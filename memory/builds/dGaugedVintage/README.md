@@ -2,7 +2,6 @@
 slug: dGaugedVintage
 node: d
 opened: 2026-09-01
-status: OPEN
 streams: deployer
 roster: DEPL
 ids: DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11
@@ -13,18 +12,18 @@ ids: DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGau
 ## The problem this build exists to solve
 
 The owner asked whether an inbound adoption audit from `d41ly/incms` yields fixes that would
-simplify updating or adopting this repo's kits. Answering it needs the document's claims measured
-against THIS tree, because most of them are about the adopter's own fork. Eleven real defects came
-out; nine were unrecorded. The evidence is
+simplify updating or adopting this repo's kits. Answering it needed the document's claims measured
+against THIS tree, because most are about the adopter's own fork. Eleven real defects came out; nine
+were unrecorded. The evidence is
 [the triage](build/2026-09-01-build-dGaugedVintage-1-incms-dossier-triage.md), which cites this tree
-rather than the document's. This build authors no product change and no spec.
+rather than the document's. Each defect now carries a spec; none is built.
 
 ## Expected improvements
 
-- The next session reads eleven cited defects instead of re-deriving a cross-repo comparison by hand.
+- Eleven cited defects arrive specced, so the next session builds rather than re-deriving.
 - `DEPL-dGaugedVintage-8` names why the mechanical update path did not answer: it leaves half the
   adopter's receipt ungraded and moves the anchor anyway.
-- Six wrong claims about this tree stop propagating into a third dossier.
+- Seven wrong claims about this tree stop propagating into a third dossier.
 
 ## Detriments if this is not built
 
@@ -34,9 +33,11 @@ rather than the document's. This build authors no product change and no spec.
 
 ## Build-level rules
 
-**No product change.** No edit to `govkit.py`, to any `kit.toml`, to the runbook, or to a gate leg.
-Each of the eleven is a follow-up unit, and the two wanting new assertions owe a failing case
-observed before they land.
+**Specs only, no product change yet.** Nothing under `tools/` is edited by this build. Every unit
+that adds an assertion carries an acceptance criterion requiring its failing case OBSERVED before it
+lands, because a gate seen only to pass asserts nothing. Build order is the `order` verb on each
+spec, rendered into the region below; `-4` and `-5` share a mechanism and an order, as do `-1`/`-9`
+and `-10`/`-11`.
 
 **The inbound document is not carried in.** It cites 43 rooted-looking paths and 34 name files
 absent here. `DEAD_PATH_PIN` is `0` and hygiene check 15 demands set equality against an empty
@@ -65,28 +66,60 @@ document scopes as a pull.
 
 <!-- roster:units -->
 
-*No unit is planned under this build; its output is eleven backlog rows and the triage record.*
+| # | Unit | Status | Mechanism |
+|---|---|---|---|
+| 1 | `DEPL-dGaugedVintage-8` | OPEN | a way out of `unattributed`, and a stamp that cannot outrun it |
+| 2 | `DEPL-dGaugedVintage-3` | OPEN | a default kit stops reporting adopted while landing no program |
+| 3 | `DEPL-dGaugedVintage-4` | OPEN | derive each kit's marker population, assert every site |
+| 4 | `DEPL-dGaugedVintage-5` | OPEN | the four kits carrying no marker gain one |
+| 5 | `DEPL-dGaugedVintage-1` | OPEN | `selfcheck` asserts the version constant actually ships |
+| 6 | `DEPL-dGaugedVintage-9` | OPEN | report the per-kit version delta the receipt already stores |
+| 7 | `DEPL-dGaugedVintage-10` | OPEN | refuse to measure from a gov checkout stale against its remote |
+| 8 | `DEPL-dGaugedVintage-11` | OPEN | the relocate rung survives a kit that fans out |
+| 9 | `DEPL-dGaugedVintage-7` | OPEN | the prefix ratchet counts literals, not lines |
+| 10 | `DEPL-dGaugedVintage-6` | OPEN | drift-audit's install block stops contradicting itself |
+| 11 | `DEPL-dGaugedVintage-2` | OPEN | fifteen backlog rows reconciled against their CLOSED specs |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-09-01 · streams deployer
+**Build status:** OPEN · 11 unit(s) · node d · opened 2026-09-01 · streams deployer
 ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [DEPL-dGaugedVintage-8 — a way out of `unattributed`, and a stamp that cannot outrun it](spec/2026-09-01-spec-DEPL-dGaugedVintage-8.md) | 1 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-3 — a default kit must not report adopted while landing no program](spec/2026-09-01-spec-DEPL-dGaugedVintage-3.md) | 2 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-4 — derive each kit's marker population, and assert every site in it](spec/2026-09-01-spec-DEPL-dGaugedVintage-4.md) | 3 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-5 — four kits an adopter cannot read a version out of](spec/2026-09-01-spec-DEPL-dGaugedVintage-5.md) | 3 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-1 — a version constant an adopter never receives](spec/2026-09-01-spec-DEPL-dGaugedVintage-1.md) | 4 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-9 — report the per-kit version delta the receipt already stores](spec/2026-09-01-spec-DEPL-dGaugedVintage-9.md) | 4 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-10 — a stale measurer reports every row current](spec/2026-09-01-spec-DEPL-dGaugedVintage-10.md) | 5 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-11 — the relocate rung goes quiet exactly where a kit fans out](spec/2026-09-01-spec-DEPL-dGaugedVintage-11.md) | 5 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-7 — a ratchet that counts lines cannot see a swapped literal](spec/2026-09-01-spec-DEPL-dGaugedVintage-7.md) | 6 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-2 — fifteen rows that outlived their specs](spec/2026-09-01-spec-DEPL-dGaugedVintage-2.md) | 7 | 1 | OPEN | rev-1 | 2026-09-01 |
+| [DEPL-dGaugedVintage-6 — an install block whose second line cannot run](spec/2026-09-01-spec-DEPL-dGaugedVintage-6.md) | 7 | 1 | OPEN | rev-1 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `DEPL-dGaugedVintage-8` | no |
+| 2 | `DEPL-dGaugedVintage-3` | no |
+| 3 | `DEPL-dGaugedVintage-4`, `DEPL-dGaugedVintage-5` | yes |
+| 4 | `DEPL-dGaugedVintage-1`, `DEPL-dGaugedVintage-9` | yes |
+| 5 | `DEPL-dGaugedVintage-10`, `DEPL-dGaugedVintage-11` | yes |
+| 6 | `DEPL-dGaugedVintage-7` | no |
+| 7 | `DEPL-dGaugedVintage-2`, `DEPL-dGaugedVintage-6` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

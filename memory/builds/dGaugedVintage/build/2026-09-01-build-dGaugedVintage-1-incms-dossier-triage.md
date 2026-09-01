@@ -30,9 +30,20 @@ gives up on — which is the defect, not a discrepancy in the count.
 - **`-8` — half the receipt is never graded, and the anchor moves anyway.** `update` short-circuits
   any row whose evidence is `unattributed` (`tools/govkit/govkit.py:5529`): it tallies, prints and
   `continue`s *before* `classify_row`. Meanwhile `--write` re-stamps
-  `receipt["gov_commit"] = to_commit` (`:6204`) regardless. Rows attributable at the receipt's own
-  vintage stay ungraded permanently, and each write moves them further from a base that could
-  attribute them. This is why a five-lens manual audit happened where a verb should have answered.
+  `receipt["gov_commit"] = to_commit` (`:6204`) regardless.
+
+  **The skip itself is DESIGNED and ratified**, not an oversight —
+  `memory/builds/dCarriedReceipt/spec/2026-08-24-spec-DEPL-dCarriedReceipt-13.md:319` and that
+  unit's acceptance ledger both state it: a row matching no gov vintage records
+  `evidence: "unattributed"` with neither `commit` nor `gov_oid`, and a following `update` prints it,
+  writes zero bytes and never reaches `classify_row`. That is the safe choice, because writing gov's
+  bytes over a row with no known base is the destructive case.
+
+  What is missing is a way OUT of that state. Nothing re-attempts attribution on a stored
+  `unattributed` row, and `--write` moves `gov_commit` forward regardless — so the base that might
+  have attributed the row recedes with every run. A live read-only `adopt --re-adopt` walk does
+  attribute rows the stored field gives up on, which is the evidence that the state is escapable and
+  simply has no path. This is why a five-lens manual audit happened where a verb should have answered.
 - **`-3` — `memory-recall` lands no working program.** A registry DEFAULT
   (`tools/govkit/registry.toml:36`) whose `query.py` is `role = "forked"`
   (`tools/memory-recall/kit.toml:77`), which `LANDABLE_ROLES` excludes (`govkit.py:236`). `apply`
