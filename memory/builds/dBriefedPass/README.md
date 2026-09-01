@@ -5,7 +5,7 @@ opened: 2026-09-01
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 TOOL-dBriefedPass-6 TOOL-dBriefedPass-7 TOOL-dBriefedPass-8
+ids: TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 TOOL-dBriefedPass-6 TOOL-dBriefedPass-7 TOOL-dBriefedPass-8 TOOL-dBriefedPass-9
 ---
 
 # dBriefedPass — the harness that orders a build's passes, and the refusal that makes the order real
@@ -76,7 +76,7 @@ Each carries its options and the reason it was refused in `RUN.md`. `TOOL-dBrief
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 5 unit(s) · node d · opened 2026-09-01 · streams tooling
-ids TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 TOOL-dBriefedPass-6 TOOL-dBriefedPass-7 TOOL-dBriefedPass-8
+ids TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 TOOL-dBriefedPass-6 TOOL-dBriefedPass-7 TOOL-dBriefedPass-8 TOOL-dBriefedPass-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
