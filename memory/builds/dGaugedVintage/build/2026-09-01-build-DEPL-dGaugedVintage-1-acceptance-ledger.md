@@ -12,10 +12,10 @@
   land`.
 - AC3 — `tools/govkit/govkit.py` — the ten `version_from.none` entries never reach the arm: check 5
   `continue`s on the `none` branch several lines above it, so the arm has no opinion about them.
-- AC4 — RED OBSERVED, and this is the whole point of the unit: the arm is GREEN over today's tree,
-  so without a staged break it would be an assertion about nothing. The break was restored from a
-  file copy rather than `git checkout --`, which had already reverted an unstaged change once in
-  this build.
+- AC4 — `python tools/govkit/govkit.py selfcheck` — RED OBSERVED, which is the whole point: the arm
+  is GREEN over today's tree, so without a staged break it would be an assertion about nothing. The
+  break was restored from a file copy rather than `git checkout --`, which had already reverted an
+  unstaged change once in this build.
 
 ## What this ledger does not claim
 
