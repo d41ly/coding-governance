@@ -49,7 +49,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.9' // gov:kit agent-cap@1.9 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.10' // gov:kit agent-cap@1.10 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -67,8 +67,47 @@ function readStdin() {
 // Template literals (backticks) are left ALONE — they can hold real ${code}.
 // Escapes handled; an unbalanced quote (e.g. inside a comment) is left as-is.
 // Run BEFORE the line-comment strip so a `//` inside a string can't truncate it.
+const LITERAL_OPENERS = new Set([
+  'return', 'case', 'throw', 'typeof', 'instanceof', 'new', 'delete', 'void', 'yield', 'await', 'else',
+])
+
+function checkLiteralOpen(line, i) {
+  let p = i - 1
+  while (p >= 0 && (line[p] === ' ' || line[p] === '\t')) p--
+  if (p < 0) return true
+  if (!/[A-Za-z0-9_$)\]\\]/.test(line[p])) return true
+  const word = /([A-Za-z_$][\w$]*)$/.exec(line.slice(0, p + 1))
+  return word !== null && LITERAL_OPENERS.has(word[1])
+}
+
+function resolveLiteralEnd(line, i) {
+  if (!checkLiteralOpen(line, i)) return -1
+  const q = line[i]
+  let e = i + 1
+  while (e < line.length && line[e] !== q) e += line[e] === '\\' ? 2 : 1
+  return e < line.length ? e : -1
+}
+
 function stripStrings(line) {
-  return line.replace(/'(?:\\.|[^'\\])*'/g, "''").replace(/"(?:\\.|[^"\\])*"/g, '""')
+  let out = ''
+  let i = 0
+  while (i < line.length) {
+    const ch = line[i]
+    if (ch === '`') {
+      let e = i + 1
+      while (e < line.length && line[e] !== '`') e += line[e] === '\\' ? 2 : 1
+      if (e < line.length) { out += line.slice(i, e + 1); i = e + 1; continue }
+      out += ch; i++; continue
+    }
+    if (ch === "'" || ch === '"') {
+      const e = resolveLiteralEnd(line, i)
+      if (e >= 0) { out += ch + ch; i = e + 1; continue }
+      out += ch; i++; continue
+    }
+    out += ch
+    i++
+  }
+  return out
 }
 
 function offendingLines(script) {
@@ -304,11 +343,9 @@ function renderCodeView(script) {
           // and any fan-out sitting on it went too, ADMITTING a script the shipped hook DENIES.
           // The measured case is an apostrophe inside a regex literal, /won't/. `stripStrings`
           // needs a matching PAIR before it blanks anything, and so does this now.
-          const q = ch
-          let e = i + 1
-          while (e < raw.length && raw[e] !== q) e += raw[e] === '\\' ? 2 : 1
-          if (e >= raw.length) { res += ch; i++; continue }
-          res += q + q
+          const e = resolveLiteralEnd(raw, i)
+          if (e < 0) { res += ch; i++; continue }
+          res += ch + ch
           i = e + 1
           continue
         }
@@ -612,12 +649,10 @@ function blankLiterals(script) {
         if (two === '/*') { mode = 'block'; i += 2; continue }
         if (ch === '`') { mode = 'tmpl'; res += '`'; i++; continue }
         if (ch === "'" || ch === '"') {
-          res += ch
-          const q = ch
-          i++
-          while (i < raw.length && raw[i] !== q) i += raw[i] === '\\' ? 2 : 1
-          res += q
-          i++
+          const e = resolveLiteralEnd(raw, i)
+          if (e < 0) { res += ch; i++; continue }
+          res += ch + ch
+          i = e + 1
           continue
         }
         res += ch

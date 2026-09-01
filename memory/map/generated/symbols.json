@@ -523,6 +523,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "checkLiteralOpen",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkUnderRoot",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2381,6 +2386,11 @@
       "id": "resolveHomeRoots",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveLiteralEnd",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "resolveRealPath",

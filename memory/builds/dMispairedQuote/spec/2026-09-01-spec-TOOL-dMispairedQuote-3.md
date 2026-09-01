@@ -1,6 +1,6 @@
 # TOOL-dMispairedQuote-3 — every rule is evaluated over both views, so no denial can be lost
 
-**Status:** OPEN · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 2
+**Status:** OPEN · rev-4 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round2.md) | spec-audit | — |
+| [2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round3.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -42,6 +43,9 @@ mechanism alone. This unit makes the change monotone in the DENY direction by co
 - **S4** — The merge keys on `n` **and on `why`**, not on `n` alone: `capFindings` can push more than
   one finding for a single line, and keying on the line number alone drops the second. Rule 1's
   finding shape is `{ line, n }` with no `why` at all, which the key handles as the empty string.
+  **ORDER: the lexed pass's findings first, in their own order, then any shipped-pass finding whose
+  key is new.** Every caller slices the first six for its message, so the order decides which six an
+  operator reads, and the lexed pass is the one whose view is correct.
 - **S5** — All FOUR rule call sites route through `runBothViews`: `offendingLines` (rule 1),
   `fanoutFindings` (rule 2), `capFindings` (rule 3) and `scanJoinFindings` (rule 5, the
   ref-keyed-join ban). Rule 5's call site is NOT wrapped in the `ONLY === null` guard the other three
@@ -56,7 +60,8 @@ mechanism alone. This unit makes the change monotone in the DENY direction by co
   ratchet nobody tightens is a ratchet that has stopped ratcheting.
 - **S7** — Mirror every byte into `.claude/hooks/agent-cap.js`.
 - **S8** — A regression arm per reproduced shape, each staged RED against unit 1 WITHOUT this unit:
-  the backtick-inside-a-regex script above a multi-line cap-50 call (rule 3); the regex-borne `)` on
+  the backtick-inside-a-regex script above a multi-line cap-50 call (rule 2, per AC1's measurement —
+  `main()` reaches `fanoutFindings` before `capFindings`); the regex-borne `)` on
   a multi-line call's argument line (rule 3); the `//` inside a quoted span inside a same-line
   template above a raw `parallel(` (rule 1); and an `agent(` fan whose receiver is hidden the same
   way (rule 2). Rule 5 gets one too, so no rule is covered only by the property.
@@ -66,13 +71,18 @@ mechanism alone. This unit makes the change monotone in the DENY direction by co
   contains its own subset", which is true of any merge and is this repo's
   assertion-between-two-derived-values class. In a tree where that blob does not resolve — an
   adopter that copy-installed the kit — the arm ANNOUNCES A SKIP naming why, rather than passing.
-  **Its population is the tracked corpus PLUS a shipped fixture set**, and the second half is not
-  padding: measured, unit 1 alone flips ZERO tracked files from DENY to ADMIT, because every one of
-  the three reproduced shapes is a synthetic script and none of them is committed here. A property
-  arm whose population contains no instance of the class it guards can only ever pass, which is §7's
-  own could-not-fail shape and was round 2's second blocker. The fixtures live under a directory the
-  arm globs, so adding a shape adds a case; the three reproductions of §4 seed it, and the corpus
-  half stays because it is what catches a shape nobody thought of.
+  **Its population is the tracked corpus PLUS a fixture set**, and the second half is not padding:
+  measured, unit 1 alone flips ZERO tracked files from DENY to ADMIT, because every one of the three
+  reproduced shapes is a synthetic script and none of them is committed here. A property arm whose
+  population contains no instance of the class it guards can only ever pass, which is §7's own
+  could-not-fail shape and was round 2's second blocker.
+  **The fixtures are HEREDOCS inside `agent-cap.test.sh`, not tracked files under `tools/hooks/`.**
+  Round 3 staged a probe file there and ran `govkit selfcheck`: check 7i FAILED by name, because that
+  home is non-flat and every tracked file under it must be claimed by a `kit.toml` rule. A fixture
+  directory would therefore have redded the ordinary bar, and the leg carries no guard. Heredocs are
+  the suite's own idiom — its `js()` helper already takes one — they add no surface for `kit.toml` to
+  claim, and adding a shape is adding a heredoc. The corpus half stays because it is what catches a
+  shape nobody thought of.
 - **S10** — A byte arm: each `renderShipped*` body equals the corresponding function in the BASE
   blob, so "verbatim" is checked rather than asserted. Same blob, same skip rule.
 
@@ -187,20 +197,30 @@ the S9 fixture directory beside it · `.lexicon.conf` (the pin falls to 461) ·
 - **AC7** — When each `renderShipped*` body is compared byte-for-byte with its counterpart in the
   BASE blob, they are equal.
 - **AC8** — When `bash tools/hooks/agent-cap.test.sh` runs, it reports 0 failed and a pass count
-  STRICTLY GREATER than 105, the count measured at BASE. A unit adding S8's five arms plus S9 and S10
-  cannot leave the count where it was, and a floor of "at least 105" would be satisfied by arms that
-  never got wired — which is the green-by-absence class this repo gates elsewhere.
-- **AC9** — When `python tools/lexicon/lexicon.py --check` runs, `P1 verb` reports `offenders=461`
-  and `VERB_OFFENDER_PIN` in `.lexicon.conf` reads `461`, so the leg is green with no headroom this
-  unit did not earn.
+  STRICTLY GREATER than the count the same suite reports with unit 1 alone. That count is measured
+  and written into `memory/builds/dMispairedQuote/build/` when unit 1 lands, and this criterion reads
+  it from there. A bar of "strictly greater than 105" is unit 1's AC7 verbatim, and unit 1 is order
+  1 — so it is already satisfied before this unit adds an arm, which is the green-by-absence class
+  this repo gates elsewhere and was round 3's second high.
+- **AC9** — When `python tools/lexicon/lexicon.py --check` runs, `P1 verb` reports an `offenders`
+  count STRICTLY BELOW the 463 measured at BASE, `VERB_OFFENDER_PIN` in `.lexicon.conf` equals that
+  reported count exactly, and the leg exits 0. **The number is read off the tool at build time and
+  written into the conf, never predicted into this spec.** Two predictions have now disagreed — 461
+  measured here against 459 derived as 463 minus four drainable rows — and the disagreement is
+  itself the argument: a count of a derived population does not belong in prose, which is this
+  repo's own rule and the one this criterion kept breaking.
 - **AC10** — When each arm from S8, the property arm from S9 **and** the byte arm from S10 is staged
   against a tree carrying unit 1 WITHOUT this unit, it FAILS. All three, not the fixtures alone: a
   class-level guard that has never been observed RED is §7's own could-not-fail shape, and S10's arm
   goes RED by mutating one byte of a `renderShipped*` body. Each observation is recorded under
   `memory/builds/dMispairedQuote/build/`.
-- **AC12** — When `grep -n 'stripStrings\|blankLiterals' tools/hooks/agent-cap.js` runs, it reports
-  nothing: S2's rename is total, and a surviving occurrence means a rule still reads a view name this
-  unit believed it had replaced.
+- **AC12** — When `grep -nE '(^|[^A-Za-z0-9_$])(stripStrings|blankLiterals)\s*[(=]' tools/hooks/agent-cap.js`
+  runs, it reports nothing. **CODE occurrences only** — a definition or a call. The two tokens
+  survive in COMMENTS and must: nine of the sixteen occurrences at BASE are prose, and one of them
+  sits at `:305`, inside the `renderCodeView` body S1 freezes verbatim and AC7 byte-compares. Rev-3
+  asked for a zero-occurrence grep, which round 3 showed AC7 and AC12 could not both satisfy. The
+  comment at `:305` is `TOOL-dMispairedQuote-2`'s to rewrite, and unit 2 is sequenced after this one
+  precisely so it edits prose whose code has stopped moving.
 - **AC11** — When the BASE blob does not resolve, the property and byte arms print a line matching
   `skip ` that names the missing blob, and `bash tools/hooks/agent-cap.test.sh` reports 0 failed.
 
@@ -209,7 +229,9 @@ the S9 fixture directory beside it · `.lexicon.conf` (the pin falls to 461) ·
 - `agent-cap self-test` — held off an ordinary bar; run it directly and with `GATE_SELFTESTS=1` at
   the Definition of Done. Declared ceiling 740 s; measured 161 s with S9 added.
 - `verifier fan-out` · `agent-cap restatement` · `lexicon naming predicates` ·
-  `kit version markers` · `codebase-map coverage + freshness`.
+  `kit version markers` · `codebase-map coverage + freshness` · **`govkit selfcheck`** and the
+  **review-join ban**, both `subject = repo` with no guard, so both run on an ordinary bar and
+  neither was listed before round 3.
 - `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at the push boundary.
 
 ## 8. Open questions
@@ -220,6 +242,17 @@ none
 
 - rev-1 · 2026-09-01 · initial draft. Promoted from unit 1's spec-audit round 2 NON-CONVERGENT exit,
   blockers 1, 8 and 17, per BUILD-METHOD M4.
+- rev-4 · 2026-09-01 · folded spec-audit round 3, which held at 2 blockers against a ceiling of 2 and
+  therefore exited NON-CONVERGENT. Per BUILD-METHOD M4 the loop STOPPED and both blockers were
+  disposed as FOLDS — neither needed a mechanism this build lacks, and the review said so. Each was
+  the repair that had closed one of round 2's: AC12's zero-occurrence grep could not coexist with
+  AC7's byte freeze, because a frozen body carries the old name in a comment, so AC12 now scopes to
+  CODE occurrences; and S9's fixture DIRECTORY would have redded `govkit selfcheck` check 7i, which
+  round 3 reproduced by staging a probe file, so the fixtures are heredocs in the suite instead. The
+  two highs: AC8's floor was unit 1's floor and unit 1 lands first, so it now reads against a count
+  measured when unit 1 lands; and AC9 stops predicting a number at all, which is the rule two
+  predictions had already broken. The two mediums: the merge ORDER is stated, and S8's stale rule-3
+  label follows AC1's measurement.
 - rev-3 · 2026-09-01 · folded spec-audit round 2 over this unit: 2 blockers, 4 highs, 2 mediums, a
   strictly falling count from 5. Both blockers were the two bug classes this diff selects. S2's
   "no rule function changes at all" was untrue and was the load-bearing half of the dispatcher

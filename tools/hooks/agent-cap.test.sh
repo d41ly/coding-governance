@@ -911,5 +911,123 @@ js "renderCodeView: a raw primitive inside a block comment still denies (fail-cl
 const r = await parallel(D.map((d) => () => agent(d.p)))
 EOF
 
+
+# ---- TOOL-dMispairedQuote-1: a quote pairs with the WRONG partner ---------------------------------
+# Every arm below was staged RED against the tip before it landed. The defect: each of this file's
+# string views pairs a quote with the next quote of the same kind on the line, so an apostrophe in
+# prose earlier on that line pairs with the quote opening `agent('a'` and the span blanked between
+# them carries the fan-out. `addc6169` already demanded a matching PAIR; a pair exists, and it is the
+# wrong one. The construct holding the apostrophe is not the mechanism -- these arms carry a regex, a
+# double-quoted string, a block comment and a template literal, and the shipped hook admitted all
+# four. The CONTROL beside each is the same line with the apostrophe removed.
+
+js "mispaired quote: regex literal shares the fan-out line -> deny" 2 <<'EOF'
+const re = /won't/
+const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: SAME LINE is the load-bearing part -> deny" 2 <<'EOF'
+const re = /won't/; const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: control, same line without the apostrophe -> deny" 2 <<'EOF'
+const re = /wont/; const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: apostrophe in a DOUBLE-quoted string -> deny" 2 <<'EOF'
+const s = "don't"; const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: apostrophe in a BLOCK COMMENT -> deny" 2 <<'EOF'
+/* don't */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: apostrophe in a TEMPLATE literal -> deny" 2 <<'EOF'
+const s = `don't`; const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: LOOSE apostrophe opening a word -> deny" 2 <<'EOF'
+/* run 'em */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: rule 2 counter loses the agent( -> deny" 2 <<'EOF'
+const re = /won't/; const r = await boundedParallel(all.map((f) => () => agent('x')), 5)
+EOF
+
+js "mispaired quote: rule 2 control, no apostrophe -> deny" 2 <<'EOF'
+const re = /wont/; const r = await boundedParallel(all.map((f) => () => agent('x')), 5)
+EOF
+
+js "mispaired quote: rule 3 loses a declared cap of 50 -> deny" 2 <<'EOF'
+const B = ['a','b']
+const re = /won't/; const r = await boundedParallel(B.map((x) => () => agent('x')), 50)
+EOF
+
+js "mispaired quote: rule 3, an unpaired double quote swallows the bound -> deny" 2 <<'EOF'
+const B = ['a','b']
+const c = x === 5"; const r = await boundedParallel(B.map((x) => () => agent(x)), 50)
+EOF
+
+# Rule 5, the ref-keyed-join ban, is defeated by the same apostrophe and nobody had named it. Both
+# of these ADMIT at the tip and deny after.
+js "mispaired quote: rule 5 join hidden by an apostrophe -> deny" 2 <<'EOF'
+const re = /won't/; m.get(f.ref); const s = 'x'
+EOF
+
+js "mispaired quote: rule 5 verdictByRef hidden by an apostrophe -> deny" 2 <<'EOF'
+const re = /won't/; const verdictByRef = {}; const s = 'x'
+EOF
+
+js "mispaired quote: rule 5 control, no apostrophe -> deny" 2 <<'EOF'
+const re = /wont/; m.get(f.ref); const s = 'x'
+EOF
+
+# ---- and the ADMIT direction, which is half the class -------------------------------------------
+# A fixture group that only ever asserts denials cannot catch a fail-closed that has become a
+# fail-open. Each of these passes at the tip and must keep passing.
+
+js "mispaired quote: a legal log() with a contraction in its trailing comment -> allow" 0 <<'EOF'
+log('parallel(') // we don't allow it
+EOF
+
+js "mispaired quote: return + a string naming a primitive -> allow" 0 <<'EOF'
+function f() { return 'parallel (nope)' }
+await boundedParallel([() => agent(1)], 5)
+EOF
+
+js "mispaired quote: case + a string naming a primitive -> allow" 0 <<'EOF'
+switch (x) { case 'parallel (nope)': break }
+await boundedParallel([() => agent(1)], 5)
+EOF
+
+js "mispaired quote: throw + a string naming a primitive -> allow" 0 <<'EOF'
+if (x) throw 'pipeline (nope)'
+await boundedParallel([() => agent(1)], 5)
+EOF
+
+js "mispaired quote: aLexedStripper-5's own fixture stays legal -> allow" 0 <<'EOF'
+const SEP = /[`]/
+const all = ['a','b']
+await boundedParallel(all.map((x) => () => agent(x)), 5)
+EOF
+
+# ---- the keyword clause, fixtured over its DECLARED SET rather than sampled ----------------------
+# `checkLiteralOpen` admits a quote as an opener after a JS keyword, because `return 'x'` is ordinary
+# code. Eleven keywords are declared and each is also an English word, so `/* <keyword> 'em */`
+# mispairs for every member: a STATED residual, one arm per member so the leak is recorded rather
+# than assumed away, and none of them a regression -- all eleven ADMIT at the tip too. The three
+# connectives dropped from the set are the CONTROL: they deny.
+for kw in return case throw typeof instanceof new delete void yield await else; do
+  js "keyword residual: /* $kw 'em */ above a raw parallel( -> allow (stated residual)" 0 <<EOF
+/* $kw 'em */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+done
+
+for kw in in of do run one; do
+  js "keyword control: /* $kw 'em */ is not a declared opener -> deny" 2 <<EOF
+/* $kw 'em */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+done
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]
