@@ -6,8 +6,10 @@ description: Start, resume, or close a run that will merge and push with NO owne
 
 # Unattended runs
 
-The binding contract is `{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md`. This is the operating
-summary; where they differ, the protocol wins and the difference is a bug in this render.
+The binding contract is `{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md` TOGETHER WITH
+`{{MEMORY_ROOT}}/guides/UNATTENDED-VERBS.md`, which holds the verb entries and is the second half of
+the same contract rather than a reference beside it. This is the operating summary; where they
+differ, the contract wins and the difference is a bug in this render.
 
 **The one thing to understand first.** An unattended run does not remove the checkpoint before a
 merge and a push — it REPLACES it with something a machine can check. If the replacement is not

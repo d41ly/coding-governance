@@ -1247,17 +1247,43 @@ fi
 # ---- who did not write it.
 SHIP="$HERE/PROTOCOL.template.md"
 LIVEDOC="$M/guides/UNATTENDED-PROTOCOL.md"
+VERBSHIP="$HERE/VERBS.template.md"
+VERBDOC="$M/guides/UNATTENDED-VERBS.md"
 KITREL=${HERE#"$(cd "$ROOT" && pwd)"/}
 PREFIX=${KITREL%/*}; [ "$PREFIX" = "$KITREL" ] && PREFIX="" || PREFIX="$PREFIX/"
-if [ -f "$SHIP" ] && [ -f "$LIVEDOC" ]; then
-  if [ -n "$PREFIX" ]; then nl=$(sed -e 's/\r$//' -e "s|$PREFIX||g" "$LIVEDOC"); else nl=$(sed -e 's/\r$//' "$LIVEDOC"); fi
-  ns=$(sed -e 's/\r$//' "$SHIP")
-  if [ "$nl" != "$ns" ]; then
-    fail 10 "the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on: $SHIP vs $LIVEDOC"
-    diff <(printf '%s\n' "$nl") <(printf '%s\n' "$ns") | head -10 | sed 's/^/    /'
-  fi
-elif [ ! -f "$SHIP" ] || [ ! -f "$LIVEDOC" ]; then
+# ---- TWO PAIRS as of TOOL-dFoldedVerdict-5, iterated rather than copied. The second exists because
+# ---- the protocol had reached its byte cap EXACTLY and section 7 moved out to make the contract
+# ---- amendable again. A ROW here and not a new check number: this check already carries the
+# ---- both-halves refusal the second pair needs, so a new number would only have to be added
+# ---- everywhere check numbers are enumerated. The pair NAME is a parameter because with one message
+# ---- for both pairs a reader has to open the paths to learn which half of the kit drifted.
+# ---- The COMPARISON is shared and the MESSAGES are not, which is deliberate rather than clumsy.
+# ---- `check-arms.py` arms a branch by finding a test assertion that names the branch's own failure
+# ---- text, and its signature is the longest LITERAL run between interpolations. A message reading
+# ---- "the shipped $1 ... drifted" therefore has no assertable literal at all — every arm for it
+# ---- would have to name a `$1` no run ever emits. So each pair states its own sentence.
+_c10_cmp() { # shipped half · installed half -> 0 identical · 1 drifted · 2 a half is missing
+  [ -f "$1" ] && [ -f "$2" ] || return 2
+  if [ -n "$PREFIX" ]; then nl=$(sed -e 's/\r$//' -e "s|$PREFIX||g" "$2"); else nl=$(sed -e 's/\r$//' "$2"); fi
+  ns=$(sed -e 's/\r$//' "$1")
+  [ "$nl" = "$ns" ]
+}
+_c10_cmp "$SHIP" "$LIVEDOC"; _c10rc=$?
+if [ "$_c10rc" -eq 2 ]; then
   fail 10 "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail: $SHIP / $LIVEDOC"
+elif [ "$_c10rc" -ne 0 ]; then
+  fail 10 "the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on: $SHIP vs $LIVEDOC"
+  diff <(printf '%s\n' "$nl") <(printf '%s\n' "$ns") | head -10 | sed 's/^/    /'
+fi
+# ---- THE SECOND PAIR, added when TOOL-dFoldedVerdict-5 moved section 7 out of a protocol that had
+# ---- reached its byte cap exactly. A row here and not a new check number: this check already owns
+# ---- the both-halves refusal the second pair needs.
+_c10_cmp "$VERBSHIP" "$VERBDOC"; _c10rc=$?
+if [ "$_c10rc" -eq 2 ]; then
+  fail 10 "one half of the verb-carrier pair is missing, and a parity check with one file is a check that cannot fail: $VERBSHIP / $VERBDOC"
+elif [ "$_c10rc" -ne 0 ]; then
+  fail 10 "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on: $VERBSHIP vs $VERBDOC"
+  diff <(printf '%s\n' "$nl") <(printf '%s\n' "$ns") | head -10 | sed 's/^/    /'
 fi
 
 # ---- 16: the INSTALLED protocol describes the rotation it is the rules for. Check 10 above cannot
@@ -2029,8 +2055,14 @@ else
   _c26_drv=$'
 '$(cat "$DRIVER")$'
 '
-  _c26_ship=""; [ -f "$SHIP" ] && _c26_ship=$'
-'$(cat "$SHIP")$'
+  # ---- THE CONTRACT ARM READS THE VERB CARRIER AND NOTHING ELSE (TOOL-dFoldedVerdict-5). Accepting
+  # ---- a hit in either that file or the protocol would pass a HALF-COMPLETED move — the state that
+  # ---- leaves the verbs in both places — so the fallback is deliberately absent. A missing carrier
+  # ---- is its own named refusal and not a skipped arm: a guard of the form `[ -f X ] && read X`
+  # ---- with no else is the shape check 10's own header calls a check that cannot fail.
+  [ -f "$VERBSHIP" ] || fail 26 "the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence: $VERBSHIP"
+  _c26_ship=""; [ -f "$VERBSHIP" ] && _c26_ship=$'
+'$(cat "$VERBSHIP")$'
 '
   _c26_tmpl=""; [ -f "$tmpl" ] && _c26_tmpl=$(cat "$tmpl")
   for v in $VERBS_ALL; do
@@ -2041,11 +2073,11 @@ else
 '*) : ;;
       *) fail 26 "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks: $v in $DRIVER" ;;
     esac
-    if [ -f "$SHIP" ]; then
+    if [ -f "$VERBSHIP" ]; then
       case "$_c26_ship" in
         *$'
 '"- "?"$v"?" — "*) : ;;
-        *) fail 26 "a declared verb has no entry in the protocol's verb section, so the contract a run is measured against does not describe a verb that run can call: $v in $SHIP" ;;
+        *) fail 26 "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call: $v in $VERBSHIP" ;;
       esac
     fi
     if [ -f "$tmpl" ]; then

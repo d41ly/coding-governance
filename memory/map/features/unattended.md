@@ -24,13 +24,13 @@ gotcha-classes = ["text-mode-read-eats-a-bare-cr.md",
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
 ]
-guides = ["UNATTENDED-PROTOCOL.md"]
+guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md"]
 backlog-shards = []
 lexicon-verbs = []
 [paths]
 globs = [
   "tools/unattended/*",
-  "memory/guides/UNATTENDED-PROTOCOL.md",
+  "memory/guides/UNATTENDED-*.md",
   ".unattended.conf",
 ]
 ```
@@ -218,8 +218,7 @@ core sets are not editable from the project layer.
 
 *Re-derived 2026-08-20 against the tree rather than carried forward. The authored region
 carries twelve facts — it said seven here, and eleven in the protocol pair, and five in the driver's own
-resume comment, all at the same time. Three carriers, three values, none of them counted by any gate:
-that is what an ungated count does, and it is why the unit that added the twelfth fact enumerated the
+resume comment, all at the same time. Three carriers, three values, none of them counted by any gate, which is why the unit that added the twelfth fact enumerated the
 carriers by path rather than trusting a builder to find them. Dossier prose is ungated — only the
 claims tables above are — so this section rots silently and is worth re-deriving whenever the feature
 is touched.*

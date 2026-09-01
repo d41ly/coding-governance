@@ -834,6 +834,16 @@ hit "$out" "drifted line"
 reset_tree; rm -f $KIT_REL/PROTOCOL.template.md
 hit "$(run)" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
 
+# ---- check 10, THE SECOND PAIR. TOOL-dFoldedVerdict-5 moved the verb entries into their own
+# ---- byte-compared carrier because the protocol had reached its cap exactly. A pair added without
+# ---- its own two arms is a pair nothing watches, and the check would still report green.
+reset_tree; printf '\ndrifted line\n' >> memory/guides/UNATTENDED-VERBS.md
+out=$(run)
+hit "$out" "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
+hit "$out" "drifted line"
+reset_tree; rm -f $KIT_REL/VERBS.template.md
+hit "$(run)" "one half of the verb-carrier pair is missing, and a parity check with one file is a check that cannot fail"
+
 # ---- check 12: the kickoff hand-back, all four states. This is the only check that reads a file
 # ---- outside the kit, and it exists because nothing else read the engine's TEXT — the manifest
 # ---- ratchet watches the project layer and the coverage gate enumerates the skill's PATH.
@@ -1912,12 +1922,20 @@ reset_tree
 reset_tree; mutate $KIT_REL/unattended.sh '/^#   unattended[.]sh --propose /d'
 hit "$(run)" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
 
-# The protocol carrier. BOTH copies, so check 10's byte-parity arm does not fire alongside and leave
-# two messages where the arm under test is one of them.
+# The VERB CARRIER, which is where the entries live after TOOL-dFoldedVerdict-5. BOTH copies, so
+# check 10's byte-parity arm does not fire alongside and leave two messages where the arm under test
+# is one of them.
 reset_tree
-mutate $KIT_REL/PROTOCOL.template.md '/^- .--propose. — writes a PROPOSAL/d'
-mutate memory/guides/UNATTENDED-PROTOCOL.md '/^- .--propose. — writes a PROPOSAL/d'
-hit "$(run)" "a declared verb has no entry in the protocol's verb section, so the contract a run is measured against does not describe a verb that run can call:"
+mutate $KIT_REL/VERBS.template.md '/^- .--propose. — writes a PROPOSAL/d'
+mutate memory/guides/UNATTENDED-VERBS.md '/^- .--propose. — writes a PROPOSAL/d'
+hit "$(run)" "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call:"
+
+# The carrier ABSENT. Its own named refusal, because the guard it replaced was `[ -f X ] && read X`
+# with no else — which skips the whole join in silence and reports a green that means nothing. This
+# arm accepts that check 10's missing-half branch speaks too: `hit` asserts the message under test is
+# PRESENT, and the alternative is a fixture that cannot reach the state at all.
+reset_tree; rm -f $KIT_REL/VERBS.template.md
+hit "$(run)" "the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence"
 
 reset_tree; mutate $KIT_REL/SKILL.template.md 's|unattended[.]sh --propose <slug>|unattended.sh --nothing <slug>|'
 hit "$(run)" "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it:"

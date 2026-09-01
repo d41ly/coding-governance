@@ -173,7 +173,8 @@
       "PLAYBOOK-TEMPLATE.md",
       "REVIEW-PROTOCOL.md",
       "SESSION-KICKOFF.md",
-      "UNATTENDED-PROTOCOL.md"
+      "UNATTENDED-PROTOCOL.md",
+      "UNATTENDED-VERBS.md"
     ],
     "backlog-shards": [
       "DEPL.md",

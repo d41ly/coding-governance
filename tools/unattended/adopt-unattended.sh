@@ -188,6 +188,12 @@ PROTO_OUT="$ROOT/$PROTO_REL"
 PBT_SHIP="$KIT_DIR/PLAYBOOK-TEMPLATE.template.md"
 PBT_REL="$MEMORY_ROOT/guides/PLAYBOOK-TEMPLATE.md"
 PBT_OUT="$ROOT/$PBT_REL"
+# the FOURTH artifact (TOOL-dFoldedVerdict-5). The protocol's section 7 moved here so a contract
+# sitting at its byte cap EXACTLY could be amended again. Copied like the two above it and for the
+# same reason: it carries no placeholder, so rendering would be a second spelling of `cat`.
+VERBS_SHIP="$KIT_DIR/VERBS.template.md"
+VERBS_REL="$MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
+VERBS_OUT="$ROOT/$VERBS_REL"
 
 # NON-ZERO on a failed substitution. A conf value carrying the s||| delimiter makes sed exit 1 while
 # the trailing `tr` still exits 0, so the adopter wrote a ZERO-BYTE Skill and --check then diffed
@@ -269,6 +275,14 @@ if [ "$MODE" = "--check" ]; then
   if ! diff -q <(tr -d '' < "$PBT_OUT") "$PBT_SHIP" >/dev/null 2>&1; then
     echo "unattended: $PBT_REL has drifted from the shipped playbook template; re-run $0"; exit 1
   fi
+  # the fourth artifact, with the same two refusals for the same reason: a reader sent to run the
+  # adopter and a reader sent to read a diff need different sentences.
+  if [ ! -f "$VERBS_OUT" ]; then
+    echo "unattended: $VERBS_REL is missing — run $0 to install the verb carrier"; exit 1
+  fi
+  if ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
+    echo "unattended: $VERBS_REL has drifted from the shipped verb carrier; re-run $0"; exit 1
+  fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0
 fi
@@ -287,6 +301,12 @@ fi
 if [ ! -f "$PBT_OUT" ] || ! diff -q <(tr -d '' < "$PBT_OUT") "$PBT_SHIP" >/dev/null 2>&1; then
   tr -d '' < "$PBT_SHIP" > "$PBT_OUT"
   echo "unattended: installed $PBT_REL"
+fi
+# the verb carrier, the same shape again. Without this the kit would ship a gate its own adopter
+# could not satisfy, which is the defect the protocol block above records having had.
+if [ ! -f "$VERBS_OUT" ] || ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
+  tr -d '' < "$VERBS_SHIP" > "$VERBS_OUT"
+  echo "unattended: installed $VERBS_REL"
 fi
 mkdir -p "$SKILL_DIR"
 TMPW=$(mktemp) || exit 2
