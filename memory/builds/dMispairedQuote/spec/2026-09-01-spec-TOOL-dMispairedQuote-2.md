@@ -1,6 +1,6 @@
 # TOOL-dMispairedQuote-2 — the carriers that describe `agent-cap.js`'s string views describe what they now do
 
-**Status:** OPEN · rev-3 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams tooling · order 3
+**Status:** INPROGRESS · rev-3 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

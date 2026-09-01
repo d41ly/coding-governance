@@ -46,6 +46,17 @@
  * pattern that causes the bursts. Ceiling: line comments AND quoted-string
  * literals are stripped before the scan; block comments naming the primitive
  * are NOT — still trips the guard (benign, fail-closed).
+ *
+ * WHAT A QUOTE IS, since three rules turn on it. A quote opens a string literal
+ * only where one may legally BEGIN (`checkLiteralOpen`): glued to the character
+ * that ends an expression it is TEXT — the apostrophe in `don't` — and so it is
+ * after a bare word that is not a JS keyword. A quote that opens nothing is left
+ * as text and its line is still blanked, EXCEPT inside a same-line template span,
+ * which is emitted whole: a quoted `'http://x'` written in one therefore survives
+ * into the line-comment strip. That channel is not closed by wording, it is
+ * bounded by the no-regression property below — every rule is evaluated over the
+ * SHIPPED views as well, and a denial from either stands, so nothing this hook
+ * denied before the quote rule changed can be admitted after it.
  */
 'use strict'
 
@@ -487,6 +498,13 @@ function boundedBranch(br, name, consts, ok) {
 // whether the scan ended inside a template literal.
 //
 // TOOL-aLexedStripper-5 — what that last flag is FOR, and what it is not. It does NOT fail closed.
+// TOOL-dMispairedQuote-1 — and the sentence below is TRUE and is NOT the explanation anyone came
+// looking for. A raw fan-out got past rule 1 whenever an apostrophe shared its line, and the regex
+// literal in the report was one of five spellings: a double-quoted `"don't"`, a block comment, a
+// backticked `don't` and loose prose all did it too. The mechanism was the APOSTROPHE, and the fix
+// is `checkLiteralOpen` above, not a regex model. What modelling regex literals would buy is
+// separate and is not built: a regex's CONTENTS supply the backtick, the `)` and the `//` that made
+// correcting the quote rule un-hide delimiters, which is why the shipped views are still evaluated.
 // This file models no regex literal (neither does `renderBlankedLiterals`), so a backtick inside `/…/`
 // opens template mode and never closes — on a LEGAL script the shipped hook admits. Denying on the
 // flag traded one false-positive class for another. Instead an unterminated scan FALLS BACK to the
@@ -512,11 +530,13 @@ function renderLexedView(script) {
         if (two === '//') break
         if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; i++; continue }
         if (ch === "'" || ch === '"') {
-          // An UNPAIRED quote is ordinary text, not a string. This used to run to end of line
-          // and then append a closer the source never had, swallowing the rest of that line --
-          // and any fan-out sitting on it went too, ADMITTING a script the shipped hook DENIES.
-          // The measured case is an apostrophe inside a regex literal, /won't/. `renderStrippedView`
-          // needs a matching PAIR before it blanks anything, and so does this now.
+          // An UNPAIRED quote is ordinary text, not a string, AND SO IS ONE WHOSE ONLY AVAILABLE
+          // PARTNER IS THE WRONG ONE. This used to run to end of line and append a closer the source
+          // never had, swallowing the rest of that line -- and any fan-out sitting on it went too.
+          // `addc6169` fixed THAT by demanding a matching PAIR, which is where it stopped: for
+          // `/won't/ ... agent('a'` a pair exists, the prose apostrophe and the quote opening the
+          // call, and blanking between them erased the `agent(` this rule counts (TOOL-dMispairedQuote-1).
+          // `resolveLiteralEnd` asks whether a literal opens here AT ALL, which a pair test cannot reach.
           const e = resolveLiteralEnd(raw, i)
           if (e < 0) { res += ch; i++; continue }
           res += ch + ch
@@ -563,6 +583,11 @@ function fanoutFindings(script) {
   // TOOL-aLexedStripper-5: an unterminated scan falls back to the per-line view, which returns
   // the verdict this hook reached before rule 2 moved. Not a fail-closed branch: that denied a
   // legal script carrying a regex literal with a backtick in it.
+  // TOOL-dMispairedQuote-1 SUPERSEDES the "returns the verdict this hook reached before" half. That
+  // record was CLOSED on the argument that this fallback IS the shipped behaviour and therefore
+  // cannot regress in either direction; the per-line view has since been re-based, so the argument
+  // no longer holds and is not the reason to trust this branch. What holds is the no-regression
+  // property: `runBothViews` evaluates this rule over the SHIPPED views too.
   const view = renderCodeView(script)
   const code = view.unterminated ? lines.map((l) => renderStrippedView(l).split('//')[0]) : view.code
 
@@ -804,6 +829,16 @@ function fanoutFindings(script) {
 // MAX_VERIFIERS is a denial. The burden is on the fan-out.
 const HELPERS = /(?<![.\w$])(boundedParallel|boundedPipeline)\s*\(/g
 
+// TOOL-dMispairedQuote-1 — the re-baselining this header's author declined is DONE, and measured.
+// The quote branch below now asks `resolveLiteralEnd` whether a literal opens at all, which removes
+// both of this branch's defects: it ran to end of line synthesizing a closer the source never had,
+// and it paired a prose apostrophe with the next quote. Rule 3 reads the BOUND through a cross-line
+// paren join, so either one hid a declared width behind an ordinary-looking comment; a cap of 50 was
+// reproduced as ADMITTED. The three dozen measured arms this header worried about all still pass,
+// and eleven more were added. The claim below that string AND template contents are gone therefore
+// holds for every span this file can RESOLVE as a literal, and a quote it cannot resolve is left as
+// text on a line that is still blanked.
+//
 // A literal-blanked view: string AND TEMPLATE contents gone, comments gone, delimiters and structure
 // kept. The per-line strip the two rules above run on cannot see a template literal spanning lines,
 // and a `(` inside a prompt string unbalances a forward paren join — which is the one mechanism this
