@@ -1,11 +1,12 @@
 # TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED
 
-**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 3
+**Status:** CLOSED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-TOOL-dBriefedPass-3-1-pass-order.md](../build/2026-09-01-build-TOOL-dBriefedPass-3-1-pass-order.md) | journal | — |
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-prompt-TOOL-dBriefedPass-3.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-3.md) | journal | — |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |

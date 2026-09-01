@@ -4475,6 +4475,59 @@ verb_dispatch() { # slug · unit · writes...
   [ "$shaped" = "$unit" ] && [ -n "$unit" ] || { local _u=${unit:-(none)}
     fail 49 "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id: $_u"; return 1; }
   [ "$#" -gt 0 ] || { fail 49 "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof: $unit"; return 1; }
+  # ------------------------------------------------------------------ TOOL-dBriefedPass-3 S1/S2
+  # THE M2 HARD FLOOR, MOVED FROM A RULE AN AGENT REMEMBERS TO A REFUSAL A MACHINE MAKES. Never
+  # build a MISSING or THIN unit is stated by the build method and was enforced by nothing: before
+  # this, `plan_state` was called at exactly two sites, `verb_plan` which only REPORTS and
+  # `build-complete` which runs after every commit has landed. So a run that built first and wrote
+  # the spec afterwards passed the Definition of Done by construction, because by close time the
+  # spec existed and was not thin. That is the defect this whole build exists for.
+  #
+  # THE MESSAGE NAMES THE ID AND THE STATE AND NOT THE EMPTY SECTION. `plan_state`'s contract is one
+  # bare token on stdout, pinned deliberately because two harnesses slice the function body, and
+  # `build-complete` already words its own message the same way for the same reason.
+  local _d_spec _d_state
+  load_spec_facts $(GIT ls-files -- "$MEMORY_ROOT/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
+  _d_spec="${SPEC_PATH[$unit]:-}"
+  if [ -z "$_d_spec" ]; then
+    fail 49 "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: $unit"
+    return 1
+  fi
+  _d_state=$(plan_state "$_d_spec")
+  case "$_d_state" in
+    THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
+  esac
+  # ------------------------------------------------------------------------------ THE ORDER GATE
+  # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
+  # nor already dispatched. Units sharing an `order` value are the parallel group and do not block
+  # each other, and a unit carrying NO order verb is unordered and blocks nothing — the verb is
+  # PERMITTED rather than required, so an absent one may not become a refusal here.
+  #
+  # THE ORDER IS READ FROM THE SPEC HEADERS, which is where `gen_build_index.py` reads it from too,
+  # so this and the rendered build-order region cannot disagree about what step a unit is on.
+  local _d_ord _o_id _o_spec _o_ord _o_st _blockers=""
+  _d_ord=$(sed -n 's/^\*\*Status:\*\*.*[·] order \([0-9][0-9]*\).*/\1/p' "$_d_spec" | head -1)
+  if [ -n "$_d_ord" ]; then
+    for _o_id in $(unit_ids_of "$slug"); do
+      [ "$_o_id" = "$unit" ] && continue
+      _o_spec="${SPEC_PATH[$_o_id]:-}"; [ -n "$_o_spec" ] || continue
+      _o_ord=$(sed -n 's/^\*\*Status:\*\*.*[·] order \([0-9][0-9]*\).*/\1/p' "$_o_spec" | head -1)
+      [ -n "$_o_ord" ] || continue
+      [ "$_o_ord" -lt "$_d_ord" ] 2>/dev/null || continue
+      _o_st="${SPEC_ST[$_o_spec]:-}"
+      case "$_o_st" in CLOSED|WONTDO) continue ;; esac
+      # THE DISPATCH ROW'S `item` FIELD IS `<anchor-sha> <unit-id>`, not the id alone, so a match on
+      # the id with a space either side finds nothing and every dispatched sibling reads as still
+      # blocking. Anchored on ` · reason ` at the tail, which makes the id a WHOLE token: without it
+      # `TOOL-x-1` matches the row of `TOOL-x-11`, the substring class this corpus has a gotcha for.
+      grep -qE "^[0-9][0-9-]*T[0-9:]*Z dispatch · item [0-9a-f]+ $_o_id · reason " "$rel" 2>/dev/null && continue
+      _blockers="$_blockers $_o_id (order $_o_ord, $_o_st)"
+    done
+  fi
+  if [ -n "$_blockers" ]; then
+    fail 49 "--dispatch declares a build pass out of the build's own declared order: $unit is at order $_d_ord and an earlier step still holds a unit that is neither terminal nor dispatched:$_blockers"
+    return 1
+  fi
   # EACH --writes IS ONE PATH. A space-joined value cannot carry the whitespace refusal below: the
   # path has already become two tokens by the time this verb sees it, and nothing recovers that.
   for p in "$@"; do

@@ -3911,6 +3911,35 @@ same "tier-2 control: the canonical ordinals still grade READY" "$(plan_state "$
 
 
 
+echo "MARK pass-order-dispatch" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- TOOL-dBriefedPass-3 S1/S2 - THE M2 HARD FLOOR, AT THE MOMENT OF THE ACT. Never build a
+# ---- MISSING or THIN unit was carried entirely by an agent's memory: `plan_state` was called at
+# ---- `verb_plan`, which only reports, and at `build-complete`, which runs after every commit has
+# ---- landed. A run that built first and specced afterwards therefore passed the Definition of Done
+# ---- by construction, because by close time the spec existed and was not thin.
+# ----
+# ---- The passing case is armed BESIDE each refusal. A refusal with no observed pass is a gate that
+# ---- cannot be satisfied, and it is the arm most often missing.
+o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"which is M2's MISSING"*) ;; *) echo "FAIL dispatch: a unit no tracked spec defines was accepted -- $o"; st=1 ;; esac
+
+# THIN: a spec whose acceptance section is empty. The state token is what the message must name,
+# never the empty SECTION -- `plan_state`'s contract is one bare token by a recorded decision, and
+# `TOOL-dBriefedPass-1` declines to widen it.
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"grades THIN"*) ;; *) echo "FAIL dispatch: a THIN unit was accepted, which is the hard floor this refusal IS -- $o"; st=1 ;; esac
+n=$((n+1)); case "$o" in *"section is empty or names nothing observable"*) ;; *) echo "FAIL dispatch: the THIN message did not say what THIN means -- $o"; st=1 ;; esac
+
+# THE PASSING CASE. The same unit with a filled acceptance section dispatches.
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"dispatch declared"*) ;; *) echo "FAIL dispatch: a READY unit was REFUSED, so the guard cannot be satisfied -- $o"; st=1 ;; esac
+
 echo "MARK brief" >&2
 # ---------------------------------------------------------------------------------------------
 # ---- TOOL-dBriefedPass-2 - THE UNIT BRIEF. "Which instructions produced this diff" had no answer

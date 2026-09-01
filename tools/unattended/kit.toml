@@ -98,6 +98,13 @@ guard = []
 red_after_land = true
 
 [[gate_leg]]
+name = "pass-order history"
+subject = "repo"
+argv = ["bash", "{kit}/check-pass-order.sh"]
+guard = []
+red_after_land = true
+
+[[gate_leg]]
 name = "unattended skill wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-unattended.sh", "--check"]

@@ -709,6 +709,17 @@
     "ceiling": 16040
   },
   {
+    "name": "pass-order history",
+    "argv": [
+      "bash",
+      "tools/unattended/check-pass-order.sh"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "guard": [],
+    "ceiling": 90
+  },
+  {
     "name": "playbook validity gate",
     "argv": [
       "bash",

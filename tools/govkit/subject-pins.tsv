@@ -57,6 +57,7 @@ method carriers (every pointer declared)	repo	declarations
 method-carriers self-test	kit	selftests
 micro-format definitions	repo	product
 micro-format gate selftest	kit	selftests
+pass-order history	repo	declarations
 placeholder-catalogue self-test	kit	selftests
 playbook parity	repo	product
 playbook parity selftest	kit	selftests

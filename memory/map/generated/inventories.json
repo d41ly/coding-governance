@@ -50,6 +50,7 @@
       "method-carriers self-test",
       "micro-format definitions",
       "micro-format gate selftest",
+      "pass-order history",
       "placeholder-catalogue self-test",
       "playbook parity",
       "playbook parity selftest",

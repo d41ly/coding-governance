@@ -437,20 +437,19 @@ what preserves the strong claim wherever the strong claim is available.
 ## 7. The verbs
 
 - `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
-  accepts `--waive <handle> --reason <text>` and no other verb does (§10),
-  records the keepalive id the agent hands it,
-  refuses on a dirty tree, on the default branch, and on an unwired repo, and writes the run-state
-  file. It OBSERVES the anchor from the remote rather than reading a local ref, and refuses when the
-  remote does not answer or advertises no default branch of its own. Failing closed there costs
-  nothing real: a run that cannot reach the remote cannot land on it either. It delegates wiring to the project's **check** mode, never the repairing one: a repairing
-  mode rewrites tracked bytes and sets git config, and the run's first act must not be the mode
-  whose past over-firing is the cautionary case this protocol cites.
+  records the keepalive id the agent hands it, and accepts `--waive <handle> --reason <text>` where no
+  other verb does (§10). It refuses on a dirty tree, on the default branch, and on an unwired repo. It
+  OBSERVES the anchor from the remote rather than reading a local ref, and refuses when the remote
+  does not answer or advertises no default branch of its own — failing closed there costs nothing
+  real, since a run that cannot reach the remote cannot land on it either. It delegates wiring to the
+  project's **check** mode, never the repairing one: that mode rewrites tracked bytes and sets git
+  config, and the run's first act must not be the mode whose past over-firing this protocol cites.
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
-  `--preflight` and `--close` ever wrote one, so every member between them could enter the file only
-  by an agent hand-editing an artifact this kit calls generated.
-- `--park` — writes a decision the run REFUSED to take into the parked region, with the question, the
-  options seen and the reason. Refused on a terminal record, and with no run-state file at all: a
-  park minted for a run that never started records nothing about a run.
+  `--preflight` and `--close` ever wrote one, so every member between them entered the file only by
+  hand-editing an artifact this kit calls generated.
+- `--park` — writes a decision the run REFUSED to take: the question, the options seen, the reason.
+  Refused on a terminal record, and with no run-state file: a park minted for a run that never
+  started records nothing about a run.
 - `--brief` — records WHAT a build pass was handed: the unit, and the hash of a TRACKED brief file,
   through `park()` as a `history` kind. `--status` reads it, grading each unit's LATEST row.
 - `--propose` — writes a PROPOSAL: an amendment a run would make to the playbook it is following,
@@ -459,9 +458,9 @@ what preserves the strong claim wherever the strong claim is available.
   bypass and terminal refusals over the new step field, and its exact-line idempotence — with the
   step inside the identity, so one amendment at two steps is two rows.
 - `--attest` — writes one of the two agent-checked Definition-of-Done items, deriving the record key
-  so no operator spells one, and REFUSING a machine-checked item by reading that item's declared
-  checker. Before it existed those keys had no writer at all and `--abort`, which requires both, was
-  reachable only by hand-editing a file this kit calls generated.
+  so no operator spells one, and REFUSING a machine-checked item by reading its declared checker.
+  Before it existed those keys had no writer, and `--abort` — which requires both — was reachable
+  only by hand-editing a file this kit calls generated.
 - `--record-piece` — writes one leg's verdict for one PIECE into a tracked record joined to that
   piece by content hash. It reuses `--park`'s newline, separator and bypass refusals and its
   exact-line idempotence. The writer takes a records ROOT rather than a slug, and `--records-root`
@@ -470,8 +469,8 @@ what preserves the strong claim wherever the strong claim is available.
   that flag the verb resolves a slug and requires a run-state file. An earlier revision of this line
   called the verb "unattended-only", which contradicted its own first half and the code.
 - `--record-set` — writes one leg's verdict for the WHOLE set of pieces, over an ordered hash list
-  that names which pieces the verdict covers. The set-scoped population is the one a per-piece review
-  structurally cannot see, and a verdict recorded without naming its members cannot be re-checked.
+  naming which pieces it covers. That population is the one a per-piece review structurally cannot
+  see, and a verdict not naming its members cannot be re-checked.
 - `--plan` — takes its unit SET and its ORDER from the GENERATED units region, which is why its
   "next" and `--status`'s are the same unit by construction rather than by coincidence. It prints
   each unit's id, status and the build method's M2 classification, and names the next one. It
@@ -482,20 +481,20 @@ what preserves the strong claim wherever the strong claim is available.
   the build README's AUTHORED roster pair against the tracked specs, so a planned unit nobody has
   specced is reported as MISSING — that question cannot be answered from a region rendered out of
   the specs that exist.
-- `--status` — one line: the current phase, the first non-terminal unit, and the parked counts.
+- `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`.
-- `--close` — evaluates the DoD set, blocks on any unmet item, and records any override. It is the
-  only writer of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
-- `--landed` — the sole producer of `LANDED`, and an OBSERVATION rather than a claim. It accepts a
-  record only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip
-  the remote advertises. Where the project declares `LANDER_MARKER` it ALSO refuses unless the marker
-  names HEAD exactly — equality, not ancestry, so any commit made between the push and this verb is a
-  refusal. It does not refuse the default branch, because the mandated lander refuses every other
-  one, so landing happens exactly where that guard would otherwise fire.
-- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the
-  unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
-  three acts; this verb is the record. It RECORDS rather than acts, because a row derived from the
-  change it just made is a summary, and a check comparing the two confirms the driver instead of
+- `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
+  of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
+- `--landed` — the sole producer of `LANDED`, an OBSERVATION rather than a claim. It accepts a record
+  only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip the
+  remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker names HEAD
+  exactly — equality, not ancestry, so any commit between the push and this verb is a refusal. It does
+  not refuse the default branch: the mandated lander refuses every other one, so landing happens
+  exactly where that guard would otherwise fire.
+- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the unit
+  as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the three
+  acts; this verb is the record. It RECORDS rather than acts: a row derived from the change it just
+  made is a summary, and a check comparing the two confirms the driver instead of
   checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a
   truthful-looking row attached to a different edit.
@@ -559,6 +558,7 @@ where this document says it may:
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
+| `PASS_ORDER_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT predates a conforming spec reds the `pass-order history` leg. Graded on the README's `opened:` date. BLANK turns the term OFF and the leg announces it |
 | `SPEC_THIN_CUTOFF` | the date from which a CLOSED unit whose spec grades THIN — an empty scope, acceptance or gates section — blocks `build-complete`. Graded on the spec's FILENAME date, so no landed spec goes retroactively red. BLANK or absent turns the term OFF and `--close` announces that it did |
 | `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
 | `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. A DECLARATION rather than a path in the driver, because a kit literal in shipped bytes resolves to nothing in a tree installed at another prefix — the carried-prefix ratchet reds on exactly that |
