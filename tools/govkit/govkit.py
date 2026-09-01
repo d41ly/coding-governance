@@ -353,7 +353,7 @@ def entry_version(root: pathlib.Path, desc: dict) -> str:
     return "(unresolvable)"
 
 
-def entry_version_at(root: pathlib.Path, desc: dict, commit: str) -> str:
+def resolve_entry_version_at(root: pathlib.Path, desc: dict, commit: str) -> str:
     """`entry_version`, resolved AT A COMMIT rather than in the working tree.
 
     DEPL-dGaugedVintage-9 S1. `update --to <rev>` can name a commit that is not HEAD, and stamping a
@@ -5362,9 +5362,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # three copies of "what version did we just land" is three places for it to drift. Before this,
     # `version` was written by `apply` and `adopt` only and `update` never touched it, so a row
     # refreshed to new bytes kept the version it landed at — reproduced by aTetheredConvoy F6.
-    def _ver_at(_row: dict) -> str:
+    def _resolve_ver_at(_row: dict) -> str:
         _d = descs.get(_row.get("kit") or "")
-        return entry_version_at(root, _d[0], to_commit) if _d else _row.get("version", "")
+        return resolve_entry_version_at(root, _d[0], to_commit) if _d else _row.get("version", "")
 
     if base_commit:
         chk = subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{base_commit}^{{commit}}"],
@@ -5781,7 +5781,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"{to_commit[:8]}); EQUALITY, not ordering:")
         for _k in sorted(_by_kit):
             _d = descs.get(_k)
-            _live = entry_version_at(root, _d[0], to_commit) if _d else "(unresolvable)"
+            _live = resolve_entry_version_at(root, _d[0], to_commit) if _d else "(unresolvable)"
             _stored = _by_kit[_k]
             if _stored == {"__ABSENT__"}:
                 _verdict = "unknown — this receipt predates the version field"
@@ -5963,7 +5963,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             row["oid"] = oid
             row["sha256"] = _sha(data)
             row["commit"] = to_commit
-            row["version"] = _ver_at(row)
+            row["version"] = _resolve_ver_at(row)
             if restored_carry:
                 row["carry"] = restored_carry
             changed.append(row["path"])
@@ -6082,7 +6082,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             row["oid"] = oid
             row["sha256"] = _sha(data)
             row["commit"] = to_commit
-            row["version"] = _ver_at(row)
+            row["version"] = _resolve_ver_at(row)
             renamed.extend([old_path, new_dest])
             # The DESTINATION line. The verdict row above names the old path, which is the only
             # spelling the receipt had when it was printed; where the file went is the other half,
@@ -6199,7 +6199,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 row["oid"] = oid
                 row["sha256"] = _sha(merged)
                 row["commit"] = to_commit
-                row["version"] = _ver_at(row)
+                row["version"] = _resolve_ver_at(row)
                 changed.append(row["path"])
 
     # NO `git add` OVER `changed`. S5 already staged every one of those paths from gov's own bytes;

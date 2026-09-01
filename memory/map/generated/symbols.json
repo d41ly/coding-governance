@@ -2423,6 +2423,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_entry_version_at",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "resolve_import",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
