@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.4
+gov:kit drift-audit@1.8
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -207,6 +207,14 @@ PINS: dict[str, int] = {
     # merges whose subjects name the branch merged INTO, carrying another build's work. A 0 measured
     # that way is a number, not a measurement.
     "closed_specs_with_no_product_commit": 1,
+    # DEPL-dGaugedVintage-13. MEASURED at this base, not chosen: 27 of 376 terminal specs have a
+    # backlog row still reading OPEN or SPECCED. `DEPL-dGaugedVintage-2` swept the DEPL shard by
+    # hand; this residue is TOOL, PLAY and KICK, and it accumulated because nothing looked.
+    #
+    # A PIN rather than a refusal, deliberately. A row's ask can be legitimately WIDER than the unit
+    # that partly served it, so calling every one a defect would push an operator to close a row
+    # that should stay open. Shrink-only like the rest of this table: it only falls.
+    "backlog_rows_outliving_closed_specs": 27,
     # 3 — MEASURED on the day the table was ratified, and non-zero BY CONSTRUCTION rather than as
     # tolerated rot. `--scaffold` seeds a concept only where the corpus has a live site, spells it the
     # canon's way, and a human then curates; curation ADDS verbs the corpus does not use yet: `measure`, `print`

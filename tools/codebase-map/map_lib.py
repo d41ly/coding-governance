@@ -43,7 +43,7 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.3 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
 KIT_CODEBASE_MAP_VERSION = "1.3"
 

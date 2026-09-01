@@ -18,7 +18,7 @@
 # Exit 0 + no FAILED lines = clean (WARN:/NOTE: lines permitted). Exit 1 = a check failed.
 # Exit 2 = environment error (not a git repo / no manifest found / path outside the repo).
 set -u
-KIT_MANIFEST_VERSION="1.3"
+KIT_MANIFEST_VERSION="1.3"   # gov:kit kickoff-manifest@1.3 — the registry id
 
 # THE ONE LIST of places a kickoff manifest may live, in precedence order. Every consumer reads it
 # from here — the discovery loop, the not-found message, and the `--locations` verb that the kickoff

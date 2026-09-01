@@ -194,7 +194,14 @@ carried_live() {
 
 carried_rows() {
   # THE ONE EMITTER. `--list`'s section and the ratchet file are the same rows from the same call, so
-  # a report that disagrees with the artifact is not reachable. The count is hit LINES per path: a
+  # a report that disagrees with the artifact is not reachable. A row is
+  # `<path>\t<count>\t<kits>`: the count is OCCURRENCES per path,
+  # not hit lines. `grep -c` counted a line carrying two literals ONCE, so a second literal added
+  # beside an existing one -- or one kit's path swapped for another's -- held the count level while
+  # the surface it grades changed. DEPL-dGaugedVintage-7. Measured before the change: appending one
+  # line carrying two literals moved a file 3 -> 4 where occurrences make it 3 -> 5. `grep -o` emits
+  # one line per MATCH prefixed `<path>:`, and awk tallies per path; repo-relative paths carry no
+  # colon, so splitting on the first is exact here. The old note read: hit LINES per path, a
   # line carrying two literals counts once. The regex is the arm above's with the SHIPPING prefix
   # bound, and `{`/`}` stay in the excluded lead class for the reason that arm already gives — the
   # corrected placeholder form must not be a hit.
@@ -218,8 +225,10 @@ carried_rows() {
     [ -n "$f" ] || continue
     [ -f "$f" ] || continue
     printf '%s\0' "$f"
-  done | xargs -0 -r grep -cHE "$re_ship" -- 2>/dev/null \
-       | awk -F: 'NF>=2 && $NF+0 > 0 { c=$NF; sub(/:[^:]*$/, "", $0); printf "%s\t%s\n", $0, c }' \
+  done | xargs -0 -r grep -oHE "$re_ship" -- 2>/dev/null \
+       | awk -F: '{ p=$1; m=$0; sub(/^[^:]*:/, "", m); if (match(m, /tools\/[^\/]+\//)) k=substr(m, RSTART+6, RLENGTH-7); else k="?"; print p "\t" k }' \
+       | LC_ALL=C sort \
+       | awk -F'\t' '{ n[$1]++; if ($2 != last[$1]) { kits[$1] = (kits[$1] == "" ? $2 : kits[$1] "," $2); last[$1] = $2 } } END { for (q in n) printf "%s\t%s\t%s\n", q, n[q], kits[q] }' \
        | LC_ALL=C sort || true
 }
 
@@ -301,16 +310,17 @@ install-prefix: this repo ships nothing. A zero HIT count is fine; a zero popula
     # every file: telling the operator to delete a ratchet that records nothing, while the correct
     # verdict UNRECORDED never printed. `FILENAME == pinf` cannot swap the roles, and it finally
     # READS the `-v pinf` this program was already being passed and never used (D13).
-    FILENAME == pinf { if ($0 !~ /^[[:space:]]*(#|$)/) pin[$1]=$2; next }
+    FILENAME == pinf { if ($0 !~ /^[[:space:]]*(#|$)/) { pin[$1]=$2; pinkit[$1]=$3 } next }
     $1 == "" { next }   # an EMPTY hit set writes one blank line; without this the
                         # awk read it as a path and reported UNRECORDED for the empty
                         # string, so the zero goal state redded on a phantom row
-    { now[$1]=$2 }
+    { now[$1]=$2; nowkit[$1]=$3 }
     END {
       bad=0
       for (p in now) {
         if (!(p in pin)) { printf "  UNRECORDED  %s\t%s — every carrying file needs a row, or the ratchet grades a subset of itself\n", p, now[p]; bad++ }
         else if (now[p]+0 > pin[p]+0) { printf "  ROSE        %s\t%s -> %s\n", p, pin[p], now[p]; bad++ }
+        else if (nowkit[p] != pinkit[p]) { printf "  SWAPPED     %s\t%s: kits %s -> %s — the count held while the kits it names changed\n", p, now[p], pinkit[p], nowkit[p]; bad++ }
       }
       for (p in pin) {
         c = (p in now) ? now[p] : 0

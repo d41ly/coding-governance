@@ -4,6 +4,12 @@ id = "drift-audit"
 home = "tools/drift-audit"
 scope = "repo"
 version_from = { file = "drift_report.py", pattern = "^KIT_DRIFT_AUDIT_VERSION = " }
+# DEPL-dGaugedVintage-4 S1. The two workflow harnesses carry `gov:kit drift-audit@` but live under
+# `tools/workflows/`, which entry `review-harness` claims through its own `**` — so no resolution of
+# THIS entry reaches them and its marker assertion would be blind to two of its own sites. Declared
+# rather than inferred, so the cross-entry exception is visible. It works around TOOL-aScouredKit-26:
+# no cross-entry destination token exists.
+marker_carriers = ["{prefix}/workflows/drift-audit-code.js", "{prefix}/workflows/drift-audit-state.js"]
 requires = ["memory-tree"]
 
 [[files]]

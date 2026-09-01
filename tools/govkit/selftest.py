@@ -193,6 +193,12 @@ kits = ["playbook"]
 
 
 def main() -> int:
+    # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
+    # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
+    # blew the 600 s ceiling. Off for the whole suite; the probe's own arms drive the function
+    # directly instead, so turning it off here costs no coverage.
+    os.environ["GOVKIT_NO_REMOTE_PROBE"] = "1"
+
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
 
@@ -582,6 +588,119 @@ def main() -> int:
         p = run("update", "--target", str(up))
         check("a second update over the same target reports current",
               "current" in p.stdout and "stale" not in p.stdout, p.stdout)
+
+        # --- DEPL-dGaugedVintage-8 S3. THE STAMP MUST NOT OUTRUN ROWS THIS RUN NEVER GRADED.
+        # --- An `evidence: "unattributed"` row is skipped before `classify_row`, by
+        # --- DEPL-dCarriedReceipt-13's ratified design, and it is graded against the receipt's OWN
+        # --- `gov_commit` — so advancing the stamp moves the base it must be attributed from
+        # --- further away on every run, and the row gets harder to recover with no event to notice.
+        # --- OBSERVED RED before the guard landed: `update --write` stamped forward over such a row
+        # --- (3e11f259 -> b263d5b9 on a scratch fixture) and printed the ordinary re-stamp line.
+        ung = stale_target("ungraded")
+        rp_u = ung / ".governance" / "install.json"
+        rec = json.loads(rp_u.read_text(encoding="utf-8"))
+        for f in rec["files"]:
+            f["evidence"] = "unattributed"
+            f.pop("commit", None)
+            f.pop("gov_oid", None)
+        rp_u.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        p = run("update", "--target", str(ung), "--write")
+        rec = json.loads(rp_u.read_text(encoding="utf-8"))
+        check("[dGV-8] update --write does NOT re-stamp while a row is unattributed",
+              rec["gov_commit"] == OLD, rec["gov_commit"])
+        check("[dGV-8] the withheld stamp says why, and names the remedy that clears the rows",
+              "NOT re-stamped" in p.stdout and "--re-adopt" in p.stdout, p.stdout)
+        check("[dGV-8] and it names the override rather than leaving the operator stuck",
+              "--allow-ungraded" in p.stdout, p.stdout)
+        p = run("update", "--target", str(ung), "--write", "--allow-ungraded")
+        rec = json.loads(rp_u.read_text(encoding="utf-8"))
+        check("[dGV-8] --allow-ungraded advances the stamp",
+              rec["gov_commit"] != OLD, rec["gov_commit"])
+        check("[dGV-8] and the override states what it overrode, so the choice is on the record",
+              "ungraded row(s), --allow-ungraded" in p.stdout, p.stdout)
+
+        # --- DEPL-dGaugedVintage-9 S1. `update` REFRESHES A ROW'S `version`. It never did: every
+        # --- `"version":` write lived in `apply` or `adopt`, and `_cmd_update` did not contain the
+        # --- string at all — so a row moved to new bytes kept the version it originally landed at,
+        # --- against the NEW commit and the NEW sha256. aTetheredConvoy round-3 F6 reproduced that
+        # --- by bumping a constant 1.0 -> 9.9 and watching the receipt keep 1.0.
+        # --- A delta report over that field would have called a fully current target "behind".
+        vr = stale_target("verrefresh")
+        rp_v = vr / ".governance" / "install.json"
+        rec = json.loads(rp_v.read_text(encoding="utf-8"))
+        for f in rec["files"]:
+            f["version"] = "STALE-SENTINEL"
+        rp_v.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        p = run("update", "--target", str(vr), "--write")
+        rec = json.loads(rp_v.read_text(encoding="utf-8"))
+        _moved = [f for f in rec["files"] if f.get("version") != "STALE-SENTINEL"]
+        check("[dGV-9] update --write refreshes a refreshed row's version, not only sha256/commit",
+              len(_moved) > 0, json.dumps(rec["files"], indent=1)[:900])
+        check("[dGV-9] and the refreshed value is the constant's SOURCE LINE, the shape "
+              "entry_version returns",
+              any("KIT_CHECK_WIRING_VERSION" in (f.get("version") or "") for f in _moved),
+              json.dumps([f.get("version") for f in rec["files"]])[:500])
+        check("[dGV-9] and sha256 and commit moved with it, so the three stay one fact",
+              all(f.get("commit") and f.get("sha256") for f in _moved),
+              json.dumps(_moved, indent=1)[:600])
+
+        # --- DEPL-dGaugedVintage-10. THE MEASURER'S OWN CURRENCY. `demand_published_vintage` and
+        # --- `demand_forward_vintage` are both satisfied by any commit the local clone can see, so
+        # --- an unfetched clone reported every row up to date for everything gov had since moved.
+        # --- Driven DIRECTLY rather than through a verb, because the probe is off for this suite
+        # --- (see main()) and a network round-trip per spawned update blew the 600 s ceiling.
+        _gk = govkit_module()
+        _dead = tmp / "deadremote"
+        _dead.mkdir()
+        git(_dead, "init", "-q", ".")
+        git(_dead, "remote", "add", "origin", str(tmp / "there-is-no-such.git"))
+        _saved = os.environ.pop("GOVKIT_NO_REMOTE_PROBE", None)
+        try:
+            _v, _d = _gk.resolve_measurer_currency(_dead, "0" * 40)
+            # The memo arm belongs INSIDE the seam window: restoring the env var first would make
+            # the second call take the disabled branch and prove nothing about memoization.
+            _v2, _d2 = _gk.resolve_measurer_currency(_dead, "0" * 40)
+        finally:
+            if _saved is not None:
+                os.environ["GOVKIT_NO_REMOTE_PROBE"] = _saved
+        check("[dGV-10] an unreachable remote is UNVERIFIED, never read as up to date",
+              _v == "unverified" and _v != "current", f"{_v} | {_d}")
+        check("[dGV-10] and the verdict says which remote did not answer",
+              "origin" in _d, _d)
+        check("[dGV-10] the probe is memoized per process, so one advertisement read serves a run",
+              (_v2, _d2) == (_v, _d), f"{_v2} | {_d2}")
+        os.environ["GOVKIT_NO_REMOTE_PROBE"] = "1"
+        _v3, _ = _gk.resolve_measurer_currency(tmp / "no-such-root", "0" * 40)
+        check("[dGV-10] the test seam yields unverified — a disabled probe is not a clean one",
+              _v3 == "unverified", _v3)
+
+        # --- DEPL-dGaugedVintage-11. THE RELOCATE RUNG SURVIVES A KIT THAT FANS OUT.
+        # --- `derive_carry_map` holds ONE destination per gov directory, so a kit shipping a
+        # --- rendered artifact to a different tree than its engine files had its whole directory
+        # --- dropped from the needle map — which is every kit that ships a Skill. The global map
+        # --- still drops it (it cannot hold two), but rows now rewrite through their OWN pair.
+        _n_global, _pairs_g, _drop_g = _gk.derive_carry_map(
+            [("tools/k/engine.py", "scripts/k/engine.py"),
+             ("tools/k/SKILL.template.md", ".claude/skills/k/SKILL.md")])
+        check("[dGV-11] a gov directory that fans out is still absent from the GLOBAL needle map",
+              "tools/k" not in _n_global and any(g == "tools/k" for g, _ in _drop_g),
+              f"{_n_global} | {_drop_g}")
+        _row = {"source": "tools/k/engine.py", "path": "scripts/k/engine.py"}
+        _n_row = _gk.resolve_row_needles(_n_global, _row)
+        check("[dGV-11] but the ROW resolves against its own destination, rooted on its own pair",
+              _n_row.get("tools/k") == "scripts/k", f"{_n_row}")
+        _row2 = {"source": "tools/k/SKILL.template.md", "path": ".claude/skills/k/SKILL.md"}
+        _n_row2 = _gk.resolve_row_needles(_n_global, _row2)
+        check("[dGV-11] and a second row under the same gov directory gets ITS destination, "
+              "not the first row's",
+              _n_row2.get("tools/k") == ".claude/skills/k", f"{_n_row2}")
+        check("[dGV-11] gov's bytes really are rewritten through the row's needle",
+              _gk.derive_carried(b"see tools/k/engine.py here", _n_row) ==
+              b"see scripts/k/engine.py here",
+              _gk.derive_carried(b"see tools/k/engine.py here", _n_row).decode())
+        _row3 = {"source": None, "path": None}
+        check("[dGV-11] a row with no pair falls back to the global map rather than emptying it",
+              _gk.resolve_row_needles(_n_global, _row3) == _n_global, "")
 
         # AC3 — THE NO-CLOBBER GUARANTEE. Nothing else observes it.
         up2 = stale_target("u2b")
@@ -1303,6 +1422,38 @@ user_skills = "/tmp/gk-fake-skills"
         # makes git report an invalid attribute name on every query in that repo, and leaves the
         # open marker off column 0 -- after which every later apply refuses forever while the
         # receipt claims a block that can never be found again.
+        # --- DEPL-dGaugedVintage-3 S1/S2/S4. AN ENTRY THAT LANDS NO PROGRAM MUST NOT READ AS
+        # --- ADOPTED. `memory-recall` is a registry DEFAULT whose engine files are `forked`, which
+        # --- the derived LANDABLE_ROLES excludes, so `apply` lands its rendered Skill — which tells
+        # --- an agent to run the CLI — and never the CLI. OBSERVED RED on the pre-fix binary over a
+        # --- fresh target: `query.py` absent and zero INCOMPLETE lines.
+        # --- The detection keys on the ROLE, never on the kit id, which is what makes it a class
+        # --- assertion while exactly one `forked` rule ships.
+        inc = make_target(tmp / "incomplete", DEPLOY_FULL)
+        p = run("apply", "--target", str(inc), "--kits", "memory-recall")
+        out = p.stdout + p.stderr
+        check("[dGV-3] apply reports an entry INCOMPLETE when its forked files are absent",
+              "INCOMPLETE memory-recall" in out, out[-900:])
+        check("[dGV-3] and it names EVERY absent file with the role that withheld it",
+              out.count("absent [forked") >= 3, out[-900:])
+        check("[dGV-3] and it gives UNLANDED_REASON's sentence rather than a bare skip",
+              "derivative of the target's" in out, out[-900:])
+        check("[dGV-3] and it tells the operator gov will not send them",
+              "gov will not send them" in out, out[-900:])
+        check("[dGV-3] the CLI really is absent, so the report is not describing a landed file",
+              not (inc / "tools" / "memory-recall" / "query.py").exists())
+        _mr = inc / "tools" / "memory-recall"
+        _mr.mkdir(parents=True, exist_ok=True)
+        (_mr / "query.py").write_text("# the adopter's own" + NLp, encoding="utf-8", newline=NLp)
+        (_mr / "extract.py").write_text("# own" + NLp, encoding="utf-8", newline=NLp)
+        (_mr / "recall-opened.js").write_text("// own" + NLp, encoding="utf-8", newline=NLp)
+        p = run("apply", "--target", str(inc), "--kits", "memory-recall")
+        check("[dGV-3] a target that ALREADY holds its forked files is not reported incomplete",
+              "INCOMPLETE memory-recall" not in (p.stdout + p.stderr), (p.stdout + p.stderr)[-700:])
+        check("[dGV-3] and apply left the adopter's own bytes alone",
+              (_mr / "query.py").read_text(encoding="utf-8").startswith("# the adopter's own"),
+              (_mr / "query.py").read_text(encoding="utf-8"))
+
         pg = pin_target("u6p1", b"*.sh text eol=lf")          # deliberately no trailing newline
         run("apply", "--target", str(pg), "--kits", "memory-recall")
         lines = (pg / ".gitattributes").read_text(encoding="utf-8").split(NLp)

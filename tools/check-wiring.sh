@@ -17,7 +17,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.1
+KIT_CHECK_WIRING_VERSION=1.1   # gov:kit check-wiring@1.1 — the deployer's read
 set -u
 
 MODE=check

@@ -353,6 +353,104 @@ def entry_version(root: pathlib.Path, desc: dict) -> str:
     return "(unresolvable)"
 
 
+def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, str]:
+    """Is the GOV checkout doing the measuring current with its own remote?
+
+    DEPL-dGaugedVintage-10. `demand_published_vintage` and `demand_forward_vintage` answer
+    reachability and direction, and BOTH are satisfied by any commit the local clone can see — so a
+    clone that has not fetched reports every row `current` for everything gov has since moved. That
+    is a green meaning the measurer was behind, not that the target was level.
+
+    IDENTITY, never distance. An advertisement returns a sha, not objects: on exactly the stale clone
+    this exists to catch, `rev-list --count` dies with a bad-object error and `merge-base` has no
+    remote history to walk. Equal-or-not is the whole answerable question without a fetch, and
+    fetching on the operator's behalf is a side effect nobody asked for.
+
+    Reads the REMOTE's advertisement rather than a tracking ref, because a tracking ref is exactly as
+    stale as the clone — the same rule `memory/guides/UNATTENDED-PROTOCOL.md` section 1 states for a
+    BASE. Returns (verdict, detail); `unverified` when the remote cannot be reached, which is
+    ANNOUNCED rather than treated as current.
+    """
+    # A TEST SEAM, and it is named rather than inferred. This probe spawns one `ls-remote` per
+    # PROCESS, and `selftest.py` spawns a fresh `update` process dozens of times — measured: the
+    # suite blew its 600 s ceiling on network round-trips alone. So a harness may turn the probe off
+    # and gets `unverified` for it, which is the honest answer: the probe did not run.
+    #
+    # It is not a gate-disabling flag. `unverified` is ANNOUNCED and is never read as up to date,
+    # which is S3's whole point, so a run with the probe off cannot be mistaken for a clean one.
+    if os.environ.get("GOVKIT_NO_REMOTE_PROBE"):
+        return "unverified", "probe disabled by GOVKIT_NO_REMOTE_PROBE"
+    _memo = getattr(resolve_measurer_currency, "_memo", None)
+    if _memo is None:
+        _memo = {}
+        resolve_measurer_currency._memo = _memo
+    _key = (str(root), to_commit)
+    if _key in _memo:
+        return _memo[_key]
+    _rn = subprocess.run(["git", "-C", str(root), "config", "--get", "branch.main.remote"],
+                         capture_output=True, text=True)
+    remote = (_rn.stdout.strip() or "origin")
+    try:
+        adv = subprocess.run(["git", "-C", str(root), "ls-remote", "--symref", "--exit-code",
+                              remote, "HEAD"], capture_output=True, text=True, timeout=20)
+    except (subprocess.TimeoutExpired, OSError) as e:
+        return _memo.setdefault(_key, ("unverified", f"{remote} did not answer ({type(e).__name__})"))
+    if adv.returncode != 0:
+        return _memo.setdefault(_key, ("unverified", f"{remote} did not answer (exit {adv.returncode})"))
+    head = ""
+    for ln in adv.stdout.splitlines():
+        parts = ln.split("\t")
+        if len(parts) == 2 and parts[1].strip() == "HEAD" and re.fullmatch(r"[0-9a-f]{40}", parts[0]):
+            head = parts[0]
+            break
+    if not head:
+        return _memo.setdefault(_key, ("unverified", f"{remote} advertised no HEAD sha"))
+    if head == to_commit:
+        return _memo.setdefault(_key, ("current", head))
+    # NOT-EQUAL IS NOT THE SAME AS BEHIND, and saying so needs no fetch. Found by running this
+    # against a feature branch: the measurer was AHEAD of the advertised head and the message told
+    # the operator to fetch, which is wrong advice and the kind that trains people to ignore a
+    # warning. If the advertised object is already in this clone, ancestry answers it exactly. If it
+    # is NOT, that absence is itself the answer: the remote has a commit this clone has never seen.
+    _have = subprocess.run(["git", "-C", str(root), "cat-file", "-e", head + "^{commit}"],
+                           capture_output=True).returncode == 0
+    if not _have:
+        return _memo.setdefault(_key, ("behind", f"measuring at {to_commit[:8]}; {remote} "
+                                       f"advertises {head[:8]}, which this clone does not have"))
+    _anc = subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor", head, to_commit],
+                          capture_output=True).returncode == 0
+    if _anc:
+        return _memo.setdefault(_key, ("ahead", f"measuring at {to_commit[:8]}, a descendant "
+                                       f"of {remote}'s advertised {head[:8]}"))
+    return _memo.setdefault(_key, ("diverged", f"measuring at {to_commit[:8]}, {remote} "
+                                   f"advertises {head[:8]}"))
+
+
+def resolve_entry_version_at(root: pathlib.Path, desc: dict, commit: str) -> str:
+    """`entry_version`, resolved AT A COMMIT rather than in the working tree.
+
+    DEPL-dGaugedVintage-9 S1. `update --to <rev>` can name a commit that is not HEAD, and stamping a
+    row with the working tree's constant would record a version the run did not land. Returns the
+    same sentinels `entry_version` does, so its three non-level outcomes stay one vocabulary.
+    """
+    vf = desc.get("version_from") or {}
+    if "none" in vf or not vf.get("file"):
+        return "(none declared)"
+    home = (desc.get("home") or "").rstrip("/")
+    src = f"{home}/{vf['file']}" if home else vf["file"]
+    data = blob_at(root, commit, src)
+    if data is None:
+        return "(unresolvable)"
+    try:
+        rx = re.compile(vf["pattern"])
+    except re.error:
+        return "(unresolvable)"
+    for ln in data.decode("utf-8", "replace").splitlines():
+        if rx.search(ln):
+            return ln.strip()
+    return "(unresolvable)"
+
+
 def entry_members(root: pathlib.Path, entry_id: str, desc: dict, desc_path: str) -> set[str]:
     """Every surface path this entry claims.
 
@@ -1071,6 +1169,23 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             r.fail(f"entry '{eid}' version_from pattern matches {len(hits)} lines in {f}, not "
                    f"exactly one — a pattern matching none is unfillable and one matching several "
                    f"cannot say which is the version")
+        # DEPL-dGaugedVintage-1. EXISTING IN GOV IS NOT SHIPPING. Everything above asks whether the
+        # constant is here; nothing asked whether an adopter RECEIVES it. A kit whose version_from
+        # names a file its own `[[files]]` rules exclude is unpinnable in the target while every
+        # gate stays green, which is the shape this repo calls green-by-absence.
+        #
+        # Resolved through `resolve_entry`, the resolver `apply` itself uses, rather than a second
+        # walk over the same rules — a re-implementation would be a second answer to the question
+        # "what does this entry ship".
+        _src = f"{home}/{f}" if home else f
+        try:
+            _w = resolve_entry(root, d, canonical_ctx(eid))["writes"]
+        except Exception:                      # a descriptor too broken to resolve is check 4's
+            _w = None
+        if _w is not None and not any(row.get("src") == _src for row in _w.values()):
+            r.fail(f"entry '{eid}' declares its version constant in '{_src}', which its own "
+                   f"[[files]] rules do not land — an adopter receives the kit without the constant "
+                   f"they pin against, and every version gate here would still be green")
 
     # ---- 5b: the version claims cross-checked against the repo's OWN version gate, BOTH directions.
     #
@@ -1098,6 +1213,102 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         for f in sorted(gate_files - set(reg_files)):
             r.note(f"tools/check-kit-versions.sh asserts a constant in '{f}' that no registry entry "
                    f"claims — reported, not repaired")
+
+    # ---- 5c: DEPL-dGaugedVintage-4. EVERY `gov:kit <id>@<n>` MARKER AGREES WITH ITS ENTRY'S
+    # ---- CONSTANT, over a DERIVED basis and a DECLARED cross-entry allowance.
+    #
+    # THE BASIS IS NAMED rather than left implicit, because the implicit answer is wrong here:
+    # `tools/workflows/kit.toml` is entry `review-harness` and claims BOTH drift-audit workflow
+    # harnesses through its own `**`, while those two files carry `gov:kit drift-audit@`. No
+    # per-entry resolution can reach them. So a descriptor may declare `marker_carriers` — paths
+    # outside its own claim that carry its marker — DECLARED, never inferred, so the exception is
+    # visible. It works around `TOOL-aScouredKit-26`: no cross-entry destination token exists.
+    #
+    # THE POPULATION IS DECLARED TOO. A bare `git grep` for the marker returns spec and review PROSE
+    # under `memory/builds/**` — including the records of the unit that asked for this check — so
+    # that set is self-referential and cannot be the population. This walks each entry's own claim.
+    #
+    # `*.test.sh` is excluded: `check-verdict-epoch.test.sh` carries a marker inside a `sed` that
+    # mutates a scratch fixture. It is noise in a deployer's grep, not a wrong claim.
+    _mk = re.compile(r"gov:kit ([a-z0-9-]+)@([0-9]+(?:\.[0-9]+)*)")
+    _numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
+    _tracked_gov = subprocess.run(["git", "-C", str(root), "ls-files"],
+                                  capture_output=True, text=True).stdout.split()
+    _claimed: dict[str, set[str]] = {}
+    for eid, (d, dpath) in descs.items():
+        pref = entry_members(root, eid, d, dpath)
+        # `{prefix}`-tokened, never a literal `tools/`: a descriptor ships to adopters and a
+        # hardcoded prefix in one resolves to nothing in a target installed elsewhere. This is
+        # the class `check-install-prefix.sh` grades, and it caught this line on the first bar.
+        allow = {c.replace("{prefix}", "tools") for c in (d.get("marker_carriers") or [])}
+        _claimed[eid] = allow | {
+            f for f in _tracked_gov
+            if not f.endswith(".test.sh")
+            and any(f == p or f.startswith(p.rstrip("/") + "/") for p in pref)}
+    _owner: dict[str, str] = {}
+    for eid, files in _claimed.items():
+        for f in files:
+            _owner.setdefault(f, eid)
+    for eid, (d, _dp) in sorted(descs.items()):
+        vf = d.get("version_from") or {}
+        if "none" in vf or not vf.get("file"):
+            continue
+        _line = entry_version(root, d) or ""
+        _m = _numv.search(_line)
+        if not _m:
+            continue
+        want, seen = _m.group(1), 0
+        for f in sorted(_claimed[eid]):
+            fp = root / f
+            if not fp.is_file():
+                continue
+            try:
+                txt = fp.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            for hit in _mk.finditer(txt):
+                if hit.group(1) != eid:
+                    continue
+                seen += 1
+                if hit.group(2) != want:
+                    r.fail(f"entry '{eid}': {f} carries `gov:kit {eid}@{hit.group(2)}` but the "
+                           f"constant is {want}. Basis: entry_members + declared marker_carriers")
+        if seen == 0:
+            # DEPL-dGaugedVintage-5 S2/S3. A REFUSAL, not a note: an entry with a constant and no
+            # marker is a kit a deployer cannot read a version out of in an adopting tree, which is
+            # what `tools/check-kit-versions.sh` calls the marker's whole job.
+            #
+            # ONE exemption and it is DECLARED, never special-cased by id: `version_from.kind`.
+            # `playbook` versions by a `governance-template: vN.N` marker rather than a `gov:kit`
+            # one, and its descriptor has said so since it was written — the key was simply read by
+            # nothing. Consuming it here is what makes the declaration true. A descriptor omitting
+            # `kind` is NOT exempted, which is the half that keeps this an assertion.
+            if (vf.get("kind") or "") == "marker":
+                r.note(f"entry '{eid}' is exempt from the gov:kit marker rule by its own declared "
+                       f"version_from.kind = \"marker\" — it versions by another convention")
+            else:
+                r.fail(f"entry '{eid}' declares a version constant and carries NO gov:kit marker in "
+                       f"its derived set, so a deployer cannot read its version from an adopting "
+                       f"tree. Add one, or declare version_from.kind if it versions another way")
+
+    # S3, the REVERSE direction, over the same declared population and no other. A file carrying a
+    # marker for an entry that neither claims it nor declares it a carrier is a marker nothing can
+    # keep true: whichever entry bumps, this file is not in its basis. Scoped to KNOWN entry ids, so
+    # a marker for something outside the registry is not read as a claim about the registry.
+    for f in sorted(_owner):
+        fp = root / f
+        if not fp.is_file():
+            continue
+        try:
+            txt = fp.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for hit in _mk.finditer(txt):
+            mid = hit.group(1)
+            if mid in descs and f not in _claimed.get(mid, set()):
+                r.fail(f"'{f}' carries `gov:kit {mid}@{hit.group(2)}` but entry '{mid}' neither "
+                       f"claims that path nor declares it in marker_carriers, so no bump can keep "
+                       f"it true")
 
     # ---- 6: every declared hole carries a discharge probe. A hole observed by NEITHER flag is the
     #         majority case measured across the shipped kits, and there the probe is the only
@@ -4069,6 +4280,31 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                         _row[_k] = _rule[_k]
             rows.append(_row)
 
+        # DEPL-dGaugedVintage-3 S1/S2/S3. AN ENTRY THAT LANDS NO PROGRAM MUST NOT READ AS ADOPTED.
+        # `forked` means gov's copy is a DERIVATIVE of the target's (DEPL-dCarriedReceipt-10 S3), so
+        # gov never sends those bytes. That is correct for an adopter who owns them and SILENT for a
+        # fresh target that does not — and `memory-recall` is a registry DEFAULT in exactly that
+        # shape: its rendered Skill lands and instructs an agent to run a CLI `apply` never wrote.
+        #
+        # SCOPED TO `forked`, and the other three non-landable roles are excluded for their own
+        # stated reasons rather than by omission. `rendered` is produced in the target by its own
+        # adopter after this loop, and the OBSERVE pass already reports one that did not appear;
+        # `generated` is its tooling's; `project-owned` is the adopter's to author whenever they
+        # choose. `forked` is the only role whose absence nothing else in this engine notices.
+        #
+        # It REPORTS. It does not refuse: DEPL-dCarriedReceipt-10 ratified that gov has no right to
+        # send these bytes, so the install is as complete as gov is allowed to make it.
+        _absent = [(u["dest"], UNLANDED_REASON.get(u["role"], ""))
+                   for u in res["unlanded"]
+                   if u["role"] == "forked" and not (target / u["dest"]).exists()]
+        if _absent:
+            print(f"govkit apply — INCOMPLETE {eid}: {len(_absent)} declared file(s) carry this "
+                  f"kit's own behaviour and this target holds none of them")
+            for _p, _why in _absent:
+                print(f"govkit apply —   absent [forked       ] {_p} — {_why}")
+            print(f"govkit apply —   supply them from your own copy; gov will not send them, and "
+                  f"this entry is installed but not usable until they arrive")
+
         for dest, w in sorted(res["writes"].items()):
             if w["missing"]:
                 r.fail(f"entry '{eid}' needs answer '{w['missing'][0]}' to resolve destination "
@@ -4842,6 +5078,28 @@ def derive_carry_map(pairs) -> tuple[dict[str, str], dict[str, str], list[tuple[
     return needles, pairs_out, dropped
 
 
+def resolve_row_needles(needles: dict[str, str], row: dict) -> dict[str, str]:
+    """The global needle map, overlaid with THIS row's own pair.
+
+    DEPL-dGaugedVintage-11. `derive_carry_map` lifts one destination per gov directory and DROPS any
+    that fans into more than one, so the `relocate` rung went silent for every kit shipping a
+    rendered artifact to a different tree than its engine files — which is every kit that ships a
+    Skill. The drop is right for the shape a single global map can hold; this overlay changes the
+    shape instead, per row.
+
+    Rooted on the receipt's own `(source, path)`, NEVER on a descriptor re-resolution:
+    `derive_carry_map`'s docstring forbids the latter, because the map must describe the target as
+    INSTALLED rather than as the descriptors read today. The single-pair call is the same one the
+    seed-override arm already makes.
+    """
+    one, _pairs, _dropped = derive_carry_map([(row.get("source"), row.get("path"))])
+    if not one:
+        return needles
+    merged = dict(needles)
+    merged.update(one)
+    return merged
+
+
 def derive_carried(data: bytes, needles: dict[str, str]) -> bytes:
     """Gov's bytes rewritten through the needle map — ONE left-to-right pass, longest needle first.
 
@@ -5158,16 +5416,16 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
 
 
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
-               write_withdrawals: bool = False) -> int:
+               write_withdrawals: bool = False, allow_ungraded: bool = False) -> int:
     """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
     try:
-        return _cmd_update(root, target, to_rev, write, write_withdrawals)
+        return _cmd_update(root, target, to_rev, write, write_withdrawals, allow_ungraded)
     finally:
         release_write_lock()
 
 
 def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
-                write_withdrawals: bool = False) -> int:
+                write_withdrawals: bool = False, allow_ungraded: bool = False) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -5194,6 +5452,34 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     if out.returncode != 0:
         raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
     to_commit = out.stdout.strip()
+
+    # DEPL-dGaugedVintage-10. The measurer's OWN currency, observed before anything is graded. It
+    # WARNS rather than refuses: S3 concedes the probe cannot always run, and a guard that blocks a
+    # disconnected operator is one they will route around. The observation is the point.
+    _cur, _cur_detail = resolve_measurer_currency(root, to_commit)
+    if _cur == "current":
+        print(f"govkit update — measurer: this gov checkout IS the remote's advertised head "
+              f"({_cur_detail[:8]})")
+    elif _cur == "ahead":
+        print(f"govkit update — measurer: ahead of the remote — {_cur_detail}. Nothing is missing "
+              f"from this clone")
+    elif _cur in ("behind", "diverged"):
+        print(f"govkit update — measurer WARNING: {_cur} — {_cur_detail}. Every verdict below is "
+              f"measured against these bytes, so fetch before trusting a green read")
+    else:
+        # NOT the word `current`: an arm elsewhere asserts that string appears nowhere in an
+        # update run, and this repo's `absence-assertion-over-whole-file-text` gotcha is exactly
+        # about a new message colliding with somebody else's absence assertion.
+        print(f"govkit update — measurer: currency UNVERIFIED — {_cur_detail}. That is not the same "
+              f"fact as being up to date")
+
+    # DEPL-dGaugedVintage-9 S1. Defined ONCE and called from all three mutating branches, because
+    # three copies of "what version did we just land" is three places for it to drift. Before this,
+    # `version` was written by `apply` and `adopt` only and `update` never touched it, so a row
+    # refreshed to new bytes kept the version it landed at — reproduced by aTetheredConvoy F6.
+    def _resolve_ver_at(_row: dict) -> str:
+        _d = descs.get(_row.get("kit") or "")
+        return resolve_entry_version_at(root, _d[0], to_commit) if _d else _row.get("version", "")
 
     if base_commit:
         chk = subprocess.run(["git", "-C", str(root), "cat-file", "-e", f"{base_commit}^{{commit}}"],
@@ -5347,11 +5633,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     needles, carry_pairs, carry_dropped = derive_carry_map(
         [(w.get("source"), w.get("path")) for w in rows_all])
     for _gd, _dests in carry_dropped:
+        # DEPL-dGaugedVintage-11 S1. Still dropped from the GLOBAL map, which can hold one
+        # destination per gov directory and nothing else — but no longer silent for the rows
+        # themselves: each is rewritten through `resolve_row_needles`, which overlays that row's own
+        # `(source, path)` pair. The global map is a run-level summary; the rewrite is per row.
         print(f"govkit update — carry map DROPPED the ambiguous gov directory '{_gd}': this receipt "
               f"puts it at {', '.join(_dests)}, so it names no single destination and cannot be a "
-              f"needle")
+              f"needle. Rows under it now resolve against their own destination instead "
+              f"(DEPL-dGaugedVintage-11)")
+    # S2. The DROPPED COUNT, printed at zero as well. A run that dropped nothing and a run whose
+    # drop report never executed used to look identical, which is the green-by-absence shape.
     print(f"govkit update — carry map: {len(carry_pairs)} directory pair(s), "
-          f"{len(needles)} needle(s)")
+          f"{len(needles)} needle(s), {len(carry_dropped)} fanned-out director(y|ies)")
 
     deploy = load_deploy(target)
 
@@ -5590,6 +5883,59 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"so there is no base to write against and none was written. "
               f"`govkit adopt --re-adopt --pin <path>=<rev> --write` supplies one")
 
+    # DEPL-dGaugedVintage-9 S2/S3/S4. THE PER-KIT VERSION DELTA, which nothing in gov reported.
+    # Every row has carried a `version` since schema 2 and no reader ever joined it to gov's own
+    # constant, so "which of my kits are behind" — the question an adopter asks BEFORE an update —
+    # had no answer in any verb.
+    #
+    # EQUALITY, never ordering. `entry_version` returns the constant's whole SOURCE LINE, not a
+    # number, so two of them compare for identity and nothing else; a parse into comparable versions
+    # would need its own stated failure mode and is not this unit's.
+    #
+    # FOUR non-level states, none collapsed into level: a row with no `version` key at all (a
+    # receipt older than the field), and the two sentinels `entry_version` itself returns.
+    _numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
+    _by_kit: dict[str, set[str]] = {}
+    for _f in receipt.get("files", []):
+        _by_kit.setdefault(_f.get("kit") or "(no kit)", set()).add(_f.get("version", "__ABSENT__"))
+    if _by_kit:
+        print("govkit update — per-kit version delta (stored in the receipt vs gov at "
+              f"{to_commit[:8]}); EQUALITY, not ordering:")
+        for _k in sorted(_by_kit):
+            _d = descs.get(_k)
+            _live = resolve_entry_version_at(root, _d[0], to_commit) if _d else "(unresolvable)"
+            _stored = _by_kit[_k]
+            if _stored == {"__ABSENT__"}:
+                _verdict = "unknown — this receipt predates the version field"
+            elif len(_stored) > 1:
+                _verdict = f"MIXED across rows: {sorted(s for s in _stored if s != '__ABSENT__')}"
+            else:
+                _s = next(iter(_stored))
+                if _s == "__ABSENT__":
+                    _verdict = "unknown — this receipt predates the version field"
+                elif _s in ("(none declared)", "(unresolvable)"):
+                    _verdict = f"{_s.strip('()')} — no comparison is possible"
+                elif _live in ("(none declared)", "(unresolvable)"):
+                    _verdict = f"gov side {_live.strip('()')} — no comparison is possible"
+                else:
+                    # COMPARE THE VERSION, DISPLAY THE LINE. Found at build time by running this
+                    # report against a live adopter: `entry_version` returns the constant's whole
+                    # SOURCE LINE, so `DEPL-dGaugedVintage-5` adding a marker COMMENT to three
+                    # constants made all three read DIFFERS at an identical version. That is a false
+                    # "behind" — the same class B1 was about, one field over. When both sides yield
+                    # a dotted number the comparison is on the NUMBER; when either does not, it
+                    # falls back to the line and SAYS which it used, because a silent fallback is
+                    # how a comparison stops meaning what its output claims.
+                    _ms, _ml = _numv.search(_s), _numv.search(_live)
+                    if _ms and _ml:
+                        _verdict = ("level" if _ms.group(1) == _ml.group(1)
+                                    else f"DIFFERS — stored {_ms.group(1)}, gov has {_ml.group(1)}")
+                    else:
+                        _verdict = ("level (whole-line compare: no version number in one side)"
+                                    if _s == _live
+                                    else f"DIFFERS by whole line — gov has {_live!r}")
+            print(f"  {_k:<28} {_verdict}")
+
     if not write:
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
         return r.emit()
@@ -5739,6 +6085,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             row["oid"] = oid
             row["sha256"] = _sha(data)
             row["commit"] = to_commit
+            row["version"] = _resolve_ver_at(row)
             if restored_carry:
                 row["carry"] = restored_carry
             changed.append(row["path"])
@@ -5794,8 +6141,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             else:
                 merged, _how = three_way(
                     c["ours"],
-                    derive_carried_by_rung(c["carry"], c["base"] or b"", needles),
-                    derive_carried_by_rung(c["carry"], c["theirs_new"], needles))
+                    derive_carried_by_rung(c["carry"], c["base"] or b"",
+                                           resolve_row_needles(needles, row)),
+                    derive_carried_by_rung(c["carry"], c["theirs_new"],
+                                           resolve_row_needles(needles, row)))
                 if merged is None:
                     conflicts += 1
                     (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md"
@@ -5857,6 +6206,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             row["oid"] = oid
             row["sha256"] = _sha(data)
             row["commit"] = to_commit
+            row["version"] = _resolve_ver_at(row)
             renamed.extend([old_path, new_dest])
             # The DESTINATION line. The verdict row above names the old path, which is the only
             # spelling the receipt had when it was printed; where the file went is the other half,
@@ -5921,8 +6271,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # reads as an operator edit and the whole file conflicts.
             merged, how = three_way(
                 c["ours"],
-                derive_carried_by_rung(c["carry"], c["base"] or b"", needles),
-                derive_carried_by_rung(c["carry"], c["theirs"], needles))
+                derive_carried_by_rung(c["carry"], c["base"] or b"",
+                                       resolve_row_needles(needles, row)),
+                derive_carried_by_rung(c["carry"], c["theirs"],
+                                       resolve_row_needles(needles, row)))
             if merged is None:
                 conflicts += 1
                 (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md").write_text(
@@ -5973,6 +6325,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 row["oid"] = oid
                 row["sha256"] = _sha(merged)
                 row["commit"] = to_commit
+                row["version"] = _resolve_ver_at(row)
                 changed.append(row["path"])
 
     # NO `git add` OVER `changed`. S5 already staged every one of those paths from gov's own bytes;
@@ -6201,14 +6554,39 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         return r.emit()
 
     receipt["schema"] = RECEIPT_SCHEMA
+    # DEPL-dGaugedVintage-8 S1. THE STAMP MUST NOT OUTRUN THE ROWS THIS RUN NEVER GRADED. An
+    # `evidence: "unattributed"` row is skipped above (`how == "table"` branch) before
+    # `classify_row`, by DEPL-dCarriedReceipt-13's ratified design, and it is graded against the
+    # receipt's OWN `gov_commit`. Advancing the stamp anyway moves the base that `adopt --re-adopt`
+    # would walk from further from the vintage those bytes actually came from, so every update makes
+    # the row harder to attribute — a slow loss with no event to notice.
+    #
+    # The byte-level work above is KEPT either way. Refusing the whole run would punish the operator
+    # for a state `adopt` recorded honestly; only the stamp is withheld.
+    ungraded = sum(1 for f in receipt.get("files", []) if f.get("evidence") == "unattributed")
+    if ungraded and not allow_ungraded:
+        print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
+              f"deleted {len(deleted)}, withheld {withheld}, {conflicts} conflict(s). "
+              f"The receipt is NOT re-stamped: {ungraded} row(s) carry `evidence: \"unattributed\"` "
+              f"and this run graded none of them, so advancing gov_commit would move the base they "
+              f"must be attributed from. Clear them with "
+              f"`govkit adopt --re-adopt --write`, or pass --allow-ungraded to stamp anyway")
+        receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+        (target / ".governance" / "install.sums").write_text(
+            "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
+            encoding="utf-8", newline="\n")
+        return r.emit()
+
     receipt["gov_commit"] = to_commit
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
     (target / ".governance" / "install.sums").write_text(
         "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
         encoding="utf-8", newline="\n")
+    # S2. The override says what it overrode, so the choice is on the record rather than silent.
+    over = (f" over {ungraded} ungraded row(s), --allow-ungraded" if ungraded else "")
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
           f"deleted {len(deleted)}, withheld {withheld}, "
-          f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}")
+          f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}{over}")
     return r.emit()
 
 
@@ -6843,7 +7221,7 @@ USAGE = """usage:
   govkit.py plan  --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
-  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals] [--allow-ungraded]
   govkit.py adopt  --target <path> [--to <rev>] [--pin <path>=<rev> ...] [--re-adopt] [--write]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
@@ -6856,7 +7234,11 @@ gov has stopped shipping is REPORTED and an order is written under `.governance/
 adopter's copy stays exactly where it is. It defaults off and it is a scope flag rather than a
 `--force` — it enables a narrower class of action and overrides no refusal. A file gov RENAMED is
 not a withdrawal at all: `update --write` moves the target's copy to the new destination its own
-descriptor resolves, carrying any local edit through a three-way merge. The default is read-only because that verb's failure mode is silent data loss in a
+descriptor resolves, carrying any local edit through a three-way merge. `--allow-ungraded` overrides
+one refusal and nothing else: `update --write` withholds the receipt's `gov_commit` re-stamp while
+any row carries `evidence: "unattributed"`, because those rows are graded against the receipt's own
+base and advancing it moves that base away from them. The bytes are written either way; only the
+stamp is withheld, and `govkit adopt --re-adopt --write` is what clears the rows. The default is read-only because that verb's failure mode is silent data loss in a
 repository the operator owns and gov does not, and the muscle-memory invocation must not be the
 destructive one. `intake` writes the target descriptor
 ONCE and refuses to overwrite one that exists — a subcommand that parses and does
@@ -6872,6 +7254,10 @@ def parse_args(argv: list[str]) -> tuple:
     resume = False
     write = False
     write_withdrawals = False
+    # DEPL-dGaugedVintage-8 S1. It overrides a refusal, so it is NOT a scope flag by the test
+    # `--write-withdrawals` passes — and it is deliberately not spelled `--force`, because a general
+    # force flag would also disable guards this unit does not own.
+    allow_ungraded = False
     to_rev = "HEAD"
     answers: dict[str, str] = {}
     # DEPL-dCarriedReceipt-13 S1. Both widen this function, which used to return a fixed 8-tuple.
@@ -6914,6 +7300,9 @@ def parse_args(argv: list[str]) -> tuple:
             # deletion it scopes lives in the write loop.
             write_withdrawals = True
             i += 1
+        elif a == "--allow-ungraded":
+            allow_ungraded = True
+            i += 1
         elif a == "--pin" and i + 1 < len(argv):
             # DEPL-dCarriedReceipt-13 S6. `<path>=<rev>`, and the SAME key=value refusal `--answer`
             # already makes: a `--pin` with no `=` is an operator naming a path and no vintage, and
@@ -6947,7 +7336,7 @@ def parse_args(argv: list[str]) -> tuple:
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
     return (verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals,
-            pins, re_adopt, coverage, emit_declines, run_discharge)
+            pins, re_adopt, coverage, emit_declines, run_discharge, allow_ungraded)
 
 
 def main(argv: list[str]) -> int:
@@ -6956,7 +7345,8 @@ def main(argv: list[str]) -> int:
         return 0 if argv else 2
     try:
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
-         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE) = parse_args(argv)
+         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE,
+         ALLOW_UNGRADED) = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
@@ -6982,7 +7372,8 @@ def main(argv: list[str]) -> int:
                 return cmd_intake(root, target, mode, kits, ANSWERS)
             if verb == "update":
                 return cmd_update(root, target, TO_REV, write=WRITE,
-                                  write_withdrawals=WRITE_WD)
+                                  write_withdrawals=WRITE_WD,
+                                  allow_ungraded=ALLOW_UNGRADED)
             if verb == "adopt":
                 return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE)
             return cmd_apply(root, target, mode, kits, resume=RESUME)
