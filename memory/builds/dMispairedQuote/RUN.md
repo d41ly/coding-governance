@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: d9efe373a3b86a91f82ab9062a9dff4306e3293c
-phase: REVIEWING
+witness: da1ea33302de665dcc4a58f25f6d0f1c15da70e0
+phase: BUILDING
 branch-sha: d9efe373a3b86a91f82ab9062a9dff4306e3293c
 branch-ref: refs/heads/branch/agent-cap-apostrophe-bug-46c953
 mode: prompt

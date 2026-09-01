@@ -1,11 +1,12 @@
 # TOOL-dMispairedQuote-3 — every rule is evaluated over both views, so no denial can be lost
 
-**Status:** OPEN · rev-4 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 2
+**Status:** INPROGRESS · rev-5 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-red-TOOL-dMispairedQuote-3.txt](../build/2026-09-01-red-TOOL-dMispairedQuote-3.txt) | journal | — |
 | [2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round2.md) | spec-audit | — |
 | [2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-3-spec-audit-round3.md) | spec-audit | — |
@@ -72,8 +73,10 @@ mechanism alone. This unit makes the change monotone in the DENY direction by co
   assertion-between-two-derived-values class. In a tree where that blob does not resolve — an
   adopter that copy-installed the kit — the arm ANNOUNCES A SKIP naming why, rather than passing.
   **Its population is the tracked corpus PLUS a fixture set**, and the second half is not padding:
-  measured, unit 1 alone flips ZERO tracked files from DENY to ADMIT, because every one of the three
-  reproduced shapes is a synthetic script and none of them is committed here. A property arm whose
+  unit 1 alone flips ONE tracked file from DENY to ADMIT and both synthetic fixtures besides. The
+  arm's own staging is the measurement and it corrects rev-2 to rev-4, which said ZERO on a reading
+  taken from a superseded candidate: `memory/builds/aSiftedPlaybook/reviews/2026-08-16-review-PLAY-aSiftedPlaybook-1-2.md`
+  is the file, and one instance in 1271 is not a population to build a class gate on. A property arm whose
   population contains no instance of the class it guards can only ever pass, which is §7's own
   could-not-fail shape and was round 2's second blocker.
   **The fixtures are HEREDOCS inside `agent-cap.test.sh`, not tracked files under `tools/hooks/`.**
@@ -242,6 +245,14 @@ none
 
 - rev-1 · 2026-09-01 · initial draft. Promoted from unit 1's spec-audit round 2 NON-CONVERGENT exit,
   blockers 1, 8 and 17, per BUILD-METHOD M4.
+- rev-5 · 2026-09-01 · BUILT. Two corrections the build itself measured, neither of them a review
+  finding. S9 said unit 1 alone flips ZERO tracked files; staging the property arm against unit 1
+  showed ONE, and the arm names it. And the two script-driven arms were first observed RED for the
+  WRONG reason — `"$TESTPY" - <<'PYEOF'` handed the Python body to node on this machine, because the
+  resolved launcher reads the dash as dispatch-by-shebang and finds the suite's own
+  `#!/usr/bin/env node`. Both now run from a file in `$TMP` and were re-staged RED for the right one.
+  Measured at landing: suite 146 passed / 0 failed in 88 s, property arm over 1271 files with 47
+  denied at BASE and 0 lost, `VERB_OFFENDER_PIN` lowered 463 to 461.
 - rev-4 · 2026-09-01 · folded spec-audit round 3, which held at 2 blockers against a ceiling of 2 and
   therefore exited NON-CONVERGENT. Per BUILD-METHOD M4 the loop STOPPED and both blockers were
   disposed as FOLDS — neither needed a mechanism this build lacks, and the review said so. Each was

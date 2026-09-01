@@ -85,18 +85,18 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 3 unit(s) · node d · opened 2026-09-01 · streams tooling
+**Build status:** INPROGRESS · 3 unit(s) · node d · opened 2026-09-01 · streams tooling
 ids TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2 TOOL-dMispairedQuote-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dMispairedQuote-1 — one quote-opening decision, shared by every view in `agent-cap.js`](spec/2026-09-01-spec-TOOL-dMispairedQuote-1.md) | 1 | 2 | OPEN | rev-3 | 2026-09-01 |
-| [TOOL-dMispairedQuote-3 — every rule is evaluated over both views, so no denial can be lost](spec/2026-09-01-spec-TOOL-dMispairedQuote-3.md) | 2 | 2 | OPEN | rev-4 | 2026-09-01 |
+| [TOOL-dMispairedQuote-1 — one quote-opening decision, shared by every view in `agent-cap.js`](spec/2026-09-01-spec-TOOL-dMispairedQuote-1.md) | 1 | 2 | INPROGRESS | rev-3 | 2026-09-01 |
+| [TOOL-dMispairedQuote-3 — every rule is evaluated over both views, so no denial can be lost](spec/2026-09-01-spec-TOOL-dMispairedQuote-3.md) | 2 | 2 | INPROGRESS | rev-5 | 2026-09-01 |
 | [TOOL-dMispairedQuote-2 — the carriers that describe `agent-cap.js`'s string views describe what they now do](spec/2026-09-01-spec-TOOL-dMispairedQuote-2.md) | 3 | 1 | OPEN | rev-3 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

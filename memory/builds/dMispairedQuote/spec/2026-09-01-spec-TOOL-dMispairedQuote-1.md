@@ -1,11 +1,12 @@
 # TOOL-dMispairedQuote-1 — one quote-opening decision, shared by every view in `agent-cap.js`
 
-**Status:** OPEN · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 1
+**Status:** INPROGRESS · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-red-TOOL-dMispairedQuote-1.txt](../build/2026-09-01-red-TOOL-dMispairedQuote-1.txt) | journal | — |
 | [2026-09-01-prompt-TOOL-dMispairedQuote-1.md](../prompts/2026-09-01-prompt-TOOL-dMispairedQuote-1.md) | research | TOOL-dMispairedQuote-2 |
 | [2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round1.md) | spec-audit | TOOL-dMispairedQuote-2 |
 | [2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round2.md) | spec-audit | TOOL-dMispairedQuote-2 |

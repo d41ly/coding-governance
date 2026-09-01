@@ -1,3 +1,11 @@
+# The staged-RED observation for TOOL-dMispairedQuote-1
+
+**Serves:** journal TOOL-dMispairedQuote-1
+
+Every arm below was run against a tree WITHOUT this unit's code, so its failing case was
+observed before it landed. Verbatim `bash tools/hooks/agent-cap.test.sh` output.
+
+```text
 ok   rule2 edges: an unbounded fan below an unterminated backtick still denies (exit 2)
 ok   rule2 prose: one-field element, stray ) in the LAST element (exit 0)
 ok   rule2 prose: a stray ) at the very end of the prose was never a denial (exit 0)
@@ -43,3 +51,4 @@ FAIL keyword control: /* do 'em */ is not a declared opener -> deny (exit 0, wan
 FAIL keyword control: /* run 'em */ is not a declared opener -> deny (exit 0, want 2)
 FAIL keyword control: /* one 'em */ is not a declared opener -> deny (exit 0, want 2)
 ---- 125 passed, 15 failed ----
+```

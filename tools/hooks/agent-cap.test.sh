@@ -1029,5 +1029,163 @@ for kw in in of do run one; do
 EOF
 done
 
+
+# ---- TOOL-dMispairedQuote-3: no denial may be LOST ------------------------------------------------
+# Correcting what counts as a string literal does not only un-hide fan-outs; it un-hides every other
+# character the old mispairing was blanking, and rules 2, 3 and 5 walk brackets and balance parens
+# ACROSS lines. Three DENY-to-ADMIT moves were reproduced against unit 1 alone. Each has a fixture
+# here, and each was ALSO closed by the property arm below -- which is what makes the property worth
+# its bytes: the next repair to these views inherits it without knowing these three shapes.
+
+js "no-regress: a backtick inside a regex, above a multi-line cap-50 call -> deny" 2 <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}
+const L = ['a','b']
+const re = /it's`don't/
+await boundedParallel(
+  L.map((s) => () => agent(s)),
+  50,
+)
+EOF
+
+js "no-regress: an exposed backtick leaks the template mode -> deny" 2 <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}
+const L = ['a','b']
+const re = /a'b`c/
+await boundedParallel(
+  L.map((s) => () => agent(s)),
+  50,
+)
+EOF
+
+js "no-regress: a quoted URL inside a same-line template -> deny" 2 <<'EOF'
+const p = `see 'http://x' now`; await parallel(all.map(f))
+EOF
+
+js "no-regress: a DOUBLE-quoted URL in a template does it without an apostrophe -> deny" 2 <<'EOF'
+const p = `see "http://x" now`; await parallel(all.map(f))
+EOF
+
+# ---- S10: `verbatim` is CHECKED, not asserted ----------------------------------------------------
+# The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
+# differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.
+GOV_BASE_SHA=${GOV_BASE_SHA:-d65da7ab}
+if git -C "$HERE" show "$GOV_BASE_SHA:tools/hooks/agent-cap.js" > "$TMP/base-hook.js" 2>/dev/null; then
+  cat > "$TMP/byte.py" <<'PYEOF'
+import sys, pathlib
+base = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n")
+cur = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n")
+PAIRS = [("function stripStrings(line) {", "function renderShippedLine(line) {"),
+         ("function renderCodeView(script) {", "function renderShippedView(script) {"),
+         ("function blankLiterals(script) {", "function renderShippedBlanks(script) {")]
+def block(text, header):
+    ls = text.split("\n")
+    s = ls.index(header)
+    e = s
+    while ls[e] != "}":
+        e += 1
+    return "\n".join(ls[s + 1:e + 1])
+bad = 0
+for b, c in PAIRS:
+    try:
+        if block(base, b) != block(cur, c):
+            print("DRIFT %s is not the BASE bytes of %s" % (c, b)); bad += 1
+    except ValueError as e:
+        print("MISSING %s or %s (%s)" % (b, c, e)); bad += 1
+print("bodies-compared 3 drifted %d" % bad)
+sys.exit(1 if bad else 0)
+PYEOF
+  "$TESTPY" "$TMP/byte.py" "$TMP/base-hook.js" "$HOOK" > "$TMP/byte.out" 2>&1
+  if [ $? = 0 ]; then
+    echo "ok   no-regress: the three renderShipped* bodies are the BASE bytes"; pass=$((pass+1))
+  else
+    echo "FAIL no-regress: a renderShipped* body has drifted from BASE"; sed 's/^/     /' "$TMP/byte.out"; fail=$((fail+1))
+  fi
+else
+  echo "skip no-regress byte arm — $GOV_BASE_SHA:tools/hooks/agent-cap.js does not resolve in this tree, so there is nothing to compare the frozen bodies against"
+fi
+
+# ---- S9: THE PROPERTY. No script this hook denied at BASE may be admitted now. --------------------
+# The population is every tracked file PLUS the fixtures below. The second half is not padding:
+# unit 1 alone flips ZERO tracked files, because every reproduced shape is synthetic. A property arm
+# whose population holds no instance of the class it guards can only ever pass.
+if [ -s "$TMP/base-hook.js" ]; then
+  mkdir -p "$TMP/nrfix"
+  cat > "$TMP/nrfix/backtick-in-regex.js" <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}
+const L = ['a','b']
+const re = /it's`don't/
+await boundedParallel(
+  L.map((s) => () => agent(s)),
+  50,
+)
+EOF
+  cat > "$TMP/nrfix/exposed-backtick.js" <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}
+const L = ['a','b']
+const re = /a'b`c/
+await boundedParallel(
+  L.map((s) => () => agent(s)),
+  50,
+)
+EOF
+  cat > "$TMP/nrfix/template-borne-comment.js" <<'EOF'
+const p = `see 'http://x' now`; await parallel(all.map(f))
+EOF
+  cat > "$TMP/nr.py" <<'PYEOF'
+import json, subprocess, sys, pathlib
+base_hook, cur_hook, root, fixdir = sys.argv[1:5]
+root = pathlib.Path(root).resolve()
+files = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True, text=True).stdout.split()
+pop = [root / f for f in files] + sorted(pathlib.Path(fixdir).glob("*.js"))
+lost, denied, n = [], 0, 0
+for p in pop:
+    try:
+        body = p.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        continue
+    payload = json.dumps({"tool_name": "Workflow", "tool_input": {"script": body}})
+    a = subprocess.run(["node", base_hook], input=payload, capture_output=True, text=True).returncode
+    n += 1
+    if a != 2:
+        continue
+    denied += 1
+    b = subprocess.run(["node", cur_hook], input=payload, capture_output=True, text=True).returncode
+    if b == 0:
+        lost.append(str(p))
+for f in lost:
+    print("LOST a denial: %s" % f)
+print("population %d scanned, %d denied at BASE, %d denial(s) lost" % (n, denied, len(lost)))
+sys.exit(1 if lost or denied == 0 else 0)
+PYEOF
+  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$HERE/../.." "$TMP/nrfix" > "$TMP/nr.out" 2>&1
+  if [ $? = 0 ]; then
+    echo "ok   no-regress: no denial lost against BASE ($(tail -1 "$TMP/nr.out"))"; pass=$((pass+1))
+  else
+    echo "FAIL no-regress: a denial the BASE hook made is gone"; sed 's/^/     /' "$TMP/nr.out"; fail=$((fail+1))
+  fi
+else
+  echo "skip no-regress property arm — the BASE blob does not resolve in this tree, so there is no shipped hook to compare verdicts against"
+fi
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]
