@@ -1,108 +1,108 @@
-.githooks/pre-commit	1
-.githooks/pre-push	2
-.githooks/pre-push.test.sh	2
-WIRE-INTO-PROJECT.md	28
-coding-governance-agents.template.md	2
-skills/session-kickoff/SKILL.md	2
-skills/session-kickoff/manifest-check.sh	2
-tools/agent-instructions/README.md	4
-tools/agent-instructions/kit.toml	1
-tools/check-agent-cap-restatement.sh	2
-tools/check-agent-cap-restatement.test.sh	1
-tools/check-install-prefix.sh	6
-tools/check-install-prefix.test.sh	3
-tools/check-kit-versions.sh	29
-tools/check-line-length.sh	1
-tools/check-microformats.sh	1
-tools/check-wiring.sh	6
-tools/check-wiring.test.sh	16
-tools/codebase-map/adopt-codebase-map.sh	3
-tools/codebase-map/adopt-codebase-map.test.sh	5
-tools/codebase-map/map_extractors.py	2
-tools/codebase-map/map_lib.py	1
-tools/codebase-map/selftest.py	5
-tools/drift-audit/README.md	3
-tools/drift-audit/adopt-drift-audit.sh	5
-tools/drift-audit/drift_report.py	3
-tools/drift-audit/drift_signals.py	3
-tools/drift-audit/drift_signals.template.py	2
-tools/gate-lint/README.md	3
-tools/gate-lint/kit.toml	1
-tools/gate-lint/ps-hygiene.py	1
-tools/govkit/registry.toml	15
-tools/hooks/README.md	1
-tools/hooks/agent-cap.js	5
-tools/hooks/agent-cap.test.sh	3
-tools/hooks/scratch-guard.js	1
-tools/hooks/scratch-guard.test.sh	4
-tools/install-prefix-carried.txt	88
-tools/install-prefix-waivers.txt	6
-tools/lexicon/LEXICON.md	3
-tools/lexicon/README.md	10
-tools/lexicon/SKILL.template.md	1
-tools/lexicon/adopt-lexicon.sh	4
-tools/lexicon/kit.toml	1
-tools/lexicon/lexicon.py	1
-tools/lexicon/lexicon_conf.py	3
-tools/lexicon/scaffold_lexicon.py	4
-tools/lexicon/selftest.py	15
-tools/memory-recall/README.md	8
-tools/memory-recall/adopt-memory-recall.sh	5
-tools/memory-recall/recall-fixture.json	1
-tools/memory-recall/recall-opened.js	1
-tools/memory-recall/recall_conf.py	1
-tools/memory-tree/README.md	4
-tools/memory-tree/adopt-memory-tree.sh	5
-tools/memory-tree/check-arms.py	4
-tools/memory-tree/check-memory-hygiene.sh	6
-tools/memory-tree/check-memory-hygiene.test.sh	4
-tools/memory-tree/check-method-carriers.sh	1
-tools/memory-tree/check-method-carriers.test.sh	2
-tools/memory-tree/check-verdict-epoch.sh	10
-tools/memory-tree/check-verdict-epoch.test.sh	3
-tools/memory-tree/corpus_ids.py	8
-tools/memory-tree/gen_build_index.py	6
-tools/memory-tree/gotchas.py	11
-tools/memory-tree/hygiene-parity.test.sh	7
-tools/memory-tree/kit-dogfood-parity.test.sh	5
-tools/memory-tree/marker-contract.test.sh	1
-tools/memory-tree/merge-rows.py	3
-tools/memory-tree/merge-rows.sh	5
-tools/memory-tree/merge-rows.test.sh	26
-tools/playbook/README.md	3
-tools/playbook/adopt-playbook.sh	3
-tools/playbook/kit.toml	1
-tools/playbook/render_playbook.py	1
-tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	3
-tools/run-gates/README.md	1
-tools/run-gates/kit.toml	2
-tools/run-gates/profile_bar.py	1
-tools/run-gates/profile_bar.test.sh	9
-tools/run-gates/run-gates.evidence.test.sh	5
-tools/run-gates/run-gates.gov.test.sh	4
-tools/run-gates/run-gates.sh	3
-tools/run-gates/run-gates.test.sh	33
-tools/run-gates/run-gates.turnstile.test.sh	21
-tools/settings-merge.py	1
-tools/unattended/.unattended.conf.example	3
-tools/unattended/SKILL.template.md	1
-tools/unattended/adopt-unattended.sh	2
-tools/unattended/adopt-unattended.test.sh	2
-tools/unattended/check-playbook.sh	1
-tools/unattended/check-playbook.test.sh	37
-tools/unattended/check-unattended.sh	3
-tools/unattended/check-unattended.test.sh	3
-tools/unattended/cross-component.test.sh	2
-tools/unattended/kit.toml	2
-tools/unattended/playbook.fixture.md	2
-tools/unattended/run-unattended-gates.sh	2
-tools/unattended/unattended.sh	7
-tools/unattended/unattended.test.sh	8
-tools/workflows/check-protocol-parity.test.sh	3
-tools/workflows/check-review-join.sh	3
-tools/workflows/check-review-join.test.sh	9
-tools/workflows/check-verifier-fanout.sh	3
-tools/workflows/check-verifier-fanout.test.sh	1
-tools/workflows/check-workflow-syntax.js	2
-tools/workflows/tier2-review.js	3
-tools/workflows/tier2-review.test.sh	1
+.githooks/pre-commit	1	memory-tree
+.githooks/pre-push	2	run-gates
+.githooks/pre-push.test.sh	2	run-gates
+WIRE-INTO-PROJECT.md	28	codebase-map,drift-audit,hooks,memory-recall,memory-tree,playbook,workflows
+coding-governance-agents.template.md	2	hooks,playbook
+skills/session-kickoff/SKILL.md	2	codebase-map,playbook
+skills/session-kickoff/manifest-check.sh	2	lib,unattended
+tools/agent-instructions/README.md	4	agent-instructions,playbook
+tools/agent-instructions/kit.toml	1	agent-instructions
+tools/check-agent-cap-restatement.sh	2	hooks,workflows
+tools/check-agent-cap-restatement.test.sh	1	hooks
+tools/check-install-prefix.sh	6	govkit,lib
+tools/check-install-prefix.test.sh	3	memory-tree
+tools/check-kit-versions.sh	29	codebase-map,drift-audit,govkit,hooks,lexicon,memory-recall,memory-tree,pytest-parallel-guardrails,run-gates,unattended,workflows
+tools/check-line-length.sh	1	lexicon
+tools/check-microformats.sh	1	playbook
+tools/check-wiring.sh	6	hooks,lib,memory-recall,memory-tree
+tools/check-wiring.test.sh	16	hooks,lib,memory-recall,memory-tree
+tools/codebase-map/adopt-codebase-map.sh	3	lib
+tools/codebase-map/adopt-codebase-map.test.sh	5	codebase-map,lib
+tools/codebase-map/map_extractors.py	2	codebase-map,run-gates
+tools/codebase-map/map_lib.py	1	hooks
+tools/codebase-map/selftest.py	5	codebase-map
+tools/drift-audit/README.md	3	drift-audit
+tools/drift-audit/adopt-drift-audit.sh	5	drift-audit,lib
+tools/drift-audit/drift_report.py	3	drift-audit
+tools/drift-audit/drift_signals.py	3	drift-audit
+tools/drift-audit/drift_signals.template.py	2	drift-audit
+tools/gate-lint/README.md	3	gate-lint
+tools/gate-lint/kit.toml	1	gate-lint
+tools/gate-lint/ps-hygiene.py	1	gate-lint
+tools/govkit/registry.toml	15	agent-instructions,codebase-map,drift-audit,gate-lint,hooks,lexicon,memory-recall,memory-tree,playbook,pytest-parallel-guardrails,run-gates,unattended,workflows
+tools/hooks/README.md	1	workflows
+tools/hooks/agent-cap.js	5	hooks,workflows
+tools/hooks/agent-cap.test.sh	3	hooks,workflows
+tools/hooks/scratch-guard.js	1	run-gates
+tools/hooks/scratch-guard.test.sh	4	hooks,run-gates
+tools/install-prefix-carried.txt	88	agent-instructions,codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,memory-recall,memory-tree,playbook,pytest-parallel-guardrails,run-gates,unattended,workflows
+tools/install-prefix-waivers.txt	6	codebase-map,memory-tree
+tools/lexicon/LEXICON.md	3	lexicon
+tools/lexicon/README.md	10	codebase-map,drift-audit,lexicon
+tools/lexicon/SKILL.template.md	1	lexicon
+tools/lexicon/adopt-lexicon.sh	4	lexicon,lib
+tools/lexicon/kit.toml	1	memory-recall
+tools/lexicon/lexicon.py	1	codebase-map
+tools/lexicon/lexicon_conf.py	3	lexicon
+tools/lexicon/scaffold_lexicon.py	4	lexicon
+tools/lexicon/selftest.py	15	codebase-map,hooks,lexicon
+tools/memory-recall/README.md	8	memory-recall
+tools/memory-recall/adopt-memory-recall.sh	5	lib,memory-recall
+tools/memory-recall/recall-fixture.json	1	memory-recall
+tools/memory-recall/recall-opened.js	1	memory-recall
+tools/memory-recall/recall_conf.py	1	memory-tree
+tools/memory-tree/README.md	4	memory-tree
+tools/memory-tree/adopt-memory-tree.sh	5	lib,memory-tree
+tools/memory-tree/check-arms.py	4	memory-tree
+tools/memory-tree/check-memory-hygiene.sh	6	codebase-map,lib,memory-tree
+tools/memory-tree/check-memory-hygiene.test.sh	4	lib,memory-tree
+tools/memory-tree/check-method-carriers.sh	1	memory-tree
+tools/memory-tree/check-method-carriers.test.sh	2	memory-tree
+tools/memory-tree/check-verdict-epoch.sh	10	memory-recall,memory-tree
+tools/memory-tree/check-verdict-epoch.test.sh	3	memory-tree
+tools/memory-tree/corpus_ids.py	8	lib,memory-tree
+tools/memory-tree/gen_build_index.py	6	memory-tree,unattended
+tools/memory-tree/gotchas.py	11	memory-tree
+tools/memory-tree/hygiene-parity.test.sh	7	memory-tree
+tools/memory-tree/kit-dogfood-parity.test.sh	5	lib,memory-tree
+tools/memory-tree/marker-contract.test.sh	1	memory-tree
+tools/memory-tree/merge-rows.py	3	lib,memory-recall,memory-tree
+tools/memory-tree/merge-rows.sh	5	lib
+tools/memory-tree/merge-rows.test.sh	26	lib,memory-recall,memory-tree
+tools/playbook/README.md	3	govkit,playbook
+tools/playbook/adopt-playbook.sh	3	playbook
+tools/playbook/kit.toml	1	govkit
+tools/playbook/render_playbook.py	1	run-gates
+tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	3	lib
+tools/run-gates/README.md	1	lib
+tools/run-gates/kit.toml	2	govkit,memory-recall
+tools/run-gates/profile_bar.py	1	run-gates
+tools/run-gates/profile_bar.test.sh	9	run-gates
+tools/run-gates/run-gates.evidence.test.sh	5	run-gates
+tools/run-gates/run-gates.gov.test.sh	4	govkit,lib,memory-recall,run-gates
+tools/run-gates/run-gates.sh	3	lib
+tools/run-gates/run-gates.test.sh	33	lib,run-gates
+tools/run-gates/run-gates.turnstile.test.sh	21	run-gates
+tools/settings-merge.py	1	hooks
+tools/unattended/.unattended.conf.example	3	memory-tree,run-gates
+tools/unattended/SKILL.template.md	1	memory-tree
+tools/unattended/adopt-unattended.sh	2	unattended
+tools/unattended/adopt-unattended.test.sh	2	unattended
+tools/unattended/check-playbook.sh	1	run-gates
+tools/unattended/check-playbook.test.sh	37	unattended
+tools/unattended/check-unattended.sh	3	memory-tree,unattended
+tools/unattended/check-unattended.test.sh	3	memory-tree,unattended
+tools/unattended/cross-component.test.sh	2	unattended
+tools/unattended/kit.toml	2	unattended
+tools/unattended/playbook.fixture.md	2	unattended
+tools/unattended/run-unattended-gates.sh	2	unattended
+tools/unattended/unattended.sh	7	memory-tree,workflows
+tools/unattended/unattended.test.sh	8	memory-recall,memory-tree,unattended
+tools/workflows/check-protocol-parity.test.sh	3	memory-tree,workflows
+tools/workflows/check-review-join.sh	3	hooks,workflows
+tools/workflows/check-review-join.test.sh	9	hooks,workflows
+tools/workflows/check-verifier-fanout.sh	3	hooks,workflows
+tools/workflows/check-verifier-fanout.test.sh	1	hooks
+tools/workflows/check-workflow-syntax.js	2	workflows
+tools/workflows/tier2-review.js	3	hooks,memory-tree,workflows
+tools/workflows/tier2-review.test.sh	1	workflows
