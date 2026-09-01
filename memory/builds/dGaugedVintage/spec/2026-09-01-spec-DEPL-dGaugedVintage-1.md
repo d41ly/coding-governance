@@ -1,11 +1,12 @@
 # DEPL-dGaugedVintage-1 — a version constant an adopter never receives
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 4
+**Status:** CLOSED · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 4 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-1-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-1-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 |
 
 <!-- /gen:spec-records -->
@@ -90,9 +91,11 @@ exists to catch.
 ## 8. Open questions
 
 - **F1 — whether the arm should also cover the SENTINEL path** declared by the seven entries that
-  use one. A sentinel is how a deployer detects an unversioned entry, so the same "is it shipped"
-  question applies. Recommendation: yes, as a second arm in the same unit, because the two share the
-  resolution and splitting them would resolve destinations twice. Unresolved.
+  use one. RESOLVED (agent, 2026-09-01, delegated): NOT in this unit, reversing rev-2's own
+  recommendation. A sentinel answers "does this entry exist in the target", not "can its version be
+  pinned", and the seven sentinel entries were never measured against a shipping test — so the arm
+  would land with no observed failing case, which is the thing this unit exists to avoid. Filed as a
+  follow-up rather than smuggled in on a shared resolution. `prior:` no prior ruling found.
 
 ## 9. Revision log
 
@@ -102,6 +105,10 @@ exists to catch.
   they are the risk surface the arm exists for. `hooks` corrected to the entry id `agent-cap`. The
   counts are re-derived, not copied: the audit reported ten-vs-five and that does not reproduce.
 
+- rev-3 · 2026-09-01 · BUILT and CLOSED as an arm inside `selfcheck` check 5, resolved through
+  `resolve_entry` — the resolver `apply` uses — rather than a second walk. F1 resolved the other
+  way from rev-2's recommendation, with the reason.
+  Acceptance ledger at `build/2026-09-01-build-DEPL-dGaugedVintage-1-acceptance-ledger.md`.
 ## 10. Reuse audit
 
 - The seam is `resolve_dests` together with `resolve_rule_pool` in `tools/govkit/govkit.py`, the

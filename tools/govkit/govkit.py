@@ -1071,6 +1071,23 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             r.fail(f"entry '{eid}' version_from pattern matches {len(hits)} lines in {f}, not "
                    f"exactly one — a pattern matching none is unfillable and one matching several "
                    f"cannot say which is the version")
+        # DEPL-dGaugedVintage-1. EXISTING IN GOV IS NOT SHIPPING. Everything above asks whether the
+        # constant is here; nothing asked whether an adopter RECEIVES it. A kit whose version_from
+        # names a file its own `[[files]]` rules exclude is unpinnable in the target while every
+        # gate stays green, which is the shape this repo calls green-by-absence.
+        #
+        # Resolved through `resolve_entry`, the resolver `apply` itself uses, rather than a second
+        # walk over the same rules — a re-implementation would be a second answer to the question
+        # "what does this entry ship".
+        _src = f"{home}/{f}" if home else f
+        try:
+            _w = resolve_entry(root, d, canonical_ctx(eid))["writes"]
+        except Exception:                      # a descriptor too broken to resolve is check 4's
+            _w = None
+        if _w is not None and not any(row.get("src") == _src for row in _w.values()):
+            r.fail(f"entry '{eid}' declares its version constant in '{_src}', which its own "
+                   f"[[files]] rules do not land — an adopter receives the kit without the constant "
+                   f"they pin against, and every version gate here would still be green")
 
     # ---- 5b: the version claims cross-checked against the repo's OWN version gate, BOTH directions.
     #
