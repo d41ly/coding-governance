@@ -1,6 +1,6 @@
 # TOOL-dMispairedQuote-2 — the carriers that describe `agent-cap.js`'s string views describe what they now do
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -25,9 +25,14 @@ carriers, one of which review had already caught once and never fixed.
 ## 2. Scope (IN)
 
 - **S1** — `tools/hooks/agent-cap.js` header, the `ponytail:` ceiling paragraph at `:44-48`. It says
-  line comments AND quoted-string literals are stripped before the scan. State what is now true: a
-  quote the file cannot resolve as a literal opener is left as text and its line is still blanked, so
-  no view ever hands a consumer a raw line.
+  line comments AND quoted-string literals are stripped before the scan. State what is now true, and
+  state it EXACTLY: a quote the file cannot resolve as a literal opener is left as text and its line
+  is still blanked — **except inside a same-line template span, which unit 1's S2 emits whole**, so a
+  quoted `'http://x'` written inside one survives into the line-comment strip. Unit 1's round 2
+  caught that as blocker 8 and left its carrier half unassigned; a replacement ceiling that is also
+  untrue would ship a second wrong sentence in the carrier written to fix the first. What bounds the
+  consequence is `TOOL-dMispairedQuote-3`, and this paragraph names it rather than implying the
+  channel is closed.
 - **S2** — the `TOOL-aLexedStripper-5` note at `:276-286`. Its sentence *"This file models no regex
   literal"* stays TRUE and stops being the explanation: the reported defect was not a regex-literal
   defect, and the note should say so, naming the apostrophe as the mechanism and pointing at
@@ -52,8 +57,14 @@ carriers, one of which review had already caught once and never fixed.
   covers but the next reader will meet again in another scanner. **`gotcha-classes` is a
   machine-enumerated inventory key set**, so the new filename is CLAIMED in the dossier's
   `gotcha-classes` array and `memory/map/generated/` is regenerated in the same commit.
-- **S8** — `TOOL-aLexedStripper-3` and `-4` backlog rows: annotate each with what unit 1 did and did
-  NOT touch, so neither reads as closed. Add a row for the balanced-loose-quote residual.
+- **S8** — `TOOL-aLexedStripper-3` and `-4` backlog rows: annotate each with what units 1 and 3 did
+  and did NOT touch, so neither reads as closed. Add rows for the two residuals unit 1 §5 names —
+  the single-sided opener test and the keyword clause — for the regex-literal model unit 3 names as
+  the root fix it does not take, and for the `--disposition` flag the rendered unattended Skill
+  documents and `unattended 1.14` refuses.
+- **S9** — The dossier gains the DISPATCHER pair unit 3 introduces: `agent-cap.js` now carries two
+  implementations of each view and a mode that selects between them, which a reader meeting
+  `renderShippedLine` deserves to find described rather than inferred.
 
 ## 3. Non-goals (OUT)
 
@@ -99,7 +110,12 @@ that supports it rather than to a summary of it.
   freshness` leg run, both are green: the new `memory/gotchas/` file is claimed by the dossier's
   `gotcha-classes` array and `memory/map/generated/` matches a fresh render.
 - **AC7** — When `grep -n 'aLexedStripper-3\|aLexedStripper-4' memory/backlog/TOOL.md` runs, both
-  rows carry the annotation and neither is marked CLOSED, and a third row records the residual.
+  rows carry the annotation and neither is marked CLOSED, and four further rows record the two
+  residuals, the regex-literal follow-up and the `--disposition` drift.
+- **AC9** — When the `ponytail:` paragraph is read, it names the template-span exception by name and
+  points at `TOOL-dMispairedQuote-3`; no sentence in it claims every line is blanked.
+- **AC10** — When `memory/map/features/agent-cap.md` is read, it describes the dispatcher pair and
+  names both implementations of at least one view.
 - **AC8** — When `bash tools/run-gates/run-gates.sh` runs, the `memory-tree hygiene` leg and the
   `agent-cap self-test` two-copy parity arm are green over the mirrored header.
 
@@ -115,6 +131,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
+- rev-3 · 2026-09-01 · took blocker 8's carrier half from unit 1's spec-audit round 2, which no unit
+  owned: S1's replacement ceiling names the template-span exception instead of shipping a second
+  untrue sentence. Added S9 for unit 3's dispatcher pair, three more backlog rows to S8, and AC9 and
+  AC10 to observe both.
 - rev-2 · 2026-09-01 · folded spec-audit round 1, findings 31, 33 and 34. Derived the carrier list
   from unit 1's files-touched instead of authoring it, which added S3 (`fanoutFindings:352`), S5
   (`blankLiterals`' header) and the two extra dossier bullets in S6. Claimed the new
