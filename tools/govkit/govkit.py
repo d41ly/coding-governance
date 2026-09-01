@@ -353,6 +353,79 @@ def entry_version(root: pathlib.Path, desc: dict) -> str:
     return "(unresolvable)"
 
 
+def resolve_measurer_currency(root: pathlib.Path, to_commit: str) -> tuple[str, str]:
+    """Is the GOV checkout doing the measuring current with its own remote?
+
+    DEPL-dGaugedVintage-10. `demand_published_vintage` and `demand_forward_vintage` answer
+    reachability and direction, and BOTH are satisfied by any commit the local clone can see — so a
+    clone that has not fetched reports every row `current` for everything gov has since moved. That
+    is a green meaning the measurer was behind, not that the target was level.
+
+    IDENTITY, never distance. An advertisement returns a sha, not objects: on exactly the stale clone
+    this exists to catch, `rev-list --count` dies with a bad-object error and `merge-base` has no
+    remote history to walk. Equal-or-not is the whole answerable question without a fetch, and
+    fetching on the operator's behalf is a side effect nobody asked for.
+
+    Reads the REMOTE's advertisement rather than a tracking ref, because a tracking ref is exactly as
+    stale as the clone — the same rule `memory/guides/UNATTENDED-PROTOCOL.md` section 1 states for a
+    BASE. Returns (verdict, detail); `unverified` when the remote cannot be reached, which is
+    ANNOUNCED rather than treated as current.
+    """
+    # A TEST SEAM, and it is named rather than inferred. This probe spawns one `ls-remote` per
+    # PROCESS, and `selftest.py` spawns a fresh `update` process dozens of times — measured: the
+    # suite blew its 600 s ceiling on network round-trips alone. So a harness may turn the probe off
+    # and gets `unverified` for it, which is the honest answer: the probe did not run.
+    #
+    # It is not a gate-disabling flag. `unverified` is ANNOUNCED and is never read as up to date,
+    # which is S3's whole point, so a run with the probe off cannot be mistaken for a clean one.
+    if os.environ.get("GOVKIT_NO_REMOTE_PROBE"):
+        return "unverified", "probe disabled by GOVKIT_NO_REMOTE_PROBE"
+    _memo = getattr(resolve_measurer_currency, "_memo", None)
+    if _memo is None:
+        _memo = {}
+        resolve_measurer_currency._memo = _memo
+    _key = (str(root), to_commit)
+    if _key in _memo:
+        return _memo[_key]
+    _rn = subprocess.run(["git", "-C", str(root), "config", "--get", "branch.main.remote"],
+                         capture_output=True, text=True)
+    remote = (_rn.stdout.strip() or "origin")
+    try:
+        adv = subprocess.run(["git", "-C", str(root), "ls-remote", "--symref", "--exit-code",
+                              remote, "HEAD"], capture_output=True, text=True, timeout=20)
+    except (subprocess.TimeoutExpired, OSError) as e:
+        return _memo.setdefault(_key, ("unverified", f"{remote} did not answer ({type(e).__name__})"))
+    if adv.returncode != 0:
+        return _memo.setdefault(_key, ("unverified", f"{remote} did not answer (exit {adv.returncode})"))
+    head = ""
+    for ln in adv.stdout.splitlines():
+        parts = ln.split("\t")
+        if len(parts) == 2 and parts[1].strip() == "HEAD" and re.fullmatch(r"[0-9a-f]{40}", parts[0]):
+            head = parts[0]
+            break
+    if not head:
+        return _memo.setdefault(_key, ("unverified", f"{remote} advertised no HEAD sha"))
+    if head == to_commit:
+        return _memo.setdefault(_key, ("current", head))
+    # NOT-EQUAL IS NOT THE SAME AS BEHIND, and saying so needs no fetch. Found by running this
+    # against a feature branch: the measurer was AHEAD of the advertised head and the message told
+    # the operator to fetch, which is wrong advice and the kind that trains people to ignore a
+    # warning. If the advertised object is already in this clone, ancestry answers it exactly. If it
+    # is NOT, that absence is itself the answer: the remote has a commit this clone has never seen.
+    _have = subprocess.run(["git", "-C", str(root), "cat-file", "-e", head + "^{commit}"],
+                           capture_output=True).returncode == 0
+    if not _have:
+        return _memo.setdefault(_key, ("behind", f"measuring at {to_commit[:8]}; {remote} "
+                                       f"advertises {head[:8]}, which this clone does not have"))
+    _anc = subprocess.run(["git", "-C", str(root), "merge-base", "--is-ancestor", head, to_commit],
+                          capture_output=True).returncode == 0
+    if _anc:
+        return _memo.setdefault(_key, ("ahead", f"measuring at {to_commit[:8]}, a descendant "
+                                       f"of {remote}'s advertised {head[:8]}"))
+    return _memo.setdefault(_key, ("diverged", f"measuring at {to_commit[:8]}, {remote} "
+                                   f"advertises {head[:8]}"))
+
+
 def resolve_entry_version_at(root: pathlib.Path, desc: dict, commit: str) -> str:
     """`entry_version`, resolved AT A COMMIT rather than in the working tree.
 
@@ -5357,6 +5430,26 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     if out.returncode != 0:
         raise Refusal(f"--to '{to_rev}' does not resolve in this gov checkout")
     to_commit = out.stdout.strip()
+
+    # DEPL-dGaugedVintage-10. The measurer's OWN currency, observed before anything is graded. It
+    # WARNS rather than refuses: S3 concedes the probe cannot always run, and a guard that blocks a
+    # disconnected operator is one they will route around. The observation is the point.
+    _cur, _cur_detail = resolve_measurer_currency(root, to_commit)
+    if _cur == "current":
+        print(f"govkit update — measurer: this gov checkout IS the remote's advertised head "
+              f"({_cur_detail[:8]})")
+    elif _cur == "ahead":
+        print(f"govkit update — measurer: ahead of the remote — {_cur_detail}. Nothing is missing "
+              f"from this clone")
+    elif _cur in ("behind", "diverged"):
+        print(f"govkit update — measurer WARNING: {_cur} — {_cur_detail}. Every verdict below is "
+              f"measured against these bytes, so fetch before trusting a green read")
+    else:
+        # NOT the word `current`: an arm elsewhere asserts that string appears nowhere in an
+        # update run, and this repo's `absence-assertion-over-whole-file-text` gotcha is exactly
+        # about a new message colliding with somebody else's absence assertion.
+        print(f"govkit update — measurer: currency UNVERIFIED — {_cur_detail}. That is not the same "
+              f"fact as being up to date")
 
     # DEPL-dGaugedVintage-9 S1. Defined ONCE and called from all three mutating branches, because
     # three copies of "what version did we just land" is three places for it to drift. Before this,

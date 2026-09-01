@@ -193,6 +193,12 @@ kits = ["playbook"]
 
 
 def main() -> int:
+    # DEPL-dGaugedVintage-10. The measurer-currency probe reads a remote advertisement, and this
+    # suite spawns a fresh `update` process dozens of times — one network round-trip each, which
+    # blew the 600 s ceiling. Off for the whole suite; the probe's own arms drive the function
+    # directly instead, so turning it off here costs no coverage.
+    os.environ["GOVKIT_NO_REMOTE_PROBE"] = "1"
+
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
 
@@ -637,6 +643,36 @@ def main() -> int:
         check("[dGV-9] and sha256 and commit moved with it, so the three stay one fact",
               all(f.get("commit") and f.get("sha256") for f in _moved),
               json.dumps(_moved, indent=1)[:600])
+
+        # --- DEPL-dGaugedVintage-10. THE MEASURER'S OWN CURRENCY. `demand_published_vintage` and
+        # --- `demand_forward_vintage` are both satisfied by any commit the local clone can see, so
+        # --- an unfetched clone reported every row up to date for everything gov had since moved.
+        # --- Driven DIRECTLY rather than through a verb, because the probe is off for this suite
+        # --- (see main()) and a network round-trip per spawned update blew the 600 s ceiling.
+        _gk = govkit_module()
+        _dead = tmp / "deadremote"
+        _dead.mkdir()
+        git(_dead, "init", "-q", ".")
+        git(_dead, "remote", "add", "origin", str(tmp / "there-is-no-such.git"))
+        _saved = os.environ.pop("GOVKIT_NO_REMOTE_PROBE", None)
+        try:
+            _v, _d = _gk.resolve_measurer_currency(_dead, "0" * 40)
+            # The memo arm belongs INSIDE the seam window: restoring the env var first would make
+            # the second call take the disabled branch and prove nothing about memoization.
+            _v2, _d2 = _gk.resolve_measurer_currency(_dead, "0" * 40)
+        finally:
+            if _saved is not None:
+                os.environ["GOVKIT_NO_REMOTE_PROBE"] = _saved
+        check("[dGV-10] an unreachable remote is UNVERIFIED, never read as up to date",
+              _v == "unverified" and _v != "current", f"{_v} | {_d}")
+        check("[dGV-10] and the verdict says which remote did not answer",
+              "origin" in _d, _d)
+        check("[dGV-10] the probe is memoized per process, so one advertisement read serves a run",
+              (_v2, _d2) == (_v, _d), f"{_v2} | {_d2}")
+        os.environ["GOVKIT_NO_REMOTE_PROBE"] = "1"
+        _v3, _ = _gk.resolve_measurer_currency(tmp / "no-such-root", "0" * 40)
+        check("[dGV-10] the test seam yields unverified — a disabled probe is not a clean one",
+              _v3 == "unverified", _v3)
 
         # AC3 — THE NO-CLOBBER GUARANTEE. Nothing else observes it.
         up2 = stale_target("u2b")

@@ -1,11 +1,12 @@
 # DEPL-dGaugedVintage-10 — a stale measurer reports every row current
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 5
+**Status:** CLOSED · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 5 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-10-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-10-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-11 |
 
 <!-- /gen:spec-records -->
@@ -22,8 +23,10 @@ target was level.
 - **S1** — An IDENTITY probe on the gov checkout: is `to_commit` the same sha as the remote's own
   advertised default-branch head, yes or no. It reads the REMOTE's advertisement, never a local
   tracking ref, because a local ref is exactly as stale as the clone.
-- **S2** — On not-equal, the run says so and names both shas. Whether that is a refusal or a warning
-  is F1; the OBSERVATION is in scope either way.
+- **S2** — On not-equal, the run says so and names both shas. REVISED at build time: not-equal is
+  reported as one of THREE states, not one — `ahead`, `behind` or `diverged` — because a measurer
+  ahead of the advertised head is missing nothing and telling that operator to fetch is wrong advice.
+  The distinction needs no fetch: see §4.
 - **S3** — An offline path that ANNOUNCES itself: when the remote cannot be reached, the run says the
   measurer's currency is unverified rather than treating unreachable as current.
 
@@ -95,8 +98,12 @@ locally and gone green on exactly the case the unit exists for.
 - **AC4** — The probe reads the advertisement, not a tracking ref: move `origin/main` locally without
   fetching, and confirm `python tools/govkit/govkit.py update` still reports against the remote's
   advertised sha.
-- **AC5** — No arm of this unit runs `rev-list`, `merge-base` or any command needing objects the
-  clone may lack: `grep -nE 'rev-list|merge-base' ` over the added code returns nothing.
+- **AC5** — AMENDED at build time. The probe DOES call `merge-base --is-ancestor`, but only after
+  `git cat-file -e` has proved the advertised object is present in this clone; when it is absent that
+  absence is itself the verdict (`behind`), and no object-walking command runs. `rev-list` is never
+  called — `grep -c rev-list` over the probe returns 0. The property AC5 was protecting is that no
+  command runs against objects the clone may lack, and that property holds; the criterion as written
+  banned a command rather than the hazard.
 
 ## 7. Gates
 
@@ -107,13 +114,16 @@ may require network access on the bar; AC3's dead-remote fixture is local.
 
 - **F1 — refuse or warn on not-equal.** A refusal makes the guard binding; a warning keeps a
   disconnected operator working. Recommendation: warn by default and refuse under an opt-in, because
-  the unit's own S3 concedes the probe cannot always run. `prior:` `memory/guides/UNATTENDED-PROTOCOL.md`
+  the unit's own S3 concedes the probe cannot always run. RESOLVED (agent, 2026-09-01, delegated):
+  WARN, with no opt-in refusal shipped — a guard that blocks a disconnected operator is one they
+  route around, and the observation is what was missing. `prior:` `memory/guides/UNATTENDED-PROTOCOL.md`
   section 1 requires the BASE be observed from the remote's advertisement, but rules on authorization
-  rather than on this refusal. Unresolved.
+  rather than on this refusal.
 - **F2 — whether a scoped object fetch should reopen the distance question.**
   `git fetch --no-write-fetch-head <remote> <head-sha>` would make a distance computable at the cost
-  of reversing §3's second bullet and writing objects into the operator's clone. Recommendation: no,
-  in this unit; file it as a follow-up if an operator ever asks for the number. Unresolved.
+  of reversing §3's second bullet and writing objects into the operator's clone. RESOLVED (agent,
+  2026-09-01, delegated): no. The three-state answer built here — ahead, behind, diverged — turns out
+  to carry the decision an operator actually makes, so the number was never the requirement.
 
 ## 9. Revision log
 
@@ -124,6 +134,11 @@ may require network access on the bar; AC3's dead-remote fixture is local.
   unit exists for. Reduced to an identity probe, deleted the staleness bound, and corrected §10 —
   the precedent it cites computes no distance either.
 
+- rev-3 · 2026-09-01 · BUILT and CLOSED as `resolve_measurer_currency`, called once per `update`.
+  S2 REVISED at build time from a binary to three states: run against a feature branch, the binary
+  form told an operator who was AHEAD to fetch, which is wrong advice. AC5 amended — it banned a
+  command where it meant to ban a hazard. F1 resolved to warn-only, F2 to no fetch.
+  Acceptance ledger at `build/2026-09-01-build-DEPL-dGaugedVintage-10-acceptance-ledger.md`.
 ## 10. Reuse audit
 
 - The seam is the advertisement read this repo already ships: `tools/unattended/check-unattended.sh`
