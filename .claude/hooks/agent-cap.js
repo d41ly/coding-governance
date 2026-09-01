@@ -414,7 +414,7 @@ const MAX_LENSES = 5
 // FORBIDDEN by the verdict; strictly sequential was REQUIRED by the verdict and FORBIDDEN by the
 // hook. A harness iterating a build's units sat exactly in that gap and could not be written at all.
 //
-// THE MARKER IS A CLAIM, NEVER A PERMISSION. Eight clauses must all hold and the two carrying the
+// THE MARKER IS A CLAIM, NEVER A PERMISSION. EVERY clause below must hold, and the two carrying the
 // weight are the bounded RECEIVER — the loop must iterate a bare identifier this file already proves
 // bounded, which is what `chunk(x, Math.ceil(x.length / K))` is for the fixed-verifiers marker — and
 // the one-call sweep after the scan, which makes the number a SPAWN count rather than an ITERATION
@@ -705,8 +705,17 @@ function fanoutFindings(script) {
     if (!/\b(for|while)\s*\(/.test(ch)) return ` — the marked line is not a loop header in the code view, so the marker sits inside a string and blesses nothing`
     // C6: THE CLAUSE THAT CARRIES THE WEIGHT. The bound is the author's claim; a receiver this file
     // already proves bounded is what makes the total real.
-    const rm = /\b(?:of|in)\s+([A-Za-z_$][\w$]*)\s*\)/.exec(ch)
-    if (!rm) return ` — the marked loop does not iterate a bare identifier, and an iteration source this scan cannot size is a denial rather than a pass`
+    // TWO OPENERS ON ONE LINE CANNOT BE ATTRIBUTED. `for (const g of OK) for (const f of ALL)`
+    // put a bounded token on the header of a loop that iterates something else, and the brace walk
+    // stops at the shared line so the inner loop never gets its own header. Refused outright.
+    if ((ch.match(/\b(?:for|while)\s*\(/g) || []).length > 1) return ` — the marked header carries more than one loop opener, and this scan cannot tell which of them the call belongs to`
+    // A STRICT for-of HEADER, matched as a whole from the `for (` itself. The earlier form read the
+    // first `of <ident>)` ANYWHERE on the line, so a block comment, a guard clause or an outer loop
+    // supplied the bounded token for free — measured, four ways. `while` is refused with no special
+    // case: it has no iteration source this scan can size, and a bound over an unsizeable loop is
+    // the claim the receiver clause exists to refuse.
+    const rm = /\bfor\s*\(\s*(?:const|let|var)\s+[A-Za-z_$][\w$]*\s+of\s+([A-Za-z_$][\w$]*)\s*\)/.exec(ch)
+    if (!rm) return ` — the marked loop is not a \`for (const x of <bounded identifier>)\` header, and an iteration source this scan cannot size is a denial rather than a pass`
     if (!ok.has(rm[1])) return ` — the marked loop iterates \`${rm[1]}\`, which this file does not show to be bounded; the marker names a number and the receiver is what makes it real`
     // C7: AWAIT-ADJACENCY on THIS occurrence, not "the line contains await" — a line may hold both
     // an awaited call and a deferred one.
@@ -715,6 +724,20 @@ function fanoutFindings(script) {
     // evasion the ban exists for.
     const body = code.slice(h, i).join('\n') + l.slice(0, c)
     if (/=>/.test(body) || /\bfunction\b/.test(body)) return ` — a function boundary sits between the loop header and this call, which makes it a deferred thunk`
+    // NOTHING MAY ENCLOSE THE MARKED LOOP. The sweep bounds ONE body; an outer loop multiplies it by
+    // a count nothing here can size, and that outer loop is never evaluated on its own because no
+    // `agent(` line is attributed to it. Measured both ways: two honest nested markers spent 5 x 5
+    // = 25 under a marker naming 5, and an UNMARKED outer loop did it unboundedly. `k !== h` so the
+    // header's own opener is not counted against it.
+    let ob = 0
+    for (let k = h; k >= 0 && k > h - 60; k--) {
+      for (const ch2 of code[k]) {
+        if (ch2 === '}') ob++
+        else if (ch2 === '{') ob--
+      }
+      if (ob < 0 && k !== h && /\b(for|while)\s*\(/.test(code[k])) return ` — the marked loop is itself inside a loop opened at line ${k + 1}, which multiplies its bound by a count nothing here can size`
+      if (ob < 0) ob = 0
+    }
     return null
   }
   const scan = (raw, i) => {
@@ -926,7 +949,14 @@ function fanoutFindings(script) {
     // NESTED LOOPS FAIL CLOSED WITH NO EXTRA CLAUSE: the walk stops at the FIRST enclosing loop, so
     // an inner loop must carry its own marker and its own bounded receiver.
     const why = checkSeqMarker(h, i, c, l)
-    if (why === null) { seqAdmitted.push({ h, n: i + 1, line: raw }); return }
+    if (why === null) {
+      // EVERY OCCURRENCE ON THE LINE COUNTS, not the first. The scan is per-LINE and `c` is the
+      // first match, so `await agent(u); await agent(u)` used to contribute one entry and the sweep
+      // saw a group of one — the bound became a LINE count, which is not a bound at all.
+      const calls = (l.match(/\bagent\s*\(/g) || []).length
+      for (let q = 0; q < Math.max(1, calls); q++) seqAdmitted.push({ h, n: i + 1, line: raw })
+      return
+    }
     bad.push({
       n: i + 1,
       line: raw,
@@ -943,6 +973,18 @@ function fanoutFindings(script) {
   for (const a of seqAdmitted) {
     if (!byHeader.has(a.h)) byHeader.set(a.h, [])
     byHeader.get(a.h).push(a)
+  }
+  // ONE MARKED LOOP PER SCRIPT. The per-header sweep below bounds a single body; it relates no two
+  // headers, so two honest markers multiplied (nested) or summed (sequential) with every clause
+  // satisfied. `MAX_VERIFIERS` is a TOTAL, and the only total this scan can actually prove is the
+  // one belonging to a single admitted loop.
+  if (byHeader.size > 1) {
+    const hs = [...byHeader.keys()].map((x) => x + 1).join(', ')
+    for (const [, group] of byHeader) {
+      for (const a of group) {
+        bad.push({ n: a.n, line: a.line, why: `${SEQ_MARK} appears on ${byHeader.size} loop headers in this script (lines ${hs}) and the bound is a TOTAL, so two marked loops multiply or sum it — only ONE marked loop per script can be proven bounded` })
+      }
+    }
   }
   for (const [hh, group] of byHeader) {
     if (group.length < 2) continue
@@ -973,7 +1015,7 @@ function fanoutFindings(script) {
 //
 // S4 is the asymmetry the audit named as the clearest lesson in this file: `gov:fixed-verifiers` is
 // a claim whose SHAPE is checked, while `gov:bounded-fanout` returned early and exempted a line
-// slicing fifty wide. Both markers are claims now.
+// slicing fifty wide. All three markers are claims now.
 //
 // FAIL CLOSED, like every other branch here: a K this file cannot resolve to an integer at or under
 // MAX_VERIFIERS is a denial. The burden is on the fan-out.

@@ -70,7 +70,12 @@ cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "
 # EXAMPLE CONF and refuses when it is absent. A fixture that drops either models a broken
 # install rather than a repo.
 cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$HERE/.unattended.conf.example" $KIT_REL/
+cp "$HERE/VERBS.template.md" $KIT_REL/
 cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
+# THE VERB CARRIER, BOTH HALVES. Seeded for the same reason the protocol pair is: check 10 now
+# iterates two pairs and check 26 reads this carrier ALONE, so a fixture missing either half
+# models a broken install and every arm below grades that refusal instead of its own subject.
+cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
 SCRIPT="$TMP/$KIT_REL/check-unattended.sh"
 
 mkconf() { cat > .unattended.conf <<EOF
@@ -714,6 +719,15 @@ git add -A >/dev/null 2>&1
 hit "$(run)" "2 subject(s) EXITED without converging and the generated units region gained only 1 non-WONTDO unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted"
 reset_tree
 
+# ---- THE SET IS READ FROM THE DRIVER, so an unreadable declaration is a refusal and not a silent
+# ---- comparison against nothing. Closing-review fold: the leg used to restate `fold|promote`, which
+# ---- drifts the moment the driver's set moves and lets this leg tell a record it was hand-edited
+# ---- when the driver itself wrote the value.
+reset_tree; mkconf
+mutate $KIT_REL/unattended.sh 's|^REVIEW_DISPOSITIONS=.*|REVIEW_DISPOSITIONS=fold\|promote|'
+hit "$(run)" "the driver declares no readable REVIEW_DISPOSITIONS, so the clause that grades a recorded disposition would compare every value against an empty set and report whatever that produces as a verdict"
+reset_tree
+
 # ---- TOOL-dFoldedVerdict-2: THE GRADED PATH — clause 3 READING a recorded disposition instead of
 # ---- inferring one from ids. Every arm pins the cutoff to a date the fixture cannot drift past:
 # ---- 2000-01-01 forces grading, 2099-01-01 forces the pre-cutoff proxy. Neither depends on the day
@@ -726,7 +740,12 @@ mkdisp() { # base-region-rows · head-region-rows · run rows
   DISPBASE=$(git rev-parse HEAD)
   printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$2" > memory/builds/tDisp/README.md
   printf '# tDisp\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n%b' "$DISPBASE" "$3" > memory/builds/tDisp/RUN.md
+  # COMMITTED, not merely staged. The cutoff grades the record's own FIRST-COMMIT date; a staged
+  # record has none, and an undated record is graded regardless of the cutoff — so a staged fixture
+  # made the 2099 and 2000 arms produce byte-identical output and the grandfathering arm proved
+  # nothing at all. GIT_COMMITTER_DATE pins the date so neither arm depends on the day it runs.
   git add -A >/dev/null 2>&1
+  GIT_COMMITTER_DATE="2026-09-01T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
 }
 D_ONE='| TOOL-tDisp-1 | CLOSED |\n'
 D_TWO='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n'

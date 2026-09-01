@@ -1,9 +1,15 @@
 <!-- gov:kit unattended@1.15 -->
 # Unattended runs — the verbs
 
+*This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
+legs byte-compare it against the template it ships from. **They compare the two copies to each
+other, so a claim FALSE IN BOTH is green** — a parity leg is a copy check, not a truth check, and
+only a reader grades a sentence against the code. This file was created by moving section 7 of the
+protocol verbatim, and one bullet arrived carrying a sentence the same build then measured false.*
+
 - `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
   records the keepalive id the agent hands it, and accepts `--waive <handle> --reason <text>` where no
-  other verb does (§10). It refuses on a dirty tree, on the default branch, and on an unwired repo. It
+  other verb does (`UNATTENDED-PROTOCOL.md` §10). It refuses on a dirty tree, on the default branch, and on an unwired repo. It
   OBSERVES the anchor from the remote rather than reading a local ref, and refuses when the remote
   does not answer or advertises no default branch of its own — failing closed there costs nothing
   real, since a run that cannot reach the remote cannot land on it either. It delegates wiring to the

@@ -77,7 +77,7 @@ is the newest and the only one admitting a loop; its bound resolves through the 
 every other, and its weight is carried by the bounded RECEIVER clause and the one-call sweep rather
 than by the number an author typed. `gov:fixed-verifiers` was always
 shape-checked; `gov:bounded-fanout` used to return early and exempt its line outright, so a line
-slicing fifty wide passed unread. Asymmetry between two markers doing the same job is how one of them
+slicing fifty wide passed unread. Asymmetry between markers doing the same job is how one of them
 becomes a password.
 
 **The cap is a FILE CONSTANT and a set `AGENT_CAP` is refused, not ignored.** An environment-settable

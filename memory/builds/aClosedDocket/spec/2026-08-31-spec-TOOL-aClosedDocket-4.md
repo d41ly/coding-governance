@@ -1,6 +1,6 @@
 # TOOL-aClosedDocket-4 — clause 3 accepts a FOLD, and the driver records one
 
-**Status:** WONTDO · rev-2 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 4 · ratified 2026-08-31 · superseded by TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3
+**Status:** WONTDO · rev-3 · 2026-09-02 · node a · Tier-2 · base 733552e1 · streams tooling · order 4 · ratified 2026-08-31 · superseded by TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3
 
 <!-- gen:spec-records -->
 
@@ -192,6 +192,21 @@ disposition was recorded rather than that it was right.
   two-guards-one-question shape this kit refuses by name.
 
 ## 9. Revision log
+
+- rev-3 · 2026-09-02 · WONTDO, superseded by `TOOL-dFoldedVerdict-1`, `-2` and `-3`, which build
+  this unit's scope in three units instead of one. Written by node `d` under the owner authorization
+  recorded in `memory/builds/dFoldedVerdict/README.md`, not by this build's own operator. A successor
+  pointer is a CONTENT change and not the pure status flip `memory/TEMPLATE-SPEC.md` exempts from a
+  rev bump, so the rev moves and the date moves with it — the first cut flipped the header at rev-2
+  and dated 2026-08-31, which nothing would have caught: hygiene check 12 asserts only that the
+  header rev appears in this section, and rev-2 did.
+  **TWO CONSEQUENCES FOR WHOEVER RESUMES THIS BUILD**, neither of them repairable from here and both
+  filed as `TOOL-dFoldedVerdict-9`. The `--rescope --act retire` row this supersession owes on
+  `RUN.md` takes that record's owed-parked count from 0 to 1 against an attested
+  `parked-surfaced: yes, 0 surfaced`, so a resumed `--close` refuses on the mismatch. And with all
+  four units terminal the derived work-state index no longer lists this build at all, while its
+  run-state record still reads `phase: BUILDING` — so the roster change this row exists to make
+  visible is invisible in the one place a resumer is told to look.
 
 - rev-2 · 2026-08-31 · round-1 spec-audit fold, the terminating audit M4 requires of a promoted
   unit. Blocker B1: S1 keyed the flag on "the verdict it computes" and `verb_review` computes no

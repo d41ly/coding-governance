@@ -5,7 +5,7 @@ opened: 2026-09-01
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 TOOL-dFoldedVerdict-7 TOOL-dFoldedVerdict-8
+ids: TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 TOOL-dFoldedVerdict-7 TOOL-dFoldedVerdict-8 TOOL-dFoldedVerdict-9
 ---
 
 # dFoldedVerdict — a FOLD becomes recordable, and the contract stops outgrowing its cap
@@ -66,7 +66,7 @@ parallelism verdict permits, and the protocol renders at its byte cap.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node d · opened 2026-09-01 · streams tooling
-ids TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 TOOL-dFoldedVerdict-7 TOOL-dFoldedVerdict-8
+ids TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 TOOL-dFoldedVerdict-7 TOOL-dFoldedVerdict-8 TOOL-dFoldedVerdict-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -79,7 +79,7 @@ ids TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFold
 | [TOOL-dFoldedVerdict-6 — the whole-document compression pass](spec/2026-09-01-spec-TOOL-dFoldedVerdict-6.md) | 6 | 2 | CLOSED | rev-4 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

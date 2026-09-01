@@ -4496,6 +4496,12 @@ reset_tree
 # ---- against either and proves neither.
 bcopen
 hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition nonsense)" "--review names a disposition outside the closed set, and a disposition nothing can compare is prose in a field; legal dispositions"
+# A VALUE CARRYING THE SET SEPARATOR. `case "|$SET|" in *"|$v|"*` matches any pipe-bounded SUBSTRING,
+# so `fold|promote` passed the membership test, was written to an append-only record, and reached
+# review_exit_note's `*)` arm — the branch whose own header certifies it unreachable. Found by the
+# closing review, reproduced against the shipped driver. The --verdict test above has the identical
+# hole and is filed rather than folded here.
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition 'fold|promote')" "--review names a disposition containing the set separator, which the membership test would read as a pipe-bounded substring of the closed set rather than as one member of it; legal dispositions"
 hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition promote)" "--review names a disposition on a round that is not a terminal exit, and a disposition recorded mid-loop is a claim about an exit that has not happened yet: state"
 run --review tRun --subject D1 --verdict BLOCKED --blockers 3 >/dev/null
 hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3)" "and requires --disposition, because the method admits BOTH fold and promote at the exit and a record naming neither leaves the gate inferring one from ids; legal dispositions"

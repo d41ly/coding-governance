@@ -292,6 +292,79 @@ for (const u of units) {
 }
 EOF
 
+# ---- THE CLOSING REVIEW'S FOLD. Four refusals, every one of them a bypass that was EXECUTED against
+# ---- the shipped hook before it existed. All four are the same shape one level up: the predicate
+# ---- read a LINE where the rule is about a CONSTRUCT, or bounded a BODY where the charter bounds a
+# ---- TOTAL.
+# The receiver clause used to take the FIRST `of <ident>)` anywhere on the header line, so a block
+# comment supplied a bounded token for a loop iterating caller-sized data. One agent per element.
+js "seq fold: a bounded token from a BLOCK COMMENT does not bless the loop -> deny" 2 <<'EOF'
+const OK = ['a', 'b', 'c']
+async function run(args) {
+  for (/* of OK) */ const f of args.findings) await agent(f) // gov:sequential-agents(5)
+}
+EOF
+# ...and from a guard clause on the same line.
+js "seq fold: a bounded token from a GUARD clause does not bless the loop -> deny" 2 <<'EOF'
+const OK = ['a', 'b', 'c']
+async function run(args) {
+  if ('probe' in OK) for (const f of args.findings) await agent(f) // gov:sequential-agents(5)
+}
+EOF
+# A `while` has no iteration source this scan can size, so a bound over one is a claim about nothing.
+js "seq fold: a marked while loop -> deny" 2 <<'EOF'
+const OK = ['a', 'b', 'c']
+async function run(args) {
+  const queue = args.findings.slice()
+  while (queue.length && ('probe' in OK)) { // gov:sequential-agents(5)
+    await agent(queue.pop())
+  }
+}
+EOF
+# Two openers on one line: the brace walk stops at the shared header and the inner loop never gets
+# its own. This is the fixture that refuted the old "nested loops fail closed" comment.
+js "seq fold: two loop openers on one header line -> deny" 2 <<'EOF'
+const OK = ['a', 'b']
+async function run(args) {
+  const ALL = args.findings
+  for (const g of OK) for (const f of ALL) await agent(f) // gov:sequential-agents(5)
+}
+EOF
+# THE SWEEP COUNTED LINES, NOT CALLS. Five awaited calls on one line contributed one entry, so the
+# group stayed at 1 and 25 spawns landed under a marker naming 5.
+js "seq fold: five awaited calls on ONE line -> deny" 2 <<'EOF'
+const UNITS = ['a', 'b', 'c', 'd', 'e']
+async function run() {
+  for (const u of UNITS) { // gov:sequential-agents(5)
+    await agent(u); await agent(u); await agent(u); await agent(u); await agent(u)
+  }
+}
+EOF
+# TWO HONEST MARKERS MULTIPLY. Every clause satisfied, 5 x 5 = 25 spawns. The bound is a TOTAL and
+# the sweep relates no two headers.
+js "seq fold: two nested marked loops -> deny" 2 <<'EOF'
+const UNITS = ['a', 'b', 'c', 'd', 'e']
+async function run() {
+  for (const u of UNITS) { // gov:sequential-agents(5)
+    for (const v of UNITS) { // gov:sequential-agents(5)
+      await agent(u + v)
+    }
+  }
+}
+EOF
+# ...and an UNMARKED outer loop does it unboundedly, while never being evaluated itself because no
+# agent( line is attributed to it.
+js "seq fold: a marked loop inside an UNMARKED loop -> deny" 2 <<'EOF'
+const UNITS = ['a', 'b', 'c', 'd', 'e']
+async function run(args) {
+  for (const x of args.findings) {
+    for (const u of UNITS) { // gov:sequential-agents(5)
+      await agent(u)
+    }
+  }
+}
+EOF
+
 # THE BYPASSES. Every one of these was ALLOWED by the first cut of rule 2 and reported "clean" by the
 # merge-bar leg that delegates to it — found by an adversarial review of the commit that introduced
 # the rule, each reproduced against this tree before it was fixed. They are here because a whitelist

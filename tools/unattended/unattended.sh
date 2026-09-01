@@ -3932,6 +3932,13 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   # not the state one, so an arm cannot pass against either. The refusal renders the constant rather
   # than a retyped literal, exactly as the --verdict refusal above it does.
   if [ -n "$disposition" ]; then
+    # A VALUE CARRYING THE SEPARATOR IS REFUSED FIRST. `case "|$SET|" in *"|$v|"*` matches any
+    # pipe-bounded SUBSTRING, so `fold|promote` passed the membership test, was written to an
+    # append-only record, and fell through review_exit_note's `*)` arm — the one whose header says
+    # it cannot be reached. The same hole exists in the --verdict test above and is pre-existing.
+    case "$disposition" in
+      *"|"*) fail 37 "--review names a disposition containing the set separator, which the membership test would read as a pipe-bounded substring of the closed set rather than as one member of it; legal dispositions: $REVIEW_DISPOSITIONS"; return 1 ;;
+    esac
     case "|$REVIEW_DISPOSITIONS|" in
       *"|$disposition|"*) ;;
       *) fail 37 "--review names a disposition outside the closed set, and a disposition nothing can compare is prose in a field; legal dispositions: $REVIEW_DISPOSITIONS"; return 1 ;;

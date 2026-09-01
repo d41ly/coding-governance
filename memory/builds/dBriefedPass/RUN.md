@@ -20,11 +20,16 @@ disposition-source: reconstructed 2026-09-01 by TOOL-dFoldedVerdict-3, by hand a
   a terminal subject a second round. This record is THIS BUILD'S OWN PREDECESSOR, which is grounds
   for more care rather than less — a run grading its own prior run is where a disposition is
   likeliest to be assumed instead of read — so neither value was taken from the TOOL-dBriefedPass-9
-  backlog row that asserts both loops folded. WHAT VERIFIES EACH. dBriefedPass-spec-set: three spec
-  revision logs record the round-3 exit and dispose the standing blockers explicitly — "all three
-  were defects in documents the review was reading, so all three FOLD; none needed a mechanism this
-  build lacks and none is promoted", with the two-blocker unit stating "both blockers here are
-  document defects and FOLD rather than promote". dBriefedPass: commit c7e9bca1 is the round-2 fold
+  backlog row that asserts both loops folded. WHAT VERIFIES EACH. dBriefedPass-spec-set: the spec revision
+  logs that record the round-3 exit dispose the standing blockers explicitly — "all three were
+  defects in documents the review was reading, so all three FOLD; none needed a mechanism this build
+  lacks and none is promoted", with the two-blocker unit stating "both blockers here are document
+  defects and FOLD rather than promote". No count of those logs is written here: it is a derived
+  population and the first cut of this line got it wrong. DISCLOSURE, because a citation that reads as precedent and is not
+  is worse than no citation: the mixed-exit rule and the protocol clause admitting this very
+  `-source:` form were BOTH authored inside the same build that writes these labels, not before it.
+  The owner authorized the retrofit; neither citation is standing prior art.
+  dBriefedPass: commit c7e9bca1 is the round-2 fold
   and its subject line reads "closing review round 2 — NON-CONVERGENT, all four blockers disposed",
   its body "All four are defects in code the review was reading, so all four FOLD", and it then
   disposes B1 through B4 individually. Seven blockers across the two exits, each accounted for, none

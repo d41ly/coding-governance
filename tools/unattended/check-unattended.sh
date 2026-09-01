@@ -228,6 +228,10 @@ DOD_NO_OVERRIDE=$(core_of DOD_NO_OVERRIDE)
 # The review loop's runaway backstop, read the same way. The leg holds NO copy of the number: a
 # second spelling of a bound is a bound that goes wrong silently when one copy moves.
 RUNAWAY_CEILING=$(core_of RUNAWAY_CEILING)
+# READ FROM THE DRIVER, never restated — this file's own rule, and fifteen other closed sets
+# already obey it. A restatement drifts silently: widen the driver's set and this leg tells a
+# record it was hand-edited when the driver itself wrote the value.
+REVIEW_DISPOSITIONS=$(core_of REVIEW_DISPOSITIONS)
 # The halt vocabulary, read the same way. The leg holds NO member token of its own: a prefix
 # alternation could not tell a member from an unrelated identifier, and a sibling unit lands a
 # constant whose name such an alternation would have matched.
@@ -249,6 +253,13 @@ DOD="$DOD_CORE $DOD_EXTRA"
 # ---- grammar split here is the park helper's own output — which is why adding a round cannot make a
 # ---- record disagree with itself.
 _disp_ok=1
+# ---- THE SET MUST BE READABLE, or the two clauses that compare against it grade every value as
+# ---- illegal or none as illegal, and both look like a working check. Same liveness shape as
+# ---- RUNAWAY_CEILING and AUTH_MODES above.
+if [ -z "$REVIEW_DISPOSITIONS" ]; then
+  fail 2 "the driver declares no readable REVIEW_DISPOSITIONS, so the clause that grades a recorded disposition would compare every value against an empty set and report whatever that produces as a verdict"
+  _disp_ok=0
+fi
 # ---- DISPOSITION_CUTOFF: malformed is a REFUSAL, never a defaulted value, because a cutoff that
 # ---- quietly defaults grades every record or none and nobody can tell which. Same shape as the
 # ---- RUNAWAY_CEILING refusal below it and as check-pass-order.sh's own cutoff guard.
@@ -268,7 +279,7 @@ if [ "$_disp_ok" != 1 ]; then
   # ---- WHICH predicate applies, and grading every record on the other one is precisely the silent
   # ---- choice the refusal above exists to prevent. Same shape as the RUNAWAY_CEILING arm beside it:
   # ---- a term that cannot be read says so instead of quietly picking a default.
-  echo "unattended: check 2 clause 3 graded NO record — the declared DISPOSITION_CUTOFF is unreadable, so which predicate applies cannot be decided and choosing one silently would be the fault the refusal above names"
+  echo "unattended: check 2 graded NO record and skipped ALL THREE of its review-loop clauses — the runaway-ceiling and stalled-loop arms as well as the disposition one. A term this check cannot read leaves it unable to decide which predicate applies, and choosing one silently would be the fault the refusal above names"
 elif [ -z "$RUNAWAY_CEILING" ]; then
   fail 2 "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
 else
@@ -304,10 +315,19 @@ else
     # keeps the id-delta proxy verbatim, messages included.
     rv_graded=0
     if [ -n "$DISPOSITION_CUTOFF" ]; then
-      rv_fc=$(GIT log --diff-filter=A --format=%cs -- "$rvf" 2>/dev/null | tail -1)
-      if [ -n "$rv_fc" ] && printf '%s\n%s\n' "$DISPOSITION_CUTOFF" "$rv_fc" | sort -C; then rv_graded=1; fi
+      # --follow OR THE ROTATION RE-DATES THE RECORD. `--preflight` moves a terminal RUN.md to
+      # RUN.<phase>.<blob8>.md, a NEW path whose first `A` is the rotation commit, so a record
+      # created before the cutoff becomes GRADED the moment any later run rotates it — and its rows
+      # predate the flag, so it reds forever on an append-only archive. Measured on
+      # RUN.ABORTED.fc79c21d.md: 2026-08-20 without, 2026-08-19 with.
+      rv_fc=$(GIT log --follow --diff-filter=A --format=%cs -- "$rvf" 2>/dev/null | tail -1)
+      # AN EMPTY DATE GRADES. The record is staged and uncommitted, which is the IN-FLIGHT run — the
+      # one case that can still record a disposition, and so the last one to hand the id proxy to.
+      # The sibling cutoff this was copied from grandfathers an empty date; the spec said to invert
+      # that and the first cut took the sibling's clause verbatim.
+      if [ -z "$rv_fc" ] || printf '%s\n%s\n' "$DISPOSITION_CUTOFF" "$rv_fc" | sort -C; then rv_graded=1; fi
     fi
-    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" '
+    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v disps="|$REVIEW_DISPOSITIONS|" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
         i = index(line, " · item "); if (i == 0) next
@@ -336,7 +356,7 @@ else
           if (it in needs) {
             if (graded != 1) nneed++
             else if (disp[it] == "") nomiss = nomiss " " it
-            else if (disp[it] != "fold" && disp[it] != "promote") illegal = illegal " " it "=" disp[it]
+            else if (index(disps, "|" disp[it] "|") == 0) illegal = illegal " " it "=" disp[it]
             else if (disp[it] == "promote") nneed++
             # a subject recording `fold` demands NOTHING, which is the entire point of reading the
             # field instead of inferring an answer from ids
@@ -346,7 +366,7 @@ else
           if (nomiss != "")
             printf "\n  %s (exited subject(s)%s record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read - and with nothing to read this clause would demand nothing and pass by finding nothing)", f, nomiss
           if (illegal != "")
-            printf "\n  %s (exited subject(s)%s carry a disposition outside the closed set fold|promote - the driver validates the flag at write time, so an illegal value reached this record by HAND, and reading it as absent would name the wrong cause)", f, illegal
+            printf "\n  %s (exited subject(s)%s carry a disposition outside the closed set %s - the driver validates the flag at write time, so an illegal value reached this record by HAND, and reading it as absent would name the wrong cause)", f, illegal, substr(disps, 2, length(disps) - 2)
           if (nneed > 0) {
             if (readable != 1)
               printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nneed

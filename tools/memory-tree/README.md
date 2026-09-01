@@ -191,6 +191,7 @@ method.
   gate discipline, diff-scoping, the final-message format. (ONE file since v3.0: the activity-scoped
   companion sections converged into those §§.)
 - `memory/guides/UNATTENDED-PROTOCOL.md` — mandate, run state, phases and witnesses, DoD, keepalive, landing.
+- `memory/guides/UNATTENDED-VERBS.md` — the verb entries, the contract's second half. Same byte-compared pair discipline.
 
 ### M2 and M3 — the judgment calls, and why they are not procedure
 

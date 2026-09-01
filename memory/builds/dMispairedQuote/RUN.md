@@ -23,7 +23,9 @@ disposition-source: reconstructed 2026-09-01 by TOOL-dFoldedVerdict-3, by hand a
   LITERAL_OPENERS. Corroborated at the other end: TOOL-dMispairedQuote-3's own rev-1 log says it was
   promoted from that exit carrying exactly 1, 8 and 17. That subject took BOTH dispositions and the
   field holds one value; `promote` is recorded, per
-  memory/gotchas/one-value-field-records-a-mixed-outcome.md, because promote is the value that
+  memory/gotchas/one-value-field-records-a-mixed-outcome.md — authored by THIS build and not standing
+  prior art, which is disclosed because a citation that reads as precedent and is not is worse than
+  none — because promote is the value that
   DEMANDS an id and fold is the value that demands nothing — recording the demanding one over-asks
   and recording the other would let a real promotion go unobserved. TOOL-dMispairedQuote-3: its
   rev-4 log records the round-3 exit holding at 2 against a ceiling of 2 and disposes both blockers
