@@ -64,7 +64,7 @@ answer on disk.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node d · opened 2026-09-01 · streams tooling
+**Build status:** CLOSED · 5 unit(s) · node d · opened 2026-09-01 · streams tooling
 ids TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 TOOL-dBriefedPass-77 TOOL-dBriefedPass-99
 
 <!-- gen:build-units -->
@@ -74,10 +74,10 @@ ids TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPas
 | [TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed](spec/2026-09-01-spec-TOOL-dBriefedPass-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-01 |
 | [TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED](spec/2026-09-01-spec-TOOL-dBriefedPass-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-01 |
 | [TOOL-dBriefedPass-4 — the harness: one Workflow script driving spec, audit, fold and build in order](spec/2026-09-01-spec-TOOL-dBriefedPass-4.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-01 |
-| [TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation](spec/2026-09-01-spec-TOOL-dBriefedPass-5.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation](spec/2026-09-01-spec-TOOL-dBriefedPass-5.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 4 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

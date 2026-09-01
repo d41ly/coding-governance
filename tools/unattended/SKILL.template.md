@@ -90,6 +90,7 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    | `conflicts-reconciled` | merge-conflict disposition | M8 | all | D8 |
    | `wrap-up-derived` | how the wrap-up is composed | M9 | all | D8 |
    | `discoveries-adopted` | a beneficial discovery joins the running build, decided at once | M10 | all | D12 |
+   | `passes-harnessed` | the pass sequence a build runs, driven as one program | M6 | all | D13 |
    | `researched` | the candidate search when no seam fits | M12 | prompt | D9 |
    | `solution-tested` | testing candidates before the pick | M12 | prompt | D10 |
    | `playbook-followed` | the pass loop and its regrounding rule | M7 | recipe | D11 |

@@ -1,11 +1,12 @@
 # TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation
 
-**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 5
+**Status:** CLOSED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-TOOL-dBriefedPass-5-1-carriers.md](../build/2026-09-01-build-TOOL-dBriefedPass-5-1-carriers.md) | journal | — |
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
