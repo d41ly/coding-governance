@@ -90,7 +90,7 @@ It schedules no keepalive, and the section above does not bind it: there is an o
    | `conflicts-reconciled` | merge-conflict disposition | M8 | all | D8 |
    | `wrap-up-derived` | how the wrap-up is composed | M9 | all | D8 |
    | `discoveries-adopted` | a beneficial discovery joins the running build, decided at once | M10 | all | D12 |
-   | `passes-harnessed` | the pass sequence a build runs, driven as one program | M6 | all | D13 |
+   | `passes-harnessed` | M6's pass sequence, DRIVEN as one program per protocol section 12 | M6 | all | D13 |
    | `researched` | the candidate search when no seam fits | M12 | prompt | D9 |
    | `solution-tested` | testing candidates before the pick | M12 | prompt | D10 |
    | `playbook-followed` | the pass loop and its regrounding rule | M7 | recipe | D11 |
@@ -492,6 +492,8 @@ definition, so the absence is a decision and not an oversight.
   bash tools/unattended/unattended.sh --propose <slug> --item "<the amendment>" --step "<the step it applies to>" --reason "<what you saw that provoked it>"
   ```
 
+  Nothing blocks on a proposal and `--status` counts them apart from the questions, so recording one
+  costs the run nothing. The same amendment against two steps is two rows, because it is two edits.
 - **Record WHAT each build pass was handed**, so "which instructions produced this diff" has an
   answer on disk rather than in a transcript nobody kept. Write the brief as a tracked file under
   the build's `prompts/` folder, then record it:
@@ -500,8 +502,9 @@ definition, so the absence is a decision and not an oversight.
   bash tools/unattended/unattended.sh --brief <slug> --unit <unit-id> --path <the brief file>
   ```
 
-  Nothing blocks on a proposal and `--status` counts them apart from the questions, so recording one
-  costs the run nothing. The same amendment against two steps is two rows, because it is two edits.
+  A brief is a `history` kind: nothing blocks on it, an unchanged re-brief is a no-op, and `--status`
+  grades the LATEST row per unit as the live claim — re-briefing an edited file clears the stale
+  report the previous row earned.
 - Record a verdict where a check ran over content rather than over code — one piece at a time, and
   once over the whole set, which is the population a per-piece pass structurally cannot see:
 

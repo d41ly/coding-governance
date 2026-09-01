@@ -261,8 +261,9 @@ log('audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers)
 
 // THE GATE. `CONVERGING` means the review loop has not ended, so BUILD is UNREACHABLE and this
 // returns to the caller with what it needs to fold and come back. The three terminal states admit
-// it, and on the two non-clean ones every standing blocker is PROMOTED to a unit rather than carried
-// into code, which is what `BUILD-METHOD.md` M4 requires at the exit.
+// it; what the two NON-CLEAN ones additionally carry is M4's disposal instruction, built into the
+// BUILD prompt below rather than asserted here. An earlier revision of this comment claimed the
+// promotion happened and no line of the program did it.
 if (verdict === 'CONVERGING') {
   log('audit is still CONVERGING — BUILD is not reachable this invocation; fold, then re-invoke at round ' + (roundNo + 1))
   return {
@@ -288,10 +289,30 @@ if (verdict === 'CONVERGING') {
 // ONE AGENT holding the ordered list. Sequential is still the contract and the agent is told so
 // explicitly; what ENFORCES it is `--dispatch`, which reads the tree and refuses a unit that is
 // MISSING, THIN or out of the build's declared order.
+//
+// ON A NON-CLEAN TERMINAL VERDICT THE BLOCKERS ARE DISPOSED FIRST, and that instruction is CARRIED
+// rather than asserted. The comment above the gate used to claim promotion happened at the exit and
+// nothing did it: control fell from a CONVERGING-only early return straight into this stage, the
+// report path was computed and discarded, and the BUILD prompt never mentioned a blocker. So on
+// `NON-CONVERGENT` and `CEILING` — the two states that structurally guarantee standing blockers,
+// since the driver emits CONVERGED only at a count of 0 — the harness built a spec set with open
+// blockers. This build itself exited NON-CONVERGENT at round 3, so the path is reached rather than
+// hypothetical.
+const disposal =
+  verdict === 'CONVERGED'
+    ? ''
+    : 'BEFORE ANY UNIT IS BUILT, DISPOSE of every blocker still standing in `' + lastReport + '` — ' +
+      'the audit exited ' + verdict + ' with ' + au.blockers + ' confirmed. BUILD-METHOD M4 admits ' +
+      'exactly two dispositions and no third: FOLD one that is a defect in a document the review ' +
+      'already read, as a rev-N bump with its section 9 line; PROMOTE one needing a MECHANISM this ' +
+      'build lacks, through `' + DRIVER + ' --rescope ' + slug + ' --act add --item <id>`, then spec ' +
+      'it at its tier and build it like any other. Never parked, never waived, never retired, never ' +
+      're-reviewed. Report what you did with each. '
 phase('Build')
 log('build stage: ' + ordered.length + ' unit(s), one at a time, each from its brief and its spec')
 const built = await agent(
   GROUND +
+    disposal +
     'BUILD every unit below, ONE AT A TIME and IN THIS ORDER. Never start one before the previous ' +
     'has committed:\n' + roster + '\n\n' +
     'For each unit you are handed exactly two documents and you read both before touching code: its ' +
@@ -331,7 +352,7 @@ return {
   built: Array.isArray(built.committed) ? built.committed.length : 0,
   unbuilt: unbuilt,
   note:
-    specRefused.length || unbuilt.length || verdict === 'CEILING'
+    specRefused.length || unbuilt.length || verdict !== 'CONVERGED'
       ? 'DEGRADED — ' + specRefused.length + ' spec(s) refused, ' + unbuilt.length +
         ' unit(s) unbuilt, verdict ' + verdict
       : 'complete',

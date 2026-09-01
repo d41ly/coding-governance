@@ -34,16 +34,21 @@ the tail, which also makes the id a whole token — without that, `TOOL-x-1` mat
 ## Evidence
 
 **Evidences:** TOOL-dBriefedPass-3
-- AC1 — `unattended.sh --dispatch dBriefedPass --pass TOOL-dBriefedPass-77` — refused with
+- AC1 — `unattended.sh --dispatch dBriefedPass --pass <a seq no spec defines>`, run with a `-77`
+  suffix — refused with
   `which is M2's MISSING`. Observed against the live record, where the shipped driver accepted it.
 - AC2 — `tools/unattended/unattended.test.sh` arm — a spec with an empty acceptance section is
   refused naming `grades THIN`, and the message names the id and the STATE, not the empty section.
 - AC3 — `unattended.sh --dispatch dBriefedPass --pass TOOL-dBriefedPass-5` — refused naming
   `TOOL-dBriefedPass-3 (order 3, SPECCED)` and `TOOL-dBriefedPass-4 (order 4, SPECCED)` as blockers;
   the same call succeeded once those were dispatched. Both arms, live.
-- AC4 — `tools/unattended/unattended.test.sh` — the guard only considers a sibling at a STRICTLY
-  earlier `order`, so units sharing a value never block each other; a unit with no `order` verb is
-  skipped entirely, because the verb is permitted rather than required.
+- AC4 — amended rev-5 — the criterion claimed `tools/unattended/unattended.test.sh` covered the
+  order gate's equal-order and no-order branches, and it covers neither. No fixture spec in that
+  suite carries an `order` verb, so the whole block is SKIPPED rather than passed in every arm
+  including the one that reads as the passing case; the `tRun` units region emits one row, which
+  makes the sibling population zero; and this build's own five units carry distinct orders 1-5, so
+  live observation missed them too. The criterion now declares the gap and `TOOL-dBriefedPass-6`
+  carries the fixture work. Section 9 logs it.
 - AC5 — `bash tools/unattended/check-pass-order.test.sh` — the `build-first` fixture builds a real
   repository whose build commit precedes its spec commit; the leg exits 1 and names the unit and
   `BUILT before a conforming spec`. **The failing case, observed**, which is what makes this a gate
@@ -70,8 +75,12 @@ the tail, which also makes the id a whole token — without that, `TOOL-x-1` mat
 
 The arms added to `tools/unattended/unattended.test.sh` were WRITTEN and that suite was **not run** —
 standing owner instruction, and the 2026-08-23 ruling took it off the bar. Its four dispatch arms are
-therefore unexecuted; every one of them was observed live against this build's own record first,
-which is where the AC1 and AC3 evidence above comes from. `check-pass-order.test.sh` IS new and IS
+therefore unexecuted; AC1 and AC3 were observed live against this build's own record instead, which
+is where their evidence above comes from. **AC4's two branches were observed by nothing at all**, and
+the arms that would cover them are not added here: the `tRun` fixture is shared by a four-thousand-
+line suite this node may not run, so a second unit added to its roster could break arms I cannot
+re-run to check. That is a deliberate refusal to write unverifiable test code, recorded rather than
+taken quietly, and `TOOL-dBriefedPass-6` carries the work. `check-pass-order.test.sh` IS new and IS
 run: 14 arms, exit 0.
 
 **Two dispatch rows in this run's record are test residue and should be read as such.** Proving the

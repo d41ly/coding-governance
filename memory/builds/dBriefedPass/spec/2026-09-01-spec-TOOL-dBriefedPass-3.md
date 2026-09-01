@@ -1,6 +1,6 @@
 # TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED
 
-**Status:** CLOSED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 3
+**Status:** CLOSED · rev-5 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-01-build-TOOL-dBriefedPass-3-1-pass-order.md](../build/2026-09-01-build-TOOL-dBriefedPass-3-1-pass-order.md) | journal | — |
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-prompt-TOOL-dBriefedPass-3.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-3.md) | journal | — |
+| [2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
@@ -166,8 +167,12 @@ carriers), and S6's five declaration carriers: `tools/gate-legs.json`,
 - **AC3** — in `tools/unattended/unattended.test.sh`, a dispatch at order 3 while an order-2 unit is OPEN and undispatched is REFUSED naming
   the blocking unit; the same call with that unit CLOSED succeeds. Both arms, because a refusal with
   no observed passing case is a gate that cannot be satisfied.
-- **AC4** — in `tools/unattended/unattended.test.sh`, two units sharing one order value dispatch concurrently without either refusing the
-  other. This is the arm that proves S2 did not serialize the parallel group.
+- **AC4** — the equal-order and no-order branches of S2 are DECLARED UNEXERCISED, and the arms that
+  would cover them are `TOOL-dBriefedPass-6`. No fixture spec in the driver suite carries an `order`
+  verb, so the block is skipped rather than passed in every existing arm; and the `tRun` fixture's
+  units region emits one row, which makes the sibling population zero and an out-of-order arm
+  unconstructible without a new fixture. Declaring it is the honest form: rev-4 claimed the suite
+  covered both branches and it covers neither.
 - **AC5** — in `tools/unattended/check-pass-order.test.sh`, a staged fixture repo where a unit's build commit precedes its spec commit reds the new
   leg, and the message names the unit and both shas. Staged, confirmed RED, unstaged.
 - **AC6** — in `tools/unattended/check-pass-order.test.sh`, the same fixture with the spec commit FIRST is green. The passing case, observed.
@@ -223,6 +228,12 @@ none
   observes the join. H3 (finding 3): the unit had no criterion reading its own manifest row, so AC9;
   and §7 named two legs that resolve to nothing. M3 (finding 8): S5's liveness line reported two
   counts over a three-population check.
+- rev-5 · 2026-09-01 · closing diff review, M3. AC4 claimed `tools/unattended/unattended.test.sh`
+  covered the order gate's equal-order and no-order branches; it covers neither, and no fixture spec
+  in that suite carries an `order` verb at all, so the whole block is SKIPPED in every arm including
+  the one that reads as the passing case. The criterion now DECLARES the gap and names
+  `TOOL-dBriefedPass-6` for the fixture work, which is not done here because the fixture is shared by
+  a suite this node may not run and unverifiable test code is worse than a recorded gap.
 - rev-4 · 2026-09-01 · round-3 spec-audit fold, at the NON-CONVERGENT exit. Every blocker still
   standing is DISPOSED and all three were defects in documents the review was reading, so all three
   FOLD; none needed a mechanism this build lacks and none is promoted. B1 (findings 1, 7, 18, 26, 28

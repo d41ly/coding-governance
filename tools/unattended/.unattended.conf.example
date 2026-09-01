@@ -212,4 +212,7 @@ LANDED_ANCHOR_CUTOFF=""
 #
 # BLANK or absent turns the term OFF and the leg ANNOUNCES that rather than passing silently.
 # Set to the day this landed.
-PASS_ORDER_CUTOFF="2026-09-01"
+# BLANK in the example, like every sibling cutoff here: a date is a per-adopter fact, and shipping
+# THIS repo's landing date would grade an adopter's whole back-catalogue from a day their tree
+# knows nothing about. Blank turns the term OFF and the leg announces that it did.
+PASS_ORDER_CUTOFF=""

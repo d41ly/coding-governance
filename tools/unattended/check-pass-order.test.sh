@@ -32,6 +32,7 @@ mkfixture() { # order -> prints the fixture root
     cat > .unattended.conf <<'CONF'
 MEMORY_ROOT=memory
 PASS_ORDER_CUTOFF="2026-01-01"
+GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
 CONF
     cat > memory/builds/tOrder/README.md <<'RM'
 ---
@@ -87,13 +88,25 @@ none
 SPEC
     }
     if [ "$1" = "spec-first" ]; then
-      write_spec; git add -A >/dev/null; git commit -q -m "spec ARCH-tOrder-1" --no-verify
+      # THE SPEC COMMIT WRITES WHAT A REAL SPEC PASS WRITES, and this is load-bearing rather than
+      # realism for its own sake. A spec pass regenerates the index, touches the build README and the
+      # run-state file, and its SUBJECT names the unit id. With the exclusion set to `spec/` and
+      # `reviews/` alone, all of those sit outside it, so this commit won the build-commit selection
+      # and the leg graded ITS parent — reporting "the spec was written after the code" about a run
+      # that did the opposite. A fixture whose spec commit touched only `spec/` could not see it.
+      write_spec
+      printf 'regenerated index
+' > memory/LIVE.md
+      git add -A >/dev/null; git commit -q -m "spec ARCH-tOrder-1 authored" --no-verify
       printf 'the product\n' > tools/product.sh; git add -A >/dev/null
       git commit -q -m "ARCH-tOrder-1: build the thing" --no-verify
     else
       printf 'the product\n' > tools/product.sh; git add -A >/dev/null
       git commit -q -m "ARCH-tOrder-1: build the thing" --no-verify
-      write_spec; git add -A >/dev/null; git commit -q -m "spec ARCH-tOrder-1 written afterwards" --no-verify
+      write_spec
+      printf 'regenerated index
+' > memory/LIVE.md
+      git add -A >/dev/null; git commit -q -m "spec ARCH-tOrder-1 written afterwards" --no-verify
     fi
   ) >/dev/null 2>&1
   printf '%s' "$T"
@@ -130,6 +143,29 @@ has  "cutoff BLANK: the skip ANNOUNCES itself" "$o" "the ORDER term is OFF"
 o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
 same "cutoff AFTER the build opened: grandfathered, exits 0" "$rc" "0"
 has  "cutoff AFTER: the skipped build is COUNTED, not silent" "$o" "1 build(s) skipped by the"
+rm -rf "$T"
+
+# ---- THE HOSTILE CONF, both shapes, and this is the arm the fix exists for. `$CONF` is a TRACKED
+# ---- file the graded run commits, so a leg that SOURCES it lets its own subject end or hijack it.
+# ---- Both shapes were reproduced against this leg before the import was hardened: `exit 0` gave rc 0
+# ---- with zero output, byte-indistinguishable from a clean tree, and `trap` was worse — the leg
+# ---- PRINTED its own FAILED line and still exited 0. Both siblings met these one incident at a time.
+T=$(mkfixture build-first)
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "hostile-conf control: the fixture reds BEFORE the conf is touched" "$rc" "1"
+( cd "$T" && printf '
+exit 0
+' >> .unattended.conf )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended \`exit 0\` cannot end the leg at 0"   || { echo "FAIL an appended exit 0 ended the leg at 0 -- the subject silenced its own gate"; st=1; }
+rm -rf "$T"
+
+T=$(mkfixture build-first)
+( cd "$T" && printf "
+trap 'exit 0' EXIT
+" >> .unattended.conf )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended EXIT trap cannot force rc 0"   || { echo "FAIL an appended EXIT trap forced rc 0 -- the worse shape, where the leg prints FAILED and exits green"; st=1; }
 rm -rf "$T"
 
 # ---- THE LIVENESS PROBE. A leg whose classifier cannot be sliced must SAY so and exit 2, never

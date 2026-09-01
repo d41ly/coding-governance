@@ -43,7 +43,8 @@ literal separators it can see, with no escape to lose, and there is an arm for t
 - AC1 — `unattended.sh --brief dBriefedPass --unit TOOL-dBriefedPass-2 --path <the brief>` — wrote
   one row and printed `brief recorded — TOOL-dBriefedPass-2 · 27a8086b8ae6`; an identical second call
   printed `brief already recorded, unchanged` and wrote nothing.
-- AC2 — same verb with `--unit TOOL-dBriefedPass-99` — `UNATTENDED check 49 FAILED — --brief names a
+- AC2 — same verb with a `--unit` this build's roster does not carry, spelled with a `-99` seq —
+  `UNATTENDED check 49 FAILED — --brief names a
   unit the build README's generated units region does not carry`. The roster is `unit_ids_of`, the
   same region `--plan` and `--status` take their set from, so the three cannot disagree.
 - AC3 — same verb with `--path /tmp/untracked-brief.md` — `UNATTENDED check 49 FAILED — --brief names

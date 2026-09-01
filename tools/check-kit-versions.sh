@@ -146,7 +146,7 @@ if [ -z "$uc" ]; then
   echo "kit-versions: KIT_UNATTENDED_VERSION is unreadable in unattended.sh, so no marker can be compared against it"
   fails=$((fails+1))
 else
-  for s in tools/unattended/unattended.sh tools/unattended/check-unattended.sh; do
+  for s in tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh; do
     if ! grep -qE "^KIT_UNATTENDED_VERSION=$uc([^0-9.]|\$)" "$s"; then
       echo "kit-versions: $s KIT_UNATTENDED_VERSION != $uc — the driver and its leg disagree about which kit this is"
       fails=$((fails+1))

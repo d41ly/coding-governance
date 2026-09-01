@@ -55,9 +55,44 @@ CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "pass-order: no .unattended.conf at the repo root, and every value this leg needs is a declaration"; exit 2; }
 [ -f "$DRIVER" ] || { echo "pass-order: no driver beside this script, and the classifier below is sliced out of it"; exit 2; }
 
-MEMORY_ROOT=""; PASS_ORDER_CUTOFF=""
-# shellcheck disable=SC1090
-. "$CONF"
+MEMORY_ROOT=""; PASS_ORDER_CUTOFF=""; GENERATED_INDEXES=""
+# ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL, and this block is `check-unattended.sh`'s
+# ---- verbatim rather than a third hand-written reader. `$CONF` is a TRACKED file the graded run
+# ---- commits, so sourcing it here executes it, and both siblings hardened this one recorded
+# ---- incident at a time. Reproduced against THIS leg before the fix, on a fixture that reds
+# ---- honestly: an appended `exit 0` gave rc 0 with zero bytes of output, byte-indistinguishable
+# ---- from a clean tree; `trap 'exit 0' EXIT` was worse — the leg PRINTED its own FAILED line and
+# ---- still exited 0. The conf loads AFTER the library here, so it could also redefine the pinned
+# ---- `GIT` wrapper this file's header spends nine lines insisting on.
+# ----
+# ---- PROTOCOL §1 cost 2 concedes that a leg reading this conf reads its subject's ANSWER. It does
+# ---- not concede code execution that suppresses the leg's own return code and output.
+# ----
+# ---- So nothing from that file executes in this shell. It is sourced inside a SUBSHELL and the
+# ---- declared keys come back as a NUL-delimited name/value stream terminated by a sentinel; a trap,
+# ---- a redefined function or an `exit` cannot cross that boundary, and the worst a hostile conf can
+# ---- do is fail to deliver the sentinel, which is a refusal. Only `[A-Z][A-Z0-9_]*` names are
+# ---- assignable, so the stream cannot introduce a name this leg does not expect.
+_conf_names=$(sed -n 's/^[[:space:]]*\(export[[:space:]][[:space:]]*\)\{0,1\}\([A-Z][A-Z0-9_]*\)=.*/\2/p' "$CONF" | sort -u)
+_conf_ok=0
+while IFS= read -r -d '' _ck; do
+  IFS= read -r -d '' _cv || break
+  case "$_ck" in
+    __CONF_IMPORT_OK__) _conf_ok=1 ;;
+    [A-Z][A-Z0-9_]*) eval "$_ck=\$_cv" ;;
+  esac
+done < <( . "$CONF" >/dev/null 2>&1 || exit 9
+          for _n in $_conf_names; do eval "_cval=\${$_n:-}"; printf '%s\0%s\0' "$_n" "$_cval"; done
+          printf '__CONF_IMPORT_OK__\0\0' )
+# THE SENTINEL IS THE WHOLE VERDICT. `|| exit 9` catches a parse error and a `return 0`, both of which
+# abort the file and RETURN rather than ending the subshell - round 9's high 2, where the probe's
+# missing `|| exit 9` let a malformed `if` load only the lines above the break and hand back an empty
+# `LANDED_ANCHOR_CUTOFF`, which this leg reads as "grandfather every anchor". Its absence catches the
+# `exit` and `set -u` shapes, which end the subshell before the sentinel is written.
+if [ "$_conf_ok" != 1 ]; then
+  echo "pass-order: the project conf does not source cleanly, so this leg cannot read a declared value - and sourcing it in this shell would let that file end or take over the leg rather than be graded by it: $CONF"
+  exit 2
+fi
 MEMORY_ROOT="${MEMORY_ROOT:-memory}"
 
 # ------------------------------------------------------------------------------- THE CLASSIFIER
@@ -130,16 +165,35 @@ for readme in $(git ls-files "$MEMORY_ROOT/builds/*/README.md" 2>/dev/null); do
   for id in $ids; do
     graded=$((graded+1))
     # STEP 1 - the BUILD commit: the earliest commit in BASE..HEAD whose SUBJECT carries this id as a
-    # WHOLE TOKEN and which touched a path outside this build's spec/ and reviews/ folders. The
-    # whole-token match is `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up
-    # sequence is a prefix of nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
+    # WHOLE TOKEN and which touched a path outside the RECORD SURFACE below. The whole-token match is
+    # `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up sequence is a prefix of
+    # nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
+    #
+    # THE EXCLUSION IS THE BUILD'S WHOLE FOLDER PLUS THE GENERATED INDEXES, and getting this wrong
+    # made a CONFORMING run unlandable. It was `spec/` and `reviews/` alone, and a spec pass
+    # legitimately writes more than those two: the regenerated index, the build README, the run-state
+    # file and the month ledger all sit outside them. So a SPEC commit naming the unit id won the
+    # selection and step 2 then graded ITS parent — where, correctly, no spec exists yet — and the leg
+    # reported "the spec was written after the code" about a run that did the opposite. Reproduced on
+    # the spec-first fixture. The shape is this corpus's norm rather than a corner: `spec(<slug>):
+    # <id> ...` subjects are everywhere, and this build escaped only because its own spec commit
+    # named the slug and no unit id. With `red_after_land = true` and history append-only, the next
+    # conforming run would have been unlandable short of a bypass.
+    #
+    # `GENERATED_INDEXES` is read from the conf as `index:generator` pairs; only the index half is an
+    # excluded path, because a commit touching the GENERATOR is touching product code.
+    _gen_ex=""
+    for _gi in $GENERATED_INDEXES; do
+      _gp=${_gi%%:*}
+      [ -n "$_gp" ] && _gen_ex="$_gen_ex -e ^$_gp"
+    done
     build_c=""
     for c in $(GIT rev-list --reverse "$base..HEAD" 2>/dev/null); do
       subj=$(GIT log -1 --format=%s "$c" 2>/dev/null)
       case " $(printf '%s' "$subj" | tr -c 'A-Za-z0-9-' ' ') " in *" $id "*) ;; *) continue ;; esac
-      # Did it touch anything that is not this build's own spec or review prose?
+      # Did it touch anything outside this build's own record surface?
       if GIT show --pretty=format: --name-only "$c" 2>/dev/null \
-         | grep -v '^$' | grep -qv -e "^$bdir/spec/" -e "^$bdir/reviews/"; then
+         | grep -v '^$' | grep -qv -e "^$bdir/" $_gen_ex; then
         build_c="$c"; break
       fi
     done

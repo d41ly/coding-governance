@@ -349,6 +349,11 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
 PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief"
+# The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
+# value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
+ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
+ORDER_LOOSE_RE='·[[:space:]]*order[[:space:]]+[^[:space:]]+'
+
 # The kinds that are OWED to the owner as an ANSWER. Three are deliberately absent, and they are
 # absent for one reason: each is a DECLARATION the run made, not a question it refused. A proposal is
 # an improvement it noticed, a rescope is an amendment it took under a delegated authority, a
@@ -1767,6 +1772,27 @@ roster_ids() { # slug -> ids the AUTHORED plan names, which may include unspecce
 }
 # The GENERATED region's ids - what a build's units actually ARE. `build-complete`'s non-empty term
 # uses this rather than the authored plan, so the term is meetable on a build nobody hand-wrapped.
+# TOOL-dBriefedPass-3, corrected by the closing review. The BUILD-ORDER verb, read the way
+# `gen_build_index.py`'s own `ORDER_RE`/`ORDER_LOOSE_RE` pair reads it: a tolerant separator, the
+# value anchored on BOTH sides, and a value that LOOKS like the verb without conforming REFUSED
+# rather than silently truncated to its numeric prefix. Two bespoke `sed` reads stood here and
+# disagreed with the generator on a doubled separator space, on no space, and on a trailing-garbage
+# value. The first two read EMPTY, which skips the order gate entirely — the failure a reader cannot
+# see, under a comment asserting the two readers could not disagree.
+order_verb_of() { # spec file -> prints the order integer, or nothing; refuses a malformed verb
+  local hdr n loose
+  hdr=$(grep -m1 '^\*\*Status:\*\*' "$1" 2>/dev/null) || return 0
+  n=$(printf '%s' "$hdr" | grep -oE "$ORDER_OK_RE" | head -1 | grep -oE '[0-9]+' | head -1)
+  if [ -z "$n" ]; then
+    loose=$(printf '%s' "$hdr" | grep -oE "$ORDER_LOOSE_RE" | head -1)
+    if [ -n "$loose" ]; then
+      fail 49 "a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $1 spells [$loose]"
+      return 1
+    fi
+  fi
+  printf '%s' "$n"
+  return 0
+}
 unit_ids_of() { # slug
   local slug="$1" rel; rel=$(readme_of "$slug")
   [ -f "$rel" ] || return 0
@@ -4506,12 +4532,17 @@ verb_dispatch() { # slug · unit · writes...
   # THE ORDER IS READ FROM THE SPEC HEADERS, which is where `gen_build_index.py` reads it from too,
   # so this and the rendered build-order region cannot disagree about what step a unit is on.
   local _d_ord _o_id _o_spec _o_ord _o_st _blockers=""
-  _d_ord=$(sed -n 's/^\*\*Status:\*\*.*[·] order \([0-9][0-9]*\).*/\1/p' "$_d_spec" | head -1)
+  # ONE READER SHAPE, the generator's own. The first cut spelled a bespoke `sed` that disagreed
+  # with `gen_build_index.py` on exactly the inputs a comment here claimed they could not
+  # disagree on: two spaces after the separator, or none, read EMPTY here and 3 there, and a
+  # trailing-garbage value read as its numeric prefix here while the generator RAISES. An empty
+  # read SILENTLY SKIPS the whole order gate, which is the worst of the three.
+  _d_ord=$(order_verb_of "$_d_spec") || return 1
   if [ -n "$_d_ord" ]; then
     for _o_id in $(unit_ids_of "$slug"); do
       [ "$_o_id" = "$unit" ] && continue
       _o_spec="${SPEC_PATH[$_o_id]:-}"; [ -n "$_o_spec" ] || continue
-      _o_ord=$(sed -n 's/^\*\*Status:\*\*.*[·] order \([0-9][0-9]*\).*/\1/p' "$_o_spec" | head -1)
+      _o_ord=$(order_verb_of "$_o_spec") || return 1
       [ -n "$_o_ord" ] || continue
       [ "$_o_ord" -lt "$_d_ord" ] 2>/dev/null || continue
       _o_st="${SPEC_ST[$_o_spec]:-}"

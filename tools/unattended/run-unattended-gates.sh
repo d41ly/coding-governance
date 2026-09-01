@@ -170,12 +170,14 @@ run_one() { # label · kind · argv...
 run_one "kit gate"                  checks bash "$HERE/check-unattended.sh"
 run_one "playbook validity gate"    checks bash "$HERE/check-playbook.sh"
 run_one "skill wiring"              checks bash "$HERE/adopt-unattended.sh" --check
+run_one "pass-order history"        checks bash "$HERE/check-pass-order.sh"
 
 run_one "gate selftest"             selftests bash "$HERE/check-unattended.test.sh"
 run_one "driver selftest"           selftests bash "$HERE/unattended.test.sh"
 run_one "playbook validity selftest" selftests bash "$HERE/check-playbook.test.sh"
 run_one "cross-component"           selftests bash "$HERE/cross-component.test.sh"
 run_one "adopter e2e"               selftests bash "$HERE/adopt-unattended.test.sh"
+run_one "pass-order selftest"       selftests bash "$HERE/check-pass-order.test.sh"
 
 # LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a clean
 # sweep are indistinguishable from the outside, which is the class this kit has spent six review
