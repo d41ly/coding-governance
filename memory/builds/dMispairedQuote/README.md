@@ -61,6 +61,19 @@ is the mandate, recorded under [prompts/](prompts/2026-09-01-prompt-TOOL-dMispai
 
 ## Parked decisions
 
+**LANDED BY HAND after the abort, at the owner's instruction (2026-09-01).** `RUN.md` records
+phase ABORTED with halt code `gate-red-out-of-scope`, which was true when it was written: the run
+could not merge itself. The owner then read the three options in the parked entry below and chose
+the first. The merge is `f0eb3239`, a `--no-ff` merge of `branch/agent-cap-apostrophe-bug-46c953`,
+pushed to `origin/main` at `bd62d866`. The full bar was run twice, on the branch tip and again on
+merged main, 85 of 86 legs green both times; the push used `--no-verify` because that is the only
+mechanism there is, and it skipped a bar that had already been run rather than one that had not.
+
+**MAIN IS RED UNTIL `TOOL-aClosedDocket-4` LANDS**, and that is this build's cost to the fleet: the
+`unattended kit gate` leg is `subject = repo` with no guard, and this run's `RUN.md` is now on main,
+so every push from this repo meets it. That unit is RATIFIED and is `aClosedDocket`'s next READY
+unit; its own section 1 predicted this and its N4 premise is falsified by this record.
+
 None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 
 <!-- roster:units -->
