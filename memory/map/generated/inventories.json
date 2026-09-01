@@ -152,6 +152,7 @@
       "hookspath-resolves-into-another-checkout.md",
       "id-matched-as-a-substring.md",
       "inputs-inside-the-subjects-reach.md",
+      "one-value-field-records-a-mixed-outcome.md",
       "pin-copied-from-another-corpus.md",
       "process-creation-is-the-suite-cost.md",
       "second-implementation-is-not-a-second-opinion.md",
@@ -173,7 +174,8 @@
       "PLAYBOOK-TEMPLATE.md",
       "REVIEW-PROTOCOL.md",
       "SESSION-KICKOFF.md",
-      "UNATTENDED-PROTOCOL.md"
+      "UNATTENDED-PROTOCOL.md",
+      "UNATTENDED-VERBS.md"
     ],
     "backlog-shards": [
       "DEPL.md",

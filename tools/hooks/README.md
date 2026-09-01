@@ -29,6 +29,30 @@ which is the configuration this hook was rewritten to stop shipping.
   LITERAL whose element count it can count here; or an identifier it has already proven bounded,
   alone or followed by operations that cannot grow it. A branch it cannot delimit never qualifies, so
   an expression the hook cannot read lands on the deny side rather than being waved through.
+- An `agent(` inside a `for (const x of <identifier>)` body. This is the ONE loop shape the hook
+  admits, and only under `gov:sequential-agents(<K>)` written as a line comment on the LOOP HEADER.
+  It exists because a ratified `parallelism route: none` verdict forbids the bounded PARALLEL fan the
+  hook permits, while the hook forbade the strictly sequential dispatch that verdict requires — a
+  harness iterating a build's units sat in the gap and could not be written at all.
+  EVERY clause below must hold and the refusal names the first that does not. The marker is read
+  from the RAW header line, since both code views break their scan on `//`. It carries a bound token,
+  and that token resolves through the same `<K>` definition every other consumer uses. The header
+  matches a STRICT `for (const|let|var <name> of <identifier>)` in the literal-blanked view — read as
+  a whole from the `for (` itself, never as the first `of <name>)` on the line, and a `while` is
+  refused outright because it has no iteration source this scan can size. That identifier must
+  already be in the hook's proven-bounded set, which is what makes the marker's number real rather
+  than asserted. The call is directly preceded by `await`, and no `=>` or `function` sits between the
+  header and it, because a deferred call is a thunk array.
+  THREE MORE conditions bound the TOTAL rather than the shape, and each of them was a working bypass
+  before it existed. A header line carrying more than one loop opener is refused, because this scan
+  cannot tell which loop the call belongs to. The marked loop may have NO enclosing loop, marked or
+  not — an outer loop multiplies the bound by a count nothing here can size, and it is never
+  evaluated on its own because no `agent(` line is attributed to it. And a script may carry only ONE
+  marked loop: the sweep bounds a single body and relates no two headers, so two honest markers
+  multiplied or summed with every other clause satisfied.
+  Finally, exactly ONE awaited call may resolve to any one header, counted per OCCURRENCE and not
+  per line — five calls on one line contributed a single entry once, which turned the bound into a
+  line count.
 - The marked DERIVATION receiver, which is the third form above and was undocumented until now. A
   marked assignment may derive its receiver from something already proven bounded — a `.filter()` or
   a `.slice()`, which cannot grow an array — and the bound is inherited. Mentioning a bounded name is

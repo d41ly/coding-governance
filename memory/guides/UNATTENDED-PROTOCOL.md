@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.14 -->
+<!-- gov:kit unattended@1.15 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -115,12 +115,12 @@ the units that do not depend on that fork. Only when EVERY remaining unit depend
 halt, with the fork-unresolvable code — a run that can still make progress on something else is not
 stuck, and stopping early spends an owner turn that was not needed.
 
-**The build method is a RUN-TIME dependency of this kit.** Every directive is a pointer into a
-section of `<MEMORY_ROOT>/guides/BUILD-METHOD.md`, so `--preflight` refuses a tree where it is absent rather than starting a run bound
-by a set that resolves to nothing.
+**The build method is a RUN-TIME dependency of this kit.** Every directive (§10) points into a
+section of it, so `--preflight` refuses a tree where `<MEMORY_ROOT>/guides/BUILD-METHOD.md` is absent
+rather than starting a run bound by a set that resolves to nothing.
 
-Absent or unreachable authorization → the run does not start. There is no override for this one: an
-override on the authorization check is the authorization check.
+Absent or unreachable authorization → the run does not start, with no override: an override on the
+authorization check IS the authorization check.
 
 **A SECOND item joined that set**, and the driver holds it as a declared list rather than a name in a
 case arm. `pieces-complete` is not overridable either: it is the item that says a `recipe`-mode run
@@ -224,6 +224,15 @@ belonging here:
 Facts 10, 11 and 12 are ABSENT on a run that did not reach the condition each records — a
 default-branch run for the first two, a run that did not abort for the third. That is legal: the
 "nothing else" clause bounds what may appear, not what must. Fact 9 is always written.
+
+**A `<key>-source:` line is ADMITTED beside a fact no verb could write**, and its value states why
+none could plus what independently verifies the value. A hand-reconstructed fact carrying no such
+line sits outside the "nothing else" clause; a labelled one is inside it. The form exists because
+repairs happen — a record whose key predates the verb that would write it, or whose verb refuses a
+terminal record, is correctable only by hand — and an UNLABELLED hand edit is indistinguishable from
+a value the run earned. Nothing reads these lines and no verb writes one: the label is for the
+reader, and writing it is an owner-authorized repair rather than something a run does to its own
+history.
 
 Facts 5-7 and 9-11 are EVIDENCE and are never read back as inputs — fact 9 emphatically so. A verb
 branching on the recorded anchor kind would take a security decision from a value its subject wrote,
@@ -334,16 +343,16 @@ A project MAY append items via `DOD_EXTRA`. It may NOT delete a core item; the g
 COUNT against the same shrink-only floor, for the reason §3 gives.
 
 `--close` BLOCKS on any unmet item. The override is named (it cites the item), recorded (it writes a
+parked entry), and surfaced in the wrap-up. The two agent-attested items do **not** spend the
+override budget: attestation is not a machine verdict, and pretending otherwise makes an override
+look like a check that failed.
+
 **The two attested items have a VERB, the only way to write one.** `--attest <slug> --item <item>
 [--value <text>]` refuses a machine-checked item by reading its declared CHECKER, so a project
 declaring its own agent-attested extra gets the verb and one renaming a machine item gets the
 refusal. Before it existed the keys had no writer, which made `--abort` — the sole documented exit
 from a wedged run, requiring both — reachable only by hand-editing the authored region of a file this
 kit calls generated. The verb removes the hand edit, not the trust assumption §9 states.
-
-parked entry), and surfaced in the wrap-up. The two agent-attested items do **not** spend the
-override budget: attestation is not a machine verdict, and pretending otherwise makes an override
-look like a check that failed.
 
 **`authorization-reachable` has NO override, and this is where a close meets that.** §1 states it at
 run START, which is where the rule is decided and not where it is hit — an agent whose close refuses
@@ -421,99 +430,13 @@ what preserves the strong claim wherever the strong claim is available.
 
 ## 7. The verbs
 
-- `--preflight` — asserts the authorization, pins the BASE, CREATES and stages the run-state file,
-  records the keepalive id the agent hands it, and accepts `--waive <handle> --reason <text>` where no
-  other verb does (§10). It refuses on a dirty tree, on the default branch, and on an unwired repo. It
-  OBSERVES the anchor from the remote rather than reading a local ref, and refuses when the remote
-  does not answer or advertises no default branch of its own — failing closed there costs nothing
-  real, since a run that cannot reach the remote cannot land on it either. It delegates wiring to the
-  project's **check** mode, never the repairing one: that mode rewrites tracked bytes and sets git
-  config, and the run's first act must not be the mode whose past over-firing this protocol cites.
-- `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
-  `--preflight` and `--close` ever wrote one, so every member between them entered the file only by
-  hand-editing an artifact this kit calls generated.
-- `--park` — writes a decision the run REFUSED to take: the question, the options seen, the reason.
-  Refused on a terminal record, and with no run-state file: a park minted for a run that never
-  started records nothing about a run.
-- `--brief` — records WHAT a build pass was handed: the unit, and the hash of a TRACKED brief file,
-  through `park()` as a `history` kind. `--status` reads it, grading each unit's LATEST row.
-- `--propose` — writes a PROPOSAL: an amendment a run would make to the playbook it is following,
-  joined to the step that provoked it. Nothing blocks on it, and it is not an edit: a run that
-  rewrites the checklist it is graded by has no rules left. It reuses `--park`'s newline, separator,
-  bypass and terminal refusals over the new step field, and its exact-line idempotence — with the
-  step inside the identity, so one amendment at two steps is two rows.
-- `--attest` — writes one of the two agent-checked Definition-of-Done items, deriving the record key
-  so no operator spells one, and REFUSING a machine-checked item by reading its declared checker.
-  Before it existed those keys had no writer, and `--abort` — which requires both — was reachable
-  only by hand-editing a file this kit calls generated.
-- `--record-piece` — writes one leg's verdict for one PIECE into a tracked record joined to that
-  piece by content hash. It reuses `--park`'s newline, separator and bypass refusals and its
-  exact-line idempotence. The writer takes a records ROOT rather than a slug, and `--records-root`
-  reaches it BEFORE the slug and run-state checks — so the attended path calls the same function with
-  no run at all, which is what makes it a second CALLER rather than a second implementation. Without
-  that flag the verb resolves a slug and requires a run-state file. An earlier revision of this line
-  called the verb "unattended-only", which contradicted its own first half and the code.
-- `--record-set` — writes one leg's verdict for the WHOLE set of pieces, over an ordered hash list
-  naming which pieces it covers. That population is the one a per-piece review structurally cannot
-  see, and a verdict not naming its members cannot be re-checked.
-- `--plan` — takes its unit SET and its ORDER from the GENERATED units region, which is why its
-  "next" and `--status`'s are the same unit by construction rather than by coincidence. It prints
-  each unit's id, status and the build method's M2 classification, and names the next one. It
-  COMPUTES that vocabulary and does not define it; M2 does. It reads the SPEC FILES for two things
-  the region cannot carry: that classification, and the two `NOT A UNIT` conditions, since a file
-  with no parseable status header has no rendered row to appear in. A region that is absent OR
-  malformed is a named refusal, never a fall-back to the older spec-derived listing. It still joins
-  the build README's AUTHORED roster pair against the tracked specs, so a planned unit nobody has
-  specced is reported as MISSING — that question cannot be answered from a region rendered out of
-  the specs that exist.
-- `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
-- `--resume` — re-enters the run from the run-state file; must agree with `--status`.
-- `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
-  of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
-- `--landed` — the sole producer of `LANDED`, an OBSERVATION rather than a claim. It accepts a record
-  only at `LANDING`, re-observes the anchor, and refuses unless HEAD is an ancestor of the tip the
-  remote advertises. Where `LANDER_MARKER` is declared it ALSO refuses unless the marker names HEAD
-  exactly — equality, not ancestry, so any commit between the push and this verb is a refusal. It does
-  not refuse the default branch: the mandated lander refuses every other one, so landing happens
-  exactly where that guard would otherwise fire.
-- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the unit
-  as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the three
-  acts; this verb is the record. It RECORDS rather than acts: a row derived from the change it just
-  made is a summary, and a check comparing the two confirms the driver instead of
-  checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
-  rather than in enforced ordering: the pair catches an amendment made with NO record, never a
-  truthful-looking row attached to a different edit.
-- `--dispatch` — records the WRITE-SET DECLARATION a concurrent dispatch owes: `--pass <unit-id>`
-  and a REPEATABLE `--writes <path>`, one path per occurrence. The build method requires two path
-  lists written down before two passes run together, and until this verb nothing read one. It decides
-  two of that condition's three clauses — the intersection test, and the shared-record refusal in
-  BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
-  is refused. The third clause is a judgement about meaning and is refused as undecidable rather than
-  faked. A re-declaration of a pass still OPEN widens or no-ops; it never narrows. Once that pass has
-  COMMITTED, a further declaration of the same unit is a new pass — M6 sanctions several pass kinds
-  per unit — recorded as its own row rather than judged against the previous one. The driver
-  distinguishes them by OVERLAP: a narrowing is a strict subset and always overlaps, so it stays
-  refused; a disjoint set is a new pass. One that PARTLY overlaps is read as
-  a narrowing and refused, which is the conservative direction and is stated here rather than
-  discovered.
-- `--review` — records ONE review round for a subject and reports what the loop is doing:
-  `CONVERGING`, `CONVERGED`, `NON-CONVERGENT` or `CEILING`. The round is an append-only `review` line
-  in the parked region, a `history` kind, so it never inflates the count of decisions the owner must
-  be shown. A round re-arms the loop only if its confirmed-blocker count is STRICTLY smaller than the
-  round before; at the exit every blocker still standing is promoted to a unit rather than parked. It
-  refuses a verdict outside the closed set, a missing subject or count, and a round on a subject whose
-  loop has already ended.
-- `--version` — prints the kit's own version and exits, touching no record. It is here because it is
-  DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
-  cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it
-  is the one verb safe to call before a run exists.
+The eighteen verb entries live in `UNATTENDED-VERBS.md`, installed beside this file from the kit's
+`VERBS.template.md` and byte-compared against it by the same leg that compares this pair. Read them
+there. Nothing about any verb changed in the move.
 
-- `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
-  effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
-  nothing, so the machine items assert obligations it does not have, while the keepalive is still
-  orphaned and the parked decisions still unseen. The code is validated before it is recorded and the
-  refusal names the legal set; it is the twelfth authored fact, and it exists because one terminal
-  phase said a run stopped and never said why.
+The move was a BYTE decision and is recorded as one. This document had reached its cap EXACTLY, and
+a contract with no room left to state its next rule has stopped being amendable — which is a
+failure mode of the contract, not of whoever wrote the rule that would not fit.
 
 ## 8. What a project declares
 
@@ -550,6 +473,7 @@ where this document says it may:
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set |
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
+| `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
 
 An empty declaration is a refusal, not a pass: a vocabulary with no members and a DoD set with no
 items would both make every check keyed on them vacuously true.

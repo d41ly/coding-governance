@@ -528,6 +528,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkSeqMarker",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkUnderRoot",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"

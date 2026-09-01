@@ -13,6 +13,26 @@ halt-code: gate-red-out-of-scope
 parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 witness: 91058925b19addc557954bae0f8884d7f03d81a3
+disposition-source: reconstructed 2026-09-01 by TOOL-dFoldedVerdict-3, by hand and not by a verb.
+  `--review --disposition` did not exist when these rounds were recorded — it lands in
+  TOOL-dFoldedVerdict-1 — and `verb_review` refuses a second round for a subject already carrying a
+  terminal token, so no verb can write these two values now or ever. WHAT VERIFIES EACH, re-derived
+  from this build's own records before either was written. TOOL-dMispairedQuote-1: its spec's rev-3
+  log records the round-2 exit at 4 blockers against a ceiling of 2 and disposes all four by name —
+  blockers 1, 8 and 17 PROMOTED to TOOL-dMispairedQuote-3, blocker 24 FOLDED by narrowing
+  LITERAL_OPENERS. Corroborated at the other end: TOOL-dMispairedQuote-3's own rev-1 log says it was
+  promoted from that exit carrying exactly 1, 8 and 17. That subject took BOTH dispositions and the
+  field holds one value; `promote` is recorded, per
+  memory/gotchas/one-value-field-records-a-mixed-outcome.md — authored by THIS build and not standing
+  prior art, which is disclosed because a citation that reads as precedent and is not is worse than
+  none — because promote is the value that
+  DEMANDS an id and fold is the value that demands nothing — recording the demanding one over-asks
+  and recording the other would let a real promotion go unobserved. TOOL-dMispairedQuote-3: its
+  rev-4 log records the round-3 exit holding at 2 against a ceiling of 2 and disposes both blockers
+  as FOLDS, stating that neither needed a mechanism the build lacked. All six blockers of the two
+  exits are accounted for. NOT reconstructed: which blocker each row's single value belongs to. The
+  field is per SUBJECT, the mixed accounting lives in the spec revision log that already holds it,
+  and inventing a per-blocker field here would be a second grammar nothing reads.
 phase: ABORTED
 branch-sha: d9efe373a3b86a91f82ab9062a9dff4306e3293c
 branch-ref: refs/heads/branch/agent-cap-apostrophe-bug-46c953
@@ -30,7 +50,7 @@ base: d9efe373a3b86a91f82ab9062a9dff4306e3293c
 
 2026-09-01T09:21:32Z review · item TOOL-dMispairedQuote-2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
-2026-09-01T09:58:47Z review · item TOOL-dMispairedQuote-1 · reason verdict BLOCKED · blockers 4 · NON-CONVERGENT
+2026-09-01T09:58:47Z review · item TOOL-dMispairedQuote-1 · reason verdict BLOCKED · blockers 4 · NON-CONVERGENT · disposition promote
 
 2026-09-01T09:58:55Z decision · item The rendered unattended Skill documents a --disposition fold|promote flag on --review that the installed driver 1.14 refuses (check 14, unknown argument). The Skill says the merge bar reads that field, and a fold with nothing recorded is indistinguishable from a promotion that never happened — so the field the bar reads cannot be written. · reason Out of this build's goal, which is agent-cap.js's string views. Not a blocker: round 2's disposition is recorded in the build README and in each spec's revision log instead, and the round itself is on the record with its NON-CONVERGENT verdict. Filed as a backlog row rather than fixed here, because the unattended kit is a different mechanism and M3 veto 2 puts its contract outside what this mandate delegates.
 
@@ -40,7 +60,7 @@ base: d9efe373a3b86a91f82ab9062a9dff4306e3293c
 
 2026-09-01T11:30:42Z review · item TOOL-dMispairedQuote-3 · reason verdict BLOCKED · blockers 2
 
-2026-09-01T12:04:02Z review · item TOOL-dMispairedQuote-3 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT
+2026-09-01T12:04:02Z review · item TOOL-dMispairedQuote-3 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold
 
 2026-09-01T13:16:41Z review · item dMispairedQuote · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 

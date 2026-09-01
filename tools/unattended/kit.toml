@@ -22,6 +22,16 @@ role = "rendered"
 to = "{memory_root}/guides/UNATTENDED-PROTOCOL.md"
 placeholders = []
 
+# the verb carrier. TOOL-dFoldedVerdict-5 moved the protocol's section 7 out to its own pair, because
+# that document had reached its byte cap exactly and a contract with no room for its next rule has
+# stopped being amendable. Placeholder-free like the protocol, so the adopter copies rather than
+# renders it.
+[[files]]
+include = ["VERBS.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/UNATTENDED-VERBS.md"
+placeholders = []
+
 # the playbook template. Placeholder-free like the protocol, so the
 # adopter copies it rather than rendering it.
 [[files]]
@@ -160,6 +170,9 @@ why = "the protocol and the playbook template are byte-compared against the ship
 [[lf_pin]]
 pattern = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
 why = "an installed artifact its own adopter byte-compares"
+[[lf_pin]]
+pattern = "{memory_root}/guides/UNATTENDED-VERBS.md"
+why = "an installed artifact both its adopter and check 10 byte-compare"
 [[lf_pin]]
 pattern = ".claude/skills/unattended/SKILL.md"
 why = "a rendered artifact its own gate byte-compares"

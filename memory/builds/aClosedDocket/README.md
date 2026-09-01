@@ -74,7 +74,7 @@ read as promoted; none was. Unit 4's N2 records why closing it needs a signal no
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 4 unit(s) · node a · opened 2026-08-31 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-08-31 · streams tooling
 ids TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 TOOL-aClosedDocket-4
 
 <!-- gen:build-units -->
@@ -83,7 +83,7 @@ ids TOOL-aClosedDocket-1 TOOL-aClosedDocket-2 TOOL-aClosedDocket-3 TOOL-aClosedD
 | [TOOL-aClosedDocket-1 — M4 gains a disposition for a NON-CONVERGENT exit over a spec](spec/2026-08-31-spec-TOOL-aClosedDocket-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-08-31 |
 | [TOOL-aClosedDocket-2 — `reuse_lookup.py` logs, and `reuse-probed` counts either probe](spec/2026-08-31-spec-TOOL-aClosedDocket-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-08-31 |
 | [TOOL-aClosedDocket-3 — the bounded-observation arms assert on `RB_TOOK`, not the harness clock](spec/2026-08-31-spec-TOOL-aClosedDocket-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-08-31 |
-| [TOOL-aClosedDocket-4 — clause 3 accepts a FOLD, and the driver records one](spec/2026-08-31-spec-TOOL-aClosedDocket-4.md) | 4 | 2 | OPEN | rev-2 | 2026-08-31 |
+| [TOOL-aClosedDocket-4 — clause 3 accepts a FOLD, and the driver records one](spec/2026-08-31-spec-TOOL-aClosedDocket-4.md) | 4 | 2 | WONTDO | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
 Records: 5 bound to this build, across 4 record folder(s).

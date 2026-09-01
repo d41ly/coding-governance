@@ -60,7 +60,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.10' // gov:kit agent-cap@1.10 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.11' // gov:kit agent-cap@1.11 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -406,6 +406,21 @@ const MAX_VERIFIERS = 5
 // and no shipped harness has ever had six lenses — tier2-review has four, both drift-audit waves
 // have five. With the count fixed, 5 is what the charter says and what every harness already obeys.
 const MAX_LENSES = 5
+// THE THIRD MARKER, and the only one that admits a LOOP. Spelling ratified by the owner
+// 2026-09-01: `gov:sequential-agents`, carrying its bound — `gov:sequential-agents(5)`.
+//
+// WHY IT EXISTS. `TOOL-cBriefedPilot-21` ratified `parallelism route: none`, while this hook denied
+// an `agent()` in ANY loop body unconditionally. Bounded-parallel was PERMITTED by the hook and
+// FORBIDDEN by the verdict; strictly sequential was REQUIRED by the verdict and FORBIDDEN by the
+// hook. A harness iterating a build's units sat exactly in that gap and could not be written at all.
+//
+// THE MARKER IS A CLAIM, NEVER A PERMISSION. EVERY clause below must hold, and the two carrying the
+// weight are the bounded RECEIVER — the loop must iterate a bare identifier this file already proves
+// bounded, which is what `chunk(x, Math.ceil(x.length / K))` is for the fixed-verifiers marker — and
+// the one-call sweep after the scan, which makes the number a SPAWN count rather than an ITERATION
+// count. A bound with no bounded receiver is the shape the owner ruling names: it would admit
+// `gov:sequential-agents 5` over an unbounded array while spawning one agent per element.
+const SEQ_MARK = 'gov:sequential-agents'
 // Every array method that can carry an agent() call once per element. The list is closed and
 // generous on purpose: a method missing from it used to mean ALLOW, which is the fail-open direction.
 const ITER_CALL = /\.\s*(map|flatMap|forEach|filter|reduce|reduceRight|some|every|find|findIndex|sort|flat)\s*$/
@@ -665,6 +680,66 @@ function fanoutFindings(script) {
   const ok = new Set()
   // S4 - one reason per refused marked assignment, keyed by the name it binds.
   const markedWhy = new Map()
+  // TOOL-dFoldedVerdict-4: candidates admitted by `gov:sequential-agents`, judged again after the
+  // scan by the one-call sweep. Collected rather than cleared immediately, because the ninth
+  // condition is about a GROUP and no per-line pass can see one.
+  const seqAdmitted = []
+  const SEQ_BOUND = new RegExp(SEQ_MARK.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\(?\\s*([A-Za-z_$][\\w$]*|\\d+)\\s*\\)?')
+  // Returns '' when NO claim was made — the unmarked denial keeps its exact shipped sentence, which
+  // several arms assert by literal — a ` — <reason>` suffix naming the FIRST clause that failed, or
+  // null when every clause holds.
+  const checkSeqMarker = (h, i, c, l) => {
+    const rawH = lines[h] || ''
+    // C2: read the MARKER from the RAW line. Both views break their scan on `//`, so a marker is
+    // invisible in `code` — the same reason FIXED_MARK is read from `raw` inside `scan`.
+    if (!rawH.includes(SEQ_MARK)) return ''
+    const mm = SEQ_BOUND.exec(rawH)
+    // C3: a bare marker claims concurrency one with an UNBOUNDED TOTAL, which is the owner's
+    // stated refusal — the two rules are separate and the marker must satisfy both.
+    if (!mm) return ` — ${SEQ_MARK} carries no bound token, and a bare marker claims concurrency one with an unbounded total`
+    // C4: the number is CHECKED, never trusted, and by the one resolver every other consumer uses.
+    if (!boundedK(mm[1], consts)) return ` — ${SEQ_MARK}(${mm[1]}) names a bound this file does not resolve to an integer no greater than ${MAX_VERIFIERS}`
+    const ch = code[h] || ''
+    // C5: the SHAPE is read from the literal-blanked view, so a marker sitting inside a quoted
+    // string on a line that is not really a loop header blesses nothing.
+    if (!/\b(for|while)\s*\(/.test(ch)) return ` — the marked line is not a loop header in the code view, so the marker sits inside a string and blesses nothing`
+    // C6: THE CLAUSE THAT CARRIES THE WEIGHT. The bound is the author's claim; a receiver this file
+    // already proves bounded is what makes the total real.
+    // TWO OPENERS ON ONE LINE CANNOT BE ATTRIBUTED. `for (const g of OK) for (const f of ALL)`
+    // put a bounded token on the header of a loop that iterates something else, and the brace walk
+    // stops at the shared line so the inner loop never gets its own header. Refused outright.
+    if ((ch.match(/\b(?:for|while)\s*\(/g) || []).length > 1) return ` — the marked header carries more than one loop opener, and this scan cannot tell which of them the call belongs to`
+    // A STRICT for-of HEADER, matched as a whole from the `for (` itself. The earlier form read the
+    // first `of <ident>)` ANYWHERE on the line, so a block comment, a guard clause or an outer loop
+    // supplied the bounded token for free — measured, four ways. `while` is refused with no special
+    // case: it has no iteration source this scan can size, and a bound over an unsizeable loop is
+    // the claim the receiver clause exists to refuse.
+    const rm = /\bfor\s*\(\s*(?:const|let|var)\s+[A-Za-z_$][\w$]*\s+of\s+([A-Za-z_$][\w$]*)\s*\)/.exec(ch)
+    if (!rm) return ` — the marked loop is not a \`for (const x of <bounded identifier>)\` header, and an iteration source this scan cannot size is a denial rather than a pass`
+    if (!ok.has(rm[1])) return ` — the marked loop iterates \`${rm[1]}\`, which this file does not show to be bounded; the marker names a number and the receiver is what makes it real`
+    // C7: AWAIT-ADJACENCY on THIS occurrence, not "the line contains await" — a line may hold both
+    // an awaited call and a deferred one.
+    if (!/\bawait$/.test(l.slice(0, c).replace(/\s+$/, ''))) return ` — this agent() is not directly awaited, so the loop builds values instead of spending one turn each`
+    // C8: a function boundary between the opener and the call makes it a THUNK, which is the
+    // evasion the ban exists for.
+    const body = code.slice(h, i).join('\n') + l.slice(0, c)
+    if (/=>/.test(body) || /\bfunction\b/.test(body)) return ` — a function boundary sits between the loop header and this call, which makes it a deferred thunk`
+    // NOTHING MAY ENCLOSE THE MARKED LOOP. The sweep bounds ONE body; an outer loop multiplies it by
+    // a count nothing here can size, and that outer loop is never evaluated on its own because no
+    // `agent(` line is attributed to it. Measured both ways: two honest nested markers spent 5 x 5
+    // = 25 under a marker naming 5, and an UNMARKED outer loop did it unboundedly. `k !== h` so the
+    // header's own opener is not counted against it.
+    let ob = 0
+    for (let k = h; k >= 0 && k > h - 60; k--) {
+      for (const ch2 of code[k]) {
+        if (ch2 === '}') ob++
+        else if (ch2 === '{') ob--
+      }
+      if (ob < 0 && k !== h && /\b(for|while)\s*\(/.test(code[k])) return ` — the marked loop is itself inside a loop opened at line ${k + 1}, which multiplies its bound by a count nothing here can size`
+      if (ob < 0) ob = 0
+    }
+    return null
+  }
   const scan = (raw, i) => {
     const l = code[i]
     const asg = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/.exec(l)
@@ -848,27 +923,79 @@ function fanoutFindings(script) {
       bad.push({ n: i + 1, line: raw, why: 'agent() fanned through Array.from() — the count is not visible here' })
       return
     }
+    // THE ENCLOSING LOOP HEADER IS LOCATED FIRST, THEN THE CALL IS JUDGED (TOOL-dFoldedVerdict-4).
+    // Both branches used to deny in place; `gov:sequential-agents` is read off the HEADER line, so
+    // the walk that finds it is hoisted and one predicate supplies both reasons.
+    const c = l.search(/\bagent\s*\(/)
+    let h = -1
+    let braceless = false
     // A BRACELESS loop body: `for (const f of all) out.push(await agent(f))`. The brace walk below
     // cannot see it — there is no brace — and it was one of the measured bypasses.
-    if (/\b(for|while)\s*\(/.test(l.slice(0, l.search(/\bagent\s*\(/)))) {
-      bad.push({ n: i + 1, line: raw, why: 'agent() in a braceless loop body — a loop-built fan-out is the evasion this rule exists for' })
+    if (/\b(for|while)\s*\(/.test(l.slice(0, c))) { h = i; braceless = true }
+    else {
+      // A loop BODY is a brace block, not a paren, so it never shows up as an enclosing opener.
+      // Judged separately: an unclosed `for (`/`while (` block whose brace is still open above.
+      let braces = 0
+      for (let k = i; k >= 0 && k > i - 60; k--) {
+        for (const ch of code[k]) {
+          if (ch === '}') braces++
+          else if (ch === '{') braces--
+        }
+        if (braces < 0 && /\b(for|while)\s*\(/.test(code[k])) { h = k; break }
+        if (braces < 0) braces = 0 // a different block opened here; keep looking outward
+      }
+    }
+    if (h < 0) return
+    // NESTED LOOPS FAIL CLOSED WITH NO EXTRA CLAUSE: the walk stops at the FIRST enclosing loop, so
+    // an inner loop must carry its own marker and its own bounded receiver.
+    const why = checkSeqMarker(h, i, c, l)
+    if (why === null) {
+      // EVERY OCCURRENCE ON THE LINE COUNTS, not the first. The scan is per-LINE and `c` is the
+      // first match, so `await agent(u); await agent(u)` used to contribute one entry and the sweep
+      // saw a group of one — the bound became a LINE count, which is not a bound at all.
+      const calls = (l.match(/\bagent\s*\(/g) || []).length
+      for (let q = 0; q < Math.max(1, calls); q++) seqAdmitted.push({ h, n: i + 1, line: raw })
       return
     }
-    // A loop BODY is a brace block, not a paren, so it never shows up as an enclosing opener. Judged
-    // separately: an unclosed `for (`/`while (` block whose brace is still open above this line.
-    let braces = 0
-    for (let k = i; k >= 0 && k > i - 60; k--) {
-      for (const ch of code[k]) {
-        if (ch === '}') braces++
-        else if (ch === '{') braces--
-      }
-      if (braces < 0 && /\b(for|while)\s*\(/.test(code[k])) {
-        bad.push({ n: i + 1, line: raw, why: 'agent() inside a loop body — a loop-built thunk array is the evasion this rule exists for' })
-        break
-      }
-      if (braces < 0) braces = 0 // a different block opened here; keep looking outward
-    }
+    bad.push({
+      n: i + 1,
+      line: raw,
+      why: braceless
+        ? `agent() in a braceless loop body — a loop-built fan-out is the evasion this rule exists for${why}`
+        : `agent() inside a loop body — a loop-built thunk array is the evasion this rule exists for${why}`,
+    })
   })
+  // THE ONE-CALL SWEEP, and it is what turns the marker's number from an ITERATION bound into a
+  // SPAWN bound. Two awaited calls in one marked body spend twice what the marker names, so the
+  // marker would be claiming a number the loop does not obey. Without this the shipped rule carries
+  // a stated 2x fail-open in its own admission path, which is the thing this unit exists to avoid.
+  const byHeader = new Map()
+  for (const a of seqAdmitted) {
+    if (!byHeader.has(a.h)) byHeader.set(a.h, [])
+    byHeader.get(a.h).push(a)
+  }
+  // ONE MARKED LOOP PER SCRIPT. The per-header sweep below bounds a single body; it relates no two
+  // headers, so two honest markers multiplied (nested) or summed (sequential) with every clause
+  // satisfied. `MAX_VERIFIERS` is a TOTAL, and the only total this scan can actually prove is the
+  // one belonging to a single admitted loop.
+  if (byHeader.size > 1) {
+    const hs = [...byHeader.keys()].map((x) => x + 1).join(', ')
+    for (const [, group] of byHeader) {
+      for (const a of group) {
+        bad.push({ n: a.n, line: a.line, why: `${SEQ_MARK} appears on ${byHeader.size} loop headers in this script (lines ${hs}) and the bound is a TOTAL, so two marked loops multiply or sum it — only ONE marked loop per script can be proven bounded` })
+      }
+    }
+  }
+  for (const [hh, group] of byHeader) {
+    if (group.length < 2) continue
+    for (const a of group) {
+      bad.push({
+        n: a.n,
+        line: a.line,
+        why: `${SEQ_MARK} on line ${hh + 1} admits ONE awaited agent() in its body and this body holds ${group.length}, so the loop spends ${group.length} times the bound the marker names`,
+      })
+    }
+  }
   return bad
 }
 
@@ -888,7 +1015,7 @@ function fanoutFindings(script) {
 //
 // S4 is the asymmetry the audit named as the clearest lesson in this file: `gov:fixed-verifiers` is
 // a claim whose SHAPE is checked, while `gov:bounded-fanout` returned early and exempted a line
-// slicing fifty wide. Both markers are claims now.
+// slicing fifty wide. All three markers are claims now.
 //
 // FAIL CLOSED, like every other branch here: a K this file cannot resolve to an integer at or under
 // MAX_VERIFIERS is a denial. The burden is on the fan-out.

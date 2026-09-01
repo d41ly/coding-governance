@@ -70,7 +70,12 @@ cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "
 # EXAMPLE CONF and refuses when it is absent. A fixture that drops either models a broken
 # install rather than a repo.
 cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$HERE/.unattended.conf.example" $KIT_REL/
+cp "$HERE/VERBS.template.md" $KIT_REL/
 cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
+# THE VERB CARRIER, BOTH HALVES. Seeded for the same reason the protocol pair is: check 10 now
+# iterates two pairs and check 26 reads this carrier ALONE, so a fixture missing either half
+# models a broken install and every arm below grades that refusal instead of its own subject.
+cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
 SCRIPT="$TMP/$KIT_REL/check-unattended.sh"
 
 mkconf() { cat > .unattended.conf <<EOF
@@ -468,7 +473,7 @@ mkdir -p memory/builds/tRev
 printf '# tRev\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T02:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2\n\n2026-08-20T03:00:00Z review · item S1 · reason verdict BLOCKED · blockers 3\n' > memory/builds/tRev/RUN.md
 git add -A >/dev/null 2>&1; git -c commit.gpgsign=false commit -q -m rev --no-verify >/dev/null 2>&1
 out=$(run)
-hit "$out" "review loops that ran past the ceiling, stalled without recording it, or exited without promoting"
+hit "$out" "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers"
 hit "$out" "blocker counts did not shrink across consecutive rounds and no round carries an exit token"
 
 # ...and the SAME sequence carrying an exit token is green. Without this the arm above could be
@@ -711,7 +716,87 @@ PROMBASE=$(git rev-parse HEAD)
 printf '# tProm\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n| TOOL-tProm-1 | CLOSED |\n| TOOL-tProm-2 | CLOSED |\n<!-- /gen:build-units -->\n' > memory/builds/tProm/README.md
 printf '# tProm\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n\n2026-08-20T02:00:00Z review · item S2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n' "$PROMBASE" > memory/builds/tProm/RUN.md
 git add -A >/dev/null 2>&1
-hit "$(run)" "2 subject(s) EXITED without converging and the generated units region gained only 1 unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted"
+hit "$(run)" "2 subject(s) EXITED without converging and the generated units region gained only 1 non-WONTDO unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted"
+reset_tree
+
+# ---- THE SET IS READ FROM THE DRIVER, so an unreadable declaration is a refusal and not a silent
+# ---- comparison against nothing. Closing-review fold: the leg used to restate `fold|promote`, which
+# ---- drifts the moment the driver's set moves and lets this leg tell a record it was hand-edited
+# ---- when the driver itself wrote the value.
+reset_tree; mkconf
+mutate $KIT_REL/unattended.sh 's|^REVIEW_DISPOSITIONS=.*|REVIEW_DISPOSITIONS=fold\|promote|'
+hit "$(run)" "the driver declares no readable REVIEW_DISPOSITIONS, so the clause that grades a recorded disposition would compare every value against an empty set and report whatever that produces as a verdict"
+reset_tree
+
+# ---- TOOL-dFoldedVerdict-2: THE GRADED PATH — clause 3 READING a recorded disposition instead of
+# ---- inferring one from ids. Every arm pins the cutoff to a date the fixture cannot drift past:
+# ---- 2000-01-01 forces grading, 2099-01-01 forces the pre-cutoff proxy. Neither depends on the day
+# ---- the suite runs, which a cutoff of "today" would.
+dispconf() { mkconf; printf 'DISPOSITION_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
+mkdisp() { # base-region-rows · head-region-rows · run rows
+  mkdir -p memory/builds/tDisp
+  printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$1" > memory/builds/tDisp/README.md
+  git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m dispbase --no-verify
+  DISPBASE=$(git rev-parse HEAD)
+  printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$2" > memory/builds/tDisp/README.md
+  printf '# tDisp\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: abc\nbase: %s\n\n%b' "$DISPBASE" "$3" > memory/builds/tDisp/RUN.md
+  # COMMITTED, not merely staged. The cutoff grades the record's own FIRST-COMMIT date; a staged
+  # record has none, and an undated record is graded regardless of the cutoff — so a staged fixture
+  # made the 2099 and 2000 arms produce byte-identical output and the grandfathering arm proved
+  # nothing at all. GIT_COMMITTER_DATE pins the date so neither arm depends on the day it runs.
+  git add -A >/dev/null 2>&1
+  GIT_COMMITTER_DATE="2026-09-01T12:00:00 +0000" git -c commit.gpgsign=false commit -q -m disprun --no-verify >/dev/null 2>&1
+}
+D_ONE='| TOOL-tDisp-1 | CLOSED |\n'
+D_TWO='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n'
+
+# A FOLD-ONLY EXIT DEMANDS NOTHING, and the region does not grow. Under the old predicate this same
+# fixture redded, which is the whole defect: a run that folded correctly was graded as though it had
+# promoted.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
+miss "$(run)" "check 2 FAILED"
+
+# ...and the GREEN CONTROL for it: the same fixture with the disposition stripped is a REFUSAL, not a
+# pass. Without this arm `nneed` falls to zero on every unlabelled record and the clause becomes
+# green-by-absence — the shape this rewrite exists to remove.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT\n'
+hit "$(run)" "record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read"
+
+# A PROMOTE EXIT SHORT OF IDS still reds, so reading the field did not disarm the clause.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n'
+hit "$(run)" "EXITED recording disposition promote and the generated units region gained only 0 non-WONTDO unit id(s) this run BASE lacked"
+
+# ...and its green control: the same promote exit WITH the id present passes.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+
+# AN ILLEGAL VALUE IS ITS OWN REFUSAL, and `promoted` is the near-miss a hand-editor actually types —
+# not a nonsense token. Reading it as ABSENT would name the wrong cause, and the hand-edited record
+# is not hypothetical: TOOL-dFoldedVerdict-3 creates exactly that class.
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promoted\n'
+out=$(run)
+hit "$out" "carry a disposition outside the closed set fold|promote"
+miss "$out" "record NO disposition while this record is graded against DISPOSITION_CUTOFF"
+
+# A CUTOFF AHEAD OF THE RECORD restores today's verdict verbatim, which is what grandfathering means.
+reset_tree; dispconf 2099-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold\n'
+hit "$(run)" "1 subject(s) EXITED without converging and the generated units region gained only 0 non-WONTDO unit id(s) this run BASE lacked"
+
+# A BLANK CUTOFF grandfathers everything AND SAYS SO, unconditionally and on stdout. A silently
+# disabled clause reads exactly like a clause finding nothing wrong.
+reset_tree; mkconf
+hit "$(run)" "DISPOSITION_CUTOFF is blank or undeclared, so check 2 clause 3 grades EVERY record on the id-delta proxy"
+
+# A MALFORMED CUTOFF is a REFUSAL, never a defaulted value — S6's one new branch, and the reason the
+# three pinned check-2 ordinals moved by one in memory/project/unarmed-branches.txt.
+reset_tree; dispconf "last tuesday"
+hit "$(run)" "DISPOSITION_CUTOFF is declared and is not an ISO date, and a cutoff nothing can compare grades every record or none"
 reset_tree
 
 # ---- check 9: A TRANSPORT FAILURE IS NOT AN ANSWER EITHER. Splitting the wall-clock bound out left
@@ -833,6 +918,16 @@ hit "$out" "the shipped protocol and this repo's installed copy have drifted, so
 hit "$out" "drifted line"
 reset_tree; rm -f $KIT_REL/PROTOCOL.template.md
 hit "$(run)" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
+
+# ---- check 10, THE SECOND PAIR. TOOL-dFoldedVerdict-5 moved the verb entries into their own
+# ---- byte-compared carrier because the protocol had reached its cap exactly. A pair added without
+# ---- its own two arms is a pair nothing watches, and the check would still report green.
+reset_tree; printf '\ndrifted line\n' >> memory/guides/UNATTENDED-VERBS.md
+out=$(run)
+hit "$out" "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
+hit "$out" "drifted line"
+reset_tree; rm -f $KIT_REL/VERBS.template.md
+hit "$(run)" "one half of the verb-carrier pair is missing, and a parity check with one file is a check that cannot fail"
 
 # ---- check 12: the kickoff hand-back, all four states. This is the only check that reads a file
 # ---- outside the kit, and it exists because nothing else read the engine's TEXT — the manifest
@@ -1912,12 +2007,20 @@ reset_tree
 reset_tree; mutate $KIT_REL/unattended.sh '/^#   unattended[.]sh --propose /d'
 hit "$(run)" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
 
-# The protocol carrier. BOTH copies, so check 10's byte-parity arm does not fire alongside and leave
-# two messages where the arm under test is one of them.
+# The VERB CARRIER, which is where the entries live after TOOL-dFoldedVerdict-5. BOTH copies, so
+# check 10's byte-parity arm does not fire alongside and leave two messages where the arm under test
+# is one of them.
 reset_tree
-mutate $KIT_REL/PROTOCOL.template.md '/^- .--propose. — writes a PROPOSAL/d'
-mutate memory/guides/UNATTENDED-PROTOCOL.md '/^- .--propose. — writes a PROPOSAL/d'
-hit "$(run)" "a declared verb has no entry in the protocol's verb section, so the contract a run is measured against does not describe a verb that run can call:"
+mutate $KIT_REL/VERBS.template.md '/^- .--propose. — writes a PROPOSAL/d'
+mutate memory/guides/UNATTENDED-VERBS.md '/^- .--propose. — writes a PROPOSAL/d'
+hit "$(run)" "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call:"
+
+# The carrier ABSENT. Its own named refusal, because the guard it replaced was `[ -f X ] && read X`
+# with no else — which skips the whole join in silence and reports a green that means nothing. This
+# arm accepts that check 10's missing-half branch speaks too: `hit` asserts the message under test is
+# PRESENT, and the alternative is a fixture that cannot reach the state at all.
+reset_tree; rm -f $KIT_REL/VERBS.template.md
+hit "$(run)" "the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence"
 
 reset_tree; mutate $KIT_REL/SKILL.template.md 's|unattended[.]sh --propose <slug>|unattended.sh --nothing <slug>|'
 hit "$(run)" "a declared verb is never invoked in the Skill an agent actually reads, so nothing an agent follows would ever call it:"

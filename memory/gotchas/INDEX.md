@@ -18,7 +18,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [absence-assertion-over-whole-file-text](absence-assertion-over-whole-file-text.md) | class | 3 |  | a ban that greps whole file text reds on the comment documenting its own fix |
 | [allowlist-narrower-than-the-root-it-guards](allowlist-narrower-than-the-root-it-guards.md) | class | 7 |  | a guard keyed on a path prefix denies the sanctioned destination too, because on this platform the sanctioned destination is INSIDE the prefix |
 | [amendment-leaves-its-other-half-standing](amendment-leaves-its-other-half-standing.md) | class | 2 |  | a criterion is amended and the clause, scope item or log line that only made sense under the old wording is left behind, so one rule now returns two verdicts |
-| [arm-literal-strands-on-message-edit](arm-literal-strands-on-message-edit.md) | class | 2 |  | editing a fail message strands its arm silently — the branch stays armed-looking, the count drops by one, and only the arms gate notices |
+| [arm-literal-strands-on-message-edit](arm-literal-strands-on-message-edit.md) | class | 3 |  | editing a fail message strands its arm silently — the branch stays armed-looking, the count drops by one, and only the arms gate notices |
 | [armed-but-unreachable-rule](armed-but-unreachable-rule.md) | class | 4 |  | a declaration can be non-empty, well-formed and still impossible to violate — testing that a rule EXISTS is not testing that it can FIRE |
 | [assertion-between-two-derived-values](assertion-between-two-derived-values.md) | class | 4 |  | a check comparing two values the same code derives from one source is a tautology, and it arms cleanly |
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 6 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
@@ -35,6 +35,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [hookspath-resolves-into-another-checkout](hookspath-resolves-into-another-checkout.md) | class | 5 |  | core.hooksPath is repo-global and absolute, so in a multi-worktree layout every push is gated by whatever the primary tree currently has checked out |
 | [id-matched-as-a-substring](id-matched-as-a-substring.md) | class | 3 |  | every id ending in a 1-up sequence is a prefix of nine others, so an unanchored match joins the wrong record |
 | [inputs-inside-the-subjects-reach](inputs-inside-the-subjects-reach.md) | class | 2 |  | a check whose inputs are all supplied by the thing it distrusts is not a check, however sound its logic |
+| [one-value-field-records-a-mixed-outcome](one-value-field-records-a-mixed-outcome.md) | class | 1 |  | a per-subject field holding ONE value has to record an outcome that was mixed — take the value that DEMANDS something, never the one that demands nothing |
 | [pin-copied-from-another-corpus](pin-copied-from-another-corpus.md) | class | 2 |  | a threshold measured on one tree is vacuous or permanently red on another |
 | [process-creation-is-the-suite-cost](process-creation-is-the-suite-cost.md) | class | 2 |  | a shell suite that is 93% not-CPU is paying an on-access antivirus scanner per exec, so its cost is spawn count and nothing in the code reads that way |
 | [second-implementation-is-not-a-second-opinion](second-implementation-is-not-a-second-opinion.md) | class | 5 |  | a gate that recomputes the driver's answer from the driver's inputs confirms it rather than checking it, and the same hole opens at the READ path |
@@ -51,6 +52,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-36 record(s): 36 class, 0 note, 0 superseded · 4 universal · 0 unanchored
+37 record(s): 37 class, 0 note, 0 superseded · 4 universal · 0 unanchored
 
 <!-- END GENERATED -->

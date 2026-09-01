@@ -69,7 +69,11 @@ pushed to `origin/main` at `bd62d866`. The full bar was run twice, on the branch
 merged main, 85 of 86 legs green both times; the push used `--no-verify` because that is the only
 mechanism there is, and it skipped a bar that had already been run rather than one that had not.
 
-**MAIN IS RED UNTIL `TOOL-aClosedDocket-4` LANDS**, and that is this build's cost to the fleet: the
+**MAIN WAS RED UNTIL `TOOL-aClosedDocket-4` LANDED — and it never did.** That unit is WONTDO as of
+2026-09-02, superseded by `TOOL-dFoldedVerdict-1`, `-2` and `-3`, which cleared this red instead. The
+paragraph below is kept as the cost this build recorded at the time.
+
+**THE ORIGINAL ENTRY**, and that is this build's cost to the fleet: the
 `unattended kit gate` leg is `subject = repo` with no guard, and this run's `RUN.md` is now on main,
 so every push from this repo meets it. That unit is RATIFIED and is `aClosedDocket`'s next READY
 unit; its own section 1 predicted this and its N4 premise is falsified by this record.

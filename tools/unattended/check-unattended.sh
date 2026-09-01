@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.14   # gov:kit unattended@1.14 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.15   # gov:kit unattended@1.15 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -116,6 +116,7 @@ fi
 ADV_NAME=""
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; CORE_FLOOR=""; LANDED_ANCHOR_CUTOFF=""
+DISPOSITION_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL. Two rounds got this wrong in two ways,
@@ -227,6 +228,10 @@ DOD_NO_OVERRIDE=$(core_of DOD_NO_OVERRIDE)
 # The review loop's runaway backstop, read the same way. The leg holds NO copy of the number: a
 # second spelling of a bound is a bound that goes wrong silently when one copy moves.
 RUNAWAY_CEILING=$(core_of RUNAWAY_CEILING)
+# READ FROM THE DRIVER, never restated — this file's own rule, and fifteen other closed sets
+# already obey it. A restatement drifts silently: widen the driver's set and this leg tells a
+# record it was hand-edited when the driver itself wrote the value.
+REVIEW_DISPOSITIONS=$(core_of REVIEW_DISPOSITIONS)
 # The halt vocabulary, read the same way. The leg holds NO member token of its own: a prefix
 # alternation could not tell a member from an unrelated identifier, and a sibling unit lands a
 # constant whose name such an alternation would have matched.
@@ -247,7 +252,35 @@ DOD="$DOD_CORE $DOD_EXTRA"
 # ---- There is no round-count fact to parse. The sequence is DERIVED from the line set, and the only
 # ---- grammar split here is the park helper's own output — which is why adding a round cannot make a
 # ---- record disagree with itself.
-if [ -z "$RUNAWAY_CEILING" ]; then
+_disp_ok=1
+# ---- THE SET MUST BE READABLE, or the two clauses that compare against it grade every value as
+# ---- illegal or none as illegal, and both look like a working check. Same liveness shape as
+# ---- RUNAWAY_CEILING and AUTH_MODES above.
+if [ -z "$REVIEW_DISPOSITIONS" ]; then
+  fail 2 "the driver declares no readable REVIEW_DISPOSITIONS, so the clause that grades a recorded disposition would compare every value against an empty set and report whatever that produces as a verdict"
+  _disp_ok=0
+fi
+# ---- DISPOSITION_CUTOFF: malformed is a REFUSAL, never a defaulted value, because a cutoff that
+# ---- quietly defaults grades every record or none and nobody can tell which. Same shape as the
+# ---- RUNAWAY_CEILING refusal below it and as check-pass-order.sh's own cutoff guard.
+if [ -n "$DISPOSITION_CUTOFF" ]; then
+  case "$DISPOSITION_CUTOFF" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) fail 2 "DISPOSITION_CUTOFF is declared and is not an ISO date, and a cutoff nothing can compare grades every record or none: $DISPOSITION_CUTOFF"; _disp_ok=0 ;;
+  esac
+else
+  # ---- ANNOUNCED UNCONDITIONALLY, on stdout, once per run. NOT through report(), which is gated on
+  # ---- GOV_UNATTENDED_REPORT and would make a disabled term invisible on a default bar run — a
+  # ---- silently disabled clause reads exactly like a clause finding nothing wrong.
+  echo "unattended: DISPOSITION_CUTOFF is blank or undeclared, so check 2 clause 3 grades EVERY record on the id-delta proxy and reads no recorded disposition — a run that folded correctly is still graded as though it had promoted"
+fi
+if [ "$_disp_ok" != 1 ]; then
+  # ---- AND THE LOOP BELOW IS SKIPPED ENTIRELY. An unreadable cutoff means this leg cannot decide
+  # ---- WHICH predicate applies, and grading every record on the other one is precisely the silent
+  # ---- choice the refusal above exists to prevent. Same shape as the RUNAWAY_CEILING arm beside it:
+  # ---- a term that cannot be read says so instead of quietly picking a default.
+  echo "unattended: check 2 graded NO record and skipped ALL THREE of its review-loop clauses — the runaway-ceiling and stalled-loop arms as well as the disposition one. A term this check cannot read leaves it unable to decide which predicate applies, and choosing one silently would be the fault the refusal above names"
+elif [ -z "$RUNAWAY_CEILING" ]; then
   fail 2 "the driver declares no readable RUNAWAY_CEILING, so the review-loop check below would be skipped entirely and its absence would look exactly like a clean corpus"
 else
   rv_bad=""
@@ -277,7 +310,24 @@ else
     fi
     rv_new=""
     [ "$rv_readable" = 1 ] && rv_new=$(comm -23 <(printf '%s\n' "$rv_now") <(printf '%s\n' "$rv_then") | grep -c . || true)
-    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" '
+    # GRADED ON THE RECORD'S OWN FIRST-COMMIT DATE, the idiom LANDED_ANCHOR_CUTOFF already uses. A
+    # record whose first commit is at or after the cutoff is read for its dispositions; one before it
+    # keeps the id-delta proxy verbatim, messages included.
+    rv_graded=0
+    if [ -n "$DISPOSITION_CUTOFF" ]; then
+      # --follow OR THE ROTATION RE-DATES THE RECORD. `--preflight` moves a terminal RUN.md to
+      # RUN.<phase>.<blob8>.md, a NEW path whose first `A` is the rotation commit, so a record
+      # created before the cutoff becomes GRADED the moment any later run rotates it — and its rows
+      # predate the flag, so it reds forever on an append-only archive. Measured on
+      # RUN.ABORTED.fc79c21d.md: 2026-08-20 without, 2026-08-19 with.
+      rv_fc=$(GIT log --follow --diff-filter=A --format=%cs -- "$rvf" 2>/dev/null | tail -1)
+      # AN EMPTY DATE GRADES. The record is staged and uncommitted, which is the IN-FLIGHT run — the
+      # one case that can still record a disposition, and so the last one to hand the id proxy to.
+      # The sibling cutoff this was copied from grandfathers an empty date; the spec said to invert
+      # that and the first cut took the sibling's clause verbatim.
+      if [ -z "$rv_fc" ] || printf '%s\n%s\n' "$DISPOSITION_CUTOFF" "$rv_fc" | sort -C; then rv_graded=1; fi
+    fi
+    rv_bad="$rv_bad$(awk -v ceil="$RUNAWAY_CEILING" -v f="$rvf" -v readable="$rv_readable" -v newids="${rv_new:-0}" -v graded="$rv_graded" -v disps="|$REVIEW_DISPOSITIONS|" '
       /^[0-9][0-9-]*T[0-9:]*Z review · item / {
         line = $0; sub(/\r$/, "", line)
         i = index(line, " · item "); if (i == 0) next
@@ -290,17 +340,41 @@ else
         if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
         last[it] = b
         if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING/) term[it] = 1
-        if (rs ~ /NON-CONVERGENT|CEILING/) needs[it] = 1
+        if (rs ~ /NON-CONVERGENT|CEILING/) {
+          needs[it] = 1
+          nf = split(rs, fld, " · ")
+          disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
+        }
       }
       END {
-        nneed = 0
+        nneed = 0; nomiss = ""; illegal = ""
         for (it in n) {
           if (n[it] > ceil)
             printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
           else if (flat[it] >= 1 && !(it in term))
             printf "\n  %s (subject %s: blocker counts did not shrink across consecutive rounds and no round carries an exit token, so the loop is non-convergent and nothing recorded that it stopped)", f, it
-          if (it in needs) nneed++
+          if (it in needs) {
+            if (graded != 1) nneed++
+            else if (disp[it] == "") nomiss = nomiss " " it
+            else if (index(disps, "|" disp[it] "|") == 0) illegal = illegal " " it "=" disp[it]
+            else if (disp[it] == "promote") nneed++
+            # a subject recording `fold` demands NOTHING, which is the entire point of reading the
+            # field instead of inferring an answer from ids
+          }
         }
+        if (graded == 1) {
+          if (nomiss != "")
+            printf "\n  %s (exited subject(s)%s record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read - and with nothing to read this clause would demand nothing and pass by finding nothing)", f, nomiss
+          if (illegal != "")
+            printf "\n  %s (exited subject(s)%s carry a disposition outside the closed set %s - the driver validates the flag at write time, so an illegal value reached this record by HAND, and reading it as absent would name the wrong cause)", f, illegal, substr(disps, 2, length(disps) - 2)
+          if (nneed > 0) {
+            if (readable != 1)
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nneed
+            else if (newids + 0 < nneed)
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one promoted blocker has no unit. A subject recording disposition fold demands nothing here)", f, nneed, newids + 0
+          }
+        }
+        else {
         # COUNTED ACROSS SUBJECTS, because `newids` is a per-FILE delta. Consumed inside the
         # per-subject loop it let ONE promotion satisfy every subject in the file that exited
         # without converging. A per-subject attribution is not available - the region records ids,
@@ -312,9 +386,10 @@ else
           else if (newids + 0 < nneed)
             printf "\n  %s (%d subject(s) EXITED without converging and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one blocker was neither fixed nor promoted. This is a LOWER BOUND: it demands one surviving id per exited SUBJECT, not one per standing BLOCKER, because the region records ids and not which subject promoted them)", f, nneed, newids + 0
         }
+        }
       }' "$rvf")"
   done
-  [ -z "$(printf '%s' "$rv_bad" | tr -d '[:space:]')" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without promoting:$rv_bad"
+  [ -z "$(printf '%s' "$rv_bad" | tr -d '[:space:]')" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers:$rv_bad"
 fi
 
 # ---- THE HALT VOCABULARY: a shrink-only floor, and every aborted record carrying a legal code.
@@ -1247,17 +1322,43 @@ fi
 # ---- who did not write it.
 SHIP="$HERE/PROTOCOL.template.md"
 LIVEDOC="$M/guides/UNATTENDED-PROTOCOL.md"
+VERBSHIP="$HERE/VERBS.template.md"
+VERBDOC="$M/guides/UNATTENDED-VERBS.md"
 KITREL=${HERE#"$(cd "$ROOT" && pwd)"/}
 PREFIX=${KITREL%/*}; [ "$PREFIX" = "$KITREL" ] && PREFIX="" || PREFIX="$PREFIX/"
-if [ -f "$SHIP" ] && [ -f "$LIVEDOC" ]; then
-  if [ -n "$PREFIX" ]; then nl=$(sed -e 's/\r$//' -e "s|$PREFIX||g" "$LIVEDOC"); else nl=$(sed -e 's/\r$//' "$LIVEDOC"); fi
-  ns=$(sed -e 's/\r$//' "$SHIP")
-  if [ "$nl" != "$ns" ]; then
-    fail 10 "the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on: $SHIP vs $LIVEDOC"
-    diff <(printf '%s\n' "$nl") <(printf '%s\n' "$ns") | head -10 | sed 's/^/    /'
-  fi
-elif [ ! -f "$SHIP" ] || [ ! -f "$LIVEDOC" ]; then
+# ---- TWO PAIRS as of TOOL-dFoldedVerdict-5, iterated rather than copied. The second exists because
+# ---- the protocol had reached its byte cap EXACTLY and section 7 moved out to make the contract
+# ---- amendable again. A ROW here and not a new check number: this check already carries the
+# ---- both-halves refusal the second pair needs, so a new number would only have to be added
+# ---- everywhere check numbers are enumerated. The pair NAME is a parameter because with one message
+# ---- for both pairs a reader has to open the paths to learn which half of the kit drifted.
+# ---- The COMPARISON is shared and the MESSAGES are not, which is deliberate rather than clumsy.
+# ---- `check-arms.py` arms a branch by finding a test assertion that names the branch's own failure
+# ---- text, and its signature is the longest LITERAL run between interpolations. A message reading
+# ---- "the shipped $1 ... drifted" therefore has no assertable literal at all — every arm for it
+# ---- would have to name a `$1` no run ever emits. So each pair states its own sentence.
+_c10_cmp() { # shipped half · installed half -> 0 identical · 1 drifted · 2 a half is missing
+  [ -f "$1" ] && [ -f "$2" ] || return 2
+  if [ -n "$PREFIX" ]; then nl=$(sed -e 's/\r$//' -e "s|$PREFIX||g" "$2"); else nl=$(sed -e 's/\r$//' "$2"); fi
+  ns=$(sed -e 's/\r$//' "$1")
+  [ "$nl" = "$ns" ]
+}
+_c10_cmp "$SHIP" "$LIVEDOC"; _c10rc=$?
+if [ "$_c10rc" -eq 2 ]; then
   fail 10 "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail: $SHIP / $LIVEDOC"
+elif [ "$_c10rc" -ne 0 ]; then
+  fail 10 "the shipped protocol and this repo's installed copy have drifted, so the kit ships something other than what it runs on: $SHIP vs $LIVEDOC"
+  diff <(printf '%s\n' "$nl") <(printf '%s\n' "$ns") | head -10 | sed 's/^/    /'
+fi
+# ---- THE SECOND PAIR, added when TOOL-dFoldedVerdict-5 moved section 7 out of a protocol that had
+# ---- reached its byte cap exactly. A row here and not a new check number: this check already owns
+# ---- the both-halves refusal the second pair needs.
+_c10_cmp "$VERBSHIP" "$VERBDOC"; _c10rc=$?
+if [ "$_c10rc" -eq 2 ]; then
+  fail 10 "one half of the verb-carrier pair is missing, and a parity check with one file is a check that cannot fail: $VERBSHIP / $VERBDOC"
+elif [ "$_c10rc" -ne 0 ]; then
+  fail 10 "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on: $VERBSHIP vs $VERBDOC"
+  diff <(printf '%s\n' "$nl") <(printf '%s\n' "$ns") | head -10 | sed 's/^/    /'
 fi
 
 # ---- 16: the INSTALLED protocol describes the rotation it is the rules for. Check 10 above cannot
@@ -2029,8 +2130,14 @@ else
   _c26_drv=$'
 '$(cat "$DRIVER")$'
 '
-  _c26_ship=""; [ -f "$SHIP" ] && _c26_ship=$'
-'$(cat "$SHIP")$'
+  # ---- THE CONTRACT ARM READS THE VERB CARRIER AND NOTHING ELSE (TOOL-dFoldedVerdict-5). Accepting
+  # ---- a hit in either that file or the protocol would pass a HALF-COMPLETED move — the state that
+  # ---- leaves the verbs in both places — so the fallback is deliberately absent. A missing carrier
+  # ---- is its own named refusal and not a skipped arm: a guard of the form `[ -f X ] && read X`
+  # ---- with no else is the shape check 10's own header calls a check that cannot fail.
+  [ -f "$VERBSHIP" ] || fail 26 "the verb carrier is absent, so the arm that joins every declared verb to the contract cannot run and would otherwise skip in silence: $VERBSHIP"
+  _c26_ship=""; [ -f "$VERBSHIP" ] && _c26_ship=$'
+'$(cat "$VERBSHIP")$'
 '
   _c26_tmpl=""; [ -f "$tmpl" ] && _c26_tmpl=$(cat "$tmpl")
   for v in $VERBS_ALL; do
@@ -2041,11 +2148,11 @@ else
 '*) : ;;
       *) fail 26 "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks: $v in $DRIVER" ;;
     esac
-    if [ -f "$SHIP" ]; then
+    if [ -f "$VERBSHIP" ]; then
       case "$_c26_ship" in
         *$'
 '"- "?"$v"?" — "*) : ;;
-        *) fail 26 "a declared verb has no entry in the protocol's verb section, so the contract a run is measured against does not describe a verb that run can call: $v in $SHIP" ;;
+        *) fail 26 "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call: $v in $VERBSHIP" ;;
       esac
     fi
     if [ -f "$tmpl" ]; then

@@ -24,13 +24,13 @@ gotcha-classes = ["text-mode-read-eats-a-bare-cr.md",
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
 ]
-guides = ["UNATTENDED-PROTOCOL.md"]
+guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md"]
 backlog-shards = []
 lexicon-verbs = []
 [paths]
 globs = [
   "tools/unattended/*",
-  "memory/guides/UNATTENDED-PROTOCOL.md",
+  "memory/guides/UNATTENDED-*.md",
   ".unattended.conf",
 ]
 ```
@@ -47,17 +47,17 @@ author its own authorization has none, and every gate downstream would certify i
 drives SPEC then AUDIT then BUILD as stages of one program, so BUILD is unreachable except through
 both and on a TERMINAL `--review` verdict — control flow, not a rule an agent remembers. It
 verifies nothing: a Workflow script has no filesystem, so every observation is a claim its own agent
-returned, and the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denies an
-`agent()` in any loop body: each stage is ONE agent over the ordered list, and the convergence LOOP
-sits in the caller while the harness holds the GATE, since a convergence loop's iteration count is
-data-dependent and no unroll exists.
+returned, and the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denied an
+`agent()` in any loop body until `TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: each stage is
+ONE agent over the ordered list, and the convergence LOOP sits in the caller while the harness holds
+the GATE, its iteration count being data-dependent and so unboundable.
 
-**PASS ORDER IS ENFORCED IN TWO PLACES BECAUSE ONE OF THEM IS BYPASSABLE.** The method's hard floor
+**PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor
 — never build a MISSING or THIN unit — was carried entirely by an agent's memory. `plan_state`, the
-M2 classifier, was called at two sites: `--plan`, which only reports, and `build-complete`, which
+M2 classifier, ran at two sites that cannot catch it: `--plan` only reports, and `build-complete`
 runs after every commit has landed, by which point a run that built first and specced afterwards has
 a spec that is neither missing nor thin. `--dispatch` now REFUSES such a pass at the moment of the
-act, and is bypassed by not calling the verb; the `pass-order history` leg reads the COMMIT GRAPH,
+act and is bypassed by not calling the verb; the `pass-order history` leg reads the COMMIT GRAPH,
 asserting each CLOSED unit's build commit had a conforming, non-THIN spec at its FIRST PARENT. Only
 the graph remembers ORDER, which is why the second exists. The first parent and not the pinned BASE:
 the method REQUIRES a run to author a missing spec, so what this refuses is authoring it AFTERWARDS.
@@ -218,8 +218,7 @@ core sets are not editable from the project layer.
 
 *Re-derived 2026-08-20 against the tree rather than carried forward. The authored region
 carries twelve facts — it said seven here, and eleven in the protocol pair, and five in the driver's own
-resume comment, all at the same time. Three carriers, three values, none of them counted by any gate:
-that is what an ungated count does, and it is why the unit that added the twelfth fact enumerated the
+resume comment, all at the same time. Three carriers, three values, none of them counted by any gate, which is why the unit that added the twelfth fact enumerated the
 carriers by path rather than trusting a builder to find them. Dossier prose is ungated — only the
 claims tables above are — so this section rots silently and is worth re-deriving whenever the feature
 is touched.*

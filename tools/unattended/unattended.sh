@@ -14,7 +14,7 @@
 #   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
-#   unattended.sh --review <slug> --subject <id> --verdict <verdict> --blockers <N>  # a review round
+#   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
@@ -39,7 +39,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.14   # gov:kit unattended@1.14 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.15   # gov:kit unattended@1.15 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -314,7 +314,7 @@ esac
 # supplying the item nobody typed.
 PK_ITEM=""; PK_STEP=""
 HALT_CODE=""
-RV_SUBJECT=""; RV_BLOCKERS=""
+RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
@@ -464,6 +464,7 @@ RUNAWAY_CEILING="8"
 # kit's conformance table rather than hoped away. Pipe-separated because one member contains a space,
 # which a space-separated set cannot hold.
 REVIEW_VERDICTS="CLEAN|CLEAN WITH FIXES|BLOCKED"
+REVIEW_DISPOSITIONS="fold|promote"
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope"
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
 
@@ -3900,8 +3901,20 @@ review_counts() { # run-state file · subject -> the blocker counts, in order
     }' "$1"
 }
 
-verb_review() { # slug · subject · verdict · blockers
-  local slug="$1" subj="$2" verdict="$3" blockers="$4" rel prior state note
+# The sentence a TERMINAL round prints, per disposition. Defined once because two exits share it and
+# a second copy is a second thing to keep true. The promote wording deliberately keeps the word
+# PROMOTED: an existing suite arm asserts that literal, and rewording it would have made a passing
+# arm pass for a different reason. The final branch is UNREACHABLE — the state gate refuses an empty
+# disposition at both exits — and it says so loudly rather than printing something reassuring.
+review_exit_note() { # disposition -> the sentence
+  case "$1" in
+    fold)    printf '%s' "every blocker still standing was FOLDED into the specs it belongs to, which is the recorded disposition. Not promoted, not parked, not waived" ;;
+    promote) printf '%s' "every blocker still standing is PROMOTED to a unit of this build, specced at its tier and built. Not parked, not waived, not re-reviewed" ;;
+    *)       printf '%s' "NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
+  esac
+}
+verb_review() { # slug · subject · verdict · blockers · disposition
+  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" rel prior state note disp
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 37 "no run-state file, so there is no run to record a review round against: $rel"; return 1; }
@@ -3914,6 +3927,23 @@ verb_review() { # slug · subject · verdict · blockers
   case "$blockers" in
     ""|*[!0-9]*) fail 37 "--review requires --blockers as a plain integer, because the predicate compares this round's count against the previous one and cannot compare prose"; return 1 ;;
   esac
+  # THE CLOSED SET, checked HERE and not below with the state gate. S3a decides the order and the
+  # consequence is testable: `--disposition nonsense` on a CONVERGING round produces THIS refusal and
+  # not the state one, so an arm cannot pass against either. The refusal renders the constant rather
+  # than a retyped literal, exactly as the --verdict refusal above it does.
+  if [ -n "$disposition" ]; then
+    # A VALUE CARRYING THE SEPARATOR IS REFUSED FIRST. `case "|$SET|" in *"|$v|"*` matches any
+    # pipe-bounded SUBSTRING, so `fold|promote` passed the membership test, was written to an
+    # append-only record, and fell through review_exit_note's `*)` arm — the one whose header says
+    # it cannot be reached. The same hole exists in the --verdict test above and is pre-existing.
+    case "$disposition" in
+      *"|"*) fail 37 "--review names a disposition containing the set separator, which the membership test would read as a pipe-bounded substring of the closed set rather than as one member of it; legal dispositions: $REVIEW_DISPOSITIONS"; return 1 ;;
+    esac
+    case "|$REVIEW_DISPOSITIONS|" in
+      *"|$disposition|"*) ;;
+      *) fail 37 "--review names a disposition outside the closed set, and a disposition nothing can compare is prose in a field; legal dispositions: $REVIEW_DISPOSITIONS"; return 1 ;;
+    esac
+  fi
   if [ -n "$BYPASS_BAN" ] && printf '%s' "$subj" | grep -qF -- "$BYPASS_BAN"; then
     fail 37 "the subject spells the declared bypass flag, and the gate greps this file whole for it, so recording this round would red the bar on a record nothing can rewrite; name the subject without the literal flag: $BYPASS_BAN"
     return 1
@@ -3953,6 +3983,22 @@ verb_review() { # slug · subject · verdict · blockers
     return 1
   fi
   state=$(review_state "$prior" "$blockers")
+  # THE STATE GATE. Keyed on the COMPUTED state and never on --verdict, whose closed set holds none
+  # of these four tokens. A terminal exit must say which disposition it took: M4 admits BOTH, and
+  # check 2 could otherwise only ever observe promotion — so a run that folded correctly had no way
+  # to say so and was graded as though it had promoted. TOOL-dBriefedPass-9 measured that.
+  case "$state" in
+    NON-CONVERGENT|CEILING)
+      if [ -z "$disposition" ]; then
+        fail 37 "--review exits $state and requires --disposition, because the method admits BOTH fold and promote at the exit and a record naming neither leaves the gate inferring one from ids; legal dispositions: $REVIEW_DISPOSITIONS"
+        return 1
+      fi ;;
+    *)
+      if [ -n "$disposition" ]; then
+        fail 37 "--review names a disposition on a round that is not a terminal exit, and a disposition recorded mid-loop is a claim about an exit that has not happened yet: state $state"
+        return 1
+      fi ;;
+  esac
   note=""
   case "$state" in
     CONVERGED|NON-CONVERGENT) note=" · $state" ;;
@@ -3961,12 +4007,13 @@ verb_review() { # slug · subject · verdict · blockers
   # THE TERMINAL LINE is the exit token written into the same free-text reason, after the verdict and
   # the count. No new field, no new grammar, no new authored fact: an append-only history of rounds is
   # what a park KIND is for, and the sibling unit takes the FACT route for a per-run singleton instead.
-  park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note"
+  disp=""; [ -n "$disposition" ] && disp=" · disposition $disposition"
+  park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note$disp"
   stage_or_fail "$rel" || return 1
   case "$state" in
     CONVERGED)      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED — the loop is done for this subject" ;;
-    NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT — the count did not shrink, so the loop STOPS here and every blocker still standing is PROMOTED to a unit of this build, specced at its tier and built. Not parked, not waived, not re-reviewed" ;;
-    CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run promotes and lands anyway; record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
+    NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT · disposition $disposition — the count did not shrink, so the loop STOPS here and $(review_exit_note "$disposition")" ;;
+    CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $(review_exit_note "$disposition"); record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
     *)              if [ -z "$(printf '%s' "$prior" | tr -d '[:space:]')" ]; then
                       echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
                     else
@@ -4808,6 +4855,7 @@ while [ $# -gt 0 ]; do
     --review)       VERB=--review; SLUG="${2:-}"; shift 2 || shift ;;
     --subject)      RV_SUBJECT="${2:-}"; shift 2 || shift ;;
     --blockers)     RV_BLOCKERS="${2:-}"; shift 2 || shift ;;
+    --disposition)  RV_DISPOSITION="${2:-}"; shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || exit 1; verb_plan "${1:-}"; exit $? ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
@@ -4845,7 +4893,7 @@ case "$VERB" in
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
-  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" ;;
+  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
