@@ -14,60 +14,53 @@ ids: DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGau
 The owner asked whether an inbound adoption audit from `d41ly/incms` yields fixes that would
 simplify updating or adopting this repo's kits. Answering it needed the document's claims measured
 against THIS tree, because most are about the adopter's own fork. Eleven real defects came out; nine
-were unrecorded. The evidence is
-[the triage](build/2026-09-01-build-dGaugedVintage-1-incms-dossier-triage.md), which cites this tree
-rather than the document's. Each defect carries a spec, and they are being built in order.
+were unrecorded. All eleven are specced, reviewed, built and closed. The evidence trail is
+[the triage](build/2026-09-01-build-dGaugedVintage-1-incms-dossier-triage.md), the
+[round-1 audit](reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md), and one
+acceptance ledger per unit under `build/`.
 
 ## Expected improvements
 
-- Eleven cited defects arrive specced, so the next session builds rather than re-deriving.
-- `DEPL-dGaugedVintage-8` names why the mechanical update path did not answer: it leaves half the
-  adopter's receipt ungraded and moves the anchor anyway.
+- `govkit update` now answers "which of my kits are behind" in one command, and reproduces by
+  machine the two releases the inbound audit found by hand.
+- A stale measurer, an ungraded stamp, a kit that lands no program and a marker nobody could read
+  are each reported where they were silent.
 - Seven wrong claims about this tree stop propagating into a third dossier.
 
 ## Detriments if this is not built
 
 - The next adopter audit repeats a five-lens manual comparison a verb should answer.
-- The receipt keeps re-stamping forward over rows it never graded, so they get harder to attribute.
-- "inCMS is a hand fork with no receipt" survives a third time, having already survived two.
+- The receipt keeps re-stamping forward over rows it never graded.
+- A default kit keeps reporting adopted while landing no executable file.
 
 ## Build-level rules
 
-**Every unit observes its own failing case FIRST.** A gate seen only to pass asserts nothing, so no
-unit closes until its RED has been reproduced on the pre-fix binary and recorded in its ledger. Two
-of the first three REDs did not fire on the first attempt and both misfires are in the ledgers.
+**Every unit observed its own failing case FIRST**, on the pre-fix binary, and each ledger records
+it. Two REDs did not fire on the first attempt — one ran the old engine from a temp dir where its
+root resolver could not work, one used a malformed fixture — and both misfires are written down,
+because a red that proves nothing is worse than no red.
 
-**A spec may narrow at build time, and three have.** Reading the code before writing it has found a
-premise wrong in `-8`, `-3` and `-9`. When that happens the spec is revised and the reason logged in
-its §9 before any code is written, rather than building to a plan already known to be false.
+**A spec may narrow at build time, and five did.** Reading the code before writing it found a premise
+wrong in `-8`, `-9`, `-10`, `-11` and `-7`. `-8` shrank the most: two revisions had scoped a
+re-attribution pass that already ships as `adopt --re-adopt`.
 
-**Build order is the `order` verb** on each spec, rendered below; `-4`/`-5`, `-1`/`-9` and
-`-10`/`-11` are parallel pairs.
-
-**The inbound document is not carried in.** It cites 43 rooted-looking paths and 34 name files
-absent here. `DEAD_PATH_PIN` is `0` and hygiene check 15 demands set equality against an empty
-registry, so carrying it in would red the bar or cost 34 waiver rows for citations that are correct
-in the repo that wrote them.
-
-**Findings are two readings, not refuted ones.** Five lenses measured; all five returned; the
-orchestrator re-read every cited line. The skeptic pass did not run, and the triage says so rather
-than letting a reader assume adversarial confidence.
-
-**A premise this build itself got wrong.** Its first commit repeated the document's claim that inCMS
-is a hand fork with no receipt. It carries a schema-3 govkit receipt. Both earlier commits are left
-in history with their reasoning intact.
+**An unmet criterion is AMENDED in place, never quietly dropped.** Seven were: `-3` AC6, `-4` AC6,
+`-5` AC5, `-9` AC5, `-10` AC5, `-11` AC1, and `-7` AC2 and AC4. `-7` is HALF BUILT and says so.
 
 ## Parked decisions
 
-**For the owner.** `DEPL-dGaugedVintage-2` asks for a status sweep this build declined to make:
-`DEPL-dCarriedReceipt-1` through `-15` read SPECCED while their specs read CLOSED. Fifteen status
-flips across a build this session did not build carry their own judgement calls.
+**For the owner.** `-3` §8 F1 asks whether to reverse `DEPL-dCarriedReceipt-10` and seed a `forked`
+file at first install. The REFUSAL branch was built, which needs no ratification; the seed branch
+stays superseded and needs an owner id. "build it" was read as scope approval, not as that
+ratification.
 
-**Unmeasured**, and named rather than left implicit: whether `-3`'s rule precedence behaves as its
-descriptor comment says when driven through `resolve_entry`; whether a genuinely receipt-less tree
-can be brought under the probe end-to-end; how many of the adopter's 59 `not-installed` rows are
-renames rather than non-adoption; and the behavioural content of the ~1,900 upstream lines the
-document scopes as a pull.
+**Filed, not built.** `DEPL-dGaugedVintage-12` is `-7`'s unbuilt identity arm, so a kit path swapped
+for another's at equal count still passes. `DEPL-dGaugedVintage-13` gates the class `-2` swept by
+hand.
+
+**Unmeasured**, named rather than implied: the fan-out kit count in `-11` is the review lens's and
+was not re-derived; `-9`'s absent-`version`-key state is implemented but no receipt in reach
+exercises it; and the ~1,900 upstream lines the document scopes as a pull were never read.
 
 <!-- roster:units -->
 
