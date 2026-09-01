@@ -2,7 +2,7 @@
 name: one-value-field-records-a-mixed-outcome
 description: a per-subject field holding ONE value has to record an outcome that was mixed — take the value that DEMANDS something, never the one that demands nothing
 kind: class
-universal: true
+universal: false
 ---
 
 # A one-value field meets a mixed outcome, and the wrong choice is the silent one
@@ -53,11 +53,11 @@ is. A lossy field that ADMITS it is lossy is fine; one that reads as complete is
 
 ## Arming it
 
-**Not gated, and the gap is stated rather than implied away.** No check can see that an outcome was
+**There is NO MACHINE GATE for this class, and the gap is stated rather than implied away.** No check can see that an outcome was
 mixed — the mixedness lives in prose the field summarises, and the record is append-only, so a value
 already written cannot be compared against a second source that does not exist.
 
 What IS gated is the absence: a graded record whose exited subject records no disposition at all is a
 refusal in check 2 of the unattended kit, and a value outside the closed set is its own refusal
 beside it. Neither can tell a correct one-value answer from an incorrect one. This rule is a
-documented manual check, and the honest form of shipping it is to say which.
+documented check performed by a reader, and the honest form of shipping it is to say which.

@@ -523,6 +523,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "checkSeqMarker",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "checkUnderRoot",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -2826,11 +2831,6 @@
       "id": "selfcheck",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "seqRefusal",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "settings_merge_src",

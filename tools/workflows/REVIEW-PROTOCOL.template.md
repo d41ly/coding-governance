@@ -126,7 +126,8 @@ Everything else is denied: a `forEach` body containing `agent(`, a `for` / `whil
 not carry a conforming `gov:sequential-agents(<K>)` marker on its header, a `.map` / `.flatMap` /
 `Array.from` over any other receiver, and a marked line whose second argument is an expression, a
 `.length`, a parameter, or a literal above 5. The sequential marker is the one loop affordance and
-it is a CLAIM, not an exemption: `tools/hooks/README.md` owns its grammar and the hook checks every
+it is a CLAIM, not an exemption: the hooks kit's own `README.md` owns its grammar and the hook
+checks every
 clause of it, including that exactly one awaited call sits in the marked body.
 
 **`<K>` resolves** — one definition, used by every consumer above — when it is an integer literal ≤ 5,
