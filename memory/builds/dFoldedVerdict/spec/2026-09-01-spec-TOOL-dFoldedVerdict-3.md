@@ -1,11 +1,12 @@
 # TOOL-dFoldedVerdict-3 — the exit rows say which disposition they took, and `origin/main` goes green
 
-**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 4
+**Status:** CLOSED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-TOOL-dFoldedVerdict-3-1-retrofit.md](../build/2026-09-01-build-TOOL-dFoldedVerdict-3-1-retrofit.md) | journal | — |
 | [2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md) | spec-audit | TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 |
 
 <!-- /gen:spec-records -->

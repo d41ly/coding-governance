@@ -15,6 +15,21 @@ landed-anchor: local
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 witness: 91fe6edb7f6a93df83be7f3e5791434af49c1fc2
+disposition-source: reconstructed 2026-09-01 by TOOL-dFoldedVerdict-3, by hand and not by a verb,
+  for the same reason as the sibling record: the flag did not exist at the time and the verb refuses
+  a terminal subject a second round. This record is THIS BUILD'S OWN PREDECESSOR, which is grounds
+  for more care rather than less — a run grading its own prior run is where a disposition is
+  likeliest to be assumed instead of read — so neither value was taken from the TOOL-dBriefedPass-9
+  backlog row that asserts both loops folded. WHAT VERIFIES EACH. dBriefedPass-spec-set: three spec
+  revision logs record the round-3 exit and dispose the standing blockers explicitly — "all three
+  were defects in documents the review was reading, so all three FOLD; none needed a mechanism this
+  build lacks and none is promoted", with the two-blocker unit stating "both blockers here are
+  document defects and FOLD rather than promote". dBriefedPass: commit c7e9bca1 is the round-2 fold
+  and its subject line reads "closing review round 2 — NON-CONVERGENT, all four blockers disposed",
+  its body "All four are defects in code the review was reading, so all four FOLD", and it then
+  disposes B1 through B4 individually. Seven blockers across the two exits, each accounted for, none
+  promoted — which is why neither of this record's rows demands a unit id. NOT reconstructed: the
+  per-blocker attribution, for the reason the sibling record gives.
 phase: LANDED
 branch-sha: 269dacae79bd5001486de32b3277675a953d3483
 branch-ref: refs/heads/branch/unattended-kit-workflow-40540b
@@ -32,7 +47,7 @@ base: 269dacae79bd5001486de32b3277675a953d3483
 
 2026-09-01T11:03:57Z review · item dBriefedPass-spec-set · reason verdict BLOCKED · blockers 2
 
-2026-09-01T11:42:04Z review · item dBriefedPass-spec-set · reason verdict BLOCKED · blockers 3 · NON-CONVERGENT
+2026-09-01T11:42:04Z review · item dBriefedPass-spec-set · reason verdict BLOCKED · blockers 3 · NON-CONVERGENT · disposition fold
 
 2026-09-01T11:42:19Z decision · item The unattended Skill instructs a run to record the NON-CONVERGENT exit disposition with --disposition fold|promote, and claims the merge bar reads that field. Neither is true: the driver refuses the flag with check 14 unknown-argument, and check-unattended.sh contains zero occurrences of disposition. Should the flag and a checker term be built? · reason MEASURED at the exit this run reached, by running the documented command: SKILL.template.md:607 and the installed render both carry the instruction; unattended.sh has one occurrence of the word, in a comment at :3758; check-unattended.sh has none; UNATTENDED-PROTOCOL.md never mentions a review disposition at all. So an agent that follows the Skill at a NON-CONVERGENT exit halts on an unknown argument, and the sentence promising the bar reads the field is false in the direction that matters. This is the same instruction-with-no-route class the protocol records about the DECISION park kind. NOT ADOPTED under protocol section 11: it needs a new public surface (a driver flag) plus edits to the Skill template and the protocol, which is M3 veto 2, and section 11 says a discovery tripping a veto is parked rather than taken. Options seen: (a) build the flag and a checker term as a unit of this build - refused, veto 2 reserves it; (b) file a backlog row - refused, section 11 routes a veto trip to a park and a backlog row would understate that the shipped instruction is currently unexecutable; (c) park it here, which is what this is. The run continues: dropping the flag records the round correctly, so this blocks nothing.
 
@@ -66,4 +81,4 @@ base: 269dacae79bd5001486de32b3277675a953d3483
 
 2026-09-01T13:42:12Z review · item dBriefedPass · reason verdict BLOCKED · blockers 3
 
-2026-09-01T14:37:52Z review · item dBriefedPass · reason verdict BLOCKED · blockers 4 · NON-CONVERGENT
+2026-09-01T14:37:52Z review · item dBriefedPass · reason verdict BLOCKED · blockers 4 · NON-CONVERGENT · disposition fold

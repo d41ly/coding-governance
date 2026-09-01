@@ -1,6 +1,6 @@
 # TOOL-aClosedDocket-4 — clause 3 accepts a FOLD, and the driver records one
 
-**Status:** OPEN · rev-2 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 4 · ratified 2026-08-31
+**Status:** WONTDO · rev-2 · 2026-08-31 · node a · Tier-2 · base 733552e1 · streams tooling · order 4 · ratified 2026-08-31 · superseded by TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3
 
 <!-- gen:spec-records -->
 

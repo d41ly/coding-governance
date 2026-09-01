@@ -34,3 +34,5 @@ base: 733552e11d36e93836767b6478fec3607a99aca4
 2026-08-31T13:00:12Z dispatch · item 217d1ddc TOOL-aClosedDocket-3 · reason tools/unattended/unattended.test.sh
 
 2026-08-31T13:21:54Z review · item TOOL-aClosedDocket-4 · reason verdict BLOCKED · blockers 1
+
+2026-09-01T20:21:36Z rescope · item retire TOOL-aClosedDocket-4 · reason superseded by TOOL-dFoldedVerdict-1, -2 and -3, which build its scope in three units instead of one; written by TOOL-dFoldedVerdict-3 and not by this build's own operator, so the roster change is visible to whoever resumes aClosedDocket. NOT --act supersede: check 24's successor arm reds unless the successor is a token of THIS record's own units region, which carries only TOOL-aClosedDocket-1 through -4, so that act would create a permanent red on another build's append-only record
