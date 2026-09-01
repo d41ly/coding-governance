@@ -80,7 +80,7 @@ document scopes as a pull.
 | 5 | `DEPL-dGaugedVintage-1` | CLOSED | `selfcheck` asserts the version constant actually ships |
 | 6 | `DEPL-dGaugedVintage-9` | CLOSED | report the per-kit version delta the receipt already stores |
 | 7 | `DEPL-dGaugedVintage-10` | CLOSED | refuse to measure from a gov checkout stale against its remote |
-| 8 | `DEPL-dGaugedVintage-11` | OPEN | the relocate rung survives a kit that fans out |
+| 8 | `DEPL-dGaugedVintage-11` | CLOSED | the relocate rung survives a kit that fans out |
 | 9 | `DEPL-dGaugedVintage-7` | OPEN | the prefix ratchet counts literals, not lines |
 | 10 | `DEPL-dGaugedVintage-6` | CLOSED | drift-audit's install block stops contradicting itself |
 | 11 | `DEPL-dGaugedVintage-2` | OPEN | fifteen backlog rows reconciled against their CLOSED specs |
@@ -101,13 +101,13 @@ ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaug
 | [DEPL-dGaugedVintage-1 — a version constant an adopter never receives](spec/2026-09-01-spec-DEPL-dGaugedVintage-1.md) | 4 | 2 | CLOSED | rev-3 | 2026-09-01 |
 | [DEPL-dGaugedVintage-9 — report the per-kit version delta, once the stored half stops lying](spec/2026-09-01-spec-DEPL-dGaugedVintage-9.md) | 4 | 2 | CLOSED | rev-3 | 2026-09-01 |
 | [DEPL-dGaugedVintage-10 — a stale measurer reports every row current](spec/2026-09-01-spec-DEPL-dGaugedVintage-10.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-01 |
-| [DEPL-dGaugedVintage-11 — the relocate rung goes quiet exactly where a kit fans out](spec/2026-09-01-spec-DEPL-dGaugedVintage-11.md) | 5 | 2 | OPEN | rev-2 | 2026-09-01 |
+| [DEPL-dGaugedVintage-11 — the relocate rung goes quiet exactly where a kit fans out](spec/2026-09-01-spec-DEPL-dGaugedVintage-11.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-01 |
 | [DEPL-dGaugedVintage-7 — a ratchet that counts lines cannot see a swapped literal](spec/2026-09-01-spec-DEPL-dGaugedVintage-7.md) | 6 | 2 | OPEN | rev-2 | 2026-09-01 |
 | [DEPL-dGaugedVintage-2 — fifteen rows that outlived their specs](spec/2026-09-01-spec-DEPL-dGaugedVintage-2.md) | 7 | 1 | OPEN | rev-1 | 2026-09-01 |
 | [DEPL-dGaugedVintage-6 — an install block whose second line cannot run](spec/2026-09-01-spec-DEPL-dGaugedVintage-6.md) | 7 | 1 | CLOSED | rev-3 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

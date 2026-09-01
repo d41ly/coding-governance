@@ -5078,6 +5078,28 @@ def derive_carry_map(pairs) -> tuple[dict[str, str], dict[str, str], list[tuple[
     return needles, pairs_out, dropped
 
 
+def resolve_row_needles(needles: dict[str, str], row: dict) -> dict[str, str]:
+    """The global needle map, overlaid with THIS row's own pair.
+
+    DEPL-dGaugedVintage-11. `derive_carry_map` lifts one destination per gov directory and DROPS any
+    that fans into more than one, so the `relocate` rung went silent for every kit shipping a
+    rendered artifact to a different tree than its engine files — which is every kit that ships a
+    Skill. The drop is right for the shape a single global map can hold; this overlay changes the
+    shape instead, per row.
+
+    Rooted on the receipt's own `(source, path)`, NEVER on a descriptor re-resolution:
+    `derive_carry_map`'s docstring forbids the latter, because the map must describe the target as
+    INSTALLED rather than as the descriptors read today. The single-pair call is the same one the
+    seed-override arm already makes.
+    """
+    one, _pairs, _dropped = derive_carry_map([(row.get("source"), row.get("path"))])
+    if not one:
+        return needles
+    merged = dict(needles)
+    merged.update(one)
+    return merged
+
+
 def derive_carried(data: bytes, needles: dict[str, str]) -> bytes:
     """Gov's bytes rewritten through the needle map — ONE left-to-right pass, longest needle first.
 
@@ -5611,11 +5633,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     needles, carry_pairs, carry_dropped = derive_carry_map(
         [(w.get("source"), w.get("path")) for w in rows_all])
     for _gd, _dests in carry_dropped:
+        # DEPL-dGaugedVintage-11 S1. Still dropped from the GLOBAL map, which can hold one
+        # destination per gov directory and nothing else — but no longer silent for the rows
+        # themselves: each is rewritten through `resolve_row_needles`, which overlays that row's own
+        # `(source, path)` pair. The global map is a run-level summary; the rewrite is per row.
         print(f"govkit update — carry map DROPPED the ambiguous gov directory '{_gd}': this receipt "
               f"puts it at {', '.join(_dests)}, so it names no single destination and cannot be a "
-              f"needle")
+              f"needle. Rows under it now resolve against their own destination instead "
+              f"(DEPL-dGaugedVintage-11)")
+    # S2. The DROPPED COUNT, printed at zero as well. A run that dropped nothing and a run whose
+    # drop report never executed used to look identical, which is the green-by-absence shape.
     print(f"govkit update — carry map: {len(carry_pairs)} directory pair(s), "
-          f"{len(needles)} needle(s)")
+          f"{len(needles)} needle(s), {len(carry_dropped)} fanned-out director(y|ies)")
 
     deploy = load_deploy(target)
 
@@ -6112,8 +6141,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             else:
                 merged, _how = three_way(
                     c["ours"],
-                    derive_carried_by_rung(c["carry"], c["base"] or b"", needles),
-                    derive_carried_by_rung(c["carry"], c["theirs_new"], needles))
+                    derive_carried_by_rung(c["carry"], c["base"] or b"",
+                                           resolve_row_needles(needles, row)),
+                    derive_carried_by_rung(c["carry"], c["theirs_new"],
+                                           resolve_row_needles(needles, row)))
                 if merged is None:
                     conflicts += 1
                     (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md"
@@ -6240,8 +6271,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # reads as an operator edit and the whole file conflicts.
             merged, how = three_way(
                 c["ours"],
-                derive_carried_by_rung(c["carry"], c["base"] or b"", needles),
-                derive_carried_by_rung(c["carry"], c["theirs"], needles))
+                derive_carried_by_rung(c["carry"], c["base"] or b"",
+                                       resolve_row_needles(needles, row)),
+                derive_carried_by_rung(c["carry"], c["theirs"],
+                                       resolve_row_needles(needles, row)))
             if merged is None:
                 conflicts += 1
                 (outbox / f"update-conflict-{pathlib.PurePosixPath(row['path']).name}.md").write_text(

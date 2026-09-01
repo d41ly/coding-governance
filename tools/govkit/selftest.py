@@ -674,6 +674,34 @@ def main() -> int:
         check("[dGV-10] the test seam yields unverified — a disabled probe is not a clean one",
               _v3 == "unverified", _v3)
 
+        # --- DEPL-dGaugedVintage-11. THE RELOCATE RUNG SURVIVES A KIT THAT FANS OUT.
+        # --- `derive_carry_map` holds ONE destination per gov directory, so a kit shipping a
+        # --- rendered artifact to a different tree than its engine files had its whole directory
+        # --- dropped from the needle map — which is every kit that ships a Skill. The global map
+        # --- still drops it (it cannot hold two), but rows now rewrite through their OWN pair.
+        _n_global, _pairs_g, _drop_g = _gk.derive_carry_map(
+            [("tools/k/engine.py", "scripts/k/engine.py"),
+             ("tools/k/SKILL.template.md", ".claude/skills/k/SKILL.md")])
+        check("[dGV-11] a gov directory that fans out is still absent from the GLOBAL needle map",
+              "tools/k" not in _n_global and any(g == "tools/k" for g, _ in _drop_g),
+              f"{_n_global} | {_drop_g}")
+        _row = {"source": "tools/k/engine.py", "path": "scripts/k/engine.py"}
+        _n_row = _gk.resolve_row_needles(_n_global, _row)
+        check("[dGV-11] but the ROW resolves against its own destination, rooted on its own pair",
+              _n_row.get("tools/k") == "scripts/k", f"{_n_row}")
+        _row2 = {"source": "tools/k/SKILL.template.md", "path": ".claude/skills/k/SKILL.md"}
+        _n_row2 = _gk.resolve_row_needles(_n_global, _row2)
+        check("[dGV-11] and a second row under the same gov directory gets ITS destination, "
+              "not the first row's",
+              _n_row2.get("tools/k") == ".claude/skills/k", f"{_n_row2}")
+        check("[dGV-11] gov's bytes really are rewritten through the row's needle",
+              _gk.derive_carried(b"see tools/k/engine.py here", _n_row) ==
+              b"see scripts/k/engine.py here",
+              _gk.derive_carried(b"see tools/k/engine.py here", _n_row).decode())
+        _row3 = {"source": None, "path": None}
+        check("[dGV-11] a row with no pair falls back to the global map rather than emptying it",
+              _gk.resolve_row_needles(_n_global, _row3) == _n_global, "")
+
         # AC3 — THE NO-CLOBBER GUARANTEE. Nothing else observes it.
         up2 = stale_target("u2b")
         (up2 / "tools" / "check-wiring.sh").write_bytes(b"#!/usr/bin/env bash\n# OPERATOR EDIT\n")

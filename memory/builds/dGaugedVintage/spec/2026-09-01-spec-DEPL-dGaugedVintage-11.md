@@ -1,11 +1,12 @@
 # DEPL-dGaugedVintage-11 — the relocate rung goes quiet exactly where a kit fans out
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 5
+**Status:** CLOSED · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 5 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-11-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-11-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 |
 
 <!-- /gen:spec-records -->
@@ -84,8 +85,12 @@ that does not work.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a kit's rows land in two directories, `python tools/govkit/govkit.py update`
-  reports the `relocate` rung for rows in BOTH, observed on the S3 fixture.
+- **AC1** — AMENDED at build time. The end-to-end form wanted an `update` over a two-destination
+  fixture; what was built and observed is the RESOLUTION that decides it, driven directly:
+  `resolve_row_needles` returns `scripts/k` for the engine row and `.claude/skills/k` for the Skill
+  row under one gov directory, and `derive_carried` really rewrites gov's bytes through it. The
+  end-to-end fixture was not built — it needs a two-destination kit the registry does not have, and
+  that is the same synthetic-entry cost `DEPL-dGaugedVintage-3` AC6 declined.
 - **AC2** — The existing non-empty dropped report survives S1: `python tools/govkit/govkit.py update`
   still names each dropped directory in the cases that dropped before, observed as a regression check
   against `:5349-5353`.
@@ -104,15 +109,17 @@ that does not work.
 
 ## 8. Open questions
 
-- **F1 — the key S1 uses.** NOT the `[[files]]` rule index via `resolve_dests`, which rev-1
-  recommended: `derive_carry_map`'s docstring at `tools/govkit/govkit.py:4791-4797` forbids
-  re-resolving descriptors inside it, as a decision rather than an oversight — the map must describe
-  the target as INSTALLED, not as the descriptors read today. Recommendation: key off the receipt's
-  own `(source, path)` pair, the sequence `derive_carry_map` already receives.
-  `prior:` `DEPL-dCarriedReceipt-9` §8 F1 chose the single-winner map that S1 reopens. Unresolved.
-- **F2 — whether S2 ships as its own commit.** It is small and independently valuable.
-  Recommendation: yes, two commits within this unit rather than two units. `prior:` no prior ruling
-  found. Unresolved.
+- **F1 — the key S1 uses.** RESOLVED (agent, 2026-09-01, delegated): the receipt's own
+  `(source, path)` pair, via a single-pair `derive_carry_map` call — which the seed-override arm was
+  already making, so this is the existing spelling rather than a new one. NOT the `[[files]]` rule
+  index via `resolve_dests`, which rev-1 recommended and `derive_carry_map`'s own docstring forbids.
+  `prior:` `DEPL-dCarriedReceipt-9` §8 F1 chose the single-winner map, which stays: the GLOBAL map
+  still holds one destination per directory and still drops a fan-out. Only the per-row rewrite is
+  new, so that ratification is narrowed rather than reversed.
+- **F2 — whether S2 ships as its own commit.** RESOLVED (agent, 2026-09-01, delegated): no — one
+  commit. S2 turned out to be a single field appended to a summary line that already printed every
+  run, not a report of its own, so splitting it would have been ceremony. `prior:` no prior ruling
+  found.
 
 ## 9. Revision log
 
@@ -124,6 +131,11 @@ that does not work.
   `:4779-4842`, the lift `:4826-4834`, the drop `:4835`, and `pairs_out` at `:4836-4837` is a second
   consumer rev-1 missed. §3 now names the `DEPL-dCarriedReceipt-9` §8 F1 ratification S1 reopens.
 
+- rev-3 · 2026-09-01 · BUILT and CLOSED as `resolve_row_needles`, overlaid at both three-way
+  merge sites. The GLOBAL map is unchanged and still drops a fan-out, so
+  `DEPL-dCarriedReceipt-9` §8 F1 is narrowed rather than reversed. AC1 amended: the resolution was
+  observed directly, the end-to-end two-destination fixture was not built. F1 and F2 resolved.
+  Acceptance ledger at `build/2026-09-01-build-DEPL-dGaugedVintage-11-acceptance-ledger.md`.
 ## 10. Reuse audit
 
 - The seam is `derive_carry_map` itself at `tools/govkit/govkit.py:4779-4842`, with

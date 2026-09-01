@@ -2458,6 +2458,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "resolve_row_needles",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "resolve_rows",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
