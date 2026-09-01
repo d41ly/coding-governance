@@ -80,9 +80,13 @@
   `CONVERGING`, `CONVERGED`, `NON-CONVERGENT` or `CEILING`. The round is an append-only `review` line
   in the parked region, a `history` kind, so it never inflates the count of decisions the owner must
   be shown. A round re-arms the loop only if its confirmed-blocker count is STRICTLY smaller than the
-  round before; at the exit every blocker still standing is promoted to a unit rather than parked. It
-  refuses a verdict outside the closed set, a missing subject or count, and a round on a subject whose
-  loop has already ended.
+  round before. At a TERMINAL exit — `NON-CONVERGENT` or `CEILING` — the round RECORDS which
+  disposition the run took, `fold` or `promote`: `--disposition` is REQUIRED there and REFUSED on any
+  round that is not one. Both values are legal, because the method admits folding a blocker back into
+  the specs it belongs to as readily as promoting it to a unit, and a record naming neither leaves the
+  gate inferring one from ids. It refuses a verdict or a disposition outside its closed set, a missing
+  subject or count, a terminal exit carrying no disposition, a disposition on a round that is not a
+  terminal exit, and a round on a subject whose loop has already ended.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

@@ -4465,14 +4465,17 @@ hit "$(run --review tRun --subject "S1 · reason smuggled" --verdict BLOCKED --b
 # ---- carrying `(` missed its OWN recorded terminal line and the loop accepted a further round.
 bcopen
 run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
-run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
+# The second call EXITS, so TOOL-dFoldedVerdict-1 makes --disposition mandatory here. This arm is
+# about the subject-as-regex defect and not about the disposition, so the flag is supplied rather
+# than asserted on.
+run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition fold >/dev/null
 hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
 reset_tree
 
 # ---- the recorded round, and the TERMINAL LINE the leg reads
 bcopen
 run --review tRun --subject S1 --verdict BLOCKED --blockers 2 >/dev/null
-out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2)
+out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2 --disposition promote)
 hit "$out" "NON-CONVERGENT"
 hit "$out" "PROMOTED"
 same "the exit token is written into the round's own reason" "$(grep -c 'review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
@@ -4485,6 +4488,28 @@ bcopen
 run --park tRun --item "a real question" --reason "options seen, and why I refused" >/dev/null
 run --review tRun --subject S1 --verdict BLOCKED --blockers 1 >/dev/null
 same "a review round does not join the surfaced parked count" "$(run --status tRun | grep -c 'parked 1')" "1"
+reset_tree
+
+# ---- TOOL-dFoldedVerdict-1: THE DISPOSITION — its closed set, its state gate in BOTH directions,
+# ---- and the ORDER of the two refusals. The order is not decoration: a value outside the set on a
+# ---- CONVERGING round must produce the CLOSED-SET refusal and not the state one, or an arm passes
+# ---- against either and proves neither.
+bcopen
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition nonsense)" "--review names a disposition outside the closed set, and a disposition nothing can compare is prose in a field; legal dispositions"
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3 --disposition promote)" "--review names a disposition on a round that is not a terminal exit, and a disposition recorded mid-loop is a claim about an exit that has not happened yet: state"
+run --review tRun --subject D1 --verdict BLOCKED --blockers 3 >/dev/null
+hit "$(run --review tRun --subject D1 --verdict BLOCKED --blockers 3)" "and requires --disposition, because the method admits BOTH fold and promote at the exit and a record naming neither leaves the gate inferring one from ids; legal dispositions"
+reset_tree
+
+# ---- the FOLD exit: its own sentence, and the field written AFTER the state token so the substring
+# ---- the gate leg already reads is untouched. That placement is why S4 put it there.
+bcopen
+run --review tRun --subject D2 --verdict BLOCKED --blockers 2 >/dev/null
+out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition fold)
+hit "$out" "NON-CONVERGENT · disposition fold"
+hit "$out" "FOLDED into the specs it belongs to"
+same "the fold disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold' memory/builds/tRun/RUN.md)" "1"
+same "the pre-existing substring the leg reads still matches" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
