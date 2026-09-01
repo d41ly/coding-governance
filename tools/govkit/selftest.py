@@ -1333,6 +1333,38 @@ user_skills = "/tmp/gk-fake-skills"
         # makes git report an invalid attribute name on every query in that repo, and leaves the
         # open marker off column 0 -- after which every later apply refuses forever while the
         # receipt claims a block that can never be found again.
+        # --- DEPL-dGaugedVintage-3 S1/S2/S4. AN ENTRY THAT LANDS NO PROGRAM MUST NOT READ AS
+        # --- ADOPTED. `memory-recall` is a registry DEFAULT whose engine files are `forked`, which
+        # --- the derived LANDABLE_ROLES excludes, so `apply` lands its rendered Skill — which tells
+        # --- an agent to run the CLI — and never the CLI. OBSERVED RED on the pre-fix binary over a
+        # --- fresh target: `query.py` absent and zero INCOMPLETE lines.
+        # --- The detection keys on the ROLE, never on the kit id, which is what makes it a class
+        # --- assertion while exactly one `forked` rule ships.
+        inc = make_target(tmp / "incomplete", DEPLOY_FULL)
+        p = run("apply", "--target", str(inc), "--kits", "memory-recall")
+        out = p.stdout + p.stderr
+        check("[dGV-3] apply reports an entry INCOMPLETE when its forked files are absent",
+              "INCOMPLETE memory-recall" in out, out[-900:])
+        check("[dGV-3] and it names EVERY absent file with the role that withheld it",
+              out.count("absent [forked") >= 3, out[-900:])
+        check("[dGV-3] and it gives UNLANDED_REASON's sentence rather than a bare skip",
+              "derivative of the target's" in out, out[-900:])
+        check("[dGV-3] and it tells the operator gov will not send them",
+              "gov will not send them" in out, out[-900:])
+        check("[dGV-3] the CLI really is absent, so the report is not describing a landed file",
+              not (inc / "tools" / "memory-recall" / "query.py").exists())
+        _mr = inc / "tools" / "memory-recall"
+        _mr.mkdir(parents=True, exist_ok=True)
+        (_mr / "query.py").write_text("# the adopter's own" + NLp, encoding="utf-8", newline=NLp)
+        (_mr / "extract.py").write_text("# own" + NLp, encoding="utf-8", newline=NLp)
+        (_mr / "recall-opened.js").write_text("// own" + NLp, encoding="utf-8", newline=NLp)
+        p = run("apply", "--target", str(inc), "--kits", "memory-recall")
+        check("[dGV-3] a target that ALREADY holds its forked files is not reported incomplete",
+              "INCOMPLETE memory-recall" not in (p.stdout + p.stderr), (p.stdout + p.stderr)[-700:])
+        check("[dGV-3] and apply left the adopter's own bytes alone",
+              (_mr / "query.py").read_text(encoding="utf-8").startswith("# the adopter's own"),
+              (_mr / "query.py").read_text(encoding="utf-8"))
+
         pg = pin_target("u6p1", b"*.sh text eol=lf")          # deliberately no trailing newline
         run("apply", "--target", str(pg), "--kits", "memory-recall")
         lines = (pg / ".gitattributes").read_text(encoding="utf-8").split(NLp)

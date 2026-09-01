@@ -4069,6 +4069,31 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                         _row[_k] = _rule[_k]
             rows.append(_row)
 
+        # DEPL-dGaugedVintage-3 S1/S2/S3. AN ENTRY THAT LANDS NO PROGRAM MUST NOT READ AS ADOPTED.
+        # `forked` means gov's copy is a DERIVATIVE of the target's (DEPL-dCarriedReceipt-10 S3), so
+        # gov never sends those bytes. That is correct for an adopter who owns them and SILENT for a
+        # fresh target that does not — and `memory-recall` is a registry DEFAULT in exactly that
+        # shape: its rendered Skill lands and instructs an agent to run a CLI `apply` never wrote.
+        #
+        # SCOPED TO `forked`, and the other three non-landable roles are excluded for their own
+        # stated reasons rather than by omission. `rendered` is produced in the target by its own
+        # adopter after this loop, and the OBSERVE pass already reports one that did not appear;
+        # `generated` is its tooling's; `project-owned` is the adopter's to author whenever they
+        # choose. `forked` is the only role whose absence nothing else in this engine notices.
+        #
+        # It REPORTS. It does not refuse: DEPL-dCarriedReceipt-10 ratified that gov has no right to
+        # send these bytes, so the install is as complete as gov is allowed to make it.
+        _absent = [(u["dest"], UNLANDED_REASON.get(u["role"], ""))
+                   for u in res["unlanded"]
+                   if u["role"] == "forked" and not (target / u["dest"]).exists()]
+        if _absent:
+            print(f"govkit apply — INCOMPLETE {eid}: {len(_absent)} declared file(s) carry this "
+                  f"kit's own behaviour and this target holds none of them")
+            for _p, _why in _absent:
+                print(f"govkit apply —   absent [forked       ] {_p} — {_why}")
+            print(f"govkit apply —   supply them from your own copy; gov will not send them, and "
+                  f"this entry is installed but not usable until they arrive")
+
         for dest, w in sorted(res["writes"].items()):
             if w["missing"]:
                 r.fail(f"entry '{eid}' needs answer '{w['missing'][0]}' to resolve destination "

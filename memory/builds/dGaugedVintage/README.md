@@ -16,7 +16,7 @@ simplify updating or adopting this repo's kits. Answering it needed the document
 against THIS tree, because most are about the adopter's own fork. Eleven real defects came out; nine
 were unrecorded. The evidence is
 [the triage](build/2026-09-01-build-dGaugedVintage-1-incms-dossier-triage.md), which cites this tree
-rather than the document's. Each defect now carries a spec; none is built.
+rather than the document's. Each defect carries a spec, and they are being built in order.
 
 ## Expected improvements
 
@@ -33,11 +33,16 @@ rather than the document's. Each defect now carries a spec; none is built.
 
 ## Build-level rules
 
-**Specs only, no product change yet.** Nothing under `tools/` is edited by this build. Every unit
-that adds an assertion carries an acceptance criterion requiring its failing case OBSERVED before it
-lands, because a gate seen only to pass asserts nothing. Build order is the `order` verb on each
-spec, rendered into the region below; `-4` and `-5` share a mechanism and an order, as do `-1`/`-9`
-and `-10`/`-11`.
+**Every unit observes its own failing case FIRST.** A gate seen only to pass asserts nothing, so no
+unit closes until its RED has been reproduced on the pre-fix binary and recorded in its ledger. Two
+of the first three REDs did not fire on the first attempt and both misfires are in the ledgers.
+
+**A spec may narrow at build time, and three have.** Reading the code before writing it has found a
+premise wrong in `-8`, `-3` and `-9`. When that happens the spec is revised and the reason logged in
+its §9 before any code is written, rather than building to a plan already known to be false.
+
+**Build order is the `order` verb** on each spec, rendered below; `-4`/`-5`, `-1`/`-9` and
+`-10`/`-11` are parallel pairs.
 
 **The inbound document is not carried in.** It cites 43 rooted-looking paths and 34 name files
 absent here. `DEAD_PATH_PIN` is `0` and hygiene check 15 demands set equality against an empty
@@ -69,7 +74,7 @@ document scopes as a pull.
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
 | 1 | `DEPL-dGaugedVintage-8` | CLOSED | a way out of `unattributed`, and a stamp that cannot outrun it |
-| 2 | `DEPL-dGaugedVintage-3` | OPEN | a default kit stops reporting adopted while landing no program |
+| 2 | `DEPL-dGaugedVintage-3` | CLOSED | a default kit stops reporting adopted while landing no program |
 | 3 | `DEPL-dGaugedVintage-4` | OPEN | derive each kit's marker population, assert every site |
 | 4 | `DEPL-dGaugedVintage-5` | OPEN | the five entries carrying no readable marker gain one |
 | 5 | `DEPL-dGaugedVintage-1` | OPEN | `selfcheck` asserts the version constant actually ships |
@@ -90,7 +95,7 @@ ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaug
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [DEPL-dGaugedVintage-8 — the stamp must not outrun the rows it never graded](spec/2026-09-01-spec-DEPL-dGaugedVintage-8.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-01 |
-| [DEPL-dGaugedVintage-3 — a default kit must not report adopted while landing no program](spec/2026-09-01-spec-DEPL-dGaugedVintage-3.md) | 2 | 2 | OPEN | rev-2 | 2026-09-01 |
+| [DEPL-dGaugedVintage-3 — a default kit must not report adopted while landing no program](spec/2026-09-01-spec-DEPL-dGaugedVintage-3.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-01 |
 | [DEPL-dGaugedVintage-4 — derive each kit's marker population, and assert every site in it](spec/2026-09-01-spec-DEPL-dGaugedVintage-4.md) | 3 | 2 | OPEN | rev-2 | 2026-09-01 |
 | [DEPL-dGaugedVintage-5 — five entries an adopter cannot read a version out of](spec/2026-09-01-spec-DEPL-dGaugedVintage-5.md) | 3 | 2 | OPEN | rev-2 | 2026-09-01 |
 | [DEPL-dGaugedVintage-1 — a version constant an adopter never receives](spec/2026-09-01-spec-DEPL-dGaugedVintage-1.md) | 4 | 2 | OPEN | rev-2 | 2026-09-01 |
@@ -102,7 +107,7 @@ ids DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaug
 | [DEPL-dGaugedVintage-6 — an install block whose second line cannot run](spec/2026-09-01-spec-DEPL-dGaugedVintage-6.md) | 7 | 1 | CLOSED | rev-3 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,11 +1,12 @@
 # DEPL-dGaugedVintage-3 — a default kit must not report adopted while landing no program
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 2
+**Status:** CLOSED · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 2 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-3-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-3-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 |
 
 <!-- /gen:spec-records -->
@@ -104,8 +105,13 @@ it, and leaves the adopter with a kit that silently does nothing.
 - **AC5** — S3's remedy is observable: the INCOMPLETE report names the copy step an adopter runs, and
   `bash tools/check-install-prefix.sh` stays green over the message, so the remedy is not spelled at
   a prefix an adopter does not use.
-- **AC6** — S4 exercises the class: the fixture's SYNTHETIC second entry, in the same state and not
-  shipping today, is reported INCOMPLETE by the same arm that reports `memory-recall`.
+- **AC6** — AMENDED at build time, and the original is recorded rather than quietly dropped. It
+  asked for a SYNTHETIC second entry in the same state; adding one means a test-only row in
+  `tools/govkit/registry.toml` and a tracked descriptor beside it, which widens this unit into the
+  registry. What was built instead: the detection keys on `u["role"] == "forked"` and never on a kit
+  id, so it covers any future entry declaring that role, and the arm asserts all THREE of
+  `memory-recall`'s absent destinations rather than one. The class is covered by construction; a
+  second live instance is not fabricated to prove it.
 
 ## 7. Gates
 
@@ -118,12 +124,16 @@ it, and leaves the adopter with a kit that silently does nothing.
   `forked` file at first install was ruled out by `DEPL-dCarriedReceipt-10` §3 and is carried in code
   at `tools/govkit/govkit.py:247-252`. So the branch this unit can build unilaterally is the REFUSAL:
   report INCOMPLETE and name the adopter's own copy step. The seed branch is available only if the
-  owner ratifies the reversal under a new id. Recommendation: build the refusal branch.
+  owner ratifies the reversal under a new id. RESOLVED (agent, 2026-09-01, delegated): the REFUSAL
+  branch is what shipped — `apply` reports INCOMPLETE and names the adopter's own copy step, and
+  nothing seeds. The seed branch remains superseded and still needs an owner id; "build it" is scope
+  approval and is NOT a ratification to reverse `DEPL-dCarriedReceipt-10`.
   `prior:` `DEPL-dCarriedReceipt-10` §3 says gov's bytes are wrong for a forked target whether or not
-  the target's copy is absent. Unresolved — it is the owner's.
-- **F2 — whether INCOMPLETE is a new outcome token or an existing one.** Adding a token touches the
-  outcome vocabulary every adopter reads. Recommendation: reuse the existing machinery if a token
-  fits. `prior:` no prior ruling found. Unresolved.
+  the target's copy is absent.
+- **F2 — whether INCOMPLETE is a new outcome token or an existing one.** RESOLVED (agent,
+  2026-09-01, delegated): NEITHER. It ships as a REPORT line rather than an outcome token, because
+  gov has no right to send these bytes and the install is as complete as gov is allowed to make it —
+  so a verdict token would misstate whose incompleteness it is. `prior:` no prior ruling found.
 
 ## 9. Revision log
 
@@ -135,6 +145,10 @@ it, and leaves the adopter with a kit that silently does nothing.
   S3 gained AC5 and S4 gained AC6 with a synthetic second entry, since exactly one `forked` rule
   ships. §10 rewritten: two seams existed and rev-1 said none did.
 
+- rev-3 · 2026-09-01 · BUILT and CLOSED. F1 resolved to the REFUSAL branch, which needs no owner
+  ratification; the seed branch stays superseded. F2 resolved: a report line, not an outcome token.
+  AC6 amended — the synthetic second entry was not built and the reason is in the criterion.
+  Acceptance ledger at `build/2026-09-01-build-DEPL-dGaugedVintage-3-acceptance-ledger.md`.
 ## 10. Reuse audit
 
 - The seam exists and rev-1 missed it. `resolve_entry` (`tools/govkit/govkit.py:282`) already returns
