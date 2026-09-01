@@ -50,6 +50,12 @@ BUDGET_driver_selftest=970    # measured 906 s (was 841; +65 s of TOOL-dNarrowed
 BUDGET_playbook_validity_selftest=300  # measured 140 s
 BUDGET_cross_component=300    # measured 92 s
 BUDGET_adopter_e2e=120        # measured 7 s
+BUDGET_pass_order_history=90  # measured 12 s over 85 build folders; the walk is one rev-list per
+                              # build plus one plan_state per CLOSED unit, so it scales with the
+                              # build count and the headroom is deliberate. Matches the ceiling
+                              # its gate-legs.json row declares — one figure, two readers.
+BUDGET_pass_order_selftest=180 # measured 41 s; every arm builds a real fixture repository, so the
+                              # cost is git process creation and node d's AV taxes every exec
 
 ONLY="${1:---selftests}"
 case "$ONLY" in
@@ -170,12 +176,14 @@ run_one() { # label · kind · argv...
 run_one "kit gate"                  checks bash "$HERE/check-unattended.sh"
 run_one "playbook validity gate"    checks bash "$HERE/check-playbook.sh"
 run_one "skill wiring"              checks bash "$HERE/adopt-unattended.sh" --check
+run_one "pass-order history"        checks bash "$HERE/check-pass-order.sh"
 
 run_one "gate selftest"             selftests bash "$HERE/check-unattended.test.sh"
 run_one "driver selftest"           selftests bash "$HERE/unattended.test.sh"
 run_one "playbook validity selftest" selftests bash "$HERE/check-playbook.test.sh"
 run_one "cross-component"           selftests bash "$HERE/cross-component.test.sh"
 run_one "adopter e2e"               selftests bash "$HERE/adopt-unattended.test.sh"
+run_one "pass-order selftest"       selftests bash "$HERE/check-pass-order.test.sh"
 
 # LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a clean
 # sweep are indistinguishable from the outside, which is the class this kit has spent six review

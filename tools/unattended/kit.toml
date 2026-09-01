@@ -64,7 +64,7 @@ means = "render-failed-half-stamped"
 # none at all in an adopter's repo that copy-installs the kit and never edits it. Ruled 2026-08-23:
 # they run on the owner's demand, never on the merge bar, here and in every adopter alike.
 #
-# THE THREE LEGS BELOW STAY, and the difference is their subject: they read the REPOSITORY - its
+# THE LEGS BELOW STAY, and the difference is their SUBJECT, and the difference is their subject: they read the REPOSITORY - its
 # run-state records, its playbooks, the shipped skill's wiring - which goes stale with nobody editing
 # this kit. Those are seconds. The self-tests were 3339 s of a 4926 s bar, 68% of all leg-seconds,
 # with the largest putting a 26-minute FLOOR under every full run. Measured node d, 2026-08-23;
@@ -94,6 +94,13 @@ red_after_land = true
 name = "playbook validity gate"
 subject = "repo"
 argv = ["bash", "{kit}/check-playbook.sh"]
+guard = []
+red_after_land = true
+
+[[gate_leg]]
+name = "pass-order history"
+subject = "repo"
+argv = ["bash", "{kit}/check-pass-order.sh"]
 guard = []
 red_after_land = true
 

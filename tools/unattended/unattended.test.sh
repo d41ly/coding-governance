@@ -3852,6 +3852,242 @@ fkspec '- **F1 — a question?** options and a recommendation.
 same "fork-mark: a mark on a continuation line still resolves its item" "$(plan_state "$TMP/fk.md")" "READY"
 
 
+# ---- TOOL-dBriefedPass-1 - THE TIER-1 ARMS. `plan_state` keyed on section ORDINALS, and a Tier-1
+# ---- spec legitimately drops `## 5. Production-readiness checklist`, so every section from five
+# ---- onward renumbers. The ordinal reader therefore graded a Tier-1 spec's GATES as its acceptance
+# ---- criteria, its OPEN QUESTIONS as its gates and its REVISION LOG as its open questions.
+# ----
+# ---- The QUIET half is the one that mattered and it is arm 2: the acceptance slot was filled by the
+# ---- Gates section, so a Tier-1 spec stating NO acceptance criterion at all graded READY. A THIN
+# ---- predicate that cannot fail on a whole spec shape is worse than the loud FORKED false positive
+# ---- beside it, and only one of the two was in the backlog row that reported this.
+t1spec() { # <acceptance body> <open-questions body> -> a TIER-1 shaped spec at $TMP/t1.md
+  printf '# t\n\n**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-1 · base 0123abcd\n\n## 1. Goal\n\n- g\n\n## 2. Scope (IN)\n\n- s\n\n## 3. Non-goals (OUT)\n\n- n\n\n## 4. Design\n\n- d\n\n## 5. Acceptance criteria\n\n%s\n\n## 6. Gates\n\n- g\n\n## 7. Open questions\n\n%s\n\n## 8. Revision log\n\n- rev-1 first\n- rev-2 second\n' "$1" "$2" > "$TMP/t1.md"
+}
+
+t1spec '- AC1 something observable.' 'none'
+same "tier-1: a filled section 5 acceptance and a none section 7 grades READY" "$(plan_state "$TMP/t1.md")" "READY"
+
+# THE QUIET ONE. Empty acceptance on a Tier-1 spec. The ordinal reader never looked at section 5, so
+# it read the GATES section as acceptance, found it non-empty, and graded READY.
+t1spec '' 'none'
+same "tier-1: an EMPTY section 5 acceptance grades THIN" "$(plan_state "$TMP/t1.md")" "THIN"
+
+# THE LOUD ONE, from both directions. A revision log has bullets and no conforming mark, so the
+# ordinal reader graded EVERY Tier-1 spec FORKED off section 8.
+t1spec '- AC1 observable.' 'none - nothing open here.'
+same "tier-1: a bulleted section 8 revision log does NOT make the spec FORKED" "$(plan_state "$TMP/t1.md")" "READY"
+
+t1spec '- AC1 observable.' '- **F1 - a real question?** options, and no mark anywhere.'
+same "tier-1: a genuinely unresolved section 7 open question IS FORKED" "$(plan_state "$TMP/t1.md")" "FORKED"
+
+# ---- FIRST OCCURRENCE BINDS on a duplicate title. Two arms, because one alone is satisfied by a
+# ---- reader that always takes the LAST. Not a refusal: this function's contract is one bare token,
+# ---- a third outcome has no branch at verb_plan's case and build-complete's string equality
+# ---- discards the exit status, so a refusing spec would grade silently non-THIN where it decides a
+# ---- landing.
+# WHICH OF THESE ARMS ACTUALLY DISCRIMINATE, stated because an arm that passes against BOTH readers
+# is not evidence about the fix and reads exactly like one that is. Driven against the pre-fix bytes
+# before landing: the first THREE Tier-1 arms go RED on the ordinal reader and are the observation
+# this unit exists for. The fourth (an unresolved section 7) passes on both, and on the OLD reader it
+# passes for the wrong reason - it graded the section 8 revision log, whose bullets carry no mark, so
+# FORKED was right by accident. The two duplicate-title arms also pass on both, because the ordinal
+# reader could not match a second `## 9. Acceptance criteria` at all; they pin a rule that title
+# keying makes newly EXPRESSIBLE rather than a behaviour that changed.
+dupspec() { # <first acceptance body> <second acceptance body>
+  printf '# t\n\n**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n%s\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n\n## 9. Acceptance criteria\n\n%s\n' "$1" "$2" > "$TMP/dup.md"
+}
+dupspec '- AC1 filled.' ''
+same "duplicate title: the FIRST occurrence binds, so a filled first section is READY" "$(plan_state "$TMP/dup.md")" "READY"
+dupspec '' '- AC1 filled.'
+same "duplicate title: the FIRST occurrence binds, so an empty first section is THIN" "$(plan_state "$TMP/dup.md")" "THIN"
+
+# ---- THE TIER-2 CONTROL. 397 of the 401 tracked specs are Tier-2 shaped, and a fix that regraded
+# ---- any of them would be a corpus-wide change wearing a bug fix's clothes. Measured before landing
+# ---- by slicing BOTH readers and running them over every tracked spec: 401 graded, 4 regraded, all
+# ---- four Tier-1 and all four FORKED -> READY. These arms pin the shape that measurement covered.
+fkspec 'none'
+same "tier-2 control: the canonical ordinals still grade READY" "$(plan_state "$TMP/fk.md")" "READY"
+
+
+
+
+echo "MARK brief-and-dispatch-arms" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- TOOL-dBriefedPass-2 and -3 - THE REFUSAL ARMS, asserting each branch's OWN longest literal
+# ---- run. `check-arms.py` grades a branch as armed only when a test line carries that run, and an
+# ---- arm asserting a short substring reads as UNARMED with no hint why. The strings below were
+# ---- copied out of `check-arms.py --report` rather than retyped, which is what that mode is for.
+mkdir -p memory/builds/tRun/prompts memory/builds/tRun/spec
+printf 'a brief
+' > memory/builds/tRun/prompts/armbrief.md
+git add memory/builds/tRun/prompts/armbrief.md >/dev/null 2>&1
+o=$(run --brief tRun --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"--brief requires --unit, because a brief naming no unit records what SOME agent was handed and joins to nothing"*) echo "ok   brief: --unit is required" ;; *) echo "FAIL brief: --unit is required -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit ARCH-tRun-1)
+n=$((n+1)); case "$o" in *"--brief requires --path, because the brief is the FILE and a row with no path records that one existed"*) echo "ok   brief: --path is required" ;; *) echo "FAIL brief: --path is required -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit ARCH-tRun-404 --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"--brief names a unit the build README's generated units region does not carry, so the brief joins to no unit of this build"*) echo "ok   brief: a unit off the roster is refused" ;; *) echo "FAIL brief: a unit off the roster is refused -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/gone.md)
+n=$((n+1)); case "$o" in *"--brief names a path that is not a file in this tree, so there is nothing to hash and the row would describe nothing"*) echo "ok   brief: a --path naming no file is refused" ;; *) echo "FAIL brief: a --path naming no file is refused -- $o"; st=1 ;; esac
+printf 'untracked
+' > memory/builds/tRun/prompts/armuntracked.md
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/armuntracked.md)
+n=$((n+1)); case "$o" in *"--brief names an UNTRACKED path, and an untracked brief does not travel with the push, so a later reader in a fresh clone finds neither the file nor anything to compare its hash against"*) echo "ok   brief: an UNTRACKED path is refused" ;; *) echo "FAIL brief: an UNTRACKED path is refused -- $o"; st=1 ;; esac
+rm -f memory/builds/tRun/prompts/armuntracked.md
+o=$(run --brief tRun --unit "$(printf 'A
+B')" --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"a brief unit or path contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second parked row nothing wrote"*) echo "ok   brief: a newline in the unit forges a second row and is refused" ;; *) echo "FAIL brief: a newline in the unit forges a second row and is refused -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit "A · B" --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"a brief unit or path spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"*) echo "ok   brief: the field separator in the unit is refused" ;; *) echo "FAIL brief: the field separator in the unit is refused -- $o"; st=1 ;; esac
+o=$(run --brief tRun --unit "A--no-verify" --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"a brief unit or path spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite"*) echo "ok   brief: the declared bypass flag in the unit is refused" ;; *) echo "FAIL brief: the declared bypass flag in the unit is refused -- $o"; st=1 ;; esac
+o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last"*) echo "ok   dispatch: a unit no spec defines is M2 MISSING" ;; *) echo "FAIL dispatch: a unit no spec defines is M2 MISSING -- $o"; st=1 ;; esac
+printf '# ARCH-tRun-1 — u
+
+**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd
+
+## 2. Scope (IN)
+
+- s
+
+## 6. Acceptance criteria
+
+## 7. Gates
+
+- g
+
+## 8. Open questions
+
+none
+' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it"*) echo "ok   dispatch: a THIN unit is refused" ;; *) echo "FAIL dispatch: a THIN unit is refused -- $o"; st=1 ;; esac
+printf '# t
+
+**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd · order 2x
+
+## 2. Scope (IN)
+
+- s
+
+## 6. Acceptance criteria
+
+- a
+
+## 7. Gates
+
+- g
+
+## 8. Open questions
+
+none
+' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $1 spells ["*) echo "ok   order verb: a malformed value is REFUSED, not truncated to its prefix" ;; *) echo "FAIL order verb: a malformed value is REFUSED, not truncated to its prefix -- $o"; st=1 ;; esac
+rm -f memory/builds/tRun/spec/one.md
+
+# A slug with a README and NO run-state file, and one with neither: the two preconditions the
+# verb tests before it looks at anything the caller passed.
+mkdir -p memory/builds/tNoRun
+readme tNoRun
+o=$(run --brief tNoRun --unit ARCH-tNoRun-1 --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"no run-state file, so there is no run to record a brief against"*) echo "ok   brief: a build with no run-state file has no run to record against" ;; *) echo "FAIL brief: a build with no run-state file has no run to record against -- $o"; st=1 ;; esac
+mkdir -p memory/builds/tNoRm
+runmd tNoRm "$MANDATE"
+o=$(run --brief tNoRm --unit ARCH-tNoRm-1 --path memory/builds/tRun/prompts/armbrief.md)
+n=$((n+1)); case "$o" in *"no build README, so there is no roster to check this unit against"*) echo "ok   brief: a build with no README has no roster to check against" ;; *) echo "FAIL brief: a build with no README has no roster to check against -- $o"; st=1 ;; esac
+
+echo "MARK pass-order-dispatch" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- TOOL-dBriefedPass-3 S1/S2 - THE M2 HARD FLOOR, AT THE MOMENT OF THE ACT. Never build a
+# ---- MISSING or THIN unit was carried entirely by an agent's memory: `plan_state` was called at
+# ---- `verb_plan`, which only reports, and at `build-complete`, which runs after every commit has
+# ---- landed. A run that built first and specced afterwards therefore passed the Definition of Done
+# ---- by construction, because by close time the spec existed and was not thin.
+# ----
+# ---- The passing case is armed BESIDE each refusal. A refusal with no observed pass is a gate that
+# ---- cannot be satisfied, and it is the arm most often missing.
+o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"which is M2's MISSING"*) ;; *) echo "FAIL dispatch: a unit no tracked spec defines was accepted -- $o"; st=1 ;; esac
+
+# THIN: a spec whose acceptance section is empty. The state token is what the message must name,
+# never the empty SECTION -- `plan_state`'s contract is one bare token by a recorded decision, and
+# `TOOL-dBriefedPass-1` declines to widen it.
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"grades THIN"*) ;; *) echo "FAIL dispatch: a THIN unit was accepted, which is the hard floor this refusal IS -- $o"; st=1 ;; esac
+n=$((n+1)); case "$o" in *"section is empty or names nothing observable"*) ;; *) echo "FAIL dispatch: the THIN message did not say what THIN means -- $o"; st=1 ;; esac
+
+# THE PASSING CASE. The same unit with a filled acceptance section dispatches.
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+n=$((n+1)); case "$o" in *"dispatch declared"*) ;; *) echo "FAIL dispatch: a READY unit was REFUSED, so the guard cannot be satisfied -- $o"; st=1 ;; esac
+
+echo "MARK brief" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- TOOL-dBriefedPass-2 - THE UNIT BRIEF. "Which instructions produced this diff" had no answer
+# ---- on disk before this verb: a build pass was handed prose by whatever orchestrated it, and the
+# ---- prose left no trace. These arms grade the four things that make the row a RECORD rather than
+# ---- a note - the roster join, the tracked-path refusal, the park() grammar, and the staleness
+# ---- reader that is the only thing making the recorded hash more than decoration.
+mkdir -p memory/builds/tRun/prompts
+printf 'the brief for unit one\n' > memory/builds/tRun/prompts/brief-1.md
+git add memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
+
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md)
+n=$((n+1)); case "$o" in *"brief recorded"*) ;; *) echo "FAIL brief: a tracked path naming a rostered unit was refused -- $o"; st=1 ;; esac
+# THE GRAMMAR IS park()'s AND THE ARM READS THE BYTES. A bespoke dash-led row was specified first and
+# no reader in this driver could have matched it, so this asserts the shape the readers actually use.
+n=$((n+1)); grep -qE "^[0-9][0-9-]*T[0-9:]*Z brief · item ARCH-tRun-1 · reason [0-9a-f]{12} memory/builds/tRun/prompts/brief-1.md$" memory/builds/tRun/RUN.md \
+  || { echo "FAIL brief: the row is not in park()'s grammar, so no reader in this driver can match it"; st=1; }
+
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md)
+n=$((n+1)); case "$o" in *"already recorded, unchanged"*) ;; *) echo "FAIL brief: an identical re-run was not idempotent -- $o"; st=1 ;; esac
+
+o=$(run --brief tRun --unit ARCH-tRun-99 --path memory/builds/tRun/prompts/brief-1.md)
+n=$((n+1)); case "$o" in *"does not carry"*) ;; *) echo "FAIL brief: a unit absent from the units region was accepted -- $o"; st=1 ;; esac
+
+printf 'untracked\n' > memory/builds/tRun/prompts/untracked.md
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/untracked.md)
+n=$((n+1)); case "$o" in *UNTRACKED*) ;; *) echo "FAIL brief: an untracked brief was accepted, and it does not travel with the push -- $o"; st=1 ;; esac
+rm -f memory/builds/tRun/prompts/untracked.md
+
+# ---- THE CLASSIFICATION. `brief` is in PARK_KINDS and deliberately NOT in PARK_KINDS_OWED, so it
+# ---- must move `noted` and must NOT move `parked`. A brief that inflated the surfaced count would
+# ---- make a truthful `parked-decisions-surfaced` attestation refuse.
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"· noted "*) ;; *) echo "FAIL brief: a recorded brief did not reach the noted aggregate -- $o"; st=1 ;; esac
+n=$((n+1)); case "$o" in *"· parked "*) echo "FAIL brief: a brief inflated the SURFACED count, which is what its history classification exists to prevent -- $o"; st=1 ;; *) ;; esac
+
+# ---- THE STALENESS READER, both directions. Detecting is half the arm; CLEARING is the half that
+# ---- proves the reader grades the LATEST row per unit. Graded over every row instead, the count
+# ---- rises monotonically and can never return to zero, which is a signal a reader cannot act on.
+# ---- Observed exactly that way while building this unit, which is why rev-5 bumped S3.
+printf 'edited after the brief was recorded\n' >> memory/builds/tRun/prompts/brief-1.md
+git add memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"STALE briefs"*) ;; *) echo "FAIL brief: an edited brief did not report STALE, so the recorded hash is decoration -- $o"; st=1 ;; esac
+run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"STALE briefs"*) echo "FAIL brief: re-briefing the edited file did NOT clear STALE, so the count can only rise -- $o"; st=1 ;; *) ;; esac
+
+# ---- TWO UNITS, ONE STALE. The case a per-unit reader must get right and the collapsed one cannot
+# ---- see: the first cut of this reader lost its unit id to a heredoc-eaten back-reference and
+# ---- grouped every row under one key, which passes with one unit and drops rows with two.
+printf 'the brief for unit two\n' > memory/builds/tRun/prompts/brief-2.md
+git add memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
+run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
+printf 'and now edited\n' >> memory/builds/tRun/prompts/brief-2.md
+git add memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"STALE briefs 1"*) ;; *) echo "FAIL brief: with two briefs and one edited, the reader did not report exactly one stale -- $o"; st=1 ;; esac
 
 echo "MARK park-taxonomy" >&2
 # ---------------------------------------------------------------------------------------------

@@ -13,6 +13,7 @@
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
 #   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
+#   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <verdict> --blockers <N>  # a review round
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
@@ -83,7 +84,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch --review"
+VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --version"
@@ -347,7 +348,12 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review"
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief"
+# The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
+# value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
+ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
+ORDER_LOOSE_RE='·[[:space:]]*order[[:space:]]+[^[:space:]]+'
+
 # The kinds that are OWED to the owner as an ANSWER. Three are deliberately absent, and they are
 # absent for one reason: each is a DECLARATION the run made, not a question it refused. A proposal is
 # an improvement it noticed, a rescope is an amendment it took under a delegated authority, a
@@ -459,7 +465,7 @@ RUNAWAY_CEILING="8"
 # which a space-separated set cannot hold.
 REVIEW_VERDICTS="CLEAN|CLEAN WITH FIXES|BLOCKED"
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope"
-DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10"
+DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
 
 # the AUTHORIZATION MODE set, published as a constant so it is spelled
 # ONCE. It was a `case` arm in one file and a hardcoded pair in another, which is why check 19 could
@@ -1648,11 +1654,35 @@ refuse_if_terminal() { # run-state file · verb
 # body out of the shipped bytes and evaluates it, so a constant defined outside it would arrive empty.
 plan_state() { # spec file -> prints the M2 state
   awk '
+    # TOOL-dBriefedPass-1 - KEYED ON THE HEADING TITLE, NOT ON THE ORDINAL. A TIER-1 SPEC LEGITIMATELY
+    # DROPS `## 5. Production-readiness checklist`, so every section from five onward renumbers: the
+    # ordinal form read a Tier-1 spec`s GATES as its acceptance criteria, its OPEN QUESTIONS as its
+    # gates, and its REVISION LOG as its open questions. Both halves cost something and the quiet one
+    # cost more. Loud: a revision log has bullets and no conforming mark, so EVERY Tier-1 spec graded
+    # FORKED - reproduced on dTieredTribunal, 2 of 2 Tier-1 FORKED against 6 of 6 Tier-2 clean. Quiet:
+    # the acceptance slot was filled by the Gates section, so a Tier-1 spec stating NO acceptance
+    # criterion at all graded READY, which is a THIN predicate that could not fail on that shape.
+    #
+    # The ordinal is still REQUIRED and still numeric - only its VALUE stops being read - because a
+    # heading with no ordinal is not a canonical section and must not become one here. This is the
+    # spelling the sibling reader in the memory-tree kit already uses (check-memory-hygiene.sh:880,
+    # :939, :1326), copied rather than invented, so the two readers agree by construction instead of
+    # by a case table nobody re-runs. Measured over the tracked corpus before landing: the four titles
+    # are uniform at 393/393/391/396 occurrences with no variant spelling.
+    #
+    # FIRST OCCURRENCE BINDS. The ordinal made a duplicate title inexpressible; keying on the title
+    # removes that accident, so the choice is made here rather than left to whichever branch runs
+    # last. It is NOT a refusal: this function`s contract is one bare token on stdout, a third outcome
+    # has no branch at verb_plan`s case and build-complete`s string equality discards the exit status,
+    # so a refusing spec would have graded silently non-THIN at the one call site where the grade
+    # decides a landing.
     /^## / { sec = ""
-             if ($0 ~ /^## 2\./) sec = "scope"
-             else if ($0 ~ /^## 6\./) sec = "acc"
-             else if ($0 ~ /^## 7\./) sec = "gates"
-             else if ($0 ~ /^## 8\./) sec = "forks"
+             if ($0 ~ /^## [0-9]+\. Scope/) sec = "scope"
+             else if ($0 ~ /^## [0-9]+\. Acceptance criteria/) sec = "acc"
+             else if ($0 ~ /^## [0-9]+\. Gates/) sec = "gates"
+             else if ($0 ~ /^## [0-9]+\. Open questions/) sec = "forks"
+             if (sec != "" && (sec in bound)) sec = ""
+             if (sec != "") bound[sec] = 1
              cur = sec; next }
     cur == "" { next }
     { line = $0; sub(/\r$/, "", line); gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
@@ -1742,6 +1772,32 @@ roster_ids() { # slug -> ids the AUTHORED plan names, which may include unspecce
 }
 # The GENERATED region's ids - what a build's units actually ARE. `build-complete`'s non-empty term
 # uses this rather than the authored plan, so the term is meetable on a build nobody hand-wrapped.
+# TOOL-dBriefedPass-3, corrected by the closing review. The BUILD-ORDER verb, read the way
+# `gen_build_index.py`'s own `ORDER_RE`/`ORDER_LOOSE_RE` pair reads it: a tolerant separator, the
+# value anchored on BOTH sides, and a value that LOOKS like the verb without conforming REFUSED
+# rather than silently truncated to its numeric prefix. Two bespoke `sed` reads stood here and
+# disagreed with the generator on a doubled separator space, on no space, and on a trailing-garbage
+# value. The first two read EMPTY, which skips the order gate entirely — the failure a reader cannot
+# see, under a comment asserting the two readers could not disagree.
+order_verb_of() { # spec file -> prints the order integer, or nothing; refuses a malformed verb
+  local hdr n loose
+  hdr=$(grep -m1 '^\*\*Status:\*\*' "$1" 2>/dev/null) || return 0
+  n=$(printf '%s' "$hdr" | grep -oE "$ORDER_OK_RE" | head -1 | grep -oE '[0-9]+' | head -1)
+  if [ -z "$n" ]; then
+    loose=$(printf '%s' "$hdr" | grep -oE "$ORDER_LOOSE_RE" | head -1)
+    if [ -n "$loose" ]; then
+      # THE REFUSAL IS THE CALLER'S TO MAKE, not this function's. Both call sites read this through
+      # `$( )`, so a `fail` here writes its message into the captured stream and its status dies in
+      # the subshell — the verb then exited 0 with zero bytes of output on a malformed order verb,
+      # which is a silent pass on exactly the input this reader was added to refuse. So the sentinel
+      # comes back on stdout and the caller fails in ITS shell, where the status is real.
+      printf 'MALFORMED %s' "$loose"
+      return 0
+    fi
+  fi
+  printf '%s' "$n"
+  return 0
+}
 unit_ids_of() { # slug
   local slug="$1" rel; rel=$(readme_of "$slug")
   [ -f "$rel" ] || return 0
@@ -2726,6 +2782,44 @@ verb_status() { # slug
     nnoted=$(grep -E "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$unowed")) · item " "$rel" 2>/dev/null | grep -cvE "$(history_exclude_re)" || true)
     [ "${nnoted:-0}" -gt 0 ] 2>/dev/null && parked="$parked · noted $nnoted"
   fi
+  # TOOL-dBriefedPass-2 S3 - THE BRIEF STALENESS READER, and naming it is the whole of that item.
+  # Nothing else in this kit recomputes a hash held in a parked row: `record_piece` writes a hash into
+  # a separate record FILE and the stale verdict over THAT is produced by check-playbook.sh, over a
+  # different artifact entirely. Without this loop the recorded hash would be decoration and the
+  # brief's advertised property - readable as stale - would be untrue on the day it landed.
+  #
+  # It RECOMPUTES rather than trusting: a brief edited after it was recorded is the case the join
+  # exists for, and the only way to see it is to hash the file again. A brief whose file has since
+  # been DELETED is `gone`, which is a different fact from `stale` and is not folded into it.
+  #
+  # THE LATEST ROW PER UNIT, NOT EVERY ROW, and this is the half that had to be built to be seen. The
+  # parked region is append-only, so re-briefing an EDITED file writes a second row and the first one
+  # keeps describing bytes that legitimately moved on. Grading every row made the count monotonically
+  # increasing: observed live on this build's own brief - record, edit, `STALE briefs 1`, re-brief,
+  # STILL `STALE briefs 1`. A count that cannot return to zero is indistinguishable from one that is
+  # stuck, so it tells a reader nothing. `awk` keeps the LAST row seen per unit, which is the live
+  # claim; the superseded rows stay in the record as the history they are.
+  local _bstale=0 _bgone=0 _bl _bh _bp _bnow
+  while IFS= read -r _bl; do
+    [ -n "$_bl" ] || continue
+    _bh=${_bl%% *}; _bp=${_bl#* }
+    if [ ! -f "$_bp" ]; then _bgone=$((_bgone+1)); continue; fi
+    _bnow=$(GIT hash-object "$_bp" 2>/dev/null | cut -c1-12)
+    [ "$_bnow" = "$_bh" ] || _bstale=$((_bstale+1))
+  #
+  # ONE awk PASS AND NO BACK-REFERENCE. The first cut used a `sed` capture group and the `` did
+  # not survive being written through a shell heredoc: the landed bytes read `/ /p`, so the unit id
+  # was dropped and every row collapsed onto ONE key. It passed here, because this build had briefed
+  # exactly one unit; with two it would have kept one row in TOTAL and reported a stale brief as
+  # clean. That is `memory/gotchas/heredoc-escape-reaches-the-regex` in the write path, caught by
+  # running the bug-class checklist over this pass, and it is why this splits on literal separators.
+  done <<BRIEFROWS
+$(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z brief$/ && $2 ~ /^item / && $3 ~ /^reason / {
+     u = substr($2, 6); r = substr($3, 8); last[u] = r
+   } END { for (u in last) print last[u] }' "$rel" 2>/dev/null)
+BRIEFROWS
+  [ "$_bstale" -gt 0 ] && parked="$parked · STALE briefs $_bstale"
+  [ "$_bgone" -gt 0 ] && parked="$parked · briefs gone $_bgone"
     # The halt code on the status line, when the record carries one. A vocabulary with no reader
     # is decoration, and this kit says so about its own phase writer.
     local hc; hc=$(fact "$rel" halt-code)
@@ -3980,6 +4074,80 @@ PROPOSED
   return 0
 }
 
+# ------------------------------------------------------------------------------- the UNIT BRIEF
+# TOOL-dBriefedPass-2. "Which instructions produced this diff" had no answer on disk. A build pass
+# was handed prose by whatever orchestrated it, and nothing tracked what that prose SAID, so a diff
+# could be read against its spec but never against the brief the builder actually worked from.
+#
+# WHY THE PARKED REGION AND NOT A PIECE RECORD, decided rather than defaulted: a brief is RUN-scoped
+# evidence and the run-state file is the run's own record, while the piece records exist precisely
+# because a piece outlives the run that made it. The spec said both at rev-1 and one of them had to
+# go.
+#
+# THE ROW IS park()'s GRAMMAR AND NOTHING ELSE. `park()` emits
+# `<ISO-Z> <kind> · item <item> · reason <reason>` with the reason LINE-FINAL, and two live readers
+# depend on that - `recorded_waivers` takes the token between ' · item ' and ' · reason ', and the
+# leg's check 17 strips a trailing reason - so the hash and the path ride the reason field and
+# nothing is appended after it. A bespoke dash-led four-field row was specified first; no writer here
+# could produce it, no reader could match it, and it would itself have tripped the protocol's anchor
+# ban on a row leading with an id.
+#
+# THE KIND IS `history`, NOT `surfaced`. It carries no question and no options, so it is in
+# PARK_KINDS and deliberately NOT in PARK_KINDS_OWED: a brief that inflated the surfaced count would
+# make `parked-decisions-surfaced` refuse a truthful attestation. `park_kinds_unowed()` derives the
+# `· noted N` aggregate as PARK_KINDS minus the owed set, so membership above puts briefs there with
+# no further edit - which is the whole of what the spec's S5 asks for.
+verb_brief() { # slug · unit-id · path
+  local slug="$1" unit="$2" path="$3" rel readme h want pl
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 49 "no run-state file, so there is no run to record a brief against: $rel"; return 1; }
+  [ -n "$unit" ] || { fail 49 "--brief requires --unit, because a brief naming no unit records what SOME agent was handed and joins to nothing"; return 1; }
+  [ -n "$path" ] || { fail 49 "--brief requires --path, because the brief is the FILE and a row with no path records that one existed"; return 1; }
+  # THE UNIT MUST BE ON THE ROSTER. A brief naming a unit this build does not carry records nothing
+  # about this build, and the units region is the same source --plan and --status take their set
+  # from, so the three cannot disagree about what a unit IS.
+  readme=$(readme_of "$slug")
+  [ -f "$readme" ] || { fail 49 "no build README, so there is no roster to check this unit against: $readme"; return 1; }
+  case " $(unit_ids_of "$slug" | tr '\n' ' ') " in
+    *" $unit "*) ;;
+    *) fail 49 "--brief names a unit the build README's generated units region does not carry, so the brief joins to no unit of this build: $unit"; return 1 ;;
+  esac
+  # THE BRIEF MUST BE TRACKED. An untracked file is not a record: it does not travel with the push,
+  # so a later reader in a fresh clone resolves the path to nothing and the hash to nothing.
+  [ -f "$path" ] || { fail 49 "--brief names a path that is not a file in this tree, so there is nothing to hash and the row would describe nothing: $path"; return 1; }
+  GIT ls-files --error-unmatch -- "$path" >/dev/null 2>&1 || {
+    fail 49 "--brief names an UNTRACKED path, and an untracked brief does not travel with the push, so a later reader in a fresh clone finds neither the file nor anything to compare its hash against: $path"; return 1; }
+  # `git hash-object` applies the path's clean filter, so this is the INDEX blob on every platform -
+  # the same derivation the piece records and the record-rotation name both use, rather than a third.
+  h=$(GIT hash-object "$path" 2>/dev/null) || { fail 49 "cannot hash the brief, so the row would carry no join: $path"; return 1; }
+  h=$(printf '%s' "$h" | cut -c1-12)
+  if [ "$(printf '%s%s' "$unit$path" | wc -l)" -ne 0 ]; then
+    fail 49 "a brief unit or path contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
+  fi
+  case "$unit$path" in *" · "*) fail 49 "a brief unit or path spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $unit at $path"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s' "$unit" "$path" | grep -qF -- "$BYPASS_BAN"; then
+    fail 49 "a brief unit or path spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite: $BYPASS_BAN"; return 1
+  fi
+  refuse_if_terminal "$rel" --brief || return 1
+  # EXACT LINE COMPARE, verb_propose's rule and for its reason: the reason is line-final, so a
+  # prefix match would call a DIFFERENT brief already-recorded and write nothing while reporting
+  # success. Re-briefing the same unit with an EDITED file is a new row, which is what makes the
+  # sequence readable.
+  want="brief · item $unit · reason $h $path"
+  while IFS= read -r pl; do
+    [ "$pl" = "$want" ] || continue
+    echo "unattended: brief already recorded, unchanged — $unit at $h"
+    return 0
+  done <<BRIEFED
+$(grep -F -- ' brief · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
+BRIEFED
+  park "$rel" brief "$unit" "$h $path"
+  stage_or_fail "$rel" || return 1
+  echo "unattended: brief recorded — $unit · $h · $path"
+  return 0
+}
+
 # ------------------------------------------------------------------- the PER-PIECE RECORD writer
 # The spec's previous revision had four READERS of this record and no writer at all, so the two
 # Definition-of-Done items reading it could only be met by hand — which the same spec forbids.
@@ -4338,6 +4506,72 @@ verb_dispatch() { # slug · unit · writes...
   [ "$shaped" = "$unit" ] && [ -n "$unit" ] || { local _u=${unit:-(none)}
     fail 49 "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id: $_u"; return 1; }
   [ "$#" -gt 0 ] || { fail 49 "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof: $unit"; return 1; }
+  # ------------------------------------------------------------------ TOOL-dBriefedPass-3 S1/S2
+  # THE M2 HARD FLOOR, MOVED FROM A RULE AN AGENT REMEMBERS TO A REFUSAL A MACHINE MAKES. Never
+  # build a MISSING or THIN unit is stated by the build method and was enforced by nothing: before
+  # this, `plan_state` was called at exactly two sites, `verb_plan` which only REPORTS and
+  # `build-complete` which runs after every commit has landed. So a run that built first and wrote
+  # the spec afterwards passed the Definition of Done by construction, because by close time the
+  # spec existed and was not thin. That is the defect this whole build exists for.
+  #
+  # THE MESSAGE NAMES THE ID AND THE STATE AND NOT THE EMPTY SECTION. `plan_state`'s contract is one
+  # bare token on stdout, pinned deliberately because two harnesses slice the function body, and
+  # `build-complete` already words its own message the same way for the same reason.
+  local _d_spec _d_state
+  load_spec_facts $(GIT ls-files -- "$MEMORY_ROOT/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1 || true
+  _d_spec="${SPEC_PATH[$unit]:-}"
+  if [ -z "$_d_spec" ]; then
+    fail 49 "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: $unit"
+    return 1
+  fi
+  _d_state=$(plan_state "$_d_spec")
+  case "$_d_state" in
+    THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
+  esac
+  # ------------------------------------------------------------------------------ THE ORDER GATE
+  # A unit may not be dispatched while an EARLIER step still holds a unit that is neither terminal
+  # nor already dispatched. Units sharing an `order` value are the parallel group and do not block
+  # each other, and a unit carrying NO order verb is unordered and blocks nothing — the verb is
+  # PERMITTED rather than required, so an absent one may not become a refusal here.
+  #
+  # THE ORDER IS READ FROM THE SPEC HEADERS, which is where `gen_build_index.py` reads it from too,
+  # so this and the rendered build-order region cannot disagree about what step a unit is on.
+  local _d_ord _o_id _o_spec _o_ord _o_st _blockers=""
+  # ONE READER SHAPE, the generator's own. The first cut spelled a bespoke `sed` that disagreed
+  # with `gen_build_index.py` on exactly the inputs a comment here claimed they could not
+  # disagree on: two spaces after the separator, or none, read EMPTY here and 3 there, and a
+  # trailing-garbage value read as its numeric prefix here while the generator RAISES. An empty
+  # read SILENTLY SKIPS the whole order gate, which is the worst of the three.
+  _d_ord=$(order_verb_of "$_d_spec")
+  case "$_d_ord" in MALFORMED\ *)
+    fail 49 "a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: $_d_spec spells [${_d_ord#MALFORMED }]"
+    return 1 ;;
+  esac
+  if [ -n "$_d_ord" ]; then
+    for _o_id in $(unit_ids_of "$slug"); do
+      [ "$_o_id" = "$unit" ] && continue
+      _o_spec="${SPEC_PATH[$_o_id]:-}"; [ -n "$_o_spec" ] || continue
+      _o_ord=$(order_verb_of "$_o_spec")
+      case "$_o_ord" in MALFORMED\ *)
+        fail 49 "a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it: $_o_spec spells [${_o_ord#MALFORMED }]"
+        return 1 ;;
+      esac
+      [ -n "$_o_ord" ] || continue
+      [ "$_o_ord" -lt "$_d_ord" ] 2>/dev/null || continue
+      _o_st="${SPEC_ST[$_o_spec]:-}"
+      case "$_o_st" in CLOSED|WONTDO) continue ;; esac
+      # THE DISPATCH ROW'S `item` FIELD IS `<anchor-sha> <unit-id>`, not the id alone, so a match on
+      # the id with a space either side finds nothing and every dispatched sibling reads as still
+      # blocking. Anchored on ` · reason ` at the tail, which makes the id a WHOLE token: without it
+      # `TOOL-x-1` matches the row of `TOOL-x-11`, the substring class this corpus has a gotcha for.
+      grep -qE "^[0-9][0-9-]*T[0-9:]*Z dispatch · item [0-9a-f]+ $_o_id · reason " "$rel" 2>/dev/null && continue
+      _blockers="$_blockers $_o_id (order $_o_ord, $_o_st)"
+    done
+  fi
+  if [ -n "$_blockers" ]; then
+    fail 49 "--dispatch declares a build pass out of the build's own declared order: $unit is at order $_d_ord and an earlier step still holds a unit that is neither terminal nor dispatched:$_blockers"
+    return 1
+  fi
   # EACH --writes IS ONE PATH. A space-joined value cannot carry the whitespace refusal below: the
   # path has already become two tokens by the time this verb sees it, and nothing recovers that.
   for p in "$@"; do
@@ -4514,7 +4748,7 @@ SIBS
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
-RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""
+RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
@@ -4546,6 +4780,7 @@ while [ $# -gt 0 ]; do
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
+    --unit)         BR_UNIT="${2:-}"; shift 2 || shift ;;
     --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
     --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
     # ONE ARM FOR ONE FLAG. Both sides of the merge added a `--verdict` case arm - one for the record
@@ -4609,6 +4844,7 @@ case "$VERB" in
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
+  --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
   --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;

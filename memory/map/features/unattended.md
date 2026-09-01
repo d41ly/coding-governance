@@ -8,10 +8,10 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended skill wiring"]
+gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history"]
 kits = ["unattended"]
 git-hooks = []
-workflow-scripts = []
+workflow-scripts = ["unattended-build.js"]
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
 gotcha-classes = ["text-mode-read-eats-a-bare-cr.md",
@@ -42,6 +42,27 @@ removes a rule — the explicit ask before a merge and a push — and its whole 
 something machine-checkable in the vacated slot. That is why the mandate is ASSERTED rather than
 written by the run, and why reachability from the pinned BASE is part of the contract: a run that can
 author its own authorization has none, and every gate downstream would certify it.
+
+**THE HARNESS BUYS STAGE ORDER AND CANNOT BUY ENFORCEMENT.** `tools/workflows/unattended-build.js`
+drives SPEC then AUDIT then BUILD as stages of one program, so BUILD is unreachable except through
+both and on a TERMINAL `--review` verdict — control flow, not a rule an agent remembers. It
+verifies nothing: a Workflow script has no filesystem, so every observation is a claim its own agent
+returned, and the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denies an
+`agent()` in any loop body: each stage is ONE agent over the ordered list, and the convergence LOOP
+sits in the caller while the harness holds the GATE, since a convergence loop's iteration count is
+data-dependent and no unroll exists.
+
+**PASS ORDER IS ENFORCED IN TWO PLACES BECAUSE ONE OF THEM IS BYPASSABLE.** The method's hard floor
+— never build a MISSING or THIN unit — was carried entirely by an agent's memory. `plan_state`, the
+M2 classifier, was called at two sites: `--plan`, which only reports, and `build-complete`, which
+runs after every commit has landed, by which point a run that built first and specced afterwards has
+a spec that is neither missing nor thin. `--dispatch` now REFUSES such a pass at the moment of the
+act, and is bypassed by not calling the verb; the `pass-order history` leg reads the COMMIT GRAPH,
+asserting each CLOSED unit's build commit had a conforming, non-THIN spec at its FIRST PARENT. Only
+the graph remembers ORDER, which is why the second exists. The first parent and not the pinned BASE:
+the method REQUIRES a run to author a missing spec, so what this refuses is authoring it AFTERWARDS.
+`PASS_ORDER_CUTOFF` grandfathers earlier builds, and the leg's liveness line names all three
+populations it walks rather than only the two it grades.
 
 **The anchor is an OBSERVATION of the remote, and the kit no longer claims more than that.** Kit 1.0
 pinned BASE against `refs/remotes/origin/<default>` and justified it in a source comment claiming the

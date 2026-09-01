@@ -57,3 +57,16 @@ tools/unattended/check-unattended.sh	16	14	the kit ships no SKILL.template.md, s
 tools/unattended/check-unattended.sh	16	15	the Skill template carries no non-overridable paragraph this leg can read, so the join would compare the driver's set against nothing and pass by finding nothing; the sentence it looks for names the items and the item names are backticked
 tools/unattended/check-unattended.sh	16	16	the driver refuses an override on an item the Skill's non-overridable paragraph does not name, so a run meets a refusal its own instructions said could not happen
 tools/unattended/check-unattended.sh	16	17	the Skill's non-overridable paragraph names an item the driver does not refuse an override on, so a run is told a route is closed that is open
+# `git hash-object` on a path this verb has already proven is a tracked file cannot fail without
+# git itself failing, so there is no constructible fixture. Pinned rather than armed with a
+# synthetic break, which proves the mechanism for the synthetic value and not the real one.
+tools/unattended/unattended.sh	49	8	cannot hash the brief, so the row would carry no join
+# The order-gate blocker message needs TWO rostered units carrying `order` verbs, and the tRun
+# fixture's units region emits one row. A second rostered unit changes a fixture shared by this
+# whole suite, which the standing instruction on this node forbids running. TOOL-dBriefedPass-6
+# carries the separate fixture; TOOL-dBriefedPass-3 rev-5 DECLARES the branch unexercised.
+tools/unattended/unattended.sh	49	19	and an earlier step still holds a unit that is neither terminal nor dispatched
+# The SIBLING malformed-order refusal sits inside the same sibling loop, so it needs the same two
+# rostered units the blocker message does and is unarmable from the shared fixture for the same
+# reason. TOOL-dBriefedPass-6 arms both together.
+tools/unattended/unattended.sh	49	18	a sibling spec status header carries something shaped like the build-order verb that does not conform, so this build's order cannot be sequenced against it

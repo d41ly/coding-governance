@@ -41,8 +41,8 @@ answers "which ids exist", never "which units are planned", and a planned unit c
 **Classify, first match wins.** Write it into the build README's BUILD-LEVEL RULES slot before acting on it — a canon closes the HEADING set, never slot bodies, so this needs no slot of its own.
 
 1. **MISSING** — no conforming spec carries the id.
-2. **THIN** — §2 Scope, §6 Acceptance or §7 Gates is empty, a placeholder, or names nothing observable.
-3. **FORKED** — §8 Open questions carries an unresolved item.
+2. **THIN** — Scope, Acceptance criteria or Gates is empty, a placeholder, or names nothing observable.
+3. **FORKED** — Open questions carries an unresolved item.
 4. **READY** — none of the above, and §10 Reuse audit is filled where the format requires it.
 
 **Act.** **MISSING → author the spec, then re-classify.** *Authoring a spec is allowed:* the rule that a run may not

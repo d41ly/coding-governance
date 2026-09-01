@@ -50,6 +50,7 @@
       "method-carriers self-test",
       "micro-format definitions",
       "micro-format gate selftest",
+      "pass-order history",
       "placeholder-catalogue self-test",
       "playbook parity",
       "playbook parity selftest",
@@ -116,7 +117,8 @@
       "check-workflow-syntax.js",
       "drift-audit-code.js",
       "drift-audit-state.js",
-      "tier2-review.js"
+      "tier2-review.js",
+      "unattended-build.js"
     ],
     "skill-engines": [
       "deploy-governance",

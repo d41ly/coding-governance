@@ -92,7 +92,7 @@ DIRECTIVES_EXTRA=""
 # adopter has today. Without it an extra handle is waivable by a verb and invisible to the agent,
 # and a project cannot fix that by editing the Skill, which is rendered from a kit template.
 DIRECTIVES_EXTRA_TABLE=""
-DIRECTIVES_FLOOR="16"
+DIRECTIVES_FLOOR="17"
 
 # Which anchors may authorize a run. CLOSED value set: `default-branch` (the build README must
 # resolve at the merge-base with the tip the remote advertises for its own HEAD) or `published`
@@ -199,3 +199,20 @@ GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py memory/le
 # Blank or absent grandfathers every record. Set it to the day you adopt the two-anchor landing.
 LANDED_ANCHOR_CUTOFF=""
 
+# TOOL-dBriefedPass-3 — the date from which a CLOSED unit whose BUILD COMMIT predates a conforming
+# spec for it blocks the bar. Graded on the build README's `opened:` date, the same idiom
+# UNITS_REGION_CUTOFF and SPEC_THIN_CUTOFF use and for the same reason: a build that landed before
+# this leg existed cannot be rewritten, and a term that reds one is unlandable by any run.
+#
+# WHAT IT BUYS, because the two neighbouring mechanisms sound like they already do this and do not.
+# `--dispatch` refuses a MISSING or THIN unit at the moment of the act, and is bypassed by not
+# calling the verb. `--close`'s build-complete grades the spec at CLOSE time, by which point a run
+# that built first and specced afterwards has a spec that is neither missing nor thin. Only the
+# commit graph remembers the ORDER.
+#
+# BLANK or absent turns the term OFF and the leg ANNOUNCES that rather than passing silently.
+# Set to the day this landed.
+# BLANK in the example, like every sibling cutoff here: a date is a per-adopter fact, and shipping
+# THIS repo's landing date would grade an adopter's whole back-catalogue from a day their tree
+# knows nothing about. Blank turns the term OFF and the leg announces that it did.
+PASS_ORDER_CUTOFF=""
