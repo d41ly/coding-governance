@@ -25,6 +25,7 @@ rendered-skills = []
 gotcha-classes = [
   "trailing-comma-counted-as-an-element.md",
   "allowlist-narrower-than-the-root-it-guards.md",
+  "a-pair-exists-and-it-is-the-wrong-one.md",
 ]
 guides = ["REVIEW-PROTOCOL.md"]
 backlog-shards = []
@@ -159,7 +160,11 @@ turns the cap rules off with no diff.
 - **The static scan cannot size a dynamically-built array**, by construction. It enforces "use the
   helper" instead, which kills the `parallel(items.map(...))` shape that causes the bursts.
 - **Block comments naming a primitive still trip rule 1.** Line comments and quoted strings are
-  stripped before the scan; block comments are not. Benign and fail-closed, so it stays.
+  stripped before the scan; block comments are not. Benign and fail-closed, so it stays. **What was
+  NOT fail-closed, until `TOOL-dMispairedQuote-1`:** an apostrophe inside such a comment paired with
+  the quote opening `agent('a'` and blanked the `parallel(` between them, so a block comment carrying
+  a contraction admitted the fan it was supposed to over-report. Fail-closed was the posture and not
+  the behaviour.
 - **`renderCodeView` models no regex literal, so rule 2 falls back for such a script.** It inherits
   `blankLiterals`' code-mode branch set, which tests `//`, `/*`, a backtick and the two quote
   characters and nothing else — a backtick inside `/…/` therefore opens template mode and never
@@ -167,6 +172,29 @@ turns the cap rules off with no diff.
   instead falls back to the per-line `stripStrings` view and returns the verdict this hook reached
   before rule 2 moved. The residual is precision, not safety: such a script is judged at the old
   view's accuracy, and prose punctuation inside it can still be read as structure. `TOOL-aLexedStripper-5`.
+  **The "precision, not safety" half was refuted by measurement** (`TOOL-dMispairedQuote-1`): prose
+  punctuation read as structure was a SAFETY loss on four of the five rules, reproduced at exit 0
+  including a declared cap of 50 read as the helper default of 5. `-5`'s ratified "cannot regress in
+  either direction" argument about this fallback is superseded, because the per-line view it rests on
+  has been re-based.
+
+- **Two residuals survive the quote rule, both stated rather than closed** (`TOOL-dMispairedQuote-1`).
+  `resolveLiteralEnd` opener-tests only the OPENING quote, so a mispairing needs ONE apostrophe in a
+  legal opener position before the fan-out and ANY unescaped quote of the same kind after it. And the
+  keyword clause admits a quote after `return`, `case`, `throw` and eight more, every one of which is
+  also an English word — `/* throw 'em */` mispairs. A THIRD, found by the closing diff review: an
+  apostrophe after an operator is in a legal opener position, so `/* rock - 'n roll */` mispairs too. Both are fixtured one arm per member of the
+  declared set rather than sampled, and neither is a regression: all of them admit at the pre-fix
+  revision too. What bounds the consequence is the next bullet.
+- **Each view exists TWICE, and that is the mechanism rather than duplication**
+  (`TOOL-dMispairedQuote-3`). `renderShippedLine`, `renderShippedView` and `renderShippedBlanks` are
+  the pre-fix bodies, frozen and byte-compared against the BASE blob by an arm; `renderStrippedLine`,
+  `renderLexedView` and `renderBlankedView` are the corrected ones; and three one-line dispatchers
+  over a module-level `VIEW_MODE` choose between them. `runBothViews` runs every rule under both and
+  merges, so a denial from either stands. Correcting what counts as a string literal un-hides
+  delimiters as well as fan-outs — three DENY-to-ADMIT moves were reproduced against the corrected
+  views alone — and this makes the change monotone in the DENY direction by construction rather than
+  by argument. The property is gated over the whole tracked corpus plus its own fixtures.
 
 ## Reuse affordance
 

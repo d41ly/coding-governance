@@ -46,10 +46,21 @@
  * pattern that causes the bursts. Ceiling: line comments AND quoted-string
  * literals are stripped before the scan; block comments naming the primitive
  * are NOT — still trips the guard (benign, fail-closed).
+ *
+ * WHAT A QUOTE IS, since three rules turn on it. A quote opens a string literal
+ * only where one may legally BEGIN (`checkLiteralOpen`): glued to the character
+ * that ends an expression it is TEXT — the apostrophe in `don't` — and so it is
+ * after a bare word that is not a JS keyword. A quote that opens nothing is left
+ * as text and its line is still blanked, EXCEPT inside a same-line template span,
+ * which is emitted whole: a quoted `'http://x'` written in one therefore survives
+ * into the line-comment strip. That channel is not closed by wording, it is
+ * bounded by the no-regression property below — every rule is evaluated over the
+ * SHIPPED views as well, and a denial from either stands, so nothing this hook
+ * denied before the quote rule changed can be admitted after it.
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.9' // gov:kit agent-cap@1.9 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.10' // gov:kit agent-cap@1.10 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -62,13 +73,291 @@ function readStdin() {
   }
 }
 
+// TOOL-dMispairedQuote-1 — the ONE decision this file makes about what OPENS a string literal.
+// All three views below ask it; none of them walks a line looking for a partner itself.
+//
+// A quote opens a literal only where one may legally BEGIN. In valid JavaScript a string's opening
+// quote is never GLUED to the character that ends an expression, and never follows a bare word that
+// is not a keyword — so `don't`, `won't`, `it's`, `y'all` and `run 'em` are TEXT, while `return 'x'`,
+// `case 'y':` and `throw 'z'` are ordinary openers. `LITERAL_OPENERS` is that keyword set, and it
+// omits `in`, `of` and `do`: those are ordinary English connectives, and admitting them let a
+// comment reading "one of 'em" open a span that swallowed a fan-out.
+//
+// WHY THIS AND NOT A REGEX-LITERAL MODEL, since the reported instance was `/won't/` sharing its line
+// with a fan-out and the obvious repair is to model `/…/`. That closes ONE spelling. Measured against
+// the pre-fix hook, four more admit the same raw `parallel(` and none of them is a regex: a
+// double-quoted `"don't"`, a block comment, a backticked `don't`, and loose prose. The APOSTROPHE is
+// the mechanism; the construct around it is not, and a fix keyed on the construct gates the instance.
+// Four of this file's five rules were defeated, rule 5's join ban included.
+//
+// WHAT THE PAIR TEST COULD NOT REACH. `addc6169` already required a matching PAIR before blanking,
+// which fixed an unpaired quote swallowing the rest of its line. A pair exists for
+// `/won't/ … agent('a'` too — the prose apostrophe and the quote opening the call — and blanking
+// between them erased the very call the rules count. Asking what a quote OPENS is the question a
+// partner test cannot ask, and it is why that repair looked like it closed the class and did not.
+//
+// THREE RESIDUALS, stated rather than closed, each with a fixture in the suite and a backlog row:
+//   (a) a BALANCED set of loose prose quotes straddling a fan-out — every quote finds a partner and
+//       none is left over, so nothing is left to notice;
+//   (b) prose whose last word before the apostrophe is one of the keywords below;
+//   (c) prose that puts the apostrophe after an OPERATOR — `/* rock - 'n roll */` — which is a legal
+//       opener position in code and which this predicate cannot tell from prose.
+// None of the three is a regression: all admit at the pre-fix revision too. What bounds them is the
+// dual evaluation in `runBothViews` — a denial from the shipped views still stands.
+const LITERAL_OPENERS = new Set([
+  'return', 'case', 'throw', 'typeof', 'instanceof', 'new', 'delete', 'void', 'yield', 'await', 'else',
+])
+
+function checkLiteralOpen(line, i) {
+  let p = i - 1
+  while (p >= 0 && (line[p] === ' ' || line[p] === '\t')) p--
+  if (p < 0) return true
+  if (!/[A-Za-z0-9_$)\]\\]/.test(line[p])) return true
+  // Walk the IDENTIFIER backwards. This read `/([A-Za-z_$][\w$]*)$/.exec(line.slice(0, p + 1))`,
+  // which copies the whole line prefix and rescans it FOR EVERY QUOTE — quadratic in line length,
+  // and every ordinary `return 'x'` pays it. Measured by the closing review on one long line:
+  // 253 KB took 33.8 s against 62 ms before this build, ~4x per doubling, so about half a megabyte
+  // clears the 60 s hook timeout. **A PreToolUse hook that times out is NON-BLOCKING**, so the cost
+  // was not slowness, it was a fan-out walking straight past the guard. The same measurement after
+  // this rewrite: 87 ms. The walk is bounded by the identifier, never by the line.
+  let s = p
+  while (s >= 0 && /[A-Za-z0-9_$]/.test(line[s])) s--
+  if (s === p) return false
+  return LITERAL_OPENERS.has(line.slice(s + 1, p + 1))
+}
+
+function resolveLiteralEnd(line, i) {
+  if (!checkLiteralOpen(line, i)) return -1
+  const q = line[i]
+  let e = i + 1
+  while (e < line.length && line[e] !== q) e += line[e] === '\\' ? 2 : 1
+  return e < line.length ? e : -1
+}
+
 // Blank the CONTENTS of single/double-quoted string literals so a `parallel(`
 // mentioned in prose (a meta.description, a log message) isn't read as a call.
-// Template literals (backticks) are left ALONE — they can hold real ${code}.
-// Escapes handled; an unbalanced quote (e.g. inside a comment) is left as-is.
+// ONE ORDERED PASS, not two `replace()` sweeps: the single-quote sweep used to run first and pair
+// the apostrophe inside a DOUBLE-quoted `"don't"` with the quote opening `agent('a'`, blanking the
+// `parallel(` between them. A single pass consumes `"don't"` whole and never sees its apostrophe.
+// A same-line template span is skipped WHOLE — its prose contributes no opener — but its text is
+// KEPT, so a primitive named inside a lens prompt still denies exactly as it did before
+// (`TOOL-aLexedStripper-3` owns that false positive and this build does not touch it). The cost is
+// that a quoted `'http://x'` inside such a span survives into the line-comment strip below, which
+// the dual evaluation bounds rather than this function.
 // Run BEFORE the line-comment strip so a `//` inside a string can't truncate it.
-function stripStrings(line) {
+function renderStrippedLine(line) {
+  let out = ''
+  let i = 0
+  while (i < line.length) {
+    const ch = line[i]
+    if (ch === '`') {
+      let e = i + 1
+      while (e < line.length && line[e] !== '`') e += line[e] === '\\' ? 2 : 1
+      if (e < line.length) { out += line.slice(i, e + 1); i = e + 1; continue }
+      out += ch; i++; continue
+    }
+    if (ch === "'" || ch === '"') {
+      const e = resolveLiteralEnd(line, i)
+      if (e >= 0) { out += ch + ch; i = e + 1; continue }
+      out += ch; i++; continue
+    }
+    out += ch
+    i++
+  }
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// TOOL-dMispairedQuote-3 — the NO-REGRESSION guarantee.
+//
+// The three views below are the SHIPPED ones, kept VERBATIM. They are not dead code and they are
+// not a second answer to the question the new views answer: every rule is evaluated over BOTH,
+// and a denial from EITHER stands. That makes the change monotone in the DENY direction by
+// construction, so no script this hook denies today can be admitted after it.
+//
+// WHY A PROPERTY AND NOT THREE FIXTURES. Correcting what counts as a string literal does not only
+// un-hide fan-outs; it un-hides every OTHER character the old mispairing was blanking, and this
+// file's rules 2 and 3 walk brackets and balance parens ACROSS lines. Three separate DENY-to-ADMIT
+// moves were reproduced against the improved views alone: a backtick inside a regex literal
+// reaching the template-mode switch, a regex-borne `)` closing a multi-line call site early so a
+// declared cap of 50 fell through to the helper default, and a `//` inside a quoted span inside a
+// template truncating rule 1's line. Each has its own fixture below, and each was ALSO closed by
+// this one property — which is what makes the property worth its bytes: the next repair to these
+// views inherits it without knowing these three shapes.
+// ---------------------------------------------------------------------------
+function renderShippedLine(line) {
   return line.replace(/'(?:\\.|[^'\\])*'/g, "''").replace(/"(?:\\.|[^"\\])*"/g, '""')
+}
+
+function renderShippedView(script) {
+  const out = []
+  let mode = 'code' // code | tmpl
+  const stack = [] // 'tmpl' | 'interp', innermost last
+  let interpDepth = 0 // brace depth inside the current interpolation
+  for (const raw of script.split(/\r?\n/)) {
+    let res = ''
+    let i = 0
+    while (i < raw.length) {
+      const ch = raw[i]
+      const two = raw.slice(i, i + 2)
+      if (mode === 'code') {
+        if (two === '//') break
+        if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; i++; continue }
+        if (ch === "'" || ch === '"') {
+          // An UNPAIRED quote is ordinary text, not a string. This used to run to end of line
+          // and then append a closer the source never had, swallowing the rest of that line --
+          // and any fan-out sitting on it went too, ADMITTING a script the shipped hook DENIES.
+          // The measured case is an apostrophe inside a regex literal, /won't/. `stripStrings`
+          // needs a matching PAIR before it blanks anything, and so does this now.
+          const q = ch
+          let e = i + 1
+          while (e < raw.length && raw[e] !== q) e += raw[e] === '\\' ? 2 : 1
+          if (e >= raw.length) { res += ch; i++; continue }
+          res += q + q
+          i = e + 1
+          continue
+        }
+        // Inside an interpolation, the matching `}` returns to the template it came from. Depth is
+        // counted so an object literal or a block inside the expression does not close it early.
+        if (stack.length && stack[stack.length - 1] === 'interp') {
+          if (ch === '{') interpDepth++
+          else if (ch === '}') {
+            if (interpDepth === 0) { stack.pop(); mode = 'tmpl'; res += ' '; i++; continue }
+            interpDepth--
+          }
+        }
+        res += ch
+        i++
+      } else if (mode === 'tmpl') {
+        if (ch === '\\') { i += 2; continue }
+        if (two === '${') { stack.push('interp'); interpDepth = 0; mode = 'code'; res += '  '; i += 2; continue }
+        if (ch === '`') { stack.pop(); mode = 'code'; res += '`'; i++; continue }
+        i++
+      }
+    }
+    out.push(res)
+  }
+  // THIS VIEW DOES NOT BLANK BLOCK COMMENTS, and that is the fix rather than an omission. It cannot
+  // tell a real block-comment opener from one inside a regex literal, so every blanking it did on
+  // hide a fan-out: a regex-borne opener closed by a later ordinary closer ends the scan back in
+  // code mode with an empty stack, no flag fires, and the span between is gone from the view. Two
+  // closing-review rounds measured that, and the second one measured the smaller repair -- widening
+  // the flag -- as insufficient for exactly this shape. The view this replaced blanked no block
+  // comment either, so leaving them alone cannot regress against it, and un-blanked comment text can
+  // only ADD apparent code, never hide it. That is the same fail-closed posture rule 1 already
+  // documents for a primitive named inside a block comment.
+  //
+  // The flag still reports every mode that outlives the scan, which now means an unterminated
+  // TEMPLATE only.
+  return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
+}
+
+function renderShippedBlanks(script) {
+  const out = []
+  let mode = 'code' // code | tmpl | block
+  for (const raw of script.split(/\r?\n/)) {
+    let res = ''
+    let i = 0
+    while (i < raw.length) {
+      const ch = raw[i]
+      const two = raw.slice(i, i + 2)
+      if (mode === 'code') {
+        if (two === '//') break
+        if (two === '/*') { mode = 'block'; i += 2; continue }
+        if (ch === '`') { mode = 'tmpl'; res += '`'; i++; continue }
+        if (ch === "'" || ch === '"') {
+          res += ch
+          const q = ch
+          i++
+          while (i < raw.length && raw[i] !== q) i += raw[i] === '\\' ? 2 : 1
+          res += q
+          i++
+          continue
+        }
+        res += ch
+        i++
+      } else if (mode === 'tmpl') {
+        if (ch === '\\') { i += 2; continue }
+        if (ch === '`') { mode = 'code'; res += '`'; i++; continue }
+        i++
+      } else {
+        if (two === '*/') { mode = 'code'; i += 2; continue }
+        i++
+      }
+    }
+    out.push(res)
+  }
+  return out
+}
+
+// ---------------------------------------------------------------------------
+// TOOL-dMispairedQuote-3 — the NO-REGRESSION guarantee, as a DISPATCHER.
+//
+// Every rule below reads its view through one of these three names and none of them knows there are
+// two implementations. `main()` runs the whole rule set, and if nothing denied, sets the mode to
+// `shipped` and runs it again: a denial from EITHER pass stands, so no script this hook denies today
+// can be admitted after the change.
+//
+// WHY A DISPATCHER AND NOT A PARAMETER. The first cut threaded a `shipped` flag through each rule
+// function, which needs a CENSUS of which rule reads which view — and that census was wrong for two
+// of the four: `fanoutFindings` reads the lexed view AND the per-line one on its fallback branch, and
+// `scanJoinFindings` reads the blanked view AND the per-line one. A census that has to be right is a
+// census that can be wrong, and getting it wrong silently drops half the guarantee. Here every read
+// goes through a dispatcher by construction and no rule function changes at all.
+//
+// A MODULE-LEVEL MODE is safe here and nowhere near a general licence: this file is a one-shot CLI
+// that reads stdin, decides, and exits. There is no concurrency, no second script in flight, and
+// `main()` is the only writer.
+let VIEW_MODE = 'lexed' // 'lexed' | 'shipped'
+
+function renderStrippedView(line) {
+  return VIEW_MODE === 'shipped' ? renderShippedLine(line) : renderStrippedLine(line)
+}
+
+function renderCodeView(script) {
+  return VIEW_MODE === 'shipped' ? renderShippedView(script) : renderLexedView(script)
+}
+
+function renderBlankedLiterals(script) {
+  return VIEW_MODE === 'shipped' ? renderShippedBlanks(script) : renderBlankedView(script)
+}
+
+// Run one rule over BOTH views and merge. The mode is restored before returning, so a rule that
+// throws cannot leave the next one reading the wrong view. Findings merge on `n`, the 1-based line
+// number every rule's finding shape carries — and on the `why` beside it where one exists, because
+// `capFindings` can push more than one finding for a single line and keying on `n` alone would drop
+// the second.
+function runBothViews(rule, script) {
+  // BOTH passes are isolated, and neither may turn a crash into an admission. `main()` has no
+  // top-level catch and a PreToolUse hook that exits 1 is NON-BLOCKING, so an unguarded lexed pass
+  // handed a crashing script straight through — reproduced by the closing review with a
+  // 9000-deep nested ternary that the pre-fix hook DENIES at exit 2. A throw in the corrected views
+  // must fall through to the shipped ones, which is what this file did before this build.
+  let lexed = []
+  let lexedThrew = false
+  try {
+    lexed = rule(script)
+  } catch (e) {
+    lexedThrew = true
+  }
+  VIEW_MODE = 'shipped'
+  let shipped = []
+  let shippedThrew = false
+  try {
+    shipped = rule(script)
+  } catch (e) {
+    shippedThrew = true
+  } finally {
+    VIEW_MODE = 'lexed'
+  }
+  // BOTH threw: this file cannot read the script at all, and FAIL CLOSED is its stated posture
+  // everywhere else. The pre-fix hook exited 1 here and admitted; denying is stricter than BASE and
+  // is the one place this build deliberately is.
+  if (lexedThrew && shippedThrew)
+    return [{ n: 1, line: String(script).split(/\r?\n/)[0] || '', why: 'this file could not scan the script under EITHER view — a script it cannot read is not a script it may approve' }]
+  const key = (f) => f.n + '\u0000' + (f.why === undefined ? '' : f.why)
+  const seen = new Set(lexed.map(key))
+  return lexed.concat(shipped.filter((f) => !seen.has(key(f))))
 }
 
 function offendingLines(script) {
@@ -81,7 +370,7 @@ function offendingLines(script) {
     .map((line, i) => ({ line, n: i + 1 }))
     .filter(({ line }) => {
       if (line.includes('gov:bounded-fanout')) return false // sanctioned helper line
-      const code = stripStrings(line).split('//')[0] // strings blanked, then line-comments
+      const code = renderStrippedView(line).split('//')[0] // strings blanked, then line-comments
       return raw.test(code)
     })
 }
@@ -244,7 +533,7 @@ function boundedBranch(br, name, consts, ok) {
       else if (c === ')' || c === ']' || c === '}') d--
       j++
     }
-    // An unclosed segment is REFUSED, never assumed closed. `stripStrings` blanks '' and "" but not
+    // An unclosed segment is REFUSED, never assumed closed. `renderStrippedView` blanks '' and "" but not
     // a template literal, so a stray `(` inside one strands this counter - and the safe reading of
     // "this file cannot tell where the chain ends" is that it cannot prove the receiver bounded.
     if (d !== 0) return false
@@ -254,16 +543,16 @@ function boundedBranch(br, name, consts, ok) {
   return links > 0
 }
 
-// TOOL-aLexedStripper-2 — the view RULE 2 reads, and the reason it is not `blankLiterals`.
+// TOOL-aLexedStripper-2 — the view RULE 2 reads, and the reason it is not `renderBlankedLiterals`.
 //
-// Rule 2 counts a lens array's elements and walks brackets to do it. `stripStrings` (line 70) blanks
+// Rule 2 counts a lens array's elements and walks brackets to do it. `renderStrippedView` (line 70) blanks
 // '…' and "…" per line and leaves backticks ALONE, so a lens PROMPT — which is a backticked template
 // literal full of English — reaches those counters as though it were code. Measured against the
 // shipped hook, five prose spellings DENIED a correct five-element fan in the multi-line array shape
 // every harness here is written in: a literal `...` (read as a spread), and an unmatched `[`, `]`,
 // `)` or `}` (read as bracket structure). None of them is code.
 //
-// `blankLiterals` cannot be that view, and this was measured rather than reasoned. It blanks template
+// `renderBlankedLiterals` cannot be that view, and this was measured rather than reasoned. It blanks template
 // CONTENTS including `${…}` bodies, which hold real code — an `agent(` inside a multi-line
 // interpolation is DENIED today and would have been ADMITTED. And its mode is carried across lines,
 // so one unterminated backtick blanks every later line and an unbounded burst below it would have
@@ -274,7 +563,14 @@ function boundedBranch(br, name, consts, ok) {
 // whether the scan ended inside a template literal.
 //
 // TOOL-aLexedStripper-5 — what that last flag is FOR, and what it is not. It does NOT fail closed.
-// This file models no regex literal (neither does `blankLiterals`), so a backtick inside `/…/`
+// TOOL-dMispairedQuote-1 — and the sentence below is TRUE and is NOT the explanation anyone came
+// looking for. A raw fan-out got past rule 1 whenever an apostrophe shared its line, and the regex
+// literal in the report was one of five spellings: a double-quoted `"don't"`, a block comment, a
+// backticked `don't` and loose prose all did it too. The mechanism was the APOSTROPHE, and the fix
+// is `checkLiteralOpen` above, not a regex model. What modelling regex literals would buy is
+// separate and is not built: a regex's CONTENTS supply the backtick, the `)` and the `//` that made
+// correcting the quote rule un-hide delimiters, which is why the shipped views are still evaluated.
+// This file models no regex literal (neither does `renderBlankedLiterals`), so a backtick inside `/…/`
 // opens template mode and never closes — on a LEGAL script the shipped hook admits. Denying on the
 // flag traded one false-positive class for another. Instead an unterminated scan FALLS BACK to the
 // per-line view rule 2 read before, which returns the shipped hook's own verdict for that script:
@@ -284,7 +580,7 @@ function boundedBranch(br, name, consts, ok) {
 // RESIDUAL, named the way `memory/map/features/agent-cap.md` names rule 1's: a script containing a
 // regex literal with an odd backtick count is judged at the shipped hook's precision, not the
 // improved one. That is a smaller and stated loss.
-function renderCodeView(script) {
+function renderLexedView(script) {
   const out = []
   let mode = 'code' // code | tmpl
   const stack = [] // 'tmpl' | 'interp', innermost last
@@ -299,16 +595,16 @@ function renderCodeView(script) {
         if (two === '//') break
         if (ch === '`') { stack.push('tmpl'); mode = 'tmpl'; res += '`'; i++; continue }
         if (ch === "'" || ch === '"') {
-          // An UNPAIRED quote is ordinary text, not a string. This used to run to end of line
-          // and then append a closer the source never had, swallowing the rest of that line --
-          // and any fan-out sitting on it went too, ADMITTING a script the shipped hook DENIES.
-          // The measured case is an apostrophe inside a regex literal, /won't/. `stripStrings`
-          // needs a matching PAIR before it blanks anything, and so does this now.
-          const q = ch
-          let e = i + 1
-          while (e < raw.length && raw[e] !== q) e += raw[e] === '\\' ? 2 : 1
-          if (e >= raw.length) { res += ch; i++; continue }
-          res += q + q
+          // An UNPAIRED quote is ordinary text, not a string, AND SO IS ONE WHOSE ONLY AVAILABLE
+          // PARTNER IS THE WRONG ONE. This used to run to end of line and append a closer the source
+          // never had, swallowing the rest of that line -- and any fan-out sitting on it went too.
+          // `addc6169` fixed THAT by demanding a matching PAIR, which is where it stopped: for
+          // `/won't/ ... agent('a'` a pair exists, the prose apostrophe and the quote opening the
+          // call, and blanking between them erased the `agent(` this rule counts (TOOL-dMispairedQuote-1).
+          // `resolveLiteralEnd` asks whether a literal opens here AT ALL, which a pair test cannot reach.
+          const e = resolveLiteralEnd(raw, i)
+          if (e < 0) { res += ch; i++; continue }
+          res += ch + ch
           i = e + 1
           continue
         }
@@ -352,8 +648,13 @@ function fanoutFindings(script) {
   // TOOL-aLexedStripper-5: an unterminated scan falls back to the per-line view, which returns
   // the verdict this hook reached before rule 2 moved. Not a fail-closed branch: that denied a
   // legal script carrying a regex literal with a backtick in it.
+  // TOOL-dMispairedQuote-1 SUPERSEDES the "returns the verdict this hook reached before" half. That
+  // record was CLOSED on the argument that this fallback IS the shipped behaviour and therefore
+  // cannot regress in either direction; the per-line view has since been re-based, so the argument
+  // no longer holds and is not the reason to trust this branch. What holds is the no-regression
+  // property: `runBothViews` evaluates this rule over the SHIPPED views too.
   const view = renderCodeView(script)
-  const code = view.unterminated ? lines.map((l) => stripStrings(l).split('//')[0]) : view.code
+  const code = view.unterminated ? lines.map((l) => renderStrippedView(l).split('//')[0]) : view.code
 
   // integer consts bound in this file, e.g. `const MAX_VERIFIERS = 5`
   const { consts } = intConsts(code)
@@ -593,12 +894,22 @@ function fanoutFindings(script) {
 // MAX_VERIFIERS is a denial. The burden is on the fan-out.
 const HELPERS = /(?<![.\w$])(boundedParallel|boundedPipeline)\s*\(/g
 
+// TOOL-dMispairedQuote-1 — the re-baselining this header's author declined is DONE, and measured.
+// The quote branch below now asks `resolveLiteralEnd` whether a literal opens at all, which removes
+// both of this branch's defects: it ran to end of line synthesizing a closer the source never had,
+// and it paired a prose apostrophe with the next quote. Rule 3 reads the BOUND through a cross-line
+// paren join, so either one hid a declared width behind an ordinary-looking comment; a cap of 50 was
+// reproduced as ADMITTED. The three dozen measured arms this header worried about all still pass,
+// and eleven more were added. The claim below that string AND template contents are gone therefore
+// holds for every span this file can RESOLVE as a literal, and a quote it cannot resolve is left as
+// text on a line that is still blanked.
+//
 // A literal-blanked view: string AND TEMPLATE contents gone, comments gone, delimiters and structure
 // kept. The per-line strip the two rules above run on cannot see a template literal spanning lines,
 // and a `(` inside a prompt string unbalances a forward paren join — which is the one mechanism this
 // rule is built on. Deliberately a SECOND view rather than a replacement: the existing strip carries
 // three dozen measured arms and is not worth re-baselining for a rule that can afford its own pass.
-function blankLiterals(script) {
+function renderBlankedView(script) {
   const out = []
   let mode = 'code' // code | tmpl | block
   for (const raw of script.split(/\r?\n/)) {
@@ -612,12 +923,10 @@ function blankLiterals(script) {
         if (two === '/*') { mode = 'block'; i += 2; continue }
         if (ch === '`') { mode = 'tmpl'; res += '`'; i++; continue }
         if (ch === "'" || ch === '"') {
-          res += ch
-          const q = ch
-          i++
-          while (i < raw.length && raw[i] !== q) i += raw[i] === '\\' ? 2 : 1
-          res += q
-          i++
+          const e = resolveLiteralEnd(raw, i)
+          if (e < 0) { res += ch; i++; continue }
+          res += ch + ch
+          i = e + 1
           continue
         }
         res += ch
@@ -678,7 +987,7 @@ function topLevelArgs(text) {
 
 function capFindings(script) {
   const lines = script.split(/\r?\n/)
-  const code = blankLiterals(script)
+  const code = renderBlankedLiterals(script)
   const { consts, orBound } = intConsts(code)
   const bad = []
 
@@ -967,14 +1276,14 @@ function guardAgentSpawn(data) {
 // gate's self-test asserts - those arms are this port's regression suite, and an unedited arm
 // proving an unchanged verdict is worth more than a prettier string.
 //
-// S2 - the view is `blankLiterals`, the one this file already defines, rather than a second
+// S2 - the view is `renderBlankedLiterals`, the one this file already defines, rather than a second
 // character scanner. That is a deliberate NARROWING: the awk kept string CONTENTS and only stripped
 // comments, so it matched the retired identifier inside a string. Two fixtures in the self-test pin
 // the difference in both directions. A regex LITERAL survives the blanking, which is why the gate
 // excludes this file from its own population - the ban table below would otherwise match itself.
 function scanJoinFindings(script) {
   const raws = script.split(/\r?\n/)
-  const code = blankLiterals(script)
+  const code = renderBlankedLiterals(script)
   const out = []
   // S3 - one ban table, tested against every view of the line. It was three inline conditions per
   // view until the M8 closing review found the second view missing; duplicating them per view would
@@ -987,7 +1296,7 @@ function scanJoinFindings(script) {
   for (let i = 0; i < code.length; i++) {
     const l = code[i]
     const raw = raws[i] === undefined ? l : raws[i]
-    // M8 closing review, HIGH: `blankLiterals` blanks template CONTENTS, so a join written inside a
+    // M8 closing review, HIGH: `renderBlankedLiterals` blanks template CONTENTS, so a join written inside a
     // `${...}` interpolation was invisible - a coverage regression against the awk this rule
     // replaced, which kept string contents. These harnesses render every report through template
     // literals, so that is exactly where such an expression lives. The interpolation SPANS are
@@ -998,10 +1307,10 @@ function scanJoinFindings(script) {
     // ROUND 2 - this took its spans from the RAW line, so the second view reached into COMMENTS and
     // into plain quoted strings and rule 5 started firing on prose. That refuted this rule's own
     // narrowing doctrine two lines above, and check-review-join.sh's, in the same commit that wrote
-    // them both down. The span view is comment-stripped and quote-blanked first: `stripStrings`
+    // them both down. The span view is comment-stripped and quote-blanked first: `renderStrippedView`
     // leaves backticks alone, which is the whole point - a `${…}` is only an interpolation inside a
     // template literal, and inside a '' or "" string it is three characters of text.
-    const interp = stripStrings(raw).split('//')[0]
+    const interp = renderStrippedView(raw).split('//')[0]
     const views = [l].concat(interp.match(/\$\{[^}]*\}/g) || [])
     let why = null
     for (const b of BANS) {
@@ -1082,7 +1391,7 @@ function main() {
   }
   if (!script) process.exit(0) // a `name:` run: no source reaches this hook (see the protocol)
 
-  const fan = ONLY === null ? fanoutFindings(script) : []
+  const fan = ONLY === null ? runBothViews(fanoutFindings, script) : []
   if (fan.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a verify/fan-out stage spawns one agent per item. The review protocol ` +
@@ -1102,7 +1411,7 @@ function main() {
   // RULE 3 runs AFTER the arity rule on purpose. A one-argument `boundedParallel(all.map(…))` breaks
   // both, and the arity message is the one that names the defect an operator has to fix; reversing
   // the order would retitle the rule-2 corpus without changing a verdict.
-  const caps = ONLY === null ? capFindings(script) : []
+  const caps = ONLY === null ? runBothViews(capFindings, script) : []
   if (caps.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a bound is written here that this file cannot resolve at or under ` +
@@ -1123,7 +1432,7 @@ function main() {
   // Order is unchanged and still decides which message an operator sees: the three rules above all
   // prevent a BURST, the expensive failure this hook exists for, while a ref-keyed join is a wrong
   // verdict, which is cheap to re-run.
-  const bad = ONLY === null ? offendingLines(script) : []
+  const bad = ONLY === null ? runBothViews(offendingLines, script) : []
   if (bad.length) {
   const shown = bad
     .slice(0, 6)
@@ -1154,7 +1463,7 @@ function main() {
   }
 
   // RULE 5 - the ref-keyed verdict join. LAST because it is the cheapest failure to recover from.
-  const joins = scanJoinFindings(script)
+  const joins = runBothViews(scanJoinFindings, script)
   if (joins.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a ref-keyed verdict join. A review harness that joins each finding to ` +

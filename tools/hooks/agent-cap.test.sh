@@ -911,5 +911,339 @@ js "renderCodeView: a raw primitive inside a block comment still denies (fail-cl
 const r = await parallel(D.map((d) => () => agent(d.p)))
 EOF
 
+
+# ---- TOOL-dMispairedQuote-1: a quote pairs with the WRONG partner ---------------------------------
+# Every arm below was staged RED against the tip before it landed. The defect: each of this file's
+# string views pairs a quote with the next quote of the same kind on the line, so an apostrophe in
+# prose earlier on that line pairs with the quote opening `agent('a'` and the span blanked between
+# them carries the fan-out. `addc6169` already demanded a matching PAIR; a pair exists, and it is the
+# wrong one. The construct holding the apostrophe is not the mechanism -- these arms carry a regex, a
+# double-quoted string, a block comment and a template literal, and the shipped hook admitted all
+# four. The CONTROL beside each is the same line with the apostrophe removed.
+
+js "mispaired quote: regex literal shares the fan-out line -> deny" 2 <<'EOF'
+const re = /won't/
+const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: SAME LINE is the load-bearing part -> deny" 2 <<'EOF'
+const re = /won't/; const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: control, same line without the apostrophe -> deny" 2 <<'EOF'
+const re = /wont/; const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: apostrophe in a DOUBLE-quoted string -> deny" 2 <<'EOF'
+const s = "don't"; const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: apostrophe in a BLOCK COMMENT -> deny" 2 <<'EOF'
+/* don't */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: apostrophe in a TEMPLATE literal -> deny" 2 <<'EOF'
+const s = `don't`; const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: LOOSE apostrophe opening a word -> deny" 2 <<'EOF'
+/* run 'em */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "mispaired quote: rule 2 counter loses the agent( -> deny" 2 <<'EOF'
+const re = /won't/; const r = await boundedParallel(all.map((f) => () => agent('x')), 5)
+EOF
+
+js "mispaired quote: rule 2 control, no apostrophe -> deny" 2 <<'EOF'
+const re = /wont/; const r = await boundedParallel(all.map((f) => () => agent('x')), 5)
+EOF
+
+js "mispaired quote: rule 3 loses a declared cap of 50 -> deny" 2 <<'EOF'
+const B = ['a','b']
+const re = /won't/; const r = await boundedParallel(B.map((x) => () => agent('x')), 50)
+EOF
+
+js "mispaired quote: rule 3, an unpaired double quote swallows the bound -> deny" 2 <<'EOF'
+const B = ['a','b']
+const c = x === 5"; const r = await boundedParallel(B.map((x) => () => agent(x)), 50)
+EOF
+
+# Rule 5, the ref-keyed-join ban, is defeated by the same apostrophe and nobody had named it. Both
+# of these ADMIT at the tip and deny after.
+js "mispaired quote: rule 5 join hidden by an apostrophe -> deny" 2 <<'EOF'
+const re = /won't/; m.get(f.ref); const s = 'x'
+EOF
+
+js "mispaired quote: rule 5 verdictByRef hidden by an apostrophe -> deny" 2 <<'EOF'
+const re = /won't/; const verdictByRef = {}; const s = 'x'
+EOF
+
+js "mispaired quote: rule 5 control, no apostrophe -> deny" 2 <<'EOF'
+const re = /wont/; m.get(f.ref); const s = 'x'
+EOF
+
+# ---- and the ADMIT direction, which is half the class -------------------------------------------
+# A fixture group that only ever asserts denials cannot catch a fail-closed that has become a
+# fail-open. Each of these passes at the tip and must keep passing.
+
+js "mispaired quote: a legal log() with a contraction in its trailing comment -> allow" 0 <<'EOF'
+log('parallel(') // we don't allow it
+EOF
+
+js "mispaired quote: return + a string naming a primitive -> allow" 0 <<'EOF'
+function f() { return 'parallel (nope)' }
+await boundedParallel([() => agent(1)], 5)
+EOF
+
+js "mispaired quote: case + a string naming a primitive -> allow" 0 <<'EOF'
+switch (x) { case 'parallel (nope)': break }
+await boundedParallel([() => agent(1)], 5)
+EOF
+
+js "mispaired quote: throw + a string naming a primitive -> allow" 0 <<'EOF'
+if (x) throw 'pipeline (nope)'
+await boundedParallel([() => agent(1)], 5)
+EOF
+
+js "mispaired quote: aLexedStripper-5's own fixture stays legal -> allow" 0 <<'EOF'
+const SEP = /[`]/
+const all = ['a','b']
+await boundedParallel(all.map((x) => () => agent(x)), 5)
+EOF
+
+# ---- the keyword clause, fixtured over its DECLARED SET rather than sampled ----------------------
+# `checkLiteralOpen` admits a quote as an opener after a JS keyword, because `return 'x'` is ordinary
+# code. Eleven keywords are declared and each is also an English word, so `/* <keyword> 'em */`
+# mispairs for every member: a STATED residual, one arm per member so the leak is recorded rather
+# than assumed away, and none of them a regression -- all eleven ADMIT at the tip too. The three
+# connectives dropped from the set are the CONTROL: they deny.
+for kw in return case throw typeof instanceof new delete void yield await else; do
+  js "keyword residual: /* $kw 'em */ above a raw parallel( -> allow (stated residual)" 0 <<EOF
+/* $kw 'em */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+done
+
+for kw in in of do run one; do
+  js "keyword control: /* $kw 'em */ is not a declared opener -> deny" 2 <<EOF
+/* $kw 'em */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+done
+
+
+# ---- TOOL-dMispairedQuote-3: no denial may be LOST ------------------------------------------------
+# Correcting what counts as a string literal does not only un-hide fan-outs; it un-hides every other
+# character the old mispairing was blanking, and rules 2, 3 and 5 walk brackets and balance parens
+# ACROSS lines. Three DENY-to-ADMIT moves were reproduced against unit 1 alone. Each has a fixture
+# here, and each was ALSO closed by the property arm below -- which is what makes the property worth
+# its bytes: the next repair to these views inherits it without knowing these three shapes.
+
+js "no-regress: a backtick inside a regex, above a multi-line cap-50 call -> deny" 2 <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}
+const L = ['a','b']
+const re = /it's`don't/
+await boundedParallel(
+  L.map((s) => () => agent(s)),
+  50,
+)
+EOF
+
+js "no-regress: an exposed backtick leaks the template mode -> deny" 2 <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}
+const L = ['a','b']
+const re = /a'b`c/
+await boundedParallel(
+  L.map((s) => () => agent(s)),
+  50,
+)
+EOF
+
+js "no-regress: a quoted URL inside a same-line template -> deny" 2 <<'EOF'
+const p = `see 'http://x' now`; await parallel(all.map(f))
+EOF
+
+js "no-regress: a DOUBLE-quoted URL in a template does it without an apostrophe -> deny" 2 <<'EOF'
+const p = `see "http://x" now`; await parallel(all.map(f))
+EOF
+
+# ---- S10: `verbatim` is CHECKED, not asserted ----------------------------------------------------
+# The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
+# differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.
+GOV_BASE_SHA=${GOV_BASE_SHA:-d65da7ab}
+# DERIVED, never spelled: a `tools/hooks/` literal is gov's own install prefix and resolves to
+# nothing in a target that installed this kit elsewhere, which is what the shipped-surface ratchet
+# refuses. `git ls-files --full-name` answers where THIS hook actually lives in THIS tree.
+HOOKREL=$(git -C "$HERE" ls-files --full-name -- "$HOOK" 2>/dev/null | head -1)
+if [ -n "$HOOKREL" ] && git -C "$HERE" show "$GOV_BASE_SHA:$HOOKREL" > "$TMP/base-hook.js" 2>/dev/null; then
+  cat > "$TMP/byte.py" <<'PYEOF'
+import sys, pathlib
+base = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n")
+cur = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n")
+PAIRS = [("function stripStrings(line) {", "function renderShippedLine(line) {"),
+         ("function renderCodeView(script) {", "function renderShippedView(script) {"),
+         ("function blankLiterals(script) {", "function renderShippedBlanks(script) {")]
+def block(text, header):
+    ls = text.split("\n")
+    s = ls.index(header)
+    e = s
+    while ls[e] != "}":
+        e += 1
+    return "\n".join(ls[s + 1:e + 1])
+bad = 0
+for b, c in PAIRS:
+    try:
+        if block(base, b) != block(cur, c):
+            print("DRIFT %s is not the BASE bytes of %s" % (c, b)); bad += 1
+    except ValueError as e:
+        print("MISSING %s or %s (%s)" % (b, c, e)); bad += 1
+print("bodies-compared 3 drifted %d" % bad)
+sys.exit(1 if bad else 0)
+PYEOF
+  "$TESTPY" "$TMP/byte.py" "$TMP/base-hook.js" "$HOOK" > "$TMP/byte.out" 2>&1
+  if [ $? = 0 ]; then
+    echo "ok   no-regress: the three renderShipped* bodies are the BASE bytes"; pass=$((pass+1))
+  else
+    echo "FAIL no-regress: a renderShipped* body has drifted from BASE"; sed 's/^/     /' "$TMP/byte.out"; fail=$((fail+1))
+  fi
+else
+  echo "skip no-regress byte arm — $GOV_BASE_SHA:${HOOKREL:-<this hook is not tracked here>} does not resolve in this tree, so there is nothing to compare the frozen bodies against"
+fi
+
+# ---- S9: THE PROPERTY. No script this hook denied at BASE may be admitted now. --------------------
+# The population is every tracked file PLUS the fixtures below. The second half is not padding:
+# unit 1 alone flips ZERO tracked files, because every reproduced shape is synthetic. A property arm
+# whose population holds no instance of the class it guards can only ever pass.
+if [ -s "$TMP/base-hook.js" ]; then
+  mkdir -p "$TMP/nrfix"
+  cat > "$TMP/nrfix/backtick-in-regex.js" <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}
+const L = ['a','b']
+const re = /it's`don't/
+await boundedParallel(
+  L.map((s) => () => agent(s)),
+  50,
+)
+EOF
+  cat > "$TMP/nrfix/exposed-backtick.js" <<'EOF'
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}
+const L = ['a','b']
+const re = /a'b`c/
+await boundedParallel(
+  L.map((s) => () => agent(s)),
+  50,
+)
+EOF
+  cat > "$TMP/nrfix/template-borne-comment.js" <<'EOF'
+const p = `see 'http://x' now`; await parallel(all.map(f))
+EOF
+  cat > "$TMP/nr.py" <<'PYEOF'
+import json, subprocess, sys, pathlib
+base_hook, cur_hook, root, fixdir = sys.argv[1:5]
+root = pathlib.Path(root).resolve()
+files = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True, text=True).stdout.split()
+pop = [root / f for f in files] + sorted(pathlib.Path(fixdir).glob("*.js"))
+lost, denied, n = [], 0, 0
+for p in pop:
+    try:
+        body = p.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        continue
+    payload = json.dumps({"tool_name": "Workflow", "tool_input": {"script": body}})
+    a = subprocess.run(["node", base_hook], input=payload, capture_output=True, text=True, timeout=120).returncode
+    n += 1
+    if a != 2:
+        continue
+    denied += 1
+    b = subprocess.run(["node", cur_hook], input=payload, capture_output=True, text=True, timeout=120).returncode
+    # ADMISSION IS `exit != 2`, not `exit == 0`. The hook BLOCKS only on 2, so a crash (1) or a
+    # timeout is an admission too — and scoring it as 0 made this arm blind to exactly the two
+    # defects the closing review found in the code it guards.
+    if b != 2:
+        lost.append("%s (exit %d)" % (p, b))
+for f in lost:
+    print("LOST a denial: %s" % f)
+print("population %d scanned, %d denied at BASE, %d denial(s) lost" % (n, denied, len(lost)))
+sys.exit(1 if lost or denied == 0 else 0)
+PYEOF
+  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$HERE/../.." "$TMP/nrfix" > "$TMP/nr.out" 2>&1
+  if [ $? = 0 ]; then
+    echo "ok   no-regress: no denial lost against BASE ($(tail -1 "$TMP/nr.out"))"; pass=$((pass+1))
+  else
+    echo "FAIL no-regress: a denial the BASE hook made is gone"; sed 's/^/     /' "$TMP/nr.out"; fail=$((fail+1))
+  fi
+else
+  echo "skip no-regress property arm — the BASE blob does not resolve in this tree, so there is no shipped hook to compare verdicts against"
+fi
+
+
+# ---- closing-review folds: a guard that times out, or crashes, does not guard --------------------
+# A PreToolUse hook is NON-BLOCKING when it times out AND when it exits 1. Both were reachable.
+
+# F1. `checkLiteralOpen` copied the whole line prefix per quote, so cost was quadratic in LINE
+# length and every ordinary `return 'x'` paid it. Measured before the fix: 253 KB on one line took
+# 33.8 s against 62 ms at BASE. This arm is a BUDGET, not a verdict: it fails if the hook takes
+# longer on one long line than a generous multiple of the same script split across lines.
+long_one=$("$TESTPY" -c "
+import json
+n = 8000
+line = 'const x = [' + ','.join(\"f(a%d, 'lit%d')\" % (i, i) for i in range(n)) + ']'
+print(json.dumps({'tool_name':'Workflow','tool_input':{'script': line}}))
+")
+t0=$(date +%s)
+printf '%s' "$long_one" | node "$HOOK" >/dev/null 2>&1
+t1=$(date +%s)
+if [ $((t1 - t0)) -le 10 ]; then
+  echo "ok   quadratic budget: 8000 literals on ONE line in $((t1 - t0))s (<= 10s)"; pass=$((pass+1))
+else
+  echo "FAIL quadratic budget: 8000 literals on ONE line took $((t1 - t0))s — a hook that times out is NON-BLOCKING"; fail=$((fail+1))
+fi
+
+# F2. A throw in the corrected views must not become an admission. This script drives
+# `parseBranches` past its recursion limit, which is PRE-EXISTING: the BASE hook exits 1 on it and
+# therefore does not block. Denying is stricter than BASE and is this file's stated posture.
+deep=$("$TESTPY" -c "
+import json
+k = ' ? args.big : '.join('c%d' % i for i in range(9000))
+sc = 'const K = ' + k + ' : args.big // gov:fixed-verifiers\nawait boundedParallel(K.map((g) => () => agent(g)), 5)'
+print(json.dumps({'tool_name':'Workflow','tool_input':{'script': sc}}))
+")
+printf '%s' "$deep" | node "$HOOK" >/dev/null 2>&1; deeprc=$?
+if [ "$deeprc" = 2 ]; then
+  echo "ok   crash posture: a script neither view can scan is DENIED, not admitted at exit 1"; pass=$((pass+1))
+else
+  echo "FAIL crash posture: a script neither view can scan exited $deeprc — only 2 blocks"; fail=$((fail+1))
+fi
+
+
+# Residual (c), from the closing review: an apostrophe after an OPERATOR is in a legal opener
+# position, so prose that writes one still mispairs. Not a regression — it admits at BASE too — and
+# it is fixtured here so the leak is recorded rather than assumed away, with its control beside it.
+js "opener residual: an apostrophe after an operator still mispairs -> allow (stated residual)" 0 <<'EOF'
+/* rock - 'n roll */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
+js "opener residual: control, the same line without the apostrophe -> deny" 2 <<'EOF'
+/* rock - n roll */ const r = await parallel([() => agent('a'), () => agent('b')])
+EOF
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

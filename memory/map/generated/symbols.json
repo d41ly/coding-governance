@@ -268,11 +268,6 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
-      "id": "blankLiterals",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
       "id": "blob_at",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -521,6 +516,11 @@
       "id": "checkDriveRootLitter",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "checkLiteralOpen",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "checkUnderRoot",
@@ -1366,6 +1366,11 @@
       "id": "json_artifact_inventory",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "key",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "key",
@@ -2268,6 +2273,16 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "renderBlankedLiterals",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderBlankedView",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderCodeView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -2276,6 +2291,36 @@
       "id": "renderDeny",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "renderLexedView",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderShippedBlanks",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderShippedLine",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderShippedView",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderStrippedLine",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderStrippedView",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "render_affordance_exempt",
@@ -2381,6 +2426,11 @@
       "id": "resolveHomeRoots",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "resolveLiteralEnd",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "resolveRealPath",
@@ -2591,6 +2641,11 @@
       "id": "run",
       "kind": "function",
       "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "runBothViews",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "run_brief",
@@ -2871,11 +2926,6 @@
       "id": "step",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "stripStrings",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "structure_identity",

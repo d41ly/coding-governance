@@ -129,6 +129,7 @@
       "unattended"
     ],
     "gotcha-classes": [
+      "a-pair-exists-and-it-is-the-wrong-one.md",
       "absence-assertion-over-whole-file-text.md",
       "allowlist-narrower-than-the-root-it-guards.md",
       "amendment-leaves-its-other-half-standing.md",
