@@ -50,7 +50,18 @@ answer on disk.
   sequentially and records the order declaration for whoever re-opens `TOOL-cBriefedPilot-28`.
 
 ## Parked decisions
-- None yet.
+- **The Skill's `--disposition` flag does not exist.** It instructs a run to record the
+  NON-CONVERGENT exit with `--disposition fold|promote` and says the merge bar reads that field; the
+  driver refuses the flag and the checker has zero occurrences of it.
+- **`agent-cap.js` forbids the one dispatch shape the ratified parallelism verdict permits.** It
+  denies an `agent()` in any loop body unconditionally, so bounded-parallel is allowed by the hook
+  and refused by `TOOL-cBriefedPilot-21`, while sequential is required by that verdict and refused by
+  the hook. Unit 4 sits in the gap and took the only shape both allow.
+- **The protocol renders at exactly its `INDEX_CAP_BYTES`.** Unit 5's section was paid for by
+  compressing fourteen passages; the next addition reds the bar before it is written.
+
+Each carries its options and the reason it was refused in `RUN.md`. `TOOL-dBriefedPass-6`, `-7` and
+`-8` are the backlog rows this build filed rather than parked.
 
 <!-- roster:units -->
 
