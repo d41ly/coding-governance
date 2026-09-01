@@ -1,11 +1,12 @@
 # TOOL-dFoldedVerdict-4 — `agent-cap` admits a strictly sequential awaited `agent()` under a marker that names a bound
 
-**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 5
+**Status:** CLOSED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-TOOL-dFoldedVerdict-4-1-sequential-marker.md](../build/2026-09-01-build-TOOL-dFoldedVerdict-4-1-sequential-marker.md) | journal | — |
 | [2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md) | spec-audit | TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 |
 
 <!-- /gen:spec-records -->

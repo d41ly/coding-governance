@@ -122,9 +122,12 @@ An `agent(` call reached through an iteration construct is allowed only when its
   (`.filter` or `.slice`) and the chain must CONSUME to a balanced close, and the whole right-hand
   side is vetoed if it can grow. A bare reassignment of the name afterwards takes the bound back.
 
-Everything else is denied: a `for` / `while` / `forEach` body containing `agent(`, a `.map` /
-`.flatMap` / `Array.from` over any other receiver, and a marked line whose second argument is an
-expression, a `.length`, a parameter, or a literal above 5.
+Everything else is denied: a `forEach` body containing `agent(`, a `for` / `while` body that does
+not carry a conforming `gov:sequential-agents(<K>)` marker on its header, a `.map` / `.flatMap` /
+`Array.from` over any other receiver, and a marked line whose second argument is an expression, a
+`.length`, a parameter, or a literal above 5. The sequential marker is the one loop affordance and
+it is a CLAIM, not an exemption: `tools/hooks/README.md` owns its grammar and the hook checks every
+clause of it, including that exactly one awaited call sits in the marked body.
 
 **`<K>` resolves** — one definition, used by every consumer above — when it is an integer literal ≤ 5,
 or an identifier bound DIRECTLY by `const <name> = <int>` and never reassigned. An `<expr> || <int>`

@@ -29,6 +29,22 @@ which is the configuration this hook was rewritten to stop shipping.
   LITERAL whose element count it can count here; or an identifier it has already proven bounded,
   alone or followed by operations that cannot grow it. A branch it cannot delimit never qualifies, so
   an expression the hook cannot read lands on the deny side rather than being waved through.
+- An `agent(` inside a `for` / `while` body. This is the ONE loop shape the hook admits, and only
+  under `gov:sequential-agents(<K>)` written as a line comment on the LOOP HEADER. It exists because
+  a ratified `parallelism route: none` verdict forbids the bounded PARALLEL fan the hook permits,
+  while the hook forbade the strictly sequential dispatch that verdict requires — a harness iterating
+  a build's units sat in the gap and could not be written at all.
+  EIGHT clauses must all hold and the refusal names the first that does not: the marker is read from
+  the RAW header line, since both code views break their scan on `//`; it carries a bound token and
+  that token resolves through the same `<K>` definition every other consumer uses; the header is a
+  real loop in the literal-blanked view, so a marker inside a string blesses nothing; the loop
+  ITERATES A BARE IDENTIFIER the hook has already proven bounded, which is what makes the marker's
+  number real rather than asserted; this occurrence is directly preceded by `await`; and no `=>` or
+  `function` sits between the header and the call, because a deferred call is a thunk array.
+  A NINTH condition is judged after the scan: exactly ONE admitted call may resolve to any one loop
+  header. Two awaited calls in one marked body spend twice the bound, so without it the marker would
+  name a number the loop does not obey. Nested loops fail closed with no extra clause — the walk
+  stops at the first enclosing loop, so an inner loop needs its own marker and its own receiver.
 - The marked DERIVATION receiver, which is the third form above and was undocumented until now. A
   marked assignment may derive its receiver from something already proven bounded — a `.filter()` or
   a `.slice()`, which cannot grow an array — and the bound is inherited. Mentioning a bounded name is

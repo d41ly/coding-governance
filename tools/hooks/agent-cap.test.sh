@@ -172,6 +172,126 @@ const b = splitInto(all, 9) // gov:fixed-verifiers
 const r = await boundedParallel(b.map((g) => () => agent(g)), 5)
 EOF
 
+# ---- gov:sequential-agents (TOOL-dFoldedVerdict-4) ----------------------------------------------
+# THE ONE LOOP SHAPE THE HOOK ADMITS. Owner-ratified spelling, 2026-09-01. It exists because a
+# ratified `parallelism route: none` verdict forbids the bounded PARALLEL fan this hook permits while
+# this hook forbade the strictly sequential dispatch that verdict requires — a harness iterating a
+# build's units sat in the gap and could not be written at all.
+#
+# The ADMIT arm first, then one arm per clause. Each refusal names the FIRST clause that failed, so
+# a fixture breaking two clauses proves only the earlier one — which is why C8's fixture keeps its
+# `await` and breaks the function boundary instead.
+js "seq: marked, bounded receiver, awaited, one call → ALLOW" 0 <<'EOF'
+const MAX = 5
+const units = [1, 2, 3, 4, 5]
+const out = []
+for (const u of units) { // gov:sequential-agents(MAX)
+  out.push(await agent('do ' + u, { label: 'u' }))
+}
+EOF
+js "seq: an array LITERAL receiver is bounded too → ALLOW" 0 <<'EOF'
+const units = ['a', 'b', 'c']
+const out = []
+for (const u of units) { // gov:sequential-agents(3)
+  out.push(await agent('do ' + u, { label: 'u' }))
+}
+EOF
+# C3 — a bare marker claims concurrency one and says nothing about the TOTAL, which is the half the
+# owner ruling insists on. Two rules, not one.
+js "seq: a bare marker with no bound → deny" 2 <<'EOF'
+const units = [1, 2, 3]
+const out = []
+for (const u of units) { // gov:sequential-agents
+  out.push(await agent('do ' + u, { label: 'u' }))
+}
+EOF
+# C4 — the number is CHECKED, through the same resolver every other consumer uses.
+js "seq: a bound above the cap → deny" 2 <<'EOF'
+const units = [1, 2, 3]
+const out = []
+for (const u of units) { // gov:sequential-agents(9)
+  out.push(await agent('do ' + u, { label: 'u' }))
+}
+EOF
+# AC6 — a bound the file cannot RESOLVE, in the two shapes that look resolved and are not. An
+# `<expr> || <int>` right-hand side is a caller-settable knob wearing a constant's clothes, which is
+# how two shipped harnesses raised their own verifier count past the cap while every gate stayed
+# green; a `.length` is a number nobody wrote down.
+js "seq: an or-bound K → deny" 2 <<'EOF'
+const K = (args && args.cap) || 5
+const units = [1, 2, 3]
+const out = []
+for (const u of units) { // gov:sequential-agents(K)
+  out.push(await agent('do ' + u, { label: 'u' }))
+}
+EOF
+js "seq: a .length K → deny" 2 <<'EOF'
+const units = [1, 2, 3]
+const out = []
+for (const u of units) { // gov:sequential-agents(units.length)
+  out.push(await agent('do ' + u, { label: 'u' }))
+}
+EOF
+# C6 — THE CLAUSE THAT CARRIES THE WEIGHT. Without it the marker's number is an author's assertion
+# over an array of any size, which is the shape the owner ruling names as the thing to refuse.
+js "seq: marked, but the receiver is not proven bounded → deny" 2 <<'EOF'
+const units = findings.map((f) => f.id)
+const out = []
+for (const u of units) { // gov:sequential-agents(5)
+  out.push(await agent('do ' + u, { label: 'u' }))
+}
+EOF
+# C7 — AWAIT-ADJACENCY on THIS occurrence. A loop that collects unawaited calls is building a thunk
+# array with extra steps.
+js "seq: marked and bounded but the call is not awaited → deny" 2 <<'EOF'
+const units = [1, 2, 3]
+const out = []
+for (const u of units) { // gov:sequential-agents(3)
+  out.push(agent('do ' + u, { label: 'u' }))
+}
+EOF
+# C8 — awaited, but through a function boundary, which is the evasion the ban exists for. This
+# fixture keeps the `await` deliberately: break C7 as well and the refusal names C7 and proves
+# nothing about C8.
+js "seq: awaited THROUGH a function boundary → deny" 2 <<'EOF'
+const units = [1, 2, 3]
+const out = []
+for (const u of units) { // gov:sequential-agents(3)
+  const run = async () => out.push(await agent('do ' + u, { label: 'u' }))
+  await run()
+}
+EOF
+# THE NINTH CONDITION, judged after the scan. Two awaited calls in one marked body spend twice the
+# bound, so the marker would name a number the loop does not obey.
+js "seq: TWO awaited calls in one marked body → deny" 2 <<'EOF'
+const units = [1, 2, 3]
+const out = []
+for (const u of units) { // gov:sequential-agents(3)
+  out.push(await agent('a ' + u, { label: 'u' }))
+  out.push(await agent('b ' + u, { label: 'u' }))
+}
+EOF
+# NESTED LOOPS FAIL CLOSED with no extra clause: the walk stops at the first enclosing loop, so an
+# unmarked inner loop inside a marked outer one is refused at the inner header.
+js "seq: an unmarked inner loop inside a marked outer one → deny" 2 <<'EOF'
+const units = [1, 2, 3]
+const out = []
+for (const u of units) { // gov:sequential-agents(3)
+  for (const p of u.parts) {
+    out.push(await agent('do ' + p, { label: 'p' }))
+  }
+}
+EOF
+# AND THE UNMARKED LOOP STILL DENIES WITH ITS ORIGINAL SENTENCE. This is the arm that proves the
+# marker is an affordance and not a weakening: no claim, no change.
+js "seq: an unmarked loop is denied exactly as before → deny" 2 <<'EOF'
+const units = [1, 2, 3]
+const out = []
+for (const u of units) {
+  out.push(await agent('do ' + u, { label: 'u' }))
+}
+EOF
+
 # THE BYPASSES. Every one of these was ALLOWED by the first cut of rule 2 and reported "clean" by the
 # merge-bar leg that delegates to it — found by an adversarial review of the commit that introduced
 # the rule, each reproduced against this tree before it was fixed. They are here because a whitelist
@@ -1124,6 +1244,23 @@ fi
 # whose population holds no instance of the class it guards can only ever pass.
 if [ -s "$TMP/base-hook.js" ]; then
   mkdir -p "$TMP/nrfix"
+  # TOOL-dFoldedVerdict-4 S7. The FIRST is the ratified path: BASE denies it, this hook admits it, and
+  # deleting the marker restores the denial — which is what makes the loss marker-attributed rather
+  # than merely tolerated. The SECOND is the control: an unmarked braceless loop that BOTH hooks deny,
+  # so the affordance is proven scoped to the marker and not to loops in general.
+  cat > "$TMP/nrfix/seq-marked-bounded.js" <<'EOF'
+const MAX = 5
+const units = [1, 2, 3, 4, 5]
+const out = []
+for (const u of units) { // gov:sequential-agents(MAX)
+  out.push(await agent('do ' + u, { label: 'u' }))
+}
+EOF
+  cat > "$TMP/nrfix/seq-unmarked-braceless.js" <<'EOF'
+const units = [1, 2, 3]
+const out = []
+for (const u of units) out.push(await agent('do ' + u, { label: 'u' }))
+EOF
   cat > "$TMP/nrfix/backtick-in-regex.js" <<'EOF'
 async function boundedParallel(thunks, cap = 5) {
   const out = []
@@ -1161,7 +1298,7 @@ base_hook, cur_hook, root, fixdir = sys.argv[1:5]
 root = pathlib.Path(root).resolve()
 files = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True, text=True).stdout.split()
 pop = [root / f for f in files] + sorted(pathlib.Path(fixdir).glob("*.js"))
-lost, denied, n = [], 0, 0
+lost, ratified, denied, n = [], [], 0, 0
 for p in pop:
     try:
         body = p.read_text(encoding="utf-8", errors="replace")
@@ -1178,11 +1315,27 @@ for p in pop:
     # timeout is an admission too — and scoring it as 0 made this arm blind to exactly the two
     # defects the closing review found in the code it guards.
     if b != 2:
-        lost.append("%s (exit %d)" % (p, b))
+        # CLASS-SCOPED RATIFICATION (TOOL-dFoldedVerdict-4). A denial this hook no longer makes is
+        # ratified ONLY when the marker is what bought it: strip every `gov:sequential-agents` token
+        # from the bytes and re-run. Denial restored means the marker did it, and the loss is this
+        # unit's declared affordance. Denial NOT restored means something else changed, and that is a
+        # regression whatever it looks like. No path list and no BASE-sha bump: the ratification is
+        # keyed on the CLASS, so a file nobody thought to enumerate is graded the same way.
+        stripped = body.replace("gov:sequential-agents", "")
+        rp = json.dumps({"tool_name": "Workflow", "tool_input": {"script": stripped}})
+        r = subprocess.run(["node", cur_hook], input=rp, capture_output=True, text=True, timeout=120).returncode
+        if r == 2:
+            ratified.append("%s (exit %d, denial restored by removing the marker)" % (p, b))
+        else:
+            lost.append("%s (exit %d)" % (p, b))
 for f in lost:
     print("LOST a denial: %s" % f)
-print("population %d scanned, %d denied at BASE, %d denial(s) lost" % (n, denied, len(lost)))
-sys.exit(1 if lost or denied == 0 else 0)
+for f in ratified:
+    print("RATIFIED a marker-attributed loss: %s" % f)
+# REDS ON ZERO RATIFICATIONS, so the ratification branch cannot go unexercised and pass by never
+# running — which is the same could-not-fail shape as the empty-population guard beside it.
+print("population %d scanned, %d denied at BASE, %d denial(s) lost, %d ratified" % (n, denied, len(lost), len(ratified)))
+sys.exit(1 if lost or denied == 0 or not ratified else 0)
 PYEOF
   "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$HERE/../.." "$TMP/nrfix" > "$TMP/nr.out" 2>&1
   if [ $? = 0 ]; then

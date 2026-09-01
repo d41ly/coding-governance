@@ -2828,6 +2828,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "seqRefusal",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "settings_merge_src",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"

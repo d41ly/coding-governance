@@ -5,7 +5,7 @@ opened: 2026-09-01
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 TOOL-dFoldedVerdict-7
+ids: TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 TOOL-dFoldedVerdict-7 TOOL-dFoldedVerdict-8
 ---
 
 # dFoldedVerdict — a FOLD becomes recordable, and the contract stops outgrowing its cap
@@ -66,7 +66,7 @@ parallelism verdict permits, and the protocol renders at its byte cap.
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 6 unit(s) · node d · opened 2026-09-01 · streams tooling
-ids TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 TOOL-dFoldedVerdict-7
+ids TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 TOOL-dFoldedVerdict-7 TOOL-dFoldedVerdict-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -75,11 +75,11 @@ ids TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFold
 | [TOOL-dFoldedVerdict-1 — the driver records which disposition a review exit took](spec/2026-09-01-spec-TOOL-dFoldedVerdict-1.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-01 |
 | [TOOL-dFoldedVerdict-2 — clause 3 reads the recorded disposition, behind a dated cutoff](spec/2026-09-01-spec-TOOL-dFoldedVerdict-2.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-01 |
 | [TOOL-dFoldedVerdict-3 — the exit rows say which disposition they took, and `origin/main` goes green](spec/2026-09-01-spec-TOOL-dFoldedVerdict-3.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-4 — `agent-cap` admits a strictly sequential awaited `agent()` under a marker that names a bound](spec/2026-09-01-spec-TOOL-dFoldedVerdict-4.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-4 — `agent-cap` admits a strictly sequential awaited `agent()` under a marker that names a bound](spec/2026-09-01-spec-TOOL-dFoldedVerdict-4.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-01 |
 | [TOOL-dFoldedVerdict-6 — the whole-document compression pass](spec/2026-09-01-spec-TOOL-dFoldedVerdict-6.md) | 6 | 2 | SPECCED | rev-4 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

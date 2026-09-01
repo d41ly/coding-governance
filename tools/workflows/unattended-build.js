@@ -39,8 +39,13 @@ export const meta = {
 //
 // ---------------------------------------------------------------------------------------------
 // TWO SHAPES HERE ARE FORCED RATHER THAN CHOSEN, and both come from one denial.
-// `tools/hooks/agent-cap.js` refuses an `agent()` inside ANY loop body, unconditionally: its
-// whitelist is closed and names no marker for the case. So the only shapes it admits are a bounded
+// `tools/hooks/agent-cap.js` refused an `agent()` inside ANY loop body when this file was written,
+// with a closed whitelist naming no marker for the case. `TOOL-dFoldedVerdict-4` has since added
+// `gov:sequential-agents(<K>)`, so a bounded sequential loop over a proven-bounded identifier is now
+// admissible and these are no longer the only shapes. Both are KEPT because both remain correct:
+// stage order is structural either way, and a convergence loop's iteration count is data-dependent,
+// so it has no bounded receiver to name and the marker cannot reach it. The shapes it admitted were
+// a bounded
 // PARALLEL fan — which the ratified verdict above forbids — and a SINGLE call. Measured by running
 // the hook's own predicate over two earlier drafts of this file; it denied every loop site, calling
 // a strictly sequential `await agent(...)` "a loop-built thunk array". The conflict is PARKED for
