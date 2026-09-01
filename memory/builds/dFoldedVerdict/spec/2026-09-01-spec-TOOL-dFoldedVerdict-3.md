@@ -1,10 +1,12 @@
 # TOOL-dFoldedVerdict-3 — the two exit rows say which disposition they took, and `origin/main` goes green
 
-**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md) | spec-audit | TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 |
 
 <!-- /gen:spec-records -->
 
@@ -21,35 +23,60 @@ and supersedes `TOOL-aClosedDocket-4`.
 
 ## 2. Scope (IN)
 
-- **S1 — reproduce, then verify, before writing a byte.** Re-run the leg and confirm the message.
-  Then re-derive the disposition of all six blockers from `dMispairedQuote`'s own reviews and spec
-  revision logs. **If any blocker was silently dropped, the red is TRUE and this unit reports that
-  instead of clearing it.** The verification done at authoring time is recorded in section 4 and is
-  re-run at build time rather than trusted from here.
+- **S1 — reproduce, then verify, before writing a byte.** Re-run the leg and confirm the message
+  **this unit's PRE-IMAGE ships, which is not the message this spec was authored against.**
+  `TOOL-dFoldedVerdict-2` lands at order 2 and replaces the shortfall sentence with an
+  absent-disposition refusal, so a reproduction aimed at the BASE wording would report a sibling as
+  having broken the leg. Section 4 carries both messages, each labelled with the image it belongs to,
+  and the reproduction targets the second. Then re-derive the disposition of all six blockers from
+  `dMispairedQuote`'s own reviews and spec revision logs. **If any blocker was silently dropped, the
+  red is TRUE and this unit reports that instead of clearing it.** The verification done at authoring
+  time is recorded in section 4 and is re-run at build time rather than trusted from here.
 - **S2 — the two exit rows gain a disposition**, in the byte shape unit 1's writer emits, appended
   to the reason tail after the terminal token. Row 33 takes the promote value and row 43 the fold
   value; the per-subject evidence for each is in section 4.
 - **S3 — a `disposition-source:` provenance block** in that record's `## Run facts`, stating why no
   verb could write those rows, what independently verifies each value, and what is deliberately not
   reconstructed. It copies `landed-anchor-source:` one key over.
-- **S4 — the mixed-exit rule is written down**, because one of the two subjects took BOTH
-  dispositions and a rule discovered per record is a rule nobody applies next time.
+- **S4 — the mixed-exit rule is written down IN A NAMED CARRIER**, because one of the two subjects
+  took BOTH dispositions and a rule discovered per record is a rule nobody applies next time. The
+  carrier is a new class record at `memory/gotchas/one-value-field-records-a-mixed-outcome.md`. Its
+  derived anchors reach `memory/builds/dMispairedQuote/RUN.md` and both scripts that read the field,
+  so `python tools/memory-tree/gotchas.py --for-diff` hands the rule to the next agent whose diff
+  touches a run-state record instead of waiting to be looked up. Section 4 says why that corpus and
+  not the protocol.
 - **S5 — `TOOL-aClosedDocket-4` is superseded**, as a status flip with a successor pointer and never
   a deletion. Two acts, not one: the spec header flips, and the amendment is recorded on
-  `aClosedDocket`'s own live run record with `--rescope --act supersede`, because without that row
-  check 24 reds — this unit trades one red for another otherwise.
+  `aClosedDocket`'s own live run record with `--rescope --act retire --item TOOL-aClosedDocket-4`,
+  naming this unit as the successor **in `--reason` and never in a `--successor` field.** Check 24's
+  RETIRE arm demands that row and a `--act supersede` row would red its successor arm permanently,
+  on another build's record. Section 4 carries both arms read at source and the reason the act is
+  `retire`.
 - **S6 — the generated artifacts are regenerated in the same commit** as the claim edit, so hygiene
-  check 9 and the build README slot contract stay green over the flipped status.
+  check 9 and the build README slot contract stay green over the flipped status. S4's new class
+  record adds a second render to that step: `python tools/memory-tree/gotchas.py --write` re-renders
+  `memory/gotchas/INDEX.md`, which hygiene check 17 byte-compares.
 - **S7 — the acceptance is CORPUS-WIDE, never record-wide.** The leg is asserted to exit 0 over
   every tracked run-state record, not over `dMispairedQuote` alone. Fixing one file and scanning
   only that file certifies coverage this unit does not have, and section 8 names a live instance of
   exactly that exposure.
+- **S8 — the `TOOL-dMispairedQuote-7` backlog row is repointed.** That row's text records it as
+  SUPERSEDED BY `TOOL-aClosedDocket-4` — the unit S5 is about to flip to WONTDO — so without this
+  item the backlog's only route from the measured defect to its fix names a WONTDO unit, and it goes
+  stale in the same commit that fixes it. The pointer is repointed at `TOOL-dFoldedVerdict-1`,
+  `TOOL-dFoldedVerdict-2` and `TOOL-dFoldedVerdict-3`, the three units that answer it.
+  `memory/backlog/TOOL.md` is edited in place: one row's text, no new row and no new id. This item is
+  owned HERE and not by `TOOL-dFoldedVerdict-2`, whose own backlog scope is the two rows that unit
+  answers.
 
 ## 3. Non-goals (OUT)
 
 - **N1 — no driver and no checker code.** The disposition flag belongs to `TOOL-dFoldedVerdict-1`
   and check 2's new predicate to `TOOL-dFoldedVerdict-2`. This unit writes records only, which is
-  why no kit version moves and no `ARMS_FLOORS` pin is touched.
+  why no `ARMS_FLOORS` pin is touched and why `KIT_UNATTENDED_VERSION` does not move here. That bump
+  is the build's LAST landing unit's — `TOOL-dFoldedVerdict-6` — by owner ruling of 2026-09-01, and
+  it moves ONCE across the carriers `bash tools/check-kit-versions.sh` asserts AGREE rather than
+  move. No file under `tools/` is touched by this unit at all.
 - **N2 — the other eleven records with an exited subject are not retrofitted.** Measured over the
   tracked corpus: thirteen run-state files carry a `NON-CONVERGENT` or `CEILING` review row, and
   eleven of them are dated 2026-08-31 or earlier. They are unit 2's cutoff's business.
@@ -68,7 +95,12 @@ and supersedes `TOOL-aClosedDocket-4`.
 
 ## 4. Design
 
-### The red, reproduced
+### The red, reproduced — and at WHICH image
+
+Two messages carry this red, one per image, and only the second is the one S1 reproduces. Pinning the
+first would calibrate the integrity check against text that no longer exists when it runs.
+
+**At BASE `adc0543c`, which is NOT this unit's pre-image:**
 
 ```
 UNATTENDED check 2 FAILED — review loops that ran past the ceiling, stalled without recording it, or exited without promoting:
@@ -79,6 +111,17 @@ Observed 2026-09-01 on this worktree at `adc0543c`; `bash tools/unattended/check
 exited 1. The count is reproducible by hand: the generated units region of that build's README holds
 three ids at HEAD and two at its run BASE `d9efe373`, so `newids` is 1 against an `nneed` of 2. The
 record and the README are both on `origin/main` at `3fb57da7`, so this is not a worktree artifact.
+
+**At this unit's PRE-IMAGE, after `TOOL-dFoldedVerdict-1` and `TOOL-dFoldedVerdict-2` land:** that
+sentence is gone. Unit 2's S7 rewrites clause 3's messages for the graded path and its own Migration
+section says so outright — the red changes from a shortfall claim to an **absent-disposition
+refusal**, naming the file and its exited subjects and carrying no counts at all. Unit 2's AC1 states
+the same expectation from the other side, naming both `memory/builds/dMispairedQuote/RUN.md` and
+`memory/builds/dBriefedPass/RUN.md` under that refusal with `DISPOSITION_CUTOFF="2026-09-01"`
+declared. That is the observation S1 reproduces and AC1 below asserts; the shortfall wording above is
+kept only as the BASE-image record of what this design was derived from. Neither message is quoted
+verbatim for the pre-image here, because unit 2 owns the wording and a second copy of it in this
+document is a copy that rots — AC1 asserts the refusal's CLASS and the names it carries.
 
 ### The disposition, per subject, verified from that build's own records
 
@@ -111,6 +154,31 @@ own spec is where the whole exit's accounting lives, fold half included. Recordi
 instead would be false about three of the four blockers and would throw away the only corroborable
 claim on the row. A third enum member was rejected: see the alternatives below.
 
+**Where the rule lives, and why not the protocol.** S4 exists because a rule discovered per record is
+a rule nobody applies next time — so a rule whose only home is the `disposition-source:` block of the
+one record that provoked it is buried, not written down. Round 1's audit found exactly that: the word
+"mixed" occurred nowhere in this build outside this spec and the block it emits. The carrier is a new
+class record under `memory/gotchas/`, and the choice is deliberate rather than convenient:
+
+- **Not `memory/guides/UNATTENDED-PROTOCOL.md`.** That document is moved and compressed by
+  `TOOL-dFoldedVerdict-5` and `TOOL-dFoldedVerdict-6`, and neither carries a scope item for this
+  sentence. Writing the requirement into this spec and expecting a sibling to satisfy it is the
+  producer-less handoff round 1 filed as its own finding class, one unit over. A spec may not assign
+  work to a unit that owns no carrier for it.
+- **Not `memory/guides/BUILD-METHOD.md` M4**, which is the sentence the rule amends. That file is a
+  RENDER of a template under `tools/`, so amending it moves a shipped kit file — which N1 forbids
+  here and which would make a record-only unit edit the memory-tree kit.
+- **The gotchas corpus fits the shape.** The class is real and is not specific to this record: a
+  field that holds ONE value is asked to record an outcome that had two, and whichever value is
+  written is false about part of it. The corpus is routed by DERIVED anchors, so
+  `python tools/memory-tree/gotchas.py --for-diff` hands the rule to the next diff that touches a
+  run-state record rather than waiting to be remembered. Hygiene check 18 makes the record declare
+  its resolution and check 19 makes it prove it can fire; N5 already states this class is ungated, so
+  the record says "no gate" in as many words rather than implying one.
+
+Section 6 observes the carrier by grep and by `--for-paths`, so a pass that writes the rule nowhere
+fails a criterion instead of passing quietly.
+
 ### Why no verb can write these two rows
 
 Three independent refusals, each read at source in `tools/unattended/unattended.sh`:
@@ -133,8 +201,9 @@ the `TOOL-dMispairedQuote-7` backlog row.
 `memory/builds/dCarriedReceipt/RUN.md:14-21` is the shape. A `landed-anchor: remote` line sits beside
 a `landed-anchor-source:` block that names who reconstructed it and when, says why the verb could not
 write it, states what independently verifies the value, and names the one field deliberately left
-unreconstructed. `memory/builds/aGroundedOrientation/RUN.md:11` carries the same key as a single line
-for the same class. Two tracked records carry it today. The prompt for this unit said four records
+unreconstructed. `memory/builds/aGroundedOrientation/RUN.md:17` carries the same key as a single line
+for the same class — rev-1 cited `:11`, which is that file's `## Run facts` heading; corrected here
+after round 1 re-derived it. Two tracked records carry it today. The prompt for this unit said four records
 were repaired that way; only two carry the key and the commit trail names two repair commits, so the
 figure four is **UNVERIFIED** here and nothing in this unit rests on it.
 
@@ -193,7 +262,7 @@ disposition-source: reconstructed 2026-09-01 by TOOL-dFoldedVerdict-3 — this r
 No continuation line begins with a dash or a pipe, so the protocol's anchor ban holds and no id in
 that block is anchored to this build folder.
 
-### The supersession, which is two acts
+### The supersession, which is two acts — and only one of them is a `supersede`
 
 `TOOL-aClosedDocket-4` is RATIFIED, OPEN, and order 4 of a run stalled at `BUILDING`. The owner
 authorized this build taking its scope after being shown the collision, and the build README records
@@ -204,14 +273,61 @@ that ruling; M3 does not delegate a sibling build's scope, so this is an owner a
    RESOLVED, which is what hygiene check 12 requires before a terminal status. The rev moves to rev-3
    with a section 9 line, because a successor pointer is a content change and not the pure status
    flip `memory/TEMPLATE-SPEC.md` exempts from a rev bump.
-2. `bash tools/unattended/unattended.sh --rescope aClosedDocket --act supersede --unit
-   TOOL-aClosedDocket-4 --successor TOOL-dFoldedVerdict-3 --reason ...` records the amendment on that
-   build's own run record. **This half is not optional.** Check 24's RETIRE arm demands a `retire` or
-   `supersede` rescope row for any id that is WONTDO now and was not so at the run's pinned baseline;
-   that record's baseline region carries no unit rows at all, so the fallback baseline applies and
-   the row is still owed. Without it this unit trades check 2's red for check 24's. The verb accepts
-   it: the record is non-terminal, so `refuse_if_terminal` passes, and the unit is in the current
-   units region, which is the membership test the supersede arm applies.
+2. `bash tools/unattended/unattended.sh --rescope aClosedDocket --act retire --item
+   TOOL-aClosedDocket-4 --reason "scope taken by TOOL-dFoldedVerdict-3 under the owner ruling of
+   2026-09-01"` records the amendment on that build's own run record. The reason names the successor
+   as a BARE id and nothing else — no path and no link, so nothing in the other run's record is
+   anchored into this build folder, and the id is enough to find it. **This half is not optional.** Check 24's RETIRE arm demands a `retire` or `supersede`
+   rescope row for any id that is WONTDO now and was not so at the run's pinned baseline; verified,
+   that record's baseline units region at `733552e1` carries no unit rows at all, so the fallback
+   baseline applies and the row is still owed. Without it this unit trades check 2's red for
+   check 24's. The verb accepts it: the record is at `phase: BUILDING`, so `refuse_if_terminal`
+   passes, and `TOOL-aClosedDocket-4` is in the current units region, which is the membership test
+   `verb_rescope` applies to `--item` for both `retire` and `supersede`.
+
+**Why the act is `retire` and NOT `supersede`, which is what rev-1 wrote.** Round 1's audit filed
+this as its only blocker and it is confirmed at source; the reasoning rev-1 gave for the act was
+inverted, so it is replaced rather than defended.
+
+Check 24 has TWO arms over rescope rows and a `supersede` row reaches both:
+
+- The RETIRE arm at `tools/unattended/check-unattended.sh:1770` is satisfied by either act — its
+  predicate is `grep -qE "item (retire|supersede) $rsid( |$)"` over the record's rescope rows.
+- The SUPERSESSION arm at `:1777-1780` then extracts every `item supersede <id> -> <succ>` and reds
+  unless `id_in "$rs_now" "$rssucc"`. `rs_now` is bound at `:1713` to THAT record's own build README
+  `gen:build-units` region, which for `aClosedDocket` carries `TOOL-aClosedDocket-1` through `-4` and
+  nothing else. `id_in` at `tools/unattended/lib-unattended.sh:37` is a whole-token match. **A
+  `dFoldedVerdict` id can never be a member of it.**
+
+So a `--act supersede --successor TOOL-dFoldedVerdict-3` row does not clear a red, it CREATES one,
+and it creates it permanently on another build's record. The record is at `BUILDING`, so the
+`LANDED|ABORTED` skip never applies; `verb_rescope` membership-tests only `--item` and never the
+successor, so the driver ACCEPTS the write; `park()` at `tools/unattended/unattended.sh:3796`
+appends with `>>` to a record no verb rewrites, and no verb can remove a row. Only a second hand edit
+could clear it, on a build this session does not own. That is the exact opposite of this unit's
+purpose.
+
+**Check 24 has no cross-build supersession shape, and that is by design rather than by omission.**
+The arm's own comment reads that a supersession which never landed its replacement is a retirement
+wearing a better name — `--act supersede` is a WITHIN-build mechanism whose successor is graded
+against the executing roster, and no record sanctions a successor from another build. A `retire` row
+carries no ` -> ` and therefore never reaches the successor arm at all, while satisfying the RETIRE
+arm that actually demands it. The successor is named in `--reason`, which the leg does not parse and
+which a reader of the other run does. If a true cross-build supersession record is ever wanted, it is
+its own unit against `tools/unattended/check-unattended.sh:1776` with its own backlog row, and not a
+scope item here.
+
+**The flag is `--item`, not `--unit`, and the driver's own refusals misspell it.** Verified at
+source: the arg loop binds `--item` to `PK_ITEM` at `tools/unattended/unattended.sh:4781` and
+`--unit` to `BR_UNIT` at `:4783`, which only `--brief` reads; the dispatch at `:4852` passes
+`$PK_ITEM` as `verb_rescope`'s third positional, and the driver's own usage header at `:14` spells
+`--rescope <slug> --act <...> --item <id>`. Spelled `--unit`, `PK_ITEM` is empty and the verb refuses
+before writing anything — reproduced by round 1, which got `check 48 FAILED — --rescope --unit is not
+id-shaped by the driver's own spelling … (none)`. **The trap is worth carrying:** `verb_rescope`'s
+own `fail 48` texts name the parameter `--unit` while the parser takes `--item`, so an operator who
+copies the refusal is misled by it, and rev-1 of this spec copied the message rather than the parser.
+The same misspelling appears in `TOOL-dUnstalledConvoy-5`'s AC1, so it reads as a house spelling
+rather than a typo.
 
 What this build discharges of that unit's scope, and what it does not:
 
@@ -230,9 +346,11 @@ What this build discharges of that unit's scope, and what it does not:
 | Path | Change |
 |---|---|
 | `memory/builds/dMispairedQuote/RUN.md` | S2, S3 — two row tails and one provenance block |
+| `memory/gotchas/one-value-field-records-a-mixed-outcome.md` | S4 — the mixed-exit rule's carrier, a new class record |
 | `memory/builds/aClosedDocket/spec/2026-08-31-spec-TOOL-aClosedDocket-4.md` | S5 — header flip, successor pointer, section 9 line |
-| `memory/builds/aClosedDocket/RUN.md` | S5 — the rescope row, written by the verb |
-| `memory/LIVE.md`, `memory/ledger/2026-09.md`, `memory/builds/aClosedDocket/README.md` | S6 — regenerated |
+| `memory/builds/aClosedDocket/RUN.md` | S5 — the `retire` rescope row, written by the verb |
+| `memory/backlog/TOOL.md` | S8 — one row's successor pointer, repointed in place |
+| `memory/LIVE.md`, `memory/ledger/2026-09.md`, `memory/builds/aClosedDocket/README.md`, `memory/gotchas/INDEX.md` | S6 — regenerated |
 
 ### Migration
 
@@ -245,11 +363,14 @@ Order 3, after units 1 and 2. Landing the labels before check 2 reads them leave
 landing check 2's new predicate before the labels leaves main red for a different reason than it is
 red for now. The regeneration in S6 rewrites generated regions across the whole memory tree, so this
 pass does not run concurrently with any sibling pass that writes a build README or a generated index.
+S8 adds a second reason for the same isolation: `memory/backlog/TOOL.md` is a `SHARED_RECORDS`
+member, and `TOOL-dFoldedVerdict-2`'s own S13 edits two other rows in it. Order 3 is after order 2,
+so the two writes are sequential rather than concurrent, and neither pass may run beside the other.
 
 ### Files touched (estimate)
 
-Four tracked files edited, one of them by a verb rather than by hand, and three generated files
-re-rendered. No file under `tools/` moves.
+Five tracked files written — four by hand, one of them new, and one by a verb rather than by hand —
+and four generated files re-rendered. No file under `tools/` moves.
 
 ### Alternatives rejected
 
@@ -283,21 +404,35 @@ re-rendered. No file under `tools/` moves.
   in the record a resuming agent reads. Nothing else reads either, and no reader is claimed here that
   does not read.
 - **risks** — three. A byte shape that disagrees with unit 1's writer, addressed by the equality arm
-  in section 6. A supersession that reds check 24, addressed by S5's second act. A cutoff that admits
-  `dBriefedPass`, addressed by S7's corpus-wide acceptance and section 8 Q1. Rollback is a revert of
-  one commit; no state moves.
+  in section 6. A rescope row that reds check 24 on ANOTHER build's record — the live risk, since the
+  driver accepts the write and no verb can remove the row; addressed by S5's `retire` act and by
+  AC9's assertion of both arms. A cutoff that admits `dBriefedPass`, addressed by S7's corpus-wide
+  acceptance and section 8 Q1. Rollback is a revert of one commit; no state moves.
 - **testing + left-shift gates** — the left-shift belongs to unit 2, whose predicate is what stops
   the next correctly-folded exit redding the bar. This unit's own class, a hand-edited parked row, is
-  left ungated and named, which N5 states rather than implies.
+  left ungated and named, which N5 states rather than implies. A SECOND left-shift is named by round
+  1 and is deliberately NOT taken here: `verb_rescope` should membership-test `--successor` against
+  the same roster check 24 reads and refuse at write time, since a driver that accepts a write its
+  own merge bar reds forever is a guard sharing nothing with the thing it guards. It is driver code,
+  which N1 excludes, and it is recorded in this build's round-1 audit record rather than filed as a
+  backlog row, because this unit mints no id. Named, not covered.
 - **migration / rollback** — see the Migration and Rollout sub-heads above. Reversible by revert.
-- **user docs** — none. The mixed-exit rule is a governance rule, and section 8 Q2 routes it to the
-  protocol rather than smuggling it into a record.
+- **user docs** — none owed to `help/`, and the mixed-exit rule is NOT what that means. It is a
+  governance rule with a named carrier of its own under S4, observed by AC12 and AC13; section 8 Q2
+  is a different question and settles only the provenance-key form. Rev-1 routed the rule to Q2,
+  which asks nothing about mixed exits; round 1 caught it.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the leg is re-run before any edit, `bash tools/unattended/check-unattended.sh` exits
-  1 and its check 2 line names `memory/builds/dMispairedQuote/RUN.md` with the counts 2 and 1. The
-  red is observed by this unit, not inherited from this spec.
+- **AC1** — When the leg is re-run before any edit, at THIS UNIT'S PRE-IMAGE and not at BASE,
+  `bash tools/unattended/check-unattended.sh` exits 1 and its check 2 output names
+  `memory/builds/dMispairedQuote/RUN.md` under `TOOL-dFoldedVerdict-2`'s ABSENT-DISPOSITION refusal —
+  the record named for recording no disposition, its exited subjects named, and no shortfall counts
+  in the sentence. The red is observed by this unit, not inherited from this spec. **The criterion is
+  the refusal's class and the names it carries, never its bytes**, because unit 2 owns the wording
+  and a literal pinned here would be a second copy of a sentence a sibling is scoped to write. If the
+  pre-image still carries the BASE shortfall message quoted in section 4, unit 2 has not landed and
+  this unit does not start.
 - **AC2** — When the six blockers are re-derived at build time, every one has a disposition recorded
   in section 9 of `memory/builds/dMispairedQuote/spec/2026-09-01-spec-TOOL-dMispairedQuote-1.md` or
   of `memory/builds/dMispairedQuote/spec/2026-09-01-spec-TOOL-dMispairedQuote-3.md`. If any has none,
@@ -315,7 +450,8 @@ re-rendered. No file under `tools/` moves.
   tail this unit wrote by hand. This is the byte-shape agreement with unit 1, observed rather than
   asserted, and it exercises the shipped driver and not the kit self-test suite.
 - **AC6** — When the two dispositions are removed from the record and the removal is STAGED,
-  `bash tools/unattended/check-unattended.sh` exits 1 again naming that file. Without this arm the
+  `bash tools/unattended/check-unattended.sh` exits 1 again, naming that file under the same
+  absent-disposition refusal AC1 observed. Without this arm the
   criterion below cannot tell a check that accepts a fold from one that stopped checking. Stage the
   break with `git add` before running, because the leg's population is the index, and restore it with
   `git stash` rather than `git checkout --`, which would restore the whole file and silently discard
@@ -328,11 +464,19 @@ re-rendered. No file under `tools/` moves.
   `memory/builds/aClosedDocket/spec/2026-08-31-spec-TOOL-aClosedDocket-4.md` reads WONTDO with a
   successor pointer in its tail, the id is still present in that build's generated units region, and
   `bash tools/memory-tree/check-memory-hygiene.sh` exits 0 over the flip.
-- **AC9** — When the rescope row is written, `grep -F 'rescope · item supersede'` over
-  `memory/builds/aClosedDocket/RUN.md` returns one line naming this unit as the successor, and
-  `bash tools/unattended/check-unattended.sh` reports no check 24 failure for that record. Removing
-  the row and re-running must red check 24, which is what proves the row is load-bearing rather than
-  decorative.
+- **AC9** — When the rescope row is written, BOTH of check 24's arms are asserted by name over
+  `memory/builds/aClosedDocket/RUN.md`, because one of them is what rev-1's design would have broken:
+  - the RETIRE arm is SATISFIED — `grep -F 'rescope · item retire TOOL-aClosedDocket-4'` over that
+    record returns exactly one line, whose `reason` field names `TOOL-dFoldedVerdict-3`, and
+    `bash tools/unattended/check-unattended.sh` reports no check 24 failure for that record;
+  - the SUPERSESSION arm is NEVER REACHED — `grep -c -- ' -> ' memory/builds/aClosedDocket/RUN.md`
+    returns 0 over the rescope rows, so no `item supersede <id> -> <succ>` row exists for
+    `check-unattended.sh:1777` to extract and no successor is graded against that build's roster.
+  Removing the row and re-running must red check 24 on the RETIRE arm, which is what proves the row
+  is load-bearing rather than decorative. Writing it with `--act supersede --successor` instead must
+  red the SUPERSESSION arm, which is what proves the act was chosen and not defaulted — observe that
+  second arm on a throwaway clone under `mktemp -d`, never on the tracked record, because the row is
+  appended to an append-only file and no verb can remove it.
 - **AC10** — When the generated artifacts are re-rendered in the same commit,
   `python3 tools/memory-tree/gen_build_index.py --check` and
   `python3 tools/memory-tree/gen_build_index.py --check-format` both exit 0.
@@ -344,6 +488,23 @@ re-rendered. No file under `tools/` moves.
   NOT a bound here and this criterion does not claim it is: hygiene check 7's exemption list excludes
   `builds/*/RUN.md` by name, which is why a 1465-byte parked row already sits in this record and
   passes.
+- **AC12** — When S4's carrier is written,
+  `grep -n 'records the promote value' memory/gotchas/one-value-field-records-a-mixed-outcome.md`
+  returns the rule's own sentence, the record's front matter carries `name` and `description` at
+  column 0, and `bash tools/memory-tree/check-memory-hygiene.sh` exits 0 — which is what asserts the
+  class declares its resolution (it declares NONE, in as many words, matching N5) and that
+  `memory/gotchas/INDEX.md` byte-matches a fresh render after S6.
+- **AC13** — When the carrier is asked whether it can FIRE,
+  `python tools/memory-tree/gotchas.py --for-paths memory/builds/dMispairedQuote/RUN.md` lists that
+  class in its stdout. Anchors are DERIVED from the backticked paths in the body, so this is the arm
+  that separates a rule written down from a rule written down where the next diff will meet it.
+  Without it, a record naming no reachable path is only REPORTED as inert and the pass still looks
+  complete.
+- **AC14** — When S8's repoint is written, `grep -n 'TOOL-dMispairedQuote-7' memory/backlog/TOOL.md`
+  returns one row naming `TOOL-dFoldedVerdict-1`, `TOOL-dFoldedVerdict-2` and `TOOL-dFoldedVerdict-3`
+  as what answers it, with no live successor pointer at the id S5 has just flipped to WONTDO, and
+  `bash tools/memory-tree/check-memory-hygiene.sh` exits 0 over the edit — the id-citation and
+  one-id-one-row-per-document checks are what grade it.
 
 ## 7. Gates
 
@@ -352,7 +513,9 @@ Named legs, each resolved in `tools/gate-legs.json` rather than remembered:
 - `unattended kit gate` — the leg that is red today and the one this unit exists to green. Unguarded,
   so it runs on every bar.
 - `memory hygiene` — grades this spec's own format, the flipped status header, the record's caps and
-  entry budget, and the id citations in both edited records.
+  entry budget, and the id citations in every edited record. It is also the leg that grades S4's new
+  class record — that it declares a resolution, that it derives an anchor rather than sitting inert,
+  and that `memory/gotchas/INDEX.md` matches a fresh render — and S8's repointed backlog row.
 - `build README slot contract` — the format check over the build READMEs S6 re-renders.
 - `pass-order history` — reads the same run-state records for their pinned BASE; named because this
   unit edits two of them and the leg must be seen to stay green rather than assumed to.
@@ -361,7 +524,9 @@ Named legs, each resolved in `tools/gate-legs.json` rather than remembered:
 
 No new gate. The predicate that makes the next folded exit legible belongs to
 `TOOL-dFoldedVerdict-2`, and this unit deliberately adds none of its own: N5 states that the
-hand-edited-row class stays ungated in both directions.
+hand-edited-row class stays ungated in both directions, and section 5 names the second candidate —
+a write-time successor refusal in `verb_rescope` — as owed, unfiled and out of this unit's scope
+rather than leaving it to read as covered.
 
 **A standing owner instruction forbids running the unattended kit self-tests**, so
 `tools/unattended/*.test.sh` and `bash tools/unattended/run-unattended-gates.sh --selftests` are NOT
@@ -386,6 +551,14 @@ neither substitutes for the arms unit 1 and unit 2 owe their own mechanisms.
   **Recommendation: the cutoff is 2026-09-01 and this unit's scope grows to `dBriefedPass`'s two
   rows, both folds.** Their dispositions must be re-derived from that build's own records first, on
   AC2's terms. AC7 fails loudly if this is got wrong, which is why the acceptance is corpus-wide.
+  **`TOOL-dFoldedVerdict-2` has since been read against this and agrees in both directions**, which
+  is corroboration rather than a second opinion: its AC1 declares `DISPOSITION_CUTOFF="2026-09-01"`
+  and names `memory/builds/dBriefedPass/RUN.md` alongside `memory/builds/dMispairedQuote/RUN.md`
+  under the absent-disposition refusal, and its AC4 takes `dBriefedPass` going UNNAMED at `nneed 0`
+  as its substitute observation for the fold arm — an observation that exists only once this unit has
+  labelled that record's two exits. So the sibling spec both admits the record and depends on this
+  unit labelling it. The fork stays OPEN pending the owner's word only because it grows this unit's
+  scope; nothing in the two specs now disagrees about which way it falls.
 - **Q2 — should the protocol sanction the provenance form this unit uses?**
   `memory/guides/UNATTENDED-PROTOCOL.md:167` says the authored half carries the declared facts "and
   nothing else", no verb writes such a key, and nothing reads one — so two tracked records already
@@ -406,6 +579,53 @@ neither substitutes for the arms unit 1 and unit 2 owe their own mechanisms.
   re-derived from `dMispairedQuote`'s reviews and spec revision logs, the three verb refusals and
   both row parsers read at source, and check 24's RETIRE arm found to demand a second act for the
   supersession.
+- rev-2 · 2026-09-01 · folded the round-1 spec audit
+  ([2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md)).
+  Six changes, each named with the finding that drove it:
+  - **B1, the blocker.** S5's second act was `--act supersede --successor TOOL-dFoldedVerdict-3`, and
+    rev-1's stated reason for it was inverted at source: check 24's successor arm at
+    `tools/unattended/check-unattended.sh:1777-1780` reds unless the successor is a whole token of
+    that record's OWN units region, which carries only `TOOL-aClosedDocket-1` through `-4`, so the
+    row CREATES a permanent red on another build's record rather than clearing one. Re-verified here
+    against `rs_now`'s binding at `:1713`, `id_in` at `tools/unattended/lib-unattended.sh:37`, and
+    the record's `phase: BUILDING`. The act is now `retire`, whose row carries no ` -> ` and never
+    reaches that arm; the successor is named in `--reason`. Section 4 gained the two-arm reading and
+    states that check 24 has NO cross-build supersession shape. AC9 was rewritten from one grep into
+    an assertion of both arms by name, with the supersede case observed on a throwaway clone because
+    the row is unremovable once written.
+  - **H7.** The same invocation spelled `--unit`, which the parser binds to `--brief`'s `BR_UNIT` at
+    `tools/unattended/unattended.sh:4783` while `--rescope` reads `PK_ITEM` from `--item` at `:4781`.
+    Re-verified at source and against the usage header at `:14`. Spelled `--item` now, and section 4
+    records the trap: the verb's own `fail 48` texts say `--unit`, so rev-1 copied the refusal rather
+    than the parser.
+  - **H5.** AC1 pinned the BASE check-2 message and its counts, which `TOOL-dFoldedVerdict-2`
+    replaces at order 2 — so the ONE integrity control in this unit, reproduce-before-writing, was
+    calibrated against text that will not exist when it runs. Section 4's reproduction sub-head now
+    labels the BASE quote as BASE and states the pre-image outcome beside it; AC1 asserts unit 2's
+    absent-disposition refusal by CLASS and by the names it carries, never by bytes a sibling owns.
+    AC6 follows it.
+  - **H3.** S4 required the mixed-exit rule to be "written down" and no file in scope carried it —
+    the rule's only home was the provenance block, which is the burial S4 forbids. S4 now names
+    `memory/gotchas/one-value-field-records-a-mixed-outcome.md` as the carrier, the Inventory carries
+    it, S6 re-renders the catalogue index, and AC12 and AC13 observe both the sentence and the
+    record's ability to FIRE on a diff. Section 4 records why that corpus and not the protocol or
+    `BUILD-METHOD.md` M4 — both would need a scope item in a unit this one does not own, or a file
+    under `tools/` that N1 excludes. Section 5's user-docs bullet no longer routes the rule to Q2,
+    which asks nothing about mixed exits.
+  - **M9.** Two prior-record claims corrected. Section 10 described the `TOOL-dMispairedQuote-7`
+    backlog row as recording this build's supersession of the ratified predecessor; the row's own
+    text records the OPPOSITE relation and names no `dFoldedVerdict` id, verified in
+    `memory/backlog/TOOL.md`. The `memory/builds/aGroundedOrientation/RUN.md` citation moved from
+    `:11`, which is that file's `## Run facts` heading, to `:17`, where the key actually sits. New S8
+    repoints that row's successor pointer, since S5 is about to flip the id it names to WONTDO, with
+    AC14 over it and `memory/backlog/TOOL.md` in the Inventory.
+  - **Owner rulings of 2026-09-01, both checked against this spec.** (b) `KIT_UNATTENDED_VERSION`
+    moves ONCE, on `TOOL-dFoldedVerdict-6`: N1 already said no version moves here and now names the
+    owning unit, so this spec claimed no other owner and nothing was reversed. (a) At CEILING the
+    driver accepts either disposition: it changes no claim in this document, because both rows this
+    unit writes are NON-CONVERGENT exits and N2 leaves every CEILING row in the corpus to unit 2's
+    cutoff. Recorded so a later reader can see it was checked rather than missed.
+- rev-3 · 2026-09-01 · reordered to order 4 by the build's own ordering fix. No scope change: the protocol render sits at EXACTLY `GUIDE_CAP_BYTES` with zero headroom, so `TOOL-dFoldedVerdict-5`'s split moved to order 1 ahead of every unit that adds a protocol byte, and the rest shifted behind it.
 
 ## 10. Reuse audit
 
@@ -416,15 +636,23 @@ generic writers — `write` and `write_text` in the memory-tree kit, `run` in `t
 them reads or writes a run-state record. **No existing seam fits in code, and that is an answer
 rather than a probe failure: this unit ships no code.** The seam it extends is a RECORD SHAPE, cited
 by path — `memory/builds/dCarriedReceipt/RUN.md:14-21` and
-`memory/builds/aGroundedOrientation/RUN.md:11`, the two tracked instances of the provenance form this
+`memory/builds/aGroundedOrientation/RUN.md:17`, the two tracked instances of the provenance form this
 design copies one key over. Where a hit was stale: the prompt for this unit described four such
 repairs, and only two carry the key in the tracked corpus, so section 4 marks the figure UNVERIFIED
-and nothing here rests on it.
+and nothing here rests on it. A second staleness, found by round 1 and corrected in rev-2: the
+`aGroundedOrientation` citation read `:11`, which is that file's `## Run facts` heading and not the
+key.
 
 Recall terms used: `python tools/memory-recall/query.py "how was a terminal unattended run-state
 record repaired by hand when no verb could write the field, and what recorded the provenance"
 --terms "unattended run-state terminal phase landed-anchor reconstructed provenance hand-edit
 refuse_if_terminal park review disposition fold promote non-convergent"`. It returned the two
-precedent records, the `TOOL-aBoundedCeiling-11` class row, the `TOOL-dMispairedQuote-7` row that
-records this build's supersession of `TOOL-aClosedDocket-4`, and the `TOOL-dBriefedPass-9` row that
-Q1 rests on.
+precedent records, the `TOOL-aBoundedCeiling-11` class row, the `TOOL-dMispairedQuote-7` row, and the
+`TOOL-dBriefedPass-9` row that Q1 rests on. **What that `-7` row actually says, quoted rather than
+paraphrased, because rev-1 paraphrased it backwards:** it opens `SUPERSEDED by TOOL-aClosedDocket-4`.
+The relation runs the other way from the sentence rev-1 wrote — the row does not record this build's
+supersession of that unit; it records itself as superseded BY it, and it names no `dFoldedVerdict` id
+at all. It is nonetheless the right hit, for a reason the paraphrase hid: the row's own body already
+records that `TOOL-aClosedDocket-4`'s N4 premise is FALSE, which is the fact section 4 builds on. S8
+exists because S5 flips that row's stated successor to WONTDO and would otherwise strand the only
+route the backlog has from this defect to its fix.

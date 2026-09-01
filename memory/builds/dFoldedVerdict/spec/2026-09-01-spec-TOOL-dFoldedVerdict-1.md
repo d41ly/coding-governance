@@ -1,10 +1,12 @@
 # TOOL-dFoldedVerdict-1 — the driver records which disposition a review exit took
 
-**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 2 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md) | spec-audit | TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6 |
 
 <!-- /gen:spec-records -->
 
@@ -69,6 +71,20 @@ where an exit occurs, and is written onto the `review` round row `verb_review` a
   fold sentence. The row assertion at `:4478` greps a SUBSTRING ending `· NON-CONVERGENT`, so S4's
   placement AFTER the state token leaves it matching — verified by reading the pattern, and it is the
   reason the field goes after the token rather than before it.
+- **S9** — the protocol's `--review` bullet stops claiming that promotion is the only exit
+  disposition. The carrier is named by SECTION, `## 7. The verbs`, and by the time this unit runs
+  that section HAS ALREADY MOVED: `TOOL-dFoldedVerdict-5` is now order 1 and this unit is order 2, so
+  the edit lands in the new carrier and not in `memory/guides/UNATTENDED-PROTOCOL.md`. At BASE the
+  bullet is at `memory/guides/UNATTENDED-PROTOCOL.md:499-505`; resolve it by SECTION, never by that
+  line number. The reorder is why: the render sits at EXACTLY `GUIDE_CAP_BYTES` with zero headroom,
+  and every unit that adds a protocol byte had been sequenced BEFORE the split that frees 8.1 KB —
+  which is M2's ordering rule broken, a unit depending on one sequenced after it. The clause
+  "at the exit every blocker still standing is promoted to a unit rather than parked" becomes one
+  saying the exit RECORDS which disposition the run took, `fold` or `promote`. Both halves of the
+  byte-identical pair change in the same commit — the render and
+  `tools/unattended/PROTOCOL.template.md` — because check 10 diffs them and one half alone reds it.
+  Section 4 prices the byte budget this edit has to fit inside, which is not optional and is not
+  generous.
 
 ## 3. Non-goals (OUT)
 
@@ -106,6 +122,25 @@ where an exit occurs, and is written onto the `review` round row `verb_review` a
 - **N7 — new readers.** `verb_status` counts review rows by KIND through `nnoted` at
   `unattended.sh:2782` and never parses the reason, and `BUILD-METHOD` M9 excludes `history`-class
   entries from the wrap-up. Neither reads the field, and this spec claims neither.
+- **N8 — the refusal ENUMERATION in the same protocol bullet S9 edits. This is a review finding
+  REFUSED, with the evidence, rather than one left unmentioned.** The round-1 audit's H4 reads both
+  halves of that sentence as going false. The promotion half does, and S9 takes it. The refusal half
+  does not, because it was never an enumeration. `verb_review` carries NINE refusal paths at BASE:
+  eight `fail 37` branches at `unattended.sh:3907`, `:3909`, `:3912`, `:3915`, `:3918`, `:3931`,
+  `:3935` and `:3952`, plus `refuse_if_terminal` at `:3908`. The bullet names four of them and omits
+  five — the missing run-state file, the terminal-phase refusal, the bypass-flag subject, the
+  newline subject and the separator subject. A list already naming four of nine is an illustration,
+  and three more unnamed refusals leave it exactly as incomplete as it is today. Making it
+  exhaustive is a different change with a different justification, and section 4 records the
+  measurement that says this unit cannot afford it in bytes.
+- **N9 — the CEILING prescription in `tools/unattended/SKILL.template.md:623` and
+  `memory/guides/BUILD-METHOD.md` M4.** Both say the run promotes and lands anyway at a ceiling. The
+  owner ruling of 2026-09-01 recorded at section 8 Q2 makes the driver accept EITHER disposition
+  there, so after this unit the driver permits an exit those two sentences do not describe. The
+  ruling sanctioned the divergence; it did not order the amendment. `BUILD-METHOD.md` is a
+  memory-tree kit render outside this kit's surface, and no unit of this build amends either
+  sentence. Recorded here and in section 4 so the gap is READ rather than discovered; the build
+  README carries the same ruling, so it owes no third carrier and no backlog row.
 
 ## 4. Design
 
@@ -130,7 +165,7 @@ The disposition is appended to that fourth argument, giving:
 `reason` is LINE-FINAL, and `park()`'s own header at `:3797-3801` records that two live readers
 recover a field by matching UP TO it. Verified at source: `recorded_waivers` at `:1155-1161` takes the
 handle with a `sed` whose pattern ends at ` · reason .*$`, and check 17 of
-`check-unattended.sh:1116-1117` splits the same line into `wh` by trimming everything from the first
+`check-unattended.sh:1117-1118` splits the same line into `wh` by trimming everything from the first
 ` · reason ` and `wr` by taking everything after it. A SIXTH positional appended after the reason
 would change the emitted grammar for all nine parked kinds at once, and on a waiver row `wr` would
 silently absorb it — the field would be written and read by nothing, which is the failure mode this
@@ -145,8 +180,8 @@ Every one was opened; none is a guess.
 
 | Reader | Site | How it splits | Effect of a trailing field |
 |---|---|---|---|
-| `review_counts` | `unattended.sh:3889-3901` | first ` · reason `, then matches `blockers <n>` | none, the count is matched and not positional |
-| `review_last_reason` | `unattended.sh:3875-3887` | same split, returns the whole tail | the tail grows, and no consumer parses past a glob |
+| `review_counts` | `unattended.sh:3888-3901` | first ` · reason `, then matches `blockers <n>` | none, the count is matched and not positional |
+| `review_last_reason` | `unattended.sh:3874-3886` | same split, returns the whole tail | the tail grows, and no consumer parses past a glob |
 | the terminal-round guard | `unattended.sh:3951` | strips through the last ` · reason `, then greps an unanchored alternation of the three states | none |
 | the closing-review DoD term | `unattended.sh:3479-3486` | `review_last_reason`, then unanchored globs on the three states | none |
 | clause 3 of check 2 | `check-unattended.sh:281-300` | first ` · reason `, then an unanchored match on the two exit states | none, and this is the reader unit 2 extends |
@@ -160,14 +195,36 @@ refusal rather than a tolerated extra. This is `TOOL-aClosedDocket-4` S1 as rati
 carried forward unchanged; that unit is superseded by `TOOL-dFoldedVerdict-3` and is cited here as
 the source of the rule.
 
-### Why CEILING requires one too
+### Why CEILING requires one too, and what accepting `fold` there costs
 
 `CEILING` is an exit, and clause 3 sets its per-subject "needs a disposition" flag for
-`NON-CONVERGENT` and `CEILING` alike (`check-unattended.sh:296`), so a CEILING exit that recorded
-nothing leaves unit 2's reader with the same hole. M4 prescribes promotion at a ceiling, but a value
-the driver forces is a constant rather than an observation, and a constant cannot be evidence for the
-clause that reads it. Section 8 Q2 carries the one consequence: accepting `fold` there means the
-driver permits an exception to a sentence the Skill and M4 both state.
+`NON-CONVERGENT` and `CEILING` alike (`check-unattended.sh:293`), so a CEILING exit that recorded
+nothing leaves unit 2's reader with the same hole.
+
+**The driver accepts EITHER disposition at `CEILING`.** Owner ruling, 2026-09-01, recorded at
+section 8 Q2 and in the build README. A value the driver forces is a constant, and a constant cannot
+be evidence for the clause that reads it, so the field stays an observation at every exit rather
+than at one of them.
+
+Said plainly, because the ruling requires it said plainly: **this permits an exit that
+`BUILD-METHOD.md` M4's sentence does not describe.** M4 says a runaway ceiling is a defect in the
+predicate and the run promotes and lands anyway; `tools/unattended/SKILL.template.md:623` says the
+same. After this unit a run may record `fold` at a ceiling and the driver will take it. The
+divergence is ratified rather than accidental, no unit of this build amends either sentence (N9),
+and this paragraph is where a reader meets it.
+
+### Reaching CEILING from a fixture
+
+A criterion nobody can run is not a criterion, so the route is written down rather than left to the
+builder. `RUNAWAY_CEILING="8"` at `unattended.sh:460` is a FILE constant — its own comment says it
+is deliberately not a conf key and not an environment variable — so a fixture cannot lower it.
+`review_state` at `:3859-3866` returns `CEILING` when the prior-round count is 7 and this round's
+blocker count is non-zero and strictly smaller than the last. `review_counts` at `:3888-3901` reads
+those rounds out of the run-state file and from nowhere else, so the seven priors are SEEDED as
+plain `review` rows in the scratch fixture's `RUN.md` — counts 8, 7, 6, 5, 4, 3, 2 and this round 1.
+None of the seeded rows may carry a terminal token, because the guard at `:3951` fires before
+`review_state` is ever called. AC14 and AC15 are written against that fixture, and it is the same
+scratch fixture AC1 and AC7 already use.
 
 ### The refusal and success texts, spelled here because an arm must quote them
 
@@ -189,12 +246,42 @@ sentence rather than a fragment. The NON-CONVERGENT success line at `:3968` keep
 sentence verbatim and gains a fold sentence beside it; the CEILING line at `:3969` replaces "The run
 promotes and lands anyway" with the recorded disposition and keeps the rest.
 
+### The protocol clause S9 changes, and the byte budget it fits inside
+
+`memory/guides/UNATTENDED-PROTOCOL.md` is **61440 bytes against a cap of 61440 bytes**, measured
+with `wc -c` at this tree. The cap is `GUIDE_CAP_BYTES` at
+`tools/memory-tree/check-memory-hygiene.sh:63`, the class selector is the `memory/guides/` prefix,
+and the comparison at `:503` is `b[f]+0>cb` — strictly greater. The file is therefore legal by
+exactly zero bytes, and ONE added byte reds check 6 and the `memory hygiene` leg. The line axis is
+not the binding one: 725 lines against `GUIDE_CAP_LINES=750`.
+
+That is why S9 changes a CLAUSE and not the bullet. The bullet is 628 bytes at BASE. A rewrite
+carrying both the disposition sentence and an enumeration of the three refusals this unit adds was
+drafted and measured at 664 bytes, +36 over, and getting it under 628 needs a claim dropped — which
+this build's README names as a worse defect than the verbosity it would buy. The clause swap alone
+measures 620 bytes, so S9 SHRINKS the capped file by 8. N8 is the half that does not fit, refused
+with that measurement rather than deferred in silence.
+
+The protocol is one of `BUILD-METHOD.md` M11's carriers, so S9 is a governance-carrier edit and
+needs the owner scope approval this spec's `SPECCED` status is waiting on. It is inside the surface
+this build already opened: `TOOL-dFoldedVerdict-5` moves this whole section into a new carrier and
+`TOOL-dFoldedVerdict-6` compresses what is left. The ordering is safe in one direction only. This
+unit is order 1, so the corrected clause is what unit 5 later moves VERBATIM; the reverse order
+would have unit 5 copying a false sentence into a fresh byte-compared pair that nothing revisits.
+
+Check 10 grades none of this. Its own header at `check-unattended.sh:1236-1247` says it compares the
+two COPIES to each other and says nothing about whether either is TRUE, so a clause false in both
+halves is green forever. AC17 therefore observes the text AND the parity leg; the parity leg alone
+passes an unchanged pair.
+
 ### Files touched (estimate)
 
 | Path | Items |
 |---|---|
 | `tools/unattended/unattended.sh` | S1, S2, S2a, S3, S3a, S4, S5, S6 |
 | `tools/unattended/unattended.test.sh` | S7, S8, S8a |
+| `memory/guides/UNATTENDED-PROTOCOL.md` | S9 |
+| `tools/unattended/PROTOCOL.template.md` | S9 |
 
 ### Alternatives rejected
 
@@ -216,10 +303,15 @@ This unit lands alone and is inert until `TOOL-dFoldedVerdict-2` reads the field
 disposition that nothing reads costs one token on a row. The reverse order is the dangerous one — a
 checker that demands a field no verb can write reds every exit.
 
+S9 has its own ordering claim and it points the other way: this unit is order 1, so the corrected
+clause is already in place when `TOOL-dFoldedVerdict-5` moves that section VERBATIM at order 5. Land
+S9 later and the build ends by copying a false sentence into a fresh byte-compared pair that nothing
+revisits.
+
 ## 5. Production-readiness checklist
 
 - **Security** — N/A. One flag on a local verb, whose value is validated against a closed set before
-  it reaches the record; the subject guards at `:3944-3950` already cover the free-text field.
+  it reaches the record; the subject guards at `:3917-3936` already cover the free-text field.
 - **Perf / scale** — N/A. One string comparison and one appended token per `--review` call.
 - **a11y** — N/A. A shell driver with no user interface.
 - **i18n** — N/A. Kit-internal English, as with every other refusal in this driver.
@@ -228,15 +320,23 @@ checker that demands a field no verb can write reds every exit.
   absent-at-exit refusal, which is the correct outcome and is stated so no reader has to derive it.
 - **Observability** — the round row carries the field, and unit 2's clause is its reader. Nothing
   else reads it; N7 names the two readers claimed for this field elsewhere that do not read.
-- **Risks** — the live one is S8: two existing driver-driven calls in the suite reach an exit and
-  would be refused. They are named by line, and the suite may not be run here (section 7), so AC7
-  witnesses them by direct invocation instead of by the suite.
+- **Risks** — two, and both are named by line. S8: two existing driver-driven calls in the suite
+  reach an exit and would be refused. The suite may not be run here (section 7), so AC7 witnesses
+  them by direct invocation and AC16 grades the file itself by grep. S9: the protocol render sits at
+  exactly its byte cap, so a careless amendment reds `memory hygiene` on a governance carrier — the
+  measurement and the 8-byte margin are in section 4, and AC17 asserts the number rather than
+  trusting the drafting.
 - **Testing + left-shift gates** — S7's arms, and `harness arms (fail branches armed or pinned)` is
-  the machine that demands them. Available left-shift not taken: N5's marker contract.
+  the machine that demands them. AC16 is the static form for a file this unit may not execute.
+  Available left-shift not taken: N5's marker contract.
 - **Migration / rollback** — no state moves. Landed run-state files are untouched (N2), and a revert
-  is a revert.
-- **User docs** — none owed. `tools/unattended/SKILL.template.md:619` already documents the flag and
-  its two values, which is the defect this unit closes rather than a document it must write.
+  is a revert. S9 reverts as text in two files that must revert together.
+- **User docs** — one, and rev-1 wrongly said none were owed. `tools/unattended/SKILL.template.md:619`
+  already documents the flag and its two values, which is the defect this unit closes rather than a
+  document it must write. But `memory/guides/UNATTENDED-PROTOCOL.md`'s `--review` bullet still tells
+  every run that promotion is the only exit disposition, and that clause is false the moment `fold`
+  becomes recordable. S9 owns it, AC17 observes it, and N8 states which neighbouring half of the
+  same sentence this unit refuses and why.
 
 ## 6. Acceptance criteria
 
@@ -284,19 +384,58 @@ checker that demands a field no verb can write reds every exit.
 - **AC12** — When the driver's usage text is emitted, its `--review` line carries `--disposition`.
   Observed by running `bash tools/unattended/unattended.sh` with no verb, which renders the usage
   from the header at `unattended.sh:108-116`, and that render is S6's only observable.
+- **AC13** — When AC1's invocation is made, its STDOUT names the recorded `fold` and does not
+  contain the literal `PROMOTED`, observed by capturing that same
+  `bash tools/unattended/unattended.sh --review` call and running `grep -c PROMOTED` over the
+  capture, which prints `0`. That call's exit status is 1, which is the PASSING outcome here and is
+  said here so the arm is not written as an `&&` chain. AC1 grades the row and reads no source;
+  this grades the success sentence S5 splits at `unattended.sh:3968`, which is the unit's one
+  user-visible outcome and was ungraded at rev-1.
+- **AC14** — When a round is driven to `CEILING` with no `--disposition`, it is REFUSED and the
+  message names `CEILING` as the state this round computed, observed in the stdout of
+  `bash tools/unattended/unattended.sh --review` against a scratch fixture whose `RUN.md` was seeded
+  with the seven prior non-terminal `review` rows section 4 specifies. This is the absent-at-exit
+  refusal reaching its second state; AC5 reaches only `NON-CONVERGENT`.
+- **AC15** — When that same fixture records `--disposition fold` at `CEILING`, the call SUCCEEDS,
+  `memory/builds/<slug>/RUN.md` gains a row ending `· CEILING · disposition fold`, and the stdout no
+  longer contains `promotes and lands anyway`. A SECOND seeded subject recording
+  `--disposition promote` at `CEILING` also succeeds — both arms, because a criterion observing only
+  `fold` passes an implementation that refuses `promote` at a ceiling, and the owner ruling of
+  2026-09-01 is that it accepts EITHER. One subject cannot serve both: the guard at
+  `unattended.sh:3951` refuses a second terminal round for a subject that already has one.
+- **AC16** — When `grep -n -- '--disposition' tools/unattended/unattended.test.sh` is run, it
+  returns a hit on each of the two driver-driven exit calls S8 names, identified by their subjects
+  `F1 (fork)` and `S1`, with `promote` on the `S1` one per S8a; the `hit "$out" "PROMOTED"`
+  assertion still stands below that call; and the two FIRST-round calls immediately above them,
+  which compute `CONVERGING`, did NOT gain one, because S3 refuses a disposition there. Graded by
+  grep and not by running `tools/unattended/unattended.test.sh`: a suite this unit may not execute
+  is still a deliverable, and rev-1 left these two call sites named in S8 and observed nowhere. The
+  calls are identified by SUBJECT rather than by line, because S8a adds an arm to the same file.
+- **AC17** — When the `--review` bullet is extracted from both halves of the protocol pair with
+  ``sed -n '/^- `--review`/,/^- `--version`/p'``, neither copy contains
+  `promoted to a unit rather than parked` and both contain `fold` and `promote`;
+  `wc -c memory/guides/UNATTENDED-PROTOCOL.md` reports at most `61440`; and
+  `bash tools/unattended/check-unattended.sh` reports no check 10 failure. All three, not the last
+  alone: check 10 compares the two copies to each other and its own header says it grades neither
+  for truth, so a parity-only criterion passes an untouched pair. The byte assertion is the one that
+  fails if the amendment grows the file, which section 4 measures at zero bytes of headroom. The
+  extractor is unambiguous today — one line-anchored match for each bullet in each half.
 
 ## 7. Gates
 
 Named from `tools/gate-legs.json`, read at authoring time.
 
-- `unattended kit gate` — unguarded, reaches this unit, and AC10 is its criterion.
+- `unattended kit gate` — unguarded, reaches this unit, and AC10 is its criterion. It also carries
+  check 10, the protocol pair's byte-diff, which S9 must keep green by editing both halves together.
 - `unattended skill wiring` — unguarded; it diffs the rendered Skill against a fresh render of
   `SKILL.template.md`. This unit edits neither, so it must stay green untouched.
 - `harness arms (fail branches armed or pinned)` — unguarded, and the leg that makes S7 mandatory.
 - `marker contracts` — unguarded, and the leg S2a exists to keep green.
 - `kit version markers` — unguarded. It asserts that the `unattended` version carriers AGREE, never
-  that they move; section 8 Q3 carries whether they move on this unit.
-- `memory hygiene` — unguarded, and the leg this spec file itself answers to.
+  that they move. Section 8 Q3 is resolved: they do NOT move on this unit.
+- `memory hygiene` — unguarded, the leg this spec file itself answers to, and after S9 the leg that
+  prices the protocol's byte budget through check 6. AC17's `wc -c` assertion is that check's
+  predicate, asserted directly so a breach is caught at the unit rather than at the bar.
 - `lexicon naming predicates` — its guard names `tools/`, so it runs. It grades nothing here: `sh` is
   declared DARK in `.lexicon.conf`, so no shell identifier this unit adds is read by it. Written down
   because a green row on a leg that cannot see the change is not coverage.
@@ -314,22 +453,29 @@ No predicate reads intent. Clause 3, once unit 2 lands, grades that a dispositio
   reader splitting on the LAST separator, or anchoring its state match to end-of-line, would have made
   S4 unbuildable as written, and `unattended.sh:3951` does strip through the LAST ` · reason `, which
   is exactly the shape that would have failed had the reason itself ever contained the separator.
-- **Q2 — at `CEILING`, does the driver accept `fold`, or force `promote`?** Options: (a) accept
-  either, as section 4 argues, so the field is an observation rather than a constant; (b) refuse
-  `fold`, matching `tools/unattended/SKILL.template.md:623` and M4, which both say the run promotes
-  and lands anyway at a ceiling. Recommendation: (a). A forced value is not evidence for the clause
-  that reads it, and a ceiling is a predicate defect rather than a statement about what the run
-  actually did with its blockers. The cost of (a) is honest and is stated: the driver then permits an
-  exception to a sentence two documents make, and closing that is a document edit for a later unit.
-- **Q3 — does `KIT_UNATTENDED_VERSION` move on this unit, or once for the build?** Six units of this
-  build touch the kit, and the version has nine carriers — the constant plus a same-line marker in
-  `unattended.sh`, `check-unattended.sh` and `check-pass-order.sh`, all three
-  `tools/unattended/*.template.md` files, and their three renders. Verified against
-  `tools/check-kit-versions.sh:144-172`, which asserts they AGREE and never that they move; the
-  `verdict epoch (kit version dates the engine)` leg is hardcoded to the memory-tree engine, so no
-  gate forces a bump here. Recommendation: once, on the build's last landing unit, so six units do
-  not collide on nine files. Noted because `TOOL-aClosedDocket-4` S6 put the bump inside this unit
-  and named only eight of the nine carriers, omitting `check-pass-order.sh`.
+- **Q2 — at `CEILING`, does the driver accept `fold`, or force `promote`?** RESOLVED (owner,
+  2026-09-01): (a), accept EITHER. The options were (a) accept either, so the field is an
+  observation rather than a constant; (b) refuse `fold`, matching
+  `tools/unattended/SKILL.template.md:623` and M4, which both say the run promotes and lands anyway
+  at a ceiling. The ruling took (a) on the ground the recommendation gave: a forced value is a
+  constant, and a constant is not evidence for the clause that reads it. Its cost is stated rather
+  than absorbed — the driver now permits an exit two documents do not describe, section 4 says so in
+  those words, N9 records that no unit of this build amends either, and AC14 and AC15 are what make
+  the accepted state observable instead of merely permitted.
+- **Q3 — does `KIT_UNATTENDED_VERSION` move on this unit, or once for the build?** RESOLVED (owner,
+  2026-09-01): ONCE, on the build's last landing unit, which is `TOOL-dFoldedVerdict-6`. It does not
+  move here, and this unit never claimed it. Six units of this build touch the kit, and the version
+  has nine carriers — the constant plus a same-line marker in `unattended.sh`,
+  `check-unattended.sh` and `check-pass-order.sh`, all three `tools/unattended/*.template.md` files,
+  and their three renders. Verified against `tools/check-kit-versions.sh:144-173`, which asserts they
+  AGREE and never that they move; the `verdict epoch (kit version dates the engine)` leg is
+  hardcoded to the memory-tree engine, so no gate forces a bump here. An adopter sees one release,
+  not six. Recorded because three specs of this set named three different owners: rev-1 named the
+  owner only by ROLE, which is what left the ambiguity, and `TOOL-aClosedDocket-4` S6 put the bump
+  inside this unit and named only eight of the nine carriers, omitting `check-pass-order.sh`. The
+  enumeration above is the corrected one; a sibling wanting the population should re-derive it with
+  `git grep -l 'gov:kit unattended@'` rather than copy this count into a third place. Reconciling
+  the ruling with unit 6's own non-goals is unit 6's, not this unit's.
 
 ## 9. Revision log
 
@@ -340,6 +486,31 @@ No predicate reads intent. Clause 3, once unit 2 lands, grades that a dispositio
   `ARMS_FLOORS` raise that is not owed and a red that does not occur, and neither it nor its round-1
   audit named the two existing test call sites (S8) that the required-at-exit rule turns into
   refusals. Added S2a, S3a, S8a, the five-reader table and Q3, none of which appear in `-4`.
+- rev-2 · 2026-09-01 · folded the round-1 spec audit
+  ([2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md))
+  and the two owner rulings of the same date. **H1**, the CEILING half shipping unobserved: added
+  AC14 and AC15, the first criteria in this spec that drive a `CEILING` round, and a section 4
+  sub-head recording how a fixture reaches one, since `RUNAWAY_CEILING` is a file constant a fixture
+  cannot lower. **M1**, the FOLD success sentence: added AC13, which observes the stdout AC1
+  explicitly does not read. **M2**, the suite call sites: added AC16, a static grep over
+  `unattended.test.sh` keyed on the call SUBJECTS, because a suite this unit may not run is still a
+  deliverable and a criterion may not cite the do-not-run instruction as a reason to observe
+  nothing. **H4**, the protocol's `--review` sentence: ACCEPTED the half this unit can carry as S9
+  and AC17 — unit 2's N7 assigns the sentence here, and for the promotion clause that assignment now
+  holds — and REFUSED the refusal-enumeration half as N8, on the measurement that the bullet already
+  names four of `verb_review`'s nine refusal paths and so was never an enumeration, plus the byte
+  budget in section 4. **Owner ruling (a)**: Q2 resolved to accept either disposition at `CEILING`;
+  section 4's CEILING sub-head rewritten to say plainly that this permits an exit M4's sentence does
+  not describe, N9 added so the un-amended M4 and Skill sentences are recorded rather than
+  discovered. **Owner ruling (b)**: Q3 resolved — the kit version moves once, on
+  `TOOL-dFoldedVerdict-6`. This unit never claimed the bump, but rev-1 named the owner by role
+  instead of by id and section 7's `kit version markers` bullet still pointed at an open question;
+  both now name the unit. Six line citations were re-opened at source and were wrong:
+  `review_last_reason` is `:3874-3886` not `:3875-3887`, `review_counts` is `:3888-3901` not
+  `:3889-3901`, check 17 splits at `check-unattended.sh:1117-1118` not `:1116-1117`, clause 3's
+  needs-a-disposition flag is at `:293` not `:296`, the subject guards are at `unattended.sh:3917-3936`
+  not `:3944-3950`, and the `check-kit-versions.sh` unattended block ends at `:173` not `:172`.
+- rev-3 · 2026-09-01 · the build's ORDER was wrong and this unit was one of two depending on a unit sequenced after it. The protocol render sits at EXACTLY `GUIDE_CAP_BYTES` with zero headroom, and the split that frees 8.1 KB was at order 5 behind two units that ADD protocol bytes. `TOOL-dFoldedVerdict-5` is now order 1 and this unit order 2, so S9 lands in the moved carrier; S9 says so and stops citing a line number that will not survive. Also: `TOOL-dFoldedVerdict-2` S14 had independently claimed this same bullet — two parallel-authored folders taking one file, which M6 clause 1 forbids — and it resolves here because the sentence goes false when `fold` becomes RECORDABLE, which is this unit's flag.
 
 ## 10. Reuse audit
 

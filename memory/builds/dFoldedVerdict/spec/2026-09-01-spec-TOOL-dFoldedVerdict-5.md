@@ -1,10 +1,12 @@
 # TOOL-dFoldedVerdict-5 — section 7 becomes its own carrier
 
-**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dFoldedVerdict-1-2-3-4-5-6-spec-audit-round1.md) | spec-audit | TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-6 |
 
 <!-- /gen:spec-records -->
 
@@ -61,14 +63,34 @@ commit or the bar reds on a section that no longer holds what it is asked for.
   bullets covering every declared verb, and check 26 is the join. `TOOL-dBriefedPass-8` names
   `INDEX_CAP_BYTES` as the cap the protocol renders at; the binding cap is `GUIDE_CAP_BYTES`, and the
   two are numerically identical, which is exactly why the mis-attribution is invisible.
+- **S11 — the `--review` bullet arrives in the new pair TRUE, and this unit is the backstop that
+  makes that observable.** The bullet sits inside section 7 and is cited by SECTION rather than by a
+  line number this move invalidates. At BASE `adc0543c` its sentence reads "at the exit every blocker
+  still standing is promoted to a unit rather than parked", and it enumerates the verb's refusals as
+  exactly three. Both halves go FALSE once `TOOL-dFoldedVerdict-1` makes `fold` a legal exit
+  disposition and adds refusals. The OWNER of that correction is `TOOL-dFoldedVerdict-1` at order 1,
+  which is the unit `TOOL-dFoldedVerdict-2`'s N7 assigns it to, and order 1 lands before this move.
+  This unit does not claim the wording. It claims the OBSERVATION: AC13 reads the moved bullet in
+  both halves of the new pair and reds while the sentence is still the false one. If the pre-image at
+  order 5 still carries it, this unit amends that ONE bullet during the move and records in the build
+  record that order 1 did not. Either way no falsified sentence is copied into a fresh byte-compared
+  pair that nothing in this build revisits.
+- **S12 — the handoff to `TOOL-dFoldedVerdict-6` is STATED, not assumed.** This unit MOVES section 7
+  and rewords nothing in it beyond S11's single bullet. `TOOL-dFoldedVerdict-6` compresses the
+  REMAINDER of the protocol and does not touch the new carrier. The two units share an author and one
+  file, which is where a handoff is likeliest to be assumed rather than written, so it is written
+  here and in that unit's S10. The kit version bump belongs to that unit and not to this one, per N9.
 
 ## 3. Non-goals (OUT)
 
 - **N1** — the protocol's sections 8 through 12 are NOT renumbered. §4 gives the three costs.
-- **N2** — no verb TEXT is reworded. This unit is a move; every byte of the eighteen bullets arrives
-  in the new file unchanged. Compression of the protocol's REMAINDER is `TOOL-dFoldedVerdict-6`, and
-  the new carrier is explicitly outside that unit's subject as well — the verb list is compressed by
-  neither unit in this build.
+- **N2** — no verb TEXT is reworded, with ONE named exception. This unit is a move; every byte of the
+  eighteen bullets arrives in the new file unchanged. Compression of the protocol's REMAINDER is
+  `TOOL-dFoldedVerdict-6`, and the new carrier is explicitly outside that unit's subject as well —
+  the verb list is compressed by neither unit in this build. The exception is S11's `--review`
+  bullet, and it is carved HERE rather than left to be discovered mid-move: a verbatim rule with no
+  carved exception is what would force this unit to copy a sentence it knows to be false. No other
+  bullet may be touched under it, and it is spent only if order 1 left that sentence false.
 - **N3** — no verb is added, removed, renamed or re-ordered. `VERBS_SLUG` and `VERBS_INLINE` at
   `tools/unattended/unattended.sh:87` and `:90` are untouched.
 - **N4** — `.gitattributes` is NOT edited. `memory/**/*.md text eol=lf` at `:47` and
@@ -84,6 +106,12 @@ commit or the bar reds on a section that no longer holds what it is asked for.
   `coding-governance-agents.template.md` name the protocol and not its sections, so the pointer they
   carry stays true; F3 in §8 is the fork about whether the new file should be charter-cited at all.
 - **N8** — the kit self-tests are not RUN. §6 states how each arm is otherwise witnessed.
+- **N9** — `KIT_UNATTENDED_VERSION` is NOT bumped here. Owner ruling of 2026-09-01, recorded in this
+  build's README: the kit version moves ONCE, on the build's LAST landing unit, which is
+  `TOOL-dFoldedVerdict-6`, so an adopter sees one release rather than six. This unit ADDS two
+  carriers of the `gov:kit unattended@` marker, and both carry whatever version is live when it
+  lands. The round-1 spec audit found three specs naming three different owners for this bump; the
+  ruling settles it, and this spec states the ruling rather than restating what a sibling says.
 
 ## 4. Design
 
@@ -148,6 +176,29 @@ pinned one renumbers every pin below it at once, and the resulting message reads
 rather than an insertion. Checks 10 and 26 carry no pinned rows, so S4 and S5 are safe; a builder who
 decides to touch check 16 instead is not.
 
+### The `--review` bullet, and why this unit observes it
+
+The bullet is the one passage in section 7 whose truth changes under this build. Two properties of
+the machinery make it worth a criterion rather than a note.
+
+Check 10 compares the two copies of a pair to each other, and its own header at
+`tools/unattended/check-unattended.sh:1244-1247` says a parity leg is a copy check. A sentence false
+in BOTH halves is green forever. This unit then CREATES a second such pair, so a falsified sentence
+copied at order 5 acquires a second permanent home that nothing later in this build reads: the new
+carrier is out of `TOOL-dFoldedVerdict-6`'s subject by that unit's own N1.
+
+AC13 is therefore stated over CONTENT and not over parity. A parity or byte-compare observation
+passes whether or not a content change ever happened, which is the shape the round-1 audit named
+three times across this spec set. AC14 is the same correction applied to the move itself.
+
+Owner ruling of 2026-09-01: at CEILING the driver accepts EITHER disposition, because a forced value
+is a constant and a constant is not evidence for the clause that reads it. That permits something
+`memory/guides/BUILD-METHOD.md` M4 does not describe — M4's sentence says a run reaching the runaway
+ceiling promotes and lands anyway, and names no fold there. The corrected bullet must therefore
+describe a CEILING exit that admits both dispositions, or the contract a run is measured against
+disagrees with the driver measuring it. What that sentence SAYS is `TOOL-dFoldedVerdict-1`'s to
+write; AC13 only observes that it no longer says the false thing.
+
 ### Alternatives rejected
 
 **Renumbering sections 8 through 12 down to 7 through 11.** Rejected on three verified costs.
@@ -174,8 +225,12 @@ becomes a stub, in both halves or neither) · `tools/unattended/check-unattended
 26) · `tools/unattended/check-unattended.test.sh` (arms for the new branches) ·
 `tools/unattended/adopt-unattended.sh` · `tools/unattended/kit.toml` ·
 `tools/unattended/SKILL.template.md` and `.claude/skills/unattended/SKILL.md` ·
-`tools/unattended/unattended.sh` and every `gov:kit unattended@` marker (the version bump) ·
 `memory/map/features/unattended.md` and the generated map artifacts · `memory/backlog/TOOL.md`.
+
+`tools/unattended/unattended.sh` is NOT edited. At rev-1 this list named it and "every
+`gov:kit unattended@` marker" as the version bump, which is a deliverable no §2 item here ever
+scoped and which owner ruling (b) assigns to `TOOL-dFoldedVerdict-6`. The row is deleted rather than
+left to read as covered. See N9.
 
 ## 5. Production-readiness checklist
 
@@ -222,10 +277,16 @@ becomes a stub, in both halves or neither) · `tools/unattended/check-unattended
   copy has been perturbed, it names `memory/guides/UNATTENDED-VERBS.md` and tells the reader to
   re-run the adopter; on an unperturbed tree it reports `unattended: in sync`.
 - **AC7** — When `bash tools/check-kit-versions.sh` runs, it exits 0, which asserts the new template
-  carries a `gov:kit unattended@` marker equal to `KIT_UNATTENDED_VERSION`.
+  carries a `gov:kit unattended@` marker EQUAL to `KIT_UNATTENDED_VERSION`. It asserts agreement and
+  never movement: the comparator at `tools/check-kit-versions.sh:159-171` compares each marker to the
+  constant, so an unbumped kit satisfies it exactly as well as a bumped one. This unit does not bump
+  the version (N9) and this criterion is not evidence that anything did.
 - **AC8** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs, it exits 0, and
-  `wc -lc memory/guides/UNATTENDED-PROTOCOL.md` reports a byte count strictly below 61440 — the
-  headroom this unit exists to create, observed rather than projected.
+  `wc -lc memory/guides/UNATTENDED-PROTOCOL.md` reports a byte count strictly below 61440 AND strictly
+  below this unit's own PRE-IMAGE, measured before the pass with
+  `git show HEAD:memory/guides/UNATTENDED-PROTOCOL.md | wc -c` and recorded in the build record. The
+  pre-image is NOT the BASE figure: `TOOL-dFoldedVerdict-2` at order 2 adds a section 8 row to this
+  same file, so 61440 is a BASE observation and the pass re-measures rather than assuming it.
 - **AC9** — When `awk '/^## 8[.] /{f=1;next} f&&/^## /{f=0} f' memory/guides/UNATTENDED-PROTOCOL.md`
   runs, it still yields the conf-key table, and `grep -n '^## ' memory/guides/UNATTENDED-PROTOCOL.md`
   still reports `## 7. The verbs` at a heading of its own with sections 8 through 12 unrenumbered.
@@ -241,6 +302,36 @@ becomes a stub, in both halves or neither) · `tools/unattended/check-unattended
 - **AC12** — When `grep -n 'TOOL-dUnstalledConvoy-17\|TOOL-dBriefedPass-8' memory/backlog/TOOL.md`
   runs, neither row still asserts what S10 measured false: no claim that section 7 omits `--park` or
   `--attest`, and no claim that `INDEX_CAP_BYTES` is the cap that binds it.
+- **AC13** — When the `--review` bullet is extracted from BOTH halves of the new pair with
+  `sed -n '/^- .--review. — /,/^- .--version. — /p'`, each extract contains the token `fold` and does
+  NOT contain the literal `promoted to a unit rather than parked`. Measured at BASE `adc0543c`: that
+  literal is present and `fold` is absent, so both arms have a failing case today and the criterion
+  reds while the sentence is still the false one. The extracts are recorded in the unit's build
+  record beside the commands that produced them. What the corrected sentence SAYS is
+  `TOOL-dFoldedVerdict-1`'s to write, and this criterion does not pin its wording.
+- **AC13a** — When those same two extracts are READ, the CEILING clause admits either disposition,
+  per the owner ruling of 2026-09-01, and the refusal enumeration matches the refusals
+  `tools/unattended/unattended.sh` actually ships. This is a READER observation and is written as one:
+  no grep distinguishes a correct enumeration from a plausible one, and an honest unobservable is
+  better than a criterion that cannot fail. The reading and its verdict go in the build record.
+- **AC14** — When `grep -cE '^- .--[a-z-]+. — '` runs over each half of the PROTOCOL pair it reports
+  0, and over each half of the NEW pair it reports 18. Measured at BASE with the same command: the
+  protocol reports 18 and every one of them sits inside section 7, so the zero is an observation with
+  a failing case rather than a restatement of AC3. This is the criterion that distinguishes a
+  completed move from a HALF-MOVE, and neither existing leg can: check 10 compares the two protocol
+  copies to each other and passes when neither was emptied, and check 26 under F1 reads only the new
+  carrier. Additionally `sed -n '/^## 7[.] The verbs$/,/^## 8[.] /p'` over each protocol half yields a
+  body that names `UNATTENDED-VERBS.md` and carries no verb bullet.
+- **AC15** — When `python tools/govkit/govkit.py selfcheck` runs, it exits 0 with the `[[files]]`
+  destination S7 declares present and unique. Stated because nothing else reaches S7: verified by
+  reading, `tools/unattended/adopt-unattended.sh` contains ZERO references to `kit.toml` and
+  hard-codes its artifact paths at `:183-190`, so AC6's adopter `--check` cannot observe a missing
+  descriptor row, and the kit half is already claimed by the `include = "**"` engine rule.
+- **AC16** — When `grep -n 'UNATTENDED-VERBS' tools/unattended/SKILL.template.md
+  .claude/skills/unattended/SKILL.md` runs, both files return a hit in the sentence naming the binding
+  contract, and `bash tools/unattended/adopt-unattended.sh --check` then reports `unattended: in sync`
+  over the regenerated render. AC6 grades the render's BYTES and would pass on a Skill that still
+  names one carrier, so S8 needs an observation of its own.
 
 ## 7. Gates
 
@@ -288,6 +379,20 @@ putting the new file where check 6 and check 26 can already reach it.
 
 - rev-1 · 2026-09-01 · initial draft. Every cap, line number and count in §4 verified at BASE
   `adc0543c` by reading the named source.
+- rev-2 · 2026-09-01 · round-1 spec-audit fold. **H4** — S11, the N2 carve-out, the new §4
+  subsection and AC13 with AC13a: the protocol's `--review` sentence goes false under
+  `TOOL-dFoldedVerdict-1` and rev-1 would have copied it verbatim into a new byte-compared pair. The
+  correction is owned by order 1 and this unit is now the backstop that observes it, cited by section
+  rather than by a line number this move invalidates. **H9 and owner ruling (b)** — N9 added, and the
+  version-bump row deleted from Files touched with the deletion stated: the bump moves ONCE, on
+  `TOOL-dFoldedVerdict-6`, and AC7 now says plainly that `check-kit-versions.sh` asserts agreement and
+  never movement. **M4's class** — AC14 added: at rev-1 no criterion observed that section 7's body
+  LEFT the protocol, and every leg touching that pair passes on a half-move. **M5** — AC15 and AC16
+  added for S7 and S8, which had no criterion and which the adopter check cannot reach; folded here
+  because this spec is the only document the finding addresses. AC8 re-stated against this unit's
+  pre-image rather than the BASE constant, which `TOOL-dFoldedVerdict-2` moves at order 2. **S12**
+  states the handoff to `TOOL-dFoldedVerdict-6` explicitly in both directions.
+- rev-3 · 2026-09-01 · MOVED TO ORDER 1, and the move is load-bearing rather than cosmetic. `memory/guides/UNATTENDED-PROTOCOL.md` renders at EXACTLY `GUIDE_CAP_BYTES` (61440 of 61440, measured) with 725 of 750 lines, and two units sequenced BEFORE this one added bytes to it — `TOOL-dFoldedVerdict-2` S12 adds a section-8 key row and `TOOL-dFoldedVerdict-1` S9 amends a bullet. Either would have red hygiene check 6 before the relief this unit provides had landed, which is M2's ordering rule broken: a unit depending on one sequenced after it. This unit now runs first and frees the 8.1 KB the rest spend. N2 is unchanged — the move is still verbatim, and the bullet it carries is corrected by unit 1 afterwards in the new carrier.
 
 ## 10. Reuse audit
 

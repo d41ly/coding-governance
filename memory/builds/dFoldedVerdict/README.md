@@ -43,6 +43,11 @@ parallelism verdict permits, and the protocol renders at its byte cap.
   exited subject that no verb can retrofit, so a cutoff is mandatory rather than optional.
 - **A compression that drops or reverses a claim is a worse defect than the verbosity.** Two parity
   legs compare the two copies to each other, so a claim false in both is green.
+- **At CEILING the driver accepts EITHER disposition.** Owner ruling. A forced value is a constant,
+  and a constant is not evidence for the clause that reads it — so the field stays evidence at every
+  exit, and the specs say plainly that this permits something M4's sentence does not describe.
+- **The kit version moves ONCE, on the build's last landing unit.** Owner ruling. Nine carriers that
+  `check-kit-versions.sh` asserts AGREE rather than MOVE; an adopter sees one release, not six.
 
 ## Parked decisions
 - None yet.
@@ -66,30 +71,30 @@ ids TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFold
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dFoldedVerdict-1 — the driver records which disposition a review exit took](spec/2026-09-01-spec-TOOL-dFoldedVerdict-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-2 — clause 3 reads the recorded disposition, behind a dated cutoff](spec/2026-09-01-spec-TOOL-dFoldedVerdict-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-3 — the two exit rows say which disposition they took, and `origin/main` goes green](spec/2026-09-01-spec-TOOL-dFoldedVerdict-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-4 — `agent-cap` admits a strictly sequential awaited `agent()` under a marker that names a bound](spec/2026-09-01-spec-TOOL-dFoldedVerdict-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-5 — section 7 becomes its own carrier](spec/2026-09-01-spec-TOOL-dFoldedVerdict-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-6 — the whole-document compression pass](spec/2026-09-01-spec-TOOL-dFoldedVerdict-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-5 — section 7 becomes its own carrier](spec/2026-09-01-spec-TOOL-dFoldedVerdict-5.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-1 — the driver records which disposition a review exit took](spec/2026-09-01-spec-TOOL-dFoldedVerdict-1.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-2 — clause 3 reads the recorded disposition, behind a dated cutoff](spec/2026-09-01-spec-TOOL-dFoldedVerdict-2.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-3 — the two exit rows say which disposition they took, and `origin/main` goes green](spec/2026-09-01-spec-TOOL-dFoldedVerdict-3.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-4 — `agent-cap` admits a strictly sequential awaited `agent()` under a marker that names a bound](spec/2026-09-01-spec-TOOL-dFoldedVerdict-4.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-6 — the whole-document compression pass](spec/2026-09-01-spec-TOOL-dFoldedVerdict-6.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFoldedVerdict-4 TOOL-dFoldedVerdict-5 TOOL-dFoldedVerdict-6.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-dFoldedVerdict-1` | no |
-| 2 | `TOOL-dFoldedVerdict-2` | no |
-| 3 | `TOOL-dFoldedVerdict-3` | no |
-| 4 | `TOOL-dFoldedVerdict-4` | no |
-| 5 | `TOOL-dFoldedVerdict-5` | no |
+| 1 | `TOOL-dFoldedVerdict-5` | no |
+| 2 | `TOOL-dFoldedVerdict-1` | no |
+| 3 | `TOOL-dFoldedVerdict-2` | no |
+| 4 | `TOOL-dFoldedVerdict-3` | no |
+| 5 | `TOOL-dFoldedVerdict-4` | no |
 | 6 | `TOOL-dFoldedVerdict-6` | no |
 <!-- /gen:build-order -->
 
