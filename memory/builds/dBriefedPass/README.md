@@ -71,13 +71,13 @@ ids TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPas
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dBriefedPass-1 — `plan_state` grades a spec by heading TITLE, not by ordinal](spec/2026-09-01-spec-TOOL-dBriefedPass-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-01 |
-| [TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed](spec/2026-09-01-spec-TOOL-dBriefedPass-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-01 |
-| [TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED](spec/2026-09-01-spec-TOOL-dBriefedPass-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-01 |
-| [TOOL-dBriefedPass-4 — the harness: one Workflow script driving spec, audit, fold and build in order](spec/2026-09-01-spec-TOOL-dBriefedPass-4.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-01 |
-| [TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation](spec/2026-09-01-spec-TOOL-dBriefedPass-5.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-01 |
+| [TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed](spec/2026-09-01-spec-TOOL-dBriefedPass-2.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED](spec/2026-09-01-spec-TOOL-dBriefedPass-3.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dBriefedPass-4 — the harness: one Workflow script driving spec, audit, fold and build in order](spec/2026-09-01-spec-TOOL-dBriefedPass-4.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation](spec/2026-09-01-spec-TOOL-dBriefedPass-5.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

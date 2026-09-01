@@ -1,6 +1,6 @@
 # TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed
 
-**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -162,9 +163,11 @@ shape `TOOL-dBriefedPass-1` S6 carries for the BUILD-METHOD pair.
   because it is the command S3 puts in scope to emit it; at rev-1 this criterion asserted a message
   no unit produced.
 - **AC7** — `bash tools/unattended/check-unattended.sh` is GREEN with `--brief` declared, which is
-  checks 26 and 27 over the new verb and the new kind, AND `bash tools/check-wiring.sh --check`
-  reports the installed Skill matching tracked, which is the `unattended skill wiring` leg over the
-  RENDER half of S8's carriers. Two commands, because the carriers are two template-and-render pairs
+  checks 26 and 27 over the new verb and the new kind, AND
+  `bash tools/unattended/adopt-unattended.sh --check` is green, which IS the `unattended skill
+  wiring` leg — its argv, read from `tools/gate-legs.json` — over the RENDER half of S8's carriers.
+  `tools/check-wiring.sh --check` was named at rev-3 and is a different program: it is the
+  SessionStart wiring check, not this leg. Two commands, because the carriers are two template-and-render pairs
   and check 26 reads only the templates.
 - **AC8** — a recorded brief moves `--status`'s `· noted` count by one and leaves `· parked`
   unchanged. That PAIR is the observation: `noted` seeing it proves `PARK_KINDS` membership took
@@ -205,6 +208,10 @@ none
   following it. H10 (finding 5): S5 asked for a per-kind `--status` split the driver does not
   produce and AC5 asserted that output, so neither could fail; briefs now land in the existing
   `noted` aggregate.
+- rev-4 · 2026-09-01 · round-3 spec-audit fold. H2 (finding 26's sibling): AC7 named
+  `tools/check-wiring.sh --check` as the `unattended skill wiring` leg; that leg's argv is
+  `bash tools/unattended/adopt-unattended.sh --check`, so the criterion ran a different program than
+  the one it claimed to observe.
 
 ## 10. Reuse audit
 

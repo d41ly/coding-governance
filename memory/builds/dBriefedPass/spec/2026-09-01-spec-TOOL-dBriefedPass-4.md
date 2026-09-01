@@ -1,6 +1,6 @@
 # TOOL-dBriefedPass-4 — the harness: one Workflow script driving spec, audit, fold and build in order
 
-**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -34,7 +35,14 @@ property of control flow rather than of an agent's recollection across a context
   stage return it already awaits. No callback and no new `args` field: a Workflow script has no
   filesystem and cannot run that command itself, and an undeclared callback would be an input this
   spec names nowhere. The blocker count it passes comes from the same `workflow()` return the AUDIT
-  stage already receives — `tier2-review.js:383` yields `{confirmed, blockers, highs, …}`. After each
+  stage already receives. The site that yields an INTEGER `blockers` is `tier2-review.js:608`, the
+synthesis return; `:373`, `:383` and `:476` are DEGRADED-PATH returns that yield `blockers: null` by
+design, and the file says so — null, never 0, so a stated absence cannot be read as a clean bill.
+That distinction is load-bearing here rather than pedantic: `unattended.sh:3821` refuses a
+non-integer `--blockers`, and `:3768` emits `CONVERGED` only on a count of 0, so routing the loop
+through a null-yielding site makes the CONVERGED exit unreachable and every audit look degraded. The
+AUDIT stage therefore reads the synthesis return, and a null `blockers` is a REFUSAL that surfaces
+the degraded run rather than a number it invents. After each
   round the harness reads that verdict token; `CONVERGING` re-enters AUDIT, and `CONVERGED`, `NON-CONVERGENT` and `CEILING` all exit
   to BUILD. On the two non-clean exits every standing blocker is PROMOTED to a unit through S6's
   sub-flow rather than carried into BUILD, which is what `BUILD-METHOD.md` M4 requires at the exit.
@@ -134,7 +142,14 @@ thing under test.
 ### Files touched (estimate)
 
 `tools/workflows/unattended-build.js` (new), `tools/workflows/unattended-build.test.sh` (new),
-`tools/workflows/kit.toml`, `tools/gate-legs.json`.
+`tools/workflows/kit.toml`, `tools/gate-legs.json`, and the CODEBASE-MAP carriers the new file
+obliges: a `workflow-scripts` claim in `memory/map/features/`'s relevant dossier plus the
+regenerated `memory/map/generated/MAP.md` and `inventories.json`. A new workflow script is a new
+inventory key against a baseline that holds none, and `codebase-map coverage + freshness` is
+`chunk: declarations`, `subject: repo`, NO guard — so it runs on every bar and reports the key
+UNCLAIMED from the creating commit onward. This unit does NOT add a `gate_leg` block: it ships no
+merge-bar leg of its own, and `tools/gate-legs.json` appears here only because the harness's test
+file is registered like its siblings.
 
 ## 5. Production-readiness checklist
 
@@ -175,7 +190,11 @@ thing under test.
   zero rounds and reads as convergence on the first pass, which is the reassuring-zero shape this
   repo refuses in its probes one layer down.
 - **AC9** — an AUDIT stage return carrying NO `verdict` field is REFUSED by S5's schema, asserted as
-  a refusal and not merely as a non-CONVERGED path.
+  a refusal and not merely as a non-CONVERGED path. An AUDIT stage whose `blockers` is `null` is
+  likewise a refusal naming the degraded run, not a count.
+- **AC10** — `python3 tools/codebase-map/test_codebase_map.py` is GREEN with the new script present,
+  which is the criterion for the dossier claim and the regenerated artifacts §4 names. Observed RED
+  first: an unclaimed new key reports `UNCLAIMED (new key? claim it in a feature dossier ...)`.
 - **AC5** — the AUDIT stage's call names `kind: 'spec-audit'`. Asserted, because `tier2-review.js`
   DEFAULTS an absent kind to `diff-review`, which would review a spec with code-shaped lenses and
   report it as a review — the exact failure M4 exists to prevent.
@@ -186,6 +205,7 @@ thing under test.
 
 `bash tools/run-gates/run-gates.sh` · `workflow script syntax` · `verifier fan-out` ·
 `harness arms (fail branches armed or pinned)` · `review-join ban (no ref-keyed join)` ·
+`codebase-map coverage + freshness` ·
 the `agent-cap` hook's admission of this file. Every leg name resolves against
 `tools/gate-legs.json`; `review-harness gates` was listed at rev-2 and resolves to nothing.
 
@@ -212,6 +232,17 @@ none
   field required so an absent verdict refuses instead of reading as CONVERGED, and AC8 asserts the
   round count is non-zero. Round 1's B5 fix created the loop and did not say where its input came
   from. Also the §7 leg-name correction, one name that resolves to nothing.
+- rev-4 · 2026-09-01 · round-3 spec-audit fold, at the NON-CONVERGENT exit; both blockers here are
+  document defects and FOLD rather than promote. B2 (finding 8): the rev-3 fix named
+  `tier2-review.js:383` as the blocker-count channel, and that is a degraded-path return yielding
+  `blockers: null` BY DESIGN — the integer path is `:608`. Since `unattended.sh:3768` emits
+  `CONVERGED` only on 0 and `:3821` refuses a non-integer, a CLEAN audit could not have reached the
+  CONVERGED exit at all. Round 2's fix named a line; it named the wrong one, which is the citation
+  class round 2 itself proposed a gate for. B3 (finding 21): `tools/workflows/unattended-build.js`
+  is a new `workflow-scripts` inventory key against an empty baseline, claimed by no dossier, and
+  the map leg is unguarded — the same landing-without-its-carrier mechanism as spec 3's B1, in a
+  different declaration system. H5 (finding 21's sibling): §4 named the descriptor pair a new LEG
+  needs while this unit declares none, which is now said explicitly.
 
 ## 10. Reuse audit
 

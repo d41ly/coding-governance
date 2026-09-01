@@ -1,6 +1,6 @@
 # TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation
 
-**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 5
+**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
 
 <!-- /gen:spec-records -->
 
@@ -43,7 +44,12 @@ and the rendered Skill and the build method point at those rules without restati
   states its own byte constraint. M11's pointer table already carries the protocol, so the harness
   rule is reachable from the method without a new sentence in it.
 - **S6** — the protocol and skill renders are regenerated so the parity legs that byte-compare
-  template against render stay green, and `tools/unattended/kit.toml` records the version bump.
+  template against render stay green, and the kit VERSION is bumped where it actually lives:
+  `tools/unattended/kit.toml:6` declares `version_from = { file = "unattended.sh", pattern =
+  "^KIT_UNATTENDED_VERSION=" }`, so the number is in the driver and the descriptor merely points at
+  it. The bump is therefore an edit to `unattended.sh`'s constant plus every `gov:kit unattended@`
+  marker the `kit version markers` leg joins to it. At rev-3 this item said the descriptor records
+  the bump, which would have had a builder editing a file that carries no version.
 - **S7** — WITHDRAWN. The protocol's section 7 verb row for `--brief` lands at order 2 with the verb
   itself, per `TOOL-dBriefedPass-2` S8, for the reason S3 already gives about the Skill's rows:
   check 26 joins a verb to three carriers on an unguarded leg, so a row claimed at order 5 reds the
@@ -80,7 +86,7 @@ The carriers touched, what each gains, and the leg that grades it:
 | `SKILL.template.md` | the harness in "While it runs", one directive row | `unattended skill wiring` |
 | `.claude/skills/unattended/SKILL.md` | the render | `check-wiring.sh` |
 | `.unattended.conf` and its example | `DIRECTIVES_FLOOR` 16 to 17 | the directive floor pin |
-| `tools/unattended/kit.toml` | version bump | kit version markers |
+| `unattended.sh`'s version constant and every `gov:kit unattended@` marker | the kit version bump | `kit version markers` |
 
 `memory/guides/BUILD-METHOD.md` and its template are NOT in this table, by S5. They form a render
 pair that `tools/memory-tree/kit-dogfood-parity.test.sh` byte-compares as the leg
@@ -129,8 +135,10 @@ number authored beside the table that owns it is wrong on the next edit.
 
 - **AC1** — `bash tools/unattended/run-unattended-gates.sh --checks` is green, which is where the
   protocol and skill parity legs live.
-- **AC2** — `bash tools/check-wiring.sh --check` reports the installed Skill matches tracked, so the
-  render in `.claude/skills/unattended/` is not left behind.
+- **AC2** — `bash tools/unattended/adopt-unattended.sh --check` is green, which IS the
+  `unattended skill wiring` leg by its declared argv, so the render in `.claude/skills/unattended/`
+  is not left behind. `tools/check-wiring.sh --check` was named at rev-3 and is the SessionStart
+  wiring check, a different program from the leg this criterion claims to observe.
 - **AC3** — under `bash tools/unattended/run-unattended-gates.sh --checks`, the directive handle appears in BOTH the driver's core set and the rendered Skill's
   table. The leg joins the two in both directions, so a handle in one and not the other is a refusal;
   this arm observes that refusal by staging the handle in only one and confirming RED.
@@ -179,6 +187,11 @@ none
   (findings 19 and 9): the `SKILL.template.md` inventory cell said "two verbs" while S3 negates it
   in the same document. M6 (finding 40): §4 Files touched authored a row count beside the table that
   owns it.
+- rev-4 · 2026-09-01 · round-3 spec-audit fold. H4: S6 asked `tools/unattended/kit.toml` to record
+  the version bump, and that file carries `version_from` pointing at a constant in `unattended.sh` —
+  `check-kit-versions.sh` never reads a version out of the descriptor, so the instruction named a
+  file with no version in it. H2: AC2 named `tools/check-wiring.sh --check` as the
+  `unattended skill wiring` leg, whose argv is `bash tools/unattended/adopt-unattended.sh --check`.
 
 ## 10. Reuse audit
 
