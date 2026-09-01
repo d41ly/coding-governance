@@ -1,6 +1,6 @@
 # TOOL-dBriefedPass-1 — `plan_state` grades a spec by heading TITLE, not by ordinal
 
-**Status:** SPECCED · rev-2 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -108,7 +109,9 @@ None. The change is a predicate, no artifact is committed from it, and no spec's
 - **Performance** — unchanged shape: one awk pass per graded spec. `TOOL-aCollapsedScan-4` records
   that this call is the `unattended kit gate` leg's dominant per-unit cost and that it is unfoldable;
   this unit must not make it slower, and a title match is the same single regex per heading line.
-- **Observability** — the refusal in S3 names the file and the duplicated title.
+- **Observability** — the duplicate-title path emits NOTHING; S3 binds the first occurrence and
+  prints the ordinary grade, so its only witness is AC5's two arms. The rev-2 wording named a
+  refusal message that the same fold had just removed.
 - **Testing** — S4's four arms, each observed RED against the shipped predicate before the fix.
 - **Migration · rollback** — revert is the single function body; nothing is persisted.
 
@@ -134,12 +137,25 @@ None. The change is a predicate, no artifact is committed from it, and no spec's
 - **AC7** — `bash tools/memory-tree/kit-dogfood-parity.test.sh` is green, which is the leg that
   byte-compares the two halves S6 edits. Named because S6 touches a render pair and editing one half
   alone reds a leg no other criterion here observes.
+- **AC8** — the POSITIVE observation of S6, without which S6 has no criterion that can fail. In BOTH
+  `memory/guides/BUILD-METHOD.md` and `tools/memory-tree/BUILD-METHOD.template.md`, M2's THIN line
+  names `Scope`, `Acceptance criteria` and `Gates` and its FORKED line names `Open questions`, and
+  neither line carries a `§`-prefixed ordinal. Asserted over those two lines specifically and not
+  over the file, whose 27 other `§` references are unrelated and would make a whole-file count
+  unfalsifiable. Observed RED against the shipped bytes first, the way AC2 already is: today both
+  lines read `§2 Scope, §6 Acceptance or §7 Gates` and `§8 Open questions`. AC6 and AC7 are a byte
+  bound and an unchanged-leg assertion, and an empty diff satisfies both.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` · `unattended driver selftest` · `unattended kit gate` ·
-`marker contract (4 readers)` · `kit/dogfood doc parity` · `method carriers (every pointer
-declared)` · `memory hygiene`.
+`bash tools/run-gates/run-gates.sh` · `unattended kit gate` · `marker contracts` ·
+`kit/dogfood doc parity` · `method carriers (every pointer declared)` · `memory hygiene`.
+
+Every name above resolves against `tools/gate-legs.json`. `unattended driver selftest` and
+`marker contract (4 readers)` were listed at rev-2 and resolve to nothing; the driver suite is
+`tools/unattended/unattended.test.sh`, which is NOT on the bar by the owner's 2026-08-23 ruling, so
+the arms S4 and S5 add are witnessed by running that file directly and the verdict is owed in the
+landing report.
 
 ## 8. Open questions
 
@@ -159,6 +175,13 @@ none
   exactly the Tier-1 specs `TOOL-dBriefedPass-3` refuses on — S6 brings that correction and its
   byte-compared template half into THIS unit so prose and code move in one commit, and S7 states that
   it is paid for inside a budget M3 reserves from this run.
+- rev-3 · 2026-09-01 · round-2 spec-audit fold. H4 (finding 1): S6's only criteria were a byte bound
+  and an unchanged-leg assertion, both satisfied by an empty diff, so the fold's headline scope item
+  had no witness — AC8 observes the content, scoped to M2's two classification lines because a
+  whole-file `§` count is 27 in both halves and cannot fail. M2 (finding 16): the §5 Observability
+  bullet still described the rev-1 refusal that the rev-2 fold removed, instructing a builder to
+  re-introduce exactly what round 1 blocked on. M1 (finding 17): §7 named two legs that resolve
+  against nothing in `tools/gate-legs.json`.
 
 ## 10. Reuse audit
 

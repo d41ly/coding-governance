@@ -1,6 +1,6 @@
 # TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation
 
-**Status:** SPECCED · rev-2 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
 
 <!-- /gen:spec-records -->
 
@@ -43,9 +44,14 @@ and the rendered Skill and the build method point at those rules without restati
   rule is reachable from the method without a new sentence in it.
 - **S6** — the protocol and skill renders are regenerated so the parity legs that byte-compare
   template against render stay green, and `tools/unattended/kit.toml` records the version bump.
-- **S7** — the protocol's section 7 verb list gains the verbs this build adds.
-  `TOOL-dUnstalledConvoy-17` records that this list is already incomplete and joined to nothing; this
-  unit does not widen that gap.
+- **S7** — WITHDRAWN. The protocol's section 7 verb row for `--brief` lands at order 2 with the verb
+  itself, per `TOOL-dBriefedPass-2` S8, for the reason S3 already gives about the Skill's rows:
+  check 26 joins a verb to three carriers on an unguarded leg, so a row claimed at order 5 reds the
+  bar for three units. This unit adds NO verb row to any carrier. Its rev-2 ground was also false —
+  `TOOL-dUnstalledConvoy-17` says the list is "incomplete and joined to nothing", and check 26
+  landed 2026-08-21, the day after that row, joining all 17 declared verbs to a row in both the
+  template and its render. What survives of that row is the reverse direction and its ordering
+  principle, neither of which this unit touches.
 
 ## 3. Non-goals (OUT)
 
@@ -71,7 +77,7 @@ The carriers touched, what each gains, and the leg that grades it:
 |---|---|---|
 | `PROTOCOL.template.md` | the harness section, the brief obligation, the dispatch requirement | protocol parity legs |
 | `memory/guides/UNATTENDED-PROTOCOL.md` | the render of the above | the same, byte-compared |
-| `SKILL.template.md` | two verbs, one directive row | skill render parity |
+| `SKILL.template.md` | the harness in "While it runs", one directive row | `unattended skill wiring` |
 | `.claude/skills/unattended/SKILL.md` | the render | `check-wiring.sh` |
 | `.unattended.conf` and its example | `DIRECTIVES_FLOOR` 16 to 17 | the directive floor pin |
 | `tools/unattended/kit.toml` | version bump | kit version markers |
@@ -105,7 +111,8 @@ the directive is what makes the obligation waivable-with-a-reason rather than si
 
 ### Files touched (estimate)
 
-The seven rows of the inventory table above.
+The carriers named in the inventory table above. No count is written here: the table owns it, and a
+number authored beside the table that owns it is wrong on the next edit.
 
 ## 5. Production-readiness checklist
 
@@ -141,8 +148,10 @@ The seven rows of the inventory table above.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` · `unattended kit gate` · `method carriers (every pointer
-declared)` · `kit version markers` · `memory hygiene` · `template size <=48KiB`.
+`bash tools/run-gates/run-gates.sh` · `unattended kit gate` · `unattended skill wiring` ·
+`kit version markers` · `memory hygiene`. Every name resolves against `tools/gate-legs.json`.
+`method carriers (every pointer declared)` and `template size <=48KiB` were listed at rev-2 and are
+dropped: S5's withdrawal means this unit touches no method carrier and no charter template.
 
 ## 8. Open questions
 
@@ -161,6 +170,15 @@ none
   `--brief` carrier rows leave S3 for `TOOL-dBriefedPass-2` S8, and AC7 observes the join. M1
   (finding 26): the README roster cell claimed this unit ships the history leg while §3 declines it;
   the roster was corrected.
+- rev-3 · 2026-09-01 · round-2 spec-audit fold. S7 is WITHDRAWN, which closes five findings at once:
+  H7, H8 and H9 (findings 36, 31 and 13) each read the same claim from a different axis — S7 claimed
+  a check-26 carrier row that `TOOL-dBriefedPass-2` S8 already claims at order 2, which is the half
+  of round 1's B1 fix that was not carried through; M4 (finding 10) is that S7 had no criterion of
+  its own and the criterion that exists credits another unit; and L1 (finding 41) is that S7's
+  stated ground was superseded by check 26 the day after the row it cites was written. M5 and M7
+  (findings 19 and 9): the `SKILL.template.md` inventory cell said "two verbs" while S3 negates it
+  in the same document. M6 (finding 40): §4 Files touched authored a row count beside the table that
+  owns it.
 
 ## 10. Reuse audit
 

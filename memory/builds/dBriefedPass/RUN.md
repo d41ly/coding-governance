@@ -24,3 +24,5 @@ base: 269dacae79bd5001486de32b3277675a953d3483
 ## Parked
 
 2026-09-01T10:24:58Z review · item dBriefedPass-spec-set · reason verdict BLOCKED · blockers 5
+
+2026-09-01T11:03:57Z review · item dBriefedPass-spec-set · reason verdict BLOCKED · blockers 2

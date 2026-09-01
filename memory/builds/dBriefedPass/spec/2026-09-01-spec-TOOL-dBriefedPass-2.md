@@ -1,6 +1,6 @@
 # TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed
 
-**Status:** SPECCED · rev-2 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -35,7 +36,11 @@ so it cannot be composed after the fact or left out.
 - **S4** — the `brief` kind is `history` class, not `surfaced`: it carries no question and no options,
   so it must not inflate the count of decisions `parked-decisions-surfaced` covers. It is added to
   the driver's `PARK_KINDS` and NOT to `PARK_KINDS_OWED`.
-- **S5** — `--status` counts briefs apart from questions, as it already does for proposals.
+- **S5** — briefs land in `--status`'s EXISTING `· noted N` aggregate and no per-kind split is
+  added. `park_kinds_unowed()` at `unattended.sh:2721` derives that aggregate as `PARK_KINDS`
+  minus the owed set, so adding `brief` to `PARK_KINDS` in S9 puts it there with no further
+  edit. This item is therefore satisfied BY S9 and states an expected consequence rather than
+  new work; at rev-2 it asked for a split the driver deliberately does not produce.
 - **S6** — the verb REFUSES a unit id that the build README's generated units region does not carry,
   and REFUSES a `--path` that is untracked. A brief naming a unit that does not exist records nothing
   about a build, and an untracked brief is not a record.
@@ -81,7 +86,10 @@ park "$rel" brief "<unit-id>" "<sha256-12> <repo-relative path>"
 between ` · item ` and ` · reason `, and the leg's check 17 recovers an item by stripping a trailing
 reason — so the hash and path ride the reason field and nothing is appended after it. The `step`
 field is not used. The timestamped shape is also what the `kinds_re` counters at `:2713` and `:3553`
-match, which is what makes S5's `--status` split able to see these rows at all.
+match. Those two counters are keyed on `PARK_KINDS_OWED`, and a brief is NOT owed, so what they do
+with a brief row is NOT match it — that non-match is precisely what S4 buys, because a matched row
+would inflate the count `parked-decisions-surfaced` is compared against. The reader that DOES see a
+brief is `park_kinds_unowed()` at `:2721`, whose alternation feeds the `· noted N` count at `:2726`.
 
 A dash-led row was specified at rev-1 and could not be produced by this writer, could not be matched
 by any of its readers, and would itself have tripped protocol section 2's anchor ban that the same
@@ -118,7 +126,11 @@ complement, to place the new one:
 
 ### Files touched (estimate)
 
-`tools/unattended/unattended.sh`, `tools/unattended/unattended.test.sh`.
+`tools/unattended/unattended.sh`, `tools/unattended/unattended.test.sh`, and the four carrier files
+S8 requires: `tools/unattended/PROTOCOL.template.md`, `tools/unattended/SKILL.template.md`, and
+their renders `memory/guides/UNATTENDED-PROTOCOL.md` and `.claude/skills/unattended/SKILL.md`. The
+templates and their renders are RENDER PAIRS — editing one half alone reds the parity legs, the same
+shape `TOOL-dBriefedPass-1` S6 carries for the BUILD-METHOD pair.
 
 ## 5. Production-readiness checklist
 
@@ -141,22 +153,31 @@ complement, to place the new one:
 - **AC4** — `parked-decisions-surfaced` with a `--value` count is UNAFFECTED by any number of brief
   lines. This is the arm that proves the `history` classification: write three briefs, attest the
   surfaced count, and `--close` must not refuse.
-- **AC5** — `--status` prints the brief count separately from the decision count.
+- **AC5** — with one brief and one proposal recorded, `--status`'s `· noted N` count is 2 and its
+  `· parked N` count is unchanged. One arm over the aggregate S5 names, rather than the per-kind
+  split rev-2 asked for and the driver does not emit.
 - **AC6** — in `tools/unattended/unattended.test.sh`, a brief recorded and then EDITED makes
   `bash tools/unattended/unattended.sh --status <slug>` print `STALE` against that row, and the arm
   asserts that word beside that unit id rather than merely a non-zero exit. `--status` is named
   because it is the command S3 puts in scope to emit it; at rev-1 this criterion asserted a message
   no unit produced.
 - **AC7** — `bash tools/unattended/check-unattended.sh` is GREEN with `--brief` declared, which is
-  checks 26 and 27 over the new verb and the new kind. This is the criterion S8 and S9 exist for, and
-  the leg it names is unguarded, so it runs on every bar from this unit onward.
-- **AC8** — the `brief` row this verb writes is MATCHED by the driver's own `kinds_re` counter regex,
-  asserted by writing one and reading the `--status` split rather than by inspecting the file.
+  checks 26 and 27 over the new verb and the new kind, AND `bash tools/check-wiring.sh --check`
+  reports the installed Skill matching tracked, which is the `unattended skill wiring` leg over the
+  RENDER half of S8's carriers. Two commands, because the carriers are two template-and-render pairs
+  and check 26 reads only the templates.
+- **AC8** — a recorded brief moves `--status`'s `· noted` count by one and leaves `· parked`
+  unchanged. That PAIR is the observation: `noted` seeing it proves `PARK_KINDS` membership took
+  effect, and `parked` not moving proves the kind stayed out of `PARK_KINDS_OWED`, which is what
+  keeps a brief from inflating the surfaced-decision count.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` · `unattended driver selftest` · `unattended kit gate` ·
-`memory hygiene`.
+`bash tools/run-gates/run-gates.sh` · `unattended kit gate` · `unattended skill wiring` ·
+`memory hygiene`. Every name resolves against `tools/gate-legs.json`; `unattended driver selftest`
+was listed at rev-2 and resolves to nothing. The driver suite `tools/unattended/unattended.test.sh`
+is not on the bar by the owner's 2026-08-23 ruling, so S7's arms are witnessed by running that file
+directly and the verdict is owed in the landing report.
 
 ## 8. Open questions
 
@@ -175,6 +196,15 @@ none
   `check-playbook.sh` over a different artifact — so S3 now names `--status` as the reader that
   recomputes the hash, and AC6 asserts that command. S1 also settles the S1-versus-S3 contradiction
   found while reading the driver during the audit: the parked region is the store, not a piece record.
+- rev-3 · 2026-09-01 · round-2 spec-audit fold. H5 (finding 15): the rev-2 fix moved the carrier
+  requirement into S8 and left §4 Files touched and §7 naming neither the carriers nor the
+  `unattended skill wiring` leg — B3's render-pair shape, one document over. H6 (finding 12): §4
+  cited `:2713` and `:3553` as the readers that see a brief row, and both are keyed on
+  `PARK_KINDS_OWED`, which a brief deliberately is not in; the sentence now states what those
+  counters must NOT do and names `park_kinds_unowed()` at `:2721` as the reader that does, with AC8
+  following it. H10 (finding 5): S5 asked for a per-kind `--status` split the driver does not
+  produce and AC5 asserted that output, so neither could fail; briefs now land in the existing
+  `noted` aggregate.
 
 ## 10. Reuse audit
 

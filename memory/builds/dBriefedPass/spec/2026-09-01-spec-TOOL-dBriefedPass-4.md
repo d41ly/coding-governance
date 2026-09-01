@@ -1,6 +1,6 @@
 # TOOL-dBriefedPass-4 — the harness: one Workflow script driving spec, audit, fold and build in order
 
-**Status:** SPECCED · rev-2 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -26,9 +27,15 @@ property of control flow rather than of an agent's recollection across a context
 - **S2** — three sequential stages and a CONVERGING PAIR: SPEC, then AUDIT and FOLD looping, then
   BUILD. A unit reaches BUILD only by having passed through SPEC and at least one AUDIT in the same
   program run. This is the unit's whole mechanism and it is JS control flow, not a check.
-- **S2b** — the AUDIT-FOLD loop is keyed on the `--review` verdict token and on nothing else. After
-  each round the caller-supplied review callback records the round and returns one of the driver's
-  four states; `CONVERGING` re-enters AUDIT, and `CONVERGED`, `NON-CONVERGENT` and `CEILING` all exit
+- **S2b** — the AUDIT-FOLD loop is keyed on the `--review` verdict token and on nothing else, and
+  the CHANNEL that token arrives on is declared rather than assumed: the AUDIT stage's own agent runs
+  `bash tools/unattended/unattended.sh --review <slug> --subject <subject> --verdict <v>
+  --blockers <n>` and returns the driver's answer in its schema, so the harness reads a field of a
+  stage return it already awaits. No callback and no new `args` field: a Workflow script has no
+  filesystem and cannot run that command itself, and an undeclared callback would be an input this
+  spec names nowhere. The blocker count it passes comes from the same `workflow()` return the AUDIT
+  stage already receives — `tier2-review.js:383` yields `{confirmed, blockers, highs, …}`. After each
+  round the harness reads that verdict token; `CONVERGING` re-enters AUDIT, and `CONVERGED`, `NON-CONVERGENT` and `CEILING` all exit
   to BUILD. On the two non-clean exits every standing blocker is PROMOTED to a unit through S6's
   sub-flow rather than carried into BUILD, which is what `BUILD-METHOD.md` M4 requires at the exit.
   The harness holds NO round cap of its own: the owner ruled on 2026-09-01 that convergence stays
@@ -47,7 +54,10 @@ property of control flow rather than of an agent's recollection across a context
   declares that two units MAY run together and this harness still runs them one at a time; the
   declaration is what a later run re-uses if the route is ever re-opened.
 - **S5** — every stage agent returns a `schema`-validated object. A stage that cannot return one is a
-  refusal, not a defaulted pass.
+  refusal, not a defaulted pass. The AUDIT stage's schema REQUIRES a `verdict` field over the
+  driver's four-state closed set, so an audit returning no verdict is a refusal rather than a silent
+  absence that would otherwise read as CONVERGED — which is the one absence that would let this
+  harness build on an unreviewed spec set.
 - **S6** — the NEW-FINDING sub-flow: a unit added mid-build re-enters at SPEC and traverses all four
   stages. It is the same code path, reached with a one-element unit list, so a new finding cannot
   reach BUILD by a shorter route.
@@ -156,10 +166,16 @@ thing under test.
   and one at order 2 dispatches all three ONE AT A TIME, in order. Asserted on the dispatch sequence
   the script emits, not on wall clock. This is the arm that proves S4 ships no concurrent route:
   at rev-1 this criterion asserted the opposite.
-- **AC7** — in `tools/workflows/unattended-build.test.sh`, a review callback returning `CONVERGING`
+- **AC7** — in `tools/workflows/unattended-build.test.sh`, an AUDIT stage returning `CONVERGING`
   re-enters AUDIT and one returning `CONVERGED` does not; `NON-CONVERGENT` and `CEILING` each exit to
   BUILD having promoted their standing blockers through S6. Four arms over the driver's four states,
   because a loop tested only on its clean exit is a loop nothing proved re-enters.
+- **AC8** — in `tools/workflows/unattended-build.test.sh`, the harness reports the number of AUDIT
+  rounds it ran and an arm asserts that count is at least 1 on a run that reached BUILD. Without it a harness whose verdict channel is broken runs
+  zero rounds and reads as convergence on the first pass, which is the reassuring-zero shape this
+  repo refuses in its probes one layer down.
+- **AC9** — an AUDIT stage return carrying NO `verdict` field is REFUSED by S5's schema, asserted as
+  a refusal and not merely as a non-CONVERGED path.
 - **AC5** — the AUDIT stage's call names `kind: 'spec-audit'`. Asserted, because `tier2-review.js`
   DEFAULTS an absent kind to `diff-review`, which would review a spec with code-shaped lenses and
   report it as a review — the exact failure M4 exists to prevent.
@@ -169,7 +185,9 @@ thing under test.
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` · `workflow script syntax` · `verifier fan-out` ·
-`review-harness gates` · `harness arms` · `agent-cap` hook admission.
+`harness arms (fail branches armed or pinned)` · `review-join ban (no ref-keyed join)` ·
+the `agent-cap` hook's admission of this file. Every leg name resolves against
+`tools/gate-legs.json`; `review-harness gates` was listed at rev-2 and resolves to nothing.
 
 ## 8. Open questions
 
@@ -187,6 +205,13 @@ none
   contained zero occurrences of `--review`; S2 becomes three stages plus a converging pair, S2b
   states the loop and its four exits, and AC7 observes all four. L1 (finding 29): AC1 invoked a
   node file through bash, which exits 2 against the declared argv.
+- rev-3 · 2026-09-01 · round-2 spec-audit fold. H1 and H2 (findings 14 and 6, one defect from two
+  axes): the rev-2 convergence loop keyed on a "caller-supplied review callback" that the §4 args
+  table never declared and no other section named, so the loop's only input came from nowhere — S2b
+  now routes the verdict through the AUDIT stage's own agent and its schema return, S5 makes that
+  field required so an absent verdict refuses instead of reading as CONVERGED, and AC8 asserts the
+  round count is non-zero. Round 1's B5 fix created the loop and did not say where its input came
+  from. Also the §7 leg-name correction, one name that resolves to nothing.
 
 ## 10. Reuse audit
 
