@@ -1,12 +1,13 @@
 # TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation
 
-**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 |
 
 <!-- /gen:spec-records -->
 
@@ -25,20 +26,26 @@ and the rendered Skill and the build method point at those rules without restati
 - **S2** — the same section states the harness's TWO LIMITS as rules rather than as caveats: it
   cannot read the tree, so it buys order and never enforcement; and it does not cover orientation,
   preflight, the owner turn, closing, landing or the keepalive.
-- **S3** — `tools/unattended/SKILL.template.md` gains the harness to its "While it runs" verbs and
-  the `--brief` verb to the same place, in the shape that file already uses. Its directive table
-  gains one handle.
+- **S3** — `tools/unattended/SKILL.template.md` gains the HARNESS to its "While it runs" section, in
+  the shape that file already uses, and its directive table gains one handle. It does NOT carry the
+  `--brief` rows: check 26 joins a verb to three carriers and the leg that runs it is unguarded, so
+  those rows land with the verb in `TOOL-dBriefedPass-2` or the bar is red for three units.
 - **S4** — a new kit-owned directive `passes-harnessed`, scoped `all`, pointing at the build method
   section the harness implements. `DIRECTIVES_FLOOR` moves from 16 to 17 in `.unattended.conf` and in
   `tools/unattended/.unattended.conf.example`, because that pin is a shrink-only SIZE and adding a
   member without moving it leaves the new one unpinned.
-- **S5** — `memory/guides/BUILD-METHOD.md` M6 gains ONE sentence naming the harness as how a pass
-  sequence is performed under a mandate, and nothing else. M1 forbids a rule appearing both there and
-  in a carrier it points at, so the rule stays in the protocol and M6 carries the pointer.
-- **S6** — both rendered copies are regenerated so the parity legs that byte-compare template against
-  render stay green, and `tools/unattended/kit.toml` records the version bump.
-- **S7** — the protocol's section 7 verb list gains `--brief`. `TOOL-dUnstalledConvoy-17` records
-  that this list is already incomplete and joined to nothing; this unit does not widen that gap.
+- **S5** — `memory/guides/BUILD-METHOD.md` IS NOT TOUCHED BY THIS UNIT. Its M6 pointer sentence was
+  in scope at rev-1 and is withdrawn: the file has 16 bytes of headroom against M1's declared 24576
+  and its byte-compared template half has 5, and M3 reserves M1's own budget from a standing
+  mandate's delegated authority, so a sentence that does not fit is not this run's to make room for
+  by raising the cap. `TOOL-dBriefedPass-1` S6 owns the one BUILD-METHOD edit this build makes and
+  states its own byte constraint. M11's pointer table already carries the protocol, so the harness
+  rule is reachable from the method without a new sentence in it.
+- **S6** — the protocol and skill renders are regenerated so the parity legs that byte-compare
+  template against render stay green, and `tools/unattended/kit.toml` records the version bump.
+- **S7** — the protocol's section 7 verb list gains the verbs this build adds.
+  `TOOL-dUnstalledConvoy-17` records that this list is already incomplete and joined to nothing; this
+  unit does not widen that gap.
 
 ## 3. Non-goals (OUT)
 
@@ -50,7 +57,9 @@ and the rendered Skill and the build method point at those rules without restati
   gating the list, and conflating them would smuggle a new gate past the round meant to price it.
 - The charter template is not edited. Its §1 unattended block already points at the protocol by name
   and says explicitly that it is not paraphrased there.
-- No new conf key is added by this unit. `PASS_ORDER_CUTOFF` belongs to `TOOL-dBriefedPass-3`.
+- No new conf key is added by this unit. `PASS_ORDER_CUTOFF` belongs to `TOOL-dBriefedPass-3`, and
+  so does the history-reading gate leg. The build README's roster cell for this unit said otherwise
+  at rev-1 and the roster was the side corrected, because spec 3 S3/S4/S6 already own that leg.
 
 ## 4. Design
 
@@ -65,8 +74,12 @@ The carriers touched, what each gains, and the leg that grades it:
 | `SKILL.template.md` | two verbs, one directive row | skill render parity |
 | `.claude/skills/unattended/SKILL.md` | the render | `check-wiring.sh` |
 | `.unattended.conf` and its example | `DIRECTIVES_FLOOR` 16 to 17 | the directive floor pin |
-| `BUILD-METHOD.md` M6 | one pointer sentence | method carriers leg |
 | `tools/unattended/kit.toml` | version bump | kit version markers |
+
+`memory/guides/BUILD-METHOD.md` and its template are NOT in this table, by S5. They form a render
+pair that `tools/memory-tree/kit-dogfood-parity.test.sh` byte-compares as the leg
+`kit/dogfood doc parity`, so a unit editing one owes the other; `TOOL-dBriefedPass-1` owns that pair
+and names both halves and that leg.
 
 The parity legs compare the two COPIES to each other, so a claim false in both is green — the
 protocol's own header says three defects survived exactly that way. The prose added here is therefore
@@ -116,8 +129,13 @@ The seven rows of the inventory table above.
   this arm observes that refusal by staging the handle in only one and confirming RED.
 - **AC4** — `DIRECTIVES_FLOOR` at 16 with 17 core directives is a REFUSAL, and at 17 it is green.
   Both arms, so the pin is proven armed rather than assumed.
-- **AC5** — `memory/guides/BUILD-METHOD.md` stays inside its declared budget of 24 KB and 350 lines
-  after S5's sentence. Measured, not assumed: M1 states the byte half binds first.
+- **AC5** — `git diff --name-only` for this unit's commit names NO file under
+  `memory/guides/BUILD-METHOD.md` or `tools/memory-tree/BUILD-METHOD.template.md`. The negative
+  criterion is the observable form of S5's withdrawal, and it is checkable; at rev-1 this criterion
+  asserted a budget held after an edit that does not fit in 16 bytes.
+- **AC7** — `bash tools/unattended/check-unattended.sh` check 26 is green over every verb this build
+  declares, asserting that the carrier rows S3 declines are present because
+  `TOOL-dBriefedPass-2` S8 landed them, not because nobody looked.
 - **AC6** — `memory/guides/UNATTENDED-PROTOCOL.md` states both limits from S2. Graded by the closing review, and this
   criterion names that reader explicitly rather than pretending a leg reads prose.
 
@@ -133,6 +151,16 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · authored under the dBriefedPass mandate.
+- rev-2 · 2026-09-01 · round-1 spec-audit fold. B2 (finding 16): S5's M6 sentence could not fit —
+  `memory/guides/BUILD-METHOD.md` measures 24560 bytes against a 24576 cap, and AC5 asserted the
+  budget held while never having measured the headroom, so the criterion would have read as verified
+  on a false premise. S5 is withdrawn and AC5 becomes the negative observation. B3 (finding 17): the
+  inventory omitted `tools/memory-tree/BUILD-METHOD.template.md`, the byte-compared half of a render
+  pair whose leg is `kit/dogfood doc parity` and whose blob has 5 bytes of headroom; the pair now
+  belongs to `TOOL-dBriefedPass-1` in one place, and this file says so. B1's share (finding 1): the
+  `--brief` carrier rows leave S3 for `TOOL-dBriefedPass-2` S8, and AC7 observes the join. M1
+  (finding 26): the README roster cell claimed this unit ships the history leg while §3 declines it;
+  the roster was corrected.
 
 ## 10. Reuse audit
 

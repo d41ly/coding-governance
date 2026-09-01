@@ -1,12 +1,13 @@
 # TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED
 
-**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -19,7 +20,11 @@ the act, and a unit whose build commit predates a conforming spec reds the merge
 ## 2. Scope (IN)
 
 - **S1** — `--dispatch` REFUSES when its `--pass <unit-id>` names a unit whose `plan_state` is
-  `MISSING` or `THIN`. The message names the id, the state and the section that is empty.
+  `MISSING` or `THIN`. The message names the ID and the STATE, and NOT the empty section:
+  `plan_state`'s contract is one bare token on stdout, pinned deliberately at
+  `tools/unattended/unattended.sh:3231-3237` because two harnesses slice the function body, and
+  `TOOL-dBriefedPass-1` §3 declines to widen it. `build-complete` already words its own message the
+  same way for the same reason.
 - **S2** — `--dispatch` REFUSES when the unit's declared `order` step has an earlier step holding a
   unit that is neither terminal nor itself dispatched. Units sharing an order value are the parallel
   group and do not block each other; a unit with NO order verb is unordered and is not blocked.
@@ -62,7 +67,9 @@ S3's join, stated as the predicate rather than as prose, for each CLOSED unit id
    run whose units were built before its own BASE is the ordinary shape for a resumed build.
 3. Otherwise, at the first parent of `C`, a tracked file under `memory/builds/<B>/spec/` must carry
    `U` in a conforming status header, and `plan_state` over that blob must not return `MISSING` or
-   `THIN`.
+   `THIN`. Those two are the whole refused set, because `TOOL-dBriefedPass-1` adds no third outcome:
+   its duplicate-title case binds the first occurrence rather than refusing, so there is no
+   ungraded state for this predicate to mistake for a pass.
 
 The whole-token match is mandatory and its class is `memory/gotchas/id-matched-as-a-substring`:
 every id ending in a 1-up sequence is a prefix of nine others, so an unanchored `TOOL-x-1` would
@@ -106,7 +113,9 @@ and grows. S5's liveness line is what stops that empty population reading as a p
 - **AC1** — a dispatch naming a unit with no tracked spec is REFUSED, naming the id and `MISSING`.
   Observed RED against the shipped driver, which accepts it today.
 - **AC2** — a dispatch naming a unit whose spec has an empty acceptance section is REFUSED, naming
-  `THIN` and the empty section.
+  the unit id and `THIN`. It does NOT name the empty section, and the arm asserts that wording: at
+  rev-1 this criterion required an output the classifier that owns the grade cannot emit, which made
+  two units of one build disagree about that classifier's interface.
 - **AC3** — in `tools/unattended/unattended.test.sh`, a dispatch at order 3 while an order-2 unit is OPEN and undispatched is REFUSED naming
   the blocking unit; the same call with that unit CLOSED succeeds. Both arms, because a refusal with
   no observed passing case is a gate that cannot be satisfied.
@@ -130,6 +139,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · authored under the dBriefedPass mandate.
+- rev-2 · 2026-09-01 · round-1 spec-audit fold. H5 (finding 40): S1 and AC2 required the refusal to
+  name the empty SECTION, which `plan_state` cannot emit — its single-token contract is a recorded
+  decision and `TOOL-dBriefedPass-1` §3 now states that it is not widened — so both are weakened to
+  the id and the state, which is the wording `build-complete` already defends. H2's consumer half
+  (finding 22): §4 step 3 now says why MISSING and THIN are the complete refused set rather than
+  leaving a third outcome unhandled.
 
 ## 10. Reuse audit
 

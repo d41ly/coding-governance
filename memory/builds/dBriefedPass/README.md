@@ -42,7 +42,12 @@ answer on disk.
 - **The harness cannot read the tree, and no unit may pretend otherwise.** A `Workflow` script has no
   filesystem: every observation it makes is a claim its own agent returned. It buys pass ORDER by
   control flow; enforcement lives in the driver, where the tree is readable.
-- **`plan_state` is a prerequisite, not a side-quest.** Unit 1 lands before any unit gates on it.
+- **`plan_state` is a prerequisite, not a side-quest.** Unit 1 lands before any unit gates on it,
+  and it owns the one `BUILD-METHOD.md` edit this build makes, so the classifier and the prose
+  stating its rule move in one commit.
+- **No concurrent build-pass dispatch.** `TOOL-cBriefedPilot-21` ratified `parallelism route: none`
+  and the route this harness would take is its R2, which failed E3 and E4. Unit 4 dispatches
+  sequentially and records the order declaration for whoever re-opens `TOOL-cBriefedPilot-28`.
 
 ## Parked decisions
 - None yet.
@@ -55,7 +60,7 @@ answer on disk.
 | 2 | `TOOL-dBriefedPass-2` | OPEN | the unit BRIEF — a tracked record of what a building agent was handed |
 | 3 | `TOOL-dBriefedPass-3` | OPEN | a build pass on an unspecced, THIN or out-of-order unit is REFUSED |
 | 4 | `TOOL-dBriefedPass-4` | OPEN | the harness — one Workflow script driving spec, audit, fold and build in order |
-| 5 | `TOOL-dBriefedPass-5` | OPEN | the carriers declare the harness the route, and the gate leg reads history |
+| 5 | `TOOL-dBriefedPass-5` | OPEN | the carriers declare the harness the route and the brief the obligation |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
@@ -65,18 +70,18 @@ ids TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPas
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dBriefedPass-1 — `plan_state` grades a spec by heading TITLE, not by ordinal](spec/2026-09-01-spec-TOOL-dBriefedPass-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-01 |
-| [TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed](spec/2026-09-01-spec-TOOL-dBriefedPass-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-01 |
-| [TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED](spec/2026-09-01-spec-TOOL-dBriefedPass-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-01 |
-| [TOOL-dBriefedPass-4 — the harness: one Workflow script driving spec, audit, fold and build in order](spec/2026-09-01-spec-TOOL-dBriefedPass-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-01 |
-| [TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation](spec/2026-09-01-spec-TOOL-dBriefedPass-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-01 |
+| [TOOL-dBriefedPass-1 — `plan_state` grades a spec by heading TITLE, not by ordinal](spec/2026-09-01-spec-TOOL-dBriefedPass-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-01 |
+| [TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed](spec/2026-09-01-spec-TOOL-dBriefedPass-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-01 |
+| [TOOL-dBriefedPass-3 — a build pass on an unspecced, THIN or out-of-order unit is REFUSED](spec/2026-09-01-spec-TOOL-dBriefedPass-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-01 |
+| [TOOL-dBriefedPass-4 — the harness: one Workflow script driving spec, audit, fold and build in order](spec/2026-09-01-spec-TOOL-dBriefedPass-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-01 |
+| [TOOL-dBriefedPass-5 — the carriers declare the harness the route, and the brief the obligation](spec/2026-09-01-spec-TOOL-dBriefedPass-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dBriefedPass-1 TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

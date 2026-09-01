@@ -1,12 +1,13 @@
 # TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed
 
-**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -20,12 +21,17 @@ so it cannot be composed after the fact or left out.
 
 - **S1** — a new verb `--brief <slug> --unit <id> --path <file>` in
   `tools/unattended/unattended.sh`. It reads the brief the caller has WRITTEN and records its content
-  hash, the unit id and the run label into the run-state file's parked region as a new `brief` kind.
+  hash and path into the run-state file's parked region as a new `brief` kind, THROUGH `park()` and
+  in `park()`'s own grammar. The parked region is the store and the piece records are not: a brief is
+  run-scoped evidence, and a piece record exists because a piece outlives its run.
 - **S2** — the brief itself is a tracked record under `memory/builds/<slug>/prompts/`, which is where
   this memory tree already sanctions prompt-kind files. It carries the standard
   `**Serves:** journal <unit-id>` binding line, so hygiene check 21 joins it to the spec.
-- **S3** — the recorded hash is over the brief FILE's bytes. Editing a brief after recording makes
-  the record STALE and readable as stale, the same join `--record-piece` uses for a piece.
+- **S3** — the recorded hash is over the brief FILE's bytes, and `--status` RECOMPUTES it on every
+  read and prints `STALE` beside any row whose file no longer hashes to what was recorded. Naming the
+  reader is the whole of this item: nothing else in this kit recomputes a hash held in a parked row,
+  so without `--status` doing it the recorded hash would be decoration and the record's advertised
+  property would be untrue on landing day.
 - **S4** — the `brief` kind is `history` class, not `surfaced`: it carries no question and no options,
   so it must not inflate the count of decisions `parked-decisions-surfaced` covers. It is added to
   the driver's `PARK_KINDS` and NOT to `PARK_KINDS_OWED`.
@@ -34,6 +40,16 @@ so it cannot be composed after the fact or left out.
   and REFUSES a `--path` that is untracked. A brief naming a unit that does not exist records nothing
   about a build, and an untracked brief is not a record.
 - **S7** — arms in `tools/unattended/unattended.test.sh` for each refusal and for the passing case.
+- **S8** — THE VERB'S THREE PROSE CARRIERS LAND IN THIS UNIT, not at order 5. Check 26 of
+  `tools/unattended/check-unattended.sh:2005-2058` joins every id in `VERBS_SLUG` to the driver's own
+  `#   unattended.sh <verb> ` header line, to `tools/unattended/PROTOCOL.template.md` and to
+  `tools/unattended/SKILL.template.md`, and `unattended.sh:91` makes `VERBS_SLUG` membership the
+  dispatch itself. The `unattended kit gate` leg carries NO `guard` key, so it runs on every bar:
+  adding the verb without its carriers reds the bar at this unit and keeps it red through units 3 and
+  4 until unit 5 lands. Both rendered copies are regenerated in the same commit.
+- **S9** — the `brief` kind is added to `PARK_KINDS` in the same commit as the `park()` call site
+  that writes one. Check 27 at `check-unattended.sh:2077-2090` fails in BOTH directions, including
+  "the driver declares a parked kind that no `park()` call site ever writes".
 
 ## 3. Non-goals (OUT)
 
@@ -50,16 +66,26 @@ so it cannot be composed after the fact or left out.
 
 ### Data model
 
-One parked line per brief, in the run-state file's authored region:
+One parked line per brief, written by `park()` and therefore in `park()`'s grammar. That writer is
+`tools/unattended/unattended.sh:3702-3711` and its format string is
+`printf '
+%s %s · item %s%s · reason %s
+'`, so the call and the line it produces are:
 
 ```
-- brief · <unit-id> · <sha256-12> · <repo-relative path>
+park "$rel" brief "<unit-id>" "<sha256-12> <repo-relative path>"
+2026-09-01T12:00:00Z brief · item TOOL-dBriefedPass-1 · reason a1b2c3d4e5f6 memory/builds/…
 ```
 
-The hash is truncated to 12 hex, the same width the piece records use, and the path is
-repo-relative and forward-slashed. The line leads with the KIND and not with the id, because
-protocol section 2's anchor ban refuses a dash row leading with an id — that would make this build a
-claimant of every unit a brief names.
+`reason` is LINE-FINAL and two live readers depend on that — `recorded_waivers` takes the token
+between ` · item ` and ` · reason `, and the leg's check 17 recovers an item by stripping a trailing
+reason — so the hash and path ride the reason field and nothing is appended after it. The `step`
+field is not used. The timestamped shape is also what the `kinds_re` counters at `:2713` and `:3553`
+match, which is what makes S5's `--status` split able to see these rows at all.
+
+A dash-led row was specified at rev-1 and could not be produced by this writer, could not be matched
+by any of its readers, and would itself have tripped protocol section 2's anchor ban that the same
+paragraph cited.
 
 ### Inventory
 
@@ -116,8 +142,16 @@ complement, to place the new one:
   lines. This is the arm that proves the `history` classification: write three briefs, attest the
   surfaced count, and `--close` must not refuse.
 - **AC5** — `--status` prints the brief count separately from the decision count.
-- **AC6** — in `tools/unattended/unattended.test.sh`, a brief recorded and then EDITED reports as stale, and the arm asserts the stale message
-  rather than merely a non-zero exit.
+- **AC6** — in `tools/unattended/unattended.test.sh`, a brief recorded and then EDITED makes
+  `bash tools/unattended/unattended.sh --status <slug>` print `STALE` against that row, and the arm
+  asserts that word beside that unit id rather than merely a non-zero exit. `--status` is named
+  because it is the command S3 puts in scope to emit it; at rev-1 this criterion asserted a message
+  no unit produced.
+- **AC7** — `bash tools/unattended/check-unattended.sh` is GREEN with `--brief` declared, which is
+  checks 26 and 27 over the new verb and the new kind. This is the criterion S8 and S9 exist for, and
+  the leg it names is unguarded, so it runs on every bar from this unit onward.
+- **AC8** — the `brief` row this verb writes is MATCHED by the driver's own `kinds_re` counter regex,
+  asserted by writing one and reading the `--status` split rather than by inspecting the file.
 
 ## 7. Gates
 
@@ -131,6 +165,16 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · authored under the dBriefedPass mandate.
+- rev-2 · 2026-09-01 · round-1 spec-audit fold. B1 (finding 1): the verb's three check-26 carriers
+  were owned by unit 5 at order 5 while the `unattended kit gate` leg is unguarded, so this unit as
+  written reds the bar and keeps it red through two later units — S8 brings the carriers here, S9
+  does the same for the `PARK_KINDS` half of check 27, and AC7 observes both. H3 (finding 37): the
+  §4 row was a bespoke dash-led shape `park()` cannot produce and none of its readers can match; §4
+  now states the call and the line, and AC8 asserts the counter regex sees it. H4 (finding 38): AC6
+  asserted staleness that nothing in scope computed — `--record-piece`'s staleness is produced by
+  `check-playbook.sh` over a different artifact — so S3 now names `--status` as the reader that
+  recomputes the hash, and AC6 asserts that command. S1 also settles the S1-versus-S3 contradiction
+  found while reading the driver during the audit: the parked region is the store, not a piece record.
 
 ## 10. Reuse audit
 

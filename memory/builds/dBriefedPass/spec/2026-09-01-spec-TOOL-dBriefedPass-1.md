@@ -1,12 +1,13 @@
 # TOOL-dBriefedPass-1 — `plan_state` grades a spec by heading TITLE, not by ordinal
 
-**Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-2 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -24,15 +25,26 @@ renumbers everything after it — is graded on the sections it actually has.
   `tools/memory-tree/check-memory-hygiene.sh` already uses at its lines 880, 939 and 1326.
 - **S2** — the ordinal is still REQUIRED to be present and numeric; only its VALUE stops being read.
   A heading with no ordinal is not a canonical section and must not become one by this change.
-- **S3** — a spec carrying two headings with the same title is a REFUSAL, not a last-one-wins merge.
-  The ordinal previously made duplicates impossible to express; keying on the title removes that
-  accident, and a silent merge would be a new could-not-fail shape introduced by the fix.
+- **S3** — a spec carrying two headings with the same title binds the FIRST occurrence, and the
+  awk does so DETERMINISTICALLY rather than by fallthrough. The ordinal previously made duplicates
+  impossible to express and keying on the title removes that accident, so the behaviour is pinned by
+  an arm instead of being left to whichever branch happens to run last.
 - **S4** — arms in `tools/unattended/unattended.test.sh` covering: a Tier-1 spec with a filled
   §5 Acceptance grading READY, a Tier-1 spec with an EMPTY §5 Acceptance grading THIN, a Tier-1 spec
   whose §7 Open questions carries an unresolved item grading FORKED, and a Tier-1 spec whose §8
   Revision log carries bullets NOT grading FORKED.
 - **S5** — `tools/memory-tree/marker-contract.test.sh` and `tools/unattended/unattended.test.sh`
   both slice this function's body out of the shipped bytes; both keep passing.
+- **S6** — `memory/guides/BUILD-METHOD.md` M2's THIN and FORKED sentences are restated in section
+  TITLES, and so is its template half `tools/memory-tree/BUILD-METHOD.template.md`, which
+  `kit/dogfood doc parity` byte-compares against the render. The prose and the classifier move in ONE
+  commit: today both are ordinal-keyed and both are wrong for Tier-1 in the same way, so a run
+  following M2 and the machine reach the same answer, and after this unit they would disagree on
+  exactly the Tier-1-shaped specs that `TOOL-dBriefedPass-3` turns into a hard refusal.
+- **S7** — S6 is paid for INSIDE the declared budget. `memory/guides/BUILD-METHOD.md` is 24560 bytes
+  against M1's 24576, and the template is 24571, so the edit is byte-neutral or byte-negative or it
+  does not land: M3 reserves M1's own budget from this run's delegated authority, so a budget bump is
+  PARKED as an owner decision and S6 is then dropped rather than forced.
 
 ## 3. Non-goals (OUT)
 
@@ -42,8 +54,18 @@ renumbers everything after it — is graded on the sections it actually has.
   classifier moves to the corpus, never the corpus to the classifier.
 - The case table that holds the two readers in agreement is not replaced with shared code. That is
   a larger refactor with its own cost and it is not what this defect needs.
-- `--close`'s THIN term keeps its `SPEC_THIN_CUTOFF` date gating exactly as declared. This unit
-  changes what THIN MEANS on a Tier-1 spec; it does not change which specs the term grades.
+- `--close`'s THIN term keeps its `SPEC_THIN_CUTOFF` date gating exactly as declared, and the
+  GRADED POPULATION is unchanged: this unit changes what THIN MEANS on a Tier-1 spec, and it adds no
+  third outcome to `plan_state`, so the set of specs the term walks is the same before and after.
+  That is what S3's first-occurrence rule buys — a refusal token would have been a new outcome, it
+  would have fallen through `verb_plan`'s `case` at `unattended.sh:2074` with no branch, and
+  `build-complete`'s bare `[ "$(plan_state …)" = THIN ]` at `:3271` discards the exit status, so a
+  refusing spec would have graded silently non-THIN at the one call site where the grade decides a
+  landing.
+- `plan_state`'s OUTPUT CONTRACT is not widened. It stays one bare token on stdout, which the driver
+  records at `:3231-3237` as a deliberate decision because two harnesses slice the function body.
+  Nothing here exposes the per-section map, which is why `TOOL-dBriefedPass-3` cannot name the empty
+  section in its refusal and says so.
 
 ## 4. Design
 
@@ -102,13 +124,22 @@ None. The change is a predicate, no artifact is committed from it, and no spec's
   `## 7. Open questions` reads `none` grades `READY`, not `FORKED`.
 - **AC4** — in `tools/unattended/unattended.test.sh`, a Tier-2 fixture spec's grade is UNCHANGED across the fix for all four states, so the
   384 Tier-2-shaped specs in the corpus are not regraded.
-- **AC5** — a fixture spec carrying two `Acceptance criteria` headings is REFUSED with a message
-  naming the file and the title.
+- **AC5** — in `tools/unattended/unattended.test.sh`, a fixture spec carrying two
+  `Acceptance criteria` headings grades on the FIRST one: the arm fills the first and empties the
+  second and asserts `READY`, then swaps them and asserts `THIN`. Two arms, because one alone is
+  satisfied by a reader that always takes the last.
+- **AC6** — `wc -c memory/guides/BUILD-METHOD.md` and `wc -c
+  tools/memory-tree/BUILD-METHOD.template.md` are both at most their pre-edit values, 24560 and
+  24571. Measured after S6, not argued: M1's byte half binds first and this unit may not raise it.
+- **AC7** — `bash tools/memory-tree/kit-dogfood-parity.test.sh` is green, which is the leg that
+  byte-compares the two halves S6 edits. Named because S6 touches a render pair and editing one half
+  alone reds a leg no other criterion here observes.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` · `unattended driver selftest` · `unattended kit gate` ·
-`marker contract (4 readers)` · `memory hygiene`.
+`marker contract (4 readers)` · `kit/dogfood doc parity` · `method carriers (every pointer
+declared)` · `memory hygiene`.
 
 ## 8. Open questions
 
@@ -117,6 +148,17 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · authored under the dBriefedPass mandate.
+- rev-2 · 2026-09-01 · round-1 spec-audit fold. H1 and H2 (findings 36 and 22, one defect reached by
+  two lenses): S3's REFUSAL had no channel — `plan_state`'s contract is one bare token by a decision
+  the driver records, a refusal token has no branch at `verb_plan`'s case and `build-complete`
+  discards the exit status, so a duplicate-title spec would have graded silently non-THIN at the one
+  site where the grade decides a landing. S3 becomes a deterministic FIRST-occurrence rule, AC5
+  becomes two arms, and §3 gains the two non-goals that state the unchanged output contract and the
+  unchanged graded population. M2 (finding 61): BUILD-METHOD M2 states the classification in the
+  ordinals this unit abandons, and after this build the method and the machine would disagree on
+  exactly the Tier-1 specs `TOOL-dBriefedPass-3` refuses on — S6 brings that correction and its
+  byte-compared template half into THIS unit so prose and code move in one commit, and S7 states that
+  it is paid for inside a budget M3 reserves from this run.
 
 ## 10. Reuse audit
 
