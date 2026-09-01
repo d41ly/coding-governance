@@ -1,6 +1,6 @@
 # TOOL-dMispairedQuote-1 — one quote-opening decision, shared by every view in `agent-cap.js`
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-01-prompt-TOOL-dMispairedQuote-1.md](../prompts/2026-09-01-prompt-TOOL-dMispairedQuote-1.md) | research | TOOL-dMispairedQuote-2 |
 | [2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round1.md) | spec-audit | TOOL-dMispairedQuote-2 |
+| [2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round2.md) | spec-audit | TOOL-dMispairedQuote-2 |
 
 <!-- /gen:spec-records -->
 
@@ -24,8 +25,13 @@ unit gives the file ONE decision about what opens a string literal, and applies 
   `tools/hooks/agent-cap.js`. A quote opens a string literal only where one may legally BEGIN.
   `checkLiteralOpen` skips whitespace backwards, then answers false when the character it lands on is
   `[A-Za-z0-9_$)\]\\]` — UNLESS the identifier ending there is a JavaScript keyword after which an
-  expression may start (`return case typeof instanceof in of new throw delete void do else yield
-  await`). `resolveLiteralEnd` returns the index of the unescaped partner on the same line, or `-1`
+  expression may start. `LITERAL_OPENERS` holds ELEVEN members — `return case throw typeof
+  instanceof new delete void yield await else` — and the three the fold first carried and round 2
+  refuted are gone: `in`, `of` and `do` are ordinary English connectives, so a comment reading
+  "one of 'em", "in 'ere" or "do 'em" made the apostrophe a legal opener and admitted the fan. The
+  eleven that remain are a STATED residual with a fixture each, not a claim of closure, and every one
+  of them admits at HEAD too, so none is a regression.
+  `resolveLiteralEnd` returns the index of the unescaped partner on the same line, or `-1`
   when the quote does not open a literal or has no partner. Escapes are consumed two characters at a
   time, as every existing branch already does. Both names lead with a verb the lexicon declares —
   `check` and `resolve` — which §10 records the consult for.
@@ -37,22 +43,33 @@ unit gives the file ONE decision about what opens a string literal, and applies 
   — rule 1's `offendingLines:84`, and rule 2's fallback view at `fanoutFindings:356`, which
   `TOOL-aLexedStripper-5` reaches whenever a scan ends unterminated. S2 re-bases both.
 - **S3** — A quote `resolveLiteralEnd` cannot pair is emitted as ORDINARY TEXT and the line stays
-  blanked. **No view ever hands a consumer a raw line.** This replaces rev-1's whole-line
+  blanked, EXCEPT inside a same-line template span, which S2 emits whole. **No view hands a
+  consumer a raw line outside a template span**, and the template case is closed by
+  `TOOL-dMispairedQuote-3` rather than by wording. This replaces rev-1's whole-line
   fail-closed, which round 1 reproduced as a fail-OPEN in two rules: `stripStrings` runs BEFORE the
   line-comment strip on purpose, so a raw line let a `//` inside a string truncate the view; and
   `joinCall` balances parens across lines, so a raw line re-admitted string and comment parens to the
   join. §4 carries both reproductions.
 - **S4** — `renderCodeView`'s code-mode quote branch calls `resolveLiteralEnd`. An unpairable quote
-  keeps the branch's existing behaviour — emit the character, advance one — so mode tracking, the
-  `unterminated` flag and the fallback route are all untouched.
+  keeps the branch's existing behaviour — emit the character, advance one. The flag's CODE is
+  untouched; **its VALUE is not**, and saying otherwise was round 2's finding 18: the shipped branch
+  SKIPS a mispaired span, so a backtick inside one never reaches the mode switch, and refusing the
+  mispairing feeds it. The flag is false at BASE and true after, for a regex literal carrying both an
+  apostrophe and a backtick. The consequence is bounded by `TOOL-dMispairedQuote-3`, not by this
+  scope item.
 - **S5** — `blankLiterals`' quote branch calls `resolveLiteralEnd` on the same terms. This also
   removes its run-to-end-of-line swallow, which is the defect `addc6169` fixed in `renderCodeView`
   and left here, named as out of scope by that round's own review record.
 - **S6** — Every byte of S1 to S5 is mirrored into `.claude/hooks/agent-cap.js`, the wired copy.
-- **S7** — `KIT_AGENT_CAP_VERSION` and the `gov:kit agent-cap@` marker on the same line both move to
-  `1.10`. `tools/hooks/kit.toml` declares that constant as the engine identity and
-  `check-kit-versions.sh` grades its FORM only, so new engine bytes shipped at `1.9` red nothing and
-  an adopter cannot tell a patched engine from the one they hold.
+- **S7** — `KIT_AGENT_CAP_VERSION` moves to `1.10`, and so does EVERY `gov:kit agent-cap@` marker.
+  There are FOUR tracked carriers, not the one line rev-2 named: both `agent-cap.js` copies and both
+  `scratch-guard.js` copies, each carrying `gov:kit agent-cap@1.9` on a line whose own constant is
+  `KIT_SCRATCH_GUARD_VERSION`. `check-kit-versions.sh` derives that population and asserts every
+  carrier agrees, so bumping one of four reds the leg. It grades FORM only and has no bump rule, so
+  new engine bytes shipped at `1.9` red nothing and an adopter cannot tell a patched engine from the
+  one they hold.
+- **S8a** — Regenerate `memory/map/generated/symbols.json`. `agent-cap.js` contributes 23 rows today
+  and S1 adds two top-level definitions to a file under `tools/`, which `map_extractors` scans.
 - **S8** — `TOOL-aLexedStripper-5` was CLOSED on the argument that the fallback view "IS the shipped
   behaviour, so it cannot regress in either direction". S2 re-bases that view, so the argument stops
   holding. Record a `memory/DECISIONS.md` row superseding that clause — the log is append-only and
@@ -64,7 +81,14 @@ unit gives the file ONE decision about what opens a string literal, and applies 
   site, which is the shape every shipped harness uses and which rev-1's three rule-3 probes all
   missed. Each carries a control with the apostrophe removed. The ADMIT direction is armed too: a
   legal `log('parallel(') // we don't allow it`, a `return`/`case`/`throw` string naming a primitive,
-  and `-5`'s regex-with-a-backtick fixture, each asserted at exit 0.
+  and `-5`'s regex-with-a-backtick fixture, each asserted at exit 0 — and rule 3 gets an ADMIT case
+  of its own, a legal multi-line `boundedParallel(x, 5)`, because rev-2's rule-3 group asserted only
+  denials and a fixture group that cannot fail in one direction is §7's could-not-fail shape.
+  **The keyword clause is fixtured over its DECLARED SET, not sampled**: one arm per member of
+  `LITERAL_OPENERS`, each a block comment ending in an apostrophe-word above a raw `parallel(`,
+  asserting the verdict measured for that member. Adding a member then adds its fixture.
+- **S10** — This unit does not land without `TOOL-dMispairedQuote-3`. Its mechanism un-hides
+  delimiters as well as fan-outs, and unit 3 is the property that bounds it.
 
 ## 3. Non-goals (OUT)
 
@@ -151,13 +175,15 @@ walks.
 | rules 2 and 3 probes | 6/6, against 3/6 at HEAD |
 | blocker probes, both directions | 11/11, against 10/11 at HEAD |
 | shipped suite at BASE | 105 passed / 0 failed, unchanged |
-| tracked `.js` `.sh` `.py` fed line-by-line to both rule-1 predicates | 86217 lines, 4319 blank differently, **0 verdict flips** |
-| every tracked file fed whole to both hooks | 1261 files, 4 flips, all markdown records and none a workflow script |
+| tracked `.js` `.sh` `.py` fed line-by-line to both rule-1 predicates | 140 files, 86217 lines, 15603 blank differently, 5 flips to DENY, **0 to ADMIT** |
+| every tracked file fed whole to both hooks, with unit 3 | 1263 files, 3 flips to DENY, **0 to ADMIT** |
 
-Of those four, three move toward DENY and one — `aSiftedPlaybook`'s review record — moves toward
-ADMIT. That one is a false positive being removed rather than a fan-out being hidden: the file is a
-markdown review record with no fan-out in it, and HEAD's denial came from rule 2 mispairing the
-quotes inside a table cell that quotes an acceptance criterion.
+The five line-level flips are all payload lines in `tools/hooks/agent-cap.test.sh` — shell
+single-quoted JSON carrying escaped double quotes — and every one moves toward DENY. The three
+file-level flips are markdown review records, never workflow scripts, and also move toward DENY.
+**Rev-2 printed 4319 and 0 flips here and both were wrong**: they were measured with a superseded
+predicate, which round 2's finding 11 caught by re-deriving the row from the block §4 publishes. The
+numbers above come from lifting the predicate out of the candidate file rather than retyping it.
 
 ### Files touched (estimate)
 
@@ -179,12 +205,19 @@ quotes inside a table cell that quotes an acceptance criterion.
 - error / empty / loading states — unchanged. `main()` exits 0 on unparseable stdin, which S1 to S7
   do not touch.
 - observability — unchanged. Every denial keeps the existing per-rule stderr explanation.
-- risks — **the residual is stated rather than closed**: a BALANCED set of loose prose quotes
-  straddling a fan-out still mispairs, because every quote finds a partner and none is left over.
-  `/* ('nuff) */ parallel(…) /* ('nuff) */` is the shape. It needs an apostrophe in a legal opener
-  position on BOTH sides of the fan-out and does not occur in this corpus. Named here, in the
-  dossier by `TOOL-dMispairedQuote-2`, and as a backlog row.
-- testing + left-shift gates — S9, and the `agent-cap self-test` leg already on the bar.
+- risks — **two residuals, both stated rather than closed, and both wider than rev-2 said.**
+  (a) `resolveLiteralEnd` opener-tests only the OPENING quote, so the shape needs ONE apostrophe in a
+  legal opener position before the fan-out and ANY unescaped quote of the same kind after it — not
+  one on each side, which was rev-2's understatement and round 2's finding 15. (b) The keyword
+  clause: prose whose last word before the apostrophe is one of the eleven `LITERAL_OPENERS` members
+  still mispairs. Neither is a regression — both admit at HEAD too — and S9 fixtures every member of
+  the declared set so the leak is recorded rather than assumed away. Named here, in the dossier by
+  `TOOL-dMispairedQuote-2`, and as backlog rows.
+- testing + left-shift gates — S9. **The `agent-cap self-test` leg is NOT on an ordinary bar**: its
+  manifest entry is `chunk = "selftests"`, `subject = "kit"`, and the runner holds every such leg
+  unless `GATE_SELFTESTS=1`, which `GATE_FULL=1` does not lift. This unit's Definition of Done is
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, and saying "already on the bar"
+  was round 2's finding 13.
 - migration / rollback — none beyond S7's version bump. The file is deployed verbatim and a revert is
   a file revert.
 - user docs — `TOOL-dMispairedQuote-2` carries the prose. Not this unit.
@@ -207,12 +240,19 @@ quotes inside a table cell that quotes an acceptance criterion.
   backtick above a bounded fan — it exits 0 both before and after this change.
 - **AC7** — When `bash tools/hooks/agent-cap.test.sh` runs, it reports 0 failed and a pass count
   strictly above 105, the count recorded at BASE.
-- **AC8** — When each new arm from S9 is staged against the tip WITHOUT the fix, it FAILS; the RED
-  observation is recorded under `memory/builds/dMispairedQuote/reports/` before the arm lands.
+- **AC8** — When each DENY-DIRECTION arm from S9 is staged against the tip WITHOUT the fix, it
+  FAILS. The quantifier is scoped: S9's ADMIT-direction arms and controls pass at the tip by
+  construction, and demanding a RED from them was round 2's finding 9. The observation is recorded
+  under `memory/builds/dMispairedQuote/build/` — NOT `reports/`, which hygiene check 4's
+  build-folder whitelist forbids.
+- **AC12** — When the keyword sweep runs — one arm per member of `LITERAL_OPENERS` above a raw
+  `parallel(` — every member's verdict matches the one S9 records, and the three dropped English
+  connectives each exit 2.
 - **AC9** — When `diff .claude/hooks/agent-cap.js tools/hooks/agent-cap.js` runs, it is empty, and
   the suite's own two-copy parity arm passes.
-- **AC10** — When `grep -c 'agent-cap@1.10' tools/hooks/agent-cap.js` runs it reports 1, and
-  `KIT_AGENT_CAP_VERSION` on that same line reads `1.10`.
+- **AC10** — When `git grep -c 'gov:kit agent-cap@1.10'` runs over the four tracked carriers it
+  reports 1 for each, `KIT_AGENT_CAP_VERSION` reads `1.10`, and `bash tools/check-kit-versions.sh`
+  exits 0.
 - **AC11** — When `python tools/lexicon/lexicon.py --suggest checkLiteralOpen` and the same for
   `resolveLiteralEnd` run, both answer OK, and the `lexicon naming predicates` leg exits 0 with
   `offenders` no higher than `VERB_OFFENDER_PIN`.
@@ -249,6 +289,17 @@ quotes inside a table cell that quotes an acceptance criterion.
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft, written after the five-candidate measurement in §4.
+- rev-3 · 2026-09-01 · folded spec-audit round 2, which exited NON-CONVERGENT at 4 blockers against
+  a ceiling of 2. Per BUILD-METHOD M4 the loop STOPPED and every standing blocker was disposed:
+  **1, 8 and 17 PROMOTED** to `TOOL-dMispairedQuote-3`, because bounding what the corrected views
+  un-hide needs a mechanism this unit does not have; **24 FOLDED** by narrowing `LITERAL_OPENERS`
+  from fourteen members to eleven and fixturing the set rather than a sample of it. The nine highs
+  folded here: the corrected inventory numbers (11), the held self-test leg (13), the four
+  kit-version carriers (25), the `symbols.json` regen (26), AC8's forbidden write target and
+  unsatisfiable quantifier (10, 9), the moved `unterminated` VALUE (18), the widened residual (15),
+  and rule 3's missing ADMIT case (2). The disposition could not be recorded with the driver's
+  `--disposition` flag: the rendered Skill documents it and `unattended 1.14` refuses it, which is
+  parked in `RUN.md` and filed as a backlog row.
 - rev-2 · 2026-09-01 · folded spec-audit round 1 (`2026-09-01-review-TOOL-dMispairedQuote-1-2-spec-audit-round1.md`),
   2 blockers and 6 highs. Deleted rev-1's whole-line fail-closed after reproducing both blockers
   against a patched hook (`B26`, `B27`); replaced it with a whitespace-skipping opener carrying a

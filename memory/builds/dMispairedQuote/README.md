@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-01
 streams: tooling
 roster: TOOL
-ids: TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2
+ids: TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2 TOOL-dMispairedQuote-3
 authorized-by: prompt
 ---
 
@@ -59,6 +59,17 @@ before it blanks; a pair exists, and it is the wrong one.
   mechanism with its own arms.
 - **`.claude/hooks/agent-cap.js` is a verbatim deploy copy.** Every byte of unit 1 lands in both, and
   the suite's own parity arm is the check.
+- **The spec-audit loop over unit 1 exited NON-CONVERGENT, and unit 3 is the promotion that exit
+  calls for.** Round 1 confirmed 2 blockers; round 2, over the fold, confirmed 4. The count did not
+  shrink, so per M4 the loop STOPPED and every standing blocker was disposed rather than re-reviewed.
+  Three were one property — correcting what counts as a string literal un-hides delimiters as well as
+  fan-outs, and rules 2 and 3 walk across lines — and closing it needs a mechanism unit 1 does not
+  have. The fourth was folded. Unit 2 converged at round 1 and is not re-reviewed.
+- **Unit 1 may not land without unit 3.** The two are one behaviour change split across two
+  mechanisms, and unit 1 alone was measured to move three scripts from DENY to ADMIT.
+- **`--disposition` could not be recorded.** The rendered unattended Skill documents
+  `--review … --disposition fold|promote` and `unattended 1.14` refuses the flag. The disposition is
+  recorded here, in each spec's revision log, and as a parked decision in `RUN.md`.
 
 ## Parked decisions
 
@@ -70,24 +81,26 @@ None yet. Parked entries live in `RUN.md` and are surfaced in the wrap-up.
 |---|---|---|---|
 | 1 | `TOOL-dMispairedQuote-1` | OPEN | one quote-opener rule, shared by every view, so a mispaired apostrophe cannot blank a fan-out |
 | 2 | `TOOL-dMispairedQuote-2` | OPEN | the file's stated ceiling and the dossier's residual describe what the view now does |
+| 3 | `TOOL-dMispairedQuote-3` | OPEN | every rule is evaluated over both views, so no denial can be lost |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 2 unit(s) · node d · opened 2026-09-01 · streams tooling
-ids TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2
+**Build status:** OPEN · 3 unit(s) · node d · opened 2026-09-01 · streams tooling
+ids TOOL-dMispairedQuote-1 TOOL-dMispairedQuote-2 TOOL-dMispairedQuote-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dMispairedQuote-1 — one quote-opening decision, shared by every view in `agent-cap.js`](spec/2026-09-01-spec-TOOL-dMispairedQuote-1.md) | 1 | 2 | OPEN | rev-2 | 2026-09-01 |
-| [TOOL-dMispairedQuote-2 — the carriers that describe `agent-cap.js`'s string views describe what they now do](spec/2026-09-01-spec-TOOL-dMispairedQuote-2.md) | 2 | 1 | OPEN | rev-2 | 2026-09-01 |
+| [TOOL-dMispairedQuote-1 — one quote-opening decision, shared by every view in `agent-cap.js`](spec/2026-09-01-spec-TOOL-dMispairedQuote-1.md) | 1 | 2 | OPEN | rev-3 | 2026-09-01 |
+| [TOOL-dMispairedQuote-3 — every rule is evaluated over both views, so no denial can be lost](spec/2026-09-01-spec-TOOL-dMispairedQuote-3.md) | 2 | 2 | OPEN | rev-1 | 2026-09-01 |
+| [TOOL-dMispairedQuote-2 — the carriers that describe `agent-cap.js`'s string views describe what they now do](spec/2026-09-01-spec-TOOL-dMispairedQuote-2.md) | 3 | 1 | OPEN | rev-2 | 2026-09-01 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dMispairedQuote-3.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dMispairedQuote-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -95,7 +108,8 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dMispairedQuote-1` | no |
-| 2 | `TOOL-dMispairedQuote-2` | no |
+| 2 | `TOOL-dMispairedQuote-3` | no |
+| 3 | `TOOL-dMispairedQuote-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
