@@ -1,6 +1,6 @@
 # DEPL-dGaugedVintage-6 — an install block whose second line cannot run
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams deployer · order 7
+**Status:** CLOSED · rev-3 · 2026-09-01 · node d · Tier-1 · base d65da7ab · streams deployer · order 7
 
 *Tier-1 light profile per `memory/TEMPLATE-SPEC.md`: the status header binds, the ten-section canon
 does not. The sections below are the ones that carry decisions.*
@@ -9,6 +9,7 @@ does not. The sections below are the ones that carry decisions.*
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-6-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-6-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-8 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 |
 
 <!-- /gen:spec-records -->
@@ -60,3 +61,5 @@ none
 - rev-2 · 2026-09-01 · folded round-1 spec audit M2, reported by four lenses. The second non-goal
   excluded waiver rows that do not exist; replaced with the measured constraint, which is the
   carried-ledger count of 3.
+- rev-3 · 2026-09-01 · BUILT and CLOSED. Acceptance ledger at
+  `build/2026-09-01-build-DEPL-dGaugedVintage-6-acceptance-ledger.md`.

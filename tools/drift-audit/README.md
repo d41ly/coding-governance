@@ -64,7 +64,8 @@ The fourth row is real. Keep it **small and loud**, not buried in prose.
 ## Install
 
 ```bash
-cp -r <governance>/tools/drift-audit <target-repo>/drift-audit
+mkdir -p <target-repo>/tools
+cp -r <governance>/tools/drift-audit <target-repo>/tools/drift-audit
 cd <target-repo>
 tools/drift-audit/adopt-drift-audit.sh
 ```
