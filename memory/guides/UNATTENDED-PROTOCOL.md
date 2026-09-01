@@ -449,14 +449,15 @@ what preserves the strong claim wherever the strong claim is available.
   `--preflight` and `--close` ever wrote one, so every member between them could enter the file only
   by an agent hand-editing an artifact this kit calls generated.
 - `--park` — writes a decision the run REFUSED to take into the parked region, with the question, the
-  options seen and the reason. Refused on a terminal record and refused with no run-state file at
-  all, because a park minted for a run that never started records nothing about a run.
+  options seen and the reason. Refused on a terminal record, and with no run-state file at all: a
+  park minted for a run that never started records nothing about a run.
+- `--brief` — records WHAT a build pass was handed: the unit, and the hash of a TRACKED brief file,
+  through `park()` as a `history` kind. `--status` reads it, grading each unit's LATEST row.
 - `--propose` — writes a PROPOSAL: an amendment a run would make to the playbook it is following,
-  joined to the step that provoked it. It is not a question, so nothing blocks on it; it is not an
-  edit, because a run that rewrites the checklist it is graded by has no rules left. It reuses
-  `--park`'s newline, separator, bypass and terminal refusals, widened over the new step field, and
-  its exact-line idempotence — with the step inside the identity, so the same amendment at two steps
-  is two rows.
+  joined to the step that provoked it. Nothing blocks on it, and it is not an edit: a run that
+  rewrites the checklist it is graded by has no rules left. It reuses `--park`'s newline, separator,
+  bypass and terminal refusals over the new step field, and its exact-line idempotence — with the
+  step inside the identity, so one amendment at two steps is two rows.
 - `--attest` — writes one of the two agent-checked Definition-of-Done items, deriving the record key
   so no operator spells one, and REFUSING a machine-checked item by reading that item's declared
   checker. Before it existed those keys had no writer at all and `--abort`, which requires both, was
@@ -481,8 +482,8 @@ what preserves the strong claim wherever the strong claim is available.
   the build README's AUTHORED roster pair against the tracked specs, so a planned unit nobody has
   specced is reported as MISSING — that question cannot be answered from a region rendered out of
   the specs that exist.
-- `--status` — prints one line naming the current phase and the first non-terminal unit.
-- `--resume` — re-enters the run from the run-state file and must agree with `--status`.
+- `--status` — one line: the current phase, the first non-terminal unit, and the parked counts.
+- `--resume` — re-enters the run from the run-state file; must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, and records any override. It is the
   only writer of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one.
 - `--landed` — the sole producer of `LANDED`, and an OBSERVATION rather than a claim. It accepts a
@@ -504,12 +505,11 @@ what preserves the strong claim wherever the strong claim is available.
   two of that condition's three clauses — the intersection test, and the shared-record refusal in
   BOTH halves, so a generated index alone is accepted and only the index TOGETHER WITH its generator
   is refused. The third clause is a judgement about meaning and is refused as undecidable rather than
-  faked. A re-declaration of a pass that is still OPEN widens or no-ops; it never narrows.
-  Once that pass has COMMITTED, a further declaration of the same unit is a new pass — M6
-  sanctions several pass kinds per unit — and is recorded as its own row rather than judged
-  against the previous one. The driver distinguishes the two by whether the new set overlaps
-  the old: a narrowing is a strict subset and always overlaps, so it is still refused; a
-  disjoint set is a new pass. A new pass whose set PARTLY overlaps its predecessor is read as
+  faked. A re-declaration of a pass still OPEN widens or no-ops; it never narrows. Once that pass has
+  COMMITTED, a further declaration of the same unit is a new pass — M6 sanctions several pass kinds
+  per unit — recorded as its own row rather than judged against the previous one. The driver
+  distinguishes them by OVERLAP: a narrowing is a strict subset and always overlaps, so it stays
+  refused; a disjoint set is a new pass. One that PARTLY overlaps is read as
   a narrowing and refused, which is the conservative direction and is stated here rather than
   discovered.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
@@ -520,9 +520,9 @@ what preserves the strong claim wherever the strong claim is available.
   refuses a verdict outside the closed set, a missing subject or count, and a round on a subject whose
   loop has already ended.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
-  DECLARED, and a declared verb an agent cannot find described is a verb they will not use to answer
-  the one question this kit cannot answer for them: which build of it they are talking to. It takes
-  no slug and no run, so it is the one verb safe to call before a run exists.
+  DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
+  cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it
+  is the one verb safe to call before a run exists.
 
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed

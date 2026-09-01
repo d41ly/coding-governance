@@ -1,12 +1,14 @@
 # TOOL-dBriefedPass-2 — the unit BRIEF, a tracked record of what a building agent was handed
 
-**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-09-01 · node d · Tier-2 · base 269dacae · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-TOOL-dBriefedPass-2-1-brief-verb.md](../build/2026-09-01-build-TOOL-dBriefedPass-2-1-brief-verb.md) | journal | — |
 | [2026-09-01-prompt-TOOL-dBriefedPass-1.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-1.md) | research | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
+| [2026-09-01-prompt-TOOL-dBriefedPass-2.md](../prompts/2026-09-01-prompt-TOOL-dBriefedPass-2.md) | journal | — |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round1.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round2.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
 | [2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md](../reviews/2026-09-01-review-TOOL-dBriefedPass-1-spec-audit-round3.md) | spec-audit | TOOL-dBriefedPass-1 TOOL-dBriefedPass-3 TOOL-dBriefedPass-4 TOOL-dBriefedPass-5 |
@@ -30,7 +32,11 @@ so it cannot be composed after the fact or left out.
   this memory tree already sanctions prompt-kind files. It carries the standard
   `**Serves:** journal <unit-id>` binding line, so hygiene check 21 joins it to the spec.
 - **S3** — the recorded hash is over the brief FILE's bytes, and `--status` RECOMPUTES it on every
-  read and prints `STALE` beside any row whose file no longer hashes to what was recorded. Naming the
+  read and prints `STALE` for any unit whose LATEST brief row no longer hashes to what was recorded.
+  The latest row per unit and not every row: the region is append-only, so re-briefing an edited file
+  writes a second row and the first keeps describing bytes that legitimately moved on. Grading every
+  row made the count monotonically increasing and therefore unactionable — it could never return to
+  zero, which is the one thing a reader needs it to be able to do. Naming the
   reader is the whole of this item: nothing else in this kit recomputes a hash held in a parked row,
   so without `--status` doing it the recorded hash would be decoration and the record's advertised
   property would be untrue on landing day.
@@ -158,8 +164,9 @@ shape `TOOL-dBriefedPass-1` S6 carries for the BUILD-METHOD pair.
   `· parked N` count is unchanged. One arm over the aggregate S5 names, rather than the per-kind
   split rev-2 asked for and the driver does not emit.
 - **AC6** — in `tools/unattended/unattended.test.sh`, a brief recorded and then EDITED makes
-  `bash tools/unattended/unattended.sh --status <slug>` print `STALE` against that row, and the arm
-  asserts that word beside that unit id rather than merely a non-zero exit. `--status` is named
+  `bash tools/unattended/unattended.sh --status <slug>` print `STALE`, and RE-BRIEFING the edited
+  file CLEARS it. Both arms, because a staleness count that can only rise is indistinguishable from
+  one that is stuck, and the clearing arm is what proves the reader grades the latest row. `--status` is named
   because it is the command S3 puts in scope to emit it; at rev-1 this criterion asserted a message
   no unit produced.
 - **AC7** — `bash tools/unattended/check-unattended.sh` is GREEN with `--brief` declared, which is
@@ -212,6 +219,11 @@ none
   `tools/check-wiring.sh --check` as the `unattended skill wiring` leg; that leg's argv is
   `bash tools/unattended/adopt-unattended.sh --check`, so the criterion ran a different program than
   the one it claimed to observe.
+- rev-5 · 2026-09-01 · found by BUILDING it, which is M2's route for a divergence: change the spec,
+  then the code. S3 as written graded EVERY brief row, and the region is append-only, so re-briefing
+  an edited file left the superseded row reporting stale forever and the count could never return to
+  zero. Observed live on this unit's own brief — record, edit, `STALE briefs 1`, re-brief, still
+  `STALE briefs 1`. S3 now grades the LATEST row per unit, and AC6 gains the clearing arm.
 
 ## 10. Reuse audit
 

@@ -13,6 +13,7 @@
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
 #   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
+#   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <verdict> --blockers <N>  # a review round
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
@@ -83,7 +84,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch --review"
+VERBS_SLUG="--preflight --status --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --version"
@@ -347,7 +348,7 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review"
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief"
 # The kinds that are OWED to the owner as an ANSWER. Three are deliberately absent, and they are
 # absent for one reason: each is a DECLARATION the run made, not a question it refused. A proposal is
 # an improvement it noticed, a rescope is an amendment it took under a delegated authority, a
@@ -2750,6 +2751,44 @@ verb_status() { # slug
     nnoted=$(grep -E "^[0-9][0-9-]*T[0-9:]*Z ($(kinds_re "$unowed")) · item " "$rel" 2>/dev/null | grep -cvE "$(history_exclude_re)" || true)
     [ "${nnoted:-0}" -gt 0 ] 2>/dev/null && parked="$parked · noted $nnoted"
   fi
+  # TOOL-dBriefedPass-2 S3 - THE BRIEF STALENESS READER, and naming it is the whole of that item.
+  # Nothing else in this kit recomputes a hash held in a parked row: `record_piece` writes a hash into
+  # a separate record FILE and the stale verdict over THAT is produced by check-playbook.sh, over a
+  # different artifact entirely. Without this loop the recorded hash would be decoration and the
+  # brief's advertised property - readable as stale - would be untrue on the day it landed.
+  #
+  # It RECOMPUTES rather than trusting: a brief edited after it was recorded is the case the join
+  # exists for, and the only way to see it is to hash the file again. A brief whose file has since
+  # been DELETED is `gone`, which is a different fact from `stale` and is not folded into it.
+  #
+  # THE LATEST ROW PER UNIT, NOT EVERY ROW, and this is the half that had to be built to be seen. The
+  # parked region is append-only, so re-briefing an EDITED file writes a second row and the first one
+  # keeps describing bytes that legitimately moved on. Grading every row made the count monotonically
+  # increasing: observed live on this build's own brief - record, edit, `STALE briefs 1`, re-brief,
+  # STILL `STALE briefs 1`. A count that cannot return to zero is indistinguishable from one that is
+  # stuck, so it tells a reader nothing. `awk` keeps the LAST row seen per unit, which is the live
+  # claim; the superseded rows stay in the record as the history they are.
+  local _bstale=0 _bgone=0 _bl _bh _bp _bnow
+  while IFS= read -r _bl; do
+    [ -n "$_bl" ] || continue
+    _bh=${_bl%% *}; _bp=${_bl#* }
+    if [ ! -f "$_bp" ]; then _bgone=$((_bgone+1)); continue; fi
+    _bnow=$(GIT hash-object "$_bp" 2>/dev/null | cut -c1-12)
+    [ "$_bnow" = "$_bh" ] || _bstale=$((_bstale+1))
+  #
+  # ONE awk PASS AND NO BACK-REFERENCE. The first cut used a `sed` capture group and the `` did
+  # not survive being written through a shell heredoc: the landed bytes read `/ /p`, so the unit id
+  # was dropped and every row collapsed onto ONE key. It passed here, because this build had briefed
+  # exactly one unit; with two it would have kept one row in TOTAL and reported a stale brief as
+  # clean. That is `memory/gotchas/heredoc-escape-reaches-the-regex` in the write path, caught by
+  # running the bug-class checklist over this pass, and it is why this splits on literal separators.
+  done <<BRIEFROWS
+$(awk -F' · ' '$1 ~ /^[0-9][0-9-]*T[0-9:]*Z brief$/ && $2 ~ /^item / && $3 ~ /^reason / {
+     u = substr($2, 6); r = substr($3, 8); last[u] = r
+   } END { for (u in last) print last[u] }' "$rel" 2>/dev/null)
+BRIEFROWS
+  [ "$_bstale" -gt 0 ] && parked="$parked · STALE briefs $_bstale"
+  [ "$_bgone" -gt 0 ] && parked="$parked · briefs gone $_bgone"
     # The halt code on the status line, when the record carries one. A vocabulary with no reader
     # is decoration, and this kit says so about its own phase writer.
     local hc; hc=$(fact "$rel" halt-code)
@@ -4004,6 +4043,80 @@ PROPOSED
   return 0
 }
 
+# ------------------------------------------------------------------------------- the UNIT BRIEF
+# TOOL-dBriefedPass-2. "Which instructions produced this diff" had no answer on disk. A build pass
+# was handed prose by whatever orchestrated it, and nothing tracked what that prose SAID, so a diff
+# could be read against its spec but never against the brief the builder actually worked from.
+#
+# WHY THE PARKED REGION AND NOT A PIECE RECORD, decided rather than defaulted: a brief is RUN-scoped
+# evidence and the run-state file is the run's own record, while the piece records exist precisely
+# because a piece outlives the run that made it. The spec said both at rev-1 and one of them had to
+# go.
+#
+# THE ROW IS park()'s GRAMMAR AND NOTHING ELSE. `park()` emits
+# `<ISO-Z> <kind> · item <item> · reason <reason>` with the reason LINE-FINAL, and two live readers
+# depend on that - `recorded_waivers` takes the token between ' · item ' and ' · reason ', and the
+# leg's check 17 strips a trailing reason - so the hash and the path ride the reason field and
+# nothing is appended after it. A bespoke dash-led four-field row was specified first; no writer here
+# could produce it, no reader could match it, and it would itself have tripped the protocol's anchor
+# ban on a row leading with an id.
+#
+# THE KIND IS `history`, NOT `surfaced`. It carries no question and no options, so it is in
+# PARK_KINDS and deliberately NOT in PARK_KINDS_OWED: a brief that inflated the surfaced count would
+# make `parked-decisions-surfaced` refuse a truthful attestation. `park_kinds_unowed()` derives the
+# `· noted N` aggregate as PARK_KINDS minus the owed set, so membership above puts briefs there with
+# no further edit - which is the whole of what the spec's S5 asks for.
+verb_brief() { # slug · unit-id · path
+  local slug="$1" unit="$2" path="$3" rel readme h want pl
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 49 "no run-state file, so there is no run to record a brief against: $rel"; return 1; }
+  [ -n "$unit" ] || { fail 49 "--brief requires --unit, because a brief naming no unit records what SOME agent was handed and joins to nothing"; return 1; }
+  [ -n "$path" ] || { fail 49 "--brief requires --path, because the brief is the FILE and a row with no path records that one existed"; return 1; }
+  # THE UNIT MUST BE ON THE ROSTER. A brief naming a unit this build does not carry records nothing
+  # about this build, and the units region is the same source --plan and --status take their set
+  # from, so the three cannot disagree about what a unit IS.
+  readme=$(readme_of "$slug")
+  [ -f "$readme" ] || { fail 49 "no build README, so there is no roster to check this unit against: $readme"; return 1; }
+  case " $(unit_ids_of "$slug" | tr '\n' ' ') " in
+    *" $unit "*) ;;
+    *) fail 49 "--brief names a unit the build README's generated units region does not carry, so the brief joins to no unit of this build: $unit"; return 1 ;;
+  esac
+  # THE BRIEF MUST BE TRACKED. An untracked file is not a record: it does not travel with the push,
+  # so a later reader in a fresh clone resolves the path to nothing and the hash to nothing.
+  [ -f "$path" ] || { fail 49 "--brief names a path that is not a file in this tree, so there is nothing to hash and the row would describe nothing: $path"; return 1; }
+  GIT ls-files --error-unmatch -- "$path" >/dev/null 2>&1 || {
+    fail 49 "--brief names an UNTRACKED path, and an untracked brief does not travel with the push, so a later reader in a fresh clone finds neither the file nor anything to compare its hash against: $path"; return 1; }
+  # `git hash-object` applies the path's clean filter, so this is the INDEX blob on every platform -
+  # the same derivation the piece records and the record-rotation name both use, rather than a third.
+  h=$(GIT hash-object "$path" 2>/dev/null) || { fail 49 "cannot hash the brief, so the row would carry no join: $path"; return 1; }
+  h=$(printf '%s' "$h" | cut -c1-12)
+  if [ "$(printf '%s%s' "$unit$path" | wc -l)" -ne 0 ]; then
+    fail 49 "a brief unit or path contains a newline, and park() appends ONE line the gate parses line-wise, so this would forge a second parked row nothing wrote"; return 1
+  fi
+  case "$unit$path" in *" · "*) fail 49 "a brief unit or path spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it: $unit at $path"; return 1 ;; esac
+  if [ -n "$BYPASS_BAN" ] && printf '%s%s' "$unit" "$path" | grep -qF -- "$BYPASS_BAN"; then
+    fail 49 "a brief unit or path spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite: $BYPASS_BAN"; return 1
+  fi
+  refuse_if_terminal "$rel" --brief || return 1
+  # EXACT LINE COMPARE, verb_propose's rule and for its reason: the reason is line-final, so a
+  # prefix match would call a DIFFERENT brief already-recorded and write nothing while reporting
+  # success. Re-briefing the same unit with an EDITED file is a new row, which is what makes the
+  # sequence readable.
+  want="brief · item $unit · reason $h $path"
+  while IFS= read -r pl; do
+    [ "$pl" = "$want" ] || continue
+    echo "unattended: brief already recorded, unchanged — $unit at $h"
+    return 0
+  done <<BRIEFED
+$(grep -F -- ' brief · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
+BRIEFED
+  park "$rel" brief "$unit" "$h $path"
+  stage_or_fail "$rel" || return 1
+  echo "unattended: brief recorded — $unit · $h · $path"
+  return 0
+}
+
 # ------------------------------------------------------------------- the PER-PIECE RECORD writer
 # The spec's previous revision had four READERS of this record and no writer at all, so the two
 # Definition-of-Done items reading it could only be met by hand — which the same spec forbids.
@@ -4538,7 +4651,7 @@ SIBS
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
-RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""
+RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
 OV_ITEMS=(); OV_REASONS=(); OV_PEND=""
@@ -4570,6 +4683,7 @@ while [ $# -gt 0 ]; do
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
     --item)         PK_ITEM="${2:-}"; shift 2 || shift ;;
     --step)         PK_STEP="${2:-}"; shift 2 || shift ;;
+    --unit)         BR_UNIT="${2:-}"; shift 2 || shift ;;
     --path)         RP_PATH="${2:-}"; shift 2 || shift ;;
     --leg)          RP_LEG="${2:-}"; shift 2 || shift ;;
     # ONE ARM FOR ONE FLAG. Both sides of the merge added a `--verdict` case arm - one for the record
@@ -4633,6 +4747,7 @@ case "$VERB" in
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
+  --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
   --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;

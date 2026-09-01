@@ -3911,6 +3911,65 @@ same "tier-2 control: the canonical ordinals still grade READY" "$(plan_state "$
 
 
 
+echo "MARK brief" >&2
+# ---------------------------------------------------------------------------------------------
+# ---- TOOL-dBriefedPass-2 - THE UNIT BRIEF. "Which instructions produced this diff" had no answer
+# ---- on disk before this verb: a build pass was handed prose by whatever orchestrated it, and the
+# ---- prose left no trace. These arms grade the four things that make the row a RECORD rather than
+# ---- a note - the roster join, the tracked-path refusal, the park() grammar, and the staleness
+# ---- reader that is the only thing making the recorded hash more than decoration.
+mkdir -p memory/builds/tRun/prompts
+printf 'the brief for unit one\n' > memory/builds/tRun/prompts/brief-1.md
+git add memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
+
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md)
+n=$((n+1)); case "$o" in *"brief recorded"*) ;; *) echo "FAIL brief: a tracked path naming a rostered unit was refused -- $o"; st=1 ;; esac
+# THE GRAMMAR IS park()'s AND THE ARM READS THE BYTES. A bespoke dash-led row was specified first and
+# no reader in this driver could have matched it, so this asserts the shape the readers actually use.
+n=$((n+1)); grep -qE "^[0-9][0-9-]*T[0-9:]*Z brief · item ARCH-tRun-1 · reason [0-9a-f]{12} memory/builds/tRun/prompts/brief-1.md$" memory/builds/tRun/RUN.md \
+  || { echo "FAIL brief: the row is not in park()'s grammar, so no reader in this driver can match it"; st=1; }
+
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md)
+n=$((n+1)); case "$o" in *"already recorded, unchanged"*) ;; *) echo "FAIL brief: an identical re-run was not idempotent -- $o"; st=1 ;; esac
+
+o=$(run --brief tRun --unit ARCH-tRun-99 --path memory/builds/tRun/prompts/brief-1.md)
+n=$((n+1)); case "$o" in *"does not carry"*) ;; *) echo "FAIL brief: a unit absent from the units region was accepted -- $o"; st=1 ;; esac
+
+printf 'untracked\n' > memory/builds/tRun/prompts/untracked.md
+o=$(run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/untracked.md)
+n=$((n+1)); case "$o" in *UNTRACKED*) ;; *) echo "FAIL brief: an untracked brief was accepted, and it does not travel with the push -- $o"; st=1 ;; esac
+rm -f memory/builds/tRun/prompts/untracked.md
+
+# ---- THE CLASSIFICATION. `brief` is in PARK_KINDS and deliberately NOT in PARK_KINDS_OWED, so it
+# ---- must move `noted` and must NOT move `parked`. A brief that inflated the surfaced count would
+# ---- make a truthful `parked-decisions-surfaced` attestation refuse.
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"· noted "*) ;; *) echo "FAIL brief: a recorded brief did not reach the noted aggregate -- $o"; st=1 ;; esac
+n=$((n+1)); case "$o" in *"· parked "*) echo "FAIL brief: a brief inflated the SURFACED count, which is what its history classification exists to prevent -- $o"; st=1 ;; *) ;; esac
+
+# ---- THE STALENESS READER, both directions. Detecting is half the arm; CLEARING is the half that
+# ---- proves the reader grades the LATEST row per unit. Graded over every row instead, the count
+# ---- rises monotonically and can never return to zero, which is a signal a reader cannot act on.
+# ---- Observed exactly that way while building this unit, which is why rev-5 bumped S3.
+printf 'edited after the brief was recorded\n' >> memory/builds/tRun/prompts/brief-1.md
+git add memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"STALE briefs"*) ;; *) echo "FAIL brief: an edited brief did not report STALE, so the recorded hash is decoration -- $o"; st=1 ;; esac
+run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-1.md >/dev/null 2>&1
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"STALE briefs"*) echo "FAIL brief: re-briefing the edited file did NOT clear STALE, so the count can only rise -- $o"; st=1 ;; *) ;; esac
+
+# ---- TWO UNITS, ONE STALE. The case a per-unit reader must get right and the collapsed one cannot
+# ---- see: the first cut of this reader lost its unit id to a heredoc-eaten back-reference and
+# ---- grouped every row under one key, which passes with one unit and drops rows with two.
+printf 'the brief for unit two\n' > memory/builds/tRun/prompts/brief-2.md
+git add memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
+run --brief tRun --unit ARCH-tRun-1 --path memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
+printf 'and now edited\n' >> memory/builds/tRun/prompts/brief-2.md
+git add memory/builds/tRun/prompts/brief-2.md >/dev/null 2>&1
+o=$(run --status tRun)
+n=$((n+1)); case "$o" in *"STALE briefs 1"*) ;; *) echo "FAIL brief: with two briefs and one edited, the reader did not report exactly one stale -- $o"; st=1 ;; esac
+
 echo "MARK park-taxonomy" >&2
 # ---------------------------------------------------------------------------------------------
 # ---- THE PARKED-KIND TAXONOMY AND THE COUNTABLE ATTESTATION.

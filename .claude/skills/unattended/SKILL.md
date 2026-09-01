@@ -491,6 +491,14 @@ definition, so the absence is a decision and not an oversight.
   bash tools/unattended/unattended.sh --propose <slug> --item "<the amendment>" --step "<the step it applies to>" --reason "<what you saw that provoked it>"
   ```
 
+- **Record WHAT each build pass was handed**, so "which instructions produced this diff" has an
+  answer on disk rather than in a transcript nobody kept. Write the brief as a tracked file under
+  the build's `prompts/` folder, then record it:
+
+  ```bash
+  bash tools/unattended/unattended.sh --brief <slug> --unit <unit-id> --path <the brief file>
+  ```
+
   Nothing blocks on a proposal and `--status` counts them apart from the questions, so recording one
   costs the run nothing. The same amendment against two steps is two rows, because it is two edits.
 - Record a verdict where a check ran over content rather than over code — one piece at a time, and
