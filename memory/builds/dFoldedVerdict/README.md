@@ -71,12 +71,12 @@ ids TOOL-dFoldedVerdict-1 TOOL-dFoldedVerdict-2 TOOL-dFoldedVerdict-3 TOOL-dFold
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dFoldedVerdict-5 — section 7 becomes its own carrier](spec/2026-09-01-spec-TOOL-dFoldedVerdict-5.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-1 — the driver records which disposition a review exit took](spec/2026-09-01-spec-TOOL-dFoldedVerdict-1.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-2 — clause 3 reads the recorded disposition, behind a dated cutoff](spec/2026-09-01-spec-TOOL-dFoldedVerdict-2.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-3 — the two exit rows say which disposition they took, and `origin/main` goes green](spec/2026-09-01-spec-TOOL-dFoldedVerdict-3.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-4 — `agent-cap` admits a strictly sequential awaited `agent()` under a marker that names a bound](spec/2026-09-01-spec-TOOL-dFoldedVerdict-4.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-01 |
-| [TOOL-dFoldedVerdict-6 — the whole-document compression pass](spec/2026-09-01-spec-TOOL-dFoldedVerdict-6.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-5 — section 7 becomes its own carrier](spec/2026-09-01-spec-TOOL-dFoldedVerdict-5.md) | 1 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-1 — the driver records which disposition a review exit took](spec/2026-09-01-spec-TOOL-dFoldedVerdict-1.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-2 — clause 3 reads the recorded disposition, behind a dated cutoff](spec/2026-09-01-spec-TOOL-dFoldedVerdict-2.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-3 — the exit rows say which disposition they took, and `origin/main` goes green](spec/2026-09-01-spec-TOOL-dFoldedVerdict-3.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-4 — `agent-cap` admits a strictly sequential awaited `agent()` under a marker that names a bound](spec/2026-09-01-spec-TOOL-dFoldedVerdict-4.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-01 |
+| [TOOL-dFoldedVerdict-6 — the whole-document compression pass](spec/2026-09-01-spec-TOOL-dFoldedVerdict-6.md) | 6 | 2 | SPECCED | rev-4 | 2026-09-01 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).

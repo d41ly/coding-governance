@@ -1,6 +1,6 @@
 # TOOL-dFoldedVerdict-1 — the driver records which disposition a review exit took
 
-**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 2 · ratified 2026-09-01
+**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 2 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
@@ -411,15 +411,21 @@ revisits.
   grep and not by running `tools/unattended/unattended.test.sh`: a suite this unit may not execute
   is still a deliverable, and rev-1 left these two call sites named in S8 and observed nowhere. The
   calls are identified by SUBJECT rather than by line, because S8a adds an arm to the same file.
-- **AC17** — When the `--review` bullet is extracted from both halves of the protocol pair with
+- **AC17** — When the `--review` bullet is extracted from both halves of the VERBS pair —
+  `memory/guides/UNATTENDED-VERBS.md` and `tools/unattended/VERBS.template.md`, which
+  `TOOL-dFoldedVerdict-5` creates at order 1 — with
   ``sed -n '/^- `--review`/,/^- `--version`/p'``, neither copy contains
   `promoted to a unit rather than parked` and both contain `fold` and `promote`;
-  `wc -c memory/guides/UNATTENDED-PROTOCOL.md` reports at most `61440`; and
-  `bash tools/unattended/check-unattended.sh` reports no check 10 failure. All three, not the last
-  alone: check 10 compares the two copies to each other and its own header says it grades neither
-  for truth, so a parity-only criterion passes an untouched pair. The byte assertion is the one that
-  fails if the amendment grows the file, which section 4 measures at zero bytes of headroom. The
-  extractor is unambiguous today — one line-anchored match for each bullet in each half.
+  `wc -c memory/guides/UNATTENDED-VERBS.md` reports at most `61440`; and
+  `bash tools/unattended/check-unattended.sh` reports no check 10 failure, which after order 1
+  covers BOTH pairs. All three, not the last alone: check 10 compares two copies to each other and
+  its own header says it grades neither for truth, so a parity-only criterion passes an untouched
+  pair. Rev-3 named the PROTOCOL pair here and the reorder falsified it: S9 had already recorded
+  that section 7 moves at order 1 and that this edit lands in the new carrier, and the criterion had
+  not followed the scope. The byte assertion moved with the text, and had to: after the split the
+  protocol carries roughly 8.1 KB of headroom and this amendment does not touch that file at all, so
+  asserting on the protocol's size would have been a criterion that cannot fail. The extractor is
+  unambiguous today — one line-anchored match for each bullet in each half.
 
 ## 7. Gates
 
@@ -511,6 +517,15 @@ No predicate reads intent. Clause 3, once unit 2 lands, grades that a dispositio
   needs-a-disposition flag is at `:293` not `:296`, the subject guards are at `unattended.sh:3917-3936`
   not `:3944-3950`, and the `check-kit-versions.sh` unattended block ends at `:173` not `:172`.
 - rev-3 · 2026-09-01 · the build's ORDER was wrong and this unit was one of two depending on a unit sequenced after it. The protocol render sits at EXACTLY `GUIDE_CAP_BYTES` with zero headroom, and the split that frees 8.1 KB was at order 5 behind two units that ADD protocol bytes. `TOOL-dFoldedVerdict-5` is now order 1 and this unit order 2, so S9 lands in the moved carrier; S9 says so and stops citing a line number that will not survive. Also: `TOOL-dFoldedVerdict-2` S14 had independently claimed this same bullet — two parallel-authored folders taking one file, which M6 clause 1 forbids — and it resolves here because the sentence goes false when `fold` becomes RECORDABLE, which is this unit's flag.
+
+- rev-4 · 2026-09-01 · the fork sweep, and one criterion the rev-3 reorder had falsified. **AC17**
+  still named the PROTOCOL pair and asserted `memory/guides/UNATTENDED-PROTOCOL.md`'s byte count,
+  while S9 in the same spec had already recorded that section 7 moves at order 1 and that this
+  unit's edit lands in the new carrier. Rev-3 moved the scope and left the acceptance behind, which
+  is the half of a reorder that is easy to miss because nothing reds. AC17 now names the VERBS pair
+  in both halves and takes its byte assertion there; on the protocol the assertion could not have
+  failed, since after the split that file gains roughly 8.1 KB of headroom and this amendment never
+  touches it. Section 8 needed no work — all three of its questions were already marked at rev-2.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
-# TOOL-dFoldedVerdict-3 — the two exit rows say which disposition they took, and `origin/main` goes green
+# TOOL-dFoldedVerdict-3 — the exit rows say which disposition they took, and `origin/main` goes green
 
-**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -17,25 +17,38 @@
 worktree. The red is a FALSE POSITIVE: every one of that build's six standing blockers was disposed,
 three by PROMOTION and three by FOLD, and the check counts only the promotion arm. Units 1 and 2 give
 the driver a disposition field and make check 2 read it, but neither can reach a record that already
-exists, because every phase writer refuses a terminal one. This unit writes the two exit rows'
-dispositions by hand, labelled as reconstructed the way two `landed-anchor` repairs already were,
+exists, because every phase writer refuses a terminal one. This unit writes FOUR exit rows'
+dispositions by hand — two in `dMispairedQuote` and, under the owner's cutoff ruling of 2026-09-01,
+two in `dBriefedPass` — labelled as reconstructed the way two `landed-anchor` repairs already were,
 and supersedes `TOOL-aClosedDocket-4`.
 
 ## 2. Scope (IN)
 
 - **S1 — reproduce, then verify, before writing a byte.** Re-run the leg and confirm the message
   **this unit's PRE-IMAGE ships, which is not the message this spec was authored against.**
-  `TOOL-dFoldedVerdict-2` lands at order 2 and replaces the shortfall sentence with an
-  absent-disposition refusal, so a reproduction aimed at the BASE wording would report a sibling as
+  `TOOL-dFoldedVerdict-2` lands at order 3, one unit ahead of this one, and replaces the shortfall
+  sentence with an absent-disposition refusal, so a reproduction aimed at the BASE wording would
+  report a sibling as
   having broken the leg. Section 4 carries both messages, each labelled with the image it belongs to,
   and the reproduction targets the second. Then re-derive the disposition of all six blockers from
   `dMispairedQuote`'s own reviews and spec revision logs. **If any blocker was silently dropped, the
   red is TRUE and this unit reports that instead of clearing it.** The verification done at authoring
   time is recorded in section 4 and is re-run at build time rather than trusted from here.
-- **S2 — the two exit rows gain a disposition**, in the byte shape unit 1's writer emits, appended
-  to the reason tail after the terminal token. Row 33 takes the promote value and row 43 the fold
-  value; the per-subject evidence for each is in section 4.
-- **S3 — a `disposition-source:` provenance block** in that record's `## Run facts`, stating why no
+- **S2 — `dMispairedQuote`'s two exit rows gain a disposition**, in the byte shape unit 1's writer
+  emits, appended to the reason tail after the terminal token. Row 33 takes the promote value and
+  row 43 the fold value; the per-subject evidence for each is in section 4.
+- **S2a — `dBriefedPass`'s two exit rows gain a disposition, on the same terms.** Owner ruling of
+  2026-09-01 taken on Q1: the cutoff is `2026-09-01`, no date separates the two records, and this
+  unit therefore labels FOUR rows across TWO landed records rather than two across one. Both of that
+  build's subjects exited NON-CONVERGENT, and the `TOOL-dBriefedPass-9` backlog row states that both
+  disposed every blocker by FOLDING — but that row is a CLAIM and this unit does not write from it.
+  Each disposition is re-derived from `dBriefedPass`'s own reviews and spec revision logs first, on
+  AC2a's terms, and a subject whose blockers cannot all be accounted for STOPS the unit exactly as
+  it would in the other record. That the record is this build's own predecessor is a reason for more
+  care rather than less: a run grading its own prior run is the one place a disposition is likeliest
+  to be assumed instead of read.
+- **S3 — a `disposition-source:` provenance block** in EACH edited record's `## Run facts` — one
+  per record after S2a, never one shared block naming two files — stating why no
   verb could write those rows, what independently verifies each value, and what is deliberately not
   reconstructed. It copies `landed-anchor-source:` one key over.
 - **S4 — the mixed-exit rule is written down IN A NAMED CARRIER**, because one of the two subjects
@@ -80,9 +93,12 @@ and supersedes `TOOL-aClosedDocket-4`.
 - **N2 — the other eleven records with an exited subject are not retrofitted.** Measured over the
   tracked corpus: thirteen run-state files carry a `NON-CONVERGENT` or `CEILING` review row, and
   eleven of them are dated 2026-08-31 or earlier. They are unit 2's cutoff's business.
-- **N3 — `dBriefedPass` is not retrofitted here**, and it is the one non-goal with a trigger. See
-  section 8 Q1; if unit 2's cutoff admits it, S7's acceptance fails and the scope grows rather than
-  the acceptance shrinking.
+- **N3 — WITHDRAWN at rev-4, by its own trigger.** It read "`dBriefedPass` is not retrofitted here"
+  and carried the condition that if unit 2's cutoff admitted that record, the scope would grow
+  rather than the acceptance shrink. The trigger FIRED: the owner set the cutoff at `2026-09-01` on
+  2026-09-01, which admits it, so the retrofit is IN SCOPE at S2a and this is no longer a non-goal.
+  The item is kept rather than deleted, so the reason the scope moved stays readable in the spec
+  instead of only in the log.
 - **N4 — no per-blocker attribution.** The row carries one value per SUBJECT. A mixed exit's full
   accounting stays in the spec revision log that already holds it.
 - **N5 — the hand-edit class is not gated.** `TOOL-aBoundedCeiling-11` is OPEN and records it:
@@ -433,14 +449,24 @@ and four generated files re-rendered. No file under `tools/` moves.
   and a literal pinned here would be a second copy of a sentence a sibling is scoped to write. If the
   pre-image still carries the BASE shortfall message quoted in section 4, unit 2 has not landed and
   this unit does not start.
-- **AC2** — When the six blockers are re-derived at build time, every one has a disposition recorded
+- **AC2** — When `dMispairedQuote`'s six blockers are re-derived at build time, every one has a
+  disposition recorded
   in section 9 of `memory/builds/dMispairedQuote/spec/2026-09-01-spec-TOOL-dMispairedQuote-1.md` or
   of `memory/builds/dMispairedQuote/spec/2026-09-01-spec-TOOL-dMispairedQuote-3.md`. If any has none,
   the unit STOPS and reports the red as true; a disposition invented to clear a gate is the one
   outcome this unit may not produce.
-- **AC3** — When the two rows and the provenance block are written, `grep -c 'disposition promote'`
+- **AC2a** — When `dBriefedPass`'s blockers are re-derived on those same terms — its spec-set
+  subject exited NON-CONVERGENT at 3 blockers and its build subject at 4 — every one has a
+  disposition recorded in that build's own reviews or spec revision logs, and the same STOP applies.
+  The `TOOL-dBriefedPass-9` backlog row's claim that both loops folded is corroboration and is
+  explicitly NOT the evidence: a criterion satisfied by a summary of the thing it grades is the
+  vacuity this build exists to remove, reproduced one level up.
+- **AC3** — When the rows and the provenance blocks are written, `grep -c 'disposition promote'`
   and `grep -c 'disposition fold'` over `memory/builds/dMispairedQuote/RUN.md` each return 1, and
-  `grep -c '^disposition-source:'` over the same file returns 1.
+  `grep -c '^disposition-source:'` over the same file returns 1. Over
+  `memory/builds/dBriefedPass/RUN.md` the provenance count returns 1 and the promote and fold counts
+  SUM to 2 — pinned here as a SUM and not as a split, because pinning the split would make this
+  criterion assert the very answer AC2a exists to derive.
 - **AC4** — When the record is re-read afterwards, `bash tools/unattended/unattended.sh --status
   dMispairedQuote` still reports the same phase and witness it reported before the edit, proving no
   fact key's first-match position moved.
@@ -484,7 +510,11 @@ and four generated files re-rendered. No file under `tools/` moves.
   memory/builds/dMispairedQuote/RUN.md` stays under `INDEX_CAP_BYTES` of 61440 from
   `.memory-tree.conf`, which is the only one of its two bounds a gate enforces, and under the 8 KB
   authored-region budget `memory/guides/UNATTENDED-PROTOCOL.md` declares in prose and nothing checks.
-  Measured before the edit: 5521 bytes, with the two rows at 116 bytes each. The per-entry budget is
+  Measured before the edit: 5521 bytes, with the two rows at 116 bytes each.
+  `memory/builds/dBriefedPass/RUN.md` is measured the same way against the same bound at build time.
+  Its pre-edit size is deliberately NOT carried here, because this spec never measured it and a
+  figure written down unmeasured is exactly the class `TOOL-dFoldedVerdict-6` F3 was just resolved
+  against. The per-entry budget is
   NOT a bound here and this criterion does not claim it is: hygiene check 7's exemption list excludes
   `builds/*/RUN.md` by name, which is why a 1465-byte parked row already sits in this record and
   passes.
@@ -539,7 +569,9 @@ neither substitutes for the arms unit 1 and unit 2 owe their own mechanisms.
 ## 8. Open questions
 
 - **Q1 — does unit 2's cutoff admit `dBriefedPass`, and does this unit's scope grow by two rows if it
-  does?** Measured, and this is the load-bearing fork. Thirteen tracked run-state records carry an
+  does?** RESOLVED (owner, 2026-09-01): the cutoff is
+  `2026-09-01`, and this unit's scope grows to FOUR rows across TWO landed records. Measured, and
+  this is the load-bearing fork. Thirteen tracked run-state records carry an
   exited subject; exactly two are dated 2026-09-01, `dBriefedPass` and `dMispairedQuote`, and both
   are terminal, so no DATE cutoff can separate them. `dBriefedPass` is LANDED with two subjects that
   each exited NON-CONVERGENT — the spec-set subject at 3 blockers and the build subject at 4 — and it
@@ -559,14 +591,23 @@ neither substitutes for the arms unit 1 and unit 2 owe their own mechanisms.
   labelled that record's two exits. So the sibling spec both admits the record and depends on this
   unit labelling it. The fork stays OPEN pending the owner's word only because it grows this unit's
   scope; nothing in the two specs now disagrees about which way it falls.
-- **Q2 — should the protocol sanction the provenance form this unit uses?**
+- **Q2 — should the protocol sanction the provenance form this unit uses?** RESOLVED (owner,
+  2026-09-01): yes, one sentence — and it lands in `TOOL-dFoldedVerdict-5` at order 1, whose S13
+  now carries it. The assignment is this unit's only remaining stake in the question: the sentence
+  exists three units before this one writes a row relying on it, and a one-sentence addition stays
+  separable inside a diff that is otherwise a verbatim move, where unit 6's document-wide compression
+  would leave a reader unable to tell an addition from a reword.
   `memory/guides/UNATTENDED-PROTOCOL.md:167` says the authored half carries the declared facts "and
   nothing else", no verb writes such a key, and nothing reads one — so two tracked records already
   sit outside a clause nothing enforces and this unit makes three. **Recommendation: yes, one
   sentence admitting a source-suffixed line whose value states why a verb could not write the key it
-  names.** It belongs to whichever of this build's two protocol units, at orders 5 and 6, is already
-  editing that document, and not to this unit, which would otherwise be writing its own permission.
-- **Q3 — is this run entitled to write a rescope row into another live run's record?** The verb
+  names.** It belongs to a protocol unit and not to this one, which would otherwise be writing its
+  own permission. Rev-3 named this build's protocol units as "orders 5 and 6", which the reorder
+  falsified; they are orders 1 and 6, and the ruling put the sentence in the first.
+- **Q3 — is this run entitled to write a rescope row into another live run's record?** RESOLVED
+  (agent, 2026-09-01): write it, naming this unit in the reason. The alternative leaves a check-24
+  red that only the stalled run can clear, and the owner has already authorized taking that build's
+  scope, which is the act the row records rather than one it performs. The verb
   permits it: `aClosedDocket` is at BUILDING, so `refuse_if_terminal` passes, and nothing keys the
   write on which session owns the slug. The owner authorized taking that build's scope, and check 24
   demands the row. **Recommendation: write it, and name this unit in the reason so the other run's
@@ -626,6 +667,21 @@ neither substitutes for the arms unit 1 and unit 2 owe their own mechanisms.
     unit writes are NON-CONVERGENT exits and N2 leaves every CEILING row in the corpus to unit 2's
     cutoff. Recorded so a later reader can see it was checked rather than missed.
 - rev-3 · 2026-09-01 · reordered to order 4 by the build's own ordering fix. No scope change: the protocol render sits at EXACTLY `GUIDE_CAP_BYTES` with zero headroom, so `TOOL-dFoldedVerdict-5`'s split moved to order 1 ahead of every unit that adds a protocol byte, and the rest shifted behind it.
+
+- rev-4 · 2026-09-01 · the fork sweep, three owner rulings, and the scope one of them grew.
+  **Q1** — the cutoff is `2026-09-01`, which admits `dBriefedPass` as well as `dMispairedQuote`, so
+  this unit labels FOUR rows across TWO landed records. N3's trigger fired and N3 is withdrawn; S2a,
+  AC2a and the second provenance block in S3 are the scope that replaces it, and AC3 pins the second
+  record's counts as a SUM rather than a split so it cannot assert the answer AC2a must derive. One
+  of the two records is this build's own predecessor, which S2a treats as grounds for more care.
+  **Q2** — the protocol sanctions the provenance form, in one sentence, and it lands in
+  `TOOL-dFoldedVerdict-5`'s new S13 at order 1 rather than here or in unit 6: it then exists three
+  units before this one writes a row relying on it, and a one-sentence addition stays separable in a
+  diff that is otherwise a verbatim move. Rev-3 called this build's protocol units "orders 5 and 6",
+  which the reorder had falsified; they are orders 1 and 6. **Q3** — the rescope row is written,
+  naming this unit in `--reason`. Two stale ordinals corrected in passing: S1 said unit 2 lands at
+  order 2, where it is now order 3 and this unit order 4 — the substance held, only the number was
+  wrong, and it is the kind of number a reader trusts without checking.
 
 ## 10. Reuse audit
 

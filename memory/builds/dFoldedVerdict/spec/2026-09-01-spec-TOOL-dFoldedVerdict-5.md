@@ -1,6 +1,6 @@
 # TOOL-dFoldedVerdict-5 — section 7 becomes its own carrier
 
-**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -63,23 +63,40 @@ commit or the bar reds on a section that no longer holds what it is asked for.
   bullets covering every declared verb, and check 26 is the join. `TOOL-dBriefedPass-8` names
   `INDEX_CAP_BYTES` as the cap the protocol renders at; the binding cap is `GUIDE_CAP_BYTES`, and the
   two are numerically identical, which is exactly why the mis-attribution is invisible.
-- **S11 — the `--review` bullet arrives in the new pair TRUE, and this unit is the backstop that
-  makes that observable.** The bullet sits inside section 7 and is cited by SECTION rather than by a
-  line number this move invalidates. At BASE `adc0543c` its sentence reads "at the exit every blocker
-  still standing is promoted to a unit rather than parked", and it enumerates the verb's refusals as
-  exactly three. Both halves go FALSE once `TOOL-dFoldedVerdict-1` makes `fold` a legal exit
-  disposition and adds refusals. The OWNER of that correction is `TOOL-dFoldedVerdict-1` at order 1,
-  which is the unit `TOOL-dFoldedVerdict-2`'s N7 assigns it to, and order 1 lands before this move.
-  This unit does not claim the wording. It claims the OBSERVATION: AC13 reads the moved bullet in
-  both halves of the new pair and reds while the sentence is still the false one. If the pre-image at
-  order 5 still carries it, this unit amends that ONE bullet during the move and records in the build
-  record that order 1 did not. Either way no falsified sentence is copied into a fresh byte-compared
-  pair that nothing in this build revisits.
+- **S11 — the `--review` bullet moves VERBATIM, false sentence and all, and its correction is
+  handed forward one unit.** The bullet sits inside section 7 and is cited by SECTION rather than by
+  a line number this move invalidates. At BASE `adc0543c` its sentence reads "at the exit every
+  blocker still standing is promoted to a unit rather than parked", and it enumerates the verb's
+  refusals as exactly three. Both halves go FALSE once `TOOL-dFoldedVerdict-1` makes `fold` a legal
+  exit disposition and adds refusals. **Rev-1 through rev-3 read the sequence the other way round**,
+  with unit 1 landing first and this unit amending the bullet mid-move as a backstop; the rev-3
+  reorder inverts it. This unit is now order 1 and `TOOL-dFoldedVerdict-1` is order 2, so the
+  pre-image DOES still carry the false sentence, and the correction lands one unit later inside the
+  carrier this unit creates. The verbatim property is worth more than a one-unit exposure: AC2, AC3
+  and AC14 all grade this move by byte-identity, and an amendment made during the move is the single
+  edit that would make a pure move unverifiable. So the sentence is copied unchanged and AC13
+  observes that it was. It does not survive the build — `TOOL-dFoldedVerdict-1` S9 names this
+  carrier and its AC17 grades the corrected text there — which answers the original worry that the
+  false sentence would acquire a second permanent home nothing revisits.
 - **S12 — the handoff to `TOOL-dFoldedVerdict-6` is STATED, not assumed.** This unit MOVES section 7
   and rewords nothing in it beyond S11's single bullet. `TOOL-dFoldedVerdict-6` compresses the
   REMAINDER of the protocol and does not touch the new carrier. The two units share an author and one
   file, which is where a handoff is likeliest to be assumed rather than written, so it is written
   here and in that unit's S10. The kit version bump belongs to that unit and not to this one, per N9.
+- **S13 — the protocol sanctions the provenance form, in one sentence.** Owner ruling of 2026-09-01,
+  taken on `TOOL-dFoldedVerdict-3` Q2. `memory/guides/UNATTENDED-PROTOCOL.md:167` says the run-state
+  file's authored half carries the declared facts "and nothing else", while four landed records
+  already carry a hand-reconstructed key with a `-source:` line stating why no verb could write it —
+  so the corpus already contradicts the clause and nothing enforces either side. The sentence admits
+  a source-suffixed line whose value states why a verb could not write the key it names, and it says
+  nothing about WHICH keys qualify. It lands in this unit rather than in `TOOL-dFoldedVerdict-6`
+  for two reasons and both are about the DIFF: this unit is order 1, so the permission exists three
+  units before `TOOL-dFoldedVerdict-3` writes rows relying on it, and a one-sentence addition stays
+  separable inside a diff that is otherwise a move, where in unit 6's document-wide compression a
+  reader could not tell an addition from a reword. It goes in the run-state section and NOT in
+  section 7, so N2's verbatim rule does not reach it — stated because a reader who sees this unit
+  adding protocol prose will reach for N2 first. `TOOL-dFoldedVerdict-3` writes the rows and owns
+  their correctness; this unit writes only the permission, and AC13a is the observation.
 
 ## 3. Non-goals (OUT)
 
@@ -183,13 +200,16 @@ the machinery make it worth a criterion rather than a note.
 
 Check 10 compares the two copies of a pair to each other, and its own header at
 `tools/unattended/check-unattended.sh:1244-1247` says a parity leg is a copy check. A sentence false
-in BOTH halves is green forever. This unit then CREATES a second such pair, so a falsified sentence
-copied at order 5 acquires a second permanent home that nothing later in this build reads: the new
-carrier is out of `TOOL-dFoldedVerdict-6`'s subject by that unit's own N1.
+in BOTH halves is green forever. This unit CREATES a second such pair, so at rev-2 the worry was
+that a falsified sentence copied here acquires a second permanent home nothing later reads — the new
+carrier being out of `TOOL-dFoldedVerdict-6`'s subject by that unit's own N1.
 
-AC13 is therefore stated over CONTENT and not over parity. A parity or byte-compare observation
-passes whether or not a content change ever happened, which is the shape the round-1 audit named
-three times across this spec set. AC14 is the same correction applied to the move itself.
+**The reorder answered that worry without a criterion.** This unit is order 1 and
+`TOOL-dFoldedVerdict-1` is order 2, so the sentence is read and corrected one unit later, in this
+carrier, and graded there by that unit's AC17. What remains for this unit is the opposite assertion
+from the one rev-2 wrote: AC13 now observes that the bullet arrived UNCHANGED, because a mid-move
+amendment is the one edit that would defeat AC2, AC3 and AC14, which grade this move by
+byte-identity. AC14 is the same discipline applied to the move as a whole.
 
 Owner ruling of 2026-09-01: at CEILING the driver accepts EITHER disposition, because a forced value
 is a constant and a constant is not evidence for the clause that reads it. That permits something
@@ -285,8 +305,11 @@ left to read as covered. See N9.
   `wc -lc memory/guides/UNATTENDED-PROTOCOL.md` reports a byte count strictly below 61440 AND strictly
   below this unit's own PRE-IMAGE, measured before the pass with
   `git show HEAD:memory/guides/UNATTENDED-PROTOCOL.md | wc -c` and recorded in the build record. The
-  pre-image is NOT the BASE figure: `TOOL-dFoldedVerdict-2` at order 2 adds a section 8 row to this
-  same file, so 61440 is a BASE observation and the pass re-measures rather than assuming it.
+  pre-image is measured and never assumed. At order 1 this unit runs before every sibling that
+  touches the file — `TOOL-dFoldedVerdict-1`'s amendment is order 2 and `TOOL-dFoldedVerdict-2`'s
+  section 8 row is order 3 — so the pre-image SHOULD equal the BASE 61440 and the re-measurement is
+  what PROVES that rather than a step that assumes it. Rev-3 had this backwards, naming unit 2 as
+  order 2 and treating its row as already landed.
 - **AC9** — When `awk '/^## 8[.] /{f=1;next} f&&/^## /{f=0} f' memory/guides/UNATTENDED-PROTOCOL.md`
   runs, it still yields the conf-key table, and `grep -n '^## ' memory/guides/UNATTENDED-PROTOCOL.md`
   still reports `## 7. The verbs` at a heading of its own with sections 8 through 12 unrenumbered.
@@ -302,18 +325,21 @@ left to read as covered. See N9.
 - **AC12** — When `grep -n 'TOOL-dUnstalledConvoy-17\|TOOL-dBriefedPass-8' memory/backlog/TOOL.md`
   runs, neither row still asserts what S10 measured false: no claim that section 7 omits `--park` or
   `--attest`, and no claim that `INDEX_CAP_BYTES` is the cap that binds it.
-- **AC13** — When the `--review` bullet is extracted from BOTH halves of the new pair with
-  `sed -n '/^- .--review. — /,/^- .--version. — /p'`, each extract contains the token `fold` and does
-  NOT contain the literal `promoted to a unit rather than parked`. Measured at BASE `adc0543c`: that
-  literal is present and `fold` is absent, so both arms have a failing case today and the criterion
-  reds while the sentence is still the false one. The extracts are recorded in the unit's build
-  record beside the commands that produced them. What the corrected sentence SAYS is
-  `TOOL-dFoldedVerdict-1`'s to write, and this criterion does not pin its wording.
-- **AC13a** — When those same two extracts are READ, the CEILING clause admits either disposition,
-  per the owner ruling of 2026-09-01, and the refusal enumeration matches the refusals
-  `tools/unattended/unattended.sh` actually ships. This is a READER observation and is written as one:
-  no grep distinguishes a correct enumeration from a plausible one, and an honest unobservable is
-  better than a criterion that cannot fail. The reading and its verdict go in the build record.
+- **AC13** — When the `--review` bullet is extracted from the PRE-IMAGE section 7 and from BOTH
+  halves of the new pair with `sed -n '/^- .--review. — /,/^- .--version. — /p'`, all three extracts
+  are byte-identical, and each still contains the literal `promoted to a unit rather than parked`.
+  **This is the inverse of what rev-2 and rev-3 asserted, and the inversion is the point.** This
+  unit is order 1: it moves the bullet unchanged per S11, and a criterion demanding the CORRECTED
+  text here would grade `TOOL-dFoldedVerdict-1`'s work inside the one unit that must not perform it.
+  The three extracts and the commands that produced them go in the build record. The correction is
+  graded by `TOOL-dFoldedVerdict-1` AC17 at order 2, over this same pair.
+- **AC13a** — When the protocol's run-state authored-half clause is read in BOTH halves of the
+  protocol pair, each carries S13's sentence, and `bash tools/unattended/check-unattended.sh` reports
+  no check 10 failure over that pair. This is a READER observation for the sentence's CONTENT and is
+  written as one: no grep distinguishes a clause that SANCTIONS the source-suffixed form from one
+  that merely mentions it, and an honest unobservable beats a criterion that cannot fail. The reading
+  and its verdict go in the build record. The CEILING-and-refusals reading that rev-2 put at this
+  number moved to `TOOL-dFoldedVerdict-1` AC17, together with the sentence it grades.
 - **AC14** — When `grep -cE '^- .--[a-z-]+. — '` runs over each half of the PROTOCOL pair it reports
   0, and over each half of the NEW pair it reports 18. Measured at BASE with the same command: the
   protocol reports 18 and every one of them sits inside section 7, so the zero is an observation with
@@ -357,18 +383,23 @@ putting the new file where check 6 and check 26 can already reach it.
 
 ## 8. Open questions
 
-- **F1 — does check 26's protocol arm read ONLY the new carrier, or either file?** Options: point
+- **F1 — does check 26's protocol arm read ONLY the new carrier, or either file?** RESOLVED (agent,
+  2026-09-01): the new carrier only, with its own named refusal when that file is absent. Options: point
   `$SHIP` at the new template and refuse when it is absent; or accept a hit in either file. The
   second is cheaper to write and is wrong: a half-completed move leaves the verbs in both places and
   passes. RECOMMENDATION: the new carrier only, with its own named refusal when the file is missing,
   on the same reasoning check 10 already records for a one-file parity check.
-- **F2 — does the second pair become a new check number, or a row inside check 10?** Options: a
+- **F2 — does the second pair become a new check number, or a row inside check 10?** RESOLVED
+  (agent, 2026-09-01): a row inside check 10. Options: a
   `PAIRS` list inside check 10, iterated; or a new check with its own number. A new number costs a
   new entry in every place check numbers are enumerated and gains nothing, because check 10 already
   carries the both-halves refusal the second pair needs. RECOMMENDATION: a row inside check 10.
   Neither option disturbs a pinned ordinal — check 10 has no pinned rows — but a new check inserted
   in file order could, depending on where it lands.
-- **F3 — should `AGENTS.md` cite `memory/guides/UNATTENDED-VERBS.md`?** A charter citation would put
+- **F3 — should `AGENTS.md` cite `memory/guides/UNATTENDED-VERBS.md`?** RESOLVED (agent,
+  2026-09-01): do not cite it. Editing the charter is a governance-carrier change and M3's veto 2
+  reserves it for the owner, so citing it here would be this unit taking a decision it may not take.
+  A charter citation would put
   the file in check 16's read path, which it does not need: `check-memory-hygiene.sh:449` already
   caps it by location, and check 16 rule 3 only asks that a charter-cited member IS capped.
   RECOMMENDATION: do not cite it. The protocol's §7 stub reaches it in one hop, and editing the
@@ -393,6 +424,23 @@ putting the new file where check 6 and check 26 can already reach it.
   pre-image rather than the BASE constant, which `TOOL-dFoldedVerdict-2` moves at order 2. **S12**
   states the handoff to `TOOL-dFoldedVerdict-6` explicitly in both directions.
 - rev-3 · 2026-09-01 · MOVED TO ORDER 1, and the move is load-bearing rather than cosmetic. `memory/guides/UNATTENDED-PROTOCOL.md` renders at EXACTLY `GUIDE_CAP_BYTES` (61440 of 61440, measured) with 725 of 750 lines, and two units sequenced BEFORE this one added bytes to it — `TOOL-dFoldedVerdict-2` S12 adds a section-8 key row and `TOOL-dFoldedVerdict-1` S9 amends a bullet. Either would have red hygiene check 6 before the relief this unit provides had landed, which is M2's ordering rule broken: a unit depending on one sequenced after it. This unit now runs first and frees the 8.1 KB the rest spend. N2 is unchanged — the move is still verbatim, and the bullet it carries is corrected by unit 1 afterwards in the new carrier.
+
+- rev-4 · 2026-09-01 · the fork sweep, one owner ruling that added scope, and the assumptions the
+  rev-3 reorder inverted. F1, F2 and F3 marked; the spec is no longer FORKED. **The inversion is the
+  substantive change.** Rev-2 wrote S11, the §4 subsection and AC13 on the premise that
+  `TOOL-dFoldedVerdict-1` lands FIRST and this unit is the backstop that observes a corrected
+  sentence. The reorder made this unit order 1 and that one order 2, so the premise is exactly
+  backwards: the pre-image still carries the false `--review` sentence and this unit copies it
+  unchanged. S11, the subsection and AC13 now say so, and AC13 asserts byte-identity across the
+  pre-image and both new halves rather than demanding the corrected text — a criterion demanding it
+  here would grade a sibling's work inside the one unit forbidden to do it. The falsified sentence
+  still does not survive the build: unit 1's S9 names this carrier and its AC17, repointed at rev-4,
+  grades the correction there. AC13a was freed by that move and now carries S13. AC8's pre-image note
+  named unit 2 as order 2 and treated its section 8 row as already landed; unit 2 is order 3, so the
+  pre-image should equal the BASE 61440 and the re-measurement is what proves it. **S13 is new**: the
+  owner ruled on `TOOL-dFoldedVerdict-3` Q2 that the protocol sanctions the source-suffixed
+  provenance form in one sentence, and it is assigned here because at order 1 the permission precedes
+  the rows that rely on it and stays separable in a diff that is otherwise a move.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFoldedVerdict-2 — clause 3 reads the recorded disposition, behind a dated cutoff
 
-**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 3
+**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -540,7 +540,10 @@ unarmed-and-not-pinned refusal, not through a floor.
 
 ## 8. Open questions
 
-- **F1 — where the retrofit puts the label, and therefore how permissive this reader is.** The reader
+- **F1 — where the retrofit puts the label, and therefore how permissive this reader is.** RESOLVED (agent,
+  2026-09-01): option A, the strict reader. Taken on the recommendation's own ground — a reader
+  looser than its writer is a second grammar nobody declared — and the owner ruling of the same date
+  makes the retrofit an authorized migration rather than a run editing its own history. The reader
   specified in §4 takes the disposition from the subject's TERMINAL row. `park()` at
   `tools/unattended/unattended.sh:3796` only appends, and `verb_review` at `:3951-3954` refuses a
   second round for a subject that already carries a terminal token, so `TOOL-dFoldedVerdict-3` cannot
@@ -552,7 +555,10 @@ unarmed-and-not-pinned refusal, not through a floor.
   which `TOOL-dFoldedVerdict-1` refuses at write time, and a reader looser than its writer is a
   second grammar nobody declared. The append-only property is about what a RUN may do to its own
   history; a retrofit is an owner-authorized migration, and it is `TOOL-dFoldedVerdict-3`'s to state.
-- **F2 — whether the declared cutoff is `2026-09-01` or a future date.** At `2026-09-01` the leg reds
+- **F2 — whether the declared cutoff is `2026-09-01` or a future date.** RESOLVED (owner,
+  2026-09-01): `2026-09-01`. The owner took the disposition that accepts it, and
+  `TOOL-dFoldedVerdict-3` Q1 carries the same ruling together with the scope consequence — four
+  labelled rows across two records, not two. At `2026-09-01` the leg reds
   on two records between this unit and `TOOL-dFoldedVerdict-3`. A future date would keep the bar green
   in between, and unit 3 would lower it in the same commit as the retrofit.
   **Recommendation: `2026-09-01`.** A cutoff set ahead of the corpus grades nothing, so this unit
@@ -561,7 +567,14 @@ unarmed-and-not-pinned refusal, not through a floor.
   `memory/builds/dMispairedQuote/RUN.md`, verified by running it in this worktree, so this unit
   inherits a red rather than introducing one; the build lands once, after unit 3. A cutoff edited
   twice inside one build is also a knob whose two values disagree in the history.
-- **F3 — how this unit's TWO protocol edits are paid for.** `memory/guides/UNATTENDED-PROTOCOL.md`
+- **F3 — how this unit's TWO protocol edits are paid for.** RESOLVED (agent, 2026-09-01): option B,
+  and it is ALREADY TAKEN. The rev-3 reorder moved `TOOL-dFoldedVerdict-5` to order 1 and this unit
+  to order 3, so the split that frees roughly 8.1 KB lands two units before either of these edits is
+  written, and the zero-headroom premise stated below does not hold at the moment they are made.
+  Option A's compression is therefore NOT performed here, which also dissolves the collision with
+  `TOOL-dFoldedVerdict-6` that made A the harder branch. The measurement obligation survives
+  untouched: AC9 still refuses a landing that has not re-measured with `wc -c`, because headroom that
+  exists in a plan is not headroom observed in a tree. `memory/guides/UNATTENDED-PROTOCOL.md`
   and `tools/unattended/PROTOCOL.template.md` are each exactly 61440 bytes, measured with `wc -c` on
   this tree, and hygiene check 6 at `tools/memory-tree/check-memory-hygiene.sh:503` reds on
   `b[f]+0>cb` with `GUIDE_CAP_BYTES=61440` declared at `:63`. There is zero byte headroom; the line
@@ -630,6 +643,15 @@ unarmed-and-not-pinned refusal, not through a floor.
   **Nothing in the round-1 report addressed to this unit is refused.** M1 to M5, M9, H1, H3, H5, H7
   and B1 are addressed to siblings and are untouched here.
 - rev-3 · 2026-09-01 · S14 WITHDRAWN: it and `TOOL-dFoldedVerdict-1` S9 had both claimed the protocol's `--review` bullet, the collision M6 clause 1 forbids, produced because the two specs were authored in parallel and could not read each other. It resolves toward unit 1 on the rule and on the bytes alike. N7's supporting argument is superseded by the reorder — this unit is now order 3 and the section-7 move is order 1 — and the Files-touched row no longer claims the bullet. The reorder itself exists because S12 ADDS a section-8 key row to a render already at EXACTLY `GUIDE_CAP_BYTES`.
+
+- rev-4 · 2026-09-01 · the fork sweep. F1, F2 and F3 marked; the spec is no longer FORKED. F2 is
+  the owner's cutoff ruling of the same date and matches `TOOL-dFoldedVerdict-3` Q1 in both
+  directions. **F3 changed its answer.** Rev-2 recommended option A — pay for both protocol edits
+  by compressing the grandfather sentences, coordinated with `TOOL-dFoldedVerdict-6` — and the
+  rev-3 reorder has since taken option B instead by moving `TOOL-dFoldedVerdict-5` to order 1. The
+  split lands two units before either edit here, so no compression is performed by this unit and the
+  collision with unit 6 is gone. AC9's obligation to re-measure with `wc -c` before landing is
+  deliberately NOT relaxed: headroom that exists in a plan is not headroom observed in a tree.
 
 ## 10. Reuse audit
 

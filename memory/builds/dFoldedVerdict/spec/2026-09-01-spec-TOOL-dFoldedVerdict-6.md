@@ -1,6 +1,6 @@
 # TOOL-dFoldedVerdict-6 — the whole-document compression pass
 
-**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 6
+**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -370,17 +370,26 @@ the diff — and there is no machine substitute for it.
 
 ## 8. Open questions
 
-- **F1 — is a rule that reads as WRONG corrected here, or filed?** Options: fold the correction into
+- **F1 — is a rule that reads as WRONG corrected here, or filed?** RESOLVED (agent, 2026-09-01):
+  file it. Options: fold the correction into
   this pass, or record it and leave the text. RECOMMENDATION: file it. N4 already says so and the
   reason is the diff: a review that must separate "this claim was cut" from "this claim was changed"
   over the same hunks is a review that finds neither reliably. A correction is its own unit with its
   own record. The exception is S6, which is not a rule correction but the repair of a sentence
   physically severed by an insertion.
-- **F2 — does the pass edit the template half only, or both halves in parallel?** Options: edit the
+- **F2 — does the pass edit the template half only, or both halves in parallel?** RESOLVED (agent,
+  2026-09-01): the template only, then re-install. Options: edit the
   template and re-install, or hand-edit both. RECOMMENDATION: the template only, then re-install.
   Hand-editing both is how two copies stop agreeing, and the leg that would catch it compares them to
   each other, so it catches a divergence and never a shared error.
-- **F3 — FACT-QUESTION · is the ~2,965-byte figure reproducible in this tree?** The probe:
+- **F3 — FACT-QUESTION · is the ~2,965-byte figure reproducible in this tree?** RESOLVED (agent,
+  2026-09-01): it is NOT recorded anywhere, so it stays cited as UNVERIFIED input and this unit
+  re-derives its own saving. The probe was run at `7f2732cc`. `git log --all -S'2,965' -- memory/`
+  returns two commits, `d8037043` and `7f2732cc`, and `git grep` across every ref returns hits in
+  exactly one path: this unit's OWN spec, at both of those commits. No prior record, review or
+  decision carries the measurement. LIVENESS held as written — the same probe for `61440` returned
+  hits in `memory/DECISIONS.md` and `memory/backlog/TOOL.md`, so the probe can produce a positive and
+  its negative is informative rather than a broken command reporting silence. The probe:
   `git log --all --oneline -S'2,965' -- memory/` and a `git grep` for the figure across every ref, run
   before the pass begins. The observation that decides it: whether any tracked or reachable record
   carries the measurement. LIVENESS: the same probe run for `61440` returns hits at BASE, so it can
@@ -411,6 +420,20 @@ the diff — and there is no machine substitute for it.
   handoff from `TOOL-dFoldedVerdict-5` explicitly, including that this unit's pre-image is never BASE
   and that `TOOL-dFoldedVerdict-2`'s F3 may already have spent the grandfather passage.
 - rev-3 · 2026-09-01 · reordered to order 6, unchanged in position but now the last of a resequenced set. Its subject is still the post-split remainder; what changed is that the split is order 1 rather than order 5, so the remainder this unit compresses is settled far earlier and every sibling's protocol edit has already landed in it.
+
+- rev-4 · 2026-09-01 · the fork sweep. F1, F2 and F3 marked; the spec is no longer FORKED. **F3 was
+  a FACT-QUESTION and it was run rather than reasoned.** At `7f2732cc`,
+  `git log --all -S'2,965' -- memory/` returns `d8037043` and `7f2732cc`, and a `git grep` across
+  every ref returns hits in exactly one path — this unit's own spec, at both commits. No prior
+  record, review or decision carries the measurement, so the figure stays cited as UNVERIFIED input
+  and §6's saving is re-derived with `wc -c` before and after. The liveness control held as the fork
+  specified: the same probe for `61440` returns hits in `memory/DECISIONS.md` and
+  `memory/backlog/TOOL.md`, so the probe can produce a positive and its negative is informative
+  rather than a broken command reporting silence. **F1** — a rule reading as WRONG is filed, not
+  corrected here, so the diff never mixes "this claim was cut" with "this claim was changed"; S6
+  stays the sole exception, being a severed sentence rather than a rule. **F2** — the template half
+  is edited and re-installed, never both halves by hand: the leg that would catch a divergence
+  compares them to each other, so it catches drift and never a shared error. No scope moved.
 
 ## 10. Reuse audit
 

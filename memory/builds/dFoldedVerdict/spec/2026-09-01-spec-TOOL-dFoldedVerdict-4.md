@@ -1,6 +1,6 @@
 # TOOL-dFoldedVerdict-4 — `agent-cap` admits a strictly sequential awaited `agent()` under a marker that names a bound
 
-**Status:** SPECCED · rev-3 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 5
+**Status:** SPECCED · rev-4 · 2026-09-01 · node d · Tier-2 · base adc0543c · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -428,12 +428,14 @@ New gate added: none. The predicate is enforced at the tool call by the hook its
 
 ## 8. Open questions
 
-- **F1 — the marker spelling.** `gov:sequential-agents` reads as what it claims and matches the
+- **F1 — the marker spelling.** RESOLVED (owner, 2026-09-01): `gov:sequential-agents`, carrying its
+  bound as `gov:sequential-agents(5)`. `gov:sequential-agents` reads as what it claims and matches the
   `gov:` prefix both siblings use. `gov:sequential-fanout` would pair with `gov:bounded-fanout` but a
   sequential dispatch is not a fan-out, and `gov:one-at-a-time` says nothing about the bound.
   Recommendation: `gov:sequential-agents`. Whatever is chosen is written once in the hook and read
   everywhere from that constant, so this decides prose and not structure.
-- **F2 — the one-call-per-marked-loop sweep.** It is what turns the marker's number from an
+- **F2 — the one-call-per-marked-loop sweep.** RESOLVED (agent, 2026-09-01): land it here. It is
+  what turns the marker's number from an
   ITERATION bound into a SPAWN bound, and without it a body holding two awaited calls spends twice
   what the marker claims. It costs a two-pass restructure of the `lines.forEach` sweep that builds
   `bad`. The alternative is to land the eight clauses now and file the
@@ -441,7 +443,9 @@ New gate added: none. The predicate is enforced at the tool call by the hook its
   Recommendation: land it here — a stated fail-open in the guard's own admission path is the thing
   this unit exists to avoid.
 - **F3 — the `denies an agent() in any loop body` clause in `memory/map/features/unattended.md`.**
-  Its sentence explains why
+  RESOLVED (agent, 2026-09-01): amend it here, as a rewrite of the clause and never as an appended
+  negation. Deferring a false claim to a compression pass is how it survives the build that
+  falsified it. Its sentence explains why
   `tools/workflows/unattended-build.js` has the two shapes it has, and those shapes do not change in
   this unit; only the absolute `denies an agent() in any loop body` goes false. Amending one clause
   here risks the append-a-negation-beside-the-text-it-contradicts class, and deferring it to unit 6's
@@ -487,6 +491,17 @@ New gate added: none. The predicate is enforced at the tool call by the hook its
   the rev-1 design and is unchanged — S1, C3, C4, AC5 and the first Alternatives-rejected bullet each
   carry it, and a bare marker is refused rather than treated as concurrency one.
 - rev-3 · 2026-09-01 · reordered to order 5 by the build's own ordering fix. No scope change: this unit touches no protocol carrier, and it moved only because the section-7 split had to precede the units that add protocol bytes to a render already at EXACTLY `GUIDE_CAP_BYTES`.
+
+- rev-4 · 2026-09-01 · the fork sweep. F1, F2 and F3 marked; the spec is no longer FORKED. **F1**
+  is the owner's, taken 2026-09-01: the marker is `gov:sequential-agents` and it carries its bound as
+  `gov:sequential-agents(5)`. It becomes permanent grammar in `tools/hooks/README.md` and in every
+  adopter's copy of the hook, which is why it went to the owner rather than being picked here.
+  **F2** — the one-call-per-marked-loop sweep lands in this unit rather than as a backlog row: it is
+  what turns the marker's number from an ITERATION bound into a SPAWN bound, and shipping without it
+  would leave a stated 2x fail-open inside the guard's own admission path. **F3** — the false
+  `denies an agent() in any loop body` clause in `memory/map/features/unattended.md` is rewritten
+  here, not appended to and not deferred to unit 6's compression pass, because a claim deferred to a
+  compression pass is a claim that survives the build which falsified it.
 
 ## 10. Reuse audit
 
