@@ -5158,16 +5158,16 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
 
 
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
-               write_withdrawals: bool = False) -> int:
+               write_withdrawals: bool = False, allow_ungraded: bool = False) -> int:
     """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
     try:
-        return _cmd_update(root, target, to_rev, write, write_withdrawals)
+        return _cmd_update(root, target, to_rev, write, write_withdrawals, allow_ungraded)
     finally:
         release_write_lock()
 
 
 def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
-                write_withdrawals: bool = False) -> int:
+                write_withdrawals: bool = False, allow_ungraded: bool = False) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -6201,14 +6201,39 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         return r.emit()
 
     receipt["schema"] = RECEIPT_SCHEMA
+    # DEPL-dGaugedVintage-8 S1. THE STAMP MUST NOT OUTRUN THE ROWS THIS RUN NEVER GRADED. An
+    # `evidence: "unattributed"` row is skipped above (`how == "table"` branch) before
+    # `classify_row`, by DEPL-dCarriedReceipt-13's ratified design, and it is graded against the
+    # receipt's OWN `gov_commit`. Advancing the stamp anyway moves the base that `adopt --re-adopt`
+    # would walk from further from the vintage those bytes actually came from, so every update makes
+    # the row harder to attribute — a slow loss with no event to notice.
+    #
+    # The byte-level work above is KEPT either way. Refusing the whole run would punish the operator
+    # for a state `adopt` recorded honestly; only the stamp is withheld.
+    ungraded = sum(1 for f in receipt.get("files", []) if f.get("evidence") == "unattributed")
+    if ungraded and not allow_ungraded:
+        print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
+              f"deleted {len(deleted)}, withheld {withheld}, {conflicts} conflict(s). "
+              f"The receipt is NOT re-stamped: {ungraded} row(s) carry `evidence: \"unattributed\"` "
+              f"and this run graded none of them, so advancing gov_commit would move the base they "
+              f"must be attributed from. Clear them with "
+              f"`govkit adopt --re-adopt --write`, or pass --allow-ungraded to stamp anyway")
+        receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+        (target / ".governance" / "install.sums").write_text(
+            "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
+            encoding="utf-8", newline="\n")
+        return r.emit()
+
     receipt["gov_commit"] = to_commit
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
     (target / ".governance" / "install.sums").write_text(
         "".join(f"{f['sha256']}  {f['path']}\n" for f in receipt["files"] if "sha256" in f),
         encoding="utf-8", newline="\n")
+    # S2. The override says what it overrode, so the choice is on the record rather than silent.
+    over = (f" over {ungraded} ungraded row(s), --allow-ungraded" if ungraded else "")
     print(f"govkit update — wrote {len(changed)}, moved {len(renamed) // 2}, "
           f"deleted {len(deleted)}, withheld {withheld}, "
-          f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}")
+          f"{conflicts} conflict(s); receipt re-stamped at {to_commit[:8]}{over}")
     return r.emit()
 
 
@@ -6843,7 +6868,7 @@ USAGE = """usage:
   govkit.py plan  --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
   govkit.py check --target <path> [--run-discharge]
   govkit.py apply --target <path> [--kits a,b | --all] [--resume]
-  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+  govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals] [--allow-ungraded]
   govkit.py adopt  --target <path> [--to <rev>] [--pin <path>=<rev> ...] [--re-adopt] [--write]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
@@ -6856,7 +6881,11 @@ gov has stopped shipping is REPORTED and an order is written under `.governance/
 adopter's copy stays exactly where it is. It defaults off and it is a scope flag rather than a
 `--force` — it enables a narrower class of action and overrides no refusal. A file gov RENAMED is
 not a withdrawal at all: `update --write` moves the target's copy to the new destination its own
-descriptor resolves, carrying any local edit through a three-way merge. The default is read-only because that verb's failure mode is silent data loss in a
+descriptor resolves, carrying any local edit through a three-way merge. `--allow-ungraded` overrides
+one refusal and nothing else: `update --write` withholds the receipt's `gov_commit` re-stamp while
+any row carries `evidence: "unattributed"`, because those rows are graded against the receipt's own
+base and advancing it moves that base away from them. The bytes are written either way; only the
+stamp is withheld, and `govkit adopt --re-adopt --write` is what clears the rows. The default is read-only because that verb's failure mode is silent data loss in a
 repository the operator owns and gov does not, and the muscle-memory invocation must not be the
 destructive one. `intake` writes the target descriptor
 ONCE and refuses to overwrite one that exists — a subcommand that parses and does
@@ -6872,6 +6901,10 @@ def parse_args(argv: list[str]) -> tuple:
     resume = False
     write = False
     write_withdrawals = False
+    # DEPL-dGaugedVintage-8 S1. It overrides a refusal, so it is NOT a scope flag by the test
+    # `--write-withdrawals` passes — and it is deliberately not spelled `--force`, because a general
+    # force flag would also disable guards this unit does not own.
+    allow_ungraded = False
     to_rev = "HEAD"
     answers: dict[str, str] = {}
     # DEPL-dCarriedReceipt-13 S1. Both widen this function, which used to return a fixed 8-tuple.
@@ -6914,6 +6947,9 @@ def parse_args(argv: list[str]) -> tuple:
             # deletion it scopes lives in the write loop.
             write_withdrawals = True
             i += 1
+        elif a == "--allow-ungraded":
+            allow_ungraded = True
+            i += 1
         elif a == "--pin" and i + 1 < len(argv):
             # DEPL-dCarriedReceipt-13 S6. `<path>=<rev>`, and the SAME key=value refusal `--answer`
             # already makes: a `--pin` with no `=` is an operator naming a path and no vintage, and
@@ -6947,7 +6983,7 @@ def parse_args(argv: list[str]) -> tuple:
         else:
             raise Refusal(f"unknown or incomplete argument: {a}")
     return (verb, target, mode, kits, resume, answers, write, to_rev, write_withdrawals,
-            pins, re_adopt, coverage, emit_declines, run_discharge)
+            pins, re_adopt, coverage, emit_declines, run_discharge, allow_ungraded)
 
 
 def main(argv: list[str]) -> int:
@@ -6956,7 +6992,8 @@ def main(argv: list[str]) -> int:
         return 0 if argv else 2
     try:
         (verb, target, mode, kits, RESUME, ANSWERS, WRITE, TO_REV, WRITE_WD,
-         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE) = parse_args(argv)
+         PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE,
+         ALLOW_UNGRADED) = parse_args(argv)
         root = repo_root()
         if verb == "selfcheck":
             # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
@@ -6982,7 +7019,8 @@ def main(argv: list[str]) -> int:
                 return cmd_intake(root, target, mode, kits, ANSWERS)
             if verb == "update":
                 return cmd_update(root, target, TO_REV, write=WRITE,
-                                  write_withdrawals=WRITE_WD)
+                                  write_withdrawals=WRITE_WD,
+                                  allow_ungraded=ALLOW_UNGRADED)
             if verb == "adopt":
                 return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE)
             return cmd_apply(root, target, mode, kits, resume=RESUME)

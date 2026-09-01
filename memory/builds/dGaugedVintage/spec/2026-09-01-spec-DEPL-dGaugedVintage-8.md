@@ -1,136 +1,135 @@
-# DEPL-dGaugedVintage-8 — a way out of `unattributed`, and a stamp that cannot outrun it
+# DEPL-dGaugedVintage-8 — the stamp must not outrun the rows it never graded
 
-**Status:** OPEN · rev-2 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 1
+**Status:** CLOSED · rev-4 · 2026-09-01 · node d · Tier-2 · base d65da7ab · streams deployer · order 1 · ratified 2026-09-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-01-build-DEPL-dGaugedVintage-8-acceptance-ledger.md](../build/2026-09-01-build-DEPL-dGaugedVintage-8-acceptance-ledger.md) | journal | — |
 | [2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md](../reviews/2026-09-01-review-DEPL-dGaugedVintage-1-spec-audit-round1.md) | spec-audit | DEPL-dGaugedVintage-1 DEPL-dGaugedVintage-2 DEPL-dGaugedVintage-3 DEPL-dGaugedVintage-4 DEPL-dGaugedVintage-5 DEPL-dGaugedVintage-6 DEPL-dGaugedVintage-7 DEPL-dGaugedVintage-9 DEPL-dGaugedVintage-10 DEPL-dGaugedVintage-11 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-Give a receipt row recorded `evidence: "unattributed"` a path back to being graded, and stop
-`update --write` from moving `gov_commit` forward past rows it never graded. Today half of a real
-adopter's receipt is permanently ungraded and the base that could grade it recedes on every run.
+`update --write` advances `receipt["gov_commit"]` to `to_commit` unconditionally, including over rows
+carrying `evidence: "unattributed"`. Those rows are graded against the receipt's OWN base, so every
+write moves the base they would have to be attributed from further away. Stop the stamp advancing
+past rows the run never graded.
 
 ## 2. Scope (IN)
 
-- **S1** — A re-attribution pass over stored `unattributed` rows, reachable from `update`. It runs
-  the same walk `adopt` runs, bounded by the receipt's OWN `gov_commit` rather than by `to_commit`,
-  and promotes a row that now attributes. A row that still matches no vintage stays `unattributed`.
-- **S2** — `update --write` REFUSES to advance `receipt["gov_commit"]` while any row is
-  `unattributed`, unless the operator passes an explicit opt-out flag. The refusal names the count
-  and the verb that clears it.
-- **S3** — The `update` tally line distinguishes "skipped because unattributed" from "graded", and
-  states how many of the unattributed rows the re-attribution pass could promote if run.
-- **S4** — A regression gate over the CLASS: a fixture receipt carrying one attributable and one
-  genuinely unattributable row, asserting the first promotes and the second does not.
+- **S1** — `update --write` REFUSES to advance `receipt["gov_commit"]` while any row carries
+  `evidence: "unattributed"`, unless the operator passes `--allow-ungraded`. The refusal names the
+  count and the existing remedy.
+- **S2** — Under `--allow-ungraded` the run proceeds and states in its output that it advanced the
+  stamp over N ungraded rows, so the choice is on the record rather than silent.
+- **S3** — A regression gate: a fixture receipt carrying one `unattributed` row, asserting
+  `update --write` leaves `gov_commit` at its stored value without the flag and advances it with.
 
 ## 3. Non-goals (OUT)
 
-- Changing what `adopt` records for a row that matches no gov vintage. `DEPL-dCarriedReceipt-13`
-  ratified that shape and this unit does not reopen it.
-- Writing bytes to an `unattributed` row. The skip in `govkit.py:5529` is the safe behaviour and
-  survives; only the exit from the state is new.
-- Re-attributing against any base other than the receipt's own `gov_commit`. Walking from a newer
-  base is how a row gets attributed to a vintage it never came from.
-- Any change to `classify_row`'s verdict grid. Follow-up: `DEPL-dGaugedVintage-9`.
+- **A re-attribution pass.** rev-1 and rev-2 scoped one; it already exists. `_cmd_adopt` calls
+  `derive_attribution` (`tools/govkit/govkit.py:6525`) for every unpinned destination and writes
+  `evidence: "vintage-match"` on a hit, so `govkit adopt --re-adopt --write` IS that pass — and
+  `update` already prints the remedy naming it at `:5589`, put there by
+  `DEPL-dCarriedReceipt-13` S7 and corrected by that unit's D14.
+- Changing what `adopt` records for a row matching no gov vintage. `DEPL-dCarriedReceipt-13`
+  ratified `evidence: "unattributed"` with neither `commit` nor `gov_oid`.
+- Writing bytes to an `unattributed` row. The skip at `:5529` is the safe path and survives.
+- Changing `classify_row`'s verdict grid, or the tally's existing labels.
 
 ## 4. Design
 
-### Data model
+### The one thing that is missing
 
-A receipt row's attribution is three fields written together or not at all: `evidence`, `commit`
-and `gov_oid`. `adopt` writes `evidence: "unattributed"` with the other two absent when its walk
-matches no gov vintage. Promotion means filling all three, so the row becomes indistinguishable
-from one `adopt` attributed on its first pass.
+`_cmd_update`'s three mutating branches never touch an `unattributed` row — the skip at `:5529`
+`continue`s before `classify_row`. But the stamp at `:6204` is unconditional:
+`receipt["gov_commit"] = to_commit`. So a target with ungraded rows drifts: the rows stay where they
+are while the base recedes, and `adopt --re-adopt`'s walk is bounded by a commit ever further from
+the vintage those bytes actually came from.
 
 ### Inventory
 
 | Site | Today | After |
 |---|---|---|
-| `govkit.py:5529` | `unattributed` rows `continue` before `classify_row` | unchanged; the skip is the safe path |
-| `govkit.py:6204` | `receipt["gov_commit"] = to_commit`, unconditional | guarded by S2's refusal |
-| `derive_attribution` | called by `adopt` only | also called by the S1 pass, bounded by the stored `gov_commit` |
+| `:5529` skip | `unattributed` rows `continue` before `classify_row` | unchanged |
+| `:5589` remedy | names `adopt --re-adopt --pin … --write` | unchanged |
+| `:6204` stamp | `receipt["gov_commit"] = to_commit`, unconditional | guarded by S1 |
+| `--allow-ungraded` | does not exist | new flag on `update` |
 
 ### Rollout
 
-The re-attribution pass is read-only in the same way `update` is: it reports under no flag and
-writes under `--write`. S2's refusal is the behaviour change an existing adopter will notice, so it
-ships with the opt-out flag in the same commit and the refusal message names it.
+S1 changes an exit condition an existing adopter will meet, so the flag ships in the same commit and
+the refusal message names it. The refusal fires only under `--write`; a read-only run is unaffected.
 
 ### Alternatives rejected
 
-Re-running the full `adopt` walk on every `update` was rejected on cost: `derive_attribution` spawns
-one `git log` per destination, measured at 65 ms per file on current bytes and 125 ms on stale ones,
-so a 95-row receipt pays seconds on every update for a state most rows are not in. Scoping the walk
-to rows already marked `unattributed` pays it only where it can change an answer.
+Refusing the whole run rather than only the stamp: the byte-level work `update` did is correct and
+worth keeping, and discarding it would punish the operator for a state `adopt` recorded honestly.
 
 ## 5. Production-readiness checklist
 
-- security — N/A. No new write path to target content; the only new write is to `.governance/`.
-- perf / scale — the pass is bounded by the unattributed subset, not the receipt. Measured basis in §4.
-- a11y — N/A. A CLI verb.
+- security — N/A. No new write path; this removes one conditionally.
+- perf / scale — one pass over rows already in memory.
+- a11y — N/A.
 - i18n — N/A.
-- error / empty / loading states — a receipt with zero unattributed rows must print that it ran and
-  found none, never nothing; a vacuous pass that prints nothing reads as a pass that did not run.
-- observability — the S3 tally is the observable; it names both counts on every run.
-- risks — the S2 refusal can block an adopter mid-update. Mitigated by the opt-out flag shipping in
-  the same commit. No data-loss path: promotion only fills absent fields.
-- testing + left-shift gates — S4, and it is the gate this unit adds.
-- migration / rollback — none. An existing receipt is read as-is; promotion is additive.
-- user docs — `WIRE-INTO-PROJECT.md` §5b gains the re-attribution step in the update sequence.
+- error / empty / loading states — a receipt with zero `unattributed` rows takes the unchanged path
+  and gains no output.
+- observability — S2 is the observable: the override says what it overrode.
+- risks — an adopter mid-update meets a new refusal. Mitigated by the flag shipping with it, named
+  in the message.
+- testing + left-shift gates — S3, observed RED first.
+- migration / rollback — none. No stored shape changes.
+- user docs — `WIRE-INTO-PROJECT.md` §5b gains a line on the guard and its override.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a receipt carries a row with `evidence: "unattributed"` whose bytes DO match a gov
-  blob at the receipt's own `gov_commit`, the re-attribution pass promotes it: `evidence`, `commit`
-  and `gov_oid` are all written, observed by re-reading `.governance/install.json`.
-- **AC2** — When a row matches no vintage at the stored `gov_commit`, it stays `unattributed` and
-  no `commit` or `gov_oid` is invented, observed on the same fixture.
-- **AC3** — When `update --write` runs against a receipt holding at least one `unattributed` row and
-  no opt-out flag, it REFUSES, names the count, and leaves `gov_commit` at its stored value.
-- **AC4** — When the opt-out flag is passed, that same run advances `gov_commit` and says in its
-  output that it did so over N ungraded rows.
-- **AC5** — When `update` runs read-only against a receipt with zero unattributed rows, the tally
-  still prints the unattributed count as `0` rather than omitting the line.
-- **AC6** — The new gate leg from S4 is observed RED before the fix lands: stage the promotion
-  branch out, run `bash tools/run-gates/run-gates.sh` scoped to that leg, and confirm it fails on
-  the attributable fixture row.
+- **AC1** — When `python tools/govkit/govkit.py update --write` runs against a receipt holding at
+  least one `unattributed` row without `--allow-ungraded`, it REFUSES to advance the stamp, names the
+  count, and `.governance/install.json`'s `gov_commit` is unchanged.
+- **AC2** — When `--allow-ungraded` is passed, the same run advances `gov_commit` and its output
+  states it did so over N ungraded rows.
+- **AC3** — When a receipt holds no `unattributed` row, `python tools/govkit/govkit.py update
+  --write` advances the stamp exactly as it does today, and its output gains no new line.
+- **AC4** — A read-only `python tools/govkit/govkit.py update` is unaffected by the guard in both
+  populations.
+- **AC5** — The S3 arm is observed RED before the guard lands: run it at this base and confirm the
+  stamp advances over an `unattributed` row.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` — the `govkit selfcheck` and `govkit acceptance matrix` legs in
-particular. This unit ADDS the S4 leg to `tools/gate-legs.json` with a declared `ceiling`.
+`bash tools/run-gates/run-gates.sh` — `govkit selfcheck` and `govkit acceptance matrix`. This unit
+adds the S3 arm to `tools/govkit/selftest.py`.
 
 ## 8. Open questions
 
-- **F1 — the opt-out flag's spelling and its default.** Options: `--allow-ungraded` (explicit, reads
-  as a decision) or reusing an existing `--force`-shaped flag if one exists. Recommendation:
-  `--allow-ungraded`, because a general force flag would also disable guards this unit does not own.
-  Unresolved.
-- **F2 — whether the re-attribution pass is a distinct verb or a phase of `update`.** A distinct
-  verb is discoverable and testable in isolation; a phase means an adopter cannot forget it.
-  Recommendation: a phase of `update` that reports always and writes only under `--write`, with no
-  new verb. The evidence is this build's own triage: a five-lens manual audit ran where `govkit
-  adopt` and `update` would have answered, so a further verb is a discoverability cost already paid
-  once here. `prior:` no prior ruling found. Unresolved.
+- **F1 — the flag's spelling.** `--allow-ungraded` reads as a decision; reusing a general force flag
+  would also disable guards this unit does not own. RESOLVED (agent, 2026-09-01, delegated):
+  `--allow-ungraded`. `prior:` no prior ruling found.
+- **F2 — whether the guard also covers `adopt --write`.** `adopt` WRITES the unattributed rows, so it
+  is the verb that CREATES the state rather than one that outruns it, and guarding it would refuse
+  the very run that records the state honestly. RESOLVED (agent, 2026-09-01, delegated): no.
+  `prior:` `DEPL-dCarriedReceipt-13` ratified adopt's recording of that state.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-01 · initial draft.
-- rev-2 · 2026-09-01 · folded round-1 spec audit L1. F2 justified its recommendation by citing
-  `DEPL-dGaugedVintage-2`, which says nothing about verb discoverability; replaced with this build's
-  own measured finding and a `prior:` line.
+- rev-2 · 2026-09-01 · folded round-1 spec audit L1.
+- rev-3 · 2026-09-01 · NARROWED at build time. rev-1 and rev-2 scoped a re-attribution pass that
+  already ships: `_cmd_adopt` calls `derive_attribution` at `:6525` and `update` prints the remedy
+  naming it at `:5589`. Building it would have been a second answer to one question. What survives
+  is the stamp guard, which nothing addresses. F1 resolved to `--allow-ungraded`.
+- rev-4 · 2026-09-01 · BUILT and CLOSED. F2 resolved (agent, delegated). Acceptance ledger at
+  `build/2026-09-01-build-DEPL-dGaugedVintage-8-acceptance-ledger.md`.
 
 ## 10. Reuse audit
 
-- The seam is `derive_attribution` in `tools/govkit/govkit.py`, the walk `adopt` already runs;
-  `python tools/codebase-map/reuse_lookup.py "derive attribution for a receipt row against gov
-  history"` ranks it alongside `classify_row` and the `derive_*` family in that same file, all
-  fan-in 1, so this unit extends an existing private seam rather than adding one.
+- The seam is the receipt stamp at `tools/govkit/govkit.py:6204` inside `_cmd_update`, and the
+  existing `evidence` field the skip at `:5529` already reads; the guard adds no walk and no new
+  data. `python tools/codebase-map/reuse_lookup.py "derive attribution for a receipt row against gov
+  history"` ranks `derive_attribution` and the `derive_*` family in that same file — which is how
+  rev-3 found that the pass rev-1 wanted was already there.
 - Recall terms used: `govkit receipt attribution unattributed forked role landable classify_row
   gov_oid vintage update adopt evidence`

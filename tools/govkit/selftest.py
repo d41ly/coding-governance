@@ -583,6 +583,36 @@ def main() -> int:
         check("a second update over the same target reports current",
               "current" in p.stdout and "stale" not in p.stdout, p.stdout)
 
+        # --- DEPL-dGaugedVintage-8 S3. THE STAMP MUST NOT OUTRUN ROWS THIS RUN NEVER GRADED.
+        # --- An `evidence: "unattributed"` row is skipped before `classify_row`, by
+        # --- DEPL-dCarriedReceipt-13's ratified design, and it is graded against the receipt's OWN
+        # --- `gov_commit` — so advancing the stamp moves the base it must be attributed from
+        # --- further away on every run, and the row gets harder to recover with no event to notice.
+        # --- OBSERVED RED before the guard landed: `update --write` stamped forward over such a row
+        # --- (3e11f259 -> b263d5b9 on a scratch fixture) and printed the ordinary re-stamp line.
+        ung = stale_target("ungraded")
+        rp_u = ung / ".governance" / "install.json"
+        rec = json.loads(rp_u.read_text(encoding="utf-8"))
+        for f in rec["files"]:
+            f["evidence"] = "unattributed"
+            f.pop("commit", None)
+            f.pop("gov_oid", None)
+        rp_u.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+        p = run("update", "--target", str(ung), "--write")
+        rec = json.loads(rp_u.read_text(encoding="utf-8"))
+        check("[dGV-8] update --write does NOT re-stamp while a row is unattributed",
+              rec["gov_commit"] == OLD, rec["gov_commit"])
+        check("[dGV-8] the withheld stamp says why, and names the remedy that clears the rows",
+              "NOT re-stamped" in p.stdout and "--re-adopt" in p.stdout, p.stdout)
+        check("[dGV-8] and it names the override rather than leaving the operator stuck",
+              "--allow-ungraded" in p.stdout, p.stdout)
+        p = run("update", "--target", str(ung), "--write", "--allow-ungraded")
+        rec = json.loads(rp_u.read_text(encoding="utf-8"))
+        check("[dGV-8] --allow-ungraded advances the stamp",
+              rec["gov_commit"] != OLD, rec["gov_commit"])
+        check("[dGV-8] and the override states what it overrode, so the choice is on the record",
+              "ungraded row(s), --allow-ungraded" in p.stdout, p.stdout)
+
         # AC3 — THE NO-CLOBBER GUARANTEE. Nothing else observes it.
         up2 = stale_target("u2b")
         (up2 / "tools" / "check-wiring.sh").write_bytes(b"#!/usr/bin/env bash\n# OPERATOR EDIT\n")
