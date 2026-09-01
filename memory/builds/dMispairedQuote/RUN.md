@@ -34,3 +34,5 @@ base: d9efe373a3b86a91f82ab9062a9dff4306e3293c
 2026-09-01T10:06:43Z rescope · item add TOOL-dMispairedQuote-3 · reason Spec-audit round 2 exited NON-CONVERGENT at 4 blockers. Three of them — 1, 8 and 17 — are one property: correcting what counts as a string literal un-hides every OTHER character the old mispairing was blanking, and rules 2 and 3 walk brackets and balance parens ACROSS lines. Three DENY-to-ADMIT moves were reproduced against unit 1's mechanism alone. Closing it needs a mechanism unit 1 does not have, so M4 promotes it to a unit.
 
 2026-09-01T10:52:54Z review · item TOOL-dMispairedQuote-3 · reason verdict BLOCKED · blockers 5
+
+2026-09-01T11:30:42Z review · item TOOL-dMispairedQuote-3 · reason verdict BLOCKED · blockers 2
