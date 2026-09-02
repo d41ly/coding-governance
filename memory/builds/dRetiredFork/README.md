@@ -149,7 +149,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22 TOOL-dRetired
 | [TOOL-dRetiredFork-2 — the git-environment leak, one defect at two legs](spec/2026-09-02-spec-TOOL-dRetiredFork-2.md) | 1 | 1 | CLOSED | rev-3 | 2026-09-03 |
 | [TOOL-dRetiredFork-3 — a present-but-unparseable build README header stops reading as absent](spec/2026-09-02-spec-TOOL-dRetiredFork-3.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-03 |
 | [TOOL-dRetiredFork-4 — reconcile inCMS's agent-cap fail-open claim against HEAD](spec/2026-09-02-spec-TOOL-dRetiredFork-4.md) | 1 | 1 | CLOSED | rev-4 | 2026-09-03 |
-| [TOOL-dRetiredFork-5 — two codebase-map selftest arms stop being stamped ok](spec/2026-09-02-spec-TOOL-dRetiredFork-5.md) | 1 | 1 | OPEN | rev-4 | 2026-09-02 |
+| [TOOL-dRetiredFork-5 — two codebase-map selftest arms stop being stamped ok](spec/2026-09-02-spec-TOOL-dRetiredFork-5.md) | 1 | 1 | CLOSED | rev-5 | 2026-09-03 |
 | [TOOL-dRetiredFork-6 — the drift-audit note is DERIVED from its counters](spec/2026-09-02-spec-TOOL-dRetiredFork-6.md) | 1 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm](spec/2026-09-02-spec-TOOL-dRetiredFork-7.md) | 1 | 2 | OPEN | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-8 — check-wiring resolves the settings file instead of spelling one path](spec/2026-09-02-spec-TOOL-dRetiredFork-8.md) | 1 | 2 | OPEN | rev-3 | 2026-09-02 |
@@ -172,7 +172,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22 TOOL-dRetired
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 4 record folder(s).
+Records: 16 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
