@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7
 
 <!-- gen:spec-records -->
 
@@ -121,6 +121,9 @@ must remember is not a mechanism.
   --write` lands every stale row, re-renders every rendered row, runs every declared generator,
   re-stamps `gov_commit`, and the tree afterwards needs no hand merge — recorded in the acceptance
   ledger. Repeated for `C:/projects/incms/main` once its receipt is repaired.
+- **AC11** — `WIRE-INTO-PROJECT.md`'s maintenance section is strictly SHORTER than at `b0108f13`,
+  and every obligation it drops is carried by a `[[regenerate]]` block in a kit descriptor. §5
+  calls that shrinkage an acceptance criterion rather than a side effect, and rev-1 wrote none.
 - **AC8** — `python tools/govkit/selftest.py` and `selfcheck` exit `0`.
 
 ## 7. Gates
@@ -150,6 +153,8 @@ must remember is not a mechanism.
   AC9 and a sixth arm now observe it. B1: every `--write` criterion in the whole 25-spec set targeted
   a fixture and every adopter-facing one was read-only, so the union could not imply the README's
   done-condition. AC10 is that observation, and this unit owns it.
+- rev-3 · 2026-09-02 · folded spec-audit round 1, finding M3. §5 declared the runbook's shrinkage an acceptance criterion
+  and §6 carried none; AC11 is it.
 
 ## 10. Reuse audit
 

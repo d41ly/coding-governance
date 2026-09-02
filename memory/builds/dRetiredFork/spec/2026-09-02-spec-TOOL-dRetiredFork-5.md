@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-5 — four codebase-map selftest arms stop being stamped ok
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -20,10 +20,15 @@ class `AGENTS.md` §7 names — a skip that looks like a pass — inside the kit
 
 ## 2. Scope (IN)
 
-- **S1** — Each of the four guarded arms records a `skipped` outcome instead of `ok`, naming the arm
-  and the unmet guard.
-- **S2** — The suite's summary line reports executed and skipped separately, and a run whose skip
-  count equals its arm count REFUSES rather than passing.
+- **S1** — Each guarded arm records a `skipped` outcome instead of `ok`, naming the arm and the
+  unmet guard. There are TWO guarded arms, not four: `test_identifier_tokens_corpus_recall`
+  (`tools/codebase-map/selftest.py:1165`) and `test_js_probe_against_the_lexicon` (`:1226`). rev-1's
+  "four" counted guard EXITS — `:1186`, `:1194`, `:1218` and `:1246` — and the suite's other 24
+  `test_*` functions are unconditional.
+- **S2** — The suite's summary line reports executed and skipped separately. The refusal predicate
+  is that every GUARDED arm skipped is a refusal, not that every arm skipped is — 24 of 26 arms are
+  unconditional, so "all skipped" is unreachable and a predicate keyed on it would be dead code the
+  moment it landed, which is the could-not-fail shape this unit exists to close.
 - **S3** — Absorb the `encoding="utf-8"` fix on the corpus-recall `subprocess.run` that inCMS
   carries as its `KIT_CODEBASE_MAP_SELFTEST_DELTA`, if gov HEAD still lacks it. Verify before
   editing: the sibling fix in `drift_report.py` landed at `TOOL-aGradedDoorway-3`, and this row may
@@ -41,7 +46,8 @@ class `AGENTS.md` §7 names — a skip that looks like a pass — inside the kit
 
 - **AC1** — When a guard is unmet, `python tools/codebase-map/selftest.py` prints that arm as
   `skipped` with the guard named, and no `ok` line for it.
-- **AC2** — When every arm is skipped, the same command exits non-zero naming the vacuity. Observed via `python tools/codebase-map/selftest.py`.
+- **AC2** — When BOTH guarded arms are skipped, `python tools/codebase-map/selftest.py` exits
+  non-zero naming the vacuity, and the RED is observed by unsetting both guards' preconditions. Observed via `python tools/codebase-map/selftest.py`.
 - **AC3** — When every guard is met, the command exits `0` and its executed count is unchanged from
   the pre-change run.
 - **AC4** — After the bump, `python tools/codebase-map/gen_map.py --check` and
@@ -55,3 +61,6 @@ class `AGENTS.md` §7 names — a skip that looks like a pass — inside the kit
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
   against gov at b0108f13.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, finding H10. rev-1's "four guarded arms" counted guard exits; the suite
+  has two guarded arms and 24 unconditional ones, so its "every arm skipped" refusal was unreachable
+  and AC2 unobservable. S1, S2 and AC2 are restated against the arm count.

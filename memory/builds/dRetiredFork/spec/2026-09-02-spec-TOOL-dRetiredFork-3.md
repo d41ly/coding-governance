@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-3 — a present-but-unparseable build README header stops reading as absent
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -32,7 +32,14 @@ around it. Those are different animals and the adopter has been paying for the d
   gov's corpus is vacuous in any other tree.
 - **S5** — Arms: a conforming header parses; a corrupt header raises and is reported; a corrupt
   header with a waiver row is tolerated and SAYS so; an empty waiver file is not an error.
-- **S6** — Bump `KIT_MEMORY_TREE_VERSION` and every paired marker.
+- **S6** — Add `F:stale-header-waiver.txt` to check 3's registry whitelist `case` in
+  `tools/memory-tree/check-memory-hygiene.sh`, IN THE SAME COMMIT. Check 3's population comes from
+  `git ls-files` and its whitelist is a hardcoded case naming nine registries, so a new tracked file
+  under `memory/project/` reds this unit's own named gate on landing. `readme-contract.txt` was
+  added with its own case line, which settles that this is a required scope item and not an
+  inference. `TOOL-dRetiredFork-15` S2's `PROJECT_REGISTRY_EXTRA` is the durable answer and lands
+  at order 5, three steps after this unit.
+- **S7** — Bump `KIT_MEMORY_TREE_VERSION` and every paired marker.
 
 ## 3. Non-goals (OUT)
 
@@ -90,8 +97,15 @@ of this parser want different answers.
 - **AC3** — When a waiver row names a path the tree does not track, the command exits non-zero
   naming the stale row. Observed via `python3 tools/memory-tree/gen_build_index.py --check`.
 - **AC4** — When the registry is absent, the command REFUSES rather than defaulting to empty. Observed via `python3 tools/memory-tree/gen_build_index.py --check`.
-- **AC5** — When no header is malformed, `--check` output is byte-identical to the pre-change run.
-- **AC6** — `bash tools/check-kit-versions.sh` exits `0` after the bump.
+- **AC5** — When no header is malformed, `--check` output differs from the pre-change run by
+  EXACTLY the unconditional `0 tolerated` line §5 requires and F2 resolves, and by nothing else.
+  rev-1 demanded byte-identity, which that line makes impossible.
+- **AC6** — When the kit is adopted into a fresh target, the waiver file arrives with its header
+  and no entries, and the memory-tree `kit.toml` `[[hole]]` discharge probe reports it UNARMED
+  rather than passing silently. This is S4, which rev-1 scoped and never observed.
+- **AC7** — `bash tools/memory-tree/check-memory-hygiene.sh` exits `0` with check 3 reporting no
+  unexpected entry for `memory/project/stale-header-waiver.txt`.
+- **AC8** — `bash tools/check-kit-versions.sh` exits `0` after the bump.
 
 ## 7. Gates
 
@@ -112,12 +126,18 @@ of this parser want different answers.
 
 - rev-1 · 2026-09-02 · initial draft, authored from the dRetiredFork classification of `nc carve-out
   9/20` against `tools/memory-tree/gen_build_index.py` at b0108f13.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, findings H7, M1, M2 and M8. H7: the new registry file reds check 3 on
+  landing, because that whitelist is a hardcoded case; S6 now edits it in the same commit and AC7
+  observes it. M1: AC5 demanded byte-identity while §5 requires an unconditional `0 tolerated` line,
+  and the two cannot both hold. M2: S4's adopter-facing half had no criterion; AC6 is it. M8: §10
+  cited a probe run for the install-prefix question, not this unit's.
 
 ## 10. Reuse audit
 
-`python tools/codebase-map/reuse_lookup.py "derive a kit file's install prefix at runtime instead of
-spelling it"` reports 605 symbols and 19 affordance seams; no seam covers a parse-failure
-distinction, so the closest existing pattern is the registry family under `memory/project/`, which
+`python tools/codebase-map/reuse_lookup.py "distinguish a present-but-unparseable record header from
+an absent one"` — rev-1 recorded the probe run for a DIFFERENT unit's question, the install-prefix
+one, which is a citation that cannot support this unit. No seam covers a parse-failure distinction,
+so the closest existing pattern is the registry family under `memory/project/`, which
 this unit extends rather than replaces — `legacy-files.txt` read into `LEGACY_SET` at
 `tools/memory-tree/check-memory-hygiene.sh` is the shape copied, including its shrink-only rule and
 its staleness arm.

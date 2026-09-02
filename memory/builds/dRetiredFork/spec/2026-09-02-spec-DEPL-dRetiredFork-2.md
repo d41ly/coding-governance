@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6
 
 <!-- gen:spec-records -->
 
@@ -45,6 +45,10 @@ CLI under a green bar.
   `vintage-match`, which is true of a file gov just wrote. The choice is a fork in §8.
 - **S5** — The report distinguishes a NEW source from a stale one, because an operator reading
   "33 stale" must not silently be reading "33 stale plus 5 new".
+- **S5b** — Fix the per-verb flag dispatch so `--kits` BINDS for `update`. It is parsed and then
+  discarded at `main`'s dispatch today, so a scoped run silently runs unscoped. This unit OWNS that
+  fix: `DEPL-dRetiredFork-7` S5 filed it at rev-1 and the two specs disagreed, which M2 forbids;
+  DEPL-7 rev-2 strikes its `--kits` clause and keeps `--add-kits`.
 - **S6** — Arms: a new engine source lands; a new rendered source is reported and not written; a
   new SEED source whose destination already exists is REPORTED and not written; a withdrawn
   source is unaffected; a run with no new sources produces byte-identical output.
@@ -106,6 +110,8 @@ flip. "Use apply" is how the safe verb stays unable to add.
 - **AC6** — When a new `seed` source's destination already exists in the target, `python
   tools/govkit/govkit.py update --target <fixture> --write` REPORTS it and the file's bytes are
   unchanged; with the guard removed the same run overwrites it.
+- **AC6b** — When `--kits <one-entry>` is passed to `update`, only that entry's sources are
+  classified; before the fix the same invocation classified the whole receipt.
 - **AC7** — `python tools/govkit/selftest.py` and `python tools/govkit/govkit.py selfcheck` exit `0`.
 
 ## 7. Gates
@@ -119,10 +125,10 @@ flip. "Use apply" is how the safe verb stays unable to add.
   arm. Recommendation: `vintage-match`, because the row IS at gov's vintage the instant it lands, and
   because widening a closed set joined to the engine by its own arm is a contract change this unit
   does not need.
-- **F2 — does the new-source pass respect `--kits`?** It should, but `--kits` is currently parsed and
-  DISCARDED for `update` at the dispatch in `main`. Recommendation: fix the dispatch here, since a
-  scoped new-source pass is the safest way to first exercise this on a real adopter.
-
+- **F2 — does the new-source pass respect `--kits`?** RESOLVED (agent, 2026-09-02, delegated): yes,
+  and this unit owns the dispatch fix, promoted to S5b with AC6b. The alternative left the defect
+  filed by `DEPL-dRetiredFork-7` at order 2 and fixed here at order 6, so that build would have
+  shipped a backlog row that was already false.
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft, from `TOOL-aFlaggedScaffold-3` with the line numbers re-read at
@@ -132,6 +138,9 @@ flip. "Use apply" is how the safe verb stays unable to add.
   source would have overwritten a file the target owns by design, through a write path carrying no
   copy-once guard. S3 now gates on `UPDATE_ROLE`'s `table` disposition, S3b carries the guard, S6
   gains the seed arm, AC6 observes it, and §5 names the risk rev-1 omitted.
+- rev-3 · 2026-09-02 · folded spec-audit round 1, finding H8. `DEPL-dRetiredFork-7` S5 FILED the `--kits` dispatch defect
+  while F2 here recommended FIXING it, and M2 requires a disagreement resolved in exactly one
+  document before the first code pass. This unit takes it; DEPL-7 strikes its clause.
 
 ## 10. Reuse audit
 

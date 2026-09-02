@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 8
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 8
 
 <!-- gen:spec-records -->
 
@@ -96,10 +96,15 @@ input that exists without anyone remembering to write one.
 ## 6. Acceptance criteria
 
 - **AC1** — When run against `C:/projects/nicocares/main`, `python tools/govkit/govkit.py contribute
-  --target <path>` independently proposes the six NicoCares fixes this build absorbed by hand, each
-  classed 1 or 2.
-- **AC2** — When run against `C:/projects/incms/main`, it proposes the three inCMS fixes this build
-  absorbed, and classes the seventeen repath rows as class 4 rather than as contributions.
+  --target <path>` independently proposes the FOUR NicoCares absorptions — `TOOL-dRetiredFork-1`
+  (`nc carve-out 5/20`), `-2` (`nc 16/20` and `17/20`), `-3` (`nc 9/20`) and the `nc 20/20` half of
+  `-9` — each classed 1 or 2. rev-1 said six, which was the inCMS count.
+- **AC2** — When run against `C:/projects/incms/main`, it proposes the SIX inCMS-sourced units —
+  `TOOL-dRetiredFork-4`, `-5`, `-6`, `-7`, `-8` and the C21 half of `-9` — and classes that
+  adopter's repath rows as class 4 rather than as contributions. rev-1 said three, and named
+  "seventeen" against the README's "fourteen": those count different populations — seventeen is
+  inCMS's repath ROWS, fourteen is path forks across BOTH adopters — so this criterion names
+  neither figure and the report derives them.
 - **AC3** — When a row encodes a project fact, the verb proposes class 3 and emits no patch. Observed via `python tools/govkit/govkit.py contribute --target <path>`.
 - **AC4** — When the census maps zero rows, the verb REFUSES. Observed via `python tools/govkit/govkit.py contribute --target <path>`.
 - **AC5** — The verb writes nothing to gov and nothing to the target, verified by comparing both
@@ -128,6 +133,10 @@ input that exists without anyone remembering to write one.
 
 - rev-1 · 2026-09-02 · initial draft. The twelve-of-44 figure and the nine hand-found absorptions
   come from this build's classification pass and are the falsification set in AC1 and AC2.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, findings H2 and M4. H2: the per-adopter falsification counts were
+  swapped — four NicoCares and six inCMS, not six and three — so a CORRECT verb would have redded
+  AC1; both criteria now name unit ids rather than counts. M4: two derived figures counting
+  different populations were compared as if they were one.
 
 ## 10. Reuse audit
 

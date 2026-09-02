@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6
 
 <!-- gen:spec-records -->
 
@@ -37,6 +37,12 @@ under it cannot prove the rung that would have reconciled them.
 - **S5** — Arms in `tools/govkit/selftest.py` for a fanned directory whose rows resolve, a genuinely
   ambiguous row that still drops, and an empty needle map that refuses.
 
+- **S6** — Record each adopter's `evidence: "unattributed"` row count BEFORE and AFTER. Nothing in
+  the 25-unit set drives that population down, and `_cmd_update` withholds the `gov_commit`
+  re-stamp while any such row exists (`tools/govkit/govkit.py:6566-6573`), naming
+  `adopt --re-adopt --write` and `--allow-ungraded` as the only escapes. Measured today: 32 rows at
+  NicoCares, 30 at inCMS. The build's done-condition requires that stamp, so this unit either moves
+  the count or states that it cannot.
 ## 3. Non-goals (OUT)
 
 - **The residual-byte problem.** Whole-file equality decides a rung — one residual byte and it does
@@ -100,7 +106,11 @@ because a kit ships a rendered SKILL.md beside its engine files.
 - **AC4** — A read-only `update` against `C:/projects/nicocares/main` reports a `relocate` count
   strictly greater than zero, and that number is recorded in the acceptance ledger.
 - **AC5** — `python tools/govkit/selftest.py` passes with its arm count increased by S5's three.
-- **AC6** — `python tools/govkit/govkit.py selfcheck` exits `0`.
+- **AC6** — The `unattributed` row count at each adopter after this unit is STRICTLY BELOW its
+  recorded before-count, or the acceptance ledger states that it cannot fall and why — naming the
+  residual-byte cause from §3 — so the `gov_commit` gap is recorded rather than discovered at the
+  build's acceptance.
+- **AC7** — `python tools/govkit/govkit.py selfcheck` exits `0`.
 
 ## 7. Gates
 
@@ -120,6 +130,10 @@ because a kit ships a rendered SKILL.md beside its engine files.
 
 - rev-1 · 2026-09-02 · initial draft. `derive_carry_rung` and the DROP message were read at
   `b0108f13` and quoted rather than recalled.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, finding H3. The README's done-condition requires a `gov_commit`
+  re-stamp, `update` withholds it while any row is unattributed, and no unit drove that population
+  down — S3 here and DEPL-2 S5 only reported it. S6 measures it; AC6 requires the count to fall or
+  the impossibility to be recorded.
 
 ## 10. Reuse audit
 

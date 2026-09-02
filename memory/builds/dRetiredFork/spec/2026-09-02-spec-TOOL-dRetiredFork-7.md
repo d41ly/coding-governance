@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -80,7 +80,9 @@ equally exposed to.
 - **AC3** — When ARM 2's population is empty, the script REFUSES rather than passing. Observed via `bash tools/workflows/check-review-join.sh`.
 - **AC4** — When run over gov's own tree, the script's hits and near-misses were printed and
   reviewed before the arm was wired, and the record names what it caught. Printed by `bash tools/workflows/check-review-join.sh` before wiring.
-- **AC5** — `bash tools/check-kit-versions.sh` exits `0` after the bump.
+- **AC5** — After the bump, `bash tools/check-kit-versions.sh` exits `0` AND, with the review-harness
+  marker reverted to its pre-bump value, exits non-zero naming that carrier. A bare post-bump green
+  cannot fail: the gate is already green before the unit starts.
 
 ## 7. Gates
 
@@ -99,6 +101,8 @@ equally exposed to.
 
 - rev-1 · 2026-09-02 · initial draft, from the inCMS `check-review-join.sh` row classified
   `genuine-fork` and its dishonest registry declaration.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, finding M5. AC5 asserted a gate that is green before the unit begins, so
+  it could not fail; it now pairs the green with an observed RED against a reverted marker.
 
 ## 10. Reuse audit
 

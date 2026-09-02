@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-4 — reconcile inCMS's agent-cap fail-open claim against HEAD
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -37,6 +37,13 @@ it. This unit disposes of it, and absorbs nothing until it has.
   — and this unit is superseded by a new spec describing THAT defect. **(b)** It does not reproduce
   at HEAD, the row is stale, and `DEPL-dRetiredFork-7` strikes it from inCMS's register. **(c)** It
   reproduces only under an adopter-local modification, so it is inCMS's and not gov's.
+- **S3b** — Reconcile against gov's OWN open row, which rev-1 and rev-2 both missed:
+  `TOOL-aNumeralWarden-2` (`memory/backlog/TOOL.md:79`) records that agent-cap's enclosing-opener
+  walk is defeated by two nested wrappers or by 59 lines of distance between the `.map` and the
+  `agent(` call, that it needs a STATEMENT-LEVEL walk rather than an opener count, and that the
+  58/59 boundary is unfixtured. That row decided the remedy AGAINST the depth-stack shape rev-1
+  proposed — a depth stack is an opener count one level smarter, over the same 60-line window the
+  live code walks. Any disposition (a) successor must be that row, not a new id.
 - **S4** — Whatever the disposition, record the reconciliation between inCMS's row and
   `agent-cap.js:949` in `memory/DECISIONS.md`. The next session reading that registry row will
   otherwise repeat rev-1's error.
@@ -63,7 +70,7 @@ it. This unit disposes of it, and absorbs nothing until it has.
 
 ## 7. Gates
 
-`agent-cap self-test` · `agent-cap restatement` · `memory hygiene` · `workflow script syntax` ·
+`agent-cap self-test` · `memory hygiene` · `workflow script syntax` ·
 `verifier fan-out`.
 
 ## 9. Revision log
@@ -76,3 +83,8 @@ it. This unit disposes of it, and absorbs nothing until it has.
   are replaced rather than edited. B4 found every rev-1 acceptance criterion anchored on
   `.claude/hooks/agent-cap.test.sh`, which is not tracked; the suite is `tools/hooks/agent-cap.test.sh`,
   and rev-2 names no untracked path. The README's "nine fixes" count drops to eight.
+- rev-3 · 2026-09-02 · folded spec-audit round 1, findings H15 and M6. H15: gov holds an OPEN row for this exact defect,
+  `TOOL-aNumeralWarden-2`, which decided the remedy AGAINST the shape rev-1 absorbed; S3b binds the
+  disposition to it. rev-2's §10 probe missed the one gov record that binds the change. M6: §7 named
+  `agent-cap restatement`, which grades the charter's five machine-compared values and is unrelated
+  to this unit; removed.

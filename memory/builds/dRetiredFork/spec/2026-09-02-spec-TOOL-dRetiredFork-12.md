@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -21,8 +21,13 @@ blocked `TOOL-aGradedDoorway-2` from finishing `check-playbook.test.sh`. inCMS c
 
 ## 2. Scope (IN)
 
-- **S1** — Retag the fixture to `role = "rendered"` with `placeholders = ["KIT_DIR", "TOOL_ROOT"]`
-  in `tools/unattended/kit.toml`, and replace its five literal spellings with the tokens.
+- **S1** — Retag the fixture to `role = "rendered"` with `placeholders = ["KIT_DIR"]` in
+  `tools/unattended/kit.toml`, and replace its five literal spellings with that ONE token.
+  `TOOL_ROOT`, which rev-1 declared, cannot be rendered here: `tools/unattended/adopt-unattended.sh`
+  substitutes only `{{KIT_DIR}}` (`:222`) and never computes `TOOL_ROOT`, which exists solely in
+  `tools/memory-tree/adopt-memory-tree.sh` (`:36-37`, `:85`). All five literals are
+  `tools/unattended/…`, entirely under the kit dir, so `{{KIT_DIR}}` covers them and an unresolved
+  `{{TOOL_ROOT}}` brace would otherwise ship to every adopter.
 - **S2** — Route it through the kit's own render step, so the rendered artifact is produced by the
   adopter the descriptor already declares rather than by a new mechanism.
 - **S3** — A parity arm asserting the rendered fixture at the default prefix is byte-identical to
@@ -86,8 +91,11 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
 - **AC3** — When a token is unresolved, the render REFUSES and emits no file. The token set is declared in `tools/unattended/kit.toml`.
 - **AC4** — `bash tools/check-install-prefix.sh` reports the fixture's carried count at `0`.
 - **AC5** — `bash tools/check-kit-versions.sh` exits `0` after the unattended bump.
-- **AC6** — Against a receipt-carrying fixture, a `govkit update` run reports the role change rather
-  than silently reverting the file.
+- **AC6** — The parity arm in S3 holds, and this build records that no adopter re-pull happens
+  before `DEPL-dRetiredFork-3` lands. rev-1 required a `govkit update` run to REPORT the role
+  change; that handling is `DEPL-dRetiredFork-3` S3 at order 7 and this unit is order 2, so the
+  criterion forward-depended on a unit five steps later and was unmeetable when built. The
+  observation moves to `DEPL-dRetiredFork-3` AC4.
 
 ## 7. Gates
 
@@ -105,6 +113,11 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
 
 - rev-1 · 2026-09-02 · initial draft, from `TOOL-dScrubbedConduit-2` and the inCMS
   `KIT_PLAYBOOK_FIXTURE_DELTA` row.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, findings H5 and H12. H5: AC6 forward-depended on `DEPL-dRetiredFork-3`
+  at order 7 from an order-2 unit, which M2's ordering axis forbids; the observation moves there and
+  the dependency is now stated in §2 rather than only in §8. H12: the `TOOL_ROOT` token rev-1
+  declared cannot be rendered by the unattended adopter, which substitutes only `{{KIT_DIR}}` — and
+  §10 had checked the memory-tree DESCRIPTOR rather than the adopter that must execute the render.
 
 ## 10. Reuse audit
 

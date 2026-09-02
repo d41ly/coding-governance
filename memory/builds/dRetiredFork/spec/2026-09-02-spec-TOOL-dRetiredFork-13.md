@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -39,6 +39,10 @@ recorded occurrences.
   its own source says so — and 259 of its 656 occurrences are already test/selftest rows. Only arm 1
   excludes them, and arm 1 is the root-spelling ban, not the ratchet.
 - Files outside the shipped surface. `tools/lib/` is gov-internal and never travels.
+- Non-test shipped CHECKERS. `tools/check-wiring.sh` is the measured case and it is NOT this unit's:
+  `TOOL-dRetiredFork-8` S6 takes its own literals in its own landing. rev-1 was named as that
+  sweep's owner by `TOOL-dRetiredFork-8` §3 while this population excluded it, so the work had no
+  owner at all; the pointer is corrected on both sides.
 
 ## 6. Acceptance criteria
 
@@ -62,3 +66,6 @@ run on demand under `GATE_SELFTESTS=1` rather than added to the bar.
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
   against gov at b0108f13.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, finding H4. rev-1's population excluded the non-test checkers that
+  `TOOL-dRetiredFork-8` §3 deferred to it, so 39 literal sites had no owning unit. §3 now names the
+  owner explicitly and the pointer is corrected on both sides.

@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 9
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -29,8 +29,14 @@ authoring rule that the ban enforces.
   Measured 2026-09-02: `coding-governance-agents.template.md` is 48867 of 49152 bytes with 285 free
   and already WARN past its recorded high-water, so there is no room and adding one would price the
   rule against the ceiling rather than against its value.
-- **S3** — Convert arm 1 of `tools/check-install-prefix.sh` from a ratchet into a ban over the
-  drained population, with exceptions in a tracked, shrink-only list carrying a reason per row.
+- **S3** — Convert the CARRIED-PREFIX arm of `tools/check-install-prefix.sh` — the shrink-only
+  ratchet keyed on `tools/install-prefix-carried.txt` and written by `--write-ratchet` — into a ban
+  over the drained population, with exceptions in a tracked, shrink-only list carrying a reason per
+  row. **Not arm 1**, which rev-1 named: arm 1 is ALREADY a ban, declared in the script's own
+  header at `:4-6` as "assert; exit 1 on an unwaived hit" against `tools/install-prefix-waivers.txt`,
+  so converting it is a no-op that would leave the 656 recorded occurrences untouched.
+  `TOOL-dRetiredFork-13` §3 already spells this correctly; the two specs disagreed and this was the
+  side that was wrong. Arm 1's existing waiver registry is kept as-is.
 - **S4** — Fix the two OPEN defects the ban would otherwise inherit. `TOOL-aScouredKit-20`: both
   arms bind a kit-DIRECTORY segment and an extension from a fixed set, so a literal naming a LOOSE
   file directly under `tools/` is invisible — which is why five wave-2 hardcoded-prefix findings were
@@ -132,6 +138,9 @@ becoming impossible. That distinction is the whole unit.
 - rev-1 · 2026-09-02 · initial draft. The 285-byte template headroom was measured by running
   `bash tools/check-template-size.sh`, and the two inherited defects were found by a recall query
   rather than assumed absent.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, finding H6. rev-1's central mechanism named arm 1, which is already a
+  ban, so the conversion was a no-op over the arm carrying none of the occurrences units 10-13
+  drain — and it contradicted `TOOL-dRetiredFork-13` §3, which spelled it correctly.
 
 ## 10. Reuse audit
 

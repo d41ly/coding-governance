@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-8 — check-wiring resolves the settings file instead of spelling one path
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -32,12 +32,16 @@ gov's hardcoded path is the defect; the resolver plus the scope arm is the fix.
 - **S4** — Arms in `tools/check-wiring.test.sh`: a resolvable in-tree file, a resolvable out-of-tree
   file that reports, and an unresolvable one that REFUSES. The third observed RED first.
 - **S5** — Bump `KIT_CHECK_WIRING_VERSION` and its `gov:kit check-wiring@` marker.
+- **S6** — Take this file's own install-prefix literals through the `KIT_REL` idiom in the same
+  landing. Its ratchet row is `tools/install-prefix-carried.txt:17` at 6 occurrences, distinct from
+  `tools/check-wiring.test.sh` at `:18` with 16.
 
 ## 3. Non-goals (OUT)
 
-- inCMS's remaining `check-wiring` divergence. Its row is `+67/-25` residual lines of which roughly
-  90 travel with S1 and S2; what remains is 39 literal prefix sites, and those retire under
-  `TOOL-dRetiredFork-13`, not here.
+- Nothing. rev-1 deferred inCMS's residual 39 literal prefix sites to `TOOL-dRetiredFork-13`, whose
+  declared population is "the 32 remaining shipped test and selftest files" and which therefore
+  excludes this checker — so the sweep had no owner. S6 takes it here instead. rev-1's arithmetic
+  was also unreconciled: "+67/-25 of which roughly 90 travel" leaves about two lines, not 39 sites.
 - `.claude/settings.json` as a written default. The resolver may PREFER it; it may not spell it as
   the only answer, which is the defect.
 
@@ -85,7 +89,13 @@ an adopter 164 commits behind cannot read a key their installed kit predates.
 - **AC3** — When no settings file resolves, the command exits non-zero naming the failed resolution. Observed via `bash tools/check-wiring.sh`.
 - **AC4** — `bash tools/check-wiring.sh --session` still auto-sets an unset `core.hooksPath` and
   never clobbers a set one.
-- **AC5** — `bash tools/check-kit-versions.sh` exits `0` after the bump.
+- **AC5** — Every arm in `tools/check-wiring.sh` resolves its settings path through `settings_json()`,
+  asserted by a grep for the literal `.claude/settings.json` in that file returning only the
+  resolver's own preference rung. Byte-identity cannot catch a residual literal here, because §4
+  states gov's own settings file sits where the literal already pointed.
+- **AC6** — `bash tools/check-install-prefix.sh` reports `tools/check-wiring.sh`'s carried count
+  BELOW its recorded 6, and the ratchet is re-baselined in the same commit.
+- **AC7** — `bash tools/check-kit-versions.sh` exits `0` after the bump.
 
 ## 7. Gates
 
@@ -101,6 +111,11 @@ an adopter 164 commits behind cannot read a key their installed kit predates.
 
 - rev-1 · 2026-09-02 · initial draft, from the inCMS `KIT_CHECK_WIRING_DELTA` row and the
   `ARCH-dBriskLanyard-1 S10` worktree false-green it records.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, findings H4 and H14. H4: rev-1's §3 deferred 39 literal sites to a unit
+  whose population excludes non-test files, leaving them undrained before `TOOL-dRetiredFork-17`'s
+  ban at order 9; S6 takes the sweep here and AC6 observes the ratchet row falling. H14: S3's
+  requirement that every caller read through `settings_json()` had no criterion, and AC1's
+  byte-identity is structurally incapable of catching a caller left on the literal; AC5 is it.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams deployer · order 6
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams deployer · order 6
 
 <!-- gen:spec-records -->
 
@@ -46,6 +46,10 @@ receipt update — a half-applied install from a verb that reported nothing. Thi
   `WinError 206`.
 - **AC2** — When the run cannot complete for any other reason, it REFUSES before the write loop
   rather than raising after it. Observed via `python tools/govkit/govkit.py apply --target <fixture>`.
+- **AC2b** — A grep over `tools/govkit/govkit.py` for every site building a pathspec from a derived
+  population returns ZERO still passing it as argv, and each converted site is named in the
+  acceptance ledger. S2 requires the CLASS and rev-1 observed only the one reported call site — the
+  charter's named failure, committed by a scope item that states the rule against itself.
 - **AC3** — `python tools/govkit/selftest.py` passes with S3's arm added.
 - **AC4** — `python tools/govkit/govkit.py selfcheck` exits `0`.
 
@@ -57,3 +61,6 @@ receipt update — a half-applied install from a verb that reported nothing. Thi
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
   against gov at b0108f13.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, finding H13. S2 required the fix at every pathspec-building site and §6
+  observed only the reported one, so the unit could pass with the class still open; AC2b is the
+  class-wide observation.

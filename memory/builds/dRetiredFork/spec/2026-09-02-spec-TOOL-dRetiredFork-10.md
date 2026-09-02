@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-10 — three workflows gates anchor their locator and population on a basename
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -23,10 +23,11 @@ location.
 - **S1** — Each script derives its own directory (`HERE`) and resolves the agent-cap hook by probing
   `$HERE/hooks/agent-cap.js`, then `$HERE/../hooks/agent-cap.js`, then `$ROOT/.claude/hooks/agent-cap.js`,
   and REFUSES when none resolves.
-- **S2** — Each script's population is anchored on a BASENAME plus the marker it already applies,
-  never on a rooted path prefix. `check-workflow-syntax.js` already applies `MARKER` at line 67 and
-  its prefix filter is genuinely redundant; the other two do NOT, so their filter is replaced by
-  basename anchoring rather than deleted.
+- **S2** — Each script's population is anchored on a BASENAME, never on a rooted path prefix. The
+  three split two ways and the split is load-bearing: `check-workflow-syntax.js` DOES apply
+  `MARKER` at `:67`, so for that one file the prefix filter is genuinely redundant and deleting it
+  is correct; `check-review-join.sh:56` and `check-verifier-fanout.sh:45` apply NO marker filter, so
+  theirs is replaced by basename anchoring and must not be deleted.
 - **S3** — Each script's `SELF_EXCLUDE` is anchored the same way, because an exclusion spelled with
   a prefix is the same class as the population it scopes and parametrising one without the other
   converts a fork into a red bar.
@@ -95,7 +96,9 @@ including one nobody has enumerated, such as swydee's repo-root install.
 - **AC4** — When no hook resolves, each script REFUSES naming the probes it tried. Observed via `bash tools/workflows/check-verifier-fanout.sh`.
 - **AC5** — The pre-wiring predicate run over gov's tree is recorded with its hits and near-misses,
   and `bash tools/workflows/check-review-join.sh` still reports a 7-file population.
-- **AC6** — `bash tools/check-kit-versions.sh` exits `0` after the bumps.
+- **AC6** — After the bumps, `bash tools/check-kit-versions.sh` exits `0` AND, with one bumped
+  marker reverted, exits non-zero naming that carrier. The bare green cannot fail: the gate is
+  already green before the unit starts.
 
 ## 7. Gates
 
@@ -114,6 +117,10 @@ including one nobody has enumerated, such as swydee's repo-root install.
 
 - rev-1 · 2026-09-02 · initial draft. Records the refuted filter-deletion approach in §3 so a later
   session does not re-propose it.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, findings M5 and M7. M7: rev-1's §3 correctly refused blanket filter
+  deletion but S2 then applied one rule to all three scripts, when `check-workflow-syntax.js` alone
+  carries a marker and is the one case where deletion IS right; the split is now stated. M5: AC6
+  asserted a gate green before the unit begins.
 
 ## 10. Reuse audit
 

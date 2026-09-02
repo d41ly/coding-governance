@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 2
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
@@ -41,7 +41,9 @@ cannot reach zero is not a programme.
 - **S5** — File the defects this census exposes that are not this build's to fix, each with its
   measurement: the `--add-kits` flag `update` names at `govkit.py:5870` and the parser does not
   have, whose absence a selftest arm at `selftest.py:746` cannot detect because it grades the
-  STRING; and the per-verb flag dispatch that parses `--kits` for `update` and discards it.
+  STRING. The `--kits` dispatch defect rev-1 also filed here is NOT filed: `DEPL-dRetiredFork-2`
+  S5b fixes it, and filing a row at order 2 that another unit closes at order 6 ships a backlog row
+  that is already false.
 - **S6** — Reclassify inCMS's `gen_build_index.py` row from `diverged` to a contract-adopted class.
   gov's file is 2519 lines with 59 top-level defs, inCMS's is 518 with 14, and they share three
   symbol names. There is no upstream file to converge on, and its 2764-line diff inflates every
@@ -138,6 +140,8 @@ direction, which is the direction that makes the build look smaller than it is.
 - rev-1 · 2026-09-02 · initial draft. The 23,384-blob index, the eleven inCMS files, the two
   NicoCares files and the swydee 32-of-35 split are measurements from this build's classification
   pass, not estimates.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, finding H8. rev-1 filed the `--kits` dispatch defect that
+  `DEPL-dRetiredFork-2` F2 recommended fixing; M2 requires one owner, and DEPL-2 takes it.
 
 ## 10. Reuse audit
 

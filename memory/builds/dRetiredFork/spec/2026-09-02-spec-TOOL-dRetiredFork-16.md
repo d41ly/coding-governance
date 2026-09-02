@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -20,10 +20,13 @@ no amount of conf keys reaches it, because the project is adding BEHAVIOUR and n
 
 ## 2. Scope (IN)
 
-- **S1** — Document the extension point that already exists and was never stated: `govkit.py:4627`
-  computes `owned` from the receipt's `gate_runner.emitted`, and `:4676` REFUSES to overwrite a leg
-  the target wrote, because "overwriting a leg the target wrote silently deletes their own coverage".
-  A project-authored leg in the target's own gate manifest is therefore already safe from `apply`.
+- **S1** — Document the extension point that already exists, and its LIMITS, both measured. The
+  guard is at `tools/govkit/govkit.py:4680` with its raise at `:4681-4683` — rev-1 cited `:4676`,
+  four lines short — and it fires ONLY on a name collision. Two behaviours follow and neither is
+  "declines and reports": a colliding name raises `Refusal`, whose nearest handler is `main`'s at
+  `:7382`, reached AFTER the write and stage loop at `:4300-4341`, so the verb aborts at exit 2
+  with a partially applied install; a NON-colliding project leg is carried in `existing` and
+  rewritten at `:4734-4736` with no report at all.
 - **S2** — A worked pattern in `tools/memory-tree/README.md` and `WIRE-INTO-PROJECT.md`: a project
   check is its own script under the project's own tree, sourcing `.memory-tree.conf` for
   `MEMORY_ROOT` exactly as the kit does, and registered as a leg the project owns.
@@ -78,15 +81,20 @@ a different name.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a fixture target's gate manifest carries a project-authored leg and `govkit apply`
-  runs, the leg is still present afterwards and the run REPORTS that it declined to overwrite it.
+- **AC1** — When a fixture target's gate manifest carries a project-authored leg whose name does
+  NOT collide with a gov leg and `govkit apply` runs, the leg is still present afterwards. The run
+  reports nothing about it, which is the measured behaviour and not the one rev-1 asserted.
+- **AC1b** — When the project-authored leg's name DOES collide, the run raises and exits `2` with
+  the install partially applied. Recorded as the extension point's limit; whether it should be a
+  pre-write refusal is filed rather than fixed here.
 - **AC2** — When the same leg's script is absent, the target's gate runner REFUSES naming it, rather
   than skipping silently. Observed via the target's own `bash tools/run-gates/run-gates.sh`.
 - **AC3** — `bash scripts/check-build-readme-comments.sh` exists as the worked example, sources
   `.memory-tree.conf`, and reds on the fixture that motivated NicoCares' check 90.
 - **AC4** — `WIRE-INTO-PROJECT.md` names the extension point, the ownership rule and the refusal in
-  S5, and `bash tools/govkit/check_runbook_parity.py` still passes.
-
+  S5, and `python tools/govkit/check_runbook_parity.py` still exits `0`. It is a python program and
+  rev-1 invoked it with `bash`; it is also invoked by NO leg in `tools/gate-legs.json`, so this
+  direct invocation is the only thing exercising the runbook claim anywhere in the build.
 ## 7. Gates
 
 `govkit selfcheck` · `memory hygiene`.
@@ -105,6 +113,10 @@ a different name.
 
 - rev-1 · 2026-09-02 · initial draft, from `nc carve-out 6/20` and the `owned`/`emitted` refusal at
   `tools/govkit/govkit.py:4627` and `:4676`.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, findings H11 and L1. H11: rev-1's AC1 required a "declines and reports"
+  behaviour the code has in neither branch — a colliding name aborts at exit 2 after a partial
+  write, a non-colliding one is preserved silently — and it pre-answered F1, which S3 declares a
+  fact-question. L1: the citation was four lines short and a python program was invoked with `bash`.
 
 ## 10. Reuse audit
 
