@@ -1030,6 +1030,26 @@ done
 n=$((n+1))
 grep -qF 'the selector is mis-segmented' <<<"$outh" || { echo "FAIL the empty-population report does not name the cause"; st=1; }
 #
+# (a2) CHECK 6's OWN mis-segmentation — TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out
+#      5/20`. Index-class files EXIST (a guide, at a pre-flatten path) while every flat selector
+#      `index_set` reads matches nothing, so check 6 walked an empty set, printed nothing and was
+#      indistinguishable from a clean tree. Eight sibling checks already carried this guard; 6 did
+#      not. The PRECONDITION is what separates this from the scaffolder case in (b): there, no
+#      index-class file exists anywhere and silence is correct.
+S6=$TMP/missegmented6
+mkdir -p "$S6/memory/architecture/guides"
+( cd "$S6" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
+  printf '# a guide, at the PRE-flatten path the flat selector does not reach\n' > memory/architecture/guides/METHOD.md
+  git add -A && git commit -q -m missegmented6 --no-verify )
+out6=$(cd "$S6" && bash "$SCRIPT" 2>/dev/null); rc6=$?
+n=$((n+1))
+grep -qE "^    check 6: " <<<"$out6" || { echo "FAIL check 6 did not report its empty population on a mis-segmented tree"; st=1; }
+n=$((n+1))
+grep -qF 'the selector is mis-segmented' <<<"$out6" || { echo "FAIL check 6's report does not name the cause"; st=1; }
+n=$((n+1))
+[ "$rc6" = 0 ] && { echo "FAIL a tree whose check-6 selector is mis-segmented exited 0"; st=1; }
+#
 # (b) A FRESHLY SCAFFOLDED tree: no builds at all, nothing mis-segmented. The guard MUST stay quiet,
 #     or `adopt --scaffold` hands every new adopter a red tree on its first run. The precondition is
 #     what separates this case from (a), and without this arm the guard's first draft did exactly

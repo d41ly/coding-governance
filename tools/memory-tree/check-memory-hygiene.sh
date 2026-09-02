@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.55   # gov:kit memory-tree@2.55 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.56   # gov:kit memory-tree@2.56 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -213,6 +213,18 @@ PRE_STATUSY=$(printf '%s\n' "$FILES" | grep -cE "(/BACKLOG\.md$|^$M/backlog/)" |
 # not there — which is exactly the mis-segmentation the guard exists to name. Extension-agnostic,
 # because one record in the corpus is a shell script.
 PRE_BINDABLE=$(printf '%s\n' "$FILES" | grep -cE "/(build|prompts|reviews)/" || true)
+# Check 6's precondition, and until TOOL-dRetiredFork-1 it had NONE — which is why arming that check
+# needed a scope item of its own rather than a one-line paste. `pop_guard` returns silently unless
+# its FOURTH argument is greater than zero, so an arming with no precondition is decoration.
+#
+# UN-SEGMENTED, like every sibling above: it asks what KIND of index-class file exists anywhere under
+# `$M/`, never where. A precondition that restated check 6's own `INDEX_SET` selector could never
+# differ from it, `pop_guard` would be unreachable, and the guard would be the very
+# could-not-fail shape it exists to catch — the same reasoning `PRE_BINDABLE` records one comment up.
+#
+# The KINDS are `index_set`'s members by name: the three memory roots, a ledger / backlog / guides /
+# map-features member at any depth, a build's README, STATUS or RUN record, and FOUNDATION.
+PRE_INDEXY=$(printf '%s\n' "$FILES" | grep -cE "/(LIVE|DECISIONS|FOUNDATION|STATUS|README)\.md$|/(ledger|backlog|guides|features)/[^/]+\.md$|/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$" || true)
 # CR-stripped + marker-matched fences: only the marker that OPENED a fence closes it (a ~~~ line
 # inside a ``` fence is content, not a toggle), and \r is dropped so CRLF worktrees (autocrlf
 # smudge read by WSL/Linux bash) compare equal to LF sources.
@@ -507,6 +519,10 @@ if [ -n "$sel6" ]; then
 fi
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
 $bad6"
+# TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out 5/20`. Eight sibling checks already
+# carry this; check 6 reported a clean zero over an empty population instead of refusing.
+pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, map dossiers)" \
+  "$(printf '%s\n' "$sel6" | grep -c . || true)" "$PRE_INDEXY"
 
 # 7 — entry budget, ENTRY_CAP_CHARS per class (grandfather: curation-debt.txt; exempt guides/*.md — a guide is prose,
 #     not index rows — builds/*/RUN.md, whose standing-mandate block is quoted prose reproduced
