@@ -115,3 +115,4 @@ memory/builds/dMispairedQuote/README.md
 memory/builds/dBriefedPass/README.md
 memory/builds/dGaugedVintage/README.md
 memory/builds/dFoldedVerdict/README.md
+memory/builds/dRetiredFork/README.md
