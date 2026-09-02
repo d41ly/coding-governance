@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-4 — reconcile inCMS's agent-cap fail-open claim against HEAD
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -74,6 +74,13 @@ it. This unit disposes of it, and absorbs nothing until it has.
 `agent-cap self-test` · `memory hygiene` · `workflow script syntax` ·
 `verifier fan-out`.
 
+## 8. Open questions
+
+none - rev-1's premise was measured FALSE and the unit was rescoped on that
+measurement, which settles the question rather than opening one. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft, from the inCMS `KIT_AGENT_CAP_DELTA` D1 row and
@@ -89,3 +96,5 @@ it. This unit disposes of it, and absorbs nothing until it has.
   disposition to it. rev-2's §10 probe missed the one gov record that binds the change. M6: §7 named
   `agent-cap restatement`, which grades the charter's five machine-compared values and is unrelated
   to this unit; removed.
+- rev-4 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.

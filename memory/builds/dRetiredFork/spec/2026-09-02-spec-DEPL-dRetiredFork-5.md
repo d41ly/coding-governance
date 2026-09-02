@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-5 — `check` runs the `[[outcome]]` probe instead of grading an exit code
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams deployer · order 6
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams deployer · order 6
 
 <!-- gen:spec-records -->
 
@@ -53,7 +53,16 @@ that ran and passed"; the arm passes when the kit is not there. This is `TOOL-aF
 
 `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix`.
 
+## 8. Open questions
+
+none - `classify_outcome` has exactly one call site and the probe it runs is the one
+its own docstring describes; there is nothing to choose between. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
   against gov at b0108f13.
+- rev-2 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.

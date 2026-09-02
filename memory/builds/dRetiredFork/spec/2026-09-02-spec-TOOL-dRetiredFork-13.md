@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 3
+**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -72,6 +72,13 @@ recorded occurrences.
 `install-prefix (shipped surface)` · `testsuite counts (every bar self-test prints one)` · every touched kit's own self-test leg,
 run on demand under `GATE_SELFTESTS=1` rather than added to the bar.
 
+## 8. Open questions
+
+none - it applies a mechanism already proven at three prefixes in two sibling
+suites; the unit is the application, not the design. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
@@ -83,3 +90,5 @@ run on demand under `GATE_SELFTESTS=1` rather than added to the bar.
   count disagreed with the ratchet; AC0 re-derives them and AC0b makes the criterion per-row. 16:
   §3 disclaimed the whole non-test checker CLASS on the strength of its one owned member, leaving
   the other six files and 41 occurrences visibly unowned before `TOOL-dRetiredFork-17`'s ban.
+- rev-4 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.

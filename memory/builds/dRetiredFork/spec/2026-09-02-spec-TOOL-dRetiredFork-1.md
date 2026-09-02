@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-1 — memory-tree arms `pop_guard` on check 6
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -53,6 +53,13 @@ not on 6, so check 6 reports a clean zero over an empty population instead of re
 
 `memory hygiene` · `memory-hygiene self-test` · `kit version markers` · `harness arms (fail branches armed or pinned)`.
 
+## 8. Open questions
+
+none - it absorbs a two-line arming VERBATIM onto a check whose eight siblings already
+carry it, so the mechanism is the sibling's. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
@@ -61,3 +68,5 @@ not on 6, so check 6 reports a clean zero over an empty population instead of re
   it refuses on a mis-segmented selector, not an empty population, and returns silently on a zero
   fourth argument. S1b now authors the missing precondition and AC1 is restated in the helper's own
   terms, so the staged RED S2 requires is producible.
+- rev-3 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.

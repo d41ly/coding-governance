@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams deployer · order 6
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams deployer · order 6
 
 <!-- gen:spec-records -->
 
@@ -58,6 +58,13 @@ receipt update — a half-applied install from a verb that reported nothing. Thi
 
 `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix`.
 
+## 8. Open questions
+
+none - the crash is measured and the pathspec-over-stdin fix is the only mechanism
+that clears a 32 KiB command line without dropping a path. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
@@ -65,3 +72,5 @@ receipt update — a half-applied install from a verb that reported nothing. Thi
 - rev-2 · 2026-09-02 · folded spec-audit round 1, finding H13. S2 required the fix at every pathspec-building site and §6
   observed only the reported one, so the unit could pass with the class still open; AC2b is the
   class-wide observation.
+- rev-3 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.

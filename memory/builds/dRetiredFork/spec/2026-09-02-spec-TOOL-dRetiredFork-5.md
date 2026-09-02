@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-5 — two codebase-map selftest arms stop being stamped ok
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
+**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -59,6 +59,13 @@ class `AGENTS.md` §7 names — a skip that looks like a pass — inside the kit
 
 `codebase-map coverage + freshness` · `codebase-map kit selftest` · `kit version markers` · `testsuite counts (every bar self-test prints one)`.
 
+## 8. Open questions
+
+none - the two arms print an honest refusal and are stamped ok anyway; making the
+stamp read the arm is the only fix that closes green-by-absence. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
@@ -70,3 +77,5 @@ class `AGENTS.md` §7 names — a skip that looks like a pass — inside the kit
   the measured truth and left the refuted "four" standing in the title, the goal and a non-goal —
   the three places a reader meets first, and the two the build README renders. Two guarded arms,
   four guard exits.
+- rev-4 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.

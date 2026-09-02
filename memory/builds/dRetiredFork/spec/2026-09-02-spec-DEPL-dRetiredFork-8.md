@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-8 — the falsification set stops counting a unit that absorbs nothing
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams deployer · order 0
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams deployer · order 0
 
 <!-- gen:spec-records -->
 
@@ -59,7 +59,16 @@ NOT edited by any other unit, so the defect has exactly one owner.
 
 `memory hygiene` · `build README slot contract` · `build-index selftest`.
 
+## 8. Open questions
+
+none - it is a PROMOTED round-2 blocker whose correction round 2 already stated, and
+it changes one falsification set in one direction. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft. PROMOTED from spec-audit round 2 blocker 1 under BUILD-METHOD
   M4's disposition rule, on the owner's instruction to promote rather than fold.
+- rev-2 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.

@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-2 — the git-environment leak, one defect at two legs
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -52,7 +52,16 @@ exported.
 
 `memory hygiene` · `build-index selftest` · `memory-recall kit selftest` · `kit version markers`.
 
+## 8. Open questions
+
+none - it is one defect at two legs and gov already carries the hook-side half, so the
+remaining half has the shape the absorbed half set. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
   against gov at b0108f13.
+- rev-2 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.
