@@ -142,7 +142,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21
 | [DEPL-dRetiredFork-9 — the done-condition names the escape it depends on](spec/2026-09-02-spec-DEPL-dRetiredFork-9.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-18 — the gap lines use the wrap helper written for them](spec/2026-09-02-spec-TOOL-dRetiredFork-18.md) | 0 | 1 | INPROGRESS | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-19 — a declared placeholder must be one its own adopter substitutes](spec/2026-09-02-spec-TOOL-dRetiredFork-19.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-20 — a spec lint resolves a spec's own machine-facing tokens](spec/2026-09-02-spec-TOOL-dRetiredFork-20.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
+| [TOOL-dRetiredFork-20 — a spec lint resolves a spec's own machine-facing tokens](spec/2026-09-02-spec-TOOL-dRetiredFork-20.md) | 0 | 2 | INPROGRESS | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-1 — memory-tree arms `pop_guard` on check 6](spec/2026-09-02-spec-TOOL-dRetiredFork-1.md) | 1 | 1 | OPEN | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-2 — the git-environment leak, one defect at two legs](spec/2026-09-02-spec-TOOL-dRetiredFork-2.md) | 1 | 1 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-3 — a present-but-unparseable build README header stops reading as absent](spec/2026-09-02-spec-TOOL-dRetiredFork-3.md) | 1 | 2 | OPEN | rev-3 | 2026-09-02 |
@@ -170,7 +170,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

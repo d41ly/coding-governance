@@ -107,7 +107,7 @@ and it costs 2211 lines plus a doubled edit surface to buy a property that one c
 - **AC2** — When `python tools/settings-merge.py --hook-path tools/hooks/agent-cap.js` runs against
   gov's settings, the wired command names the shipped copy and `bash tools/check-wiring.sh` exits `0`.
 - **AC3** — When only one copy exists, the parity arm asserts against a population of one and
-  passes; when zero exist, it REFUSES. Observed via `bash .claude/hooks/agent-cap.test.sh`.
+  passes; when zero exist, it REFUSES. Observed via `bash tools/hooks/agent-cap.test.sh`.
 - **AC4** — When a legacy second copy is present, `bash tools/check-wiring.sh` REPORTS it and still
   exits `0`.
 - **AC5** — `bash tools/hooks/agent-cap.test.sh` passes against the surviving copy.
@@ -146,8 +146,9 @@ and it costs 2211 lines plus a doubled edit surface to buy a property that one c
 - rev-2 · 2026-09-02 · folded spec-audit round 1, findings B3 and B4. B3 measured `merge()`'s dedup
   as a basename-marker substring test, so rev-1's "call-site change, not a new capability" was
   inverted and its AC2 was unsatisfiable on any wired tree; S1 is corrected, S1b adds the missing
-  capability and AC7 observes it. B4 corrected AC5's untracked `.claude/hooks/agent-cap.test.sh`
-  to the tracked `tools/hooks/agent-cap.test.sh`. §10 corrected: the seam is not already sufficient.
+  capability and AC7 observes it. B4 corrected AC5 only, and left the byte-identical untracked
+  path standing in AC3 — the instance-not-class miss round 3 filed as blocker 4 and
+  `TOOL-dRetiredFork-20` corrected in both criteria. §10 corrected: the seam is not already sufficient.
 - rev-3 · 2026-09-02 · folded spec-audit round 2, findings 7, 8, 25, 26, 30a and 30b. Finding 7: the round-1
   fold prepended its §10 correction in front of the text it refutes, leaving both verdicts and a
   truncated sentence; §10 is rewritten to one claim. Finding 8: S2 withdraws scratch-guard's wired

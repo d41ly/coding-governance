@@ -1,11 +1,12 @@
 # TOOL-dRetiredFork-20 — a spec lint resolves a spec's own machine-facing tokens
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0 · ratified 2026-09-02
+**Status:** INPROGRESS · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-02-build-TOOL-dRetiredFork-20-1.md](../build/2026-09-02-build-TOOL-dRetiredFork-20-1.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
@@ -36,7 +37,17 @@ stops that.
   `memory/builds/*/spec/`, not only the one the review named.
 - **S3** — The lint, over a spec's own machine-facing tokens, in three joins the tree already owns:
   a §7 gate name against `tools/gate-legs.json`; a backticked path-shaped token in a §6 criterion
-  against `git ls-files`; a `path:line` citation anywhere in the spec against that file's line count.
+  against `git ls-files`; and a `path:line` citation against that file's line count — the third
+  join SCOPED to citations whose path resolves, per S3b.
+- **S3b** — The citation join's population is citations naming a TRACKED path, and a bare basename
+  is OUT of population, reported and not graded. Measured over the tracked corpus at
+  `b0108f13`: 453 specs carry 1721 backticked `path:line` citations and 854 of them — 50% — name
+  a path `git ls-files` does not track, because the house style cites a kit file by basename
+  (`run-gates.sh:407`, `check-memory-hygiene.sh:94`). Redding those is 854 dispositions and the
+  lint never lands; passing them silently is a could-not-fail arm over half the corpus. So the
+  arm REPORTS its skipped count on every run, which is what stops a green row reading as
+  coverage. F2's shape predicate governs the §6-criterion join ONLY; this join is scoped by
+  tracked-ness, not by shape.
 - **S4** — A declared, shrink-only exception registry for paths a unit is deliberately about to
   create, with a reason per row. Without it every unit that adds a file reds itself, which is how a
   lint stops being run.
@@ -47,6 +58,13 @@ stops that.
   lint landing over an undrained population is the state `TOOL-dRetiredFork-17` §4 warns against.
 - **S7** — The leg declares a wall-clock ceiling in `tools/gate-legs.json` and carries its
   `memory/project/testsuite-count-waivers.txt` row if its suite prints no assertion count.
+- **S8** — DECLARE the new files, or the gate this unit names in §7 reds on the day it lands.
+  `surface_paths` at `tools/govkit/govkit.py:132-155` expands `tools/*` to depth-1, so a new
+  `tools/check-*.sh` and its `.test.sh` are unclaimed surface paths the moment they are
+  tracked; and `govkit.py:1601-1602` fails any `tools/gate-legs.json` leg "claimed by no
+  descriptor and carried by no `[[exempt_leg]]`". Both files get a `tools/govkit/registry.toml`
+  home — an entry with a descriptor, or an `[[exempt]]` row with a non-empty reason — and the
+  leg gets a claim or an `[[exempt_leg]]`, in the same commit that adds them.
 
 ## 3. Non-goals (OUT)
 
@@ -63,9 +81,12 @@ stops that.
 
 ### Data model
 
-Three predicates, one population. A token is machine-facing when it is backticked AND matches a path
-shape, a `path:line` shape, or sits inside a §7 gate list. Everything else in a spec is prose and is
-not this lint's business.
+Three predicates, THREE populations, and they are not the same set — rev-1 said "one population"
+and that is what left the citation join undefined over half the corpus. A §7 gate name is graded
+against the manifest. A backticked path-shaped token in a §6 criterion is graded against
+`git ls-files`, with F2's shape predicate deciding what counts as path-shaped. A `path:line`
+citation is graded ONLY where its path is tracked; an untracked one is skipped and counted, per
+S3b. Everything else in a spec is prose and is not this lint's business.
 
 ### Migration
 
@@ -117,8 +138,15 @@ worktree; the bar is where this binds.
 - **AC5** — When an exception row names a path `git ls-files` now tracks, or that no spec names any
   more, the lint exits non-zero — a stale exception cannot hide a real hit.
 - **AC6** — When `memory/builds/*/spec/*.md` matches nothing, the lint REFUSES rather than passing.
-- **AC7** — The S6 run over every tracked spec is recorded with hits and near-misses, and
-  `TOOL-dRetiredFork-14` AC3 is corrected in the same landing.
+- **AC7** — The S6 run over every tracked spec is recorded with hits and near-misses; and BOTH
+  clauses of S1 land — `TOOL-dRetiredFork-14` AC3 names the tracked suite, AND its rev-2 log
+  line names AC5 only, verified by `grep` for the corrected sentence. rev-1's AC7 named the
+  first clause and left the second ungraded, in the unit whose subject is unverified
+  bookkeeping.
+- **AC7b** — When a `path:line` citation names an untracked path, the lint SKIPS it and the run
+  reports how many it skipped; against the corpus at `b0108f13` that count is 854 of 1721.
+- **AC7c** — `python tools/govkit/govkit.py selfcheck` exits `0` with the new files and the new
+  leg tracked, which it does not do until S8 lands.
 - **AC8** — `bash tools/check-testsuite-counts.sh` exits `0` and the leg declares a ceiling.
 
 ## 7. Gates
@@ -145,6 +173,12 @@ worktree; the bar is where this binds.
 - rev-1 · 2026-09-02 · initial draft. PROMOTED from spec-audit round 2 blocker 4 under BUILD-METHOD
   M4's disposition rule. `git ls-files .claude/hooks/` was run at `b0108f13`; the surviving AC3
   string was read in the file rather than taken from the review.
+- rev-2 · 2026-09-02 · folded spec-audit round 3, findings 12, 16 and 29, before building.
+  16: the citation join was undefined over half its own population — measured independently at 854
+  untracked paths of 1721 citations across 453 specs — so it would either red 854 dispositions or
+  pass vacuously; S3b scopes it and AC7b reports the skip. 12: `surface_paths` quantifies `tools/*`
+  at depth-1 and `govkit.py:1601` fails an unclaimed leg, so this unit's own §7 gate would red on
+  landing; S8 declares the files and AC7c observes it. 29: AC7 graded one of S1's two clauses.
 
 ## 10. Reuse audit
 

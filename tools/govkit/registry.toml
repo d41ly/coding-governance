@@ -178,6 +178,19 @@ path = "tools/check-template-size.sh"
 why = "gates gov's OWN product template, defaulting to the playbook at the repo root. Prescribed for copy nowhere in the runbook, and an adopter's instantiated playbook carries no size ceiling."
 
 [[exempt]]
+path = "tools/check-spec-tokens.py"
+why = """
+grades gov's OWN spec corpus against gov's OWN gate manifest. Its leg join reads tools/gate-legs.json,
+which registry.toml already exempts as gov-specific by construction, and its waiver registry is seeded
+from THIS tree's measured hits. An adopter's specs are theirs and their manifest lives elsewhere;
+shipping this would red on install day for a population gov never measured. Prescribed for copy nowhere.
+"""
+
+[[exempt]]
+path = "tools/check-spec-tokens.test.sh"
+why = "the red/green self-test for the above, which is itself an exemption. Exemptions are exact-path, so the gate's row does not cover its sibling."
+
+[[exempt]]
 path = "tools/check-dead-paths.sh"
 why = """
 gates gov's OWN corpus against gov's OWN deletion history. The needle set is derived from `git log --diff-filter=D` over this repo, and the anti-vacuity guard is a FROZEN SENTINEL naming a basename this repo deleted at 5b00666 — in a target tree that name was never present, so the sentinel could not resolve and the leg would red on install day. That is the exact defect the closing review filed against three other new gates; shipping this one would repeat it. An adopter who wants the class authors their own sentinel from their own deletion history.
@@ -256,6 +269,17 @@ name = "recall floor arms"
 why = """
 the arms for the leg above, and gov-only for the same reason plus a sharper one: each arm is keyed on a specific gov record id (`TOOL-aWrittenMethod-4`, `TOOL-aMouldedFolio-1`, `TOOL-aStandingWrit-2`) and on literals measured against this corpus, so in any other tree they would red on absence rather than on behaviour. Withheld by the same `project-owned` rule. This is why they do NOT live in `selftest.py`, which DOES ship and DOES run on an adopter's bar.
 """
+
+[[exempt_leg]]
+name = "spec tokens (a spec's own names resolve)"
+why = """
+grades gov's OWN specs against gov's OWN leg manifest, through a script that is itself a registry
+exemption for that reason. An adopter receives neither.
+"""
+
+[[exempt_leg]]
+name = "spec-tokens self-test"
+why = "gov's own red/green proof of the leg above; it travels with a gate that does not travel."
 
 [[exempt_leg]]
 name = "dead-path carriers (deleted files still named)"
