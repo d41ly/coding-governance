@@ -85,6 +85,8 @@ run-gates turnstile	kit	selftests
 run-gates wiring	repo	wiring
 scratch-guard self-test	kit	selftests
 settings-merge selftest	kit	selftests
+spec tokens (a spec's own names resolve)	repo	declarations
+spec-tokens self-test	kit	selftests
 template size <=48KiB	repo	product
 template size gate selftest	kit	selftests
 testsuite counts (every bar self-test prints one)	repo	declarations

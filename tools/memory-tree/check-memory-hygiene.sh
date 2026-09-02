@@ -324,7 +324,7 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # TOOL-dFramedEntrypoint-3 - the build-README contract registry. Same shape as
   # method-carriers.txt above: a declared population asserted in both directions by a script
   # other than this one.
-  F:readme-contract.txt) ;;
+  F:spec-token-waivers.txt|F:readme-contract.txt) ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
 if [ -n "$MAP_SUB" ]; then
