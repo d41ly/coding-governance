@@ -1620,10 +1620,91 @@ def test_lang_mode_ratchet(tmp: pathlib.Path) -> None:
           dr.build_lang_mode_findings(_Git(), root) == [], "expected []")
 
 
+def test_harness_liveness_note_is_derived(tmp: pathlib.Path) -> None:
+    """TOOL-dRetiredFork-6 S4 — the derived note, one arm per counter state.
+
+    The harnesses are Workflow-runtime scripts: top-level `await`, globals this process does not
+    have, so they cannot be imported. The two helpers are EXTRACTED and run in node, which grades
+    the SHIPPED bytes rather than a paraphrase of them.
+
+    WHY THREE ARMS AND NOT ONE. The ternary this replaced had three outcomes and conflated two of
+    them: "nothing moved" and "the probe could not run" both rendered the bare word `complete`. An
+    arm that only checked the dead state would pass against the ternary too, because the ternary
+    also produced *a* string. What distinguishes them is that the three states are now DISTINCT
+    sentences, so the arms assert distinctness, not just presence.
+    """
+    import json
+    import subprocess
+
+    LF = chr(10)
+
+    for harness in ("drift-audit-code.js", "drift-audit-state.js"):
+        src = (KIT.parent / "workflows" / harness).read_text(encoding="utf-8")
+        if "function deriveLiveness" not in src:
+            check(f"{harness}: carries the derived note", False,
+                  "deriveLiveness is absent — the hand-written ternary is back")
+            continue
+
+        def extract_fn(name: str) -> str:
+            i = src.index("function " + name + "(")
+            depth = 0
+            started = False
+            for j in range(i, len(src)):
+                if src[j] == "{":
+                    depth += 1
+                    started = True
+                elif src[j] == "}":
+                    depth -= 1
+                    if started and depth == 0:
+                        return src[i:j + 1]
+            raise AssertionError("unterminated " + name)
+
+        driver = (
+            extract_fn("deriveLiveness") + LF + extract_fn("renderLivenessNote") + LF +
+            "const states = {" + LF +
+            "  clean: { synth: true, lensesRun: 3, lensesDead: 0, skepticsDead: 0, unverified: 0 }," + LF +
+            "  partial: { synth: true, lensesRun: 3, lensesDead: 1, skepticsDead: 0, unverified: 2 }," + LF +
+            "  dead: { synth: false, lensesRun: 0, lensesDead: 3, skepticsDead: 0, unverified: 0 }," + LF +
+            "};" + LF +
+            "const out = {};" + LF +
+            "for (const k of Object.keys(states)) {" + LF +
+            "  out[k] = [deriveLiveness(states[k]), renderLivenessNote(deriveLiveness(states[k]), states[k])];" + LF +
+            "}" + LF +
+            "console.log(JSON.stringify(out));" + LF
+        )
+        d = tmp / (harness + ".driver.js")
+        d.write_text(driver, encoding="utf-8")
+        proc = subprocess.run(["node", str(d)], capture_output=True, text=True, encoding="utf-8")
+        check(f"{harness}: the extracted helpers run", proc.returncode == 0, proc.stderr[:160])
+        if proc.returncode != 0:
+            continue
+        got = json.loads(proc.stdout)
+
+        # AC1 / AC2 — moved and did-not-move are DIFFERENT sentences, and a consumer re-deriving
+        # either byte-matches, because both come from the same two functions.
+        check(f"{harness}: a moved counter renders PARTIAL", got["partial"][0] == "partial"
+              and got["partial"][1].startswith("PARTIAL:"), str(got["partial"]))
+        check(f"{harness}: nothing-moved renders CLEAN, not the bare word complete",
+              got["clean"][0] == "clean" and got["clean"][1].startswith("CLEAN:")
+              and got["clean"][1] != "complete", str(got["clean"]))
+
+        # AC3 — the state the ternary could not express. Observed RED against the ternary first:
+        # with `!synth` it produced an UNVERIFIED string and with lensesRun 0 alone it produced the
+        # bare `complete`, so a dead probe reported as a clean run.
+        check(f"{harness}: a probe that could not run says DEAD PROBE",
+              got["dead"][0] == "dead" and "DEAD PROBE" in got["dead"][1], str(got["dead"]))
+
+        # ANTI-VACUITY: three states, three DISTINCT sentences. The defect was that two of them were
+        # the same string, so an arm that never compared them would have passed against the ternary.
+        check(f"{harness}: the three states are three distinct sentences",
+              len({got["clean"][1], got["partial"][1], got["dead"][1]}) == 3)
+
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
+        test_harness_liveness_note_is_derived(tmp)
         test_signals_can_move(tmp)
         test_lexicon_signals(tmp)
         test_lexicon_marginal_rate(tmp)
