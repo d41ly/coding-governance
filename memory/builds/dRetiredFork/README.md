@@ -58,6 +58,11 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
   and `AGENTS.md`.
 - **Never absorb an adopter's fix without reproducing it at HEAD first.** Round 1 was BLOCKED on six
   findings; one measured a unit's premise inverted. All 30 are folded.
+- **A criterion labelled the build's DONE-CONDITION is read against every other spec's §2 before
+  the set closes.** `DEPL-dRetiredFork-3` AC10 and `DEPL-dRetiredFork-1` AC6 were written in one
+  fold round from two findings and could not both be satisfied: the done-condition required a
+  `gov_commit` re-stamp the sibling's accepted state withholds. Round 2 called this the manual
+  check that belongs in BUILD-METHOD; it lives here until someone promotes it upstream.
 - **Never patch a spec in place; rewrite the section.** Round 2 was BLOCKED on five, and 21 of its 30
   defects were created by round 1's fold. Its five blockers are PROMOTED to units 19, 20, 21, 8 and
   9 at order 0, per M4, and the specs they correct are unedited until those units run.
@@ -140,7 +145,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [DEPL-dRetiredFork-8 — the falsification set stops counting a unit that absorbs nothing](spec/2026-09-02-spec-DEPL-dRetiredFork-8.md) | 0 | 1 | CLOSED | rev-3 | 2026-09-02 |
-| [DEPL-dRetiredFork-9 — the done-condition names the escape it depends on](spec/2026-09-02-spec-DEPL-dRetiredFork-9.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
+| [DEPL-dRetiredFork-9 — the done-condition names the escape it depends on](spec/2026-09-02-spec-DEPL-dRetiredFork-9.md) | 0 | 2 | CLOSED | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-18 — the gap lines use the wrap helper written for them](spec/2026-09-02-spec-TOOL-dRetiredFork-18.md) | 0 | 1 | CLOSED | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-19 — a declared placeholder must be one its own adopter substitutes](spec/2026-09-02-spec-TOOL-dRetiredFork-19.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-20 — a spec lint resolves a spec's own machine-facing tokens](spec/2026-09-02-spec-TOOL-dRetiredFork-20.md) | 0 | 2 | CLOSED | rev-2 | 2026-09-02 |
@@ -162,16 +167,16 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22
 | [TOOL-dRetiredFork-21 — the two hooks whose path comes from a fragment, not from the default](spec/2026-09-02-spec-TOOL-dRetiredFork-21.md) | 4 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys](spec/2026-09-02-spec-TOOL-dRetiredFork-15.md) | 5 | 2 | OPEN | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine](spec/2026-09-02-spec-TOOL-dRetiredFork-16.md) | 5 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations](spec/2026-09-02-spec-DEPL-dRetiredFork-1.md) | 6 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations](spec/2026-09-02-spec-DEPL-dRetiredFork-1.md) | 6 | 2 | OPEN | rev-4 | 2026-09-02 |
 | [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | OPEN | rev-4 | 2026-09-02 |
 | [DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin](spec/2026-09-02-spec-DEPL-dRetiredFork-4.md) | 6 | 1 | OPEN | rev-3 | 2026-09-02 |
 | [DEPL-dRetiredFork-5 — `check` runs the `[[outcome]]` probe instead of grading an exit code](spec/2026-09-02-spec-DEPL-dRetiredFork-5.md) | 6 | 1 | OPEN | rev-2 | 2026-09-02 |
-| [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | OPEN | rev-4 | 2026-09-02 |
+| [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | OPEN | rev-5 | 2026-09-02 |
 | [DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's](spec/2026-09-02-spec-DEPL-dRetiredFork-6.md) | 8 | 2 | OPEN | rev-4 | 2026-09-02 |
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 4 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

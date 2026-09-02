@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
+**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -49,6 +49,11 @@ under it cannot prove the rung that would have reconciled them.
   `adopt --re-adopt --write` and `--allow-ungraded` as the only escapes. Measured today: 32 rows at
   NicoCares, 30 at inCMS. The build's done-condition requires that stamp, so this unit either moves
   the count or states that it cannot.
+- **S7** — MOVE it: drive the NicoCares `evidence: "unattributed"` population to ZERO, which is the
+  branch S6 names and `DEPL-dRetiredFork-9` ratified. S6 only MEASURES; without this item AC6 would
+  be an acceptance criterion with no scope behind it, which is the shape this build keeps finding.
+  The 32 rows measured today are the before-count. inCMS is out of scope here and its half of the
+  done-condition stays deferred.
 ## 3. Non-goals (OUT)
 
 - **The residual-byte problem.** Whole-file equality decides a rung — one residual byte and it does
@@ -112,10 +117,13 @@ because a kit ships a rendered SKILL.md beside its engine files.
 - **AC4** — A read-only `update` against `C:/projects/nicocares/main` reports a `relocate` count
   strictly greater than zero, and that number is recorded in the acceptance ledger.
 - **AC5** — `python tools/govkit/selftest.py` passes with its arm count increased by S5's three.
-- **AC6** — The `unattributed` row count at each adopter after this unit is STRICTLY BELOW its
-  recorded before-count, or the acceptance ledger states that it cannot fall and why — naming the
-  residual-byte cause from §3 — so the `gov_commit` gap is recorded rather than discovered at the
-  build's acceptance.
+- **AC6** — The `evidence: "unattributed"` row count at NicoCares after this unit is ZERO, with
+  the before-count recorded beside it per S6.
+  At NicoCares the done-condition depends on NO escape: `DEPL-dRetiredFork-1` S7 drives the
+  `evidence: "unattributed"` count to ZERO, so `tools/govkit/govkit.py:6566-6573` does not withhold
+  the `gov_commit` re-stamp and the pinned argv carries neither `--allow-ungraded` nor a preceding
+  `govkit adopt --re-adopt --write`. inCMS's half is DEFERRED, and when it is attempted it is
+  attempted with `--allow-ungraded`, which is a stated weakening and not a quiet one.
 - **AC7** — When a receipt row yields an empty or single-character needle fragment, the run
   REFUSES naming the row, observed via `python tools/govkit/govkit.py update --target <fixture>`,
   and the RED is staged before the grading is wired.
@@ -148,6 +156,10 @@ because a kit ships a rendered SKILL.md beside its engine files.
 - rev-3 · 2026-09-02 · folded spec-audit round 2, finding 22. §5's security row stated a grading obligation
   on the needle map that no scope item built and no criterion observed — on the path where a
   wrong needle writes gov's bytes over a target's real edit. S3b builds it; AC7 observes it.
+- rev-4 · 2026-09-02 · `DEPL-dRetiredFork-9` resolves the done-condition fork against this spec:
+  AC6 now requires ZERO at NicoCares rather than merely below-before, and S7 adds the scope item
+  that drives it — the branch S6 already named. The AC6 sentence is shared verbatim with
+  `DEPL-dRetiredFork-3` AC10.
 
 ## 10. Reuse audit
 

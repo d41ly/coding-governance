@@ -1,11 +1,13 @@
 # DEPL-dRetiredFork-9 — the done-condition names the escape it depends on
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 0 · ratified 2026-09-02
+**Status:** CLOSED · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 0 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-02-build-DEPL-dRetiredFork-9-1-acceptance-ledger.md](../build/2026-09-02-build-DEPL-dRetiredFork-9-1-acceptance-ledger.md) | journal | — |
+| [2026-09-02-prompt-DEPL-dRetiredFork-9-1-build-brief.md](../prompts/2026-09-02-prompt-DEPL-dRetiredFork-9-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
@@ -111,6 +113,11 @@ so the restatement would be a retreat dressed as a correction.
 - rev-1 · 2026-09-02 · initial draft. PROMOTED from spec-audit round 2 blocker 2 under BUILD-METHOD
   M4's disposition rule. The withholding branch at `tools/govkit/govkit.py:6566-6573` and the two
   escapes it names were read at `b0108f13` rather than taken from the review.
+- rev-2 · 2026-09-02 · built. F1's ratified Recommendation is written into `DEPL-dRetiredFork-3`
+  AC10 and `DEPL-dRetiredFork-1` AC6 as ONE sentence shared verbatim, so AC2's diff finds them
+  identical. AC3's scope item is `DEPL-dRetiredFork-1` S7, which is the branch that spec's own S6
+  already named — "this unit either moves the count or states that it cannot" — so no new unit was
+  minted and M2's one-mechanism rule is not strained.
 
 ## 10. Reuse audit
 

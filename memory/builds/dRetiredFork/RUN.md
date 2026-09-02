@@ -28,3 +28,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-02T17:59:34Z brief · item DEPL-dRetiredFork-8 · reason 6bf87236ad4a memory/builds/dRetiredFork/prompts/2026-09-02-prompt-DEPL-dRetiredFork-8-1-build-brief.md
 
 2026-09-02T18:04:48Z brief · item DEPL-dRetiredFork-8 · reason 7eb94309086d memory/builds/dRetiredFork/prompts/2026-09-02-prompt-DEPL-dRetiredFork-8-1-build-brief.md
+
+2026-09-02T18:06:37Z brief · item DEPL-dRetiredFork-9 · reason d7197204f049 memory/builds/dRetiredFork/prompts/2026-09-02-prompt-DEPL-dRetiredFork-9-1-build-brief.md
+
+2026-09-02T18:06:42Z dispatch · item b9fcc024 DEPL-dRetiredFork-9 · reason memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-3.md memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-1.md memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-9.md memory/builds/dRetiredFork/README.md memory/LIVE.md memory/ledger/2026-09.md

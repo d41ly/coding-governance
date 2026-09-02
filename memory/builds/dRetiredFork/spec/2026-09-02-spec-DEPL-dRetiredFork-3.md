@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates
 
-**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7 · ratified 2026-09-02
+**Status:** OPEN · rev-5 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -125,9 +125,15 @@ must remember is not a mechanism.
   the re-render flag ON, `python tools/govkit/govkit.py update --target C:/projects/nicocares/main
   --write` lands every stale row, re-renders every rendered row, runs every declared generator,
   re-stamps `gov_commit`, and the tree afterwards needs no hand merge — recorded in the acceptance
-  ledger. **inCMS's half of the done-condition is DEFERRED, and §3 says so**: no unit in this
-  roster repairs that receipt, so a criterion gated on the repair would be permanently neither
-  green nor red — worse than a missing one, because it looks covered.
+  ledger.
+  At NicoCares the done-condition depends on NO escape: `DEPL-dRetiredFork-1` S7 drives the
+  `evidence: "unattributed"` count to ZERO, so `tools/govkit/govkit.py:6566-6573` does not withhold
+  the `gov_commit` re-stamp and the pinned argv carries neither `--allow-ungraded` nor a preceding
+  `govkit adopt --re-adopt --write`. inCMS's half is DEFERRED, and when it is attempted it is
+  attempted with `--allow-ungraded`, which is a stated weakening and not a quiet one.
+  **§3 states the inCMS deferral**: no unit in this roster repairs that receipt, so a criterion
+  gated on the repair would be permanently neither green nor red — worse than a missing one,
+  because it looks covered.
 - **AC11** — `python tools/govkit/check_runbook_parity.py` exits `0`, and
   `WIRE-INTO-PROJECT.md`'s maintenance section is strictly SHORTER than at `b0108f13`,
   and every obligation it drops is carried by a `[[regenerate]]` block in a kit descriptor. §5
@@ -170,6 +176,10 @@ must remember is not a mechanism.
   writing now. 12: the `generated` non-goal contradicted S2 — it disclaims authorship, not
   invocation. 14: a stale arm count becomes a pointer. 23: AC11 lost its gate when `runbook
   parity` proved not to be a leg; it invokes the program directly. 28: AC8 sat after AC11.
+- rev-5 · 2026-09-02 · `DEPL-dRetiredFork-9` writes the ratified done-condition escape into AC10:
+  NO escape at NicoCares, since `DEPL-dRetiredFork-1` S7 now drives that count to zero, and
+  `--allow-ungraded` at inCMS when its deferred half is attempted. The sentence is shared verbatim
+  with `DEPL-dRetiredFork-1` AC6 so neither criterion can be read alone.
 
 ## 10. Reuse audit
 
