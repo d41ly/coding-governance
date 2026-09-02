@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 137aff9806f1abac8146df4c30ab5d742926c80b
+witness: 30fde460ecba46c3d31721dd18cb331f2f6aaf9d
 phase: BUILDING
 mode: slug
 anchor-kind: default-branch
@@ -58,3 +58,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-02T22:17:46Z brief · item TOOL-dRetiredFork-5 · reason 0229295989e2 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-5-1-build-brief.md
 
 2026-09-02T22:17:55Z dispatch · item bd5b9f0a TOOL-dRetiredFork-5 · reason tools/codebase-map/selftest.py tools/codebase-map/map_lib.py memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-5.md memory/builds/dRetiredFork/README.md
+
+2026-09-02T22:25:21Z brief · item TOOL-dRetiredFork-6 · reason f2580060a435 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-6-1-build-brief.md
+
+2026-09-02T22:25:30Z dispatch · item b6af9e50 TOOL-dRetiredFork-6 · reason tools/workflows/drift-audit-code.js tools/workflows/drift-audit-state.js tools/drift-audit/drift_report.py tools/drift-audit/README.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-6.md memory/builds/dRetiredFork/README.md
