@@ -1,117 +1,78 @@
-# TOOL-dRetiredFork-4 — the agent-cap nested-loop fail-open closes
+# TOOL-dRetiredFork-4 — reconcile inCMS's agent-cap fail-open claim against HEAD
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-Absorb the `interpDepths` fix inCMS carries as `KIT_AGENT_CAP_DELTA` D1, filed upstream as
-`ABL-aFerriedToolkit-3` and never taken. Measured at that adopter: a marked sequential-agent loop
-nested inside another loop exits `0` where the unnested form exits `2`. gov HEAD has zero
-occurrences of the fix. This is a fail-open in the hook that enforces the fan-out bound, so a wide
-burst that the guard exists to refuse passes when it is written one level deeper.
+**This unit's rev-1 premise was measured FALSE, and the unit is rescoped rather than rewritten
+around.** rev-1 claimed, from inCMS's `KIT_AGENT_CAP_DELTA` D1 row, that a marked sequential-agent
+loop nested inside another loop exits `0` where the unnested form exits `2` — a fail-open. Reproduced
+at `b0108f13` through the live hook: the nested case exits **2** and the unnested exits **0**, the
+exact opposite. The machinery rev-1 said was missing is present and named:
+`tools/hooks/agent-cap.js:949` reads "NESTED LOOPS FAIL CLOSED WITH NO EXTRA CLAUSE",
+`tools/hooks/README.md:48` already owns the clause, and `tools/hooks/agent-cap.test.sh:357` already
+ships the fixture as `seq fold: a marked loop inside an UNMARKED loop -> deny`, expecting exit 2.
+
+So there is no fail-open of that shape to close. What remains is real and unfinished: an adopter
+carries a divergence row asserting a defect gov's own suite contradicts, and nobody has disposed of
+it. This unit disposes of it, and absorbs nothing until it has.
 
 ## 2. Scope (IN)
 
-- **S1** — Absorb the `interpDepths` stack into `tools/hooks/agent-cap.js`, so an `agent(` call's
-  enclosing-loop depth is computed rather than inferred from the header line alone.
-- **S2** — The refusal message names the enclosing loop, because the hook's contract is that a
-  refusal names the first clause that fails.
-- **S3** — Arms in `.claude/hooks/agent-cap.test.sh` covering the nested case both ways: the nested
-  marked loop REFUSED, and the correctly unnested marked loop still admitted. Observed RED first.
-- **S4** — Bump `KIT_AGENT_CAP_VERSION` and every tracked `*.js` carrying a `gov:kit agent-cap@`
-  marker, which `tools/check-kit-versions.sh` derives rather than lists.
-- **S5** — Restate nothing in the charter. `tools/hooks/README.md` already owns the grammar and
-  gains the depth clause there.
+- **S1** — Obtain inCMS's actual reproduction for D1: the fixture, the invocation and the observed
+  exit code, from `ARCH-aFerriedToolkit-3` or from that adopter's own suite. rev-1 paraphrased the
+  registry's `what` field and ran nothing, which is how the direction inverted.
+- **S2** — Run that exact fixture against gov `b0108f13` and record both exit codes verbatim.
+- **S3** — Dispose on the evidence, in exactly one of three ways, and record which. **(a)** The
+  fixture reproduces a real gov defect of a DIFFERENT shape than rev-1 described — most plausibly an
+  outer iteration count multiplying an admitted inner bound, which the `:949` comment does not cover
+  — and this unit is superseded by a new spec describing THAT defect. **(b)** It does not reproduce
+  at HEAD, the row is stale, and `DEPL-dRetiredFork-7` strikes it from inCMS's register. **(c)** It
+  reproduces only under an adopter-local modification, so it is inCMS's and not gov's.
+- **S4** — Whatever the disposition, record the reconciliation between inCMS's row and
+  `agent-cap.js:949` in `memory/DECISIONS.md`. The next session reading that registry row will
+  otherwise repeat rev-1's error.
 
 ## 3. Non-goals (OUT)
 
-- Modelling regex literals in the literal-blanker. inCMS declined it and so does this unit: the
-  regex-versus-division ambiguity is a real parser problem, and the shortcut of matching raw text is
-  fail-closed in the wrong direction because the hook's own remedy string contains `parallel(` and so
-  does every correct `boundedParallel` helper. It stays `ABL-dBriskLanyard-1`.
-- Changing the bound. The number is parked at build level.
-
-## 4. Design
-
-### Data model
-
-`interpDepths` is a stack of open-loop positions maintained across the literal-blanked scan. An
-`agent(` occurrence is attributed to the innermost open loop, and a marked header whose stack is
-non-empty at its own position is refused by the existing "no enclosing loop" clause — which is
-already written in `tools/hooks/README.md` and is currently unenforceable because nothing computes
-depth.
-
-### Rollout
-
-The hook ships to every adopter and is wired at SessionStart, so a false refusal is loud and
-immediate. The two arms in S3 are the whole safety case; there is no flag and no staged rollout,
-because a guard behind a default-OFF flag is not a guard.
-
-### Alternatives rejected
-
-Counting `for (` occurrences before the marked header. That is the inference the current code makes
-and is exactly what the nested case defeats, because a closed loop and an open one look identical to
-a counter.
-
-## 5. Production-readiness checklist
-
-- security — this IS the security surface. The hook bounds fan-out; a fail-open here is the whole
-  defect, and the change is fail-closed by construction: an unresolvable depth refuses.
-- perf / scale — one integer stack over a scan the hook already performs. No new pass.
-- a11y — N/A.
-- i18n — N/A.
-- error / empty / loading states — a script the scan cannot parse must REFUSE, never admit. That is
-  the existing contract and this unit must not weaken it.
-- observability — the refusal names the enclosing loop and its line, so an author can act on it.
-- risks — a false refusal blocks legitimate work at every adopter simultaneously, since the hook is
-  wired at SessionStart. Mitigated by running the existing suite plus S3 before the version bump,
-  and by the fact that the admitted-case arm is as load-bearing as the refused-case arm.
-- testing + left-shift gates — `.claude/hooks/agent-cap.test.sh` is already a bar leg.
-- migration / rollback — reverting is deleting the stack; no data, no receipt, no adopter state.
-- user docs — the depth clause in `tools/hooks/README.md`.
+- Editing `tools/hooks/agent-cap.js`. No defect is established, and rev-1's S1 would have added a
+  depth stack the file already carries.
+- Modelling regex literals in the literal-blanker. Unchanged from rev-1: inCMS declined it, and
+  matching raw text is fail-closed in the wrong direction, because the hook's own remedy string
+  contains `parallel(` and so does every correct `boundedParallel` helper.
+- Changing the fan-out bound. Parked at build level as an owner turn.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a `gov:sequential-agents(3)` loop sits inside another `for` loop,
-  `bash .claude/hooks/agent-cap.test.sh` observes the hook exiting `2`, and the pre-change hook
-  exited `0` on the same input.
-- **AC2** — When the same marked loop has no enclosing loop, the hook still admits it and the
-  existing arms are unchanged. Observed via `bash .claude/hooks/agent-cap.test.sh`.
-- **AC3** — When the scan cannot resolve a depth, the hook refuses naming the unresolved position. Observed via `bash .claude/hooks/agent-cap.test.sh`.
-- **AC4** — After the bump, `bash tools/check-kit-versions.sh` exits `0` and every tracked `*.js`
-  carrying the marker agrees with `KIT_AGENT_CAP_VERSION`.
-- **AC5** — `bash tools/check-agent-cap-restatement.sh` exits `0`, so the five machine-compared
-  values in the charter still agree with the hook.
+- **AC1** — inCMS's D1 fixture is recorded verbatim in this build's folder with the invocation that
+  runs it, and `bash tools/hooks/agent-cap.test.sh` still passes unchanged at `b0108f13`.
+- **AC2** — Running that fixture against gov HEAD produces a recorded exit code, and the record
+  states whether it agrees with inCMS's claim or with `tools/hooks/agent-cap.js:949`.
+- **AC3** — Exactly one disposition from S3 is recorded, naming its evidence. Disposition (a) names
+  the successor spec id; (b) names the register row `DEPL-dRetiredFork-7` will strike.
+- **AC4** — `memory/DECISIONS.md` carries the reconciliation, and `bash
+  tools/memory-tree/check-memory-hygiene.sh` exits `0` afterwards.
 
 ## 7. Gates
 
-`agent-cap self-test` · `agent-cap restatement parity` · `kit versions` · `workflow syntax` ·
+`agent-cap self-test` · `agent-cap restatement` · `memory hygiene` · `workflow script syntax` ·
 `verifier fan-out`.
-
-## 8. Open questions
-
-- **F1 — does gov credit the adopter in the source, or only in the record?** inCMS found this and
-  `TOOL-aGradedDoorway-3` set the precedent of crediting in the file. Recommendation: credit at the
-  site, because the next reader asking why the stack exists is owed the measurement that produced it.
 
 ## 9. Revision log
 
-- rev-1 · 2026-09-02 · initial draft, authored from the inCMS `KIT_AGENT_CAP_DELTA` D1 row and
+- rev-1 · 2026-09-02 · initial draft, from the inCMS `KIT_AGENT_CAP_DELTA` D1 row and
   `ABL-aFerriedToolkit-3`.
-
-## 10. Reuse audit
-
-No existing seam fits. `python tools/codebase-map/reuse_lookup.py` reports the `agent-cap` affordance
-seam covering `topLevelArgs`, which is the argument scan this unit sits beside but does not extend —
-the depth stack is new state in an existing pass, and there is no fan-in-3 helper for loop-depth
-anywhere in the corpus. The nearest prior art is the hook's own literal-blanked view, reused
-unchanged.
-
-Recall terms used: `agent-cap`, `fail-open`, `fan-out`, `sequential-agents`, `marker`, `bound`,
-`nested loop`, `literal-blanked`, `hook`, `refusal`, `adopter`, `interpDepths`.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, findings B4 and B5. B5 measured the rev-1 premise
+  INVERTED at HEAD — the nested case denies, the unnested admits — so the unit is rescoped from an
+  absorption to a reconciliation, dropped from Tier-2 to Tier-1, and its goal, scope and acceptance
+  are replaced rather than edited. B4 found every rev-1 acceptance criterion anchored on
+  `.claude/hooks/agent-cap.test.sh`, which is not tracked; the suite is `tools/hooks/agent-cap.test.sh`,
+  and rev-2 names no untracked path. The README's "nine fixes" count drops to eight.

@@ -1,10 +1,12 @@
 # TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 
 <!-- /gen:spec-records -->
 
@@ -20,8 +22,16 @@ dual-ship doubles it before anyone edits anything.
 ## 2. Scope (IN)
 
 - **S1** — Point the wired command at `{prefix}/hooks/agent-cap.js`. `tools/settings-merge.py`
-  already takes `hook_path` as a parameter and merely DEFAULTS it to `.claude/hooks/agent-cap.js`,
-  with `--hook-path` as the override, so this is a call-site change and not a new capability.
+  takes `hook_path` as a parameter and defaults it to `.claude/hooks/agent-cap.js`, with
+  `--hook-path` as the override. **This is NOT merely a call-site change**, which rev-1 claimed:
+  `HOOK_MARKER` is the bare basename `agent-cap.js` at `tools/settings-merge.py:53`, and `merge()`
+  returns the object unchanged when any command in the matcher group already contains it
+  (`:108-109`). The module docstring says so at `:37` — the dedup "deliberately does NOT rewrite a
+  stale hook path". Every already-wired tree, gov's own included, is a no-op today.
+- **S1b** — Build the capability that is missing: either a `--rewrite-stale-path` mode replacing a
+  command whose marker matches but whose path differs, or a fragment-level `hook_path` compare
+  distinct from the marker compare. Without it S2's withdrawal leaves every wired tree naming a
+  path that no longer ships, which is the silent unwiring §5 calls the highest risk in the build.
 - **S2** — Drop the `.claude/hooks/` destinations from the hooks and memory-recall descriptors, so
   one copy ships.
 - **S3** — The two-copy parity arm becomes SELF-ARMING on the resolved destination count: it must
@@ -93,13 +103,16 @@ and it costs 2211 lines plus a doubled edit surface to buy a property that one c
   passes; when zero exist, it REFUSES. Observed via `bash .claude/hooks/agent-cap.test.sh`.
 - **AC4** — When a legacy second copy is present, `bash tools/check-wiring.sh` REPORTS it and still
   exits `0`.
-- **AC5** — `bash .claude/hooks/agent-cap.test.sh` passes against the surviving copy.
+- **AC5** — `bash tools/hooks/agent-cap.test.sh` passes against the surviving copy.
+- **AC7** — When a settings file is ALREADY wired at `.claude/hooks/agent-cap.js`, running the
+  repath MOVES the command to the shipped copy; measured at `b0108f13`, `merge()` returns the
+  object unchanged in that case, so this criterion fails against today's engine.
 - **AC6** — `bash tools/check-kit-versions.sh` exits `0`, with every tracked `*.js` marker agreeing.
 
 ## 7. Gates
 
-`agent-cap self-test` · `wiring` · `wiring self-test` · `kit versions` · `govkit selfcheck` ·
-`agent-cap restatement parity`.
+`agent-cap self-test` · `check-wiring self-test` · `check-wiring self-test` · `kit version markers` · `govkit selfcheck` ·
+`agent-cap restatement`.
 
 ## 8. Open questions
 
@@ -114,10 +127,17 @@ and it costs 2211 lines plus a doubled edit surface to buy a property that one c
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft. Duplication measured directly at b0108f13 rather than cited.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, findings B3 and B4. B3 measured `merge()`'s dedup
+  as a basename-marker substring test, so rev-1's "call-site change, not a new capability" was
+  inverted and its AC2 was unsatisfiable on any wired tree; S1 is corrected, S1b adds the missing
+  capability and AC7 observes it. B4 corrected AC5's untracked `.claude/hooks/agent-cap.test.sh`
+  to the tracked `tools/hooks/agent-cap.test.sh`. §10 corrected: the seam is not already sufficient.
 
 ## 10. Reuse audit
 
-The seam is `tools/settings-merge.py`'s existing `hook_path` parameter — `reuse_lookup.py` reports
+The seam is `tools/settings-merge.py`'s `hook_path` parameter, which is parameterised for the
+FIRST write and NOT for a repath — the dedup branch above it decides that, and S1b builds what is
+missing. The seam is — `reuse_lookup.py` reports
 the `agent-cap` affordance seam covering install and prefix concerns, and `merge(obj, hook_path,
 frag)` at `tools/settings-merge.py:91` is the exact extension point, already parameterised and
 already exercised by `--hook-path`. No new mechanism is built; a default is stopped from being a

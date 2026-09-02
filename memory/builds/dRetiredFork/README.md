@@ -27,14 +27,15 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
 - `govkit update --write` becomes the whole update at both adopters, because nothing is left for a
   person to merge.
 - Fourteen path forks reconcile automatically, and the literals that generate them stop shipping.
-- gov gains nine fixes it does not have today, each found by a tree that could not send it back.
+- gov gains eight fixes it does not have today, each found by a tree that could not send it back.
 - Two of NicoCares' 41 gate legs exist only to police the freeze and can retire.
 
 ## Detriments if this is not built
 
 - The fork surface grows at gov's own commit rate, a median 29 commits a day on the deployable
   surface, so each release manufactures carve-outs faster than any adopter drains them.
-- Eight known gov defects stay live in gov and in every future adopter.
+- Seven known gov defects stay live in gov and in every future adopter, and an eighth claim stays
+  unreconciled against a shipped fixture that contradicts it.
 - inCMS stays un-updatable by any command, its receipt refusing before it classifies a row.
 
 ## Build-level rules
@@ -56,6 +57,8 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
 - **The authoring rule does not land in the charter template.** Measured 2026-09-02: 48867 of 49152
   bytes, 285 free, already WARN past its recorded high-water. It lands in `tools/hooks/README.md`
   and `AGENTS.md`.
+- **Never absorb an adopter's fix without reproducing it at HEAD first.** Spec-audit round 1 was
+  BLOCKED on six findings; one measured a unit's whole premise inverted. All six are folded at rev-2.
 
 ## Parked decisions
 
@@ -86,7 +89,7 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
 | 1 | `TOOL-dRetiredFork-1` | 1 | memory-tree arms `pop_guard` on check 6, as it already does on eight siblings |
 | 1 | `TOOL-dRetiredFork-2` | 1 | the git-environment leak, one defect at two legs, stops reaching a subprocess |
 | 1 | `TOOL-dRetiredFork-3` | 2 | a build README header that is present and unparseable stops reading as absent |
-| 1 | `TOOL-dRetiredFork-4` | 2 | the agent-cap nested-loop fail-open closes |
+| 1 | `TOOL-dRetiredFork-4` | 1 | an adopter's fail-open claim is reconciled against a fixture that contradicts it |
 | 1 | `TOOL-dRetiredFork-5` | 1 | four codebase-map selftest arms stop printing "NOT a pass" and being stamped ok |
 | 1 | `TOOL-dRetiredFork-6` | 2 | the drift-audit note is DERIVED from its counters instead of hand-written |
 | 1 | `TOOL-dRetiredFork-7` | 2 | the review join gains the dead-agent-wave arity arm |
@@ -131,7 +134,7 @@ ids TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFo
 | [TOOL-dRetiredFork-1 — memory-tree arms `pop_guard` on check 6](spec/2026-09-02-spec-TOOL-dRetiredFork-1.md) | 1 | 1 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-2 — the git-environment leak, one defect at two legs](spec/2026-09-02-spec-TOOL-dRetiredFork-2.md) | 1 | 1 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-3 — a present-but-unparseable build README header stops reading as absent](spec/2026-09-02-spec-TOOL-dRetiredFork-3.md) | 1 | 2 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-4 — the agent-cap nested-loop fail-open closes](spec/2026-09-02-spec-TOOL-dRetiredFork-4.md) | 1 | 2 | OPEN | rev-1 | 2026-09-02 |
+| [TOOL-dRetiredFork-4 — reconcile inCMS's agent-cap fail-open claim against HEAD](spec/2026-09-02-spec-TOOL-dRetiredFork-4.md) | 1 | 1 | OPEN | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-5 — four codebase-map selftest arms stop being stamped ok](spec/2026-09-02-spec-TOOL-dRetiredFork-5.md) | 1 | 1 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-6 — the drift-audit note is DERIVED from its counters](spec/2026-09-02-spec-TOOL-dRetiredFork-6.md) | 1 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm](spec/2026-09-02-spec-TOOL-dRetiredFork-7.md) | 1 | 2 | OPEN | rev-1 | 2026-09-02 |
@@ -142,25 +145,23 @@ ids TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFo
 | [TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix](spec/2026-09-02-spec-TOOL-dRetiredFork-11.md) | 2 | 1 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`](spec/2026-09-02-spec-TOOL-dRetiredFork-12.md) | 2 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface](spec/2026-09-02-spec-TOOL-dRetiredFork-13.md) | 3 | 1 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two](spec/2026-09-02-spec-TOOL-dRetiredFork-14.md) | 4 | 2 | OPEN | rev-1 | 2026-09-02 |
+| [TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two](spec/2026-09-02-spec-TOOL-dRetiredFork-14.md) | 4 | 2 | OPEN | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys](spec/2026-09-02-spec-TOOL-dRetiredFork-15.md) | 5 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine](spec/2026-09-02-spec-TOOL-dRetiredFork-16.md) | 5 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations](spec/2026-09-02-spec-DEPL-dRetiredFork-1.md) | 6 | 2 | OPEN | rev-1 | 2026-09-02 |
-| [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | OPEN | rev-1 | 2026-09-02 |
+| [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | OPEN | rev-2 | 2026-09-02 |
 | [DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin](spec/2026-09-02-spec-DEPL-dRetiredFork-4.md) | 6 | 1 | OPEN | rev-1 | 2026-09-02 |
 | [DEPL-dRetiredFork-5 — `check` runs the `[[outcome]]` probe instead of grading an exit code](spec/2026-09-02-spec-DEPL-dRetiredFork-5.md) | 6 | 1 | OPEN | rev-1 | 2026-09-02 |
-| [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | OPEN | rev-1 | 2026-09-02 |
+| [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | OPEN | rev-2 | 2026-09-02 |
 | [DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's](spec/2026-09-02-spec-DEPL-dRetiredFork-6.md) | 8 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-1 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14
-TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13
-TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

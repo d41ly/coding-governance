@@ -1,10 +1,12 @@
 # DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 
 <!-- /gen:spec-records -->
 
@@ -37,7 +39,8 @@ red. This is the difference between "the bytes arrived" and "the update ran".
   the surviving hook copy BEFORE the second copy is withdrawn, enforced by the engine rather than by
   a runbook sentence.
 - **S6** — Arms for each: a rendered row re-rendered; a version bump triggering its declared
-  generator; a role change surviving a round trip; a failed render rolling back.
+  generator; a role change surviving a round trip; a failed render rolling back; and a target
+  whose wired command still names the copy S5 would withdraw.
 
 ## 3. Non-goals (OUT)
 
@@ -109,12 +112,20 @@ must remember is not a mechanism.
 - **AC6** — When the feature flag is off, the run's output is byte-identical to the pre-change run. Compared across `python tools/govkit/govkit.py update --target <fixture>` runs.
 - **AC7** — A read-only run against `C:/projects/nicocares/main` names all eight rendered
   destinations and the generators each would owe.
+- **AC9** — When a target's settings still name the withdrawn hook copy, `python
+  tools/govkit/govkit.py update --target <fixture> --write` REFUSES the withdrawal naming the
+  unwired window. This is S5, the constraint `TOOL-dRetiredFork-14` §4 delegates here and its §5
+  calls the highest risk in the build; rev-1 carried it in scope and observed it nowhere.
+- **AC10** — THE BUILD'S DONE-CONDITION, and the only criterion in the set that observes it. With
+  the re-render flag ON, `python tools/govkit/govkit.py update --target C:/projects/nicocares/main
+  --write` lands every stale row, re-renders every rendered row, runs every declared generator,
+  re-stamps `gov_commit`, and the tree afterwards needs no hand merge — recorded in the acceptance
+  ledger. Repeated for `C:/projects/incms/main` once its receipt is repaired.
 - **AC8** — `python tools/govkit/selftest.py` and `selfcheck` exit `0`.
 
 ## 7. Gates
 
-`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` ·
-`runbook parity`.
+`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join`.
 
 ## 8. Open questions
 
@@ -133,6 +144,12 @@ must remember is not a mechanism.
 
 - rev-1 · 2026-09-02 · initial draft. `UPDATE_ROLE`, the report cap and the absence of any
   `[adopt].argv` spawn inside `update` were read at `b0108f13`.
+- rev-2 · 2026-09-02 · folded spec-audit round 1, findings B1 and B6. B6: S5 — the ordering
+  constraint `TOOL-dRetiredFork-14` delegates here and calls the build's highest risk — appeared in
+  no acceptance criterion and no S6 arm, so it could ship unbuilt while both units passed their DoD.
+  AC9 and a sixth arm now observe it. B1: every `--write` criterion in the whole 25-spec set targeted
+  a fixture and every adopter-facing one was read-only, so the union could not imply the README's
+  done-condition. AC10 is that observation, and this unit owns it.
 
 ## 10. Reuse audit
 
