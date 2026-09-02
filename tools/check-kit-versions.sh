@@ -24,6 +24,21 @@ need "KIT_AGENT_CAP_VERSION"      tools/hooks/agent-cap.js                  "KIT
 need "tier2-review meta.version"  tools/workflows/tier2-review.js           "version: '$V'"
 need "KIT_MANIFEST_VERSION"       skills/session-kickoff/manifest-check.sh  "^KIT_MANIFEST_VERSION=\"$V\""
 
+# tier2-review.js carries THREE version tokens on one line: `meta.version`, a `gov:kit tier2-review@`
+# marker and a `gov:kit review-harness@` marker — BOTH ids, because the file ships under two kit
+# names. Only the first was paired. Found by TOOL-dRetiredFork-7's AC5, which required the gate to go
+# RED with the marker reverted rather than accepting a bare post-bump green: reverting
+# `review-harness@` alone left this gate at exit 0, so that carrier could drift a whole release
+# without anything noticing. An unpaired version marker is not a version carrier; it is a comment.
+for id in tier2-review review-harness; do
+  mk=$(grep -oE "gov:kit $id@$V" tools/workflows/tier2-review.js | head -1 | grep -oE "$V")
+  tv=$(grep -oE "version: '$V'" tools/workflows/tier2-review.js | head -1 | grep -oE "$V")
+  if [ -z "$mk" ] || [ "$mk" != "$tv" ]; then
+    echo "kit-versions: tier2-review.js gov:kit $id@ marker (${mk:-unreadable}) != its meta.version (${tv:-unreadable})"
+    fails=$((fails+1))
+  fi
+done
+
 # The kickoff manifest format: the constant in the checker, and the marker in the SEED an adopter
 # instantiates from. Nothing forced these to agree before — this file had no entry for the constant
 # and the verdict-epoch gate is hardcoded to the memory-tree engine — so the checker could demand a

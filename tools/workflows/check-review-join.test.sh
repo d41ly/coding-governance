@@ -204,6 +204,66 @@ cp "$GATE" "$N/gate.sh"
 arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
   bash -c 'cd "$1" && bash ./gate.sh' _ "$N"
 
+# ---- ARM 2: the agent wave that silently drops itself (TOOL-dRetiredFork-7) ----------------------
+# Absorbed from inCMS, REDUCED: its arms keyed on that repo's own record ids are left behind, because
+# an arm keyed on a foreign corpus reds on absence rather than on behaviour.
+#
+# Each fixture is a whole scratch TREE, not a lone file, because arm 2's population and its liveness
+# refusal are both properties of the scan, and an explicit file list bypasses the refusal by design.
+a2tree() {  # $1 = dir · $2 = harness body
+  mkdir -p "$1/tools/workflows" "$1/tools/hooks"
+  cp "$ROOT/tools/hooks/agent-cap.js" "$1/tools/hooks/agent-cap.js"
+  printf '%s\n' "$2" > "$1/tools/workflows/h.js"
+  ( cd "$1" && git init -q . && git config user.email t@t.test && git config user.name t \
+    && git add -A && git commit -q -m f --no-verify ) >/dev/null 2>&1
+}
+
+A2=$(mktemp -d)
+a2tree "$A2/nocount" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+const live = raw.filter(Boolean)
+return { note: "clean: 0 findings", findings: live }'
+arm 'arm 2: a falsy-dropped wave with NO arity counter is caught' 'never counts them' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/nocount" "$ROOT/$GATE"
+
+# THE FALSY DROP IS A FAMILY, not a spelling. `.filter((r) => r)` walked past the first version of
+# this arm upstream, so it is fixtured here rather than trusted.
+a2tree "$A2/arrow" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+const live = raw.filter((r) => r)
+return { note: "clean", findings: live }'
+arm 'arm 2: the arrow spelling of the falsy drop is judged too' 'never counts them' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/arrow" "$ROOT/$GATE"
+
+# THE COUNTER NAME IS CAPTURED, NEVER MATCHED. A correct harness whose counter is spelled
+# `deadLenses` rather than `lensesDead` went RED upstream; that regression is fixtured.
+a2tree "$A2/named" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+const live = raw.filter(Boolean)
+const deadLenses = LENSES.length - live.length
+if (deadLenses) log("dead " + deadLenses)
+return { note: deadLenses ? "PARTIAL" : "clean", dead: deadLenses }'
+arm 'arm 2: an oddly-named counter that IS read passes' 'clean — no ref-keyed' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/named" "$ROOT/$GATE"
+
+# A COUNT COMPUTED AND NEVER CONSULTED is the same silent pass wearing a number.
+a2tree "$A2/unread" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+const live = raw.filter(Boolean)
+const lensesDead = LENSES.length - live.length
+return { note: "clean: 0 findings", findings: live }'
+arm 'arm 2: a counter computed and never read is caught' 'never reads the count' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/unread" "$ROOT/$GATE"
+
+# S3's LIVENESS REFUSAL: a scanned population that judges NOTHING is not a pass.
+a2tree "$A2/vacuous" 'const LENSES = ["a","b","c"]
+const raw = await Promise.all(LENSES.map((l) => agent(l)))
+log(raw.length)'
+arm 'arm 2: agents dispatched but nothing judged REFUSES' 'judged NONE of them' \
+  bash -c 'cd "$1" && bash "$2"' _ "$A2/vacuous" "$ROOT/$GATE"
+
+rm -rf "$A2"
+
 # ---- verdict, LAST -------------------------------------------------------------------------------
 if [ "$fails" = 0 ]; then echo "PASS — review-join + workflow-syntax gates: all arms held"; exit 0; fi
 echo "FAIL — $fails arm(s) failed"
