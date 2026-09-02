@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 92c595fe21857ab829edda61c105bdb77c3dec81
-phase: SPECCING
+witness: e8dd66dc8d0c5369e8d33c1aa0e70d63953324d6
+phase: BUILDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 534edee2
@@ -26,3 +26,5 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-02T17:59:28Z dispatch · item 21ad9bb3 DEPL-dRetiredFork-8 · reason memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-6.md memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-8.md memory/builds/dRetiredFork/README.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-02T17:59:34Z brief · item DEPL-dRetiredFork-8 · reason 6bf87236ad4a memory/builds/dRetiredFork/prompts/2026-09-02-prompt-DEPL-dRetiredFork-8-1-build-brief.md
+
+2026-09-02T18:04:48Z brief · item DEPL-dRetiredFork-8 · reason 7eb94309086d memory/builds/dRetiredFork/prompts/2026-09-02-prompt-DEPL-dRetiredFork-8-1-build-brief.md
