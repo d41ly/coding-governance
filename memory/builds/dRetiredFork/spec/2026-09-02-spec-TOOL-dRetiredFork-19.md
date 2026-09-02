@@ -1,11 +1,13 @@
 # TOOL-dRetiredFork-19 — a declared placeholder must be one its own adopter substitutes
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0 · ratified 2026-09-02
+**Status:** CLOSED · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-02-build-TOOL-dRetiredFork-19-1-prewiring-run.md](../build/2026-09-02-build-TOOL-dRetiredFork-19-1-prewiring-run.md) | journal | — |
+| [2026-09-02-prompt-TOOL-dRetiredFork-19-1-build-brief.md](../prompts/2026-09-02-prompt-TOOL-dRetiredFork-19-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->

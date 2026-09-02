@@ -32,3 +32,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-02T18:06:37Z brief · item DEPL-dRetiredFork-9 · reason d7197204f049 memory/builds/dRetiredFork/prompts/2026-09-02-prompt-DEPL-dRetiredFork-9-1-build-brief.md
 
 2026-09-02T18:06:42Z dispatch · item b9fcc024 DEPL-dRetiredFork-9 · reason memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-3.md memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-1.md memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-9.md memory/builds/dRetiredFork/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-02T18:16:06Z brief · item TOOL-dRetiredFork-19 · reason 4668ae574d60 memory/builds/dRetiredFork/prompts/2026-09-02-prompt-TOOL-dRetiredFork-19-1-build-brief.md
+
+2026-09-02T18:16:14Z dispatch · item 27a8e806 TOOL-dRetiredFork-19 · reason tools/check-kit-placeholders.py tools/check-kit-placeholders.test.sh tools/gate-legs.json memory/project/testsuite-count-waivers.txt tools/unattended/kit.toml tools/govkit/registry.toml memory/map/features/kit-placeholders.md memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/symbols.json WIRE-INTO-PROJECT.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-12.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-19.md memory/builds/dRetiredFork/README.md memory/LIVE.md memory/ledger/2026-09.md

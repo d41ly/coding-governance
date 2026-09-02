@@ -141,6 +141,12 @@ sanctioned change, and its facts-over-wit rules are not adjustable at all.
 survived. Those are two questions, and a conf that declares nothing for a key renders a region that
 is perfectly in sync and still tells the agent to invoke a placeholder's name.
 
+**Authoring a kit: a `placeholders` list may only name tokens that kit's OWN adopter substitutes.**
+Declaring one the adopter never computes ships an unresolved `{{TOKEN}}` brace into every adopter's
+committed tree, and they can only fix it by forking the descriptor. `python
+tools/check-kit-placeholders.py` is the join and reds on it; a kit that legitimately has no adopter
+says so with `why_no_adopter` in its `[adopt]` block.
+
 <!-- govkit:entry memory-tree -->
 ## 3 — Adopt the memory-tree kit (if chosen in §0)
 

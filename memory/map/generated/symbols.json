@@ -428,6 +428,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "build_report",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.py"
+    },
+    {
       "id": "build_spec_record_index",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1178,6 +1183,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "extract_declared",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.py"
+    },
+    {
       "id": "extract_plan_writes",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -1523,6 +1533,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "load_descriptor",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.py"
+    },
+    {
       "id": "load_dossier_texts",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -1566,6 +1581,11 @@
       "id": "log_path",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.py"
     },
     {
       "id": "main",
@@ -2103,6 +2123,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_bytes_as_text",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.py"
+    },
+    {
       "id": "read_conf",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -2483,6 +2508,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolve_adopter",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.py"
+    },
+    {
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -2541,6 +2571,11 @@
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "resolve_root",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.py"
     },
     {
       "id": "resolve_root",
@@ -2831,6 +2866,11 @@
       "id": "scan_slot_budget",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_substituted",
+      "kind": "function",
+      "file": "tools/check-kit-placeholders.py"
     },
     {
       "id": "scan_unarmed_slots",

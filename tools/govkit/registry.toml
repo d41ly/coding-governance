@@ -191,6 +191,20 @@ path = "tools/check-spec-tokens.test.sh"
 why = "the red/green self-test for the above, which is itself an exemption. Exemptions are exact-path, so the gate's row does not cover its sibling."
 
 [[exempt]]
+path = "tools/check-kit-placeholders.py"
+why = """
+grades a kit-AUTHORING invariant, and an adopter does not author kit descriptors — they receive
+them copy-installed. The join is declared-placeholders subset-of substituted-by-that-kit's-own-adopter,
+so the defect it catches is one gov ships; catching it in the adopter's tree is one release too
+late, and the adopter cannot fix it there without forking the descriptor. That is the fork class
+this whole build exists to stop manufacturing. Prescribed for copy nowhere in the runbook.
+"""
+
+[[exempt]]
+path = "tools/check-kit-placeholders.test.sh"
+why = "the red/green self-test for the above, which is itself an exemption. Exemptions are exact-path, so the gate's row does not cover its sibling."
+
+[[exempt]]
 path = "tools/check-dead-paths.sh"
 why = """
 gates gov's OWN corpus against gov's OWN deletion history. The needle set is derived from `git log --diff-filter=D` over this repo, and the anti-vacuity guard is a FROZEN SENTINEL naming a basename this repo deleted at 5b00666 — in a target tree that name was never present, so the sentinel could not resolve and the leg would red on install day. That is the exact defect the closing review filed against three other new gates; shipping this one would repeat it. An adopter who wants the class authors their own sentinel from their own deletion history.
@@ -374,3 +388,13 @@ name = "playbook parity selftest"
 why = """
 gov's own red/green proof of the parity gate above; same reason.
 """
+
+[[exempt_leg]]
+name = "kit placeholders (a declared token its adopter substitutes)"
+why = """
+grades a kit-AUTHORING invariant over gov's own tools/*/kit.toml and the adopter script each one names. An adopter RECEIVES descriptors copy-installed and does not author them, so the defect this catches — a declared placeholder its own adopter never substitutes, which ships an unresolved brace — is one gov emits and gov must catch. Catching it downstream is one release too late, and the adopter could only fix it by forking the descriptor, which is the fork class this build exists to stop manufacturing. The gate script is itself a registry exemption for the same reason.
+"""
+
+[[exempt_leg]]
+name = "kit-placeholders self-test"
+why = "the red/green arms for the leg above, gov-only for the same reason. Its fixtures build their own scratch trees and assert against gov's own predicate, so in an adopter tree they would grade a program that is not there."

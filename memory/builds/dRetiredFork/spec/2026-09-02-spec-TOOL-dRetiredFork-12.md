@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
+**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -52,8 +52,11 @@ blocked `TOOL-aGradedDoorway-2` from finishing `check-playbook.test.sh`. inCMS c
 
 ### Data model
 
-Two tokens only, `KIT_DIR` and `TOOL_ROOT`, matching the pair the memory-tree kit's three rendered
-templates already declare. No new token alphabet.
+ONE token, `KIT_DIR`. `TOOL_ROOT` is NOT declared here and must not be: it is computed only by
+`tools/memory-tree/adopt-memory-tree.sh`, and `tools/unattended/adopt-unattended.sh` never
+computes it, so declaring it would ship an unresolved `{{TOOL_ROOT}}` brace to every adopter.
+This section is the one a builder implements from, which is why the correction had to reach it
+and not only S1. No new token alphabet.
 
 ### Migration
 
@@ -83,7 +86,7 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
   required before landing.
 - testing + left-shift gates — S3's parity arm plus `check-playbook.sh` at two prefixes.
 - migration / rollback — reverting the role is a descriptor edit plus restoring the literals.
-- user docs — `tools/unattended/README.md` names the fixture as rendered and its two tokens.
+- user docs — `tools/unattended/README.md` names the fixture as rendered and its ONE token.
 
 ## 6. Acceptance criteria
 
@@ -127,13 +130,21 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
   `adopt-unattended.sh` substitutes seven tokens, not one — inside the sentence carrying H12's whole
   measurement, though its conclusion about `TOOL_ROOT` survives. 24: §7 named a leg no scope item
   touches and omitted `playbook validity gate`, which grades the fixture this unit retags.
+- rev-4 · 2026-09-02 · `TOOL-dRetiredFork-19` finishes the H12 correction. S1 was fixed to
+  `["KIT_DIR"]` in an earlier fold, but §4 Data model still read "Two tokens only", §10 still
+  asserted the pair, and §5's user-docs row still said "its two tokens" — and §4 is the section a
+  builder implements from, so following this spec still shipped the brace. All three now agree
+  with S1, and the gate that makes the class unbuildable is that unit's.
 
 ## 10. Reuse audit
 
 The seam is the memory-tree kit's three `role = "rendered"` rules in `tools/memory-tree/kit.toml`,
-which already declare the exact `["KIT_DIR", "TOOL_ROOT"]` placeholder pair this unit adopts —
-`reuse_lookup.py` reports `render-doc` and the rendered-template family as the corpus's existing
-answer, so this extends a live pattern rather than inventing a channel.
+cited as a SHAPE precedent and not as a token list: they declare `["KIT_DIR", "TOOL_ROOT"]`
+because their own adopter computes both, while this kit's adopter substitutes a NARROWER set and
+this unit therefore declares `["KIT_DIR"]` alone. `reuse_lookup.py` reports `render-doc` and the
+rendered-template family as the corpus's existing answer, so this extends a live pattern rather
+than inventing a channel. `TOOL-dRetiredFork-19` gates the declared-subset-of-substituted join
+that makes a mismatch unbuildable.
 
 Recall terms used: `playbook.fixture`, `rendered`, `engine`, `placeholder`, `KIT_DIR`, `TOOL_ROOT`,
 `prefix`, `check-playbook`, `adopter`, `receipt`, `role`, `carried`.

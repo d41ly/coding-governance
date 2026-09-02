@@ -703,7 +703,7 @@
    "bash",
    "tools/unattended/check-unattended.sh"
   ],
-  "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint \u2014 the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
+  "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
   "chunk": "declarations",
   "subject": "repo",
   "ceiling": 16040
@@ -1108,10 +1108,33 @@
   "ceiling": 60
  },
  {
+  "name": "kit placeholders (a declared token its adopter substitutes)",
+  "argv": [
+   "python",
+   "tools/check-kit-placeholders.py"
+  ],
+  "chunk": "declarations",
+  "subject": "repo",
+  "ceiling": 60
+ },
+ {
   "name": "spec-tokens self-test",
   "argv": [
    "bash",
    "tools/check-spec-tokens.test.sh"
+  ],
+  "guard": [
+   "tools/"
+  ],
+  "chunk": "selftests",
+  "subject": "kit",
+  "ceiling": 120
+ },
+ {
+  "name": "kit-placeholders self-test",
+  "argv": [
+   "bash",
+   "tools/check-kit-placeholders.test.sh"
   ],
   "guard": [
    "tools/"

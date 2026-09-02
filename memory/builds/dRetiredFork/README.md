@@ -147,7 +147,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22
 | [DEPL-dRetiredFork-8 — the falsification set stops counting a unit that absorbs nothing](spec/2026-09-02-spec-DEPL-dRetiredFork-8.md) | 0 | 1 | CLOSED | rev-3 | 2026-09-02 |
 | [DEPL-dRetiredFork-9 — the done-condition names the escape it depends on](spec/2026-09-02-spec-DEPL-dRetiredFork-9.md) | 0 | 2 | CLOSED | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-18 — the gap lines use the wrap helper written for them](spec/2026-09-02-spec-TOOL-dRetiredFork-18.md) | 0 | 1 | CLOSED | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-19 — a declared placeholder must be one its own adopter substitutes](spec/2026-09-02-spec-TOOL-dRetiredFork-19.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
+| [TOOL-dRetiredFork-19 — a declared placeholder must be one its own adopter substitutes](spec/2026-09-02-spec-TOOL-dRetiredFork-19.md) | 0 | 2 | CLOSED | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-20 — a spec lint resolves a spec's own machine-facing tokens](spec/2026-09-02-spec-TOOL-dRetiredFork-20.md) | 0 | 2 | CLOSED | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-1 — memory-tree arms `pop_guard` on check 6](spec/2026-09-02-spec-TOOL-dRetiredFork-1.md) | 1 | 1 | OPEN | rev-3 | 2026-09-02 |
 | [TOOL-dRetiredFork-2 — the git-environment leak, one defect at two legs](spec/2026-09-02-spec-TOOL-dRetiredFork-2.md) | 1 | 1 | OPEN | rev-2 | 2026-09-02 |
@@ -161,7 +161,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22
 | [DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract](spec/2026-09-02-spec-DEPL-dRetiredFork-7.md) | 2 | 2 | OPEN | rev-3 | 2026-09-02 |
 | [TOOL-dRetiredFork-10 — three workflows gates anchor their locator and population on a basename](spec/2026-09-02-spec-TOOL-dRetiredFork-10.md) | 2 | 2 | OPEN | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix](spec/2026-09-02-spec-TOOL-dRetiredFork-11.md) | 2 | 1 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`](spec/2026-09-02-spec-TOOL-dRetiredFork-12.md) | 2 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`](spec/2026-09-02-spec-TOOL-dRetiredFork-12.md) | 2 | 2 | OPEN | rev-4 | 2026-09-02 |
 | [TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface](spec/2026-09-02-spec-TOOL-dRetiredFork-13.md) | 3 | 1 | OPEN | rev-4 | 2026-09-02 |
 | [TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two](spec/2026-09-02-spec-TOOL-dRetiredFork-14.md) | 4 | 2 | OPEN | rev-3 | 2026-09-02 |
 | [TOOL-dRetiredFork-21 — the two hooks whose path comes from a fragment, not from the default](spec/2026-09-02-spec-TOOL-dRetiredFork-21.md) | 4 | 2 | OPEN | rev-1 | 2026-09-02 |
@@ -176,7 +176,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 9 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
