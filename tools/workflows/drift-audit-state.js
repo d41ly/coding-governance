@@ -33,7 +33,7 @@ const CAP = 5
 // AGENTS.md section 7 names.
 //
 // THE SENTENCE IS NOW A CONTRACT (ratified F1). Changing it is a version bump like any other, and
-// `tools/drift-audit/README.md` states the three states so a later editor knows the cost.
+// the drift-audit kit's own README states the three states so a later editor knows the cost.
 function deriveLiveness(c) {
   // Order matters and is the fail-closed direction: the WORST state is decided first, so a run that
   // is both dead and partial reports dead.
