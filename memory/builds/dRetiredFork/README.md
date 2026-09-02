@@ -170,11 +170,11 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
-Ids no record names: DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
