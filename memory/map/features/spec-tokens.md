@@ -29,9 +29,10 @@ globs = [
 ## Constraints & why
 
 Three spec-audit rounds over one build found the same class by hand every time: a section 7 gate
-name that is not a leg (18 of 36 in one set), a section 6 criterion whose witness path is not
-tracked, and a `path:line` citation four lines short. Each is a JOIN over two tracked files, so
-hand-verifying them was paying a reviewer to do what a checker does.
+name that is not a leg, a section 6 criterion whose witness path is not tracked, and a `path:line`
+citation past the end of its file. Each is a JOIN over two tracked files, so hand-verifying them was
+paying a reviewer to do what a checker does. The checker's own header carries the measurements that
+sized each arm, pinned to the sha they were taken at; they are not restated here.
 
 **It resolves EXISTENCE and RANGE, and nothing else.** It does not read the cited line, so a
 citation naming a real line that argues the opposite passes. It grades no prose, scope, acceptance
@@ -39,13 +40,13 @@ or tier. That limit is in the checker's own header because a structural check re
 one to everybody who did not write it.
 
 **The three joins have three populations, and conflating them was the defect rev-2 folded.** Legs
-are graded only on a section 7 line that IS the list — treating every backticked token there as a
-leg name produced 270 hits, 271 of them from prose in a single spec. Paths are graded only where
-path-shaped, a slash AND an extension or an exact tracked path, because a bare word is prose.
-Citations are SCOPED to a tracked path: at `b0108f13`, 453 specs carried 1721 citations and 854
-named an untracked path, because the house style cites a kit file by basename. Redding those is 854
-dispositions and the lint never lands; passing them silently is a could-not-fail arm over half the
-corpus. So they are skipped AND COUNTED, and the count prints on every run.
+are graded only on a section 7 line that IS the list, because treating every backticked token there
+as a leg name drowns in prose. Paths are graded only where path-shaped, a slash AND an extension or
+an exact tracked path, because a bare word is prose. Citations are SCOPED to a tracked path, because
+the house style cites a kit file by basename and most citations therefore name nothing `git ls-files`
+holds. Redding those is a disposition per row and the lint never lands; passing them silently is a
+could-not-fail arm over much of the corpus. So they are skipped AND COUNTED, and the count prints on
+every run.
 
 **Terminal specs are outside the population by construction.** This repo cites a landed decision
 verbatim and never rewrites one, so grading a CLOSED spec would demand editing a frozen record to
@@ -84,9 +85,9 @@ shape, never a waiver row, because a shape generalises to specs nobody has writt
 
 ## Gaps
 
-- **The citation arm covers less than half its corpus.** 854 of 1721 citations name an untracked
-  path and are skipped. Draining that means changing the house style for kit-file citations, which
-  nothing schedules.
+- **The citation arm skips most of its corpus.** The majority of citations name an untracked path
+  and are skipped; the run prints how many. Draining that means changing the house style for
+  kit-file citations, which nothing schedules.
 - **A leg name inside section 7 PROSE is not graded.** The list-line predicate is what makes the arm
   affordable, and it is also the hole: a spec that names a dead leg in a sentence passes.
 - **Existence is not agreement.** The three joins prove a name resolves; no arm reads what it
