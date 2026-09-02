@@ -770,12 +770,20 @@ def render_region(build: dict) -> str:
     own = [u["id"] for u in build["units"]]
     gap = [i for i in own if i not in named]
     agap = [i for i in own if i not in audited]
-    out += ["", f"Ids no record names: {' '.join(gap) if gap else 'none — every unit id is named by a record'}."]
+    # WRAPPED, through the helper written for these two lines (TOOL-dRetiredFork-18). Both are
+    # graded by check 7 against the AUTHORED-prose entry cap, and both grow with every unit a build
+    # carries, so an unwrapped list makes a build's unit COUNT the bound — 24 units rendered 509 and
+    # 531 characters against 350. `_render_wrapped_ids` was written for exactly this and carried
+    # selftest arms while nothing called it; arms that grade a helper in isolation cannot see that.
+    # The `none` branches stay UNWRAPPED and unchanged: the helper appends its own terminator and
+    # would render `Ids no record names.`, a different sentence, for the commonest case of all.
+    out += [""] + (_render_wrapped_ids("Ids no record names:", gap) if gap else
+                   ["Ids no record names: none — every unit id is named by a record."])
     # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit record names
     # EVER — a spec audited at rev-1 and since bumped does not appear here. An "unreviewed" label
     # would be a coverage claim the data cannot support.
-    out += ["", f"Ids no `spec-audit` record has ever named: "
-                f"{' '.join(agap) if agap else 'none — every unit id has one'}."]
+    out += [""] + (_render_wrapped_ids("Ids no `spec-audit` record has ever named:", agap) if agap
+                   else ["Ids no `spec-audit` record has ever named: none — every unit id has one."])
     out.append(MARK_CLOSE)
     return "\n".join(out)
 
@@ -2473,6 +2481,48 @@ def cmd_selftest() -> int:
         arm("a build with NO records renders no table, and BOTH joins saying none", "True",
             lambda: str("| Record | Kind | Serves |" not in
                         plan(t15, conf15)[0]["memory/builds/tOne/README.md"]))
+        # TOOL-dRetiredFork-18. This arm grades the EMISSION, which is the gap the two arms on
+        # `_render_wrapped_ids` could not see: that helper passed in isolation for as long as
+        # nothing called it, while a 24-unit build rendered 509- and 531-character gap lines. The
+        # subject is therefore the rendered README's widest line, not the helper's return.
+        t16 = os.path.join(base, "wide"); os.makedirs(t16)
+        conf16 = _fixture(t16)
+        d16 = os.path.join(t16, "memory/builds/tOne/spec")
+        for n in range(2, 62):
+            write_text(os.path.join(d16, "2026-08-01-spec-tOne-%d.md" % n),
+                       "# ARCH-tOne-%d — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-08-01 · "
+                       "node a · Tier-2 · base 0123abcd\n" % n)
+        run("git", "add", "-A", cwd=t16)
+        # SCOPED to the gap PARAGRAPHS, and both scopings were mistakes this arm made first.
+        # A draft measured the widest line in the whole render and failed on the front-matter
+        # `ids:` line at 398 characters, which check 7 does not grade — an arm whose population is
+        # wider than the rule it grades reports a defect nobody owes. A second draft counted lines
+        # beginning `Ids no `, which counts PARAGRAPH HEADS: a wrapped continuation carries ids and
+        # no prefix, so a working wrap scored 2 and read as no wrap at all.
+        def _gap_para(head):
+            body = plan(t16, conf16)[0]["memory/builds/tOne/README.md"].split("\n")
+            i = next((n for n, x in enumerate(body) if x.startswith(head)), None)
+            if i is None:
+                return []
+            out = [body[i]]
+            for x in body[i + 1:]:
+                if not x.strip():
+                    break
+                out.append(x)
+            return out
+
+        arm("a 61-unit build's gap paragraph wraps in the RENDER, not only in the helper", "True",
+            lambda: str(max((len(x) for x in _gap_para("Ids no record names:")), default=10 ** 6)
+                        <= IDS_WRAP + 1))
+        # ANTI-VACUITY. Without this the arm above passes on a build whose ids happen to fit, which
+        # is what a 31-unit fixture did: 291 characters, one line, no wrap ever exercised.
+        arm("...and the wrap actually happened, so the arm cannot pass on a short list", "True",
+            lambda: str(len(_gap_para("Ids no record names:")) > 1))
+        arm("the spec-audit gap paragraph wraps too", "True",
+            lambda: str(len(_gap_para("Ids no `spec-audit` record has ever named:")) > 1
+                        and max((len(x) for x in
+                                 _gap_para("Ids no `spec-audit` record has ever named:")),
+                                default=10 ** 6) <= IDS_WRAP + 1))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")

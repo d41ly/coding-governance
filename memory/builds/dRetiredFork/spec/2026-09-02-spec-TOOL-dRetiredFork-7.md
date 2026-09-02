@@ -1,0 +1,109 @@
+# TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm
+
+**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
+
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+Absorb ARM 2 from inCMS's `scripts/workflows/check-review-join.sh`, which its own registry row
+declares as a population repath and which is in fact `+117` residual code lines carrying an entire
+second arm plus `isfalsy` and `falsydrop` helpers, armed by a 550-line suite gov has never reviewed.
+The arm catches a review harness that dispatches a wave of agents which all return falsy, so the
+join silently drops every finding and the run reports a clean bill. Until this lands, that suite is
+550 lines of coverage gov will never see and inCMS re-merges on every pull.
+
+## 2. Scope (IN)
+
+- **S1** — Absorb ARM 2 and its two helpers into `tools/workflows/check-review-join.sh`, keeping
+  gov's message shapes and gov's exit-code contract.
+- **S2** — Absorb the arms that exercise it from inCMS's `check-review-join.test.sh`, reduced to the
+  subset that is not keyed on inCMS record ids. An arm keyed on a foreign corpus reds on absence
+  rather than on behaviour and must not ship.
+- **S3** — A liveness assertion on ARM 2's own population, because an arm that scans nothing reports
+  the same zero as an arm that scanned everything and found nothing.
+- **S4** — Bump the review-harness version and its `gov:kit` markers.
+
+## 3. Non-goals (OUT)
+
+- The population and hook-path halves of that same inCMS row. Those are `TOOL-dRetiredFork-10`, and
+  splitting them is deliberate: one is a behavioural absorption and the other is a path derivation,
+  and a closing diff cannot attribute a finding across both.
+- Re-keying inCMS's remaining suite. What does not travel stays theirs, and `DEPL-dRetiredFork-7`
+  records the residue honestly rather than implying it converged.
+
+## 4. Design
+
+### Inventory
+
+Three things travel: the arm, `isfalsy`, `falsydrop`. Everything else in the `+117` is either the
+population filter (unit 10) or inCMS-corpus-keyed test scaffolding (out of scope).
+
+### Migration
+
+gov gains an arm it does not have, so gov's own bar may go RED on landing if gov's harnesses trip
+it. That is a finding, not a regression: run the candidate predicate over the tree BEFORE wiring,
+print hits and near-misses, and fix whatever it legitimately catches in its own commit.
+
+### Alternatives rejected
+
+Leaving it at the adopter and citing the registry row. That is the status quo, and its cost is
+measured: 550 lines of suite and 117 of arm that re-merge every release, for a defect class gov is
+equally exposed to.
+
+## 5. Production-readiness checklist
+
+- security — N/A directly, though the arm protects the integrity of a review that gates merges.
+- perf / scale — one additional pass over an already-enumerated population.
+- a11y — N/A.
+- i18n — N/A.
+- error / empty / loading states — an empty population REFUSES; that is S3.
+- observability — the arm names the wave and the count it found falsy.
+- risks — landing an arm gov's own harnesses trip. Mitigated by the pre-wiring predicate run, which
+  is a build-level rule here and not optional.
+- testing + left-shift gates — S2's arms, plus the existing `check-review-join.test.sh`.
+- migration / rollback — additive arm; reverting removes it.
+- user docs — `tools/workflows/README.md` gains the arm and what it does NOT check.
+
+## 6. Acceptance criteria
+
+- **AC1** — When a harness dispatches a wave whose agents all return falsy,
+  `bash tools/workflows/check-review-join.sh` exits non-zero naming the wave; the pre-change script
+  exited `0` on the same fixture.
+- **AC2** — When a wave returns a mix of falsy and real findings, the script exits `0`.
+- **AC3** — When ARM 2's population is empty, the script REFUSES rather than passing. Observed via `bash tools/workflows/check-review-join.sh`.
+- **AC4** — When run over gov's own tree, the script's hits and near-misses were printed and
+  reviewed before the arm was wired, and the record names what it caught. Printed by `bash tools/workflows/check-review-join.sh` before wiring.
+- **AC5** — `bash tools/check-kit-versions.sh` exits `0` after the bump.
+
+## 7. Gates
+
+`review join` · `review join self-test` · `workflow syntax` · `kit versions` · `testsuite counts`.
+
+## 8. Open questions
+
+- **F1 — does ARM 2 ride the same exit code as ARM 1, or its own?** Sharing keeps the contract
+  simple; separating lets a consumer distinguish the two failures. Recommendation: share, because
+  the script's contract today is one exit code and widening it is a change every adopter inherits.
+- **F2 — what does gov's own tree do under this arm?** UNRESOLVED until the predicate is run. This
+  is a `FACT-QUESTION` decided by that run, and the liveness assertion in S3 is what lets it produce
+  a negative.
+
+## 9. Revision log
+
+- rev-1 · 2026-09-02 · initial draft, from the inCMS `check-review-join.sh` row classified
+  `genuine-fork` and its dishonest registry declaration.
+
+## 10. Reuse audit
+
+The seam is `tools/workflows/check-review-join.sh` itself, which this unit extends with a second arm
+rather than adding a script beside it — `reuse_lookup.py` reports the review-join predicate as the
+single carrier of this class, and `tools/hooks/agent-cap.js` already owns the ref-keyed-join ban that
+ARM 2 complements rather than duplicates.
+
+Recall terms used: `review-join`, `verdict`, `ref-keyed`, `fan-out`, `skeptic`, `falsy`, `wave`,
+`arity`, `agent-cap`, `harness`, `liveness`, `adopter`, `absorb`.

@@ -1,0 +1,56 @@
+# TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix
+
+**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 2
+
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+`.githooks/pre-push` hardcodes `tools/` at five functional sites and ships VERBATIM to every
+push-main adopter, so the defect ships too. `TOOL-aBoundedCeiling-7` records the consequence:
+forcing predicates 6 and 7 — the diff touches the leg manifest, and the recorded manifest blob
+differs — match NOTHING at any other prefix, so a manifest-wide change lands there scoped against a
+green earned on a different leg set. Green-by-absence, in the hook that decides whether the
+authoritative bar is owed. NicoCares carries the fix as `nc carve-out 14/20`.
+
+## 2. Scope (IN)
+
+- **S1** — Adopt NicoCares' two-line prefix probe, which is layout-agnostic, defaults to `tools` and
+  is correct in gov's tree unchanged.
+- **S2** — All five functional sites read through it: the leg-manifest path, the gate-fingerprint
+  path, and the three remaining spellings.
+- **S3** — A path that resolves to nothing is a REFUSAL, never a non-match. The two are
+  indistinguishable today and that is what makes the failure silent.
+- **S4** — An arm in `.githooks/pre-push.test.sh` running the hook against a fixture installed at a
+  non-`tools` prefix and observing predicates 6 and 7 FIRE, observed RED first.
+- **S5** — Close `TOOL-aBoundedCeiling-7` in `memory/backlog/TOOL.md` in the same commit.
+
+## 3. Non-goals (OUT)
+
+- Reading the prefix from `deploy.toml`. The hook must work in a tree with no receipt, which is
+  swydee's state and every fresh clone's.
+- Any change to what the hook decides. Only where it looks, never whether it forces.
+
+## 6. Acceptance criteria
+
+- **AC1** — When the leg manifest changes in a fixture installed at `scripts/`, the hook's forcing
+  predicate 6 FIRES; the pre-change hook matched nothing and did not force.
+- **AC2** — When the recorded manifest blob differs at that prefix, predicate 7 fires. Observed via `bash .githooks/pre-push.test.sh`.
+- **AC3** — When the prefix resolves to nothing, the hook REFUSES naming the failed resolution. Observed via `bash .githooks/pre-push.test.sh`.
+- **AC4** — In gov's own tree, `bash .githooks/pre-push.test.sh` passes with its arm results
+  byte-identical to the pre-change run.
+- **AC5** — `bash tools/check-install-prefix.sh` reports `.githooks/pre-push` at a lower carried
+  count than its current ratchet row of 2.
+
+## 7. Gates
+
+`push-main self-test` · `install prefix (shipped surface)` · `wiring` · `testsuite counts`.
+
+## 9. Revision log
+
+- rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
+  against gov at b0108f13.

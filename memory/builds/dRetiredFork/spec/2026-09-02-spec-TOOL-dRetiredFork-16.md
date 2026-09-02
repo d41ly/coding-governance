@@ -1,0 +1,115 @@
+# TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine
+
+**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 5
+
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+`nc carve-out 6/20` is an entire NicoCares-authored check — roughly 22 lines plus a two-fixture arm,
+over a live population of 75 build READMEs — living INSIDE `check-memory-hygiene.sh` because there
+was nowhere else to put it. A project with a rule gov does not have currently has exactly one option:
+edit the kit engine and re-merge it on every release. That is the class this build exists to end, and
+no amount of conf keys reaches it, because the project is adding BEHAVIOUR and not a value.
+
+## 2. Scope (IN)
+
+- **S1** — Document the extension point that already exists and was never stated: `govkit.py:4627`
+  computes `owned` from the receipt's `gate_runner.emitted`, and `:4676` REFUSES to overwrite a leg
+  the target wrote, because "overwriting a leg the target wrote silently deletes their own coverage".
+  A project-authored leg in the target's own gate manifest is therefore already safe from `apply`.
+- **S2** — A worked pattern in `tools/memory-tree/README.md` and `WIRE-INTO-PROJECT.md`: a project
+  check is its own script under the project's own tree, sourcing `.memory-tree.conf` for
+  `MEMORY_ROOT` exactly as the kit does, and registered as a leg the project owns.
+- **S3** — Verify S1 by measurement rather than by reading: install a fixture, add a
+  project-authored leg to its manifest, run `govkit apply`, and confirm the leg survives. This is a
+  `FACT-QUESTION` and the observation decides it.
+- **S4** — NicoCares' check 90 is written out as the worked example — `scripts/check-build-readme-comments.sh`
+  — and named in the record, so the pattern ships with a real instance rather than a sketch.
+- **S5** — A named refusal for the thing that must NOT be built: a plugin loader inside the kit
+  engine. Stated in the README so a later session does not add one.
+
+## 3. Non-goals (OUT)
+
+- A hook or plugin mechanism inside `check-memory-hygiene.sh`. A kit engine that loads project code
+  is a kit engine whose behaviour the kit cannot state, and every gate it runs becomes ungradeable.
+- Absorbing check 90 into gov. It is a genuine project rule about a project's own comment
+  convention; gov has no such convention and a check gov cannot fail is a check gov should not carry.
+- Any change to how the gate runner discovers legs. The manifest is already the seam.
+
+## 4. Design
+
+### Migration
+
+Nothing in gov changes behaviourally. The unit's deliverable is a documented, MEASURED contract plus
+one worked example, which is why its risk is low and its value is high: it removes the last reason
+an adopter has to edit an engine at all.
+
+### Alternatives rejected
+
+A `PROJECT_CHECKS` conf key naming scripts the kit invokes. It inverts the ownership — the kit would
+then be responsible for a script it cannot read — and it re-creates the loader in S5's refusal under
+a different name.
+
+## 5. Production-readiness checklist
+
+- security — a project-authored leg runs project-authored code under the project's own bar, which is
+  where it belongs. gov executes nothing new.
+- perf / scale — the project's leg costs what the project decides; the gate runner already bounds
+  legs by declared ceiling.
+- a11y — N/A.
+- i18n — N/A.
+- error / empty / loading states — a project leg that cannot find its subject must REFUSE, and the
+  worked example demonstrates that rather than describing it.
+- observability — the gate runner already names every leg it runs and every leg it skips.
+- risks — the documented contract is only as true as S3's measurement. If `apply` in fact overwrites
+  a target-authored leg, this unit's premise is false and the unit becomes a defect report instead.
+  That inversion is why S3 is scoped as a probe with an observable negative.
+- testing + left-shift gates — S3's fixture run; no new gov leg.
+- migration / rollback — documentation plus one example; nothing to roll back.
+- user docs — this unit is largely user docs, in `tools/memory-tree/README.md` and
+  `WIRE-INTO-PROJECT.md`.
+
+## 6. Acceptance criteria
+
+- **AC1** — When a fixture target's gate manifest carries a project-authored leg and `govkit apply`
+  runs, the leg is still present afterwards and the run REPORTS that it declined to overwrite it.
+- **AC2** — When the same leg's script is absent, the target's gate runner REFUSES naming it, rather
+  than skipping silently. Observed via the target's own `bash tools/run-gates/run-gates.sh`.
+- **AC3** — `bash scripts/check-build-readme-comments.sh` exists as the worked example, sources
+  `.memory-tree.conf`, and reds on the fixture that motivated NicoCares' check 90.
+- **AC4** — `WIRE-INTO-PROJECT.md` names the extension point, the ownership rule and the refusal in
+  S5, and `bash tools/govkit/check_runbook_parity.py` still passes.
+
+## 7. Gates
+
+`govkit selfcheck` · `runbook parity` · `memory hygiene` · `gate-lint`.
+
+## 8. Open questions
+
+- **F1 — FACT-QUESTION · does `apply` really preserve a target-authored leg?** The probe is S3:
+  install a fixture, add a leg, run `apply`, look. The liveness assertion is that the fixture's leg
+  must be observable BEFORE the run, so a run that deleted the manifest entirely is distinguishable
+  from one that preserved the leg. UNRESOLVED until run; the unit's shape depends on the answer.
+- **F2 — does a project leg get a declared wall-clock ceiling like a kit leg?** The runner already
+  reds a leg arriving without one. Recommendation: yes, and say so in the worked example, because an
+  adopter discovering that rule from a red bar is a worse first experience than reading it.
+
+## 9. Revision log
+
+- rev-1 · 2026-09-02 · initial draft, from `nc carve-out 6/20` and the `owned`/`emitted` refusal at
+  `tools/govkit/govkit.py:4627` and `:4676`.
+
+## 10. Reuse audit
+
+The seam is the gate manifest itself plus `govkit`'s `owned` computation from `gate_runner.emitted` —
+`reuse_lookup.py` reports the `govkit` affordance seam covering `registry.toml` and the leg-emission
+surface, and this unit documents and measures that existing refusal rather than adding a mechanism
+beside it. No new seam is created, which is the point.
+
+Recall terms used: `gate_runner`, `emitted`, `owned`, `leg`, `manifest`, `project check`,
+`extension point`, `carve-out`, `adopter`, `apply`, `overwrite`, `ceiling`.

@@ -1,0 +1,146 @@
+# DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates
+
+**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7
+
+<!-- gen:spec-records -->
+
+*No record names this unit.*
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+Bytes landing is not an update finishing. `UPDATE_ROLE["rendered"]` is `"adopter"` but the
+disposition CAPS at report, and the write loop's first act is to skip anything whose `how` is not
+`table`, printing "reported only … this role is never written by update". No `[adopt].argv` is
+spawned anywhere in `update`; the only subprocess it runs per kit is `[check].argv`, a verifier. So
+eight rendered destinations at NicoCares — including both binding protocols and three `SKILL.md`
+files — go ONE VINTAGE STALE on every update, and the two adopter CI jobs that byte-compare them
+red. This is the difference between "the bytes arrived" and "the update ran".
+
+## 2. Scope (IN)
+
+- **S1** — After the write loop, `update` re-runs the `[adopt].argv` of every entry whose landed set
+  invalidated a rendered destination, in dependency order, and REPORTS what it ran.
+- **S2** — A generator obligation table: an entry declares which of its artifacts must be
+  regenerated when its version moves, so `codebase-map`'s `gen_map.py --write` on a
+  `KIT_CODEBASE_MAP_VERSION` bump and `memory-tree`'s `gen_build_index.py --write` are performed
+  rather than described in a runbook. The obligation is DECLARED in `kit.toml`, because a rule that
+  lives only in `WIRE-INTO-PROJECT.md` is a rule an unattended run cannot honour.
+- **S3** — A `role` change on an existing row is handled in place: a file moving from `engine` to
+  `rendered`, which `TOOL-dRetiredFork-12` performs, must not revert silently because `engine`
+  asserts the recorded OID.
+- **S4** — Post-write verification already exists — `DEPL-dCarriedReceipt-14` re-runs each touched
+  kit's `[check].argv` and rolls back from recorded OIDs on red. This unit extends it to cover the
+  re-render and regeneration steps, so a bad render is rolled back rather than committed.
+- **S5** — The ordering constraint `TOOL-dRetiredFork-14` depends on: a wired command must move to
+  the surviving hook copy BEFORE the second copy is withdrawn, enforced by the engine rather than by
+  a runbook sentence.
+- **S6** — Arms for each: a rendered row re-rendered; a version bump triggering its declared
+  generator; a role change surviving a round trip; a failed render rolling back.
+
+## 3. Non-goals (OUT)
+
+- Running an adopter for a kit the target holds deliberately INERT. That is a posture flip and is
+  exactly why "just run `apply`" is not the workaround. An inert kit's adopter is not run, and the
+  run says so.
+- The `merged` role. Its code says plainly that no writer exists yet, and building one is out of
+  scope; `DEPL-dRetiredFork-7` records it.
+- `generated` rows. They are produced in the target by the target's own tooling by declared design.
+  The report NAMES which generators are owed; running the target's own tooling is the adopter's.
+
+## 4. Design
+
+### Data model
+
+A new `[[regenerate]]` block per entry: `when = "version_moves"`, `argv = [...]`, `why = "…"`. It is
+additive and defaulted — an entry declaring none behaves as today — which satisfies the
+forward-compatible-data rule and means no adopter's install breaks on the pull.
+
+### Rollout
+
+The re-render step is gated OFF by default for its first release and flipped on after in-place
+verification against a fixture and then one adopter, because it is the first time `update` executes
+target-side code. That is `AGENTS.md` §1's dark-landing rule applied to the deployer itself.
+
+### Alternatives rejected
+
+Telling the operator which generators to run. That is the status quo — `WIRE-INTO-PROJECT.md`'s
+maintenance section already does it — and it is the reason a kit pull is a build. A rule a person
+must remember is not a mechanism.
+
+## 5. Production-readiness checklist
+
+- security — `update` begins executing target-side declared argv. Every argv is gov-authored in a
+  gov descriptor, but it runs in the target's tree under the operator's uid, and the trust boundary
+  is exactly the one `AGENTS.md` §9 states: a check running under the run's own uid can be defeated
+  by whoever runs it. The mitigation is that the argv comes from gov's descriptor and never from the
+  target's `deploy.toml`, and that the strict path class grades every interpolated fragment.
+- perf / scale — one adopter invocation per touched entry, not per file.
+- a11y — N/A.
+- i18n — N/A.
+- error / empty / loading states — a render that produces an empty artifact must REFUSE, because
+  empty-versus-empty passing is the class `TOOL-aBranchedMandate-5` already records for
+  `adopt-drift-audit.sh`.
+- observability — the run prints every adopter it invoked, every generator it ran, and every one it
+  DECLINED to run with the reason. A skip that looks like a pass is the class this build keeps
+  closing.
+- risks — executing code in a repository gov does not own, after a write, with a rollback that must
+  itself work. Highest-risk unit in the build. Mitigated by the default-OFF flag, by S4's rollback
+  extension, and by the fixture-then-one-adopter rollout.
+- testing + left-shift gates — S6's four arms plus the acceptance matrix.
+- migration / rollback — the `[[regenerate]]` block is additive and defaulted; the feature flag is
+  the rollback.
+- user docs — `WIRE-INTO-PROJECT.md` maintenance section SHRINKS, because the obligations it lists
+  become declarations. That shrinkage is an acceptance criterion, not a side effect.
+
+## 6. Acceptance criteria
+
+- **AC1** — When a landed template invalidates its rendered artifact, `python
+  tools/govkit/govkit.py update --target <fixture> --write` re-renders it and names the adopter it
+  ran; the pre-change run left the artifact one vintage stale.
+- **AC2** — When an entry's version moves and it declares a `[[regenerate]]` argv, the run performs
+  it and the target's freshness gate exits `0` immediately afterwards.
+- **AC3** — When a render produces an empty artifact, the run REFUSES and rolls back from the
+  recorded OIDs. Observed via `python tools/govkit/govkit.py update --target <fixture> --write`.
+- **AC4** — When a row's role changes from `engine` to `rendered`, a round trip preserves the
+  rendered artifact rather than reverting it.
+- **AC5** — When a kit is held INERT by the target, its adopter is NOT run and the report says so. Observed via `python tools/govkit/govkit.py update --target <fixture> --write`.
+- **AC6** — When the feature flag is off, the run's output is byte-identical to the pre-change run. Compared across `python tools/govkit/govkit.py update --target <fixture>` runs.
+- **AC7** — A read-only run against `C:/projects/nicocares/main` names all eight rendered
+  destinations and the generators each would owe.
+- **AC8** — `python tools/govkit/selftest.py` and `selfcheck` exit `0`.
+
+## 7. Gates
+
+`govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` ·
+`runbook parity`.
+
+## 8. Open questions
+
+- **F1 — does the generator obligation live in `kit.toml` or in the receipt?** The descriptor is
+  gov's and travels; the receipt is the target's and records what happened. Recommendation:
+  descriptor, with the receipt recording that it ran.
+- **F2 — what happens when a re-render needs an answer the target's `deploy.toml` does not carry?**
+  `intake` refuses to rewrite an existing descriptor by design, so the run cannot add the key.
+  Recommendation: REFUSE the re-render naming the missing key, and leave the bytes landed — the same
+  shape `apply` already uses when a destination needs an unanswered key.
+- **F3 — is the default-OFF flag removed after the first successful adopter run, or kept?**
+  Recommendation: keep it for one release, then remove it in a follow-up, so a regression has a
+  documented switch rather than a revert.
+
+## 9. Revision log
+
+- rev-1 · 2026-09-02 · initial draft. `UPDATE_ROLE`, the report cap and the absence of any
+  `[adopt].argv` spawn inside `update` were read at `b0108f13`.
+
+## 10. Reuse audit
+
+`python tools/codebase-map/reuse_lookup.py` was run for this build and reports the
+`govkit` affordance seam plus the `derive_*` family in `tools/govkit/govkit.py`. The seam is `_cmd_apply`'s existing adopter invocation plus `classify_outcome`, which already spawn
+and grade a kit's declared argv — this unit lifts that pair out of `apply` and reuses it from
+`update` rather than writing a second spawner. `DEPL-dCarriedReceipt-14`'s post-write verification
+and its rollback from recorded OIDs is the second live seam, extended rather than duplicated.
+
+Recall terms used: `govkit`, `update`, `rendered`, `adopter`, `argv`, `regenerate`, `freshness`,
+`rollback`, `outcome`, `inert`, `receipt`, `role`, `vintage`, `generator`.
