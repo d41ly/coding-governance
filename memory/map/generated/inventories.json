@@ -78,6 +78,8 @@
       "run-gates wiring",
       "scratch-guard self-test",
       "settings-merge selftest",
+      "spec tokens (a spec's own names resolve)",
+      "spec-tokens self-test",
       "template size <=48KiB",
       "template size gate selftest",
       "testsuite counts (every bar self-test prints one)",

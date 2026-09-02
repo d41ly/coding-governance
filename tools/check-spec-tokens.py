@@ -75,16 +75,16 @@ def run(*args):
     return subprocess.run(args, capture_output=True, text=True).stdout
 
 
-def tracked(root):
+def read_tracked(root):
     return set(run("git", "-C", str(root), "ls-files").split())
 
 
-def section(text, num):
+def extract_section(text, num):
     m = re.search(SEC % num, text, re.S | re.M)
     return m.group(1) if m else ""
 
 
-def path_shaped(tok, files):
+def check_path_shaped(tok, files):
     """A path this join can resolve. The pre-wiring run over the live corpus produced every one of
     these exclusions as a near-miss, and each would otherwise red an innocent spec.
 
@@ -125,7 +125,7 @@ def main(argv):
         print("spec-tokens: not a git repo")
         return 2
 
-    files = tracked(root)
+    files = read_tracked(root)
     allspecs = sorted(f for f in files
                       if re.match(r"memory/builds/[^/]+/spec/.*\.md$", f))
     specs, frozen = [], 0
@@ -161,7 +161,7 @@ def main(argv):
     hits, skipped, graded, seen_waived = [], 0, 0, set()
     for f in specs:
         text = (root / f).read_bytes().decode("utf-8", "replace")
-        for line in section(text, 7).splitlines():
+        for line in extract_section(text, 7).splitlines():
             if not LEG_LINE.match(line):
                 continue
             for tok in TICK.findall(line):
@@ -170,10 +170,10 @@ def main(argv):
                 graded += 1
                 if tok not in legs:
                     hits.append((f, "leg", tok, f"not a name in {LEGS}"))
-        for bullet in re.findall(r"^- .*(?:\n  .*)*", section(text, 6), re.M):
+        for bullet in re.findall(r"^- .*(?:\n  .*)*", extract_section(text, 6), re.M):
             for tok in TICK.findall(bullet):
                 for word in tok.split():
-                    if not path_shaped(word, files):
+                    if not check_path_shaped(word, files):
                         continue
                     graded += 1
                     if word not in files:

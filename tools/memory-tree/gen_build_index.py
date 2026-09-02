@@ -2499,7 +2499,7 @@ def cmd_selftest() -> int:
         # wider than the rule it grades reports a defect nobody owes. A second draft counted lines
         # beginning `Ids no `, which counts PARAGRAPH HEADS: a wrapped continuation carries ids and
         # no prefix, so a working wrap scored 2 and read as no wrap at all.
-        def _gap_para(head):
+        def _extract_gap_para(head):
             body = plan(t16, conf16)[0]["memory/builds/tOne/README.md"].split("\n")
             i = next((n for n, x in enumerate(body) if x.startswith(head)), None)
             if i is None:
@@ -2512,16 +2512,16 @@ def cmd_selftest() -> int:
             return out
 
         arm("a 61-unit build's gap paragraph wraps in the RENDER, not only in the helper", "True",
-            lambda: str(max((len(x) for x in _gap_para("Ids no record names:")), default=10 ** 6)
+            lambda: str(max((len(x) for x in _extract_gap_para("Ids no record names:")), default=10 ** 6)
                         <= IDS_WRAP + 1))
         # ANTI-VACUITY. Without this the arm above passes on a build whose ids happen to fit, which
         # is what a 31-unit fixture did: 291 characters, one line, no wrap ever exercised.
         arm("...and the wrap actually happened, so the arm cannot pass on a short list", "True",
-            lambda: str(len(_gap_para("Ids no record names:")) > 1))
+            lambda: str(len(_extract_gap_para("Ids no record names:")) > 1))
         arm("the spec-audit gap paragraph wraps too", "True",
-            lambda: str(len(_gap_para("Ids no `spec-audit` record has ever named:")) > 1
+            lambda: str(len(_extract_gap_para("Ids no `spec-audit` record has ever named:")) > 1
                         and max((len(x) for x in
-                                 _gap_para("Ids no `spec-audit` record has ever named:")),
+                                 _extract_gap_para("Ids no `spec-audit` record has ever named:")),
                                 default=10 ** 6) <= IDS_WRAP + 1))
 
     if fails:
