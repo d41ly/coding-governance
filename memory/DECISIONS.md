@@ -15,6 +15,7 @@
 
 ## TOOL — tooling
 
+- TOOL-dRetiredFork-4 · inCMS's D1 is nested template INTERPOLATION, not a nested agent loop; two spec revisions argued a fixture the adopter never claimed. At HEAD the view still corrupts, the fail-open does not. Disposition (b); latent scalar is `TOOL-dRetiredFork-24`
 - TOOL-aWarmedTether-2 · the bar runs INSIDE the push, so the connection idles its whole duration and the server closes it; the push dies AFTER a green gate and the refusal names auth, not a timeout. `push-main.sh` defaults SSH keepalives; HTTPS here cannot exercise it. Measured on an adopter
 - TOOL-aWarmedTether-1 · three arms in `check-unattended.test.sh` graded nothing, found by an adopter running the suite we ship: WRITE_RE omits `_` so our own `_pv_rm` reds the no-write arm; check 30's liveness arm breaks only tRun though tPlanOk grades (0 hits vs 1); branch 2 shipped unarmed
 
