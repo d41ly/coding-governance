@@ -4,9 +4,10 @@
 TOOL-dRetiredFork-19. A kit descriptor's `[[files]]` rule declares `placeholders = [...]`, and the
 kit's adopter script is what turns those tokens into values. Nothing joined the two, so a descriptor
 could declare a token its own adopter has never heard of and the unresolved `{{TOKEN}}` brace would
-ship into every adopter's committed tree. That is not hypothetical: `TOOL-dRetiredFork-12` declared
+ship into every adopter's committed tree. That is not hypothetical: one unit in this build declared
 `TOOL_ROOT` for the unattended kit, whose adopter does not substitute it, and the correction had to
-be made by hand three times before it stuck.
+be made by hand three times before it stuck. The id is deliberately not cited here — product source
+naming a non-terminal spec is a drift signal this repo pins, and the dossier carries the provenance.
 
 The data is already declared on BOTH sides. This is a join, not a heuristic.
 
@@ -53,15 +54,23 @@ _SCRIPT_IN_ARGV = re.compile(r"^\{kit\}/(?P<name>[A-Za-z0-9._-]+\.sh)$")
 
 
 def load_descriptor(path):
-    """The descriptor reader, reused rather than re-implemented (this unit's section 10)."""
+    """The descriptor reader, reused rather than re-implemented (this unit's section 10).
+
+    THE FALLBACK IS NARROW ON PURPOSE. An earlier revision caught bare `Exception` here and named a
+    variable that did not exist, so every call raised `NameError`, was swallowed, and silently took
+    the tomllib path — the reuse this section-10 line promises was not happening on any run, and
+    nothing said so. A fallback that hides a bug in the thing it falls back FROM is the
+    `fallback-fabricates-the-passing-value` class. It now catches ImportError alone: govkit absent is
+    the one condition worth surviving, and any other failure is this file's bug and should raise.
+    """
     try:
-        sys.path.insert(0, str(ROOT / "tools" / "govkit"))
+        sys.path.insert(0, str(DEFAULT_ROOT / "tools" / "govkit"))
         from govkit import load_toml  # the corpus's one descriptor reader
-        return load_toml(path)
-    except Exception:
+    except ImportError:
         import tomllib
         with path.open("rb") as fh:
             return tomllib.load(fh)
+    return load_toml(path)
 
 
 def read_bytes_as_text(path):

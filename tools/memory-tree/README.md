@@ -126,6 +126,15 @@ running `--fix` in a fixture of each layout, so a stray third spelling in this f
   checkout is CRLF in the tracked copy — the normalisation keeps the gate honest, the pin keeps the
   committed bytes right, and you want both.
 - The gate is Bash (git-bash on Windows works). The `--staged` leg scopes the file-checks to staged paths.
+- **`memory/project/stale-header-waiver.txt` — a build README header that is PRESENT and unparseable
+  is not one that is ABSENT.** The generator raises on the first and would otherwise treat it as the
+  second, regenerating the index around a corrupted header. A row here (one build README path, then
+  the reason) tolerates a known-bad header; the run prints how many it tolerated on EVERY invocation,
+  so growing tolerance is visible without opening the file. **Shrink-only**: delete a row when the
+  header is repaired, never add one to clear a red. A row naming a path the tree no longer tracks is
+  a refusal, and the file itself is required even when empty — a file nobody created is a decision
+  nobody made. It ships EMPTY, and the kit declares a `[[hole]]` whose discharge probe reports it
+  unarmed rather than passing silently.
 - No brand gate, no product-specific migration lives here — those stay in the adopting repo.
 
 ## Codebase-map interop

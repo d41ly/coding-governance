@@ -8,7 +8,6 @@
 # name; the pre-wiring run decides its first rows and each one is dispositioned in the record.
 scripts/check-wiring.sh	an ADOPTER path. DEPL-dRetiredFork-7 measures inCMS's tree and gov does not track it.
 scripts/check-build-readme-comments.sh	an ADOPTER path, and TOOL-dRetiredFork-16 section 3 forbids landing it in gov.
-memory/project/stale-header-waiver.txt	TOOL-dRetiredFork-3 S3 CREATES this registry; the row retires when that unit lands.
 spec/_working/notes.md	a hypothetical fixture path inside TOOL-dRetiredFork-9 AC1, not a file anyone ships.
 codebase-map/selftest.py	a prefix-relative path in bConvergentLodestar, whose spec predates the tools/ prefix.
 tools/run-gates.sh	[path] REAL and that build's to fix: the runner moved to tools/run-gates/run-gates.sh (aBatchedLintel)

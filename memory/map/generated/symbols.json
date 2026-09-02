@@ -158,6 +158,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "StaleHeader",
+      "kind": "class",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "StructureDrift",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
@@ -2229,6 +2234,11 @@
     },
     {
       "id": "read_slot_table",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_stale_header_waiver",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },

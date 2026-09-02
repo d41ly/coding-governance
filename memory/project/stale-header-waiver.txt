@@ -1,0 +1,23 @@
+# stale-header-waiver.txt — build READMEs whose PRESENT-but-unparseable header is tolerated.
+#
+# TOOL-dRetiredFork-3. `gen_build_index.py` raises StaleHeader when a build README's front matter
+# OPENED at line 1 and then did not conform. That is a corrupted header, not a missing one, and by
+# default it stops the run. A row here says "this one is known, proceed anyway".
+#
+# SHRINK-ONLY. A row is deleted when the header is repaired and never added to make a red go away:
+# the mechanism exists because a corrupt header used to read as an absent one, and a waiver that
+# outlives its header restores exactly that. The run names how many headers it tolerated on every
+# invocation, so growing tolerance is visible without opening this file.
+#
+# A row naming a path the tree no longer tracks is a REFUSAL, not a warning — a stale exception
+# cannot hide a live hit.
+#
+# GRAMMAR: one repo-relative build README path per row, then whitespace, then the reason.
+# Keyed on PATH and not on slug, matching every sibling registry under memory/project/ and
+# gradeable against `git ls-files`.
+#
+#   memory/builds/<slug>/README.md    <why this header is tolerated, and what would clear it>
+#
+# EMPTY IS THE EXPECTED STATE, in gov and in every adopter. The mechanism is inert until a header
+# actually corrupts. A MISSING file is a refusal, because a file nobody created is a decision
+# nobody made.
