@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-02T20:14:49+03:00 @ b0108f13af0caa5a88516ca2eb5505845c5e7da6
+last-audit: 2026-09-02T20:38:04+03:00 @ b0108f13af0caa5a88516ca2eb5505845c5e7da6
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 3c91e00d97ee326fe3b6cf818fe1366147ce495c
+last-body-change: afbd0926673dacac62527e96836703cea3101d4a
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -288,10 +288,10 @@ does — hit three times in one file in one session) · `process-creation-is-the
 - `merge-rows.py` takes `%O %A %B` — BASE, OURS, THEIRS — and writes into the OURS path. A wrong
   order does not error: it emits a plausible file with the other side's rows silently dropped.
   Diff the merged id-set against BOTH inputs, never eyeball the output.
-- A HARNESS-CREATED WORKTREE starts with a RED bar and a refusing `--preflight`: it carries CRLF on
-  the `eol=lf`-pinned `.claude/` renders, which reds the `memory-recall skill wiring` leg and makes
-  `check-wiring.sh --check` exit 1. NOT `git worktree add`, which measures clean. Run
-  `bash tools/check-wiring.sh --fix` first. Prune when the memory-recall adopter CR-normalises.
+- A HARNESS-CREATED WORKTREE carries CRLF on the four `eol=lf`-pinned `.claude/` renders and that
+  GATES NOTHING: measured 2026-09-02 with CRLF forced into all four, every wiring leg and
+  `check-wiring.sh --check` (also `WIRING_CHECK`) exit 0 — committed bytes are LF. This bullet
+  claimed a red bar and a refusing `--preflight`; both were false.
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
