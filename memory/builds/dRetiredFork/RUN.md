@@ -74,3 +74,9 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-02T22:55:12Z dispatch · item 1545cdb0 TOOL-dRetiredFork-8 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/install-prefix-carried.txt tools/README.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-8.md memory/builds/dRetiredFork/README.md
 
 2026-09-02T22:59:42Z dispatch · item 1545cdb0 TOOL-dRetiredFork-8 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/install-prefix-carried.txt tools/install-prefix-waivers.txt tools/README.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-8.md memory/builds/dRetiredFork/README.md
+
+2026-09-02T23:25:47Z brief · item TOOL-dRetiredFork-9 · reason d9146a19a6c0 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-9-1-build-brief.md
+
+2026-09-02T23:25:58Z dispatch · item 5265a643 TOOL-dRetiredFork-9 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/PLAYBOOK-TEMPLATE.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-9.md memory/builds/dRetiredFork/README.md
+
+2026-09-02T23:39:18Z dispatch · item 5265a643 TOOL-dRetiredFork-9 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/PLAYBOOK-TEMPLATE.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/PLAYBOOK-TEMPLATE.md .claude/skills/unattended/SKILL.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-9.md memory/builds/dRetiredFork/README.md

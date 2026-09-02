@@ -26,7 +26,7 @@
 #     build that was never carried by an unattended run has no such pin. Those are COUNTED and
 #     announced, never silently skipped.
 set -u
-KIT_UNATTENDED_VERSION=1.15   # gov:kit unattended@1.15 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.16   # gov:kit unattended@1.16 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong

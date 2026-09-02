@@ -39,7 +39,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.15   # gov:kit unattended@1.15 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.16   # gov:kit unattended@1.16 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1888,9 +1888,24 @@ load_spec_facts() { # spec paths... -> fills the three maps, replacing whatever 
 # ONE awk instead of one per spec. STATELESS on purpose: `--close` reaches it through `missing_units`
 # with no `verb_plan` frame above, so a version that read the shared maps would read whatever the
 # process happened to have loaded - which in that path is nothing at all.
+# ---- a `_`-prefixed subfolder under spec/ is NOT a spec (TOOL-dRetiredFork-9) --------------------
+# Absorbed from NicoCares `nc carve-out 20/20`. THE CAUSE IS THE PATHSPEC, not the glob: in
+# `git ls-files "<dir>/spec/*.md"` the `*` is a GIT pathspec wildcard and crosses `/`, unlike a shell
+# glob. So `spec/_working/notes.md` was enumerated as a spec and produced a `NOT A UNIT` row beside
+# "every tracked spec is terminal". Reproduced here before the fix.
+#
+# NO CONFIG KEY. `_` is already this tree's marker for "not part of the set", so the rule is
+# structural — and a key an adopter's installed kit predates cannot be read by it anyway.
+#
+# ONE filter, two callers. Both enumeration sites carried the same defect, and a second copy of the
+# predicate is exactly where they would drift apart.
+drop_working_specs() { # stdin: tracked paths -> stdout: the ones that are specs
+  grep -vE '/spec/_[^/]*/' || true
+}
+
 spec_ids() { # dir -> every spec id under this build that parses as a unit, sorted, one per line
   local dir="$1" specs
-  specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null)
+  specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null | drop_working_specs)
   [ -n "$specs" ] || return 0
   # BOTH fields required, which is the predicate the per-spec awk applied with `if (hdr && id != "")`.
   spec_facts $specs | awk -F'\t' '$2 != "" && $3 != "" { print $2 }' | sort -u
@@ -2025,7 +2040,7 @@ verb_plan() { # slug
     fail 42 "the build README carries a roster marker but not exactly one well-formed pair, so the id set this line reports is not a single slice: $_rmp"
     return 1
   fi
-  specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null)
+  specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null | drop_working_specs)
   if [ -z "$specs" ]; then
     fail 19 "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against: $dir/spec"
     return 1

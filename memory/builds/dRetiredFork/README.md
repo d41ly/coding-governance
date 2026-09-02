@@ -153,7 +153,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22 TOOL-dRetired
 | [TOOL-dRetiredFork-6 — the drift-audit note is DERIVED from its counters](spec/2026-09-02-spec-TOOL-dRetiredFork-6.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-03 |
 | [TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm](spec/2026-09-02-spec-TOOL-dRetiredFork-7.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-03 |
 | [TOOL-dRetiredFork-8 — check-wiring resolves the settings file instead of spelling one path](spec/2026-09-02-spec-TOOL-dRetiredFork-8.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-03 |
-| [TOOL-dRetiredFork-9 — `_`-prefixed spec subfolders, and C21's batched greps](spec/2026-09-02-spec-TOOL-dRetiredFork-9.md) | 1 | 1 | OPEN | rev-3 | 2026-09-02 |
+| [TOOL-dRetiredFork-9 — `_`-prefixed spec subfolders, and C21's batched greps](spec/2026-09-02-spec-TOOL-dRetiredFork-9.md) | 1 | 1 | CLOSED | rev-3 | 2026-09-03 |
 | [DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract](spec/2026-09-02-spec-DEPL-dRetiredFork-7.md) | 2 | 2 | OPEN | rev-3 | 2026-09-02 |
 | [TOOL-dRetiredFork-10 — three workflows gates anchor their locator and population on a basename](spec/2026-09-02-spec-TOOL-dRetiredFork-10.md) | 2 | 2 | OPEN | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix](spec/2026-09-02-spec-TOOL-dRetiredFork-11.md) | 2 | 1 | OPEN | rev-3 | 2026-09-02 |
@@ -172,7 +172,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22 TOOL-dRetired
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
