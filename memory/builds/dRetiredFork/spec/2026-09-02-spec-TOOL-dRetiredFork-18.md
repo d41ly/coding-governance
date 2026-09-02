@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-18 — the gap lines use the wrap helper written for them
 
-**Status:** INPROGRESS · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 0
+**Status:** CLOSED · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 0
 
 <!-- gen:spec-records -->
 
@@ -59,7 +59,16 @@ and 531 characters.
 `memory hygiene` · `build README slot contract` · `build-index selftest` · `kit version markers` ·
 `verdict epoch (kit version dates the engine)`.
 
+## 8. Open questions
+
+none - this unit raised no fork. The mechanism was a helper that already existed with its
+own arms, unwired at the two emissions its docstring names, so there was nothing to choose
+between. This section is present because a terminal status requires it: silence and a
+resolved fork are the same byte without it.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft. The helper, its docstring and its unwired call sites were read
   at b0108f13 rather than recalled.
+- rev-2 · 2026-09-02 · added the section 8 `none` declaration a terminal status requires;
+  no design content changed.

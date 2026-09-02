@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-20 — a spec lint resolves a spec's own machine-facing tokens
 
-**Status:** INPROGRESS · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0 · ratified 2026-09-02
+**Status:** CLOSED · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
