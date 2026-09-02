@@ -40,32 +40,28 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
 
 ## Build-level rules
 
-- **Every absorption lands as its own unit.** M2's one-mechanism rule, applied literally: eight
-  separable upstream fixes are eight units, and the ninth order-1 unit carries a claim that
-  absorbs nothing until it has, because a closing diff cannot attribute a finding otherwise.
+- **Every absorption lands as its own unit.** M2's one-mechanism rule: eight fixes are eight units,
+  and a ninth carries a claim that absorbs nothing until it has. A closing diff cannot attribute a
+  finding otherwise.
 - **A path fix is a DERIVATION or a RENDER, never a new config key.** A key cannot be read by an
   adopter whose installed kit predates it, and both adopters are 164 commits behind.
-- **Deleting a population filter is refused.** Two of the three workflows gates apply no marker
-  filter, so dropping theirs widens the population and reds the bar. `TOOL-dRetiredFork-10` §3
-  carries the measurement; basename anchoring is the form.
-- **Every absorbed fix must be behaviour-preserving in gov's own tree**, proven by running the
-  affected leg before and after, not asserted.
-- **No new bar leg without its wall-clock ceiling and its `memory/project/testsuite-count-waivers.txt`
-  row.** `tools/check-testsuite-counts.sh` derives its population from `tools/gate-legs.json`.
-- **A kit self-test may not be added to the bar.** Owner ruling of 2026-08-23, restated in `AGENTS.md`.
-- **The authoring rule does not land in the charter template.** Measured 2026-09-02: 48867 of 49152
-  bytes, 285 free, already WARN past its recorded high-water. It lands in `tools/hooks/README.md`
+- **Deleting a population filter is refused**: dropping one widens the population and reds the bar.
+  `TOOL-dRetiredFork-10` §3 carries the measurement; basename anchoring is the form.
+- **Every absorbed fix is behaviour-preserving in gov's tree**, proven by running the affected leg
+  before and after, not asserted.
+- **No new bar leg without its wall-clock ceiling and its testsuite-count row.**
+  `tools/check-testsuite-counts.sh` derives its population from `tools/gate-legs.json`.
+- **A kit self-test may not be added to the bar** (owner, 2026-08-23; `AGENTS.md`).
+- **The authoring rule does not land in the charter template**, which is already WARN past its
+  high-water; read the margin from `check-template-size.sh`. It lands in `tools/hooks/README.md`
   and `AGENTS.md`.
-- **Never absorb an adopter's fix without reproducing it at HEAD first.** Round 1 was BLOCKED on six
-  findings; one measured a unit's premise inverted. All 30 are folded.
+- **Never absorb an adopter's fix without reproducing it at HEAD first.** Round 1 inverted one
+  unit's premise; `TOOL-dRetiredFork-4` then found a second argued against the wrong fixture.
 - **A criterion labelled the build's DONE-CONDITION is read against every other spec's §2 before
-  the set closes.** `DEPL-dRetiredFork-3` AC10 and `DEPL-dRetiredFork-1` AC6 were written in one
-  fold round from two findings and could not both be satisfied: the done-condition required a
-  `gov_commit` re-stamp the sibling's accepted state withholds. Round 2 called this the manual
-  check that belongs in BUILD-METHOD; it lives here until someone promotes it upstream.
-- **Never patch a spec in place; rewrite the section.** Round 2 was BLOCKED on five, and 21 of its 30
-  defects were created by round 1's fold. Its five blockers are PROMOTED to units 19, 20, 21, 8 and
-  9 at order 0, per M4, and the specs they correct are unedited until those units run.
+  the set closes.** Two criteria from one fold round could not both hold; `DEPL-dRetiredFork-9`
+  carries the case and the correction.
+- **Never patch a spec in place; rewrite the section.** 21 of round 2's 30 defects were created by
+  round 1's fold. Its five blockers were promoted to units at order 0, per M4.
 
 ## Parked decisions
 
