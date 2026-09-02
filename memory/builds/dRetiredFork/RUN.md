@@ -68,3 +68,9 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-02T22:36:47Z dispatch · item a7107519 TOOL-dRetiredFork-7 · reason tools/workflows/check-review-join.sh tools/workflows/check-review-join.test.sh tools/workflows/README.md tools/workflows/tier2-review.js memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-7.md memory/builds/dRetiredFork/README.md
 
 2026-09-02T22:42:14Z dispatch · item a7107519 TOOL-dRetiredFork-7 · reason tools/workflows/check-review-join.sh tools/workflows/check-review-join.test.sh tools/workflows/README.md tools/workflows/tier2-review.js tools/check-kit-versions.sh memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-7.md memory/builds/dRetiredFork/README.md
+
+2026-09-02T22:55:02Z brief · item TOOL-dRetiredFork-8 · reason 9a62fcac77c4 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-8-1-build-brief.md
+
+2026-09-02T22:55:12Z dispatch · item 1545cdb0 TOOL-dRetiredFork-8 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/install-prefix-carried.txt tools/README.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-8.md memory/builds/dRetiredFork/README.md
+
+2026-09-02T22:59:42Z dispatch · item 1545cdb0 TOOL-dRetiredFork-8 · reason tools/check-wiring.sh tools/check-wiring.test.sh tools/install-prefix-carried.txt tools/install-prefix-waivers.txt tools/README.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-8.md memory/builds/dRetiredFork/README.md

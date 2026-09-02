@@ -7,14 +7,13 @@
 # legacy, preserved for adopters carrying a pre-1.1 gate file the maintenance rule never overwrites.
 
 .githooks/pre-commit:48                 dual-spelling: the hygiene leg locates its gate at either prefix
-tools/check-wiring.sh:178               dual-spelling probe: scratch-guard fragment, both layouts
-tools/check-wiring.sh:231               dual-spelling probe: memory-recall fragment, both layouts
-tools/check-wiring.sh:384               dual-spelling probe: the merge driver, both layouts
-tools/check-wiring.sh:393               launcher probe: the gov-internal shim is the fallback after the kit launcher
-tools/check-wiring.sh:416               prose naming the gov-internal shim's own dependency
 tools/codebase-map/map_lib.py:1387      REGEN_CMD legacy, deliberate: a pre-1.1 GATE_FILE is project-owned and never overwritten
 tools/codebase-map/gen_map.py:47        prose quoting that legacy literal
 tools/codebase-map/adopt-codebase-map.sh:155  prose quoting that legacy literal
 tools/memory-tree/README.md:109         the PUBLISHED root-prefix driver command; check-wiring.test.sh AC12 derives and requires it
 tools/memory-tree/corpus_ids.py:837     check-15 selftest fixture: a wrong-prefix citation, built to prove the check fires
 tools/memory-tree/corpus_ids.py:841     the tracked file that fixture cites at the correct prefix
+tools/check-wiring.sh:297	dual-spelling probe: scratch-guard fragment, both layouts
+tools/check-wiring.sh:350	dual-spelling probe: memory-recall fragment, both layouts
+tools/check-wiring.sh:503	dual-spelling probe: the merge driver, both layouts
+tools/check-wiring.sh:512	launcher probe: the gov-internal shim is the fallback after the kit launcher

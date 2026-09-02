@@ -18,6 +18,10 @@ newrepo() {   # cd (in THIS shell) into a fresh repo with a tracked .githooks/pr
 }
 cleanup() { cd "$REPO"; [ -n "$D" ] && rm -rf "$D"; [ -n "$OOT" ] && rm -rf "$OOT"; D=""; OOT=""; }
 chk() { bash "$SCRIPT" "$@" 2>/dev/null; }   # run the checker, drop stderr noise
+# ...and the variant that KEEPS stderr. The resolver's refusals are written there, so an arm that
+# asserts on a refusal MESSAGE through `chk` would be asserting on text it discarded — a fixture
+# that cannot see what it grades. TOOL-dRetiredFork-8.
+chke() { bash "$SCRIPT" "$@" 2>&1; }
 
 # A kit file in THIS repo, resolved across both install prefixes the way every arm resolves them
 # (`tools/<rel>` here, `<rel>` in a copy-installed adopter). Nothing below hard-codes `$HERE/…`:
@@ -733,6 +737,55 @@ HOME="$FAKEHOME" bash "$SCRIPT" --fix >/dev/null 2>&1 || true
 after=$(cat "$FAKEHOME/.claude/skills/session-kickoff/SKILL.md")
 ck "AC5 --fix leaves the out-of-repo install byte-identical" "$([ "$before" = "$after" ] && echo 1 || echo 0)"
 rm -rf "$FAKEHOME"; cleanup
+
+# ---- S4: the settings file is RESOLVED, and an unresolvable one REFUSES (TOOL-dRetiredFork-8) -----
+# Three arms, because the three outcomes are three different facts and the defect this unit removes
+# was exactly that two of them looked the same. The pre-change script had NO settings file in these
+# trees and graded the wiring anyway, reporting ok for every settings-dependent arm.
+newrepo
+mkdir -p .claude
+printf '{"hooks":{}}\n' > .claude/settings.json
+out=$(chke --check); ck "S4 in-tree settings resolve and are reported" \
+  "$(printf '%s' "$out" | grep -qF 'settings  — resolved' && echo 1 || echo 0)"
+ck "S4 an in-tree file is reported as INSIDE the root" \
+  "$(printf '%s' "$out" | grep -qF '(inside the repo root)' && echo 1 || echo 0)"
+
+# OUT OF TREE: reported, never failed. This is the layout at least one adopter runs deliberately,
+# and it is also the shape in which the hardcoded path silently graded nothing.
+OOTS=$(mktemp -d); printf '{"hooks":{}}\n' > "$OOTS/settings.json"
+out=$(GOV_SETTINGS_JSON="$OOTS/settings.json" chke --check)
+ck "S4 an out-of-tree settings file is REPORTED, not failed" \
+  "$(printf '%s' "$out" | grep -qF 'OUTSIDE the repo root' && echo 1 || echo 0)"
+ck "S4 ...and the wiring is still graded" \
+  "$(printf '%s' "$out" | grep -qE '^(ok|UNWIRED|note) +(hooks|agent-cap|scratch|recall|merge)' && echo 1 || echo 0)"
+
+# UNRESOLVABLE: a REFUSAL, not a non-match. An empty string here is what let every arm pass by
+# absence, so this is the arm the whole unit exists for.
+rm -f .claude/settings.json
+# NOT exit 2. The refusal belongs to the ARMS that need the file, not to the run: a repo with no
+# settings file is legal and its hooks, skills and eol wiring must still be graded. Measured: an
+# eager whole-run refusal killed 45 of 76 arms, not one of which was about settings. What the
+# refusal buys is that no arm reads "no file" as "nothing to check".
+chk --check >/dev/null 2>&1; rc=$?
+ck "S4 no settings file -> non-zero, the run still grading" "$([ "$rc" != 0 ] && echo 1 || echo 0)"
+out=$(chke --check)
+ck "S4 ...and the run names the failed resolution" \
+  "$(printf '%s' "$out" | grep -qF 'no settings file resolved' && echo 1 || echo 0)"
+# THE ARM NEEDS AN ADOPTED KIT. With no kit installed every settings arm reports `skip — not
+# adopted`, which is correct and says nothing about this unit; the false-green case is a kit
+# that IS installed while the settings file cannot be found.
+mkdir -p .claude/hooks && printf '// agent-cap\n' > .claude/hooks/agent-cap.js
+out=$(chke --check)
+ck "S4 an ADOPTED kit with no settings file says UNWIRED, not ok" \
+  "$(printf '%s' "$out" | grep -qE '^UNWIRED +agent-cap' && echo 1 || echo 0)"
+
+# A DECLARED path that is not there is also a refusal, never a silent fallthrough to the preference
+# rung — resolving a DIFFERENT file than the operator named would make every arm confidently wrong.
+chk --check >/dev/null 2>&1 || true
+out=$(GOV_SETTINGS_JSON="$OOTS/nope.json" chke --check)
+ck "S4 a declared path that is absent does NOT fall back to the rung" \
+  "$(printf '%s' "$out" | grep -qF 'which is not a file' && echo 1 || echo 0)"
+rm -rf "$OOTS"; cleanup
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

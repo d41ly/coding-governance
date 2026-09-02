@@ -14,7 +14,7 @@ tools/check-install-prefix.test.sh	3	memory-tree
 tools/check-kit-versions.sh	30	codebase-map,drift-audit,govkit,hooks,lexicon,memory-recall,memory-tree,pytest-parallel-guardrails,run-gates,unattended,workflows
 tools/check-line-length.sh	1	lexicon
 tools/check-microformats.sh	1	playbook
-tools/check-wiring.sh	6	hooks,lib,memory-recall,memory-tree
+tools/check-wiring.sh	1	lib
 tools/check-wiring.test.sh	16	hooks,lib,memory-recall,memory-tree
 tools/codebase-map/adopt-codebase-map.sh	3	lib
 tools/codebase-map/adopt-codebase-map.test.sh	5	codebase-map,lib
