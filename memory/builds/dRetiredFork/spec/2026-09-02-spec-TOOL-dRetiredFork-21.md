@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-21 — the two hooks whose path comes from a fragment, not from the default
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 4
+**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 4 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -129,6 +129,8 @@ own descriptors in the first place.
 - **F2 — does `--with-hook` survive at all?** Its whole job is installing a second copy. With one
   copy shipped and wired, the flag may be vestigial. Recommendation: keep it, writing the shipped
   destination, and let `DEPL-dRetiredFork-7`'s census say whether any adopter still relies on it.
+
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
 

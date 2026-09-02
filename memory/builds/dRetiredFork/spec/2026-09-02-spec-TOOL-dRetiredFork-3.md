@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-3 — a present-but-unparseable build README header stops reading as absent
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -54,7 +54,7 @@ around it. Those are different animals and the adopter has been paying for the d
 ### Data model
 
 `StaleHeader(Exception)` carries the path and the raw region text. The waiver registry is one
-`<path>` per row with a reason after whitespace, matching the shape of the five registries already
+`<path>` per row with a reason after whitespace, matching the shape of the nine registries already
 under `memory/project/`.
 
 ### Migration
@@ -123,6 +123,8 @@ of this parser want different answers.
   is indistinguishable from a check that never ran, so it should. Recommendation: print
   `0 tolerated`, unconditionally.
 
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft, authored from the dRetiredFork classification of `nc carve-out
@@ -132,6 +134,9 @@ of this parser want different answers.
   observes it. M1: AC5 demanded byte-identity while §5 requires an unconditional `0 tolerated` line,
   and the two cannot both hold. M2: S4's adopter-facing half had no criterion; AC6 is it. M8: §10
   cited a probe run for the install-prefix question, not this unit's.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, findings 17 and 18. 17: the M8 fold corrected §10's probe
+  QUERY and left the rev-1 terms line, which is the half M7 regrounding actually re-runs. 18: §4
+  said five registries where the tree holds nine and S6 edits a whitelist with nine arms.
 
 ## 10. Reuse audit
 
@@ -143,5 +148,10 @@ this unit extends rather than replaces — `legacy-files.txt` read into `LEGACY_
 `tools/memory-tree/check-memory-hygiene.sh` is the shape copied, including its shrink-only rule and
 its staleness arm.
 
-Recall terms used: `carve-out`, `install-prefix`, `KIT_REL`, `carried`, `relocate`, `rung`,
+Recall terms used: `StaleHeader`, `header`, `parse failure`, `waiver`, `registry`, `shrink-only`,
+`gen_build_index`, `collect`, `build README`, `tolerated`, `memory/project`, `check 3`.
+
+*(rev-3 replaces the rev-1 terms, which were the install-prefix unit's and which BUILD-METHOD M7
+regrounding would have re-run against the wrong question. Superseded terms, for the record:*
+`carve-out`, `install-prefix`, `KIT_REL`, `carried`, `relocate`, `rung`,
 `adopter`, `divergence`, `repath`, `govkit`, `receipt`, `unattributed`, `derive`, `prefix`.

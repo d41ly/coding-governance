@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 9
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 9 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -102,6 +102,12 @@ becoming impossible. That distinction is the whole unit.
 
 ## 6. Acceptance criteria
 
+- **AC0** — The authoring rule is WRITTEN, which rev-1 scoped in S1 and S2 and observed nowhere:
+  `tools/hooks/README.md` carries the four clauses in full, `AGENTS.md` carries a pointer and not a
+  copy — F1's ratified pick — and `bash tools/check-template-size.sh` exits `0` with
+  `coding-governance-agents.template.md` byte-unchanged. Without this the ban can land green while
+  enforcing a rule no document states.
+
 - **AC1** — When a new root-prefix literal is staged in a shipped file, `bash
   tools/check-install-prefix.sh` exits non-zero naming the file and line; the RED is observed before
   the ban is wired.
@@ -134,6 +140,8 @@ becoming impossible. That distinction is the whole unit.
   zero makes it red until every survivor is dispositioned. Recommendation: zero, and let the red be
   the work — but this is an owner turn, because it blocks the branch until it is finished.
 
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft. The 285-byte template headroom was measured by running
@@ -142,6 +150,10 @@ becoming impossible. That distinction is the whole unit.
 - rev-2 · 2026-09-02 · folded spec-audit round 1, finding H6. rev-1's central mechanism named arm 1, which is already a
   ban, so the conversion was a no-op over the arm carrying none of the occurrences units 10-13
   drain — and it contradicted `TOOL-dRetiredFork-13` §3, which spelled it correctly.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, finding 10. Half the unit's title — the authoring rule — was
+  scoped in S1 and S2 and observed by no criterion, so the ban could land with the rule unwritten;
+  AC0 observes both carriers. F1 is ratified with the rest of this build's forks, and S2 now agrees
+  with it: the kit README owns the rule and the charter points.
 
 ## 10. Reuse audit
 

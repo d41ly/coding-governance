@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-6 — the drift-audit note is DERIVED from its counters
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -91,6 +91,8 @@ comment text.
 - **F1 — does the note's sentence become a declared contract, or stay incidental?** If a consumer
   gate byte-compares it, it is a contract whether declared or not. Recommendation: declare it in the
   kit README so a later editor knows the cost, and let the version bump carry it.
+
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
 

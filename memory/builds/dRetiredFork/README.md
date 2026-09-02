@@ -96,7 +96,7 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
 | 1 | `TOOL-dRetiredFork-2` | 1 | the git-environment leak, one defect at two legs, stops reaching a subprocess |
 | 1 | `TOOL-dRetiredFork-3` | 2 | a build README header that is present and unparseable stops reading as absent |
 | 1 | `TOOL-dRetiredFork-4` | 1 | an adopter's fail-open claim is reconciled against a fixture that contradicts it |
-| 1 | `TOOL-dRetiredFork-5` | 1 | four codebase-map selftest arms stop printing "NOT a pass" and being stamped ok |
+| 1 | `TOOL-dRetiredFork-5` | 1 | two codebase-map selftest arms stop printing "NOT a pass" and being stamped ok |
 | 1 | `TOOL-dRetiredFork-6` | 2 | the drift-audit note is DERIVED from its counters instead of hand-written |
 | 1 | `TOOL-dRetiredFork-7` | 2 | the review join gains the dead-agent-wave arity arm |
 | 1 | `TOOL-dRetiredFork-8` | 2 | check-wiring resolves the settings file instead of spelling one path |
@@ -145,29 +145,29 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21
 | [TOOL-dRetiredFork-20 — a spec lint resolves a spec's own machine-facing tokens](spec/2026-09-02-spec-TOOL-dRetiredFork-20.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-1 — memory-tree arms `pop_guard` on check 6](spec/2026-09-02-spec-TOOL-dRetiredFork-1.md) | 1 | 1 | OPEN | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-2 — the git-environment leak, one defect at two legs](spec/2026-09-02-spec-TOOL-dRetiredFork-2.md) | 1 | 1 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-3 — a present-but-unparseable build README header stops reading as absent](spec/2026-09-02-spec-TOOL-dRetiredFork-3.md) | 1 | 2 | OPEN | rev-2 | 2026-09-02 |
+| [TOOL-dRetiredFork-3 — a present-but-unparseable build README header stops reading as absent](spec/2026-09-02-spec-TOOL-dRetiredFork-3.md) | 1 | 2 | OPEN | rev-3 | 2026-09-02 |
 | [TOOL-dRetiredFork-4 — reconcile inCMS's agent-cap fail-open claim against HEAD](spec/2026-09-02-spec-TOOL-dRetiredFork-4.md) | 1 | 1 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-5 — four codebase-map selftest arms stop being stamped ok](spec/2026-09-02-spec-TOOL-dRetiredFork-5.md) | 1 | 1 | OPEN | rev-2 | 2026-09-02 |
+| [TOOL-dRetiredFork-5 — two codebase-map selftest arms stop being stamped ok](spec/2026-09-02-spec-TOOL-dRetiredFork-5.md) | 1 | 1 | OPEN | rev-3 | 2026-09-02 |
 | [TOOL-dRetiredFork-6 — the drift-audit note is DERIVED from its counters](spec/2026-09-02-spec-TOOL-dRetiredFork-6.md) | 1 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm](spec/2026-09-02-spec-TOOL-dRetiredFork-7.md) | 1 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-8 — check-wiring resolves the settings file instead of spelling one path](spec/2026-09-02-spec-TOOL-dRetiredFork-8.md) | 1 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-9 — `_`-prefixed spec subfolders, and C21's batched greps](spec/2026-09-02-spec-TOOL-dRetiredFork-9.md) | 1 | 1 | OPEN | rev-1 | 2026-09-02 |
-| [DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract](spec/2026-09-02-spec-DEPL-dRetiredFork-7.md) | 2 | 2 | OPEN | rev-2 | 2026-09-02 |
+| [TOOL-dRetiredFork-8 — check-wiring resolves the settings file instead of spelling one path](spec/2026-09-02-spec-TOOL-dRetiredFork-8.md) | 1 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [TOOL-dRetiredFork-9 — `_`-prefixed spec subfolders, and C21's batched greps](spec/2026-09-02-spec-TOOL-dRetiredFork-9.md) | 1 | 1 | OPEN | rev-2 | 2026-09-02 |
+| [DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract](spec/2026-09-02-spec-DEPL-dRetiredFork-7.md) | 2 | 2 | OPEN | rev-3 | 2026-09-02 |
 | [TOOL-dRetiredFork-10 — three workflows gates anchor their locator and population on a basename](spec/2026-09-02-spec-TOOL-dRetiredFork-10.md) | 2 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix](spec/2026-09-02-spec-TOOL-dRetiredFork-11.md) | 2 | 1 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`](spec/2026-09-02-spec-TOOL-dRetiredFork-12.md) | 2 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface](spec/2026-09-02-spec-TOOL-dRetiredFork-13.md) | 3 | 1 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two](spec/2026-09-02-spec-TOOL-dRetiredFork-14.md) | 4 | 2 | OPEN | rev-2 | 2026-09-02 |
+| [TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix](spec/2026-09-02-spec-TOOL-dRetiredFork-11.md) | 2 | 1 | OPEN | rev-2 | 2026-09-02 |
+| [TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`](spec/2026-09-02-spec-TOOL-dRetiredFork-12.md) | 2 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface](spec/2026-09-02-spec-TOOL-dRetiredFork-13.md) | 3 | 1 | OPEN | rev-3 | 2026-09-02 |
+| [TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two](spec/2026-09-02-spec-TOOL-dRetiredFork-14.md) | 4 | 2 | OPEN | rev-3 | 2026-09-02 |
 | [TOOL-dRetiredFork-21 — the two hooks whose path comes from a fragment, not from the default](spec/2026-09-02-spec-TOOL-dRetiredFork-21.md) | 4 | 2 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys](spec/2026-09-02-spec-TOOL-dRetiredFork-15.md) | 5 | 2 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine](spec/2026-09-02-spec-TOOL-dRetiredFork-16.md) | 5 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations](spec/2026-09-02-spec-DEPL-dRetiredFork-1.md) | 6 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys](spec/2026-09-02-spec-TOOL-dRetiredFork-15.md) | 5 | 2 | OPEN | rev-2 | 2026-09-02 |
+| [TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine](spec/2026-09-02-spec-TOOL-dRetiredFork-16.md) | 5 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations](spec/2026-09-02-spec-DEPL-dRetiredFork-1.md) | 6 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | OPEN | rev-4 | 2026-09-02 |
 | [DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin](spec/2026-09-02-spec-DEPL-dRetiredFork-4.md) | 6 | 1 | OPEN | rev-2 | 2026-09-02 |
 | [DEPL-dRetiredFork-5 — `check` runs the `[[outcome]]` probe instead of grading an exit code](spec/2026-09-02-spec-DEPL-dRetiredFork-5.md) | 6 | 1 | OPEN | rev-1 | 2026-09-02 |
-| [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's](spec/2026-09-02-spec-DEPL-dRetiredFork-6.md) | 8 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-2 | 2026-09-02 |
+| [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | OPEN | rev-4 | 2026-09-02 |
+| [DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's](spec/2026-09-02-spec-DEPL-dRetiredFork-6.md) | 8 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 2 record folder(s).

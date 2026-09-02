@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-8 — check-wiring resolves the settings file instead of spelling one path
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -39,7 +39,8 @@ gov's hardcoded path is the defect; the resolver plus the scope arm is the fix.
 
 ## 3. Non-goals (OUT)
 
-- Nothing. rev-1 deferred inCMS's residual 39 literal prefix sites to `TOOL-dRetiredFork-13`, whose
+- inCMS's residual literal prefix sites are NOT deferred: S6 takes them here. rev-1 sent them to
+  `TOOL-dRetiredFork-13`, whose
   declared population is "the 32 remaining shipped test and selftest files" and which therefore
   excludes this checker — so the sweep had no owner. S6 takes it here instead. rev-1's arithmetic
   was also unreconciled: "+67/-25 of which roughly 90 travel" leaves about two lines, not 39 sites.
@@ -100,13 +101,16 @@ an adopter 164 commits behind cannot read a key their installed kit predates.
 
 ## 7. Gates
 
-`check-wiring self-test` · `check-wiring self-test` · `kit version markers` · `install-prefix (shipped surface)`.
+`check-wiring self-test` · `kit version markers` · `install-prefix (shipped surface)`.
+
 
 ## 8. Open questions
 
 - **F1 — does the scope arm REPORT or RED?** inCMS reports, because its layout is deliberate. A
   project whose settings file escaped the repo by accident wants RED. Recommendation: report, and let
   `TOOL-dRetiredFork-16`'s extension point be how a project promotes it to a leg of its own.
+
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
 
@@ -117,6 +121,8 @@ an adopter 164 commits behind cannot read a key their installed kit predates.
   ban at order 9; S6 takes the sweep here and AC6 observes the ratchet row falling. H14: S3's
   requirement that every caller read through `settings_json()` had no criterion, and AC1's
   byte-identity is structurally incapable of catching a caller left on the literal; AC5 is it.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, findings 25 and 29. 29: a cut-line section opened with
+  "Nothing." and then listed an item. 25: the leg rename left a duplicate in §7.
 
 ## 10. Reuse audit
 

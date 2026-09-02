@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6
+**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -92,7 +92,7 @@ flip. "Use apply" is how the safe verb stays unable to add.
   seed arm is what observes it. Secondly, landing a file into a target that deliberately declined it. Mitigated by `[[decline]]`,
   which already grades a deliberate omission and which BOTH adopters currently use zero times; this
   unit's report should name a decline that would have suppressed a row.
-- testing + left-shift gates — S6's four arms in `tools/govkit/selftest.py`.
+- testing + left-shift gates — one arm per S6 item, in `tools/govkit/selftest.py`.
 - migration / rollback — additive; a run that lands nothing new behaves exactly as today.
 - user docs — `WIRE-INTO-PROJECT.md` maintenance section, and the `update` usage block.
 
@@ -104,7 +104,10 @@ flip. "Use apply" is how the safe verb stays unable to add.
 - **AC2** — When gov ships a new `rendered` source, the run REPORTS it and writes no bytes.
 - **AC3** — When a `[[decline]]` row covers the destination, the run names the decline and lands
   nothing.
-- **AC4** — When no source is new, the run's output is byte-identical to the pre-change run. Compared across `python tools/govkit/govkit.py update --target <fixture>` runs.
+- **AC4** — When no source is new, the run's output differs from the pre-change run by EXACTLY
+  the `0 new` line §5 requires, and by nothing else; compared across `python
+  tools/govkit/govkit.py update --target <fixture>` runs. rev-1 demanded byte-identity, which
+  that line makes impossible — the same pair `TOOL-dRetiredFork-3` AC5 already reconciles.
 - **AC5** — A read-only run against `C:/projects/nicocares/main` names all five currently invisible
   additions, and against `C:/projects/incms/main` reports a count reconcilable with
   `plan --coverage`'s 59 of 142.
@@ -142,6 +145,10 @@ flip. "Use apply" is how the safe verb stays unable to add.
 - rev-3 · 2026-09-02 · folded spec-audit round 1, finding H8. `DEPL-dRetiredFork-7` S5 FILED the `--kits` dispatch defect
   while F2 here recommended FIXING it, and M2 requires a disagreement resolved in exactly one
   document before the first code pass. This unit takes it; DEPL-7 strikes its clause.
+- rev-4 · 2026-09-02 · folded spec-audit round 2, findings 13, 14 and 30d. 13: §5 requires an unconditional
+  `0 new` line and AC4 demanded byte-identity; both cannot hold. 14: §5 counted S6's arms and
+  the count went stale the moment S6 grew — it points now. 30d: the rev-3 fold marked F2
+  RESOLVED without the `ratified` pointer TEMPLATE-SPEC requires beside the mark.
 
 ## 10. Reuse audit
 

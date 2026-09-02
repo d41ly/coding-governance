@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 5
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 5 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -90,9 +90,12 @@ a different name.
   pre-write refusal is filed rather than fixed here.
 - **AC2** — When the same leg's script is absent, the target's gate runner REFUSES naming it, rather
   than skipping silently. Observed via the target's own `bash tools/run-gates/run-gates.sh`.
-- **AC3** — `bash scripts/check-build-readme-comments.sh` exists as the worked example, sources
+- **AC3** — NicoCares' `scripts/check-build-readme-comments.sh` is quoted VERBATIM in this build's
+  record together with its fixture and its red output. gov does not track that path and §3's own
+  non-goal forbids landing it here, so the example travels as evidence rather than as a file. It
+  sources
   `.memory-tree.conf`, and reds on the fixture that motivated NicoCares' check 90.
-- **AC4** — `WIRE-INTO-PROJECT.md` names the extension point, the ownership rule and the refusal in
+- **AC4** — `tools/memory-tree/README.md` and `WIRE-INTO-PROJECT.md` both name the extension point, the ownership rule and the refusal in
   S5, and `python tools/govkit/check_runbook_parity.py` still exits `0`. It is a python program and
   rev-1 invoked it with `bash`; it is also invoked by NO leg in `tools/gate-legs.json`, so this
   direct invocation is the only thing exercising the runbook claim anywhere in the build.
@@ -110,6 +113,8 @@ a different name.
   reds a leg arriving without one. Recommendation: yes, and say so in the worked example, because an
   adopter discovering that rule from a red bar is a worse first experience than reading it.
 
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft, from `nc carve-out 6/20` and the `owned`/`emitted` refusal at
@@ -118,6 +123,9 @@ a different name.
   behaviour the code has in neither branch — a colliding name aborts at exit 2 after a partial
   write, a non-colliding one is preserved silently — and it pre-answered F1, which S3 declares a
   fact-question. L1: the citation was four lines short and a python program was invoked with `bash`.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, finding 19. AC3 required a path gov does not track and §3's
+  own non-goal forbids creating; the worked example now travels as quoted evidence. AC4 gained the
+  second carrier S2 names.
 
 ## 10. Reuse audit
 

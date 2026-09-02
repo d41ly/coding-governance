@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -25,7 +25,8 @@ blocked `TOOL-aGradedDoorway-2` from finishing `check-playbook.test.sh`. inCMS c
 - **S1** — Retag the fixture to `role = "rendered"` with `placeholders = ["KIT_DIR"]` in
   `tools/unattended/kit.toml`, and replace its five literal spellings with that ONE token.
   `TOOL_ROOT`, which rev-1 declared, cannot be rendered here: `tools/unattended/adopt-unattended.sh`
-  substitutes only `{{KIT_DIR}}` (`:222`) and never computes `TOOL_ROOT`, which exists solely in
+  substitutes `{{KIT_DIR}}`, `{{MEMORY_ROOT}}` and `{{LANDER}}` (`:222-224`) plus three
+  `KEEPALIVE_*` and `{{ANCHOR_SCOPE}}`, and never computes `TOOL_ROOT`, which exists solely in
   `tools/memory-tree/adopt-memory-tree.sh` (`:36-37`, `:85`). All five literals are
   `tools/unattended/…`, entirely under the kit dir, so `{{KIT_DIR}}` covers them and an unresolved
   `{{TOOL_ROOT}}` brace would otherwise ship to every adopter.
@@ -100,7 +101,7 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
 
 ## 7. Gates
 
-`unattended kit gate` · `install-prefix (shipped surface)` · `kit version markers` · `govkit selfcheck` ·
+`playbook validity gate` · `install-prefix (shipped surface)` · `kit version markers` · `govkit selfcheck` ·
 `kit/dogfood doc parity`.
 
 ## 8. Open questions
@@ -109,6 +110,8 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
   `--re-adopt` re-measures from scratch and would classify the file correctly, but it also discards
   every other row's recorded base. Recommendation: make `DEPL-dRetiredFork-3` handle a role change
   in place, and treat `--re-adopt` as the fallback the runbook names rather than the plan.
+
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
 
@@ -119,6 +122,10 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
   the dependency is now stated in §2 rather than only in §8. H12: the `TOOL_ROOT` token rev-1
   declared cannot be rendered by the unattended adopter, which substitutes only `{{KIT_DIR}}` — and
   §10 had checked the memory-tree DESCRIPTOR rather than the adopter that must execute the render.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, findings 24 and 30c. 30c: the H12 fold's premise was false —
+  `adopt-unattended.sh` substitutes seven tokens, not one — inside the sentence carrying H12's whole
+  measurement, though its conclusion about `TOOL_ROOT` survives. 24: §7 named a leg no scope item
+  touches and omitted `playbook validity gate`, which grades the fixture this unit retags.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7
+**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 7 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -50,7 +50,10 @@ red. This is the difference between "the bytes arrived" and "the update ran".
   run says so.
 - The `merged` role. Its code says plainly that no writer exists yet, and building one is out of
   scope; `DEPL-dRetiredFork-7` records it.
-- `generated` rows. They are produced in the target by the target's own tooling by declared design.
+- Writing a `generated` file's BYTES. `update` never does that, by declared design — but a
+  `[[regenerate]]` argv declared by a gov descriptor IS run by this verb, which is S2's whole
+  content, so this disclaims AUTHORSHIP and not INVOCATION. Such rows are otherwise produced in
+  the target by the target's own tooling.
   The report NAMES which generators are owed; running the target's own tooling is the adopter's.
 
 ## 4. Design
@@ -92,7 +95,7 @@ must remember is not a mechanism.
 - risks — executing code in a repository gov does not own, after a write, with a rollback that must
   itself work. Highest-risk unit in the build. Mitigated by the default-OFF flag, by S4's rollback
   extension, and by the fixture-then-one-adopter rollout.
-- testing + left-shift gates — S6's four arms plus the acceptance matrix.
+- testing + left-shift gates — one arm per S6 item, plus the acceptance matrix.
 - migration / rollback — the `[[regenerate]]` block is additive and defaulted; the feature flag is
   the rollback.
 - user docs — `WIRE-INTO-PROJECT.md` maintenance section SHRINKS, because the obligations it lists
@@ -121,11 +124,14 @@ must remember is not a mechanism.
   the re-render flag ON, `python tools/govkit/govkit.py update --target C:/projects/nicocares/main
   --write` lands every stale row, re-renders every rendered row, runs every declared generator,
   re-stamps `gov_commit`, and the tree afterwards needs no hand merge — recorded in the acceptance
-  ledger. Repeated for `C:/projects/incms/main` once its receipt is repaired.
-- **AC11** — `WIRE-INTO-PROJECT.md`'s maintenance section is strictly SHORTER than at `b0108f13`,
+  ledger. **inCMS's half of the done-condition is DEFERRED, and §3 says so**: no unit in this
+  roster repairs that receipt, so a criterion gated on the repair would be permanently neither
+  green nor red — worse than a missing one, because it looks covered.
+- **AC11** — `python tools/govkit/check_runbook_parity.py` exits `0`, and
+  `WIRE-INTO-PROJECT.md`'s maintenance section is strictly SHORTER than at `b0108f13`,
   and every obligation it drops is carried by a `[[regenerate]]` block in a kit descriptor. §5
   calls that shrinkage an acceptance criterion rather than a side effect, and rev-1 wrote none.
-- **AC8** — `python tools/govkit/selftest.py` and `selfcheck` exit `0`.
+- **AC12** — `python tools/govkit/selftest.py` and `selfcheck` exit `0`.
 
 ## 7. Gates
 
@@ -144,6 +150,8 @@ must remember is not a mechanism.
   Recommendation: keep it for one release, then remove it in a follow-up, so a regression has a
   documented switch rather than a revert.
 
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft. `UPDATE_ROLE`, the report cap and the absence of any
@@ -156,6 +164,11 @@ must remember is not a mechanism.
   done-condition. AC10 is that observation, and this unit owns it.
 - rev-3 · 2026-09-02 · folded spec-audit round 1, finding M3. §5 declared the runbook's shrinkage an acceptance criterion
   and §6 carried none; AC11 is it.
+- rev-4 · 2026-09-02 · folded spec-audit round 2, findings 6, 12, 14, 23 and 28. 6: AC10's inCMS half was
+  gated on a repair no unit performs, so it could neither discharge nor fail; DEFERRED in
+  writing now. 12: the `generated` non-goal contradicted S2 — it disclaims authorship, not
+  invocation. 14: a stale arm count becomes a pointer. 23: AC11 lost its gate when `runbook
+  parity` proved not to be a leg; it invokes the program directly. 28: AC8 sat after AC11.
 
 ## 10. Reuse audit
 

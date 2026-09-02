@@ -1,6 +1,6 @@
-# TOOL-dRetiredFork-5 — four codebase-map selftest arms stop being stamped ok
+# TOOL-dRetiredFork-5 — two codebase-map selftest arms stop being stamped ok
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -14,7 +14,7 @@
 ## 1. Goal
 
 Close the green-by-absence hole inCMS found in gov's own harness and filed as
-`ABL-aFerriedToolkit-4`, which gov has not taken. Four guarded arms in
+`ABL-aFerriedToolkit-4`, which gov has not taken. Two guarded arms in
 `tools/codebase-map/selftest.py` print an honest "NOT a pass" line when their guard is unmet and are
 then stamped `ok` on the next line, so the suite reports coverage it does not have. This is the
 class `AGENTS.md` §7 names — a skip that looks like a pass — inside the kit's own proof.
@@ -40,7 +40,7 @@ class `AGENTS.md` §7 names — a skip that looks like a pass — inside the kit
 
 ## 3. Non-goals (OUT)
 
-- Making the four guards satisfiable. Whether the guarded arms CAN run in gov's tree is a separate
+- Making the four guard EXITS satisfiable. Whether the two guarded arms CAN run in gov's tree is a separate
   question; this unit makes the report honest, not the coverage complete.
 
 ## 6. Acceptance criteria
@@ -65,3 +65,7 @@ class `AGENTS.md` §7 names — a skip that looks like a pass — inside the kit
 - rev-2 · 2026-09-02 · folded spec-audit round 1, finding H10. rev-1's "four guarded arms" counted guard exits; the suite
   has two guarded arms and 24 unconditional ones, so its "every arm skipped" refusal was unreachable
   and AC2 unobservable. S1, S2 and AC2 are restated against the arm count.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, finding 11. The H10 fold restated S1, S2 and AC2 against
+  the measured truth and left the refuted "four" standing in the title, the goal and a non-goal —
+  the three places a reader meets first, and the two the build README renders. Two guarded arms,
+  four guard exits.

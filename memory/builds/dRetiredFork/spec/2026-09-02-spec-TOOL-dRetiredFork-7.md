@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -97,6 +97,8 @@ equally exposed to.
 - **F2 — what does gov's own tree do under this arm?** UNRESOLVED until the predicate is run. This
   is a `FACT-QUESTION` decided by that run, and the liveness assertion in S3 is what lets it produce
   a negative.
+
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
 

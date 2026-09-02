@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -51,9 +51,11 @@ authoritative bar is owed. NicoCares carries the fix as `nc carve-out 14/20`.
 
 ## 7. Gates
 
-`push-main self-test` · `install-prefix (shipped surface)` · `check-wiring self-test` · `testsuite counts (every bar self-test prints one)`.
+`push-main self-test` · `install-prefix (shipped surface)` · `pre-push self-test` · `testsuite counts (every bar self-test prints one)`.
 
 ## 9. Revision log
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
   against gov at b0108f13.
+- rev-2 · 2026-09-02 · folded spec-audit round 2, finding 27. §7 named the wiring suite; this unit touches
+  `.githooks/pre-push`, which `pre-push self-test` grades and which its own criteria already invoke.

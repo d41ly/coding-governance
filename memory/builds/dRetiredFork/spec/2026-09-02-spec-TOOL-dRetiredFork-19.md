@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-19 — a declared placeholder must be one its own adopter substitutes
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0
+**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -122,6 +122,8 @@ the failure mode rather than a check on it.
 - **F2 — is the reverse direction ever worth gating?** An adopter substituting a token no rule
   declares is legitimate today and S5 reports it. Recommendation: report only, and revisit if the
   report is ever non-empty for a reason nobody can explain.
+
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
 

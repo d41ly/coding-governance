@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -35,6 +35,10 @@ under it cannot prove the rung that would have reconciled them.
 - **S4** — Measure the effect on both adopters read-only and record it: how many of NicoCares' 19
   and inCMS's rows move from `rung=None` to `relocate`. The number is the unit's whole value and it
   is currently unknown.
+- **S3b** — GRADE every derived needle and REFUSE a degenerate one. §5's security row states
+  this obligation and rev-1 built nothing for it: a needle is a path fragment used in a byte
+  substitution over file content, so an empty or single-character fragment matches far more than
+  the path it names, on the build's highest-severity path.
 - **S5** — Arms in `tools/govkit/selftest.py` for a fanned directory whose rows resolve, a genuinely
   ambiguous row that still drops, and an empty needle map that refuses.
 
@@ -111,7 +115,10 @@ because a kit ships a rendered SKILL.md beside its engine files.
   recorded before-count, or the acceptance ledger states that it cannot fall and why — naming the
   residual-byte cause from §3 — so the `gov_commit` gap is recorded rather than discovered at the
   build's acceptance.
-- **AC7** — `python tools/govkit/govkit.py selfcheck` exits `0`.
+- **AC7** — When a receipt row yields an empty or single-character needle fragment, the run
+  REFUSES naming the row, observed via `python tools/govkit/govkit.py update --target <fixture>`,
+  and the RED is staged before the grading is wired.
+- **AC8** — `python tools/govkit/govkit.py selfcheck` exits `0`.
 
 ## 7. Gates
 
@@ -127,6 +134,8 @@ because a kit ships a rendered SKILL.md beside its engine files.
 - **F2 — does a per-row needle change the recorded `carry` field's meaning?** The field records the
   rung, not the map. Recommendation: no schema change, and assert that in the selftest.
 
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft. `derive_carry_rung` and the DROP message were read at
@@ -135,6 +144,9 @@ because a kit ships a rendered SKILL.md beside its engine files.
   re-stamp, `update` withholds it while any row is unattributed, and no unit drove that population
   down — S3 here and DEPL-2 S5 only reported it. S6 measures it; AC6 requires the count to fall or
   the impossibility to be recorded.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, finding 22. §5's security row stated a grading obligation
+  on the needle map that no scope item built and no criterion observed — on the path where a
+  wrong needle writes gov's bytes over a target's real edit. S3b builds it; AC7 observes it.
 
 ## 10. Reuse audit
 

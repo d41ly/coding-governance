@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-10 — three workflows gates anchor their locator and population on a basename
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -113,6 +113,8 @@ including one nobody has enumerated, such as swydee's repo-root install.
   convention rather than an install prefix. Recommendation: keep it, and say in the header that it is
   the harness convention and not a kit path — but this is a fork the owner should see, because it is
   the one place the unit does not practise what it enforces.
+
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
 

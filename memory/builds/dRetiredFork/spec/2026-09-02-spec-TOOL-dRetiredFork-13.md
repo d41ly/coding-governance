@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -40,12 +40,20 @@ recorded occurrences.
   its own source says so — and 259 of its 656 occurrences are already test/selftest rows. Only arm 1
   excludes them, and arm 1 is the root-spelling ban, not the ratchet.
 - Files outside the shipped surface. `tools/lib/` is gov-internal and never travels.
-- Non-test shipped CHECKERS. `tools/check-wiring.sh` is the measured case and it is NOT this unit's:
+- `tools/check-wiring.sh` SPECIFICALLY, and no wider class. It is NOT this unit's:
   `TOOL-dRetiredFork-8` S6 takes its own literals in its own landing. rev-1 was named as that
   sweep's owner by `TOOL-dRetiredFork-8` §3 while this population excluded it, so the work had no
   owner at all; the pointer is corrected on both sides.
 
 ## 6. Acceptance criteria
+
+- **AC0** — The file count and the occurrence count are RE-DERIVED from
+  `tools/install-prefix-carried.txt` and written as a reconciled pair, stating whether
+  `.githooks/pre-push.test.sh` belongs to this unit's population or `TOOL-dRetiredFork-11`'s.
+  Measured at `b0108f13` the ratchet holds 33 test rows summing to 259, and rev-1 said 32 carrying
+  259, which cannot both be right.
+- **AC0b** — AC4 names the per-file rows of `tools/install-prefix-carried.txt` expected to reach
+  zero rather than a total, so a partial sweep cannot pass by moving one large row.
 
 - **AC1** — For each touched file, expanding `$KIT_REL` to its default and removing the added line
   reproduces the file's bytes at `b0108f13` exactly.
@@ -70,3 +78,7 @@ run on demand under `GATE_SELFTESTS=1` rather than added to the bar.
 - rev-2 · 2026-09-02 · folded spec-audit round 1, finding H4. rev-1's population excluded the non-test checkers that
   `TOOL-dRetiredFork-8` §3 deferred to it, so 39 literal sites had no owning unit. §3 now names the
   owner explicitly and the pointer is corrected on both sides.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, findings 15 and 16. 15: the file count and the occurrence
+  count disagreed with the ratchet; AC0 re-derives them and AC0b makes the criterion per-row. 16:
+  §3 disclaimed the whole non-test checker CLASS on the strength of its one owned member, leaving
+  the other six files and 41 occurrences visibly unowned before `TOOL-dRetiredFork-17`'s ban.

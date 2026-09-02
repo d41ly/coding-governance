@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 2
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 2 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -45,7 +45,10 @@ cannot reach zero is not a programme.
   STRING. The `--kits` dispatch defect rev-1 also filed here is NOT filed: `DEPL-dRetiredFork-2`
   S5b fixes it, and filing a row at order 2 that another unit closes at order 6 ships a backlog row
   that is already false.
-- **S6** — Reclassify inCMS's `gen_build_index.py` row from `diverged` to a contract-adopted class.
+- **S6** — RECORD inCMS's `gen_build_index.py` row as contract-adopted in the census output, and
+  hand the reclassification to that adopter as a named recommendation. rev-1 said "Reclassify",
+  which §3 forbids and AC7 asserts against — the row lives in inCMS's own `kits.json` and gov
+  owns none of it. Recording it carves the item cleanly out of §3's non-goal.
   gov's file is 2519 lines with 59 top-level defs, inCMS's is 518 with 14, and they share three
   symbol names. There is no upstream file to converge on, and its 2764-line diff inflates every
   metric computed over that registry.
@@ -110,6 +113,10 @@ direction, which is the direction that makes the build look smaller than it is.
 - **AC3** — When it runs against `C:/projects/swydee`, it reports 32 of 35 differing files as
   identical to some gov vintage and names the three that diverge.
 - **AC4** — When the census maps zero files, it REFUSES rather than reporting a clean tree. The index is built from `git rev-list --objects --all`, so an empty map is detectable.
+- **AC4b** — The census output NAMES the `gen_build_index.py` row, its recorded class and the
+  two symbol counts that justify it — 2519 lines with 59 defs against 518 with 14, sharing three
+  names — and the recommendation handed to inCMS is quoted in this build's record. This is S6,
+  which rev-1 left unobserved by every criterion.
 - **AC5** — The ledger contract is written, and a worked example shows a NicoCares carve-out being
   retired without editing any other tag and without the census arm failing at zero. The contract and the worked example land in `WIRE-INTO-PROJECT.md`.
 - **AC6** — Each defect in S5 has a row in `memory/backlog/DEPL.md` carrying its file, line and
@@ -136,6 +143,8 @@ direction, which is the direction that makes the build look smaller than it is.
   keep it parked, and put this measurement in front of the owner, because the ordering argument may
   now favour doing it first.
 
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft. The 23,384-blob index, the eleven inCMS files, the two
@@ -143,6 +152,9 @@ direction, which is the direction that makes the build look smaller than it is.
   pass, not estimates.
 - rev-2 · 2026-09-02 · folded spec-audit round 1, finding H8. rev-1 filed the `--kits` dispatch defect that
   `DEPL-dRetiredFork-2` F2 recommended fixing; M2 requires one owner, and DEPL-2 takes it.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, finding 9. S6 was imperative, §3 forbade it and no criterion
+  observed it, so the unit could pass its DoD with the row untouched while the README believed
+  it reclassified. S6 RECORDS and recommends now, which §3 permits, and AC4b observes it.
 
 ## 10. Reuse audit
 

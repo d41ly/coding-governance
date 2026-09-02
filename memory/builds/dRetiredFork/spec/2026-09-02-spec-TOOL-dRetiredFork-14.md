@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 4
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 4 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -25,7 +25,7 @@ dual-ship doubles it before anyone edits anything.
 - **S1** — Point the wired command at `{prefix}/hooks/agent-cap.js`. `tools/settings-merge.py`
   takes `hook_path` as a parameter and defaults it to `.claude/hooks/agent-cap.js`, with
   `--hook-path` as the override. **This is NOT merely a call-site change**, which rev-1 claimed:
-  `HOOK_MARKER` is the bare basename `agent-cap.js` at `tools/settings-merge.py:53`, and `merge()`
+  `HOOK_MARKER` is the bare basename `agent-cap.js` at `tools/settings-merge.py:49`, and `merge()`
   returns the object unchanged when any command in the matcher group already contains it
   (`:108-109`). The module docstring says so at `:37` — the dedup "deliberately does NOT rewrite a
   stale hook path". Every already-wired tree, gov's own included, is a no-op today.
@@ -33,9 +33,13 @@ dual-ship doubles it before anyone edits anything.
   command whose marker matches but whose path differs, or a fragment-level `hook_path` compare
   distinct from the marker compare. Without it S2's withdrawal leaves every wired tree naming a
   path that no longer ships, which is the silent unwiring §5 calls the highest risk in the build.
-- **S2** — Drop the `.claude/hooks/` destinations from the hooks and memory-recall descriptors, so
+- **S2** — Drop the `.claude/hooks/` destinations from the hooks and memory-recall descriptors —
+  which in `tools/hooks/kit.toml:43-46` covers `scratch-guard.js` as well as `agent-cap.js`, so
   one copy ships.
-- **S3** — The two-copy parity arm becomes SELF-ARMING on the resolved destination count: it must
+- **S3** — EVERY two-copy parity arm becomes SELF-ARMING on the resolved destination count —
+  `tools/hooks/agent-cap.test.sh:810-817` and `tools/hooks/scratch-guard.test.sh:183-190`, the
+  second of which hard-FAILS rather than skipping when the kit copy is tracked and the wired copy
+  is absent, which is exactly the state AC1 requires after this unit lands. Each must
   assert what it finds rather than assume two, and it must REFUSE on zero. A parity arm over a
   population of one that assumes two is the green-by-absence class this repo has already recorded.
 - **S4** — `tools/check-wiring.sh` verifies the wired command names the shipped copy, and reports —
@@ -89,7 +93,8 @@ and it costs 2211 lines plus a doubled edit surface to buy a property that one c
 - risks — an adopter whose settings file is not rewritten keeps pointing at a withdrawn path and
   loses the hook silently. This is the highest risk in the build and is why S4 reports rather than
   reds, and why the withdrawal is not part of this unit.
-- testing + left-shift gates — the agent-cap suite, the wiring suite, and a fixture that verifies
+- testing + left-shift gates — the agent-cap suite, the scratch-guard suite, the wiring suite, the
+  settings-merge selftest, and a fixture that verifies
   the two-step ordering.
 - migration / rollback — restoring the second destination is a descriptor edit; nothing is deleted
   from an adopter by this unit.
@@ -112,10 +117,17 @@ and it costs 2211 lines plus a doubled edit surface to buy a property that one c
 
 ## 7. Gates
 
-`agent-cap self-test` · `check-wiring self-test` · `check-wiring self-test` · `kit version markers` · `govkit selfcheck` ·
-`agent-cap restatement`.
+`agent-cap self-test` · `scratch-guard self-test` · `check-wiring self-test` ·
+`settings-merge selftest` · `kit version markers` · `govkit selfcheck` · `agent-cap restatement`.
 
 ## 8. Open questions
+
+- **F0 — does the repath mode rewrite a path a FRAGMENT supplied, or only the built-in default?**
+  S1b offers `--rewrite-stale-path` or a fragment-level `hook_path` compare and settles neither; a
+  CLI-surface choice sitting outside §8 is one nothing forces before the first code pass.
+  `TOOL-dRetiredFork-21` F1 asks the same question from the fragment side and the two must agree.
+  Recommendation: a fragment-level compare, so a fragment gov owns and an adopter cannot edit
+  without forking is repathed by the same run.
 
 - **F1 — does `.claude/hooks/` remain a legal destination for a project that wants it?** Dropping it
   from gov's descriptors does not forbid an adopter choosing it via a per-entry `kit`. Recommendation:
@@ -125,6 +137,8 @@ and it costs 2211 lines plus a doubled edit surface to buy a property that one c
   Recommendation: leave the withdrawal to the adopter and say so in the maintenance docs; do not
   automate a delete whose wrong ordering unwires a security guard.
 
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft. Duplication measured directly at b0108f13 rather than cited.
@@ -133,16 +147,22 @@ and it costs 2211 lines plus a doubled edit surface to buy a property that one c
   inverted and its AC2 was unsatisfiable on any wired tree; S1 is corrected, S1b adds the missing
   capability and AC7 observes it. B4 corrected AC5's untracked `.claude/hooks/agent-cap.test.sh`
   to the tracked `tools/hooks/agent-cap.test.sh`. §10 corrected: the seam is not already sufficient.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, findings 7, 8, 25, 26, 30a and 30b. Finding 7: the round-1
+  fold prepended its §10 correction in front of the text it refutes, leaving both verdicts and a
+  truncated sentence; §10 is rewritten to one claim. Finding 8: S2 withdraws scratch-guard's wired
+  copy too, and `tools/hooks/scratch-guard.test.sh:183-190` hard-FAILS on the resulting state — S3
+  now names every parity arm and §7 names that leg. Findings 25 and 26: §7 carried
+  `check-wiring self-test` twice from the leg rename and named no leg for the central change.
+  30a: `HOOK_MARKER` is at `:49`, not `:53`. 30b: S1b's either/or is promoted to F0.
 
 ## 10. Reuse audit
 
-The seam is `tools/settings-merge.py`'s `hook_path` parameter, which is parameterised for the
-FIRST write and NOT for a repath — the dedup branch above it decides that, and S1b builds what is
-missing. The seam is — `reuse_lookup.py` reports
-the `agent-cap` affordance seam covering install and prefix concerns, and `merge(obj, hook_path,
-frag)` at `tools/settings-merge.py:91` is the exact extension point, already parameterised and
-already exercised by `--hook-path`. No new mechanism is built; a default is stopped from being a
-decision.
+`merge(obj, hook_path, frag)` at `tools/settings-merge.py:91` is the extension point, and
+`reuse_lookup.py` reports the `agent-cap` affordance seam covering install and prefix concerns as
+the corpus's nearest neighbour. It is NOT sufficient: the dedup at `:108-109` returns the object
+unchanged whenever a command already contains the bare marker, so the seam is parameterised for the
+FIRST write and not for a repath. S1b builds the missing mode; this unit extends a seam rather than
+reusing one whole.
 
 Recall terms used: `agent-cap`, `dual-ship`, `settings-merge`, `hook_path`, `wiring`, `parity`,
 `destination`, `descriptor`, `withdrawal`, `adopter`, `prefix`, `carve-out`.

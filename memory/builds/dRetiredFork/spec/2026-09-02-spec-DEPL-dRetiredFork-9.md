@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-9 — the done-condition names the escape it depends on
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 0
+**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 0 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -101,6 +101,8 @@ so the restatement would be a retreat dressed as a correction.
   an OWNER TURN.** It decides what "the update runs centrally" means, and M3's veto 2 reserves a
   change to the build's own acceptance for the owner. Recommendation to put to them: zero at
   NicoCares, `--allow-ungraded` at inCMS until its receipt is repaired, both stated in AC10.
+
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
 

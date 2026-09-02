@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-20 — a spec lint resolves a spec's own machine-facing tokens
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0
+**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 0 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -135,6 +135,8 @@ worktree; the bar is where this binds.
   tight and `scripts/` cases slip through. Recommendation: require a slash AND an extension, or an
   exact match against a tracked path, and record the near-misses S6 produces as the calibration
   evidence rather than guessing twice.
+
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
 
 ## 9. Revision log
 

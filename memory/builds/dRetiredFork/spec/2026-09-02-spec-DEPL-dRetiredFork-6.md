@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 8
+**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 8 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -91,7 +91,9 @@ input that exists without anyone remembering to write one.
   proposal, never decision.
 - testing + left-shift gates — the nine-absorption falsification run, plus arms for each class.
 - migration / rollback — a new read-only verb; nothing to roll back.
-- user docs — `WIRE-INTO-PROJECT.md` gains the contribution route, and the four-class rule lands in
+- user docs — `WIRE-INTO-PROJECT.md` gains the contribution route, verified by `python
+  tools/govkit/check_runbook_parity.py` exiting `0` rather than by a leg, since no leg runs it;
+  and the four-class rule lands in
   the deployer's own contract rather than in prose here.
 
 ## 6. Acceptance criteria
@@ -130,6 +132,8 @@ input that exists without anyone remembering to write one.
   product, which sounds like governance. But it is applied by a verb and must be machine-readable.
   Recommendation: the deployer owns it, and the playbook points.
 
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft. The twelve-of-44 figure and the nine hand-found absorptions
@@ -138,6 +142,9 @@ input that exists without anyone remembering to write one.
   swapped — four NicoCares and six inCMS, not six and three — so a CORRECT verb would have redded
   AC1; both criteria now name unit ids rather than counts. M4: two derived figures counting
   different populations were compared as if they were one.
+- rev-3 · 2026-09-02 · folded spec-audit round 2, finding 23. The runbook claim had no leg behind it once
+  `runbook parity` proved not to be a row in `tools/gate-legs.json`; §5 names the direct
+  invocation now, matching `TOOL-dRetiredFork-16` AC4.
 
 ## 10. Reuse audit
 

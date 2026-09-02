@@ -1,6 +1,6 @@
 # TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys
 
-**Status:** OPEN · rev-1 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 5 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -45,7 +45,10 @@ values in one block — so the mechanism is present and these five were simply n
 - `nc 3/20`. It needs no gov change: `memory/project/legacy-files.txt` already exists, is already
   wired into `LEGACY_SET`, is already whitelisted by check 3, and NicoCares' copy holds one comment
   and zero entries. `DEPL-dRetiredFork-7` tells them; gov builds nothing.
-- Any key that can drive a violation count to zero. `PROJECT_REGISTRY_EXTRA` adds to a whitelist and
+- Any key that sets a THRESHOLD on a violation count. That is the narrow claim rev-1 should have
+  made: `RECORD_SERVES_CUTOFF` IS a population date filter and `BUILD_SLUG_RE` IS a predicate, so
+  both can narrow what is graded, and S1 and S3 therefore owe the guards AC0 adds rather than a
+  blanket disclaimer. `PROJECT_REGISTRY_EXTRA` adds to a whitelist and
   is bounded by the tree's own contents; a threshold key is a different animal and none is added here.
 
 ## 4. Design
@@ -88,6 +91,11 @@ generic reader can check neither.
 
 ## 6. Acceptance criteria
 
+- **AC0** — A `RECORD_SERVES_CUTOFF` dated in the future is REFUSED, and a `BUILD_SLUG_RE` matching
+  the empty string is REFUSED, both by the validation loop S1 extends; each RED is observed before
+  the key is wired. Without these two guards a project silently grades nothing and the checker
+  reports green.
+
 - **AC1** — When no key is set, `bash tools/memory-tree/check-memory-hygiene.sh` output is
   byte-identical to the pre-change run over gov's tree.
 - **AC2** — When `BUILD_SLUG_RE="^[A-Za-z]+$"` is set, check 4 rejects a build folder carrying a
@@ -118,10 +126,15 @@ generic reader can check neither.
   records with no `Serves` line. A cutoff is one value; a list is 549 rows. Recommendation: cutoff,
   matching the five cutoffs already in `.memory-tree.conf`.
 
+**RESOLVED (owner, 2026-09-02): every fork above is settled by its own stated Recommendation.** The owner ratified them as written on 2026-09-02 with the instruction to fold the recommendations. No fork is resolved against its recommendation and none by silence; where a later measurement contradicts a ratified pick, that is a new fork with a new id.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-02 · initial draft, from the dRetiredFork classification of `nc carve-out` 1, 2, 4,
   7 and 19.
+- rev-2 · 2026-09-02 · folded spec-audit round 2, finding 20. rev-1's third non-goal claimed the unit added no
+  disarming key, so neither of the two keys that CAN narrow a graded population was guarded. The
+  non-goal is narrowed to thresholds and AC0 adds the two refusals.
 
 ## 10. Reuse audit
 
