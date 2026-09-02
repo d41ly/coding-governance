@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 8 · ratified 2026-09-02
+**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 8 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
@@ -14,7 +14,7 @@
 
 ## 1. Goal
 
-This build absorbs nine defects the adopters found and held privately, one at a time, by hand,
+This build absorbs eight defects the adopters found and held privately, one at a time, by hand,
 because there is no route. Without one the class returns immediately: the next adopter fix is held
 the same way, re-merged on every release, and gov keeps shipping the defect to everyone else. Twelve
 of the 44 classified rows are an adopter holding a fix gov needs. `contribute` is the mechanism that
@@ -65,15 +65,17 @@ output is large by construction.
 
 ### Rollout
 
-Run it against both adopters as its own acceptance evidence. The nine absorptions in this build's
-order-1 units were found by hand; `contribute` must independently propose at least those nine, or it
-does not work. That is a genuine falsification test rather than a demonstration.
+Run it against both adopters as its own acceptance evidence. The eight absorptions in this build's
+order-1 units were found by hand; `contribute` must independently propose at least those eight, or
+it does not work. Order 1 carries NINE units and eight absorptions: the ninth order-1 unit was
+rescoped to absorb nothing until it has, so it is excluded from the falsification set and a verb
+that proposed it would be wrong. That is a genuine falsification test rather than a demonstration.
 
 ### Alternatives rejected
 
 A `[[contribution]]` block in the target's `deploy.toml`. It asks the adopter to declare what they
 are contributing, which is the same act as filing an issue and has the same failure mode: it did not
-happen for any of the nine. The verb must DERIVE candidates from bytes, because that is the only
+happen for any of the eight. The verb must DERIVE candidates from bytes, because that is the only
 input that exists without anyone remembering to write one.
 
 ## 5. Production-readiness checklist
@@ -90,7 +92,7 @@ input that exists without anyone remembering to write one.
 - risks — a class-3 project fact proposed as a class-1 gov defect, absorbed, and shipped to every
   adopter as gov's behaviour. This is the failure that matters and S3 is the whole mitigation:
   proposal, never decision.
-- testing + left-shift gates — the nine-absorption falsification run, plus arms for each class.
+- testing + left-shift gates — the eight-absorption falsification run, plus arms for each class.
 - migration / rollback — a new read-only verb; nothing to roll back.
 - user docs — `WIRE-INTO-PROJECT.md` gains the contribution route, verified by `python
   tools/govkit/check_runbook_parity.py` exiting `0` rather than by a leg, since no leg runs it;
@@ -103,9 +105,13 @@ input that exists without anyone remembering to write one.
   --target <path>` independently proposes the FOUR NicoCares absorptions — `TOOL-dRetiredFork-1`
   (`nc carve-out 5/20`), `-2` (`nc 16/20` and `17/20`), `-3` (`nc 9/20`) and the `nc 20/20` half of
   `-9` — each classed 1 or 2. rev-1 said six, which was the inCMS count.
-- **AC2** — When run against `C:/projects/incms/main`, it proposes the SIX inCMS-sourced units —
-  `TOOL-dRetiredFork-4`, `-5`, `-6`, `-7`, `-8` and the C21 half of `-9` — and classes that
-  adopter's repath rows as class 4 rather than as contributions. rev-1 said three, and named
+- **AC2** — When run against `C:/projects/incms/main`, it proposes the FIVE inCMS-sourced units —
+  `TOOL-dRetiredFork-5`, `-6`, `-7`, `-8` and the C21 half of `-9` — and classes that
+  adopter's repath rows as class 4 rather than as contributions. It reports the inCMS
+  `KIT_AGENT_CAP_DELTA` D1 row as stale or ALREADY ABSORBED, never as a contribution:
+  the ninth order-1 unit was rescoped to absorb nothing until it has and its §3 forbids editing
+  `tools/hooks/agent-cap.js` at all, so a CORRECT verb proposes five and a criterion naming six is
+  one a correct implementation fails. rev-1 said three, and named
   "seventeen" against the README's "fourteen": those count different populations — seventeen is
   inCMS's repath ROWS, fourteen is path forks across BOTH adopters — so this criterion names
   neither figure and the report derives them.
@@ -146,6 +152,11 @@ input that exists without anyone remembering to write one.
 - rev-3 · 2026-09-02 · folded spec-audit round 2, finding 23. The runbook claim had no leg behind it once
   `runbook parity` proved not to be a row in `tools/gate-legs.json`; §5 names the direct
   invocation now, matching `TOOL-dRetiredFork-16` AC4.
+- rev-4 · 2026-09-02 · `DEPL-dRetiredFork-8` corrects the falsification set: AC2 named SIX
+  inCMS-sourced units including the ninth order-1 unit, which was rescoped to absorb nothing, so a
+  correct verb proposed five and redded its own criterion. Five sites saying "nine" become
+  "eight", and §4 Rollout now says ONCE why the ninth order-1 unit is excluded. §9 is untouched:
+  a revision log records what an earlier rev said.
 
 ## 10. Reuse audit
 

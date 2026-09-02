@@ -40,9 +40,9 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
 
 ## Build-level rules
 
-- **Every absorption lands as its own unit.** M2's one-mechanism rule, applied literally: nine
-  separable upstream fixes are nine units, because a closing diff cannot attribute a finding
-  otherwise.
+- **Every absorption lands as its own unit.** M2's one-mechanism rule, applied literally: eight
+  separable upstream fixes are eight units, and the ninth order-1 unit carries a claim that
+  absorbs nothing until it has, because a closing diff cannot attribute a finding otherwise.
 - **A path fix is a DERIVATION or a RENDER, never a new config key.** A key cannot be read by an
   adopter whose installed kit predates it, and both adopters are 164 commits behind.
 - **Deleting a population filter is refused.** Two of the three workflows gates apply no marker
@@ -119,7 +119,8 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
 | 4 | `TOOL-dRetiredFork-21` | 2 | the two hooks whose path comes from a fragment, not from the default |
 
 The `#` column is the `order` verb each spec declares. Units sharing a value are the parallel group.
-Order 1 is nine independent absorptions that need no design decision and no key; order 2 begins only
+Order 1 is nine independent units carrying eight absorptions — `TOOL-dRetiredFork-4` absorbs nothing
+until it has — needing no design decision and no key; order 2 begins only
 after `DEPL-dRetiredFork-7` has measured what the two registers do not declare, because a sweep that
 retires a fork nobody counted cannot be verified.
 
@@ -138,7 +139,7 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dRetiredFork-8 — the falsification set stops counting a unit that absorbs nothing](spec/2026-09-02-spec-DEPL-dRetiredFork-8.md) | 0 | 1 | OPEN | rev-2 | 2026-09-02 |
+| [DEPL-dRetiredFork-8 — the falsification set stops counting a unit that absorbs nothing](spec/2026-09-02-spec-DEPL-dRetiredFork-8.md) | 0 | 1 | CLOSED | rev-3 | 2026-09-02 |
 | [DEPL-dRetiredFork-9 — the done-condition names the escape it depends on](spec/2026-09-02-spec-DEPL-dRetiredFork-9.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-18 — the gap lines use the wrap helper written for them](spec/2026-09-02-spec-TOOL-dRetiredFork-18.md) | 0 | 1 | CLOSED | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-19 — a declared placeholder must be one its own adopter substitutes](spec/2026-09-02-spec-TOOL-dRetiredFork-19.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
@@ -166,11 +167,11 @@ ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22
 | [DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin](spec/2026-09-02-spec-DEPL-dRetiredFork-4.md) | 6 | 1 | OPEN | rev-3 | 2026-09-02 |
 | [DEPL-dRetiredFork-5 — `check` runs the `[[outcome]]` probe instead of grading an exit code](spec/2026-09-02-spec-DEPL-dRetiredFork-5.md) | 6 | 1 | OPEN | rev-2 | 2026-09-02 |
 | [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | OPEN | rev-4 | 2026-09-02 |
-| [DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's](spec/2026-09-02-spec-DEPL-dRetiredFork-6.md) | 8 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's](spec/2026-09-02-spec-DEPL-dRetiredFork-6.md) | 8 | 2 | OPEN | rev-4 | 2026-09-02 |
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
