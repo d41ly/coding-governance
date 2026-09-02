@@ -40,3 +40,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-02T21:29:35Z brief · item TOOL-dRetiredFork-1 · reason 5c8aca2bdf2c memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-1-1-build-brief.md
 
 2026-09-02T21:29:41Z dispatch · item 194ec62f TOOL-dRetiredFork-1 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md memory/guides/SESSION-KICKOFF.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-1.md memory/builds/dRetiredFork/README.md
+
+2026-09-02T21:40:19Z brief · item TOOL-dRetiredFork-2 · reason 218e034b657c memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-2-1-build-brief.md
+
+2026-09-02T21:40:26Z dispatch · item a92ab1f1 TOOL-dRetiredFork-2 · reason tools/memory-tree/gen_build_index.py tools/memory-recall/selftest.py tools/memory-recall/recall_conf.py tools/memory-recall/README.md tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md memory/guides/SESSION-KICKOFF.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-2.md memory/builds/dRetiredFork/README.md

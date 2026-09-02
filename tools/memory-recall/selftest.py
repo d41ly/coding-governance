@@ -32,6 +32,16 @@ import tempfile
 # ABOVE the sys.path insert: this file imports the same siblings query.py does, so without it the
 # gate leg itself drops __pycache__ into the adopter's worktree (spec F5/S12).
 sys.dont_write_bytecode = True
+
+# ALSO above it, and process-level rather than per-subprocess. TOOL-dRetiredFork-2, absorbed from
+# NicoCares `nc carve-out 17/20`; the sibling half lives in gen_build_index.py and the list is gov's
+# own from `.githooks/pre-push`. Every arm here builds a throwaway git repo, and `git init` under an
+# inherited GIT_DIR does not make a repo at the cwd — it RE-INITIALISES the repo GIT_DIR names. Run
+# from a hook, this suite would rewrite the caller's repository instead of its own fixture.
+for _leak in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+              "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX"):
+    os.environ.pop(_leak, None)
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import recall_conf  # noqa: E402
@@ -1400,6 +1410,22 @@ def main() -> int:
             if after == before
             else ("FAIL", "the live query log is byte-identical after this run", "the gate wrote to it")
         )
+
+    # TOOL-dRetiredFork-2 — the git-environment scrub at the top of this file, asserted rather than
+    # trusted. Appended here for the same reason the sweep below is: it is a property of the RUN.
+    # Every arm above built a throwaway repo, and `git init` under an inherited GIT_DIR does not
+    # make a repo at the cwd — it RE-INITIALISES the repo GIT_DIR names, so run from a hook this
+    # suite would rewrite the caller's repository. The scrub is process-level, so the assertion is
+    # that the variables are gone from THIS process by the time any arm ran.
+    _still_set = [k for k in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+                              "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE",
+                              "GIT_PREFIX") if k in os.environ]
+    _checks.append(
+        ("ok", "git's exported repository pointers were scrubbed before any arm ran", "8 checked")
+        if not _still_set
+        else ("FAIL", "git's exported repository pointers were scrubbed before any arm ran",
+              f"still set: {', '.join(_still_set)}")
+    )
 
     # The scratch sweep, asserted rather than assumed - the shape test_recall_floor.py already
     # uses. Appended after the arity assert on purpose: it is a property of the RUN, not a

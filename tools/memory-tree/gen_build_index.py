@@ -179,8 +179,42 @@ class Problem(Exception):
 
 
 # --------------------------------------------------------------------------------------- plumbing
+#: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts.
+#: TOOL-dRetiredFork-2, absorbed from NicoCares `nc carve-out 16/20`. Taken VERBATIM from gov's own
+#: hook-side scrub at `.githooks/pre-push` rather than re-derived, because these are two halves of
+#: ONE defect and a second list would be the place they drift apart.
+_GIT_ENV_LEAKS = (
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_COMMON_DIR",
+    "GIT_NAMESPACE",
+    "GIT_PREFIX",
+)
+
+
+def _build_git_env() -> dict[str, str]:
+    """The parent environment with git's exported repository pointers removed.
+
+    Git exports `GIT_DIR` whenever the repository is reached through a `.git` FILE rather than a
+    `.git` directory — every linked worktree — so a generator started from a hook inherits a pointer
+    to a DIFFERENT tree than the one it was asked about, and reads it silently. There is no error;
+    the answer is just about the wrong repository.
+
+    Named `_build_git_env` and not nc's `_clean_git_env`: gov's lexicon table declares no `clean`
+    verb, and `build` is declared as "create a new value and return it", which is exactly this.
+    """
+    return {k: v for k, v in os.environ.items() if k not in _GIT_ENV_LEAKS}
+
+
 def run(*argv: str, cwd: str | None = None) -> str:
-    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, check=True).stdout
+    # `env=` HERE, at the one choke point every git call in this file goes through, rather than at
+    # seven call sites that would each have to remember.
+    return subprocess.run(
+        argv, cwd=cwd, capture_output=True, text=True, check=True, env=_build_git_env()
+    ).stdout
 
 
 def read_text(path: str) -> str:
@@ -2523,6 +2557,30 @@ def cmd_selftest() -> int:
                         and max((len(x) for x in
                                  _extract_gap_para("Ids no `spec-audit` record has ever named:")),
                                 default=10 ** 6) <= IDS_WRAP + 1))
+
+        # TOOL-dRetiredFork-2 — the git-environment leak. Git exports GIT_DIR to every hook, and a
+        # generator started from one inherits a pointer to a DIFFERENT repository, which it then
+        # reads silently. Measured before the scrub was wired: with GIT_DIR naming a decoy, `--check`
+        # died `build-index: not a git repo` at exit 2; with it, exit 0 and byte-identical output.
+        def _run_under_decoy_git_dir():
+            with tempfile.TemporaryDirectory() as decoy:
+                saved = os.environ.get("GIT_DIR")
+                os.environ["GIT_DIR"] = decoy
+                try:
+                    return run("git", "rev-parse", "--show-toplevel").strip()
+                finally:
+                    if saved is None:
+                        os.environ.pop("GIT_DIR", None)
+                    else:
+                        os.environ["GIT_DIR"] = saved
+
+        # ANTI-VACUITY: it asserts the REAL toplevel comes back, not merely that nothing raised. A
+        # decoy that happened to resolve would still fail this.
+        arm("an inherited GIT_DIR does not redirect the generator's git calls", "True",
+            lambda: str(_run_under_decoy_git_dir()
+                        == run("git", "rev-parse", "--show-toplevel").strip()))
+        arm("...and GIT_DIR is not in the environment run() hands the subprocess", "True",
+            lambda: str("GIT_DIR" not in _build_git_env()))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
