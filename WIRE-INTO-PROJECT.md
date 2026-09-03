@@ -701,6 +701,67 @@ run that also grades it.
 Declined rows PRINT, with their state and their reason. A gap that vanishes from a report without
 saying why is the failure mode of every exclusion list.
 
+### Recording a kit file you deliberately EDITED — the carve-out ledger contract
+
+A `[[decline]]` records a kit file you did not take. This records one you took and then changed:
+a **carve-out**. The two are different questions and want different registers, because a declined
+file has no bytes to grade and a carved-out one has bytes that must never be silently overwritten
+by the next `update`.
+
+**The contract, in three rules.** Each exists because the obvious design fails, and the failure is
+named rather than left for the adopter to rediscover.
+
+1. **The id carries NO denominator.** Tag each site `carve-out <stable-id>` — a number, a slug,
+   anything stable — and never `<n>/<total>`. A tag encoding the population size means retiring
+   ONE carve-out requires editing every other tag in the tree, so the cheapest operation in the
+   whole retirement programme is also the one that touches the most files. Adopters do not do
+   expensive things; they leave the carve-out in place.
+2. **The population lives in ONE tracked registry**, not in the tags. The tags say "this site is
+   carved out"; the registry says how many there are and what each is for. A count derived by
+   grepping the tags is a count that changes whenever somebody adds a comment, and a count typed
+   into a document is wrong on the next commit.
+3. **The guard asserts the registry is READABLE, never that it is NON-EMPTY.** This is the rule
+   that decides whether the programme can ever finish. A guard written as "fail if zero
+   carve-outs found" reds the moment the last one retires — it makes SUCCESS indistinguishable
+   from a broken probe, so the tree can never reach the state the programme exists to produce.
+   The anti-vacuity instinct behind it is right and must be kept; it just has to point at the
+   registry rather than at the count.
+
+**What rule 3 is protecting, because it is worth keeping.** A census that greps for its own
+subjects can be scoped so narrowly that it reaches none of them and reports a clean run. That has
+happened twice in the field, both times letting a real regression through a green bar. So the
+guard still has to prove it could have found something. It proves it against the REGISTRY — which
+is tracked, has a known path, and is readable or not — instead of against the tag count, which is
+legitimately zero at the end.
+
+```
+# the guard, in shape:
+[ -r "$REGISTRY" ] || fail "the carve-out registry is unreadable: the census cannot see its subjects"
+declared=$(count rows in "$REGISTRY")
+tagged=$(grep -rhoE 'carve-out [A-Za-z0-9_-]+' $ROOTS | sort -u | wc -l)
+[ "$declared" = "$tagged" ] || fail "registry has $declared rows, tree has $tagged tagged sites"
+# declared == tagged == 0 is a PASS: the programme finished.
+```
+
+**Worked example — retiring one carve-out, touching only its own files.** A tree carries carve-outs
+`cap-is-four`, `prefix-scripts` and `flat-index`. `cap-is-four` converges upstream, so it goes:
+
+1. Delete the `carve-out cap-is-four` tag from each site that carries it, and take the upstream
+   bytes. Only those files are touched.
+2. Delete that one row from the registry.
+3. Run the guard. Registry rows and tagged sites both fell by one and still agree, so it passes.
+   **No other tag was edited**, because no other tag ever named the total.
+
+Retire the last two the same way and the tree reaches zero carve-outs: registry readable, zero
+rows, zero tags, guard green. Under an `N/M` scheme step 1 would have meant editing every
+remaining tag in the tree, and the final state would have RED the bar.
+
+**Migrating an existing `N/M` ledger.** One commit, and it is mechanical: rewrite each
+`carve-out <n>/<total>` to `carve-out <stable-id>` (the old `<n>` is a fine id — it is already
+unique and already grep-able), write the registry with one row per id, and repoint the guard at
+the registry. Do it BEFORE retiring anything, or the first retirement pays the cost this contract
+exists to remove.
+
 ## 6 — Verify the whole chain, then commit
 
 - Codebase-map (if adopted): `python <kit>/selftest.py` (kit contract) · run the gate file

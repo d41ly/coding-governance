@@ -1,11 +1,16 @@
 # DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 2 · ratified 2026-09-02
+**Status:** CLOSED · rev-4 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams deployer · order 2 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-DEPL-dRetiredFork-7-1-census-incms.md](../build/2026-09-03-build-DEPL-dRetiredFork-7-1-census-incms.md) | journal | — |
+| [2026-09-03-build-DEPL-dRetiredFork-7-2-census-nicocares.md](../build/2026-09-03-build-DEPL-dRetiredFork-7-2-census-nicocares.md) | journal | — |
+| [2026-09-03-build-DEPL-dRetiredFork-7-3-census-swydee.md](../build/2026-09-03-build-DEPL-dRetiredFork-7-3-census-swydee.md) | journal | — |
+| [2026-09-03-build-DEPL-dRetiredFork-7-4-acceptance-ledger.md](../build/2026-09-03-build-DEPL-dRetiredFork-7-4-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-DEPL-dRetiredFork-7-1-build-brief.md](../prompts/2026-09-03-prompt-DEPL-dRetiredFork-7-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
@@ -156,6 +161,19 @@ direction, which is the direction that makes the build look smaller than it is.
 - rev-3 · 2026-09-02 · folded spec-audit round 2, finding 9. S6 was imperative, §3 forbade it and no criterion
   observed it, so the unit could pass its DoD with the row untouched while the README believed
   it reclassified. S6 RECORDS and recommends now, which §3 permits, and AC4b observes it.
+
+- rev-4 · 2026-09-03 · BUILT. Three of this spec's own figures did not reproduce and the measurement
+  won each time, which is what §5 said the risk was. gov's index is 25,837 objects, not 23,384.
+  gov's `gen_build_index.py` is 2785 lines / 63 symbols, not 2519 / 59 — THIS BUILD changed that
+  file, so the spec's number rotted against a source the same build was editing. And swydee has
+  ONE divergent kit file, not three: `tools/run-gates.sh` is exactly the 70-line file this spec
+  describes, but its blob is byte-identical to gov `a86fc3ee`, which makes it DRIFT by this unit's
+  own definition. AC3 is recorded PARTIALLY MET rather than argued into a pass. Two findings no
+  criterion asked for: inCMS's two registers disagree on 30 paths (not one file set), and
+  NicoCares holds eleven gov-named files in no register at all, one of them byte-identical to gov
+  HEAD. F3's recommendation is strengthened, not merely confirmed — swydee's convergence cost is
+  approximately zero, since its single divergence is a file gov's registry says targets must
+  author themselves.
 
 ## 10. Reuse audit
 

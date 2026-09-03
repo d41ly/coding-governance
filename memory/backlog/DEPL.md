@@ -40,3 +40,5 @@
 
 - DEPL-aTetheredConvoy-8 · CLOSED · Reconciled `TOOL-dClosedLexicon-13` against receipt schema 2. One of the four filed questions was the schema; two were arms riding the playbook role unit 1 corrected, one was fixture order, plus a vacuous `SKIP` mark. → builds/aTetheredConvoy/
 - DEPL-aTetheredConvoy-9 · OPEN · `apply over the DEFAULT selection ran` needs unit 5's `[[outcome]]` evaluator AND a fixture whose adopters can run; today two exit 1 and four rendered destinations are absent. Not weakened to green. → builds/aTetheredConvoy/
+- DEPL-dRetiredFork-11 · OPEN · `govkit update` names a `--add-kits` flag the parser does not define (`govkit.py:5870`, its only occurrence); the arm at `selftest.py:745` asserts the STRING is in stdout, so it grades the message → builds/dRetiredFork/
+- DEPL-dRetiredFork-12 · OPEN · gov intake leaves gov-identical files in no register: 11 at NicoCares, one byte-identical to gov HEAD. A receipt omitting a file it could match by OID is surface no ratchet sees → builds/dRetiredFork/
