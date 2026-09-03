@@ -8,7 +8,7 @@
 .githooks/pre-commit	2	(loose),memory-tree
 .githooks/pre-push	2	(loose),run-gates
 .githooks/pre-push.test.sh	2	(loose)
-WIRE-INTO-PROJECT.md	48	(loose),codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,playbook,workflows	the 29th is `contribute`, a GOV-SIDE verb an adopter never runs: it is invoked from a gov checkout against an adopter tree, so the path is gov's own and is correct at gov's prefix. DEPL-dRetiredFork-6. The other 28 predate this column and are recorded, not justified.
+WIRE-INTO-PROJECT.md	47	(loose),codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,playbook,workflows	the 29th is `contribute`, a GOV-SIDE verb an adopter never runs: it is invoked from a gov checkout against an adopter tree, so the path is gov's own and is correct at gov's prefix. DEPL-dRetiredFork-6. The other 28 predate this column and are recorded, not justified.
 coding-governance-agents.template.md	3	(loose),hooks,playbook
 skills/session-kickoff/SKILL.md	2	codebase-map,playbook
 skills/session-kickoff/manifest-check.sh	2	lib,unattended
@@ -102,7 +102,7 @@ tools/unattended/SKILL.template.md	1	memory-tree
 tools/unattended/adopt-unattended.sh	2	unattended
 tools/unattended/adopt-unattended.test.sh	2	unattended
 tools/unattended/check-pass-order.sh	2	unattended
-tools/unattended/check-pass-order.test.sh	1	unattended
+tools/unattended/check-pass-order.test.sh	14	memory-tree,unattended	FIXTURE-INTERNAL PATHS, not gov's install prefix. This suite builds its own tree with `mkdir -p tools/unattended` and runs the checker inside it, so `tools/` here is that fixture's own layout and is correct at every prefix. TOOL-dRetiredFork-17 swept them to a derived prefix and broke 14 of 19 arms -- the .unattended.conf heredoc is QUOTED, so the config received four literal bytes -- and reverting them is what raised this row 1 -> 14. The suite is on no bar, so nothing else would have reported it.
 tools/unattended/check-playbook.sh	1	run-gates
 tools/unattended/check-playbook.test.sh	3	unattended
 tools/unattended/check-unattended.sh	3	memory-tree,unattended

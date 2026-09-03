@@ -532,7 +532,11 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   ships kits onward. It polices the SHIPPING surface, not an installed one.
 
 **Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
-- Copy `tools/hooks/agent-cap.js` (+ `tools/hooks/agent-cap.test.sh`) into the project (e.g. `<project>/.claude/hooks/`).
+- Copy `tools/hooks/agent-cap.js` (+ its `.test.sh` sibling) into the project **under the same kit
+  prefix as your other kits** — `<project>/<prefix>/hooks/`, so `<project>/tools/hooks/` in a
+  default install. **NOT `<project>/.claude/hooks/`**, which this runbook prescribed until
+  TOOL-dRetiredFork-14/21 withdrew that destination: the wiring check now expects the hook beside
+  the kit that ships it and reports a `.claude/` copy as a legacy one.
 - Wire the `PreToolUse` hook into `.claude/settings.json` idempotently (from the project root):
   ```bash
   python <gov>/tools/settings-merge.py    # merges/creates .claude/settings.json; re-run = no-op; `--check` verifies; backs up to settings.json.bak on change

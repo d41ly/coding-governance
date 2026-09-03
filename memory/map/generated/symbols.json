@@ -733,6 +733,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "cmd_contribute",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "cmd_emit_pin",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -861,6 +866,11 @@
       "id": "confirm_blobs",
       "kind": "function",
       "file": "tools/govkit/census.py"
+    },
+    {
+      "id": "contrib_propose_class",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "copy_extra",
@@ -1324,6 +1334,11 @@
     },
     {
       "id": "git_path",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "git_pathspec",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
     },

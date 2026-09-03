@@ -18,6 +18,14 @@
 set -u
 HERE=$(cd "$(dirname "$0")/../.." && pwd)
 CENSUS="$HERE/tools/govkit/census.py"
+
+# THROUGH THE ONE RESOLVER, never a bare launcher name. The MS-Store `python3` stub answers
+# `command -v` and then exits 9009, so a bare name is not an answer — and the invocation ban in
+# `tools/lib/resolve-python.test.sh` refuses one repo-wide, which is how this file was caught:
+# it shipped with six bare `python` calls and redded that leg on the closing bar.
+# shellcheck source=/dev/null
+. "$HERE/tools/lib/resolve-python.sh"
+PY="$(resolve_python)"
 n=0; st=0
 
 ok()   { n=$((n+1)); echo "ok   $1"; }
@@ -58,7 +66,7 @@ JSON
 # and a novel file landed in one bucket the tool would be a HEAD-diff wearing a costume, and every
 # number this build rests on would be inflated by every stale copy in every adopter.
 A1=$(mktemp -d); mkadopter "$A1"
-out=$(python "$CENSUS" --adopter "$A1" --name t --gov "$GOV" 2>&1)
+out=$("$PY" "$CENSUS" --adopter "$A1" --name t --gov "$GOV" 2>&1)
 has "$out" "IN-SYNC: 1" && ok "the HEAD-identical file is IN-SYNC" \
                         || bad "IN-SYNC not 1: $(printf '%s' "$out" | head -12)"
 has "$out" "DRIFT: 1"   && ok "the file matching gov's FIRST commit is DRIFT, not a fork" \
@@ -77,7 +85,7 @@ mkdir -p "$A2/.governance"
 printf '{"schema":3,"prefix":"scripts","kits":[],"files":[]}\n' > "$A2/.governance/install.json"
 ( cd "$A2" && git init -q . && git config user.email t@t && git config user.name t \
     && git add -A && git commit -q -m e --no-verify ) >/dev/null 2>&1
-out=$(python "$CENSUS" --adopter "$A2" --name t --gov "$GOV" 2>&1); rc=$?
+out=$("$PY" "$CENSUS" --adopter "$A2" --name t --gov "$GOV" 2>&1); rc=$?
 [ "$rc" -ne 0 ] && ok "a census mapping ZERO files exits non-zero (got $rc)" \
                 || bad "a zero-map census exited 0 — it reported a clean tree it never measured"
 has "$out" "REFUSED" && ok "and says REFUSED in as many words" \
@@ -88,7 +96,7 @@ has "$out" "cannot report a clean tree" && ok "and says why a zero map is not a 
 # ---- ARM 3: the refusal is NOT vacuous ---------------------------------------------------------
 # ARM 2 alone would pass if the tool refused ALWAYS. This is the negative half, and without it
 # ARM 2 proves only that the program can print a word.
-out=$(python "$CENSUS" --adopter "$A1" --name t --gov "$GOV" 2>&1); rc=$?
+out=$("$PY" "$CENSUS" --adopter "$A1" --name t --gov "$GOV" 2>&1); rc=$?
 [ "$rc" -eq 0 ] && ok "a census that DOES map files runs to completion" \
                 || bad "the tool refuses even a good tree (rc=$rc)"
 has "$out" "REFUSED" && bad "a populated census still printed REFUSED" \
@@ -98,7 +106,7 @@ has "$out" "REFUSED" && bad "a populated census still printed REFUSED" \
 # A receipt row whose file was deleted has NO blob to test. Calling that "in no gov commit ever"
 # is true and useless: it would put every deleted file in the retirement programme.
 A4=$(mktemp -d); mkadopter "$A4"; rm -f "$A4/scripts/mine.sh"
-out=$(python "$CENSUS" --adopter "$A4" --name t --gov "$GOV" 2>&1)
+out=$("$PY" "$CENSUS" --adopter "$A4" --name t --gov "$GOV" 2>&1)
 has "$out" "ABSENT: 1" && ok "a declared-but-deleted file is ABSENT, not a fork" \
                        || bad "deleted file misclassified: $(printf '%s' "$out" | head -12)"
 
@@ -107,7 +115,7 @@ has "$out" "ABSENT: 1" && ok "a declared-but-deleted file is ABSENT, not a fork"
 # would be uninvitable, and nothing else here would catch a stray write.
 before_gov=$(cd "$GOV" && git status --porcelain | wc -l)
 before_ad=$(cd "$A1" && git status --porcelain | wc -l)
-python "$CENSUS" --adopter "$A1" --name t --gov "$GOV" >/dev/null 2>&1
+"$PY" "$CENSUS" --adopter "$A1" --name t --gov "$GOV" >/dev/null 2>&1
 after_gov=$(cd "$GOV" && git status --porcelain | wc -l)
 after_ad=$(cd "$A1" && git status --porcelain | wc -l)
 [ "$before_gov" = "$after_gov" ] && [ "$before_ad" = "$after_ad" ] \
@@ -119,7 +127,7 @@ after_ad=$(cd "$A1" && git status --porcelain | wc -l)
 # v1 file must STILL be DRIFT, because v1 is still in the history even though HEAD has left it.
 ( cd "$GOV" && printf 'v3 engine\n' > tools/kit/engine.sh && git add -A \
     && git commit -q -m v3 --no-verify ) >/dev/null 2>&1
-out=$(python "$CENSUS" --adopter "$A1" --name t --gov "$GOV" 2>&1)
+out=$("$PY" "$CENSUS" --adopter "$A1" --name t --gov "$GOV" 2>&1)
 has "$out" "DRIFT: 1" && ok "a vintage stays DRIFT after gov's HEAD moves past it again" \
                       || bad "moving HEAD reclassified a vintage: $(printf '%s' "$out" | head -12)"
 

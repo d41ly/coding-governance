@@ -28,6 +28,9 @@
 #
 #   bash tools/memory-tree/merge-rows.test.sh
 KIT_REL="${KIT_REL:-tools}"
+# EXPORTED, because four python blocks below read it from the environment rather than by
+# interpolation — see the comment at the first of them.
+export KIT_REL
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SELF="$HERE/$(basename "$0")"
@@ -324,7 +327,15 @@ keys() {  # $1=line -> 0 if the DRIVER keys it, 1 if not
   "$PY" - "$1" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True   # a test that leaves __pycache__ in tools/ dirties the tree it gates
-spec = importlib.util.spec_from_file_location("mr", "$KIT_REL/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mr)
 sys.exit(0 if mr.key(sys.argv[1] + "\n") is not None else 1)
@@ -893,7 +904,15 @@ printf '%s\n' "$BARE" > "$TMP/bare"
 "$PY" - "$BARE" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("mr", "$KIT_REL/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 a, b = mr._row_key(sys.argv[1] + "\n"), mr._row_key(sys.argv[1])
 sys.exit(0 if a == b and a.startswith("raw:") else 1)
@@ -1148,7 +1167,15 @@ run "a delete/modify row inside a heading rename" 1 "TOOL-zFixture-1 TOOL-zFixtu
 "$PY" - "$TMP/a" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("mr", "$KIT_REL/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 lines = mr.read(sys.argv[1])
 leaked = [ln for ln in mr.settled(lines) if ln.lstrip().startswith(("<<<<<<<", "=======", ">>>>>>>"))]
@@ -1211,7 +1238,15 @@ done
 cat > "$TMP/sabotage.py" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("mr", "$KIT_REL/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 _real = mr.reconcile
 

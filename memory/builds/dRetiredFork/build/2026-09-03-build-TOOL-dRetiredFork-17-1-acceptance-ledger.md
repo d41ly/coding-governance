@@ -45,9 +45,10 @@ the defect, reproduced by its author on a live tree rather than argued for.
 - AC7 — MET — `grep -oHE` ran the candidate predicate over gov's tree BEFORE wiring, over a
   scratch copy of the same population `carried_population` derives, printing hits AND
   near-misses. It changed the design twice; the numbers are in the next section.
-- AC8 — MET, with one correction owed and paid — `bash tools/check-testsuite-counts.sh` exits 0,
-  and both legs declare a wall-clock ceiling in `tools/gate-legs.json`. The self-test leg's
-  ceiling was 14x stale at HEAD; re-declared from measurement, and the class filed. Below.
+- AC8 — MET — `bash tools/check-testsuite-counts.sh` exits 0,
+  and both legs declare a wall-clock ceiling in `tools/gate-legs.json`. I also reported a 14x
+  breach here that did not exist — the ceilings are SECONDS, not milliseconds. That correction,
+  and the one real breach the closing bar did find, are below.
 
 ## S5 changed the design twice, which is the whole argument for the rule
 
@@ -97,15 +98,30 @@ Hand-written reason columns survive every later write. Without that join the nex
 would erase every justification in the file, leaving a ban whose exceptions nobody could account
 for.
 
-## The correction owed under AC8, and the class behind it
+## The correction owed under AC8 was MY OWN UNIT ERROR, and it is recorded rather than erased
 
-The `install-prefix self-test` leg declared `ceiling: 1670`. Measured at **HEAD, unmodified**:
-23066 ms and 24095 ms. Fourteen times over, and not caused by this unit — my five arms add about
-300 ms, inside the noise. Nobody noticed because the leg is `chunk: selftests` behind a guard, so it
-does not run unless asked: **a ceiling on a leg that never runs is a number nothing compares.**
-Re-declared to 40000 from the measurement, with headroom for this node's threefold wall variance.
-That fixes the instance; the class is filed as `TOOL-dRetiredFork-30`, since every other held
-selftest ceiling is under the same blindness.
+I reported that the `install-prefix self-test` leg breached its declared ceiling fourteenfold:
+23066 ms measured against `ceiling: 1670`. **That was wrong, and the mistake was mine.** The
+declaration is in SECONDS. `tools/run-gates/run-gates.sh:1110` passes it straight to
+`timeout -k 5s "$bound"`, where a bare number is seconds. The true comparison is 23 s against
+1670 s, so the leg sat comfortably inside a bound it has never approached. I then "fixed" it to
+40000 — an eleven-hour ceiling on a 23-second suite, which is strictly worse than the number I
+was correcting. Reverted to 1670.
+
+The backlog row I filed on that evidence, `TOOL-dRetiredFork-30`, is WITHDRAWN in the same pass.
+Its general claim — that a held leg's ceiling is never compared to anything, so it can rot
+unobserved — remains true and unaddressed; but it now rests on no measurement, and a row whose
+evidence evaporated is worth less than no row at all.
+
+**What the closing bar DID find, on a leg that actually runs.** `pass-order history` declares 90 s
+and takes **128 s** standalone. It was killed at 90 s and reported as a failure while, given time,
+it passes. That is a real breach of a real bound: the leg's cost scales with the number of closed
+units, and this build added fifteen. Re-declared to 300 s from the measurement.
+
+Two ceilings, then, and only one of them was ever wrong in the direction I claimed. The
+transferable part is smaller than the story I first told: **read the unit off the consumer, not off
+the magnitude.** Four digits looked like milliseconds because the other ceilings in that file are
+four digits too, and I never checked what read them.
 
 ## The arms were mutation-tested, because five green arms prove nothing
 

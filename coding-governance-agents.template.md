@@ -312,6 +312,7 @@ matched its target population.
 - Forward-compatible data: new fields additive + defaulted (old content renders identically, new capability inert until used); shape changes ship an auto-upgrade step; prefer riding an existing shape over a migration.
 - Reuse audit before building: grep for an existing component/util/endpoint to extend before adding one.
 - Gate the layout conventions you can (naming, layer boundaries); the "where things live" map lives in the always-loaded doc (§6) so every feature has an obvious home.
+- **A kit file names nothing outside itself by literal.** Its own kit dir and tool root are DERIVED and an empty derivation REFUSES; a sibling kit is a render token. Gated as a BAN, not a ratchet — the writer may lower a count, never add one. The hooks kit README states it.
 <!-- kit:lexicon -->
 *The naming bullets below are kit-conditional — drop them if the project does not adopt the lexicon kit, the same way §1's unattended block is dropped. The rest of §12 is universal core. Their count is not stated here, because it has already changed once and nothing derives it.*
 

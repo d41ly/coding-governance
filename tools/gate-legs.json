@@ -253,7 +253,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 480000
+    "ceiling": 900
   },
   {
     "name": "row-keyed merge driver replay",
@@ -717,7 +717,7 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 90
+    "ceiling": 300
   },
   {
     "name": "playbook validity gate",
@@ -868,7 +868,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 180000
+    "ceiling": 240
   },
   {
     "name": "agent-cap restatement",
@@ -902,7 +902,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 40000
+    "ceiling": 1670
   },
   {
     "name": "dead-path carriers (deleted files still named)",

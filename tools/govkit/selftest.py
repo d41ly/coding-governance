@@ -6873,6 +6873,53 @@ user_skills = "/tmp/gk-fake-skills"
             # announcement under the flag is covered by the S6 arms below, which set it.
             "_cmd_update": None,
         }
+        # ---- DEPL-dRetiredFork-5, ROUND 2. THE VERDICT ARMS WERE SWAPPED ----------------------
+        # The first version of `run_kit_check`'s outcome block re-asked `_oc.get("ok")` after
+        # `classify_outcome` had ALREADY returned the block only because its probe was satisfied.
+        # Five shipped descriptors declare `code = 0, means = "adopted"` with NO `ok` key, so a
+        # CORRECT install came back `landed-but-inert` while exit-0-by-absence still said `adopted`.
+        #
+        # THE ARM THAT MISSED IT declared `"ok": True` on its synthetic descriptor — the one shape
+        # no shipped kit has. So this fixture is built to match the CORPUS instead: `code = 0`, a
+        # probe, and no `ok`. Measured against tools/lexicon/kit.toml, which is exactly this shape.
+        _k5d = {"outcome": [{"code": 0, "means": "adopted",
+                             "probe": {"must_exist": ["{kit}/marker.txt"]}}]}
+        _k5r = pathlib.Path(__import__("tempfile").mkdtemp())
+        (_k5r / "kitdir").mkdir(parents=True, exist_ok=True)
+        _k5c = {"kit": str((_k5r / "kitdir").as_posix())}
+        check("[-5] R2 a descriptor with code 0 and NO `ok` key is the SHIPPED shape",
+              _k5d["outcome"][0].get("ok") is None, "the fixture drifted back to the ok=True shape")
+        # ABSENT -> the probe is unsatisfied on a zero exit: exit-0-by-absence, the real target.
+        _k5absent = GK9.classify_outcome(_k5r, _k5d, _k5c, 0)
+        check("[-5] R2 with the probe UNSATISFIED, classify_outcome returns None on rc 0",
+              _k5absent is None, repr(_k5absent))
+        # PRESENT -> satisfied. The block comes back, and `ok` is absent from it. A verdict that
+        # reads `ok` here calls a correct install inert, which is the defect.
+        (_k5r / "kitdir" / "marker.txt").write_text("x", encoding="utf-8")
+        _k5present = GK9.classify_outcome(_k5r, _k5d, _k5c, 0)
+        check("[-5] R2 with the probe SATISFIED, the block returns and carries no `ok`",
+              _k5present is not None and _k5present.get("ok") is None, repr(_k5present))
+        # THE DECISION ITSELF, called with all four input shapes. This replaced a SOURCE-SUBSTRING
+        # assertion that could not fail: mutating the guarded expression to `... or True` left the
+        # substring present and the arm green. A pure function has no such escape.
+        _k5truth = [
+            # (rc, oc, declared_for_rc, expected, what it is)
+            (0, None, False, True,  "rc 0, nothing declared — unchanged pre-DEPL-5 behaviour"),
+            (0, {"means": "adopted"}, True, True, "rc 0, declared AND satisfied — a real install"),
+            (0, None, True, False, "rc 0, declared and NOT satisfied — exit zero BY ABSENCE"),
+            (1, {"ok": True}, True, True, "rc 1 with ok — memory-tree seeds its conf and stops"),
+            (1, {"means": "refused-foreign-tree"}, True, False, "rc 1 without ok — a real refusal"),
+            (1, None, True, False, "rc 1, probe unsatisfied — refused"),
+        ]
+        for _rc, _oc5, _dec, _want, _what in _k5truth:
+            check(f"[-5] R2 outcome_accepted({_rc}, {'block' if _oc5 else 'None'}, {_dec}) "
+                  f"is {_want} — {_what}",
+                  GK9.outcome_accepted(_rc, _oc5, _dec) is _want,
+                  f"got {GK9.outcome_accepted(_rc, _oc5, _dec)!r}")
+        check("[-5] R2 LIVENESS the truth table covers both verdicts",
+              len({w for _r, _o, _d, w, _x in _k5truth}) == 2, "the table only asserts one answer")
+        __import__("shutil").rmtree(str(_k5r), ignore_errors=True)
+
         # ---- DEPL-dRetiredFork-6. THE CONTRIBUTION CLASSIFIER ----------------------------------
         # NAMES ARE NAMESPACED `_k6*` BECAUSE THEY ARE NOT IN A FUNCTION OF THEIR OWN.
         # Every arm in this file shares one scope, and `_g4` was already a scratch gov

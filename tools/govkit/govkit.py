@@ -2762,19 +2762,46 @@ def run_kit_check(eid: str, desc: dict, ctx: dict[str, str], target: pathlib.Pat
         # when no block matches and when none is declared, so the fall-through below is today's
         # answer exactly. A descriptor that DID declare a probe now has it honoured; no descriptor
         # is retroactively broken, which is why this needed no per-kit authoring pass.
+        # THE FIRST VERSION OF THIS BLOCK INVERTED ITS OWN VERDICT, and the closing review proved
+        # it on a real descriptor. `classify_outcome` returns a block ONLY when that block's probe
+        # is SATISFIED, so `_oc is not None` ALREADY MEANS SATISFIED; re-asking `_oc.get("ok")`
+        # then answers a question five shipped descriptors never answer. `agent-instructions`,
+        # `drift-audit`, `lexicon`, `memory-recall` and `run-gates` each declare
+        # `code = 0, means = "adopted"` with NO `ok` key, so a CORRECT install came back
+        # `landed-but-inert` carrying a message asserting the opposite of what the probe returned —
+        # while the exit-0-by-absence case this whole change exists to catch still printed
+        # `adopted`. The two arms were swapped.
+        #
+        # `ok` IS STILL MEANINGFUL, which is why it is not simply dropped: `memory-tree` declares
+        # TWO blocks for code 1, `seed-and-stop` with `ok = true` and `refused-foreign-tree`
+        # without, and only the first is an acceptable stop. So `ok` decides a NON-ZERO exit, and
+        # a zero exit is decided by whether a declared probe for code 0 is satisfied. That is the
+        # rc-first shape `_cmd_apply`'s CONFIGURE step already had; this copy simply lacked it.
         _oc = classify_outcome(target, desc, ctx, rc)
-        if _oc is not None:
-            _means = str(_oc.get("means") or "").strip()
-            if _oc.get("ok"):
-                # A DECLARED, ACCEPTED outcome — including a non-zero one. `memory-tree` seeds its
-                # conf and stops by design, and that is a correct install rather than a failure.
+        _means = str((_oc or {}).get("means") or "").strip()
+        _declared_here = declares_outcome_for(desc, rc)
+        if rc == 0:
+            if outcome_accepted(rc, _oc, _declared_here):
+                # Either the declared probe holds, or the descriptor declares nothing for a zero
+                # exit and the old unconditional `adopted` is still the right answer.
                 return "adopted", (f" ({_means})" if _means else ""), rc
+            # DECLARED AND NOT SATISFIED: exit 0 BY ABSENCE. This is the case
+            # DEPL-dRetiredFork-5 was written for — an adopter that exits 0 because it is not
+            # installed, reporting as `adopted` for a kit with no conf, no Skill and no module.
             if r is not None:
-                r.fail(f"kit '{eid}': its adopter exited {rc} and the declared probe for that code "
-                       f"is NOT satisfied"
-                       + (f" — {_means}" if _means else "")
-                       + " — landed but inert, surfaced rather than swallowed")
-            return "landed-but-inert", (f" ({_means})" if _means else ""), rc
+                r.fail(f"kit '{eid}': its adopter exited 0 but the probe declared for that code is "
+                       f"NOT satisfied, so it exited zero BY ABSENCE rather than by working — "
+                       f"landed but inert, surfaced rather than swallowed")
+            return "landed-but-inert", "", rc
+        if _oc is not None and _oc.get("ok"):
+            # A DECLARED, ACCEPTED non-zero outcome. `memory-tree` seeds its conf and stops by
+            # design, and that is a correct install rather than a failure.
+            return "adopted", (f" ({_means})" if _means else ""), rc
+        if r is not None:
+            r.fail(f"kit '{eid}': its adopter exited {rc} and no declared outcome accepts that code"
+                   + (f" — {_means}" if _means else "")
+                   + " — landed but inert, surfaced rather than swallowed")
+        return "landed-but-inert", (f" ({_means})" if _means else ""), rc
         if rc != 0 and r is not None:
             r.fail(f"kit '{eid}': its own adopter check arm exits {rc}, so the kit is landed "
                    f"but not working — surfaced rather than swallowed")
@@ -3457,6 +3484,38 @@ def hook_probe(target: pathlib.Path) -> tuple[str, str]:
     return "block", (out.stdout + out.stderr).strip()
 
 
+def outcome_accepted(rc: int, oc, declared_for_rc: bool) -> bool:
+    """Is an adopter's exit code an ACCEPTED outcome? The whole decision, as one testable value.
+
+    Extracted because the first version of this logic was INVERTED and the arm that should have
+    caught it asserted on a source SUBSTRING instead. A substring survives the mutation it is
+    supposed to detect — measured: changing the guarded expression to `... or True` left the
+    assertion passing. A pure function has no such escape; the arms below call it with all four
+    input shapes and read the answer.
+
+    `oc` is `classify_outcome`'s return, which is the matched block or None. It is None both when
+    no block is declared for this code and when one is declared whose probe is NOT satisfied, so
+    `declared_for_rc` is what tells those two apart — and telling them apart IS the feature:
+
+      rc == 0, nothing declared          -> accepted (unchanged, pre-DEPL-5 behaviour)
+      rc == 0, declared and satisfied    -> accepted
+      rc == 0, declared and unsatisfied  -> REFUSED. Exit zero BY ABSENCE: the adopter returned 0
+                                            because it is not installed. This is the case
+                                            DEPL-dRetiredFork-5 exists for.
+      rc != 0, block satisfied with ok   -> accepted (memory-tree seeds its conf and stops)
+      rc != 0, anything else             -> REFUSED
+    """
+    if rc == 0:
+        return (oc is not None) or (not declared_for_rc)
+    return bool(oc is not None and oc.get("ok"))
+
+
+def declares_outcome_for(desc: dict, rc: int) -> bool:
+    """Does this descriptor declare ANY `[[outcome]]` block for exactly this exit code?"""
+    return any(isinstance(b, dict) and b.get("code") == rc
+               for b in (desc.get("outcome") or []))
+
+
 def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: int) -> dict | None:
     """The DECLARED meaning of an adopter's exit code, decided by a filesystem PROBE.
 
@@ -3617,6 +3676,10 @@ def blob_oid(data: bytes) -> str:
                         usedforsecurity=False).hexdigest()
 
 
+def as_posix_p(p) -> str:
+    return str(p).replace(chr(92), "/")
+
+
 def git_pathspec(target: pathlib.Path, argv: list[str], paths: list[str],
                  text: bool = False) -> subprocess.CompletedProcess:
     """Run a git command whose PATHSPEC arrives over stdin instead of the command line.
@@ -3643,6 +3706,25 @@ def git_pathspec(target: pathlib.Path, argv: list[str], paths: list[str],
     if not paths:
         raise ValueError("git_pathspec called with an empty path list: git would read no pathspec "
                          "and operate on the whole tree, which is never what the caller meant")
+    # ONLY SOME SUBCOMMANDS TAKE THIS FLAG, AND THE REST FAIL SILENTLY-ENOUGH TO MATTER.
+    # `git ls-files` and `git diff` REJECT `--pathspec-from-file` — measured on git 2.54:
+    # `error: unknown option 'pathspec-from-file=-'`, exit 129, EMPTY STDOUT. This helper captures
+    # output and passes `check=False`, so a caller reading `.stdout` gets "" and concludes the
+    # population is clean. Two live checks were converted to this shape by DEPL-dRetiredFork-4 and
+    # went vacuous: the pre-renormalize cleanliness guard and the LF-index verification, the second
+    # of which then printed "0 not LF in the index" unconditionally. Found by the closing review.
+    #
+    # A DENYLIST WOULD BE THE WRONG SHAPE. The question is which subcommands SUPPORT it, and a new
+    # caller is far likelier to name an unsupported one than to add support to git. So the set is
+    # ALLOW-listed, and an unlisted verb refuses loudly rather than returning an empty answer.
+    _verb = next((a for a in argv if not a.startswith("-")), "")
+    if _verb not in {"add", "rm", "checkout", "restore", "reset", "commit", "stash"}:
+        raise ValueError(
+            f"git_pathspec cannot run `git {_verb}`: that subcommand does not accept "
+            f"--pathspec-from-file, and git answers an unknown option with exit 129 and EMPTY "
+            f"stdout — which a caller reading .stdout cannot tell from 'nothing matched'. "
+            f"Read the whole set and filter in python instead; there is no command-line bound "
+            f"on a command that takes no pathspec at all")
     return subprocess.run(
         ["git", "-C", str(target)] + argv + ["--pathspec-from-file=-", "--pathspec-file-nul"],
         input=(chr(0).join(paths) + chr(0)).encode("utf-8") if not text
@@ -4579,9 +4661,14 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # for. Measured: without this, a clean fixture target failed here on the DEFAULT
             # selection, naming two files gov had itself just landed.
             ours = set(staged)
-            dirty = [p for p in git_pathspec(
-                target, ["diff", "--name-only", "HEAD"], lf_paths,
-                text=True).stdout.split() if p not in ours]
+            # NO PATHSPEC, FILTERED HERE. `git diff` does not take `--pathspec-from-file`, and
+            # passing 25 KiB of paths as argv is what DEPL-dRetiredFork-4 was fixing. Asking for
+            # the WHOLE diff and intersecting in python has neither bound: one process, no
+            # command line, and the filter is visible instead of being git's.
+            _lfset = set(lf_paths)
+            _alldiff = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "HEAD"],
+                                      capture_output=True, text=True)
+            dirty = [p for p in _alldiff.stdout.split() if p in _lfset and p not in ours]
             missing_wt = [p for p in lf_paths if not (target / p).exists()]
             if dirty or missing_wt:
                 r.fail(f"the pinned population is not clean relative to HEAD "
@@ -4592,9 +4679,19 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                 git_pathspec(target, ["add", "--renormalize"], lf_paths)
                 _renormalized = True   # M3: the re-stamp below keys on THIS, not on `staged`
         after = eol_population(target)
-        idx = git_pathspec(target, ["ls-files", "--eol"], lf_paths,
-                           text=True).stdout if lf_paths else ""
-        bad = [ln.split("\t")[-1] for ln in idx.splitlines() if ln and "i/lf" not in ln.split()[0]]
+        # SAME FIX, AND THIS IS THE ONE THAT WENT FULLY VACUOUS: `git ls-files` rejects the flag,
+        # so `idx` was "" on every run, `bad` was [] for every input, and the r.fail below became
+        # unreachable while the step still printed its reassuring count. A green-by-absence hole
+        # opened by the build whose subject was green-by-absence.
+        _idxr = subprocess.run(["git", "-C", str(target), "ls-files", "--eol"],
+                               capture_output=True, text=True) if lf_paths else None
+        if _idxr is not None and _idxr.returncode != 0:
+            r.fail(f"`git ls-files --eol` exited {_idxr.returncode} in {as_posix_p(target)}, so the "
+                   f"LF-index verification could not run. Refusing to report it clean")
+        _lfset2 = set(lf_paths)
+        idx = _idxr.stdout if (_idxr is not None and _idxr.returncode == 0) else ""
+        bad = [ln.split("\t")[-1] for ln in idx.splitlines()
+               if ln and ln.split("\t")[-1] in _lfset2 and "i/lf" not in ln.split()[0]]
         for b in bad:
             r.fail(f"'{b}' is pinned eol=lf and its INDEX blob is not LF after the renormalize")
         covers_nothing = [p for p, _c, _w in pins
@@ -6557,8 +6654,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # SEEDS ITS CONF AND STOPS BY DESIGN -- a declared, accepted, non-zero outcome.
                 # DEPL-dRetiredFork-5 taught `check` this same lesson one unit ago; the third
                 # caller learning it independently is the argument for the helper existing.
+                # THE SAME INVERSION WAS WRITTEN HERE TOO, and was latent only because no
+                # descriptor declares a `[[regenerate]]` block yet — it would have armed itself on
+                # the first one. Same rule as `run_kit_check`: a satisfied probe on a zero exit is
+                # good, and `ok` decides a non-zero one.
                 _oc_rr = classify_outcome(target, _d, _ctx_rr, _out.returncode)
-                _bad = (not _oc_rr.get("ok")) if _oc_rr is not None else (_out.returncode != 0)
+                _bad = not outcome_accepted(_out.returncode, _oc_rr,
+                                            declares_outcome_for(_d, _out.returncode))
                 _rr_ran.append(f"{_eid}: {' '.join(_res)} -> exit {_out.returncode}"
                                + (f" ({_oc_rr.get('means')})" if _oc_rr else "")
                                + ("  REFUSED" if _bad else ""))
