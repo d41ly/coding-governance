@@ -2740,6 +2740,33 @@ def run_kit_check(eid: str, desc: dict, ctx: dict[str, str], target: pathlib.Pat
             if r is not None:
                 r.fail(f"kit '{eid}': its own adopter check arm could not run: {e}")
             return "landed-but-inert", f" (its check arm could not run: {e})", None
+        # ---- DEPL-dRetiredFork-5 S1. THE EXIT CODE GOES THROUGH THE DECLARED PROBE -------------
+        # `classify_outcome` exists to decide what an adopter's exit code MEANS, by asking the
+        # filesystem rather than trusting the integer — and it had exactly ONE call site, inside
+        # `_cmd_apply`. So every `[[outcome]]` block was dead code for `check`.
+        #
+        # MEASURED on an adopter: `adopt-lexicon.sh --check` exits 0 BY ABSENCE, so `check` printed
+        # `lexicon: adopted` for a kit with no conf, no Skill and no importable module. This
+        # function's own docstring says `adopted` means a check arm that ran and passed; the arm
+        # passed because the kit was not there. TOOL-aFlaggedScaffold-5.
+        #
+        # S2 — AN ENTRY WITH NO `[[outcome]]` IS UNCHANGED. `classify_outcome` returns None both
+        # when no block matches and when none is declared, so the fall-through below is today's
+        # answer exactly. A descriptor that DID declare a probe now has it honoured; no descriptor
+        # is retroactively broken, which is why this needed no per-kit authoring pass.
+        _oc = classify_outcome(target, desc, ctx, rc)
+        if _oc is not None:
+            _means = str(_oc.get("means") or "").strip()
+            if _oc.get("ok"):
+                # A DECLARED, ACCEPTED outcome — including a non-zero one. `memory-tree` seeds its
+                # conf and stops by design, and that is a correct install rather than a failure.
+                return "adopted", (f" ({_means})" if _means else ""), rc
+            if r is not None:
+                r.fail(f"kit '{eid}': its adopter exited {rc} and the declared probe for that code "
+                       f"is NOT satisfied"
+                       + (f" — {_means}" if _means else "")
+                       + " — landed but inert, surfaced rather than swallowed")
+            return "landed-but-inert", (f" ({_means})" if _means else ""), rc
         if rc != 0 and r is not None:
             r.fail(f"kit '{eid}': its own adopter check arm exits {rc}, so the kit is landed "
                    f"but not working — surfaced rather than swallowed")

@@ -6865,6 +6865,37 @@ user_skills = "/tmp/gk-fake-skills"
             # declared target sites, so leaving the key here would red exactly as leaving the
             # row there did -- which is the pair working.
         }
+        # ---- DEPL-dRetiredFork-5 S3. AN ADOPTER THAT EXITS 0 BY ABSENCE ------------------------
+        # `classify_outcome` decides what an exit code MEANS by probing the filesystem, and it had
+        # exactly ONE call site — inside `_cmd_apply`. So every `[[outcome]]` block was dead code for
+        # `check`, and a kit whose adopter exits 0 because it is NOT INSTALLED reported `adopted`.
+        # Measured on a real adopter: a kit with no conf, no Skill and no importable module.
+        #
+        # The fixture is the same descriptor read twice, once with the probe's path present and once
+        # without, so the ONLY moving part is whether the probe is satisfied.
+        _d5 = {"outcome": [{"code": 0, "means": "the adopter reports it is installed",
+                            "ok": True, "probe": {"must_exist": ["{kit}/marker.txt"]}}]}
+        import tempfile as _tf5
+        _r5 = pathlib.Path(_tf5.mkdtemp())
+        (_r5 / "kitdir").mkdir(parents=True, exist_ok=True)
+        _ctx5 = {"kit": str((_r5 / "kitdir").as_posix())}
+        _absent = GK9.classify_outcome(_r5, _d5, _ctx5, 0)
+        check("[-5] S3 exit 0 with the probe's path ABSENT does not classify as ok",
+              not (_absent and _absent.get("ok")), repr(_absent))
+        (_r5 / "kitdir" / "marker.txt").write_text("x", encoding="utf-8")
+        _present = GK9.classify_outcome(_r5, _d5, _ctx5, 0)
+        check("[-5] S3 ...and the SAME descriptor with the path present classifies ok",
+              bool(_present and _present.get("ok")), repr(_present))
+        # THE JOIN THAT WAS MISSING: `run_kit_check` must consult that probe, not just `rc == 0`.
+        # Asserted on the source, because building a runnable adopter fixture here would test the
+        # fixture. The call site is what was absent; its presence is the whole fix.
+        _src5 = pathlib.Path(GK9.__file__).read_text(encoding="utf-8")
+        _rkc = _src5[_src5.index("def run_kit_check"):_src5.index("def classify_outcome")]
+        check("[-5] S3 run_kit_check routes its exit code through classify_outcome",
+              "classify_outcome(" in _rkc,
+              "the probe is still dead code for `check`")
+        _sh5 = __import__("shutil"); _sh5.rmtree(str(_r5), ignore_errors=True)
+
         # ---- DEPL-dRetiredFork-4 S3. A PATHSPEC LARGER THAN THE COMMAND LINE --------------------
         # The argv form died at 32 KiB with WinError 206, AFTER apply's write loop — leaving files
         # staged, a conf scaffolded and no receipt update. This arm builds a pathspec past that bound
