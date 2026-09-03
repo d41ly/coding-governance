@@ -596,3 +596,53 @@ unclaimed here, and the unclaimed set is not obscure. Verbatim, each tested by m
 `tools/run-gates/run-gates.sh` IS claimed, so this is not a blanket gap. It is a set of load-bearing
 files nobody wrote a dossier for, invisible to `map_diff`'s digest and therefore to the kickoff
 skill's "what did the fast-forward bring in" step.
+
+## CORRECTION: nicocares is not running 2.49
+
+The earlier entry said `RECORD_SERVES_CUTOFF` was retired from the engine without a notice. It was
+never IN the engine. `git log --oneline -S RECORD_SERVES_CUTOFF -- tools/memory-tree/ .memory-tree.conf`
+over gov's whole history returns nothing; `grep -c` finds it four times in
+`nc/scripts/check-memory-hygiene.sh` and zero times in gov 2.55. gov's key for the adjacent idea is
+`RECORD_UNBOUND_PIN`.
+
+So nicocares is running a LOCAL FORK of the engine that wears a `KIT_MEMORY_TREE_VERSION=2.49`
+marker, and its 178-byte green is a property of that fork rather than of any shipped kit. The
+adversarial pass refuted the original claim and the refutation is correct; what replaces it is worse
+for the kit, not better.
+
+It also composes with the hardcoded-prefix defect. `check-verdict-epoch.sh` is the leg whose whole
+job is to force the version marker to move when the engine's verdicts change, and line 68's literal
+`ENGINE=tools/memory-tree/check-memory-hygiene.sh` makes it exit 2 at nicocares's install prefix. The
+detector for exactly this divergence is disabled at the one adopter where the divergence happened.
+`govkit update` does see it, as one of the 19 `unattributed` rows — a signal nobody was running.
+
+## The lexicon pin's own history settles the question
+
+Command, over the scratch clone:
+`git log --reverse --format="%h %ad" --date=short -- .lexicon.conf`, reading
+`VERB_OFFENDER_PIN` out of the conf at each commit.
+
+| date | sha | pin | move |
+|---|---|---|---|
+| 2026-08-16 | b0626152 | 412 | first |
+| 2026-08-16 | d54f0caf | 415 | +3 |
+| 2026-08-16 | be0ee6a7 | 417 | +2 |
+| 2026-08-18 | 66782601 | 463 | +46 |
+| 2026-08-18 | a8d1c1be | 450 | -13 |
+| 2026-08-18 | 94a41505 | 463 | +13 |
+| 2026-08-25 | 95737bc8 | 384 | -79 |
+| 2026-08-26 | e16de5fe | 452 | +68 |
+| 2026-08-26 | 267b598f | 455 | +3 |
+| 2026-08-26 | 3dee7112 | 458 | +3 |
+| 2026-08-26 | d8bbb16c | 460 | +2 |
+| 2026-08-27 | 3b2d89c8 | 463 | +3 |
+| 2026-09-01 | aa852df4 | 461 | -2 |
+
+Nine raises totalling +143 against four drops totalling -94: **net +49 in sixteen days**, on a pin
+the kit calls shrink-only. The two large moves are a matched pair — -79 on 2026-08-25 and +68 the
+next day — which is the signature of a definition change rather than of debt paid and returned.
+
+This is the whole verdict for that kit, and it needs no argument about the predicate: a ratchet that
+has gone up by a net 49 since it was created is not restraining anything. `lexicon.py:697` tests
+`if len(unwaived) > pin`, so raising the pin to match the count is the sanctioned way to make it
+green, and that is what the history records happening nine times.

@@ -1,12 +1,14 @@
 # TOOL-aProbedToolkit-1 — grade the four knowledge kits against four real repos
 
-**Status:** INPROGRESS · rev-1 · 2026-09-03 · node a · Tier-1 · base 51444cc1 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-03 · node a · Tier-1 · base 51444cc1 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-aProbedToolkit-1-graded-findings.md](../build/2026-09-03-build-TOOL-aProbedToolkit-1-graded-findings.md) | journal | — |
 | [2026-09-03-build-TOOL-aProbedToolkit-1-measurements.md](../build/2026-09-03-build-TOOL-aProbedToolkit-1-measurements.md) | journal | — |
+| [2026-09-03-build-TOOL-aProbedToolkit-1-synthesis.md](../build/2026-09-03-build-TOOL-aProbedToolkit-1-synthesis.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -103,6 +105,10 @@ none
 
 - rev-1 · 2026-09-03 · opened; scope derived from the kickoff message, subjects corrected after
   measuring that nicocares is a vendored repository rather than a top-level checkout.
+- rev-2 · 2026-09-03 · CLOSED. All six acceptance criteria met. Sixteen cells measured, 45 findings
+  graded by five skeptics with 44 confirmed, five readings withdrawn under checking and recorded as
+  withdrawn, fifteen backlog rows filed. The report is published as an artifact and its working is
+  the two journals in this folder.
 
 ## 10. Reuse audit
 
