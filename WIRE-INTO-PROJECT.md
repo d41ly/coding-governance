@@ -822,6 +822,23 @@ exists to remove.
   and the settings block only if the step-4 opt-in was taken). The index and query log live under the
   common git dir, never in the worktree — nothing to ignore, nothing to commit.
 
+### A check your project needs and gov does not have
+
+Do not edit a kit engine. Write the check as your own script, in your own tree, and register it as a
+leg in your gate manifest — `govkit apply` leaves a leg it does not own alone.
+
+Measured, not assumed: a fixture whose manifest held one project-authored leg came out of `apply`
+holding 23, the project's row byte-identical. The run reports nothing about it, so silence is the
+success case.
+
+Two limits worth knowing before you hit them. Give the leg a **ceiling**, because the runner reds one
+that arrives without it. And pick a name gov does not use: a collision makes `apply` exit 2 *after*
+partially writing the install, and while your leg is protected rather than overwritten, the tree then
+needs a re-run once you rename. Prefixing the leg with your project name is enough.
+
+The full contract, including why this kit will never grow a plugin loader, is in the memory-tree
+kit's own README.
+
 ## Maintenance
 
 ### The hooks ship ONE copy each — migrating a tree that has two

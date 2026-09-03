@@ -223,3 +223,54 @@ Three to five, primed with the mandate, the build overview and the spec format:
 - **unstated assumption** — what must be true of existing code for §4 to work that §4 never says and §10 never
   checked.
 - **prior art** — has a record already decided this? That is the recall probe, M5.
+
+## Adding a check gov does not have — the extension point, and its limits
+
+A project with a rule this kit does not implement does **not** edit the engine. It writes its own
+script, under its own tree, and registers it as a leg it owns. `govkit apply` then leaves that leg
+alone.
+
+That is a MEASURED claim, not a reading of the code. The probe: a fixture target whose gate manifest
+held exactly ONE leg — project-authored, named `project build-README comment convention` — then
+`govkit apply`. Afterwards the manifest held 23: gov's 22 emitted alongside the project's own, byte
+for byte unchanged, argv and ceiling intact.
+
+```json
+{ "name": "project build-README comment convention",
+  "argv": ["bash", "scripts/check-build-readme-comments.sh"],
+  "chunk": "product", "subject": "repo", "ceiling": 3000 }
+```
+
+The leg's script sources `.memory-tree.conf` for `MEMORY_ROOT` exactly as this kit's own checks do,
+so it reads the same tree from the same declaration.
+
+**Give it a ceiling.** The runner reds a leg that arrives without one, and finding that out from a
+red bar is a worse first experience than reading it here.
+
+### Two limits, both measured, neither of which is "declines and reports"
+
+**A non-colliding leg is preserved SILENTLY.** The run says nothing about it at all. Do not expect a
+line confirming your leg survived; its absence from the output is the normal case.
+
+**A COLLIDING name aborts the verb, after a partial write.** If your leg's name is one gov also
+emits and your receipt does not already claim it, `apply` refuses:
+
+```
+govkit: the target's runner already has a leg named 'memory hygiene' and this target's receipt
+does not claim it — overwriting a leg the target wrote silently deletes their own coverage
+```
+
+Measured: exit 2, with **41 paths already changed in the working tree**. The refusal protects your
+leg — it is not overwritten — but it arrives after the install has partly landed, so the tree needs
+`git checkout` or a re-run once the name is changed. Pick a name gov will not: prefixing yours with
+the project name is enough.
+
+### What this kit will NOT grow
+
+**No plugin loader, and no `PROJECT_CHECKS` conf key naming scripts the engine invokes.** An engine
+that loads project code is an engine whose behaviour the kit cannot state, and every gate it runs
+becomes ungradeable. The conf-key version is the same loader under another name: it inverts
+ownership, making this kit responsible for a script it cannot read.
+
+The seam is the gate manifest, and it is already the seam. Your check is your code, in your tree,
+run by your bar.
