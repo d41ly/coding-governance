@@ -39,10 +39,28 @@ cd "$ROOT" || exit 2
 # ---- across two days and repeatedly abandoned. Slowness that only annoys never gets fixed. Slowness
 # ---- that REDS gets either fixed or re-declared with a reason, and both of those are progress.
 # ----
-# ---- These are CEILINGS in seconds, generous against the 2026-08-23 readings on node d and paired
-# ---- with them so a raise is visibly a raise. Raising one is fine; raising one silently is not, which
-# ---- is the same rule this repo applies to every other pin it owns.
-BUDGET_kit_gate=120           # measured 28 s
+# ---- These are CEILINGS in seconds, paired with the reading they were set against so a raise is
+# ---- visibly a raise. Raising one is fine; raising one silently is not, which is the same rule this
+# ---- repo applies to every other pin it owns.
+# ----
+# ---- THE READINGS ARE NOT ALL FROM ONE NODE, and a single global integer cannot be right for a cost
+# ---- that is node-relative (TOOL-aCollapsedScan-4). FIVE of the eight below are the 2026-08-23
+# ---- readings on node `d`, and two more (`gate_selftest`, `driver_selftest`) are 2026-08-25 node-`d`
+# ---- re-declarations under TOOL-dNarrowedAnchor-1. `BUDGET_kit_gate` is a node-`a` one, because the
+# ---- node-`d` figure was never
+# ---- a statement about node `a` at all: the same leg with check 30 removed costs about 70 s here
+# ---- against 28 s there, a 2.5x ratio that holds across this kit's work. Whether the SHAPE should be
+# ---- per node rather than one integer is `TOOL-aCollapsedScan-9`, not this line.
+# ---- IT IS CALIBRATED IDLE, AND A BUSY BOX WILL BREACH IT. Measured the same day on the same node:
+# ---- 187 s idle, 362 s while a concurrent session ran a full bar with self-tests. The obvious answer
+# ---- is a bigger number and it is WRONG here: this file's own note prices ambient load at 2.4x, which
+# ---- would put the ceiling near 450 s — above the 305 s the leg cost when check 30 landed unmeasured,
+# ---- so the very regression this whole build exists to have caught would pass. A single integer
+# ---- cannot separate "the leg regressed" from "the box was busy", so this one is set to catch the
+# ---- former and is EXPECTED to fire on the latter. READ A BREACH THIS WAY: re-run it on an idle box
+# ---- before believing it. Making the shape load-aware instead of re-arguing the integer is
+# ---- `TOOL-aCollapsedScan-9`.
+BUDGET_kit_gate=240           # measured 187 s IDLE on node `a` 2026-08-26, after TOOL-aCollapsedScan-1
 BUDGET_playbook_validity_gate=120   # measured 13 s
 BUDGET_skill_wiring=60        # measured 0 s
 BUDGET_gate_selftest=3800     # MEASURED 3565 s end to end — TOOL-dNarrowedAnchor-1, see the note below
