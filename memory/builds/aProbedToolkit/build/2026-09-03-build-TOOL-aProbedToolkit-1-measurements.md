@@ -646,3 +646,36 @@ This is the whole verdict for that kit, and it needs no argument about the predi
 has gone up by a net 49 since it was created is not restraining anything. `lexicon.py:697` tests
 `if len(unwaived) > pin`, so raising the pin to match the count is the sanctioned way to make it
 green, and that is what the history records happening nine times.
+
+## This unit reds a leg, and the fix is an owner decision
+
+`bash tools/run-gates/run-gates.sh` on the closed tree:
+
+```
+---- chunk records:   RED    (3 ran, 1 failed)
+---- chunk product:   green  (9 ran, 0 failed)
+---- chunk selftests: skipped (44 held)
+
+GATE FAIL  drift-audit records  (exit 1)
+    drift-report: closed_specs_with_no_product_commit = 2 (pin 1) — this list is shrink-only
+      TOOL-aMooredAnchor-1   closed 2026-08-11
+      TOOL-aProbedToolkit-1  closed 2026-09-03
+```
+
+The signal is correct and the unit is correct. `TOOL-aProbedToolkit-1` is CLOSED and ships no product
+source, because its deliverable IS the records: four journal files, fifteen backlog rows and a
+published report. The signal has no way to tell "closed with nothing to show" from "closed because
+the deliverable was records", and `drift_signals` carries no exemption key for the second.
+
+Three ways out, and only the owner can pick:
+
+1. Raise the pin to 2 with a recorded reason. This is a shrink-only list, and raising a shrink-only
+   pin to make a gate green is precisely what this report's own lexicon finding is about — nine
+   raises, net +49. Doing it here in the same session would be the same act with better manners.
+2. Hold the spec at a non-terminal status until the follow-up units land. That is untrue: the
+   acceptance criteria are met and the work is delivered.
+3. Give the signal an exemption a records-only unit can declare, the way the memory tree's other
+   ratchets carry registries with a reason per row.
+
+Not chosen here. The leg is left RED with this note, because silently taking option 1 would make the
+report an argument its own author had already declined to follow.
