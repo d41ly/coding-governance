@@ -5450,16 +5450,18 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
 
 
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
-               write_withdrawals: bool = False, allow_ungraded: bool = False) -> int:
+               write_withdrawals: bool = False, allow_ungraded: bool = False,
+               kits: list[str] | None = None) -> int:
     """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
     try:
-        return _cmd_update(root, target, to_rev, write, write_withdrawals, allow_ungraded)
+        return _cmd_update(root, target, to_rev, write, write_withdrawals, allow_ungraded, kits)
     finally:
         release_write_lock()
 
 
 def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
-                write_withdrawals: bool = False, allow_ungraded: bool = False) -> int:
+                write_withdrawals: bool = False, allow_ungraded: bool = False,
+                kits: list[str] | None = None) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -5551,6 +5553,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # the classification loop; filtering it out here would turn that into a silent drop, which is a
     # skip that looks like a pass — one row of a receipt quietly ungraded and nothing saying so.
     rows_all = receipt.get("files", [])
+
+    # ---- S5b. THE SCOPE BINDS. `--kits` narrows the population to the named entries' rows; an
+    # entry this receipt does not claim is a REFUSAL, because `update` moves an INSTALLED set
+    # forward and widening it is `--add-kits` and an owner decision.
+    if kits:
+        _claimed = set(receipt.get("kits") or [])
+        _unknown = sorted(k for k in kits if k not in _claimed)
+        if _unknown:
+            raise Refusal(
+                "--kits names " + ", ".join(_unknown) + ", which this receipt does not claim. "
+                "`update` moves an INSTALLED set forward; widening it is `--add-kits` and an owner "
+                "decision. Refusing rather than silently classifying an entry the target never took")
+        _want = set(kits)
+        rows_all = [w for w in rows_all if str(w.get("kit") or "") in _want]
+        print(f"govkit update — scope: --kits {', '.join(sorted(_want))} -> "
+              f"{len(rows_all)} of {len(receipt.get('files') or [])} receipt row(s)")
 
     # ---- SCHEMA MIGRATION, and it runs before S9 because S9's third arm grades a field this fills.
     # A receipt written before schema 3 carries no `gov_oid` at all, so every engine row in one would
@@ -7433,9 +7451,12 @@ def main(argv: list[str]) -> int:
             if verb == "intake":
                 return cmd_intake(root, target, mode, kits, ANSWERS)
             if verb == "update":
+                # S5b (DEPL-dRetiredFork-2). `kits` REACHES the verb. It was parsed and then thrown
+                # away here, so `update --kits <one>` classified the WHOLE receipt -- measured
+                # byte-identical to the unscoped run, with nothing saying the scope was ignored.
                 return cmd_update(root, target, TO_REV, write=WRITE,
                                   write_withdrawals=WRITE_WD,
-                                  allow_ungraded=ALLOW_UNGRADED)
+                                  allow_ungraded=ALLOW_UNGRADED, kits=kits)
             if verb == "adopt":
                 return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE)
             return cmd_apply(root, target, mode, kits, resume=RESUME)

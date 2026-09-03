@@ -1,11 +1,13 @@
 # DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row
 
-**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
+**Status:** INPROGRESS · rev-5 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-DEPL-dRetiredFork-2-1-acceptance-ledger.md](../build/2026-09-03-build-DEPL-dRetiredFork-2-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-DEPL-dRetiredFork-2-1-build-brief.md](../prompts/2026-09-03-prompt-DEPL-dRetiredFork-2-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
@@ -150,6 +152,25 @@ flip. "Use apply" is how the safe verb stays unable to add.
   `0 new` line and AC4 demanded byte-identity; both cannot hold. 14: §5 counted S6's arms and
   the count went stale the moment S6 grew — it points now. 30d: the rev-3 fold marked F2
   RESOLVED without the `ratified` pointer TEMPLATE-SPEC requires beside the mark.
+
+- rev-5 . 2026-09-03 . PARTIAL. S5b is BUILT AND LANDED: `--kits` was parsed and discarded, so a
+  scoped `update` ran unscoped -- measured byte-identical to the unscoped run. It now narrows the
+  population, prints the scope, and REFUSES an entry the receipt does not claim. Selftest and
+  selfcheck green with it.
+
+  S1/S2/S3/S3b/S5 were BUILT AND MEASURED WORKING, then WITHDRAWN. NicoCares showed 9 landable new
+  sources and 8 correctly reported-not-landed, including the rendered VERBS.template.md trap S3b
+  names. But landing new files broke 19 selftest arms, one of them a STANDING PREDICATE another unit
+  established: the tracked-file count is UNCHANGED across a run without --write-withdrawals, 18 to
+  25. Changing that contract on the verb whose failure mode is silent data loss in a repository gov
+  does not own is an owner decision; rewriting the arms that would have caught the risk in order to
+  land the thing carrying it is the shape this build exists to remove. PARKED with three options.
+
+  AC5's numbers do not reproduce and the measurement wins: 9 landable at NicoCares rather than five,
+  because gov has shipped more since b0108f13 -- including files this build added. inCMS cannot be
+  measured at all: `update` refuses there on a pre-existing receipt corruption, a row carrying
+  `commit` and no `gov_oid`, unrelated to this unit. rev-1's LANDABLE_ROLES gate is confirmed wrong
+  by reading the tables: it admits `seed`, whose own disposition says this verb never writes it.
 
 ## 10. Reuse audit
 

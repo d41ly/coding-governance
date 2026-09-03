@@ -132,7 +132,7 @@ every invalidated generator, re-stamps `gov_commit`, and leaves nothing for a pe
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 30 unit(s) · node d · opened 2026-09-02 · streams tooling+deployer
+**Build status:** INPROGRESS · 30 unit(s) · node d · opened 2026-09-02 · streams tooling+deployer
 ids DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 DEPL-dRetiredFork-10 DEPL-dRetiredFork-11 DEPL-dRetiredFork-12 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2
 ids TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16
 ids TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22 TOOL-dRetiredFork-23 TOOL-dRetiredFork-24 TOOL-dRetiredFork-25 TOOL-dRetiredFork-26 TOOL-dRetiredFork-27 TOOL-dRetiredFork-28
@@ -164,7 +164,7 @@ ids TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetired
 | [TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys](spec/2026-09-02-spec-TOOL-dRetiredFork-15.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-03 |
 | [TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine](spec/2026-09-02-spec-TOOL-dRetiredFork-16.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-03 |
 | [DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations](spec/2026-09-02-spec-DEPL-dRetiredFork-1.md) | 6 | 2 | CLOSED | rev-5 | 2026-09-03 |
-| [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | OPEN | rev-4 | 2026-09-02 |
+| [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | INPROGRESS | rev-5 | 2026-09-03 |
 | [DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin](spec/2026-09-02-spec-DEPL-dRetiredFork-4.md) | 6 | 1 | OPEN | rev-3 | 2026-09-02 |
 | [DEPL-dRetiredFork-5 — `check` runs the `[[outcome]]` probe instead of grading an exit code](spec/2026-09-02-spec-DEPL-dRetiredFork-5.md) | 6 | 1 | OPEN | rev-2 | 2026-09-02 |
 | [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | OPEN | rev-5 | 2026-09-02 |
@@ -172,7 +172,7 @@ ids TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetired
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 46 bound to this build, across 4 record folder(s).
+Records: 48 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
