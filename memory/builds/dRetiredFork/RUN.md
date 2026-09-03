@@ -90,3 +90,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-03T00:10:05Z brief · item TOOL-dRetiredFork-10 · reason be23a95443c5 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-10-1-build-brief.md
 
 2026-09-03T00:10:18Z dispatch · item 967d1885 TOOL-dRetiredFork-10 · reason tools/workflows/check-review-join.sh tools/workflows/check-verifier-fanout.sh tools/workflows/check-workflow-syntax.js tools/workflows/README.md tools/workflows/check-review-join.test.sh tools/workflows/check-verifier-fanout.test.sh tools/hooks/agent-cap.js memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-10.md
+
+2026-09-03T00:35:23Z brief · item TOOL-dRetiredFork-11 · reason a3d8091158f9 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-11-1-build-brief.md
+
+2026-09-03T00:35:54Z dispatch · item 38ee8b2a TOOL-dRetiredFork-11 · reason .githooks/pre-push .githooks/pre-push.test.sh tools/install-prefix-carried.txt memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-11.md

@@ -1,5 +1,5 @@
 .githooks/pre-commit	1	memory-tree
-.githooks/pre-push	2	run-gates
+.githooks/pre-push	1	run-gates
 .githooks/pre-push.test.sh	2	run-gates
 WIRE-INTO-PROJECT.md	28	codebase-map,drift-audit,hooks,memory-recall,memory-tree,playbook,workflows
 coding-governance-agents.template.md	2	hooks,playbook

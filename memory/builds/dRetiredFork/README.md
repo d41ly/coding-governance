@@ -156,7 +156,7 @@ ids TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetired
 | [TOOL-dRetiredFork-9 — `_`-prefixed spec subfolders, and C21's batched greps](spec/2026-09-02-spec-TOOL-dRetiredFork-9.md) | 1 | 1 | CLOSED | rev-3 | 2026-09-03 |
 | [DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract](spec/2026-09-02-spec-DEPL-dRetiredFork-7.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-03 |
 | [TOOL-dRetiredFork-10 — three workflows gates anchor their locator and population on a basename](spec/2026-09-02-spec-TOOL-dRetiredFork-10.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-03 |
-| [TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix](spec/2026-09-02-spec-TOOL-dRetiredFork-11.md) | 2 | 1 | OPEN | rev-3 | 2026-09-02 |
+| [TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix](spec/2026-09-02-spec-TOOL-dRetiredFork-11.md) | 2 | 1 | CLOSED | rev-4 | 2026-09-03 |
 | [TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`](spec/2026-09-02-spec-TOOL-dRetiredFork-12.md) | 2 | 2 | OPEN | rev-4 | 2026-09-02 |
 | [TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface](spec/2026-09-02-spec-TOOL-dRetiredFork-13.md) | 3 | 1 | OPEN | rev-4 | 2026-09-02 |
 | [TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two](spec/2026-09-02-spec-TOOL-dRetiredFork-14.md) | 4 | 2 | OPEN | rev-3 | 2026-09-02 |
@@ -172,7 +172,7 @@ ids TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetired
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 31 bound to this build, across 4 record folder(s).
+Records: 32 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

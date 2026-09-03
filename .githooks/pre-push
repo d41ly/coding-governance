@@ -43,6 +43,47 @@ if ! cd "$top"; then
   exit 1
 fi
 
+# ---- WHERE THIS TREE KEEPS ITS KITS — TOOL-dRetiredFork-11 ---------------------------------------
+# This hook ships VERBATIM to every push-main adopter, so a hardcoded prefix ships too. It spelled
+# `tools/` at five functional sites; at an adopter installed anywhere else the fingerprint helper and
+# the leg-manifest diff resolved to NOTHING and the bar command named a script that does not exist.
+# Forcing predicates 6 and 7 then matched nothing and did not fire, so a manifest-wide change landed
+# scoped against a green earned on a DIFFERENT leg set — green-by-absence, in the hook that decides
+# whether the authoritative bar is owed at all. TOOL-aBoundedCeiling-7; NicoCares carries the fix by
+# hand as its carve-out 14/20.
+#
+# PROBED ON THE LEG MANIFEST, not on the run-gates directory. The manifest is what predicates 6 and 7
+# actually read, and the two are not interchangeable: this repo's own pre-push fixtures write a
+# `gate-legs.json` and never create a `run-gates/` directory at all, so a probe keyed on the
+# directory falls through and takes twenty arms with it. Measured, on the first cut of this change.
+#
+# `tools` FIRST, because it is this kit's default and gov's tree must resolve unchanged; the fallback
+# is only consulted when this tree shows no sign of `tools` at all. NicoCares probes `scripts` first
+# for the mirror-image reason — the order is a default, never a rule.
+GOV_KITROOT=tools
+if [ ! -f "$top/tools/gate-legs.json" ] && [ ! -d "$top/tools/run-gates" ]; then
+  if [ -f "$top/scripts/gate-legs.json" ] || [ -d "$top/scripts/run-gates" ]; then
+    GOV_KITROOT=scripts
+  fi
+fi
+
+# A PATH THAT RESOLVES TO NOTHING IS A REFUSAL, NEVER A NON-MATCH — but only where the tree actually
+# HAS a manifest to find. Those two cases look identical from the outside and that is precisely what
+# made the original failure silent: `git diff -- <unresolvable>` reports "no change here" and the
+# push sails through. A repo with no manifest anywhere is a different and legitimate case (a fresh
+# adopter, a project not using run-gates, this hook's own fixtures), and it is left alone.
+if [ ! -f "$top/$GOV_KITROOT/gate-legs.json" ]; then
+  _elsewhere=$(git ls-files --cached -- '*gate-legs.json' 2>/dev/null | head -1)
+  if [ -n "$_elsewhere" ]; then
+    echo "pre-push: REFUSING — this tree tracks a leg manifest at '$_elsewhere', but this hook" >&2
+    echo "  resolved its kit root to '$GOV_KITROOT' and looked for '$GOV_KITROOT/gate-legs.json'." >&2
+    echo "  Left alone, the two forcing predicates that read that path would match NOTHING and the" >&2
+    echo "  push would be scoped against a green earned on a different leg set." >&2
+    echo "  Deliberate override, as always: git push --no-verify" >&2
+    exit 1
+  fi
+fi
+
 # $def decides which pushed ref gets gated, so whoever supplies $def decides whether the gate runs AT
 # ALL. GOV_DEFAULT_BRANCH used to outrank the observed default and was never checked for meaning, which
 # made it a fail-OPEN over every leg on the bar, not just this hook's own refusals.
@@ -92,7 +133,7 @@ done
 # push lacks it and is refused (--no-verify bypasses). The kit hook has no code/docs split, so EVERY
 # unmarked default-branch push is refused.
 if [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then
-  echo "pre-push: refusing a raw push to $def — land via tools/push-main.sh (it reconciles before the gate), or --no-verify to bypass." >&2
+  echo "pre-push: refusing a raw push to $def — land via $GOV_KITROOT/push-main.sh (it reconciles before the gate), or --no-verify to bypass." >&2
   exit 1
 fi
 
@@ -137,7 +178,7 @@ _gate_env="$(git rev-parse --show-toplevel 2>/dev/null)/.githooks/gate-env.sh"
 [ -f "$_gate_env" ] && . "$_gate_env"
 
 gd=$(git rev-parse --git-dir 2>/dev/null)
-kitfp="$(git rev-parse --show-toplevel)/tools/run-gates/gate-fingerprint.sh"
+kitfp="$top/$GOV_KITROOT/run-gates/gate-fingerprint.sh"
 rec="$gd/gate-full-green"
 force=""
 rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
@@ -192,7 +233,7 @@ fi
 # 6. the diff touches the LEG MANIFEST, so the scoping decision itself has changed. A guard added,
 #    widened or removed in this very push cannot be trusted to scope this very push.
 if [ -z "$force" ]; then
-  git diff --quiet "$rec_sha" "$main_local" -- tools/gate-legs.json 2>/dev/null \
+  git diff --quiet "$rec_sha" "$main_local" -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null \
     || force="the pushed diff touches the leg manifest, so the scoping rules themselves moved"
 fi
 
@@ -200,7 +241,7 @@ fi
 #    the record's side, and it catches an uncommitted or differently-resolved manifest that a diff
 #    between two commits cannot see.
 if [ -z "$force" ] && [ -n "$rec_blob" ]; then
-  now_blob=$(git hash-object -- tools/gate-legs.json 2>/dev/null)
+  now_blob=$(git hash-object -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null)
   [ -n "$now_blob" ] && [ "$now_blob" != "$rec_blob" ] \
     && force="the leg manifest differs from the one the recorded green was earned on"
 fi
@@ -226,7 +267,7 @@ else
   echo "pre-push: scoped gate on $def push (${main_local:0:8}) — full green ${rec_sha:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG"
   export GATE_BASE="$rec_sha"
 fi
-gate=${GOV_GATE_CMD:-bash tools/run-gates/run-gates.sh}
+gate=${GOV_GATE_CMD:-bash $GOV_KITROOT/run-gates/run-gates.sh}
 $gate </dev/null
 rc=$?
 [ "$rc" -eq 0 ] || echo "pre-push: gate RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."
