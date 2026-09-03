@@ -178,9 +178,63 @@ class Problem(Exception):
     """A named, user-facing failure. Never a traceback: blind spot 3."""
 
 
+class StaleHeader(Problem):
+    """A build README header that is PRESENT and does not conform — NOT one that is absent.
+
+    TOOL-dRetiredFork-3, absorbed from NicoCares `nc carve-out 9/20`. Those two states were one
+    `Problem` here, so a CORRUPTED header read as a MISSING one and the index regenerated around it.
+    They are different animals: an absent header is a build nobody wrote front matter for, and a
+    corrupt one is front matter that rotted after someone did.
+
+    It subclasses `Problem` rather than `Exception` directly, so an unhandled one still reports as a
+    named failure instead of a traceback — this file's blind-spot-3 rule. `collect()` catches it
+    specifically, BEFORE the generic handler, and decides tolerance there.
+    """
+
+    def __init__(self, path: str, region: str, detail: str) -> None:
+        super().__init__(f"{path}: header present but unparseable — {detail}")
+        self.path = path
+        self.region = region
+        self.detail = detail
+
+
 # --------------------------------------------------------------------------------------- plumbing
+#: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts.
+#: TOOL-dRetiredFork-2, absorbed from NicoCares `nc carve-out 16/20`. Taken VERBATIM from gov's own
+#: hook-side scrub at `.githooks/pre-push` rather than re-derived, because these are two halves of
+#: ONE defect and a second list would be the place they drift apart.
+_GIT_ENV_LEAKS = (
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_COMMON_DIR",
+    "GIT_NAMESPACE",
+    "GIT_PREFIX",
+)
+
+
+def _build_git_env() -> dict[str, str]:
+    """The parent environment with git's exported repository pointers removed.
+
+    Git exports `GIT_DIR` whenever the repository is reached through a `.git` FILE rather than a
+    `.git` directory — every linked worktree — so a generator started from a hook inherits a pointer
+    to a DIFFERENT tree than the one it was asked about, and reads it silently. There is no error;
+    the answer is just about the wrong repository.
+
+    Named `_build_git_env` and not nc's `_clean_git_env`: gov's lexicon table declares no `clean`
+    verb, and `build` is declared as "create a new value and return it", which is exactly this.
+    """
+    return {k: v for k, v in os.environ.items() if k not in _GIT_ENV_LEAKS}
+
+
 def run(*argv: str, cwd: str | None = None) -> str:
-    return subprocess.run(argv, cwd=cwd, capture_output=True, text=True, check=True).stdout
+    # `env=` HERE, at the one choke point every git call in this file goes through, rather than at
+    # seven call sites that would each have to remember.
+    return subprocess.run(
+        argv, cwd=cwd, capture_output=True, text=True, check=True, env=_build_git_env()
+    ).stdout
 
 
 def read_text(path: str) -> str:
@@ -280,8 +334,17 @@ def parse_front_matter(path: str, slug: str) -> dict:
     anywhere would swallow that whole half as front matter.
     """
     lines = read_text(path).split("\n")
+    # THE ONE ABSENT CASE. Line 1 is not `---`, so no header was ever opened and there is nothing to
+    # call stale. Every failure BELOW this point is a header that opened and then did not conform,
+    # and those raise StaleHeader — TOOL-dRetiredFork-3, which is the whole distinction.
     if not lines or lines[0].strip() != "---":
         raise Problem(f"{path}: no front matter — line 1 must be '---' (build '{slug}')")
+
+    def _extract_region(upto: int | None = None) -> str:
+        """The raw header text, for the report. Bounded so a file with no closing `---` cannot
+        hand the operator the entire document as its 'region'."""
+        return "\n".join(lines[: (upto if upto is not None else min(len(lines), 40))])
+
     fm: dict = {}
     end = None
     for i, line in enumerate(lines[1:], start=1):
@@ -291,23 +354,26 @@ def parse_front_matter(path: str, slug: str) -> dict:
         if not line.strip():
             continue
         if line[:1].isspace():
-            raise Problem(
-                f"{path}:{i + 1}: front-matter key is indented — keys live at COLUMN 0, and an "
-                f"indented key is silently dropped by every simple parser"
+            raise StaleHeader(
+                path, _extract_region(i + 1),
+                f"line {i + 1}: front-matter key is indented — keys live at COLUMN 0, and an "
+                f"indented key is silently dropped by every simple parser",
             )
         if ":" not in line:
-            raise Problem(f"{path}:{i + 1}: front-matter line is not 'key: value'")
+            raise StaleHeader(path, _extract_region(i + 1), f"line {i + 1}: not 'key: value'")
         k, _, v = line.partition(":")
         fm[k.strip()] = v.strip()
     if end is None:
-        raise Problem(f"{path}: front matter opened at line 1 but never closed with '---'")
+        raise StaleHeader(path, _extract_region(), "front matter opened at line 1 but never closed with '---'")
     missing = [k for k in REQUIRED_KEYS if k not in fm]
     if missing:
-        raise Problem(f"{path}: front matter missing required key(s): {', '.join(missing)}")
+        raise StaleHeader(path, _extract_region(end + 1), f"missing required key(s): {', '.join(missing)}")
     if fm["slug"] != slug:
-        raise Problem(f"{path}: front matter slug '{fm['slug']}' != folder name '{slug}'")
+        raise StaleHeader(path, _extract_region(end + 1),
+                          f"front matter slug '{fm['slug']}' != folder name '{slug}'")
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", fm["opened"]):
-        raise Problem(f"{path}: opened '{fm['opened']}' is not a YYYY-MM-DD date")
+        raise StaleHeader(path, _extract_region(end + 1),
+                          f"opened '{fm['opened']}' is not a YYYY-MM-DD date")
     if "status" in fm and fm["status"] not in STATUS_TOKENS:
         raise Problem(f"{path}: status '{fm['status']}' is not one of {' '.join(STATUS_TOKENS)}")
     return fm
@@ -629,9 +695,50 @@ def rosters(root: str, tracked: list, m: str, families: set) -> dict:
 
 
 # --------------------------------------------------------------------------------------- collecting
+#: Where the tolerated-header rows live. Sibling of the nine registries already under this dir.
+STALE_HEADER_WAIVER = "project/stale-header-waiver.txt"
+
+
+def read_stale_header_waiver(root: str, m: str, tracked: list) -> dict:
+    """The tolerated set, read ONCE per collect() and never per file.
+
+    Read at the CALLER and not inside the parser, which is the seam nc's own comment argues for and
+    is right about: a parser that knows about tolerance cannot be reused by a caller that wants
+    strictness, and this parser has two readers who want different answers.
+
+    A MISSING file refuses. An EMPTY one is the expected state — the mechanism is inert until a
+    header actually corrupts — and a row naming a path the tree no longer tracks refuses, because a
+    stale exception cannot hide a live hit.
+    """
+    rel = f"{m}/{STALE_HEADER_WAIVER}"
+    full = os.path.join(root, rel)
+    if not os.path.exists(full):
+        raise Problem(
+            f"{rel}: absent. The stale-header waiver registry is REQUIRED even when empty — a file "
+            f"nobody created is a decision nobody made, and defaulting it to empty would silently "
+            f"disarm the distinction it exists to keep."
+        )
+    rows = {}
+    for line in read_text(full).split("\n"):
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        path, _, why = line.partition(" ")
+        rows[path.strip()] = why.strip()
+    stale = sorted(p for p in rows if p not in tracked)
+    if stale:
+        raise Problem(
+            f"{rel}: {len(stale)} row(s) name a path the tree does not track, so the exception "
+            f"outlived the header it excused: {', '.join(stale)}"
+        )
+    return rows
+
+
 def collect(root: str, conf: dict) -> list:
     m = conf["MEMORY_ROOT"]
     tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
+    stale_waived = read_stale_header_waiver(root, m, tracked)
+    tolerated: list = []
     slugs = sorted({p.split("/")[2] for p in tracked if p.startswith(m + "/builds/") and p.count("/") >= 3})
     disciplines = set(conf["DISCIPLINES"].split())
     families = {pair.split(":")[1] for pair in conf["FAMILIES"].split() if ":" in pair}
@@ -656,7 +763,20 @@ def collect(root: str, conf: dict) -> list:
                 f"{m}/builds/{slug}/: no tracked README.md — a build with no front matter cannot be "
                 f"indexed, and an unindexed build is a silent departure from the universe"
             )
-        fm = parse_front_matter(os.path.join(root, readme), slug)
+        try:
+            fm = parse_front_matter(os.path.join(root, readme), slug)
+        except StaleHeader as exc:
+            # PRESENT and unparseable. Tolerance is decided HERE, by the caller, from the registry
+            # read once above — never inside the parser.
+            if readme not in stale_waived:
+                raise Problem(
+                    f"{exc}\n"
+                    f"  the header region follows; repair it, or add a row to "
+                    f"{m}/{STALE_HEADER_WAIVER} naming this path and why:\n"
+                    f"{exc.region}"
+                ) from None
+            tolerated.append(readme)
+            continue
         for value in fm["streams"].split("+"):
             if disciplines and value.strip() not in disciplines:
                 raise Problem(f"{readme}: streams value '{value.strip()}' is outside the DISCIPLINES enum")
@@ -693,6 +813,10 @@ def collect(root: str, conf: dict) -> list:
                 "status": derive_status(units, fm, readme),
             }
         )
+    # UNCONDITIONALLY, including at zero — the ratified F2. A clean run that printed nothing here
+    # would be indistinguishable from a check that never consulted the registry at all, and a
+    # tolerance that grows silently is the failure this whole mechanism exists to prevent.
+    print(f"build-index: {len(tolerated)} header(s) tolerated by waiver")
     return builds
 
 
@@ -1787,6 +1911,12 @@ def _fixture(tmp: str, *, marker=True, readme=True, status_key=None, spec_status
     run("git", "config", "user.name", "t", cwd=tmp)
     write_text(os.path.join(tmp, ".memory-tree.conf"),
                'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\n')
+    # The stale-header waiver registry, EMPTY, because `collect()` refuses without it
+    # (TOOL-dRetiredFork-3, AC4) and every fixture below goes through `collect()`. Written here
+    # rather than in fifteen fixtures: this helper is the one place they all pass through, and a
+    # per-fixture copy is fifteen chances for one of them to drift out of the population.
+    write_text(os.path.join(tmp, "memory", STALE_HEADER_WAIVER),
+               "# empty: the mechanism is inert until a header corrupts\n")
     d = os.path.join(tmp, "memory", "builds", "tOne", "spec")
     os.makedirs(d, exist_ok=True)
     if spec_status:
@@ -2523,6 +2653,92 @@ def cmd_selftest() -> int:
                         and max((len(x) for x in
                                  _extract_gap_para("Ids no `spec-audit` record has ever named:")),
                                 default=10 ** 6) <= IDS_WRAP + 1))
+
+        # TOOL-dRetiredFork-2 — the git-environment leak. Git exports GIT_DIR to every hook, and a
+        # generator started from one inherits a pointer to a DIFFERENT repository, which it then
+        # reads silently. Measured before the scrub was wired: with GIT_DIR naming a decoy, `--check`
+        # died `build-index: not a git repo` at exit 2; with it, exit 0 and byte-identical output.
+        def _run_under_decoy_git_dir():
+            with tempfile.TemporaryDirectory() as decoy:
+                saved = os.environ.get("GIT_DIR")
+                os.environ["GIT_DIR"] = decoy
+                try:
+                    return run("git", "rev-parse", "--show-toplevel").strip()
+                finally:
+                    if saved is None:
+                        os.environ.pop("GIT_DIR", None)
+                    else:
+                        os.environ["GIT_DIR"] = saved
+
+        # ANTI-VACUITY: it asserts the REAL toplevel comes back, not merely that nothing raised. A
+        # decoy that happened to resolve would still fail this.
+        arm("an inherited GIT_DIR does not redirect the generator's git calls", "True",
+            lambda: str(_run_under_decoy_git_dir()
+                        == run("git", "rev-parse", "--show-toplevel").strip()))
+        arm("...and GIT_DIR is not in the environment run() hands the subprocess", "True",
+            lambda: str("GIT_DIR" not in _build_git_env()))
+
+        # TOOL-dRetiredFork-3 — a PRESENT but unparseable header is not an ABSENT one. Before this,
+        # both raised the same Problem, so a corrupted header read as a missing one and the index
+        # regenerated around it.
+        def _derive_kind_exc(body: str):
+            try:
+                parse_front_matter(_build_header(body), "tOne")
+            except StaleHeader as exc:
+                return exc
+            except Problem:
+                return None
+            return None
+
+        def _build_header(body: str) -> str:
+            d = tempfile.mkdtemp()
+            p = os.path.join(d, "README.md")
+            with open(p, "w", encoding="utf-8", newline="") as fh:
+                fh.write(body)
+            return p
+
+        _good = ("---\nslug: tOne\nnode: t\nopened: 2026-09-02\nstreams: tooling\n"
+                 "roster: TOOL\nids: TOOL-tOne-1\n---\n# t\n")
+
+        def _derive_kind(body: str) -> str:
+            try:
+                parse_front_matter(_build_header(body), "tOne")
+            except StaleHeader:
+                return "StaleHeader"
+            except Problem:
+                return "Problem"
+            return "parsed"
+
+        arm("a conforming header parses", "parsed", lambda: _derive_kind(_good))
+        # THE DISTINCTION ITSELF, and the reason this unit exists. Absent stays Problem; present
+        # and malformed becomes StaleHeader. An arm asserting only the second would pass even if
+        # BOTH raised StaleHeader, which is the collapse in the other direction.
+        arm("an ABSENT header is a Problem, not a StaleHeader", "Problem",
+            lambda: _derive_kind("# no front matter here\n"))
+        arm("a PRESENT but indented key is a StaleHeader", "StaleHeader",
+            lambda: _derive_kind(_good.replace("node: t", "  node: t")))
+        arm("a header that never closes is a StaleHeader", "StaleHeader",
+            lambda: _derive_kind("---\nslug: tOne\n# never closed\n"))
+        arm("a StaleHeader carries the region for the report", "True",
+            lambda: str(bool(getattr(_derive_kind_exc(_good.replace("node: t", "  node: t")), "region", ""))))
+
+        def _read_waiver(body: str | None):
+            d = tempfile.mkdtemp()
+            os.makedirs(os.path.join(d, "memory", "project"), exist_ok=True)
+            if body is not None:
+                with open(os.path.join(d, "memory", STALE_HEADER_WAIVER), "w",
+                          encoding="utf-8", newline="") as fh:
+                    fh.write(body)
+            try:
+                return str(read_stale_header_waiver(d, "memory", ["memory/builds/x/README.md"]))
+            except Problem as exc:
+                return str(exc)
+
+        arm("an EMPTY waiver registry is not an error", "{}",
+            lambda: _read_waiver("# only comments\n\n"))
+        arm("a MISSING waiver registry REFUSES", "absent", lambda: _read_waiver(None))
+        arm("a waiver row naming an untracked path REFUSES", "outlived",
+            lambda: _read_waiver("memory/builds/ghost/README.md   gone\n"))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")

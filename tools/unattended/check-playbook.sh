@@ -181,7 +181,13 @@ _pb_sel=$(git -c core.quotePath=false ls-files -z -- '*.md' \
 PLAYBOOKS=""
 while IFS= read -r f; do
   [ -n "$f" ] || continue
-  case "$f" in */PLAYBOOK-TEMPLATE.template.md|*/PLAYBOOK-TEMPLATE.md) continue ;; esac
+  # WIDENED from the two PLAYBOOK-TEMPLATE spellings to ANY `*.template.md`. The reason above is
+  # not specific to that one file: a template's values are a SPECIMEN, and a rendered artifact's
+  # template necessarily carries unresolved `{{TOKEN}}` braces, so grading one reds check 6 on a
+  # target that is not meant to resolve until render time. Found the moment a second template
+  # existed -- `playbook.fixture.template.md`, TOOL-dRetiredFork-12 -- which redded this gate in
+  # gov's own tree.
+  case "$f" in *.template.md|*/PLAYBOOK-TEMPLATE.md) continue ;; esac
   grep -q '^```toml' "$f" 2>/dev/null || continue
   PLAYBOOKS="$PLAYBOOKS$f
 "

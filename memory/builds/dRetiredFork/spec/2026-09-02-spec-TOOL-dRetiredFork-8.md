@@ -1,14 +1,17 @@
 # TOOL-dRetiredFork-8 — check-wiring resolves the settings file instead of spelling one path
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
+**Status:** CLOSED · rev-4 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-8-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-8-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-8-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-8-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -81,7 +84,10 @@ an adopter 164 commits behind cannot read a key their installed kit predates.
   every wiring check confidently wrong. Mitigated by S4's arms and by printing the resolved path.
 - testing + left-shift gates — `tools/check-wiring.test.sh`, already a bar leg.
 - migration / rollback — reverting restores the literal; no adopter state.
-- user docs — `tools/README.md` wiring section names the resolution order.
+- user docs — the resolution order in the script's own header AND in its runtime output, which
+  prints the resolved path and its scope on EVERY run. `tools/README.md` does not exist, and
+  the only other place check-wiring is documented is `AGENTS.md`, a governance carrier M3
+  veto 2 puts outside this mandate. A path printed on every run beats a file nobody opens.
 
 ## 6. Acceptance criteria
 
@@ -124,6 +130,21 @@ an adopter 164 commits behind cannot read a key their installed kit predates.
   byte-identity is structurally incapable of catching a caller left on the literal; AC5 is it.
 - rev-3 · 2026-09-02 · folded spec-audit round 2, findings 25 and 29. 29: a cut-line section opened with
   "Nothing." and then listed an item. 25: the leg rename left a duplicate in §7.
+
+
+- rev-4 · 2026-09-03 · built, and THREE of my own cuts were measured wrong before they landed.
+  (a) The resolver was called EAGERLY at startup and exited 2 whenever nothing resolved, which
+  killed 45 of the self-test's 76 arms — not one of them about settings. A repo with no settings
+  file is legal; the refusal belongs to the ARMS that need it, so each says UNWIRED with the
+  reason instead of passing by absence. AC3 is met by that non-zero, not by a whole-run refusal.
+  (b) S6's collapse to ONE derived rung broke five recall arms and the two-layout arm: KIT_REL is
+  derived from where the SCRIPT lives, not from the tree it grades, and those differ exactly when
+  it matters. The dual-spelling probe is restored with only the PREFIXED rung derived.
+  (c) The tolerant wrapper discarded the resolver's stderr, so "you named a path that is not
+  there" and "there is no settings file" printed the same sentence. The resolver's own words now
+  reach the operator.
+  §5's user-docs row named a file that does not exist; the disposition matches
+  `TOOL-dRetiredFork-7`'s.
 
 ## 10. Reuse audit
 

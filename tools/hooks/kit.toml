@@ -8,10 +8,18 @@ requires = ["settings-merge"]
 
 # TWO destinations for ONE source. The kit copy AND the wired copy are both required: the parity arm
 # fails outright when the wired copy is absent, so a single-destination model reds it in every target.
+# ONE DESTINATION, not two. TOOL-dRetiredFork-14: these hooks shipped to `{prefix}/hooks/` AND
+# `.claude/hooks/`, byte-identical, so every policy value in them was stated twice and every carve-out
+# over them doubled before anyone edited anything. 2211 duplicated tracked lines across three files.
+#
+# `.claude/hooks/` stays EXPRESSIBLE -- an adopter who wants it can still say so in their own entry
+# (F1, ratified). gov simply stops shipping it. Nothing is deleted from an adopter's tree by this
+# change: `govkit update --write-withdrawals` does that, on their timing and after their wired
+# command has moved, because the reverse order unwires a security guard for the window between.
 [[files]]
 include = ["agent-cap.js"]
 role = "engine"
-to = ["{prefix}/hooks/agent-cap.js", ".claude/hooks/agent-cap.js"]
+to = "{prefix}/hooks/agent-cap.js"
 
 [[files]]
 include = ["agent-cap.test.sh"]
@@ -43,7 +51,7 @@ to = "{prefix}/hooks/README.md"
 [[files]]
 include = ["scratch-guard.js"]
 role = "engine"
-to = ["{prefix}/hooks/scratch-guard.js", ".claude/hooks/scratch-guard.js"]
+to = "{prefix}/hooks/scratch-guard.js"
 
 [[files]]
 include = ["scratch-guard.test.sh"]

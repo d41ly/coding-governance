@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/agent-cap.js\""
           }
         ]
       },
@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/scratch-guard.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/scratch-guard.js\""
           }
         ]
       }
@@ -36,7 +36,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/recall-opened.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/memory-recall/recall-opened.js\""
           }
         ]
       }

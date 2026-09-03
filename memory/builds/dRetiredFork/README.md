@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-02
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21
+ids: DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 DEPL-dRetiredFork-10 DEPL-dRetiredFork-11 DEPL-dRetiredFork-12 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22 TOOL-dRetiredFork-23 TOOL-dRetiredFork-24 TOOL-dRetiredFork-25 TOOL-dRetiredFork-26 TOOL-dRetiredFork-27 TOOL-dRetiredFork-28 TOOL-dRetiredFork-29 TOOL-dRetiredFork-30 TOOL-dRetiredFork-31 TOOL-dRetiredFork-32 TOOL-dRetiredFork-33 TOOL-dRetiredFork-34 TOOL-dRetiredFork-35 TOOL-dRetiredFork-36 TOOL-dRetiredFork-37 TOOL-dRetiredFork-38 TOOL-dRetiredFork-39 TOOL-dRetiredFork-40
 ---
 
 # dRetiredFork — gov stops generating the forks, and takes back the fixes its adopters hold
@@ -40,27 +40,28 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
 
 ## Build-level rules
 
-- **Every absorption lands as its own unit.** M2's one-mechanism rule, applied literally: nine
-  separable upstream fixes are nine units, because a closing diff cannot attribute a finding
-  otherwise.
+- **Every absorption lands as its own unit.** M2's one-mechanism rule: eight fixes are eight units,
+  and a ninth carries a claim that absorbs nothing until it has. A closing diff cannot attribute a
+  finding otherwise.
 - **A path fix is a DERIVATION or a RENDER, never a new config key.** A key cannot be read by an
   adopter whose installed kit predates it, and both adopters are 164 commits behind.
-- **Deleting a population filter is refused.** Two of the three workflows gates apply no marker
-  filter, so dropping theirs widens the population and reds the bar. `TOOL-dRetiredFork-10` §3
-  carries the measurement; basename anchoring is the form.
-- **Every absorbed fix must be behaviour-preserving in gov's own tree**, proven by running the
-  affected leg before and after, not asserted.
-- **No new bar leg without its wall-clock ceiling and its `memory/project/testsuite-count-waivers.txt`
-  row.** `tools/check-testsuite-counts.sh` derives its population from `tools/gate-legs.json`.
-- **A kit self-test may not be added to the bar.** Owner ruling of 2026-08-23, restated in `AGENTS.md`.
-- **The authoring rule does not land in the charter template.** Measured 2026-09-02: 48867 of 49152
-  bytes, 285 free, already WARN past its recorded high-water. It lands in `tools/hooks/README.md`
+- **Deleting a population filter is refused**: dropping one widens the population and reds the bar.
+  `TOOL-dRetiredFork-10` §3 carries the measurement; basename anchoring is the form.
+- **Every absorbed fix is behaviour-preserving in gov's tree**, proven by running the affected leg
+  before and after, not asserted.
+- **No new bar leg without its wall-clock ceiling and its testsuite-count row.**
+  `tools/check-testsuite-counts.sh` derives its population from `tools/gate-legs.json`.
+- **A kit self-test may not be added to the bar** (owner, 2026-08-23; `AGENTS.md`).
+- **The authoring rule does not land in the charter template**, which is already WARN past its
+  high-water; read the margin from `check-template-size.sh`. It lands in `tools/hooks/README.md`
   and `AGENTS.md`.
-- **Never absorb an adopter's fix without reproducing it at HEAD first.** Round 1 was BLOCKED on six
-  findings; one measured a unit's premise inverted. All 30 are folded.
-- **Never patch a spec in place; rewrite the section.** Round 2 was BLOCKED on five, and 21 of its 30
-  defects were created by round 1's fold. Its five blockers are PROMOTED to units 19, 20, 21, 8 and
-  9 at order 0, per M4, and the specs they correct are unedited until those units run.
+- **Never absorb an adopter's fix without reproducing it at HEAD first.** Round 1 inverted one
+  unit's premise; `TOOL-dRetiredFork-4` then found a second argued against the wrong fixture.
+- **A criterion labelled the build's DONE-CONDITION is read against every other spec's §2 before
+  the set closes.** Two criteria from one fold round could not both hold; `DEPL-dRetiredFork-9`
+  carries the case and the correction.
+- **Never patch a spec in place; rewrite the section.** 21 of round 2's 30 defects were created by
+  round 1's fold. Its five blockers were promoted to units at order 0, per M4.
 
 ## Parked decisions
 
@@ -119,7 +120,8 @@ twelve-unit spec at rev-4 to move two kits by one minor version each.
 | 4 | `TOOL-dRetiredFork-21` | 2 | the two hooks whose path comes from a fragment, not from the default |
 
 The `#` column is the `order` verb each spec declares. Units sharing a value are the parallel group.
-Order 1 is nine independent absorptions that need no design decision and no key; order 2 begins only
+Order 1 is nine independent units carrying eight absorptions — `TOOL-dRetiredFork-4` absorbs nothing
+until it has — needing no design decision and no key; order 2 begins only
 after `DEPL-dRetiredFork-7` has measured what the two registers do not declare, because a sweep that
 retires a fork nobody counted cannot be verified.
 
@@ -130,47 +132,48 @@ every invalidated generator, re-stamps `gov_commit`, and leaves nothing for a pe
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 30 unit(s) · node d · opened 2026-09-02 · streams tooling+deployer
-ids DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5
-ids TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19
-ids TOOL-dRetiredFork-20 TOOL-dRetiredFork-21
+**Build status:** DEFERRED · 30 unit(s) · node d · opened 2026-09-02 · streams tooling+deployer
+ids DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 DEPL-dRetiredFork-10 DEPL-dRetiredFork-11 DEPL-dRetiredFork-12 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2
+ids TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16
+ids TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 TOOL-dRetiredFork-22 TOOL-dRetiredFork-23 TOOL-dRetiredFork-24 TOOL-dRetiredFork-25 TOOL-dRetiredFork-26 TOOL-dRetiredFork-27 TOOL-dRetiredFork-28 TOOL-dRetiredFork-29 TOOL-dRetiredFork-30
+ids TOOL-dRetiredFork-31 TOOL-dRetiredFork-32 TOOL-dRetiredFork-33 TOOL-dRetiredFork-34 TOOL-dRetiredFork-35 TOOL-dRetiredFork-36 TOOL-dRetiredFork-37 TOOL-dRetiredFork-38 TOOL-dRetiredFork-39 TOOL-dRetiredFork-40
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dRetiredFork-8 — the falsification set stops counting a unit that absorbs nothing](spec/2026-09-02-spec-DEPL-dRetiredFork-8.md) | 0 | 1 | OPEN | rev-1 | 2026-09-02 |
-| [DEPL-dRetiredFork-9 — the done-condition names the escape it depends on](spec/2026-09-02-spec-DEPL-dRetiredFork-9.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
+| [DEPL-dRetiredFork-8 — the falsification set stops counting a unit that absorbs nothing](spec/2026-09-02-spec-DEPL-dRetiredFork-8.md) | 0 | 1 | CLOSED | rev-3 | 2026-09-02 |
+| [DEPL-dRetiredFork-9 — the done-condition names the escape it depends on](spec/2026-09-02-spec-DEPL-dRetiredFork-9.md) | 0 | 2 | CLOSED | rev-2 | 2026-09-02 |
 | [TOOL-dRetiredFork-18 — the gap lines use the wrap helper written for them](spec/2026-09-02-spec-TOOL-dRetiredFork-18.md) | 0 | 1 | CLOSED | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-19 — a declared placeholder must be one its own adopter substitutes](spec/2026-09-02-spec-TOOL-dRetiredFork-19.md) | 0 | 2 | OPEN | rev-1 | 2026-09-02 |
+| [TOOL-dRetiredFork-19 — a declared placeholder must be one its own adopter substitutes](spec/2026-09-02-spec-TOOL-dRetiredFork-19.md) | 0 | 2 | CLOSED | rev-1 | 2026-09-02 |
 | [TOOL-dRetiredFork-20 — a spec lint resolves a spec's own machine-facing tokens](spec/2026-09-02-spec-TOOL-dRetiredFork-20.md) | 0 | 2 | CLOSED | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-1 — memory-tree arms `pop_guard` on check 6](spec/2026-09-02-spec-TOOL-dRetiredFork-1.md) | 1 | 1 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-2 — the git-environment leak, one defect at two legs](spec/2026-09-02-spec-TOOL-dRetiredFork-2.md) | 1 | 1 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-3 — a present-but-unparseable build README header stops reading as absent](spec/2026-09-02-spec-TOOL-dRetiredFork-3.md) | 1 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-4 — reconcile inCMS's agent-cap fail-open claim against HEAD](spec/2026-09-02-spec-TOOL-dRetiredFork-4.md) | 1 | 1 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-5 — two codebase-map selftest arms stop being stamped ok](spec/2026-09-02-spec-TOOL-dRetiredFork-5.md) | 1 | 1 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-6 — the drift-audit note is DERIVED from its counters](spec/2026-09-02-spec-TOOL-dRetiredFork-6.md) | 1 | 2 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm](spec/2026-09-02-spec-TOOL-dRetiredFork-7.md) | 1 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-8 — check-wiring resolves the settings file instead of spelling one path](spec/2026-09-02-spec-TOOL-dRetiredFork-8.md) | 1 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-9 — `_`-prefixed spec subfolders, and C21's batched greps](spec/2026-09-02-spec-TOOL-dRetiredFork-9.md) | 1 | 1 | OPEN | rev-2 | 2026-09-02 |
-| [DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract](spec/2026-09-02-spec-DEPL-dRetiredFork-7.md) | 2 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-10 — three workflows gates anchor their locator and population on a basename](spec/2026-09-02-spec-TOOL-dRetiredFork-10.md) | 2 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix](spec/2026-09-02-spec-TOOL-dRetiredFork-11.md) | 2 | 1 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`](spec/2026-09-02-spec-TOOL-dRetiredFork-12.md) | 2 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface](spec/2026-09-02-spec-TOOL-dRetiredFork-13.md) | 3 | 1 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two](spec/2026-09-02-spec-TOOL-dRetiredFork-14.md) | 4 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-21 — the two hooks whose path comes from a fragment, not from the default](spec/2026-09-02-spec-TOOL-dRetiredFork-21.md) | 4 | 2 | OPEN | rev-1 | 2026-09-02 |
-| [TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys](spec/2026-09-02-spec-TOOL-dRetiredFork-15.md) | 5 | 2 | OPEN | rev-2 | 2026-09-02 |
-| [TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine](spec/2026-09-02-spec-TOOL-dRetiredFork-16.md) | 5 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations](spec/2026-09-02-spec-DEPL-dRetiredFork-1.md) | 6 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | OPEN | rev-4 | 2026-09-02 |
-| [DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin](spec/2026-09-02-spec-DEPL-dRetiredFork-4.md) | 6 | 1 | OPEN | rev-2 | 2026-09-02 |
-| [DEPL-dRetiredFork-5 — `check` runs the `[[outcome]]` probe instead of grading an exit code](spec/2026-09-02-spec-DEPL-dRetiredFork-5.md) | 6 | 1 | OPEN | rev-1 | 2026-09-02 |
-| [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | OPEN | rev-4 | 2026-09-02 |
-| [DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's](spec/2026-09-02-spec-DEPL-dRetiredFork-6.md) | 8 | 2 | OPEN | rev-3 | 2026-09-02 |
-| [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
+| [TOOL-dRetiredFork-1 — memory-tree arms `pop_guard` on check 6](spec/2026-09-02-spec-TOOL-dRetiredFork-1.md) | 1 | 1 | CLOSED | rev-3 | 2026-09-03 |
+| [TOOL-dRetiredFork-2 — the git-environment leak, one defect at two legs](spec/2026-09-02-spec-TOOL-dRetiredFork-2.md) | 1 | 1 | CLOSED | rev-3 | 2026-09-03 |
+| [TOOL-dRetiredFork-3 — a present-but-unparseable build README header stops reading as absent](spec/2026-09-02-spec-TOOL-dRetiredFork-3.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-03 |
+| [TOOL-dRetiredFork-4 — reconcile inCMS's agent-cap fail-open claim against HEAD](spec/2026-09-02-spec-TOOL-dRetiredFork-4.md) | 1 | 1 | CLOSED | rev-4 | 2026-09-03 |
+| [TOOL-dRetiredFork-5 — two codebase-map selftest arms stop being stamped ok](spec/2026-09-02-spec-TOOL-dRetiredFork-5.md) | 1 | 1 | CLOSED | rev-5 | 2026-09-03 |
+| [TOOL-dRetiredFork-6 — the drift-audit note is DERIVED from its counters](spec/2026-09-02-spec-TOOL-dRetiredFork-6.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-03 |
+| [TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm](spec/2026-09-02-spec-TOOL-dRetiredFork-7.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-03 |
+| [TOOL-dRetiredFork-8 — check-wiring resolves the settings file instead of spelling one path](spec/2026-09-02-spec-TOOL-dRetiredFork-8.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-03 |
+| [TOOL-dRetiredFork-9 — `_`-prefixed spec subfolders, and C21's batched greps](spec/2026-09-02-spec-TOOL-dRetiredFork-9.md) | 1 | 1 | CLOSED | rev-3 | 2026-09-03 |
+| [DEPL-dRetiredFork-7 — the undeclared-fork census, and the ledger contract](spec/2026-09-02-spec-DEPL-dRetiredFork-7.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-03 |
+| [TOOL-dRetiredFork-10 — three workflows gates anchor their locator and population on a basename](spec/2026-09-02-spec-TOOL-dRetiredFork-10.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-03 |
+| [TOOL-dRetiredFork-11 — `.githooks/pre-push` derives its install prefix](spec/2026-09-02-spec-TOOL-dRetiredFork-11.md) | 2 | 1 | CLOSED | rev-4 | 2026-09-03 |
+| [TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`](spec/2026-09-02-spec-TOOL-dRetiredFork-12.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-03 |
+| [TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface](spec/2026-09-02-spec-TOOL-dRetiredFork-13.md) | 3 | 1 | CLOSED | rev-5 | 2026-09-03 |
+| [TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two](spec/2026-09-02-spec-TOOL-dRetiredFork-14.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-03 |
+| [TOOL-dRetiredFork-21 — the two hooks whose path comes from a fragment, not from the default](spec/2026-09-02-spec-TOOL-dRetiredFork-21.md) | 4 | 2 | CLOSED | rev-2 | 2026-09-03 |
+| [TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys](spec/2026-09-02-spec-TOOL-dRetiredFork-15.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-03 |
+| [TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine](spec/2026-09-02-spec-TOOL-dRetiredFork-16.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-03 |
+| [DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations](spec/2026-09-02-spec-DEPL-dRetiredFork-1.md) | 6 | 2 | CLOSED | rev-5 | 2026-09-03 |
+| [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | DEFERRED | rev-5 | 2026-09-03 |
+| [DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin](spec/2026-09-02-spec-DEPL-dRetiredFork-4.md) | 6 | 1 | CLOSED | rev-4 | 2026-09-03 |
+| [DEPL-dRetiredFork-5 — `check` runs the `[[outcome]]` probe instead of grading an exit code](spec/2026-09-02-spec-DEPL-dRetiredFork-5.md) | 6 | 1 | CLOSED | rev-3 | 2026-09-03 |
+| [DEPL-dRetiredFork-3 — `update` re-runs the adopters, renderers and generators it invalidates](spec/2026-09-02-spec-DEPL-dRetiredFork-3.md) | 7 | 2 | CLOSED | rev-5 | 2026-09-03 |
+| [DEPL-dRetiredFork-6 — `govkit contribute`, the route by which an adopter's fix becomes gov's](spec/2026-09-02-spec-DEPL-dRetiredFork-6.md) | 8 | 2 | CLOSED | rev-4 | 2026-09-03 |
+| [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | CLOSED | rev-3 | 2026-09-03 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 58 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

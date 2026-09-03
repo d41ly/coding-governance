@@ -61,22 +61,87 @@ E="$TMP/empty"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify ) >/dev/null 2>&1
 mkdir -p "$E/tools/hooks" && cp "$(cd "$HERE/../hooks" && pwd)/agent-cap.js" "$E/tools/hooks/agent-cap.js"
-cp "$GATE" "$E/gate.sh"
+# TOOL-dRetiredFork-10: the gate now resolves its predicate RELATIVE TO ITSELF, so the fixture
+# has to put it where an install actually puts it. It previously sat at the bare repository
+# root and worked only because the gate hard-coded `$ROOT/tools/hooks/` -- the literal this
+# unit removes. No kit installs a workflow gate at a repo root, so the old fixture described a
+# layout that never existed, and it would have kept passing while real adopters stayed broken.
+mkdir -p "$E/tools/workflows" && cp "$GATE" "$E/tools/workflows/gate.sh"
 arm 'an empty population is not a pass' 'the population is empty, which is not a pass' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$E"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$E"
 
 # The marker filter: a `.js` that is not a workflow is not judged, even carrying the banned shape.
 arm 'a non-workflow .js is not judged by the discovery path' 'verifier-fanout: clean' \
-  bash -c 'cp "$2" "$1/tools/x-helper.js" && cp "$3" "$1/tools/wf.js" && cd "$1" && bash ./gate.sh' \
+  bash -c 'cp "$2" "$1/tools/x-helper.js" && cp "$3" "$1/tools/wf.js" && cd "$1" && bash ./tools/workflows/gate.sh' \
   _ "$E" "$TMP/not-a-workflow.js" "$TMP/bounded.js"
 
 # The gate has no predicate of its own: break the delegation and it must FAIL, not pass quietly.
 D="$TMP/nohook"; mkdir -p "$D"
 ( cd "$D" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm base --no-verify ) >/dev/null 2>&1
-cp "$GATE" "$D/gate.sh"
+mkdir -p "$D/tools/workflows" && cp "$GATE" "$D/tools/workflows/gate.sh"
 arm 'a missing predicate is a named failure' 'has no predicate to delegate to' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$D"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$D"
+
+
+# ---- TOOL-dRetiredFork-10: the gate resolves at a FOREIGN install prefix -------------------------
+# These three arms are the reason the unit exists. Before it, the population filter and the hook
+# path both spelled `tools/`, so an adopter who installs at `scripts/` got an EMPTY population and
+# a missing predicate — and every one of them carried a hand-maintained carve-out to fix it.
+#
+# The fixtures are built here rather than borrowed, because the two real adopters are foreign trees
+# this suite must not depend on: a fixture keyed to inCMS's current bytes grades a moving target.
+mkfix() { # $1 = fixture root · $2 = where the hook goes, relative to the root ("" = no hook at all)
+  local fix=$1 hookrel=$2
+  mkdir -p "$fix/scripts/workflows"
+  cp "$HERE/check-verifier-fanout.sh" "$fix/scripts/workflows/"
+  # a bounded harness, so the population is non-empty and the verdict is legitimately clean
+  cat >"$fix/scripts/workflows/harness.js" <<'JS'
+export const meta = { name: 'fixture', description: 'a bounded harness', phases: [] }
+const LENSES = ['security', 'correctness', 'integration']
+const out = await boundedParallel(LENSES.map((l) => () => agent(`check ${l}`)), 5)
+JS
+  if [ -n "$hookrel" ]; then
+    mkdir -p "$fix/$(dirname "$hookrel")"
+    cp "$HERE/../hooks/agent-cap.js" "$fix/$hookrel"
+  fi
+  ( cd "$fix" && git init -q . && git config user.email t@t && git config user.name t \
+      && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
+}
+
+# AC2 — the NicoCares shape: kit at `scripts/`, hook a directory up from the harnesses. Rung 2.
+FIX_A=$(mktemp -d); mkfix "$FIX_A" "scripts/hooks/agent-cap.js"
+out=$(cd "$FIX_A" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
+if [ "$rc" = 0 ]; then printf 'arm ok    AC2: resolves at a scripts/ install and exits 0\n'
+else fails=$((fails+1)); printf 'arm FAIL  AC2: a scripts/ install did not pass (rc=%s)\n%s\n' "$rc" "$out"; fi
+case "$out" in *"1 workflow script"*) printf 'arm ok    AC2: and the population is non-empty there\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  AC2: population wrong at a foreign prefix: %s\n' "$out" ;; esac
+
+# AC3 — the inCMS shape: NO scripts/hooks/ at all, the only copy at .claude/hooks/. Rung 3, which a
+# two-rung chain strands. This arm is the one that would have caught that.
+FIX_B=$(mktemp -d); mkfix "$FIX_B" ".claude/hooks/agent-cap.js"
+out=$(cd "$FIX_B" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
+if [ "$rc" = 0 ]; then printf 'arm ok    AC3: resolves the .claude/hooks/ copy when no sibling exists\n'
+else fails=$((fails+1)); printf 'arm FAIL  AC3: the third rung did not resolve (rc=%s)\n%s\n' "$rc" "$out"; fi
+
+# AC4 — no hook anywhere. The gate must REFUSE and NAME what it probed. A gate that cannot find its
+# predicate and prints a clean line is the failure this whole build keeps finding.
+FIX_C=$(mktemp -d); mkfix "$FIX_C" ""
+out=$(cd "$FIX_C" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
+if [ "$rc" != 0 ]; then printf 'arm ok    AC4: an unresolvable predicate REFUSES (rc=%s)\n' "$rc"
+else fails=$((fails+1)); printf 'arm FAIL  AC4: no hook anywhere and the gate still passed\n%s\n' "$out"; fi
+case "$out" in *"hooks/"*".claude/hooks/"*) printf 'arm ok    AC4: and the refusal names the probes it tried\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  AC4: the refusal does not name its probes: %s\n' "$out" ;; esac
+
+# ANTI-VACUITY. Every arm above would also pass if the fixtures were empty and the gate refused for
+# an unrelated reason, so pin the thing that actually distinguishes them: fixture A and fixture C
+# differ ONLY by the presence of the hook, and their verdicts must differ.
+outA=$(cd "$FIX_A" && bash scripts/workflows/check-verifier-fanout.sh 2>&1)
+outC=$(cd "$FIX_C" && bash scripts/workflows/check-verifier-fanout.sh 2>&1)
+if [ "$outA" != "$outC" ]; then printf 'arm ok    the hook is what the fixtures are testing, not the tree shape\n'
+else fails=$((fails+1)); printf 'arm FAIL  identical verdicts with and without the predicate\n'; fi
+
+rm -rf "$FIX_A" "$FIX_B" "$FIX_C"
 
 if [ "$fails" = 0 ]; then echo "PASS — check-verifier-fanout: all arms held"; exit 0; fi
 echo "FAIL — $fails arm(s) failed"

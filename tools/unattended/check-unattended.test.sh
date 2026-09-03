@@ -2808,6 +2808,57 @@ esac
 # because no gate sees it: a "the tree is still clean after N mutations" control is a control only if
 # those N mutations ran in the same process. Split away from them it degrades into a duplicate of the
 # opening control — still green, and no longer evidence.
+
+
+# ---- TOOL-dRetiredFork-9 S3: the BATCHED C21 join agrees with the per-file loop -------------------
+# The absorption replaced 2 greps PER FILE with 2 greps and one awk for the whole population — 176
+# processes to 3 over this corpus's 88 build READMEs. A speed-up that changes a verdict is not an
+# optimisation, so the two are run over one fixture and their answers compared.
+#
+# The fixture carries all four shapes on purpose: well-formed, missing-open, missing-close, and
+# DUPLICATED — because the check's own contract is EXACTLY ONE pair, and a join that merely tested
+# presence would pass the duplicate.
+c21_fixture=$(mktemp -d)
+mkdir -p "$c21_fixture/ok" "$c21_fixture/noopen" "$c21_fixture/noclose" "$c21_fixture/dup"
+printf '<!-- gen:build-units -->\n<!-- /gen:build-units -->\n' > "$c21_fixture/ok/README.md"
+printf '<!-- /gen:build-units -->\n'                            > "$c21_fixture/noopen/README.md"
+printf '<!-- gen:build-units -->\n'                             > "$c21_fixture/noclose/README.md"
+printf '<!-- gen:build-units -->\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n' > "$c21_fixture/dup/README.md"
+c21_files="$c21_fixture/ok/README.md $c21_fixture/noopen/README.md $c21_fixture/noclose/README.md $c21_fixture/dup/README.md"
+
+# the RETIRED per-file loop, kept here as the oracle
+c21_loop=""
+for f in $c21_files; do
+  o=$(grep -cxF -- '<!-- gen:build-units -->' "$f" 2>/dev/null || true)
+  c=$(grep -cxF -- '<!-- /gen:build-units -->' "$f" 2>/dev/null || true)
+  [ "${o:-0}" = 1 ] && [ "${c:-0}" = 1 ] && continue
+  c21_loop="$c21_loop $f"
+done
+
+# the SHIPPED batched join, character for character
+c21_batched=$(grep -cxF -- '<!-- gen:build-units -->' /dev/null $c21_files 2>/dev/null \
+  | awk -F: -v closes="$(grep -cxF -- '<!-- /gen:build-units -->' /dev/null $c21_files 2>/dev/null)" '
+      BEGIN { n = split(closes, L, "\n")
+              for (i = 1; i <= n; i++) { p = L[i]; sub(/:[0-9]*$/, "", p)
+                                         c = L[i]; sub(/^.*:/, "", c); CL[p] = c } }
+      $0 !~ /^\/dev\/null:/ {
+        path = $0; sub(/:[0-9]*$/, "", path)
+        open = $0; sub(/^.*:/, "", open)
+        if (open != 1 || CL[path] != 1) printf " %s", path
+      }')
+
+n=$((n+1))
+if [ "$c21_loop" = "$c21_batched" ]; then
+  echo "ok   C21: the batched join and the per-file loop return the same verdict"
+else
+  echo "FAIL C21: batched [$c21_batched] != per-file [$c21_loop]"; st=1
+fi
+# ANTI-VACUITY: the fixture must actually catch something, or the equality above is two empties.
+n=$((n+1))
+case "$c21_batched" in *noopen*|*noclose*|*dup*) echo "ok   C21: the fixture is non-vacuous" ;;
+  *) echo "FAIL C21: the fixture caught nothing, so the equality proves nothing"; st=1 ;; esac
+rm -rf "$c21_fixture"
+
 [ "$SH_I" = 0 ] || echo "  (this leg ran $MODE only; the other region was NOT exercised here)"
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

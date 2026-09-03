@@ -12,6 +12,7 @@
 # where it stopped matching. `memory/gotchas/fixture-inherits-ambient-machine-state.md` names exactly
 # this. The fixture home is deliberately a name no machine has, in two spellings, so the 8.3
 # cross-substitution is exercised rather than assumed.
+KIT_REL="${KIT_REL:-tools/hooks}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 HOOK="$HERE/scratch-guard.js"
@@ -179,19 +180,43 @@ esac
 # tools/-scoped JS gates, so nothing else in the bar notices the EXECUTED copy drifting from the
 # graded one. Absence must not satisfy it.
 ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null || echo "")
-if [ -n "$ROOT" ] && [ -f "$ROOT/tools/hooks/scratch-guard.js" ]; then
-  if [ ! -f "$ROOT/.claude/hooks/scratch-guard.js" ]; then
-    echo "FAIL the wired copy .claude/hooks/scratch-guard.js is MISSING (parity must not be satisfiable by absence)"
-    fail=$((fail+1))
-  elif diff -q <(sed 's/\r$//' "$ROOT/.claude/hooks/scratch-guard.js") <(sed 's/\r$//' "$ROOT/tools/hooks/scratch-guard.js") >/dev/null; then
-    echo "ok   the wired copy matches the kit copy"; pass=$((pass+1))
+# SELF-ARMING ON THE RESOLVED COPY COUNT — TOOL-dRetiredFork-14.
+# This arm asserted TWO copies and hard-FAILED when the second was absent. That became the CORRECT
+# state the moment the kit stopped shipping a second destination, so the arm failed on the shipped
+# layout: not a parity check any more, just a stale assumption with a test around it.
+#
+# It now grades the population it actually finds:
+#   0 copies  -> REFUSE. A parity arm with no subject proves nothing, and saying "skip" there is the
+#                green-by-absence shape this repo has a catalogue entry for.
+#   1 copy    -> the single-copy layout. There is nothing to drift FROM, and that is a pass.
+#   2 or more -> the historical dual-ship. Every extra copy must match the kit copy byte for byte.
+if [ -n "$ROOT" ] && [ -f "$ROOT/$KIT_REL/scratch-guard.js" ]; then
+  sg_extra=""
+  for sg_c in "$ROOT/.claude/hooks/scratch-guard.js"; do
+    [ -f "$sg_c" ] && sg_extra="$sg_extra $sg_c"
+  done
+  sg_n=$(printf '%s' "$sg_extra" | wc -w | tr -d ' ')
+  if [ "$sg_n" = 0 ]; then
+    echo "ok   single-copy layout: $KIT_REL/scratch-guard.js is the only tracked copy, so there is nothing to drift from"
+    pass=$((pass+1))
   else
-    echo "FAIL .claude/hooks/scratch-guard.js has drifted from tools/hooks/scratch-guard.js"
-    echo "     fix: cp tools/hooks/scratch-guard.js .claude/hooks/scratch-guard.js"
-    fail=$((fail+1))
+    sg_drift=0
+    for sg_c in $sg_extra; do
+      if ! diff -q <(sed 's/\r$//' "$sg_c") <(sed 's/\r$//' "$ROOT/$KIT_REL/scratch-guard.js") >/dev/null; then
+        echo "FAIL ${sg_c#"$ROOT/"} has drifted from $KIT_REL/scratch-guard.js"
+        echo "     fix: cp $KIT_REL/scratch-guard.js ${sg_c#"$ROOT/"}"
+        sg_drift=1
+      fi
+    done
+    if [ "$sg_drift" = 0 ]; then
+      echo "ok   all $((sg_n+1)) tracked copies of scratch-guard.js agree"; pass=$((pass+1))
+    else
+      fail=$((fail+1))
+    fi
   fi
 else
-  echo "skip the two-copy parity arm — no kit copy tracked in this tree (adopter layout)"
+  echo "FAIL the parity arm found NO kit copy of scratch-guard.js in this tree — an arm with no subject cannot pass"
+  fail=$((fail+1))
 fi
 
 # ---- the meta-arm: prove the liveness guard itself fires ------------------------------------------

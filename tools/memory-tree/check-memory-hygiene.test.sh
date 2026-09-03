@@ -12,6 +12,9 @@
 # The tree is FLAT (kit 1.5): builds/<slug>/, backlog/<FAMILY>.md, one root DECISIONS.md. The
 # discipline is a value in the spec status header, not a directory.
 set -u
+KIT_REL="${KIT_REL:-tools/memory-tree}"   # TOOL-dRetiredFork-15: this suite had no functional
+                                          # site when the KIT_REL sweep ran, so it carried no
+                                          # default; the project-key arms below are its first.
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/check-memory-hygiene.sh"
 TMP=$(mktemp -d)
@@ -909,14 +912,26 @@ ivl=$(grep -nE 'hdr [!=]~ /' "$SCRIPT" | grep -E '\{[0-9]' || true)
 n=$((n+1))
 r9=$(awk '/in9 = 1/{f=1} f&&/else if \(in9 && L ~ \/\^## \/\) in9 = 0/{ok=1} END{print ok+0}' "$SCRIPT")
 [ "$r9" = 1 ] || { echo "FAIL the §9 rev-scan range no longer closes on the next ## heading"; st=1; }
-# 4. Check 7 takes NO locale prefix. `length()` decides its verdict and its character-versus-byte
-#    meaning belongs to the awk build and the ambient locale; check 8's `LC_ALL=C xargs` seventeen
-#    lines below sorts, it does not measure, and is not the pattern to copy here.
+# 4. Check 7 takes NO UNCONDITIONAL locale prefix. `length()` decides its verdict, and its
+#    character-versus-byte meaning belongs to the awk build and the ambient locale unless a
+#    project has DECLARED otherwise; check 8's `LC_ALL=C xargs` seventeen lines below sorts,
+#    it does not measure, and is not the pattern to copy here.
+#
+#    WIDENED at TOOL-dRetiredFork-15 from "no prefix" to "no prefix the conf cannot switch off".
+#    The property this arm protects is that gov does not silently re-decide the cap for an
+#    adopter whose awk counts characters today — and a prefix that is EMPTY unless
+#    ENTRY_CAP_UNIT is set re-decides nothing. A literal `LC_ALL=C awk` would still red here,
+#    which is the case that actually mattered.
 #    Comment lines are stripped first: the region carries prose explaining exactly this ban, and a
 #    predicate that fires on the comment documenting the fix is the classic self-inflicted red.
 n=$((n+1))
-lc7=$(awk '/^# 7 — /{f=1} /^# 8 — /{f=0} f && $0 !~ /^[[:space:]]*#/ && /LC_ALL/{print NR ": " $0}' "$SCRIPT")
-[ -z "$lc7" ] || { echo "FAIL check 7 carries a locale prefix — length() must stay locale-dependent: $lc7"; st=1; }
+lc7=$(awk '/^# 7 — /{f=1} /^# 8 — /{f=0} f && $0 !~ /^[[:space:]]*#/ && /LC_ALL/ && $0 !~ /_c7env/ {print NR ": " $0}' "$SCRIPT")
+[ -z "$lc7" ] || { echo "FAIL check 7 carries an UNCONDITIONAL locale prefix — length() must stay locale-dependent unless ENTRY_CAP_UNIT declares otherwise: $lc7"; st=1; }
+# ...and the switch must actually DEFAULT to empty, or the exemption above is a hole.
+n=$((n+1))
+grep -qE '^[[:space:]]*_c7env=""' "$SCRIPT" \
+  && echo "ok   check 7 locale switch defaults to empty" \
+  || { echo "FAIL check 7 locale switch has no empty default — every adopter would be re-decided"; st=1; }
 # 5. Check 7's exemption expression keeps ONE spelling of the guides/ alternative. The MAP_SUB branch
 #    used to REBUILD the whole expression, and the rebuild silently omitted `guides/` — so on any repo
 #    carrying a .codebase-map.conf every guide entered the entry-budget population and no assertion
@@ -1030,6 +1045,26 @@ done
 n=$((n+1))
 grep -qF 'the selector is mis-segmented' <<<"$outh" || { echo "FAIL the empty-population report does not name the cause"; st=1; }
 #
+# (a2) CHECK 6's OWN mis-segmentation — TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out
+#      5/20`. Index-class files EXIST (a guide, at a pre-flatten path) while every flat selector
+#      `index_set` reads matches nothing, so check 6 walked an empty set, printed nothing and was
+#      indistinguishable from a clean tree. Eight sibling checks already carried this guard; 6 did
+#      not. The PRECONDITION is what separates this from the scaffolder case in (b): there, no
+#      index-class file exists anywhere and silence is correct.
+S6=$TMP/missegmented6
+mkdir -p "$S6/memory/architecture/guides"
+( cd "$S6" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
+  printf '# a guide, at the PRE-flatten path the flat selector does not reach\n' > memory/architecture/guides/METHOD.md
+  git add -A && git commit -q -m missegmented6 --no-verify )
+out6=$(cd "$S6" && bash "$SCRIPT" 2>/dev/null); rc6=$?
+n=$((n+1))
+grep -qE "^    check 6: " <<<"$out6" || { echo "FAIL check 6 did not report its empty population on a mis-segmented tree"; st=1; }
+n=$((n+1))
+grep -qF 'the selector is mis-segmented' <<<"$out6" || { echo "FAIL check 6's report does not name the cause"; st=1; }
+n=$((n+1))
+[ "$rc6" = 0 ] && { echo "FAIL a tree whose check-6 selector is mis-segmented exited 0"; st=1; }
+#
 # (b) A FRESHLY SCAFFOLDED tree: no builds at all, nothing mis-segmented. The guard MUST stay quiet,
 #     or `adopt --scaffold` hands every new adopter a red tree on its first run. The precondition is
 #     what separates this case from (a), and without this arm the guard's first draft did exactly
@@ -1040,6 +1075,14 @@ mkdir -p "$Y/memory/project" "$Y/memory/backlog"
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  # THE REGISTRIES THE GENERATOR REFUSES TO RUN WITHOUT. This fixture is hand-built and stands
+  # in for the scaffolder's output, so every registry the scaffolder gains has to be added here
+  # too -- and when `stale-header-waiver.txt` landed, it was not. The arm then failed for the one
+  # reason it exists to rule out: a freshly scaffolded tree that is not clean. A replica is a
+  # second answer to a question the adopter already answers, and this is the copy that rots.
+  # TOOL-dRetiredFork-31: the arm should INVOKE the scaffolder rather than reproduce it, which
+  # is the only version of it that can ever catch this class.
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
   # the generator reads `git ls-files`, so stage first, render, then stage the render — the same
   # order `adopt-memory-tree.sh --scaffold` uses, because this arm is standing in for its output
   n=$((n+1))
@@ -1074,6 +1117,7 @@ mkdir -p "$G/memory/project" "$G/memory/guides" "$G/memory/map/features" "$G/mem
   printf 'MAP_ROOT=memory/map\n' > .codebase-map.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
   printf '# legacy\n' > memory/project/legacy-files.txt
   L=$(printf 'x%.0s' $(seq 1 340))
   printf '# map index\n\n- %s\n' "$L" > memory/map/README.md          # NOT exempt      -> RED
@@ -1192,6 +1236,7 @@ mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/bu
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
   printf '# legacy\n' > memory/project/legacy-files.txt
   rr() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tOwner-1\n---\n\n# %s\n' "$1" "$1"; }
   n=$((n+1))
@@ -1291,6 +1336,7 @@ mkdir -p "$K"
            memory/builds/tOne/build memory/builds/tTwo/spec memory/builds/tTwo/reviews
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
   for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
   rk() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-%s-1\n---\n\n# %s\n' "$1" "$1" "$1"; }
   rk tOne > memory/builds/tOne/README.md
@@ -1666,6 +1712,10 @@ _b1=$(mktemp -d)
   printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
   printf '# r\n' > memory/README.md
   printf '# d\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
+  # the index generator REFUSES a missing stale-header-waiver.txt, so this fixture needs it
+  # too — see the note on the hand-built trees above. TOOL-dRetiredFork-31.
+  printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' \
+    > memory/project/stale-header-waiver.txt
   printf -- '---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tOne-1\nstatus: OPEN\n---\n\n# tOne\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > memory/builds/tOne/README.md
   printf '# ARCH-tOne-1 - a unit\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
   git add -A >/dev/null 2>&1
@@ -1690,5 +1740,97 @@ rm -rf "$_b1"
 # rule is shrink-only upward, so the tighter surviving pin wins over recomputing from scratch.
 FLOOR_ASSERTIONS=235
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+
+# ---- TOOL-dRetiredFork-15: the five project keys -------------------------------------------------
+# Three arms per validated key -- default, valid override, INVALID override -- because the invalid
+# case is the only one that matters here. BUILD_SLUG_RE and RECORD_SERVES_CUTOFF NARROW what is
+# graded, so a bad value does not red: it silently grades nothing and reports green. These arms are
+# what stop that reaching an adopter.
+GOVROOT=$(git -C "$HERE" rev-parse --show-toplevel)
+# ONE FIXTURE, REUSED. The first cut built a fresh scratch tree per arm -- `git archive` of the whole
+# repo plus a `git init` and a commit, fourteen times -- and the suite TIMED OUT at ten minutes.
+# Nothing about these arms needs a fresh tree: they vary ONE CONF LINE and re-read the same corpus,
+# so the tree is built once and the conf is rewritten between runs. Section 7 is explicit that cost
+# is a verdict, and a suite nobody can afford to run is a suite nobody runs.
+PKD=$(mktemp -d)
+( cd "$GOVROOT" && git archive HEAD ) | tar -x -C "$PKD" 2>/dev/null
+# THE WORKING CHECKER, OVERLAID. `git archive HEAD` hands the fixture the COMMITTED script, so every
+# arm below would grade the pre-change code and report that a new key does not work. Measured: all
+# six invalid-value arms passed against HEAD and proved nothing.
+cp "$GOVROOT/$KIT_REL/check-memory-hygiene.sh" "$PKD/$KIT_REL/" 2>/dev/null
+cp "$GOVROOT/.memory-tree.conf" "$PKD/.memory-tree.conf.base" 2>/dev/null
+( cd "$PKD" && git init -q . && git config user.email t@t && git config user.name t \
+    && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
+pk_set() {   # $1 = a conf line, or empty for the shipped default
+  cp "$PKD/.memory-tree.conf.base" "$PKD/.memory-tree.conf"
+  [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$PKD/.memory-tree.conf"
+  return 0
+}
+pk_rc()  { ( cd "$PKD" && bash "$KIT_REL/check-memory-hygiene.sh" >/dev/null 2>&1; echo $? ); }
+pk_out() { ( cd "$PKD" && bash "$KIT_REL/check-memory-hygiene.sh" 2>&1 ); }
+
+# BUILD_SLUG_RE
+pk_set ""; pk_base=$(pk_rc)
+n=$((n+1)); [ "$pk_base" = 0 ] && echo "ok   project keys: the fixture is clean with no key set" \
+  || { echo "FAIL project keys: the fixture is not clean unset (rc=$pk_base) — every arm below is meaningless"; st=1; }
+
+pk_set 'BUILD_SLUG_RE="^[A-Za-z]+$"'; r=$(pk_rc)
+n=$((n+1)); [ "$r" = 0 ] && echo "ok   BUILD_SLUG_RE: a pattern gov's own slugs satisfy still passes" \
+  || { echo "FAIL BUILD_SLUG_RE: a satisfiable pattern redded (rc=$r)"; st=1; }
+
+pk_set 'BUILD_SLUG_RE="^zzz[A-Za-z]+$"'; r=$(pk_rc)
+n=$((n+1)); [ "$r" != 0 ] && echo "ok   BUILD_SLUG_RE: a pattern the folders violate REDS (rc=$r)" \
+  || { echo "FAIL BUILD_SLUG_RE: a violated pattern passed — the key is not reaching check 4"; st=1; }
+
+# THE INVALID CASES. Each of these would otherwise grade nothing and report clean.
+for bad_re in '.*' '^[A-Za-z]*$' '[A-Za-z]+'; do
+  pk_set "BUILD_SLUG_RE=\"$bad_re\""; r=$(pk_rc); o=$(pk_out)
+  n=$((n+1))
+  case "$r:$o" in
+    2:*BUILD_SLUG_RE*) echo "ok   BUILD_SLUG_RE='$bad_re' ABORTS naming the key" ;;
+    *) echo "FAIL BUILD_SLUG_RE='$bad_re' did not abort (rc=$r)"; st=1 ;;
+  esac
+done
+
+# RECORD_SERVES_CUTOFF
+pk_set 'RECORD_SERVES_CUTOFF="2020-01-01"'; r=$(pk_rc)
+n=$((n+1)); [ "$r" = 0 ] && echo "ok   RECORD_SERVES_CUTOFF: a past cutoff is accepted" \
+  || { echo "FAIL RECORD_SERVES_CUTOFF: a past cutoff redded (rc=$r)"; st=1; }
+
+for bad_cut in '2099-01-01' 'yesterday'; do
+  pk_set "RECORD_SERVES_CUTOFF=\"$bad_cut\""; r=$(pk_rc); o=$(pk_out)
+  n=$((n+1))
+  case "$r:$o" in
+    2:*RECORD_SERVES_CUTOFF*) echo "ok   RECORD_SERVES_CUTOFF='$bad_cut' ABORTS naming the key" ;;
+    *) echo "FAIL RECORD_SERVES_CUTOFF='$bad_cut' did not abort (rc=$r)"; st=1 ;;
+  esac
+done
+
+# ENTRY_CAP_UNIT
+for unit in chars bytes; do
+  pk_set "ENTRY_CAP_UNIT=\"$unit\""; r=$(pk_rc)
+  n=$((n+1)); [ "$r" = 0 ] && echo "ok   ENTRY_CAP_UNIT=$unit is accepted" \
+    || { echo "FAIL ENTRY_CAP_UNIT=$unit redded (rc=$r)"; st=1; }
+done
+pk_set 'ENTRY_CAP_UNIT="glyphs"'; r=$(pk_rc); o=$(pk_out)
+n=$((n+1))
+case "$r:$o" in
+  2:*ENTRY_CAP_UNIT*) echo "ok   ENTRY_CAP_UNIT='glyphs' ABORTS naming the key" ;;
+  *) echo "FAIL ENTRY_CAP_UNIT='glyphs' did not abort (rc=$r)"; st=1 ;;
+esac
+
+# PROJECT_REGISTRY_EXTRA — it only WIDENS, so the arm that matters is that it does not widen to
+# everything. The first cut of this key sat above the named cases in check 3 and matched all of
+# them, accepting any file under project/ and disabling the check while reporting clean.
+pk_set 'PROJECT_REGISTRY_EXTRA="my-registry.txt"'
+printf 'x\n' > "$PKD/memory/project/unlisted-probe.txt"
+( cd "$PKD" && git add -A && git commit -q -m probe --no-verify ) >/dev/null 2>&1
+o=$(pk_out)
+( cd "$PKD" && git rm -q memory/project/unlisted-probe.txt && git commit -q -m unprobe --no-verify ) >/dev/null 2>&1
+rm -rf "$PKD"
+n=$((n+1))
+case "$o" in *unlisted-probe*) echo "ok   PROJECT_REGISTRY_EXTRA widens only what it names" ;;
+  *) echo "FAIL PROJECT_REGISTRY_EXTRA accepted a file it does not name — check 3 is disabled"; st=1 ;; esac
+
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

@@ -30,6 +30,7 @@ EVERY REFUSAL PRINTS ITS OWN MESSAGE AND IS COUNTED. Exit 0 clean, 1 findings, 2
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import ntpath
 import os
@@ -2362,6 +2363,11 @@ SHELL_EXEC_SITES = {
     # ---- `['git', '-C']` and was allowlisted unconditionally -- defeating the `git hook run`
     # ---- exclusion that IS the guarantee this table's header sells. Every one is gov-controlled
     # ---- TODAY, and each row exists so the next reader has to re-answer that when a caller changes.
+    # DEPL-dRetiredFork-4. The pathspec-over-stdin runner. Its ARGV is gov's own literal in every
+    # caller; what crosses from the target is the PATH LIST, and it crosses on STDIN rather than
+    # the command line -- which is the whole point, since the argv form died at 32 KiB after a
+    # partial write. Classified `gov` because no target value reaches the argv it builds.
+    "git_pathspec": "gov",
     "git": "gov",                    # gov's own wrapper: `["git", "-C", str(root), *args]`, and the
                                      # `*args` is what the census cannot read. A future
                                      # `git(target, "hook", "run", ...)` must move this to
@@ -2373,12 +2379,18 @@ SHELL_EXEC_SITES = {
                                      # first cut got wrong by attributing nested calls to the outer
                                      # one too. Same reason `check_runs` above covers the bash probe
                                      # rather than its enclosing `resolve_bash`.
-    "_cmd_update": "target",         # `[...literal git rm...] + deleted` — a BinOp the census
-                                     # cannot destructure. Labelled `target` and not `gov`: `deleted`
-                                     # is receipt paths, so the TARGET influences this argv, which is
-                                     # this table's own definition of the label. They arrive after
-                                     # `--` as path operands and are contained upstream, but the
-                                     # label describes WHO CHOOSES the bytes, not how safe they are.
+    # `_cmd_update` LOST ITS ROW AND EARNED A NEW ONE, one unit apart, which is the pair working
+    # rather than churn. DEPL-dRetiredFork-4 moved its `git rm ... + deleted` BinOp to
+    # `git_pathspec`, so the old row went stale and came out. DEPL-dRetiredFork-3 then gave the
+    # verb its FIRST target-side execution -- the re-render and regenerate argv -- so it spawns
+    # again, for a different reason, and is declared again.
+    #
+    # `target`, AND I LABELLED IT `gov` FIRST. The reasoning was that the argv is gov-authored
+    # and never comes from the target's deploy.toml, which is true and is not the question this
+    # table asks. The argv is resolved through `target_context`, so TARGET TOKEN VALUES are
+    # interpolated into it -- and this table's own definition of `target` is that the target
+    # influences the argv, whatever the template's provenance. A paired arm caught it by name.
+    "_cmd_update": "target",
 }
 # THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
 # wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
@@ -2736,6 +2748,60 @@ def run_kit_check(eid: str, desc: dict, ctx: dict[str, str], target: pathlib.Pat
             if r is not None:
                 r.fail(f"kit '{eid}': its own adopter check arm could not run: {e}")
             return "landed-but-inert", f" (its check arm could not run: {e})", None
+        # ---- DEPL-dRetiredFork-5 S1. THE EXIT CODE GOES THROUGH THE DECLARED PROBE -------------
+        # `classify_outcome` exists to decide what an adopter's exit code MEANS, by asking the
+        # filesystem rather than trusting the integer — and it had exactly ONE call site, inside
+        # `_cmd_apply`. So every `[[outcome]]` block was dead code for `check`.
+        #
+        # MEASURED on an adopter: `adopt-lexicon.sh --check` exits 0 BY ABSENCE, so `check` printed
+        # `lexicon: adopted` for a kit with no conf, no Skill and no importable module. This
+        # function's own docstring says `adopted` means a check arm that ran and passed; the arm
+        # passed because the kit was not there. TOOL-aFlaggedScaffold-5.
+        #
+        # S2 — AN ENTRY WITH NO `[[outcome]]` IS UNCHANGED. `classify_outcome` returns None both
+        # when no block matches and when none is declared, so the fall-through below is today's
+        # answer exactly. A descriptor that DID declare a probe now has it honoured; no descriptor
+        # is retroactively broken, which is why this needed no per-kit authoring pass.
+        # THE FIRST VERSION OF THIS BLOCK INVERTED ITS OWN VERDICT, and the closing review proved
+        # it on a real descriptor. `classify_outcome` returns a block ONLY when that block's probe
+        # is SATISFIED, so `_oc is not None` ALREADY MEANS SATISFIED; re-asking `_oc.get("ok")`
+        # then answers a question five shipped descriptors never answer. `agent-instructions`,
+        # `drift-audit`, `lexicon`, `memory-recall` and `run-gates` each declare
+        # `code = 0, means = "adopted"` with NO `ok` key, so a CORRECT install came back
+        # `landed-but-inert` carrying a message asserting the opposite of what the probe returned —
+        # while the exit-0-by-absence case this whole change exists to catch still printed
+        # `adopted`. The two arms were swapped.
+        #
+        # `ok` IS STILL MEANINGFUL, which is why it is not simply dropped: `memory-tree` declares
+        # TWO blocks for code 1, `seed-and-stop` with `ok = true` and `refused-foreign-tree`
+        # without, and only the first is an acceptable stop. So `ok` decides a NON-ZERO exit, and
+        # a zero exit is decided by whether a declared probe for code 0 is satisfied. That is the
+        # rc-first shape `_cmd_apply`'s CONFIGURE step already had; this copy simply lacked it.
+        _oc = classify_outcome(target, desc, ctx, rc)
+        _means = str((_oc or {}).get("means") or "").strip()
+        _declared_here = declares_outcome_for(desc, rc)
+        if rc == 0:
+            if outcome_accepted(rc, _oc, _declared_here):
+                # Either the declared probe holds, or the descriptor declares nothing for a zero
+                # exit and the old unconditional `adopted` is still the right answer.
+                return "adopted", (f" ({_means})" if _means else ""), rc
+            # DECLARED AND NOT SATISFIED: exit 0 BY ABSENCE. This is the case
+            # DEPL-dRetiredFork-5 was written for — an adopter that exits 0 because it is not
+            # installed, reporting as `adopted` for a kit with no conf, no Skill and no module.
+            if r is not None:
+                r.fail(f"kit '{eid}': its adopter exited 0 but the probe declared for that code is "
+                       f"NOT satisfied, so it exited zero BY ABSENCE rather than by working — "
+                       f"landed but inert, surfaced rather than swallowed")
+            return "landed-but-inert", "", rc
+        if _oc is not None and _oc.get("ok"):
+            # A DECLARED, ACCEPTED non-zero outcome. `memory-tree` seeds its conf and stops by
+            # design, and that is a correct install rather than a failure.
+            return "adopted", (f" ({_means})" if _means else ""), rc
+        if r is not None:
+            r.fail(f"kit '{eid}': its adopter exited {rc} and no declared outcome accepts that code"
+                   + (f" — {_means}" if _means else "")
+                   + " — landed but inert, surfaced rather than swallowed")
+        return "landed-but-inert", (f" ({_means})" if _means else ""), rc
         if rc != 0 and r is not None:
             r.fail(f"kit '{eid}': its own adopter check arm exits {rc}, so the kit is landed "
                    f"but not working — surfaced rather than swallowed")
@@ -3418,6 +3484,38 @@ def hook_probe(target: pathlib.Path) -> tuple[str, str]:
     return "block", (out.stdout + out.stderr).strip()
 
 
+def outcome_accepted(rc: int, oc, declared_for_rc: bool) -> bool:
+    """Is an adopter's exit code an ACCEPTED outcome? The whole decision, as one testable value.
+
+    Extracted because the first version of this logic was INVERTED and the arm that should have
+    caught it asserted on a source SUBSTRING instead. A substring survives the mutation it is
+    supposed to detect — measured: changing the guarded expression to `... or True` left the
+    assertion passing. A pure function has no such escape; the arms below call it with all four
+    input shapes and read the answer.
+
+    `oc` is `classify_outcome`'s return, which is the matched block or None. It is None both when
+    no block is declared for this code and when one is declared whose probe is NOT satisfied, so
+    `declared_for_rc` is what tells those two apart — and telling them apart IS the feature:
+
+      rc == 0, nothing declared          -> accepted (unchanged, pre-DEPL-5 behaviour)
+      rc == 0, declared and satisfied    -> accepted
+      rc == 0, declared and unsatisfied  -> REFUSED. Exit zero BY ABSENCE: the adopter returned 0
+                                            because it is not installed. This is the case
+                                            DEPL-dRetiredFork-5 exists for.
+      rc != 0, block satisfied with ok   -> accepted (memory-tree seeds its conf and stops)
+      rc != 0, anything else             -> REFUSED
+    """
+    if rc == 0:
+        return (oc is not None) or (not declared_for_rc)
+    return bool(oc is not None and oc.get("ok"))
+
+
+def declares_outcome_for(desc: dict, rc: int) -> bool:
+    """Does this descriptor declare ANY `[[outcome]]` block for exactly this exit code?"""
+    return any(isinstance(b, dict) and b.get("code") == rc
+               for b in (desc.get("outcome") or []))
+
+
 def classify_outcome(target: pathlib.Path, desc: dict, ctx: dict[str, str], rc: int) -> dict | None:
     """The DECLARED meaning of an adopter's exit code, decided by a filesystem PROBE.
 
@@ -3576,6 +3674,62 @@ def blob_oid(data: bytes) -> str:
     """
     return hashlib.sha1(b"blob %d\0" % len(data) + data,  # noqa: S324 - git's object name, not a MAC
                         usedforsecurity=False).hexdigest()
+
+
+def as_posix_p(p) -> str:
+    return str(p).replace(chr(92), "/")
+
+
+def git_pathspec(target: pathlib.Path, argv: list[str], paths: list[str],
+                 text: bool = False) -> subprocess.CompletedProcess:
+    """Run a git command whose PATHSPEC arrives over stdin instead of the command line.
+
+    DEPL-dRetiredFork-4. Passing a derived population as argv blows the 32 KiB Windows command line:
+    measured on an adopter whose `.gitattributes` is 28 KB, `apply` died with
+    `FileNotFoundError: [WinError 206]` — AFTER the write loop and AFTER configure, leaving new files
+    staged, a conf scaffolded, a Skill rendered, a stale write lock, and no receipt update. A verb
+    whose failure mode is a half-applied install cannot fail that way for a reason as incidental as
+    how long a list was.
+
+    `--pathspec-from-file=-` REMOVES the bound rather than raising it. Chunking would leave the same
+    class open at a larger size, and the failure would then be rarer and harder to attribute — which
+    is worse than a bound you can name.
+
+    `--pathspec-file-nul` because a path may contain any byte but NUL. The newline form would split a
+    path whose name contains a newline into two pathspecs that match nothing, which is a silent
+    wrong answer where this one is at least loud.
+
+    AN EMPTY LIST IS NOT AN EMPTY PATHSPEC. `git` reads no pathspec at all from empty stdin and would
+    then operate on the WHOLE TREE, so this refuses to run rather than widening the caller's
+    intended population to everything — the difference between `add -- <nothing>` and `add -A`.
+    """
+    if not paths:
+        raise ValueError("git_pathspec called with an empty path list: git would read no pathspec "
+                         "and operate on the whole tree, which is never what the caller meant")
+    # ONLY SOME SUBCOMMANDS TAKE THIS FLAG, AND THE REST FAIL SILENTLY-ENOUGH TO MATTER.
+    # `git ls-files` and `git diff` REJECT `--pathspec-from-file` — measured on git 2.54:
+    # `error: unknown option 'pathspec-from-file=-'`, exit 129, EMPTY STDOUT. This helper captures
+    # output and passes `check=False`, so a caller reading `.stdout` gets "" and concludes the
+    # population is clean. Two live checks were converted to this shape by DEPL-dRetiredFork-4 and
+    # went vacuous: the pre-renormalize cleanliness guard and the LF-index verification, the second
+    # of which then printed "0 not LF in the index" unconditionally. Found by the closing review.
+    #
+    # A DENYLIST WOULD BE THE WRONG SHAPE. The question is which subcommands SUPPORT it, and a new
+    # caller is far likelier to name an unsupported one than to add support to git. So the set is
+    # ALLOW-listed, and an unlisted verb refuses loudly rather than returning an empty answer.
+    _verb = next((a for a in argv if not a.startswith("-")), "")
+    if _verb not in {"add", "rm", "checkout", "restore", "reset", "commit", "stash"}:
+        raise ValueError(
+            f"git_pathspec cannot run `git {_verb}`: that subcommand does not accept "
+            f"--pathspec-from-file, and git answers an unknown option with exit 129 and EMPTY "
+            f"stdout — which a caller reading .stdout cannot tell from 'nothing matched'. "
+            f"Read the whole set and filter in python instead; there is no command-line bound "
+            f"on a command that takes no pathspec at all")
+    return subprocess.run(
+        ["git", "-C", str(target)] + argv + ["--pathspec-from-file=-", "--pathspec-file-nul"],
+        input=(chr(0).join(paths) + chr(0)).encode("utf-8") if not text
+              else chr(0).join(paths) + chr(0),
+        capture_output=True, check=False, text=text)
 
 
 def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[str, str]], set[str]]:
@@ -4346,8 +4500,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- STAGE. Not housekeeping: every gate in this suite reads the INDEX, so an unstaged install
     # ---- is invisible to the verification that follows it.
     if staged:
-        subprocess.run(["git", "-C", str(target), "add", "--"] + staged,
-                       capture_output=True, check=False)
+        git_pathspec(target, ["add"], staged)
     # S7's second half: `oid` is read from each row's INDEX ENTRY, once the stage above has made one.
     # ONE batched read over the writes channel's paths, per row and not per stage — that one `git
     # add` covers every channel, and a seed the target already owned was never staged by this run at
@@ -4508,9 +4661,14 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # for. Measured: without this, a clean fixture target failed here on the DEFAULT
             # selection, naming two files gov had itself just landed.
             ours = set(staged)
-            dirty = [p for p in subprocess.run(
-                ["git", "-C", str(target), "diff", "--name-only", "HEAD", "--"] + lf_paths,
-                capture_output=True, text=True).stdout.split() if p not in ours]
+            # NO PATHSPEC, FILTERED HERE. `git diff` does not take `--pathspec-from-file`, and
+            # passing 25 KiB of paths as argv is what DEPL-dRetiredFork-4 was fixing. Asking for
+            # the WHOLE diff and intersecting in python has neither bound: one process, no
+            # command line, and the filter is visible instead of being git's.
+            _lfset = set(lf_paths)
+            _alldiff = subprocess.run(["git", "-C", str(target), "diff", "--name-only", "HEAD"],
+                                      capture_output=True, text=True)
+            dirty = [p for p in _alldiff.stdout.split() if p in _lfset and p not in ours]
             missing_wt = [p for p in lf_paths if not (target / p).exists()]
             if dirty or missing_wt:
                 r.fail(f"the pinned population is not clean relative to HEAD "
@@ -4518,13 +4676,22 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                        f"renormalize rather than folding somebody's work-in-progress into an index "
                        f"gov does not own")
             else:
-                subprocess.run(["git", "-C", str(target), "add", "--renormalize", "--"] + lf_paths,
-                               capture_output=True, check=False)
+                git_pathspec(target, ["add", "--renormalize"], lf_paths)
                 _renormalized = True   # M3: the re-stamp below keys on THIS, not on `staged`
         after = eol_population(target)
-        idx = subprocess.run(["git", "-C", str(target), "ls-files", "--eol", "--"] + lf_paths,
-                             capture_output=True, text=True).stdout if lf_paths else ""
-        bad = [ln.split("\t")[-1] for ln in idx.splitlines() if ln and "i/lf" not in ln.split()[0]]
+        # SAME FIX, AND THIS IS THE ONE THAT WENT FULLY VACUOUS: `git ls-files` rejects the flag,
+        # so `idx` was "" on every run, `bad` was [] for every input, and the r.fail below became
+        # unreachable while the step still printed its reassuring count. A green-by-absence hole
+        # opened by the build whose subject was green-by-absence.
+        _idxr = subprocess.run(["git", "-C", str(target), "ls-files", "--eol"],
+                               capture_output=True, text=True) if lf_paths else None
+        if _idxr is not None and _idxr.returncode != 0:
+            r.fail(f"`git ls-files --eol` exited {_idxr.returncode} in {as_posix_p(target)}, so the "
+                   f"LF-index verification could not run. Refusing to report it clean")
+        _lfset2 = set(lf_paths)
+        idx = _idxr.stdout if (_idxr is not None and _idxr.returncode == 0) else ""
+        bad = [ln.split("\t")[-1] for ln in idx.splitlines()
+               if ln and ln.split("\t")[-1] in _lfset2 and "i/lf" not in ln.split()[0]]
         for b in bad:
             r.fail(f"'{b}' is pinned eol=lf and its INDEX blob is not LF after the renormalize")
         covers_nothing = [p for p, _c, _w in pins
@@ -5075,6 +5242,31 @@ def derive_carry_map(pairs) -> tuple[dict[str, str], dict[str, str], list[tuple[
     for gd, td in pairs_out.items():
         needles[gd] = td
         needles[gd.replace("/", "~")] = td.replace("/", "~")
+    # ---- S3b (DEPL-dRetiredFork-1). EVERY DERIVED NEEDLE IS GRADED, and a degenerate one is
+    # ---- refused rather than used. A needle is a path fragment substituted over FILE CONTENT, so
+    # ---- its width is the blast radius: an empty fragment matches at every position in every file,
+    # ---- and a single character matches almost as widely. Section 5 calls this the highest-severity
+    # ---- path in the build, because a wrong needle writes gov's bytes over a target's real edit.
+    # ---- The values come from a target-supplied receipt, so "it cannot happen" is not available.
+    # THE THRESHOLD IS EMPTINESS, and it was measured down to that. A first cut refused anything
+    # shorter than two characters, which is the wider rule the risk argues for -- and it broke 16
+    # arms belonging to other units, because gov's own fixtures legitimately use single-letter
+    # directory names (`a/x.txt` -> `b/x.txt`). Refusing those would have made this grade a tax on
+    # every fixture author to buy protection against a receipt shape nobody has produced.
+    #
+    # So the refusal covers the case section 5 actually names, an empty or whitespace fragment, and
+    # the residual risk is stated rather than papered over: a ONE-character needle is permitted and
+    # would match widely if a real receipt ever produced one. What contains it is the same thing
+    # that contains every other wrong needle -- the rung is proved by WHOLE-FILE equality before any
+    # write, so a row whose bytes are not exactly the carried form falls to three-way regardless.
+    bad = sorted(k for k in needles if not k.strip())
+    if bad:
+        raise Refusal(
+            "the carry needle map derived an EMPTY fragment from this receipt: "
+            + ", ".join(repr(b) for b in bad)
+            + ". A needle is substituted over file CONTENT, so an empty fragment matches at every "
+              "position in every file and would rewrite bytes the target never relocated. "
+              "Refusing rather than carrying it")
     return needles, pairs_out, dropped
 
 
@@ -5304,7 +5496,16 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
 
     carry = None
     if base is not None and ours_oid is not None:
-        carry = derive_carry_rung(base, needles or {}, read_ours,
+        # S1 — THE ROW'S OWN NEEDLES, not the run-level map. `resolve_row_needles` has existed since
+        # DEPL-dGaugedVintage-11 and is applied on the REWRITE paths, but the rung PROOF read the
+        # global map — so for a gov directory that fans into several destinations, and is therefore
+        # dropped from that map, the proof had no needle to prove with and every row under it
+        # returned rung=None. Seven such directories at one measured adopter.
+        #
+        # The overlay is per row and cannot collide: it derives one pair from this row's own
+        # `(source, path)`, which is exactly the fact the global map could not hold for a fanned
+        # directory.
+        carry = derive_carry_rung(base, resolve_row_needles(needles or {}, row), read_ours,
                                   known_equal=(ours_oid == blob_oid(base)))
 
     # ---- DEPL-dCarriedReceipt-11 S2. THE RENAME, DECIDED BEFORE THE GRID IS CONSULTED, so the
@@ -5416,16 +5617,18 @@ def three_way(ours: bytes, base: bytes, theirs: bytes) -> tuple[bytes | None, st
 
 
 def cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
-               write_withdrawals: bool = False, allow_ungraded: bool = False) -> int:
+               write_withdrawals: bool = False, allow_ungraded: bool = False,
+               kits: list[str] | None = None) -> int:
     """The verb. Its BODY is `_cmd_update`; see `cmd_apply` for why the split exists."""
     try:
-        return _cmd_update(root, target, to_rev, write, write_withdrawals, allow_ungraded)
+        return _cmd_update(root, target, to_rev, write, write_withdrawals, allow_ungraded, kits)
     finally:
         release_write_lock()
 
 
 def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bool,
-                write_withdrawals: bool = False, allow_ungraded: bool = False) -> int:
+                write_withdrawals: bool = False, allow_ungraded: bool = False,
+                kits: list[str] | None = None) -> int:
     """Move an installed target forward to a newer gov commit. READ-ONLY unless `--write`.
 
     The default is read-only because this verb's failure mode is silent data loss in a repository the
@@ -5517,6 +5720,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # the classification loop; filtering it out here would turn that into a silent drop, which is a
     # skip that looks like a pass — one row of a receipt quietly ungraded and nothing saying so.
     rows_all = receipt.get("files", [])
+
+    # ---- S5b. THE SCOPE BINDS. `--kits` narrows the population to the named entries' rows; an
+    # entry this receipt does not claim is a REFUSAL, because `update` moves an INSTALLED set
+    # forward and widening it is `--add-kits` and an owner decision.
+    if kits:
+        _claimed = set(receipt.get("kits") or [])
+        _unknown = sorted(k for k in kits if k not in _claimed)
+        if _unknown:
+            raise Refusal(
+                "--kits names " + ", ".join(_unknown) + ", which this receipt does not claim. "
+                "`update` moves an INSTALLED set forward; widening it is `--add-kits` and an owner "
+                "decision. Refusing rather than silently classifying an entry the target never took")
+        _want = set(kits)
+        rows_all = [w for w in rows_all if str(w.get("kit") or "") in _want]
+        print(f"govkit update — scope: --kits {', '.join(sorted(_want))} -> "
+              f"{len(rows_all)} of {len(receipt.get('files') or [])} receipt row(s)")
 
     # ---- SCHEMA MIGRATION, and it runs before S9 because S9's third arm grades a field this fills.
     # A receipt written before schema 3 carries no `gov_oid` at all, so every engine row in one would
@@ -5632,6 +5851,26 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- both come off the derivation, on this run, over this receipt.
     needles, carry_pairs, carry_dropped = derive_carry_map(
         [(w.get("source"), w.get("path")) for w in rows_all])
+    # S3 (DEPL-dRetiredFork-1). AN EMPTY NEEDLE MAP REFUSES. A run with no needles reports every row
+    # as unattributed, which is byte-for-byte what a run over a target that relocated nothing looks
+    # like — and one of those is a broken derivation. The receipt has rows, so an empty map means the
+    # lift failed, not that the target is tidy.
+    # THE REFUSAL NEEDS A ROW THAT COULD HAVE LIFTED. An empty map is legitimate when every row is
+    # a root-level file: those lift to the empty needle and are skipped by design, so "no needles"
+    # there is the right answer and not a broken derivation. A first cut refused on emptiness alone
+    # and broke 16 arms whose fixtures are exactly that shape.
+    #
+    # What is NOT legitimate is an empty map over rows that DO name a gov directory: the lift had
+    # subjects and produced nothing, and that reads identically to a target that relocated nothing.
+    _liftable = [w for w in rows_all
+                 if "/" in str(w.get("source") or "") and "/" in str(w.get("path") or "")]
+    if _liftable and not needles and not carry_dropped:
+        raise Refusal(
+            f"the carry needle map is EMPTY over {len(_liftable)} row(s) that name a gov directory, "
+            f"and nothing was dropped as ambiguous either. The lift had subjects and produced no "
+            f"needle, so every row would classify as unattributed — which is indistinguishable from "
+            f"a target that relocated nothing. Refusing rather than reporting a verdict it did not "
+            f"earn")
     for _gd, _dests in carry_dropped:
         # DEPL-dGaugedVintage-11 S1. Still dropped from the GLOBAL map, which can hold one
         # destination per gov directory and nothing else — but no longer silent for the rows
@@ -5641,6 +5880,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"puts it at {', '.join(_dests)}, so it names no single destination and cannot be a "
               f"needle. Rows under it now resolve against their own destination instead "
               f"(DEPL-dGaugedVintage-11)")
+        # S2 (DEPL-dRetiredFork-1). NAME THE ROWS, not only the directory. An operator reading
+        # "dropped tools/memory-tree" cannot tell which files that freezes; the answer is the rows
+        # whose source sits under it, and this run already holds them.
+        _frozen = sorted(str(w.get("path")) for w in rows_all
+                         if str(w.get("source", "")).rsplit("/", 1)[0] == _gd)
+        if _frozen:
+            print(f"govkit update —   the {len(_frozen)} row(s) under it: "
+                  + ", ".join(_frozen[:6]) + (", …" if len(_frozen) > 6 else ""))
     # S2. The DROPPED COUNT, printed at zero as well. A run that dropped nothing and a run whose
     # drop report never executed used to look identical, which is the green-by-absence shape.
     print(f"govkit update — carry map: {len(carry_pairs)} directory pair(s), "
@@ -6333,8 +6580,108 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # not round-trip exactly would replace gov's blob with a near-miss nobody asked for. The staging
     # this verb owes is done, and it is done from the blob rather than from the disk.
     if deleted:
-        subprocess.run(["git", "-C", str(target), "rm", "-q", "--ignore-unmatch", "--"] + deleted,
-                       capture_output=True, check=False)
+        git_pathspec(target, ["rm", "-q", "--ignore-unmatch"], deleted)
+
+    # ======================= DEPL-dRetiredFork-3 S1 + S2 — RE-RENDER AND REGENERATE =============
+    # BYTES LANDING IS NOT AN UPDATE FINISHING. `UPDATE_ROLE["rendered"]` is `"adopter"` but the
+    # disposition CAPS at report, and no `[adopt].argv` is spawned anywhere in this verb — the only
+    # subprocess it runs per kit is `[check].argv`, a verifier. So every rendered destination goes
+    # ONE VINTAGE STALE on every update. Measured at one adopter: NINE rendered rows, including three
+    # SKILL.md files and both binding protocols, plus the two CI jobs that byte-compare them.
+    #
+    # GATED OFF BY DEFAULT, and that is this spec's own section 4 rather than caution added here:
+    # this is the first time `update` executes target-side code, so it ships dark and is flipped on
+    # after in-place verification against a fixture and then one adopter. The charter's dark-landing
+    # rule, applied to the deployer itself. With the flag off the output is byte-identical to before,
+    # which is what makes the first release safe to land.
+    #
+    # THE ARGV IS ALWAYS GOV'S. It comes from a gov-authored descriptor and NEVER from the target's
+    # `deploy.toml`. That is the trust boundary section 5 names: the code runs in the target's tree
+    # under the operator's uid, so a check running under the run's own uid can be defeated by whoever
+    # runs it — and the mitigation is that the target never supplies the argv, not that the uid is
+    # trusted.
+    _rerender_on = os.environ.get("GOVKIT_RERENDER") == "1"
+    _rr_ran: list[str] = []
+    _rr_declined: list[tuple[str, str]] = []
+    if write:
+        for _eid in touched_kits:
+            _d, _ = descs[_eid]
+            # S3 non-goal — A KIT THE TARGET HOLDS DELIBERATELY INERT IS NOT RUN, and the run says
+            # so. Running its adopter is a POSTURE FLIP, which is exactly why "just run apply" was
+            # never the workaround for any of this.
+            if _eid in {str(x) for x in (deploy.get("inert") or [])}:
+                _rr_declined.append((_eid, "the target holds this kit INERT; running its adopter "
+                                           "would flip a posture the target chose"))
+                continue
+            # S1 IS NOT BUILT, AND THE REASON IS A MEASUREMENT RATHER THAN A PREFERENCE. The
+            # spec asks `update` to run the kit's `[adopt].argv`. Run against an adopted tree,
+            # `memory-tree`'s adopter takes one of exactly two branches, and NEITHER re-renders:
+            # with its marker present it prints "already scaffolded — nothing to do" and exits
+            # 0, and with the marker absent it REFUSES the tree as foreign and exits 1, which
+            # that kit declares as the outcome `refused-foreign-tree`. Both were reproduced on a
+            # fixture. So the adopter cannot refresh a stale rendered row: it is a no-op on the
+            # happy path and a refusal off it, which is correct behaviour for an ADOPTER and is
+            # why re-adoption was never the missing piece.
+            #
+            # A DECLARED `[[regenerate]]` BLOCK IS THEREFORE THE WHOLE MECHANISM: a narrow argv
+            # whose one job is to re-render, with no adoption guard to trip over.
+            _regen = _d.get("regenerate") or []
+            if not _regen:
+                # NOT `continue`. A kit that ships rendered rows and declares no regeneration is
+                # the actual live defect -- its artifacts go one vintage stale on every update --
+                # and a silent skip here would report that state as a clean run. TOOL-dRetiredFork-29.
+                if any(str((_row or {}).get("role")) == "rendered"
+                       for _row in (_d.get("files") or [])):
+                    _rr_declined.append((_eid, "this kit ships `rendered` rows and declares no "
+                                               "[[regenerate]] argv, so they stay one vintage "
+                                               "stale; its adopter cannot do this job"))
+                continue
+            if not _rerender_on:
+                _rr_declined.append((_eid, "the re-render step is OFF (set GOVKIT_RERENDER=1); "
+                                           "its artifacts are one vintage stale until it is run"))
+                continue
+            _ctx_rr = target_context(target, deploy, _eid, _d)
+            for _blk in list(_regen):
+                _argv = _blk.get("argv") or []
+                if not _argv:
+                    continue
+                _res = [resolve_tokens(a, _ctx_rr)[0] for a in _argv]
+                _out = subprocess.run(resolve_shell_argv(_res), cwd=str(target),
+                                      capture_output=True, text=True)
+                # THE EXIT CODE GOES THROUGH THE DECLARED PROBE, exactly as `_cmd_apply`'s
+                # CONFIGURE step does, and NOT through `rc != 0`. Writing the naive test here
+                # would have failed every update that touched `memory-tree`, whose adopter
+                # SEEDS ITS CONF AND STOPS BY DESIGN -- a declared, accepted, non-zero outcome.
+                # DEPL-dRetiredFork-5 taught `check` this same lesson one unit ago; the third
+                # caller learning it independently is the argument for the helper existing.
+                # THE SAME INVERSION WAS WRITTEN HERE TOO, and was latent only because no
+                # descriptor declares a `[[regenerate]]` block yet — it would have armed itself on
+                # the first one. Same rule as `run_kit_check`: a satisfied probe on a zero exit is
+                # good, and `ok` decides a non-zero one.
+                _oc_rr = classify_outcome(target, _d, _ctx_rr, _out.returncode)
+                _bad = not outcome_accepted(_out.returncode, _oc_rr,
+                                            declares_outcome_for(_d, _out.returncode))
+                _rr_ran.append(f"{_eid}: {' '.join(_res)} -> exit {_out.returncode}"
+                               + (f" ({_oc_rr.get('means')})" if _oc_rr else "")
+                               + ("  REFUSED" if _bad else ""))
+                if _bad:
+                    r.fail(f"kit '{_eid}': the declared re-render/regenerate argv exited "
+                           f"{_out.returncode} and no declared outcome accepts that. The "
+                           f"post-write verification below rolls this run back rather than "
+                           f"committing a bad render")
+    # AC6 — SILENT WHEN THE FLAG IS OFF. The criterion asks for output byte-identical to the
+    # pre-change run, and a step that announces its own absence is not dark. Once the flag is
+    # ON every decline is named, which is section 5s observability item and the class this
+    # build keeps closing: a skip that looks like a pass.
+    if _rerender_on:
+        print(f"govkit update — re-render: {len(_rr_ran)} argv run, "
+              f"{len(_rr_declined)} declined")
+        for _line in _rr_ran:
+            print(f"govkit update —   ran {_line}")
+    for _eid, _why in (_rr_declined if _rerender_on else []):
+        # A SKIP THAT LOOKS LIKE A PASS IS THE CLASS THIS BUILD KEEPS CLOSING. Every declined kit is
+        # named with its reason, so "nothing re-rendered" is never read as "nothing needed it".
+        print(f"govkit update —   DECLINED {_eid}: {_why}")
 
     # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
     # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
@@ -7339,6 +7686,317 @@ def parse_args(argv: list[str]) -> tuple:
             pins, re_adopt, coverage, emit_declines, run_discharge, allow_ungraded)
 
 
+# ======================= DEPL-dRetiredFork-6 — `contribute` ====================================
+# THE ROUTE BY WHICH AN ADOPTER'S FIX BECOMES GOV'S. This build absorbed eight adopter-held defects
+# by hand, one at a time, because no route existed. Without one the class returns on the next
+# release: the fix is held privately, re-merged forever, and gov keeps shipping the defect to
+# everybody else.
+#
+# READ-ONLY IN BOTH DIRECTIONS (S6). It never writes to gov and never writes to the target. It emits
+# a patch set; a person lands it, through gov's merge bar and review protocol like any other change.
+# A verb that landed code into gov from a foreign tree would be a write surface §9 would have to
+# price, and the spec's §3 rules it out rather than deferring it.
+#
+# ONLY `FORK` ROWS ARE CANDIDATES, and this is the distinction the whole verb turns on. The census
+# separates three states: `IN-SYNC` is gov's own bytes, and `DRIFT` is an OLDER GOV VINTAGE — the
+# adopter is behind, which is `update`'s job and not a contribution. Only `FORK`, whose bytes appear
+# in NO gov commit ever, can be something gov does not have. Proposing a DRIFT row would be
+# proposing gov's own history back to it, which is the shape a reader of the output cannot audit.
+CONTRIB_CLASSES = {
+    1: ("gov defect", "the adopter's bytes fix a bug in gov's own behaviour. Qualifies outright"),
+    2: ("gov gap", "a capability gov lacks. Qualifies as a PROPOSAL, never an automatic take"),
+    3: ("project fact", "true only of that tree. Belongs in a declaration or an extension point"),
+    4: ("layout carriage", "a repath. A gov literal, and TOOL-dRetiredFork-17 bans the class"),
+}
+
+
+def _contrib_diff(a: str, b: str) -> list:
+    import difflib
+    return list(difflib.unified_diff(a.splitlines(), b.splitlines(), lineterm=""))
+
+
+def _contrib_depath(line: str) -> str:
+    """Erase path-shaped tokens so two lines differing only by a repath compare equal.
+
+    Deliberately blunt: any run of word characters, dots, dashes and slashes containing at least
+    one slash is a path token and becomes a single marker. A blunt eraser over-merges (two lines
+    that differ ONLY in a path both collapse), which is the safe direction here — over-merging
+    proposes class 4, and class 4 is the class that asks for nothing to be taken. Under-merging
+    would propose a repath as a gov defect, which is the direction that costs somebody a bad
+    absorption.
+    """
+    import re as _re
+    return _re.sub(r"[\w.\-]*/[\w./\-]*", "<P>", line)
+
+
+def contrib_propose_class(row: dict, gov_text: str, adopter_text: str,
+                          adopter_name: str) -> tuple:
+    """PROPOSE a class for one forked row. PROPOSE, never decide — S3 is the safety property.
+
+    The failure that matters is a class-3 project fact proposed as a class-1 gov defect, absorbed,
+    and shipped to every adopter as gov's behaviour. The mitigation is that a person confirms every
+    row, so this returns a proposal AND the evidence for it, and the caller prints both. Nothing
+    downstream may treat the number as settled.
+    """
+    ap = str(row.get("path") or "")
+    gp = str(row.get("gov_path") or "")
+    if not gov_text:
+        return 2, "gov has no file at this path at all, so these bytes are a capability gov lacks"
+    _d = _contrib_diff(gov_text, adopter_text)
+    added = [l[1:].strip() for l in _d if l.startswith("+") and not l.startswith("+++")]
+    removed = [l[1:].strip() for l in _d if l.startswith("-") and not l.startswith("---")]
+    added = [l for l in added if l]
+    # CLASS 4 IS A PROPERTY OF THE DIFF, NOT OF THE DESTINATION, and I wrote it the other way
+    # first: `gov_path != path` fires on EVERY deployed file, because an install destination
+    # differing from its gov source is what deployment IS. That test classed 30 of 31 NicoCares
+    # candidates as layout carriage and left one real proposal, when the criterion expects four.
+    #
+    # What layout carriage actually looks like in the BYTES: every changed line is the same line
+    # with a path rewritten. So normalise both sides by deleting every path-shaped token and
+    # compare: if the change vanishes under that erasure, nothing but paths moved.
+    if added and removed:
+        _ea = [_contrib_depath(l) for l in added]
+        _er = [_contrib_depath(l) for l in removed]
+        # THE ERASURE MUST HAVE ERASED SOMETHING. Comparing equal after erasure is necessary and
+        # NOT sufficient: with no path token anywhere, `depath` is the identity, and a pure
+        # REORDER of two ordinary lines then compares equal and proposes layout carriage. A test
+        # arm caught exactly that. So at least one changed line must actually contain a path.
+        _moved = any(e != l for e, l in zip(_ea, added)) or any(e != l for e, l in zip(_er, removed))
+        if _moved and sorted(_ea) == sorted(_er):
+            return 4, ("every changed line is identical once path tokens are erased, so only "
+                       "literals moved — %d line(s) of carriage" % len(added))
+    # CLASS 3 needs a token that could ONLY be true of this tree. The adopter's own name is the
+    # cheapest such token and the only one available without asking the tree what it is about.
+    nm = (adopter_name or "").lower()
+    hits = [l for l in added if nm and nm in l.lower()]
+    if hits:
+        return 3, ("%d added line(s) name `%s` itself, so the change encodes a project fact: %s"
+                   % (len(hits), adopter_name, hits[0][:80]))
+    # ALREADY ABSORBED (F2), reported as a class-1 proposal CARRYING THE CONTRARY EVIDENCE rather
+    # than as a fifth class: every added line already appears in gov's own copy, so gov took this
+    # change under different bytes and this is the row the adopter can delete today. It is the
+    # cheapest output the verb produces, which is why F2 asked for it by name.
+    if added and all(any(a == g.strip() for g in gov_text.splitlines()) for a in added):
+        return 1, ("ALREADY ABSORBED — every added line already appears in gov's copy, so gov took "
+                   "this change under different bytes. The adopter can drop this row")
+    return 1, "gov carries this file and the adopter changed it in %d added line(s)" % len(added)
+
+
+def cmd_contribute(root: pathlib.Path, target: pathlib.Path) -> int:
+    """`govkit contribute --target <path>` — S1. Read-only; emits a patch set and a summary."""
+    import importlib.util
+    _sp = importlib.util.spec_from_file_location(
+        "gov_census", str(pathlib.Path(__file__).parent / "census.py"))
+    if _sp is None or _sp.loader is None:
+        raise Refusal("contribute consumes the census (F1, ratified) and cannot import "
+                      "tools/govkit/census.py. There is no second join to fall back to")
+    _cen = importlib.util.module_from_spec(_sp)
+    _sp.loader.exec_module(_cen)
+
+    # The tree's own name, not the checkout directory's: every adopter here is cloned at
+    # `<name>/main`, so `target.name` would call every one of them "main" and the class-3 token
+    # test would then look for the word "main" in every added line.
+    name = target.name if target.name not in ("main", "master") else target.parent.name
+    # THE ORDER IS `(ever, head)`, AND I UNPACKED IT BACKWARDS FIRST. Both are dicts keyed by
+    # strings, so the wrong order raises nothing, runs to completion, and inverts every
+    # classification: `head` would be consulted for history and `ever` for the current tip. The
+    # census's own `main` is the spelling of record and this now matches it.
+    gov_ever, gov_head = _cen.build_gov_index(root)
+    # A REGISTER IS A DICT WITH A `rows` KEY, not the row list. Same class of defect: iterating the
+    # dict yields its KEYS, which are strings, and the first `.get` on one is where it surfaces.
+    reg = _cen.map_from_receipt(target)
+    derived = reg is None
+    if reg is None:
+        gov_paths = set(gov_head) | set(p for ps in gov_ever.values() for p in ps)
+        reg = _cen.map_by_basename(
+            target, gov_paths,
+            ["memory-tree", "memory-recall", "tools", "scripts", ".claude", ".githooks"])
+    rows = (reg or {}).get("rows") or []
+    # S5 — THE LIVENESS ASSERTION. A zero map REFUSES rather than reporting that this adopter has
+    # nothing to contribute. The two readings are indistinguishable in the output and opposite in
+    # meaning, and the wrong one is the reassuring one. Inherited from the census's own AC4 rather
+    # than re-derived, which is what consuming the census is supposed to buy.
+    if not rows:
+        raise Refusal(
+            "contribute mapped ZERO rows at %s, so it cannot tell 'this adopter has nothing to "
+            "contribute' from 'the map is broken'. Refusing rather than reporting the reassuring "
+            "one. Check that %s/.governance/ holds a receipt — the basename is `install.json`, "
+            "not `receipt.json` — or that the basename derivation reaches this tree's layout"
+            % (str(target).replace(chr(92), "/"), str(target).replace(chr(92), "/")))
+    # HASH EVERY MAPPED FILE FIRST. `classify` reads `oid` and nothing fills it for us: the
+    # census's own `main` does this in a loop before classifying, and skipping it left every row
+    # with `oid` None, classified ABSENT, and the verb reporting ZERO candidates over 160 mapped
+    # rows -- a clean report from a probe that never reached its subject, which is the exact shape
+    # this build keeps closing. It surfaced only because the standalone census had said 26.
+    for r in rows:
+        r["oid"] = _cen.hash_file(str(target), r["path"])
+    oids = set(r.get("oid") for r in rows if r.get("oid"))
+    if not oids:
+        raise Refusal(
+            "contribute hashed %d mapped row(s) at %s and got NO object ids, so every row would "
+            "classify as absent and the verb would report zero candidates. That is the map being "
+            "broken, not the adopter having nothing to contribute"
+            % (len(rows), str(target).replace(chr(92), "/")))
+    blobs = _cen.confirm_blobs(root, oids)
+    _cen.classify(rows, target, gov_ever, gov_head, blobs)
+    forks = [r for r in rows if r.get("class") == _cen.CLASS_FORK]
+
+    # THE OUTPUT LIVES IN GOV'S OWN GIT DIR, which is untracked by construction, so an emit
+    # cannot dirty either tree and S6 stays true without anyone remembering to clean up.
+    _gd = subprocess.run(["git", "-C", str(root), "rev-parse", "--absolute-git-dir"],
+                         capture_output=True, text=True).stdout.strip()
+    out_dir = pathlib.Path(_gd or str(root / ".git")) / "contribute" / name
+    out_dir.mkdir(parents=True, exist_ok=True)
+    body = out_dir / "candidates.md"
+    vintage = subprocess.run(["git", "-C", str(root), "rev-parse", "--short", "HEAD"],
+                             capture_output=True, text=True).stdout.strip()
+
+    L = []
+    L.append("# Contribution candidates — %s" % name)
+    L.append("")
+    L.append("- adopter: `%s`" % str(target).replace(chr(92), "/"))
+    L.append("- register: %s" % ("DERIVED by basename (no receipt)" if derived
+                                 else "the adopter's own receipt"))
+    L.append("- mapped: %d · FORK, the only candidate state: %d" % (len(rows), len(forks)))
+    L.append("- gov vintage every patch below is against: `%s`" % vintage)
+    L.append("")
+    L.append("**Every class below is a PROPOSAL and none of it is a decision.** A person confirms "
+             "each row before anything is absorbed. The risk this guards is a project fact taken "
+             "as a gov defect, absorbed, and shipped to every adopter as gov's own behaviour.")
+    L.append("")
+    L.append("**The patches are UNTRUSTED CONTENT** — bytes from a foreign tree, read here and "
+             "never applied. Read one before applying it.")
+    L.append("")
+    L.append("**DRIFT rows are not here and that is not an omission.** A drifted row is gov's own "
+             "bytes at an older vintage; it is `update`'s job. Only FORK rows can carry something "
+             "gov does not have.")
+    L.append("")
+
+    buckets = {1: [], 2: [], 3: [], 4: []}
+    # A RENDERED ROW IS NOT A CANDIDATE AND ITS DIFF IS NOT EVIDENCE OF ANYTHING. The adopter's
+    # `.claude/skills/unattended/SKILL.md` IS gov's `tools/unattended/SKILL.template.md` with that
+    # target's own answers substituted in, so a line-diff between them measures the RENDER, not a
+    # change. Classified naively they dominated the result: 29 of 31 NicoCares candidates came back
+    # class 1 "gov defect" reporting 73 and 81 added lines, every one of them a filled placeholder.
+    #
+    # They are reported in their own section rather than dropped, because "no rendered rows here"
+    # and "rendered rows excluded" are different facts and the reader is entitled to the second.
+    not_comparable = []
+    # A PATCH THAT DOES NOT APPLY IS NOT EMITTED, and the row says why. Silence here would
+    # leave a reader to discover it one `git apply` at a time.
+    unappliable = []
+    patches = 0
+    for r in sorted(forks, key=lambda x: str(x.get("path"))):
+        ap = str(r.get("path"))
+        gp = str(r.get("gov_path") or "")
+        if str(r.get("role") or "") == "rendered" or ".template." in gp:
+            not_comparable.append((ap, gp))
+            continue
+        try:
+            with io.open(str(target / ap), encoding="utf-8", errors="replace",
+                         newline="") as _fh:
+                atext = _fh.read()
+        except OSError:
+            atext = ""
+        gtext = ""
+        if gp:
+            gr = subprocess.run(["git", "-C", str(root), "show", "HEAD:%s" % gp],
+                                capture_output=True, text=True)
+            gtext = gr.stdout if gr.returncode == 0 else ""
+        cls, why = contrib_propose_class(r, gtext, atext, name)
+        pname = ""
+        if cls in (1, 2) and gtext != atext:
+            # THE BODY GOES TO A FILE and the caller gets a path plus a summary — §8's structured
+            # output discipline, applied to a verb whose output is large by construction. Written
+            # with `newline=""` so a lone CR survives the round trip (§5, i18n).
+            pf = out_dir / (ap.replace("/", "__").replace("\\", "__") + ".patch")
+            d = _contrib_diff(gtext, atext)
+            hdr = ["--- a/%s" % (gp or ap), "+++ b/%s" % (gp or ap)]
+            pf.write_text(chr(10).join(hdr + d[2:]) + chr(10), encoding="utf-8", newline="")
+            # AC6, AS A SELF-CHECK RATHER THAN AN EXTERNAL ASSERTION. Every emitted patch is run
+            # through `git apply --check` against the vintage it names, HERE, because a patch set
+            # whose rows may or may not apply is worse than a smaller one that does: a reader who
+            # has to test each row before trusting it is doing the verb's job by hand.
+            #
+            # WHAT ACTUALLY FAILS THIS, MEASURED: two of thirty-five, both files that merely SHARE
+            # A BASENAME with a gov file and are otherwise unrelated — inCMS's 199-line
+            # `merge-rows.test.sh` against gov's 1488-line one. That is the derived map reaching a
+            # wrong conclusion, and the right output is to say so on the row rather than to ship a
+            # patch that rewrites a file into a different file.
+            _chk = subprocess.run(["git", "-C", str(root), "apply", "--check", str(pf)],
+                                  capture_output=True, text=True)
+            if _chk.returncode != 0:
+                pf.unlink(missing_ok=True)
+                unappliable.append((ap, gp, (_chk.stderr or "").strip().splitlines()[:1]))
+                pname = ""
+                cls, why = cls, (why + " — PATCH WITHHELD: it does not apply to the vintage it "
+                                        "names, so the mapping to this gov path is unsound")
+            else:
+                pname = pf.name
+                patches += 1
+        buckets[cls].append((ap, gp, why, pname))
+
+    L.append("## Patch withheld — does not apply to the named vintage (%d)" % len(unappliable))
+    L.append("")
+    L.append("*The row is still classed above; only the patch is withheld. A patch that does not "
+             "apply means the map reached a wrong gov path — usually two unrelated files sharing a "
+             "basename — so the row needs a human look before anything is absorbed.*")
+    L.append("")
+    if not unappliable:
+        L.append("None.")
+        L.append("")
+    for ap, gp, err in unappliable:
+        L.append("- `%s` → `%s` — %s" % (ap, gp, (err[0] if err else "no reason reported")))
+    L.append("")
+
+    L.append("## Not comparable — rendered from a gov template (%d)" % len(not_comparable))
+    L.append("")
+    L.append("*These are gov's own templates with this target's answers substituted in. A line "
+             "diff between a render and its template measures the render. They are excluded from "
+             "every class below, and listed here so that exclusion is visible rather than assumed.*")
+    L.append("")
+    if not not_comparable:
+        L.append("None.")
+        L.append("")
+    for ap, gp in not_comparable:
+        L.append("- `%s` ← `%s`" % (ap, gp))
+    L.append("")
+
+    for cls in (1, 2, 3, 4):
+        nm, gloss = CONTRIB_CLASSES[cls]
+        L.append("## Class %d — %s (%d)" % (cls, nm, len(buckets[cls])))
+        L.append("")
+        L.append("*%s.*" % gloss)
+        L.append("")
+        if not buckets[cls]:
+            # A SKIP ANNOUNCES ITSELF. An empty class is written as empty rather than dropped, so
+            # "no class-1 candidates" can never be read as "the verb did not look for any".
+            L.append("None proposed.")
+            L.append("")
+            continue
+        for ap, gp, why, pname in buckets[cls]:
+            row = "- `%s`" % ap
+            if gp and gp != ap:
+                row += " (gov: `%s`)" % gp
+            row += " — %s" % why
+            if pname:
+                row += " · patch `%s`" % pname
+            L.append(row)
+        L.append("")
+
+    body.write_text(chr(10).join(L) + chr(10), encoding="utf-8", newline="")
+    print("govkit contribute — %s: %d mapped · %d forked · %d not comparable (rendered) · "
+          "%d candidate(s) · %s · %d patch(es)"
+          % (name, len(rows), len(forks), len(not_comparable),
+             sum(len(buckets[c]) for c in (1, 2, 3, 4)),
+             " · ".join("class %d %d" % (c, len(buckets[c])) for c in (1, 2, 3, 4)), patches))
+    if unappliable:
+        print("govkit contribute — %d patch(es) WITHHELD: they do not apply to the vintage they "
+              "name, so those rows' gov paths are unsound" % len(unappliable))
+    print("govkit contribute — %s" % str(body).replace(chr(92), "/"))
+    return 0
+
+
 def main(argv: list[str]) -> int:
     if not argv or argv[0] in ("-h", "--help"):
         sys.stderr.write(USAGE)
@@ -7355,6 +8013,11 @@ def main(argv: list[str]) -> int:
             if len(argv) > 2 or (len(argv) == 2 and argv[1] != "--write"):
                 raise Refusal("selfcheck takes no arguments except --write")
             return selfcheck(root, write=(len(argv) == 2))
+        if verb == "contribute":
+            if target is None:
+                raise Refusal("contribute needs an explicit --target: the adopter tree to "
+                              "read. It writes to neither tree")
+            return cmd_contribute(root, target)
         if verb in ("plan", "check", "apply", "intake", "update", "adopt"):
             if target is None:
                 raise Refusal(
@@ -7371,9 +8034,12 @@ def main(argv: list[str]) -> int:
             if verb == "intake":
                 return cmd_intake(root, target, mode, kits, ANSWERS)
             if verb == "update":
+                # S5b (DEPL-dRetiredFork-2). `kits` REACHES the verb. It was parsed and then thrown
+                # away here, so `update --kits <one>` classified the WHOLE receipt -- measured
+                # byte-identical to the unscoped run, with nothing saying the scope was ignored.
                 return cmd_update(root, target, TO_REV, write=WRITE,
                                   write_withdrawals=WRITE_WD,
-                                  allow_ungraded=ALLOW_UNGRADED)
+                                  allow_ungraded=ALLOW_UNGRADED, kits=kits)
             if verb == "adopt":
                 return cmd_adopt(root, target, TO_REV, PINS, RE_ADOPT, write=WRITE)
             return cmd_apply(root, target, mode, kits, resume=RESUME)

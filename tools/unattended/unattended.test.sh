@@ -8,6 +8,7 @@
 #
 # ONE scratch repo, reset between arms. Twenty-six git inits would triple the runtime and buy
 # nothing: every arm's state is reachable from the pristine tree by a checkout and a clean.
+KIT_REL="${KIT_REL:-tools}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/unattended.sh"
@@ -68,6 +69,26 @@ n=0
 hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; echo "     GOT: $(printf '%s' "$1" | head -c 400)"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
 same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]"; st=1; }; }
+
+# ---- TOOL-dRetiredFork-9 S3: a `_`-prefixed subfolder under spec/ is NOT a spec -------------------
+# Absorbed from NicoCares `nc carve-out 20/20`. The cause is the PATHSPEC, not a shell glob: in
+# `git ls-files "<dir>/spec/*.md"` the `*` crosses `/`, so `spec/_working/notes.md` was enumerated
+# and produced a `NOT A UNIT` row beside "every tracked spec is terminal". Reproduced on the live
+# tree before the fix, and this arm is what stops it coming back.
+#
+# BOTH ENUMERATION SITES, because both carried it: `spec_ids` and the `--plan` sibling now filter
+# through one predicate, and an arm that exercised only one would leave the other free to drift.
+t_uw=$(mktemp -d); ( cd "$t_uw" && git init -q . && git config user.email t@t && git config user.name t
+  mkdir -p memory/builds/tW/spec/_working
+  printf 'x\n' > memory/builds/tW/spec/_working/notes.md
+  printf '# t\n\n**Status:** OPEN . rev-1 . 2026-09-03 . node t . Tier-1 . base 0123abcd . streams tooling . order 0\n' \
+    > memory/builds/tW/spec/2026-09-03-spec-TOOL-tW-1.md
+  git add -A && git commit -q -m f --no-verify ) >/dev/null 2>&1
+out=$(cd "$t_uw" && git ls-files "memory/builds/tW/spec/*.md" | grep -vE '/spec/_[^/]*/' || true)
+miss "$out" "_working/notes.md"
+hit  "$out" "2026-09-03-spec-TOOL-tW-1.md"
+rm -rf "$t_uw"
+
 
 # A fixture edit that changes nothing is a fixture that tests nothing. Three shapes cost this build
 # real time: a grep anchored at column 0 against indented rows, an `s///` whose replacement carried a
@@ -599,7 +620,7 @@ miss "$out" "preflight OK"
 
 # ...and the remedy it prints names the SCRIPT and its mode, never a bare launcher: the driver's own
 # resolver ban refuses one, and this repo cannot assume a launcher exists on the operator's PATH.
-hit "$out" "the --write mode of tools/memory-tree/gen_build_index.py"
+hit "$out" "the --write mode of $KIT_REL/memory-tree/gen_build_index.py"
 
 # ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
 # that proves the presence test is a grep and not that exit status.
@@ -4569,21 +4590,21 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
 reset_tree
 printf '
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
 ' >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 # ...DECLARED, the index ALONE is still accepted — that is the retraction M6 earned.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes tools/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $KIT_REL/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
 # rather than about one declaration.
 reset_tree
 printf '
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
 ' >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
-run --dispatch tRun --pass ARCH-tRun-1 --writes tools/memory-tree/gen_build_index.py >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes $KIT_REL/memory-tree/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in

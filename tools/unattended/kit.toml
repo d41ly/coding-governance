@@ -40,6 +40,20 @@ role = "rendered"
 to = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
 placeholders = []
 
+# the playbook FIXTURE. RENDERED, not engine — and that role change is the whole unit. It shipped
+# verbatim with `{kit}` spelled out five times in its outputs, grain, records and legs, so
+# `check-playbook.sh` exited 1 for any adopter installed at another prefix and the suite above it
+# could not follow a variable the fixture did not have. TOOL-dScrubbedConduit-2.
+#
+# ONE token, and deliberately not two. `TOOL_ROOT` is computed only by the memory-tree adopter;
+# this kit's adopter never computes it, so declaring it here would ship an unresolved brace to every
+# adopter. All five spellings sat under the kit directory, so `KIT_DIR` covers every one.
+[[files]]
+include = ["playbook.fixture.template.md"]
+role = "rendered"
+to = "{kit}/playbook.fixture.md"
+placeholders = ["KIT_DIR"]
+
 [config]
 file = ".unattended.conf"
 owner = "unattended"

@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-code',
-  version: '1.8',
+  version: '1.9',
   description:
     'Drift audit Tier 2, wave 1: dead / inefficient / unwired / duplicated code + instrument integrity. Project-agnostic; all repo facts arrive via args.',
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.8
+// gov:kit drift-audit@1.9
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
 // budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.
@@ -22,6 +22,43 @@ export const meta = {
 // now RESOLVES the bound and refuses that binder form outright. (The spelling itself is paraphrased
 // here on purpose: the acceptance grep for it is repo-wide and would match the comment explaining it.)
 const CAP = 5
+// TOOL-dRetiredFork-6, taken from inCMS's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
+// hand-written ternary with THREE outcomes that conflated TWO of them: `!synth` gave UNVERIFIED,
+// anything non-zero gave PARTIAL, and everything else gave the bare string `complete` — so "nothing
+// moved" and "the probe could not run" were the same sentence, and `complete` is a reassuring word
+// for a run that measured nothing.
+//
+// DERIVED, so a consumer gate can re-derive the expected sentence and byte-compare it. That is the
+// whole mechanical difference: a gate that re-derives CANNOT be satisfied by a hand-written string,
+// and relaxing it to a substring match would make it satisfiable by prose — the first class
+// AGENTS.md section 7 names.
+//
+// THE SENTENCE IS NOW A CONTRACT (ratified F1). Changing it is a version bump like any other, and
+// the drift-audit kit's own README states the three states so a later editor knows the cost.
+function deriveLiveness(c) {
+  // Order matters and is the fail-closed direction: the WORST state is decided first, so a run that
+  // is both dead and partial reports dead.
+  if (!c.synth) return 'dead'
+  if (c.lensesRun === 0) return 'dead'
+  if (c.lensesDead || c.skepticsDead || c.unverified) return 'partial'
+  return 'clean'
+}
+
+function renderLivenessNote(state, c) {
+  if (state === 'dead') {
+    // DEAD PROBE, never a zero. AGENTS.md section 7: a probe that cannot move says so, because a
+    // reassuring zero from a broken signal is indistinguishable from a clean run.
+    return `DEAD PROBE: this run measured NOTHING - ${c.lensesRun} lens(es) ran, ` +
+      `${c.lensesDead} died, synthesis ${c.synth ? 'returned' : 'DIED'}; the note is not a zero ` +
+      `because the signal could not move`
+  }
+  if (state === 'partial') {
+    return `PARTIAL: ${c.lensesDead} lens(es) and ${c.skepticsDead} skeptic batch(es) died, ` +
+      `${c.unverified} finding(s) unverified`
+  }
+  return `CLEAN: ${c.lensesRun} lens(es) ran, none died, ${c.unverified} finding(s) unverified`
+}
+
 async function boundedParallel(thunks, cap = CAP) {
   const out = []
   for (let i = 0; i < thunks.length; i += cap)
@@ -467,11 +504,10 @@ return {
   // was reachable only when nothing else was degraded, which made the most serious note the least
   // reachable one. This unit's own demote-on-conflict rule makes `unverified.length` non-zero more
   // often, so the port had quietly narrowed the path to its own honest message.
-  note: !synth
-    ? `UNVERIFIED: the synthesis agent DIED, so NO report was written (${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) also died, ${unverified.length} finding(s) unverified)`
-    : lensesDead || skepticsDead || unverified.length
-      ? `PARTIAL: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) died, ${unverified.length} finding(s) unverified`
-      : 'complete',
+  note: renderLivenessNote(
+    deriveLiveness({ synth, lensesRun: LENSES.length - lensesDead, lensesDead, skepticsDead, unverified: unverified.length }),
+    { synth, lensesRun: LENSES.length - lensesDead, lensesDead, skepticsDead, unverified: unverified.length },
+  ),
   counts: {
     raw: indexed.length,
     confirmed: confirmed.length,

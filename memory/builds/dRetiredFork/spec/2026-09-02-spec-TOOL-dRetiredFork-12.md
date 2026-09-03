@@ -1,14 +1,17 @@
 # TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
+**Status:** CLOSED · rev-5 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-12-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-12-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-12-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-12-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -52,8 +55,11 @@ blocked `TOOL-aGradedDoorway-2` from finishing `check-playbook.test.sh`. inCMS c
 
 ### Data model
 
-Two tokens only, `KIT_DIR` and `TOOL_ROOT`, matching the pair the memory-tree kit's three rendered
-templates already declare. No new token alphabet.
+ONE token, `KIT_DIR`. `TOOL_ROOT` is NOT declared here and must not be: it is computed only by
+`tools/memory-tree/adopt-memory-tree.sh`, and `tools/unattended/adopt-unattended.sh` never
+computes it, so declaring it would ship an unresolved `{{TOOL_ROOT}}` brace to every adopter.
+This section is the one a builder implements from, which is why the correction had to reach it
+and not only S1. No new token alphabet.
 
 ### Migration
 
@@ -83,7 +89,7 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
   required before landing.
 - testing + left-shift gates — S3's parity arm plus `check-playbook.sh` at two prefixes.
 - migration / rollback — reverting the role is a descriptor edit plus restoring the literals.
-- user docs — `tools/unattended/README.md` names the fixture as rendered and its two tokens.
+- user docs — `tools/unattended/README.md` names the fixture as rendered and its ONE token.
 
 ## 6. Acceptance criteria
 
@@ -127,13 +133,35 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
   `adopt-unattended.sh` substitutes seven tokens, not one — inside the sentence carrying H12's whole
   measurement, though its conclusion about `TOOL_ROOT` survives. 24: §7 named a leg no scope item
   touches and omitted `playbook validity gate`, which grades the fixture this unit retags.
+- rev-4 · 2026-09-02 · `TOOL-dRetiredFork-19` finishes the H12 correction. S1 was fixed to
+  `["KIT_DIR"]` in an earlier fold, but §4 Data model still read "Two tokens only", §10 still
+  asserted the pair, and §5's user-docs row still said "its two tokens" — and §4 is the section a
+  builder implements from, so following this spec still shipped the brace. All three now agree
+  with S1, and the gate that makes the class unbuildable is that unit's.
+
+- rev-5 . 2026-09-03 . BUILT. Two things the spec could not have known, both found by running it.
+  The fixture RECORDS carry the prefix in their FILENAMES as well as their bodies, so rendering the
+  fixture alone left both describing pieces that do not exist and the gate reported them as orphan
+  records; the adopter repaths both halves now, recovering the old prefix from each record's own
+  name. And a TEMPLATE is not a playbook: the gate excluded `PLAYBOOK-TEMPLATE.*` by name, so the
+  moment a second template existed it scanned it, found `{{KIT_DIR}}` in a leg target and redded
+  check 6 in GOV'S OWN TREE. The exclusion is widened to any `*.template.md`. AC1 is met with one
+  stated difference: the rendered file gains the `gov:kit unattended@` marker that
+  `check-kit-versions.sh` requires of every shipped file and that this file did not carry at
+  b0108f13; discounting that line it is byte-identical. AC4 is met structurally rather than by luck
+  -- the carried arm grades the SOURCE paths the descriptors resolve, and the source is now the
+  tokenised template. A fourth instrument error was corrected mid-unit: piping a gate through `tail`
+  and reading `$?` reports tail's status, and it read rc=0 over a gate that was exiting 1.
 
 ## 10. Reuse audit
 
 The seam is the memory-tree kit's three `role = "rendered"` rules in `tools/memory-tree/kit.toml`,
-which already declare the exact `["KIT_DIR", "TOOL_ROOT"]` placeholder pair this unit adopts —
-`reuse_lookup.py` reports `render-doc` and the rendered-template family as the corpus's existing
-answer, so this extends a live pattern rather than inventing a channel.
+cited as a SHAPE precedent and not as a token list: they declare `["KIT_DIR", "TOOL_ROOT"]`
+because their own adopter computes both, while this kit's adopter substitutes a NARROWER set and
+this unit therefore declares `["KIT_DIR"]` alone. `reuse_lookup.py` reports `render-doc` and the
+rendered-template family as the corpus's existing answer, so this extends a live pattern rather
+than inventing a channel. `TOOL-dRetiredFork-19` gates the declared-subset-of-substituted join
+that makes a mismatch unbuildable.
 
 Recall terms used: `playbook.fixture`, `rendered`, `engine`, `placeholder`, `KIT_DIR`, `TOOL_ROOT`,
 `prefix`, `check-playbook`, `adopter`, `receipt`, `role`, `carried`.

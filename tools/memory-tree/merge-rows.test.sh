@@ -27,6 +27,10 @@
 # half of the oracle is proved live in case 0d before anything leans on it.
 #
 #   bash tools/memory-tree/merge-rows.test.sh
+KIT_REL="${KIT_REL:-tools}"
+# EXPORTED, because four python blocks below read it from the environment rather than by
+# interpolation — see the comment at the first of them.
+export KIT_REL
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SELF="$HERE/$(basename "$0")"
@@ -43,7 +47,7 @@ trap cleanup EXIT
 . "$ROOT/tools/lib/resolve-python.sh"
 PY=$(resolve_python) || { echo "FAIL no usable python on this host — every arm below is unrunnable"; exit 2; }
 
-DRV="bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py"
+DRV="bash $KIT_REL/lib/pyrun.sh $KIT_REL/memory-tree/merge-rows.py"
 bad() { echo "FAIL $1"; st=1; }
 
 # THE ORACLE — a family-agnostic id shape, deliberately NOT the driver's grammar. Keying the
@@ -203,7 +207,7 @@ printf -- '- a row\r\n' > "$TMP/bagcrlf"; printf -- '- a row\n' > "$TMP/baglf"
 
 # --- 0a. the driver PARSES under the interpreter the shim actually resolves -----------------------
 "$PY" -c 'import py_compile,sys; py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)' \
-      tools/memory-tree/merge-rows.py "$TMP/mr.pyc" >/dev/null 2>&1 \
+      $KIT_REL/memory-tree/merge-rows.py "$TMP/mr.pyc" >/dev/null 2>&1 \
   || bad "merge-rows.py does not compile under the resolved interpreter ($PY)"
 
 # ...and the version-INDEPENDENT half of the same concern, which py_compile on a modern node cannot
@@ -213,7 +217,7 @@ printf -- '- a row\r\n' > "$TMP/bagcrlf"; printf -- '- a row\n' > "$TMP/baglf"
 # leaves OURS-only content with no markers. Upstream's arm needed `uv python find 3.11` and SKIPPED
 # where uv was absent; this repo depends on uv nowhere, so a skippable arm would be a silent hole.
 FSTR='f"[^"]*\{[^}"]*"'
-nested=$(awk '!/^[[:space:]]*#/' tools/memory-tree/merge-rows.py | grep -nE "$FSTR" || true)
+nested=$(awk '!/^[[:space:]]*#/' $KIT_REL/memory-tree/merge-rows.py | grep -nE "$FSTR" || true)
 [ -z "$nested" ] || { echo "FAIL merge-rows.py carries a nested same-quote f-string (PEP 701, 3.12+):"; printf '%s\n' "$nested" | sed 's/^/    /'; st=1; }
 # ...the ban FIRES on the shape it bans, or "clean" means "the predicate is broken".
 printf 'v = f"{"X" if c else "y"}"\n' > "$TMP/pep701.py"
@@ -255,13 +259,13 @@ printf '%s\n' "$out" | grep -qF "GOV_PYTHON is set to '$C/python3' and did not r
 copies=$(git grep -l '^# >>> resolve_python' -- '*.sh' || true)
 [ -n "$copies" ] || bad "no inline resolver copy found — the marker-population assertion below is vacuous"
 printf '%s\n' "$copies" | grep -qx 'tools/lib/pyrun.sh' \
-  && bad "tools/lib/pyrun.sh carries the resolver marker block; it SOURCES the resolver instead"
+  && bad "$KIT_REL/lib/pyrun.sh carries the resolver marker block; it SOURCES the resolver instead"
 # ...and the COMPLEMENT, which is the half that matters to an adopter. The kit-internal launcher
 # ships inside the kit, where `../lib/` does not exist, so it MUST carry the inline block — and being
 # in the marker population is what puts it under the byte-identical parity gate. Asserting only the
 # exclusion above would pass on a kit that ships no launcher at all.
 printf '%s\n' "$copies" | grep -qx 'tools/memory-tree/merge-rows.sh' \
-  || bad "tools/memory-tree/merge-rows.sh does not carry the inline resolver block; a copy-installed kit cannot source ../lib/ and the driver would never start"
+  || bad "$KIT_REL/memory-tree/merge-rows.sh does not carry the inline resolver block; a copy-installed kit cannot source ../lib/ and the driver would never start"
 
 # --- 0c. FAIL CLOSED: every deferred-resolution failure becomes a conflict, never a take-ours ------
 # The driver reads its anchor grammar from the worktree at merge time. At module scope that import
@@ -270,7 +274,7 @@ printf '%s\n' "$copies" | grep -qx 'tools/memory-tree/merge-rows.sh' \
 # failures land in main()'s fail-closed handler. Simulated on scratch trees rather than by breaking
 # the real kit under a concurrently-running gate. This is corpus case C18, the worst class in it, and
 # the redesign does not touch the property — so it is re-proven here rather than assumed (AC17).
-failclosed() {  # $1 label · $2 scratch tree holding tools/memory-tree/merge-rows.py
+failclosed() {  # $1 label · $2 scratch tree holding $KIT_REL/memory-tree/merge-rows.py
   { pre; row TOOL-zFixture-1 base; } > "$TMP/o"
   { pre; row TOOL-zFixture-1 base; } > "$TMP/a"
   { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 INCOMING; } > "$TMP/b"
@@ -282,7 +286,7 @@ failclosed() {  # $1 label · $2 scratch tree holding tools/memory-tree/merge-ro
 }
 mkscratch() { local d; d=$(mktemp -d); SCRATCH="$SCRATCH $d"
   mkdir -p "$d/tools/memory-tree" "$d/tools/memory-recall"
-  cp tools/memory-tree/merge-rows.py "$d/tools/memory-tree/"
+  cp $KIT_REL/memory-tree/merge-rows.py "$d/tools/memory-tree/"
   printf '%s' "$d"; }
 S=$(mkscratch); cp .memory-tree.conf "$S/"
 printf 'this is not valid syntax(\n' > "$S/tools/memory-recall/extract.py"
@@ -290,7 +294,7 @@ failclosed "broken grammar" "$S"
 S=$(mkscratch); cp .memory-tree.conf "$S/"          # kit dir present, extract.py absent
 failclosed "missing grammar module" "$S"
 S=$(mkscratch)                                       # no .memory-tree.conf above the driver
-cp tools/memory-recall/extract.py tools/memory-recall/recall_conf.py "$S/tools/memory-recall/"
+cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$S/tools/memory-recall/"
 failclosed "missing .memory-tree.conf" "$S"
 
 # --- 0d. the oracle sees a row the driver's grammar does NOT, and `dups` fires ---------------------
@@ -323,7 +327,15 @@ keys() {  # $1=line -> 0 if the DRIVER keys it, 1 if not
   "$PY" - "$1" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True   # a test that leaves __pycache__ in tools/ dirties the tree it gates
-spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mr)
 sys.exit(0 if mr.key(sys.argv[1] + "\n") is not None else 1)
@@ -575,9 +587,9 @@ audit "a structure conflict at rc 1" 1 0 0 1
 E=$(mktemp -d); SCRATCH="$SCRATCH $E"
 mkdir -p "$E/tools/memory-tree" "$E/tools/memory-recall" "$E/tools/lib" "$E/memory/backlog"
 cp .memory-tree.conf "$E/"
-cp tools/memory-tree/merge-rows.py "$E/tools/memory-tree/"
-cp tools/memory-recall/extract.py tools/memory-recall/recall_conf.py "$E/tools/memory-recall/"
-cp tools/lib/pyrun.sh tools/lib/resolve-python.sh "$E/tools/lib/"
+cp $KIT_REL/memory-tree/merge-rows.py "$E/tools/memory-tree/"
+cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$E/tools/memory-recall/"
+cp $KIT_REL/lib/pyrun.sh $KIT_REL/lib/resolve-python.sh "$E/tools/lib/"
 (
   cd "$E" || exit 2
   git init -q -b main
@@ -892,7 +904,15 @@ printf '%s\n' "$BARE" > "$TMP/bare"
 "$PY" - "$BARE" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 a, b = mr._row_key(sys.argv[1] + "\n"), mr._row_key(sys.argv[1])
 sys.exit(0 if a == b and a.startswith("raw:") else 1)
@@ -1147,7 +1167,15 @@ run "a delete/modify row inside a heading rename" 1 "TOOL-zFixture-1 TOOL-zFixtu
 "$PY" - "$TMP/a" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 lines = mr.read(sys.argv[1])
 leaked = [ln for ln in mr.settled(lines) if ln.lstrip().startswith(("<<<<<<<", "=======", ">>>>>>>"))]
@@ -1210,7 +1238,15 @@ done
 cat > "$TMP/sabotage.py" <<'PYEOF'
 import importlib.util, sys
 sys.dont_write_bytecode = True
-spec = importlib.util.spec_from_file_location("mr", "tools/memory-tree/merge-rows.py")
+# $KIT_REL DOES NOT EXPAND HERE. Every one of these blocks is a `<<'PYEOF'` heredoc, which
+# is QUOTED, so the shell passes the four bytes `$KIT_REL` through to python verbatim and
+# `spec_from_file_location` is handed a path that cannot exist. The module then never loads
+# and all seventeen keying arms fail for a reason that has nothing to do with keying.
+# TOOL-dRetiredFork-17's closing bar caught it; the sweep that introduced it tracked
+# single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
+import os
+_kit = os.environ.get("KIT_REL", "tools")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 _real = mr.reconcile
 

@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.15   # gov:kit unattended@1.15 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.17   # gov:kit unattended@1.17 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -2042,13 +2042,41 @@ done
 # ---- The generator CREATES a missing pair on --write, so the repair is one render and the refusal
 # ---- names it: the SCRIPT and its mode, never a launcher, because this repo cannot assume a bare
 # ---- `python` exists and the driver's own resolver ban refuses one in source.
+# BATCHED: two greps over the whole population, not two per file. Absorbed from inCMS, which
+# measured 132.2 s -> 2.795 s on its own corpus with the verdict asserted IDENTICAL. The verdict is
+# what matters and the equality is fixtured, because a speed-up that changes a verdict is not an
+# optimisation.
+#
+# `/dev/null` IS LOAD-BEARING. `grep -c` omits the filename when handed ONE file and prefixes it when
+# handed several, so a corpus that happens to hold a single build README would silently change the
+# output shape and this parse would read nothing — passing by finding no rows. The extra argument
+# forces the prefix in both cases, and /dev/null contributes a `0` row that names a path no build
+# ever has.
 bad_units=""
-for bmd in $(GIT ls-files "$M/builds/*/README.md" 2>/dev/null); do
-  no=$(grep -cxF -- '<!-- gen:build-units -->' "$bmd" 2>/dev/null || true)
-  nc=$(grep -cxF -- '<!-- /gen:build-units -->' "$bmd" 2>/dev/null || true)
-  [ "${no:-0}" = 1 ] && [ "${nc:-0}" = 1 ] && continue
-  bad_units="$bad_units $bmd"
-done
+_c21_files=$(GIT ls-files "$M/builds/*/README.md" 2>/dev/null)
+if [ -n "$_c21_files" ]; then
+  # TWO greps and ONE awk for the whole population — THREE processes, not 2N.
+  #
+  # THE FIRST CUT OF THIS WAS NOT AN OPTIMISATION AND THE MEASUREMENT SAID SO. It batched the greps
+  # and then parsed their output with a `sed` PER FILE, trading 176 greps for 2 greps plus 176 seds:
+  # measured over 88 build READMEs, 109 ms became 116 ms. Process creation is the cost on this node,
+  # so the join has to happen in ONE pass or the batching buys nothing.
+  #
+  # `/dev/null` IS LOAD-BEARING. `grep -c` omits the filename when handed ONE file and prefixes it
+  # when handed several, so a corpus holding a single build README would silently change the output
+  # shape and this parse would read nothing — passing by finding no rows. The extra argument forces
+  # the prefix in both cases and contributes a `0` row for a path no build ever has.
+  bad_units=$(grep -cxF -- '<!-- gen:build-units -->' /dev/null $_c21_files 2>/dev/null \
+    | awk -F: -v closes="$(grep -cxF -- '<!-- /gen:build-units -->' /dev/null $_c21_files 2>/dev/null)" '
+        BEGIN { n = split(closes, L, "\n")
+                for (i = 1; i <= n; i++) { p = L[i]; sub(/:[0-9]*$/, "", p)
+                                           c = L[i]; sub(/^.*:/, "", c); CL[p] = c } }
+        $0 !~ /^\/dev\/null:/ {
+          path = $0; sub(/:[0-9]*$/, "", path)
+          open = $0; sub(/^.*:/, "", open)
+          if (open != 1 || CL[path] != 1) printf " %s", path
+        }')
+fi
 if [ -n "$bad_units" ]; then
   fail 21 "a tracked build README does not carry exactly one well-formed generated-units marker pair, so the driver cannot read its unit list and no run against it can close; repair with the --write mode of tools/memory-tree/gen_build_index.py:$bad_units"
 fi

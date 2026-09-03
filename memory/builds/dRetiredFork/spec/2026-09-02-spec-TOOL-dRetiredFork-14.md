@@ -1,14 +1,17 @@
 # TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 4 · ratified 2026-09-02
+**Status:** CLOSED · rev-4 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 4 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-14-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-14-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-14-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-14-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -156,6 +159,29 @@ and it costs 2211 lines plus a doubled edit surface to buy a property that one c
   now names every parity arm and §7 names that leg. Findings 25 and 26: §7 carried
   `check-wiring self-test` twice from the leg rename and named no leg for the central change.
   30a: `HOOK_MARKER` is at `:49`, not `:53`. 30b: S1b's either/or is promoted to F0.
+
+- rev-4 . 2026-09-03 . BUILT. The spec treats three hooks as one class and they are three:
+  `recall-opened.js` resolves to ONE destination under a `forked` rule, so the `.claude/hooks/` copy
+  gov tracked and wired was produced by NO descriptor and could not be removed by dropping one.
+
+  `.claude/hooks/` had a property this design gives up and nobody had written down: it is the same
+  path in every repository, so a hook_path naming it needed no resolution anywhere. The fragments
+  now declare `{kit}/...` and BOTH consumers expand it against THE FRAGMENT'S OWN LOCATION rather
+  than their own -- `check-wiring.sh` is run by its self-test against foreign trees, and
+  `settings-merge.py` is handed fragments from other kits, so resolving against self was wrong in
+  both, live, and found by running the suites.
+
+  check-wiring's agent-cap arm keyed adoption on the withdrawn file and printed `skip - not adopted`
+  about the repo's most important guard the moment the duplicate went. Its own comment gave the
+  reason -- the hook path "is not declared anywhere this script can read" -- which expired when
+  hook_path moved into the fragment. The arm now probes, and asserts the wired command NAMES the
+  shipped copy; staged and observed red. The first cut of that check wrote its failure into `st`
+  where this script counts `unwired`, which would have printed UNWIRED and gated nothing.
+
+  AC3 is MET on the single-copy half and PARTIAL on the zero half: the suite refuses at rc=1, but it
+  refuses because every other arm loses its subject too, so the parity arm's own zero branch is
+  verified by reading rather than execution. The install-prefix waiver registry is line-keyed and
+  shifted three times during this unit; re-keyed by content each time, count unchanged.
 
 ## 10. Reuse audit
 

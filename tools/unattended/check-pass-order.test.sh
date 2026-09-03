@@ -6,6 +6,12 @@
 # The two arms that matter are a matched pair: the same build, once with the spec commit BEFORE the
 # build commit and once after. An arm for the refusal alone would not distinguish a leg that reds
 # correctly from one that reds on everything.
+# NO KIT_REL SWEEP IN THIS FILE, DELIBERATELY. Every path below is INSIDE the fixture tree this
+# suite builds with `mkdir -p tools/unattended`, so `tools/` here is the FIXTURE's own layout
+# and not gov's install prefix -- a fixture value, not a path to derive. Sweeping it broke 14
+# of 19 arms: the `.unattended.conf` heredoc is `<<'CONF'`, which is QUOTED, so the config got
+# the four literal bytes `$KIT_REL` and the generated-index claim pointed at nothing. This
+# suite is not on the bar, so nothing would have reported it.
 set -u
 st=0; n=0
 SCRIPT="$(cd "$(dirname "$0")" && pwd)/check-pass-order.sh"

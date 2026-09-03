@@ -15,6 +15,7 @@
 
 ## TOOL — tooling
 
+- TOOL-dRetiredFork-4 · inCMS's D1 is nested template INTERPOLATION, not a nested agent loop; two spec revisions argued a fixture the adopter never claimed. At HEAD the view still corrupts, the fail-open does not. Disposition (b); latent scalar is `TOOL-dRetiredFork-24`
 - TOOL-aWarmedTether-2 · the bar runs INSIDE the push, so the connection idles its whole duration and the server closes it; the push dies AFTER a green gate and the refusal names auth, not a timeout. `push-main.sh` defaults SSH keepalives; HTTPS here cannot exercise it. Measured on an adopter
 - TOOL-aWarmedTether-1 · three arms in `check-unattended.test.sh` graded nothing, found by an adopter running the suite we ship: WRITE_RE omits `_` so our own `_pv_rm` reds the no-write arm; check 30's liveness arm breaks only tRun though tPlanOk grades (0 hits vs 1); branch 2 shipped unarmed
 
@@ -123,3 +124,4 @@
 - TOOL-dBriefedPass-1 · the M2 classifier grades a spec by heading TITLE, not ordinal. A Tier-1 spec renumbers, so the ordinal reader graded its GATES as acceptance and a spec stating none graded READY. 401 specs, 4 regraded, all Tier-1, zero Tier-2
 - TOOL-dBriefedPass-3 · pass ORDER is enforced TWICE because one half is bypassable: `--dispatch` at the moment of the act, and a history leg over the commit graph anchored on the build commit's FIRST PARENT, which admits authoring a spec and refuses authoring it after
 - TOOL-dBriefedPass-4 · a Workflow harness buys pass ORDER and never ENFORCEMENT — no filesystem, so every observation is its own agent's claim. Two of its shapes are forced by `agent-cap.js` denying `agent()` in any loop, which is parked for the owner
+- DEPL-dRetiredFork-10 · the `forked` role is declared in OPPOSITE directions by gov and inCMS, and inCMS's own two registers disagree with EACH OTHER on 30 paths. RECORDED, not resolved: gov owns none of those rows → builds/dRetiredFork/

@@ -49,10 +49,47 @@ def claims(**over):
     return {k: () for k in IDS} | over
 
 
+class Skipped(Exception):
+    """An arm whose GUARD is unmet. TOOL-dRetiredFork-5, from inCMS's ABL-aFerriedToolkit-4.
+
+    It is an exception and not a `return` because `check` cannot tell a return from a pass: the
+    guarded arms printed an honest `NOT a pass.` and returned, and the next line stamped them `ok`.
+    A skip that looks like a pass is indistinguishable from coverage, which is the class AGENTS.md
+    section 7 names — and it was living inside this kit's own proof.
+    """
+
+
+#: How many guarded arms exist, and how many skipped this run. The refusal below is keyed on the
+#: GUARDED pair and never on "every arm": 24 of the 26 are unconditional, so an all-skipped
+#: predicate is unreachable and would be dead code the moment it landed — the could-not-fail shape
+#: this unit exists to close.
+SKIPPED: list = []
+#: Every arm `check` ran, skipped ones included. DERIVED here rather than counted by hand in
+#: main(), because a hand-kept total is one more thing that can disagree with the arms.
+EXECUTED: list = []
+#: The arms that CAN skip, recorded by the registration that runs them rather than by a list of
+#: their names. The first cut of this hard-coded the two names, got one of them wrong, and the
+#: refusal below never fired while reporting `1 of 2 guarded` — a predicate that did not match
+#: its own population, which is the exact class this unit exists to close. Measured by unsetting
+#: both guards: 2 skipped, refusal silent, exit 0.
+GUARDED: list = []
+
+
+def check_guarded(name, fn):
+    """`check` for an arm with a guard: registers it so the vacuity refusal has a population."""
+    GUARDED.append(name)
+    return check(name, fn)
+
+
 def check(name, fn):
+    EXECUTED.append(name)
     try:
         fn()
         print(f"ok   {name}")
+        return 0
+    except Skipped as exc:
+        SKIPPED.append(name)
+        print(f"skipped {name}: {exc}")
         return 0
     except AssertionError as exc:
         print(f"FAIL {name}: {exc}")
@@ -1182,17 +1219,19 @@ def test_identifier_tokens_corpus_recall():
     # CPython tree scores 0.858 precision against the 0.95 floor, so a git-ness guard turns this arm
     # into a spurious RED in any adopter that vendors the kit inside its own repo.
     if not (root / "coding-governance-agents.template.md").is_file():
-        print("     SKIP corpus recall: not the coding-governance repo, and these floors are "
-              "calibrated to its corpus. NOT a pass.")
-        return
+        raise Skipped("not the coding-governance repo, and these floors are calibrated to its "
+                      "corpus")
     try:
         listing = subprocess.run(
+            # `encoding=` EXPLICITLY (TOOL-dRetiredFork-5, from inCMS's
+            # KIT_CODEBASE_MAP_SELFTEST_DELTA). `text=True` alone decodes with the locale codec, so
+            # a repo path carrying a non-ASCII byte raises UnicodeDecodeError on a Windows console
+            # codepage and the arm dies for a reason that has nothing to do with what it measures.
             ["git", "-C", str(root), "ls-files", "*.py"],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, encoding="utf-8",
         ).stdout.split("\n")
     except (OSError, subprocess.CalledProcessError):
-        print("     SKIP corpus recall: not a git checkout, so there is no corpus to measure. NOT a pass.")
-        return
+        raise Skipped("not a git checkout, so there is no corpus to measure")
 
     truth_total = hit = kept = 0
     for rel in listing:
@@ -1215,8 +1254,7 @@ def test_identifier_tokens_corpus_recall():
         kept += len(got)
 
     if truth_total < 1000:
-        print(f"     SKIP corpus recall: only {truth_total} ground-truth identifiers found. NOT a pass.")
-        return
+        raise Skipped(f"only {truth_total} ground-truth identifiers found")
     recall = hit / truth_total
     precision = hit / kept if kept else 0.0
     assert recall >= 0.99, f"corpus recall {recall:.3f} below the 0.99 floor"
@@ -1242,9 +1280,8 @@ def test_js_probe_against_the_lexicon():
     """
     kit = m.repo_root() / "tools" / "lexicon"
     if not (kit / "lexicon.py").is_file():
-        print("     SKIP js-probe cross-check: tools/lexicon/ is not installed here, so the "
-              "independent definition set this arm compares against does not exist. NOT a pass.")
-        return
+        raise Skipped("tools/lexicon/ is not installed here, so the independent definition set "
+                      "this arm compares against does not exist")
     sys.path.insert(0, str(kit))
     try:
         import lexicon as lx
@@ -1279,8 +1316,7 @@ def test_js_probe_against_the_lexicon():
     conf = lxc.load_conf(root / ".lexicon.conf")
     langs = {ext: (pset, mode) for ext, pset, mode in lxc.langs(conf) if mode != "dark"}
     if "js" not in langs:
-        print("     SKIP js-probe cross-check: .lexicon.conf declares no live `js` language.")
-        return
+        raise Skipped(".lexicon.conf declares no live `js` language")
     pset, mode = langs["js"]
     theirs = set()
     for f in lx.tracked_files(root):
@@ -1331,7 +1367,7 @@ def main() -> int:
             "printed remedies name real paths; the remedy runs (TOOL-aRootedPrefix-2)",
             lambda: test_remedy_paths_are_real(Path(td)),
         )
-    failures += check("js definition probe ⊇ the lexicon's own set (TOOL-dClosedLexicon-12)",
+    failures += check_guarded("js definition probe ⊇ the lexicon's own set (TOOL-dClosedLexicon-12)",
                       test_js_probe_against_the_lexicon)
     failures += check("coverage both directions + ratchet guards", test_coverage_directions)
     failures += check("dossier contract fails loud", test_parse_contract)
@@ -1371,7 +1407,19 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
-    failures += check("identifier tokens: corpus recall + precision floors", test_identifier_tokens_corpus_recall)
+    failures += check_guarded("identifier tokens: corpus recall + precision floors", test_identifier_tokens_corpus_recall)
+    # S2 — EXECUTED and SKIPPED reported separately, always. A single number cannot say which of
+    # the two it is, and the whole defect this unit closes was a report that could not tell them
+    # apart.
+    skipped_guarded = [n for n in GUARDED if n in SKIPPED]
+    print(f"codebase-map selftest: {len(EXECUTED) - len(SKIPPED)} executed, {len(SKIPPED)} skipped "
+          f"({len(skipped_guarded)} of {len(GUARDED)} guarded)")
+    if GUARDED and len(skipped_guarded) == len(GUARDED):
+        # BOTH guarded arms skipped: the suite measured none of the corpus-calibrated claims and a
+        # green line here would be exactly the vacuity this unit removed one level down.
+        print("codebase-map selftest: REFUSED — every GUARDED arm skipped, so nothing "
+              "corpus-calibrated was measured and a pass would report coverage that does not exist")
+        return 1
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 

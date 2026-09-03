@@ -1,14 +1,17 @@
 # DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
+**Status:** CLOSED · rev-5 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-DEPL-dRetiredFork-1-1-acceptance-ledger.md](../build/2026-09-03-build-DEPL-dRetiredFork-1-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-DEPL-dRetiredFork-1-1-build-brief.md](../prompts/2026-09-03-prompt-DEPL-dRetiredFork-1-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -49,6 +52,11 @@ under it cannot prove the rung that would have reconciled them.
   `adopt --re-adopt --write` and `--allow-ungraded` as the only escapes. Measured today: 32 rows at
   NicoCares, 30 at inCMS. The build's done-condition requires that stamp, so this unit either moves
   the count or states that it cannot.
+- **S7** — MOVE it: drive the NicoCares `evidence: "unattributed"` population to ZERO, which is the
+  branch S6 names and `DEPL-dRetiredFork-9` ratified. S6 only MEASURES; without this item AC6 would
+  be an acceptance criterion with no scope behind it, which is the shape this build keeps finding.
+  The 32 rows measured today are the before-count. inCMS is out of scope here and its half of the
+  done-condition stays deferred.
 ## 3. Non-goals (OUT)
 
 - **The residual-byte problem.** Whole-file equality decides a rung — one residual byte and it does
@@ -112,10 +120,13 @@ because a kit ships a rendered SKILL.md beside its engine files.
 - **AC4** — A read-only `update` against `C:/projects/nicocares/main` reports a `relocate` count
   strictly greater than zero, and that number is recorded in the acceptance ledger.
 - **AC5** — `python tools/govkit/selftest.py` passes with its arm count increased by S5's three.
-- **AC6** — The `unattributed` row count at each adopter after this unit is STRICTLY BELOW its
-  recorded before-count, or the acceptance ledger states that it cannot fall and why — naming the
-  residual-byte cause from §3 — so the `gov_commit` gap is recorded rather than discovered at the
-  build's acceptance.
+- **AC6** — The `evidence: "unattributed"` row count at NicoCares after this unit is ZERO, with
+  the before-count recorded beside it per S6.
+  At NicoCares the done-condition depends on NO escape: `DEPL-dRetiredFork-1` S7 drives the
+  `evidence: "unattributed"` count to ZERO, so `tools/govkit/govkit.py:6566-6573` does not withhold
+  the `gov_commit` re-stamp and the pinned argv carries neither `--allow-ungraded` nor a preceding
+  `govkit adopt --re-adopt --write`. inCMS's half is DEFERRED, and when it is attempted it is
+  attempted with `--allow-ungraded`, which is a stated weakening and not a quiet one.
 - **AC7** — When a receipt row yields an empty or single-character needle fragment, the run
   REFUSES naming the row, observed via `python tools/govkit/govkit.py update --target <fixture>`,
   and the RED is staged before the grading is wired.
@@ -148,6 +159,33 @@ because a kit ships a rendered SKILL.md beside its engine files.
 - rev-3 · 2026-09-02 · folded spec-audit round 2, finding 22. §5's security row stated a grading obligation
   on the needle map that no scope item built and no criterion observed — on the path where a
   wrong needle writes gov's bytes over a target's real edit. S3b builds it; AC7 observes it.
+- rev-4 · 2026-09-02 · `DEPL-dRetiredFork-9` resolves the done-condition fork against this spec:
+  AC6 now requires ZERO at NicoCares rather than merely below-before, and S7 adds the scope item
+  that drives it — the branch S6 already named. The AC6 sentence is shared verbatim with
+  `DEPL-dRetiredFork-3` AC10.
+
+- rev-5 . 2026-09-03 . BUILT, and F1 is answered with the awkward answer its own liveness note
+  anticipated. The rung proof read the GLOBAL needle map, so a fanned gov directory -- dropped from
+  that map by design -- left every row under it at rung=None. It now reads `resolve_row_needles`,
+  which has existed since DEPL-dGaugedVintage-11 and was applied on the rewrite paths but not on the
+  proof. Isolated on a fixture: global map gives None, the row overlay gives `relocate`, and ONE
+  residual byte gives None again.
+
+  AC4 is NOT MET -- still zero relocate rungs at NicoCares -- because every row there carries a
+  carve-out comment, which is the residual-byte problem section 3 puts out of scope and hands to
+  DEPL-dRetiredFork-7. The mechanism works; the adopter's rows are not eligible for it. That is the
+  ordering evidence F1 asked for rather than an assertion about it.
+
+  AC6 is NOT MET AND NOT ATTEMPTED. S7 requires a write against a repository gov does not own, with
+  no owner present; PARKED on three independent grounds -- section 9's default-OFF rule for
+  autonomous irreversible action, this build's own repeated boundary that gov owns none of an
+  adopter's tree, and the authorization itself, which covers landing this build in gov and nothing
+  else. Before-counts are on the record: 32 unattributed rows at NicoCares, 30 at inCMS.
+
+  TWO OVER-REACHES OF MINE, both caught by arms belonging to other units. S3b first refused any
+  needle under two characters, which broke 16 arms because gov's fixtures use single-letter
+  directories; it now refuses emptiness and the residual is STATED. S3 first refused any empty map,
+  which is legitimate for a receipt of root-level rows; it now asks whether the lift had subjects.
 
 ## 10. Reuse audit
 

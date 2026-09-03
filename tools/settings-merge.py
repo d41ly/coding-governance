@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.1
+# gov:kit settings-merge@1.2
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 tools/hooks/agent-cap.js verbatim):
@@ -34,8 +34,10 @@ Exit: 0 wired (already present OR merged this run) · 1 --check found drift · 2
 # ponytail: the fragment carries only what the three former hardcodes needed — event, matcher,
 # marker, hook_path (+ a name for the messages). Everything else about the entry (type: command,
 # the ${CLAUDE_PROJECT_DIR} spelling) stays fixed, because no consumer has asked to vary it. Dedup
-# is a substring test on the marker and deliberately does NOT rewrite a stale hook path (a Phase-3
-# upgrade concern, not Phase-0 wiring).
+# is a substring test on the marker, and since TOOL-dRetiredFork-14 a command whose marker matches
+# but whose PATH differs is REPATHED in place rather than left alone. That sentence used to promise
+# the opposite, and the promise was load-bearing in the wrong direction: it meant every already-wired
+# tree ignored --hook-path entirely, so moving a hook's shipped location silently unwired it.
 """
 from __future__ import annotations
 
@@ -45,8 +47,27 @@ import sys
 import tempfile
 from pathlib import Path
 
-KIT_SETTINGS_MERGE_VERSION = "1.1"  # gov:kit settings-merge@1.1 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.2"  # gov:kit settings-merge@1.2 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
+
+
+def _kit_rel() -> str:
+    """Where this kit sits, relative to the target repo root — DERIVED, never spelled.
+
+    `.claude/hooks/` used to be the wired location and it had one property nobody wrote down: it is
+    the SAME PATH IN EVERY REPO, so a hook_path naming it was correct for every adopter without
+    anyone resolving anything. Moving the wired copy under the kit directory gives that property up,
+    and a constant naming gov's own prefix would be wrong in every tree that installs elsewhere.
+
+    This script's docstring already fixes cwd as the target repo root, so the kit's own directory
+    relative to cwd IS the prefix. The fallback is the kit-root NAME alone, which is a default and
+    not a path — a repo that somehow runs this from outside its own tree gets the conventional
+    answer rather than an absolute path baked into a settings file.
+    """
+    try:
+        return Path(__file__).resolve().parent.relative_to(Path.cwd().resolve()).as_posix()
+    except (ValueError, OSError):
+        return "tools"
 
 # The built-in fragment. Identical to the three values this script hardcoded before --fragment
 # existed, so a no-argument run is unchanged in behaviour AND in what it prints.
@@ -59,7 +80,7 @@ AGENT_CAP = {
     # the merge below finds the existing group by this exact matcher value.
     "matcher": "Workflow|Agent",
     "marker": HOOK_MARKER,
-    "hook_path": ".claude/hooks/agent-cap.js",
+    "hook_path": _kit_rel() + "/hooks/agent-cap.js",
 }
 _FRAGMENT_KEYS = tuple(AGENT_CAP)
 
@@ -88,8 +109,35 @@ def _command(hook_path: str) -> str:
     return f'node "${{CLAUDE_PROJECT_DIR}}/{hook_path}"'
 
 
-def merge(obj: dict, hook_path: str, frag: dict = AGENT_CAP) -> dict:
+def resolve_hook_path(hook_path: str, frag_file: str | None = None) -> str:
+    """Expand a `{kit}`-relative hook_path against this kit's own location.
+
+    A fragment is DATA shipped verbatim, so it cannot name gov's prefix and stay correct for an
+    adopter who installs elsewhere. `.claude/hooks/` used to hide that problem by being the same
+    path in every repo; naming the kit directory gives that up, so the fragment names the kit
+    SYMBOLICALLY and this resolves it. A path with no placeholder is returned untouched, so an
+    explicit --hook-path and every older fragment keep working exactly as before.
+    """
+    # RESOLVED AGAINST THE FRAGMENT'S OWN LOCATION when one was supplied, and only otherwise
+    # against this script's. The two differ whenever a repo installs its kits at more than one
+    # prefix -- and the checker's own fixtures do exactly that -- so deriving from settings-merge's
+    # directory would write a command naming a kit root the hook does not live under. A fragment
+    # sits at <kit>/<dir>/x.fragment.json, so two parents up is its kit prefix, empty at the root.
+    if frag_file:
+        pfx = Path(frag_file).resolve().parent.parent
+        try:
+            rel = pfx.relative_to(Path.cwd().resolve()).as_posix()
+        except (ValueError, OSError):
+            rel = _kit_rel()
+        if rel == ".":
+            rel = ""
+        return hook_path.replace("{kit}/", (rel + "/") if rel else "")
+    return hook_path.replace("{kit}", _kit_rel())
+
+
+def merge(obj: dict, hook_path: str, frag: dict = AGENT_CAP, frag_file: str | None = None) -> dict:
     """Ensure the fragment's hook is present in obj (mutates + returns obj)."""
+    hook_path = resolve_hook_path(hook_path, frag_file)
     event, matcher, marker = frag["event"], frag["matcher"], frag["marker"]
     hooks = obj.setdefault("hooks", {})
     if not isinstance(hooks, dict):
@@ -105,8 +153,22 @@ def merge(obj: dict, hook_path: str, frag: dict = AGENT_CAP) -> dict:
     inner = group.setdefault("hooks", [])
     if not isinstance(inner, list):
         raise ValueError(f"settings {matcher} group 'hooks' is not an array")
-    if any(isinstance(h, dict) and marker in str(h.get("command", "")) for h in inner):
-        return obj  # already wired — no change
+    # THE MARKER SAYS "this is our hook"; THE PATH SAYS "and it points at the right copy". Those are
+    # two questions and this used to ask only the first, so an already-wired tree was a no-op even
+    # when its command named a path the kit no longer ships. That is not a cosmetic gap: it is how a
+    # tree keeps a command pointing at a withdrawn file and loses the hook silently.
+    #
+    # The compare is FRAGMENT-LEVEL, per TOOL-dRetiredFork-14 F0: the fragment supplies hook_path, so
+    # a fragment gov owns repaths on the same run as the built-in default, and an adopter who cannot
+    # edit that fragment without forking gets the fix for free. The rejected alternative was a
+    # `--rewrite-stale-path` flag, which puts the decision on whoever remembers to pass it.
+    want = entry["command"]
+    for h in inner:
+        if not isinstance(h, dict) or marker not in str(h.get("command", "")):
+            continue
+        if str(h.get("command", "")) != want:
+            h["command"] = want   # REPATH in place: same hook, right copy
+        return obj                # found either way -- never append a second entry
     inner.append(entry)
     return obj
 
@@ -127,13 +189,14 @@ def _dump(obj: dict) -> str:
     return json.dumps(obj, indent=2, ensure_ascii=False) + "\n"
 
 
-def run(settings_file: str, hook_path: str, check: bool, frag: dict = AGENT_CAP) -> int:
+def run(settings_file: str, hook_path: str, check: bool, frag: dict = AGENT_CAP,
+        frag_file: str | None = None) -> int:
     path = Path(settings_file)
     existed = path.exists()
     what = f"{frag['name']} {frag['matcher']} hook"
     try:
         before = _dump(_load(path))
-        after = _dump(merge(json.loads(before), hook_path, frag))
+        after = _dump(merge(json.loads(before), hook_path, frag, frag_file))
     except ValueError as e:
         print(f"settings-merge: {e}", file=sys.stderr)
         return 2
@@ -204,8 +267,11 @@ def _selftest() -> int:
 
         # --- --fragment: a SECOND hook, on a different event and matcher -----------------------
         recall = {"name": "recall-opened", "event": "PostToolUse", "matcher": "Read",
-                  "marker": "recall-opened.js", "hook_path": ".claude/hooks/recall-opened.js"}
-        rhp = recall["hook_path"]
+                  "marker": "recall-opened.js",
+                  "hook_path": "{kit}/memory-recall/recall-opened.js"}
+        # The PIN is the shipped text, tokens and all -- that is what drift would change. The path
+        # used below is the RESOLVED one, because a fixture needs a real directory.
+        rhp = resolve_hook_path(recall["hook_path"])
 
         # 7) a fragment adds ITS block and leaves the agent-cap one alone; re-run is byte-identical
         sf6 = root / "s6.json"
@@ -283,7 +349,10 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError as e:
             print(f"settings-merge: {e}", file=sys.stderr)
             return 2
-    hook_path = a.hook_path or frag["hook_path"]
+    # RESOLVED ONCE, HERE, before anything reads it. The existence refusal below and the merge
+    # itself must agree on which file they are talking about, and a `{kit}` token reaching the
+    # refusal makes it reject a path nobody ever meant to write.
+    hook_path = resolve_hook_path(a.hook_path or frag["hook_path"], a.fragment)
     # Refuse to wire a script that is not there: settings would dispatch `node <missing>` on every
     # matching tool call, and check-wiring can only NAME that state, not prevent it. Resolved from
     # the cwd, which the runbook fixes at the target repo root. --check is exempt — it writes
@@ -294,7 +363,7 @@ def main(argv: list[str] | None = None) -> int:
               "missing script makes every matching tool call run `node` against nothing.",
               file=sys.stderr)
         return 2
-    return run(a.settings_file, hook_path, a.check, frag)
+    return run(a.settings_file, hook_path, a.check, frag, a.fragment)
 
 
 if __name__ == "__main__":

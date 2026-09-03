@@ -3885,6 +3885,57 @@ user_skills = "/tmp/gk-fake-skills"
               repr(GK9.derive_carried(b"tools~hooks~probe.md",
                                       {k: v for k, v in _n9.items() if "~" not in k})))
 
+        # ---- DEPL-dRetiredFork-1. A FANNED gov directory proves its rung PER ROW ---------------
+        # The global map holds one destination per gov directory and DROPS a fanned one, so the rung
+        # PROOF — which read that map — had no needle and returned None for every row underneath.
+        # Seven such directories at one measured adopter, and zero `relocate` rungs across all of it.
+        #
+        # The three arms below are one fixture read three ways, so the difference between them is the
+        # only thing that can move: same base, same content, different needle source.
+        _f1 = [("tools/hooks/agent-cap.js", "scripts/hooks/agent-cap.js"),
+               ("tools/hooks/scratch-guard.js", ".claude/hooks/scratch-guard.js")]
+        _nf, _pf, _df = GK9.derive_carry_map(_f1)
+        check("[-1] S1 a fanned gov directory is still DROPPED from the global map",
+              [d[0] for d in _df] == ["tools/hooks"] and not _nf,
+              f"dropped={_df} needles={_nf}")
+        _rowf = {"source": "tools/hooks/agent-cap.js", "path": "scripts/hooks/agent-cap.js"}
+        _pf2 = GK9.resolve_row_needles(_nf, _rowf)
+        check("[-1] S1 ...but the row's own overlay supplies the needle the map could not hold",
+              _pf2.get("tools/hooks") == "scripts/hooks", repr(_pf2))
+        _base1 = b"# see tools/hooks/agent-cap.js for the rule" + bytes([10])
+        _ours1 = GK9.derive_carried(_base1, _pf2)
+        check("[-1] S1 the rung is RELOCATE with the row's needles, where the map gave nothing",
+              GK9.derive_carry_rung(_base1, _pf2, lambda: _ours1, known_equal=False) == "relocate"
+              and GK9.derive_carry_rung(_base1, _nf, lambda: _ours1, known_equal=False) is None,
+              "per-row=%r global=%r" % (
+                  GK9.derive_carry_rung(_base1, _pf2, lambda: _ours1, known_equal=False),
+                  GK9.derive_carry_rung(_base1, _nf, lambda: _ours1, known_equal=False)))
+        # AND THE LIMIT, asserted so nobody reads the arm above as a general promise: ONE residual
+        # byte and the rung is gone. Every `nc carve-out N/20` comment is such a byte, which is why
+        # widening the map moved ZERO rows at that adopter. Section 3 puts this out of scope and
+        # names DEPL-dRetiredFork-7; the arm keeps the boundary honest rather than implied.
+        check("[-1] S1 ...and ONE residual byte still falls through to three-way",
+              GK9.derive_carry_rung(_base1, _pf2, lambda: _ours1 + b"# nc carve-out 13/20" + bytes([10]),
+                                    known_equal=False) is None)
+
+        # ---- S3b: a DEGENERATE needle is refused, not carried ----------------------------------
+        # A needle is substituted over file CONTENT, so its width is its blast radius. A one-character
+        # fragment matches almost everywhere, and the values come from a target-supplied receipt.
+        # The threshold is EMPTINESS. A first cut refused anything under two characters and broke 16
+        # arms in other units, because gov's own fixtures use single-letter directory names — so the
+        # grade covers the case section 5 names and the arm says which case that is.
+        _degen = None
+        try:
+            GK9.derive_carry_map([(" /x.txt", "b/x.txt")])
+        except Exception as _e:
+            _degen = type(_e).__name__
+        check("[-1] S3b an EMPTY/whitespace needle is REFUSED rather than substituted",
+              _degen == "Refusal", f"got {_degen}")
+        check("[-1] S3b ...and a normal two-segment pair still derives",
+              GK9.derive_carry_map([("tools/x.txt", "scripts/x.txt")])[0].get("tools") == "scripts")
+        check("[-1] S3b ...and a single-letter directory is PERMITTED, which is the stated residual",
+              GK9.derive_carry_map([("a/x.txt", "b/x.txt")])[0].get("a") == "b")
+
         # ---- S4: THE OUTPUT IS NEVER RESCANNED. The fixture is built so a rescan WOULD visibly
         # ---- change the answer — `tools` rewrites to `demo` and `demo` rewrites to `final` — and
         # ---- that second step is asserted live FIRST, so this cannot pass by finding nothing.
@@ -6808,11 +6859,215 @@ user_skills = "/tmp/gk-fake-skills"
             "exempt_leg": None,          # silent; re-runs a hole probe to decide a leg exemption
             "_cmd_apply": None,          # announces that a baseline WILL run, not which argv
             "read_gate_verdicts": None,  # silent at both spawns; apply prints before the first only
-            "_cmd_update": None,         # `git rm ... + deleted`: the paths come from the receipt,
-                                         # so the target influences the argv and the row is `target`
-                                         # -- but the verb prints its withdrawal decisions, never
-                                         # this argv. Unasserted, and named below like the rest.
+            # `_cmd_update` LEFT THIS MAP AND CAME BACK, one unit apart, and both moves were
+            # forced rather than chosen. DEPL-dRetiredFork-4 moved its `git rm ... + deleted`
+            # BinOp to `git_pathspec` and the row went stale; DEPL-dRetiredFork-3 gave the verb
+            # its first target-side execution and it spawns again. The map is asserted EQUAL to
+            # the declared sites, so neither move could be forgotten on one side only.
+            #
+            # `None`, AND THE REASON IS THE FEATURE ITSELF. The re-render step announces every
+            # argv it runs and every kit it declines -- but ONLY when GOVKIT_RERENDER=1, because
+            # AC6 asks for output byte-identical to the pre-change run while the flag is off,
+            # and a dark feature that announces its own absence is not dark. Every arm in this
+            # file runs with the flag unset, so there is no live needle to assert HERE. The
+            # announcement under the flag is covered by the S6 arms below, which set it.
+            "_cmd_update": None,
         }
+        # ---- DEPL-dRetiredFork-5, ROUND 2. THE VERDICT ARMS WERE SWAPPED ----------------------
+        # The first version of `run_kit_check`'s outcome block re-asked `_oc.get("ok")` after
+        # `classify_outcome` had ALREADY returned the block only because its probe was satisfied.
+        # Five shipped descriptors declare `code = 0, means = "adopted"` with NO `ok` key, so a
+        # CORRECT install came back `landed-but-inert` while exit-0-by-absence still said `adopted`.
+        #
+        # THE ARM THAT MISSED IT declared `"ok": True` on its synthetic descriptor — the one shape
+        # no shipped kit has. So this fixture is built to match the CORPUS instead: `code = 0`, a
+        # probe, and no `ok`. Measured against tools/lexicon/kit.toml, which is exactly this shape.
+        _k5d = {"outcome": [{"code": 0, "means": "adopted",
+                             "probe": {"must_exist": ["{kit}/marker.txt"]}}]}
+        _k5r = pathlib.Path(__import__("tempfile").mkdtemp())
+        (_k5r / "kitdir").mkdir(parents=True, exist_ok=True)
+        _k5c = {"kit": str((_k5r / "kitdir").as_posix())}
+        check("[-5] R2 a descriptor with code 0 and NO `ok` key is the SHIPPED shape",
+              _k5d["outcome"][0].get("ok") is None, "the fixture drifted back to the ok=True shape")
+        # ABSENT -> the probe is unsatisfied on a zero exit: exit-0-by-absence, the real target.
+        _k5absent = GK9.classify_outcome(_k5r, _k5d, _k5c, 0)
+        check("[-5] R2 with the probe UNSATISFIED, classify_outcome returns None on rc 0",
+              _k5absent is None, repr(_k5absent))
+        # PRESENT -> satisfied. The block comes back, and `ok` is absent from it. A verdict that
+        # reads `ok` here calls a correct install inert, which is the defect.
+        (_k5r / "kitdir" / "marker.txt").write_text("x", encoding="utf-8")
+        _k5present = GK9.classify_outcome(_k5r, _k5d, _k5c, 0)
+        check("[-5] R2 with the probe SATISFIED, the block returns and carries no `ok`",
+              _k5present is not None and _k5present.get("ok") is None, repr(_k5present))
+        # THE DECISION ITSELF, called with all four input shapes. This replaced a SOURCE-SUBSTRING
+        # assertion that could not fail: mutating the guarded expression to `... or True` left the
+        # substring present and the arm green. A pure function has no such escape.
+        _k5truth = [
+            # (rc, oc, declared_for_rc, expected, what it is)
+            (0, None, False, True,  "rc 0, nothing declared — unchanged pre-DEPL-5 behaviour"),
+            (0, {"means": "adopted"}, True, True, "rc 0, declared AND satisfied — a real install"),
+            (0, None, True, False, "rc 0, declared and NOT satisfied — exit zero BY ABSENCE"),
+            (1, {"ok": True}, True, True, "rc 1 with ok — memory-tree seeds its conf and stops"),
+            (1, {"means": "refused-foreign-tree"}, True, False, "rc 1 without ok — a real refusal"),
+            (1, None, True, False, "rc 1, probe unsatisfied — refused"),
+        ]
+        for _rc, _oc5, _dec, _want, _what in _k5truth:
+            check(f"[-5] R2 outcome_accepted({_rc}, {'block' if _oc5 else 'None'}, {_dec}) "
+                  f"is {_want} — {_what}",
+                  GK9.outcome_accepted(_rc, _oc5, _dec) is _want,
+                  f"got {GK9.outcome_accepted(_rc, _oc5, _dec)!r}")
+        check("[-5] R2 LIVENESS the truth table covers both verdicts",
+              len({w for _r, _o, _d, w, _x in _k5truth}) == 2, "the table only asserts one answer")
+        __import__("shutil").rmtree(str(_k5r), ignore_errors=True)
+
+        # ---- DEPL-dRetiredFork-6. THE CONTRIBUTION CLASSIFIER ----------------------------------
+        # NAMES ARE NAMESPACED `_k6*` BECAUSE THEY ARE NOT IN A FUNCTION OF THEIR OWN.
+        # Every arm in this file shares one scope, and `_g4` was already a scratch gov
+        # tree several hundred lines above. Reusing it here rebound a `pathlib.Path` to a
+        # string and crashed an unrelated coverage arm with a TypeError on `/`, which is a
+        # collision the language does not warn about and a reader cannot see locally.
+        # S3 is the safety property: the verb PROPOSES and a person CONFIRMS. What these arms grade
+        # is that the proposals are not noise -- specifically that class 4 is a property of the
+        # DIFF and not of the destination, which is how it was written first and which classed 30
+        # of 31 real NicoCares candidates as layout carriage.
+        _k6GKC = govkit_module()
+        # Class 4: the same line with a path rewritten, and nothing else.
+        _k6g4 = "load('tools/hooks/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
+        _k6a4 = "load('scripts/hooks/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
+        _k6c4, _k6w4 = _k6GKC.contrib_propose_class({"path": "a.js", "gov_path": "a.js"}, _k6g4, _k6a4, "nc")
+        check("[-6] a change that is only a repath proposes class 4", _k6c4 == 4, f"{_k6c4}: {_k6w4}")
+        # ...and the DESTINATION differing does NOT, on its own, make it class 4. This is the arm
+        # that would have caught the original test: every deployed file has a destination unlike
+        # its gov source, so a destination-based rule fires on all of them.
+        _k6g4b = "x = 1" + chr(10)
+        _k6a4b = "x = 2" + chr(10)
+        _k6c4b, _k6w4b = _k6GKC.contrib_propose_class(
+            {"path": "scripts/a.js", "gov_path": "tools/a.js"}, _k6g4b, _k6a4b, "nc")
+        check("[-6] a real change at a repathed DESTINATION is not class 4",
+              _k6c4b != 4, f"{_k6c4b}: {_k6w4b}")
+        # Class 3: an added line naming the tree itself.
+        _k6c3, _k6w3 = _k6GKC.contrib_propose_class(
+            {"path": "a.js", "gov_path": "a.js"}, "x = 1" + chr(10),
+            "x = 1" + chr(10) + "# incms keeps a single copy" + chr(10), "incms")
+        check("[-6] an added line naming the tree itself proposes class 3", _k6c3 == 3, f"{_k6c3}: {_k6w3}")
+        # Class 2: gov has no such file at all.
+        _k6c2, _k6w2 = _k6GKC.contrib_propose_class(
+            {"path": "new.js", "gov_path": ""}, "", "x = 1" + chr(10), "nc")
+        check("[-6] bytes gov has no file for propose class 2", _k6c2 == 2, f"{_k6c2}: {_k6w2}")
+        # F2: already absorbed -- every added line is already in gov's copy.
+        _k6cA, _k6wA = _k6GKC.contrib_propose_class(
+            {"path": "a.js", "gov_path": "a.js"},
+            "x = 1" + chr(10) + "y = 2" + chr(10), "y = 2" + chr(10) + "x = 1" + chr(10), "nc")
+        check("[-6] F2 a change gov already carries is reported ALREADY ABSORBED",
+              "ALREADY ABSORBED" in _k6wA, _k6wA)
+        # LIVENESS: the four classes are genuinely reachable from this classifier. Without this the
+        # arms above could all pass while some class were unreachable in practice.
+        check("[-6] LIVENESS the classifier reaches more than one class",
+              len({_k6c4, _k6c4b, _k6c3, _k6c2}) >= 3, str(sorted({_k6c4, _k6c4b, _k6c3, _k6c2})))
+
+        # ---- DEPL-dRetiredFork-3 S6. THE RE-RENDER SELECTOR IS NOT VACUOUS ---------------------
+        # The decline path reads `role == "rendered"` out of each kit descriptor's row list, and the
+        # row key is `files`. Written as `file` -- which it was, and which parses, type-checks and
+        # runs -- the predicate matches NOTHING, every kit skips silently, and the run reports a
+        # clean `0 declined` over an empty population. Indistinguishable from a healthy tree.
+        #
+        # So this asserts the POPULATION, not the outcome: at least one shipped kit must have rows
+        # the selector actually selects. It reds if the key is renamed, if the role vocabulary
+        # changes, or if the predicate is retyped wrong -- the three ways this becomes vacuous again.
+        _kits3 = sorted((pathlib.Path(GK9.__file__).parent.parent).glob("*/kit.toml"))
+        check("[-3] S6 the kit population is non-empty (else the arm below proves nothing)",
+              len(_kits3) >= 3, f"{len(_kits3)} kit.toml files")
+        _rendered3 = {}
+        for _kt in _kits3:
+            try:
+                _d3 = GK9.load_toml(_kt)
+            except Exception:
+                continue
+            _n = sum(1 for _r in (_d3.get("files") or [])
+                     if str((_r or {}).get("role")) == "rendered")
+            if _n:
+                _rendered3[_kt.parent.name] = _n
+        check("[-3] S6 the `rendered` selector matches a LIVE population under the real key `files`",
+              bool(_rendered3),
+              "no kit has a rendered row -- the selector is vacuous and the decline path is dead")
+        check("[-3] S6 ...and the WRONG key `file` matches nothing, which is how it went unseen",
+              not any(GK9.load_toml(_k).get("file") for _k in _kits3),
+              "a `file` key exists after all -- re-read the selector")
+        print(f"note [-3] S6 rendered rows per kit: {_rendered3}")
+
+        # ---- DEPL-dRetiredFork-5 S3. AN ADOPTER THAT EXITS 0 BY ABSENCE ------------------------
+        # `classify_outcome` decides what an exit code MEANS by probing the filesystem, and it had
+        # exactly ONE call site — inside `_cmd_apply`. So every `[[outcome]]` block was dead code for
+        # `check`, and a kit whose adopter exits 0 because it is NOT INSTALLED reported `adopted`.
+        # Measured on a real adopter: a kit with no conf, no Skill and no importable module.
+        #
+        # The fixture is the same descriptor read twice, once with the probe's path present and once
+        # without, so the ONLY moving part is whether the probe is satisfied.
+        _d5 = {"outcome": [{"code": 0, "means": "the adopter reports it is installed",
+                            "ok": True, "probe": {"must_exist": ["{kit}/marker.txt"]}}]}
+        import tempfile as _tf5
+        _r5 = pathlib.Path(_tf5.mkdtemp())
+        (_r5 / "kitdir").mkdir(parents=True, exist_ok=True)
+        _ctx5 = {"kit": str((_r5 / "kitdir").as_posix())}
+        _absent = GK9.classify_outcome(_r5, _d5, _ctx5, 0)
+        check("[-5] S3 exit 0 with the probe's path ABSENT does not classify as ok",
+              not (_absent and _absent.get("ok")), repr(_absent))
+        (_r5 / "kitdir" / "marker.txt").write_text("x", encoding="utf-8")
+        _present = GK9.classify_outcome(_r5, _d5, _ctx5, 0)
+        check("[-5] S3 ...and the SAME descriptor with the path present classifies ok",
+              bool(_present and _present.get("ok")), repr(_present))
+        # THE JOIN THAT WAS MISSING: `run_kit_check` must consult that probe, not just `rc == 0`.
+        # Asserted on the source, because building a runnable adopter fixture here would test the
+        # fixture. The call site is what was absent; its presence is the whole fix.
+        _src5 = pathlib.Path(GK9.__file__).read_text(encoding="utf-8")
+        _rkc = _src5[_src5.index("def run_kit_check"):_src5.index("def classify_outcome")]
+        check("[-5] S3 run_kit_check routes its exit code through classify_outcome",
+              "classify_outcome(" in _rkc,
+              "the probe is still dead code for `check`")
+        _sh5 = __import__("shutil"); _sh5.rmtree(str(_r5), ignore_errors=True)
+
+        # ---- DEPL-dRetiredFork-4 S3. A PATHSPEC LARGER THAN THE COMMAND LINE --------------------
+        # The argv form died at 32 KiB with WinError 206, AFTER apply's write loop — leaving files
+        # staged, a conf scaffolded and no receipt update. This arm builds a pathspec past that bound
+        # and asserts the command SUCCEEDS, which is only meaningful because the same list through
+        # argv is asserted to FAIL right after it.
+        import tempfile as _tf4
+        _d4 = _tf4.mkdtemp()
+        _r4 = pathlib.Path(_d4)
+        subprocess.run(["git", "init", "-q", str(_r4)], capture_output=True)
+        subprocess.run(["git", "-C", str(_r4), "config", "user.email", "t@t"], capture_output=True)
+        subprocess.run(["git", "-C", str(_r4), "config", "user.name", "t"], capture_output=True)
+        # ~40 KiB of pathspec: 500 names of ~80 characters each.
+        _names4 = [("f%03d-" % i) + ("x" * 72) + ".txt" for i in range(500)]
+        for _n4 in _names4:
+            (_r4 / _n4).write_text("x" + chr(10), encoding="utf-8", newline=chr(10))
+        _bytes4 = sum(len(n) + 1 for n in _names4)
+        check("[-4] S3 the fixture pathspec really exceeds the 32 KiB command line",
+              _bytes4 > 32768, f"{_bytes4} bytes")
+        _ok4 = GK9.git_pathspec(_r4, ["add"], _names4)
+        check("[-4] S3 a >32 KiB pathspec over STDIN succeeds",
+              _ok4.returncode == 0, _ok4.stderr[:200] if _ok4.stderr else "")
+        _staged4 = subprocess.run(["git", "-C", str(_r4), "diff", "--cached", "--name-only"],
+                                  capture_output=True, text=True).stdout.split()
+        check("[-4] S3 ...and every path in it actually reached git",
+              len(_staged4) == len(_names4), f"{len(_staged4)} of {len(_names4)}")
+        # THE RED, OBSERVED: the same list through argv is what the fix replaced. On a platform with
+        # a larger limit this raises nothing and the arm says so rather than asserting a failure the
+        # host cannot produce — a check that cannot fire must announce itself, not pass quietly.
+        try:
+            subprocess.run(["git", "-C", str(_r4), "add", "--"] + _names4,
+                           capture_output=True, check=False)
+            _argv_died = False
+        except (OSError, ValueError):
+            _argv_died = True
+        if _argv_died:
+            check("[-4] S3 ...where the SAME list through argv still dies", True)
+        else:
+            print("skip [-4] S3 the argv form did not die on this host: its command-line limit is "
+                  "above the fixture size, so the RED half is unexercised HERE. It was observed on "
+                  "the reporting platform, and the stdin form is asserted above either way.")
+        _sh4 = __import__("shutil"); _sh4.rmtree(_d4, ignore_errors=True)
+
         check("[-5] D1/M4 the announcement map covers exactly the declared `target` sites",
               set(_D1_ANNOUNCED) == set(_tgt_sites),
               f"map {sorted(_D1_ANNOUNCED)} vs declared {sorted(_tgt_sites)}")

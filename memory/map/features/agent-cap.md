@@ -16,6 +16,8 @@ gate-legs = [
   "review-protocol parity (kit vs dogfood)",
   "agent-cap restatement",
   "agent-cap restatement self-test",
+  "hook destinations (every declared hook path ships)",
+  "hook destinations self-test",
 ]
 kits = ["hooks"]
 git-hooks = []
@@ -108,6 +110,16 @@ learned when `Workflow` alone left direct `Agent` spawns unguarded. The kit entr
 second constant would be invisible to govkit rather than gated by it.
 
 ## Shared seams
+
+**Every declared hook path is asserted to SHIP, in both directions.** A fragment names a
+destination and an adopter script writes one, and neither is any use if the file it points at
+is not in the kit — a hook wired to nothing is indistinguishable from a hook that never fires,
+and the settings file looks correct either way. `check-hook-destinations.sh` quantifies over
+both populations, fragments AND the adopter scripts that write hook commands, because a kit
+that installs its hook from a script rather than a fragment is otherwise ungraded.
+TOOL-dRetiredFork-14/21 moved these destinations out of `.claude/hooks/` and into the shipping
+kit dir, which is what made a checker necessary rather than merely tidy.
+
 
 `topLevelArgs` in `tools/hooks/agent-cap.js` is the ONE splitter: it splits on top-level commas and
 drops a trailing empty segment. Both the call-site argument walk and the array-literal element counter
