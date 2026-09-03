@@ -9,8 +9,10 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+keepalive-reaped: yes
+parked-surfaced: yes
 witness: a9560632
-phase: BUILDING
+phase: LANDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 534edee2
@@ -146,3 +148,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-03T08:17:58Z brief · item TOOL-dRetiredFork-17 · reason e44424244be8 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-17-1-build-brief.md
 
 2026-09-03T08:18:16Z dispatch · item 05649507 TOOL-dRetiredFork-17 · reason tools/check-install-prefix.sh,tools/install-prefix-carried.txt,tools/install-prefix-exceptions.txt,tools/hooks/README.md,AGENTS.md,tools/gate-legs.json,memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-17.md
+
+2026-09-03T10:53:08Z review · item dRetiredFork · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-03T10:56:22Z override · item build-complete · reason DEPL-dRetiredFork-2 is DEFERRED, not unbuilt. Its S1/S2 were built and MEASURED WORKING against NicoCares (9 landable, 8 correctly reported-not-landed), and it then hit a collision with a standing predicate that no run may resolve on its own: the disposition is a parked owner decision, recorded in RUN.md and in that unit's own acceptance ledger. Building past it would mean this run choosing which of two ratified predicates wins, which is exactly the class of decision the parked region exists to defer. Every other unit of the build is CLOSED.
