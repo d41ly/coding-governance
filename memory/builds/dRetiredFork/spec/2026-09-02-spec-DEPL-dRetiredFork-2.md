@@ -1,6 +1,6 @@
 # DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row
 
-**Status:** INPROGRESS · rev-5 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
+**Status:** DEFERRED · rev-5 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02 · parked: the new-source pass collides with a standing predicate, see RUN.md parked rows and builds/dRetiredFork/build/2026-09-03-build-DEPL-dRetiredFork-2-1-acceptance-ledger.md
 
 <!-- gen:spec-records -->
 

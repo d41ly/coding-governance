@@ -6859,11 +6859,54 @@ user_skills = "/tmp/gk-fake-skills"
             "exempt_leg": None,          # silent; re-runs a hole probe to decide a leg exemption
             "_cmd_apply": None,          # announces that a baseline WILL run, not which argv
             "read_gate_verdicts": None,  # silent at both spawns; apply prints before the first only
-            "_cmd_update": None,         # `git rm ... + deleted`: the paths come from the receipt,
-                                         # so the target influences the argv and the row is `target`
-                                         # -- but the verb prints its withdrawal decisions, never
-                                         # this argv. Unasserted, and named below like the rest.
+            # `_cmd_update` IS GONE FROM BOTH SIDES. Its row existed for the BinOp
+            # `git rm ... + deleted`; DEPL-dRetiredFork-4 moved that call to `git_pathspec`, so
+            # the shape and the declaration went together. This map is asserted EQUAL to the
+            # declared target sites, so leaving the key here would red exactly as leaving the
+            # row there did -- which is the pair working.
         }
+        # ---- DEPL-dRetiredFork-4 S3. A PATHSPEC LARGER THAN THE COMMAND LINE --------------------
+        # The argv form died at 32 KiB with WinError 206, AFTER apply's write loop — leaving files
+        # staged, a conf scaffolded and no receipt update. This arm builds a pathspec past that bound
+        # and asserts the command SUCCEEDS, which is only meaningful because the same list through
+        # argv is asserted to FAIL right after it.
+        import tempfile as _tf4
+        _d4 = _tf4.mkdtemp()
+        _r4 = pathlib.Path(_d4)
+        subprocess.run(["git", "init", "-q", str(_r4)], capture_output=True)
+        subprocess.run(["git", "-C", str(_r4), "config", "user.email", "t@t"], capture_output=True)
+        subprocess.run(["git", "-C", str(_r4), "config", "user.name", "t"], capture_output=True)
+        # ~40 KiB of pathspec: 500 names of ~80 characters each.
+        _names4 = [("f%03d-" % i) + ("x" * 72) + ".txt" for i in range(500)]
+        for _n4 in _names4:
+            (_r4 / _n4).write_text("x" + chr(10), encoding="utf-8", newline=chr(10))
+        _bytes4 = sum(len(n) + 1 for n in _names4)
+        check("[-4] S3 the fixture pathspec really exceeds the 32 KiB command line",
+              _bytes4 > 32768, f"{_bytes4} bytes")
+        _ok4 = GK9.git_pathspec(_r4, ["add"], _names4)
+        check("[-4] S3 a >32 KiB pathspec over STDIN succeeds",
+              _ok4.returncode == 0, _ok4.stderr[:200] if _ok4.stderr else "")
+        _staged4 = subprocess.run(["git", "-C", str(_r4), "diff", "--cached", "--name-only"],
+                                  capture_output=True, text=True).stdout.split()
+        check("[-4] S3 ...and every path in it actually reached git",
+              len(_staged4) == len(_names4), f"{len(_staged4)} of {len(_names4)}")
+        # THE RED, OBSERVED: the same list through argv is what the fix replaced. On a platform with
+        # a larger limit this raises nothing and the arm says so rather than asserting a failure the
+        # host cannot produce — a check that cannot fire must announce itself, not pass quietly.
+        try:
+            subprocess.run(["git", "-C", str(_r4), "add", "--"] + _names4,
+                           capture_output=True, check=False)
+            _argv_died = False
+        except (OSError, ValueError):
+            _argv_died = True
+        if _argv_died:
+            check("[-4] S3 ...where the SAME list through argv still dies", True)
+        else:
+            print("skip [-4] S3 the argv form did not die on this host: its command-line limit is "
+                  "above the fixture size, so the RED half is unexercised HERE. It was observed on "
+                  "the reporting platform, and the stdin form is asserted above either way.")
+        _sh4 = __import__("shutil"); _sh4.rmtree(_d4, ignore_errors=True)
+
         check("[-5] D1/M4 the announcement map covers exactly the declared `target` sites",
               set(_D1_ANNOUNCED) == set(_tgt_sites),
               f"map {sorted(_D1_ANNOUNCED)} vs declared {sorted(_tgt_sites)}")

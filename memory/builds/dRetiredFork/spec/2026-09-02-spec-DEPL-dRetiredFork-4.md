@@ -1,11 +1,13 @@
 # DEPL-dRetiredFork-4 — the lf-pin pathspec goes over stdin
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams deployer · order 6
+**Status:** CLOSED · rev-4 · 2026-09-03 · node d · Tier-1 · base b0108f13 · streams deployer · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-DEPL-dRetiredFork-4-1-acceptance-ledger.md](../build/2026-09-03-build-DEPL-dRetiredFork-4-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-DEPL-dRetiredFork-4-1-build-brief.md](../prompts/2026-09-03-prompt-DEPL-dRetiredFork-4-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 
@@ -74,3 +76,19 @@ this spec's readers grade it that way.
   class-wide observation.
 - rev-3 . 2026-09-02 . added the section 8 `none` declaration both readers require;
   no design content changed.
+
+- rev-4 . 2026-09-03 . BUILT. `git_pathspec` feeds the pathspec over stdin with
+  `--pathspec-from-file=-` and `--pathspec-file-nul`, removing the 32 KiB bound rather than raising
+  it. AC2b's CLASS is closed: five sites converted, and `index_read` named as deliberately outside
+  it because it already chunks at 400. Four of the five were invisible to the crash report, which is
+  why rev-2 added the class-wide criterion.
+
+  BOTH HALVES OF THE ARM FIRE ON THIS HOST: a 40,500-byte pathspec succeeds over stdin with all 500
+  paths reaching git, and the SAME list through argv still dies. The skip branch for a
+  larger-command-line platform announces itself and was not needed.
+
+  The change made TWO declarations stale and the gate caught both: the new function reds until
+  SHELL_EXEC_SITES declares it, and `_cmd_update`'s row -- which existed for exactly the BinOp shape
+  this unit removed -- redded on "declared but no longer spawning", with a paired map in the
+  selftest redding the same way when only one side was taken out.
+

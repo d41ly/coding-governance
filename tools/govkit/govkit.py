@@ -2362,6 +2362,11 @@ SHELL_EXEC_SITES = {
     # ---- `['git', '-C']` and was allowlisted unconditionally -- defeating the `git hook run`
     # ---- exclusion that IS the guarantee this table's header sells. Every one is gov-controlled
     # ---- TODAY, and each row exists so the next reader has to re-answer that when a caller changes.
+    # DEPL-dRetiredFork-4. The pathspec-over-stdin runner. Its ARGV is gov's own literal in every
+    # caller; what crosses from the target is the PATH LIST, and it crosses on STDIN rather than
+    # the command line -- which is the whole point, since the argv form died at 32 KiB after a
+    # partial write. Classified `gov` because no target value reaches the argv it builds.
+    "git_pathspec": "gov",
     "git": "gov",                    # gov's own wrapper: `["git", "-C", str(root), *args]`, and the
                                      # `*args` is what the census cannot read. A future
                                      # `git(target, "hook", "run", ...)` must move this to
@@ -2373,12 +2378,11 @@ SHELL_EXEC_SITES = {
                                      # first cut got wrong by attributing nested calls to the outer
                                      # one too. Same reason `check_runs` above covers the bash probe
                                      # rather than its enclosing `resolve_bash`.
-    "_cmd_update": "target",         # `[...literal git rm...] + deleted` — a BinOp the census
-                                     # cannot destructure. Labelled `target` and not `gov`: `deleted`
-                                     # is receipt paths, so the TARGET influences this argv, which is
-                                     # this table's own definition of the label. They arrive after
-                                     # `--` as path operands and are contained upstream, but the
-                                     # label describes WHO CHOOSES the bytes, not how safe they are.
+    # `_cmd_update` HELD A ROW HERE and no longer does. It existed for ONE shape: the BinOp
+    # `[...literal git rm...] + deleted`, which the census could not destructure.
+    # DEPL-dRetiredFork-4 moved that call to `git_pathspec`, so the shape is gone and the row
+    # went with it -- this table asserts in BOTH directions, and a declaration naming a function
+    # that no longer spawns widens the surface it was written to narrow.
 }
 # THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
 # wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
@@ -3578,6 +3582,39 @@ def blob_oid(data: bytes) -> str:
                         usedforsecurity=False).hexdigest()
 
 
+def git_pathspec(target: pathlib.Path, argv: list[str], paths: list[str],
+                 text: bool = False) -> subprocess.CompletedProcess:
+    """Run a git command whose PATHSPEC arrives over stdin instead of the command line.
+
+    DEPL-dRetiredFork-4. Passing a derived population as argv blows the 32 KiB Windows command line:
+    measured on an adopter whose `.gitattributes` is 28 KB, `apply` died with
+    `FileNotFoundError: [WinError 206]` — AFTER the write loop and AFTER configure, leaving new files
+    staged, a conf scaffolded, a Skill rendered, a stale write lock, and no receipt update. A verb
+    whose failure mode is a half-applied install cannot fail that way for a reason as incidental as
+    how long a list was.
+
+    `--pathspec-from-file=-` REMOVES the bound rather than raising it. Chunking would leave the same
+    class open at a larger size, and the failure would then be rarer and harder to attribute — which
+    is worse than a bound you can name.
+
+    `--pathspec-file-nul` because a path may contain any byte but NUL. The newline form would split a
+    path whose name contains a newline into two pathspecs that match nothing, which is a silent
+    wrong answer where this one is at least loud.
+
+    AN EMPTY LIST IS NOT AN EMPTY PATHSPEC. `git` reads no pathspec at all from empty stdin and would
+    then operate on the WHOLE TREE, so this refuses to run rather than widening the caller's
+    intended population to everything — the difference between `add -- <nothing>` and `add -A`.
+    """
+    if not paths:
+        raise ValueError("git_pathspec called with an empty path list: git would read no pathspec "
+                         "and operate on the whole tree, which is never what the caller meant")
+    return subprocess.run(
+        ["git", "-C", str(target)] + argv + ["--pathspec-from-file=-", "--pathspec-file-nul"],
+        input=(chr(0).join(paths) + chr(0)).encode("utf-8") if not text
+              else chr(0).join(paths) + chr(0),
+        capture_output=True, check=False, text=text)
+
+
 def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[str, str]], set[str]]:
     """The TARGET's index, batched: `(path -> (mode, oid))` at STAGE 0, and every path at ANY stage.
 
@@ -4346,8 +4383,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # ---- STAGE. Not housekeeping: every gate in this suite reads the INDEX, so an unstaged install
     # ---- is invisible to the verification that follows it.
     if staged:
-        subprocess.run(["git", "-C", str(target), "add", "--"] + staged,
-                       capture_output=True, check=False)
+        git_pathspec(target, ["add"], staged)
     # S7's second half: `oid` is read from each row's INDEX ENTRY, once the stage above has made one.
     # ONE batched read over the writes channel's paths, per row and not per stage — that one `git
     # add` covers every channel, and a seed the target already owned was never staged by this run at
@@ -4508,9 +4544,9 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             # for. Measured: without this, a clean fixture target failed here on the DEFAULT
             # selection, naming two files gov had itself just landed.
             ours = set(staged)
-            dirty = [p for p in subprocess.run(
-                ["git", "-C", str(target), "diff", "--name-only", "HEAD", "--"] + lf_paths,
-                capture_output=True, text=True).stdout.split() if p not in ours]
+            dirty = [p for p in git_pathspec(
+                target, ["diff", "--name-only", "HEAD"], lf_paths,
+                text=True).stdout.split() if p not in ours]
             missing_wt = [p for p in lf_paths if not (target / p).exists()]
             if dirty or missing_wt:
                 r.fail(f"the pinned population is not clean relative to HEAD "
@@ -4518,12 +4554,11 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
                        f"renormalize rather than folding somebody's work-in-progress into an index "
                        f"gov does not own")
             else:
-                subprocess.run(["git", "-C", str(target), "add", "--renormalize", "--"] + lf_paths,
-                               capture_output=True, check=False)
+                git_pathspec(target, ["add", "--renormalize"], lf_paths)
                 _renormalized = True   # M3: the re-stamp below keys on THIS, not on `staged`
         after = eol_population(target)
-        idx = subprocess.run(["git", "-C", str(target), "ls-files", "--eol", "--"] + lf_paths,
-                             capture_output=True, text=True).stdout if lf_paths else ""
+        idx = git_pathspec(target, ["ls-files", "--eol"], lf_paths,
+                           text=True).stdout if lf_paths else ""
         bad = [ln.split("\t")[-1] for ln in idx.splitlines() if ln and "i/lf" not in ln.split()[0]]
         for b in bad:
             r.fail(f"'{b}' is pinned eol=lf and its INDEX blob is not LF after the renormalize")
@@ -6413,8 +6448,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # not round-trip exactly would replace gov's blob with a near-miss nobody asked for. The staging
     # this verb owes is done, and it is done from the blob rather than from the disk.
     if deleted:
-        subprocess.run(["git", "-C", str(target), "rm", "-q", "--ignore-unmatch", "--"] + deleted,
-                       capture_output=True, check=False)
+        git_pathspec(target, ["rm", "-q", "--ignore-unmatch"], deleted)
 
     # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
     # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
