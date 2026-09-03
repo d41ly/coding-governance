@@ -102,3 +102,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-03T00:54:56Z brief · item TOOL-dRetiredFork-13 · reason 39afc648ab0b memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-13-1-build-brief.md
 
 2026-09-03T01:23:02Z dispatch · item 338ede7f TOOL-dRetiredFork-13 · reason tools/install-prefix-carried.txt memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-13.md
+
+2026-09-03T01:34:11Z brief · item TOOL-dRetiredFork-14 · reason 52a453862e24 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-14-1-build-brief.md
+
+2026-09-03T01:34:26Z dispatch · item 8d140d19 TOOL-dRetiredFork-14 · reason tools/settings-merge.py tools/hooks/kit.toml tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/check-wiring.sh tools/check-wiring.test.sh tools/memory-recall/recall-opened.js .claude/settings.json WIRE-INTO-PROJECT.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-14.md

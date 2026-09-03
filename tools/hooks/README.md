@@ -16,6 +16,35 @@ grammar is implementation detail of one hook and does not belong in a ruleset ev
 The matcher is the exact pair `Workflow|Agent`. `Workflow` alone leaves direct spawns unguarded,
 which is the configuration this hook was rewritten to stop shipping.
 
+**ONE COPY SHIPS, and the wired command names it.** Until `TOOL-dRetiredFork-14` this hook was
+installed to `{prefix}/hooks/` AND `.claude/hooks/`, byte-identical, and the wired command named the
+second. Two copies meant every policy value in the file was stated twice, and every carve-out over
+it doubled before anyone edited anything.
+
+`.claude/hooks/` had one property that made it attractive and that nobody wrote down: it is the same
+path in every repo, so a wired command naming it was correct for every adopter with nothing to
+resolve. Naming the kit directory gives that up, so the fragments declare their path with a `{kit}`
+token and both consumers expand it **against the fragment's own location** — two directories up from
+the `.fragment.json`. That is the rule on the writing side (`settings-merge.py`) and on the reading
+side (`check-wiring.sh`), and it has to be the same rule or one of them wires a path the other
+cannot find.
+
+**Migrating an installed tree is two steps, and the order is not optional.** The wired command moves
+to the surviving copy FIRST; the second copy is withdrawn SECOND. Reversed, the hook is unwired for
+the window between — a security guard silently off, which is the one failure mode this whole change
+had to avoid.
+
+    python tools/settings-merge.py                 # repaths an already-wired command in place
+    bash tools/check-wiring.sh --check             # says which copy is wired, every session
+
+`settings-merge.py` repaths rather than no-ops: a command whose marker matches but whose path
+differs is rewritten. It used to return unchanged in that case, which meant every already-wired tree
+ignored the new path entirely.
+
+Nothing deletes an adopter's second copy. `govkit update --write-withdrawals` does, on their timing,
+and `check-wiring.sh` REPORTS a legacy copy rather than redding so that a half-migrated tree is told
+rather than blocked.
+
 ## What the hook DENIES, and how to satisfy it
 
 - A raw `parallel(` / `pipeline(` primitive. Route through a bounded helper instead —

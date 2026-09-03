@@ -806,19 +806,43 @@ if [ -n "$ROOT" ]; then
     [ -n "$rel" ] && KITJS="$ROOT/$rel"
   fi
 fi
+# SELF-ARMING ON THE RESOLVED COPY COUNT — TOOL-dRetiredFork-14.
+# This arm asserted TWO copies and hard-FAILED when the second was absent. That became the CORRECT
+# state the moment the kit stopped shipping a second destination, so the arm failed on the shipped
+# layout: not a parity check any more, just a stale assumption with a test around it.
+#
+# It now grades the population it actually finds:
+#   0 copies  -> REFUSE. A parity arm with no subject proves nothing, and saying "skip" there is the
+#                green-by-absence shape this repo has a catalogue entry for.
+#   1 copy    -> the single-copy layout. There is nothing to drift FROM, and that is a pass.
+#   2 or more -> the historical dual-ship. Every extra copy must match the kit copy byte for byte.
 if [ -n "$KITJS" ]; then
-  if [ ! -f "$ROOT/.claude/hooks/agent-cap.js" ]; then
-    echo "FAIL the wired copy .claude/hooks/agent-cap.js is MISSING (parity must not be satisfiable by absence)"
-    fail=$((fail+1))
-  elif diff -q <(sed 's/\r$//' "$ROOT/.claude/hooks/agent-cap.js") <(sed 's/\r$//' "$KITJS") >/dev/null; then
-    echo "ok   the wired copy matches the kit copy"; pass=$((pass+1))
+  ac_extra=""
+  for ac_c in "$ROOT/.claude/hooks/agent-cap.js"; do
+    [ -f "$ac_c" ] && ac_extra="$ac_extra $ac_c"
+  done
+  ac_n=$(printf '%s' "$ac_extra" | wc -w | tr -d ' ')
+  if [ "$ac_n" = 0 ]; then
+    echo "ok   single-copy layout: ${KITJS#"$ROOT/"} is the only tracked copy, so there is nothing to drift from"
+    pass=$((pass+1))
   else
-    echo "FAIL .claude/hooks/agent-cap.js has drifted from ${KITJS#"$ROOT/"}"
-    echo "     fix: cp ${KITJS#"$ROOT/"} .claude/hooks/agent-cap.js"
-    fail=$((fail+1))
+    ac_drift=0
+    for ac_c in $ac_extra; do
+      if ! diff -q <(sed 's/\r$//' "$ac_c") <(sed 's/\r$//' "$KITJS") >/dev/null; then
+        echo "FAIL ${ac_c#"$ROOT/"} has drifted from ${KITJS#"$ROOT/"}"
+        echo "     fix: cp ${KITJS#"$ROOT/"} ${ac_c#"$ROOT/"}"
+        ac_drift=1
+      fi
+    done
+    if [ "$ac_drift" = 0 ]; then
+      echo "ok   all $((ac_n+1)) tracked copies of agent-cap.js agree"; pass=$((pass+1))
+    else
+      fail=$((fail+1))
+    fi
   fi
 else
-  echo "skip the two-copy parity arm — no kit copy of agent-cap.js is tracked in this tree (looked for tools/hooks/, hooks/, then any */hooks/ outside .claude/)"
+  echo "FAIL the parity arm found NO copy of agent-cap.js anywhere (looked for tools/hooks/, hooks/, then any */hooks/ outside .claude/) — an arm with no subject cannot pass"
+  fail=$((fail+1))
 fi
 
 

@@ -393,6 +393,11 @@
       "file": "tools/lexicon/canon.py"
     },
     {
+      "id": "build_gov_index",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
+    },
+    {
       "id": "build_index",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -481,6 +486,11 @@
       "id": "carry_matches",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "carve_out_sites",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
     },
     {
       "id": "case_collisions",
@@ -651,6 +661,11 @@
       "id": "claims",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "classify",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
     },
     {
       "id": "classify",
@@ -843,6 +858,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "confirm_blobs",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
+    },
+    {
       "id": "copy_extra",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -871,6 +891,11 @@
       "id": "dead_alias_diagnosis",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "declared_in_kits_json",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
     },
     {
       "id": "declares",
@@ -936,6 +961,16 @@
       "id": "demand_writable_target",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "deriveLiveness",
+      "kind": "function",
+      "file": "tools/workflows/drift-audit-code.js"
+    },
+    {
+      "id": "deriveLiveness",
+      "kind": "function",
+      "file": "tools/workflows/drift-audit-state.js"
     },
     {
       "id": "derive_attribution",
@@ -1338,6 +1373,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "hash_file",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
+    },
+    {
       "id": "heading_level",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -1645,6 +1685,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/govkit/census.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/govkit/check_runbook_parity.py"
     },
     {
@@ -1796,6 +1841,16 @@
       "id": "make_target",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "map_by_basename",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
+    },
+    {
+      "id": "map_from_receipt",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
     },
     {
       "id": "map_root",
@@ -2038,6 +2093,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "profile_symbols",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
+    },
+    {
       "id": "pytest_configure",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/crashprobe.py"
@@ -2206,6 +2266,11 @@
       "id": "read_input",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_kits_json",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
     },
     {
       "id": "read_lang_modes",
@@ -2381,6 +2446,16 @@
       "id": "renderLexedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderLivenessNote",
+      "kind": "function",
+      "file": "tools/workflows/drift-audit-code.js"
+    },
+    {
+      "id": "renderLivenessNote",
+      "kind": "function",
+      "file": "tools/workflows/drift-audit-state.js"
     },
     {
       "id": "renderRoster",
@@ -2573,6 +2648,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_hook_path",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
+    },
+    {
       "id": "resolve_import",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -2658,6 +2738,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "roles_from_kits_json",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
+    },
+    {
       "id": "rootSegments",
       "kind": "function",
       "file": "tools/memory-recall/recall-opened.js"
@@ -2711,6 +2796,11 @@
       "id": "run",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "run",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
     },
     {
       "id": "run",
@@ -3338,6 +3428,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_harness_liveness_note_is_derived",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_hits_disagreement_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -3646,6 +3741,11 @@
       "id": "validate_gate_runner",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "vintage",
+      "kind": "function",
+      "file": "tools/govkit/census.py"
     },
     {
       "id": "walk",

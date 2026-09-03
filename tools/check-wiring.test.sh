@@ -104,7 +104,12 @@ cleanup
 
 # AC7 — agent-cap adopted but unwired -> --check UNWIRED (exit 1); --session still exits 0
 if [ -f "$SMERGE" ]; then
-  newrepo; mkdir -p tools .claude/hooks; cp "$SMERGE" tools/settings-merge.py; printf '// stub\n' > .claude/hooks/agent-cap.js
+  newrepo; mkdir -p $KIT_REL/hooks .claude/hooks; cp "$SMERGE" tools/settings-merge.py
+  # The stub goes where the FRAGMENT declares the hook, not at `.claude/hooks/`.
+  # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
+  # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
+  # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
+  printf '// stub\n' > $KIT_REL/hooks/agent-cap.js
   git config core.hooksPath .githooks     # isolate: hooks wired, so only agent-cap can be unwired
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap'; } && ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 1 || ck "AC7 agent-cap unwired -> UNWIRED, exit 1" 0
@@ -124,7 +129,7 @@ if [ -f "$SMERGE" ]; then
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-cap.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/agent-cap.js\""
           }
         ]
       }
@@ -175,7 +180,7 @@ fi
 # UNWIRED and an absent hook file is "kit not adopted here".
 SGFRAG="$HERE/hooks/scratch-guard.fragment.json"
 if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
-  newrepo; mkdir -p tools/hooks .claude/hooks
+  newrepo; mkdir -p $KIT_REL/hooks $KIT_REL/memory-recall .claude/hooks
   cp "$SMERGE" tools/settings-merge.py
   cp "$SGFRAG" $KIT_REL/hooks/scratch-guard.fragment.json
   git config core.hooksPath .githooks    # isolate: hooks wired, so only scratch-guard can move the exit
@@ -188,7 +193,11 @@ if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
 
   # 13b — hook installed but nothing in settings.json: the dormant-guard state, and the whole reason
   # this arm exists. A guard that is silent because it is unwired looks exactly like one that passed.
-  printf '// stub\n' > .claude/hooks/scratch-guard.js
+  # The stub goes where the FRAGMENT declares the hook, not at `.claude/hooks/`.
+  # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
+  # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
+  # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
+  printf '// stub\n' > $KIT_REL/hooks/scratch-guard.js
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  scratch'; } \
     && ck "AC13b hook present, unwired -> UNWIRED, exit 1" 1 \
@@ -210,7 +219,7 @@ if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/scratch-guard.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/scratch-guard.js\""
           }
         ]
       }
@@ -264,7 +273,11 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
     && ck "AC8 recall opt-in not taken -> skip, exit 0" 1 || ck "AC8 recall opt-in not taken -> skip, exit 0" 0
 
   # state 3 — hook file present but no settings block -> UNWIRED, exit 1; --session still exits 0
-  printf '// stub\n' > .claude/hooks/recall-opened.js
+  # The stub goes where the FRAGMENT declares the hook, not at `.claude/hooks/`.
+  # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
+  # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
+  # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
+  printf '// stub\n' > memory-recall/recall-opened.js
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
     && ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 1 || ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 0
@@ -288,7 +301,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # state 5 — settings still dispatch the hook, the script is gone: UNWIRED, exit 1. Reachable from
   # WIRE §3c step 4 (two separate commands) in reverse order, and from any later loss of the
   # untracked hook file; Claude Code then runs `node` against nothing on every Read.
-  rm -f .claude/hooks/recall-opened.js
+  rm -f memory-recall/recall-opened.js
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall' && printf '%s' "$out" | grep -q 'is missing'; } \
     && ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 1 || ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 0
@@ -775,7 +788,7 @@ ck "S4 ...and the run names the failed resolution" \
 # THE ARM NEEDS AN ADOPTED KIT. With no kit installed every settings arm reports `skip — not
 # adopted`, which is correct and says nothing about this unit; the false-green case is a kit
 # that IS installed while the settings file cannot be found.
-mkdir -p .claude/hooks && printf '// agent-cap\n' > .claude/hooks/agent-cap.js
+mkdir -p $KIT_REL/hooks && printf '// agent-cap\n' > $KIT_REL/hooks/agent-cap.js
 out=$(chke --check)
 ck "S4 an ADOPTED kit with no settings file says UNWIRED, not ok" \
   "$(printf '%s' "$out" | grep -qE '^UNWIRED +agent-cap' && echo 1 || echo 0)"

@@ -824,6 +824,30 @@ exists to remove.
 
 ## Maintenance
 
+### The hooks ship ONE copy each — migrating a tree that has two
+
+Before `TOOL-dRetiredFork-14`, `agent-cap.js` and `scratch-guard.js` installed to both
+`{prefix}/hooks/` and `.claude/hooks/`, and the wired command named the second. Only the first ships
+now. A tree adopted before that change has two copies and a command pointing at the one that is no
+longer maintained.
+
+**The order is the whole instruction.** Move the wired command to the surviving copy, THEN withdraw
+the second. Reversed, the hook is unwired for the window between, and an unwired agent-cap is a
+security guard that is silently off:
+
+```bash
+python tools/settings-merge.py                                            # repaths agent-cap
+python tools/settings-merge.py --fragment "$KIT/hooks/scratch-guard.fragment.json"   # $KIT = your prefix
+bash tools/check-wiring.sh --check                                        # confirm before step 2
+govkit update --write-withdrawals                                         # only now
+```
+
+`check-wiring.sh` REPORTS a legacy copy instead of failing on it, precisely so this two-step is
+possible: a tree mid-migration is told what remains, not blocked from finishing.
+
+If your kits are not at `tools/`, nothing above changes — the fragments declare their hook path with
+a `{kit}` token and both the writer and the checker expand it against the fragment's own location.
+
 - Codebase-map engine files (`map_lib.py`, `gen_map.py`, `map_diff.py`, `reuse_lookup.py`, the two
   templates, `selftest.py`, `adopt-codebase-map.sh`) are identical across repos — update by
   overwriting from `<gov-repo>` wholesale; NEVER overwrite the project-owned

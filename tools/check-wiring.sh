@@ -245,13 +245,30 @@ rm -f "$_sj_err"
 # hook that is plainly in the file will conclude the checker is broken.
 AGENTCAP_MATCHER='Workflow|Agent'
 check_agentcap() {
-  local smerge found; smerge=$(first_of tools/settings-merge.py settings-merge.py)
-  # Left as a plain skip on purpose: agent-cap's hook path is not declared anywhere this script can
-  # read (settings-merge.py hardcodes it), so "settings wired, script missing" cannot be told from a
-  # deliberate out-of-tree copy. The recall arm below CAN — its fragment declares `hook_path`.
-  if [ ! -f .claude/hooks/agent-cap.js ]; then
-    echo "skip     agent-cap — not adopted (.claude/hooks/agent-cap.js absent)"
+  local smerge found shipped; smerge=$(first_of tools/settings-merge.py settings-merge.py)
+  # THE ADOPTION TEST PROBES FOR THE HOOK, IT DOES NOT NAME ONE COPY. This used to key on
+  # `.claude/hooks/agent-cap.js` and said so on purpose: the hook path "is not declared anywhere this
+  # script can read". That reason stopped being true at TOOL-dRetiredFork-14, which moved `hook_path`
+  # into the fragment exactly as the recall arm below already had it.
+  #
+  # Keying on the withdrawn copy was not merely stale, it was DANGEROUS: the moment the duplicate was
+  # dropped this arm printed `skip — not adopted` about a hook that is adopted and wired, over the
+  # most important guard in the repo. A skip that reads as a pass is the shape this repo keeps
+  # finding, and here it was one commit away from hiding an unwired security hook.
+  # The adopter rung is spelled through KIT_REL rather than as a bare `hooks/...`. Both forms probe
+  # the same place; only the bare one is a root-install spelling the prefix gate bans, and its
+  # waiver registry is shrink-only, so buying a new row here would spend a budget meant for the
+  # probes that already have one.
+  shipped=$(first_of "$KIT_REL/hooks/agent-cap.js" .claude/hooks/agent-cap.js)
+  if [ -z "$shipped" ]; then
+    echo "skip     agent-cap — not adopted (no agent-cap.js at tools/hooks/, hooks/ or .claude/hooks/)"
     return
+  fi
+  # S4: a LEGACY second copy is REPORTED, never redded. An adopter mid-migration has both, and their
+  # wired command may still name either; blocking them would make the safe ordering -- move the
+  # command first, withdraw second -- impossible to perform.
+  if [ "$shipped" != ".claude/hooks/agent-cap.js" ] && [ -f .claude/hooks/agent-cap.js ]; then
+    echo "note     agent-cap — a legacy copy remains at .claude/hooks/agent-cap.js while the shipped copy is $shipped; withdraw it once your wired command names the shipped one"
   fi
   if wired "agent-cap.js" "$AGENTCAP_MATCHER"; then
     # TOOL-dTieredTribunal-14 S7 - a WIRED command may never carry --only. The flag narrows the hook
@@ -270,7 +287,15 @@ check_agentcap() {
       unwired=$((unwired+1))
       return
     fi
-    echo "ok       agent-cap — PreToolUse hook wired in $(render_settings_path) (matcher '$AGENTCAP_MATCHER')"
+    # WIRED IS NOT ENOUGH -- it must name the copy that actually ships. A command pointing at a
+    # withdrawn path satisfies the marker test and loads nothing, which is precisely the silent
+    # unwiring this unit's migration ordering exists to prevent.
+    if ! grep -q "$shipped" "$(settings_json)" 2>/dev/null; then
+      echo "UNWIRED  agent-cap — wired, but the command does not name the shipped copy $shipped. Repath with: $PY ${smerge:-tools/settings-merge.py}"
+      unwired=$((unwired+1))
+      return
+    fi
+    echo "ok       agent-cap — PreToolUse hook wired in $(render_settings_path) at $shipped (matcher '$AGENTCAP_MATCHER')"
     return
   fi
   found=$(matchers_of "agent-cap.js" | paste -sd, - 2>/dev/null || matchers_of "agent-cap.js" | tr '\n' ',')
@@ -301,7 +326,17 @@ check_scratch_guard() {
   fi
   smerge=$(first_of tools/settings-merge.py settings-merge.py)
   marker=$(json_str "$frag" marker)
-  hookjs=$(json_str "$frag" hook_path)
+  # `{kit}` IS EXPANDED HERE, at the one place the value is read. A fragment ships verbatim, so it
+  # names the kit symbolically rather than spelling a prefix that is only correct in gov; leaving
+  # the token unexpanded makes this arm test for a file literally called `{kit}/...` and report a
+  # missing hook that is present. TOOL-dRetiredFork-14.
+  # `{kit}` resolves against THE FRAGMENT WE FOUND, not against this script's own KIT_REL. Those
+  # differ whenever the checker is run against a tree other than its own -- which is exactly what
+  # its self-test does -- and gov's prefix applied to a foreign layout names a file nobody has. The
+  # fragment sits at <kit>/<dir>/x.fragment.json, so two dirnames up IS the kit prefix, and it is
+  # empty for a kit installed at the repo root.
+  _kitpfx=$(dirname "$(dirname "$frag")"); [ "$_kitpfx" = "." ] && _kitpfx=""
+  hookjs=$(json_str "$frag" hook_path | sed "s|{kit}/|${_kitpfx:+$_kitpfx/}|g")
   smatcher=$(json_str "$frag" matcher)
   if [ -z "$marker" ] || [ -z "$hookjs" ] || [ -z "$smatcher" ]; then
     echo "UNWIRED  scratch   — $frag declares no marker/matcher/hook_path; settings-merge.py refuses it too. Fix: restore the shipped fragment"
@@ -354,7 +389,17 @@ check_recall_opened() {
   fi
   smerge=$(first_of tools/settings-merge.py settings-merge.py)
   marker=$(json_str "$frag" marker)
-  hookjs=$(json_str "$frag" hook_path)
+  # `{kit}` IS EXPANDED HERE, at the one place the value is read. A fragment ships verbatim, so it
+  # names the kit symbolically rather than spelling a prefix that is only correct in gov; leaving
+  # the token unexpanded makes this arm test for a file literally called `{kit}/...` and report a
+  # missing hook that is present. TOOL-dRetiredFork-14.
+  # `{kit}` resolves against THE FRAGMENT WE FOUND, not against this script's own KIT_REL. Those
+  # differ whenever the checker is run against a tree other than its own -- which is exactly what
+  # its self-test does -- and gov's prefix applied to a foreign layout names a file nobody has. The
+  # fragment sits at <kit>/<dir>/x.fragment.json, so two dirnames up IS the kit prefix, and it is
+  # empty for a kit installed at the repo root.
+  _kitpfx=$(dirname "$(dirname "$frag")"); [ "$_kitpfx" = "." ] && _kitpfx=""
+  hookjs=$(json_str "$frag" hook_path | sed "s|{kit}/|${_kitpfx:+$_kitpfx/}|g")
   # The MATCHER comes from the fragment too, so this arm still asserts nothing the shipped kit does
   # not itself declare — the same rule the marker already followed, applied to the half that decides
   # whether the hook fires at all.
