@@ -11,11 +11,12 @@
 #    repo per assertion.
 #  * `PASS` prints after the LAST arm. Upstream printed it ~150 lines early and landed a red bar
 #    because the head of the output said success.
+KIT_REL="${KIT_REL:-tools/workflows}"
 set -u
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
-GATE="tools/workflows/check-review-join.sh"
-SYNTAX="tools/workflows/check-workflow-syntax.js"
+GATE="$KIT_REL/check-review-join.sh"
+SYNTAX="$KIT_REL/check-workflow-syntax.js"
 fails=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
@@ -101,7 +102,7 @@ BS="$TMP/badstatus"; mkdir -p "$BS/tools/workflows" "$BS/tools/hooks"
 ( cd "$BS" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }
 await log('hi')
-" > tools/workflows/w.js
+" > $KIT_REL/w.js
   printf 'process.exit(3)
 ' > tools/hooks/agent-cap.js
   git add -A && git commit -qm badstatus --no-verify )
@@ -154,9 +155,9 @@ mkdir -p "$D/tools/workflows"
   # tools/, while the syntax gate scans only files carrying the `export const meta` marker. With one
   # plain seed the ignored-file arm below would empty the syntax gate's population and red for the
   # opposite reason to the one it is testing — measured, not guessed.
-  printf 'const x = 1\n' > tools/workflows/seed.js
+  printf 'const x = 1\n' > $KIT_REL/seed.js
   printf "export const meta = { name: 'seed', description: 'a tracked workflow' }\nawait log('hi')\n" \
-    > tools/workflows/seed-workflow.js
+    > $KIT_REL/seed-workflow.js
   git add -A && git commit -qm seed --no-verify )
 mkdir -p "$D/tools/workflows" && cp "$GATE" "$D/tools/workflows/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
 # TOOL-dTieredTribunal-14 S8 - the gate DELEGATES its predicate to the hook now, so a scratch repo
@@ -203,7 +204,7 @@ arm 'discovery: an empty population is still not a pass' 'the population is empt
 # assertion about nothing. Named `N` and not `D`, which is already bound to the discovery repo.
 N="$TMP/nohook"; mkdir -p "$N/tools/workflows"
 ( cd "$N" && git init -q . && git config user.email t@t.test && git config user.name t
-  printf "export const meta = { name: 'x' }\nawait log('hi')\n" > tools/workflows/w.js
+  printf "export const meta = { name: 'x' }\nawait log('hi')\n" > $KIT_REL/w.js
   git add -A && git commit -qm nohook --no-verify )
 cp "$GATE" "$N/tools/workflows/gate.sh"
 arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \

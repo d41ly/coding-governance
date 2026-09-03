@@ -6,6 +6,7 @@
 # The two arms that matter are a matched pair: the same build, once with the spec commit BEFORE the
 # build commit and once after. An arm for the refusal alone would not distinguish a leg that reds
 # correctly from one that reds on everything.
+KIT_REL="${KIT_REL:-tools}"
 set -u
 st=0; n=0
 SCRIPT="$(cd "$(dirname "$0")" && pwd)/check-pass-order.sh"
@@ -32,7 +33,7 @@ mkfixture() { # order -> prints the fixture root
     cat > .unattended.conf <<'CONF'
 MEMORY_ROOT=memory
 PASS_ORDER_CUTOFF="2026-01-01"
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
 CONF
     cat > memory/builds/tOrder/README.md <<'RM'
 ---
@@ -115,7 +116,7 @@ SPEC
 # ---- AC6: THE PASSING CASE, first. A refusal with no observed passing case is a gate that cannot be
 # ---- satisfied, and it is the arm most often missing.
 T=$(mkfixture spec-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 same "spec BEFORE build: the leg is green" "$rc" "0"
 has  "spec BEFORE build: the unit was graded" "$o" "graded 1 closed unit"
 hasnt "spec BEFORE build: nothing is reported as a violation" "$o" "FAILED"
@@ -124,7 +125,7 @@ rm -rf "$T"
 # ---- AC5: THE FAILING CASE, OBSERVED. This is the arm the whole leg exists for, and until it has
 # ---- been seen RED the leg is an assertion about nothing.
 T=$(mkfixture build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 same "build BEFORE spec: the leg REDS" "$rc" "1"
 has  "build BEFORE spec: the message names the unit" "$o" "ARCH-tOrder-1"
 has  "build BEFORE spec: the message says what happened" "$o" "BUILT before a conforming spec"
@@ -135,12 +136,12 @@ rm -rf "$T"
 # ---- liveness line names all three populations this leg walks.
 T=$(mkfixture build-first)
 ( cd "$T" && sed -i 's/^PASS_ORDER_CUTOFF=.*/PASS_ORDER_CUTOFF=""/' .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 same "cutoff BLANK: exits 0 over a tree that would otherwise RED" "$rc" "0"
 has  "cutoff BLANK: the skip ANNOUNCES itself" "$o" "the ORDER term is OFF"
 # The grandfathering direction: a build OPENED before the cutoff is skipped and counted.
 ( cd "$T" && sed -i 's/^PASS_ORDER_CUTOFF=.*/PASS_ORDER_CUTOFF="2026-12-01"/' .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 same "cutoff AFTER the build opened: grandfathered, exits 0" "$rc" "0"
 has  "cutoff AFTER: the skipped build is COUNTED, not silent" "$o" "1 build(s) skipped by the"
 rm -rf "$T"
@@ -151,12 +152,12 @@ rm -rf "$T"
 # ---- with zero output, byte-indistinguishable from a clean tree, and `trap` was worse — the leg
 # ---- PRINTED its own FAILED line and still exited 0. Both siblings met these one incident at a time.
 T=$(mkfixture build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 same "hostile-conf control: the fixture reds BEFORE the conf is touched" "$rc" "1"
 ( cd "$T" && printf '
 exit 0
 ' >> .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended \`exit 0\` cannot end the leg at 0"   || { echo "FAIL an appended exit 0 ended the leg at 0 -- the subject silenced its own gate"; st=1; }
 rm -rf "$T"
 
@@ -168,9 +169,9 @@ rm -rf "$T"
 T=$(mkfixture build-first)
 ( cd "$T" && printf 'echo OWNED; plan_state() { echo READY; }
 ' > tools/unattended/evil.sh    && printf '
-DRIVER="tools/unattended/evil.sh"
+DRIVER="$KIT_REL/unattended/evil.sh"
 ' >> .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 n=$((n+1)); case "$o" in *OWNED*) echo "FAIL a conf line redirected DRIVER, so the leg eval'd a file the graded run chose"; st=1 ;; *) echo "ok   hostile conf: DRIVER is not assignable from the conf" ;; esac
 same "hostile conf: the honest verdict survives the DRIVER line" "$rc" "1"
 rm -rf "$T"
@@ -179,15 +180,15 @@ T=$(mkfixture build-first)
 ( cd "$T" && printf "
 trap 'exit 0' EXIT
 " >> .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended EXIT trap cannot force rc 0"   || { echo "FAIL an appended EXIT trap forced rc 0 -- the worse shape, where the leg prints FAILED and exits green"; st=1; }
 rm -rf "$T"
 
 # ---- THE LIVENESS PROBE. A leg whose classifier cannot be sliced must SAY so and exit 2, never
 # ---- report a clean bill. Staged by breaking the driver's function header in a copy.
 T=$(mkfixture spec-first)
-( cd "$T" && sed -i 's/^plan_state()/plan_state_renamed()/' tools/unattended/unattended.sh )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+( cd "$T" && sed -i 's/^plan_state()/plan_state_renamed()/' $KIT_REL/unattended/unattended.sh )
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 same "unsliceable classifier: exits 2 rather than reporting clean" "$rc" "2"
 has  "unsliceable classifier: it says which predicate it lost" "$o" "plan_state"
 rm -rf "$T"
@@ -198,7 +199,7 @@ rm -rf "$T"
 T=$(mkfixture spec-first)
 ( cd "$T" && printf 'x\n' > tools/other.sh && git add -A >/dev/null \
     && git commit -q -m "ARCH-tOrder-11: a different unit entirely" --no-verify )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash $KIT_REL/unattended/check-pass-order.sh 2>&1); rc=$?
 same "id join is whole-token: a -11 commit does not disturb -1's verdict" "$rc" "0"
 rm -rf "$T"
 

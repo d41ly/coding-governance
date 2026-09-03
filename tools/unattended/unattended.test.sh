@@ -8,6 +8,7 @@
 #
 # ONE scratch repo, reset between arms. Twenty-six git inits would triple the runtime and buy
 # nothing: every arm's state is reachable from the pristine tree by a checkout and a clean.
+KIT_REL="${KIT_REL:-tools}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$HERE/unattended.sh"
@@ -619,7 +620,7 @@ miss "$out" "preflight OK"
 
 # ...and the remedy it prints names the SCRIPT and its mode, never a bare launcher: the driver's own
 # resolver ban refuses one, and this repo cannot assume a launcher exists on the operator's PATH.
-hit "$out" "the --write mode of tools/memory-tree/gen_build_index.py"
+hit "$out" "the --write mode of $KIT_REL/memory-tree/gen_build_index.py"
 
 # ...a SECOND pair in the working copy. `region` conflates absent with duplicated, so this is the arm
 # that proves the presence test is a grep and not that exit status.
@@ -4589,21 +4590,21 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
 reset_tree
 printf '
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
 ' >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 # ...DECLARED, the index ALONE is still accepted — that is the retraction M6 earned.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes tools/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $KIT_REL/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
 # rather than about one declaration.
 reset_tree
 printf '
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:$KIT_REL/memory-tree/gen_build_index.py"
 ' >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
-run --dispatch tRun --pass ARCH-tRun-1 --writes tools/memory-tree/gen_build_index.py >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes $KIT_REL/memory-tree/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in

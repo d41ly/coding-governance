@@ -10,6 +10,7 @@
 # Asserting over text is weaker than executing and is used only where executing cannot reach: whether
 # an `agent(` sits inside a loop is a property of the source, and it is the property `agent-cap.js`
 # itself judges from the source.
+KIT_REL="${KIT_REL:-tools}"
 set -u
 st=0; n=0
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -120,7 +121,7 @@ n=$((n+1)); grep -qE '\bparallel\s*\(|\bpipeline\s*\(' "$F" \
   || echo "ok   no parallel()/pipeline() call anywhere in the harness"
 if [ -f "$ROOT/tools/hooks/agent-cap.js" ]; then
   o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"tools/workflows/unattended-build.js"}}' \
-      | (cd "$ROOT" && node tools/hooks/agent-cap.js 2>&1); echo "rc=$?")
+      | (cd "$ROOT" && node $KIT_REL/hooks/agent-cap.js 2>&1); echo "rc=$?")
   n=$((n+1)); case "$o" in *"rc=0"*) echo "ok   agent-cap ADMITS the harness" ;; *) echo "FAIL agent-cap denied the harness -- $o"; st=1 ;; esac
 else
   echo "SKIP agent-cap admission — no hook at $ROOT/tools/hooks/agent-cap.js, so this arm was NOT exercised"

@@ -12,6 +12,7 @@
 # where it stopped matching. `memory/gotchas/fixture-inherits-ambient-machine-state.md` names exactly
 # this. The fixture home is deliberately a name no machine has, in two spellings, so the 8.3
 # cross-substitution is exercised rather than assumed.
+KIT_REL="${KIT_REL:-tools/hooks}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 HOOK="$HERE/scratch-guard.js"
@@ -186,8 +187,8 @@ if [ -n "$ROOT" ] && [ -f "$ROOT/tools/hooks/scratch-guard.js" ]; then
   elif diff -q <(sed 's/\r$//' "$ROOT/.claude/hooks/scratch-guard.js") <(sed 's/\r$//' "$ROOT/tools/hooks/scratch-guard.js") >/dev/null; then
     echo "ok   the wired copy matches the kit copy"; pass=$((pass+1))
   else
-    echo "FAIL .claude/hooks/scratch-guard.js has drifted from tools/hooks/scratch-guard.js"
-    echo "     fix: cp tools/hooks/scratch-guard.js .claude/hooks/scratch-guard.js"
+    echo "FAIL .claude/hooks/scratch-guard.js has drifted from $KIT_REL/scratch-guard.js"
+    echo "     fix: cp $KIT_REL/scratch-guard.js .claude/hooks/scratch-guard.js"
     fail=$((fail+1))
   fi
 else

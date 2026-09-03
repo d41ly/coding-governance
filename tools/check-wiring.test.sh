@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Runnable check for tools/check-wiring.sh. Spins throwaway repos and asserts the wired/unwired
 # detection, the never-clobber auto-fix, and the always-exit-0 --session mode. Run: bash tools/check-wiring.test.sh
+KIT_REL="${KIT_REL:-tools}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"      # safe dir to return to before any rm -rf
@@ -176,7 +177,7 @@ SGFRAG="$HERE/hooks/scratch-guard.fragment.json"
 if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
   newrepo; mkdir -p tools/hooks .claude/hooks
   cp "$SMERGE" tools/settings-merge.py
-  cp "$SGFRAG" tools/hooks/scratch-guard.fragment.json
+  cp "$SGFRAG" $KIT_REL/hooks/scratch-guard.fragment.json
   git config core.hooksPath .githooks    # isolate: hooks wired, so only scratch-guard can move the exit
 
   # 13a — fragment shipped, hook not installed, nothing in settings: NOT adopted, must not gate.
@@ -226,7 +227,7 @@ JSON
   # 13d — and the declared matcher reads ok. Without this half the arm is satisfied by a checker that
   # denies every matcher there is.
   rm -f .claude/settings.json
-  "${PYBIN:-python}" tools/settings-merge.py --fragment tools/hooks/scratch-guard.fragment.json >/dev/null 2>&1
+  "${PYBIN:-python}" tools/settings-merge.py --fragment $KIT_REL/hooks/scratch-guard.fragment.json >/dev/null 2>&1
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       scratch'; } \
     && ck "AC13d the fragment's own matcher -> ok, exit 0" 1 \
@@ -412,7 +413,7 @@ cleanup
 newrepo
 git config core.hooksPath .githooks        # isolate: hooks wired, so only the merge arm can be unwired
 mkdir -p tools/memory-tree tools/lib memory/backlog
-WANT="bash tools/memory-tree/merge-rows.sh %O %A %B %P"
+WANT="bash $KIT_REL/memory-tree/merge-rows.sh %O %A %B %P"
 
 # state 1 — kit not adopted -> skip, exit 0
 out=$(chk --check); rc=$?
@@ -423,7 +424,7 @@ out=$(chk --check); rc=$?
 # a merge driver that cannot start exits non-zero without writing %A: git then reports CONFLICT and
 # leaves the path holding OURS-only content with no markers. The remedy has to name the launcher that
 # TRAVELS WITH THE KIT, because `tools/lib/pyrun.sh` is gov-internal and an adopter never receives it.
-cp "$(src_of memory-tree/merge-rows.py)" tools/memory-tree/merge-rows.py
+cp "$(src_of memory-tree/merge-rows.py)" $KIT_REL/memory-tree/merge-rows.py
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'merge-rows.sh beside it'; } \
   && ck "AC10 no launcher -> UNWIRED naming the kit-internal one, exit 1" 1 \
@@ -467,7 +468,7 @@ chk --fix >/dev/null; got=$(git config merge.rows.driver); out=$(chk --check); r
 # longer breaks it — that decoupling is the whole point of shipping a launcher with the kit. What it
 # still cannot survive is a driver that will not parse. Removing the FILE would trip the
 # not-adopted probe one test earlier and never reach this arm, so the content is what breaks.
-cp tools/memory-tree/merge-rows.py tools/memory-tree/merge-rows.py.away
+cp $KIT_REL/memory-tree/merge-rows.py $KIT_REL/memory-tree/merge-rows.py.away
 printf 'this is not python(
 ' > tools/memory-tree/merge-rows.py
 out=$(chk --check); rc=$?
@@ -479,7 +480,7 @@ out=$(chk --check); rc=$?
 git config --unset merge.rows.driver
 chk --fix >/dev/null; got=$(git config merge.rows.driver 2>/dev/null || true)
 [ -z "$got" ] && ck "AC10 --fix refuses to wire a driver that cannot run" 1 || ck "AC10 --fix refuses to wire a driver that cannot run" 0
-mv -f tools/memory-tree/merge-rows.py.away tools/memory-tree/merge-rows.py
+mv -f $KIT_REL/memory-tree/merge-rows.py.away $KIT_REL/memory-tree/merge-rows.py
 chk --fix >/dev/null; out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the driver goes green again" 1 || ck "AC10 restoring the driver goes green again" 0
@@ -537,7 +538,7 @@ out=$(chk --check); rc=$?
 # id-level no-duplicate guarantee is entirely off. Every other assertion in the arm is green over it.
 # `anchor_at` is REDEFINED rather than deleted, so the import still succeeds and the fail-closed
 # handler is not what answers: this state is about a grammar that works and recognises nothing.
-printf '\n\ndef anchor_at(line, g=None):\n    return None\n' >> tools/memory-recall/extract.py
+printf '\n\ndef anchor_at(line, g=None):\n    return None\n' >> $KIT_REL/memory-recall/extract.py
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'HASHED'; } \
   && ck "AC10 a grammar that keys NOTHING -> UNWIRED naming the hashed count, exit 1" 1 || ck "AC10 a grammar that keys NOTHING -> UNWIRED naming the hashed count, exit 1" 0
@@ -546,15 +547,15 @@ out=$(chk --check); rc=$?
 # smoke's own three-way by hand and observing a clean, complete, id-preserving merge.
 Q=$(mktemp -d); printf -- '- TOOL-001 | base\n' > "$Q/o"
 printf -- '- TOOL-001 | base\n- TOOL-002 | ours\n' > "$Q/a"; printf -- '- TOOL-001 | base\n- TOOL-003 | theirs\n' > "$Q/b"
-qerr=$(bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py "$Q/o" "$Q/a" "$Q/b" x 2>&1 >/dev/null); qrc=$?
+qerr=$(bash $KIT_REL/lib/pyrun.sh $KIT_REL/memory-tree/merge-rows.py "$Q/o" "$Q/a" "$Q/b" x 2>&1 >/dev/null); qrc=$?
 qn=0; for i in 001 002 003; do [ "$(grep -c -- "^- TOOL-$i |" "$Q/a")" = 1 ] && qn=$((qn+1)); done
 { [ "$qrc" = 0 ] && [ "$qn" = 3 ] && printf '%s' "$qerr" | grep -q '(0 keyed, 3 hashed)'; } \
   && ck "AC10 the dead grammar still merges cleanly (0 keyed, 3 hashed) — the channel is real and quiet" 1 \
   || ck "AC10 the dead grammar still merges cleanly (0 keyed, 3 hashed) — the channel is real and quiet [rc=$qrc ids=$qn err=$qerr]" 0
 rm -rf "$Q"
-git checkout -q -- tools/memory-recall/extract.py 2>/dev/null || true
-if grep -q 'def anchor_at(line, g=None):' tools/memory-recall/extract.py; then
-  cp "$(src_of memory-recall/extract.py)" tools/memory-recall/extract.py
+git checkout -q -- $KIT_REL/memory-recall/extract.py 2>/dev/null || true
+if grep -q 'def anchor_at(line, g=None):' $KIT_REL/memory-recall/extract.py; then
+  cp "$(src_of memory-recall/extract.py)" $KIT_REL/memory-recall/extract.py
 fi
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \

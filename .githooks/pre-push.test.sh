@@ -2,6 +2,7 @@
 # pre-push.test.sh — drives a REAL git push through .githooks/pre-push in a throwaway scratch repo,
 # with the gate stubbed via GOV_GATE_CMD so the bar never actually runs. Proves the hook FIRES and
 # classifies correctly. Exit 0 = all cases ok.
+KIT_REL="${KIT_REL:-tools}"
 set -u
 SRC=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "pre-push.test: not a git repo"; exit 2; }
 [ -f "$SRC/.githooks/pre-push" ] || { echo "pre-push.test: .githooks/pre-push missing"; exit 1; }
@@ -127,7 +128,7 @@ stamp() {    # write a full-green record naming a sha, with a reproducible finge
   # is the shape of every record written before TOOL-dUnstalledConvoy-26 and is what AC4 grades.
   local sha=$1 st=${2-} gd; gd=$(git rev-parse --git-dir)
   local fp=""
-  [ -x tools/run-gates/gate-fingerprint.sh ] && fp=$(bash tools/run-gates/gate-fingerprint.sh "$sha" 2>/dev/null)
+  [ -x $KIT_REL/run-gates/gate-fingerprint.sh ] && fp=$(bash $KIT_REL/run-gates/gate-fingerprint.sh "$sha" 2>/dev/null)
   printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nrun_id\ttest\n' \
     "$sha" "$fp" "$(git hash-object -- tools/gate-legs.json 2>/dev/null)" > "$gd/gate-full-green"
   [ -n "$st" ] && printf 'selftests\t%s\n' "$st" >> "$gd/gate-full-green"
@@ -346,7 +347,13 @@ pfx_home=$PWD
 # repo, where HEAD carries no .githooks/ at all. The bare form wrote an EMPTY file, the red-first
 # control below hit its `[ -s ]` guard and skipped, and the suite still printed all-ok — a control
 # that silently does not run is worse than no control.
-git -C "$SRC" show HEAD:.githooks/pre-push > "$tmp/hooks-old-pre-push" 2>/dev/null || true
+# PINNED TO AN IMMUTABLE SHA, not HEAD. Reading HEAD made this control SELF-INVALIDATING: the
+# moment TOOL-dRetiredFork-11 landed, "the pre-change hook" became the fixed one and the arm
+# reported that it "already forced — this arm proves nothing". It was green when run before the
+# commit and red immediately after, which is the worst possible timing for a control nobody re-runs.
+# 05455c45 is the last commit that touched this hook BEFORE that unit.
+PREPUSH_PRE=05455c45fc0fc32f7de331541daea5c57cb856e0
+git -C "$SRC" show "$PREPUSH_PRE:.githooks/pre-push" > "$tmp/hooks-old-pre-push" 2>/dev/null || true
 [ -s "$tmp/hooks-old-pre-push" ] || bad "AC1 red-first control unavailable — could not read the pre-change hook"
 
 # Build a scratch repo whose kits live at $1, push once so a record can name a real sha, and leave

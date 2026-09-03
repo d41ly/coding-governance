@@ -10,6 +10,7 @@
 # WHY A SEPARATE LEG rather than arms in the driver suite: that suite pins a single unit-branch
 # commit and never pushes. The arms here deliberately MOVE the advertised branch tip, and
 # retrofitting that into a shared fixture would perturb every existing arm in a 1600-line file.
+KIT_REL="${KIT_REL:-tools/unattended}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 st=0; n=0
@@ -69,8 +70,8 @@ sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CM
 git add -A >/dev/null && git commit -q -m base --no-verify
 git remote add origin ../origin.git && git push -q origin main
 
-drive() { bash tools/unattended/unattended.sh "$@" 2>&1; }
-leg()   { bash tools/unattended/check-unattended.sh 2>&1; }
+drive() { bash $KIT_REL/unattended.sh "$@" 2>&1; }
+leg()   { bash $KIT_REL/check-unattended.sh 2>&1; }
 mk() { # slug · optional extra front-matter line
   mkdir -p "memory/builds/$1"
   { echo '---'; echo "slug: $1"; [ -n "${2:-}" ] && echo "$2"; echo 'streams: tooling'; echo '---'
