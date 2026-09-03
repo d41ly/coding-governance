@@ -42,7 +42,13 @@ run_wf() { # args-expr · returns-expr -> prints the trace, then RESULT/THROW
     const log = (m) => trace.push("log:" + m)
     const parallel = async () => { trace.push("parallel"); return [] }
     const pipeline = async () => { trace.push("pipeline"); return [] }
-    const workflow = async () => { trace.push("workflow"); return {} }
+    // TOOL-dRatifiedSeam-1. The AUDIT verdict now comes from a SUB-WORKFLOW rather than from an
+    // agent, so this double has to be able to return one. It returned a bare `{}` while `workflow`
+    // was unreachable, and a double that cannot produce the value under test grades nothing.
+    const workflow = async (ref, wargs) => {
+      trace.push("workflow:" + ((ref && ref.scriptPath) || String(ref)))
+      return returns["workflow"] || {}
+    }
     const budget = { total: null, spent: () => 0, remaining: () => Infinity }
     const fn = new AsyncFunction("args", "agent", "parallel", "pipeline", "phase", "log", "budget", "workflow", src)
     fn(JSON.parse(process.argv[2]), agent, parallel, pipeline, phase, log, budget, workflow)
@@ -51,11 +57,11 @@ run_wf() { # args-expr · returns-expr -> prints the trace, then RESULT/THROW
   ' "$F" "$1" "$2" 2>&1
 }
 
-UNITS='{"repo":"/tmp/r","slug":"tB","units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
+UNITS='{"repo":"/tmp/r","slug":"tB","subjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
 SPEC_OK='{"authored":["A-tB-1"],"alreadyPresent":["A-tB-2","A-tB-3"],"refused":[],"summary":"ok"}'
 BUILD_OK='{"committed":["A-tB-1","A-tB-2","A-tB-3"],"unbuilt":[],"summary":"ok"}'
 audit() { printf '{"verdict":"%s","blockers":%s,"reportPath":"r.md","summary":"s"}' "$1" "$2"; }
-returns() { printf '{"spec:":%s,"audit:":%s,"build:":%s}' "$SPEC_OK" "$1" "$BUILD_OK"; }
+returns() { printf '{"spec:":%s,"workflow":%s,"build:":%s}' "$SPEC_OK" "$1" "$BUILD_OK"; }
 
 # ---- AC2: THE ARGS GUARD, BOTH DIRECTIONS. The first cut of the guard this ports from tested
 # ---- `typeof a !== "object"` and refused every legitimate caller, so the PASSING case is armed.
@@ -91,17 +97,57 @@ for v in CONVERGED NON-CONVERGENT CEILING; do
   n=$((n+1)); case "$o" in *"phase:Build"*) echo "ok   $v: admits BUILD" ;; *) echo "FAIL $v did not admit BUILD, so a terminal verdict cannot land a build"; st=1 ;; esac
 done
 
+# ---- TOOL-dRatifiedSeam-1. THE STAGE THAT COULD NEVER COMPLETE ------------------------------
+# The AUDIT stage used to order a SIDECHAIN agent to invoke the Workflow tool, which a sidechain
+# does not hold. The stage could not complete, BUILD was unreachable, and the harness named a
+# route that did not run. These arms grade the fixed shape: the spawn happens in the SCRIPT.
+
+# S1 — the sub-workflow is invoked BY THIS SCRIPT, and the trace names which one. Without this,
+# every arm below could pass over a harness that reached BUILD by some other path entirely.
+o=$(run_wf "$UNITS" "$(returns "$(audit CONVERGED 0)")")
+has "S1 the AUDIT stage invokes tier2-review as a SUB-WORKFLOW from the script" "$o" \
+    "workflow:tools/workflows/tier2-review.js"
+
+# S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
+# converge on has converged, so the pairing is this repo's signature for a record no verb
+# produced — and it is exactly what the dead stage returned.
+o=$(run_wf "$UNITS" "$(returns "$(audit CONVERGING 0)")")
+has "S3 CONVERGING with 0 blockers THROWS" "$o" "THROW"
+has "S3 ...and the refusal names the pairing rather than a generic failure" "$o" \
+    "CONVERGING paired with 0 blockers"
+n=$((n+1)); case "$o" in
+  *"phase:Build"*) echo "FAIL S3 the impossible pairing still reached BUILD"; st=1 ;;
+  *) echo "ok   S3 ...and BUILD is not reached" ;;
+esac
+
+# S2 — A NON-INTEGER BLOCKER COUNT IS A DEGRADED RUN AND IS REPORTED AS ONE. tier2-review yields
+# `null` there BY DESIGN, never 0, so reading it as 0 would make every degraded audit look clean:
+# unattended.sh emits CONVERGED only on a count of 0.
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"verdict":"CONVERGED","blockers":null},"build:":%s}' \
+    "$SPEC_OK" "$BUILD_OK")")
+has "S2 a null blocker count THROWS rather than rounding to zero" "$o" "non-integer blocker count"
+n=$((n+1)); case "$o" in
+  *"phase:Build"*) echo "FAIL S2 a degraded audit reached BUILD"; st=1 ;;
+  *) echo "ok   S2 ...and a degraded audit does not reach BUILD" ;;
+esac
+
+# THE SUBJECT GUARD. An unpinned subject audits whatever the file happens to say when the lens
+# reads it, which is not a review of anything in particular — and tier2-review would refuse it
+# downstream with a message about its own arguments rather than about which stage failed.
+o=$(run_wf "${UNITS/\"blob\":\"abc1234\"/\"blob\":\"nothex\"}" "$(returns "$(audit CONVERGED 0)")")
+has "an unpinned subject blob is REFUSED before the sub-workflow runs" "$o" "7-40 hex blob"
+
 # ---- AC9: A DEAD AUDIT STAGE IS A REFUSAL, never a silent pass to BUILD. This is the absence that
 # ---- would otherwise let the harness build on an unreviewed spec set.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"build:":%s}' "$SPEC_OK" "$BUILD_OK")")
 has "a dead AUDIT stage THROWS" "$o" "THROW"
 has "the throw says an absent verdict is not a convergence" "$o" "must never read as CONVERGED"
-o=$(run_wf "$UNITS" "$(printf '{"audit:":%s,"build:":%s}' "$(audit CONVERGED 0)" "$BUILD_OK")")
+o=$(run_wf "$UNITS" "$(printf '{"workflow":%s,"build:":%s}' "$(audit CONVERGED 0)" "$BUILD_OK")")
 has "a dead SPEC stage THROWS rather than auditing nothing" "$o" "SPEC stage returned nothing"
 
 # ---- AC6: A DEGRADED RUN SAYS SO. `degradation-known-but-unreported` is the class where a pipeline
 # ---- computes how badly it degraded and does not report it.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"audit:":%s,"build:":%s}' \
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"build:":%s}' \
     '{"authored":[],"alreadyPresent":["A-tB-1"],"refused":["A-tB-2","A-tB-3"],"summary":"s"}' \
     "$(audit CONVERGED 0)" \
     '{"committed":["A-tB-1"],"unbuilt":["A-tB-2","A-tB-3"],"summary":"s"}')")
@@ -129,7 +175,7 @@ fi
 
 # ---- AC5: the AUDIT stage must name the spec-audit kind. `tier2-review.js` DEFAULTS an absent kind
 # ---- to `diff-review`, which primes code-shaped lenses at a spec and reports it as a review.
-n=$((n+1)); grep -q 'kind: "spec-audit"' "$F" \
+n=$((n+1)); grep -qE "kind: ['\"]spec-audit['\"]" "$F" \
   && echo "ok   the audit prompt names kind: \"spec-audit\"" \
   || { echo "FAIL the audit prompt does not name the spec-audit kind, so tier2-review would default to diff-review"; st=1; }
 
