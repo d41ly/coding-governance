@@ -112,7 +112,10 @@ spec claimed it was already written and that was wrong), and `DEPL-dRetiredFork-
 - **AC4** — When `govkit update --write` runs against a fixture holding a gov source with no
   receipt row, the source is written and reported, and a row appears in `install.json`.
 - **AC5** — When the same run meets a destination the target already holds, it REFUSES rather than
-  overwriting, and `.governance/install.json` is unchanged for that row.
+  overwriting, and the fixture target's receipt is unchanged for that row. The receipt path is
+  named in `tools/govkit/govkit.py` rather than spelled here: it is generated INSIDE an adopter
+  at install time and gov tracks no such file, so citing it as a repo path is a citation that
+  resolves to nothing.
 - **AC6** — When `python tools/govkit/selftest.py` is re-run, ZERO arms fail. The nineteen
   cascade arms are each named in this unit's ledger with what resolved them, but the criterion
   is the exit status, not the prose: a disposition written beside a still-failing arm satisfies
