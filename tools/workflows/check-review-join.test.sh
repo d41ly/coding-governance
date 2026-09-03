@@ -105,8 +105,13 @@ await log('hi')
   printf 'process.exit(3)
 ' > tools/hooks/agent-cap.js
   git add -A && git commit -qm badstatus --no-verify )
-cp "$GATE" "$BS/gate.sh"
-arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./gate.sh' _ "$BS"
+# TOOL-dRetiredFork-10: the gate resolves its predicate RELATIVE TO ITSELF now, so these
+# fixtures place it where an install actually puts it. They previously dropped it at the
+# fixture ROOT and worked only because the gate hard-coded `$ROOT/tools/hooks/` -- the very
+# literal this unit removes. No kit installs a workflow gate at a repository root, so the old
+# shape described a layout that has never existed in any adopter.
+cp "$GATE" "$BS/tools/workflows/gate.sh"
+arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$BS"
 
 # ---- the gate cannot pass by looking at nothing --------------------------------------------------
 arm 'an empty scan is not a pass' 'nothing was scanned, which is not a pass' \
@@ -153,7 +158,7 @@ mkdir -p "$D/tools/workflows"
   printf "export const meta = { name: 'seed', description: 'a tracked workflow' }\nawait log('hi')\n" \
     > tools/workflows/seed-workflow.js
   git add -A && git commit -qm seed --no-verify )
-cp "$GATE" "$D/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
+mkdir -p "$D/tools/workflows" && cp "$GATE" "$D/tools/workflows/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
 # TOOL-dTieredTribunal-14 S8 - the gate DELEGATES its predicate to the hook now, so a scratch repo
 # without one meets the missing-predicate refusal instead of the verdict this arm asserts.
 mkdir -p "$D/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$D/tools/hooks/agent-cap.js"
@@ -164,7 +169,7 @@ const verdicts = {}
 for (const v of all) verdicts[v.ref] = v
 EOF
 arm 'discovery: an UNTRACKED banned join is caught' 'scratch-join.js' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$D"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$D"
 cat >"$D/tools/workflows/scratch-workflow.js" <<'EOF'
 export const meta = { name: 'x', description: 'y' }
 const a = (
@@ -176,7 +181,7 @@ arm 'discovery: an UNTRACKED workflow script is parsed' 'SyntaxError' \
 # .gitignore line: both gates must go quiet, or "untracked" would mean "unignorable".
 printf 'tools/workflows/scratch-*.js\n' > "$D/.gitignore"
 arm 'discovery: a git-ignored file is not judged (review-join)' 'clean — no ref-keyed verdict join' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$D"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$D"
 arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
   bash -c 'cd "$1" && node ./syntax.js' _ "$D"
 
@@ -186,12 +191,12 @@ arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
 E="$TMP/emptyrepo"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify )
-cp "$GATE" "$E/gate.sh"
+mkdir -p "$E/tools/workflows" && cp "$GATE" "$E/tools/workflows/gate.sh"
 # S8 - same reason as the $D site. `$E` and not `$D`: the scratch variable is per SITE, and `E` is
 # not bound until this block, so a `$D` spelling here would judge the wrong repo.
 mkdir -p "$E/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$E/tools/hooks/agent-cap.js"
 arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$E"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$E"
 
 # TOOL-dTieredTribunal-14 S8 - the missing-predicate refusal's own failing case, OBSERVED. A gate whose
 # predicate is absent must SAY SO rather than pass, and a refusal nobody has watched fire is an
@@ -200,9 +205,9 @@ N="$TMP/nohook"; mkdir -p "$N/tools/workflows"
 ( cd "$N" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }\nawait log('hi')\n" > tools/workflows/w.js
   git add -A && git commit -qm nohook --no-verify )
-cp "$GATE" "$N/gate.sh"
+cp "$GATE" "$N/tools/workflows/gate.sh"
 arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
-  bash -c 'cd "$1" && bash ./gate.sh' _ "$N"
+  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$N"
 
 # ---- ARM 2: the agent wave that silently drops itself (TOOL-dRetiredFork-7) ----------------------
 # Absorbed from inCMS, REDUCED: its arms keyed on that repo's own record ids are left behind, because

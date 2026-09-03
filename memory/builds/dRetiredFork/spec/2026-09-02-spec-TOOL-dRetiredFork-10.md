@@ -1,11 +1,14 @@
 # TOOL-dRetiredFork-10 — three workflows gates anchor their locator and population on a basename
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
+**Status:** CLOSED · rev-3 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-10-1-predicate-run.md](../build/2026-09-03-build-TOOL-dRetiredFork-10-1-predicate-run.md) | journal | — |
+| [2026-09-03-build-TOOL-dRetiredFork-10-2-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-10-2-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-10-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-10-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 
@@ -124,6 +127,22 @@ including one nobody has enumerated, such as swydee's repo-root install.
   deletion but S2 then applied one rule to all three scripts, when `check-workflow-syntax.js` alone
   carries a marker and is the one case where deletion IS right; the split is now stated. M5: AC6
   asserted a gate green before the unit begins.
+
+- rev-3 · 2026-09-03 · BUILT, and S4 refuted S2 before a line was wired. A `workflows/`
+  basename anchor NARROWS review-join's population from 7 files to 5, dropping
+  `tools/hooks/scratch-guard.js` and `tools/memory-recall/recall-opened.js`, while AC5 requires 7.
+  §5 had named the risk as WIDENING and the run was built to catch that; the widening direction
+  measured zero and the losing direction held two files. Built on a DERIVED prefix instead
+  (`git rev-parse --show-prefix` from the script's own directory), which spells no literal and
+  reproduces the population exactly — PARKED, since the owner ratified S2 as written. Basename
+  anchoring was kept for the two `SELF_EXCLUDE` patterns, which name single files rather than a
+  subtree. Two deviations recorded in the ledger: only review-harness was bumped, because no
+  agent-cap kit file changed and a bump asserts bytes that moved; and §5's observability item is
+  partly met, because AC1 pins the default run's bytes and the two cannot both hold
+  unconditionally. The unit's most useful finding is not in any criterion: FOUR test-suite fixtures
+  installed the gate at the bare repository root and resolved its hook through the hard-coded
+  `$ROOT/tools/`, a layout no adopter has ever had — so the literal had propagated into the tests
+  meant to be able to detect it, and they would have kept passing while adopters stayed broken.
 
 ## 10. Reuse audit
 

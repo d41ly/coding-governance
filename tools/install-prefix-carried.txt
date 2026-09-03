@@ -35,7 +35,7 @@ tools/hooks/agent-cap.js	5	hooks,workflows
 tools/hooks/agent-cap.test.sh	3	hooks,workflows
 tools/hooks/scratch-guard.js	1	run-gates
 tools/hooks/scratch-guard.test.sh	4	hooks,run-gates
-tools/install-prefix-carried.txt	92	agent-instructions,codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,memory-recall,memory-tree,playbook,pytest-parallel-guardrails,run-gates,unattended,workflows
+tools/install-prefix-carried.txt	93	agent-instructions,codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,memory-recall,memory-tree,playbook,pytest-parallel-guardrails,run-gates,unattended,workflows
 tools/install-prefix-waivers.txt	6	codebase-map,memory-tree
 tools/lexicon/LEXICON.md	3	lexicon
 tools/lexicon/README.md	10	codebase-map,drift-audit,lexicon
@@ -100,6 +100,7 @@ tools/unattended/playbook.fixture.md	2	unattended
 tools/unattended/run-unattended-gates.sh	2	unattended
 tools/unattended/unattended.sh	7	memory-tree,workflows
 tools/unattended/unattended.test.sh	8	memory-recall,memory-tree,unattended
+tools/workflows/README.md	4	workflows
 tools/workflows/check-protocol-parity.test.sh	3	memory-tree,workflows
 tools/workflows/check-review-join.sh	3	hooks,workflows
 tools/workflows/check-review-join.test.sh	9	hooks,workflows

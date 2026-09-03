@@ -35,12 +35,49 @@ set -o pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "review-join: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-SELF_EXCLUDE='^tools/(workflows/check-review-join\.(sh|js|test\.sh)|hooks/agent-cap\.js)$'
+SELF_EXCLUDE='(^|/)(check-review-join\.(sh|js|test\.sh)|agent-cap\.js)$'
+# BASENAME-anchored, because the exclusion must travel with the population it scopes:
+# parametrising one and not the other converts a fork into a red bar. Basename is the
+# right form HERE -- these are individual FILES -- and the wrong form for the population,
+# which is a subtree whose name is the thing that varies. See the parked decision.
 # TOOL-dTieredTribunal-14 S6 - the hook joins the exclusion because it now HOLDS the ban table.
 # Measured, not defensive: the retired-identifier ban is a bare regex literal, a regex literal
 # survives the hook's own literal blanking, and the predicate run over the hook returns one hit on
 # exactly the table's line. This file's header already declared the doctrine and said SELF_EXCLUDE
 # keeps it true if the predicate is ever written in JavaScript. After S1 it is.
+
+# ---- WHERE THIS KIT LIVES, DERIVED -- TOOL-dRetiredFork-10 ------------------------------------
+# This script spells no install prefix. It is `tools/` here, `scripts/` at both measured adopters,
+# and whatever the next one picks. Three carve-outs and three divergence rows existed for a path
+# each script can work out from its own location.
+#
+# GIT COMPUTES THE REPO-RELATIVE PATH. This does NOT subtract `--show-toplevel` from `pwd`, which
+# is the obvious spelling and is broken on MSYS: `pwd` yields /c/projects/... while
+# `--show-toplevel` yields C:/projects/..., so the subtraction leaves the string untouched and the
+# population matches NOTHING. Measured during this unit -- population 0, no error, no diagnostic.
+#
+# An EMPTY prefix is a real layout, not a bug: a kit installed at the repository root has no
+# prefix to strip, and the population is then every *.js the repo holds.
+HERE="$(cd "$(dirname "$0")" && pwd)"
+KIT_PREFIX="$(cd "$HERE/.." && git rev-parse --show-prefix 2>/dev/null)"
+KIT_PREFIX="${KIT_PREFIX%/}"
+if [ -n "$KIT_PREFIX" ]; then POP_RE="^$KIT_PREFIX/.*\.js$"; else POP_RE='\.js$'; fi
+KIT_SAYS="${KIT_PREFIX:-the repository root}"
+
+# ---- THE PREDICATE, PROBED -------------------------------------------------------------------
+# Three rungs, and the third is not optional. NicoCares keeps its hooks a directory up from its
+# harnesses, which rung 2 reaches. inCMS has no such directory AT ALL -- its only copy sits at
+# `.claude/hooks/agent-cap.js` -- so a two-rung chain strands it, and that was found by testing the
+# derivation against both trees rather than by reasoning about one.
+#
+# F1, ratified: rung 3 stays a literal. `.claude/hooks/` is the HARNESS's own convention, not an
+# install prefix an adopter chooses, and this is the one place the unit does not practise what it
+# enforces. Said here rather than left for a reader to notice.
+HOOK=""
+for _cand in "$HERE/hooks/agent-cap.js" "$HERE/../hooks/agent-cap.js" "$ROOT/.claude/hooks/agent-cap.js"; do
+  if [ -f "$_cand" ]; then HOOK="$_cand"; break; fi
+done
+[ -n "$HOOK" ] || { echo "review-join: no agent-cap.js at $HERE/hooks/, $HERE/../hooks/ or $ROOT/.claude/hooks/ — a gate whose predicate is absent must say so, not pass"; exit 2; }
 
 EXPLAIN=0
 ARGS=()
@@ -63,12 +100,12 @@ else
   # and so deliberately permits untracked files at a push — which is the point: a banned join sitting
   # unstaged in the tree was previously invisible to the gate that exists to ban it.
   FILES=$(git ls-files --cached --others --exclude-standard -- '*.js' \
-    | grep -E '^tools/.*\.js$' | grep -vE "$SELF_EXCLUDE" | LC_ALL=C sort -u || true)
+    | grep -E "$POP_RE" | grep -vE "$SELF_EXCLUDE" | LC_ALL=C sort -u || true)
   EXPLICIT=0
 fi
 
 if [ "$EXPLICIT" = 0 ] && [ -z "$FILES" ]; then
-  echo "review-join: no JavaScript under tools/ — the population is empty, which is not a pass"
+  echo "review-join: no JavaScript under $KIT_SAYS/ — the population is empty, which is not a pass"
   exit 1
 fi
 
@@ -88,8 +125,6 @@ if [ "${#SCAN[@]}" = 0 ]; then
   exit 1
 fi
 
-HOOK="$ROOT/tools/hooks/agent-cap.js"
-[ -f "$HOOK" ] || { echo "review-join: the predicate is at $HOOK and it is not there — a gate whose predicate is absent must say so, not pass"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "review-join: node is not on PATH, so the predicate cannot run — refusing rather than passing"; exit 2; }
 
 hits=""
@@ -278,6 +313,10 @@ agentfiles=$(printf '%s\n' "$arm2" | sed -n 's/^AGENTFILES //p' | head -1)
 agentfiles=${agentfiles:-0}
 
 if [ "$EXPLAIN" = 1 ]; then
+  # Section 5 observability, behind --explain and NOT in the default run: AC1 requires this gate's
+  # ordinary output to stay byte-identical to its pre-change run, so an unconditional new line would
+  # fail the very criterion it was added to serve. The resolution is fully visible here instead.
+  echo "review-join: --explain — predicate at $HOOK, population under $KIT_SAYS/"
   echo "review-join: --explain — the population, and why each file is or is not judged:"
   printf '%s\n' "$arm2" | sed -n 's/^EXPLAIN /    /p'
 fi
@@ -313,7 +352,7 @@ if [ "$EXPLICIT" = 0 ] && [ "$agentfiles" != 0 ] && [ "$judged" = 0 ]; then
 fi
 
 [ "$st" = 0 ] || exit 1
-echo "review-join: clean — no ref-keyed verdict join under tools/, and every agent wave that this"
+echo "review-join: clean — no ref-keyed verdict join under $KIT_SAYS/, and every agent wave that this"
 echo "review-join: scan can judge is counted ($judged file(s) judged by arm 2)."
 echo "review-join: NOT CHECKED HERE (this is a source scan): that the count actually GUARDS the clean"
 echo "review-join: note, and that a SECOND wave is counted too — the counters are tallied per FILE."
