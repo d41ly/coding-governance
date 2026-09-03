@@ -1,6 +1,6 @@
 # DEPL-dRatifiedSeam-1 — the tracked-count invariant admits additions, and `update` lands a new source
 
-**Status:** OPEN · rev-1 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams deployer · order 1
+**Status:** OPEN · rev-2 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
@@ -24,8 +24,11 @@ changes the predicate and lands the half that was held back.
 - **S2** — Audit the other three tracked-count sites in `tools/govkit/selftest.py` and give each
   the same treatment or a stated reason it differs. Grounding measured exactly four; a change that
   fixes one and leaves three is the could-not-fail shape one level up.
-- **S3** — Land `DEPL-dRetiredFork-2`'s new-source half: `update` writes a gov source that has no
-  receipt row, and records it. The S5b scope fix already landed and is not in scope here.
+- **S3** — WRITE the new-source landing path: `update` writes a gov source the target has no
+  receipt row for, and records it. **The code does not exist yet.** `DEPL-dRetiredFork-2`
+  diagnosed, built and MEASURED it in a working tree and then committed none of it — its own
+  commit `cf97f3bc` says so: "diagnosed, built, measured working, and NOT landed". Only the
+  `--kits` scope fix landed. So the diagnosis is reusable and the implementation is not.
 - **S4** — A NEW arm asserting the direction that still binds: a run without
   `--write-withdrawals` that REMOVES a tracked file must still red. Without this, S1 relaxes the
   predicate into a check that cannot fail, which is the class `dRetiredFork` spent fifteen units
@@ -72,8 +75,8 @@ supersede the invariant instead. Recorded, not relitigated.
 ### Files touched (estimate)
 
 `tools/govkit/selftest.py` (one predicate, three audited sites, one new arm),
-`tools/govkit/govkit.py` (the new-source landing path already written for
-`DEPL-dRetiredFork-2`), and that unit's spec status.
+`tools/govkit/govkit.py` (the new-source landing path, WRITTEN HERE — see S3; rev-1 of this
+spec claimed it was already written and that was wrong), and `DEPL-dRetiredFork-2`'s spec status.
 
 ## 5. Production-readiness checklist
 
@@ -134,6 +137,12 @@ supersede the invariant instead. Recorded, not relitigated.
 - rev-1 · 2026-09-03 · initial draft. Scope corrected from the ruling's "nineteen arms" by the
   grounding measurement: four tracked-count sites, one standing predicate, nineteen cascade
   failures downstream of a single write run.
+- rev-2 · 2026-09-03 · S3 and §4 corrected. rev-1 said the new-source landing path was "already
+  written for `DEPL-dRetiredFork-2`" and it is NOT: `grep` for its reporting text over
+  `tools/govkit/govkit.py` returns 0 at HEAD, `git log -S` finds it in no commit, and that
+  unit's own commit message states it was built and not landed. A builder reading rev-1 would
+  have gone looking for code that does not exist. Found by the M4 audit — by hand, because the
+  agent fan died whole on a 529 and returned an empty finding list that read like a clean pass.
 
 ## 10. Reuse audit
 
