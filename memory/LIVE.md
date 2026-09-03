@@ -20,6 +20,7 @@ terminal status. Nothing here is edited by hand.
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [dNarrowedAnchor](builds/dNarrowedAnchor/README.md) | INPROGRESS | d | 2026-08-24 | tooling | 3 |
 | [dPromptedSeam](builds/dPromptedSeam/README.md) | DEFERRED | d | 2026-08-25 | tooling | 4 |
+| [dRatifiedSeam](builds/dRatifiedSeam/README.md) | OPEN | d | 2026-09-03 | tooling+deployer | 2 |
 | [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 |
 | [dScaffoldedMirror](builds/dScaffoldedMirror/README.md) | DEFERRED | d | 2026-08-24 | tooling | 22 |
 | [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 15 |
