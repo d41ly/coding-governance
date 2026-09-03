@@ -6859,12 +6859,50 @@ user_skills = "/tmp/gk-fake-skills"
             "exempt_leg": None,          # silent; re-runs a hole probe to decide a leg exemption
             "_cmd_apply": None,          # announces that a baseline WILL run, not which argv
             "read_gate_verdicts": None,  # silent at both spawns; apply prints before the first only
-            # `_cmd_update` IS GONE FROM BOTH SIDES. Its row existed for the BinOp
-            # `git rm ... + deleted`; DEPL-dRetiredFork-4 moved that call to `git_pathspec`, so
-            # the shape and the declaration went together. This map is asserted EQUAL to the
-            # declared target sites, so leaving the key here would red exactly as leaving the
-            # row there did -- which is the pair working.
+            # `_cmd_update` LEFT THIS MAP AND CAME BACK, one unit apart, and both moves were
+            # forced rather than chosen. DEPL-dRetiredFork-4 moved its `git rm ... + deleted`
+            # BinOp to `git_pathspec` and the row went stale; DEPL-dRetiredFork-3 gave the verb
+            # its first target-side execution and it spawns again. The map is asserted EQUAL to
+            # the declared sites, so neither move could be forgotten on one side only.
+            #
+            # `None`, AND THE REASON IS THE FEATURE ITSELF. The re-render step announces every
+            # argv it runs and every kit it declines -- but ONLY when GOVKIT_RERENDER=1, because
+            # AC6 asks for output byte-identical to the pre-change run while the flag is off,
+            # and a dark feature that announces its own absence is not dark. Every arm in this
+            # file runs with the flag unset, so there is no live needle to assert HERE. The
+            # announcement under the flag is covered by the S6 arms below, which set it.
+            "_cmd_update": None,
         }
+        # ---- DEPL-dRetiredFork-3 S6. THE RE-RENDER SELECTOR IS NOT VACUOUS ---------------------
+        # The decline path reads `role == "rendered"` out of each kit descriptor's row list, and the
+        # row key is `files`. Written as `file` -- which it was, and which parses, type-checks and
+        # runs -- the predicate matches NOTHING, every kit skips silently, and the run reports a
+        # clean `0 declined` over an empty population. Indistinguishable from a healthy tree.
+        #
+        # So this asserts the POPULATION, not the outcome: at least one shipped kit must have rows
+        # the selector actually selects. It reds if the key is renamed, if the role vocabulary
+        # changes, or if the predicate is retyped wrong -- the three ways this becomes vacuous again.
+        _kits3 = sorted((pathlib.Path(GK9.__file__).parent.parent).glob("*/kit.toml"))
+        check("[-3] S6 the kit population is non-empty (else the arm below proves nothing)",
+              len(_kits3) >= 3, f"{len(_kits3)} kit.toml files")
+        _rendered3 = {}
+        for _kt in _kits3:
+            try:
+                _d3 = GK9.load_toml(_kt)
+            except Exception:
+                continue
+            _n = sum(1 for _r in (_d3.get("files") or [])
+                     if str((_r or {}).get("role")) == "rendered")
+            if _n:
+                _rendered3[_kt.parent.name] = _n
+        check("[-3] S6 the `rendered` selector matches a LIVE population under the real key `files`",
+              bool(_rendered3),
+              "no kit has a rendered row -- the selector is vacuous and the decline path is dead")
+        check("[-3] S6 ...and the WRONG key `file` matches nothing, which is how it went unseen",
+              not any(GK9.load_toml(_k).get("file") for _k in _kits3),
+              "a `file` key exists after all -- re-read the selector")
+        print(f"note [-3] S6 rendered rows per kit: {_rendered3}")
+
         # ---- DEPL-dRetiredFork-5 S3. AN ADOPTER THAT EXITS 0 BY ABSENCE ------------------------
         # `classify_outcome` decides what an exit code MEANS by probing the filesystem, and it had
         # exactly ONE call site — inside `_cmd_apply`. So every `[[outcome]]` block was dead code for

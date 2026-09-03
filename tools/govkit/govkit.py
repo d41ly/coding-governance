@@ -2378,11 +2378,18 @@ SHELL_EXEC_SITES = {
                                      # first cut got wrong by attributing nested calls to the outer
                                      # one too. Same reason `check_runs` above covers the bash probe
                                      # rather than its enclosing `resolve_bash`.
-    # `_cmd_update` HELD A ROW HERE and no longer does. It existed for ONE shape: the BinOp
-    # `[...literal git rm...] + deleted`, which the census could not destructure.
-    # DEPL-dRetiredFork-4 moved that call to `git_pathspec`, so the shape is gone and the row
-    # went with it -- this table asserts in BOTH directions, and a declaration naming a function
-    # that no longer spawns widens the surface it was written to narrow.
+    # `_cmd_update` LOST ITS ROW AND EARNED A NEW ONE, one unit apart, which is the pair working
+    # rather than churn. DEPL-dRetiredFork-4 moved its `git rm ... + deleted` BinOp to
+    # `git_pathspec`, so the old row went stale and came out. DEPL-dRetiredFork-3 then gave the
+    # verb its FIRST target-side execution -- the re-render and regenerate argv -- so it spawns
+    # again, for a different reason, and is declared again.
+    #
+    # `target`, AND I LABELLED IT `gov` FIRST. The reasoning was that the argv is gov-authored
+    # and never comes from the target's deploy.toml, which is true and is not the question this
+    # table asks. The argv is resolved through `target_context`, so TARGET TOKEN VALUES are
+    # interpolated into it -- and this table's own definition of `target` is that the target
+    # influences the argv, whatever the template's provenance. A paired arm caught it by name.
+    "_cmd_update": "target",
 }
 # THREE LABELS, because there are three things and two of them were being called one. `gov`: gov
 # wrote the argv and gov controls every value in it. `target`: the target influences the ARGV, so a
@@ -6476,6 +6483,102 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # this verb owes is done, and it is done from the blob rather than from the disk.
     if deleted:
         git_pathspec(target, ["rm", "-q", "--ignore-unmatch"], deleted)
+
+    # ======================= DEPL-dRetiredFork-3 S1 + S2 — RE-RENDER AND REGENERATE =============
+    # BYTES LANDING IS NOT AN UPDATE FINISHING. `UPDATE_ROLE["rendered"]` is `"adopter"` but the
+    # disposition CAPS at report, and no `[adopt].argv` is spawned anywhere in this verb — the only
+    # subprocess it runs per kit is `[check].argv`, a verifier. So every rendered destination goes
+    # ONE VINTAGE STALE on every update. Measured at one adopter: NINE rendered rows, including three
+    # SKILL.md files and both binding protocols, plus the two CI jobs that byte-compare them.
+    #
+    # GATED OFF BY DEFAULT, and that is this spec's own section 4 rather than caution added here:
+    # this is the first time `update` executes target-side code, so it ships dark and is flipped on
+    # after in-place verification against a fixture and then one adopter. The charter's dark-landing
+    # rule, applied to the deployer itself. With the flag off the output is byte-identical to before,
+    # which is what makes the first release safe to land.
+    #
+    # THE ARGV IS ALWAYS GOV'S. It comes from a gov-authored descriptor and NEVER from the target's
+    # `deploy.toml`. That is the trust boundary section 5 names: the code runs in the target's tree
+    # under the operator's uid, so a check running under the run's own uid can be defeated by whoever
+    # runs it — and the mitigation is that the target never supplies the argv, not that the uid is
+    # trusted.
+    _rerender_on = os.environ.get("GOVKIT_RERENDER") == "1"
+    _rr_ran: list[str] = []
+    _rr_declined: list[tuple[str, str]] = []
+    if write:
+        for _eid in touched_kits:
+            _d, _ = descs[_eid]
+            # S3 non-goal — A KIT THE TARGET HOLDS DELIBERATELY INERT IS NOT RUN, and the run says
+            # so. Running its adopter is a POSTURE FLIP, which is exactly why "just run apply" was
+            # never the workaround for any of this.
+            if _eid in {str(x) for x in (deploy.get("inert") or [])}:
+                _rr_declined.append((_eid, "the target holds this kit INERT; running its adopter "
+                                           "would flip a posture the target chose"))
+                continue
+            # S1 IS NOT BUILT, AND THE REASON IS A MEASUREMENT RATHER THAN A PREFERENCE. The
+            # spec asks `update` to run the kit's `[adopt].argv`. Run against an adopted tree,
+            # `memory-tree`'s adopter takes one of exactly two branches, and NEITHER re-renders:
+            # with its marker present it prints "already scaffolded — nothing to do" and exits
+            # 0, and with the marker absent it REFUSES the tree as foreign and exits 1, which
+            # that kit declares as the outcome `refused-foreign-tree`. Both were reproduced on a
+            # fixture. So the adopter cannot refresh a stale rendered row: it is a no-op on the
+            # happy path and a refusal off it, which is correct behaviour for an ADOPTER and is
+            # why re-adoption was never the missing piece.
+            #
+            # A DECLARED `[[regenerate]]` BLOCK IS THEREFORE THE WHOLE MECHANISM: a narrow argv
+            # whose one job is to re-render, with no adoption guard to trip over.
+            _regen = _d.get("regenerate") or []
+            if not _regen:
+                # NOT `continue`. A kit that ships rendered rows and declares no regeneration is
+                # the actual live defect -- its artifacts go one vintage stale on every update --
+                # and a silent skip here would report that state as a clean run. TOOL-dRetiredFork-29.
+                if any(str((_row or {}).get("role")) == "rendered"
+                       for _row in (_d.get("files") or [])):
+                    _rr_declined.append((_eid, "this kit ships `rendered` rows and declares no "
+                                               "[[regenerate]] argv, so they stay one vintage "
+                                               "stale; its adopter cannot do this job"))
+                continue
+            if not _rerender_on:
+                _rr_declined.append((_eid, "the re-render step is OFF (set GOVKIT_RERENDER=1); "
+                                           "its artifacts are one vintage stale until it is run"))
+                continue
+            _ctx_rr = target_context(target, deploy, _eid, _d)
+            for _blk in list(_regen):
+                _argv = _blk.get("argv") or []
+                if not _argv:
+                    continue
+                _res = [resolve_tokens(a, _ctx_rr)[0] for a in _argv]
+                _out = subprocess.run(resolve_shell_argv(_res), cwd=str(target),
+                                      capture_output=True, text=True)
+                # THE EXIT CODE GOES THROUGH THE DECLARED PROBE, exactly as `_cmd_apply`'s
+                # CONFIGURE step does, and NOT through `rc != 0`. Writing the naive test here
+                # would have failed every update that touched `memory-tree`, whose adopter
+                # SEEDS ITS CONF AND STOPS BY DESIGN -- a declared, accepted, non-zero outcome.
+                # DEPL-dRetiredFork-5 taught `check` this same lesson one unit ago; the third
+                # caller learning it independently is the argument for the helper existing.
+                _oc_rr = classify_outcome(target, _d, _ctx_rr, _out.returncode)
+                _bad = (not _oc_rr.get("ok")) if _oc_rr is not None else (_out.returncode != 0)
+                _rr_ran.append(f"{_eid}: {' '.join(_res)} -> exit {_out.returncode}"
+                               + (f" ({_oc_rr.get('means')})" if _oc_rr else "")
+                               + ("  REFUSED" if _bad else ""))
+                if _bad:
+                    r.fail(f"kit '{_eid}': the declared re-render/regenerate argv exited "
+                           f"{_out.returncode} and no declared outcome accepts that. The "
+                           f"post-write verification below rolls this run back rather than "
+                           f"committing a bad render")
+    # AC6 — SILENT WHEN THE FLAG IS OFF. The criterion asks for output byte-identical to the
+    # pre-change run, and a step that announces its own absence is not dark. Once the flag is
+    # ON every decline is named, which is section 5s observability item and the class this
+    # build keeps closing: a skip that looks like a pass.
+    if _rerender_on:
+        print(f"govkit update — re-render: {len(_rr_ran)} argv run, "
+              f"{len(_rr_declined)} declined")
+        for _line in _rr_ran:
+            print(f"govkit update —   ran {_line}")
+    for _eid, _why in (_rr_declined if _rerender_on else []):
+        # A SKIP THAT LOOKS LIKE A PASS IS THE CLASS THIS BUILD KEEPS CLOSING. Every declined kit is
+        # named with its reason, so "nothing re-rendered" is never read as "nothing needed it".
+        print(f"govkit update —   DECLINED {_eid}: {_why}")
 
     # ======================= DEPL-dCarriedReceipt-14 S4..S8 — POST-WRITE VERIFICATION ============
     # Every byte this run was going to move has moved. Now ask each TOUCHED kit the one question it
