@@ -4936,17 +4936,56 @@ user_skills = "/tmp/gk-fake-skills"
               str(sorted(p.name for p in (_t11 / ".governance" / "outbox").glob("*"))
                   if (_t11 / ".governance" / "outbox").exists() else []))
 
-        # ---- THE WRITE RUN. AC6's standing predicate is measured ACROSS it: no `update --write` without
-        # ---- `--write-withdrawals` may reduce the target's tracked-file count, whatever any verdict says.
+        # ---- THE WRITE RUN. The standing predicate is measured ACROSS it: no `update --write`
+        # ---- without `--write-withdrawals` may REDUCE the target's tracked-file count, whatever any
+        # ---- verdict says.
+        #
+        # DEPL-dRatifiedSeam-1 S1 — THE DIRECTION CHANGED, THE ASSERTION DID NOT. This asserted
+        # `len(before) == len(after)` until the owner ruled (`DEPL-dRetiredFork-13`) that `update`
+        # may LAND a gov source the receipt does not name. An equality forbids that outright, so it
+        # becomes `>=`: the count may RISE and may never FALL.
+        #
+        # THE HALF THAT MATTERS IS THE ONE STILL BOUND. `DEPL-dCarriedReceipt-11`'s own spec records
+        # why this predicate exists — that unit removed the engine's only unguarded delete of a
+        # tracked file in a repository gov does not own — and the destructive direction is exactly
+        # the one a relaxation must not reach. `>=` keeps it. S4 below then ARMS it, because a
+        # direction nothing exercises is a direction nothing grades.
         _files_before = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
         _w11 = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
         _files_after = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
         check("[-11] AC2 `update --write` exits 0 with nine renamed sources in the receipt",
               _w11.returncode == 0, _w11.stdout[-2000:] + _w11.stderr[-1000:])
-        check("[-11] AC6 THE STANDING PREDICATE: the tracked-file count is UNCHANGED across a run with no "
-              "--write-withdrawals", len(_files_before) == len(_files_after),
+        check("[-11] AC6 THE STANDING PREDICATE: the tracked-file count NEVER FALLS across a run "
+              "with no --write-withdrawals",
+              GK9.count_never_falls(len(_files_before), len(_files_after)),
               f"{len(_files_before)} -> {len(_files_after)}: "
-              f"{sorted(set(_files_before) - set(_files_after))}")
+              f"lost {sorted(set(_files_before) - set(_files_after))}")
+
+        # ---- DEPL-dRatifiedSeam-1 S4. THE REMOVAL DIRECTION, ARMED --------------------------------
+        # S1 relaxed one direction. Without this, the predicate grades NOTHING: `>=` is satisfied by
+        # every run that does not delete, and no fixture deletes, so it would report green forever
+        # whatever the engine did. That is the could-not-fail class this build inherits its records
+        # from, and it would have been introduced by the unit that inherits them.
+        #
+        # THE SHIPPED DECISION, called with every input shape. My first cut of this arm compared
+        # `len(_fell) >= len(_files_before)` in the TEST — a re-implementation, and a tautology:
+        # one fewer than a number is never at least that number, so it passed whatever the engine
+        # did. Grading a copy of a predicate grades the copy. `count_never_falls` is now the one
+        # subject, the check above calls it, and mutating it reds these rows.
+        for _b, _a, _want, _what in (
+                (5, 5, True,  "unchanged — the pre-ruling state, still legal"),
+                (5, 7, True,  "a RISE — what DEPL-dRetiredFork-13 ruled must become legal"),
+                (5, 4, False, "a FALL — the destructive direction, still refused"),
+                (5, 0, False, "everything gone — the shape -11 removed the unguarded delete for"),
+                (0, 0, True,  "empty both sides — no population is not a violation"),
+                (0, 3, True,  "growth from empty"),
+        ):
+            check(f"[-11] S4 count_never_falls({_b}, {_a}) is {_want} — {_what}",
+                  GK9.count_never_falls(_b, _a) is _want,
+                  f"got {GK9.count_never_falls(_b, _a)!r}")
+        check("[-11] S4 LIVENESS the table asserts BOTH verdicts, so it cannot pass by agreeing",
+              len({_w for _x, _y, _w, _z in (
+                  (5, 5, True, ""), (5, 4, False, ""))}) == 2, "the table lost a direction")
         check("[-11] AC3 ...so the below-threshold row's file is still on disk",
               (_t11 / "tools" / "demo" / "low.txt").is_file(), "")
         check("[-11] AC3 ...and still tracked, and still a row in install.json",

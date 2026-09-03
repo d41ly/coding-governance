@@ -3484,6 +3484,23 @@ def hook_probe(target: pathlib.Path) -> tuple[str, str]:
     return "block", (out.stdout + out.stderr).strip()
 
 
+def count_never_falls(before: int, after: int) -> bool:
+    """The standing predicate, as one testable value: a run without `--write-withdrawals` may raise
+    the target's tracked-file count and may never lower it.
+
+    EXTRACTED RATHER THAN INLINED, and the reason is a defect I wrote twice. `DEPL-dCarriedReceipt-11`
+    asserted `before == after` inline in the suite; `DEPL-dRatifiedSeam-1` relaxed it to `>=` inline
+    and then "armed" the removal direction with an arm that re-implemented the comparison in the
+    test. That arm is a TAUTOLOGY — `len(x) - 1 >= len(x)` is false for every x, so it passes
+    whatever the shipped code does, which is the same could-not-fail shape the closing review of
+    `dRetiredFork` found in that build's BAN arms. A copy of a predicate grades the copy.
+
+    With the decision here, the suite calls it and a truth table grades it, so mutating this line
+    reds the suite. That is the whole difference.
+    """
+    return after >= before
+
+
 def outcome_accepted(rc: int, oc, declared_for_rc: bool) -> bool:
     """Is an adopter's exit code an ACCEPTED outcome? The whole decision, as one testable value.
 

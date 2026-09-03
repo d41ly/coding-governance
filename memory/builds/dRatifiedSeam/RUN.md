@@ -20,3 +20,7 @@ anchor-ref: refs/heads/main
 base: a69e57d751d1dcbfb0f7eee5d86444b84a75980b
 
 ## Parked
+
+2026-09-03T21:41:28Z brief · item DEPL-dRatifiedSeam-1 · reason c4f787e4f140 memory/builds/dRatifiedSeam/prompts/2026-09-03-prompt-DEPL-dRatifiedSeam-1-1-build-brief.md
+
+2026-09-03T21:41:29Z dispatch · item a156548f DEPL-dRatifiedSeam-1 · reason tools/govkit/selftest.py,tools/govkit/govkit.py,memory/builds/dRatifiedSeam/spec/2026-09-03-spec-DEPL-dRatifiedSeam-1.md,memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-2.md

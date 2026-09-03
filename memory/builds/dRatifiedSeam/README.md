@@ -73,9 +73,9 @@ ids DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1
 | [TOOL-dRatifiedSeam-1 — the harness AUDIT stage runs where Workflow exists](spec/2026-09-03-spec-TOOL-dRatifiedSeam-1.md) | 2 | 2 | OPEN | rev-2 | 2026-09-03 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1.
+Ids no record names: TOOL-dRatifiedSeam-1.
 
 Ids no `spec-audit` record has ever named: DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1.
 <!-- /gen:build-index -->
