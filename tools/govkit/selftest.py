@@ -5099,6 +5099,72 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-11] S4 ...while the merged row reads `patched`, which is what a surviving edit IS",
               verdict_of(_w11b.stdout, _d2) == "patched", _w11b.stdout)
 
+        # ---- DEPL-dRatifiedSeam-1 AC4 + AC5. THE UNCLAIMED SOURCE, EXERCISED --------------------
+        # S3 SHIPPED UNEXERCISED AND I ALMOST LEFT IT THERE. The suite went green at 1065 arms with
+        # the landing reached by nothing: every destination the `-11` fixture offered was one the
+        # walk had already decided about, so the block skipped them all and reported zero. Zero
+        # landings and a broken landing are the same green — the green-by-absence class this whole
+        # lineage exists to remove, sitting inside the unit that removes it.
+        #
+        # The scenario is the real one: gov gains a file inside a kit whose descriptor already says
+        # `include = "**"`, so the descriptor DECLARES it and the receipt has never named it. That
+        # is precisely what an adopter meets when gov ships a new file into a kit they installed.
+        (_g11 / "tools" / "demo" / "arrival.txt").write_text(
+            "a file gov added after this target installed\n", encoding="utf-8", newline="\n")
+        settle(_g11, "gov gains a file the receipt has never named")
+        settle(_t11, "before the unclaimed-source run")
+        _files_pre_new = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
+        _wn = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
+        _files_post_new = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
+        _rc_new = json.loads((_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))
+
+        check("[-RS1] AC4 the run exits 0 and SAYS it landed an unclaimed source",
+              _wn.returncode == 0 and "unclaimed sources: 1 landed" in _wn.stdout,
+              _wn.stdout[-1400:] + _wn.stderr[-600:])
+        check("[-RS1] AC4 ...and the file is really in the target's worktree",
+              (_t11 / "tools" / "demo" / "arrival.txt").is_file(), "")
+        check("[-RS1] AC4 ...and it is TRACKED, not merely written",
+              "tools/demo/arrival.txt" in _files_post_new,
+              f"{len(_files_pre_new)} -> {len(_files_post_new)}")
+        check("[-RS1] AC4 ...and the receipt now carries a row for it",
+              any(f.get("path") == "tools/demo/arrival.txt" for f in _rc_new.get("files", [])),
+              str(sorted(f.get("path") for f in _rc_new.get("files", []))[-4:]))
+        # THE ROW MUST BE ATTRIBUTABLE, which is what the five-field version of it was not: a row
+        # with no `commit`/`gov_oid` cannot be traced to a gov vintage, and `-7`'s integrity
+        # preamble refuses the NEXT run over it.
+        _row_new = next((f for f in _rc_new.get("files", [])
+                         if f.get("path") == "tools/demo/arrival.txt"), {})
+        check("[-RS1] AC4 ...carrying the four fields that make a row attributable to a vintage",
+              all(_row_new.get(k) for k in ("commit", "gov_oid", "source", "sha256")),
+              str(sorted(_row_new.keys())))
+        check("[-RS1] AC4 LIVENESS the count really ROSE, so S1's relaxed direction was taken",
+              len(_files_post_new) == len(_files_pre_new) + 1,
+              f"{len(_files_pre_new)} -> {len(_files_post_new)}")
+
+        # AC5 — A DESTINATION THE TARGET ALREADY HOLDS IS A REFUSAL. The receipt does not name it,
+        # so gov never put those bytes there and has no basis for calling them stale. Overwriting
+        # would be the silent data loss in somebody else's repository that this verb's read-only
+        # default exists to prevent.
+        (_g11 / "tools" / "demo" / "occupied.txt").write_text(
+            "gov's version\n", encoding="utf-8", newline="\n")
+        settle(_g11, "gov declares a second new file")
+        (_t11 / "tools" / "demo" / "occupied.txt").write_text(
+            "the adopter got here first\n", encoding="utf-8", newline="\n")
+        _wo = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
+        check("[-RS1] AC5 a destination the target already holds is REFUSED, not overwritten",
+              "REFUSED tools/demo/occupied.txt" in _wo.stdout,
+              _wo.stdout[-1400:] + _wo.stderr[-600:])
+        check("[-RS1] AC5 ...and the adopter's bytes are untouched",
+              (_t11 / "tools" / "demo" / "occupied.txt").read_text(encoding="utf-8")
+              == "the adopter got here first\n",
+              (_t11 / "tools" / "demo" / "occupied.txt").read_text(encoding="utf-8"))
+        check("[-RS1] AC5 ...and no receipt row was minted for it",
+              not any(f.get("path") == "tools/demo/occupied.txt" for f in json.loads(
+                  (_t11 / ".governance" / "install.json").read_text(encoding="utf-8")).get("files", [])),
+              "a refused landing minted a row anyway")
+        (_t11 / "tools" / "demo" / "occupied.txt").unlink()
+        settle(_t11, "clear the AC5 collision before the withdrawal arms")
+
         # ---- AC4: the deletion, and the ONLY way to get one.
         settle(_t11, "after the second update")
         _files_pre_wd = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)

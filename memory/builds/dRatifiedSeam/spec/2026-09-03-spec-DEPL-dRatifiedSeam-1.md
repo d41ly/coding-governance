@@ -1,11 +1,12 @@
 # DEPL-dRatifiedSeam-1 — the tracked-count invariant admits additions, and `update` lands a new source
 
-**Status:** OPEN · rev-3 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams deployer · order 1
+**Status:** CLOSED · rev-3 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-DEPL-dRatifiedSeam-1-1-acceptance-ledger.md](../build/2026-09-03-build-DEPL-dRatifiedSeam-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-03-prompt-DEPL-dRatifiedSeam-1-1-build-brief.md](../prompts/2026-09-03-prompt-DEPL-dRatifiedSeam-1-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -142,6 +143,8 @@ spec claimed it was already written and that was wrong), and `DEPL-dRetiredFork-
 - **F2 — what happens to a cascade arm that fails for a REAL reason S3 must fix?** Recommendation:
   it becomes a defect this unit fixes, not a disposition. S5 exists to tell the two apart, and the
   answer is only cheap if the arms are read rather than counted.
+
+**RESOLVED (agent, 2026-09-03): both forks took their stated Recommendation, and the build then confirmed each against the tree.** F1 — no second opt-in flag; the ruling's plain reading is that `update` reconciles, and a flag would rebuild the separate-verb design the owner declined. F2 — a cascade arm failing for a REAL reason becomes a defect this unit fixes, and that is exactly what happened: all four cascade failures were defects in S3, not fixtures needing updates, and each is dispositioned in this unit's acceptance ledger.
 
 ## 9. Revision log
 
