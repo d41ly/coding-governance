@@ -1075,6 +1075,14 @@ mkdir -p "$Y/memory/project" "$Y/memory/backlog"
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  # THE REGISTRIES THE GENERATOR REFUSES TO RUN WITHOUT. This fixture is hand-built and stands
+  # in for the scaffolder's output, so every registry the scaffolder gains has to be added here
+  # too -- and when `stale-header-waiver.txt` landed, it was not. The arm then failed for the one
+  # reason it exists to rule out: a freshly scaffolded tree that is not clean. A replica is a
+  # second answer to a question the adopter already answers, and this is the copy that rots.
+  # TOOL-dRetiredFork-31: the arm should INVOKE the scaffolder rather than reproduce it, which
+  # is the only version of it that can ever catch this class.
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
   # the generator reads `git ls-files`, so stage first, render, then stage the render — the same
   # order `adopt-memory-tree.sh --scaffold` uses, because this arm is standing in for its output
   n=$((n+1))
@@ -1109,6 +1117,7 @@ mkdir -p "$G/memory/project" "$G/memory/guides" "$G/memory/map/features" "$G/mem
   printf 'MAP_ROOT=memory/map\n' > .codebase-map.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
   printf '# legacy\n' > memory/project/legacy-files.txt
   L=$(printf 'x%.0s' $(seq 1 340))
   printf '# map index\n\n- %s\n' "$L" > memory/map/README.md          # NOT exempt      -> RED
@@ -1227,6 +1236,7 @@ mkdir -p "$R/memory/builds/tOwner/spec" "$R/memory/builds/tRunBig" "$R/memory/bu
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
   printf '# legacy\n' > memory/project/legacy-files.txt
   rr() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tOwner-1\n---\n\n# %s\n' "$1" "$1"; }
   n=$((n+1))
@@ -1326,6 +1336,7 @@ mkdir -p "$K"
            memory/builds/tOne/build memory/builds/tTwo/spec memory/builds/tTwo/reviews
   printf '# r\n' > memory/README.md
   printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
   for r in legacy-files.txt curation-debt.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt; do : > "memory/project/$r"; done
   rk() { printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-%s-1\n---\n\n# %s\n' "$1" "$1" "$1"; }
   rk tOne > memory/builds/tOne/README.md
@@ -1701,6 +1712,10 @@ _b1=$(mktemp -d)
   printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
   printf '# r\n' > memory/README.md
   printf '# d\n\n- ARCH-tOne-1 - a decision\n' > memory/DECISIONS.md
+  # the index generator REFUSES a missing stale-header-waiver.txt, so this fixture needs it
+  # too — see the note on the hand-built trees above. TOOL-dRetiredFork-31.
+  printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' \
+    > memory/project/stale-header-waiver.txt
   printf -- '---\nslug: tOne\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tOne-1\nstatus: OPEN\n---\n\n# tOne\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > memory/builds/tOne/README.md
   printf '# ARCH-tOne-1 - a unit\n\nbody\n' > memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md
   git add -A >/dev/null 2>&1

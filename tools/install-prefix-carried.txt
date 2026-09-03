@@ -17,7 +17,7 @@ tools/agent-instructions/kit.toml	1	agent-instructions
 tools/check-agent-cap-restatement.sh	3	(loose),hooks,workflows
 tools/check-agent-cap-restatement.test.sh	1	hooks
 tools/check-install-prefix.sh	9	(loose),govkit,lib
-tools/check-install-prefix.test.sh	18	(loose),memory-tree
+tools/check-install-prefix.test.sh	25	(loose),memory-tree	FIXTURE-INTERNAL PATHS. `mkfix_source` builds a scratch gov tree containing `tools/demo/` and `tools/govkit/`, and the arms then run the gate INSIDE it -- so `tools/` in this file is the fixture's own layout and is correct at every prefix. The row rose 18 -> 25 when TOOL-dRetiredFork-17's closing review forced the BAN arms to stop re-implementing the gate's awk and invoke the real gate instead, which needs real fixture trees. Same class as the check-pass-order row below: a sweep that rewrites a fixture value is not a repath.
 tools/check-kit-versions.sh	33	(loose),codebase-map,drift-audit,govkit,hooks,lexicon,memory-recall,memory-tree,pytest-parallel-guardrails,run-gates,unattended,workflows
 tools/check-line-length.sh	6	(loose),lexicon
 tools/check-line-length.test.sh	2	(loose)

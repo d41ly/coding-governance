@@ -259,9 +259,22 @@ check_agentcap() {
   # the same place; only the bare one is a root-install spelling the prefix gate bans, and its
   # waiver registry is shrink-only, so buying a new row here would spend a budget meant for the
   # probes that already have one.
-  shipped=$(first_of "$KIT_REL/hooks/agent-cap.js" .claude/hooks/agent-cap.js)
+  # `${KIT_REL:+...}` LIKE EVERY SIBLING ARM, and this one was the only probe in the file
+  # without it. Unguarded, a ROOT install (KIT_REL empty) built the absolute path
+  # `/hooks/agent-cap.js`, matched nothing, and printed `skip -- not adopted` over a hook that
+  # was present and correctly wired. A silent skip over the concurrency hook, which is the
+  # one arm in this file where a false skip has a security shape. Found by the closing review
+  # of TOOL-dRetiredFork-17, reproduced on a scratch root-layout tree.
+  #
+  # The guard buys no waiver row: with KIT_REL empty the rung IS the bare spelling, so the
+  # form the prefix gate bans never appears in the source.
+  shipped=$(first_of "${KIT_REL:+$KIT_REL/}hooks/agent-cap.js" .claude/hooks/agent-cap.js)
   if [ -z "$shipped" ]; then
-    echo "skip     agent-cap — not adopted (no agent-cap.js at tools/hooks/, hooks/ or .claude/hooks/)"
+    # THE MESSAGE NAMES WHAT THE PROBE ACTUALLY TRIED. It used to advertise three locations
+    # for a two-rung probe, one of them a hardcoded install-prefix literal in prose that
+    # ships verbatim to an adopter at another prefix -- the class this build exists to drain,
+    # inside the arm whose own comment is about skips that read as passes.
+    echo "skip     agent-cap — not adopted (no agent-cap.js at ${KIT_REL:+$KIT_REL/}hooks/ or .claude/hooks/)"
     return
   fi
   # S4: a LEGACY second copy is REPORTED, never redded. An adopter mid-migration has both, and their
