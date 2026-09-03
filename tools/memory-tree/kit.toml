@@ -235,4 +235,4 @@ kind = "measurement"
 blocks_adopt = false
 blocks_gate = false
 why = "stale-header-waiver.txt ships with its header and NO rows, in gov and in every adopter. The rows a tree needs are the headers that actually corrupted in THAT tree, so a list measured on gov's corpus is vacuous anywhere else — the same reason measured-pins and slot-budget-ceilings ship unarmed. EMPTY IS THE EXPECTED STATE and the mechanism is inert until a header rots; a MISSING file stays a refusal, because a file nobody created is a decision nobody made. The generator names how many headers it tolerated on every run, so a tree that never armed this says so rather than reporting a clean bar."
-discharge = { command = ["bash", "-c", "grep -qvE '^[[:space:]]*(#|$)' {memory_root}/project/stale-header-waiver.txt"] }
+discharge = { command = ["grep", "-qvE", "^[[:space:]]*(#|$)", "{memory_root}/project/stale-header-waiver.txt"] }

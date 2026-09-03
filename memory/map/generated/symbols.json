@@ -258,6 +258,11 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "as_posix_p",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "ask_shell",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -911,6 +916,11 @@
       "id": "declares",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "declares_outcome_for",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "decline_findings",
@@ -1991,6 +2001,11 @@
       "id": "openersOf",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "outcome_accepted",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "owners_of",
