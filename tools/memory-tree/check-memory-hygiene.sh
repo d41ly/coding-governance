@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.58   # gov:kit memory-tree@2.58 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.59   # gov:kit memory-tree@2.59 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -71,6 +71,21 @@ DOSSIER_CAP_BYTES=20480       ; DOSSIER_CAP_LINES=0
 # bytes: `length()` decides this verdict and whether it counts characters or bytes is a property of
 # the awk build and the ambient locale, which check 7 deliberately does not pin.
 ENTRY_CAP_CHARS=300           ; BUILD_README_ENTRY_CAP_CHARS=350
+
+# ---- FIVE VALUES A PROJECT OWNS — TOOL-dRetiredFork-15 -------------------------------------------
+# Each was a literal in a check below, which is why NicoCares carries four carve-outs against this
+# one file. BLANK MEANS GOV'S CURRENT BEHAVIOUR for all five, so an adopter who never edits
+# .memory-tree.conf sees a byte-identical run.
+#
+# TWO OF THESE NARROW WHAT IS GRADED and are therefore validated below rather than merely read.
+# BUILD_SLUG_RE is a predicate and RECORD_SERVES_CUTOFF is a population filter: a bad value does not
+# red, it silently grades NOTHING and reports green. A regex matching the empty string admits every
+# folder name; a cutoff dated in the future excludes every record. That is the difference between a
+# declared key and a hole with a name.
+BUILD_SLUG_RE=""              # blank = ^[A-Za-z][A-Za-z0-9-]*$ ; must be anchored and must not match ""
+PROJECT_REGISTRY_EXTRA=""     # whitespace-separated extra filenames legal under <M>/project/
+RECORD_SERVES_CUTOFF=""       # blank = grade every record; else ISO date, records BEFORE it are exempt
+ENTRY_CAP_UNIT=""             # blank = today's locale-decided counting; or `chars` / `bytes`
 [ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
 : "${SPEC10_CUTOFF:=$_SPEC10_SHIPPED}"   # see the declaration above: blank resolves forward, never off
 # The caps are validated HERE, once, before anything reads them — ahead of the print modes below, so
@@ -94,6 +109,50 @@ for _k in INDEX_CAP_BYTES INDEX_CAP_LINES GUIDE_CAP_BYTES GUIDE_CAP_LINES BUILD_
   esac
 done
 [ -n "$_capbad" ] && { echo "HYGIENE — cannot run: size cap(s) declared in .memory-tree.conf are unusable:$_capbad"; exit 2; }
+
+# ---- AC0: THE TWO NARROWING KEYS ARE VALIDATED, and an invalid value ABORTS ----------------------
+# Blank and INVALID are different answers and must not collapse into one. Blank is "use gov's
+# behaviour"; invalid is "this configuration cannot be graded", and a checker that treats the second
+# as the first reports green over a population it silently emptied.
+_cfgbad=""
+if [ -n "$BUILD_SLUG_RE" ]; then
+  case "$BUILD_SLUG_RE" in
+    "^"*) ;; *) _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (not anchored at ^: an unanchored slug pattern matches inside any name)" ;;
+  esac
+  case "$BUILD_SLUG_RE" in
+    *"$") ;; *) _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (not anchored at \$: an unanchored slug pattern matches any suffix)" ;;
+  esac
+  # THE EMPTY-STRING TEST IS THE LOAD-BEARING ONE. A pattern that matches "" matches every folder
+  # name, so check 4 passes everything and reports a clean tree. Asked of awk, which is the engine
+  # that will actually apply it -- asking `grep` a question awk answers is two dialects and one
+  # assumption.
+  if printf '' | awk -v re="$BUILD_SLUG_RE" '{ } END { exit ("" ~ re) ? 0 : 1 }' 2>/dev/null; then
+    _cfgbad="$_cfgbad BUILD_SLUG_RE='$BUILD_SLUG_RE' (matches the EMPTY string, so check 4 would admit every folder name)"
+  fi
+fi
+if [ -n "$RECORD_SERVES_CUTOFF" ]; then
+  case "$RECORD_SERVES_CUTOFF" in
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) _cfgbad="$_cfgbad RECORD_SERVES_CUTOFF='$RECORD_SERVES_CUTOFF' (not an ISO YYYY-MM-DD date)" ;;
+  esac
+  # A FUTURE CUTOFF EXEMPTS EVERY RECORD. It is the same silent-green shape as the empty regex, from
+  # the population side rather than the predicate side.
+  _today=$(date +%Y-%m-%d)
+  if [ "$RECORD_SERVES_CUTOFF" ">" "$_today" ]; then
+    _cfgbad="$_cfgbad RECORD_SERVES_CUTOFF='$RECORD_SERVES_CUTOFF' (dated after today, $_today: every record would be exempt)"
+  fi
+fi
+case "${ENTRY_CAP_UNIT:-}" in
+  ""|chars|bytes) ;;
+  *) _cfgbad="$_cfgbad ENTRY_CAP_UNIT='$ENTRY_CAP_UNIT' (not one of: chars bytes)" ;;
+esac
+[ -n "$_cfgbad" ] && { echo "HYGIENE — cannot run: project key(s) declared in .memory-tree.conf are unusable:$_cfgbad"; exit 2; }
+
+# OBSERVABILITY: a divergent configuration is visible without opening the conf.
+for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF ENTRY_CAP_UNIT; do
+  eval "_dv=\${$_dk}"
+  [ -n "$_dv" ] && echo "memory-hygiene: project key $_dk='$_dv' (gov's default is blank)"
+done
 # CONVERGED. This branch (TOOL-aRelaxedShard-1) built the same feature independently and arrived at
 # two byte-only keys with blank resolving FORWARD to a shipped default. main's scheme is kept because
 # it is strictly more general — both axes of every class — and because its validation caught a trap the
@@ -338,6 +397,27 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # other than this one.
   F:spec-token-waivers.txt|F:readme-contract.txt) ;;
   F:stale-header-waiver.txt) ;;
+  # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
+  # forking this whitelist, which is what NicoCares carved this file out to do.
+  #
+  # PLACED LAST ON PURPOSE. The first cut put this case ABOVE the named ones, where `F:*`
+  # matched every one of them and accepted it — check 3 stopped grading anything under
+  # project/ and still reported clean. A widening case has to sit where it can only widen.
+  #
+  # A NON-MATCH FALLS THROUGH TO THE SAME REFUSAL the catch-all gives, spelled here rather
+  # than reached by omission: a case that ends in `;;` accepts, and accepting is the one
+  # thing this branch must not do by accident.
+  F:*)
+    # THE CASE SUBJECT IS `$e`. `bp` is the variable this whole substitution is being ASSIGNED
+    # to, so it is unset in here -- and under `set -u` reading it killed the subshell, which
+    # emptied check 3 output entirely and reported a clean tree. Measured twice: this key
+    # disabled check 3 in two different ways before it widened it in the intended one.
+    _pok=0
+    for _px in $PROJECT_REGISTRY_EXTRA; do
+      if [ "$e" = "F:$_px" ]; then _pok=1; break; fi
+    done
+    if [ "$_pok" != 1 ]; then echo "$M/project/${e#*:}"; fi
+    ;;
   *) echo "$M/project/${e#*:}";; esac; done)
 bm=""
 if [ -n "$MAP_SUB" ]; then
@@ -371,11 +451,24 @@ $bad3"
 # express the run phases — the unattended leg owns validating those.
 BUILD_N=$(printf '%s\n' "$FILES" | awk -F/ -v m="$M" '$0 ~ "^" m "/builds/" && NF > 3 { print $3 }' | LC_ALL=C sort -u | grep -c .)
 pop_guard 4 "no build folder under $M/builds/" "$BUILD_N" "$PRE_ANYBUILD"
+# S4 — CHECK 4 CONSULTS THE GRANDFATHER REGISTRY, which check 5 has read at its `in_legacy`
+# line all along. A build root listed in legacy-files.txt was grandfathered by one check and
+# graded by the other, so a project with a pre-governance folder name had to carve out this
+# whole file to keep its own bar green. One registry, both checks — and it needs no new key.
+#
+# Passed as ONE binding and split in BEGIN rather than filtered by a shell loop: check 4 runs
+# over every tracked file under builds/, and a per-file `in_legacy` call would trade one awk
+# for thousands of subshells.
 bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
-  | LC_ALL=C awk -F/ -v m="$M" -v famalt="$FAM_ALT" '
+  | LC_ALL=C awk -F/ -v m="$M" -v famalt="$FAM_ALT" -v slugre="$BUILD_SLUG_RE" -v legacy="$LEGACY" '
       BEGIN {
         n_m = split(m, _seg, "/"); fidx = n_m + 2    # <m>/builds/<folder>
-        vre = "^[A-Za-z][A-Za-z0-9-]*$"              # the slug, alone
+        # S1 — the slug pattern is a PROJECT value now. Blank keeps the gov default. Any override was
+        # validated in the preset block before this ran: anchored at both ends, and NOT matching
+        # the empty string, because a pattern matching "" admits every folder name silently.
+        vre = (slugre != "") ? slugre : "^[A-Za-z][A-Za-z0-9-]*$"
+        _nleg = split(legacy, _lg, "\\n")
+        for (_i = 1; _i <= _nleg; _i++) if (_lg[_i] != "") LEG[_lg[_i]] = 1
         rre = "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-(prompt|spec|build|review)-((" famalt ")-)?[A-Za-z0-9]+-[0-9]+\\.md$"
         # An ARCHIVED run-state file (2.18). A GRAMMAR, because the whitelist above it is string
         # equality and a family of names cannot be spelled that way. SHAPE, not vocabulary: a phase
@@ -389,7 +482,8 @@ bad4=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/" \
       function flush(   n,i,j,k,keys,tmp,type,name) {
         if (folder=="") return
         if (folder !~ vre) {
-          print m "/builds/" folder " (bad folder name — expected the slug alone, no date and no FAMILY prefix)"
+          if (!((m "/builds/" folder) in LEG))
+            print m "/builds/" folder " (bad folder name — expected the slug alone, no date and no FAMILY prefix)"
           folder=""; delete ent; return }
         n=0; for (k in ent) keys[++n]=k
         for (i=2;i<=n;i++){ tmp=keys[i]; j=i-1; while(j>=1 && keys[j]>tmp){keys[j+1]=keys[j];j--} keys[j+1]=tmp }
@@ -550,7 +644,17 @@ sel7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
 done)
 bad7=""
 if [ -n "$sel7" ]; then
-  bad7=$(awk -v bp="$M/builds/" -v ecc="$ENTRY_CAP_CHARS" -v becc="$BUILD_README_ENTRY_CAP_CHARS" '
+  # S5 — ENTRY_CAP_UNIT. gov deliberately sets NO locale here, and its own comment says why:
+  # pinning one "would silently re-decide the cap on any adopter whose awk counts characters
+  # today". A DECLARED key with a blank default re-decides nothing, which is the difference.
+  # `bytes` forces C; `chars` asks for UTF-8 and gets whatever the platform supports, which is
+  # stated rather than promised; blank leaves the locale exactly as it is today.
+  _c7env=""
+  case "${ENTRY_CAP_UNIT:-}" in
+    bytes) _c7env="LC_ALL=C" ;;
+    chars) _c7env="LC_ALL=C.UTF-8" ;;
+  esac
+  bad7=$(env $_c7env awk -v bp="$M/builds/" -v ecc="$ENTRY_CAP_CHARS" -v becc="$BUILD_README_ENTRY_CAP_CHARS" '
     { f = $0; if (f == "") next
       # PER-CLASS WIDTH, both declared. A build README is four rendered regions plus one authored
       # block, and its widest authored lines were MEASURED between 300 and 331 — that measurement is
@@ -703,6 +807,31 @@ pop_guard 21 "no record under $M/builds/*/{build,prompts,reviews}/" \
 if [ "$STAGED" = 0 ] && printf '%s\n' "$c21_sel" | grep -q .; then
   b21=$("$_PY" "$HERE/gen_build_index.py" --print-bindings 2>/dev/null || true)
   miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
+  # S3 — RECORD_SERVES_CUTOFF. A project adopting this kit mid-life has landed records that
+  # predate the Serves grammar; NicoCares measured 549 of them. A cutoff is one value where a
+  # grandfather list would be 549 rows, and it matches the five cutoffs already in the conf.
+  #
+  # THIS NARROWS A POPULATION, which is why the preset block refuses a cutoff dated after
+  # today: a future date exempts every record and the check reports clean over nothing.
+  # Blank grades everything, which is what gov does.
+  if [ -n "$RECORD_SERVES_CUTOFF" ]; then
+    miss21=$(printf '%s\n' "$miss21" | awk -v cut="$RECORD_SERVES_CUTOFF" '
+      # the record date is the basename prefix the naming grammar already pins. A row whose
+      # name carries no date is KEPT: unparseable is not the same answer as old, and only one
+      # of them is an exemption.
+      {
+        # LEADING SPACES COME OFF FIRST. The row is `  <path> — <detail>`, so cutting at the
+        # first space before trimming the indent leaves an EMPTY path and the filter matches
+        # nothing -- the cutoff then silently exempts no record while appearing to work.
+        p = $0; sub(/^ +/, "", p); sub(/ .*$/, "", p)
+        b = p; sub(/^.*\//, "", b)
+        if (b ~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]-/) {
+          d = substr(b, 1, 10)
+          if (d < cut) next
+        }
+        print
+      }' | grep . || true)
+  fi
   [ -n "$miss21" ] && fail 21 "records under build/, prompts/ or reviews/ whose head carries no conformant Serves line:
 $miss21"
   bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')

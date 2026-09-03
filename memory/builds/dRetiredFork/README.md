@@ -161,7 +161,7 @@ ids TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetired
 | [TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface](spec/2026-09-02-spec-TOOL-dRetiredFork-13.md) | 3 | 1 | CLOSED | rev-5 | 2026-09-03 |
 | [TOOL-dRetiredFork-14 — one hook copy is shipped and wired, not two](spec/2026-09-02-spec-TOOL-dRetiredFork-14.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-03 |
 | [TOOL-dRetiredFork-21 — the two hooks whose path comes from a fragment, not from the default](spec/2026-09-02-spec-TOOL-dRetiredFork-21.md) | 4 | 2 | CLOSED | rev-2 | 2026-09-03 |
-| [TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys](spec/2026-09-02-spec-TOOL-dRetiredFork-15.md) | 5 | 2 | OPEN | rev-2 | 2026-09-02 |
+| [TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys](spec/2026-09-02-spec-TOOL-dRetiredFork-15.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-03 |
 | [TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine](spec/2026-09-02-spec-TOOL-dRetiredFork-16.md) | 5 | 2 | OPEN | rev-3 | 2026-09-02 |
 | [DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations](spec/2026-09-02-spec-DEPL-dRetiredFork-1.md) | 6 | 2 | OPEN | rev-4 | 2026-09-02 |
 | [DEPL-dRetiredFork-2 — `update` lands a gov source that has no receipt row](spec/2026-09-02-spec-DEPL-dRetiredFork-2.md) | 6 | 2 | OPEN | rev-4 | 2026-09-02 |
@@ -172,7 +172,7 @@ ids TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetired
 | [TOOL-dRetiredFork-17 — the authoring rule, and the gate that turns the ratchet into a ban](spec/2026-09-02-spec-TOOL-dRetiredFork-17.md) | 9 | 2 | OPEN | rev-3 | 2026-09-02 |
 <!-- /gen:build-units -->
 
-Records: 40 bound to this build, across 4 record folder(s).
+Records: 42 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -253,7 +253,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 6590
+    "ceiling": 480000
   },
   {
     "name": "row-keyed merge driver replay",

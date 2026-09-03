@@ -110,3 +110,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-03T02:17:32Z brief · item TOOL-dRetiredFork-21 · reason 8e24a7b33560 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-21-1-build-brief.md
 
 2026-09-03T02:17:48Z dispatch · item 597d874f TOOL-dRetiredFork-21 · reason tools/memory-recall/adopt-memory-recall.sh tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/gate-legs.json WIRE-INTO-PROJECT.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-21.md
+
+2026-09-03T02:43:39Z brief · item TOOL-dRetiredFork-15 · reason 6fe2a0d25416 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-15-1-build-brief.md
+
+2026-09-03T02:43:55Z dispatch · item d63b2aaa TOOL-dRetiredFork-15 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/.memory-tree.conf.example tools/memory-tree/kit.toml tools/memory-tree/README.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-15.md

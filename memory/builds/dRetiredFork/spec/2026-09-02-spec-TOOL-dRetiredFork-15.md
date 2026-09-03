@@ -1,11 +1,13 @@
 # TOOL-dRetiredFork-15 — five memory-tree values a project owns become declared keys
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 5 · ratified 2026-09-02
+**Status:** CLOSED · rev-3 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 5 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-15-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-15-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-15-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-15-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
@@ -136,6 +138,26 @@ generic reader can check neither.
 - rev-2 · 2026-09-02 · folded spec-audit round 2, finding 20. rev-1's third non-goal claimed the unit added no
   disarming key, so neither of the two keys that CAN narrow a graded population was guarded. The
   non-goal is narrowed to thresholds and AC0 adds the two refusals.
+
+- rev-3 . 2026-09-03 . BUILT, all five keys, every AC met. AC7 is met as a DECLARATION and the
+  measurement is the interesting part: on this node awk already counts BYTES by default (200
+  em-dashes measure 600), so `bytes` is a no-op here and `chars` is the value that changes anything.
+  That IS the platform-dependence the key exists to surface.
+
+  PROJECT_REGISTRY_EXTRA disabled check 3 TWICE before it widened it once -- first by sitting above
+  the named cases and matching all of them, then by comparing `$bp`, the variable the substitution
+  is being assigned to, which is unset inside it and killed the subshell under `set -u`. Both were
+  caught by an arm asserting an UNLISTED file is still reported; an arm checking only the silencing
+  half would have passed all three times.
+
+  A pre-existing arm FORBADE this unit's own change: check 7 was asserted to carry no locale prefix,
+  which is F1's concern exactly. Widened to "no prefix the conf cannot switch off", with a second arm
+  pinning the empty default.
+
+  COST: the suite went 6.6 s to 381 s and its ceiling is re-declared 6590 to 480000 ms. The first cut
+  built a fresh tree per arm and TIMED OUT at ten minutes; one reused fixture fixed that, and
+  trimming three full-corpus runs moved the wall five seconds, which located the cost as the single
+  fixture build rather than the runs.
 
 ## 10. Reuse audit
 

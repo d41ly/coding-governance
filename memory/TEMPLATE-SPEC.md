@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.58 -->
+<!-- gov:kit memory-tree@2.59 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned

@@ -143,3 +143,37 @@ ACCEPTANCE_LEDGER_CUTOFF=""
 # the rule above. For the units that close across the cutoff date, where a date boundary falling
 # mid-day is the whole of the reason. Naming them individually is what keeps the exemption auditable.
 ACCEPTANCE_LEDGER_GRANDFATHER=""
+
+# ---- FIVE VALUES A PROJECT OWNS — TOOL-dRetiredFork-15 -------------------------------------------
+# Each of these was a literal inside check-memory-hygiene.sh, which is why an adopter with a
+# different convention had to fork the checker to keep their own bar green. BLANK MEANS GOV'S
+# CURRENT BEHAVIOUR for all five, so leaving this whole block untouched changes nothing.
+#
+# TWO OF THEM NARROW WHAT IS GRADED, and both are validated at startup: a bad value ABORTS rather
+# than quietly grading nothing. Blank and invalid are different answers and the checker keeps them
+# apart.
+
+# BUILD_SLUG_RE — the pattern a build folder name must match. Blank = ^[A-Za-z][A-Za-z0-9-]*$
+# MUST be anchored at both ends, and MUST NOT match the empty string: a pattern matching "" admits
+# every folder name and check 4 then passes everything. The checker refuses all three cases.
+BUILD_SLUG_RE=""
+
+# PROJECT_REGISTRY_EXTRA — whitespace-separated extra filenames legal directly under
+# <MEMORY_ROOT>/project/. This only WIDENS the whitelist and is bounded by what your tree actually
+# contains, so it carries none of the silent-narrowing risk the two keys above and below do.
+PROJECT_REGISTRY_EXTRA=""
+
+# RECORD_SERVES_CUTOFF — an ISO date. Records whose filename date falls BEFORE it are exempt from
+# check 21's "every record names the spec it is evidence about". For a tree adopting this kit
+# mid-life with landed records that predate the grammar. A record whose name carries no parseable
+# date is KEPT: unparseable is not the same answer as old, and only one of them is an exemption.
+# A cutoff dated after today is REFUSED — it would exempt every record and report a clean run.
+RECORD_SERVES_CUTOFF=""
+
+# ENTRY_CAP_UNIT — `chars`, `bytes`, or blank. Blank leaves the counting exactly as your platform
+# does it today, and that is deliberate. The checker's own comment explains why it pins no locale:
+# doing so "would silently re-decide the cap on any adopter whose awk counts characters today". A
+# DECLARED key re-decides nothing; it only makes the choice visible. Measured on gov's own node, the
+# default counts BYTES, so `chars` is the value that changes anything there — which is precisely the
+# platform-dependence this key exists to take out of the shadows.
+ENTRY_CAP_UNIT=""
