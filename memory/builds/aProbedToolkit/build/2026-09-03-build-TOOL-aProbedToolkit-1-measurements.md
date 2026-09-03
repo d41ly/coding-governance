@@ -526,3 +526,56 @@ takes "system inventory" to mean the system. In nicocares it means 28 of 713 sou
 green gate, and nothing in the gate's output says which of the two it just verified. §7's own rule
 covers this exactly: "A gate's OWN header states what it does NOT check. A structural check reads as
 a semantic one to everybody who did not write it."
+
+## Which kits check their own wiring
+
+`bash <kit>/adopt-<kit>.sh --check`, run in every clone that carries the script:
+
+| repo | memory-tree | memory-recall | lexicon | codebase-map |
+|---|---|---|---|---|
+| gov | exit 2 — no `--check` verb | exit 0, verified | exit 0, verified | exit 2 — no `--check` verb |
+| nc | exit 2 — no `--check` verb | exit 0, verified | exit 0, **NOT ADOPTED** | exit 2 — no `--check` verb |
+| incms | script absent (forked away) | script absent (forked away) | exit 0, **NOT ADOPTED** | exit 2 — no `--check` verb |
+| swydee | exit 2 — no `--check` verb | exit 0, verified | absent | absent |
+
+Two of the four kits have no wiring verb at all: `adopt-memory-tree.sh` and
+`adopt-codebase-map.sh` both print `usage: … --scaffold` and exit 2. `tools/gate-legs.json` carries a
+`wiring` leg for memory-recall and for lexicon and none for the other two. The two kits without a
+wiring check are the two whose adopters were found mis-wired here — nicocares missing
+`memory/project/readme-contract.txt`, and incms's `map_extractors` failing at `all_inventories()`.
+
+The `lexicon wiring` leg is declared with `guard: []`, so it runs on every bar, and
+`adopt-lexicon.sh --check` exits 0 while printing `NOT ADOPTED`. `tools/run-gates/run-gates.sh`
+reports one row per leg and sends a green leg's stdout to `<git-dir>/gate-logs/`, so in an adopter
+that leg is a green row whose only content is the sentence saying it graded nothing.
+
+## CORRECTION: there IS an upgrade path, and it is good
+
+The earlier claim "there is no migration verb" is wrong about the engine and right about the corpus.
+`python tools/govkit/govkit.py update --target /tmp/kite/nc` is read-only and reports the whole plan.
+It resolved nicocares's prefix remapping on its own, dropped seven ambiguous gov directories from the
+carry map with a reason each, and graded every file:
+
+| disposition | files |
+|---|---|
+| current | 87 |
+| stale | 34 |
+| unattributed (no gov vintage matches; locally edited) | 19 |
+| reseed-available | 4 |
+
+Per kit: `memory-tree` DIFFERS (receipt stores 2.50, gov has 2.55), `drift-audit` DIFFERS (1.7 -> 1.8),
+`unattended` DIFFERS (1.12 -> 1.15); ten kits level. `scripts/check-memory-hygiene.sh` is one of the
+19 unattributed rows, which is consistent with its file marker reading 2.49 against the receipt's
+stored 2.50 — the receipt records what gov shipped and the file was edited after.
+
+So the deployer does the hard part: three-way merge through a local edit, rename carrying, withdrawal
+orders under `.governance/outbox/`, and read-only by default because "that verb's failure mode is
+silent data loss in a repository the operator owns".
+
+What it does not do, and what nothing does, is the CORPUS migration. `update --write` would land
+memory-tree 2.55 in nicocares and the next gate run reds on checks 3, 4, 5, 9 and 21 across 612
+listed lines, because those checks want `**Serves:**` headers on 612 records, the retirement of ten
+`STATUS.md` files, seven recording-file renames, four `memory/project/*.txt` registries reconciled,
+and a `RECORD_UNBOUND_PIN` measured against that corpus. The engine upgrade is one command; the
+records upgrade is a build nobody has scoped. That asymmetry, not a missing verb, is why both
+adopters sit behind.
