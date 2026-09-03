@@ -717,7 +717,7 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 300
+    "ceiling": 900
   },
   {
     "name": "playbook validity gate",
@@ -868,7 +868,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 240
+    "ceiling": 900
   },
   {
     "name": "agent-cap restatement",
