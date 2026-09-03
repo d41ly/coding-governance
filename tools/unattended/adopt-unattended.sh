@@ -194,12 +194,22 @@ PBT_OUT="$ROOT/$PBT_REL"
 VERBS_SHIP="$KIT_DIR/VERBS.template.md"
 VERBS_REL="$MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
 VERBS_OUT="$ROOT/$VERBS_REL"
+# the FIFTH artifact (TOOL-dRetiredFork-12), and the only one besides the Skill that is RENDERED
+# rather than copied: it carries `{{KIT_DIR}}` five times. It also lands inside the kit directory
+# rather than under the memory root, because it is a fixture the kit's own validity gate reads.
+FIXTURE_SHIP="$KIT_DIR/playbook.fixture.template.md"
+FIXTURE_REL="$KIT_REL/playbook.fixture.md"
+FIXTURE_OUT="$KIT_DIR/playbook.fixture.md"
 
 # NON-ZERO on a failed substitution. A conf value carrying the s||| delimiter makes sed exit 1 while
 # the trailing `tr` still exits 0, so the adopter wrote a ZERO-BYTE Skill and --check then diffed
 # empty against empty and certified it. pipefail plus the emptiness refusal below turn that silent
 # truncation into a loud one. Escaping the values themselves is tracked separately.
-render() { # -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
+render() { # [template] -> stdout; LF only (the render is pinned eol=lf in .gitattributes)
+  # The template is an ARGUMENT now, defaulting to the Skill's so every existing caller is
+  # unchanged. Two artifacts carry placeholders, and a second copy of this function is the last
+  # thing this file needs -- the escaping commentary below is the reason why.
+  local TEMPLATE=${1:-$TEMPLATE}
   # NO `sed`. Conf values are FREE PROSE, and unescaped they landed in `s|…|…|` where a `|` closes
   # the delimiter (sed exits 1, the trailing `tr` exits 0, so a ZERO-BYTE Skill was written and
   # `--check` certified it) and an `&` re-inserts the whole match. Two attempts to escape around that
@@ -283,6 +293,32 @@ if [ "$MODE" = "--check" ]; then
   if ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
     echo "unattended: $VERBS_REL has drifted from the shipped verb carrier; re-run $0"; exit 1
   fi
+  # the FIFTH artifact. RENDERED, so it is compared the way the Skill is and not the way the three
+  # copied ones are: re-render from the template and diff. This is the parity assertion that makes
+  # the role change safe -- at the default prefix the render must reproduce the committed bytes
+  # exactly. This leg is ON THE BAR, so a drifted fixture reds here rather than waiting for a kit
+  # self-test that no boundary runs.
+  if [ ! -f "$FIXTURE_OUT" ]; then
+    echo "unattended: $FIXTURE_REL is not rendered — run $0"; exit 1
+  fi
+  FTMP=$(mktemp) || exit 2
+  render "$FIXTURE_SHIP" > "$FTMP" || { echo "unattended: the fixture render FAILED — refusing to compare"; rm -f "$FTMP"; exit 1; }
+  [ -s "$FTMP" ] || { echo "unattended: the fixture render produced an EMPTY file — comparing it to an equally empty fixture is the green-by-absence shape this kit refuses"; rm -f "$FTMP"; exit 1; }
+  if ! diff -q <(tr -d '' < "$FIXTURE_OUT") "$FTMP" >/dev/null 2>&1; then
+    echo "unattended: $FIXTURE_REL is out of sync with playbook.fixture.template.md"
+    echo "  re-render with: $0"
+    diff <(tr -d '' < "$FIXTURE_OUT") "$FTMP" | head -20 | sed 's/^/    /'
+    rm -f "$FTMP"; exit 1
+  fi
+  rm -f "$FTMP"
+  # An UNRESOLVED token is a REFUSAL, never an emitted brace. Same rule as the Skill's, and it is
+  # asserted separately because a fixture in sync with its template can still carry a placeholder
+  # the conf declared nothing for -- in sync and useless, which is the whole value of the channel.
+  if grep -qE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT"; then
+    echo "unattended: $FIXTURE_REL still carries an unfilled placeholder"
+    grep -nE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT" | head -5 | sed 's/^/    /'
+    exit 1
+  fi
   echo "unattended: in sync (skill rendered from template + .unattended.conf)"
   exit 0
 fi
@@ -307,6 +343,61 @@ fi
 if [ ! -f "$VERBS_OUT" ] || ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
   tr -d '' < "$VERBS_SHIP" > "$VERBS_OUT"
   echo "unattended: installed $VERBS_REL"
+fi
+# the fifth artifact, RENDERED rather than copied. It is written into the kit directory itself, so
+# an adopter installed at any prefix gets a fixture whose paths name THEIR prefix -- which is the
+# entire point of the role change, and what lets check-playbook.sh run anywhere.
+FTMP=$(mktemp) || exit 2
+if render "$FIXTURE_SHIP" > "$FTMP" && [ -s "$FTMP" ]; then
+  # AN UNRESOLVED TOKEN EMITS NO FILE. Catching it at --check time would still leave a rendered
+  # artifact on disk carrying a literal brace, and something downstream reads that file before
+  # anything runs --check. Refusing here means the bad render never lands.
+  if grep -qE '[{][{][A-Z_]+[}][}]' "$FTMP"; then
+    echo "unattended: the fixture render left an unfilled placeholder — refusing to write $FIXTURE_REL" >&2
+    grep -nE '[{][{][A-Z_]+[}][}]' "$FTMP" | head -5 | sed 's/^/    /' >&2
+    rm -f "$FTMP"; exit 1
+  fi
+  if [ ! -f "$FIXTURE_OUT" ] || ! diff -q <(tr -d '' < "$FIXTURE_OUT") "$FTMP" >/dev/null 2>&1; then
+    cp "$FTMP" "$FIXTURE_OUT"
+    echo "unattended: rendered $FIXTURE_REL"
+  fi
+else
+  echo "unattended: the fixture render FAILED or was empty — refusing to write $FIXTURE_REL" >&2
+  rm -f "$FTMP"; exit 1
+fi
+rm -f "$FTMP"
+
+# THE FIXTURE RECORDS CARRY THE PREFIX IN THEIR FILENAMES, not in their bytes. Each is named for the
+# piece it describes with `/` written as `~`, so a record for `tools/unattended/fixture-pieces/one/
+# piece.md` is `tools~unattended~fixture-pieces~one~piece.md.md`. Rendering the fixture alone leaves
+# those names pointing at a tree that does not exist, and `check-playbook.sh` reports every one as an
+# ORPHAN RECORD -- coverage nobody has. Renaming them is therefore part of the same render, not a
+# separate tidy-up; inCMS had already done it by hand, which is what its two `engine`-declared
+# fixture-record forks actually were.
+_fx_want=$(printf '%s' "$KIT_REL" | tr '/' '~')
+if [ -d "$KIT_DIR/fixture-records" ]; then
+  for _r in "$KIT_DIR"/fixture-records/*~fixture-pieces~*.md; do
+    [ -e "$_r" ] || continue
+    _base=$(basename "$_r")
+    _tail=${_base#*~fixture-pieces~}
+    _new="${_fx_want}~fixture-pieces~${_tail}"
+    # THE BODY CARRIES THE PATH TOO, and fixing only the name leaves the record describing a piece
+    # that does not exist -- `check-playbook.sh` then reports it as an ORPHAN RECORD, which is
+    # coverage nobody has. The old prefix is recovered from the record's OWN name rather than
+    # assumed, so a record already at the right prefix is rewritten to itself and a record from any
+    # other prefix is still corrected.
+    _old_pref=$(printf '%s' "${_base%%~fixture-pieces~*}" | tr '~' '/')
+    if [ "$_old_pref" != "$KIT_REL" ]; then
+      _body=$( cat "$_r" || exit 1; printf X ) || exit 1
+      _body=${_body%X}
+      _body=${_body//"$_old_pref/fixture-pieces/"/"$KIT_REL/fixture-pieces/"}
+      printf '%s' "$_body" > "$_r"
+    fi
+    if [ "$_base" != "$_new" ]; then
+      mv "$_r" "$KIT_DIR/fixture-records/$_new"
+      echo "unattended: repathed fixture record $_base -> $_new"
+    fi
+  done
 fi
 mkdir -p "$SKILL_DIR"
 TMPW=$(mktemp) || exit 2

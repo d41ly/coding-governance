@@ -94,3 +94,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-03T00:35:23Z brief · item TOOL-dRetiredFork-11 · reason a3d8091158f9 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-11-1-build-brief.md
 
 2026-09-03T00:35:54Z dispatch · item 38ee8b2a TOOL-dRetiredFork-11 · reason .githooks/pre-push .githooks/pre-push.test.sh tools/install-prefix-carried.txt memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-11.md
+
+2026-09-03T00:50:38Z brief · item TOOL-dRetiredFork-12 · reason 3c1cd4371e00 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-12-1-build-brief.md
+
+2026-09-03T00:50:51Z dispatch · item 6a4369c4 TOOL-dRetiredFork-12 · reason tools/unattended/playbook.fixture.template.md tools/unattended/playbook.fixture.md tools/unattended/kit.toml tools/unattended/adopt-unattended.sh tools/unattended/check-playbook.sh tools/unattended/README.md tools/install-prefix-carried.txt memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-12.md

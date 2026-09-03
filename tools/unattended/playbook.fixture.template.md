@@ -9,12 +9,12 @@ makes no claim to be a good playbook about anything.
 ```toml
 step_selector = "^[*][*]F[0-9]+[.]"
 step_floor    = 3
-outputs       = ["tools/unattended/fixture-pieces/**"]
-grain         = "tools/unattended/fixture-pieces/*/piece.md"
-records       = "tools/unattended/fixture-records"
+outputs       = ["{{KIT_DIR}}/fixture-pieces/**"]
+grain         = "{{KIT_DIR}}/fixture-pieces/*/piece.md"
+records       = "{{KIT_DIR}}/fixture-records"
 piece_checks  = ["fixture-shape"]
 set_checks    = ["fixture-distinct"]
-legs          = { fixture-shape = "tools/unattended/check-playbook.sh", fixture-distinct = "tools/unattended/check-playbook.sh" }
+legs          = { fixture-shape = "{{KIT_DIR}}/check-playbook.sh", fixture-distinct = "{{KIT_DIR}}/check-playbook.sh" }
 coverage      = "resolvable"
 curated       = "the playbook-mode build, node d, 2026-08-21"
 ```

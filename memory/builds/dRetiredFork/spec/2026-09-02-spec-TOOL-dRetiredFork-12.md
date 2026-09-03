@@ -1,11 +1,13 @@
 # TOOL-dRetiredFork-12 — `playbook.fixture.md` becomes `rendered`
 
-**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
+**Status:** CLOSED · rev-5 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 2 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-12-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-12-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-12-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-12-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
@@ -135,6 +137,20 @@ as a decision: the suite above it stays unrunnable at any foreign prefix and
   asserted the pair, and §5's user-docs row still said "its two tokens" — and §4 is the section a
   builder implements from, so following this spec still shipped the brace. All three now agree
   with S1, and the gate that makes the class unbuildable is that unit's.
+
+- rev-5 . 2026-09-03 . BUILT. Two things the spec could not have known, both found by running it.
+  The fixture RECORDS carry the prefix in their FILENAMES as well as their bodies, so rendering the
+  fixture alone left both describing pieces that do not exist and the gate reported them as orphan
+  records; the adopter repaths both halves now, recovering the old prefix from each record's own
+  name. And a TEMPLATE is not a playbook: the gate excluded `PLAYBOOK-TEMPLATE.*` by name, so the
+  moment a second template existed it scanned it, found `{{KIT_DIR}}` in a leg target and redded
+  check 6 in GOV'S OWN TREE. The exclusion is widened to any `*.template.md`. AC1 is met with one
+  stated difference: the rendered file gains the `gov:kit unattended@` marker that
+  `check-kit-versions.sh` requires of every shipped file and that this file did not carry at
+  b0108f13; discounting that line it is byte-identical. AC4 is met structurally rather than by luck
+  -- the carried arm grades the SOURCE paths the descriptors resolve, and the source is now the
+  tokenised template. A fourth instrument error was corrected mid-unit: piping a gate through `tail`
+  and reading `$?` reports tail's status, and it read rc=0 over a gate that was exiting 1.
 
 ## 10. Reuse audit
 
