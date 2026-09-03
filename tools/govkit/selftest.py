@@ -3885,6 +3885,57 @@ user_skills = "/tmp/gk-fake-skills"
               repr(GK9.derive_carried(b"tools~hooks~probe.md",
                                       {k: v for k, v in _n9.items() if "~" not in k})))
 
+        # ---- DEPL-dRetiredFork-1. A FANNED gov directory proves its rung PER ROW ---------------
+        # The global map holds one destination per gov directory and DROPS a fanned one, so the rung
+        # PROOF — which read that map — had no needle and returned None for every row underneath.
+        # Seven such directories at one measured adopter, and zero `relocate` rungs across all of it.
+        #
+        # The three arms below are one fixture read three ways, so the difference between them is the
+        # only thing that can move: same base, same content, different needle source.
+        _f1 = [("tools/hooks/agent-cap.js", "scripts/hooks/agent-cap.js"),
+               ("tools/hooks/scratch-guard.js", ".claude/hooks/scratch-guard.js")]
+        _nf, _pf, _df = GK9.derive_carry_map(_f1)
+        check("[-1] S1 a fanned gov directory is still DROPPED from the global map",
+              [d[0] for d in _df] == ["tools/hooks"] and not _nf,
+              f"dropped={_df} needles={_nf}")
+        _rowf = {"source": "tools/hooks/agent-cap.js", "path": "scripts/hooks/agent-cap.js"}
+        _pf2 = GK9.resolve_row_needles(_nf, _rowf)
+        check("[-1] S1 ...but the row's own overlay supplies the needle the map could not hold",
+              _pf2.get("tools/hooks") == "scripts/hooks", repr(_pf2))
+        _base1 = b"# see tools/hooks/agent-cap.js for the rule" + bytes([10])
+        _ours1 = GK9.derive_carried(_base1, _pf2)
+        check("[-1] S1 the rung is RELOCATE with the row's needles, where the map gave nothing",
+              GK9.derive_carry_rung(_base1, _pf2, lambda: _ours1, known_equal=False) == "relocate"
+              and GK9.derive_carry_rung(_base1, _nf, lambda: _ours1, known_equal=False) is None,
+              "per-row=%r global=%r" % (
+                  GK9.derive_carry_rung(_base1, _pf2, lambda: _ours1, known_equal=False),
+                  GK9.derive_carry_rung(_base1, _nf, lambda: _ours1, known_equal=False)))
+        # AND THE LIMIT, asserted so nobody reads the arm above as a general promise: ONE residual
+        # byte and the rung is gone. Every `nc carve-out N/20` comment is such a byte, which is why
+        # widening the map moved ZERO rows at that adopter. Section 3 puts this out of scope and
+        # names DEPL-dRetiredFork-7; the arm keeps the boundary honest rather than implied.
+        check("[-1] S1 ...and ONE residual byte still falls through to three-way",
+              GK9.derive_carry_rung(_base1, _pf2, lambda: _ours1 + b"# nc carve-out 13/20" + bytes([10]),
+                                    known_equal=False) is None)
+
+        # ---- S3b: a DEGENERATE needle is refused, not carried ----------------------------------
+        # A needle is substituted over file CONTENT, so its width is its blast radius. A one-character
+        # fragment matches almost everywhere, and the values come from a target-supplied receipt.
+        # The threshold is EMPTINESS. A first cut refused anything under two characters and broke 16
+        # arms in other units, because gov's own fixtures use single-letter directory names — so the
+        # grade covers the case section 5 names and the arm says which case that is.
+        _degen = None
+        try:
+            GK9.derive_carry_map([(" /x.txt", "b/x.txt")])
+        except Exception as _e:
+            _degen = type(_e).__name__
+        check("[-1] S3b an EMPTY/whitespace needle is REFUSED rather than substituted",
+              _degen == "Refusal", f"got {_degen}")
+        check("[-1] S3b ...and a normal two-segment pair still derives",
+              GK9.derive_carry_map([("tools/x.txt", "scripts/x.txt")])[0].get("tools") == "scripts")
+        check("[-1] S3b ...and a single-letter directory is PERMITTED, which is the stated residual",
+              GK9.derive_carry_map([("a/x.txt", "b/x.txt")])[0].get("a") == "b")
+
         # ---- S4: THE OUTPUT IS NEVER RESCANNED. The fixture is built so a rescan WOULD visibly
         # ---- change the answer — `tools` rewrites to `demo` and `demo` rewrites to `final` — and
         # ---- that second step is asserted live FIRST, so this cannot pass by finding nothing.

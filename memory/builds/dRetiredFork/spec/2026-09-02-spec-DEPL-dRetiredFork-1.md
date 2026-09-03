@@ -1,11 +1,13 @@
 # DEPL-dRetiredFork-1 — the carry map stops dropping a gov directory that fans into two destinations
 
-**Status:** OPEN · rev-4 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
+**Status:** CLOSED · rev-5 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams deployer · order 6 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-DEPL-dRetiredFork-1-1-acceptance-ledger.md](../build/2026-09-03-build-DEPL-dRetiredFork-1-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-DEPL-dRetiredFork-1-1-build-brief.md](../prompts/2026-09-03-prompt-DEPL-dRetiredFork-1-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
@@ -160,6 +162,29 @@ because a kit ships a rendered SKILL.md beside its engine files.
   AC6 now requires ZERO at NicoCares rather than merely below-before, and S7 adds the scope item
   that drives it — the branch S6 already named. The AC6 sentence is shared verbatim with
   `DEPL-dRetiredFork-3` AC10.
+
+- rev-5 . 2026-09-03 . BUILT, and F1 is answered with the awkward answer its own liveness note
+  anticipated. The rung proof read the GLOBAL needle map, so a fanned gov directory -- dropped from
+  that map by design -- left every row under it at rung=None. It now reads `resolve_row_needles`,
+  which has existed since DEPL-dGaugedVintage-11 and was applied on the rewrite paths but not on the
+  proof. Isolated on a fixture: global map gives None, the row overlay gives `relocate`, and ONE
+  residual byte gives None again.
+
+  AC4 is NOT MET -- still zero relocate rungs at NicoCares -- because every row there carries a
+  carve-out comment, which is the residual-byte problem section 3 puts out of scope and hands to
+  DEPL-dRetiredFork-7. The mechanism works; the adopter's rows are not eligible for it. That is the
+  ordering evidence F1 asked for rather than an assertion about it.
+
+  AC6 is NOT MET AND NOT ATTEMPTED. S7 requires a write against a repository gov does not own, with
+  no owner present; PARKED on three independent grounds -- section 9's default-OFF rule for
+  autonomous irreversible action, this build's own repeated boundary that gov owns none of an
+  adopter's tree, and the authorization itself, which covers landing this build in gov and nothing
+  else. Before-counts are on the record: 32 unattributed rows at NicoCares, 30 at inCMS.
+
+  TWO OVER-REACHES OF MINE, both caught by arms belonging to other units. S3b first refused any
+  needle under two characters, which broke 16 arms because gov's fixtures use single-letter
+  directories; it now refuses emptiness and the residual is STATED. S3 first refused any empty map,
+  which is legitimate for a receipt of root-level rows; it now asks whether the lift had subjects.
 
 ## 10. Reuse audit
 

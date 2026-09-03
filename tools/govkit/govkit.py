@@ -5075,6 +5075,31 @@ def derive_carry_map(pairs) -> tuple[dict[str, str], dict[str, str], list[tuple[
     for gd, td in pairs_out.items():
         needles[gd] = td
         needles[gd.replace("/", "~")] = td.replace("/", "~")
+    # ---- S3b (DEPL-dRetiredFork-1). EVERY DERIVED NEEDLE IS GRADED, and a degenerate one is
+    # ---- refused rather than used. A needle is a path fragment substituted over FILE CONTENT, so
+    # ---- its width is the blast radius: an empty fragment matches at every position in every file,
+    # ---- and a single character matches almost as widely. Section 5 calls this the highest-severity
+    # ---- path in the build, because a wrong needle writes gov's bytes over a target's real edit.
+    # ---- The values come from a target-supplied receipt, so "it cannot happen" is not available.
+    # THE THRESHOLD IS EMPTINESS, and it was measured down to that. A first cut refused anything
+    # shorter than two characters, which is the wider rule the risk argues for -- and it broke 16
+    # arms belonging to other units, because gov's own fixtures legitimately use single-letter
+    # directory names (`a/x.txt` -> `b/x.txt`). Refusing those would have made this grade a tax on
+    # every fixture author to buy protection against a receipt shape nobody has produced.
+    #
+    # So the refusal covers the case section 5 actually names, an empty or whitespace fragment, and
+    # the residual risk is stated rather than papered over: a ONE-character needle is permitted and
+    # would match widely if a real receipt ever produced one. What contains it is the same thing
+    # that contains every other wrong needle -- the rung is proved by WHOLE-FILE equality before any
+    # write, so a row whose bytes are not exactly the carried form falls to three-way regardless.
+    bad = sorted(k for k in needles if not k.strip())
+    if bad:
+        raise Refusal(
+            "the carry needle map derived an EMPTY fragment from this receipt: "
+            + ", ".join(repr(b) for b in bad)
+            + ". A needle is substituted over file CONTENT, so an empty fragment matches at every "
+              "position in every file and would rewrite bytes the target never relocated. "
+              "Refusing rather than carrying it")
     return needles, pairs_out, dropped
 
 
@@ -5304,7 +5329,16 @@ def classify_row(root: pathlib.Path, target: pathlib.Path, row: dict, to_commit:
 
     carry = None
     if base is not None and ours_oid is not None:
-        carry = derive_carry_rung(base, needles or {}, read_ours,
+        # S1 — THE ROW'S OWN NEEDLES, not the run-level map. `resolve_row_needles` has existed since
+        # DEPL-dGaugedVintage-11 and is applied on the REWRITE paths, but the rung PROOF read the
+        # global map — so for a gov directory that fans into several destinations, and is therefore
+        # dropped from that map, the proof had no needle to prove with and every row under it
+        # returned rung=None. Seven such directories at one measured adopter.
+        #
+        # The overlay is per row and cannot collide: it derives one pair from this row's own
+        # `(source, path)`, which is exactly the fact the global map could not hold for a fanned
+        # directory.
+        carry = derive_carry_rung(base, resolve_row_needles(needles or {}, row), read_ours,
                                   known_equal=(ours_oid == blob_oid(base)))
 
     # ---- DEPL-dCarriedReceipt-11 S2. THE RENAME, DECIDED BEFORE THE GRID IS CONSULTED, so the
@@ -5632,6 +5666,26 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- both come off the derivation, on this run, over this receipt.
     needles, carry_pairs, carry_dropped = derive_carry_map(
         [(w.get("source"), w.get("path")) for w in rows_all])
+    # S3 (DEPL-dRetiredFork-1). AN EMPTY NEEDLE MAP REFUSES. A run with no needles reports every row
+    # as unattributed, which is byte-for-byte what a run over a target that relocated nothing looks
+    # like — and one of those is a broken derivation. The receipt has rows, so an empty map means the
+    # lift failed, not that the target is tidy.
+    # THE REFUSAL NEEDS A ROW THAT COULD HAVE LIFTED. An empty map is legitimate when every row is
+    # a root-level file: those lift to the empty needle and are skipped by design, so "no needles"
+    # there is the right answer and not a broken derivation. A first cut refused on emptiness alone
+    # and broke 16 arms whose fixtures are exactly that shape.
+    #
+    # What is NOT legitimate is an empty map over rows that DO name a gov directory: the lift had
+    # subjects and produced nothing, and that reads identically to a target that relocated nothing.
+    _liftable = [w for w in rows_all
+                 if "/" in str(w.get("source") or "") and "/" in str(w.get("path") or "")]
+    if _liftable and not needles and not carry_dropped:
+        raise Refusal(
+            f"the carry needle map is EMPTY over {len(_liftable)} row(s) that name a gov directory, "
+            f"and nothing was dropped as ambiguous either. The lift had subjects and produced no "
+            f"needle, so every row would classify as unattributed — which is indistinguishable from "
+            f"a target that relocated nothing. Refusing rather than reporting a verdict it did not "
+            f"earn")
     for _gd, _dests in carry_dropped:
         # DEPL-dGaugedVintage-11 S1. Still dropped from the GLOBAL map, which can hold one
         # destination per gov directory and nothing else — but no longer silent for the rows
@@ -5641,6 +5695,14 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"puts it at {', '.join(_dests)}, so it names no single destination and cannot be a "
               f"needle. Rows under it now resolve against their own destination instead "
               f"(DEPL-dGaugedVintage-11)")
+        # S2 (DEPL-dRetiredFork-1). NAME THE ROWS, not only the directory. An operator reading
+        # "dropped tools/memory-tree" cannot tell which files that freezes; the answer is the rows
+        # whose source sits under it, and this run already holds them.
+        _frozen = sorted(str(w.get("path")) for w in rows_all
+                         if str(w.get("source", "")).rsplit("/", 1)[0] == _gd)
+        if _frozen:
+            print(f"govkit update —   the {len(_frozen)} row(s) under it: "
+                  + ", ".join(_frozen[:6]) + (", …" if len(_frozen) > 6 else ""))
     # S2. The DROPPED COUNT, printed at zero as well. A run that dropped nothing and a run whose
     # drop report never executed used to look identical, which is the green-by-absence shape.
     print(f"govkit update — carry map: {len(carry_pairs)} directory pair(s), "
