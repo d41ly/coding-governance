@@ -29,6 +29,8 @@
       "govkit selfcheck",
       "govkit selftest",
       "harness arms (fail branches armed or pinned)",
+      "hook destinations (every declared hook path ships)",
+      "hook destinations self-test",
       "install-prefix (shipped surface)",
       "install-prefix self-test",
       "kickoff engine size <=18KiB",

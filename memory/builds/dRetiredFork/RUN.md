@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 206af3de
+witness: 597d874f
 phase: BUILDING
 mode: slug
 anchor-kind: default-branch
@@ -106,3 +106,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-03T01:34:11Z brief · item TOOL-dRetiredFork-14 · reason 52a453862e24 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-14-1-build-brief.md
 
 2026-09-03T01:34:26Z dispatch · item 8d140d19 TOOL-dRetiredFork-14 · reason tools/settings-merge.py tools/hooks/kit.toml tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh tools/hooks/scratch-guard.test.sh tools/hooks/README.md tools/check-wiring.sh tools/check-wiring.test.sh tools/memory-recall/recall-opened.js .claude/settings.json WIRE-INTO-PROJECT.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-14.md
+
+2026-09-03T02:17:32Z brief · item TOOL-dRetiredFork-21 · reason 8e24a7b33560 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-21-1-build-brief.md
+
+2026-09-03T02:17:48Z dispatch · item 597d874f TOOL-dRetiredFork-21 · reason tools/memory-recall/adopt-memory-recall.sh tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/gate-legs.json WIRE-INTO-PROJECT.md memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-21.md

@@ -36,6 +36,8 @@ govkit refusal join	repo	declarations
 govkit selfcheck	repo	declarations
 govkit selftest	kit	selftests
 harness arms (fail branches armed or pinned)	repo	declarations
+hook destinations (every declared hook path ships)	repo	product
+hook destinations self-test	kit	selftests
 install-prefix (shipped surface)	repo	product
 install-prefix self-test	kit	selftests
 kickoff engine size <=18KiB	repo	product

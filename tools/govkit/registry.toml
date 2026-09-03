@@ -243,6 +243,14 @@ path = "tools/template-size-highwater.txt"
 why = "the size gate's high-water record, keyed by measured file. Travels with check-template-size.sh, which is exempt for the same reason: it gates gov's own product template and is prescribed for copy nowhere. Exemptions are exact-path, so the gate's row does not cover this one."
 
 [[exempt]]
+path = "tools/check-hook-destinations.sh"
+why = "it resolves gov's own descriptors through `tools/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
+
+[[exempt]]
+path = "tools/check-hook-destinations.test.sh"
+why = "the arms for the gate above, exempt for the same reason: they drive a checker that cannot run in an adopter tree."
+
+[[exempt]]
 path = "tools/govkit"
 why = "the deployer itself. It runs on the deployer machine and is never installed into a target, so it is an entry of nothing. Stated rather than omitted, because the surface assertion would otherwise red on it."
 
@@ -257,6 +265,14 @@ why = "gov's own red/green self-test of the reference branch-guard block. The ru
 [[exempt]]
 path = "skills/session-kickoff/manifest-check.test.sh"
 why = "not prescribed for copy anywhere in the runbook, unlike the check-wiring and push-main self-tests which are. The asymmetry is deliberate here and recorded as an open question in the spec rather than resolved by guessing."
+
+[[exempt_leg]]
+name = "hook destinations (every declared hook path ships)"
+why = "it resolves gov's own descriptors through `tools/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
+
+[[exempt_leg]]
+name = "hook destinations self-test"
+why = "the arms for that gate; no descriptor can claim a leg whose script no adopter receives."
 
 [[exempt_leg]]
 name = "kickoff engine size <=18KiB"

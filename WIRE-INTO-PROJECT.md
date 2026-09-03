@@ -403,7 +403,7 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
    query (PostToolUse on `Read`, bounded 128 KB log tail, never blocks the tool). Only if wanted:
    ```bash
    mkdir -p tools && cp <gov>/tools/settings-merge.py tools/    # the merge tool — nothing else copies it
-   bash tools/memory-recall/adopt-memory-recall.sh --scaffold --with-hook   # -> .claude/hooks/recall-opened.js
+   bash tools/memory-recall/adopt-memory-recall.sh --scaffold --with-hook   # the hook already ships in the kit dir
    python3 tools/settings-merge.py --fragment tools/memory-recall/recall-opened.fragment.json
    ```
    The copy is not optional plumbing: nothing else delivers that tool, so without it the merge dies
@@ -818,7 +818,7 @@ exists to remove.
   project-owned `<kit>/map_extractors.py` · `.codebase-map.conf` at the ROOT · the gate at GATE_FILE ·
   `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).
 - Memory-recall (only if §3c adopted): `memory-recall/` kit dir + the generated
-  `.claude/skills/memory-recall/SKILL.md` (+ `.claude/hooks/recall-opened.js`, `tools/settings-merge.py`
+  `.claude/skills/memory-recall/SKILL.md` (+ the kit's own `recall-opened.js`, `tools/settings-merge.py`
   and the settings block only if the step-4 opt-in was taken). The index and query log live under the
   common git dir, never in the worktree — nothing to ignore, nothing to commit.
 

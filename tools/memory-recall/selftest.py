@@ -952,7 +952,7 @@ def test_python3_only():
         cleanup(shimdir)
 
 
-@check("adopt --scaffold converges byte-identically, and copies NO hook without --with-hook")
+@check("adopt --scaffold converges byte-identically, and --with-hook copies no hook anywhere")
 def test_scaffold_converges():
     """AC8 and the opt-in half of AC13.
 
@@ -976,10 +976,17 @@ def test_scaffold_converges():
         assert not (root / ".claude" / "hooks").exists(), "a hook was installed without --with-hook"
         with_hook = adopt(root, kitdir, "--scaffold", "--with-hook")
         assert with_hook.returncode == 0, f"{with_hook.stdout}{with_hook.stderr}"
-        hook = root / ".claude" / "hooks" / "recall-opened.js"
-        assert hook.read_bytes() == (KIT / "recall-opened.js").read_bytes(), "hook copy differs"
+        # --with-hook COPIES NOTHING NOW. TOOL-dRetiredFork-21: the hook ships in the kit directory
+        # and is wired there, so the old behaviour -- copying it into `.claude/hooks/` -- re-created
+        # the exact duplicate TOOL-dRetiredFork-14 withdrew. This arm asserted the copy existed, so
+        # it was pinning the defect in place.
+        assert not (root / ".claude" / "hooks").exists(), \
+            "--with-hook re-created .claude/hooks/, the destination gov withdrew"
+        assert (kitdir / "recall-opened.js").exists(), "the shipped copy is missing from the kit dir"
+        assert "recall-opened.js is installed" in with_hook.stdout, \
+            "--with-hook does not name the copy it wired"
         assert "settings-merge.py --fragment" in with_hook.stdout, "no wiring instruction printed"
-        return f"{len(b1)} B skill, idempotent; hook absent until --with-hook"
+        return f"{len(b1)} B skill, idempotent; --with-hook wires the shipped copy and copies nothing"
     finally:
         cleanup(root)
 
