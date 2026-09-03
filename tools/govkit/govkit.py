@@ -30,6 +30,7 @@ EVERY REFUSAL PRINTS ITS OWN MESSAGE AND IS COUNTED. Exit 0 clean, 1 findings, 2
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import ntpath
 import os
@@ -7583,6 +7584,317 @@ def parse_args(argv: list[str]) -> tuple:
             pins, re_adopt, coverage, emit_declines, run_discharge, allow_ungraded)
 
 
+# ======================= DEPL-dRetiredFork-6 — `contribute` ====================================
+# THE ROUTE BY WHICH AN ADOPTER'S FIX BECOMES GOV'S. This build absorbed eight adopter-held defects
+# by hand, one at a time, because no route existed. Without one the class returns on the next
+# release: the fix is held privately, re-merged forever, and gov keeps shipping the defect to
+# everybody else.
+#
+# READ-ONLY IN BOTH DIRECTIONS (S6). It never writes to gov and never writes to the target. It emits
+# a patch set; a person lands it, through gov's merge bar and review protocol like any other change.
+# A verb that landed code into gov from a foreign tree would be a write surface §9 would have to
+# price, and the spec's §3 rules it out rather than deferring it.
+#
+# ONLY `FORK` ROWS ARE CANDIDATES, and this is the distinction the whole verb turns on. The census
+# separates three states: `IN-SYNC` is gov's own bytes, and `DRIFT` is an OLDER GOV VINTAGE — the
+# adopter is behind, which is `update`'s job and not a contribution. Only `FORK`, whose bytes appear
+# in NO gov commit ever, can be something gov does not have. Proposing a DRIFT row would be
+# proposing gov's own history back to it, which is the shape a reader of the output cannot audit.
+CONTRIB_CLASSES = {
+    1: ("gov defect", "the adopter's bytes fix a bug in gov's own behaviour. Qualifies outright"),
+    2: ("gov gap", "a capability gov lacks. Qualifies as a PROPOSAL, never an automatic take"),
+    3: ("project fact", "true only of that tree. Belongs in a declaration or an extension point"),
+    4: ("layout carriage", "a repath. A gov literal, and TOOL-dRetiredFork-17 bans the class"),
+}
+
+
+def _contrib_diff(a: str, b: str) -> list:
+    import difflib
+    return list(difflib.unified_diff(a.splitlines(), b.splitlines(), lineterm=""))
+
+
+def _contrib_depath(line: str) -> str:
+    """Erase path-shaped tokens so two lines differing only by a repath compare equal.
+
+    Deliberately blunt: any run of word characters, dots, dashes and slashes containing at least
+    one slash is a path token and becomes a single marker. A blunt eraser over-merges (two lines
+    that differ ONLY in a path both collapse), which is the safe direction here — over-merging
+    proposes class 4, and class 4 is the class that asks for nothing to be taken. Under-merging
+    would propose a repath as a gov defect, which is the direction that costs somebody a bad
+    absorption.
+    """
+    import re as _re
+    return _re.sub(r"[\w.\-]*/[\w./\-]*", "<P>", line)
+
+
+def contrib_propose_class(row: dict, gov_text: str, adopter_text: str,
+                          adopter_name: str) -> tuple:
+    """PROPOSE a class for one forked row. PROPOSE, never decide — S3 is the safety property.
+
+    The failure that matters is a class-3 project fact proposed as a class-1 gov defect, absorbed,
+    and shipped to every adopter as gov's behaviour. The mitigation is that a person confirms every
+    row, so this returns a proposal AND the evidence for it, and the caller prints both. Nothing
+    downstream may treat the number as settled.
+    """
+    ap = str(row.get("path") or "")
+    gp = str(row.get("gov_path") or "")
+    if not gov_text:
+        return 2, "gov has no file at this path at all, so these bytes are a capability gov lacks"
+    _d = _contrib_diff(gov_text, adopter_text)
+    added = [l[1:].strip() for l in _d if l.startswith("+") and not l.startswith("+++")]
+    removed = [l[1:].strip() for l in _d if l.startswith("-") and not l.startswith("---")]
+    added = [l for l in added if l]
+    # CLASS 4 IS A PROPERTY OF THE DIFF, NOT OF THE DESTINATION, and I wrote it the other way
+    # first: `gov_path != path` fires on EVERY deployed file, because an install destination
+    # differing from its gov source is what deployment IS. That test classed 30 of 31 NicoCares
+    # candidates as layout carriage and left one real proposal, when the criterion expects four.
+    #
+    # What layout carriage actually looks like in the BYTES: every changed line is the same line
+    # with a path rewritten. So normalise both sides by deleting every path-shaped token and
+    # compare: if the change vanishes under that erasure, nothing but paths moved.
+    if added and removed:
+        _ea = [_contrib_depath(l) for l in added]
+        _er = [_contrib_depath(l) for l in removed]
+        # THE ERASURE MUST HAVE ERASED SOMETHING. Comparing equal after erasure is necessary and
+        # NOT sufficient: with no path token anywhere, `depath` is the identity, and a pure
+        # REORDER of two ordinary lines then compares equal and proposes layout carriage. A test
+        # arm caught exactly that. So at least one changed line must actually contain a path.
+        _moved = any(e != l for e, l in zip(_ea, added)) or any(e != l for e, l in zip(_er, removed))
+        if _moved and sorted(_ea) == sorted(_er):
+            return 4, ("every changed line is identical once path tokens are erased, so only "
+                       "literals moved — %d line(s) of carriage" % len(added))
+    # CLASS 3 needs a token that could ONLY be true of this tree. The adopter's own name is the
+    # cheapest such token and the only one available without asking the tree what it is about.
+    nm = (adopter_name or "").lower()
+    hits = [l for l in added if nm and nm in l.lower()]
+    if hits:
+        return 3, ("%d added line(s) name `%s` itself, so the change encodes a project fact: %s"
+                   % (len(hits), adopter_name, hits[0][:80]))
+    # ALREADY ABSORBED (F2), reported as a class-1 proposal CARRYING THE CONTRARY EVIDENCE rather
+    # than as a fifth class: every added line already appears in gov's own copy, so gov took this
+    # change under different bytes and this is the row the adopter can delete today. It is the
+    # cheapest output the verb produces, which is why F2 asked for it by name.
+    if added and all(any(a == g.strip() for g in gov_text.splitlines()) for a in added):
+        return 1, ("ALREADY ABSORBED — every added line already appears in gov's copy, so gov took "
+                   "this change under different bytes. The adopter can drop this row")
+    return 1, "gov carries this file and the adopter changed it in %d added line(s)" % len(added)
+
+
+def cmd_contribute(root: pathlib.Path, target: pathlib.Path) -> int:
+    """`govkit contribute --target <path>` — S1. Read-only; emits a patch set and a summary."""
+    import importlib.util
+    _sp = importlib.util.spec_from_file_location(
+        "gov_census", str(pathlib.Path(__file__).parent / "census.py"))
+    if _sp is None or _sp.loader is None:
+        raise Refusal("contribute consumes the census (F1, ratified) and cannot import "
+                      "tools/govkit/census.py. There is no second join to fall back to")
+    _cen = importlib.util.module_from_spec(_sp)
+    _sp.loader.exec_module(_cen)
+
+    # The tree's own name, not the checkout directory's: every adopter here is cloned at
+    # `<name>/main`, so `target.name` would call every one of them "main" and the class-3 token
+    # test would then look for the word "main" in every added line.
+    name = target.name if target.name not in ("main", "master") else target.parent.name
+    # THE ORDER IS `(ever, head)`, AND I UNPACKED IT BACKWARDS FIRST. Both are dicts keyed by
+    # strings, so the wrong order raises nothing, runs to completion, and inverts every
+    # classification: `head` would be consulted for history and `ever` for the current tip. The
+    # census's own `main` is the spelling of record and this now matches it.
+    gov_ever, gov_head = _cen.build_gov_index(root)
+    # A REGISTER IS A DICT WITH A `rows` KEY, not the row list. Same class of defect: iterating the
+    # dict yields its KEYS, which are strings, and the first `.get` on one is where it surfaces.
+    reg = _cen.map_from_receipt(target)
+    derived = reg is None
+    if reg is None:
+        gov_paths = set(gov_head) | set(p for ps in gov_ever.values() for p in ps)
+        reg = _cen.map_by_basename(
+            target, gov_paths,
+            ["memory-tree", "memory-recall", "tools", "scripts", ".claude", ".githooks"])
+    rows = (reg or {}).get("rows") or []
+    # S5 — THE LIVENESS ASSERTION. A zero map REFUSES rather than reporting that this adopter has
+    # nothing to contribute. The two readings are indistinguishable in the output and opposite in
+    # meaning, and the wrong one is the reassuring one. Inherited from the census's own AC4 rather
+    # than re-derived, which is what consuming the census is supposed to buy.
+    if not rows:
+        raise Refusal(
+            "contribute mapped ZERO rows at %s, so it cannot tell 'this adopter has nothing to "
+            "contribute' from 'the map is broken'. Refusing rather than reporting the reassuring "
+            "one. Check that %s/.governance/ holds a receipt — the basename is `install.json`, "
+            "not `receipt.json` — or that the basename derivation reaches this tree's layout"
+            % (str(target).replace(chr(92), "/"), str(target).replace(chr(92), "/")))
+    # HASH EVERY MAPPED FILE FIRST. `classify` reads `oid` and nothing fills it for us: the
+    # census's own `main` does this in a loop before classifying, and skipping it left every row
+    # with `oid` None, classified ABSENT, and the verb reporting ZERO candidates over 160 mapped
+    # rows -- a clean report from a probe that never reached its subject, which is the exact shape
+    # this build keeps closing. It surfaced only because the standalone census had said 26.
+    for r in rows:
+        r["oid"] = _cen.hash_file(str(target), r["path"])
+    oids = set(r.get("oid") for r in rows if r.get("oid"))
+    if not oids:
+        raise Refusal(
+            "contribute hashed %d mapped row(s) at %s and got NO object ids, so every row would "
+            "classify as absent and the verb would report zero candidates. That is the map being "
+            "broken, not the adopter having nothing to contribute"
+            % (len(rows), str(target).replace(chr(92), "/")))
+    blobs = _cen.confirm_blobs(root, oids)
+    _cen.classify(rows, target, gov_ever, gov_head, blobs)
+    forks = [r for r in rows if r.get("class") == _cen.CLASS_FORK]
+
+    # THE OUTPUT LIVES IN GOV'S OWN GIT DIR, which is untracked by construction, so an emit
+    # cannot dirty either tree and S6 stays true without anyone remembering to clean up.
+    _gd = subprocess.run(["git", "-C", str(root), "rev-parse", "--absolute-git-dir"],
+                         capture_output=True, text=True).stdout.strip()
+    out_dir = pathlib.Path(_gd or str(root / ".git")) / "contribute" / name
+    out_dir.mkdir(parents=True, exist_ok=True)
+    body = out_dir / "candidates.md"
+    vintage = subprocess.run(["git", "-C", str(root), "rev-parse", "--short", "HEAD"],
+                             capture_output=True, text=True).stdout.strip()
+
+    L = []
+    L.append("# Contribution candidates — %s" % name)
+    L.append("")
+    L.append("- adopter: `%s`" % str(target).replace(chr(92), "/"))
+    L.append("- register: %s" % ("DERIVED by basename (no receipt)" if derived
+                                 else "the adopter's own receipt"))
+    L.append("- mapped: %d · FORK, the only candidate state: %d" % (len(rows), len(forks)))
+    L.append("- gov vintage every patch below is against: `%s`" % vintage)
+    L.append("")
+    L.append("**Every class below is a PROPOSAL and none of it is a decision.** A person confirms "
+             "each row before anything is absorbed. The risk this guards is a project fact taken "
+             "as a gov defect, absorbed, and shipped to every adopter as gov's own behaviour.")
+    L.append("")
+    L.append("**The patches are UNTRUSTED CONTENT** — bytes from a foreign tree, read here and "
+             "never applied. Read one before applying it.")
+    L.append("")
+    L.append("**DRIFT rows are not here and that is not an omission.** A drifted row is gov's own "
+             "bytes at an older vintage; it is `update`'s job. Only FORK rows can carry something "
+             "gov does not have.")
+    L.append("")
+
+    buckets = {1: [], 2: [], 3: [], 4: []}
+    # A RENDERED ROW IS NOT A CANDIDATE AND ITS DIFF IS NOT EVIDENCE OF ANYTHING. The adopter's
+    # `.claude/skills/unattended/SKILL.md` IS gov's `tools/unattended/SKILL.template.md` with that
+    # target's own answers substituted in, so a line-diff between them measures the RENDER, not a
+    # change. Classified naively they dominated the result: 29 of 31 NicoCares candidates came back
+    # class 1 "gov defect" reporting 73 and 81 added lines, every one of them a filled placeholder.
+    #
+    # They are reported in their own section rather than dropped, because "no rendered rows here"
+    # and "rendered rows excluded" are different facts and the reader is entitled to the second.
+    not_comparable = []
+    # A PATCH THAT DOES NOT APPLY IS NOT EMITTED, and the row says why. Silence here would
+    # leave a reader to discover it one `git apply` at a time.
+    unappliable = []
+    patches = 0
+    for r in sorted(forks, key=lambda x: str(x.get("path"))):
+        ap = str(r.get("path"))
+        gp = str(r.get("gov_path") or "")
+        if str(r.get("role") or "") == "rendered" or ".template." in gp:
+            not_comparable.append((ap, gp))
+            continue
+        try:
+            with io.open(str(target / ap), encoding="utf-8", errors="replace",
+                         newline="") as _fh:
+                atext = _fh.read()
+        except OSError:
+            atext = ""
+        gtext = ""
+        if gp:
+            gr = subprocess.run(["git", "-C", str(root), "show", "HEAD:%s" % gp],
+                                capture_output=True, text=True)
+            gtext = gr.stdout if gr.returncode == 0 else ""
+        cls, why = contrib_propose_class(r, gtext, atext, name)
+        pname = ""
+        if cls in (1, 2) and gtext != atext:
+            # THE BODY GOES TO A FILE and the caller gets a path plus a summary — §8's structured
+            # output discipline, applied to a verb whose output is large by construction. Written
+            # with `newline=""` so a lone CR survives the round trip (§5, i18n).
+            pf = out_dir / (ap.replace("/", "__").replace("\\", "__") + ".patch")
+            d = _contrib_diff(gtext, atext)
+            hdr = ["--- a/%s" % (gp or ap), "+++ b/%s" % (gp or ap)]
+            pf.write_text(chr(10).join(hdr + d[2:]) + chr(10), encoding="utf-8", newline="")
+            # AC6, AS A SELF-CHECK RATHER THAN AN EXTERNAL ASSERTION. Every emitted patch is run
+            # through `git apply --check` against the vintage it names, HERE, because a patch set
+            # whose rows may or may not apply is worse than a smaller one that does: a reader who
+            # has to test each row before trusting it is doing the verb's job by hand.
+            #
+            # WHAT ACTUALLY FAILS THIS, MEASURED: two of thirty-five, both files that merely SHARE
+            # A BASENAME with a gov file and are otherwise unrelated — inCMS's 199-line
+            # `merge-rows.test.sh` against gov's 1488-line one. That is the derived map reaching a
+            # wrong conclusion, and the right output is to say so on the row rather than to ship a
+            # patch that rewrites a file into a different file.
+            _chk = subprocess.run(["git", "-C", str(root), "apply", "--check", str(pf)],
+                                  capture_output=True, text=True)
+            if _chk.returncode != 0:
+                pf.unlink(missing_ok=True)
+                unappliable.append((ap, gp, (_chk.stderr or "").strip().splitlines()[:1]))
+                pname = ""
+                cls, why = cls, (why + " — PATCH WITHHELD: it does not apply to the vintage it "
+                                        "names, so the mapping to this gov path is unsound")
+            else:
+                pname = pf.name
+                patches += 1
+        buckets[cls].append((ap, gp, why, pname))
+
+    L.append("## Patch withheld — does not apply to the named vintage (%d)" % len(unappliable))
+    L.append("")
+    L.append("*The row is still classed above; only the patch is withheld. A patch that does not "
+             "apply means the map reached a wrong gov path — usually two unrelated files sharing a "
+             "basename — so the row needs a human look before anything is absorbed.*")
+    L.append("")
+    if not unappliable:
+        L.append("None.")
+        L.append("")
+    for ap, gp, err in unappliable:
+        L.append("- `%s` → `%s` — %s" % (ap, gp, (err[0] if err else "no reason reported")))
+    L.append("")
+
+    L.append("## Not comparable — rendered from a gov template (%d)" % len(not_comparable))
+    L.append("")
+    L.append("*These are gov's own templates with this target's answers substituted in. A line "
+             "diff between a render and its template measures the render. They are excluded from "
+             "every class below, and listed here so that exclusion is visible rather than assumed.*")
+    L.append("")
+    if not not_comparable:
+        L.append("None.")
+        L.append("")
+    for ap, gp in not_comparable:
+        L.append("- `%s` ← `%s`" % (ap, gp))
+    L.append("")
+
+    for cls in (1, 2, 3, 4):
+        nm, gloss = CONTRIB_CLASSES[cls]
+        L.append("## Class %d — %s (%d)" % (cls, nm, len(buckets[cls])))
+        L.append("")
+        L.append("*%s.*" % gloss)
+        L.append("")
+        if not buckets[cls]:
+            # A SKIP ANNOUNCES ITSELF. An empty class is written as empty rather than dropped, so
+            # "no class-1 candidates" can never be read as "the verb did not look for any".
+            L.append("None proposed.")
+            L.append("")
+            continue
+        for ap, gp, why, pname in buckets[cls]:
+            row = "- `%s`" % ap
+            if gp and gp != ap:
+                row += " (gov: `%s`)" % gp
+            row += " — %s" % why
+            if pname:
+                row += " · patch `%s`" % pname
+            L.append(row)
+        L.append("")
+
+    body.write_text(chr(10).join(L) + chr(10), encoding="utf-8", newline="")
+    print("govkit contribute — %s: %d mapped · %d forked · %d not comparable (rendered) · "
+          "%d candidate(s) · %s · %d patch(es)"
+          % (name, len(rows), len(forks), len(not_comparable),
+             sum(len(buckets[c]) for c in (1, 2, 3, 4)),
+             " · ".join("class %d %d" % (c, len(buckets[c])) for c in (1, 2, 3, 4)), patches))
+    if unappliable:
+        print("govkit contribute — %d patch(es) WITHHELD: they do not apply to the vintage they "
+              "name, so those rows' gov paths are unsound" % len(unappliable))
+    print("govkit contribute — %s" % str(body).replace(chr(92), "/"))
+    return 0
+
+
 def main(argv: list[str]) -> int:
     if not argv or argv[0] in ("-h", "--help"):
         sys.stderr.write(USAGE)
@@ -7599,6 +7911,11 @@ def main(argv: list[str]) -> int:
             if len(argv) > 2 or (len(argv) == 2 and argv[1] != "--write"):
                 raise Refusal("selfcheck takes no arguments except --write")
             return selfcheck(root, write=(len(argv) == 2))
+        if verb == "contribute":
+            if target is None:
+                raise Refusal("contribute needs an explicit --target: the adopter tree to "
+                              "read. It writes to neither tree")
+            return cmd_contribute(root, target)
         if verb in ("plan", "check", "apply", "intake", "update", "adopt"):
             if target is None:
                 raise Refusal(

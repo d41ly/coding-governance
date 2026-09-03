@@ -6873,6 +6873,51 @@ user_skills = "/tmp/gk-fake-skills"
             # announcement under the flag is covered by the S6 arms below, which set it.
             "_cmd_update": None,
         }
+        # ---- DEPL-dRetiredFork-6. THE CONTRIBUTION CLASSIFIER ----------------------------------
+        # NAMES ARE NAMESPACED `_k6*` BECAUSE THEY ARE NOT IN A FUNCTION OF THEIR OWN.
+        # Every arm in this file shares one scope, and `_g4` was already a scratch gov
+        # tree several hundred lines above. Reusing it here rebound a `pathlib.Path` to a
+        # string and crashed an unrelated coverage arm with a TypeError on `/`, which is a
+        # collision the language does not warn about and a reader cannot see locally.
+        # S3 is the safety property: the verb PROPOSES and a person CONFIRMS. What these arms grade
+        # is that the proposals are not noise -- specifically that class 4 is a property of the
+        # DIFF and not of the destination, which is how it was written first and which classed 30
+        # of 31 real NicoCares candidates as layout carriage.
+        _k6GKC = govkit_module()
+        # Class 4: the same line with a path rewritten, and nothing else.
+        _k6g4 = "load('tools/hooks/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
+        _k6a4 = "load('scripts/hooks/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
+        _k6c4, _k6w4 = _k6GKC.contrib_propose_class({"path": "a.js", "gov_path": "a.js"}, _k6g4, _k6a4, "nc")
+        check("[-6] a change that is only a repath proposes class 4", _k6c4 == 4, f"{_k6c4}: {_k6w4}")
+        # ...and the DESTINATION differing does NOT, on its own, make it class 4. This is the arm
+        # that would have caught the original test: every deployed file has a destination unlike
+        # its gov source, so a destination-based rule fires on all of them.
+        _k6g4b = "x = 1" + chr(10)
+        _k6a4b = "x = 2" + chr(10)
+        _k6c4b, _k6w4b = _k6GKC.contrib_propose_class(
+            {"path": "scripts/a.js", "gov_path": "tools/a.js"}, _k6g4b, _k6a4b, "nc")
+        check("[-6] a real change at a repathed DESTINATION is not class 4",
+              _k6c4b != 4, f"{_k6c4b}: {_k6w4b}")
+        # Class 3: an added line naming the tree itself.
+        _k6c3, _k6w3 = _k6GKC.contrib_propose_class(
+            {"path": "a.js", "gov_path": "a.js"}, "x = 1" + chr(10),
+            "x = 1" + chr(10) + "# incms keeps a single copy" + chr(10), "incms")
+        check("[-6] an added line naming the tree itself proposes class 3", _k6c3 == 3, f"{_k6c3}: {_k6w3}")
+        # Class 2: gov has no such file at all.
+        _k6c2, _k6w2 = _k6GKC.contrib_propose_class(
+            {"path": "new.js", "gov_path": ""}, "", "x = 1" + chr(10), "nc")
+        check("[-6] bytes gov has no file for propose class 2", _k6c2 == 2, f"{_k6c2}: {_k6w2}")
+        # F2: already absorbed -- every added line is already in gov's copy.
+        _k6cA, _k6wA = _k6GKC.contrib_propose_class(
+            {"path": "a.js", "gov_path": "a.js"},
+            "x = 1" + chr(10) + "y = 2" + chr(10), "y = 2" + chr(10) + "x = 1" + chr(10), "nc")
+        check("[-6] F2 a change gov already carries is reported ALREADY ABSORBED",
+              "ALREADY ABSORBED" in _k6wA, _k6wA)
+        # LIVENESS: the four classes are genuinely reachable from this classifier. Without this the
+        # arms above could all pass while some class were unreachable in practice.
+        check("[-6] LIVENESS the classifier reaches more than one class",
+              len({_k6c4, _k6c4b, _k6c3, _k6c2}) >= 3, str(sorted({_k6c4, _k6c4b, _k6c3, _k6c2})))
+
         # ---- DEPL-dRetiredFork-3 S6. THE RE-RENDER SELECTOR IS NOT VACUOUS ---------------------
         # The decline path reads `role == "rendered"` out of each kit descriptor's row list, and the
         # row key is `files`. Written as `file` -- which it was, and which parses, type-checks and

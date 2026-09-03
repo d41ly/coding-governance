@@ -138,3 +138,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-03T07:03:50Z brief · item DEPL-dRetiredFork-3 · reason 511072614100 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-DEPL-dRetiredFork-3-1-build-brief.md
 
 2026-09-03T07:04:09Z dispatch · item b760d4ff DEPL-dRetiredFork-3 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/memory-tree/kit.toml tools/codebase-map/kit.toml memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-3.md
+
+2026-09-03T07:47:41Z brief · item DEPL-dRetiredFork-6 · reason 8fab523dbf29 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-DEPL-dRetiredFork-6-1-build-brief.md
+
+2026-09-03T07:48:30Z dispatch · item 803633bd DEPL-dRetiredFork-6 · reason tools/govkit/govkit.py,tools/govkit/census.py,tools/govkit/selftest.py,WIRE-INTO-PROJECT.md,memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-6.md

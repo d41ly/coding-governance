@@ -799,6 +799,39 @@ exists to remove.
 6. **Work state generated, not authored:** `python tools/memory-tree/gen_build_index.py --check` → 0, and
    `memory/LIVE.md` exists. Nothing under `memory/project/` but the six `*.txt` waiver registries.
 
+## 5c — Send a fix back: `contribute`
+
+An adopter that fixes a gov defect in its own copy has, until now, held that fix privately: it gets
+re-merged on every release, and gov keeps shipping the defect to everybody else. This build absorbed
+eight such fixes by hand, one at a time, because there was no route. `contribute` is the route.
+
+```bash
+python tools/govkit/govkit.py contribute --target /path/to/adopter
+```
+
+It is **read-only in both directions**. It writes nothing to gov and nothing to the adopter; the
+output goes under gov's own git dir, and the verb's acceptance includes the adopter's `git status`
+being byte-identical before and after. It emits a patch set. A person lands it, through the merge
+bar and the review protocol like any other change.
+
+**What it looks at.** Only rows whose bytes appear in NO gov commit ever. A row that merely differs
+from gov's current tip is an OLDER GOV VINTAGE — the adopter is behind, which is `update`'s job.
+Proposing one of those would be proposing gov's own history back to it. Rows rendered from a gov
+template are excluded and listed separately, because diffing a render against its template measures
+the render.
+
+**Every class is a PROPOSAL and none of it is a decision.** The report says so at the top, and the
+reason is the failure that matters: a fact true only of one tree, taken as a gov defect, absorbed,
+and shipped to every adopter as gov's behaviour. The four classes are gov defect, gov gap, project
+fact and layout carriage; the first two carry a patch, the last two carry a reason and nothing else.
+
+**A patch that does not apply is withheld, not shipped.** Each one is run through `git apply --check`
+against the vintage it names before it is emitted, and a row whose patch fails is reported with that
+fact — it means the map reached a wrong gov path, usually two unrelated files sharing a basename.
+
+**The patches are untrusted content.** They are bytes from a foreign tree. Read one before applying
+it.
+
 ## Result — what the project now has
 
 ```
