@@ -1485,19 +1485,32 @@ fi
 #
 # It wires the SHIPPED wrapper, not pyrun.sh: `merge-rows.sh` is what a node actually carries, and it
 # is the path an adopter gets.
+#
+# EACH KIT DIR IS NAMED ONCE, and the sources are anchored rather than left to the caller's cwd.
+# `MT`/`MR`/`LIB` each appear in three places — the scratch layout this case BUILDS, the copies into
+# it, and (for `MT`) the driver command — so those cannot drift apart. Sources hang off `$ROOT`,
+# which is this script's own location two levels up, the idiom case 32 already uses; that makes them
+# independent of the ambient cwd, which a bare relative path is not once any subshell cds elsewhere.
+# It is NOT a claim about the install prefix: `$ROOT` is two segments up, so it answers the repo root
+# only for a kit installed two deep, which is where `check-install-prefix.sh` and its ratchet come in
+# — that checker grades the literal `tools/<kit>/<file>` spellings a body ships, because `apply`
+# writes gov's bytes verbatim and such a literal resolves to nothing at another prefix.
 W=$(mktemp -d); SCRATCH="$SCRATCH $W"
-mkdir -p "$W/tools/memory-tree" "$W/tools/memory-recall" "$W/tools/lib" "$W/memory/backlog"
-cp .memory-tree.conf "$W/"
-cp tools/memory-tree/merge-rows.py tools/memory-tree/merge-rows.sh "$W/tools/memory-tree/"
-cp tools/memory-recall/extract.py tools/memory-recall/recall_conf.py "$W/tools/memory-recall/"
-cp tools/lib/pyrun.sh tools/lib/resolve-python.sh "$W/tools/lib/"
+MT=tools/memory-tree
+MR=tools/memory-recall
+LIB=tools/lib
+mkdir -p "$W/$MT" "$W/$MR" "$W/$LIB" "$W/memory/backlog"
+cp "$ROOT/.memory-tree.conf" "$W/"
+cp "$ROOT/$MT/merge-rows.py" "$ROOT/$MT/merge-rows.sh" "$W/$MT/"
+cp "$ROOT/$MR/extract.py" "$ROOT/$MR/recall_conf.py" "$W/$MR/"
+cp "$ROOT/$LIB/pyrun.sh" "$ROOT/$LIB/resolve-python.sh" "$W/$LIB/"
 WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 (
   cd "$W" || exit 2
   git init -q -b main
   git config user.email t@e; git config user.name t; git config core.autocrlf false
   printf 'memory/DECISIONS.md merge=rows\nmemory/backlog/*.md merge=rows\n' > .gitattributes
-  git config merge.rows.driver 'bash tools/memory-tree/merge-rows.sh %O %A %B %P'
+  git config merge.rows.driver "bash $MT/merge-rows.sh %O %A %B %P"
   { printf '# tooling backlog\n\n> Mutable. Each row leads with one status token.\n'
     row TOOL-zFixture-1 base; } > memory/backlog/TOOL.md
   git add -A; git commit -q -m base

@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-02T20:38:04+03:00 @ b0108f13af0caa5a88516ca2eb5505845c5e7da6
+last-audit: 2026-09-03T08:16:23+03:00 @ 51444cc12cd05f02df9bac677a3b32c5689f27bf
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: afbd0926673dacac62527e96836703cea3101d4a
@@ -283,8 +283,9 @@ does — hit three times in one file in one session) · `process-creation-is-the
   ordinals, invalidating any `unarmed-branches.txt` row below the insertion point.
 - A positional in a gate's `fail` message CANNOT be armed — `check-arms.py` reads a bare `$1` as
   literal text inside the signature. Bind it to a name and put it at the END, after the sentence.
-- Hygiene checks 13-19 are OFF unless a pin is armed; a fixture tree written WITHOUT pins arms nothing
-  in that range. Set the pin in the scratch tree, or the arm passes by finding nothing.
+- Hygiene checks 13-15 ALONE are pin-gated (`armed()` reads DEAD_PATH_PIN/ORPHAN_ID_PIN), so a
+  fixture without pins arms nothing THERE — set one. 16 is structural, 17-19 are `gotchas.py`'s,
+  neither pinned. Said 13-19; false above 15.
 - `merge-rows.py` takes `%O %A %B` — BASE, OURS, THEIRS — and writes into the OURS path. A wrong
   order does not error: it emits a plausible file with the other side's rows silently dropped.
   Diff the merged id-set against BOTH inputs, never eyeball the output.
