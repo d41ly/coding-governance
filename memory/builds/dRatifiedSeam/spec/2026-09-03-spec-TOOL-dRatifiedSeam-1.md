@@ -119,13 +119,16 @@ and `tools/workflows/unattended-build.test.sh`.
   FILE, and that is not its interface: it reads a PreToolUse payload from stdin
   (`readFileSync(0)`), uses `process.argv` only for `--only=`, and given a path it hangs. The
   observation is the tool call being permitted, not a command that cannot make it.
-- **AC7** — `bash tools/run-gates/run-gates.sh` is green, AND its `workflow syntax`,
+- **AC7** — `bash tools/run-gates/run-gates.sh` is green, AND its `workflow script syntax`,
   `verifier fan-out` and `agent-cap self-test` legs are among the legs that RAN rather than
-  being skipped by a guard. A bare green bar proves nothing about this change.
+  being skipped by a guard. A bare green bar proves nothing about this change. rev-2 named two
+  legs that DO NOT EXIST — `workflow syntax` and `review-protocol parity`, both missing their
+  real suffixes — which the spec-tokens gate caught and which would have sent a builder looking
+  for legs no manifest declares.
 
 ## 7. Gates
 
-`workflow syntax` · `verifier fan-out` · `review-protocol parity` · `agent-cap self-test`
+`workflow script syntax` · `verifier fan-out` · `review-protocol parity (kit vs dogfood)` · `agent-cap self-test`
 
 ## 8. Open questions
 
