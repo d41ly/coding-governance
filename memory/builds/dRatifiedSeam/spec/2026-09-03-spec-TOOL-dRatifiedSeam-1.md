@@ -1,6 +1,6 @@
 # TOOL-dRatifiedSeam-1 — the harness AUDIT stage runs where Workflow exists
 
-**Status:** OPEN · rev-1 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -105,13 +105,23 @@ and `tools/workflows/unattended-build.test.sh`.
   `AUDIT_SCHEMA` still refuses a run that omits it.
 - **AC3** — When a stage returns CONVERGING paired with 0 blockers, `unattended-build.js`
   REFUSES by name rather than emitting the record. Observed by staging that pairing.
-- **AC4** — When `grep -n "Workflow"` runs over the AUDIT stage's prompt, no instruction remains
-  ordering a sidechain agent to invoke a tool it cannot hold.
-- **AC5** — `bash tools/workflows/unattended-build.test.sh` exits 0, and its arm count is reported
-  in this unit's acceptance ledger.
-- **AC6** — When `node tools/hooks/agent-cap.js` grades the changed script, it neither denies it
-  nor requires a marker the script does not carry.
-- **AC7** — `bash tools/run-gates/run-gates.sh` is green at the push boundary.
+- **AC4** — When the AUDIT stage runs, the agent that invokes `Workflow` is one that HOLDS it,
+  demonstrated by that invocation succeeding in AC1's run. rev-1 graded this as the ABSENCE of a
+  `grep -n "Workflow"` hit inside the stage prompt, which deleting the prompt would satisfy and
+  which rewording without fixing would also satisfy — an absence over a scope no machine
+  defines.
+- **AC5** — `bash tools/workflows/unattended-build.test.sh` exits 0 AND its arm count is HIGHER
+  than the 21 it reports today, because this unit adds the arms for S3's refusal and S4's
+  end-to-end route. Measured before authoring: that suite already exits 0 at 21 arms, so rev-1's
+  criterion was satisfied by doing nothing.
+- **AC6** — When the changed harness is invoked through the `Workflow` tool, the `agent-cap`
+  PreToolUse hook does not deny it. rev-1 said `node tools/hooks/agent-cap.js` grades a script
+  FILE, and that is not its interface: it reads a PreToolUse payload from stdin
+  (`readFileSync(0)`), uses `process.argv` only for `--only=`, and given a path it hangs. The
+  observation is the tool call being permitted, not a command that cannot make it.
+- **AC7** — `bash tools/run-gates/run-gates.sh` is green, AND its `workflow syntax`,
+  `verifier fan-out` and `agent-cap self-test` legs are among the legs that RAN rather than
+  being skipped by a guard. A bare green bar proves nothing about this change.
 
 ## 7. Gates
 
@@ -135,6 +145,12 @@ and `tools/workflows/unattended-build.test.sh`.
 - rev-1 · 2026-09-03 · initial draft. Written against `TOOL-dRetiredFork-41` and grounded on
   `TOOL-dBriefedPass-4`'s order-not-enforcement ruling, plus the discovery that `agent-cap.js`'s
   loop denial is superseded by `gov:sequential-agents(5)`.
+- rev-2 · 2026-09-03 · folded four M4 findings against this spec's own acceptance, each verified
+  against the tree. AC5 was ALREADY TRUE before the unit starts — the suite exits 0 at 21 arms
+  today, measured — so it was satisfied by building nothing. AC6 named a witness that is not an
+  interface: the hook reads stdin, and invoked with a path it hangs (`rc=124`, measured). AC4
+  graded an ABSENCE over a scope no machine defines. AC7 was a bare green bar. The audit was
+  self-review, the cold reviewers having died on server 529s, so a cold M4 pass is still owed.
 
 ## 10. Reuse audit
 

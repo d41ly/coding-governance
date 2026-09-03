@@ -1,6 +1,6 @@
 # DEPL-dRatifiedSeam-1 — the tracked-count invariant admits additions, and `update` lands a new source
 
-**Status:** OPEN · rev-2 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams deployer · order 1
+**Status:** OPEN · rev-3 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
@@ -99,24 +99,30 @@ spec claimed it was already written and that was wrong), and `DEPL-dRetiredFork-
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a write run adds a tracked file, `python tools/govkit/selftest.py` exits 0 rather
-  than failing the standing predicate.
+- **AC1** — When the `[-11]` fixture's write run ADDS a tracked file — an arm S1 must create,
+  because no arm adds one today and the relaxed direction is otherwise never taken —
+  `python tools/govkit/selftest.py` exits 0 rather than failing the standing predicate.
 - **AC2** — When a write run without `--write-withdrawals` REMOVES a tracked file, that same
   command exits non-zero, naming the removal. Observed by staging the break and reverting.
-- **AC3** — When `grep -cE "tracked-file count|tracked_before|tracked_after"` runs over
-  `tools/govkit/selftest.py`, every site it reports is either changed by S1 or carries a comment
-  saying why it differs.
+- **AC3** — When `grep -nE "tracked-file count|tracked_before|tracked_after"` runs over
+  `tools/govkit/selftest.py`, it reports the same FOUR sites grounding measured, and each one's
+  comparison operator is `>=` or is named in this unit's ledger with the arm that proves its
+  different direction still fails. A comment alone does not satisfy this: the ledger row must
+  cite an arm, because a criterion a comment can answer is the class this build closes.
 - **AC4** — When `govkit update --write` runs against a fixture holding a gov source with no
   receipt row, the source is written and reported, and a row appears in `install.json`.
 - **AC5** — When the same run meets a destination the target already holds, it REFUSES rather than
   overwriting, and `.governance/install.json` is unchanged for that row.
-- **AC6** — When `python tools/govkit/selftest.py` is re-run, each of the nineteen cascade arms
-  is green or carries a recorded disposition in this unit's acceptance ledger; none is left
-  failing and unexplained.
+- **AC6** — When `python tools/govkit/selftest.py` is re-run, ZERO arms fail. The nineteen
+  cascade arms are each named in this unit's ledger with what resolved them, but the criterion
+  is the exit status, not the prose: a disposition written beside a still-failing arm satisfies
+  nothing.
 - **AC7** — `python tools/govkit/selftest.py` and `python tools/govkit/govkit.py selfcheck` both
   exit 0.
-- **AC8** — `bash tools/run-gates/run-gates.sh` is green on the diff-scoped run at the push
-  boundary.
+- **AC8** — `bash tools/run-gates/run-gates.sh` is green, AND its `govkit selftest` and
+  `govkit acceptance matrix` legs are among the legs that RAN rather than being skipped by a
+  guard. A bare green bar is the unrelated-green-gate shape `memory/TEMPLATE-SPEC.md` forbids;
+  what makes it an observation of THIS change is that the legs grading this diff executed.
 
 ## 7. Gates
 
@@ -143,6 +149,15 @@ spec claimed it was already written and that was wrong), and `DEPL-dRetiredFork-
   unit's own commit message states it was built and not landed. A builder reading rev-1 would
   have gone looking for code that does not exist. Found by the M4 audit — by hand, because the
   agent fan died whole on a 529 and returned an empty finding list that read like a clean pass.
+- rev-3 · 2026-09-03 · folded four M4 findings against this spec's own acceptance, every one
+  verified against the tree. AC1's antecedent was never exercised: no fixture arm adds a tracked
+  file, so it could pass with the relaxed direction untaken. AC3 and AC6 were SELF-GRADED — each
+  admitted a comment or a ledger sentence as its answer, which is the gate-satisfied-by-its-own
+  -prose class this build spent fifteen units removing, appearing in the acceptance of the spec
+  that removes it. AC8 was a bare green bar, which `memory/TEMPLATE-SPEC.md` names as the
+  unrelated-green-gate shape. The audit was self-review: the cold reviewers all died on server
+  529s, and self-review of one's own spec is the weaker instrument, so a cold M4 pass is still
+  owed and is not claimed here.
 
 ## 10. Reuse audit
 
