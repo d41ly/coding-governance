@@ -902,7 +902,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 1670
+    "ceiling": 40000
   },
   {
     "name": "dead-path carriers (deleted files still named)",

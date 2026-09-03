@@ -142,3 +142,7 @@ base: 5e7f41d3cf1713382189208d3703f3373c764d75
 2026-09-03T07:47:41Z brief · item DEPL-dRetiredFork-6 · reason 8fab523dbf29 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-DEPL-dRetiredFork-6-1-build-brief.md
 
 2026-09-03T07:48:30Z dispatch · item 803633bd DEPL-dRetiredFork-6 · reason tools/govkit/govkit.py,tools/govkit/census.py,tools/govkit/selftest.py,WIRE-INTO-PROJECT.md,memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-6.md
+
+2026-09-03T08:17:58Z brief · item TOOL-dRetiredFork-17 · reason e44424244be8 memory/builds/dRetiredFork/prompts/2026-09-03-prompt-TOOL-dRetiredFork-17-1-build-brief.md
+
+2026-09-03T08:18:16Z dispatch · item 05649507 TOOL-dRetiredFork-17 · reason tools/check-install-prefix.sh,tools/install-prefix-carried.txt,tools/install-prefix-exceptions.txt,tools/hooks/README.md,AGENTS.md,tools/gate-legs.json,memory/builds/dRetiredFork/spec/2026-09-02-spec-TOOL-dRetiredFork-17.md

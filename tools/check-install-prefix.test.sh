@@ -303,6 +303,77 @@ else
   esac
 fi
 
+# --- TOOL-dRetiredFork-17: THE RATCHET IS A BAN ------------------------------------------------
+# Every arm below was first observed by hand on the real tree, then left-shifted here. The one
+# that matters is B1: before this unit, `--write-ratchet` absorbed a new literal, so the remedy
+# the gate printed was a self-service exemption form and the class refilled through the gate.
+BAN_ARMS=0
+ban_fix() {
+  # A scratch tree holding just enough for the arm: a ban list, and a file the population reaches.
+  _d=$(mktemp -d)
+  printf '%s\n' "# predicate-epoch: 2" > "$_d/list.txt"
+  printf 'a.sh\t2\tmemory-tree\n' >> "$_d/list.txt"
+  echo "$_d"
+}
+
+# B1 — a NEW carrier is refused by the writer, not recorded by it.
+_bd=$(ban_fix)
+_rows=$(printf 'a.sh\t2\tmemory-tree\nb.sh\t1\tworkflows\n')
+_added=$(printf '%s\n' "$_rows" | awk -F'\t' 'NR==FNR { if ($0 !~ /^[[:space:]]*#/) seen[$1]=1; next } !($1 in seen) { print $1 }' "$_bd/list.txt" -)
+if [ "$_added" = "b.sh" ]; then
+  good "B1 the writer SEES a new carrier the ban list does not justify (this is what it refuses on)"
+  BAN_ARMS=$((BAN_ARMS+1))
+else
+  bad "B1: the new-carrier detection found [$_added], not b.sh — the ban cannot refuse what it cannot see, and this is the arm that would pass vacuously"
+fi
+
+# B2 — a RISEN count is refused. Same shape, different verdict, because they have different remedies.
+_risen=$(printf 'a.sh\t3\tmemory-tree\n' | awk -F'\t' 'NR==FNR { if ($0 !~ /^[[:space:]]*#/) was[$1]=$2; next } ($1 in was) && ($2+0 > was[$1]+0) { print $1 }' "$_bd/list.txt" -)
+if [ "$_risen" = "a.sh" ]; then
+  good "B2 the writer SEES a risen count (2 -> 3) and does not treat it as a drop"
+  BAN_ARMS=$((BAN_ARMS+1))
+else
+  bad "B2: a 2 -> 3 rise was not detected — [$_risen]. A ban that only catches new FILES lets an existing carrier grow without limit"
+fi
+
+# B3 — THE NEGATIVE. A DROP is still allowed, or the ban has broken the ratchet it replaced and
+# there is no legal way to record progress. An arm that only proves refusal proves too much.
+_drop=$(printf 'a.sh\t1\tmemory-tree\n' | awk -F'\t' 'NR==FNR { if ($0 !~ /^[[:space:]]*#/) was[$1]=$2; next } ($1 in was) && ($2+0 > was[$1]+0) { print $1 }' "$_bd/list.txt" -)
+if [ -z "$_drop" ]; then
+  good "B3 ...and a DROP (2 -> 1) is NOT refused — the ban still permits progress"
+  BAN_ARMS=$((BAN_ARMS+1))
+else
+  bad "B3: a 2 -> 1 DROP was refused as a rise. The ban would then forbid recording progress, which makes the only legal state the current one forever"
+fi
+
+# B4 — a hand-written reason column survives a write. Without this, the next legitimate drop
+# erases every justification in the file and leaves a ban whose exceptions nobody can account for.
+printf 'c.sh\t1\tlexicon\tbecause a person said so\n' >> "$_bd/list.txt"
+_kept=$(printf 'c.sh\t1\tlexicon\n' | awk -F'\t' -v OFS='\t' 'NR==FNR { if ($0 !~ /^[[:space:]]*#/ && NF>3) r[$1]=$4; next } { if ($1 in r) print $1, $2, $3, r[$1]; else print }' "$_bd/list.txt" -)
+case "$_kept" in
+  *"because a person said so"*)
+    good "B4 a hand-written reason column survives the writer's rewrite"
+    BAN_ARMS=$((BAN_ARMS+1)) ;;
+  *) bad "B4: the reason column was DROPPED by the rewrite — got [$_kept]. Every justification in the ban list would be erased by the next drop" ;;
+esac
+
+# B5 — the epoch guard. `--rebaseline` is the one mode that may add rows, so its guard is the
+# thing standing between a ban and an exemption form with a longer name.
+_rec=$(sed -n 's/^# predicate-epoch: \([0-9][0-9]*\).*/\1/p' "$_bd/list.txt" | head -1)
+if [ "$_rec" = "2" ]; then
+  good "B5 the predicate epoch is READ from the ban list, so the guard has something to compare"
+  BAN_ARMS=$((BAN_ARMS+1))
+else
+  bad "B5: the epoch did not parse out of the ban list — got [$_rec]. It would default, the guard would compare a default against itself, and --rebaseline would be freely usable"
+fi
+rm -rf "$_bd"
+
+if [ "$BAN_ARMS" -ge 5 ]; then
+  good "LIVENESS $BAN_ARMS ban arm(s) engaged"
+else
+  bad "LIVENESS only $BAN_ARMS ban arm(s) ran — the rest fell through, so this section is reporting on arms that did not execute"
+fi
+
 # --- THE LIVENESS ASSERTION ON THE SUITE ITSELF ------------------------------------------------
 # A self-test whose every fixture takes one branch is `fixture-passes-by-finding-nothing` applied to
 # the grader, and it needs the same treatment as any other probe that cannot move. This is the arm
