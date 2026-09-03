@@ -579,3 +579,20 @@ listed lines, because those checks want `**Serves:**` headers on 612 records, th
 and a `RECORD_UNBOUND_PIN` measured against that corpus. The engine upgrade is one command; the
 records upgrade is a build nobody has scoped. That asymmetry, not a missing verb, is why both
 adopters sit behind.
+
+## What this repo's own map does not claim
+
+Attributing every tracked path through `map_lib` (not a diff range) leaves 56 files under `tools/`
+unclaimed here, and the unclaimed set is not obscure. Verbatim, each tested by membership in the
+`UNMAPPED` bucket:
+
+- `AGENTS.md` — the charter
+- `.githooks/pre-push` and `.githooks/pre-commit` — the two hooks that enforce the merge bar
+- `tools/push-main.sh` — the lander `.unattended.conf` mandates
+- `tools/check-wiring.sh` — the wiring checker the SessionStart hook runs
+- `tools/drift-audit/drift_report.py` — the self-audit
+- `skills/session-kickoff/manifest-check.sh` and `SKILL.md` — the kickoff ratchet
+
+`tools/run-gates/run-gates.sh` IS claimed, so this is not a blanket gap. It is a set of load-bearing
+files nobody wrote a dossier for, invisible to `map_diff`'s digest and therefore to the kickoff
+skill's "what did the fast-forward bring in" step.
