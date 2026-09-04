@@ -6612,7 +6612,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # RECEIPT's paths and a rename destination is by definition not one of them, so a
             # tracked file there whose worktree copy the operator removed is invisible to `exists()`
             # — and `git mv` would take its index entry without a word.
-            # DEPL-dSealedTally-4. THE ONE MID-WRITE CALLER, and the only one that catches.
+            # DEPL-dSealedTally-4. A MID-WRITE CALLER, and one of THREE that catch: this one,
+            # the pre-landing read below, and the two in `_cmd_apply`. An earlier version of
+            # this comment said "THE ONE", which stopped being true the moment the landing
+            # gained a reader of its own.
             # Every other `index_read` runs before this verb has written anything, so letting
             # the refusal reach the verb boundary costs nothing there. This one runs INSIDE the
             # write walk: raising here would abort a part-written target and never reach the
@@ -7123,7 +7126,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             #
             # `lexists`, NOT `.exists()` — F2 again. A symlink is an occupant whether or not its
             # target exists, and the one that does not exist is the dangerous one.
-            if os.path.lexists(_abs0):
+            # A THIRD MID-WRITE READER, taken HERE because the gate below needs it and
+            # because after the `git add` the pre-write state no longer exists. An
+            # uncaught `Refusal` would abort a part-written target, so it disposes
+            # like the other two mid-write readers.
+            try:
+                _idx_pre, _ = index_read(target, [_dest])
+            except Refusal as _pre_idx_err:
+                _refused_new.append((_dest, f"the index could not be read before landing "
+                                            f"it, so whether the target already holds it "
+                                            f"is UNKNOWN: {_pre_idx_err}"))
+                continue
+            # THE INDEX IS ASKED TOO, not just the disk. `lexists` cannot see a path
+            # that is STAGED with no worktree copy, so gov used to overwrite an
+            # an adopter blob at exit 0 on any run that was not rolled back.
+            if os.path.lexists(_abs0) or _idx_pre.get(_dest) is not None:
                 _refused_new.append((_dest, "the target already holds this path and the receipt "
                                             "does not name it, so gov did not put it there"))
                 continue
@@ -7143,7 +7160,6 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # no longer exists. The landing gate refuses a destination `os.path.lexists`
             # finds, but that is a DISK probe and cannot see a path staged with no worktree
             # copy -- so the snapshot must ASK the index rather than assume `absent` from it.
-            _idx_pre, _ = index_read(target, [_dest])
             try:
                 _abs0.parent.mkdir(parents=True, exist_ok=True)
                 _abs0.write_bytes(_blob0)
@@ -7415,14 +7431,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 f"{exits}\n"
                 f"vintage {base_commit} -> {to_commit}\n\n"
                 f"This kit's check PASSED before this run and FAILS after it, so this run is what "
-                f"broke it. Every path below was restored to the index entry it had before the "
-                f"first byte moved, and this kit's receipt rows were restored with them. No other "
+                f"broke it. Every path marked `restored` below was put back to the index entry "
+                f"it had before the first byte moved, and its receipt row with it. Every path "
+                f"marked `removed` was one this run LANDED: it had no earlier state to return "
+                f"to, so it was deleted and the row this run minted for it was dropped. No other "
                 f"kit was touched: a green kit's write is correct and reverting it to punish a "
                 f"sibling discards a good result.\n\n"
                 + "".join(f"restored  {p}\n" for p in restored)
                 + "".join(f"removed   {p}\n" for p in removed_landed)
+                # F7. BOTH LISTS. This line used to fire whenever `restored` was empty, so a
+                # rollback that really did REMOVE a landing told the operator that nothing had
+                # happened -- printed directly beneath the `removed` line contradicting it.
                 + ("(nothing to restore: every path this kit owns was refused before it was "
-                   "written)\n" if not restored else "")
+                   "written)\n" if not restored and not removed_landed else "")
                 + "".join(f"left alone {p} — this run never wrote it, so there is nothing here to "
                           f"undo\n" for p in untouched)
                 + f"\nThe receipt is NOT re-stamped, so the next run re-classifies these rows from "
@@ -7431,7 +7452,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                   f"`update`.\n",
                 encoding="utf-8", newline="\n")
             print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · ROLLED BACK · "
-                  + (" ".join(restored) if restored else "(no path restored)"))
+                  + (" ".join(restored + removed_landed)
+                     if (restored or removed_landed) else "(no path restored)"))
             r.fail(f"kit '{eid}' passed its own check before this run and fails it after: "
                    f"{exits}. Its writes were ROLLED BACK to their pre-run index entries and an "
                    f"order was written under .governance/outbox/")

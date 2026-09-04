@@ -44,3 +44,7 @@ base: 4fd318320cd4d17dcc543d38eb6dceb7b2d5cbf8
 2026-09-04T06:30:29Z review · item DEPL-dSealedTally-1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold
 
 2026-09-04T06:30:30Z review · item DEPL-dSealedTally-5 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold
+
+2026-09-04T10:33:14Z review · item dSealedTally · reason verdict BLOCKED · blockers 1
+
+2026-09-04T10:58:04Z review · item dSealedTally · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · disposition fold
