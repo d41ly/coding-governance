@@ -1,12 +1,13 @@
 # TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
 
 <!-- /gen:spec-records -->
 
@@ -37,23 +38,42 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
   to exempt its own build by committing one bad line, and it would leave a build with a garbage
   `RUN.md` more exempt than a build with none.
 - **S2c** — a CLOSED unit in the run-state-free population whose build commit is NOT found inside
-  the derived range is searched for ONCE more, in the history strictly before the anchor, with a
-  whole-token id match. A hit is a VIOLATION and is reported as one: product code naming that unit
-  landed before the build folder existed, so it necessarily landed before any spec for it. A miss
-  stays in the `unbuilt-in-range` tally. The extra search runs only for units the range search did
-  not resolve, which is 5 units across the whole tree at the reading in S4, so the cost is bounded by
-  the misses and not by the population.
+  the derived range is searched for ONCE more, in the history strictly before the anchor. **That
+  search uses the SAME build-commit predicate as the in-range one, unchanged: a whole-token subject
+  match AND a path touched outside the record surface** — the build's own folder, plus
+  `GENERATED_INDEXES`, plus `SHARED_RECORDS`, which `.unattended.conf` sets to
+  `memory/DECISIONS.md memory/backlog`. Rev-3 wrote only the first half, which would have made the
+  probe a false-positive engine: a `backlog(TOOL-xFoo-1): open the row` commit touching only
+  `memory/backlog/TOOL.md` ordinarily lands before the build folder exists, and a predicate without
+  the exclusion reports it as a violation and reds the bar on a build that did nothing wrong. The
+  script's own comment records that dropping this exclusion once "made a CONFORMING run unlandable",
+  and §3's second non-goal forbids changing the definition in any case. A hit is a VIOLATION: product
+  code naming that unit landed before the build folder existed, so it necessarily landed before any
+  spec for it. A miss stays in the `unbuilt-in-range` tally.
+- **S2d — the pre-anchor probe is BOUNDED BY CONSTRUCTION, because its cost cannot be measured
+  before S1 lands.** Rev-3 bounded it with "5 units across the whole tree", a figure that appears in
+  no section of this spec and, worse, measures the wrong population: `unbuilt` is incremented only
+  after the `RUN.md` gate, so no reading of it has ever seen a run-state-free build. The three such
+  builds inside the cutoff carry 20 CLOSED units whose miss rate is simply unknown, and HEAD is 1969
+  commits, so an unbounded pre-anchor walk per miss is not obviously cheap. The probe therefore
+  takes a DECLARED commit cap, and what it truncates is COUNTED on the liveness line — a probe that
+  gave up must say so rather than reporting a miss as a clean result.
 - **S3** — the liveness assertion gains a count for the widened population: builds graded that carry
   no run-state file. The line ALREADY prints four counts — builds graded, builds skipped by the
   cutoff, builds `with no pinned run BASE`, and units `unbuilt-in-range` — while the block comment
   above it at line 246 says "THREE COUNTS"; that comment is stale and is corrected in the same
-  commit. After this unit the line prints SIX: the four above, the new run-state-free-graded count,
-  and the pre-anchor violations S2c finds. `skipped_norun` is RETAINED rather than repurposed,
-  because S2b leaves it a residual population — a build whose `RUN.md` is unreadable for a reason
-  neither S1 nor S2b admits — and the leg's own doctrine is that a skip is counted and announced,
-  never silent.
-- **S4** — the cost ceiling for this leg is re-declared against a fresh reading taken after S1
-  lands, with the reading written beside it, in BOTH carriers that declare one:
+  commit. **`skipped_norun` is RETIRED, not retained.** Rev-3 kept it and justified it with a
+  residual population that does not exist: the counter is incremented at exactly three sites — no
+  `RUN.md`, a `base:` that is not hex-shaped, a sha that does not resolve — S1 closes the first and
+  S2b routes the other two to the folder anchor, and an absent or unreadable `base:` yields the
+  empty string, which is not hex-shaped, so it lands in the second. Every path is closed, and a
+  field pinned at zero printed beside four that move is the DEAD PROBE class this leg's own header
+  makes load-bearing. After this unit the line prints FIVE: graded, skipped-by-cutoff,
+  run-state-free-graded, `unbuilt-in-range`, and the pre-anchor violations S2c finds, plus S2d's
+  truncation count where it is non-zero.
+- **S4** — the cost ceiling for this leg is re-declared against a fresh reading taken after S1, S2c
+  AND S2d have landed — not after S1 alone, since the pre-anchor probe is the part whose cost is
+  unmeasured — with the reading written beside it, in BOTH carriers that declare one:
   `tools/unattended/run-unattended-gates.sh` (`BUDGET_pass_order_history`, currently 90) and the
   `pass-order history` row of `tools/gate-legs.json` (currently 900). **The 900 is the one that
   binds the merge bar**; the 90 bounds only the on-demand kit runner, and the comment beside it
@@ -136,15 +156,19 @@ satisfied by not opting in, which is the shape this unit exists to remove.
 - perf / scale — the binding concern. See S4 and Alternatives rejected; the population grows by
   every run-state-free build the cutoff admits, and the leg is already over the RUNNER's ceiling at
   463 s against 90, while sitting inside the manifest ceiling of 900 that actually binds the merge
-  bar. S2c adds work only for units the range search did not resolve, which is 5 across the whole
-  tree, so it does not scale with the population.
+  bar. **S2c's cost is UNMEASURED and is bounded by construction instead**, per S2d. Rev-3 wrote
+  "5 across the whole tree"; that figure is in no section of this spec and counts a population the
+  `RUN.md` gate structurally excludes, so it says nothing about the builds S1 adds. The three
+  run-state-free builds inside the cutoff carry 20 CLOSED units whose miss rate is unknown until S1
+  lands, and records-only units — the ordinary `unbuilt` shape — are the class most likely to miss.
 - residual lever — the COMMITTED `opened:` value is still authored by the graded run. S6 narrows
   the working-tree edit and does not close the class; the leg's header says so.
 - a11y — N/A. No user-facing surface.
 - i18n — N/A. No user-facing strings beyond gate output.
 - error / empty / loading states — a build with no CLOSED unit contributes nothing and must be
   counted as skipped rather than passing silently.
-- observability — the fourth liveness count in S3 is the whole of it.
+- observability — S3's liveness line is the whole of it, including the retirement of a counter S1
+  and S2b leave with no reachable increment site.
 - risks — a widened population may red builds already landed on the default branch. The date cutoff
   is the control, and S1 does not move it.
 - testing + left-shift gates — S5, with the red observed before the green.
@@ -159,17 +183,30 @@ satisfied by not opting in, which is the shape this unit exists to remove.
   The RED is observed and recorded before the fix that greens it.
 - **AC2** — When the same fixture is re-staged with the spec commit first, `check-pass-order.sh`
   exits 0 and the unit appears in the graded count.
-- **AC3** — When `check-pass-order.sh` runs over the real tree, its liveness line names the
-  run-state-free-graded count explicitly and that count is NON-ZERO, and the four counts the line
-  printed before this unit are all still present. A cardinality is not the criterion: the line
-  already printed four before any change, so counting fields cannot distinguish a landed unit from
-  an unlanded one.
+- **AC3** — When `bash tools/unattended/check-pass-order.sh` runs over the real tree, its liveness
+  line names the run-state-free-graded count explicitly and that count is NON-ZERO, and it no longer
+  prints `with no pinned run BASE`. A cardinality is not the criterion: the line already printed four
+  counts before any change, so counting fields cannot distinguish a landed unit from an unlanded one.
+  Rev-3's "the four counts printed before this unit are all still present" was worse than useless —
+  it REQUIRED the retired counter to survive, blessing a field S1 and S2b leave permanently zero.
+- **AC11** — When `grep -n 'skipped_norun' tools/unattended/check-pass-order.sh` runs after this
+  unit, it returns nothing: the counter is gone rather than pinned at zero. A liveness field with no
+  reachable increment site is a dead probe whichever value it prints.
+- **AC12** — When a fixture build with no `RUN.md` has a pre-anchor commit that names its unit id and
+  touches ONLY a `SHARED_RECORDS` path, `check-pass-order.sh` does NOT report a violation for that
+  unit. This is the false-positive arm: the pre-anchor window admits product commits and record
+  commits alike, and a predicate without the record-surface exclusion reds a conforming build.
+- **AC13** — When a fixture drives the pre-anchor probe into S2d's declared commit cap,
+  `bash tools/unattended/check-pass-order.sh` reports the truncation as its own count on the liveness
+  line. A probe that gave up and a probe that found nothing print the same thing otherwise.
 - **AC4** — When `bash tools/unattended/check-pass-order.test.sh` runs, every arm passes and the
   arm count reported exceeds the count recorded before this unit.
-- **AC5** — When `bash tools/unattended/run-unattended-gates.sh --checks` runs, the `pass-order
-  history` leg finishes inside its re-declared ceiling; that ceiling carries the reading it was set
-  against on the line beside it; and the `pass-order history` row of `tools/gate-legs.json` carries
-  a ceiling at least as large, with the stale parity comment gone from the runner.
+- **AC5** — When `bash tools/unattended/run-unattended-gates.sh --checks` runs AFTER S1, S2c and S2d
+  have all landed, the `pass-order history` leg finishes inside its re-declared ceiling; that ceiling
+  carries the reading it was set against on the line beside it; and the `pass-order history` row of
+  `tools/gate-legs.json` carries a ceiling at least as large, with the stale parity comment gone from
+  the runner. The reading is taken after the pre-anchor probe exists, not after S1 alone: S2c is the
+  part whose cost nothing has measured.
 - **AC7** — When a fixture build has NO `RUN.md`, and a commit writing product code and naming its
   unit id lands BEFORE the commit that creates the build folder, `check-pass-order.sh` exits
   non-zero and names that unit. The unit must NOT appear only in the `unbuilt-in-range` tally: that
@@ -247,6 +284,18 @@ branches. The full bar is `bash tools/run-gates/run-gates.sh`.
   deletes rather than restores the false "one figure, two readers" parity comment; S6 and F1
   restated as a NARROWING with the parent review's finding cited and the residual routed to the
   leg's header, with AC10 covering the committed back-date that remains possible.
+- rev-4 · 2026-09-04 · round-2 spec audit folded: findings 4, 5 and 6 — all three defects the rev-3
+  FOLD introduced, not defects rev-2 carried. S2c had specified the pre-anchor probe as a bare
+  whole-token id match, dropping the record-surface exclusion the in-range predicate carries: that
+  is a false-positive engine on the one path this leg reports a hard violation, and a reproduced
+  failure the script's own comment documents. AC12 arms it. S3 had RETAINED `skipped_norun` on a
+  residual population that does not exist — S1 and S2b between them close all three of its increment
+  sites — so the field would have been pinned at zero forever, and AC3 as written REQUIRED it to
+  survive; the counter is retired and AC11 observes the retirement. S2d added because rev-3 bounded
+  the probe's cost with "5 units across the whole tree", a figure in no section of this spec that
+  counts a population the `RUN.md` gate structurally excludes; the cost is unmeasurable before S1
+  lands, so the probe is bounded by construction and its truncations are counted (AC13). AC5's
+  reading moves to after S2c and S2d rather than after S1 alone.
 
 ## 10. Reuse audit
 

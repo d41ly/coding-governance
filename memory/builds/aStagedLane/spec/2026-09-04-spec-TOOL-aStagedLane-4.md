@@ -1,12 +1,13 @@
 # TOOL-aStagedLane-4 — the carriers name the classifier and the attended route
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 |
 
 <!-- /gen:spec-records -->
 
@@ -20,17 +21,24 @@ pass, so what the preceding units build is reachable without reading their sourc
 ## 2. Scope (IN)
 
 - **S1** — the detect paragraph of the build method names the plan verb as the way to obtain a
-  unit's state, without the mandate qualifier the guide's only current mention carries. The
-  classifier runs with no run-state file, measured on this node against a build that never had one.
+  unit's state. The classifier runs with no run-state file, measured on this node against a build
+  that never had one. **This is a pure ADDITION and rev-2's wording was wrong about the tree.** It
+  said "without the mandate qualifier the guide's only current mention carries", which implies the
+  guide already mentions the plan verb. It does not: `grep -- '--plan' memory/guides/BUILD-METHOD.md`
+  returns nothing, `grep -i plan` returns only line 38's "planned", and the guide's sole driver
+  mention is `--resume` at :204 inside M7's regrounding list — that is the mention carrying the
+  qualifier, and it is a different verb. So S1 replaces nothing, and it is funded from nothing.
 - **S2** — the passes paragraph of the same guide names the harness as the route for spec and build
   passes, and names its two modes, so a session that is not under a mandate knows the route exists.
 - **S3** — both halves of the byte-compared pair move in one commit:
   `tools/memory-tree/BUILD-METHOD.template.md` and the rendered `memory/guides/BUILD-METHOD.md`. The
   `kit/dogfood doc parity` leg compares them, so editing one alone reds the bar.
-- **S4** — `memory/project/method-carriers.txt` keeps its existing row for the harness. That row
-  classifies the file as a pointer that states no rule the method does not, and the attended mode
-  must not change that classification. If unit 2's header additions make it state a rule, the row is
-  re-classified in this unit rather than left disagreeing.
+- **S4** — `memory/project/method-carriers.txt` keeps its existing row for the harness, and the
+  conditional is RESOLVED rather than left hanging. That row classifies the file as a pointer that
+  states no rule the method does not. Under F1's owner ruling the method carries the mode
+  semantics and the header stays a pointer, so the row does not move — unconditionally, not "if
+  unit 2's header additions make it state a rule". A spec that hedges on whether it edits a
+  registry leaves the implementer to decide, which is the thing S7 exists to stop.
 - **S5 — WITHDRAWN at rev-3. The charter is not edited by this unit at all.** Rev-2 required
   deleting the charter's description of the pass-order leg. There is no such description:
   `grep -inE 'pass.?order|check-pass-order|predates|built before|spec-before-build'` over `AGENTS.md`
@@ -39,17 +47,36 @@ pass, so what the preceding units build is reachable without reading their sourc
   `tools/unattended/PROTOCOL.template.md:469`, which §3's third non-goal refuses to touch and which
   unit 1 does not make false — it describes `PASS_ORDER_CUTOFF`, which is unchanged. So nothing in
   the charter goes stale when unit 1 lands, and there is nothing to delete. See F2.
-- **S6 — THE BUDGET IS THE BINDING CONSTRAINT ON S1 AND S2, and it is 23 bytes.**
+- **S6 — THE BUDGET IS THE BINDING CONSTRAINT, AND THE UNIT DOES NOT FIT IT.**
   `memory/guides/BUILD-METHOD.md` is 24553 bytes against M1's declared ≤24 KB (24576), and the line
-  half is 317 of 350 — M1 says the BYTE half binds first and this is what that looks like. S1 and S2
-  are therefore authored as net-≤23-byte edits: S1 REPLACES the mandate qualifier on the guide's
-  existing plan-verb mention rather than adding a sentence, and S2 is spent from what S1 returns
-  plus any deletion M1's own rule already mandates — a rule stated both here and in an M11 carrier
-  is "a defect HERE" whose resolution is deletion, so removing one is in scope and is not a budget
-  raise. **Raising the budget is NOT available to this run**: M3 puts M1's own budget inside veto 2's
-  governance-carrier clause by name, so a raise is an owner turn and a run that took one would be
-  amending the constraint it is judged by. If S1 and S2 cannot be written inside 23 bytes without a
-  sanctioned deletion, the unit PARKS rather than growing the file.
+  half is 317 of 350 — M1 says the BYTE half binds first and this is what that looks like. **23 bytes
+  remain, and S1 and S2 are both pure additions.** Rev-3 planned to fund them by having S1 replace an
+  existing plan-verb mention; there is none (see S1). The path literal
+  `tools/workflows/unattended-build.js` that AC7 requires is 35 bytes by itself, before the sentence
+  around it and before both mode values. The arithmetic does not close, and it is not close to
+  closing.
+  Neither remaining source of funding is available to this run. **Raising the budget is not**: M3 puts
+  M1's own budget inside veto 2's governance-carrier clause BY NAME, so a raise is an owner turn.
+  **Deleting method prose to make room is not either**: M1's rule that a duplicated obligation is "a
+  defect HERE" does sanction deletion in principle, but choosing what to delete from a governance
+  carrier is a change to a governance carrier beyond the scope the owner ratified at rev-2, which is
+  veto 2 again. The owner approved ADDING two names to the method; nobody approved removing anything
+  from it.
+  **So this unit PARKS.** The decision is recorded and is the owner's: raise M1's budget, name a
+  sanctioned deletion that funds the edit, or drop the unit. Under F1's owner ruling the cost is
+  larger still — see the reconciliation below, which puts the mode SEMANTICS in the method rather
+  than merely its two names.
+- **S7 — WHICH DOCUMENT CARRIES THE MODE SEMANTICS: F1's owner ruling, and the other two texts move
+  to match it.** Three documents currently hold three positions. §3's second non-goal says unit 2's
+  file header owns them. §8 F1, an OWNER ruling, says "keep it a pointer; the method carries the mode
+  semantics". Unit 2's S5 and AC6 require that header to enumerate five named losses, which is mode
+  semantics in the header, and `memory/project/method-carriers.txt:19` asserts of that same file that
+  "It states no rule the method does not". A delegated run does not get to pick between an owner
+  ruling and a non-goal, so it does not: **F1's ruling is the owner's and it governs.** The non-goal
+  is inverted to match it, and S4's conditional hedge is resolved the same way — under F1 the row
+  does not move, so unit 2's header must stay a pointer, which means the five losses are NAMED there
+  and their semantics live in the method. That is what makes S6's arithmetic worse rather than
+  better, and it is why the park is the honest outcome rather than a shortfall of effort.
 
 ## 3. Non-goals (OUT)
 
@@ -58,7 +85,10 @@ pass, so what the preceding units build is reachable without reading their sourc
   ADDS, because the method already spells all four in M2's "Classify, first match wins" block: a
   non-goal written as though the tree were already clean reads as licence to delete that block, and
   nothing here covers deleting the method's own act rule.
-- Not restating the harness's mode semantics. Unit 2's file header owns them; this unit points.
+- Not leaving the harness's mode semantics in unit 2's file header. **INVERTED at rev-4**, because
+  the rev-2 wording was the exact opposite of §8 F1's owner ruling, which says the METHOD carries
+  them and the header stays a pointer. S7 records the reconciliation; a non-goal contradicting a
+  ratified fork resolution in the same document is a defect in the non-goal.
 - Not editing the rendered protocol guide. It documents the mandate contract, which none of these
   units changes.
 - Not adding a new carrier file. Every claim here lands in a document that already exists.
@@ -128,9 +158,11 @@ that does not already know the harness exists never reads that header.
   withdrawn and `AGENTS.md` is not touched. The BARE `check-template-size.sh` measures
   `coding-governance-agents.template.md`, a file this unit also does not edit; rev-2 named the bare
   command while meaning the charter, which are two different subjects and two different legs.
-- **AC3b** — When `memory/guides/BUILD-METHOD.md` is measured after this unit, it is at most 24576
-  bytes and at most 350 lines. This is the criterion S1 and S2 are actually at risk of failing:
-  23 bytes of headroom, not the charter's six.
+- **AC3b** — When `wc -c memory/guides/BUILD-METHOD.md` and `wc -l` on the same file are run after
+  this unit, the results are at most 24576 and at most 350. This is a DOCUMENTED MANUAL CHECK, not
+  a leg: no gate in this repository enforces M1's pair, which is exactly why the guide reached 23
+  bytes of headroom with nobody noticing. It is the criterion S1 and S2 actually fail, and S6
+  records that they fail it.
 - **AC4** — When the detect paragraph of `memory/guides/BUILD-METHOD.md` is read, it names the plan
   verb without a mandate qualifier, and THIS UNIT introduces no second spelling of the four unit
   states. The rev-2 wording — "the guide contains no second spelling" — is false of the tree today,
@@ -153,8 +185,12 @@ that does not already know the harness exists never reads that header.
 ## 7. Gates
 
 `bash tools/memory-tree/check-method-carriers.sh`, the `kit/dogfood doc parity` leg named in
-`tools/gate-legs.json`, and `bash tools/memory-tree/check-memory-hygiene.sh`, whose guide caps are
-what S6's 23 bytes are measured against. The full bar is `bash tools/run-gates/run-gates.sh`.
+`tools/gate-legs.json`, and `bash tools/memory-tree/check-memory-hygiene.sh`. **That leg does NOT
+measure M1's budget** — `check-memory-hygiene.sh:63` sets `GUIDE_CAP_BYTES=61440` and
+`GUIDE_CAP_LINES=750`, so it passes this guide up to 60 KiB, two and a half times the 24576 S6
+works against, and M1 itself says of its own pair "No gate enforces the pair". Rev-3 claimed the
+opposite, which would have made a green hygiene leg read as proof the budget held — green-by-
+absence on the one constraint this spec calls most likely to stop it. The full bar is `bash tools/run-gates/run-gates.sh`.
 The two `check-template-size.sh` legs — the bare one over the playbook template and `charter size`
 over `AGENTS.md` — are listed here only to be told apart: rev-2 named the bare command while meaning
 the charter, and after S5's withdrawal this unit edits neither subject.
@@ -221,6 +257,17 @@ the charter, and after S5's withdrawal this unit edits neither subject.
   six, and S1 and S2 both add to it. That is now S6, and it is the constraint most likely to stop
   this unit; raising the budget is explicitly outside the mandate, so the alternative to fitting is
   parking.
+- rev-4 · 2026-09-04 · round-2 spec audit folded: both blockers and findings 3 and 11, and the
+  unit is PARKED as a result. Blocker 1: rev-3's funding plan rested on an existing plan-verb
+  mention in the guide, and there is none — the sole driver mention is `--resume` at :204, a
+  different verb. S1 is a pure addition, S2 is a pure addition, and 23 bytes does not hold them;
+  the reintroduced false premise is the same class round 1 blocked on, which is the cost of
+  writing fold prose without re-running the grep. Blocker 2: §3's second non-goal was the exact
+  inverse of §8 F1's OWNER ruling, with unit 2's S5 header taking a third position against
+  `method-carriers.txt:19`; F1 governs, the non-goal is inverted, and S4's hedge is resolved
+  unconditionally — all recorded in the new S7. Finding 3: S6 had no criterion; AC3b now is one.
+  Finding 11: §7 claimed the hygiene leg measures the budget, and it caps guides at 61440/750 —
+  the claim is corrected and AC3b is stated as the documented manual check it has to be.
 
 ## 10. Reuse audit
 

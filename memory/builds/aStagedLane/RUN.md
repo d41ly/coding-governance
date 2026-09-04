@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: c4fcf5add1d0a553097f9eef70935a056896cf16
+witness: e99b9776395da8c4fc6d25eb51dce9f3604833f4
 phase: REVIEWING
 mode: slug
 anchor-kind: default-branch
@@ -22,3 +22,5 @@ base: c4fcf5add1d0a553097f9eef70935a056896cf16
 ## Parked
 
 2026-09-04T19:08:12Z review · item aStagedLane-spec-set · reason verdict BLOCKED · blockers 4
+
+2026-09-04T19:44:45Z review · item aStagedLane-spec-set · reason verdict BLOCKED · blockers 2

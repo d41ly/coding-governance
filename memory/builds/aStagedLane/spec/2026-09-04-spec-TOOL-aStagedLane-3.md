@@ -1,27 +1,32 @@
 # TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-4 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-4 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 The spec stage of `tools/workflows/unattended-build.js` gives every unit of a build to one agent
-under a ten-line prompt. Fan it over disjoint slices, each writer holding a brief for its own slice
-and nothing else, so a build's specs stop being written from one accumulating context.
+under a ten-line prompt. Fan it over disjoint GROUPS of slices, each writer holding the briefs of
+its own group and of nothing outside it, so a build's specs stop being written from one accumulating
+context. A group is one or more slices: at up to `K` slices it is exactly one, and above `K` the
+bounded receiver S3b requires makes it more, because the agent TOTAL is capped and the slice count
+is not.
 
 ## 2. Scope (IN)
 
 - **S1** — an optional `specBriefPath` per entry in the `units` argument, symmetric with the
   `briefPath` the build stage already takes. A unit with no spec brief falls back to the current
   prompt, so the argument is additive and no caller breaks.
-- **S2** — the spec stage fans one writer per slice through a `boundedParallel` helper that this
+- **S2** — the spec stage fans one writer per GROUP, where a group is one or more slices, through a
+  `boundedParallel` helper that this
   unit INLINES INTO `tools/workflows/unattended-build.js`. **The helper is not there today.** It
   lives at `tools/workflows/tier2-review.js:17` with its `// gov:bounded-fanout` marker at :20;
   `unattended-build.js` contains no `boundedParallel`, no `parallel(` and no fan at all — its four
@@ -45,13 +50,31 @@ and nothing else, so a build's specs stop being written from one accumulating co
   is a second rule and not the concurrency cap wearing a different hat: the caller's slice count
   bounds neither. The grammar is `tools/hooks/README.md`; this item names the marker so the shape is
   decided at spec time rather than discovered at the tool call.
+  **What a GROUPED writer receives**, because the chunking is what makes a group bigger than one
+  slice: every brief of every slice in its group, merged, and no brief from outside it. `chunk`
+  slices contiguously into groups of `Math.ceil(N/K)`, so at six slices and K=5 there are three
+  writers holding two slices each — the shape degrades to grouped writers at exactly the build sizes
+  that motivate this unit, and rev-3 left the goal, S2 and AC2 all asserting one slice per writer,
+  which is false there. AC1's three-slice fixture chunks to size 1 and never leaves the regime where
+  both readings agree, so S6 owes an arm ABOVE `K`.
+- **S3d** — **the header of `tools/workflows/unattended-build.js` is amended by this unit**, because
+  the fan makes it false. Its lines 41-56 record that the two shapes available were "a bounded
+  PARALLEL fan — which the ratified verdict above forbids — and a SINGLE call", and case 1 reads
+  "EACH STAGE IS ONE AGENT holding the ordered unit list". After this unit the spec stage is a
+  bounded parallel fan, so that claim is scoped to the BUILD stage, the spec stage's new shape is
+  recorded with its bounded receiver, and the reason `TOOL-cBriefedPilot-21` does not reach it —
+  S3c's author-never-commit — is stated there. `memory/project/method-carriers.txt` registers this
+  file as a carrier, and leaving its header describing a tree it no longer matches is the drift class
+  the sibling unit 4 reasons explicitly about not creating.
 - **S3c** — **spec writers AUTHOR and never COMMIT; the caller commits once after the fan returns**,
   alongside the single index regeneration S4 already gives it. Without this the disjointness proof is
   false: every writer is told to read `memory/guides/BUILD-METHOD.md` whole, M6 makes "a spec
   authored" a pass and orders a commit at the end of every pass, so N writers would contend on one
-  git index — and the spec template mandates a backlog row per spec, so they would contend on
-  `memory/backlog/<FAMILY>.md`, a record clause 3 of the parallelism rule enumerates BY NAME. That
-  contention is the recorded experiment E4, which `TOOL-cBriefedPilot-21` ratified as
+  git index. The git index alone carries this — rev-3 also claimed "the spec template mandates a
+  backlog row per spec", and it does not: `grep -c -i backlog memory/TEMPLATE-SPEC.md` returns 0,
+  and this build's own four specs added no backlog row. The backlog half of the argument is
+  withdrawn; the index half is sufficient and is what clause 3 reaches. That contention is the
+  recorded experiment E4, which `TOOL-cBriefedPilot-21` ratified as
   `parallelism route: none` and `TOOL-cBriefedPilot-28` records as never actually run. Both ids sit
   in the header of the very file this unit edits. Authoring-only keeps this stage clear of that
   verdict instead of contradicting it unremarked.
@@ -66,7 +89,11 @@ and nothing else, so a build's specs stop being written from one accumulating co
   whatever specs already existed. The refusal that file spends six lines justifying would become
   unreachable, which is a guard deleted without saying so.
 - **S6** — arms in `tools/workflows/unattended-build.test.sh` covering a multi-slice fan, a
-  single-slice fan, and a slice whose writer returns nothing.
+  single-slice fan, a slice whose writer returns nothing, EVERY slice's writer returning nothing,
+  a slice count ABOVE `K` so the grouped shape is exercised rather than only the one-slice-per-group
+  regime, the S4 generator prohibition in a composed prompt, and the S3c author-never-commit
+  instruction in one. The above-`K` arm is the one the cap's own behaviour depends on: gate the
+  CLASS, not the instance.
 - **S7** — a unit entry with no `specBriefPath` logs the fallback, naming the unit, before the
   writer is spawned. A silent fallback and a deliberate omission are otherwise indistinguishable,
   and a mistyped key would hand back the old behaviour with no signal.
@@ -123,8 +150,9 @@ follows from spawning at all.
 
 ### Files touched (estimate)
 
-`tools/workflows/unattended-build.js` and `tools/workflows/unattended-build.test.sh`. Two files
-written, the same pair as the preceding unit, which is why the two are sequenced.
+`tools/workflows/unattended-build.js` — both its code and its HEADER, per S3d — and
+`tools/workflows/unattended-build.test.sh`. Two files written, the same pair as the preceding unit,
+which is why the two are sequenced.
 `tools/workflows/tier2-review.js` is READ as the copy source for the helper and its cap literal and
 is not edited.
 
@@ -140,7 +168,8 @@ Deriving slices inside the script was rejected because the script cannot read th
 
 - security — N/A. No new write path outside the build's own spec folder.
 - perf / scale — the point of the unit. Wall clock falls from the sum of the units to the slowest
-  slice, bounded by the existing cap.
+  GROUP, bounded by the copied helper's cap. Above `K` slices the fall is bounded by `ceil(N/K)`
+  slices per writer rather than by one, which is the price of a bound the hook can prove.
 - a11y — N/A. No user-facing surface.
 - i18n — N/A. No user-facing strings.
 - error / empty / loading states — a slice whose writer dies returns null and must be counted as
@@ -159,8 +188,23 @@ Deriving slices inside the script was rejected because the script cannot read th
   many slices the caller supplies. A criterion tying the agent count to the caller's slice count
   would bound concurrency and leave the total unbounded, which is the second of the two rules the
   charter insists are not one rule.
-- **AC2** — When a unit entry carries a `specBriefPath`, that path appears in the writer's prompt
-  and no other slice's brief does.
+- **AC2** — When a unit entry carries a `specBriefPath`, that path appears in the prompt of the
+  writer holding ITS GROUP, and no brief from a slice outside that group appears there. Rev-3 said
+  "no other slice's brief", which is false above `K` by construction, where one writer legitimately
+  holds several slices' briefs.
+- **AC8** — When `bash tools/workflows/unattended-build.test.sh` runs an arm with MORE slices than
+  the resolvable `K`, the stage spawns at most `K` writers, each writer's prompt carries every brief
+  of its own group, and no prompt carries a brief from another group. AC1's three-slice fixture
+  chunks to groups of one and never reaches this regime, so without this arm the grouped shape — the
+  one that actually runs at the build sizes motivating the unit — is untested.
+- **AC9** — When `bash tools/workflows/unattended-build.test.sh` runs its S4 arm over a composed
+  writer prompt, the prompt forbids running the index generator. S4 is half of clause 3 of the
+  disjointness proof and rev-3 left it with no observation of any kind.
+- **AC10** — When the header of `tools/workflows/unattended-build.js` is read after this unit, its
+  "EACH STAGE IS ONE AGENT" claim is scoped to the BUILD stage, and it records the spec stage's
+  bounded fan together with why `TOOL-cBriefedPilot-21` does not reach it. Read back the way unit 2's
+  AC6 reads its own header, because the fan otherwise leaves the file's header describing a tree it
+  no longer matches.
 - **AC3** — When a unit entry carries no `specBriefPath`, the writer receives the current prompt,
   a `log()` line names that unit as falling back, and the stage completes, proving the argument is
   additive and the fallback is not silent.
@@ -222,6 +266,17 @@ bar is `bash tools/run-gates/run-gates.sh`.
   clear of `TOOL-cBriefedPilot-21`'s ratified verdict — rev-2's proof covered the file paths and the
   index and skipped the commit and the backlog row. S5 and AC4 close the all-slices-dead path, where
   the existing truthy-object guard would otherwise stop firing.
+- rev-4 · 2026-09-04 · round-2 spec audit folded: findings 7, 8, 9 and 10. Finding 7 is a
+  contradiction rev-3 created: S3b's `chunk` bound means one writer holds `ceil(N/K)` slices above
+  `K`, while the goal, S2 and AC2 all still said one slice per writer — and AC1's three-slice
+  fixture chunks to groups of one, so every arm ran in the regime where the two readings agree. The
+  goal, S2 and AC2 are restated in terms of GROUPS and AC8 arms the above-`K` case. S3d added: the
+  fan makes the edited file's own header false, and no scope item retired it, in a build whose
+  sibling unit reasons explicitly about not shipping a document that describes a route the tree does
+  not have; AC10 reads it back. AC9 added for S4, which had no observation at all despite being half
+  of clause 3 of the disjointness proof. S3c's backlog claim is WITHDRAWN — the spec template
+  mandates no backlog row (`grep -c -i backlog memory/TEMPLATE-SPEC.md` returns 0, and this build's
+  own four specs added none); the git-index contention alone carries the argument.
 
 ## 10. Reuse audit
 

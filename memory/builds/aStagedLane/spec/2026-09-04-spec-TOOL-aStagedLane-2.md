@@ -1,12 +1,13 @@
 # TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
 
 <!-- /gen:spec-records -->
 
@@ -38,9 +39,15 @@ choosing its route per session.
   refusal means the order is wrong and to STOP. In attended mode the refusal is caused by the mode
   itself, so an unmodified prompt halts the build at unit one after units are already being written
   — strictly worse than the refusal the mode was meant to trade away. In attended mode the prompt
-  therefore omits `--dispatch` and `--brief` entirely, and replaces `--rescope` with the direct
-  roster edit M2 describes, so M4's PROMOTE disposal stays available rather than leaving the method
-  one of its two admitted routes.
+  therefore omits `--dispatch` and `--brief` entirely.
+  **`--rescope` is a THIRD case and rev-3 got it wrong.** It appears only in the `disposal` clause,
+  which `unattended-build.js:473` composes as `verdict === 'CONVERGED' ? '' : …`; under S3 attended
+  mode reaches BUILD only at zero blockers, which is the terminal verdict, so that clause is ALWAYS
+  the empty string in this mode. Rev-3 said it was "replaced … so M4's PROMOTE disposal stays
+  available", which rewrites a string attended mode never builds. What this unit does instead is
+  state the fact: **attended mode has no reachable non-clean terminal verdict, so M4's disposal
+  clause is unreachable in it**, and that limitation is named in the S5 header rather than papered
+  over with a substitution nothing composes.
 - **S4c** — `GROUND`, the preamble every spawned agent receives, is mode-aware. It currently
   hard-codes "You are one stage of a harnessed unattended build" and "nobody reads a transcript
   under a mandate", and it prefixes EVERY agent this file spawns in both stages. In this repository
@@ -51,13 +58,18 @@ choosing its route per session.
   losses SEPARATELY rather than as one list of "refusals", because one of them is not a refusal.
   They are: the `--review` round record, `--dispatch`'s order refusal, `--dispatch`'s write-set
   record, `--brief`'s record of what each pass was handed, and `--rescope`'s amendment row. A reader
-  who assumes otherwise gets a weaker guarantee than the one they think they have.
+  who assumes otherwise gets a weaker guarantee than the one they think they have. The header also
+  states that M4's blocker-disposal clause is UNREACHABLE in attended mode, because under S3 that
+  mode reaches BUILD only at a terminal verdict and the clause is composed only for a non-clean
+  one.
 - **S6** — arms in `tools/workflows/unattended-build.test.sh` covering both modes: that unattended
   mode still records through the driver, that attended mode does not, that a null blocker count
   refuses in both, that the attended BUILD prompt names none of the three refusing verbs, and that
-  the attended preamble carries no mandate vocabulary. The last two assert on the COMPOSED prompt
-  string rather than on a run's behaviour, because a prompt is the one artifact here that no gate
-  downstream ever reads.
+  the attended preamble carries no mandate vocabulary, and that a zero blocker count terminates while
+  a positive one converges. The prompt arms assert on the COMPOSED string rather than on a
+  run's behaviour, because a prompt is the one artifact here that no gate downstream ever reads,
+  and each absence assertion is paired with a positive one so an empty clause cannot pass for a
+  removed substring.
 - **S7** — when `mode` is `attended` and a run-state file exists for that slug, the run WARNS and
   CONTINUES. The warning names the slug and the refusals being skipped, so a session that meant to
   run under its own mandate sees the mismatch rather than discovering it at the merge bar. The
@@ -165,9 +177,20 @@ Making `attended` the default was rejected because it silently weakens every exi
   states that the S7 warning depends on the caller rather than on detection, in the section saying
   what this harness cannot buy.
 - **AC8** — When the BUILD prompt is composed in attended mode, it contains no `--dispatch` and no
-  `--brief` instruction, and its disposal clause names the roster edit rather than `--rescope`. The
-  arm asserts on the composed string, because the defect is what the agent is TOLD to run and no
-  gate downstream reads a prompt.
+  `--brief` instruction, AND it still contains the surrounding per-unit build instruction that those
+  two were removed from. The paired positive assertion is the point: an arm that only checks a
+  substring is ABSENT passes just as well when the whole clause is empty, which is the
+  vacuous-selector class this spec set polices elsewhere. The arm asserts on the composed string,
+  because the defect is what the agent is TOLD to run and no gate downstream reads a prompt. Rev-3
+  also asserted the disposal clause names a roster edit; that clause is never composed in attended
+  mode, so the assertion is dropped rather than left to pass for the wrong reason.
+- **AC10** — When `bash tools/workflows/unattended-build.test.sh` runs its two S3 verdict arms: the
+  audit stage in attended mode receiving a blocker count of ZERO, the verdict is
+  terminal and the build stage is reached; when it receives a POSITIVE integer, the verdict is
+  converging and the harness returns without reaching the build stage. Both arms, because S3 is a new
+  scope item of this unit and rev-3 observed only its null-refusal third — a branch mapping a
+  positive count to terminal would reach BUILD over open blockers and satisfy every other criterion
+  here, which is the exact failure the audit stage exists to prevent.
 - **AC9** — When any agent is spawned in attended mode, the preamble it receives contains neither
   the word `mandate` nor the claim that nobody reads its transcript. A grep over the composed
   attended prompt for that vocabulary returns nothing.
@@ -216,6 +239,15 @@ because this file is a declared method pointer. The full bar is `bash tools/run-
   mandate in both modes and no scope item touched it. S5 and AC6 now name the five losses separately
   instead of calling a record a refusal, and AC8 and AC9 observe the composed prompt, which is where
   the defect lives and where no downstream gate looks.
+- rev-4 · 2026-09-04 · round-2 spec audit folded: findings 12 and 13. S4b's `--rescope` third
+  was rewriting a string attended mode never composes — the disposal clause is built only for a
+  NON-clean terminal verdict, and under S3 attended mode reaches BUILD only at zero blockers — so
+  the substitution is withdrawn, the unreachability is stated in the S5 header instead, and AC8
+  drops the assertion that could only have passed because its subject was absent. AC8 also gains
+  a paired POSITIVE assertion, since an absence arm and an empty clause are indistinguishable.
+  AC10 added: S3 specifies three verdict outcomes and rev-3 observed only the null refusal, so a
+  branch mapping a positive blocker count to terminal would have reached BUILD over open blockers
+  and passed every criterion in the section.
 
 ## 10. Reuse audit
 
