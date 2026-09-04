@@ -108,19 +108,19 @@ ids TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 T
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aSurfacedLexicon-1 — the design pass: measure the kit, then design and judge its rebuild](spec/2026-09-04-spec-aSurfacedLexicon-1.md) | 0 | 2 | CLOSED | rev-1 | 2026-09-04 |
-| [TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint](spec/2026-09-04-spec-aSurfacedLexicon-2.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-04 |
-| [TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes](spec/2026-09-04-spec-aSurfacedLexicon-3.md) | 1 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint](spec/2026-09-04-spec-aSurfacedLexicon-2.md) | 1 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes](spec/2026-09-04-spec-aSurfacedLexicon-3.md) | 1 | 2 | SPECCED | rev-5 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-4 — the CELLS and PINS declaration grammar](spec/2026-09-04-spec-aSurfacedLexicon-4.md) | 2 | 2 | SPECCED | rev-7 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-5 — the convention predicate](spec/2026-09-04-spec-aSurfacedLexicon-5.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-04 |
-| [TOOL-aSurfacedLexicon-9 — the owner-declarable PATTERNS block](spec/2026-09-04-spec-aSurfacedLexicon-9.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-9 — the owner-declarable PATTERNS block](spec/2026-09-04-spec-aSurfacedLexicon-9.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-13 — the prefix selector, routing a subset of a cell to a second convention](spec/2026-09-04-spec-aSurfacedLexicon-13.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-14 — a real shell parser, arming the shell function cell](spec/2026-09-04-spec-aSurfacedLexicon-14.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-04 |
-| [TOOL-aSurfacedLexicon-6 — the three cell refusals and the per-cell coverage report](spec/2026-09-04-spec-aSurfacedLexicon-6.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-6 — the three cell refusals and the per-cell coverage report](spec/2026-09-04-spec-aSurfacedLexicon-6.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-7 — P1 splits into DEBT and UNRULED, and DEBT names its replacement](spec/2026-09-04-spec-aSurfacedLexicon-7.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-10 — `--expand`, the one-time widening the canon bounds](spec/2026-09-04-spec-aSurfacedLexicon-10.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-11 — the canon overlay and its stamp](spec/2026-09-04-spec-aSurfacedLexicon-11.md) | 6 | 2 | SPECCED | rev-2 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-8 — `--suggest` becomes surface-aware and answers in the declared convention](spec/2026-09-04-spec-aSurfacedLexicon-8.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-04 |
-| [TOOL-aSurfacedLexicon-12 — the conf rewrite, the owed records, and the spec-template cell line](spec/2026-09-04-spec-aSurfacedLexicon-12.md) | 7 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-12 — the conf rewrite, the owed records, and the spec-template cell line](spec/2026-09-04-spec-aSurfacedLexicon-12.md) | 7 | 2 | SPECCED | rev-5 | 2026-09-04 |
 <!-- /gen:build-units -->
 
 Records: 6 bound to this build, across 3 record folder(s).

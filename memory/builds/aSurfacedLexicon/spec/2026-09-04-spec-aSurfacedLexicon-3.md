@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -170,8 +170,9 @@ The transition's tripwire is therefore already installed and needs nothing new.
 
 The cross-kit deletion is different and is the one that can be missed. `codebase-map kit selftest`
 names `tools/lexicon/` in its guard, so a lexicon-only commit does select it — but its chunk is
-`selftests`, `.githooks/pre-push` sets `GATE_FULL` and not `GATE_SELFTESTS`, and no boundary sets
-the latter. A miss will not surface at the push that caused it. S7 lands in this commit or the
+`selftests` and no boundary sets `GATE_SELFTESTS`. The hook DECIDES whether to force `GATE_FULL`
+rather than setting it unconditionally; that does not move this conclusion, because `GATE_FULL`
+bypasses GUARDS and never unlocks a `selftests` chunk. A miss will not surface at the push that caused it. S7 lands in this commit or the
 neighbour kit is broken behind a leg the push bar never runs.
 
 **Deleting `run_probe` orphans an import, and nothing in this repo would notice.**
@@ -503,6 +504,8 @@ at stake and the scaffold route already covers it.
   order-dependent one; the count is gone and the sibling is excluded by name, matching AC1. §5's
   observability bullet carried the same count and is corrected with it — the amendment's other
   half, found by the bug-class checklist rather than by the review.
+- rev-5 · 2026-09-04 · same correction as the sibling at this build order — the pre-push hook DECIDES whether to
+  force a total run. The cross-kit-deletion conclusion is unchanged for the same reason.
 
 ## 10. Reuse audit
 

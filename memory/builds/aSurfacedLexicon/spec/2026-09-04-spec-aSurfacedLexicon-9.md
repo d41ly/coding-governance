@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-9 — the owner-declarable PATTERNS block
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -114,11 +114,14 @@ vocabulary-and-convention apparatus then grades filenames or nothing. Owner ruli
   owed and still cost one line each, the grammar is in place from build order 2, and they make the
   fixture independent of the promotion's order as well as of unit 6's. The cells declare the `snake`
   convention, matching the fixture's own definitions, so the arming moves no verdict whichever order
-  `TOOL-aSurfacedLexicon-5` lands in. WHICH commit promotes the arm is NOT relied on here, because
-  the two specs disagree: `TOOL-aSurfacedLexicon-6`'s Rollout hands the flip to
-  `TOOL-aSurfacedLexicon-12` at order 7, and that spec at rev-4 carries no flip and no mention of
-  `UNDECLARED CELL` — `grep -n 'flip\|promot\|default-OFF\|CELL'` over it returns nothing. That
-  hand-off is those two units' to reconcile; it is reported, not patched from here.
+  `TOOL-aSurfacedLexicon-5` lands in. WHICH commit promotes the arm is NOT relied on here, and that
+  independence is now belt-and-braces rather than a workaround: when this section was written the
+  two siblings disagreed, because `TOOL-aSurfacedLexicon-6` handed the flip to
+  `TOOL-aSurfacedLexicon-12` and that spec carried no matrix and no mention of `UNDECLARED CELL`.
+  The hand-off was reported rather than patched from here, and it has since been ACCEPTED — that
+  unit's S14 and AC14 now carry the matrix, the constant flip and the same-commit assertion. This
+  fixture still does not depend on which commit promotes the arm, which is why it needed no edit
+  when the ownership moved.
 - **No real lexer for anything.** Shell stays dark under owner ruling Q5 and belongs to the shell
   parser unit.
 - **No RESHAPING of `extract` or `extract_text`.** `tools/drift-audit/drift_report.py` derives both
@@ -454,14 +457,18 @@ is not one, so no `memory/project/testsuite-count-waivers.txt` row is owed eithe
   by a later flip, so the stated mechanism was false. The rows survive on the corrected one — a
   refusal that arrives later still arrives, and the fixture cell is merely printed until it does —
   and both places now name the promotion instead of the landing. Neither place relies on WHICH
-  commit promotes the arm, because the two siblings disagree: `TOOL-aSurfacedLexicon-6` hands the
-  flip to `TOOL-aSurfacedLexicon-12` at order 7 and that spec at rev-4 carries no such scope item.
-  That mismatch is reported to those two units rather than patched from a spec that owns neither
-  file. Every other cross-unit claim was re-checked by opening the sibling at its current rev rather
+  commit promotes the arm. At the time the two siblings disagreed, because
+  `TOOL-aSurfacedLexicon-6` handed the flip to `TOOL-aSurfacedLexicon-12` and that spec carried no
+  such scope item; the mismatch was reported to those two units rather than patched from a spec that
+  owns neither file, and it was accepted there rather than by weakening anything here. Every other cross-unit claim was re-checked by opening the sibling at its current rev rather
   than by trusting this spec's summary of it: units 3, 4, 5 and 11, the `TOOL-aSurfacedLexicon-16`
   backlog row, and both `TOOL-dScaffoldedMirror-13` cites all hold as written. §10's "the same
   lookup" is corrected to the same tool onto the same seam, that spec's query string being a keyword
   list rather than this one's sentence.
+- rev-5 · 2026-09-04 · the hand-off this spec reported rather than patched has been ACCEPTED by
+  `TOOL-aSurfacedLexicon-12` as S14 and AC14. Both places that described the disagreement now
+  describe its resolution. Nothing else moved, because this fixture never depended on which commit
+  promotes the arm — which is why it needed no edit when the ownership did move.
 
 ## 10. Reuse audit
 

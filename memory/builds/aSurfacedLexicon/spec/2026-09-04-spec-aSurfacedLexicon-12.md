@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-12 — the conf rewrite, the owed records, and the spec-template cell line
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 7
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -71,6 +71,18 @@ otherwise find as a contradiction rather than a record.
   decision and this unit may not spend into it. The order is load-bearing: S11 is written only after
   the P3 deletion has landed, and if the net is positive the fix is to trim the block's
   non-instructional prose rather than to raise the ceiling.
+- **S14** — THE `CELLS` MATRIX, AND THE PROMOTION IT CARRIES. `TOOL-aSurfacedLexicon-6` states this
+  as an OWED ITEM rather than a routing, on the ground that no sibling spec had ever accepted it —
+  measured there by grepping the set, and reproduced here: before this revision `grep -c CELLS` over
+  this file returned 0. This unit accepts it, because it is the unit that rewrites the declaration
+  and there is no other candidate at any build order. Three obligations, in the receiving unit's
+  words as that spec wrote them. Write the full `CELLS` matrix into `.lexicon.conf`. Set
+  `UNDECLARED_CELL_ARMED = True` in `tools/lexicon/lexicon.py` in the SAME commit, so the report-only
+  arm that unit landed dark becomes a refusal on the commit that makes it satisfiable. PRESERVE that
+  unit's `py.constant` row and its population comment. A matrix that lands with the constant left
+  off ships an arm that reports and can never refuse, which is the land-dark-then-flip rule with its
+  second half missing — and `TOOL-aSurfacedLexicon-5` and `TOOL-aSurfacedLexicon-9` both already
+  name this unit as the owner, so declining it would leave two specs pointing at nothing.
 - **S13** — The `PINS:` block this unit pastes is emitted and committed BLANK-SEPARATED: exactly one
   blank line between every pin row. That whitespace IS the merge property under
   `TOOL-aSurfacedLexicon-4`'s ratified F1, not a formatting preference, so a later tidying edit that
@@ -106,11 +118,17 @@ of narration is a block the tool writes and a human pastes. What survives from t
 number of comments that state a DECISION rather than a history: the boundary between what the owner
 declares and what the kit owns, the note on the seven Python filename offenders that owner ruling
 Q3 pins rather than waives, and the `py.constant` population comment carrying all three measured
-readings that owner ruling Q6 requires — 527 against 419, 432 against 413, and 331 against 331, each
-with the reading that produced it. That third one is `TOOL-aSurfacedLexicon-6`'s AC5, asserted by a
-selftest arm, so a rewrite that treats it as archaeology reds that unit's arm rather than merely
-losing a comment. Its numbers are that unit's re-measurement, and its first row disagrees with the
-research record's 539; the disagreement is UNRECONCILED there and is carried, not resolved, here.
+readings that owner ruling Q6 requires, each with the reading that produced it. **THE FIGURES ARE
+THAT UNIT'S, NOT THIS ONE'S, and this spec carried the wrong ones until now.** Rev-3 reproduced a
+triple of 527 against 419, 432 against 413, and 331 against 331; `TOOL-aSurfacedLexicon-6` re-measured
+at this base and its AC5 asserts 544 against 436, 449 against 430, and 346 against 346, with the
+counting rule stated beside them — the earlier triple was taken at the pre-rebase tree. Preserving the
+comment as rev-3 quoted it would have preserved numbers that RED the selftest arm this unit is
+preserving them for. This unit copies whatever that unit's arm asserts at the time it lands, rather
+than restating a triple here that can go stale again; the figures above are shown to say WHICH ones
+were wrong, not to become a second carrier. Its first row disagreed with the research record's 539;
+`TOOL-aSurfacedLexicon-6` declares that reconciled and withdrawn at its rev-3, so this spec no longer
+carries it as UNRECONCILED.
 
 The row shape is not cosmetic here. Owner ruling Q2 makes the pins two-sided, so a correct rename blocks
 the bar until a second commit edits the pin, and two nodes each draining one name would produce a
@@ -273,6 +291,15 @@ the deletion leaves a reader who remembers the old claim with nothing to reconci
   BELOW the count it reported after `TOOL-aSurfacedLexicon-2`'s deletion, and does not WARN past a
   new high-water. Both readings are recorded in this unit's acceptance ledger, because a budget
   claim with one reading is an assertion.
+- **AC14** — When the commit landing S14 is read, `.lexicon.conf` carries a `CELLS` block and
+  `tools/lexicon/lexicon.py` carries `UNDECLARED_CELL_ARMED = True`, in THAT SAME commit — asserted
+  by a check over the commit rather than over the tree, because the two landing separately is the
+  exact failure S14 exists to prevent and a tree-scoped check cannot see it. `python
+  tools/lexicon/lexicon.py --check` is then green on the tracked tree, which is the armed run
+  `TOOL-aSurfacedLexicon-6` requires observed before landing, and the `py.constant` row and its
+  population comment are still present. The RED half is observed too: with the matrix landed and the
+  constant left at its default, the undeclared-cell arm prints and does not refuse, and that is
+  recorded as the failing case rather than assumed.
 - **AC13** — When the rewritten `.lexicon.conf` is read, every consecutive pair of `PINS:` rows is
   separated by exactly one blank line, and `python tools/lexicon/lexicon_conf.py --print-verbs
   .lexicon.conf` still parses the file. The merge property that separation buys is
@@ -337,6 +364,14 @@ speculatively would be a defect rather than caution.
   `6c670b02` in the status header, S1 and AC1, because all three S1 figures reproduce there:
   `wc -l < .lexicon.conf` is 216, `grep -cE '^#' .lexicon.conf` is 178, and
   `awk 'NR>=24 && NR<=163' .lexicon.conf | grep -cE '^#'` is 139, all unchanged.
+- rev-5 · 2026-09-04 · this unit ACCEPTS the matrix and the promotion `TOOL-aSurfacedLexicon-6` stated as an
+  OWED ITEM, as S14 and AC14; it is the unit that rewrites the declaration and there was no other
+  candidate at any build order, and two siblings already named it as owner. AC14 asserts the matrix
+  and the arming constant land in the SAME commit, over the commit rather than over the tree,
+  because a tree-scoped check cannot see them landing separately. Separately: this spec reproduced
+  the `py.constant` triple from the pre-rebase tree, so preserving the comment as written would have
+  preserved numbers that RED the selftest arm it is preserved for. It now copies whatever that
+  unit's arm asserts instead of carrying a second copy that can go stale again.
 
 ## 10. Reuse audit
 

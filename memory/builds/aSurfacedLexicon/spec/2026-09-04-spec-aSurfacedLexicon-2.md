@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -244,8 +244,10 @@ argv, guards and ceilings so `tools/gate-legs.json` and the map's gate-legs inve
 A grep is also the wrong instrument for the reason given under Data model.
 
 **Charge the constraint to the kit self-test.** Rejected because `lexicon selftest` carries
-`chunk = selftests`, `.githooks/pre-push` sets `GATE_FULL` and not `GATE_SELFTESTS`, and no boundary
-sets the latter. A constraint held only there is not held at the push boundary at all.
+`chunk = selftests` and no boundary sets `GATE_SELFTESTS`. The hook DECIDES whether to force
+`GATE_FULL` and does not set it unconditionally, but that half does not matter here: `GATE_FULL`
+bypasses GUARDS and never unlocks a `selftests` chunk, so the conclusion holds under either
+reading and the conditional is stated only so the sentence is not reused as a fact about the hook. A constraint held only there is not held at the push boundary at all.
 
 ## 5. Production-readiness checklist
 
@@ -442,6 +444,10 @@ update` clobbers. That route is unowned by any unit in this build.
   staged, and AC11 observes it. §4 Migration's dead-path count re-derived: the tracked-only grep
   returns seven lines across four files, not five carriers, and `lexicon.py:93` joins the two engine
   carriers the paragraph already named. New criteria AC10 through AC13.
+- rev-4 · 2026-09-04 · the pre-push hook DECIDES whether to force a total run rather than setting `GATE_FULL=1`
+  unconditionally, so the alternatives note no longer states it as a fact about the hook. The
+  conclusion it supported is unchanged: `GATE_FULL` bypasses guards and never unlocks a
+  `selftests` chunk.
 
 ## 10. Reuse audit
 

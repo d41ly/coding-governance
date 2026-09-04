@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-6 — the three cell refusals and the per-cell coverage report
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -63,7 +63,7 @@ context reads as coverage when it is only a scope.
   this.** `TOOL-aSurfacedLexicon-5` is amended and owes nothing further: its section 3 states the
   split in its own words, that the arming boundary is two units and not one, with this unit arming
   `py.constant` at build order 4 and `TOOL-aSurfacedLexicon-12` pasting the rest at order 7.
-  `TOOL-aSurfacedLexicon-4` is UNTOUCHED at rev-6 and owes nothing either, because it never made the
+  `TOOL-aSurfacedLexicon-4` owes nothing either, because it never made the
   claim rev-2 attributed to it: its `### Migration` says that the conf rewrite pasting the real
   `CELLS` and `PINS` bodies is a later unit, and that a declaration not yet rewritten parses exactly
   as it does now. Both remain true of a tree carrying this unit's single row, so there is no
@@ -96,9 +96,12 @@ context reads as coverage when it is only a scope.
   EIGHT, not the seven that three records still carry.** Measured at this base by first-dot
   stemming: `git ls-files '*.py' | xargs -n1 basename | cut -d. -f1 | sort -u | grep -cvE
   '^[a-z0-9_]+$'` returns 8, the eighth being `check-kit-placeholders.py`, added by `5169cc8d` after
-  the seven were counted. **Rev-2 routed the correction to the wrong file, and
+  the eight were counted. **Rev-2 routed the correction to the wrong file, and
   `TOOL-aSurfacedLexicon-4` was opened at rev-3 to find that out.** That spec declares no pin VALUE
-  at all. `py.file.conv 7` appears in it once, as a parsed-shape example in its section 4 key table,
+  at all. `py.file.conv` appears there three times and every occurrence is a shape example, never a
+  declared value: once in its section 4 key table, once as a non-integer refusal fixture, and once in
+  an indented merge example. The load-bearing half of this sentence is that unit 4 declares no pin
+  VALUE, which holds; rev-2 said the token appeared once, which does not,
   and its section 3 hands the pin rows' initial values to `TOOL-aSurfacedLexicon-7`, whose
   `--measure` emits them from a run — so no spec carries a 7 that a two-sided comparison could red.
   What does carry it is `memory/backlog/TOOL.md`, whose `TOOL-aSurfacedLexicon-15` row names seven
@@ -118,7 +121,9 @@ context reads as coverage when it is only a scope.
   edit as one extra 300 s leg per conf edit; the real price is a red push. **The compensating check,
   because an exemption is not coverage:** a conf-only diff is still graded, by `lexicon wiring`,
   whose guard is empty and which reaches the declaration through `bash
-  tools/lexicon/adopt-lexicon.sh --check`, and that leg carries no `guard` key either, so it runs on
+  tools/lexicon/adopt-lexicon.sh --check`. Its guard key is PRESENT and valued `[]`, which is not the
+  same thing as absent and is worth spelling because this paragraph said both in one breath; the
+  behaviour is identical either way, so it runs on
   every bar — `GATE_FULL` or not, because `tools/run-gates/run-gates.sh:951` drops UNGUARDED legs
   out of the guard PASS rather than out of the run. **That is the whole of the guarantee, and
   rev-2's version of this sentence was false.** Rev-2 wrote that `.githooks/pre-push` sets
@@ -184,7 +189,7 @@ constants are SCREAMING, which is the convention of the `py.constant` cell this 
 at once, `python tools/lexicon/lexicon.py --check` reports `P1 verb graded=1047 offenders=461`
 against `graded=1045 offenders=461` on the unstaged tree. **The offender delta is ZERO and this unit
 raises no pin.** That is worth measuring rather than assuming, because `VERB_OFFENDER_PIN` has no
-headroom at all: it stands at 461, `TOOL-aSurfacedLexicon-5` at order 2 takes it to 462 with the one
+headroom at all: it stands at 461, `TOOL-aSurfacedLexicon-5` at order 3 takes it to 462 with the one
 name it adds, and this unit lands at order 4 on top of that raise. Zero is not luck — both function
 definitions lead with a table verb, and the two constants are invisible to that predicate. The same
 staging moves the armed constant cell from 346 graded to 348, still at 0 violations, which is why
@@ -268,8 +273,12 @@ to route:
 > run green on the tracked tree before landing. A matrix that lands with the constant left off ships
 > an arm that reports and can never refuse.
 
-Until a sibling spec carries that paragraph the promotion is UNOWNED, and this unit says so instead
-of assuming a sibling notices. That is the charter's land-dark-then-flip rule with its second half
+**`TOOL-aSurfacedLexicon-12` ACCEPTED IT** — its S14 and AC14 carry the three obligations above in
+these words, and AC14 asserts the matrix and the constant land in the SAME commit over the commit
+rather than over the tree, because the two landing separately is precisely the failure this
+paragraph exists to prevent. The item was UNOWNED when this revision was written and stating that
+plainly is what got it routed, so the sentence stays as the record of how it was closed rather than
+being rewritten to look like it was always fine. That is the charter's land-dark-then-flip rule with its second half
 actually assigned to someone.
 
 **`DEAD CELL` (S2) lands ARMED and green.** It is re-keyed onto declared cells, so the only cell it
@@ -510,6 +519,13 @@ free, and the current cost is UNVERIFIED here because the research pass did not 
   receiver must carry, because no sibling spec has ever mentioned it. And `### Inventory` now names
   the four identifiers this unit mints, each with its `--suggest` verdict and a measured pin budget:
   zero offender delta, no pin raise.
+- rev-4 · 2026-09-04 · cross-spec reconciliation, single-writer. FIVE wrong claims about siblings, all written
+  without the sibling open or written before it moved: unit 4 pinned at a rev it has left and called
+  untouched, unit 5 placed at build order 2 where its header says 3, `py.file.conv` said to appear
+  once in unit 4 where it appears three times, `lexicon wiring` said to carry no `guard` key in the
+  same sentence that called its guard empty, and one hyphenated-basename count left at seven. The
+  UNOWNED promotion is now OWNED — `TOOL-aSurfacedLexicon-12` accepted it as S14/AC14 — and the
+  paragraph that reported it unowned stays, as the record of how it got routed.
 
 ## 10. Reuse audit
 
