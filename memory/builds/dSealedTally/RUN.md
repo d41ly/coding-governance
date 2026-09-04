@@ -9,6 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes, 1 surfaced
+keepalive-reaped: yes
 witness: 3a1c0d6d1c28157ab480c8952ec7c46275dae1b4
 phase: VERIFYING
 branch-sha: 4fd318320cd4d17dcc543d38eb6dceb7b2d5cbf8
@@ -48,3 +50,5 @@ base: 4fd318320cd4d17dcc543d38eb6dceb7b2d5cbf8
 2026-09-04T10:33:14Z review · item dSealedTally · reason verdict BLOCKED · blockers 1
 
 2026-09-04T10:58:04Z review · item dSealedTally · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · disposition fold
+
+2026-09-04T11:20:22Z decision · item M6 requires parallelism where disjointness is PROVEN, and order 1's two units were provably disjoint. I sequenced them anyway. Should a future run delegate authoring to concurrent agents when the write sets do not intersect? · reason Running them concurrently means delegating AUTHORING to sub-agents, and the recorded feedback here is to author inline and delegate only adversarial review, because cold-start authoring is a tax to write and a feature only when refuting. Those two rules point opposite ways and I could not satisfy both. I chose the memory note over M6 because this build's defect rate was already high and every unit needed the code in front of me. That is a deliberate deviation from a binding rule, not an oversight, and the owner should decide which rule wins rather than inheriting my choice silently.

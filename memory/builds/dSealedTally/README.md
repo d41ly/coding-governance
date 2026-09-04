@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-04
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 TOOL-dSealedTally-2
+ids: DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 DEPL-dSealedTally-6 TOOL-dSealedTally-1 TOOL-dSealedTally-2
 authorized-by: prompt
 ---
 
@@ -78,7 +78,7 @@ None yet.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 6 unit(s) · node d · opened 2026-09-04 · streams tooling+deployer
-ids DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 TOOL-dSealedTally-2
+ids DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 DEPL-dSealedTally-6 TOOL-dSealedTally-1 TOOL-dSealedTally-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
