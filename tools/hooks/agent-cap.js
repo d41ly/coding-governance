@@ -895,36 +895,33 @@ function fanoutFindings(script) {
   lines.forEach(scan)
   lines.forEach(scan)
 
-  // THE VIEW BOTH TAKE-BACK SWEEPS READ, and getting it wrong cost this build two review rounds.
-  // A sweep that revokes a bound must see neither COMMENTS nor STRING contents — a mention grows
-  // nothing — and must still see `${…}` INTERPOLATION bodies, because a real call lives there.
-  // Neither shipped view is both:
-  //   `code` (renderCodeView)  keeps ${…} bodies, and deliberately does NOT blank block comments
-  //   renderBlankedLiterals    blanks comments, and ERASES ${…} bodies
-  // Round 1 of the closing review caught the first — `/* never do LENSES.push(x) */` revoked a legal
-  // bound — and round 2 caught the second, which the fix for the first introduced: with the blanked
-  // view, `const s = `${LENSES.push(x)}`` went invisible and the bound survived a real growth. Both
-  // are failures on the only mechanical control against an agent burst, in opposite directions, so
-  // the view is BUILT here rather than borrowed from a rule that wants a different one.
+  // THE TAKE-BACK SWEEPS READ `code` DIRECTLY, WITH NO COMMENT STRIP, and the four review rounds
+  // that led here are the reason — this comment is the finding, not decoration.
   //
-  // THE STRIP IS PER LINE, NEVER OVER THE JOINED TEXT, and that is the whole of round 3's blocker.
-  // A joined strip pairs `/*` with the next `*/` anywhere below it — and this file models NO regex
-  // literal, by its own standing decision, so `const re = /[/*]/` (legal JS) opened a phantom
-  // comment that ran to the next real `*/` and DELETED every take-back between. Fail-OPEN, in both
-  // sweeps, and a regression against BASE for the reassignment one. `renderLexedView`'s own header
-  // refuses exactly this blanking for exactly this reason; the joined strip reinstated it one layer
-  // up, which is what makes it a defect rather than an inherited residual.
+  // The closing review's round 1 reported a FALSE DENY: `/* never do LENSES.push(x) */` revoked a
+  // legal bound, because `renderCodeView` deliberately does not blank block comments. Three separate
+  // fixes for that cosmetic complaint each bought a FAIL-OPEN on the only mechanical control this
+  // repo has against an agent burst:
   //
-  // Per line, a `/*` with no `*/` on the same line strips NOTHING and the damage cannot propagate.
-  // The single-line comment that round 1 found — `/* never do LENSES.push(x) here */` — still
-  // strips, which is the case that mattered.
+  //   round 2 — the blanked view erases `${…}` bodies, so `` `${LENSES.push(x)}` `` went invisible
+  //   round 3 — a joined-text strip paired a regex literal's `/*` with the next real `*/` below it
+  //   round 4 — a per-line strip did the same thing within one line
   //
-  // THE RESIDUAL, named rather than discovered later: a MULTI-LINE block comment mentioning a growth
-  // still revokes, because a per-line strip cannot see that the line is inside one. That is a false
-  // DENY — fail-CLOSED — on a shape no tracked harness writes, and it is the direction this file's
-  // posture prefers. Closing it needs a regex-literal-aware lexer, which this file has deliberately
-  // never had.
-  const takeBackView = code.map((l) => l.replace(/\/\*.*?\*\//g, ' ').split('//')[0])
+  // The common cause is not any of those regexes. It is that THIS FILE MODELS NO REGEX LITERAL, by
+  // a standing decision `renderLexedView`'s own header records, so every comment strip built on top
+  // of it inherits that blindness in a new shape. Closing the class needs a regex-literal-aware
+  // lexer, which this file has never had and which is not this unit's scope.
+  //
+  // So the strip is GONE and the false deny is ACCEPTED. That is the fail-CLOSED direction and the
+  // charter's stated posture: a construct this rule cannot prove bounded is denied, and the burden
+  // is on the fan-out rather than on the gate. Weighed plainly — a comment mentioning a growth costs
+  // an author one reworded comment; a fail-open costs an unbounded agent burst nothing.
+  //
+  // THE RESIDUAL, named: a comment or a string that mentions `<bounded>.push(` revokes that name's
+  // bound and denies the script. No tracked harness writes one — all five still exit 0 — and this is
+  // exactly the behaviour that shipped before this build, so it is a preserved property rather than
+  // a new cost. `memory/gotchas/` carries the class.
+  const takeBackView = code
 
   // A BARE REASSIGNMENT invalidates the bound. `let items = [1, 2]` then `items = allFindings` was a
   // measured bypass: the whitelist was keyed on a name and nothing ever took the name back. The
@@ -1000,8 +997,14 @@ function fanoutFindings(script) {
         // The spread test is over the TOP-LEVEL arguments, not the whole call text. Scanning the
         // text made `LENSES.splice(0, Math.min(...ns))` read as growth — a spread nested inside an
         // argument grows nothing, and denying it states "was GROWN" about an array that shrank.
+        //
+        // AND AN ARGUMENT LIST CARRYING A COMMENT IS NOT GRADED AT ALL. `splice(0, /*…*/ ...rest)`
+        // put the comment in front of the spread, so a prefix test saw a two-argument shrink and
+        // admitted a growth. Since this file models no regex literal, no comment strip here can be
+        // trusted — that is the whole lesson of rounds 2 through 4 — so a call this scan cannot read
+        // cleanly is DENIED rather than measured. Fail-closed, on a shape nothing writes.
         const call = joinCall(takeBackView, li, g.index + g[0].length - 1)
-        const args = call ? topLevelArgs(call.text) : null
+        const args = call && !/\/\*|\/\//.test(call.text) ? topLevelArgs(call.text) : null
         if (args && !args.some((a) => a.trim().startsWith('...')) && args.length < 3) continue
       }
       ok.delete(g[1])

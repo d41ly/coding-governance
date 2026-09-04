@@ -86,9 +86,16 @@ check "grown but the fan is not adjacent → allow" 0 '{"tool_name":"Workflow","
 check "concat does not grow the receiver → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nconst more = LENSES.concat(extra)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
 # ---- the closing diff review's fold. Every arm below FAILED before its fix, and each was
 # ---- reproduced by running the shipped hook rather than argued.
-# A COMMENT MENTIONING A GROWTH GROWS NOTHING. The sweep read `renderCodeView`, which deliberately
-# does not blank block comments, so a comment naming `LENSES.push(` revoked a legal bound.
-check "a block comment naming a push does not take the bound back → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n/* never do LENSES.push(x) here */\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# THE ACCEPTED RESIDUAL, and the arm states it as such rather than hiding it. A BLOCK comment
+# mentioning a growth REVOKES the bound and denies the script. Four review rounds went into trying
+# to strip comments out of the take-back view and each attempt bought a FAIL-OPEN instead, because
+# this file models no regex literal and every strip inherits that blindness in a new shape. The
+# strip is gone; the false deny is accepted, which is the fail-closed direction and the behaviour
+# that shipped before this build. Cost: one reworded comment. The alternative cost an agent burst.
+check "a block comment naming a push DENIES (accepted residual, fail-closed)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n/* never do LENSES.push(x) here */\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# A LINE comment is different and still allows: the lexed view breaks on `//` itself, so no strip
+# of ours is involved. Kept as an arm because the two comment forms now diverge, and a reader who
+# assumes they behave alike would be wrong.
 check "a line comment naming a push does not take the bound back → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n// never do LENSES.push(x)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
 # A MEMBER CHAIN IS NOT THE TOP-LEVEL NAME. Without a left guard the regex captured the LAST segment,
 # so `state.lenses.push(x)` denied a script naming a variable nothing had touched.
@@ -145,6 +152,14 @@ deny_growth "between two regex literals"      'const a = /[/*]/
 LENSES.push(x)
 const b = /[*/]/'
 deny_growth "on the same line as a closed block comment" '/* note */ LENSES.push(x)'
+# ROUND 4's blocker: a regex literal and a REAL closer on the SAME line. Every strip this build
+# tried paired the two; there is no strip now, so the growth is simply visible.
+deny_growth "regex literal and a real closer on one line" 'if (/[/*]/.test(s)) LENSES.push(x) /* ok */'
+deny_growth "regex literal, growth and closer, all one line" 'const re = /[/*]/; LENSES.push(x); const t = 1 /* pad */'
+# ROUND 4's high: a comment in the argument list hid a top-level spread from the arity test. An
+# argument list carrying a comment is no longer graded at all.
+deny_growth "a comment hiding a spread in splice args" 'LENSES.splice(0, /*
+*/ ...rest)'
 # The reassignment half of the same view, which round 3 found this fold had newly broken.
 check "deny-corpus: a reassignment below a regex-literal comment opener" 2 "$(node -e '
   const s = "export const meta={name:\"x\",description:\"y\"}\nconst MAX_VERIFIERS = 5\nlet LENSES = [1,2,3]\n"
@@ -153,7 +168,7 @@ check "deny-corpus: a reassignment below a regex-literal comment opener" 2 "$(no
   process.stdout.write(JSON.stringify({tool_name:"Workflow",tool_input:{script:s}}))')"
 # AND THE NEGATIVE HALF OF THE VIEW AXIS. A comment that MENTIONS a growth grows nothing, and a
 # spread NESTED in a removal-only splice's argument is not a spread argument.
-check "view axis: a single-line block comment mentioning a push → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n/* never do LENSES.push(x) here */\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+check "view axis: a single-line block comment mentioning a push DENIES (residual)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n/* never do LENSES.push(x) here */\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
 check "view axis: a spread nested in a removal-only splice → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nLENSES.splice(0, Math.min(...ns))\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
 
 # ---- the blanked view reports an unterminated scan (TOOL-aWeldedTribunal-3) ---------------------
