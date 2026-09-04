@@ -1,19 +1,22 @@
 # TOOL-aWeldedTribunal-8 — close the four rows whose defect the tree no longer has
 
-**Status:** OPEN · rev-1 · 2026-09-04 · node a · Tier-1 · base 9b5ae688 · streams tooling · order 8
+**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-1 · base 9b5ae688 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 |
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 Four of the eleven rows the owner named describe a defect that is already fixed. Close them against
-the work that fixed them, with the evidence on the row, so the next run does not re-triage them.
+the work that fixed them, with the evidence on the row, so the next run does not re-triage them. A
+fifth row, reached through one of the seven live ones, closes as a DUPLICATE rather than as a fixed
+defect — the difference is stated because the two are not interchangeable and S5 says which.
 
 ## 2. Scope (IN)
 
@@ -22,9 +25,13 @@ the work that fixed them, with the evidence on the row, so the next run does not
 - **S2** — `TOOL-dScaffoldedMirror-22` → `CLOSED`, against `dSealedTally`.
 - **S3** — `TOOL-aGroundedOrientation-4` → `CLOSED`, against the same fix. One defect, two rows.
 - **S4** — `TOOL-aFlaggedScaffold-4` → `CLOSED`, against `DEPL-dRetiredFork-4`.
-- **S5** — `TOOL-aScouredKit-25` → `CLOSED` against `TOOL-aWeldedTribunal-6`, per that row's own
-  instruction to close it rather than work it twice. It is not one of the owner's eleven; it is
-  reached through `TOOL-aFlaggedScaffold-3` and closing it is part of closing that.
+- **S5** — `TOOL-aScouredKit-25` → `CLOSED` as a **DUPLICATE of `TOOL-aFlaggedScaffold-3`**, which
+  is what its own text instructs and which is NOT the same as closing it against
+  `TOOL-aWeldedTribunal-6`. `TOOL-aFlaggedScaffold-3` STAYS OPEN: its claim — `govkit update` cannot
+  LAND a source gov ships — survives unit 6 by unit 6's own first non-goal, which reports and does
+  not land. The tail says `TOOL-aWeldedTribunal-6` adds the REPORT and that the landing verb is
+  still open, so two rows with identical headlines do not end at opposite statuses. This row is a
+  DEDUPE, not a fixed defect, and §1 describes it that way.
 - **S6** — Each closure names the file, the line and the commit or unit that fixed it. A closure
   citing nothing is a status flip, and a later reader has no way to tell it from a guess.
 
@@ -49,7 +56,7 @@ the work that fixed them, with the evidence on the row, so the next run does not
 | `TOOL-dScaffoldedMirror-22` | `--landed` writes `phase: LANDED` above the check that refuses | `tools/unattended/unattended.sh:2444-2446` writes `landed-anchor` then `phase` immediately before `stage_or_fail`; the reason is at `:2425` |
 | `TOOL-aGroundedOrientation-4` | same defect, observed on a second build | same lines |
 | `TOOL-aFlaggedScaffold-4` | `govkit apply` blows the 32 KiB argv on renormalize | `git_pathspec` at `tools/govkit/govkit.py:3724` uses `--pathspec-from-file=-` with `--pathspec-file-nul`, plus a subcommand allowlist and an empty-list refusal |
-| `TOOL-aScouredKit-25` | `govkit update` cannot land a new source | closed by `TOOL-aWeldedTribunal-6`, per its own text |
+| `TOOL-aScouredKit-25` | `govkit update` cannot land a new source | a DUPLICATE of `TOOL-aFlaggedScaffold-3` (`memory/backlog/TOOL.md:303` says close it against that one). That row STAYS OPEN — its claim survives unit 6, which reports and does not land |
 
 Every row in that table was verified by reading the named file at the named line, not by reading a
 commit message.
@@ -94,6 +101,15 @@ none
 
 - rev-1 · 2026-09-04 · initial draft. Every row in §4's table verified against the file and line it
   names before this spec was written.
+- rev-2 · 2026-09-04 · folded spec-audit round 2 (H5). **H5, high:** rev-1 closed
+  `TOOL-aScouredKit-25` "against `TOOL-aWeldedTribunal-6`", reversing what that row's own text says.
+  `memory/backlog/TOOL.md:303` instructs closing it against `TOOL-aFlaggedScaffold-3`, which is still
+  OPEN at `:16` and which NO unit of this build closes — its claim, that `update` cannot LAND a new
+  source, survives unit 6 by unit 6's own first non-goal. Rev-1's tail would therefore have named a
+  fix that did not happen and left two rows with identical headlines at opposite statuses, which is
+  the stale-row harm this unit exists to remove, inverted. S5, §1 and §4's fifth row now describe a
+  DEDUPE and say `TOOL-aFlaggedScaffold-3` stays open. Unit 6's §3 had this right and unit 8 quoted
+  the same source and reversed it.
 
 ## 10. Reuse audit
 

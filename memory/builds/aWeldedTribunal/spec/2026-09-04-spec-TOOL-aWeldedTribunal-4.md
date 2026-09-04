@@ -1,12 +1,13 @@
 # TOOL-aWeldedTribunal-4 — the tier-2 synthesis prompt carries the liveness counters the run computed
 
-**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 4
+**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
@@ -71,7 +72,8 @@ reference harness they were copied from was not.
 
 Every one is already logged to stdout, and stdout is not the record. `allFindings.length`,
 `confirmed.length`, `refuted.length`, `unverified.length` and `precision` already reach the prompt;
-the seven above that describe RUN HEALTH rather than finding counts do not.
+every counter in the table above describes RUN HEALTH rather than a finding count, and none of them
+reaches the prompt.
 
 `conflicts` is the counter rev-1 wrongly excluded. It is bound at `:434`, added to at `:443`, used to
 DELETE verdicts at `:445`, warned about at `:455`, and returned as `conflicts:` at `:480` and `:593`.
@@ -99,8 +101,8 @@ the counter set, so a future reader of the class sees which carriers are covered
 check is a DoD line: a harness that computes a liveness counter states it where the durable record
 is written, and that is verified by reading the prompt, not by a predicate.
 
-Stated plainly because the temptation will return: what a static check CAN see is that the seven
-identifiers appear inside the synthesis prompt's template literal. What it cannot see is whether the
+Stated plainly because the temptation will return: what a static check CAN see is that the identifiers
+in the table above appear inside the synthesis prompt's template literal. What it cannot see is whether the
 report used them, and a check that greps for the block's own words is satisfied by a comment quoting
 this spec. The ruling is right and rev-1 was wrong.
 
@@ -140,7 +142,12 @@ this spec. The ruling is right and rev-1 was wrong.
 - **AC1** — When the synthesis prompt in `tools/workflows/tier2-review.js` is read, it interpolates
   every counter in §4's inventory: `lensesDead`, `liveResults.length`, `LENSES.length`,
   `skepticsDead`, `batches.length`, `conflicts.size`, `spurious` and `duplicates`. The criterion is
-  the SET, not a sample, so a counter dropped from the block fails it.
+  the SET, not a sample, so a counter dropped from the block fails it. **And it covers the block's
+  two SENTENCES as well as its interpolations** — the do-not-describe-this-run-as-complete
+  instruction and the a-zero-is-not-evidence-of-absence clause. S2 calls the second one "the half
+  that makes the block do work", and a block carrying all eight numbers and neither sentence is
+  exactly the "prints the counters and still opens with no issues found" outcome this unit exists to
+  prevent.
 - **AC2** — When `tools/workflows/tier2-review.js` is run end to end on a real review, the report it
   writes contains a `RUN INTEGRITY` line carrying those numbers. This is the observation that the
   block reached the record rather than only the source, and it is the one this build can make
@@ -151,14 +158,19 @@ this spec. The ruling is right and rev-1 was wrong.
 - **AC4** — When `node tools/workflows/check-workflow-syntax.js` runs, it exits `0`. The block must
   not break the syntax leg, which is subject `repo` and therefore runs on every bar.
 - **AC5** — When `bash tools/run-gates/run-gates.sh` runs, the `workflow script syntax` leg is
-  green. That leg is subject `repo`, so the plain bar does run it — unlike the kit-subject legs the
-  other units name, which need `GATE_SELFTESTS=1`.
+  green; that leg is `subject = repo`, so the plain bar runs it. **In addition**, when
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs, `tier2-review self-test` is
+  green — it guards on `tools/workflows/`, which is where this unit's only code change lands.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` — the `workflow script syntax` leg, whose name and argv are in
-`tools/gate-legs.json`. That leg is `subject = repo` and `chunk = wiring`, so the plain bar runs it;
-no `GATE_SELFTESTS=1` is owed by this unit.
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, **and rev-2 was wrong to say no
+`GATE_SELFTESTS` was owed here.** This unit's only code file is `tools/workflows/tier2-review.js`,
+and `tools/gate-legs.json` carries THREE kit-subject legs guarding on `tools/workflows/`:
+`tier2-review self-test` (ceiling 1800), `verifier fan-out self-test` and `review-join self-test`.
+The edited file sits inside that guard, so a prompt edit breaking that suite would land green under
+rev-2's command. The plain `bash tools/run-gates/run-gates.sh` still covers the `workflow script
+syntax` leg, which is `subject = repo` and runs on every bar.
 
 ## 8. Open questions
 
@@ -176,6 +188,17 @@ none
   **H9, high:** rev-1's third non-goal claimed this file computes no contradictory-verdict counter.
   False — `conflicts` at `:434`. It is now in §4's inventory, in the block and in AC1, and the
   non-goal is narrowed to `downgrades` alone.
+
+- rev-3 · 2026-09-04 · folded spec-audit round 2 (H3, M2, M5). The loop exited NON-CONVERGENT at
+  round 2, so this is the disposing fold and there is no round 3. **H3, high:** §7 said flatly that
+  no `GATE_SELFTESTS` was owed, while `tools/gate-legs.json` carries three kit-subject legs guarding
+  on `tools/workflows/` — the directory holding this unit's only code file. A prompt edit breaking
+  `tier2-review self-test` would have landed green, and the sentence also put two opposite rules
+  about one leg class inside one spec set. **M2:** after rev-2 dropped the scanner ACs, nothing
+  observed S2's incompleteness clause, so a block with all eight counters and neither sentence passed
+  every criterion; AC1 now covers the block's TEXT. **M5:** the fold grew §4's inventory to eight rows
+  and left two sentences beside it saying "the seven"; both now point at the table, per the same
+  no-count-in-prose rule.
 
 ## 10. Reuse audit
 

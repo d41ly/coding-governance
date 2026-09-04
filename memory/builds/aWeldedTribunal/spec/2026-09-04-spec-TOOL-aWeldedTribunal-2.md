@@ -1,12 +1,13 @@
 # TOOL-aWeldedTribunal-2 — a bounded array loses its bound when a later statement grows it
 
-**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 2
+**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
@@ -151,13 +152,24 @@ branch depends on `indexed` being in the bounded set.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a script binding `const batches = []`, growing it at top level with
-  `batches.push(() => agent(f.claim))`, and fanning with `batches.map((b) => b())` is piped to
+- **AC1** — When a script binding `const batches = []`, growing it with a PLAIN VALUE at top level
+  (`batches.push(f)`), and fanning with
+  `await boundedParallel(batches.map((f) => () => agent(f.claim)), 5)` is piped to
   `node tools/hooks/agent-cap.js`, it exits `2` and the refusal names `batches` and the MUTATION.
-  Today it exits `0`. This shape reaches the `iter` arm at `agent-cap.js:912-919`, which is the ONE
-  site that reads `markedWhy`, so the message observed is this unit's and not unit 1's loop denial.
+  Today it exits `0`.
+  **THE `agent()` CALL MUST SIT LEXICALLY INSIDE THE MAP RECEIVER'S PARENS.** That adjacency, not
+  the presence of `.map` somewhere on the line, is what the opener walk reads: `fanoutFindings`
+  judges only lines matching the `agent(` pattern at `agent-cap.js:851`, and `markedWhy` is read at
+  exactly one site, `:918`, inside the `hit.kind === 'iter'` arm. A `push(` whose preceding text is
+  `batches.push` does not match `ITER_CALL` at `:426`, so a criterion that puts the agent call in
+  the push and the `.map` on another line reaches nothing. The fixture's bound must also resolve, or
+  it reds under a different rule and hides the one being tested.
 - **AC2** — When that same script's `push` is removed so the literal is never grown, the hook exits
   `0`. An empty literal is legal and must stay so.
+- **AC2b** — When the growth is a `push` and the `.map` fan is on a SEPARATE line from the
+  `agent()` call, the hook exits `0` — that shape is legal and must stay legal. This is the control
+  that distinguishes AC1's mechanism from an over-broad predicate, and it is the shape rev-2's AC1
+  wrongly asserted would be denied.
 - **AC3** — One arm per NEW verb: the AC1 shape spelled with `unshift` and with `splice` each exits
   `2` naming the mutation.
 - **AC4** — When each of the five tracked harnesses is piped to the hook, every one exits `0`,
@@ -172,12 +184,17 @@ branch depends on `indexed` being in the bounded set.
 
 ## 7. Gates
 
-`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `agent-cap self-test` and
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `agent-cap self-test` and
 `agent-cap restatement self-test` legs, which are `subject = kit` in `tools/gate-legs.json` and are
 therefore held as `ondemand` by `tools/run-gates/run-gates.sh:947` on the plain bar. `AGENTS.md`
 records that no boundary sets `GATE_SELFTESTS` (owner, 2026-08-27) and that a DoD owes the full pair
 for KIT work, which this is.
 
+
+**The FULL PAIR, not half of it.** `AGENTS.md:488` spells the DoD command for KIT work as
+`GATE_FULL=1 GATE_SELFTESTS=1`; `GATE_SELFTESTS=1` alone lifts the `ondemand` hold but leaves every
+per-leg GUARD in force, so kit legs outside the touched directory stay held with no `skipped` line
+saying which. Rev-2 cited the pair and prescribed one half of it.
 ## 8. Open questions
 
 none
@@ -198,6 +215,19 @@ none
   file already uses"; the existing constant has six verbs and neither `unshift` nor `splice`. S1
   now names them as NEW and AC3 gives each its own arm. **H7:** §7 named the plain bar for
   `subject = kit` legs it holds; corrected to `GATE_SELFTESTS=1`.
+
+- rev-3 · 2026-09-04 · folded spec-audit round 2 (B1, M10). The loop exited NON-CONVERGENT at round
+  2 — 17 defects against round 1's 16 — so this is the disposing fold and there is no round 3.
+  **B1, blocker, and it is round 1's H2 recurring on the same criterion.** Rev-2's AC1 moved the fan
+  to a `.map` but left the `agent()` call inside the `push`, and the reviewer REPRODUCED the
+  consequence rather than arguing it: AC1's script exits 0 against the shipped hook AND against a
+  copy patched with this unit's own take-back sweep, the sweep firing twice on `batches` and denying
+  nothing, while a control with the agent call moved inside the map receiver went 0 to 2 carrying
+  this unit's own reason text. A criterion green before and after a faithful build cannot be built
+  against. AC1 is respelled onto `batches.push(f)` plus an inline
+  `boundedParallel(batches.map((f) => () => agent(f.claim)), 5)`, states the adjacency requirement
+  explicitly, and AC2b adds the legal-shape control. **M10:** §7 cited `AGENTS.md`'s full pair and
+  prescribed half of it; corrected to `GATE_FULL=1 GATE_SELFTESTS=1`.
 
 ## 10. Reuse audit
 

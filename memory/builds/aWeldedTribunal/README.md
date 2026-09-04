@@ -131,17 +131,17 @@ ids TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aW
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aWeldedTribunal-1 — one loop-header predicate, and it recognises `for await` and `do`-blocks](spec/2026-09-04-spec-TOOL-aWeldedTribunal-1.md) | 1 | 2 | OPEN | rev-2 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-2 — a bounded array loses its bound when a later statement grows it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-2.md) | 2 | 2 | OPEN | rev-2 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-3 — the blanked view reports an unterminated scan, and its readers fall back](spec/2026-09-04-spec-TOOL-aWeldedTribunal-3.md) | 3 | 2 | OPEN | rev-2 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-4 — the tier-2 synthesis prompt carries the liveness counters the run computed](spec/2026-09-04-spec-TOOL-aWeldedTribunal-4.md) | 4 | 2 | OPEN | rev-2 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by all five python readers](spec/2026-09-04-spec-TOOL-aWeldedTribunal-5.md) | 5 | 2 | OPEN | rev-2 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-6.md) | 6 | 2 | OPEN | rev-2 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-7 — the wiring check names the hooks that will actually run](spec/2026-09-04-spec-TOOL-aWeldedTribunal-7.md) | 7 | 2 | OPEN | rev-2 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-8 — close the four rows whose defect the tree no longer has](spec/2026-09-04-spec-TOOL-aWeldedTribunal-8.md) | 8 | 1 | OPEN | rev-1 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-1 — one loop-header predicate, and it recognises `for await` and `do`-blocks](spec/2026-09-04-spec-TOOL-aWeldedTribunal-1.md) | 1 | 2 | OPEN | rev-3 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-2 — a bounded array loses its bound when a later statement grows it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-2.md) | 2 | 2 | OPEN | rev-3 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-3 — the blanked view reports an unterminated scan, and its readers fall back](spec/2026-09-04-spec-TOOL-aWeldedTribunal-3.md) | 3 | 2 | OPEN | rev-3 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-4 — the tier-2 synthesis prompt carries the liveness counters the run computed](spec/2026-09-04-spec-TOOL-aWeldedTribunal-4.md) | 4 | 2 | OPEN | rev-3 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by every python reader](spec/2026-09-04-spec-TOOL-aWeldedTribunal-5.md) | 5 | 2 | OPEN | rev-3 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-6.md) | 6 | 2 | OPEN | rev-3 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-7 — the wiring check names the hooks that will actually run](spec/2026-09-04-spec-TOOL-aWeldedTribunal-7.md) | 7 | 2 | OPEN | rev-3 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-8 — close the four rows whose defect the tree no longer has](spec/2026-09-04-spec-TOOL-aWeldedTribunal-8.md) | 8 | 1 | OPEN | rev-2 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 4 record folder(s).
+Records: 2 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

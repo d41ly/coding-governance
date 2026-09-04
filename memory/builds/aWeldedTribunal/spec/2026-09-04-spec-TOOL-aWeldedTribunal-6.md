@@ -1,12 +1,13 @@
 # TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it
 
-**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 6
+**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 6 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
@@ -27,6 +28,11 @@ point of that kit died for six days under a green bar.
   both existing call sites do it. `coverage_rows` does NOT honour the decline registry — §4 shows
   its body — so an ungraded call reports every deliberately-declined file as a gap. It needs
   `commit_now` from `git rev-parse HEAD`, and it grades staleness as well as presence.
+  **It is NOT a pure grader**: it calls `r.fail(...)` on twelve arms between `govkit.py:2489` and
+  `:2609`, `Report.emit` returns 1 whenever `problems` is non-empty (`:964-972`), and `_cmd_update`
+  returns `r.emit()` on every exit path. So passing `update`'s own Report would make a malformed or
+  stale `[[decline]]` row FAIL a write verb operators run constantly, for a defect that has nothing
+  to do with the update. §8 resolves which Report is passed.
 - **S2** — Each UNDECLINED gap is REPORTED as its own counted line, naming the kit, the destination
   and the gov source, in the same shape the other classification verdicts print. A DECLINED row
   prints too, as a declined row, because a gap that disappears from a report without saying why is
@@ -37,6 +43,12 @@ point of that kit died for six days under a green bar.
   decline registry is the same defect with the sign flipped.
 - **S4** — `--kits` scoping binds the gap set exactly as it binds `rows_all`. A gap in a kit the
   caller did not name is not this invocation's business.
+- **S4b** — The THREE call-site enumerations in the source are renumbered in the same commit:
+  `govkit.py:2438` reads "ONE PREDICATE, TWO CALL SITES — `cmd_check` and `plan --coverage`" inside
+  `decline_findings`'s own docstring, `:2674` reads "call site one of two" and `:2859` "call site two
+  of two". S1b makes `update` the third. Those three sentences are the record of the decision S1b
+  reuses, and leaving them to become wrong on landing is the same class sibling unit 7 spends four
+  scope items on for two other carriers — in the file this unit edits.
 - **S5** — An arm proving a gap is DETECTED and one proving a clean install reports ZERO gaps, and
   the zero is PRINTED. A clean run that prints nothing is indistinguishable from a coverage report
   that failed to run, which is a rule `plan --coverage` already follows in this same file.
@@ -105,7 +117,8 @@ coverage join that did not run. This unit inherits that rule rather than restati
 
 ### Files touched (estimate)
 
-- `tools/govkit/govkit.py` — one call, one print loop, one summary field.
+- `tools/govkit/govkit.py` — one call, one print loop, one summary field, and the three call-site
+  enumerations of S4b at `:2438`, `:2674` and `:2859`.
 - `tools/govkit/selftest.py` or the govkit suite — the arms of S5.
 
 ### Alternatives rejected
@@ -157,21 +170,52 @@ coverage join that did not run. This unit inherits that rule rather than restati
 - **AC6** — When `govkit update` runs against a fixture target whose ONLY gap is DECLINED, it prints
   no undeclined `GAP` row and its summary says COMPLETE. This is S1b, and it is the criterion that
   catches a build made on rev-1's false premise.
-- **AC7** — When `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs the govkit legs, they
+- **AC6b** — When `govkit update` runs against that same fixture, the output PRINTS a `declined` row
+  naming the kit and the destination. AC6 takes the absence half of S2, this takes the presence half.
+  Without it the cheapest build filters declined rows out of the report entirely, which passes every
+  other criterion whole while committing exactly the exclusion-list failure `DEPL-dCarriedReceipt-5`
+  exists to prevent — and which the reference call site at `govkit.py:2681-2689` goes out of its way
+  to avoid.
+- **AC6c** — When `govkit update` runs against a fixture holding one STALE `[[decline]]` row, its
+  exit code is whatever §8 F1 resolved, observed rather than assumed. This is the criterion H2 found
+  missing: rev-2 wired a grader that fails on twelve arms into a verb whose §5 asserted no new
+  failure mode.
+- **AC7** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs the govkit legs, they
   stay green.
 
 ## 7. Gates
 
-`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for `govkit selftest`, which is
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for `govkit selftest`, which is
 `subject = kit` in `tools/gate-legs.json` and is therefore held as `ondemand` by
 `tools/run-gates/run-gates.sh:947` on the plain bar — a leg's GUARD scopes a run, the subject and
 chunk decide whether it runs at all. `AGENTS.md` records that no boundary sets `GATE_SELFTESTS`
 (owner, 2026-08-27) and that a DoD owes the full pair for KIT work, which this is. The repo-subject
 govkit legs still run on the plain bar.
 
+
+**The FULL PAIR, not half of it.** `AGENTS.md:488` spells the DoD command for KIT work as
+`GATE_FULL=1 GATE_SELFTESTS=1`; `GATE_SELFTESTS=1` alone lifts the `ondemand` hold but leaves every
+per-leg GUARD in force, so kit legs outside the touched directory stay held with no `skipped` line
+saying which. Rev-2 cited the pair and prescribed one half of it.
 ## 8. Open questions
 
-none
+- **F1 · Which `Report` does `update` pass to `decline_findings`?** The grader writes findings and
+  `update` emits whatever Report it is handed, so this decides whether decline-registry hygiene can
+  fail a write verb.
+
+  **Option A, `update`'s own Report:** matches both existing call sites exactly. A stale or malformed
+  `[[decline]]` row then fails `govkit update`.
+
+  **Option B, a throwaway Report whose problems are PRINTED as informational lines:** `update` gets
+  the decline MAP without inheriting decline-hygiene refusals, and nothing is hidden.
+
+  RESOLVED (agent, 2026-09-04, delegated): **Option B**. Option A trips M3's veto 3 — it widens what
+  a write verb REFUSES beyond anything this unit's risk tier priced, and §1's whole subject is a
+  REPORT. `update` is the verb operators run most, and making it fail on a defect in a different
+  registry is how a report stops being run at all. Printing the grader's problems keeps Option A's
+  visibility without its blast radius, and AC6c observes the resulting exit code rather than assuming
+  it. The reference call sites pass their own Report because `check` and `plan` are read-only verbs
+  whose whole job is grading; `update` is not, and that difference is the reason the two diverge.
 
 ## 9. Revision log
 
@@ -186,6 +230,17 @@ none
   every declined file as a gap and read INCOMPLETE forever. S1b adds the grading step, S2 and S3 are
   scoped to UNDECLINED gaps, and AC6 is its arm. **H7:** §7 named the plain bar for a
   `subject = kit` leg and reasoned from the leg's guard; corrected to `GATE_SELFTESTS=1`.
+
+- rev-3 · 2026-09-04 · folded spec-audit round 2 (H1, H2, M8, M10). The loop exited NON-CONVERGENT
+  at round 2, so this is the disposing fold and there is no round 3. **H1, high:** S2's DECLINED-row
+  half was observed by nothing — AC6 checked only the ABSENCE of an undeclined `GAP` row, so the
+  cheapest build filters declined rows out entirely and commits the exclusion-list failure S2 names.
+  AC6b takes the presence half. This is round 1's dominant pattern recurring on a fold-new scope
+  item. **H2, high:** S1b wired `decline_findings` — which `r.fail`s on twelve arms — into a verb
+  that returns `r.emit()` on every exit path, while §5 asserted no new failure mode. F1 resolves it
+  to a throwaway Report whose problems print, and AC6c observes the exit code. **M8:** S1b makes
+  `update` the third call site and three enumerations in the source say two; S4b renumbers them.
+  **M10:** §7 prescribed half the pair it cited.
 
 ## 10. Reuse audit
 

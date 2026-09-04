@@ -1,27 +1,29 @@
-# TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by all five python readers
+# TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by every python reader
 
-**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 5
+**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-Five python readers in `tools/memory-tree/` each re-implement the `.memory-tree.conf` parse with an
+The python readers in `tools/memory-tree/` each re-implement the `.memory-tree.conf` parse with an
 identical naive `v.strip().strip('"').strip("'")`, while the shell gate SOURCES the same file in
 bash. A legal spelling bash accepts and the python half mis-reads takes `gotchas.py --check` from
 rc=1 to rc=0 over an identical planted violation — coverage removed, not failed closed, gate still
-green. Route all five through one parser that agrees with the shell.
+green. Route them all through one parser that agrees with the shell.
 
 ## 2. Scope (IN)
 
-- **S1** — One conf parser, exported from `tools/memory-tree/corpus_ids.py`, which already holds
-  `load_conf` and is already imported by `gotchas.py`. It becomes the single reader.
+- **S1** — One conf parser, exported from `tools/memory-tree/corpus_ids.py`, which already OWNS the
+  conf and carries the widest defaults set. It becomes the single reader. It is NOT already imported
+  by `gotchas.py` — §4 measures the import graph and prices the four new edges.
 - **S2** — It handles the two spellings bash accepts and the current parse does not: an INLINE
   COMMENT after the value (`MEMORY_ROOT=memory   # note`) and an `export ` prefix on the key.
 - **S3** — `gotchas.py`, `gen_build_index.py`, `check-arms.py` and `row_grammar.py` call it instead
@@ -52,12 +54,12 @@ green. Route all five through one parser that agrees with the shell.
   and the pins, `gotchas` needs the universal budget, `check-arms` needs the arms floors. One
   defaults dict for all five would give every reader keys it has no use for and hide which reader
   actually depends on which key.
-- **The drift-audit copy.** `TOOL-aScouredKit-5` already fixed it; a sixth caller is not in this
+- **The drift-audit copy.** `TOOL-aScouredKit-5` already fixed it; that caller is not in this
   unit's population and pulling it in would widen the diff for no defect.
 
 ## 4. Design
 
-### Inventory — the five copies
+### Inventory — the copies
 
 | File | Line | Reads | Defaults it carries |
 |---|---|---|---|
@@ -65,13 +67,23 @@ green. Route all five through one parser that agrees with the shell.
 | `tools/memory-tree/gotchas.py` | 92 | values | `MEMORY_ROOT` `UNIVERSAL_BUDGET` |
 | `tools/memory-tree/gen_build_index.py` | 287 | values | `MEMORY_ROOT` `DISCIPLINES` `FAMILIES` |
 | `tools/memory-tree/check-arms.py` | 82 | values | `MEMORY_ROOT` `ARMS_FLOORS` |
-| `tools/memory-tree/row_grammar.py` | 93 | values | `MEMORY_ROOT` `FAMILIES` and a pin |
+| `tools/memory-tree/row_grammar.py` | 93 | values | **none — `conf = {}`, and it RAISES on an absent conf** |
 | `tools/memory-tree/corpus_ids.py` `read_declared_keys` | 122-136 | **keys only** | none — it returns a key set |
 
-The first five hold the identical body: skip blank, skip `#`-leading, skip no-`=`, partition on the
-first `=`, strip whitespace then one layer of double quotes then one layer of single quotes. The
-sixth shares the skip rules and the partition and stops at the key, which is why rev-1's inventory
-missed it and why AC6's quote-strip grep cannot see it either.
+The value-reading rows hold the identical body: skip blank, skip `#`-leading, skip no-`=`, partition
+on the first `=`, strip whitespace then one layer of double quotes then one layer of single quotes.
+The key-reading row shares the skip rules and the partition and stops at the key, which is why
+rev-1's inventory missed it and why AC6's quote-strip grep cannot see it either.
+
+**`row_grammar.load_conf` IS NOT LIKE THE OTHERS, and rev-2's cell said it was.**
+`tools/memory-tree/row_grammar.py:86-94` is `def load_conf(root): conf = {}` with a bare
+`read(os.path.join(root, ".memory-tree.conf"))`, and `read` at `:56-58` is a plain `open` — so it
+holds NO defaults and RAISES on an absent conf. The other four all open with a populated defaults
+dict AND an `os.path.isfile` guard. `MEMORY_ROOT` and `FAMILIES` are keys it READS, not defaults it
+carries. This matters because routing it through a shared `load_conf(root, defaults)` carrying the
+isfile guard would silently convert today's hard failure on a missing conf into a quiet empty-dict
+success — the direction toward silent success, and the opposite of §5's claim that an absent conf
+still yields the defaults. AC7 decides it rather than letting the shared parser decide by accident.
 
 **This inventory is the single source for the count.** No criterion in §6 states a number, per the
 charter's rule that no count of a derived population is written in prose.
@@ -122,8 +134,8 @@ is a trade, and the row presented it as free.
 
 ### Alternatives rejected
 
-- **A new `conf.py` module.** Rejected: `corpus_ids.py` already holds `load_conf` and is already
-  the import target of one of the four. A sixth file to hold twelve lines is scaffolding.
+- **A new `conf.py` module.** Rejected: `corpus_ids.py` already owns the conf, and the four import
+  edges it needs are priced in §4. Another file to hold twelve lines is scaffolding.
 - **Make the shell half match python instead.** Rejected backwards: bash is the reference because
   bash is what the conf format IS. The python half is the copy and the copy is what is wrong.
 - **Leave it, since no tracked conf here uses either spelling.** Rejected: this repo ships the kit,
@@ -171,10 +183,15 @@ is a trade, and the row presented it as free.
 - **AC6** — When `grep -c "strip('\"')" tools/memory-tree/*.py` is run, one copy remains. This
   criterion CANNOT see `read_declared_keys`, which carries no quote strip — AC2b is what covers that
   reader, and saying so here is cheaper than a later reader assuming this grep is the whole audit.
+- **AC7** — When every reader in §4's inventory is run against a fixture root holding NO
+  `.memory-tree.conf`, each behaves as §4 documents: the four guarded readers return their defaults,
+  and `row_grammar.load_conf` does whatever this unit decides — it RAISES today, and the shared
+  parser must not change that by accident. One arm makes the difference a fact rather than a table
+  cell.
 
 ## 7. Gates
 
-`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `memory-hygiene self-test` leg, which
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `memory-hygiene self-test` leg, which
 is `subject = kit` in `tools/gate-legs.json` and is therefore held as `ondemand` by
 `tools/run-gates/run-gates.sh:947` on the plain bar. A leg's GUARD scopes a RUN; the subject and
 chunk decide whether the leg runs at all, and rev-1 reasoned from the wrong one. `AGENTS.md` records
@@ -182,6 +199,11 @@ that no boundary sets `GATE_SELFTESTS` (owner, 2026-08-27) and that a DoD owes t
 work, which this is. The plain bar still covers the repo-subject memory-tree hygiene legs, which are
 what actually grade this repo's own tree.
 
+
+**The FULL PAIR, not half of it.** `AGENTS.md:488` spells the DoD command for KIT work as
+`GATE_FULL=1 GATE_SELFTESTS=1`; `GATE_SELFTESTS=1` alone lifts the `ondemand` hold but leaves every
+per-leg GUARD in force, so kit legs outside the touched directory stay held with no `skipped` line
+saying which. Rev-2 cited the pair and prescribed one half of it.
 ## 8. Open questions
 
 none
@@ -204,6 +226,18 @@ none
   which is equally broken; criteria now name the §4 inventory instead of a number. **H7:** §7 named
   the plain bar for a `subject = kit` leg and reasoned from the leg's GUARD, which is the wrong
   mechanism; corrected to `GATE_SELFTESTS=1`.
+
+- rev-3 · 2026-09-04 · folded spec-audit round 2 (M1, M6, M7, M10). The loop exited NON-CONVERGENT
+  at round 2, so this is the disposing fold and there is no round 3. **M1:** §4 credited
+  `row_grammar.py` with defaults it does not carry — it is `conf = {}` with no isfile guard and it
+  RAISES on an absent conf. The cell mattered more after rev-2 made the table "the single source for
+  the count", and routing that reader through a guarded shared parser would silently turn a hard
+  failure into an empty-dict success. Cell corrected, §4 explains it, AC7 decides it. **M6:** the
+  title, §1 and §4's heading all said FIVE over a six-row table, in the paragraph nominating that
+  table as the count's only source; the counts are gone. **M7:** S1 and the Alternatives bullet still
+  carried the import claim this document refutes three times elsewhere — the false answer sitting in
+  the binding scope section. Both rewritten to what was measured. **M10:** §7 prescribed half the
+  pair it cited.
 
 ## 10. Reuse audit
 

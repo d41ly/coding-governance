@@ -1,12 +1,13 @@
 # TOOL-aWeldedTribunal-7 — the wiring check names the hooks that will actually run
 
-**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 7 · ratified 2026-09-04
+**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 7 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-8 |
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
@@ -35,10 +36,16 @@ against the blobs the current tree tracks, and REPORT — without gating — whe
   hook is the tracked dir "so tracked == active by construction — no staleness class for THIS
   repo", which §4's measurement falsifies for exactly this layout.
 - **S5** — `memory/gotchas/hookspath-resolves-into-another-checkout.md` is refreshed in the same
-  commit. Its "Its gate" section still says this comparison "is opened as a backlog item rather than
-  written here, because a check whose subject is the operator's environment needs a decision about
-  whether it reds or reports" — the decision §8 takes and the check S1 writes. A record asserting
-  that the thing just built does not exist is the same class S4 closes for the hook header.
+  commit, **written over the record's CARRIERS and not over one heading**: after the refresh, no
+  paragraph of that file may assert the comparison is unwritten or unopened. Two sections say it
+  today. "Its gate" says the check "is opened as a backlog item rather than written here, because a
+  check whose subject is the operator's environment needs a decision about whether it reds or
+  reports" — the decision §8 takes and the check S1 writes. And `:59-62`, under "What to do", says
+  "**A gate on this is possible and is not written.** `check-wiring.sh` already resolves
+  `core.hooksPath`; it could compare the resolved directory's blob against the tracked one at HEAD
+  and report a mismatch" — a description of exactly what S1 builds, in the conditional. Rev-2 scoped
+  only the first, which would leave the cited class record still asserting that the thing just built
+  does not exist: verbatim the defect S5 exists to remove, one paragraph up.
 - **S6** — Arms in the `check-wiring self-test` suite, derived from S1's hook list rather than
   hand-written per hook: a planted divergence prints the line for that hook, a matching pair does
   not, an untracked hook prints `skip`, and **`--check` exits 0 in every one of those states.**
@@ -172,21 +179,27 @@ Recorded in §8, which is where the fork and its vetoes are.
   track, the output says UNKNOWN and never `ok`.
 - **AC7** — When `.githooks/pre-push` is read, its header no longer claims there is no staleness
   class for this repo, and names the multi-worktree condition instead.
-- **AC8** — When `memory/gotchas/hookspath-resolves-into-another-checkout.md` is read, its "Its
-  gate" section names the decision taken and the check written, and no longer says the check is an
-  unopened backlog item.
-- **AC9** — When `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs, the
+- **AC8** — When `memory/gotchas/hookspath-resolves-into-another-checkout.md` is read, NO paragraph
+  of it asserts the comparison is unwritten or unopened, and it names the decision taken and the
+  check written. The criterion is the WHOLE FILE, not one heading — rev-2 scoped it to "Its gate"
+  and left the same false assertion standing under "What to do" at `:59-62`.
+- **AC9** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs, the
   `check-wiring self-test` leg is green with the new arms counted.
 
 ## 7. Gates
 
-`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `check-wiring self-test` leg, which is
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `check-wiring self-test` leg, which is
 `subject = kit` in `tools/gate-legs.json` and is therefore held as `ondemand` by
 `tools/run-gates/run-gates.sh:947` on the plain bar — a guard scopes a run, it does not decide
 whether a held leg runs at all. `AGENTS.md` records that no boundary sets `GATE_SELFTESTS` (owner,
 2026-08-27) and that a DoD owes the full pair for KIT work, which this is. The plain
 `bash tools/run-gates/run-gates.sh` still covers the repo-subject legs.
 
+
+**The FULL PAIR, not half of it.** `AGENTS.md:488` spells the DoD command for KIT work as
+`GATE_FULL=1 GATE_SELFTESTS=1`; `GATE_SELFTESTS=1` alone lifts the `ondemand` hold but leaves every
+per-leg GUARD in force, so kit legs outside the touched directory stay held with no `skipped` line
+saying which. Rev-2 cited the pair and prescribed one half of it.
 ## 8. Open questions
 
 - **F1 · Does a divergence RED, or report?** The row that opens this unit states the decision is
@@ -235,6 +248,14 @@ whether a held leg runs at all. `AGENTS.md` records that no boundary sets `GATE_
   leg that `run-gates.sh:947` holds; it now names `GATE_SELFTESTS=1` and drops the guard-based
   reasoning, which was the wrong mechanism. **M1:** S5 adds the gotcha-record refresh, which rev-1
   left asserting that this very check was unwritten.
+
+- rev-3 · 2026-09-04 · folded spec-audit round 2 (M9, M10). The loop exited NON-CONVERGENT at round
+  2, so this is the disposing fold and there is no round 3. **M9:** rev-2's S5 and AC8 scoped the
+  gotcha refresh to the record's "Its gate" heading, while the same false assertion — that this gate
+  "is possible and is not written" — also stands under "What to do" at `:59-62`. A build satisfying
+  AC8 whole would have left the cited class record still saying the thing just built does not exist,
+  which is the exact defect S5 exists to remove. Both are now written over the file's carriers rather
+  than one heading. **M10:** §7 cited `AGENTS.md`'s full pair and prescribed half of it.
 
 ## 10. Reuse audit
 

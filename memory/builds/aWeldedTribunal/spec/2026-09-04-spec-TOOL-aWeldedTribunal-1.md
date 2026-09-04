@@ -1,12 +1,13 @@
 # TOOL-aWeldedTribunal-1 — one loop-header predicate, and it recognises `for await` and `do`-blocks
 
-**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round2.md) | spec-audit | TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
@@ -14,15 +15,16 @@
 
 `tools/hooks/agent-cap.js` decides whether an `agent()` call sits inside a loop by testing
 `/\b(for|while)\s*\(/` against a line. Two ordinary JavaScript loop headers do not match it, and
-both were measured at exit 0 carrying an unmarked thunk-array fan past the hook. Replace the five
-copies of that regex with one predicate that recognises the shapes the ban was written to deny.
+both were measured at exit 0 carrying an unmarked thunk-array fan past the hook. Replace the six
+copies of that keyword set with one source, so every site asking whether a line opens a loop gets
+the same answer.
 
 ## 2. Scope (IN)
 
 - **S1** — ONE module-level SOURCE for the loop-keyword set, used at every site that asks "is this a
   loop opener". There are SIX such sites today and each holds its own copy of the regex, which is the
-  `two-answers-to-one-question` class the checklist selects for this file. Five take the predicate
-  directly; `:710` and `:910` take siblings DERIVED from the same source, because one counts
+  `two-answers-to-one-question` class the checklist selects for this file. FOUR take the predicate
+  directly; `:711` and `:910` take siblings DERIVED from the same source, because one counts
   occurrences and the other matches a keyword TAIL rather than a header.
 - **S2** — The predicate recognises `for await (`. The current regex requires `for` followed by
   optional whitespace and then `(`; `for await (` puts an identifier between them.
@@ -68,13 +70,13 @@ SIX sites, each holding its own copy today, and what each asks:
 | Site | Line today | What it asks | Takes |
 |---|---|---|---|
 | `checkSeqMarker` C5 | 705 | is the marked line a loop header at all | `LOOP_HEADER` |
-| `checkSeqMarker` C6 | 710 | does the marked header carry more than one opener | a global-flag sibling |
+| `checkSeqMarker` C6 | 711 | does the marked header carry more than one opener | a global-flag sibling |
 | `checkSeqMarker` nesting walk | 738 | is the enclosing block a loop | `LOOP_HEADER` |
 | **opener walk** | **910** | **is this open paren a loop opener** | **a keyword-TAIL sibling** |
 | call-site braceless arm | 934 | is this `agent()` on a braceless loop header line | `LOOP_HEADER` |
 | call-site brace walk | 944 | is the block still open above this line a loop | `LOOP_HEADER` |
 
-Site 710 counts occurrences and needs the global flag. **Site 910 was omitted from rev-1's inventory
+Site 711 counts occurrences and needs the global flag. **Site 910 was omitted from rev-1's inventory
 and it is the one that cannot take `LOOP_HEADER` at all**: it is `/\b(for|while)\s*$/` tested against
 the text BEFORE an opener position, so a pattern ending in `\(` or `do\s*\{` never matches there. It
 needs a sibling anchored at end-of-text, `/\b(?:for(?:\s+await)?|while)\s*$/`, derived from the same
@@ -105,14 +107,15 @@ nothing else does; S4's negative arms pin that.
 
 ### Files touched (estimate)
 
-- `tools/hooks/agent-cap.js` — one constant added, five regex literals replaced.
+- `tools/hooks/agent-cap.js` — one constant plus two derived siblings added, six regex literals
+  replaced.
 - `tools/hooks/agent-cap.test.sh` — the arms of S4.
 
 ### Alternatives rejected
 
-- **Widen each of the five copies in place.** Rejected: it leaves five answers to one question,
+- **Widen each of the six copies in place.** Rejected: it leaves six answers to one question,
   which is the class this file's own checklist selects, and the next shape to be discovered has to
-  be applied five times again.
+  be applied six times again.
 - **Parse the script.** Rejected: this hook is a one-shot stdin CLI with no dependency budget, and
   the file's own history records that every previous attempt at more structure bought a new
   false-positive class.
@@ -156,13 +159,18 @@ nothing else does; S4's negative arms pin that.
 
 ## 7. Gates
 
-`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `agent-cap self-test` and
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `agent-cap self-test` and
 `agent-cap restatement self-test` legs, which are `subject = kit` in `tools/gate-legs.json` and are
 therefore held as `ondemand` by `tools/run-gates/run-gates.sh:947` on the plain bar. `AGENTS.md`
 records that no boundary sets `GATE_SELFTESTS` (owner, 2026-08-27) and that a DoD owes the full pair
 for KIT work, which this is. The `agent-cap restatement` leg is `subject = repo` and does run on the
 plain bar.
 
+
+**The FULL PAIR, not half of it.** `AGENTS.md:488` spells the DoD command for KIT work as
+`GATE_FULL=1 GATE_SELFTESTS=1`; `GATE_SELFTESTS=1` alone lifts the `ondemand` hold but leaves every
+per-leg GUARD in force, so kit legs outside the touched directory stay held with no `skipped` line
+saying which. Rev-2 cited the pair and prescribed one half of it.
 ## 8. Open questions
 
 none
@@ -182,14 +190,23 @@ none
   renumbered AC6. **H7:** §7 named the plain bar for `subject = kit` legs that
   `run-gates.sh:947` holds as `ondemand`; corrected to `GATE_SELFTESTS=1`, and the one leg that IS
   `subject = repo` is now distinguished rather than lumped in.
+- rev-3 · 2026-09-04 · folded spec-audit round 2 (M3, M4, M10). The loop exited NON-CONVERGENT at
+  round 2 — 17 defects against round 1's 16 — so this is the disposing fold and there is no round 3.
+  **M3:** §1, §4's Files-touched estimate and §10 still said FIVE over a six-row table, and the
+  Goal plus the estimate are the two lines a builder scopes a diff from, so the site the last fold
+  added was exactly the one a five-count drops. All corrected, and the second site's address fixed
+  from `:710` to `:711` in both places. **M4:** S1's arithmetic did not close — six sites, "five
+  direct plus two siblings" is seven. The table shows four direct, so S1 now reads FOUR. **M10:**
+  §7 cited `AGENTS.md`'s full pair and prescribed half of it; it now names
+  `GATE_FULL=1 GATE_SELFTESTS=1`.
 
 ## 10. Reuse audit
 
-The seam is `tools/hooks/agent-cap.js` itself and specifically its five existing loop-header
+The seam is `tools/hooks/agent-cap.js` itself and specifically its six existing loop-keyword
 predicates, found by `python tools/codebase-map/reuse_lookup.py "fan-out cap hook scans a script for
 loop shapes and array literals"`, which ranked `capFindings`, `checkLiteralOpen`,
 `renderBlankedLiterals` and `resolveLiteralEnd` in that file. No new mechanism is introduced: this
-unit consolidates a predicate the file already has five copies of.
+unit consolidates a keyword set the file already spells six times.
 
 Recall terms used: `--terms "agent-cap blankLiterals capFindings fanoutFindings landed phase check34
 lander marker unrepairable govkit renormalize memory-tree conf"`
