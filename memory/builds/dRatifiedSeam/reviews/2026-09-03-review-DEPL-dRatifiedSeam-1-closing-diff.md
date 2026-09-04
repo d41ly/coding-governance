@@ -103,3 +103,23 @@ foreign repository, which deserves its own unit and its own review rather than a
 a build that has already absorbed two blockers.
 
 The M4 spec audit for this build remains SELF-review; the cold pass on the specs is still unpaid.
+
+## A seventeenth finding, from the closing bar itself
+
+The total bar (`GATE_FULL=1 GATE_SELFTESTS=1`) was run at the `--no-ff` merge commit before the
+push, which is where the merge protocol asks for it. It came back 92/93 with the `govkit selftest`
+leg red on 46 arms, every one of them an `update` arm.
+
+None of them was about the tree. `update` defaults to `--to HEAD`, and `demand_published_vintage`
+refuses a commit this checkout can reach from NO ref. A `--no-ff` merge made on a detached head is
+exactly that commit, so the leg refused the vintage rather than grading anything. Measured both
+ways: `git for-each-ref --contains` returns nothing for the merge commit and returns its own branch
+ref for the branch tip, and the same suite over the byte-identical branch-tip tree passed all 1074
+arms.
+
+So the leg's verdict is decided by commit topology rather than by the content under test, and it
+reds precisely at the moment the merge protocol says to run a gate. Filed as
+`DEPL-dRatifiedSeam-6`. It is not folded here because the fix belongs in the leg or in how the
+fixture pins its gov vintage, not in this build's diff — and a leg that reds for a reason unrelated
+to its subject is the mirror image of one that greens for a reason unrelated to its subject, which
+is the class this whole build has been chasing.
