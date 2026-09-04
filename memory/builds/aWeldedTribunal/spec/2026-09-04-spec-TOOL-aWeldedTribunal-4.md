@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-4 — the tier-2 synthesis prompt carries the liveness counters the run computed
 
-**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 4
+**Status:** CLOSED · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
