@@ -108,6 +108,7 @@ skills/session-kickoff/SKILL.md text eol=lf
 # of the checkout with 350 CR bytes and the shipped Tier-2 harness could not be launched at all,
 # while its own syntax leg stayed green. The committed blobs were already LF; `* text=auto` plus
 # core.autocrlf smudged every unpinned path on the way out.
+tools/hooks/*.js text eol=lf
 tools/workflows/*.js text eol=lf
 
 # codebase-map determinism (this repo dogfoods the kit). The gate's freshness leg BYTE-COMPARES the

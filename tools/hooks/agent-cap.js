@@ -894,10 +894,34 @@ function fanoutFindings(script) {
   }
   lines.forEach(scan)
   lines.forEach(scan)
+
+  // THE VIEW BOTH TAKE-BACK SWEEPS READ, and getting it wrong cost this build two review rounds.
+  // A sweep that revokes a bound must see neither COMMENTS nor STRING contents — a mention grows
+  // nothing — and must still see `${…}` INTERPOLATION bodies, because a real call lives there.
+  // Neither shipped view is both:
+  //   `code` (renderCodeView)  keeps ${…} bodies, and deliberately does NOT blank block comments
+  //   renderBlankedLiterals    blanks comments, and ERASES ${…} bodies
+  // Round 1 of the closing review caught the first — `/* never do LENSES.push(x) */` revoked a legal
+  // bound — and round 2 caught the second, which the fix for the first introduced: with the blanked
+  // view, `const s = `${LENSES.push(x)}`` went invisible and the bound survived a real growth. Both
+  // are failures on the only mechanical control against an agent burst, in opposite directions, so
+  // the view is BUILT here rather than borrowed from a rule that wants a different one.
+  //
+  // Block comments are stripped over the JOINED text because they span lines; line comments per
+  // line. `code` has already had string contents blanked by the lexed view, so this adds only the
+  // comment strip.
+  const takeBackView = code
+    .join('\n')
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .split('\n')
+    .map((l) => l.split('//')[0])
+
   // A BARE REASSIGNMENT invalidates the bound. `let items = [1, 2]` then `items = allFindings` was a
   // measured bypass: the whitelist was keyed on a name and nothing ever took the name back. The
   // protocol publishes "assigned exactly once", so anything assigned twice loses the claim.
-  code.forEach((l) => {
+  // R6: it reads the comment-free view too. The first fold gave that to the growth sweep alone, so a
+  // block-commented reassignment still denied a legal harness — the same class, one sweep over.
+  takeBackView.forEach((l) => {
     const m = /(?:^|[;{}]\s*)([A-Za-z_$][\w$]*)\s*=[^=]/.exec(l)
     if (m && !/\b(const|let|var)\s+$/.test(l.slice(0, m.index + m[0].indexOf(m[1])))) {
       if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) {
@@ -935,18 +959,16 @@ function fanoutFindings(script) {
   // is not tracked, because this file tracks names and not values; and `batches[i] = x` past the end
   // and `batches.length = n` both grow an array and are not here, because a regex over
   // `name[<expr>] =` matches every ordinary element write and denies innocent files.
-  // THE LEFT GUARD IS LOAD-BEARING. `\b` alone captures the LAST segment of a member chain, so
-  // `state.lenses.push(x)` withdrew the bound from an unrelated top-level `lenses` and denied a
-  // legal harness naming a variable nothing had touched. Reproduced by the closing review.
-  const GROWS_RECEIVER = /(?:^|[^.\w$)\]])([A-Za-z_$][\w$]*)\s*\.\s*(?:push|unshift|splice)\s*\(/g
-  // AND THE SWEEP READS A COMMENT-FREE VIEW. `code` here is `renderCodeView`, which deliberately
-  // does NOT blank block comments — so `/* never do LENSES.push(x) */` revoked LENSES' bound and
-  // denied a correctly-bounded fan. Measured BASE rc=0 -> rc=2 before this guard. The blanked view
-  // blanks comments AND literal contents, which is exactly the population this sweep wants: a
-  // `.push(` inside a string or a comment grows nothing.
-  const growView = renderBlankedLiterals(script)
-  const growCode = growView.unterminated ? perLineBlanked(script) : growView.code
-  growCode.forEach((l) => {
+  // THE LEFT GUARD IS ZERO-WIDTH, and it took two rounds to get there. `\b` alone captured the LAST
+  // segment of a member chain, so `state.lenses.push(x)` withdrew the bound from an unrelated
+  // top-level `lenses`. The obvious repair — a consuming class `[^.\w$)\]]` — leaked TWICE from one
+  // regex: it excluded `)` and `]`, so `if (x) LENSES.push(y)` never matched at all; and because it
+  // CONSUMES the character it inspects, under `/g` a receiver sitting right after a previous match's
+  // `(` was unreachable, so `sink.push(LENSES.push(9))` escaped. Both close with the LOOKBEHIND form
+  // this file already uses in `offendingLines`: it asserts without consuming, and it excludes only
+  // what actually makes a name a member — a dot or a name character.
+  const GROWS_RECEIVER = /(?<![.\w$])([A-Za-z_$][\w$]*)\s*\.\s*(?:push|unshift|splice)\s*\(/g
+  takeBackView.forEach((l, li) => {
     let g
     GROWS_RECEIVER.lastIndex = 0
     while ((g = GROWS_RECEIVER.exec(l))) {
@@ -955,11 +977,18 @@ function fanoutFindings(script) {
       // recorded defect, right verdict and false reason.
       if (!ok.has(g[1])) continue
       // A REMOVAL-ONLY `splice` SHRINKS. `LENSES.splice(0, 2)` takes two elements OUT, and revoking
-      // a bound for that is a denial whose stated reason — "was GROWN" — is false about the array
-      // it names. Only a 3-plus-argument splice inserts. Two args or fewer: not a growth.
+      // a bound for that is a denial whose stated reason — "was GROWN" — is false about the array it
+      // names. Only a 3-plus-argument splice inserts.
+      //
+      // TWO CORRECTIONS FROM ROUND 2, both fail-OPEN. The line was resolved by VALUE
+      // (`indexOf(l)`), so two textually identical splice lines graded the later one against the
+      // earlier one's arguments — the free `forEach` index is the whole fix. And counting top-level
+      // commas cannot see through a SPREAD, so `LENSES.splice(...more)` read as a two-argument
+      // shrink; a spread is unbounded growth, which the marked-branch veto forty lines above already
+      // says, so it is treated as growth here rather than measured.
       if (/\.\s*splice\s*\($/.test(l.slice(0, g.index + g[0].length))) {
-        const call = joinCall(growCode, growCode.indexOf(l), g.index + g[0].length - 1)
-        if (call && topLevelArgs(call.text).length < 3) continue
+        const call = joinCall(takeBackView, li, g.index + g[0].length - 1)
+        if (call && !call.text.includes('...') && topLevelArgs(call.text).length < 3) continue
       }
       ok.delete(g[1])
       markedWhy.set(g[1], `\`${g[1]}\` was GROWN by a mutation after its bounded assignment, which takes the bound back`)
@@ -986,7 +1015,8 @@ function fanoutFindings(script) {
     if (!moved) break
   }
 
-  const bad = []
+  const bad = []
+
   lines.forEach((raw, i) => {
     const l = code[i]
     if (!/\bagent\s*\(/.test(l)) return

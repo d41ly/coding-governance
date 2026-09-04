@@ -103,6 +103,37 @@ check "push-then-derive: the derived name loses its bound too → deny" 2 '{"too
 check "reassign-then-derive: the derived name loses its bound too → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nlet items = [1, 2]\nitems = allFindings\nconst groups = items.filter(Boolean) // gov:fixed-verifiers\nawait boundedParallel(groups.map((g) => () => agent(g)), MAX_VERIFIERS)"}}'
 check "derive from a source that KEEPS its bound → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nconst groups = LENSES.filter(Boolean) // gov:fixed-verifiers\nawait boundedParallel(groups.map((g) => () => agent(g)), MAX_VERIFIERS)"}}'
 
+# ---- THE FROZEN DENY CORPUS (TOOL-aWeldedTribunal-2, round 2 of the closing review) -------------
+# WHY THIS EXISTS, and it is the most useful thing in this file. The fold that fixed round 1's
+# false-DENY findings traded them for four fail-OPEN bound escapes, and this suite was 196 passed,
+# 0 failed while it happened — because every arm above pins the exact script a review reported and
+# none pins the CLASS. A green leg over a broken control is the shape the charter names, and it
+# happened here, in the file that enforces the fan-out cap.
+#
+# So: ONE GROWTH, spelled every way legal JavaScript allows, all of which must DENY. Adding a
+# spelling is one line; a view change or a regex tightening that blinds any of them reds. That is
+# the difference between gating an instance and gating a class.
+#
+# `LENSES` is bounded by its literal; each line grows it; the fan is bounded-looking and must
+# therefore be refused because the receiver is not.
+deny_growth() { # $1 = label, $2 = the mutation line
+  check "deny-corpus: $1" 2 "$(node -e '
+    const m = process.argv[1]
+    const s = "export const meta={name:\"x\",description:\"y\"}\nconst MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n"
+            + m + "\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)\n"
+    process.stdout.write(JSON.stringify({tool_name:"Workflow",tool_input:{script:s}}))' "$2")"
+}
+deny_growth "a plain push"                    'LENSES.push(x)'
+deny_growth "an unshift"                      'LENSES.unshift(x)'
+deny_growth "an inserting splice"             'LENSES.splice(0, 0, x)'
+deny_growth "a splice with a spread"          'LENSES.splice(...more)'
+deny_growth "inside a template interpolation" 'const s = `${LENSES.push(x)}`'
+deny_growth "after a closing paren"           'if (x) LENSES.push(y)'
+deny_growth "nested in another call"          'sink.push(LENSES.push(9))'
+deny_growth "after a semicolon"               'let i = 0; LENSES.push(x)'
+deny_growth "inside an arrow body"            'const f = () => LENSES.push(x)'
+deny_growth "as an expression statement"      '(LENSES.push(x))'
+
 # ---- the blanked view reports an unterminated scan (TOOL-aWeldedTribunal-3) ---------------------
 # The blanked view carries its mode ACROSS lines, correctly, because a template literal spans them.
 # That is also how one unterminated backtick blanked every line below it and the two rules reading

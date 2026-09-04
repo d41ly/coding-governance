@@ -38,3 +38,5 @@ base: 9b5ae68820500aafb32d0edde32936991472980c
 2026-09-04T19:42:34Z dispatch · item 898152f2 TOOL-aWeldedTribunal-7 · reason tools/check-wiring.sh .githooks/pre-push memory/gotchas/hookspath-resolves-into-another-checkout.md
 
 2026-09-04T20:13:44Z review · item aWeldedTribunal · reason verdict BLOCKED · blockers 8
+
+2026-09-04T20:53:02Z review · item aWeldedTribunal · reason verdict BLOCKED · blockers 6
