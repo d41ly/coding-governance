@@ -20,6 +20,7 @@ F="$HERE/unattended-build.js"
 
 same() { n=$((n+1)); if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 -- got '$2' want '$3'"; st=1; fi }
 has()  { n=$((n+1)); case "$2" in *"$3"*) echo "ok   $1" ;; *) echo "FAIL $1 -- output lacked '$3'"; st=1 ;; esac }
+hasnt_(){ n=$((n+1)); case "$2" in *"$3"*) echo "FAIL $1 -- output carried '$3' and must not"; st=1 ;; *) echo "ok   $1" ;; esac }
 
 # ---------------------------------------------------------------------------------------------
 # THE RUNNER. Evaluates the script the way its runtime does, with stub hooks that RECORD rather than
@@ -35,6 +36,11 @@ run_wf() { # args-expr · returns-expr -> prints the trace, then RESULT/THROW
     const agent = async (prompt, opts) => {
       const label = (opts && opts.label) || "(unlabelled)"
       trace.push("agent:" + label)
+      // TOOL-aStagedLane-2 - THE PROMPT IS TRACED, not just the label. The whole defect this unit
+      // closes is what the agent is TOLD to run: the unattended BUILD prompt names three driver verbs
+      // that refuse without a run-state file, and no gate downstream of here reads a prompt. A double
+      // recording only labels cannot see the difference between the two modes at all.
+      trace.push("prompt:" + label + ":" + String(prompt).replace(/\n/g, " "))
       for (const k of Object.keys(returns)) if (label.indexOf(k) === 0) return returns[k]
       return null
     }
@@ -189,6 +195,120 @@ fi
 n=$((n+1)); grep -qE "kind: ['\"]spec-audit['\"]" "$F" \
   && echo "ok   the audit prompt names kind: \"spec-audit\"" \
   || { echo "FAIL the audit prompt does not name the spec-audit kind, so tier2-review would default to diff-review"; st=1; }
+
+# ======================================================= TOOL-aStagedLane-2 — THE ATTENDED MODE
+# The two modes differ in WHAT THEY TELL THEIR AGENTS and in which driver calls they make. Both are
+# properties of the composed prompt and the call trace, which is why these arms read the trace rather
+# than a return value.
+
+# ---- AC2: the DEFAULT is unchanged. Every existing caller keeps the contract it had.
+o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"build":{"committed":["A-tB-1"],"unbuilt":[],"summary":"b"}}')
+has  "default mode: the round IS recorded through the driver" "$o" "agent:audit:record"
+has  "default mode: the BUILD prompt still names --dispatch" "$o" "--dispatch"
+has  "default mode: reaches BUILD" "$o" "agent:build:tB"
+
+# ---- AC1: attended mode reaches BUILD and spawns NO recorder agent.
+A_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"READY"}]}'
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":["A-tB-1"],"unbuilt":[],"summary":"b"}}')
+has   "attended: reaches the build stage" "$o" "agent:build:tB"
+hasnt_ "attended: no round is recorded through the driver" "$o" "agent:audit:record"
+has   "attended: it SAYS the round was not recorded" "$o" "no round was recorded"
+
+# ---- AC8: the BUILD prompt drops the verbs that refuse without a run-state file — AND still carries
+# ---- the surrounding instruction. The paired positive is the point: an absence assertion passes just
+# ---- as well when the whole clause is empty.
+hasnt_ "attended prompt: no --dispatch INSTRUCTION" "$o" "--dispatch tB"
+# The verbs are NAMED in the attended prompt, to say they are unavailable. The assertion must
+# therefore target the INSTRUCTION form `--brief <slug>`, not the word — an absence arm aimed at
+# the word fails on the sentence explaining the absence.
+hasnt_ "attended prompt: no --brief INSTRUCTION" "$o" "--brief tB"
+has   "attended prompt: the per-unit build instruction SURVIVES" "$o" "BUILD every unit below, ONE AT A TIME"
+has   "attended prompt: it says why the verbs are absent" "$o" "recording verbs are unavailable"
+
+# ---- AC9: no agent is told it holds a mandate. In this repo a mandate IS the authority to merge and
+# ---- push with no owner turn, so the unattended preamble is a falsehood in attended mode.
+hasnt_ "attended preamble: the word 'mandate' does not reach any agent" "$o" "under a mandate"
+has   "attended preamble: it says an owner is in the loop" "$o" "OWNER in the loop"
+
+# ---- AC10: both live verdict branches. A branch mapping a positive count to terminal would reach
+# ---- BUILD over open blockers and satisfy every other criterion here.
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":2,"report":"r.md"}}')
+has   "attended, 2 blockers: CONVERGING" "$o" "CONVERGING"
+hasnt_ "attended, 2 blockers: BUILD is NOT reached" "$o" "agent:build:tB"
+
+# ---- AC3: a null blocker count REFUSES in attended mode too. tier2-review.js yields null on its
+# ---- degraded paths BY DESIGN, and reading it as 0 would make every degraded audit look clean.
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":null,"report":"r.md"}}')
+has  "attended, null blockers: REFUSES" "$o" "THROW"
+has  "attended, null blockers: names the degraded return" "$o" "DEGRADED"
+
+# ---- AC4: a FORKED unit refuses, and the message names both the id and the state. The bare token is
+# ---- supplied directly: --plan rewrites a terminal unit's grade to `DONE (FORKED)`, so a bare FORKED
+# ---- and a real closed build's roster are jointly unsatisfiable.
+F_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"FORKED"}]}'
+o=$(run_wf "$F_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+has  "attended, FORKED unit: refuses" "$o" "THROW"
+has  "attended, FORKED unit: names the id" "$o" "A-tB-1"
+has  "attended, FORKED unit: names the state" "$o" "FORKED"
+
+# ---- AC11: the terminal-unit SKIP, with the vocabulary --plan actually emits. `DONE (FORKED)` is
+# ---- what a closed build reports for a unit whose underlying grade was not READY, and a five-token
+# ---- allow-list halts on it — round-1's halt-at-unit-one, for the third time.
+D_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE (FORKED)"},{"id":"A-tB-2","order":2,"specPath":"s2","planState":"DONE"}]}'
+o=$(run_wf "$D_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
+has  "attended, DONE (FORKED): SKIPPED, not refused" "$o" "SKIPPING 2 terminal unit"
+has  "attended, terminal units: still reaches BUILD" "$o" "agent:build:tB"
+
+# ---- AC13: a state outside every arm refuses BY NAME. Neither building nor skipping an unknown state
+# ---- is safe, and this vocabulary has been mis-transcribed twice already.
+X_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"WOBBLE"}]}'
+o=$(run_wf "$X_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+has  "attended, unknown state: refuses" "$o" "THROW"
+has  "attended, unknown state: names the value it did not recognise" "$o" "WOBBLE"
+
+# ---- AC12: a missing planState refuses rather than defaulting. A defaulted state puts the refusal
+# ---- predicate to work on a value nobody supplied.
+M_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1"}]}'
+o=$(run_wf "$M_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+has  "attended, no planState: refuses" "$o" "THROW"
+has  "attended, no planState: names the field" "$o" "planState"
+
+# ---- AC14: the FRESH-BUILD path. A unit stage 1 authors reports MISSING at entry — there is no point
+# ---- between the stages at which a caller could re-run --plan — so the entry-time value is stale by
+# ---- construction and the stage must not refuse the build it just specced.
+N_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"MISSING"}]}'
+o=$(run_wf "$N_UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":["A-tB-1"],"unbuilt":[],"summary":"b"}}')
+has  "attended, unit specced THIS invocation: builds despite entry-time MISSING" "$o" "agent:build:tB"
+# and the control: the same MISSING state, NOT specced by stage 1, must still refuse.
+o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":["A-tB-1"],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+has  "attended, MISSING and NOT specced: still refuses" "$o" "THROW"
+
+# ---- S1: the mode is a CLOSED pair. A typo must not fall back to a default that hands the caller
+# ---- fewer checks than they asked for.
+B_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attnded","units":[{"id":"A-tB-1","order":1}]}'
+o=$(run_wf "$B_UNITS" '{}')
+has  "bad mode: refuses rather than defaulting" "$o" "THROW"
+has  "bad mode: names the closed set" "$o" "unattended, attended"
+
+# ---- S7: the warning depends on a CALLER-SUPPLIED fact, because this script has no filesystem. A
+# ---- caller that supplies nothing gets no warning, which is a hole the header names rather than one
+# ---- a reader has to infer.
+W_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","runStateExists":true,"subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"READY"}]}'
+o=$(run_wf "$W_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":["A-tB-1"],"unbuilt":[],"summary":"b"}}')
+has  "attended + run-state file: WARNS" "$o" "WARNING: attended mode was requested"
+has  "attended + run-state file: names the slug" "$o" "tB"
+has  "attended + run-state file: CONTINUES to build" "$o" "agent:build:tB"
+
+# ---- AC6: the header names all five losses separately, and does not conflate a record with a
+# ---- refusal. Asserted over the file's own text, which is where the honesty statement lives.
+HDR=$(sed -n '1,110p' "$F")
+has "header: names the --review round record" "$HDR" "ROUND RECORD"
+has "header: names dispatch's order refusal" "$HDR" "ORDER REFUSAL"
+has "header: names dispatch's write-set record" "$HDR" "WRITE-SET RECORD"
+has "header: names --brief" "$HDR" "--brief"
+has "header: names --rescope" "$HDR" "--rescope"
+has "header: says M4's disposal clause is unreachable attended" "$HDR" "UNREACHABLE HERE"
+has "header: says the S7 warning is caller-supplied, not detected" "$HDR" "DEPENDS ON THE CALLER AND NOT ON DETECTION"
 
 echo "--- $n arms, exit $st"
 exit $st

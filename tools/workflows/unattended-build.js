@@ -27,6 +27,35 @@ export const meta = {
 // history` leg refuses a unit whose build commit predates its spec. A stage in this file claiming to
 // VERIFY the tree would be the could-not-fail shape this repo names.
 //
+// ---------------------------------------------------------------------------------------------
+// ATTENDED MODE — WHAT IT BUYS AND WHAT IT LOSES (TOOL-aStagedLane-2)
+//
+// A CLOSED PAIR, DEFAULTING TO `unattended`, so every existing caller is unchanged and none has
+// to be migrated. Making `attended` the default would silently weaken all of them.
+//
+// WHAT ATTENDED MODE BUYS: the STAGE ORDER, which is JS control flow and does not touch the
+// driver at all. That is the property this harness exists to provide, and it is the whole of what
+// survives without a run-state file.
+//
+// WHAT IT LOSES — five things, and they are NOT all refusals, which is why they are listed apart:
+//   1. the `--review` ROUND RECORD. Nothing records that an audit round happened; the review
+//      artifact under the build's reviews folder is the only trace, and nothing here refuses a run
+//      that never files one.
+//   2. `--dispatch`'s ORDER REFUSAL — the tree-reading check that a unit is not MISSING, THIN or
+//      out of order. What replaces it is weaker BY CONSTRUCTION: an agent's claim about a state
+//      the caller resolved, not a refusal the driver made against the tree.
+//   3. `--dispatch`'s WRITE-SET RECORD. No declaration of what a pass will write exists.
+//   4. `--brief`'s record of what each pass was handed.
+//   5. `--rescope`'s amendment row.
+//
+// AND M4's BLOCKER-DISPOSAL CLAUSE IS UNREACHABLE HERE. `disposal` below is composed only for a
+// non-CONVERGED verdict, and attended mode reaches BUILD only at zero blockers, which is the
+// terminal one. So a run that must PROMOTE a standing blocker has no route through this mode.
+//
+// THE S7 WARNING DEPENDS ON THE CALLER AND NOT ON DETECTION. A workflow script has no filesystem,
+// so this file cannot see whether a run-state file exists; `runStateExists` is a fact the caller
+// supplies, and a caller that supplies nothing gets NO WARNING. That is a real hole and it is
+// named here rather than left for a reader to assume away.
 // IT DOES NOT COVER orientation, preflight, the owner turn, closing, landing or the keepalive. Those
 // are main-loop acts by construction: the scheduling store is in-memory and session-scoped, and
 // `--close` and `--landed` run after this returns.
@@ -124,6 +153,30 @@ if (!units.length) {
 }
 const roundNo = Number.isInteger(a.round) && a.round > 0 ? a.round : 1
 
+// TOOL-aStagedLane-2 — the mode argument. What each mode buys and loses is in this file's
+// HEADER, above, because that is where a reader looking for the honesty statement goes.
+const MODES = ['unattended', 'attended']
+const mode = a.mode === undefined ? 'unattended' : a.mode
+if (MODES.indexOf(mode) === -1) {
+  throw new Error(
+    'unattended-build: `mode` must be one of ' + MODES.join(', ') + ', got ' + JSON.stringify(a.mode) +
+      '. Refusing rather than defaulting: the mode selects which refusals run, so a typo that fell\n' +
+      'back to a default would hand the caller fewer checks than they asked for.',
+  )
+}
+const attended = mode === 'attended'
+// S7 - warn and continue, which is the owner's ruling AGAINST this file's own recommendation to
+// refuse. A run under a mandate does not get to opt out of the mandate's enforcement by passing an
+// argument, but the owner ruled that saying so loudly beats refusing.
+if (attended && a.runStateExists === true) {
+  log(
+    'WARNING: attended mode was requested for `' + slug + '`, and the caller reports a run-state ' +
+      'file EXISTS for it. Continuing, but these are skipped: the --review round record, ' +
+      "--dispatch's order refusal and write-set record, --brief's record, and --rescope's " +
+      'amendment row. If this run is under a mandate, it is now weaker than the mandate requires.',
+  )
+}
+
 const DRIVER = 'bash tools/unattended/unattended.sh'
 const ordered = units.slice().sort(function (x, y) {
   const ox = Number.isInteger(x.order) ? x.order : 1e9
@@ -218,11 +271,19 @@ const BUILD_SCHEMA = {
   },
 }
 
+// S4c - MODE-AWARE, and this is not cosmetic. In this repository a mandate is precisely the
+// authority to merge and push with no owner turn, so a preamble telling an attended run's agents
+// they hold one is a falsehood this file would otherwise manufacture — and it prefixed EVERY agent
+// in both stages.
 const GROUND =
-  'You are one stage of a harnessed unattended build in the repository at ' + repo + '. ' +
+  'You are one stage of a harnessed ' + (attended ? 'ATTENDED' : 'unattended') + ' build in the ' +
+  'repository at ' + repo + '. ' +
   'Read `memory/guides/BUILD-METHOD.md` WHOLE before acting; it is the procedure you are bound by. ' +
   'The build is `' + slug + '` and its record is `memory/builds/' + slug + '/`. ' +
-  'Speak only in your return value: nobody reads a transcript under a mandate. '
+  (attended
+    ? 'There is an OWNER in the loop: this run holds no mandate, and the driver\'s recording verbs ' +
+      'are unavailable because there is no run-state file to record against. '
+    : 'Speak only in your return value: nobody reads a transcript under a mandate. ')
 
 // ============================================================== STAGE 1 — SPEC
 phase('Spec')
@@ -385,7 +446,22 @@ if (!lastReport) {
 // THE ROUND IS RECORDED BY THE DRIVER, and the driver's answer is the verdict. An agent runs it
 // because a workflow script has no shell; what the agent may NOT do is invent the token, so it is
 // told to return the driver's own output verbatim and the enum below refuses anything else.
-const rv = await agent(
+// S2/S3 - IN ATTENDED MODE THE DRIVER IS NOT REACHED, so no agent is spawned to record the round.
+// The verdict is computed from the blocker count alone: 0 is terminal, a positive integer is
+// converging. That is a PER-ROUND verdict and not the driver's SEQUENCE-derived one — convergence
+// is a property of the sequence of rounds and no JS here can see it — so the tokens are the two
+// this mode can honestly produce and no more.
+//
+// `CONVERGED` AT ZERO IS THE ONLY TERMINAL THIS MODE HAS. `NON-CONVERGENT` and `CEILING` are
+// sequence verdicts, so a run needing M4's blocker disposal cannot get one here, which is what the
+// header means by the disposal clause being unreachable.
+//
+// The non-integer case is already refused above, in BOTH modes, and must stay so: `tier2-review.js`
+// yields `blockers: null` on its degraded paths BY DESIGN, and reading null as 0 would make every
+// degraded audit look clean.
+const rv = attended
+  ? { token: auRaw.blockers === 0 ? 'CONVERGED' : 'CONVERGING', exitCode: 0 }
+  : await agent(
   GROUND +
     'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
     'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + slug + '-spec-set' +
@@ -397,6 +473,7 @@ const rv = await agent(
     'command fails, return its stderr rather than a token.',
   { label: 'audit:record:r' + roundNo, phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
 )
+if (attended) log('attended mode: verdict computed from the blocker count; no round was recorded')
 if (!rv || typeof rv.token !== 'string') {
   throw new Error(
     'unattended-build: the round was not recorded at round ' + roundNo + ' (driver said: ' +
@@ -482,6 +559,67 @@ const disposal =
       're-reviewed. Report what you did with each. '
 phase('Build')
 log('build stage: ' + ordered.length + ' unit(s), one at a time, each from its brief and its spec')
+// S4/S4b - THE PER-UNIT REFUSAL, and in attended mode it happens HERE rather than at `--dispatch`.
+// Three verbs the unattended prompt names hard-refuse without a run-state file — `--dispatch`
+// (fail 49), `--brief` (fail 49) and `--rescope` (fail 48) — and the prompt tells the agent that a
+// refusal means the order is wrong and to STOP. Left unchanged, attended mode would halt at unit
+// one AFTER units were already being written: strictly worse than the refusal it traded away.
+//
+// THE STATE COMES FROM THE CALLER, resolved ONCE from `--plan` at entry, because this script has
+// no shell and there is no point between the stages at which a caller could re-run it.
+//
+// MATCHED AS A PREFIX ON `DONE`, never against a closed token set. `--plan` prints `DONE ($state)`
+// for a terminal unit whose underlying grade is not READY, so the live vocabulary includes
+// `DONE (THIN)` and `DONE (FORKED)`. A five-token allow-list halts on the first such unit.
+//
+// AND THE ENTRY-TIME VALUE IS STALE BY CONSTRUCTION for the units stage 1 authors: a fresh build
+// reports MISSING for every one of them. So a unit this invocation SPECCED is treated as READY
+// whatever it reported at entry — otherwise the stage refuses the build it just specced.
+const speccedNow = []
+  .concat(Array.isArray(specced.authored) ? specced.authored : [])
+  .concat(Array.isArray(specced.alreadyPresent) ? specced.alreadyPresent : [])
+let planRefusal = ''
+const skippedDone = []
+if (attended) {
+  for (const u of ordered) {
+    if (speccedNow.indexOf(u.id) !== -1) continue
+    const st = u.planState
+    if (typeof st !== 'string' || !st) {
+      planRefusal =
+        'unattended-build: attended mode requires a `planState` on every units[] entry, resolved by ' +
+        'the caller from `' + DRIVER + ' --plan ' + slug + '`, and ' + u.id + ' carries none. ' +
+        'Refusing rather than defaulting: a defaulted state puts the refusal predicate to work on a ' +
+        'value nobody supplied.'
+      break
+    }
+    if (st.indexOf('DONE') === 0) { skippedDone.push(u.id); continue }
+    if (st === 'READY') continue
+    if (st === 'MISSING' || st === 'THIN' || st === 'FORKED') {
+      planRefusal =
+        'unattended-build: attended mode refuses ' + u.id + ' — `--plan` grades it ' + st + ', and ' +
+        'this stage builds only a unit that is READY or already terminal. This is the refusal ' +
+        '`--dispatch` would have made against the tree; here it is a claim about a state the caller ' +
+        'resolved, which is weaker.'
+      break
+    }
+    planRefusal =
+      'unattended-build: attended mode does not recognise the state ' + JSON.stringify(st) + ' for ' +
+      u.id + '. Neither building nor skipping an unknown state is safe, so it refuses by name.'
+    break
+  }
+  if (planRefusal) throw new Error(planRefusal)
+  if (skippedDone.length) log('attended mode: SKIPPING ' + skippedDone.length + ' terminal unit(s) — ' + skippedDone.join(', '))
+}
+const driverSteps = attended
+  ? 'This run has NO run-state file, so the driver\'s recording verbs are unavailable and you must ' +
+    'not call them: --dispatch, --brief and --rescope all refuse without one. Write down the paths ' +
+    'each pass will touch before you touch them anyway — the declaration is what makes disjointness ' +
+    'checkable, and here only you can check it. '
+  : 'Before writing, declare the write set with `' + DRIVER + ' --dispatch ' + slug +
+    ' --pass <unit-id> --writes <path>`, and record what you were handed with `' + DRIVER +
+    ' --brief ' + slug + ' --unit <unit-id> --path <the brief>`. THAT DISPATCH IS THE ORDER GATE: it ' +
+    'refuses a unit that is MISSING, THIN or out of the declared order, and a refusal is this ' +
+    'harness telling you the order is wrong. Read it and stop — do not work around it. '
 const built = await agent(
   GROUND +
     disposal +
@@ -490,11 +628,7 @@ const built = await agent(
     'For each unit you are handed exactly two documents and you read both before touching code: its ' +
     'BRIEF and its SPEC, both named in the roster. The spec is the design; where you must diverge ' +
     'from it, CHANGE THE SPEC FIRST as a `rev-N` bump with its section 9 line, then write the code. ' +
-    'Before writing, declare the write set with `' + DRIVER + ' --dispatch ' + slug +
-    ' --pass <unit-id> --writes <path>`, and record what you were handed with `' + DRIVER +
-    ' --brief ' + slug + ' --unit <unit-id> --path <the brief>`. THAT DISPATCH IS THE ORDER GATE: it ' +
-    'refuses a unit that is MISSING, THIN or out of the declared order, and a refusal is this ' +
-    'harness telling you the order is wrong. Read it and stop — do not work around it. ' +
+    driverSteps +
     'Commit at the end of each pass with the unit id in the subject, then run ' +
     '`python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` and act on what it names before ' +
     'the next unit begins. NAME every unit you did not commit, in `unbuilt`, and why.',
@@ -513,6 +647,7 @@ const unbuilt = Array.isArray(built.unbuilt) ? built.unbuilt : []
 // count below is carried OUT of this harness rather than left in a log nobody reads.
 return {
   slug: slug,
+  mode: mode,
   base: base,
   round: roundNo,
   units: ordered.length,
@@ -521,6 +656,7 @@ return {
   verdict: verdict,
   blockers: au.blockers,
   lastReport: lastReport,
+  skippedTerminal: skippedDone,
   built: Array.isArray(built.committed) ? built.committed.length : 0,
   unbuilt: unbuilt,
   note:

@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 92a6f7fc31ba8c747cb0cfa74386bec2ae9eda83
+witness: 8e508e65d5e3b7e7996b80b0c687c9d00fcbc4cb
 phase: BUILDING
 mode: slug
 anchor-kind: default-branch
@@ -34,3 +34,5 @@ base: c4fcf5add1d0a553097f9eef70935a056896cf16
 2026-09-04T20:51:00Z review · item aStagedLane-spec-set · reason verdict BLOCKED · blockers 3 · NON-CONVERGENT · disposition fold
 
 2026-09-04T20:54:12Z dispatch · item 92a6f7fc TOOL-aStagedLane-1 · reason tools/unattended/check-pass-order.sh tools/unattended/check-pass-order.test.sh tools/unattended/run-unattended-gates.sh tools/gate-legs.json memory/project/pass-order-waiver.txt .memory-tree.conf
+
+2026-09-04T22:03:04Z dispatch · item 8e508e65 TOOL-aStagedLane-2 · reason tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh
