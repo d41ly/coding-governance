@@ -67,11 +67,82 @@ GOVKIT = HERE / "govkit.py"
 FAILURES: list[str] = []
 
 
+# ============================ DEPL-dSealedTally-5 — THE GOV VINTAGE PIN ========================
+# The suite's real-root `update` invocations defaulted to `--to HEAD`, and `demand_published_vintage`
+# refuses a commit no ref contains. On a `--no-ff` merge made on a detached head -- which is what the
+# merge protocol asks a run to produce, and where it asks for a gate -- that refused 46 arms. The
+# suite was grading the SHAPE OF THE HEAD rather than the tree it was handed.
+#
+# TREE IDENTITY IS THE ACCEPTANCE CONDITION, not mere ref-reachability. Measured on a scratch repo
+# holding a detached merge: parent^1 was ref-reachable and carried the WRONG tree, parent^2 carried
+# the right one. `HEAD^` picks the first, so a "nearest ref-reachable ancestor" rule grades the
+# pre-merge tree and reports on something nobody asked about.
+def _gov_git(root, *args: str) -> str:
+    return subprocess.run(["git", "-C", str(root), *args],
+                          capture_output=True, text=True).stdout.strip()
+
+
+def resolve_gov_pin(root) -> str:
+    """A ref-reachable commit whose TREE is the one under test, or a named refusal.
+
+    TAKES A ROOT so an arm can drive it against a scratch repository. A resolver that can
+    only ever be asked about the real checkout has no negative case anything can reach, and
+    S3's refusal would be a branch nothing exercises.
+    """
+    _tree = _gov_git(root, "rev-parse", "HEAD^{tree}")
+    if _gov_git(root, "for-each-ref", "--contains", "HEAD", "--count=1"):
+        return _gov_git(root, "rev-parse", "HEAD")
+    for _p in _gov_git(root, "rev-parse", "HEAD^@").split():
+        if (_gov_git(root, "rev-parse", _p + "^{tree}") == _tree
+                and _gov_git(root, "for-each-ref", "--contains", _p, "--count=1")):
+            return _p
+    # S3. A REFUSAL, NEVER A FALLBACK TO HEAD. Falling back is what makes a broken derivation
+    # indistinguishable from a working one, which is the class this whole build drains.
+    raise SystemExit(
+        "govkit-selftest: no ref-reachable commit carries this working tree, so the vintage the "
+        "suite would hand `update` is one `demand_published_vintage` refuses. Commit or branch "
+        "this tree and re-run; the suite will not grade it against a vintage nothing published.")
+
+
+GOV_PIN = resolve_gov_pin(HERE.parents[1])
+GOV_HEAD = _gov_git(HERE.parents[1], "rev-parse", "HEAD")
+print(f"govkit-selftest: gov vintage pin {GOV_PIN[:12]} "
+      f"({'HEAD' if GOV_PIN == GOV_HEAD else 'a ref-reachable ancestor with this tree'})")
+
+
+def repin_receipt(argv: list[str]) -> None:
+    """S4. `apply` has no vintage argument, so the FIXTURE stamps the receipt at the pin.
+
+    `_cmd_apply` hardcodes `git rev-parse HEAD`, and `main` dispatches it with no `TO_REV`. Giving it
+    one would add a public surface to a product verb, which is an owner turn this run cannot take.
+    Without the rewrite, a receipt applied at a detached HEAD and then updated to an ancestor pin is
+    refused by `demand_forward_vintage` as a downgrade -- so AC1 would be unsatisfiable.
+    """
+    if GOV_PIN == GOV_HEAD or "--target" not in argv:
+        return
+    _rp = pathlib.Path(argv[argv.index("--target") + 1]) / ".governance" / "install.json"
+    if not _rp.is_file():
+        return
+    _d = json.loads(_rp.read_text(encoding="utf-8"))
+    if _d.get("gov_commit"):
+        _d["gov_commit"] = GOV_PIN
+        _rp.write_text(json.dumps(_d, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+
 def run(*args: str, cwd: pathlib.Path | None = None) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        [sys.executable, str(GOVKIT), *args],
+    # S1. THE PIN IS THREADED HERE, for the verbs that accept one and only when the caller
+    # did not pass its own. Eleven call sites carry a deliberate per-fixture vintage and a
+    # blanket pin would clobber what those arms grade.
+    _argv = list(args)
+    if _argv and _argv[0] in ("update", "adopt") and "--to" not in _argv:
+        _argv += ["--to", GOV_PIN]
+    _p = subprocess.run(
+        [sys.executable, str(GOVKIT), *_argv],
         capture_output=True, text=True, cwd=str(cwd) if cwd else None,
     )
+    if _argv and _argv[0] == "apply" and _p.returncode == 0:
+        repin_receipt(_argv)
+    return _p
 
 
 def _extract_plan_rows(out: str) -> list[tuple[str, str]]:
@@ -383,7 +454,10 @@ def main() -> int:
         p = run("apply", "--target", str(cm), "--kits", "codebase-map")
         rec = json.loads((cm / ".governance" / "install.json").read_text(encoding="utf-8"))
         govroot = HERE.parents[1]
-        idx_of = lambda q: subprocess.run(["git", "-C", str(govroot), "show", f"HEAD:{q}"],
+        # S5. AT THE PIN, not at HEAD: a pinned `update` writes the PIN's bytes, so an arm
+        # comparing against HEAD reds on a correct fix whenever the two differ.
+        idx_of = lambda q: subprocess.run(
+            ["git", "-C", str(govroot), "show", f"{GOV_PIN}:{q}"],
                                           capture_output=True).stdout
         landed = (cm / "tools" / "codebase-map" / "map_extractors.py").read_bytes()
         check("the carved destination carries the TEMPLATE's bytes",
@@ -576,14 +650,16 @@ def main() -> int:
 
         # AC2 — --write takes gov's new bytes, and they are the INDEX's at the new commit.
         p = run("update", "--target", str(up), "--write")
+        # S5. AT THE PIN, for the reason `idx_of` above carries.
         head_bytes = subprocess.run(["git", "-C", str(govroot), "show",
-                                     "HEAD:tools/check-wiring.sh"], capture_output=True).stdout
+                                     f"{GOV_PIN}:tools/check-wiring.sh"],
+                                    capture_output=True).stdout
         check("update --write brings a stale engine file to the new commit's bytes",
               (up / "tools" / "check-wiring.sh").read_bytes() == head_bytes, "")
         rec = json.loads((up / ".governance" / "install.json").read_text(encoding="utf-8"))
         check("and re-stamps the receipt at the new commit",
               rec["gov_commit"] == subprocess.run(
-                  ["git", "-C", str(govroot), "rev-parse", "HEAD"],
+                  ["git", "-C", str(govroot), "rev-parse", GOV_PIN],
                   capture_output=True, text=True).stdout.strip(), rec["gov_commit"])
         p = run("update", "--target", str(up))
         check("a second update over the same target reports current",
@@ -2624,7 +2700,11 @@ user_skills = "/tmp/gk-fake-skills"
         _race = None
         for _attempt in range(3):
             _first = subprocess.Popen(
-                [sys.executable, str(GOVKIT), "update", "--target", str(cc), "--write"],
+                # S1. THE SECOND THREADING SITE. This one does not go through `run()`, so
+                # threading `run()` alone would leave a real-root `update` unpinned and AC1
+                # unreachable by S1's own mechanism.
+                [sys.executable, str(GOVKIT), "update", "--target", str(cc), "--write",
+                 "--to", GOV_PIN],
                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             _deadline = time.time() + 30
             while time.time() < _deadline and not _lk.exists() and _first.poll() is None:
@@ -5019,6 +5099,64 @@ user_skills = "/tmp/gk-fake-skills"
               len({GK9.paths_never_lost(_b3, _a3, []),
                    GK9.paths_never_lost(_b2, _a2, ["moved.txt"])}) == 2,
               "the table is single-valued and proves nothing")
+
+        # ---- DEPL-dSealedTally-5. THE GOV VINTAGE PIN ------------------------------------------
+        # AC3: the liveness assertion, and it carries TWO conditions because either alone is
+        # satisfied by a silently-defaulted HEAD. Tree identity is what makes the pin grade the tree
+        # under test; ref-reachability is what makes `demand_published_vintage` accept it.
+        check("[-ST5] AC3 LIVENESS the pin's tree IS the working tree's, so it grades THIS tree",
+              _gov_git(HERE.parents[1], "rev-parse", GOV_PIN + "^{tree}")
+              == _gov_git(HERE.parents[1], "rev-parse", "HEAD^{tree}"),
+              f"pin {GOV_PIN}")
+        check("[-ST5] AC3 LIVENESS ...and some ref contains it, which is what the published-vintage "
+              "guard demands",
+              _gov_git(HERE.parents[1], "for-each-ref", "--contains", GOV_PIN, "--count=1") != "",
+              f"pin {GOV_PIN} is reachable from no ref")
+
+        # AC4: the refusal, driven against a scratch repository holding a detached commit no ref
+        # contains -- the state the resolver exists for -- rather than asserted from a docstring.
+        _pinrepo = tmp / "st5-norefs"
+        _pinrepo.mkdir(parents=True, exist_ok=True)
+        (_pinrepo / "a.txt").write_text("a", encoding="utf-8", newline="\n")
+        git(_pinrepo, "init", "-q", "-b", "main")
+        git(_pinrepo, "config", "user.email", "t@e")
+        git(_pinrepo, "config", "user.name", "t")
+        git(_pinrepo, "add", "-A")
+        git(_pinrepo, "commit", "-qm", "base")
+        git(_pinrepo, "checkout", "-q", "--detach", "HEAD")
+        (_pinrepo / "b.txt").write_text("b", encoding="utf-8", newline="\n")
+        git(_pinrepo, "add", "-A")
+        git(_pinrepo, "commit", "-qm", "a commit no ref contains")
+        _refused5 = ""
+        try:
+            resolve_gov_pin(_pinrepo)
+        except SystemExit as _e5:
+            _refused5 = str(_e5)
+        check("[-ST5] AC4 a tree no ref-reachable commit carries is REFUSED, never defaulted to HEAD",
+              _refused5 != "", "resolve_gov_pin returned instead of refusing")
+        check("[-ST5] AC4 ...and the refusal names the remedy rather than only the fault",
+              "re-run" in _refused5 and "branch" in _refused5, _refused5)
+        git(_pinrepo, "branch", "-f", "pinned", "HEAD")
+        check("[-ST5] AC4 LIVENESS ...while giving that same commit a ref makes it RESOLVE, so the "
+              "refusal grades reachability rather than the fixture",
+              resolve_gov_pin(_pinrepo) == _gov_git(_pinrepo, "rev-parse", "HEAD"), "")
+
+        # AC5: the population that must NOT be re-pointed, counted by an ANCHORED match. The
+        # unanchored form matches `gov_run(` too and returns 9, which is the miscount an earlier
+        # revision of this unit's spec shipped as a fact.
+        _suite_src = pathlib.Path(__file__).read_text(encoding="utf-8")
+        _own_to = 0
+        for _ln in _suite_src.splitlines():
+            _k = _ln.find("run(")
+            while _k != -1:
+                _pre = _ln[_k - 1] if _k else " "
+                if not (_pre.isalnum() or _pre == "_") and '"--to"' in _ln[_k:]:
+                    _own_to += 1
+                    break
+                _k = _ln.find("run(", _k + 1)
+        check("[-ST5] AC5 the invocations carrying their OWN --to are unchanged in number",
+              _own_to == 4, f"found {_own_to}, expected 4 -- a widened pin re-points a fixture")
+
         # F9 IS REAL AND MY FIRST FIX FOR IT WAS WRONG. The reviewer is right that a count is no
         # longer a fair proxy for the set: a regression deleting one tracked file and landing one
         # in the same run satisfies `after >= before`. But `set(before) <= set(after)` is NOT the
