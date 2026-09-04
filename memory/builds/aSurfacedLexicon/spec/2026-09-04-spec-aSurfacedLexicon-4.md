@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-4 — the CELLS and PINS declaration grammar
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base d0a18683 · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -96,9 +96,10 @@ themselves, which is one expression and no new contract.
 The two cross-block refusals in S5 run after the whole file is parsed, because `LANGS` may be
 declared below `CELLS` and a reader that refuses on line order refuses a legal file.
 
-Row SEPARATION inside the `PINS` block is a merge property rather than a formatting preference, and
-which separation ships is fork F1. The reader is indifferent either way: blank lines inside a block
-are skipped rather than treated as terminators, verified at `lexicon_conf.py:72-75`.
+Row SEPARATION inside the `PINS` block is a merge property rather than a formatting preference. Fork
+F1 is ratified as option (c), one blank line between rows. The reader is indifferent either way:
+blank lines inside a block are skipped rather than treated as terminators, verified at
+`lexicon_conf.py:72-75`.
 
 ### Inventory
 
@@ -150,7 +151,7 @@ parsing. The unit that deletes `LAYERS` owns that breakage, which is why this on
 | `tools/lexicon/lexicon.py` | call `check_declaration` from the declaration-validation path so S5's refusals reach a verdict |
 | `tools/lexicon/selftest.py` | red and green fixtures per refusal in S3, S4 and S5, plus the merge arm of AC5 |
 | `tools/gate-legs.json` | one guard entry (S8) |
-| `.gitattributes` | one line, only under fork F1 option (b) |
+| `.gitattributes` | NOT touched — F1 ratified option (c), which changes nothing outside `.lexicon.conf` |
 | `tools/lexicon/README.md` | the block grammar paragraph |
 
 ESTIMATE, and marked as one because nothing comparable ships: no case-style or matrix declaration
@@ -221,9 +222,17 @@ membership test at `:67`, not the regex.
 - **AC5** — When two branches off one base each drain a different pin row and are merged, `git merge`
   exits 0 with no conflict markers in `.lexicon.conf`, including for two ADJACENT cells. This is a
   standing selftest arm that performs the merge, not a one-time observation, so an edit that removes
-  the separation F1 chose reds it. Measured on this worktree with today's dense block and no
-  attribute set, the adjacent case exits 1 with one conflict marker while a four-row separation exits
-  0; under F1 option (c) the adjacent case exits 0.
+  the separation F1 chose reds it. **The measurement is UNVERIFIABLE against the live declaration and
+  says so**: `grep -n "PINS" .lexicon.conf` returns nothing, so there is no dense block in the tree
+  today and the arm and every figure behind it run over a SYNTHESIZED block. With that block dense
+  and no attribute set, the adjacent case exits 1 with one conflict marker while a four-row
+  separation exits 0; under F1 option (c) the adjacent case exits 0.
+- **AC5's scope limit, written rather than left implicit.** This criterion covers DRAIN against DRAIN
+  only. A drain against an INSERTION after the same row still exits 1 with one conflict marker under
+  option (c), measured on the same synthesized block, and insertion is the shape every cell-arming
+  commit produces and the shape §3 hands to `TOOL-aSurfacedLexicon-7` when it emits the whole `PINS`
+  block. No insert arm is owed here. The obligation this unit hands off instead is that whichever
+  unit emits the block emits it blank-separated, so no cell-arming commit ever authors a dense pair.
 - **AC6** — When a `PINS` row names a cell with no `CELLS` row, `python tools/lexicon/lexicon.py
   --check` REDS naming that cell; when the `CELLS` row is added it greens.
 - **AC7** — When a commit touches only `.lexicon.conf`, `bash tools/run-gates/run-gates.sh` runs the
@@ -261,23 +270,28 @@ membership test at `:67`, not the regex.
 
 **F1 — what actually makes two branches draining different cells merge clean?**
 
-The Q2 ruling names the mitigation as already present: "The `PINS:` block is ROW-SHAPED — one row per
-cell — so it reconciles under this repo's existing `merge.rows.driver` the way the backlogs do."
-Verified against source at writing time, that mitigation does not exist as shipped, in two
-independent ways.
+Q2's ruling was first written with a merge-driver mitigation named as already present. **That
+mitigation was RETRACTED by the owner-rulings record itself, in its own voice, before this spec was
+written.** The record's Q2 override paragraph withdraws the claim, states that it was reasoning from
+a shape rather than from the attribute, and re-derives the result independently: what buys the
+concurrency property is git's ordinary text merge over SEPARATED rows, not a driver. It then routes
+the separation options here as this unit's fork. This spec inherits that retraction rather than
+discovering it, and what follows is the re-verification, not the finding.
 
-First, `git check-attr merge -- .lexicon.conf` reports `unspecified`. The `merge=rows` attribute is
-declared only for `memory/DECISIONS.md` and `memory/backlog/*.md`. Second, the driver's partition
-predicate is `_ROW_RE = re.compile(r"^\s*[-*]\s")` at `tools/memory-tree/merge-rows.py:252`, which
-matches a markdown bullet. An indented conf row such as `  py.file.conv 7` is classified as
-STRUCTURE, not as a row, so even with the attribute set the driver would hand those lines to
-`git merge-file` positionally. Its key extractor `_ID_RE` at `:271` wants a decision-id shape a pin
-row does not carry either.
+The two source facts the retraction rests on, re-checked here rather than taken on trust.
+`git check-attr merge -- .lexicon.conf` reports `unspecified`: the `merge=rows` attribute is declared
+only for `memory/DECISIONS.md` and `memory/backlog/*.md`. And the driver's partition predicate is
+`_ROW_RE = re.compile(r"^\s*[-*]\s")` at `tools/memory-tree/merge-rows.py:252`, which matches a
+markdown bullet, so an indented conf row such as `  py.file.conv 7` is classified as STRUCTURE rather
+than as a row and would go to `git merge-file` positionally even with the attribute set. Its key
+extractor `_ID_RE` at `:271` wants a decision-id shape a pin row does not carry either.
 
-Measured on this worktree with a ten-row block and no attribute set, using the scratchpad script
-`pinmerge.py`: two branches draining rows four apart merge at exit 0 with zero conflict markers; two
-branches draining ADJACENT rows merge at exit 1 with one conflict marker; two branches draining the
-same row conflict, which is correct and is not the case at issue.
+There is no `PINS:` block in `.lexicon.conf` today — `grep -n "PINS" .lexicon.conf` returns nothing —
+so every block measured in this section is SYNTHESIZED, and no figure here can be reproduced against
+the live declaration. Measured on this worktree with a ten-row synthesized block and no attribute
+set, using the scratchpad script `pinmerge.py`: two branches draining rows four apart merge at exit 0
+with zero conflict markers; two branches draining ADJACENT rows merge at exit 1 with one conflict
+marker; two branches draining the same row conflict, which is correct and is not the case at issue.
 
 - **(a) Accept plain three-way text merge and weaken AC5 to non-adjacent rows.** Costs nothing and
   ships today. Buys a property that holds for most pairs and fails exactly when two nodes drain
@@ -295,13 +309,60 @@ same row conflict, which is correct and is not the case at issue.
   Its cost is that the block roughly doubles in length, and that a merge property is then encoded in
   whitespace that a later tidying edit could silently close.
 
-**Recommendation: (c), with AC5's merge arm as its own guard.** It needs no attribute, no driver
-change and no reader change, and it is the only option measured to deliver the property Q2's ruling
-assumes. The whitespace hazard is what makes AC5 a real regression arm rather than a one-time
-observation: an edit that closes the gaps reds the merge arm, so the property is gated rather than
-remembered. Option (b) is a change to a shared merge driver bought for one conf file, which is a trade
-this build's own rules call out. What is NOT open is whether the pin block is row-shaped; Q2's ruling
-makes that a requirement of this unit and S4 delivers it. Only the reconciliation mechanism is open.
+**Recommendation: (c).** It needs no attribute, no driver change and no reader change, and it is the
+only option measured to deliver the property Q2's ruling assumes.
+
+**Correction to rev-3's recommendation, which claimed the opposite of what is true.** Rev-3 said the
+whitespace hazard is "gated rather than remembered" because an edit closing the gaps reds AC5's merge
+arm. It does not. That arm lives on the `lexicon selftest` leg, chunk `selftests`, subject `kit`,
+guard `["tools/lexicon/"]`, and `tools/run-gates/run-gates.sh` holds every `selftests` leg unless
+`GATE_SELFTESTS` is set BEFORE guards are evaluated — which no boundary does, and the guard would
+exclude a conf-only diff even if one did. A commit that closes the blank lines in `.lexicon.conf`
+therefore reaches the arm only under `GATE_SELFTESTS=1 GATE_FULL=1`. Under (c) the whitespace hazard
+is REMEMBERED, not gated. The compensating check, since an exemption is not coverage: this unit's
+Definition of Done already runs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` explicitly per
+§7, and the same explicit run is owed by the conf rewrite that first pastes a real `PINS` block and
+by any commit that edits one.
+
+Option (b) is a change to a shared merge driver bought for one conf file, which is a trade this
+build's own rules call out. What is NOT open is whether the pin block is row-shaped; Q2's ruling
+makes that a requirement of this unit and S4 delivers it. Only the reconciliation mechanism was open,
+and the mark below closes it.
+
+**RESOLVED (agent, 2026-09-04, delegated): F1 — option (c), separate the `PINS:` rows with a single
+blank line.**
+
+Option (a) falls to veto 1: it is DEFINED as weakening AC5, a criterion already written in §6
+("including for two ADJACENT cells"). An option whose own text is "delete the clause" is the purest
+case of the first rung, and adjacent cells are the likeliest concurrent pair, because related cells
+sit together — so (a) fails exactly where the property is worth having.
+
+Option (b) falls to veto 2, on either half. `.gitattributes` is a governance carrier named in the
+AGENTS.md layout, and its only two `merge=` declarations govern the append-only decision log and the
+backlogs. `tools/memory-tree/merge-rows.py` is the driver ARBITRATING those two, and (b) changes its
+row predicate — the arbitration behaviour of a governance carrier — and promotes `%P` / `argv[4]`
+from read-by-nothing to load-bearing. Corroborating rather than deciding: the attribute half is
+measurably INERT on its own. With `.lexicon.conf merge=rows` wired to the shipped driver, it printed
+its own verdict — `rows O/A/B 0/0/0 -> 0 written (0 keyed, 0 hashed), … 1 structure conflicts,
+CONFLICT` — because `_ROW_RE = re.compile(r"^\s*[-*]\s")` cannot match an indented pin row, so the
+lines go to `git merge-file` positionally, the same geometry as no attribute at all. §5's rollback
+claim ("one module plus one manifest entry") is false under (b) as well.
+
+(c) is the sole survivor and would also win the feature-richness test outright: it is the only
+option measured to deliver AC5's adjacent clause, and it does so touching nothing outside
+`.lexicon.conf`'s own whitespace. The reader is indifferent — `lexicon_conf.py` skips blank lines
+inside a block at `if not nxt.strip(): i += 1; continue` and terminates only on the dedent test
+below it — so no parser changes. Two blank lines buy nothing further; same-row divergent drains
+still conflict, which is correct.
+
+Two residuals, neither a veto. (c) does NOT survive drain-vs-INSERT: a drain against an insertion
+after the same row still exits 1 with one marker, and that is the edit shape §3 hands to
+`TOOL-aSurfacedLexicon-7` and to every cell-arming commit, while AC5 is written only about two
+drains. And AC5's regression arm cannot see the commit class it exists to catch: `lexicon selftest`
+is chunk `selftests`, subject `kit`, guard `["tools/lexicon/"]`, and the runner holds every such leg
+unless `GATE_SELFTESTS` is set BEFORE guards are evaluated — so a commit closing the blank lines in
+`.lexicon.conf` reaches the arm only under `GATE_SELFTESTS=1 GATE_FULL=1`. Under (c) the whitespace
+hazard is remembered, not gated, which is the trade §8 claims the recommendation avoids.
 
 ## 9. Revision log
 
@@ -321,6 +382,24 @@ makes that a requirement of this unit and S4 delivers it. Only the reconciliatio
   `tools/lexicon/lexicon.py:697`, AC10 requires both directions observed RED, and §3's two new
   non-goals keep the counts themselves out: their values are emitted by `TOOL-aSurfacedLexicon-7`
   and draining them is Q3's rename unit.
+- rev-4 · 2026-09-04 · F1 ratified as option (c), one blank line between pin rows, measured at exit 0
+  with zero markers for adjacent drains where the dense block exits 1. The status base is RE-PINNED
+  from `d0a18683` to `6c670b02`, because every figure this revision writes was measured there.
+  Recorded that (c) covers drain-vs-drain only — a drain against an insertion still conflicts, which
+  is the edit shape `TOOL-aSurfacedLexicon-7` and every cell-arming commit produce — and AC5 now
+  carries that scope limit explicitly plus the hand-off that whichever unit emits the block emits it
+  blank-separated, rather than leaving either implicit. Recorded that AC5's arm is unreachable from a
+  conf-only commit because `lexicon selftest` is held behind `GATE_SELFTESTS` and guarded to
+  `tools/lexicon/`; rev-3's claim that the hazard is "gated rather than remembered" is struck as
+  false and the compensating explicit run is written in its place. AC5 is also marked UNVERIFIABLE
+  against the live declaration: `grep -n "PINS" .lexicon.conf` returns nothing, so the arm and every
+  merge figure behind it run over a synthesized block. §8's opening paragraph rewritten to report the
+  owner-rulings retraction, which that record already made in its own voice, rather than to
+  re-discover it against the ruling; the same falsified merge-driver claim still stands in the
+  sibling conf-rewrite spec and is flagged there for the same correction. §4's separation sentence
+  and the `.gitattributes` row of the files-touched table updated to the ratified option. Option (d),
+  a comment line as the separator, is recorded as an unballoted refinement measuring identically to
+  (c) without the whitespace hazard.
 
 ## 10. Reuse audit
 

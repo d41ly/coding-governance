@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-12 — the conf rewrite, the owed records, and the spec-template cell line
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base d0a18683 · streams tooling · order 7
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -18,7 +18,7 @@ otherwise find as a contradiction rather than a record.
 
 ## 2. Scope (IN)
 
-- **S1** — Rewrite `.lexicon.conf`'s pin region. Measured at base `d0a18683`: the file is 216 lines
+- **S1** — Rewrite `.lexicon.conf`'s pin region. Measured at base `6c670b02`: the file is 216 lines
   (`wc -l .lexicon.conf`) of which 178 are comments (`grep -cE '^#' .lexicon.conf`), and 139 of those
   comments sit in the single region between the `LANGS=` line and `VERB_OFFENDER_PIN=`, lines 24
   through 163 (`awk 'NR>=24 && NR<=163' .lexicon.conf | grep -cE '^#'`). That region is eleven recorded
@@ -71,6 +71,15 @@ otherwise find as a contradiction rather than a record.
   decision and this unit may not spend into it. The order is load-bearing: S11 is written only after
   the P3 deletion has landed, and if the net is positive the fix is to trim the block's
   non-instructional prose rather than to raise the ceiling.
+- **S13** — The `PINS:` block this unit pastes is emitted and committed BLANK-SEPARATED: exactly one
+  blank line between every pin row. That whitespace IS the merge property under
+  `TOOL-aSurfacedLexicon-4`'s ratified F1, not a formatting preference, so a later tidying edit that
+  closes the gaps silently removes it. The property is narrower than it sounds and this unit records
+  the bound rather than inheriting a comfortable reading of it: blank separation survives
+  drain-vs-drain, and does NOT survive drain-vs-INSERT — a drain against an insertion after the same
+  row still exits 1 with one conflict marker, which is the edit shape every cell-arming commit
+  produces. Whichever unit emits the block emits it blank-separated; nothing here claims the
+  insertion case away.
 
 ## 3. Non-goals (OUT)
 
@@ -105,9 +114,22 @@ research record's 539; the disagreement is UNRECONCILED there and is carried, no
 
 The row shape is not cosmetic here. Owner ruling Q2 makes the pins two-sided, so a correct rename blocks
 the bar until a second commit edits the pin, and two nodes each draining one name would produce a
-conflicting single-line edit in a shared mutable scalar. A row-shaped block reconciles under this repo's
-existing row merge driver the way the backlogs do. That property belongs to
-`TOOL-aSurfacedLexicon-4`, which builds the block; this unit only pastes the measured values into it.
+conflicting single-line edit in a shared mutable scalar. Through rev-3 this section said that a
+row-shaped block reconciles under this repo's existing row merge driver the way the backlogs do. That
+was WRONG, and it is corrected rather than hedged. `.lexicon.conf` carries no merge attribute —
+`git check-attr merge -- .lexicon.conf` prints `unspecified`, and `grep -n "merge=" .gitattributes`
+returns five hits of which only two are declarations, the append-only decision log at `:61` and the
+backlogs at `:62`; the other three are that file's own comment prose. The driver's row predicate
+matches a markdown bullet (`grep -n "_ROW_RE = " tools/memory-tree/merge-rows.py` puts it at `:252`),
+so an indented conf row is classified as STRUCTURE and handed to a positional three-way merge. Wired
+up and run against the shipped driver, the attribute produced `1 structure conflicts, CONFLICT` with
+`rows O/A/B 0/0/0 -> 0 written (0 keyed, 0 hashed)` — zero rows keyed, exit 1.
+
+`TOOL-aSurfacedLexicon-4` ratified a different mechanism for the same property: a single blank line
+between pin rows. Measured on this worktree by that unit's F1 resolution, two branches draining
+ADJACENT cells merge at exit 0 with zero conflict markers where the dense block exits 1 with one
+marker. The mechanism belongs to that unit, which builds the block; this unit only pastes the measured
+values into it, blank-separated per S13.
 
 ### The records, and how a supersession is written here
 
@@ -147,6 +169,14 @@ records are appends; the template line is a two-file edit under a byte-compare.
 
 Nothing lands dark. The conf rewrite is the last of this build's declaration changes and is expected to
 land after the units that give the `PINS:` block its grammar.
+
+One ordering hazard is RECORDED here rather than resolved, so neither implementer trips it. This unit
+is build order 7 and `TOOL-aSurfacedLexicon-10` is order 6, and that unit's S7 has `--expand` tell the
+operator that the `PINS:` block must be re-measured and re-pasted — a block that does not exist in
+`.lexicon.conf` until this unit lands. The grammar is not the problem; `TOOL-aSurfacedLexicon-4`
+supplies it at order 2. The pasted block is. So unit 10's message must read correctly against a conf
+carrying no `PINS:` block, the same way its `expanded=` guard already reads an absent key as empty,
+and this unit must not assume unit 10 has pasted one.
 
 ### Files touched (estimate)
 
@@ -208,7 +238,7 @@ the deletion leaves a reader who remembers the old claim with nothing to reconci
 ## 6. Acceptance criteria
 
 - **AC1** — When the rewrite has landed, `wc -l .lexicon.conf` is smaller by at least the 139 comment
-  lines measured in lines 24 through 163 at base `d0a18683`, and
+  lines measured in lines 24 through 163 at base `6c670b02`, and
   `python tools/lexicon/lexicon_conf.py --print-verbs .lexicon.conf` still prints the same 23 rows.
 - **AC2** — When `python tools/lexicon/lexicon.py --measure` is run, its emitted `PINS:` block is
   byte-identical to the block committed in `.lexicon.conf`; staging a one-digit edit to any pin row
@@ -243,6 +273,11 @@ the deletion leaves a reader who remembers the old claim with nothing to reconci
   BELOW the count it reported after `TOOL-aSurfacedLexicon-2`'s deletion, and does not WARN past a
   new high-water. Both readings are recorded in this unit's acceptance ledger, because a budget
   claim with one reading is an assertion.
+- **AC13** — When the rewritten `.lexicon.conf` is read, every consecutive pair of `PINS:` rows is
+  separated by exactly one blank line, and `python tools/lexicon/lexicon_conf.py --print-verbs
+  .lexicon.conf` still parses the file. The merge property that separation buys is
+  `TOOL-aSurfacedLexicon-4`'s AC5 and is deliberately not re-asserted here; what this criterion
+  observes is that the block as COMMITTED still carries the shape that arm assumes.
 
 ## 7. Gates
 
@@ -289,6 +324,19 @@ speculatively would be a defect rather than caution.
   `kit:lexicon` block, so the charter would have survived the build describing a tool that no longer
   matches the kit. S11 writes the block, S12 binds it to the bytes the P3 deletion frees rather than
   to the template's 285 free bytes, and AC11 and AC12 gate both halves.
+- rev-4 · 2026-09-04 · the merge-driver claim REFUTED and the base re-pinned. §4 said a row-shaped
+  `PINS:` block reconciles under this repo's row merge driver the way the backlogs do; wired up and
+  run, the driver printed `1 structure conflicts, CONFLICT` with zero rows keyed, because
+  `.lexicon.conf` carries no merge attribute and `_ROW_RE` matches a markdown bullet. The mechanism
+  that does deliver the property is `TOOL-aSurfacedLexicon-4`'s ratified F1 — one blank line between
+  pin rows — and this spec was the last carrier still saying otherwise. S13 now requires the block to
+  be emitted blank-separated and records that the property covers drain-vs-drain only, so every
+  cell-arming commit still conflicts; AC13 observes the committed shape. The Rollout sub-head gains
+  the order-6-before-order-7 hazard, `TOOL-aSurfacedLexicon-10`'s `--expand` message naming a `PINS:`
+  block that does not exist until this unit lands. Base re-pinned from `d0a18683` to the run's base
+  `6c670b02` in the status header, S1 and AC1, because all three S1 figures reproduce there:
+  `wc -l < .lexicon.conf` is 216, `grep -cE '^#' .lexicon.conf` is 178, and
+  `awk 'NR>=24 && NR<=163' .lexicon.conf | grep -cE '^#'` is 139, all unchanged.
 
 ## 10. Reuse audit
 

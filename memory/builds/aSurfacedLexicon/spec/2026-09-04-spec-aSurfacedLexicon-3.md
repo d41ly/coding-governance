@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base d0a18683 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -31,14 +31,18 @@ and all three confessions are still in the source.
   consuming them. Neither `--check` nor `--measure` may read a refusal the other cannot.
 - **S6** — Delete the 23 self-test arms in `tools/lexicon/selftest.py` covering the deleted modes and
   constants, and add the differential arm named in §6.
-- **S7** — Delete the stopword parity arm at `tools/codebase-map/selftest.py:1268-1276`, in this same
-  commit.
+- **S7** — Delete the stopword parity arm at `tools/codebase-map/selftest.py:1305-1313`, in this same
+  commit. Rev-1 cited `:1268-1276`, which sits inside a DIFFERENT arm's docstring; the parity
+  assertion opens at `if lx.DEAD_TOKENS != m._STOPWORDS:` on `:1305`, per
+  `grep -n DEAD_TOKENS tools/codebase-map/selftest.py`.
 - **S8** — Repair the Skill surface: the `{{BRIEF_CLI}}` substitution at
   `tools/lexicon/adopt-lexicon.sh:110`, the placeholder array at `tools/lexicon/kit.toml:38`, the
   `description` line and the routing block at `tools/lexicon/SKILL.template.md:3` and `:30`, and the
   re-rendered `.claude/skills/lexicon/SKILL.md`.
 - **S9** — Repair the prose carriers: `tools/lexicon/README.md:107` and `:115`, and
-  `tools/lexicon/LEXICON.md:45`.
+  `tools/lexicon/LEXICON.md:45`. The README also gains the SURVIVING pre-adoption route ratified in
+  §8 — `python tools/lexicon/scaffold_lexicon.py <path-outside-the-repo>` — written as a route a
+  reader can run, not as a record of a lost capability.
 
 ## 3. Non-goals (OUT)
 
@@ -69,7 +73,7 @@ Measured on this worktree at writing time by AST spans over `tools/lexicon/lexic
 | `DEAD_TOKENS`, `MIN_LIVE_TOKEN` | 3 lines | a restatement of `map_lib`'s set and its length rule |
 | `run_probe` | 84 lines | |
 | Self-test arms for the above | 23 of 140 | `grep -c` over `tools/lexicon/selftest.py` |
-| Cross-kit parity arm | 9 lines | `tools/codebase-map/selftest.py:1268-1276` |
+| Cross-kit parity arm | 9 lines | `tools/codebase-map/selftest.py:1305-1313` |
 
 Two hundred and fifty engine lines, and the deletion also removes a second copy of a neighbour kit's
 data. `DEAD_TOKENS` exists only because the declared layer rule forbade importing `map_lib`, so the
@@ -131,6 +135,23 @@ names `tools/lexicon/` in its guard, so a lexicon-only commit does select it —
 the latter. A miss will not surface at the push that caused it. S7 lands in this commit or the
 neighbour kit is broken behind a leg the push bar never runs.
 
+**Deleting `run_probe` orphans an import, and nothing in this repo would notice.**
+`grep -n 'canon\.' tools/lexicon/lexicon.py` returns only lines inside `run_probe`, so
+`import canon  # noqa: E402` at `tools/lexicon/lexicon.py:84` loses its last caller in this commit.
+Unit 11 gives it one again at build order 6, and there is no python lint leg on this bar that would
+red a dead import in between. The remedy is decided in this commit rather than discovered later:
+either keep the import with a one-line comment naming the unit that restores its caller, or delete
+it here and re-add it there. Silence is not an option, because silence is exactly what the tooling
+will give.
+
+**The deletion also forecloses the cheapest route for a unit that is not being built.** `run_probe`
+at `tools/lexicon/lexicon.py:1053-1136` already implements unit 10's S3 candidate computation and
+its S4 unruled tail, in S4's own framing, and unit 10 sits at build order 6 — so deleting these 84
+lines makes unit 10 re-implement roughly two thirds of them. Unit 10's own F1 is PARKED for an owner
+turn, no option having survived its veto ladder, so unit 10 is not built by this run. This unit
+lands FIRST, which is why the consequence is written here: the owner turn is owed BEFORE this
+deletion lands if the owner wants that route preserved.
+
 ### Rollout
 
 One commit, no flag. A deleted CLI mode cannot ship dark, and the Skill render must agree with the
@@ -150,8 +171,10 @@ direction the canon exists to close: it reports how this tree already spells a c
 input a naming decision must not take. It is also the second-largest function in the kit and the
 owner of two of the five walks.
 
-**Keep `--probe` because it is the only pre-adoption reading.** This is a real cost and it is the
-fork in §8 rather than an alternative dismissed here.
+**Keep `--probe` for the pre-adoption reading.** It is not the only such reading — rev-1 said it was
+and that was wrong. `python tools/lexicon/scaffold_lexicon.py <path-outside-the-repo>` gives one
+without writing into the target, measured in §8. The cost is real but smaller than rev-1 priced it,
+and it is the fork in §8 rather than an alternative dismissed here.
 
 **Split `run()` without deleting the modes.** Rejected as more work for less: `run_brief` and
 `run_probe` own two of the five walks and 23 of the 140 self-test arms, so splitting first means
@@ -175,14 +198,18 @@ one place is cheaper than a gated copy, and cheaper still than a gated copy nobo
   swallows it today, and it is deliberate.
 - observability — the surviving output lines do not move. §6 AC1 pins that as a byte comparison
   rather than an eyeball.
-- risks (concurrency, data-loss, rollback hazards) — the cross-kit arm deletion is the one hazard,
-  and it is invisible to the push bar for the reason given under Migration. No state is written and
-  rollback is a revert.
+- risks (concurrency, data-loss, rollback hazards) — three hazards, none of them touching data. The
+  cross-kit arm deletion is invisible to the push bar, for the reason given under Migration.
+  Deleting `run_probe` orphans `import canon` at `tools/lexicon/lexicon.py:84` with no lint leg on
+  this bar to catch it. And the same deletion forecloses unit 10's cheapest route while unit 10's
+  fork is parked for an owner turn. No state is written and rollback is a revert.
 - testing + left-shift gates — the differential arm in §6 AC4 is the left-shift: it gates the CLASS
   the three confessions describe rather than the three instances already repaired.
 - migration / rollback — covered under §4 Migration. Reversible by revert.
 - user docs — `tools/lexicon/README.md` and `tools/lexicon/LEXICON.md` lose their `--brief`
-  sections, and the rendered Skill loses one of its two routing blocks.
+  sections, and the rendered Skill loses one of its two routing blocks. The README gains the
+  surviving pre-adoption route, `python tools/lexicon/scaffold_lexicon.py <path-outside-the-repo>`,
+  which reads a repo without writing into it.
 
 ## 6. Acceptance criteria
 
@@ -202,9 +229,13 @@ one place is cheaper than a gated copy, and cheaper still than a gated copy nobo
   zero today and an unstaged arm would be an assertion about nothing.
 - **AC5** — When `python tools/codebase-map/selftest.py` runs with its `DEAD_TOKENS` arm deleted, it
   is green, and `grep -c DEAD_TOKENS tools/codebase-map/selftest.py` returns `0`.
-- **AC6** — When `python tools/lexicon/selftest.py` runs, it is green and its printed arm count is
-  lower than the pre-edit `140` by exactly the arms S6 removes, with the new differential arm
-  counted.
+- **AC6** — When `python tools/lexicon/selftest.py` runs, it is green and its printed arm count
+  equals what `grep -c "check(" tools/lexicon/selftest.py` reports on the landed tree. The expected
+  number is RECOMPUTED by that grep at build time and is never carried from a figure typed into this
+  spec. Rev-1 asked for a drop "by exactly the arms S6 removes" and inherited an off-by-2: it
+  counted 4 probe arms where `grep -n -- "--probe\|run_probe" tools/lexicon/selftest.py` returns
+  TWO, at `:744` and `:746`. Any arithmetic anchored to a spec-side constant inherits that class of
+  error, so the criterion is written to derive its own expectation.
 - **AC7** — When `bash tools/lexicon/adopt-lexicon.sh --check` runs, the `lexicon wiring` leg is
   green, which asserts `.claude/skills/lexicon/SKILL.md` byte-compares against a fresh render after
   `BRIEF_CLI` left `tools/lexicon/kit.toml:38`.
@@ -228,24 +259,96 @@ no new gate leg and no new ceiling. It adds one self-test arm to an existing sui
 
 **F1 — `--probe` is the only pre-adoption reading the kit has. Delete it, or replace it?**
 `run_probe` is documented as legal against a repo with no declaration at all, read-only, and
-unconditionally exit 0, with a self-test arm at `tools/lexicon/selftest.py:744` asserting exactly
-that. The research record calls it derivable from `--measure` plus the canon, and that is true of
-the numbers but not of the entry condition: `run()` prints `NOT ADOPTED` and returns 0 when
-`.lexicon.conf` is absent, so `--measure` answers nothing on an unadopted repo. Deleting `--probe`
-therefore removes a capability nothing else provides, and the only remaining pre-adoption route is
-`--scaffold`, which writes a file. Option A deletes it and records the loss in
-`tools/lexicon/README.md`, per §7's rule that a deliberate exemption is documented together with
-what compensates it. Option B keeps the entry condition by letting `--measure` fall back to the
-shipped `KNOWN_EXTS` defaults when no declaration exists, which is a few lines but emits pins that
-mean nothing without a table.
-**Recommendation: option A, with the loss written into the kit README rather than left for an
-adopter to discover.** The measured adopter population this build could read is zero, so preserving
-the capability is speculative, while the 84 lines and 4 self-test arms are real.
+unconditionally exit 0, with two self-test arms at `tools/lexicon/selftest.py:744` and `:746`
+asserting exactly that. The research record calls it derivable from `--measure` plus the canon, and
+that is true of the numbers but not of the entry condition: `run()` prints `NOT ADOPTED` and returns
+0 when `.lexicon.conf` is absent, so `--measure` answers nothing on an unadopted repo.
+
+Three claims rev-1 made in this fork were wrong, and correcting them is what carries the pick rather
+than weakening it.
+
+`--probe` is NOT the last pre-adoption route. Rev-1 said the only remaining one was `--scaffold`,
+"which writes a file"; it need not. `python tools/lexicon/scaffold_lexicon.py <path-outside-the-repo>`
+gives the same reading and writes nothing into the target, because `scaffold_lexicon.py:105-107`
+takes `dest = Path(argv[1])` while `:106` derives `root` from `git rev-parse --show-toplevel`
+INDEPENDENTLY of `dest`. Measured end to end in a conf-less throwaway repo: the full reading printed,
+`git status --short` unchanged, no `.lexicon.conf` created.
+
+The adopter population is NOT zero. A `python -c` read of
+`tools/govkit/fixtures/incms-2cff5855.receipt.json` counts 52 rows over 11 kits, 11 of them
+`kit: "lexicon"` at prefix `scripts/lexicon/`. Rev-1's "the measured adopter population this build
+could read is zero" is therefore struck, and every argument that leaned on it goes with it.
+
+The probe arms are two, not four; `grep -n -- "--probe\|run_probe" tools/lexicon/selftest.py`
+returns `:744` and `:746`. The 84 lines are exact, by AST span.
+
+Option A deletes `--probe` and records the SURVIVING route in `tools/lexicon/README.md`. Option B
+keeps the entry condition by letting `--measure` fall back to the shipped `KNOWN_EXTS` defaults when
+no declaration exists, which is a few lines but emits pins that mean nothing without a table.
+**Recommendation: option A, with the surviving route written into the kit README rather than left
+for an adopter to discover.**
+
+One appeal in rev-1 is UNVERIFIABLE and is kept only as a note, not deleted: the charter rule that a
+deliberate exemption is documented together with its compensating check quantifies over GATE
+exemptions, and a deleted CLI mode is not one. Nothing in this fork rests on it.
+
+**RESOLVED (agent, 2026-09-04, delegated): F1 — option A, delete `--probe` and record the
+pre-adoption reading in the kit README; the README names the SURVIVING route, not a bare loss.**
+
+Option B falls to veto 1. §3 Non-goals lists verbatim "Replacing the pre-adoption reading `--probe`
+provided. See the fork in §8", and option B is that replacement. Everything measured downstream
+confirms the discard rather than fighting it. With the exact fallback patched in (`conf = {}`,
+`declared = dict(KNOWN_EXTS)`, skipping the NOT ADOPTED return), `--measure` exits **rc 1** — before
+and after the sibling unit removes P3 — because `UNDECLARED EXTENSIONS` fires for every extension
+outside `{py, js}`. `--probe`'s documented contract is "EXITS 0 UNCONDITIONALLY", so B loses the one
+property that justifies it, and buying that property back means suppressing `problems` on the
+no-conf path, manufacturing a mode that cannot fail — the exact class this unit exists to close.
+Worse, B's pins are FALSELY GREEN: with no conf `banned` is empty, so P2 grades nothing and prints
+`SUFFIX_OFFENDER_PIN="0"` over a fixture containing `class ThingManager`, which the scaffold
+measures at 1. Green-by-absence, handed to an operator deciding whether to adopt.
+
+A is the sole survivor and is not itself vetoed. It satisfies AC3 (the dispatcher prints usage and
+exits 2 for both flags), AC6 as written, AC8 and AC9, and touches none of the frozen contract
+functions.
+
+The spec's own rationale for A is REFUTED and A survives on better ground. §8 argues "the measured
+adopter population this build could read is zero"; `tools/govkit/fixtures/incms-2cff5855.receipt.json`
+carries 52 rows over 11 kits, 11 of them `kit: "lexicon"` at prefix `scripts/lexicon/`, reconstructed
+on a node "where both live adopter checkouts are in hand". What actually carries A is that the
+capability is NOT LOST: `python tools/lexicon/scaffold_lexicon.py <path-outside-the-repo>` already
+gives a pre-adoption reading that writes nothing into the target, because `scaffold_lexicon.py:39`
+sets `KNOWN = lex.KNOWN_EXTS` — the same shipped defaults B reaches for — and `:106` derives `root`
+from `git rev-parse --show-toplevel` independently of `dest`. Measured end to end in a conf-less
+throwaway repo: 77 lines carrying LANGS, all three MEASURED pins, the VERBS proposal table and the
+rename-debt worklist, with `git status` unchanged and no `.lexicon.conf` created. That is MORE of
+`--probe`'s reading than B preserves, at zero lines. The README line is therefore a ROUTE, and that
+is the binding condition on this pick.
+
+Two corrections ride with it. §8's appeal to charter §7 does not reach — that rule quantifies over
+GATE exemptions and a deleted CLI mode is not one. And the research record's sentence continues past
+what §8 quotes: "Its useful half (the debt/unruled split) becomes the permanent shape of the
+ordinary report", which units 7 and 10 implement, so only the pre-adoption ENTRY CONDITION was ever
+at stake and the scaffold route already covers it.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, written against `d0a18683` with every figure re-measured on
   this worktree, including a correction to the research record's walk count.
+- rev-2 · 2026-09-04 · F1 ratified as option A (delete `--probe`), with the README naming the
+  surviving pre-adoption route — `scaffold_lexicon.py <path-outside-the-repo>`, which writes nothing
+  into the target — rather than recording a bare loss. That route is now in §2 S9, §4 Alternatives
+  and §5 user docs, not only in the §8 mark. §8's supporting claims corrected: the measured adopter
+  population is at least one (11 lexicon rows in the incms receipt), `--scaffold` does NOT
+  necessarily write into the repo, the probe self-test arms number 2 and not 4, and the charter's
+  exemption rule quantifies over gate exemptions and does not reach a deleted CLI mode. AC6 rewritten
+  to recompute its expected arm count from `grep -c "check(" tools/lexicon/selftest.py` at build
+  time, since its old arithmetic inherited the off-by-2. Recorded in §4 Migration that deleting
+  `run_probe` orphans `import canon` at `tools/lexicon/lexicon.py:84` until unit 11, with no python
+  lint leg to catch it, and that the same deletion forecloses unit 10's cheapest route while unit
+  10's fork is parked for an owner turn — so that owner turn is owed before this deletion lands. S7's
+  cite corrected from `tools/codebase-map/selftest.py:1268-1276`, which is another arm's docstring,
+  to `:1305-1313`. Header base re-pinned from `d0a18683` to `6c670b02`, the commit every figure in
+  this rev was measured at.
 
 ## 10. Reuse audit
 
