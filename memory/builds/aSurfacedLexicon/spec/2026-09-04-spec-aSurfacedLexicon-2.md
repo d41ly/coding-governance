@@ -1,10 +1,13 @@
 # TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 |
+| [2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 |
 
 <!-- /gen:spec-records -->
 
@@ -47,6 +50,31 @@ value `"0"` across every commit it has ever had.
 - **S10** — Add `tools/dead-path-waivers.txt` rows for the four spellings of the deleted waiver
   filename in `tools/govkit/fixtures/incms-2cff5855.receipt.json`, which is a frozen adopter receipt
   and must not be rewritten to please a gate.
+- **S11** — Refresh `memory/map/features/lexicon.md`, the codebase map's own dossier for this
+  feature, which describes P3 as a live predicate in five places this unit falsifies. `grep -nE
+  'LAYERS|resolve_import|_glob_match|P3' memory/map/features/lexicon.md` returns eleven lines at
+  this rev's base, covering four of the five. The fifth is the front-matter `title` field, which
+  counts the kit's predicates in WORDS and so is reached by no such grep — one reason a criterion
+  over this file has to be read rather than exit-coded. The other four are the third vacuity arm at
+  `:90`; the reachability paragraph at `:92-100`, whose subject is the deleted resolver; the
+  unarmed-predicate paragraph at `:109-111`, whose only example is the empty `LAYERS` block; and the
+  two Gaps bullets at `:171-187` on the resolver's limits and on the two helper functions that
+  carried every P3 defect. The title and the two present-tense paragraphs are rewritten to the
+  two-predicate kit. The reachability and helper-function material is history the kit paid four
+  blockers for, so it is kept and moved to the past tense naming P3 as deleted, rather than dropped
+  — but no line may leave the dossier asserting a predicate, a rule shape or a resolver that no
+  longer exists. The dossier's `claims` block is untouched: `armed-but-unreachable-rule.md` names a
+  gotcha file this unit does not delete, so the claimed key stays live.
+- **S12** — Run `python tools/codebase-map/gen_map.py --write` and commit the refreshed
+  `memory/map/generated/symbols.json` in the SAME commit as S1. The map's symbol tier indexes every
+  public module-level def, and four of S1's eight deletions are in that index today:
+  `build_module_index`, `check_layer_violation`, `resolve_import` and `scan_unselective_rules`, all
+  four carried with `file: tools/lexicon/lexicon.py` among the 21 rows the artifact holds for that
+  file (counted by a `json` read of `memory/map/generated/symbols.json`). The artifact moves in both
+  directions, because S6 adds one public def, `check_self_containment`, and one added row is as
+  stale as four removed ones. `symbols.json` is the only generated artifact this unit moves: the
+  same run renders `inventories.json` and `MAP.md` from the claim and inventory sets, which S1's
+  deletions do not touch, and neither of those two carries a symbol row.
 
 ## 3. Non-goals (OUT)
 
@@ -120,14 +148,47 @@ of them makes it return one, because `map_lib` is in neither `sys.stdlib_module_
 sibling set `{canon, lexicon, lexicon_conf, scaffold_lexicon, selftest, subtokens}`. That is the
 same 44 imports P3 could reach, now reported as 44 rather than as 557.
 
-**Three conditions bind the implementation.** They were ratified with the fork in §8 and are
-repeated here because this is where the implementer reads. First, the refusal is emitted as a
-refusal line and a population line, never as a third `P<n> … graded=` row: a third row would
-contradict the §3 non-goal that leaves the kit at two predicates and the observability line in §5.
-Second, it sits BELOW the NOT ADOPTED return at `tools/lexicon/lexicon.py:478-480`, which keeps the
-inert-without-a-declaration contract intact. Third, it dedupes on the top-level module name, because
-`_python_defs` emits both `map_lib` and `map_lib._STOPWORDS` for `from map_lib import _STOPWORDS`
-and the population AC2 names would otherwise read doubled.
+**Four conditions bind the implementation.** The first three were ratified with the fork in §8 and
+are repeated here because this is where the implementer reads; the fourth was added at rev-3 and is
+not part of that ratification. First, the refusal is emitted as a refusal line and a population
+line, never as a third `P<n> … graded=` row: a third row would contradict the §3 non-goal that
+leaves the kit at two predicates and the observability line in §5. Second, it sits BELOW the NOT
+ADOPTED return at `tools/lexicon/lexicon.py:478-480`, which keeps the inert-without-a-declaration
+contract intact. Third, it dedupes on the top-level module name, because `_python_defs` emits both
+`map_lib` and `map_lib._STOPWORDS` for `from map_lib import _STOPWORDS` and the population AC2 names
+would otherwise read doubled.
+
+Fourth, and this one pins a placement rather than a shape: the refusal is appended to the shared
+`problems` list ABOVE the `measure_mode` return at `tools/lexicon/lexicon.py:669`, beside `DEAD
+PROBE` at `:612` and `DEAD SNIFFER` at `:665`. Conditions two and four together fix the insertion
+window to the span between `:480` and `:669`, and S6's "the `run()` check path" is not that window —
+it reads equally as the `--check` branch below `:680`, where a refusal is reachable from `--check`
+and unreachable from `--measure`. That is the armed-but-unreachable defect this file has now earned
+three times, and its own comments confess to each one at `:624-632`, `:654-663` and `:738-745`:
+every one of them was a refusal written below this return that a later review had to hoist above it.
+No new exit plumbing is needed on the `--measure` side, because `:680` already returns `1` when
+`problems` is non-empty; the whole cost of getting this right is which side of `:669` one
+`problems.append` sits on. AC10 observes it differentially rather than by reading the diff.
+
+**The refusal carries its own liveness assertion, because the thing it replaces existed to buy
+one.** The `P3 NOT ARMED` refusal S2 deletes was the kit's written answer to a predicate that is
+satisfied and a predicate that was never asked returning the same exit code. Its successor walks a
+population it derives, and every derivation can come back empty for reasons that have nothing to do
+with self-containment: an install layout where the tracked-file walk selects nothing beside
+`lexicon.py`, or an extractor that stops returning imports. Zero offenders over zero imports is
+exactly the clean green a broken probe prints. So the walk REDS when it judges zero imports, in the
+`DEAD PROBE` token the engine already spells at `:612` and the neighbouring kits already read,
+rather than in a second spelling invented here. That refusal joins `problems` under the same fourth
+condition as the self-containment refusal itself, so `--measure` sees it too.
+
+For that arm to be observable the population source has to be injectable, and this is the one place
+the design constrains the code shape. `check_self_containment` takes the directory it walks as a
+parameter defaulting to `Path(__file__).resolve().parent`, so a self-test arm can point it at an
+empty temporary directory and watch it RED. A predicate that can only ever read its own installed
+directory has a liveness arm nobody can stage, which is the same unfalsifiable shape one level up.
+The name was checked before it was written: `python tools/lexicon/lexicon.py --suggest
+check_self_containment` answers `OK — check_self_containment leads with 'check', which the
+declaration carries`.
 
 ### Migration
 
@@ -142,9 +203,16 @@ which a lexicon-only commit does not select, and its chunk is `selftests`, which
 The break is invisible to the push boundary in two independent ways, so it lands in this commit.
 
 Deleting `lexicon-layer-waivers.txt` makes its basename a dead-path needle on the next run of the
-unguarded `dead-path carriers` leg. `grep -rn lexicon-layer-waivers` finds five carriers outside
-`memory/`: `tools/lexicon/kit.toml:26` and `tools/lexicon/selftest.py:84` are edited by S3 and S7,
-and four spellings live in the frozen govkit receipt fixture, which S10 waives instead of editing.
+unguarded `dead-path carriers` leg. Re-derived at this rev's base rather than carried: `git grep -n
+lexicon-layer-waivers -- . ':!memory/'` returns SEVEN lines across FOUR files, not the five carriers
+rev-2 claimed under a command that produces no such number. Three of the seven are engine carriers
+this unit edits — `tools/lexicon/kit.toml:26` (S3), `tools/lexicon/selftest.py:84` (S7), and
+`tools/lexicon/lexicon.py:93`, the `WAIVER_FILES["layer"]` row, which S2 removes and which the rev-2
+sentence never named. The remaining four are the receipt spellings at
+`tools/govkit/fixtures/incms-2cff5855.receipt.json:128`, `:129`, `:597` and `:600`, which S10 waives
+instead of editing. The plain `grep -rn` form rev-2 wrote reports an eighth match inside an
+untracked `__pycache__` blob, which is why the tracked-only form is the one written here: the leg
+reads tracked files, so an untracked hit is noise in the implementer's checklist.
 
 ### Rollout
 
@@ -157,8 +225,10 @@ constraint is unheld between them.
 `tools/lexicon/lexicon.py`, `tools/lexicon/lexicon_conf.py`, `tools/lexicon/selftest.py`,
 `tools/lexicon/scaffold_lexicon.py`, `tools/lexicon/kit.toml`, `tools/lexicon/README.md`,
 `tools/lexicon/LEXICON.md`, `tools/lexicon/lexicon-layer-waivers.txt` (deleted), `.lexicon.conf`,
-`tools/drift-audit/selftest.py`, `tools/dead-path-waivers.txt`, `AGENTS.md` and
-`coding-governance-agents.template.md`. Thirteen files, one of them a deletion.
+`tools/drift-audit/selftest.py`, `tools/dead-path-waivers.txt`, `AGENTS.md`,
+`coding-governance-agents.template.md`, `memory/map/features/lexicon.md` (S11, the dossier) and
+`memory/map/generated/symbols.json` (S12, regenerated, never hand-edited). Fifteen files, one of
+them a deletion and one of them generated.
 
 ### Alternatives rejected
 
@@ -189,7 +259,9 @@ sets the latter. A constraint held only there is not held at the push boundary a
 - error / empty / loading states — the new refusal must name the file, the line and the offending
   import target, because a refusal that says only "not self-contained" leaves the reader grepping.
 - observability — the checker prints two predicate rows instead of three, and prints the
-  self-containment population so a green row is a measurement rather than a mood.
+  self-containment population so a green row is a measurement rather than a mood. PRINTING the
+  population is not enough on its own: a printed zero is still a green, so the zero-population case
+  REDS as `DEAD PROBE` per §4 Data model, and AC11 is the arm that observes it.
 - risks (concurrency, data-loss, rollback hazards) — the conf edit and the drift-audit fixture edit
   must ride the same commit or the neighbour kit is broken between them. Rollback is a revert; no
   data is migrated and no state is written. The standing residual the §8 ratification surfaced lives
@@ -240,17 +312,49 @@ sets the latter. A constraint held only there is not held at the push boundary a
   number typed here. The leg also WARNs past its recorded high-water independently of the ceiling,
   and that warning is advisory and does not satisfy or fail this criterion.
 - **AC9** — When `bash tools/run-gates/run-gates.sh` runs at the push boundary, it is green,
-  including the unguarded `dead-path carriers` and `testsuite counts` legs whose populations this
-  unit moves.
+  including the three unguarded legs whose populations this unit moves: `dead-path carriers`,
+  `testsuite counts` and `codebase-map coverage + freshness`. All three carry `chunk: declarations`
+  and `subject: repo` with no `guard` key in `tools/gate-legs.json`, so no scoping keeps any of them
+  off this commit's bar.
+- **AC10** — When `import map_lib` is staged into any module under `tools/lexicon/`, `python
+  tools/lexicon/lexicon.py --check` and `python tools/lexicon/lexicon.py --measure` BOTH exit `1`
+  and both name that file, that line and `map_lib`; when it is unstaged both exit `0`. The two
+  refusal sets are compared as sets, not spot-checked: a refusal visible to one mode and not the
+  other fails this criterion even when the leg is green, which is the only way to observe the fourth
+  binding condition without reading the diff. Baseline for the unstaged half, measured at this rev's
+  base: both modes exit `0` today, `--measure` printing three pin lines and `--check` printing its
+  predicate rows.
+- **AC11** — When `check_self_containment` is pointed at a directory holding no `.py` files, or at
+  one whose modules yield no imports, the run REDS with a `DEAD PROBE` refusal naming the empty
+  population, and the same refusal is present in `--measure` output. The failing case is STAGED and
+  OBSERVED before the arm lands, per the build README rule. A run that prints a zero and exits `0`
+  on an empty population fails this criterion: that outcome is indistinguishable from a satisfied
+  predicate, which is the distinction the deleted `P3 NOT ARMED` refusal was bought to keep.
+- **AC12** — When `grep -nE 'LAYERS|resolve_import|_glob_match|P3' memory/map/features/lexicon.md`
+  runs on the landed tree, every surviving hit is in a past-tense sentence naming P3 as DELETED, and
+  the front-matter `title` no longer counts three predicates. A hit that reads as a description of a
+  live predicate, a live rule shape or a live resolver fails this criterion. Nothing on the bar
+  catches this — the freshness leg grades claimed KEYS and not dossier prose — so this criterion is
+  the only observation there is, and it is checked by reading the command's output rather than by
+  its exit code.
+- **AC13** — When `python tools/codebase-map/gen_map.py --write` has run in the landing commit,
+  `python tools/codebase-map/test_codebase_map.py` passes `test_generated_artifacts_are_fresh` at
+  that commit, and `memory/map/generated/symbols.json` contains no row for `build_module_index`,
+  `check_layer_violation`, `resolve_import` or `scan_unselective_rules` while carrying one for
+  `check_self_containment`. Both halves are needed: the freshness assert alone passes on a
+  hand-edited artifact, and the row check alone passes on an artifact stale in some other feature.
+  The baseline is measured: at this rev's base that command reports all five of its checks `ok` in
+  about two seconds, so a RED on the landing commit is attributable to this unit and not inherited.
 
 ## 7. Gates
 
 `lexicon naming predicates` (the leg that carries the replacement refusal), `lexicon wiring`,
 `lexicon selftest` and `drift-audit selftest` under `GATE_SELFTESTS=1`, `codebase-map kit selftest`
 (its guard names `tools/lexicon/`), `dead-path carriers (deleted files still named)`,
-`testsuite counts (every bar self-test prints one)`, the memory-tree hygiene leg, and
-`bash tools/check-template-size.sh`. This unit adds no new gate leg and no new ceiling; it moves one
-refusal into a leg that already exists.
+`testsuite counts (every bar self-test prints one)`, `codebase-map coverage + freshness` (unguarded,
+and S1's four public deletions plus S6's one addition move the artifact it byte-compares), the
+memory-tree hygiene leg, and `bash tools/check-template-size.sh`. This unit adds no new gate leg and
+no new ceiling; it moves one refusal into a leg that already exists.
 
 ## 8. Open questions
 
@@ -323,6 +427,21 @@ update` clobbers. That route is unowned by any unit in this build.
   AC3's `44` and `6` recorded as gov-scoped figures an adopter's run does not reproduce. The adopter
   waiver route for the new refusal recorded in §5 as unowned by this build. Header base re-pinned
   from `d0a18683` to `6c670b02`, the commit every figure in this rev was measured at.
+- rev-3 · 2026-09-04 · spec-audit fold, four findings. Two scope items added: S11 refreshes the
+  codebase map's own dossier for this feature, which described the deleted predicate in five places
+  no gate reads, and S12 regenerates `memory/map/generated/symbols.json` in the landing commit,
+  because four of S1's eight deletions and S6's one addition move rows in an artifact the unguarded
+  `codebase-map coverage + freshness` leg byte-compares. Both files added to §4 Files touched, which
+  is now fifteen rather than thirteen, and that leg named in §7 and in AC9. A FOURTH binding
+  condition added to §4 Data model, pinning the refusal above the `measure_mode` return rather than
+  merely below the NOT ADOPTED one, since S6's "the `run()` check path" also reads as the branch
+  below it — the placement this file's own comments confess to getting wrong three times — with AC10
+  observing `--check` and `--measure` refusal sets as equal. The replacement refusal given the
+  liveness assertion the deleted `P3 NOT ARMED` refusal used to buy: a zero-import population REDS
+  in the engine's existing `DEAD PROBE` token, the walk root becomes a parameter so the arm can be
+  staged, and AC11 observes it. §4 Migration's dead-path count re-derived: the tracked-only grep
+  returns seven lines across four files, not five carriers, and `lexicon.py:93` joins the two engine
+  carriers the paragraph already named. New criteria AC10 through AC13.
 
 ## 10. Reuse audit
 

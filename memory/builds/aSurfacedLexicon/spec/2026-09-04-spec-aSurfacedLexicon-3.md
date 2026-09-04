@@ -1,10 +1,13 @@
 # TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-4 |
+| [2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-4 |
 
 <!-- /gen:spec-records -->
 
@@ -27,8 +30,11 @@ and all three confessions are still in the source.
   argument-count guard that special-cases them.
 - **S4** — Add `scan_corpus(root, declared)`, one generator yielding each armed file with its
   extracted definitions, and route every surviving walk through it.
-- **S5** — Split `run()` into a measurement pass returning counts and refusals, and a verdict pass
-  consuming them. Neither `--check` nor `--measure` may read a refusal the other cannot.
+- **S5** — Split `run()` into `measure_pass`, returning counts and refusals, and `check_pass`,
+  consuming them. Neither `--check` nor `--measure` may read a refusal the other cannot. Both
+  spellings are fixed here rather than left to the implementer, because this file is itself graded
+  corpus and a name outside the declared verb table reds this unit's own first gate leg. The
+  verdicts are in §4 Identifiers minted.
 - **S6** — Delete the 23 self-test arms in `tools/lexicon/selftest.py` covering the deleted modes and
   constants, and add the differential arm named in §6.
 - **S7** — Delete the stopword parity arm at `tools/codebase-map/selftest.py:1305-1313`, in this same
@@ -43,16 +49,27 @@ and all three confessions are still in the source.
   `tools/lexicon/LEXICON.md:45`. The README also gains the SURVIVING pre-adoption route ratified in
   §8 — `python tools/lexicon/scaffold_lexicon.py <path-outside-the-repo>` — written as a route a
   reader can run, not as a record of a lost capability.
+- **S10** — Re-render the codebase map's generated artifacts in this same commit with
+  `python tools/codebase-map/gen_map.py --write`. This unit removes five public module-level defs
+  from `tools/lexicon/lexicon.py` and adds three, and `memory/map/generated/symbols.json` indexes
+  every one of them. The leg that re-derives it carries no guard, so a miss reds the push bar rather
+  than waiting for a later one. Observed in §6 AC10.
 
 ## 3. Non-goals (OUT)
 
 - Deleting P3, the `LAYERS` block or the layer waiver file. That is the sibling unit at the same
   build order, and this unit does not touch the third predicate beyond the walk it shares.
-- Changing any predicate's verdict. Every surviving output line is byte-identical, which is the
-  point of §6 AC1 and is what makes this unit safe to land first.
-- Wiring `--suggest` to the canon, or adding `--as <cell>`. The Skill loses one of its two routes
-  for the units between this one and the one that adds the cell-aware suggestion, and that is stated
-  rather than hidden.
+- Changing any predicate's VERDICT. No offender count, no pin, no coverage line and no `lexicon OK`
+  line moves. The `graded=` figures DO move, because the functions this unit deletes are themselves
+  graded corpus, so a blanket byte-identity claim over `--check` output would be unsatisfiable —
+  rev-2 made one. §6 AC1 names which lines are pinned, which are expected to move, and by how much.
+- Wiring `--suggest` to the canon, or adding `--as <cell>`. That is `TOOL-aSurfacedLexicon-8` at
+  build order 6, and this unit is order 1, so the Skill runs on the per-identifier route alone for
+  five build orders. The route deleted is the one the source calls PRIMARY: the comment above
+  `tools/lexicon/lexicon.py:984` says `--brief` on an uncommitted file "is the lexicon Skill's
+  PRIMARY path, since the whole point is naming something before you commit it". Nothing in this
+  build restores a per-FILE reading at all; `TOOL-aSurfacedLexicon-8` restores the per-NAME one with
+  the canon behind it. That is the size of the gap, stated rather than softened.
 - Replacing the pre-adoption reading `--probe` provided. See the fork in §8.
 - Touching `extract`, `extract_text` or `_python_defs`. `scan_corpus` calls `extract`; it does not
   change it. Their signatures are frozen by contract for `drift_report.py`.
@@ -80,6 +97,28 @@ data. `DEAD_TOKENS` exists only because the declared layer rule forbade importin
 lexicon restated 21 words inline and a cross-kit arm asserted the two never diverge. Deleting the
 restatement retires the fact-in-two-places rather than continuing to gate it.
 
+### Identifiers minted
+
+Every identifier this unit adds was run through the gate BEFORE it was written down. That is not
+ceremony here: `tools/lexicon/lexicon.py` is graded corpus for the `lexicon naming predicates` leg
+that §7 names first, the conf pins the verb offender count at the value `--measure` prints, and
+`tools/lexicon/lexicon.py:697` reds when the unwaived offender count exceeds that pin. A refused
+name therefore reds this unit on its own commit, and no deletion in this unit offsets it, because
+all five functions it removes already lead with declared verbs.
+
+| Identifier | Leading token | `python tools/lexicon/lexicon.py --suggest <name>` |
+|---|---|---|
+| `scan_corpus` | `scan` | OK — the declaration carries it |
+| `measure_pass` | `measure` | OK — the declaration carries it |
+| `check_pass` | `check` | OK — the declaration carries it |
+
+Rev-2's spelling for the second pass was `verdict_pass`, and the gate refuses it: "`verdict` is not
+in the declared table, and no row bans it by name." `check_pass` was taken because it keeps the
+`measure_pass` pairing and matches the two modes the passes serve; `check_verdict`, `run_verdict`,
+`derive_verdict` and `render_verdict` all resolve too, and the choice among them is taste rather
+than compliance. The practice copied here is `TOOL-aSurfacedLexicon-4`'s: mint nothing a spec has
+not asked the gate about first.
+
 ### Data model
 
 **`scan_corpus(root, declared)`** yields one record per armed file: the repo-relative path, the
@@ -98,7 +137,7 @@ correction matters because a collapse spec naming four would leave the fifth wal
 its own, which is the shape being removed.
 
 **The two passes.** `measure_pass` walks the corpus once and returns the graded counts, the offender
-lists per predicate, and the refusal list. `verdict_pass` consumes that and decides. `--measure`
+lists per predicate, and the refusal list. `check_pass` consumes that and decides. `--measure`
 prints the pins plus the refusals; `--check` prints the counts, the pin verdicts and the same
 refusals. One reader of the refusal set, so there is no path on which one mode can see a refusal the
 other cannot.
@@ -162,14 +201,35 @@ template at every commit because the wiring leg compares them on every bar.
 `tools/lexicon/lexicon.py`, `tools/lexicon/selftest.py`, `tools/lexicon/scaffold_lexicon.py`,
 `tools/lexicon/adopt-lexicon.sh`, `tools/lexicon/kit.toml`, `tools/lexicon/SKILL.template.md`,
 `tools/lexicon/README.md`, `tools/lexicon/LEXICON.md`, `.claude/skills/lexicon/SKILL.md` and
-`tools/codebase-map/selftest.py`. Ten files, no deletions and no additions.
+`tools/codebase-map/selftest.py` — ten source files. Plus whatever
+`python tools/codebase-map/gen_map.py --write` rewrites under `memory/map/generated/`, which is S10
+and is not optional: five rows leave `symbols.json` and three enter, and the leg that re-derives it
+is unguarded. No file is created or deleted by this unit; the generated artifacts are rewritten in
+place.
 
 ### Alternatives rejected
 
-**Keep `--brief` and only collapse the walks.** Rejected because `--brief` is the corpus-as-authority
-direction the canon exists to close: it reports how this tree already spells a concept, which is the
-input a naming decision must not take. It is also the second-largest function in the kit and the
-owner of two of the five walks.
+**Keep `--brief` and only collapse the walks.** Rejected on COST, and the canon argument that
+carried this in rev-2 is STRUCK. Rev-2 called `--brief` "the corpus-as-authority direction the canon
+exists to close", inheriting that line verbatim from the rebuild research table, and two CLOSED
+units refute it. `TOOL-dScaffoldedMirror-8` draws the anti-mirror line at SELECTION, not at
+reporting: which CLUSTERS enter a proposed table is the corpus's decision, which FORM represents one
+is the canon's, always element 0. Its backlog row puts it plainly — the corpus is admitted as
+evidence for exactly one thing, which spellings become debt rows. Flagging an object this tree
+spells two ways is inside that admitted use. `TOOL-dScaffoldedMirror-10` then built `--brief`
+per-file on that footing, and the surface still says so: `tools/lexicon/SKILL.template.md:34-38` has
+it printing "what the corpus DOES, never what it should do", deciding nothing, unable to exit 1 and
+printing no pin. A report is not an authority.
+
+What survives is the price, which is a sufficient ground on its own. `--brief` and its three helpers
+plus the two constants are 166 of the 250 engine lines this unit deletes. They own 3 of the 10
+corpus-walk call sites §6 AC9 enumerates. And they carry a second copy of a neighbour kit's stopword
+set whose only guard is a cross-kit parity arm on a leg the push bar does not run. The capability
+being deleted is real and §3 now states its full size rather than calling it one of two routes.
+Recall terms that found the two units:
+`python tools/memory-recall/query.py "is reporting how the corpus already spells a concept the
+corpus-as-authority direction the canon exists to close" --terms "anti-mirror corpus authority canon
+selection reporting brief probe cluster representative frequency allowlist debt"`.
 
 **Keep `--probe` for the pre-adoption reading.** It is not the only such reading — rev-1 said it was
 and that was wrong. `python tools/lexicon/scaffold_lexicon.py <path-outside-the-repo>` gives one
@@ -196,8 +256,9 @@ one place is cheaper than a gated copy, and cheaper still than a gated copy nobo
   remaining callers, and it takes `run()`'s policy: an unparseable file in an armed language is a
   named refusal, never a silent skip. That is a behaviour change for `scaffold_lexicon.py`, which
   swallows it today, and it is deliberate.
-- observability — the surviving output lines do not move. §6 AC1 pins that as a byte comparison
-  rather than an eyeball.
+- observability — the verdict lines, the offender counts, the coverage line and the three pins do
+  not move; the `graded=` figures do, because this file is graded corpus. §6 AC1 pins the first set
+  as a byte comparison and derives the second as a delta, rather than asserting either by eye.
 - risks (concurrency, data-loss, rollback hazards) — three hazards, none of them touching data. The
   cross-kit arm deletion is invisible to the push bar, for the reason given under Migration.
   Deleting `run_probe` orphans `import canon` at `tools/lexicon/lexicon.py:84` with no lint leg on
@@ -214,11 +275,32 @@ one place is cheaper than a gated copy, and cheaper still than a gated copy nobo
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/lexicon/lexicon.py --check` runs before and after this unit on the
-  same tree, every surviving line is byte-identical, compared with `diff` against a baseline file
-  captured on the branch point. The pre-edit output is six lines; the `P3 layer` row belongs to the
-  sibling unit and is excluded from this comparison rather than counted as a change here.
+  same tree, the `offenders=` and `waived=` figures, the coverage line, the armed-but-grading-nothing
+  line and the `lexicon OK` line are byte-identical, compared with `diff` against a baseline file
+  captured on the branch point. The `graded=` figures are EXPECTED to move and are the one thing
+  excluded from that comparison, because `tools/lexicon/lexicon.py` is itself graded corpus: this
+  unit removes five top-level defs and adds three, so `P1 verb` falls by 2 and no other row moves.
+  Measured on this worktree at the pinned base by staging the five deletions and three stubs for the
+  minted names — baseline `python tools/lexicon/lexicon.py --check` prints
+  `P1 verb graded=1045 offenders=461 waived=0`, staged it prints
+  `P1 verb graded=1043 offenders=461 waived=0`, and `P2 suffix`, `P3 layer`, the coverage line and
+  the `lexicon OK` line are byte-identical across both runs. The self-test edits in S6 and S7 move
+  no def and so contribute nothing to that delta: S6 deletes ARMS, and
+  `grep -n "^def " tools/lexicon/selftest.py` returns 8 top-level defs of which none names the
+  deleted surface. The expected delta is RE-DERIVED from the same two runs at
+  build time and never carried from the figure typed here. The `P3 layer` row belongs to the sibling
+  unit at this build order and is excluded rather than counted as a change here.
 - **AC2** — When `python tools/lexicon/lexicon.py --measure` runs before and after this unit on the
-  same tree, its pin lines are byte-identical by the same `diff`.
+  same tree, every pin line SURVIVING this unit is byte-identical by the same `diff`. The count is
+  deliberately not written here: `TOOL-aSurfacedLexicon-2` sits at this same build order and deletes
+  `LAYER_OFFENDER_PIN`, so "all three" is false on a tree where that sibling landed first and true
+  where it did not, which makes an order-independent criterion into an order-dependent one. AC1
+  already excludes that sibling by name; this criterion now does too. That is satisfiable ONLY
+  because every identifier §4 Identifiers minted introduces leads with a declared verb; a name the
+  gate refuses takes the verb offender count up by one, breaks this criterion, and reds
+  `lexicon naming predicates` on this unit's own commit. Measured with the deletions and the three
+  stubs staged: `--measure` printed `VERB_OFFENDER_PIN="461"`, `SUFFIX_OFFENDER_PIN="0"` and
+  `LAYER_OFFENDER_PIN="0"`, identical to baseline.
 - **AC3** — When `python tools/lexicon/lexicon.py --brief <path>` or
   `python tools/lexicon/lexicon.py --probe` is run, the dispatcher prints its usage block and exits
   2, naming neither flag among the modes it accepts.
@@ -239,19 +321,65 @@ one place is cheaper than a gated copy, and cheaper still than a gated copy nobo
 - **AC7** — When `bash tools/lexicon/adopt-lexicon.sh --check` runs, the `lexicon wiring` leg is
   green, which asserts `.claude/skills/lexicon/SKILL.md` byte-compares against a fresh render after
   `BRIEF_CLI` left `tools/lexicon/kit.toml:38`.
-- **AC8** — When `grep -rn -- "--brief" --include=*.py --include=*.sh --include=*.md .` runs outside
-  `memory/`, the only hit is the unrelated `tools/unattended/` flag of the same spelling in
-  `.claude/skills/unattended/SKILL.md:504`.
-- **AC9** — When `scan_corpus` is the only corpus walk left, `grep -c "for rel in files"`
-  over `tools/lexicon/lexicon.py` and `tools/lexicon/scaffold_lexicon.py` accounts for no walk
-  outside it, and `bash tools/check-dead-paths.sh` plus
-  `bash tools/check-testsuite-counts.sh` are green.
+- **AC8** — When `git grep -n -- "--brief" tools/lexicon .claude/skills/lexicon` runs on the landed
+  tree it returns ZERO lines. Two corrections ride in that spelling. Rev-2 wrote
+  `grep -rn -- "--brief" --include=*.py …`, putting the options AFTER the `--`, so grep read them as
+  filenames and the command errored three times rather than counting anything. And `--include`
+  filters are the wrong instrument here: they silently skip file classes, which is how rev-2's own
+  survivor set lost a `.js` carrier. `git grep` walks the tracked set with no extension list to get
+  wrong, and skips the untracked `__pycache__` hit a bare `grep -r` picks up. Run at the pinned
+  base, that command returns 31 lines across six files —
+  `tools/lexicon/selftest.py` 17, `tools/lexicon/lexicon.py` 8, `tools/lexicon/README.md` 2,
+  `.claude/skills/lexicon/SKILL.md` 2, `tools/lexicon/LEXICON.md` 1 and
+  `tools/lexicon/adopt-lexicon.sh` 1 — which is exactly the set S8 and S9 clear. Rev-2 pointed its
+  grep at `.` and expected one surviving hit; `git grep -n -- "--brief" -- ':!memory/'` returns 67
+  lines at the pinned base, and this unit clears 31 of them.
+- **AC8b** — The residue OUTSIDE this unit's carriers is the unrelated `tools/unattended/` flag of
+  the same spelling, and it is EXPECTED to survive untouched. When
+  `git grep -n -- "--brief" -- ':!memory/' ':!tools/lexicon/' ':!.claude/skills/lexicon/'` runs on
+  the landed tree it returns 36 lines across seven files, unchanged from the pinned base:
+  `tools/unattended/unattended.test.sh` 21, `tools/unattended/unattended.sh` 9,
+  `tools/unattended/PROTOCOL.template.md` 2, and one each in `tools/unattended/SKILL.template.md`,
+  `tools/unattended/VERBS.template.md`, `.claude/skills/unattended/SKILL.md` and
+  `tools/workflows/unattended-build.js`. A number that MOVES here means this unit reached outside
+  its scope, so the criterion fails on a drop as well as on a rise.
+- **AC9** — Every `extract` and `tracked_files` call site in `tools/lexicon/lexicon.py` and
+  `tools/lexicon/scaffold_lexicon.py` resolves inside `scan_corpus`, asserted as an ABSENCE over the
+  real population rather than by counting survivors.
+  `grep -n "tracked_files(\|extract(" tools/lexicon/lexicon.py tools/lexicon/scaffold_lexicon.py`
+  returns exactly FOUR lines on the landed tree: the two `def` lines in `tools/lexicon/lexicon.py`
+  and the two calls inside `scan_corpus`. Zero lines REDS as loudly as five, because an enumerator
+  that has stopped matching is indistinguishable from a clean tree. At the pinned base the same
+  command returns 13 lines — two defs, one comment, and ten call sites — and an AST enumeration
+  resolving each call to its enclosing `FunctionDef` puts those ten in five functions: `run` 2,
+  `run_brief` 3, `run_probe` 2, `main` 2, `_measure_suffix_offenders` 1. That enumeration is what
+  fixed the criterion. Rev-2 used `grep -c "for rel in files"`, which misses `run_brief`'s walk
+  entirely — it is spelled `for f in tracked_files(root):` — counts two `scaffold_lexicon.py` walks
+  it never named, and states no expected value at all. Alongside it,
+  `bash tools/check-dead-paths.sh` and `bash tools/check-testsuite-counts.sh` are green.
+- **AC10** — When `python tools/codebase-map/test_codebase_map.py` runs on the landed commit it is
+  green, and `memory/map/generated/` was rewritten by `python tools/codebase-map/gen_map.py --write`
+  in that SAME commit, per S10. The leg `codebase-map coverage + freshness` carries no `guard` key
+  in `tools/gate-legs.json`, chunk `declarations`, subject `repo`, so it runs on every bar including
+  the push boundary and a miss cannot be deferred. Observed RED first, which is what makes this a
+  criterion rather than a note: with this unit's five deletions staged, that suite prints
+  `FAIL test_generated_artifacts_are_fresh` and
+  `STALE symbols.json — regen: python tools/codebase-map/gen_map.py --write`. A `json` read of
+  `memory/map/generated/symbols.json` at the pinned base finds all five deleted names carried with
+  `file: tools/lexicon/lexicon.py` — `read_object`, `read_object_state`, `read_token_is_live`,
+  `run_brief`, `run_probe` — among 21 rows for that file, and finds no `scan_corpus`. After this
+  unit those five rows are gone and `scan_corpus`, `measure_pass` and `check_pass` are present.
 
 ## 7. Gates
 
 `lexicon naming predicates`, `lexicon wiring`, `lexicon selftest` and `codebase-map kit selftest`
-under `GATE_SELFTESTS=1`, `dead-path carriers (deleted files still named)`,
-`testsuite counts (every bar self-test prints one)`, and the memory-tree hygiene leg. This unit adds
+under `GATE_SELFTESTS=1`, `codebase-map coverage + freshness`,
+`dead-path carriers (deleted files still named)`,
+`testsuite counts (every bar self-test prints one)`, and the memory-tree hygiene leg.
+`codebase-map coverage + freshness` is the one on this list that reds WITHOUT a self-test flag and
+without a guard to scope it away — it re-derives `memory/map/generated/symbols.json`, which this
+unit moves eight rows of, so S10 regenerates the artifacts in the same commit and §6 AC10 observes
+it. This unit adds
 no new gate leg and no new ceiling. It adds one self-test arm to an existing suite, so no
 `memory/project/testsuite-count-waivers.txt` row is owed.
 
@@ -349,6 +477,26 @@ at stake and the scaffold route already covers it.
   cite corrected from `tools/codebase-map/selftest.py:1268-1276`, which is another arm's docstring,
   to `:1305-1313`. Header base re-pinned from `d0a18683` to `6c670b02`, the commit every figure in
   this rev was measured at.
+- rev-3 · 2026-09-04 · spec-audit round 1 folded, five findings. The second pass is renamed from
+  `verdict_pass`, which `--suggest` refuses because `verdict` is not a declared verb, to
+  `check_pass`, which it accepts; §4 gains an Identifiers-minted subsection running every name this
+  unit adds through the gate before minting it, copying `TOOL-aSurfacedLexicon-4`'s practice. AC1
+  and AC2 no longer claim byte-identity of `--check` output, which was unsatisfiable because the
+  deleted functions are themselves graded corpus: AC1 now pins the offender counts, the coverage
+  line and the `lexicon OK` line, states the `graded=` delta as measured at minus 2 on `P1 verb`,
+  and re-derives it at build time; §3's identically-worded non-goal and §5's observability bullet
+  follow. AC8 is scoped to the carriers this unit owns and rewritten as `git grep`, since rev-2's
+  spelling put its options after the `--` and could not run; the expected answer is now zero in
+  scope, with the surviving `tools/unattended/` residue split into AC8b and pinned at its measured
+  size in both directions. AC9 becomes an absence assertion over the real call-site population
+  rather than a `grep -c` that missed one of its own targets and named no expected value. New S10
+  and AC10 regenerate `memory/map/generated/` in the same commit and add
+  `codebase-map coverage + freshness` to §7, because that leg is unguarded and this unit moves eight
+  rows of `symbols.json`; the RED was staged and observed. §4's `--brief` rejection is re-grounded
+  on cost alone, citing `TOOL-dScaffoldedMirror-8` and `TOOL-dScaffoldedMirror-10`, which put the
+  anti-mirror line at selection rather than reporting; §3 now states that the deleted route is the
+  one the source calls primary and that no unit in this build restores a per-file reading.
+- rev-4 · 2026-09-04 · round-1 audit fold verification. AC2 said "all three pin lines" where the order-1 sibling deletes one of them; the count is gone and the sibling is excluded by name, matching AC1.
 
 ## 10. Reuse audit
 
