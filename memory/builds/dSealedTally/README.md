@@ -53,6 +53,14 @@ before the check that refuses it.
 - **`DEPL-dSealedTally-3` has a REJECTED obvious fix on the record.** `set(before) <= set(after)`
   reds on a legal rename, measured on `tools/demo/content.txt`. An assertion that fires on correct
   work is worse than the gap it closes.
+- **The M4 audit came back BLOCKED with 22 confirmed findings, and two of them killed mechanisms.**
+  `DEPL-dSealedTally-1` rev-1 appended to a structure the pass had already consumed 200 lines
+  earlier; `TOOL-dSealedTally-1` rev-1 cited none of the three OPEN backlog rows that had already
+  measured its defect four times and decided a wider fix. Both are folded at rev-2.
+- **The build order is now a five-step chain, not two parallel pairs.** Four units write
+  `tools/govkit/selftest.py`, so M6 clause 1 forbids running them together. Only `order 1` is
+  parallel, and only because `TOOL-dSealedTally-1` touches no file the others do.
+
 
 ## Parked decisions
 
@@ -62,12 +70,12 @@ None yet.
 
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `DEPL-dSealedTally-1` | 2 | landed sources join the verify-and-rollback pass |
-| 2 | `DEPL-dSealedTally-2` | 2 | `rename_dests` is populated eagerly, before any row can exit |
-| 3 | `DEPL-dSealedTally-3` | 1 | the tracked-path check grades paths, excusing renames and withdrawals |
-| 4 | `DEPL-dSealedTally-4` | 2 | `index_read` asserts git's exit code instead of reading a failure as absence |
-| 5 | `DEPL-dSealedTally-5` | 1 | the govkit self-test grades the tree, not the commit's ref-reachability |
-| 6 | `TOOL-dSealedTally-1` | 2 | `--landed` writes its terminal phase after every check that can refuse it |
+| 1 | `DEPL-dSealedTally-2` | 2 | `rename_dests` is populated eagerly, before any row can exit |
+| 1 | `TOOL-dSealedTally-1` | 2 | `--landed` writes phase and anchor together, after every check |
+| 2 | `DEPL-dSealedTally-4` | 2 | `index_read` asserts git’s exit code, splitting pre- and mid-write sites |
+| 3 | `DEPL-dSealedTally-1` | 2 | landed sources join the verify-and-rollback pass |
+| 4 | `DEPL-dSealedTally-3` | 1 | the tracked-path check grades paths, excusing pre-rename and withdrawn |
+| 5 | `DEPL-dSealedTally-5` | 2 | the govkit self-test pins a ref-reachable same-tree vintage |
 
 <!-- /roster:units -->
 
@@ -78,28 +86,30 @@ ids DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTall
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dSealedTally-2 — `rename_dests` is populated eagerly, before any row can exit](spec/2026-09-04-spec-DEPL-dSealedTally-2.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
-| [DEPL-dSealedTally-4 — `index_read` asserts git's exit code instead of reading failure as absence](spec/2026-09-04-spec-DEPL-dSealedTally-4.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
-| [TOOL-dSealedTally-1 — `--landed` writes its terminal phase after every check that can refuse it](spec/2026-09-04-spec-TOOL-dSealedTally-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
-| [DEPL-dSealedTally-1 — landed sources join the verify-and-rollback pass](spec/2026-09-04-spec-DEPL-dSealedTally-1.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-04 |
-| [DEPL-dSealedTally-3 — the tracked-path check grades paths, excusing renames and withdrawals](spec/2026-09-04-spec-DEPL-dSealedTally-3.md) | 2 | 1 | SPECCED | rev-1 | 2026-09-04 |
-| [DEPL-dSealedTally-5 — the govkit self-test grades the tree, not the commit's ref-reachability](spec/2026-09-04-spec-DEPL-dSealedTally-5.md) | 3 | 1 | SPECCED | rev-1 | 2026-09-04 |
+| [DEPL-dSealedTally-2 — `rename_dests` is populated eagerly, before any row can exit](spec/2026-09-04-spec-DEPL-dSealedTally-2.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-dSealedTally-1 — `--landed` writes phase and anchor together, after every check](spec/2026-09-04-spec-TOOL-dSealedTally-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [DEPL-dSealedTally-4 — `index_read` asserts git's exit code instead of reading failure as absence](spec/2026-09-04-spec-DEPL-dSealedTally-4.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [DEPL-dSealedTally-1 — landed sources join the verify-and-rollback pass](spec/2026-09-04-spec-DEPL-dSealedTally-1.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [DEPL-dSealedTally-3 — the tracked-path check grades paths, excusing renames and withdrawals](spec/2026-09-04-spec-DEPL-dSealedTally-3.md) | 4 | 1 | SPECCED | rev-2 | 2026-09-04 |
+| [DEPL-dSealedTally-5 — the govkit self-test grades the tree, not the commit's ref-reachability](spec/2026-09-04-spec-DEPL-dSealedTally-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `DEPL-dSealedTally-2`, `DEPL-dSealedTally-4`, `TOOL-dSealedTally-1` | yes |
-| 2 | `DEPL-dSealedTally-1`, `DEPL-dSealedTally-3` | yes |
-| 3 | `DEPL-dSealedTally-5` | no |
+| 1 | `DEPL-dSealedTally-2`, `TOOL-dSealedTally-1` | yes |
+| 2 | `DEPL-dSealedTally-4` | no |
+| 3 | `DEPL-dSealedTally-1` | no |
+| 4 | `DEPL-dSealedTally-3` | no |
+| 5 | `DEPL-dSealedTally-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,82 +1,137 @@
 # DEPL-dSealedTally-5 — the govkit self-test grades the tree, not the commit's ref-reachability
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node d · Tier-1 · base 0f19429a · streams deployer · order 3
+**Status:** SPECCED · rev-2 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 TOOL-dSealedTally-1 |
+| [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 TOOL-dSealedTally-1 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 `python tools/govkit/selftest.py` red 46 arms on a `--no-ff` merge commit made on a detached head,
-and passed all 1074 over the byte-identical tree on a branch. The suite drives `update`, whose
-`--to` defaults to `HEAD`, and `demand_published_vintage` refuses a commit no ref contains. Make the
-suite's verdict a function of the tree it grades.
+and passed all 1074 over the byte-identical tree on a branch. The suite's real-root `update`
+invocations default to `--to HEAD`, and `demand_published_vintage` refuses a commit no ref
+contains. Pin those invocations to a ref-reachable commit carrying the SAME TREE, so the suite's
+verdict is a function of the tree it grades.
 
 ## 2. Scope (IN)
 
-- **S1** The suite pins the gov vintage it hands `update` to a REF-REACHABLE commit rather than
-  letting it default to `HEAD`, so a detached head is no longer a refusal.
-- **S2** The pin is DERIVED, not spelled: the suite asks git which ref-reachable commit describes
-  the tree under test, and REFUSES with a named reason if it cannot find one, rather than falling
-  back to a default that would reintroduce the coupling.
-- **S3** A liveness assertion: an arm proving the pin actually took effect, so a run where the
-  derivation silently returned `HEAD` is distinguishable from one where it worked.
-- **S4** `demand_published_vintage` itself is unchanged. It is a correct guard and the bug is that
-  the suite hands it an argument the suite chose.
+- **S1** A pin is derived once and threaded ONLY into the real-root invocations — those going
+  through the `run(*args)` helper at `tools/govkit/selftest.py:69`, which executes govkit in the
+  checkout under test.
+- **S2** The pin is a ref-reachable commit whose `rev-parse <pin>^{tree}` EQUALS
+  `rev-parse HEAD^{tree}`. Tree identity is the acceptance condition, not mere ref-reachability: an
+  ancestor that is ref-reachable but carries a different tree grades the wrong tree, which is the
+  same defect one level over.
+- **S3** When no such commit exists, the suite prints a NAMED refusal and exits non-zero rather than
+  falling back to `HEAD`.
+- **S4** The fixtures that `apply` at gov HEAD apply at the PIN instead, so each receipt's
+  `gov_commit` IS the pin and `demand_forward_vintage` holds reflexively.
+- **S5** A liveness arm asserting BOTH conditions of the pin — that its tree equals the working
+  tree's, and that some ref contains it. Either alone is satisfied by a silently-defaulted `HEAD`.
+- **S6** Neither `demand_published_vintage` nor `demand_forward_vintage` is changed. Both are
+  correct guards; the bug is the argument the suite hands them.
 
 ## 3. Non-goals (OUT)
 
-- Not relaxing `demand_published_vintage`. Refusing a vintage no ref names is what stops a branch
-  nobody shipped becoming an adopter's baseline, and weakening it to make a test pass would be the
-  test dictating the product.
-- Not making the `govkit selftest` leg skip on a detached head. A skip that looks like a pass is
-  the class this repo gates against; the suite should RUN and grade the tree.
-- Not auditing other legs for the same coupling. Empirically only this one red at the merge commit,
-  and a sweep is a separate unit if one is wanted.
+- Not touching the scratch-gov invocations. 27 scratch repositories are built by
+  `git init -q -b main` plus one commit, and a sha from the real checkout does not exist in their
+  object databases at all — threading the pin there would convert a 46-arm failure into a near-total
+  one.
+- Not touching any invocation that already carries its own `--to`. 32 of the 74 do, several taking a
+  deliberate per-fixture vintage from a scratch repo's own history, and a blanket pin would clobber
+  what those arms grade.
+- Not relaxing either vintage guard. Refusing a vintage no ref names is what stops a branch nobody
+  shipped becoming an adopter's baseline; refusing a downgrade is what stops a rewind being recorded
+  as an update.
+- Not making the `govkit selftest` leg skip on a detached head. A skip that looks like a pass is the
+  class this repo gates against; the suite should RUN and grade the tree.
 
 ## 4. Design
 
 ### Data model
 
-A module-level resolution in `tools/govkit/selftest.py`: ask `git for-each-ref --contains HEAD
---count=1` for a ref that already contains the working commit, and use `HEAD` when one exists. When
-none does — the detached-merge case — walk to the first ancestor that IS ref-reachable via
-`git rev-list --max-count=1 HEAD --not --branches --remotes` inverted, or more simply take
-`git rev-parse HEAD^{commit}`'s nearest described ancestor. The value is passed to every `update`
-invocation as an explicit `--to`.
+One module-level value in `tools/govkit/selftest.py`, resolved before any arm runs, and threaded
+through the `run(*args)` helper alone.
 
-The REFUSAL matters more than the happy path: if no ref-reachable ancestor exists at all, the suite
-prints a named refusal saying the tree cannot be graded here and why, rather than proceeding.
+### Inventory
+
+The population, counted rather than asserted — rev-1 said "every `update` invocation" and that was
+false of all three groups:
+
+| Group | Count | Pin applies |
+|---|---|---|
+| `update` invocations in the suite | 74 | — |
+| already carrying an explicit `--to` | 32 | no, untouched |
+| against a scratch gov repo | 27 repos | no, the sha does not exist there |
+| real-root, via `run(*args)` at line 69 | the remainder | YES |
+
+### Migration
+
+The derivation, spelled as one runnable sequence rather than two candidates neither of which ran:
+
+```bash
+T=$(git rev-parse HEAD^{tree})
+if [ -n "$(git for-each-ref --contains HEAD --count=1)" ]; then
+  PIN=$(git rev-parse HEAD)                 # ordinary case: HEAD is ref-reachable
+else
+  PIN=""
+  for p in $(git rev-parse HEAD^@); do      # every parent, not just the first
+    [ "$(git rev-parse "$p^{tree}")" = "$T" ] || continue
+    [ -n "$(git for-each-ref --contains "$p" --count=1)" ] || continue
+    PIN=$p; break
+  done
+fi
+```
+
+Measured on a scratch repository holding a detached `--no-ff` merge: HEAD tree `02573c73`,
+parent^1 `0aa8969` tree `3be22be7` (ref-reachable but the WRONG tree), parent^2 `741af85` tree
+`02573c73` (ref-reachable and the right one). `HEAD^` would have picked parent^1, which is why
+rev-1's `^` spelling was wrong and why the loop tests every parent.
+
+`PIN` empty is S3's refusal. It is NOT a fallback to `HEAD`: falling back is what makes a broken
+derivation indistinguishable from a working one.
+
+### Rollout
+
+The pin is threaded at one helper, so a future edit widening it is visible in one place.
 
 ### Files touched (estimate)
 
-`tools/govkit/selftest.py` (~50 lines: the resolution, its refusal, the `--to` threading through the
-`update` helper, and the liveness arm).
+`tools/govkit/selftest.py` (~70 lines: the resolution, its refusal, the `--to` threading through
+`run(*args)`, the apply-at-pin change for S4, and the liveness arm).
 
 ### Alternatives rejected
 
 Creating a temporary ref pointing at `HEAD` for the duration of the suite. Rejected: it mutates the
-repository the suite is grading, and a crashed run leaves the ref behind. Deriving an existing
-ancestor reads and writes nothing.
+repository the suite is grading, and a crashed run leaves the ref behind.
+
+Deriving the pin as `HEAD^` or "the nearest described ancestor", which is what rev-1 said. Rejected
+on measurement, above: for a merge, `^` is the pre-merge base and its tree is not the tree under
+test.
 
 ## 5. Production-readiness checklist
 
-- security — N/A — a test harness change; the guard it stops tripping is untouched.
-- perf / scale — one `for-each-ref` per suite run, not per arm.
+- security — N/A — a test harness change; neither guard it stops tripping is touched.
+- perf / scale — one `for-each-ref` and at most a handful of `rev-parse` calls per suite run, not
+  per arm.
 - a11y — N/A.
 - i18n — N/A.
-- error / empty / loading states — a repository with no refs at all is the refusal case, named.
-- observability — the suite prints which vintage it pinned, so a reader can tell a pinned run from
-  an unpinned one without reading the code.
-- risks — the derivation could silently pick a WRONG ancestor, grading an older tree. S3's liveness
-  arm exists for exactly that, and the printed vintage makes it visible.
-- testing + left-shift gates — the liveness arm; and the real regression test is that the suite now
-  passes on a detached head, which is checkable directly.
+- error / empty / loading states — a repository with no ref-reachable same-tree commit is S3's
+  named refusal, which is the empty case and is not a fallback.
+- observability — the suite prints the pin it resolved and which branch it took, so a reader can
+  tell a pinned run from a defaulted one without reading the code.
+- risks — the derivation picking a ref-reachable commit with a DIFFERENT tree would grade the wrong
+  tree silently. S2 makes tree identity the acceptance condition and S5's arm asserts both halves,
+  which is the mitigation actually covering the risk — rev-1 named a mitigation that did not.
+- testing + left-shift gates — S5's liveness arm, plus an arm counting explicitly-pinned `update`
+  invocations against a declared number, so a future edit widening the pin reds rather than quietly
+  re-pointing fixtures.
 - migration / rollback — reverting the commit is the rollback.
 - user docs — N/A.
 
@@ -84,13 +139,22 @@ ancestor reads and writes nothing.
 
 - **AC1** — When `python tools/govkit/selftest.py` runs on a detached `--no-ff` merge commit whose
   tree matches a branch tip, it exits 0, where at base `0f19429a` it exits 1 with 46 failing arms.
-- **AC2** — When `python tools/govkit/selftest.py` runs on that same tree checked out as a branch, it still exits 0 with an arm
-  count strictly greater than the 1074 at base, so the fix adds coverage rather than removing arms.
-- **AC3** — When the suite starts, it prints the gov vintage it pinned and whether that vintage is
-  `HEAD` or a derived ancestor, observable in `tools/govkit/selftest.py`'s own stdout.
-- **AC4** — When no ref-reachable commit can be derived, the suite prints a named refusal and exits
-  non-zero rather than silently defaulting to `HEAD`, proved by an arm in
-  `tools/govkit/selftest.py` driving the resolution against a fixture repository with no refs.
+- **AC2** — When `python tools/govkit/selftest.py` runs on that same tree checked out as a branch,
+  it still exits 0, so the fix does not trade one head shape for another.
+- **AC3** — When the pin is resolved, an arm in `tools/govkit/selftest.py` asserts BOTH that
+  `rev-parse <pin>^{tree}` equals `rev-parse HEAD^{tree}` AND that some ref contains the pin — the
+  liveness assertion, failing if the resolution silently returned an unpinned `HEAD`.
+- **AC4** — When no ref-reachable same-tree commit exists, `tools/govkit/selftest.py` prints a named
+  refusal and exits non-zero, proved by an arm driving the resolution against a fixture repository
+  with no refs.
+- **AC5** — When the suite runs, the `--to` values passed by the scratch-gov helpers and by every
+  invocation already carrying one are UNCHANGED from base `0f19429a`, asserted by an arm counting
+  explicitly-pinned invocations against a declared number.
+- **AC6** — When a fixture applied at the pin is then updated to the pin,
+  `demand_forward_vintage` does not refuse it, proved by an arm in `tools/govkit/selftest.py`
+  exercising the apply-then-update path on a detached head.
+- **AC7** — When `python tools/govkit/selftest.py` runs, its arm count is at least 4 greater than
+  the count observed at the head of `order 4`, captured in §9 when this unit's pass opens.
 
 ## 7. Gates
 
@@ -105,13 +169,26 @@ none
 
 - rev-1 · 2026-09-04 · initial draft. The 92/93 and 1074/1074 figures are from `dRatifiedSeam`'s
   own landing, recorded in its closing diff review.
+- rev-2 · 2026-09-04 · folded the spec audit's B3, B5, H4, H12 and M2, and raised the tier from 1 to
+  2 because the unit turned out to touch a guarded argument's whole path. B3: rev-1 said "every
+  `update` invocation" and the population is three groups, not one — 74 total, 32 already pinned, 27
+  scratch repositories whose object databases do not hold a real-root sha; §3 and the Inventory now
+  count them. B5: `demand_forward_vintage` at `tools/govkit/govkit.py:4129` runs first and refuses
+  an ancestor pin as a downgrade, which made rev-1's AC1 unsatisfiable by any implementation; S4 and
+  AC6 close it by applying fixtures at the pin. H4 and H12: the derivation now requires TREE
+  IDENTITY, measured against a real detached merge where `^` picks the wrong-tree parent. M2:
+  the derivation is one runnable sequence with its empty case named, replacing two candidates
+  neither of which ran. Order moved 3 to 5 per M1.
 
 ## 10. Reuse audit
 
-No existing seam fits — the evidence is that `tools/govkit/selftest.py` has no vintage-resolution
-layer at all today: every `update` invocation in it relies on the `--to HEAD` default, which is the
-coupling being removed. `reuse_lookup.py` returned no candidate in the self-test's own harness
-layer, and `demand_published_vintage` is the guard rather than a seam to extend.
+No existing seam fits — `tools/govkit/selftest.py` has no vintage-resolution layer today, which is
+the coupling being removed; `python tools/codebase-map/reuse_lookup.py "resolve a ref-reachable
+commit for a working tree"` returned no candidate in the suite's harness layer, and both vintage
+guards are things this unit satisfies rather than seams it extends.
+
+`memory/backlog/DEPL.md` carries `DEPL-dRatifiedSeam-6` as the row this unit closes; no other OPEN
+DEPL row names `tools/govkit/selftest.py`'s vintage handling.
 
 Recall terms used: `govkit update receipt rollback verify snapshot touched_kits landing unclaimed
 sources liveness dead probe index_read topology`

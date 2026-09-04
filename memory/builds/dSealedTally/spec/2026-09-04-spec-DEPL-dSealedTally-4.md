@@ -1,12 +1,13 @@
 # DEPL-dSealedTally-4 — `index_read` asserts git's exit code instead of reading failure as absence
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 1
+**Status:** SPECCED · rev-2 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
+| [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,14 @@ A refusal where there was silence. The risk direction is a run that now stops ra
 proceeding on bad data, which is the intended trade: `update` writes into a repository gov does not
 own, and proceeding on a false "absent" is how it decides a path is free to write.
 
+THE CALL SITES SPLIT, and rev-1 treated them as one. The preamble read and the snapshot's
+extra-path read are PRE-WRITE: a refusal there aborts before anything is touched, which is
+strictly safe. The read at `tools/govkit/govkit.py:6460` is MID-WRITE: a raise there leaves a
+part-written target and never reaches the rollback pass, which is the harm this build is
+otherwise closing. So the mid-write site FAILS AND CONTINUES — it records the read as failed,
+marks the run for rollback, and lets the verify pass run — while the pre-write sites raise. Two
+behaviours, because the two positions owe different things.
+
 ### Files touched (estimate)
 
 `tools/govkit/govkit.py` (~15 lines: the returncode check and its refusal text).
@@ -70,8 +79,10 @@ exactly the bug being fixed. A refusal at the read is one decision in one place.
 - perf / scale — one integer comparison per chunk.
 - a11y — N/A — a CLI verb with no rendered surface.
 - i18n — N/A — operator-facing English.
-- error / empty / loading states — an EMPTY path list still returns empty maps without invoking
-  git, which the existing `if not chunk` guard already handles and this change must not disturb.
+- error / empty / loading states — an EMPTY path list returns empty maps because the chunking
+  loop does not execute at all; the `if not chunk` guard inside it is unreachable for every input
+  and is NOT what handles this. The returncode check sits inside the loop body, so an empty list
+  still spawns nothing. Rev-1 named the unreachable guard as load-bearing.
 - observability — the refusal names the exit code and stderr, so the operator sees git's own words.
 - risks — a run that previously limped now refuses. That is the point, and the refusal names the
   remedy rather than leaving the operator stuck.
@@ -92,6 +103,12 @@ exactly the bug being fixed. A refusal at the read is one decision in one place.
   git, proved by an arm asserting no subprocess is spawned in `tools/govkit/selftest.py`.
 - **AC5** — When the returncode check is reverted in a scratch copy of `tools/govkit/govkit.py`, the AC1 arm FAILS, recorded as
   an observed staged break rather than asserted.
+- **AC6** — When the MID-WRITE read at `tools/govkit/govkit.py:6460` fails, the run reaches its
+  own rollback pass rather than raising, proved by an arm in `tools/govkit/selftest.py` forcing
+  that site to fail and asserting the target is restored.
+- **AC7** — When `python tools/govkit/selftest.py` runs, it exits 0 and its arm count is at
+  least 5 greater than the count observed at the head of `order 1`, captured in §9 when this
+  unit's pass opens.
 
 ## 7. Gates
 
@@ -105,13 +122,22 @@ exactly the bug being fixed. A refusal at the read is one decision in one place.
   where a raise aborts a run mid-write. Options: raise always, or raise only on the read-only
   preflight read. Recommendation: raise always, because a snapshot built on a false absence is
   worse than an aborted run — the rollback pass depends on that snapshot being true.
-  RESOLVED (agent, 2026-09-04, delegated): raise always, per the recommendation. A snapshot that
+  RESOLVED (agent, 2026-09-04, delegated): raise at the PRE-WRITE sites, and fail-and-continue
+  at the mid-write site at 6460. The recommendation said raise always and the audit refuted it: a
+  raise at 6460 aborts a part-written target and never reaches the rollback pass. A snapshot that
   records a path as absent when it is not cannot roll that path back.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, grounded against `tools/govkit/govkit.py` lines 3752-3785 at
   `0f19429a`, where no `returncode` read exists in the function body.
+- rev-2 · 2026-09-04 · folded the spec audit's H11, L1, H5 and H3. H11 overturned F1's
+  resolution: one call site is mid-write, so raise-always would abort a part-written target in a
+  foreign repository and never reach the rollback pass — Rollout now splits the sites and AC6
+  observes the mid-write one. L1: rev-1 named the `if not chunk` guard as handling the empty case,
+  and it is unreachable for every input; the loop simply does not execute. H5 replaced the shared
+  arm-count constant with a delta. H3 moved the order from 1 to 2 so this unit no longer shares a
+  parallel step with `DEPL-dSealedTally-2` over an identical write set.
 
 ## 10. Reuse audit
 

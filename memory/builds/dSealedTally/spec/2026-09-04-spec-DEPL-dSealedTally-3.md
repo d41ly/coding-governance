@@ -1,12 +1,13 @@
 # DEPL-dSealedTally-3 — the tracked-path check grades paths, excusing renames and withdrawals
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node d · Tier-1 · base 0f19429a · streams deployer · order 2
+**Status:** SPECCED · rev-2 · 2026-09-04 · node d · Tier-1 · base 0f19429a · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
+| [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 
 <!-- /gen:spec-records -->
 
@@ -19,12 +20,16 @@ and a withdrawal.
 
 ## 2. Scope (IN)
 
-- **S1** A predicate over path sets replaces the count comparison at its assertion sites in
-  `tools/govkit/selftest.py`, taking the before set, the after set, and the paths this run
-  legitimately removed.
-- **S2** The legitimate-removal set is supplied by the fixture from what the run REPORTED it did —
-  the rename destinations and the withdrawn rows in the receipt — never inferred from the
-  difference it is grading.
+- **S1** A predicate over path sets replaces the count comparison at the assertion sites in
+  `tools/govkit/selftest.py` that grade a tracked-file population after an `update --write`,
+  taking the before set, the after set, and the paths this run legitimately removed. The sites
+  are enumerated in the pass's own commit message; every OTHER caller of `count_never_falls`
+  keeps it, which is what §3's third non-goal means.
+- **S2** The legitimate-removal set holds PRE-RENAME paths: each renamed receipt row's path as it
+  stood BEFORE the run, plus the withdrawn rows' paths. A rename removes the OLD path, so the
+  destination — which is what rev-1 said — excuses nothing. Both are read from the receipt taken
+  BEFORE the run, or from the run's own rename verdict lines, never from the difference being
+  graded: the post-run receipt carries only destinations and has withdrawn rows stripped out.
 - **S3** A staged-RED arm: a fixture that deletes one tracked file and lands another passes the old
   predicate and fails the new one.
 - **S4** A mutation control that actually discriminates, checked against the two that did not in
@@ -45,6 +50,12 @@ and a withdrawal.
 `paths_never_lost(before, after, excused)` returns `True` when `set(before) - set(after) <=
 set(excused)`. Three arguments, and the third is the whole design: without it the predicate is the
 rejected one, and with it inferred from the diff it is the vacuous one.
+
+`excused` holds PRE-RENAME paths and withdrawn paths. That direction is load-bearing and rev-1
+had it backwards: the set is subtracted from `before - after`, and what leaves `before` on a
+rename is the OLD path. Excusing the destination excuses a path that was never lost, so the
+predicate would still red on the `[-11]` fixture — the exact failure that made
+`set(before) <= set(after)` unusable.
 
 `excused` is assembled by the caller from two sources that both exist independently of the
 comparison: the rename destinations the run reported, and the paths of the receipt rows the run
@@ -89,8 +100,14 @@ on a legal rename because a rename removes the old path, and the `[-11]` fixture
   that path in `excused` and `False` with `excused` empty, so the argument is load-bearing.
 - **AC4** — When the mutation control runs, removing the `excused` subtraction makes the AC2 arm
   FAIL, recorded as an observed break in `tools/govkit/selftest.py` rather than asserted.
-- **AC5** — When `python tools/govkit/selftest.py` runs, it exits 0 with an arm count strictly
-  greater than the 1074 it reports at base `0f19429a`.
+- **AC5** — When the delete-one-land-one fixture is driven through one of S1's named assertion
+  sites, that site REDS where at base `0f19429a` it passes, proved in `tools/govkit/selftest.py`
+  — without this, the predicate could be correct and reach no caller.
+- **AC6** — When `paths_never_lost` is given a rename's DESTINATION as `excused` instead of its
+  pre-rename path, the `[-11]` fixture REDS, proving the direction in S2 is the load-bearing one.
+- **AC7** — When `python tools/govkit/selftest.py` runs, it exits 0 and its arm count is at
+  least 5 greater than the count observed at the head of `order 3`, captured in §9 when this
+  unit's pass opens.
 
 ## 7. Gates
 
@@ -104,6 +121,14 @@ none
 
 - rev-1 · 2026-09-04 · initial draft; the rejected alternative is carried from `dRatifiedSeam`'s
   closing diff review, which measured it on `tools/demo/content.txt`.
+- rev-2 · 2026-09-04 · folded the spec audit's H2, H9, H5 and M1. H9 is the one that mattered:
+  rev-1 put the rename's DESTINATION in `excused`, and the set is subtracted from
+  `before - after`, so it excused a path that was never lost and the predicate would still have
+  redded on the `[-11]` rename — the exact defect that disqualified the rejected alternative. S2,
+  the Data model and AC6 now carry the pre-rename direction. H2 added AC5, since rev-1 could have
+  shipped a correct predicate that no assertion site called. H5 replaced the shared arm-count
+  constant with a delta. M1 moved the order from 2 to 4 so this unit no longer shares a parallel
+  step with `DEPL-dSealedTally-1` over `tools/govkit/selftest.py`.
 
 ## 10. Reuse audit
 
