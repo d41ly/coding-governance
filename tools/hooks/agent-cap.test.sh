@@ -133,6 +133,28 @@ deny_growth "nested in another call"          'sink.push(LENSES.push(9))'
 deny_growth "after a semicolon"               'let i = 0; LENSES.push(x)'
 deny_growth "inside an arrow body"            'const f = () => LENSES.push(x)'
 deny_growth "as an expression statement"      '(LENSES.push(x))'
+# THE VIEW AXIS, which is the one every fold of this build broke and the first corpus did not reach.
+# Round 3's blocker: the take-back view stripped block comments over the JOINED text, so a `/*` in a
+# regex literal — this file models none, by standing decision — opened a phantom comment that ate
+# every take-back down to the next real `*/`. Ten spellings of the MUTATION could not see it,
+# because the mutation was never what changed.
+deny_growth "below a regex literal containing a comment opener" 'const re = /[/*]/
+LENSES.push(x)
+const t = 1 /* a later real closer */'
+deny_growth "between two regex literals"      'const a = /[/*]/
+LENSES.push(x)
+const b = /[*/]/'
+deny_growth "on the same line as a closed block comment" '/* note */ LENSES.push(x)'
+# The reassignment half of the same view, which round 3 found this fold had newly broken.
+check "deny-corpus: a reassignment below a regex-literal comment opener" 2 "$(node -e '
+  const s = "export const meta={name:\"x\",description:\"y\"}\nconst MAX_VERIFIERS = 5\nlet LENSES = [1,2,3]\n"
+          + "const re = /[/*]/\nLENSES = allFindings\nconst t = 1 /* closer */\n"
+          + "await boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)\n"
+  process.stdout.write(JSON.stringify({tool_name:"Workflow",tool_input:{script:s}}))')"
+# AND THE NEGATIVE HALF OF THE VIEW AXIS. A comment that MENTIONS a growth grows nothing, and a
+# spread NESTED in a removal-only splice's argument is not a spread argument.
+check "view axis: a single-line block comment mentioning a push → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n/* never do LENSES.push(x) here */\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+check "view axis: a spread nested in a removal-only splice → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nLENSES.splice(0, Math.min(...ns))\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
 
 # ---- the blanked view reports an unterminated scan (TOOL-aWeldedTribunal-3) ---------------------
 # The blanked view carries its mode ACROSS lines, correctly, because a template literal spans them.

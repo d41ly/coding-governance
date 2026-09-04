@@ -907,14 +907,24 @@ function fanoutFindings(script) {
   // are failures on the only mechanical control against an agent burst, in opposite directions, so
   // the view is BUILT here rather than borrowed from a rule that wants a different one.
   //
-  // Block comments are stripped over the JOINED text because they span lines; line comments per
-  // line. `code` has already had string contents blanked by the lexed view, so this adds only the
-  // comment strip.
-  const takeBackView = code
-    .join('\n')
-    .replace(/\/\*[\s\S]*?\*\//g, ' ')
-    .split('\n')
-    .map((l) => l.split('//')[0])
+  // THE STRIP IS PER LINE, NEVER OVER THE JOINED TEXT, and that is the whole of round 3's blocker.
+  // A joined strip pairs `/*` with the next `*/` anywhere below it — and this file models NO regex
+  // literal, by its own standing decision, so `const re = /[/*]/` (legal JS) opened a phantom
+  // comment that ran to the next real `*/` and DELETED every take-back between. Fail-OPEN, in both
+  // sweeps, and a regression against BASE for the reassignment one. `renderLexedView`'s own header
+  // refuses exactly this blanking for exactly this reason; the joined strip reinstated it one layer
+  // up, which is what makes it a defect rather than an inherited residual.
+  //
+  // Per line, a `/*` with no `*/` on the same line strips NOTHING and the damage cannot propagate.
+  // The single-line comment that round 1 found — `/* never do LENSES.push(x) here */` — still
+  // strips, which is the case that mattered.
+  //
+  // THE RESIDUAL, named rather than discovered later: a MULTI-LINE block comment mentioning a growth
+  // still revokes, because a per-line strip cannot see that the line is inside one. That is a false
+  // DENY — fail-CLOSED — on a shape no tracked harness writes, and it is the direction this file's
+  // posture prefers. Closing it needs a regex-literal-aware lexer, which this file has deliberately
+  // never had.
+  const takeBackView = code.map((l) => l.replace(/\/\*.*?\*\//g, ' ').split('//')[0])
 
   // A BARE REASSIGNMENT invalidates the bound. `let items = [1, 2]` then `items = allFindings` was a
   // measured bypass: the whitelist was keyed on a name and nothing ever took the name back. The
@@ -987,8 +997,12 @@ function fanoutFindings(script) {
       // shrink; a spread is unbounded growth, which the marked-branch veto forty lines above already
       // says, so it is treated as growth here rather than measured.
       if (/\.\s*splice\s*\($/.test(l.slice(0, g.index + g[0].length))) {
+        // The spread test is over the TOP-LEVEL arguments, not the whole call text. Scanning the
+        // text made `LENSES.splice(0, Math.min(...ns))` read as growth — a spread nested inside an
+        // argument grows nothing, and denying it states "was GROWN" about an array that shrank.
         const call = joinCall(takeBackView, li, g.index + g[0].length - 1)
-        if (call && !call.text.includes('...') && topLevelArgs(call.text).length < 3) continue
+        const args = call ? topLevelArgs(call.text) : null
+        if (args && !args.some((a) => a.trim().startsWith('...')) && args.length < 3) continue
       }
       ok.delete(g[1])
       markedWhy.set(g[1], `\`${g[1]}\` was GROWN by a mutation after its bounded assignment, which takes the bound back`)
