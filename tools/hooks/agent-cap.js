@@ -870,6 +870,39 @@ function fanoutFindings(script) {
     }
   })
 
+  // TOOL-aWeldedTribunal-2 — A GROWTH CALL TAKES THE BOUND BACK, exactly as a reassignment does.
+  // `const batches = []` counts zero elements and is blessed by the array-literal case above; a
+  // later `batches.push(...)` grows it to one entry per finding with the bound still standing
+  // (TOOL-aCandidStub-1). Runs AFTER both scan passes and beside the reassignment sweep, for that
+  // sweep's own stated reason: a name accepted on pass 2 and taken back earlier would fall through
+  // to whatever pass 1 wrote.
+  //
+  // NOT THE RIGHT-HAND-SIDE VOCABULARY, and the difference was MEASURED rather than reasoned. The
+  // marked-branch veto lists `concat|push|flat|flatMap|fill|repeat`, and three of those are
+  // NON-MUTATING: `concat`, `flat` and `flatMap` return a NEW array and leave the receiver exactly
+  // as long as it was. Run over this tree, that list took the bound back from `ALL_LENSES` on the
+  // strength of a `.concat` that changes nothing. The two answer different questions — the RHS one
+  // asks whether an expression can PRODUCE something bigger, this one whether a statement GROWS the
+  // array named — so they share this comment and not a constant.
+  //
+  // RESIDUALS, named rather than implied: a mutation through an alias (`const b = batches; b.push`)
+  // is not tracked, because this file tracks names and not values; and `batches[i] = x` past the end
+  // and `batches.length = n` both grow an array and are not here, because a regex over
+  // `name[<expr>] =` matches every ordinary element write and denies innocent files.
+  const GROWS_RECEIVER = /\b([A-Za-z_$][\w$]*)\s*\.\s*(?:push|unshift|splice)\s*\(/g
+  code.forEach((l) => {
+    let g
+    GROWS_RECEIVER.lastIndex = 0
+    while ((g = GROWS_RECEIVER.exec(l))) {
+      // Scoped to a name that HAD a bound, mirroring the reassignment sweep's `hadBound` guard:
+      // announcing that a bound was withdrawn from a name that never had one is that guard's own
+      // recorded defect, right verdict and false reason.
+      if (!ok.has(g[1])) continue
+      ok.delete(g[1])
+      markedWhy.set(g[1], `\`${g[1]}\` was GROWN by a mutation after its bounded assignment, which takes the bound back`)
+    }
+  })
+
   const bad = []
   lines.forEach((raw, i) => {
     const l = code[i]

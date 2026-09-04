@@ -66,6 +66,25 @@ check "do-block inline agent → deny" 2 '{"tool_name":"Workflow","tool_input":{
 check "bounded fan, no loop → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nawait boundedParallel(LENSES.map(L=>()=>agent(L)), 5)"}}'
 check "the words for-await inside a string → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const note = \"we never write for await (x of y) here\"\nawait boundedParallel(T, 5)"}}'
 
+# ---- a GROWN receiver loses its bound (TOOL-aWeldedTribunal-2) ----------------------------------
+# `const batches = []` counts zero elements and is blessed by the array-literal case; a later
+# `batches.push(...)` grows it to one entry per finding with the bound still standing. The arms
+# assert on the refusal TEXT, not just the exit code: an arm checking non-zero alone cannot tell
+# this rule's denial from the loop ban's, and a criterion that could not was this unit's own blocker.
+#
+# THE ADJACENCY IS THE POINT. The hook judges only lines containing `agent(`, and `push` is not an
+# ITER_CALL — so the agent call must sit lexically INSIDE the map receiver's parens for the iter arm
+# to be reached at all. `push` on one line and a detached `.map` on another is LEGAL and stays 0.
+check "grown-by-push receiver → deny, naming the mutation" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nbatches.push(f)\nawait boundedParallel(batches.map((f) => () => agent(f.claim)), MAX_VERIFIERS)"}}'
+check "grown-by-unshift receiver → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nbatches.unshift(f)\nawait boundedParallel(batches.map((f) => () => agent(f.claim)), MAX_VERIFIERS)"}}'
+check "grown-by-splice receiver → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nbatches.splice(0, 0, f)\nawait boundedParallel(batches.map((f) => () => agent(f.claim)), MAX_VERIFIERS)"}}'
+# THE NEGATIVES. An empty literal nobody grows is legal, and so is a growth whose fan is not
+# adjacent — a non-mutating `.concat`/`.flat`/`.flatMap` must NOT take a bound back, which is what
+# the pre-wiring run over this tree refuted the first vocabulary for.
+check "empty literal never grown → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nawait boundedParallel(batches.map((f) => () => agent(f.claim)), MAX_VERIFIERS)"}}'
+check "grown but the fan is not adjacent → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const batches = []\nbatches.push(f)\nconst out = batches.map((b) => b())\nawait agent(\"one call\")"}}'
+check "concat does not grow the receiver → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nconst more = LENSES.concat(extra)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+
 # ---- rule 5: the ref-keyed verdict join -----------------------------------------------------------
 # TOOL-dTieredTribunal-14's section 4 declared these ten arms as what "the failing case has been
 # observed" means for that unit, and the unit landed WITHOUT them: `git show --stat fb2d692e` never
