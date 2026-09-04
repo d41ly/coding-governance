@@ -121,5 +121,5 @@ tools/workflows/check-verifier-fanout.test.sh	1	hooks
 tools/workflows/check-workflow-syntax.js	2	workflows
 tools/workflows/drift-audit-state.js	1	(loose)
 tools/workflows/tier2-review.js	3	hooks,memory-tree,workflows
-tools/workflows/unattended-build.js	4	hooks,memory-tree,unattended,workflows
-tools/workflows/unattended-build.test.sh	1	workflows
+tools/workflows/unattended-build.js	5	hooks,memory-tree,unattended,workflows	the harness NAMES the sub-workflow it invokes: `workflow({scriptPath: 'tools/workflows/tier2-review.js'})` is the call itself, not prose about one, so the literal is the mechanism. TOOL-dRatifiedSeam-1 raised this 4 -> 5 by moving that spawn out of an agent prompt and into the script, where the path has to be real. The others are the same shape: a harness that cannot name what it runs does not run it.
+tools/workflows/unattended-build.test.sh	2	workflows	the suite ASSERTS on the sub-workflow's path — an arm greps the trace for `workflow:tools/workflows/tier2-review.js` to prove the spawn happened in the script rather than anywhere else. The literal IS the assertion; deriving it would make the arm agree with whatever the harness did.

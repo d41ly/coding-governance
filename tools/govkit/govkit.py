@@ -6200,7 +6200,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                     else f"DIFFERS by whole line — gov has {_live!r}")
             print(f"  {_k:<28} {_verdict}")
 
-    def _unclaimed_candidates(_withdrawn_paths):
+    def derive_unclaimed_candidates(_withdrawn_paths):
         """Which declared destinations the receipt has never named — the decision, with no writes.
 
         DEFINED ONCE AND CALLED TWICE, by the read-only preview and by the write loop, so the two
@@ -6267,13 +6267,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # repository gov does not own — and the one thing this build added was the one thing an operator
     # could not preview. That is the inverse of the safety the default exists to provide.
     #
-    # ONE IMPLEMENTATION, TWO CALLS. `_unclaimed_candidates` is defined once and used here and by
+    # ONE IMPLEMENTATION, TWO CALLS. `derive_unclaimed_candidates` is defined once and used here and by
     # the write path, so the preview cannot drift from what actually lands. What it CANNOT know yet
     # is withdrawals: `withdrawn_rows` is computed further down, after this return. So the preview
     # says so rather than quietly listing a row a withdrawal would remove — a preview that overstates
     # by one row and admits it beats one that is silently wrong.
     if not write:
-        _pv_land, _pv_ref = _unclaimed_candidates(set())
+        _pv_land, _pv_ref = derive_unclaimed_candidates(set())
         print(f"govkit update — unclaimed sources: {len(_pv_land)} would land · "
               f"{len(_pv_ref)} would be refused  [preview: withdrawals are decided later in a "
               f"write run, so a row here may yet be withdrawn]")
