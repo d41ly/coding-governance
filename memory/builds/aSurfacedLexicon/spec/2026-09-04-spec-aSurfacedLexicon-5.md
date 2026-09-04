@@ -1,10 +1,12 @@
 # TOOL-aSurfacedLexicon-5 — the convention predicate
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-6 |
 
 <!-- /gen:spec-records -->
 
@@ -57,7 +59,11 @@ exists anywhere in `tools/lexicon/` — the only case-aware code is `run_suggest
 - The prefix and decorator selector Q10 added to the build, and the shell parser Q5 added. Both route
   a SUBSET of a cell's population to a different convention, and neither is reachable from a
   classifier that sees one name at a time.
-- Deciding which cells ship armed. This unit builds the predicate; the conf rewrite arms it.
+- Deciding which cells ship armed. This unit builds the predicate and arms NOTHING. The arming
+  boundary is two units and not one: `TOOL-aSurfacedLexicon-6` arms the FIRST cell, `py.constant`, at
+  build order 4, and `TOOL-aSurfacedLexicon-12` pastes the rest of the matrix at order 7. Rev-2 wrote
+  "the conf rewrite arms it", which read as an absolute and was contradicted by a sibling one order
+  after this one — a reader of rev-2 would have refused the conf edit unit 6 requires.
 - Fixing non-ASCII identifiers. The research record files an unreviewed finding that `subtokens.py`
   is ASCII-only, and this non-goal used to claim the classifier "does not widen" that exposure. **It
   does widen it, and the claim is struck.** `read_core`'s `_AFFIX` is an anchored DOTALL strip, so a
@@ -191,19 +197,80 @@ Identifiers this unit mints, each with its cell.
 | `check_convention` | `py.function` | one name against one declared convention, returning a verdict |
 | `read_stem` | `py.function` | basename up to the first dot |
 
-`read` is the declared verb for "pull bytes or records from a named source" and `check` for "assert a
-predicate and return a verdict", so `read_core`, `read_stem` and `check_convention` need no
-consultation. `classify` is NOT in the declared table, which this unit records rather than papers
-over: it is one of the 418 UNRULED offenders the P1 split is being built to report, it is the name the
-prototype used, and renaming it to fit is the reflex the charter's naming bullets call a synonym list.
-It stays and it is reported.
+**All six went to the gate rather than to judgement**, which rev-2 did for one of them and inferred
+for the rest. `python tools/lexicon/lexicon.py --suggest <name>`, run per identifier at `693bcf96`:
+`read_core`, `read_stem` and `check_convention` each answer `OK — ... leads with <verb>, which the
+declaration carries`, while `classify`, `_AFFIX` and `_FORMS` each answer `... is not in the declared
+table, and no row bans it by name`. Three refusals, not one. Only one of the three costs anything,
+and the next subsection is the measurement that says which.
+
+`classify` STAYS, which this unit records rather than papers over: it is the name the prototype used,
+and renaming it to fit is the reflex the charter's naming bullets call a synonym list. The
+disposition is ratified elsewhere and is not re-derived here — `memory/backlog/TOOL.md` row
+`TOOL-aResumedRelay-1` is OPEN and already refused a rename for this same engine-name class on the
+scoping-not-spelling argument. What rev-3 adds is that keeping the name COSTS something, which rev-2
+did not budget.
+
+### The pin this unit raises
+
+`VERB_OFFENDER_PIN` has ZERO headroom, and rev-2's argument for `classify` was built on not knowing
+it. Measured at `693bcf96`: `python tools/lexicon/lexicon.py --check` prints
+`P1 verb graded=1045 offenders=461 waived=0` and exits 0, and `grep -n VERB_OFFENDER_PIN
+.lexicon.conf` returns `461`. Rev-2 reasoned that `classify` is already among the unruled offenders
+the P1 split reports, which does not save it: P1 counts offenders per OCCURRENCE and not per distinct
+name, so a new definition is a new offender however many namesakes it has.
+
+Staged and measured rather than predicted. With all six identifiers appended to
+`tools/lexicon/subtokens.py` as bare definitions, the same command prints
+`P1 verb graded=1049 offenders=462`, exits 1, and leads with
+`lexicon: verb offenders 462 over pin 461`. Restoring the file returns it to
+`graded=1045 offenders=461` and exit 0.
+
+**Two numbers in that measurement move for different reasons, and separating them is the whole
+budget.** `graded` moves by FOUR because P1 grades function definitions, so `read_core`, `classify`,
+`check_convention` and `read_stem` all enter the population. `offenders` moves by ONE because only
+`classify` leads with an undeclared token. `_AFFIX` and `_FORMS` are module-body assignments, which
+P1 does not grade at all — their `--suggest` refusals are real and cost this landing nothing. The
+other two pins do not move either: the same staged run prints `P2 suffix graded=41 offenders=0` and
+`P3 layer graded=557 offenders=0`, unchanged.
+
+So the landing commit raises the pin `461` -> `462` in the conf's existing RAISED-by-name comment
+form, naming `classify` as the sole arrival and carrying the command that measured it. That is AC11,
+and it is why `### Rollout` no longer claims this unit moves no verdict. The leg an unbudgeted pin
+would have red is `lexicon naming predicates` — the same leg §7 nominates — so the omission would
+have red this unit's own verification route on its own landing commit.
 
 ### Rollout
 
-The predicate lands inert. It is reachable only from a cell declared in `CELLS`, and no cell is armed
-until the conf rewrite unit pastes the matrix. So this unit can land, be gated by its own fixtures and
-be reverted without moving a single verdict on the bar — which is the dark-landing rule applied to a
-predicate rather than to a feature.
+**The predicate lands INERT as code and NOT inert on the bar, and rev-2 conflated those two.** The
+first half stands: the predicate is reachable only from a cell declared in `CELLS`, the tracked
+declaration carries no `CELLS` block at all — `grep -nE '^[A-Z]+:' .lexicon.conf` returns `VERBS:`
+and `LAYERS:` and nothing else — and this unit adds none. Arming belongs to the two units §3 now
+names, at build orders 4 and 7.
+
+**One verdict on the bar DOES move, so rev-2's "without moving a single verdict" is struck.** The
+`def classify` this unit mints is a P1 verb offender against a pin with zero headroom, so the landing
+commit raises that pin. The arithmetic, the staged measurement and the criterion are
+`### The pin this unit raises` and AC11.
+
+**Every criterion phrased against an ARMED cell is therefore measured in a scratch declaration, and
+each one now says so.** A scratch declaration is a `CELLS` block written into the working-tree
+`.lexicon.conf` and never committed: `main()` resolves the root with `git rev-parse --show-toplevel`
+and `run()` opens `root / CONF_NAME`, so the engine takes no `--conf` flag and no fixture repo is
+needed. The corpus is still the real tracked tree, which is why AC3, AC4, AC6 and AC7 keep the tree's
+own denominators. AC6 already took this route at rev-2 and the other seven criteria now match it;
+rev-2 phrased them against the bar's own declaration, where none of them could be observed at all.
+
+**What is DEFERRED, named rather than implied.** The STANDING verdict for each cell against the
+tracked declaration is not this unit's to observe, because this unit arms nothing:
+`py.constant` is `TOOL-aSurfacedLexicon-6`'s at order 4, and every other cell —
+including the four file cells whose dotfile stem rule `### The empty-core population` hands off — is
+`TOOL-aSurfacedLexicon-12`'s at order 7. What is NOT deferred is the observed-RED obligation. Both
+staged breaks, AC1's `loadUserData` and AC10's `_`, are observed RED against a scratch declaration
+before this unit is called done, which is where "a new predicate is not landed until its failing case
+has been observed" is actually discharged. Deferring the failing case to the arming unit would have
+been the same rule broken quietly, and it is the reason the scratch route was taken over the
+alternative of pulling `CELLS` rows into this unit's scope.
 
 ### Files touched (estimate)
 
@@ -213,6 +280,11 @@ predicate rather than to a feature.
 | `tools/lexicon/lexicon.py` | call the predicate from the corpus walk per armed cell, and print the verdict and teeth lines |
 | `tools/lexicon/selftest.py` | red and green fixtures per verdict, the staged-break arm, the teeth arm, the stem arm |
 | `tools/lexicon/README.md` | the convention paragraph, replacing a promise with a description |
+| `.lexicon.conf` | `VERB_OFFENDER_PIN` `461` -> `462` in the RAISED-by-name comment form, `classify` named as the sole arrival (AC11). NO `CELLS` row: this unit arms nothing |
+| `memory/map/generated/symbols.json` | regenerated by `python tools/codebase-map/gen_map.py --write` in the same commit (AC12) |
+| `memory/map/features/lexicon.md` | dossier prose refreshed on touch, per the charter DoD. No new claim is owed — see AC12 |
+
+The last three rows are rev-3's, and each closes a way this unit would have red a leg it never named.
 
 ESTIMATE, and marked as one for the reason the research record gives: nothing comparable ships, so a
 line count would be a guess. The prototype's own classifier is nine lines plus six patterns, which is
@@ -256,10 +328,16 @@ a floor for the classifier alone and says nothing about the walk or the report.
   core, which was fork F1 and is now ratified as AMBIGUOUS under Q7's message. Every state is one of
   the three verdicts, and each is printed; the fall-through that printed nothing is closed in §4.
 - observability — the teeth line of S8 is the observability requirement, not a nicety: a cell printing
-  zero violations and nothing else is indistinguishable from a cell that cannot fail.
-- risks (concurrency, data-loss, rollback hazards) — none for this unit. It writes nothing and lands
-  inert per `### Rollout`. The build-wide concurrency risk lives in the pin block, which is
-  `TOOL-aSurfacedLexicon-4`'s fork.
+  zero violations and nothing else is indistinguishable from a cell that cannot fail. At rev-2 that
+  requirement was scope with NO criterion, so an implementation shipping no teeth line at all passed
+  all ten criteria — the section defeating green-by-absence, shipping green by absence. AC6 is now
+  its criterion and observes the printed line rather than the figure behind it.
+- risks (concurrency, data-loss, rollback hazards) — it writes no runtime state, but it is NOT
+  verdict-neutral on the bar, and rev-2 claimed it was. The AC11 pin raise is an edit to the tracked
+  declaration, so a revert of this unit must revert the pin with it: leaving `462` standing over a
+  population that shrank back to 461 reds `lexicon naming predicates` under
+  `TOOL-aSurfacedLexicon-4`'s two-sided equality. The build-wide concurrency risk lives in the pin
+  block, which is that same unit's fork, and this raise is a second writer to it.
 - testing + left-shift gates — the staged break is the DoD, not the fixtures. Both the prototype's
   breaks are re-staged into the real kit and observed RED, then unstaged and observed back at
   baseline. The AMBIGUOUS arm has no in-corpus instance and is exercised by a staged fixture, which
@@ -268,81 +346,148 @@ a floor for the classifier alone and says nothing about the walk or the report.
   population`, so its arm is a real red held latent by four dark cells rather than a synthetic one.
   No new bar leg is added, so no ceiling and no `memory/project/testsuite-count-waivers.txt` row is
   owed.
-- migration / rollback — additive. Revert is one module plus one call site, and no declaration
-  references the predicate until the conf rewrite arms a cell.
+- migration / rollback — additive. Revert is one module plus one call site while this unit stands
+  alone, and the AC11 pin raise reverts with it per the risks bullet above. It stops being free at
+  build order 4: `TOOL-aSurfacedLexicon-6` arms `py.constant` on the `screaming` form this unit
+  mints — read at its rev-2, whose S5 calls that row the build's FIRST armed cell and calls this
+  unit's `_FORMS` mapping a hard prerequisite for it — so a revert from that order onward takes an
+  armed cell down with the predicate. Rev-3 left this bullet saying no declaration references
+  the predicate until the conf rewrite arms a cell, the absolute §3 and `### Rollout` had already
+  struck one revision earlier.
 - user docs — `tools/lexicon/README.md` replaces the standing convention promise with a description of
   what actually ships, including that shell and markdown are dark and why.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `def loadUserData` is staged into a tracked `.py` file, `python
-  tools/lexicon/lexicon.py --check` REDS `py.function` with the message `VIOLATION  loadUserData
-  satisfies camel, not snake`; when unstaged, the same command returns to the baseline counts. The RED
-  is observed and recorded before this unit is called done.
-- **AC2** — When `class user_record` is staged into a tracked `.py` file, `--check` REDS `py.type`
-  with `VIOLATION  user_record  satisfies snake, not pascal`; unstaging returns to baseline.
-- **AC3** — When the tree is graded with nothing staged, `python tools/lexicon/lexicon.py --check`
-  reports `py.function` at 0 violations of 976 and `py.type` at 0 of 41, and `__init__` and
-  `_build_index` are among the passing names rather than the offenders. Re-measured at base
-  `6c670b02` over the 49 files `git ls-files "*.py" | wc -l` reports; rev-1's denominators, 925 and
-  39 at `d0a18683`, are stale and are corrected here rather than hedged. The zero itself is unchanged
-  — only the denominator moved.
-- **AC4** — When the tree is graded with nothing staged, the same command reports `py.file.conv 8`
-  naming exactly `aiosqlite-seam-conftest.py`, `check-arms.py`, `check-kit-placeholders.py`,
-  `check-recall.py`, `check-spec-tokens.py`, `merge-rows.py`, `ps-hygiene.py` and `settings-merge.py`,
-  and `sh.file.conv 5`. Re-measured at base `6c670b02`; rev-1's `7` and `4` are stale, and
-  `tools/check-kit-placeholders.py` is the basename that joined the Python list. Denominators are 49
-  and 94, from `git ls-files "*.py" | wc -l` and `git ls-files "*.sh" | wc -l`. This is the gate's
-  failing case observed IN THE TREE rather than staged.
-- **AC5** — When `def FAMILY_of` is staged, an identifier whose core is non-empty and whose
-  convention set is empty, `--check` REDS with a message naming AMBIGUOUS and NOT the word
-  VIOLATION. Re-measured at base `6c670b02`, 0 of the 1017 Python definitions return a non-empty core
-  with an empty set, so THIS arm has no in-corpus population and its only exercise is the staged
-  fixture; every report of a green run states that. **That statement is scoped to the non-empty core
-  and no further.** The empty-core arm is AC10 and its in-corpus population is nine, not zero.
-- **AC6** — When `py.function` is re-declared as `camel` in a scratch declaration, `--check` reports
-  736 violations of 976. Re-measured at base `6c670b02`; rev-1's `691 of 925` is stale. This is the
-  teeth arm, and it is what makes the 0-of-976 result in AC3 a measurement rather than an assertion
+**Every criterion below that grades an ARMED cell names the declaration it is measured against**, per
+`### Rollout`. That declaration is a scratch `CELLS` block in the working-tree `.lexicon.conf`, never
+committed, because this unit arms nothing and the bar's own declaration has no cell for these
+criteria to grade. Rev-2 phrased seven of them against the tracked declaration, where none of the
+seven — including both observed-RED obligations — could be observed at all. The corpus is unchanged
+either way, so every denominator below is still the real tracked tree's.
+
+- **AC1** — With a scratch declaration arming `py.function snake` and `def loadUserData` staged into
+  a tracked `.py` file, `python tools/lexicon/lexicon.py --check` REDS `py.function` with the message
+  `VIOLATION  loadUserData  satisfies camel, not snake`; unstaging the definition returns the run to
+  that scratch declaration's baseline, and removing the scratch block returns it to the tracked one.
+  The RED is observed and recorded before this unit is called done. This is one of the two
+  observed-RED obligations `### Rollout` refuses to defer.
+- **AC2** — With a scratch declaration arming `py.type pascal` and `class user_record` staged into a
+  tracked `.py` file, `--check` REDS `py.type` with `VIOLATION  user_record  satisfies snake, not
+  pascal`; unstaging returns to that declaration's baseline.
+- **AC3** — With a scratch declaration arming `py.function snake` and `py.type pascal` and nothing
+  staged, `python tools/lexicon/lexicon.py --check` reports `py.function` at 0 violations of 976 and
+  `py.type` at 0 of 41, and `__init__` and `_build_index` are among the passing names rather than the
+  offenders. Re-measured at `693bcf96` by an `ast` walk over the 49 files `git ls-files "*.py"`
+  returns, stripping affixes with S2's `_AFFIX` before matching: 976 function definitions, 41
+  classes, 0 snake violations. Rev-1's denominators, 925 and 39, are stale and were corrected at
+  rev-2; the zero itself has never moved.
+- **AC4** — With a scratch declaration arming `py.file snake` and `sh.file kebab` and nothing staged,
+  the same command reports `py.file.conv 8` naming exactly `aiosqlite-seam-conftest.py`,
+  `check-arms.py`, `check-kit-placeholders.py`, `check-recall.py`, `check-spec-tokens.py`,
+  `merge-rows.py`, `ps-hygiene.py` and `settings-merge.py`, and `sh.file.conv 5`. Re-measured at
+  `693bcf96` by first-dot stemming over `git ls-files "*.py"` and `git ls-files "*.sh"`, whose
+  denominators are 49 and 94. Rev-1's `7` and `4` are stale, and `tools/check-kit-placeholders.py` is
+  the basename that joined the Python list. This is the failing case observed over the real tracked
+  population rather than staged: the eight are genuinely there, and only the declaration grading them
+  is scratch.
+- **AC5** — With a scratch declaration arming `py.function snake` and `def FAMILY_of` staged — an
+  identifier whose core is non-empty and whose convention set is empty — `--check` REDS with a
+  message naming AMBIGUOUS and NOT the word VIOLATION. Re-measured at `693bcf96`, 0 of the 1017
+  Python definitions return a non-empty core with an empty set, so THIS arm has no in-corpus
+  population and its only exercise is the staged fixture; every report of a green run states that.
+  **That statement is scoped to the non-empty core and no further.** The empty-core arm is AC10 and
+  its in-corpus population is nine, not zero.
+- **AC6** — the teeth arm, and at rev-3 it observes the SHIPPED line rather than the figure behind
+  it. With a scratch declaration arming `py.function snake` and nothing staged, `--check` reports
+  that cell at 0 violations of 976 AND prints S8's teeth line beside the row, and that line reports
+  736 for `camel` over the same 976. A second arm in `tools/lexicon/selftest.py` REDS when an armed
+  cell's row carries a violation count with no teeth figure beside it. Re-measured at `693bcf96` by
+  the same `ast` walk as AC3, matching the camel form against the affix-stripped core: 736 of 976.
+  Rev-1's `691 of 925` is stale. **Rev-2's version asserted only the 736, from a one-off
+  re-declaration of `py.function` as `camel`** — a hand-run experiment producing the number the teeth
+  line would print, which an implementation shipping no teeth line at all satisfied. That left S8 as
+  the only scope item in this spec with no criterion, which is H3 of the round-1 audit; folding the
+  observation into this criterion closes it here rather than adding an eleventh arm for a line AC6
+  was already about. This is also what makes AC3's 0-of-976 a measurement rather than an assertion
   about nothing.
-- **AC7** — When the tree is graded, all 49 files matched by `git ls-files "*.test.sh"` pass
-  `sh.file`, and a build using last-dot stems instead reports `sh.file.conv 53`. Re-measured at base
-  `6c670b02`; rev-1's `46` and `49` are stale. Rev-1 also reconciled the two numbers as "46 tracked
-  scripts plus 3 frozen dated build-repro scripts = 49"; at 49 and 53 that arithmetic no longer
-  closes and it is RESTATED rather than patched — the remainder of 4 is UNVERIFIED and this criterion
-  does not claim to account for it. What the criterion actually gates is the pair: every test script
-  passes first-dot and fails last-dot.
+- **AC7** — With a scratch declaration arming `sh.file kebab` and nothing staged, all 49 files matched
+  by `git ls-files "*.test.sh"` pass, and the same declaration built on last-dot stems instead
+  reports `sh.file.conv 53`. Re-measured at `693bcf96`; rev-1's `46` and `49` are stale. Rev-1 also
+  reconciled the two numbers as "46 tracked scripts plus 3 frozen dated build-repro scripts = 49"; at
+  49 and 53 that arithmetic no longer closes and it is RESTATED rather than patched — the remainder
+  of 4 is UNVERIFIED and this criterion does not claim to account for it. What the criterion actually
+  gates is the pair: every test script passes first-dot and fails last-dot.
 - **AC8** — When `classify` is asked about `run`, it returns a set containing at least `snake`,
   `camel` and `kebab`; when asked about `_build_index` it returns a set containing `snake`. Both are
   selftest arms on the function directly, so the set contract is gated at the seam and not only
   through the report.
 - **AC9** — When `bash tools/lexicon/adopt-lexicon.sh --check` runs after this unit, the rendered
   Skill still byte-matches, so the `lexicon wiring` leg stays green. This unit changes no placeholder.
-- **AC10** — the empty-core verdict, which F1 ratified and which would otherwise land ungated. When a
-  definition literally named `_` is staged into a tracked `.py` file — an identifier whose core is
-  empty after the affix strip — `python tools/lexicon/lexicon.py --check` REDS it as AMBIGUOUS under
-  the same message AC5 asserts, and NOT as a VIOLATION, and NOT by printing nothing. The RED is
-  OBSERVED and recorded before this unit is called done, and unstaging returns the run to baseline.
+- **AC10** — the empty-core verdict, which F1 ratified and which would otherwise land ungated. With a
+  scratch declaration arming `py.function snake` and a definition literally named `_` staged into a
+  tracked `.py` file — an identifier whose core is empty after the affix strip — `python
+  tools/lexicon/lexicon.py --check` REDS it as AMBIGUOUS under the same message AC5 asserts, and NOT
+  as a VIOLATION, and NOT by printing nothing. The RED is OBSERVED and recorded before this unit is
+  called done, and unstaging returns the run to that declaration's baseline. This is the second of
+  the two observed-RED obligations, and it is the reason `### Rollout` takes the scratch route rather
+  than deferring the failing case to whichever unit arms `py.function`.
   A second arm calls the predicate directly: `read_core("_")` returns the empty string and the
   verdict for it is AMBIGUOUS. Unlike AC5 this arm is NOT population-free: the in-corpus population is
   the nine tracked dot-leading basenames of `### The empty-core population`, latent only because all
   four of their file cells are dark in `LANGS` today. Every report of this arm says nine, not zero.
+- **AC11** — the pin, and unlike every criterion above it is measured against the TRACKED declaration,
+  because that is where the cost lands. `VERB_OFFENDER_PIN` moves `461` to `462` in `.lexicon.conf`
+  in the SAME commit that adds `classify`, written in that file's existing RAISED-by-name comment
+  form, naming `classify` as the sole arrival and carrying
+  `python tools/lexicon/lexicon.py --check` as the command that measured it. The failing case is
+  observed FIRST and was staged at spec time: with the definitions in place and the pin unmoved, that
+  command prints `lexicon: verb offenders 462 over pin 461` and exits 1; with the pin moved it exits
+  0. No other pin moves — `SUFFIX_OFFENDER_PIN` and `LAYER_OFFENDER_PIN` stay at `0`, and the same
+  staged run confirms it at `P2 suffix graded=41 offenders=0` and `P3 layer graded=557 offenders=0`.
+  The arithmetic and the graded-versus-offender split are `### The pin this unit raises`.
+- **AC12** — the generated map artifact. When the four new public module-level defs land in
+  `tools/lexicon/subtokens.py`, `python3 tools/codebase-map/test_codebase_map.py` exits 0 on the
+  commit that adds them, because `python tools/codebase-map/gen_map.py --write` ran in the same
+  commit. The failing case is observed FIRST and was staged at spec time: appending a two-line
+  `read_core` to that file and running the checker prints `FAIL test_generated_artifacts_are_fresh`
+  and `STALE symbols.json — regen: python tools/codebase-map/gen_map.py --write` and exits 1;
+  removing it returns rc 0. `memory/map/generated/symbols.json` already indexes `subtokens` and
+  `leading_verb` from this file, which declares no `__all__`, so a new public def lands in the
+  artifact by the same rule; `_AFFIX` and `_FORMS` do not, being a leading-underscore name and a
+  module-body assignment. **The coverage arm is NOT implicated and the staged run is the evidence:**
+  it reported the freshness failure alone, with no unclaimed-inventory-key violation, so the dossier
+  owes prose refreshed on touch and no new claim. Saying which of the leg's two arms bites is the
+  point — the leg carries no `guard` key at all, so an unregenerated artifact reds the push.
 
 ## 7. Gates
 
-- `lexicon naming predicates` — chunk `declarations`, subject `repo`, ceiling 300 s. Where the
-  verdicts in AC1 through AC7 and AC10 are observed on the bar. AC10 joined this list when F1 was
-  ratified; a range left reading `AC1 through AC7` after a criterion is appended is the
-  amendment-leaves-its-other-half-standing class, and it is why this clause enumerates rather than
-  spans.
+- `lexicon naming predicates` — chunk `declarations`, subject `repo`, guard
+  `["tools/", "skills/session-kickoff/", ".githooks/", ".claude/"]`, ceiling 300 s. A diff touching
+  `tools/lexicon/subtokens.py` selects it. **It does NOT observe the cell verdicts, and rev-2 said it
+  did.** This leg runs the engine against the repo's OWN `.lexicon.conf`, which this unit leaves with
+  no `CELLS` block, so it has no armed cell for AC1 through AC7 or AC10 to grade — the whole of B1 in
+  the round-1 audit. What it observes here is AC11, the pin raise, and it is the leg an unbudgeted
+  `classify` would have red on this unit's own landing commit. The scratch-declaration verdicts are
+  observed by the direct command each criterion names, and their standing coverage is
+  `lexicon selftest` below.
 - `lexicon selftest` — chunk `selftests`, subject `kit`, guard `["tools/lexicon/"]`, ceiling 880 s.
   Carries every fixture. AC5's AMBIGUOUS arm has no corpus instance and AC10's has nine, latent
   behind four dark file cells — one word for both would be wrong about one of them. It is invisible to
   the push bar, so this unit's DoD runs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` rather
   than trusting the push boundary.
 - `lexicon wiring` — chunk `wiring`, subject `repo`, guard empty, ceiling 330 s. AC9's leg.
-- `codebase-map kit selftest` — its guard includes `tools/lexicon/`, so editing `subtokens.py` selects
-  it. It asserts a cross-kit contract on the lexicon's own constants and must be seen green under
-  `GATE_SELFTESTS=1` in the same commit.
+- `codebase-map kit selftest` — chunk `selftests`, subject `kit`, guard
+  `["tools/codebase-map/", "tools/lib/", "tools/lexicon/"]`, ceiling 300 s, so editing `subtokens.py`
+  selects it. It asserts a cross-kit contract on the lexicon's own constants and must be seen green
+  under `GATE_SELFTESTS=1` in the same commit.
+- `codebase-map coverage + freshness` — chunk `declarations`, subject `repo`, NO `guard` key at all,
+  ceiling 300 s. **Rev-2 omitted it and named the guarded kit selftest above in its place**, which is
+  a different question on a leg no push-boundary run reaches without `GATE_SELFTESTS=1`. This one runs
+  on every bar including the push, and its freshness arm byte-compares
+  `memory/map/generated/symbols.json` against a live re-derivation. AC12 is its arm and the regen is
+  the work. Every leg fact in this section is read from `tools/gate-legs.json` as JSON rather than
+  from prose beside it.
 - The memory-tree hygiene leg, for this spec.
 
 ## 8. Open questions
@@ -482,6 +627,37 @@ lands ungated, which is a gate nobody has ever seen fail.
   scripts = 49" reconciliation collapsed at those numbers and is restated with the remainder of 4
   marked UNVERIFIED rather than patched. §4's "213 files, 65 differ" pair is marked UNVERIFIED: the
   65 reproduces over 210 files and no constructible set yields both.
+- rev-3 · 2026-09-04 · the round-1 spec audit's B1, B2, H2, H3 and M1 folded, every figure re-run at
+  `693bcf96` rather than copied from the report. B1 was a contradiction inside this spec:
+  `### Rollout` said the predicate lands inert while seven criteria graded armed cells on the
+  tracked declaration,  and both could not be true. **Resolved by keeping the inert landing and re-phrasing AC1-AC5, AC7 and
+  AC10 against a scratch `CELLS` block, the route AC6 already used**, with §7's first clause corrected
+  to match — that leg reads the repo's own declaration and observes none of those verdicts. Rollout
+  now names what is DEFERRED to the two arming units and states that the observed-RED obligation is not
+  among it. B2 costs a budget line: `VERB_OFFENDER_PIN` has zero headroom at `461` and offenders count
+  per occurrence, so `def classify` takes the count to `462` and reds the same leg §7 nominates.
+  Staged all six identifiers and measured `graded 1045 -> 1049` against `offenders 461 -> 462` — four
+  functions enter the population, one is an offender, and `_AFFIX` and `_FORMS` are module-body
+  assignments P1 does not grade, so their `--suggest` refusals cost nothing. `.lexicon.conf` joins
+  Files touched, AC11 is the pin raise, and Rollout's "without moving a single verdict on the bar" is
+  struck. H2: the four new public defs stale `memory/map/generated/symbols.json` on an UNGUARDED leg —
+  staged one def and saw `STALE symbols.json` and rc 1 — so the regen joins Files touched, AC12 is its
+  arm, and the staged run's silence on the coverage arm is recorded as the reason no new dossier claim
+  is owed. H3: S8's teeth line had no criterion and could ship absent; folded into AC6, which now
+  observes the printed line rather than the 736 behind it. M1: §3's "the conf rewrite arms it" read as
+  an absolute a sibling contradicts, and now names `TOOL-aSurfacedLexicon-6` at order 4 for
+  `py.constant` and `TOOL-aSurfacedLexicon-12` at order 7 for the rest.
+- rev-4 · 2026-09-04 · round-2 defect D6: the amendment rev-3 made in §3 and `### Rollout` left a
+  THIRD carrier standing in §5, whose migration bullet still said no declaration references the
+  predicate until the conf rewrite arms a cell. Rewritten to the two-unit boundary the other two
+  sections already carry, and to say what a revert costs from build order 4 onward. The whole file
+  was re-grepped for the same absolute rather than the one line the finding named —
+  `grep -n -iE "conf rewrite|arms a cell|arms nothing|inert|until |references the predicate"` over
+  this spec returns no fourth. `TOOL-aSurfacedLexicon-6` was OPENED at its rev-2 rather than
+  asserted: its status header reads order 4, its S5 arms `py.constant` as the build's first armed
+  cell and names this unit's `screaming` form a hard prerequisite, and its `### Rollout` names
+  `TOOL-aSurfacedLexicon-12` as the order-7 conf rewrite. Both specs agree on which unit arms the
+  first cell and when. No figure moved, so nothing was re-measured.
 
 ## 10. Reuse audit
 

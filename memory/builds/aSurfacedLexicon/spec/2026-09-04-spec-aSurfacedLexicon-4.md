@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-4 — the CELLS and PINS declaration grammar
 
-**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 2
+**Status:** SPECCED · rev-7 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -133,11 +133,23 @@ rather than convenient.
   declared classes, and a root-level conf is in none of them, so declaring one reds `govkit selfcheck`
   instead of scoping anything. Widening that taxonomy is an edit to a second kit's contract, which is
   not a cost this unit is buying. **The compensating note, because an exemption is not coverage.**
-  What the narrow guard loses is an EARLY signal on a conf-only diff, never a merge verdict:
-  `.githooks/pre-push` sets `GATE_FULL=1`, which bypasses every guard, so the authoritative run stays
-  total. And the early signal is not wholly lost either — S5 places the declaration refusals inside
-  `load_conf`, where `lexicon wiring` reaches them with an empty guard, so a conf-only commit is
-  refused on the bar regardless.
+  What the narrow guard loses is an early signal, and the loss is BOUNDED rather than absent — the
+  bound is the hook's, not this spec's. Read against source rather than assumed:
+  `.githooks/pre-push` DECIDES whether a total run is owed. It exports `GATE_FULL=1` only when no
+  recorded full green covers the pushed tip, when that green is not an ancestor of it, when it is
+  further behind the tip than the source constant at `.githooks/pre-push:184` allows (`grep -n
+  'GATE_FULL_MAX_LAG=' .githooks/pre-push` returns `GATE_FULL_MAX_LAG=10`), when its tree
+  fingerprint does not reproduce at the sha it names, when the tip is a merge whose second parent
+  the record cannot speak for, when the leg manifest moved, or when the push runs the kit self-tests
+  against a green earned with them held. On any other default-branch push it exports `GATE_BASE`
+  instead and every guard is evaluated, so a conf-only diff skips `lexicon naming predicates` at the
+  push boundary too. Rev-5 wrote the opposite here — that the hook sets `GATE_FULL=1` and the
+  authoritative run stays total — and that is the behaviour the hook RETIRED, as its own comment at
+  `:163-171` and `tools/run-gates/run-gates.sh:140` both say. What the narrow guard actually costs
+  is an early signal for at most that many commits, never a permanent blind spot, and here it costs
+  nothing at all: S5 places the declaration refusals inside `load_conf`, where `lexicon wiring`
+  reaches them with an empty guard, so a conf-only commit is refused on the bar whichever way the
+  hook decides.
 
 ## 4. Design
 
@@ -561,6 +573,17 @@ remembered. The gating just does not come from AC5, and AC5 now says so in its o
   order-independence claim replaced with the stated difference and the sibling's id. S11 and AC12 add
   the map regeneration the unguarded freshness leg requires.
 - rev-6 · 2026-09-04 · round-1 audit fold verification. AC2 asserted a red on `lexicon naming predicates`, a leg whose guard makes a conf-only stage skip it — the exact could-not-fail shape this rev removed elsewhere. It now observes the command, and names the unguarded path the conf actually reaches on the bar.
+- rev-7 · 2026-09-04 · round-2 fold. §3's compensating note leaned on a retired hook behaviour: it
+  said `.githooks/pre-push` sets `GATE_FULL=1` so the authoritative run stays total, which the hook
+  stopped doing when the force became a bounded recorded obligation. The note now states what the
+  hook guarantees — the forcing predicates, the ten-commit lag constant read at
+  `.githooks/pre-push:184`, and that a scoped push evaluates every guard — so the exemption is
+  priced against a bounded early signal rather than against a total run that no longer happens. §4
+  Migration is deliberately UNCHANGED: `TOOL-aSurfacedLexicon-6` rev-2 S5 says this section must be
+  amended to except its order-4 `py.constant` arming, and it was read here rather than taken on
+  trust — Migration says the conf rewrite that pastes the real `CELLS` and `PINS` BODIES is a later
+  unit, which one armed row at order 4 does not contradict, and it nowhere carries the sentence
+  about no cell being armed that the sibling attributes to it.
 
 ## 10. Reuse audit
 
