@@ -57,10 +57,11 @@ of the same.
 
 ## Parked decisions
 
-- **Whether the three current predicates belong in one tool with a convention gate is open.** Verb
-  vocabulary, banned type suffixes and forbidden import directions are three unrelated questions
-  wearing one kit name, and adding a fourth may be the wrong move. Put to the design pass rather than
-  assumed either way.
+- **RULED, not parked: P3 goes and the other two stay.** The design pass measured the import-direction
+  predicate at 44 of 548 imports judgeable, a green line overstating its reach twelvefold, with its
+  pin written once as `"0"` across 17 commits. Vocabulary and convention stay in one tool because they
+  share one corpus walk and one declaration. All ten open questions are ruled in the owner-rulings
+  record; four went against the recommendation and the unit count is 13, not 11.
 - **The three `TOOL-aFlaggedScaffold` govkit defects are out of scope and in the way.** `-3` cannot
   land a source gov started shipping, `-4` crashes with a traceback on a large adopter under Windows,
   and `-5` calls a kit adopted on the exit code alone. A rebuilt kit that ships through the same
@@ -87,7 +88,7 @@ ids TOOL-aSurfacedLexicon-1
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 1 record folder(s).
+Records: 3 bound to this build, across 1 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
