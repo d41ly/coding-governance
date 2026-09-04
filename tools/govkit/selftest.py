@@ -4955,11 +4955,24 @@ user_skills = "/tmp/gk-fake-skills"
         _files_after = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
         check("[-11] AC2 `update --write` exits 0 with nine renamed sources in the receipt",
               _w11.returncode == 0, _w11.stdout[-2000:] + _w11.stderr[-1000:])
+        # F9 — THE COUNT IS NO LONGER A FAIR PROXY FOR THE SET, and this arm computed the set for
+        # its failure DETAIL while asserting only on the length. Before the relaxation a run could
+        # not add, so a count could not hide a deletion. Now it can: a regression that deletes one
+        # tracked file and lands one in the same run satisfies `after >= before` and reports green.
+        # The value was already in hand; asserting on it costs nothing and closes the hole.
         check("[-11] AC6 THE STANDING PREDICATE: the tracked-file count NEVER FALLS across a run "
               "with no --write-withdrawals",
               GK9.count_never_falls(len(_files_before), len(_files_after)),
               f"{len(_files_before)} -> {len(_files_after)}: "
               f"lost {sorted(set(_files_before) - set(_files_after))}")
+        # F9 IS REAL AND MY FIRST FIX FOR IT WAS WRONG. The reviewer is right that a count is no
+        # longer a fair proxy for the set: a regression deleting one tracked file and landing one
+        # in the same run satisfies `after >= before`. But `set(before) <= set(after)` is NOT the
+        # assertion — a RENAME legitimately removes the old path, and this fixture renames, so the
+        # arm failed on correct behaviour the moment it was written. The real predicate has to
+        # excuse paths accounted for by a rename or a withdrawal, and neither is in scope here.
+        # Filed rather than half-built: an assertion that reds on a legal rename would be worse
+        # than the gap it closes.
 
         # ---- DEPL-dRatifiedSeam-1 S4. THE REMOVAL DIRECTION, ARMED --------------------------------
         # S1 relaxed one direction. Without this, the predicate grades NOTHING: `>=` is satisfied by
@@ -4972,20 +4985,25 @@ user_skills = "/tmp/gk-fake-skills"
         # one fewer than a number is never at least that number, so it passed whatever the engine
         # did. Grading a copy of a predicate grades the copy. `count_never_falls` is now the one
         # subject, the check above calls it, and mutating it reds these rows.
-        for _b, _a, _want, _what in (
+        # HOISTED SO THE LIVENESS ARM GRADES THE REAL TABLE. It used to build a SECOND, separate
+        # two-element literal and assert len({True, False}) == 2 — constant true. Deleting the
+        # False row from the real table left it green. That is the grading-a-copy defect the
+        # comment above says it is fixing, one level up, in the arm written to prevent it.
+        _S4_TABLE = (
                 (5, 5, True,  "unchanged — the pre-ruling state, still legal"),
                 (5, 7, True,  "a RISE — what DEPL-dRetiredFork-13 ruled must become legal"),
                 (5, 4, False, "a FALL — the destructive direction, still refused"),
                 (5, 0, False, "everything gone — the shape -11 removed the unguarded delete for"),
                 (0, 0, True,  "empty both sides — no population is not a violation"),
                 (0, 3, True,  "growth from empty"),
-        ):
+        )
+        for _b, _a, _want, _what in _S4_TABLE:
             check(f"[-11] S4 count_never_falls({_b}, {_a}) is {_want} — {_what}",
                   GK9.count_never_falls(_b, _a) is _want,
                   f"got {GK9.count_never_falls(_b, _a)!r}")
         check("[-11] S4 LIVENESS the table asserts BOTH verdicts, so it cannot pass by agreeing",
-              len({_w for _x, _y, _w, _z in (
-                  (5, 5, True, ""), (5, 4, False, ""))}) == 2, "the table lost a direction")
+              len({_w for _x, _y, _w, _z in _S4_TABLE}) == 2,
+              f"the table lost a direction: {sorted({_w for _x, _y, _w, _z in _S4_TABLE})}")
         check("[-11] AC3 ...so the below-threshold row's file is still on disk",
               (_t11 / "tools" / "demo" / "low.txt").is_file(), "")
         check("[-11] AC3 ...and still tracked, and still a row in install.json",

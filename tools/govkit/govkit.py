@@ -6932,7 +6932,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _decided.update(_dl)
     _landed_new: list[str] = []
     _refused_new: list[tuple[str, str]] = []
-    for _eid in claimed:
+    # F4 — `--kits` BINDS THIS LOOP TOO. It narrows `rows_all` and does not touch `claimed`, so a
+    # scoped run landed sources for kits the operator EXCLUDED — and because `rename_dests` is only
+    # populated over the scoped walk, `_decided` was empty for those kits, so the block re-landed a
+    # rename destination it is specifically written not to touch. Measured: `--kits demoa` landed
+    # two `demob` paths, one of them a rename target, leaving two copies of one gov source.
+    for _eid in (kits or claimed):
         _d0 = descs.get(_eid)
         if not _d0:
             continue
@@ -6954,12 +6959,76 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _src0 = str(_row0.get("src") or "")
             if not _src0:
                 continue
+            # APPLY'S OWN FOUR SKIPS, and this block had NONE of them. `_cmd_apply` declines a row
+            # with unresolved tokens, a machine-SCOPED row, a machine-scoped RULE and a LINK rule
+            # before it writes anything; landing them here made `update` write what `apply`
+            # deliberately refuses.
+            #
+            # MEASURED, both halves. `kickoff-manifest` is `role = "engine"` (landable),
+            # `scope = "machine"`, `link = true`, destination `{user_skills}/session-kickoff`, and it
+            # sits in the registry's DEFAULT selection: `apply` printed `SKIPPED`, and the landing
+            # block wrote that path as a plain file OUTSIDE the repository and minted a row for it.
+            # Separately, a target with no `docs_home` answer got a literal `{docs_home}` directory
+            # created and `git add`ed — a row with an unresolved token is not a coverage row, which
+            # `resolve_dests`' own docstring records as long since fixed for `apply`.
+            #
+            # A machine-scoped rule should produce an ORDER, as it does under `apply`, never a write.
+            if _row0.get("missing"):
+                _refused_new.append((_dest, "its source carries unresolved token(s) "
+                                            + ", ".join(sorted(_row0.get("missing") or []))
+                                            + " — a row with an unresolved token is not a row"))
+                continue
+            if _row0.get("scope") == "machine":
+                continue
+            try:
+                _rule0 = (_dd.get("files") or [])[_row0["rule"]]
+            except (KeyError, IndexError, TypeError):
+                _rule0 = {}
+            if _rule0.get("scope") == "machine" or _rule0.get("link"):
+                continue
             _abs0 = target / _dest
+            # F1 + F2 — CONTAINMENT, THE CHECK EVERY OTHER PRODUCER IN THIS ENGINE ALREADY MAKES.
+            # `planned_writes` calls `demand_contained_dest`, `_cmd_apply` calls
+            # `demand_contained_rows`, and this verb's own row walk resolves-and-contains. This block
+            # called none of them, and `demand_safe_token` admits `.` and `/` because every
+            # legitimate token here is a path fragment — so `prefix = "../ESCAPED"` landed four files
+            # in a SIBLING directory of the repository the operator named, at exit 0, while `plan`
+            # refused the identical configuration. An absolute `C:/…` prefix worked too, because
+            # `target / "C:/x"` discards the base entirely.
+            #
+            # `.resolve()` AND NOT A STRING TEST, because that is what also closes F2: a DANGLING
+            # SYMLINK at the destination reads as absent to `.exists()` (which follows links), so the
+            # refusal below never fired and `write_bytes` created the file AT THE LINK TARGET,
+            # outside the tree, with a sane prefix and no tampering at all. A string-normalised
+            # containment check calls `tools/demo/arrival.txt` contained and misses it; resolving the
+            # link does not.
+            try:
+                _res_abs = _abs0.resolve()
+                _res_abs.relative_to(target.resolve())
+            except (ValueError, OSError):
+                _refused_new.append((_dest, "it resolves outside the target repository — a path that "
+                                            "escapes the tree the operator named is not a path this "
+                                            "verb may write, whatever the descriptor says"))
+                continue
+            # F3 — NOTHING LANDS INSIDE `.git`. A per-entry `kit = ".git/hooks"` token is admitted by
+            # `target_context`, and landing there writes an executable the adopter's next commit
+            # runs. The hole is shared with `apply`/`plan` and predates this block; what is new is
+            # that `update` can now reach it, so it is closed here and filed for the others.
+            try:
+                _res_abs.relative_to((target / ".git").resolve())
+                _refused_new.append((_dest, "it resolves inside the target's .git directory, where a "
+                                            "landed file is repository machinery rather than content"))
+                continue
+            except ValueError:
+                pass
             # AC5 — A DESTINATION THE TARGET ALREADY HOLDS IS A REFUSAL, NEVER AN OVERWRITE. The
             # receipt does not name this path, so gov has no record of putting those bytes there and
             # no basis for calling them stale. Overwriting them would be exactly the silent data loss
             # in somebody else's repository that this verb's read-only default exists to prevent.
-            if _abs0.exists():
+            #
+            # `lexists`, NOT `.exists()` — F2 again. A symlink is an occupant whether or not its
+            # target exists, and the one that does not exist is the dangerous one.
+            if os.path.lexists(_abs0):
                 _refused_new.append((_dest, "the target already holds this path and the receipt "
                                             "does not name it, so gov did not put it there"))
                 continue
@@ -6971,8 +7040,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _refused_new.append((_dest, f"gov declares it at {_src0}, which does not resolve "
                                             f"at {to_commit[:8]}"))
                 continue
-            _abs0.parent.mkdir(parents=True, exist_ok=True)
-            _abs0.write_bytes(_blob0)
+            # F5 — AN `OSError` HERE USED TO ESCAPE AS A TRACEBACK, leaving files already staged in
+            # the adopter's index that the receipt does not name and gov can never withdraw.
+            # Measured: an adopter file at `tools/demo/sub` makes `mkdir` raise `FileExistsError`,
+            # and the run died with `A  tools/demo/aaa.txt` staged and no row for it.
+            try:
+                _abs0.parent.mkdir(parents=True, exist_ok=True)
+                _abs0.write_bytes(_blob0)
+            except OSError as _e0:
+                _refused_new.append((_dest, f"writing it failed ({_e0.__class__.__name__}), so "
+                                            f"nothing was landed for this row"))
+                continue
             # THE ROW SHAPE IS `_cmd_apply`'S, NOT AN INVENTION. My first cut wrote five fields —
             # path, source, kit, role, sha256 — and a real receipt row carries nine. The run AFTER
             # this one then failed DEPL-dCarriedReceipt-7's receipt-integrity preamble, because a
@@ -6982,7 +7060,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # apply-side producer documents.
             receipt.setdefault("files", []).append({
                 "path": _dest, "role": str(_row0.get("role") or "copy"), "kit": _eid,
-                "version": str(_row0.get("version") or ""),
+                # `_row0` COMES FROM `expand_rules`, WHOSE ROWS ARE `{rule, src, dest, role, miss}`
+                # — there is no `version` key and there never was, so `_row0.get("version")` was a
+                # vacuous read that stamped every landed row with "". That empty string is a fifth
+                # state in a four-state vocabulary, and the per-kit delta report then reads it as a
+                # distinct value forever: `MIXED across rows: ['', 'KIT_VERSION=1.0']` for any kit
+                # that ever landed one. `_resolve_ver_at` is the resolver this verb already uses for
+                # its own rows.
+                "version": _resolve_ver_at({"kit": _eid}),
+                # `written` is what `_cmd_apply` records and this omitted; a row with no `written`
+                # is not the same shape as every other row in the file.
+                "written": True,
                 "sha256": hashlib.sha256(_blob0).hexdigest(), "gov_oid": blob_oid(_blob0),
                 "source": _src0, "commit": to_commit,
             })
@@ -6991,7 +7079,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # `update-index`, not through a list. It raised NameError on the WRITE path only, so
             # every read-only run passed and the fixture's second write run caught it. A variable
             # borrowed from another function is a compile-clean way to break exactly one arm.
-            git_pathspec(target, ["add"], [_dest])
+            # F6 — THE STAGE'S RESULT IS CHECKED, and an ordinary `.gitignore` is why. The return
+            # was discarded, so an ignored destination minted a receipt row for a file git never
+            # tracked — and every LATER `update` then refused the install forever, blaming the
+            # operator: *present in the WORKTREE and absent from its INDEX*. One `--write` wedged
+            # the adopter permanently, with no adversary and no tampering.
+            _add0 = git_pathspec(target, ["add"], [_dest])
+            if _add0.returncode != 0:
+                try:
+                    _abs0.unlink()
+                except OSError:
+                    pass
+                _refused_new.append((_dest, "git refused to stage it (it is most likely ignored by "
+                                            "the target's own .gitignore), so it was removed rather "
+                                            "than left as a receipt row for an untracked file"))
+                continue
             # `oid` is the blob the TARGET's index holds, which does not exist until the stage
             # above — the same ordering `_cmd_apply`'s producer documents, and the reason that
             # field is filled after staging rather than beside `gov_oid`.

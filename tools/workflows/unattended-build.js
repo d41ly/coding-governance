@@ -173,6 +173,18 @@ const SPEC_SCHEMA = {
 // The resolver stage's return. `blob` is a pattern rather than a bare string because an agent that
 // cannot resolve one is likelier to answer with a plausible-looking placeholder than to omit the
 // entry, and a subject pinned at an invented blob audits nothing while looking pinned.
+// The recorder agent's return. `token` is the DRIVER's word, not the agent's opinion, which is why
+// the prompt says verbatim and the enum is re-checked on this side regardless.
+const REVIEW_RECORD_SCHEMA = {
+  type: 'object',
+  properties: {
+    token: { type: 'string' },
+    exitCode: { type: 'integer' },
+    stderr: { type: 'string' },
+  },
+  required: ['token'],
+}
+
 const SUBJECTS_SCHEMA = {
   type: 'object',
   properties: {
@@ -191,17 +203,10 @@ const SUBJECTS_SCHEMA = {
   required: ['subjects'],
 }
 
-const AUDIT_SCHEMA = {
-  type: 'object',
-  required: ['verdict', 'blockers', 'reportPath', 'summary'],
-  additionalProperties: true,
-  properties: {
-    verdict: { type: 'string', enum: ['CONVERGING', 'CONVERGED', 'NON-CONVERGENT', 'CEILING'] },
-    blockers: { type: 'integer' },
-    reportPath: { type: 'string' },
-    summary: { type: 'string' },
-  },
-}
+// `AUDIT_SCHEMA` LIVED HERE AND IS GONE. It bound the AGENT return that no longer exists, and
+// leaving it would be a declaration nothing reads — but its `enum` was load-bearing, so that
+// moved to `REVIEW_TOKENS` at the check rather than being lost with the constant. Deleting a
+// dead schema and silently dropping its enum is how a check gets weaker while looking tidier.
 const BUILD_SCHEMA = {
   type: 'object',
   required: ['committed', 'unbuilt', 'summary'],
@@ -330,60 +335,100 @@ const auRaw = await workflow(
   },
 )
 
-// S2 — THE VERDICT IS STILL REQUIRED, AND THE REQUIREMENT MOVED. `AUDIT_SCHEMA` bound the AGENT's
-// return, and with no agent in that position there is no schema to enforce. So the obligation
-// becomes an explicit check on what the sub-workflow returned, which is stronger rather than
-// weaker: a schema on an agent is a retry prompt, and this is a refusal.
+// ===================== THE ADAPTER, REBUILT AGAINST THE CALLEE'S ACTUAL CONTRACT =============
+// MY FIRST CUT READ `auRaw.verdict` AND `tier2-review.js` HAS NEVER RETURNED ONE. Its four returns
+// yield `{blockers, report, highs, note, precision, confirmed, refuted, …}`; the only `verdict` in
+// that file is per-FINDING. So the check below fired on every real invocation and the stage still
+// could not complete — the failure had merely moved from an agent that refuses to a script that
+// throws. The 28 suite arms were green because the test double returned a `verdict` and a
+// `reportPath` I had invented, which is the fixture grading the fixture.
 //
-// THE TRAP THIS AVOIDS is S2's inverse. A stage that cannot complete is at least LOUD; a stage that
-// completes with a fabricated verdict is silent, and silent is worse. Trading one for the other
-// would have been a clean-looking way to lose the whole guarantee.
-if (!auRaw || typeof auRaw !== 'object') {
+// WHO OWNS THE VERDICT VOCABULARY. `CONVERGING|CONVERGED|NON-CONVERGENT|CEILING` is produced by
+// `unattended.sh`'s `review_state()` from the PRIOR round's counts — no JS can compute it, because
+// convergence is a property of the sequence and not of this round. The old prompt ran the driver's
+// `--review` and returned its token; that call was deleted with the agent and nothing replaced it,
+// so no round was recorded either and the DoD leg that reads the last round found none.
+//
+// So the split is three ways, each part where its capability lives: the SCRIPT holds `Workflow`
+// and calls the review; an AGENT holds a shell and records the round; the DRIVER owns the token.
+// AN EMPTY OBJECT IS 'NOTHING', TOO. A dead sub-workflow yields `{}`, which is an object, so a
+// bare type test let it through to the blocker check and the operator got a message about an
+// integer when the real fact was that the stage produced nothing at all.
+if (!auRaw || typeof auRaw !== 'object' ||
+    (!Object.prototype.hasOwnProperty.call(auRaw, 'blockers') && !auRaw.report)) {
   throw new Error(
     'unattended-build: the AUDIT sub-workflow returned nothing at round ' + roundNo + '. That is a ' +
       'refusal and not a convergence: an absent verdict must never read as CONVERGED, because that ' +
       'token is the only thing between this harness and building on an unreviewed spec set.',
   )
 }
-const au = {
-  verdict: auRaw.verdict,
-  blockers: auRaw.blockers,
-  reportPath: auRaw.reportPath || auRaw.path || '',
-}
-if (typeof au.verdict !== 'string' || !au.verdict) {
-  throw new Error(
-    'unattended-build: the AUDIT sub-workflow returned no verdict token at round ' + roundNo +
-      '. That is a refusal and not a convergence: an absent verdict must never read as ' +
-      'CONVERGED, because that token is the only thing between this harness and building on ' +
-      'an unreviewed spec set. Refusing rather than defaulting: every default here is a pass.',
-  )
-}
 // THE BLOCKER COUNT MUST BE AN INTEGER, and `null` is the DEGRADED signal `tier2-review.js` yields
-// by design — null, never 0, so a stated absence cannot be read as a clean bill. `unattended.sh`
-// emits CONVERGED only on a count of 0, so reading a null as 0 would make every degraded audit look
-// clean. That is the single most expensive misread available in this file.
-if (!Number.isInteger(au.blockers)) {
+// by design — null, never 0, so a stated absence cannot be read as a clean bill. Reading a null as
+// 0 would make every degraded audit look clean, since 0 is the only count that converges.
+if (!Number.isInteger(auRaw.blockers)) {
   throw new Error(
     'unattended-build: the AUDIT sub-workflow returned a non-integer blocker count (' +
-      JSON.stringify(au.blockers) + ') at round ' + roundNo + '. That is a DEGRADED run and it is ' +
-      'reported as one; it is never rounded to zero, because zero is the only count that converges.',
+      JSON.stringify(auRaw.blockers) + ') at round ' + roundNo + '. That is a DEGRADED run and it ' +
+      'is reported as one; it is never rounded to zero.',
   )
 }
-// S3 — THE IMPOSSIBLE PAIRING IS A REFUSAL BY NAME. `CONVERGING` with zero blockers is this repo's
-// own signature for a record no verb produced: the loop cannot still be converging with nothing
-// left to converge on. The dead stage returned exactly this pairing, and it was the tell. Refusing
-// it here means the next failure of this kind is loud at the moment it happens rather than being
-// diagnosed later from a record that looks almost plausible.
+const lastReport = auRaw.report || ''
+// `report`, NOT `reportPath` — the second name was mine and matched nothing, so `lastReport` was
+// always '' and every disposal instruction named an empty path.
+if (!lastReport) {
+  throw new Error(
+    'unattended-build: the AUDIT sub-workflow returned no report path at round ' + roundNo +
+      '. The fold instruction the caller receives would name nothing to fold from.',
+  )
+}
+
+// THE ROUND IS RECORDED BY THE DRIVER, and the driver's answer is the verdict. An agent runs it
+// because a workflow script has no shell; what the agent may NOT do is invent the token, so it is
+// told to return the driver's own output verbatim and the enum below refuses anything else.
+const rv = await agent(
+  GROUND +
+    'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
+    'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + slug + '-spec-set' +
+    ' --verdict ' + (auRaw.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
+    ' --blockers ' + auRaw.blockers + '\n\n' +
+    'Return the CONVERGENCE token it prints — one of CONVERGING, CONVERGED, NON-CONVERGENT, ' +
+    'CEILING — verbatim, and the command\'s exit code. Do not infer the token from the blocker ' +
+    'count: it is a property of the SEQUENCE of rounds, which only the driver can see. If the ' +
+    'command fails, return its stderr rather than a token.',
+  { label: 'audit:record:r' + roundNo, phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
+)
+if (!rv || typeof rv.token !== 'string') {
+  throw new Error(
+    'unattended-build: the round was not recorded at round ' + roundNo + ' (driver said: ' +
+      JSON.stringify(rv && rv.stderr) + '). An unrecorded round leaves the convergence predicate ' +
+      'with no predecessor to shrink against, and the Definition of Done leg that reads the last ' +
+      'round finds nothing.',
+  )
+}
+// THE ENUM IS RESTORED. `AUDIT_SCHEMA` carried it and my replacement checked only that the verdict
+// was a non-empty string, so `"ok"` would have passed, failed the `=== 'CONVERGING'` test, and
+// fallen straight through to BUILD. That is weaker than what it replaced, in the direction that
+// matters.
+const REVIEW_TOKENS = ['CONVERGING', 'CONVERGED', 'NON-CONVERGENT', 'CEILING']
+if (REVIEW_TOKENS.indexOf(rv.token) === -1) {
+  throw new Error(
+    'unattended-build: the driver returned "' + rv.token + '", which is not one of ' +
+      REVIEW_TOKENS.join(', ') + '. An unknown token is not CONVERGING, so it would fall through ' +
+      'to BUILD — refusing instead.',
+  )
+}
+const au = { verdict: rv.token, blockers: auRaw.blockers, reportPath: lastReport }
+// S3 — THE IMPOSSIBLE PAIRING IS A REFUSAL BY NAME. CONVERGING with zero blockers is this repo's
+// signature for a record no verb produced: a loop with nothing left to converge on has converged.
+// The dead stage returned exactly this pairing, and it was the tell.
 if (au.verdict === 'CONVERGING' && au.blockers === 0) {
   throw new Error(
     'unattended-build: the AUDIT stage returned CONVERGING paired with 0 blockers at round ' +
-      roundNo + '. Those two cannot both be true — a loop with nothing left to converge on has ' +
-      'converged — and this pairing is this repo\'s signature for a record no verb produced. ' +
-      'REFUSING rather than emitting it.',
+      roundNo + '. Those two cannot both be true, and this pairing is this repo\'s signature for a ' +
+      'record no verb produced. REFUSING rather than emitting it.',
   )
 }
 const verdict = au.verdict
-const lastReport = au.reportPath || ''
 log('audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers)
 
 // THE GATE. `CONVERGING` means the review loop has not ended, so BUILD is UNREACHABLE and this

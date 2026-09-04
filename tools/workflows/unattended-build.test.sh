@@ -60,8 +60,19 @@ run_wf() { # args-expr · returns-expr -> prints the trace, then RESULT/THROW
 UNITS='{"repo":"/tmp/r","slug":"tB","subjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
 SPEC_OK='{"authored":["A-tB-1"],"alreadyPresent":["A-tB-2","A-tB-3"],"refused":[],"summary":"ok"}'
 BUILD_OK='{"committed":["A-tB-1","A-tB-2","A-tB-3"],"unbuilt":[],"summary":"ok"}'
-audit() { printf '{"verdict":"%s","blockers":%s,"reportPath":"r.md","summary":"s"}' "$1" "$2"; }
-returns() { printf '{"spec:":%s,"workflow":%s,"build:":%s}' "$SPEC_OK" "$1" "$BUILD_OK"; }
+# THE DOUBLE RETURNS THE CALLEE'S REAL KEYS, and the first version of it did not. It invented
+# `verdict` and `reportPath`, so all 28 arms passed on two fields `tier2-review.js` has never
+# returned — the harness and its callee had never met. Its actual returns carry `blockers`,
+# `report`, `highs`, `note` and `precision`; there is no `verdict` anywhere but per-FINDING.
+review_out() { printf '{"blockers":%s,"report":"r.md","highs":0,"precision":1,"note":"n"}' "$1"; }
+# The CONVERGENCE token is the driver's, recorded by an agent, so it is a separate fixture. Keeping
+# them separate is the point: a run can produce a clean review and still not converge.
+rec() { printf '{"token":"%s","exitCode":0}' "$1"; }
+# `audit <token> <blockers>` still reads as one thing at the call sites, but it now feeds the two
+# halves their own shapes.
+returns() { printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"build:":%s}' \
+  "$SPEC_OK" "$(review_out "${2:-0}")" "$(rec "$1")" "$BUILD_OK"; }
+audit() { printf '%s' "$1"; }
 
 # ---- AC2: THE ARGS GUARD, BOTH DIRECTIONS. The first cut of the guard this ports from tested
 # ---- `typeof a !== "object"` and refused every legitimate caller, so the PASSING case is armed.
@@ -78,22 +89,22 @@ o=$(run_wf '{"repo":"/tmp/r","units":[{"id":"A-tB-1"}]}' '{}')
 has "args: an object with no slug is REFUSED" "$o" "must carry an explicit \`slug\`"
 o=$(run_wf '{"repo":"/tmp/r","slug":"tB","units":[]}' '{}')
 has "args: an empty unit set is REFUSED rather than reported clean" "$o" "carries no \`units\`"
-o=$(run_wf "$UNITS" "$(returns "$(audit CONVERGED 0)")")
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has "args: a VALID object is accepted — the passing case" "$o" "RESULT"
 
 # ---- AC3: THE STAGE ORDER, asserted on the emitted sequence. A reordering reds this.
-o=$(run_wf "$UNITS" "$(returns "$(audit CONVERGED 0)")")
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 seq=$(printf '%s\n' "$o" | grep '^phase:' | tr '\n' ' ')
 same "stage order is Spec then Audit then Build" "$seq" "phase:Spec phase:Audit phase:Build "
 
 # ---- AC7: THE GATE ON THE VERDICT, over all four driver states. A gate tested only on the state
 # ---- that OPENS it is a gate nothing proved closes.
-o=$(run_wf "$UNITS" "$(returns "$(audit CONVERGING 3)")")
+o=$(run_wf "$UNITS" "$(returns CONVERGING 3)")
 has "CONVERGING: BUILD is not reached" "$o" "HELD AT AUDIT"
 n=$((n+1)); case "$o" in *"phase:Build"*) echo "FAIL CONVERGING reached the Build phase, which is the one thing this gate exists to stop"; st=1 ;; *) echo "ok   CONVERGING: the Build phase never ran" ;; esac
 has "CONVERGING: the caller is told what to do next" "$o" "re-invoke this harness with round"
 for v in CONVERGED NON-CONVERGENT CEILING; do
-  o=$(run_wf "$UNITS" "$(returns "$(audit "$v" 0)")")
+  o=$(run_wf "$UNITS" "$(returns "$v" 0)")
   n=$((n+1)); case "$o" in *"phase:Build"*) echo "ok   $v: admits BUILD" ;; *) echo "FAIL $v did not admit BUILD, so a terminal verdict cannot land a build"; st=1 ;; esac
 done
 
@@ -104,14 +115,14 @@ done
 
 # S1 — the sub-workflow is invoked BY THIS SCRIPT, and the trace names which one. Without this,
 # every arm below could pass over a harness that reached BUILD by some other path entirely.
-o=$(run_wf "$UNITS" "$(returns "$(audit CONVERGED 0)")")
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has "S1 the AUDIT stage invokes tier2-review as a SUB-WORKFLOW from the script" "$o" \
     "workflow:tools/workflows/tier2-review.js"
 
 # S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
 # converge on has converged, so the pairing is this repo's signature for a record no verb
 # produced — and it is exactly what the dead stage returned.
-o=$(run_wf "$UNITS" "$(returns "$(audit CONVERGING 0)")")
+o=$(run_wf "$UNITS" "$(returns CONVERGING 0)")
 has "S3 CONVERGING with 0 blockers THROWS" "$o" "THROW"
 has "S3 ...and the refusal names the pairing rather than a generic failure" "$o" \
     "CONVERGING paired with 0 blockers"
@@ -123,8 +134,8 @@ esac
 # S2 — A NON-INTEGER BLOCKER COUNT IS A DEGRADED RUN AND IS REPORTED AS ONE. tier2-review yields
 # `null` there BY DESIGN, never 0, so reading it as 0 would make every degraded audit look clean:
 # unattended.sh emits CONVERGED only on a count of 0.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"verdict":"CONVERGED","blockers":null},"build:":%s}' \
-    "$SPEC_OK" "$BUILD_OK")")
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"blockers":null,"report":"r.md"},"audit:record":%s,"build:":%s}' \
+    "$SPEC_OK" "$(rec CONVERGED)" "$BUILD_OK")")
 has "S2 a null blocker count THROWS rather than rounding to zero" "$o" "non-integer blocker count"
 n=$((n+1)); case "$o" in
   *"phase:Build"*) echo "FAIL S2 a degraded audit reached BUILD"; st=1 ;;
@@ -134,7 +145,7 @@ esac
 # THE SUBJECT GUARD. An unpinned subject audits whatever the file happens to say when the lens
 # reads it, which is not a review of anything in particular — and tier2-review would refuse it
 # downstream with a message about its own arguments rather than about which stage failed.
-o=$(run_wf "${UNITS/\"blob\":\"abc1234\"/\"blob\":\"nothex\"}" "$(returns "$(audit CONVERGED 0)")")
+o=$(run_wf "${UNITS/\"blob\":\"abc1234\"/\"blob\":\"nothex\"}" "$(returns CONVERGED 0)")
 has "an unpinned subject blob is REFUSED before the sub-workflow runs" "$o" "7-40 hex blob"
 
 # ---- AC9: A DEAD AUDIT STAGE IS A REFUSAL, never a silent pass to BUILD. This is the absence that
@@ -142,14 +153,14 @@ has "an unpinned subject blob is REFUSED before the sub-workflow runs" "$o" "7-4
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"build:":%s}' "$SPEC_OK" "$BUILD_OK")")
 has "a dead AUDIT stage THROWS" "$o" "THROW"
 has "the throw says an absent verdict is not a convergence" "$o" "must never read as CONVERGED"
-o=$(run_wf "$UNITS" "$(printf '{"workflow":%s,"build:":%s}' "$(audit CONVERGED 0)" "$BUILD_OK")")
+o=$(run_wf "$UNITS" "$(printf '{"workflow":%s,"audit:record":%s,"build:":%s}' "$(review_out 0)" "$(rec CONVERGED)" "$BUILD_OK")")
 has "a dead SPEC stage THROWS rather than auditing nothing" "$o" "SPEC stage returned nothing"
 
 # ---- AC6: A DEGRADED RUN SAYS SO. `degradation-known-but-unreported` is the class where a pipeline
 # ---- computes how badly it degraded and does not report it.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"build:":%s}' \
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"build:":%s}' \
     '{"authored":[],"alreadyPresent":["A-tB-1"],"refused":["A-tB-2","A-tB-3"],"summary":"s"}' \
-    "$(audit CONVERGED 0)" \
+    "$(review_out 0)" "$(rec CONVERGED)" \
     '{"committed":["A-tB-1"],"unbuilt":["A-tB-2","A-tB-3"],"summary":"s"}')")
 has "a degraded run reports DEGRADED, not complete" "$o" "DEGRADED"
 has "the refused units are NAMED, not merely counted" "$o" "A-tB-2"
