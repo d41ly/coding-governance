@@ -85,6 +85,33 @@ check "empty literal never grown → allow" 0 '{"tool_name":"Workflow","tool_inp
 check "grown but the fan is not adjacent → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const batches = []\nbatches.push(f)\nconst out = batches.map((b) => b())\nawait agent(\"one call\")"}}'
 check "concat does not grow the receiver → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nconst more = LENSES.concat(extra)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
 
+# ---- the blanked view reports an unterminated scan (TOOL-aWeldedTribunal-3) ---------------------
+# The blanked view carries its mode ACROSS lines, correctly, because a template literal spans them.
+# That is also how one unterminated backtick blanked every line below it and the two rules reading
+# that view went blind under it. Both now fall back to a PER-LINE blanked render.
+#
+# ARMS PER RULE, not per view. Rule 3 and rule 5 read the same view through the same dispatcher, so
+# fixing one and pinning only that one certifies coverage that does not exist.
+#
+# THE RULE-3 FIXTURE IS ISOLATING BY CONSTRUCTION: a BOUNDED receiver with an OVER-CAP K, which only
+# rule 3 refuses. An unbounded receiver would be denied by rule 2 in both trees and prove nothing —
+# measured, and it is why the first draft of this arm was thrown away.
+check "rule3: over-cap K below an unterminated backtick → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nconst note = `an unterminated template\nawait boundedParallel(LENSES.map((L) => () => agent(L)), 50)"}}'
+check "rule3: the same with the backtick terminated → deny (control)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nconst note = `a terminated template`\nawait boundedParallel(LENSES.map((L) => () => agent(L)), 50)"}}'
+check "rule5: a ref-keyed join below an unterminated backtick → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const note = `an unterminated template\nconst m = new Map()\nm.set(f.ref, v)"}}'
+# THE NARROWING SURVIVES THE FALLBACK. `TOOL-dTieredTribunal-14 S2` chose the blanked view for rule 5
+# so a banned pattern inside a STRING would not match; falling back to a view that keeps template
+# contents would regain that false-positive class, and `runBothViews` unions the views so either one
+# denying is a denial. The fallback is the same scan reset per line, so the narrowing holds.
+check "rule5: banned text in a single-line terminated template → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const p = `we never key a map by verdictByRef here`\nawait boundedParallel(T, 5)"}}'
+# THE RESIDUAL, pinned rather than left unstated. A per-line view cannot know a line CONTINUES a
+# template opened above it, so banned text on a continuation line reads as code and denies. It needs
+# an unterminated backtick AND banned text, and it errs fail-CLOSED. Measured 0 before this unit and
+# 2 after — an arm asserting the residual is how a trade stays priced instead of becoming folklore.
+check "rule5: banned text on a continuation line → deny (stated residual)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const note = `an unterminated template\nwe never key a map by verdictByRef here"}}'
+check "rule5: a legal join under a terminated multi-line literal → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const p = `line one\nline two`\nconst m = new Map()\nm.set(f.id, v)"}}'
+check "a legal multi-line prompt with a bounded fan → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nconst prompt = `line one\nline two\nline three`\nawait boundedParallel(LENSES.map((L) => () => agent(prompt)), 5)"}}'
+
 # ---- rule 5: the ref-keyed verdict join -----------------------------------------------------------
 # TOOL-dTieredTribunal-14's section 4 declared these ten arms as what "the failing case has been
 # observed" means for that unit, and the unit landed WITHOUT them: `git show --stat fb2d692e` never

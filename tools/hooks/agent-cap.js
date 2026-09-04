@@ -290,6 +290,25 @@ function renderShippedBlanks(script) {
   return out
 }
 
+// TOOL-aWeldedTribunal-3 — THE FALLBACK VIEW for the blanked readers, and it is NOT
+// `renderStrippedView`. Rule 2's fallback uses that one, which leaves backticks ALONE; the two rules
+// that read the blanked view were given a view that blanks template CONTENTS as a deliberate
+// narrowing (TOOL-dTieredTribunal-14 S2, pinned by two self-test fixtures), and falling back to a
+// view that keeps those contents would regain exactly the false-positive class those fixtures exist
+// to pin — `runBothViews` UNIONS the views, so a false positive under either DENIES.
+//
+// So the fallback is the SAME scan with the mode reset PER LINE. That is wrong as the primary view,
+// because it un-blanks the second and later lines of every legal multi-line template; as a fallback
+// it is right, because it runs only when the primary scan already ended inside a literal, and a
+// per-line reset cannot carry one line's damage into the next. It preserves the narrowing within
+// each line, which is what the unit's S6 requires.
+function perLineBlanked(script) {
+  return script.split(/\r?\n/).map((line) => {
+    const one = renderBlankedLiterals(line)
+    return one.code[0] === undefined ? '' : one.code[0]
+  })
+}
+
 // ---------------------------------------------------------------------------
 // TOOL-dMispairedQuote-3 — the NO-REGRESSION guarantee, as a DISPATCHER.
 //
@@ -319,7 +338,20 @@ function renderCodeView(script) {
 }
 
 function renderBlankedLiterals(script) {
-  return VIEW_MODE === 'shipped' ? renderShippedBlanks(script) : renderBlankedView(script)
+  // TOOL-aWeldedTribunal-3 — both arms return `{ code, unterminated }`, and the SHIPPED arm is
+  // hard-coded `false` rather than reporting. That is not an oversight and not a shortcut.
+  //
+  // The three `renderShipped*` bodies are FROZEN: a self-test arm byte-compares them against BASE,
+  // because they ARE the no-regression baseline that makes `runBothViews`'s union sound. Editing one
+  // to add a report would break exactly the guarantee this whole dispatcher exists to provide — the
+  // suite caught the first attempt at it, which is the arm working as designed.
+  //
+  // Nothing is lost. `runBothViews` UNIONS the two passes, so the corrected view's fallback ADDS the
+  // findings the frozen view cannot see, and the frozen view keeps behaving exactly as it always
+  // has. The improvement belongs to the corrected view; the baseline stays a baseline.
+  return VIEW_MODE === 'shipped'
+    ? { code: renderShippedBlanks(script), unterminated: false }
+    : renderBlankedView(script)
 }
 
 // Run one rule over BOTH views and merge. The mode is restored before returning, so a rule that
@@ -1128,7 +1160,10 @@ function renderBlankedView(script) {
     }
     out.push(res)
   }
-  return out
+  // TOOL-aWeldedTribunal-3 — same report as the shipped sibling, so the dispatcher's two arms return
+  // one shape. A dispatcher whose arms differ is a defect every caller has to know about, which is
+  // the thing a dispatcher exists to prevent.
+  return { code: out, unterminated: mode !== 'code' }
 }
 
 // Join forward from the `(` at code[i][col] until the parens BALANCE, and return the inside. The
@@ -1173,7 +1208,13 @@ function topLevelArgs(text) {
 
 function capFindings(script) {
   const lines = script.split(/\r?\n/)
-  const code = renderBlankedLiterals(script)
+  // TOOL-aWeldedTribunal-3 — an UNTERMINATED scan falls back to the per-line blanked view. The
+  // primary view carries its mode across lines, so one unterminated backtick blanked every line
+  // below it and this rule saw nothing under it (TOOL-aLexedStripper-4). Not a fail-closed branch:
+  // `TOOL-aLexedStripper-5` measured that and it denied a legal script carrying a regex literal with
+  // a backtick in it.
+  const view = renderBlankedLiterals(script)
+  const code = view.unterminated ? perLineBlanked(script) : view.code
   const { consts, orBound } = intConsts(code)
   const bad = []
 
@@ -1469,7 +1510,13 @@ function guardAgentSpawn(data) {
 // excludes this file from its own population - the ban table below would otherwise match itself.
 function scanJoinFindings(script) {
   const raws = script.split(/\r?\n/)
-  const code = renderBlankedLiterals(script)
+  // TOOL-aWeldedTribunal-3 — the SAME fallback rule 3 takes, for the same reason and over the same
+  // view. Giving rule 3 the fallback and not this one would be the gate-the-class-not-the-instance
+  // failure one level up: both read `renderBlankedLiterals` through the same dispatcher and both
+  // went blind below an unterminated literal. The per-line view preserves S2's narrowing WITHIN each
+  // line, which `renderStrippedView` would not — it leaves backticks alone.
+  const view = renderBlankedLiterals(script)
+  const code = view.unterminated ? perLineBlanked(script) : view.code
   const out = []
   // S3 - one ban table, tested against every view of the line. It was three inline conditions per
   // view until the M8 closing review found the second view missing; duplicating them per view would

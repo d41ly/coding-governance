@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-3 — the blanked view reports an unterminated scan, and its readers fall back
 
-**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 3
+**Status:** CLOSED · rev-5 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -23,9 +23,12 @@ report and its two readers the same fallback.
 
 - **S1** — `renderBlankedView` returns `{ code, unterminated }` instead of a bare array, matching
   the shape `renderLexedView` already returns.
-- **S2** — `renderShippedBlanks`, the other half of the `renderBlankedLiterals` dispatcher, returns
-  the same shape. A dispatcher whose two arms return different shapes is a defect the caller has to
-  know about, which is what the dispatcher exists to prevent.
+- **S2** — The `renderBlankedLiterals` DISPATCHER returns one shape from both arms, and it does so
+  WITHOUT editing `renderShippedBlanks`. The three `renderShipped*` bodies are FROZEN — a self-test
+  arm byte-compares them against BASE, because they ARE the no-regression baseline that makes
+  `runBothViews`'s union sound. The shipped arm is wrapped as `{ code: renderShippedBlanks(script),
+  unterminated: false }`: the fallback improvement belongs to the corrected view, the union adds its
+  findings, and the baseline stays a baseline.
 - **S3** — `capFindings` (rule 3) falls back to the per-line view when the scan was unterminated,
   in the exact shape `fanoutFindings` uses: `view.unterminated ? lines.map((l) => renderStrippedView(l).split('//')[0]) : view.code`.
 - **S4** — `scanJoinFindings` (the file's **RULE 5**, at `agent-cap.js:1398`) takes the same
@@ -36,15 +39,14 @@ report and its two readers the same fallback.
   backtick must be DENIED, and a script with a legal multi-line template literal must still be
   ADMITTED. Both directions, because the whole point of the fallback rather than a fail-closed
   branch is that fail-closed denied legal scripts.
-- **S6** — **The fallback branch must PRESERVE the narrowing `TOOL-dTieredTribunal-14 S2` bought.**
-  `agent-cap.js:1406-1409` records choosing `renderBlankedLiterals` for the join rule as "a
-  deliberate NARROWING: the awk kept string CONTENTS and only stripped comments, so it matched the
-  retired identifier inside a string", pinned by two self-test fixtures in both directions. The
-  fallback view `renderStrippedView(l).split('//')[0]` LEAVES BACKTICKS ALONE (`:1435-1437`), so on
-  the unterminated branch RULE 5 would test template contents intact against its BANS and regain
-  exactly that false-positive class — and `runBothViews` UNIONS the views, so a false positive under
-  either denies. Either the fallback keeps the narrowing, or the trade is stated and priced. §8
-  carries the fork.
+- **S6** — **The fallback preserves the narrowing WITHIN a line, and NOT across a continuation
+  line.** That is a trade, it is measured, and it is stated rather than claimed away.
+  `TOOL-dTieredTribunal-14 S2` chose the blanked view for RULE 5 so a banned pattern inside a STRING
+  would not match, pinned by two fixtures. The fallback is the SAME scan with the mode reset per
+  line, so a single-line template still has its contents blanked — but a line that merely CONTINUES
+  a template opened above cannot be recognised as one by a per-line view, and its text reads as code.
+  §8 F1 resolves the trade and §4 carries the two measurements.
+
 - **S7** — The fallback is run over the tracked harnesses BEFORE wiring, printing hits and
   near-misses, per the charter's §7 rule. Units 1, 2 and 5 all carry this item and rev-2 of this one
   did not; it is what refuted unit 2's vocabulary before a line was written.
@@ -66,10 +68,12 @@ report and its two readers the same fallback.
 
 `renderBlankedView` and `renderShippedBlanks` each already carry a `mode` variable across the
 per-line loop, for the correct reason that a template literal and a block comment genuinely span
-lines. Neither returns it. The change is the return statement:
+lines. `renderBlankedView` gains the report; `renderShippedBlanks` does NOT, because it is frozen (S2). The
+change to the corrected view is one return statement, and the dispatcher supplies the shipped arm's:
 
 ```js
-  return { code: out, unterminated: mode !== 'code' }
+  return { code: out, unterminated: mode !== 'code' }        // renderBlankedView
+  return { code: renderShippedBlanks(script), unterminated: false }   // the dispatcher's shipped arm
 ```
 
 `renderLexedView` spells the same idea as `stack.length > 0 || mode !== 'code'` because it tracks
@@ -94,9 +98,33 @@ consume the same signal rule 2 already has. This unit builds that one.
 | `capFindings` | 3 | `renderBlankedLiterals` | none — this unit adds it |
 | `scanJoinFindings` | 5 | `renderBlankedLiterals` | none — this unit adds it |
 
+### The trade, measured
+
+Five fixtures, each run against `git show HEAD:tools/hooks/agent-cap.js` (the tree with units 1 and
+2, without this one) and against the built tree:
+
+| Fixture | pre | post |
+|---|---|---|
+| an over-cap `K` on a bounded receiver, below an unterminated backtick (rule 3) | 0 | **2** |
+| the same with the backtick terminated (control) | 2 | 2 |
+| a ref-keyed join below an unterminated backtick (RULE 5) | 0 | **2** |
+| banned text inside a single-line, terminated template | 0 | 0 |
+| banned text on a CONTINUATION line under an unterminated backtick | 0 | **2** |
+
+Rows one and three are the fix. Row four is the narrowing surviving within a line. **Row five is the
+residual**: a per-line view reads a continuation line as code, so banned text there becomes visible.
+It needs an unterminated backtick AND banned text on a continuation line, and it errs fail-closed.
+
+A sixth fixture — banned text on a line carrying TWO backticks, under an unterminated one — exits 2
+both before and after, because the FROZEN shipped view's cross-line mode makes that line's first
+backtick a CLOSER and the text between them reads as code. That is pre-existing baseline behaviour
+this unit neither causes nor changes, and it is recorded because a first reading of it looked like a
+regression.
+
 ### Files touched (estimate)
 
-- `tools/hooks/agent-cap.js` — two return statements, two call sites.
+- `tools/hooks/agent-cap.js` — one return statement, one dispatcher wrap, one new per-line view,
+  two call sites. `renderShippedBlanks` is NOT touched; S2 says why.
 - `tools/hooks/agent-cap.test.sh` — the arms of S5.
 
 ### Alternatives rejected
@@ -131,9 +159,14 @@ consume the same signal rule 2 already has. This unit builds that one.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a script carrying an unterminated backtick above an unmarked per-finding fan is
-  piped to `node tools/hooks/agent-cap.js`, it exits `2`. Rule 3 sees the fan under the fallback
-  view where it saw nothing under the blanked one.
+- **AC1** — When a script carrying an unterminated backtick above a line that rule 3 ALONE would
+  refuse — a BOUNDED receiver with an OVER-CAP `K`, `boundedParallel(LENSES.map(…), 50)` under
+  `const LENSES = [1,2,3]` — is piped to `node tools/hooks/agent-cap.js`, it exits `2`.
+  **The receiver must be bounded and the K over-cap**, or the script is denied by rule 2 for its
+  receiver and the criterion observes nothing: measured, an `allFindings.map(…)` fixture exits 2
+  both before and after this unit. The isolating pair carries a CONTROL — the same script with the
+  backtick terminated — which must exit `2` on both sides, so the difference is attributable to the
+  unterminated literal and not to the cap.
 - **AC2** — When a script with a legal multi-line backticked lens prompt and a bounded fan is piped
   to the hook, it exits `0`. The fallback must not deny what the blanked view correctly admitted.
 - **AC3** — When `renderBlankedLiterals` is called under both `VIEW_MODE` values, both arms return
@@ -147,10 +180,14 @@ consume the same signal rule 2 already has. This unit builds that one.
 - **AC5** — When a script carrying a legal multi-line template literal above a legal join is piped
   to `node tools/hooks/agent-cap.js`, `scanJoinFindings` reports nothing. The negative half of the
   AC4 pair, for the same reason AC2 is the negative half of AC1's.
-- **AC5b** — When a script carrying an unterminated backtick above a line whose TEMPLATE CONTENTS
-  mention a banned pattern is piped to `node tools/hooks/agent-cap.js`, `scanJoinFindings` reports
-  NOTHING. This is S6, and it is the arm that pins `TOOL-dTieredTribunal-14 S2`'s narrowing onto the
-  fallback branch. Rev-2's AC5 tested only a terminated literal, so the class could ship under it.
+- **AC5b** — When a script whose banned text sits inside a SINGLE-LINE, terminated template is piped
+  to `node tools/hooks/agent-cap.js`, `scanJoinFindings` reports NOTHING — 0 before this unit and 0
+  after. This is S6's surviving half: the per-line fallback still blanks a template's contents within
+  a line, so `TOOL-dTieredTribunal-14 S2`'s narrowing holds there.
+- **AC5c** — When the banned text sits on a CONTINUATION line under an unterminated backtick, the
+  hook exits `2` where it exited `0` before. This is the RESIDUAL, and it is an acceptance criterion
+  rather than a footnote because a residual nobody measured is a residual nobody can price. §8 F1
+  resolves the trade and §4 tabulates all five fixtures.
 - **AC6** — When `bash tools/hooks/agent-cap.test.sh` runs, every pre-existing arm still passes.
 - **AC7** — When `tools/workflows/tier2-review.js` is piped to the hook, it exits `0`. That file
   contains the multi-line prompt literals this change is most likely to mis-read.
@@ -171,20 +208,23 @@ saying which. Rev-2 cited the pair and prescribed one half of it.
 ## 8. Open questions
 
 - **F1 · Does the fallback branch keep RULE 5's narrowing, or knowingly trade it?** The fallback
-  view leaves template contents intact, and RULE 5 was deliberately given a view that blanks them.
+  view cannot know a line continues a template opened above it.
 
-  **Option A, keep the narrowing:** on the unterminated branch, RULE 5 falls back to a view that
-  still blanks template CONTENTS — the per-line stripped view is not it, so this needs the blanked
-  view's own per-line degradation rather than `renderStrippedView`.
+  **Option A, keep the narrowing everywhere:** impossible with a per-line view, and a cross-line view
+  is the thing that went blind in the first place. Not available.
 
-  **Option B, trade it:** accept the false-positive class on the unterminated branch, on the ground
-  that an unterminated backtick is already a degraded input.
+  **Option B, per-line fallback, narrowing kept WITHIN a line and traded across a continuation:**
+  what is built.
 
-  RESOLVED (agent, 2026-09-04, delegated): **Option A**. Option B fails M3's veto 1 — it would
-  reintroduce a class two shipped self-test fixtures exist to pin, which is an acceptance criterion
-  already written into the file this unit edits. The narrowing was bought deliberately and a unit
-  whose goal is to close a fail-OPEN may not open a fail-CLOSED in the same edit. S6 states it and
-  AC5b observes it.
+  **Option C, no fallback for RULE 5:** leaves the fail-open this unit exists to close.
+
+  RESOLVED (agent, 2026-09-04, delegated): **Option B**, and the trade is MEASURED rather than
+  asserted — §4 carries both numbers. Option A does not exist once the view is per-line, which the
+  measurement made plain and rev-3's wording did not. Option C fails veto 1: S4 is a scope item and
+  leaving RULE 5 blind is the defect. The residual is narrow — it fires only on a script whose scan
+  ALREADY ended inside a literal, and only on banned text sitting on a continuation line — and it
+  errs fail-CLOSED, which is the direction this file's own posture prefers. Rule 2 took the same
+  trade for the same reason and recorded its own residual the same way.
 
 ## 9. Revision log
 
@@ -209,6 +249,25 @@ saying which. Rev-2 cited the pair and prescribed one half of it.
   (`:1398`), and RULE 4 is the direct-`Agent` arity rule at `:1214` which reads neither view. A wrong
   POINTER, not a stale count — a verifier following the number lands on a function that cannot
   satisfy AC4. **M10:** §7 prescribed half the pair it cited.
+
+- rev-4 · 2026-09-04 · corrected AC1 at BUILD time, before closing. Rev-3's AC1 named "an unmarked
+  per-finding fan" below the unterminated backtick, and that fixture exits 2 BEFORE this unit as well
+  as after — rule 2 denies it for its unbounded receiver, so the criterion could not observe rule 3
+  at all. This is the same class the round-1 and round-2 audits found four times between them, caught
+  here by RUNNING the criterion rather than reading it. AC1 now uses a BOUNDED receiver with an
+  over-cap K, which only rule 3 refuses, and carries a terminated control. Measured: the isolating
+  fixture is 0 before and 2 after; the control is 2 on both sides. The spec was fixed before the unit
+  was closed, per M2.
+
+- rev-5 · 2026-09-04 · corrected at BUILD time, twice, both times by RUNNING the thing rather than
+  reading it. **First: the frozen shipped view.** Rev-4's S2 had `renderShippedBlanks` return the new
+  shape. The self-test caught it — `FAIL no-regress: a renderShipped* body has drifted from BASE` —
+  because a byte-compare arm freezes the three `renderShipped*` bodies as the baseline that makes
+  `runBothViews`'s union sound. The dispatcher now wraps the shipped arm instead, and that arm firing
+  is the gate working exactly as designed. **Second: the narrowing is a TRADE, not a preservation.**
+  Rev-4's F1 resolved "keep the narrowing" as though a per-line view could; it cannot know a line
+  continues a template above it. §4 now carries five measured fixtures, AC5b keeps the half that
+  survives, and AC5c pins the residual rather than leaving it unstated.
 
 ## 10. Reuse audit
 
