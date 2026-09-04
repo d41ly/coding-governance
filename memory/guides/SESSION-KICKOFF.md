@@ -189,18 +189,17 @@ does — hit three times in one file in one session) · `process-creation-is-the
 `trace-profile-measures-itself.md` · `fallback-fabricates-the-passing-value.md` ·
 `two-readers-of-one-config-one-re-derived.md`.
 
-- A gate FIXTURE this node cannot host: `git add` never stages a `*.bak` path (the global
-  `core.excludesfile` carries it), and a name differing only in CASE is the same file. Both
-  produce an arm that passes because its fixture was never there. Check what `git ls-files`
-  actually holds before trusting a near-miss control.
+- A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
+  CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`
+  is ignored on node `d`, on node `a` at NO scope (2026-09-04): run `git check-ignore -v` on YOURS.
 - The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
   recorded high-water. Prefer dropping a conditional block, or trimming non-instructional prose, to
   spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
   margin FROM `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
-- Merging in a LINKED WORKTREE leaves conflict markers in the row-merged files: the driver's
-  grammar load raises against a conf path and it fails CLOSED rather than take-ours. Recover by
-  running `tools/memory-tree/merge-rows.py <base> <ours> <theirs>` directly on the three stages
-  (`git show :1: :2: :3:`) — it merges them clean. `TOOL-aCandidStub-4`.
+- `git -C <dir> rev-parse --show-toplevel` returns `<dir>` ITSELF when an absolute `GIT_DIR` is
+  inherited — what git exports to a merge driver in a LINKED WORKTREE. That made the row driver
+  conflict every merge there until `repo_root()` walked up for the conf (`TOOL-aCollapsedScan-7`).
+  Worktree merges are CLEAN now, re-verified 2026-09-04.
 - Two branches can BOTH rotate `memory/backlog/<FAMILY>.md` to archive independently. The row
   driver then reports the other side's rotation as DELETES and conflicts. Before resolving,
   verify every id absent from the union is present in some `memory/archive/<FAMILY>.*.md` —
@@ -221,10 +220,10 @@ does — hit three times in one file in one session) · `process-creation-is-the
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
 - Editing the shipped `manifest-check.sh` diverges it from adopters' copies — they re-pull on kit update.
-- The hooks kit ships TWO PreToolUse guards. `agent-cap` is wired on `Workflow|Agent` and enforces four rules;
-  the bound is a FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Binding rules:
-  `memory/guides/REVIEW-PROTOCOL.md`. Ready-made harness: `tools/workflows/tier2-review.js`. The
-  concurrency half of this trap is `memory/gotchas/concurrency-is-not-a-budget.md`.
+- The hooks kit ships TWO PreToolUse guards. `agent-cap` is wired on `Workflow|Agent`; its rule count
+  is NOT restated here — `tools/hooks/README.md` owns it, and the copy here rotted. The bound is a
+  FILE CONSTANT and `AGENT_CAP` is refused, not honoured. Rules: `memory/guides/REVIEW-PROTOCOL.md`;
+  harness `tools/workflows/tier2-review.js`; concurrency `concurrency-is-not-a-budget.md`.
 - `scratch-guard` is the second hook, wired on `Bash|PowerShell`: it DENIES a shell command that
   writes under the home directory outside the roots it derives from `TMPDIR`/`TEMP`/`TMP` plus
   `~/.claude`. A blocked command is a real refusal, not a harness glitch — put the write in the
