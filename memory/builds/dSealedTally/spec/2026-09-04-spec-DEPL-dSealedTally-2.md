@@ -1,11 +1,12 @@
 # DEPL-dSealedTally-2 — `rename_dests` is populated eagerly, before any row can exit
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 1
+**Status:** CLOSED · rev-3 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-04-build-DEPL-dSealedTally-2-1-acceptance-ledger.md](../build/2026-09-04-build-DEPL-dSealedTally-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-1 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 | [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 
@@ -23,6 +24,10 @@ written not to touch. Fill it per kit, before the walk can skip it.
 - **S1** `rename_dests[eid]` is populated for every kit the walk visits, at the point the kit is
   entered, rather than at the first row that reaches the fill site at line 5956.
 - **S2** The landing block's `_decided` set therefore holds every rename destination for every kit
+- **S4** `_decided` is NARROWED to the destinations of sources gov actually renamed:
+  `for _new_src in renames.values(): _decided.update(_m.get(_new_src) or [])`. Without this the
+  eager fill makes `_decided` the entire declared surface of every kit, and nothing can ever land
+  as an unclaimed source. Discovered while building, by the `[-RS1]` arms going red.
   in `(kits or claimed)`, not only those whose rows survived to the fill.
 - **S3** A staged-RED arm proving the gap: a kit whose only row `continue`s before `classify_row`,
   whose descriptor declares a rename destination, and whose destination is landed as new before the
@@ -127,6 +132,12 @@ none
   named only one direction. H5: the arm-count criterion states a delta, and this unit is the one
   that may measure against the base because it is `order 1`.
 
+- rev-3 · 2026-09-04 · BUILT, and the build changed the mechanism, so the spec moved first. The
+  hoist alone broke the unclaimed-source landing: `rename_dests[eid]` is a kit's FULL
+  source-to-destination map, and `_decided` took every value in it, so filling eagerly made
+  `_decided` the whole declared surface of every kit and nothing could land. Latent while the fill
+  was lazy, because a run with no renames left the map empty. Seven `[-RS1]` arms caught it. S4
+  adds the narrowing, and the unit is two changes rather than one.
 ## 10. Reuse audit
 
 The seam is `rename_dests` itself, in `tools/govkit/govkit.py`, and this unit deliberately does not

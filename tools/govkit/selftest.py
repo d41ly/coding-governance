@@ -5183,6 +5183,85 @@ user_skills = "/tmp/gk-fake-skills"
         (_t11 / "tools" / "demo" / "occupied.txt").unlink()
         settle(_t11, "clear the AC5 collision before the withdrawal arms")
 
+        # ---- DEPL-dSealedTally-2. THE EAGER FILL AND THE NARROWED `_decided`, END TO END ----
+        # The fill used to live inside `resolve_renamed`, reached only from the `classify_row`
+        # call and only on the rename branch. Seven `continue`s precede that call, so a kit
+        # whose renamed row takes one of them left `rename_dests[eid]` empty -- the landing's
+        # `_decided` set never learned about that destination, and it was landed as a NEW
+        # source. Two copies of one gov file, in a tree gov does not own.
+        #
+        # THE TRIGGER is an engine row carrying `evidence: "unattributed"`, which continues at
+        # `govkit.py:6112` before `classify_row` is ever called. That is a real receipt state --
+        # `apply` writes it at 7594 for a row it cannot attribute to a vintage -- and it is the
+        # cheapest of the seven to construct, because it is a receipt field rather than a role.
+        _gs2 = tmp / "st2-gov"
+        (_gs2 / "tools" / "govkit").mkdir(parents=True)
+        shutil.copy2(GOVKIT, _gs2 / "tools" / "govkit" / "govkit.py")
+        (_gs2 / "tools" / "govkit" / "registry.toml").write_text(
+            '[surface]\nglobs = ["tools/*"]\n\n'
+            '[selection]\ndefault = ["mvkit"]\n\n'
+            '[[entry]]\nid = "mvkit"\ndescriptor = "tools/mvkit/kit.toml"\n\n'
+            '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+            encoding="utf-8", newline="\n")
+        _ds2 = _gs2 / "tools" / "mvkit"
+        _ds2.mkdir(parents=True, exist_ok=True)
+        (_ds2 / "kit.toml").write_text(
+            'id = "mvkit"\nhome = "tools/mvkit"\nversion_from = { none = "fixture" }\n\n'
+            '[check]\nnone = "a fixture kit"\n\n'
+            '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+            '[adopt]\nargv = []\nmutates_index = false\n',
+            encoding="utf-8", newline="\n")
+        (_ds2 / "mover.txt").write_text("mover one\nmover two\nmover three\n",
+                                        encoding="utf-8", newline="\n")
+        (_ds2 / "stay.txt").write_text("stay one\nstay two\n",
+                                       encoding="utf-8", newline="\n")
+        git(_gs2, "init", "-q", "-b", "main")
+        git(_gs2, "config", "user.email", "t@e")
+        git(_gs2, "config", "user.name", "t")
+        git(_gs2, "config", "core.autocrlf", "false")
+        git(_gs2, "add", "-A")
+        git(_gs2, "commit", "-qm", "mvkit A")
+
+        _ts2 = make_target(tmp / "st2-t",
+                           'gov_source = "local"\nprefix = "tools"\nkits = ["mvkit"]\n')
+        _ap2 = run_in_gov(_gs2, "apply", "--target", str(_ts2), "--kits", "mvkit")
+        check("[-ST2] the mvkit fixture installs GREEN, or every arm below grades a broken "
+              "target", _ap2.returncode == 0, _ap2.stdout[-900:] + _ap2.stderr[-600:])
+
+        # The row is made UNATTRIBUTED by hand, which is the one thing the fixture stages: it is
+        # the state `apply` reaches on a receipt it cannot pin, and staging it is cheaper than
+        # constructing a history that produces one.
+        _rp2 = _ts2 / ".governance" / "install.json"
+        _rj2 = json.loads(_rp2.read_text(encoding="utf-8"))
+        for _r2 in _rj2.get("files", []):
+            if _r2.get("path") == "tools/mvkit/mover.txt":
+                _r2["evidence"] = "unattributed"
+        _rp2.write_text(json.dumps(_rj2, indent=2) + "\n", encoding="utf-8",
+                        newline="\n")
+        settle(_ts2, "the mvkit install, with one row made unattributed")
+
+        git(_gs2, "mv", "tools/mvkit/mover.txt", "tools/mvkit/moved2.txt")
+        git(_gs2, "add", "-A")
+        git(_gs2, "commit", "-qm", "mvkit B: gov renames the unattributed source")
+
+        _w2 = run_in_gov(_gs2, "update", "--target", str(_ts2), "--write")
+        _files2 = sorted(x for x in gout(_ts2, "ls-files").splitlines() if x)
+
+        # THE ANTECEDENT, ASSERTED FIRST. Without it every arm below could pass because the
+        # fixture never reached the `unattributed` continue at all, which is the
+        # fixture-passes-by-finding-nothing class this whole build exists to drain.
+        check("[-ST2] LIVENESS the renamed row really took the `unattributed` continue, so the "
+              "fill was skipped", any("unattributed" in ln and "mover.txt" in ln
+                                      for ln in _w2.stdout.splitlines()), _w2.stdout[-1400:])
+        check("[-ST2] AC1 the rename DESTINATION is not landed as a new source",
+              "tools/mvkit/moved2.txt" not in _files2, repr(_files2))
+        check("[-ST2] AC1 ...and the run says it landed no unclaimed source",
+              "unclaimed sources: 0 landed" in _w2.stdout, _w2.stdout[-1400:])
+        check("[-ST2] AC1 ...while the kit's other file is untouched, so the run did act",
+              "tools/mvkit/stay.txt" in _files2, repr(_files2))
+        check("[-ST2] AC1 ...and the run exits 0 rather than refusing the kit",
+              _w2.returncode == 0, _w2.stdout[-900:] + _w2.stderr[-600:])
+
         # ---- AC4: the deletion, and the ONLY way to get one.
         settle(_t11, "after the second update")
         _files_pre_wd = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)

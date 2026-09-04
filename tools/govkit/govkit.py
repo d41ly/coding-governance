@@ -7033,9 +7033,20 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # same reason: this run decided to remove them, and re-landing them in the same run would be the
     # verb arguing with itself.
     _decided = {str(f.get("path")) for f in withdrawn_rows}
+    # DEPL-dSealedTally-2. NARROWED TO ACTUAL RENAME DESTINATIONS, and this is the half the
+    # eager fill made mandatory. `rename_dests[eid]` is the kit's FULL source-to-destination
+    # map, not a rename-only one, so taking every value made `_decided` the whole declared
+    # surface of every kit the map held. That was latent while the fill was lazy: it only ran
+    # for a kit with a rename that reached it, and a run with NO renames left the map empty,
+    # which is why the landing worked at all. Filling eagerly turned the latent bug live and
+    # the `-RS1` arms caught it -- nothing could ever land as unclaimed again.
+    #
+    # So the set is built from the sources gov actually RENAMED, which is what its name and
+    # its comment always claimed. `renames` maps old source to new source; the destination of
+    # a new source is what the rename machinery decided, and nothing else is.
     for _m in rename_dests.values():
-        for _dl in _m.values():
-            _decided.update(_dl)
+        for _new_src in renames.values():
+            _decided.update(_m.get(_new_src) or [])
     _landed_new: list[str] = []
     _refused_new: list[tuple[str, str]] = []
     # F4 — `--kits` BINDS THIS LOOP TOO. It narrows `rows_all` and does not touch `claimed`, so a

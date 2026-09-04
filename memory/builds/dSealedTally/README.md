@@ -86,7 +86,7 @@ ids DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTall
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dSealedTally-2 — `rename_dests` is populated eagerly, before any row can exit](spec/2026-09-04-spec-DEPL-dSealedTally-2.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [DEPL-dSealedTally-2 — `rename_dests` is populated eagerly, before any row can exit](spec/2026-09-04-spec-DEPL-dSealedTally-2.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-04 |
 | [TOOL-dSealedTally-1 — `--landed` writes phase and anchor together, after every check](spec/2026-09-04-spec-TOOL-dSealedTally-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-04 |
 | [DEPL-dSealedTally-4 — `index_read` asserts git's exit code instead of reading failure as absence](spec/2026-09-04-spec-DEPL-dSealedTally-4.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-04 |
 | [DEPL-dSealedTally-1 — landed sources join the verify-and-rollback pass](spec/2026-09-04-spec-DEPL-dSealedTally-1.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-04 |
@@ -94,7 +94,7 @@ ids DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTall
 | [DEPL-dSealedTally-5 — the govkit self-test grades the tree, not the commit's ref-reachability](spec/2026-09-04-spec-DEPL-dSealedTally-5.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
