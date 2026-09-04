@@ -5,7 +5,6 @@ opened: 2026-09-04
 streams: tooling
 roster: TOOL
 ids: TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8
-status: OPEN
 authorized-by: prompt
 ---
 
@@ -117,23 +116,41 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-04 · streams tooling
+**Build status:** OPEN · 8 unit(s) · node a · opened 2026-09-04 · streams tooling
 ids TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aWeldedTribunal-1 — one loop-header predicate, and it recognises `for await` and `do`-blocks](spec/2026-09-04-spec-TOOL-aWeldedTribunal-1.md) | 1 | 2 | OPEN | rev-1 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-2 — a bounded array loses its bound when a later statement grows it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-3 — the blanked view reports an unterminated scan, and its readers fall back](spec/2026-09-04-spec-TOOL-aWeldedTribunal-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-4 — the tier-2 synthesis prompt carries the liveness counters the run computed](spec/2026-09-04-spec-TOOL-aWeldedTribunal-4.md) | 4 | 2 | OPEN | rev-1 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by all five python readers](spec/2026-09-04-spec-TOOL-aWeldedTribunal-5.md) | 5 | 2 | OPEN | rev-1 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-6.md) | 6 | 2 | OPEN | rev-1 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-7 — the wiring check names the pre-push that will actually run](spec/2026-09-04-spec-TOOL-aWeldedTribunal-7.md) | 7 | 2 | OPEN | rev-1 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-8 — close the four rows whose defect the tree no longer has](spec/2026-09-04-spec-TOOL-aWeldedTribunal-8.md) | 8 | 1 | OPEN | rev-1 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 0 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aWeldedTribunal-1` | no |
+| 2 | `TOOL-aWeldedTribunal-2` | no |
+| 3 | `TOOL-aWeldedTribunal-3` | no |
+| 4 | `TOOL-aWeldedTribunal-4` | no |
+| 5 | `TOOL-aWeldedTribunal-5` | no |
+| 6 | `TOOL-aWeldedTribunal-6` | no |
+| 7 | `TOOL-aWeldedTribunal-7` | no |
+| 8 | `TOOL-aWeldedTribunal-8` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
