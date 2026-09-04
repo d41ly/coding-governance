@@ -23,4 +23,4 @@ terminal status. Nothing here is edited by hand.
 | [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 |
 | [dScaffoldedMirror](builds/dScaffoldedMirror/README.md) | DEFERRED | d | 2026-08-24 | tooling | 22 |
 | [dScriptedRepeat](builds/dScriptedRepeat/README.md) | SPECCED | d | 2026-08-20 | tooling | 15 |
-| [dSealedTally](builds/dSealedTally/README.md) | SPECCED | d | 2026-09-04 | tooling+deployer | 6 |
+| [dSealedTally](builds/dSealedTally/README.md) | SPECCED | d | 2026-09-04 | tooling+deployer | 7 |

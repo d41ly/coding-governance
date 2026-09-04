@@ -2354,7 +2354,6 @@ WTS
       return 1
     fi
   fi
-  set_fact "$rel" phase LANDED || return 1
   # THE WITNESS IS THE COMMIT THE TAKEN ARM ACTUALLY VALIDATED. The local arm tests the run's own
   # branch tip against the local default branch and never looks at HEAD; recording HEAD there writes a
   # terminal fact about a commit nothing in this verb examined, and the two differ exactly when the
@@ -2400,9 +2399,6 @@ WTS
   fi
 
   set_fact "$rel" witness "$wit" || return 1
-  # WRITTEN ON BOTH ARMS AND NEVER DEFAULTED. An absent `landed-anchor` would read as `remote` to any
-  # later reader, silently promoting a record to the stronger claim.
-  set_fact "$rel" landed-anchor "$akind" || return 1
   # The message names the commit the RECORD carries. It printed `$head` while writing `$wit`, so on
   # the local arm the operator was told one sha and the terminal record kept another.
   head="$wit"
@@ -2425,6 +2421,28 @@ WTS
   set_fact "$rel" units-at-landing \
     "$(unit_rows "$(readme_of "$slug")" \
        | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
+  # TOOL-dSealedTally-1. THE TERMINAL WRITES SIT HERE, LAST, AND THE ORDERING IS LOAD-BEARING.
+  # `phase LANDED` used to be written ~70 lines above, before the lander-marker gate that can
+  # refuse and before every fact write below. A refused `--landed` therefore exited 1 leaving a
+  # record that was terminal, missing its `landed-anchor`, red on the unattended leg check 15
+  # forever, and UNREPAIRABLE: check 26 refuses `--park` and `--phase` on a finished record, so
+  # no verb could undo what the verb did. Four instances across three nodes are recorded at
+  # `TOOL-dScaffoldedMirror-22`, `TOOL-aGroundedOrientation-4` and `TOOL-dTieredTribunal-28`,
+  # one of which sat red on `main` for two days before anyone noticed.
+  #
+  # ANCHOR BEFORE PHASE, deliberately. If the anchor write fails, the record keeps a
+  # non-terminal phase and stays repairable; if the phase write failed first, an anchor failure
+  # would reproduce exactly the wedge this unit removes. The next reader's instinct is to hoist
+  # these back beside the anchor SELECTION they belong to conceptually, ~70 lines up. That is
+  # the bug.
+  #
+  # ONE RESIDUAL, ACCEPTED AND NAMED: `stage_or_fail` below can still fail after both writes,
+  # leaving a COMPLETE terminal record that is unstaged. That is repairable with `git add`,
+  # where the state this ordering removes was repairable by nothing.
+  # WRITTEN ON BOTH ARMS AND NEVER DEFAULTED. An absent `landed-anchor` would read as `remote` to any
+  # later reader, silently promoting a record to the stronger claim.
+  set_fact "$rel" landed-anchor "$akind" || return 1
+  set_fact "$rel" phase LANDED || return 1
   stage_or_fail "$rel" || return 1
   if [ "$akind" = remote ]; then
     echo "unattended: phase LANDED · witness $head · anchor remote · observed on $AREF at $ASHA · unpushed on local $lbranch: $unp"
