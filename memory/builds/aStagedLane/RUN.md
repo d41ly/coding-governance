@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: a5937694be09e4f0224977cca3ee459f75244413
+witness: bc1c116da51731cfcc0433d79e00f4c80622dbfa
 phase: REVIEWING
 mode: slug
 anchor-kind: default-branch
@@ -30,3 +30,5 @@ base: c4fcf5add1d0a553097f9eef70935a056896cf16
 2026-09-04T19:52:04Z rescope · item retire TOOL-aStagedLane-4 · reason Cannot be built inside M1's declared byte budget for memory/guides/BUILD-METHOD.md: 23 bytes remain and both of its scope items are pure additions, the path literal alone being 35. Both fundings are owner turns under M3 veto 2 -- raising the budget, which M3 names explicitly, and deleting method prose, which is a governance-carrier change beyond the rev-2 ratified scope. Parked for the owner rather than resolved; the decision is on the run-state file with all three options. Units 1 to 3 do not depend on it.
 
 2026-09-04T20:16:17Z review · item aStagedLane-spec-set · reason verdict BLOCKED · blockers 1
+
+2026-09-04T20:51:00Z review · item aStagedLane-spec-set · reason verdict BLOCKED · blockers 3 · NON-CONVERGENT · disposition fold

@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief
 
-**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
+**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round4.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round4.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 |
 
 <!-- /gen:spec-records -->
 
@@ -227,8 +228,11 @@ Deriving slices inside the script was rejected because the script cannot read th
   writer prompt, the prompt instructs the writer to AUTHOR and forbids committing, and the
   caller-side commit is named in the stage's return or its log line. A fan of committing writers is
   the failure S3c exists to prevent, and no downstream gate reads a prompt.
-- **AC6** — When `bash tools/workflows/check-review-join.sh` runs, it counts the new wave and does
-  not report a ref-keyed join.
+- **AC6** — When `bash tools/workflows/check-review-join.sh` runs, it exits 0 and does not report a
+  ref-keyed join for this file. It does NOT "count the new wave": that gate's own `--explain`
+  reports this file as not judged, and its trailer disclaims per-wave counting, so rev-5 asked it
+  for a number it does not produce. What it does answer is the join-shape question, and that is
+  what this criterion now asks.
 
 ## 7. Gates
 
@@ -288,6 +292,11 @@ bar is `bash tools/run-gates/run-gates.sh`.
   three times. Finding 9: AC5 justified a separate `agent-cap.js` invocation with "the two
   workflow checks do not answer the hook's question", and `check-verifier-fanout.sh` pipes the
   file to that very hook — premise and clause both dropped.
+- rev-6 · 2026-09-04 · round-4 spec audit folded, the TERMINATING fold (blocker counts 4, 2, 1, 3 —
+  NON-CONVERGENT, disposition FOLD). No blocker landed on this spec. H3: AC6 asked
+  `check-review-join.sh` to "count the new wave", and that gate reports this file as not judged and
+  disclaims per-wave counting in its own trailer — the criterion now asks it the question it
+  actually answers.
 
 ## 10. Reuse audit
 

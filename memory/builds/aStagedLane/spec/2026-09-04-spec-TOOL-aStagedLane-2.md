@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate
 
-**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
+**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round4.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round4.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 |
 
 <!-- /gen:spec-records -->
 
@@ -39,8 +40,28 @@ choosing its route per session.
   carries `{id, order, specPath, briefPath}`, and a missing `planState` in attended mode REFUSES
   rather than defaulting — a defaulted state is a refusal predicate grading a value nobody
   supplied.
-  **The states are ENUMERATED, not allow-listed on one token.** `MISSING`, `THIN` and `FORKED`
-  refuse. `DONE` is a SKIP with a log line naming the unit, and `READY` builds. Rev-4 refused
+  **WHEN it is resolved is the other half, and rev-5 did not say.** The caller resolves `planState`
+  ONCE, at entry, because this harness runs SPEC, AUDIT and BUILD in a single invocation and the
+  only early return before BUILD is the CONVERGING gate — there is no point between the stages at
+  which a caller could re-run `--plan`. That makes the entry-time value STALE BY CONSTRUCTION for
+  exactly the units the SPEC stage is about to author: a fresh build reports `MISSING` for every
+  one of them, and a BUILD stage refusing on `MISSING` would refuse the whole build it just specced.
+  **So the BUILD stage subtracts what stage 1 did**: a unit the SPEC stage returned in `authored`
+  or `alreadyPresent` is treated as `READY` regardless of its entry-time `planState`, and the
+  entry-time value governs only units that stage did not touch. That return already exists and is
+  already schema-required, so this reuses it rather than adding a channel.
+  **The state is matched as a PREFIX, not against a closed token set**, and rev-5 got this wrong in
+  a way that would have halted attended mode at unit one for the third time. `--plan` does not emit
+  five tokens: `verb_plan` at `unattended.sh:2144` prints `DONE ($state)` for a terminal unit whose
+  underlying grade is not READY, so the live vocabulary includes `DONE (THIN)`, `DONE (FORKED)` and
+  `DONE (MISSING)`. Reproduced on `cBriefedPilot`, which prints `DONE (FORKED)`; `dGaugedVintage`,
+  the build rev-5 cited, happens to be the one with a uniform `DONE` column, which is why the
+  five-token reading survived. So: **any state BEGINNING `DONE` is terminal and SKIPS**, whatever
+  follows it in parentheses — the parenthetical records how complete the spec was, not whether the
+  unit still needs building. Of the rest, `MISSING`, `THIN` and `FORKED` REFUSE and `READY` builds.
+  **A state matching none of those REFUSES BY NAME** rather than falling through to either arm, so
+  a vocabulary this spec has now twice mis-transcribed cannot silently pick a behaviour. Rev-4
+  refused
   "any state that is not `READY`", and `--plan` reports every terminal unit as `DONE` —
   `verb_plan` at `unattended.sh:2144` rewrites `CLOSED` and `WONTDO` to it, and `--plan
   dGaugedVintage` prints all thirteen ids that way. So the first attended run over a resumed or
@@ -80,9 +101,10 @@ choosing its route per session.
   one.
 - **S6** — arms in `tools/workflows/unattended-build.test.sh` covering both modes: that unattended
   mode still records through the driver, that attended mode does not, that a null blocker count
-  refuses in both, that the attended BUILD prompt names neither `--dispatch` nor `--brief`, and that
-  the attended preamble carries no mandate vocabulary, and that a zero blocker count terminates while
-  a positive one converges. The prompt arms assert on the COMPOSED string rather than on a
+  refuses in both, that the attended BUILD prompt names neither `--dispatch` nor `--brief`, that the
+  attended preamble carries no mandate vocabulary, that a zero blocker count terminates while a
+  positive one converges, that a `DONE (FORKED)` unit skips, that an unrecognised state refuses, and
+  that a unit specced in this invocation is built despite an entry-time `MISSING`. The prompt arms assert on the COMPOSED string rather than on a
   run's behaviour, because a prompt is the one artifact here that no gate downstream ever reads,
   and each absence assertion is paired with a positive one so an empty clause cannot pass for a
   removed substring.
@@ -187,12 +209,22 @@ Making `attended` the default was rejected because it silently weakens every exi
   not reached.
 - **AC4** — When `bash tools/workflows/unattended-build.test.sh` runs the build stage in attended
   mode against a unit whose `planState` is `FORKED`, the stage refuses and its message names both
-  the unit id and the state. The refusal is observed before the arm asserting it is written, and
-  the arm is fed the REAL `--plan` output of a closed build on disk rather than a hand-written
-  roster — a double containing only `READY` cannot discover that a closed unit reports `DONE`.
-- **AC11** — When the same stage meets a unit whose `planState` is `DONE`, it SKIPS that unit with
-  a log line naming it and proceeds to the next, rather than refusing. Without this arm the mode
-  halts at unit one on every resumed build.
+  the unit id and the state. The refusal is observed before the arm asserting it is written. The
+  arm supplies that bare `FORKED` directly rather than harvesting it from a closed build's roster:
+  `:2144` rewrites a terminal unit's grade to `DONE (FORKED)`, so a bare `FORKED` and a real closed
+  build are jointly unsatisfiable and rev-5 asked for both at once. The REAL-roster requirement
+  moves to AC11, where the value under test is one a closed build actually emits.
+- **AC11** — When the same stage is fed the REAL `--plan` output of a closed build on disk — one
+  emitting `DONE (FORKED)` as `cBriefedPilot` does, not only bare `DONE` — every terminal unit is
+  SKIPPED with a log line naming it and the stage proceeds. A double containing only `READY`, or
+  only bare `DONE`, cannot discover what a closed unit actually reports, and that is precisely how
+  the five-token reading survived to rev-5.
+- **AC13** — When the stage meets a `planState` outside every arm above, it REFUSES and names the
+  unrecognised value. Neither building nor skipping an unknown state is safe, and this spec has
+  mis-transcribed that vocabulary twice.
+- **AC14** — When the SPEC stage authors a unit in the same invocation, the BUILD stage builds it
+  even though its entry-time `planState` was `MISSING`. This is the fresh-build path: without it
+  the harness refuses every unit it has just specced.
 - **AC12** — When a `units[]` entry carries no `planState` in attended mode, the harness REFUSES
   at entry and names the entry. A defaulted state would put the refusal predicate to work on a
   value nobody supplied.
@@ -288,6 +320,18 @@ because this file is a declared method pointer. The full bar is `bash tools/run-
   the skip and the missing field, and AC4 is fed a real closed build's roster. AC6 gains the third
   clause S5's rev-4 addition needed, since that fold traded an observed assertion for an
   unobserved one.
+- rev-6 · 2026-09-04 · round-4 spec audit folded, the TERMINATING fold: the blocker count went 4, 2,
+  1, 3, so the loop exited NON-CONVERGENT and M4's disposition is FOLD. Two of the three blockers
+  were in this spec's rev-5 S4, the paragraph written to close round 3. B1: the "enumerated" state
+  set is not what `--plan` emits — `:2144` prints `DONE (THIN)` and `DONE (FORKED)`, reproduced on
+  `cBriefedPilot`, and `dGaugedVintage` was the one build with a uniform column, which is why the
+  five-token reading survived being checked. The match is now a PREFIX on `DONE`, with an
+  unrecognised state refusing BY NAME rather than falling through; AC13 arms that. B3: S4 never said
+  WHEN the caller resolves `planState`, and the harness has no point between its stages at which a
+  caller could re-run `--plan`, so a fresh build's entry-time value is `MISSING` for exactly the
+  units stage 1 authors — the BUILD stage now subtracts that stage's own return, and AC14 arms the
+  fresh-build path. H2: AC4 asked for a bare `FORKED` from a real closed build's roster, which
+  `:2144` makes impossible; the two requirements are split across AC4 and AC11.
 
 ## 10. Reuse audit
 

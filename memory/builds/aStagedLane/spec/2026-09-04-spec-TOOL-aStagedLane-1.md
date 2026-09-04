@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file
 
-**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
+**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round4.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round4.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 |
 
 <!-- /gen:spec-records -->
 
@@ -73,8 +74,19 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
   `opened: 2026-09-01` equals `PASS_ORDER_CUTOFF` and is therefore admitted rather than
   grandfathered. History is append-only and `.githooks/pre-push` blocks a red default-branch push, so
   unit 1 as specified through rev-4 is UNLANDABLE.
-  The disposition is a DECLARED per-unit waiver registry at `memory/project/`, which this repository
-  states is the home of exactly that and nothing else, listing those ids with the reason. It is
+  The disposition is a DECLARED per-unit waiver registry, and rev-5 left it unnamed and unformatted,
+  which would have landed it RED. **The file is `memory/project/pass-order-waiver.txt`.** One row
+  per waived unit, the unit id then a TAB then the reason, with `#` comments and blank lines
+  ignored, matching the shape the sibling registries in that directory already use. **An ABSENT
+  file means an EMPTY waiver set** — every violation reds — because the safe default for an
+  exemption list is to exempt nothing; a missing file that waived everything would be the
+  vacuous-selector class on the one path this leg reports a hard violation.
+  **And `memory/project/` is a NAME-WHITELISTED closed set**, enforced by the unguarded `memory
+  hygiene` merge-bar leg at `check-memory-hygiene.sh:389-421`, which carries one arm per existing
+  registry. Its declared escape is the `PROJECT_REGISTRY_EXTRA` conf key, and `.memory-tree.conf`
+  does not currently set it. So this unit ALSO adds `pass-order-waiver.txt` to that key — without
+  which the registry lands red on a leg no guard scopes away, and AC14 and AC15 would be grading
+  a surface the tree refuses. It is
   preferred over the two alternatives on M3's rule. Raising `PASS_ORDER_CUTOFF` past 2026-09-01 is
   discarded by veto 1: §3's third non-goal says the date gate "stays exactly as it is", and a raise
   would also grandfather every future build opened in that window, blanket-exempting a population to
@@ -123,9 +135,12 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
   load-aware. Deriving `BUDGET_pass_order_history` from a loaded reading would silently reverse a
   settled decision inside the file that records it and leave the runner's bound unable to fire on a
   real regression. So: the manifest row from a LOADED reading, the budget from an IDLE one, each with
-  its reading and its conditions written beside it. The loaded reading in hand is **463 s on node
-  `a`, 2026-09-04, with two concurrent builds running**, against 134 s recorded by
-  `TOOL-dSealedTally-2`; the idle reading is taken separately, per AC5.
+  its reading and its conditions recorded. **Only ONE of the two carriers can hold that record in
+  place**: `gate-legs.json` is JSON with a closed key set pinned by the run-gates canary, so it
+  takes no comment, and its reading is recorded in this spec and in the commit message instead.
+  The `BUDGET_*` line takes its reading as the inline comment its siblings all carry. The loaded
+  reading in hand is **463 s on node `a`, 2026-09-04, with two concurrent builds running**,
+  against 134 s recorded by `TOOL-dSealedTally-2`; the idle reading is taken separately, per AC5.
 - **S5** — `tools/unattended/check-pass-order.test.sh` gains arms for the new population: a
   run-state-free build whose unit was built before its spec must be observed RED, and the same build
   with the spec commit first must be observed green.
@@ -146,9 +161,11 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
 
 ## 3. Non-goals (OUT)
 
-- Not auditing the existing corpus for builds this widening will red. The date cutoff is the
-  control and S1 does not move it. A build the widened leg reds is a finding for whoever lands it,
-  not a migration this unit performs.
+- Not auditing the existing corpus BEYOND what S2e's waiver requires. **Narrowed at rev-6**, because
+  the rev-2 wording forbade exactly the audit S2e now performs: the widened predicate must be run
+  over the tree before it is wired (§7), and the two violations it finds must be declared or the
+  unit cannot land. What remains out of scope is fixing or migrating those builds — history is
+  append-only and a waived row stays waived until someone rewrites the record it names.
 - Not changing the per-unit predicate, the first-parent anchor, or the build-commit definition. Each
   was settled by `TOOL-dBriefedPass-3` and re-deciding them here would put two answers in the tree.
 - Not grading builds the cutoff excludes. The date gate stays exactly as it is; this unit widens
@@ -177,7 +194,9 @@ per unit, was rejected under Alternatives rejected below.
 
 `tools/unattended/check-pass-order.sh`, `tools/unattended/check-pass-order.test.sh`,
 `tools/unattended/run-unattended-gates.sh` and `tools/gate-legs.json` for the two ceilings, and the
-kit descriptor only if the leg's guard changes. Five files, two of them declarations. `gate-legs.json`
+`memory/project/pass-order-waiver.txt` and the `PROJECT_REGISTRY_EXTRA` line of
+`.memory-tree.conf` that legalises it, and the kit descriptor only if the leg's guard changes.
+Seven files, four of them declarations. `gate-legs.json`
 was absent from this list at rev-2, which is how S4 came to name one carrier of a figure that has
 two.
 
@@ -207,7 +226,8 @@ satisfied by not opting in, which is the shape this unit exists to remove.
 - a11y — N/A. No user-facing surface.
 - i18n — N/A. No user-facing strings beyond gate output.
 - error / empty / loading states — a build with no CLOSED unit contributes nothing and must be
-  counted as skipped rather than passing silently.
+  counted as skipped rather than passing silently. Observed by AC17, which rev-5 owed it and did
+  not carry: the one error state this section declares had no criterion anywhere.
 - observability — S3's liveness line is the whole of it, including the retirement of a counter S1
   and S2b leave with no reachable increment site.
 - risks — the widened population REDS TWO UNITS already landed on the default branch, MEASURED:
@@ -239,6 +259,13 @@ satisfied by not opting in, which is the shape this unit exists to remove.
   touches ONLY a `SHARED_RECORDS` path, `check-pass-order.sh` does NOT report a violation for that
   unit. This is the false-positive arm: the pre-anchor window admits product commits and record
   commits alike, and a predicate without the record-surface exclusion reds a conforming build.
+- **AC17** — When `bash tools/unattended/check-pass-order.sh` runs over a fixture build whose
+  generated units region carries NO CLOSED unit, that build is counted as skipped and the run exits
+  0. A build contributing nothing and a build passing silently print the same thing otherwise.
+- **AC18** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs after this unit,
+  `memory/project/pass-order-waiver.txt` is accepted, which requires `.memory-tree.conf` to declare
+  it in `PROJECT_REGISTRY_EXTRA`. That directory is a name-whitelisted closed set on an unguarded
+  merge-bar leg, so an undeclared registry file reds the bar however correct its contents are.
 - **AC14** — When `bash tools/unattended/check-pass-order.sh --preview` runs over the real
   `memory/builds/` tree, the violation set it prints is EXACTLY the set S2e's waiver registry
   declares — neither more nor fewer. This is the criterion whose absence made rev-2 through rev-4
@@ -262,7 +289,10 @@ satisfied by not opting in, which is the shape this unit exists to remove.
   carries the reading it was set against on the line beside it; and the `pass-order history` row of
   `tools/gate-legs.json` carries a ceiling at least as large, with the stale parity comment gone from
   the runner. The reading is taken after the pre-anchor probe exists, not after S1 alone: S2c is the
-  part whose cost nothing has measured.
+  part whose cost nothing has measured. **The `gate-legs.json` half is asserted as a DECISION, not
+  an inequality**: the row's ceiling is either changed by this unit or explicitly re-confirmed
+  against the post-S2c loaded reading, and the spec records which. "At least as large" is satisfied
+  by the untouched 900 and would let the manifest half of S4 ship unexamined.
 - **AC7** — When a fixture build has NO `RUN.md`, and a commit writing product code and naming its
   unit id lands BEFORE the commit that creates the build folder, `check-pass-order.sh` exits
   non-zero and names that unit. The unit must NOT appear only in the `unbuilt-in-range` tally: that
@@ -369,6 +399,19 @@ from that gate's subject list and could never have graded these branches. A gate
   Finding 4: rev-4 derived BOTH ceilings from one LOADED reading, which reverses
   `TOOL-aCollapsedScan-4` inside the file that records it; the manifest row takes the loaded
   reading and the `BUDGET_*` figure an idle one, and AC5 now says which.
+- rev-6 · 2026-09-04 · round-4 spec audit folded, and this is the TERMINATING fold: the blocker
+  count went 4, 2, 1, 3, so the convergence predicate exited NON-CONVERGENT and M4's disposition for
+  every blocker still standing is FOLD. B2 was this spec's: S2e named no file, no row format and no
+  absent-file behaviour, and `memory/project/` is a name-whitelisted closed set on an unguarded
+  merge-bar leg whose `PROJECT_REGISTRY_EXTRA` escape `.memory-tree.conf` does not declare — so the
+  registry as specified would have landed RED and AC14/AC15 would have graded a surface the tree
+  refuses. The file is now named, formatted, defaulted to the empty set, and declared, with AC18
+  observing the declaration. H1: a `gate-legs.json` row cannot hold the reading S4 told it to carry
+  — JSON, closed key set, canary-pinned — so only the `BUDGET_*` line takes an inline reading and
+  the manifest half is recorded here; AC5 now asserts that row was DECIDED rather than left to
+  satisfy an inequality against its untouched 900. M1: the first non-goal forbade exactly the corpus
+  audit S2e performs, and is narrowed to forbid the migration instead. L1: §5's only declared error
+  state had no criterion; AC17 is it.
 
 ## 10. Reuse audit
 
