@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-04
 streams: tooling
 roster: TOOL
-ids: TOOL-aWeighedCompass-1 TOOL-aWeighedCompass-2 TOOL-aWeighedCompass-3 TOOL-aWeighedCompass-4 TOOL-aWeighedCompass-5 TOOL-aWeighedCompass-6 TOOL-aWeighedCompass-7 TOOL-aWeighedCompass-8 TOOL-aWeighedCompass-9 TOOL-aWeighedCompass-10 TOOL-aWeighedCompass-11 TOOL-aWeighedCompass-12 TOOL-aWeighedCompass-13 TOOL-aWeighedCompass-14 TOOL-aWeighedCompass-15 TOOL-aWeighedCompass-16
+ids: TOOL-aWeighedCompass-1 TOOL-aWeighedCompass-2 TOOL-aWeighedCompass-3 TOOL-aWeighedCompass-4 TOOL-aWeighedCompass-5 TOOL-aWeighedCompass-6 TOOL-aWeighedCompass-7 TOOL-aWeighedCompass-8 TOOL-aWeighedCompass-9 TOOL-aWeighedCompass-10 TOOL-aWeighedCompass-11 TOOL-aWeighedCompass-12 TOOL-aWeighedCompass-13 TOOL-aWeighedCompass-14 TOOL-aWeighedCompass-15 TOOL-aWeighedCompass-16 TOOL-aWeighedCompass-17 TOOL-aWeighedCompass-18 TOOL-aWeighedCompass-19
 ---
 
 # aWeighedCompass — measuring whether the orientation toolchain actually orients
@@ -68,7 +68,7 @@ probed with, which is a ground truth for the map half.
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node a · opened 2026-09-04 · streams tooling
 ids TOOL-aWeighedCompass-1 TOOL-aWeighedCompass-2 TOOL-aWeighedCompass-3 TOOL-aWeighedCompass-4 TOOL-aWeighedCompass-5 TOOL-aWeighedCompass-6 TOOL-aWeighedCompass-7 TOOL-aWeighedCompass-8 TOOL-aWeighedCompass-9 TOOL-aWeighedCompass-10 TOOL-aWeighedCompass-11 TOOL-aWeighedCompass-12
-ids TOOL-aWeighedCompass-13 TOOL-aWeighedCompass-14 TOOL-aWeighedCompass-15 TOOL-aWeighedCompass-16
+ids TOOL-aWeighedCompass-13 TOOL-aWeighedCompass-14 TOOL-aWeighedCompass-15 TOOL-aWeighedCompass-16 TOOL-aWeighedCompass-17 TOOL-aWeighedCompass-18 TOOL-aWeighedCompass-19
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

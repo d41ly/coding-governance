@@ -108,6 +108,48 @@ python -c "import json;from collections import Counter;rows=[json.loads(l) for l
 `check-recall.py` pins `records:fts5:r@5 >= 0.81` and reports 0.8333. That cell is real and it
 passes. It is also the only cell anyone grades, and it is the half that works.
 
+**Finding 3b — the published chunk numbers are measured on a query shape no session sends, and
+correcting it changes the answer. MEASURED, added after the first draft.** The committed fixture
+carries no terms (`any with terms? 0 of 12`), so `bench.py` grades the bare question — while
+`query.py` REFUSES without `--terms` and all 148 logged queries supplied them. Re-running with terms
+appended to each question, at the live chunk width:
+
+| set | substrate | r@20 bare | r@20 with terms | MRR bare | MRR with terms |
+|---|---|---|---|---|---|
+| chunks | fts5 | 0.08 | 0.17 | 0.008 | 0.026 |
+| chunks | **roll** | 0.08 | **0.33** | 0.010 | **0.044** |
+| records | fts5 | 0.83 | **1.00** | 0.681 | 0.646 |
+
+So terms roughly double chunk recall and take `records` to a perfect r@20. `roll` — the small-to-big
+rollup already implemented at `bench.py` (`:135`) and dispatchable as `roll` (`:322`) — quadruples
+chunk recall and is the only chunk substrate that beats grep decisively. The kit's own docstring
+records rollup as worth "+0.04 to +0.05 on CHUNK-ONLY retrieval"; with terms it is +0.25 at r@20.
+**That docstring's measurement is stale for the query shape sessions actually use.**
+
+**Finding 3c — in the live ensemble the chunk half adds zero recall and 58% more bytes. MEASURED
+with `union.py`**, the ensemble scorer that grades the two-set shape the CLI serves, with terms, k=20:
+
+| ensemble | recall | bytes_full | bytes_snippet |
+|---|---|---|---|
+| `records:fts5+chunks:fts5` (the live shape) | 1.000 | 32451 | 18424 |
+| `records:fts5` alone | **1.000** | **20483** | **8544** |
+| `records:fts5+chunks:roll` | 1.000 | 32400 | 18374 |
+
+Identical recall. The chunk half costs 11968 extra bytes read in full, and 9880 extra as snippets —
+116% more snippet bytes for nothing measurable.
+
+**The caveat that stops this being a verdict, and it is a big one.** `records` alone already reaches
+1.000 at k=20 on this fixture, so the fixture CANNOT show chunks contributing anything — there is no
+headroom left to contribute. This is fixture saturation, not proof that chunks are useless. And
+`union.py`'s own docstring names the thing recall@k cannot see: whether an agent can still pick the
+right record off snippets alone. Chunks may be earning their place by pointing at the right LINE
+inside a record, which no metric here measures. Two further honesty notes: n=12, so 0.08 to 0.33 is
+one question becoming four; and the terms were written by hand by someone who had just spent a
+session in this corpus, which biases them optimistic.
+
+**So the first move is not to tune chunks. It is to build a fixture that can tell the difference.**
+Every number above saturates, and tuning against a saturated fixture is how a pin gets set to noise.
+
 **The honest caveat, stated because it changes what the number means.** The fixture's `expected_ids`
 are record ids, so an expected "document" in the chunks set is whichever 600-character slice carries
 the anchor. Ranking that specific slice is a harder task than ranking a whole record, and part of
@@ -433,17 +475,19 @@ liveness discipline working exactly as the charter specifies, and is worth recor
 | 3 | Correct the `curation-debt.txt` note that names rotation as the remedy | A recorded plan that provably cannot work, plus one hidden status fault | One-line edit | `-3` |
 | 4 | Collapse same-file hits in `rrf()`, or cap hits per path | ~7.8 KB of duplicate context per query, on 148 queries so far | Kit change | `-6` |
 | 5 | Split or shorten `memory/backlog/TOOL.md` | 261 KB — 68.3% of a tooling session's stated reading order | Curation job | `-3` |
-| 6 | Grade the chunks half, or stop merging it | Half of every result set, currently below grep and ungated | **Owner call** | `-4` |
-| 7 | Log `shown_paths` in the map log | Makes the map half measurable at all, as recall already is | Small kit change | `-10` |
-| 8 | Record every corpus read in the open window, with rank | Turns this report's weakest numbers into real ones | Small hook change | `-11` |
-| 9 | Rank the neighbour pool BEFORE truncating it | A high-fan-in neighbour sorting late is discarded unranked | One-line reorder | `-12` |
-| 10 | Index private symbols, or index them at lower weight | The internal seams a reuse audit hunts for are absent | Kit change, needs measurement | `-13` |
-| 11 | Demote or re-rank the name-stem arm in `reuse_lookup` | Precision 0.056; ~17 paths returned to deliver ~1 | Kit change, needs its own measurement | `-7` |
-| 12 | Add a shell definition extractor | The largest structural blind spot in the map | Real work | `-8` |
-| 13 | Anchor the 211 orphan ids, or waive them explicitly | Retrieval cannot define 23.7% of the ids the corpus cites | Curation job | `-9` |
-| 14 | Narrow the pointer map's `tooling` entrypoint below `tools/` | A 30-class "checklist" that is really the catalogue | Manifest edit | `-14` |
-| 15 | Declare the recall kit in the manifest | One of three probes is reached by a filesystem guess | Manifest edit | `-15` |
-| 16 | Grade the query shape sessions actually send | The one quality leg grades neither the real query nor the real result set | Kit change | `-16` |
+| 6 | Add terms to the recall fixture | Every chunk figure today grades a query shape no session sends | Fixture edit | `-4` |
+| 7 | Switch the chunk source to `roll` in `query.py` | 2x chunk recall AND collapses the 54.5% duplicate slots, one change | Kit change, already implemented | `-17` |
+| 8 | Wire `union.py` behind a pin | The one quality leg would grade the shape the CLI serves | Kit change | `-16`, `-19` |
+| 9 | Build a fixture that discriminates, then re-price the chunk half | The current one saturates at records-alone, so it cannot | **Owner call** | `-18` |
+| 10 | Log `shown_paths` in the map log | Makes the map half measurable at all, as recall already is | Small kit change | `-10` |
+| 11 | Record every corpus read in the open window, with rank | Turns this report's weakest numbers into real ones | Small hook change | `-11` |
+| 12 | Rank the neighbour pool BEFORE truncating it | A high-fan-in neighbour sorting late is discarded unranked | One-line reorder | `-12` |
+| 13 | Index private symbols, or index them at lower weight | The internal seams a reuse audit hunts for are absent | Kit change, needs measurement | `-13` |
+| 14 | Demote or re-rank the name-stem arm in `reuse_lookup` | Precision 0.056; ~17 paths returned to deliver ~1 | Kit change, needs its own measurement | `-7` |
+| 15 | Add a shell definition extractor | The largest structural blind spot in the map | Real work | `-8` |
+| 16 | Anchor the 211 orphan ids, or waive them explicitly | Retrieval cannot define 23.7% of the ids the corpus cites | Curation job | `-9` |
+| 17 | Narrow the pointer map's `tooling` entrypoint below `tools/` | A 30-class "checklist" that is really the catalogue | Manifest edit | `-14` |
+| 18 | Declare the recall kit in the manifest | One of three probes is reached by a filesystem guess | Manifest edit | `-15` |
 
 Rows 1 through 3 are edits, not projects, and between them remove a false fact, a broken plan and a
 silently dead retrieval layer. They should go first regardless of what is decided about 6.
