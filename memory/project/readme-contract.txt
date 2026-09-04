@@ -73,6 +73,7 @@ memory/builds/aThawedCorpus/README.md
 !memory/builds/aTimedTurnstile/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aUnmannedHelm/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aWalkedCorpus/README.md - predates the contract; drains when its build's owner conforms it
+memory/builds/aWeighedCompass/README.md
 !memory/builds/aWireWarden/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aWrittenMethod/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/bConvergentLodestar/README.md - predates the contract; drains when its build's owner conforms it
