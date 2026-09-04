@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-8 — close the four rows whose defect the tree no longer has
 
-**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-1 · base 9b5ae688 · streams tooling · order 8
+**Status:** CLOSED · rev-2 · 2026-09-04 · node a · Tier-1 · base 9b5ae688 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 

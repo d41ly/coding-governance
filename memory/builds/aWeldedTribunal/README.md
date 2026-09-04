@@ -77,7 +77,7 @@ records are under `reviews/`, and each unit's §9 names the findings it folded.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 8 unit(s) · node a · opened 2026-09-04 · streams tooling
+**Build status:** CLOSED · 8 unit(s) · node a · opened 2026-09-04 · streams tooling
 ids TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8
 
 <!-- gen:build-units -->
@@ -90,7 +90,7 @@ ids TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aW
 | [TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by every python reader](spec/2026-09-04-spec-TOOL-aWeldedTribunal-5.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-04 |
 | [TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-6.md) | 6 | 2 | CLOSED | rev-4 | 2026-09-04 |
 | [TOOL-aWeldedTribunal-7 — the wiring check names the hooks that will actually run](spec/2026-09-04-spec-TOOL-aWeldedTribunal-7.md) | 7 | 2 | CLOSED | rev-3 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-8 — close the four rows whose defect the tree no longer has](spec/2026-09-04-spec-TOOL-aWeldedTribunal-8.md) | 8 | 1 | OPEN | rev-2 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-8 — close the four rows whose defect the tree no longer has](spec/2026-09-04-spec-TOOL-aWeldedTribunal-8.md) | 8 | 1 | CLOSED | rev-2 | 2026-09-04 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 4 record folder(s).
