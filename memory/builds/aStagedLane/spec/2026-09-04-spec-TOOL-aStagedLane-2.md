@@ -80,7 +80,7 @@ choosing its route per session.
   one.
 - **S6** — arms in `tools/workflows/unattended-build.test.sh` covering both modes: that unattended
   mode still records through the driver, that attended mode does not, that a null blocker count
-  refuses in both, that the attended BUILD prompt names none of the three refusing verbs, and that
+  refuses in both, that the attended BUILD prompt names neither `--dispatch` nor `--brief`, and that
   the attended preamble carries no mandate vocabulary, and that a zero blocker count terminates while
   a positive one converges. The prompt arms assert on the COMPOSED string rather than on a
   run's behaviour, because a prompt is the one artifact here that no gate downstream ever reads,

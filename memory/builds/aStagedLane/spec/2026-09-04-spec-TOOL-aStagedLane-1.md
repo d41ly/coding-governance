@@ -97,9 +97,11 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
   S2b routes the other two to the folder anchor, and an absent or unreadable `base:` yields the
   empty string, which is not hex-shaped, so it lands in the second. Every path is closed, and a
   field pinned at zero printed beside four that move is the DEAD PROBE class this leg's own header
-  makes load-bearing. After this unit the line prints FIVE: graded, skipped-by-cutoff,
-  run-state-free-graded, `unbuilt-in-range`, and the pre-anchor violations S2c finds, plus S2d's
-  truncation count where it is non-zero.
+  makes load-bearing. After this unit the line prints SIX: graded, skipped-by-cutoff,
+  run-state-free-graded, `unbuilt-in-range`, the pre-anchor violations S2c finds, and the units
+  S2e's registry WAIVED — a waived violation that nothing counts is an exemption nobody can see,
+  which is the same doctrine that makes a skip announce itself — plus S2d's truncation count where
+  it is non-zero.
 - **S4** — the cost ceiling for this leg is re-declared against a fresh reading taken after S1, S2c
   AND S2d have landed — not after S1 alone, since the pre-anchor probe is the part whose cost is
   unmeasured — with the reading written beside it, in BOTH carriers that declare one:
@@ -284,9 +286,12 @@ satisfied by not opting in, which is the shape this unit exists to remove.
 
 The `pass-order history` leg in `tools/gate-legs.json`, its self-test
 `tools/unattended/check-pass-order.test.sh`, the unattended `--checks` runner in
-`tools/unattended/run-unattended-gates.sh`, . `python tools/memory-tree/check-arms.py` was named here through rev-4 and is DROPPED: its
-population is tracked `*.sh` files that define `fail() {`, and `check-pass-order.sh` defines none, so
-it is absent from that gate's subject list and could never have covered these branches. The full bar is `bash tools/run-gates/run-gates.sh`.
+`tools/unattended/run-unattended-gates.sh`, and the full bar, `bash tools/run-gates/run-gates.sh`.
+
+`python tools/memory-tree/check-arms.py` was named here through rev-4 and is DROPPED. Its population
+is tracked `*.sh` files that define `fail() {`; `check-pass-order.sh` defines none, so it is absent
+from that gate's subject list and could never have graded these branches. A gate named in a spec's
+§7 that does not select the file is coverage nobody has.
 
 ## 8. Open questions
 
