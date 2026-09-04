@@ -81,9 +81,15 @@ export const meta = {
 // the owner rather than worked around, because restructuring a call into a helper the loop invokes
 // would be textually indistinguishable from the evasion the rule names.
 //
-//   1. EACH STAGE IS ONE AGENT holding the ordered unit list, rather than one agent per unit. The
-//      stage order stays structural; per-unit order moves onto `--dispatch`'s refusal, which reads
-//      the tree and is therefore a STRONGER check than a JS loop rather than a weaker one.
+//   1. THE BUILD STAGE IS ONE AGENT holding the ordered unit list, rather than one agent per unit.
+//      The stage order stays structural; per-unit order moves onto `--dispatch`'s refusal, which
+//      reads the tree and is therefore a STRONGER check than a JS loop rather than a weaker one.
+//      SCOPED TO BUILD AT TOOL-aStagedLane-3, which made the SPEC stage a bounded parallel fan of
+//      writers over groups of slices. That does not contradict the ratified `parallelism route:
+//      none` above: the verdict failed on E4, two passes COMMITTING without racing one index, and
+//      the spec writers author and never commit — the caller commits once after they return.
+//      Leaving this claim unscoped would have left the file's own header describing a shape it no
+//      longer has, which is the drift class this repository gates for.
 //
 //   2. THE CONVERGENCE LOOP LIVES IN THE CALLER, and this file holds the GATE. A convergence loop's
 //      iteration count is data-dependent by definition, so unlike case 1 there is no bounded unroll.
@@ -91,6 +97,31 @@ export const meta = {
 //      no caller error can build on a spec set the review is still working through. The owner's
 //      2026-09-01 ruling survives in the half that matters — the verdict decides, and NO round cap
 //      exists anywhere in this file.
+
+// --- cap-5 fan-out, INLINED FROM `tools/workflows/tier2-review.js` (TOOL-aStagedLane-3 S2) ------
+// NOT A REUSE — A COPY, and the difference cost this spec two review rounds. `boundedParallel` was
+// never in this file: it lives at `tier2-review.js:17` and the copies elsewhere are in the two
+// drift-audit workflows. Workflow scripts cannot import, so a second marked copy is the only shape
+// available, and `tier2-review.js` REMAINS THE OWNER of the cap literal — this one carries the same
+// value and names that file so the two are one figure with a stated source rather than two
+// declarations drifting apart.
+//
+// The marker on the slice line below is what `agent-cap.js` reads to admit the raw primitive. Do not
+// spell that token anywhere else in this file, including in prose: the hook scans line by line and
+// treats any line carrying it as a marked one, so a comment ABOUT the marker is read as a marker
+// claiming a bound over nothing, and denies the whole file. Learned here. Grammar:
+// `tools/hooks/README.md`.
+async function boundedParallel(thunks, cap = 5) {
+  const out = []
+  for (let i = 0; i < thunks.length; i += cap)
+    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
+  return out
+}
+function chunk(a, n) {
+  const out = []
+  for (let i = 0; i < a.length; i += n) out.push(a.slice(i, i + n))
+  return out
+}
 
 // --- inputs (via Workflow `args`) --------------------------------------------------------------
 // { repo: "/abs/path/to/worktree",                 // REQUIRED
@@ -286,26 +317,120 @@ const GROUND =
     : 'Speak only in your return value: nobody reads a transcript under a mandate. ')
 
 // ============================================================== STAGE 1 — SPEC
+// TOOL-aStagedLane-3 — A FAN OVER GROUPS OF SLICES, not one agent holding every unit.
+//
+// WHY IT IS PERMITTED. The parallelism rule requires concurrency where disjointness is PROVEN, in
+// three clauses. (1) The write sets are the spec file paths, one per unit, and they do not
+// intersect. (2) No writer reads another's output and no spec is a contract input to a sibling.
+// (3) No writer touches a shared mutable record — which needs BOTH the generator prohibition in
+// each prompt AND the rule that writers AUTHOR and never COMMIT, since every writer is told to
+// read BUILD-METHOD whole and M6 orders a commit at the end of every pass. N writers committing
+// would contend on one git index, which is the recorded experiment E4 that
+// `TOOL-cBriefedPilot-21` ratified `parallelism route: none` on and `TOOL-cBriefedPilot-28`
+// records as never actually run. Authoring-only keeps this stage clear of that verdict instead of
+// contradicting it unremarked; BUILD dispatch stays strictly sequential.
+//
+// SLICES COME FROM THE CALLER, grouped by the declared `order` verb — this runtime has no
+// filesystem and cannot derive a grouping. The caller's slice count bounds NOTHING, so the slices
+// are re-split into at most `SPEC_WRITERS` groups: that bounds the agent TOTAL, which is the
+// second of the two rules the charter insists are not one rule, and it is the receiver shape
+// `agent-cap.js` can prove bounded.
+//
+// SO A WRITER HOLDS A GROUP, WHICH ABOVE THE CAP IS MORE THAN ONE SLICE. At seven slices and a cap
+// of five there are five groups, two of them carrying two slices. The unit's headline property is
+// that a writer holds ITS OWN group's briefs and nothing outside it — not that it holds exactly
+// one slice.
 phase('Spec')
-log('spec stage: ' + ordered.length + ' unit(s), in the order the caller derived from --plan')
-const specced = await agent(
-  GROUND +
-    'SPEC every unit below, IN THIS ORDER:\n' + roster + '\n\n' +
-    'For each: if a conforming spec already carries that id, leave it alone and count it in ' +
-    'alreadyPresent. Otherwise author it against `memory/TEMPLATE-SPEC.md` at the tier the kickoff ' +
-    'engine assigns, satisfy its section 10 reuse obligation with a real probe rather than a claim, ' +
-    'and give its status header the `order` verb this roster names. ' +
-    'DO NOT WRITE PRODUCT CODE in this stage. It authors designs and nothing else — a unit built ' +
-    'here would be the exact defect this harness exists to remove. ' +
-    'NAME every unit you could not spec, in `refused`, with the reason in your summary.',
-  { label: 'spec:' + slug, phase: 'Spec', schema: SPEC_SCHEMA },
+const SPEC_WRITERS = 5 // the cap `tier2-review.js` owns; this copy carries the same value
+const sliceKeys = []
+for (const u of ordered) {
+  const k = Number.isInteger(u.order) ? String(u.order) : 'unordered'
+  if (sliceKeys.indexOf(k) === -1) sliceKeys.push(k)
+}
+const slices = sliceKeys.map(function (k) {
+  return ordered.filter(function (u) {
+    return (Number.isInteger(u.order) ? String(u.order) : 'unordered') === k
+  })
+})
+// gov:fixed-verifiers — the bounded receiver. `chunk(x, Math.ceil(x.length / K))` with a resolvable
+// K is the sanctioned spelling; the group COUNT is what stands still while the batch grows.
+const specGroups = chunk(slices, Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers
+log('spec stage: ' + ordered.length + ' unit(s) in ' + slices.length + ' slice(s) -> ' +
+    specGroups.length + ' writer(s), each holding only its own group')
+// S7 — a unit with no `specBriefPath` falls back to the shared prompt, and SAYS SO. A silent
+// fallback and a deliberate omission are otherwise indistinguishable, and a mistyped key would
+// hand back the old behaviour with no signal at all.
+for (const u of ordered) {
+  if (!u.specBriefPath) log('spec stage: ' + u.id + ' has no specBriefPath — falling back to the shared prompt')
+}
+const specResults = await boundedParallel(
+  specGroups.map(function (grp, gi) {
+    return function () {
+      const gUnits = [].concat.apply([], grp)
+      const gRoster = renderRoster(gUnits, slug, briefDir)
+      const briefs = gUnits
+        .filter(function (u) { return u.specBriefPath })
+        .map(function (u) { return u.id + ' -> ' + u.specBriefPath })
+      return agent(
+        GROUND +
+          'SPEC every unit below, IN THIS ORDER. This is YOUR GROUP and it is all you are ' +
+          'responsible for; other writers hold the rest of this build concurrently.\n' + gRoster +
+          '\n\n' +
+          (briefs.length
+            ? 'Read the brief for each unit that names one, and no other brief:\n  ' +
+              briefs.join('\n  ') + '\n\n'
+            : '') +
+          'For each: if a conforming spec already carries that id, leave it alone and count it in ' +
+          'alreadyPresent. Otherwise author it against `memory/TEMPLATE-SPEC.md` at the tier the ' +
+          'kickoff engine assigns, satisfy its section 10 reuse obligation with a real probe rather ' +
+          'than a claim, and give its status header the `order` verb this roster names. ' +
+          'DO NOT WRITE PRODUCT CODE in this stage. It authors designs and nothing else — a unit ' +
+          'built here would be the exact defect this harness exists to remove. ' +
+          'AUTHOR ONLY — DO NOT COMMIT, and do not run the build-index generator. You are one of ' +
+          'several writers running at once: the caller commits once after all of you return, and ' +
+          'regenerates the index once. A writer that commits contends with its siblings on one git ' +
+          'index, which is the experiment this repository has NOT run. ' +
+          'NAME every unit you could not spec, in `refused`, with the reason in your summary.',
+        { label: 'spec:' + slug + ':g' + gi, phase: 'Spec', schema: SPEC_SCHEMA },
+      )
+    }
+  }),
+  SPEC_WRITERS,
 )
-if (!specced) {
+// THE MERGE, and its refusal. A dead writer returns null and its units are REFUSED rather than
+// dropped — `degradation-known-but-unreported` is the class where a stage computes its own losses
+// and does not report them.
+//
+// AND AN ALL-DEAD FAN THROWS. The old guard was `if (!specced) throw` on a falsy return; a merged
+// object is always truthy, so without this an entirely dead spec stage would present as a clean
+// object with empty arrays and reach AUDIT and BUILD on whatever specs already existed. That is
+// the refusal this file spends six lines justifying, deleted by accident.
+const specced = { authored: [], alreadyPresent: [], refused: [], summary: '' }
+let liveWriters = 0
+specResults.forEach(function (r, gi) {
+  const gUnits = [].concat.apply([], specGroups[gi] || [])
+  if (!r) {
+    gUnits.forEach(function (u) { specced.refused.push(u.id) })
+    specced.summary += 'group ' + gi + ' returned nothing; '
+    return
+  }
+  liveWriters++
+  ;['authored', 'alreadyPresent', 'refused'].forEach(function (k) {
+    if (Array.isArray(r[k])) specced[k] = specced[k].concat(r[k])
+  })
+  specced.summary += 'group ' + gi + ': ' + (r.summary || '(no summary)') + '; '
+})
+if (!specResults.length || liveWriters === 0) {
   throw new Error(
-    'unattended-build: the SPEC stage returned nothing, so no unit is known to have a design. That ' +
-      'is a refusal and not an empty pass: continuing would put the BUILD stage on a spec set ' +
-      'nothing confirmed exists.',
+    'unattended-build: EVERY spec writer returned nothing (' + specGroups.length + ' group(s)), so ' +
+      'no unit is known to have a design. That is a refusal and not an empty pass: continuing ' +
+      'would put the BUILD stage on a spec set nothing confirmed exists. A merged return is always ' +
+      'truthy, so this is checked on the LIVE WRITER COUNT and not on the object.',
   )
+}
+if (liveWriters < specGroups.length) {
+  log('spec stage: DEGRADED — ' + (specGroups.length - liveWriters) + ' of ' + specGroups.length +
+      ' writer(s) returned nothing; their units are in `refused`')
 }
 const specRefused = Array.isArray(specced.refused) ? specced.refused : []
 const speccedCount =
