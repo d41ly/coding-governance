@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-1 — one loop-header predicate, and it recognises `for await` and `do`-blocks
 
-**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

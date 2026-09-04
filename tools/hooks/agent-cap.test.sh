@@ -47,6 +47,25 @@ check "string mentions parallel() + a real raw parallel( → deny" 2 '{"tool_nam
 # reject cannot double as the fixture proving it accepts.
 check "boundedParallel + marker → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"async function boundedParallel(t,cap=5){const o=[];for(let i=0;i<t.length;i+=cap)o.push(...await parallel(t.slice(i,i+cap))); // gov:bounded-fanout\nreturn o}\nconst LENSES = [1,2,3]\nconst r = await boundedParallel(LENSES.map(d=>()=>agent(d)),5)"}}'
 
+# ---- the LOOP KEYWORD SET (TOOL-aWeldedTribunal-1) ----------------------------------------------
+# Every loop-recognition path must see the SAME keyword set. Six sites in agent-cap.js used to hold
+# their own `for|while` regex, and two ordinary spellings matched none of them: `for await (` puts an
+# identifier between the keyword and the paren, and a `do { … } while (…)` block's opening line
+# carries no keyword at all. Both were MEASURED at exit 0 against the shipped hook before this unit.
+#
+# ARMS PER WALK, NOT PER KEYWORD. The same fan expressed as `for await (` must deny whether it is
+# reached through the BRACE walk or the OPENER walk — those are different predicates and the opener
+# walk needs the end-of-text form, so a single arm would certify coverage it does not have.
+check "for-await thunk array (brace walk) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const th = []\nfor await (const f of allFindings) { th.push(() => agent(f.claim)) }\nawait Promise.all(th.map(t=>t()))"}}'
+check "do-while thunk array (brace walk) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const th = []\nlet i = 0\ndo { th.push(() => agent(allFindings[i].claim)); i++ } while (i < allFindings.length)\nawait Promise.all(th.map(t=>t()))"}}'
+check "for-await inline agent (opener walk) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"for await (const f of allFindings) await agent(f.claim)"}}'
+check "do-block inline agent → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"let i = 0\ndo { await agent(allFindings[i].claim); i++ } while (i < allFindings.length)"}}'
+# THE NEGATIVE DIRECTION. A widened predicate that denies innocent files is the failure this pair
+# exists to catch; measured over all eight tracked *.js, ZERO lines match the widened form and not
+# the old one, so nothing legal may change verdict.
+check "bounded fan, no loop → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nawait boundedParallel(LENSES.map(L=>()=>agent(L)), 5)"}}'
+check "the words for-await inside a string → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const note = \"we never write for await (x of y) here\"\nawait boundedParallel(T, 5)"}}'
+
 # ---- rule 5: the ref-keyed verdict join -----------------------------------------------------------
 # TOOL-dTieredTribunal-14's section 4 declared these ten arms as what "the failing case has been
 # observed" means for that unit, and the unit landed WITHOUT them: `git show --stat fb2d692e` never

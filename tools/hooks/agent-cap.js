@@ -425,6 +425,27 @@ const SEQ_MARK = 'gov:sequential-agents'
 // generous on purpose: a method missing from it used to mean ALLOW, which is the fail-open direction.
 const ITER_CALL = /\.\s*(map|flatMap|forEach|filter|reduce|reduceRight|some|every|find|findIndex|sort|flat)\s*$/
 
+// TOOL-aWeldedTribunal-1 — THE LOOP KEYWORD SET, spelled ONCE. Six sites in this file used to ask
+// "is this a loop" and each held its own `/\b(for|while)\s*\(/`, which is two answers to one
+// question six times over. Two ordinary spellings matched none of them and were MEASURED at exit 0
+// carrying an unmarked thunk-array fan past this hook (TOOL-dFoldedVerdict-8): `for await (` puts an
+// identifier between the keyword and the paren, and a `do { … } while (…)` block's opening line
+// carries no keyword at all because its `while` sits after the closing brace.
+//
+// THREE FORMS, because three sites ask the question differently and a single regex cannot serve all
+// of them. `LOOP_HEADER` matches an opener anywhere on a line. `LOOP_HEADER_G` is the same with the
+// global flag, for the site that COUNTS openers. `LOOP_KEYWORD_TAIL` matches a keyword at
+// END-of-text, for the opener walk, which tests the text BEFORE a paren — a pattern ending in `\(`
+// or `do\s*\{` can never match there. The `do` spelling is deliberately absent from the tail form: a
+// `do` block opens with a BRACE, so it never appears as an enclosing paren opener.
+//
+// Measured before wiring, over all eight tracked *.js: ZERO lines match the widened form and not the
+// old one, so nothing currently admitted becomes denied. The widening reaches the evasions only.
+const LOOP_KEYWORDS = 'for(?:\\s+await)?|while'
+const LOOP_HEADER = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{')
+const LOOP_HEADER_G = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{', 'g')
+const LOOP_KEYWORD_TAIL = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*$')
+
 // `K` resolved against this file: an integer literal, or an identifier bound to one.
 function boundedK(tok, consts) {
   const t = String(tok).trim()
@@ -702,13 +723,13 @@ function fanoutFindings(script) {
     const ch = code[h] || ''
     // C5: the SHAPE is read from the literal-blanked view, so a marker sitting inside a quoted
     // string on a line that is not really a loop header blesses nothing.
-    if (!/\b(for|while)\s*\(/.test(ch)) return ` — the marked line is not a loop header in the code view, so the marker sits inside a string and blesses nothing`
+    if (!LOOP_HEADER.test(ch)) return ` — the marked line is not a loop header in the code view, so the marker sits inside a string and blesses nothing`
     // C6: THE CLAUSE THAT CARRIES THE WEIGHT. The bound is the author's claim; a receiver this file
     // already proves bounded is what makes the total real.
     // TWO OPENERS ON ONE LINE CANNOT BE ATTRIBUTED. `for (const g of OK) for (const f of ALL)`
     // put a bounded token on the header of a loop that iterates something else, and the brace walk
     // stops at the shared line so the inner loop never gets its own header. Refused outright.
-    if ((ch.match(/\b(?:for|while)\s*\(/g) || []).length > 1) return ` — the marked header carries more than one loop opener, and this scan cannot tell which of them the call belongs to`
+    if ((ch.match(LOOP_HEADER_G) || []).length > 1) return ` — the marked header carries more than one loop opener, and this scan cannot tell which of them the call belongs to`
     // A STRICT for-of HEADER, matched as a whole from the `for (` itself. The earlier form read the
     // first `of <ident>)` ANYWHERE on the line, so a block comment, a guard clause or an outer loop
     // supplied the bounded token for free — measured, four ways. `while` is refused with no special
@@ -735,7 +756,7 @@ function fanoutFindings(script) {
         if (ch2 === '}') ob++
         else if (ch2 === '{') ob--
       }
-      if (ob < 0 && k !== h && /\b(for|while)\s*\(/.test(code[k])) return ` — the marked loop is itself inside a loop opened at line ${k + 1}, which multiplies its bound by a count nothing here can size`
+      if (ob < 0 && k !== h && LOOP_HEADER.test(code[k])) return ` — the marked loop is itself inside a loop opened at line ${k + 1}, which multiplies its bound by a count nothing here can size`
       if (ob < 0) ob = 0
     }
     return null
@@ -907,7 +928,12 @@ function fanoutFindings(script) {
         break
       }
       if (/\bArray\s*\.\s*from\s*$/.test(before)) { hit = { kind: 'from' }; break }
-      if (/\b(for|while)\s*$/.test(before)) { hit = { kind: 'loop' }; break }
+      // The TAIL form: this tests the text BEFORE an opener position, so a pattern ending in `\(`
+      // can never match here. `for await (` used to miss, leaving `hit` null so the walk continued
+      // OUTWARD — and if the next enclosing opener was a bounded `.map(` receiver already in `ok`,
+      // the call-site arm returned with no finding and the loop arms below were never reached.
+      // A fail-open the header widening alone does not close (TOOL-aWeldedTribunal-1, H3).
+      if (LOOP_KEYWORD_TAIL.test(before)) { hit = { kind: 'loop' }; break }
     }
     if (hit && hit.kind === 'iter') {
       if (hit.name === null) {
@@ -931,7 +957,7 @@ function fanoutFindings(script) {
     let braceless = false
     // A BRACELESS loop body: `for (const f of all) out.push(await agent(f))`. The brace walk below
     // cannot see it — there is no brace — and it was one of the measured bypasses.
-    if (/\b(for|while)\s*\(/.test(l.slice(0, c))) { h = i; braceless = true }
+    if (LOOP_HEADER.test(l.slice(0, c))) { h = i; braceless = true }
     else {
       // A loop BODY is a brace block, not a paren, so it never shows up as an enclosing opener.
       // Judged separately: an unclosed `for (`/`while (` block whose brace is still open above.
@@ -941,7 +967,7 @@ function fanoutFindings(script) {
           if (ch === '}') braces++
           else if (ch === '{') braces--
         }
-        if (braces < 0 && /\b(for|while)\s*\(/.test(code[k])) { h = k; break }
+        if (braces < 0 && LOOP_HEADER.test(code[k])) { h = k; break }
         if (braces < 0) braces = 0 // a different block opened here; keep looking outward
       }
     }
