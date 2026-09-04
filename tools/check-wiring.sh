@@ -185,6 +185,56 @@ else
   PY=python3   # gov:literal-python — printed in a remedy string, never executed; the resolver is not installed beside this script
 fi
 
+# TOOL-aWeldedTribunal-7 — WHICH HOOK WILL ACTUALLY RUN. `core.hooksPath` is repo-global and
+# absolute, so in a multi-worktree layout the hooks that gate a commit and a push come from whatever
+# the PRIMARY tree has checked out, NOT from the tree being worked in. Measured at
+# `TOOL-dUnstalledConvoy-26`'s landing: the primary tree sat on `contrib/incms-memory-recall`, so the
+# push ran that branch's `pre-push` — no gate-env sourcing, no predicate 8, and the boundary's own
+# coverage check simply absent. Nothing wrong shipped, because a separate full bar had verified the
+# pushed tree; the BOUNDARY was not the one that shipped.
+#
+# WHAT THIS DOES NOT CHECK, stated because a structural check reads as a semantic one to everybody
+# who did not write it: it reports a divergence, it does not PREVENT one, and a push made after the
+# report still runs the other checkout's hook. Closing that needs a refusal inside the hook itself,
+# which is a separate decision about what the push boundary REFUSES.
+#
+# IT IS A `note`, NOT AN `UNWIRED`, and that is the load-bearing half. `unwired` is exactly what
+# line 809 turns into this script's exit code, and `.unattended.conf` makes `--check` an unattended
+# run's precondition — so an UNWIRED line here would refuse every unattended run whenever a sibling
+# checkout moved to a branch that touched `.githooks/`. A primary tree parked on a feature branch is
+# a NORMAL state of this layout, and a gate that reds on a structural condition is a gate that gets
+# bypassed. The severity carries the whole fork resolution.
+#
+# WRITTEN OVER A LIST, so a third hook is one row rather than a third copy of the comparison.
+GOV_WIRING_HOOKS="pre-commit pre-push"
+check_hook_blobs() { # $1 = resolved hooks dir, $2 = the configured value as written
+  local dir="$1" shown="$2" hook resolved tracked otherbranch
+  for hook in $GOV_WIRING_HOOKS; do
+    # A hook this tree does not TRACK is a SKIP, never a comparison and never a finding. Check H's
+    # entry guard is tracked `.githooks/pre-commit` alone, so an adopter that owns its own pre-commit
+    # and ships no pre-push must not acquire a permanent report it has no action to clear.
+    if ! git ls-files --error-unmatch ".githooks/$hook" >/dev/null 2>&1; then
+      echo "skip     hooks     — .githooks/$hook is not tracked here, so there is nothing to compare"
+      continue
+    fi
+    # `ls-tree`, not `rev-parse HEAD:<path>`: a POSIX-emulation shell on Windows can mangle the
+    # `<rev>:.dotpath` spelling and report ABSENT for a file that is present.
+    tracked=$(git ls-tree HEAD -- ".githooks/$hook" 2>/dev/null | awk '{print $3}')
+    resolved=$([ -f "$dir/$hook" ] && git hash-object "$dir/$hook" 2>/dev/null)
+    # LIVENESS: an unreadable side is never printed as `ok`. "Could not compare" and "compared and
+    # agreed" are different facts, and only one of them is evidence.
+    if [ -z "$tracked" ] || [ -z "$resolved" ]; then
+      echo "note     hooks     — $hook: UNKNOWN, could not read both sides (tracked='${tracked:-?}' resolved='${resolved:-?}')"
+      continue
+    fi
+    [ "$tracked" = "$resolved" ] && continue
+    otherbranch=$(git -C "$(dirname "$dir")" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+    echo "note     hooks     — $hook DIVERGES: the hook that will run is $resolved from $shown"
+    echo "note     hooks       (checkout on '${otherbranch:-unknown}'), this tree tracks $tracked."
+    echo "note     hooks       core.hooksPath is repo-global, so a sibling worktree supplies it."
+  done
+}
+
 # --- Check H: git hooks (core.hooksPath) ---------------------------------------------------------
 check_hooks() {
   if ! { [ -f .githooks/pre-commit ] && git ls-files --error-unmatch .githooks/pre-commit >/dev/null 2>&1; }; then
@@ -197,6 +247,7 @@ check_hooks() {
     curdir=$(abspath "$cur")
     if [ -n "$curdir" ] && [ -f "$curdir/pre-commit" ]; then
       echo "ok       hooks     — core.hooksPath -> $cur"
+      check_hook_blobs "$curdir" "$cur"
     else
       echo "UNWIRED  hooks     — core.hooksPath='$cur' resolves to no pre-commit; NOT overwriting (deliberate?). Fix: git config core.hooksPath .githooks"
       unwired=$((unwired+1))

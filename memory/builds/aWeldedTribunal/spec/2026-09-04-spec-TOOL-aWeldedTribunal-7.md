@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-7 — the wiring check names the hooks that will actually run
 
-**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 7 · ratified 2026-09-04
+**Status:** CLOSED · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 7 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 

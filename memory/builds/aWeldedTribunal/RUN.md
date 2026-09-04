@@ -34,3 +34,5 @@ base: 9b5ae68820500aafb32d0edde32936991472980c
 2026-09-04T19:03:07Z dispatch · item d2191189 TOOL-aWeldedTribunal-5 · reason tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py tools/memory-tree/gen_build_index.py tools/memory-tree/check-arms.py tools/memory-tree/row_grammar.py
 
 2026-09-04T19:09:45Z dispatch · item bf5101af TOOL-aWeldedTribunal-6 · reason tools/govkit/govkit.py
+
+2026-09-04T19:42:34Z dispatch · item 898152f2 TOOL-aWeldedTribunal-7 · reason tools/check-wiring.sh .githooks/pre-push memory/gotchas/hookspath-resolves-into-another-checkout.md
