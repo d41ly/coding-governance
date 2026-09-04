@@ -1,10 +1,15 @@
 # TOOL-dRatifiedSeam-1 — the harness AUDIT stage runs where Workflow exists
 
-**Status:** OPEN · rev-2 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-09-03 · node d · Tier-2 · base 7c6f3eb7 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-03-build-TOOL-dRatifiedSeam-1-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRatifiedSeam-1-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRatifiedSeam-1-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRatifiedSeam-1-1-build-brief.md) | journal | — |
+| [2026-09-03-review-DEPL-dRatifiedSeam-1-closing-diff.md](../reviews/2026-09-03-review-DEPL-dRatifiedSeam-1-closing-diff.md) | diff-review | DEPL-dRatifiedSeam-1 |
+| [2026-09-03-review-DEPL-dRatifiedSeam-1-spec-audit-round1.md](../reviews/2026-09-03-review-DEPL-dRatifiedSeam-1-spec-audit-round1.md) | spec-audit | DEPL-dRatifiedSeam-1 |
 
 <!-- /gen:spec-records -->
 
@@ -142,6 +147,8 @@ and `tools/workflows/unattended-build.test.sh`.
 - **F3 — should S3's refusal live in the harness or in the driver that reads its record?**
   Recommendation: the harness, because it is the thing that can emit the pairing; a reader-side
   check would grade a record already written.
+
+**RESOLVED (agent, 2026-09-03): all three forks settled, and F1 against its own stated Recommendation.** F1 — the stage STAYS in the harness, but not with the caller supplying the result: the harness is a workflow script, so it calls `workflow({scriptPath})` itself. The recommendation was written before reading the runtime. F2 — no `gov:sequential-agents(5)` marker; the resolver is a single spawn, and a marker taken without need is a claim nobody checked. F3 — the refusal lives in the harness, which is the thing that can emit the pairing.
 
 ## 9. Revision log
 

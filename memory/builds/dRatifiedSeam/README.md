@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-03
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1
+ids: DEPL-dRatifiedSeam-1 DEPL-dRatifiedSeam-2 DEPL-dRatifiedSeam-3 DEPL-dRatifiedSeam-4 DEPL-dRatifiedSeam-5 DEPL-dRatifiedSeam-6 TOOL-dRatifiedSeam-1
 ---
 
 # dRatifiedSeam — build the two owner rulings dRetiredFork parked
@@ -63,21 +63,21 @@ None yet. Five forks sit in the two specs' §8 with recommendations.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 2 unit(s) · node d · opened 2026-09-03 · streams tooling+deployer
-ids DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1
+**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-09-03 · streams tooling+deployer
+ids DEPL-dRatifiedSeam-1 DEPL-dRatifiedSeam-2 DEPL-dRatifiedSeam-3 DEPL-dRatifiedSeam-4 DEPL-dRatifiedSeam-5 DEPL-dRatifiedSeam-6 TOOL-dRatifiedSeam-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-dRatifiedSeam-1 — the tracked-count invariant admits additions, and `update` lands a new source](spec/2026-09-03-spec-DEPL-dRatifiedSeam-1.md) | 1 | 2 | OPEN | rev-3 | 2026-09-03 |
-| [TOOL-dRatifiedSeam-1 — the harness AUDIT stage runs where Workflow exists](spec/2026-09-03-spec-TOOL-dRatifiedSeam-1.md) | 2 | 2 | OPEN | rev-2 | 2026-09-03 |
+| [DEPL-dRatifiedSeam-1 — the tracked-count invariant admits additions, and `update` lands a new source](spec/2026-09-03-spec-DEPL-dRatifiedSeam-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-03 |
+| [TOOL-dRatifiedSeam-1 — the harness AUDIT stage runs where Workflow exists](spec/2026-09-03-spec-TOOL-dRatifiedSeam-1.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-03 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
-Ids no record names: DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

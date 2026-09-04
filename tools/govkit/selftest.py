@@ -4936,17 +4936,74 @@ user_skills = "/tmp/gk-fake-skills"
               str(sorted(p.name for p in (_t11 / ".governance" / "outbox").glob("*"))
                   if (_t11 / ".governance" / "outbox").exists() else []))
 
-        # ---- THE WRITE RUN. AC6's standing predicate is measured ACROSS it: no `update --write` without
-        # ---- `--write-withdrawals` may reduce the target's tracked-file count, whatever any verdict says.
+        # ---- THE WRITE RUN. The standing predicate is measured ACROSS it: no `update --write`
+        # ---- without `--write-withdrawals` may REDUCE the target's tracked-file count, whatever any
+        # ---- verdict says.
+        #
+        # DEPL-dRatifiedSeam-1 S1 — THE DIRECTION CHANGED, THE ASSERTION DID NOT. This asserted
+        # `len(before) == len(after)` until the owner ruled (`DEPL-dRetiredFork-13`) that `update`
+        # may LAND a gov source the receipt does not name. An equality forbids that outright, so it
+        # becomes `>=`: the count may RISE and may never FALL.
+        #
+        # THE HALF THAT MATTERS IS THE ONE STILL BOUND. `DEPL-dCarriedReceipt-11`'s own spec records
+        # why this predicate exists — that unit removed the engine's only unguarded delete of a
+        # tracked file in a repository gov does not own — and the destructive direction is exactly
+        # the one a relaxation must not reach. `>=` keeps it. S4 below then ARMS it, because a
+        # direction nothing exercises is a direction nothing grades.
         _files_before = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
         _w11 = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
         _files_after = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
         check("[-11] AC2 `update --write` exits 0 with nine renamed sources in the receipt",
               _w11.returncode == 0, _w11.stdout[-2000:] + _w11.stderr[-1000:])
-        check("[-11] AC6 THE STANDING PREDICATE: the tracked-file count is UNCHANGED across a run with no "
-              "--write-withdrawals", len(_files_before) == len(_files_after),
+        # F9 — THE COUNT IS NO LONGER A FAIR PROXY FOR THE SET, and this arm computed the set for
+        # its failure DETAIL while asserting only on the length. Before the relaxation a run could
+        # not add, so a count could not hide a deletion. Now it can: a regression that deletes one
+        # tracked file and lands one in the same run satisfies `after >= before` and reports green.
+        # The value was already in hand; asserting on it costs nothing and closes the hole.
+        check("[-11] AC6 THE STANDING PREDICATE: the tracked-file count NEVER FALLS across a run "
+              "with no --write-withdrawals",
+              GK9.count_never_falls(len(_files_before), len(_files_after)),
               f"{len(_files_before)} -> {len(_files_after)}: "
-              f"{sorted(set(_files_before) - set(_files_after))}")
+              f"lost {sorted(set(_files_before) - set(_files_after))}")
+        # F9 IS REAL AND MY FIRST FIX FOR IT WAS WRONG. The reviewer is right that a count is no
+        # longer a fair proxy for the set: a regression deleting one tracked file and landing one
+        # in the same run satisfies `after >= before`. But `set(before) <= set(after)` is NOT the
+        # assertion — a RENAME legitimately removes the old path, and this fixture renames, so the
+        # arm failed on correct behaviour the moment it was written. The real predicate has to
+        # excuse paths accounted for by a rename or a withdrawal, and neither is in scope here.
+        # Filed rather than half-built: an assertion that reds on a legal rename would be worse
+        # than the gap it closes.
+
+        # ---- DEPL-dRatifiedSeam-1 S4. THE REMOVAL DIRECTION, ARMED --------------------------------
+        # S1 relaxed one direction. Without this, the predicate grades NOTHING: `>=` is satisfied by
+        # every run that does not delete, and no fixture deletes, so it would report green forever
+        # whatever the engine did. That is the could-not-fail class this build inherits its records
+        # from, and it would have been introduced by the unit that inherits them.
+        #
+        # THE SHIPPED DECISION, called with every input shape. My first cut of this arm compared
+        # `len(_fell) >= len(_files_before)` in the TEST — a re-implementation, and a tautology:
+        # one fewer than a number is never at least that number, so it passed whatever the engine
+        # did. Grading a copy of a predicate grades the copy. `count_never_falls` is now the one
+        # subject, the check above calls it, and mutating it reds these rows.
+        # HOISTED SO THE LIVENESS ARM GRADES THE REAL TABLE. It used to build a SECOND, separate
+        # two-element literal and assert len({True, False}) == 2 — constant true. Deleting the
+        # False row from the real table left it green. That is the grading-a-copy defect the
+        # comment above says it is fixing, one level up, in the arm written to prevent it.
+        _S4_TABLE = (
+                (5, 5, True,  "unchanged — the pre-ruling state, still legal"),
+                (5, 7, True,  "a RISE — what DEPL-dRetiredFork-13 ruled must become legal"),
+                (5, 4, False, "a FALL — the destructive direction, still refused"),
+                (5, 0, False, "everything gone — the shape -11 removed the unguarded delete for"),
+                (0, 0, True,  "empty both sides — no population is not a violation"),
+                (0, 3, True,  "growth from empty"),
+        )
+        for _b, _a, _want, _what in _S4_TABLE:
+            check(f"[-11] S4 count_never_falls({_b}, {_a}) is {_want} — {_what}",
+                  GK9.count_never_falls(_b, _a) is _want,
+                  f"got {GK9.count_never_falls(_b, _a)!r}")
+        check("[-11] S4 LIVENESS the table asserts BOTH verdicts, so it cannot pass by agreeing",
+              len({_w for _x, _y, _w, _z in _S4_TABLE}) == 2,
+              f"the table lost a direction: {sorted({_w for _x, _y, _w, _z in _S4_TABLE})}")
         check("[-11] AC3 ...so the below-threshold row's file is still on disk",
               (_t11 / "tools" / "demo" / "low.txt").is_file(), "")
         check("[-11] AC3 ...and still tracked, and still a row in install.json",
@@ -5059,6 +5116,72 @@ user_skills = "/tmp/gk-fake-skills"
               and verdict_of(_w11b.stdout, _c2) == "current", _w11b.stdout)
         check("[-11] S4 ...while the merged row reads `patched`, which is what a surviving edit IS",
               verdict_of(_w11b.stdout, _d2) == "patched", _w11b.stdout)
+
+        # ---- DEPL-dRatifiedSeam-1 AC4 + AC5. THE UNCLAIMED SOURCE, EXERCISED --------------------
+        # S3 SHIPPED UNEXERCISED AND I ALMOST LEFT IT THERE. The suite went green at 1065 arms with
+        # the landing reached by nothing: every destination the `-11` fixture offered was one the
+        # walk had already decided about, so the block skipped them all and reported zero. Zero
+        # landings and a broken landing are the same green — the green-by-absence class this whole
+        # lineage exists to remove, sitting inside the unit that removes it.
+        #
+        # The scenario is the real one: gov gains a file inside a kit whose descriptor already says
+        # `include = "**"`, so the descriptor DECLARES it and the receipt has never named it. That
+        # is precisely what an adopter meets when gov ships a new file into a kit they installed.
+        (_g11 / "tools" / "demo" / "arrival.txt").write_text(
+            "a file gov added after this target installed\n", encoding="utf-8", newline="\n")
+        settle(_g11, "gov gains a file the receipt has never named")
+        settle(_t11, "before the unclaimed-source run")
+        _files_pre_new = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
+        _wn = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
+        _files_post_new = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
+        _rc_new = json.loads((_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))
+
+        check("[-RS1] AC4 the run exits 0 and SAYS it landed an unclaimed source",
+              _wn.returncode == 0 and "unclaimed sources: 1 landed" in _wn.stdout,
+              _wn.stdout[-1400:] + _wn.stderr[-600:])
+        check("[-RS1] AC4 ...and the file is really in the target's worktree",
+              (_t11 / "tools" / "demo" / "arrival.txt").is_file(), "")
+        check("[-RS1] AC4 ...and it is TRACKED, not merely written",
+              "tools/demo/arrival.txt" in _files_post_new,
+              f"{len(_files_pre_new)} -> {len(_files_post_new)}")
+        check("[-RS1] AC4 ...and the receipt now carries a row for it",
+              any(f.get("path") == "tools/demo/arrival.txt" for f in _rc_new.get("files", [])),
+              str(sorted(f.get("path") for f in _rc_new.get("files", []))[-4:]))
+        # THE ROW MUST BE ATTRIBUTABLE, which is what the five-field version of it was not: a row
+        # with no `commit`/`gov_oid` cannot be traced to a gov vintage, and `-7`'s integrity
+        # preamble refuses the NEXT run over it.
+        _row_new = next((f for f in _rc_new.get("files", [])
+                         if f.get("path") == "tools/demo/arrival.txt"), {})
+        check("[-RS1] AC4 ...carrying the four fields that make a row attributable to a vintage",
+              all(_row_new.get(k) for k in ("commit", "gov_oid", "source", "sha256")),
+              str(sorted(_row_new.keys())))
+        check("[-RS1] AC4 LIVENESS the count really ROSE, so S1's relaxed direction was taken",
+              len(_files_post_new) == len(_files_pre_new) + 1,
+              f"{len(_files_pre_new)} -> {len(_files_post_new)}")
+
+        # AC5 — A DESTINATION THE TARGET ALREADY HOLDS IS A REFUSAL. The receipt does not name it,
+        # so gov never put those bytes there and has no basis for calling them stale. Overwriting
+        # would be the silent data loss in somebody else's repository that this verb's read-only
+        # default exists to prevent.
+        (_g11 / "tools" / "demo" / "occupied.txt").write_text(
+            "gov's version\n", encoding="utf-8", newline="\n")
+        settle(_g11, "gov declares a second new file")
+        (_t11 / "tools" / "demo" / "occupied.txt").write_text(
+            "the adopter got here first\n", encoding="utf-8", newline="\n")
+        _wo = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
+        check("[-RS1] AC5 a destination the target already holds is REFUSED, not overwritten",
+              "REFUSED tools/demo/occupied.txt" in _wo.stdout,
+              _wo.stdout[-1400:] + _wo.stderr[-600:])
+        check("[-RS1] AC5 ...and the adopter's bytes are untouched",
+              (_t11 / "tools" / "demo" / "occupied.txt").read_text(encoding="utf-8")
+              == "the adopter got here first\n",
+              (_t11 / "tools" / "demo" / "occupied.txt").read_text(encoding="utf-8"))
+        check("[-RS1] AC5 ...and no receipt row was minted for it",
+              not any(f.get("path") == "tools/demo/occupied.txt" for f in json.loads(
+                  (_t11 / ".governance" / "install.json").read_text(encoding="utf-8")).get("files", [])),
+              "a refused landing minted a row anyway")
+        (_t11 / "tools" / "demo" / "occupied.txt").unlink()
+        settle(_t11, "clear the AC5 collision before the withdrawal arms")
 
         # ---- AC4: the deletion, and the ONLY way to get one.
         settle(_t11, "after the second update")

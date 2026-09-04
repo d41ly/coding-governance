@@ -898,6 +898,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "count_never_falls",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "coverage_rows",
       "kind": "function",
       "file": "tools/govkit/govkit.py"

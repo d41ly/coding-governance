@@ -170,17 +170,43 @@ const SPEC_SCHEMA = {
     summary: { type: 'string' },
   },
 }
-const AUDIT_SCHEMA = {
+// The resolver stage's return. `blob` is a pattern rather than a bare string because an agent that
+// cannot resolve one is likelier to answer with a plausible-looking placeholder than to omit the
+// entry, and a subject pinned at an invented blob audits nothing while looking pinned.
+// The recorder agent's return. `token` is the DRIVER's word, not the agent's opinion, which is why
+// the prompt says verbatim and the enum is re-checked on this side regardless.
+const REVIEW_RECORD_SCHEMA = {
   type: 'object',
-  required: ['verdict', 'blockers', 'reportPath', 'summary'],
-  additionalProperties: true,
   properties: {
-    verdict: { type: 'string', enum: ['CONVERGING', 'CONVERGED', 'NON-CONVERGENT', 'CEILING'] },
-    blockers: { type: 'integer' },
-    reportPath: { type: 'string' },
-    summary: { type: 'string' },
+    token: { type: 'string' },
+    exitCode: { type: 'integer' },
+    stderr: { type: 'string' },
   },
+  required: ['token'],
 }
+
+const SUBJECTS_SCHEMA = {
+  type: 'object',
+  properties: {
+    subjects: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          path: { type: 'string' },
+          blob: { type: 'string', pattern: '^[0-9a-f]{7,40}$' },
+        },
+        required: ['path', 'blob'],
+      },
+    },
+  },
+  required: ['subjects'],
+}
+
+// `AUDIT_SCHEMA` LIVED HERE AND IS GONE. It bound the AGENT return that no longer exists, and
+// leaving it would be a declaration nothing reads — but its `enum` was load-bearing, so that
+// moved to `REVIEW_TOKENS` at the check rather than being lost with the constant. Deleting a
+// dead schema and silently dropping its enum is how a check gets weaker while looking tidier.
 const BUILD_SCHEMA = {
   type: 'object',
   required: ['committed', 'unbuilt', 'summary'],
@@ -235,33 +261,174 @@ if (specRefused.length) log('spec stage: ' + specRefused.length + ' unit(s) REFU
 // on a count of 0 while refusing a non-integer. Routing this through a null-yielding site would make
 // the CONVERGED exit unreachable and every audit look degraded.
 phase('Audit')
-const au = await agent(
-  GROUND +
-    'AUDIT round ' + roundNo + ' over this build spec set:\n' + roster + '\n\n' +
-    'Run the shipped harness as a Workflow — not as direct Agent spawns, whose budget is keyed per ' +
-    'user prompt and which an unattended run cannot reset — with ' +
-    '`scriptPath: tools/workflows/tier2-review.js` and args carrying `kind: "spec-audit"`, `repo`, ' +
-    '`round: ' + roundNo + '`, `reviewDir: "' + reviewDir + '"`, and one `subjects` entry per spec ' +
-    'pinned at its blob. The `kind` is MANDATORY: an absent one defaults to `diff-review`, which ' +
-    'primes code-shaped lenses at a spec and reports it as a review. ' +
-    'Take the CONFIRMED BLOCKER COUNT from that run synthesis return, which is the only site ' +
-    'yielding an integer; a `null` there is a DEGRADED run and you must return that fact rather than ' +
-    'a number you invented. Then record the round with `' + DRIVER + ' --review ' + slug +
-    ' --subject ' + slug + '-spec-set --verdict <CLEAN|CLEAN WITH FIXES|BLOCKED> --blockers <N>` ' +
-    'and return the driver own verdict token verbatim.',
-  { label: 'audit:r' + roundNo, phase: 'Audit', schema: AUDIT_SCHEMA },
-)
-if (!au) {
-  // A dead AUDIT stage is a REFUSAL, never a silent exit to BUILD. This is the absence that would
-  // otherwise let the harness build on an unreviewed spec set.
+// ============================ TOOL-dRatifiedSeam-1 S1 — THE SPAWN MOVED TO WHERE THE TOOL IS ====
+// WHAT WAS WRONG. This stage used to spawn an AGENT whose prompt said: run the shipped harness as
+// a Workflow, with `scriptPath: tools/workflows/tier2-review.js`. That agent is a SIDECHAIN agent,
+// and a sidechain holds neither `Workflow` nor `Agent` — the capability is ABSENT, not policed, as
+// `AGENTS.md` §8 states and as the stage agent proved by searching the deferred registry three
+// times, refusing to fabricate a verdict, and writing nothing. It was right on every count. The
+// stage could never complete, so BUILD was unreachable through this harness and the
+// `passes-harnessed` directive named a route that did not run.
+//
+// THE FIX IS NOT A BETTER PROMPT. No wording gives an agent a tool it does not hold. But THIS FILE
+// is a workflow script, and the script runtime provides `workflow({scriptPath}, args)` for running
+// another workflow inline as a sub-step. So the spawn does not need to leave the harness — it needs
+// to stop being delegated to something that cannot perform it. Nesting is one level deep and this
+// harness is invoked at the top by the main loop, so the one level is available and is spent here.
+//
+// FIRST CALLER IN THE REPO. `grep -rnE '\bworkflow\(' tools/workflows/*.js` returned nothing before
+// this line, which is why S4 OBSERVES the route end to end rather than asserting it.
+//
+// THE SPLIT IS FORCED, NOT CHOSEN, and measuring it is what produced this shape. `tier2-review.js`
+// REFUSES a spec-audit whose `subjects` is not a non-empty array of `{path, blob}` with a 7-40 hex
+// blob per subject. A workflow script has no filesystem and no git, so it cannot resolve a blob;
+// an agent can. So the agent does what only an agent can — read the tree and pin each spec at its
+// blob — and the SCRIPT does what only the script can, which is hold `Workflow`. The old code gave
+// the agent BOTH jobs, and the second one is the one it could not do.
+//
+// A CALLER-SUPPLIED SET WINS. `--plan` already knows the spec set, so a caller that pinned the
+// blobs itself is authoritative and the resolver stage is skipped rather than run for a second
+// opinion about the same files.
+let subjects = Array.isArray(a.subjects) ? a.subjects : null
+if (!subjects) {
+  const res = await agent(
+    GROUND +
+      'Resolve the blob of every spec in this build so an audit can be pinned at immutable bytes.\n' +
+      roster + '\n\n' +
+      'For each unit above that HAS a spec path, run `git rev-parse HEAD:<specPath>` in ' + repo +
+      ' and return one entry per spec. Return ONLY units whose spec exists and whose blob resolves; ' +
+      'an unspecced unit is not a subject and must be omitted rather than given an invented blob. ' +
+      'Paths are repo-relative and forward-slashed.',
+    { label: 'audit:subjects:r' + roundNo, phase: 'Audit', schema: SUBJECTS_SCHEMA },
+  )
+  subjects = (res && Array.isArray(res.subjects)) ? res.subjects : []
+}
+// REFUSED HERE RATHER THAN DOWNSTREAM. `tier2-review.js` would refuse an empty set too, but its
+// message is about its own arguments; this one can say which stage failed to produce them, which is
+// the difference between a diagnosable refusal and a puzzling one.
+if (!subjects.length) {
   throw new Error(
-    'unattended-build: the AUDIT stage returned nothing at round ' + roundNo + '. That is a refusal ' +
-      'and not a convergence: an absent verdict must never read as CONVERGED, because that token is ' +
-      'the only thing between this harness and building on an unreviewed spec set.',
+    'unattended-build: no spec subjects could be pinned at round ' + roundNo + '. A spec-audit over ' +
+      'an empty subject set would grade nothing and report it as a clean round, which is the exact ' +
+      'shape this stage exists to prevent.',
+  )
+}
+const badSubject = subjects.findIndex(function (s) {
+  return !s || typeof s.path !== 'string' || !s.path || !/^[0-9a-f]{7,40}$/.test(String(s.blob || ''))
+})
+if (badSubject !== -1) {
+  throw new Error(
+    'unattended-build: subject ' + badSubject + ' is not a {path, blob} with a 7-40 hex blob: ' +
+      JSON.stringify(subjects[badSubject]) + '. An unpinned subject is an audit of whatever the ' +
+      'file happens to say when the lens reads it, which is not a review of anything in particular.',
+  )
+}
+
+const auRaw = await workflow(
+  { scriptPath: 'tools/workflows/tier2-review.js' },
+  {
+    kind: 'spec-audit',
+    repo: repo,
+    round: roundNo,
+    reviewDir: reviewDir,
+    subjects: subjects,
+  },
+)
+
+// ===================== THE ADAPTER, REBUILT AGAINST THE CALLEE'S ACTUAL CONTRACT =============
+// MY FIRST CUT READ `auRaw.verdict` AND `tier2-review.js` HAS NEVER RETURNED ONE. Its four returns
+// yield `{blockers, report, highs, note, precision, confirmed, refuted, …}`; the only `verdict` in
+// that file is per-FINDING. So the check below fired on every real invocation and the stage still
+// could not complete — the failure had merely moved from an agent that refuses to a script that
+// throws. The 28 suite arms were green because the test double returned a `verdict` and a
+// `reportPath` I had invented, which is the fixture grading the fixture.
+//
+// WHO OWNS THE VERDICT VOCABULARY. `CONVERGING|CONVERGED|NON-CONVERGENT|CEILING` is produced by
+// `unattended.sh`'s `review_state()` from the PRIOR round's counts — no JS can compute it, because
+// convergence is a property of the sequence and not of this round. The old prompt ran the driver's
+// `--review` and returned its token; that call was deleted with the agent and nothing replaced it,
+// so no round was recorded either and the DoD leg that reads the last round found none.
+//
+// So the split is three ways, each part where its capability lives: the SCRIPT holds `Workflow`
+// and calls the review; an AGENT holds a shell and records the round; the DRIVER owns the token.
+// AN EMPTY OBJECT IS 'NOTHING', TOO. A dead sub-workflow yields `{}`, which is an object, so a
+// bare type test let it through to the blocker check and the operator got a message about an
+// integer when the real fact was that the stage produced nothing at all.
+if (!auRaw || typeof auRaw !== 'object' ||
+    (!Object.prototype.hasOwnProperty.call(auRaw, 'blockers') && !auRaw.report)) {
+  throw new Error(
+    'unattended-build: the AUDIT sub-workflow returned nothing at round ' + roundNo + '. That is a ' +
+      'refusal and not a convergence: an absent verdict must never read as CONVERGED, because that ' +
+      'token is the only thing between this harness and building on an unreviewed spec set.',
+  )
+}
+// THE BLOCKER COUNT MUST BE AN INTEGER, and `null` is the DEGRADED signal `tier2-review.js` yields
+// by design — null, never 0, so a stated absence cannot be read as a clean bill. Reading a null as
+// 0 would make every degraded audit look clean, since 0 is the only count that converges.
+if (!Number.isInteger(auRaw.blockers)) {
+  throw new Error(
+    'unattended-build: the AUDIT sub-workflow returned a non-integer blocker count (' +
+      JSON.stringify(auRaw.blockers) + ') at round ' + roundNo + '. That is a DEGRADED run and it ' +
+      'is reported as one; it is never rounded to zero.',
+  )
+}
+const lastReport = auRaw.report || ''
+// `report`, NOT `reportPath` — the second name was mine and matched nothing, so `lastReport` was
+// always '' and every disposal instruction named an empty path.
+if (!lastReport) {
+  throw new Error(
+    'unattended-build: the AUDIT sub-workflow returned no report path at round ' + roundNo +
+      '. The fold instruction the caller receives would name nothing to fold from.',
+  )
+}
+
+// THE ROUND IS RECORDED BY THE DRIVER, and the driver's answer is the verdict. An agent runs it
+// because a workflow script has no shell; what the agent may NOT do is invent the token, so it is
+// told to return the driver's own output verbatim and the enum below refuses anything else.
+const rv = await agent(
+  GROUND +
+    'Record AUDIT round ' + roundNo + ' with the driver and return its convergence token.\n\n' +
+    'Run exactly:\n  ' + DRIVER + ' --review ' + slug + ' --subject ' + slug + '-spec-set' +
+    ' --verdict ' + (auRaw.blockers > 0 ? '"BLOCKED"' : '"CLEAN"') +
+    ' --blockers ' + auRaw.blockers + '\n\n' +
+    'Return the CONVERGENCE token it prints — one of CONVERGING, CONVERGED, NON-CONVERGENT, ' +
+    'CEILING — verbatim, and the command\'s exit code. Do not infer the token from the blocker ' +
+    'count: it is a property of the SEQUENCE of rounds, which only the driver can see. If the ' +
+    'command fails, return its stderr rather than a token.',
+  { label: 'audit:record:r' + roundNo, phase: 'Audit', schema: REVIEW_RECORD_SCHEMA },
+)
+if (!rv || typeof rv.token !== 'string') {
+  throw new Error(
+    'unattended-build: the round was not recorded at round ' + roundNo + ' (driver said: ' +
+      JSON.stringify(rv && rv.stderr) + '). An unrecorded round leaves the convergence predicate ' +
+      'with no predecessor to shrink against, and the Definition of Done leg that reads the last ' +
+      'round finds nothing.',
+  )
+}
+// THE ENUM IS RESTORED. `AUDIT_SCHEMA` carried it and my replacement checked only that the verdict
+// was a non-empty string, so `"ok"` would have passed, failed the `=== 'CONVERGING'` test, and
+// fallen straight through to BUILD. That is weaker than what it replaced, in the direction that
+// matters.
+const REVIEW_TOKENS = ['CONVERGING', 'CONVERGED', 'NON-CONVERGENT', 'CEILING']
+if (REVIEW_TOKENS.indexOf(rv.token) === -1) {
+  throw new Error(
+    'unattended-build: the driver returned "' + rv.token + '", which is not one of ' +
+      REVIEW_TOKENS.join(', ') + '. An unknown token is not CONVERGING, so it would fall through ' +
+      'to BUILD — refusing instead.',
+  )
+}
+const au = { verdict: rv.token, blockers: auRaw.blockers, reportPath: lastReport }
+// S3 — THE IMPOSSIBLE PAIRING IS A REFUSAL BY NAME. CONVERGING with zero blockers is this repo's
+// signature for a record no verb produced: a loop with nothing left to converge on has converged.
+// The dead stage returned exactly this pairing, and it was the tell.
+if (au.verdict === 'CONVERGING' && au.blockers === 0) {
+  throw new Error(
+    'unattended-build: the AUDIT stage returned CONVERGING paired with 0 blockers at round ' +
+      roundNo + '. Those two cannot both be true, and this pairing is this repo\'s signature for a ' +
+      'record no verb produced. REFUSING rather than emitting it.',
   )
 }
 const verdict = au.verdict
-const lastReport = au.reportPath || ''
 log('audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers)
 
 // THE GATE. `CONVERGING` means the review loop has not ended, so BUILD is UNREACHABLE and this

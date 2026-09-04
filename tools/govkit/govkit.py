@@ -3484,6 +3484,23 @@ def hook_probe(target: pathlib.Path) -> tuple[str, str]:
     return "block", (out.stdout + out.stderr).strip()
 
 
+def count_never_falls(before: int, after: int) -> bool:
+    """The standing predicate, as one testable value: a run without `--write-withdrawals` may raise
+    the target's tracked-file count and may never lower it.
+
+    EXTRACTED RATHER THAN INLINED, and the reason is a defect I wrote twice. `DEPL-dCarriedReceipt-11`
+    asserted `before == after` inline in the suite; `DEPL-dRatifiedSeam-1` relaxed it to `>=` inline
+    and then "armed" the removal direction with an arm that re-implemented the comparison in the
+    test. That arm is a TAUTOLOGY — `len(x) - 1 >= len(x)` is false for every x, so it passes
+    whatever the shipped code does, which is the same could-not-fail shape the closing review of
+    `dRetiredFork` found in that build's BAN arms. A copy of a predicate grades the copy.
+
+    With the decision here, the suite calls it and a truth table grades it, so mutating this line
+    reds the suite. That is the whole difference.
+    """
+    return after >= before
+
+
 def outcome_accepted(rc: int, oc, declared_for_rc: bool) -> bool:
     """Is an adopter's exit code an ACCEPTED outcome? The whole decision, as one testable value.
 
@@ -6183,7 +6200,87 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                     else f"DIFFERS by whole line — gov has {_live!r}")
             print(f"  {_k:<28} {_verdict}")
 
+    def derive_unclaimed_candidates(_withdrawn_paths):
+        """Which declared destinations the receipt has never named — the decision, with no writes.
+
+        DEFINED ONCE AND CALLED TWICE, by the read-only preview and by the write loop, so the two
+        cannot drift. The preview passes an empty withdrawal set because `withdrawn_rows` is not
+        computed until later in a write run; it says so in its own output rather than pretending.
+        """
+        _claimed = {str(f.get("path")) for f in (receipt.get("files") or [])}
+        _dec = set(_withdrawn_paths)
+        for _m in rename_dests.values():
+            for _dl in _m.values():
+                _dec.update(_dl)
+        _land, _ref = [], []
+        for _eid in (kits or claimed):
+            _d0 = descs.get(_eid)
+            if not _d0:
+                continue
+            _dd = _d0[0]
+            try:
+                _res0 = resolve_entry(root, _dd, target_context(target, deploy, _eid, _dd))
+            except Refusal:
+                continue
+            for _dest, _row0 in sorted((_res0.get("writes") or {}).items()):
+                if _dest in _claimed or _dest in _dec:
+                    continue
+                if not str(_row0.get("src") or ""):
+                    continue
+                if _row0.get("missing"):
+                    _ref.append((_dest, "its source carries unresolved token(s) "
+                                        + ", ".join(sorted(_row0.get("missing") or []))))
+                    continue
+                if _row0.get("scope") == "machine":
+                    continue
+                try:
+                    _rule0 = (_dd.get("files") or [])[_row0["rule"]]
+                except (KeyError, IndexError, TypeError):
+                    _rule0 = {}
+                if _rule0.get("scope") == "machine" or _rule0.get("link"):
+                    continue
+                _abs0 = target / _dest
+                try:
+                    _res_abs = _abs0.resolve()
+                    _res_abs.relative_to(target.resolve())
+                except (ValueError, OSError):
+                    _ref.append((_dest, "it resolves outside the target repository"))
+                    continue
+                try:
+                    _res_abs.relative_to((target / ".git").resolve())
+                    _ref.append((_dest, "it resolves inside the target's .git directory"))
+                    continue
+                except ValueError:
+                    pass
+                if os.path.lexists(_abs0):
+                    _ref.append((_dest, "the target already holds this path and the receipt does "
+                                        "not name it, so gov did not put it there"))
+                    continue
+                _land.append((_dest, _eid, _row0))
+        return [x[0] for x in _land], _ref
+
+    # ===================== THE UNCLAIMED-SOURCE PREVIEW, ON THE READ-ONLY PATH ==================
+    # THE `would land` BRANCHES WERE DEAD CODE. The landing block sits far below this return, so on
+    # a read-only run it never executed: `unclaimed sources` appeared in no output, and the ternaries
+    # that say `would land` could only ever take the `landed` branch. This verb is read-only BY
+    # DEFAULT — its own docstring says so, because its failure mode is silent data loss in a
+    # repository gov does not own — and the one thing this build added was the one thing an operator
+    # could not preview. That is the inverse of the safety the default exists to provide.
+    #
+    # ONE IMPLEMENTATION, TWO CALLS. `derive_unclaimed_candidates` is defined once and used here and by
+    # the write path, so the preview cannot drift from what actually lands. What it CANNOT know yet
+    # is withdrawals: `withdrawn_rows` is computed further down, after this return. So the preview
+    # says so rather than quietly listing a row a withdrawal would remove — a preview that overstates
+    # by one row and admits it beats one that is silently wrong.
     if not write:
+        _pv_land, _pv_ref = derive_unclaimed_candidates(set())
+        print(f"govkit update — unclaimed sources: {len(_pv_land)} would land · "
+              f"{len(_pv_ref)} would be refused  [preview: withdrawals are decided later in a "
+              f"write run, so a row here may yet be withdrawn]")
+        for _p0 in _pv_land:
+            print(f"govkit update —   would land {_p0}")
+        for _p0, _why0 in _pv_ref:
+            print(f"govkit update —   would REFUSE {_p0}: {_why0}")
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
         return r.emit()
 
@@ -6881,6 +6978,221 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # pre-existing-red tally would hide exactly the kits nothing verified.
     print(f"govkit update — verify: verified {n_verified} · unverified {n_unverified} · "
           f"not-run {len(not_run)} · rolled back {n_rolled} · pre-existing red {n_preexisting}")
+
+    # ======================= DEPL-dRatifiedSeam-1 S3 — THE UNCLAIMED SOURCE =====================
+    # WHY `update` COULD NOT DO THIS. Its whole row walk starts at `rows_all = receipt.get("files")`
+    # — the RECEIPT's rows. A destination gov's descriptor declares and the receipt has never named
+    # is not in that list, so it was invisible to every verdict, every write arm and every count.
+    # Not refused, not reported: absent from the question. An adopter's only route was to land it
+    # by hand in a repository gov does not own, which is where a mistake costs most.
+    #
+    # THE OWNER RULED THIS IN (`DEPL-dRetiredFork-13`), over this run's own recommendation of a
+    # separate verb. The standing predicate that forbade it is relaxed by S1, and S4 arms the
+    # direction that still binds, so the destructive half is not what moved.
+    #
+    # THE DECLARED SET IS `resolve_entry`'s, NOT A SECOND WALK. `apply` already resolves exactly
+    # this — every landable destination a descriptor declares for this target — and a second
+    # enumeration would be two answers to one question about which files a kit owns.
+    _claimed_paths = {str(f.get("path")) for f in (receipt.get("files") or [])}
+    # A DESTINATION THE WALK ALREADY DECIDED ABOUT IS NOT UNCLAIMED — IT IS DECIDED, and the first
+    # cut of this block did not know the difference. It landed `tools/demo/twin-a.txt` and
+    # `twin-b.txt`, which are the two destinations of a rename the walk had just REFUSED as
+    # ambiguous ("one row cannot move to several, and picking one would be a guess"). Landing both
+    # manufactures the very ambiguity the refusal exists to preserve, and it broke four arms of the
+    # fixture that grades that refusal. Found by the suite, which is what S5 predicted a cascade
+    # would look like and why it asked for each arm to be dispositioned rather than counted.
+    #
+    # `rename_dests` is the walk's own map of every destination the rename machinery considered, so
+    # excluding it needs no second opinion about what a move is. Withdrawn rows are excluded for the
+    # same reason: this run decided to remove them, and re-landing them in the same run would be the
+    # verb arguing with itself.
+    _decided = {str(f.get("path")) for f in withdrawn_rows}
+    for _m in rename_dests.values():
+        for _dl in _m.values():
+            _decided.update(_dl)
+    _landed_new: list[str] = []
+    _refused_new: list[tuple[str, str]] = []
+    # F4 — `--kits` BINDS THIS LOOP TOO. It narrows `rows_all` and does not touch `claimed`, so a
+    # scoped run landed sources for kits the operator EXCLUDED — and because `rename_dests` is only
+    # populated over the scoped walk, `_decided` was empty for those kits, so the block re-landed a
+    # rename destination it is specifically written not to touch. Measured: `--kits demoa` landed
+    # two `demob` paths, one of them a rename target, leaving two copies of one gov source.
+    for _eid in (kits or claimed):
+        _d0 = descs.get(_eid)
+        if not _d0:
+            continue
+        _dd = _d0[0]
+        try:
+            # `resolve_entry`'s FIRST argument is GOV's root, not the target — its rule walk
+            # reads gov's tree to expand the globs. I passed `target`, so it expanded the
+            # ADOPTER's files against gov's descriptor and declared nothing new, and the
+            # landing silently found zero on every run. `_cmd_apply` at its own call site
+            # spells it `resolve_entry(root, ...)`, which is the line I should have copied.
+            _res0 = resolve_entry(root, _dd, target_context(target, deploy, _eid, _dd))
+        except Refusal:
+            # A descriptor that cannot resolve for this target is ALREADY reported by the row walk
+            # above; re-reporting it here would be the second answer this block exists to avoid.
+            continue
+        for _dest, _row0 in sorted((_res0.get("writes") or {}).items()):
+            if _dest in _claimed_paths or _dest in _decided:
+                continue
+            _src0 = str(_row0.get("src") or "")
+            if not _src0:
+                continue
+            # APPLY'S OWN FOUR SKIPS, and this block had NONE of them. `_cmd_apply` declines a row
+            # with unresolved tokens, a machine-SCOPED row, a machine-scoped RULE and a LINK rule
+            # before it writes anything; landing them here made `update` write what `apply`
+            # deliberately refuses.
+            #
+            # MEASURED, both halves. `kickoff-manifest` is `role = "engine"` (landable),
+            # `scope = "machine"`, `link = true`, destination `{user_skills}/session-kickoff`, and it
+            # sits in the registry's DEFAULT selection: `apply` printed `SKIPPED`, and the landing
+            # block wrote that path as a plain file OUTSIDE the repository and minted a row for it.
+            # Separately, a target with no `docs_home` answer got a literal `{docs_home}` directory
+            # created and `git add`ed — a row with an unresolved token is not a coverage row, which
+            # `resolve_dests`' own docstring records as long since fixed for `apply`.
+            #
+            # A machine-scoped rule should produce an ORDER, as it does under `apply`, never a write.
+            if _row0.get("missing"):
+                _refused_new.append((_dest, "its source carries unresolved token(s) "
+                                            + ", ".join(sorted(_row0.get("missing") or []))
+                                            + " — a row with an unresolved token is not a row"))
+                continue
+            if _row0.get("scope") == "machine":
+                continue
+            try:
+                _rule0 = (_dd.get("files") or [])[_row0["rule"]]
+            except (KeyError, IndexError, TypeError):
+                _rule0 = {}
+            if _rule0.get("scope") == "machine" or _rule0.get("link"):
+                continue
+            _abs0 = target / _dest
+            # F1 + F2 — CONTAINMENT, THE CHECK EVERY OTHER PRODUCER IN THIS ENGINE ALREADY MAKES.
+            # `planned_writes` calls `demand_contained_dest`, `_cmd_apply` calls
+            # `demand_contained_rows`, and this verb's own row walk resolves-and-contains. This block
+            # called none of them, and `demand_safe_token` admits `.` and `/` because every
+            # legitimate token here is a path fragment — so `prefix = "../ESCAPED"` landed four files
+            # in a SIBLING directory of the repository the operator named, at exit 0, while `plan`
+            # refused the identical configuration. An absolute `C:/…` prefix worked too, because
+            # `target / "C:/x"` discards the base entirely.
+            #
+            # `.resolve()` AND NOT A STRING TEST, because that is what also closes F2: a DANGLING
+            # SYMLINK at the destination reads as absent to `.exists()` (which follows links), so the
+            # refusal below never fired and `write_bytes` created the file AT THE LINK TARGET,
+            # outside the tree, with a sane prefix and no tampering at all. A string-normalised
+            # containment check calls `tools/demo/arrival.txt` contained and misses it; resolving the
+            # link does not.
+            try:
+                _res_abs = _abs0.resolve()
+                _res_abs.relative_to(target.resolve())
+            except (ValueError, OSError):
+                _refused_new.append((_dest, "it resolves outside the target repository — a path that "
+                                            "escapes the tree the operator named is not a path this "
+                                            "verb may write, whatever the descriptor says"))
+                continue
+            # F3 — NOTHING LANDS INSIDE `.git`. A per-entry `kit = ".git/hooks"` token is admitted by
+            # `target_context`, and landing there writes an executable the adopter's next commit
+            # runs. The hole is shared with `apply`/`plan` and predates this block; what is new is
+            # that `update` can now reach it, so it is closed here and filed for the others.
+            try:
+                _res_abs.relative_to((target / ".git").resolve())
+                _refused_new.append((_dest, "it resolves inside the target's .git directory, where a "
+                                            "landed file is repository machinery rather than content"))
+                continue
+            except ValueError:
+                pass
+            # AC5 — A DESTINATION THE TARGET ALREADY HOLDS IS A REFUSAL, NEVER AN OVERWRITE. The
+            # receipt does not name this path, so gov has no record of putting those bytes there and
+            # no basis for calling them stale. Overwriting them would be exactly the silent data loss
+            # in somebody else's repository that this verb's read-only default exists to prevent.
+            #
+            # `lexists`, NOT `.exists()` — F2 again. A symlink is an occupant whether or not its
+            # target exists, and the one that does not exist is the dangerous one.
+            if os.path.lexists(_abs0):
+                _refused_new.append((_dest, "the target already holds this path and the receipt "
+                                            "does not name it, so gov did not put it there"))
+                continue
+            if not write:
+                _landed_new.append(_dest)
+                continue
+            _blob0 = blob_at(root, to_commit, _src0)
+            if _blob0 is None:
+                _refused_new.append((_dest, f"gov declares it at {_src0}, which does not resolve "
+                                            f"at {to_commit[:8]}"))
+                continue
+            # F5 — AN `OSError` HERE USED TO ESCAPE AS A TRACEBACK, leaving files already staged in
+            # the adopter's index that the receipt does not name and gov can never withdraw.
+            # Measured: an adopter file at `tools/demo/sub` makes `mkdir` raise `FileExistsError`,
+            # and the run died with `A  tools/demo/aaa.txt` staged and no row for it.
+            try:
+                _abs0.parent.mkdir(parents=True, exist_ok=True)
+                _abs0.write_bytes(_blob0)
+            except OSError as _e0:
+                _refused_new.append((_dest, f"writing it failed ({_e0.__class__.__name__}), so "
+                                            f"nothing was landed for this row"))
+                continue
+            # THE ROW SHAPE IS `_cmd_apply`'S, NOT AN INVENTION. My first cut wrote five fields —
+            # path, source, kit, role, sha256 — and a real receipt row carries nine. The run AFTER
+            # this one then failed DEPL-dCarriedReceipt-7's receipt-integrity preamble, because a
+            # row missing `commit` and `gov_oid` cannot be attributed to a gov vintage at all.
+            # `gov_oid` is the blob gov shipped at `commit` and means that forever; `oid` is the
+            # blob the TARGET's index holds and is filled by the staging below, exactly as the
+            # apply-side producer documents.
+            receipt.setdefault("files", []).append({
+                "path": _dest, "role": str(_row0.get("role") or "copy"), "kit": _eid,
+                # `_row0` COMES FROM `expand_rules`, WHOSE ROWS ARE `{rule, src, dest, role, miss}`
+                # — there is no `version` key and there never was, so `_row0.get("version")` was a
+                # vacuous read that stamped every landed row with "". That empty string is a fifth
+                # state in a four-state vocabulary, and the per-kit delta report then reads it as a
+                # distinct value forever: `MIXED across rows: ['', 'KIT_VERSION=1.0']` for any kit
+                # that ever landed one. `_resolve_ver_at` is the resolver this verb already uses for
+                # its own rows.
+                "version": _resolve_ver_at({"kit": _eid}),
+                # `written` is what `_cmd_apply` records and this omitted; a row with no `written`
+                # is not the same shape as every other row in the file.
+                "written": True,
+                "sha256": hashlib.sha256(_blob0).hexdigest(), "gov_oid": blob_oid(_blob0),
+                "source": _src0, "commit": to_commit,
+            })
+            # STAGED HERE, EXPLICITLY. My first cut appended to a name called `staged`, which does
+            # not exist in this function — `_cmd_update` stages through `checkout-index` and
+            # `update-index`, not through a list. It raised NameError on the WRITE path only, so
+            # every read-only run passed and the fixture's second write run caught it. A variable
+            # borrowed from another function is a compile-clean way to break exactly one arm.
+            # F6 — THE STAGE'S RESULT IS CHECKED, and an ordinary `.gitignore` is why. The return
+            # was discarded, so an ignored destination minted a receipt row for a file git never
+            # tracked — and every LATER `update` then refused the install forever, blaming the
+            # operator: *present in the WORKTREE and absent from its INDEX*. One `--write` wedged
+            # the adopter permanently, with no adversary and no tampering.
+            _add0 = git_pathspec(target, ["add"], [_dest])
+            if _add0.returncode != 0:
+                try:
+                    _abs0.unlink()
+                except OSError:
+                    pass
+                _refused_new.append((_dest, "git refused to stage it (it is most likely ignored by "
+                                            "the target's own .gitignore), so it was removed rather "
+                                            "than left as a receipt row for an untracked file"))
+                continue
+            # `oid` is the blob the TARGET's index holds, which does not exist until the stage
+            # above — the same ordering `_cmd_apply`'s producer documents, and the reason that
+            # field is filled after staging rather than beside `gov_oid`.
+            _idx0 = subprocess.run(["git", "-C", str(target), "ls-files", "-s", "--", _dest],
+                                   capture_output=True, text=True).stdout.split()
+            if len(_idx0) >= 2:
+                receipt["files"][-1]["oid"] = _idx0[1]
+            _claimed_paths.add(_dest)
+            _landed_new.append(_dest)
+
+    # EVERY COUNT PRINTS, INCLUDING THE ZEROS, for the reason the verify tally above gives: an
+    # absence is never coverage, and a silent zero here would be indistinguishable from a verb that
+    # never looked. The read-only run says `would land` because it did not.
+    print(f"govkit update — unclaimed sources: {len(_landed_new)} "
+          f"{'landed' if write else 'would land'} · {len(_refused_new)} refused")
+    for _p0 in _landed_new:
+        print(f"govkit update —   {'landed' if write else 'would land'} {_p0}")
+    for _p0, _why0 in _refused_new:
+        print(f"govkit update —   REFUSED {_p0}: {_why0}")
 
     if withdrawn_rows:
         receipt["files"] = [f for f in receipt["files"] if f not in withdrawn_rows]
