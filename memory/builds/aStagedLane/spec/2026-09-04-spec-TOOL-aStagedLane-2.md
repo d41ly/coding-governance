@@ -104,7 +104,7 @@ the verbs cannot all be disposed of the same way and S4b says which gets which t
 ### What each mode buys
 
 Unattended mode is unchanged. Attended mode keeps the stage ORDER, which is JS control flow and does
-not depend on the driver at all, and loses the two driver-side refusals. Stage order is the property
+not depend on the driver at all, and loses the five things S5 enumerates. Stage order is the property
 the harness exists to provide, so attended mode delivers the thing it is for and is honest about the
 rest.
 

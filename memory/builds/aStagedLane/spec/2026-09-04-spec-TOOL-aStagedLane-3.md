@@ -82,7 +82,9 @@ and nothing else, so a build's specs stop being written from one accumulating co
   that drifts. The scratchpad script that motivated this build proved the drift inside one day.
 - Not parallel BUILD passes. The dispatch order is settled and stays sequential; this unit fans the
   spec stage alone.
-- Not raising the concurrency cap. The existing helper's bound is reused as-is.
+- Not raising the concurrency cap. The copied helper carries `tier2-review.js`'s bound unchanged;
+  S2 copies the helper because it is not in this file, and copying it is not licence to re-pick its
+  number.
 
 ## 4. Design
 

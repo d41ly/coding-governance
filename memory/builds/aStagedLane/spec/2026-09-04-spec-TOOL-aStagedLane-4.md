@@ -197,8 +197,8 @@ the charter, and after S5's withdrawal this unit edits neither subject.
   veto 1 again; and editing the charter is a change to a governance carrier, which is veto 2 and
   therefore an owner turn this run does not hold. Withdrawal trips no veto and leaves no follow-up:
   there is no stale sentence to come back for. S5 and AC6 are withdrawn, AC3 is re-pointed at the
-  leg that actually measures the charter, and the unit keeps S1–S4 — the method edits, which were
-  always the load-bearing half.
+  leg that actually measures the charter, and the unit keeps S1–S4 plus the new S6 — the method
+  edits and the budget that binds them, which were always the load-bearing half.
 
 ## 9. Revision log
 
