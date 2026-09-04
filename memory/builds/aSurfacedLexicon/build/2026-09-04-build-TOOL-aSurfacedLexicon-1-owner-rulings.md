@@ -103,3 +103,14 @@ first of the two further readings the docstring requires, so a third reading is 
 `TOOL-dScaffoldedMirror-4`, `-9` and `-11`'s cut fourth pin can be abandoned. The two prose copies and
 `dScaffoldedMirror/README.md`'s "reading one of two" are superseded by the docstring and are corrected
 under Q9's record (a).
+
+## Acceptance ledger
+
+**Evidences:** TOOL-aSurfacedLexicon-1
+
+- AC1 — `memory/builds/aSurfacedLexicon/build/2026-09-04-build-TOOL-aSurfacedLexicon-1-rebuild-research.md` — the measured evidence table landed with every number carrying its command or file:line, and the two places a lens and the synthesis disagreed are printed rather than reconciled.
+- AC2 — `conv_probe.py` — the shipped idiomatic defaults cost zero violations on identifiers here: 925 `py.function` and 39 `py.type`, none offending, and 100 `js.function` over a subset the prototype's two regexes can see. All 11 violations in the tree are filenames, 7 Python and 4 shell.
+- AC3 — `conv_probe.py` liveness line — re-grading `py.function` as camel violates 691 of 925, so the predicate fails on demand rather than only ever passing. An independent run of mine using a different affix rule read 697, and the difference is the affix strip.
+- AC4 — `git add tools/lexicon/_conv_break.py` — staging `def loadUserData` and `class user_record` moved `py.function` 0 to 1 and `py.type` 0 to 1, each message naming the convention the name DOES satisfy; unstaging returned the tree to its 11-violation baseline.
+- AC5 — `python tools/memory-recall/query.py` plus a grep of all four backlog shards and every build README — no in-repo record concludes the tool is better retired than maintained. The nearest, `TOOL-dScaffoldedMirror-16`, concludes the opposite on the evidence that the declaration constrains generations while the enforcement contributes zero.
+- AC6 — `memory/builds/aSurfacedLexicon/build/2026-09-04-build-TOOL-aSurfacedLexicon-1-owner-rulings.md` — all ten forks put to the owner and all ten resolved, four against the recommendation, each override recorded with its consequence rather than its argument.

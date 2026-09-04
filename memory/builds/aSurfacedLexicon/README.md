@@ -93,13 +93,14 @@ of the same.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 13 unit(s) · node a · opened 2026-09-04 · streams tooling
+**Build status:** SPECCED · 14 unit(s) · node a · opened 2026-09-04 · streams tooling
 ids TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12
 ids TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
+| [TOOL-aSurfacedLexicon-1 — the design pass: measure the kit, then design and judge its rebuild](spec/2026-09-04-spec-aSurfacedLexicon-1.md) | 0 | 2 | CLOSED | rev-1 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint](spec/2026-09-04-spec-aSurfacedLexicon-2.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes](spec/2026-09-04-spec-aSurfacedLexicon-3.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-4 — the CELLS and PINS declaration grammar](spec/2026-09-04-spec-aSurfacedLexicon-4.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-04 |
@@ -120,14 +121,15 @@ Records: 3 bound to this build, across 2 record folder(s).
 Ids no record names: TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7
 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9.
 
-Ids no `spec-audit` record has ever named: TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6
-TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9.
+Ids no `spec-audit` record has ever named: TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5
+TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
+| 0 | `TOOL-aSurfacedLexicon-1` | no |
 | 1 | `TOOL-aSurfacedLexicon-2`, `TOOL-aSurfacedLexicon-3` | yes |
 | 2 | `TOOL-aSurfacedLexicon-4` | no |
 | 3 | `TOOL-aSurfacedLexicon-5`, `TOOL-aSurfacedLexicon-9` | yes |
