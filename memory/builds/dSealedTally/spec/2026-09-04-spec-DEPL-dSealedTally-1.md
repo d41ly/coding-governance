@@ -1,6 +1,6 @@
 # DEPL-dSealedTally-1 — landed sources join the verify-and-rollback pass
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 3
+**Status:** SPECCED · rev-3 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 | [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
+| [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round2.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round2.md) | spec-audit | DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 
 <!-- /gen:spec-records -->
 
@@ -20,10 +21,11 @@ repository gov does not own is covered by the same guard.
 
 ## 2. Scope (IN)
 
-- **S1** The landed destinations are DERIVED before the snapshot, from the existing
-  `derive_unclaimed_candidates` call at `tools/govkit/govkit.py:6276`, so `touched_kits` and
-  `baseline` at 6347-6352 widen from that preview and a landed-only kit is baselined PRE-WRITE like
-  every other kit.
+- **S1** The write path ADDS a `derive_unclaimed_candidates(set())` call between `tools/govkit/govkit.py:6286`
+  and the snapshot at 6319, and the function returns `(dest, eid)` PAIRS rather than bare dest
+  paths, so `touched_kits` and `baseline` at 6347-6352 can widen from it and a landed-only kit is
+  baselined PRE-WRITE. The existing call at 6276 is NOT that source: it sits inside `if not write:`
+  and the branch returns at 6285, so a `--write` run never reaches it.
 - **S2** The landing block MOVES to sit between the write loop's end and `written_paths = ...` at
   `tools/govkit/govkit.py:6806`, appending its own `snap_rows` entries there, where the pass that
   reads them has not yet run.
@@ -31,6 +33,9 @@ repository gov does not own is covered by the same guard.
   removes its index entry, and removes the receipt row the landing minted at 7134.
 - **S4** A landed destination is added to `written_paths`, so the closing tally does not classify it
   untouched, and a rolled-back landing is removed from `_landed_new` so the summary does not report
+- **S7** The rollback report prints a landed entry under its own verb, `removed <path>`, not
+  `restored` — and the order’s "was restored to the index entry it had" sentence is conditioned on
+  whether any landed entry is present, since a landed path had no index entry to restore.
   a landing that was undone.
 - **S5** The rollback of a landed file is contained by the same `demand_contained_dest` guard the
   existing rollback path calls, under a reason string naming the landing.
@@ -69,13 +74,15 @@ Three positions matter and rev-1 confused two of them.
 
 | What | Line | When |
 |---|---|---|
-| `derive_unclaimed_candidates` preview | 6276 | before the snapshot — supplies S1 |
+| `derive_unclaimed_candidates`, read-only preview | 6276 | inside `if not write:`, returns at 6285 |
+| the SAME classifier, called on the write path | new, 6286-6319 | before the snapshot — supplies S1 |
 | `snap_rows`, `touched_kits`, `baseline` | 6319-6352 | before the write loop |
 | landing block, MOVED here | 6806 | after the write loop, before the rollback pass |
 | verify-and-rollback pass | 6806-6980 | reads `snap_rows` and `baseline` |
 
-The preview at 6276 runs with an EMPTY withdrawal set, because `withdrawn_rows` does not exist yet;
-it says so in its own output today. For S1 that is safe in the only direction that matters: it can
+The new call runs with an EMPTY withdrawal set, because `withdrawn_rows` does not exist that early.
+Rev-2 added "it says so in its own output today", which was about the READ-ONLY preview’s printed
+caveat and says nothing about a write-path call; it is struck. For S1 the empty set is safe in the
 name a kit that turns out not to need a baseline, and baselining a kit the run does not touch costs
 one `run_kit_check` and grades nothing wrongly. It cannot MISS a kit, which is the direction that
 would reintroduce the `KeyError`.
@@ -142,11 +149,11 @@ is a check that cannot fail, which is the class this build is draining.
   entry, asserted by the AC1 arm alongside its `lexists` check.
 - **AC4** — When a landed file is rolled back, the post-rollback receipt names no landed path,
   asserted against the receipt's file list in `tools/govkit/selftest.py`.
-- **AC5** — When the `demand_contained_dest` call is removed from the landed restore branch by
-  mutation, the AC1 arm FAILS, proving the guard is reached — the arm cannot be built by giving the
-  landing an escaping destination, because the landing itself refuses one before anything is
-  written.
-- **AC6** — When the `snap_rows` append is removed by mutation in a scratch copy of
+- **AC5** — When a landed entry is rolled back, `demand_contained_dest` is CALLED with the reason
+  string S5 names, observed by an arm in `tools/govkit/selftest.py` that monkeypatches the guard to
+  record its `where` argument. Deleting the call is not the observation: an arm built that way
+  cannot fail for the right reason, because the landing refuses an escaping destination before
+  anything is written, so the guard has no hostile input to catch.
   `tools/govkit/govkit.py`, the AC1 arm FAILS, recorded as an observed staged break.
 - **AC7** — When `python tools/govkit/selftest.py` runs, it exits 0 and its arm count is at least 6
   greater than the count observed at the head of `order 2`, captured in §9 when this unit's pass
@@ -179,6 +186,13 @@ is a check that cannot fail, which is the class this build is draining.
   AC5, which could not be constructed as written. H5 replaced the shared arm-count constant with a
   delta. M1 moved the order from 2 to 3 so this unit no longer shares a parallel step with
   `DEPL-dSealedTally-3` over one test file.
+- rev-3 · 2026-09-04 · folded round 2’s B1, H1 and L1. B1: rev-2’s own fix for B2 pointed at the
+  `derive_unclaimed_candidates` call at 6276, which sits inside `if not write:` and returns at
+  6285 — a `--write` run never reaches it, and the function returns dest paths where `touched_kits`
+  needs kit ids. S1 now adds a call on the write path and changes the return shape. H1: AC5 was a
+  mutation that cannot fail, since the landing refuses an escaping destination before anything is
+  written; it is now a monkeypatch observation. L1 adds S7, because a deleted landing printing as
+  `restored` is a report that contradicts what happened.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # DEPL-dSealedTally-5 — the govkit self-test grades the tree, not the commit's ref-reachability
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 5
+**Status:** SPECCED · rev-3 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 TOOL-dSealedTally-1 |
 | [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 TOOL-dSealedTally-1 |
+| [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round2.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round2.md) | spec-audit | DEPL-dSealedTally-1 TOOL-dSealedTally-1 |
 
 <!-- /gen:spec-records -->
 
@@ -21,17 +22,22 @@ verdict is a function of the tree it grades.
 
 ## 2. Scope (IN)
 
-- **S1** A pin is derived once and threaded ONLY into the real-root invocations — those going
-  through the `run(*args)` helper at `tools/govkit/selftest.py:69`, which executes govkit in the
-  checkout under test.
+- **S1** A pin is derived once and threaded into the real-root invocations: the `run(*args)` helper
+  at `tools/govkit/selftest.py:69`, AND the direct `subprocess.Popen` at 2627, which runs
+  `update --write` against the real checkout without going through `run()` and would otherwise stay
+  unpinned — leaving AC1 unreachable by S1’s own mechanism.
 - **S2** The pin is a ref-reachable commit whose `rev-parse <pin>^{tree}` EQUALS
   `rev-parse HEAD^{tree}`. Tree identity is the acceptance condition, not mere ref-reachability: an
   ancestor that is ref-reachable but carries a different tree grades the wrong tree, which is the
   same defect one level over.
 - **S3** When no such commit exists, the suite prints a NAMED refusal and exits non-zero rather than
   falling back to `HEAD`.
-- **S4** The fixtures that `apply` at gov HEAD apply at the PIN instead, so each receipt's
-  `gov_commit` IS the pin and `demand_forward_vintage` holds reflexively.
+- **S4** The fixtures that `apply` at gov HEAD have their receipt’s `gov_commit` REWRITTEN to the
+  pin by the fixture itself, immediately after `apply` returns, so `demand_forward_vintage` holds
+  reflexively. `apply` is NOT given a vintage argument: `_cmd_apply` hardcodes
+  `git rev-parse HEAD` at `tools/govkit/govkit.py:4199` and `main` dispatches it with no `TO_REV`,
+  so pinning it would add a public surface to a product verb — M3 veto 2, which is an owner turn
+  this run cannot take. The fixture edit is test-only and keeps §4 Files touched honest.
 - **S5** A liveness arm asserting BOTH conditions of the pin — that its tree equals the working
   tree's, and that some ref contains it. Either alone is satisfied by a silently-defaulted `HEAD`.
 - **S6** Neither `demand_published_vintage` nor `demand_forward_vintage` is changed. Both are
@@ -64,12 +70,19 @@ through the `run(*args)` helper alone.
 The population, counted rather than asserted — rev-1 said "every `update` invocation" and that was
 false of all three groups:
 
+
 | Group | Count | Pin applies |
 |---|---|---|
 | `update` invocations in the suite | 74 | — |
-| already carrying an explicit `--to` | 32 | no, untouched |
+| carrying an explicit `"--to"` ARGUMENT | 13 | no, untouched |
+| — of which inline in a `run()` call | 9 | the quantity AC5 counts |
 | against a scratch gov repo | 27 repos | no, the sha does not exist there |
-| real-root, via `run(*args)` at line 69 | the remainder | YES |
+| real-root, via `run()` at line 69 plus the direct `Popen` at 2627 | the remainder | YES |
+
+Rev-2 said "32 of the 74" and that was a LINE count — lines mentioning `--to` anywhere, prose and
+comments included — wrong by about 2.5x. The argument count is 13, measured with
+`grep -o '"--to"' tools/govkit/selftest.py | wc -l`, and 9 of those are inline in a `run()` call.
+AC5 counts the 9, because that is the quantity its arm can compute from the file.
 
 ### Migration
 
@@ -147,12 +160,12 @@ test.
 - **AC4** — When no ref-reachable same-tree commit exists, `tools/govkit/selftest.py` prints a named
   refusal and exits non-zero, proved by an arm driving the resolution against a fixture repository
   with no refs.
-- **AC5** — When the suite runs, the `--to` values passed by the scratch-gov helpers and by every
-  invocation already carrying one are UNCHANGED from base `0f19429a`, asserted by an arm counting
-  explicitly-pinned invocations against a declared number.
-- **AC6** — When a fixture applied at the pin is then updated to the pin,
-  `demand_forward_vintage` does not refuse it, proved by an arm in `tools/govkit/selftest.py`
-  exercising the apply-then-update path on a detached head.
+- **AC5** — When the suite runs, the number of `run()` invocations carrying their own inline
+  `"--to"` is 9, unchanged from base `0f19429a`, asserted by an arm in `tools/govkit/selftest.py`
+  so a future edit widening the pin reds rather than quietly re-pointing fixtures.
+- **AC6** — When a fixture’s receipt has its `gov_commit` rewritten to the pin after `apply` and
+  is then updated to the pin, `demand_forward_vintage` does not refuse it, proved by an arm in
+  `tools/govkit/selftest.py` exercising the apply-rewrite-update path on a detached head.
 - **AC7** — When `python tools/govkit/selftest.py` runs, its arm count is at least 4 greater than
   the count observed at the head of `order 4`, captured in §9 when this unit's pass opens.
 
@@ -179,6 +192,13 @@ none
   IDENTITY, measured against a real detached merge where `^` picks the wrong-tree parent. M2:
   the derivation is one runnable sequence with its empty case named, replacing two candidates
   neither of which ran. Order moved 3 to 5 per M1.
+- rev-3 · 2026-09-04 · folded round 2’s B2, H2 and H3. B2: rev-2’s S4 pinned `apply` to a vintage
+  `apply` has no parameter for — `_cmd_apply` hardcodes `rev-parse HEAD` at 4199 — so the fix as
+  written needed a product-surface change §4 never budgeted; S4 now rewrites the fixture’s
+  `gov_commit` instead, keeping the unit test-only because adding `apply --to` trips M3 veto 2.
+  H2: the "32 of 74" row was a LINE count, wrong by 2.5x; the argument count is 13 and AC5 now
+  counts the 9 it can actually compute. H3: a real-root `update --write` runs outside `run()` at
+  `tools/govkit/selftest.py:2627` and would have stayed unpinned, making AC1 unreachable.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dSealedTally-1 — `--landed` writes phase and anchor together, after every check
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 |
 | [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 |
+| [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round2.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round2.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-5 |
 
 <!-- /gen:spec-records -->
 
@@ -22,15 +23,14 @@ refusal leaves the record untouched.
 
 ## 2. Scope (IN)
 
-- **S1** The `phase LANDED` write moves to sit immediately before the staging call at
-  `tools/unattended/unattended.sh:2427`, after every other fact write, so no statement that can
-  return non-zero runs after it.
+- **S1** The `phase LANDED` write moves to sit immediately before `stage_or_fail` at
+  `tools/unattended/unattended.sh:2428` — that is, after the `units-at-landing` write whose
+  continuation ends at 2427 — so no statement that can return non-zero runs between the terminal
+  write and the staging call. The four fact writes it moves below are `landed-anchor` at 2405,
+  `unpushed-at-landing` at 2409, and `units-at-landing` at 2425-2427.
 - **S2** `phase` and `landed-anchor` are written TOGETHER at that point, which is the fix the corpus
   already decided at `TOOL-dScaffoldedMirror-22`: a refusal leaves the record with neither, rather
   than with one and not the other.
-- **S3** The idempotence guard (check 26) is evaluated before any write, not after — observed by
-  `TOOL-dUnstalledConvoy-38` printing "already finished" in the same invocation that wrote
-  `phase: LANDED`.
 - **S4** A hermetic probe, built from `tools/unattended/unattended.test.sh`'s own setup per the
   standing do-not-run instruction, proving a `--landed` refused on the marker leaves the phase at
   `LANDING` and writes no `landed-anchor`.
@@ -51,7 +51,11 @@ refusal leaves the record untouched.
   fix candidates. Out of scope because it is a new verb surface for records already wedged, where
   this unit stops new ones being created. The four wedged records named across those rows were
   hand-completed and are not re-wedged by anything here.
-- Not making the lander runnable from a worktree. Real, different mechanism, its own unit.
+- **Not hoisting the idempotence guard.** Rev-2’s S3 claimed `-38` needed it moved; re-derived,
+  `refuse_if_terminal` already runs at `tools/unattended/unattended.sh:2255`, before every write in
+  `verb_landed`. Whatever `-38` observed, it is not this verb, and asserting a half was closed without
+  re-deriving it is how a spec claims coverage it does not have.
+- Not making the lander runnable from a worktree.
 - Not running the unattended self-test suites. Standing owner instruction, 2026-08-23.
 
 ## 4. Design
@@ -116,9 +120,11 @@ fixed. Not writing until the decision is made has no such window.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `--landed` is refused by the lander-marker gate, the run-state file's `phase:` line
-  still reads `LANDING` and no `landed-anchor` key is present, proved by a hermetic probe built
-  from `tools/unattended/unattended.test.sh` and committed under this build's `build/` folder.
+- **AC1** — When `--landed` is refused by the lander-marker gate, the run-state file is
+  BYTE-IDENTICAL to what it was before the invocation, proved by a hermetic probe built from
+  `tools/unattended/unattended.test.sh` and committed under this build's `build/` folder. Byte
+  identity is the criterion `TOOL-dTieredTribunal-28` decided, and it is stronger than "phase reads
+  LANDING with no anchor" because it also covers the other three fact writes.
 - **AC2** — When that same probe runs against the unpatched `tools/unattended/unattended.sh`, the
   phase reaches `LANDED` with the anchor absent, recorded as an observed staged break.
 - **AC3** — When `--landed` succeeds with a marker naming HEAD, it writes `phase: LANDED` AND
@@ -129,6 +135,10 @@ fixed. Not writing until the decision is made has no such window.
 - **AC5** — When `bash tools/unattended/run-unattended-gates.sh --checks` runs, it exits 0, which is
   the sanctioned non-self-test verification for this kit.
 - **AC6** — When `bash tools/run-gates/run-gates.sh` runs, the `unattended kit gate` leg is green.
+- **AC7** — When `stage_or_fail` at 2428 is forced to fail, the record is COMPLETE and terminal but
+  unstaged, and the probe asserts exactly that — the one residual this ordering keeps, accepted
+  because an unstaged complete record is repairable by `git add` where a wedged one is repairable
+  by nothing.
 
 ## 7. Gates
 
@@ -157,6 +167,13 @@ standing owner instruction, and the compensating check is AC1's committed hermet
   adds the guard-ordering half `TOOL-dUnstalledConvoy-38` observed, and §3 states which of their
   asks are deliberately out. H13: the phase write moves to 2427 rather than merely below the marker
   gate, because five more failure sites follow it; AC4 covers them.
+- rev-3 · 2026-09-04 · folded round 2’s B3, H4, M1 and M2, and this subject went NON-CONVERGENT at
+  one blocker in both rounds, so the loop STOPS here with disposition FOLD per the build method.
+  B3: rev-2 declared a CLOSED population of four backlog rows and missed a fifth,
+  `TOOL-dTieredTribunal-28`, whose decided byte-identical criterion no AC graded — AC1 is now that
+  criterion. H4: rev-2’s S3 claimed a guard needed hoisting that already runs at 2255, deleted and
+  explained in §3. M1 adds AC7 for the one residual the ordering keeps. M2 corrected two addresses
+  in the table rev-2 had added in order to fix addressing.
 
 ## 10. Reuse audit
 
@@ -169,8 +186,10 @@ facts — this unit reuses it unchanged and moves two call sites, which is why n
 audit's B4. They are `TOOL-dScaffoldedMirror-22` (line 231, three instances, and the source of the
 decided fix this unit adopts), `TOOL-aGroundedOrientation-4` (line 273, a fourth instance on node
 `a`), `TOOL-dUnstalledConvoy-38` (line 212, the distinct no-ff predicate defect, deliberately out
-per §3), and `TOOL-dRatifiedSeam-2`, which is this build's own source row and is a FIFTH filing of
-what line 231 already recorded. Closing this unit closes 231, 273 and `dRatifiedSeam-2`; 212 stays
+per §3), `TOOL-dTieredTribunal-28` (line 262, a fifth OPEN row and the source of AC1’s
+byte-identical criterion), and `TOOL-dRatifiedSeam-2`, which is this build’s own source row and is a
+SIXTH filing of what line 231 already recorded. Closing this unit closes 231, 262, 273 and
+`dRatifiedSeam-2`; 212 stays OPEN.
 OPEN.
 
 Recall terms used: `govkit update receipt rollback verify snapshot touched_kits landing unclaimed
