@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-14 — a real shell parser, arming the shell function cell
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -21,7 +21,8 @@ already refuses.
 That gain is not free and rev-2 states the price in the goal rather than burying it in section 5.
 Arming the language puts 608 shell function names in front of the P1 verb predicate, of which 508
 occurrences lead with a token the declared table does not carry, so this unit raises
-`VERB_OFFENDER_PIN` by 508 — more than doubling it. The measurement, the command and the
+`VERB_OFFENDER_PIN` by up to 508 — more than doubling it. That is the NAIVE pattern's figure and
+therefore an upper bound the parser is committed to beating; §4 says why. The measurement, the command and the
 RAISED-by-name form are `### The pins this unit moves` in section 4, and S8 is the raise.
 
 ## 2. Scope (IN)
@@ -112,7 +113,9 @@ RAISED-by-name form are `### The pins this unit moves` in section 4, and S8 is t
 **The deferral risk, said plainly, because the owner ruling asks for it.** This is the unit most
 likely not to be built: it is the only one in the rebuild whose cost is a new parser rather than a new
 declaration, and its whole value arrives at the end. It carries `order 4`, alongside
-`TOOL-aSurfacedLexicon-6` and `TOOL-aSurfacedLexicon-13`, deliberately ahead of the conf rewrite. If
+`TOOL-aSurfacedLexicon-6`, deliberately ahead of the conf rewrite —
+`TOOL-aSurfacedLexicon-13` was at that order when this sentence was written and moved to order 5
+during the same audit fold, which is why this now names one sibling and not two. If
 it has not landed by the time that rewrite lands, shell stays `dark`, the shipped conf comment records
 owner ruling Q5 as OWED rather than done, and the build's wrap-up says the largest coverage gain was
 not taken. It does not quietly become a regex.
@@ -347,6 +350,19 @@ hundred — `verb`, `fail`, `ok`, `bad`, `mk`, `say`, `is` — none of which is 
 which this unit renames. **This is the largest single pin movement in the build**, it is a
 consequence of arming rather than of any name this unit writes, and it lands as S8's RAISED-by-name
 comment naming shell as the sole arrival.
+
+**`508` IS AN UPPER BOUND, NOT THE VALUE, and this spec would contradict itself if it said
+otherwise.** The snippet above is the NAIVE same-line pattern, and AC1 requires the parser's
+population to DIFFER from that pattern's — a parser count equal to the naive count is a finding
+there, not a pass. So the population that produced `508` is one this unit is committed to
+replacing. The direction is known and only the direction: the naive pattern over-counts, because
+it matches definition-shaped lines inside heredocs and quoted blocks — a heredoc-aware refinement
+of the same pattern over the same 94 files returns 336 rather than 608, losing 272, and ten of
+those losses are one test script's conflict-marker fixtures. The parser's number will be smaller
+than 508 and cannot be stated before the parser exists. **S8 and AC12 therefore raise the pin by
+what the PARSER measures at landing, read from its own run, and this figure is here to say the
+movement is large rather than to be pasted into the conf.** A spec that pinned `508` would be
+gating the naive regex it was written to retire.
 
 The arithmetic is expressed as a READ and not as a literal, because a sibling moves the scalar before
 this unit runs: `TOOL-aSurfacedLexicon-5` is order 3 and its files-touched table takes
@@ -583,6 +599,12 @@ recorded that it did not run that leg and that the figure circulating for it sho
   rules for. The `sh.file` non-goal's two false claims are retracted and the shebang deferral is
   restated as an OWED item in a receiver's words, since `TOOL-aSurfacedLexicon-9` lands at an earlier
   order and never accepted it.
+- rev-3 · 2026-09-05 · `508` demoted from a value to an UPPER BOUND. It is the NAIVE pattern's figure, and
+  this spec's own AC1 requires the parser's population to DIFFER from that pattern's — so pinning it
+  would gate the regex this unit exists to retire. The direction is measured and only the direction:
+  a heredoc-aware refinement of the same pattern returns 336 rather than 608. S8 raises by what the
+  PARSER measures at landing. Also: `TOOL-aSurfacedLexicon-13` left build order 4 during the same
+  fold, so the deferral-risk paragraph no longer names it as a co-resident.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-7 — P1 splits into DEBT and UNRULED, and DEBT names its replacement
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -178,7 +178,7 @@ not at all. The two rows land when unit 12 writes the matrix at order 7 and past
 present and falls back to `VERB_OFFENDER_PIN`, so it is independently landable and the bar stays green
 between the two commits.
 
-**The scalar this unit hands to unit 12 is 462, not 461.** `TOOL-aSurfacedLexicon-5` is order 3 and
+**The scalar this unit hands on is 462 ONLY IF the shell cell is not armed before it.** `TOOL-aSurfacedLexicon-5` is order 3 and
 its §4 raises `VERB_OFFENDER_PIN` from `461` to `462` in the conf's RAISED-by-name comment form, with
 its minted `classify` as the sole arrival, measured there as `graded 1045 -> 1049` against
 `offenders 461 -> 462`. `TOOL-aSurfacedLexicon-6` at order 4 cites that raise and records its own
@@ -192,6 +192,24 @@ leading token is a canon key, in which case it goes to `debt`.
 None of those four numbers is a literal in a criterion. AC4 states the reconciliation as an identity
 between readings taken in ONE run, so a raise landing between order 3 and order 5 moves both sides
 and falsifies nothing.
+
+**SEQUENCING, because the generated build-order table will say otherwise.** This unit shares build
+order 5 with `TOOL-aSurfacedLexicon-13`, and both Files-touched tables name
+`tools/lexicon/lexicon.py` and `tools/lexicon/selftest.py`. Write sets intersect, so BUILD-METHOD
+M6 requires the two to be SEQUENCED and forbids dispatching them together. The README's generated
+table renders `Parallel: yes` for that step, which it derives from the step holding two units and
+not from any disjointness it checked; that over-claim is filed as `TOOL-aSurfacedLexicon-17`
+against the generator. Read the write sets, not the column.
+
+**AND THE SHELL CELL IS THE RAISE THAT MATTERS, which rev-2 did not open and therefore did not see.**
+`TOOL-aSurfacedLexicon-14` sits at order 4 and arms the shell function cell. Its own measurement:
+608 shell function names reach the verb predicate, of which 508 lead with a token the declared table
+does not carry — this repo's test-harness idioms. That is not a rounding error against a scalar of
+462; it is the dominant term. The four py/js rows above are unaffected, because they are per-cell and
+shell is a fourth cell, which is precisely the property this unit exists to deliver — but any
+sentence here about the SCALAR is a sentence about a number that unit owns more of than this one
+does. This unit therefore states no scalar value as a pass condition, and where it must reason about
+one it says under which landing order the reasoning holds.
 
 **A `js.function.debt` pin of `0` is a real row, not a placeholder.** Under S9's two-sided equality a
 zero pin can only red upward, which is exactly right: js has no DEBT population today, and the day a
@@ -294,8 +312,16 @@ commit and hand unit 12 a matrix it did not write half of.
   working-tree declaration arming `py.function` and `js.function` with `vocab`, the per-cell report
   satisfies three equalities read out of that ONE run: `py.function.debt` plus `py.function.unruled`
   equals `py.function`'s own offender count; `js.function.debt` plus `js.function.unruled` equals
-  `js.function`'s; and the four sum to the scalar `grep -n VERB_OFFENDER_PIN .lexicon.conf` reports at
-  the landing order. **No literal appears in this criterion**, because rev-1's did: it required a
+  `js.function`'s; and the four sum to the PYTHON-AND-JAVASCRIPT part of the scalar
+  `grep -n VERB_OFFENDER_PIN .lexicon.conf` reports at the landing order — NOT to the scalar itself.
+  **That third equality was written against a scalar of 462 and it is wrong by more than a factor of
+  two.** `TOOL-aSurfacedLexicon-14` is order 4, one step before this unit, and arming the shell cell
+  puts 608 shell function names in front of the same verb predicate, 508 of which lead with a token
+  the declared table does not carry. So the scalar at THIS unit's landing order is on the order of
+  970 once that unit lands, and 462 if it does not — and this unit must not depend on which, because
+  its own §3 says that unit is the one most likely to be deferred. The equality is therefore stated
+  over the two cells this unit owns, and the shell contribution is read from the report rather than
+  assumed absent. **No literal appears in this criterion**, because rev-1's did: it required a **No literal appears in this criterion**, because rev-1's did: it required a
   `debt` of 43 and an `unruled` of 418 "for `py.function`" and asserted their sum was the corpus 461,
   when `py.function`'s own pair is 435 and the missing 26 are `js.function`'s. Satisfying that
   literally meant folding js into python's row — the single-bucket defect this unit exists to remove.
@@ -390,6 +416,14 @@ ceiling is owed.
   records unit 5's order-3 raise to 462 and which row absorbs it. §4 Files touched names the four
   minted identifiers with their `--suggest` verdicts and a measured pin delta of zero. §7's
   `memory-tree hygiene` corrected to `memory hygiene`.
+- rev-3 · 2026-09-05 · cross-unit reconciliation. AC4's third equality summed the four py/js rows to the
+  conf scalar; `TOOL-aSurfacedLexicon-14` is one build order earlier and arming the shell cell puts
+  up to 508 more occurrences behind that same scalar, so the equality was wrong by more than a
+  factor of two and is now stated over the two cells this unit owns. §4 Migration's scalar claim is
+  conditional on whether that unit landed, which its own §3 says is the least certain thing in the
+  build. The order-5 write-set intersection with `TOOL-aSurfacedLexicon-13` is pinned here, since
+  the generated table asserts a parallelism it derives from the step's cardinality alone —
+  `TOOL-aSurfacedLexicon-17`.
 
 ## 10. Reuse audit
 
