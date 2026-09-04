@@ -123,3 +123,26 @@ reds precisely at the moment the merge protocol says to run a gate. Filed as
 fixture pins its gov vintage, not in this build's diff — and a leg that reds for a reason unrelated
 to its subject is the mirror image of one that greens for a reason unrelated to its subject, which
 is the class this whole build has been chasing.
+
+## An eighteenth, found by landing this build
+
+`--landed` refused, and had already written the phase it refused.
+
+Line 2357 is `set_fact "$rel" phase LANDED || return 1`. The lander-marker check that can refuse
+sits at 2373, sixteen lines below it. So the verb stamps the terminal phase, then discovers the
+marker names an earlier landing, prints check 34 and exits 1 — leaving a run-state file that reads
+`phase: LANDED` next to a refusal saying nothing observed this landing.
+
+Reproduced deliberately rather than inferred: the phase was restored to `LANDING`, the verb re-run
+with its exit code captured directly rather than through a pipe, and it exited 1 with the refusal on
+stderr and `phase: LANDED` on disk.
+
+That is a refusal that records the success it refused, in the terminal verb of the kit whose whole
+subject is the difference between an observation and a claim. It is the same shape as the two
+blockers above, one level up: the check runs, the check is correct, and the state it was guarding
+has already been written. Filed as `TOOL-dRatifiedSeam-2`; the fix is an ordering change, but it
+owes a staged-RED arm proving a refused `--landed` leaves the phase alone, and that is a unit rather
+than a fold.
+
+This build's record therefore stays at `LANDING`. The merge is real and `origin/main` carries it,
+but no lander observed it, and the phase that says otherwise was written by a verb that refused.
