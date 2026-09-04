@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 keepalive-reaped: yes
 parked-surfaced: yes
 witness: a69e57d751d1dcbfb0f7eee5d86444b84a75980b
-phase: RUNNING
+phase: LANDING
 mode: slug
 anchor-kind: default-branch
 keepalive: b63bc3c1
