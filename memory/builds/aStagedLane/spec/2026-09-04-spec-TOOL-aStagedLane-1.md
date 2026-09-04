@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file
 
-**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

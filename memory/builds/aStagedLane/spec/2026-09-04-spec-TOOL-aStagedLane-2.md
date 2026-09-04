@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate
 
-**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

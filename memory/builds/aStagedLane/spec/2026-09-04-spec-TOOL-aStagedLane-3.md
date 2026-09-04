@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief
 
-**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
+**Status:** CLOSED · rev-6 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
