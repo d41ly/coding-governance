@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 |
 
 <!-- /gen:spec-records -->
 
@@ -29,9 +30,24 @@ choosing its route per session.
 - **S3** — in attended mode the verdict is computed from that blocker count alone: zero is terminal,
   a positive integer is converging, and a non-integer REFUSES. The degraded paths of the review
   harness return a null blocker count by design, so null must never be read as a clean bill.
-- **S4** — in attended mode the build stage takes its per-unit refusal from
-  `bash tools/unattended/unattended.sh --plan <slug>`, which runs with no run-state file. The stage
-  refuses a unit whose reported state is not `READY` and names the state it saw.
+- **S4** — in attended mode the build stage takes its per-unit refusal from the state `--plan`
+  reports, and **the CALLER runs that verb**, matching §4's table rather than contradicting it.
+  This script has no shell and no filesystem, so it cannot run `--plan` itself; rev-4 said the
+  stage "takes its refusal from `--plan`" without saying who ran it or how the answer arrived, and
+  the two texts gave different answers. **The mechanism is a `planState` field on each `units[]`
+  entry**, resolved by the caller from `--plan`. That CHANGES the input contract, which today
+  carries `{id, order, specPath, briefPath}`, and a missing `planState` in attended mode REFUSES
+  rather than defaulting — a defaulted state is a refusal predicate grading a value nobody
+  supplied.
+  **The states are ENUMERATED, not allow-listed on one token.** `MISSING`, `THIN` and `FORKED`
+  refuse. `DONE` is a SKIP with a log line naming the unit, and `READY` builds. Rev-4 refused
+  "any state that is not `READY`", and `--plan` reports every terminal unit as `DONE` —
+  `verb_plan` at `unattended.sh:2144` rewrites `CLOSED` and `WONTDO` to it, and `--plan
+  dGaugedVintage` prints all thirteen ids that way. So the first attended run over a resumed or
+  partly built build would have halted at unit one, which is round-1 B4's failure recurring inside
+  the fold that claimed to close it. It would also have made attended mode STRICTER than the mode
+  §3 says it is deliberately weaker than: `verb_dispatch` refuses only MISSING, THIN and
+  out-of-order, and refuses neither `DONE` nor `FORKED`.
 - **S4b** — the BUILD stage's PROMPT TEXT is mode-dependent, and this is the scope item without
   which the unit does not achieve its goal. Three driver verbs the prompt instructs the agent to run
   hard-refuse with no run-state file: `--dispatch` (`unattended.sh:4584`, fail 49), `--brief`
@@ -107,7 +123,9 @@ reachable from this file, with what it does when no run-state file exists:
 | `--rescope` | the BUILD prompt's disposal clause (`:480`) | refuses, fail 48 at `unattended.sh:4481` |
 | `--plan` | the CALLER, never this script | works |
 
-All four of the first four are mode-dependent, and the fifth is not this script's call at all.
+All four of the first four are mode-dependent, and the fifth is not this script's call at all —
+S4 now agrees with this row rather than contradicting it, and names the `planState` field that
+carries the caller's answer in.
 `--plan` already works without a run-state file, measured on this node against a build that never
 had one, returning a unit state with exit status zero. The driver ships an attended records-root
 path for `record_set` and `record_piece` (`unattended.sh:4418`, `:4449`) and none for `--brief`, so
@@ -167,15 +185,26 @@ Making `attended` the default was rejected because it silently weakens every exi
 - **AC3** — When the audit stage receives a null `blockers` value from `tools/workflows/tier2-review.js`
   in either mode, the run REFUSES with a message naming the degraded return, and the build stage is
   not reached.
-- **AC4** — When the build stage runs in attended mode against a unit that `--plan` grades `FORKED`,
-  the stage refuses and its message names both the unit id and the state `FORKED`. The refusal is
-  observed before the arm asserting it is written.
+- **AC4** — When `bash tools/workflows/unattended-build.test.sh` runs the build stage in attended
+  mode against a unit whose `planState` is `FORKED`, the stage refuses and its message names both
+  the unit id and the state. The refusal is observed before the arm asserting it is written, and
+  the arm is fed the REAL `--plan` output of a closed build on disk rather than a hand-written
+  roster — a double containing only `READY` cannot discover that a closed unit reports `DONE`.
+- **AC11** — When the same stage meets a unit whose `planState` is `DONE`, it SKIPS that unit with
+  a log line naming it and proceeds to the next, rather than refusing. Without this arm the mode
+  halts at unit one on every resumed build.
+- **AC12** — When a `units[]` entry carries no `planState` in attended mode, the harness REFUSES
+  at entry and names the entry. A defaulted state would put the refusal predicate to work on a
+  value nobody supplied.
 - **AC5** — When `node tools/workflows/check-workflow-syntax.js tools/workflows/unattended-build.js`
   runs, it exits 0, and `bash tools/workflows/check-verifier-fanout.sh` stays green.
 - **AC6** — When the header of `tools/workflows/unattended-build.js` is read, it names all five
   losses S5 enumerates, each classified as a refusal or a record and not the two conflated, and
-  states that the S7 warning depends on the caller rather than on detection, in the section saying
-  what this harness cannot buy.
+  states that the S7 warning depends on the caller rather than on detection, AND states that M4's
+  blocker-disposal clause is unreachable in attended mode and why — all in the section saying what
+  this harness cannot buy. That third clause is S5's rev-4 addition, and without it coverage FELL
+  across that fold: AC8 dropped an observed assertion about the disposal clause and S5's header
+  statement replaced it unobserved.
 - **AC8** — When the BUILD prompt is composed in attended mode, it contains no `--dispatch` and no
   `--brief` instruction, AND it still contains the surrounding per-unit build instruction that those
   two were removed from. The paired positive assertion is the point: an arm that only checks a
@@ -248,6 +277,17 @@ because this file is a declared method pointer. The full bar is `bash tools/run-
   AC10 added: S3 specifies three verdict outcomes and rev-3 observed only the null refusal, so a
   branch mapping a positive blocker count to terminal would have reached BUILD over open blockers
   and passed every criterion in the section.
+- rev-5 · 2026-09-04 · round-3 spec audit folded: findings 5, 6 and 8. S4 had put the refusal on
+  `--plan` without saying who runs it, while §4's own table rowed that verb as the caller's — two
+  answers, and AC4 gradeable only against a double the builder writes to match whichever they
+  picked. S4 now names the `planState` field, says the input contract changes, and refuses a
+  missing value. It also ENUMERATES the states instead of allow-listing `READY`: `--plan` reports
+  every terminal unit as `DONE` (`unattended.sh:2144`), so the rev-4 predicate would have halted
+  at unit one on any resumed build — round-1 B4 recurring inside the fold that closed it — and
+  would have made attended mode stricter than the mode §3 calls it weaker than. AC11 and AC12 arm
+  the skip and the missing field, and AC4 is fed a real closed build's roster. AC6 gains the third
+  clause S5's rev-4 addition needed, since that fold traded an observed assertion for an
+  unobserved one.
 
 ## 10. Reuse audit
 

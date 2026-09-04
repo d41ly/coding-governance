@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 |
 
 <!-- /gen:spec-records -->
 
@@ -38,7 +39,7 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
   to exempt its own build by committing one bad line, and it would leave a build with a garbage
   `RUN.md` more exempt than a build with none.
 - **S2c** — a CLOSED unit in the run-state-free population whose build commit is NOT found inside
-  the derived range is searched for ONCE more, in the history strictly before the anchor. **That
+  the derived range is searched for ONCE more, in the history at and before the anchor. **That
   search uses the SAME build-commit predicate as the in-range one, unchanged: a whole-token subject
   match AND a path touched outside the record surface** — the build's own folder, plus
   `GENERATED_INDEXES`, plus `SHARED_RECORDS`, which `.unattended.conf` sets to
@@ -50,6 +51,12 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
   and §3's second non-goal forbids changing the definition in any case. A hit is a VIOLATION: product
   code naming that unit landed before the build folder existed, so it necessarily landed before any
   spec for it. A miss stays in the `unbuilt-in-range` tally.
+  **The window is INCLUSIVE of `<first>^`**, spelled `rev-list <first>^` and never `<first>^^`. S2
+  takes the anchor as `<first>^` so the range is `<first>..HEAD`; a pre-anchor window described as
+  "strictly before the anchor" would exclude `<first>^` a second time and leave a one-commit hole
+  exactly where the natural staging of this violation lands — product code committed, the build
+  folder created in the very next commit. One end of the range is pinned by S2 and armed by AC8; this
+  is the other end.
 - **S2d — the pre-anchor probe is BOUNDED BY CONSTRUCTION, because its cost cannot be measured
   before S1 lands.** Rev-3 bounded it with "5 units across the whole tree", a figure that appears in
   no section of this spec and, worse, measures the wrong population: `unbuilt` is incremented only
@@ -58,6 +65,28 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
   commits, so an unbounded pre-anchor walk per miss is not obviously cheap. The probe therefore
   takes a DECLARED commit cap, and what it truncates is COUNTED on the liveness line — a probe that
   gave up must say so rather than reporting a miss as a clean result.
+- **S2e — THE WIDENED POPULATION NEEDS ITS OWN DECLARED WAIVER, because the predicate REDS ON `main`
+  TODAY.** Run over the real tree before wiring it — which §7 requires and rev-2 through rev-4 never
+  did — S1's widened predicate finds two violations already landed on the default branch:
+  `DEPL-dGaugedVintage-12` at build commit `9ba3757d` and `DEPL-dGaugedVintage-13` at `34492bb6`,
+  each adding its own spec in the SAME commit as its product code, in a build with no `RUN.md` whose
+  `opened: 2026-09-01` equals `PASS_ORDER_CUTOFF` and is therefore admitted rather than
+  grandfathered. History is append-only and `.githooks/pre-push` blocks a red default-branch push, so
+  unit 1 as specified through rev-4 is UNLANDABLE.
+  The disposition is a DECLARED per-unit waiver registry at `memory/project/`, which this repository
+  states is the home of exactly that and nothing else, listing those ids with the reason. It is
+  preferred over the two alternatives on M3's rule. Raising `PASS_ORDER_CUTOFF` past 2026-09-01 is
+  discarded by veto 1: §3's third non-goal says the date gate "stays exactly as it is", and a raise
+  would also grandfather every future build opened in that window, blanket-exempting a population to
+  clear two rows. Landing the reds as a recorded exception is not an option at all, since it leaves
+  the bar red. The registry is the more feature-rich survivor: it names the two real rows rather than
+  a date range, an entry whose violation stops existing REDS the way this repo's other registries do,
+  and it cannot silently grow.
+- **S2f — the leg gains a `--preview` mode**: it grades the live tree, prints every violation and
+  near-miss, and sets no exit status. This is the mechanism that would have caught S2e's blocker
+  three revisions earlier, and §7's rule — run a candidate predicate over the real tree before wiring
+  it, printing hits AND near-misses — has no cheap form without it. It is also what makes AC14
+  runnable.
 - **S3** — the liveness assertion gains a count for the widened population: builds graded that carry
   no run-state file. The line ALREADY prints four counts — builds graded, builds skipped by the
   cutoff, builds `with no pinned run BASE`, and units `unbuilt-in-range` — while the block comment
@@ -81,10 +110,20 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
   false by `TOOL-dRetiredFork-40`, which raised the manifest row to 900 deliberately so that a leg
   running under the concurrent pool would not be killed at a standalone bound. That comment is
   DELETED rather than corrected, since the two figures answer different questions and the parity it
-  asserts should never be restored. The reading behind the current values: the leg costs **463 s on
-  node `a`, measured 2026-09-04 under load** with two concurrent builds running, against 134 s
-  recorded by `TOOL-dSealedTally-2`. A ceiling is derived from the loaded reading, because a bound
-  that fires on normal concurrent execution is worse than no bound.
+  asserts should never be restored.
+  **THE TWO CARRIERS TAKE TWO DIFFERENT READINGS, and rev-4 got this wrong by giving both the loaded
+  one.** `gate-legs.json`'s row is a kill bound under the 8-wide pool, so it is derived from a LOADED
+  reading — that is `TOOL-dRetiredFork-40`'s rule and it belongs to that carrier alone. The
+  `BUDGET_*` figure is deliberately calibrated IDLE: its own file says so at lines 54-62, says a
+  bigger load-tolerant number "is WRONG here" because it would pass the regression the ceiling exists
+  to catch, and says the ceiling "is EXPECTED to fire" on a busy box. `TOOL-aCollapsedScan-4` is
+  CLOSED on that basis and `TOOL-aCollapsedScan-9` is the open question about making the shape
+  load-aware. Deriving `BUDGET_pass_order_history` from a loaded reading would silently reverse a
+  settled decision inside the file that records it and leave the runner's bound unable to fire on a
+  real regression. So: the manifest row from a LOADED reading, the budget from an IDLE one, each with
+  its reading and its conditions written beside it. The loaded reading in hand is **463 s on node
+  `a`, 2026-09-04, with two concurrent builds running**, against 134 s recorded by
+  `TOOL-dSealedTally-2`; the idle reading is taken separately, per AC5.
 - **S5** — `tools/unattended/check-pass-order.test.sh` gains arms for the new population: a
   run-state-free build whose unit was built before its spec must be observed RED, and the same build
   with the spec commit first must be observed green.
@@ -169,8 +208,10 @@ satisfied by not opting in, which is the shape this unit exists to remove.
   counted as skipped rather than passing silently.
 - observability — S3's liveness line is the whole of it, including the retirement of a counter S1
   and S2b leave with no reachable increment site.
-- risks — a widened population may red builds already landed on the default branch. The date cutoff
-  is the control, and S1 does not move it.
+- risks — the widened population REDS TWO UNITS already landed on the default branch, MEASURED:
+  `DEPL-dGaugedVintage-12` (`9ba3757d`) and `DEPL-dGaugedVintage-13` (`34492bb6`). Not "may red"
+  — rev-4 wrote that word because nobody had run the predicate. S2e declares the waiver and S2f
+  builds the `--preview` mode that makes the measurement cheap enough to repeat.
 - testing + left-shift gates — S5, with the red observed before the green.
 - migration / rollback — reverting the commit restores the current population exactly; no state is
   written anywhere.
@@ -196,13 +237,26 @@ satisfied by not opting in, which is the shape this unit exists to remove.
   touches ONLY a `SHARED_RECORDS` path, `check-pass-order.sh` does NOT report a violation for that
   unit. This is the false-positive arm: the pre-anchor window admits product commits and record
   commits alike, and a predicate without the record-surface exclusion reds a conforming build.
+- **AC14** — When `bash tools/unattended/check-pass-order.sh --preview` runs over the real
+  `memory/builds/` tree, the violation set it prints is EXACTLY the set S2e's waiver registry
+  declares — neither more nor fewer. This is the criterion whose absence made rev-2 through rev-4
+  unlandable: a widening that has never been run over the tree it will grade is a gate armed
+  against an unknown population.
+- **AC15** — When a waiver registry entry names a unit that the leg no longer reports as a
+  violation, `check-pass-order.sh` REDS. A stale exemption silently widens the surface it was
+  written to narrow, which is the posture this repository takes for every other declared
+  population.
+- **AC16** — When a fixture build with no `RUN.md` has its violating build commit as the
+  IMMEDIATE PARENT of the build folder's first commit, `bash tools/unattended/check-pass-order.sh`
+  exits non-zero. AC8 pins the range's near end; this pins the pre-anchor window's, where S2's
+  `<first>^` anchor and a "strictly before" window would otherwise leave a one-commit hole.
 - **AC13** — When a fixture drives the pre-anchor probe into S2d's declared commit cap,
   `bash tools/unattended/check-pass-order.sh` reports the truncation as its own count on the liveness
   line. A probe that gave up and a probe that found nothing print the same thing otherwise.
 - **AC4** — When `bash tools/unattended/check-pass-order.test.sh` runs, every arm passes and the
   arm count reported exceeds the count recorded before this unit.
-- **AC5** — When `bash tools/unattended/run-unattended-gates.sh --checks` runs AFTER S1, S2c and S2d
-  have all landed, the `pass-order history` leg finishes inside its re-declared ceiling; that ceiling
+- **AC5** — When `bash tools/unattended/run-unattended-gates.sh --checks` runs on an IDLE box AFTER
+  S1, S2c, S2e and S2f have all landed, the `pass-order history` leg finishes inside its re-declared ceiling; that ceiling
   carries the reading it was set against on the line beside it; and the `pass-order history` row of
   `tools/gate-legs.json` carries a ceiling at least as large, with the stale parity comment gone from
   the runner. The reading is taken after the pre-anchor probe exists, not after S1 alone: S2c is the
@@ -230,8 +284,9 @@ satisfied by not opting in, which is the shape this unit exists to remove.
 
 The `pass-order history` leg in `tools/gate-legs.json`, its self-test
 `tools/unattended/check-pass-order.test.sh`, the unattended `--checks` runner in
-`tools/unattended/run-unattended-gates.sh`, and `python tools/memory-tree/check-arms.py` for the new
-branches. The full bar is `bash tools/run-gates/run-gates.sh`.
+`tools/unattended/run-unattended-gates.sh`, . `python tools/memory-tree/check-arms.py` was named here through rev-4 and is DROPPED: its
+population is tracked `*.sh` files that define `fail() {`, and `check-pass-order.sh` defines none, so
+it is absent from that gate's subject list and could never have covered these branches. The full bar is `bash tools/run-gates/run-gates.sh`.
 
 ## 8. Open questions
 
@@ -296,6 +351,19 @@ branches. The full bar is `bash tools/run-gates/run-gates.sh`.
   counts a population the `RUN.md` gate structurally excludes; the cost is unmeasurable before S1
   lands, so the probe is bounded by construction and its truncations are counted (AC13). AC5's
   reading moves to after S2c and S2d rather than after S1 alone.
+- rev-5 · 2026-09-04 · round-3 spec audit folded: the blocker and findings 2, 3 and 4. THE BLOCKER
+  IS MEASURED, not predicted: running S1's widened predicate over the real tree — which §7 requires
+  before wiring one and which no revision of this spec had done — finds two violations already on
+  the default branch, so the unit was unlandable as written. S2e declares the waiver registry,
+  S2f adds the `--preview` mode that makes the measurement repeatable, AC14 and AC15 arm both,
+  and §5's risk line is rewritten from "may red" to the two shas. Finding 2: S2's anchor is
+  `<first>^` and S2c searched "strictly before the anchor", excluding that commit twice and
+  leaving a one-commit hole at the pre-anchor boundary; the window is now inclusive and AC16 pins
+  it. Finding 3: §7 named `check-arms.py`, whose population is shell files defining `fail() {` and
+  which therefore never graded this script — dropped rather than left as coverage nobody has.
+  Finding 4: rev-4 derived BOTH ceilings from one LOADED reading, which reverses
+  `TOOL-aCollapsedScan-4` inside the file that records it; the manifest row takes the loaded
+  reading and the `BUDGET_*` figure an idle one, and AC5 now says which.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-4 |
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 |
 
 <!-- /gen:spec-records -->
 
@@ -121,7 +122,10 @@ The parallelism rule requires concurrency where disjointness is proven, and prov
 clauses. Clause 1: the write sets are the spec file paths, one per unit, and they do not intersect.
 Clause 2: no writer reads another writer's output, and no spec is a contract input to a sibling
 spec. Clause 3: no writer touches a shared mutable record — which needs BOTH S4, keeping the index
-generator out of the writers' hands, AND S3c, keeping the git index and the backlog out of them.
+generator out of the writers' hands, AND S3c, keeping the git INDEX out of them. (Not the backlog:
+that half of S3c's argument was withdrawn at rev-4 because the spec template mandates no backlog
+row, and this clause was the fold's second site, left asserting a coverage its own scope item had
+dropped.)
 Rev-2's proof covered the spec file paths and the generated index and never covered the COMMIT, and
 a proof missing a clause it enumerates by name is not a proof. With S3c the three hold, so the fan
 is owed rather than merely allowed.
@@ -215,9 +219,10 @@ Deriving slices inside the script was rejected because the script cannot read th
   path on which the existing refusal stops firing.
 - **AC5** — When `bash tools/workflows/check-verifier-fanout.sh` and
   `node tools/workflows/check-workflow-syntax.js tools/workflows/unattended-build.js` run, both exit
-  0, AND `tools/hooks/agent-cap.js` admits the changed file when its own predicate is run over it.
-  The two workflow checks exiting 0 do not answer the hook's question, and the hook is the gate that
-  actually denies this shape at the tool call.
+  0. That first leg DOES answer the hook's question — it pipes the file to `tools/hooks/agent-cap.js`
+  and its own header says so — so the rev-4 clause claiming otherwise, and the separate hook
+  invocation it justified, are both dropped. A criterion resting on a false premise about its own
+  gate is the class this spec set has now met at every revision.
 - **AC7** — When `bash tools/workflows/unattended-build.test.sh` runs its S3c arm over the composed
   writer prompt, the prompt instructs the writer to AUTHOR and forbids committing, and the
   caller-side commit is named in the stage's return or its log line. A fan of committing writers is
@@ -277,6 +282,12 @@ bar is `bash tools/run-gates/run-gates.sh`.
   of clause 3 of the disjointness proof. S3c's backlog claim is WITHDRAWN — the spec template
   mandates no backlog row (`grep -c -i backlog memory/TEMPLATE-SPEC.md` returns 0, and this build's
   own four specs added none); the git-index contention alone carries the argument.
+- rev-5 · 2026-09-04 · round-3 spec audit folded: findings 7 and 9. Finding 7 is rev-4's own fold
+  left half-done — the backlog claim was withdrawn in S3c and §4's clause-3 paragraph went on
+  asserting it, which is the amendment-leaves-its-other-half-standing class this build has now hit
+  three times. Finding 9: AC5 justified a separate `agent-cap.js` invocation with "the two
+  workflow checks do not answer the hook's question", and `check-verifier-fanout.sh` pipes the
+  file to that very hook — premise and clause both dropped.
 
 ## 10. Reuse audit
 
