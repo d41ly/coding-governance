@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -22,9 +22,11 @@ and nothing else, so a build's specs stop being written from one accumulating co
 - **S2** — the spec stage groups units into slices and fans one writer per slice through the
   `boundedParallel` helper already inlined at the top of the file, at its existing cap. The helper is
   reused rather than re-spelled, because `check-verifier-fanout.sh` already grades that shape.
-- **S3** — slices arrive from the caller in the `units` argument. The script has no filesystem and
-  cannot derive a grouping; the caller holds the plan output and the build README and is the only
-  side that can.
+- **S3** — slices arrive from the caller in the `units` argument, grouped by the declared `order`
+  verb: units sharing an order value form one slice. The script has no filesystem and cannot derive
+  a grouping; the caller holds the plan output and the build README and is the only side that can.
+  The order verb is chosen because it is already in the data the caller reads, and units that land
+  together are the ones most likely to share the reading a single writer does once.
 - **S4** — every writer's prompt forbids running the index generator. The generated build index is a
   shared mutable artifact, and the parallelism rule refuses concurrent passes that touch a generated
   index together with its generator. The caller regenerates once after the fan returns.
@@ -32,6 +34,9 @@ and nothing else, so a build's specs stop being written from one accumulating co
   list stays a required field, so a slice that wrote nothing is reported rather than being absent.
 - **S6** — arms in `tools/workflows/unattended-build.test.sh` covering a multi-slice fan, a
   single-slice fan, and a slice whose writer returns nothing.
+- **S7** — a unit entry with no `specBriefPath` logs the fallback, naming the unit, before the
+  writer is spawned. A silent fallback and a deliberate omission are otherwise indistinguishable,
+  and a mistyped key would hand back the old behaviour with no signal.
 
 ## 3. Non-goals (OUT)
 
@@ -105,8 +110,9 @@ Deriving slices inside the script was rejected because the script cannot read th
   `bash tools/workflows/check-verifier-fanout.sh`.
 - **AC2** — When a unit entry carries a `specBriefPath`, that path appears in the writer's prompt
   and no other slice's brief does.
-- **AC3** — When a unit entry carries no `specBriefPath`, the writer receives the current prompt and
-  the stage completes, proving the argument is additive.
+- **AC3** — When a unit entry carries no `specBriefPath`, the writer receives the current prompt,
+  a `log()` line names that unit as falling back, and the stage completes, proving the argument is
+  additive and the fallback is not silent.
 - **AC4** — When one slice's writer returns nothing, its units appear in the stage's `refused` list
   and the other slices' results are still returned. The arm observes the empty return before the
   merge logic is written.
@@ -131,6 +137,7 @@ bar is `bash tools/run-gates/run-gates.sh`.
   to the caller with no guidance.
   Recommendation: group by the order verb. It is derivable from data the caller already has, and
   units sharing an order value are the ones most likely to share reading.
+  RESOLVED (owner, 2026-09-04): group by the order verb. Written into S3.
 
 - **F2 — should a missing `specBriefPath` warn?** Falling back silently keeps the argument additive,
   but a build that meant to supply briefs and mistyped the key gets the old behaviour and no signal.
@@ -138,10 +145,13 @@ bar is `bash tools/run-gates/run-gates.sh`.
   silent.
   Recommendation: log it. A silent fallback and a deliberate omission are indistinguishable
   otherwise, and this is the class the harness's own return schema already guards against elsewhere.
+  RESOLVED (owner, 2026-09-04): log the fallback. In scope as S7, observed by AC3.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-04 · both forks resolved at the owner's scope-approval turn, both as recommended.
+  F1 wrote the order-verb grouping into S3; F2 added S7 and widened AC3 to observe the log line.
 
 ## 10. Reuse audit
 

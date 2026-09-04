@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -35,12 +35,16 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
 - **S5** — `tools/unattended/check-pass-order.test.sh` gains arms for the new population: a
   run-state-free build whose unit was built before its spec must be observed RED, and the same build
   with the spec commit first must be observed green.
+- **S6** — the grading cutoff is read from the commit being graded rather than from the working
+  tree, so editing a build README's `opened:` field in the working copy can no longer exempt that
+  build from the leg. The comparison itself is unchanged; only the source of the value moves. This
+  costs one object read per build and none per unit.
 
 ## 3. Non-goals (OUT)
 
-- Not closing the self-authored cutoff field. `check-pass-order.sh` reads `opened:` from the working
-  tree, so one character disables the leg for that build. This unit inherits that weakness over a
-  larger population and carries the fork in section 8 rather than fixing it silently.
+- Not auditing the existing corpus for builds this widening will red. The date cutoff is the
+  control and S1 does not move it. A build the widened leg reds is a finding for whoever lands it,
+  not a migration this unit performs.
 - Not changing the per-unit predicate, the first-parent anchor, or the build-commit definition. Each
   was settled by `TOOL-dBriefedPass-3` and re-deciding them here would put two answers in the tree.
 - Not grading builds the cutoff excludes. The date gate stays exactly as it is; this unit widens
@@ -112,6 +116,10 @@ satisfied by not opting in, which is the shape this unit exists to remove.
 - **AC5** — When `bash tools/unattended/run-unattended-gates.sh --checks` runs, the `pass-order
   history` leg finishes inside its re-declared ceiling, and that ceiling carries the reading it was
   set against on the line beside it.
+- **AC6** — When a fixture build's committed `opened:` field is inside the cutoff and its
+  working-tree copy is edited to a date outside it, `bash tools/unattended/check-pass-order.sh`
+  still grades that build. The bypass is observed working before S6 lands and observed refused
+  after.
 
 ## 7. Gates
 
@@ -131,15 +139,21 @@ branches. The full bar is `bash tools/run-gates/run-gates.sh`.
   committed value; or leave it and record the exposure.
   Recommendation: read it from the commit being graded. It is the smaller change, it removes the
   lever entirely, and the extra read is per build rather than per unit.
+  RESOLVED (owner, 2026-09-04): read `opened:` from the commit being graded. In scope as S6, with
+  the withdrawn non-goal replaced and AC6 observing the bypass before and after.
 
 - **F2 — should a run-state-free build be graded from its folder's first commit, or from the first
   commit carrying any of its unit ids?** The folder anchor is cheaper and is what S2 specifies. The
   id anchor is tighter for a build whose folder was created long before work started.
   Recommendation: the folder anchor, and revisit only if a real build shows the gap.
+  RESOLVED (owner, 2026-09-04): the folder anchor, exactly as S2 already specifies.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-04 · both forks resolved at the owner's scope-approval turn. F1 moved the cutoff
+  read into scope as S6, withdrew the non-goal that had deferred it, and added AC6; F2 confirmed S2
+  unchanged.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -35,6 +35,12 @@ choosing its route per session.
 - **S6** — arms in `tools/workflows/unattended-build.test.sh` covering both modes: that unattended
   mode still records through the driver, that attended mode does not, and that a null blocker count
   refuses in both.
+- **S7** — when `mode` is `attended` and a run-state file exists for that slug, the run WARNS and
+  CONTINUES. The warning names the slug and the refusals being skipped, so a session that meant to
+  run under its own mandate sees the mismatch rather than discovering it at the merge bar. The
+  script cannot detect the file itself, because it has no filesystem; the caller supplies the fact
+  and the harness warns on what it is given. A caller that supplies nothing gets no warning, and
+  S5's header statement says so rather than leaving a reader to assume detection.
 
 ## 3. Non-goals (OUT)
 
@@ -119,7 +125,11 @@ Making `attended` the default was rejected because it silently weakens every exi
 - **AC5** — When `node tools/workflows/check-workflow-syntax.js tools/workflows/unattended-build.js`
   runs, it exits 0, and `bash tools/workflows/check-verifier-fanout.sh` stays green.
 - **AC6** — When the header of `tools/workflows/unattended-build.js` is read, it names the two
-  refusals attended mode does not perform, in the section stating what this harness cannot buy.
+  refusals attended mode does not perform, and states that the S7 warning depends on the caller
+  rather than on detection, in the section saying what this harness cannot buy.
+- **AC7** — When the harness is invoked with `mode` set to `attended` and told a run-state file
+  exists for that slug, a `log()` line names the slug and the skipped refusals, and the run reaches
+  the build stage rather than refusing.
 
 ## 7. Gates
 
@@ -134,6 +144,9 @@ because this file is a declared method pointer. The full bar is `bash tools/run-
   Options: refuse when a run-state file exists for that slug; warn and continue; ignore.
   Recommendation: refuse. The mode is a statement about which enforcement applies, and a run under a
   mandate does not get to opt out of the mandate's enforcement by passing an argument.
+  RESOLVED (owner, 2026-09-04): warn and continue. This goes AGAINST the recommendation above, which
+  is recorded rather than rewritten. In scope as S7, with the caller-supplied detection and its
+  limit named there, and AC7 observing the warning.
 
 - **F2 — how does an attended run record that a review round happened?** In unattended mode the
   driver's round record is the answer. In attended mode the review artifact under the build's
@@ -142,10 +155,14 @@ because this file is a declared method pointer. The full bar is `bash tools/run-
   refuses to reach build without one; defer to a later unit.
   Recommendation: leave it. Adding a refusal here would be the script claiming to verify a file it
   cannot read.
+  RESOLVED (owner, 2026-09-04): leave it to the review artifact the protocol already requires.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-04 · both forks resolved at the owner's scope-approval turn. F1 was ruled AGAINST
+  the recommendation, taking warn-and-continue, which added S7 and AC7; F2 confirmed the design
+  unchanged.
 
 ## 10. Reuse audit
 

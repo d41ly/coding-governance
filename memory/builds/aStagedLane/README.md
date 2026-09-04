@@ -51,10 +51,10 @@ accident. The classifier that would ground it already runs without a run-state f
   `tools/workflows/unattended-build.js`, so clause 1 of the parallelism rule is unsatisfied.
 
 ## Parked decisions
-- **The grading cutoff is read from a field the graded build authors.** `check-pass-order.sh` reads
-  `opened:` from the working tree, and one character disables the leg for that build. It was
-  recorded as a medium finding in the parent build's closing review. Unit 1 widens the population
-  that field governs without closing it, and carries the fork in its own section 8.
+- **The harness cannot detect its own mandate.** The owner ruled that attended mode WARNS rather
+  than refuses when a run-state file exists, and a workflow script has no filesystem, so the
+  detection is the caller's and a caller that supplies nothing gets no warning. Unit 2 names the
+  limit in its scope rather than implying the warning is reliable.
 - **The harness self-test is on no bar.** `TOOL-dBriefedPass-7` is open:
   `tools/workflows/unattended-build.test.sh` is a 21-arm suite in no manifest, so units 2 and 3 add
   arms to a suite nobody runs. That row says registering it belongs to a unit that specs it, and no
@@ -80,10 +80,10 @@ ids TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file](spec/2026-09-04-spec-TOOL-aStagedLane-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
-| [TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate](spec/2026-09-04-spec-TOOL-aStagedLane-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-04 |
-| [TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief](spec/2026-09-04-spec-TOOL-aStagedLane-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-04 |
-| [TOOL-aStagedLane-4 — the carriers name the classifier and the attended route](spec/2026-09-04-spec-TOOL-aStagedLane-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file](spec/2026-09-04-spec-TOOL-aStagedLane-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate](spec/2026-09-04-spec-TOOL-aStagedLane-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief](spec/2026-09-04-spec-TOOL-aStagedLane-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aStagedLane-4 — the carriers name the classifier and the attended route](spec/2026-09-04-spec-TOOL-aStagedLane-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-04 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).

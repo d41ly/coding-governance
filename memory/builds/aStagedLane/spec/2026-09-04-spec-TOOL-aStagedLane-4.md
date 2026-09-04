@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-4 — the carriers name the classifier and the attended route
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -29,8 +29,12 @@ pass, so what the preceding units build is reachable without reading their sourc
   classifies the file as a pointer that states no rule the method does not, and the attended mode
   must not change that classification. If unit 2's header additions make it state a rule, the row is
   re-classified in this unit rather than left disagreeing.
-- **S5** — the charter's merge-bar section gains one sentence naming the pass-order leg's widened
-  population, because the current text describes a leg that grades unattended builds only.
+- **S5** — the charter's DESCRIPTION of the pass-order leg is deleted rather than corrected.
+  `tools/gate-legs.json` owns what that leg does, and a description beside a source that owns it is
+  the rule this repository breaks most often. What replaces it is a pointer plus a short
+  instruction: where the leg list lives, the command that runs the leg, and when it binds. The edit
+  nets negative bytes, and it removes a sentence that would go stale again the next time the leg's
+  population moves.
 
 ## 3. Non-goals (OUT)
 
@@ -40,8 +44,10 @@ pass, so what the preceding units build is reachable without reading their sourc
 - Not editing the rendered protocol guide. It documents the mandate contract, which none of these
   units changes.
 - Not adding a new carrier file. Every claim here lands in a document that already exists.
-- Not spending charter headroom on prose. The charter edit is one sentence, and the size gate prices
-  every growth against a recorded high-water.
+- Not spending charter headroom on prose. The charter edit nets negative bytes: a description is
+  deleted and a shorter pointer with its instruction replaces it.
+- Not auditing the charter for other descriptions that duplicate a source. S5 removes the one this
+  build makes false; the rest is a separate sweep with its own unit.
 
 ## 4. Design
 
@@ -93,12 +99,15 @@ that does not already know the harness exists never reads that header.
   and reports no undeclared pointer.
 - **AC2** — When the `kit/dogfood doc parity` leg runs, the template and the rendered guide compare
   equal, proving both halves moved in this commit.
-- **AC3** — When `bash tools/check-template-size.sh` runs, it exits 0 and the charter stays inside
-  its ceiling with the growth priced against the recorded high-water.
+- **AC3** — When `bash tools/check-template-size.sh` runs, it exits 0, and the charter's byte count
+  after this unit is LOWER than before it, because S5 deletes more than it adds.
 - **AC4** — When the detect paragraph of `memory/guides/BUILD-METHOD.md` is read, it names the plan
   verb without a mandate qualifier, and the guide contains no second spelling of the four unit
   states.
 - **AC5** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over the tree, it exits 0.
+- **AC6** — When the charter's merge-bar section is read, it carries no description of what the
+  pass-order leg checks, and instead names `tools/gate-legs.json`, the command that runs the leg,
+  and the boundary at which it binds.
 
 ## 7. Gates
 
@@ -116,6 +125,8 @@ that does not already know the harness exists never reads that header.
   re-classify the row and accept the harness as a rule carrier; split the description across both.
   Recommendation: keep it a pointer and let the method carry the semantics. A rule with two carriers
   is the drift shape this repository already pays to detect.
+  RESOLVED (owner, 2026-09-04): keep it a pointer; the method carries the mode semantics. S4 stands
+  and the carriers row does not move.
 
 - **F2 — should the charter sentence in S5 be spent at all?** The charter has a hard ceiling and the
   pass-order leg is already described there in terms that will be wrong after unit 1.
@@ -123,10 +134,18 @@ that does not already know the harness exists never reads that header.
   charter's description and point at the manifest.
   Recommendation: correct it in place. The existing sentence becomes false when unit 1 lands, so
   leaving it is not an option, and correcting it spends no headroom.
+  RESOLVED (owner, 2026-09-04): delete the description and point at the manifest, with a short
+  instruction on what to do with it. This goes AGAINST the recommendation above, which is recorded
+  rather than rewritten, and it is the stronger reading of the derive-over-author rule: correcting
+  the sentence would have left a description to go stale again. S5 and AC6 carry it, and the
+  instruction half is what keeps the pointer usable rather than merely accurate.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-04 · both forks resolved at the owner's scope-approval turn. F1 confirmed S4
+  unchanged; F2 was ruled AGAINST the recommendation, replacing the charter correction with a
+  deletion plus a pointer and instruction, which rewrote S5, added a non-goal and added AC6.
 
 ## 10. Reuse audit
 
