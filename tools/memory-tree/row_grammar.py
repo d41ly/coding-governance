@@ -36,6 +36,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from corpus_ids import parse_conf, parse_conf_line  # the kit's ONE conf parser
 from gen_build_index import unfenced_lines  # the kit's ONE fence reader; see scan()
 
 CHECK = 20
@@ -84,13 +85,19 @@ def resolve_root(start=None):
 
 
 def load_conf(root):
+    """This reader carries NO defaults and REFUSES an absent conf, unlike its four siblings.
+
+    TOOL-aWeldedTribunal-5. The difference is deliberate and is preserved rather than smoothed away:
+    the other four open with a populated defaults dict AND an `os.path.isfile` guard, so an absent
+    conf yields their defaults. This one reads the file unconditionally, so an absent conf RAISES.
+    Routing it through the shared parser with a guard bolted on would have converted a hard failure
+    into a quiet empty-dict success -- coverage removed rather than failed closed, which is the exact
+    class this unit exists to close, reintroduced by the unit closing it.
+
+    Only the PARSE is shared. The disposition on a missing file stays this module's own.
+    """
     conf = {}
-    for line in read(os.path.join(root, ".memory-tree.conf")).split("\n"):
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        k, _, v = line.partition("=")
-        conf[k.strip()] = v.strip().strip('"').strip("'")
+    parse_conf(read(os.path.join(root, ".memory-tree.conf")), conf)
     return conf
 
 

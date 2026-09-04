@@ -12,102 +12,54 @@ authorized-by: prompt
 
 ## The problem this build exists to solve
 
-The owner named eleven OPEN `TOOL` rows and asked for them to be built. Reading each row against
-the source it names, **four of the eleven describe a defect the tree no longer has** — one was
-already marked CLOSED in the backlog itself, two were fixed by `dSealedTally`, and one by
-`DEPL-dRetiredFork-4`. Building those four is not possible: there is nothing left to change.
-Leaving them OPEN is the harm the row-closing pass exists to remove, and this branch's own recent
-history is four merges doing exactly that for a different cluster.
+The owner named eleven OPEN `TOOL` rows. Four describe a defect the tree no longer has, so they are
+closed on cited evidence rather than rebuilt; `TOOL-aWeldedTribunal-8` §4 tabulates the file and line
+that closed each. The other seven are live and were re-measured against source before speccing.
 
-The remaining seven are live and were each re-measured rather than read. Three are holes in the
-fan-out cap hook, which is the only mechanical control this repo has against an agent burst, and
-two of those three were reproduced at exit 0 against the shipped hook. One is a review harness that
-computes its own liveness counters and hands none of them to the agent writing the durable report.
-One is a conf parser divergence that removes coverage rather than failing closed. One is a deploy
-verb that cannot land a file gov started shipping. One is a push boundary that can be gated by a
-hook from another checkout entirely.
+Three are holes in the fan-out cap hook, which is this repo's only mechanical control against an
+agent burst. The rest are a review harness that computes its own liveness counters and reports none
+of them, a conf parser divergence that removes coverage instead of failing closed, a deploy verb
+blind to a file gov started shipping, and a push boundary gated by another checkout's hook.
 
 ## Expected improvements
 
-- **The fan-out cap stops admitting three shapes it was written to deny.** Two are measured
-  evasions today: `for await (…)` and `do { … } while (…)` both carry an unmarked thunk-array fan
-  past the hook at exit 0. The third blanks every line below an unterminated template literal, so
-  rule 3 sees nothing under it.
-- **A degraded review can no longer write a confident report.** `tier2-review.js` gains the
-  run-integrity block its two drift-audit siblings already carry, plus a criterion that reds while
-  the prompt lacks it — so the class cannot silently return.
-- **One conf parser, five readers.** A legal `.memory-tree.conf` spelling the kit's own example
-  neither shows nor forbids currently takes `gotchas.py --check` from rc=1 to rc=0 over an identical
-  planted violation. Coverage is removed, and the gate stays green.
-- **`govkit update` REPORTS a file gov ships that the adopter does not hold, and says the install is
-  INCOMPLETE.** It does not land the bytes; the landing verb is a filed follow-up, because
-  synthesising a receipt row means deciding a role, a commit and an origin the verb has no evidence
-  for. Twelve of one adopter's fourteen claimed kits have descriptor sources with no receipt row;
-  one of them killed every entry point of that adopter's kit for six days under a green bar, and a
-  report at the moment the verb runs is what makes that legible instead of arriving as a crash.
-- **The push boundary is gated by the hook that ships with the pushed tree**, or at minimum says so
-  when it is not.
-- **Four rows stop being open**, each with the evidence that closed it recorded beside it.
+- The cap hook stops admitting four shapes, every one measured at exit 0 before this build.
+- A degraded Tier-2 review can no longer write a confident record.
+- One `.memory-tree.conf` parser, agreeing with the bash half that sources the same file.
+- `govkit update` reports a source the adopter does not hold.
+- The wiring check names the hooks that will actually run.
+- Four rows stop being open.
 
 ## Detriments if this is not built
 
-- Three of the four rules in `agent-cap.js` stay bypassable by spellings that are ordinary
-  JavaScript, not adversarial cleverness. `for await` is what anyone writes over an async iterable.
-- The next Tier-2 review whose lenses half die writes a durable record that cannot say so, and the
-  finding count it reports is read as coverage.
-- The conf divergence is latent HERE and live for any adopter, which is the population this repo
-  ships to. It fails open on a gate, which is this repo's own stated worst shape.
-- The four stale rows keep being re-read, re-triaged and re-worked by later runs. That is what this
-  build's own first hour was spent on.
+- Three of five hook rules stay bypassable by ordinary JavaScript.
+- The next review whose lenses half die writes a record that cannot say so.
+- The conf divergence fails OPEN on a gate, for every adopter.
+- The four stale rows keep being re-triaged, which is what this build's first hour went on.
 
 ## Build-level rules
 
-- **The classification, written before acting on it (M2).** Eight units, all MISSING at the start —
-  no conforming spec carried any of these ids — so every one is authored this run and every one is
-  unreviewed by definition. `TOOL-aWeldedTribunal-7` is additionally FORKED and its fork is
-  resolved in its own §8 before code, never during.
-- **FOUR ROWS ARE CLOSED ON EVIDENCE, NOT BUILT, and each cite is a file and a line rather than a
-  recollection.** This is `TOOL-aWeldedTribunal-8`, and the evidence is:
-  - `TOOL-dScrubbedConduit-2` — already reads `CLOSED` in `memory/backlog/TOOL.md` itself. The
-    owner's list included a row that was never open.
-  - `TOOL-dScaffoldedMirror-22` and `TOOL-aGroundedOrientation-4` — one defect, two rows. Both say
-    `--landed` writes `phase: LANDED` before the check that refuses it. `dSealedTally` moved both
-    `set_fact` calls: `tools/unattended/unattended.sh:2444-2446` now writes `landed-anchor` then
-    `phase` immediately before `stage_or_fail`, with the reason at `:2425`.
-  - `TOOL-aFlaggedScaffold-4` — the `govkit apply` argv blowout. `DEPL-dRetiredFork-4` built
-    `git_pathspec` at `tools/govkit/govkit.py:3724`, using the exact `--pathspec-from-file=-` plus
-    `--pathspec-file-nul` candidate the row proposed, and added an allowlist and an empty-list
-    refusal the row did not ask for.
-- **`TOOL-aScouredKit-25` closes with `TOOL-aWeldedTribunal-6`, not beside it.** That row exists
-  only to record an independent re-confirmation of `TOOL-aFlaggedScaffold-3` and says in its own
-  text to close it against that one rather than work it twice.
-- **`TOOL-aCandidStub-1`'s reachability was MEASURED and it runs through
-  `TOOL-dFoldedVerdict-8`.** Four growth spellings for an empty array literal were piped to the
-  shipped hook: `for (…)`, `.forEach`, a `map` reassignment, and `for await`. The first three exit
-  2. Only the fourth exits 0, and it exits 0 because of the loop-walk hole, not the literal
-  blessing. So unit 2 is sequenced AFTER unit 1 and its acceptance is measured against a tree where
-  unit 1 already landed — otherwise its staged-RED arm passes for the wrong reason.
-- **Three units write `tools/hooks/agent-cap.js`, so M6 clause 1 forbids running them together.**
-  Units 1, 2 and 3 are a three-step chain. The other four code units have disjoint write sets.
-- **`TOOL-aWeldedTribunal-8` writes `memory/backlog/TOOL.md`, a shared mutable record**, so M6
-  clause 3 forbids pairing it with anything. It runs last, alone.
-- **PARALLEL DISPATCH IS DECLARED AND NOT TAKEN, and this is a stated deviation from M6 rather
-  than an oversight.** Units 4, 5, 6 and 7 have proven-disjoint write sets and M6 requires
-  concurrency where disjointness is proven. This run is a single agent with no sanctioned
-  build-pass fan-out primitive: the review protocol's caps govern review agents, and dispatching
-  build passes as subagents is a capability this run was not granted. The passes are therefore
-  sequenced, the write-set declarations are recorded anyway via `--dispatch` so the disjointness
-  claim is on disk and falsifiable, and the cost is wall clock only.
+- **Classification (M2):** eight units, all MISSING at the start, so every spec is authored this run.
+  `TOOL-aWeldedTribunal-7` was additionally FORKED; its fork is resolved in its own §8 before code.
+- **Four rows close on EVIDENCE, not a rebuild.** `TOOL-aWeldedTribunal-8` §4 carries the table.
+- **Unit 2 is sequenced AFTER unit 1 by measurement**, not preference: its defect is only reachable
+  through unit 1's, so an arm written against the old tree would go green for the wrong reason. The
+  four-spelling probe is in that unit's §4.
+- **Three units write `tools/hooks/agent-cap.js`**, so M6 clause 1 makes 1, 2 and 3 a chain. Unit 8
+  writes `memory/backlog/TOOL.md`, a shared mutable record, so M6 clause 3 puts it alone and last.
+- **PARALLEL DISPATCH IS DECLARED AND NOT TAKEN — a stated deviation from M6.** Units 4 to 7 have
+  proven-disjoint write sets, and this run is a single agent with no sanctioned build-pass fan-out
+  primitive. The write sets are recorded through `--dispatch` anyway, so the disjointness claim is on
+  disk and falsifiable; the cost is wall clock only.
 
 ## Parked decisions
 
-None yet. The spec audit's two blockers were both DISPOSED rather than parked, and how is worth a
-line each. `TOOL-aWeldedTribunal-4`'s scanner is DROPPED, because
-`memory/DECISIONS.md:116` records an owner ruling against exactly that scanner and the mandate
-delegates this build's forks, never a ratified owner decision. `TOOL-aWeldedTribunal-7`'s fork
-resolution STANDS and its scoping was corrected: rev-1 implemented "report" with a line that
-increments the counter deciding the exit code, so it shipped the vetoed behaviour under the accepted
-option's name.
+None. Both spec-audit rounds came back BLOCKED and every finding was DISPOSED rather than parked.
+
+Round 2 exited **NON-CONVERGENT** — 17 defects against round 1's 16 — so the loop stopped and the
+recorded disposition is `fold`. Unit 4's scanner was DROPPED against the owner ruling at
+`memory/DECISIONS.md:116`; unit 7's fork resolution STANDS with its scoping corrected. Both review
+records are under `reviews/`, and each unit's §9 names the findings it folded.
 
 <!-- roster:units -->
 
@@ -135,7 +87,7 @@ ids TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aW
 | [TOOL-aWeldedTribunal-2 — a bounded array loses its bound when a later statement grows it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-04 |
 | [TOOL-aWeldedTribunal-3 — the blanked view reports an unterminated scan, and its readers fall back](spec/2026-09-04-spec-TOOL-aWeldedTribunal-3.md) | 3 | 2 | CLOSED | rev-5 | 2026-09-04 |
 | [TOOL-aWeldedTribunal-4 — the tier-2 synthesis prompt carries the liveness counters the run computed](spec/2026-09-04-spec-TOOL-aWeldedTribunal-4.md) | 4 | 2 | CLOSED | rev-3 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by every python reader](spec/2026-09-04-spec-TOOL-aWeldedTribunal-5.md) | 5 | 2 | OPEN | rev-3 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by every python reader](spec/2026-09-04-spec-TOOL-aWeldedTribunal-5.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-04 |
 | [TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-6.md) | 6 | 2 | OPEN | rev-3 | 2026-09-04 |
 | [TOOL-aWeldedTribunal-7 — the wiring check names the hooks that will actually run](spec/2026-09-04-spec-TOOL-aWeldedTribunal-7.md) | 7 | 2 | OPEN | rev-3 | 2026-09-04 |
 | [TOOL-aWeldedTribunal-8 — close the four rows whose defect the tree no longer has](spec/2026-09-04-spec-TOOL-aWeldedTribunal-8.md) | 8 | 1 | OPEN | rev-2 | 2026-09-04 |

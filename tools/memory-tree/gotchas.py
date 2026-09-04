@@ -80,16 +80,19 @@ def write(path, text):
         fh.write(text.encode("utf-8"))
 
 
+# TOOL-aWeldedTribunal-5 -- ONE `.memory-tree.conf` parser for the whole kit. Six readers held an
+# identical naive body while the shell gate SOURCES the same file, so a legal spelling bash accepts
+# and the python half mis-read REMOVED coverage with the gate still green. `row_grammar.py` already
+# used this sys.path pattern to reach a sibling; the edges are new and are priced in the unit's
+# section 4, against a backlog row that claimed reuse here was free.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from corpus_ids import parse_conf, parse_conf_line  # noqa: E402  the kit's ONE conf parser
+
 def load_conf(root: str) -> dict:
     conf = {"MEMORY_ROOT": "memory", "UNIVERSAL_BUDGET": ""}
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
-        for line in read(p).split("\n"):
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            k, _, v = line.partition("=")
-            conf[k.strip()] = v.strip().strip('"').strip("'")
+        parse_conf(read(p), conf)
     return conf
 
 

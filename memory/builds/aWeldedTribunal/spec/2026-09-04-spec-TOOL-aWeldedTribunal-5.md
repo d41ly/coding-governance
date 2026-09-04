@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by every python reader
 
-**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 5
+**Status:** CLOSED · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

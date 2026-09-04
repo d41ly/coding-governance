@@ -30,3 +30,5 @@ base: 9b5ae68820500aafb32d0edde32936991472980c
 2026-09-04T18:37:13Z dispatch · item 6a8743dd TOOL-aWeldedTribunal-1 · reason tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh
 
 2026-09-04T19:01:44Z dispatch · item 38a86de1 TOOL-aWeldedTribunal-4 · reason tools/workflows/tier2-review.js memory/gotchas/degradation-known-but-unreported.md
+
+2026-09-04T19:03:07Z dispatch · item d2191189 TOOL-aWeldedTribunal-5 · reason tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py tools/memory-tree/gen_build_index.py tools/memory-tree/check-arms.py tools/memory-tree/row_grammar.py

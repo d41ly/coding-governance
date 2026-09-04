@@ -102,6 +102,69 @@ def read(path) -> str:
         return fh.read().decode("utf-8", "replace").replace("\r\n", "\n")
 
 
+def parse_conf_line(line: str):
+    """One `.memory-tree.conf` line -> `(key, value)`, or `None` for a line that declares nothing.
+
+    TOOL-aScouredKit-19. SIX readers in this kit held this body and the shell gate SOURCES the same
+    file in bash, so any spelling bash accepts and the python half mis-reads REMOVES coverage while
+    the gate stays green. Reproduced: `MEMORY_ROOT=memory   # note` took `gotchas.py --check` from
+    rc=1 to rc=0 over an identical planted violation, because the python half then walked a directory
+    that does not exist. Coverage removed, not failed closed.
+
+    TWO SPELLINGS BASH ACCEPTS THAT THE OLD BODY DID NOT, both measured against `set -a; . conf`:
+
+        MEMORY_ROOT=memory   # note   ->  memory        (an unquoted inline comment is stripped)
+        export FAMILIES="TOOL DEPL"   ->  TOOL DEPL     (the export prefix is not part of the key)
+
+    AND ONE IT MUST NOT BREAK, which is why the comment strip is not unconditional:
+
+        QUOTED="a # b"                ->  a # b         (a `#` inside quotes is DATA)
+
+    Stripping `#` unconditionally would turn that into `a`, a silent wrong value where today's bug is
+    at least a loud directory miss. So the strip runs BEFORE the quote peel and only on an unquoted
+    `#` that begins a word, which is bash's own rule.
+
+    NOT a general shell grammar, and deliberately: command substitution, parameter expansion, line
+    continuations and quoted whitespace are all legal bash and none is in scope. These two are the
+    spellings an adopter actually writes and the ones the kit's own example neither shows nor forbids.
+    """
+    line = line.strip()
+    if not line or line.startswith("#") or "=" not in line:
+        return None
+    k, _, v = line.partition("=")
+    k = k.strip()
+    if k.startswith("export ") or k.startswith("export\t"):
+        k = k[len("export"):].strip()
+    if not k:
+        return None
+    v = v.strip()
+    # The unquoted-comment strip, before the quote peel. A `#` that OPENS the value is a comment
+    # too (`X=   # note` is an empty value in bash), so the scan starts at position 0.
+    if v[:1] not in ("'", '"'):
+        cut = -1
+        for i, ch in enumerate(v):
+            if ch == "#" and (i == 0 or v[i - 1].isspace()):
+                cut = i
+                break
+        if cut >= 0:
+            v = v[:cut].strip()
+    return k, v.strip('"').strip("'")
+
+
+def parse_conf(text: str, conf: dict) -> dict:
+    """Merge every declaration in `text` into `conf`, which carries the caller's OWN defaults.
+
+    The defaults stay per-reader on purpose: they differ (`CHARTER` and the pins for this module, the
+    universal budget for gotchas, the arms floors for check-arms), and one merged dict would give
+    every reader keys it has no use for and hide which reader depends on which.
+    """
+    for line in text.split("\n"):
+        kv = parse_conf_line(line)
+        if kv is not None:
+            conf[kv[0]] = kv[1]
+    return conf
+
+
 def load_conf(root: str) -> dict:
     conf = {
         "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": DEFAULT_CHARTER,
@@ -110,12 +173,7 @@ def load_conf(root: str) -> dict:
     }
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
-        for line in read(p).split("\n"):
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            k, _, v = line.partition("=")
-            conf[k.strip()] = v.strip().strip('"').strip("'")
+        parse_conf(read(p), conf)
     return conf
 
 
@@ -130,10 +188,14 @@ def read_declared_keys(root: str) -> set:
     out = set()
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
+        # TOOL-aWeldedTribunal-5 S3b. THE SIXTH READER, and it must agree with `load_conf` on keys
+        # or the retired-key and undeclared-CHARTER checks disagree with the parser inside one file.
+        # The docstring above claims it "cannot drift from it — same file, same rule", which the
+        # `export ` handling would have made false the moment only one of the two learned it.
         for line in read(p).split("\n"):
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                out.add(line.partition("=")[0].strip())
+            kv = parse_conf_line(line)
+            if kv is not None:
+                out.add(kv[0])
     return out
 
 
