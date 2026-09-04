@@ -112,6 +112,7 @@ memory/builds/aGradedMandate/README.md
 memory/builds/aProvenReuse/README.md
 memory/builds/aClosedDocket/README.md
 memory/builds/dMispairedQuote/README.md
+memory/builds/aTunedCompass/README.md
 !memory/builds/aUnblockedFleet/README.md - registered BOUND by commit 655fffc5 without measuring the slots, so three of them (problem 1893/900, improvements 719/500, rules 3802/1800) have reddened the leg ever since. That run is PARKED at phase BUILDING, not closed, so this row is a temporary unblock and drains when that run resumes and trims the three slots.
 memory/builds/dBriefedPass/README.md
 memory/builds/dGaugedVintage/README.md

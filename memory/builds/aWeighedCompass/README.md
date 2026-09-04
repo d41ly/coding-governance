@@ -92,5 +92,5 @@ Ids no `spec-audit` record has ever named: TOOL-aWeighedCompass-1.
 
 <!-- gen:build-edges -->
 
-*This build declares no parent and no build declares it as one.*
+- **Child builds:** [aTunedCompass](../aTunedCompass/README.md)
 <!-- /gen:build-edges -->
