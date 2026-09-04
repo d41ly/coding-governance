@@ -84,6 +84,24 @@ check "grown-by-splice receiver → deny" 2 '{"tool_name":"Workflow","tool_input
 check "empty literal never grown → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nawait boundedParallel(batches.map((f) => () => agent(f.claim)), MAX_VERIFIERS)"}}'
 check "grown but the fan is not adjacent → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const batches = []\nbatches.push(f)\nconst out = batches.map((b) => b())\nawait agent(\"one call\")"}}'
 check "concat does not grow the receiver → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nconst more = LENSES.concat(extra)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# ---- the closing diff review's fold. Every arm below FAILED before its fix, and each was
+# ---- reproduced by running the shipped hook rather than argued.
+# A COMMENT MENTIONING A GROWTH GROWS NOTHING. The sweep read `renderCodeView`, which deliberately
+# does not blank block comments, so a comment naming `LENSES.push(` revoked a legal bound.
+check "a block comment naming a push does not take the bound back → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n/* never do LENSES.push(x) here */\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+check "a line comment naming a push does not take the bound back → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n// never do LENSES.push(x)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# A MEMBER CHAIN IS NOT THE TOP-LEVEL NAME. Without a left guard the regex captured the LAST segment,
+# so `state.lenses.push(x)` denied a script naming a variable nothing had touched.
+check "a member-chain push does not revoke an unrelated name → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst lenses = [1,2,3]\nstate.lenses.push(x)\nawait boundedParallel(lenses.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# A REMOVAL-ONLY SPLICE SHRINKS. Denying it states "was GROWN" about an array that got smaller.
+check "removal-only splice does not take the bound back → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3,4,5]\nLENSES.splice(0, 2)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+check "a 3-argument splice INSERTS, so it still takes the bound back → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nLENSES.splice(0, 0, extra)\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)"}}'
+# THE TAKE-BACK CASCADES. A derivation is bounded only because its SOURCE was; when the source loses
+# its bound the derived name must lose it too, or an unbounded fan is admitted one `.filter()` away.
+# Two arms, one per sweep — the reassignment sweep had this hole before this build and now does not.
+check "push-then-derive: the derived name loses its bound too → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst batches = []\nbatches.push(f)\nconst groups = batches.filter(Boolean) // gov:fixed-verifiers\nawait boundedParallel(groups.map((g) => () => agent(g)), MAX_VERIFIERS)"}}'
+check "reassign-then-derive: the derived name loses its bound too → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nlet items = [1, 2]\nitems = allFindings\nconst groups = items.filter(Boolean) // gov:fixed-verifiers\nawait boundedParallel(groups.map((g) => () => agent(g)), MAX_VERIFIERS)"}}'
+check "derive from a source that KEEPS its bound → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\nconst groups = LENSES.filter(Boolean) // gov:fixed-verifiers\nawait boundedParallel(groups.map((g) => () => agent(g)), MAX_VERIFIERS)"}}'
 
 # ---- the blanked view reports an unterminated scan (TOOL-aWeldedTribunal-3) ---------------------
 # The blanked view carries its mode ACROSS lines, correctly, because a template literal spans them.

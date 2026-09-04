@@ -62,7 +62,7 @@ reports a divergence naming both hashes, the resolved path, and the branch the s
 on. A hook this tree does not TRACK prints a `skip` rather than a finding.
 
 **It is a `note`, and that is the decision rather than an omission.** `unwired` is what
-`check-wiring.sh:809` turns into the exit code, and `.unattended.conf` makes `--check` an unattended
+`check-wiring.sh`'s final line turns into the exit code, and `.unattended.conf` makes `--check` an unattended
 run's precondition — so redding here would refuse every unattended run whenever a sibling checkout
 moved to a branch touching `.githooks/`. A primary tree parked on a feature branch is a NORMAL state
 of this layout, and a gate that reds on a structural condition is a gate that gets bypassed.

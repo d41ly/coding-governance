@@ -199,7 +199,7 @@ fi
 # which is a separate decision about what the push boundary REFUSES.
 #
 # IT IS A `note`, NOT AN `UNWIRED`, and that is the load-bearing half. `unwired` is exactly what
-# line 809 turns into this script's exit code, and `.unattended.conf` makes `--check` an unattended
+# this script's final line turns into its exit code, and `.unattended.conf` makes `--check` an unattended
 # run's precondition — so an UNWIRED line here would refuse every unattended run whenever a sibling
 # checkout moved to a branch that touched `.githooks/`. A primary tree parked on a feature branch is
 # a NORMAL state of this layout, and a gate that reds on a structural condition is a gate that gets

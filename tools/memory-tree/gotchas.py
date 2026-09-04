@@ -86,7 +86,7 @@ def write(path, text):
 # used this sys.path pattern to reach a sibling; the edges are new and are priced in the unit's
 # section 4, against a backlog row that claimed reuse here was free.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from corpus_ids import parse_conf, parse_conf_line  # noqa: E402  the kit's ONE conf parser
+from corpus_ids import parse_conf  # noqa: E402  the kit's ONE conf parser
 
 def load_conf(root: str) -> dict:
     conf = {"MEMORY_ROOT": "memory", "UNIVERSAL_BUDGET": ""}

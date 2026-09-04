@@ -7504,7 +7504,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _gap_selection = [e for e in (receipt.get("kits") or []) if e in descs]
         if kits:
             _gap_selection = [e for e in _gap_selection if e in set(kits)]
-        _gaps = coverage_rows(root, target, deploy, descs, _gap_selection, r)
+        # THE THROWAWAY REPORT IS HOISTED ABOVE **BOTH** CONSUMERS, and the closing diff review is
+        # why. The first cut gave it to `decline_findings` alone and handed `coverage_rows` the run's
+        # own `r` -- but `coverage_rows` reaches `planned_writes`, which `r.fail`s on a malformed
+        # descriptor, so a coverage PROBE could fail `update --write` AFTER the bytes landed and
+        # suppress the receipt re-stamp. The comment two paragraphs down claimed the refusal surface
+        # was unchanged while the line above it changed exactly that. A report that can fail the verb
+        # is not a report.
+        _gr = Report()
+        _gaps = coverage_rows(root, target, deploy, descs, _gap_selection, _gr)
         # A DECLINE MAY ONLY HIDE A GAP IN A RUN THAT ALSO GRADES IT. `coverage_rows` does NOT
         # consult the decline registry -- its body filters on kind/missing/tracked and nothing else
         # -- and BOTH existing call sites grade the result themselves. Ungraded, this would print
@@ -7519,12 +7527,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # `check` and `plan` pass their own Report because grading IS their job; this verb's is not.
         _gap_declined: dict = {}
         if _gaps or deploy.get("decline"):
-            _gr = Report()
             _gcommit = git(root, "rev-parse", "HEAD").strip()
             _gap_declined = decline_findings(root, target, deploy, descs, _gap_selection,
                                              _gcommit, _gaps, _gr)
-            for _p in _gr.problems:
-                print(f"govkit update --   decline registry: {_p}")
+        for _p in _gr.problems:
+            print(f"govkit update --   probe finding (NOT a verb failure): {_p}")
         _gap_open = [g for g in _gaps if _gap_declined.get((g["kit"], g["dest"])) is None]
         for _g in _gaps:
             _st = _gap_declined.get((_g["kit"], _g["dest"]))

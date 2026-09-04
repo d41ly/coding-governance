@@ -733,6 +733,9 @@ function fanoutFindings(script) {
   const ok = new Set()
   // S4 - one reason per refused marked assignment, keyed by the name it binds.
   const markedWhy = new Map()
+  // TOOL-aWeldedTribunal-2, closing-review fold: which bounded names a blessing LEANED ON, so a
+  // take-back can follow the derivation instead of stopping at the mutated name.
+  const derivedFrom = new Map()
   // TOOL-dFoldedVerdict-4: candidates admitted by `gov:sequential-agents`, judged again after the
   // scan by the one-call sweep. Collected rather than cleared immediately, because the ninth
   // condition is about a GROUP and no per-line pass can see one.
@@ -813,6 +816,17 @@ function fanoutFindings(script) {
       const branches = parseBranches(rhs)
       const bad0 = branches.find((b) => !boundedBranch(b, name, consts, ok))
       if (!grows && branches.length && bad0 === undefined) {
+        // TOOL-aWeldedTribunal-2, closing-review fold. RECORD WHAT THIS BLESSING LEANED ON. A
+        // derivation like `const groups = batches.filter(Boolean)` is bounded only because
+        // `batches` was; when a later take-back removes `batches`, `groups` kept a bound nothing
+        // supported any more, and an unbounded agent-per-finding fan was admitted one `.filter()`
+        // away. The cascade below drops the derived name too.
+        const srcs = new Set()
+        for (const br of branches) {
+          const lead = /^\s*([A-Za-z_$][\w$]*)/.exec(String(br))
+          if (lead && lead[1] !== name && ok.has(lead[1])) srcs.add(lead[1])
+        }
+        if (srcs.size) derivedFrom.set(name, srcs)
         ok.add(name)
         // D10 - the reason is a CACHE and both scan passes write it. A name refused on pass 1 for a
         // declaration-order reason and ACCEPTED on pass 2 kept the pass-1 text, so a later refusal
@@ -921,8 +935,18 @@ function fanoutFindings(script) {
   // is not tracked, because this file tracks names and not values; and `batches[i] = x` past the end
   // and `batches.length = n` both grow an array and are not here, because a regex over
   // `name[<expr>] =` matches every ordinary element write and denies innocent files.
-  const GROWS_RECEIVER = /\b([A-Za-z_$][\w$]*)\s*\.\s*(?:push|unshift|splice)\s*\(/g
-  code.forEach((l) => {
+  // THE LEFT GUARD IS LOAD-BEARING. `\b` alone captures the LAST segment of a member chain, so
+  // `state.lenses.push(x)` withdrew the bound from an unrelated top-level `lenses` and denied a
+  // legal harness naming a variable nothing had touched. Reproduced by the closing review.
+  const GROWS_RECEIVER = /(?:^|[^.\w$)\]])([A-Za-z_$][\w$]*)\s*\.\s*(?:push|unshift|splice)\s*\(/g
+  // AND THE SWEEP READS A COMMENT-FREE VIEW. `code` here is `renderCodeView`, which deliberately
+  // does NOT blank block comments — so `/* never do LENSES.push(x) */` revoked LENSES' bound and
+  // denied a correctly-bounded fan. Measured BASE rc=0 -> rc=2 before this guard. The blanked view
+  // blanks comments AND literal contents, which is exactly the population this sweep wants: a
+  // `.push(` inside a string or a comment grows nothing.
+  const growView = renderBlankedLiterals(script)
+  const growCode = growView.unterminated ? perLineBlanked(script) : growView.code
+  growCode.forEach((l) => {
     let g
     GROWS_RECEIVER.lastIndex = 0
     while ((g = GROWS_RECEIVER.exec(l))) {
@@ -930,12 +954,39 @@ function fanoutFindings(script) {
       // announcing that a bound was withdrawn from a name that never had one is that guard's own
       // recorded defect, right verdict and false reason.
       if (!ok.has(g[1])) continue
+      // A REMOVAL-ONLY `splice` SHRINKS. `LENSES.splice(0, 2)` takes two elements OUT, and revoking
+      // a bound for that is a denial whose stated reason — "was GROWN" — is false about the array
+      // it names. Only a 3-plus-argument splice inserts. Two args or fewer: not a growth.
+      if (/\.\s*splice\s*\($/.test(l.slice(0, g.index + g[0].length))) {
+        const call = joinCall(growCode, growCode.indexOf(l), g.index + g[0].length - 1)
+        if (call && topLevelArgs(call.text).length < 3) continue
+      }
       ok.delete(g[1])
       markedWhy.set(g[1], `\`${g[1]}\` was GROWN by a mutation after its bounded assignment, which takes the bound back`)
     }
   })
 
-  const bad = []
+  // THE CASCADE. Both take-back sweeps above remove the name they matched and stop there, so a
+  // DERIVED name kept a bound its source no longer has: `const groups = batches.filter(Boolean)`
+  // with the marker still exits 0 after `batches.push(...)` revoked `batches`. Iterated to a fixed
+  // point rather than one pass, because a derivation can lean on a derivation. The pre-existing
+  // reassignment sweep had the same hole and is covered here too, since both write to the same
+  // `ok` set and this runs after both.
+  for (let pass = 0; pass < derivedFrom.size + 1; pass++) {
+    let moved = false
+    derivedFrom.forEach((srcs, n) => {
+      if (!ok.has(n)) return
+      srcs.forEach((s) => {
+        if (ok.has(s)) return
+        ok.delete(n)
+        markedWhy.set(n, `\`${n}\` was derived from \`${s}\`, whose bound was taken back, so this one no longer holds either`)
+        moved = true
+      })
+    })
+    if (!moved) break
+  }
+
+  const bad = []
   lines.forEach((raw, i) => {
     const l = code[i]
     if (!/\bagent\s*\(/.test(l)) return

@@ -138,16 +138,31 @@ def parse_conf_line(line: str):
     if not k:
         return None
     v = v.strip()
-    # The unquoted-comment strip, before the quote peel. A `#` that OPENS the value is a comment
-    # too (`X=   # note` is an empty value in bash), so the scan starts at position 0.
-    if v[:1] not in ("'", '"'):
-        cut = -1
-        for i, ch in enumerate(v):
-            if ch == "#" and (i == 0 or v[i - 1].isspace()):
-                cut = i
-                break
-        if cut >= 0:
-            v = v[:cut].strip()
+    # A QUOTED VALUE AND AN UNQUOTED ONE NEED DIFFERENT SCANS, and the first cut of this function
+    # had only the second — so `KEY="v"  # note` kept both the comment AND a stray quote, which is
+    # live on five lines of this kit's own shipped `.memory-tree.conf.example`. Found by the closing
+    # diff review, reproduced against `set -a; . conf`.
+    #
+    # QUOTED: take the text between the opening quote and its MATCH, then treat only the remainder
+    # as comment territory. That is what makes `Q="a # b"` keep its `#` while `Q="a"  # note` loses
+    # its trailing one — the two directions this parser has to get right at once.
+    if v[:1] in ("'", '"'):
+        q = v[0]
+        end = v.find(q, 1)
+        if end >= 0:
+            return k, v[1:end]
+        # An UNTERMINATED quote is not something to guess at. Fall through to the unquoted scan,
+        # which is what the old body did for every value, so this is no worse than before for a
+        # spelling bash itself would reject.
+    # UNQUOTED: a `#` that begins a word starts a comment, including at position 0 — `X=   # note`
+    # is an empty value in bash, not the literal `# note`.
+    cut = -1
+    for i, ch in enumerate(v):
+        if ch == "#" and (i == 0 or v[i - 1].isspace()):
+            cut = i
+            break
+    if cut >= 0:
+        v = v[:cut].strip()
     return k, v.strip('"').strip("'")
 
 
@@ -791,6 +806,27 @@ def cmd_selftest() -> int:
         t = os.path.join(base, "clean"); os.makedirs(t)
         c = _scratch(t)
         arm("a clean corpus produces no finding", None, lambda: checks(walk(t, c)))
+
+        # ---- TOOL-aWeldedTribunal-5: the conf parser, graded against BASH rather than asserted.
+        # ---- bash is the reference because bash is what the format IS; the python half is the copy,
+        # ---- and six readers held an identical naive one. Each pair below was measured with
+        # ---- `set -a; . conf` before it was written here.
+        for _line, _want in [
+            ("MEMORY_ROOT=memory   # note", ("MEMORY_ROOT", "memory")),
+            ("export FAMILIES=\"TOOL DEPL\"", ("FAMILIES", "TOOL DEPL")),
+            # THE TWO DIRECTIONS THIS PARSER HAS TO GET RIGHT AT ONCE, and the closing diff review
+            # found the first cut got only one: a `#` INSIDE quotes is data, a `#` after the closing
+            # quote is a comment. Getting the first alone kept a trailing comment and a stray quote,
+            # live on five lines of this kit's own shipped conf example.
+            ("Q=\"a # b\"", ("Q", "a # b")),
+            ("R=\"v\"  # note", ("R", "v")),
+            ("T=   # empty", ("T", "")),
+            ("S=plain", ("S", "plain")),
+        ]:
+            arm("conf parse agrees with bash: %s" % _line, repr(_want),
+                (lambda ln=_line: repr(parse_conf_line(ln))))
+        arm("a blank line declares nothing", "None", lambda: repr(parse_conf_line("   ")))
+        arm("a full-line comment declares nothing", "None", lambda: repr(parse_conf_line("# x=1")))
 
         # 13 — two build folders claiming one id.
         t2 = os.path.join(base, "coll"); os.makedirs(t2)

@@ -36,7 +36,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from corpus_ids import parse_conf, parse_conf_line  # the kit's ONE conf parser
+from corpus_ids import parse_conf  # the kit's ONE conf parser
 from gen_build_index import unfenced_lines  # the kit's ONE fence reader; see scan()
 
 CHECK = 20
