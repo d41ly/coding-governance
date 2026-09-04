@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it
 
-**Status:** OPEN · rev-3 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 6 · ratified 2026-09-04
+**Status:** CLOSED · rev-4 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 6 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -104,9 +104,20 @@ question is already answered correctly somewhere in this file and simply is not 
 
 ### Where it runs
 
-After `rows_all` is scoped by `--kits` and before the classification loop, so the gap lines and the
-row verdicts appear in one report and the summary can count both. The scope filter runs first for
-S4: `coverage_rows` takes `selection`, so the same kit set that narrowed `rows_all` narrows it.
+**AFTER every refusal this verb already makes**, immediately before the unclaimed-sources report and
+the three summary exits. Rev-3 said "after `--kits` scoping and before the classification loop", and
+that was MEASURED WRONG: `coverage_rows` calls `planned_writes`, which RAISES on an out-of-tree
+prefix, so the `-11` escape fixture's GRADED refusal became a hard abort and its self-test arm went
+from pass to fail. `index_read`'s own header in this same file records that class for out-of-tree
+paths — raising on one turns a graded refusal into an abort and changes the verb's exit code.
+
+**A report may never pre-empt a refusal.** The whole pass is additionally wrapped so it cannot raise
+at all: an exception prints `coverage: UNAVAILABLE` naming the type and message, which is a different
+fact from zero gaps and says so. The exit code is never touched — a coverage report is not a merge
+verdict.
+
+The `--kits` scope still binds: `_gap_selection` is the receipt's claimed entries intersected with
+the descriptors, narrowed by `--kits` when given.
 
 ### The summary
 
@@ -241,6 +252,15 @@ saying which. Rev-2 cited the pair and prescribed one half of it.
   to a throwaway Report whose problems print, and AC6c observes the exit code. **M8:** S1b makes
   `update` the third call site and three enumerations in the source say two; S4b renumbers them.
   **M10:** §7 prescribed half the pair it cited.
+
+- rev-4 · 2026-09-04 · corrected at BUILD time. Rev-3's stated insertion point put the gap pass
+  BEFORE the classification loop, and running the govkit self-test refuted it: `coverage_rows` reaches
+  `planned_writes`, which raises on the `-11` escape fixture's out-of-tree prefix, so that fixture's
+  graded refusal became a hard abort and its arm failed. Confirmed as MINE rather than pre-existing by
+  running the same suite against the stashed-clean tree, where all arms held. The pass now runs after
+  every refusal and is wrapped so it cannot raise; §4 records both. This is the same out-of-tree class
+  `index_read`'s header already documents in this file, which is worth noting: the file warned about
+  it and the first cut walked into it anyway.
 
 ## 10. Reuse audit
 
