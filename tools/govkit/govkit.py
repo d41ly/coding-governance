@@ -3484,6 +3484,30 @@ def hook_probe(target: pathlib.Path) -> tuple[str, str]:
     return "block", (out.stdout + out.stderr).strip()
 
 
+def check_paths_never_lost(before, after, excused) -> bool:
+    """DEPL-dSealedTally-3. The standing predicate over PATHS, which a count cannot express.
+
+    `count_never_falls` grades a TOTAL, so since the relaxation to "never falls" a run that deletes
+    one tracked file and lands another satisfies it and reports green. That is a real regression
+    shape and a count cannot see it.
+
+    THE OBVIOUS FIX IS WRONG AND IS RECORDED HERE SO IT IS NOT RE-PROPOSED. `set(before) <=
+    set(after)` reds on a LEGAL rename, measured on `tools/demo/content.txt`: a rename removes the
+    old path, so the subset never holds for a run that moved anything. An assertion that fires on
+    correct work is worse than the gap it closes, because it teaches everyone to ignore the arm.
+
+    So the third argument is the whole design. `excused` holds the paths a run LEGITIMATELY removed,
+    and it must come from what the run REPORTED -- its own `renamed` verdict lines, or the receipt
+    read before the run -- never from the difference being graded. Derived from that difference it
+    would be a restatement of it, and the predicate could not fail.
+
+    THE DIRECTION MATTERS AND rev-1 OF THE SPEC HAD IT BACKWARDS. What leaves `before` on a rename
+    is the OLD path, so `excused` holds pre-rename paths. Excusing the destination excuses a path
+    that was never lost, and the predicate would still red on every legal rename.
+    """
+    return set(before) - set(after) <= set(excused)
+
+
 def count_never_falls(before: int, after: int) -> bool:
     """The standing predicate, as one testable value: a run without `--write-withdrawals` may raise
     the target's tracked-file count and may never lower it.
@@ -3765,12 +3789,62 @@ def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[
     """
     at_stage0: dict[str, tuple[str, str]] = {}
     present: set[str] = set()
+
+    # DEPL-dSealedTally-4 S4. OUT-OF-TREE PATHS ARE FILTERED, NOT RAISED ON, and the difference
+    # is the whole point of the liveness assertion below. `git ls-files` exits 128 for a path
+    # outside the repository -- measured, with `fatal: ... is outside repository` on stderr --
+    # and that is an ANSWER rather than a probe failure: such a path is definitionally absent
+    # from THIS index. Raising on it turns a graded refusal into a hard abort and changes the
+    # verb's exit code, which is exactly what the first cut of this unit did to the escape arm
+    # in `tools/govkit/selftest.py`: the rename-destination probe for a `prefix` that climbs out
+    # of the tree stopped reaching its own containment refusal.
+    #
+    # Filtered HERE so all callers inherit it, using the same resolve/relative_to idiom the
+    # rename-destination containment check already uses. A filtered path is simply left out of
+    # both return values, which is what "absent" means to every caller.
+    # F5. LEXICAL, NOT RESOLVED. `.resolve()` follows symlinks, so a TRACKED symlink that points
+    # outside the tree resolved outside it and was filtered away -- reported absent from an index it
+    # is really in, which is the same false-absent this whole unit exists to remove, reintroduced by
+    # its own filter. The question here is about the PATH git was given, and git paths are
+    # repo-relative: one escapes when its normalised form climbs out or is absolute.
+    _inside: list[str] = []
+    for _p in paths:
+        _n = os.path.normpath(_p).replace("\\", "/")
+        if os.path.isabs(_n) or _n == ".." or _n.startswith("../"):
+            continue
+        _inside.append(_p)
+    paths = _inside
+
     for i in range(0, len(paths), 400):
         chunk = paths[i:i + 400]
         if not chunk:
             continue
         out = subprocess.run(["git", "-C", str(target), "ls-files", "-s", "-z", "--", *chunk],
                              capture_output=True, text=True, check=False)
+
+        # THE LIVENESS ASSERTION. It sits INSIDE the loop body, so an empty `paths` still spawns
+        # nothing -- the empty case is handled by this loop not executing at all, never by the
+        # `if not chunk` guard above, which is unreachable for every input and which a spec
+        # revision named as load-bearing without checking.
+        #
+        # `check=False` with no returncode read is the DEAD-PROBE shape: a chunk that fails
+        # produces empty stdout, so every path in it parses as absent-from-index, and "absent"
+        # is exactly the answer that lets a writing verb decide a path is free to write -- in a
+        # repository gov does not own. So the refusal says what the caller would OTHERWISE have
+        # concluded, because an operator who reads only "git failed" does not learn which
+        # decision was about to be taken on the strength of it.
+        #
+        # Everything reaching here is INSIDE the tree, per the filter above, so a non-zero exit
+        # now means the repository or the invocation is broken and nothing else.
+        if out.returncode != 0:
+            _idx_err = (out.stderr or "").strip() or "(nothing on stderr)"
+            raise Refusal(
+                f"reading the index failed: `git ls-files` exited {out.returncode} over a "
+                f"chunk of {len(chunk)} path(s) starting at {chunk[0]!r}. Git said: "
+                f"{_idx_err}. Refusing rather than reading the empty result as an answer: "
+                f"every path in that chunk would have been reported ABSENT from the index, "
+                f"and absent is what tells a writing verb a path is free to write here")
+
         for rec in out.stdout.split("\0"):
             if not rec.strip():
                 continue
@@ -4524,7 +4598,14 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # all. A row whose path the target does not track gets no `oid`, which is a true statement about
     # a target that holds no index entry for it.
     _landed = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES]
-    _idx, _ = index_read(target, _landed) if _landed else ({}, set())
+    # F4. MID-WRITE, so it disposes rather than raises. `index_read` began raising a `Refusal`
+    # in this build; uncaught here it aborts `apply` after files are on disk and before the receipt
+    # is written, which is the half-install-with-no-receipt state this verb is built to avoid.
+    try:
+        _idx, _ = index_read(target, _landed) if _landed else ({}, set())
+    except Refusal as _ap_idx_err:
+        r.fail(f"could not read the index after writing: {_ap_idx_err}")
+        _idx = {}
     for w in rows:
         if w.get("role") in LANDABLE_ROLES and w["path"] in _idx:
             w["oid"] = _idx[w["path"]][1]
@@ -4757,7 +4838,12 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # the renormalize moves.
     if staged or _renormalized:
         _re = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES and w.get("path")]
-        _idx2, _ = index_read(target, sorted(set(_re))) if _re else ({}, set())
+        # F4. MID-WRITE, disposed for the reason the first reader above carries.
+        try:
+            _idx2, _ = index_read(target, sorted(set(_re))) if _re else ({}, set())
+        except Refusal as _ap_idx_err2:
+            r.fail(f"could not read the index after writing: {_ap_idx_err2}")
+            _idx2 = {}
         for w in rows:
             if w.get("role") in LANDABLE_ROLES and w.get("path") in _idx2:
                 w["oid"] = _idx2[w["path"]][1]
@@ -5921,6 +6007,42 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
           f"vintages, at >= {RENAME_SIMILARITY_PERCENT}% similarity")
     rename_dests: dict[str, dict[str, list[str]]] = {}
 
+    def resolve_rename_dests(eid: str) -> None:
+        """Resolve ONE kit's source-to-destination map into `rename_dests`, idempotently.
+
+        DEPL-dSealedTally-2. Extracted so the eager loop below and `resolve_renamed`'s own guard
+        call ONE implementation. The body is what `resolve_renamed` used to inline.
+        """
+        if eid in rename_dests or eid not in descs:
+            return
+        _d, _p = descs[eid]
+        _res = resolve_entry(root, _d, target_context(target, deploy, eid, _d))
+        _by_src: dict[str, list[str]] = {}
+        for _dest, _w in _res["writes"].items():
+            if _w.get("src"):
+                _by_src.setdefault(_w["src"], []).append(_dest)
+        for _u in _res["unlanded"]:
+            if _u.get("src"):
+                _by_src.setdefault(_u["src"], []).append(_u["dest"])
+        rename_dests[eid] = {k: sorted(set(v)) for k, v in _by_src.items()}
+
+    # DEPL-dSealedTally-2. EAGERLY, before the walk, over the same population the unclaimed-source
+    # landing iterates. The fill used to live inside `resolve_renamed`, which is reached only from
+    # the `classify_row` call at 6091 and only on the rename branch -- so a kit whose rows all take
+    # one of the SEVEN `continue`s above that call (6004, 6015, 6018, 6022, 6041, 6065, 6089) left
+    # `rename_dests[eid]` empty, the landing's `_decided` set was empty for that kit, and its rename
+    # DESTINATION was landed as a new source. Two copies of one gov file, in a tree gov does not own.
+    #
+    # WRAPPED, and that is not defensive habit. Before this hoist `resolve_entry` ran only for kits
+    # that HAVE a rename and are in `descs`; running it for every kit moves any Refusal it raises
+    # onto a path that previously never reached it, so an unresolvable descriptor would abort a run
+    # that used to skip it. The landing block below makes the same call under the same `except`.
+    for _eid_pre in (kits or claimed):
+        try:
+            resolve_rename_dests(_eid_pre)
+        except Refusal:
+            continue
+
     def resolve_renamed(row: dict) -> tuple[str, str] | None:
         """gov's new source for this row, and the ONE destination the descriptor puts it at.
 
@@ -5953,17 +6075,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', and this row "
                   f"names kit '{eid}', which no registry entry claims")
             return None
-        if eid not in rename_dests:
-            d, _p = descs[eid]
-            res = resolve_entry(root, d, target_context(target, deploy, eid, d))
-            by_src: dict[str, list[str]] = {}
-            for _dest, _w in res["writes"].items():
-                if _w.get("src"):
-                    by_src.setdefault(_w["src"], []).append(_dest)
-            for _u in res["unlanded"]:
-                if _u.get("src"):
-                    by_src.setdefault(_u["src"], []).append(_u["dest"])
-            rename_dests[eid] = {k: sorted(set(v)) for k, v in by_src.items()}
+        resolve_rename_dests(eid)
         dests = rename_dests[eid].get(new) or []
         if len(dests) != 1:
             print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', which kit "
@@ -6208,10 +6320,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         computed until later in a write run; it says so in its own output rather than pretending.
         """
         _claimed = {str(f.get("path")) for f in (receipt.get("files") or [])}
+        # DEPL-dSealedTally-1. NARROWED THE SAME WAY THE LANDING BLOCK IS, and this was a live
+        # defect rather than tidiness. `DEPL-dSealedTally-2` narrowed the landing's copy of this
+        # loop and left THIS one alone, so once the rename map was filled eagerly the classifier
+        # treated every declared destination of every kit as already-decided and answered ZERO.
+        # The read-only preview is this function; the write path had its own inline loop. So the
+        # preview reported "0 would land" on a run that landed one -- a preview disagreeing with
+        # the write, which is the exact failure the preview was built to prevent.
+        #
+        # The two copies are still two, and that is recorded rather than hidden: the landing loop
+        # below is not yet routed through this function. `[-ST1] AC9` asserts they AGREE, so the
+        # next divergence reds instead of shipping.
         _dec = set(_withdrawn_paths)
         for _m in rename_dests.values():
-            for _dl in _m.values():
-                _dec.update(_dl)
+            for _new_src in renames.values():
+                _dec.update(_m.get(_new_src) or [])
         _land, _ref = [], []
         for _eid in (kits or claimed):
             _d0 = descs.get(_eid)
@@ -6257,7 +6380,18 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                         "not name it, so gov did not put it there"))
                     continue
                 _land.append((_dest, _eid, _row0))
-        return [x[0] for x in _land], _ref
+        # DEPL-dSealedTally-1 S1. THE TRIPLES ARE RETURNED WHOLE. This function already
+        # built `(dest, kit, row)` and then threw two thirds of it away at the return, so
+        # the write path could not learn WHICH KIT a landing belongs to -- which is exactly
+        # what `touched_kits` needs in order to baseline a landed-only kit before the write
+        # loop. The spec asked for pairs; triples are that plus the resolved row the landing
+        # writes from. THE ROW IS CURRENTLY UNCONSUMED: the write path reads only the kit id,
+        # and an earlier version of this comment claimed the row saved a second resolve,
+        # which nothing does. It is kept because the landing loop below is the caller that
+        # will want it when it is finally routed through this function, and dropping it now
+        # would change the shape twice. Stated rather than implied, so the next reader does
+        # not go looking for the saving.
+        return _land, _ref
 
     # ===================== THE UNCLAIMED-SOURCE PREVIEW, ON THE READ-ONLY PATH ==================
     # THE `would land` BRANCHES WERE DEAD CODE. The landing block sits far below this return, so on
@@ -6277,12 +6411,25 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         print(f"govkit update — unclaimed sources: {len(_pv_land)} would land · "
               f"{len(_pv_ref)} would be refused  [preview: withdrawals are decided later in a "
               f"write run, so a row here may yet be withdrawn]")
-        for _p0 in _pv_land:
+        for _p0, _e0, _r0 in _pv_land:
             print(f"govkit update —   would land {_p0}")
         for _p0, _why0 in _pv_ref:
             print(f"govkit update —   would REFUSE {_p0}: {_why0}")
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
         return r.emit()
+
+    # DEPL-dSealedTally-1 S1. THE WRITE PATH'S OWN CALL, and it has to be here rather than
+    # reusing the preview above: that call sits inside `if not write:` and the branch RETURNS,
+    # so a `--write` run never reaches it. rev-2 of this spec named the preview call as the
+    # source and round 2 of the audit caught that it is unreachable from here.
+    #
+    # THE WITHDRAWAL SET IS EMPTY, because `withdrawn_rows` is not built until the write loop
+    # below. For this purpose that is safe in the direction it errs: it can only NAME a kit
+    # that turns out not to need a baseline, and baselining a kit the run does not touch costs
+    # one `run_kit_check` and grades nothing wrongly. It cannot MISS a kit, which is the
+    # direction that would leave a landed-only kit with no baseline and no rollback.
+    _land_pre, _ = derive_unclaimed_candidates(set())
+    _landed_kits_pre = {_e for _d0, _e, _r0 in _land_pre}
 
     outbox = target / ".governance" / "outbox"
     outbox.mkdir(parents=True, exist_ok=True)
@@ -6323,8 +6470,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _paths = [a["row"]["path"]]
         if a["verdict"] == "renamed" and a["c"].get("renamed_to"):
             _paths.append(a["c"]["renamed_to"][1])
+        # DEPL-dSealedTally-1. `origin` DECLARED, so the restore branch can tell a receipt
+        # row it must put back from a row this run MINTED and must remove.
         snap_rows.append({"kit": a["row"].get("kit"), "row": a["row"], "paths": _paths,
-                          "fields": {k: a["row"][k] for k in ROLLBACK_FIELDS if k in a["row"]}})
+                          "origin": "table",
+                          "fields": {k: a["row"][k] for k in ROLLBACK_FIELDS
+                                     if k in a["row"]}})
 
     # THE INDEX SIDE IS `-7`'s READER, not a second one. `index0` is the batched read the preamble
     # already took over every receipt path; a rename DESTINATION is by definition not one of those,
@@ -6344,7 +6495,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # S4's POPULATION, and the reason the baseline is affordable: exactly the kits this run is about
     # to write to, which is exactly the set the after-pass will check. Baselining every CLAIMED kit
     # would run checks for kits the run never touches, which is the whole-bar behaviour §3 refuses.
-    touched_kits = [e for e in claimed if any(s["kit"] == e for s in snap_rows)]
+    # DEPL-dSealedTally-1 S1. WIDENED BY THE LANDED SET. A kit whose ONLY change is a landed
+    # source has no acted row, so no snapshot entry, so without this it gets no baseline --
+    # and the verify pass below would either skip it entirely or raise on a missing key.
+    touched_kits = [e for e in claimed
+                    if any(s["kit"] == e for s in snap_rows) or e in _landed_kits_pre]
     orphan_kits = sorted({(s["kit"] or "(no kit)") for s in snap_rows if s["kit"] not in claimed})
     baseline: dict[str, tuple[str, str, int | None]] = {}
     for _eid in touched_kits:
@@ -6457,7 +6612,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # RECEIPT's paths and a rename destination is by definition not one of them, so a
             # tracked file there whose worktree copy the operator removed is invisible to `exists()`
             # — and `git mv` would take its index entry without a word.
-            _, _at_dest = index_read(target, [new_dest])
+            # DEPL-dSealedTally-4. A MID-WRITE CALLER, and one of THREE that catch: this one,
+            # the pre-landing read below, and the two in `_cmd_apply`. An earlier version of
+            # this comment said "THE ONE", which stopped being true the moment the landing
+            # gained a reader of its own.
+            # Every other `index_read` runs before this verb has written anything, so letting
+            # the refusal reach the verb boundary costs nothing there. This one runs INSIDE the
+            # write walk: raising here would abort a part-written target and never reach the
+            # verify-and-rollback pass, which is the harm this build is otherwise closing. So it
+            # fails the ROW and continues, and the run reaches its own rollback.
+            try:
+                _, _at_dest = index_read(target, [new_dest])
+            except Refusal as _idx_read_err:
+                r.fail(f"could not read the index for the rename destination {new_dest!r}, so "
+                       f"whether this target already holds it is UNKNOWN. Skipping this row "
+                       f"rather than moving onto a path that may be occupied: {_idx_read_err}")
+                continue
             if new_dest in _at_dest or ndp.exists():
                 r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
                        f"'{new_dest}' — and this target ALREADY holds a file there. Refusing rather "
@@ -6803,182 +6973,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # first and not the second, and rolling one of those back is not merely wasted: the occupied
     # rename destination is an UNTRACKED operator file whose snapshot entry is `absent`, so the
     # `absent` arm below would unlink bytes this run never wrote and the refusal exists to protect.
-    written_paths = set(changed) | set(renamed) | set(deleted)
-    n_verified = n_unverified = n_rolled = n_preexisting = 0
-    for eid in touched_kits:
-        d, _ = descs[eid]
-        ctx_v = target_context(target, deploy, eid, d)
-        was, _was_detail, was_rc = baseline[eid]
-        now, now_detail, now_rc = run_kit_check(eid, d, ctx_v, target)
-        exits = f"exit {'no-launch' if was_rc is None else was_rc} -> " \
-                f"{'no-launch' if now_rc is None else now_rc}"
-
-        # S8. THE SKIP ANNOUNCES ITSELF. A `[check] = { none = "…" }` and an argv carrying an
-        # unresolved token both land here, and a check that could not run is not a pass — so it is
-        # counted apart from verified rather than swelling it.
-        if now == "landed-unmeasured":
-            n_unverified += 1
-            print(f"govkit update — verify {eid}: {was} -> {now}{now_detail} · UNVERIFIED: nothing "
-                  f"measured this kit's writes, which is not the same as measuring them green")
-            continue
-
-        # S6. PRE-EXISTING RED, the only escape from the wedge. Its writes stand, nothing is rolled
-        # back, and no `r.fail` — so the run completes and the receipt re-stamps.
-        if was == "landed-but-inert" and now == "landed-but-inert":
-            n_preexisting += 1
-            (outbox / f"update-preexisting-red-{eid}.md").write_text(
-                f"# {eid} was already red before this update\n\n"
-                f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
-                f"{exits}\n"
-                f"vintage {base_commit} -> {to_commit}\n\n"
-                f"This kit's own check failed BEFORE this run wrote anything and failed again "
-                f"after, so this run did not break it and nothing was rolled back. Its writes "
-                f"stand and the receipt re-stamps.\n\n"
-                f"WHAT THIS DOES NOT SAY: a binary check cannot tell `still broken` from `newly "
-                f"broken`, so a bad merge inside THIS kit would land unobserved. Fix the standing "
-                f"red, then re-run `update` to get this kit verified again.\n",
-                encoding="utf-8", newline="\n")
-            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · PRE-EXISTING RED: not "
-                  f"rolled back, and this run is not what broke it")
-            continue
-
-        # S5. GREEN BEFORE, RED AFTER: this run broke it, and only this kit is undone.
-        if was == "adopted" and now == "landed-but-inert":
-            n_rolled += 1
-            # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
-            # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
-            # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot
-            # replace, an index `git rm --cached` will not touch — and this suite manufactures none
-            # of those modes; `land_through_index`'s post-`git mv` failure is in exactly the same
-            # position and says so where it stands. What each of them leaves is a PART-restored
-            # target, and each says that in its own message, because a silent partial restore is
-            # worse than the write it was undoing.
-            restored: list[str] = []
-            untouched: list[str] = []
-            for s in [x for x in snap_rows if x["kit"] == eid]:
-                for p in s["paths"]:
-                    # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
-                    # built from `acted` BEFORE the write loop's own containment check, and this
-                    # loop `unlink()`s and `checkout-index`es each path — so a receipt row spelling
-                    # `../../x` that the write loop refused could still be reached here, on the
-                    # rollback path, where the operation is a DELETE. Narrow (it needs a kit whose
-                    # check goes red after the run) and not reproduced, which is stated rather than
-                    # dressed up: it is guarded because the class is the same and the cost is one
-                    # condition, not because a fixture demonstrated it.
-                    try:
-                        demand_contained_dest(p, f"rollback of kit '{eid}'")
-                    except Refusal as _esc:
-                        r.fail(f"rolling back kit '{eid}': refusing to touch '{p}' — {_esc}")
-                        continue
-                    if p not in written_paths:
-                        untouched.append(p)
-                        continue
-                    entry = s["index"].get(p)
-                    if entry is None:
-                        # `absent` before the write. The bytes at this path are ones this run put
-                        # there — a rename destination, or a `missing` restore — so unstaging and
-                        # unlinking returns the target to what it had, which was nothing.
-                        rmv = subprocess.run(
-                            ["git", "-C", str(target), "rm", "-q", "--cached", "--ignore-unmatch",
-                             "--", p], capture_output=True, text=True, check=False)
-                        if rmv.returncode != 0:
-                            r.fail(f"rolling back kit '{eid}': '{p}' was absent from the index "
-                                   f"before this run and `git rm --cached` would not unstage it: "
-                                   f"{rmv.stderr.strip()}. The target is now PART restored — say so "
-                                   f"rather than reporting a rollback that did not happen")
-                            continue
-                        if (target / p).is_file():
-                            (target / p).unlink()
-                        restored.append(p)
-                        continue
-                    mode, oid = entry
-                    upx = subprocess.run(
-                        ["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
-                         f"{mode},{oid},{p}"], capture_output=True, text=True, check=False)
-                    if upx.returncode != 0:
-                        r.fail(f"rolling back kit '{eid}': `git update-index` would not restore "
-                               f"{mode},{oid[:12]},{p}: {upx.stderr.strip()}. The target is now "
-                               f"PART restored")
-                        continue
-                    (target / p).parent.mkdir(parents=True, exist_ok=True)
-                    cox = subprocess.run(
-                        ["git", "-C", str(target), "checkout-index", "-f", "--", p],
-                        capture_output=True, text=True, check=False)
-                    if cox.returncode != 0:
-                        r.fail(f"rolling back kit '{eid}': the index now names {oid[:12]} at '{p}' "
-                               f"and `git checkout-index` could not write the worktree file: "
-                               f"{cox.stderr.strip()}. The target is now PART restored — a silent "
-                               f"partial restore is worse than the write it was undoing")
-                        continue
-                    restored.append(p)
-
-                # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
-                # row stamped forward re-creates `-8` exactly — the next run reads the row as
-                # `equal` against bytes that were reverted — and restoring only some of the six is
-                # the split `-7` S9 refuses the whole next run on.
-                for k in ROLLBACK_FIELDS:
-                    if k in s["fields"]:
-                        s["row"][k] = s["fields"][k]
-                    else:
-                        s["row"].pop(k, None)
-                if s["row"] in withdrawn_rows:
-                    withdrawn_rows.remove(s["row"])
-
-            # The three lists are what the closing line counts, and a rolled-back path is not a
-            # write that stands. Both spellings of a restored rename leave `renamed` together, so
-            # its `// 2` stays a pair count.
-            for p in restored:
-                for lst in (changed, deleted, renamed):
-                    while p in lst:
-                        lst.remove(p)
-
-            (outbox / f"update-rollback-{eid}.md").write_text(
-                f"# {eid} was rolled back — its own check reds on what this run wrote\n\n"
-                f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
-                f"{exits}\n"
-                f"vintage {base_commit} -> {to_commit}\n\n"
-                f"This kit's check PASSED before this run and FAILS after it, so this run is what "
-                f"broke it. Every path below was restored to the index entry it had before the "
-                f"first byte moved, and this kit's receipt rows were restored with them. No other "
-                f"kit was touched: a green kit's write is correct and reverting it to punish a "
-                f"sibling discards a good result.\n\n"
-                + "".join(f"restored  {p}\n" for p in restored)
-                + ("(nothing to restore: every path this kit owns was refused before it was "
-                   "written)\n" if not restored else "")
-                + "".join(f"left alone {p} — this run never wrote it, so there is nothing here to "
-                          f"undo\n" for p in untouched)
-                + f"\nThe receipt is NOT re-stamped, so the next run re-classifies these rows from "
-                  f"the vintage they are actually at. Resolve by hand — most often the clean "
-                  f"three-way merge that produced this is plausible and wrong — then re-run "
-                  f"`update`.\n",
-                encoding="utf-8", newline="\n")
-            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · ROLLED BACK · "
-                  + (" ".join(restored) if restored else "(no path restored)"))
-            r.fail(f"kit '{eid}' passed its own check before this run and fails it after: "
-                   f"{exits}. Its writes were ROLLED BACK to their pre-run index entries and an "
-                   f"order was written under .governance/outbox/")
-            continue
-
-        n_verified += 1
-        print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · verified")
-
-    for eid in orphan_kits:
-        print(f"govkit update — verify {eid}: NOT VERIFIED — this run moved rows the receipt "
-              f"attributes to that kit and its own `kits` list does not claim it, so there is no "
-              f"descriptor to ask and no check to run")
-
-    # S4's `not-run`, bounded to CLAIMED kits. An unclaimed registry entry is NOT one of these:
-    # `available (not installed)` above already printed it, and a second line about the same kit is
-    # two answers to one question in the output of the verb built to end silent partial installs.
-    not_run = [e for e in claimed if e not in touched_kits]
-    for eid in not_run:
-        print(f"govkit update — verify {eid}: not-run — this run moved no path this kit owns, so "
-              f"its check was executed neither before nor after")
-    # EVERY COUNT PRINTS, including the zeros. An absence is never coverage, and a silent
-    # pre-existing-red tally would hide exactly the kits nothing verified.
-    print(f"govkit update — verify: verified {n_verified} · unverified {n_unverified} · "
-          f"not-run {len(not_run)} · rolled back {n_rolled} · pre-existing red {n_preexisting}")
-
+    # ---- DEPL-dSealedTally-1 S2. MOVED HERE, AND THE BLOCK IS SPLIT ------------------------
+    # This half decides and WRITES. It used to sit ~400 lines below, after the whole
+    # verify-and-rollback pass, which meant its `snap_rows` entries were appended to a
+    # structure nothing read again: the pass reads `snap_rows` at `touched_kits` and at the
+    # restore loop, and both are finished before the old position. So the landing was the one
+    # write in this verb outside the guard that rolls a failed target back.
+    #
+    # IT MOVES NO EARLIER THAN THIS. It needs `withdrawn_rows`, which the write loop above
+    # builds, so the end of that loop is the earliest position available.
+    #
+    # THE TALLY DID NOT COME WITH IT. Its `unclaimed sources:` summary stays below the pass,
+    # because a rolled-back landing is removed from `_landed_new` DURING the pass -- printing
+    # the list up here would report a landing the rollback is about to undo.
     # ======================= DEPL-dRatifiedSeam-1 S3 — THE UNCLAIMED SOURCE =====================
     # WHY `update` COULD NOT DO THIS. Its whole row walk starts at `rows_all = receipt.get("files")`
     # — the RECEIPT's rows. A destination gov's descriptor declares and the receipt has never named
@@ -7007,9 +7014,20 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # same reason: this run decided to remove them, and re-landing them in the same run would be the
     # verb arguing with itself.
     _decided = {str(f.get("path")) for f in withdrawn_rows}
+    # DEPL-dSealedTally-2. NARROWED TO ACTUAL RENAME DESTINATIONS, and this is the half the
+    # eager fill made mandatory. `rename_dests[eid]` is the kit's FULL source-to-destination
+    # map, not a rename-only one, so taking every value made `_decided` the whole declared
+    # surface of every kit the map held. That was latent while the fill was lazy: it only ran
+    # for a kit with a rename that reached it, and a run with NO renames left the map empty,
+    # which is why the landing worked at all. Filling eagerly turned the latent bug live and
+    # the `-RS1` arms caught it -- nothing could ever land as unclaimed again.
+    #
+    # So the set is built from the sources gov actually RENAMED, which is what its name and
+    # its comment always claimed. `renames` maps old source to new source; the destination of
+    # a new source is what the rename machinery decided, and nothing else is.
     for _m in rename_dests.values():
-        for _dl in _m.values():
-            _decided.update(_dl)
+        for _new_src in renames.values():
+            _decided.update(_m.get(_new_src) or [])
     _landed_new: list[str] = []
     _refused_new: list[tuple[str, str]] = []
     # F4 — `--kits` BINDS THIS LOOP TOO. It narrows `rows_all` and does not touch `claimed`, so a
@@ -7108,7 +7126,21 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             #
             # `lexists`, NOT `.exists()` — F2 again. A symlink is an occupant whether or not its
             # target exists, and the one that does not exist is the dangerous one.
-            if os.path.lexists(_abs0):
+            # A THIRD MID-WRITE READER, taken HERE because the gate below needs it and
+            # because after the `git add` the pre-write state no longer exists. An
+            # uncaught `Refusal` would abort a part-written target, so it disposes
+            # like the other two mid-write readers.
+            try:
+                _idx_pre, _ = index_read(target, [_dest])
+            except Refusal as _pre_idx_err:
+                _refused_new.append((_dest, f"the index could not be read before landing "
+                                            f"it, so whether the target already holds it "
+                                            f"is UNKNOWN: {_pre_idx_err}"))
+                continue
+            # THE INDEX IS ASKED TOO, not just the disk. `lexists` cannot see a path
+            # that is STAGED with no worktree copy, so gov used to overwrite an
+            # an adopter blob at exit 0 on any run that was not rolled back.
+            if os.path.lexists(_abs0) or _idx_pre.get(_dest) is not None:
                 _refused_new.append((_dest, "the target already holds this path and the receipt "
                                             "does not name it, so gov did not put it there"))
                 continue
@@ -7124,6 +7156,10 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # the adopter's index that the receipt does not name and gov can never withdraw.
             # Measured: an adopter file at `tools/demo/sub` makes `mkdir` raise `FileExistsError`,
             # and the run died with `A  tools/demo/aaa.txt` staged and no row for it.
+            # F2. THE PRE-WRITE INDEX STATE, read HERE because after the `git add` below it
+            # no longer exists. The landing gate refuses a destination `os.path.lexists`
+            # finds, but that is a DISK probe and cannot see a path staged with no worktree
+            # copy -- so the snapshot must ASK the index rather than assume `absent` from it.
             try:
                 _abs0.parent.mkdir(parents=True, exist_ok=True)
                 _abs0.write_bytes(_blob0)
@@ -7166,6 +7202,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # the adopter permanently, with no adversary and no tampering.
             _add0 = git_pathspec(target, ["add"], [_dest])
             if _add0.returncode != 0:
+                # F6. THE ROW GOES BACK TOO. It is minted above, BEFORE this stage, so a
+                # refusal here used to unlink the file and leave its row behind -- a receipt
+                # naming a path the target does not have and git never tracked, which is
+                # the orphan the refusal text below says it is avoiding. Guarded on the
+                # path rather than popping blind, so it can only ever remove its own row.
+                if receipt.get("files") and receipt["files"][-1].get("path") == _dest:
+                    receipt["files"].pop()
                 try:
                     _abs0.unlink()
                 except OSError:
@@ -7183,6 +7226,258 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 receipt["files"][-1]["oid"] = _idx0[1]
             _claimed_paths.add(_dest)
             _landed_new.append(_dest)
+
+            # DEPL-dSealedTally-1 S3. THE SNAPSHOT ENTRY, taken here because this is the
+            # moment the write happened and the pre-state is known: the destination was
+            # REFUSED unless `os.path.lexists` said the target did not hold it, so `absent`
+            # is not an assumption, it is the condition that made the landing legal.
+            #
+            # `index` maps the path to None, which is the marker the snapshot already uses
+            # for "no index entry" -- and the restore loop already does the right thing with
+            # it: `git rm --cached` then `unlink`. So the file half of the rollback needs no
+            # new branch at all. `origin` exists for the half that DOES: the receipt row
+            # below was minted by this run and must be removed rather than restored.
+            # F2. THE INDEX IS ASKED, NOT ASSUMED. This entry used to hardcode `None` on the
+            # strength of the landing gate's `os.path.lexists` refusal -- but that is a DISK probe
+            # and cannot see an index entry, so a path staged in the adopter's index with no
+            # worktree copy was recorded as absent and the rollback would `git rm --cached` and
+            # unlink the adopter's own staged blob instead of restoring it. The rename branch above
+            # asks both index and disk and says why; this now does the same.
+            snap_rows.append({"kit": _eid, "row": receipt["files"][-1], "paths": [_dest],
+                              "origin": "landed", "fields": {},
+                              "index": {_dest: _idx_pre.get(_dest)}})
+
+    # DEPL-dSealedTally-1 S4. THE LANDED DESTINATIONS COUNT AS WRITTEN. Without this a landed
+    # path is classified untouched by the closing tally, which reports it as a file this run
+    # never wrote -- while it sits staged in the adopter's index.
+    written_paths = set(changed) | set(renamed) | set(deleted) | set(_landed_new)
+    n_verified = n_unverified = n_rolled = n_preexisting = 0
+    for eid in touched_kits:
+        d, _ = descs[eid]
+        ctx_v = target_context(target, deploy, eid, d)
+        # DEPL-dSealedTally-1. `.get`, NOT `[]`, and the refusal is aimed at the NEXT unit
+        # that widens `touched_kits` rather than at this one. A missing baseline here used to
+        # be a `KeyError` traceback inside a repository gov does not own, mid-write.
+        _base_v = baseline.get(eid)
+        if _base_v is None:
+            raise Refusal(
+                f"kit {eid!r} reached the verify pass with no baseline, so there is "
+                f"nothing to compare its check against, and a rollback decision here would be a "
+                f"guess. `touched_kits` was widened without widening the baseline loop beside it; "
+                f"the two are derived together and must stay that way")
+        was, _was_detail, was_rc = _base_v
+        now, now_detail, now_rc = run_kit_check(eid, d, ctx_v, target)
+        exits = f"exit {'no-launch' if was_rc is None else was_rc} -> " \
+                f"{'no-launch' if now_rc is None else now_rc}"
+
+        # S8. THE SKIP ANNOUNCES ITSELF. A `[check] = { none = "…" }` and an argv carrying an
+        # unresolved token both land here, and a check that could not run is not a pass — so it is
+        # counted apart from verified rather than swelling it.
+        if now == "landed-unmeasured":
+            n_unverified += 1
+            print(f"govkit update — verify {eid}: {was} -> {now}{now_detail} · UNVERIFIED: nothing "
+                  f"measured this kit's writes, which is not the same as measuring them green")
+            continue
+
+        # S6. PRE-EXISTING RED, the only escape from the wedge. Its writes stand, nothing is rolled
+        # back, and no `r.fail` — so the run completes and the receipt re-stamps.
+        if was == "landed-but-inert" and now == "landed-but-inert":
+            n_preexisting += 1
+            (outbox / f"update-preexisting-red-{eid}.md").write_text(
+                f"# {eid} was already red before this update\n\n"
+                f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
+                f"{exits}\n"
+                f"vintage {base_commit} -> {to_commit}\n\n"
+                f"This kit's own check failed BEFORE this run wrote anything and failed again "
+                f"after, so this run did not break it and nothing was rolled back. Its writes "
+                f"stand and the receipt re-stamps.\n\n"
+                f"WHAT THIS DOES NOT SAY: a binary check cannot tell `still broken` from `newly "
+                f"broken`, so a bad merge inside THIS kit would land unobserved. Fix the standing "
+                f"red, then re-run `update` to get this kit verified again.\n",
+                encoding="utf-8", newline="\n")
+            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · PRE-EXISTING RED: not "
+                  f"rolled back, and this run is not what broke it")
+            continue
+
+        # S5. GREEN BEFORE, RED AFTER: this run broke it, and only this kit is undone.
+        if was == "adopted" and now == "landed-but-inert":
+            n_rolled += 1
+            # NO ARM REACHES THE THREE PLUMBING FAILURES BELOW, and the skip announces itself
+            # rather than passing for coverage. Each fires only when the TARGET's own git refuses a
+            # call — an entry `update-index` will not take, a worktree file `checkout-index` cannot
+            # replace, an index `git rm --cached` will not touch — and this suite manufactures none
+            # of those modes; `land_through_index`'s post-`git mv` failure is in exactly the same
+            # position and says so where it stands. What each of them leaves is a PART-restored
+            # target, and each says that in its own message, because a silent partial restore is
+            # worse than the write it was undoing.
+            restored: list[str] = []
+            # DEPL-dSealedTally-1 S7. A REMOVED LANDING PRINTS UNDER ITS OWN VERB. A landed
+            # path had no index entry to restore, so reporting it as `restored` describes
+            # something that did not happen -- and the order's "was restored to the index
+            # entry it had" sentence is false of it.
+            removed_landed: list[str] = []
+            untouched: list[str] = []
+            for s in [x for x in snap_rows if x["kit"] == eid]:
+                for p in s["paths"]:
+                    # B1's THIRD SITE, closed by enumeration rather than by symptom. `snap_rows` is
+                    # built from `acted` BEFORE the write loop's own containment check, and this
+                    # loop `unlink()`s and `checkout-index`es each path — so a receipt row spelling
+                    # `../../x` that the write loop refused could still be reached here, on the
+                    # rollback path, where the operation is a DELETE. Narrow (it needs a kit whose
+                    # check goes red after the run) and not reproduced, which is stated rather than
+                    # dressed up: it is guarded because the class is the same and the cost is one
+                    # condition, not because a fixture demonstrated it.
+                    try:
+                        demand_contained_dest(p, f"rollback of kit '{eid}'")
+                    except Refusal as _esc:
+                        r.fail(f"rolling back kit '{eid}': refusing to touch '{p}' — {_esc}")
+                        continue
+                    if p not in written_paths:
+                        untouched.append(p)
+                        continue
+                    entry = s["index"].get(p)
+                    if entry is None:
+                        # `absent` before the write. The bytes at this path are ones this run put
+                        # there — a rename destination, or a `missing` restore — so unstaging and
+                        # unlinking returns the target to what it had, which was nothing.
+                        rmv = subprocess.run(
+                            ["git", "-C", str(target), "rm", "-q", "--cached", "--ignore-unmatch",
+                             "--", p], capture_output=True, text=True, check=False)
+                        if rmv.returncode != 0:
+                            r.fail(f"rolling back kit '{eid}': '{p}' was absent from the index "
+                                   f"before this run and `git rm --cached` would not unstage it: "
+                                   f"{rmv.stderr.strip()}. The target is now PART restored — say so "
+                                   f"rather than reporting a rollback that did not happen")
+                            continue
+                        if (target / p).is_file():
+                            (target / p).unlink()
+                        restored.append(p)
+                        continue
+                    mode, oid = entry
+                    upx = subprocess.run(
+                        ["git", "-C", str(target), "update-index", "--add", "--cacheinfo",
+                         f"{mode},{oid},{p}"], capture_output=True, text=True, check=False)
+                    if upx.returncode != 0:
+                        r.fail(f"rolling back kit '{eid}': `git update-index` would not restore "
+                               f"{mode},{oid[:12]},{p}: {upx.stderr.strip()}. The target is now "
+                               f"PART restored")
+                        continue
+                    (target / p).parent.mkdir(parents=True, exist_ok=True)
+                    cox = subprocess.run(
+                        ["git", "-C", str(target), "checkout-index", "-f", "--", p],
+                        capture_output=True, text=True, check=False)
+                    if cox.returncode != 0:
+                        r.fail(f"rolling back kit '{eid}': the index now names {oid[:12]} at '{p}' "
+                               f"and `git checkout-index` could not write the worktree file: "
+                               f"{cox.stderr.strip()}. The target is now PART restored — a silent "
+                               f"partial restore is worse than the write it was undoing")
+                        continue
+                    restored.append(p)
+
+                # DEPL-dSealedTally-1 S3. A LANDED ENTRY IS REMOVED, NOT RESTORED, and the two
+                # halves the table branch below performs are both WRONG for it: restoring
+                # `ROLLBACK_FIELDS` would write receipt fields onto a row that should cease to
+                # exist, and the `withdrawn_rows` removal is about rows this run withdrew,
+                # which has nothing to say about a row this run MINTED.
+                if s.get("origin") == "landed":
+                    # F3. THE ROW GOES ONLY IF THE FILE WENT. This branch ran once per ENTRY, after
+                    # the per-path loop, and dropped the receipt row whatever that loop decided --
+                    # so a path whose removal was REFUSED by containment, or whose `git rm --cached`
+                    # failed, left a gov-written file staged in a repository gov does not own,
+                    # named in no line of the rollback order and withdrawable by nothing, because
+                    # the row that would have named it was gone.
+                    _left_landed = [p for p in s["paths"] if p not in restored]
+                    for _lp in [p for p in s["paths"] if p in restored]:
+                        while _lp in _landed_new:
+                            _landed_new.remove(_lp)
+                        restored.remove(_lp)
+                        removed_landed.append(_lp)
+                    if _left_landed:
+                        r.fail(f"rolling back kit '{eid}': the landed path(s) "
+                               f"{', '.join(sorted(_left_landed))} could not be removed, so their "
+                               f"receipt row is KEPT. The target is PART restored and those bytes "
+                               f"are still staged; the row is what a later `update` needs in order "
+                               f"to see them at all")
+                    else:
+                        try:
+                            receipt["files"].remove(s["row"])
+                        except ValueError:
+                            pass
+                    continue
+
+                # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
+                # row stamped forward re-creates `-8` exactly — the next run reads the row as
+                # `equal` against bytes that were reverted — and restoring only some of the six is
+                # the split `-7` S9 refuses the whole next run on.
+                for k in ROLLBACK_FIELDS:
+                    if k in s["fields"]:
+                        s["row"][k] = s["fields"][k]
+                    else:
+                        s["row"].pop(k, None)
+                if s["row"] in withdrawn_rows:
+                    withdrawn_rows.remove(s["row"])
+
+            # The three lists are what the closing line counts, and a rolled-back path is not a
+            # write that stands. Both spellings of a restored rename leave `renamed` together, so
+            # its `// 2` stays a pair count.
+            for p in restored:
+                for lst in (changed, deleted, renamed):
+                    while p in lst:
+                        lst.remove(p)
+
+            (outbox / f"update-rollback-{eid}.md").write_text(
+                f"# {eid} was rolled back — its own check reds on what this run wrote\n\n"
+                f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
+                f"{exits}\n"
+                f"vintage {base_commit} -> {to_commit}\n\n"
+                f"This kit's check PASSED before this run and FAILS after it, so this run is what "
+                f"broke it. Every path marked `restored` below was put back to the index entry "
+                f"it had before the first byte moved, and its receipt row with it. Every path "
+                f"marked `removed` was one this run LANDED: it had no earlier state to return "
+                f"to, so it was deleted and the row this run minted for it was dropped. No other "
+                f"kit was touched: a green kit's write is correct and reverting it to punish a "
+                f"sibling discards a good result.\n\n"
+                + "".join(f"restored  {p}\n" for p in restored)
+                + "".join(f"removed   {p}\n" for p in removed_landed)
+                # F7. BOTH LISTS. This line used to fire whenever `restored` was empty, so a
+                # rollback that really did REMOVE a landing told the operator that nothing had
+                # happened -- printed directly beneath the `removed` line contradicting it.
+                + ("(nothing to restore: every path this kit owns was refused before it was "
+                   "written)\n" if not restored and not removed_landed else "")
+                + "".join(f"left alone {p} — this run never wrote it, so there is nothing here to "
+                          f"undo\n" for p in untouched)
+                + f"\nThe receipt is NOT re-stamped, so the next run re-classifies these rows from "
+                  f"the vintage they are actually at. Resolve by hand — most often the clean "
+                  f"three-way merge that produced this is plausible and wrong — then re-run "
+                  f"`update`.\n",
+                encoding="utf-8", newline="\n")
+            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · ROLLED BACK · "
+                  + (" ".join(restored + removed_landed)
+                     if (restored or removed_landed) else "(no path restored)"))
+            r.fail(f"kit '{eid}' passed its own check before this run and fails it after: "
+                   f"{exits}. Its writes were ROLLED BACK to their pre-run index entries and an "
+                   f"order was written under .governance/outbox/")
+            continue
+
+        n_verified += 1
+        print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · verified")
+
+    for eid in orphan_kits:
+        print(f"govkit update — verify {eid}: NOT VERIFIED — this run moved rows the receipt "
+              f"attributes to that kit and its own `kits` list does not claim it, so there is no "
+              f"descriptor to ask and no check to run")
+
+    # S4's `not-run`, bounded to CLAIMED kits. An unclaimed registry entry is NOT one of these:
+    # `available (not installed)` above already printed it, and a second line about the same kit is
+    # two answers to one question in the output of the verb built to end silent partial installs.
+    not_run = [e for e in claimed if e not in touched_kits]
+    for eid in not_run:
+        print(f"govkit update — verify {eid}: not-run — this run moved no path this kit owns, so "
+              f"its check was executed neither before nor after")
+    # EVERY COUNT PRINTS, including the zeros. An absence is never coverage, and a silent
+    # pre-existing-red tally would hide exactly the kits nothing verified.
+    print(f"govkit update — verify: verified {n_verified} · unverified {n_unverified} · "
+          f"not-run {len(not_run)} · rolled back {n_rolled} · pre-existing red {n_preexisting}")
 
     # EVERY COUNT PRINTS, INCLUDING THE ZEROS, for the reason the verify tally above gives: an
     # absence is never coverage, and a silent zero here would be indistinguishable from a verb that
