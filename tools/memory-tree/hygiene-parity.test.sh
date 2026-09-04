@@ -34,11 +34,12 @@
 # Two corpora, because either alone is blind:
 #   arm 1  the REAL tracked memory tree with violations injected — real ordering, real population
 #   arm 2  pathological SHAPES no committed file has — where the subtle divergences actually live
+KIT_REL="${KIT_REL:-tools/memory-tree}"
 set -u
 ROOT=$(git rev-parse --show-toplevel) || exit 2
 cd "$ROOT" || exit 2
 BEFORE_REV=${1:-}
-[ -n "$BEFORE_REV" ] || { echo "usage: bash tools/memory-tree/hygiene-parity.test.sh <before-rev>"; exit 2; }
+[ -n "$BEFORE_REV" ] || { echo "usage: bash $KIT_REL/hygiene-parity.test.sh <before-rev>"; exit 2; }
 
 # THE BASELINE FLOOR. This harness asserts BYTE-IDENTITY, and a kit version bump is where the engine
 # deliberately changes what it says — the 1.5 flatten changed the verdicts on purpose. Handed a
@@ -48,9 +49,9 @@ BEFORE_REV=${1:-}
 # The floor is DERIVED, never written down. A hardcoded sha rots at the next bump; the thing that
 # actually defines "when the verdicts changed" is the version constant, so the floor is the first
 # commit in which the constant reached its CURRENT value.
-KITV=$(sed -n 's/^KIT_MEMORY_TREE_VERSION=\([0-9.]*\).*/\1/p' tools/memory-tree/check-memory-hygiene.sh | head -1)
+KITV=$(sed -n 's/^KIT_MEMORY_TREE_VERSION=\([0-9.]*\).*/\1/p' $KIT_REL/check-memory-hygiene.sh | head -1)
 [ -n "$KITV" ] || { echo "FAIL cannot read KIT_MEMORY_TREE_VERSION — the baseline floor is derived from it"; exit 2; }
-FLOOR=$(git log --format=%H -S"KIT_MEMORY_TREE_VERSION=$KITV" -- tools/memory-tree/check-memory-hygiene.sh | tail -1)
+FLOOR=$(git log --format=%H -S"KIT_MEMORY_TREE_VERSION=$KITV" -- $KIT_REL/check-memory-hygiene.sh | tail -1)
 if [ -z "$FLOOR" ]; then
   # THE EMPTY CASE IS DEFINED, because "no floor found" is not "any baseline is fine". A shallow
   # clone or a squashed import has no commit introducing the constant, and silently skipping the
@@ -72,9 +73,9 @@ fi
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 BEFORE="$TMP/before.sh"; AFTER="$TMP/after.sh"
-git show "$BEFORE_REV:tools/memory-tree/check-memory-hygiene.sh" > "$BEFORE" 2>/dev/null \
+git show "$BEFORE_REV:$KIT_REL/check-memory-hygiene.sh" > "$BEFORE" 2>/dev/null \
   || { echo "FAIL cannot read the engine at $BEFORE_REV"; exit 2; }
-cp tools/memory-tree/check-memory-hygiene.sh "$AFTER" || exit 2
+cp $KIT_REL/check-memory-hygiene.sh "$AFTER" || exit 2
 # Without this, passing the CURRENT revision (or running after the change is committed) compares a
 # deterministic program against itself and prints PASS over every arm. That is the exact defect this
 # harness exists to catch, in the harness itself.

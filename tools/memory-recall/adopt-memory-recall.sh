@@ -176,9 +176,14 @@ if [ "$with_hook" = 1 ]; then
   if [ ! -f "$HERE/recall-opened.js" ]; then
     echo "memory-recall: --with-hook asked for, but $REL/recall-opened.js is not installed"; exit 1
   fi
-  mkdir -p "$ROOT/.claude/hooks"
-  cp "$HERE/recall-opened.js" "$ROOT/.claude/hooks/recall-opened.js"
-  echo "installed .claude/hooks/recall-opened.js — now merge it into settings.json:"
+  # NOTHING IS COPIED ANY MORE. The hook SHIPS at $REL/recall-opened.js and is wired there.
+  #
+  # This block used to `mkdir -p .claude/hooks` and copy into it, which RE-CREATED the exact
+  # duplicate TOOL-dRetiredFork-14 withdrew: an adopter who took this opt-in got the second copy
+  # back whatever the descriptor said, and a closing instruction naming it. That instruction is the
+  # last thing they read at the moment they wire the hook, so a stale path here is worse than a
+  # stale path in a descriptor -- one is followed by hand, the other is resolved by a tool.
+  echo "$REL/recall-opened.js is installed — now merge it into settings.json:"
   # RESOLVED, not hardcoded — this is the last instruction an adopter sees at the moment they take
   # the opt-in, and the step whose omission leaves the hook inert. A hardcoded tools/ path printed
   # here died with errno 2 in an adopter, because no runbook step delivered the tool. WIRE §3c

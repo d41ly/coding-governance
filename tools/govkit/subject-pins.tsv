@@ -36,11 +36,15 @@ govkit refusal join	repo	declarations
 govkit selfcheck	repo	declarations
 govkit selftest	kit	selftests
 harness arms (fail branches armed or pinned)	repo	declarations
+hook destinations (every declared hook path ships)	repo	product
+hook destinations self-test	kit	selftests
 install-prefix (shipped surface)	repo	product
 install-prefix self-test	kit	selftests
 kickoff engine size <=18KiB	repo	product
 kickoff-manifest ratchet	repo	records
+kit placeholders (a declared token its adopter substitutes)	repo	declarations
 kit version markers	repo	declarations
+kit-placeholders self-test	kit	selftests
 kit/dogfood doc parity	repo	declarations
 lexicon naming predicates	repo	declarations
 lexicon selftest	kit	selftests

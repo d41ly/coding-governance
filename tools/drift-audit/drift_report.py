@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.8
+gov:kit drift-audit@1.9
 
     python tools/drift-audit/drift_report.py            # human table, always exits 0
     python tools/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -48,7 +48,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree (matching memory-recall's query.py).
 sys.dont_write_bytecode = True
 
-KIT_DRIFT_AUDIT_VERSION = "1.8"
+KIT_DRIFT_AUDIT_VERSION = "1.9"
 
 CONF_NAME = ".memory-tree.conf"
 

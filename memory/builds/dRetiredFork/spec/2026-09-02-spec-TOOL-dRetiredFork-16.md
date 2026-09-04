@@ -1,14 +1,17 @@
 # TOOL-dRetiredFork-16 — a project adds a check without editing a kit engine
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 5 · ratified 2026-09-02
+**Status:** CLOSED · rev-4 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 5 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-16-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-16-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-16-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-16-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -127,6 +130,22 @@ a different name.
 - rev-3 · 2026-09-02 · folded spec-audit round 2, finding 19. AC3 required a path gov does not track and §3's
   own non-goal forbids creating; the worked example now travels as quoted evidence. AC4 gained the
   second carrier S2 names.
+
+- rev-4 . 2026-09-03 . BUILT. F1 ANSWERED BY MEASUREMENT: a fixture manifest holding ONE
+  project-authored leg came out of `apply` holding 23, the project row byte-identical and mentioned
+  zero times. The premise holds; the unit is not a defect report. AC1b is exact -- a colliding name
+  the receipt cannot claim exits 2 with 41 paths already changed, and the target leg preserved.
+
+  THE PROBE'S FIRST ANSWER WAS VACUOUS. It reported SURVIVED after a run that had refused on a stale
+  lock and never touched the manifest, which is indistinguishable from success by outcome alone.
+  Caught by asking whether the emission stage ran, not by looking harder at the result.
+
+  AC2 is NOT VERIFIED and named as such: the fixture runner hung past 300 s, so the absent-script
+  refusal was never observed, and asserting it from the code is the error this unit exists to avoid.
+  AC4 is met on documentation and not on its checker: `check_runbook_parity.py` exits 1 with 18
+  problems, measured identically before and after, and no leg invokes it -- filed as -28. A finding
+  no criterion asked for: when the receipt DOES claim a colliding name, both rows survive, leaving
+  two legs named `memory hygiene` in a manifest keyed by name -- filed as -27.
 
 ## 10. Reuse audit
 

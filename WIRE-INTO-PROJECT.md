@@ -141,6 +141,12 @@ sanctioned change, and its facts-over-wit rules are not adjustable at all.
 survived. Those are two questions, and a conf that declares nothing for a key renders a region that
 is perfectly in sync and still tells the agent to invoke a placeholder's name.
 
+**Authoring a kit: a `placeholders` list may only name tokens that kit's OWN adopter substitutes.**
+Declaring one the adopter never computes ships an unresolved `{{TOKEN}}` brace into every adopter's
+committed tree, and they can only fix it by forking the descriptor. `python
+tools/check-kit-placeholders.py` is the join and reds on it; a kit that legitimately has no adopter
+says so with `why_no_adopter` in its `[adopt]` block.
+
 <!-- govkit:entry memory-tree -->
 ## 3 — Adopt the memory-tree kit (if chosen in §0)
 
@@ -397,7 +403,7 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
    query (PostToolUse on `Read`, bounded 128 KB log tail, never blocks the tool). Only if wanted:
    ```bash
    mkdir -p tools && cp <gov>/tools/settings-merge.py tools/    # the merge tool — nothing else copies it
-   bash tools/memory-recall/adopt-memory-recall.sh --scaffold --with-hook   # -> .claude/hooks/recall-opened.js
+   bash tools/memory-recall/adopt-memory-recall.sh --scaffold --with-hook   # the hook already ships in the kit dir
    python3 tools/settings-merge.py --fragment tools/memory-recall/recall-opened.fragment.json
    ```
    The copy is not optional plumbing: nothing else delivers that tool, so without it the merge dies
@@ -526,7 +532,11 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   ships kits onward. It polices the SHIPPING surface, not an installed one.
 
 **Concurrency guard (recommended for ANY project that fans out `Workflow` agents — playbook §8):**
-- Copy `tools/hooks/agent-cap.js` (+ `tools/hooks/agent-cap.test.sh`) into the project (e.g. `<project>/.claude/hooks/`).
+- Copy `tools/hooks/agent-cap.js` (+ its `.test.sh` sibling) into the project **under the same kit
+  prefix as your other kits** — `<project>/<prefix>/hooks/`, so `<project>/tools/hooks/` in a
+  default install. **NOT `<project>/.claude/hooks/`**, which this runbook prescribed until
+  TOOL-dRetiredFork-14/21 withdrew that destination: the wiring check now expects the hook beside
+  the kit that ships it and reports a `.claude/` copy as a legacy one.
 - Wire the `PreToolUse` hook into `.claude/settings.json` idempotently (from the project root):
   ```bash
   python <gov>/tools/settings-merge.py    # merges/creates .claude/settings.json; re-run = no-op; `--check` verifies; backs up to settings.json.bak on change
@@ -695,6 +705,67 @@ run that also grades it.
 Declined rows PRINT, with their state and their reason. A gap that vanishes from a report without
 saying why is the failure mode of every exclusion list.
 
+### Recording a kit file you deliberately EDITED — the carve-out ledger contract
+
+A `[[decline]]` records a kit file you did not take. This records one you took and then changed:
+a **carve-out**. The two are different questions and want different registers, because a declined
+file has no bytes to grade and a carved-out one has bytes that must never be silently overwritten
+by the next `update`.
+
+**The contract, in three rules.** Each exists because the obvious design fails, and the failure is
+named rather than left for the adopter to rediscover.
+
+1. **The id carries NO denominator.** Tag each site `carve-out <stable-id>` — a number, a slug,
+   anything stable — and never `<n>/<total>`. A tag encoding the population size means retiring
+   ONE carve-out requires editing every other tag in the tree, so the cheapest operation in the
+   whole retirement programme is also the one that touches the most files. Adopters do not do
+   expensive things; they leave the carve-out in place.
+2. **The population lives in ONE tracked registry**, not in the tags. The tags say "this site is
+   carved out"; the registry says how many there are and what each is for. A count derived by
+   grepping the tags is a count that changes whenever somebody adds a comment, and a count typed
+   into a document is wrong on the next commit.
+3. **The guard asserts the registry is READABLE, never that it is NON-EMPTY.** This is the rule
+   that decides whether the programme can ever finish. A guard written as "fail if zero
+   carve-outs found" reds the moment the last one retires — it makes SUCCESS indistinguishable
+   from a broken probe, so the tree can never reach the state the programme exists to produce.
+   The anti-vacuity instinct behind it is right and must be kept; it just has to point at the
+   registry rather than at the count.
+
+**What rule 3 is protecting, because it is worth keeping.** A census that greps for its own
+subjects can be scoped so narrowly that it reaches none of them and reports a clean run. That has
+happened twice in the field, both times letting a real regression through a green bar. So the
+guard still has to prove it could have found something. It proves it against the REGISTRY — which
+is tracked, has a known path, and is readable or not — instead of against the tag count, which is
+legitimately zero at the end.
+
+```
+# the guard, in shape:
+[ -r "$REGISTRY" ] || fail "the carve-out registry is unreadable: the census cannot see its subjects"
+declared=$(count rows in "$REGISTRY")
+tagged=$(grep -rhoE 'carve-out [A-Za-z0-9_-]+' $ROOTS | sort -u | wc -l)
+[ "$declared" = "$tagged" ] || fail "registry has $declared rows, tree has $tagged tagged sites"
+# declared == tagged == 0 is a PASS: the programme finished.
+```
+
+**Worked example — retiring one carve-out, touching only its own files.** A tree carries carve-outs
+`cap-is-four`, `prefix-scripts` and `flat-index`. `cap-is-four` converges upstream, so it goes:
+
+1. Delete the `carve-out cap-is-four` tag from each site that carries it, and take the upstream
+   bytes. Only those files are touched.
+2. Delete that one row from the registry.
+3. Run the guard. Registry rows and tagged sites both fell by one and still agree, so it passes.
+   **No other tag was edited**, because no other tag ever named the total.
+
+Retire the last two the same way and the tree reaches zero carve-outs: registry readable, zero
+rows, zero tags, guard green. Under an `N/M` scheme step 1 would have meant editing every
+remaining tag in the tree, and the final state would have RED the bar.
+
+**Migrating an existing `N/M` ledger.** One commit, and it is mechanical: rewrite each
+`carve-out <n>/<total>` to `carve-out <stable-id>` (the old `<n>` is a fine id — it is already
+unique and already grep-able), write the registry with one row per id, and repoint the guard at
+the registry. Do it BEFORE retiring anything, or the first retirement pays the cost this contract
+exists to remove.
+
 ## 6 — Verify the whole chain, then commit
 
 - Codebase-map (if adopted): `python <kit>/selftest.py` (kit contract) · run the gate file
@@ -732,6 +803,39 @@ saying why is the failure mode of every exclusion list.
 6. **Work state generated, not authored:** `python tools/memory-tree/gen_build_index.py --check` → 0, and
    `memory/LIVE.md` exists. Nothing under `memory/project/` but the six `*.txt` waiver registries.
 
+## 5c — Send a fix back: `contribute`
+
+An adopter that fixes a gov defect in its own copy has, until now, held that fix privately: it gets
+re-merged on every release, and gov keeps shipping the defect to everybody else. This build absorbed
+eight such fixes by hand, one at a time, because there was no route. `contribute` is the route.
+
+```bash
+python tools/govkit/govkit.py contribute --target /path/to/adopter
+```
+
+It is **read-only in both directions**. It writes nothing to gov and nothing to the adopter; the
+output goes under gov's own git dir, and the verb's acceptance includes the adopter's `git status`
+being byte-identical before and after. It emits a patch set. A person lands it, through the merge
+bar and the review protocol like any other change.
+
+**What it looks at.** Only rows whose bytes appear in NO gov commit ever. A row that merely differs
+from gov's current tip is an OLDER GOV VINTAGE — the adopter is behind, which is `update`'s job.
+Proposing one of those would be proposing gov's own history back to it. Rows rendered from a gov
+template are excluded and listed separately, because diffing a render against its template measures
+the render.
+
+**Every class is a PROPOSAL and none of it is a decision.** The report says so at the top, and the
+reason is the failure that matters: a fact true only of one tree, taken as a gov defect, absorbed,
+and shipped to every adopter as gov's behaviour. The four classes are gov defect, gov gap, project
+fact and layout carriage; the first two carry a patch, the last two carry a reason and nothing else.
+
+**A patch that does not apply is withheld, not shipped.** Each one is run through `git apply --check`
+against the vintage it names before it is emitted, and a row whose patch fails is reported with that
+fact — it means the map reached a wrong gov path, usually two unrelated files sharing a basename.
+
+**The patches are untrusted content.** They are bytes from a foreign tree. Read one before applying
+it.
+
 ## Result — what the project now has
 
 ```
@@ -751,11 +855,52 @@ saying why is the failure mode of every exclusion list.
   project-owned `<kit>/map_extractors.py` · `.codebase-map.conf` at the ROOT · the gate at GATE_FILE ·
   `<MAP_ROOT>/` (FOUNDATION.md, baseline.toml, affordance-exempt.toml, features/, generated/).
 - Memory-recall (only if §3c adopted): `memory-recall/` kit dir + the generated
-  `.claude/skills/memory-recall/SKILL.md` (+ `.claude/hooks/recall-opened.js`, `tools/settings-merge.py`
+  `.claude/skills/memory-recall/SKILL.md` (+ the kit's own `recall-opened.js`, `tools/settings-merge.py`
   and the settings block only if the step-4 opt-in was taken). The index and query log live under the
   common git dir, never in the worktree — nothing to ignore, nothing to commit.
 
+### A check your project needs and gov does not have
+
+Do not edit a kit engine. Write the check as your own script, in your own tree, and register it as a
+leg in your gate manifest — `govkit apply` leaves a leg it does not own alone.
+
+Measured, not assumed: a fixture whose manifest held one project-authored leg came out of `apply`
+holding 23, the project's row byte-identical. The run reports nothing about it, so silence is the
+success case.
+
+Two limits worth knowing before you hit them. Give the leg a **ceiling**, because the runner reds one
+that arrives without it. And pick a name gov does not use: a collision makes `apply` exit 2 *after*
+partially writing the install, and while your leg is protected rather than overwritten, the tree then
+needs a re-run once you rename. Prefixing the leg with your project name is enough.
+
+The full contract, including why this kit will never grow a plugin loader, is in the memory-tree
+kit's own README.
+
 ## Maintenance
+
+### The hooks ship ONE copy each — migrating a tree that has two
+
+Before `TOOL-dRetiredFork-14`, `agent-cap.js` and `scratch-guard.js` installed to both
+`{prefix}/hooks/` and `.claude/hooks/`, and the wired command named the second. Only the first ships
+now. A tree adopted before that change has two copies and a command pointing at the one that is no
+longer maintained.
+
+**The order is the whole instruction.** Move the wired command to the surviving copy, THEN withdraw
+the second. Reversed, the hook is unwired for the window between, and an unwired agent-cap is a
+security guard that is silently off:
+
+```bash
+python tools/settings-merge.py                                            # repaths agent-cap
+python tools/settings-merge.py --fragment "$KIT/hooks/scratch-guard.fragment.json"   # $KIT = your prefix
+bash tools/check-wiring.sh --check                                        # confirm before step 2
+govkit update --write-withdrawals                                         # only now
+```
+
+`check-wiring.sh` REPORTS a legacy copy instead of failing on it, precisely so this two-step is
+possible: a tree mid-migration is told what remains, not blocked from finishing.
+
+If your kits are not at `tools/`, nothing above changes — the fragments declare their hook path with
+a `{kit}` token and both the writer and the checker expand it against the fragment's own location.
 
 - Codebase-map engine files (`map_lib.py`, `gen_map.py`, `map_diff.py`, `reuse_lookup.py`, the two
   templates, `selftest.py`, `adopt-codebase-map.sh`) are identical across repos — update by

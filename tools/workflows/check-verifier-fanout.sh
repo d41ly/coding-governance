@@ -25,15 +25,47 @@ set -u
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "verifier-fanout: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-HOOK="$ROOT/tools/hooks/agent-cap.js"
-[ -f "$HOOK" ] || { echo "verifier-fanout: $HOOK is missing — this gate has no predicate to delegate to"; exit 2; }
+# ---- WHERE THIS KIT LIVES, DERIVED -- TOOL-dRetiredFork-10 ------------------------------------
+# This script spells no install prefix. It is `tools/` here, `scripts/` at both measured adopters,
+# and whatever the next one picks. Three carve-outs and three divergence rows existed for a path
+# each script can work out from its own location.
+#
+# GIT COMPUTES THE REPO-RELATIVE PATH. This does NOT subtract `--show-toplevel` from `pwd`, which
+# is the obvious spelling and is broken on MSYS: `pwd` yields /c/projects/... while
+# `--show-toplevel` yields C:/projects/..., so the subtraction leaves the string untouched and the
+# population matches NOTHING. Measured during this unit -- population 0, no error, no diagnostic.
+#
+# An EMPTY prefix is a real layout, not a bug: a kit installed at the repository root has no
+# prefix to strip, and the population is then every *.js the repo holds.
+HERE="$(cd "$(dirname "$0")" && pwd)"
+KIT_PREFIX="$(cd "$HERE/.." && git rev-parse --show-prefix 2>/dev/null)"
+KIT_PREFIX="${KIT_PREFIX%/}"
+if [ -n "$KIT_PREFIX" ]; then POP_RE="^$KIT_PREFIX/.*\.js$"; else POP_RE='\.js$'; fi
+KIT_SAYS="${KIT_PREFIX:-the repository root}"
+
+# ---- THE PREDICATE, PROBED -------------------------------------------------------------------
+# Three rungs, and the third is not optional. NicoCares keeps its hooks a directory up from its
+# harnesses, which rung 2 reaches. inCMS has no such directory AT ALL -- its only copy sits at
+# `.claude/hooks/agent-cap.js` -- so a two-rung chain strands it, and that was found by testing the
+# derivation against both trees rather than by reasoning about one.
+#
+# F1, ratified: rung 3 stays a literal. `.claude/hooks/` is the HARNESS's own convention, not an
+# install prefix an adopter chooses, and this is the one place the unit does not practise what it
+# enforces. Said here rather than left for a reader to notice.
+HOOK=""
+for _cand in "$HERE/hooks/agent-cap.js" "$HERE/../hooks/agent-cap.js" "$ROOT/.claude/hooks/agent-cap.js"; do
+  if [ -f "$_cand" ]; then HOOK="$_cand"; break; fi
+done
+[ -n "$HOOK" ] || { echo "verifier-fanout: no agent-cap.js at $HERE/hooks/, $HERE/../hooks/ or $ROOT/.claude/hooks/ — this gate has no predicate to delegate to"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "verifier-fanout: node not found — the predicate is a node hook"; exit 2; }
 
 # The gate and its fixtures are outside their own population: the test's RED fixtures spell the banned
 # shape on purpose, and a fixture that lands in the repo would otherwise make the merge bar
 # permanently red. (They live under `mktemp -d`, so this is belt-and-braces — the same shape
 # check-review-join.sh carries for the same reason.)
-SELF_EXCLUDE='^tools/workflows/check-verifier-fanout\.(sh|js|test\.sh)$'
+SELF_EXCLUDE='(^|/)check-verifier-fanout\.(sh|js|test\.sh)$'
+# BASENAME-anchored for the same reason as the population's derived prefix: an exclusion
+# spelled with a rooted literal is the same class as the filter it scopes.
 
 if [ "$#" -gt 0 ]; then
   FILES=$(printf '%s\n' "$@")
@@ -42,7 +74,7 @@ else
   # tracked AND untracked-but-unignored, matching the other two JavaScript gates: a new harness is
   # judged the moment it exists, not the moment someone remembers to stage it.
   FILES=$(git ls-files --cached --others --exclude-standard -- '*.js' \
-    | grep -E '^tools/.*\.js$' | grep -vE "$SELF_EXCLUDE" | LC_ALL=C sort -u || true)
+    | grep -E "$POP_RE" | grep -vE "$SELF_EXCLUDE" | LC_ALL=C sort -u || true)
   EXPLICIT=0
 fi
 
@@ -61,7 +93,7 @@ if [ -z "$SCAN" ]; then
   if [ "$EXPLICIT" = 1 ]; then
     echo "verifier-fanout: none of the named files exist — nothing was scanned, which is not a pass"
   else
-    echo "verifier-fanout: no workflow script under tools/ — the population is empty, which is not a pass"
+    echo "verifier-fanout: no workflow script under $KIT_SAYS/ — the population is empty, which is not a pass"
   fi
   exit 1
 fi

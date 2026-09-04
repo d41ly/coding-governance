@@ -16,6 +16,35 @@ grammar is implementation detail of one hook and does not belong in a ruleset ev
 The matcher is the exact pair `Workflow|Agent`. `Workflow` alone leaves direct spawns unguarded,
 which is the configuration this hook was rewritten to stop shipping.
 
+**ONE COPY SHIPS, and the wired command names it.** Until `TOOL-dRetiredFork-14` this hook was
+installed to `{prefix}/hooks/` AND `.claude/hooks/`, byte-identical, and the wired command named the
+second. Two copies meant every policy value in the file was stated twice, and every carve-out over
+it doubled before anyone edited anything.
+
+`.claude/hooks/` had one property that made it attractive and that nobody wrote down: it is the same
+path in every repo, so a wired command naming it was correct for every adopter with nothing to
+resolve. Naming the kit directory gives that up, so the fragments declare their path with a `{kit}`
+token and both consumers expand it **against the fragment's own location** — two directories up from
+the `.fragment.json`. That is the rule on the writing side (`settings-merge.py`) and on the reading
+side (`check-wiring.sh`), and it has to be the same rule or one of them wires a path the other
+cannot find.
+
+**Migrating an installed tree is two steps, and the order is not optional.** The wired command moves
+to the surviving copy FIRST; the second copy is withdrawn SECOND. Reversed, the hook is unwired for
+the window between — a security guard silently off, which is the one failure mode this whole change
+had to avoid.
+
+    python tools/settings-merge.py                 # repaths an already-wired command in place
+    bash tools/check-wiring.sh --check             # says which copy is wired, every session
+
+`settings-merge.py` repaths rather than no-ops: a command whose marker matches but whose path
+differs is rewritten. It used to return unchanged in that case, which meant every already-wired tree
+ignored the new path entirely.
+
+Nothing deletes an adopter's second copy. `govkit update --write-withdrawals` does, on their timing,
+and `check-wiring.sh` REPORTS a legacy copy rather than redding so that a half-migrated tree is told
+rather than blocked.
+
 ## What the hook DENIES, and how to satisfy it
 
 - A raw `parallel(` / `pipeline(` primitive. Route through a bounded helper instead —
@@ -95,3 +124,35 @@ outside a workflow script, which is why the matcher must name both tools.
 
 `AGENT_CAP` in the environment is REFUSED, not honoured — the bound is a file constant. A ready-made
 harness that satisfies every rule above ships at `tools/workflows/tier2-review.js`.
+
+## The authoring rule for kit files
+
+*Here because the charter template had no room for it: it sits within a few hundred bytes of its
+gated ceiling and already past its recorded high-water, so adding a rule there would price it
+against the ceiling rather than against its value. This README and the repo charter carry it.*
+
+**A kit file names nothing outside itself by literal.**
+
+- Its own kit directory and the tool root are DERIVED at run time. An empty derivation is a
+  REFUSAL — never a fallback to a guessed prefix, which is the shape that makes a broken install
+  look like a working one.
+- A sibling kit is a token the render channel fills. So is anything a non-program document must
+  SAY rather than execute. An unresolved token is a refusal, not an emitted brace.
+- A replicated policy value is extracted or rendered from the one file that owns it. Retyping it
+  creates two answers to one question, and the copy is always the one that rots.
+
+**Why it is a rule and not a preference.** The deployer writes gov's bytes VERBATIM. A literal
+naming a kit path therefore arrives unchanged in a target that installed at its own prefix, where
+it resolves to nothing — silently, at the moment somebody needed it.
+
+**How it is enforced.** The carried-prefix arm of the install-prefix gate. As of
+`TOOL-dRetiredFork-17` it is a BAN rather than a shrink-only ratchet: its writer may lower a
+count or drop a row that reached zero, and may NOT add one. That single change is the whole
+conversion — before it, the remedy the gate printed was a self-service exemption form, and a new
+literal could be absorbed by anyone who followed the gate's own advice.
+
+A literal that is genuinely correct is justified BY HAND, as a reason column on its row in the
+ban list, in the pass that wants it. Those reasons survive later writes. A definitional widening
+of the predicate — which necessarily makes many literals newly visible at once — goes through a
+separate re-baseline mode guarded by a declared predicate epoch, so it can be spent once per
+change to the predicate and never to absorb a literal.

@@ -32,6 +32,16 @@ import tempfile
 # ABOVE the sys.path insert: this file imports the same siblings query.py does, so without it the
 # gate leg itself drops __pycache__ into the adopter's worktree (spec F5/S12).
 sys.dont_write_bytecode = True
+
+# ALSO above it, and process-level rather than per-subprocess. TOOL-dRetiredFork-2, absorbed from
+# NicoCares `nc carve-out 17/20`; the sibling half lives in gen_build_index.py and the list is gov's
+# own from `.githooks/pre-push`. Every arm here builds a throwaway git repo, and `git init` under an
+# inherited GIT_DIR does not make a repo at the cwd — it RE-INITIALISES the repo GIT_DIR names. Run
+# from a hook, this suite would rewrite the caller's repository instead of its own fixture.
+for _leak in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+              "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX"):
+    os.environ.pop(_leak, None)
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import recall_conf  # noqa: E402
@@ -942,7 +952,7 @@ def test_python3_only():
         cleanup(shimdir)
 
 
-@check("adopt --scaffold converges byte-identically, and copies NO hook without --with-hook")
+@check("adopt --scaffold converges byte-identically, and --with-hook copies no hook anywhere")
 def test_scaffold_converges():
     """AC8 and the opt-in half of AC13.
 
@@ -966,10 +976,17 @@ def test_scaffold_converges():
         assert not (root / ".claude" / "hooks").exists(), "a hook was installed without --with-hook"
         with_hook = adopt(root, kitdir, "--scaffold", "--with-hook")
         assert with_hook.returncode == 0, f"{with_hook.stdout}{with_hook.stderr}"
-        hook = root / ".claude" / "hooks" / "recall-opened.js"
-        assert hook.read_bytes() == (KIT / "recall-opened.js").read_bytes(), "hook copy differs"
+        # --with-hook COPIES NOTHING NOW. TOOL-dRetiredFork-21: the hook ships in the kit directory
+        # and is wired there, so the old behaviour -- copying it into `.claude/hooks/` -- re-created
+        # the exact duplicate TOOL-dRetiredFork-14 withdrew. This arm asserted the copy existed, so
+        # it was pinning the defect in place.
+        assert not (root / ".claude" / "hooks").exists(), \
+            "--with-hook re-created .claude/hooks/, the destination gov withdrew"
+        assert (kitdir / "recall-opened.js").exists(), "the shipped copy is missing from the kit dir"
+        assert "recall-opened.js is installed" in with_hook.stdout, \
+            "--with-hook does not name the copy it wired"
         assert "settings-merge.py --fragment" in with_hook.stdout, "no wiring instruction printed"
-        return f"{len(b1)} B skill, idempotent; hook absent until --with-hook"
+        return f"{len(b1)} B skill, idempotent; --with-hook wires the shipped copy and copies nothing"
     finally:
         cleanup(root)
 
@@ -1400,6 +1417,22 @@ def main() -> int:
             if after == before
             else ("FAIL", "the live query log is byte-identical after this run", "the gate wrote to it")
         )
+
+    # TOOL-dRetiredFork-2 — the git-environment scrub at the top of this file, asserted rather than
+    # trusted. Appended here for the same reason the sweep below is: it is a property of the RUN.
+    # Every arm above built a throwaway repo, and `git init` under an inherited GIT_DIR does not
+    # make a repo at the cwd — it RE-INITIALISES the repo GIT_DIR names, so run from a hook this
+    # suite would rewrite the caller's repository. The scrub is process-level, so the assertion is
+    # that the variables are gone from THIS process by the time any arm ran.
+    _still_set = [k for k in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+                              "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE",
+                              "GIT_PREFIX") if k in os.environ]
+    _checks.append(
+        ("ok", "git's exported repository pointers were scrubbed before any arm ran", "8 checked")
+        if not _still_set
+        else ("FAIL", "git's exported repository pointers were scrubbed before any arm ran",
+              f"still set: {', '.join(_still_set)}")
+    )
 
     # The scratch sweep, asserted rather than assumed - the shape test_recall_floor.py already
     # uses. Appended after the arity assert on purpose: it is a property of the RUN, not a

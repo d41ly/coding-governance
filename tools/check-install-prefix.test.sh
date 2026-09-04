@@ -303,6 +303,82 @@ else
   esac
 fi
 
+# --- TOOL-dRetiredFork-17: THE RATCHET IS A BAN ------------------------------------------------
+# THESE ARMS INVOKE THE GATE, and the first version did not. It hand-copied the gate's awk into
+# the suite and asserted on the copy, so it graded a transcription rather than the shipped code.
+# The closing review proved the consequence by staging a break: replacing the whole refusal
+# condition with `if false; then` left every arm green and the suite closing PASS. A gate whose
+# failing case has never been observed is an assertion about nothing, and a SUITE that cannot see
+# its gate switched off is that same defect one level up.
+#
+# The copies had already drifted, which is the other half of why the shape was wrong: the suite's
+# `seen[$1]=1` clause had grown a comment filter the shipped gate does not have.
+BAN_ARMS=0
+ban_arm() { # label · want-substring · want-rc · dir · [argv...]
+  local before=$CARRIED_ARMS
+  carried_arm "$@"
+  [ "$CARRIED_ARMS" -gt "$before" ] && BAN_ARMS=$((BAN_ARMS+1))
+  return 0
+}
+
+# B1 — a NEW carrier is REFUSED by the writer, where the ratchet it replaced would have absorbed it.
+B1="$TMP/ban-new"; mkfix_source "$B1" 'The engine lives at tools/demo/thing.sh in this repo.'
+(cd "$B1" && bash tools/check-install-prefix.sh --write-ratchet >/dev/null 2>&1)
+printf '#!/usr/bin/env bash\n# and see tools/demo/thing.sh too\n' > "$B1/tools/demo/second.sh"
+git -C "$B1" add -A >/dev/null 2>&1
+ban_arm "B1 --write-ratchet REFUSES a new carrier instead of absorbing it" "NEW carrier" 1 "$B1" --write-ratchet
+
+# B2 — a RISEN count is refused too, and reported as its own verdict because the remedy differs.
+B2="$TMP/ban-rise"; mkfix_source "$B2" 'The engine lives at tools/demo/thing.sh in this repo.'
+(cd "$B2" && bash tools/check-install-prefix.sh --write-ratchet >/dev/null 2>&1)
+printf 'And again tools/demo/thing.sh.\n' >> "$B2/tools/demo/README.md"
+git -C "$B2" add -A >/dev/null 2>&1
+ban_arm "B2 --write-ratchet REFUSES a risen count" "RISEN count" 1 "$B2" --write-ratchet
+
+# B3 — THE NEGATIVE, and the arm that stops B1 and B2 proving too much. A DROP must still be
+# writable, or the ban has broken the ratchet it replaced and the only legal state is whatever the
+# file already says, forever.
+B3="$TMP/ban-drop"; mkfix_source "$B3" 'The engine lives at tools/demo/thing.sh in this repo.'
+(cd "$B3" && bash tools/check-install-prefix.sh --write-ratchet >/dev/null 2>&1)
+printf 'nothing carried here now\n' > "$B3/tools/demo/README.md"
+git -C "$B3" add -A >/dev/null 2>&1
+b3out=$(cd "$B3" && bash tools/check-install-prefix.sh --write-ratchet 2>&1); b3rc=$?
+if [ "$b3rc" = 0 ]; then
+  good "B3 ...and a DROP is still written — the ban did not break progress"
+  BAN_ARMS=$((BAN_ARMS+1))
+else
+  bad "B3 a DROP was REFUSED (rc $b3rc) — the ban forbids recording progress, so the only legal state is the current one forever"
+  printf '%s\n' "$b3out" | sed 's/^/      /' | head -8
+fi
+
+# B4 — a hand-written reason column SURVIVES a legitimate write. Without the join that preserves
+# it, the next drop erases every justification in the file and leaves a ban nobody can account for.
+B4="$TMP/ban-reason"; mkfix_source "$B4" 'The engine lives at tools/demo/thing.sh in this repo.'
+(cd "$B4" && bash tools/check-install-prefix.sh --write-ratchet >/dev/null 2>&1)
+awk -F'\t' -v OFS='\t' '/README/ { print $1, $2, $3, "a person decided this"; next } { print }' \
+  "$B4/tools/install-prefix-carried.txt" > "$B4/.tmpban" \
+  && mv "$B4/.tmpban" "$B4/tools/install-prefix-carried.txt"
+printf 'nothing carried here now\n' > "$B4/tools/demo/thing.sh"
+git -C "$B4" add -A >/dev/null 2>&1
+(cd "$B4" && bash tools/check-install-prefix.sh --write-ratchet >/dev/null 2>&1)
+if grep -q 'a person decided this' "$B4/tools/install-prefix-carried.txt"; then
+  good "B4 a hand-written reason column survives a later write"
+  BAN_ARMS=$((BAN_ARMS+1))
+else
+  bad "B4 the reason column was ERASED by a later write — every justification in a ban list would be lost on the next drop"
+fi
+
+# B5 — the epoch guard. `--rebaseline` is the ONE mode that may add rows, so a guard that does not
+# hold turns the ban back into an exemption form with a longer name.
+B5="$TMP/ban-epoch"; mkfix_source "$B5" 'The engine lives at tools/demo/thing.sh in this repo.'
+(cd "$B5" && bash tools/check-install-prefix.sh --rebaseline >/dev/null 2>&1)
+ban_arm "B5 --rebaseline REFUSES when the recorded epoch already matches" "REFUSING to rebaseline" 1 "$B5" --rebaseline
+
+if [ "$BAN_ARMS" -ge 5 ]; then
+  good "LIVENESS $BAN_ARMS ban arm(s) engaged the real gate"
+else
+  bad "LIVENESS only $BAN_ARMS ban arm(s) reached the gate — the rest fell through or SKIPPED, so this section reports on arms that did not run"
+fi
 # --- THE LIVENESS ASSERTION ON THE SUITE ITSELF ------------------------------------------------
 # A self-test whose every fixture takes one branch is `fixture-passes-by-finding-nothing` applied to
 # the grader, and it needs the same treatment as any other probe that cannot move. This is the arm

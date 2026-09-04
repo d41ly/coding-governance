@@ -15,6 +15,7 @@
 # Intersecting recorded start and end times was tried in a sibling build and retired by name: it
 # graded the node's clock rather than the runner, and red three consecutive pushes on a tree it had
 # already passed.
+KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "turnstile-test: not a git repo"; exit 2; }
@@ -83,7 +84,7 @@ OCC
   ( cd "$d" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
 }
 legs()  { printf '%s\n' "$2" > "$1/tools/gate-legs.json"; }
-runbg() { ( cd "$1" && shift; env "$@" bash tools/run-gates/run-gates.sh; ) >>"$tmp/out.$RANDOM" 2>&1 & }
+runbg() { ( cd "$1" && shift; env "$@" bash $KIT_REL/run-gates.sh; ) >>"$tmp/out.$RANDOM" 2>&1 & }
 peak()  { awk 'BEGIN{m=0} {if ($1+0>m) m=$1+0} END{print m+0}' "$1/peaks" 2>/dev/null; }
 # RESOLVED ABSOLUTELY, the way the runner resolves it. `git rev-parse --git-common-dir` answers a
 # path RELATIVE to the repo it was asked in — plain `.git` in an ordinary clone — so a helper that
@@ -133,7 +134,7 @@ fi
 R3=$tmp/dead; mk_repo "$R3"; B3=$(beacon "$R3")
 mkdir -p "$B3"; printf '%s' 999999 > "$B3/pid"; printf '%s' "$(date +%s)" > "$B3/heartbeat"; printf '%s' stale > "$B3/nonce"
 legs "$R3" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
-out3=$( cd "$R3" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 )
+out3=$( cd "$R3" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
 printf '%s' "$out3" | grep -q 'dead holder (pid 999999)' \
   && ok "a holder with a dead PID is reaped, and the reason recorded is the dead PID" \
   || { nope "a dead holder was not reaped by its PID"; printf '%s\n' "$out3" | tail -4 | sed 's/^/      /'; }
@@ -147,7 +148,7 @@ printf '%s' "$out3" | grep -q 'gates GREEN' \
 R4=$tmp/stale; mk_repo "$R4"; B4=$(beacon "$R4")
 mkdir -p "$B4"; printf '%s' "$$" > "$B4/pid"; printf '%s' "$(( $(date +%s) - 99999 ))" > "$B4/heartbeat"; printf '%s' stale > "$B4/nonce"
 legs "$R4" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
-out4=$( cd "$R4" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 )
+out4=$( cd "$R4" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
 if printf '%s' "$out4" | grep -q 'stalled holder'; then
   ok "a LIVE holder with a stale heartbeat is reaped, and the reason recorded is the TTL"
   printf '%s' "$out4" | grep -q 'dead holder' \
@@ -165,7 +166,7 @@ R5=$tmp/held; mk_repo "$R5"; B5=$(beacon "$R5")
 legs "$R5" '[ {"name": "t1", "argv": ["bash", "fx/tick.sh"]}, {"name": "t2", "argv": ["bash", "fx/tick.sh"]},
   {"name": "t3", "argv": ["bash", "fx/tick.sh"]}, {"name": "t4", "argv": ["bash", "fx/tick.sh"]},
   {"name": "t5", "argv": ["bash", "fx/tick.sh"]}, {"name": "t6", "argv": ["bash", "fx/tick.sh"]} ]'
-( cd "$R5" && env GATE_FULL=1 GATE_JOBS=1 GATE_TURNSTILE_TTL=3 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1 &
+( cd "$R5" && env GATE_FULL=1 GATE_JOBS=1 GATE_TURNSTILE_TTL=3 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
 holder=$!
 claimed=0; poached=0
 # THIRTY, and a liveness break. This loop does two jobs at once — wait for the claim, and watch for
@@ -217,9 +218,9 @@ fi
 # ----------------------- 4c: ONE leg longer than the TTL IS reaped, and it is a NAMED ceiling -----
 R6=$tmp/ceiling; mk_repo "$R6"; B6=$(beacon "$R6")
 legs "$R6" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'
-( cd "$R6" && env GATE_FULL=1 TS_LONG=8 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1 &
+( cd "$R6" && env GATE_FULL=1 TS_LONG=8 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
 h6=$!; sleep 5
-out6=$( cd "$R6" && env GATE_FULL=1 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 )
+out6=$( cd "$R6" && env GATE_FULL=1 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
 wait "$h6" 2>/dev/null
 printf '%s' "$out6" | grep -q 'stalled holder' \
   && ok "a single leg longer than the TTL with no per-leg deadline IS reaped mid-run (the named ceiling)" \
@@ -243,7 +244,7 @@ wait
 R8=$tmp/pos; mk_repo "$R8"; B8=$(beacon "$R8")
 mkdir -p "$B8"; printf '%s' "$$" > "$B8/pid"; printf '%s' "$(date +%s)" > "$B8/heartbeat"; printf '%s' held > "$B8/nonce"
 legs "$R8" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
-( cd "$R8" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh >"$tmp/pos.out" 2>&1 ) &
+( cd "$R8" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh >"$tmp/pos.out" 2>&1 ) &
 w8=$!
 qs="$R8/.git/gate-queue-status"
 for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do
@@ -280,7 +281,7 @@ mkdir -p "$B9"; printf '%s' "$$" > "$B9/pid"; printf '%s' "$(date +%s)" > "$B9/h
 legs "$R9" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 # TTL 600 so the holder is never reapable; the WAIT bound is what has to expire, and it is a declared
 # multiple of the TTL, so the arm scales it through the same knob rather than pinning a second number.
-out9=$( cd "$R9" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 ); rc9=$?
+out9=$( cd "$R9" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 ); rc9=$?
 printf '%s' "$out9" | grep -q 'WAIT EXPIRED\|stalled holder' \
   && ok "a blocked waiter either reaps or expires — it never blocks forever" \
   || { nope "the waiter neither reaped nor expired"; printf '%s\n' "$out9" | tail -3 | sed 's/^/      /'; }
@@ -310,7 +311,7 @@ legs "$R9b" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 # up with it and lengthen the window the refresher must survive, which is the wrong direction.
 ( while [ -d "$B9b" ]; do printf '%s' "$(date +%s)" > "$B9b/heartbeat" 2>/dev/null || true; sleep 0.25; done ) &
 hb=$!
-out9b=$( cd "$R9b" && env GATE_FULL=1 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 ); rc9b=$?
+out9b=$( cd "$R9b" && env GATE_FULL=1 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 ); rc9b=$?
 q9b=$(hdrkey "$R9b" queued); qf9b=$(hdrkey "$R9b" queued_from)
 rm -rf "$B9b"; kill "$hb" 2>/dev/null; wait "$hb" 2>/dev/null
 if [ "${qf9b:-}" = expired ]; then
@@ -326,7 +327,7 @@ fi
 
 R10=$tmp/quiet; mk_repo "$R10"
 legs "$R10" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
-out10=$( cd "$R10" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh 2>&1 ); rc10=$?
+out10=$( cd "$R10" && env GATE_FULL=1 bash $KIT_REL/run-gates.sh 2>&1 ); rc10=$?
 printf '%s' "$out10" | grep -q 'WAIT EXPIRED' \
   && nope "an UNCONTENDED run printed the expiry notice — the bound fires on an ordinary run" \
   || ok "control: an uncontended run at the shipped bound is silent about the queue bound"
@@ -351,7 +352,7 @@ for sig in INT TERM HUP; do
   # signal aimed at the recorded holder left that wrapper alive holding the shell open — which is
   # what made this arm flake on TERM and HUP while never failing on INT. Verified in isolation:
   # all three signals release, TERM and HUP within a second and INT when the blocking wait returns.
-  ( cd "$Rs" && GATE_FULL=1 TS_LONG=4 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1 &
+  ( cd "$Rs" && GATE_FULL=1 TS_LONG=4 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
   pid=$!; held=0
   # THIRTY, matching the queue-position poll above, because it is the SAME event — "has the runner
   # reached the turnstile yet" — and this file budgeted it 30 there, 8 elsewhere and 6 here with no
@@ -404,7 +405,7 @@ fi
 # -------------------------------------- 11: a reaped run does not delete its successor's beacon ---
 R11=$tmp/nonce; mk_repo "$R11"; B11=$(beacon "$R11")
 legs "$R11" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'
-( cd "$R11" && env GATE_FULL=1 TS_LONG=6 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1 &
+( cd "$R11" && env GATE_FULL=1 TS_LONG=6 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
 p11=$!
 # Thirty, for the reason given at the signal arms above: same event, and this file already allows
 # 30 for it elsewhere.
@@ -425,7 +426,7 @@ fi
 # ------------------------------------------------ 13: the queue line, and the verdict alternation -
 R12=$tmp/qline; mk_repo "$R12"
 legs "$R12" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
-out12=$( cd "$R12" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh 2>&1 )
+out12=$( cd "$R12" && env GATE_FULL=1 bash $KIT_REL/run-gates.sh 2>&1 )
 printf '%s' "$out12" | grep -q '^gate queue: waited 0s$' \
   && ok "an uncontended run reports zero queue seconds on one parseable line" \
   || { nope "the queue line is missing or non-zero on an uncontended run"; printf '%s\n' "$out12" | head -3 | sed 's/^/      /'; }
@@ -451,7 +452,7 @@ sec12=$(printf '%s' "$out12" | sed -n 's/^gate queue: waited \([0-9][0-9]*\)s$/\
 # 13d: A DISABLED TURNSTILE WRITES A DASH. This is the dead-probe arm and the whole justification
 # for the second key. A `0` here would be a reassuring number about a probe that never ran, and
 # nothing downstream could tell it from a genuine uncontended zero.
-out12b=$( cd "$R12" && env GATE_FULL=1 GATE_TURNSTILE=0 bash tools/run-gates/run-gates.sh 2>&1 )
+out12b=$( cd "$R12" && env GATE_FULL=1 GATE_TURNSTILE=0 bash $KIT_REL/run-gates.sh 2>&1 )
 q12b=$(hdrkey "$R12" queued); qf12b=$(hdrkey "$R12" queued_from)
 [ "${q12b:-}" = - ] && ok "a run with the turnstile DISABLED records a dash, never a zero" \
                     || nope "a disabled turnstile recorded '${q12b:-<absent>}' rather than a dash"
@@ -464,7 +465,7 @@ q12b=$(hdrkey "$R12" queued); qf12b=$(hdrkey "$R12" queued_from)
 # `waited 0s`. Repeat the uncontended acquire and require every run to report zero.
 qz=0
 for _ in 1 2 3 4 5; do
-  outz=$( cd "$R12" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh 2>&1 )
+  outz=$( cd "$R12" && env GATE_FULL=1 bash $KIT_REL/run-gates.sh 2>&1 )
   printf '%s' "$outz" | grep -q '^gate queue: waited 0s$' || qz=$((qz+1))
 done
 [ "$qz" = 0 ] && ok "repeated uncontended acquires all report zero — the refresh is guarded" \
@@ -506,7 +507,7 @@ s12="$R12/.git/gate-last-summary.txt"
 R13=$tmp/qred; mk_repo "$R13"
 printf '#!/usr/bin/env bash\nexit 1\n' > "$R13/fx/bad.sh"; chmod +x "$R13/fx/bad.sh" 2>/dev/null || true
 legs "$R13" '[ {"name": "bad", "argv": ["bash", "fx/bad.sh"]} ]'
-( cd "$R13" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh >/dev/null 2>&1 ) || true
+( cd "$R13" && env GATE_FULL=1 bash $KIT_REL/run-gates.sh >/dev/null 2>&1 ) || true
 [ -f "$R13/.git/gate-last-summary.txt" ] && grep -q '^gate queue: queued ' "$R13/.git/gate-last-summary.txt" \
   && ok "the durable summary carries the queue line on a RED run too" \
   || nope "the red summary file carries no queue line"
@@ -535,7 +536,7 @@ for sig in INT TERM HUP; do
   printf '%s' held > "$Bq/nonce"
   legs "$Rq" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
   ( cd "$Rq" && env GATE_FULL=1 GATE_TURNSTILE_TICK=1 \
-      timeout -s "$sig" -k 10 12 bash tools/run-gates/run-gates.sh >/dev/null 2>&1 ); rcq=$?
+      timeout -s "$sig" -k 10 12 bash $KIT_REL/run-gates.sh >/dev/null 2>&1 ); rcq=$?
   nq=$(ls -1 "$Qq" 2>/dev/null | wc -l)
   [ "$nq" -eq 0 ] \
     && ok "a waiter killed by SIG$sig while queued left no ticket behind" \
@@ -555,7 +556,7 @@ done
 R14=$tmp/deadticket; mk_repo "$R14"; Q14=$(queue "$R14")
 mkdir -p "$Q14"; : > "$Q14/20200101T000000-999999-1"
 legs "$R14" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
-out14=$( cd "$R14" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 )
+out14=$( cd "$R14" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
 printf '%s' "$out14" | grep -q 'dead waiter (pid 999999)' \
   && ok "a queue ticket whose PID is dead is swept, and the reason recorded is the dead PID" \
   || { nope "a dead waiter's ticket was not swept"; printf '%s\n' "$out14" | tail -4 | sed 's/^/      /'; }
@@ -575,7 +576,7 @@ printf '%s' "$out14" | grep -q 'gates GREEN' \
 R15=$tmp/oldticket; mk_repo "$R15"; Q15=$(queue "$R15")
 mkdir -p "$Q15"; : > "$Q15/$(date -u -d "@$(( $(date +%s) - 99999 ))" +%Y%m%dT%H%M%S)-$$-1"
 legs "$R15" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
-out15=$( cd "$R15" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash tools/run-gates/run-gates.sh 2>&1 )
+out15=$( cd "$R15" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
 if printf '%s' "$out15" | grep -q 'past the bounded wait'; then
   ok "a ticket whose PID is ALIVE but whose stamp is past the bound is swept, and the reason is the age"
   printf '%s' "$out15" | grep -q 'dead waiter' \
@@ -605,7 +606,7 @@ legs "$R16" '[ {"name": "quick", "argv": ["bash", "fx/quick.sh"]} ]'
 # Caught by the bug-class checklist over this build's own diff; the pattern did not exist anywhere in
 # this suite before these arms introduced it.
 ( cd "$R16" && env GATE_FULL=1 GATE_TURNSTILE_TTL=300 GATE_TURNSTILE_TICK=1 \
-    timeout -s TERM -k 10 45 bash tools/run-gates/run-gates.sh ) </dev/null >"$tmp/out16.raw" 2>&1 || true
+    timeout -s TERM -k 10 45 bash $KIT_REL/run-gates.sh ) </dev/null >"$tmp/out16.raw" 2>&1 || true
 out16=$(cat "$tmp/out16.raw" 2>/dev/null)
 [ "$(ls -1 "$Q16" 2>/dev/null | wc -l)" -ge 1 ] \
   && ok "a LIVE waiter's fresh ticket is NOT swept" \
@@ -648,7 +649,7 @@ if [ -f "$Q17" ]; then
   # wrong clock. That is precisely what the class record says an arm must not do.
   t17s=$(date +%s)
   ( cd "$R17" && env GATE_FULL=1 GATE_TURNSTILE_TTL=1800 \
-      timeout -s TERM -k 10 180 bash tools/run-gates/run-gates.sh ) </dev/null >"$tmp/out17.raw" 2>&1; rc17=$?
+      timeout -s TERM -k 10 180 bash $KIT_REL/run-gates.sh ) </dev/null >"$tmp/out17.raw" 2>&1; rc17=$?
   out17=$(cat "$tmp/out17.raw" 2>/dev/null)
   t17=$(( $(date +%s) - t17s ))
   printf '%s' "$out17" | grep -q 'could not create a queue ticket' \

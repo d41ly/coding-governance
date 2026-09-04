@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.8` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.9` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -124,6 +124,26 @@ metric, because it is read as good news.
 The kit holds itself to that rule — `selftest.py` exercises each gateable signal **twice**, once on a
 fixture where it must be silent and once on a minimal violating fixture where it must fire. An arm
 that can only pass the first is the dead probe the report refuses.
+
+### The harness note is a DERIVED contract, not prose
+
+Both `drift-audit-code.js` and `drift-audit-state.js` build their run `note` from
+`deriveLiveness(counters)` and `renderLivenessNote(state, counters)`. **The sentence is a contract**
+(`TOOL-dRetiredFork-6`, ratified F1): a consumer gate re-derives it and byte-compares, which is what
+a hand-written string can never satisfy — and relaxing such a gate to a substring match makes it
+satisfiable by prose, the first class the charter's §7 names.
+
+Three states, three distinct sentences, and the split is the point:
+
+| state | when | the sentence opens |
+|---|---|---|
+| `clean` | synthesis returned, no lens or skeptic died, nothing unverified | `CLEAN:` |
+| `partial` | something died or something is unverified, but the run measured | `PARTIAL:` |
+| `dead` | synthesis died, OR no lens ran at all | `DEAD PROBE:` |
+
+The retired ternary had three branches and conflated the last two into the bare word `complete`, so
+a run that measured NOTHING reported the same word as a clean one. Changing any of these sentences
+is a version bump like any other.
 
 ## Why pins rather than a perfect oracle
 

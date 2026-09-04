@@ -32,8 +32,8 @@ cd "$ROOT" || exit 2
 
 WAIVERS="tools/install-prefix-waivers.txt"
 MODE="${1:---check}"
-case "$MODE" in --check|--list|--write-ratchet) ;;
-  *) echo "usage: $(basename "$0") [--check|--list|--write-ratchet]"; exit 2 ;; esac
+case "$MODE" in --check|--list|--write-ratchet|--rebaseline) ;;
+  *) echo "usage: $(basename "$0") [--check|--list|--write-ratchet|--rebaseline]"; exit 2 ;; esac
 # The python launcher for the carried-prefix arm below, resolved through the repo's ONE resolver and
 # through nothing else. There is deliberately no `PY=python` fallback: the MS-Store `python3` stub
 # answers `command -v` and exits 9009, so a bare launcher name is not an answer — and the idiom ban
@@ -154,6 +154,30 @@ fi
 # would red every usage header in every kit they received.
 CARRIED="tools/install-prefix-carried.txt"
 
+# ==================== TOOL-dRetiredFork-17 S4 — THE PREDICATE EPOCH =============================
+# WHAT THIS EXISTS TO PREVENT. The block below made this arm a BAN: --write-ratchet may lower a
+# count, never add one. That is the whole value, and it creates one honest problem — when the
+# PREDICATE itself widens, every newly-visible literal reads as a new carrier, and a ban with no
+# way to re-baseline would have to be edited by hand a hundred rows at a time or, far more likely,
+# switched off.
+#
+# A `--rebaseline` mode with no guard is the self-service exemption form again, wearing a new name.
+# So it is guarded by a value that a definitional change MUST move and an ordinary pass CANNOT:
+# this epoch, recorded in the ratchet's own header. `--rebaseline` refuses unless the two differ,
+# which makes it one-shot per predicate change and useless for absorbing a literal.
+PREDICATE_EPOCH=2
+
+# epoch 1 — `tools/<kit>/<file>.<ext>`, a kit DIRECTORY segment required.
+# epoch 2 — TOOL-aScouredKit-20. Adds a LOOSE file directly under `tools/`, which epoch 1 could not
+#   see at all: five wave-2 hardcoded-prefix findings were green on this leg for that reason.
+#   Counted ONLY when the named file actually exists in the tree, and that test is not tidiness —
+#   measured over the real population before wiring, per S5, it separates 50 real literals from 76
+#   FIXTURE names (`gate-a.sh`, `some-gate.sh`, `alpha.sh`) inside test helpers, which would
+#   otherwise red seven innocent files. Its one known false drop is `tools/manifest-check.sh`,
+#   which is real but ships from `skills/session-kickoff/`, so gov does not carry it at that path;
+#   recorded here rather than papered over, because a heuristic with an unstated blind spot is how
+#   this arm got its first one.
+
 carried_population() {
   # Every distinct SOURCE path the descriptors resolve, deduplicated — the same pair `planned_writes`
   # walks — PLUS the one named addition. `WIRE-INTO-PROJECT.md` is resolved for no kit and would be
@@ -163,8 +187,10 @@ carried_population() {
   # company: a shipped test IS received.
   # shellcheck source=/dev/null
   . tools/lib/resolve-python.sh
-  "$(resolve_python)" - <<'PYEOF'
+  CARRIED_SELF="$CARRIED" "$(resolve_python)" - <<'PYEOF'
+import os
 import pathlib, sys
+CARRIED_SELF = os.environ.get("CARRIED_SELF", "")
 sys.path.insert(0, "tools/govkit")
 import govkit
 root = pathlib.Path(".").resolve()
@@ -175,6 +201,18 @@ for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
         if row.get("src"):
             srcs.add(row["src"])
 srcs.add("WIRE-INTO-PROJECT.md")
+# TOOL-dTieredTribunal-27, AND IT DOES REPRODUCE — under epoch 2, which is how it was finally
+# seen. THE RATCHET MUST NOT GRADE ITSELF. Every row in it IS a path, so the file counts its own
+# rows as carried literals: writing it moves its own count, the next --check reds, and no
+# hand-edit settles it because the edit changes the count again. Under epoch 1 the number
+# happened to sit still and the defect read as FIXED — my own brief recorded it as not
+# reproducing, on a one-pass fixed-point measurement. Widening the predicate moved it 96 -> 107
+# and the loop was immediate.
+#
+# A file whose entire content is a list of paths cannot CARRY one: the paths are its data, not a
+# reference that would arrive at a target and resolve to nothing there. Same reason the arm above
+# already drops this script and the waiver registry from its own population.
+srcs.discard(str(CARRIED_SELF))
 print("\n".join(sorted(srcs)))
 PYEOF
 }
@@ -205,7 +243,10 @@ carried_rows() {
   # line carrying two literals counts once. The regex is the arm above's with the SHIPPING prefix
   # bound, and `{`/`}` stay in the excluded lead class for the reason that arm already gives — the
   # corrected placeholder form must not be a hit.
-  local re_ship="(^|[^/{}[:alnum:]._-])tools/($alt)/[A-Za-z0-9_.-]+\.(sh|py|js|md|json|toml)"
+  # EPOCH 2. The second alternative is the loose file, and it is fenced on both sides: `(?!/)` is
+  # unavailable in POSIX ERE, so the trailing `[^/]` job is done by the existence filter below —
+  # a `tools/foo/` prefix never names an existing loose file, so it cannot double-count.
+  local re_ship="(^|[^/{}[:alnum:]._-])tools/(($alt)/[A-Za-z0-9_.-]+|[A-Za-z0-9_.-]+)\.(sh|py|js|md|json|toml)"
   # `tr -d '\r'` because python's `print` translates newlines on Windows, so every path arrives with
   # a trailing CR and `[ -f "$f" ]` answers false for all 181 of them — a population that silently
   # becomes empty, which is the shape this whole unit is written against. The arm above already does
@@ -226,7 +267,23 @@ carried_rows() {
     [ -f "$f" ] || continue
     printf '%s\0' "$f"
   done | xargs -0 -r grep -oHE "$re_ship" -- 2>/dev/null \
-       | awk -F: '{ p=$1; m=$0; sub(/^[^:]*:/, "", m); if (match(m, /tools\/[^\/]+\//)) k=substr(m, RSTART+6, RLENGTH-7); else k="?"; print p "\t" k }' \
+       | awk -F: -v tracked="$(git ls-files -- 'tools/*' | tr '\n' ' ')" '
+           BEGIN { n = split(tracked, T, " "); for (i = 1; i <= n; i++) have[T[i]] = 1 }
+           {
+             p = $1; m = $0; sub(/^[^:]*:/, "", m)
+             if (match(m, /tools\/[^\/]+\//)) { k = substr(m, RSTART+6, RLENGTH-7) }
+             else {
+               # EPOCH 2, THE EXISTENCE FILTER. A loose-file literal counts only when the file it
+               # names is really there. Without it, 76 FIXTURE names in seven test helpers become
+               # hits and the arm reds files whose only crime is having a fixture called `gate-a.sh`.
+               if (match(m, /tools\/[A-Za-z0-9_.-]+\.(sh|py|js|md|json|toml)/) == 0) next
+               lit = substr(m, RSTART, RLENGTH)
+               sub(/^[^t]*/, "", lit)
+               if (!(lit in have)) next
+               k = "(loose)"
+             }
+             print p "\t" k
+           }' \
        | LC_ALL=C sort \
        | awk -F'\t' '{ n[$1]++; if ($2 != last[$1]) { kits[$1] = (kits[$1] == "" ? $2 : kits[$1] "," $2); last[$1] = $2 } } END { for (q in n) printf "%s\t%s\t%s\n", q, n[q], kits[q] }' \
        | LC_ALL=C sort || true
@@ -255,9 +312,93 @@ install-prefix: the derivation resolved no shippable sources at all, which means
 install-prefix: that this repo ships nothing. Refusing to truncate $CARRIED over a probe that cannot
 install-prefix: move. A zero HIT count is fine and is the goal; a zero population is a dead probe."; exit 1; }
   rows=$(carried_rows)
+  # ==================== TOOL-dRetiredFork-17 S3 — THE RATCHET IS NOW A BAN ====================
+  # THE ONE CHANGE THAT CONVERTS THEM, and it is here rather than on the check path. A shrink-only
+  # ratchet slows the class without closing it: a new literal may still enter, it just has to be
+  # paid for elsewhere. And the payment is self-service — `--write-ratchet` re-stamps the baseline,
+  # so anybody who runs the remedy the gate itself prints absorbs the rise and the leg goes green.
+  #
+  # MEASURED, ON THIS BUILD, BY ME: `DEPL-dRetiredFork-6` added one line to the runbook naming the
+  # deployer's entry point, taking that file 28 -> 29. The leg redded correctly. I ran
+  # `--write-ratchet`, it rewrote the baseline, and the rise was gone without anyone deciding
+  # anything. A speed limit with a self-service exemption form is not a speed limit.
+  #
+  # AND THIS COMMENT SPELLED THAT PATH OUT AT FIRST, which took THIS file 6 -> 7 and was refused by
+  # the block below as I wrote it. A rule against retyping literals, broken inside the sentence
+  # explaining the rule. Left recorded rather than quietly fixed, because it is the best evidence
+  # the arm has that the class is reflexive and not a thing only other people do.
+  #
+  # So this mode may now only LOWER a recorded count or DROP a row that reached zero. A path with
+  # no row, or a count above its row, is refused HERE — the new literal has to be justified by hand
+  # in the file, with a reason, in the pass that wants it. That is the whole ban.
+  if [ -s "$CARRIED" ]; then
+    added=$(printf '%s\n' "$rows" | awk -F'\t' 'NR==FNR { seen[$1]=1; next } !($1 in seen) { print $1 }' "$CARRIED" -)
+    risen=$(printf '%s\n' "$rows" | awk -F'\t' '
+      NR==FNR { was[$1]=$2; next }
+      ($1 in was) && ($2+0 > was[$1]+0) { printf "%s\t%s -> %s\n", $1, was[$1], $2 }' "$CARRIED" -)
+    if [ -n "$added" ] || [ -n "$risen" ]; then
+      echo "install-prefix: REFUSING to write. This is a BAN, not a ratchet: --write-ratchet may"
+      echo "install-prefix: lower a count or drop a row that reached zero, and may NOT absorb a new"
+      echo "install-prefix: one. Otherwise the remedy this gate prints is a self-service exemption"
+      echo "install-prefix: form, and the class it exists to drain refills through the gate itself."
+      [ -n "$added" ] && { echo "install-prefix: NEW carrier(s), which no row justifies:"; \
+                           printf '%s\n' "$added" | sed 's/^/install-prefix:   /'; }
+      [ -n "$risen" ] && { echo "install-prefix: RISEN count(s):"; \
+                           printf '%s\n' "$risen" | sed 's/^/install-prefix:   /'; }
+      echo "install-prefix: Derive the path — that is S1's rule and the reason this arm exists — or,"
+      echo "install-prefix: if the literal is genuinely correct, add its row to the ratchet BY HAND"
+      echo "install-prefix:   ($CARRIED)"
+      echo "install-prefix: with a trailing reason column saying why. A row a human wrote is a"
+      echo "install-prefix: decision; a row this script wrote is an accident nobody reviewed."
+      exit 1
+    fi
+  fi
+  # THE REASONS SURVIVE THE WRITE. A row's fourth column is a human's justification for a literal
+  # the ban would otherwise refuse, and `carried_rows` emits three columns — so without this join,
+  # the next legitimate drop would silently erase every reason in the file and leave a ban whose
+  # exceptions nobody can account for. Comment lines are carried through untouched for the same
+  # reason: the file's own header explains what it is.
+  if [ -s "$CARRIED" ]; then
+    rows=$(printf '%s\n' "$rows" | awk -F'\t' -v OFS='\t' '
+      NR==FNR { if ($0 !~ /^[[:space:]]*(#|$)/ && NF>3) { r[$1]=$4 } next }
+      { if ($1 in r) { print $1, $2, $3, r[$1] } else { print } }' "$CARRIED" -)
+    hdr=$(grep -E '^[[:space:]]*#' "$CARRIED" || true)
+    [ -n "$hdr" ] && rows="$hdr
+$rows"
+  fi
   printf '%s
 ' "$rows" > "$CARRIED.tmp" && mv "$CARRIED.tmp" "$CARRIED"
-  echo "install-prefix: wrote $(grep -c . "$CARRIED" || true) carried-prefix row(s) to $CARRIED"
+  echo "install-prefix: wrote $(grep -cE '^[^#]' "$CARRIED" || true) carried-prefix row(s) to $CARRIED"
+  exit 0
+elif [ "$MODE" = --rebaseline ]; then
+  # GUARDED BY THE EPOCH, and refuses outright when it has not moved. This is the ONLY way a row is
+  # added to a ban list without a human writing it, and it is spendable exactly once per predicate
+  # change — which is what stops it from being the exemption form under a new name.
+  recorded=$(sed -n 's/^# predicate-epoch: \([0-9][0-9]*\).*/\1/p' "$CARRIED" | head -1)
+  recorded=${recorded:-1}
+  if [ "$recorded" = "$PREDICATE_EPOCH" ]; then
+    echo "install-prefix: REFUSING to rebaseline. The recorded predicate epoch is $recorded and the"
+    echo "install-prefix: script declares $PREDICATE_EPOCH — they agree, so the predicate has not"
+    echo "install-prefix: changed and there is nothing to re-derive. This mode exists for a"
+    echo "install-prefix: DEFINITIONAL widening and for nothing else; a new literal under an"
+    echo "install-prefix: unchanged predicate is a decision, and it is made by hand in $CARRIED."
+    exit 1
+  fi
+  [ "$(carried_live)" -gt 0 ] || { echo "install-prefix: the population is empty — refusing to rebaseline over a dead probe."; exit 1; }
+  before=$(grep -cE '^[^#]' "$CARRIED" 2>/dev/null || echo 0)
+  rows=$(carried_rows)
+  keep=$(grep -E '^[[:space:]]*#' "$CARRIED" 2>/dev/null | grep -v '^# predicate-epoch:' || true)
+  reasons=$(printf '%s\n' "$rows" | awk -F'\t' -v OFS='\t' '
+    NR==FNR { if ($0 !~ /^[[:space:]]*(#|$)/ && NF>3) { r[$1]=$4 } next }
+    { if ($1 in r) { print $1, $2, $3, r[$1] } else { print } }' "$CARRIED" -)
+  { [ -n "$keep" ] && printf '%s\n' "$keep"
+    echo "# predicate-epoch: $PREDICATE_EPOCH"
+    printf '%s\n' "$reasons"; } > "$CARRIED.tmp" && mv "$CARRIED.tmp" "$CARRIED"
+  after=$(grep -cE '^[^#]' "$CARRIED" || true)
+  echo "install-prefix: REBASELINED for predicate epoch $recorded -> $PREDICATE_EPOCH."
+  echo "install-prefix: rows $before -> $after. Every hand-written reason column was preserved."
+  echo "install-prefix: This is a DEFINITIONAL re-derivation, not an absorption: read the diff and"
+  echo "install-prefix: say in the commit message what the predicate now sees that it did not."
   exit 0
 elif [ "$MODE" = --list ]; then
   echo "install-prefix: carried-prefix rows (the shipping spelling, inside the shippable set):"
@@ -330,11 +471,20 @@ install-prefix: this repo ships nothing. A zero HIT count is fine; a zero popula
     }' "$CARRIED" "$_now"
   cstat=$?
   if [ "$cstat" != 0 ]; then
-    echo "install-prefix: apply writes gov's bytes VERBATIM, so a carried tools/<kit>/ literal arrives"
-    echo "install-prefix: unchanged in a target installed at another prefix and resolves to nothing"
-    echo "install-prefix: there. Derive the path, or re-run --write-ratchet in the pass that earned"
-    echo "install-prefix: the drop and commit the file."
+    echo "install-prefix: apply writes gov's bytes VERBATIM, so a carried literal naming a kit path"
+    echo "install-prefix: arrives unchanged in a target installed at another prefix and resolves to"
+    echo "install-prefix: nothing there. Derive the path — that is the authoring rule this arm"
+    echo "install-prefix: enforces, and it is stated in AGENTS.md and in the hooks README."
+    echo "install-prefix:"
+    echo "install-prefix: THE REMEDY DEPENDS ON THE VERDICT, and --write-ratchet is no longer a"
+    echo "install-prefix: blanket answer to any of them (TOOL-dRetiredFork-17 made this arm a BAN):"
+    echo "install-prefix:   SLACK      — a count fell. Re-run --write-ratchet; that is what it is for."
+    echo "install-prefix:   ROSE       — a new literal entered. Derive it, or justify it by hand."
+    echo "install-prefix:   UNRECORDED — a file started carrying one. Same two options."
+    echo "install-prefix:   SWAPPED    — the count held while the kits changed. Read the diff."
+    echo "install-prefix: A hand-written row takes a fourth tab-separated column giving the reason,"
+    echo "install-prefix: and that column now survives later writes."
     exit 1
   fi
-  echo "install-prefix: carried-prefix clean — $(grep -c . "$CARRIED") recorded file(s), none rising"
+  echo "install-prefix: carried-prefix clean — $(grep -cE '^[^#]' "$CARRIED") recorded file(s), $(awk -F'\t' 'NF>3 && $0 !~ /^[[:space:]]*#/' "$CARRIED" | grep -c . || true) hand-justified, none rising"
 fi

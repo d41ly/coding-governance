@@ -104,7 +104,7 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
   echo "## Directories"; echo
   echo "- [builds/](builds/) — one folder per slug: \`README.md\` · \`RUN.md\` (unattended run-state, only while a run is or was live) · \`prompts/\` \`spec/\` \`build/\` \`reviews/\`."
   echo "- [backlog/](backlog/) — one mutable shard per id family."
-  echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else: legacy-files, curation-debt, id-orphan-waiver, corpus-path-unresolved, unarmed-branches, method-carriers."; echo
+  echo "- [project/](project/) — the gate's own waiver registries (\`*.txt\`) and nothing else. Read the directory rather than this line: it listed them by name until a seventh landed and the list did not."; echo
   echo "## Streams (the closed enum)"; echo
   echo "| Value | Family |"; echo "|---|---|"
   for d in $DISCIPLINES; do echo "| \`$d\` | \`$(FAMILY_of "$d")\` |"; done
@@ -123,10 +123,16 @@ if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.
 *(none yet)*
 ' "$(FAMILY_of "$d")" "$d"; done
 } > "$M/DECISIONS.md"
-# project/ — the gate's OWN waiver registries and nothing else. ALL SIX are written here, not two:
-# three of them are NAMED by gates (corpus_ids.py's checks 14 and 15, check-arms.py) and were created
-# by nothing, so an adopter met them as a missing file rather than as an empty ratchet. The gate reads
-# "absent" and "present and empty" identically, which is exactly what makes the omission invisible.
+# project/ — the gate's OWN waiver registries and nothing else. EVERY registry any gate reads is
+# written here: several are NAMED by gates (corpus_ids.py's checks 14 and 15, check-arms.py,
+# gen_build_index.py) and were created by nothing, so an adopter met them as a missing file rather
+# than as an empty ratchet. Most gates read "absent" and "present and empty" identically, which is
+# what makes an omission invisible — and where one does NOT, as the index generator does not, the
+# omission is worse: it refuses, and the tree never scaffolds.
+#
+# THE COUNT USED TO BE WRITTEN HERE ("ALL SIX") AND IT WENT STALE THE MOMENT A SEVENTH LANDED,
+# which is how `stale-header-waiver.txt` shipped missing. A number beside the thing it counts is
+# wrong on the next commit and nobody notices; the list below is the count.
 printf '# legacy-files.txt — recording files kept under historical names (permanent C5 exemption). Empty = strict.
 ' > "$M/project/legacy-files.txt"
 printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
@@ -230,6 +236,20 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
     fi
   done
 } > "$M/project/method-carriers.txt"
+
+# stale-header-waiver.txt — SEEDED WITH ITS HEADER AND NO ROWS, and it must exist or the tree does
+# not scaffold at all. `gen_build_index.py` REFUSES a missing one by design ("a file nobody created
+# is a decision nobody made"), and the memory-tree descriptor already tells every adopter that this
+# file ships with them — but nothing wrote it here, so `--scaffold` produced a tree whose very first
+# index render died. Caught by the closing bar of TOOL-dRetiredFork-17: the memory-hygiene self-test
+# is GREEN at the merge-base and red at HEAD, on the arm asserting a freshly scaffolded tree is
+# clean. A descriptor claiming a file ships and an adopter that does not write it are two answers to
+# one question, and this was the copy that was wrong.
+printf '# stale-header-waiver.txt — build README headers the index generator may leave stale.
+# EMPTY IS THE EXPECTED STATE: the rows a tree needs are the headers that actually rotted in THAT
+# tree, so a list measured on another corpus is vacuous here. The file must EXIST even so — the
+# generator refuses a missing one, because a file nobody created is a decision nobody made.
+' > "$M/project/stale-header-waiver.txt"
 # one mutable backlog shard per FAMILY
 for d in $DISCIPLINES; do
   fam=$(FAMILY_of "$d")

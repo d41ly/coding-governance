@@ -1,14 +1,17 @@
 # TOOL-dRetiredFork-13 — the `KIT_REL` default reaches the remaining test and selftest surface
 
-**Status:** OPEN · rev-3 · 2026-09-02 · node d · Tier-1 · base b0108f13 · streams tooling · order 3
+**Status:** CLOSED · rev-5 · 2026-09-03 · node d · Tier-1 · base b0108f13 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-13-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-13-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-13-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-13-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-3-21-and-depl-1-9-spec-audit-round3.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-3 TOOL-dRetiredFork-5 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-7 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -72,6 +75,13 @@ recorded occurrences.
 `install-prefix (shipped surface)` · `testsuite counts (every bar self-test prints one)` · every touched kit's own self-test leg,
 run on demand under `GATE_SELFTESTS=1` rather than added to the bar.
 
+## 8. Open questions
+
+none - it applies a mechanism already proven at three prefixes in two sibling
+suites; the unit is the application, not the design. This section is present
+because a section 8 with neither an item nor a `none` form is a refusal, not a pass, and both
+this spec's readers grade it that way.
+
 ## 9. Revision log
 
 - rev-1 - 2026-09-02 - initial draft, authored from the dRetiredFork fork classification
@@ -83,3 +93,26 @@ run on demand under `GATE_SELFTESTS=1` rather than added to the bar.
   count disagreed with the ratchet; AC0 re-derives them and AC0b makes the criterion per-row. 16:
   §3 disclaimed the whole non-test checker CLASS on the strength of its one owned member, leaving
   the other six files and 41 occurrences visibly unowned before `TOOL-dRetiredFork-17`'s ban.
+- rev-4 . 2026-09-02 . added the section 8 `none` declaration both readers require;
+  no design content changed.
+
+- rev-5 . 2026-09-03 . BUILT. AC0 re-derived: the ratchet holds 33 test rows summing to 259, so
+  rev-1's 32 was wrong, and `.githooks/pre-push.test.sh` belongs here rather than to
+  `TOOL-dRetiredFork-11`, which added an arm to it but swept no literals. The carried total fell
+  652 to 470 and the test surface 259 to 83, seven rows vanishing entirely.
+
+  THE FIRST CUT SHIPPED A DEFECT AC1 CANNOT SEE. It rewrote literals inside SINGLE-QUOTED shell
+  strings, where `$KIT_REL` does not expand; `check-review-join.test.sh` broke on
+  `H='tools/workflows/tier2-review.js'`. The equivalence proof passed it, because expanding the
+  variable back reproduces the bytes whether or not a shell would have expanded it -- the proof is
+  textual and blind to quoting. RUNNING the suite caught it, which is why AC2 and AC3 sit beside
+  AC1 rather than after it. The sweep now skips single-quoted spans: 214 candidate sites became
+  196, and that difference of 18 is exactly the set that would have broken silently.
+
+  AC2 is met at `scripts/<kit>` with three suites at equal assertion counts and SHORT BY ONE at the
+  repo root, where only two matched; both halves are reported rather than the passing one. Both
+  Python selftests are unswept and named: `lexicon/selftest.py` needs an `import os` and five of
+  its literals are glob FIXTURE data whose spelling is the thing under test. A pre-existing
+  two-arm failure in `check-memory-hygiene.test.sh` on a scaffolded tree was measured before this
+  unit touched the file and filed rather than absorbed.
+

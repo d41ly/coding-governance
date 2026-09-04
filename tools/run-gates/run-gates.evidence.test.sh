@@ -12,6 +12,7 @@
 # greps the runner) and never executes run-gates.sh. Executing the real runner in place would re-run
 # the whole bar recursively and clobber the live gate-last-summary.txt mid-run, so every case here
 # drives it through GATE_LEGS with its own scratch GIT_DIR.
+KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "evidence-test: not a git repo"; exit 2; }
@@ -205,7 +206,7 @@ rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
 #
 # This is the `inputs-inside-the-subjects-reach` class: the harness measuring the subject shares an
 # input with it. Every call site's own `KEY=VALUE` still wins, because `-u` is applied first.
-rec_run()  { ( cd "$REC_T" && env -u GATE_BASE -u GATE_FULL -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES "$@" bash tools/run-gates/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
+rec_run()  { ( cd "$REC_T" && env -u GATE_BASE -u GATE_FULL -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES "$@" bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
 rec_legs() { printf '%s\n' "$1" > "$REC_T/tools/gate-legs.json"
              ( cd "$REC_T" && git add -A && git commit -qm legs ) >/dev/null 2>&1; }
 rec_dir()  { printf '%s/gate-run/%s' "$REC_GD" "$(cat "$REC_GD/gate-run/current" 2>/dev/null)"; }
@@ -257,7 +258,7 @@ REC_KILL=$(( REC_STARTUP * 3 ))
 [ "$REC_KILL" -gt 50 ] && REC_KILL=50
 rec_repo
 rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
-( cd "$REC_T" && timeout -s KILL "$REC_KILL" env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
+( cd "$REC_T" && timeout -s KILL "$REC_KILL" env GATE_FULL=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1
 d=$(rec_dir)
 # A MISSING HEADER IS NOT AUTOMATICALLY A DEFECT, and this arm used to say it was. The header is
 # written late in startup — after the fingerprint, the porcelain walk, python resolution and the
@@ -405,7 +406,7 @@ rec_done
 rec_repo
 for i in 1 2 3 4 5 6 7 8; do mkdir -p "$REC_GD/gate-run/old$i"; done
 rec_legs '[ {"name": "slow", "argv": ["bash", "fx/slow.sh"]} ]'
-( cd "$REC_T" && timeout -s KILL 20 env GATE_FULL=1 bash tools/run-gates/run-gates.sh ) >/dev/null 2>&1
+( cd "$REC_T" && timeout -s KILL 20 env GATE_FULL=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1
 left=$(ls -1 "$REC_GD/gate-run" 2>/dev/null | grep -cv '^current$')
 [ "$left" -ge 9 ] && ok "a run KILLED before its verdict swept nothing (the sweep is after the verdict)" \
                   || nope "a killed run swept $((9-left)) record(s) — the sweep is running before the verdict"
@@ -504,7 +505,7 @@ ru_repo() {   # -> RU_T, RU_GD
       && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
   RU_GD="$RU_T/.git"
 }
-ru_run() { ( cd "$RU_T" && env "$@" bash tools/run-gates/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
+ru_run() { ( cd "$RU_T" && env "$@" bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
 ru_done() { rm -rf "$RU_T"; }
 
 REC_OUT=${REC_OUT:-$(mktemp)}
@@ -598,7 +599,7 @@ if [ -f "$ROOT/tools/run-gates/profile_bar.py" ]; then
   ru_repo
   cp "$ROOT/tools/run-gates/profile_bar.py" "$RU_T/tools/run-gates/"
   ru_run GATE_FULL=1 >/dev/null
-  ru_out=$( cd "$RU_T" && "${PYBIN:-python}" tools/run-gates/profile_bar.py --width 2 2>&1 )
+  ru_out=$( cd "$RU_T" && "${PYBIN:-python}" $KIT_REL/profile_bar.py --width 2 2>&1 )
   # Matched on the word the tool uses for a REFUSAL, not on 'executed leg' — which appears in its
   # ordinary success line ('across N executed leg(s)') and made this arm fail on a healthy run.
   if printf '%s' "$ru_out" | grep -qi 'refus'; then

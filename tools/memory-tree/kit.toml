@@ -44,7 +44,7 @@ file = ".memory-tree.conf"
 owner = "memory-tree"
 required_keys_gate = ["MEMORY_ROOT", "DISCIPLINES", "FAMILIES"]
 required_keys_render = ["MEMORY_ROOT"]
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "ENTRY_CAP_UNIT"]
 conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"]
 defaults = { MEMORY_ROOT = "memory" }
 
@@ -228,3 +228,11 @@ why = "a sourced conf: a CR reaches the shell as part of the value"
 [[lf_pin]]
 pattern = "{kit}/.memory-tree.conf.example"
 why = "the adopter copies it verbatim into the line above"
+
+[[hole]]
+id = "stale-header-waiver"
+kind = "measurement"
+blocks_adopt = false
+blocks_gate = false
+why = "stale-header-waiver.txt ships with its header and NO rows, in gov and in every adopter. The rows a tree needs are the headers that actually corrupted in THAT tree, so a list measured on gov's corpus is vacuous anywhere else — the same reason measured-pins and slot-budget-ceilings ship unarmed. EMPTY IS THE EXPECTED STATE and the mechanism is inert until a header rots; a MISSING file stays a refusal, because a file nobody created is a decision nobody made. The generator names how many headers it tolerated on every run, so a tree that never armed this says so rather than reporting a clean bar."
+discharge = { command = ["grep", "-qvE", "^[[:space:]]*(#|$)", "{memory_root}/project/stale-header-waiver.txt"] }

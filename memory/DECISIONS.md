@@ -15,6 +15,7 @@
 
 ## TOOL — tooling
 
+- TOOL-dRetiredFork-4 · inCMS's D1 is nested template INTERPOLATION, not a nested agent loop; two spec revisions argued a fixture the adopter never claimed. At HEAD the view still corrupts, the fail-open does not. Disposition (b); latent scalar is `TOOL-dRetiredFork-24`
 - TOOL-aWarmedTether-2 · the bar runs INSIDE the push, so the connection idles its whole duration and the server closes it; the push dies AFTER a green gate and the refusal names auth, not a timeout. `push-main.sh` defaults SSH keepalives; HTTPS here cannot exercise it. Measured on an adopter
 - TOOL-aWarmedTether-1 · three arms in `check-unattended.test.sh` graded nothing, found by an adopter running the suite we ship: WRITE_RE omits `_` so our own `_pv_rm` reds the no-write arm; check 30's liveness arm breaks only tRun though tPlanOk grades (0 hits vs 1); branch 2 shipped unarmed
 
@@ -125,3 +126,8 @@
 - TOOL-dBriefedPass-4 · a Workflow harness buys pass ORDER and never ENFORCEMENT — no filesystem, so every observation is its own agent's claim. Two of its shapes are forced by `agent-cap.js` denying `agent()` in any loop, which is parked for the owner
 - TOOL-aCollapsedScan-4 · scoping check 30's population is REFUSED; `BUDGET_kit_gate` is re-declared 120 → 240 instead, calibrated IDLE. Scoping saves ~15% of a bar by narrowing the only check that saw the five defective builds, and is blind to a driver change → `builds/aCollapsedScan/`
 - TOOL-aCollapsedScan-10 · SUPERSEDES the finding in `TOOL-aCollapsedScan-6` and the sentence in `3dd03ea1`: hygiene check 20 DOES gate duplicate ids per file, on the bar, observed RED on a staged break. No bar run ever saw the duplicates I reported it green over → `builds/aCollapsedScan/`
+- DEPL-dRetiredFork-10 · the `forked` role is declared in OPPOSITE directions by gov and inCMS, and inCMS's own two registers disagree with EACH OTHER on 30 paths. RECORDED, not resolved: gov owns none of those rows → builds/dRetiredFork/
+- TOOL-dRetiredFork-41 · OWNER RULING: FIX the passes-harnessed harness, do not drop or waive it. Its AUDIT stage asks a SIDECHAIN agent for Workflow, which a sidechain does not hold; move that stage to the main loop → tools/workflows/unattended-build.js
+- DEPL-dRetiredFork-13 · OWNER RULING: REWRITE the nineteen [-11] AC6 arms to admit additions, superseding the unchanged-count invariant. Not the run's recommendation; they must still ASSERT 'may rise', never nothing → tools/govkit/selftest.py
+- DEPL-dRetiredFork-14 · OWNER RULING: the ADOPTER performs DEPL-dRetiredFork-1 S7's write, on their timing; gov hands over the measurement. Ratifies the run's refusal on §9 grounds, so S7 and AC6 are NOT MET BY RULING → memory/builds/dRetiredFork/
+- DEPL-dRetiredFork-15 · OWNER RULING: land dRetiredFork by a DIRECT --no-ff merge, no lander. Merged d352b04a, tree byte-identical to the branch tip's. landed-via-lander is machine-checked, so this route owes an override → memory/guides/UNATTENDED-PROTOCOL.md

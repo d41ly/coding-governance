@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.4
+gov:kit memory-recall@1.6
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -36,7 +36,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.4"
+KIT_MEMORY_RECALL_VERSION = "1.6"
 
 CONF_NAME = ".memory-tree.conf"
 # a-z, per tools/memory-tree/check-memory-hygiene.sh's own `node [a-z]` (spec Q1 option (b)).

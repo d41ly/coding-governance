@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # run-gates.test.sh — canary: gate-legs.json is well-formed AND run-gates.sh sources every leg from it
 # (no inlined leg command). Exit 0 = clean. Runs as a leg of run-gates.sh itself.
+KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
@@ -359,7 +360,7 @@ JSON
 
 # CLEARS fx/ts FIRST. Without it the width-1 run reads the width-4 run's records and the negative
 # control passes on stale evidence -- this repo's fixture-passes-by-finding-nothing class exactly.
-run_scratch() { rm -rf "$SCRATCH/fx/ts"; ( cd "$SCRATCH" && GATE_FULL= GATE_BASE= GATE_JOBS=$1 bash tools/run-gates/run-gates.sh 2>&1 ); }
+run_scratch() { rm -rf "$SCRATCH/fx/ts"; ( cd "$SCRATCH" && GATE_FULL= GATE_BASE= GATE_JOBS=$1 bash $KIT_REL/run-gates.sh 2>&1 ); }
 # Read IMMEDIATELY after a run: the next run_scratch deletes these.
 peaks_now()  { cat "$SCRATCH/fx/ts"/*.peak 2>/dev/null | sort -rn | tr "\n" " "; }
 npeaks_now() { ls "$SCRATCH/fx/ts"/*.peak 2>/dev/null | grep -c . || true; }
@@ -513,7 +514,7 @@ esac
 clamp_expired_verdict() { # width-input -> prints the verdict; 1 = blame the clamp, 2 = undecidable
   local w="$1" ctw ctl crc
   ctw=$(clamp_target "$w")
-  ctl=$(GATE_FULL= GATE_BASE= GATE_JOBS="$ctw" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); crc=$?
+  ctl=$(GATE_FULL= GATE_BASE= GATE_JOBS="$ctw" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash $KIT_REL/run-gates.sh" 2>&1); crc=$?
   if [ "$crc" = 124 ]; then
     echo "canary: GATE_JOBS='$w' and its width-$ctw control BOTH expired - this host could not finish the fixture at any width, so the clamp is unproven either way"
     # 2, NOT 1. This branch already DECLINES to blame the clamp, and the caller red anyway - so
@@ -530,7 +531,7 @@ cp "$SCRATCH/fx/instant.sh" "$SCRATCH/fx/slow.sh"; cp "$SCRATCH/fx/instant.sh" "
 for w in 0 -3 nonsense 99999999999999999999 999999999999999999999999999999; do
 n=$((n+1))
 n=$((n+1))
-  out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash tools/run-gates/run-gates.sh" 2>&1); trc=$?
+  out=$(GATE_FULL= GATE_BASE= GATE_JOBS="$w" timeout "$CLAMP_BUDGET" bash -c "cd '$SCRATCH' && bash $KIT_REL/run-gates.sh" 2>&1); trc=$?
   if [ "$trc" = 124 ]; then
     clamp_expired_verdict "$w"; cv=$?
     if [ "$cv" = 2 ]; then
@@ -611,7 +612,7 @@ json.dump([{"name": "l%02d" % i, "argv": ["bash", "fx/a.sh"]} for i in range(30)
 #     parent scratch repo and the arm runs the 4-leg manifest at width 1: exactly the configuration
 #     the comment above forbids, reported green. So assert the run HAPPENED first.
 for rep in 1 2 3 4; do
-  o=$( cd "$SCRATCH/many" && GATE_FULL= GATE_BASE= GATE_JOBS=1 bash tools/run-gates/run-gates.sh 2>&1 )
+  o=$( cd "$SCRATCH/many" && GATE_FULL= GATE_BASE= GATE_JOBS=1 bash $KIT_REL/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^gates GREEN — 30/30 legs passed$' \
     || { echo "canary: the 30-leg width-1 fixture did not run — arm 3g proves nothing"
     n=$((n+1))
@@ -645,7 +646,7 @@ JSON
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 # Pass 1 with no origin ref: BASE is unresolvable, changed() fails SAFE to "run", so all three legs
 # execute and all three land a timing row. This is also the arm for that fail-safe.
-o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
   || { echo "canary: with no resolvable BASE a guarded leg did not fail safe to RUN"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
@@ -656,7 +657,7 @@ for w in 1 4; do
 n=$((n+1))
 n=$((n+1))
 n=$((n+1))
-  o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=$w bash tools/run-gates/run-gates.sh 2>&1 )
+  o=$( cd "$G" && GATE_FULL= GATE_BASE= GATE_JOBS=$w bash $KIT_REL/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^GATE skip  guarded  (unchanged vs main)$' \
     || { echo "canary: width $w printed no GATE skip line for a guarded, unchanged leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed (1 skipped)$' \
@@ -697,7 +698,7 @@ JSON
 
 # OFF: the kit leg is held, and it is held with its OWN verb. Not `skip`, whose tail says
 # `unchanged vs <branch>` — false here, since the leg is not unchanged, it is out of subject.
-o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  ' \
   || { echo "canary: a kit-subject leg was not HELD with the switch off"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
@@ -716,13 +717,13 @@ printf '%s\n' "$o" | grep -q '^GATE ok    an undeclared leg$' \
 # GATE_FULL DOES NOT ASK. This is the arm the whole unit rests on: GATE_FULL means "ignore every
 # guard", and a kit's own self-tests are not a guard. If this ever passes, every adopter is back to
 # running them at the push boundary.
-o=$( cd "$S" && GATE_FULL=1 GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S" && GATE_FULL=1 GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^GATE held  a kit self-test  ' \
   || { echo "canary: GATE_FULL unlocked the kit-subject legs, which is the bypass this replaced"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 
 # ON: the switch is the only thing that asks, and it asks for all of them.
-o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^GATE ok    a kit self-test$' \
   || { echo "canary: GATE_SELFTESTS=1 did not run the kit-subject leg"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
@@ -739,7 +740,7 @@ grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
 # then reads every partial bar as a complete one. The row must be present and EMPTY, never absent —
 # absent and empty read the same to a grep, and TOOL-dUnstalledConvoy-27 defaults a missing key to
 # HELD, so the two agree; what must not happen is a `1`.
-o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
   && { echo "canary: a switch-OFF green recorded selftests=1 — the stamp claims a coverage the run did not have"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
@@ -770,7 +771,7 @@ JSON
 ( cd "$S2" && git init -q -b main . && git config user.email t@e && git config user.name t \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
-o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 # -31 AC1: the total is the count that RAN. Two repo legs ran, so the total is 2 and not 5.
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed' \
@@ -806,7 +807,7 @@ printf '%s\n' "$o" | grep -qE '^---- chunk mixed: green  \(2 ran, 0 failed, 0 sk
 
 # -31 AC4: with the switch ON nothing is held, so the total is the whole manifest and the note is
 # gone. A note that survives a run with nothing to report is the same defect pointing the other way.
-o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S2" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
   || { echo "canary: with the switch on the total was not the whole manifest, or a stale held note survived"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
@@ -829,7 +830,7 @@ JSON
 ( cd "$S3" && git init -q -b main . && git config user.email t@e && git config user.name t \
   && git add -A && git commit -qm fx ) >/dev/null 2>&1
 
-o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
 n=$((n+1))
 [ "$rc" = 2 ] \
   || { echo "canary: an all-held run exited $rc, not the configuration-refusal code 2"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
@@ -854,13 +855,13 @@ cat > "$S3/tools/gate-legs.json" <<'JSON'
 ]
 JSON
 ( cd "$S3" && git add -A && git commit -qm two ) >/dev/null 2>&1
-o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
 n=$((n+1))
 { [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN — 1/1 legs passed'; } \
   || { echo "canary: CONTROL — one repo-subject leg beside two held ones must still be a green partial bar, got rc=$rc"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
 # ...and with the switch ON the all-held manifest is an ordinary full bar, not a refusal. The
 # refusal is about a run that executed nothing, never about the subject values themselves.
-o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 ); rc=$?
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS=1 GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 ); rc=$?
 n=$((n+1))
 { [ "$rc" = 0 ] && printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$'; } \
   || { echo "canary: CONTROL — with the switch on, the same manifest must run every leg, got rc=$rc"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
@@ -876,7 +877,7 @@ cat > "$S3/tools/gate-legs.json" <<'JSON'
 ]
 JSON
 ( cd "$S3" && git add -A && git commit -qm allheld ) >/dev/null 2>&1
-( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh >/dev/null 2>&1 )
+( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh >/dev/null 2>&1 )
 n=$((n+1))
 vf3="$S3/.git/gate-run/$(cat "$S3/.git/gate-run/current" 2>/dev/null)/verdict"
 awk -F'\t' '$1=="verdict" && $2=="REFUSED"{ok=1} END{exit !ok}' "$vf3" 2>/dev/null \
@@ -902,7 +903,7 @@ cat > "$S3/tools/gate-legs.json" <<'JSON'
 ]
 JSON
 ( cd "$S3" && git add -A && git commit -qm redbar ) >/dev/null 2>&1
-o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$S3" && GATE_FULL= GATE_SELFTESTS= GATE_JOBS=4 bash $KIT_REL/run-gates.sh 2>&1 )
 n=$((n+1))
 printf '%s\n' "$o" | grep -q '^gates RED — 1/2 legs failed' \
   || { echo "canary: the RED line's denominator is not the count that ran"; printf '%s\n' "$o" | grep '^gates' | sed 's/^/    /'; fail=1; }
@@ -919,7 +920,7 @@ grep -q 'gates RED — 1/2 legs failed' "$S3/.git/gate-last-summary.txt" 2>/dev/
 for w in 1 4; do
 n=$((n+1))
 n=$((n+1))
-  o=$( cd "$G" && GATE_FULL=1 GATE_BASE= GATE_JOBS=$w bash tools/run-gates/run-gates.sh 2>&1 )
+  o=$( cd "$G" && GATE_FULL=1 GATE_BASE= GATE_JOBS=$w bash $KIT_REL/run-gates.sh 2>&1 )
   printf '%s\n' "$o" | grep -q '^gates GREEN — 3/3 legs passed$' \
     || { echo "canary: GATE_FULL=1 at width $w did not run every leg past its guard"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
   printf '%s\n' "$o" | grep -q '^GATE skip' \
@@ -976,7 +977,7 @@ cat > "$P/tools/gate-legs.json" <<'JSON'
 ]
 JSON
 ( cd "$P" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
-runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash tools/run-gates/run-gates.sh 2>&1 ); }
+runp() { ( cd "$P" && env GATE_FULL= GATE_BASE= "$@" bash $KIT_REL/run-gates.sh 2>&1 ); }
 profline() { printf '%s\n' "$1" | grep '^gate profile: ' | head -1; }
 # A LEG's own measured seconds, from the timing cache the runner writes for the next run's dispatch
 # hint. Truncated to an integer: the arm compares magnitudes and `[` cannot read a decimal.
@@ -1218,7 +1219,7 @@ printf '#!/usr/bin/env bash\nexit 7\n' > "$P/shim/getconf"
 chmod +x "$P/shim/nproc" "$P/shim/getconf"
 n=$((n+1))
 n=$((n+1))
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" bash $KIT_REL/run-gates.sh 2>&1 )
 printf '%s\n' "$o" | grep -q '^gates GREEN — 2/2 legs passed$' \
   || { echo "canary: with its first core and RAM sources failing, the runner did not complete"; printf '%s\n' "$o" | tail -3 | sed 's/^/    /'; fail=1; }
 case "$(profline "$o")" in
@@ -1251,7 +1252,7 @@ chmod +x "$P/shim/timeout"
 n=$((n+1))
 n=$((n+1))
 n=$((n+1))
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" GATE_PROFILES=fx/tbl-timeout.txt bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= PATH="$P/shim:$PATH" GATE_PROFILES=fx/tbl-timeout.txt bash $KIT_REL/run-gates.sh 2>&1 )
 printf '%s\n' "$o" | grep -q 'INERT' \
   || { echo "canary: with no working timeout the runner did not announce the knob INERT — a knob the operator set and the host cannot honour is worse than no knob"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
 case "$(profline "$o")" in *'timeout off'*) ;; *) echo "canary: the INERT run still reported a live timeout on its visibility line: $(profline "$o")"; fail=1 ;; esac
@@ -1312,14 +1313,14 @@ n=$((n+1))
 n=$((n+1))
 n=$((n+1))
 printf '2147483648\n' > "$P/cg/memory.max"        # 2 GB, well under any real host reading
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash $KIT_REL/run-gates.sh 2>&1 )
 case "$(profline "$o")" in
   *'via '*'cgroup'*) ;;
   *) echo "canary: an enforced cgroup memory limit was not read, so the RAM guard cannot fire in a container: $(profline "$o")"; fail=1 ;;
 esac
 [ "$(profname "$o")" != "$(profname "$(runp)")" ] || echo "canary: SKIP the cgroup-selection half — this host already selects the same row at 2 GB, so the fixture cannot show the limit changing the choice"
 printf 'max\n' > "$P/cg/memory.max"               # v2's no-limit spelling is UNKNOWN, never a reading
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash $KIT_REL/run-gates.sh 2>&1 )
 case "$(profline "$o")" in
   *cgroup*) echo "canary: the literal 'max' was taken as a memory READING rather than as no limit: $(profline "$o")"; fail=1 ;;
 esac
@@ -1331,14 +1332,14 @@ esac
 rm -f "$P/cg/memory.max"; mkdir -p "$P/cg/memory"
 printf '2147483648\n' > "$P/cg/memory/memory.limit_in_bytes"     # v1, and the ONLY source present
 n=$((n+1))
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash $KIT_REL/run-gates.sh 2>&1 )
 case "$(profline "$o")" in
   *'via '*'cgroup'*) ;;
   *) echo "canary: the cgroup v1 limit file was never opened, so the older images this source exists for are ungraded: $(profline "$o")"; fail=1 ;;
 esac
 n=$((n+1))
 printf '9223372036854771712\n' > "$P/cg/memory/memory.limit_in_bytes"   # v1's sentinel, in v1's file
-o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash tools/run-gates/run-gates.sh 2>&1 )
+o=$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" bash $KIT_REL/run-gates.sh 2>&1 )
 case "$(profline "$o")" in
   *cgroup*) echo "canary: the cgroup v1 no-limit sentinel was taken as a memory reading: $(profline "$o")"; fail=1 ;;
 esac
@@ -1353,11 +1354,11 @@ rm -rf "$P/cg"; mkdir -p "$P/cg"
 printf '2147483648\n' > "$P/cg/memory.max"
 n=$((n+1))
 n=$((n+1))
-pl=$(profline "$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" GATE_CORES=16 GATE_RAM_MB=32000 bash tools/run-gates/run-gates.sh 2>&1 )")
+pl=$(profline "$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" GATE_CORES=16 GATE_RAM_MB=32000 bash $KIT_REL/run-gates.sh 2>&1 )")
 case "$pl" in
   *cgroup*) echo "canary: an explicit GATE_RAM_MB was capped by the cgroup source — the seam bypasses detection by definition, and the shipped threshold arms would red inside any memory-capped container: $pl"; fail=1 ;;
 esac
-pl=$(profline "$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" GATE_CORES=0 GATE_RAM_MB=0 bash tools/run-gates/run-gates.sh 2>&1 )")
+pl=$(profline "$( cd "$P" && env GATE_FULL= GATE_BASE= GATE_CGROUP_ROOT="$P/cg" GATE_CORES=0 GATE_RAM_MB=0 bash $KIT_REL/run-gates.sh 2>&1 )")
 case "$pl" in
   *'detection failed'*) ;;
   *) echo "canary: GATE_RAM_MB=0 is a deliberate UNKNOWN and the cgroup source replaced it with a reading: $pl"; fail=1 ;;
@@ -1392,7 +1393,7 @@ printf '%s\n' '[' \
 ( cd "$BB" && git checkout -q -b feature && echo edited > ga/f && git add -A && git commit -qm branch \
    && git checkout -q main && echo advanced > gb/f && git add -A && git commit -qm advance \
    && git update-ref refs/remotes/origin/main HEAD && git checkout -q feature ) >/dev/null 2>&1
-bout=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+bout=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash $KIT_REL/run-gates.sh 2>&1 )
 if printf '%s' "$bout" | grep -q '^GATE skip  gb leg'; then
   : # the branch never touched gb/, and against the BRANCH POINT it is unchanged
 else
@@ -1408,7 +1409,7 @@ n=$((n+1))
 # An unresolvable baseline runs EVERYTHING. Fail-safe, and it is the property that makes every
 # scoping rule above safe to get wrong.
 ( cd "$BB" && git update-ref -d refs/remotes/origin/main; git symbolic-ref -d refs/remotes/origin/HEAD ) >/dev/null 2>&1
-bout2=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+bout2=$( cd "$BB" && env GATE_FULL= GATE_BASE= bash $KIT_REL/run-gates.sh 2>&1 )
 printf '%s' "$bout2" | grep -q '^GATE skip' \
   && { echo "canary: a leg skipped with NO resolvable baseline — the scoping rule does not fail safe"; fail=1; } || :
 rm -rf "$BB"
@@ -1433,7 +1434,7 @@ printf '%s\n' '[' \
   ']' > "$CK/tools/gate-legs.json"
 ( cd "$CK" && git init -q -b main . && git config user.email c@t && git config user.name c \
    && git add -A && git commit -qm seed ) >/dev/null 2>&1
-cout=$( cd "$CK" && env GATE_FULL=1 bash tools/run-gates/run-gates.sh 2>&1 )
+cout=$( cd "$CK" && env GATE_FULL=1 bash $KIT_REL/run-gates.sh 2>&1 )
 # SNAPSHOT THE SUMMARY NOW. Every run overwrites it, and the all-skipped fixture below runs a
 # DIFFERENT manifest with different chunk names — so an assertion deferred to the end looks for
 # this run's chunks in that run's file and reports a missing roll-up that is really a missing run.
@@ -1461,7 +1462,7 @@ printf '%s\n' '[' \
 ( cd "$CK" && git add -A && git commit -qm two \
    && git update-ref refs/remotes/origin/main HEAD \
    && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
-sout=$( cd "$CK" && env GATE_FULL= GATE_BASE= bash tools/run-gates/run-gates.sh 2>&1 )
+sout=$( cd "$CK" && env GATE_FULL= GATE_BASE= bash $KIT_REL/run-gates.sh 2>&1 )
 if printf '%s' "$sout" | grep -q '^GATE skip  guarded'; then
   printf '%s' "$sout" | grep -qE '^---- chunk gone: skipped' \
     || { echo "canary: a chunk whose every leg was skipped did not report as skipped"; printf '%s\n' "$sout" | grep 'chunk' | sed 's/^/    /'; fail=1; }

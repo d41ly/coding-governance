@@ -2,6 +2,7 @@
 # pre-push.test.sh — drives a REAL git push through .githooks/pre-push in a throwaway scratch repo,
 # with the gate stubbed via GOV_GATE_CMD so the bar never actually runs. Proves the hook FIRES and
 # classifies correctly. Exit 0 = all cases ok.
+KIT_REL="${KIT_REL:-tools}"
 set -u
 SRC=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "pre-push.test: not a git repo"; exit 2; }
 [ -f "$SRC/.githooks/pre-push" ] || { echo "pre-push.test: .githooks/pre-push missing"; exit 1; }
@@ -127,7 +128,7 @@ stamp() {    # write a full-green record naming a sha, with a reproducible finge
   # is the shape of every record written before TOOL-dUnstalledConvoy-26 and is what AC4 grades.
   local sha=$1 st=${2-} gd; gd=$(git rev-parse --git-dir)
   local fp=""
-  [ -x tools/run-gates/gate-fingerprint.sh ] && fp=$(bash tools/run-gates/gate-fingerprint.sh "$sha" 2>/dev/null)
+  [ -x $KIT_REL/run-gates/gate-fingerprint.sh ] && fp=$(bash $KIT_REL/run-gates/gate-fingerprint.sh "$sha" 2>/dev/null)
   printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nrun_id\ttest\n' \
     "$sha" "$fp" "$(git hash-object -- tools/gate-legs.json 2>/dev/null)" > "$gd/gate-full-green"
   [ -n "$st" ] && printf 'selftests\t%s\n' "$st" >> "$gd/gate-full-green"
@@ -328,5 +329,120 @@ else
   ok "18 the hook refuses when it cannot resolve its repo, instead of failing open"
 fi
 rm -rf "$wt" "$nr"
+
+
+# ============================================================================================
+# TOOL-dRetiredFork-11 — THE HOOK RESOLVES ITS OWN KIT ROOT.
+#
+# Everything above this line runs in a fixture that keeps its leg manifest at `tools/`, which is
+# where gov keeps it — so every arm above would pass unchanged with the prefix hardcoded, and did.
+# That is the shape of the defect: the suite could not tell a resolving hook from a hardcoded one,
+# because it only ever asked in the layout the hardcoding happened to match.
+#
+# These arms ask in the OTHER layout, and they compare against the pre-change hook on the SAME
+# fixture. A new arm that has only ever been run against the fixed code proves nothing about what
+# it fixed.
+pfx_home=$PWD
+# `git -C "$SRC"`, NOT a bare `git show`: by this line the suite is standing inside its own scratch
+# repo, where HEAD carries no .githooks/ at all. The bare form wrote an EMPTY file, the red-first
+# control below hit its `[ -s ]` guard and skipped, and the suite still printed all-ok — a control
+# that silently does not run is worse than no control.
+# PINNED TO AN IMMUTABLE SHA, not HEAD. Reading HEAD made this control SELF-INVALIDATING: the
+# moment TOOL-dRetiredFork-11 landed, "the pre-change hook" became the fixed one and the arm
+# reported that it "already forced — this arm proves nothing". It was green when run before the
+# commit and red immediately after, which is the worst possible timing for a control nobody re-runs.
+# 05455c45 is the last commit that touched this hook BEFORE that unit.
+PREPUSH_PRE=05455c45fc0fc32f7de331541daea5c57cb856e0
+git -C "$SRC" show "$PREPUSH_PRE:.githooks/pre-push" > "$tmp/hooks-old-pre-push" 2>/dev/null || true
+[ -s "$tmp/hooks-old-pre-push" ] || bad "AC1 red-first control unavailable — could not read the pre-change hook"
+
+# Build a scratch repo whose kits live at $1, push once so a record can name a real sha, and leave
+# the caller standing in it.
+pfx_fixture() {
+  local pfx=$1 hook=$2 tag=$3
+  # SPLIT deliberately: `local a=$1 d="...$a..."` reads $a as unset under `set -u` here, so the
+  # fixture builder died before it built anything. One name per statement.
+  local d="$tmp/pfx-$pfx-$tag"
+  mkdir -p "$d/hooks"; cp "$hook" "$d/hooks/pre-push"
+  git init -q --bare "$d/remote.git"; git init -q "$d/work"
+  cd "$d/work" || return 1
+  git config user.email t@example.com; git config user.name t
+  git config core.hooksPath "$d/hooks"
+  mkdir -p "$pfx"
+  printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$pfx/gate-legs.json"
+  git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+  git remote add origin "$d/remote.git"
+  touch "$(git rev-parse --git-dir)/push-main-active"
+  GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
+}
+# A full-green record for a fixture at $1, naming sha $2. Deliberately NOT the `stamp` above: that
+# one spells `tools/` itself, which is the very assumption under test here.
+pfx_stamp() {
+  local pfx=$1 sha=$2 blob=${3-} gd; gd=$(git rev-parse --git-dir)
+  [ -n "$blob" ] || blob=$(git hash-object -- "$pfx/gate-legs.json" 2>/dev/null)
+  printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nrun_id\ttest\n' "$sha" "" "$blob" \
+    > "$gd/gate-full-green"
+}
+pfx_decide() {
+  git commit -q --allow-empty -m "decide $RANDOM" >/dev/null 2>&1
+  ( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 ) \
+    | grep -m1 -E 'gate on main push' || true
+}
+
+# --- AC1: a manifest change at a NON-tools prefix must force a full run ------------------------
+for _h in new old; do
+  case $_h in new) _hook="$SRC/.githooks/pre-push" ;; old) _hook="$tmp/hooks-old-pre-push" ;; esac
+  [ -s "$_hook" ] || continue
+  pfx_fixture scripts "$_hook" "ac1$_h" || { bad "AC1 could not build the $_h fixture"; continue; }
+  pfx_stamp scripts "$(git rev-parse HEAD)"
+  case "$(pfx_decide)" in
+    *"scoped gate"*) [ "$_h" = new ] && ok "AC1 precondition — a scripts/ tree reaches a SCOPED decision" ;;
+    *) [ "$_h" = new ] && bad "AC1 precondition — no scoped decision at a scripts/ prefix" ;;
+  esac
+  _prev=$(git rev-parse HEAD)
+  printf '%s\n' '[{"name":"x","argv":["bash","b.sh"]},{"name":"y","argv":["bash","c.sh"]}]' \
+    > scripts/gate-legs.json
+  git add -A >/dev/null 2>&1; git commit -qm "move the manifest" >/dev/null 2>&1
+  pfx_stamp scripts "$_prev"
+  _dec=$(pfx_decide)
+  case "$_h:$_dec" in
+    new:*"FULL gate"*) ok "AC1 a manifest change at scripts/ FORCES a full run (predicate 6 fires)" ;;
+    new:*) bad "AC1 predicate 6 did not fire at a scripts/ prefix: ${_dec:-<no decision>}" ;;
+    old:*"FULL gate"*) bad "AC1 the PRE-CHANGE hook already forced — this arm proves nothing" ;;
+    old:*) ok "AC1 red-first: the pre-change hook did NOT force here — it matched nothing" ;;
+  esac
+done
+
+# --- AC2: a recorded manifest blob that differs, at that same prefix ---------------------------
+pfx_fixture scripts "$SRC/.githooks/pre-push" ac2 || bad "AC2 could not build its fixture"
+pfx_stamp scripts "$(git rev-parse HEAD)" "0000000000000000000000000000000000000000"
+_dec=$(pfx_decide)
+case "$_dec" in
+  *"differs from the one the recorded green was earned on"*)
+    ok "AC2 a differing recorded manifest blob at scripts/ FORCES (predicate 7 fires)" ;;
+  *) bad "AC2 predicate 7 did not fire at a scripts/ prefix: ${_dec:-<no decision>}" ;;
+esac
+
+# --- AC3: a manifest the resolved root does NOT point at is a REFUSAL, not a non-match ---------
+# The distinction the whole unit turns on. A tree that tracks a manifest somewhere the hook does not
+# look must SAY SO; reading it as "no change here" is what let a manifest-wide change land scoped.
+pfx_fixture nowhere "$SRC/.githooks/pre-push" ac3 >/dev/null 2>&1
+git commit -q --allow-empty -m c >/dev/null 2>&1
+_out=$( GOV_GATE_CMD="bash $green" git push -q origin main 2>&1 )
+case "$_out" in
+  *"REFUSING"*"resolved its kit root"*)
+    ok "AC3 a manifest outside the resolved root REFUSES and names the resolution" ;;
+  *) bad "AC3 expected a refusal naming the failed resolution, got: ${_out:-<push SUCCEEDED>}" ;;
+esac
+# ANTI-VACUITY: a repo with NO manifest anywhere is a legitimate case and must NOT refuse, or the
+# arm above is satisfied by a hook that refuses everything.
+pfx_fixture scripts "$SRC/.githooks/pre-push" ac3b >/dev/null 2>&1
+rm -f scripts/gate-legs.json; git add -A >/dev/null 2>&1
+git commit -qm "no manifest at all" >/dev/null 2>&1
+if GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1; then
+  ok "AC3 a tree with no manifest ANYWHERE is left alone, so the refusal is not universal"
+else bad "AC3 the hook refused a tree that simply has no leg manifest"; fi
+
+cd "$pfx_home" || exit 2
 
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

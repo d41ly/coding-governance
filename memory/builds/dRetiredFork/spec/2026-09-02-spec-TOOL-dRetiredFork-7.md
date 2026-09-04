@@ -1,13 +1,16 @@
 # TOOL-dRetiredFork-7 — the review join gains the dead-agent-wave arity arm
 
-**Status:** OPEN · rev-2 · 2026-09-02 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
+**Status:** CLOSED · rev-3 · 2026-09-03 · node d · Tier-2 · base b0108f13 · streams tooling · order 1 · ratified 2026-09-02
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-03-build-TOOL-dRetiredFork-7-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRetiredFork-7-1-acceptance-ledger.md) | journal | — |
+| [2026-09-03-prompt-TOOL-dRetiredFork-7-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRetiredFork-7-1-build-brief.md) | journal | — |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round1.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
 | [2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md](../reviews/2026-09-02-review-TOOL-dRetiredFork-1-18-and-depl-1-7-spec-audit-round2.md) | spec-audit | DEPL-dRetiredFork-1 DEPL-dRetiredFork-2 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 |
+| [2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md](../reviews/2026-09-03-review-TOOL-dRetiredFork-1-21-and-depl-1-9-closing-diff.md) | diff-review | DEPL-dRetiredFork-1 DEPL-dRetiredFork-3 DEPL-dRetiredFork-4 DEPL-dRetiredFork-5 DEPL-dRetiredFork-6 DEPL-dRetiredFork-7 DEPL-dRetiredFork-8 DEPL-dRetiredFork-9 TOOL-dRetiredFork-1 TOOL-dRetiredFork-2 TOOL-dRetiredFork-3 TOOL-dRetiredFork-4 TOOL-dRetiredFork-5 TOOL-dRetiredFork-6 TOOL-dRetiredFork-8 TOOL-dRetiredFork-9 TOOL-dRetiredFork-10 TOOL-dRetiredFork-11 TOOL-dRetiredFork-12 TOOL-dRetiredFork-13 TOOL-dRetiredFork-14 TOOL-dRetiredFork-15 TOOL-dRetiredFork-16 TOOL-dRetiredFork-17 TOOL-dRetiredFork-18 TOOL-dRetiredFork-19 TOOL-dRetiredFork-20 TOOL-dRetiredFork-21 |
 
 <!-- /gen:spec-records -->
 
@@ -70,7 +73,11 @@ equally exposed to.
   is a build-level rule here and not optional.
 - testing + left-shift gates — S2's arms, plus the existing `check-review-join.test.sh`.
 - migration / rollback — additive arm; reverting removes it.
-- user docs — `tools/workflows/README.md` gains the arm and what it does NOT check.
+- user docs — the arm and what it does NOT check, in the gate's own header AND in its runtime
+  output on BOTH paths. `tools/workflows/README.md` does not exist, and the kit's
+  adopter-facing doc is `memory/guides/REVIEW-PROTOCOL.md`, which M11 names a governance
+  carrier — so extending it trips M3 veto 2 and is an owner turn, not this unit's. The scope
+  lines print on the clean path too, which is stronger than a file nobody opens.
 
 ## 6. Acceptance criteria
 
@@ -106,6 +113,17 @@ equally exposed to.
   `genuine-fork` and its dishonest registry declaration.
 - rev-2 · 2026-09-02 · folded spec-audit round 1, finding M5. AC5 asserted a gate that is green before the unit begins, so
   it could not fail; it now pairs the green with an observed RED against a reverted marker.
+
+
+- rev-3 · 2026-09-03 · built. THREE corrections the build measured. (a) §5's user-docs row named
+  `tools/workflows/README.md`, which does not exist; the doc lives in the gate header and its own
+  output, and the kit's real adopter doc is a governance carrier this mandate may not edit.
+  (b) S3's liveness refusal, as first written, fired whenever arm 2 judged nothing and broke a
+  legitimate existing arm over a fixture tree with no harness at all; it is tightened to "files
+  dispatch agents AND none was judged", which is the fact that actually means the arm was retired.
+  (c) AC5's required RED could not be produced: the `gov:kit review-harness@` marker was paired by
+  NOTHING, so reverting it left the gate green. `check-kit-versions.sh` now pairs both ids on that
+  file, which is what made AC5 observable.
 
 ## 10. Reuse audit
 
