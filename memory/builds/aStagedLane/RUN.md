@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: bc1c116da51731cfcc0433d79e00f4c80622dbfa
-phase: REVIEWING
+witness: 92a6f7fc31ba8c747cb0cfa74386bec2ae9eda83
+phase: BUILDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 92d609a5
@@ -32,3 +32,5 @@ base: c4fcf5add1d0a553097f9eef70935a056896cf16
 2026-09-04T20:16:17Z review · item aStagedLane-spec-set · reason verdict BLOCKED · blockers 1
 
 2026-09-04T20:51:00Z review · item aStagedLane-spec-set · reason verdict BLOCKED · blockers 3 · NON-CONVERGENT · disposition fold
+
+2026-09-04T20:54:12Z dispatch · item 92a6f7fc TOOL-aStagedLane-1 · reason tools/unattended/check-pass-order.sh tools/unattended/check-pass-order.test.sh tools/unattended/run-unattended-gates.sh tools/gate-legs.json memory/project/pass-order-waiver.txt .memory-tree.conf

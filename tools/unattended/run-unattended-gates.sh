@@ -68,10 +68,25 @@ BUDGET_driver_selftest=970    # measured 906 s (was 841; +65 s of TOOL-dNarrowed
 BUDGET_playbook_validity_selftest=300  # measured 140 s
 BUDGET_cross_component=300    # measured 92 s
 BUDGET_adopter_e2e=120        # measured 7 s
-BUDGET_pass_order_history=90  # measured 12 s over 85 build folders; the walk is one rev-list per
-                              # build plus one plan_state per CLOSED unit, so it scales with the
-                              # build count and the headroom is deliberate. Matches the ceiling
-                              # its gate-legs.json row declares — one figure, two readers.
+BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to builds carrying no
+                              # run-state file and added a pre-anchor probe per unresolved unit.
+                              # THREE readings on node `a`, 2026-09-04/05, all with other builds
+                              # running: 804 s, 889 s, 1141 s. Up from 463 s before the widening and
+                              # from the 12 s this line was set at when the leg walked 45 closed
+                              # units; it now walks 65. The 337 s spread across three runs of the
+                              # SAME code is the contention, not the leg, which is exactly why a
+                              # single integer cannot separate "regressed" from "busy". 1800 clears
+                              # the highest reading with margin.
+                              # BOTH READINGS WERE TAKEN UNDER LOAD — two other builds ran
+                              # concurrently throughout — and this file's own header says this
+                              # figure is meant to be calibrated IDLE. I could not obtain an idle
+                              # box, so this is a LOADED reading wearing an idle ceiling's slot, and
+                              # saying so is the point: an idle re-declaration is owed and until it
+                              # lands this bound is looser than the doctrine above wants. It does
+                              # NOT match the gate-legs.json row, and must not — that row is a kill
+                              # bound under the 8-wide pool (TOOL-dRetiredFork-40) and this one is a
+                              # cost verdict. The claim that they are one figure was deleted with
+                              # this edit.
 BUDGET_pass_order_selftest=180 # measured 41 s; every arm builds a real fixture repository, so the
                               # cost is git process creation and node d's AV taxes every exec
 

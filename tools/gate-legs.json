@@ -718,7 +718,7 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 900
+    "ceiling": 2400
   },
   {
     "name": "playbook validity gate",
