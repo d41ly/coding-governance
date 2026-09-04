@@ -23,23 +23,20 @@ before the check that refuses it.
 
 ## Expected improvements
 
-- A landed source is verified and can be rolled back, like every other thing `update` writes.
-- A rename destination is decided once, not classified as new because its row exited early.
-- The tracked-path check grades paths rather than a total, and still passes a legal rename.
-- A batched git read that fails says so instead of reporting every row absent.
-- `govkit`'s self-test grades the tree it is handed, on a detached head as on a branch.
-- A refused `--landed` leaves the phase alone, so no record claims a landing nothing observed.
+- A landed source is verified and rolled back like every other write.
+- A rename destination is decided once, not landed as new.
+- The tracked-path check grades paths, and still passes a legal rename.
+- A failed index read says so instead of reporting every row absent.
+- The self-test grades the tree, detached head or branch.
+- A refused `--landed` leaves the record untouched.
 
 ## Detriments if this is not built
 
-- `update` keeps a write path outside its own data-loss guard, in a foreign repository, which is
-  exactly where the guard was built to matter.
-- The dead-probe and could-not-fail classes stay live in the deployer, in a build whose predecessor
-  spent its whole diff removing that shape from the same file.
-- The bar cannot be run at a merge commit before pushing, which is where the merge protocol asks for
-  it, so the run either skips a gate or learns to disbelieve one.
-- The kit whose subject is the difference between an observation and a claim keeps a verb that
-  records the success it refuses.
+- `update` keeps a write path outside its own data-loss guard, in a foreign repository.
+- The dead-probe and could-not-fail classes stay live in the deployer.
+- The bar cannot run at a merge commit, which is where the protocol asks for it.
+- The kit whose subject is observation-versus-claim keeps a verb that records the
+  success it refuses.
 
 ## Build-level rules
 

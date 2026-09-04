@@ -77,7 +77,7 @@ FAILURES: list[str] = []
 # holding a detached merge: parent^1 was ref-reachable and carried the WRONG tree, parent^2 carried
 # the right one. `HEAD^` picks the first, so a "nearest ref-reachable ancestor" rule grades the
 # pre-merge tree and reports on something nobody asked about.
-def _gov_git(root, *args: str) -> str:
+def run_gov_git(root, *args: str) -> str:
     return subprocess.run(["git", "-C", str(root), *args],
                           capture_output=True, text=True).stdout.strip()
 
@@ -89,12 +89,12 @@ def resolve_gov_pin(root) -> str:
     only ever be asked about the real checkout has no negative case anything can reach, and
     S3's refusal would be a branch nothing exercises.
     """
-    _tree = _gov_git(root, "rev-parse", "HEAD^{tree}")
-    if _gov_git(root, "for-each-ref", "--contains", "HEAD", "--count=1"):
-        return _gov_git(root, "rev-parse", "HEAD")
-    for _p in _gov_git(root, "rev-parse", "HEAD^@").split():
-        if (_gov_git(root, "rev-parse", _p + "^{tree}") == _tree
-                and _gov_git(root, "for-each-ref", "--contains", _p, "--count=1")):
+    _tree = run_gov_git(root, "rev-parse", "HEAD^{tree}")
+    if run_gov_git(root, "for-each-ref", "--contains", "HEAD", "--count=1"):
+        return run_gov_git(root, "rev-parse", "HEAD")
+    for _p in run_gov_git(root, "rev-parse", "HEAD^@").split():
+        if (run_gov_git(root, "rev-parse", _p + "^{tree}") == _tree
+                and run_gov_git(root, "for-each-ref", "--contains", _p, "--count=1")):
             return _p
     # S3. A REFUSAL, NEVER A FALLBACK TO HEAD. Falling back is what makes a broken derivation
     # indistinguishable from a working one, which is the class this whole build drains.
@@ -105,12 +105,12 @@ def resolve_gov_pin(root) -> str:
 
 
 GOV_PIN = resolve_gov_pin(HERE.parents[1])
-GOV_HEAD = _gov_git(HERE.parents[1], "rev-parse", "HEAD")
+GOV_HEAD = run_gov_git(HERE.parents[1], "rev-parse", "HEAD")
 print(f"govkit-selftest: gov vintage pin {GOV_PIN[:12]} "
       f"({'HEAD' if GOV_PIN == GOV_HEAD else 'a ref-reachable ancestor with this tree'})")
 
 
-def repin_receipt(argv: list[str]) -> None:
+def write_receipt_pin(argv: list[str]) -> None:
     """S4. `apply` has no vintage argument, so the FIXTURE stamps the receipt at the pin.
 
     `_cmd_apply` hardcodes `git rev-parse HEAD`, and `main` dispatches it with no `TO_REV`. Giving it
@@ -142,7 +142,7 @@ def run(*args: str, cwd: pathlib.Path | None = None) -> subprocess.CompletedProc
         capture_output=True, text=True, cwd=str(cwd) if cwd else None,
     )
     if _argv and _argv[0] == "apply" and _p.returncode == 0:
-        repin_receipt(_argv)
+        write_receipt_pin(_argv)
     return _p
 
 
@@ -5051,7 +5051,7 @@ user_skills = "/tmp/gk-fake-skills"
               len(_renamed_olds) >= 1, _w11.stdout[-1500:])
         check("[-11] AC6 THE STANDING PREDICATE: no tracked path is LOST across a run with no "
               "--write-withdrawals, except the ones a reported rename moved",
-              GK9.paths_never_lost(_files_before, _files_after, _renamed_olds),
+              GK9.check_paths_never_lost(_files_before, _files_after, _renamed_olds),
               f"lost {sorted(set(_files_before) - set(_files_after))} · "
               f"excused {sorted(_renamed_olds)}")
         check("[-11] AC6 ...and the COUNT predicate still holds too, so this replaces a weaker "
@@ -5065,7 +5065,7 @@ user_skills = "/tmp/gk-fake-skills"
         _b3 = ["a.txt", "b.txt", "c.txt"]
         _a3 = ["a.txt", "c.txt", "new.txt"]
         check("[-ST3] AC1 a delete-one-land-one run is caught by the PATH predicate",
-              GK9.paths_never_lost(_b3, _a3, []) is False,
+              GK9.check_paths_never_lost(_b3, _a3, []) is False,
               f"{sorted(set(_b3) - set(_a3))}")
         check("[-ST3] AC1 ...and is MISSED by the count predicate, which is why this unit exists",
               GK9.count_never_falls(len(_b3), len(_a3)) is True, "the count caught it after all")
@@ -5074,7 +5074,7 @@ user_skills = "/tmp/gk-fake-skills"
         _b2 = ["keep.txt", "moved.txt"]
         _a2 = ["keep.txt", "renamed.txt"]
         check("[-ST3] AC2 a legal rename PASSES when its old path is excused",
-              GK9.paths_never_lost(_b2, _a2, ["moved.txt"]) is True, "")
+              GK9.check_paths_never_lost(_b2, _a2, ["moved.txt"]) is True, "")
         check("[-ST3] AC2 ...while the rejected subset assertion would have redded on it",
               (set(_b2) <= set(_a2)) is False,
               "the rejected alternative no longer reds, so this record is stale")
@@ -5082,23 +5082,23 @@ user_skills = "/tmp/gk-fake-skills"
         # AC6: the DIRECTION is load-bearing. Excusing the DESTINATION excuses a path that was
         # never lost, so the predicate still reds -- which is the defect rev-1 of the spec shipped.
         check("[-ST3] AC6 excusing the rename DESTINATION instead of its old path still REDS",
-              GK9.paths_never_lost(_b2, _a2, ["renamed.txt"]) is False,
+              GK9.check_paths_never_lost(_b2, _a2, ["renamed.txt"]) is False,
               "the direction is not load-bearing, so S2 is unfalsifiable")
 
         # AC3: a withdrawal is excused by its own path, and only by it.
         _b4 = ["keep.txt", "gone.txt"]
         _a4 = ["keep.txt"]
         check("[-ST3] AC3 a withdrawn path is excused when the run reported withdrawing it",
-              GK9.paths_never_lost(_b4, _a4, ["gone.txt"]) is True, "")
+              GK9.check_paths_never_lost(_b4, _a4, ["gone.txt"]) is True, "")
         check("[-ST3] AC3 ...and is NOT excused when the excused set is empty, so the argument "
               "is load-bearing rather than decorative",
-              GK9.paths_never_lost(_b4, _a4, []) is False, "")
+              GK9.check_paths_never_lost(_b4, _a4, []) is False, "")
 
         # AC4 LIVENESS: the table above must contain BOTH verdicts, or it grades one direction.
         check("[-ST3] AC4 LIVENESS the table exercises both verdicts, so it cannot pass by "
               "only ever asserting one of them",
-              len({GK9.paths_never_lost(_b3, _a3, []),
-                   GK9.paths_never_lost(_b2, _a2, ["moved.txt"])}) == 2,
+              len({GK9.check_paths_never_lost(_b3, _a3, []),
+                   GK9.check_paths_never_lost(_b2, _a2, ["moved.txt"])}) == 2,
               "the table is single-valued and proves nothing")
 
         # ---- DEPL-dSealedTally-5. THE GOV VINTAGE PIN ------------------------------------------
@@ -5106,12 +5106,12 @@ user_skills = "/tmp/gk-fake-skills"
         # satisfied by a silently-defaulted HEAD. Tree identity is what makes the pin grade the tree
         # under test; ref-reachability is what makes `demand_published_vintage` accept it.
         check("[-ST5] AC3 LIVENESS the pin's tree IS the working tree's, so it grades THIS tree",
-              _gov_git(HERE.parents[1], "rev-parse", GOV_PIN + "^{tree}")
-              == _gov_git(HERE.parents[1], "rev-parse", "HEAD^{tree}"),
+              run_gov_git(HERE.parents[1], "rev-parse", GOV_PIN + "^{tree}")
+              == run_gov_git(HERE.parents[1], "rev-parse", "HEAD^{tree}"),
               f"pin {GOV_PIN}")
         check("[-ST5] AC3 LIVENESS ...and some ref contains it, which is what the published-vintage "
               "guard demands",
-              _gov_git(HERE.parents[1], "for-each-ref", "--contains", GOV_PIN, "--count=1") != "",
+              run_gov_git(HERE.parents[1], "for-each-ref", "--contains", GOV_PIN, "--count=1") != "",
               f"pin {GOV_PIN} is reachable from no ref")
 
         # AC4: the refusal, driven against a scratch repository holding a detached commit no ref
@@ -5140,7 +5140,7 @@ user_skills = "/tmp/gk-fake-skills"
         git(_pinrepo, "branch", "-f", "pinned", "HEAD")
         check("[-ST5] AC4 LIVENESS ...while giving that same commit a ref makes it RESOLVE, so the "
               "refusal grades reachability rather than the fixture",
-              resolve_gov_pin(_pinrepo) == _gov_git(_pinrepo, "rev-parse", "HEAD"), "")
+              resolve_gov_pin(_pinrepo) == run_gov_git(_pinrepo, "rev-parse", "HEAD"), "")
 
         # AC5: the population that must NOT be re-pointed, counted by an ANCHORED match. The
         # unanchored form matches `gov_run(` too and returns 9, which is the miscount an earlier

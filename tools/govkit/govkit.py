@@ -3484,7 +3484,7 @@ def hook_probe(target: pathlib.Path) -> tuple[str, str]:
     return "block", (out.stdout + out.stderr).strip()
 
 
-def paths_never_lost(before, after, excused) -> bool:
+def check_paths_never_lost(before, after, excused) -> bool:
     """DEPL-dSealedTally-3. The standing predicate over PATHS, which a count cannot express.
 
     `count_never_falls` grades a TOTAL, so since the relaxation to "never falls" a run that deletes
@@ -6007,7 +6007,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
           f"vintages, at >= {RENAME_SIMILARITY_PERCENT}% similarity")
     rename_dests: dict[str, dict[str, list[str]]] = {}
 
-    def fill_rename_dests(eid: str) -> None:
+    def resolve_rename_dests(eid: str) -> None:
         """Resolve ONE kit's source-to-destination map into `rename_dests`, idempotently.
 
         DEPL-dSealedTally-2. Extracted so the eager loop below and `resolve_renamed`'s own guard
@@ -6039,7 +6039,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # that used to skip it. The landing block below makes the same call under the same `except`.
     for _eid_pre in (kits or claimed):
         try:
-            fill_rename_dests(_eid_pre)
+            resolve_rename_dests(_eid_pre)
         except Refusal:
             continue
 
@@ -6075,7 +6075,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', and this row "
                   f"names kit '{eid}', which no registry entry claims")
             return None
-        fill_rename_dests(eid)
+        resolve_rename_dests(eid)
         dests = rename_dests[eid].get(new) or []
         if len(dests) != 1:
             print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', which kit "

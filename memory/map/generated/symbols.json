@@ -618,6 +618,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_paths_never_lost",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "check_quiet",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -2098,11 +2103,6 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
-      "id": "paths_never_lost",
-      "kind": "function",
-      "file": "tools/govkit/govkit.py"
-    },
-    {
       "id": "pin_of",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -2588,11 +2588,6 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
-      "id": "repin_receipt",
-      "kind": "function",
-      "file": "tools/govkit/selftest.py"
-    },
-    {
       "id": "repo_root",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -2936,6 +2931,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "run_gov_git",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "run_grep",
@@ -3831,6 +3831,11 @@
       "id": "write_lookup",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "write_receipt_pin",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "write_text",
