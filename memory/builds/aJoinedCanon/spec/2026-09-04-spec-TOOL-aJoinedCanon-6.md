@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 750ca0ca · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 6 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -30,8 +30,9 @@ the answer that claims to evidence it.
   `LEDGER_TOKEN_CUTOFF`, each compared against the SPEC's filename date exactly as `alcut` is at
   `check-memory-hygiene.sh:1376`, each blank-means-off. Observed by AC5 and AC6.
 - **S5** — Both arms announce an empty population, in the shape `check-memory-hygiene.sh:1526`
-  already uses, so a cutoff that grandfathers everything is not mistaken for a clean run. Observed
-  by AC7.
+  already uses, so a cutoff that grandfathers everything is not mistaken for a clean run. Not
+  optional and not hypothetical: with both cutoffs ahead of the fleet (§4), an empty population is
+  what the landing commit itself measures. Observed by AC7.
 - **S6** — The ledger grammar in `memory/HYGIENE.md` and `tools/memory-tree/HYGIENE.template.md`
   states the token rule, so an author reads it where the grammar lives rather than discovering it
   from a red bar. Observed by AC8.
@@ -109,6 +110,19 @@ subject two ways across the join — a criterion says `tools/govkit/selftest.py`
 `python tools/govkit/selftest.py`, or a criterion names a spec file by basename and its answer names
 it by repo path. Exact set intersection calls all of those disagreements.
 
+**Arm B sets `status=1`** — it reds, per §8's resolved FORK-1, and is not an advisory count. The
+risk that carries is stated here rather than only in the fork: this arm can manufacture work on a
+correct ledger and then get waived, which is the failure mode of every gate whose false-positive
+rate outruns its authors' patience. The rate is not hypothetical. Containment fails 25.4% of the
+gradeable corpus and 18.2% of the newest closed cohort, so on today's writing habits roughly one
+answer in five would have to be re-worded. Two things answer it, and neither is optimism. The
+cutoffs below put both arms AHEAD of the fleet, so the population an author meets is a population
+they wrote after reading the rule, not one they wrote before it existed. And S6 puts the rule in the
+ledger grammar, which is where the residual form — a ledger citing a self-test arm id where the
+criterion named a file — becomes a notation an author follows rather than a red they have to argue
+with. If the arm still manufactures work once real specs start meeting it, the honest response is a
+blank `LEDGER_TOKEN_CUTOFF`, which is the rollback below, and not a waiver row.
+
 ### Inventory
 
 Reproduced at base 750ca0ca with a throwaway probe mirroring check 23's own selectors (filename date
@@ -137,16 +151,10 @@ record names; the count is otherwise as recorded.
 
 ### Migration
 
-**Arm A ships at `LEDGER_LABEL_CUTOFF="2026-09-04"`.** Measured: six CLOSED Tier-2 specs are already
-dated at or after 2026-09-04, and arm A reds NONE of them. The one historical hit is dated
-2026-09-02 and falls outside. So arm A lands with a live, non-empty first population and reds no
-landed work, which is the shape `.memory-tree.conf:298-300` argues for.
-
-**Arm B ships at a `LEDGER_TOKEN_CUTOFF` strictly AFTER the newest spec filename date in the tree at
-landing.** No earlier value is available. Measured on the same six-unit cohort dated 2026-09-04 or
-later, containment still fails 8 of 44 answers (18.2%) across 5 of those 6 units, so even the
-newest closed work does not satisfy this arm. The value is derived in the landing commit rather than
-pinned here, because a date typed into a spec goes stale between writing and landing:
+**BOTH keys ship strictly AFTER the newest spec filename date in the tree at landing** — the
+build-wide ruling of 2026-09-05: this build's cutoffs sit ahead of the fleet, so no landed ledger
+reds. The value is derived in the landing commit rather than pinned here, because a date typed into
+a spec goes stale between writing and landing:
 
 ```bash
 git ls-files 'memory/builds/*/spec/*.md' | sed 's#.*/##' | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}-' \
@@ -156,6 +164,22 @@ git ls-files 'memory/builds/*/spec/*.md' | sed 's#.*/##' | grep -E '^[0-9]{4}-[0
 The landing commit states the chosen value and its reason, per the cutoff discipline the other keys
 in that file already follow.
 
+For arm B no earlier value was ever available. Measured on the six-unit cohort dated 2026-09-04 or
+later, containment still fails 8 of 44 answers (18.2%) across 5 of those 6 units, so even the newest
+closed work does not satisfy this arm.
+
+For arm A this is a CHANGE from rev-1, which pinned `LEDGER_LABEL_CUTOFF="2026-09-04"` on the
+measurement that six CLOSED Tier-2 specs are already dated at or after that day and arm A reds NONE
+of them — the one historical hit is dated 2026-09-02 and falls outside. That measurement still
+stands and is why the predicate is known not to be wild; what changed is the conclusion drawn from
+it. Rev-1 argued for the live, non-empty first population that `.memory-tree.conf:298-300` calls
+for. The owner's ruling overrides that shape here, and the cost is real and worth naming: arm A's
+first run on the real tree measures nothing, which is exactly the "assertion about nothing" that
+conf comment warns against. Two things keep it from being one. The empty population ANNOUNCES itself
+per S5, so the zero is a stated measurement and not a silent green (AC7). And the observed red both
+arms owe is earned in the fixtures per S7, in `check-memory-hygiene.test.sh`, which is where a
+forward-cutoff arm can earn it at all.
+
 The residual failures under containment are dominated by one legitimate answer form the predicate
 cannot recognise: the ledger cites a self-test ARM ID such as `[-ST4]` where the criterion named the
 file the arm lives in. That is a real answer, and it is why S6 puts the rule in the ledger grammar
@@ -163,8 +187,13 @@ where an author reads it — the fix is a notation the writer follows, not a pre
 
 ### Rollout
 
-Arm A and arm B land in one commit and are separated by their cutoffs, not by a flag. A blank value
-in either key turns that arm off entirely, which is the rollback: one conf edit, no code revert.
+Arm A and arm B land in one commit, both setting `status=1` on a hit, and both dark over every
+landed ledger because both cutoffs sit ahead of the fleet. Under rev-1 the two keys held DIFFERENT dates and that
+difference was the rollout; under the 2026-09-05 ruling they land at the same derived value, so what
+separates them is no longer their dates but their independent disarm. A blank value in either key
+turns that arm off entirely without touching the other, which is the rollback: one conf edit, no
+code revert. Two keys therefore still earn their place — they let arm B be withdrawn on a
+false-positive rate while arm A, whose corpus-wide hit count is 1, stays armed.
 
 ### Files touched (estimate)
 
@@ -178,13 +207,18 @@ in either key turns that arm off entirely, which is the rollback: one conf edit,
 
 ### Alternatives rejected
 
-- **One cutoff key for both arms.** It forces the free arm to wait for the expensive one. Arm A
-  is landable today against a live population; arm B is not landable against any date in the corpus.
-  One key buys a smaller diff and costs both arms a live first run.
+- **One cutoff key for both arms.** REASON REPLACED at rev-2. Rev-1 rejected it because it forced
+  the free arm to wait for the expensive one — arm A was landable against a live population and arm
+  B was not landable against any date in the corpus. The 2026-09-05 ruling puts both cutoffs ahead
+  of the fleet, so both arms now land against an empty first population and that reason is dead. Two
+  keys survive on the reason stated under Rollout, which the ruling does not touch: independent
+  disarm, so arm B can be withdrawn on a false-positive rate without taking arm A with it.
 - **Add `DEPL-dRetiredFork-3` to `ACCEPTANCE_LEDGER_GRANDFATHER` and land arm A at the existing
-  cutoff.** That list exempts a unit from ALL of check 23, so it would trade one new finding for
-  three existing ones. Its own declaration also restricts admissions to units that closed while the
-  grammar was unmerged, which this is not.
+  cutoff.** MOOT at rev-2, and kept because it records a real option. A cutoff ahead of the fleet
+  never grades that unit at all, so no exemption is needed for it. Had arm A landed at the existing
+  cutoff, this was still the wrong instrument: that list exempts a unit from ALL of check 23, so it
+  would have traded one new finding for three existing ones, and its own declaration restricts
+  admissions to units that closed while the grammar was unmerged, which this is not.
 - **Fix the `DEPL-dRetiredFork-3` ledger line instead.** Ruled out by the position recorded beside
   the grandfather list: a build's own folder owns its own prose.
 - **Exact token-set equality.** Measured at 39.2% against containment's 25.4%, and the extra 172
@@ -207,8 +241,13 @@ in either key turns that arm off entirely, which is the rollback: one conf edit,
 - error / empty / loading states — an empty population per arm announces itself, which is S5.
 - observability — each failure names the unit and the label, in the shape the three existing `fail 23`
   branches use.
-- risks — the named risk is arm B's false-positive rate against future authors, which is what §8's
-  fork is about. There is no data-loss or rollback hazard: a blank cutoff disarms either arm.
+- risks — arm B reds (§8 FORK-1, resolved 2026-09-05), so its false-positive rate against future
+  authors is now a property of the shipped gate rather than an open question. Stated plainly: 25.4%
+  of the gradeable corpus and 18.2% of the newest closed cohort fail containment, and a gate that
+  manufactures work on correct ledgers gets waived. What holds it down is §4's pair — a cutoff ahead
+  of the fleet, so nobody meets the rule retroactively, and S6's grammar note, so the one legitimate
+  form the predicate cannot recognise has a notation. There is no data-loss or rollback hazard: a
+  blank cutoff disarms either arm.
 - testing + left-shift gates — the harness meta-gate makes this mandatory rather than optional. Every
   `fail` branch must be ARMED by a positive assertion in `check-memory-hygiene.test.sh` naming a
   literal slice of its own failure text, or be listed in `memory/project/unarmed-branches.txt`; neither new
@@ -234,16 +273,22 @@ in either key turns that arm off entirely, which is the rollback: one conf edit,
 - **AC6** — When either new key is blank in `.memory-tree.conf`, its arm reports nothing at all and
   `bash tools/memory-tree/check-memory-hygiene.sh` is green over the real tree.
 - **AC7** — When every graded spec predates an arm's cutoff, that arm prints its own
-  `measured NO unit` announce line, matching the shape at `check-memory-hygiene.sh:1526`.
+  `measured NO unit` announce line, matching the shape at `check-memory-hygiene.sh:1526`. Since the
+  2026-09-05 ruling puts both cutoffs ahead of the fleet, this is not a fixture-only case: it is
+  what BOTH arms print on the real tree in the landing commit, and it is the only thing standing
+  between an empty first population and a silent green.
 - **AC8** — When the token rule lands in `memory/HYGIENE.md`, `bash
   tools/memory-tree/kit-dogfood-parity.test.sh` is green, proving
   `tools/memory-tree/HYGIENE.template.md` carries the same bytes.
 - **AC9** — When `python3 tools/memory-tree/check-arms.py --check` runs, both new `fail 23` branches
   are ARMED, and neither appears in `memory/project/unarmed-branches.txt`.
 - **AC10** — When `LEDGER_TOKEN_CUTOFF` is temporarily set to `ACCEPTANCE_LEDGER_CUTOFF`'s value and
-  `bash tools/memory-tree/check-memory-hygiene.sh` is run, the arm reports a count within a stated
-  tolerance of the 315-of-1,241 figure in §4, re-deriving the table from the landed arm instead of
-  from the probe that is not committed. The temporary value is reverted in the same session.
+  `bash tools/memory-tree/check-memory-hygiene.sh` is run, the run is RED — arm B sets `status=1`
+  per §8 — and the offenders counted out of its `fail 23` output land within a stated tolerance of
+  the 315-of-1,241 figure in §4, re-deriving the table from the landed arm instead of from the probe
+  that is not committed. A GREEN run under that temporary value falsifies the arm rather than
+  passing this criterion. The temporary value is reverted in the same session, and no commit carries
+  it: the ruling that no landed ledger reds is about what ships, and this is a measurement.
 - **AC11** — When the whole bar runs, `bash tools/run-gates/run-gates.sh` is green with
   `memory hygiene` and `memory-hygiene self-test` among its legs, and the elapsed row for
   `memory hygiene` in `<git-dir>/gate-ledger.tsv` is recorded beside the pre-change one.
@@ -251,10 +296,14 @@ in either key turns that arm off entirely, which is the rollback: one conf edit,
 ## 7. Gates
 
 - `memory hygiene` — `bash tools/memory-tree/check-memory-hygiene.sh`, unguarded, and the leg both
-  arms actually bind on. Check 23 is HELD under `--staged` (`check-memory-hygiene.sh:1405`), so these
-  arms bind at the push boundary and never in pre-commit.
+  arms live on and will eventually red on. Check 23 is HELD under `--staged`
+  (`check-memory-hygiene.sh:1405`), so these arms bind at the push boundary and never in pre-commit.
+  On the landing commit itself this leg CANNOT red on either arm: both cutoffs sit ahead of the
+  fleet per §4, so what it prints is the empty-population announce (AC7). It starts grading real
+  work with the first spec dated past the cutoff.
 - `memory-hygiene self-test` — `bash tools/memory-tree/check-memory-hygiene.test.sh`, guarded on
-  `tools/memory-tree/`, which this unit edits.
+  `tools/memory-tree/`, which this unit edits. Under the forward cutoffs this is where both arms'
+  observed red is EARNED — the fixtures of S7, not the corpus.
 - `kit/dogfood doc parity` — `bash tools/memory-tree/kit-dogfood-parity.test.sh`, the byte-compare
   that makes the `HYGIENE` pair move together.
 - `harness arms (fail branches armed or pinned)` — `python3 tools/memory-tree/check-arms.py --check`,
@@ -280,12 +329,25 @@ in either key turns that arm off entirely, which is the rollback: one conf edit,
 
   **Recommendation: A.** An advisory arm has no failing case to observe, so it cannot satisfy the
   build rule that a new arm owes an observed red, and a check that cannot fail is the shape §7 of
-  the charter refuses outright. UNRESOLVED — the owner decides, and it is the one decision in this
-  spec that changes what the arm is.
+  the charter refuses outright.
+
+  RESOLVED (owner, 2026-09-05): option A — arm B REDS. It sets `status=1` like every other `fail 23`
+  branch, on the recommendation's own reasoning: an advisory arm has no failing case to observe, so
+  it could not satisfy this build's rule that a new arm owes an observed red, and a check that
+  cannot fail is the shape charter §7 refuses. Option B, the advisory release, loses; its text stays
+  above as the record of what was considered. The risk named against the recommendation stands and
+  is not waved away — it moves into §4 and §5 as a body claim rather than living only here.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · §8 · §4 Design/Migration/Rollout/Alternatives rejected · §5 · §6 AC7, AC10 ·
+  §7 · header status line · folded the owner's ruling on FORK-1: arm B REDS, and the risk it carries
+  moved out of the fork into §4 and §5. Applied the build-wide ruling that this build's cutoffs sit
+  ahead of the fleet, which moved `LEDGER_LABEL_CUTOFF` off rev-1's pinned `2026-09-04` onto arm B's
+  derived-at-landing value, emptied both arms' first population, killed the population reason under
+  the rejected one-key alternative, made the grandfather alternative moot, and moved the observed
+  red from the corpus to the S7 fixtures. Header gains `ratified 2026-09-05`; §8 holds no open fork.
 
 ## 10. Reuse audit
 

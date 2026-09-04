@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-11 — the base sha resolves to a real object
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-1 · base 750ca0ca · streams tooling · order 11
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 11 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -32,6 +32,12 @@ transposed digit is caught by the bar instead of by a reviewer.
 - **S6** — the `base` bullet in `memory/TEMPLATE-SPEC.md` and its byte-compared twin
   `tools/memory-tree/SPEC-TEMPLATE.template.md` gains the resolution rule and names the cutoff, in
   one commit, with the kit version marker moved in every carrier that holds it.
+- **S7** — check 12's catalog entry in `memory/HYGIENE.md` and its byte-compared twin
+  `tools/memory-tree/HYGIENE.template.md` state the live-only population AND the gap it accepts:
+  a spec whose base does not resolve can be silenced by closing it, and a unit that goes `SPECCED`
+  to `CLOSED` in one commit is never graded at all. It sits beside that entry's existing
+  `SHAPE only` caveat, in the same commit as S2, because a check whose own description omits what
+  it does not check is the shape charter §7 refuses.
 
 **What this arm buys, stated plainly because the honest answer is small.** All 22 spec files carrying
 an unresolvable base are CLOSED, so this catches nothing that exists. Re-derived at `750ca0ca`:
@@ -55,7 +61,9 @@ is the same defect on a review's own range, again caught by a person.
   branch. Reachability is a different and much more expensive question, and a spec grounded on a
   branch tip is legitimate — `aRelaxedShard-4`'s own revision log records why.
 - **Any claim about the CONTENT at that sha.** This resolves an object and stops.
-- **Widening the population to terminal specs.** See §8 — that is the one open decision here.
+- **Widening the population to terminal specs.** Ruled out by the owner on 2026-09-05 as §8's answer
+  to F1. The never-graded bypass that leaves is an ACCEPTED gap, documented by S7, not a deferred
+  decision and not a follow-up.
 - **A second channel for the value.** No environment override, for the reason `TOOL-aDeclaredBound-2`
   retired the one `SPEC10_CUTOFF` had.
 
@@ -143,7 +151,7 @@ unaffected and no separate branch is needed for it.
 | `tools/memory-tree/check-memory-hygiene.test.sh` | S5, two fixtures after the `git commit` at `:573` |
 | `memory/TEMPLATE-SPEC.md` | S6, the `base` bullet |
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | S6, the same bytes |
-| `memory/HYGIENE.md` | check 12's catalog entry gains the clause |
+| `memory/HYGIENE.md` | check 12's catalog entry gains the clause and S7's accepted-gap sentence |
 | `tools/memory-tree/HYGIENE.template.md` | the same bytes |
 | `tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUILD-METHOD.md` | kit version marker only |
 | `memory/map/features/memory-tree-hygiene.md` | dossier prose, refreshed on touch |
@@ -170,8 +178,9 @@ resolved would be the could-not-fail shape this unit exists to close.
 - **Resolving without the `^{commit}` peel.** An abbreviation naming a tree would pass.
 - **Failing on a shallow clone.** It converts a legitimate CI configuration into an unlandable one,
   and the charter's rule is that a skip announces itself, not that a blind probe reds.
-- **Retrofitting by widening the population to CLOSED specs.** Named in §3 and reopened as the §8
-  fork, because it is the owner's call and not this unit's.
+- **Retrofitting by widening the population to CLOSED specs.** Named in §3 and ruled out by the
+  owner on 2026-09-05, closing the §8 fork: a landed green spec must not be able to go red from
+  history it does not control.
 
 ## 5. Production-readiness checklist
 
@@ -188,7 +197,8 @@ resolved would be the could-not-fail shape this unit exists to close.
   transposition without opening anything. The skip line names the condition.
 - **risks** — a history rewrite that drops a `base` commit reds a previously green corpus with no
   legal remedy, since editing a ratified record is forbidden. Restricting the population to live
-  specs is what bounds this, and it is the §8 fork.
+  specs is what bounds this, per the owner's ruling on F1. The residual risk is the bypass that
+  ruling accepts — a bad base silenced by closing the spec — which S7 documents rather than closes.
 - **testing + left-shift gates** — S5's two fixtures. The red one is staged, confirmed red, and kept
   as a fixture rather than unstaged, which is what the self-test is for.
 - **migration / rollback** — blanking `BASE_RESOLVE_CUTOFF` turns the arm off completely, and the
@@ -215,6 +225,10 @@ resolved would be the could-not-fail shape this unit exists to close.
 - **AC7** — When `python tools/memory-tree/check-arms.py --report` runs after the change,
   `tools/memory-tree/check-memory-hygiene.sh` still reports `20:20`, confirming the arm adds a
   finding to the existing `fail 12` branch rather than a new unarmed one.
+- **AC8** — When check 12's catalog entry is read in `memory/HYGIENE.md` after the change, it states
+  both the live-only population and the never-graded bypass S7 names, and
+  `bash tools/memory-tree/kit-dogfood-parity.test.sh` passes, proving
+  `tools/memory-tree/HYGIENE.template.md` carries those same bytes.
 
 ## 7. Gates
 
@@ -242,11 +256,20 @@ No new gate leg. The arm is a finding inside check 12, which is already on the b
   silenced by closing it, and a unit that goes `SPECCED` to `CLOSED` in one commit is never graded at
   all. Widening to every post-cutoff spec is a one-condition change in the same `if`, so this is a
   decision and not a rebuild. **Recommendation: live-only, with the never-graded case named in
-  `memory/HYGIENE.md` as a known gap rather than implied away.** UNRESOLVED — owner's call.
+  `memory/HYGIENE.md` as a known gap rather than implied away.**
+  RESOLVED (owner, 2026-09-05): live specs only — post-cutoff specs whose status is not `CLOSED` or
+  `WONTDO`, because a landed green spec must not be able to go red from history it does not control
+  and this tree forbids editing a ratified record, so the corpus-wide scope has a failure mode with
+  no legal remedy. The bypass is ACCEPTED, not closed: naming it in check 12's own catalog entry is
+  a requirement of this unit, carried as S7 and graded by AC8.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · §8 · §2 · §3 · §4 · §5 · §6 · folded the owner's ruling on F1: live specs
+  only, and the bypass it accepts became a requirement — S7 states it in check 12's catalog entry
+  and its twin, AC8 grades it, §3 and §4 stop calling the widening an open decision, and §5's risk
+  bullet names the residual rather than the fork.
 
 ## 10. Reuse audit
 

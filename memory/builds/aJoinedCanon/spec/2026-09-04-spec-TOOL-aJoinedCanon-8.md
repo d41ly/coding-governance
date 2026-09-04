@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 750ca0ca · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 8 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -37,11 +37,15 @@ every edge naming a sibling, so a handoff into a unit that never accepted it red
 - **S7** — the EXTERNAL-PAYLOAD arm: a bullet whose payload is `external` and whose prose backticks
   an id in this build's roster reds and names the verb it should have used. Observed by AC5.
 - **S8** — the zero-population announcement, modelled on the §10 evidence arm's at
-  `tools/memory-tree/check-memory-hygiene.sh:1300-1305`. Observed by AC8.
+  `tools/memory-tree/check-memory-hygiene.sh:1300-1305`. Under the cutoff §8 resolved on, this is
+  load-bearing rather than a nicety: the arm grades no tracked spec on day one, so the notice is the
+  only thing separating its silence from coverage. Observed by AC8.
 - **S9** — red and green fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`, taking free
   `tFixture` numbers from 100 up, since the highest in the file today is `tFixture-86` and
-  `TOOL-aJoinedCanon-3` S7 claims 90. Every red is OBSERVED before the arm lands. Observed by AC1
-  through AC8.
+  `TOOL-aJoinedCanon-3` S7 claims 90. Every red is OBSERVED before the arm lands. The fixtures are
+  the ENTIRE graded population at adoption, because §8 resolved the cutoff strictly ahead of every
+  live spec filename date: no tracked spec is back-filled, this build's own eleven included.
+  Observed by AC1 through AC8.
 - **S10** — the declaration bookkeeping: `ARMS_FLOORS` re-measured for
   `tools/memory-tree/check-memory-hygiene.sh` with `python tools/memory-tree/check-arms.py
   --report`, and `KIT_MEMORY_TREE_VERSION` bumped in every carrier of the marker, the set derived
@@ -80,9 +84,9 @@ every edge naming a sibling, so a handoff into a unit that never accepted it red
 - **hands-off** `TOOL-aJoinedCanon-10` — `SPEC_EDGES_CUTOFF` is one more declared cutoff key, so the
   sentence unit 10 corrects must count it. Unit 10 is at order 10 and this unit is at order 8, so the
   correction is written after the key exists.
-- **consumes-from** external — owner scope approval on §8's fork. If it resolves to the landing date
-  rather than strictly ahead, S9 gains the back-filled blocks for this build's own eleven specs and
-  AC7's grandfather case changes.
+- **consumes-from** external — owner scope approval on §8's fork, SATISFIED 2026-09-05: the cutoff
+  sits strictly ahead of every live spec filename date. S9 and AC7 are written to that answer, so the
+  back-fill this edge used to hang on is refused rather than pending.
 
 ## 4. Design
 
@@ -221,10 +225,11 @@ The commit also owes a `gov:kit memory-tree@` bump in every carrier. Derive that
 - **risks** — a rubber-stamped reciprocal passes, as §4 says. The external-payload arm can
   false-positive on a bullet that backticks a sibling id as context, which is why AC10 runs the
   candidate predicate over the whole tree before it is wired. A cutoff set too early reds in-flight
-  branches, which is §8's fork. Naming a foreign build's id in prose already contributes to THAT
-  build's roster, since `rosters()` at `gen_build_index.py:661-693` keys on the id's own slug
-  component; the grammar adds no new instance of that because a joined edge names a sibling in this
-  build only.
+  branches; §8 resolved that fork to the strictly-ahead date, which retires the risk and moves the
+  whole day-one cost onto S8's zero-population notice. Naming a foreign build's id in prose already
+  contributes to THAT build's roster, since `rosters()` at `gen_build_index.py:661-693` keys on the
+  id's own slug component; the grammar adds no new instance of that because a joined edge names a
+  sibling in this build only.
 - **testing + left-shift gates** — S9. Each red is staged, observed, unstaged, per build rule 4.
 - **migration / rollback** — §4 Migration.
 - **user docs** — `memory/HYGIENE.md` item 12 and the template itself are what an author reads. This
@@ -247,8 +252,10 @@ The commit also owes a `gov:kit memory-tree@` bump in every carrier. Derive that
 - **AC6** — When the fixture build's specs each carry a conforming block, including this spec's own
   §3 block copied in as a fixture, `bash tools/memory-tree/check-memory-hygiene.sh` is green and no
   arm fires.
-- **AC7** — When `SPEC_EDGES_CUTOFF` is blank, and separately when a fixture spec's filename date
-  precedes it, no arm fires and the run is green.
+- **AC7** — When `SPEC_EDGES_CUTOFF` is blank, no arm fires and the run is green. And when it holds
+  the strictly-ahead date §8 resolved on, `bash tools/memory-tree/check-memory-hygiene.sh` over the
+  real tree is green with every tracked spec grandfathered, this build's own eleven included — the
+  grandfather case is the LIVE CORPUS rather than one fixture, which is what that resolution made it.
 - **AC8** — When no tracked spec reaches the cutoff, the run prints the named zero-population notice
   on stdout, in the shape `check-memory-hygiene.sh:1300-1305` already uses.
 - **AC9** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs after the template edit, it
@@ -288,12 +295,22 @@ branches move.
   a sibling unit is mid-build against. RECOMMENDATION: option A. Build rule 3 says every template
   change is a dated cutoff and never a retrofit, and eleven concurrent rev bumps across a sequenced
   build is exactly the retrofit that rule exists to refuse. The zero-population announcement in S8 is
-  what stops option A's silence being mistaken for coverage. Not resolved here — it changes S9 and
-  AC7, and the owner owns it.
+  what stops option A's silence being mistaken for coverage.
+
+  RESOLVED (owner, 2026-09-05): option A — `SPEC_EDGES_CUTOFF` sits strictly ahead of every spec
+  filename date on every live branch, and this build's own eleven specs back-fill nothing. Option B's
+  text stays above as the record of what was weighed and why it lost. The two things this fork said
+  it changed are changed: S9 now states the fixtures are the entire graded population at adoption,
+  and AC7's grandfather case is the live corpus rather than a fixture. S8 stays, promoted from a
+  nicety to the load-bearing thing that keeps day-one silence from reading as coverage.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · §8 · §2 · §3 · §5 · §6 · folded the owner's ruling on F1: option A, the cutoff
+  sits strictly ahead of every live spec filename date and nothing is back-filled. S9 gained the
+  day-one population statement, S8 the load-bearing note, §3's external edge is marked satisfied,
+  §5's cutoff risk is retired, and AC7's grandfather case moved from a fixture to the live corpus.
 
 ## 10. Reuse audit
 

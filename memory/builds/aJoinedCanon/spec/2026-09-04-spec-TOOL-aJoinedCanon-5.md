@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-1 · base 750ca0ca · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -11,16 +11,19 @@
 ## 1. Goal
 
 §6 asks for an observation and never asks what the observation needs before it can be made. Add one
-paragraph to §6 telling an author to declare a criterion's preconditions — its cost, its permission,
-the fixture or live instance it needs, and whether a figure it states is derived or pinned. Finding
+instructional block to §6 telling an author to declare a criterion's preconditions as four named
+sub-fields — its `cost:`, its `permission:`, the `fixture:` or live instance it needs, and whether a
+`figure:` it states is derived or pinned. Finding
 A5 of `memory/builds/aWeighedCanon/build/2026-09-04-build-TOOL-aWeighedCanon-2-what-the-spec-format-is-missing.md`
 measured 81 acceptance criteria amended at build time across 32 records, and 37 of them trace to one
 of those four things going unsaid.
 
 ## 2. Scope (IN)
 
-- **S1** — One paragraph added to §6 of `tools/memory-tree/SPEC-TEMPLATE.template.md`, inside the
-  skeleton fence, naming the four preconditions and the one-line form that declares them.
+- **S1** — One instructional block added to §6 of `tools/memory-tree/SPEC-TEMPLATE.template.md`,
+  inside the skeleton fence, naming the four preconditions as four named sub-fields — `cost:`,
+  `permission:`, `fixture:`, `figure:` — written as lines under the criterion's own bullet, and
+  stating that a field which does not apply is OMITTED rather than written as `none`.
 - **S2** — The same text present in `memory/TEMPLATE-SPEC.md`, produced by re-rendering the twin
   rather than by hand-editing the live copy.
 - **S3** — This spec's own §6 written in the shape S1 proposes, so the first instance of the rule
@@ -36,7 +39,7 @@ of those four things going unsaid.
   both land in §6, which is why they are sequenced rather than parallel.
 - **Not §7's arm-location question.** Where a new gate's arm lives is `TOOL-aJoinedCanon-7`, and the
   overlap is deliberate: a criterion may declare that its arm's suite is one this run may not
-  execute, which is a permission, while unit 7 owns where the arm is written.
+  execute, which is this unit's `permission:` field, while unit 7 owns where the arm is written.
 - **Not the ledger side.** This changes what a criterion declares, never what an acceptance ledger
   answers. `TOOL-aJoinedCanon-6` owns the join.
 - **No new §5 row.** The production-readiness row set is `TOOL-aJoinedCanon-9`'s subject.
@@ -45,17 +48,30 @@ of those four things going unsaid.
 
 ### The four preconditions, and the evidence for each
 
-| Precondition | The question §6 does not ask | Evidence |
+| Field | The question §6 does not ask | Evidence |
 |---|---|---|
-| Cost | What does making this observation cost, when it is not seconds? | 23 of 81 amendments were over cost or permission. `grep -ciE 'cost\|budget\|minutes\|hours' memory/TEMPLATE-SPEC.md` returns `0` — verified 2026-09-04, and the silence is total. |
-| Permission | May THIS run execute the thing that observes it? | Same 23. The unrunnable suite and the boundary an unattended run may not cross are both this class. |
-| Fixture | Does the tree contain the live instance this observation needs? | 6 amendments named one it did not contain. `TOOL-dHonouredPark-4` AC10 is the worked case: "zero tracked specs produce a heading whose id does not parse, so the condition has no live instance and its fixture is in the unrunnable suite." |
-| Derived or pinned | Is a figure this criterion states re-derived at observation time, or typed as a literal? | 8 amendments pinned a measured literal that was stale by build time. `TOOL-aNamedGesture-1` AC13 is the worked case, and its repair is the rule: "The witness is now the command, not a number." |
+| `cost:` | What does making this observation cost, when it is not seconds? | 23 of 81 amendments were over cost or permission. `grep -ciE 'cost\|budget\|minutes\|hours' memory/TEMPLATE-SPEC.md` returns `0` — verified 2026-09-04, and the silence is total. |
+| `permission:` | May THIS run execute the thing that observes it? | Same 23. The unrunnable suite and the boundary an unattended run may not cross are both this class. |
+| `fixture:` | Does the tree contain the live instance this observation needs? | 6 amendments named one it did not contain. `TOOL-dHonouredPark-4` AC10 is the worked case: "zero tracked specs produce a heading whose id does not parse, so the condition has no live instance and its fixture is in the unrunnable suite." |
+| `figure:` | Is a number this criterion states re-derived at observation time, or typed as a literal? | 8 amendments pinned a measured literal that was stale by build time. `TOOL-aNamedGesture-1` AC13 is the worked case, and its repair is the rule: "The witness is now the command, not a number." |
 
 23 plus 8 plus 6 is 37 of the 81. The cost and permission pair is the largest class that bins, and
 that qualifier is load-bearing: 33 of the 81 resist binning, so nothing here claims a largest cause
 overall. The four are one mechanism because they answer one question — what this criterion needs
 before it can be observed — and BUILD-METHOD M2 allows a unit exactly one.
+
+### The shape: four named sub-fields
+
+Four named lines under the criterion's own bullet, not one `Preconditions:` line. This is the
+owner's ruling of 2026-09-05 on §8's F1, against this spec's own recommendation, and the reason is
+the one F1's losing side conceded: four names read as a checklist and are what a future arm would
+grade, where one line is prose that happens to start with a word.
+
+An author writes only the fields that APPLY and omits the rest. A field that does not apply is
+absent, never written as `none` — the four names are questions the template asks, not blanks a
+bullet must fill, and a criterion carrying none of them is the common case rather than an
+under-filled one. That property is not a residue of the losing branch: it is the axis F1 never
+disputed, and §7 depends on it.
 
 ### The text
 
@@ -64,17 +80,24 @@ Added inside the §6 skeleton block, after the acceptance-witness paragraph:
 ```
 A criterion that cannot be observed for free, by this run, or against today's tree says so with the
 criterion instead of leaving the next session to discover it. Four things go unsaid and get paid for
-in build-time amendments. The COST of the observation, when it is not seconds. The PERMISSION it
-needs, when the suite or the boundary that observes it is one this run may not execute. The FIXTURE
-or live instance it needs, and whether the tree holds one today. And whether a figure the criterion
-states is DERIVED at observation time or PINNED as a literal — a pinned literal names when it was
-measured, because the writing rules verify at writing time and a build outlives its own
-measurements. Write one `Preconditions:` line under the bullet naming whichever apply, and omit the
-line when none do. Nothing grades that line: §7 of this unit's spec says why, and a criterion whose
-preconditions are all trivial is the common case.
+in build-time amendments. Declare whichever of them apply as named lines under the criterion's own
+bullet:
+
+- `cost:` — what the observation costs, when it is not seconds.
+- `permission:` — the suite, boundary or credential that observes it is one THIS run may not execute.
+- `fixture:` — the live instance or path the observation needs, and whether the tree holds one today.
+- `figure:` — whether a number the criterion states is DERIVED at observation time or PINNED as a
+  literal; a pinned literal names when it was measured, because the writing rules verify at writing
+  time and a build outlives its own measurements.
+
+Write only the fields that apply and OMIT the rest. A field written as `none` is a blank being
+filled rather than a question being answered, and a criterion whose preconditions are all trivial
+carries no fields at all — the common case. Nothing grades these lines.
 ```
 
-Wording is indicative, not byte-exact; the reviewed diff is the authority.
+Wording is indicative, not byte-exact; the reviewed diff is the authority. The four spellings are
+not indicative: they are the owner's, and a rendering that spells them otherwise has not landed the
+ruling.
 
 ### Where it goes, and why that placement is not arbitrary
 
@@ -88,6 +111,16 @@ instructions rather than trailing the section. The hazard is pre-existing and un
 the two paragraphs already there carry backticks — and it is recorded because a later editor moving
 this text down would silently weaken the witness arm.
 
+Two consequences of the four-field shape land on that same arm, and both were checked against the
+source rather than assumed. The block's own field-name bullets cannot be misread as criteria: the
+label regex at :1039 requires `AC[0-9]+` after an optional list marker, so a field-name bullet is
+instructional prose like the paragraphs beside it. And a sub-field line under a real criterion IS
+appended to that criterion's witness blob, because `acc` accumulates every line until the next label
+— so a bullet whose only backticked token sits in its `fixture:` line satisfies the witness arm
+while the criterion sentence itself names nothing. That was already true of any continuation line
+and is not a regression, but four permitted lines widen the surface, and an author reading this
+should put the witness in the criterion and let the fields add to it.
+
 ### Files touched (estimate)
 
 | File | Change |
@@ -95,9 +128,11 @@ this text down would silently weaken the witness arm.
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | The authored source. Edit here. |
 | `memory/TEMPLATE-SPEC.md` | Re-rendered from the twin, never hand-edited. |
 
-Roughly 900 B added to each, against 16,913 B and 16,906 B today. That figure is an ESTIMATE from
+Roughly 1,100 B added to each, against 16,913 B and 16,906 B today. That figure is an ESTIMATE from
 the draft text above and not a measurement; the observation in AC4 derives it rather than repeating
-it. Verified 2026-09-04 that no size gate binds either file: neither has a row in
+it. It rose from rev-1's roughly 900 B because the ruling's four named fields cost more template
+prose than the one-line form did, which is the shape's price and not a surprise. Verified 2026-09-04
+that no size gate binds either file: neither has a row in
 `tools/template-size-limits.txt`, and `bash tools/memory-tree/check-memory-hygiene.sh
 --print-index-set` does not list `memory/TEMPLATE-SPEC.md`, so check 6's per-class caps do not
 reach it.
@@ -115,10 +150,13 @@ repair one instance of.
 - **A fifth `##` section for preconditions.** The template forbids additional `##` headings and
   check 12 compares the section list for equality, so this is a new canon and a new dated cutoff for
   a paragraph. Rejected on cost.
-- **Four named sub-fields per criterion.** Carried to §8 as an open fork rather than rejected here,
-  because it is the owner's shape call and not mine.
-- **A `Preconditions:` marker plus an arm that requires one per bullet.** Rejected: a required line
-  that has nothing to say gets written as "none" 1,400 times and the gate then measures typing. §7.
+- **One `Preconditions:` line per criterion.** This spec's own recommendation in §8's F1, and
+  OVERRULED by the owner on 2026-09-05. Recorded here as the rejected alternative it now is; the
+  argument for it, and the cost the ruling accepts, stay in F1 rather than being re-litigated here.
+- **A required field set plus an arm that demands all four per bullet.** Rejected: four names that
+  have nothing to say get typed as `none` across 1,404 AC lines and the gate then measures typing.
+  This is the same rejection rev-1 made against a required `Preconditions:` line, and the ruling
+  makes it four times louder rather than retiring it. §7.
 - **Putting the derived-or-pinned rule in the Writing rules instead.** Carried to §8 as a fork.
 
 ## 5. Production-readiness checklist
@@ -134,8 +172,10 @@ repair one instance of.
   bullets and weakens the acceptance-witness arm. Recorded in §4 where an editor reads it. Rollback
   is a revert of two files, and the twin parity gate refuses a revert of only one.
 - testing + left-shift gates — **No gate, deliberately, and this row names the compensating check.**
-  "Did the author declare the cost" is not mechanically distinguishable from prose, so no arm is
-  written and none is claimed. The compensating check is a re-measurement, not a review pass: after
+  A `cost:` label is greppable — that is what the ruling's four names buy — but "did the author
+  declare the cost TRUTHFULLY, and did they notice they had one" is not mechanically distinguishable
+  from prose, so no arm is written and none is claimed. The compensating check is a re-measurement,
+  not a review pass: after
   five more builds close, re-run finding A5's method — count acceptance criteria amended at build
   time, bin them by cost, permission, fixture and stale literal, and compare against the 23, 6 and 8
   recorded here. If the three classes have not moved, this unit did nothing and should be reverted
@@ -147,32 +187,32 @@ repair one instance of.
 
 ## 6. Acceptance criteria
 
-*This section is written in the shape S1 proposes. A `Preconditions:` line appears only where one
-applies, which is the recommendation §8's first fork carries.*
+*This section is written in the shape S1 proposes, which is the owner's ruling of 2026-09-05 on
+§8's F1 and not this spec's recommendation. Each criterion carries only the sub-fields that apply,
+and AC1 and AC5 show what the omission looks like in practice.*
 
-- **AC1** — When the paragraph is added to `tools/memory-tree/SPEC-TEMPLATE.template.md` and the
-  live copy is re-rendered, `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0.
-  Preconditions: the render direction is TEMPLATE to LIVE, so `--render` must have been run; a
-  hand-edited `memory/TEMPLATE-SPEC.md` fails this criterion rather than satisfying it.
+- **AC1** — When the block is added to `tools/memory-tree/SPEC-TEMPLATE.template.md` and the live
+  copy is re-rendered, `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0.
+  fixture: the live copy must be the RENDERED one, so `--render` must have been run; a hand-edited
+  `memory/TEMPLATE-SPEC.md` fails this criterion rather than satisfying it.
 - **AC2** — When `grep -ciE 'cost|budget|minutes|hours' memory/TEMPLATE-SPEC.md` is run after the
   change, it returns a count greater than the `0` it returned before.
-  Preconditions: the `0` is DERIVED, measured on this branch at base `750ca0ca` on 2026-09-04, not
+  figure: the `0` is DERIVED, measured on this branch at base `750ca0ca` on 2026-09-04, not
   inherited from the finding; re-derive it on the pre-change tree if the after-count is disputed.
 - **AC3** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over the whole tree, it exits
   0, and no spec in `memory/builds/*/spec/` is newly named by check 12.
-  Preconditions: the full run is minutes rather than seconds on this node, and it is the whole-tree
-  form and not `--staged`, because a staged run grades only the diff and would report a green that
-  means nothing here.
+  cost: minutes rather than seconds on this node, which is exactly why the cheaper `--staged` form
+  does not substitute — it grades only the diff and would report a green that means nothing here.
 - **AC4** — When `wc -c` is taken over both files before and after, the growth is reported as the
   measured pair rather than as §4's estimate.
-  Preconditions: the figure is DERIVED at observation time. §4's roughly 900 B is a pinned estimate
-  and is not what this criterion grades.
-- **AC5** — When this spec is read at close, its own §6 still carries a `Preconditions:` line on the
-  criteria that need one, so `git grep -c 'Preconditions:' -- memory/builds/aJoinedCanon/spec/`
-  returns a non-zero count for this file.
-  Preconditions: no fixture and no permission; this is S3's observation and it is deliberately weak
-  — it grades presence, exactly as the witness arm does, and claims nothing about whether the
-  declarations are true.
+  figure: DERIVED at observation time. §4's roughly 1,100 B is a pinned estimate, restated at rev-2
+  for the four-field text, and is not what this criterion grades.
+- **AC5** — When this spec is read at close, its own §6 still carries named sub-fields on the
+  criteria that need them, so `git grep -cE '^ +(cost|permission|fixture|figure):' -- memory/builds/aJoinedCanon/spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md`
+  returns a non-zero count. This is S3's observation and it is deliberately weak — it grades
+  presence, exactly as the witness arm does, and claims nothing about whether the declarations are
+  true. No sub-field applies to it, so it carries none, which is the omission rule being obeyed
+  rather than a criterion left under-filled.
 
 ## 7. Gates
 
@@ -180,17 +220,20 @@ Kept green, by name from `tools/gate-legs.json`: `memory hygiene`, `kit/dogfood 
 whole bar is `bash tools/run-gates/run-gates.sh`; those two are the legs this diff can actually
 move.
 
-**This unit adds no gate, and the reason is the unit's own subject.** The charter binds a new arm to
-an observed failing case, and there is no failing case to observe: a criterion that declares its
-cost and a criterion that does not are the same bytes to a machine, because the declaration is
-prose. An arm that required a `Preconditions:` line on every bullet would grade typing, not
-declaration, and would be satisfied by "Preconditions: none" — the could-not-fail shape one level
-up, which §7 of the charter names. §5's testing row carries the compensating manual check instead of
-an arm, and that is the honest trade rather than a gap left open.
+**This unit adds no gate, and the ruling of 2026-09-05 does not change that.** The charter binds a
+new arm to an observed failing case, and there is no failing case to observe. Four named fields make
+the LABEL greppable where one prose line did not — that is the ruling's gain and it is real — but a
+criterion that needed a `cost:` line and omitted it is still byte-identical to one that correctly
+carried none, because the omission rule is what makes the fields writable at all. An arm demanding
+all four on every bullet would grade typing, not declaration, and would be satisfied by `cost: none`
+four times over — the could-not-fail shape one level up, which §7 of the charter names, and the
+ruling multiplies the blanks rather than removing them. §5's testing row carries the compensating
+manual check instead of an arm, and that is the honest trade rather than a gap left open.
 
-If a later unit finds a sub-shape that a machine can grade — a cost figure that must resolve, a
-named fixture path that must exist in `git ls-files` — it is a separate unit with its own dated
-cutoff and its own observed red. It is not smuggled in here.
+If a later unit finds a sub-shape that a machine can grade — a `cost:` figure that must resolve, a
+`fixture:` path that must exist in `git ls-files` — it is a separate unit with its own dated cutoff
+and its own observed red. The four named fields bring that day closer, which is the strongest thing
+this spec will say for the shape it did not recommend. It is still not smuggled in here.
 
 ## 8. Open questions
 
@@ -201,7 +244,12 @@ cutoff and its own observed red. It is not smuggled in here.
   ceremony across a population that is 1,404 AC lines today, and three of the four are empty on most
   criteria. **Recommendation: one line, written only when something applies, with the four names
   listed in the template's PROMPT so the author is asked all four and emits only what is true.** The
-  prompt is the checklist; the line is the answer. UNRESOLVED — this is a shape call for the owner.
+  prompt is the checklist; the line is the answer.
+  RESOLVED (owner, 2026-09-05): four named sub-fields — `cost:`, `permission:`, `fixture:`,
+  `figure:` — written as lines under the criterion's bullet, with a field that does not apply
+  OMITTED rather than written as `none`. The recommendation above lost: the ceremony cost across
+  1,404 AC lines was heard and did not outweigh the checklist reading and the gradeability a future
+  arm would need. The body is rewritten to this shape at rev-2, and §9 names every section moved.
 - **F2 · Does the derived-or-pinned rule belong in §6, or in the Writing rules?** Finding 24's eight
   amendments were all acceptance criteria, which argues §6. But the Writing rules already say
   "Verify every claim about existing code against source at writing time" and a stale figure is that
@@ -214,6 +262,16 @@ cutoff and its own observed red. It is not smuggled in here.
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · §8 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · folded the owner's ruling on F1: four
+  named sub-fields (`cost:`, `permission:`, `fixture:`, `figure:`), omitted when they do not apply,
+  overruling this spec's one-`Preconditions:`-line recommendation. §1's goal sentence and S1
+  respecified to the four fields; §3's arm-location non-goal now names the `permission:` field; §4
+  gained the shape section, moved the one-line form into "Alternatives rejected", raised the estimate to
+  roughly 1,100 B, and recorded that a sub-field line folds into its criterion's witness blob; §5's
+  testing row now concedes the label is greppable and the truth is not; §6 rewritten to the fields,
+  including AC5, whose grep for `Preconditions:` would have matched nothing after this fold; §7
+  restated against four blanks rather than one line. F2 was NOT ruled on and stays UNRESOLVED, so
+  the header carries no `ratified`.
 
 ## 10. Reuse audit
 

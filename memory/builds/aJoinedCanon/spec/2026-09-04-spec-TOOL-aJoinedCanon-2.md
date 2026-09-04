@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-1 · base 750ca0ca · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -26,6 +26,12 @@ invalidated.
   sections to re-read before the rev is bumped. The four rows are §2, §4, §6 and §7; the sets are
   derived in §4 below from the finding's own round-level distribution and from `A5`'s amended-arm
   count, not invented.
+- **S2b** — a FIFTH row, `§8`, whose set is §2, §4, §6 and every criterion naming an `F<n>`. It is
+  listed separately from S2's four because it was not derived the same way: the four came from the
+  measured round distribution, and this one came from RUNNING S2's table on a real fold and watching
+  it miss. §8 is the section a fork resolution ALWAYS edits, so a table with no §8 row triggers no
+  re-read at all on the most common fold there is. Evidence is this build's own rev-2 pass,
+  recorded in §4.
 - **S3** — `tools/memory-tree/SPEC-TEMPLATE.template.md:183` — `Review corrections fold in here; bump
   the header rev and log it in §9.` — becomes a POINTER at M4's procedure and restates no row of it.
   One text, one home.
@@ -88,6 +94,7 @@ M4's fold sentence gains this, in M4's own voice:
 > | §4 Design | §2 Scope · §6 Acceptance · §7 Gates |
 > | §6 Acceptance | §2 Scope · §7 Gates |
 > | §7 Gates | §6 Acceptance |
+> | §8 Open questions | §2 Scope · §4 Design · §6 Acceptance · every criterion naming an `F<n>` |
 >
 > The set says WHERE to look. What goes wrong there is
 > `memory/gotchas/fold-text-is-unreviewed-surface.md`, which the fold round's own checklist already
@@ -100,6 +107,18 @@ the misplacement surfaced only at the closing review after 42 of 85 legs had sil
 profile. §3 sits only in §2's set, because a scope item moving is the one edit that moves a cut-line.
 §5 and §9 are deliberately absent: §5 is a fixed row sweep a fold rarely invalidates, and §9 is
 written by the fold itself.
+
+**The §8 row was earned differently, and the difference matters.** The four rows above come from
+B1's measured round-level distribution. The §8 row comes from RUNNING those four rows on a real fold
+and watching them miss: this build's own rev-2 pass folded ten owner rulings across ten specs on
+2026-09-05, and a fork resolution edits §8 and often nothing else, so a four-row table keyed on the
+edited section fires no re-read at all on the single most common fold there is. Two stale clauses
+were caught in that pass by the mechanic rather than by the table — `TOOL-aJoinedCanon-1`'s AC1
+named a fixture whose date fell PRE-cutoff under the very cutoff the fold had just ratified, making
+a gate's own failing-case criterion unable to fail; and `TOOL-aJoinedCanon-3`'s AC5 still branched
+on the outcome of a fork that had just been decided. Both are criteria naming an `F<n>`, which is
+why that clause is in the row rather than a bare section list. A table derived from where defects
+LAND cannot see the section a fold always TOUCHES, and only using it revealed that.
 
 ### Files touched (estimate)
 
@@ -159,8 +178,8 @@ LIVE, and hand-editing the live copy is what the leg exists to catch.
 ## 6. Acceptance criteria
 
 - **AC1** — When M4 of `memory/guides/BUILD-METHOD.md` is read at HEAD, its fold sentence is followed
-  by a re-read table with one row each for `§2`, `§4`, `§6` and `§7`, and the §4 row lists §2, §6 and
-  §7.
+  by a re-read table with one row each for `§2`, `§4`, `§6`, `§7` and `§8`; the §4 row lists §2, §6
+  and §7; and the §8 row lists §2, §4, §6 and the `F<n>` criterion clause.
 - **AC2** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs on the landing commit, it
   exits 0, proving both live copies were produced by `--render` from
   `tools/memory-tree/BUILD-METHOD.template.md` and `tools/memory-tree/SPEC-TEMPLATE.template.md`
@@ -215,6 +234,8 @@ row, per charter §7.
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · §2 · §4 · added S2b, the §8 row, after this build's own fold pass ran S2's
+  four-row table against ten specs and measured it missing the §8 case. §8's fork remains OPEN.
 
 ## 10. Reuse audit
 

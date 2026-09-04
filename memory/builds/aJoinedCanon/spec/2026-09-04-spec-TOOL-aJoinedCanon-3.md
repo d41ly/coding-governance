@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 750ca0ca · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 3 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -60,7 +60,9 @@ build, and because the answer is doc-local: it needs no tree access and no secon
   nothing checks it; 3,146 of 3,207 items (98.1%) comply anyway. Grading the BULLET rather than the
   LABEL is what makes this unit indifferent to that gap, so closing it separately is not owed here.
 - **Retrofitting any landed spec.** Build rule 3. The cutoff carries the whole corpus and this unit
-  edits no existing spec.
+  edits no existing spec. Per F2 this build's own eleven specs are grandfathered with the rest: the
+  cutoff is set ahead of every spec on every live branch, so the rule's first live subject is the
+  next build.
 - **The reverse join, §6 to §2.** A criterion that observes nothing in scope is a different and
   weaker defect, and walking criteria cannot see an unobserved scope item at all.
 - **Anything in check 23's ledger join**, which is `TOOL-aJoinedCanon-6`, and anything in §7's leg
@@ -125,7 +127,7 @@ specs for exactly that reason.
 | Items carrying an `S<n>` label | 3,146 (98.1%) |
 | Items naming an `AC<n>` in their own text | 110 (3.4%) |
 | Items containing the string `not observed` | 0 |
-| Tier-1 share | 114 specs · 519 items |
+| Tier-1 share, graded under F1 | 114 specs · 519 items |
 
 Three things follow. The corpus passes this predicate at 3.4%, so the cutoff carries everything and
 the arm grades no landed spec on day one — S6 exists because of that number. The escape spelling is
@@ -232,8 +234,8 @@ same defect being hit twice, the second time costing a full extra bar cycle.
   run in §4 measured 0 of 3,207 items containing that string.
 - **AC5** — When a spec carries a `## N. Scope (IN)` heading and no `## N. Acceptance criteria`
   heading, `bash tools/memory-tree/check-memory-hygiene.sh` is silent for it, pinning the M13 class
-  from `dUnstalledConvoy`. A Tier-1 fixture pins whichever tier scope F1 resolves to, as a `hit`
-  line if both tiers and a `miss` line if Tier-2 only.
+  from `dUnstalledConvoy`. A Tier-1 fixture carrying BOTH headings and one unjoined item reds, as a
+  `hit` line, pinning F1's both-tiers ruling.
 - **AC6** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs after the edit, it exits 0,
   proving `memory/TEMPLATE-SPEC.md` was re-rendered from
   `tools/memory-tree/SPEC-TEMPLATE.template.md` rather than hand-edited.
@@ -256,27 +258,34 @@ adds no new leg; the arm lives inside check 12, which is already on the bar.
 
 ## 8. Open questions
 
-- **F1 · Does the arm run on both tiers, or on Tier-2 only?** Both-tiers is the acceptance-witness
-  arm's own answer, recorded at `tools/memory-tree/check-memory-hygiene.sh:1014` as "a Tier-1 spec
+- **F1 · Does the arm run on both tiers, or on Tier-2 only?** RESOLVED (owner, 2026-09-05): both
+  tiers, guarded by the both-headings precondition, so the 114 Tier-1 specs and their 519 items are
+  in the graded population. Both-tiers is the acceptance-witness arm's own answer, recorded at `tools/memory-tree/check-memory-hygiene.sh:1014` as "a Tier-1 spec
   is exempt from the canon, not from meaning what it writes", and the conf records that narrowing
   that arm to Tier-2 left its harness byte-identical until a fixture existed. Against it: Tier-1 is
   the light profile the template calls "ceremony is conditional", and the evidence for this join is
   entirely Tier-2 multi-unit builds. The population at stake is 114 specs and 519 items, 16.2% of
   the graded items. RECOMMENDATION: both tiers, guarded by the both-headings precondition, which
-  makes a Tier-1 spec that writes only §2 untouched either way. Unresolved — it changes what the
-  gate demands of every future Tier-1 spec and that is the owner's knob, not this spec's.
-- **F2 · Does this build retrofit its own eleven specs to the new form?** The cutoff must be set
-  ahead of them, so they are grandfathered and the rule's first live subject is the next build. That
+  makes a Tier-1 spec that writes only §2 untouched either way. It was the owner's knob and not this
+  spec's, because it changes what the gate demands of every future Tier-1 spec.
+- **F2 · Does this build retrofit its own eleven specs to the new form?** RESOLVED (owner,
+  2026-09-05): grandfather them, ruled for the whole build at once — the cutoff sits ahead of every
+  spec on every live branch, so this build's own eleven do not follow the rule they add, and the
+  arm's coverage is its fixtures. The cutoff must be set ahead of them, so they are grandfathered
+  and the rule's first live subject is the next build. That
   is the established idiom and it means the build that adds the join ships eleven specs that do not
   follow it. The alternative is a voluntary rev-2 fold across all eleven at fold time, which is
   authoring rather than a gate retrofit and so does not collide with build rule 3, but it edits ten
   specs written by other writers who never had the rule. RECOMMENDATION: grandfather them, and let
   the arm's coverage be its fixtures, exactly as `SPEC10_EVIDENCE_CUTOFF` did one week earlier.
-  Unresolved.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · §8 · §3 · §4 · §6 · folded the owner's rulings on both forks. F1: both
+  tiers, so the 114 Tier-1 specs and 519 items are in the graded population and AC5's Tier-1 fixture
+  is a `hit` line rather than a fixture whose tier scope the fork still decided. F2: grandfather this
+  build's own eleven specs, which §3 now states as a non-goal in its own right.
 
 ## 10. Reuse audit
 

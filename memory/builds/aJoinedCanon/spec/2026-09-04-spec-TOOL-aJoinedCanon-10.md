@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-1 · base 750ca0ca · streams tooling · order 10
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 10 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -20,8 +20,8 @@ drift to fix and the most expensive kind to leave standing.
 ## 2. Scope (IN)
 
 - **S1** — the count leaves line 16 of both template halves. The sentence stops saying "beside the
-  three other cutoffs". It may keep the location and the shipped value; it may not keep a number
-  that no check derives.
+  three other cutoffs" and puts no other count in its place. It KEEPS the location claim, which S2
+  makes true, and keeps the shipped value; what it may not keep is a number no check derives.
 - **S2** — `.memory-tree.conf` declares `SPEC10_CUTOFF="2026-08-04"`, which makes the location half
   of the sentence true in this tree as it already is in a fresh adopter's. Placed beside
   `SPEC10_EVIDENCE_CUTOFF` at `:104`, whose own comment at `:101` already names `SPEC10_CUTOFF`
@@ -79,7 +79,10 @@ excludes any key whose name carries a digit, so it does not see `SPEC10_EVIDENCE
 The digit-inclusive `grep -nE '^[A-Z0-9_]+CUTOFF=' .memory-tree.conf` returns seven. Both numbers are
 true of their own predicate and neither belongs in a document, which is the argument for S1 in one
 sentence: a count of this population has now been wrong in the template, wrong in a comment, and
-ambiguous in the finding that reported it.
+ambiguous in the finding that reported it. S2 sharpens it. The key it declares carries digits, so
+the digit-inclusive predicate sees it and the other cannot: the moment this unit lands the two
+report six and eight instead of six and seven. A number written into line 16 would be stale by the
+same commit that wrote it, which is why S1 deletes the count rather than correcting it.
 
 ### Files touched (estimate)
 
@@ -94,8 +97,8 @@ ambiguous in the finding that reported it.
 - **Reword the sentence to describe the preset and the forward resolution, and leave the conf alone.**
   It is honest and it is more prose about the checker in a document whose prose-about-the-checker
   share was already measured in `aWeighedCanon`. It also leaves this tree disagreeing with the conf
-  the kit ships. Kept alive as the §8 fork rather than rejected outright, because it is the owner's
-  call whether a doc edit or a tree edit is the right half to move.
+  the kit ships. Carried as the §8 fork rather than rejected outright, because it was the owner's
+  call whether a doc edit or a tree edit is the right half to move — ruled against on 2026-09-05.
 - **Delete the whole `SPEC10_CUTOFF` section and point at the conf comment.** The section carries the
   blank-resolves-forward reasoning, which lives nowhere else in a document an author reads. Out.
 
@@ -119,7 +122,10 @@ ambiguous in the finding that reported it.
 ## 6. Acceptance criteria
 
 - **AC1** — When `grep -n 'three other cutoffs' memory/TEMPLATE-SPEC.md
-  tools/memory-tree/SPEC-TEMPLATE.template.md` runs, it matches nothing.
+  tools/memory-tree/SPEC-TEMPLATE.template.md` runs, it matches nothing, and
+  `grep -c 'DECLARED in' memory/TEMPLATE-SPEC.md tools/memory-tree/SPEC-TEMPLATE.template.md`
+  returns 1 for each file — the count is gone and the location claim the ruling makes true is still
+  standing, which is the half S1 must not take with it.
 - **AC2** — When `grep -nE '^SPEC10_CUTOFF=' .memory-tree.conf` runs, it returns one line whose value
   is `2026-08-04`, so a reader following line 16 to the conf finds the key it names.
 - **AC3** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh --check` runs, it exits 0, proving
@@ -149,11 +155,20 @@ ambiguous in the finding that reported it.
   `check-memory-hygiene.sh:42` and the forward resolution at `:90`, leaving the conf alone. A is
   cheaper and removes a drift; B is cheaper to revert and adds no key to a conf that four other
   units in this build may also be editing. **Recommendation: A, with S1 landing under either.**
-  Unresolved — this is the owner's call at scope approval, and S1 is written to be independent of it.
+  RESOLVED (owner, 2026-09-05): Option A — the conf declares `SPEC10_CUTOFF`, so line 16's location
+  claim becomes true rather than being reworded away; B's rewording around the preset and the forward
+  resolution loses, and its text stays above as the record of what was weighed. S1 lands either way
+  and is unchanged by the pick.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · §8 · §2 · §4 · §6 · folded the owner's ruling on F1: option A, the conf
+  declares `SPEC10_CUTOFF`. S1 stops offering to drop the location claim and now keeps it; §4's
+  alternative is marked ruled-against rather than open, and gains the arithmetic showing S2 moves the
+  digit-inclusive count from seven to eight; AC1 gained the second half that pins the location claim
+  in place. §7 was re-read and needs nothing — option B would have removed S2 and with it the
+  `.memory-tree.conf` bullet, and A keeps both.
 
 ## 10. Reuse audit
 

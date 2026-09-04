@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-1 — the revision log becomes a structured entry
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -51,8 +51,8 @@ almost nothing about where, which is the mechanism behind the corpus's dominant 
 - **The two arms `TOOL-dUnstalledConvoy-14` proposes** — that rev numbers in a log are unique and
   that they descend. Same section, same walk, different mechanism, and BUILD-METHOD M2 gives a unit
   one. The entry accumulator S3 builds is what that row needs, so it gets cheaper, not done.
-- **Retrofitting the corpus.** No landed spec is edited. Measured below: under the cutoff this unit
-  recommends, zero landed specs change.
+- **Retrofitting the corpus.** No landed spec is edited. Measured below: under the ratified cutoff
+  `2026-09-06`, zero landed specs change.
 - **The fold procedure's re-read set.** That is `TOOL-aJoinedCanon-2`, and it is the half of B1 that
   edits `memory/guides/BUILD-METHOD.md`. This unit touches no method carrier.
 - **Grading truth.** The arm asserts an entry NAMES a section, never that the fold actually touched
@@ -135,16 +135,20 @@ resolve forward the way `SPEC10_CUTOFF` must. It is preset above the conf source
 never back-fills a key into an existing conf, so an unpreset key aborts the gate in every adopter
 tree whose conf predates it.
 
-The date itself is §8's fork. The measurement behind it: across every local and remote ref in this
-tree there are 50 distinct spec versions dated on or after 2026-09-04, and exactly 2 of them carry
-a rev-2+ entry naming nothing. Both sit on `branch/agent-orientation-tooling-research-5dad25`
-(`aWeighedCompass-1` and `dSealedTally-5`).
+The date is `2026-09-06`, ratified by the owner at §8 F1 as one ruling over this whole build: every
+cutoff it introduces sits strictly past the newest spec filename date on any branch. Re-derived at
+the fold rather than carried over — across all 44 local and remote refs the newest spec filename
+date is 2026-09-04, no spec dated 2026-09-05 exists on any ref or in any of the 15 live worktrees,
+and today is 2026-09-05, so today is a date this fleet can still write into and 2026-09-06 is the
+first one it cannot. `SPEC10_EVIDENCE_CUTOFF` is the precedent for that correction: measured
+2026-08-31, it took 2026-09-01 because sibling branches held specs dated on the measuring day.
 
 ### Rollout
 
-Under the recommended cutoff the arm grades no spec in this corpus on day one, which is the state
-`STREAMS_CUTOFF`, `SPEC_WITNESS_CUTOFF` and `SPEC10_EVIDENCE_CUTOFF` each shipped in and each
-recorded. S5 is why that is not a silent green: the notice at `:1298-1305` already exists for the
+Under `REV_SCOPE_CUTOFF="2026-09-06"` the arm grades no spec in this corpus on day one, and the S6
+fixtures are its entire coverage. That is the ratified cost rather than a tradeoff still being
+weighed, and it is the state `STREAMS_CUTOFF`, `SPEC_WITNESS_CUTOFF` and `SPEC10_EVIDENCE_CUTOFF`
+each shipped in and each recorded. S5 is why it is not a silent green: the notice at `:1298-1305` already exists for the
 §10 evidence arm, counts its population by DATE alone over `c12_sel`, and prints one line when the
 count is zero. The new notice is that block with two strings changed.
 
@@ -190,15 +194,16 @@ line-1 doc markers and the seventh the constant and marker sharing `check-memory
 - error / empty / loading states: the zero-population notice (S5) is the empty state, and it is
   loud by design.
 - observability: the failure message names the file, the rev numbers and the cutoff.
-- risks (concurrency, data-loss, rollback hazards): the only real hazard is a cutoff that reds
-  in-flight branches on merge, which §8 quantifies. Rollback is blanking one conf key.
+- risks (concurrency, data-loss, rollback hazards): the only real hazard was a cutoff that reds
+  in-flight branches on merge, and §8's ratified date retires it — `2026-09-06` sits past every spec
+  filename date on every ref, so no branch reds on merge. Rollback is blanking one conf key.
 - testing + left-shift gates: S6, with the red observed before landing per the build's own rule.
 - migration / rollback: dated cutoff, blank means off, no corpus edit.
 - user docs: the template and `HYGIENE.md` are where an author reads this; both are in scope.
 
 ## 6. Acceptance criteria
 
-- **AC1** When fixture `2026-09-05-spec-tFixture-90.md` carries a rev-2 entry naming no section,
+- **AC1** When fixture `2026-09-06-spec-tFixture-90.md` carries a rev-2 entry naming no section,
   scope id or acceptance id, `bash tools/memory-tree/check-memory-hygiene.sh` reds and its check-12
   output names that file and its rev number. The red is staged, confirmed and unstaged BEFORE the
   arm lands.
@@ -254,11 +259,26 @@ carries, so the manifest does not move.
     own rule is that a gate must not red honest content written before the rule existed. The
     dogfooding argument is weaker here than it was for the acceptance ledger, because that build
     could back-fill its OWN units and this one cannot back-fill another node's branch.
-  - UNRESOLVED — owner's call.
+  - RESOLVED (owner, 2026-09-05): ahead of the fleet, ruled across the whole build at once — every
+    cutoff this build introduces sits strictly past the newest spec filename date on any branch, so
+    nothing landed and nothing in flight goes red. `REV_SCOPE_CUTOFF="2026-09-06"`. The date is
+    RE-DERIVED and not the one the option above names: that bullet was written on 2026-09-04, when
+    2026-09-05 was tomorrow, and today is 2026-09-05, so it is now the fleet's own working date
+    rather than a date ahead of it. Measured at the fold across all 44 local and remote refs — newest
+    spec filename date 2026-09-04, no spec dated 2026-09-05 on any ref or in any of the 15 live
+    worktrees — 2026-09-06 is the first date this fleet can no longer write into.
+    `SPEC10_EVIDENCE_CUTOFF` is the precedent for the same correction. The accepted cost is now a
+    fact rather than a tradeoff: the arm grades zero specs on day one, and its S6 fixtures are its
+    entire coverage.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · §8, §3, §4, §5, §6 · folded the owner's ruling on F1: the cutoff takes the
+  ahead-of-the-fleet branch, re-derived to `2026-09-06` because 2026-09-05 is now the fleet's own
+  working date. §4's Migration and Rollout, §3's retrofit non-goal and §5's risk row state the date
+  and its zero-population cost as fact rather than as a pending choice, and AC1's fixture filename
+  moved from 2026-09-05 to 2026-09-06 so the observed red is still reachable under the new cutoff.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -39,8 +39,9 @@ therefore neither find it nor check it.
   `bash tools/memory-tree/kit-dogfood-parity.test.sh --render`, never hand-edited, because the two
   are byte-compared after placeholder substitution.
 - **S6** — five fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`, numbered 90 through 94
-  in the free range above the current high of `tFixture-86`. They are the coverage: the live cutoff
-  will sit ahead of every dated spec on every branch, so the real corpus cannot exercise the arm.
+  in the free range above the current high of `tFixture-86`. They are the WHOLE coverage rather than
+  a supplement to it: §8's resolved cutoff sits ahead of every dated spec on every ref, so the arm
+  grades zero live specs on the day it lands and the real corpus cannot exercise it at all.
 - **S7** — the documentation carriers. Item 12 of `tools/memory-tree/HYGIENE.template.md` gains one
   sentence beside its existing acceptance-witness sentence at `memory/HYGIENE.md:183-185`, and
   `KIT_MEMORY_TREE_VERSION` moves from `2.59` to `2.60` in the engine constant and in the
@@ -55,8 +56,8 @@ therefore neither find it nor check it.
   this arm. That liveness lives with whoever observes the staged red, which is the charter's §7 rule
   and the journal record, not this gate. Said here because a structural check reads as a semantic one
   to everybody who did not write it.
-- **Retrofitting the corpus.** 479 specs and 414 CLOSED ones stay untouched; the cutoff grandfathers
-  them by filename date.
+- **Retrofitting the corpus.** All 479 specs stay untouched — the 414 CLOSED ones and the twenty
+  dated 2026-09-04 alike. §8's resolved cutoff grandfathers every one of them by filename date.
 - **A `### Failure modes` table or any other second list.** Follow-up: none — it is rejected in §4,
   not deferred.
 - **Anything about the acceptance ledger or check 23.** Joining a ledger answer to its criterion's
@@ -145,8 +146,9 @@ inside a loop that already exists; the fixture file is the bulk of the diff.
 - observability — the finding names the offending bullet's label and the cutoff key, matching the
   witness message at `:1046-1047`.
 - risks — one, and it is a false-red risk rather than a data risk: a cutoff set behind a live spec's
-  filename date reds landed work. Rollback is blanking the key. There is no concurrency and no data
-  loss surface.
+  filename date reds landed work. §8's resolved date forecloses that at landing, because no spec on
+  any ref is dated at or after it, so the residual exposure is a LATER lowering of the key and not
+  this landing. Rollback is blanking the key. There is no concurrency and no data loss surface.
 - testing + left-shift gates — five fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`.
   That harness is the ONLY arm available: `tools/memory-tree/check-arms.py` cannot see a branch
   inside an awk body, which is why the fixtures are scope and not a nicety.
@@ -218,9 +220,24 @@ inside a loop that already exists; the fixture file is the bulk of the diff.
   witness ratchet deliberately made its own spec the first subject, and that bought an example the
   fixtures cannot. Owner's call.
 
+  RESOLVED (owner, 2026-09-05): the recommendation, ruled for the whole build at once. The cutoff
+  lands strictly past the newest spec filename date on any ref, which is 2026-09-04 across every
+  branch and remote-tracking ref in this tree, and strictly past today as well, because a spec
+  minted today would carry today's date and would not sit behind a cutoff set at it. The declared
+  value is therefore `SPEC_FAILURE_MODE_CUTOFF="2026-09-06"`. The twenty specs dated 2026-09-04,
+  eleven of them this build's own, are NOT its first subjects. The accepted cost is now a fact
+  rather than a tradeoff: the arm grades zero specs on the day it lands, and S6's fixtures are its
+  whole coverage. The counter-argument above LOST and stays on the record — the witness ratchet did
+  make its own spec the first subject and did buy an example the fixtures cannot, and that was
+  weighed rather than overlooked.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · §8 · §2 · §3 · §5 · folded the owner's ruling on F1: `SPEC_FAILURE_MODE_CUTOFF`
+  lands at 2026-09-06, strictly past the newest spec filename date on any ref, so no landed spec is
+  a subject, S6's fixtures are the arm's whole coverage, and §5's false-red risk is foreclosed at
+  landing.
 
 ## 10. Reuse audit
 
