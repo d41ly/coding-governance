@@ -1,11 +1,12 @@
 # DEPL-dSealedTally-4 — `index_read` asserts git's exit code instead of reading failure as absence
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 2
+**Status:** CLOSED · rev-4 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-04-build-DEPL-dSealedTally-4-1-acceptance-ledger.md](../build/2026-09-04-build-DEPL-dSealedTally-4-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 | [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 
@@ -24,6 +25,13 @@ read say so.
   chunk's first path, the exit code, and git's stderr, rather than returning a silently empty map.
 - **S2** The refusal states what the caller would otherwise have concluded — that these paths are
   absent from the index — so the operator reads a diagnosis and not just a failure.
+- **S4** An OUT-OF-TREE path is FILTERED before the query and reported absent, not raised on.
+  `git ls-files` exits 128 for a path outside the repository, saying "is outside repository" —
+  measured. That is an ANSWER, not a probe failure: such a path is definitionally absent from that
+  index. Raising on it converts a graded refusal into a hard abort and changes the verb's exit
+  code, which is what it did to the `[-11]` escape arm. The filter lives in `index_read` so all
+  eight callers get it, and it is the same `resolve()`/`relative_to` idiom the rename-destination
+  containment check already uses.
 - **S3** A staged-RED arm that forces a chunk to fail and asserts the refusal, plus a negative arm
   proving an ordinary read still returns its map.
 
@@ -109,6 +117,12 @@ exactly the bug being fixed. A refusal at the read is one decision in one place.
 - **AC7** — When `python tools/govkit/selftest.py` runs, it exits 0 and its arm count is at
   least 5 greater than the count observed at the head of `order 1`, captured in §9 when this
   unit's pass opens.
+- **AC6** — When `index_read` is handed a path OUTSIDE the target, it reports that path absent
+  and does NOT raise, proved by the `[-11]` escape arm in `tools/govkit/selftest.py` staying green:
+  the run must still exit 1 with its own containment refusal rather than aborting on a `Refusal`.
+- **AC7** — When the out-of-tree FILTER is removed by mutation in a scratch copy of
+  `tools/govkit/govkit.py`, that escape arm FAILS, recorded as an observed staged break — which is
+  how this constraint was found in the first place.
 
 ## 7. Gates
 
@@ -131,6 +145,13 @@ exactly the bug being fixed. A refusal at the read is one decision in one place.
 
 - rev-1 · 2026-09-04 · initial draft, grounded against `tools/govkit/govkit.py` lines 3752-3785 at
   `0f19429a`, where no `returncode` read exists in the function body.
+- rev-4 · 2026-09-04 · BUILT, and building found a constraint no round of the audit did. The bare
+  liveness assertion redded the `[-11]` escape arm: `git ls-files` exits 128 for a path outside the
+  repository, so the rename-destination probe for an escaping `prefix` raised where it used to
+  return empty, and the verb exited on a `Refusal` instead of reaching its own containment refusal.
+  Measured directly — exit 128, "is outside repository". S4 adds the filter and AC6/AC7 grade it.
+  The lesson is the spec's own subject one level up: a non-zero exit is not automatically a
+  failure, and treating it as one manufactures a different dead end.
 - rev-2 · 2026-09-04 · folded the spec audit's H11, L1, H5 and H3. H11 overturned F1's
   resolution: one call site is mid-write, so raise-always would abort a part-written target in a
   foreign repository and never reach the rollback pass — Rollout now splits the sites and AC6

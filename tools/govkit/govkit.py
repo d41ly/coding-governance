@@ -3765,12 +3765,59 @@ def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[
     """
     at_stage0: dict[str, tuple[str, str]] = {}
     present: set[str] = set()
+
+    # DEPL-dSealedTally-4 S4. OUT-OF-TREE PATHS ARE FILTERED, NOT RAISED ON, and the difference
+    # is the whole point of the liveness assertion below. `git ls-files` exits 128 for a path
+    # outside the repository -- measured, with `fatal: ... is outside repository` on stderr --
+    # and that is an ANSWER rather than a probe failure: such a path is definitionally absent
+    # from THIS index. Raising on it turns a graded refusal into a hard abort and changes the
+    # verb's exit code, which is exactly what the first cut of this unit did to the escape arm
+    # in `tools/govkit/selftest.py`: the rename-destination probe for a `prefix` that climbs out
+    # of the tree stopped reaching its own containment refusal.
+    #
+    # Filtered HERE so all callers inherit it, using the same resolve/relative_to idiom the
+    # rename-destination containment check already uses. A filtered path is simply left out of
+    # both return values, which is what "absent" means to every caller.
+    _root = target.resolve()
+    _inside: list[str] = []
+    for _p in paths:
+        try:
+            (target / _p).resolve().relative_to(_root)
+        except (ValueError, OSError):
+            continue
+        _inside.append(_p)
+    paths = _inside
+
     for i in range(0, len(paths), 400):
         chunk = paths[i:i + 400]
         if not chunk:
             continue
         out = subprocess.run(["git", "-C", str(target), "ls-files", "-s", "-z", "--", *chunk],
                              capture_output=True, text=True, check=False)
+
+        # THE LIVENESS ASSERTION. It sits INSIDE the loop body, so an empty `paths` still spawns
+        # nothing -- the empty case is handled by this loop not executing at all, never by the
+        # `if not chunk` guard above, which is unreachable for every input and which a spec
+        # revision named as load-bearing without checking.
+        #
+        # `check=False` with no returncode read is the DEAD-PROBE shape: a chunk that fails
+        # produces empty stdout, so every path in it parses as absent-from-index, and "absent"
+        # is exactly the answer that lets a writing verb decide a path is free to write -- in a
+        # repository gov does not own. So the refusal says what the caller would OTHERWISE have
+        # concluded, because an operator who reads only "git failed" does not learn which
+        # decision was about to be taken on the strength of it.
+        #
+        # Everything reaching here is INSIDE the tree, per the filter above, so a non-zero exit
+        # now means the repository or the invocation is broken and nothing else.
+        if out.returncode != 0:
+            _idx_err = (out.stderr or "").strip() or "(nothing on stderr)"
+            raise Refusal(
+                f"reading the index failed: `git ls-files` exited {out.returncode} over a "
+                f"chunk of {len(chunk)} path(s) starting at {chunk[0]!r}. Git said: "
+                f"{_idx_err}. Refusing rather than reading the empty result as an answer: "
+                f"every path in that chunk would have been reported ABSENT from the index, "
+                f"and absent is what tells a writing verb a path is free to write here")
+
         for rec in out.stdout.split("\0"):
             if not rec.strip():
                 continue
@@ -6483,7 +6530,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # RECEIPT's paths and a rename destination is by definition not one of them, so a
             # tracked file there whose worktree copy the operator removed is invisible to `exists()`
             # — and `git mv` would take its index entry without a word.
-            _, _at_dest = index_read(target, [new_dest])
+            # DEPL-dSealedTally-4. THE ONE MID-WRITE CALLER, and the only one that catches.
+            # Every other `index_read` runs before this verb has written anything, so letting
+            # the refusal reach the verb boundary costs nothing there. This one runs INSIDE the
+            # write walk: raising here would abort a part-written target and never reach the
+            # verify-and-rollback pass, which is the harm this build is otherwise closing. So it
+            # fails the ROW and continues, and the run reaches its own rollback.
+            try:
+                _, _at_dest = index_read(target, [new_dest])
+            except Refusal as _idx_read_err:
+                r.fail(f"could not read the index for the rename destination {new_dest!r}, so "
+                       f"whether this target already holds it is UNKNOWN. Skipping this row "
+                       f"rather than moving onto a path that may be occupied: {_idx_read_err}")
+                continue
             if new_dest in _at_dest or ndp.exists():
                 r.fail(f"gov moved '{row.get('source')}' to '{new_src}', which resolves to "
                        f"'{new_dest}' — and this target ALREADY holds a file there. Refusing rather "

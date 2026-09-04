@@ -5262,6 +5262,63 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-ST2] AC1 ...and the run exits 0 rather than refusing the kit",
               _w2.returncode == 0, _w2.stdout[-900:] + _w2.stderr[-600:])
 
+        # ---- DEPL-dSealedTally-4. `index_read` ASSERTS GIT'S EXIT CODE ---------------------
+        # Driven DIRECTLY, which is legitimate here rather than a shortcut: `index_read` is a
+        # pure function of (target, paths), so the module-level call IS the subject. The verb
+        # arms above already exercise it in place; these grade the predicate itself.
+        _gk4 = govkit_module()
+
+        # A DIRECTORY THAT IS NOT A REPOSITORY makes `git ls-files` exit non-zero over an
+        # ordinary in-tree-looking path, which is the failure the liveness assertion is for.
+        _nr4 = tmp / "st4-not-a-repo"
+        (_nr4 / "sub").mkdir(parents=True, exist_ok=True)
+        (_nr4 / "sub" / "f.txt").write_text("x", encoding="utf-8", newline="\n")
+        _raised4 = ""
+        try:
+            _gk4.index_read(_nr4, ["sub/f.txt"])
+        except _gk4.Refusal as _e4:
+            _raised4 = str(_e4)
+        check("[-ST4] AC1 a failing `git ls-files` RAISES rather than reporting every path absent",
+              _raised4 != "", "index_read returned instead of raising")
+        check("[-ST4] AC2 ...and the refusal names the exit code and the first path of the chunk",
+              "exited" in _raised4 and "sub/f.txt" in _raised4, _raised4)
+        check("[-ST4] AC2 ...and says what the caller would OTHERWISE have concluded",
+              "ABSENT" in _raised4, _raised4)
+
+        # AC4: an EMPTY path list spawns nothing and returns empty maps. The `if not chunk`
+        # guard is NOT what handles this -- the chunking loop simply does not execute.
+        _m4, _p4 = _gk4.index_read(_nr4, [])
+        check("[-ST4] AC4 an empty path list returns empty maps without invoking git at all",
+              _m4 == {} and _p4 == set(), f"{_m4} | {_p4}")
+
+        # AC6: an OUT-OF-TREE path is FILTERED and reported absent, never raised on. This is the
+        # constraint building found and three rounds of spec audit did not: `git ls-files` exits
+        # 128 for such a path, and treating that as a probe failure turned the escape arm above
+        # from a graded refusal into a hard abort.
+        _ok4 = tmp / "st4-real-repo"
+        _ok4.mkdir(parents=True, exist_ok=True)
+        (_ok4 / "in.txt").write_text("y", encoding="utf-8", newline="\n")
+        git(_ok4, "init", "-q", "-b", "main")
+        git(_ok4, "config", "user.email", "t@e")
+        git(_ok4, "config", "user.name", "t")
+        git(_ok4, "add", "-A")
+        git(_ok4, "commit", "-qm", "base")
+        _raised6 = ""
+        _m6: dict = {}
+        _p6: set = set()
+        try:
+            _m6, _p6 = _gk4.index_read(_ok4, ["in.txt", "../escape/out.txt"])
+        except _gk4.Refusal as _e6:
+            _raised6 = str(_e6)
+        check("[-ST4] AC6 an out-of-tree path does NOT raise: it is absent, not a failure",
+              _raised6 == "", _raised6)
+        check("[-ST4] AC6 ...it is simply absent from both return values",
+              "../escape/out.txt" not in _m6 and "../escape/out.txt" not in _p6,
+              f"{sorted(_m6)} | {sorted(_p6)}")
+        check("[-ST4] AC6 LIVENESS ...while the IN-TREE path beside it is really found, so the "
+              "filter is not simply dropping everything", "in.txt" in _p6, f"{sorted(_p6)}")
+
+
         # ---- AC4: the deletion, and the ONLY way to get one.
         settle(_t11, "after the second update")
         _files_pre_wd = sorted(x for x in gout(_t11, "ls-files").splitlines() if x)
