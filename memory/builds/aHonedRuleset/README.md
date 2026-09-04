@@ -2,10 +2,9 @@
 slug: aHonedRuleset
 node: a
 opened: 2026-09-04
-streams: tooling+playbook
+streams: tooling+playbook+kickoff+deployer
 roster: TOOL
-status: INPROGRESS
-ids: TOOL-aHonedRuleset-1
+ids: TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7
 ---
 
 # aHonedRuleset — measure what is actually redundant in the governing prose, before trimming any of it
@@ -33,15 +32,18 @@ one build and called it a pattern rather than a coincidence; its population was 
 ## Build-level rules
 - **The census measures and edits no protocol prose.** Cuts are separate units the owner selects
   from the ranked list. A measurement pass that starts trimming has stopped being a measurement.
-- **The report cites no figure the shipped script does not emit**, names the command that emits it,
-  and says outright that the output wins when the two disagree. A dated measurement quoted with its
-  derivation is not the thing §7 forbids; a number typed beside the thing it counts, with no way
-  back to the measurement, is. A census whose findings were unquotable would be unreadable, so the
-  rule is traceability rather than silence — and it binds hardest here, on a document whose entire
-  subject is documents.
+- **No record here cites a figure the shipped script does not emit**, and each names the command
+  that emits it and cedes to that output on any disagreement. §7 forbids a number typed with no way
+  back to its measurement, never a dated measurement quoted with its derivation.
 - **Authored sources only.** Five of the six named documents are rendered from kit templates and
   byte-compared by parity legs. A cut is made in the template and rendered down; hand-editing the
   copy under `memory/guides/` reds the leg and loses the edit at the next render.
+- **Five units re-stamp one line, and two pairs of them run in parallel.** Each stages a watched
+  pathspec, so units 2, 3, 4 and 6 all bundle the `memory/guides/SESSION-KICKOFF.md` `last-audit`
+  re-stamp unit 5 already carried. Units 2 and 3 share `order 1` and units 4 and 5 share `order 2`,
+  so each pair rewrites that line on two branches and the merge conflicts BY CONSTRUCTION. The
+  charter's kickoff-manifest merge exception governs it, and the follow-up re-stamp is the
+  Definition of Done of whichever unit in the pair lands SECOND.
 - **The script states what it cannot see, where it reports.** Shingle matching finds copied text and
   is blind to a rule restated in different words, which is the costly half. A pair reported at zero
   shared bytes is not a pair with no duplicated meaning, and the header says so.
@@ -62,18 +64,29 @@ one build and called it a pattern rather than a coincidence; its population was 
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aHonedRuleset-1` | INPROGRESS | a re-runnable census over the governing prose, and the ranked cut list it grounds |
+| 1 | `TOOL-aHonedRuleset-1` | CLOSED | a re-runnable census over the governing prose, and the ranked cut list it grounds |
+| 2 | `TOOL-aHonedRuleset-2` | SPECCED | the charter stops restating the micro-format grammar a gate already holds |
+| 3 | `TOOL-aHonedRuleset-3` | SPECCED | the kickoff engine's unattended exits move to the kit that owns them |
+| 4 | `TOOL-aHonedRuleset-4` | SPECCED | the charter's agent-cap bullet keeps its pointer and drops the restatement |
+| 5 | `TOOL-aHonedRuleset-5` | SPECCED | the last-audit stamp rule collapses to one prose home and one machine home |
+| 6 | `TOOL-aHonedRuleset-6` | SPECCED | BUILD-METHOD's self-declared budget becomes enforceable or goes away |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 0 unit(s) · node a · opened 2026-09-04 · streams tooling+playbook
-ids TOOL-aHonedRuleset-1
+**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-09-04 · streams tooling+playbook+kickoff+deployer
+ids TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds](spec/2026-09-04-spec-TOOL-aHonedRuleset-2.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-04 |
+| [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement](spec/2026-09-04-spec-TOOL-aHonedRuleset-4.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-04 |
+| [TOOL-aHonedRuleset-5 — the last-audit stamp rule gets exactly one home](spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away](spec/2026-09-04-spec-TOOL-aHonedRuleset-6.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -82,7 +95,11 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aHonedRuleset-2`, `TOOL-aHonedRuleset-3` | yes |
+| 2 | `TOOL-aHonedRuleset-4`, `TOOL-aHonedRuleset-5` | yes |
+| 3 | `TOOL-aHonedRuleset-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
