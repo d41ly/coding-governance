@@ -18,6 +18,7 @@ terminal status. Nothing here is edited by hand.
 | [aSurfacedLexicon](builds/aSurfacedLexicon/README.md) | SPECCED | a | 2026-09-04 | tooling | 16 |
 | [aTetheredScratch](builds/aTetheredScratch/README.md) | INPROGRESS | a | 2026-08-20 | tooling | 4 |
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 |
+| [aWeighedCanon](builds/aWeighedCanon/README.md) | OPEN | a | 2026-09-04 | tooling | 2 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [dNarrowedAnchor](builds/dNarrowedAnchor/README.md) | INPROGRESS | d | 2026-08-24 | tooling | 3 |
 | [dPromptedSeam](builds/dPromptedSeam/README.md) | DEFERRED | d | 2026-08-25 | tooling | 4 |

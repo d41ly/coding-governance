@@ -1,11 +1,11 @@
 # What the spec corpus measures about the format that produced it
 
-**Serves:** none — this is the measurement half of a research build that precedes any spec. The
-findings half is a sibling record; anything either recommends becomes its own unit in its own build.
+**Serves:** none — a research report precedes the specs, and this build authors none by owner
+ruling, so there is no id for it to bind. The aFerriedDossier and dGaugedVintage precedents.
 
 Taken 2026-09-04 on node `a`, at base `6c670b02`, over all 479 spec files under
-`memory/builds/*/spec/**`. Every figure below is derived by a script, none is authored. The three
-scripts are reproduced at the end so the numbers can be re-derived rather than trusted.
+`memory/builds/*/spec/**`. Every figure below is derived, none is authored. The last section gives
+the commands for the load-bearing ones so they can be re-derived rather than trusted.
 
 ## The population
 
@@ -176,8 +176,8 @@ A builder does not read one spec. It reads its build's whole set.
 | dUnstalledConvoy | 24 | 317,149 | 79,287 |
 
 At the top of that distribution the spec set alone is a substantial fraction of a context window
-before any source file is opened. This is the problem `TOOL-aStagedLane-3` on the
-`spec-writing-harness` branch is aimed at from the writing side — per-slice briefs so each writer
+before any source file is opened. This is the problem the `aStagedLane` build on the
+unmerged `spec-writing-harness` branch is aimed at from the writing side — per-slice briefs so each writer
 holds only its own unit. The same measurement says the READING side has the same problem and no
 equivalent mitigation.
 
@@ -224,12 +224,22 @@ is written in prose*. Verified by `grep -nE '^[A-Z_]+CUTOFF=' .memory-tree.conf`
 
 ## Reproducing these figures
 
-Three stdlib-only scripts, written for this pass and not installed anywhere:
+The measurement scripts were throwaway and are not kept — a script in a records tree is a moving
+part nobody services. The load-bearing figures are re-derivable directly:
 
-- `measure_specs.py` — the population, rev distribution by tier, size-by-rev buckets.
-- `measure_sections.py` — per-section mass, `N/A` counts, the section-5 bullet split, `UNVERIFIED`.
-- `measure_growth.py` — per-section median bytes bucketed by rev high-water, and growth shares.
+```bash
+# section 9's share of the whole corpus
+find memory/builds -path '*/spec/*' -name '*.md' | xargs awk 'FNR==1{s=0} /^## 9\./{s=1;next}   /^## 1?[0-9]\./{if(s)s=0} {t+=length($0)+1; if(s)n+=length($0)+1}   END{printf "total=%d sec9=%d pct=%.1f%%
+", t, n, 100*n/t}'
 
-They are throwaway measurement code, not a kit. If any figure here becomes load-bearing for a
-later unit, that unit owes it a derived check rather than a citation of this record — which is the
-same rule this record's own section 8 finding is about.
+# rev high-water distribution
+grep -rhoE '^\*\*Status:\*\* [A-Z]+ · rev-[0-9]+' memory/builds/*/spec/*.md   | grep -oE 'rev-[0-9]+' | sort -V | uniq -c
+
+# the cutoff-declaration defect in section 8 of this record
+grep -nE '^[A-Z_]+CUTOFF=' .memory-tree.conf
+```
+
+Anything finer — the per-section mass table, the growth buckets — is a dozen lines of stdlib Python
+over `memory/builds/*/spec/**/*.md`, splitting on `^## N\.` headings. If a figure here becomes
+load-bearing for a later unit, that unit owes it a DERIVED check rather than a citation of this
+record, which is the same rule this record's own section 8 finding is about.

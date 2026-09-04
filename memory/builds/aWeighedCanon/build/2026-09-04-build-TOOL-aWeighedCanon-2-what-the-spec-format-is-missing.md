@@ -1,8 +1,7 @@
 # What the spec format is missing, and what it costs — the findings
 
-**Serves:** none — the findings half of a research build that precedes any spec. Its measurement
-sibling is `2026-09-04-build-TOOL-aWeighedCanon-1-spec-format-measurements.md`. Nothing here is a
-decision; anything acted on becomes its own unit in its own build.
+**Serves:** none — the findings half of the same research build, and the same reason: it precedes
+specs that the owner ruled this session would not write.
 
 Method: five disjoint evidence lenses over the corpus, then an adversarial verify pass prompted to
 REFUTE. 34 findings raised, **29 confirmed, 5 refuted — precision 0.85**, against the charter's
