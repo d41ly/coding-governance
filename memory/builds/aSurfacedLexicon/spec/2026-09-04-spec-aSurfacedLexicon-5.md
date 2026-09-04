@@ -330,9 +330,13 @@ a floor for the classifier alone and says nothing about the walk or the report.
 ## 7. Gates
 
 - `lexicon naming predicates` — chunk `declarations`, subject `repo`, ceiling 300 s. Where the
-  verdicts in AC1 through AC7 are observed on the bar.
+  verdicts in AC1 through AC7 and AC10 are observed on the bar. AC10 joined this list when F1 was
+  ratified; a range left reading `AC1 through AC7` after a criterion is appended is the
+  amendment-leaves-its-other-half-standing class, and it is why this clause enumerates rather than
+  spans.
 - `lexicon selftest` — chunk `selftests`, subject `kit`, guard `["tools/lexicon/"]`, ceiling 880 s.
-  Carries every fixture, including the AMBIGUOUS arm that has no corpus instance. It is invisible to
+  Carries every fixture. AC5's AMBIGUOUS arm has no corpus instance and AC10's has nine, latent
+  behind four dark file cells — one word for both would be wrong about one of them. It is invisible to
   the push bar, so this unit's DoD runs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` rather
   than trusting the push boundary.
 - `lexicon wiring` — chunk `wiring`, subject `repo`, guard empty, ceiling 330 s. AC9's leg.
