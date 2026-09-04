@@ -80,7 +80,7 @@ None yet.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 6 unit(s) · node d · opened 2026-09-04 · streams tooling+deployer
+**Build status:** CLOSED · 6 unit(s) · node d · opened 2026-09-04 · streams tooling+deployer
 ids DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 TOOL-dSealedTally-2
 
 <!-- gen:build-units -->
@@ -91,10 +91,10 @@ ids DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTall
 | [DEPL-dSealedTally-4 — `index_read` asserts git's exit code instead of reading failure as absence](spec/2026-09-04-spec-DEPL-dSealedTally-4.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-04 |
 | [DEPL-dSealedTally-1 — landed sources join the verify-and-rollback pass](spec/2026-09-04-spec-DEPL-dSealedTally-1.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-04 |
 | [DEPL-dSealedTally-3 — the tracked-path check grades paths, excusing renames and withdrawals](spec/2026-09-04-spec-DEPL-dSealedTally-3.md) | 4 | 1 | CLOSED | rev-2 | 2026-09-04 |
-| [DEPL-dSealedTally-5 — the govkit self-test grades the tree, not the commit's ref-reachability](spec/2026-09-04-spec-DEPL-dSealedTally-5.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [DEPL-dSealedTally-5 — the govkit self-test grades the tree, not the commit's ref-reachability](spec/2026-09-04-spec-DEPL-dSealedTally-5.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 4 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
