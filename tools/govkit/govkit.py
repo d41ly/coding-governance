@@ -5921,6 +5921,42 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
           f"vintages, at >= {RENAME_SIMILARITY_PERCENT}% similarity")
     rename_dests: dict[str, dict[str, list[str]]] = {}
 
+    def fill_rename_dests(eid: str) -> None:
+        """Resolve ONE kit's source-to-destination map into `rename_dests`, idempotently.
+
+        DEPL-dSealedTally-2. Extracted so the eager loop below and `resolve_renamed`'s own guard
+        call ONE implementation. The body is what `resolve_renamed` used to inline.
+        """
+        if eid in rename_dests or eid not in descs:
+            return
+        _d, _p = descs[eid]
+        _res = resolve_entry(root, _d, target_context(target, deploy, eid, _d))
+        _by_src: dict[str, list[str]] = {}
+        for _dest, _w in _res["writes"].items():
+            if _w.get("src"):
+                _by_src.setdefault(_w["src"], []).append(_dest)
+        for _u in _res["unlanded"]:
+            if _u.get("src"):
+                _by_src.setdefault(_u["src"], []).append(_u["dest"])
+        rename_dests[eid] = {k: sorted(set(v)) for k, v in _by_src.items()}
+
+    # DEPL-dSealedTally-2. EAGERLY, before the walk, over the same population the unclaimed-source
+    # landing iterates. The fill used to live inside `resolve_renamed`, which is reached only from
+    # the `classify_row` call at 6091 and only on the rename branch -- so a kit whose rows all take
+    # one of the SEVEN `continue`s above that call (6004, 6015, 6018, 6022, 6041, 6065, 6089) left
+    # `rename_dests[eid]` empty, the landing's `_decided` set was empty for that kit, and its rename
+    # DESTINATION was landed as a new source. Two copies of one gov file, in a tree gov does not own.
+    #
+    # WRAPPED, and that is not defensive habit. Before this hoist `resolve_entry` ran only for kits
+    # that HAVE a rename and are in `descs`; running it for every kit moves any Refusal it raises
+    # onto a path that previously never reached it, so an unresolvable descriptor would abort a run
+    # that used to skip it. The landing block below makes the same call under the same `except`.
+    for _eid_pre in (kits or claimed):
+        try:
+            fill_rename_dests(_eid_pre)
+        except Refusal:
+            continue
+
     def resolve_renamed(row: dict) -> tuple[str, str] | None:
         """gov's new source for this row, and the ONE destination the descriptor puts it at.
 
@@ -5953,17 +5989,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', and this row "
                   f"names kit '{eid}', which no registry entry claims")
             return None
-        if eid not in rename_dests:
-            d, _p = descs[eid]
-            res = resolve_entry(root, d, target_context(target, deploy, eid, d))
-            by_src: dict[str, list[str]] = {}
-            for _dest, _w in res["writes"].items():
-                if _w.get("src"):
-                    by_src.setdefault(_w["src"], []).append(_dest)
-            for _u in res["unlanded"]:
-                if _u.get("src"):
-                    by_src.setdefault(_u["src"], []).append(_u["dest"])
-            rename_dests[eid] = {k: sorted(set(v)) for k, v in by_src.items()}
+        fill_rename_dests(eid)
         dests = rename_dests[eid].get(new) or []
         if len(dests) != 1:
             print(f"  rename NOT taken  {row['path']}: gov moved '{old}' to '{new}', which kit "

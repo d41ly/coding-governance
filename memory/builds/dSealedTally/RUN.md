@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 4bb93fb6a1fdabc08d0b734de7aa16aa4eb27d20
-phase: SPECCING
+witness: 6efa29d6cf05d28702d4ece63ed089af8b582025
+phase: BUILDING
 branch-sha: 4fd318320cd4d17dcc543d38eb6dceb7b2d5cbf8
 branch-ref: refs/heads/branch/dsealedtally-build
 mode: prompt
