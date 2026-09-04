@@ -39,9 +39,12 @@ hook from another checkout entirely.
 - **One conf parser, five readers.** A legal `.memory-tree.conf` spelling the kit's own example
   neither shows nor forbids currently takes `gotchas.py --check` from rc=1 to rc=0 over an identical
   planted violation. Coverage is removed, and the gate stays green.
-- **`govkit update` can land a file gov started shipping.** Twelve of one adopter's fourteen claimed
-  kits have descriptor sources with no receipt row; one of them killed every entry point of that
-  adopter's kit for six days under a green bar.
+- **`govkit update` REPORTS a file gov ships that the adopter does not hold, and says the install is
+  INCOMPLETE.** It does not land the bytes; the landing verb is a filed follow-up, because
+  synthesising a receipt row means deciding a role, a commit and an origin the verb has no evidence
+  for. Twelve of one adopter's fourteen claimed kits have descriptor sources with no receipt row;
+  one of them killed every entry point of that adopter's kit for six days under a green bar, and a
+  report at the moment the verb runs is what makes that legible instead of arriving as a crash.
 - **The push boundary is gated by the hook that ships with the pushed tree**, or at minimum says so
   when it is not.
 - **Four rows stop being open**, each with the evidence that closed it recorded beside it.
@@ -98,7 +101,13 @@ hook from another checkout entirely.
 
 ## Parked decisions
 
-None yet.
+None yet. The spec audit's two blockers were both DISPOSED rather than parked, and how is worth a
+line each. `TOOL-aWeldedTribunal-4`'s scanner is DROPPED, because
+`memory/DECISIONS.md:116` records an owner ruling against exactly that scanner and the mandate
+delegates this build's forks, never a ratified owner decision. `TOOL-aWeldedTribunal-7`'s fork
+resolution STANDS and its scoping was corrected: rev-1 implemented "report" with a line that
+increments the counter deciding the exit code, so it shipped the vetoed behaviour under the accepted
+option's name.
 
 <!-- roster:units -->
 
@@ -109,7 +118,7 @@ None yet.
 | 3 | `TOOL-aWeldedTribunal-3` | 2 | rule 3's blanked view reports an unterminated scan and falls back |
 | 4 | `TOOL-aWeldedTribunal-4` | 2 | the tier-2 synthesis prompt carries its run-integrity counters |
 | 5 | `TOOL-aWeldedTribunal-5` | 2 | five memory-tree readers route through one conf parser |
-| 6 | `TOOL-aWeldedTribunal-6` | 2 | `govkit update` lands a descriptor source with no receipt row |
+| 6 | `TOOL-aWeldedTribunal-6` | 2 | `govkit update` reports a descriptor source with no receipt row |
 | 7 | `TOOL-aWeldedTribunal-7` | 2 | the wiring check grades the resolved pre-push against the tracked blob |
 | 8 | `TOOL-aWeldedTribunal-8` | 1 | four rows close on cited evidence rather than on a rebuild |
 
@@ -122,21 +131,21 @@ ids TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aW
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aWeldedTribunal-1 — one loop-header predicate, and it recognises `for await` and `do`-blocks](spec/2026-09-04-spec-TOOL-aWeldedTribunal-1.md) | 1 | 2 | OPEN | rev-1 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-2 — a bounded array loses its bound when a later statement grows it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-3 — the blanked view reports an unterminated scan, and its readers fall back](spec/2026-09-04-spec-TOOL-aWeldedTribunal-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-4 — the tier-2 synthesis prompt carries the liveness counters the run computed](spec/2026-09-04-spec-TOOL-aWeldedTribunal-4.md) | 4 | 2 | OPEN | rev-1 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by all five python readers](spec/2026-09-04-spec-TOOL-aWeldedTribunal-5.md) | 5 | 2 | OPEN | rev-1 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-6.md) | 6 | 2 | OPEN | rev-1 | 2026-09-04 |
-| [TOOL-aWeldedTribunal-7 — the wiring check names the pre-push that will actually run](spec/2026-09-04-spec-TOOL-aWeldedTribunal-7.md) | 7 | 2 | OPEN | rev-1 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-1 — one loop-header predicate, and it recognises `for await` and `do`-blocks](spec/2026-09-04-spec-TOOL-aWeldedTribunal-1.md) | 1 | 2 | OPEN | rev-2 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-2 — a bounded array loses its bound when a later statement grows it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-2.md) | 2 | 2 | OPEN | rev-2 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-3 — the blanked view reports an unterminated scan, and its readers fall back](spec/2026-09-04-spec-TOOL-aWeldedTribunal-3.md) | 3 | 2 | OPEN | rev-2 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-4 — the tier-2 synthesis prompt carries the liveness counters the run computed](spec/2026-09-04-spec-TOOL-aWeldedTribunal-4.md) | 4 | 2 | OPEN | rev-2 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by all five python readers](spec/2026-09-04-spec-TOOL-aWeldedTribunal-5.md) | 5 | 2 | OPEN | rev-2 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it](spec/2026-09-04-spec-TOOL-aWeldedTribunal-6.md) | 6 | 2 | OPEN | rev-2 | 2026-09-04 |
+| [TOOL-aWeldedTribunal-7 — the wiring check names the hooks that will actually run](spec/2026-09-04-spec-TOOL-aWeldedTribunal-7.md) | 7 | 2 | OPEN | rev-2 | 2026-09-04 |
 | [TOOL-aWeldedTribunal-8 — close the four rows whose defect the tree no longer has](spec/2026-09-04-spec-TOOL-aWeldedTribunal-8.md) | 8 | 1 | OPEN | rev-1 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 3 record folder(s).
+Records: 1 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

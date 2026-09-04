@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 4fc4aeb3a8f2e7dd56d7403b20f6012dee236116
-phase: REVIEWING
+witness: 89781a2a942c60eb97946bc83b56b95a817d70f7
+phase: FOLDING
 branch-sha: 9b5ae68820500aafb32d0edde32936991472980c
 branch-ref: refs/heads/branch/backlog-items-build-c4c36b
 mode: prompt
@@ -22,3 +22,5 @@ anchor-ref: refs/heads/main
 base: 9b5ae68820500aafb32d0edde32936991472980c
 
 ## Parked
+
+2026-09-04T17:52:49Z review · item TOOL-aWeldedTribunal-1 · reason verdict BLOCKED · blockers 16

@@ -1,10 +1,12 @@
 # TOOL-aWeldedTribunal-3 — the blanked view reports an unterminated scan, and its readers fall back
 
-**Status:** OPEN · rev-1 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
@@ -121,14 +123,25 @@ consume the same signal rule 2 already has. This unit builds that one.
 - **AC3** — When `renderBlankedLiterals` is called under both `VIEW_MODE` values, both arms return
   an object carrying `code` and `unterminated`. A dispatcher with two return shapes is what S2
   closes, and this criterion is what makes S2 observable.
-- **AC4** — When `bash tools/hooks/agent-cap.test.sh` runs, every pre-existing arm still passes.
-- **AC5** — When `tools/workflows/tier2-review.js` is piped to the hook, it exits `0`. That file
+- **AC4** — When a script whose banned JOIN sits BELOW an unterminated backtick is piped to the
+  hook, rule 4 reports it. This is S4, and without its own criterion the minimum work that stops
+  rule 4 crashing after S1 changes the return type is appending `.code` at `agent-cap.js:1413` —
+  which passes every other criterion here whole while leaving rule 4 blind. That is the
+  gate-the-class-not-the-instance failure S4 exists to prevent, shipped under a green spec.
+- **AC5** — When a script carrying a legal multi-line template literal above a legal join is piped
+  to `node tools/hooks/agent-cap.js`, `scanJoinFindings` reports nothing. The negative half of the
+  AC4 pair, for the same reason AC2 is the negative half of AC1's.
+- **AC6** — When `bash tools/hooks/agent-cap.test.sh` runs, every pre-existing arm still passes.
+- **AC7** — When `tools/workflows/tier2-review.js` is piped to the hook, it exits `0`. That file
   contains the multi-line prompt literals this change is most likely to mis-read.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` — the `agent-cap` self-test and restatement legs, named in
-`tools/gate-legs.json`.
+`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `agent-cap self-test` leg, which is
+`subject = kit` in `tools/gate-legs.json` and is therefore held as `ondemand` by
+`tools/run-gates/run-gates.sh:947` on the plain bar. `AGENTS.md` records that no boundary sets
+`GATE_SELFTESTS` (owner, 2026-08-27) and that a DoD owes the full pair for KIT work. The
+`agent-cap restatement` leg is `subject = repo` and does run on the plain bar.
 
 ## 8. Open questions
 
@@ -140,6 +153,13 @@ none
   `tools/hooks/agent-cap.js:1039-1072`, where `let mode` is declared above the per-line loop and the
   function returns a bare array. The row that names it cites a line number and a function name that
   no longer exist in the file; the defect does, at the renamed function.
+- rev-2 · 2026-09-04 · folded spec-audit round 1 (H4, H7). **H4, high:** S4 scopes rule 4
+  `scanJoinFindings` and rev-1's criteria observed rule 4 nowhere — AC1 was a per-finding fan
+  (rule 3), AC3 pinned only the dispatcher's return shape, and the rest were negative or regression
+  arms. So the cheapest build satisfying rev-1 was to append `.code` at `:1413` and leave rule 4
+  blind, which is the exact failure S4 exists to prevent. AC4 and AC5 are the mirrored pair for rule
+  4; the old AC4 and AC5 are renumbered AC6 and AC7. **H7:** §7 named the plain bar for a
+  `subject = kit` leg that `run-gates.sh:947` holds; corrected to `GATE_SELFTESTS=1`.
 
 ## 10. Reuse audit
 

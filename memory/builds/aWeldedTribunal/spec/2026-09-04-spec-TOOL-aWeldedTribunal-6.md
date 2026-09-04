@@ -1,10 +1,12 @@
 # TOOL-aWeldedTribunal-6 — `govkit update` reports a source gov started shipping instead of missing it
 
-**Status:** OPEN · rev-1 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 6
+**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
@@ -21,11 +23,18 @@ point of that kit died for six days under a green bar.
 
 - **S1** — `update` computes the GAP set for the kits in scope, using `coverage_rows`, which is the
   existing read-only join that answers exactly this question and needs no receipt.
-- **S2** — Each gap is REPORTED as its own counted line, naming the kit, the destination and the
-  gov source, in the same shape the other classification verdicts print.
-- **S3** — A gap makes the verb's summary say the install is INCOMPLETE. The defect is not that the
-  file was left out; it is that leaving it out read as clean. `update` today reports a receipt
-  fully classified and says nothing about a population it never iterated.
+- **S1b** — **The gap set is GRADED through `decline_findings` before anything is printed**, the way
+  both existing call sites do it. `coverage_rows` does NOT honour the decline registry — §4 shows
+  its body — so an ungraded call reports every deliberately-declined file as a gap. It needs
+  `commit_now` from `git rev-parse HEAD`, and it grades staleness as well as presence.
+- **S2** — Each UNDECLINED gap is REPORTED as its own counted line, naming the kit, the destination
+  and the gov source, in the same shape the other classification verdicts print. A DECLINED row
+  prints too, as a declined row, because a gap that disappears from a report without saying why is
+  the exclusion-list shape the decline contract exists to avoid becoming.
+- **S3** — An UNDECLINED gap makes the verb's summary say the install is INCOMPLETE. A fully
+  declined gap set summarises COMPLETE. The defect is not that a file was left out; it is that
+  leaving it out read as clean, and a summary that reads INCOMPLETE forever for a target with a
+  decline registry is the same defect with the sign flipped.
 - **S4** — `--kits` scoping binds the gap set exactly as it binds `rows_all`. A gap in a kit the
   caller did not name is not this invocation's business.
 - **S5** — An arm proving a gap is DETECTED and one proving a clean install reports ZERO gaps, and
@@ -55,9 +64,27 @@ point of that kit died for six days under a green bar.
 
 `coverage_rows(root, target, deploy, descs, selection, r, rows)` at
 `tools/govkit/govkit.py:2263` is the existing predicate, built by `DEPL-dCarriedReceipt-4`, with two
-call sites already: `plan --coverage` and `cmd_check`. It is a read-only join that needs no receipt,
-its population is `kind == "write"` and nothing else, and it honours the decline registry. This unit
-is call site three and adds no predicate.
+call sites already: `plan --coverage` and `cmd_check`. It is a read-only join that needs no receipt.
+This unit is call site three and adds no predicate.
+
+**It does NOT honour the decline registry, and rev-1 said it did.** Its whole body is:
+
+```python
+return [{"kit": row["kit"], "dest": row["dest"], "src": row["src"]}
+        for row in rows
+        if row["kind"] == "write" and not row["missing"] and row["dest"] not in have]
+```
+
+No decline lookup anywhere. **Both existing call sites grade it themselves**: `:2673` computes gaps,
+calls `decline_findings` at `:2679`, and prints `GAP` only where the lookup returns `None`; `:2869`
+does the same for `check`. The comment beside the first says why the map comes back from the GRADER
+rather than being read off the descriptor — filtering on presence alone makes it an exclusion list
+again, which is the thing `DEPL-dCarriedReceipt-5` exists to prevent.
+
+Built on rev-1's false premise, `update` would print every deliberately-declined file as a gap and
+pin its summary to INCOMPLETE permanently for any target with a decline registry. That is the
+crying-wolf failure the decline contract's own header names, applied to the verb operators run most.
+So the grading step is S1b and it is not optional.
 
 That single-predicate property is the whole reason this is small. The row's measurement — that
 `plan --coverage` REPORTS the gap while `update --write` leaves it out — is the evidence that the
@@ -127,12 +154,20 @@ coverage join that did not run. This unit inherits that rule rather than restati
 - **AC5** — When the arm reproducing the row's own measurement runs — a kit claimed by
   `include = "**"` with a source added upstream — `update` reports the gap that
   `plan --coverage` already reports, so the two verbs agree.
-- **AC6** — When `bash tools/run-gates/run-gates.sh` runs the govkit legs, they stay green.
+- **AC6** — When `govkit update` runs against a fixture target whose ONLY gap is DECLINED, it prints
+  no undeclined `GAP` row and its summary says COMPLETE. This is S1b, and it is the criterion that
+  catches a build made on rev-1's false premise.
+- **AC7** — When `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs the govkit legs, they
+  stay green.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` — the govkit legs named in `tools/gate-legs.json`, several of
-which are guarded on `tools/govkit/` and so run on this diff.
+`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for `govkit selftest`, which is
+`subject = kit` in `tools/gate-legs.json` and is therefore held as `ondemand` by
+`tools/run-gates/run-gates.sh:947` on the plain bar — a leg's GUARD scopes a run, the subject and
+chunk decide whether it runs at all. `AGENTS.md` records that no boundary sets `GATE_SELFTESTS`
+(owner, 2026-08-27) and that a DoD owes the full pair for KIT work, which this is. The repo-subject
+govkit legs still run on the plain bar.
 
 ## 8. Open questions
 
@@ -143,6 +178,14 @@ none
 - rev-1 · 2026-09-04 · initial draft. Confirmed against source that the classification loop is
   `for row in rows_all` over `receipt.get("files", [])` at `tools/govkit/govkit.py:5825`, and that
   `coverage_rows` exists at `:2263` with call sites in `plan --coverage` and `cmd_check` only.
+- rev-2 · 2026-09-04 · folded spec-audit round 1 (H1, H7). **H1, high:** rev-1's §4 asserted that
+  `coverage_rows` "honours the decline registry". It does not — its body filters on
+  `kind == "write"`, `not missing` and `dest not in have`, and BOTH existing call sites grade the
+  result themselves through `decline_findings`. The claim was load-bearing, because S1 reused the
+  predicate and §4 said the unit "adds no predicate": built faithfully, `update` would have printed
+  every declined file as a gap and read INCOMPLETE forever. S1b adds the grading step, S2 and S3 are
+  scoped to UNDECLINED gaps, and AC6 is its arm. **H7:** §7 named the plain bar for a
+  `subject = kit` leg and reasoned from the leg's guard; corrected to `GATE_SELFTESTS=1`.
 
 ## 10. Reuse audit
 

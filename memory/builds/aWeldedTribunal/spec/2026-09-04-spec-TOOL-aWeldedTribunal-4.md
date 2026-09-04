@@ -1,20 +1,22 @@
 # TOOL-aWeldedTribunal-4 — the tier-2 synthesis prompt carries the liveness counters the run computed
 
-**Status:** OPEN · rev-1 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 `tools/workflows/tier2-review.js` computes how badly its own run degraded — dead lenses, dead
-skeptic batches, spurious and duplicate verdicts — and hands none of it to the agent that writes the
-durable report. A run whose lenses half died therefore writes a record that cannot say so. The two
-drift-audit siblings were given this block by `TOOL-dTieredTribunal-3`; the reference harness they
-were copied from was not.
+skeptic batches, contradictory verdicts, spurious and duplicate ones — and hands none of it to the
+agent that writes the durable report. A run whose lenses half died therefore writes a record that
+cannot say so. The two drift-audit siblings were given this block by `TOOL-dTieredTribunal-3`; the
+reference harness they were copied from was not.
 
 ## 2. Scope (IN)
 
@@ -25,26 +27,32 @@ were copied from was not.
   INCOMPLETE and a zero is not evidence of absence. This is the half that makes the block do work,
   because a report that prints the counters and still opens with "no issues found" has reported
   nothing.
-- **S3** — A criterion that REDS while the prompt lacks it, in
-  `tools/workflows/check-workflow-syntax.js`, which is the merge-bar leg over this population
-  (`workflow script syntax` in `tools/gate-legs.json`, subject `repo`, so it runs on every bar).
-  Without it the class returns the moment someone writes a fourth harness.
-- **S4** — The criterion is verified by a STAGED BREAK: the block is removed, the leg observed RED,
-  the removal unstaged. A gate seen only passing is an assertion about nothing.
-- **S5** — The criterion's population is DERIVED, not a list of three filenames. A harness that
-  computes a liveness counter and does not interpolate it is the defect; naming the three files
-  that have the problem today certifies coverage for tomorrow's fourth.
+- **S3** — The left-shift is a DOCUMENTED CHECK plus a refresh of
+  `memory/gotchas/degradation-known-but-unreported.md`, naming this harness as a closed instance of
+  the class and the DoD line that keeps it closed. It is NOT a gate. Rev-1 specified a scanner; §3
+  records why that was dropped.
 
 ## 3. Non-goals (OUT)
 
+- **A SCANNER, and this is a reversal of rev-1 rather than an omission.** `memory/DECISIONS.md:116`
+  records `TOOL-dTieredTribunal-9`: *"the left-shift M8 owed for the closing review's D1 and D2 is a
+  `memory/gotchas/` RECORD, not a scanner (owner, 2026-08-26). Named as a documented check, not a
+  gate: nothing static separates a fold-created sentence from any other."* Rev-1's S3 built exactly
+  the refused thing, and its predicate — assert the literal `RUN INTEGRITY` appears in the file —
+  demonstrates the ruling's own reasoning: a comment carrying those two words satisfies it, so the
+  gate could not fail for the reason it existed. A standing mandate delegates this build's forks and
+  its scope; it does not reach a ratified owner decision, so the disposition is to DROP the scope
+  item, not to park the unit and not to build it anyway.
 - **Changing what the counters MEAN or how they are computed.** `TOOL-dTieredTribunal-1` and
   `TOOL-aGuardedTally-1` settled the counting, including that an unjudged finding is UNVERIFIED and
   never refuted. This unit moves numbers into a prompt and does not re-adjudicate them.
 - **Re-counting the record.** One agent writes the record and returns the integers from one
   adjudication; nothing re-counts it. That property is stated in the file already and is unchanged.
-- **A `conflictIds` or `downgrades` counter.** The siblings interpolate those because they compute
-  them. This file does not, and inventing a counter so the block matches the siblings' text
-  byte-for-byte would put a number in a report that nothing derives.
+- **A `downgrades` / severity-correction counter.** The siblings interpolate one because they
+  compute one. This file does not, and inventing a counter so the block matches the siblings'
+  text byte-for-byte would put a number in a report that nothing derives. Rev-1 said the same of
+  `conflictIds` and was WRONG: this file computes that one under a different spelling, and §4's
+  inventory now carries it.
 
 ## 4. Design
 
@@ -57,13 +65,19 @@ were copied from was not.
 | `lensesDead` | 364 | the difference |
 | `batches.length` | 397 | skeptic batches dispatched |
 | `skepticsDead` | 424 | batches that died |
+| `conflicts.size` | 434 | findings whose skeptics disagreed, demoted to unverified |
 | `spurious` | 436 | verdicts carrying an id this run never assigned |
 | `duplicates` | 435 | repeat verdicts agreeing with the standing one |
-| `unverified.length` | 449 | findings no skeptic judged |
 
 Every one is already logged to stdout, and stdout is not the record. `allFindings.length`,
 `confirmed.length`, `refuted.length`, `unverified.length` and `precision` already reach the prompt;
-the six that describe RUN HEALTH rather than finding counts do not.
+the seven above that describe RUN HEALTH rather than finding counts do not.
+
+`conflicts` is the counter rev-1 wrongly excluded. It is bound at `:434`, added to at `:443`, used to
+DELETE verdicts at `:445`, warned about at `:455`, and returned as `conflicts:` at `:480` and `:593`.
+It is the one counter that says findings were demoted because two skeptics disagreed — precisely the
+degradation §1 exists to surface — and it was kept out of the durable record on a premise that
+nothing needed inventing. Only the spelling differs from the siblings' `conflictIds`.
 
 ### The block
 
@@ -72,78 +86,79 @@ Appended to the synthesis prompt, after the existing review-shape sentence:
 ```
 RUN INTEGRITY - state these in the report and do NOT describe this run as complete if any is non-zero:
 lenses <live>/<total> returned, <n> DIED; skeptic batches <live>/<total> returned, <n> DIED;
-<n> spurious verdict(s) discarded, <n> duplicate(s).
+<n> contradictory verdict(s) demoted to unverified, <n> spurious verdict(s) discarded, <n> duplicate(s).
 If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. Say so
 where you would otherwise call a zero positive evidence.
 ```
 
-### The criterion, and why it is a derived population
+### The left-shift, and what it can and cannot be
 
-`tools/workflows/check-workflow-syntax.js` already discovers its population by a marker
-(`export const meta =`) rather than a filename list, which is the shape this criterion needs. The
-predicate: for each discovered harness that BINDS a liveness counter — an identifier matching the
-degradation vocabulary this corpus already uses, `lensesDead` and `skepticsDead` — assert the
-literal `RUN INTEGRITY` appears in the file. A harness that computes no such counter is not in the
-population and is not red for lacking a block it has nothing to put in.
+The owner ruling in §3 settles the form: a record and a documented check. The record
+`memory/gotchas/degradation-known-but-unreported.md` gains this harness as a closed instance, naming
+the counter set, so a future reader of the class sees which carriers are covered. The documented
+check is a DoD line: a harness that computes a liveness counter states it where the durable record
+is written, and that is verified by reading the prompt, not by a predicate.
 
-The predicate is run over the tracked tree before wiring, printing hits and near-misses, per the
-charter's §7 rule; the result goes in §9.
+Stated plainly because the temptation will return: what a static check CAN see is that the seven
+identifiers appear inside the synthesis prompt's template literal. What it cannot see is whether the
+report used them, and a check that greps for the block's own words is satisfied by a comment quoting
+this spec. The ruling is right and rev-1 was wrong.
 
 ### Files touched (estimate)
 
 - `tools/workflows/tier2-review.js` — the prompt block.
-- `tools/workflows/check-workflow-syntax.js` — the criterion.
+- `memory/gotchas/degradation-known-but-unreported.md` — the closed-instance entry.
 
 ### Alternatives rejected
 
-- **Assert the exact sibling text.** Rejected: the sibling text names counters this file does not
-  compute, so byte-equality would force an invented counter or a permanent exemption.
-- **Put the criterion in a new gate leg.** Rejected: `workflow script syntax` already owns this
-  population, runs on every bar, and discovers by marker. A second leg over the same population is
-  a second answer to one question.
+- **Assert the exact sibling text.** Rejected: the sibling text names a `downgrades` counter this
+  file does not compute, so byte-equality would force an invented counter or a permanent exemption.
+- **A gate leg for the block.** Refused by owner ruling `TOOL-dTieredTribunal-9`; see §3.
 - **Have the harness write the record itself instead of instructing an agent to.** Rejected: the
   harness has no filesystem and no repo access, which is stated in this file already and is why the
   binding line is instructed rather than written.
 
 ## 5. Production-readiness checklist
 
-- security — N/A — no write path, no input boundary; the change is prompt text and a gate predicate.
-- perf / scale — one longer prompt string and one regex per discovered harness.
+- security — N/A — no write path, no input boundary; the change is prompt text.
+- perf / scale — one longer prompt string.
 - a11y — N/A.
 - i18n — N/A.
 - error / empty / loading states — the block's whole subject IS the degraded state.
 - observability — this unit IS the observability fix. The counters existed and went nowhere a
   reader would find them.
 - risks — the block is an INSTRUCTION to an agent, not a mechanism. A synthesis agent can ignore it,
-  and no gate can check that it did not. Stated here rather than implied: what S3 makes checkable is
-  that the counters REACH the prompt, never that the report used them. That is the honest boundary
-  and the gate's own header will say so, per the charter's rule that a gate states what it does not
-  check.
-- testing + left-shift gates — S3 is the left-shift and S4 is its staged RED. The class is
-  `memory/gotchas/degradation-known-but-unreported.md`, and this row is its live instance.
+  and per §3's ruling no gate can usefully check that it did not. This limit is the reason the
+  left-shift is a record, and it is stated rather than implied.
+- testing + left-shift gates — S3, which is a record and a documented check, not a gate. The class
+  is `memory/gotchas/degradation-known-but-unreported.md`, and this row is its live instance.
 - migration / rollback — none; two files, both revert cleanly.
 - user docs — none; the harness is internal.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `tools/workflows/tier2-review.js` is read, the synthesis prompt interpolates
-  `lensesDead`, `liveResults.length`, `LENSES.length`, `skepticsDead`, `batches.length`, `spurious`
-  and `duplicates`.
-- **AC2** — When the `RUN INTEGRITY` block is deleted from `tools/workflows/tier2-review.js` and
-  `node tools/workflows/check-workflow-syntax.js` is run, it exits non-zero and names that file.
-  This is S4's staged break and it is an acceptance criterion because a gate nobody has seen fail
-  is not a gate.
-- **AC3** — When the block is restored, `node tools/workflows/check-workflow-syntax.js` exits `0`.
-- **AC4** — When a harness that binds no liveness counter is placed in the population,
-  `node tools/workflows/check-workflow-syntax.js` does NOT red it. The negative arm; without it the
-  predicate could red every workflow script and still look correct on the three that matter.
-- **AC5** — When `bash tools/run-gates/run-gates.sh` runs the `workflow script syntax` leg, it is
-  green with the block present.
+- **AC1** — When the synthesis prompt in `tools/workflows/tier2-review.js` is read, it interpolates
+  every counter in §4's inventory: `lensesDead`, `liveResults.length`, `LENSES.length`,
+  `skepticsDead`, `batches.length`, `conflicts.size`, `spurious` and `duplicates`. The criterion is
+  the SET, not a sample, so a counter dropped from the block fails it.
+- **AC2** — When `tools/workflows/tier2-review.js` is run end to end on a real review, the report it
+  writes contains a `RUN INTEGRITY` line carrying those numbers. This is the observation that the
+  block reached the record rather than only the source, and it is the one this build can make
+  because the closing review of this very build runs that harness.
+- **AC3** — When `memory/gotchas/degradation-known-but-unreported.md` is read, it names
+  `tools/workflows/tier2-review.js` as a closed instance and names the counter set. This is S3, and
+  it is observable by reading one file because the owner ruling says the left-shift is that file.
+- **AC4** — When `node tools/workflows/check-workflow-syntax.js` runs, it exits `0`. The block must
+  not break the syntax leg, which is subject `repo` and therefore runs on every bar.
+- **AC5** — When `bash tools/run-gates/run-gates.sh` runs, the `workflow script syntax` leg is
+  green. That leg is subject `repo`, so the plain bar does run it — unlike the kit-subject legs the
+  other units name, which need `GATE_SELFTESTS=1`.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` — the `workflow script syntax` leg, whose name and argv are in
-`tools/gate-legs.json` and read from there.
+`tools/gate-legs.json`. That leg is `subject = repo` and `chunk = wiring`, so the plain bar runs it;
+no `GATE_SELFTESTS=1` is owed by this unit.
 
 ## 8. Open questions
 
@@ -153,16 +168,24 @@ none
 
 - rev-1 · 2026-09-04 · initial draft. Confirmed against source: `drift-audit-code.js:467` and
   `drift-audit-state.js:490` carry the block, `tier2-review.js` carries none, and every counter the
-  block would name is already bound in that file at the lines §4 tabulates.
+  block would name is already bound in that file.
+- rev-2 · 2026-09-04 · folded spec-audit round 1 (B2, H6, H9). **B2, blocker:** rev-1's S3 built the
+  scanner owner ruling `TOOL-dTieredTribunal-9` refused at `memory/DECISIONS.md:116`, with a
+  predicate a comment satisfies. S3/S4/S5, AC2, AC3 and AC4 of rev-1 are DROPPED and the left-shift
+  is now the record the ruling names. **H6** dies with them, as the review said it would.
+  **H9, high:** rev-1's third non-goal claimed this file computes no contradictory-verdict counter.
+  False — `conflicts` at `:434`. It is now in §4's inventory, in the block and in AC1, and the
+  non-goal is narrowed to `downgrades` alone.
 
 ## 10. Reuse audit
 
 The seam is the `RUN INTEGRITY` block already in `tools/workflows/drift-audit-code.js` and
 `tools/workflows/drift-audit-state.js`, built by `TOOL-dTieredTribunal-3`. This unit copies that
-established shape onto the third harness rather than designing a new one, and the criterion extends
-`tools/workflows/check-workflow-syntax.js`, which already owns this population and already discovers
-it by marker. Found by `python tools/codebase-map/reuse_lookup.py "fan-out cap hook scans a script
-for loop shapes and array literals"` and by direct grep for the block literal across `tools/workflows/`.
+established shape onto the third harness rather than designing a new one. The left-shift reuses
+`memory/gotchas/degradation-known-but-unreported.md`, the class record that already exists for
+exactly this defect. Found by `python tools/codebase-map/reuse_lookup.py "fan-out cap hook scans a
+script for loop shapes and array literals"` and by direct grep for the block literal across
+`tools/workflows/`.
 
 Recall terms used: `--terms "agent-cap blankLiterals capFindings fanoutFindings landed phase check34
 lander marker unrepairable govkit renormalize memory-tree conf"`

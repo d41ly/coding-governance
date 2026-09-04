@@ -1,10 +1,12 @@
 # TOOL-aWeldedTribunal-1 — one loop-header predicate, and it recognises `for await` and `do`-blocks
 
-**Status:** OPEN · rev-1 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
@@ -17,9 +19,11 @@ copies of that regex with one predicate that recognises the shapes the ban was w
 
 ## 2. Scope (IN)
 
-- **S1** — ONE module-level predicate, used at every site that asks "is this line a loop header".
-  There are five such sites today and each holds its own copy of the regex, which is the
-  `two-answers-to-one-question` class the checklist selects for this file.
+- **S1** — ONE module-level SOURCE for the loop-keyword set, used at every site that asks "is this a
+  loop opener". There are SIX such sites today and each holds its own copy of the regex, which is the
+  `two-answers-to-one-question` class the checklist selects for this file. Five take the predicate
+  directly; `:710` and `:910` take siblings DERIVED from the same source, because one counts
+  occurrences and the other matches a keyword TAIL rather than a header.
 - **S2** — The predicate recognises `for await (`. The current regex requires `for` followed by
   optional whitespace and then `(`; `for await (` puts an identifier between them.
 - **S3** — The predicate recognises a `do`-block opener, `do {`. A `do { … } while (…)` block's
@@ -59,18 +63,32 @@ const LOOP_HEADER = /\b(?:for(?:\s+await)?|while)\s*\(|\bdo\s*\{/
 
 ### Inventory
 
-The five sites, each holding its own copy today, and what each asks:
+SIX sites, each holding its own copy today, and what each asks:
 
-| Site | Line today | What it asks |
-|---|---|---|
-| `checkSeqMarker` C5 | 705 | is the marked line a loop header at all |
-| `checkSeqMarker` C6 | 710 | does the marked header carry more than one opener |
-| `checkSeqMarker` nesting walk | 738 | is the enclosing block a loop |
-| call-site braceless arm | 934 | is this `agent()` on a braceless loop header line |
-| call-site brace walk | 944 | is the block still open above this line a loop |
+| Site | Line today | What it asks | Takes |
+|---|---|---|---|
+| `checkSeqMarker` C5 | 705 | is the marked line a loop header at all | `LOOP_HEADER` |
+| `checkSeqMarker` C6 | 710 | does the marked header carry more than one opener | a global-flag sibling |
+| `checkSeqMarker` nesting walk | 738 | is the enclosing block a loop | `LOOP_HEADER` |
+| **opener walk** | **910** | **is this open paren a loop opener** | **a keyword-TAIL sibling** |
+| call-site braceless arm | 934 | is this `agent()` on a braceless loop header line | `LOOP_HEADER` |
+| call-site brace walk | 944 | is the block still open above this line a loop | `LOOP_HEADER` |
 
-Sites 705, 738, 934 and 944 take `LOOP_HEADER` directly. Site 710 counts occurrences and needs the
-global flag, so it takes a second constant built from the same source rather than a second literal.
+Site 710 counts occurrences and needs the global flag. **Site 910 was omitted from rev-1's inventory
+and it is the one that cannot take `LOOP_HEADER` at all**: it is `/\b(for|while)\s*$/` tested against
+the text BEFORE an opener position, so a pattern ending in `\(` or `do\s*\{` never matches there. It
+needs a sibling anchored at end-of-text, `/\b(?:for(?:\s+await)?|while)\s*$/`, derived from the same
+keyword source exactly as site 710's is.
+
+### Why :910 is not cosmetic — a fail-open the header widening alone leaves open
+
+`openersOf()` walks right-to-left. When `before` ends in `for await`, the `:910` predicate misses,
+`hit` stays null, and the walk continues OUTWARD. If the next enclosing opener is a bounded
+`.map(` / `.forEach(` receiver already in `ok`, the call-site arm returns at `:912-919` with no
+finding and the loop arms at `:934` and `:944` are never reached. So widening only the header sites
+leaves a second `for await` path admitted, and S1's "one source at every site" and AC5's single-
+source claim would both be false after the change. The `do`-block spelling does not reach this site
+— a `do {` opener is a brace, not a paren — so only the `for await` half is added here.
 
 ### Why widening the marker path is safe, checked rather than assumed
 
@@ -129,14 +147,21 @@ nothing else does; S4's negative arms pin that.
 - **AC4** — When the shipped harness `tools/workflows/tier2-review.js` is piped to the hook, it
   exits `0`. That file is the repo's own review harness and the one this predicate class has
   falsely denied before.
-- **AC5** — When `grep -c 'for|while' tools/hooks/agent-cap.js` is run over the loop-header sites,
-  the five separate literals are gone and `LOOP_HEADER` is the single source.
+- **AC5** — When the same `for await` fan is reached through the OPENER walk rather than the brace
+  walk — the shape where the next enclosing opener is a bounded `.map(` receiver already in `ok` —
+  `node tools/hooks/agent-cap.js` exits `2`. This is the `:910` path, and without its own arm the
+  brace-walk arm passes while this one stays admitted.
+- **AC6** — When `grep -n 'for|while' tools/hooks/agent-cap.js` is run, the six separate literals are
+  gone: `LOOP_HEADER` and the two siblings derived from it are the only carriers of the keyword set.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` — specifically the `agent-cap` self-test leg and the
-`agent-cap restatement` leg, whose names are in `tools/gate-legs.json`. Both are read from that
-manifest at emission time and not typed here as a list.
+`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `agent-cap self-test` and
+`agent-cap restatement self-test` legs, which are `subject = kit` in `tools/gate-legs.json` and are
+therefore held as `ondemand` by `tools/run-gates/run-gates.sh:947` on the plain bar. `AGENTS.md`
+records that no boundary sets `GATE_SELFTESTS` (owner, 2026-08-27) and that a DoD owes the full pair
+for KIT work, which this is. The `agent-cap restatement` leg is `subject = repo` and does run on the
+plain bar.
 
 ## 8. Open questions
 
@@ -146,6 +171,17 @@ none
 
 - rev-1 · 2026-09-04 · initial draft. Both evasion shapes reproduced at exit 0 against the shipped
   hook before writing; the transcript of that measurement is in the build README's rules slot.
+- rev-2 · 2026-09-04 · folded the pre-wiring predicate run and spec-audit round 1 (H3, H7).
+  **The predicate run** over all eight tracked `*.js` found ZERO lines the widened predicate matches
+  and the current one does not, so the widening denies nothing currently admitted. Recorded at
+  `memory/builds/aWeldedTribunal/build/2026-09-04-build-TOOL-aWeldedTribunal-2-1-predicate-measurement.md`.
+  **H3, high:** rev-1's inventory listed five sites and omitted `:910`,
+  `if (/\b(for|while)\s*$/.test(before))`, which cannot take `LOOP_HEADER` because it matches a
+  keyword TAIL. §4 now carries the sixth row, the derived sibling, and the fail-open that widening
+  the header sites alone would leave open; AC5 gives the opener walk its own arm and the old AC5 is
+  renumbered AC6. **H7:** §7 named the plain bar for `subject = kit` legs that
+  `run-gates.sh:947` holds as `ondemand`; corrected to `GATE_SELFTESTS=1`, and the one leg that IS
+  `subject = repo` is now distinguished rather than lumped in.
 
 ## 10. Reuse audit
 

@@ -1,10 +1,12 @@
 # TOOL-aWeldedTribunal-5 — one `.memory-tree.conf` parser, read by all five python readers
 
-**Status:** OPEN · rev-1 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-09-04 · node a · Tier-2 · base 9b5ae688 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md](../reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-round1.md) | spec-audit | TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 |
 
 <!-- /gen:spec-records -->
 
@@ -25,6 +27,13 @@ green. Route all five through one parser that agrees with the shell.
 - **S3** — `gotchas.py`, `gen_build_index.py`, `check-arms.py` and `row_grammar.py` call it instead
   of their own copies. Each keeps its OWN defaults dict — the defaults differ per reader and merging
   them would be a scope change nobody asked for — and only the PARSE is shared.
+- **S3b** — `corpus_ids.read_declared_keys` is the SIXTH reader and is routed through the same
+  parser for its KEYS. It re-partitions the file on `=` at `corpus_ids.py:122-136` and takes
+  `line.partition("=")[0].strip()`, so after S2 an `export MEMORY_ROOT=memory` line yields
+  `MEMORY_ROOT` from the shared parser and `export MEMORY_ROOT` from this one — the retired-key and
+  undeclared-`CHARTER` checks would then disagree with the parser inside a single file. Its own
+  docstring says it "cannot drift from it — same file, same rule", which S2 makes false unless this
+  item is built.
 - **S4** — A fixture covering both spellings, in whichever of the kit's suites owns conf parsing.
   `TOOL-aScouredKit-5` fixed exactly this divergence in the drift-audit copy and its fixture covers
   both spellings; this unit's fixture is modelled on that one.
@@ -50,16 +59,22 @@ green. Route all five through one parser that agrees with the shell.
 
 ### Inventory — the five copies
 
-| File | Line | Defaults it carries |
-|---|---|---|
-| `tools/memory-tree/corpus_ids.py` | 118 | `MEMORY_ROOT` `DISCIPLINES` `FAMILIES` `CHARTER` and four pins |
-| `tools/memory-tree/gotchas.py` | 92 | `MEMORY_ROOT` `UNIVERSAL_BUDGET` |
-| `tools/memory-tree/gen_build_index.py` | 287 | `MEMORY_ROOT` `DISCIPLINES` `FAMILIES` |
-| `tools/memory-tree/check-arms.py` | 82 | `MEMORY_ROOT` `ARMS_FLOORS` |
-| `tools/memory-tree/row_grammar.py` | 93 | `MEMORY_ROOT` `FAMILIES` and a pin |
+| File | Line | Reads | Defaults it carries |
+|---|---|---|---|
+| `tools/memory-tree/corpus_ids.py` `load_conf` | 118 | values | `MEMORY_ROOT` `DISCIPLINES` `FAMILIES` `CHARTER` and four pins |
+| `tools/memory-tree/gotchas.py` | 92 | values | `MEMORY_ROOT` `UNIVERSAL_BUDGET` |
+| `tools/memory-tree/gen_build_index.py` | 287 | values | `MEMORY_ROOT` `DISCIPLINES` `FAMILIES` |
+| `tools/memory-tree/check-arms.py` | 82 | values | `MEMORY_ROOT` `ARMS_FLOORS` |
+| `tools/memory-tree/row_grammar.py` | 93 | values | `MEMORY_ROOT` `FAMILIES` and a pin |
+| `tools/memory-tree/corpus_ids.py` `read_declared_keys` | 122-136 | **keys only** | none — it returns a key set |
 
-All five hold the identical body: skip blank, skip `#`-leading, skip no-`=`, partition on the first
-`=`, strip whitespace then one layer of double quotes then one layer of single quotes.
+The first five hold the identical body: skip blank, skip `#`-leading, skip no-`=`, partition on the
+first `=`, strip whitespace then one layer of double quotes then one layer of single quotes. The
+sixth shares the skip rules and the partition and stops at the key, which is why rev-1's inventory
+missed it and why AC6's quote-strip grep cannot see it either.
+
+**This inventory is the single source for the count.** No criterion in §6 states a number, per the
+charter's rule that no count of a derived population is written in prose.
 
 ### The shared parser
 
@@ -86,9 +101,17 @@ is a silent wrong answer where the current bug is at least a loud directory miss
 
 ### Import mechanism
 
-`row_grammar.py` already does `sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))` and
-imports a sibling; `gotchas.py` already imports `corpus_ids`. The pattern exists, is used, and is
-what the other three adopt. No packaging change.
+`row_grammar.py:38-39` does `sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))` and
+imports a sibling. The pattern exists, is used, and is what the four value-readers adopt. No
+packaging change.
+
+**The backlog row's justification does NOT survive, and the difference is worth stating.**
+`TOOL-aScouredKit-19` closes with *"`gotchas.py` already imports `corpus_ids.py`, so routing all
+five through one parser costs no new coupling"*. Measured: `grep -n corpus_ids tools/memory-tree/*.py`
+hits only inside `corpus_ids.py` itself, and the complete import graph among the readers is the ONE
+edge above. So this adds four import edges where the row promised zero. Four edges inside one kit
+directory, all pointing at the module that already owns the conf, is still the right trade — but it
+is a trade, and the row presented it as free.
 
 ### Files touched (estimate)
 
@@ -128,10 +151,15 @@ what the other three adopt. No packaging change.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a fixture conf holding `MEMORY_ROOT=memory   # note` is read by each of the five
-  readers, every one returns `memory`. Today four of them return `memory   # note`.
-- **AC2** — When a fixture conf holding `export MEMORY_ROOT=memory` is read by each of the five,
-  every one returns `memory` under the key `MEMORY_ROOT`. Today the key is `export MEMORY_ROOT`.
+- **AC1** — When a fixture conf holding `MEMORY_ROOT=memory   # note` is read by every reader in
+  §4's inventory, each returns `memory`. Today every value-reading one of them returns
+  `memory   # note`.
+- **AC2** — When a fixture conf holding `export MEMORY_ROOT=memory` is read by every reader in §4's
+  inventory, each yields the key `MEMORY_ROOT`. Today every one of them yields `export MEMORY_ROOT`,
+  `read_declared_keys` included.
+- **AC2b** — When that same fixture is read, `corpus_ids.read_declared_keys` and
+  `corpus_ids.load_conf` agree on the key set. This is S3b, and it is the one criterion that catches
+  a build that routes the four value-readers and leaves the key-reader behind.
 - **AC3** — When the planted violation of `TOOL-aScouredKit-19`'s reproduction is staged under a
   conf carrying the inline comment, `python tools/memory-tree/gotchas.py --check` exits `1`. It
   exits `0` today, which is the whole defect: coverage removed rather than failed closed.
@@ -140,13 +168,19 @@ what the other three adopt. No packaging change.
 - **AC5** — When a fixture conf is SOURCED in `bash` and read by `corpus_ids.parse_conf`, the two
   agree on every key. This is S5, and it is what makes the arm a cross-language check rather than a
   tautology between two values the same code derives.
-- **AC6** — When `grep -c "strip('\"')" tools/memory-tree/*.py` is run, one copy remains.
+- **AC6** — When `grep -c "strip('\"')" tools/memory-tree/*.py` is run, one copy remains. This
+  criterion CANNOT see `read_declared_keys`, which carries no quote strip — AC2b is what covers that
+  reader, and saying so here is cheaper than a later reader assuming this grep is the whole audit.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` — the memory-tree hygiene legs and the kit self-test legs whose
-names are in `tools/gate-legs.json`. Several are guarded on the kit dir this unit writes, so they
-run on this diff by construction.
+`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `memory-hygiene self-test` leg, which
+is `subject = kit` in `tools/gate-legs.json` and is therefore held as `ondemand` by
+`tools/run-gates/run-gates.sh:947` on the plain bar. A leg's GUARD scopes a RUN; the subject and
+chunk decide whether the leg runs at all, and rev-1 reasoned from the wrong one. `AGENTS.md` records
+that no boundary sets `GATE_SELFTESTS` (owner, 2026-08-27) and that a DoD owes the full pair for KIT
+work, which this is. The plain bar still covers the repo-subject memory-tree hygiene legs, which are
+what actually grade this repo's own tree.
 
 ## 8. Open questions
 
@@ -154,19 +188,37 @@ none
 
 ## 9. Revision log
 
-- rev-1 · 2026-09-04 · initial draft. All five copies confirmed present at the lines §4 tabulates,
-  by `grep -c` over each file.
+- rev-1 · 2026-09-04 · initial draft. All five value-parsing copies confirmed present at the lines
+  §4 tabulates, by `grep -c` over each file.
+- rev-2 · 2026-09-04 · folded the pre-wiring measurement and spec-audit round 1 (H7, H10, L1).
+  **The measurement** confirmed bash's behaviour on all three spellings, including that a quoted
+  `#` must survive, and REFUTED the backlog row's claim that `gotchas.py` already imports
+  `corpus_ids` — the complete import graph among the readers is one edge, `row_grammar` to
+  `gen_build_index`. The mechanism survives; the "costs no new coupling" justification does not, and
+  §4 no longer repeats it. Recorded at
+  `memory/builds/aWeldedTribunal/build/2026-09-04-build-TOOL-aWeldedTribunal-5-1-conf-parse-measurement.md`.
+  **H10, high:** `corpus_ids.read_declared_keys` is a SIXTH reader living in the host module, absent
+  from rev-1's inventory and from every non-goal. After S2 it would disagree with the shared parser
+  on keys inside one file — a new two-answers-to-one-question created by the unit whose goal is one
+  parser. S3b and AC2b close it. **L1:** rev-1's AC1 said "four of them", excluding `corpus_ids`,
+  which is equally broken; criteria now name the §4 inventory instead of a number. **H7:** §7 named
+  the plain bar for a `subject = kit` leg and reasoned from the leg's GUARD, which is the wrong
+  mechanism; corrected to `GATE_SELFTESTS=1`.
 
 ## 10. Reuse audit
 
 The seam is `corpus_ids.load_conf` at `tools/memory-tree/corpus_ids.py:105`, which is already the
-kit's conf reader and is already imported by `gotchas.py`; this unit widens it rather than adding a
+kit's conf reader and carries the widest defaults set; this unit widens it rather than adding a
 module. The import mechanism reused is `row_grammar.py`'s existing `sys.path.insert` plus sibling
-import at lines 38-39. The fixture is modelled on the one `TOOL-aScouredKit-5` landed for the
-drift-audit copy of the same divergence. Found by
+import at lines 38-39 — the only such edge in the kit today. The fixture is modelled on the one
+`TOOL-aScouredKit-5` landed for the drift-audit copy of the same divergence. Found by
 `python tools/codebase-map/reuse_lookup.py "fan-out cap hook scans a script for loop shapes and
 array literals"`, which surfaced `row_grammar.scan` and `corpus_ids` in the ranked set, and
-confirmed by direct grep of the five files.
+confirmed by direct grep over every reader.
+
+**A STALE HIT, recorded per this section's own rule.** The backlog row asserts `gotchas.py` already
+imports `corpus_ids`, and it does not — verified by grep at `711c4c50`. The seam is still the right
+one; the row's claim that reusing it is free is where the two disagreed, and §4 says so.
 
 Recall terms used: `--terms "agent-cap blankLiterals capFindings fanoutFindings landed phase check34
 lander marker unrepairable govkit renormalize memory-tree conf"`
