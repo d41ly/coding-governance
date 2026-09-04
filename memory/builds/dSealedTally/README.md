@@ -94,7 +94,7 @@ ids DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTall
 | [DEPL-dSealedTally-5 — the govkit self-test grades the tree, not the commit's ref-reachability](spec/2026-09-04-spec-DEPL-dSealedTally-5.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -131,8 +131,9 @@ def repin_receipt(argv: list[str]) -> None:
 
 def run(*args: str, cwd: pathlib.Path | None = None) -> subprocess.CompletedProcess:
     # S1. THE PIN IS THREADED HERE, for the verbs that accept one and only when the caller
-    # did not pass its own. Eleven call sites carry a deliberate per-fixture vintage and a
-    # blanket pin would clobber what those arms grade.
+    # did not pass its own. FOUR `run()` call sites carry a deliberate per-fixture vintage --
+    # the number `[-ST5] AC5` pins and re-measures every run, not a prose figure beside it --
+    # and a blanket pin would clobber what those arms grade.
     _argv = list(args)
     if _argv and _argv[0] in ("update", "adopt") and "--to" not in _argv:
         _argv += ["--to", GOV_PIN]

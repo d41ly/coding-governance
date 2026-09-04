@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-04-build-DEPL-dSealedTally-4-1-acceptance-ledger.md](../build/2026-09-04-build-DEPL-dSealedTally-4-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
+| [2026-09-04-review-DEPL-dSealedTally-1-closing-diff-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-closing-diff-round1.md) | diff-review | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 | [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 
 <!-- /gen:spec-records -->

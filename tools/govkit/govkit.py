@@ -3802,12 +3802,15 @@ def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[
     # Filtered HERE so all callers inherit it, using the same resolve/relative_to idiom the
     # rename-destination containment check already uses. A filtered path is simply left out of
     # both return values, which is what "absent" means to every caller.
-    _root = target.resolve()
+    # F5. LEXICAL, NOT RESOLVED. `.resolve()` follows symlinks, so a TRACKED symlink that points
+    # outside the tree resolved outside it and was filtered away -- reported absent from an index it
+    # is really in, which is the same false-absent this whole unit exists to remove, reintroduced by
+    # its own filter. The question here is about the PATH git was given, and git paths are
+    # repo-relative: one escapes when its normalised form climbs out or is absolute.
     _inside: list[str] = []
     for _p in paths:
-        try:
-            (target / _p).resolve().relative_to(_root)
-        except (ValueError, OSError):
+        _n = os.path.normpath(_p).replace("\\", "/")
+        if os.path.isabs(_n) or _n == ".." or _n.startswith("../"):
             continue
         _inside.append(_p)
     paths = _inside
@@ -4595,7 +4598,14 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # all. A row whose path the target does not track gets no `oid`, which is a true statement about
     # a target that holds no index entry for it.
     _landed = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES]
-    _idx, _ = index_read(target, _landed) if _landed else ({}, set())
+    # F4. MID-WRITE, so it disposes rather than raises. `index_read` began raising a `Refusal`
+    # in this build; uncaught here it aborts `apply` after files are on disk and before the receipt
+    # is written, which is the half-install-with-no-receipt state this verb is built to avoid.
+    try:
+        _idx, _ = index_read(target, _landed) if _landed else ({}, set())
+    except Refusal as _ap_idx_err:
+        r.fail(f"could not read the index after writing: {_ap_idx_err}")
+        _idx = {}
     for w in rows:
         if w.get("role") in LANDABLE_ROLES and w["path"] in _idx:
             w["oid"] = _idx[w["path"]][1]
@@ -4828,7 +4838,12 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     # the renormalize moves.
     if staged or _renormalized:
         _re = [w["path"] for w in rows if w.get("role") in LANDABLE_ROLES and w.get("path")]
-        _idx2, _ = index_read(target, sorted(set(_re))) if _re else ({}, set())
+        # F4. MID-WRITE, disposed for the reason the first reader above carries.
+        try:
+            _idx2, _ = index_read(target, sorted(set(_re))) if _re else ({}, set())
+        except Refusal as _ap_idx_err2:
+            r.fail(f"could not read the index after writing: {_ap_idx_err2}")
+            _idx2 = {}
         for w in rows:
             if w.get("role") in LANDABLE_ROLES and w.get("path") in _idx2:
                 w["oid"] = _idx2[w["path"]][1]
@@ -6370,7 +6385,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # the write path could not learn WHICH KIT a landing belongs to -- which is exactly
         # what `touched_kits` needs in order to baseline a landed-only kit before the write
         # loop. The spec asked for pairs; triples are that plus the resolved row the landing
-        # writes from, so nothing has to resolve it twice.
+        # writes from. THE ROW IS CURRENTLY UNCONSUMED: the write path reads only the kit id,
+        # and an earlier version of this comment claimed the row saved a second resolve,
+        # which nothing does. It is kept because the landing loop below is the caller that
+        # will want it when it is finally routed through this function, and dropping it now
+        # would change the shape twice. Stated rather than implied, so the next reader does
+        # not go looking for the saving.
         return _land, _ref
 
     # ===================== THE UNCLAIMED-SOURCE PREVIEW, ON THE READ-ONLY PATH ==================
@@ -7119,6 +7139,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # the adopter's index that the receipt does not name and gov can never withdraw.
             # Measured: an adopter file at `tools/demo/sub` makes `mkdir` raise `FileExistsError`,
             # and the run died with `A  tools/demo/aaa.txt` staged and no row for it.
+            # F2. THE PRE-WRITE INDEX STATE, read HERE because after the `git add` below it
+            # no longer exists. The landing gate refuses a destination `os.path.lexists`
+            # finds, but that is a DISK probe and cannot see a path staged with no worktree
+            # copy -- so the snapshot must ASK the index rather than assume `absent` from it.
+            _idx_pre, _ = index_read(target, [_dest])
             try:
                 _abs0.parent.mkdir(parents=True, exist_ok=True)
                 _abs0.write_bytes(_blob0)
@@ -7161,6 +7186,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # the adopter permanently, with no adversary and no tampering.
             _add0 = git_pathspec(target, ["add"], [_dest])
             if _add0.returncode != 0:
+                # F6. THE ROW GOES BACK TOO. It is minted above, BEFORE this stage, so a
+                # refusal here used to unlink the file and leave its row behind -- a receipt
+                # naming a path the target does not have and git never tracked, which is
+                # the orphan the refusal text below says it is avoiding. Guarded on the
+                # path rather than popping blind, so it can only ever remove its own row.
+                if receipt.get("files") and receipt["files"][-1].get("path") == _dest:
+                    receipt["files"].pop()
                 try:
                     _abs0.unlink()
                 except OSError:
@@ -7189,8 +7221,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # it: `git rm --cached` then `unlink`. So the file half of the rollback needs no
             # new branch at all. `origin` exists for the half that DOES: the receipt row
             # below was minted by this run and must be removed rather than restored.
+            # F2. THE INDEX IS ASKED, NOT ASSUMED. This entry used to hardcode `None` on the
+            # strength of the landing gate's `os.path.lexists` refusal -- but that is a DISK probe
+            # and cannot see an index entry, so a path staged in the adopter's index with no
+            # worktree copy was recorded as absent and the rollback would `git rm --cached` and
+            # unlink the adopter's own staged blob instead of restoring it. The rename branch above
+            # asks both index and disk and says why; this now does the same.
             snap_rows.append({"kit": _eid, "row": receipt["files"][-1], "paths": [_dest],
-                              "origin": "landed", "fields": {}, "index": {_dest: None}})
+                              "origin": "landed", "fields": {},
+                              "index": {_dest: _idx_pre.get(_dest)}})
 
     # DEPL-dSealedTally-1 S4. THE LANDED DESTINATIONS COUNT AS WRITTEN. Without this a landed
     # path is classified untouched by the closing tally, which reports it as a file this run
@@ -7325,16 +7364,29 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 # exist, and the `withdrawn_rows` removal is about rows this run withdrew,
                 # which has nothing to say about a row this run MINTED.
                 if s.get("origin") == "landed":
-                    try:
-                        receipt["files"].remove(s["row"])
-                    except ValueError:
-                        pass
-                    for _lp in s["paths"]:
+                    # F3. THE ROW GOES ONLY IF THE FILE WENT. This branch ran once per ENTRY, after
+                    # the per-path loop, and dropped the receipt row whatever that loop decided --
+                    # so a path whose removal was REFUSED by containment, or whose `git rm --cached`
+                    # failed, left a gov-written file staged in a repository gov does not own,
+                    # named in no line of the rollback order and withdrawable by nothing, because
+                    # the row that would have named it was gone.
+                    _left_landed = [p for p in s["paths"] if p not in restored]
+                    for _lp in [p for p in s["paths"] if p in restored]:
                         while _lp in _landed_new:
                             _landed_new.remove(_lp)
-                        if _lp in restored:
-                            restored.remove(_lp)
-                            removed_landed.append(_lp)
+                        restored.remove(_lp)
+                        removed_landed.append(_lp)
+                    if _left_landed:
+                        r.fail(f"rolling back kit '{eid}': the landed path(s) "
+                               f"{', '.join(sorted(_left_landed))} could not be removed, so their "
+                               f"receipt row is KEPT. The target is PART restored and those bytes "
+                               f"are still staged; the row is what a later `update` needs in order "
+                               f"to see them at all")
+                    else:
+                        try:
+                            receipt["files"].remove(s["row"])
+                        except ValueError:
+                            pass
                     continue
 
                 # S3 + S5. THE ROW'S OWN FIELDS, restored TOGETHER. Restoring bytes and leaving the
