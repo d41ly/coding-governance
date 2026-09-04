@@ -256,8 +256,10 @@ one place is cheaper than a gated copy, and cheaper still than a gated copy nobo
   remaining callers, and it takes `run()`'s policy: an unparseable file in an armed language is a
   named refusal, never a silent skip. That is a behaviour change for `scaffold_lexicon.py`, which
   swallows it today, and it is deliberate.
-- observability — the verdict lines, the offender counts, the coverage line and the three pins do
-  not move; the `graded=` figures do, because this file is graded corpus. §6 AC1 pins the first set
+- observability — the verdict lines, the offender counts, the coverage line and every pin
+  SURVIVING this unit do not move; the `graded=` figures do, because this file is graded corpus.
+  The pin COUNT is deliberately not written here, for AC2's reason: the sibling unit at this
+  build order deletes one, so a number here is true or false depending on landing order. §6 AC1 pins the first set
   as a byte comparison and derives the second as a delta, rather than asserting either by eye.
 - risks (concurrency, data-loss, rollback hazards) — three hazards, none of them touching data. The
   cross-kit arm deletion is invisible to the push bar, for the reason given under Migration.
@@ -496,7 +498,11 @@ at stake and the scaffold route already covers it.
   on cost alone, citing `TOOL-dScaffoldedMirror-8` and `TOOL-dScaffoldedMirror-10`, which put the
   anti-mirror line at selection rather than reporting; §3 now states that the deleted route is the
   one the source calls primary and that no unit in this build restores a per-file reading.
-- rev-4 · 2026-09-04 · round-1 audit fold verification. AC2 said "all three pin lines" where the order-1 sibling deletes one of them; the count is gone and the sibling is excluded by name, matching AC1.
+- rev-4 · 2026-09-04 · round-1 audit fold verification. AC2 said "all three pin lines" where the
+  order-1 sibling deletes one of them, turning an order-independent criterion into an
+  order-dependent one; the count is gone and the sibling is excluded by name, matching AC1. §5's
+  observability bullet carried the same count and is corrected with it — the amendment's other
+  half, found by the bug-class checklist rather than by the review.
 
 ## 10. Reuse audit
 
