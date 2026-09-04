@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-03
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-dRatifiedSeam-1 DEPL-dRatifiedSeam-2 DEPL-dRatifiedSeam-3 DEPL-dRatifiedSeam-4 DEPL-dRatifiedSeam-5 DEPL-dRatifiedSeam-6 TOOL-dRatifiedSeam-1
+ids: DEPL-dRatifiedSeam-1 DEPL-dRatifiedSeam-2 DEPL-dRatifiedSeam-3 DEPL-dRatifiedSeam-4 DEPL-dRatifiedSeam-5 DEPL-dRatifiedSeam-6 TOOL-dRatifiedSeam-1 TOOL-dRatifiedSeam-2
 ---
 
 # dRatifiedSeam — build the two owner rulings dRetiredFork parked
@@ -64,7 +64,7 @@ None yet. Five forks sit in the two specs' §8 with recommendations.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node d · opened 2026-09-03 · streams tooling+deployer
-ids DEPL-dRatifiedSeam-1 DEPL-dRatifiedSeam-2 DEPL-dRatifiedSeam-3 DEPL-dRatifiedSeam-4 DEPL-dRatifiedSeam-5 DEPL-dRatifiedSeam-6 TOOL-dRatifiedSeam-1
+ids DEPL-dRatifiedSeam-1 DEPL-dRatifiedSeam-2 DEPL-dRatifiedSeam-3 DEPL-dRatifiedSeam-4 DEPL-dRatifiedSeam-5 DEPL-dRatifiedSeam-6 TOOL-dRatifiedSeam-1 TOOL-dRatifiedSeam-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
