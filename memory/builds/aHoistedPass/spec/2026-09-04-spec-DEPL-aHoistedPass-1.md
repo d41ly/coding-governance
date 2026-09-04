@@ -1,12 +1,12 @@
 # DEPL-aHoistedPass-1 — a declared kit dependency that is actually checked
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 |
 
 <!-- /gen:spec-records -->
 
@@ -248,8 +248,9 @@ path — the ratchet is a BAN (`check-install-prefix.sh:315-319`), so any rise i
   `review-harness`. Both, because an arm expecting one name passes on a half-built check.
 - **AC4** — When the selection names every link, `apply --kits
   memory-tree,settings-merge,agent-cap,review-harness,unattended` passes the new check.
-- **AC5** — When a target whose `.governance/install.json` claims `review-harness` and `memory-tree`
-  is given `apply --kits unattended`, it passes; the receipt carve-out is exercised, not assumed.
+- **AC5** — When a target whose receipt already claims `review-harness` and `memory-tree` is given
+  `apply --kits unattended`, it passes; the carve-out reading that receipt at `govkit.py:4275-4276`
+  is exercised, not assumed.
 - **AC6** — When `plan --target <virgin> --kits unattended` runs, it prints the unsatisfied-dependency
   row AND still exits 0. The baseline is observed: at this base it exits 0 and prints nothing about
   the missing dependency.
@@ -336,6 +337,11 @@ This unit adds no gate leg and registers nothing in `tools/gate-legs.json` or `r
   the design applies to `unattended`, and S8 takes it.
   Also new and unpriced anywhere in the design: nine `govkit selftest` `--kits` call sites break under
   arm B. Measured, repaired in scope, and raised as fork F2.
+- rev-2 · 2026-09-05 · AC5's witness re-pointed. It named `.governance/install.json`, which lives in
+  an adopter target and is not tracked here, so the criterion asserted the existence of a file this
+  repo will never hold. It now names the receipt by role and cites the read at `govkit.py:4275-4276`,
+  which is the seam the carve-out actually exercises. No criterion was weakened or dropped, and the
+  set of things AC5 observes is unchanged.
 
 ## 10. Reuse audit
 

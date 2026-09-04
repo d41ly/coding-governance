@@ -1,12 +1,12 @@
 # TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -450,8 +450,9 @@ entry in the CHILD's unit, not here.
   the current file first and observed to FAIL there.
 - **AC7** — When the suite runs the harness with a terminal verdict and a successful `dispose:`
   double, the `RESULT`'s `roster` is an array of three objects each carrying exactly `id`, `order`,
-  `specPath` and `briefPath`, in `order` then id sequence, and `dispatch.scriptPath` equals
-  `tools/workflows/unattended-unit.js` while `dispatch.resolvePathsWith` ends with `--plan tB --paths`.
+  `specPath` and `briefPath`, in `order` then id sequence, and `dispatch.scriptPath` equals the
+  repo-relative path of the child script `TOOL-aHoistedPass-5` lands — the literal §4 spells — while
+  `dispatch.resolvePathsWith` ends with `--plan tB --paths`.
 - **AC8** — When the suite asserts on `dispatch.args`, its keys are exactly `repo`, `slug`, `driver`,
   `ground` and `checklist`, and no key of the return below `dispatch` is named `roster` inside it.
   The child never receives the list.
@@ -598,6 +599,12 @@ constant, so it may drift a whole release unnoticed.
     `tier2-review.js` moving 1.6 to 1.7 without assigning it to a unit. `TOOL-aHoistedPass-5`'s spec
     was read here at `order 4` and names no bump, so S12 takes it and §8 F1 records the coordination
     rather than leaving two units each assuming the other did it.
+- rev-2 · 2026-09-05 · AC7's witness re-pointed. It asserted `dispatch.scriptPath` against a path
+  literal that does not exist until `TOOL-aHoistedPass-5` lands at the preceding order, so the
+  criterion read as a claim about a file rather than about this unit's dispatch. It now names the
+  child by the unit that owns it and defers the literal to §4, which already spells it once in the
+  dispatch block. This is also the more durable criterion: if the child's path moves, §4 moves with
+  it and AC7 does not go stale. Nothing else in AC7 changed.
 
 ## 10. Reuse audit
 
