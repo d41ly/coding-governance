@@ -299,6 +299,12 @@ has  "attended + run-state file: WARNS" "$o" "WARNING: attended mode was request
 has  "attended + run-state file: names the slug" "$o" "tB"
 has  "attended + run-state file: CONTINUES to build" "$o" "agent:build:tB"
 
+# ---- The run-integrity note must SAY the run was attended. A pipeline that computes how weak its own
+# ---- run was and returns a bare "complete" is the degradation-known-but-unreported class, and the
+# ---- caller cannot otherwise tell an attended run from an unattended one by its return.
+has  "attended: the note says which guarantee the caller actually got" "$o" "NOT the guarantee an unattended run gives"
+has  "attended: the return carries the mode" "$o" "\"mode\":\"attended\""
+
 # ---- AC6: the header names all five losses separately, and does not conflate a record with a
 # ---- refusal. Asserted over the file's own text, which is where the honesty statement lives.
 HDR=$(sed -n '1,110p' "$F")

@@ -659,9 +659,16 @@ return {
   skippedTerminal: skippedDone,
   built: Array.isArray(built.committed) ? built.committed.length : 0,
   unbuilt: unbuilt,
+  // THE MODE IS PART OF THE RUN-INTEGRITY REPORT, not decoration. `degradation-known-but-unreported`
+  // is the class where a pipeline computes how weak its own run was and then does not say so where a
+  // reader looks. An attended run that returns a bare 'complete' has skipped five checks an
+  // unattended one performs, and the caller cannot tell the two apart from this field.
   note:
     specRefused.length || unbuilt.length || verdict !== 'CONVERGED'
       ? 'DEGRADED — ' + specRefused.length + ' spec(s) refused, ' + unbuilt.length +
-        ' unit(s) unbuilt, verdict ' + verdict
-      : 'complete',
+        ' unit(s) unbuilt, verdict ' + verdict + (attended ? ' · ATTENDED, so no driver-side check ran' : '')
+      : attended
+        ? 'complete for ATTENDED mode — stage order held, and none of the five driver-side records or ' +
+          'refusals ran; this is NOT the guarantee an unattended run gives'
+        : 'complete',
 }
