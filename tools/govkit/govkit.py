@@ -3484,6 +3484,30 @@ def hook_probe(target: pathlib.Path) -> tuple[str, str]:
     return "block", (out.stdout + out.stderr).strip()
 
 
+def paths_never_lost(before, after, excused) -> bool:
+    """DEPL-dSealedTally-3. The standing predicate over PATHS, which a count cannot express.
+
+    `count_never_falls` grades a TOTAL, so since the relaxation to "never falls" a run that deletes
+    one tracked file and lands another satisfies it and reports green. That is a real regression
+    shape and a count cannot see it.
+
+    THE OBVIOUS FIX IS WRONG AND IS RECORDED HERE SO IT IS NOT RE-PROPOSED. `set(before) <=
+    set(after)` reds on a LEGAL rename, measured on `tools/demo/content.txt`: a rename removes the
+    old path, so the subset never holds for a run that moved anything. An assertion that fires on
+    correct work is worse than the gap it closes, because it teaches everyone to ignore the arm.
+
+    So the third argument is the whole design. `excused` holds the paths a run LEGITIMATELY removed,
+    and it must come from what the run REPORTED -- its own `renamed` verdict lines, or the receipt
+    read before the run -- never from the difference being graded. Derived from that difference it
+    would be a restatement of it, and the predicate could not fail.
+
+    THE DIRECTION MATTERS AND rev-1 OF THE SPEC HAD IT BACKWARDS. What leaves `before` on a rename
+    is the OLD path, so `excused` holds pre-rename paths. Excusing the destination excuses a path
+    that was never lost, and the predicate would still red on every legal rename.
+    """
+    return set(before) - set(after) <= set(excused)
+
+
 def count_never_falls(before: int, after: int) -> bool:
     """The standing predicate, as one testable value: a run without `--write-withdrawals` may raise
     the target's tracked-file count and may never lower it.

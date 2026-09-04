@@ -1,11 +1,12 @@
 # DEPL-dSealedTally-3 — the tracked-path check grades paths, excusing renames and withdrawals
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node d · Tier-1 · base 0f19429a · streams deployer · order 4
+**Status:** CLOSED · rev-2 · 2026-09-04 · node d · Tier-1 · base 0f19429a · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-04-build-DEPL-dSealedTally-3-1-acceptance-ledger.md](../build/2026-09-04-build-DEPL-dSealedTally-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 | [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-1 DEPL-dSealedTally-2 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 

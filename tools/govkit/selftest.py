@@ -4960,11 +4960,65 @@ user_skills = "/tmp/gk-fake-skills"
         # not add, so a count could not hide a deletion. Now it can: a regression that deletes one
         # tracked file and lands one in the same run satisfies `after >= before` and reports green.
         # The value was already in hand; asserting on it costs nothing and closes the hole.
-        check("[-11] AC6 THE STANDING PREDICATE: the tracked-file count NEVER FALLS across a run "
-              "with no --write-withdrawals",
+        # DEPL-dSealedTally-3. THE EXCUSED SET COMES FROM WHAT THE RUN REPORTED, never from the
+        # difference being graded. A `renamed` verdict line names the row's OLD path -- the one that
+        # leaves `_files_before` -- which is exactly what a rename legitimately removes.
+        _renamed_olds = [ln.split()[-1] for ln in _w11.stdout.splitlines()
+                         if ln.split() and ln.split()[0] == "renamed"]
+        check("[-11] AC6 LIVENESS the run really reported renames, or the excused set below is "
+              "empty and the predicate is grading nothing it was written for",
+              len(_renamed_olds) >= 1, _w11.stdout[-1500:])
+        check("[-11] AC6 THE STANDING PREDICATE: no tracked path is LOST across a run with no "
+              "--write-withdrawals, except the ones a reported rename moved",
+              GK9.paths_never_lost(_files_before, _files_after, _renamed_olds),
+              f"lost {sorted(set(_files_before) - set(_files_after))} · "
+              f"excused {sorted(_renamed_olds)}")
+        check("[-11] AC6 ...and the COUNT predicate still holds too, so this replaces a weaker "
+              "check rather than trading one failure for another",
               GK9.count_never_falls(len(_files_before), len(_files_after)),
-              f"{len(_files_before)} -> {len(_files_after)}: "
-              f"lost {sorted(set(_files_before) - set(_files_after))}")
+              f"{len(_files_before)} -> {len(_files_after)}")
+
+        # ---- DEPL-dSealedTally-3. THE PREDICATE ITSELF, graded by a table ----------------------
+        # AC1: the case a COUNT cannot see. Delete one tracked path, land another: the total is
+        # unchanged, so `count_never_falls` is satisfied and a real regression reports green.
+        _b3 = ["a.txt", "b.txt", "c.txt"]
+        _a3 = ["a.txt", "c.txt", "new.txt"]
+        check("[-ST3] AC1 a delete-one-land-one run is caught by the PATH predicate",
+              GK9.paths_never_lost(_b3, _a3, []) is False,
+              f"{sorted(set(_b3) - set(_a3))}")
+        check("[-ST3] AC1 ...and is MISSED by the count predicate, which is why this unit exists",
+              GK9.count_never_falls(len(_b3), len(_a3)) is True, "the count caught it after all")
+
+        # AC2: a legal rename passes, where the rejected `set(before) <= set(after)` would not.
+        _b2 = ["keep.txt", "moved.txt"]
+        _a2 = ["keep.txt", "renamed.txt"]
+        check("[-ST3] AC2 a legal rename PASSES when its old path is excused",
+              GK9.paths_never_lost(_b2, _a2, ["moved.txt"]) is True, "")
+        check("[-ST3] AC2 ...while the rejected subset assertion would have redded on it",
+              (set(_b2) <= set(_a2)) is False,
+              "the rejected alternative no longer reds, so this record is stale")
+
+        # AC6: the DIRECTION is load-bearing. Excusing the DESTINATION excuses a path that was
+        # never lost, so the predicate still reds -- which is the defect rev-1 of the spec shipped.
+        check("[-ST3] AC6 excusing the rename DESTINATION instead of its old path still REDS",
+              GK9.paths_never_lost(_b2, _a2, ["renamed.txt"]) is False,
+              "the direction is not load-bearing, so S2 is unfalsifiable")
+
+        # AC3: a withdrawal is excused by its own path, and only by it.
+        _b4 = ["keep.txt", "gone.txt"]
+        _a4 = ["keep.txt"]
+        check("[-ST3] AC3 a withdrawn path is excused when the run reported withdrawing it",
+              GK9.paths_never_lost(_b4, _a4, ["gone.txt"]) is True, "")
+        check("[-ST3] AC3 ...and is NOT excused when the excused set is empty, so the argument "
+              "is load-bearing rather than decorative",
+              GK9.paths_never_lost(_b4, _a4, []) is False, "")
+
+        # AC4 LIVENESS: the table above must contain BOTH verdicts, or it grades one direction.
+        check("[-ST3] AC4 LIVENESS the table exercises both verdicts, so it cannot pass by "
+              "only ever asserting one of them",
+              len({GK9.paths_never_lost(_b3, _a3, []),
+                   GK9.paths_never_lost(_b2, _a2, ["moved.txt"])}) == 2,
+              "the table is single-valued and proves nothing")
         # F9 IS REAL AND MY FIRST FIX FOR IT WAS WRONG. The reviewer is right that a count is no
         # longer a fair proxy for the set: a regression deleting one tracked file and landing one
         # in the same run satisfies `after >= before`. But `set(before) <= set(after)` is NOT the
