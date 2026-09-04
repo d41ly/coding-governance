@@ -3,9 +3,8 @@ slug: aSurfacedLexicon
 node: a
 opened: 2026-09-04
 streams: tooling
-status: OPEN
 roster: TOOL
-ids: TOOL-aSurfacedLexicon-1
+ids: TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16
 ---
 
 # aSurfacedLexicon — the lexicon stops grading two surfaces and starts declaring all of them
@@ -77,27 +76,65 @@ of the same.
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 0 | `TOOL-aSurfacedLexicon-1` | 2 | measure the shipped kit against the five goals, then design and adversarially judge the rebuild |
+| 1 | `TOOL-aSurfacedLexicon-2` | 2 | delete P3, keep its one real constraint on the declarations leg |
+| 1 | `TOOL-aSurfacedLexicon-3` | 2 | one corpus walk, two passes, two fewer modes |
+| 2 | `TOOL-aSurfacedLexicon-4` | 2 | the CELLS and PINS declaration grammar, and the two-sided pin equality |
+| 3 | `TOOL-aSurfacedLexicon-5` | 2 | the convention predicate — set membership over an affix-stripped core |
+| 3 | `TOOL-aSurfacedLexicon-9` | 2 | the owner-declarable PATTERNS block |
+| 4 | `TOOL-aSurfacedLexicon-6` | 2 | the three cell refusals and the per-cell coverage report |
+| 4 | `TOOL-aSurfacedLexicon-13` | 2 | the prefix selector, routing a subset of a cell to a second convention |
+| 4 | `TOOL-aSurfacedLexicon-14` | 2 | a real shell parser, arming the shell function cell |
+| 5 | `TOOL-aSurfacedLexicon-7` | 2 | P1 splits into DEBT and UNRULED, and DEBT names its replacement |
+| 6 | `TOOL-aSurfacedLexicon-8` | 2 | `--suggest` becomes surface-aware and answers in the declared convention |
+| 6 | `TOOL-aSurfacedLexicon-10` | 2 | `--expand`, the one-time widening the canon bounds |
+| 6 | `TOOL-aSurfacedLexicon-11` | 2 | the canon overlay and its stamp |
+| 7 | `TOOL-aSurfacedLexicon-12` | 2 | the conf rewrite, the owed records, and the spec-template cell line |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-04 · streams tooling
-ids TOOL-aSurfacedLexicon-1
+**Build status:** SPECCED · 13 unit(s) · node a · opened 2026-09-04 · streams tooling
+ids TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12
+ids TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint](spec/2026-09-04-spec-aSurfacedLexicon-2.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes](spec/2026-09-04-spec-aSurfacedLexicon-3.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-4 — the CELLS and PINS declaration grammar](spec/2026-09-04-spec-aSurfacedLexicon-4.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-5 — the convention predicate](spec/2026-09-04-spec-aSurfacedLexicon-5.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-9 — the owner-declarable PATTERNS block](spec/2026-09-04-spec-aSurfacedLexicon-9.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-13 — the prefix selector, routing a subset of a cell to a second convention](spec/2026-09-04-spec-aSurfacedLexicon-13.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-14 — a real shell parser, arming the shell function cell](spec/2026-09-04-spec-aSurfacedLexicon-14.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-6 — the three cell refusals and the per-cell coverage report](spec/2026-09-04-spec-aSurfacedLexicon-6.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-7 — P1 splits into DEBT and UNRULED, and DEBT names its replacement](spec/2026-09-04-spec-aSurfacedLexicon-7.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-10 — `--expand`, the one-time widening the canon bounds](spec/2026-09-04-spec-aSurfacedLexicon-10.md) | 6 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-11 — the canon overlay and its stamp](spec/2026-09-04-spec-aSurfacedLexicon-11.md) | 6 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-8 — `--suggest` becomes surface-aware and answers in the declared convention](spec/2026-09-04-spec-aSurfacedLexicon-8.md) | 6 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-12 — the conf rewrite, the owed records, and the spec-template cell line](spec/2026-09-04-spec-aSurfacedLexicon-12.md) | 7 | 2 | SPECCED | rev-3 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 1 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7
+TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6
+TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aSurfacedLexicon-2`, `TOOL-aSurfacedLexicon-3` | yes |
+| 2 | `TOOL-aSurfacedLexicon-4` | no |
+| 3 | `TOOL-aSurfacedLexicon-5`, `TOOL-aSurfacedLexicon-9` | yes |
+| 4 | `TOOL-aSurfacedLexicon-13`, `TOOL-aSurfacedLexicon-14`, `TOOL-aSurfacedLexicon-6` | yes |
+| 5 | `TOOL-aSurfacedLexicon-7` | no |
+| 6 | `TOOL-aSurfacedLexicon-10`, `TOOL-aSurfacedLexicon-11`, `TOOL-aSurfacedLexicon-8` | yes |
+| 7 | `TOOL-aSurfacedLexicon-12` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

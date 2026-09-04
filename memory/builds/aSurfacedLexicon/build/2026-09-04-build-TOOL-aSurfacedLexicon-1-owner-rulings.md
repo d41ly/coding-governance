@@ -29,9 +29,22 @@ rename blocks the bar until a second commit edits the scalar. The measured hazar
 nodes each draining one name produce a conflicting single-line edit in a shared mutable value, and
 §3 says shared mutable files reconcile additively, which one scalar cannot.
 
-*The mitigation is already in the design and should now be treated as load-bearing rather than
-cosmetic.* The `PINS:` block is ROW-SHAPED — one row per cell — so it reconciles under this repo's
-existing `merge.rows.driver` the way the backlogs do. A single `VERB_OFFENDER_PIN` scalar does not.
+*The mitigation I wrote here first was FALSE, and the spec pass caught it.* This paragraph claimed
+the row-shaped `PINS:` block "reconciles under this repo's existing `merge.rows.driver` the way the
+backlogs do". It does not, and both halves fail. `git check-attr merge -- .lexicon.conf` reports
+`unspecified`, because `.gitattributes` wires that driver for `memory/DECISIONS.md` and
+`memory/backlog/*.md` and nothing else. And even if it were wired, `merge-rows.py:252` defines a row
+as `^\s*[-*]\s` — a markdown bullet — so an indented conf row is STRUCTURE to that driver, not a row.
+The claim was reasoning from a shape rather than from the attribute, which is the error this repo
+files under two-answers-to-one-question, committed by the record that rules on it.
+
+*What is actually true, measured rather than reasoned.* Git's ordinary text merge already reconciles
+the block when rows are SEPARATED: two branches each draining a different cell merge at rc 0 with a
+blank line between rows, and at rc 1 with one conflict marker when the rows are dense and adjacent.
+So the row shape does buy the concurrency property Q2's ruling needs, but it buys it from the text
+merge and from a deliberate separation, not from a driver. `TOOL-aSurfacedLexicon-4` carries the
+three options as its fork F1, each measured against a real merge, and AC5 is a standing selftest arm
+that performs the merge including the adjacent-row case rather than asserting the property once.
 Q2's ruling therefore makes the per-cell pin block a REQUIREMENT of U3 rather than a convenience, and
 U3's acceptance check gains an arm: two branches each draining a different cell must merge clean.
 
@@ -63,13 +76,27 @@ they are.
 
 ## What the unit count now is
 
-Thirteen, not eleven. U1–U11 stand as the research record has them, with U3 and U5 gaining the two
-acceptance arms named above, plus:
+Thirteen build units, plus the research unit that produced this record — and the ids are NOT U1–U13.
 
-- **U12 — the prefix/decorator selector** (Q10). Synthetic fixtures; no in-repo population.
-- **U13 — a real shell parser, arming `sh.function`** (Q5). The largest coverage gain, and the unit
-  most at risk of being deferred indefinitely; the build should sequence it early or say plainly that
-  it will not.
+`TOOL-aSurfacedLexicon-1` is this research and design pass, and it is merged in three commits. The
+thirteen build units are therefore `-2` through `-14`, decided by section 2's residual tie-break
+rather than by preference: the later-to-merge re-mints its UNMERGED ids and an already-merged id
+wins. The specs were written as 1–13 and renumbered before landing. Two further rows were filed as
+`-15` and `-16`, being Q3's rename unit and the unfiled review finding against the identifier
+splitter, both of which the specs named and neither of which was anybody's unit.
+
+The two units the overrides added:
+
+- **`TOOL-aSurfacedLexicon-13` — the prefix selector** (Q10). Its routing half is exercised against a
+  real in-repo population and its verdict half is not, so the component fixtures are synthetic and
+  its spec says so in as many words.
+- **`TOOL-aSurfacedLexicon-14` — a real shell parser** (Q5). The largest coverage gain here, and the
+  unit most at risk of indefinite deferral; the build sequences it at order 4 or says plainly that it
+  will not ship.
+
+Q2's operator was owned by no spec when the thirteen were first written — four named its consequences
+and none edited the comparison. It is now `TOOL-aSurfacedLexicon-4`'s S9, assigned rather than
+escalated, because the owner had already ruled the behaviour and only the routing was open.
 
 Q8's ruling settles the arithmetic but does NOT close the pressure-chain question: today's 3.6% is the
 first of the two further readings the docstring requires, so a third reading is owed before
