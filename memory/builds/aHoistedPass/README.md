@@ -61,8 +61,9 @@ Every rule below is argued in the design record; this slot is the index, not the
   observation is the one that unit should own.
 - **`check 23` of the unattended leg reports 30 findings against `dRetiredFork`** and is non-gating:
   identical counts pre-merge and post-merge, with the pre-merge run green. Not this build's to fix.
-- **`push-main.sh` exits 0 on a refused push.** Found landing this build. A caller reading `$?` sees
-  success. Filed rather than fixed here.
+- **A landing attempt swept an untracked root-level log into a commit** via `git add -A`, and the next
+  bar wrote into it, dirtying the tree and making the lander refuse. Removed. The lesson is the `-A`,
+  not the log.
 
 
 <!-- roster:units -->
