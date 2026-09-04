@@ -9,6 +9,7 @@
 | [2026-09-03-build-TOOL-dRatifiedSeam-1-1-acceptance-ledger.md](../build/2026-09-03-build-TOOL-dRatifiedSeam-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-03-prompt-TOOL-dRatifiedSeam-1-1-build-brief.md](../prompts/2026-09-03-prompt-TOOL-dRatifiedSeam-1-1-build-brief.md) | journal | — |
 | [2026-09-03-review-DEPL-dRatifiedSeam-1-closing-diff.md](../reviews/2026-09-03-review-DEPL-dRatifiedSeam-1-closing-diff.md) | diff-review | DEPL-dRatifiedSeam-1 |
+| [2026-09-03-review-DEPL-dRatifiedSeam-1-spec-audit-round1.md](../reviews/2026-09-03-review-DEPL-dRatifiedSeam-1-spec-audit-round1.md) | spec-audit | DEPL-dRatifiedSeam-1 |
 
 <!-- /gen:spec-records -->
 

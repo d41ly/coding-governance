@@ -9,6 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+keepalive-reaped: yes
+parked-surfaced: yes
 witness: a69e57d751d1dcbfb0f7eee5d86444b84a75980b
 phase: RUNNING
 mode: slug
