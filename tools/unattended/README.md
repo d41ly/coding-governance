@@ -61,11 +61,11 @@ existed.
 adopt-unattended.sh --check      # the five artifacts are installed and in sync
 check-unattended.sh              # the kit gate
 check-playbook.sh                # playbook validity, including the fixture
+check-pass-order.sh              # refuses a unit built before it was specced
 run-unattended-gates.sh          # the kit's self-tests, ON DEMAND ONLY
 ```
 
 The self-tests are deliberately **not** on the merge bar. A suite that stages breaks into a copy of
 a checker has a job only when that checker's source changes, and none at all in an adopter's repo
-that copy-installs this kit and never edits it. The three legs whose subject is the *repository* —
-run-state records, playbooks, skill wiring — stayed on the bar, because those go stale with nobody
-editing the kit.
+that copy-installs this kit and never edits it. The legs whose subject is the *repository* stayed on
+the bar, because those go stale with nobody editing the kit; `tools/gate-legs.json` names which.
