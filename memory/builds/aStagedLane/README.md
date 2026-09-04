@@ -80,17 +80,17 @@ ids TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file](spec/2026-09-04-spec-TOOL-aStagedLane-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-04 |
-| [TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate](spec/2026-09-04-spec-TOOL-aStagedLane-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-04 |
-| [TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief](spec/2026-09-04-spec-TOOL-aStagedLane-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-04 |
-| [TOOL-aStagedLane-4 — the carriers name the classifier and the attended route](spec/2026-09-04-spec-TOOL-aStagedLane-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file](spec/2026-09-04-spec-TOOL-aStagedLane-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-04 |
+| [TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate](spec/2026-09-04-spec-TOOL-aStagedLane-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-04 |
+| [TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief](spec/2026-09-04-spec-TOOL-aStagedLane-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-04 |
+| [TOOL-aStagedLane-4 — the carriers name the classifier and the attended route](spec/2026-09-04-spec-TOOL-aStagedLane-4.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

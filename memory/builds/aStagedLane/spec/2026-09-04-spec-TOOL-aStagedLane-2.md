@@ -1,10 +1,12 @@
 # TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-3 TOOL-aStagedLane-4 |
 
 <!-- /gen:spec-records -->
 
@@ -29,12 +31,33 @@ choosing its route per session.
 - **S4** — in attended mode the build stage takes its per-unit refusal from
   `bash tools/unattended/unattended.sh --plan <slug>`, which runs with no run-state file. The stage
   refuses a unit whose reported state is not `READY` and names the state it saw.
-- **S5** — the file states, in its own header, what attended mode does NOT check. The `--dispatch`
-  refusal and the write-set recording are absent in this mode, and a reader who assumes otherwise
-  gets a weaker guarantee than the one they think they have.
+- **S4b** — the BUILD stage's PROMPT TEXT is mode-dependent, and this is the scope item without
+  which the unit does not achieve its goal. Three driver verbs the prompt instructs the agent to run
+  hard-refuse with no run-state file: `--dispatch` (`unattended.sh:4584`, fail 49), `--brief`
+  (`:4184`, fail 49) and `--rescope` (`:4481`, fail 48). The prompt also tells the agent that such a
+  refusal means the order is wrong and to STOP. In attended mode the refusal is caused by the mode
+  itself, so an unmodified prompt halts the build at unit one after units are already being written
+  — strictly worse than the refusal the mode was meant to trade away. In attended mode the prompt
+  therefore omits `--dispatch` and `--brief` entirely, and replaces `--rescope` with the direct
+  roster edit M2 describes, so M4's PROMOTE disposal stays available rather than leaving the method
+  one of its two admitted routes.
+- **S4c** — `GROUND`, the preamble every spawned agent receives, is mode-aware. It currently
+  hard-codes "You are one stage of a harnessed unattended build" and "nobody reads a transcript
+  under a mandate", and it prefixes EVERY agent this file spawns in both stages. In this repository
+  a mandate is precisely the authority to merge and push with no owner turn, so an attended run
+  telling its agents they hold one is the falsehood this unit would otherwise create. The attended
+  preamble says an owner is in the loop and that the driver's recording verbs are unavailable.
+- **S5** — the file states, in its own header, what attended mode does NOT check, and it names the
+  losses SEPARATELY rather than as one list of "refusals", because one of them is not a refusal.
+  They are: the `--review` round record, `--dispatch`'s order refusal, `--dispatch`'s write-set
+  record, `--brief`'s record of what each pass was handed, and `--rescope`'s amendment row. A reader
+  who assumes otherwise gets a weaker guarantee than the one they think they have.
 - **S6** — arms in `tools/workflows/unattended-build.test.sh` covering both modes: that unattended
-  mode still records through the driver, that attended mode does not, and that a null blocker count
-  refuses in both.
+  mode still records through the driver, that attended mode does not, that a null blocker count
+  refuses in both, that the attended BUILD prompt names none of the three refusing verbs, and that
+  the attended preamble carries no mandate vocabulary. The last two assert on the COMPOSED prompt
+  string rather than on a run's behaviour, because a prompt is the one artifact here that no gate
+  downstream ever reads.
 - **S7** — when `mode` is `attended` and a run-state file exists for that slug, the run WARNS and
   CONTINUES. The warning names the slug and the refusals being skipped, so a session that meant to
   run under its own mandate sees the mismatch rather than discovering it at the merge bar. The
@@ -60,10 +83,23 @@ choosing its route per session.
 
 ### The mode boundary
 
-Three call sites in this script reach the driver: the review recorder in the audit stage, the
-dispatch call in the build stage, and the roster the caller derives from the plan verb. Only the
-first two are mode-dependent. The third already works without a run-state file, which was measured
-on this node against a build that never had one and returned a unit state with exit status zero.
+**Enumerated by DRIVER VERB REACHED, not by call site**, because rev-2 counted call sites and
+missed two verbs that the prompts name but the script does not itself invoke. Every driver verb
+reachable from this file, with what it does when no run-state file exists:
+
+| verb | reached from | with no run-state file |
+|---|---|---|
+| `--review` | the audit stage's recorder agent (`:391`) | refuses |
+| `--dispatch` | the BUILD prompt (`:493`) | refuses, fail 49 at `unattended.sh:4584` |
+| `--brief` | the BUILD prompt (`:495`) | refuses, fail 49 at `unattended.sh:4184` |
+| `--rescope` | the BUILD prompt's disposal clause (`:480`) | refuses, fail 48 at `unattended.sh:4481` |
+| `--plan` | the CALLER, never this script | works |
+
+All four of the first four are mode-dependent, and the fifth is not this script's call at all.
+`--plan` already works without a run-state file, measured on this node against a build that never
+had one, returning a unit state with exit status zero. The driver ships an attended records-root
+path for `record_set` and `record_piece` (`unattended.sh:4418`, `:4449`) and none for `--brief`, so
+the verbs cannot all be disposed of the same way and S4b says which gets which treatment.
 
 ### What each mode buys
 
@@ -124,9 +160,17 @@ Making `attended` the default was rejected because it silently weakens every exi
   observed before the arm asserting it is written.
 - **AC5** — When `node tools/workflows/check-workflow-syntax.js tools/workflows/unattended-build.js`
   runs, it exits 0, and `bash tools/workflows/check-verifier-fanout.sh` stays green.
-- **AC6** — When the header of `tools/workflows/unattended-build.js` is read, it names the two
-  refusals attended mode does not perform, and states that the S7 warning depends on the caller
-  rather than on detection, in the section saying what this harness cannot buy.
+- **AC6** — When the header of `tools/workflows/unattended-build.js` is read, it names all five
+  losses S5 enumerates, each classified as a refusal or a record and not the two conflated, and
+  states that the S7 warning depends on the caller rather than on detection, in the section saying
+  what this harness cannot buy.
+- **AC8** — When the BUILD prompt is composed in attended mode, it contains no `--dispatch` and no
+  `--brief` instruction, and its disposal clause names the roster edit rather than `--rescope`. The
+  arm asserts on the composed string, because the defect is what the agent is TOLD to run and no
+  gate downstream reads a prompt.
+- **AC9** — When any agent is spawned in attended mode, the preamble it receives contains neither
+  the word `mandate` nor the claim that nobody reads its transcript. A grep over the composed
+  attended prompt for that vocabulary returns nothing.
 - **AC7** — When the harness is invoked with `mode` set to `attended` and told a run-state file
   exists for that slug, a `log()` line names the slug and the skipped refusals, and the run reaches
   the build stage rather than refusing.
@@ -163,6 +207,15 @@ because this file is a declared method pointer. The full bar is `bash tools/run-
 - rev-2 · 2026-09-04 · both forks resolved at the owner's scope-approval turn. F1 was ruled AGAINST
   the recommendation, taking warn-and-continue, which added S7 and AC7; F2 confirmed the design
   unchanged.
+- rev-3 · 2026-09-04 · round-1 spec audit folded: B4, M1, M2. B4 is the one that made the unit miss
+  its own goal — `--brief` and `--rescope` refuse without a run-state file exactly as `--dispatch`
+  does, and the BUILD prompt tells the agent to run all three and to STOP on a refusal, so attended
+  mode would have halted at unit one. S4b puts the prompt text under the mode branch; §4's boundary
+  is now enumerated by driver VERB reached rather than by call site, which is how rev-2 counted three
+  and missed two. S4c makes `GROUND` mode-aware, since it told every spawned agent it was under a
+  mandate in both modes and no scope item touched it. S5 and AC6 now name the five losses separately
+  instead of calling a record a refusal, and AC8 and AC9 observe the composed prompt, which is where
+  the defect lives and where no downstream gate looks.
 
 ## 10. Reuse audit
 
