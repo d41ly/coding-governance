@@ -6200,7 +6200,87 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                                     else f"DIFFERS by whole line — gov has {_live!r}")
             print(f"  {_k:<28} {_verdict}")
 
+    def _unclaimed_candidates(_withdrawn_paths):
+        """Which declared destinations the receipt has never named — the decision, with no writes.
+
+        DEFINED ONCE AND CALLED TWICE, by the read-only preview and by the write loop, so the two
+        cannot drift. The preview passes an empty withdrawal set because `withdrawn_rows` is not
+        computed until later in a write run; it says so in its own output rather than pretending.
+        """
+        _claimed = {str(f.get("path")) for f in (receipt.get("files") or [])}
+        _dec = set(_withdrawn_paths)
+        for _m in rename_dests.values():
+            for _dl in _m.values():
+                _dec.update(_dl)
+        _land, _ref = [], []
+        for _eid in (kits or claimed):
+            _d0 = descs.get(_eid)
+            if not _d0:
+                continue
+            _dd = _d0[0]
+            try:
+                _res0 = resolve_entry(root, _dd, target_context(target, deploy, _eid, _dd))
+            except Refusal:
+                continue
+            for _dest, _row0 in sorted((_res0.get("writes") or {}).items()):
+                if _dest in _claimed or _dest in _dec:
+                    continue
+                if not str(_row0.get("src") or ""):
+                    continue
+                if _row0.get("missing"):
+                    _ref.append((_dest, "its source carries unresolved token(s) "
+                                        + ", ".join(sorted(_row0.get("missing") or []))))
+                    continue
+                if _row0.get("scope") == "machine":
+                    continue
+                try:
+                    _rule0 = (_dd.get("files") or [])[_row0["rule"]]
+                except (KeyError, IndexError, TypeError):
+                    _rule0 = {}
+                if _rule0.get("scope") == "machine" or _rule0.get("link"):
+                    continue
+                _abs0 = target / _dest
+                try:
+                    _res_abs = _abs0.resolve()
+                    _res_abs.relative_to(target.resolve())
+                except (ValueError, OSError):
+                    _ref.append((_dest, "it resolves outside the target repository"))
+                    continue
+                try:
+                    _res_abs.relative_to((target / ".git").resolve())
+                    _ref.append((_dest, "it resolves inside the target's .git directory"))
+                    continue
+                except ValueError:
+                    pass
+                if os.path.lexists(_abs0):
+                    _ref.append((_dest, "the target already holds this path and the receipt does "
+                                        "not name it, so gov did not put it there"))
+                    continue
+                _land.append((_dest, _eid, _row0))
+        return [x[0] for x in _land], _ref
+
+    # ===================== THE UNCLAIMED-SOURCE PREVIEW, ON THE READ-ONLY PATH ==================
+    # THE `would land` BRANCHES WERE DEAD CODE. The landing block sits far below this return, so on
+    # a read-only run it never executed: `unclaimed sources` appeared in no output, and the ternaries
+    # that say `would land` could only ever take the `landed` branch. This verb is read-only BY
+    # DEFAULT — its own docstring says so, because its failure mode is silent data loss in a
+    # repository gov does not own — and the one thing this build added was the one thing an operator
+    # could not preview. That is the inverse of the safety the default exists to provide.
+    #
+    # ONE IMPLEMENTATION, TWO CALLS. `_unclaimed_candidates` is defined once and used here and by
+    # the write path, so the preview cannot drift from what actually lands. What it CANNOT know yet
+    # is withdrawals: `withdrawn_rows` is computed further down, after this return. So the preview
+    # says so rather than quietly listing a row a withdrawal would remove — a preview that overstates
+    # by one row and admits it beats one that is silently wrong.
     if not write:
+        _pv_land, _pv_ref = _unclaimed_candidates(set())
+        print(f"govkit update — unclaimed sources: {len(_pv_land)} would land · "
+              f"{len(_pv_ref)} would be refused  [preview: withdrawals are decided later in a "
+              f"write run, so a row here may yet be withdrawn]")
+        for _p0 in _pv_land:
+            print(f"govkit update —   would land {_p0}")
+        for _p0, _why0 in _pv_ref:
+            print(f"govkit update —   would REFUSE {_p0}: {_why0}")
         print("govkit update — read-only. NOTHING was written; re-run with --write to perform it.")
         return r.emit()
 

@@ -20,6 +20,25 @@ split is forced rather than chosen: an AGENT does what only an agent can — rea
 each spec at its blob — and the SCRIPT does what only the script can, which is hold `Workflow`. The
 old code gave the agent both jobs, and the second is the one it could not do.
 
+## CORRECTION — this ledger's first version graded a mechanism that did not work
+
+Everything below was written before the closing diff review, and the review found that
+`tier2-review.js` has never returned a `verdict` key. The adapter read one, its own throw fired
+on every real invocation, and BUILD was still unreachable — the failure had moved from an agent
+that refuses to a script that throws. The 28 arms cited below were green because the test
+double returned a `verdict` and a `reportPath` I had invented: the harness and its callee had
+never met.
+
+So AC1, AC2 and AC5 as first recorded were **true of a fixture and false of the code**. They
+are true now, against a rebuilt adapter that reads `blockers` and `report` and takes the
+convergence token from the driver — but the first version of this file is the more useful
+artefact, because it shows exactly how a unit passes its own acceptance while not working.
+
+Two defects surfaced inside the rebuild that no criterion had asked about: the `--review` call
+was deleted with the old agent and nothing replaced it, so no round was recorded at all; and
+`AUDIT_SCHEMA`'s enum was lost with the schema, so `"ok"` would have passed the verdict check
+and fallen through to BUILD. Both are closed; the enum now lives at the check.
+
 ## Acceptance criteria
 
 **Evidences:** TOOL-dRatifiedSeam-1

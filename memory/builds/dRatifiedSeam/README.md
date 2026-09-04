@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-03
 streams: tooling+deployer
 roster: TOOL+DEPL
-ids: DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1
+ids: DEPL-dRatifiedSeam-1 DEPL-dRatifiedSeam-2 DEPL-dRatifiedSeam-3 DEPL-dRatifiedSeam-4 DEPL-dRatifiedSeam-5 TOOL-dRatifiedSeam-1
 ---
 
 # dRatifiedSeam — build the two owner rulings dRetiredFork parked
@@ -64,7 +64,7 @@ None yet. Five forks sit in the two specs' §8 with recommendations.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node d · opened 2026-09-03 · streams tooling+deployer
-ids DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1
+ids DEPL-dRatifiedSeam-1 DEPL-dRatifiedSeam-2 DEPL-dRatifiedSeam-3 DEPL-dRatifiedSeam-4 DEPL-dRatifiedSeam-5 TOOL-dRatifiedSeam-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -73,7 +73,7 @@ ids DEPL-dRatifiedSeam-1 TOOL-dRatifiedSeam-1
 | [TOOL-dRatifiedSeam-1 — the harness AUDIT stage runs where Workflow exists](spec/2026-09-03-spec-TOOL-dRatifiedSeam-1.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-03 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
