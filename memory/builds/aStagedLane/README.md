@@ -70,7 +70,7 @@ accident. The classifier that would ground it already runs without a run-state f
 | 1 | `TOOL-aStagedLane-1` | OPEN | the pass-order leg grades builds that carry no run-state file |
 | 2 | `TOOL-aStagedLane-2` | OPEN | an attended mode on the harness, so the stage order needs no mandate |
 | 3 | `TOOL-aStagedLane-3` | OPEN | the spec stage fans over slices, each writer holding only its brief |
-| 4 | `TOOL-aStagedLane-4` | OPEN | the carriers name the classifier and the attended route |
+| 4 | `TOOL-aStagedLane-4` | WONTDO | the carriers name the classifier and the attended route — RETIRED, does not fit the method's byte budget; parked for the owner |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
@@ -83,7 +83,7 @@ ids TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4
 | [TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file](spec/2026-09-04-spec-TOOL-aStagedLane-1.md) | 1 | 2 | SPECCED | rev-4 | 2026-09-04 |
 | [TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate](spec/2026-09-04-spec-TOOL-aStagedLane-2.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-04 |
 | [TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief](spec/2026-09-04-spec-TOOL-aStagedLane-3.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-04 |
-| [TOOL-aStagedLane-4 — the carriers name the classifier and the attended route](spec/2026-09-04-spec-TOOL-aStagedLane-4.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [TOOL-aStagedLane-4 — the carriers name the classifier and the attended route](spec/2026-09-04-spec-TOOL-aStagedLane-4.md) | 4 | 2 | WONTDO | rev-4 | 2026-09-04 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 2 record folder(s).

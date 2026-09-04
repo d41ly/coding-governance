@@ -1,6 +1,6 @@
 # TOOL-aStagedLane-4 — the carriers name the classifier and the attended route
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 4
+**Status:** WONTDO · rev-4 · 2026-09-04 · node a · Tier-2 · base 15339de0 · streams tooling · order 4 · RETIRED: does not fit M1's 23-byte budget for memory/guides/BUILD-METHOD.md, and both fundings are owner turns under M3 veto 2 — parked, see S6
 
 <!-- gen:spec-records -->
 
