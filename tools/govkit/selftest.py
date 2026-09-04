@@ -5318,6 +5318,117 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-ST4] AC6 LIVENESS ...while the IN-TREE path beside it is really found, so the "
               "filter is not simply dropping everything", "in.txt" in _p6, f"{sorted(_p6)}")
 
+        # ---- DEPL-dSealedTally-1. A LANDED SOURCE IS ROLLED BACK LIKE ANY OTHER WRITE -------
+        # The landing was the ONE write in `update` outside the verify-and-rollback pass: it ran
+        # ~400 lines below it, appending snapshot entries to a structure the pass had already
+        # finished reading. A kit whose only change was a landed file got no baseline, no
+        # after-check and no rollback -- in a repository gov does not own.
+        #
+        # THE FIXTURE WRITES ITSELF. The kit's check rejects the very file gov ships, so the
+        # baseline is GREEN (the file is not there yet) and the after-check is RED (it is). That
+        # is the realistic case rather than a contrived one: gov ships a file the adopter's own
+        # guard rejects, which is exactly when a rollback has to work.
+        _gl = tmp / "st1-gov"
+        (_gl / "tools" / "govkit").mkdir(parents=True)
+        shutil.copy2(GOVKIT, _gl / "tools" / "govkit" / "govkit.py")
+        (_gl / "tools" / "govkit" / "registry.toml").write_text(
+            '[surface]\nglobs = ["tools/*"]\n\n'
+            '[selection]\ndefault = ["landkit"]\n\n'
+            '[[entry]]\nid = "landkit"\ndescriptor = "tools/landkit/kit.toml"\n\n'
+            '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+            encoding="utf-8", newline="\n")
+        _dl = _gl / "tools" / "landkit"
+        _dl.mkdir(parents=True, exist_ok=True)
+        (_dl / "kit.toml").write_text(
+            'id = "landkit"\nhome = "tools/landkit"\nversion_from = { none = "fixture" }\n\n'
+            '[check]\nargv = ["bash", "{kit}/check.sh", "{kit}"]\n\n'
+            '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+            '[adopt]\nargv = []\nmutates_index = false\n',
+            encoding="utf-8", newline="\n")
+        (_dl / "check.sh").write_text(
+            '#!/usr/bin/env bash\n'
+            'd="$1"\n'
+            '# The kit rejects the very file gov ships: green before the landing, red after it.\n'
+            'test -f "$d/arrival.txt" && exit 1\n'
+            'exit 0\n', encoding="utf-8", newline="\n")
+        (_dl / "keep.txt").write_text("keep one\n", encoding="utf-8", newline="\n")
+        git(_gl, "init", "-q", "-b", "main")
+        git(_gl, "config", "user.email", "t@e")
+        git(_gl, "config", "user.name", "t")
+        git(_gl, "config", "core.autocrlf", "false")
+        git(_gl, "add", "-A")
+        git(_gl, "commit", "-qm", "landkit A")
+
+        _tl = make_target(tmp / "st1-t",
+                          'gov_source = "local"\nprefix = "tools"\nkits = ["landkit"]\n')
+        _apl = run_in_gov(_gl, "apply", "--target", str(_tl), "--kits", "landkit")
+        check("[-ST1] the landkit fixture installs GREEN, or every arm below grades a broken "
+              "target", _apl.returncode == 0, _apl.stdout[-900:] + _apl.stderr[-600:])
+        settle(_tl, "the landkit install")
+
+        # Gov gains a file the receipt has never named, inside a kit whose descriptor already
+        # says `include = "**"` -- the real shape of an adopter meeting a new gov source.
+        (_dl / "arrival.txt").write_text("gov added this after the install\n",
+                                         encoding="utf-8", newline="\n")
+        git(_gl, "add", "-A")
+        git(_gl, "commit", "-qm", "landkit B: gov ships a file the kit check rejects")
+
+        _files_pre_l = sorted(x for x in gout(_tl, "ls-files").splitlines() if x)
+
+        # AC9. THE READ-ONLY PREVIEW MUST NAME WHAT THE WRITE LANDS, and this arm exists because
+        # it did not: `DEPL-dSealedTally-2` narrowed the landing block's `_decided` loop and left
+        # the classifier's untouched, so the preview answered ZERO on a run that landed one. The
+        # preview and the write are meant to be one implementation; until they are, this arm is
+        # what makes a divergence red instead of silent.
+        _pl = run_in_gov(_gl, "update", "--target", str(_tl))
+        check("[-ST1] AC9 the read-only preview names the source the write run will land",
+              "unclaimed sources: 1 would land" in _pl.stdout, _pl.stdout[-1400:])
+        check("[-ST1] AC9 ...and names it by path, not merely by count",
+              "would land tools/landkit/arrival.txt" in _pl.stdout, _pl.stdout[-1400:])
+        check("[-ST1] AC9 ...and the preview wrote NOTHING, which is what read-only means",
+              not (_tl / "tools" / "landkit" / "arrival.txt").exists(),
+              "the read-only run created the file")
+
+        _wl = run_in_gov(_gl, "update", "--target", str(_tl), "--write")
+        _files_post_l = sorted(x for x in gout(_tl, "ls-files").splitlines() if x)
+        _rcl = json.loads((_tl / ".governance" / "install.json").read_text(encoding="utf-8"))
+
+        # THE ANTECEDENT, ASSERTED FIRST. Without these two, every arm below passes whenever the
+        # landing never happened or the check never went red -- the fixture-passes-by-finding-
+        # nothing class, which is what this whole build exists to drain.
+        # THE LANDING'S OWN WITNESS IS THE ROLLBACK ORDER, not stdout. This arm first asserted the
+        # path appeared in the run's output and CONTRADICTED AC7 below, which requires the summary
+        # NOT to name it -- the tally prints after the rollback removed it, which is the whole
+        # point of leaving the tally below the pass. The order is where a landing that happened and
+        # was undone is legible.
+        _ord_l = (_tl / ".governance" / "outbox" / "update-rollback-landkit.md").read_text(
+            encoding="utf-8")
+        check("[-ST1] LIVENESS the landing really happened, and the order says it was REMOVED",
+              "removed   tools/landkit/arrival.txt" in _ord_l, _ord_l[-900:])
+        check("[-ST1] AC8 ...under its own verb, never `restored`, which it never was",
+              "restored  tools/landkit/arrival.txt" not in _ord_l, _ord_l[-900:])
+        # THIS ARM WAS VACUOUS AND SHIPPED GREEN OVER A RUN THAT ROLLED BACK NOTHING: it matched
+        # the word "rolled back" in the summary line `rolled back 0`. It now asserts the COUNT.
+        check("[-ST1] LIVENESS ...and the kit check really went red, so a rollback really ran",
+              "rolled back 1" in _wl.stdout, _wl.stdout[-1600:])
+
+        check("[-ST1] AC1 the landed file is GONE from the worktree after the rollback",
+              not (_tl / "tools" / "landkit" / "arrival.txt").exists(),
+              "the landed file survived a failed verification")
+        check("[-ST1] AC3 ...and gone from the INDEX, which is the half a bare unlink misses",
+              "tools/landkit/arrival.txt" not in _files_post_l, repr(_files_post_l))
+        check("[-ST1] AC1 ...and the target is back to exactly the file set it had",
+              _files_post_l == _files_pre_l,
+              f"before={_files_pre_l} after={_files_post_l}")
+        check("[-ST1] AC4 ...and the receipt names no landed path, so the minted row went too",
+              not any(f.get("path") == "tools/landkit/arrival.txt"
+                      for f in _rcl.get("files", [])), "a rolled-back landing kept its row")
+        check("[-ST1] AC7 ...and the closing summary does not report a landing that was undone",
+              "landed tools/landkit/arrival.txt" not in _wl.stdout, _wl.stdout[-1600:])
+        check("[-ST1] AC1 ...and the run reached its own rollback report, not a traceback",
+              "Traceback" not in _wl.stderr, _wl.stderr[-900:])
+
+
 
         # ---- AC4: the deletion, and the ONLY way to get one.
         settle(_t11, "after the second update")

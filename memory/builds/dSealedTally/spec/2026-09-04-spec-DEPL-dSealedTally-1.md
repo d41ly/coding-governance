@@ -1,11 +1,12 @@
 # DEPL-dSealedTally-1 — landed sources join the verify-and-rollback pass
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 3
+**Status:** CLOSED · rev-4 · 2026-09-04 · node d · Tier-2 · base 0f19429a · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-04-build-DEPL-dSealedTally-1-1-acceptance-ledger.md](../build/2026-09-04-build-DEPL-dSealedTally-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md](../prompts/2026-09-04-prompt-DEPL-dSealedTally-1-0-run-mandate.md) | journal | DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 | [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round1.md) | spec-audit | DEPL-dSealedTally-2 DEPL-dSealedTally-3 DEPL-dSealedTally-4 DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
 | [2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round2.md](../reviews/2026-09-04-review-DEPL-dSealedTally-1-spec-audit-round2.md) | spec-audit | DEPL-dSealedTally-5 TOOL-dSealedTally-1 |
