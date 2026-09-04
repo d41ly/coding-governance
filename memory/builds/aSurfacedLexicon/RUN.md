@@ -46,3 +46,9 @@ base: 6c670b024644bf6bbcc28ee74d2265c0efd453c6
 2026-09-04T21:15:40Z review · item TOOL-aSurfacedLexicon-6 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
 2026-09-04T21:15:42Z review · item TOOL-aSurfacedLexicon-9 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-04T21:48:41Z review · item TOOL-aSurfacedLexicon-13 · reason verdict BLOCKED · blockers 4
+
+2026-09-04T21:48:43Z review · item TOOL-aSurfacedLexicon-14 · reason verdict BLOCKED · blockers 5
+
+2026-09-04T21:48:44Z review · item TOOL-aSurfacedLexicon-7 · reason verdict BLOCKED · blockers 7
