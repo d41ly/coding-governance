@@ -277,8 +277,16 @@ for readme in $(git ls-files "$MEMORY_ROOT/builds/*/README.md" 2>/dev/null); do
     # definition and both the in-range walk and the pre-anchor probe call it. A second copy would be
     # two answers to one question, and the copy would be the one that drifts.
     _find_build_commit() {
-      local _range="$1" _cap="$2" _c _subj _n=0
-      for _c in $(GIT rev-list --reverse $_range 2>/dev/null); do
+      # THE CAP BOUNDS THE ENUMERATION TOO, not only the loop body. `for _c in $(rev-list ...)` runs
+      # the whole traversal in a command substitution BEFORE the first iteration, so a loop-only cap
+      # bounds the VERDICT and not the WORK — the `bounded-through-a-pipe-is-unbounded` class. The
+      # pre-anchor window is the entire history behind the anchor, so `--max-count` is what keeps it
+      # bounded; with `--reverse` git applies the count to the traversal and reverses after, which
+      # yields the commits NEAREST the anchor, and any violating commit there is a violation.
+      # The loop-body counter stays as the liveness half: it is what reports TRUNCATED.
+      local _range="$1" _cap="$2" _c _subj _n=0 _mc=""
+      [ -n "$_cap" ] && _mc="--max-count=$((_cap+1))"
+      for _c in $(GIT rev-list --reverse $_mc $_range 2>/dev/null); do
         if [ -n "$_cap" ] && [ "$_n" -ge "$_cap" ]; then printf 'TRUNCATED'; return 0; fi
         _n=$((_n+1))
         _subj=$(GIT log -1 --format=%s "$_c" 2>/dev/null)

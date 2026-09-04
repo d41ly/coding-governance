@@ -87,8 +87,11 @@ BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to bu
                               # bound under the 8-wide pool (TOOL-dRetiredFork-40) and this one is a
                               # cost verdict. The claim that they are one figure was deleted with
                               # this edit.
-BUDGET_pass_order_selftest=180 # measured 41 s; every arm builds a real fixture repository, so the
-                              # cost is git process creation and node d's AV taxes every exec
+BUDGET_pass_order_selftest=600 # measured 149 s on node `a` 2026-09-05, up from 41 s: TOOL-aStagedLane-1
+                              # took the suite from 19 arms to 52, and every arm builds a real fixture
+                              # repository, so the cost is git PROCESS CREATION and scales with the arm
+                              # count rather than with the work each arm does. Node d's AV taxes every
+                              # exec, so the ceiling carries margin over the node-`a` reading
 
 ONLY="${1:---selftests}"
 case "$ONLY" in

@@ -421,6 +421,23 @@ has  "--preview: the violation is still printed" "$o" "ARCH-tOrder-1"
 has  "--preview: it says the status is not set" "$o" "exit status is NOT set"
 rm -rf "$T"
 
+# ---- AC13: the pre-anchor probe's cap, exercised by DECLARING a cap of 1 rather than by building a
+# ---- 400-commit fixture. The conf key is the seam that makes this arm affordable; a probe that gave
+# ---- up and a probe that found nothing print the same thing without the count.
+# The RECORD-only fixture, not the violating one: with a cap of 1 the probe's first look at a
+# violating fixture MATCHES, so it returns a hit and never truncates — the arm would then assert on a
+# path it does not take. Here the first look legitimately misses, which is the only way a probe can
+# reach its cap. Written the other way first, and it failed honestly.
+T=$(mkfixture preanchor-record preanchor-record)
+( cd "$T" && printf '
+PASS_ORDER_PREANCHOR_CAP="1"
+' >> .unattended.conf )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+has  "pre-anchor cap: the truncation is COUNTED" "$o" "1 probe(s) truncated"
+has  "pre-anchor cap: the cap it stopped at is named" "$o" "1-commit cap"
+same "pre-anchor cap: a truncated probe does not invent a violation" "$rc" "0"
+rm -rf "$T"
+
 # ---- S6: the cutoff is read from the COMMIT, so editing the working copy cannot exempt a build.
 # ---- Control first — the same fixture reds before the working tree is touched.
 T=$(mkfixture norun build-first)
