@@ -123,7 +123,7 @@ ids TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 T
 | [TOOL-aSurfacedLexicon-12 — the conf rewrite, the owed records, and the spec-template cell line](spec/2026-09-04-spec-aSurfacedLexicon-12.md) | 7 | 2 | SPECCED | rev-5 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 9 bound to this build, across 3 record folder(s).
 
 Ids no record names: TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-8.
 

@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-7 |
+| [2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-7 |
 
 <!-- /gen:spec-records -->
 
