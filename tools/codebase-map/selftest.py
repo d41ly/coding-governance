@@ -1009,6 +1009,60 @@ def test_neighbour_cap_ranks_before_truncating(tmp: Path):
         os.environ.pop("CODEBASE_MAP_ROOT", None)
 
 
+def test_neighbour_predicate_is_directory_scoped(tmp: Path):
+    """The same-kind arm admits a candidate in the seed's DIRECTORY and refuses one outside it.
+
+    Both directions, because a narrowing tested only on what it keeps is a narrowing whose whole
+    point is unobserved. Kind alone admitted 95% of the corpus here; the cap over that selected
+    nothing, whatever it sorted by.
+
+    Observed RED against the un-narrowed predicate before it was written: `far_helper` was admitted
+    as a `same kind` neighbour from another directory.
+    """
+    import os
+
+    (tmp / ".codebase-map.conf").write_text(
+        "MAP_ROOT=memory/map\nSEAM_FANIN_THRESHOLD=3\n", encoding="utf-8")
+    gen = tmp / "memory" / "map" / "generated"
+    gen.mkdir(parents=True)
+    syms = [
+        {"id": "slugify", "kind": "function", "file": "src/near/text.py"},     # the seed
+        {"id": "near_helper", "kind": "function", "file": "src/near/util.py"},  # same dir  -> ADMIT
+        {"id": "far_helper", "kind": "function", "file": "src/far/util.py"},    # other dir -> REFUSE
+    ]
+    (gen / "symbols.json").write_text(m.render_symbols_json(syms), encoding="utf-8")
+    (tmp / "memory" / "map" / "features").mkdir(parents=True)
+
+    (tmp / "src" / "near").mkdir(parents=True)
+    (tmp / "src" / "far").mkdir(parents=True)
+    (tmp / "src" / "near" / "text.py").write_text("def slugify(s):\n    return s\n", encoding="utf-8")
+    (tmp / "src" / "near" / "util.py").write_text("def near_helper(s):\n    return s\n", encoding="utf-8")
+    (tmp / "src" / "far" / "util.py").write_text("def far_helper(s):\n    return s\n", encoding="utf-8")
+    # far_helper is the HIGHER fan-in of the two, so if it is absent that is the predicate refusing
+    # it rather than the ranking burying it — otherwise this arm would pass for the wrong reason.
+    for i in range(4):
+        (tmp / "src" / f"ref{i}.py").write_text(
+            "from far.util import far_helper\nx = far_helper(1)\n", encoding="utf-8")
+
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp)
+    try:
+        corpus = rl.load_corpus()
+        ref = m.build_reference_index(corpus.symbol_files)
+        sl = rl.assemble_shortlist("normalise a display name into a url slug", corpus, ref)
+        same_kind = {r.candidate.name: r for r in sl.ranked
+                     if not r.is_seed and "same kind" in r.reason}
+
+        assert "near_helper" in same_kind, (
+            f"the narrowed arm dropped a same-directory candidate: {sorted(same_kind)}")
+        assert "far_helper" not in same_kind, (
+            "the same-kind arm admitted a candidate from another directory — the predicate is "
+            f"still kind-only: {sorted(same_kind)}")
+        # S4: the printed reason names the narrowed predicate, so an empty pool reads as honest.
+        assert "src/near" in same_kind["near_helper"].reason, same_kind["near_helper"].reason
+    finally:
+        os.environ.pop("CODEBASE_MAP_ROOT", None)
+
+
 def test_reuse_lookup(tmp: Path):
     """AC3 on a portable FIXTURE repo (no host-repo paths): a planted `slugify` seam is ranked
     above unrelated symbols for a behaviour query; a no-home query returns 'no seam fits'; and a
@@ -1466,6 +1520,11 @@ def main() -> int:
         failures += check(
             "the neighbour cap slices the RANKED pool, not the alphabetical one",
             lambda: test_neighbour_cap_ranks_before_truncating(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "the same-kind neighbour arm is directory-scoped, both directions",
+            lambda: test_neighbour_predicate_is_directory_scoped(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(

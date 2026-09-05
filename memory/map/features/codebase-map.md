@@ -85,6 +85,18 @@ repo-wide python-launcher seam rather than anything this feature owns.
   nil on this corpus. The instrument is `replay-phrases.py`, which is `project-owned` and on no leg.
 - **The printed header discloses what the ranking does not mean.** Fan-in counts name tokens and
   resolves no symbols, so a high rank means "this name appears a lot", never "this is your seam".
+- **The same-kind arm is DIRECTORY-SCOPED, and the axis is the defining file's own directory.** Kind
+  alone admitted 619 of 648 kinded candidates — 95% — so no cap over it selected by anything.
+  Scoped to the seed's directory the same pool falls to 134 / 133 / 101 / 81 across the four
+  largest, a reach reduction of 4.6x to 7.6x. The axis is `os.path.dirname`, not a "kit" concept, so
+  it needs no declaration and means the same thing in an adopter's tree.
+- **What the narrowing COSTS, measured and not buried.** Replayed over the same 140 phrases, the
+  hit rate falls 0.600 → 0.586: two phrases lose their hit, at ranks **31 and 27**. hit@5, hit@10
+  and the median rank are unchanged, one phrase's rank improves and none worsens. So what the
+  narrowing discards sat far below the twelve-slot cap, where no reader reaches; what it buys is a
+  pool a cap can bound. A seed whose directory holds no other symbol of its kind gets an EMPTY
+  neighbour list, which the reason string makes legible — measured here, no directory is in that
+  state: all 18 (directory, kind) groups holding more than one symbol return a non-empty arm.
 
 ## Reuse affordance
 

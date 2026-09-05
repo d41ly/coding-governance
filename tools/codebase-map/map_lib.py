@@ -43,9 +43,9 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map@1.5 — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.6 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.5"
+KIT_CODEBASE_MAP_VERSION = "1.6"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where

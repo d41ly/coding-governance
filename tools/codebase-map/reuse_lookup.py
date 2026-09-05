@@ -228,14 +228,31 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     seed_syms = [pool[n] for n in seeds if pool[n].kind]
     seed_kinds = {c.kind for c in seed_syms}
     seed_files = {c.file for c in seed_syms if c.file}
+    # The same-kind arm is narrowed to the seed's own DIRECTORY, which in this repo is the kit dir.
+    # Kind alone admits nearly the whole corpus: measured over the pool the arm actually iterates,
+    # 619 of 648 kinded candidates are `function`, so a function seed pulled in 95% of everything and
+    # a cap of 12 over that is not a selection, whatever it sorts by. Grouped by directory the same
+    # 619 fall to 134 / 133 / 101 / 81 across the four largest, a reach reduction of 4.6x to 7.6x.
+    #
+    # The axis is the DEFINING FILE'S DIRECTORY rather than a "kit" concept, so it needs no literal
+    # and no new declaration, and it means the same thing in an adopter's tree that it means here.
+    # The reuse question a session asks is nearly always "does this already exist in the code I am
+    # about to edit"; a candidate further away reaches the reader better through the same-file arm
+    # or a shared-seam hit than through a kind match that would have admitted everything.
+    seed_dirs = {_dir_of(c.file) for c in seed_syms if c.file}
     neighbours: dict[str, str] = {}
     for name, cand in sorted(pool.items()):
         if name in seeds or not cand.kind:
             continue
         if cand.file and cand.file in seed_files:
             neighbours[name] = f"neighbour: same file as a hit ({cand.file})"
-        elif cand.kind in seed_kinds:
-            neighbours[name] = f"neighbour: same kind ({cand.kind})"
+        elif cand.kind in seed_kinds and cand.file and _dir_of(cand.file) in seed_dirs:
+            # The reason names the NARROWED predicate. A predicate that changes while its printed
+            # reason does not is a gate lying quietly, and an empty neighbour list for a small
+            # directory has to read as honest rather than broken.
+            neighbours[name] = (
+                f"neighbour: same kind ({cand.kind}) in {_dir_of(cand.file)}"
+            )
 
     ranked: list[Ranked] = []
     for name, reason in seeds.items():
@@ -282,6 +299,17 @@ def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -
             scored.append((cand, fanin))
     scored.sort(key=lambda cf: (-cf[1], cf[0].name))
     return scored[:top]
+
+
+def _dir_of(path: str) -> str:
+    """The directory a symbol is defined in, POSIX-normalised. `""` when there is no directory.
+
+    The one place this axis is spelled, because the neighbour predicate and its printed reason must
+    agree by construction: a predicate that narrows while its reason still says `same kind` is the
+    quiet-lie shape this kit's own dossier names.
+    """
+    p = (path or "").replace("\\", "/")
+    return p.rsplit("/", 1)[0] if "/" in p else ""
 
 
 def _shortlist_key(r: Ranked) -> tuple:
