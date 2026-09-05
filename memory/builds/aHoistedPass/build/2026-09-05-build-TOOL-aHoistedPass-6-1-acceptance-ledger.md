@@ -24,7 +24,7 @@ suites by hand, and nothing standing re-checks them. Their exit codes are below.
   `label: 'audit:subjects:`, `label: 'audit:record:` and `label: 'dispose:` returns `1`. Four
   surviving `agent()` call sites, named rather than counted.
 - **AC2** — MET — the five-alternative pattern returns `0`. It returned `5` at BASE.
-- **AC2b** — MET, by reading each of the three survivors. The WHY block names MISSING and THIN as
+- **AC2b** — MET — read in `tools/workflows/unattended-build.js`, each of the three survivors. The WHY block names MISSING and THIN as
   unconditional and marks the ORDER clause conditional on the unit *and the sibling ahead of it*
   carrying an `order` verb, with the `pass-order history` clause narrowed to a CLOSED unit whose
   build commit predates a conforming spec. Forced-shapes item 1 now reads `THE DISPOSAL STAGE IS ONE
@@ -44,7 +44,7 @@ suites by hand, and nothing standing re-checks them. Their exit codes are below.
 - **AC6** — MET — suite arms, both exits. `CONVERGING` carries `"roster":[]`; attended mode with
   every unit terminal carries `"roster":[]` too. Neither carried the key before this change, and
   both arms were observed FAILING against the unchanged source (see AC17).
-- **AC7** — MET — suite arm, asserting the roster WHOLE rather than by id:
+- **AC7** — MET — a `tools/workflows/unattended-build.test.sh` arm, asserting the roster WHOLE rather than by id:
   `"roster":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2",…},{"id":"A-tB-3",…}]`
   — key set, key order, values and sequence in one comparison. `dispatch.scriptPath` is
   `tools/workflows/unattended-unit.js`, the path `TOOL-aHoistedPass-5` landed, and
@@ -56,7 +56,7 @@ suites by hand, and nothing standing re-checks them. Their exit codes are below.
 - **AC9** — MET — `grep -c "renderRoster"` returns `3` (definition, the top-level call, the spec
   fan's per-group call). `python3 tools/codebase-map/test_codebase_map.py` exits `0` and
   `gen_map.py --check` exits `0`; no map artifact is in the diff.
-- **AC10** — MET, by hand and against the REAL tree, twice and the second time better. First:
+- **AC10** — MET — `bash tools/unattended/unattended.sh --plan aHoistedPass`, by hand and against the REAL tree, twice and the second time better. First:
   `bash tools/unattended/unattended.sh --plan aHoistedPass` captured BEFORE the driver edit and
   again after, `diff` empty. That capture is confounded once this unit's own spec header flips, so
   it was redone against the PRE-CHANGE DRIVER ITSELF — `git show HEAD:tools/unattended/unattended.sh`
@@ -76,7 +76,7 @@ suites by hand, and nothing standing re-checks them. Their exit codes are below.
   shape in `--paths` mode and carries ZERO TABs, so a four-field split skips it.
 - **AC14** — MET — suite arm. The empty-`units` refusal names `--plan <slug> --paths` and no longer
   names the bare `--plan` that cannot supply a spec path.
-- **AC15** — MET — the nesting comment names a DEPTH limit, states that a parent may make several
+- **AC15** — MET — `grep -cE "\bspent\b|\bbudget\b"` returns `0`; the nesting comment names a DEPTH limit, states that a parent may make several
   sequential nested calls at the same depth, and marks the `wf_9b984206-816` three-call evidence as
   CARRIED from an earlier pass and not re-run here. `grep -cE "\bspent\b|\bbudget\b"` over the whole
   file returns `0`; it returned `1` at BASE and the one hit WAS this comment, so the criterion has a
@@ -84,7 +84,7 @@ suites by hand, and nothing standing re-checks them. Their exit codes are below.
 - **AC16** — MET — evaluating `meta` out of the file gives `phases` titled `Spec`, `Audit`,
   `Disposal`, and a `description` containing neither `BUILD` nor `-> BUILD`. **Graded by no leg**;
   `TOOL-aHoistedPass-34` is the row that survives this spec going CLOSED.
-- **AC17** — MET, and this is the one criterion the rest lean on. Every new arm was staged into
+- **AC17** — MET — `bash tools/workflows/unattended-build.test.sh`, and this is the one criterion the rest lean on. Every new arm was staged into
   `unattended-build.test.sh` FIRST and the suite run against the UNCHANGED source: **exit 1, 40
   FAILs**, naming each new arm — `AC4 CONVERGED: the skip is ANNOUNCED`, `AC5 failed disposal: the
   roster is EMPTY`, `AC6 the CONVERGING exit carries an empty roster`, `AC7 the roster is the
@@ -109,17 +109,17 @@ suites by hand, and nothing standing re-checks them. Their exit codes are below.
   tip, and its check 23 lists a long tail of dispatched passes from the landed `dRetiredFork` build
   that committed paths outside their declared set — the same class this unit's own backlog write
   falls in, reported rather than refused.
-- **AC21** — MET, and OBSERVED rather than read. In a scratch clone at a short root, the resolving
+- **AC21** — MET — `bash tools/unattended/unattended.sh --dispatch`, and OBSERVED rather than read. In a scratch clone at a short root, the resolving
   mark was stripped from this spec's section 8 so `--plan` graded the unit `FORKED`, and
   `bash tools/unattended/unattended.sh --dispatch aHoistedPass --pass TOOL-aHoistedPass-6 --writes tools/probe-ac21.js`
   exited `0` and parked `dispatch · item c55b155b TOOL-aHoistedPass-6 · reason tools/probe-ac21.js`.
   Section 4's enumeration of what `--dispatch` does NOT refuse stands on a measurement. Clone removed.
-- **AC22** — MET, both directions, each run WITHOUT a pipe so the status is the checker's and not
+- **AC22** — MET — `bash tools/check-kit-versions.sh`, both directions, each run WITHOUT a pipe so the status is the checker's and not
   `tail`'s. Landed: `bash tools/check-kit-versions.sh` exits `0` with all three tokens on
   `tier2-review.js:3` reading `1.7`. Staged break — `meta.version` at 1.7, the
   `gov:kit review-harness@` marker left at 1.6 — exits **1** with
   `gov:kit review-harness@ marker (1.6) != its meta.version (1.7)`. Restored, exit 0.
-- **AC23** — MET for five of six as written, with one qualification stated rather than hidden.
+- **AC23** — MET — `node tools/workflows/check-workflow-syntax.js` and four siblings, for five of six as written, with one qualification stated rather than hidden.
   `node tools/workflows/check-workflow-syntax.js` 0 · `bash tools/workflows/check-verifier-fanout.sh`
   0 · `bash tools/workflows/check-review-join.sh` 0 · `python tools/memory-tree/check-arms.py --check`
   0 · `bash tools/check-kit-versions.sh` 0. The sixth,
