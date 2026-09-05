@@ -45,6 +45,9 @@ tools/run-gates/gate-profiles.txt text eol=lf
 # (`check-memory-hygiene.sh --print-index-set`): a new backlog shard, guide, or build README joins
 # it with no edit here. A pin that must be remembered is the pin that gets forgotten.
 memory/**/*.md text eol=lf
+# Measurement scripts live beside the build record that ran them (`*.sh` is pinned globally above;
+# `.py` was not, and a build-record script is read and re-run the same way a shell one is).
+memory/**/*.py text eol=lf
 memory/**/*.toml text eol=lf
 memory/**/*.txt text eol=lf
 
