@@ -17,12 +17,7 @@ in BYTES for that reason: ≤24 KB was ambiguous between 24576 and 24000, and th
 which is under one reading and over the other. 27648 is 27 KiB, matching the KiB-round convention of
 the rows already declared beside it, and it funds the M6 route sentence and the directive anchors.
 **The BYTE half binds first** — at this file's ~100 B prose line the bytes run out well before the
-line figure does, so most of that figure is headroom the bytes do not grant. **The gate is
-`build-method size`**, which measures this file's RENDER against the ceiling declared for it, and its
-PAIR TERM reds when the figure above disagrees with that declaration — including when the prose is
-rewritten to a form the gate cannot parse as bytes, because a document that can move its own prose
-and pass is the thing this term exists to stop. **What it does NOT cover is the LINE half**, which no
-checker reads: a document that grew in lines without growing in bytes still passes.
+line figure does, so most of that figure is headroom the bytes do not grant.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
 stated anywhere else in this repo — every generic obligation is POINTED AT via M11, and a rule appearing both here

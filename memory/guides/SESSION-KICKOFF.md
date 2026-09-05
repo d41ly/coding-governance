@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-05T23:33:10+03:00 @ 3cef2a2c0d1d1141abe59eded356fb3f2ab82fee
+last-audit: 2026-09-06T01:52:00+03:00 @ 6b8026d310a55317425a1e9ea452bd64ce29656b
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: f516f627ec10b4af618f7bc90a2b785fcb11b2a3
+last-body-change: 6b8026d310a55317425a1e9ea452bd64ce29656b
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -74,6 +74,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   registry is a driver constant, and a leg joins the two in both directions. Neither the count nor
   the handles are written here — that is the drift the pointer design exists to avoid. Two invert
   the reflex: a discovery is ADOPTED not parked; the keepalive precedes orienting. §11 and §5.
+
+- **`passes-harnessed` RESOLVES now and did not before `aHoistedPass`.** All seventeen core handles
+  are anchored in the sections they cite and check 16 arm B reads the BODY, not just existence. The
+  route MOVED too: the harness returns a roster and the run makes one `Workflow` call per unit. M6
+  owns it and check 31 grades it — do not restate it here.
 
 - **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`.** A breach is KILLED, and `gates-green`
   then says the bar never RETURNED — not the same fact as a leg FAILING. `TOOL-aBoundedCeiling-6`.
@@ -162,13 +167,9 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests` only when they ask. The cost is process creation, not logic:
   `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
-- 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling. `unattended` is the first to
-  take it: seven `*.test.sh` legs left `tools/gate-legs.json` AND `tools/unattended/kit.toml`, so
-  adopters lose them too, and `bash tools/unattended/run-unattended-gates.sh` is the on-demand
-  runner. They were 68 % of leg-seconds and the largest put a 26-minute floor under every full run.
-  Nothing exercises them automatically now; the compensating check is in that kit's descriptor ·
-  `TOOL-dScriptedRepeat-5` · prune when a second kit adopts the same split, which makes it a rule
-  rather than an exception.
+- 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling, `TOOL-dScriptedRepeat-5`.
+  Stated in full in the auto-loaded `AGENTS.md`, so this row POINTS and does not copy · prune when a
+  second kit adopts the split, making it a rule not an exception.
 
 
 ### Environment traps worth front-loading

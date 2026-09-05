@@ -72,4 +72,15 @@ AGENTS.md	64512
 # THIS ROW IS PAIRED WITH THE DOCUMENT'S OWN PROSE. `**Budget: ≤27648 bytes` is written in the file
 # itself, and check 6 of the gate reds when the two disagree — including when the prose is rewritten
 # to a spelling the gate cannot parse as bytes. Change both or neither.
+#
+# THE LEG IS `build-method size`, AND ITS IDENTITY LIVES HERE RATHER THAN IN THE DOCUMENT. The
+# subject is a RENDERED kit template: `tools/memory-tree/` ships BUILD-METHOD.template.md and ships
+# no size gate, so the leg is an `[[exempt_leg]]` in tools/govkit/registry.toml and reaches no
+# adopter. The template used to name this leg in its own M1, which made every adopter render assert
+# a checker it does not receive — the `a directive names a route that does not run` class. That
+# sentence was dropped on 2026-09-06 (aHoistedPass closing review, F5) and the byte figure stayed,
+# because the figure is a property of the document and the gate is a property of THIS repo.
+#
+# WHAT THE LEG DOES NOT COVER is the LINE half of that budget line. No checker reads it, so a
+# document that grew in lines without growing in bytes still passes — priced at TOOL-aHoistedPass-28.
 memory/guides/BUILD-METHOD.md	27648
