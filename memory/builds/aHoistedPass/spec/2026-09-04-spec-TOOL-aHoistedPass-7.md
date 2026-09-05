@@ -1,12 +1,12 @@
 # TOOL-aHoistedPass-7 — a brief on disk before the code that cites it
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -247,8 +247,8 @@ this an owner turn, not a prose edit anyone intended.
 ## 6. Acceptance criteria
 
 - **AC1** — When a fixture repo's closed unit has its `brief · item` row dropped from the build
-  commit and `bash tools/unattended/check-brief-recorded.sh` runs, the leg exits 1 and names that
-  unit id and the short sha of its build commit.
+  commit and the `brief-recorded` leg runs, it exits 1 and names that unit id and the short sha of
+  its build commit.
 - **AC2** — When the leg runs in a scratch clone of this repo with `BRIEF_RECORDED_CUTOFF` back-dated
   to `2026-09-01`, `TOOL-dBriefedPass-2` is absent from the printed violations and
   `TOOL-dBriefedPass-1` is present in them. The exit code of that run is 1 and no arm asserts on it,
@@ -271,10 +271,10 @@ this an owner turn, not a prose edit anyone intended.
 - **AC8** — When `python tools/govkit/govkit.py selfcheck` runs, it exits 0, which is what proves the
   `[[gate_leg]]` row and the `memory/map/features/unattended.md` claim are both present, since
   `govkit.py:1602-1604` reds without the second and the leg is claimed by no other descriptor.
-- **AC9** — When `bash tools/check-kit-versions.sh` runs after the bump, it exits 0 with
-  `tools/unattended/check-brief-recorded.sh` in the script list it walks, and it exits non-zero when
-  that script's `KIT_UNATTENDED_VERSION` is staged back to `1.17`.
-- **AC10** — When `bash tools/unattended/check-brief-recorded.sh` runs on the landing tree, every
+- **AC9** — When `bash tools/check-kit-versions.sh` runs after the bump, it exits 0 with the new
+  leg's script in the list it walks, and it exits non-zero when that script's
+  `KIT_UNATTENDED_VERSION` is staged back to `1.17`.
+- **AC10** — When the `brief-recorded` leg runs on the landing tree, every
   tracked `memory/builds/*/README.md` whose `opened:` date is on or after `BRIEF_RECORDED_CUTOFF` is
   zero, so the leg reports `graded 0` — asserted as the intended day-one population, with the
   cutoff's value strictly later than every tracked `opened:` date.
@@ -351,6 +351,12 @@ of them this one. A leg built as its twin is invisible to that checker by constr
   Two further figures were re-derived rather than carried: the first-parent anchor reds 25 of 26
   conforming units (the design asserted the failure without a count), and all 26 rows join their
   blobs, which is why AC3 is a staged arm.
+- rev-2 · 2026-09-05 · AC1, AC9 and AC10 re-pointed from the script this unit creates to the leg
+  name `brief-recorded`, which §7 and `tools/gate-legs.json` own. The three criteria asserted a path
+  that does not exist until the unit lands; naming the leg observes the same runs through the
+  identifier the manifest is keyed on, and it stays correct if the script is ever renamed under a
+  stable leg name. AC9 keeps `KIT_UNATTENDED_VERSION` and the `1.17` staging as its failing case.
+  No criterion was weakened or dropped, and §4's file table still spells the path once.
 
 ## 10. Reuse audit
 
