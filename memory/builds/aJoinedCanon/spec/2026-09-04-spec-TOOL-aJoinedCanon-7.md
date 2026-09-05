@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 7 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 7 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -50,7 +50,9 @@ thing this arm reds.
   same breath as it defines it — including that it never satisfies S7: the prose prefix is exactly
   what keeps it out of the leg join, so a §7 carrying only an arm-home line still names no leg.
 - **S4** — `tools/check-spec-tokens.py` gains three behaviours. The §7 body is located by HEADING
-  TEXT (`^## [0-9]+\. Gates`) rather than by the ordinal `extract_section(text, 7)` passes today, so
+  TEXT — `^## [0-9]+[.] Gates[ \t]*$`, which is check 12's acceptance-witness regex with one word
+  changed, bracketed dot and tab class and end anchor intact — rather than by the ordinal
+  `extract_section(text, 7)` passes today, so
   a Tier-1 spec written under the light profile is graded on the section it actually has and not on
   whatever sits seventh. A token that IS a manifest name is
   resolved BEFORE the `NOT_A_LEG` shape exclusions, so a manifest name excluded by shape — one
@@ -115,6 +117,13 @@ thing this arm reds.
   it would ship an adopter a dead repo-path citation.
 - **Grading whether a declared arm home is real.** The named suite usually does not exist yet when
   the spec is written; a resolver would red every honest spec.
+- **Turning the assertion floor into an equality.** AC6 observes THIS suite's advance with a staged
+  break and nothing more. Making `compliant()` in `tools/check-testsuite-counts.sh` compare the
+  pinned `FLOOR_ASSERTIONS` to the `n` in a suite's own `PASS ($n assertions)` line is the gate for
+  the class — round 2's H7 left-shift — and it reaches every suite that leg covers, not this one. It
+  is a change to a leg this unit does not own, over a population this unit never measured, and it
+  belongs in its own unit. Recorded here so the narrower criterion below is a scope decision and not
+  an oversight.
 
 ## 4. Design
 
@@ -140,7 +149,7 @@ Every figure below is DERIVED, and the deriving command is written beside it rat
 being trusted from here. Re-derive them at the start of this unit's build pass; the design depends on
 which of them is true, not on the digits.
 
-- **26 of the 42 live specs carry no `LEG_LINE` at all**, and **31 of the 42 contribute no graded leg
+- **27 of the 42 live specs carry no `LEG_LINE` at all**, and **31 of the 42 contribute no graded leg
   token** — the five between them have a list line whose every token is excluded by shape. Derived by
   running `LIVE`, the Gates-heading regex, `LEG_LINE` and `NOT_A_LEG` over the tracked spec glob, which is
   what S4's new report field turns into a printed number so this stops being a research pass.
@@ -148,7 +157,9 @@ which of them is true, not on the digits.
   had each read the finding that says §7 is silently ungraded, and the house style most of them used —
   `- ` bulleted leg names — is precisely the shape `LEG_LINE` cannot match. That is
   the evidence that this is a discoverability defect and not an attention defect. The two exceptions
-  are this unit, which is about the defect, and unit 9.
+  are this unit, which is about the defect, and unit 9. The figure is a fold-time measurement over a
+  population the siblings' own folds move — round 2 rules a §7 leg list onto `TOOL-aJoinedCanon-11`,
+  which is one of the nine — so re-derive it, never quote it.
 - **The figures moved with the corpus and not with the predicate.** The findings record's
   post-skeptic number was 18 of 31; the design pass measured 20 of 33; the fold measures 26 of 42.
   `750ca0ca` names the tree the design READ, not the tree as committed. The ratio held while the
@@ -200,10 +211,14 @@ Three edits inside the existing per-spec walk over `specs`:
    `""` — indistinguishable, in S7's eyes, from a Gates section that named no leg. That is the whole
    defect: `memory/TEMPLATE-SPEC.md`'s Tier-1 light profile lets a spec write only the sections that
    matter, so the first post-cutoff Tier-1 spec would red with no remedy but a per-path waiver. The
-   Gates body is instead matched by `^## [0-9]+\. Gates`, and whether the heading was FOUND is
+   Gates body is instead matched by `^## [0-9]+[.] Gates[ \t]*$`, and whether the heading was FOUND is
    returned alongside the body, because S7 must tell "no Gates section" from "a Gates section naming
-   nothing". The regex is not invented here — it is check 12's acceptance-witness regex with one word
-   changed, tab class and all, so the two checkers cannot drift on what a heading looks like.
+   nothing". The regex is not invented here — check 12's acceptance-witness arm reads
+   `^## [0-9]+[.] Acceptance criteria[ \t]*$`, and one word is the whole difference: bracketed dot,
+   tab class and end anchor are carried over unchanged, so the two checkers cannot drift on what a
+   heading looks like. Through rev-3 this spec claimed that reuse while writing `^## [0-9]+\. Gates`,
+   which has neither the class nor the anchor — a document asserting a property of itself that was
+   false, which is the shape round 2 graded HIGH on a sibling.
 2. Resolve first. `if tok in legs` is tested before `NOT_A_TOKEN`/`NOT_A_LEG`, so a name that IS in
    the manifest counts as graded whatever its shape. This can never turn a green tree red: the hit
    list is only reachable from the else branch, which is unchanged. Simulated over the live specs at
@@ -219,8 +234,13 @@ Three edits inside the existing per-spec walk over `specs`:
 ### The cutoff, and the conf read it costs
 
 `SPEC_LEGLINE_CUTOFF="2026-09-06"`, in this repo's `.memory-tree.conf` beside the dated cutoffs
-already there — six at the fold, and the count is a `grep -cE '^[A-Z_]+CUTOFF=' .memory-tree.conf`
-rather than a number this spec keeps fresh. The date is the build-wide one and is not re-derived here: `TOOL-aJoinedCanon-1`'s
+already there — seven at the fold, and the count is a
+`grep -cE '^[A-Z][A-Z0-9_]*_CUTOFF=' .memory-tree.conf` rather than a number this spec keeps fresh.
+The character class is the engine's own: `check-memory-hygiene.test.sh` derives `_engpresets` with
+exactly that shape. It is not cosmetic. The `^[A-Z_]+` this spec carried through rev-3 cannot match a
+digit, so it returned six by silently dropping `SPEC10_EVIDENCE_CUTOFF` — the one key the next
+paragraph cites as this arm's own precedent. A derivation that omits its own witness is the
+could-not-fail shape inside the remedy for it. The date is the build-wide one and is not re-derived here: `TOOL-aJoinedCanon-1`'s
 fold measured it across all 44 local and remote refs and all 15 live worktrees — newest spec filename
 date 2026-09-04, nothing dated 2026-09-05 anywhere — so 2026-09-06 is the first date this fleet can
 no longer write into. Every cutoff this build introduces takes it.
@@ -351,11 +371,16 @@ every carrier, the carrier set derived with `grep -rl` rather than listed.
   'LEG_LINE\|line of its own'` finds the shape stated there, and `bash
   tools/memory-tree/kit-dogfood-parity.test.sh` exits 0 with `memory/TEMPLATE-SPEC.md` rendered from
   it rather than hand-edited.
-- **AC2** — When the body under the `## 7. Gates` heading of
-  `tools/memory-tree/SPEC-TEMPLATE.template.md` is read, it
-  names the list line and the `New arm:` line, and `bash tools/memory-tree/check-memory-hygiene.sh`
-  still exits 0 over the corpus — the body change requires nothing of a landed spec, and every
-  landed spec predates `SPEC_LEGLINE_CUTOFF`, which is the reason and not a coincidence.
+- **AC2** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh --render` has run,
+  `grep -c 'New arm:' tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md` reports
+  non-zero for BOTH halves, the body under the `## 7. Gates` heading states the list line as a
+  REQUIREMENT and points at the S1 section, and the sentence `The named gate legs this unit must keep
+  green, plus any new gate it adds.` appears in neither half. Measured RED at base, where that
+  sentence is the entire body in both files and `New arm:` appears zero times in either — the
+  criterion is a command with an observed failing case, not a reading. `bash
+  tools/memory-tree/check-memory-hygiene.sh` still exits 0 over the corpus, because the body change
+  requires nothing of a landed spec and every landed spec predates `SPEC_LEGLINE_CUTOFF`, which is
+  the reason and not a coincidence.
 - **AC3** — When `python tools/check-spec-tokens.py` runs on this tree, its report line names the
   ungraded live-spec population, the no-Gates-heading population and the cutoff in force, and each
   number it prints AGREES with a live re-derivation over the same corpus. Red when the printed figure
@@ -371,11 +396,18 @@ every carrier, the carrier set derived with `grep -rl` rather than listed.
   tools/check-spec-tokens.test.sh` observes it graded rather than skipped, and against the unpatched
   checker the same arm fails. This is `NOT_A_LEG`'s path alternative only; its command-verb sibling is
   AC10, because one arm covering both would pass while either half regressed.
-- **AC6** — When `bash tools/check-testsuite-counts.sh` runs, `FLOOR_ASSERTIONS` in
-  `tools/check-spec-tokens.test.sh` equals the arm total the suite actually executes and the suite
-  compares the two, so the eight added arms cannot be stranded silently. The floor's VALUE is derived
-  at observation time — the criterion is the equality, and this unit is the only one that moves
-  either side of it.
+- **AC6** — When `tools/check-spec-tokens.test.sh` is read at this unit's base and again at its
+  landing commit, `FLOOR_ASSERTIONS` has risen by exactly eight; and with the raised floor left in
+  place, deleting any ONE of the eight added arms makes `bash tools/check-spec-tokens.test.sh` exit 1
+  on its own `[ "$total" -lt "$FLOOR_ASSERTIONS" ]` test. That staged deletion is the whole
+  observation, because nothing else makes it. Verified at source: the suite's test is a FLOOR, not an
+  equality, and `compliant()` in `tools/check-testsuite-counts.sh` asserts only that a file prints
+  the agreed `PASS ($n assertions)` shape, pins a non-zero `^FLOOR_ASSERTIONS=[0-9]+$`, and mentions
+  the variable somewhere — it never compares the pin to the count, whatever its own header says.
+  Landing the eight arms with the floor unmoved therefore passes both the suite and the leg, so the
+  advance has no observer but this break. Through rev-3 this criterion asserted an equality neither
+  performs. The floor's VALUE is derived at observation time; the criterion is the advance and the
+  break.
 - **AC7** — When `memory/map/features/spec-tokens.md` is read, it names both new report fields, the
   heading-text location, the S7 arm with its conf key, and all three surviving limits of S6, and `bash
   tools/run-gates/run-gates.sh` is green with `GATE_SELFTESTS=1`.
@@ -393,8 +425,8 @@ every carrier, the carrier set derived with `grep -rl` rather than listed.
   graded rather than skipped, and against the unpatched checker the same arm fails. Red when
   resolve-first is wired only ahead of `NOT_A_LEG`'s path alternative, which is the shape the
   spec's own §4 asserted before it was re-derived and found to describe one name, not two.
-- **AC11** — When a LIVE Tier-1 fixture spec dated at or after `SPEC_LEGLINE_CUTOFF` carries NO
-  `## N. Gates` heading at all, `bash tools/check-spec-tokens.test.sh` observes the run exit 0 and
+- **AC11** — When a LIVE Tier-1 fixture spec dated at or after `SPEC_LEGLINE_CUTOFF` carries no line
+  matching S4's `^## [0-9]+[.] Gates[ \t]*$` at all, `bash tools/check-spec-tokens.test.sh` observes the run exit 0 and
   that spec named in the no-Gates-heading field rather than in the hits; and when a second fixture
   carries a legal Gates section at a NON-seventh ordinal naming a real leg, the same run observes
   that leg graded. Both arms fail against the unpatched checker, where the first reds a legal Tier-1
@@ -408,12 +440,20 @@ every carrier, the carrier set derived with `grep -rl` rather than listed.
 ## 7. Gates
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` ·
-`kit version markers` · `kit/dogfood doc parity`
+`kit version markers` · `kit/dogfood doc parity` ·
+`testsuite counts (every bar self-test prints one)`
 
 New arm: `tools/check-spec-tokens.test.sh` · scratch repos staging each of AC4, AC5, AC10, AC8's two
 cutoff twins, AC9's blank key and AC11's two Tier-1 fixtures, all run against the unpatched checker
 first · `FLOOR_ASSERTIONS` advances by eight, from whatever value the file declares at this unit's
-base — no unit but this one writes either side of that equality.
+base — no unit but this one writes either side of that pin, and of the eleven only units 3 and 9 name
+`check-spec-tokens` at all, both only to cite the checker.
+
+Neither the floor's advance nor the leg `testsuite counts (every bar self-test prints one)` compares
+that pin to the executed count, so AC6's staged deletion is its only observer; the gate for the class
+is §3's last non-goal. The suite builds scratch repos and uses none of the `tFixture-N` naming the
+hygiene harness reserves, so the build's `80 + 10·order` allocation is not drawn here and this unit's
+block stays unclaimed.
 
 This unit adds no leg. S7's verdict lands in `spec tokens (a spec's own names resolve)` and its test
 arms in `spec-tokens self-test`, both already in `tools/gate-legs.json`, so the manifest does not
@@ -429,12 +469,15 @@ this is kit work and its DoD owes
   - **Branch A — red it, behind a dated cutoff.** A live spec whose filename date is at or after a
     new `SPEC_LEGLINE_CUTOFF` and whose §7 contributes no leg name becomes a hit. Cost: one conf key,
     a conf read in a tool that currently reads none, one arm with an observed red, and a corpus that
-    stays green because the 20 ungraded live specs all predate the cutoff. It makes the shape
+    stays green because the ungraded live specs — 20 when this fork was written — all predate the
+    cutoff. It makes the shape
     mandatory, which is the only thing that would have caught the six specs this build wrote.
   - **Branch B — widen `LEG_LINE` so prose lines are graded.** No author burden and no cutoff, but
     the checker's own header records what that costs: 270 hits, 271 of them from prose in a single
-    spec. It also cannot see a §7 that names no leg at all, which is 24 of the 33 live specs today —
-    so it addresses the near-miss spellings and not the silence.
+    spec (the header's own arithmetic, quoted as it stands). It also cannot see a §7 that names no leg
+    at all, which was 24 of the 33 live specs when this fork was written — so it addresses the
+    near-miss spellings and not the silence. Every figure in this fork is of its own date and §4's
+    derivations own the live ones; a resolved fork is a record of what was weighed, not a counter.
   - **Recommendation: branch A.** The measured failure is silence, not misspelling, and branch B
     grades more text without grading more specs. The counter S4 adds is what makes branch A's blast
     radius readable before it is chosen: run the tool, read the number.
@@ -464,6 +507,35 @@ this is kit work and its DoD owes
   than by line; H2 strips the `2.59` kit-version literal for the invariant it was standing in for.
   Every §4 figure is now DERIVED with its command beside it, and §4's example-conf paragraph names
   the build cutoff rule's one declared exception with the registry row that grounds it.
+- rev-4 · 2026-09-05 · §2 · §3 · §4 · §6 · §7 · §8 · folded spec-audit round 2. H7, the named
+  finding: AC6 asserted that `FLOOR_ASSERTIONS` equals the executed arm total and that the suite
+  compares the two, and neither is so — the suite's test is `-lt` and `compliant()` only requires the
+  pin to exist, be non-zero and be mentioned; AC6 now observes the advance against a staged deletion,
+  §7's arm line says the same, and §3 gains a non-goal recording the equality gate as a change to a
+  leg this unit does not own. Then the CLASS sweep, which found five more instances of round 2's
+  classes in this file, none of them named against it. M1: §4's `26 of the 42` was 27, re-derived
+  today. M1 again, one level in: §4's cutoff count derived with `^[A-Z_]+CUTOFF=`, which cannot match
+  a digit and so returned six by dropping `SPEC10_EVIDENCE_CUTOFF`, the very key the next paragraph
+  cites as precedent — the pattern is now the engine's own `^[A-Z][A-Z0-9_]*_CUTOFF=` and the count
+  is seven. H9's shape: §2 S4 and §4 claimed to reuse check 12's acceptance-witness regex `tab class
+  and all` while writing `^## [0-9]+\. Gates`, which has neither the tab class nor the end anchor;
+  all three sites now carry `^## [0-9]+[.] Gates[ \t]*$`. H2/H3's shape: AC2 graded the entire
+  author-facing skeleton body by `is read`, with no command — it is now a `grep -c` over both
+  rendered halves with the base state measured RED. M4's shape: AC6 invokes
+  `bash tools/check-testsuite-counts.sh` while §7 named no leg for it; the manifest name
+  `testsuite counts (every bar self-test prints one)` joins the list. M3's shape: §8 was outside
+  rev-3's swept set and carried `the 20 ungraded live specs` and `24 of the 33 live specs today`,
+  both stale — the fork's figures are now dated to the fork and §4 owns the live ones. L1's shape:
+  §4's `nine of the eleven` is a population round 2's own rulings move, and now says so. Swept and
+  CLEAN, each checked rather than assumed: B1 (the §7 walk in `check-spec-tokens.py` is a flat loop,
+  no nested cutoff guard, and S7's arm answers to `SPEC_LEGLINE_CUTOFF` alone), H1 (§4 states no
+  version bump is owed, verified — `check-verdict-epoch.sh` scans its `ENGINE=` plus `DELEGATES=`
+  and a `*.template.md` is in neither), H4 (S1–S7 each carry at least one criterion), H5, H6 (every
+  command, flag and verb in §6 run or read at source), H8, H10, M2 (every citation into the template
+  pair is heading text or a quoted literal, both verified present at base), M5 (§7 hides no leg and
+  no argument here rests on a behaviour a lower-`order` sibling changes), M6, M7, M8, M9, M10, and L2
+  (the one `path:line` in this file, the `dUnstalledConvoy-26-2` ledger at `:12`, is correct and
+  points into a frozen terminal record).
 
 ## 10. Reuse audit
 

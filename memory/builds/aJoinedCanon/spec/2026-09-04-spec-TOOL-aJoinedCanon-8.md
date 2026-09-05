@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 8 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 8 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -24,19 +24,27 @@ absence from the graded set is a different answer from disagreement inside it.
 
 - **S1** — the `### Edges` block, its two verbs and its payload rule, stated in
   `tools/memory-tree/SPEC-TEMPLATE.template.md` inside the skeleton's §3 body and in the prose
-  section above the skeleton. Observed by AC6 and AC9.
+  section above the skeleton. Observed by AC6 and AC14. AC9 is NOT an observer of this item: it
+  compares the pair's bytes and is equally green when neither half moved.
 - **S2** — `memory/TEMPLATE-SPEC.md` re-rendered from that template with
-  `bash tools/memory-tree/kit-dogfood-parity.test.sh --render`, never hand-edited. Observed by AC9.
+  `bash tools/memory-tree/kit-dogfood-parity.test.sh --render`, never hand-edited. Observed by AC9
+  for the render and by AC14 for the text the render must carry.
 - **S3** — a new cutoff key `SPEC_EDGES_CUTOFF`, declared in `.memory-tree.conf` beside its siblings,
   preset blank in `tools/memory-tree/check-memory-hygiene.sh` beside the `SPEC10_EVIDENCE_CUTOFF=""`
   preset whose trailing comment reads `blank = never required`, and shipped blank in
   `tools/memory-tree/.memory-tree.conf.example`. Blank means off, which is `STREAMS_CUTOFF`
   semantics and not `SPEC10_CUTOFF`'s forward resolution. Both conf carriers, per build rule 3: a
-  key in one and not the other gives an adopter a dead arm reading as armed. Observed by AC7.
+  key in one and not the other gives an adopter a dead arm reading as armed. Observed by AC7 for
+  the repo's own conf and by AC15 for the shipped example, which is the adopter's copy and the one
+  no criterion reached before rev-4.
 - **S4** — the SHAPE arm: a branch in check 12's awk that reds a Tier-2 spec at or after the cutoff
   whose §3 carries no `### Edges` block, and reds a bullet inside that block whose head is neither
   verb. It reads ONE file and joins nothing, so it is the only arm here that stays live under
-  `--staged`, where it is the committer's own file it grades. Observed by AC1, AC2 and AC12.
+  `--staged`, where it is the committer's own file it grades. **The branch sits OUTSIDE every other
+  cutoff guard on that awk path and tests `SPEC_EDGES_CUTOFF` and nothing else**, so its population
+  is its own key rather than an intersection with `SPEC_WITNESS_CUTOFF` or any sibling's; an arm
+  nested inside a neighbour's guard reads as armed in an adopter conf that arms only this key and
+  never executes. Observed by AC1, AC2 and AC12.
 - **S5** — the RECIPROCITY arm: a `hands-off` naming a sibling that declares no matching
   `consumes-from` back reds, and so does the mirror case. Graded only where the sibling is IN the
   graded population, per S14. Observed by AC3 and AC13.
@@ -58,14 +66,18 @@ absence from the graded set is a different answer from disagreement inside it.
   adoption, because §8 resolved the cutoff strictly ahead of every live spec filename date: no
   tracked spec is back-filled, this build's own eleven included. Observed by AC1 through AC8 and by
   AC12 and AC13.
-- **S10** — the declaration bookkeeping: `ARMS_FLOORS` re-measured for
-  `tools/memory-tree/check-memory-hygiene.sh` with `python tools/memory-tree/check-arms.py
-  --report`, and `KIT_MEMORY_TREE_VERSION` bumped in every carrier of the marker, the set derived
-  rather than counted. Measured today, seven tracked files carry the version value and the
-  `TOOL-dSettledRoster-4` row says six, which is the reason to derive it. Observed by AC11.
+- **S10** — the `ARMS_FLOORS` half of the declaration bookkeeping: the pair re-measured for
+  `tools/memory-tree/check-memory-hygiene.sh` with `python3 tools/memory-tree/check-arms.py
+  --report`, never typed. Observed by AC11.
+- **S10b** — the VERSION half, split out of S10 at rev-4 because AC11 was never its observer:
+  `KIT_MEMORY_TREE_VERSION` advanced and the `gov:kit memory-tree@` marker moved in every carrier,
+  the set derived with `grep -rl` at build time and never counted here. The backlog row
+  `TOOL-dSettledRoster-4` records a remediation that named three carriers when more existed, which
+  is the whole reason the set is derived rather than written down — including in this bullet.
+  Observed by AC16.
 - **S11** — the check-12 paragraph in `tools/memory-tree/HYGIENE.template.md` gains the two
   sentences its sibling ratchets each get, and the arm's own header states what it does not check.
-  Observed by AC9.
+  Observed by AC9 for the pair's parity and by AC14 for the sentences themselves.
 - **S12** — this spec's own §3 carries the block in the shape S1 proposes, so the first instance is
   in the tree on the day the rule lands. Observed by AC6.
 - **S13** — the THREE JOIN ARMS (S5, S6, S7) are HELD under `--staged`, and say so. Their input is
@@ -115,11 +127,16 @@ absence from the graded set is a different answer from disagreement inside it.
   lands different.
 - **hands-off** `TOOL-aJoinedCanon-10` — `SPEC_EDGES_CUTOFF` is one more declared cutoff key, and
   what unit 10 owes it is nothing but knowing it exists: that unit's S1 DELETES the cutoff count
-  beside `TEMPLATE-SPEC.md` line 16 and "puts no other count in its place", so a new key arriving at
-  order 8 leaves no number at order 10 to update. Unit 10 is Tier-1 and carries no `### Edges` block,
-  so this edge has no reciprocal and S14's membership test makes it silent — the first live instance
-  of the grammar is also the first live instance of the skip. An earlier rev of this bullet claimed
-  the sentence unit 10 corrects "must count it", which is the opposite of what unit 10 does.
+  from the sentence naming the declared keys and puts no other count in its place, so a new key
+  arriving at order 8 leaves no number at order 10 to update. Unit 10's rev-3 DOES declare the
+  reciprocal — a `consumes-from` `TOOL-aJoinedCanon-8` bullet in its own `### Edges` block, naming
+  the key's existence as the whole of what it accepts. The pair is still silent, on the other
+  ground: unit 10 is Tier-1, so it is `next`-ed at `if (hdr ~ /Tier-1/) next` before the pass
+  registers it and it is outside the population S14 tests membership against. The first live
+  instance of the grammar is also the first live instance of the skip, and the skip survives the
+  reciprocal existing — which is the point, because reciprocity is not what produces the silence.
+  Two earlier revs of this bullet were wrong about unit 10 in opposite directions: rev-2 claimed the
+  sentence it corrects "must count it", and rev-3 claimed it carries no `### Edges` block.
 - **consumes-from** external — owner scope approval on §8's fork, SATISFIED 2026-09-05: the cutoff
   sits strictly ahead of every live spec filename date. S9 and AC7 are written to that answer, so the
   back-fill this edge used to hang on is refused rather than pending.
@@ -130,8 +147,12 @@ absence from the graded set is a different answer from disagreement inside it.
 
 450 of 479 specs (94%) sit in multi-spec build folders, 60 of the 89 folders holding a spec. The
 template's only cross-unit field is the permitted `order <n>`, carried by 159 of 479. Those are the
-research record's post-skeptic figures, and they reproduce today at 455 of 484 across 61 of 90 with
-164 carrying `order` — the delta is exactly this build's own five specs written so far.
+research record's post-skeptic figures, quoted as the record's, and they are the only three numbers
+this section holds. The live corpus is DERIVED rather than restated: count it with
+`git ls-files 'memory/builds/*/spec/*.md'`, group by the folder segment for the multi-spec share,
+and `git grep -lE '^\*\*Status:\*\*.*· order [0-9]'` over the same set for the `order` share. Every
+earlier rev pinned a live re-measurement beside the record's figures, and the pin was stale within a
+day because this build's own specs land into the population it counts.
 
 `order` expresses sequence and never an edge, and the confirmed cross-unit defects are edge failures.
 `dRetiredFork` H4 hands 39 literal sites in `tools/check-wiring.sh` to `TOOL-dRetiredFork-13`, whose
@@ -173,14 +194,30 @@ an opinion about encoding.
 
 ### Where it lives
 
-Line numbers are not cited here: units 3, 4 and 6 edit `check-memory-hygiene.sh` before this one, so
-every number in this section would be stale by the time it is read. Each site is named by its own
-text, per build rule 6.
+Line numbers are not cited here: units 1, 3, 4 and 6 all edit `check-memory-hygiene.sh` before this
+one, so every number in this section would be stale by the time it is read. Each site is named by its
+own text, per build rule 6.
+
+**And the SHAPE of that file is a lower-`order` sibling's to change too, so this placement argument
+is re-verified at build time rather than assumed.** Unit 4 HOISTS the acceptance-witness accumulator
+out of the `wcut` guard, and units 1 and 3 each add an arm and a `-v` binding to the same check-12
+invocation. Every structural claim below — which guard encloses what, where the END block routes,
+what the post-pass switches on — is asserted against the file as those four leave it, and a builder
+who finds it different amends this section rather than the code. Round 2's H10 is the class: a
+design argument verified against a structure that no longer exists at build time.
 
 The shape arm is a branch in the batched awk that check 12 runs over `c12_sel`, placed BELOW the
 `if (hdr ~ /Tier-1/) next` cut beside the section canon and the empty-body walk, because it is Tier-2
-only. It reports inline like the other per-file findings in that pass, so it adds no `fail` branch,
-and it reads exactly one file.
+only. That position is OUTSIDE every cutoff guard on the path: the cut and the two walks below it sit
+at the top level of the record body, the `scut`, `wcut` and `fcut` blocks all close above it, and the
+`ecut` §10-evidence block below it is a sibling rather than an enclosure.
+The branch therefore carries its own `SPEC_EDGES_CUTOFF` liveness test and inherits no neighbour's,
+which is what keeps its population from becoming an intersection of two keys — the defect round 2
+recorded as B1 against a sibling, where an arm anchored on a print INSIDE the `wcut` guard would
+have graded only specs past both cutoffs while its own key read as armed. AC1 observes the
+independence in the only way that can fail: a scratch conf arming this key ALONE. The arm reports
+inline like the other per-file findings in that pass, so it adds no `fail` branch, and it reads
+exactly one file.
 
 The three join arms accumulate in that same pass and emit in its END block, tagged the way the
 canon-diff arm tags its excerpt request with a `\001` sentinel record. The `case "$bad12_raw" in`
@@ -233,12 +270,18 @@ of the Tier-1 residual §3 records, and it is a declared blind spot rather than 
 
 - **A new §11 section.** It needs a third section canon and a `want` selection over two cutoffs in a
   check that today picks between two. A `###` sub-head under §3 is ungraded structure the template
-  already sanctions, costs no canon change, and cannot red a grandfathered spec. Measured: no
-  tracked spec carries a `### Edges` sub-head and exactly one carries any `###` inside §3, so the
-  name is free.
+  already sanctions, costs no canon change, and cannot red a grandfathered spec. Measured: outside
+  this build no tracked spec carries a `### Edges` sub-head, and exactly one spec in the whole tree
+  carries any `###` inside §3 at all — `cTracedPromise-1`, whose sub-head is prose. So the name is
+  free. The two `### Edges` blocks that DO exist are this spec's own and unit 10's reciprocal, both
+  written to the grammar S1 proposes; an earlier rev said "no tracked spec carries" one and unit
+  10's rev-3 falsified it the same day, which is why the exclusion is now stated rather than the
+  bare zero.
 - **A generated `build-edges` region per unit.** The name is already taken at build granularity —
-  `GEN_REGIONS` at `gen_build_index.py:85-86` and `render_edges` at `:1013` render parent and child
-  BUILDS from the README's authored `parents:` key. A unit-level twin would be a second region, a
+  the `"build-edges"` row of `GEN_REGIONS` and `def render_edges(build: dict)` in
+  `tools/memory-tree/gen_build_index.py` render parent and child BUILDS from the README's authored
+  `parents:` key. Cited by symbol: an earlier rev pinned `render_edges` at `:1013`, which is the
+  closing `return` of the function above it. A unit-level twin would be a second region, a
   fourth marker pair in every build README, and a committed artifact whose only consumer is a check
   in the same language. Charter §12 says to derive that live and commit nothing. The arm reads the
   specs directly. If a reader later wants the graph rendered, it is a follow-up unit and the field
@@ -268,17 +311,22 @@ rather than resolving forward.
 | `tools/memory-tree/check-memory-hygiene.sh` | the preset, the `-v` binding, four arms, the membership test, the `--staged` hold and its announce line, three fails |
 | `tools/memory-tree/check-memory-hygiene.test.sh` | the fixtures, in the `tFixture-160` block, including a `--staged` scratch-tree case beside the existing one |
 | `.memory-tree.conf` | the cutoff key and the re-measured `ARMS_FLOORS` |
-| `tools/memory-tree/.memory-tree.conf.example` | the same key, blank |
+| `tools/memory-tree/.memory-tree.conf.example` | the same key, blank, with its adopter comment |
+| every `gov:kit memory-tree@` marker carrier | `KIT_MEMORY_TREE_VERSION` advanced and the marker moved; the set is DERIVED below, never listed here |
 
-The commit also owes a `gov:kit memory-tree@` bump in every carrier. Derive that set with
+The version row is S10b and its observer is AC16. Derive the carrier set with
 `grep -rl 'gov:kit memory-tree@'` rather than from a remediation message, which
-`TOOL-dSettledRoster-4` records naming three carriers when six existed.
+`TOOL-dSettledRoster-4` records naming fewer carriers than existed. This unit changes the engine's
+verdicts, so `verdict epoch (kit version dates the engine)` is the leg that reds on an unmoved
+constant; `kit version markers` reds on a carrier left behind while its siblings moved. Two legs,
+two different failures, and rev-3 declared the obligation in this table with no criterion behind it.
 
 ## 5. Production-readiness checklist
 
 - **security** — N/A. The arm reads tracked spec text the same pass already reads and writes nothing.
 - **perf / scale** — no new file read and no second pass. The END-block arrays are bounded by the
-  selected spec population, 484 files today. The `memory hygiene` leg's cost is recorded per run in
+  selected spec population, which `git ls-files 'memory/builds/*/spec/*.md' | wc -l` counts and no
+  number here restates. The `memory hygiene` leg's cost is recorded per run in
   `<git-dir>/gate-ledger.tsv`; compare the row before and after rather than asserting the arm is free.
 - **a11y** — N/A.
 - **i18n** — N/A for language. The marker bytes are ASCII by decision, for the mojibake reason §4
@@ -296,9 +344,9 @@ The commit also owes a `gov:kit memory-tree@` bump in every carrier. Derive that
   candidate predicate over the whole tree before it is wired. A cutoff set too early reds in-flight
   branches; §8 resolved that fork to the strictly-ahead date, which retires the risk and moves the
   whole day-one cost onto S8's zero-population notice. Naming a foreign build's id in prose already
-  contributes to THAT build's roster, since `rosters()` at `gen_build_index.py:661-693` keys on the
-  id's own slug component; the grammar adds no new instance of that because a joined edge names a
-  sibling in this build only.
+  contributes to THAT build's roster, since `def rosters(root: str, tracked: list, m: str,
+  families: set)` in `tools/memory-tree/gen_build_index.py` keys on the id's own slug component; the
+  grammar adds no new instance of that because a joined edge names a sibling in this build only.
 - **testing + left-shift gates** — S9. Each red is staged, observed, unstaged, per build rule 4.
 - **migration / rollback** — §4 Migration.
 - **user docs** — `memory/HYGIENE.md` item 12 and the template itself are what an author reads. This
@@ -308,7 +356,11 @@ The commit also owes a `gov:kit memory-tree@` bump in every carrier. Derive that
 
 - **AC1** — When a Tier-2 fixture spec dated at or after `SPEC_EDGES_CUTOFF` carries a §3 with no
   `### Edges` block, `bash tools/memory-tree/check-memory-hygiene.sh` reds naming that file and the
-  missing block. Staged, observed RED, unstaged.
+  missing block — and it reds the same way in a scratch tree whose conf declares `SPEC_EDGES_CUTOFF`
+  and BLANKS every other cutoff key the engine reads, which is what proves the branch carries its own
+  liveness test rather than a neighbour's. Staged, observed RED, unstaged. The one-key-armed run is
+  the arm that fails when the branch is nested inside another cutoff's guard; the fully-armed fixture
+  conf is green either way, which is how round 2's B1 survived a sibling's whole criteria set.
 - **AC2** — When a fixture's block carries a bullet whose head is neither `consumes-from` nor
   `hands-off`, the same command reds naming that bullet's label rather than the whole file.
 - **AC3** — When fixture unit A declares `hands-off` `B` and B's spec declares no `consumes-from`
@@ -326,6 +378,10 @@ The commit also owes a `gov:kit memory-tree@` bump in every carrier. Derive that
   the strictly-ahead date §8 resolved on, `bash tools/memory-tree/check-memory-hygiene.sh` over the
   real tree is green with every tracked spec grandfathered, this build's own eleven included — the
   grandfather case is the LIVE CORPUS rather than one fixture, which is what that resolution made it.
+  That green is read TOGETHER with the notice AC8 observes, never alone: a whole-corpus green with a
+  graded population of zero and a whole-corpus green with a graded population of hundreds are the
+  same byte, and the notice is the only thing that tells them apart. A green with no notice on it is
+  a FAILED AC7, because it means the arm graded specs and said nothing about them.
 - **AC8** — When no tracked spec reaches the cutoff, the full run prints the named zero-population
   notice on stdout, in the shape the §10 evidence arm's `graded NO spec` notice already uses.
 - **AC9** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs after the template edit, it
@@ -335,9 +391,14 @@ The commit also owes a `gov:kit memory-tree@` bump in every carrier. Derive that
   `git ls-files 'memory/builds/*/spec/*'` BEFORE it is wired, it prints its hits AND its
   near-misses, and the near-miss list is read for false positives rather than counted. Charter §7
   requires this, and it is the run that decides AC5's shape.
-- **AC11** — When `python3 tools/memory-tree/check-arms.py --check` runs with the re-measured
-  `ARMS_FLOORS`, it is green, and `--report` shows the three new `fail 12` branches armed rather than
-  pinned.
+- **AC11** — When `python3 tools/memory-tree/check-arms.py --report` is run BEFORE and AFTER this
+  diff, the `check-memory-hygiene.sh` row's branch and armed counts have each risen by three, and
+  `--check` with the re-measured `ARMS_FLOORS` is green. Then the failing case, because green alone
+  proves nothing here: `ARMS_FLOORS` is a SHRINK-ONLY floor, compared with `<`, so adding three
+  branches and leaving the pin untouched passes `--check` unchanged. With the floor raised, delete
+  one of the three arms' assertions from `check-memory-hygiene.test.sh`, observe `--check` RED
+  naming `armed branch(es) against a floor of`, restore. That red is the only evidence that the
+  re-measurement is load-bearing rather than decorative.
 - **AC12** — When exactly ONE spec of a conforming edge pair is staged in the self-test scratch tree
   and `bash tools/memory-tree/check-memory-hygiene.sh --staged` runs, the run does not red on that
   pair and prints the HELD announce line naming check 12, in the wording
@@ -345,12 +406,32 @@ The commit also owes a `gov:kit memory-tree@` bump in every carrier. Derive that
   file's own missing `### Edges` block, which is what proves the shape arm stayed live rather than
   the whole check going quiet. The harness is the existing `--staged` block in
   `tools/memory-tree/check-memory-hygiene.test.sh`, the one whose comment reads
-  `in_scope is the ONLY thing deciding selection there`.
+  ``--staged: `in_scope` is the ONLY thing deciding selection there`` — quoted with its backticks,
+  because rev-3 quoted it without them and the string it named matches nothing in that file.
 - **AC13** — When a Tier-2 fixture declares `hands-off` a Tier-1 sibling that carries no `### Edges`
   block, a FULL `bash tools/memory-tree/check-memory-hygiene.sh` is silent about that pair, and it is
   silent the same way for an edge naming a spec the cutoff grandfathered. Staged, observed GREEN
   against the version of the arm that lacks the membership test — that arm reds, which is the failing
   case this criterion exists to have seen.
+- **AC14** — When the render has run, the AUTHOR-FACING TEXT is present in the rendered halves, not
+  merely identical to its template. `grep -c 'consumes-from' memory/TEMPLATE-SPEC.md` returns at
+  least 2 and `grep -c '### Edges' memory/TEMPLATE-SPEC.md` at least 1, against a pre-change count
+  of 0 for both, measured today; `grep -c 'SPEC_EDGES_CUTOFF' memory/HYGIENE.md` returns at least 1
+  against a pre-change 0. The failing case is the one AC9 cannot see: land the arm, skip the
+  template edit, re-render — AC9 stays green because both halves still match, and AC14 reds. S1,
+  S2 and S11 are the whole author-facing product of this unit under a cutoff that grades no live
+  spec on day one, so a byte-compare is the wrong and only observer round 2 found five times.
+- **AC15** — When the edit has landed, `grep -c '^SPEC_EDGES_CUTOFF=' tools/memory-tree/.memory-tree.conf.example`
+  returns 1 against a pre-change count of 0, the value is blank, and the line carries an adopter
+  comment saying blank means off. Deleting that line is the observed red. The example conf is the
+  file an adopter reads and edits; a key present in this repo's `.memory-tree.conf` and absent from
+  the shipped example is build rule 3's exact failure and nothing before rev-4 observed it.
+- **AC16** — When the landing commit is in place, `bash tools/check-kit-versions.sh` and
+  `bash tools/memory-tree/check-verdict-epoch.sh` both exit 0. The observed reds are two, because
+  the legs fail on different things: revert `KIT_MEMORY_TREE_VERSION` alone with the engine changed
+  and `verdict epoch (kit version dates the engine)` reds; move the constant in one carrier and not
+  the rest and `kit version markers` reds. Both restored before the commit. This is S10b, split out
+  of S10 because AC11 runs `check-arms.py` and reaches neither script.
 
 ## 7. Gates
 
@@ -363,9 +444,15 @@ This unit adds no leg. The arm's home is check 12 inside `tools/memory-tree/chec
 which the `memory hygiene` leg already runs. Its fixtures live in
 `tools/memory-tree/check-memory-hygiene.test.sh`, run by `memory-hygiene self-test`, which is guarded
 to `tools/memory-tree/` and so fires on this unit's own diff. `kit/dogfood doc parity` is what makes
-the two template halves one edit, `kit version markers` reds if a `gov:kit memory-tree@` carrier is
-left behind, and `harness arms (fail branches armed or pinned)` is what the three new `fail 12`
-branches move.
+the two template halves one edit and AC9 is what runs it — but the halves agreeing is not the text
+being there, which is AC14's job. `kit version markers` reds if a `gov:kit memory-tree@` carrier is
+left behind while its siblings moved, `verdict epoch (kit version dates the engine)` reds if the
+constant sits still while the engine's verdicts change — which is exactly what this unit does to it —
+and AC16 observes both, with a separate staged red for each because they fail on different things.
+`harness arms (fail branches armed or pinned)` is what the three new `fail 12` branches move, and
+AC11 observes the move against a deleted assertion rather than against a green. `spec tokens (a
+spec's own names resolve)` grades this document's own leg names; every name in the list above was
+checked against `tools/gate-legs.json` and resolves, and no script path stands in for one.
 
 One exemption, stated with its compensating check. S13 takes the three join arms off the pre-commit
 `--staged` run entirely, so the only bar that grades them is the full `memory hygiene` leg, which
@@ -413,6 +500,25 @@ what keeps the pre-commit silence from reading as a pass.
   count rather than update it. Build rules: S9 moves to the README-allocated `tFixture-160` block,
   every `check-memory-hygiene.sh` line pin in §4 and §10 becomes a text citation, S10's
   `ARMS_FLOORS` is derived rather than quoted, and S3 states both conf carriers explicitly.
+- rev-4 · 2026-09-05 · §2 · §3 · §4 · §5 · §6 · §7 · folded spec-audit round 2. NAMED FINDINGS: M9 —
+  the §3 `hands-off TOOL-aJoinedCanon-10` bullet said unit 10 carries no `### Edges` block, and unit
+  10's rev-3 added one naming this unit; the bullet now rests on the reason that survives, which is
+  that a Tier-1 spec is outside the graded population S14 tests. M10 — S10 claimed AC11 observed
+  both the `ARMS_FLOORS` re-measure and the version bump; the version half is now S10b with AC16,
+  and §4's file table gained the carrier row it lacked. L2 — `render_edges` is cited by its `def`
+  line, not by `:1013`, which is the previous function's `return`. SWEPT CLASSES THAT HIT: B1, S4
+  and §4 now state the branch sits outside every cutoff guard and AC1 arms this key alone; H1 and
+  H2/H3/H5, AC14 grades the author-facing text the byte-compare cannot see and S1, S2 and S11 lose
+  AC9 as their sole observer; H7, AC11 observes a shrink-only floor against a deleted assertion
+  rather than against a green; H10, §4 names all four lower-`order` units that edit the engine and
+  says the placement argument is re-verified at build time; M1/L1, the live corpus re-measurement,
+  the `484 files` figure, the `### Edges` zero and S10's carrier count are all derived or dropped;
+  M6, AC15 grades the shipped example conf; M7, AC7 must read the zero-population notice beside its
+  green; plus one citation of its own finding — AC12 quoted the harness comment without its
+  backticks and matched nothing. SWEPT AND CLEAN: H4 (every scope item carries a tag), H6 and M4
+  (`--render`, `--check`, `--report` and all seven §7 leg names run or resolve against
+  `tools/gate-legs.json`), H8, H9 (no `check-memory-hygiene.sh` line pin survives), M2, M3, M5
+  (unit 6 does not touch the `check 23 HELD under --staged` line this unit copies), M8.
 
 ## 10. Reuse audit
 

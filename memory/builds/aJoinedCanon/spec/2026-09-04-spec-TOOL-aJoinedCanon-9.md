@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 9 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 9 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -42,7 +42,10 @@ answered.
 - **S4** — `tools/memory-tree/kit.toml` declares `READINESS_ROWS` in the `SPEC-TEMPLATE.template.md`
   rule's `placeholders`, and both new keys in its `[config]` key lists.
 - **S5** — check 12 gains a §5 row-presence arm inside its existing awk: for every declared row, the
-  §5 body must contain that row's label. Gated by `READINESS_ROWS_CUTOFF`, blank means off.
+  §5 body must contain that row's label. Gated by `READINESS_ROWS_CUTOFF`, blank means off. The
+  branch sits at the SAME NESTING LEVEL as the §10 evidence arm and outside its `ecut` guard, so this
+  arm's population is `READINESS_ROWS_CUTOFF` alone and never the intersection of two cutoffs; AC11
+  observes that independence under a conf arming this cutoff and no other.
 - **S6** — the arm's predicate is run over the real tree BEFORE it is wired, printing hits AND
   near-misses, and the result is recorded in the conf comment beside the key.
 - **S7** — `tools/memory-tree/check-memory-hygiene.test.sh` gains a red fixture (a post-cutoff Tier-2
@@ -52,18 +55,26 @@ answered.
 - **S8** — gov's own `.memory-tree.conf` declares EIGHT rows, dropping `a11y` and `i18n` per F1. The
   kit example keeps all ten. That divergence is the point rather than a defect to reconcile: it is
   the first demonstration that the key is per-project, and it is safe because no gate compares the
-  live conf's VALUES to the example's — the govkit selfcheck joins KEYS to the descriptor's lists,
-  which is AC1, and nothing else reads the example at all outside the absent-conf seeding path.
+  live conf's VALUES to the example's. Nothing joins their KEYS either, which rev-3 asserted here and
+  §4 now measures; nothing reads the example at all outside the absent-conf seeding path.
 - **S9** — the adopter tailoring path is documented and OBSERVED, because it is the half of F1's
   ruling that no other scope item carries. Three parts. The example's comment (S1) is where an
   adopter reads that the row set is theirs. `tools/memory-tree/README.md` gains `READINESS_ROWS` and
   `READINESS_ROWS_CUTOFF` in the conf list it already keeps at its "Copy … and edit" step, with the
   same statement, so the answer is reachable without opening the checker. And the no-overwrite
-  property is ASSERTED rather than assumed: it already holds by construction at
-  `adopt-memory-tree.sh:47-51` (the example is copied only when the conf is ABSENT, then the script
-  exits 1) and `:57-60` (a tree already carrying the `gov:kit memory-tree@` marker is an early exit
-  0), so this unit ADDS no code for it and instead pins it with AC9 — a property nobody observed is
-  a property nobody can rely on.
+  property is ASSERTED rather than assumed: it already holds by construction in
+  `tools/memory-tree/adopt-memory-tree.sh`, at its `if [ ! -f "$ROOT/.memory-tree.conf" ]` branch (the
+  example is copied only when the conf is ABSENT, then the script exits 1) and at the branch whose
+  test is `grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"` and whose body prints
+  `already scaffolded by memory-tree — nothing to do.` and exits 0. Cited by text rather than by line
+  because this unit's own diff edits that file. So it ADDS no code for the property and instead pins
+  it with AC9 — a property nobody observed is a property nobody can rely on.
+- **S10** — the bookkeeping every engine-touching unit owes, declared rather than left in §4 prose:
+  `KIT_MEMORY_TREE_VERSION` advances and every `gov:kit memory-tree@` carrier moves with it in the
+  same commit. The carrier set is DERIVED at build time by `grep -rl 'gov:kit memory-tree@'` over the
+  tracked tree, never counted here. AC12 observes it, and the leg that reds without it is
+  `verdict epoch` rather than `kit version markers`, because an unbumped constant leaves every
+  carrier agreeing with every other.
 
 ## 3. Non-goals (OUT)
 
@@ -86,6 +97,13 @@ answered.
   makes that visible instead of inventing it. Fixing it is a `playbook`-stream edit against a byte-gated 48 KiB
   ceiling, and it is named here as the follow-up this unit does not do. Until it lands, the
   declaration is the single home for the SKELETON's rows and not yet for the charter's menu.
+- The missing join itself. NO gate compares a conf key to its kit descriptor's `[config]` lists:
+  gov's own `.memory-tree.conf` declares eighteen keys that appear in none of
+  `tools/memory-tree/kit.toml`'s four lists, and `python tools/govkit/govkit.py selfcheck` exits 0
+  with all eighteen standing. Building that arm means running its predicate over eighteen live
+  instances first and naming whichever of them is a legitimate exemption class, per §7's
+  measure-before-wiring rule — which is a `govkit` unit, not this one. It is named here because
+  rev-3's AC1 claimed the arm already existed, under a subcommand spelling that does not.
 - `TOOL-dTieredTribunal-17`, the open row where `plan_state` in `tools/unattended/unattended.sh` maps
   spec sections by ordinal and mis-grades every Tier-1 spec because §5 is legitimately absent. It is
   adjacent, it is another consumer of this section, and it is a different unit.
@@ -147,8 +165,8 @@ All three readers still PRESET the variable above their conf source. That is not
 `set -u` safety, and the reason is already recorded in `check-memory-hygiene.sh` — the comment
 opening `PRESET HERE, above the conf source, and that is load-bearing rather than tidy`, above the
 existing cutoff presets: without the preset the gate ABORTS rather than fails in every adopter tree
-whose conf predates the key. Cited by its text because four sibling units of this build edit that
-file at a lower `order`, so any line number here is stale before the builder reads it.
+whose conf predates the key. Cited by its text because sibling units of this build edit that file at
+a lower `order`, so any line number here is stale before the builder reads it.
 
 ### How an adopter changes the set (F1's second half)
 
@@ -156,11 +174,13 @@ The ruling that drops two rows from gov's declaration is only safe if an adopter
 so this is a scope item (S9) rather than a consequence. What was CHECKED in
 `tools/memory-tree/adopt-memory-tree.sh` before writing it:
 
-- The conf is never rewritten on an update. `:47-51` copies `.memory-tree.conf.example` only when
-  `.memory-tree.conf` is ABSENT, prints "EDIT IT … then re-run", and exits 1 — so the copy happens
-  exactly once, before the adopter has a declaration to lose. `:57-60` then makes a tree already
-  carrying the `gov:kit memory-tree@` marker a clean no-op exit 0, which is the path every
-  re-run after adoption takes. The property the owner asked for therefore already holds, and this
+- The conf is never rewritten on an update. The `if [ ! -f "$ROOT/.memory-tree.conf" ]` branch copies
+  `.memory-tree.conf.example` only when `.memory-tree.conf` is ABSENT, prints "EDIT IT … then
+  re-run", and exits 1 — so the copy happens exactly once, before the adopter has a declaration to
+  lose. The branch below it, whose test is `grep -q 'gov:kit memory-tree@' "$M/HYGIENE.md"`, then
+  makes an already-scaffolded tree a clean no-op exit 0, which is the path every re-run after
+  adoption takes. Note what the marker test actually reads: the tree's own `HYGIENE.md` under
+  `MEMORY_ROOT`, not any carrier. The property the owner asked for therefore already holds, and this
   unit adds no code for it; AC9 pins it so a later refactor cannot quietly take it away.
 - The cost of that same property: a key ADDED to the example after adoption never reaches an
   existing adopter's conf. `READINESS_ROWS` is such a key. That is why every reader resolves blank
@@ -191,14 +211,29 @@ formatters never meet and no gate would see them diverge.
 
 `tools/check-kit-placeholders.py` joins a descriptor's declared `placeholders` to the literal
 `{{TOKEN}}` spellings its adopter substitutes, and its `scan_substituted` already matches the
-backslash-escaped brace form the block is written in — so S4's declaration is satisfied by S2's edit
-with nothing further. This is the seam §10 names.
+backslash-escaped brace form the block is written in — so the `placeholders` half of S4's declaration
+is satisfied by S2's edit with nothing further. This is the seam §10 names.
+
+The `[config]` half of S4 has NO such seam, and this spec said otherwise until rev-4. Nothing joins a
+conf key to its descriptor's key lists: `govkit.py selfcheck`'s only config-list arm grades
+`requires_if` `when_any_key_set` conditions, `tools/check-kit-placeholders.py` reads `placeholders`
+and nothing else, and no other tracked file reads `optional_keys` at all. The live evidence is
+eighteen keys in gov's own conf that appear in none of the memory-tree descriptor's four lists while
+the leg exits 0. So declaring both keys there buys a readable surface and a future arm's input, not a
+verdict, and AC1 grades it as the documented check it is.
 
 ### The check-12 arm
 
-It sits in the Tier-2 block, after the empty-body walk and beside the §10 evidence arm, and it
-follows that arm's shape: a section blob, `index()` over lowercased text rather than a regex, and
-four conjuncts on the guard.
+It sits in the Tier-2 block, after the empty-body walk, as a SIBLING `if` of the §10 evidence arm at
+the same nesting level — never inside that arm's `want == canon10 && ecut != "" && …` guard. That
+nesting is the failure this build has now shipped twice: it would make the arm's population the
+INTERSECTION of `READINESS_ROWS_CUTOFF` and `SPEC10_EVIDENCE_CUTOFF` while the new key still read as
+armed, and `tools/memory-tree/.memory-tree.conf.example` ships `SPEC10_EVIDENCE_CUTOFF=""`, so every
+adopter would arm a dead rule. No existing fixture could tell the two placements apart either: the
+suite's main fixture conf arms every cutoff at once. AC11 is what tells them apart. The arm follows
+the §10 arm's SHAPE and nothing else about its position: a section blob, `index()` over lowercased
+text rather than a regex, and four conjuncts of its own on the guard —
+`want == canon10`, the blank-means-off test, the `fdate != ""` sibling test, and `fdate >= rcut`.
 
 For each declared row, both the declared TOKEN and the §5 body are lowercased and stripped of every
 non-alphanumeric byte; the row is present when the squashed token is a substring of the squashed
@@ -297,22 +332,25 @@ is regenerated, never edited, so there is no third thing to undo.
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | §5 skeleton rows become the token; the prose above the fence explains the declaration |
 | `memory/TEMPLATE-SPEC.md` | re-rendered by `--render` |
 | `tools/memory-tree/check-memory-hygiene.sh` | preset, `-v` bindings, the arm, the version marker |
-| `tools/memory-tree/check-memory-hygiene.test.sh` | fixture conf keys, one red fixture, one green twin |
+| `tools/memory-tree/check-memory-hygiene.test.sh` | fixture conf keys, one red fixture, one green twin, and AC11's one-cutoff run |
+| every `gov:kit memory-tree@` carrier | the version bump of S10, the set derived by `grep -rl` at build time |
 
-The kit version bump rides in the same commit and touches every `gov:kit memory-tree@` carrier, which
-is more than the three `check-verdict-epoch.sh`'s remediation message names. The builder DERIVES the
-set rather than reading a number here — `grep -rl 'gov:kit memory-tree@'` over the tracked tree, plus
-the `KIT_MEMORY_TREE_VERSION` constant in `check-memory-hygiene.sh`, whose line carries both the
-constant and a marker. The message's undercount is an open defect, recorded twice as
+The kit version bump is S10 and AC12 rather than this paragraph's advice, because rev-3 left it as
+prose that no scope item declared and no criterion observed. It touches every `gov:kit memory-tree@`
+carrier, which is more than the three `check-verdict-epoch.sh`'s remediation message names. The
+builder DERIVES the set rather than reading a number here — `grep -rl 'gov:kit memory-tree@'` over the
+tracked tree, plus the `KIT_MEMORY_TREE_VERSION` constant in `check-memory-hygiene.sh`, whose line
+carries both the constant and a marker. The message's undercount is an open defect, recorded twice as
 `TOOL-aSiftedFork-5` and `TOOL-dSettledRoster-4`, and following it costs a second full-bar cycle;
 rev-2 stated a count of its own here and got it wrong in the same direction, which is why this
-paragraph now names the command instead.
+paragraph names the command instead.
 
-The arm adds no `fail` call site — check 12 has exactly one, the
-`[ -n "$bad12" ] && fail 12` line at the end of the check in
-`tools/memory-tree/check-memory-hygiene.sh`, and the arm prints into the same collected stream.
-So `ARMS_FLOORS` and the harness-arms leg are unmoved. Cited by text for the same reason as the
-preset above: four sibling units edit that file first.
+The arm adds no `fail` call site OF ITS OWN: it prints into the collected stream that check 12
+already ends by testing at `[ -n "$bad12" ] && fail 12`. Whether the `ARMS_FLOORS` pair moves is
+DERIVED and not asserted here — `python tools/memory-tree/check-arms.py --report` before and after the
+diff, with check 12's reported pair expected unchanged. rev-3 instead pinned a count of that file's
+`fail` sites, which unit 8 changes at `order` 8, before this unit builds. Cited by text for the same
+reason as the preset above: sibling units at a lower `order` edit that file first.
 
 ### Alternatives rejected
 
@@ -354,7 +392,8 @@ preset above: four sibling units edit that file first.
 - risks (concurrency, data-loss, rollback hazards) — the real risk is a cutoff set too early. It reds
   48 landed specs and blocks every run until reverted, which is why the date is enumerated across
   branches rather than taken from this one.
-- testing + left-shift gates — S7's two fixtures, with the red observed before landing. The suite's
+- testing + left-shift gates — S7's two fixtures, with the red observed before landing, plus AC11's
+  third run of the red fixture under a conf arming this cutoff alone. The suite's
   own conf declares the cutoff ahead of every existing fixture, so no fixture in it changes verdict.
   S9's no-overwrite property is covered by AC9's observation rather than by a new test file, because
   the property is two early-exit branches that already exist and a fixture repo would be a second
@@ -365,13 +404,22 @@ preset above: four sibling units edit that file first.
   set is the adopter's to declare and naming the one edit that changes it; the template's own §5
   prose is where an author reads the rule. Under F1 this row stopped being bookkeeping: the README
   and the example's comment ARE the adopter tool the ruling required, so a missing sentence here is
-  a missing deliverable rather than a thin doc.
+  a missing deliverable rather than a thin doc. Both halves are now graded — AC10 reads the README
+  AND the example's comment, and AC13 reads the rendered template prose — because until rev-4 the
+  comment an adopter meets first, in their own conf, was the ungraded one.
 
 ## 6. Acceptance criteria
 
-- **AC1** (S1, S4) — When `READINESS_ROWS` is declared in `.memory-tree.conf` and
-  `python tools/govkit/govkit.py --selfcheck` runs, the key resolves in the memory-tree entry's
-  config key lists and the run is green. It reds if the key is declared in the conf and in no list.
+- **AC1** (S4) — When `tools/memory-tree/kit.toml` is PARSED on the landing commit and its
+  `[config] optional_keys` list is read, that list holds both `READINESS_ROWS` and
+  `READINESS_ROWS_CUTOFF` — a two-line `tomllib` read, not a grep, so a name in a comment or in a
+  neighbouring list cannot satisfy it. Deleting either name from the list is the observed red, and it
+  is observed by running the same read against the deletion. This is a DOCUMENTED
+  CHECK and §7 carries its compensating step, because §4 establishes that no gate joins a conf key to
+  a descriptor's key lists. rev-3 asserted the opposite through
+  `python tools/govkit/govkit.py --selfcheck`, which is not a subcommand — it prints
+  `govkit: unknown subcommand '--selfcheck'` and exits 2 — while the real verb, the `govkit selfcheck`
+  leg, exits 0 today with eighteen conf keys declared in no list at all.
 - **AC2** (S2, S3) — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs after the
   template edit and the re-render, it reports parity. Staging the render token in
   `tools/memory-tree/SPEC-TEMPLATE.template.md` WITHOUT re-rendering turns it red, naming the pair.
@@ -401,46 +449,85 @@ preset above: four sibling units edit that file first.
   This is the criterion that the divergence is legal: a leg that redded on it would be a gate
   comparing the live conf's VALUES to the example's, which is the thing S8 asserts does not exist.
 - **AC9** (S9) — When `bash tools/memory-tree/adopt-memory-tree.sh --scaffold` is re-run in a tree
-  that already carries the `gov:kit memory-tree@` marker, it exits 0 and `git diff --stat
+  whose `$MEMORY_ROOT/HYGIENE.md` carries the `gov:kit memory-tree@` marker, which is the file the
+  script's own test reads, it exits 0 and `git diff --stat
   .memory-tree.conf` is empty — an adopter's declaration survives a kit update. Run in a tree with
   NO conf, the same command instead writes `.memory-tree.conf` from the example carrying all ten
   rows and exits 1. Both halves are observed; the second is what makes the first mean something,
   because a script that never writes the conf at all would pass the first alone.
-- **AC10** (S9) — When `tools/memory-tree/README.md` is read at its "Copy … and edit" step,
+- **AC10** (S1, S9) — When `tools/memory-tree/README.md` is read at its "Copy … and edit" step,
   `READINESS_ROWS` and `READINESS_ROWS_CUTOFF` each appear with the statement that the row set is
-  per-project and the pointer to the one edit that changes it. No leg binds this; §7 names it as a
-  documented check with its compensating reviewer step.
+  per-project and the pointer to the one edit that changes it. The SAME two facts are read, in the
+  same grep shape, in the `READINESS_ROWS` comment of `tools/memory-tree/.memory-tree.conf.example` —
+  the file an adopter meets first and the one this criterion did not reach until rev-4. Either file
+  missing either fact is the red. No leg binds this; §7 names it as a documented check with its
+  compensating reviewer step.
+- **AC11** (S5, S7) — When S7's red fixture is run a SECOND time under a scratch conf that declares
+  `SPEC_FORMAT_CUTOFF` and `READINESS_ROWS_CUTOFF` and leaves every other cutoff blank —
+  `SPEC10_EVIDENCE_CUTOFF`, `SPEC_WITNESS_CUTOFF`, `STREAMS_CUTOFF`, `FORK_MARK_CUTOFF` — it still
+  reds on the missing row. `SPEC_FORMAT_CUTOFF` is in that conf because check 12 does not run without
+  it, which the suite's own blank-cutoff section already observes. The observed red is the nesting
+  itself: with the branch moved inside the §10 evidence arm's guard, this run goes silent while the
+  fully-armed fixture conf stays red — which is exactly what the adopter example ships into.
+- **AC12** (S10) — When `bash tools/check-kit-versions.sh` and
+  `bash tools/memory-tree/check-verdict-epoch.sh` run on the landing commit, both exit 0. Landing the
+  arm with `KIT_MEMORY_TREE_VERSION` untouched is the observed red, and the leg that reds is
+  `verdict epoch`: `kit version markers` stays GREEN on an unbumped constant, because every carrier
+  still agrees with every other.
+- **AC13** (S3) — When `memory/TEMPLATE-SPEC.md` is read after the render, the prose above the §5
+  skeleton names `READINESS_ROWS` and where it is declared: `grep -c READINESS_ROWS` over that file
+  returns 0 before this change and non-zero after. AC2 cannot observe this — it renders and
+  byte-compares a pair, and is equally green when neither half moved.
+- **AC14** (S6) — When `.memory-tree.conf` is read after the edit, the comment beside
+  `READINESS_ROWS_CUTOFF` carries S6's pre-wiring measurement: the graded total, the count missing at
+  least one row, and the near-miss note, in the shape the sibling cutoff comments already use. The
+  red is the key landing with a bare comment, which would leave that measurement living only in this
+  spec — the copy that rots.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `kit version markers` ·
+`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `kit version markers` ·
 `verdict epoch (kit version dates the engine)` ·
 `python resolver (behaviour + inline parity + idiom ban)` ·
 `kit placeholders (a declared token its adopter substitutes)` · `kit-placeholders self-test` ·
+`govkit selfcheck` ·
 `spec tokens (a spec's own names resolve)` · `harness arms (fail branches armed or pinned)` ·
 `marker contracts`
 
 The new arm adds no leg. It lands inside check 12, whose leg is `memory hygiene` and whose self-test
 leg is guarded on the kit directory, so a records-only commit still runs the first and skips the
-second. `kit/dogfood doc parity` is the leg that binds the template pair and is named in AC2; its
-name carries a `/`, which `tools/check-spec-tokens.py` treats as a path and does not resolve, so it
-is written here in prose rather than in the list above.
+second. `kit/dogfood doc parity` is the leg that binds the template pair and is named in AC2, and it
+is now IN the list above rather than exiled to prose: `tools/check-spec-tokens.py` still excludes it
+by shape today, because its `NOT_A_LEG` pattern treats any token carrying a `/` as a path, so writing
+it here is inert — and `TOOL-aJoinedCanon-7` resolves manifest names BEFORE those shape exclusions at
+`order` 7, two steps before this unit builds, after which the name grades like any other. rev-3 kept
+it out on the strength of a checker behaviour a lower-`order` sibling deletes. `govkit selfcheck` is
+listed because this unit edits `tools/memory-tree/kit.toml`, which that leg parses.
 
 F1's added scope adds no leg either, and two of its criteria are DOCUMENTED CHECKS rather than gated
 ones, named here so the exemption travels with its compensating step. AC9 is observed by hand
 because the adopter's no-overwrite behaviour is two early-exit branches and a fixture repo for them
-would be a second copy of the adopter to keep fresh; the compensating check is that any diff
-touching `adopt-memory-tree.sh:47-60` re-runs AC9's two halves. AC10 is prose in
-`tools/memory-tree/README.md` and nothing grades prose; the compensating check is that the same diff
-re-reads the README's conf list, which is where an adopter looks first and the checker is where they
-must not have to look.
+would be a second copy of the adopter to keep fresh; the compensating check is that any diff touching
+either branch — the `if [ ! -f "$ROOT/.memory-tree.conf" ]` copy or the `already scaffolded by
+memory-tree` exit — re-runs AC9's two halves. AC10 is prose in `tools/memory-tree/README.md` and in
+the example conf's comment, and nothing grades prose; the compensating check is that the same diff
+re-reads both, which is where an adopter looks first and the checker is where they must not have to
+look.
+
+Two more documented checks arrive with rev-4, and both exist because their subject has no gate at
+all. AC1 reads `tools/memory-tree/kit.toml`'s `[config]` list directly, since §4 establishes that no
+leg joins a conf key to a descriptor's key lists; the compensating check is that any diff adding a
+conf key re-runs that read, and the real fix is the `govkit selfcheck` arm §3 parks as a follow-up.
+AC14 reads a comment, which nothing grades either; its compensating check rides AC1's, because both
+fire on the same event — a new conf key landing.
 
 F3 adds no leg either. Its render half rides `kit/dogfood doc parity` through AC2, which grades the
 pair whatever the rows say. Its second half — the two greps in AC7, which observe that the skeleton's
 long labels are GONE — is a documented check, because no leg knows the difference between a label
 this unit deliberately shortened and one a later edit dropped by accident. The compensating check is
 that any diff touching `READINESS_ROWS` in either conf re-runs AC7's greps against the re-rendered
-file.
+file. AC13's grep for the declaration's name in the rendered prose rides the same step, for the same
+reason: `kit/dogfood doc parity` grades that both halves moved together and never what they say.
 
 `tools/memory-tree/hygiene-parity.test.sh` is NOT on the bar — it appears in no row of
 `tools/gate-legs.json` — but it copies the LIVE `.memory-tree.conf` into its fixture repos and its
@@ -511,6 +598,25 @@ bar stayed green.
   literal-text citations, S7 points at the README's `tFixture` allocation, and the
   `resolve-python.test.sh:88-91` pin — wrong by four lines, the `render_doc` row is not in that
   range — became a citation of the `render_doc|` row of `PARITY_ROWS`.
+- rev-4 · 2026-09-05 · §2 · §3 · §4 · §5 · §6 · §7 · §9 · folded spec-audit round 2. Named findings:
+  H6 (AC1 invoked `govkit.py --selfcheck`, which exits 2 as an unknown subcommand, and claimed a
+  failing case the real verb does not have — AC1 now reads `kit.toml`'s `[config]` list directly as a
+  documented check, §4 states that no gate joins a conf key to a descriptor's lists with the eighteen
+  live instances as evidence, and §3 parks the missing `govkit` arm as a follow-up); M5
+  (`kit/dogfood doc parity` moved into §7's leg list, its exile justified by a checker behaviour unit
+  7 deletes at `order` 7); M6 (AC10 extended to the example conf's comment, the part of the F1
+  adopter deliverable nothing observed); L1 (§4's `fail`-call-site count dropped for a
+  `check-arms.py --report` derivation, since unit 8 changes that population at `order` 8). Swept
+  classes that HIT: B1 — §2 S5 and §4 now place the arm OUTSIDE the §10 evidence arm's `ecut` guard
+  and AC11 observes the independence under a one-cutoff conf, because the example ships
+  `SPEC10_EVIDENCE_CUTOFF=""` and the suite's fixture conf arms every cutoff at once; H1 — the
+  version bump became S10, a Files-touched row and AC12, with the failure attribution corrected to
+  `verdict epoch`; H2/H3/H5 — AC13 grades the rendered §5 prose that only the byte-compare reached;
+  H4 — S6's measurement-in-the-comment gained AC14; H10/M2 — the two `adopt-memory-tree.sh` line
+  ranges became literal-text citations, since this unit's own diff edits that file; M1 — "four
+  sibling units edit that file" was wrong at base (at least five do) and is now uncounted; M4 —
+  `govkit selfcheck` joined §7, which this unit's `kit.toml` edit runs; M10 — AC1 lost its false
+  `S1` tag, which AC10 now carries for real.
 
 ## 10. Reuse audit
 

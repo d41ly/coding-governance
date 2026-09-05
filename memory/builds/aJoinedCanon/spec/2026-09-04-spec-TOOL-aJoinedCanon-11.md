@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-11 — the base sha resolves to a real object
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 11 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 11 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -37,7 +37,7 @@ transposed digit is caught by the bar instead of by a reviewer.
   `tFixture-190` block upward per the build's `order`-allocated number space: a post-cutoff live spec
   whose base does not resolve (red, observed before landing) and one whose base is the scratch
   repo's own `HEAD` (silent).
-- **S6** — the `base` bullet in `memory/TEMPLATE-SPEC.md` and its byte-compared twin
+- **S6** *(Observed by AC10)* — the `base` bullet in `memory/TEMPLATE-SPEC.md` and its byte-compared twin
   `tools/memory-tree/SPEC-TEMPLATE.template.md` gains the resolution rule and names the cutoff, in
   one commit, with the kit version marker moved in every carrier that holds it.
 - **S7** — check 12's catalog entry in `memory/HYGIENE.md` and its byte-compared twin
@@ -151,10 +151,16 @@ HYGIENE check 12: base-resolution arm SKIPPED — shallow repository, no base sh
 ```
 
 Stderr, not stdout, because the script's contract is that anything on stdout is a hygiene
-regression. `run-gates.sh:1110-1111` merges both streams into the per-leg log, so the skip is
-durable and readable where the leg's output is read. The script's own header comment is
-amended in the same commit to say that stdout carries findings and stderr carries announced skips,
-because a contract that a change quietly widens is worse than the change.
+regression. `run-gates.sh` merges both streams into the per-leg log — its leg dispatch redirects
+with `>"$WORK/$i.raw" 2>&1` on both the bounded and unbounded branches — so the skip is durable and
+readable where the leg's output is read.
+
+**What the header amendment may and may not say.** The checker's stderr is NOT empty today: its one
+`>&2` block is `resolve_python`'s refusal of a set-but-unusable `GOV_PYTHON`, which returns 1. So a
+header claiming "stdout carries findings, stderr carries announced skips" would be FALSE of the file
+before this unit writes a line — the could-not-fail shape pointed at prose instead of at an arm. The
+amendment this unit makes is the true one: stdout carries findings, and stderr carries announced
+skips AND the resolver's refusal to run under a broken override. Observed by AC11.
 
 Prior art worth reading before touching this: `memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-7.md:106`
 measured that in a `--depth 1` clone a derived-commit probe does not fail and does not return
@@ -243,8 +249,12 @@ unit exists to close.
   silent on it, so the terminal-status exemption in `check-memory-hygiene.sh` is exercised rather
   than assumed.
 - **AC4** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over this tracked tree, it
-  stays green, proving the 22 grandfathered specs across `aBatchedTribunal`, `aDrainedSluice`,
-  `aRelaxedShard`, `aUnmannedHelm` and `cSettledDocket` are not redded.
+  stays green. **What this can and cannot prove, stated because the earlier wording claimed more
+  than it observes:** every spec carrying an unresolvable base is CLOSED, so S2's terminal-status
+  conjunct excludes all of them before the cutoff is ever consulted — the green is therefore
+  guaranteed by that conjunct and is NOT evidence that grandfathering works. It observes only that
+  the arm adds no regression. The grandfathering itself is observed by AC3, on a fixture built for
+  it.
 - **AC5** — When the gate runs in a `git clone --depth 1` scratch tree, `git rev-parse
   --is-shallow-repository` answers `true`, the skip line appears on stderr, and the process exits 0.
 - **AC6** — When `BASE_RESOLVE_CUTOFF` is set to `""`, the arm emits no sentinel and the run is
@@ -266,6 +276,19 @@ unit exists to close.
   grep is red before the edit, and that arm reds from the moment the engine gains the preset until
   the example declares it — the third carrier of S1 that no other criterion reaches.
 
+- **AC10** — When the `base` bullet is read in `memory/TEMPLATE-SPEC.md` after the change, it states
+  that the sha is RESOLVED on a live spec rather than only shape-checked, and
+  `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0, proving
+  `tools/memory-tree/SPEC-TEMPLATE.template.md` carries the same bytes. The phrase is absent from
+  both files today — `grep -cF 'resolved on a live spec' memory/TEMPLATE-SPEC.md` returns 0 at this
+  base — so the criterion is red before the edit and green after. figure: DERIVED, re-measured at
+  build time. This is S6's observer; before rev-4 S6 had none.
+- **AC11** — When the amended header of `tools/memory-tree/check-memory-hygiene.sh` is read, it names
+  BOTH streams truthfully: stdout for findings, stderr for announced skips and for
+  `resolve_python`'s refusal under a set-but-unusable `GOV_PYTHON`. Observed by reading the file, and
+  falsified by the header as this unit finds it, which mentions neither stream. The refusal block is
+  the file's only `>&2` today.
+
 ## 7. Gates
 
 Leg names are read from `tools/gate-legs.json`, never from a list typed here.
@@ -278,8 +301,11 @@ Leg names are read from `tools/gate-legs.json`, never from a list typed here.
 - `kit/dogfood doc parity` — `tools/memory-tree/kit-dogfood-parity.test.sh`, which byte-compares
   `memory/TEMPLATE-SPEC.md` against `tools/memory-tree/SPEC-TEMPLATE.template.md` and both
   `HYGIENE` and `BUILD-METHOD` pairs at `:53`.
-- `tools/check-kit-versions.sh` — the seven-carrier version marker, named because the two backlog
-  rows above record it being missed twice.
+- `kit version markers` — the leg `tools/check-kit-versions.sh` runs, named because the two backlog
+  rows above record the carrier set being missed twice. The count of carriers is not written here;
+  that script is the authority on it.
+- `verdict epoch (kit version dates the engine)` — this unit changes the engine, so the epoch leg
+  binds it. Round 2 found this leg missing from the §7 of every unit that touches the engine.
 - `bash tools/run-gates/run-gates.sh` at the push boundary. This is kit work, so the Definition of
   Done owes `GATE_FULL=1 GATE_SELFTESTS=1`.
 
@@ -306,6 +332,13 @@ No new gate leg. The arm is a finding inside check 12, which is already on the b
 
 - rev-1 · 2026-09-04 · initial draft.
 - rev-2 · 2026-09-05 · §8 · §2 · §3 · §4 · §5 · §6 · folded the owner's ruling on F1: live specs
+- rev-4 · 2026-09-05 · §2 · §4 · §6 · §7 · folded spec-audit round 2: H4 (S6 had no
+  observer — added AC10), M4 (§7 carried a script path where a leg name belongs, and omitted
+  `verdict epoch`), M7 (AC4's green was guaranteed by S2's terminal-status conjunct and proved
+  nothing about grandfathering — now says what it can and cannot show, with AC3 carrying the real
+  observation), M8 (the prescribed header amendment was false of the file before writing, because
+  stderr already carries `resolve_python`'s refusal — added AC11). Class sweep over all 23: also
+  converted the `run-gates.sh:1110-1111` pin to a text anchor per the build's citation rule.
   only, and the bypass it accepts became a requirement — S7 states it in check 12's catalog entry
   and its twin, AC8 grades it, §3 and §4 stop calling the widening an open decision, and §5's risk
   bullet names the residual rather than the fork.

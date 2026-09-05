@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 2 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 2 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -30,9 +30,11 @@ invalidated.
   derived in §4 below from the finding's own round-level distribution and from `A5`'s amended-arm
   count, not invented.
 - **S2b** — a FIFTH row, `§8`, whose set is §2, §4, §6 and every criterion naming an `F<n>` or a
-  `Q<n>`. BOTH spellings, because the corpus uses both: ten of this build's eleven forks are labelled
-  `F1`/`F2` and this spec's own is `Q1`, so an `F<n>`-only clause would have skipped the criteria of
-  the very spec that wrote it. Measured at the rev-3 fold. It is
+  `Q<n>`. BOTH spellings, because this build uses both: most of its §8 forks are labelled `F<n>` and
+  this spec's own is `Q1`, so an `F<n>`-only clause would have skipped the criteria of
+  the very spec that wrote it. The split is derived by grepping the build's §8 headings, never
+  counted here — every fold in this build resolves, adds or renames forks, so a pinned count is
+  wrong by the next `order` step. Measured at the rev-3 fold. It is
   listed separately from S2's four because it was not derived the same way: the four came from the
   measured round distribution, and this one came from RUNNING S2's table on a real fold and watching
   it miss. §8 is the section a fork resolution ALWAYS edits, so a table with no §8 row triggers no
@@ -40,9 +42,11 @@ invalidated.
   recorded in §4. The block also states that the table fires for EVERY section the fold ends up
   editing, not only the one it started in: the rev-3 fold of THIS spec edited §8 and §2, and it is
   §2's row, not §8's, that reaches §3 — where the non-goal contradicted by the ruling was sitting.
-- **S3** — `tools/memory-tree/SPEC-TEMPLATE.template.md:183` — `Review corrections fold in here; bump
-  the header rev and log it in §9.` — becomes a POINTER at M4's procedure and restates no row of it.
-  One text, one home.
+- **S3** — the fold clause in `tools/memory-tree/SPEC-TEMPLATE.template.md`, whose whole text is
+  `Review corrections fold in here; bump the header rev and log it in §9.`, becomes a POINTER at M4's
+  procedure and restates no row of it. One text, one home. The clause is cited by that sentence and
+  by no line number: `TOOL-aJoinedCanon-1` at `order` 1 inserts a `## REV_SCOPE_CUTOFF` explainer
+  into this same file above the skeleton, so every offset into it is stale before this unit builds.
 - **S4** — both live copies are re-rendered from the two templates by
   `bash tools/memory-tree/kit-dogfood-parity.test.sh --render`, never hand-edited, so
   `memory/guides/BUILD-METHOD.md` and `memory/TEMPLATE-SPEC.md` move in the same commit as their
@@ -68,6 +72,16 @@ invalidated.
   `gov:kit review-harness@` markers beside it. `tools/check-kit-versions.sh` requires the three to
   agree, and `tools/workflows/kit.toml` DERIVES the kit version from that same field, so there is no
   fourth carrier to move.
+- **S10** — `memory/guides/SESSION-KICKOFF.md` is re-stamped: `last-audit` moves to a fresh
+  `<ISO datetime> @ <sha>` per that manifest's own stamping rule, which this spec does not restate.
+  Not bookkeeping to taste. `memory/guides/BUILD-METHOD.md` is a `watch:` pathspec of that manifest
+  and its §B says so in its own words — editing it forces the manifest to be re-audited — so S1's
+  edit is a watched change, and check C5 of `skills/session-kickoff/manifest-check.sh` reds on a
+  watched change with no re-stamp at or after it. `last-body-change` does NOT move and §B gains no
+  delta line: this unit changes no gate command, entrypoint, layout convention or front-loaded
+  claim, and the charter's rule is "no delta → no touch". `TOOL-aJoinedCanon-1` carries the same
+  obligation as a Files-touched row; it is here because the reason applies to every unit that edits
+  a watched file, not because a sibling happened to write it down first.
 
 ## 3. Non-goals (OUT)
 
@@ -147,17 +161,22 @@ B1's measured round-level distribution. The §8 row comes from RUNNING those fou
 and watching them miss: this build's own rev-2 pass folded ten owner rulings across ten specs on
 2026-09-05, and a fork resolution edits §8 and often nothing else, so a four-row table keyed on the
 edited section fires no re-read at all on the single most common fold there is. Two stale clauses
-were caught in that pass by the mechanic rather than by the table — `TOOL-aJoinedCanon-1`'s AC1
-named a fixture whose date fell PRE-cutoff under the very cutoff the fold had just ratified, making
-a gate's own failing-case criterion unable to fail; and `TOOL-aJoinedCanon-3`'s AC5 still branched
-on the outcome of a fork that had just been decided. Both are criteria naming a fork id, which is
-why that clause is in the row rather than a bare section list. A table derived from where defects
+were caught in that pass by the mechanic rather than by the table — in `TOOL-aJoinedCanon-1`, a
+criterion naming a fixture whose date fell PRE-cutoff under the very cutoff the fold had just
+ratified, making a gate's own failing-case criterion unable to fail; and in
+`TOOL-aJoinedCanon-3`, a criterion still branching on the outcome of a fork that had just been
+decided. Both are criteria naming a fork id, which is why that clause is in the row rather than a
+bare section list. Neither is cited by its AC NUMBER, because both siblings are being folded again
+in this round and a criterion label is a literal a sibling moves. A table derived from where defects
 LAND cannot see the section a fold always TOUCHES, and only using it revealed that.
 
 Running it once more, on this spec at rev-3, moved the clause again. Both spellings are live in one
-build: ten of `aJoinedCanon`'s eleven forks are `F<n>` and this spec's is `Q1`, so the `F<n>`-only
+build: most of `aJoinedCanon`'s §8 forks are `F<n>` and this spec's is `Q1`, so the `F<n>`-only
 clause of rev-2 selected nothing here — the row would have gone quiet on the only spec whose author
-had read it. Hence `F<n>` or `Q<n>` in S2b. The same pass produced the transitivity sentence, for the
+had read it. The rev-3 text put a count on that split and the count was already wrong one round
+later, which is the reason this sentence now carries none: a fold resolves, adds and renames forks,
+so the population is derived by grepping the build's §8 headings at the moment anyone needs it.
+Hence `F<n>` or `Q<n>` in S2b. The same pass produced the transitivity sentence, for the
 same reason: the ruling's contradiction sat in §3, which no §8 row reaches, and only §2's row does.
 
 ### The third carrier, and why three carriers are still one mechanism
@@ -197,11 +216,12 @@ the pointer gains regression coverage no new arm had to be written for.
 | File | Change |
 |---|---|
 | `tools/memory-tree/BUILD-METHOD.template.md` | M4's fold sentence gains the procedure block |
-| `tools/memory-tree/SPEC-TEMPLATE.template.md` | line 183's clause becomes a pointer at M4 |
+| `tools/memory-tree/SPEC-TEMPLATE.template.md` | the fold clause becomes a pointer at M4 |
 | `memory/guides/BUILD-METHOD.md` | RENDERED, not hand-edited |
 | `memory/TEMPLATE-SPEC.md` | RENDERED, not hand-edited |
 | `tools/workflows/tier2-review.js` | the `isSpec` fold-review priming gains the pointer; version 1.6 -> 1.7 |
 | `memory/project/method-carriers.txt` | one row declaring the harness a pointer |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp only; no body delta (S10) |
 
 The render direction is the parity test's own, stated in its header: `--render` writes TEMPLATE ->
 LIVE, and hand-editing the live copy is what the leg exists to catch.
@@ -219,7 +239,9 @@ LIVE, and hand-editing the live copy is what the leg exists to catch.
   `tools/memory-tree/SPEC-TEMPLATE.template.md` is not in `memory/project/method-carriers.txt`. The
   path spelling would therefore red the `method carriers (every pointer declared)` leg until a
   registry row is added. Rejected in favour of the pathless `BUILD-METHOD M4` spelling the same file
-  already uses at line 138 for M7 — zero new gate obligation. A builder who wants the path anyway
+  already uses in its §10 bullet, `BUILD-METHOD M7's regrounding step 5 re-runs the query FROM that
+  line` — zero new gate obligation. Cited by that sentence rather than by an offset, because
+  `TOOL-aJoinedCanon-1` inserts into this file at `order` 1. A builder who wants the path anyway
   owes the registry row and now knows it.
 - **Restate the gotcha record's four practices in M4.** Two carriers of one rule is the shape that rot
   is measured in, and the gotcha's own fourth practice is about exactly that failure.
@@ -273,23 +295,36 @@ LIVE, and hand-editing the live copy is what the leg exists to catch.
 - **AC1** — When M4 of `memory/guides/BUILD-METHOD.md` is read at HEAD, its fold sentence is followed
   by a re-read table with one row each for `§2`, `§4`, `§6`, `§7` and `§8`; the §4 row lists §2, §6
   and §7; the §8 row lists §2, §4, §6 and criteria naming an `F<n>` OR a `Q<n>`; and the block
-  states that every section the fold ends up editing fires its own row, not only the first.
+  states that every section the fold ends up editing fires its own row, not only the first. The
+  block also contains the literal `fold-text-is-unreviewed-surface` and closes by deferring the log
+  line to §9's own rule without spelling a rev-line grammar of its own, which are S1's pointer and
+  S5's deferral — the two halves of this unit no other criterion reads. Both are red before the
+  edit: `grep -c fold-text-is-unreviewed-surface memory/guides/BUILD-METHOD.md` returns 0 at base,
+  measured at rev-4, and no fold procedure exists there to defer anything.
 - **AC2** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs on the landing commit, it
-  exits 0, proving both live copies were produced by `--render` from
-  `tools/memory-tree/BUILD-METHOD.template.md` and `tools/memory-tree/SPEC-TEMPLATE.template.md`
-  rather than hand-edited.
-- **AC3** — When the fold clause at `memory/TEMPLATE-SPEC.md:183` is read, it names `BUILD-METHOD` M4
-  and contains no row of the table, so `grep -c 'Re-read, in this order' memory/TEMPLATE-SPEC.md`
-  returns 0 while the same grep over `memory/guides/BUILD-METHOD.md` returns 1.
+  exits 0. This is a SAMENESS compare and nothing more: it proves each live copy is the `--render`
+  of its template rather than a hand-edit, and it is equally green when neither half moved. Every
+  content claim of this unit is AC1's and AC3's; AC2 observes S4 alone.
+- **AC3** — When the fold clause in `memory/TEMPLATE-SPEC.md` — the one whose base text is
+  `Review corrections fold in here; bump the header rev and log it in §9.` — is read, it names
+  `BUILD-METHOD` M4 and contains no row of the table, so
+  `grep -c 'Re-read, in this order' memory/TEMPLATE-SPEC.md` returns 0 while the same grep over
+  `memory/guides/BUILD-METHOD.md` returns 1. Both greps return 0 at base, measured at rev-4, so the
+  BUILD-METHOD half of this pair is red before the edit.
 - **AC4** — When `bash tools/memory-tree/check-method-carriers.sh` runs after the edit, it exits 0.
   The `SPEC-TEMPLATE.template.md` pointer adds no row, because it uses the pathless
   `BUILD-METHOD M4` spelling; `memory/project/method-carriers.txt` gains EXACTLY one row, for
   `tools/workflows/tier2-review.js`, whose pointer spells the path. Reverting that one row while
   keeping the harness edit reds the leg's check 3, which is the failing case this criterion is
   written against.
-- **AC5** — When `python tools/memory-tree/gotchas.py --for-diff <base>..HEAD` is run over this unit's
-  own diff, `fold-text-is-unreviewed-surface` appears in the checklist, because that record's derived
-  anchors include `memory/guides/BUILD-METHOD.md`.
+- **AC5** — When `python tools/memory-tree/gotchas.py --for-diff <base>..HEAD` is run over this
+  unit's own diff, `fold-text-is-unreviewed-surface` appears in the checklist. What this observes is
+  the ROUTING and only that: this unit's write set reaches the record's anchors, so a reviewer of
+  this diff is handed the class. It observes nothing about the pointer S1 requires — that record
+  already anchors `memory/guides/BUILD-METHOD.md` and `tools/workflows/tier2-review.js`, so this
+  criterion is green the moment the diff touches either file and would be green with the pointer
+  never written. AC1 carries the pointer. Stated because the rev-3 text let this criterion stand in
+  for S1, which is the shape where a criterion grades a tool's output instead of the tree.
 - **AC6** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs at the push
   boundary, `memory hygiene`, `kit version markers`, `kit/dogfood doc parity`,
   `method carriers (every pointer declared)`, `workflow script syntax` and `tier2-review self-test`
@@ -308,6 +343,13 @@ LIVE, and hand-editing the live copy is what the leg exists to catch.
   `node tools/workflows/check-workflow-syntax.js` are run on the landing commit, both exit 0, proving
   the added prompt text neither broke the script's restricted-runtime parse nor moved an argument
   arm the suite pins.
+- **AC10** — When `bash skills/session-kickoff/manifest-check.sh` runs on the landing commit it
+  exits 0, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` names a sha at or after the commit
+  that edits `memory/guides/BUILD-METHOD.md`. The failing case is the revert of S10 alone: keep the
+  M4 edit, restore the old stamp, and check C5 — `no unaudited watch drift` — reds naming
+  `memory/guides/BUILD-METHOD.md` as a watched file changed with no re-stamp. `last-body-change` is
+  the SAME sha before and after, which is the half of the criterion that observes the "no delta → no
+  touch" side of the rule rather than the re-stamp side.
 
 ## 7. Gates
 
@@ -328,6 +370,9 @@ Legs this unit must keep green, all named as they appear in `tools/gate-legs.jso
   now kit work.
 - `agent-cap restatement` — binds `tools/workflows/tier2-review.js` and is UNAFFECTED: the added
   sentence touches no restated cap value.
+- `kickoff-manifest ratchet` — `subject = repo`, no guard, so it runs on every bar. It is on this
+  list because `memory/guides/BUILD-METHOD.md` is a `watch:` pathspec of the manifest S10 re-stamps;
+  see AC10 for the observed red.
 - `memory hygiene` — this spec is itself graded by check 12.
 
 `line length` is deliberately NOT in that list, and rev-2 was wrong to claim it. Verified at HEAD:
@@ -336,6 +381,14 @@ which today are `AGENTS.md` and `coding-governance-agents.template.md`. It reads
 six files, so naming it as a leg this unit keeps green claimed a measurement that never happens. The
 ~100-column wrap in both documents is the writing rule from `memory/TEMPLATE-SPEC.md`, enforced by
 review and not by that gate.
+
+`verdict epoch (kit version dates the engine)` is NOT owed either, and the reason is worth one line
+because this unit does bump a kit version and a reader will reach for it. Verified at HEAD: that gate
+scans `tools/memory-tree/check-memory-hygiene.sh` and a named delegate list, and it grades
+`KIT_MEMORY_TREE_VERSION`. This unit touches no engine file and moves no memory-tree constant, so
+that gate has nothing to say about it. The version it does move, `tier2-review`/`review-harness`, is
+paired by `kit version markers` alone. Two version gates exist and only one binds here; saying which
+is what stops the next fold from adding the wrong one.
 
 **This unit adds NO gate arm, deliberately, and the argument is re-made for three carriers.** For the
 two DOCUMENT carriers it is unchanged: a re-read is an ACT, not an artifact, nothing in the tree
@@ -393,6 +446,37 @@ lands. The exemption's compensating check is recorded in §5's testing row, per 
   schema and every return key are untouched, so no shared contract moves — the version bump moves a
   contract's VALUE, which is what that contract exists to carry, not its shape. One stream, one node,
   no merge. The unit stays mechanical and additive, so Tier-1 holds and the header is unchanged.
+- rev-4 · 2026-09-05 · §2 · §4 · §6 · §7 · folded spec-audit round 2, and swept all 23 of its defect
+  classes over this spec rather than only the two it addressed here. NAMED FINDINGS. H8: AC5 stood
+  in for S1's pointer while grading only that `gotchas.py --for-diff` selects a record whose own
+  anchors this diff already touches — AC1 now requires the literal `fold-text-is-unreviewed-surface`
+  in the M4 block against a measured base count of 0, and AC5 says what it actually observes. M2:
+  the three `:183` pins in S3, AC3 and the Files-touched row and the `line 138` pin in §4 became
+  literal-text anchors, the last one quoting the §10 bullet's own sentence.
+  FOUND BY THE SWEEP, not by a finding of this unit's. H1's class, the largest hit of the round:
+  `memory/guides/BUILD-METHOD.md` is a `watch:` pathspec of `memory/guides/SESSION-KICKOFF.md`, so
+  S1's edit owes a `last-audit` re-stamp that no scope item, no Files-touched row, no criterion and
+  no leg carried — added as S10, a table row, AC10 and the `kickoff-manifest ratchet` leg, with
+  check C5 as the observed red. `TOOL-aJoinedCanon-1` already carried the same obligation, which is
+  the round's dominant shape exactly. M1/L1/M3's class: "ten of this build's eleven forks" in §2 and
+  §4 was wrong at rev-4 and is a population every fold moves, so both sites now derive it. H3/H5's
+  class: AC2 is restated as the sameness compare it is, and S5's deferral to §9's grammar — a scope
+  item no criterion read — folded into AC1. M4's class: `verdict epoch` is stated as NOT owed, with
+  the reason, since this unit bumps a kit version and the wrong version gate is the obvious wrong
+  guess. M9's class: two sibling criteria cited in §4 by AC number are now cited by content, because
+  both siblings are being folded in this same round. SWEPT AND ABSENT: B1 (this unit adds no awk arm
+  and no cutoff key), H2/H4/M6/M10 (every remaining S item has a criterion; no `Observed by` tags
+  exist at `order` 2), H6 (every invocation in §6 was RUN or read at source — the parity test's
+  `--render`, `check-method-carriers.sh` checks 3 and 4, the three-token loop in
+  `check-kit-versions.sh`, both workflow suites, and C5), H7 (AC8's three-token claim is what that
+  loop performs), H9/L2 (the `aBoundedVerdict:534` pin is correct at HEAD and sits outside this
+  build's write set), H10 (no design argument here rests on a shape unit 1 restructures), M5 (no
+  decision here is justified by a checker behaviour unit 7 changes; the slash-carrying leg name is
+  listed, not argued from), M7 (no criterion claims a whole-tree green proves an unexercised guard),
+  M8 (this unit prescribes no header amendment). RE-READ TABLE, run on itself: §2 fired §3 and §6 —
+  §3's non-goals survive S10, since it adds no arm and no conf key; §4 fired §2, §6 and §7, which is
+  what caught that the new obligation needed all three; §6 fired §2 and §7; §7 fired §6. §5 is in no
+  fired row and is deliberately untouched.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 5 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 5 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -28,16 +28,19 @@ of those four things going unsaid.
 - **S1** — An instructional block added to §6 of `tools/memory-tree/SPEC-TEMPLATE.template.md`,
   inside the skeleton fence, naming the four preconditions as four named sub-fields — `cost:`,
   `permission:`, `fixture:`, `figure:` — written as lines under the criterion's own bullet, and
-  stating that a field which does not apply is OMITTED rather than written as `none`.
+  stating that a field which does not apply is OMITTED rather than written as `none`. Observed by
+  AC7 for the four spellings and AC2 for the cost-and-permission silence the finding measured.
 - **S1b** — One bullet added to the `## Writing rules` list of the same file, OUTSIDE the skeleton
   fence, stating that a measured number a spec pins says whether it is DERIVED or PINNED, in any
   section. This is the owner's ruling of 2026-09-05 on §8's F2, against this spec's own
   recommendation of §6 alone. That bullet OWNS the obligation; §6's `figure:` field points at it and
-  restates none of it, which is the ownership decision §4 records.
+  restates none of it, which is the ownership decision §4 records. Observed by AC6.
 - **S2** — Both edits present in `memory/TEMPLATE-SPEC.md`, produced by re-rendering the twin
-  rather than by hand-editing the live copy.
+  rather than by hand-editing the live copy. Observed by AC1, which grades SAMENESS and nothing
+  else, in company with AC2, AC6 and AC7, which read the rendered content.
 - **S3** — This spec's own §6 written in the shape S1 proposes, so the first instance of the rule
   exists in the tree on the day the rule lands rather than being asserted about a future author.
+  Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -96,8 +99,9 @@ The owner ruled on 2026-09-05 that the rule lands in BOTH §6 and the Writing ru
 spec's recommendation of §6 alone. That widening carries a cost this spec named while recommending
 against it: the unit now writes to two places in one document, and two copies of one rule in one
 document is exactly the drift this build exists to close. So ONE of the two locations owns the rule
-and the other points at it, the same one-text-one-home split `TOOL-aJoinedCanon-2` makes when
-`tools/memory-tree/SPEC-TEMPLATE.template.md:183` becomes a pointer at BUILD-METHOD M4.
+and the other points at it, the same one-text-one-home split `TOOL-aJoinedCanon-2` makes when the
+fold clause `Review corrections fold in here; bump the header rev and log it in §9.` in
+`tools/memory-tree/SPEC-TEMPLATE.template.md` becomes a pointer at BUILD-METHOD M4.
 
 **The Writing rules OWN it. §6's `figure:` field is its instance and restates none of it.** The
 decision is by READER, not by subject. A Writing rule is read by an author filling ANY section; the
@@ -130,6 +134,9 @@ bullet:
 - `cost:` — what the observation costs, when it is not seconds.
 - `permission:` — the suite, boundary or credential that observes it is one THIS run may not execute.
 - `fixture:` — the live instance or path the observation needs, and whether the tree holds one today.
+  A criterion observing a gate arm names every cutoff key its fixture conf arms: an arm sitting
+  inside a second key's guard is graded by nobody when that second key is blank, and the fixture
+  that arms both cannot tell you so.
 - `figure:` — whether a number the criterion states is DERIVED at observation time or PINNED as a
   literal. The writing rule on measured numbers states the obligation; this field is where a
   criterion answers it.
@@ -157,28 +164,41 @@ ruling. The ownership direction is not indicative either — a second copy of th
 
 ### Where it goes, and why that placement is not arbitrary
 
-Inside the skeleton, after the witness paragraph and before the author's own bullets. Verified
-against `tools/memory-tree/check-memory-hygiene.sh:1020-1048`: the acceptance-witness arm sets `lab`
-only on a line matching its AC-label regex and appends every later line to `acc` until the next
-label or the next `## `. Instructional prose sitting ABOVE an author's first bullet is therefore
-read with `lab` empty and can satisfy nothing. Prose left BELOW an author's last bullet would fold
-its backticks into that bullet's witness blob, which is why the paragraph joins the existing §6
-instructions rather than trailing the section. The hazard is pre-existing and unchanged in kind —
-the two paragraphs already there carry backticks — and it is recorded because a later editor moving
-this text down would silently weaken the witness arm.
+Inside the skeleton, after the witness paragraph and before the author's own bullets. At `order` 4
+`TOOL-aJoinedCanon-4` adds its own `Red when:` paragraph to this same block, so this one follows
+that: two instructional paragraphs, one placement question, and the later-`order` unit is the one
+that has to know.
+
+Verified against the block under `# ---- acceptance witnesses:` in
+`tools/memory-tree/check-memory-hygiene.sh`: the acceptance-witness arm sets `lab` only on a line
+matching its AC-label regex and appends every later line to `acc` until the next label or the next
+`## `. Instructional prose sitting ABOVE an author's first bullet is therefore read with `lab` empty
+and can satisfy nothing. Prose left BELOW an author's last bullet would fold its backticks into that
+bullet's witness blob, which is why the paragraph joins the existing §6 instructions rather than
+trailing the section. The hazard is pre-existing and unchanged in kind — the two paragraphs already
+there carry backticks — and it is recorded because a later editor moving this text down would
+silently weaken the witness arm.
+
+**That verification was made against a structure `TOOL-aJoinedCanon-4` restructures first, and it is
+re-run at build time rather than trusted.** Unit 4's S3 HOISTS this accumulator out of the
+`if (wcut != "" && fdate != "" && fdate >= wcut) {` guard it sits in today, so at `order` 5 the loop
+runs under different conditions and at a different indent. Nothing above depends on the guard — the
+argument is about where `lab` is set and what `acc` swallows, and the hoist moves neither — but
+"nothing depends on it" is a claim about code that has changed, so re-read the hoisted loop before
+placing the paragraph and correct this sub-section if the `lab` semantics moved with it.
 
 Two consequences of the four-field shape land on that same arm, and both were checked against the
 source rather than assumed. The block's own field-name bullets cannot be misread as criteria: the
-label regex at :1039 requires `AC[0-9]+` after an optional list marker, so a field-name bullet is
-instructional prose like the paragraphs beside it. And a sub-field line under a real criterion IS
-appended to that criterion's witness blob, because `acc` accumulates every line until the next label
-— so a bullet whose only backticked token sits in its `fixture:` line satisfies the witness arm
-while the criterion sentence itself names nothing. That was already true of any continuation line
-and is not a regression, but four permitted lines widen the surface, and an author reading this
-should put the witness in the criterion and let the fields add to it.
+label regex — the line matching `AC[0-9]+[a-z]?` after an optional list marker — requires that
+label, so a field-name bullet is instructional prose like the paragraphs beside it. And a sub-field
+line under a real criterion IS appended to that criterion's witness blob, because `acc` accumulates
+every line until the next label — so a bullet whose only backticked token sits in its `fixture:`
+line satisfies the witness arm while the criterion sentence itself names nothing. That was already
+true of any continuation line and is not a regression, but four permitted lines widen the surface,
+and an author reading this should put the witness in the criterion and let the fields add to it.
 
-The Writing-rules bullet sits OUTSIDE that fence, at `memory/TEMPLATE-SPEC.md:85`'s list, and none
-of the paragraph above reaches it. The witness arm scans a spec's own §6, and the Writing rules are
+The Writing-rules bullet sits OUTSIDE that fence, in the list under the `## Writing rules` heading,
+and none of the paragraph above reaches it. The witness arm scans a spec's own §6, and the Writing rules are
 never copied into a spec — they are read while writing one. So the second half carries no arm
 interaction at all, and its only placement constraint is the one it takes for free: it goes directly
 under the writing-time verification bullet, because it is that bullet's seam and a reader must not
@@ -195,9 +215,19 @@ have to hold the two apart.
 files, so the unit still touches two paths, adds no code, crosses no contract and moves no gate —
 which is why the header stays Tier-1 after the fold rather than moving with the scope.
 
-Roughly 1,450 B added to each, against 16,913 B and 16,906 B today. That figure is an ESTIMATE from
-the draft text above and not a measurement; the observation in AC4 derives it rather than repeating
-it. It rose from rev-1's roughly 900 B for the four named fields, and again at rev-3 for F2's
+**No version bump is owed, and that was checked rather than assumed.** Both shipped templates carry
+a `gov:kit memory-tree@` marker that `tools/check-kit-versions.sh` compares against
+`KIT_MEMORY_TREE_VERSION`, so editing a template body while leaving the constant alone keeps that
+leg GREEN — every carrier still agrees. `tools/memory-tree/check-verdict-epoch.sh` scans the engine
+and its named delegates for behaviour-bearing lines, and this unit touches none of them: it adds no
+arm and moves no verdict. Sibling units that DO change the engine owe both legs; this one owes
+neither, which is why no version carrier appears in the table above.
+
+Roughly 1,450 B added to each. That figure is PINNED — an ESTIMATE from the draft text above and
+not a measurement — and the pre-change sizes are deliberately not pinned beside it, because AC4
+derives the before-and-after pair at observation time and a byte count typed here is stale the
+moment any of the five lower-`order` units re-renders the pair. The estimate rose from rev-1's
+roughly 900 B for the four named fields, and again at rev-3 for F2's
 Writing-rules bullet net of the clause that bullet takes out of `figure:`. Verified 2026-09-04
 that no size gate binds either file: neither has a row in
 `tools/template-size-limits.txt`, and `bash tools/memory-tree/check-memory-hygiene.sh
@@ -208,9 +238,12 @@ reach it.
 
 None. No cutoff key is declared, and that is compliance with this build's dated-cutoff rule rather
 than an exception to it: a cutoff exists so a new machine-graded demand cannot red landed work, and
-this unit adds no machine-graded demand. Declaring one would put a dead key in
-`.memory-tree.conf` that nothing reads — which is the defect `TOOL-aJoinedCanon-10` exists to
-repair one instance of.
+this unit adds no machine-graded demand. Declaring one would put a key in `.memory-tree.conf` that
+no arm reads — a key that reads as armed with nothing behind it, which is the mirror image of the
+defect `TOOL-aJoinedCanon-10` repairs rather than the same one. Unit 10's key IS read by the engine
+and is missing from this repo's conf; this one would be present and read by nothing. Both directions
+break the same join, and this build's dated-cutoff rule forbids the second as plainly as unit 10
+repairs the first.
 
 ### Alternatives rejected
 
@@ -221,7 +254,9 @@ repair one instance of.
   OVERRULED by the owner on 2026-09-05. Recorded here as the rejected alternative it now is; the
   argument for it, and the cost the ruling accepts, stay in F1 rather than being re-litigated here.
 - **A required field set plus an arm that demands all four per bullet.** Rejected: four names that
-  have nothing to say get typed as `none` across 1,404 AC lines and the gate then measures typing.
+  have nothing to say get typed as `none` across the corpus's AC lines — 1,404 of them, PINNED as
+  measured 2026-09-04 at base `750ca0ca`, and rising as this build's own eleven specs add criteria —
+  and the gate then measures typing.
   This is the same rejection rev-1 made against a required `Preconditions:` line, and the ruling
   makes it four times louder rather than retiring it. §7.
 - **The derived-or-pinned rule in §6 ALONE.** This spec's own recommendation in §8's F2, and
@@ -270,11 +305,15 @@ repair one instance of.
 
 *This section is written in the shape S1 proposes, which is the owner's ruling of 2026-09-05 on
 §8's F1 and not this spec's recommendation. Each criterion carries only the sub-fields that apply,
-and AC1 and AC5 show what the omission looks like in practice. AC6 observes S1b, the second carrier
-F2's ruling added on the same day.*
+and AC5 shows what the omission looks like in practice. AC6 observes S1b, the second carrier F2's
+ruling added on the same day, and AC7 observes that the four spellings the ruling names actually
+reached the rendered file — the content half AC1's sameness compare cannot supply.*
 
 - **AC1** — When the block is added to `tools/memory-tree/SPEC-TEMPLATE.template.md` and the live
-  copy is re-rendered, `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0.
+  copy is re-rendered, `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0, proving
+  `memory/TEMPLATE-SPEC.md` matches the template rather than having been hand-edited. It grades
+  SAMENESS, and is equally green when NEITHER file was touched, so it observes S2 only in company
+  with AC2, AC6 and AC7, which supply the content half.
   fixture: the live copy must be the RENDERED one, so `--render` must have been run; a hand-edited
   `memory/TEMPLATE-SPEC.md` fails this criterion rather than satisfying it.
 - **AC2** — When `grep -ciE 'cost|budget|minutes|hours' memory/TEMPLATE-SPEC.md` is run after the
@@ -282,7 +321,14 @@ F2's ruling added on the same day.*
   figure: the `0` is DERIVED, measured on this branch at base `750ca0ca` on 2026-09-04, not
   inherited from the finding; re-derive it on the pre-change tree if the after-count is disputed.
 - **AC3** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over the whole tree, it exits
-  0, and no spec in `memory/builds/*/spec/` is newly named by check 12.
+  0, and no spec in `memory/builds/*/spec/` is newly named by check 12. **This green is a regression
+  guard and not an observation of the added text, and the difference is stated because a green that
+  cannot fail reads like coverage.** The section canon is the hardcoded `SPEC_CANON` constant in
+  `tools/memory-tree/check-memory-hygiene.sh`, not a list read from the template, so no edit to the
+  template can red a landed spec through this check — verified at source rather than assumed, and it
+  is the opposite of what an earlier draft of this criterion claimed. The hazard a `## ` heading in
+  the added block WOULD create is a template skeleton that disagrees with that constant, which reds
+  the next author's spec and not this landing; nothing in §6 catches it, and the diff review does.
   cost: minutes rather than seconds on this node, which is exactly why the cheaper `--staged` form
   does not substitute — it grades only the diff and would report a green that means nothing here.
 - **AC4** — When `wc -c` is taken over both files before and after, the growth is reported as the
@@ -300,17 +346,33 @@ F2's ruling added on the same day.*
   carrier F2's ruling requires exists and is in the Writing rules rather than only in §6. AC1
   through AC5 all observe the §6 half; without this one the wider placement ships ungraded.
   figure: the `0` is DERIVED, re-measured on this branch at base `750ca0ca` on 2026-09-05. The
-  whole-file count of `PINNED` or `DERIVED` is not `0` today — `memory/TEMPLATE-SPEC.md:80` already
-  carries one — which is why the range is scoped and an unscoped grep would not fail before the
-  change.
+  whole-file count of `PINNED` or `DERIVED` is not `0` today — the `order` bullet ending
+  `DERIVED from this field, which is why the order belongs on the spec and not in README prose.`
+  already carries one — which is why the range is scoped and an unscoped grep would not fail before
+  the change.
   fixture: a no-match `grep -c` exits non-zero while printing `0`, so this reads the printed count
   and never a `&&` chain's exit status.
+- **AC7** — When
+  ``sed -n '/^## 6. Acceptance criteria/,/^## 7. Gates/p' memory/TEMPLATE-SPEC.md | grep -cE '`(cost|permission|fixture|figure):`'``
+  is run after the render, it returns 4 — one for each spelling the owner's F1 ruling names, inside
+  the §6 skeleton block rather than anywhere in the file.
+  figure: the pre-change count is DERIVED, measured as `0` on this branch at base `750ca0ca` on
+  2026-09-05, so this cannot be green until the four fields exist. AC2's whole-file `cost` grep is
+  the finding's own silence measure and reaches one of the four; this criterion is the one that
+  fails when a rendering spells them otherwise, which §4 calls a failed landing of the ruling.
 
 ## 7. Gates
 
-Kept green, by name from `tools/gate-legs.json`: `memory hygiene`, `kit/dogfood doc parity`. The
-whole bar is `bash tools/run-gates/run-gates.sh`; those two are the legs this diff can actually
-move.
+Kept green, by name from `tools/gate-legs.json`: `memory hygiene`, `kit/dogfood doc parity`. Both
+spellings were read out of the manifest rather than typed from memory, and the whole bar —
+`bash tools/run-gates/run-gates.sh` — is the DoD's invocation rather than a third leg name.
+
+**`kit version markers` and `verdict epoch (kit version dates the engine)` are NOT owed, and that
+was checked at source rather than left silent.** Every sibling unit touching the engine carries
+both; this unit touches no engine file, so `verdict epoch` sees no behaviour-bearing line move, and
+editing a template body without moving `KIT_MEMORY_TREE_VERSION` leaves every `gov:kit
+memory-tree@` carrier in agreement, so `kit version markers` stays green on its own terms rather
+than by omission. §4's Files-touched note carries the same finding where a builder reads it.
 
 **This unit adds no gate, and neither ruling of 2026-09-05 changes that.** The charter binds a
 new arm to an observed failing case, and there is no failing case to observe. Four named fields make
@@ -393,12 +455,33 @@ this spec will say for the shape it did not recommend. It is still not smuggled 
   from an arm than the first. The Tier field was re-checked and stays 1: both halves land in the
   same two files §4 already listed. This entry supersedes rev-2's closing clause, which recorded F2
   as unresolved and the header as unratified — true at rev-2, false now.
+- rev-4 · 2026-09-05 · §2 · §4 · §6 · §7 · §9 · §10 · folded round 2's H10 and swept all 23 of its
+  defect classes over this spec, which the round-1 fold never opened. **H10, the named finding:**
+  every anchor into a file a sibling edits is now literal text — the accumulator is cited as the
+  block under `# ---- acceptance witnesses:`, the label regex as the line matching `AC[0-9]+[a-z]?`,
+  unit 2's fold clause and the `## Writing rules` heading by their own words, and AC6's existing
+  DERIVED instance by the `order` bullet's sentence. The two byte baselines are dropped, because AC4
+  derives the pair. §4's placement sub-section now says outright that its verification was made
+  against a loop `TOOL-aJoinedCanon-4` hoists at `order` 4 and must be re-run before the paragraph
+  is placed, and it states where this paragraph sits relative to unit 4's own `Red when:` block.
+  **The classes that hit beyond H10:** the H2/H3/H5 false-observer shape — AC1 is restated as the
+  SAMENESS compare it is and AC7 is added for the four field spellings, whose pre-change count in
+  §6's skeleton range is a derived `0`; the H4/M10 join shape — S1, S1b, S2 and S3 gained `Observed
+  by` tags, each true of the whole scope item; the H6 could-not-fail shape — AC3's failing case was
+  written, then checked against `SPEC_CANON` and found FALSE, so AC3 now states that the canon is a
+  hardcoded engine constant and that this green is a regression guard rather than an observation of
+  the added text, which is M7's class in the same edit; the M9 shape — §4's Migration cited
+  `TOOL-aJoinedCanon-10` for the inverse of unit 10's actual defect and now names both directions;
+  the H1/M4 shape — §4 and §7 record that `kit version markers` and `verdict epoch` are not owed
+  here and why, verified at both scripts' source. §4's `1,404` and §10's probe counts are now marked
+  PINNED with the date they were measured, which is this unit's own rule applied to itself.
 
 ## 10. Reuse audit
 
 No existing seam fits, and the evidence is that the closest candidates are all the wrong kind of
 thing. `python tools/codebase-map/reuse_lookup.py "declaring the preconditions an acceptance
-observation needs before it can be run"` returned 645 symbols over 20 dossiers and its ranked
+observation needs before it can be run"` returned 645 symbols over 20 dossiers — both PINNED, from
+one probe run on 2026-09-04 at base `750ca0ca` — and its ranked
 candidates are code seams — `extract_declarations`, `read_declared_keys`, `load_declarations`,
 `declared_in_kits_json` — every one of them a reader of a machine declaration in a conf or a
 registry. There is no seam for a PROSE declaration in a template, because this unit adds no code and
@@ -414,4 +497,5 @@ build that had no section asking for it.
 
 Recall terms used: `acceptance criterion cost budget minutes fixture permission derived figure stale
 literal precondition witness`, passed to `python tools/memory-recall/query.py "does any spec section
-already declare an acceptance criterion cost, permission or fixture precondition"` for 38 hits.
+already declare an acceptance criterion cost, permission or fixture precondition"` for 38 hits,
+PINNED from that same run.

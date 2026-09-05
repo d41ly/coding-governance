@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-1 — the revision log becomes a structured entry
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -21,18 +21,25 @@ almost nothing about where, which is the mechanism behind the corpus's dominant 
 
 - **S1** — A `## REV_SCOPE_CUTOFF` section in `tools/memory-tree/SPEC-TEMPLATE.template.md` stating
   the entry grammar: a rev line is `- rev-<N> · <date> · <scope> · <what moved>`, where `<scope>` is
-  one or more `§<n>`, `S<n>` or `AC<n>` tokens. It states that the gate reads SHAPE only, and that
-  the token may sit anywhere in the entry including a wrapped continuation line.
+  one or more `§<n>`, `S<n>` or `AC<n>` tokens, separated by spaces, commas or the `·` this corpus
+  already writes its status fields with. It states that the gate reads SHAPE only, and that the
+  token may sit anywhere in the entry including a wrapped continuation line. Observed by AC14.
 - **S2** — The §9 skeleton example in the same file stops modelling the uninformative form. Both
   example lines move: `rev-1` keeps `initial draft`, and the `rev-2` example gains a scope field.
+  Observed by AC14.
 - **S3** — A check-12 arm: for a spec whose FILENAME date is at or after `REV_SCOPE_CUTOFF`, every
   §9 entry whose rev number is 2 or greater must carry at least one scope token. The arm is
-  per-ENTRY with continuation lines folded in, and it runs on BOTH tiers.
+  per-ENTRY with continuation lines folded in, it runs on BOTH tiers, and `REV_SCOPE_CUTOFF` is its
+  ONLY date guard — it does not nest inside another cutoff's block. Observed by AC1–AC5 for the
+  behaviour and by AC15 for the independence.
 - **S4** — The `REV_SCOPE_CUTOFF` key in all THREE of its carriers: preset blank in
   `check-memory-hygiene.sh` above the conf source, bound into the one batched awk as `-v` and
   guarded by an explicit non-empty test; declared in `.memory-tree.conf` with the evidence for the
   date chosen; and shipped blank in `tools/memory-tree/.memory-tree.conf.example`. §4's Migration
-  says why the third carrier is not bookkeeping. Observed by AC13.
+  says why the third carrier is not bookkeeping. Observed by AC13 for the shipped example ONLY;
+  the preset and the `-v` binding are observed by AC1 and AC6, which are what make the arm fire
+  under a valued key and fall silent under a blank one, and an unpreset key aborts the gate before
+  any criterion runs at all.
 - **S5** — A zero-population notice on the same footing as the §10 evidence arm's, so an arm that
   grades no spec in this corpus says so instead of printing a silent green. Observed by AC12.
 - **S6** — Fixtures in `check-memory-hygiene.test.sh` covering the red, the pre-cutoff
@@ -40,29 +47,39 @@ almost nothing about where, which is the mechanism behind the corpus's dominant 
   red is OBSERVED before the arm lands. They take `tFixture-90` upward, which is not a free-block
   claim measured against the file's high-water but the block the build README's number-space rule
   allocates to this unit by `order` — `80 + 10N`, N = 1 — so a sibling landing later cannot collide
-  with it whatever the file looks like by then. This unit's whole claim is 90 through 95.
+  with it whatever the file looks like by then. This unit's whole claim is 90 through 95. Observed
+  by AC1–AC6.
 - **S7** — The check-12 paragraph in `tools/memory-tree/HYGIENE.template.md` gains the arm, in the
-  two sentences its sibling ratchets each get.
+  two sentences its sibling ratchets each get. Observed by AC14.
 - **S8** — The landing bookkeeping this kit's own gates demand: `KIT_MEMORY_TREE_VERSION` bumped
   and the `gov:kit memory-tree@` marker moved in every carrier, both doc pairs re-rendered from
-  their templates, and `memory/guides/SESSION-KICKOFF.md` re-stamped.
+  their templates, and `memory/guides/SESSION-KICKOFF.md` re-stamped. Observed by AC9 for the
+  version bump, AC8 for the re-render, and AC11 for the re-stamp.
 
 ## 3. Non-goals (OUT)
 
 - **Trimming, capping or summarising §9.** §9 is load-bearing in four places and this unit
-  structures the entry rather than shortening it. Verified at writing time: `memory/HYGIENE.md:299`
-  defines the acceptance ledger's `AMENDED` form as naming "the section 9 line that logs it";
-  `memory/guides/BUILD-METHOD.md:207` (M7 step 4) has a regrounding session read the current
-  sub-spec whole; `tools/drift-audit/drift_report.py:1281-1294` parses §9 entries as the evidence
-  side of its build-README mechanism-drift signal; and the findings record's B2 closes by naming
-  A5, A4 and B2 itself as resting on §9 lines as their evidence carrier.
+  structures the entry rather than shortening it. Re-verified at this fold, and cited by source text
+  rather than by line because three of these four files are in this build's shared write set:
+  `memory/HYGIENE.md`'s acceptance-ledger skeleton defines the `AMENDED` form as the line
+  `- AC2 — amended rev-<n> — the change, and the section 9 line that logs it`;
+  `memory/guides/BUILD-METHOD.md` M7's step `4. The CURRENT sub-spec, whole` has a regrounding
+  session read it; `_REVLOG_RE` and the entry loop beneath it in `tools/drift-audit/drift_report.py`
+  parse §9 entries as the evidence side of its build-README mechanism-drift signal; and the findings
+  record's B2 closes by naming A5, A4 and B2 itself as resting on §9 lines as their evidence
+  carrier. Three of those four anchors were cited by line at rev-3 and two of the three numbers were
+  wrong — `:1173` for a cut at 1172, `:299` for the ledger's OBSERVED form when `AMENDED` is the
+  line below it, and `:207` labelled "M7 step 4" when 207 is step 3 — which is why none of them is a
+  number any more.
 - **The two arms `TOOL-dUnstalledConvoy-14` proposes** — that rev numbers in a log are unique and
   that they descend. Same section, same walk, different mechanism, and BUILD-METHOD M2 gives a unit
   one. The entry accumulator S3 builds is what that row needs, so it gets cheaper, not done.
 - **Retrofitting the corpus.** No landed spec is edited. Measured below: under the ratified cutoff
   `2026-09-06`, zero landed specs change.
 - **The fold procedure's re-read set.** That is `TOOL-aJoinedCanon-2`, and it is the half of B1 that
-  edits `memory/guides/BUILD-METHOD.md`. This unit touches no method carrier.
+  edits `memory/guides/BUILD-METHOD.md`. This unit writes no method PROSE — it touches that pair
+  only for the kit-version marker, which §4's Files-touched table declares and which the parity test
+  compares as one of its three pairs.
 - **Grading truth.** The arm asserts an entry NAMES a section, never that the fold actually touched
   it, exactly as the acceptance-witness arm grades a backticked token and not the thing it names.
 
@@ -76,10 +93,13 @@ The entry grammar, as the template will state it:
 - rev-<N> · <YYYY-MM-DD> · <scope> · <what moved>
 ```
 
-`<scope>` is a space- or comma-separated list of `§<n>`, `S<n>` and `AC<n>` tokens. The field sits
-AFTER the date and never before it, and that ordering is a constraint rather than a preference:
-`drift_report.py:1192` anchors on `^- rev-(\d+)\s*[·|-]\s*(\d{4}-\d{2}-\d{2})`, so a scope field
-inserted ahead of the date would silently drop every entry out of that signal's population.
+`<scope>` is a list of `§<n>`, `S<n>` and `AC<n>` tokens separated by spaces, commas or the `·` this
+corpus already uses between status fields — the arm reads presence, so the separator is house style
+rather than grammar, and stating all three is what keeps this document legal under its own rule.
+The field sits AFTER the date and never before it, and that ordering is a constraint rather than a
+preference: `drift_report.py`'s `_REVLOG_RE` anchors on `^- rev-(\d+)\s*[·|-]\s*(\d{4}-\d{2}-\d{2})`,
+so a scope field inserted ahead of the date would silently drop every entry out of that signal's
+population.
 
 The gate grades presence, not position. That is the same call `SPEC_WITNESS_CUTOFF` recorded in
 `.memory-tree.conf`, where four candidate predicates were measured and the loosest one was the only
@@ -87,35 +107,63 @@ one that did not punish good criteria. The template prescribes the field; the ar
 
 ### The arm
 
-It rides the walk that already exists. `check-memory-hygiene.sh:1066-1078` opens §9 on
-`/^## [0-9]+\. Revision log/`, closes on the next `## `, and scans `rev-[0-9]+` for the header-rev
-high-water. That loop sits ABOVE the `if (hdr ~ /Tier-1/) next` cut at `:1173` — hoisted by
-`TOOL-cSettledDocket-3` so both hoisted assertions grade every tier — so an arm added there is a
-both-tiers arm for free, as `STREAMS_CUTOFF` and `SPEC_WITNESS_CUTOFF` are.
+It rides the walk that already exists: in `check-memory-hygiene.sh`, the loop opening on
+`if (L ~ /^## [0-9]+\. Revision log/) in9 = 1`, closing on the next `## `, and scanning
+`while (match(L, /rev-[0-9]+/))` for the header-rev high-water that ends in
+`print f " (header rev-" hrev " not logged in the §9 Revision log)"`.
 
-Three decisions inside it, each measured over the 476 tracked specs at `base 750ca0ca`:
+**Where it sits, stated as an exclusion.** That walk is ALREADY outside every cutoff guard — the
+comment above it says so in the engine's own words, `these two run for EVERY TIER, so they sit ABOVE
+the Tier-1 cut` — and this arm goes in it, at the same nesting depth, guarded by `mcut != ""` and by
+nothing else. It does NOT go inside the `if (wcut != "" && fdate != "" && fdate >= wcut) {` block
+that ends in `print f " (acceptance bullets naming no backticked witness…`. That is a live trap and
+not a hypothetical one: this build's round-1 blocker and its round-2 blocker are both a new arm
+nested in that guard, whose real population becomes the INTERSECTION of two cutoffs while its own
+key reads as armed. Here the intersection would be invisible in this repo — `SPEC_WITNESS_CUTOFF` is
+`2026-08-15` and `REV_SCOPE_CUTOFF` is `2026-09-06`, so every spec reaching the second passes the
+first — and visible only in an adopter that arms one key and not the other, which is the case with
+no local witness. AC15 is that witness. Being outside the `if (hdr ~ /Tier-1/) next` cut also makes
+it a both-tiers arm for free, as `STREAMS_CUTOFF` and `SPEC_WITNESS_CUTOFF` are.
 
-**Per ENTRY, not per line.** The same scope-token predicate applied per LINE says 594 of 2,016 rev
-lines name a token, 29.5% — which reproduces the findings record's 492 of 1,665 exactly. Applied
-per ENTRY with continuation lines folded in, it says 1,013 of 1,682, 60.2%. The gap is entirely
+Three decisions inside it, each measured at `base 750ca0ca` over the 476 date-named specs there —
+which is the population check 12's selector grades, and is the 479 files under `spec/` less the
+three whose filenames carry no date.
+
+**Per ENTRY, not per line.** The same scope-token predicate applied per LINE marks about 30% of §9's
+lines, which is the rate the findings record measured at 29.5% (492 of 1,665) on a smaller corpus.
+Applied per ENTRY with continuation lines folded in, it marks about 60%. The gap is entirely
 wrapping: this corpus writes §9 at its ~100-column house width and puts the detail in the wrap. A
-line-oriented arm would red half the corpus that already does the right thing, so the arm reuses
-the acceptance-witness accumulator's shape at `:1020-1048` — a head line opens an entry, every
-following non-blank line appends to it, and the entry is tested when the next head or the next
-`## ` arrives.
+line-oriented arm would red half the corpus that already does the right thing, so the arm reuses the
+shape of the acceptance-witness accumulator — the block whose head selector is
+`/^([ \t]*(-|\*)[ \t]*)?(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)/` and whose fold is
+`if (lab != "") acc = acc " " L` — where a head line opens an entry, every following non-blank line
+appends to it, and the entry is tested when the next head or the next `## ` arrives. That block is
+cited by its own source text and not by line because `TOOL-aJoinedCanon-4` unindents it out of the
+`wcut` guard at `order` 4; this unit is `order` 1 and builds against the nested form, and the shape
+it borrows survives that unindent either way.
+
+The rates above are stated as rates on purpose. A Python transcription of the same predicate,
+re-run at this fold over the same base, returns 1,028 of 1,682 entries and 934 of 1,194 rev-2+
+entries where rev-3 recorded 1,013 and 919 — a spread of about 1.1 points that is a property of the
+transcription, not of the corpus, since the arm's awk is the only authority and does not exist yet.
+The load-bearing figure is the 2× gap between line and entry granularity, which both derivations
+agree on; the exact counts are re-derived by the arm itself at build time.
 
 **Head selector.** `/^([ \t]*(-|\*)[ \t]*)?(\*\*)?rev-[0-9]+/`, which is the witness arm's selector
 with its label swapped. The optional-marker group is what makes an INDENTED continuation line fail
-to open a new entry, which is the phantom-bullet defect that arm's own comment records. Measured:
-1,683 rev heads in the corpus, 5 of them bolded, none using `*`, and 0 continuation lines that this
-selector would misread as a head. Continuations are indented in 8,621 of 8,635 cases, so the arm
-folds ANY non-blank line rather than requiring the two-space indent `drift_report.py:1293` requires
-— the looser rule reaches 14 more lines and cannot misgrade.
+to open a new entry, which is the phantom-bullet defect that arm's own comment records. Measured at
+base: 1,682 rev heads in the corpus — one per entry, which is what makes the head count and the
+entry count the same number — a handful of them bolded, none using `*`, and 0 continuation lines
+that this selector would misread as a head. Continuations are indented in 8,621 of 8,635 cases, so
+the arm folds ANY non-blank line rather than requiring the two-space indent that
+`drift_report.py`'s `elif revs and revs[-1][0] == sp and ln.startswith("  ")` guard requires — the
+looser rule reaches 14 more lines and cannot misgrade.
 
 **rev-1 is exempt.** A first draft moved the whole document, so a scope list on it names everything
-and says nothing. Measured: rev-2+ entries are 1,194, of which 919 (77.0%) already carry a token;
-rev-1 entries are 488, of which 94 (19.3%) do. Grading rev-1 would add 394 failing entries that no
-author could usefully answer.
+and says nothing. Measured at base: rev-2+ entries are 1,194, of which roughly 78% already carry a
+token; rev-1 entries are 488, of which 94 do. Grading rev-1 would add 394 failing entries that no
+author could usefully answer, and that subtraction is exact because both of its terms are counts of
+entries rather than of matches.
 
 The token test, spelled to survive the awk dialect surface this file's header warns about twice:
 
@@ -166,9 +214,12 @@ first one it cannot. `SPEC10_EVIDENCE_CUTOFF` is the precedent for that correcti
 Under `REV_SCOPE_CUTOFF="2026-09-06"` the arm grades no spec in this corpus on day one, and the S6
 fixtures are its entire coverage. That is the ratified cost rather than a tradeoff still being
 weighed, and it is the state `STREAMS_CUTOFF`, `SPEC_WITNESS_CUTOFF` and `SPEC10_EVIDENCE_CUTOFF`
-each shipped in and each recorded. S5 is why it is not a silent green: the notice at `:1298-1305` already exists for the
-§10 evidence arm, counts its population by DATE alone over `c12_sel`, and prints one line when the
-count is zero. The new notice is that block with two strings changed.
+each shipped in and each recorded. S5 is why it is not a silent green: the notice already exists for
+the §10 evidence arm, as the block opening
+`if [ "$STAGED" = 0 ] && [ -n "$SPEC10_EVIDENCE_CUTOFF" ]; then` and ending in the echo beginning
+`memory-hygiene: the §10 reuse-evidence arm graded NO spec`. It counts its population by DATE alone
+over `c12_sel` and prints one line when the count is zero. The new notice is that block with two
+strings changed.
 
 ### Files touched (estimate)
 
@@ -185,10 +236,29 @@ count is zero. The new notice is that block with two strings changed.
 | `memory/guides/BUILD-METHOD.md` + template | version marker ONLY, no prose |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp |
 
-Both doc pairs are byte-compared after a render substituting `{{KIT_DIR}}` and `{{TOOL_ROOT}}`, by
-`kit-dogfood-parity.test.sh`, whose direction is TEMPLATE to LIVE. Editing a live copy by hand is
-the red. `git grep -l 'memory-tree@2\.59'` names 7 carriers of the kit version today, six of them
-line-1 doc markers and the seventh the constant and marker sharing `check-memory-hygiene.sh:20`.
+Every doc pair is byte-compared after a render substituting `{{KIT_DIR}}` and `{{TOOL_ROOT}}`, by
+`kit-dogfood-parity.test.sh`, whose direction is TEMPLATE to LIVE and whose `PAIRS` list carries
+three of them — `HYGIENE.md`, `TEMPLATE-SPEC.md` and `guides/BUILD-METHOD.md` — so the version-marker
+row in the table above is a pair edit like the other two. Editing a live copy by hand is the red.
+
+The kit-version carrier set is DERIVED at build time by
+`git grep -l 'memory-tree@<the version being replaced>' -- ':!memory/builds'`, and no count of it is
+written here. Two reasons, both learned: build records quoting the old version string match that
+grep without being carriers, so the unscoped form already returns one more hit than rev-3 claimed;
+and the marker's own line in the engine, `KIT_MEMORY_TREE_VERSION=2.59   # gov:kit memory-tree@2.59`,
+is a carrier twice over — the constant and the marker share it — which is the thing a count hides
+and the reason `check-verdict-epoch.sh`'s remediation message under-names its own remedy.
+
+**Baseline for AC14, measured at this fold, before any of these files move.** In
+`memory/TEMPLATE-SPEC.md`: `grep -cF '<scope>'` is 0 and `grep -cF 'REV_SCOPE_CUTOFF'` is 0, while
+`grep -cF 'rev-<N>'` is already 2 (the status-header field and the bump rule), which is why AC14
+greps for the scope field and not for the rev token. The §9 skeleton's second line today is the
+`rev-2` example whose reason reads `folded review wf_<id> corrections.` and whose trailing HTML
+comment marks it as the example shape; it carries no `§`. In `memory/HYGIENE.md`:
+`grep -cF 'REV_SCOPE_CUTOFF'` is 0. Every one of those is a count AC14 requires to have RISEN, which
+is what makes it a content check rather than a sameness check. That skeleton line cannot be quoted
+whole in this spec, because check 12 reds any spec body containing the date placeholder it carries —
+a small, real constraint on how a spec discusses the template it edits.
 
 ### Alternatives rejected
 
@@ -206,8 +276,8 @@ line-1 doc markers and the seventh the constant and marker sharing `check-memory
 
 - security: N/A — the arm reads tracked text already in scope and writes nothing.
 - perf / scale: rides the existing §9 walk in the one batched awk, so it adds no pass over the
-  corpus and no fork per spec. The `memory hygiene` leg's declared ceiling is 12,720 s and this
-  cannot move it measurably.
+  corpus and no fork per spec. `tools/gate-legs.json` owns the `memory hygiene` leg's ceiling and
+  declared 12,720 s at this fold; a walk that adds no pass cannot move it measurably.
 - a11y: N/A — a shell gate with no user surface.
 - i18n: N/A, except that the multibyte `§` is handled by `index`/`substr` rather than a regex.
 - error / empty / loading states: the zero-population notice (S5) is the empty state, and it is
@@ -217,8 +287,12 @@ line-1 doc markers and the seventh the constant and marker sharing `check-memory
   in-flight branches on merge, and §8's ratified date retires it — `2026-09-06` sits past every spec
   filename date on every ref, so no branch reds on merge. Rollback is blanking one conf key.
 - testing + left-shift gates: S6, with the red observed before landing per the build's own rule.
+  AC15 is the second observed red and it costs no fixture — it rides the self-test's existing
+  blank-`SPEC_WITNESS_CUTOFF` run over the same fixture tree.
 - migration / rollback: dated cutoff, blank means off, no corpus edit.
-- user docs: the template and `HYGIENE.md` are where an author reads this; both are in scope.
+- user docs: the template and `HYGIENE.md` are where an author reads this; both are in scope, and
+  AC14 grades what they SAY rather than only that both halves of each pair moved together. No gate
+  leg greps template prose, so AC14 is a documented manual check and §7 records it as one.
 
 ## 6. Acceptance criteria
 
@@ -236,9 +310,15 @@ line-1 doc markers and the seventh the constant and marker sharing `check-memory
 - **AC6** When `.memory-tree.conf` declares `REV_SCOPE_CUTOFF=""`, the blank-cutoff run in
   `check-memory-hygiene.test.sh` emits no `revision entries naming no` finding at all.
 - **AC7** When `bash tools/memory-tree/check-memory-hygiene.sh` runs over this tree at the landing
-  sha, it exits 0 — no landed spec is redded by the new arm.
+  sha, it exits 0. Read honestly: under `REV_SCOPE_CUTOFF="2026-09-06"` the arm grades no spec, so
+  this criterion CANNOT go red for the reason "a landed spec was redded by the new arm" — no such
+  spec exists to red. What it does observe is that the engine edit broke nothing ELSE in check 12,
+  which is a real failure mode and the one the `-v` binding and the awk dialect surface actually
+  threaten. The corpus-truth half is AC12's lowered run, not this line.
 - **AC8** When both halves of each doc pair have moved,
   `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0, and it exits 1 if only one half did.
+  This is a SAMENESS check and nothing more: it compares a render of the template against the live
+  copy and has no opinion about what either says. AC14 is the criterion that reads the content.
 - **AC9** When `KIT_MEMORY_TREE_VERSION` is bumped in the same range as the engine edit,
   `bash tools/memory-tree/check-verdict-epoch.sh` exits 0.
 - **AC10** When the arm has landed, `python tools/memory-tree/check-arms.py --check` exits 0 with
@@ -250,12 +330,32 @@ line-1 doc markers and the seventh the constant and marker sharing `check-memory
   `REV_SCOPE_CUTOFF` on stdout, and still exits 0 — the notice is stdout, not a verdict, so AC7
   holds beside it. The run must not be `--staged`: the §10 evidence notice this one copies is inside
   an `[ "$STAGED" = 0 ]` block and a staged run would report the absence of a notice that was never
-  reachable. When the cutoff is temporarily lowered to a date the corpus reaches, the line is
-  absent; the lowering is reverted before the commit.
+  reachable. When the cutoff is temporarily lowered to `2026-01-01`, a date the whole corpus
+  reaches, the line is absent AND the run names untagged rev-2+ entries in the LOW HUNDREDS — the
+  fold's own re-derivation predicts about 260 of 1,194 — rather than zero, which would mean the arm
+  never fired, or thousands, which would mean it is grading per line. That lowered run is this arm's
+  only observation against real specs and the reason the lowering happens at all rather than being a
+  formality. The lowering is reverted before the commit.
 - **AC13** When `grep -qE '^REV_SCOPE_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` succeeds
   and `bash tools/memory-tree/check-memory-hygiene.test.sh` exits 0, the key has reached the shipped
   example. Deleting that one line and re-running the self-test reds naming `REV_SCOPE_CUTOFF`, which
   is the failing case observed before the landing commit.
+- **AC14** When the render has run, the AUTHOR-FACING text exists and says the thing, measured
+  against the baseline §4's Files-touched records: `grep -cF '<scope>' memory/TEMPLATE-SPEC.md` and
+  `grep -cF 'REV_SCOPE_CUTOFF' memory/TEMPLATE-SPEC.md` each rise from 0 to at least 1;
+  `grep -cF 'REV_SCOPE_CUTOFF' memory/HYGIENE.md` rises from 0 to at least 1; and the §9 skeleton's
+  `rev-2` example line in `memory/TEMPLATE-SPEC.md` contains a `§`, where today it does not. Red
+  when: S1, S2 or S7 ships as a heading with no body, or as a body that never names the key — every
+  one of which passes AC8, because AC8 compares two files to each other and neither of them to the
+  grammar this unit exists to publish. This is a manual check by construction (§7 records the
+  exemption), and its failing case is observed by running the four greps BEFORE the render, where
+  all four return 0.
+- **AC15** When `SPEC_WITNESS_CUTOFF` is blank and `REV_SCOPE_CUTOFF` is valued, the self-test's
+  existing disabled-when-blank run — the one already asserting `no backticked witness` does not fire
+  — ALSO shows the rev-scope finding still firing on `tFixture-90`. Red when: the arm is nested
+  inside the `wcut` guard, in which case blanking the unrelated key silently disarms this one while
+  its own key still reads as armed. No new fixture: the run and the fixture tree both exist, and
+  this is one assertion added beside the three already there.
 
 ## 7. Gates
 
@@ -271,6 +371,14 @@ the one carrying S6's fixtures.
 
 No new gate leg is added. The arm lives inside check 12, which `tools/gate-legs.json` already
 carries, so the manifest does not move.
+
+**One deliberate gate exemption, with its compensating check named beside it** (charter §7). AC14
+reads the author-facing prose in `memory/TEMPLATE-SPEC.md` and `memory/HYGIENE.md`, and no leg on
+this bar greps either file for content: `kit/dogfood doc parity` compares each pair to itself and
+`memory hygiene` grades specs, not the template that describes them. Gating "the template explains
+the rule" would mean pinning template prose in a test, which is the paraphrase-beside-its-source
+shape this repo refuses. So AC14 stays a manual check, run at the fold and again at the landing, and
+its four greps are written out in full so that running it takes no judgement.
 
 ## 8. Open questions
 
@@ -320,6 +428,26 @@ carries, so the manifest does not move.
   the file's high-water. §7 gains the clause naming `memory-hygiene self-test` as the parity arm's
   home. §4's Migration also stops calling this the "sixth" dated cutoff in the conf — the count was
   wrong and nothing derives it.
+- rev-4 · 2026-09-05 · §2 S1 S2 S3 S4 S6 S7 S8 · §3 · §4 · §5 · §6 AC7 AC8 AC12 AC14 AC15 · §7 · §10 ·
+  folded spec-audit round 2, named findings H3 and M1, plus the class sweep the build README's
+  close-over-the-CLASS rule requires. H3: every scope item now names its observer, and new AC14
+  grades what the author-facing text SAYS — four greps against a baseline §4 records before the
+  render — where AC8, now restated as the sameness check it always was, only ever compared two files
+  to each other. M1: the three wrong anchors are gone, and with them every other line pin in this
+  document; §3, §4 and §10 cite `check-memory-hygiene.sh`, `drift_report.py`, `HYGIENE.md` and
+  `BUILD-METHOD.md` by source text, since round 1 ruled `:1173` should have been `:1172` and the fold
+  corrected only the sibling. Swept classes that HIT: B1's nested-guard shape — §4 now states the
+  arm's placement as an exclusion and AC15 witnesses it on a blank `SPEC_WITNESS_CUTOFF`; M7's
+  could-not-fail criterion — AC7 says what it cannot prove and AC12's lowered run carries the
+  corpus evidence; M10's false `Observed by` — S4's tag covered one of three carriers; M3 and L1's
+  stale population count — the seven kit-version carriers became a derivation; M8's
+  false-of-its-own-file prescription — S1's grammar admits the `·` separator this file's own §9 uses;
+  L2's off-by-N — the `drift_report.py` pin named the append line, not the indent guard the sentence
+  beside it quoted, so it too became a source-text citation. This document now holds no line pin at
+  all, which is the only form of the build README's rule 6 that cannot rot. Also
+  corrected without a finding: 1,683 rev heads was 1,682, "476 tracked specs" now says which
+  population it counts, and three entry-level percentages became rates because a re-derivation at
+  this fold disagreed with them by about a point.
 
 ## 10. Reuse audit
 
@@ -328,11 +456,14 @@ wrapped continuation lines into the entry before testing it"` returns no seam fo
 and the reason is a property of the index rather than of the tree: the lookup ranks Python and
 shell SYMBOLS plus inventory keys, and the accumulator this unit extends is an unnamed awk block
 inside a shell script, so it is unreachable by that instrument. Read directly, the seam is real and
-is named in §4: the acceptance-witness accumulator at `check-memory-hygiene.sh:1020-1048` supplies
-the head-selector and continuation-fold shape, and the §9 range walk at `:1066-1078` supplies the
-section extraction, so the arm adds no new pass. A second, non-shareable prior art exists at
-`tools/drift-audit/drift_report.py:1281-1294`, which folds §9 continuations in Python for the
-mechanism-drift signal; it constrains this unit's grammar rather than being extended by it.
+is named in §4, and cited there and here by source text rather than by line because three sibling
+units edit this engine before this one builds: the acceptance-witness accumulator in
+`check-memory-hygiene.sh` — the block whose fold is `if (lab != "") acc = acc " " L` — supplies the
+head-selector and continuation-fold shape, and the §9 range walk opening on
+`if (L ~ /^## [0-9]+\. Revision log/) in9 = 1` supplies the section extraction, so the arm adds no
+new pass. A second, non-shareable prior art is `_REVLOG_RE` and the loop under it in
+`tools/drift-audit/drift_report.py`, which folds §9 continuations in Python for the mechanism-drift
+signal; it constrains this unit's grammar rather than being extended by it.
 
 Recall terms used: `python tools/memory-recall/query.py "why does the spec revision log stay
 unstructured and what dated cutoff would a new check 12 arm need" --terms "revision log rev line

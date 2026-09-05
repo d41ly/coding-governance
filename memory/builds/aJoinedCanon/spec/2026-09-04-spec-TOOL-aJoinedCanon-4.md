@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -15,8 +15,11 @@
 
 Make `## 6. Acceptance criteria` ask each criterion what break would turn it red, because authors are
 already answering that question in a section that never asked it. Finding A3 measured 93 of 479 specs
-mentioning a staged break or a red-first run, clustering in §6 with 79 lines and in §5 with 30. The
-format is collecting the answer by accident, in whichever section the author reached for, and can
+mentioning a staged break or a red-first run, clustering in §6 with 79 lines and in §5 with 30. Those
+four figures are A3's own, measured over the corpus as it stood at `aWeighedCanon`'s base; the corpus
+has grown since — this build's own eleven specs among the additions — so re-deriving them today
+returns different numbers. They are cited as that finding's measurement, never as a present count.
+The format is collecting the answer by accident, in whichever section the author reached for, and can
 therefore neither find it nor check it.
 
 ## 2. Scope (IN)
@@ -24,7 +27,11 @@ therefore neither find it nor check it.
 - **S1** — a per-criterion failure-mode clause, marked `Red when:`, stated in the acceptance-criteria
   body of `tools/memory-tree/SPEC-TEMPLATE.template.md`. The clause may sit on the bullet's opening
   line or on any continuation line beneath it, which is the same latitude the acceptance-witness rule
-  already grants and matches this corpus's wrap style at 100 columns.
+  already grants and matches this corpus's wrap style at 100 columns. Observed by AC12, which greps
+  the RENDERED `memory/TEMPLATE-SPEC.md` for the marker text. AC10 does not observe it and never
+  could: a byte-compare grades SAMENESS and is equally green when neither half of the pair moved.
+  This is the only thing a post-cutoff author ever meets — under §8's ratified cutoff the arm grades
+  zero live specs at landing — so it is the half that least tolerates having no observer.
 - **S2** — `SPEC_FAILURE_MODE_CUTOFF` declared in THREE carriers, not two. It is preset blank in
   `tools/memory-tree/check-memory-hygiene.sh` beside its siblings, in the block that runs from
   `STREAMS_CUTOFF=""` to `SPEC10_EVIDENCE_CUTOFF=""`; declared in `.memory-tree.conf` with its date
@@ -48,7 +55,13 @@ therefore neither find it nor check it.
   unit's. Two independent bad-lists, two independent messages, two populations that do not intersect.
   The union guard is COST, never population: every finding is emitted under its own arm's predicate
   alone, so no verdict of either arm can depend on the other key. Still no new walk, no new section,
-  no new `fail` branch.
+  no new `fail` branch. **The "today" in this item is the base sha, not this unit's build day.**
+  `TOOL-aJoinedCanon-3` writes into the same guard one `order` step earlier, and its own round-2
+  blocker moves its branch out of it, so re-read the block under the comment head
+  `# ---- acceptance witnesses:` at this unit's actual base before implementing: if unit 3's fix
+  already unindented the accumulator loop, this item reduces to splitting one liveness boolean into
+  two. What must hold either way is the PROPERTY and not the diff — the two predicates are
+  independent — and AC7 observes that property rather than the unindent.
 - **S4** — the rule binds BOTH tiers, like the streams and witness ratchets and unlike the section
   canon. A Tier-1 spec is exempt from the ceremony, not from meaning what it writes.
 - **S5** — both halves of the template move together. `tools/memory-tree/SPEC-TEMPLATE.template.md`
@@ -71,7 +84,10 @@ therefore neither find it nor check it.
   advances by one minor in this landing — in the engine constant and in every `gov:kit memory-tree@`
   carrier, the carrier set derived with `grep -rl` at build time. No version pair is written here:
   units at a lower `order` in this build also declare a bump of that constant, so a pair recorded now
-  is a no-op or a regression by the time this unit builds.
+  is a no-op or a regression by the time this unit builds. Observed by AC12's second grep for the
+  HYGIENE sentence and by AC13 for the version bump. Both halves of this item had no observer at all
+  before rev-4 while §7 stated the version obligation outright, which is how an author-facing
+  deliverable ships absent with every fixture green.
 
 ## 3. Non-goals (OUT)
 
@@ -85,8 +101,11 @@ therefore neither find it nor check it.
   and that restructure is behaviour-neutral for it BY CONSTRUCTION: the witness test keeps its own
   predicate, its own bad-list and its own message, and only the accumulator is shared. AC8 observes
   it. Follow-up: none — a witness verdict that moves is a defect in this unit, not a deferred one.
-- **Retrofitting the corpus.** All 479 specs stay untouched — the 414 CLOSED ones and the twenty
-  dated 2026-09-04 alike. §8's resolved cutoff grandfathers every one of them by filename date.
+- **Retrofitting the corpus.** Every tracked spec stays untouched — the CLOSED ones and the ones
+  dated 2026-09-04 alike. §8's resolved cutoff grandfathers every one of them by filename date. No
+  size of that population is written here: `git ls-files 'memory/**/spec/*.md'` derives it, and this
+  build's own eleven specs joined it after the 479 A3 measured, so the figure this section used to
+  carry was already stale when it was folded.
 - **A `### Failure modes` table or any other second list.** Follow-up: none — it is rejected in §4,
   not deferred.
 - **Anything about the acceptance ledger or check 23.** Joining a ledger answer to its criterion's
@@ -144,6 +163,13 @@ all there is IS the finding — that is the "criteria that could not fail reache
 | `tools/memory-tree/HYGIENE.template.md` | one sentence in item 12; `memory/HYGIENE.md` regenerated |
 | kit version | `KIT_MEMORY_TREE_VERSION` one minor forward, in the engine constant and in every `gov:kit memory-tree@` carrier `grep -rl` finds at build time |
 
+**The pre-change baseline AC12 grades against.** `grep -c 'Red when:'` returns **0** on both
+`memory/TEMPLATE-SPEC.md` and `tools/memory-tree/SPEC-TEMPLATE.template.md`, measured 2026-09-05 at
+this unit's base. Zero is what makes AC12 a real observation rather than a restatement: the grep
+cannot be non-zero until the rule text exists, so a landing that ships the engine and skips the
+template half reds on it. Re-derive rather than trust it — three units at a lower `order` write to
+that pair, and any of them adding the string would move the floor off zero.
+
 ### Migration
 
 None. The cutoff is a date compared against a filename, and blanking the key in `.memory-tree.conf`
@@ -187,10 +213,13 @@ diff.
 - **A section-level minimum — §6 mentions one break somewhere.** One line would satisfy ten criteria.
   That is the vacuous-selector class the charter names, and BUILD-METHOD M3's counter-rule refuses an
   observation that passes by matching nothing.
-- **Widening the marker to `reds when`, `would red` or `fails when`.** Measured over the tracked spec
-  corpus with `git grep -ci`: `would red` appears in 92 specs, `staged break` in 43, `reds when` in
-  33, `red-first` in 18. All four are prose, and admitting them would let an incidental sentence
-  satisfy the arm. The §10 terms arm took this exact decision and recorded the reason in its own
+- **Widening the marker to `reds when`, `would red` or `fails when`.** Measured 2026-09-05 with
+  `git grep -cil '<phrase>' -- 'memory/**/spec/*.md' | wc -l`: `would red` appears in 97 specs,
+  `staged break` in 44, `reds when` in 34, `red-first` in 19. Those are counts of a population this
+  build's own eleven specs already moved and every later spec moves again — re-derive with the
+  command, never quote the figures, and note that the rev-3 numbers here were five, one, one and one
+  low for exactly that reason. The argument does not rest on the sizes: all four spellings are prose,
+  and admitting them would let an incidental sentence satisfy the arm. The §10 terms arm took this exact decision and recorded the reason in its own
   comment head, `THE TERMS ARM ACCEPTS TWO SPELLINGS AND WAS DELIBERATELY NOT WIDENED`: a false red
   names its own remedy, a false pass is silent.
 - **A `Red when: n/a — <why>` escape.** Rejected on the ledger precedent above.
@@ -220,12 +249,15 @@ diff.
   runs in, so a mistake there moves acceptance-witness verdicts across the live corpus. AC8 is its
   observer and the harness's existing witness fixtures are its regression net. There is no
   concurrency and no data loss surface.
-- testing + left-shift gates — six fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`.
-  That harness is the ONLY arm available: `tools/memory-tree/check-arms.py` cannot see a branch
-  inside an awk body, which is why the fixtures are scope and not a nicety.
+- testing + left-shift gates — six fixtures in `tools/memory-tree/check-memory-hygiene.test.sh` for
+  the ARM. That harness is the only arm available for it: `tools/memory-tree/check-arms.py` cannot
+  see a branch inside an awk body, which is why the fixtures are scope and not a nicety. The fixtures
+  cover the engine and nothing else, so the author-facing half — the template paragraph, the HYGIENE
+  sentence, the version bump — is covered by AC12 and AC13 instead, as content greps and two gate
+  legs. Those three deliverables had zero coverage while all eleven earlier criteria were green.
 - migration / rollback — see §4. Blank the key.
 - user docs — the §6 body of `memory/TEMPLATE-SPEC.md` and item 12 of `memory/HYGIENE.md`, both
-  rendered from their kit templates.
+  rendered from their kit templates, both observed by AC12.
 
 ## 6. Acceptance criteria
 
@@ -249,10 +281,14 @@ diff.
   Tier-2 and leaves the harness byte-identical. That cut is cited by its source text and not by line
   number deliberately: three specs in this build gave three different numbers for this one anchor and
   only one was right, and seven units edit this file in sequence.
-- **AC6** — When `SPEC_FAILURE_MODE_CUTOFF` is blank in `.memory-tree.conf`, the AC1 fixture passes
-  and `bash tools/memory-tree/check-memory-hygiene.sh` prints no failure-mode finding at all.
+- **AC6** — When the key is blanked in the HARNESS SCRATCH TREE's conf — not in this repo's
+  `.memory-tree.conf` — the AC1 fixture stops being reported and
+  `bash tools/memory-tree/check-memory-hygiene.sh` prints no failure-mode finding over that tree.
   Red when: the blank string compares earlier than every date and arms the rule over the whole corpus,
   which is the `mcut != ""` conjunct every rule cutoff in this engine carries.
+  The tree is named because this criterion cannot be graded on the real one: under §8's ratified
+  2026-09-06 cutoff the arm grades zero live specs, so a whole-tree run is green with the key set and
+  green with it blank, and a criterion whose two arms are indistinguishable observes nothing.
 - **AC7** — When a fixture dated on or after `SPEC_FAILURE_MODE_CUTOFF` carries a clauseless AC
   bullet in a scratch tree whose conf declares that key and declares NO `SPEC_WITNESS_CUTOFF`,
   `bash tools/memory-tree/check-memory-hygiene.sh` still exits 1 naming `tFixture-125`.
@@ -272,10 +308,32 @@ diff.
 - **AC10** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh --check` runs after the edit, it
   reports no drift between `memory/TEMPLATE-SPEC.md` and `tools/memory-tree/SPEC-TEMPLATE.template.md`.
   Red when: one half was edited and the other was not, which is the build's second rule.
+  It grades SAMENESS and nothing else. It is equally green when NEITHER file moved, so it observes S1
+  and S5 only in company with AC12, which supplies the content half; on its own it certifies that the
+  two files agree about having no rule in them.
 - **AC11** — When each of the six fixtures is staged as a break and the suite is run,
   `bash tools/memory-tree/check-memory-hygiene.test.sh` is observed RED for that fixture before the
   fixture is unstaged, and the observation is recorded per item in this unit's journal record.
   Red when: an arm passes by finding nothing, which is the class this whole unit is about.
+- **AC12** — When the render has run, `grep -c 'Red when:' memory/TEMPLATE-SPEC.md` returns non-zero
+  against the pre-change baseline of 0 that §4's Inventory derives, that file's §6 body names the
+  marker, and `grep -n 'SPEC_FAILURE_MODE_CUTOFF' memory/HYGIENE.md` finds the added sentence in item
+  12, beside the existing one ending `SHAPE only — that a bullet names something, never that the
+  named thing exists.`
+  Red when: the engine, the conf and the fixtures all land and the author-facing half does not, which
+  every other criterion in this list passes through — AC1 to AC7 and AC11 drive fixtures, AC8 the
+  hoist, AC9 the example conf, AC10 a sameness compare that cannot reach `memory/HYGIENE.md` at all.
+  Under the ratified cutoff the arm grades zero live specs at landing, so the template paragraph is
+  the only thing a post-cutoff author meets, and it was the half with no observer.
+- **AC13** — When the landing commit is HEAD, the `kit version markers` and
+  `verdict epoch (kit version dates the engine)` legs both pass, which is
+  `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh` exiting 0:
+  `KIT_MEMORY_TREE_VERSION` advanced by one minor in this same commit and every carrier the
+  build-time `grep -rl 'gov:kit memory-tree@'` returns moved with it.
+  Red when: the new marker test lands on an untouched constant — which is the observed red for this
+  criterion, staged deliberately before the bump, since `check-verdict-epoch.sh`'s rule is
+  topological and a bump made in an earlier commit than the engine edit does not satisfy it.
+  §7 stated this obligation outright while §6 had nothing behind it.
 
 ## 7. Gates
 
@@ -286,8 +344,14 @@ diff.
   `_CUTOFF=` preset in the engine is missing from the shipped example conf.
 - `kit/dogfood doc parity` — the byte-compare that binds the two template halves together.
 - `verdict epoch (kit version dates the engine)` — a new arm changes the engine's verdicts, so
-  `KIT_MEMORY_TREE_VERSION` must move in the same landing. Verified at
-  `tools/memory-tree/check-verdict-epoch.sh:2-18`.
+  `KIT_MEMORY_TREE_VERSION` must move in the same landing. Its rule is topological, not an endpoint
+  comparison: the leg's own header states it under `THE RULE IS TOPOLOGICAL, not an endpoint
+  comparison.`, and the bump must come at or after the commit that last moved a behaviour-bearing
+  line. Observed by AC13. Cited by that literal rather than by a line range, which is the build's
+  citation rule and which the rev-3 fold left standing here as `:2-18`.
+- `kit version markers` — `bash tools/check-kit-versions.sh`, the other half of S7's version
+  obligation: the constant and every `gov:kit memory-tree@` carrier move together. Also AC13. The
+  leg was missing from this list entirely while §7's prose demanded the bump.
 - `spec tokens (a spec's own names resolve)` — this spec's own backticked names must resolve.
 - No new leg, and no new `fail` branch: this arm appends to check 12's existing finding list and
   reaches the tree through the single `fail 12` site, the line beginning `[ -n "$bad12" ] && fail 12`.
@@ -344,6 +408,36 @@ diff.
   M4, AC5's break was named against the wrong line and is now cited by source text. Every line-number
   anchor into a file this build's units share is now a literal-text anchor, which is the only §8 edit
   — F1's ruling, its recommendation and its recorded counter-argument are untouched.
+- rev-4 · 2026-09-05 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · folded spec-audit round 2 and swept all
+  twenty-three of its defect classes over this file. **Named finding H2** — the author-facing half
+  had no observer: S1 and S7 now name theirs, AC12 greps `memory/TEMPLATE-SPEC.md` for the marker
+  against the 0 baseline §4's Inventory now derives and `memory/HYGIENE.md` for the item-12
+  sentence, AC13 puts the `kit version markers` and `verdict epoch` legs behind S7's version bump,
+  AC10 is restated as the sameness compare it is, and §5's testing and user-docs rows follow.
+  **Swept and HIT:** H1 (§7 demanded the version bump with no criterion and no `kit version markers`
+  leg — AC13 and a new §7 row); H3 and H5 (AC10 was a byte-compare standing in for content — AC12);
+  H4 and M6 (S1 and S7 had no observer at all — same); H10 (S3 argued from a block
+  `TOOL-aJoinedCanon-3` restructures one `order` step earlier — S3 now says its "today" is the base
+  sha and points at the property rather than the diff); M1 and M3 (§1's and §3's corpus figures were
+  never swept and are stale — §1's are attributed to A3's measurement, §3's are derived); M7 (AC6
+  named a whole-tree run that is green either way under the ratified cutoff — it is scoped to the
+  scratch tree); L1 (§4's four `git grep` figures were low by 5, 1, 1 and 1 because this build's own
+  specs moved the population — re-measured, with the command and the as-of); L2 (§7 pinned
+  `check-verdict-epoch.sh:2-18` — now the literal `THE RULE IS TOPOLOGICAL`).
+  **Swept and ABSENT:** B1 (this unit is where the hoist was ruled; no arm of it is nested);
+  H6 (every command, flag and verb in §6 and §7 was run or read at base — `--check` and `--render`
+  on `kit-dogfood-parity.test.sh`, `--report` on `check-arms.py`, the `^KEY=` form in the shipped
+  example conf, the derived example-conf parity arm the self-test really carries, and all six leg
+  names against `tools/gate-legs.json`); H7 (no criterion here claims an equality a leg does not
+  perform; AC10's claim is narrowed rather than dropped); H8 (no criterion is driven by this
+  record's own anchors); H9 (the rev-3 claim about literal-text anchors held — the one surviving
+  pin was L2's, outside the shared write set, and it is gone anyway); M2 (no line pin into the
+  template pair); M4 (all five §7 entries were already leg names, verified against the manifest, and
+  `verdict epoch` was already present); M5 (no leg is withheld from §7 on any ground); M8 (this unit
+  prescribes no header amendment); M9 (§4's worked example asserts nothing a sibling contradicts);
+  M10 (no `Observed by` tag is claimed for more than it covers). Every literal this spec cites into
+  `check-memory-hygiene.sh` was re-grepped at base and each one resolves; no count of them is written
+  here, for the same reason §3's corpus figure is gone.
 
 ## 10. Reuse audit
 

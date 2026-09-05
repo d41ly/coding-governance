@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 10 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 10 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -42,17 +42,28 @@ the cheapest kind of drift to fix and the most expensive kind to leave standing.
 ## 3. Non-goals (OUT)
 
 - **The other prose-stated counts in the same section are OUT, and that is a deliberate cut.**
-  Lines 22, 24 and 29 of both halves say "its three siblings", "Those three" and "the four cutoffs".
-  Each is stale by the same arithmetic. They are a separate concern because they are historical
-  claims about the population at `TOOL-aDeclaredBound-2`'s time, whereas the location sentence is a
-  live navigation instruction that fails a reader today. Follow-up: one `TOOL` backlog row, "the
-  SPEC10_CUTOFF section states four counts of a population nothing derives". Leaving them is a
-  knowingly deferred instance of the same class, said plainly rather than implied away.
+  Both halves say `its three siblings`, `Those three` and `the four cutoffs`. Each phrase occurs
+  exactly once in each file, which is why the follow-up gets phrases and no line numbers: five
+  lower-`order` siblings re-render this pair before anyone reads the row, and the numbers this
+  bullet used to carry were wrong at base as well as stale by construction. Each count is wrong by
+  the same arithmetic. They are a separate concern because they are historical claims about the
+  population at `TOOL-aDeclaredBound-2`'s time, whereas the location sentence is a live navigation
+  instruction that fails a reader today. Follow-up: one `TOOL` backlog row, "the SPEC10_CUTOFF
+  section states counts of a population nothing derives" — worded with no number of its own, because
+  S1 removes one of those counts and any figure the row carried would be wrong on the commit that
+  files it. Leaving the rest is a knowingly deferred instance of the same class, said plainly rather
+  than implied away.
 - No change to check 12, to the canon selection, or to `SPEC10_CUTOFF`'s value. This unit moves
   prose and one inert declaration; the gate must grade every spec in the tree exactly as it does now.
-- No `KIT_MEMORY_TREE_VERSION` bump. `tools/check-kit-versions.sh:132-147` asserts every tracked
-  `tools/memory-tree/*.template.md` marker EQUALS the constant; it never demands the constant move
-  on a body change. Both files already carry the marker, at whatever value the chain has reached when
+- No `KIT_MEMORY_TREE_VERSION` bump, and BOTH gates that could demand one were read rather than
+  assumed. `tools/check-kit-versions.sh` derives the population with
+  `git ls-files 'tools/memory-tree/*.template.md'` and reds any member whose
+  `marker != KIT_MEMORY_TREE_VERSION`; that is an EQUALITY assertion and it never demands the
+  constant move on a body change. The gate that does demand a move is
+  `verdict epoch (kit version dates the engine)`, and it cannot reach this diff: it scans `ENGINE`
+  plus `DELEGATES` — the hygiene script and its Python delegates, no template among them — and a
+  run prints that set on its own clean line, so the claim is checkable rather than quoted. AC5 runs
+  both. Both template halves already carry the marker, at whatever value the chain has reached when
   this unit builds — siblings at a lower `order` declare a bump of it, so the value is read at
   build time and pinned nowhere in this spec. A bump is a judgment call for the owner, not a gate
   obligation, and this unit does not take it.
@@ -167,17 +178,25 @@ wrote it, which is why S1 deletes the count rather than correcting it.
 - **AC4** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs against the tree before and
   after S2, both runs report the same verdict on every spec, confirming the added declaration is
   inert against the preset it duplicates.
-- **AC5** — When `bash tools/check-kit-versions.sh` runs, it exits 0, and `KIT_MEMORY_TREE_VERSION`
-  is unchanged BY THIS DIFF — read at observation time from the diff itself, never compared against a
-  value written here, because siblings at a lower `order` move that constant before this unit builds.
-  That is what confirms §3's no-bump decision leaves no half-bumped marker.
+- **AC5** — When `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh`
+  each run, both exit 0, and `KIT_MEMORY_TREE_VERSION` is unchanged BY THIS DIFF — read at
+  observation time from the diff itself, never compared against a value written here, because
+  siblings at a lower `order` move that constant before this unit builds. The first reds if one half
+  of the template pair moved while its marker did not; the second reds if a behaviour-bearing engine
+  line moved with the constant standing still. Together they are what confirms §3's no-bump decision
+  leaves no half-bumped marker. The second leg is named because a no-bump argument resting on the
+  equality gate alone has read half the evidence, and the leg that would actually contradict it is
+  the half that was missing.
 
 ## 7. Gates
 
 - `kit/dogfood doc parity` — guarded on `memory/TEMPLATE-SPEC.md` and `tools/memory-tree/`, both of
   which S1 and S3 touch, so the leg runs on this diff without `GATE_FULL=1`.
-- `memory hygiene` and `kit version markers` — both carry no `guard` in `tools/gate-legs.json`, so
-  they run on every bar regardless of what this diff touches.
+- `memory hygiene`, `kit version markers` and `verdict epoch (kit version dates the engine)` — none
+  of the three carries a `guard` in `tools/gate-legs.json`, so all three run on every bar regardless
+  of what this diff touches. The third is listed because AC5 now reads it: it is the only leg that
+  can demand a version move, and §3's no-bump decision is worth exactly as much as the gate that
+  could contradict it.
 - No new gate. `.memory-tree.conf` is a repo-root file that no leg guard can select, recorded as
   `TOOL-aWalkedCorpus-5`; S2 therefore relies on the unguarded legs above rather than on a guard of
   its own, and this is stated so a reviewer does not read the absent guard as an oversight.
@@ -217,6 +236,35 @@ wrote it, which is why S1 deletes the count rather than correcting it.
   verbatim, line numbers included, because option B is a rejected path nobody builds from. §7 was
   re-read and needs nothing: it names the legs that observe AC5 and AC1, and neither changed which
   leg observes it.
+- rev-4 · 2026-09-05 · §3 · §6 · §7 · §10 · folded spec-audit round 2. Named finding M3: §3's first
+  non-goal was the one section rev-3's citation sweep never reached, and its `Lines 22, 24 and 29`
+  were wrong at base as well as stale — it now hands the follow-up row the three phrases, each
+  verified to occur exactly once per half, and no numbers. The same sweep, re-run over every
+  remaining section rather than the address the finding named, found three more: §3's no-bump
+  argument cited `check-kit-versions.sh:132-147`, whose start line is the unreadable-constant echo
+  rather than the `git ls-files` enumeration the sentence describes, so it now quotes the
+  enumeration and the `marker != KIT_MEMORY_TREE_VERSION` branch; §10's
+  `kit-dogfood-parity.test.sh:53` became the `PAIRS` assignment by name; and the follow-up backlog
+  row this bullet dictates said "four counts" — a count of a population S1 itself changes — so the
+  row is now worded with no figure. Sweeping round 2's H1 and M4 classes moved what an AC observes:
+  §3's no-bump decision rested on the equality gate alone, and
+  `verdict epoch (kit version dates the engine)` is the leg that could actually contradict it, so
+  §3 argues it, §7 lists it beside the other two unguarded legs, and AC5 runs it. Every criterion's
+  invocation was RUN at base, not read: AC3's `--check` is the parity script's own default `MODE`,
+  AC5's two legs exit 0, and AC2's grep returns nothing today, which is the defect S2 closes.
+  Classes swept and ABSENT here: B1 (this unit adds no arm to the engine at all), H2/H4 (every scope
+  item has a criterion — S1 AC1, S2 AC2, S3 AC3), H3 (AC1 greps the rendered content, so the pair is
+  not observed by parity alone), H5 (AC4's sameness compare grades INERTNESS, which is the one claim
+  a sameness compare proves, and a wrong value in S2 reds it), H6 (see the run above), H7, H8, H10
+  (nothing here argues from a block a lower-`order` sibling restructures), M2 (same conversion as
+  M3), M5 (§7's `.memory-tree.conf` claim is the guard-pathspec limit recorded in
+  `TOOL-aWalkedCorpus-5`, which no sibling changes), M6, M7, M8, M10, L1 (§4 already refuses every
+  count of this population). M9 was checked from the other end: the `### Edges` preamble here is
+  accurate — `TOOL-aJoinedCanon-8`'s §3 does exempt Tier-1 and its S3 cutoff does sit ahead of this
+  filename date — and the contradiction M9 names lives in that unit's own bullet, which still says
+  this spec carries no block. §1, §2, §4, §5 and §8 were re-read under the five-row table and need
+  nothing: the fold changed what AC5 OBSERVES and what §3 argues, never what the unit DOES, so the
+  scope items, the files-touched table and the fork record all stand as written.
 
 ## 10. Reuse audit
 
@@ -224,7 +272,8 @@ The probe result: no existing seam fits the *change* — a prose correction exte
 seam this unit RIDES is real and named. `python tools/codebase-map/reuse_lookup.py "a document
 states where a configuration key is declared"` ranked `kit-dogfood-parity.PAIRS` in the
 `build-method` dossier among its affordance seams, which is exactly the template-to-live render pair
-S3 depends on, at `tools/memory-tree/kit-dogfood-parity.test.sh:53`. Its symbol candidates are all
+S3 depends on — the `PAIRS` assignment in `tools/memory-tree/kit-dogfood-parity.test.sh`, cited by
+the name the dossier gives it rather than by a line. Its symbol candidates are all
 key-parsing and declaration-extraction functions with no bearing on editing a sentence, so nothing is
 being reimplemented here. `python tools/memory-recall/query.py` returned
 `TOOL-aDeclaredBound-2` as hit 2, which is the unit that authored the sentence this one corrects, and

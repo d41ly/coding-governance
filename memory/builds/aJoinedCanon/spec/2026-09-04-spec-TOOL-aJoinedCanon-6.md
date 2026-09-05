@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 6 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 6 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -28,7 +28,10 @@ the answer that claims to evidence it.
   backticked tokens and the answer's backticked tokens must share at least one token under
   case-folded bidirectional containment. Observed by AC2 and AC3.
 - **S3** — Both arms are bullet-scoped on both sides: a criterion's tokens are collected across its
-  continuation lines, and so are an answer's. Observed by AC4.
+  continuation lines, and so are an answer's. Neither side is free. `alledger`'s existing `form`
+  classification reads a ledger bullet's FIRST LINE only, so the LEDGER emitter is widened as well
+  as the spec one, and a fold that widened only the spec side would leave half of this item
+  unbuilt. Observed by AC4, which grades both sides.
 - **S4** — Two new dated cutoff keys, `LEDGER_LABEL_CUTOFF` and `LEDGER_TOKEN_CUTOFF`, each compared
   against the SPEC's filename date exactly as `alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"` is in
   `tools/memory-tree/check-memory-hygiene.sh`, each blank-means-off. Each is declared in
@@ -37,7 +40,8 @@ the answer that claims to evidence it.
   in `check-memory-hygiene.test.sh` derives the engine's `*_CUTOFF` presets and the `${NAME:-}` read
   form alike and reds any key the shipped example does not declare, so a key that reaches only the
   local conf reds `memory-hygiene self-test` on this unit's own landing commit and leaves an adopter
-  with a dead arm reading as armed. Observed by AC5, AC6 and AC13.
+  with a dead arm reading as armed. Each key's comment, in BOTH confs, states S9's dependency.
+  Observed by AC5, AC6 and AC13.
 - **S5** — Both arms announce an empty population, in the shape the existing
   `check 23 measured NO unit` line already uses, so a cutoff that grandfathers everything is not
   mistaken for a clean run. Not
@@ -45,16 +49,24 @@ the answer that claims to evidence it.
   what the landing commit itself measures. Observed by AC7.
 - **S6** — The ledger grammar in `memory/HYGIENE.md` and `tools/memory-tree/HYGIENE.template.md`
   states the token rule, so an author reads it where the grammar lives rather than discovering it
-  from a red bar. Observed by AC8.
+  from a red bar. Observed by AC14 for the CONTENT and by AC8 for the pair parity — two criteria
+  because AC8 is a byte-compare and is green when the rule reached neither half.
 - **S7** — A failing fixture per new `fail 23` branch in `check-memory-hygiene.test.sh`, with the
   positive `hit` assertion the harness meta-gate requires. Fixture ids come from this unit's block in
-  the build README's `tFixture` allocation, which is owned there and not re-derived from the file's
-  high-water at build time. Observed by AC9.
+  the build README's `tFixture` allocation — `tFixture-140` upward, by that README's `80 + 10N`
+  rule — which is owned there and not re-derived from the file's high-water at build time. Observed
+  by AC9.
 - **S8** — The kit version advances in this landing, because both arms change what the engine
   VERDICTS: `KIT_MEMORY_TREE_VERSION` in `tools/memory-tree/check-memory-hygiene.sh` moves by one
   minor, and every `gov:kit memory-tree@` carrier moves with it. The carrier set is derived at build
   time with `grep -rl 'gov:kit memory-tree@'` and is not counted here — `TOOL-dSettledRoster-4`
   records a remediation message naming three carriers when more existed. Observed by AC12.
+- **S9** — Both arms are declared as what they are: BRANCHES OF CHECK 23, never independent checks.
+  The block they live in opens on `if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then`, so a blank
+  `ACCEPTANCE_LEDGER_CUTOFF` disarms both of them whatever their own keys say, and the graded spec
+  set is filtered by `alcut` before either arm sees it. That dependency is written into each new
+  key's comment in both confs and is OBSERVED, not asserted — it is the one shape this build's
+  round-1 blocker and round-2 blocker were both instances of. Observed by AC13 and AC15.
 
 ## 3. Non-goals (OUT)
 
@@ -62,9 +74,10 @@ the answer that claims to evidence it.
   the wrong QUESTION. `DEPL-dRetiredFork-3`'s ledger `AC3` cites `classify_outcome` while its spec
   `AC3` asks about an empty artifact, and under this unit's predicate that pair would still have to
   be caught by a token disagreement, not by understanding either sentence. The row that approaches
-  this from the other side is `TOOL-aBoundedVerdict-32` (`memory/backlog/TOOL.md:152`), which
+  this from the other side is `TOOL-aBoundedVerdict-32` in `memory/backlog/TOOL.md`, which
   records that nothing gates a criterion against the TREE at close time. Neither row subsumes the
-  other and this unit does not close that one.
+  other and this unit does not close that one. (Cited by row id, not by line: the backlog is
+  mutable and this build's own landing adds rows to it.)
 - **No retrofit of any landed ledger.** `DEPL-dRetiredFork-3` is CLOSED and green and its ledger
   invents a label its spec never wrote; it stays as it is. The `ACCEPTANCE_LEDGER_GRANDFATHER`
   declaration in `.memory-tree.conf` states the
@@ -78,8 +91,8 @@ the answer that claims to evidence it.
   whether a criterion names anything at all. This unit
   never re-grades that: a criterion with no backticked token is silent here, not doubly red.
 - **HYGIENE.md's numbered catalog is not renumbered.** It stops at item 22 while the shell
-  implements 23; that is `TOOL-aScouredKit-22` (`memory/backlog/TOOL.md:300`) and it is a different
-  edit to the same file pair.
+  implements 23; that is `TOOL-aScouredKit-22` in `memory/backlog/TOOL.md`, cited by row id for the
+  same reason, and it is a different edit to the same file pair.
 - **No new check number.** Both arms are `fail 23` branches on the existing check, so the kit
   README's check count does not move.
 
@@ -106,6 +119,12 @@ captured token therefore cannot contain one. The `U` row carries the era flags r
 filename date, so the date comparison stays in awk beside the one `alcut` already does and bash
 reads booleans.
 
+Both new fields are BULLET-scoped, and on the ledger side that is a change of kind rather than an
+extra capture: `alledger` prints on the line matching `^- *(\*\*)?AC[0-9]+` and classifies `form`
+from that line alone, so the token list has to accumulate over the answer's continuation lines until
+the next bullet, `**Evidences:**` block or heading. S3 declares both halves and AC4 grades both;
+widening only the spec side is the shape that would pass every other criterion here.
+
 The existing bash reader, the `declare -A ALFORM` loop, splits a triple with `${_al% *}` and
 `${_al##* }`. It gains
 a leading `IFS=$'\t' read -r _altriple _altok` and then splits `_altriple` exactly as today, so the
@@ -119,7 +138,7 @@ same first-wins rule and the same key.
 `U` walk gains `ALUID["$_uuid"]=$labera`. A new walk over `ALFORM`'s keys reports any key whose unit
 is in `ALUID` with the flag set and whose full key is absent from `ALSPECLAB`. Bash associative-array
 key order is unspecified, so the collected offenders are piped through `sort` before the failure
-string is built — the three existing arms get byte-stable output from a sorted input stream and this
+string is built — the existing arms get byte-stable output from a sorted input stream and this
 one must earn it explicitly.
 
 **Arm B, the token join.** Inside the existing `L` walk, when the key is present in `ALFORM` and the
@@ -147,6 +166,23 @@ criterion named a file — becomes a notation an author follows rather than a re
 with. If the arm still manufactures work once real specs start meeting it, the honest response is a
 blank `LEDGER_TOKEN_CUTOFF`, which is the rollback below, and not a waiver row.
 
+### Where the arms sit, and what that dependency costs
+
+Both arms are BRANCHES of check 23, inside the block opening on
+`if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then`. Two consequences, and neither is optional to write
+down. A blank `ACCEPTANCE_LEDGER_CUTOFF` disarms both arms however their own keys are set, and
+NOTHING announces it: the `pop_guard 23` call and the `memory-hygiene: check 23 measured NO unit`
+printf are inside that same block, so the check is simply dark. And each arm's population is the
+INTERSECTION of `alcut` and its own key, because `alsel` drops a spec whose filename date is below
+`alcut` before either arm sees a row from it. With both new keys ahead of the fleet the intersection
+is their own dates in THIS repo; the shape that bites is the adopter's, and it is the one
+`tools/memory-tree/.memory-tree.conf.example` ships — `ACCEPTANCE_LEDGER_CUTOFF=""` beside a
+`LEDGER_TOKEN_CUTOFF` the adopter has armed, giving an arm that never executes while its own key
+reads as armed. `TOOL-aJoinedCanon-4` met this shape in check 12 and hoisted out of the guard; that
+is not available here (Alternatives rejected, below). So it is declared in both conf comments (S9)
+and observed by a fixture (AC15), which is the option unit 4 considered and rejected and this unit
+is stuck with.
+
 ### Inventory
 
 Reproduced at base 750ca0ca with a throwaway probe mirroring check 23's own selectors (filename date
@@ -165,13 +201,15 @@ figure. The denominators differ: 1,377 counts every ledger answer, while 1,241 c
 whose label the spec also numbers, which is the set arm B can grade at all. Both are recorded rather
 than reconciled, and the design is sized against the larger of them.
 
-Arm A's single corpus-wide hit is `DEPL-dRetiredFork-3` `AC8`. Verified directly: the spec numbers
-ELEVEN labels at
-`memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-3.md:96-131`, `AC1`-`AC7` and
-`AC9`-`AC12`, and the ledger at
-`memory/builds/dRetiredFork/build/2026-09-03-build-DEPL-dRetiredFork-3-1-acceptance-ledger.md:24-64`
-writes TWELVE, `AC1`-`AC12`. The invented label is the twelfth, not the thirteenth the findings
-record names; the count is otherwise as recorded.
+Arm A's single corpus-wide hit is `DEPL-dRetiredFork-3` `AC8`, and it is cited by LABEL rather than
+by line because the two ranges this paragraph carried at rev-3 were both wrong at base — a defect
+inside the very sentence that said "verified directly". Re-derive each set with
+`grep -nE '^-? *(\*\*)?AC[0-9]+'` over the file rather than trusting a number here. The spec
+`memory/builds/dRetiredFork/spec/2026-09-02-spec-DEPL-dRetiredFork-3.md` numbers ELEVEN criteria in
+its §6, `AC1`-`AC7` and `AC9`-`AC12`, skipping `AC8`. The ledger
+`memory/builds/dRetiredFork/build/2026-09-03-build-DEPL-dRetiredFork-3-1-acceptance-ledger.md`
+writes TWELVE answers, `AC1`-`AC12`, and its `- AC8 — MET — default-OFF` line is the orphan. The
+findings record calls that answer a thirteenth; the file carries twelve.
 
 ### Migration
 
@@ -226,8 +264,8 @@ false-positive rate while arm A, whose corpus-wide hit count is 1, stays armed.
 |---|---|
 | `tools/memory-tree/check-memory-hygiene.sh` | two awk emitters, two bash walks, two `fail 23` branches, two announce lines, the two blank presets, and `KIT_MEMORY_TREE_VERSION` advanced by one minor |
 | `tools/memory-tree/check-memory-hygiene.test.sh` | fixtures for both arms plus their `hit` assertions; the fixture conf the harness printf-writes gains both keys |
-| `.memory-tree.conf` | two keys with their reasons |
-| `tools/memory-tree/.memory-tree.conf.example` | the same two keys, blank |
+| `.memory-tree.conf` | two keys with their reasons, each comment naming S9's `ACCEPTANCE_LEDGER_CUTOFF` dependency |
+| `tools/memory-tree/.memory-tree.conf.example` | the same two keys, blank, with the same dependency in each comment (AC13) |
 | `memory/HYGIENE.md` | the token rule under `## Acceptance ledger` |
 | `tools/memory-tree/HYGIENE.template.md` | the same bytes — `tools/memory-tree/kit-dogfood-parity.test.sh` compares the pair |
 
@@ -253,6 +291,11 @@ a remediation message naming three carriers when more existed.
   admissions to units that closed while the grammar was unmerged, which this is not.
 - **Fix the `DEPL-dRetiredFork-3` ledger line instead.** Ruled out by the position recorded beside
   the grandfather list: a build's own folder owns its own prose.
+- **Hoisting both arms out of check 23's `alcut` guard**, the way `TOOL-aJoinedCanon-4` hoists its
+  accumulator out of the witness guard. NOT AVAILABLE, rather than rejected on taste: the `ALFORM`
+  ledger map, the graded unit set and the label rows exist only inside that block, so a hoist is a
+  rebuild of check 23's whole pipeline and not an unindent. Declaring the dependency and observing
+  it (S9, AC15) is the second-best answer and is named as such rather than presented as equivalent.
 - **Exact token-set equality.** Measured at 39.2% against containment's 25.4%, and the extra 172
   answers are dominated by path-prefix and invocation-prefix variance rather than by disagreement.
 - **A third form in the ledger grammar for "no shared token, and here is why".** It re-introduces
@@ -271,8 +314,10 @@ a remediation message naming three carriers when more existed.
 - i18n — N/A, with one real constraint: case folding must not be locale-sensitive, so the comparison
   stays ASCII and the surrounding code sets no `LC_ALL`, matching the deliberate choice the
   `No LC_ALL` comment above the existing label sort already records.
-- error / empty / loading states — an empty population per arm announces itself, which is S5.
-- observability — each failure names the unit and the label, in the shape the three existing `fail 23`
+- error / empty / loading states — an empty population per arm announces itself, which is S5. The one
+  case that CANNOT announce is S9's: with `ACCEPTANCE_LEDGER_CUTOFF` blank the whole check is dark,
+  announce line included, so the dependency is carried by the conf comments and AC15 instead.
+- observability — each failure names the unit and the label, in the shape the existing `fail 23`
   branches use.
 - risks — arm B reds (§8 FORK-1, resolved 2026-09-05), so its false-positive rate against future
   authors is now a property of the shipped gate rather than an open question. Stated plainly: 25.4%
@@ -286,7 +331,9 @@ a remediation message naming three carriers when more existed.
   literal slice of its own failure text, or be listed in `memory/project/unarmed-branches.txt`; neither new
   branch will be listed there.
 - migration / rollback — two dated cutoffs, per §4 Migration. Rollback is a conf edit.
-- user docs — the ledger grammar in the `HYGIENE` pair is the doc, and it is S6.
+- user docs — the ledger grammar in the `HYGIENE` pair is the doc, and it is S6, graded for content
+  by AC14 and not by the pair byte-compare. The shipped example conf's two comments are the other
+  adopter-facing half, and they are graded by AC13.
 
 ## 6. Acceptance criteria
 
@@ -298,21 +345,31 @@ a remediation message naming three carriers when more existed.
 - **AC3** — When that same fixture answer names `` `python alpha --write` ``, the run is green,
   because containment matches where exact intersection would not.
 - **AC4** — When a fixture criterion's only backticked token sits on a CONTINUATION line rather than
-  the bullet head, the run is green; the same fixture with the token deleted reds. This is the
-  bullet-scope assertion, and it is the one that would silently pass if the token capture were
-  line-scoped like `alledger`'s existing `form` classification.
+  the bullet head, the run is green; the same fixture with the token deleted reds. The MIRROR case is
+  graded too, on the ledger side: a fixture whose ANSWER carries its only backticked token on a
+  continuation line is green, and reds with that token deleted. Both halves together are S3's
+  bullet-scope assertion, and both would silently pass if the token capture stayed line-scoped the
+  way `alledger`'s existing `form` classification is. Grading only the spec half is the fold that
+  builds half of S3 and reads as covered.
 - **AC5** — When `LEDGER_LABEL_CUTOFF` is set past a fixture spec's filename date, that spec's
   orphan ledger label stops being reported and the rest of check 23's verdict on it is unchanged.
-- **AC6** — When either new key is blank in `.memory-tree.conf`, its arm reports nothing at all and
-  `bash tools/memory-tree/check-memory-hygiene.sh` is green over the real tree.
+- **AC6** — When a fixture conf blanks one new key and arms the other, the blanked arm's own red
+  fixture goes GREEN while the armed arm's still reds, and restoring the key reds it again. The
+  observation lives in `check-memory-hygiene.test.sh` and NOT over the real tree: with both cutoffs
+  ahead of the fleet a whole-tree run is green whether either key is blank or set, so a real-tree
+  green cannot fail for the reason this criterion gives and is not what grades the disarm. Stated
+  because rev-3's AC6 claimed exactly that green as its proof.
 - **AC7** — When every graded spec predates an arm's cutoff, that arm prints its own
-  `measured NO unit` announce line, matching the shape at `check-memory-hygiene.sh:1526`. Since the
+  `measured NO unit` announce line, in the shape of the engine's existing
+  `memory-hygiene: check 23 measured NO unit` printf. Since the
   2026-09-05 ruling puts both cutoffs ahead of the fleet, this is not a fixture-only case: it is
   what BOTH arms print on the real tree in the landing commit, and it is the only thing standing
   between an empty first population and a silent green.
 - **AC8** — When the token rule lands in `memory/HYGIENE.md`, `bash
-  tools/memory-tree/kit-dogfood-parity.test.sh` is green, proving
-  `tools/memory-tree/HYGIENE.template.md` carries the same bytes.
+  tools/memory-tree/kit-dogfood-parity.test.sh` is green, proving ONLY that
+  `tools/memory-tree/HYGIENE.template.md` carries the same bytes: landing the rule in one half reds
+  it, and landing it in NEITHER half leaves it green. What the two halves say is AC14's job, and
+  this criterion makes no claim about it.
 - **AC9** — When `python3 tools/memory-tree/check-arms.py --check` runs, both new `fail 23` branches
   are ARMED, and neither appears in `memory/project/unarmed-branches.txt`.
 - **AC10** — When `LEDGER_TOKEN_CUTOFF` is temporarily set to `ACCEPTANCE_LEDGER_CUTOFF`'s value and
@@ -339,7 +396,27 @@ a remediation message naming three carriers when more existed.
   the same grep for `LEDGER_TOKEN_CUTOFF` both succeed with a blank value, and
   `bash tools/memory-tree/check-memory-hygiene.test.sh` exits 0, the shipped example declares both
   keys. Deleting either row reds that self-test at its example-conf parity arm naming the missing
-  key, which is how the arm reports that an adopter cannot discover it.
+  key, which is how the arm reports that an adopter cannot discover it. A second half, because the
+  parity arm grades the DECLARATION and never the comment beside it: the comment block introducing
+  each new key — the contiguous `#` lines above its own `KEY=` row, which do not exist before this
+  edit — names `ACCEPTANCE_LEDGER_CUTOFF` as the switch that disarms that arm regardless (S9). A
+  whole-file grep will not do, since the example already declares that key elsewhere. Without this
+  half, the sentence an adopter needs most is the one nothing observes.
+- **AC14** — When the token rule lands under `memory/HYGIENE.md`'s
+  `## Acceptance ledger — how a built unit evidences its criteria` heading, that section states that
+  an answer shares a backticked token with the criterion it evidences and NAMES the key that
+  enforces it, so `grep -c 'LEDGER_TOKEN_CUTOFF' memory/HYGIENE.md` returns non-zero against the
+  count of 0 that same grep returns at base. The key name is the anchor deliberately: the phrase
+  `backticked token` is already in that section once, so grepping the concept would pass without the
+  rule. This is S6's CONTENT half. AC8 proves only that the two halves of the
+  pair moved together and is equally green when the rule reached NEITHER, and S6 is the one named
+  mitigation for arm B's measured 25.4% containment failure — shipping it graded by a sameness
+  compare would leave the answer to that rate resting on a check that cannot fail.
+- **AC15** — When a fixture tree's conf arms `LEDGER_LABEL_CUTOFF` and leaves
+  `ACCEPTANCE_LEDGER_CUTOFF` BLANK, the orphan-label fixture does not red and check 23 prints
+  nothing at all; setting `ACCEPTANCE_LEDGER_CUTOFF` in that same tree reds it. That is S9's nesting,
+  observed rather than assumed, and the blank-`ACCEPTANCE_LEDGER_CUTOFF` shape is what
+  `tools/memory-tree/.memory-tree.conf.example` ships to every adopter.
 
 ## 7. Gates
 
@@ -349,14 +426,18 @@ a remediation message naming three carriers when more existed.
   and never in pre-commit.
   On the landing commit itself this leg CANNOT red on either arm: both cutoffs sit ahead of the
   fleet per §4, so what it prints is the empty-population announce (AC7). It starts grading real
-  work with the first spec dated past the cutoff.
+  work with the first spec dated past the cutoff. In a tree whose `ACCEPTANCE_LEDGER_CUTOFF` is
+  blank this leg runs green with BOTH arms dark and nothing printed, because they are branches of
+  check 23 and not checks of their own — S9, observed by AC15.
 - `memory-hygiene self-test` — `bash tools/memory-tree/check-memory-hygiene.test.sh`, guarded on
   `tools/memory-tree/`, which this unit edits. Under the forward cutoffs this is where both arms'
   observed red is EARNED — the fixtures of S7, not the corpus. It also carries the example-conf
   parity arm, which reds on a new engine `*_CUTOFF` the shipped example does not declare; that is
-  what S4's second declaration answers (AC13).
+  what S4's second declaration answers (AC13). It is also where the two blank-key fixtures of AC6
+  and the nested-disarm fixture of AC15 live, since neither can be observed over the real tree.
 - `kit/dogfood doc parity` — `bash tools/memory-tree/kit-dogfood-parity.test.sh`, the byte-compare
-  that makes the `HYGIENE` pair move together.
+  that makes the `HYGIENE` pair move together. It is a SAMENESS leg and grades no content: what the
+  pair says is AC14's grep, and this leg is green over two halves that never received the rule.
 - `harness arms (fail branches armed or pinned)` — `python3 tools/memory-tree/check-arms.py --check`,
   unguarded, and the leg that refuses an unarmed new `fail` branch.
 - `check-arms selftest` — `python3 tools/memory-tree/check-arms.py --selftest`.
@@ -421,6 +502,51 @@ a remediation message naming three carriers when more existed.
   `check-memory-hygiene.sh`, `.memory-tree.conf` and `memory/HYGIENE.md` off line numbers and onto
   source text, since units 1, 3 and 4 move all three first; S7 now takes its fixture ids from the
   README's `tFixture` allocation instead of the file's high-water.
+- rev-4 · 2026-09-05 · header status line · §2 S3, S4, S6, S7 · §2 S9 new · §3 both backlog
+  citations · §4 Data model, Where the arms sit (NEW), Inventory, Files touched, Alternatives
+  rejected · §5 error/empty, observability, user docs · §6 AC4, AC6, AC7, AC13 · §6 AC14, AC15 new ·
+  §7 three bullets · §10 · folded spec-audit round 2 and swept all 23 of its classes over this spec.
+  Named findings: H5 — S6's content now has AC14, which greps `memory/HYGIENE.md` for
+  `LEDGER_TOKEN_CUTOFF` against the 0 that grep returns at base, and AC8 is restated in §6, §7 and
+  S6 as the sameness compare it is. The key name is the anchor because `backticked token` already
+  appears in that section, so the obvious grep would have passed with the rule absent. H9 — all three
+  line pins are gone: AC7 now cites the `memory-hygiene: check 23 measured NO unit` printf by its
+  text, and §10 cites `declare -A ALFORM` and the `read -r _lt _lseq _luid _llab` walk. This entry
+  claims no conversion the document does not carry: `grep -nE '[a-z-]+\.(sh|md|py):[0-9]'` over this
+  file returns nothing.
+  Swept classes that HIT and what closed them. B1 — both arms are branches of check 23 inside
+  `if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then`, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disarms
+  them silently and their population is an intersection; that is now S9, a §4 subsection, both conf
+  comments, AC13's second half, AC15, a §7 clause and a rejected-hoist alternative. M7 — rev-3's AC6
+  proved a disarm with a whole-tree green that is green either way under a forward cutoff; AC6 now
+  observes the blank key in the fixture suite and says why the real-tree run is not the observation.
+  M10 — S3 declared bullet scope on BOTH sides while AC4 graded only the spec side; AC4 gains the
+  ledger half and §4's Data model says the `alledger` emitter is widened, not just extended. M6 —
+  the shipped example's two comments are adopter documentation and had no observer; AC13 grades
+  them. M1 and L2 — §4's two `dRetiredFork` line ranges were both WRONG at base inside a sentence
+  claiming direct verification, and are replaced by label-level citation plus the re-derivation
+  command. L1 — two counts of populations this spec does not own (`the three existing arms`, `the
+  three existing fail 23 branches`) are dropped; both were correct at base and neither is worth
+  carrying.
+  Swept classes checked and ABSENT here, each by re-running its own predicate: H1 and M4 (the
+  version-bump obligation is scoped at S8, tabled in Files touched, in §7 as `verdict epoch (kit
+  version dates the engine)` and `kit version markers`, and observed by AC12 — every §7 entry
+  verified as a `name` in `tools/gate-legs.json`, and its unguarded/guarded claims verified against
+  that manifest). H2 and H3 (S6 was the only scope item resting on a parity compare; H5 closed it).
+  H4 (every scope item S1-S9 carries an `Observed by` tag). H6 (`check-arms.py --check`,
+  `--selftest`, `--report` are real modes; `kit-dogfood-parity.test.sh` really pairs
+  `memory/HYGIENE.md` with `HYGIENE.template.md`; the `--staged` HELD line and the announce printf
+  exist verbatim; all four scripts named in §6 exist). H7 (AC13's claimed red was verified against
+  the suite's example-conf parity arm, which derives bare `*_CUTOFF` presets AND `${NAME:-}` reads
+  from the engine and reds naming the missing key). H8 (no criterion here grades a retrieval or
+  selection result). H10 and M5 (§3's acceptance-witness parenthetical survives unit 4's hoist —
+  that hoist moves the accumulator and leaves the witness test on its own boolean, verified in unit
+  4's S3 and §3; no other argument here rests on a shape a lower-`order` sibling restructures). M2
+  and M3 (no line pin into the template pair or `HYGIENE.md` remained after H9's conversion; the two
+  backlog pins were correct at base and were dropped anyway, since the backlog is mutable and this
+  build's own landing adds rows). M8 (this unit prescribes no header or contract sentence about its
+  own file). M9 (the only sibling claim made here is that units 1, 3 and 4 edit the engine first,
+  re-verified against their specs; unit 5 was checked and adds no arm and no cutoff).
 
 ## 10. Reuse audit
 
@@ -431,9 +557,11 @@ returns no join helper: its ranked hits are `join_aliases` in `tools/memory-reca
 (fan-in 0, both about the fan-out cap), and `signal_ledger` in
 `tools/drift-audit/drift_report.py` (fan-in 0, a drift signal and not this ledger). Nothing in the
 corpus compares two token sets across a document join. The seam this unit extends is therefore
-check 23's own, already built and named in §4: the `ALFORM` map at
-`tools/memory-tree/check-memory-hygiene.sh:1495` and the label walk at `:1508-1516`, both of which
-gain fields rather than callers. The recall query surfaced two rows worth reading before building,
+check 23's own, already built and named in §4: in `tools/memory-tree/check-memory-hygiene.sh`, the
+map declared at `declare -A ALFORM` and the label walk opening on
+`read -r _lt _lseq _luid _llab` (its `IFS` is a literal tab, so grep the variable list), both of which
+gain fields rather than callers. Cited by source text and not by line, because three lower-`order`
+units insert into this file first — the rule §4 states and rev-3 left unapplied in this section. The recall query surfaced two rows worth reading before building,
 and both are in §3: `TOOL-aBoundedVerdict-32` and `TOOL-aScouredKit-22`.
 
 Recall terms used: `acceptance ledger criterion label join hygiene check 23 backticked token
