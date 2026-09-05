@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-7 — the manifest declares the recall kit and narrows the tooling entrypoint
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
+**Status:** CLOSED · rev-2 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
