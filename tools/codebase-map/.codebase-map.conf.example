@@ -46,3 +46,13 @@ SEAM_FANIN_THRESHOLD=3
 # `new_clones`; folding a duplicate drops the count. Leave unset when no clone kit is adopted
 # (--converge then reports `new_clones: null`). It is NOT a codebase-map artifact and is never gated here.
 CLONE_COUNT_FILE=""
+
+# How many feature dossiers may declare an EMPTY `decisions` list. SHRINK-ONLY: it is a debt
+# being drained, not a tolerance. SHIPS UNSET ON PURPOSE — a number measured on gov's corpus is
+# either vacuous or permanently red on yours. Unset, the check reports the count as UNGRADED and
+# says so rather than reading it as zero (which would red your first run) or skipping silently
+# (which would make the check the vacuous selector it exists to close). Measure yours, then set
+# it, and record the reading beside it. Enforcement of the shrink-only half needs the
+# drift-audit kit, whose RATCHETS list reds an unjustified raise; without that kit the pin is a
+# declared number with no gate behind it, which is a documented gap rather than a silent one.
+DOSSIER_DECISIONS_EMPTY_PIN=""

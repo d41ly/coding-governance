@@ -119,6 +119,35 @@ def test_dossier_affordance_present_or_graced() -> None:
     )
 
 
+def test_dossier_decisions_are_declining() -> None:
+    """How many dossiers declare NO decisions, against a shrink-only pin.
+
+    An empty list passes validation, so nothing has ever failed on the field, so nobody fills
+    it, so the reuse audit returns a seam with no rationale. That is the vacuous-selector
+    class: a rule that binds nothing reports clean forever. The pin is what converts "legal"
+    into "declining".
+
+    UNSET OR EMPTY IS UNGRADED, AND SAYS SO. A fresh adopter has no measurement of their own
+    corpus, and a number copied from another tree is either vacuous or permanently red. Reading
+    an absent pin as 0 would red their first run; reading it as "skip" silently would make this
+    check the very thing it exists to close. So it announces.
+    """
+    tree = m.load_map_tree(INVENTORY_IDS, decision_id_re=ID_RE)
+    assert tree.dossiers, "no dossiers under the map root: this check cannot judge an empty population"
+    empty = sorted(d.feature for d in tree.dossiers if not d.decisions)
+    raw = (m.load_conf().get("DOSSIER_DECISIONS_EMPTY_PIN", "") or "").strip()
+    if not raw:
+        print(f"     UNGRADED: {len(empty)} of {len(tree.dossiers)} dossier(s) declare no decisions; "
+              "set DOSSIER_DECISIONS_EMPTY_PIN in the kit conf to a value measured on THIS corpus")
+        return
+    pin = int(raw)
+    assert len(empty) <= pin, (
+        f"{len(empty)} of {len(tree.dossiers)} dossier(s) declare no decisions, over a "
+        f"shrink-only pin of {pin}. Fill one, or lower the pin with the reading beside it.\n"
+        f"empty: {empty}"
+    )
+
+
 def test_path_derived_keys_are_posix() -> None:
     for inv_id, keys in ext.all_inventories().items():
         offenders = [k for k in keys if "\\" in k]
@@ -157,6 +186,7 @@ if __name__ == "__main__":
         test_every_inventory_key_is_claimed_or_baselined,
         test_dossier_prose_headings_pinned,
         test_dossier_affordance_present_or_graced,
+        test_dossier_decisions_are_declining,
         test_path_derived_keys_are_posix,
         test_generated_artifacts_are_fresh,
     ):

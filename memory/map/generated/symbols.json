@@ -3433,6 +3433,11 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_dossier_decisions_are_declining",
+      "kind": "function",
+      "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
       "id": "test_dossier_prose_headings_pinned",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"

@@ -338,6 +338,10 @@ RATCHETS: list[dict] = [
     # an ungateable pin, and without it the word is a comment.
     {"file": "tools/drift-audit/drift_signals.py",
      "key": "source_cited_ids_resolving_to_no_record", "weakens": "up"},
+    # A pin in ANOTHER kit's conf. The ratchet does not care which file a scalar lives in, and
+    # codebase-map has no shrink-only mechanism of its own - so an adopter without drift-audit
+    # gets a declared pin and no enforcement, which the conf example states rather than hides.
+    {"file": ".codebase-map.conf", "key": "DOSSIER_DECISIONS_EMPTY_PIN", "weakens": "up"},
 ]
 
 CHARTER = "AGENTS.md"

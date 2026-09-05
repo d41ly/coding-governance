@@ -5,7 +5,7 @@ feature = "build-method"
 title = "The build method: how to spec, review and build, rendered from the memory-tree kit"
 status = "shipped"
 streams = ["tooling"]
-decisions = []
+decisions = ["TOOL-aWrittenMethod-1"]
 
 [claims]
 gate-legs = ["method carriers (every pointer declared)", "method-carriers self-test"]

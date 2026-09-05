@@ -64,6 +64,26 @@ class Candidate:
     kind: str = ""                  # symbol kind (function/class/component/const-export), else ""
     file: str = ""                  # def file (symbols only) — for fan-in + "read this"
     detail: str = ""                # inventory id / owning dossier — human context
+    # The unit ids the owning dossier declares. A SEPARATE field on purpose: `detail` is one
+    # overloaded string that `_sources` branches on to resolve a candidate back to its dossier
+    # or its inventory, so folding ids into it would corrupt that branch.
+    decisions: tuple = ()
+
+
+_DECISIONS_RE = re.compile(r"^decisions\s*=\s*\[([^\]]*)\]", re.M)
+
+
+def _dossier_decisions(text: str) -> tuple:
+    """The unit ids a dossier declares, read from its front matter TEXT.
+
+    A front-matter read rather than a parse, so this module keeps needing no project layer.
+    An absent or empty list yields an empty tuple, which prints no clause at all -- an empty
+    clause would be noise on every candidate from the 17 dossiers that declare none.
+    """
+    m_ = _DECISIONS_RE.search(text)
+    if not m_:
+        return ()
+    return tuple(t.strip().strip('"').strip("\'") for t in m_.group(1).split(",") if t.strip())
 
 
 @dataclass
@@ -134,12 +154,13 @@ def load_corpus(root: Path | None = None) -> Corpus:
 
     candidates: dict[str, Candidate] = {}
 
-    def merge(name: str, source: str, *, kind: str = "", file: str = "", detail: str = "") -> None:
+    def merge(name: str, source: str, *, kind: str = "", file: str = "", detail: str = "",
+              decisions: tuple = ()) -> None:
         if not name:
             return
         prev = candidates.get(name)
         if prev is None:
-            candidates[name] = Candidate(name, (source,), kind, file, detail)
+            candidates[name] = Candidate(name, (source,), kind, file, detail, decisions)
             return
         candidates[name] = Candidate(
             name,
@@ -147,6 +168,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
             kind or prev.kind,
             file or prev.file,
             detail or prev.detail,
+            decisions or prev.decisions,
         )
 
     symbol_files: list[str] = []
@@ -163,8 +185,12 @@ def load_corpus(root: Path | None = None) -> Corpus:
 
     shared_seams: dict[str, str] = {}
     for feature, text in m.load_dossier_texts(map_dir).items():
+        # The ids come out of the dossier TEXT, not a parsed dossier. That is the whole reason
+        # this is a front-matter read: the parsed form needs the project-side extractor, and
+        # this module's header declares it portable precisely so it needs none.
+        decisions = _dossier_decisions(text)
         for seam in m.parse_affordance(text).seams:
-            merge(seam, "affordance-seam", detail=feature)
+            merge(seam, "affordance-seam", detail=feature, decisions=decisions)
         prose = _section_body(text, "## Shared seams")
         if prose:
             shared_seams[feature] = prose
@@ -350,7 +376,14 @@ def _line(r: Ranked) -> str:
     meta = " | ".join(bits)
     tag = "" if r.is_seed else " (neighbour)"
     src = "/".join(c.sources)
-    return f"- {c.name}{tag}  [{meta}]  ({r.reason}; via {src})" if meta else f"- {c.name}{tag}  ({r.reason}; via {src})"
+    head = (f"- {c.name}{tag}  [{meta}]  ({r.reason}; via {src})" if meta
+            else f"- {c.name}{tag}  ({r.reason}; via {src})")
+    # EVERY id, not the first few. The range digest truncates because it prints one line per
+    # feature over a whole commit range; here the reader is deciding whether to extend this
+    # seam, and a hidden id is a hidden reason.
+    if c.decisions:
+        head += "\n    decisions: " + " ".join(c.decisions)
+    return head
 
 
 def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
