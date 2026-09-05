@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself
 
-**Status:** OPEN · rev-1 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -129,17 +129,29 @@ No new leg.
   keeps one source and fails loudly on divergence; (b) keep a local copy with a parity arm only;
   (c) move the grammar into a shared location both kits read. Recommendation: (a) — it is the shape
   this repo already uses for a value two kits must agree on, and (c) is a cross-kit contract change
-  that would need its own design pass.
+  that would need its own design pass. RESOLVED (agent, 2026-09-05, delegated): (a).
+  Option (c) trips M3's veto 2 — a cross-kit contract is a new public surface — so it is
+  discarded rather than chosen. Between the two survivors (a) satisfies strictly more of
+  §6: it keeps one source AND fails loudly on divergence, where (b) only reports.
 - **F2 — whether the narrowed globs belong to this signal alone or to a named second population.**
   The trace globs are already a second declaration for one signal, so the precedent says per-signal.
   Recommendation: follow the precedent and declare a third, rather than inventing a shared "non-test
-  product" set that no measurement supports yet.
+  product" set that no measurement supports yet. RESOLVED (agent, 2026-09-05,
+  delegated): declare a third per-signal population beside the trace globs. A shared set
+  would rest on no measurement, and §3 already forbids touching the existing product globs
+  that other, unmeasured signals read.
 - **F3 — what the pin becomes.** Unknown until S1 to S3 are measured. FACT-QUESTION · run the report
-  after each change and take the reading; do not predict it here.
+  after each change and take the reading; do not predict it here. RESOLVED (agent, 2026-09-05,
+  delegated): the pin is whatever S4's measurement returns, taken one change at a time and
+  recorded beside the value. That IS the pick — the number is data the probe produces, not
+  an option anyone chooses — and §3 already forecloses the one choice available here by
+  refusing a raise made to tidy the figure. Liveness: the reading can move in either
+  direction, and a raise is a §8 finding rather than an edit.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
+- rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 
 ## 10. Reuse audit
 

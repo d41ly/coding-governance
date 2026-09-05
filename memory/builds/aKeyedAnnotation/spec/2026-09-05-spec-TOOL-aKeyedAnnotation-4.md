@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only
 
-**Status:** OPEN · rev-1 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -132,19 +132,30 @@ runs, and that leg is unguarded so it runs on every bar.
   repo's other measured pins. Options: (a) the codebase-map conf, keeping a kit's pin with its kit;
   (b) the memory-tree conf, keeping every corpus pin together. Recommendation: (a) — the kit is
   copy-installed and its pin must travel with it, and an adopter without memory-tree must still be
-  able to declare it.
+  able to declare it. RESOLVED (agent, 2026-09-05, delegated): (a), the kit's own
+  conf. Verified at this base that the file exists and already carries this kit's other
+  measured pins, so (a) extends a seam where (b) would create a cross-kit read an adopter
+  without the memory-tree kit could not satisfy at all.
 - **F2 — how S4 keeps a new dossier landable.** A scaffolded dossier legitimately has no decisions
   yet, so a check that reds on it blocks the map's own convergence rule. Options: (a) the scaffold
   emits the key with a comment and the check counts it like any other empty, since the pin is
   shrink-only and one new empty is a visible movement; (b) date-grandfather new dossiers. (a) is
   simpler and the pin already tolerates a temporary rise as a recorded raise. Recommendation: (a).
+  RESOLVED (agent, 2026-09-05, delegated): (a). Option (b) is a date-grandfather term, which
+  is the waiver-registry-by-another-name shape §4 rejects one paragraph above for the schema
+  question; taking it here would contradict that rejection inside one spec.
 - **F3 — which dossiers S5 may fill.** FACT-QUESTION · decided by reading, not judgement: a dossier
   may be filled only where this build read the governing records directly. Everything else stays
-  empty and drains later.
+  empty and drains later. RESOLVED (agent, 2026-09-05, delegated): that rule, applied per
+  dossier at build time, with AC6 as the observation — each id grepped against the memory
+  root and recorded in the acceptance ledger. Liveness: the grep returns nothing for an id
+  that does not resolve, which is what makes a guessed id fail rather than pass, and the
+  honest outcome of the sweep may be that no dossier qualifies.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
+- rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 
 ## 10. Reuse audit
 

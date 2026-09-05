@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-3 — a report-only signal for a source-cited id that resolves to no record
 
-**Status:** OPEN · rev-1 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -134,17 +134,29 @@ deliberately cheaper than a leg, and the leg it rides is unguarded so it already
   narrowed product population, which aligns with the shipped-evidence oracle. Recommendation: (a) —
   the question here is citation integrity, not shipped evidence, and a dangling id in a test file is
   as wrong as one in a module. Note that (a) is what surfaced the second finding at this base.
+  RESOLVED (agent, 2026-09-05, delegated): (a). It is the more feature-rich option on the
+  measurement already in §4 — it satisfies AC1's requirement to report the two ids measured
+  at this base, which (b) would not reach — and it trips no veto, because it reads a
+  population that is already tracked and widens no write surface.
 - **F2 — the pin's shape.** Its siblings use two forms, a tolerance and a shrink-only pin. Given the
   population is small and every member is actionable, shrink-only is the closer fit. Recommendation:
   shrink-only, seeded at the measured value, with the reading recorded beside it.
+  RESOLVED (agent, 2026-09-05, delegated): shrink-only. A tolerance pin permits the
+  population to sit where it is forever, which fails §4's stated intent that the pin be a
+  drain target from the first commit — a criterion the other option cannot satisfy.
 - **F3 — whether the two findings are repaired by this build.** They belong to another node's build
   whose records were never written, so repairing them means writing records for work this session did
   not do. Recommendation: file them as backlog rows against that build and let the signal carry them
-  until its owner drains it; unit 1 repairs only the comment prose it touches.
+  until its owner drains it; unit 1 repairs only the comment prose it touches. RESOLVED
+  (agent, 2026-09-05, delegated): backlog rows, and no records invented. Writing records for
+  another node's unbuilt work would put fiction into the corpus that every consumer in this
+  build then reads as truth, and unit 1's S4 already commits to the same disposition —
+  resolving this fork the other way would leave two specs in disagreement.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
+- rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 
 ## 10. Reuse audit
 

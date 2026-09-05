@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs
 
-**Status:** OPEN · rev-1 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -129,14 +129,25 @@ typed here. No new leg.
   charter pointer and reach the guide from the kickoff manifest's §B, which is not byte-gated;
   (b) trim non-instructional prose elsewhere in the template to buy the line; (c) ask the owner to
   raise the ceiling. Recommendation: (a) now, and let a later unit that is already trimming the
-  template carry the pointer for free.
+  template carry the pointer for free. RESOLVED (agent, 2026-09-05, delegated): (a).
+  Options (b) and (c) both change the governance template, which M3's veto 2 reserves to
+  the owner, so neither survives to be picked. (a) is what is left standing, and it is also
+  the option costing no acceptance criterion.
 - **F2 — carrier registration.** Whether a second rendered guide must join the kit's method-carrier
   registry is a fact the adopter script decides, not a judgement. FACT-QUESTION · read
-  `tools/memory-tree/adopt-memory-tree.sh` at the carrier-registry block and follow what it demands.
+  `tools/memory-tree/adopt-memory-tree.sh` at the carrier-registry block and follow what it demands. RESOLVED (agent, 2026-09-05,
+  delegated): the probe was run, and the answer falls out of it in two halves. That block
+  seeds `memory/project/method-carriers.txt` by grepping every file OUTSIDE the memory root
+  for a literal reference to the build method, so the RENDERED guide lands inside that root
+  and never joins the registry — no registration is demanded. The half it does demand is the
+  TEMPLATE, which lands in the kit dir where the seed does look: it must either avoid that
+  literal or gain a skip case beside the two already in that block. Liveness: the probe can
+  return no obligation, and on the first half it did.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
+- rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 
 ## 10. Reuse audit
 
