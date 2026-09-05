@@ -947,6 +947,232 @@ def test_reuse_shared_primitives(tmp: Path):
         pass
 
 
+def test_lookup_row_carries_sources(tmp: Path):
+    """The log row records WHAT came back, not only that a probe ran, and the write stays non-fatal.
+
+    Against a SCRATCH repo with `CODEBASE_MAP_ROOT` redirected: an arm that wrote into this tree's
+    own log would manufacture the very evidence a reader of that log would count.
+    """
+    import os
+    import json
+    import subprocess
+
+    (tmp / ".codebase-map.conf").write_text(
+        "MAP_ROOT=memory/map\nSEAM_FANIN_THRESHOLD=3\n", encoding="utf-8")
+    gen = tmp / "memory" / "map" / "generated"
+    gen.mkdir(parents=True)
+    # A DOSSIER, and it is the whole point of this fixture. The first version of this arm had none,
+    # so `corpus: … 0 affordance seams | 0 dossiers` and the dossier branch of `derive_source_paths`
+    # was never entered — the (a2) containment assertion below then passed byte-for-byte against the
+    # very defect it was written to gate. Caught by the closing review, which staged the break and
+    # watched the arm stay green. A regression gate whose fixture cannot reach the regression is the
+    # `fixture-passes-by-finding-nothing` class wearing the costume of a fix.
+    feats = tmp / "memory" / "map" / "features"
+    feats.mkdir(parents=True)
+    (feats / "text.md").write_text(
+        "## Reuse affordance\n"
+        "seam: slugify — reuse for name->slug; extend via the transform registry\n"
+        "\n## Shared seams\nThe text module normalises display names into url slugs.\n",
+        encoding="utf-8",
+    )
+    # BOTH symbols in ONE file, deliberately: `n_shown` counts ranked CANDIDATES and `n_sources`
+    # counts distinct source PATHS, so a fixture giving each symbol its own file makes the two
+    # numbers coincide and cannot test either. They must differ for the arm to mean anything.
+    syms = [{"id": "slugify", "kind": "function", "file": "src/text.py"},
+            {"id": "slug_case", "kind": "function", "file": "src/text.py"},
+            {"id": "slug_helper", "kind": "function", "file": "src/text.py"}]
+    (gen / "symbols.json").write_text(m.render_symbols_json(syms), encoding="utf-8")
+    src = tmp / "src"
+    src.mkdir()
+    (src / "text.py").write_text(
+        "def slugify(s):\n    return s\n"
+        "def slug_case(s):\n    return s\n"
+        "def slug_helper(s):\n    return s\n", encoding="utf-8")
+    subprocess.run(["git", "-c", "init.defaultBranch=main", "init", "-q", str(tmp)],
+                   check=True, capture_output=True)
+
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp)
+    try:
+        corpus = rl.load_corpus()
+        ref = m.build_reference_index(corpus.symbol_files)
+        sl = rl.assemble_shortlist("normalise a display name into a url slug", corpus, ref)
+
+        # (a) ONE derivation: the paths the writer records are the candidates' own files, deduped
+        #     and in shortlist order. Nothing parses rendered output.
+        paths = rl.derive_source_paths(sl)
+        assert paths == list(dict.fromkeys(paths)), f"not deduped: {paths}"
+        assert all("\\" not in p for p in paths), f"not forward-slashed: {paths}"
+        assert "src/text.py" in paths, paths
+
+        # (a2) CONTAINMENT IN BOTH DIRECTIONS. A one-way subset assertion is what let the first
+        #      cut of this field ship dropping every dossier source: `shown_paths` was a strict
+        #      subset of what the reader saw, and a subset assertion cannot see that. The reverse
+        #      direction is the whole gate.
+        shown = rl._sources(sl, corpus)
+        labelled = set()
+        for line in shown:
+            if line.startswith("symbol def: "):
+                labelled.add(line[len("symbol def: "):])
+            elif line.startswith("dossier: "):
+                labelled.add(line[len("dossier: "):])
+        assert set(paths) <= labelled, f"logged a path the reader was never shown: {set(paths) - labelled}"
+        assert labelled <= set(paths), f"showed a source the log dropped: {labelled - set(paths)}"
+        # (b) the row carries both fields, and n_shown keeps its OLD meaning -- the ranked count,
+        #     which is a different number from the path count.
+        rl.write_lookup(m.repo_root(), "q", len(sl.ranked), paths)
+        log = rl._resolve_git_dir(m.repo_root()) / "codebase-map" / "lookups.jsonl"
+        row = json.loads(log.read_text(encoding="utf-8").strip().splitlines()[-1])
+        assert row["n_shown"] == len(sl.ranked), row
+        assert row["n_sources"] == len(paths), row
+        assert row["shown_paths"] == paths[: rl.SOURCE_PATHS_CAP], row
+
+        # (c) THE CAP, exercised rather than assumed: n_sources records the pre-cap count, so a
+        #     truncated list is visible AS truncated. Without this the cap is a constant nothing reads.
+        many = [f"src/f{i}.py" for i in range(rl.SOURCE_PATHS_CAP + 7)]
+        rl.write_lookup(m.repo_root(), "q2", 999, many)
+        row = json.loads(log.read_text(encoding="utf-8").strip().splitlines()[-1])
+        assert len(row["shown_paths"]) == rl.SOURCE_PATHS_CAP, len(row["shown_paths"])
+        assert row["n_sources"] == len(many), row["n_sources"]
+        assert row["n_sources"] > len(row["shown_paths"]), "truncation is invisible"
+
+        # (c2) THE REAL CALL SITE, end to end. Everything above drives `write_lookup` with values
+        #      the test itself computed, which cannot catch `main()` passing the wrong ones -- and
+        #      that is exactly what a defaulted `paths` argument would have hidden. Run the CLI.
+        before = log.read_text(encoding="utf-8").strip().splitlines()
+        assert rl.main(["normalise a display name into a url slug"]) == 0
+        after = log.read_text(encoding="utf-8").strip().splitlines()
+        assert len(after) == len(before) + 1, "main() wrote no row"
+        real = json.loads(after[-1])
+        assert real["n_sources"] == len(real["shown_paths"]), real
+        assert real["n_sources"] > 0, "main() logged an EMPTY source set — the argument was dropped"
+        assert real["n_shown"] != real["n_sources"], (
+            "this fixture cannot tell the two fields apart, so it proves nothing about either")
+        # (d) NEVER FATAL: a write that cannot happen must not change the exit code. The root is
+        #     pointed at a tree with no git dir at all, which is the real resolution failure.
+        nogit = tmp / "nogit"
+        nogit.mkdir()
+        rl.write_lookup(nogit, "q3", 1, ["src/text.py"])  # must not raise
+        assert not list(nogit.rglob("lookups.jsonl")), "wrote a row with no git dir to write into"
+    finally:
+        os.environ.pop("CODEBASE_MAP_ROOT", None)
+
+
+def test_neighbour_cap_ranks_before_truncating(tmp: Path):
+    """The neighbour cap slices the RANKED pool, not the alphabetical one.
+
+    The fixture is built so the two orderings cannot agree: `zzz_hub` has the highest fan-in in the
+    pool and sorts LAST by name, while a run of `aa_*` names with fan-in 0 sorts first. Under the
+    shipped code the cap took `sorted(neighbours.items())[:CAP]`, so `_rank` never even saw
+    `zzz_hub` and the printed shortlist was the twelve alphabetically-first names ordered by a
+    fan-in that had already been thrown away.
+
+    Observed RED against the shipped ordering before it was written: `zzz_hub` was absent from the
+    shortlist and the zero-fan-in filler was present.
+    """
+    import os
+
+    cap = rl.NEIGHBOUR_CAP
+    (tmp / ".codebase-map.conf").write_text(
+        "MAP_ROOT=memory/map\nSEAM_FANIN_THRESHOLD=3\n", encoding="utf-8")
+    gen = tmp / "memory" / "map" / "generated"
+    gen.mkdir(parents=True)
+
+    # One seed (matched by name stem), then MORE THAN `cap` same-kind neighbours whose names sort
+    # before `zzz_hub`. Filler count is derived from the cap so the arm cannot rot if the cap moves.
+    filler = [f"aa_pad_{i:02d}" for i in range(cap + 3)]
+    syms = [{"id": "slugify", "kind": "function", "file": "src/text.py"}]
+    syms += [{"id": n, "kind": "function", "file": f"src/{n}.py"} for n in filler]
+    syms += [{"id": "zzz_hub", "kind": "function", "file": "src/hub.py"}]
+    (gen / "symbols.json").write_text(m.render_symbols_json(syms), encoding="utf-8")
+    (tmp / "memory" / "map" / "features").mkdir(parents=True)
+
+    src = tmp / "src"
+    src.mkdir()
+    (src / "text.py").write_text("def slugify(s):\n    return s\n", encoding="utf-8")
+    (src / "hub.py").write_text("def zzz_hub(s):\n    return s\n", encoding="utf-8")
+    for n in filler:
+        (src / f"{n}.py").write_text(f"def {n}(s):\n    return s\n", encoding="utf-8")
+    # zzz_hub is referenced from many files -> the highest fan-in in the pool. The filler is
+    # referenced from none -> fan-in 0. Nothing references slugify, so the seed stays a seed.
+    for i in range(6):
+        (src / f"ref{i}.py").write_text("from hub import zzz_hub\nx = zzz_hub(1)\n", encoding="utf-8")
+
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp)
+    try:
+        corpus = rl.load_corpus()
+        ref = m.build_reference_index(corpus.symbol_files)
+        sl = rl.assemble_shortlist("normalise a display name into a url slug", corpus, ref)
+        neighbours = [r for r in sl.ranked if not r.is_seed]
+        names = [r.candidate.name for r in neighbours]
+
+        assert neighbours, "the fixture produced no neighbours at all — it proves nothing"
+        assert len(neighbours) <= cap, f"the cap was not applied: {len(neighbours)} > {cap}"
+        assert "zzz_hub" in names, (
+            "the highest-fan-in neighbour was truncated before it could be ranked — the cap is "
+            f"still slicing the alphabetical pool: {names}"
+        )
+        assert names[0] == "zzz_hub", f"the ranked cap must keep fan-in order: {names}"
+        # and the ordering is descending fan-in, which is the key the shortlist sort also reads
+        fanins = [r.fanin for r in neighbours]
+        assert fanins == sorted(fanins, reverse=True), fanins
+    finally:
+        os.environ.pop("CODEBASE_MAP_ROOT", None)
+
+
+def test_neighbour_predicate_is_directory_scoped(tmp: Path):
+    """The same-kind arm admits a candidate in the seed's DIRECTORY and refuses one outside it.
+
+    Both directions, because a narrowing tested only on what it keeps is a narrowing whose whole
+    point is unobserved. Kind alone admitted 95% of the corpus here; the cap over that selected
+    nothing, whatever it sorted by.
+
+    Observed RED against the un-narrowed predicate before it was written: `far_helper` was admitted
+    as a `same kind` neighbour from another directory.
+    """
+    import os
+
+    (tmp / ".codebase-map.conf").write_text(
+        "MAP_ROOT=memory/map\nSEAM_FANIN_THRESHOLD=3\n", encoding="utf-8")
+    gen = tmp / "memory" / "map" / "generated"
+    gen.mkdir(parents=True)
+    syms = [
+        {"id": "slugify", "kind": "function", "file": "src/near/text.py"},     # the seed
+        {"id": "near_helper", "kind": "function", "file": "src/near/util.py"},  # same dir  -> ADMIT
+        {"id": "far_helper", "kind": "function", "file": "src/far/util.py"},    # other dir -> REFUSE
+    ]
+    (gen / "symbols.json").write_text(m.render_symbols_json(syms), encoding="utf-8")
+    (tmp / "memory" / "map" / "features").mkdir(parents=True)
+
+    (tmp / "src" / "near").mkdir(parents=True)
+    (tmp / "src" / "far").mkdir(parents=True)
+    (tmp / "src" / "near" / "text.py").write_text("def slugify(s):\n    return s\n", encoding="utf-8")
+    (tmp / "src" / "near" / "util.py").write_text("def near_helper(s):\n    return s\n", encoding="utf-8")
+    (tmp / "src" / "far" / "util.py").write_text("def far_helper(s):\n    return s\n", encoding="utf-8")
+    # far_helper is the HIGHER fan-in of the two, so if it is absent that is the predicate refusing
+    # it rather than the ranking burying it — otherwise this arm would pass for the wrong reason.
+    for i in range(4):
+        (tmp / "src" / f"ref{i}.py").write_text(
+            "from far.util import far_helper\nx = far_helper(1)\n", encoding="utf-8")
+
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp)
+    try:
+        corpus = rl.load_corpus()
+        ref = m.build_reference_index(corpus.symbol_files)
+        sl = rl.assemble_shortlist("normalise a display name into a url slug", corpus, ref)
+        same_kind = {r.candidate.name: r for r in sl.ranked
+                     if not r.is_seed and "same kind" in r.reason}
+
+        assert "near_helper" in same_kind, (
+            f"the narrowed arm dropped a same-directory candidate: {sorted(same_kind)}")
+        assert "far_helper" not in same_kind, (
+            "the same-kind arm admitted a candidate from another directory — the predicate is "
+            f"still kind-only: {sorted(same_kind)}")
+        # S4: the printed reason names the narrowed predicate, so an empty pool reads as honest.
+        assert "src/near" in same_kind["near_helper"].reason, same_kind["near_helper"].reason
+    finally:
+        os.environ.pop("CODEBASE_MAP_ROOT", None)
+
+
 def test_reuse_lookup(tmp: Path):
     """AC3 on a portable FIXTURE repo (no host-repo paths): a planted `slugify` seam is ranked
     above unrelated symbols for a behaviour query; a no-home query returns 'no seam fits'; and a
@@ -1400,6 +1626,21 @@ def main() -> int:
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check("reuse-lookup shortlist (AC3 fixture)", lambda: test_reuse_lookup(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "the neighbour cap slices the RANKED pool, not the alphabetical one",
+            lambda: test_neighbour_cap_ranks_before_truncating(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "the same-kind neighbour arm is directory-scoped, both directions",
+            lambda: test_neighbour_predicate_is_directory_scoped(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "the map log row records the sources it showed, capped and never fatal",
+            lambda: test_lookup_row_carries_sources(Path(td)),
+        )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "closing loop: collisions + backlog dedup (S5 / AC4)", lambda: test_detect_collisions_and_backlog(Path(td))

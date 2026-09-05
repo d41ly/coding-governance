@@ -1,10 +1,15 @@
 # TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran
 
-**Status:** BLOCKED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3 · ratified 2026-09-05
+**Status:** CLOSED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-05-build-TOOL-aTunedCompass-8-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aTunedCompass-8-acceptance-ledger.md) | journal | — |
+| [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md) | spec-audit | TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-9 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
 
 <!-- /gen:spec-records -->
 
@@ -54,7 +59,7 @@ measurable by the same method the parent build used on the recall half.
   ranking at `tools/codebase-map/reuse_lookup.py` (`:243`) is `TOOL-aTunedCompass-6`, and the
   private-symbol exclusion is a backlog row that needs its own measurement first. If both landed in
   one pass, no later analysis could tell a ranking change from a logging change. That is why this
-  unit carries `order 2` against that unit's `order 1`: they are two passes, not one parallel group.
+  unit carries `order 3` against that unit's `order 1`: they are two passes, not one parallel group.
 - Not logging the rendered answer, its byte count, or its snippet text. The parent measured a mean
   of 10782 bytes of output per probe; storing that is a corpus, not a telemetry row.
 - Not tracking the log, moving it out of the git common directory, or rotating it.
@@ -106,6 +111,15 @@ a research harness.
 Inside the existing guarded block, after the answer is rendered, exactly as the row is written today.
 The ordering is deliberate in the current code and it survives: a row means a lookup that ANSWERED,
 so a crash in the renderer leaves no evidence of a probe whose result nobody saw.
+
+**Which path the log resolves to, stated because AC4 turns on it.** `_resolve_git_dir`
+(`tools/codebase-map/reuse_lookup.py` `:392`-`:404`) is pure path math over `root/.git` plus the
+`commondir` file, with an explicit "NO child process" docstring, and `root` is `m.repo_root()`, which
+reads `CODEBASE_MAP_ROOT` alone (`tools/codebase-map/map_lib.py` `:113`-`:119`). `GIT_DIR` appears
+nowhere under `tools/codebase-map/`. So the only lever that moves the log's location is
+`CODEBASE_MAP_ROOT`, and an arm that tried to disable the writer through the git environment would
+leave the writer pointed at the real common directory and APPEND to the live corpus it was written to
+protect.
 
 ### Data model
 
@@ -175,8 +189,12 @@ dossier says so, because a zero would read as "the probe pointed at nothing".
 - **AC3** — When the same query's rendered output is compared with its row, every entry in
   `shown_paths` appears in the command's own `## sources to open` block, is repo-relative, and uses
   forward slashes.
-- **AC4** — When the command is run with `GIT_DIR` pointed at a path that does not exist, it still
-  prints its candidates and exits 0, and no row is written.
+- **AC4** — When the command is run with `CODEBASE_MAP_ROOT` pointed at a scratch tree holding no
+  `.git` (or whose `.git` file names a missing gitdir), it still prints its candidates and exits 0,
+  no row is written anywhere, and this repository's own `lookups.jsonl` is byte-unchanged across the
+  run. The environment variable is named deliberately: the resolution walks from the map root to its
+  git directory and then through `commondir`, and `GIT_DIR` reaches none of it — see §4, which
+  spells the path form.
 - **AC5** — When `python tools/codebase-map/selftest.py` runs, the new arm passes, and the real
   log's hash is unchanged by the suite run — the arm wrote into its scratch repository, not this one.
 - **AC6** — When `bash tools/check-install-prefix.sh` runs, it stays green: the diff adds no sibling
@@ -254,6 +272,12 @@ log that has no schema, and the row exists so that cost is a planned one.
 - rev-3 · 2026-09-05 · both forks resolved by the owner. The unit is BLOCKED on the new
   `TOOL-aTunedCompass-11` and moves to order 3; the extra attribution is deferred to a backlog row
   rather than declined.
+- rev-4 · 2026-09-05 · round-1 spec audit folded, findings H5 and L1. AC4 named `GIT_DIR`, which
+  reaches nothing under this kit: the log path is `CODEBASE_MAP_ROOT` -> `root/.git` -> `commondir`,
+  so the criterion could not fail for the reason it gave and running it would have appended a row to
+  the live log AC5 exists to protect. AC4 now drives the real lever and asserts the corpus is
+  byte-unchanged, and §4 states the resolution. §3 still read `order 2` after rev-3 moved the header
+  to 3; the body follows the header.
 
 ## 10. Reuse audit
 

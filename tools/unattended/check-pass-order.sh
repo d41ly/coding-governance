@@ -35,7 +35,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.17   # gov:kit unattended@1.17 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.18   # gov:kit unattended@1.18 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong

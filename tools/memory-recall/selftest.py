@@ -45,6 +45,7 @@ for _leak in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTOR
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import recall_conf  # noqa: E402
+import query  # noqa: E402
 
 KIT = pathlib.Path(__file__).resolve().parent
 SHIPPED = ("recall_conf.py", "extract.py", "bench.py", "union.py", "query.py", "selftest.py")
@@ -87,7 +88,8 @@ class _Skip(Exception):
 # ------------------------------------------------------------------ throwaway repo construction
 
 
-def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str | None = None):
+def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str | None = None,
+              flat: bool = False):
     """A git repo with the kit copied in, a two-record corpus, and NO __pycache__ ignore rule.
 
     The ignore rule is deliberately absent: `git status --porcelain` is also clean when a write was
@@ -104,8 +106,16 @@ def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str |
     for f in SHIPPED:
         shutil.copyfile(KIT / f, kitdir / f)
     (root / ".memory-tree.conf").write_text(conf, encoding="utf-8", newline="\n")
-    disc = root / "memory" / "tooling"
-    disc.mkdir(parents=True)
+    # `flat` writes <root>/DECISIONS.md, which is the layout the memory-tree kit's own adopter
+    # creates; the default writes <root>/<discipline>/DECISIONS.md, which is upstream's. `DURABLE`
+    # must admit BOTH, and until this parameter existed every fixture here was nested, so the
+    # pattern's failure on a flat root was invisible to this suite as well as to the product.
+    if flat:
+        disc = root / "memory"
+        disc.mkdir(parents=True)
+    else:
+        disc = root / "memory" / "tooling"
+        disc.mkdir(parents=True)
     (disc / "DECISIONS.md").write_text(CORPUS, encoding="utf-8", newline="\n")
     if gitignore is not None:
         (root / ".gitignore").write_text(gitignore, encoding="utf-8", newline="\n")
@@ -299,6 +309,164 @@ def test_empty_alias():
         return f"{n_rec} records + {n_chunk} chunks, alias digest empty, ranked list non-empty"
     finally:
         cleanup(root)
+
+
+SPINE_RE = re.compile(r"^spine\s+(\d+) docs", re.M)
+
+
+def _measure_spine_docs(root: pathlib.Path, kitdir: pathlib.Path) -> tuple[int, str]:
+    """Run extract.py and return (spine doc count, stderr)."""
+    out = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-spine-"))
+    try:
+        ex = run(root, kitdir, str(root), str(out), script="extract.py")
+        m = SPINE_RE.search(ex.stdout)
+        assert m, f"no spine row in extract output:\n{ex.stdout}\n{ex.stderr}"
+        return int(m.group(1)), ex.stderr
+    finally:
+        cleanup(out)
+
+
+@check("spine is NON-EMPTY on a FLAT memory root — the layout this kit's own adopter writes")
+def test_spine_flat_layout():
+    """The shipped `DURABLE` required a directory segment between the root and the index file.
+
+    A flat root has none, so `spine` was empty here and in every adopter with a flat tree, for a
+    month, with nothing saying so. This arm was observed RED against the shipped pattern before it
+    was written: it reported 0 docs and the assertion below fired.
+    """
+    root, kitdir = make_repo(flat=True)
+    try:
+        n, err = _measure_spine_docs(root, kitdir)
+        assert n > 0, f"spine is EMPTY on a flat root — DURABLE does not admit <root>/DECISIONS.md\n{err}"
+        assert "EMPTY SPINE" not in err, f"non-empty spine must not print the diagnosis:\n{err}"
+        return f"flat root yields {n} spine doc(s)"
+    finally:
+        cleanup(root)
+
+
+@check("spine is still NON-EMPTY on a NESTED root — the widening trades no layout for the other")
+def test_spine_nested_layout():
+    root, kitdir = make_repo()  # nested, upstream's shape
+    try:
+        n, err = _measure_spine_docs(root, kitdir)
+        assert n > 0, f"the widened DURABLE stopped matching the nested layout\n{err}"
+        return f"nested root yields {n} spine doc(s)"
+    finally:
+        cleanup(root)
+
+
+@check("DURABLE is DERIVED from FAMILIES, not a literal — the pattern moves with the conf")
+def test_durable_derives_families():
+    """A literal family list would ship THIS repo's four prefixes into every adopter's kit.
+
+    The observation is that the compiled pattern CHANGES when the stub conf's FAMILIES changes.
+    Reading the pattern out of the module under two confs is the only way to see that; asserting on
+    spine counts alone would pass for a hard-coded list as readily as for a derived one.
+    """
+    snippet = (
+        "import sys; sys.dont_write_bytecode = True\n"
+        "sys.path.insert(0, sys.argv[1])\n"
+        "import extract\n"
+        "print(extract.DURABLE.pattern)\n"
+    )
+    pats = {}
+    for tag, fam in (("a", "tooling:TOOL"), ("b", "widgets:WDGT")):
+        root, kitdir = make_repo(conf=f'MEMORY_ROOT=memory\nFAMILIES="{fam}"\n')
+        try:
+            p = subprocess.run([sys.executable, "-c", snippet, str(kitdir)],
+                               cwd=str(root), capture_output=True, text=True)
+            assert p.returncode == 0, f"could not read DURABLE under {fam}:\n{p.stderr}"
+            pats[tag] = p.stdout.strip()
+        finally:
+            cleanup(root)
+    assert pats["a"] != pats["b"], (
+        "DURABLE did not move with FAMILIES — the alternation is a literal, and this kit would "
+        f"ship gov's own prefixes to every adopter:\n{pats['a']}"
+    )
+    assert "TOOL" in pats["a"] and "WDGT" in pats["b"], (
+        f"the declared family is absent from the compiled pattern:\n{pats['a']}\n{pats['b']}"
+    )
+    assert "WDGT" not in pats["a"], "a family the conf did not declare leaked into the pattern"
+    return "the compiled pattern follows the declared FAMILIES"
+
+
+@check("an empty spine beside non-empty records ANNOUNCES itself on stderr, and exits 0")
+def test_empty_spine_is_loud():
+    """The state that was silent for a month. A print, not a refusal, matching zero_record_diagnosis.
+
+    The fixture is a corpus whose records anchor in a file `DURABLE` does not admit at any layout,
+    so records are non-empty and spine is empty — the exact shape that shipped.
+    """
+    root, kitdir = make_repo()
+    try:
+        # Move the corpus to a name no index alternation admits: records still extract from it,
+        # but it is not a durable HOME.
+        src = root / "memory" / "tooling" / "DECISIONS.md"
+        dst = root / "memory" / "tooling" / "notes.md"
+        src.rename(dst)
+        subprocess.run(["git", "-C", str(root), "add", "-A"], check=True, capture_output=True)
+        out = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-spine-"))
+        try:
+            ex = run(root, kitdir, str(root), str(out), script="extract.py")
+            assert ex.returncode == 0, f"a print, not a refusal — got {ex.returncode}\n{ex.stderr}"
+            m = SPINE_RE.search(ex.stdout)
+            assert m and int(m.group(1)) == 0, f"wrong fixture: spine is not empty\n{ex.stdout}"
+            assert "EMPTY SPINE" in ex.stderr, f"the silent empty stayed silent:\n{ex.stderr}"
+            assert "DURABLE" in ex.stderr, "the diagnosis does not name the pattern"
+            assert "MEMORY_ROOT" in ex.stderr, "the diagnosis does not name the resolved root"
+            return "diagnosed on stderr, exit 0"
+        finally:
+            cleanup(out)
+    finally:
+        cleanup(root)
+
+
+
+@check("the served chunk arm is ROLLED UP: at most one hit per parent, both key branches")
+def test_chunk_arm_rolls_up():
+    """`run_rollup` keeps the best hit per parent, and BOTH branches of the parent key are covered.
+
+    The key is `hit["id"] or hit["path"]`. Measured over the tracked corpus, 129 of 20056 chunk
+    documents carry a record id, so for 99.4% of the served arm this is a per-PATH cap and an arm
+    over the 0.6% would certify nothing about the rest.
+
+    Corpus-independent: it drives `query.run_rollup` on synthetic hit dicts, so it cannot rot with
+    the memory tree, and it is a pure function so no index is built.
+    """
+    rr = query.run_rollup
+
+    # (a) ANCHORED — several hits sharing one record id collapse to the first, and a second record
+    #     survives. The id, not the path, is doing the work: all three sit in one file.
+    anchored = [
+        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 1},
+        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 40},
+        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 90},
+        {"id": "TOOL-x-2", "path": "memory/a.md", "line": 120},
+    ]
+    got = rr(anchored, 20)
+    assert [h["id"] for h in got] == ["TOOL-x-1", "TOOL-x-2"], got
+    assert got[0]["line"] == 1, "the rollup must keep the BEST-RANKED hit, not the last"
+
+    # (b) UNANCHORED — the branch the corpus actually takes. No `id` at all, so the key degrades to
+    #     the path and the cap is one hit per FILE.
+    unanchored = [
+        {"path": "memory/guides/long.md", "line": 1},
+        {"path": "memory/guides/long.md", "line": 200},
+        {"path": "memory/guides/long.md", "line": 400},
+        {"path": "memory/guides/other.md", "line": 5},
+    ]
+    got = rr(unanchored, 20)
+    assert [h["path"] for h in got] == ["memory/guides/long.md", "memory/guides/other.md"], got
+    assert got[0]["line"] == 1, got
+
+    # (c) the cap still bounds the result, and a MIXED list keys each hit on its own branch.
+    mixed = anchored + unanchored
+    assert len(rr(mixed, 2)) == 2, "k must bound the rolled-up list"
+    assert len(rr(mixed, 20)) == 4, rr(mixed, 20)
+
+    # (d) an empty ranking rolls up to an empty list rather than raising.
+    assert rr([], 20) == []
+    return "one hit per parent on both key branches, capped"
 
 
 @check("mis-declared FAMILIES is LOUD: zero records diagnosed, not reported as success")
@@ -1394,6 +1562,8 @@ def main() -> int:
 
     order = [
         test_parser_vs_bash, test_no_conf_query, test_no_conf_adopt, test_empty_alias,
+        test_spine_flat_layout, test_spine_nested_layout, test_durable_derives_families, test_chunk_arm_rolls_up,
+        test_empty_spine_is_loud,
         test_zero_records_is_loud, test_empty_corpus_names_memory_root,
         test_conf_digest_both_directions, test_digest_covers_kit_version, test_writes_nothing_in_worktree,
         test_alias_rebuild, test_dead_alias_is_loud, test_eviction, test_printed_invocations_resolve,

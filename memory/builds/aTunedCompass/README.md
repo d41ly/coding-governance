@@ -37,13 +37,12 @@ before it sorts by fan-in. Two records state facts their own sources refute.
 - **M2 classification, recorded before acting: every unit is MISSING.** No conforming spec carries
   any of these ids at BASE; each is authored by this build and is therefore unreviewed by definition,
   so M4's spec audit is owed before any code.
-- **Nothing here is built in this pass.** The units land at `SPECCED` awaiting owner scope approval.
-  A Tier-2 DoR is a design pass, and approval precedes building — this build stops at the spec set.
 - **Unit 1 is the only records-only unit and it corrects two documents, not one.** Both are the same
   mechanism — a record asserting a fact its own source refutes — applied to two files. Splitting one
   mechanism across two units to satisfy a document count would make the closing diff less readable,
   which is what M2's rule exists to protect.
-- **RESTRUCTURED at scope approval, under M3.** Twelve forks went to the owner; eleven are answered
+- **RESTRUCTURED at scope approval, under M3.** The first pass built nothing and stopped at the
+  spec set; approval then came. Twelve forks went to the owner; eleven are answered
   and unit 3's second stays open with the unit it belongs to. Three units were ADDED: 9 builds the
   discriminating fixture that 2 and 3 are now BLOCKED on, 10 takes the predicate narrowing that would
   have made 6 two mechanisms, 11 lands the reader 8 is blocked on. Unit 4 moved to order 1 on the
@@ -53,6 +52,8 @@ before it sorts by fan-in. Two records state facts their own sources refute.
   each spec cites it rather than re-deriving. A unit that needs a NEW number says so in its §8.
 - **This build sets no floor.** The owner blocked pinning on unit 9 rather than derive one from a
   saturated 12-question fixture. A figure quoted anywhere here carries its n.
+- **This run's outcome is a RECORD, not a rule**:
+  `build/2026-09-05-build-TOOL-aTunedCompass-1-run-outcome.md`.
 
 ## Parked decisions
 - **Whether the chunk set earns its place at all is still NOT decided.** `union.py` puts
@@ -69,19 +70,19 @@ before it sorts by fan-in. Two records state facts their own sources refute.
 
 <!-- roster:units -->
 
-| # | Unit | Status | Mechanism |
-|---|---|---|---|
-| 1 | `TOOL-aTunedCompass-1` | OPEN | the two records this build's parent refuted are corrected in place |
-| 2 | `TOOL-aTunedCompass-2` | BLOCKED | the recall fixture carries the terms every real query supplies |
-| 3 | `TOOL-aTunedCompass-3` | BLOCKED | the recall floor grades the two-set ensemble the CLI serves |
-| 4 | `TOOL-aTunedCompass-4` | OPEN | the chunk source becomes the rollup, which also de-duplicates the slots |
-| 5 | `TOOL-aTunedCompass-5` | OPEN | `DURABLE` matches a flat memory root, so `spine` stops being empty |
-| 6 | `TOOL-aTunedCompass-6` | OPEN | the reuse probe ranks its neighbour pool before it truncates it |
-| 7 | `TOOL-aTunedCompass-7` | OPEN | the manifest declares the recall kit and narrows the tooling entrypoint |
-| 8 | `TOOL-aTunedCompass-8` | BLOCKED | the map log records what a probe returned, not only that it ran |
-| 9 | `TOOL-aTunedCompass-9` | OPEN | a recall fixture that can tell the two-set ensemble from its records half |
-| 10 | `TOOL-aTunedCompass-10` | OPEN | the neighbour predicate selects a pool a cap can meaningfully bound |
-| 11 | `TOOL-aTunedCompass-11` | OPEN | the map log gains the run-state reader a closed unit's acceptance claimed |
+| # | Unit | Mechanism |
+|---|---|---|
+| 1 | `TOOL-aTunedCompass-1` | the two records this build's parent refuted are corrected in place |
+| 2 | `TOOL-aTunedCompass-2` | the recall fixture carries the terms every real query supplies |
+| 3 | `TOOL-aTunedCompass-3` | the recall floor grades the two-set ensemble the CLI serves |
+| 4 | `TOOL-aTunedCompass-4` | the chunk source becomes the rollup, which also de-duplicates the slots |
+| 5 | `TOOL-aTunedCompass-5` | `DURABLE` matches a flat memory root, so `spine` stops being empty |
+| 6 | `TOOL-aTunedCompass-6` | the reuse probe ranks its neighbour pool before it truncates it |
+| 7 | `TOOL-aTunedCompass-7` | the manifest declares the recall kit and narrows the tooling entrypoint |
+| 8 | `TOOL-aTunedCompass-8` | the map log records what a probe returned, not only that it ran |
+| 9 | `TOOL-aTunedCompass-9` | a recall fixture that can tell the two-set ensemble from its records half |
+| 10 | `TOOL-aTunedCompass-10` | the neighbour predicate selects a pool a cap can meaningfully bound |
+| 11 | `TOOL-aTunedCompass-11` | the map log gains the run-state reader a closed unit's acceptance claimed |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
@@ -91,24 +92,24 @@ ids TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCo
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aTunedCompass-1 — the two records this build's parent refuted are corrected in place](spec/2026-09-04-spec-TOOL-aTunedCompass-1.md) | 1 | 1 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aTunedCompass-4 — the chunk source becomes the rollup, which also de-duplicates the slots](spec/2026-09-04-spec-TOOL-aTunedCompass-4.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aTunedCompass-5 — `DURABLE` matches a flat memory root, so `spine` stops being empty](spec/2026-09-04-spec-TOOL-aTunedCompass-5.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-05 |
-| [TOOL-aTunedCompass-6 — the reuse probe ranks its neighbour pool before it truncates it](spec/2026-09-04-spec-TOOL-aTunedCompass-6.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-05 |
-| [TOOL-aTunedCompass-7 — the manifest declares the recall kit and narrows the tooling entrypoint](spec/2026-09-04-spec-TOOL-aTunedCompass-7.md) | 1 | 1 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aTunedCompass-9 — a recall fixture that can tell the two-set ensemble from its records half](spec/2026-09-04-spec-TOOL-aTunedCompass-9.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-05 |
-| [TOOL-aTunedCompass-10 — the neighbour predicate selects a pool a cap can meaningfully bound](spec/2026-09-04-spec-TOOL-aTunedCompass-10.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-05 |
-| [TOOL-aTunedCompass-11 — the map log gains the run-state reader a closed unit's acceptance claimed](spec/2026-09-04-spec-TOOL-aTunedCompass-11.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-05 |
+| [TOOL-aTunedCompass-1 — the two records this build's parent refuted are corrected in place](spec/2026-09-04-spec-TOOL-aTunedCompass-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-09-05 |
+| [TOOL-aTunedCompass-4 — the chunk source becomes the rollup, which also de-duplicates the slots](spec/2026-09-04-spec-TOOL-aTunedCompass-4.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-05 |
+| [TOOL-aTunedCompass-5 — `DURABLE` matches a flat memory root, so `spine` stops being empty](spec/2026-09-04-spec-TOOL-aTunedCompass-5.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-05 |
+| [TOOL-aTunedCompass-6 — the reuse probe ranks its neighbour pool before it truncates it](spec/2026-09-04-spec-TOOL-aTunedCompass-6.md) | 1 | 2 | CLOSED | rev-5 | 2026-09-05 |
+| [TOOL-aTunedCompass-7 — the manifest declares the recall kit and narrows the tooling entrypoint](spec/2026-09-04-spec-TOOL-aTunedCompass-7.md) | 1 | 1 | CLOSED | rev-2 | 2026-09-05 |
+| [TOOL-aTunedCompass-9 — a recall fixture that can tell the two-set ensemble from its records half](spec/2026-09-04-spec-TOOL-aTunedCompass-9.md) | 1 | 2 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aTunedCompass-10 — the neighbour predicate selects a pool a cap can meaningfully bound](spec/2026-09-04-spec-TOOL-aTunedCompass-10.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-05 |
+| [TOOL-aTunedCompass-11 — the map log gains the run-state reader a closed unit's acceptance claimed](spec/2026-09-04-spec-TOOL-aTunedCompass-11.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-05 |
 | [TOOL-aTunedCompass-2 — the recall fixture carries the terms every real query supplies](spec/2026-09-04-spec-TOOL-aTunedCompass-2.md) | 2 | 2 | BLOCKED | rev-4 | 2026-09-05 |
 | [TOOL-aTunedCompass-3 — the recall floor grades the two-set ensemble the CLI serves](spec/2026-09-04-spec-TOOL-aTunedCompass-3.md) | 3 | 2 | BLOCKED | rev-3 | 2026-09-05 |
-| [TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran](spec/2026-09-04-spec-TOOL-aTunedCompass-8.md) | 3 | 2 | BLOCKED | rev-3 | 2026-09-05 |
+| [TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran](spec/2026-09-04-spec-TOOL-aTunedCompass-8.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 10 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aTunedCompass-1 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aTunedCompass-1 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

@@ -6,9 +6,9 @@ Assembles a candidate corpus from the map's four recall sources — generated/sy
 ids/kinds, generated/inventories.json keys, every dossier's `## Reuse affordance` seam line,
 and every `## Shared seams` prose block — and prints a ranked SHORTLIST for an agent to read.
 The shortlist is NOT a hard top-K lexical cut (that scores ~0% behavioural recall): it is the
-UNION of token-stem matches (the seeds) AND a capped set of structural neighbours (same kind or
-same file as a seed), so a seam whose name doesn't literally contain the query word still
-surfaces for the agent to judge. Fan-in is computed ON DEMAND here (never committed) to rank
+UNION of token-stem matches (the seeds) AND a capped set of structural neighbours (same file as a
+seed, or the same kind in the same DIRECTORY), so a seam whose name doesn't literally contain
+the query word still surfaces for the agent to judge. Fan-in is computed ON DEMAND here to rank
 hot seams. A recall-dark layer (declared in .codebase-map.conf) prints a partial-recall notice
 so an empty result is never a falsely-confident "no seam fits".
 
@@ -52,6 +52,17 @@ import map_lib as m  # noqa: E402
 #: cap on the structural-neighbour set (seeds are NEVER capped — the whole point is that the
 #: lexical shortlist is not a hard top-K; only the "here's what lives next to a hit" widening is).
 NEIGHBOUR_CAP = 12
+# How many source paths a log row carries. `n_sources` records the count BEFORE this cap, so a
+# truncated list is visible AS truncated rather than as a short one.
+#
+# 40, and the number is measured rather than picked -- but measured against the SYMBOL-ONLY
+# derivation that shipped first, so it is a FLOOR rather than a fitted value: the set now also
+# carries dossiers, which grew it by roughly half on live queries (14->26, 18->36, 9->13). The
+# parent measured ~17 file-backed sources per probe against ~71 ranked entries; at a nominal 40
+# bytes per path a capped worst case adds ~1.6 KB, against a recall log running at a 2150 B mean
+# row that nobody has called expensive. Re-measure before trusting it. Cheap to raise, since
+# `n_sources` records what was cut.
+SOURCE_PATHS_CAP = 40
 
 
 @dataclass(frozen=True)
@@ -189,8 +200,8 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     """The pure heart: query + corpus + reference index -> a ranked shortlist. Seeds = every
     candidate sharing a token stem with the query, PLUS the dossier of any `## Shared seams`
     prose that shares a stem (behavioural recall beyond names). Structural neighbours = symbols
-    with the same kind OR the same file as a symbol seed, capped. Ranked seeds-first, then by
-    fan-in desc, then name — deterministic. Empty seeds -> empty shortlist -> 'no seam fits'."""
+    in the same FILE as a symbol seed, or of the same kind IN THE SAME DIRECTORY, capped. Ranked
+    seeds-first, then fan-in desc, then name — deterministic. Empty seeds -> 'no seam fits'."""
     qstems = m.stems(query)
     if not qstems:
         return Shortlist(query, [], corpus.recall_dark, corpus.threshold, _counts(corpus))
@@ -224,26 +235,59 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
             pool.setdefault(name, Candidate(name, ("shared-seams",), detail=feature))
             seeds[name] = f"shared-seams prose ({feature}): {', '.join(sorted(shared))}"
 
-    # structural neighbours of the symbol seeds — same kind OR same def file, capped.
+    # structural neighbours of the symbol seeds — same def file, or same kind in the same dir.
     seed_syms = [pool[n] for n in seeds if pool[n].kind]
     seed_kinds = {c.kind for c in seed_syms}
     seed_files = {c.file for c in seed_syms if c.file}
+    # The same-kind arm is narrowed to the seed's own DIRECTORY, which in this repo is the kit dir.
+    # Kind alone admits nearly the whole corpus: measured over the pool the arm actually iterates,
+    # 619 of 648 kinded candidates are `function`, so a function seed pulled in 95% of everything and
+    # a cap of 12 over that is not a selection, whatever it sorts by. Grouped by directory the same
+    # 619 fall to 134 / 133 / 101 / 81 across the four largest, a reach reduction of 4.6x to 7.6x.
+    #
+    # The axis is the DEFINING FILE'S DIRECTORY rather than a "kit" concept, so it needs no literal
+    # and no new declaration, and it means the same thing in an adopter's tree that it means here.
+    # The reuse question a session asks is nearly always "does this already exist in the code I am
+    # about to edit"; a candidate further away reaches the reader better through the same-file arm
+    # or a shared-seam hit than through a kind match that would have admitted everything.
+    seed_dirs = {_derive_dir(c.file) for c in seed_syms if c.file}
     neighbours: dict[str, str] = {}
     for name, cand in sorted(pool.items()):
         if name in seeds or not cand.kind:
             continue
         if cand.file and cand.file in seed_files:
             neighbours[name] = f"neighbour: same file as a hit ({cand.file})"
-        elif cand.kind in seed_kinds:
-            neighbours[name] = f"neighbour: same kind ({cand.kind})"
+        elif cand.kind in seed_kinds and cand.file and _derive_dir(cand.file) in seed_dirs:
+            # The reason names the NARROWED predicate. A predicate that changes while its printed
+            # reason does not is a gate lying quietly, and an empty neighbour list for a small
+            # directory has to read as honest rather than broken.
+            neighbours[name] = (
+                f"neighbour: same kind ({cand.kind}) in {_derive_dir(cand.file)}"
+            )
 
     ranked: list[Ranked] = []
     for name, reason in seeds.items():
         ranked.append(_rank(pool, corpus.threshold, ref_index, name, True, reason))
-    for name, reason in sorted(neighbours.items())[:NEIGHBOUR_CAP]:
-        ranked.append(_rank(pool, corpus.threshold, ref_index, name, False, reason))
 
-    ranked.sort(key=lambda r: (not r.is_seed, -r.fanin, r.candidate.name))
+    # RANK THE WHOLE NEIGHBOUR POOL, THEN CAP. The cap used to slice `sorted(neighbours.items())`,
+    # which is ALPHABETICAL, so the twelve slots went to the twelve names that sort earliest and
+    # `_rank` only ever saw those twelve -- the sort below then ordered a pool the alphabet had
+    # already chosen. Measured at base c4fcf5ad on the phrase this unit's spec records: every class
+    # name here starts uppercase and every function name does not, ASCII orders uppercase first, so
+    # a seed set containing one class filled all twelve slots from the 28 class names before any of
+    # the 616 functions was considered. The twelve retained summed to fan-in 8; the twelve the
+    # ranking keeps sum to 271, and the two sets do not intersect.
+    #
+    # Cost: `_rank` is one `fan_in` lookup per name, so this ranks the pool rather than a slice of
+    # it. That is the price of the cap meaning anything, and it is paid once per probe.
+    neighbour_ranked = [
+        _rank(pool, corpus.threshold, ref_index, name, False, reason)
+        for name, reason in sorted(neighbours.items())
+    ]
+    neighbour_ranked.sort(key=_derive_shortlist_key)
+    ranked.extend(neighbour_ranked[:NEIGHBOUR_CAP])
+
+    ranked.sort(key=_derive_shortlist_key)
     return Shortlist(query, ranked, corpus.recall_dark, corpus.threshold, _counts(corpus))
 
 
@@ -266,6 +310,29 @@ def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -
             scored.append((cand, fanin))
     scored.sort(key=lambda cf: (-cf[1], cf[0].name))
     return scored[:top]
+
+
+def _derive_dir(path: str) -> str:
+    """The directory a symbol is defined in, POSIX-normalised. `""` when there is no directory.
+
+    The one place this axis is spelled, because the neighbour predicate and its printed reason must
+    agree by construction: a predicate that narrows while its reason still says `same kind` is the
+    quiet-lie shape this kit's own dossier names.
+    """
+    p = (path or "").replace("\\", "/")
+    return p.rsplit("/", 1)[0] if "/" in p else ""
+
+
+def _derive_shortlist_key(r: Ranked) -> tuple:
+    """THE ordering key, stated once and read twice: once to CAP the neighbour pool, once to sort
+    the shortlist that is printed.
+
+    A second, retyped copy is exactly how the cap came to select by a criterion nobody chose --
+    the slice was alphabetical while the sort was by fan-in, so the two disagreed silently and the
+    ranking only ever ran on what the alphabet had already kept. Seeds sort first and are never
+    capped; within a group it is descending fan-in, then name for a stable tie-break.
+    """
+    return (not r.is_seed, -r.fanin, r.candidate.name)
 
 
 def _rank(pool: dict[str, Candidate], threshold: int, ref_index: dict[str, set[str]],
@@ -302,6 +369,13 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
         f"# corpus: {cc.get('symbol', 0)} symbols | {cc.get('inventory', 0)} inventory keys | "
         f"{cc.get('affordance-seam', 0)} affordance seams | {cc.get('shared-seams', 0)} dossiers",
         f"# a seam = fan-in >= {shortlist.threshold} (SEAM_FANIN_THRESHOLD)",
+        # What the neighbour ranking does NOT mean. Twelve high-fan-in names read as twelve SEAMS
+        # to everybody who did not write the ranker, and the fan-in behind them counts bare
+        # identifier tokens with no symbol resolution (TOOL-aScouredKit-16) -- so a common short
+        # name scores high for reasons that have nothing to do with reuse. The line discloses the
+        # signal's limit rather than repairing it, which is a different unit.
+        "# neighbours are ranked by fan-in, which counts NAME TOKENS and resolves no symbols:",
+        "# a high rank means 'this name appears a lot', never 'this is the seam you want'",
         "",
     ]
     if shortlist.empty:
@@ -353,6 +427,51 @@ def _line(r: Ranked) -> str:
     return f"- {c.name}{tag}  [{meta}]  ({r.reason}; via {src})" if meta else f"- {c.name}{tag}  ({r.reason}; via {src})"
 
 
+def _scan_sources(shortlist: Shortlist):
+    """The ONE walk over a shortlist's sources, yielding `(kind, value)` in shortlist order.
+
+    `kind` is `symbol`, `dossier` or `inventory`; only the first two are openable PATHS.
+
+    THE single derivation, and it is single by CONSTRUCTION rather than by two functions agreeing.
+    `_sources` labels these for a human and `derive_source_paths` records the file-backed ones.
+    Those were two hand-copied walks for one commit each way: the first dropped every dossier from
+    the log while the reader was still shown it (measured: 6 of 19 entries on one live query), and
+    the fix for THAT made the two walks agree by copying, which is the same defect one move later.
+    Two readers of one fact is the class; one walk with two views is the answer.
+    """
+    try:
+        root_name = m.map_root().relative_to(m.repo_root()).as_posix()
+    except ValueError:
+        root_name = m.map_root().name
+    for r in shortlist.ranked:
+        c = r.candidate
+        if c.file:
+            yield "symbol", c.file.replace("\\", "/")
+        if ("affordance-seam" in c.sources or "shared-seams" in c.sources) and c.detail:
+            where = "FOUNDATION.md" if c.detail == "foundation" else f"features/{c.detail}.md"
+            yield "dossier", f"{root_name}/{where}"
+        elif "inventory" in c.sources and not c.file:
+            yield "inventory", c.detail
+
+
+def derive_source_paths(shortlist: Shortlist) -> list[str]:
+    """The file-backed sources the answer points a reader at, deduped, in shortlist order.
+
+    A thin view over `_scan_sources`, which `_sources` also reads. Repo-relative and
+    forward-slashed, because that is how a later analysis joins them to the tree. An inventory key
+    with no file contributes nothing here, exactly as it contributes no openable path there.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for kind, value in _scan_sources(shortlist):
+        if kind == "inventory":
+            continue
+        if value and value not in seen:
+            seen.add(value)
+            out.append(value)
+    return out
+
+
 def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
     """The concrete files/records to open, in shortlist order, deduped. A candidate points at
     its OWN source: a symbol -> its def file; a declared/prose seam -> its dossier; an inventory
@@ -372,15 +491,13 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
             seen.add(line)
             lines.append(line)
 
-    for r in shortlist.ranked:
-        c = r.candidate
-        if c.file:
-            add(f"symbol def: {c.file}")
-        if ("affordance-seam" in c.sources or "shared-seams" in c.sources) and c.detail:
-            where = "FOUNDATION.md" if c.detail == "foundation" else f"features/{c.detail}.md"
-            add(f"dossier: {root_name}/{where}")
-        elif "inventory" in c.sources and not c.file:
-            add(f"inventory `{c.detail}` (see {root_name}/generated/MAP.md)")
+    for kind, value in _scan_sources(shortlist):
+        if kind == "symbol":
+            add(f"symbol def: {value}")
+        elif kind == "dossier":
+            add(f"dossier: {value}")
+        else:
+            add(f"inventory `{value}` (see {root_name}/generated/MAP.md)")
     return lines or ["(no file-backed sources - inspect the candidates above)"]
 
 
@@ -414,7 +531,7 @@ def _resolve_git_dir(root: Path) -> Path | None:
     return gitdir
 
 
-def write_lookup(root: Path, query: str, n_shown: int) -> None:
+def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None:
     """Append one JSONL row recording that this probe RAN. Never fatal, never gating.
 
     WHY: ``BUILD-METHOD`` M5 names two reuse probes and only the recall one left evidence, so a
@@ -439,6 +556,8 @@ def write_lookup(root: Path, query: str, n_shown: int) -> None:
         common = _resolve_git_dir(root)
         if common is None:
             return
+        # REQUIRED, not defaulted: an optional `paths` turns a dropped argument into a row that
+        # logs zero sources and looks merely quiet. A TypeError at the one call site is louder.
         path = common / "codebase-map" / "lookups.jsonl"
         path.parent.mkdir(parents=True, exist_ok=True)
         row = {
@@ -447,6 +566,11 @@ def write_lookup(root: Path, query: str, n_shown: int) -> None:
             "query": query,
             "worktree": str(root),
             "n_shown": n_shown,
+            # `n_shown` keeps the meaning it has always had -- the RANKED CANDIDATE count -- and is
+            # deliberately not redefined: an analysis joining old rows to new ones must not find
+            # one field silently changing what it counts. The two new fields are the path view.
+            "shown_paths": paths[:SOURCE_PATHS_CAP],
+            "n_sources": len(paths),
         }
         with path.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -475,7 +599,7 @@ def main(argv: list[str] | None = None) -> int:
     print(render(shortlist, corpus), end="")
     # AFTER the answer is rendered, so a row means a lookup that ANSWERED. Before it, a crash in
     # render() would leave evidence of a probe whose result nobody ever saw.
-    write_lookup(m.repo_root(), query, len(shortlist.ranked))
+    write_lookup(m.repo_root(), query, len(shortlist.ranked), derive_source_paths(shortlist))
     return 0  # advisory: a RESULT never fails (never a gate). Only the refusal above exits non-zero.
 
 

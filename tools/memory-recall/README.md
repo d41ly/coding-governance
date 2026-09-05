@@ -1,6 +1,6 @@
 # memory-recall — ask your decision corpus a question, get the records that answer it
 
-<!-- gov:kit memory-recall@1.6 -->
+<!-- gov:kit memory-recall@1.8 -->
 
 A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and

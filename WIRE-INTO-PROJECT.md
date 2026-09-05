@@ -304,6 +304,17 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
    The NAME is fixed and the prefix is ONE segment: `test_codebase_map.template.py` resolves the kit
    at the root, at `<x>/codebase-map`, and nowhere deeper, and `adopt-codebase-map.sh` refuses a
    two-segment prefix before writing anything. `tools/` is the declared prefix for every kit here.
+
+   **Then delete the GOV-ONLY file that copy brings with it.** `kit.toml` withholds it from
+   `govkit apply`, but a `cp -r` does not read `kit.toml`, so this path needs its own step:
+   ```bash
+   rm -f <project>/tools/codebase-map/replay-phrases.py
+   ```
+   It is gov's own grading harness: it reads `memory/builds/**` for recorded probe phrases and the
+   seam each spec's §10 names, and grades the ranker against that pair. In your tree it finds no
+   such corpus, so it grades nothing and says so — the same
+   `memory/gotchas/pin-copied-from-another-corpus.md` shape the memory-recall fixture has. If you
+   want the measurement, point an equivalent at YOUR records.
 2. `cp <kit>/.codebase-map.conf.example .codebase-map.conf` and fill MAP_ROOT · GATE_FILE ·
    MAP_DIFF_CMD (per the §0 decisions). It lives at the project **root** whatever the kit's prefix:
    the kit walks up from its own directory looking for this file, and that is how it finds the root.

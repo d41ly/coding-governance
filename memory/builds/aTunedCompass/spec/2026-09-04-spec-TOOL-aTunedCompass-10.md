@@ -1,10 +1,15 @@
 # TOOL-aTunedCompass-10 — the neighbour predicate selects a pool a cap can meaningfully bound
 
-**Status:** SPECCED · rev-1 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-05-build-TOOL-aTunedCompass-10-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aTunedCompass-10-acceptance-ledger.md) | journal | — |
+| [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md) | spec-audit | TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9 TOOL-aTunedCompass-11 |
 
 <!-- /gen:spec-records -->
 
@@ -18,13 +23,17 @@ order they are ranked in. The two land in one pass.
 
 ## 2. Scope (IN)
 
-- **S1** — the `same kind` arm in `tools/codebase-map/reuse_lookup.py` (`:237`) narrows. Measured on
-  this corpus today: of 769 indexed symbols, 731 are kind `function`, so a seed of that kind admits
-  95.1% of the corpus through this arm alone. A cap of 12 over a pool of 731 is not a selection.
+- **S1** — the `same kind` arm in `tools/codebase-map/reuse_lookup.py` (`:237`) narrows. Measured
+  over the pool the ARM ITSELF iterates, `corpus.candidates` at `:231`, by loading it through
+  `reuse_lookup.load_corpus(map_lib.repo_root())`: 843 candidates, of which 648 carry a kind, and 619
+  of those are kind `function`. So a seed of that kind admits 95.5% of the kinded corpus through this
+  arm alone, and a cap of 12 over a pool of 619 is not a selection.
 - **S2** — the narrowing is `same kind AND same kit directory`, which the fork named and which this
-  unit measured before adopting. The map's own symbol inventory groups as 156 symbols in the largest
-  kit directory and roughly 100 to 150 in each of the next three, so the arm's reach falls by
-  between five and seven times while staying non-empty for every kit that has one.
+  unit measured before adopting. Grouping that same 619 by kit directory gives 134 in
+  `tools/memory-recall`, 133 in `tools/govkit`, 101 in `tools/memory-tree` and 81 in
+  `tools/codebase-map`, across 15 kit directories in all. The arm's reach therefore falls by between
+  4.6 and 7.6 times depending on the seed's kit, and no kit directory on this corpus holds exactly
+  one function, so the empty pool F1 accepts is not a state any seed reaches here today.
 - **S3** — the `same file as a hit` arm at (`:235`) is UNCHANGED. It is checked first, it is already
   narrow, and it is the arm that produces the neighbours a reader actually uses.
 - **S4** — the reason string each neighbour carries names the narrowed predicate, so a reader can see
@@ -34,8 +43,12 @@ order they are ranked in. The two land in one pass.
   same-kind, same-directory candidate is admitted, and a same-kind, different-directory candidate is
   refused. Each arm's red is observed before the arm is written.
 - **S6** — the before-and-after is measured with the replay harness `TOOL-aTunedCompass-6` commits,
-  over the same 133 graded probe phrases the parent report left behind, so the two units report on
-  one instrument rather than two.
+  over whatever phrase set that harness grades, so the two units report on one instrument rather than
+  two. The count is NOT pinned here. Unit 6's §4 states that only 74 of the parent's 133 invocations
+  sit on one line inside double quotes, so reaching 133 needs a wrapping parser its scope does not
+  commit to; a criterion naming 133 against a harness that grades 74 is satisfied by reporting the
+  number nobody measured. This unit therefore takes unit 6's own AC4 wording — report the count you
+  graded, beside the result.
 
 ## 3. Non-goals (OUT)
 
@@ -66,27 +79,67 @@ pool, and for a query seeded in such a kit the arm may return almost nothing. Th
 over returning 12 alphabetically-first names from across the tree, but it must be VISIBLE, which is
 what S4's reason string is for.
 
+### Which population the figures come from, and the check that keeps it honest
+
+rev-1 of this spec priced the argument on `memory/map/generated/symbols.json` — 769 symbols, 731
+functions — which is the RAW INDEX and not what the arm sees. The arm iterates `corpus.candidates`
+(`tools/codebase-map/reuse_lookup.py` `:231`), which loads to 648 kinded candidates and 619
+functions, a pool 19% smaller, and the per-kit group sizes shrink with it. The conclusion survived;
+the figures did not, and unit 6 was quoting the arm's pool for the same predicate at the same base,
+so one build reported two denominators for one question.
+
+The left-shift is a DOCUMENTED CHECK rather than a gate, because deciding whether a quoted figure
+came from the right population needs a reader: **a population figure in a spec is quoted from the
+command that printed it, with that command named on the same line.** §7 of the charter already
+states this rule for code — "NO count of a derived population is written in prose" — and the gap is
+that specs were never named as prose it covers. Every figure in S1 and S2 above now names its
+derivation, which is what makes them re-checkable rather than re-assertable.
+
 ## 5. Production-readiness checklist
 
-Observability: the reason string names the predicate, so a reader can tell a narrow pool from a
-broken one. Testing: S5's two-direction arms, plus S6's corpus-level before-and-after. Migration:
-none, the probe is stateless and rebuilt per run. Rollback: the arm is one condition and reverting is
-one line. Cost: no measurable change to probe latency, which the parent measured at about 1.1s.
+- security — N/A. The arm filters an in-memory candidate list; no surface, no input, no write path.
+- perf / scale — N/A as a change. One extra string comparison per candidate on a pool of a few
+  hundred; probe latency stays at the parent's measured ~1.1s and no criterion claims a change.
+- a11y — N/A. A terminal probe with no user-facing surface.
+- i18n — N/A. No user-facing strings; the reason string is developer-facing English like its siblings.
+- error / empty / loading states — the EMPTY state is the one this unit creates and F1 accepts. A
+  seed whose kit directory holds no other symbol of its kind gets an empty neighbour list, and S4's
+  reason string is what makes that legible rather than silent. Measured below: no kit directory on
+  this corpus is in that state today, so the accepted cost is currently hypothetical here.
+- observability — the reason string names the narrowed predicate, so a reader can tell a narrow pool
+  from a broken one. That is S4 and it is the whole of F1's mitigation.
+- risks — a narrowing that is too aggressive removes the only useful candidate for some query with
+  no signal saying so. Priced by criterion AC4's before-and-after over the graded phrases, which is
+  required to REPORT a hit-rate drop rather than bury it.
+- testing + left-shift gates — AC3's two-direction arms in `tools/codebase-map/selftest.py`, each
+  observed RED first, plus AC4's corpus-level replay. The class this unit's own defect belongs to —
+  a population figure quoted from the wrong population — is left-shifted as the documented check
+  in §4, not as a new leg.
+- migration / rollback — none needed; the probe is stateless and rebuilt per run. Rollback is one
+  condition, one line.
+- user docs — N/A. `help/` pages cover user-facing features; this is a developer probe, and its
+  behaviour change is carried by the `codebase-map` dossier that AC5 refreshes.
 
 ## 6. Acceptance criteria
 
-1. `python tools/codebase-map/reuse_lookup.py "<a phrase seeded in one kit>"` returns no neighbour
-   from another kit directory through the same-kind arm, verified by reading the printed reasons.
-2. The narrowed arm is non-empty for a seed in each kit directory that has more than one symbol,
-   checked by a loop over the kit dirs and recorded in the unit's journal.
-3. `bash tools/codebase-map/selftest.py` or the kit's declared self-test entrypoint passes with S5's
-   two new arms, and each arm was observed RED before it was written.
-4. The replay harness from `TOOL-aTunedCompass-6` reports hit rate and median rank over the 133
-   graded phrases before and after, and the record states both. A narrowing that lowers the hit rate
-   is a finding to report, not a result to bury.
-5. `python tools/codebase-map/gen_map.py --check` exits 0, and the `codebase-map` dossier under
-   `memory/map/features/` is refreshed in the same commit, since this changes how the kit behaves.
-6. `bash tools/check-kit-versions.sh` exits 0 with the codebase-map kit version moved.
+- **AC1** — `python tools/codebase-map/reuse_lookup.py "<a phrase seeded in one kit>"` returns no
+  neighbour from another kit directory through the same-kind arm, verified by reading the printed
+  reasons.
+- **AC2** — `python tools/codebase-map/reuse_lookup.py` returns a non-empty narrowed neighbour list
+  for a seed in each kit directory holding more than one symbol of that kind, checked by a loop over
+  the kit dirs and recorded in the unit's journal.
+- **AC3** — `bash tools/codebase-map/selftest.py` or the kit's declared self-test entrypoint passes
+  with S5's two new arms, and each arm was observed RED before it was written.
+- **AC4** — The replay harness from `TOOL-aTunedCompass-6` reports hit rate and upper-median rank before
+  and after, over the phrase set that harness actually grades, and the record states BOTH the two
+  figures and the phrase count they were computed over. No count is pinned here: unit 6's own AC4
+  declines to pin one, and a criterion naming a number its sibling does not commit to producing is
+  met either by not running or by grading fewer and reporting more. A narrowing that lowers the hit
+  rate is a finding to report, not a result to bury.
+- **AC5** — `python tools/codebase-map/gen_map.py --check` exits 0, and the `codebase-map` dossier
+  under `memory/map/features/` is refreshed in the same commit, since this changes how the kit
+  behaves.
+- **AC6** — `bash tools/check-kit-versions.sh` exits 0 with the codebase-map kit version moved.
 
 ## 7. Gates
 
@@ -95,6 +148,16 @@ markers` the legs that bind. The kit's own self-test is `subject = kit` and held
 arms need `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` and the record must say so.
 
 ## 8. Open questions
+
+**F1 RESOLVED (agent, 2026-09-05, delegated): accept the empty pool, and let S4's reason string make it
+legible.** Both alternatives are vetoed on the spec's own text rather than on preference. AC1 requires
+that the same-kind arm return no neighbour from another kit directory; the unnarrowed fallback and the
+widen-to-tool-root variant each return exactly that, in exactly the case they fire, so both fail an
+acceptance criterion already written here. AC2 confirms the survivor was the shape this unit was
+specced around — it asks for non-emptiness only where a kit directory holds more than one symbol,
+which is the one-symbol case conceded. The fork's own argument stands unaltered: a fallback that
+reinstates a 95%-of-corpus pool whenever the good predicate returns nothing makes the narrowing
+untestable.
 
 - **F1 — what happens to a seed in a kit directory with one symbol?** Its narrowed neighbour pool is
   empty, so the probe returns seeds and shared-seam hits only. Options: accept it, since an empty
@@ -111,6 +174,21 @@ arms need `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` and the record mu
 - rev-1 · 2026-09-05 · first draft. Added by the restructure recorded in the build README: the owner
   chose to narrow the predicate rather than ship unit 6's reorder alone, then chose to split the
   narrowing into its own unit so M2's one-mechanism rule holds.
+- rev-2 · 2026-09-05 · F1 resolved under the standing mandate, M3's rule. Both fallback options fail
+  AC1, which forbids a cross-kit neighbour through this arm, so only the fork's recommendation
+  survived the first veto. No scope, acceptance or gate text moved.
+- rev-3 · 2026-09-05 · round-1 spec audit folded, findings M1, M5, M6 and M7. M6 was the material
+  one: S1 and S2 priced the whole argument on the raw symbol index, 769/731, while the arm iterates
+  `corpus.candidates`, which loads to 648 kinded and 619 functions — so this spec and unit 6 reported
+  two denominators for one predicate at one base, which is the disease this build was opened to cure.
+  Both re-derived from the arm's own pool with the command named beside each figure, and the reach
+  reduction restated as 4.6x to 7.6x, whose low end falls BELOW the "five to seven" rev-1 claimed.
+  M5 — S6 and AC4 pinned 133 graded phrases that unit 6's scope does not commit to producing, so both
+  now take unit 6's own wording and report the count actually graded. M1 — §6 relabelled
+  `- **ACn** — `, because a bare ordered list left this spec's own F1 resolution citing AC1 and AC2 as
+  unresolvable ids, and reds hygiene check 23 the moment the unit closes. M7 — §5 restored to the full
+  ten labelled lines; the empty-pool state F1 accepts now has a line of its own, recording that no kit
+  directory on this corpus reaches it today.
 
 ## 10. Reuse audit
 

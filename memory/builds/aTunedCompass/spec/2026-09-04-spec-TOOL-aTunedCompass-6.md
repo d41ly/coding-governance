@@ -1,10 +1,16 @@
 # TOOL-aTunedCompass-6 — the reuse probe ranks its neighbour pool before it truncates it
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-05-build-TOOL-aTunedCompass-6-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aTunedCompass-6-acceptance-ledger.md) | journal | — |
+| [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md) | spec-audit | TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md) | spec-audit | TOOL-aTunedCompass-4 TOOL-aTunedCompass-9 |
 
 <!-- /gen:spec-records -->
 
@@ -31,8 +37,30 @@ name sorts late is discarded before it can ever be ranked.
 - **S5** — the probe's output header states what the neighbour ranking does NOT mean. Twelve
   high-fan-in names read as twelve seams to everybody who did not write the ranker, and
   `TOOL-aScouredKit-16` already records that the fan-in count resolves no symbols.
-- **S6** — a one-time before-and-after measurement over the phrase corpus, recorded in this build's
-  folder. §4 says what it grades and §8 F2 carries what is unresolved about it.
+- **S6** — the before-and-after over the phrase corpus is produced by a COMMITTED replay harness, not
+  a one-off. F2 resolved this: the harness is a tracked, registered, on-demand script that no merge-bar
+  leg runs, on the same split the owner ruled for a kit's self-tests. §4 says what it grades. It lands
+  at `tools/codebase-map/replay-phrases.py`.
+- **S7** — that path is claimed EXPLICITLY in `tools/codebase-map/kit.toml` as
+  `role = "project-owned"`. The kit's `[[files]] include = "**" role = "engine"` rule means an
+  unclaimed new file under this directory ships verbatim to every adopter, and `govkit.py`'s
+  `LANDABLE_ROLES` is `(engine, seed)`. What would ship here is a harness that parses THIS repo's
+  build records for probe phrases — useless to an adopter and exactly the shape
+  `memory/gotchas/pin-copied-from-another-corpus.md` names. The memory-recall kit already withholds
+  its three gov-only files this way, and that precedent is the one being copied.
+- **S7b** — the SECOND carrier, because the first covers only half the install surface. A
+  `project-owned` role withholds a file from `govkit apply` and from nothing else —
+  `tools/memory-recall/kit.toml` says exactly that in its own words, and pays for it with an explicit
+  `rm -f` step in the runbook. This kit's documented copy-install is a plain `cp -r`
+  (`WIRE-INTO-PROJECT.md` §3b step 1), which the descriptor does not reach, so the harness needs a
+  matching removal step there and a line in that runbook's adopter inventory. One carrier alone is a
+  withholding that reads as complete and is not.
+- **S8** — the harness DECLARES a wall-clock ceiling, and the SCRIPT ITSELF enforces it: it self-times
+  and exits non-zero on a breach. That is the whole enforcement, stated because "the runner that owns
+  it reds on a breach" left the enforcing component unnamed and uncreated — this suite is on no leg,
+  so there is no other runner to inherit it from. The unattended kit's on-demand runner carrying its
+  own budget is the precedent. This repo reds a suite arriving without a ceiling, and F2's resolution
+  names the obligation explicitly.
 
 ## 3. Non-goals (OUT)
 
@@ -54,8 +82,9 @@ Also out:
   hit` or `same kind`. §8 F1 is where that decision is put to the owner.
 - Not fixing the fan-in signal itself. `TOOL-aScouredKit-16` records that it counts bare identifier
   tokens with no symbol resolution; S5 discloses that rather than repairing it.
-- Not making the phrase-set replay a merge-bar leg. It grades a corpus, costs a probe per phrase,
-  and has no ceiling anyone has declared.
+- Not making the phrase-set replay a merge-bar leg. It grades a corpus and costs a probe per phrase.
+  It is on no bar and runs on demand, which is F2's resolution; S8 gives it the declared ceiling that
+  status obliges, so "no ceiling anyone has declared" is no longer the reason and is no longer true.
 
 ## 4. Design
 
@@ -120,7 +149,7 @@ better of the parent's two, because it grades against a seam a human picked rath
 every file a unit happened to edit, and it needs no commit-to-id join.
 
 The replay runs each recorded phrase against the shipped ordering and against the reordered one at
-the same base sha, and reports hit rate, hit@5, hit@10 and the median rank of the first correct
+the same base sha, and reports hit rate, hit@5, hit@10 and the upper-median rank of the first correct
 path, before and after. A neutral or negative delta is a legal result and is recorded as the result.
 The reorder touches only the neighbour tail of each shortlist, so a small delta is the expected
 outcome and a large one would itself be worth explaining.
@@ -134,9 +163,20 @@ joins wrapped invocations is the difference between grading 74 phrases and gradi
 ### Files touched (estimate)
 
 `tools/codebase-map/reuse_lookup.py`, `tools/codebase-map/selftest.py`,
-`tools/codebase-map/map_lib.py` for the `KIT_CODEBASE_MAP_VERSION` marker AC7 asserts, and
-`memory/map/features/codebase-map.md` for the dossier refresh §5 owes, plus one record under
-this build's folder holding the replay. Four source files.
+`tools/codebase-map/map_lib.py` for the `KIT_CODEBASE_MAP_VERSION` marker AC7 asserts,
+`memory/map/features/codebase-map.md` for the dossier refresh §5 owes,
+`tools/codebase-map/replay-phrases.py` as the committed harness S6 names,
+`tools/codebase-map/kit.toml` for the `project-owned` rule S7 requires so that harness does not ship,
+`WIRE-INTO-PROJECT.md` for the copy-install removal step and adopter-inventory line S7b requires, and
+the generated map artifacts under `memory/map/generated/` that adding a tracked Python file to a kit
+directory re-renders — `codebase-map coverage + freshness` reds if they are stale in the same commit.
+Seven source files plus the regenerated artifacts, and one record under this build's folder holding
+the replay's output.
+
+rev-3 resolved F2 to a committed harness and left this table at four files naming no script, §3
+still calling the replay unceilinged, and S6 still describing the one-off the owner rejected — so a
+builder could not tell which file to create, and `TOOL-aTunedCompass-10`'s own criterion depends on
+an artifact this unit's scope did not produce.
 
 ### Alternatives rejected
 
@@ -177,16 +217,41 @@ in two places and the ordering key would exist twice, which is the drift S2 exis
   observed RED against the shipped `sorted(neighbours.items())[:NEIGHBOUR_CAP]` before it is
   written.
 - **AC2** — When `python tools/codebase-map/reuse_lookup.py` is run on the phrase this spec's §10
-  records, before and after, the retained neighbour set changes from twelve names whose fan-in sums
-  to 8 to twelve whose fan-in sums to 271, and the two sets do not intersect.
+  records, before and after, the twelve retained neighbours change from the twelve alphabetically
+  first to the twelve highest by fan-in, and the two sets do not intersect. The RELATION is the
+  criterion. The two fan-in sums this spec quoted at rev-3, 8 and 271, were measured at base
+  `c4fcf5ad`, on a tree that does not contain this unit's own new harness file; that file adds symbols
+  to the index the probe builds, so a literal re-measured after the unit lands need not reproduce
+  either number, and pinning them would make the criterion fail for a reason that is not a defect.
+  Both halves are run at ONE tree state and the figures recorded beside the result.
 - **AC3** — When the same replay is inspected, the SEED half of the shortlist is byte-identical
   before and after, which is the observation that `_rank` and the seed arm were not disturbed.
 - **AC4** — When the replay over the recorded phrase corpus runs, graded against the seam each
-  spec's own §10 names, it records hit rate, hit@5, hit@10 and the median rank of the first correct
+  spec's own §10 names, it records hit rate, hit@5, hit@10 and the upper-median rank of the first correct
   path for both orderings, in a record under `memory/builds/aTunedCompass/build/`, together with
   the phrase count it actually graded. A neutral or negative delta is recorded as the result.
 - **AC5** — When `python tools/codebase-map/reuse_lookup.py "<any phrase>"` runs, its header names
   what the neighbour ranking does not mean, alongside the `recall partial` line it already prints.
+- **AC9** — When `git ls-files` is run against the harness path S6 names, it returns that path; the
+  script prints its declared wall-clock ceiling when invoked with no arguments; and — the observation
+  that matters — with the ceiling temporarily set below the measured wall clock, the script EXITS
+  NON-ZERO, restored before landing. A ceiling whose breach was never observed is an assertion about
+  nothing, which is this repo's own rule about a gate that has only ever been seen to pass. The path
+  is spelled in S6 and in §4
+  and deliberately NOT backticked here: `python tools/check-spec-tokens.py` joins every path-shaped
+  backticked token in a §6 bullet against `git ls-files`, so a criterion naming a file its own unit
+  has yet to create reds the bar before the unit is built. Observed: it did, on this spec, at fold
+  commit `5bc5b3f9`.
+- **AC10** — When `python tools/govkit/govkit.py selfcheck` runs and when an `apply` is performed
+  against a scratch target, the harness is NOT written into that target, and
+  `tools/codebase-map/kit.toml` names it with an explicit `project-owned` role. The observation that
+  matters is the apply, not the descriptor: the descriptor is the mechanism and the absent file is
+  the property.
+- **AC11** — When `cp -r`-style copy-installation is followed per `WIRE-INTO-PROJECT.md` §3b, the
+  harness does not arrive in the target either. `project-owned` withholds a file from `govkit apply`
+  ONLY — `tools/memory-recall/kit.toml` says so in its own words and pays for it with an explicit
+  `rm -f` step in that runbook — so the descriptor alone leaves the copy path open, and this kit's
+  §3b step 1 is a plain `cp -r`. The runbook gains the matching removal line.
 - **AC6** — When `python3 tools/codebase-map/selftest.py` and
   `python3 tools/codebase-map/test_codebase_map.py` run, both are green.
 - **AC7** — When `bash tools/check-kit-versions.sh` runs, it is green with
@@ -196,7 +261,14 @@ in two places and the ordering key would exist twice, which is the drift S2 exis
 
 The legs this unit must keep green when it is built, by their `tools/gate-legs.json` names:
 `codebase-map kit selftest`, `codebase-map coverage + freshness`, `codebase-map adopter e2e`,
-`kit version markers`, and `lexicon naming predicates`, whose guard covers `tools/`. The full bar is
+`kit version markers`, `lexicon naming predicates`, whose guard covers `tools/`,
+`spec tokens (a spec's own names resolve)`, and `govkit selfcheck`, which is the leg grading the
+descriptor S7 edits.
+
+The last two were added at rev-5 and both were live omissions rather than tidying. The spec-tokens
+leg is `subject = repo` with no guard, so it runs on every bar, and rev-4's own new criteria turned
+it RED on two untracked backticked paths — a spec must name the leg its acceptance section can
+break. And a unit that edits a `kit.toml` owes the leg that grades kit descriptors. The full bar is
 `bash tools/run-gates/run-gates.sh`. `codebase-map kit selftest` and `codebase-map adopter e2e` have
 the KIT as their subject, so this repo's standing ruling holds them off the ordinary bar and this
 unit's Definition of Done owes them under `GATE_SELFTESTS=1`, which is what the charter requires of
@@ -257,6 +329,34 @@ and it therefore owes a declared wall-clock ceiling like any suite here.
 - rev-3 · 2026-09-05 · both forks resolved by the owner. The predicate narrowing becomes
   `TOOL-aTunedCompass-10` rather than a backlog row, so the non-goals now name a sibling unit; the
   replay harness is committed as an on-demand script with a declared ceiling.
+- rev-4 · 2026-09-05 · round-1 spec audit folded, finding B3 — and B3 is precisely rev-3's second
+  clause never leaving §8. The resolution committed a tracked, registered, on-demand harness with a
+  declared ceiling; S6 still described the recorded one-off the owner had rejected, §3 still called
+  the replay unceilinged, §4 Files-touched named four files and no script, and no criterion observed
+  the harness at all. A builder could not tell which file to create or where the ceiling lived, and
+  `TOOL-aTunedCompass-10`'s AC4 depends on an artifact this unit's scope did not produce. S6 now names
+  `tools/codebase-map/replay-phrases.py`; S7 claims it `project-owned` in `tools/codebase-map/kit.toml`,
+  because that kit's `include = "**" role = "engine"` rule would otherwise ship a harness that parses
+  THIS repo's build records to every adopter — the defect
+  `memory/gotchas/pin-copied-from-another-corpus.md` names, and the reason the memory-recall kit
+  withholds its own three files; S8 carries the ceiling; AC9 and AC10 observe the path, the ceiling
+  and the withholding, with AC10 asserting on the APPLY rather than on the descriptor.
+- rev-5 · 2026-09-05 · round-2 spec audit folded, findings B2, H5, M3, M4, M5 and M6 — every one of
+  them created by rev-4's own fold. B2 was the sharp one: rev-4's two new criteria put untracked
+  backticked paths in §6, and the `spec tokens (a spec's own names resolve)` leg is `subject = repo`
+  with no guard, so the bar went RED at commit `5bc5b3f9` and the waiver registry is shrink-only, so
+  it could only be reworded. AC9 now names the harness without backticking a path its own unit has yet
+  to create; M4's `tools/govkit/govkit.sh`, which has never been tracked at any revision, becomes
+  `python tools/govkit/govkit.py selfcheck` with the hedge dropped. A third hit of the same class, in
+  unit 8, was found by re-running the leg rather than by the review. H5 — `project-owned` withholds a
+  file from `govkit apply` and nothing else, while this kit's documented install is a plain `cp -r`,
+  so S7b adds the runbook carrier and AC11 observes it. M5 — S8 said "the runner that owns it reds on
+  a breach" and no scope item created that runner; the script now self-times, and AC9 observes the RED
+  rather than the printed number. M3 — AC2 pinned two fan-in sums measured at base on a tree without
+  this unit's own new file, which changes the index; the criterion is now the relation. M6 — §7 gained
+  `govkit selfcheck`, the leg that grades the descriptor S7 edits, and the spec-tokens leg its own
+  acceptance section had just broken; Files-touched gained the runbook and the regenerated map
+  artifacts.
 
 ## 10. Reuse audit
 
