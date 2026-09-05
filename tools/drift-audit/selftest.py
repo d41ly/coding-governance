@@ -1937,6 +1937,94 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
           not (r / "memory-recall").exists() and sig()["signal"],
           "the fixture unexpectedly has a recall kit beside it")
 
+
+# ---------------------------------------------------------------------------------------------
+# The two closing-review repairs, each with the arm it landed without.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None:
+    """A report-only signal at exactly its pinned value prints a CALM status, not an over one.
+
+    The display branch for a non-gateable signal compared against the bare `tolerance` while both
+    gateable branches compared against the resolved `pin`, so a report-only signal WITH a pin
+    announced itself over at the very value its pin ratifies. A signal whose only product is its
+    status line cannot afford that: it trains a reader to ignore the column.
+    """
+    r = make_repo(tmp, name="pinned")
+    proj = r / "drift-audit" / "drift_signals.py"
+    NL = chr(10)
+
+    def human() -> str:
+        out = run([sys.executable, "drift-audit/drift_report.py"], r)
+        assert out.returncode == 0, out.stderr[:300]
+        return out.stdout
+
+    # A REPORT-ONLY SIGNAL WITH A NON-ZERO VALUE, built rather than assumed. The first version of
+    # this arm reached for a signal the fixture leaves at 0, so pinning it at its value pinned it at
+    # zero and the two checks below passed over nothing -- the fixture-passes-by-finding-nothing
+    # class, in the arm written to catch a reporting defect. The premise is asserted first now.
+    (r / "src" / "dangling.py").write_text(
+        "# cites TOOL-aThing-404, whose slug anchors a record but whose seq does not" + NL,
+        encoding="utf-8", newline=NL)
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: plant a dangling citation", "--no-verify"], r)
+
+    name = "source_cited_ids_resolving_to_no_record"
+    value = report(r)[name]["value"]
+    check("report-only: the fixture's report-only signal has a value to pin",
+          value > 0, f"value {value} -- the arm below would pin at zero and prove nothing")
+
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "PINS = {}", "PINS = {'" + name + "': " + str(value) + "}"),
+        encoding="utf-8", newline=NL)
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: pin the report-only signal at its value", "--no-verify"], r)
+
+    line = [ln for ln in human().splitlines() if name in ln]
+    check("report-only: a signal AT its pin does not report itself over",
+          bool(line) and "over" not in line[0],
+          f"status line: {line[0].strip() if line else '(absent)'}")
+    check("report-only: and it NAMES the pin rather than printing a bare ok",
+          bool(line) and ("pin " + str(value)) in line[0],
+          f"status line: {line[0].strip() if line else '(absent)'}")
+
+
+def test_evidence_globs_exclude_test_templates(tmp: pathlib.Path) -> None:
+    """A `.test-template` file is a test that is neither `.test.sh` nor named `fixture`.
+
+    The exclusion list was collapsed to a single fixture predicate and silently lost this shape,
+    re-admitting a template to the evidence population under a comment claiming total coverage.
+    """
+    r = make_repo(tmp, name="templates")
+    proj = r / "drift-audit" / "drift_signals.py"
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']",
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh', ':(exclude)*fixture*', "
+        "':(exclude)*.test-template.*']"),
+        encoding="utf-8", newline="\n")
+    (r / "src" / "thing.test-template.py").write_text(
+        "# cites TOOL-aThing-1 from a test TEMPLATE\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: cite a spec id from a test template", "--no-verify"], r)
+
+    sig = report(r)["non_terminal_specs_cited_by_product_source"]
+    check("evidence: a `.test-template` citation is not evidence a unit shipped",
+          all(row["id"] != "TOOL-aThing-1" for row in sig["detail"]),
+          f"detail: {[row['id'] for row in sig['detail']]}")
+
+    # AND THE SHIPPED DECLARATION CARRIES IT. The arm above writes its own glob list into the
+    # fixture's project layer, so it proves the PATHSPEC works and guards nothing about what this
+    # repo actually declares -- measured, by deleting the shipped line and watching the arm stay
+    # green. This half reads the shipped list directly, which is the only thing that reds when the
+    # exclusion is dropped from it.
+    shipped = KIT / "drift_signals.py"
+    globs = [ln.strip().strip(",").strip('"').strip("'")
+             for ln in shipped.read_text(encoding="utf-8").splitlines()]
+    check("evidence: the SHIPPED declaration excludes the test-template shape",
+          ":(exclude)*.test-template.*" in globs,
+          "the shipped EVIDENCE_GLOBS lost the exclusion the arm above only proves is honoured")
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -1956,6 +2044,8 @@ def main() -> int:
         test_evidence_oracle(tmp)
         test_local_grammar_matches_the_extractor(tmp)
         test_source_cited_ids(tmp)
+        test_report_only_signal_is_judged_against_its_pin(tmp)
+        test_evidence_globs_exclude_test_templates(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")

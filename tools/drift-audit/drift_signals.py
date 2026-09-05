@@ -84,13 +84,17 @@ EVIDENCE_GLOBS: list[str] = [
     ":(exclude)*.test.sh",
     ":(exclude)*/selftest.py",
     ":(exclude)*/test_*.py",
-    # FIXTURE ANYTHING, in ONE predicate. The three lines above name three spellings of "a test
-    # file"; an earlier revision of this block answered that with four more literal spellings of
-    # "a fixture", which is the same gate-the-instance shape one level along and left two fixture
-    # files inside the population anyway — one of them carrying a dozen real unit ids. A single
-    # substring match over the path covers every spelling the tree uses now and every one it grows
-    # later. Re-measured in the same commit that changed it.
+    # FIXTURE ANYTHING, in ONE predicate. An earlier revision answered the three test-file
+    # spellings above with four more literal spellings of "a fixture", which is the same
+    # gate-the-instance shape one level along. A substring match over the path covers every fixture
+    # spelling the tree uses now and every one it grows later.
     ":(exclude)*fixture*",
+    # AND THE TEMPLATE SHAPE, which the collapse dropped and nothing else covers: a `.test-template`
+    # file is a test that is not named `fixture` and not named `.test.sh`. Losing it re-admitted one
+    # file to this population under a comment claiming the single predicate covered everything —
+    # a collapse that generalises three cases and silently loses a fourth. Both lines together are
+    # 175 files; the predicate alone was 176. Measured at the commit that restored this.
+    ":(exclude)*.test-template.*",
 ]
 
 # --------------------------------------------------------------------------------------------

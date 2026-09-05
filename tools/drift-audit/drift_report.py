@@ -1293,10 +1293,14 @@ def build_live_backlog_rows(ctx) -> dict:
         # split per-gate to avoid.
         "value": max((r["live"] for r in judgeable), default=0),
         "of": len(rows),
-        # The threshold comes from the project layer, and for a NON-GATEABLE signal the status line
-        # compares against `tolerance` rather than `pin` (see the report loop), so it is read here.
-        # Absent, it is 0 and every non-empty shard reads "out of tolerance" — which trains a reader
-        # to ignore the line, the failure mode this signal is supposed to cure.
+        # The threshold comes from the project layer. It is read into `tolerance` here because that
+        # is this signal's declared floor; the status line now compares against the RESOLVED `pin`,
+        # exactly as the gateable branches do, and `pin` falls back to `tolerance` when PINS declares
+        # none — so this read still decides the verdict for this signal either way. The clause that
+        # used to sit here said the report loop compares against `tolerance` rather than `pin`, which
+        # a closing review found true until the same fold made it false and left this sentence
+        # standing. Absent, the threshold is 0 and every non-empty shard reads as over — which trains
+        # a reader to ignore the line, the failure mode this signal is supposed to cure.
         "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
         "gateable": False,
         # A tree with no backlog shards at all cannot move this signal, so it reports DEAD rather than
@@ -1833,11 +1837,14 @@ def main(argv: list[str] | None = None) -> int:
                 # declares none, so this changes nothing for a signal without one — but a
                 # report-only signal WITH a pin could otherwise never print a calm status at its own
                 # declared floor. A signal whose only product is its status line was reporting
-                # "out of tolerance" at exactly the value its pin ratifies, which trains a reader to
-                # ignore the column. The two gateable branches above already compare against `pin`.
-                status = "out of tolerance (report only)"
+                # "over" at exactly the value its pin ratifies, which trains a reader to ignore the
+                # column. The two gateable branches above already compare against `pin`.
+                status = f"over pin {s['pin']} (report only)"
             else:
-                status = "ok"
+                # NAMING THE PIN, like the gateable branch does. A bare `ok` beside a sibling that
+                # prints its pin and a drain hint reads as "nothing declared here", which is the
+                # opposite of true for a signal whose pin is the only thing holding it.
+                status = (f"ok (pin {s['pin']}, drain it)" if s["pin"] else "ok")
             print(f"  {s['signal']:<48} {s['value']:>7} {s['of']:>6}  {status}")
         print("\n# detail: rerun with --json")
 

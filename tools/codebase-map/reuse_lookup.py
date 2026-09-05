@@ -75,10 +75,14 @@ class Candidate:
 _DECISIONS_RE = re.compile(r"^decisions\s*=\s*\[([^\]]*)\]", re.M | re.S)
 # THE AUTHORITY, not a retype of it. This was a hand-copied byte-identical duplicate of the same
 # pattern in `map_lib`, in a module that already imports `map_lib` — a second reader of one rule
-# with nothing comparing the pair, which is the defect this same build fixed one kit over. Taking
-# it from the module also picks up a project override where one is declared, where a copy silently
-# would not: this reader DROPS a token it does not match, so a divergence loses ids in silence
-# where the authority fails loud.
+# with nothing comparing the pair, which is the defect this same build fixed one kit over.
+#
+# IT DOES NOT PICK UP A PROJECT OVERRIDE, and an earlier revision of this comment said it did. The
+# override lives in the project-side extractor and every other reader resolves it with a `getattr`
+# against that module; this one deliberately imports no project layer, which is the portability
+# property the decisions read was written to preserve in the first place. So an adopter who
+# overrides the grammar gets the default here. That is a KNOWN limitation of reading the field
+# without the project layer, stated rather than claimed away — the alternative ends the portability.
 _ID_SHAPE = m.DEFAULT_DECISION_ID_RE
 
 

@@ -3473,6 +3473,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_evidence_globs_exclude_test_templates",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_evidence_oracle",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -3701,6 +3706,11 @@
       "id": "test_repo_root_linked_worktree",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_report_only_signal_is_judged_against_its_pin",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_require_adopted_root_refuses",

@@ -20,12 +20,8 @@ therefore not the integration the question implied. It repairs the reader that e
 validated field that already owns the code-to-decision link, and writes the convention down once.
 
 ## Expected improvements
-- BOTH source citations resolving to no record are repaired, and each comment survives its id.
-  This said ONE, which was true only of the product-source population the design pass had
-  measured: a second sits in a test file, and unit 3's signal reads the whole tracked
-  non-memory tree, so it reports two. Both blocks now name their evidence in prose and carry
-  the id on a trailing line of its own, which is the delete-the-id test the dangling one had
-  been failing for its entire life.
+- BOTH source citations resolving to no record are repaired, each surviving its id. This said
+  ONE, true only of the product population; a second sits in a test file.
 - The repo has one id regex rather than two, and a `.test.sh` citation stops certifying a spec as
   shipped.
 - The dossier `decisions` field stops being a validated inert key nothing fills.
@@ -95,7 +91,7 @@ ids TOOL-aKeyedAnnotation-13
 | [TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-4.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

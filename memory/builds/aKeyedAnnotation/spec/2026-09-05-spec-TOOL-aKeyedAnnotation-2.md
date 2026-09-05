@@ -11,6 +11,7 @@
 | [2026-09-05-build-TOOL-aKeyedAnnotation-2-acceptance.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-2-acceptance.md) | journal | — |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round1.md) | diff-review | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round2.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round2.md) | diff-review | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
+| [2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round3.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round3.md) | diff-review | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 
