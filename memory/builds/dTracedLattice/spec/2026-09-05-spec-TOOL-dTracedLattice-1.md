@@ -188,9 +188,11 @@ Thresholds are the measured shipped baselines, so a change that does not beat th
 - **AC8 — cost ceiling.** At most `0.05` s added to a roughly 1 s command, and no second
   full-corpus scan. The stem-posting key adds `0.0164` s; a raw-text document-frequency spelling adds
   `1.554` s and fails this criterion alone.
-- **AC9 — beat the constant-answer control.** Leave-one-out, the K most-frequently-changed files,
-  query ignored, scores `.098/.515/.720/.841` at K=1/5/10/20. Any file-granularity recall figure that
-  does not beat it establishes nothing.
+- **AC9 — beat the constant-answer control.** A leave-one-out control that ignores the query and
+  returns the K most-frequently-changed files scores .098, .515, .720 and .841 at K of 1, 5, 10 and
+  20. Any file-granularity `recall@K` that does not beat those establishes nothing. The figures are
+  written unbackticked on purpose: a slash-separated numeric list inside backticks reads as a path
+  citation to the spec-tokens leg, which is how this criterion reddened the bar once already.
 - **AC10 — disclose citation churn.** Report how many of the 92 resolvable seams cited in a
   `## 10. Reuse audit` and currently in a shipped top 5 leave it, and how many sit in live specs. A
   disclosure, not a blocker.
