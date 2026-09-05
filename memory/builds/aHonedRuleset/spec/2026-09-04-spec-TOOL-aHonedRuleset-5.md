@@ -6,7 +6,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-6 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-6 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-6 |
+| [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-6 |
 
 <!-- /gen:spec-records -->
 
@@ -307,7 +309,7 @@ No new file, no new gate leg, no inventory key. `tools/gate-legs.json` is not ed
   seven carriers rather than the four the prose census reported, corrected three of its four line
   numbers, and measured the `SKILL.md` recovery at 97 B net against its 250-400 B estimate.
 - rev-2 · 2026-09-04 · folded the spec audit
-  ([2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md)),
+  ([2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md)),
   four findings addressed to this unit. **A2** — AC2 was an absolute against 18432 that
   `TOOL-aHonedRuleset-3` satisfies alone at `order 1`; it is now a ≥90 B delta against a `wc -c`
   taken immediately before this unit, and its no-WARN clause is restated to hold under either branch

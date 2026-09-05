@@ -6,7 +6,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 
 <!-- /gen:spec-records -->
 
@@ -369,7 +371,7 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
 - rev-1 · 2026-09-04 · initial draft. Every figure in §4 measured at base `102e98f0`; the census's
   1200–1400 B estimate for this cut was confirmed at 1467 B moved.
 - rev-2 · 2026-09-04 · folded the round-1 spec audit
-  (`2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md`), findings S1, S2, S3, A4, A5, A6, A7, P2
+  (`2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md`), findings S1, S2, S3, A4, A5, A6, A7, P2
   and P4. Rev-1's **S6** — the `check-template-size.sh --bump` of the engine's high-water row — was
   DELETED and the slot left vacant so the audit's citation still points at the removed item; §3 now
   states that the row is `TOOL-aHonedRuleset-5` §8 F1's to rule. AC11 lost its bump clause and now

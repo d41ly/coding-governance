@@ -73,12 +73,13 @@ one build and called it a pattern rather than a coincidence; its population was 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node a · opened 2026-09-04 · streams tooling+playbook+kickoff+deployer
+**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-09-04 · streams tooling+playbook+kickoff+deployer
 ids TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
+| [TOOL-aHonedRuleset-1 — the prose census](spec/2026-09-04-spec-TOOL-aHonedRuleset-1.md) | 0 | 1 | CLOSED | rev-1 | 2026-09-04 |
 | [TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds](spec/2026-09-04-spec-TOOL-aHonedRuleset-2.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-04 |
 | [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-04 |
 | [TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement](spec/2026-09-04-spec-TOOL-aHonedRuleset-4.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-04 |
@@ -86,17 +87,18 @@ ids TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRu
 | [TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away](spec/2026-09-04-spec-TOOL-aHonedRuleset-6.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aHonedRuleset-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
+| 0 | `TOOL-aHonedRuleset-1` | no |
 | 1 | `TOOL-aHonedRuleset-2`, `TOOL-aHonedRuleset-3` | yes |
 | 2 | `TOOL-aHonedRuleset-4`, `TOOL-aHonedRuleset-5` | yes |
 | 3 | `TOOL-aHonedRuleset-6` | no |

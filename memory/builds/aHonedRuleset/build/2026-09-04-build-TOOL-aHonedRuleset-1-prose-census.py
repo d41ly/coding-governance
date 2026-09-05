@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# **Serves:** research TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6
+# **Commissions:** TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6
 """prose-census — measure byte pressure and cross-document redundancy over this repo's
 load-bearing governing prose.
 

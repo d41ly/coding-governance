@@ -6,7 +6,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 
 <!-- /gen:spec-records -->
 
@@ -307,7 +309,7 @@ removes is the one that script already holds.
 
 - rev-1 · 2026-09-04 · initial draft.
 - rev-2 · 2026-09-04 · folded the round-1 spec audit
-  ([2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md)),
+  ([2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md)),
   three findings. **Audit S1** — scope item S1 stages a watched pathspec with no re-stamp in scope
   and §7 named no ratchet leg: added S5 (the
   bundled `memory/guides/SESSION-KICKOFF.md` `last-audit` re-stamp, unit 5's S8 copied), its

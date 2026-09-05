@@ -1,5 +1,9 @@
 # TOOL-aHonedRuleset-1 — prose census over the load-bearing governing documents
 
+**Serves:** research TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6
+
+**Commissions:** TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6
+
 **Status:** INPROGRESS · Tier 1 · streams tooling+playbook · node a · 2026-09-04 · base `c4fcf5ad`
 
 Every figure below is emitted by the script beside this file and none is typed here as a standing

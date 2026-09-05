@@ -6,7 +6,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 
 <!-- /gen:spec-records -->
 
@@ -323,7 +325,7 @@ that WARN is not this unit's job.
 - rev-1 · 2026-09-04 · initial draft. Every figure in `§4` measured at base `102e98f0` rather than
   carried from the census; where the two disagree, the disagreement is stated in place.
 - rev-2 · 2026-09-04 · folded the four findings the spec audit
-  `2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md` addresses to this unit. B2: AC8 forbade the
+  `2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md` addresses to this unit. B2: AC8 forbade the
   third file `.githooks/pre-commit` requires, so it now names `memory/guides/SESSION-KICKOFF.md`
   alongside the two carriers, S6 adds the bundled `last-audit` re-stamp, and §7 gains the
   `kickoff-manifest ratchet` and `memory hygiene` legs that commit owes. P1: AC2 cited

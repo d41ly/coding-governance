@@ -6,7 +6,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
+| [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
+| [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
 
 <!-- /gen:spec-records -->
 
@@ -357,7 +359,7 @@ at half the size, and the file's own measurement says the line half never binds.
 
 - rev-1 · 2026-09-04 · initial draft. Design pass only, no target file edited.
 - rev-2 · 2026-09-04 · folded the three spec-audit findings addressed to this unit, from
-  `2026-09-04-review-TOOL-aHonedRuleset-1-spec-audit.md`. **B3** — AC1 through AC4 presumed option
+  `2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md`. **B3** — AC1 through AC4 presumed option
   (a) while §8 F1 stays unsigned; each is now split into an (a) half and a (b) half, the shape AC8
   already had. F1 is NOT resolved by this rev. **S1** — the unit stages `tools/gate-legs.json` and
   `memory/guides/BUILD-METHOD.md`, both watched on line 6 of `memory/guides/SESSION-KICKOFF.md`, with
