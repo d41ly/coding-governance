@@ -68,8 +68,8 @@ predate this unit and a reader owes the attribution.
   not report PASS in either shard, and it did not before this unit either. Shard 1/2 ran to
   COMPLETION — `rc=1`, 12 failures, the closing C21 arms and the shard notice both printed, and no
   assertion-floor failure, so it met its floor of 83. Shard 2/2 was re-run after the AC15 repair and
-  stood at 12 failures with the run still in flight when this ledger was written; its pre-repair
-  sibling was stopped at 13. **`grep -c 'check 31'` over every shard output is 0**, and the arms
+  stood at 12 failures after two and a half hours, still short of its closing line and unmoved for the
+  last fifty minutes of it; its pre-repair sibling was stopped at 13 to free the machine. **`grep -c 'check 31'` over every shard output is 0**, and the arms
   positioned after this unit's block did fire on their own unrelated causes, so the seven arms added
   here executed and none of them failed. What the criterion asked for — PASS with a raised assertion
   count — is not available from a suite that is red for four pre-existing reasons, and claiming it
@@ -104,12 +104,13 @@ predate this unit and a reader owes the attribution.
 compensating check the 2026-08-23 ruling relies on. **It is RED, and no failure names check 31** —
 `grep -c 'check 31'` over every shard output returns 0. Shard 1/2: `rc=1`, 12 failures, ran to
 completion and met its assertion floor. Shard 2/2, re-run after the AC15 repair: 12 failures and
-still running when this was written, against 13 in the pre-repair run that was stopped to free the
-machine. The check-17 waiver control that headed the pre-repair list is GONE from the repaired run,
+12 failures after two and a half hours, never reaching its closing line, against 13 in the pre-repair
+run that was stopped to free the machine. That 12 is therefore not a verdict on the region and is not
+offered as one. The check-17 waiver control that headed the pre-repair list is GONE from the repaired run,
 which is AC15 witnessed in situ rather than argued.
 
 Unlike its sibling `tools/unattended/unattended.test.sh` (`TOOL-aHoistedPass-36`), this suite does
-RUN — it aborts nowhere and both regions reach their closing arms. It simply reports failures nobody
+RUN — it aborts nowhere, and shard 1/2 reached its closing arms. It simply reports failures nobody
 has read since its legs left the bar.
 
 The failures are pre-existing and attributed by measurement, not by assumption:
@@ -134,8 +135,18 @@ The rest are filed rather than fixed. Fixing another build's fixture debt inside
 
 ## The bar, and one red on it that is not this unit's
 
-`bash tools/memory-tree/check-memory-hygiene.sh` exits **1**, on check 23: an acceptance-ledger AC
-line must carry a backticked token on its OWN first line, or name `amended rev-N`, or be a checkbox —
+`bash tools/memory-tree/check-memory-hygiene.sh` exits **1**, and after three runs every finding it
+raises against this pass is cleared. What remains is check 23 on `TOOL-aHoistedPass-6`'s ledger, one
+reported check 15 citation in `TOOL-aHoistedPass-33`'s backlog row, and one reported check 16
+read-path line — all three present at the pass base.
+
+The findings that WERE this pass's, and are fixed: check 9 (the generated index went stale, because
+the ledger edits moved what the renderer reads and the regen had run one commit too early), check 15
+rule 1 twice (a BACKTICKED `<path>:<line>` token is a citation whose path resolves to nothing —
+`corpus_ids.py` reads the whole token, so a line number inside the backticks makes it name no file),
+and nine of check 23's seventeen entries.
+
+Check 23's rule: an acceptance-ledger AC line must carry a backticked token on its OWN first line, or name `amended rev-N`, or be a checkbox —
 the classifier in `tools/memory-tree/check-memory-hygiene.sh` at line 1430 reads that one line and nothing
 below it. Seventeen entries were named. **Nine were mine and are fixed**: AC2, AC3, AC5, AC6, AC7,
 AC10, AC12, AC13 and AC15 carried their evidence on a continuation line, and each now names it up
