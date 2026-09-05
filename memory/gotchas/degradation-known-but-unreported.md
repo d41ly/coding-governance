@@ -43,12 +43,28 @@ same unit makes the unverified count non-zero more often, so the port narrowed t
 honest message while adding it. All three now test the synthesis death first, each under a comment
 naming the unit that reordered it.
 
-The REACH shape is the one still half-open, which is why this record is worth reading rather than
-filing. The two drift-audit siblings now interpolate a run-integrity line into their synthesis
-prompts. `tools/workflows/tier2-review.js` does not: its synthesis prompt names the raw, confirmed,
-refuted and unverified counts and the precision, and no line in it hands the agent a liveness
-counter. So the record that harness writes cannot state that half its lenses died — in the file the
-closing review called the reference implementation.
+The REACH shape is **CLOSED as of `TOOL-aWeldedTribunal-4`, 2026-09-04**, and the record keeps the
+history because the class is still live for the next harness anybody writes.
+
+All three harnesses now interpolate a `RUN INTEGRITY` block into their synthesis prompts. The two
+drift-audit siblings got theirs from `TOOL-dTieredTribunal-3`; `tools/workflows/tier2-review.js` —
+the file the closing review called the reference implementation — went a further nine days without
+one, and its record therefore could not state that half its lenses had died.
+
+**What `tier2-review.js` now hands the agent**, and the set is the point rather than any member of
+it: `lensesDead` with the live and dispatched lens counts, `skepticsDead` with the live and
+dispatched batch counts, `conflicts.size`, `spurious` and `duplicates`. Plus the two SENTENCES that
+make the numbers do work — do not describe this run as complete if any is non-zero, and if lenses
+died then a zero count is not evidence of absence.
+
+`conflicts` is in that set and `downgrades` is not, deliberately: this harness computes the first and
+does not compute the second, and interpolating a counter nothing derives would put an invented number
+in a durable record. The unit that closed this shape said so in its own §3 rather than padding the
+block to match its siblings byte-for-byte.
+
+**The DoD line this record now carries.** A harness that computes a liveness counter states it where
+the DURABLE RECORD is written, not only on stdout. Stdout is not the record, and that sentence is the
+whole class in one line.
 
 ## The fix
 

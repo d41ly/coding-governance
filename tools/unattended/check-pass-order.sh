@@ -22,9 +22,18 @@
 #   - whether a build pass was DISPATCHED. That is a different join over the same range.
 #   - anything about a unit that is not CLOSED. An OPEN unit legitimately has no build commit yet, so
 #     grading one would red mid-build on every run including the one that must land it.
-#   - anything about a build with no run-state file. The range this walks is a RUN's pinned BASE, and a
-#     build that was never carried by an unattended run has no such pin. Those are COUNTED and
-#     announced, never silently skipped.
+#   - whether the WAIVER REGISTRY's rows deserve their waivers. It grades that each waived unit is
+#     still a violation (a stale row REDS) and never why the waiver was granted.
+#   - whether a build's COMMITTED `opened:` is honest. EVERY read in this file now comes from the
+#     graded commit — the records, the waiver registry, and the SELECTOR that decides which builds
+#     are read at all — which closes the edit-and-run bypass and NOT the class: the
+#     graded run still authors the value it commits. Narrowing, not removal, and it is said here
+#     because a gate's header states what it does not check.
+#
+# TOOL-aStagedLane-1 WIDENED THE POPULATION to builds with no run-state file. The range for those is
+# derived from the build FOLDER's own first commit instead of a run's pinned BASE; see THE RANGE
+# below. `--preview` grades the live tree and prints violations without setting exit status, which is
+# how a candidate predicate gets run over the real tree before it is wired.
 set -u
 KIT_UNATTENDED_VERSION=1.17   # gov:kit unattended@1.17 — must match unattended.sh; check-kit-versions.sh pairs them
 
@@ -46,6 +55,14 @@ _LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # shellcheck source=lib-unattended.sh
 . "$_LIB_DIR/lib-unattended.sh"
 
+# S2f - `--preview` grades the live tree and prints everything it finds WITHOUT setting exit status.
+# AGENTS.md section 7 requires a candidate gate predicate to be run over the real tree before it is
+# wired, printing hits AND near-misses; without a mode that does not red, doing so means editing the
+# script or reading a failing bar. The blocker this leg's own build met at round 3 - two units
+# already on the default branch that the widened predicate reds - was found exactly this way.
+PREVIEW=0
+case "${1:-}" in --preview) PREVIEW=1 ;; "") ;; *) echo "pass-order: unknown argument: $1" >&2; exit 2 ;; esac
+
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "pass-order: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -56,6 +73,7 @@ CONF="$ROOT/.unattended.conf"
 [ -f "$DRIVER" ] || { echo "pass-order: no driver beside this script, and the classifier below is sliced out of it"; exit 2; }
 
 MEMORY_ROOT=""; PASS_ORDER_CUTOFF=""; GENERATED_INDEXES=""; SHARED_RECORDS=""
+PASS_ORDER_PREANCHOR_CAP=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL, and this block is `check-unattended.sh`'s
 # ---- verbatim rather than a third hand-written reader. `$CONF` is a TRACKED file the graded run
 # ---- commits, so sourcing it here executes it, and both siblings hardened this one recorded
@@ -86,7 +104,7 @@ while IFS= read -r -d '' _ck; do
     # made the leg eval an attacker-chosen file and exit 0 with its own FAILED line printed.
     # Reproduced end to end before this line existed. Only the keys this leg DECLARES are assignable,
     # so the stream cannot reach a name the leg did not ask for.
-    MEMORY_ROOT|PASS_ORDER_CUTOFF|GENERATED_INDEXES|SHARED_RECORDS) eval "$_ck=\$_cv" ;;
+    MEMORY_ROOT|PASS_ORDER_CUTOFF|GENERATED_INDEXES|SHARED_RECORDS|PASS_ORDER_PREANCHOR_CAP) eval "$_ck=\$_cv" ;;
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
           for _n in $_conf_names; do eval "_cval=\${$_n:-}"; printf '%s\0%s\0' "$_n" "$_cval"; done
@@ -121,7 +139,10 @@ declare -F plan_state >/dev/null || { echo "pass-order: plan_state did not survi
 # A PROBE THAT CANNOT MOVE SAYS SO. The classifier must return a real token on a real spec before a
 # single verdict is trusted; without this the whole leg reports a clean bill when the slice breaks,
 # which is indistinguishable from a clean run and is how a green bar stops meaning anything.
-_probe=$(git ls-files "$MEMORY_ROOT/builds/*/spec/*.md" 2>/dev/null | head -1)
+# FROM THE GRADED COMMIT, like every other read in this file. `git ls-files` enumerates the INDEX,
+# so a staged-but-uncommitted `git rm --cached` of the spec tree emptied this probe and the DEAD
+# PROBE guard — the one whose job is to say the leg graded nothing — skipped silently.
+_probe=$(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/null | grep -E "/spec/.*\.md$" | head -1)
 if [ -n "$_probe" ]; then
   case "$(plan_state "$_probe")" in
     MISSING|THIN|FORKED|READY) ;;
@@ -144,30 +165,129 @@ case "$PASS_ORDER_CUTOFF" in
   *) echo "pass-order: PASS_ORDER_CUTOFF is not an ISO date, and a cutoff nothing can compare grades every build or none: $PASS_ORDER_CUTOFF"; exit 2 ;;
 esac
 
-graded=0; skipped_cutoff=0; skipped_norun=0; unbuilt=0; violations=""
+# ------------------------------------------------------------------------- THE WAIVER REGISTRY
+# S2e. The widening reds two units already landed on the default branch, and history is append-only,
+# so the leg could not otherwise be wired at all. The registry is a DECLARED population: one row per
+# waived unit, `<unit-id><TAB><reason>`, comments and blanks ignored.
+#
+# AN ABSENT FILE MEANS AN EMPTY WAIVER SET, never a blanket one. An exemption list that exempts
+# everything when it goes missing is the vacuous-selector class on the one path this leg reports a
+# hard violation, so the default direction is the one that REDS.
+#
+# AND A STALE ROW REDS. A waiver naming a unit this leg no longer reports is an exemption that has
+# outlived its reason, and leaving it silently widens the surface it was written to narrow - the same
+# posture every other declared population in this repo takes.
+WAIVER_FILE="$MEMORY_ROOT/project/pass-order-waiver.txt"
+waived_ids=""
+# READ FROM THE GRADED COMMIT, not the working tree. A registry read from disk waives on an
+# UNCOMMITTED file — and then its stale-row red cannot fire for anybody else, because the file is
+# not in the pushed tree. An absent blob is an empty waiver set, which is the direction this file
+# already declares.
+if GIT cat-file -e "HEAD:$WAIVER_FILE" 2>/dev/null; then
+  # FLATTENED TO ONE SPACE-SEPARATED LINE, and the unquoted expansion doing it is load-bearing rather
+  # than sloppy. The membership tests below are `case " $waived_ids " in *" $id "*`, which needs a
+  # SPACE on both sides of every id. Left as grep's newline-separated output, the first row matches
+  # only if it is also the last — so a ONE-ROW registry works and a two-row one silently waives
+  # nothing. Found by running the wired leg over the real tree, which has two rows, AFTER a self-test
+  # arm carrying one row had passed: the instance was covered and the class was not.
+  waived_ids=$(GIT show "HEAD:$WAIVER_FILE" 2>/dev/null | sed -e 's/#.*//' -e 's/[[:space:]].*$//' | grep -E '^[A-Z]+-[A-Za-z]+-[0-9]+$' || true)
+  waived_ids=$(echo $waived_ids)
+fi
 
-for readme in $(git ls-files "$MEMORY_ROOT/builds/*/README.md" 2>/dev/null); do
+# VALIDATED BEFORE IT REACHES `$(( ))`, beside the cutoff check and for the same two reasons. This
+# value is admitted from a TRACKED conf the graded run commits, and it flowed into arithmetic
+# evaluation unchecked — which is code execution in this leg's own shell. A non-numeric value also
+# disabled the whole pre-anchor violation class while reporting zero truncations, which is a silent
+# green rather than a refusal. `PASS_ORDER_CUTOFF` has had this treatment since it existed; the new
+# key was added to the allow-list and not to the validation.
+PREANCHOR_CAP="${PASS_ORDER_PREANCHOR_CAP:-400}"
+case "$PREANCHOR_CAP" in
+  ''|*[!0-9]*) echo "pass-order: PASS_ORDER_PREANCHOR_CAP must be a non-negative integer, and a cap nothing can compare disables the pre-anchor probe silently: $PASS_ORDER_PREANCHOR_CAP"; exit 2 ;;
+esac
+# AND IT MUST BE IN RANGE, not merely all-digits. `99999999999999999999` passes a character-class
+# test, and then `git rev-list --max-count=<huge>` answers `fatal: not an integer` into the
+# 2>/dev/null, `[ 0 -ge <huge> ]` errors and evaluates false, and the leg exits 0 with both
+# counters at zero — verbatim the silent green the character-class check was added to close. A
+# validator that admits a value the consumer refuses has moved the failure, not removed it.
+[ "${#PREANCHOR_CAP}" -le 9 ] && [ "$PREANCHOR_CAP" -le 100000 ] || {
+  echo "pass-order: PASS_ORDER_PREANCHOR_CAP is out of range (max 100000), and git refuses a --max-count it cannot parse, which turns this probe off while reporting nothing: $PREANCHOR_CAP"
+  exit 2
+}
+
+graded=0; skipped_cutoff=0; norun_graded=0; unbuilt=0; preanchor_hits=0; waived_n=0; truncated=0
+violations=""; waived_seen=""; previews=""
+
+# THE POPULATION COMES FROM THE GRADED COMMIT TOO, and this line was the last one left behind.
+# The fold moved four record READS to `HEAD:` and left the SELECTOR that decides which builds are
+# read at all on `git ls-files`, which enumerates the INDEX. So one `git rm --cached` of a build
+# README — staged, nothing committed — dropped that whole build from grading, and doing it across
+# the tree silenced the leg entirely while it reported a clean bill. That is the same
+# sibling-left-behind shape the fold existed to close, one level earlier and strictly wider: the
+# earlier fix protected what is read, this protects WHETHER IT IS READ.
+#
+# The self-test arms could not see it either. They mutate file CONTENT with `sed -i`, which leaves
+# the path in the index; only an INDEX mutation reaches this line, so the arm below uses
+# `git rm --cached`.
+for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/null | grep -E "/README\.md$"); do
   bdir=${readme%/README.md}
   slug=${bdir##*/}
-  opened=$(sed -n 's/^opened:[[:space:]]*//p' "$readme" | head -1)
+  # S6 - THE CUTOFF IS READ FROM THE COMMIT BEING GRADED, not the working tree. Reading it from disk
+  # let one uncommitted character exempt a build from this leg, and the widening multiplies the
+  # population that field governs. One object read per build, none per unit. The residual - the run
+  # still authors the value it COMMITS - is in this file's header rather than left to be discovered.
+  opened=$(GIT show "HEAD:$readme" 2>/dev/null | sed -n 's/^opened:[[:space:]]*//p' | head -1)
   case "$opened" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) skipped_cutoff=$((skipped_cutoff+1)); continue ;; esac
   # `sort -C` over the pair is the same date comparison the driver's THIN term uses; a build opened
   # BEFORE the cutoff keeps the grandfathering.
   if ! printf '%s\n%s\n' "$PASS_ORDER_CUTOFF" "$opened" | sort -C; then
     skipped_cutoff=$((skipped_cutoff+1)); continue
   fi
+
+  # ------------------------------------------------------------------------------- THE RANGE
+  # S1/S2/S2b. A run's pinned BASE where one is readable; otherwise the build FOLDER's own first
+  # commit. `norun` marks which, because the pre-anchor probe below is scoped to the derived-range
+  # population - an unattended build's BASE is pinned before its run starts and has no such hole.
+  #
+  # THE ANCHOR IS `<first>^`, so the range INCLUDES `<first>` itself: `rev-list A..HEAD` excludes A,
+  # and a commit that creates the build folder and writes product code in one act is precisely the
+  # violation this widening exists to catch. A root commit has no parent, so the walk starts there.
+  #
+  # S2b - AN UNUSABLE `base:` FALLS BACK rather than skipping. Otherwise a build with a garbage
+  # RUN.md would be MORE exempt than a build with none, which is one committed line away from any
+  # run that wants out of this leg.
+  # FROM THE GRADED COMMIT, exactly as `opened:` above. S6 hardened that read and left these two
+  # siblings on the filesystem, which is the bypass it exists to close, still open one line below
+  # where it was closed. An UNTRACKED `RUN.md` carrying `base: <HEAD sha>` makes the range empty, so
+  # no build commit is ever found, every unit lands in `unbuilt-in-range` and the leg exits 0.
+  # Reproduced on this suite's own fixture. `gate the CLASS, not the instance`, applied to the unit
+  # that cites the rule.
   run="$bdir/RUN.md"
-  if [ ! -f "$run" ]; then skipped_norun=$((skipped_norun+1)); continue; fi
-  base=$(sed -n 's/^base:[[:space:]]*//p' "$run" | head -1)
-  case "$base" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;; *) skipped_norun=$((skipped_norun+1)); continue ;; esac
-  GIT cat-file -e "$base^{commit}" 2>/dev/null || { skipped_norun=$((skipped_norun+1)); continue; }
+  base=""; norun=1
+  _runblob=$(GIT show "HEAD:$run" 2>/dev/null || true)
+  if [ -n "$_runblob" ]; then
+    base=$(printf '%s\n' "$_runblob" | sed -n 's/^base:[[:space:]]*//p' | head -1)
+    case "$base" in
+      [0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) GIT cat-file -e "$base^{commit}" 2>/dev/null && norun=0 || base="" ;;
+      *) base="" ;;
+    esac
+  fi
+  first=""
+  if [ "$norun" = 1 ]; then
+    first=$(GIT rev-list --reverse HEAD -- "$bdir" 2>/dev/null | head -1)
+    [ -n "$first" ] || { skipped_cutoff=$((skipped_cutoff+1)); continue; }
+    base=$(GIT rev-parse "$first^" 2>/dev/null) || base=""
+    norun_graded=$((norun_graded+1))
+  fi
 
   # The CLOSED units, from the generated region. A row's id is spelled twice, so `match` takes the
   # first occurrence per row rather than a `grep -o` that would emit each unit twice.
-  ids=$(awk -v s="$slug" '
+  # ALSO FROM THE GRADED COMMIT. This read selects the POPULATION, so an uncommitted deletion of a
+  # ` CLOSED ` row dropped that unit from grading entirely — the same class as the `base:` read
+  # above and strictly earlier in the pipeline.
+  ids=$(GIT show "HEAD:$readme" 2>/dev/null | awk -v s="$slug" '
       /<!-- gen:build-units -->/ { inr=1; next }
       /<!-- \/gen:build-units -->/ { inr=0 }
-      inr && / CLOSED / { if (match($0, "[A-Z]+-" s "-[0-9]+")) print substr($0, RSTART, RLENGTH) }' "$readme" | sort -u)
+      inr && / CLOSED / { if (match($0, "[A-Z]+-" s "-[0-9]+")) print substr($0, RSTART, RLENGTH) }' | sort -u)
 
   for id in $ids; do
     graded=$((graded+1))
@@ -202,17 +322,91 @@ for readme in $(git ls-files "$MEMORY_ROOT/builds/*/README.md" 2>/dev/null); do
     for _sr in $SHARED_RECORDS; do
       [ -n "$_sr" ] && _gen_ex="$_gen_ex -e ^$_sr"
     done
-    build_c=""
-    for c in $(GIT rev-list --reverse "$base..HEAD" 2>/dev/null); do
-      subj=$(GIT log -1 --format=%s "$c" 2>/dev/null)
-      case " $(printf '%s' "$subj" | tr -c 'A-Za-z0-9-' ' ') " in *" $id "*) ;; *) continue ;; esac
-      # Did it touch anything outside this build's own record surface?
-      if GIT show --pretty=format: --name-only "$c" 2>/dev/null \
-         | grep -v '^$' | grep -qv -e "^$bdir/" $_gen_ex; then
-        build_c="$c"; break
+    _report() {
+      previews="$previews
+$1"
+      case " $waived_ids " in
+        *" $id "*) waived_n=$((waived_n+1)); waived_seen="$waived_seen $id" ;;
+        *) violations="$violations
+$1" ;;
+      esac
+    }
+    # ONE PREDICATE, TWO WINDOWS. `_find_build_commit <rev-range>` is the whole build-commit
+    # definition and both the in-range walk and the pre-anchor probe call it. A second copy would be
+    # two answers to one question, and the copy would be the one that drifts.
+    _find_build_commit() {
+      # THE CAP BOUNDS THE ENUMERATION, not only the loop body. `for _c in $(rev-list ...)` runs the
+      # whole traversal in a command substitution BEFORE the first iteration, so a loop-only cap
+      # bounds the VERDICT and not the WORK — the `bounded-through-a-pipe-is-unbounded` class. The
+      # pre-anchor window is the entire history behind the anchor, so `--max-count` is what bounds it.
+      #
+      # THE TWO WINDOWS WALK IN OPPOSITE DIRECTIONS, and getting that wrong is what made the probe
+      # unable to see its own target. The IN-RANGE walk wants the EARLIEST build commit, so it is
+      # `--reverse`. The PRE-ANCHOR probe wants ANY violating commit behind the anchor, and the
+      # nearest is both the likeliest and the one that must survive truncation — so it walks
+      # NEWEST-FIRST and truncates the FAR end.
+      #
+      # WHAT WENT WRONG, because it is worth one reader's minute. `rev-list --reverse --max-count=N`
+      # applies the count during traversal and reverses AFTER, so the anchor is the LAST element of
+      # the window, not the first. The probe was written `--reverse` for both windows on the belief
+      # that it yielded the commits nearest the anchor; it yields the farthest. So the one commit the
+      # probe exists to reach was dropped by the cap whenever the history behind it was deeper — and
+      # the truncation arm could not see that, because it used the record-only fixture, where the
+      # correct and the broken behaviour give the same verdict.
+      #
+      # Truncation is therefore reported AFTER the walk, on the count actually emitted.
+      local _range="$1" _cap="$2" _ord="$3" _c _subj _n=0 _mc=""
+      # `cap+1` FETCHED, `cap` GRADED, so truncation is EXACT. With `--max-count=$_cap` a complete
+      # walk of an exactly-cap-deep window is indistinguishable from a truncated one, and the leg
+      # reported TRUNCATED for a probe that had in fact seen everything. Fetching one extra is the
+      # only way to know there was more.
+      [ -n "$_cap" ] && _mc="--max-count=$((_cap+1))"
+      for _c in $(GIT rev-list $_ord $_mc $_range 2>/dev/null); do
+        _n=$((_n+1))
+        # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
+        if [ -n "$_cap" ] && [ "$_n" -gt "$_cap" ]; then printf 'TRUNCATED'; return 0; fi
+        _subj=$(GIT log -1 --format=%s "$_c" 2>/dev/null)
+        case " $(printf '%s' "$_subj" | tr -c 'A-Za-z0-9-' ' ') " in *" $id "*) ;; *) continue ;; esac
+        # Did it touch anything outside this build's own record surface?
+        if GIT show --pretty=format: --name-only "$_c" 2>/dev/null \
+           | grep -v '^$' | grep -qv -e "^$bdir/" $_gen_ex; then
+          printf '%s' "$_c"; return 0
+        fi
+      done
+      return 0
+    }
+    build_c=$(_find_build_commit "${base:+$base..}HEAD" "" "--reverse")
+    if [ -z "$build_c" ]; then
+      # S2c - THE PRE-ANCHOR PROBE, and it runs ONLY for the derived-range population. A commit that
+      # writes product code for a unit touches nothing under the build folder, so it sits STRICTLY
+      # EARLIER than that folder's first commit and outside the derived range entirely - the most
+      # flagrant instance of the violation, landing in a tally this file's own liveness block warns
+      # must not be read as benign. The window is INCLUSIVE of the anchor `<first>^`, which the range
+      # above excludes, so `rev-list <anchor>` and never `<anchor>^`.
+      #
+      # SAME PREDICATE, exclusion included. Without it a `backlog(<id>): open the row` commit - which
+      # ordinarily lands before the build folder exists - reads as a violation and reds a conforming
+      # build. This script's own comment above records that dropping the exclusion once made a
+      # conforming run unlandable.
+      #
+      # S2d - BOUNDED BY CONSTRUCTION, because the miss rate over the widened population could not be
+      # measured before this landed. A probe that gives up is COUNTED, never reported as a miss.
+      if [ "$norun" = 1 ] && [ -n "$base" ]; then
+        pre_c=$(_find_build_commit "$base" "$PREANCHOR_CAP" "")
+        if [ "$pre_c" = TRUNCATED ]; then
+          truncated=$((truncated+1))
+        elif [ -n "$pre_c" ]; then
+          preanchor_hits=$((preanchor_hits+1))
+          # ROUTED THROUGH `_report` like every other violation. This path duplicated the waiver
+          # bookkeeping inline, beside a helper whose own comment says it exists so that a future
+          # violation class cannot be added on a path that forgets to consult the registry — and then
+          # this class was added on exactly such a path.
+          _report "  $id — BUILT at $(GIT rev-parse --short "$pre_c") BEFORE this build's folder existed, so no spec for it can have existed either"
+          continue
+        fi
       fi
-    done
-    if [ -z "$build_c" ]; then unbuilt=$((unbuilt+1)); continue; fi
+      unbuilt=$((unbuilt+1)); continue
+    fi
 
     # STEP 2 - at the build commit's FIRST PARENT, a tracked spec under this build must carry the id
     # in a conforming status header and must not grade MISSING or THIN. The first parent and not the
@@ -228,24 +422,27 @@ for readme in $(git ls-files "$MEMORY_ROOT/builds/*/README.md" 2>/dev/null); do
       state=$(plan_state "$tmp"); rm -f "$tmp"
       found="$sp"; break
     done
+    # EVERY VIOLATION ROUTES THROUGH THE WAIVER, and one helper does it so a future violation class
+    # cannot be added on a path that forgets to consult the registry.
     if [ -z "$found" ]; then
-      violations="$violations
-  $id — BUILT at $(GIT rev-parse --short "$build_c") with NO tracked spec at that commit's parent $(GIT rev-parse --short "$parent"); the spec was written after the code, which is the same act with the record written last"
+      _report "  $id — BUILT at $(GIT rev-parse --short "$build_c") with NO tracked spec at that commit's parent $(GIT rev-parse --short "$parent"); the spec was written after the code, which is the same act with the record written last"
       continue
     fi
     case "$state" in
       MISSING|THIN)
-        violations="$violations
-  $id — BUILT at $(GIT rev-parse --short "$build_c") against a spec that graded $state at the parent $(GIT rev-parse --short "$parent") ($found); nothing stated what done meant for it before it was built"
+        _report "  $id — BUILT at $(GIT rev-parse --short "$build_c") against a spec that graded $state at the parent $(GIT rev-parse --short "$parent") ($found); nothing stated what done meant for it before it was built"
         ;;
     esac
   done
 done
 
 # ------------------------------------------------------------------------------- THE LIVENESS LINE
-# THREE COUNTS, one per population this leg WALKS, because a liveness line naming fewer populations
-# than the check walks is a partial probe reporting as a whole one. `unbuilt` is the population step
-# 1 drops: a unit whose build commit is outside its run's own range.
+# ONE COUNT PER POPULATION THIS LEG WALKS, because a liveness line naming fewer populations than the
+# check walks is a partial probe reporting as a whole one. This comment said "THREE COUNTS" while the
+# line below printed four, from before `skipped_norun` existed; TOOL-aStagedLane-1's S3 read the
+# comment rather than the line and inherited the miscount into its own scope item. Do not write the
+# number here again — the line is two inches below and cannot go stale.
+# `unbuilt` is the population step 1 drops: a unit whose build commit is outside its own range.
 #
 # DO NOT READ A NON-ZERO `unbuilt` AS BENIGN. It is the ordinary shape for a RESUMED build, and it is
 # ALSO what a widened exclusion set looks like — every commit falls inside the excluded surface, no
@@ -259,8 +456,32 @@ done
 # one visible in the one line an operator actually reads. It does not PREVENT the widening: the conf
 # is inside the run's reach and protocol section 1 cost 2 concedes exactly that, so what this buys is
 # a trace, not a guard, and saying which is the point.
-echo "pass-order: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $PASS_ORDER_CUTOFF cutoff · $skipped_norun with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range"
+# SIX COUNTS, one per population this leg walks, and `skipped_norun` is GONE rather than pinned at
+# zero: S1 grades those builds and S2b routes an unusable base to the folder anchor, so every path
+# that once incremented it is closed. A field that can only ever print 0 is a dead probe whatever
+# value it shows, and this file's own doctrine is that a probe which cannot move says so.
+echo "pass-order: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $PASS_ORDER_CUTOFF cutoff · $norun_graded build(s) graded with no run-state file · $unbuilt unit(s) unbuilt-in-range · $preanchor_hits pre-anchor violation(s) · $waived_n waived by $WAIVER_FILE · $truncated probe(s) truncated at the $PREANCHOR_CAP-commit cap"
 echo "pass-order: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
+
+# A STALE WAIVER REDS. A row naming a unit this leg no longer reports has outlived its reason, and an
+# exemption nobody re-checks silently widens the surface it was written to narrow.
+stale=""
+for _w in $waived_ids; do
+  case " $waived_seen " in *" $_w "*) ;; *) stale="$stale $_w" ;; esac
+done
+
+if [ "$PREVIEW" = 1 ]; then
+  echo "pass-order --preview: every violation the predicate finds, waived or not:${previews:-
+  (none)}"
+  [ -n "$stale" ] && echo "pass-order --preview: waiver rows matching nothing:$stale"
+  echo "pass-order --preview: exit status is NOT set in this mode"
+  exit 0
+fi
+
+if [ -n "$stale" ]; then
+  echo "pass-order FAILED — $WAIVER_FILE waives unit(s) this leg no longer reports as a violation, and a stale exemption widens the surface it was written to narrow:$stale"
+  exit 1
+fi
 
 if [ -n "$violations" ]; then
   echo "pass-order FAILED — a unit was BUILT before a conforming spec for it existed:$violations"

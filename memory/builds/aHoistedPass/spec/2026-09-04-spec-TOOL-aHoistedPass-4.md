@@ -6,7 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -148,12 +148,12 @@ was written for a burst of verifiers.
 
 The note states that structure and names no figure. Two reasons. A roster distribution restated in a
 hook comment rots on the next build, which is the rule this repo keeps breaking. And the hooks kit's
-own authoring rule (`tools/hooks/README.md:132`) forbids a kit file naming anything outside itself
+own authoring rule (`tools/hooks/README.md:134`) forbids a kit file naming anything outside itself
 by literal, so the note may cite neither the harness path nor the record that measured the rosters.
 
 It lands in two carriers, because a reader arrives from either direction. The RULE 4 comment block
 at `:1214` is where the ledger's own design is argued. `## Direct spawns are COUNTED, not parsed`
-at `README.md:119` is where a reader asking "why not count Workflow too?" arrives first.
+at `tools/hooks/README.md:119` is where a reader asking "why not count Workflow too?" arrives first.
 
 ### Migration
 

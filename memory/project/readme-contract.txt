@@ -26,13 +26,7 @@
 # every run. TOOL-dFramedEntrypoint-7 converts rows to bound, one build at a time, and lowers the pin
 # in the same commit as the file it describes.
 
-# RAISED 67 -> 68 by TOOL-aKeyedAnnotation's session, 2026-09-05. Not a drain reversal: the
-# aHoistedPass merge landed a build README naming no row at all, which the FORWARD direction
-# refuses, so this leg has been RED on main since that merge and could bind nothing. Tested as
-# BOUND first and it fails seven ways (three slots over ceiling, a missing canonical slot, no
-# authored roster pair, authored content after the first generated marker), so exempt is the only
-# state that is both true and unblocking. It drains when that build's owner conforms the file.
-exempt-pin: 68
+exempt-pin: 67
 
 !memory/builds/aBatchedLintel/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBatchedTribunal/README.md - predates the contract; drains when its build's owner conforms it
@@ -79,6 +73,7 @@ memory/builds/aThawedCorpus/README.md
 !memory/builds/aTimedTurnstile/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aUnmannedHelm/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aWalkedCorpus/README.md - predates the contract; drains when its build's owner conforms it
+memory/builds/aWeighedCompass/README.md
 !memory/builds/aWireWarden/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aWrittenMethod/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/bConvergentLodestar/README.md - predates the contract; drains when its build's owner conforms it
@@ -117,6 +112,7 @@ memory/builds/aGradedMandate/README.md
 memory/builds/aProvenReuse/README.md
 memory/builds/aClosedDocket/README.md
 memory/builds/dMispairedQuote/README.md
+memory/builds/aTunedCompass/README.md
 !memory/builds/aUnblockedFleet/README.md - registered BOUND by commit 655fffc5 without measuring the slots, so three of them (problem 1893/900, improvements 719/500, rules 3802/1800) have reddened the leg ever since. That run is PARKED at phase BUILDING, not closed, so this row is a temporary unblock and drains when that run resumes and trims the three slots.
 memory/builds/dBriefedPass/README.md
 memory/builds/dGaugedVintage/README.md
@@ -126,5 +122,8 @@ memory/builds/dRatifiedSeam/README.md
 memory/builds/dSealedTally/README.md
 memory/builds/aSurfacedLexicon/README.md
 memory/builds/aStagedLane/README.md
+memory/builds/aHoistedPass/README.md
+memory/builds/aHonedRuleset/README.md
+memory/builds/aWeldedTribunal/README.md
+memory/builds/dTracedLattice/README.md
 memory/builds/aKeyedAnnotation/README.md
-!memory/builds/aHoistedPass/README.md - landed by a merge naming no contract row, so the leg was red for every session; BOUND fails seven ways today. Drains when its build's owner conforms the README to the slot canon

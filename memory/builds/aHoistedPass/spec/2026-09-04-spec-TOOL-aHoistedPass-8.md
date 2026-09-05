@@ -1,12 +1,12 @@
 # TOOL-aHoistedPass-8 — the recipe-mode question, measured instead of argued
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -64,7 +64,7 @@ which one is right, because no recipe-mode build has ever existed.
 ### The population
 
 At `c4fcf5ad`, `memory/builds/` holds 93 folders. Searching the whole memory tree for a
-`authorized-by: recipe` value returns exactly one file, `memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md`,
+`authorized-by: recipe` value returns exactly one file, `memory/builds/aHoistedPass/build/2026-09-04-build-aHoistedPass-1-design-pass.md`,
 which is this build's own design document quoting the key. **Zero build READMEs declare `recipe`.**
 Every `authorized-by:` value in the corpus is `prompt`.
 
@@ -209,13 +209,15 @@ No file under `tools/` is touched, and no gate leg is added or moved.
 - **AC6** — When `tools/unattended/unattended.sh:1172` is read, the comparison is
   `[ "$sc" != all ] && [ "$sc" != "${AUTH_MODE:-}" ]`, a single-token equality against `all` or one
   member of `AUTH_MODES`, so no mode list is expressible.
-- **AC7** — When the memory tree is searched for `authorized-by:[[:space:]]*recipe` at `c4fcf5ad`, the
-  only hit is `memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md` and no
-  build README matches.
-- **AC8** — When the record lands at
-  `memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-8-recipe-probe.md` carrying
+- **AC7** — When the tracked memory tree is searched for `authorized-by:[[:space:]]*recipe` on the
+  landing tree, every hit sits inside this build's own folder — its design of record and this spec —
+  and no `memory/builds/*/README.md` matches, so the value has no live subject. At `c4fcf5ad` the
+  pattern has no hit at all, this build's folder not existing there; that is the control, and rev-2
+  corrects rev-1, which named a hit at a base where the file did not exist.
+- **AC8** — When the probe record lands in this build's `build/` folder carrying
   `**Serves:** research TOOL-aHoistedPass-8`, `bash tools/memory-tree/check-memory-hygiene.sh` exits 0
-  and this spec's `rev-1` appears in its §9.
+  — which is what grades the record's filename against the naming rule — and this spec's header
+  `rev-2` appears in its §9.
 - **AC9** — When the unit's commit is diffed, it touches no path under `tools/`, and
   `git grep -c "Recipe mode does not take it"` still returns 1 for each of
   `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md` — the unit
@@ -276,6 +278,20 @@ No file under `tools/` is touched, and no gate leg is added or moved.
     `unattended.sh:469`, `:478`, `:505-514`, `:1163-1179` with the comparison at `:1172` and `fail 45`
     at `:1173`, `:2043`, `unattended-build.js:118-124` with its message at `:120-122`,
     `UNATTENDED-PROTOCOL.md:637`, `SKILL.template.md:95`. No line number needed moving.
+- rev-2 · 2026-09-05 · AC7 CORRECTED, not merely re-pointed, and the correction is the reason this
+  rev exists. rev-1 claimed that searching the memory tree for `authorized-by:[[:space:]]*recipe` at
+  `c4fcf5ad` yields the design of record as its only hit. Re-run rather than re-read, that claim is
+  false three ways. At `c4fcf5ad` the pattern has NO hit, because `memory/builds/aHoistedPass/` does
+  not exist at that sha — it first appears in `fa273fc7`. On the landing tree the pattern has TWO
+  hits, the design record and this spec, which quotes the pattern it searches for. And the design
+  record has since been renamed, so rev-1's path is stale as well as mis-based. AC7 now asserts what
+  the unit actually needs: on the landing tree every hit is inside this build's own folder, no build
+  README matches, and the `c4fcf5ad` empty is stated as the control it is. The probe still has no
+  live subject, which is the finding AC7 exists to carry.
+  In the same pass, AC8's witness was re-pointed off the record's own filename, which does not exist
+  until the unit lands, onto `bash tools/memory-tree/check-memory-hygiene.sh`, which is what grades
+  that filename against the naming rule. Its `rev-1` self-reference is updated to `rev-2` to match
+  this header, the pairing the hygiene gate checks.
 
 ## 10. Reuse audit
 

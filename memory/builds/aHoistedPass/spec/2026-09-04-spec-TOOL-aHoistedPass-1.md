@@ -6,7 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -58,7 +58,7 @@ knowingly leaves open a durable, greppable home instead of a paragraph in a desi
 ### Inventory
 
 Everything below was re-opened at `c4fcf5ad` in this worktree. The design record is
-`memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md`, and `<the design
+`memory/builds/aHoistedPass/build/2026-09-04-build-aHoistedPass-1-design-pass.md`, and `<the design
 record>` below is that path.
 
 | fact | where | state at this base |

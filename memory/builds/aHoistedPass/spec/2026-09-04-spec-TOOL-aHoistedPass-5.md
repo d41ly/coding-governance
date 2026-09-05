@@ -1,12 +1,12 @@
 # TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -251,8 +251,8 @@ versioning contract the file does not have.
 - **AC3** — When `bash tools/workflows/check-verifier-fanout.sh` runs in discovery mode, it exits 0 and
   reports `5 workflow script(s)`, and the same population re-derived by hand —
   `git ls-files --cached --others --exclude-standard -- '*.js'` filtered by
-  `grep -qE '^[[:space:]]*export[[:space:]]+const[[:space:]]+meta[[:space:]]*='` — CONTAINS
-  `tools/workflows/unattended-unit.js`.
+  `grep -qE '^[[:space:]]*export[[:space:]]+const[[:space:]]+meta[[:space:]]*='` — returns exactly one
+  entry the same re-derivation at `c4fcf5ad` did not, and that entry is the script this unit lands.
 - **AC4** — When the candidate plus `for (const u of cfg.units) { await agent(…) }` is fed to
   `node tools/hooks/agent-cap.js` by `scriptPath`, it exits **2** naming
   `a verify/fan-out stage spawns one agent per item`; when the pristine file is fed the same way it
@@ -261,24 +261,24 @@ versioning contract the file does not have.
   claim in `memory/map/features/unattended.md` present and `gen_map.py --write` re-run in the same
   commit, it exits 0 with all five tests `ok`.
 - **AC6** — When the file is staged WITHOUT its top-level definition, the same leg exits **1** on
-  `map_lib.MapError: kit-js: tools/workflows/unattended-unit.js yielded NO definition`. Staged,
+  a `map_lib.MapError` reading `kit-js: <the staged script> yielded NO definition`. Staged,
   observed, unstaged — already observed once at this base, and it is the reason S6 exists.
 - **AC7** — When the file is staged and `bash tools/check-install-prefix.sh` runs, it exits 0 and
   reports `181 shipped files`, up from the `180` measured at this base; when one
   `bash tools/unattended/unattended.sh` literal is appended to the staged file, the same command exits
-  **1** with `UNRECORDED  tools/workflows/unattended-unit.js`. Both observed; the break is unstaged
-  before landing.
-- **AC8** — When `grep -c 'tools/' tools/workflows/unattended-unit.js` runs, it prints `0`, and
+  **1** with an `UNRECORDED` row naming the staged script at count `1`. Both observed; the break is
+  unstaged before landing.
+- **AC8** — When `grep -c 'tools/'` runs over the landed script, it prints `0`, and
   `memory/project/method-carriers.txt` gains no row, because the file names neither an install path nor
   `BUILD-METHOD.md`.
 - **AC9** — When the landed file is scanned with its `//` comment lines removed, it holds exactly one
   `agent(` and zero `workflow(`, and
-  `grep -cE '^[[:space:]]*export[[:space:]]+const[[:space:]]+meta[[:space:]]*=' tools/workflows/unattended-unit.js`
+  `grep -cE '^[[:space:]]*export[[:space:]]+const[[:space:]]+meta[[:space:]]*='` over the landed script
   prints `1`. A bare `grep -c 'export const meta'` prints `3` on this file and means nothing, because
   two of the three occurrences are the header comments about the marker.
 - **AC10** — When the landed file's prompt string is read, it names the `CLOSED` / `WONTDO` flip AND
   the same-commit requirement AND `--plan` as the reader that acts on it, and
-  `grep -c 'THAT DISPATCH IS THE ORDER GATE' tools/workflows/unattended-unit.js` prints `0`.
+  `grep -c 'THAT DISPATCH IS THE ORDER GATE'` over the landed script prints `0`.
 - **AC11** — When the landed file's args are read, there is no `roster` key and no `reportPath` key,
   and `UNIT_SCHEMA.required` is exactly `committed`, `sha`, `why`, `summary`.
 - **AC12** — When `bash tools/workflows/check-review-join.sh` runs with the file landed, it exits 0.
@@ -333,7 +333,7 @@ lands unchanged behind it.
 
 - rev-1 · 2026-09-04 · initial draft, written against `origin/main` = `c4fcf5ad` with every line number
   re-opened locally and every exit code re-measured in this worktree. Five corrections to the design of
-  record, `build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md`:
+  record, `build/2026-09-04-build-aHoistedPass-1-design-pass.md`:
   1. **The design names two boundaries for this unit and there are five.** It lists `workflow script
      syntax` and `verifier fan-out`; measured, the file also lands on `review-join ban (no ref-keyed
      join)` (by PATH, not by marker), `install-prefix (shipped surface)` (once tracked), and
@@ -359,6 +359,15 @@ lands unchanged behind it.
   `:4630`, `:4639`, `:4647`; `check-workflow-syntax.js:30` and `:72`; `check-verifier-fanout.sh:86`;
   `grep -c "workflow(" tools/hooks/agent-cap.js` = 0; the candidate at 110 lines / 6933 bytes with the
   `export const meta` declaration at `:30`.
+- rev-2 · 2026-09-05 · six acceptance witnesses re-pointed, AC3 and AC6 through AC10. Each named the
+  script this unit lands, which does not exist until it lands, so each read as "this path will
+  exist" rather than as an observation. AC3 now asserts the DELTA against the same re-derivation at
+  `c4fcf5ad` — one entry this unit adds — which is the membership claim it was reaching for, and a
+  stronger one than a substring match on a path. AC6 and AC7 keep their diagnostic shapes,
+  `map_lib.MapError` and `UNRECORDED`, and describe the subject rather than spelling it. AC8, AC9
+  and AC10 keep their grep patterns verbatim, which is the load-bearing half, and run them over the
+  landed script instead of naming it as an operand. The §2 and §4 literals are untouched: the path is
+  still spelled once, where the unit declares what it builds. No criterion was weakened or dropped.
 
 ## 10. Reuse audit
 
