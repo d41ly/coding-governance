@@ -225,7 +225,8 @@ minted, so `memory/map/features/unattended.md` keeps its `[claims]` block unchan
 
 ### Rollout
 
-Lands as one commit after `TOOL-aHoistedPass-2`. It is a read-only check on a read-only leg; the
+Lands after `TOOL-aHoistedPass-2`, in one code commit plus one records commit for the fixes its own
+bug-class checklist selected. It is a read-only check on a read-only leg; the
 rollback is deleting the block.
 
 **This unit is NOT an owner turn, and the correction matters more than the classification does.**
