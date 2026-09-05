@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-04
 streams: tooling+playbook+kickoff+deployer
 roster: TOOL
-ids: TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8 TOOL-aHonedRuleset-9
+ids: TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8 TOOL-aHonedRuleset-9 TOOL-aHonedRuleset-10
 ---
 
 # aHonedRuleset — measure what is actually redundant in the governing prose, before trimming any of it
@@ -76,7 +76,7 @@ one build and called it a pattern rather than a coincidence; its population was 
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 7 unit(s) · node a · opened 2026-09-04 · streams tooling+playbook+kickoff+deployer
-ids TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8 TOOL-aHonedRuleset-9
+ids TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8 TOOL-aHonedRuleset-9 TOOL-aHonedRuleset-10
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
