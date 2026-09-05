@@ -1,11 +1,12 @@
 # TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran
 
-**Status:** BLOCKED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3 · ratified 2026-09-05
+**Status:** CLOSED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aTunedCompass-8-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aTunedCompass-8-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md) | spec-audit | TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-9 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
 
 <!-- /gen:spec-records -->

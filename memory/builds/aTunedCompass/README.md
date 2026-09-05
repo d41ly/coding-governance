@@ -110,10 +110,10 @@ ids TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCo
 | [TOOL-aTunedCompass-11 — the map log gains the run-state reader a closed unit's acceptance claimed](spec/2026-09-04-spec-TOOL-aTunedCompass-11.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-05 |
 | [TOOL-aTunedCompass-2 — the recall fixture carries the terms every real query supplies](spec/2026-09-04-spec-TOOL-aTunedCompass-2.md) | 2 | 2 | BLOCKED | rev-4 | 2026-09-05 |
 | [TOOL-aTunedCompass-3 — the recall floor grades the two-set ensemble the CLI serves](spec/2026-09-04-spec-TOOL-aTunedCompass-3.md) | 3 | 2 | BLOCKED | rev-3 | 2026-09-05 |
-| [TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran](spec/2026-09-04-spec-TOOL-aTunedCompass-8.md) | 3 | 2 | BLOCKED | rev-4 | 2026-09-05 |
+| [TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran](spec/2026-09-04-spec-TOOL-aTunedCompass-8.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

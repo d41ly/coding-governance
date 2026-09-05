@@ -947,6 +947,72 @@ def test_reuse_shared_primitives(tmp: Path):
         pass
 
 
+def test_lookup_row_carries_sources(tmp: Path):
+    """The log row records WHAT came back, not only that a probe ran, and the write stays non-fatal.
+
+    Against a SCRATCH repo with `CODEBASE_MAP_ROOT` redirected: an arm that wrote into this tree's
+    own log would manufacture the very evidence a reader of that log would count.
+    """
+    import os
+    import json
+    import subprocess
+
+    (tmp / ".codebase-map.conf").write_text(
+        "MAP_ROOT=memory/map\nSEAM_FANIN_THRESHOLD=3\n", encoding="utf-8")
+    gen = tmp / "memory" / "map" / "generated"
+    gen.mkdir(parents=True)
+    (tmp / "memory" / "map" / "features").mkdir(parents=True)
+    syms = [{"id": "slugify", "kind": "function", "file": "src/text.py"},
+            {"id": "slug_helper", "kind": "function", "file": "src/util.py"}]
+    (gen / "symbols.json").write_text(m.render_symbols_json(syms), encoding="utf-8")
+    src = tmp / "src"
+    src.mkdir()
+    (src / "text.py").write_text("def slugify(s):\n    return s\n", encoding="utf-8")
+    (src / "util.py").write_text("def slug_helper(s):\n    return s\n", encoding="utf-8")
+    subprocess.run(["git", "-c", "init.defaultBranch=main", "init", "-q", str(tmp)],
+                   check=True, capture_output=True)
+
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp)
+    try:
+        corpus = rl.load_corpus()
+        ref = m.build_reference_index(corpus.symbol_files)
+        sl = rl.assemble_shortlist("normalise a display name into a url slug", corpus, ref)
+
+        # (a) ONE derivation: the paths the writer records are the candidates' own files, deduped
+        #     and in shortlist order. Nothing parses rendered output.
+        paths = rl.derive_source_paths(sl)
+        assert paths == list(dict.fromkeys(paths)), f"not deduped: {paths}"
+        assert all("\\" not in p for p in paths), f"not forward-slashed: {paths}"
+        assert "src/text.py" in paths, paths
+
+        # (b) the row carries both fields, and n_shown keeps its OLD meaning -- the ranked count,
+        #     which is a different number from the path count.
+        rl.write_lookup(m.repo_root(), "q", len(sl.ranked), paths)
+        log = rl._resolve_git_dir(m.repo_root()) / "codebase-map" / "lookups.jsonl"
+        row = json.loads(log.read_text(encoding="utf-8").strip().splitlines()[-1])
+        assert row["n_shown"] == len(sl.ranked), row
+        assert row["n_sources"] == len(paths), row
+        assert row["shown_paths"] == paths[: rl.SOURCE_PATHS_CAP], row
+
+        # (c) THE CAP, exercised rather than assumed: n_sources records the pre-cap count, so a
+        #     truncated list is visible AS truncated. Without this the cap is a constant nothing reads.
+        many = [f"src/f{i}.py" for i in range(rl.SOURCE_PATHS_CAP + 7)]
+        rl.write_lookup(m.repo_root(), "q2", 999, many)
+        row = json.loads(log.read_text(encoding="utf-8").strip().splitlines()[-1])
+        assert len(row["shown_paths"]) == rl.SOURCE_PATHS_CAP, len(row["shown_paths"])
+        assert row["n_sources"] == len(many), row["n_sources"]
+        assert row["n_sources"] > len(row["shown_paths"]), "truncation is invisible"
+
+        # (d) NEVER FATAL: a write that cannot happen must not change the exit code. The root is
+        #     pointed at a tree with no git dir at all, which is the real resolution failure.
+        nogit = tmp / "nogit"
+        nogit.mkdir()
+        rl.write_lookup(nogit, "q3", 1, ["src/text.py"])  # must not raise
+        assert not list(nogit.rglob("lookups.jsonl")), "wrote a row with no git dir to write into"
+    finally:
+        os.environ.pop("CODEBASE_MAP_ROOT", None)
+
+
 def test_neighbour_cap_ranks_before_truncating(tmp: Path):
     """The neighbour cap slices the RANKED pool, not the alphabetical one.
 
@@ -1525,6 +1591,11 @@ def main() -> int:
         failures += check(
             "the same-kind neighbour arm is directory-scoped, both directions",
             lambda: test_neighbour_predicate_is_directory_scoped(Path(td)),
+        )
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "the map log row records the sources it showed, capped and never fatal",
+            lambda: test_lookup_row_carries_sources(Path(td)),
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check(

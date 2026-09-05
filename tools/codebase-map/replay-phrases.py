@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Replay the reuse probe over this repo's own recorded phrases, and grade it.
+"""Replay the reuse probe over this repo's own recorded phrases, and measure_phrase it.
 
 WHAT THIS IS FOR. `reuse_lookup.py` is an orientation instrument, and until this harness existed
 the only way to say whether a change to it made the answers better was to run a few phrases by hand
@@ -20,10 +20,10 @@ fixed, slowness that fails is fixed or re-declared -- so the run is timed and a 
 NON-ZERO. `--ceiling` re-declares it for a deliberately larger corpus; there is no way to disable it.
 
 Usage:
-    python tools/codebase-map/replay-phrases.py            # grade every phrase, print the summary
-    python tools/codebase-map/replay-phrases.py --json     # the same, machine-readable
-    python tools/codebase-map/replay-phrases.py --limit 20 # a sample, for a quick before/after
-    python tools/codebase-map/replay-phrases.py            # with no args it also prints the ceiling
+    {cli}            # measure_phrase every phrase, print the summary
+    {cli} --json     # the same, machine-readable
+    {cli} --limit 20 # a sample, for a quick before/after
+    {cli}            # with no args it also prints the ceiling
 """
 
 from __future__ import annotations
@@ -48,6 +48,23 @@ sys.path.insert(0, str(KIT))
 import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
 
+
+def _resolve_self() -> str:
+    """This script as the adopter spells it -- repo-relative when it can be.
+
+    DERIVED, never a literal: a kit path written into shipped bytes arrives verbatim in a tree
+    installed at another prefix and resolves to nothing there. `check-install-prefix.sh` bans it,
+    and this file earned that refusal on its first commit.
+    """
+    me = pathlib.Path(os.path.abspath(__file__))
+    try:
+        return "python3 " + me.relative_to(m.repo_root()).as_posix()
+    except (ValueError, Exception):  # noqa: B014 - repo_root can refuse outside a tree
+        return "python3 " + me.name
+
+
+__doc__ = (__doc__ or "").replace("{cli}", _resolve_self())
+
 # THE DECLARED CEILING, in seconds, for the whole run. MEASURED, not guessed: the full corpus of
 # 140 phrases grades in ~3s, because the corpus is loaded ONCE and each phrase is an in-process
 # rank rather than a subprocess. 60s is ~20x that -- room for the corpus to grow severalfold, and
@@ -71,11 +88,11 @@ _NEXTSEC = re.compile(r"^##\s+", re.M)
 _PATH = re.compile(r"`([A-Za-z0-9_./-]+\.(?:py|sh|js|md|json|toml))`")
 
 
-def _repo_root() -> pathlib.Path:
+def _resolve_repo_root() -> pathlib.Path:
     return m.repo_root()
 
 
-def tracked_specs(root: pathlib.Path) -> list[str]:
+def scan_tracked_specs(root: pathlib.Path) -> list[str]:
     out = subprocess.run(
         ["git", "-C", str(root), "ls-files", "--", "memory/builds"],
         capture_output=True, text=True, check=True,
@@ -83,7 +100,7 @@ def tracked_specs(root: pathlib.Path) -> list[str]:
     return [p for p in out if p.endswith(".md")]
 
 
-def phrases_from(root: pathlib.Path, rel: str) -> list[tuple[str, list[str]]]:
+def extract_phrases(root: pathlib.Path, rel: str) -> list[tuple[str, list[str]]]:
     """Every (phrase, ground-truth paths) pair a spec carries.
 
     The ground truth is the section-10 path set for the WHOLE document, which is the seam its
@@ -105,11 +122,11 @@ def phrases_from(root: pathlib.Path, rel: str) -> list[tuple[str, list[str]]]:
         found.append(phrase)
     if not found:
         return []
-    truth = _section10_paths(text)
+    truth = _parse_section10_paths(text)
     return [(p, truth) for p in dict.fromkeys(found)]
 
 
-def _section10_paths(text: str) -> list[str]:
+def _parse_section10_paths(text: str) -> list[str]:
     mo = _SEC10.search(text)
     if not mo:
         return []
@@ -119,7 +136,7 @@ def _section10_paths(text: str) -> list[str]:
     return sorted(set(_PATH.findall(body)))
 
 
-def grade(corpus, ref, phrase: str, truth: list[str]) -> dict:
+def measure_phrase(corpus, ref, phrase: str, truth: list[str]) -> dict:
     """Rank one phrase and locate the first ground-truth path in the shortlist."""
     sl = rl.assemble_shortlist(phrase, corpus, ref)
     files = [(r.candidate.file or "") for r in sl.ranked]
@@ -142,7 +159,7 @@ def grade(corpus, ref, phrase: str, truth: list[str]) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--json", action="store_true", help="machine-readable output")
-    ap.add_argument("--limit", type=int, default=0, help="grade only the first N phrases")
+    ap.add_argument("--limit", type=int, default=0, help="measure_phrase only the first N phrases")
     ap.add_argument("--ceiling", type=float, default=CEILING_S,
                     help=f"wall-clock ceiling in seconds (declared: {CEILING_S:g})")
     args = ap.parse_args()
@@ -152,10 +169,10 @@ def main() -> int:
               f"(default {CEILING_S:g}s) — a breach EXITS NON-ZERO")
 
     t0 = time.monotonic()
-    root = _repo_root()
+    root = _resolve_repo_root()
     pairs: list[tuple[str, list[str]]] = []
-    for rel in tracked_specs(root):
-        pairs.extend(phrases_from(root, rel))
+    for rel in scan_tracked_specs(root):
+        pairs.extend(extract_phrases(root, rel))
     # de-duplicate on the phrase, keeping the first ground truth seen
     seen: dict[str, list[str]] = {}
     for p, t in pairs:
@@ -167,7 +184,7 @@ def main() -> int:
 
     corpus = rl.load_corpus()
     ref = m.build_reference_index(corpus.symbol_files)
-    rows = [grade(corpus, ref, p, t) for p, t in graded]
+    rows = [measure_phrase(corpus, ref, p, t) for p, t in graded]
 
     hits = [r for r in rows if r["hit"]]
     ranks = sorted(r["rank"] for r in hits)
@@ -183,7 +200,7 @@ def main() -> int:
         "median_rank_of_first_correct": median,
         "elapsed_s": round(elapsed, 1),
         "ceiling_s": args.ceiling,
-        "corpus_symbols": corpus_symbol_count(corpus),
+        "corpus_symbols": measure_corpus_symbols(corpus),
     }
 
     if args.json:
@@ -209,7 +226,7 @@ def main() -> int:
     return 0
 
 
-def corpus_symbol_count(corpus) -> int:
+def measure_corpus_symbols(corpus) -> int:
     return sum(1 for c in corpus.candidates.values() if c.kind)
 
 

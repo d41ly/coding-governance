@@ -98,6 +98,22 @@ repo-wide python-launcher seam rather than anything this feature owns.
   neighbour list, which the reason string makes legible — measured here, no directory is in that
   state: all 18 (directory, kind) groups holding more than one symbol return a non-empty arm.
 
+## What the lookup log records
+
+- **The row carries `shown_paths` and `n_sources`, so the probe has EFFICACY evidence and not only
+  liveness.** `shown_paths` is the deduped, file-backed, repo-relative source set the answer
+  pointed a reader at, in shortlist order; `n_sources` is that count BEFORE `SOURCE_PATHS_CAP`, so
+  a truncated list is visible AS truncated rather than as a short one.
+- **`n_shown` was NOT redefined.** It still counts RANKED CANDIDATES, which is a different number
+  from the path count — measured on one live row, 39 ranked against 10 sources. An analysis joining
+  old rows to new ones must not find a field silently changing what it counts.
+- **ONE derivation, read twice.** `derive_source_paths()` produces the set; `_sources()` labels it for a
+  human and `write_lookup()` records it. Nothing parses rendered output for paths.
+- **The write is NEVER FATAL and the log path is not the git ENVIRONMENT.** Resolution is
+  `CODEBASE_MAP_ROOT` -> `root/.git` -> `commondir`, pure path math with no child process, so
+  `GIT_DIR` reaches none of it. An arm that tried to disable the writer through the git environment
+  would leave it pointed at the real common directory and APPEND to the corpus it meant to protect.
+
 ## Reuse affordance
 
 seam: map_lib — reuse for dossier/baseline parsing, deterministic rendering, coverage asserts and

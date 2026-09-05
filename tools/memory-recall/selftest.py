@@ -314,7 +314,7 @@ def test_empty_alias():
 SPINE_RE = re.compile(r"^spine\s+(\d+) docs", re.M)
 
 
-def _spine_docs(root: pathlib.Path, kitdir: pathlib.Path) -> tuple[int, str]:
+def _measure_spine_docs(root: pathlib.Path, kitdir: pathlib.Path) -> tuple[int, str]:
     """Run extract.py and return (spine doc count, stderr)."""
     out = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-spine-"))
     try:
@@ -336,7 +336,7 @@ def test_spine_flat_layout():
     """
     root, kitdir = make_repo(flat=True)
     try:
-        n, err = _spine_docs(root, kitdir)
+        n, err = _measure_spine_docs(root, kitdir)
         assert n > 0, f"spine is EMPTY on a flat root — DURABLE does not admit <root>/DECISIONS.md\n{err}"
         assert "EMPTY SPINE" not in err, f"non-empty spine must not print the diagnosis:\n{err}"
         return f"flat root yields {n} spine doc(s)"
@@ -348,7 +348,7 @@ def test_spine_flat_layout():
 def test_spine_nested_layout():
     root, kitdir = make_repo()  # nested, upstream's shape
     try:
-        n, err = _spine_docs(root, kitdir)
+        n, err = _measure_spine_docs(root, kitdir)
         assert n > 0, f"the widened DURABLE stopped matching the nested layout\n{err}"
         return f"nested root yields {n} spine doc(s)"
     finally:

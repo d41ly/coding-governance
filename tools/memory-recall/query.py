@@ -11,7 +11,7 @@ log under the common git dir and requires ``--tag``; (5) the cache manifest carr
 and ``worktree``, which drive freshness and eviction; (6) an empty record arm, an empty corpus,
 or an alias layer that joins to nothing is diagnosed out loud, and the manifest carries the join
 counts the third one reads; (7) the served chunk arm is ROLLED UP through ``run_rollup`` and
-the two fusion call sites are collapsed into one ``fuse()``, so a rollup cannot be applied to
+the two fusion call sites are collapsed into one ``run_fusion()``, so a rollup cannot be applied to
 the healthy path and not the cache-rebuild path.
 
 Standard library only. Two derived FTS5 indexes -- one per anchored record, one per 600-char
@@ -120,7 +120,7 @@ __doc__ = (__doc__ or "").replace("{cli}", CLI)
 
 CHUNK_MAX = 600  # pinned by the parent spec: 2400 and 300 both measured worse
 # How deep the chunk arm reads before it is rolled up to `k`. MIRRORS the `k * 8` literal inside
-# `bench.run_rollup` (`tools/memory-recall/bench.py` :147), which is the instrument this serving
+# `bench.run_rollup` (the sibling module, imported here as `B`), which is the instrument this serving
 # path is being aligned with -- named rather than re-derived, because the two must agree and
 # `bench.py` is byte-pinned in `verbatim.json` so the literal there cannot move to meet this one.
 # Collapsing several hits from one parent leaves fewer than `k` distinct parents from a `k`-deep
@@ -761,7 +761,7 @@ def run_rollup(hits: list[dict], k: int) -> list[dict]:
     return list(best.values())[:k]
 
 
-def fuse(dirp: pathlib.Path, expr: str, k: int) -> list[dict]:
+def run_fusion(dirp: pathlib.Path, expr: str, k: int) -> list[dict]:
     """The served fusion: the records arm as-is, the chunk arm rolled up to one hit per parent.
 
     ONE call site, deliberately. This was two identical expressions -- the first attempt and the
@@ -1265,11 +1265,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
-        hits = fuse(dirp, expr, k)
+        hits = run_fusion(dirp, expr, k)
     except sqlite3.DatabaseError:
         shutil.rmtree(dirp, ignore_errors=True)
         dirp, man, rebuilt = ensure_cache(repo, force=True)
-        hits = fuse(dirp, expr, k)
+        hits = run_fusion(dirp, expr, k)
 
     live_files = len(E.corpus_files(repo, include_untracked=True))
     notices = []

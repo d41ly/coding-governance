@@ -149,7 +149,7 @@ DURABLE = re.compile(
 )
 
 
-def empty_spine_diagnosis(n_records: int, n_spine: int) -> str | None:
+def render_empty_spine_diagnosis(n_records: int, n_spine: int) -> str | None:
     """A non-empty ``records`` beside an empty ``spine``. ``None`` when there is nothing to say.
 
     Unlike zero records, this state has NO honest reading. Records exist, so the corpus root and the
@@ -699,7 +699,7 @@ def main() -> int:
     diag = zero_record_diagnosis(len(records), len(chunks))
     if diag:
         print(diag, file=sys.stderr)
-    spine_diag = empty_spine_diagnosis(len(records), len(spine))
+    spine_diag = render_empty_spine_diagnosis(len(records), len(spine))
     if spine_diag:
         print(spine_diag, file=sys.stderr)
     for n, rows in (("spine", spine), ("records", records), ("chunks", chunks)):

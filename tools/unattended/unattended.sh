@@ -3673,7 +3673,7 @@ $_bcnon"
       # `type`, `at`, `query`, `worktree` -- which is why this is a second PATH to count and not a
       # second parser. That compatibility is recorded in the closed unit's own spec, and it is what
       # makes the reader a few lines rather than a rewrite.
-      _count_rows() {  # $1 = log path, $2 = the row `type` that log writes
+      _read_rows() {  # $1 = log path, $2 = the row `type` that log writes
         [ -f "$1" ] || { printf '0'; return; }
         grep "\"type\": \"$2\"" "$1" 2>/dev/null \
           | grep -o '"worktree": "[^"]*"' \
@@ -3682,8 +3682,8 @@ $_bcnon"
           | grep -cxF "$_rt" || true
       }
       _rn=0; _mn=0
-      if [ -n "$RECALL_CLI" ] && [ -f "$ROOT/$RECALL_CLI" ]; then _rn=$(_count_rows "$_rl" query); fi
-      if [ -n "$MAP_CLI" ] && [ -f "$ROOT/$MAP_CLI" ]; then _mn=$(_count_rows "$_ml" lookup); fi
+      if [ -n "$RECALL_CLI" ] && [ -f "$ROOT/$RECALL_CLI" ]; then _rn=$(_read_rows "$_rl" query); fi
+      if [ -n "$MAP_CLI" ] && [ -f "$ROOT/$MAP_CLI" ]; then _mn=$(_read_rows "$_ml" lookup); fi
       _tn=$(( ${_rn:-0} + ${_mn:-0} ))
       if [ "$_tn" -lt 1 ]; then
         DOD_OUT="no declared probe log holds a row for this tree ($_rt), so no reuse probe is recorded as having run — run a declared probe (${RECALL_CLI:-<no RECALL_CLI>}${MAP_CLI:+, $MAP_CLI}), or override with a reason"

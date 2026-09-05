@@ -52,6 +52,17 @@ import map_lib as m  # noqa: E402
 #: cap on the structural-neighbour set (seeds are NEVER capped — the whole point is that the
 #: lexical shortlist is not a hard top-K; only the "here's what lives next to a hit" widening is).
 NEIGHBOUR_CAP = 12
+# How many source paths a log row carries. `n_sources` records the count BEFORE this cap, so a
+# truncated list is visible AS truncated rather than as a short one.
+#
+# 40, and the number is measured rather than picked. The logged list is the deduped SOURCE set,
+# not the ranked candidates: the parent build measured a mean of ~17 file-backed sources per probe
+# against ~71 ranked entries, so this is comfortably above the mean and below the 188-candidate
+# outlier. At a nominal 40 bytes per path, ~17 paths add ~700 B to a row that measures ~255 B
+# today, and a capped worst case adds ~1.6 KB — against the recall log, the comparator, which runs
+# at a 2150 B mean row and nobody has called it expensive. Cheap to raise, because `n_sources`
+# records what was cut.
+SOURCE_PATHS_CAP = 40
 
 
 @dataclass(frozen=True)
@@ -239,19 +250,19 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     # The reuse question a session asks is nearly always "does this already exist in the code I am
     # about to edit"; a candidate further away reaches the reader better through the same-file arm
     # or a shared-seam hit than through a kind match that would have admitted everything.
-    seed_dirs = {_dir_of(c.file) for c in seed_syms if c.file}
+    seed_dirs = {_derive_dir(c.file) for c in seed_syms if c.file}
     neighbours: dict[str, str] = {}
     for name, cand in sorted(pool.items()):
         if name in seeds or not cand.kind:
             continue
         if cand.file and cand.file in seed_files:
             neighbours[name] = f"neighbour: same file as a hit ({cand.file})"
-        elif cand.kind in seed_kinds and cand.file and _dir_of(cand.file) in seed_dirs:
+        elif cand.kind in seed_kinds and cand.file and _derive_dir(cand.file) in seed_dirs:
             # The reason names the NARROWED predicate. A predicate that changes while its printed
             # reason does not is a gate lying quietly, and an empty neighbour list for a small
             # directory has to read as honest rather than broken.
             neighbours[name] = (
-                f"neighbour: same kind ({cand.kind}) in {_dir_of(cand.file)}"
+                f"neighbour: same kind ({cand.kind}) in {_derive_dir(cand.file)}"
             )
 
     ranked: list[Ranked] = []
@@ -273,10 +284,10 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
         _rank(pool, corpus.threshold, ref_index, name, False, reason)
         for name, reason in sorted(neighbours.items())
     ]
-    neighbour_ranked.sort(key=_shortlist_key)
+    neighbour_ranked.sort(key=_derive_shortlist_key)
     ranked.extend(neighbour_ranked[:NEIGHBOUR_CAP])
 
-    ranked.sort(key=_shortlist_key)
+    ranked.sort(key=_derive_shortlist_key)
     return Shortlist(query, ranked, corpus.recall_dark, corpus.threshold, _counts(corpus))
 
 
@@ -301,7 +312,7 @@ def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -
     return scored[:top]
 
 
-def _dir_of(path: str) -> str:
+def _derive_dir(path: str) -> str:
     """The directory a symbol is defined in, POSIX-normalised. `""` when there is no directory.
 
     The one place this axis is spelled, because the neighbour predicate and its printed reason must
@@ -312,7 +323,7 @@ def _dir_of(path: str) -> str:
     return p.rsplit("/", 1)[0] if "/" in p else ""
 
 
-def _shortlist_key(r: Ranked) -> tuple:
+def _derive_shortlist_key(r: Ranked) -> tuple:
     """THE ordering key, stated once and read twice: once to CAP the neighbour pool, once to sort
     the shortlist that is printed.
 
@@ -416,6 +427,26 @@ def _line(r: Ranked) -> str:
     return f"- {c.name}{tag}  [{meta}]  ({r.reason}; via {src})" if meta else f"- {c.name}{tag}  ({r.reason}; via {src})"
 
 
+def derive_source_paths(shortlist: Shortlist) -> list[str]:
+    """The file-backed paths the answer points a reader at, deduped, in shortlist order.
+
+    ONE derivation, read twice: `_sources` LABELS these for a human, and `write_lookup` records
+    them. Nothing parses rendered output for paths — a second derivation would drift from the
+    first, and the whole value of the row is that it says what the reader was actually shown.
+
+    Repo-relative and forward-slashed, because that is how every candidate carries its file and
+    how a later analysis will join them against the tree.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for r in shortlist.ranked:
+        f = (r.candidate.file or "").replace("\\", "/")
+        if f and f not in seen:
+            seen.add(f)
+            out.append(f)
+    return out
+
+
 def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
     """The concrete files/records to open, in shortlist order, deduped. A candidate points at
     its OWN source: a symbol -> its def file; a declared/prose seam -> its dossier; an inventory
@@ -477,7 +508,7 @@ def _resolve_git_dir(root: Path) -> Path | None:
     return gitdir
 
 
-def write_lookup(root: Path, query: str, n_shown: int) -> None:
+def write_lookup(root: Path, query: str, n_shown: int, paths: list[str] | None = None) -> None:
     """Append one JSONL row recording that this probe RAN. Never fatal, never gating.
 
     WHY: ``BUILD-METHOD`` M5 names two reuse probes and only the recall one left evidence, so a
@@ -502,6 +533,7 @@ def write_lookup(root: Path, query: str, n_shown: int) -> None:
         common = _resolve_git_dir(root)
         if common is None:
             return
+        paths = paths or []
         path = common / "codebase-map" / "lookups.jsonl"
         path.parent.mkdir(parents=True, exist_ok=True)
         row = {
@@ -510,6 +542,11 @@ def write_lookup(root: Path, query: str, n_shown: int) -> None:
             "query": query,
             "worktree": str(root),
             "n_shown": n_shown,
+            # `n_shown` keeps the meaning it has always had -- the RANKED CANDIDATE count -- and is
+            # deliberately not redefined: an analysis joining old rows to new ones must not find
+            # one field silently changing what it counts. The two new fields are the path view.
+            "shown_paths": paths[:SOURCE_PATHS_CAP],
+            "n_sources": len(paths),
         }
         with path.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -538,7 +575,7 @@ def main(argv: list[str] | None = None) -> int:
     print(render(shortlist, corpus), end="")
     # AFTER the answer is rendered, so a row means a lookup that ANSWERED. Before it, a crash in
     # render() would leave evidence of a probe whose result nobody ever saw.
-    write_lookup(m.repo_root(), query, len(shortlist.ranked))
+    write_lookup(m.repo_root(), query, len(shortlist.ranked), derive_source_paths(shortlist))
     return 0  # advisory: a RESULT never fails (never a gate). Only the refusal above exits non-zero.
 
 
