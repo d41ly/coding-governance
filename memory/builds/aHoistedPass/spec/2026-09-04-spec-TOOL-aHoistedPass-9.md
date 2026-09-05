@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-9 — the adopter without the harness is told, on every bar
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -313,6 +313,13 @@ case is AC2 — staged, observed RED, unstaged, before the check lands.
   **Recommendation: (a)**, on the grounds that a skip whose subject is a set is the shape this build
   exists to remove.
 
+RESOLVED (agent, 2026-09-05, delegated): **F1 — (a), backticked tokens only.** `TOOL-aHoistedPass-2`'s own acceptance greps the
+backticked paths, so the two agree by construction. The residual is disclosed rather than closed: a
+later reword that drops the backticks degrades check 31 to a skip visible only under
+`GOV_UNATTENDED_REPORT=1`, and nothing holds that. **F2 — (a), one report line per unresolved path**,
+matching the per-item grammar the file already uses; a skip whose subject is a set is the shape this
+build exists to remove.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, written against `c4fcf5ad` with every cited line re-opened.
@@ -344,6 +351,10 @@ case is AC2 — staged, observed RED, unstaged, before the check lands.
   Two facts the design stated were re-derived and CONFIRMED unchanged: the free check number is 31,
   with 23 claimed as a label by four `report` calls and three `printf` violation lines; and
   `tools/unattended/check-unattended.test.sh` is not a gate leg.
+- rev-2 - 2026-09-05 - M3 fork sweep under the standing mandate: F1 and F2 marked RESOLVED at
+  their recommendations. Premise re-derived at the run's BASE `e828f778`:
+  `tools/unattended/check-unattended.sh` still carries no check 31, so the number this unit claims is
+  still free 66 commits after the spec's base.
 
 ## 10. Reuse audit
 

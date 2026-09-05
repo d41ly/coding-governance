@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -549,6 +549,11 @@ constant, so it may drift a whole release unnoticed.
   it discusses only its own ungraded `gov:kit unattended-unit@1.0` marker. If that spec is revised to
   take the bump, S12 and AC22 drop out of this one; they must not both land.
 
+RESOLVED (agent, 2026-09-05, delegated): **F1 — this unit takes the single `review-harness` 1.6 to 1.7 move**, as S12 and AC22
+already specify. `TOOL-aHoistedPass-5`'s spec was re-read during this sweep and is NOT revised to
+take the bump, so S12 and AC22 stand rather than dropping out. The two must not both land, and this
+line is the record of which one does.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, written against `origin/main` at `c4fcf5ad` in a worktree
@@ -605,6 +610,11 @@ constant, so it may drift a whole release unnoticed.
   child by the unit that owns it and defers the literal to §4, which already spells it once in the
   dispatch block. This is also the more durable criterion: if the child's path moves, §4 moves with
   it and AC7 does not go stale. Nothing else in AC7 changed.
+- rev-3 - 2026-09-05 - M3 fork sweep under the standing mandate: F1 marked RESOLVED at its
+  recommendation, and `TOOL-aHoistedPass-5`'s rev-3 confirms it takes no bump. Premise re-derived at
+  the run's BASE `e828f778`: `tools/workflows/unattended-build.js:784` is still ONE `agent()` call
+  handed the whole roster, and that file's own header still states the shape at `:84`, so the hoist
+  is still unbuilt 66 commits on.
 
 ## 10. Reuse audit
 

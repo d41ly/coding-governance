@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-4 — the loop ban learns the two spellings that walk past it
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -18,12 +18,24 @@ one commit, so the ban covers the class rather than the two shapes somebody happ
 
 ## 2. Scope (IN)
 
-- **S1** — Replace the six inline loop-opener literals in `tools/hooks/agent-cap.js` with two named
-  constants, `LOOP_HEAD` and `LOOP_TAIL`, so the predicate has one spelling and a partial widening
-  becomes impossible to write.
-- **S2** — Both constants recognise `for await (`. `LOOP_HEAD` also recognises a `do {` block opener.
-- **S3** — Arms in BOTH directions in `tools/hooks/agent-cap.test.sh`: four DENY arms for the newly
-  covered spellings, and control arms proving the widened predicate still admits what it admitted.
+**S1, S2 and S3 LANDED WITHOUT THIS UNIT, between this spec's base and the run's BASE `e828f778`,
+under `TOOL-aWeldedTribunal-1`.** They are kept below as written rather than rewritten, because a
+scope item edited to match what shipped stops recording that the two differ. What this unit owes for
+them is a VERIFICATION at BASE and nothing else; what it BUILDS is S4, S5 and S6, none of which
+landed. Section 9's rev-2 row carries the observation and the exact anchors.
+
+- **S1** — ~~Replace the six inline loop-opener literals in `tools/hooks/agent-cap.js` with two named
+  constants, `LOOP_HEAD` and `LOOP_TAIL`~~ — **LANDED, and better than specified**: THREE forms, not
+  two, at `tools/hooks/agent-cap.js:476-479`. `LOOP_KEYWORDS` holds the keyword set once;
+  `LOOP_HEADER`, `LOOP_HEADER_G` and `LOOP_KEYWORD_TAIL` derive from it. The third form exists
+  because the opener walk tests the text BEFORE a paren, where a pattern ending in `\(` can never
+  match — a distinction this spec's two-constant design did not make.
+- **S2** — ~~Both constants recognise `for await (`; `LOOP_HEAD` also recognises a `do {` block
+  opener.~~ — **LANDED.** `for(?:\s+await)?|while` plus a `\bdo\s*\{` alternation, with the `do`
+  spelling deliberately absent from the tail form because a `do` block opens with a brace.
+- **S3** — ~~Arms in BOTH directions in `tools/hooks/agent-cap.test.sh`~~ — **LANDED**, at
+  `tools/hooks/agent-cap.test.sh:59-67`: four DENY arms across both walks and a string control
+  proving the widened predicate still admits the words inside a string literal.
 - **S4** — The mutual-exclusivity note, in the two places a reader extending the slot ledger meets
   it: the RULE 4 comment block at `tools/hooks/agent-cap.js:1214` and the
   `## Direct spawns are COUNTED, not parsed` section at `tools/hooks/README.md:119`.
@@ -305,6 +317,18 @@ none
     that no longer exists anywhere in the file.
   - **A braceless `do` is named OUT rather than silently covered.** `LOOP_HEAD` requires the brace,
     so `do await agent(u); while (c)` still admits. The design did not mention it.
+- rev-2 - 2026-09-05 - **S1, S2 and S3 LANDED WITHOUT THIS UNIT.** Re-derived at the run's
+  BASE `e828f778`, 66 commits after this spec's base: `tools/hooks/agent-cap.js:476-479` carries
+  `LOOP_KEYWORDS = 'for(?:\s+await)?|while'` with `LOOP_HEADER`, `LOOP_HEADER_G` and
+  `LOOP_KEYWORD_TAIL` derived from it, attributed to `TOOL-aWeldedTribunal-1`, and
+  `tools/hooks/agent-cap.test.sh:59-67` carries the four DENY arms and the string control S3 asked
+  for. That landing is BETTER than this spec's S1: THREE named forms rather than two, because the
+  opener walk tests text before a paren and cannot share a pattern ending in `\(`. **What did NOT
+  land is S4, S5 and S6** - no mutual-exclusivity note at either site, `KIT_AGENT_CAP_VERSION` still
+  `1.12` at `:63`, and `TOOL-dFoldedVerdict-8` still `OPEN` at `memory/backlog/TOOL.md:11`. This unit
+  is therefore NARROWED to that residual and to recording the supersession; the M2 route for a
+  divergence is to change the spec first, which this row is. Section 8 stays `none`: nothing here is
+  a fork.
 
 ## 10. Reuse audit
 

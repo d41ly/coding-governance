@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-8 — the recipe-mode question, measured instead of argued
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -261,6 +261,21 @@ No file under `tools/` is touched, and no gate leg is added or moved.
   the grammar, is the work. **Option (c) is the honest fallback if that price is refused**, and it
   should then be written down as a deliberate choice rather than left as the default nobody picked.
 
+RESOLVED (agent, 2026-09-05, delegated): **F1 is NOT TAKEN, and that is the resolution rather than a deferral by omission.**
+Two independent reasons, and either alone is sufficient. **First, this spec forbids it**: section 3
+says "This unit is not the fix", "No other unit of this build takes a side, and this one does not
+either. It reports", and AC9 requires the unit's commit to touch no path under `tools/`. Taking any
+option here would fail M3 veto 1 against this unit's own acceptance. **Second, option (a) trips M3
+veto 2**: it moves `SKILL.template.md`'s Scope cell and its prose, and ruling D1 put that file and
+its render on the veto-2 list, which the mandate's delegation does not reach. Option (b) is already
+refuted by finding 5.
+
+**So what ships is option (c) — leave both — and this line is the deliberate record of that choice
+rather than the default nobody picked**, which is precisely what the option's own text asks for. The
+carrier/registry disagreement stays live on the bar exactly as section 3 says it does, and the fork
+is PARKED to the owner in this run's run-state file so it reaches the wrap-up as a decision they
+still hold.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, written against `c4fcf5ad` with S1–S4 performed during the
@@ -292,6 +307,14 @@ No file under `tools/` is touched, and no gate leg is added or moved.
   until the unit lands, onto `bash tools/memory-tree/check-memory-hygiene.sh`, which is what grades
   that filename against the naming rule. Its `rev-1` self-reference is updated to `rev-2` to match
   this header, the pairing the hygiene gate checks.
+- rev-3 - 2026-09-05 - M3 fork sweep under the standing mandate. F1 marked RESOLVED as NOT
+  TAKEN, with both grounds recorded: this spec's own section 3 and AC9, and M3 veto 2 over
+  `SKILL.template.md` under ruling D1. Option (c) ships and is written down as the choice. The fork
+  is additionally parked to the owner through the driver, so it surfaces in the wrap-up. Premises
+  re-derived at the run's BASE `e828f778` and BOTH HOLD, with exact line numbers: `DIRECTIVES_CORE`
+  at `tools/unattended/unattended.sh:469` still carries `passes-harnessed:M6` with no scope segment,
+  and `memory/guides/UNATTENDED-PROTOCOL.md:637` still reads "Recipe mode does not take it: its
+  pieces are not specs."
 
 ## 10. Reuse audit
 

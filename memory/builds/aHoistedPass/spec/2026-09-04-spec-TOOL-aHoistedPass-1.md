@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-1 — the record catches up with the verdicts that superseded it
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -230,6 +230,15 @@ excludes, so its own citations are unconstrained.
   does not own. Either way it is one line, and it belongs to whichever commit first tracks the folder,
   which at `order 1` is this one.
 
+RESOLVED (agent, 2026-09-05, delegated): **F1 is MOOT — the BOUND row already exists.** Re-derived at the run's BASE
+`e828f778`, 66 commits after the base this spec was written against:
+`memory/project/readme-contract.txt:123` already carries the bare path
+`memory/builds/aHoistedPass/README.md`, and `python tools/memory-tree/gen_build_index.py --survey`
+reports `BOUND memory/builds/aHoistedPass/README.md - conforms`. So the fork's premise — that the
+registry has no row for this build — is false at BASE. **No row is minted and `exempt-pin: 67` is
+untouched**, which is the BOUND branch the recommendation asked for, reached by observation rather
+than by a pick.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, written against the design record at `c4fcf5ad` with four
@@ -244,6 +253,12 @@ excludes, so its own citations are unconstrained.
   **(4)** Counts re-derived here rather than carried: the §10 residual bullets are 28, split 21 and 7
   across the adopter-block paragraph; `memory/backlog/TOOL.md:137` and `memory/DECISIONS.md:65` both
   verified at this base, against `dBriefedPass`'s round-1 audit which cites the backlog row at `:131`.
+- rev-2 - 2026-09-05 - M3 fork sweep under the standing mandate. F1 marked RESOLVED as MOOT:
+  the readme-contract row this fork was to mint landed between `c4fcf5ad` and the run's BASE
+  `e828f778`. S1 and S2's premises were re-verified at BASE and both HOLD — `memory/DECISIONS.md:65`
+  still states `parallelism route: none` and `memory/backlog/TOOL.md:138` still says E3 and E4 "never
+  were" run, so the line numbers this spec cites are exact at BASE for S1 and one line off for S2
+  (`:138`, not `:137`).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-3 — the build-method budget becomes a number a gate reads
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -339,6 +339,15 @@ version question in §8.
   cheaper, and it is the owner's call because `TOOL-aHoistedPass-2` edits the same template at
   `order 3` and would face the same question one commit later.
 
+RESOLVED (agent, 2026-09-05, delegated): **F1 — BUMP, and the number moved.** The recommendation was 2.59 to 2.60, and 2.60
+LANDED between this spec's base and the run's BASE `e828f778`:
+`tools/memory-tree/check-memory-hygiene.sh:20` reads `KIT_MEMORY_TREE_VERSION=2.60` today. The pick
+is unchanged and the move is now **2.60 to 2.61** — the marker's stated job is to let an adopter tell
+which text they hold, and two different budget lines shipping under one version defeats exactly that.
+**This unit takes the bump and `TOOL-aHoistedPass-2` does not**, because this one lands at `order 2`
+and that one edits the same template at `order 3`; the second asserts
+`bash tools/check-kit-versions.sh` exit 0 without moving the version again.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, written against `origin/main` at `c4fcf5ad` in a worktree at that
@@ -384,6 +393,12 @@ version question in §8.
     S6 adds two lines rather than one. And the template-minus-render delta is not sign-stable — four
     `{{KIT_DIR}}` grow and five `{{TOOL_ROOT}}` shrink, netting the measured −11 — which is why §4's
     rejected alternative does not rest on the template being the larger half.
+- rev-2 - 2026-09-05 - M3 fork sweep under the standing mandate. F1 marked RESOLVED at its
+  recommendation, with the target version re-derived at the run's BASE `e828f778`: the 2.59 to 2.60
+  move this fork proposed has already landed, so the bump this unit owes is 2.60 to 2.61. S1's
+  premise re-verified at BASE and HOLDS - `tools/memory-tree/BUILD-METHOD.template.md:8` still reads
+  `**Budget: <=24 KB, <=350 lines**` and `tools/template-size-limits.txt` still carries no row for the
+  rendered guide.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -329,6 +329,14 @@ Widening a fail-closed check so a style preference can survive is the trade this
 making. If the owner prefers (b), it is a separate unit against the codebase-map kit and this unit
 lands unchanged behind it.
 
+RESOLVED (agent, 2026-09-05, delegated): **F1 — (a), the child yields.** One top-level `function need(key, why)` replaces the
+seven near-identical argument refusals, and the file header stops claiming a style rule it no longer
+keeps. Option (b) is discarded under M3 veto 2: it edits a fail-closed liveness floor in ANOTHER
+kit's public surface (`map_extractors.py`, `map_lib.py`), which is not this unit's ratified scope and
+is not a change the mandate delegates. The recommendation's own argument is the deciding one -
+widening a fail-closed check so a style preference can survive is the trade this build exists to stop
+making. If the owner prefers (b) it is a separate unit and this one lands unchanged behind it.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, written against `origin/main` = `c4fcf5ad` with every line number
@@ -368,6 +376,10 @@ lands unchanged behind it.
   and AC10 keep their grep patterns verbatim, which is the load-bearing half, and run them over the
   landed script instead of naming it as an operand. The §2 and §4 literals are untouched: the path is
   still spelled once, where the unit declares what it builds. No criterion was weakened or dropped.
+- rev-3 - 2026-09-05 - M3 fork sweep under the standing mandate: F1 marked RESOLVED at (a),
+  with veto 2 recorded as what discards (b) rather than leaving it a preference. Premise re-derived
+  at the run's BASE `e828f778`: `tools/workflows/unattended-unit.js` still does not exist, so this
+  unit still has a file to land and the hoist still has no callee without it.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-7 — a brief on disk before the code that cites it
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -327,6 +327,18 @@ of them this one. A leg built as its twin is invisible to that checker by constr
   makes two owner turns out of one and leaves an intermediate commit where the helper exists with a
   single caller. Owner call; either resolution changes only sequencing, not the design.
 
+RESOLVED (agent, 2026-09-05, delegated): **F1 — (a).** `BRIEF_RECORDED_CUTOFF` is dated at the landing, `graded 0` is accepted
+on day one, and the evidential weight sits in AC1, AC3 and AC6, which are staged failures observed
+RED before the leg lands. Option (b) invents an exemption surface for five historical units, and an
+exemption is not coverage. The cost of (a) is restated rather than softened: this leg's first real
+verdict arrives with the first unattended run that lands after the cutoff.
+
+**F2 is MOOT — the `build_commit` extraction already landed.** Re-derived at the run's BASE
+`e828f778`: `tools/unattended/check-pass-order.sh:337` defines `_find_build_commit` with its two call
+sites at `:378` and `:395`, and the file has grown by roughly 285 lines since this spec's base.
+Neither option is taken, because neither is available: this unit CONSUMES the landed helper rather
+than extracting it, and S2 and S3 are re-read against the shipped shape before any code.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, from design rev-8 §6 at `c4fcf5ad`. Four corrections to the
@@ -357,6 +369,13 @@ of them this one. A leg built as its twin is invisible to that checker by constr
   identifier the manifest is keyed on, and it stays correct if the script is ever renamed under a
   stable leg name. AC9 keeps `KIT_UNATTENDED_VERSION` and the `1.17` staging as its failing case.
   No criterion was weakened or dropped, and §4's file table still spells the path once.
+- rev-3 - 2026-09-05 - M3 fork sweep under the standing mandate. F1 marked RESOLVED at (a);
+  F2 marked RESOLVED as MOOT because the extraction it debated landed between `c4fcf5ad` and the
+  run's BASE. Consequence recorded rather than assumed: `tools/unattended/check-pass-order.sh` and
+  its suite moved substantially between the two bases, so every `file:line` this spec cites in that
+  file is re-opened at BASE before it is built on, and S2 and S3 are re-read against the shipped
+  `_find_build_commit` rather than against the extraction they proposed. `BRIEF_RECORDED_CUTOFF` is
+  confirmed absent from `.unattended.conf` at BASE, so the leg itself is still unbuilt.
 
 ## 10. Reuse audit
 

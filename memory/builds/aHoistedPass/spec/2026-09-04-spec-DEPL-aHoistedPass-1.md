@@ -1,6 +1,6 @@
 # DEPL-aHoistedPass-1 — a declared kit dependency that is actually checked
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
@@ -316,6 +316,14 @@ This unit adds no gate leg and registers nothing in `tools/gate-legs.json` or `r
   ignore nine times over is exactly the dead declaration this unit exists to end — but the owner sees
   the number at scope approval, not in the landing report.
 
+RESOLVED (agent, 2026-09-05, delegated): **F1 — this unit takes the `unattended` 1.17 to 1.18 bump.** It lands at `order 2`
+and `TOOL-aHoistedPass-2` at `order 3`, so the recommendation's "whichever lands FIRST" names this
+one. `TOOL-aHoistedPass-2` asserts `bash tools/check-kit-versions.sh` exit 0 and moves the version no
+further. **F2 — REFUSE stands, and the nine repairs land inside this unit**, as recommended: the
+evidence that gov's own suite ignores the edge nine times over strengthens the ruling it was offered
+against. Both taken under the standing mandate's delegated resolver authority; the picks are the
+spec's own recommendations and neither adds a carrier beyond this unit's ratified scope.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, grounded on `origin/main` at `c4fcf5ad` with every cited line
@@ -342,6 +350,11 @@ This unit adds no gate leg and registers nothing in `tools/gate-legs.json` or `r
   repo will never hold. It now names the receipt by role and cites the read at `govkit.py:4275-4276`,
   which is the seam the carve-out actually exercises. No criterion was weakened or dropped, and the
   set of things AC5 observes is unchanged.
+- rev-3 - 2026-09-05 - M3 fork sweep under the standing mandate: F1 and F2 marked RESOLVED in
+  place at their recommendations. No scope, acceptance or design text moved. Re-derived at the run's
+  BASE `e828f778` rather than at `c4fcf5ad`: `tools/unattended/kit.toml:7` still reads
+  `requires = ["memory-tree"]` and `KIT_UNATTENDED_VERSION=1.17` still stands at
+  `tools/unattended/unattended.sh:42`, so both premises hold 66 commits on.
 
 ## 10. Reuse audit
 

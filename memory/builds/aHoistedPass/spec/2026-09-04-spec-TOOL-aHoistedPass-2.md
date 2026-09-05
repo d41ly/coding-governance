@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-2 — the route a run can find, and the ratchet that keeps it findable
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -449,6 +449,19 @@ existing leg. Its failing case is staged and observed as AC1 and AC2 before the 
   line axis has roughly 22 lines of slack after this unit's other additions and nothing measures a
   breach, so the cheaper option is the one that fails silently.
 
+RESOLVED (agent, 2026-09-05, delegated): **all four forks taken at their recommendations.** **F1** — the AC17 dispatch targets
+`tools/workflows/unattended-build.js`, which exists at BASE; the premise under test is whether a
+Skill bullet authorizes a `Workflow` call at all. **F2** — both script paths are named now, and the
+dangling-path window is HELD BY THE RUN rather than by any check, which is disclosed here because
+nothing catches it. **F3** — `last-audit` advances unconditionally, `last-body-change` only if the
+re-audit actually changed the body, both counters re-derived at commit time. **F4** — woven, not
+listed.
+
+**One coupling this section did not state, added by the sweep:** the `memory-tree` kit version bump
+belongs to `TOOL-aHoistedPass-3` at `order 2`, one commit ahead of this unit's `order 3` edit of the
+same template. This unit asserts `bash tools/check-kit-versions.sh` exit 0 and moves that version no
+further, the same shape `DEPL-aHoistedPass-1`'s F1 sets for the `unattended` version.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, written against `origin/main` at `c4fcf5ad` with every cited
@@ -480,6 +493,11 @@ existing leg. Its failing case is staged and observed as AC1 and AC2 before the 
   at `:2177`; the two `--dispatch` state refusals at `:4604` and `:4609`; the protocol pair at
   54772 bytes and 649 lines each with `:642`'s over-claim live; and the Skill placement lines `:465`,
   `:543` and `:557`.
+- rev-2 - 2026-09-05 - M3 fork sweep under the standing mandate: F1 to F4 marked RESOLVED at
+  their recommendations, plus the memory-tree version-bump coupling this section had left implicit.
+  Premise re-derived at the run's BASE `e828f778`: none of the seventeen `DIRECTIVES_CORE` handles
+  appears in `memory/guides/BUILD-METHOD.md`, and `tools/unattended/check-unattended.sh` still holds
+  no check 31 - so both halves of this unit's goal stand 66 commits after the spec's own base.
 
 ## 10. Reuse audit
 
