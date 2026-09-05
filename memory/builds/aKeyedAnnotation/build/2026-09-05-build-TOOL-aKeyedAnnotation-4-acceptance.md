@@ -18,7 +18,7 @@
 - AC4 — `python tools/codebase-map/test_codebase_map.py` — the check asserts a non-empty dossier
   population before reporting any count, so a map root holding none is a named refusal rather than a
   perfect score.
-- AC5 — AMENDED, because the mechanism it names does not exist. `tools/codebase-map/gen_map.py`
+- AC5 — amended rev-6 — the mechanism it names does not exist. `tools/codebase-map/gen_map.py`
   scaffolds only the FOUNDATION file, and that is the ONE file the dossier loader excludes from the
   population the new check grades — so annotating it, which is what this unit did first, put the
   guidance where no reader the check could red would ever see it. There is no feature-dossier
@@ -31,13 +31,23 @@
   extended. One id, verified by reading the row rather than by pattern-matching the slug. Sixteen
   dossiers stay empty because this build did not read their governing records, and a guessed id
   resolves, which makes it worse than a visibly empty list.
-- AC7 — deferred to the closing bar, which is where a full-bar criterion binds. The diff-scoped gates
-  were green at this unit's commit: memory hygiene, spec tokens, codebase-map coverage, drift-audit
-  records, corpus ids, the deployer selfcheck and kit versions.
+- AC7 — `bash tools/run-gates/run-gates.sh` — the full bar, which binds at the close rather than per unit and is
+  recorded there for all four units. The diff-scoped gates were green at this unit's own commit:
+  memory hygiene, spec tokens, codebase-map coverage, drift-audit records, corpus ids, the
+  deployer selfcheck and kit versions.
 - AC8 — `python tools/codebase-map/selftest.py` — the decisions clause is asserted inside the arm
   that already builds a fixture with NO project-side extractor, and that arm now asserts the absence
   of one explicitly. Passing there IS the portability observation, which is why this extends the
   existing arm rather than adding a second one that would rebuild the same fixture.
+- AC8b — `bash tools/codebase-map/adopt-codebase-map.sh --scaffold` — run into a fresh scratch repo
+  with the kit copied in. The conf it writes carries the new pin row with an EMPTY value, which is
+  the adopter half S3 specifies. The criterion's second clause — running the INSTALLED gate there
+  with the pin unset — cannot be observed on a bare scaffold and that is a property of the scaffold
+  rather than of this unit: the module dies in a sibling check that needs a gate manifest the fresh
+  tree has not got, before reaching this one. The UNGRADED branch is therefore observed where it can
+  run, by blanking the pin in this repo: `python tools/codebase-map/test_codebase_map.py` then prints
+  the count as ungraded, names the conf key, and exits 0 rather than reading the absent pin as zero.
+  Restored after.
 - AC9 — `python tools/drift-audit/drift_report.py --check --base-ref HEAD` — the ratchet mechanism
   observed on this build's other new pin, both ways: an unmarked raise REDS naming both values, and a
   marked one clears. The row for THIS pin is registered the same way and in the same list. It cannot

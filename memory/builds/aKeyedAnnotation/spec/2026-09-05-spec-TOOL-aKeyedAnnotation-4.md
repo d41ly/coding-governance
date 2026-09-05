@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only
 
-**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
+**Status:** CLOSED · rev-6 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -240,6 +240,7 @@ runs, and that leg is unguarded so it runs on every bar.
 - rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
 - rev-4 · 2026-09-05 · §5 carries S8's second kit and the two arms the fold added.
 - rev-5 · 2026-09-05 · round-2 fixes folded: F1's false ground removed, the adopter carrier named, the arm made permanent.
+- rev-6 · 2026-09-05 · S4 and AC5 amended at build time: the file they named scaffolds no feature dossier.
 
 ## 10. Reuse audit
 

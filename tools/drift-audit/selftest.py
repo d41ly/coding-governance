@@ -1724,21 +1724,21 @@ def test_evidence_oracle(tmp: pathlib.Path) -> None:
         run(["git", "add", "-A"], r)
         run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
 
-    def sig(*extra: str) -> dict:
+    def read_signal(*extra: str) -> dict:
         return report(r, *extra)["non_terminal_specs_cited_by_product_source"]
 
     # ---- ARM 1: the correction-form id. Its seq carries a trailing lowercase letter, which the
     # hand-typed digits-then-boundary pattern could not match at all -- so the spec scored UNKEYED
     # and the probe declined to judge it, silently. Observed RED against that pattern: the spec was
     # absent from the judgeable population entirely.
-    before = sig()["of"]
+    before = read_signal()["of"]
     add(str(pathlib.Path(SPEC_DIR_FOR_FIXTURE) / "2026-01-02-spec-aFixed-1b.md").replace("\\", "/"),
         "# TOOL-aFixed-1b \u2014 a ratified correction\n\n"
         "**Status:** SPECCED \u00b7 rev-1 \u00b7 2026-01-02 \u00b7 node a \u00b7 Tier-2 \u00b7 base 0000000\n",
         "spec(aFixed): a correction-form id")
     check("evidence: a correction-form id is JUDGED, not silently unkeyed",
-          sig()["of"] == before + 1,
-          f"population {before} -> {sig()['of']}, wanted +1")
+          read_signal()["of"] == before + 1,
+          f"population {before} -> {read_signal()['of']}, wanted +1")
 
     # ---- ARM 2: a citation from a TEST file is the house's own bookkeeping certifying the
     # bookkeeping, so it must not count as evidence a unit shipped. The same id cited from a
@@ -1746,13 +1746,13 @@ def test_evidence_oracle(tmp: pathlib.Path) -> None:
     add("src/thing.test.sh", "# cites TOOL-aThing-1 from a test file\n",
         "test: cite a spec id from a test file")
     check("evidence: a test-file citation is not evidence a unit shipped",
-          all(row["id"] != "TOOL-aThing-1" for row in sig()["detail"]),
-          f"detail: {[row['id'] for row in sig()['detail']]}")
+          all(row["id"] != "TOOL-aThing-1" for row in read_signal()["detail"]),
+          f"detail: {[row['id'] for row in read_signal()['detail']]}")
     add("src/thing.py", "# cites TOOL-aThing-1 from product source\n",
         "feat: cite the same id from product source")
     check("evidence: a product-file citation IS evidence a unit shipped",
-          any(row["id"] == "TOOL-aThing-1" for row in sig()["detail"]),
-          f"detail: {[row['id'] for row in sig()['detail']]}")
+          any(row["id"] == "TOOL-aThing-1" for row in read_signal()["detail"]),
+          f"detail: {[row['id'] for row in read_signal()['detail']]}")
 
     # ---- ARM 3: the drain. Remove every remaining product citation and the VALUE reaches zero,
     # while the judgeable population does NOT -- they are different fields, and an arm asserting on
@@ -1760,7 +1760,7 @@ def test_evidence_oracle(tmp: pathlib.Path) -> None:
     (r / "src" / "thing.py").unlink()
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "chore: drop the product citation", "--no-verify"], r)
-    drained = sig()
+    drained = read_signal()
     check("evidence: the value drains to zero when the product citations go",
           drained["value"] == 0, f"value {drained['value']}")
     check("evidence: the judgeable population does NOT drain with it",
@@ -1774,7 +1774,7 @@ def test_evidence_oracle(tmp: pathlib.Path) -> None:
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "chore: empty the evidence declaration", "--no-verify"], r)
-    dead = sig()
+    dead = read_signal()
     check("evidence: a declaration resolving to no file reports DEAD, not a clean zero",
           dead["live"] is False and dead["evidence_files"] == 0,
           f"live={dead['live']} evidence_files={dead['evidence_files']}")
@@ -1797,8 +1797,8 @@ def test_evidence_oracle(tmp: pathlib.Path) -> None:
     add("src/widget.py", "# cites WDGT-aWidget-1 from product source\n",
         "feat: cite the foreign-family id")
     check("evidence: the grammar is bound to the tree, so a foreign family is classified",
-          any(row["id"] == "WDGT-aWidget-1" for row in sig()["detail"]),
-          f"detail: {[row['id'] for row in sig()['detail']]}")
+          any(row["id"] == "WDGT-aWidget-1" for row in read_signal()["detail"]),
+          f"detail: {[row['id'] for row in read_signal()['detail']]}")
 
 
 def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
@@ -1819,7 +1819,7 @@ def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     root = KIT.parent.parent
-    families = mod._families_of(mod.load_conf(root))
+    families = mod._read_families(mod.load_conf(root))
     # AGAINST THE EXTRACTOR ITSELF, not against the accessor. The accessor falls back to the local
     # copy on ANY import failure, so comparing the two compared the copy to itself and passed for
     # free -- reproduced by forcing the import to raise. The arm now imports the extractor by path
@@ -1836,7 +1836,7 @@ def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
         except ValueError:
             pass
     check("local grammar equals the extractor's for this tree",
-          mod._local_ident(families) == shipped,
+          mod._build_local_ident(families) == shipped,
           "the local fallback has diverged from the shipped alternation")
 
 
@@ -1851,14 +1851,14 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
     conf = r / ".memory-tree.conf"
     proj = r / "drift-audit" / "drift_signals.py"
 
-    def commit(msg: str) -> None:
+    def run_commit(msg: str) -> None:
         run(["git", "add", "-A"], r)
         run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
 
-    def sig(*extra: str) -> dict:
+    def read_signal(*extra: str) -> dict:
         return report(r, *extra)["source_cited_ids_resolving_to_no_record"]
 
-    base = sig()
+    base = read_signal()
     check("citations: the signal is live on a fixture with records and source",
           base["live"] and base["known_slugs"] > 0 and base["scanned_source_files"] > 0,
           f"slugs={base['known_slugs']} files={base['scanned_source_files']}")
@@ -1867,19 +1867,19 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
     # a real dangling citation; the same shape under a slug no record anchors is a fixture. Only the
     # pair proves the discriminator discriminates -- one half alone passes for a signal that counts
     # everything, and the other for a signal that counts nothing.
-    before = sig()["value"]
+    before = read_signal()["value"]
     (r / "src" / "resolving.py").write_text(
         "# cites TOOL-aThing-999, whose slug anchors a record\n", encoding="utf-8", newline="\n")
-    commit("chore: cite a fabricated id under a RESOLVING slug")
+    run_commit("chore: cite a fabricated id under a RESOLVING slug")
     check("citations: a dangling id under a known slug is a finding",
-          sig()["value"] == before + 1, f"value {before} -> {sig()['value']}, wanted +1")
+          read_signal()["value"] == before + 1, f"value {before} -> {read_signal()['value']}, wanted +1")
 
-    mid = sig()["value"]
+    mid = read_signal()["value"]
     (r / "src" / "fixture.py").write_text(
         "# cites TOOL-zNoSuchSlug-1, whose slug anchors nothing\n", encoding="utf-8", newline="\n")
-    commit("chore: cite a fabricated id under a slug no record anchors")
+    run_commit("chore: cite a fabricated id under a slug no record anchors")
     check("citations: a dangling id under an UNKNOWN slug is a fixture, not a finding",
-          sig()["value"] == mid, f"value {mid} -> {sig()['value']}, wanted no movement")
+          read_signal()["value"] == mid, f"value {mid} -> {read_signal()['value']}, wanted no movement")
 
     # ---- LIVENESS HALF ONE: no records, so no slugs. The signal must say it is dead rather than
     # report a clean zero over a corpus it cannot see.
@@ -1887,15 +1887,15 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
     for p in sorted((r / FIXTURE_MEMORY_ROOT).rglob("*.md")):
         keep[p] = p.read_text(encoding="utf-8")
         p.unlink()
-    commit("chore: empty the memory root")
-    dead = sig()
+    run_commit("chore: empty the memory root")
+    dead = read_signal()
     check("citations: an empty memory root reports DEAD, not zero findings",
           dead["live"] is False and dead["known_slugs"] == 0,
           f"live={dead['live']} slugs={dead['known_slugs']}")
     for p, text in keep.items():
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(text, encoding="utf-8", newline="\n")
-    commit("chore: restore the memory root")
+    run_commit("chore: restore the memory root")
 
     # ---- LIVENESS HALF TWO, and it is NOT the scanned-file count. That count can never reach zero
     # in a tree with this kit installed, because the report is itself a tracked non-memory file --
@@ -1905,8 +1905,8 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
     # see. That is the hazard, and this is the arm for it.
     conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="nothing:ZZZZ"' + NL,
                     encoding="utf-8", newline=NL)
-    commit("chore: bind the grammar to a family nothing uses")
-    blind = sig()
+    run_commit("chore: bind the grammar to a family nothing uses")
+    blind = read_signal()
     check("citations: a grammar matching nothing reports DEAD, not a clean zero",
           blind["live"] is False and blind["of"] == 0 and blind["scanned_source_files"] > 0,
           f"live={blind['live']} of={blind['of']} files={blind['scanned_source_files']}")
@@ -1918,23 +1918,23 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
     (r / "src" / "foreign.py").write_text(
         "# cites WDGT-aThing-7, in a family the conf may or may not declare" + NL,
         encoding="utf-8", newline=NL)
-    commit("chore: cite an id in a foreign family")
+    run_commit("chore: cite an id in a foreign family")
     conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="tooling:TOOL"' + NL,
                     encoding="utf-8", newline=NL)
-    commit("chore: declare TOOL only")
-    narrow = sig()["value"]
+    run_commit("chore: declare TOOL only")
+    narrow = read_signal()["value"]
     conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="widget:WDGT tooling:TOOL"' + NL,
                     encoding="utf-8", newline=NL)
-    commit("chore: declare the foreign family too")
+    run_commit("chore: declare the foreign family too")
     check("citations: the family enum is READ from the conf, not spelled in the engine",
-          sig()["value"] == narrow + 1,
-          f"value {narrow} -> {sig()['value']}, wanted +1 once the family was declared")
+          read_signal()["value"] == narrow + 1,
+          f"value {narrow} -> {read_signal()['value']}, wanted +1 once the family was declared")
 
     # ---- THE WHOLE REPORT SURVIVES A TREE WITH NO RECALL KIT. This fixture has never had one, so
     # the assertion is that the run RETURNS at all rather than raising and taking the other signals
     # with it -- the failure mode is a dead leg for that adopter, not a missing signal.
     check("citations: the report returns in a tree with drift-audit and no recall kit",
-          not (r / "memory-recall").exists() and sig()["signal"],
+          not (r / "memory-recall").exists() and read_signal()["signal"],
           "the fixture unexpectedly has a recall kit beside it")
 
 
@@ -1955,7 +1955,7 @@ def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None
     proj = r / "drift-audit" / "drift_signals.py"
     NL = chr(10)
 
-    def human() -> str:
+    def read_human_table() -> str:
         out = run([sys.executable, "drift-audit/drift_report.py"], r)
         assert out.returncode == 0, out.stderr[:300]
         return out.stdout
@@ -1981,7 +1981,7 @@ def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "chore: pin the report-only signal at its value", "--no-verify"], r)
 
-    line = [ln for ln in human().splitlines() if name in ln]
+    line = [ln for ln in read_human_table().splitlines() if name in ln]
     check("report-only: a signal AT its pin does not report itself over",
           bool(line) and "over" not in line[0],
           f"status line: {line[0].strip() if line else '(absent)'}")

@@ -17,16 +17,16 @@
   that counts nothing.
 - AC3 — `python tools/drift-audit/selftest.py` — a scratch tree whose memory root is emptied reports
   the signal DEAD with a zero slug count, rather than zero findings.
-- AC4 — AMENDED, and the amendment is in the arm rather than the criterion. Declaring a family enum
+- AC4 — amended rev-4 — the amendment is in the arm rather than the criterion. Declaring a family enum
   can only NARROW, because with none declared the engine falls back to a permissive family pattern.
   The arm was first written to declare a family and expect the count to RISE, which would have passed
   against an engine ignoring the conf entirely. It now runs narrow-then-wide: with `TOOL` alone the
   foreign id is invisible, and declaring the foreign family raises the count by exactly one.
 - AC5 — `python tools/memory-tree/corpus_ids.py --report` — orphan count 0, unchanged from this
   base, proving the memory-side check was not widened.
-- AC6 — deferred to the closing bar, which is where a full-bar criterion binds. The diff-scoped gates
-  were green at this unit's commit.
-- AC5b — AMENDED rev-4 — the criterion asked for a scratch tree where the source walk resolves to no
+- AC6 — `bash tools/run-gates/run-gates.sh` — the full bar, which binds at the close rather than per unit and is
+  recorded there for all four units. The diff-scoped gates were green at this unit's own commit.
+- AC5b — amended rev-4 — the criterion asked for a scratch tree where the source walk resolves to no
   tracked file, and that state is UNREACHABLE: this report is itself a tracked non-memory file, so a
   tree with the kit installed always has source to scan. Found by writing the arm and watching it
   refuse to go dead. The population that can actually collapse is the CITED set, so the arm binds the

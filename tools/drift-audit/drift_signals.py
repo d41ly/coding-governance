@@ -74,13 +74,12 @@ TRACE_GLOBS: list[str] = [
 # Declared as its own list rather than by editing PRODUCT_GLOBS, which other signals read and which
 # this unit has not measured them against. That is the same precedent TRACE_GLOBS set: a second
 # declaration for one signal, taken before it costs something rather than after.
-EVIDENCE_GLOBS: list[str] = [
-    "tools",
-    "skills",
-    ".claude",
-    "memory/guides/SESSION-KICKOFF.md",
-    "coding-governance-agents.template.md",
-    "WIRE-INTO-PROJECT.md",
+# DERIVED from PRODUCT_GLOBS rather than retyped beside it. The first spelling of this list
+# repeated all six product paths and then subtracted; that is a second copy of one declaration
+# in one file, which drifts the first time either moves, and it put two more kit-path literals
+# into a shipped file that bans them. The narrowing is now only the SUBTRACTION, which is all
+# this signal actually declares.
+EVIDENCE_GLOBS: list[str] = PRODUCT_GLOBS + [
     ":(exclude)*.test.sh",
     ":(exclude)*/selftest.py",
     ":(exclude)*/test_*.py",
@@ -212,7 +211,7 @@ PINS: dict[str, int] = {
     # which put this file inside the population it describes: measured, `drift_signals.py` was
     # returned in the citation set for BOTH pinned ids, so the pin could not be drained by removing
     # the annotations it was describing. The pin documented itself into permanence. Run
-    # `python tools/drift-audit/drift_report.py --json` and read the signal's own `detail`, which
+    # this kit's report with `--json` and read the signal's own `detail`, which
     # derives the two rows and cannot go stale the way this comment did.
     #
     # WHAT THE RESIDUAL IS, which is the part worth keeping: both are INPROGRESS with their ids in
@@ -336,21 +335,28 @@ PINS: dict[str, int] = {
 # key is discoverable from this file rather than only from the kit's default.
 RATCHET_LOOKBACK = 14
 
+# ONE SPELLING OF THIS FILE'S OWN PATH, not one per row. Every ratchet row below that names this
+# module used to carry the literal again, so adding a row RAISED the carried-literal count and
+# tripped the ban on a kit file spelling paths. The rows need a repo-relative path because the
+# reader resolves it against the repo root, so this is the narrowest honest form: one name, used
+# four times, and adding a fifth row now costs nothing.
+_THIS_FILE = "tools/drift-audit/drift_signals.py"
+
 RATCHETS: list[dict] = [
     {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "DEAD_PATH_PIN", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "UNIVERSAL_BUDGET", "weakens": "up"},
     {"file": ".memory-tree.conf", "key": "ROW_DUPLICATE_PIN", "weakens": "up"},
-    {"file": "tools/drift-audit/drift_signals.py",
+    {"file": _THIS_FILE,
      "key": "non_terminal_specs_cited_by_product_source", "weakens": "up"},
-    {"file": "tools/drift-audit/drift_signals.py",
+    {"file": _THIS_FILE,
      "key": "handkept_inventories_disagreeing_with_source", "weakens": "up"},
-    {"file": "tools/drift-audit/drift_signals.py",
+    {"file": _THIS_FILE,
      "key": "live_backlog_rows_per_shard", "weakens": "up"},
     # The signal is report-only, so crossing this pin never blocks a merge. What the row buys is
     # that RAISING it needs a reason written in place — which is the whole of "shrink-only" for
     # an ungateable pin, and without it the word is a comment.
-    {"file": "tools/drift-audit/drift_signals.py",
+    {"file": _THIS_FILE,
      "key": "source_cited_ids_resolving_to_no_record", "weakens": "up"},
     # A pin in ANOTHER kit's conf. The ratchet does not care which file a scalar lives in, and
     # codebase-map has no shrink-only mechanism of its own - so an adopter without drift-audit

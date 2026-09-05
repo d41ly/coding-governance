@@ -456,7 +456,7 @@ _NODE_TAG_CLASS = "a-z"
 _FAMILY_SHAPE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
 
-def _local_ident(families) -> str:
+def _build_local_ident(families) -> str:
     """The LOCAL COPY of the shipped id alternation, for a tree with no recall kit.
 
     Byte-compared against the extractor's own output by this kit's self-test whenever that kit is
@@ -472,11 +472,11 @@ def _local_ident(families) -> str:
     return r"(?:" + fam + r")-(?:" + "|".join(eras) + r")"
 
 
-def _grammar_ident(root, families) -> str:
+def _resolve_ident(root, families) -> str:
     """The shipped alternation for THIS tree, from the recall extractor where it is importable."""
     kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
     if not (kit / "extract.py").exists():
-        return _local_ident(families)
+        return _build_local_ident(families)
     added = str(kit)
     sys.path.insert(0, added)
     try:
@@ -485,7 +485,7 @@ def _grammar_ident(root, families) -> str:
     except Exception:
         # A present-but-unusable sibling is the fallback case, never a crash. Every signal is
         # evaluated in one unguarded comprehension, so a raise here takes the whole report down.
-        return _local_ident(families)
+        return _build_local_ident(families)
     finally:
         try:
             sys.path.remove(added)
@@ -494,13 +494,13 @@ def _grammar_ident(root, families) -> str:
 
 
 
-def _local_anchors(ident: str):
+def _build_local_anchors(ident: str):
     """The LOCAL COPY of the four anchor shapes, for a tree with no recall kit.
 
-    UNGUARDED, and said so rather than claimed otherwise. The sibling `_local_ident` IS
+    UNGUARDED, and said so rather than claimed otherwise. The sibling `_build_local_ident` IS
     byte-compared against the extractor by this kit's self-test; these anchor patterns are NOT.
     MEASURED, because this docstring has now been wrong twice: the flags are EQUAL on all four
-    (`_grammar_anchors` re-compiles the extractor's with the same multiline flag), and two of the
+    (`_resolve_anchors` re-compiles the extractor's with the same multiline flag), and two of the
     four `.pattern` strings are byte-identical. What differs on the other two is escape SPELLING of
     the same character classes. So a byte-compare would red today on a difference that is
     cosmetic, and an equivalence compare is a second grammar deciding what "equivalent" means. The
@@ -519,18 +519,18 @@ def _local_anchors(ident: str):
     )
 
 
-def _grammar_anchors(root, families):
+def _resolve_anchors(root, families):
     """The anchor patterns for THIS tree, from the recall extractor where it is importable."""
     kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
     if not (kit / "extract.py").exists():
-        return _local_anchors(_local_ident(families))
+        return _build_local_anchors(_build_local_ident(families))
     added = str(kit)
     sys.path.insert(0, added)
     try:
         import extract  # type: ignore
         return tuple(re.compile(a.pattern, a.flags | re.M) for a in extract.grammar_for(root).anchors)
     except Exception:
-        return _local_anchors(_local_ident(families))
+        return _build_local_anchors(_build_local_ident(families))
     finally:
         try:
             sys.path.remove(added)
@@ -538,11 +538,11 @@ def _grammar_anchors(root, families):
             pass
 
 
-def _own_id_re(root, families):
-    return re.compile(r"^#\s+(" + _grammar_ident(root, families) + r")\b", re.M)
+def _build_own_id_re(root, families):
+    return re.compile(r"^#\s+(" + _resolve_ident(root, families) + r")\b", re.M)
 
 
-def _families_of(conf) -> tuple:
+def _read_families(conf) -> tuple:
     """The id FAMILY allowlist, from the memory-tree conf this kit already reads.
 
     Declared as `discipline:FAMILY` pairs; the uppercase half is the allowlist. Read rather
@@ -567,7 +567,7 @@ def _families_of(conf) -> tuple:
     return tuple(out)
 
 
-def _slug_of(uid: str):
+def _parse_slug(uid: str):
     """The slug PROJECTION of a matched id, or None for an era that has none.
 
     DERIVED, not captured. The shipped alternation carries no groups of its own and exposes no
@@ -856,7 +856,7 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         if when.group(1) < ctx.trace_cutoff:
             unjudged += 1  # grandfathered: it closed before the convention it would be judged by.
             continue
-        uid, slug = own.group(1), _slug_of(own.group(1))
+        uid, slug = own.group(1), _parse_slug(own.group(1))
         if slug is None:
             unjudged += 1  # an era with no slug: this BUILD-level question has no key here.
             continue
@@ -1602,7 +1602,7 @@ def build_backlog_rows_outliving_specs(ctx) -> dict:
 # --------------------------------------------------------------------------------------------
 
 
-def signal_source_cited_ids_with_no_record(ctx) -> dict:
+def build_source_cited_ids_with_no_record(ctx) -> dict:
     name = "source_cited_ids_resolving_to_no_record"
     grammar_re, anchors = ctx.id_re, ctx.anchors
     mem = ctx.memory_root + "/"
@@ -1630,7 +1630,7 @@ def signal_source_cited_ids_with_no_record(ctx) -> dict:
             for m in anchor.finditer(text):
                 uid = m.group(1)
                 defined.add(uid)
-                s = _slug_of(uid)
+                s = _parse_slug(uid)
                 if s:
                     slugs.add(s)
 
@@ -1654,7 +1654,7 @@ def signal_source_cited_ids_with_no_record(ctx) -> dict:
     for uid in sorted(cited):
         if uid in defined:
             continue
-        s = _slug_of(uid)
+        s = _parse_slug(uid)
         if not s or s not in slugs:
             continue  # a slug no record anchors: a fixture, not a finding
         findings.append({"id": uid, "cited_in": sorted(cited[uid])[:3]})
@@ -1689,7 +1689,7 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
            build_live_backlog_rows, build_readme_mechanism_drift,
            build_backlog_rows_outliving_specs,
-           signal_source_cited_ids_with_no_record]
+           build_source_cited_ids_with_no_record]
 
 
 # --------------------------------------------------------------------------------------------
@@ -1720,12 +1720,12 @@ class Ctx:
         # — which declares neither name — keeps working instead of tripping a required-attribute
         # refusal, and visibly gets the old unnarrowed behaviour until they fill it.
         self.evidence_globs = list(getattr(proj, "EVIDENCE_GLOBS", None) or proj.PRODUCT_GLOBS)
-        fams = _families_of(conf)
-        self.own_id_re = _own_id_re(root, fams)
+        fams = _read_families(conf)
+        self.own_id_re = _build_own_id_re(root, fams)
         # ONE accessor for both projections, so the citation scan and the definition scan
         # cannot drift apart into two spellings of the same grammar.
-        self.id_re = re.compile(_grammar_ident(root, fams))
-        self.anchors = _grammar_anchors(root, fams)
+        self.id_re = re.compile(_resolve_ident(root, fams))
+        self.anchors = _resolve_anchors(root, fams)
         self.shrink_only = dict(proj.SHRINK_ONLY)
         self.handkept = list(proj.HANDKEPT)
         self.pins = dict(proj.PINS)

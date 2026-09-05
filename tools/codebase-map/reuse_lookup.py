@@ -86,7 +86,7 @@ _DECISIONS_RE = re.compile(r"^decisions\s*=\s*\[([^\]]*)\]", re.M | re.S)
 _ID_SHAPE = m.DEFAULT_DECISION_ID_RE
 
 
-def _dossier_decisions(text: str) -> tuple:
+def _parse_dossier_decisions(text: str) -> tuple:
     """The unit ids a dossier declares, read from its front matter TEXT.
 
     A front-matter read rather than a parse, so this module keeps needing no project layer.
@@ -210,7 +210,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
         # The ids come out of the dossier TEXT, not a parsed dossier. That is the whole reason
         # this is a front-matter read: the parsed form needs the project-side extractor, and
         # this module's header declares it portable precisely so it needs none.
-        decisions_by_feature[feature] = _dossier_decisions(text)
+        decisions_by_feature[feature] = _parse_dossier_decisions(text)
         for seam in m.parse_affordance(text).seams:
             merge(seam, "affordance-seam", detail=feature)
         prose = _section_body(text, "## Shared seams")

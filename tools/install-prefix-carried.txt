@@ -36,7 +36,7 @@ tools/codebase-map/selftest.py	5	codebase-map
 tools/drift-audit/README.md	4	(loose),drift-audit
 tools/drift-audit/adopt-drift-audit.sh	5	drift-audit,lib
 tools/drift-audit/drift_report.py	3	drift-audit
-tools/drift-audit/drift_signals.py	5	(loose),drift-audit
+tools/drift-audit/drift_signals.py	3	(loose),drift-audit
 tools/drift-audit/drift_signals.template.py	4	(loose),drift-audit
 tools/gate-lint/README.md	3	gate-lint
 tools/gate-lint/kit.toml	1	gate-lint

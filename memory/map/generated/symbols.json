@@ -458,6 +458,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "build_source_cited_ids_with_no_record",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_spec_record_index",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3159,11 +3164,6 @@
     },
     {
       "id": "signal_shrink_only",
-      "kind": "function",
-      "file": "tools/drift-audit/drift_report.py"
-    },
-    {
-      "id": "signal_source_cited_ids_with_no_record",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
     },

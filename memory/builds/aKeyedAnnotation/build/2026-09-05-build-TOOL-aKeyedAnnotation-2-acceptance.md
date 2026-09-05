@@ -31,9 +31,10 @@
 - AC6 — `python tools/drift-audit/selftest.py` — exit 0 with eight new checks present: the five arms,
   their two control halves, and the byte-compare. Every arm observed RED against the mechanism it
   guards, by staging each pre-change form in turn and confirming which arms flipped.
-- AC7 — deferred to the closing bar, which is where a full-bar criterion binds. The diff-scoped gates
-  were green at this unit's commit: memory hygiene, spec tokens, codebase-map coverage, drift-audit
-  records, kit versions and the deployer selfcheck.
+- AC7 — `bash tools/run-gates/run-gates.sh` — the full bar, which binds at the close rather than per unit and is
+  recorded there for all four units. The diff-scoped gates were green at this unit's own commit:
+  memory hygiene, spec tokens, codebase-map coverage, drift-audit records, kit versions and the
+  deployer selfcheck.
 - AC8 — `python tools/drift-audit/selftest.py` — emptying the narrowed declaration in a scratch tree
   makes the signal report itself DEAD rather than a clean zero. Observed RED against the old liveness
   half, which counts specs and is computed before any glob is read, so it stayed True at full size
