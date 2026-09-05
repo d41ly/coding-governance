@@ -1,12 +1,13 @@
 # TOOL-aHoistedPass-7 — a brief on disk before the code that cites it
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -40,9 +41,17 @@ itself carries a `brief · item <id>` row whose hash still joins to a tracked fi
 - **S7** — `tools/unattended/check-brief-recorded.test.sh`, carrying the arms of §6, and its two
   rows in `tools/unattended/run-unattended-gates.sh` beside `pass-order history` at `:197` and
   `pass-order selftest` at `:204`.
-- **S8** — the five-declaration act of §4's Inventory, plus the kit version bump 1.17 → 1.18 that a
-  new shipped script and three moved files owe, and the fourth entry in `check-kit-versions.sh:169`'s
-  script list.
+- **S8** — the five-declaration act of §4's Inventory, plus the fourth entry in
+  `check-kit-versions.sh:169`'s script list — `tools/unattended/check-brief-recorded.sh` joins
+  `unattended.sh`, `check-unattended.sh` and `check-pass-order.sh` in the loop that requires each to
+  carry `KIT_UNATTENDED_VERSION` and a same-line `gov:kit unattended@` marker agreeing with it.
+
+  ~~plus the kit version bump 1.17 → 1.18 that a new shipped script and three moved files owe~~ —
+  **SPENT.** `DEPL-aHoistedPass-1`'s section 8 F1 takes that single move at `order 2`; this unit is
+  at `order 7`. What it owes instead is an ASSERTION that `bash tools/check-kit-versions.sh` exits 0
+  at the version the earlier order set, WITH the new script's constant and marker carrying that same
+  value — which is a real obligation of this unit, because the new script is a new carrier and the
+  loop above will red without it.
 - **S9** — `tools/install-prefix-carried.txt` rows for both new files if either spells a `tools/`
   literal, in the shape of `:104-105`.
 
@@ -197,12 +206,21 @@ right answer at that point rather than now.
 `tools/govkit/subject-pins.tsv` · `tools/install-prefix-carried.txt` ·
 `memory/map/features/unattended.md` and the regenerated map artifacts.
 
-**This unit is OWNER-GATED and the coupling is why.** The kit's version comes from
-`unattended.sh`'s constant (`tools/unattended/kit.toml:6`, today 1.17). A new shipped script plus
-moved bytes in three shipped files owes 1.17 → 1.18, and `check-kit-versions.sh:179-192` requires the
-matching `gov:kit unattended@` marker in every tracked `tools/unattended/*.template.md` — including
-`SKILL.template.md`, which ruling D1 of 2026-09-04 put on the veto-2 list. The bump is what makes
-this an owner turn, not a prose edit anyone intended.
+**This unit is NOT owner-gated by the version bump, and rev-4 re-derives the classification from
+the carriers it actually edits.** rev-1 argued: the kit's version comes from `unattended.sh`'s
+constant, a new shipped script plus moved bytes in three shipped files owes 1.17 → 1.18, and
+`check-kit-versions.sh:179-192` requires the matching `gov:kit unattended@` marker in every tracked
+`tools/unattended/*.template.md` — `SKILL.template.md` among them, which ruling D1 put on the veto-2
+list. That chain is sound and its first link is gone: at `order 7` the bump is spent, taken by
+`DEPL-aHoistedPass-1` at `order 2`, and this unit touches no template marker.
+
+**A classification derived from an edit the unit does not make is the one class of spec defect that
+changes whether an unattended run may land the unit at all**, which is why this is restated rather
+than quietly dropped. What this unit edits is `tools/unattended/lib-unattended.sh`,
+`check-pass-order.sh`, the new `check-brief-recorded.sh`, `.unattended.conf`, `gate-legs.json`,
+`kit.toml` and the map dossier. None is on D1's veto-2 list, so **the unit is not an owner turn on
+that ground.** If a later pass finds it editing a listed carrier after all, the classification moves
+back — and it must name the carrier, not the bump.
 
 ### Alternatives rejected
 
@@ -264,10 +282,20 @@ this an owner turn, not a prose edit anyone intended.
   non-ISO value the leg exits 2 naming the value.
 - **AC6** — When the fixture's `unattended.sh` no longer spells the row grammar, the leg exits 2 with
   a line carrying `DEAD PROBE`, and it does so before printing any violation.
-- **AC7** — When `bash tools/unattended/check-pass-order.test.sh` runs after `build_commit` is
-  extracted into `tools/unattended/lib-unattended.sh`, it exits 0 with every arm unchanged, and
-  `bash tools/unattended/check-pass-order.sh` on the live tree prints a liveness line whose four
-  counts are identical to the pre-extraction run.
+- **AC7** — When `bash tools/unattended/check-pass-order.test.sh` is run BY HAND after the S2 lift,
+  it exits 0 with every arm unchanged, and `bash tools/unattended/check-pass-order.sh` on the live
+  tree prints a liveness line whose four counts are byte-identical to a run captured BEFORE the lift.
+  The before-run is taken and recorded first; a post-only reading proves nothing about a move.
+
+  **This criterion survives rev-4's re-resolution of F2 and its precondition is now reachable.** Under
+  rev-3's MOOT it graded an extraction the spec said was not happening, naming a symbol
+  (`build_commit`) and a file (`lib-unattended.sh`) that nothing would ever carry. F2 is re-opened
+  above and the lift is back in scope, so AC7 grades the work the unit actually does.
+- **AC14** — When `bash tools/unattended/lib-unattended.sh` is sourced from a scratch script and
+  `build_commit` is invoked with the five arguments S2 names, it answers — proving the helper is
+  reachable from a SIBLING and not merely present in a file. This is the fact rev-3 missed: at BASE
+  the same test against `check-pass-order.sh`'s `_find_build_commit` FAILS, because that definition
+  is indented inside an enclosing block and does not exist until the block runs.
 - **AC8** — When `python tools/govkit/govkit.py selfcheck` runs, it exits 0, which is what proves the
   `[[gate_leg]]` row and the `memory/map/features/unattended.md` claim are both present, since
   `govkit.py:1602-1604` reds without the second and the leg is claimed by no other descriptor.
@@ -333,11 +361,23 @@ RED before the leg lands. Option (b) invents an exemption surface for five histo
 exemption is not coverage. The cost of (a) is restated rather than softened: this leg's first real
 verdict arrives with the first unattended run that lands after the cutoff.
 
-**F2 is MOOT — the `build_commit` extraction already landed.** Re-derived at the run's BASE
-`e828f778`: `tools/unattended/check-pass-order.sh:337` defines `_find_build_commit` with its two call
-sites at `:378` and `:395`, and the file has grown by roughly 285 lines since this spec's base.
-Neither option is taken, because neither is available: this unit CONSUMES the landed helper rather
-than extracting it, and S2 and S3 are re-read against the shipped shape before any code.
+**F2 — RE-OPENED AND RE-RESOLVED at rev-4, because rev-3's answer was wrong on the fact that
+decides it.** rev-3 read `tools/unattended/check-pass-order.sh:337` at BASE, found
+`_find_build_commit` with call sites at `:378` and `:395`, declared the extraction already landed and
+this unit a CONSUMER of it. Round 1's audit re-opened the same file and found what rev-3 did not
+check: **`check-pass-order.sh` has NO top-level function definitions at all.** `_find_build_commit`
+at `:337` and `_report` at `:325` are both INDENTED, defined inside an enclosing block, so neither
+exists until that block runs. A sibling script cannot source the file and call the helper. The
+symbol is there and the SEAM is not, which is invisible to a grep for the name.
+
+**So the extraction is still owed, S2 and S3 are LIVE as originally written, and rev-3's MOOT is
+withdrawn.** Of the two routes the audit named — lift the helper to `tools/unattended/lib-unattended.sh`,
+or leave it inlined and assert the new leg's own selection agrees with `check-pass-order.sh` over one
+fixture — this takes the LIFT, which is F2's original option (a) and this spec's own recommendation.
+The alternative is a second copy of a selection whose sibling's header forbids exactly that, and the
+lift is the seam §10 already names. Its price is the one option (b) priced: S2 and S3 touch a green
+merge-bar leg whose own suite is on no bar, so `check-pass-order.test.sh` is run BY HAND and its
+result reported, and AC7 asserts the four liveness counts are byte-identical across the move.
 
 ## 9. Revision log
 
@@ -376,6 +416,24 @@ than extracting it, and S2 and S3 are re-read against the shipped shape before a
   file is re-opened at BASE before it is built on, and S2 and S3 are re-read against the shipped
   `_find_build_commit` rather than against the extraction they proposed. `BRIEF_RECORDED_CUTOFF` is
   confirmed absent from `.unattended.conf` at BASE, so the leg itself is still unbuilt.
+- rev-4 - 2026-09-05 - folded round-1 spec-audit findings 21, 3 and 19. **21 and 3 are one defect,
+  and it is a defect rev-3 INTRODUCED.** rev-3 resolved F2 as MOOT on the ground that
+  `_find_build_commit` had already landed at `check-pass-order.sh:337`, and left S2, S3 and AC7 -
+  which all grade an EXTRACTION - standing beside a resolution saying the unit CONSUMES instead.
+  Round 1 re-opened the file and found the fact rev-3 never checked: that file has NO top-level
+  function definitions. `_find_build_commit` at `:337` and `_report` at `:325` are both indented
+  inside an enclosing block, so neither exists until the block runs and no sibling script can source
+  and call them. The symbol is present and the SEAM is not, which a grep for the name cannot see.
+  F2 is re-opened and re-resolved to its original option (a): LIFT the helper to
+  `lib-unattended.sh`. S2 and S3 are live as written, AC7's precondition is reachable again, and
+  AC14 is added to assert the lifted helper answers when sourced from a SIBLING - the exact test
+  that fails at BASE and that rev-3 should have run. **19** - S8 scoped the `unattended`
+  1.17-to-1.18 bump, which `DEPL-aHoistedPass-1` takes at `order 2`, five orders earlier; and
+  section 4 derived this unit's OWNER-GATED status transitively from owning it, through
+  `SKILL.template.md`'s marker under ruling D1. The bump half of S8 is struck to an assertion, the
+  `check-kit-versions.sh:169` script-list entry stays because a new carrier genuinely owes it, and
+  the classification is re-derived from the carriers this unit edits - none of them on the veto-2
+  list, so it is not an owner turn on that ground.
 
 ## 10. Reuse audit
 

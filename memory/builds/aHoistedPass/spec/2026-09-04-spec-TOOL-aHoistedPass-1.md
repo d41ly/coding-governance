@@ -1,12 +1,13 @@
 # TOOL-aHoistedPass-1 — the record catches up with the verdicts that superseded it
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -41,8 +42,17 @@ knowingly leaves open a durable, greppable home instead of a paragraph in a desi
   present-tense description of the very backlog row S2 rewrites. Correcting them makes a records unit
   edit three files of the `agent-cap` kit and one of `review-harness`; `tools/hooks/agent-cap.js` is a
   governance carrier, so M3 veto 2 (`memory/guides/BUILD-METHOD.md:84`) makes the unit an owner turn,
-  and each edited kit owes a version bump. S4's row carries the work; the design's U5 already opens
-  `unattended-build.js` and is the cheapest home for that one.
+  and each edited kit owes a version bump. **S4's row carries all four, and NO unit of this build
+  takes any of them — including the `unattended-build.js` one.**
+
+  That last clause is a correction, not a restatement. rev-1 said "the design's U5 already opens
+  `unattended-build.js` and is the cheapest home for that one", U5 in the design's section 7 table is
+  `TOOL-aHoistedPass-6`, and that spec's own section 3 disclaims the same edit on the ground that
+  "`TOOL-aHoistedPass-1` at `order 1` owns that correction by name" — which is false against this
+  text. The two specs disclaimed to each other and the edit fell between them, which nothing on the
+  bar would have caught: no leg grades whether a decision row's quotation is still true. **The
+  residual is now FILED rather than assumed handled**, which is the whole point of S4 and is the
+  weaker but honest half of this unit's goal.
 - **`memory/DECISIONS.md:65` is not rewritten, softened or annotated.** Supersession is a new id and a
   note (§6 of the charter).
 - **`TOOL-cBriefedPilot-28` is not CLOSED.** Its R3 and R1 clauses are unmeasured, and closing the row
@@ -57,9 +67,19 @@ knowingly leaves open a durable, greppable home instead of a paragraph in a desi
 
 ### Inventory
 
-Everything below was re-opened at `c4fcf5ad` in this worktree. The design record is
-`memory/builds/aHoistedPass/build/2026-09-04-build-aHoistedPass-1-design-pass.md`, and `<the design
-record>` below is that path.
+Everything below was re-opened at `c4fcf5ad` in this worktree. `<the design record>` below is **the
+path in this spec's own `gen:spec-records` table at the top of this file** — today
+`memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md`.
+
+**It is defined by pointing at that generated row rather than by retyping the filename, and rev-2
+learned why the hard way.** rev-1 bound the token to
+`…/2026-09-04-build-aHoistedPass-1-design-pass.md`, a name that has never been tracked in this
+repository — the record was added under its real name in `fa273fc7`. The token is the operand of a
+derivation this spec runs twice (the residual count in the table below, and AC3 at landing), so a
+missing operand makes the `awk` emit nothing, `grep -c` print `0`, and AC3 compare a real backlog
+count against zero. The generated table cannot go stale and a hand-typed second copy can; that is the
+charter's derive-over-author rule applied to a spec. **Re-derived at BASE `e828f778` against the real
+record: the count is 28, unchanged, so only the path was wrong and every figure below stands.**
 
 | fact | where | state at this base |
 |---|---|---|
@@ -212,8 +232,13 @@ excludes, so its own citations are unconstrained.
   checks that grade this unit's output: 7 and 8 for the row shapes where they are not silenced, 9 for the
   regenerated artifacts, 13 and 14 for the ids, 15 for the path citations.
 - **`build README slot contract`** (`gen_build_index.py --check-format`, chunk `records`, subject `repo`,
-  no guard) — this unit's commit is the first to track `memory/builds/aHoistedPass/README.md`, which is
-  the fork in §8.
+  no guard) — the README is **already tracked and already contract-BOUND at BASE `e828f778`**, with a
+  bare-path row at `memory/project/readme-contract.txt:123` and `--survey` reporting it conforms, so
+  this leg simply stays green and this unit mints no registry row. rev-1 said this commit would be the
+  first to track that README and routed the question to §8's F1; rev-2 resolved F1 as MOOT on exactly
+  this evidence and left this bullet standing — the amendment class, in this spec, one section away
+  from where it was fixed. The leg's chunk, subject and guard are unchanged and the obligation was
+  never in doubt; what was stale was the reason given for it.
 - No new gate leg, and no existing leg is moved, scoped or waived.
 
 ## 8. Open questions
@@ -259,6 +284,23 @@ than by a pick.
   still states `parallelism route: none` and `memory/backlog/TOOL.md:138` still says E3 and E4 "never
   were" run, so the line numbers this spec cites are exact at BASE for S1 and one line off for S2
   (`:138`, not `:137`).
+- rev-3 - 2026-09-05 - folded round-1 spec-audit findings 35, 23, 17 and 27. **35 and 23** are one
+  defect seen by two lenses: section 4 bound `<the design record>` to a filename that has never been
+  tracked, and that token is the operand of the residual derivation AND of AC3. The token is now
+  defined by POINTING at this spec's generated `gen:spec-records` row instead of retyping a path, and
+  the derivation was re-run at BASE against the real record - 28 bullets, 21 above the adopter-block
+  paragraph and 7 below, all unchanged. Only the path was wrong. **17** - section 3 routed the
+  `unattended-build.js:34-37` correction to the design's U5, which is `TOOL-aHoistedPass-6`, whose own
+  section 3 routes it back here by name. Two specs disclaiming to each other left the cheapest of the
+  four carriers owned by nobody, and nothing on the bar grades a decision row's truth, so it would
+  have closed green. Section 3 now states that S4's row carries all four and that no unit of this
+  build takes any of them - the residual is FILED rather than assumed handled. **27** - section 7's
+  build-README bullet still argued from "this unit's commit is the first to track the README", which
+  rev-2's own F1-is-MOOT resolution had already disproved one section away. Rewritten to the BASE
+  fact: tracked, contract-BOUND at `readme-contract.txt:123`, leg stays green, no registry row minted.
+  Section 4's rejected alternative keeps its "UNTRACKED at this base" clause, which is explicitly
+  qualified to `c4fcf5ad` and is true there; the review refuted that half of the finding and it is
+  left standing as the model for how the other half should have been written.
 
 ## 10. Reuse audit
 

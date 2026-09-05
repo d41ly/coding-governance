@@ -1,12 +1,13 @@
 # TOOL-aHoistedPass-4 — the loop ban learns the two spellings that walk past it
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -263,9 +264,14 @@ covered.
   is attributable to `TOOL-aWeldedTribunal-1` and not to this unit, and this unit's own commit
   touches neither `tools/hooks/agent-cap.js`'s predicate block nor `tools/hooks/agent-cap.test.sh`'s
   arms.
-- **AC8** — When this unit's diff is read, the only files it changes under `tools/` are the two the
-  residual needs: `tools/hooks/agent-cap.js` (the S4 note and the S5 version constant) and
-  `tools/hooks/README.md` (the S4 note). Every other edit is under `memory/`.
+- **AC8** — When this unit's diff is read, the files it changes under `tools/` are exactly **three**:
+  `tools/hooks/agent-cap.js` (the S4 note and the S5 version constant), `tools/hooks/README.md` (the
+  S4 note), and `tools/hooks/scratch-guard.js` (**the `gov:kit agent-cap@` marker at `:41` and
+  nothing else**). Every other edit is under `memory/`. The third file is not optional and its
+  omission is not a smaller diff: `tools/check-kit-versions.sh:87` reds when any file carrying that
+  marker disagrees with `KIT_AGENT_CAP_VERSION`, so a two-file diff ships a half-bumped kit and
+  fails AC9. S5 already says the carrier population is TWO files; this criterion used to say two
+  files TOTAL and the two counts are of different things.
 - **AC9** — When `git grep -lE "gov:kit agent-cap@" -- '*.js'` runs, every file it names carries
   `1.13`, `KIT_AGENT_CAP_VERSION` reads `1.13`, and `bash tools/check-kit-versions.sh` exits `0`.
   With only one carrier moved it exits non-zero naming the other.
@@ -361,6 +367,14 @@ none
   `absence-assertion-over-whole-file-text` class and AC4 now names it. Old AC6's staged-break is
   recorded as a LOSS rather than dropped silently: this run cannot observe a failing case for arms
   that are already in the tree. Section 7's closing paragraph amended with it.
+- rev-4 - 2026-09-05 - folded round-1 spec-audit finding 22, which rev-3 INTRODUCED while fixing an
+  instance of the same class. AC8 asserted a closed two-file set under `tools/` while section 4's
+  Files-touched table and AC9 both require `tools/hooks/scratch-guard.js:41`'s `gov:kit agent-cap@`
+  marker to move with the constant. The two could not both pass: satisfying AC8 left the second
+  carrier at 1.12, which `tools/check-kit-versions.sh:87` reds - the exact failure AC9 names.
+  AC8 now names three files and says why the third is not optional. The two counts that collided
+  are of different things and the criterion now says which: S5's TWO is the marker-carrier
+  population, AC8's THREE is the diff's file set.
 
 ## 10. Reuse audit
 

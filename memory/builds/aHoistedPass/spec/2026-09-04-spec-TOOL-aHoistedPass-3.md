@@ -1,12 +1,13 @@
 # TOOL-aHoistedPass-3 — the build-method budget becomes a number a gate reads
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -47,6 +48,14 @@ number drifting between the document and the declaration.
 - **S11** — Re-stamp the kickoff manifest's `last-audit`, which this diff owes because
   `memory/guides/SESSION-KICKOFF.md:6` lists `tools/check-template-size.sh`, `tools/gate-legs.json`
   and `memory/guides/BUILD-METHOD.md` among its watched pathspecs.
+- **S12** — Perform the `memory-tree` kit version move **2.60 → 2.61** that section 8's F1 assigns to
+  this unit: `KIT_MEMORY_TREE_VERSION` at `tools/memory-tree/check-memory-hygiene.sh:20`, the
+  `gov:kit memory-tree@` marker in every tracked `tools/memory-tree/*.template.md`, and the rendered
+  halves those markers travel into. **The carrier set is DERIVED by
+  `bash tools/check-kit-versions.sh` rather than counted here**, because a number typed beside the
+  population it counts is wrong on the next commit. This unit takes the move and
+  `TOOL-aHoistedPass-2`, which edits the same template one order later, does not — it asserts exit 0
+  and moves nothing.
 
 ## 3. Non-goals (OUT)
 
@@ -261,7 +270,34 @@ the argument is good.
 
 - **AC1** — When `bash tools/check-template-size.sh memory/guides/BUILD-METHOD.md` runs on the
   untouched post-raise tree, it exits 0 and prints one `template-size OK` line naming the measured
-  bytes against `27648`. This is the third staged observation: an untouched file passes.
+  bytes against `27648`, **and its output carries no line matching `no-ratchet`**. This is the third
+  staged observation: an untouched file passes.
+
+  **The `no-ratchet` clause is the fix for a criterion that could not fail.** Section 4's declaration
+  6 records that without the high-water row the leg prints
+  `TEMPLATE-SIZE no-ratchet ... growth is unpriced` on every bar AT EXIT 0
+  (`tools/check-template-size.sh:178`) and still prints the OK line after it. So the old AC1 — exit 0
+  plus one OK line — was satisfied exactly as well by skipping S9 entirely, and AC12's green bar
+  tolerated it too. Skipping it would have left the new leg permanently announcing that the growth it
+  was built to price is unpriced, with nothing failing. A checker that announces its own blindness and
+  then exits 0 is the reassuring-zero shape §7 names.
+- **AC13** — When `tools/template-size-highwater.txt` is read on the landing tree, it carries a row
+  keyed on `memory/guides/BUILD-METHOD.md`, written by S9's `--bump` and not by hand.
+- **AC14** — When `grep -c 'No gate enforces the pair' tools/memory-tree/BUILD-METHOD.template.md`
+  and the same over `memory/guides/BUILD-METHOD.md` both run on the landing tree, both return `0`,
+  and the sentence that replaced it NAMES the build-method size leg and STATES that the line axis
+  stays ungated. S2's replacement text had no criterion at all: AC10's dogfood-parity run compares
+  template to render for byte identity modulo substitution, which holds equally well over the
+  unrevised sentence, and the new pair term reads only the `**Budget:` line. Skipping S2 would have
+  landed the leg while the document kept telling every reader that nothing enforces its budget — a
+  false claim in the exact file whose false claim this unit exists to remove.
+- **AC15** — When `bash tools/check-kit-versions.sh` runs on the landing tree, it exits 0 with
+  `KIT_MEMORY_TREE_VERSION` and every tracked `memory-tree` marker reading `2.61`; and when ONE
+  carrier is staged back to `2.60`, it exits non-zero NAMING that carrier. Without this criterion the
+  S12 bump had no observation anywhere in the build: this spec's own §7 records that
+  `check-kit-versions.sh` grades presence and agreement while `check-verdict-epoch.sh`'s scan set
+  excludes templates, so skipping the bump left every leg green and — with no AC — no ledger line
+  recording the skip either.
 - **AC2** — When filler is appended to a scratch copy of `memory/guides/BUILD-METHOD.md` until it
   exceeds 27648 bytes and the gate is run against it, it exits `1` with the message
   `the file is over its size budget`, naming the file, the measured bytes and the overage. Staged,
@@ -399,6 +435,19 @@ and that one edits the same template at `order 3`; the second asserts
   premise re-verified at BASE and HOLDS - `tools/memory-tree/BUILD-METHOD.template.md:8` still reads
   `**Budget: <=24 KB, <=350 lines**` and `tools/template-size-limits.txt` still carries no row for the
   rendered guide.
+- rev-3 - 2026-09-05 - folded round-1 spec-audit findings 1, 5 and 9, which are one class three
+  times: a scope obligation nothing grades. **1** - section 8's F1 sweep assigned this unit the
+  `memory-tree` 2.60-to-2.61 bump and that work appeared in no scope item and no criterion. The
+  spec's own section 7 says why nothing would have caught it: `check-kit-versions.sh` grades presence
+  and agreement, `check-verdict-epoch.sh` excludes templates, and `TOOL-aHoistedPass-2` had already
+  stood down from moving it. Added as S12 with AC15 naming both the target and a staged failing case,
+  and with the carrier set DERIVED by the checker rather than counted in prose. **5** - S9 seeds the
+  leg's high-water row and AC1 did not exclude the `no-ratchet` line the missing row produces at
+  exit 0, so skipping S9 satisfied AC1 exactly. AC1 now excludes that line and AC13 asserts the row.
+  **9** - S2 replaces the now-false "No gate enforces the pair" sentence and nothing observed the
+  replacement; AC14 greps the phrase to 0 in both halves and asserts what the new sentence must say.
+  A fork resolution can create work no criterion reaches, so the gate this class argues for must read
+  section-8 resolutions as scope and not only `S<n>` rows.
 
 ## 10. Reuse audit
 

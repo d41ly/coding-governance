@@ -1,12 +1,13 @@
 # TOOL-aHoistedPass-9 — the adopter without the harness is told, on every bar
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 DEPL-aHoistedPass-1 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -34,8 +35,13 @@ the population the install-time arm can never reach.
   never from a literal install prefix.
 - **S6.** Four staged-break arms plus one green control in `tools/unattended/check-unattended.test.sh`,
   of which one is the positive assertion `fail 31` owes under the arms meta-gate.
-- **S7.** The `unattended` kit version bump 1.17 → 1.18 the payload change owes: three engine
-  constants and the marker in all five tracked `tools/unattended/*.template.md`.
+- **S7.** ~~The `unattended` kit version bump 1.17 → 1.18 the payload change owes: three engine
+  constants and the marker in all five tracked `tools/unattended/*.template.md`.~~ — **SPENT.**
+  `DEPL-aHoistedPass-1`'s section 8 F1 takes that single move at `order 2`; this unit is at `order 6`
+  and the version is already `1.18` by the time it runs. What this unit owes instead is an
+  ASSERTION: `bash tools/check-kit-versions.sh` exits 0 at whatever version the earlier order set,
+  and this unit moves it no further. A kit version is a release, not a per-commit stamp, so a second
+  bump inside one build records a release that never shipped.
 
 ## 3. Non-goals (OUT)
 
@@ -187,20 +193,30 @@ minted, so `memory/map/features/unattended.md` keeps its `[claims]` block unchan
 ### Rollout
 
 Lands as one commit after `TOOL-aHoistedPass-2`. It is a read-only check on a read-only leg; the
-rollback is deleting the block. The kit version bump 1.17 → 1.18 rides the same commit and, under
-ruling D1, makes this an owner turn transitively, because `tools/check-kit-versions.sh:164-192`
-requires the marker in every tracked `tools/unattended/*.template.md` and `SKILL.template.md` is one
-of the five.
+rollback is deleting the block.
+
+**This unit is NOT an owner turn, and the correction matters more than the classification does.**
+rev-1 derived owner-turn status transitively from carrying the `1.17 → 1.18` bump, because
+`tools/check-kit-versions.sh:164-192` requires the marker in every tracked
+`tools/unattended/*.template.md` and `SKILL.template.md` is one of the five. That coupling is spent:
+`DEPL-aHoistedPass-1` performs the move at `order 2` and this unit no longer touches a template
+marker at all. The files it does edit are `check-unattended.sh` and its test file, neither of which
+is on ruling D1's veto-2 list. **A classification derived from an edit the unit does not make is the
+one class of spec defect that changes whether an unattended run may land the unit at all**, which is
+why this paragraph now names the carriers this unit actually edits rather than a bump it does not
+own.
 
 ### Files touched (estimate)
 
 | file | change |
 |---|---|
-| `tools/unattended/check-unattended.sh` | the check-31 block after `:2903`; `KIT_UNATTENDED_VERSION` at `:40` |
+| `tools/unattended/check-unattended.sh` | the check-31 block after `:2903` |
 | `tools/unattended/check-unattended.test.sh` | four staged arms plus a green control |
-| `tools/unattended/unattended.sh` | `KIT_UNATTENDED_VERSION` at `:42` |
-| `tools/unattended/check-pass-order.sh` | `KIT_UNATTENDED_VERSION` at `:29` |
-| five tracked `tools/unattended/*.template.md` | the `gov:kit unattended@` marker |
+
+Two rows left this table at rev-2 with S7: `tools/unattended/unattended.sh` and
+`tools/unattended/check-pass-order.sh` were booked for their `KIT_UNATTENDED_VERSION` constants, and
+the five tracked `tools/unattended/*.template.md` for their `gov:kit unattended@` marker.
+`DEPL-aHoistedPass-1` owns all seven at `order 2`. This unit reads them and edits none.
 
 ### Alternatives rejected
 
@@ -276,9 +292,13 @@ of the five.
 - **AC10** — When `bash tools/unattended/check-unattended.test.sh` is run to completion, sharded as
   `--shard 1/2` and `--shard 2/2`, it reports PASS with a raised assertion count and no existing
   `GOV_UNATTENDED_REPORT=1` arm flips on the new line.
-- **AC11** — When `bash tools/check-kit-versions.sh` runs after the bump, it exits 0 with
-  `KIT_UNATTENDED_VERSION=1.18` in the three engine constants and the matching marker in all five
-  tracked `tools/unattended/*.template.md`.
+- **AC11** — When `bash tools/check-kit-versions.sh` runs on the landing tree it exits 0, with the
+  three `unattended` engine constants and the marker in all five tracked
+  `tools/unattended/*.template.md` AGREEING — whatever value `DEPL-aHoistedPass-1` set. **No literal
+  version number appears in this criterion, and that is the fix rather than an omission.** rev-1
+  asserted `KIT_UNATTENDED_VERSION=1.18`, which at `order 6` is green because a different unit moved
+  it; a criterion that passes on somebody else's work witnesses nothing about this one. AC13 below is
+  what witnesses this unit.
 - **AC12** — When `bash tools/check-install-prefix.sh` runs, it exits 0 and
   `tools/install-prefix-carried.txt` still records 3 for this checker, because the block spells no
   install-prefixed literal.
@@ -355,6 +375,20 @@ build exists to remove.
   their recommendations. Premise re-derived at the run's BASE `e828f778`:
   `tools/unattended/check-unattended.sh` still carries no check 31, so the number this unit claims is
   still free 66 commits after the spec's base.
+- rev-3 - 2026-09-05 - folded round-1 spec-audit finding 20, which is one member of a four-unit
+  collision the round found: `DEPL-aHoistedPass-1`, `TOOL-aHoistedPass-2`, `TOOL-aHoistedPass-7` and
+  this unit each scoped the SAME single `unattended` 1.17-to-1.18 move. Section 8's F1 sweep gave it
+  to `DEPL-aHoistedPass-1` at `order 2`; at `order 6` the whole of S7 was spent. S7 is struck rather
+  than deleted, so the record keeps that it was claimed. Two consequences beyond the strike, and the
+  second is the reason the finding was rated high rather than medium. AC11 asserted the literal
+  `1.18` and would have stayed green because a different unit moved the version - a criterion
+  witnessing somebody else's work - so it is restated as a pure agreement assertion with no literal.
+  And section 4's Rollout derived this unit's OWNER-TURN status transitively from owning the bump,
+  through `SKILL.template.md`'s marker under ruling D1. With the bump gone that derivation is hollow
+  and the classification is WRONG in the direction that matters: it said an unattended run may not
+  land this unit without an owner. Re-derived from the carriers this unit actually edits -
+  `check-unattended.sh` and its test file, neither on the veto-2 list - it is not an owner turn.
+  Files-touched loses the two constant rows and the five template-marker row.
 
 ## 10. Reuse audit
 

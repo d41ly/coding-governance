@@ -1,12 +1,13 @@
 # DEPL-aHoistedPass-1 — a declared kit dependency that is actually checked
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 |
 
 <!-- /gen:spec-records -->
 
@@ -32,6 +33,12 @@ arm in `selfcheck`, and an installed-set refusal in the verb that actually insta
 - **S6.** Arms for both new branches, at the existing `requires` seam in `tools/govkit/selftest.py`
   (`:2405-2430`), plus repair of the nine existing `--kits` call sites arm B newly refuses.
 - **S7.** Both refusal strings name the REMEDY, and neither spells a `tools/` path literal.
+- **S9.** File the TWO backlog rows this spec's own section 3 and section 4 defer to, in
+  `memory/backlog/DEPL.md`: the mis-spelled `require` key class, and the stale `BRANCH_PIN` /
+  `FILE_PIN` re-baseline. Both are already booked in section 4's Files-touched table and both are
+  arguments this design leans on to justify narrowing its own scope, so neither may be left as an
+  implied record. The sibling `TOOL-aHoistedPass-1` S3 is the convention: filing a backlog row is an
+  explicit scope item, never a side effect of a deferral sentence.
 - **S8.** The version bumps the changed payload owes: `KIT_GOVKIT_VERSION` (`govkit.py:44`) and the
   `unattended` kit version, the latter subject to fork F1.
 
@@ -261,8 +268,23 @@ path — the ratchet is a BAN (`check-install-prefix.sh:315-319`), so any rise i
   was run by hand and gives the exit code.
 - **AC9** — When `python tools/govkit/refusal_join.py` runs, it exits 0 and reports a branch count
   exactly two higher than the 244 measured at this base, with `BRANCH_PIN` unmoved at 217.
-- **AC10** — When `bash tools/check-kit-versions.sh` runs, it exits 0 with `KIT_GOVKIT_VERSION` and
-  every `unattended` carrier agreeing.
+- **AC10** — When `bash tools/check-kit-versions.sh` runs, it exits 0 with `KIT_GOVKIT_VERSION` at
+  **`1.10`** and all eight `unattended` carriers at **`1.18`**; and when ONE of those carriers is
+  staged back to `1.17`, it exits non-zero NAMING that carrier.
+
+  **The target numbers and the staged failing case are both load-bearing, and their absence was the
+  defect.** rev-2's AC10 asserted only that the checker "exits 0 with `KIT_GOVKIT_VERSION` and every
+  `unattended` carrier agreeing", which is satisfied at `1.9`/`1.17` exactly as at `1.10`/`1.18` —
+  this spec's own F1 says why, because `check-kit-versions.sh` grades marker presence and
+  marker/constant agreement and no branch of it reads a diff. Since section 8's F1 makes THIS the unit
+  that performs the `unattended` move for the whole build and stands `TOOL-aHoistedPass-2` down on the
+  strength of it, both units could have shipped green with the kit still at `1.17`. The
+  `KIT_GOVKIT_VERSION` half was named nowhere in the build at all. This is §7's rule — a new gate is
+  not landed until its failing case has been observed — applied to an acceptance criterion: an AC
+  whose only observation is that a checker exits 0 is an assertion about nothing.
+- **AC14** — When `git grep -c` runs over `memory/backlog/DEPL.md` on the landing tree, it finds the
+  mis-spelled-`require`-key row and the stale-pin row S9 files, each carrying its reason, so section
+  4's Files-touched table and section 2's scope agree about that file.
 - **AC11** — When `bash tools/check-install-prefix.sh` runs, it exits 0 and
   `tools/install-prefix-carried.txt` is unchanged, because the two new strings name kit ids and no
   `tools/` path.
@@ -355,6 +377,18 @@ spec's own recommendations and neither adds a carrier beyond this unit's ratifie
   BASE `e828f778` rather than at `c4fcf5ad`: `tools/unattended/kit.toml:7` still reads
   `requires = ["memory-tree"]` and `KIT_UNATTENDED_VERSION=1.17` still stands at
   `tools/unattended/unattended.sh:42`, so both premises hold 66 commits on.
+- rev-4 - 2026-09-05 - folded round-1 spec-audit findings 2 and 24. **2** - AC10 was
+  green-by-construction over the one move section 8's F1 resolution had just made this unit's
+  responsibility for the whole build. It asserted agreement and named no target, and
+  `check-kit-versions.sh` grades agreement rather than movement, so `1.9`/`1.17` satisfied it exactly
+  as `1.10`/`1.18` would - and `TOOL-aHoistedPass-2` had already stood down from the same move on
+  the strength of this unit taking it. AC10 now names both target values AND a staged failing case,
+  which is the charter's observed-failing-case rule applied to an acceptance criterion rather than to
+  a gate. **24** - two backlog rows that section 3 and section 4 both defer to, and that section 4's
+  Files-touched table already books, had no scope item and no criterion; a green landing would have
+  closed the unit with both residuals unrecorded, one of them the stale-pin argument AC9 leans on to
+  accept `BRANCH_PIN` at 217 against a live 244. Added as S9 with AC14 witnessing it, following the
+  sibling convention that filing a backlog row is an explicit scope item.
 
 ## 10. Reuse audit
 
