@@ -57,10 +57,12 @@ from an operator's install command to them.
 - **No new deployer machinery, in the SELECTION-EXPANDING sense.** No `implied_by`, no
   reverse-`requires`, no rule that selecting an entry drags in a conditional one that requires it.
   `resolve_selection` returns exactly what it returns today. **This bullet's justification is
-  narrower than it looks and §8 F2 is still OPEN over it**: the opt-in variant F2 raises escapes
-  every argument written against `implied_by`, and the owner re-opened that fork knowingly. What
-  makes the ban safe to carry at this rev is that nothing in this unit turns on the answer — S1 and
-  S2 land identically either way.
+  narrower than it looks, and §8 F2 now closes the gap rather than leaving it open**: the opt-in
+  variant F2 raises escapes every argument written against `implied_by`, so the ban does not reach it
+  and never did. F2 rejects that variant on its own terms — a new public surface M3's veto 2 discards,
+  serving a population of zero — which is what makes the ban safe to carry as a scope line instead of
+  an open question. Nothing in this unit turned on the answer in any case: S1 and S2 land identically
+  either way.
 - **The two guards this unit BUILDS assert, they do not expand.** S4 and S5 are `r.fail` arms in
   `cmd_selfcheck`. They read declarations and grade them; neither adds a member to any selection,
   writes a descriptor key, or touches `resolve_selection`. That distinction is what keeps S5 clear of
@@ -884,8 +886,12 @@ three are the owner's and one is delegated, and each mark says which.
   prevent. §8's preamble is rewritten from *three of four* to *all four*, and it now says the header's
   `ratified` token covers three owner marks and one delegated one rather than four owner marks. The
   header gains `ratified 2026-09-06` and the status stays SPECCED, which is now the accurate pair:
-  every fork carries a conforming mark and no code has been written. No scope item, acceptance
-  criterion, design section or figure moved.
+  every fork carries a conforming mark and no code has been written. No acceptance criterion, design
+  section or figure moved. **One §3 bullet did move**, and it was found by the M6 bug-class checklist
+  rather than by re-reading: the `implied_by` ban's justification said in its own words that F2 was
+  still open over it, which is `amendment-leaves-its-other-half-standing` — the clause that only made
+  sense under the old status, left behind. It now states what F2 decided and why the ban does not
+  reach the opt-in shape. The ban itself is unchanged.
 
 ## 10. Reuse audit
 
