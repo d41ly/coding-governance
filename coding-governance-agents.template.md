@@ -321,7 +321,7 @@ matched its target population.
 - Every row carries a NEGATIVE — `build` not `create`, `load` not `fetch` — because a row with only a positive gloss cannot tell two verbs apart, and the boundary is the whole product.
 - The corpus decides WHICH concepts the table holds, never what any of them is CALLED: seed spellings from a prescriptive source OUTSIDE the tree, freeze the result, and mark a human curated it — a table ranked from the code it grades is a mirror, the one shape a naming gate must not have (§7). Measure every pin against THIS corpus.
 - Declare a COVERAGE MODE per language — parser, probe (incomplete by construction, reported so every run), or explicitly dark — and make an undeclared one a named refusal, never a silent skip.
-- **The rows themselves are NOT restated here.** They live in the declaration, and the kit renders them into a Skill its own gate byte-compares, so an edit nobody re-rendered reds. Ask it per name rather than reading a copy: the kit's `--suggest` answers one identifier from the declaration alone.
+- **The rows themselves are NOT restated here.** They live in the declaration, and the kit renders them into a Skill its own gate byte-compares, so an edit nobody re-rendered reds. Ask it per name rather than reading a copy: the kit's `--suggest` answers one identifier from the declaration and the shipped canon.
 <!-- /kit:lexicon -->
 
 ## §14 — Session execution hygiene (per-call token discipline)

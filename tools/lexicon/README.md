@@ -33,8 +33,8 @@ not a silent skip.
 | Block | Row | Means |
 |---|---|---|
 | `VERBS` | `<verb>  <gloss>` | the closed verb table P1 grades against; the gloss carries the NOT clause |
-| `CELLS` | `<ext>.<surface>  <convention> [vocab] [notail]` | which case convention this (language, surface) cell asks for |
-| `PINS` | `<ext>.<surface>.<predicate>  <count>` | the declared offender count for one cell and one predicate |
+| `CELLS` | `<ext>.<surface>[+<kind>:<literal>]  <convention> [vocab] [notail]` | which case convention this (language, surface) cell asks for |
+| `PINS` | `<cell>.<predicate>  <count>` | the declared offender count for one cell and one predicate |
 
 `surface` is one of `function` `type` `file` `constant`; `convention` is one of `snake` `screaming`
 `camel` `pascal` `kebab` `dark`; `predicate` is one of `debt` `unruled` `suffix` `conv`. A token
@@ -42,9 +42,53 @@ outside its closed set names the file and the line. `dot` is deliberately NOT a 
 convention: it is a classifier form the report uses so a dotted name is reported as satisfying
 something, and no language convention is "identifiers contain dots".
 
-Two refusals are CROSS-BLOCK and run after the whole file is parsed, because `LANGS` may be declared
-below `CELLS` and a reader that refuses on line order refuses a legal file. A `CELLS` row naming an
-extension `LANGS` does not declare reds, and a `PINS` row naming a cell with no `CELLS` row reds.
+Three refusals are CROSS-BLOCK and run after the whole file is parsed, because `LANGS` may be
+declared below `CELLS` and a reader that refuses on line order refuses a legal file. A `CELLS` row
+naming an extension `LANGS` does not declare reds; a `PINS` row naming a cell with no `CELLS` row
+reds; and a `decorator` selector on a language `LANGS` declares `probe` or `dark` reds, naming both,
+because decorators come from a real parse and that subset could only ever be empty.
+
+### The selector — routing a SUBSET of a cell to a second convention
+
+A `CELLS` row key may carry ONE selector clause, `+<kind>:<literal>`, with `kind` in `prefix`
+`decorator`. It splits the cell's population in two: the names the selector matches are graded ONCE,
+against the selector's own convention and its own pin, and they LEAVE the parent cell's population.
+The parent keeps its own row and grades the complement.
+
+```
+CELLS:
+  py.function                     snake
+
+  py.function+prefix:Test         pascal
+
+PINS:
+  py.function.conv                0
+
+  py.function+prefix:Test.conv    2
+```
+
+It exists for the languages whose case is a function of ROLE rather than of surface — Go's export
+rule, React's PascalCase components — where one `(language, surface)` cell would red half a correct
+codebase, and the only honest alternative is declaring the language `dark`.
+
+- **A routed name is graded once**, never against both conventions. Grading it twice would make
+  every routed name a guaranteed violation of one of the two cells.
+- **A name matching TWO selectors is REFUSED**, naming both literals, and is graded by neither. A
+  verdict that depends on which row the reader saw first is not a declaration. That refusal plus
+  `DEAD CELL` covers an overlapping pair completely: two selectors that CAN both match either do
+  both match some name, or one of them selected nothing and reds as a dead cell.
+- **A selector matching NOTHING reds** as a `DEAD CELL`, like any other cell grading an empty
+  population.
+- **A selector'd cell with no `PINS` row of its own reads as a pin of `0`.** It never inherits the
+  parent's count, and its offenders are never folded back into the parent's row — the two ratchet
+  separately, in both directions.
+- **The literal carries no dot**, because a `PINS` row key is `<cell>.<predicate>` split on the dot.
+  A dotted decorator (`@app.route`) is matched on its LAST segment, so it is selectable as `route`.
+- There is no regex kind, and no suffix or infix kind. A predicate language over names is a second
+  grading language inside a naming gate; the two motivating populations use a prefix.
+
+The selector row prints directly beneath its parent, with its own count, denominator and rule, so a
+routed subset is visible rather than a silent subtraction from the row above it.
 
 **Pin rows are BLANK-SEPARATED, and the reader refuses a dense pair.** That whitespace is a merge
 property rather than a formatting preference: two branches each draining a neighbouring cell conflict
@@ -96,11 +140,52 @@ explicit `dark` declaration — not a silent skip.
 failed. A cell reporting zero violations and nothing else is indistinguishable from a cell whose
 predicate never ran, and the teeth are what tell the two apart on a green run.
 
-`constant` is a declarable surface with no extractor in this kit yet, so a `constant` cell prints
-`SKIPPED … UNEXERCISED` rather than a clean zero. `screaming` and `pascal` are declarable;
-`dot` is a classifier form only. Shell and markdown are dark in this repo's own `LANGS`, so no cell
-over them can be armed at all — a `sh.file` cell is legal because `sh` is DECLARED dark, while
-`sh.function` would grade an empty population, which is why the row prints its denominator.
+**Every row also prints the POPULATION RULE that selected its denominator**, because a count with no
+rule beside it reads as coverage when it is only a scope:
+
+    lexicon: py.constant.conv 0 of 352 against screaming — violation 0, ambiguous 0,
+    teeth camel=352 kebab=352 pascal=241 snake=352;
+    population 352 of 736 (rule: public simple module-body assignments)
+
+The denominator is the WIDER population the rule narrowed, not the graded count restated. A row
+whose two figures are equal is legal and common — every `function` cell narrows nothing — and the
+point of printing both is that `py.constant` does. The rule string is DECLARED beside its selector
+in `CELL_POPULATION_RULES`, never derived from a docstring: two carriers of one fact with no gate
+comparing them is the class this kit exists to close.
+
+`screaming` and `pascal` are declarable; `dot` is a classifier form only. A surface in the closed
+set with no row in `CELL_POPULATION_RULES` is an `UNRULED SURFACE` refusal — the cell would grade
+nothing while reporting a clean zero, which a skip that looks like a pass always does. `sh.function`
+is this declaration's first armed cell, over the 607 definitions the shell tokenizer reads, against
+`snake`; `py.constant` is its second.
+
+## The three cell refusals, and what each does NOT check
+
+**`DEAD CELL`** — a declared, armed cell whose population rule selected NOTHING. It replaces a
+report: the engine printed `armed but grading nothing` for the whole life of the declaration and
+nothing ever acted on it, which is the green-by-absence class wearing a different label. Two
+exemptions, both the same argument — an empty population is evidence only where a non-empty one was
+possible. A `dark` row is a declared refusal to grade, so its zero is the declaration working. An
+extension the corpus carries no file of is an `INERT DECLARATION`, which this engine already
+reports one arm over; redding a cell for it would make two refusals disagree about one tree.
+**It does not check** an armed EXTENSION with no cell row at all — that is `DEAD PROBE`, which is
+still shipped and is not subsumed.
+
+**`DEAD CELL REPORT`** — the report's own liveness, asserted as PARITY against the parsed `CELLS`
+block rather than as "more than zero", so it catches the single row that goes missing as well as the
+table that empties. **It does not check** a declaration carrying no `CELLS` block at all: that is a
+legal inert state every adopter passes through, and refusing it would red every tree that installed
+this kit before the block existed.
+
+**`UNDECLARED CELL`** — an (extension, surface) pair the extractors produced a non-empty population
+for, with no `CELLS` row. It **REPORTS and does not refuse** while `UNDECLARED_CELL_ARMED` is
+`False` in `lexicon.py`, which is how it ships: armed against a declaration whose matrix is
+incomplete it would refuse populations nobody has ruled on yet. Whichever change first writes a full
+matrix flips that constant in the same commit. **It does not check** the `file` and `constant`
+surfaces. Their populations are computed by a declared cell's own selector, so an undeclared one of
+those has no population to be non-empty and this arm cannot see it — the run says so on the line
+below the list, every time. A reader who takes that list for the whole undeclared population is
+reading a scope as a coverage claim.
 
 ## ...and the refusal that is not a predicate
 
@@ -132,9 +217,47 @@ undeclared one is a named refusal.
 
 | Mode | Extractor | Standing |
 |---|---|---|
-| `parser` | a real parse (Python `ast`) | complete over its extension |
+| `parser` | a real parse | complete over its extension |
 | `probe` | a regex pattern set | incomplete BY CONSTRUCTION, reported as such every run |
 | `dark` | none, declared explicitly | named every run, never silently absent |
+
+TWO PARSERS SHIP and the `LANGS` row's pattern-set id says which runs: `python-ast` is `ast`,
+`shell-tokens` is the tokenizer below. A `parser` row naming neither is a refusal, not a
+fallthrough to Python. A new mode TOKEN was the other shape available and it is refused:
+`drift-audit` ranks `parser` above `probe` above `dark` and reads an unknown mode as ABSENT, so
+a language moving from `dark` to a freshly named mode would score as a weakening and fire a
+ratchet finding on a strengthening edit.
+
+### `shell-tokens` — what it reads, and the three things it refuses
+
+A tokenizer rather than a regex, and the reason is measured rather than argued. Over the 94
+tracked `.sh` files in this repo the naive same-line pattern reads 608 definitions, and a
+heredoc-aware refinement of the SAME pattern reads substantially fewer — two regex readings of one
+population, each wrong where the other is not. Only the naive count is quoted, because it is the
+only one that reproduces: an earlier revision of this page and the engine header each carried a
+figure for the refinement, the two disagreed, and the refinement itself was never committed, so
+no reader could re-derive either. The refinement loses real definitions to a `grep` for a merge
+conflict marker, whose run of `<` it takes for a heredoc
+opener; the naive pattern gains a JavaScript `function f() { … }` sitting inside a `<<'EOF'`
+body. A number a second regex moves by half is not a population.
+
+It tracks single quotes, double quotes as a STATE, `$'…'`, backslash escapes and line
+continuations, `#` comments at a word boundary, `${…}` and `$((…))`, backticks, command
+substitution as suspended-string-state code with its own nesting, heredocs with quoted and
+unquoted delimiters in both the plain and `<<-` forms, and here-strings. It recognises four
+definition forms: `name() { … }`, `function name { … }`, `function name() { … }` and the
+subshell body `name() ( … )`, with the body free to open on a later line.
+
+It REFUSES three things, and the header of `parse_shell_defs` is where they are enumerated
+because two of them have no runtime behaviour to observe. A file it cannot tokenize RAISES
+naming the construct and the line — never a partial list, and never an empty one, because an
+unreadable file under an armed declaration is a broken corpus. A definition built by `eval` or
+arriving by `source` is NOT found: there is no definition site to grade. A definition inside a
+heredoc BODY is not a definition. It returns empty lists for types and imports, which shell has
+neither of in any sense this kit grades.
+
+It is not an interpreter and is not a step toward one: it tokenizes and locates, and never
+evaluates, expands or runs what it reads.
 
 `dark` is the honest cheap declaration, not a cop-out: most extensions in a tree carry no
 definitions at all, and declaring them dark is what makes the undeclared-extension refusal
@@ -188,7 +311,8 @@ a real state: an extension can be armed, report a healthy total, and have one of
 grading ZERO. A pair in that state is NAMED every run and does **not** red:
 
 ```
-lexicon: armed but grading nothing (reported, not a refusal): .js suffix=0
+lexicon: armed but grading nothing, UNDECLARED as a cell (reported, not a refusal;
+a DECLARED cell at zero is a DEAD CELL refusal above): .js suffix=0, .sh suffix=0
 ```
 
 **That is a report on purpose, and the reason is the difference between two things a single tree
@@ -202,7 +326,7 @@ Every run also prints the COVERAGE FRACTION — the armed share of the tracked f
 definition at all:
 
 ```
-lexicon: coverage — armed 54 of 128 definition-carrying file(s) (42.2%)
+lexicon: coverage — armed 140 of 141 definition-carrying file(s) (99.3%)
 ```
 
 **What it does NOT measure is extraction QUALITY.** It answers "is this file's language graded by
@@ -241,9 +365,11 @@ python tools/lexicon/lexicon.py --suggest <identifier>   # one line, no corpus p
 bash tools/lexicon/adopt-lexicon.sh --render             # re-render the Skill after a declaration edit
 ```
 
-`--suggest` answers from the declaration alone. Off-table, it names the REPLACEMENT and quotes the
-negative that bans what you tried — `use load_remote — the declaration says load, NOT fetch: read a
-store into memory` — which is why the NOT clauses are the product rather than decoration.
+`--suggest` answers from the declaration FIRST and the shipped canon second, in that fixed
+precedence, and from no corpus at all. Off-table, it names the REPLACEMENT and quotes the negative
+that bans what you tried — `use load_remote — the declaration says load, NOT fetch: read a store
+into memory` — which is why the NOT clauses are the product rather than decoration. Where no row
+bans the token by name the canon answers instead, and the line says which source spoke.
 
 **It is not a gate, structurally.** It cannot exit 1, it prints no pin, and nothing in
 `scaffold_lexicon.py` imports it — so what the corpus DOES has no code path to becoming what it
@@ -251,8 +377,38 @@ SHOULD do. A promise would not survive a refactor; the absence of a return path 
 
 `TOOL-aSurfacedLexicon-3` deleted two further modes: a per-FILE reading, which reported how the
 corpus already spelled one file's objects, and a pre-adoption report over the shipped canon. Nothing
-in this kit restores a per-FILE reading; `TOOL-aSurfacedLexicon-8` wires `--suggest` to the canon,
-which is the per-NAME half. The pre-adoption reading survives, below.
+in this kit restores a per-FILE reading. The per-NAME half is back:
+`TOOL-aSurfacedLexicon-7` wired `--suggest` to the canon, which is the DEBT half below. The
+pre-adoption reading survives, further down.
+
+### DEBT and UNRULED — the two halves of a P1 offender
+
+A P1 offender is a definition whose leading token the declaration does not carry, and until
+`TOOL-aSurfacedLexicon-7` that was the whole message. A gate that says no and nothing else gets
+waived rather than obeyed, so the offender is now CLASSIFIED against the shipped canon:
+
+| Class | The test | What the line says |
+|---|---|---|
+| DEBT | the token is a key of `canon.build_form_index()` | the replacement identifier, its representative, and that verb's gloss |
+| UNRULED | it is not | that no cluster holds it, plus how many definitions corpus-wide lead with it |
+
+The distinction is the product. DEBT is a rename the kit can hand you. UNRULED is a scoping question
+no vocabulary can answer: the token either names a responsibility the table should carry, or the
+function does more than one thing. The site count is what tells those apart — a token with one site
+is a name to fix, one with eighteen is a house idiom that joins the table or gets renamed everywhere.
+
+**`--suggest` reads the two sources in a fixed precedence.** The declaration's own inverted `NOT`
+clauses win, because the owner wrote that negative and the canon did not; only where no row bans the
+token by name is the canon asked. Where the canon's representative is not itself a declared `VERBS`
+row it is still proposed, and the line says the row is owed — suppressing the advice would leave the
+author with a refusal and nothing else, which is the defect this path exists to close.
+
+**A `vocab` flag on a `CELLS` row splits that cell's ratchet in two**, `<cell>.debt` and
+`<cell>.unruled`, both two-sided equalities like every other pin. `--measure` emits the pair for
+every armed `vocab` cell, blank-separated because `PINS` refuses two adjacent rows, and a cell with
+no `CELLS` row gets no pin row at all. The scalar `VERB_OFFENDER_PIN` keeps grading the whole
+population beside them: it is a single bucket over two populations, so a rename moving a definition
+from DEBT to UNRULED inside one cell holds the total and greens there while both cell rows red.
 
 ### Reading a repo BEFORE you adopt
 

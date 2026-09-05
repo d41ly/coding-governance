@@ -19,9 +19,20 @@ shell and declares that language recall-dark instead, because a regex over shell
 look like coverage while silently skipping what it forgot. That law binds here, so every extension
 in the corpus carries a DECLARED mode and an undeclared one is a named refusal:
 
-    parser  a real parse (Python `ast`)   complete over its extension
+    parser  a real parse                  complete over its extension
     probe   a regex pattern set           incomplete BY CONSTRUCTION, reported as such every run
     dark    none, declared explicitly     named every run, never silently absent
+
+TWO PARSERS SHIP, and which one runs is the `LANGS` row's pattern-set id, not a second mode token:
+`python-ast` is `ast`, `shell-tokens` is the tokenizer in `parse_shell_defs`. That law above is why
+the shell one is a tokenizer: the naive same-line regex over this corpus over-counts a JavaScript
+function sitting inside a bash heredoc, AND a heredoc-aware refinement of that same regex loses
+real definitions to a quoted run of `<` characters it mistakes for an opener. Two regex readings of
+one population, each wrong where the other is not, which is the whole argument for tokenizing.
+NO FIGURE IS QUOTED HERE and the omission is deliberate: this header and the kit README each
+carried a number for that loss, they disagreed with each other, and the refinement that produced
+either was never committed, so neither could be re-derived. The reproducible one is the naive
+count, and it lives in the build record with the command. TOOL-aSurfacedLexicon-14.
 
 VACUITY IS THE DOMINANT FAILURE MODE, not false positives — a predicate that selects an empty
 population passes green forever and tells you nothing. Three checks push back:
@@ -51,8 +62,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+import canon  # noqa: E402
 from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, langs, load_conf,  # noqa: E402
-                          build_negatives)
+                          build_negatives, parse_cell_key)
 from subtokens import check_convention, leading_verb, read_stem, subtokens  # noqa: E402
 
 KIT_LEXICON_VERSION = "1.1"
@@ -69,7 +81,8 @@ WAIVER_FILES = {
 #: code paths, and they do not — `extract_text` dispatches on `mode` alone and reads `pset` only
 #: under `probe`, so nothing anywhere compares a pattern-set id against `""`. A fix comment is read
 #: as provenance, so an overstated one is worse than none. Closing review M7, trimmed by round 2.
-KNOWN_EXTS = {"py": ("python-ast", "parser"), "js": ("js-regex", "probe")}
+KNOWN_EXTS = {"py": ("python-ast", "parser"), "js": ("js-regex", "probe"),
+              "sh": ("shell-tokens", "parser")}
 
 PIN_KEYS = {"verb": "VERB_OFFENDER_PIN", "suffix": "SUFFIX_OFFENDER_PIN"}
 
@@ -163,15 +176,150 @@ def scan_definition_carriers(root: Path, files: list[str]) -> set[str]:
 class Offender:
     """One finding. `text` is the WAIVER KEY, and it is the matched text rather than
     `<path>:<line>` on purpose: `install-prefix-waivers.txt` keys on position and any edit ABOVE a
-    waived line unpins it, which reds a merge that touched nothing the waiver guards."""
+    waived line unpins it, which reds a merge that touched nothing the waiver guards.
 
-    __slots__ = ("kind", "path", "line", "text", "detail")
+    `verb` and `cls` carry TOOL-aSurfacedLexicon-7's P1 split and are `None` for every other
+    predicate. `cls` is `"debt"` when the canon holds a cluster for the leading token — the kit can
+    name the rename — and `"unruled"` when it does not. It is stored rather than re-derived because
+    the report, the per-cell pins and the site census all read the same classification, and three
+    readers each asking `canon.build_form_index()` again is three chances to answer differently.
+    """
 
-    def __init__(self, kind, path, line, text, detail):
+    __slots__ = ("kind", "path", "line", "text", "detail", "verb", "cls")
+
+    def __init__(self, kind, path, line, text, detail, verb=None, cls=None):
         self.kind, self.path, self.line, self.text, self.detail = kind, path, line, text, detail
+        self.verb, self.cls = verb, cls
 
     def __str__(self):
         return f"{self.path}:{self.line}: {self.kind}: {self.text} — {self.detail}"
+
+
+def read_debt_gloss(verb: str, forms: dict | None = None) -> tuple[str, str]:
+    """`(representative, gloss)` for a token the shipped canon holds a cluster for; `("", "")` else.
+
+    THE SPLIT'S WHOLE CLASSIFIER, and it is one dict lookup on purpose. A P1 offender whose leading
+    token is a key of `canon.build_form_index()` is DEBT — the kit can name the rename it owes — and
+    one that is not is UNRULED, which is a scoping question no vocabulary can answer for the author.
+
+    THE CANON DECIDES THE SPELLING, NEVER THE STANDARD. `canon.py` is prescriptive, frozen in the
+    kit under `role = "engine"`, and was written without reading any adopter's corpus, so consulting
+    it here cannot turn what this repo already does into what it should do. The corpus is evidence
+    for exactly ONE thing on this path: which spellings become debt. TOOL-aSurfacedLexicon-7.
+
+    `forms` is the resolved index, passed by the corpus walk so 968 offenders do not rebuild it 968
+    times; `--suggest` grades one name and lets it default.
+    """
+    forms = canon.build_form_index() if forms is None else forms
+    rep = forms.get(verb, "")
+    return (rep, canon.read_gloss(rep)) if rep else ("", "")
+
+
+def render_swapped_name(name: str, want: str) -> str:
+    """`name` with its leading subtoken replaced by `want`, in the CALLER's own spelling.
+
+    ONE HOME FOR THE SWAP, because there are now two readers of it — the P1 offender line and
+    `--suggest` — and two implementations of "what should this be called instead" is the same defect
+    this kit exists to gate, one level up. TOOL-aSurfacedLexicon-7.
+
+    THE TAIL IS THE ORIGINAL SURFACE, SLICED. It is never re-derived, and two review rounds were
+    needed to land on that. Round 1 sliced by `len(verb)` while `leading_verb` had stripped the
+    leading underscores first, so the two disagreed about where the verb ended and `_fetch_conf`
+    suggested `_load_h_conf`. Round 2 found that rebuilding the tail out of `subtokens()` — the
+    round-1 fix — traded that for worse: the splitter lowercases, breaks acronym runs, splits digit
+    boundaries and drops anything outside its character class, so `getUserURLs` came back as
+    `readUserUrLs`, `fetch_v2_data` as `load_v_2_data` and `create$data` as `build_data` with the
+    `$` silently gone. Three of those had been CORRECT before the fix.
+
+    Slicing at the end of the FIRST SUBTOKEN's own surface is what both rounds were reaching for.
+    The splitter decides where the verb ends, which is the half round 1 had right; nothing
+    downstream re-spells a character the caller wrote, which is the half round 2 had right.
+    Separator style, case, acronym runs, digit suffixes, trailing underscores and characters the
+    splitter cannot even see all survive, because not one of them is ever regenerated.
+
+    THE VERB INHERITS THE CASE OF THE TOKEN IT REPLACES, so a SCREAMING_SNAKE name is not answered
+    in lower snake and a PascalCase one is not answered in camelCase. Round 1 answered every shape
+    in the declaration's own lowercase, which is a second way of handing back a name whose only
+    remaining defect is that the author must edit it before typing it.
+    """
+    lead = name[:len(name) - len(name.lstrip("_"))]
+    body = name[len(lead):]
+    toks = subtokens(name)
+    first = toks[0] if toks else ""
+    if not first or body[:len(first)].lower() != first:
+        # The splitter and the surface disagree. `leading_verb`'s contract allows that for a name
+        # with no word characters; answer with the bare verb rather than invent a tail for it.
+        surface, rest = "", ""
+    else:
+        surface, rest = body[:len(first)], body[len(first):]
+    if len(surface) > 1 and surface.isupper():
+        cased = want.upper()
+    elif surface[:1].isupper():
+        cased = want[:1].upper() + want[1:]
+    else:
+        cased = want
+    return lead + cased + rest
+
+
+def measure_vocab_cells(unwaived: list, cells: dict) -> tuple[dict, list]:
+    """`{cell: (debt, unruled)}` over every `CELLS` row carrying the `vocab` flag, plus refusals.
+
+    SCOPED TO THE CELLS THAT EXIST (S4). A pair with no `CELLS` row gets no pin row, so on a tree
+    whose declaration arms no `vocab` cell this returns `{}` and the scalar `VERB_OFFENDER_PIN` is
+    the only verb ratchet — which is the state this unit lands in, deliberately, because a `PINS`
+    row naming an undeclared cell is a `load_conf` refusal on the unguarded wiring leg.
+
+    THE TWO REFUSALS BELOW ARE WHY THIS IS NOT THREE INLINE LINES. A `vocab` flag on a surface P1
+    does not grade, or on a routed subset whose partition this census does not read, would count the
+    WHOLE extension's offenders under that row's name — a pin that ratchets a population it does not
+    describe. Both are named where they are written rather than reported as a plausible number.
+    """
+    rows: dict[str, tuple[int, int]] = {}
+    problems: list[str] = []
+    per: dict[str, list] = {}
+    for o in unwaived:
+        per.setdefault(f"{ext_of(o.path)}.{PREDICATE_SURFACES['verb']}", []).append(o)
+    for cell, (_conv, flags) in cells.items():
+        if "vocab" not in flags:
+            continue
+        _ext, surface, kind, _lit = parse_cell_key(cell)
+        if surface != PREDICATE_SURFACES["verb"]:
+            problems.append(
+                f"VOCAB ON THE WRONG SURFACE — the cell `{cell}` carries the `vocab` flag, but P1 "
+                f"grades the `{PREDICATE_SURFACES['verb']}` surface and this row names "
+                f"`{surface}`. Its debt/unruled pair would count a population the row does not "
+                f"describe, so it is refused rather than reported.")
+            continue
+        if kind:
+            problems.append(
+                f"VOCAB ON A ROUTED SUBSET — the cell `{cell}` carries the `vocab` flag on a "
+                f"`{kind}` selector. P1's offenders are censused per extension and not through the "
+                f"cell partition, so this row's pair would be its PARENT's count under a selector's "
+                f"name. Declare `vocab` on the parent row, or extend the census to the partition.")
+            continue
+        got = per.get(cell, [])
+        rows[cell] = (sum(1 for o in got if o.cls == "debt"),
+                      sum(1 for o in got if o.cls == "unruled"))
+    return rows, problems
+
+
+def render_pin_rows(rows: dict) -> list[str]:
+    """The `PINS:` rows for `measure_vocab_cells`'s census, BLANK-SEPARATED (S5).
+
+    The blank line is not formatting. `_parse_pins` REFUSES two rows whose line numbers differ by
+    one — TOOL-aSurfacedLexicon-4's S10, so that two branches draining neighbouring cells merge
+    clean — and this is the emitter that reader grades. A dense emission would produce bytes
+    `adopt-lexicon.sh --check` rejects on an unguarded leg, which is a `--measure` output nobody can
+    paste. Returned as a list of lines rather than one string so the caller decides the surround.
+    """
+    out: list[str] = []
+    for cell, (debt, unruled) in rows.items():
+        if out:
+            out.append("")
+        out.append(f"  {cell}.debt  {debt}")
+        out.append("")
+        out.append(f"  {cell}.unruled  {unruled}")
+    return out
 
 
 def tracked_files(root: Path) -> list[str]:
@@ -221,6 +369,361 @@ def _python_defs(src: str):
                 sep = "." if mod else ""
                 imports.append((dots + mod + sep + a.name, node.lineno))
     return funcs, types_, imports
+
+
+#: A shell function name, as this parser will accept one. Deliberately the SAME character class the
+#: naive same-line regex used, so the two populations are comparable name-for-name and the only
+#: difference between them is what the tokenizer could see that a line match could not.
+_SH_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+#: Characters that end a heredoc DELIMITER word. Not a general operator set — the tokenizer below
+#: dispatches on characters directly and this is the one place it needs a class.
+_SH_BREAK = " \t;&|<>\n"
+
+
+def scan_shell_tokens(src: str) -> list:
+    """`[(kind, text, line)]` for shell source: every CODE token, and nothing that is not code.
+
+    `kind` is `word` or `op`; `op` is one of `( ) { }`. Everything else the shell reads as syntax —
+    redirections, separators, pipes — is consumed as a word break and emitted as nothing, because
+    the four definition forms `parse_shell_defs` recognises need no other operator.
+
+    WHAT IT TRACKS, which is the whole reason this is not a regex: single quotes, double quotes as a
+    STATE rather than a span, `$'…'`, backslash escapes and line continuations, `#` comments at a
+    word boundary, `${…}` and `$((…))` as opaque expansions, backticks as an opaque span, command
+    substitution `$(…)` as suspended-string-state CODE with its own nesting, heredocs with quoted
+    and unquoted delimiters in both the plain and `<<-` tab-stripped forms, and here-strings `<<<`.
+
+    THE HERE-STRING IS WHY THE STATE MACHINE EXISTS. `<<<` and a literal run of `<` inside a quoted
+    grep pattern are indistinguishable to a line regex and trivially distinguishable here: a
+    heredoc-aware REFINEMENT of the naive pattern reads `'^<<<<<<< ours$'` in
+    `tools/memory-tree/merge-rows.test.sh` as an opener whose terminator never arrives and blanks
+    the thousand lines below it, losing ten real definitions. A tokenizer never enters that branch,
+    because the run is inside single quotes.
+
+    RAISES `SyntaxError` on a source it cannot tokenize — an unterminated quote, heredoc or `${`,
+    naming the construct and the line it opened on. Never a partial list and never an empty one:
+    `scan_corpus` turns that into a named refusal, and returning `[]` would launder a broken file
+    into a clean run exactly as it would for `_python_defs`.
+    """
+    toks: list = []
+    word: list = []
+    wline = 1
+    i, n, line = 0, len(src), 1
+    parens: list = []
+    heredocs: list = []
+    at_word_start = True
+    dq = False
+    dq_line = 0
+
+    def add_word():
+        """Close the word being accumulated, if any, and emit it."""
+        nonlocal word
+        if word:
+            toks.append(("word", "".join(word), wline))
+            word = []
+
+    def add_char(s: str):
+        """Append source text to the word being accumulated, opening one if none is."""
+        nonlocal wline
+        if not word:
+            wline = line
+        word.append(s)
+
+    def read_quoted(j: int, q: str, escapes: bool) -> int:
+        """The index just past the `q` that closes a span opened before `j`."""
+        while j < n:
+            c2 = src[j]
+            if escapes and c2 == "\\" and j + 1 < n:
+                j += 2
+                continue
+            if c2 == q:
+                return j + 1
+            j += 1
+        raise SyntaxError(f"unterminated {q} quote opened at line {line}")
+
+    def read_braced(j: int) -> int:
+        """The index just past the `}` closing a `${` opened before `j`, counting nesting."""
+        depth = 1
+        while j < n and depth:
+            if src[j] == "\\":
+                j += 2
+                continue
+            if src[j] == "{":
+                depth += 1
+            elif src[j] == "}":
+                depth -= 1
+            j += 1
+        if depth:
+            raise SyntaxError(f"unterminated ${{ opened at line {line}")
+        return j
+
+    while i < n:
+        c = src[i]
+
+        # --- the expansions a double-quoted string and bare code read the same way ------------
+        if c == "\\" and i + 1 < n:
+            if src[i + 1] == "\n":
+                i += 2
+                line += 1
+                continue
+            add_char(src[i:i + 2])
+            i += 2
+            at_word_start = False
+            continue
+
+        if c == "`":
+            j = read_quoted(i + 1, "`", True)
+            seg = src[i:j]
+            add_char(seg)
+            line += seg.count("\n")
+            i = j
+            at_word_start = False
+            continue
+
+        if src.startswith("$((", i):
+            j = src.find("))", i + 3)
+            if j < 0:
+                raise SyntaxError(f"unterminated $(( opened at line {line}")
+            seg = src[i:j + 2]
+            add_char(seg)
+            line += seg.count("\n")
+            i = j + 2
+            at_word_start = False
+            continue
+
+        if src.startswith("${", i):
+            j = read_braced(i + 2)
+            seg = src[i:j]
+            add_char(seg)
+            line += seg.count("\n")
+            i = j
+            at_word_start = False
+            continue
+
+        if src.startswith("$(", i):
+            # A command substitution's body is CODE, including inside a double-quoted string, so
+            # the string state is SUSPENDED here and restored by the `)` that closes it. Handling
+            # this by counting parentheses inside the string instead was wrong in both directions
+            # and measured so: without the count, `"$(sed "1s/^x*()/y()/")"` closed the string on
+            # its inner quote and lost four later definitions; with a bare count, the `(` inside
+            # `"$(sed 's/FAILED (\(.*\)/x/')"` closed it one paren early and cost twenty.
+            add_word()
+            parens.append(("$(", dq))
+            dq = False
+            i += 2
+            at_word_start = True
+            continue
+
+        # --- inside a double-quoted string: everything not handled above is literal -----------
+        if dq:
+            if c == '"':
+                add_char('"')
+                dq = False
+                i += 1
+                at_word_start = False
+                continue
+            if c == "\n":
+                line += 1
+            add_char(c)
+            i += 1
+            continue
+
+        # --- code state ------------------------------------------------------------------------
+        if c == "\n":
+            add_word()
+            line += 1
+            i += 1
+            # A heredoc BODY is not code and is never tokenized. The queue is drained here rather
+            # than at the `<<` because a line may open several, and their bodies follow the line.
+            while heredocs:
+                delim, strip, hline = heredocs.pop(0)
+                while True:
+                    j = src.find("\n", i)
+                    raw = (src[i:] if j < 0 else src[i:j]).rstrip("\r")
+                    if (raw.lstrip("\t") if strip else raw) == delim:
+                        i = n if j < 0 else j + 1
+                        line += 1
+                        break
+                    if j < 0:
+                        raise SyntaxError(
+                            f"unterminated heredoc <<{delim} opened at line {hline}")
+                    i = j + 1
+                    line += 1
+            at_word_start = True
+            continue
+
+        if c in " \t":
+            add_word()
+            i += 1
+            at_word_start = True
+            continue
+
+        if c == "#" and at_word_start:
+            j = src.find("\n", i)
+            i = n if j < 0 else j
+            continue
+
+        if c == "'":
+            j = read_quoted(i + 1, "'", False)
+            seg = src[i:j]
+            add_char(seg)
+            line += seg.count("\n")
+            i = j
+            at_word_start = False
+            continue
+
+        if c == '"':
+            add_char('"')
+            dq, dq_line = True, line
+            i += 1
+            at_word_start = False
+            continue
+
+        if c == "(":
+            add_word()
+            parens.append(("(", dq))
+            toks.append(("op", "(", line))
+            i += 1
+            at_word_start = True
+            continue
+
+        if c == ")":
+            add_word()
+            marker, was_dq = parens.pop() if parens else ("(", False)
+            if marker == "$(":
+                dq = was_dq
+            else:
+                # An UNBALANCED `)` is legal shell — every `case` arm ends with one — so it is
+                # emitted rather than refused. Only quote and heredoc states can fail to close.
+                toks.append(("op", ")", line))
+            i += 1
+            at_word_start = True
+            continue
+
+        if c in "{}":
+            add_word()
+            toks.append(("op", c, line))
+            i += 1
+            at_word_start = True
+            continue
+
+        if src.startswith("<<", i):
+            add_word()
+            strip = src.startswith("<<-", i)
+            j = i + (3 if strip else 2)
+            while j < n and src[j] in " \t":
+                j += 1
+            delim: list = []
+            while j < n and src[j] not in _SH_BREAK:
+                ch = src[j]
+                if ch in "'\"":
+                    k = read_quoted(j + 1, ch, False)
+                    delim.append(src[j + 1:k - 1])
+                    j = k
+                elif ch == "\\" and j + 1 < n:
+                    delim.append(src[j + 1])
+                    j += 2
+                else:
+                    delim.append(ch)
+                    j += 1
+            i = j
+            # A HERE-STRING LANDS HERE WITH AN EMPTY DELIMITER and queues nothing, which is
+            # right: `<<<` is `<<` followed by a `<`, and `<` is a word break, so the
+            # delimiter scan stops immediately. There WAS an explicit `<<<` arm above this
+            # one and it is deleted: reverting it changed not one token anywhere in this
+            # corpus, because this path already produced the same result for every
+            # here-string in it. A branch whose removal reds nothing is an assertion about
+            # nothing, which is the rule this kit's own gate legs are held to.
+            if delim:
+                heredocs.append(("".join(delim), strip, line))
+            at_word_start = True
+            continue
+
+        if c in ";&|<>":
+            add_word()
+            i += 1
+            at_word_start = True
+            continue
+
+        add_char(c)
+        i += 1
+        at_word_start = False
+
+    add_word()
+    if dq:
+        raise SyntaxError(f'unterminated " quote opened at line {dq_line}')
+    if heredocs:
+        raise SyntaxError(
+            f"unterminated heredoc <<{heredocs[0][0]} opened at line {heredocs[0][2]}")
+    return toks
+
+
+def parse_shell_defs(src: str):
+    """Shell function definitions as `(functions, types, imports)`, from a TOKENIZER not a regex.
+
+    FOUR RECOGNISED FORMS, and no fifth: the POSIX `name() { … }`, the bash `function name { … }`,
+    the combined `function name() { … }`, and the subshell body `name() ( … )`. The body may open on
+    a later line than the name. A name is `[A-Za-z_][A-Za-z0-9_]*`, which is the same class the
+    naive same-line regex accepted, so the two readings are comparable name-for-name. Each hit is
+    `(name, line)` — the line the NAME is on.
+
+    TYPES AND IMPORTS ARE EMPTY LISTS, and that is a refusal rather than an omission: shell has
+    neither in any sense this kit grades, so the declaration carries no `sh` type cell and P2 grades
+    nothing here. The three-list shape is `extract`'s contract and is unchanged.
+
+    THREE REFUSALS, each of which this header owes you because two of them have no runtime behaviour
+    to observe:
+
+    1. A file it CANNOT TOKENIZE raises `SyntaxError` naming the construct and the line it opened
+       on — an unterminated quote, heredoc or `${`. It never returns an empty or partial list for
+       such a file. `scan_corpus` catches that and yields a named refusal, exactly as it does for an
+       unparseable Python file, because an unreadable file under an armed declaration is a broken
+       corpus and `[]` would launder it into a clean run.
+    2. A definition constructed by `eval`, or arriving by `source`/`.` of another file, is NOT
+       found. There is no definition SITE to grade: the name exists only after a runtime expansion.
+       A sourced file's own definitions are extracted where they are written, which is the right
+       answer; this repo carries thirty such constructions and every one of them is out of reach of
+       any static extractor, so pretending otherwise would be the green-by-absence claim this parser
+       exists to refuse.
+    3. A definition inside a HEREDOC BODY is not a definition and is not returned. This is the one
+       refusal with a confirmed live instance: `tools/hooks/agent-cap.test.sh` embeds a JavaScript
+       `function f() { … }` inside a `<<'EOF'` body, which the naive same-line pattern reports as a
+       shell function.
+
+    NOT AN INTERPRETER. It tokenizes and locates; it never evaluates, never expands and never runs
+    what it reads. TOOL-aSurfacedLexicon-14.
+    """
+    toks = scan_shell_tokens(src)
+    out, k, m = [], 0, len(toks)
+    while k < m:
+        kind, text, ln = toks[k]
+        if kind == "word" and text == "function" and k + 1 < m and toks[k + 1][0] == "word" \
+                and _SH_NAME.match(toks[k + 1][1]):
+            j = k + 2
+            if j + 1 < m and toks[j][1] == "(" and toks[j + 1][1] == ")":
+                j += 2
+            if j < m and toks[j][0] == "op" and toks[j][1] in "{(":
+                out.append((toks[k + 1][1], toks[k + 1][2]))
+                k = j + 1
+                continue
+        elif kind == "word" and _SH_NAME.match(text) and k + 2 < m \
+                and toks[k + 1][1] == "(" and toks[k + 2][1] == ")":
+            j = k + 3
+            if j < m and toks[j][0] == "op" and toks[j][1] in "{(":
+                out.append((text, ln))
+                k = j + 1
+                continue
+        k += 1
+    return out, [], []
+
+
+#: The `parser`-mode extractors, keyed by the pattern-set id its `LANGS` row names — the third
+#: extractor arm, beside `python-ast` and the `probe` sets. Keyed rather than branched on the
+#: extension because `extract_text` is handed source TEXT and a mode, never a path: `drift-audit`
+#: calls it against git blobs at two shas and has no file to look at. A `parser` row naming an id
+#: that is not here is a REFUSAL in `scan_corpus`, never a silent fallthrough to Python.
+PARSERS = {"python-ast": _python_defs, "shell-tokens": parse_shell_defs}
 
 
 def resolve_pattern_sets(conf: dict) -> dict:
@@ -280,7 +783,13 @@ def extract_text(src: str, mode: str, pset: str, *, sets: dict | None = None):
     if mode == "dark":
         return None
     if mode == "parser":
-        return _python_defs(src)
+        # THE THIRD ARM, and it is keyed on the pattern-set id rather than branched a second time on
+        # `mode`. A new mode TOKEN would have been the other shape and it is refused: `LANG_MODE_RANK`
+        # in `drift_report.py` ranks parser above probe above dark and reads an unknown mode as -1, so
+        # a language moving from `dark` to a freshly-named mode would score as a WEAKENING and fire a
+        # ratchet finding on a strengthening edit. `parser` already means "a real parse"; which parse
+        # is what the set id has always said. TOOL-aSurfacedLexicon-14.
+        return PARSERS[pset](src)
     return _probe_defs(src, pset, sets)
 
 
@@ -327,6 +836,14 @@ def scan_corpus(root: Path, declared: dict, sets: dict | None = None):
         if mode == "probe" and pset not in sets:
             yield rel, ext, None, (f"LANGS declares pattern set {pset!r} for .{ext}, which this kit "
                                    f"does not ship and no PATTERNS: row declares")
+            continue
+        # THE SAME REFUSAL FOR THE OTHER ARM. `parser` used to ignore its set id entirely and always
+        # run the Python one, so a row naming any id at all graded Python — which was harmless while
+        # one parser shipped and is a silent mis-extraction now that two do. A `PATTERNS:` row cannot
+        # declare a parser (it declares regexes), so this refusal names the shipped set instead.
+        if mode == "parser" and pset not in PARSERS:
+            yield rel, ext, None, (f"LANGS declares parser {pset!r} for .{ext}, which this kit does "
+                                   f"not ship; the parsers are {' '.join(sorted(PARSERS))}")
             continue
         try:
             defs = extract(root / rel, mode, pset, sets=sets)
@@ -434,18 +951,222 @@ def check_self_containment(kit_dir: Path = Path(__file__).resolve().parent):
 #: declarable, so neither belongs in a teeth figure.
 GRADED_CONVENTIONS = tuple(c for c in CONVENTIONS if c != "dark")
 
-#: `<ext>.<surface>` -> the population that surface names. `constant` is DECLARABLE and has no
-#: extractor in this kit yet, so a `constant` cell is ANNOUNCED as unexercised rather than reported
-#: at zero: TOOL-aSurfacedLexicon-6 owns that population and its rule. A skip that looks like a pass
-#: is the one outcome this whole report exists to prevent.
-CELL_SURFACES = ("function", "type", "file")
+def scan_function_names(scanned: list, root: Path, declared: dict, ext: str):
+    """Every function definition the armed extractor produced for `ext`. Narrows nothing."""
+    names = [(rel, line, name) for rel, e, got, _p in scanned if e == ext and got is not None
+             for name, line in got[0]]
+    return names, len(names)
 
 
-def measure_conventions(scanned: list, conf: dict) -> dict:
-    """Per declared CELLS row: the population, the verdicts and the alternate-convention teeth.
+def scan_type_names(scanned: list, root: Path, declared: dict, ext: str):
+    """Every type definition the armed extractor produced for `ext`. Narrows nothing."""
+    names = [(rel, line, name) for rel, e, got, _p in scanned if e == ext and got is not None
+             for name, line in got[1]]
+    return names, len(names)
 
-    NO VERDICT AND NO PRINT, like everything else in the measurement half. It returns one dict per
-    cell and `check_pass` decides what any of it means.
+
+def scan_file_stems(scanned: list, root: Path, declared: dict, ext: str):
+    """The basename stem of every TRACKED file of `ext`, armed or not. Narrows nothing."""
+    names = [(rel, 0, read_stem(rel.rsplit("/", 1)[-1])) for rel, e, _g, _p in scanned if e == ext]
+    return names, len(names)
+
+
+def extract_bound_names(target):
+    """The `ast.Name` nodes an assignment TARGET binds, through `Tuple`, `List` and `Starred` only.
+
+    A subscript or attribute target binds no module constant — `d[k] = v` names nothing this kit
+    can grade — and counting the `d` underneath it inflates the denominator by exactly those
+    targets. That gap is 13 names on this repo's own corpus and it is the entire difference between
+    two readings a reader would both describe as "every module-body target", which is why the rule
+    is written down here rather than left to whoever next edits the walk.
+    """
+    import ast
+
+    if isinstance(target, ast.Name):
+        yield target
+    elif isinstance(target, (ast.Tuple, ast.List)):
+        for elt in target.elts:
+            yield from extract_bound_names(elt)
+    elif isinstance(target, ast.Starred):
+        yield from extract_bound_names(target.value)
+
+
+def scan_module_constants(scanned: list, root: Path, declared: dict, ext: str):
+    """PUBLIC SIMPLE module-body assignments, narrowed from every module-body target.
+
+    THE COUNTING RULE LIVES HERE AND NOWHERE ELSE, because three readings of "a module constant" are
+    all defensible — every module-body target, simple single-`Name` targets, public ones — and only
+    the third yields a clean zero. NO COUNT IS STATED HERE. All three move with every unit that
+    binds a module-body name, and the three that were stated here were wrong within two units. The
+    `py.constant` comment in `.lexicon.conf` records them, under a selftest arm that reds when they
+    drift from what `--check` prints. Module BODY
+    statements only, with no descent into a class or function body. Both `ast.Assign` and
+    `ast.AnnAssign` count; dropping the annotated form moves all three readings by roughly a tenth.
+    A bound name is whatever `extract_bound_names` binds. The DENOMINATOR is every name that rule
+    binds, and the GRADED population narrows it to single-`Name` targets with no leading underscore,
+    which is the reading this repo arms and the leading underscore is what correlates with mutable
+    module state in this corpus.
+
+    IT RE-READS THE FILES OF THIS ONE EXTENSION, which is the only second read in this engine and is
+    a deliberate trade: the corpus walk keeps definitions rather than source, and holding fifteen
+    hundred files of text in memory to serve one declared cell is the worse half of that bargain.
+    It runs only for a `constant` cell a `CELLS` row declares.
+
+    A NON-PYTHON EXTENSION RETURNS AN EMPTY POPULATION rather than guessing, because `ast` cannot
+    read one. That empty population is a `DEAD CELL` refusal one caller up, which is the honest
+    outcome: a `constant` cell declared for a language this rule cannot select in REDS instead of
+    reporting a clean zero at it forever.
+    """
+    import ast
+
+    if (declared.get(ext) or ("", "dark"))[0] != "python-ast":
+        return [], 0
+    names: list[tuple[str, int, str]] = []
+    targets = 0
+    for rel, e, got, _p in scanned:
+        if e != ext or got is None:
+            continue
+        tree = ast.parse((root / rel).read_text(encoding="utf-8", errors="replace"))
+        for stmt in tree.body:
+            if isinstance(stmt, ast.Assign):
+                bound = [n for t in stmt.targets for n in extract_bound_names(t)]
+                simple = stmt.targets
+            elif isinstance(stmt, ast.AnnAssign):
+                bound = list(extract_bound_names(stmt.target))
+                simple = [stmt.target]
+            else:
+                continue
+            targets += len(bound)
+            if len(simple) == 1 and isinstance(simple[0], ast.Name) \
+                    and not simple[0].id.startswith("_"):
+                names.append((rel, stmt.lineno, simple[0].id))
+    return names, targets
+
+
+def extract_decorators(scanned: list, root: Path, declared: dict, ext: str) -> dict:
+    """`{(path, lineno): {decorator-name, …}}` for a `python-ast` extension, `{}` for every other.
+
+    THE ADDITIVE ACCESSOR (TOOL-aSurfacedLexicon-13 S3), and it is a separate walk rather than a
+    third element on each function entry ON PURPOSE. `extract` and `extract_text` return
+    `(functions, types, imports)` with each function entry a `(name, lineno)` PAIR, and two call
+    sites in ANOTHER kit unpack that pair positionally — `for nm, _ln in got[0]` in
+    `tools/drift-audit/drift_report.py`, both of them OUTSIDE any catch naming `ValueError`.
+    Widening the pair therefore raises uncaught on `drift-audit records`, a leg carrying no guard,
+    which means it reds every bar rather than degrading quietly. The shape is frozen; this accessor
+    is how a decorator arrives without touching it, and this kit's own selftest asserts the arity so
+    the break is caught here first.
+
+    A DOTTED DECORATOR IS RECORDED BY ITS LAST SEGMENT, so `@app.route` is selectable as `route`. A
+    selector literal carries no dot (`lexicon_conf._SEL_LIT_RE`) because a dotted literal would make
+    the selector'd cell's own `PINS` row key unparseable.
+
+    WHAT IT DOES NOT DO: a `parser` extension whose pattern set is not `python-ast` — `sh` under
+    `shell-tokens` — returns `{}` here, because shell has no decorators to read. A decorator selector
+    declared on one selects nothing and reds as a `DEAD CELL`, which is the honest outcome; the
+    NON-parser modes are refused earlier and by name, in `lexicon_conf.check_declaration`.
+    """
+    import ast
+
+    if (declared.get(ext) or ("", "dark"))[0] != "python-ast":
+        return {}
+    out: dict[tuple[str, int], set] = {}
+    for rel, e, got, _p in scanned:
+        if e != ext or got is None:
+            continue
+        # A SyntaxError cannot reach here: `scan_corpus` already ran the same parse over this file
+        # and recorded a problem instead of yielding defs, so `got is None` is the unparseable case.
+        tree = ast.parse((root / rel).read_text(encoding="utf-8", errors="replace"))
+        for node in ast.walk(tree):
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                continue
+            for dec in node.decorator_list:
+                target = dec.func if isinstance(dec, ast.Call) else dec
+                name = getattr(target, "attr", None) or getattr(target, "id", None)
+                if name:
+                    # `node.lineno` is the `def`/`class` line on every Python this kit runs on, which
+                    # is the line `_python_defs` records — so these keys align with that population
+                    # by construction rather than by an offset nobody re-checks.
+                    out.setdefault((rel, node.lineno), set()).add(name)
+    return out
+
+
+def scan_routes(names: list, selectors: list, decorators: dict):
+    """Route each name to at most ONE selector. Returns `(complement, {cell: names}, ambiguous)`.
+
+    `selectors` is `[(cell, kind, literal)]` for ONE parent cell and `names` is that parent's whole
+    population as `[(path, line, name)]`.
+
+    A ROUTED NAME IS GRADED ONCE, against the selector's convention, and LEAVES the parent's
+    population. The alternative — grading it against both — makes every routed name a guaranteed
+    violation of one of the two cells, which is the failure mode the whole mechanism exists to avoid.
+
+    A NAME MATCHING TWO SELECTORS IS REFUSED, not resolved by declaration order, and is graded by
+    NEITHER: a naming gate whose verdict depends on which row the reader saw first is not a
+    declaration. That refusal plus the `DEAD CELL` arm covers the overlapping-prefix pair completely
+    — two selectors that CAN both match either do both match some name here, or one of them selected
+    nothing and reds as a dead cell one layer up.
+    """
+    routed: dict[str, list] = {cell: [] for cell, _k, _l in selectors}
+    complement: list = []
+    ambiguous: list = []
+    for entry in names:
+        path, line, name = entry
+        hit = [(cell, kind, lit) for cell, kind, lit in selectors
+               if (name.startswith(lit) if kind == "prefix"
+                   else lit in decorators.get((path, line), ()))]
+        if len(hit) > 1:
+            ambiguous.append((entry, [f"+{k}:{l}" for _c, k, l in hit]))
+        elif hit:
+            routed[hit[0][0]].append(entry)
+        else:
+            complement.append(entry)
+    return complement, routed, ambiguous
+
+
+#: `<surface>` -> `(selector, POPULATION RULE)`. The rule is a DECLARED string beside the selector
+#: and is never derived from the selector's docstring: that would be a second carrier of one fact
+#: with no gate comparing the two, which is the class this build exists to close. Every report row
+#: prints its rule (TOOL-aSurfacedLexicon-6 S4), because a count with no rule beside it reads as
+#: coverage when it is only a scope.
+#:
+#: A selector takes `(scanned, root, declared, ext)` and returns `(names, denominator)`, where
+#: `names` is `[(path, line, graded string)]` and the DENOMINATOR is the wider population the rule
+#: narrowed. Equal figures are legal and common — `py.function` grades every function it extracted —
+#: and printing both is the only way a reader can see that `py.constant` does not.
+#:
+#: A surface in `lexicon_conf.SURFACES` with no row here is a REFUSAL in `measure_pass`, never a
+#: silent skip: the cell would grade nothing while reporting a clean zero, which is the whole shape
+#: this report exists to abolish.
+CELL_POPULATION_RULES = {
+    "function": (scan_function_names, "every extracted function definition"),
+    "type": (scan_type_names, "every extracted type definition"),
+    "file": (scan_file_stems, "every tracked file's basename stem"),
+    "constant": (scan_module_constants, "public simple module-body assignments"),
+}
+
+#: The surface each PREDICATE's population is the population OF. `graded` is keyed on the predicate
+#: because that is what P1 and P2 are; the cell matrix is keyed on the surface. This is the one
+#: mapping between them, and it is what lets `UNDECLARED CELL` be DERIVED from the extracted
+#: population rather than asserted beside it.
+PREDICATE_SURFACES = {"verb": "function", "suffix": "type"}
+
+#: DEFAULT-OFF, and the flip is owed to whichever unit first writes a full `CELLS` matrix into
+#: `.lexicon.conf` — TOOL-aSurfacedLexicon-12 accepted it as its S14/AC14. Armed at this build order
+#: the arm would fire three refusals on the commit that lands it, against a declaration whose matrix
+#: does not exist yet. So it lands REPORT-ONLY: computed on every run, printed on every run, and
+#: refusing nothing. A matrix that lands with this constant left `False` ships an arm that reports
+#: and can never refuse, which is the failure this whole unit was written against.
+UNDECLARED_CELL_ARMED = False
+
+
+def measure_conventions(scanned: list, conf: dict, root: Path, declared: dict) -> dict:
+    """Per declared CELLS row: the population, its RULE, the verdicts and the alternate-convention teeth.
+
+    NO VERDICT AND NO PRINT, like everything else in the measurement half. It returns
+    `(rows, problems)` — one dict per cell plus the refusals only the ROUTING can raise — and
+    `check_pass` decides what any of it means. The problems come back rather than being appended to
+    a list passed in, so this function still reads its inputs and returns its outputs, which is what
+    lets the selftest call it directly.
 
     THE TEETH ARE NOT A NICETY. A cell that prints `0 violations` and nothing else is
     indistinguishable from a cell that CANNOT fail, which is the green-by-absence class one level up
@@ -455,22 +1176,73 @@ def measure_conventions(scanned: list, conf: dict) -> dict:
     """
     cells = conf.get("CELLS") or {}
     pins = conf.get("PINS") or {}
+    problems: list[str] = []
+    parsed = {cell: parse_cell_key(cell) for cell in cells}
+
+    # The selectors on each PARENT cell string, whether or not that parent has a row of its own. A
+    # selector with no parent row is legal — its complement is then simply ungraded, and the
+    # `UNDECLARED CELL` report is what names that — so this is keyed on the derived parent rather
+    # than on the declared rows.
+    selectors: dict[str, list] = {}
+    for cell, (ext, surface, kind, lit) in parsed.items():
+        if kind:
+            selectors.setdefault(f"{ext}.{surface}", []).append((cell, kind, lit))
+
+    # THE POPULATION RULE RUNS ONCE PER `(ext, surface)`, not once per row. `scan_module_constants`
+    # re-reads every file of its extension, so a parent and three selectors would otherwise pay for
+    # four walks of one population — and the four could not disagree only by accident.
+    pops: dict[tuple[str, str], tuple] = {}
+    for _cell, (ext, surface, _k, _l) in parsed.items():
+        if (ext, surface) in pops:
+            continue
+        rule = CELL_POPULATION_RULES.get(surface)
+        pops[(ext, surface)] = ((None, [], 0) if rule is None
+                                else (rule, *rule[0](scanned, root, declared, ext)))
+
+    # THE PARTITION. Every graded list below comes from here, so the parent's names and its
+    # selectors' names cannot overlap by construction rather than by two call sites agreeing.
+    graded_names: dict[str, list] = {}
+    for (ext, surface), (_rule, names, _denominator) in pops.items():
+        parent = f"{ext}.{surface}"
+        sels = selectors.get(parent, [])
+        if not sels:
+            graded_names[parent] = names
+            continue
+        decorators = (extract_decorators(scanned, root, declared, ext)
+                      if any(k == "decorator" for _c, k, _l in sels) else {})
+        complement, routed, ambiguous = scan_routes(names, sels, decorators)
+        graded_names[parent] = complement
+        graded_names.update(routed)
+        for (path, line, name), lits in ambiguous:
+            problems.append(
+                f"AMBIGUOUS SELECTOR — the name `{name}` at {path}:{line} matches "
+                f"{len(lits)} selectors on cell `{parent}`: {' '.join(lits)}. Which convention it "
+                f"is graded against would depend on which row the reader saw first, so it is graded "
+                f"by NEITHER and the overlap is refused where it is written.")
+
+    # THE ROW ORDER: each parent, then its own selectors beneath it, then any selector whose parent
+    # declares no row. S5 — a routed subset printed anywhere else reads as a separate cell rather
+    # than as a subtraction from the row above it, and the denominators only make sense as a pair.
+    order: list[str] = []
+    for cell, (ext, surface, kind, _l) in parsed.items():
+        if kind:
+            continue
+        order.append(cell)
+        order += [c for c, _k, _l2 in selectors.get(f"{ext}.{surface}", []) if c in cells]
+    order += [c for c in cells if c not in order]
+
     out: dict[str, dict] = {}
-    for cell, (conv, _flags) in cells.items():
-        ext, surface = cell.split(".")
-        names: list[tuple[str, int, str]] = []          # (path, line, graded string)
-        for rel, e, got, _p in scanned:
-            if e != ext:
-                continue
-            if surface == "file":
-                names.append((rel, 0, read_stem(rel.rsplit("/", 1)[-1])))
-            elif got is not None and surface in ("function", "type"):
-                for name, lineno in got[0 if surface == "function" else 1]:
-                    names.append((rel, lineno, name))
+    for cell in order:
+        conv, _flags = cells[cell]
+        ext, surface, _kind, _lit = parsed[cell]
+        rule, _all_names, denominator = pops[(ext, surface)]
+        names = graded_names.get(cell, [])
         row = {
             "convention": conv,
             "population": len(names),
-            "graded": surface in CELL_SURFACES,
+            "denominator": denominator,
+            "rule": rule[1] if rule is not None else None,
+            "graded": rule is not None,
             "pin": pins.get(f"{cell}.conv", 0),
             "verdicts": [],
             "teeth": {},
@@ -485,7 +1257,7 @@ def measure_conventions(scanned: list, conf: dict) -> dict:
                 for alt in GRADED_CONVENTIONS if alt != conv
             }
         out[cell] = row
-    return out
+    return out, problems
 
 
 def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
@@ -574,6 +1346,11 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
     # when this loop did the extracting itself.
     problems.extend(scan_problems)
 
+    # RESOLVED ONCE, like `sets` above and for the same reason: the P1 split asks this index one
+    # membership question per offending definition, and rebuilding a 120-key dict per question is a
+    # second answer waiting to disagree with the first.
+    forms = canon.build_form_index()
+
     for rel, ext, got, _problem in scanned:
         if got is None:
             continue
@@ -588,9 +1365,26 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
             if not verb:
                 continue
             if verb not in verbs:
+                # S1/S2 — CLASSIFIED HERE, once, in the one walk. The kit used to refuse and stop
+                # there, and a gate that says no and nothing else gets waived rather than obeyed:
+                # 79 of this tree's 968 offenders have a canon cluster naming the rename they owe,
+                # and the message named none of them.
+                rep, gloss = read_debt_gloss(verb, forms)
+                detail = f"leading token {verb!r} is not in the declared VERBS table"
+                if rep:
+                    # THE REPLACEMENT IDENTIFIER, not just the representative. A refusal naming
+                    # `check` leaves the author to re-spell their own name against it; one naming
+                    # `check_thing` is a rename they can apply. Same helper `--suggest` uses, so the
+                    # two surfaces cannot answer one question differently.
+                    detail += (f" — DEBT: rename to `{render_swapped_name(name, rep)}`; it is a "
+                               f"spelling of `{rep}`: "
+                               + ((verbs.get(rep) or gloss).strip() or "no gloss declared")
+                               + ("" if rep in verbs else
+                                  f" (and `{rep}` needs a VERBS row of its own before the gate "
+                                  f"accepts it)"))
                 offenders["verb"].append(Offender(
-                    "P1 verb", rel, lineno, name,
-                    f"leading token {verb!r} is not in the declared VERBS table"))
+                    "P1 verb", rel, lineno, name, detail,
+                    verb=verb, cls="debt" if rep else "unruled"))
 
         for name, lineno in types_:
             for suf in banned:
@@ -602,6 +1396,29 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
                         "P2 suffix", rel, lineno, name,
                         f"type name ends with the banned suffix {suf!r}"))
                     break
+
+    # S2 — THE UNRULED HALF'S SITE CENSUS, and it can only be written after the walk because it is a
+    # count over the whole corpus. MOST distinct unruled tokens on this tree occur exactly ONCE, so
+    # `1 site` and `18 sites` are two different findings wearing one message: the first is a name to
+    # fix, the second is a house idiom that either joins the table or gets renamed everywhere. The
+    # proportion is deliberately not stated. It was, as 339 of 491, and the denominator was already
+    # 751 by the time the line shipped -- both operands move with every unit that adds a definition,
+    # and this build corrected that class seven times before deleting it instead. Read it from
+    # `--list` when you need it.
+    #
+    # CORPUS-WIDE, not per-cell, and fork F3 of the spec is why the choice is written down. A reader
+    # renaming a token wants to know how many definitions move; a per-cell count answers a question
+    # about the row instead. The number is LABELLED corpus-wide on the line, because an unlabelled
+    # count under a per-cell report reads as that cell's.
+    sites: dict[str, int] = {}
+    for o in offenders["verb"]:
+        if o.cls == "unruled":
+            sites[o.verb] = sites.get(o.verb, 0) + 1
+    for o in offenders["verb"]:
+        if o.cls == "unruled":
+            o.detail += (f" — UNRULED: no canon cluster holds {o.verb!r}, so this is a scoping "
+                         f"question and not a rename; {sites[o.verb]} definition(s) corpus-wide "
+                         f"lead with it")
 
     # S6 — the live non-empty assertion. HYGIENE rule 5 applied to this gate: a check must not
     # select an empty population. A declared parser/probe language with NO definitions, against a
@@ -683,9 +1500,86 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
                         f"file(s) where an ARMED extractor did, e.g. {blind[0]}; the denominator is "
                         f"undercounting, which reports coverage as BETTER than it is)")
 
+    # --- TOOL-aSurfacedLexicon-6: the cell matrix's own three populations ---------------------
+    #
+    # THEY ARE DELIBERATELY DIFFERENT POPULATIONS. Two of them can legally be empty in a healthy
+    # tree — nothing may be undeclared, and no armed cell need be dead — and the third cannot,
+    # which is why only the third carries a liveness assertion.
+    declared_cells = conf.get("CELLS") or {}
+    cells, cell_problems = measure_conventions(scanned, conf, root, declared)
+    problems.extend(cell_problems)
+
+    # --- TOOL-aSurfacedLexicon-7: the P1 split, censused per DECLARED vocab cell ---------------
+    #
+    # OVER THE UNWAIVED OFFENDERS, so the pair reconciles with the scalar that grades the same list.
+    # A waived offender is one the declaration already accounted for, and counting it into a debt
+    # row would make the two ratchets disagree about the same corpus.
+    vocab_cells, vocab_problems = measure_vocab_cells(unwaived_by["verb"], declared_cells)
+    problems.extend(vocab_problems)
+
+    # S7 — THE REPORT'S LIVENESS, asserted as PARITY against the parsed block rather than as
+    # `> 0`, so it catches the single row that goes missing as well as the table that empties.
+    # A declared row that never reaches the printer is a reporting bug, and an empty table under a
+    # green line is exactly what a cell matrix exists to abolish.
+    #
+    # WHAT IT DOES NOT CHECK: a declaration carrying NO `CELLS` block at all. That is a legal inert
+    # state — the kit is opt-in and every adopter passes through it — and refusing it would red
+    # every tree that installed this kit before the block existed. The population nobody declared
+    # is what `UNDECLARED CELL` below reports on instead.
+    if len(cells) != len(declared_cells):
+        problems.append(
+            f"DEAD CELL REPORT — the declaration carries {len(declared_cells)} CELLS row(s) and "
+            f"the report built {len(cells)}. A report that drops rows prints a table nobody can "
+            f"tell from a clean matrix.")
+
+    for cell, row in cells.items():
+        if row["rule"] is None:
+            problems.append(
+                f"UNRULED SURFACE — the cell `{cell}` names surface `{cell.split('.')[1]}`, which "
+                f"is declarable but carries no row in CELL_POPULATION_RULES, so the cell would "
+                f"grade nothing while reporting a clean zero. Declare its population rule, or drop "
+                f"the surface from the closed set in lexicon_conf.py.")
+            continue
+        # S2 — DEAD CELL. This REPLACES a report — the tree printed `armed but grading nothing
+        # (reported, not a refusal)` for the whole life of the declaration and nothing ever changed,
+        # which is the green-by-absence class wearing a different label.
+        #
+        # TWO EXEMPTIONS, and both are the same argument: an empty population is only evidence of a
+        # dead cell where a non-empty one was POSSIBLE. `dark` is a declared refusal to grade, so
+        # its zero is the declaration working. And an extension the corpus carries no file of is an
+        # INERT DECLARATION, which this engine already reports rather than refuses one arm over —
+        # declaring a language before its first file is written is a legal state a scaffolded
+        # adopter passes through, and redding a cell for it would make this refusal disagree with
+        # its own sibling about the same tree.
+        if (row["convention"] != "dark" and not row["population"]
+                and cell.split(".")[0] in present_exts):
+            problems.append(
+                f"DEAD CELL — `{cell}` is armed at `{row['convention']}` and its population rule "
+                f"({row['rule']}) selected NOTHING. A cell grading an empty population passes green "
+                f"forever, so the declaration is wrong or the selector is.")
+
+    # S1 — UNDECLARED CELL, over the EXTRACTED populations and NOTHING else. `graded` is what
+    # `extract` produced without being asked, which is functions and types; a `file` or `constant`
+    # population exists only for a cell a `CELLS` row declares, so an undeclared one of THOSE has
+    # no population to be non-empty and this arm cannot see it. That hole is real, it is stated on
+    # the run beside the list, and closing it needs a declaration-independent selector per surface.
+    # DERIVED from the walk rather than asserted beside it: this list moves if and only if the
+    # extracted population moves.
+    undeclared_cells = [f"{ext}.{PREDICATE_SURFACES[kind]} at {n}"
+                        for (ext, kind), n in sorted(graded.items())
+                        if n and f"{ext}.{PREDICATE_SURFACES[kind]}" not in declared_cells]
+    if undeclared_cells and UNDECLARED_CELL_ARMED:
+        problems.append(
+            "UNDECLARED CELL (an extracted population with no CELLS row grades nothing and is "
+            "invisible to every cell verdict; declare each, `dark` if it should not be graded): "
+            + ", ".join(undeclared_cells))
+
     return {
         "problems": problems,
-        "cells": measure_conventions(scanned, conf),
+        "cells": cells,
+        "vocab_cells": vocab_cells,
+        "pin_rows": conf.get("PINS") or {},
+        "undeclared_cells": undeclared_cells,
         "graded": graded,
         "offenders": offenders,
         "waivers": waived_by,
@@ -755,19 +1649,24 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     # indistinguishable from one whose predicate never ran.
     for cell, row in measured["cells"].items():
         if not row["graded"]:
-            print(f"lexicon: {cell}.conv SKIPPED — this kit ships no extractor for the "
-                  f"`{cell.split('.')[1]}` surface, so the cell is declared and UNEXERCISED")
+            print(f"lexicon: {cell}.conv UNRULED — the `{cell.split('.')[1]}` surface carries no "
+                  f"population rule, so this cell is refused rather than reported at zero")
             continue
+        # S4 — THE POPULATION RULE, on every row and beside every count. A count with no rule reads
+        # as coverage when it is only a scope, and the denominator is printed with it because a row
+        # whose graded count equals its denominator (every `function` cell, by construction) is the
+        # only way a reader can see that a narrowed row does NOT.
+        pop = (f"population {row['population']} of {row['denominator']} (rule: {row['rule']})")
         if row["convention"] == "dark":
             print(f"lexicon: {cell}.conv dark — declared unGRADED over "
-                  f"{row['population']} name(s), which is a refusal and not a skip")
+                  f"{row['population']} name(s), which is a refusal and not a skip; {pop}")
             continue
         bad = row["verdicts"]
         n_amb = sum(1 for _p, _l, v, _m in bad if v == "AMBIGUOUS")
         teeth = " ".join(f"{a}={n}" for a, n in sorted(row["teeth"].items()))
         print(f"lexicon: {cell}.conv {len(bad)} of {row['population']} against "
               f"{row['convention']} — violation {len(bad) - n_amb}, ambiguous {n_amb}, "
-              f"teeth {teeth}")
+              f"teeth {teeth}; {pop}")
         for path, line, _v, message in bad[:40]:
             print(f"  {path}:{line}: {message}")
         if len(bad) > 40:
@@ -780,6 +1679,30 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
                   f"an equality in both directions. Paste this row into .lexicon.conf under PINS:")
             print(f"  {cell}.conv  {len(bad)}")
 
+    # --- TOOL-aSurfacedLexicon-7: the P1 split's own per-cell ratchets -------------------------
+    #
+    # ADDITIVE TO THE SCALAR, never a replacement for it at this build order. `VERB_OFFENDER_PIN`
+    # keeps grading the whole unwaived population above; these rows grade the two halves of each
+    # DECLARED vocab cell. Both bind, and that is the point rather than a transition cost: a rename
+    # moving a definition from DEBT to UNRULED inside one cell holds the total, so the scalar greens
+    # and only these rows can see it. TOOL-aSurfacedLexicon-12 retires the scalar when it writes the
+    # full matrix; until then a tree with no vocab cell has exactly the ratchet it had before.
+    #
+    # TWO-SIDED, like every other pin here. A fall reds as loudly as a rise, because a drain nobody
+    # was obliged to re-measure is a drain nobody re-measured.
+    pin_rows = measured["pin_rows"]
+    for cell, (debt, unruled) in measured["vocab_cells"].items():
+        for predicate, got in (("debt", debt), ("unruled", unruled)):
+            key = f"{cell}.{predicate}"
+            want = pin_rows.get(key, 0)
+            print(f"lexicon: {key} {got} against declared pin {want}")
+            if got != want:
+                exit_code = 1
+                print(f"lexicon:   {key} MOVED {want} -> {got} — the pin is an equality in both "
+                      f"directions. Paste this row into .lexicon.conf under PINS:, separated from "
+                      f"its neighbour by one blank line:")
+                print(f"  {key}  {got}")
+
     for p in problems:
         print(f"lexicon: {p}")
     if problems:
@@ -791,7 +1714,16 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     label = {"verb": "P1 verb  ", "suffix": "P2 suffix"}
     for kind in KINDS:
         g, off, wv = tally[kind]
-        print(f"lexicon: {label[kind]} graded={g} offenders={off} waived={wv}")
+        # S6 — THE SPLIT ON THE COUNT LINE, on GREEN as well as on RED, and its two halves printed
+        # beside the sum they add to so a reader can see that the split moved no verdict. A total
+        # with no split is what let one bucket over two populations move eleven times and produce
+        # no renames from the second of them.
+        split = ""
+        if kind == "verb":
+            unw = measured["unwaived"][kind]
+            debt = sum(1 for o in unw if o.cls == "debt")
+            split = f" (debt={debt} + unruled={len(unw) - debt})"
+        print(f"lexicon: {label[kind]} graded={g} offenders={off}{split} waived={wv}")
 
     # THE SELF-CONTAINMENT POPULATION, on green as well as on red, and deliberately NOT shaped like
     # the two rows above: this is a refusal with a measured reach, not a third declared predicate.
@@ -815,9 +1747,27 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     print(f"lexicon: coverage — armed {len(armed_carriers)} of {len(carriers)} "
           f"definition-carrying file(s) ({pct:.1f}%)")
 
+    # STILL A REPORT, and it now covers the REMAINDER rather than the whole. A zero population on a
+    # cell a `CELLS` row DECLARES is a `DEAD CELL` refusal above; what is left here is the pairs
+    # nobody declared, where a zero is a repo that writes no JavaScript classes rather than an
+    # extractor gone inert, and a single tree cannot tell those two apart.
     empty = [f".{e} {k}=0" for (e, k), v in sorted(graded.items()) if v == 0]
     if empty:
-        print("lexicon: armed but grading nothing (reported, not a refusal): " + ", ".join(empty))
+        print("lexicon: armed but grading nothing, UNDECLARED as a cell (reported, not a refusal; "
+              "a DECLARED cell at zero is a DEAD CELL refusal above): " + ", ".join(empty))
+
+    # S1 — the UNDECLARED CELL list, printed on EVERY run whether or not it is armed, so the pairs
+    # it names stay visible for however long the promotion is outstanding rather than accruing where
+    # nobody looks. The second line is the arm's own header, per the charter's rule that a gate
+    # states what it does NOT check: a reader who takes this list for the whole undeclared
+    # population is reading a scope as a coverage claim.
+    print(f"lexicon: UNDECLARED CELL — {len(measured['undeclared_cells'])} extracted population(s) "
+          f"with no CELLS row"
+          + (": " + ", ".join(measured["undeclared_cells"]) if measured["undeclared_cells"] else "")
+          + (" [REFUSED above]" if UNDECLARED_CELL_ARMED else " [reported, not a refusal]"))
+    print("lexicon:   NOT CHECKED by that list — the `file` and `constant` surfaces. Their "
+          "populations are computed by a declared cell's own selector, so an UNDECLARED one of "
+          "those has no population to be non-empty and this arm cannot see it.")
 
     # S7 — the declaration that arms nothing because the corpus carries none of it. Reported, never
     # a refusal; see the comment beside the measurement.
@@ -875,6 +1825,16 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
         # that cannot fail discharges nothing. NOT SELF-CONTAINED and its own DEAD PROBE join them.
         for kind in KINDS:
             print(f'{PIN_KEYS[kind]}="{len(measured["unwaived"][kind])}"')
+        # S5 — the P1 split's rows, for every DECLARED vocab cell and no others. EMPTY on a tree
+        # that arms none, which is this repo at this build order and is the correct result: a pin
+        # row naming a cell no `CELLS` row declares is a `load_conf` refusal, so emitting one
+        # eagerly would hand the operator bytes the wiring leg rejects.
+        rows = render_pin_rows(measured["vocab_cells"])
+        if rows:
+            print("# PINS: rows — paste them INSIDE the PINS: block, indented, keeping the blank")
+            print("# lines; two adjacent pin rows are a refusal in lexicon_conf._parse_pins.")
+            for line in rows:
+                print(line)
         if problems:
             print("# NOTE: the run also reported problems that are not pin-counted:")
             for p in problems:
@@ -923,10 +1883,16 @@ def build_banned_index(conf: dict) -> dict:
 
 
 def run_suggest(root: Path, name: str) -> int:
-    """S1 — one deterministic line for ONE identifier. Reads the declaration and nothing else.
+    """S1 — one deterministic line for ONE identifier, from the declaration and the SHIPPED CANON.
+
+    TWO SOURCES, IN THE FIXED PRECEDENCE the body below states: the declaration's own inverted NOT
+    clauses first, then `canon.py` where no row bans the token by name. It read the declaration and
+    nothing else until TOOL-aSurfacedLexicon-7 wired the canon in, and this line said so for one
+    unit longer than it was true.
 
     NO CORPUS PASS, deliberately and measurably: the whole value is that an author can ask before
     writing, and a verb that walks 900 files to answer one question is a verb nobody waits for.
+    Both sources are tables that ship with the kit, so this stays true wherever it is installed.
     """
     try:
         conf = load_conf(root / CONF_NAME)
@@ -947,47 +1913,38 @@ def run_suggest(root: Path, name: str) -> int:
         return 0
 
     banned = build_banned_index(conf)
-    # THE TAIL IS THE ORIGINAL SURFACE, SLICED. It is never re-derived, and two review rounds were
-    # needed to land on that. Round 1 found the tail sliced by `len(verb)` while `leading_verb` had
-    # stripped the leading underscores first, so the two disagreed about where the verb ended and
-    # `_fetch_conf` suggested `_load_h_conf`. Round 2 found that rebuilding the tail out of
-    # `subtokens()` -- the round-1 fix -- traded that for worse: the splitter lowercases, breaks
-    # acronym runs, splits digit boundaries and drops anything outside its character class, so
-    # `getUserURLs` came back as `readUserUrLs`, `fetch_v2_data` as `load_v_2_data` and `create$data`
-    # as `build_data` with the `$` silently gone. Three of those had been CORRECT before the fix.
+    # S3 — TWO SOURCES, IN A FIXED PRECEDENCE, and the order is the whole criterion. The
+    # declaration's own inverted NOT clauses win: the owner wrote that negative and the canon did
+    # not. Only where no row bans the token by name does the shipped canon get asked — which is 36
+    # of this repo's 44 python debt definitions, the population that used to get a refusal and
+    # nothing else.
     #
-    # Slicing at the end of the FIRST SUBTOKEN's own surface is what both rounds were reaching for.
-    # The splitter decides where the verb ends, which is the half round 1 had right; nothing
-    # downstream re-spells a character the caller wrote, which is the half round 2 had right.
-    # Separator style, case, acronym runs, digit suffixes, trailing underscores and characters the
-    # splitter cannot even see all survive, because not one of them is ever regenerated.
-    lead = name[:len(name) - len(name.lstrip("_"))]
-    body = name[len(lead):]
-    _toks = subtokens(name)
-    _first = _toks[0] if _toks else ""
-    if not _first or body[:len(_first)].lower() != _first:
-        # The splitter and the surface disagree. `leading_verb`'s contract allows that for a name
-        # with no word characters; suggest the bare verb rather than invent a tail for it.
-        surface, rest = "", ""
-    else:
-        surface, rest = body[:len(_first)], body[len(_first):]
+    # THE TWO DISAGREE ON THIS TREE, which is what makes the precedence observable rather than
+    # asserted: `install` is banned by a row naming `seed`, and `canon.build_form_index()["install"]`
+    # is `init`. An arm in `selftest.py` reds if the last such disagreement ever leaves the
+    # declaration. TOOL-aSurfacedLexicon-7.
+    want, gloss, source = "", "", ""
     if verb in banned:
         want = banned[verb]
         gloss = (verbs.get(want) or "").strip()
-        # THE VERB INHERITS THE CASE OF THE TOKEN IT REPLACES, so a SCREAMING_SNAKE name is not
-        # answered in lower snake and a PascalCase one is not answered in camelCase. Round 1 answered
-        # every shape in the declaration's own lowercase, which is a second way of handing back a
-        # name whose only remaining defect is that the author must edit it before typing it.
-        if len(surface) > 1 and surface.isupper():
-            want_cased = want.upper()
-        elif surface[:1].isupper():
-            want_cased = want[:1].upper() + want[1:]
-        else:
-            want_cased = want
-        swap = lead + want_cased + rest
-        print(f"use `{swap}` — the declaration says `{want}`, NOT `{verb}`: {gloss}")
+        source = "the declaration says"
     else:
-        print(f"`{verb}` is not in the declared table, and no row bans it by name. "
+        rep, canon_gloss = read_debt_gloss(verb)
+        if rep:
+            want = rep
+            gloss = (verbs.get(rep) or canon_gloss).strip()
+            # Fork F2, decided as its recommendation: propose the representative even where this
+            # declaration does not carry it, and SAY SO. Suppressing the advice leaves the author
+            # with a refusal and nothing else, which is the defect this whole path exists to close;
+            # proposing it silently hands them a name the gate reds on the next run.
+            source = ("the shipped canon says" if rep in verbs else
+                      "the shipped canon says (and this declaration carries NO row for it, so it "
+                      "needs one first)")
+    if want:
+        print(f"use `{render_swapped_name(name, want)}` — {source} `{want}`, NOT `{verb}`: {gloss}")
+    else:
+        print(f"`{verb}` is not in the declared table, no row bans it by name, and the shipped "
+              f"canon holds no cluster for it — so this is a SCOPING question, not a spelling one. "
               f"Declared verbs: {' '.join(sorted(verbs))}")
     return 0
 

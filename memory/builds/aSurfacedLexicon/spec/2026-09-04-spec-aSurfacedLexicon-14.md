@@ -1,11 +1,13 @@
 # TOOL-aSurfacedLexicon-14 — a real shell parser, arming the shell function cell
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4
+**Status:** CLOSED · rev-4 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aSurfacedLexicon-14-shell-parser-prewiring-run.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-14-shell-parser-prewiring-run.md) | journal | — |
+| [2026-09-05-build-TOOL-aSurfacedLexicon-6-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-6-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-7 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-7 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-7 |
 

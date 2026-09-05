@@ -50,6 +50,21 @@ PATTERN_PARTS = ("functions", "types", "imports")
 #: why the generic row-key parse and not the alphabetic `VERBS` one is what this block runs through.
 _PSET_RE = re.compile(r"^[A-Za-z0-9_-]+$")
 
+#: The selector kinds a `CELLS` row key may name (TOOL-aSurfacedLexicon-13). `prefix` is a literal
+#: leading-substring test over the NAME; `decorator` names one decorator and is a `parser`-mode
+#: capability, refused on any other mode by `check_declaration`. A CLOSED set, for the reason
+#: `SURFACES` is one: a typo'd kind would route nothing and report nothing, which is the shape a
+#: declaration must never be able to take by accident. There is deliberately no regex kind — a
+#: predicate language over names is a second grading language inside a naming gate.
+SELECTOR_KINDS = ("prefix", "decorator")
+
+#: A selector literal carries NO DOT, and that is load-bearing rather than fussy: a `PINS` row key is
+#: `<cell>.<predicate>` split on the dot, so a dotted literal would make the pin row of the very cell
+#: the selector creates unparseable — and S4's whole point is that a selector'd cell ratchets on a
+#: pin of its own. A dotted decorator (`@app.route`) is recorded and matched by its LAST segment,
+#: which is why the restriction costs an adopter nothing.
+_SEL_LIT_RE = re.compile(r"^[A-Za-z0-9_]+$")
+
 #: Per-cell flags. `vocab` grades the row's names against the verb table; `notail` bans a trailing
 #: type suffix. Both are declared here rather than accepted freely so a typo reds instead of
 #: silently arming nothing.
@@ -159,6 +174,43 @@ def _parse_verbs(rows: list[tuple[int, str]], p: Path) -> dict[str, str]:
     return table
 
 
+def parse_cell_key(rowkey: str, where: str = "") -> tuple[str, str, str | None, str | None]:
+    """`<ext>.<surface>[+<kind>:<literal>]` -> `(ext, surface, kind, literal)`; kind is None for a
+    plain cell.
+
+    ONE READER for the row key, because three callers ask the same question of it — the `CELLS`
+    parser, the cross-block check below, and the engine's routing — and a second copy of the split is
+    how a key an owner typed stops matching the row a refusal prints. `where` is the caller's
+    `"<file>:<line>: "` prefix; it is a prefix rather than a pair of arguments so a caller with no
+    position (the engine, reading an ALREADY-parsed block) passes nothing and still gets the message.
+
+    THE SELECTOR RIDES ON THE KEY rather than in a block of its own, and that buys three things a
+    second block does not: the `PINS` block is keyed on the cell string, so a selector'd key gets its
+    own pin row for free; the report is keyed on the same string, so a selector'd row prints with no
+    second lookup; and one cell's declaration stays in one place, which matters because the parent
+    and the selector PARTITION a population — reading only one of them tells a reader the wrong
+    denominator.
+    """
+    head, sep, sel = rowkey.partition("+")
+    parts = head.split(".")
+    if len(parts) != 2 or not all(parts):
+        raise ConfError(f"{where}a CELLS row key is `<ext>.<surface>`, optionally followed by one "
+                        f"`+<kind>:<literal>` selector, got {rowkey!r}")
+    if parts[1] not in SURFACES:
+        raise ConfError(f"{where}unknown surface {parts[1]!r} in {rowkey!r}; "
+                        f"the closed set is {' '.join(SURFACES)}")
+    if not sep:
+        return parts[0], parts[1], None, None
+    kind, ksep, lit = sel.partition(":")
+    if not ksep or kind not in SELECTOR_KINDS:
+        raise ConfError(f"{where}a CELLS selector is `+<kind>:<literal>` with a kind in "
+                        f"{' '.join(SELECTOR_KINDS)}, got {'+' + sel!r} in {rowkey!r}")
+    if not _SEL_LIT_RE.match(lit):
+        raise ConfError(f"{where}selector literal {lit!r} in {rowkey!r} is not `[A-Za-z0-9_]+`; a "
+                        f"dot there would make this cell's own PINS row key unparseable")
+    return parts[0], parts[1], kind, lit
+
+
 def _parse_cells(rows: list[tuple[int, str]], p: Path) -> dict[str, tuple[str, frozenset]]:
     """`{"py.function": ("snake", frozenset({"vocab"}))}` from `<ext>.<surface>  <conv> [flags]`.
 
@@ -168,12 +220,7 @@ def _parse_cells(rows: list[tuple[int, str]], p: Path) -> dict[str, tuple[str, f
     """
     out: dict[str, tuple[str, frozenset]] = {}
     for rowkey, (lineno, rest) in _parse_rows(rows, p).items():
-        parts = rowkey.split(".")
-        if len(parts) != 2 or not all(parts):
-            raise ConfError(f"{p}:{lineno}: a CELLS row key is `<ext>.<surface>`, got {rowkey!r}")
-        if parts[1] not in SURFACES:
-            raise ConfError(f"{p}:{lineno}: unknown surface {parts[1]!r} in {rowkey!r}; "
-                            f"the closed set is {' '.join(SURFACES)}")
+        parse_cell_key(rowkey, f"{p}:{lineno}: ")
         toks = rest.split()
         if not toks:
             raise ConfError(f"{p}:{lineno}: CELLS row {rowkey!r} declares no convention")
@@ -310,12 +357,23 @@ def check_declaration(conf: dict, p: Path, rowlines: dict) -> None:
     """
     cells = conf.get("CELLS") or {}
     if cells:
-        declared = {ext for ext, _pset, _mode in langs(conf)}
+        declared = {ext: mode for ext, _pset, mode in langs(conf)}
         for rowkey in cells:
-            ext = rowkey.split(".")[0]
+            ext, _surface, kind, _lit = parse_cell_key(rowkey)
             if ext not in declared:
                 raise ConfError(f"{p}:{rowlines['CELLS'][rowkey]}: CELLS row {rowkey!r} names "
                                 f"extension {ext!r}, which LANGS does not declare")
+            # A DECORATOR SELECTOR IS A `parser` CAPABILITY, and this is the third cross-block
+            # refusal for the same reason as the two beside it: a `probe` set is a regex over text
+            # and knows nothing about decorators, so the subset would be EMPTY and the cell would
+            # report a clean zero at it forever. A named refusal here, at the line it is written on,
+            # beats a `DEAD CELL` two layers down that names the population and not the cause.
+            if kind == "decorator" and declared[ext] != "parser":
+                raise ConfError(f"{p}:{rowlines['CELLS'][rowkey]}: CELLS row {rowkey!r} declares a "
+                                f"`decorator` selector on extension {ext!r}, which LANGS declares "
+                                f"{declared[ext]!r}; decorators come from a real parse, so a "
+                                f"{declared[ext]!r} language would route an EMPTY subset and grade "
+                                f"nothing")
     for rowkey in conf.get("PINS") or {}:
         cell = ".".join(rowkey.split(".")[:2])
         if cell not in cells:

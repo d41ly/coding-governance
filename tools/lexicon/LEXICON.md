@@ -39,14 +39,33 @@ declaration is delivered two ways, and neither of them is the gate.
   the declaration, rows and negatives included, so an agent carries the table without opening the
   conf. Its own gate re-renders and byte-compares, so an edit nobody re-rendered reds.
 - **`python tools/lexicon/lexicon.py --suggest <name>`** answers ONE identifier from the declaration
-  alone: whether its leading verb is declared, and if not, which row's NOT clause names it and what
-  that row means. The suggestion keeps your separator, case, acronyms and digits — it hands back a
-  name you can type, not one you have to edit.
+  FIRST and the kit's frozen canon SECOND, in that fixed precedence and from no corpus at all:
+  whether its leading verb is declared, and if not, which row's NOT clause names it and what that
+  row means — or, where no row names it, which cluster the canon holds it in. The suggestion keeps
+  your separator, case, acronyms and digits — it hands back a name you can type, not one you have to
+  edit.
 
 There used to be a third: a per-FILE reading, which listed the OBJECTS a file already defined so a
 new function in it could be named alongside its neighbours. `TOOL-aSurfacedLexicon-3` deleted it, and
-no unit in that build restores a per-FILE reading — `TOOL-aSurfacedLexicon-8` restores the per-NAME
-one by wiring `--suggest` to the canon. That is the size of the gap, stated rather than softened.
+no unit in that build restores a per-FILE reading. The per-NAME half is back:
+`TOOL-aSurfacedLexicon-7` wired `--suggest` to the canon, which is why a token the declaration does
+not name now gets a replacement instead of a list of verbs. That is the size of the remaining gap,
+stated rather than softened.
+
+## DEBT and UNRULED — which refusals the kit can answer
+
+An off-table leading token splits in two, and the split is what tells you what to DO about it.
+
+- **DEBT** — the canon holds a cluster for the token, so it is a spelling of a concept the kit
+  already names. The gate hands you the replacement identifier and the gloss. This is a rename.
+- **UNRULED** — no cluster holds it. Nothing can name the replacement, because the question is not
+  how to spell the concept but whether it *is* one. The gate gives you the token's site count
+  instead: one site is a name to fix, twenty is a house idiom that either earns a `VERBS` row or
+  gets renamed everywhere.
+
+The corpus decides which spellings become DEBT and NOTHING else. It never decides what a concept is
+called — that is the canon's, and the canon was written without reading your code. Reversing those
+two is how a naming gate becomes a mirror of the habits it exists to grade.
 
 Read the table when you are naming something, not when a gate stops you.
 

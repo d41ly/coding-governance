@@ -248,9 +248,10 @@ def ratchet_findings(git: "Git", root: pathlib.Path, ratchets, lookback: int = D
 # that widening explicitly.
 #
 # WHY THIS EXISTS AT ALL: flipping an armed extension to `dark` is a ONE-STRING edit that empties a
-# graded population and, before this, reddened nothing. Measured on this repo — flip `py` from
-# `parser` to `dark` and the armed share of definition-carrying files falls from 42.2% to 7.8%,
-# with the gate still exiting 0.
+# graded population and, before this, reddened nothing. Flip `py` from `parser` to `dark` and the
+# armed share of definition-carrying files falls by tens of points with the gate still exiting 0.
+# The two percentages this comment used to name were measured before the shell cell was armed and
+# were wrong by the time anyone read them; `--check` prints the live share on every run.
 #
 # THE GAP IT DOES NOT CLOSE, said plainly. An extension ARRIVING already-dark is a rise from absent
 # (-1) to dark (0), so it is not a weakening and nothing here fires — yet it lowers coverage exactly

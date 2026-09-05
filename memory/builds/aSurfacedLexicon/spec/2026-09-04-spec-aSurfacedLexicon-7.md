@@ -1,11 +1,12 @@
 # TOOL-aSurfacedLexicon-7 — P1 splits into DEBT and UNRULED, and DEBT names its replacement
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 5
+**Status:** CLOSED · rev-3 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 5 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aSurfacedLexicon-6-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-6-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-13 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-13-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 |
 

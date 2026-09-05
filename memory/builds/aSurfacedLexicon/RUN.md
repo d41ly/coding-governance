@@ -74,3 +74,5 @@ base: 6c670b024644bf6bbcc28ee74d2265c0efd453c6
 2026-09-05T02:01:00Z dispatch · item 8674f4f0 TOOL-aSurfacedLexicon-2 · reason tools/lexicon/lexicon.py tools/lexicon/selftest.py tools/lexicon/kit.toml tools/lexicon/README.md tools/lexicon/LEXICON.md tools/lexicon/adopt-lexicon.sh tools/lexicon/SKILL.template.md .claude/skills/lexicon/SKILL.md .lexicon.conf memory/map/features/lexicon.md memory/map/generated/symbols.json coding-governance-agents.template.md AGENTS.md
 
 2026-09-05T03:27:36Z dispatch · item e6af6206 TOOL-aSurfacedLexicon-4 · reason tools/lexicon/lexicon.py tools/lexicon/lexicon_conf.py tools/lexicon/subtokens.py tools/lexicon/selftest.py tools/lexicon/README.md .lexicon.conf memory/map/features/lexicon.md
+
+2026-09-05T05:49:23Z dispatch · item e354db0a TOOL-aSurfacedLexicon-14 · reason tools/lexicon/lexicon.py tools/lexicon/selftest.py tools/lexicon/README.md .lexicon.conf

@@ -1273,6 +1273,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_bound_names",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "extract_chunks",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -1286,6 +1291,11 @@
       "id": "extract_declared",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "extract_decorators",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "extract_plan_writes",
@@ -1958,6 +1968,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "measure_vocab_cells",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "merge",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -2083,6 +2098,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "parse_cell_key",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
       "id": "parse_dossier",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -2116,6 +2136,11 @@
       "id": "parse_registry",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "parse_shell_defs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "parse_spec",
@@ -2288,9 +2313,19 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_conv_row",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "read_core",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_debt_gloss",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "read_declared_keys",
@@ -2593,6 +2628,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_pin_rows",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "render_region",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2606,6 +2646,11 @@
       "id": "render_spec_records",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_swapped_name",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "render_symbols_json",
@@ -3033,14 +3078,39 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "scan_file_stems",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_function_names",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "scan_js_definitions",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "scan_module_constants",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "scan_produced_destinations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_routes",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_shell_tokens",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "scan_slot_budget",
@@ -3051,6 +3121,11 @@
       "id": "scan_substituted",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "scan_type_names",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "scan_unarmed_slots",
@@ -3696,6 +3771,21 @@
       "id": "test_seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_shell_constructs",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "test_shell_refusals",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "test_shell_sentinel",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "test_signals_can_move",
