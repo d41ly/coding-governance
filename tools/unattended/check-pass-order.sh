@@ -410,9 +410,12 @@ $1" ;;
 done
 
 # ------------------------------------------------------------------------------- THE LIVENESS LINE
-# THREE COUNTS, one per population this leg WALKS, because a liveness line naming fewer populations
-# than the check walks is a partial probe reporting as a whole one. `unbuilt` is the population step
-# 1 drops: a unit whose build commit is outside its run's own range.
+# ONE COUNT PER POPULATION THIS LEG WALKS, because a liveness line naming fewer populations than the
+# check walks is a partial probe reporting as a whole one. This comment said "THREE COUNTS" while the
+# line below printed four, from before `skipped_norun` existed; TOOL-aStagedLane-1's S3 read the
+# comment rather than the line and inherited the miscount into its own scope item. Do not write the
+# number here again — the line is two inches below and cannot go stale.
+# `unbuilt` is the population step 1 drops: a unit whose build commit is outside its own range.
 #
 # DO NOT READ A NON-ZERO `unbuilt` AS BENIGN. It is the ordinary shape for a RESUMED build, and it is
 # ALSO what a widened exclusion set looks like — every commit falls inside the excluded surface, no
