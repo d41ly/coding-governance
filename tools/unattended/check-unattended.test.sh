@@ -316,6 +316,68 @@ out=$(run)
 hit "$out" "a required key is undeclared in .unattended.conf, and an undeclared value is not a defaulted one"
 hit "$out" "LANDER"
 
+# ---- THE CONF MAY NOT REDIRECT THE LEG'S OWN SUBJECT (closing-review F1). The import's arm used to
+# ---- be the open glob `[A-Z][A-Z0-9_]*`, which assigned EVERY uppercase key the conf declared -
+# ---- including the three this leg sets ABOVE the import. `.unattended.conf` is a tracked file an
+# ---- unattended run commits itself, and this leg is on an unguarded merge bar, so one line in it
+# ---- pointed the gate at a file other than the one it certifies.
+# ----
+# ---- PORTED FROM `check-brief-recorded.test.sh`'s evil-driver arm, which armed the same class on
+# ---- the sibling importer in the same build. Three keys, three shapes, because they break three
+# ---- different things and an arm on one is an arm on one.
+# ----
+# ---- EQUALITY, not a `miss` on one string. The claim is that the hostile line changed NOTHING, and
+# ---- a `miss` on one refusal would pass over any other damage the redirect did. `$_f1_clean` is
+# ---- captured on the same pristine fixture, so the two runs differ by exactly one appended line.
+# ----
+# ---- THE HOSTILE LINES ARE `export`-PREFIXED, and that is the whole point rather than a flourish.
+# ---- Check 22's project-conf key join greps `^[A-Z_]+=` - column 0, no `export` - while the
+# ---- importer's sed accepts a leading `export`, so the exported spelling is the one check 22 is
+# ---- BLIND to and the importer still honours. An arm on the column-0 form alone would have been
+# ---- satisfied by check 22 redding for an entirely different reason, and would have proved nothing
+# ---- about the import. The column-0 form gets its own arm below, saying exactly that.
+reset_tree
+_f1_clean=$(run)
+# The control's validity, asserted rather than assumed - and NOT as "the baseline is empty". This
+# fixture carries whatever standing reds the suite already has, and an emptiness assertion here would
+# simply restate the conforming-tree arm above and inherit its failures. What matters is that the
+# baseline does not ALREADY carry the redirect's own symptom, or the equality arms below would be
+# comparing one broken run against another.
+miss "$_f1_clean" "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set"
+
+reset_tree
+printf 'export DRIVER="/dev/null"
+' >> .unattended.conf
+same "a conf DRIVER does not redirect the leg away from the driver it certifies" "$(run)" "$_f1_clean"
+
+# ...`HERE` redirects the kit files this leg reads out of its own install directory - the Skill
+# template check 16 joins the registry against, and the playbook leg check 28 byte-compares.
+reset_tree
+printf 'export HERE="/nonexistent"
+' >> .unattended.conf
+same "a conf HERE does not redirect the kit files this leg reads out of its own install dir" "$(run)" "$_f1_clean"
+
+# ...and `SCOPE`, which is the worst of the three: it is read AFTER the import, so `skip28` in the
+# conf silently deleted the whole check-28 region including 28c, the pinned-git-read enforcement -
+# a check quietly deleted by the file it grades. The break is check 28's own scalar-parser arm, so a
+# region that RAN says so in its own words rather than by the absence of something.
+reset_tree
+rm -f $KIT_REL/check-playbook.sh
+printf 'export SCOPE="skip28"
+' >> .unattended.conf
+hit "$(run)" "the declared-scalar parser is missing from one of the two scripts that inline it, so the comparison that keeps the copies one answer would pass over an empty pair - driver and leg follow:"
+
+# ...and the COLUMN-0 spelling, recorded so nobody re-litigates check 22 as the mitigation. It reds
+# here, but on check 22 and for its own reason - an undeclared key in the project conf - while the
+# thing that actually matters is that check 1 no longer refuses over a driver it was pointed at.
+reset_tree
+printf 'DRIVER="/dev/null"
+' >> .unattended.conf
+out=$(run)
+hit "$out" "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol:"
+miss "$out" "cannot read AUTH_MODES from the driver, so the mode-membership branch and the directive scope join would both pass over an empty set"
+reset_tree
+
 reset_tree; sed -i 's/^PHASES_CORE=.*/PHASES_CORE=unparseable/' $KIT_REL/unattended.sh
 hit "$(run)" "cannot read the kit's core sets from the driver, so every membership check below would pass over an empty set"
 
@@ -1631,7 +1693,7 @@ _bm31() { # [route path]; with no argument the section names no route at all
 reset_tree
 _bm31 "$_c31_route"
 mkdir -p "$_c31_dir"
-hit "$(run)" "the build-method section naming the harnessed-pass route names a script this tree does not carry while the directory that holds it IS present, so the route's kit was taken and its route is broken: $_c31_route"
+hit "$(run)" "a carrier of the harnessed-pass route names a script this tree does not carry while the directory that holds it IS present, so the route's kit was taken and its route is broken: $_c31_route named by memory/guides/BUILD-METHOD.md"
 
 # branch S5, and the split against F1 above IS the ruling: an absent DIRECTORY means the route's kit
 # was never installed here, which is an install decision a standing bar cannot undo. It announces on
@@ -1676,11 +1738,51 @@ mutate $KIT_REL/unattended.sh 's/^DIRECTIVES_CORE=.*/DIRECTIVES_CORE=""/'
 hit "$(GOV_UNATTENDED_REPORT=1 run)" "— the directive registry names no passes-harnessed handle this leg can read"
 miss "$(run)" "check 31"
 
-# ...and the GREEN CONTROL, which is the arm that makes the six above mean anything: with the route
-# actually resolving, check 31 says nothing on EITHER channel. Without it, six announcing arms are
-# equally consistent with a check that announces unconditionally.
+# ---- THE SECOND CARRIER (closing-review F6). Check 31 read the build-method render alone, so the
+# ---- Skill - the carrier an agent actually reads, and the one that mandates `scriptPath` calls -
+# ---- was graded by nothing, while it spelled the same two scripts as install-prefix LITERALS that
+# ---- resolve to nothing at a root install. A check added to catch an unresolvable route, passing
+# ---- over exactly the half that had one. These arms are the same three branches as above, driven
+# ---- through the Skill instead, so a future edit cannot re-narrow the subject without redding.
+# ----
+# ---- THE SKILL IS WRITTEN, NOT RENDERED. The fixture's kit ships `SKILL.template.md` and no
+# ---- adopter has run here, so `.claude/skills/unattended/SKILL.md` is genuinely absent - which is
+# ---- branch S6's own fixture and is why that arm needs no break. `printf` with a single-quoted
+# ---- format for the same reason `_bm31` uses one: a backtick inside a double-quoted string in this
+# ---- suite is command substitution.
+_c31_skill=".claude/skills/unattended/SKILL.md"
+_mkskill() { # <route path>...; the Skill's harness bullet and nothing else
+  mkdir -p "$(dirname "$_c31_skill")"
+  { printf 'the harness is:\n'; for _s in "$@"; do printf -- '- `%s`\n' "$_s"; done; } > "$_c31_skill"
+}
+
+# branch S6, the Skill absent. The fixture ships no render, so this state is the shipped one and the
+# arm breaks nothing - the point being that the announcement exists at all, where before this the
+# whole carrier was silent by omission rather than by a stated skip.
+reset_tree
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for .claude/skills/unattended/SKILL.md — this tree carries no rendered Skill"
+
+# branch S7, the Skill present and naming no route: every adopter whose render predates the bullet.
+reset_tree
+_mkskill
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for .claude/skills/unattended/SKILL.md — the rendered Skill names no backticked route script"
+
+# branch F1 THROUGH THE SKILL, which is the arm that says the widening actually grades: the same
+# broken route, named only by the Skill, with the build-method carrier absent entirely. The message
+# names its own carrier, so the two halves are distinguishable in a failing run rather than merged.
+reset_tree
+_mkskill "$_c31_route"
+mkdir -p "$_c31_dir"
+hit "$(run)" "a carrier of the harnessed-pass route names a script this tree does not carry while the directory that holds it IS present, so the route's kit was taken and its route is broken: $_c31_route named by $_c31_skill"
+
+# ...and the GREEN CONTROL, which is the arm that makes the announcing ones mean anything: with the
+# route actually resolving in BOTH carriers, check 31 says nothing on EITHER channel. Without it,
+# every arm above is equally consistent with a check that announces unconditionally. The Skill is
+# seeded here too - leave it out and the S6 announcement fires and this control reds, which is the
+# correct behaviour and would make the control a test of the fixture.
 reset_tree
 _bm31 "$_c31_route"
+_mkskill "$_c31_route"
 mkdir -p "$_c31_dir" && : > "$_c31_route"
 miss "$(GOV_UNATTENDED_REPORT=1 run)" "check 31"
 reset_tree
@@ -1830,6 +1932,35 @@ hit "$(run)" "DIRECTIVES_EXTRA_TABLE names a file that does not exist, so every 
 # this leg has one: a source contributing nothing is indistinguishable from no source at all.
 mkdir -p memory/project && printf 'no rows here, just prose\n' > memory/project/nope.md
 hit "$(run)" "DIRECTIVES_EXTRA_TABLE names a file carrying no readable directive row, so the project declared a row source and the union it contributes is empty"
+reset_tree
+
+# ---- AN EXTRA HANDLE IS GRADED FOR EXISTENCE AND NOT FOR BODY (closing-review F3). The body term
+# ---- looped `core` - core PLUS extra - while its own rationale promised CORE-ONLY, so an adopter
+# ---- who used the documented `DIRECTIVES_EXTRA` knob got a permanent `fail 16` on a carrier the
+# ---- memory-tree kit ships as `role = "rendered"` and the doc-parity leg byte-compares. No route
+# ---- to green, on an unguarded merge-bar leg.
+# ----
+# ---- THE FIXTURE MUST HAVE THE CARRIER, and that is the reusable half. `declared + shown is
+# ---- silent` above runs after a `reset_tree` that leaves no `BUILD-METHOD.md`, so the term's own
+# ---- `[ -f … ]` guard makes it silent whatever it iterates: that arm passed on the broken code and
+# ---- on the fixed code alike. Any arm exercising a `[ -f ]`-guarded term must assert the file is
+# ---- there first, or it is testing the guard.
+# ----
+# ---- THE CONTROL IS A CORE HANDLE CITING THE SAME SECTION. `wrap-up-derived:M9` and
+# ---- `house-style:M9` read the same empty M9 body; the only difference between them is core versus
+# ---- extra. So the `hit` proves the term is LIVE on this exact fixture and the `miss` proves it
+# ---- stops at the core set - which no pair of separate fixtures could establish.
+reset_tree
+mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9"/'
+mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
+mkdir -p memory/project
+printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
+_bm_sections "" > memory/guides/BUILD-METHOD.md
+n=$((n+1)); [ -f memory/guides/BUILD-METHOD.md ] \
+  || { echo "FAIL fixture: no build-method carrier, so the term under test is guarded off and this arm proves nothing"; st=1; }
+out=$(run)
+hit  "$out" "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment: wrap-up-derived:M9"
+miss "$out" "absent in backticks outside every HTML comment: house-style:M9"
 reset_tree
 
 # ---- TOOL-cSettledDocket-6: the STANDING frozen-versus-live fixture. cBriefedPilot's closing review

@@ -555,9 +555,9 @@ definition, so the absence is a decision and not an oversight.
   pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
   commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
 - **Drive the build as ONE program, and know exactly what that buys.** The harness is
-  `tools/workflows/unattended-build.js`, which runs SPEC, AUDIT and DISPOSAL as ordered stages and
-  hands back the ordered roster only on a terminal `--review` verdict; each unit is then built by
-  `tools/workflows/unattended-unit.js`, one unit per call, holding that unit's brief and spec and
+  `{{TOOL_ROOT}}workflows/unattended-build.js`, which runs SPEC, AUDIT and DISPOSAL as ordered stages
+  and hands back the ordered roster only on a terminal `--review` verdict; each unit is then built by
+  `{{TOOL_ROOT}}workflows/unattended-unit.js`, one unit per call, holding that unit's brief and spec and
   nothing else. **Every call is made by `scriptPath` and never by `name`** — the fan-out guard's
   read-window narrowing is conditional on `scriptPath`, and a `name:` call exits it at zero.
   **Read the build method WHOLE before the first call**, because the child is handed one unit and the
