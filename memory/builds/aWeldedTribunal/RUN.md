@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: local
+units-at-landing: TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8
+unpushed-at-landing: 58 oldest 9b5ae688
 keepalive-reaped: yes
 parked-surfaced: yes, 0 surfaced — both spec-audit rounds and all four closing-review rounds were DISPOSED by fold, never parked
-witness: 267c90bad05713006ecbfcba034639b2c5a9a436
-phase: LANDING
+witness: a2adab9a45a4379ce59c45b7509489ddac2de272
+phase: LANDED
 branch-sha: 9b5ae68820500aafb32d0edde32936991472980c
 branch-ref: refs/heads/branch/backlog-items-build-c4c36b
 mode: prompt
