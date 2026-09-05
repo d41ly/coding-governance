@@ -84,3 +84,21 @@ base: e828f7784ce1fc713a9d008a82d524bb62dcb6a1
 2026-09-05T14:36:13Z decision · item unattended.test.sh cannot complete in EITHER mode, and both were measured · reason UNSHARDED it ABORTS. One arm spells a bare $1 inside a case pattern - the driver's own message parameter, interpolated by accident into the test - and with no positional parameters and set -u on, bash dies: 'line 4064: $1: unbound variable'. Reproduced in isolation with 'bash -c set -u; case x in *"$1 y"*)'. The arm is BYTE-IDENTICAL at the pristine BASE-side tip e4c7dd4d, where it sits at line 4011, so this predates TOOL-aHoistedPass-6 and every arm after it is unreachable in the invocation a developer types. SHARDED it survives, because --shard makes $1 the literal --shard, and instead reds 54 times on region-two arms that depend on region-one state. So the suite has never been run to completion by either route and nothing would have said so: the 2026-08-23 owner ruling took its legs off the bar. What this pass observed on its own tree: unsharded exit 1 with 3 pre-existing --brief FAILs before the abort, and shard 2/2 exit 1 with 54 FAILs byte-identical to the pristine baseline's 54. Options seen: (1) fix the $1 here, one character, which makes roughly thirty arms reachable for the first time and whatever they say is a build of its own; (2) fix the shard contract, also a build; (3) measure both, file both, and take neither. Took (3).
 
 2026-09-05T14:40:51Z brief · item TOOL-aHoistedPass-9 · reason f87ead152af0 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-9-brief.md
+
+2026-09-05T14:42:02Z brief · item DEPL-aHoistedPass-1 · reason ba1243a4519b memory/builds/aHoistedPass/prompts/2026-09-05-prompt-DEPL-aHoistedPass-1-brief.md
+
+2026-09-05T14:42:04Z brief · item TOOL-aHoistedPass-1 · reason f653600377c3 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-1-brief.md
+
+2026-09-05T14:42:07Z brief · item TOOL-aHoistedPass-2 · reason efed5bbe4283 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-2-brief.md
+
+2026-09-05T14:42:08Z brief · item TOOL-aHoistedPass-3 · reason 1b7a491cc35f memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-3-brief.md
+
+2026-09-05T14:42:10Z brief · item TOOL-aHoistedPass-4 · reason de4fa3053b46 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-4-brief.md
+
+2026-09-05T14:42:13Z brief · item TOOL-aHoistedPass-5 · reason 3ab06ce31148 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-brief.md
+
+2026-09-05T14:42:17Z brief · item TOOL-aHoistedPass-8 · reason 080b0a871e2d memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-8-brief.md
+
+2026-09-05T14:42:21Z brief · item TOOL-aHoistedPass-5 · reason 9de4aa6c4a79 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-fold-round1.md
+
+2026-09-05T14:42:24Z brief · item TOOL-aHoistedPass-6 · reason 7b2037072883 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-6-fold-round1.md
