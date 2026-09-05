@@ -1374,6 +1374,80 @@ def test_new_clones_reader(tmp: Path):
     assert md._new_clones(tmp, conf) is None
 
 
+def test_symbols_at_ref_absent_is_not_empty(tmp: Path):
+    """ABL-bCandidLoupe-2: `_symbols_at_ref` distinguishes THREE states, and `--converge` prints no
+    `collision_flags` NUMBER for the third.
+
+    The defect this pins: the reader failed open to `[]` for an absent file, which is
+    indistinguishable from a present-but-empty one. With no baseline no seam reaches the fan-in
+    threshold, so every range whose base predates the SYMBOL tier printed `collision_flags: 0` — a
+    confident empty answer over nothing measured, while a base AFTER the tier over the same repo
+    reported 538. Gating the CLASS, not the instance: the assertion is about the three-state
+    contract, so a future fail-open at either call site reds here rather than in a number nobody
+    re-reads.
+
+    THE ONLY REAL `git init` FIXTURE IN THIS SUITE, and it is isolated on purpose. `_symbols_at_ref`
+    shells out to `git show <ref>:<path>`, so the three states cannot be faked by an empty `.git`
+    directory the way this file's other arms do — the difference between "no such path at this ref"
+    and "this path holds []" only exists in a real object store. The environment is pinned
+    (`GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM` to the null device, `--template=` empty) so a node with
+    an opinionated global config, a commit template or a hook directory cannot change the result,
+    and every git failure is re-raised as an AssertionError because `check` above catches only that
+    and `Skipped`."""
+    import os
+    import subprocess
+
+    import map_diff as md
+
+    env = dict(os.environ)
+    env["GIT_CONFIG_GLOBAL"] = os.devnull
+    env["GIT_CONFIG_SYSTEM"] = os.devnull
+    env["GIT_CONFIG_NOSYSTEM"] = "1"
+
+    def run_git(*a):
+        r = subprocess.run(
+            ["git", "-C", str(tmp), *a], capture_output=True, text=True,
+            encoding="utf-8", errors="replace", env=env,
+        )
+        assert r.returncode == 0, f"git {' '.join(a)} failed: {r.stderr.strip()[:200]}"
+        return r.stdout.strip()
+
+    def seed_commit(msg):
+        run_git("add", "-A")
+        run_git("commit", "-qm", msg)
+        return run_git("rev-parse", "HEAD")
+
+    run_git("init", "--template=", "-q")
+    run_git("config", "user.email", "t@t")
+    run_git("config", "user.name", "t")
+    run_git("config", "commit.gpgsign", "false")
+    rel = "gen/symbols.json"
+    (tmp / "gen").mkdir()
+    (tmp / "seed.txt").write_text("x\n", encoding="utf-8")
+    before = seed_commit("no symbols yet")
+
+    (tmp / rel).write_text('{"symbols": []}\n', encoding="utf-8")
+    empty = seed_commit("empty symbols")
+
+    (tmp / rel).write_text(
+        '{"symbols": [{"id": "slugify", "kind": "function", "file": "src/text.py"}]}\n',
+        encoding="utf-8",
+    )
+    full = seed_commit("one symbol")
+
+    # STATE 3 — the ref carries no such file. Not measurable, and NOT an empty measurement.
+    assert md._symbols_at_ref(tmp, before, rel) is None, "an ABSENT symbols.json must not read as empty"
+    # STATE 2 — present and holding nothing. A real measurement of zero.
+    assert md._symbols_at_ref(tmp, empty, rel) == [], "a present-but-empty file must read as []"
+    # STATE 1 — present with rows.
+    rows = md._symbols_at_ref(tmp, full, rel)
+    assert rows is not None and len(rows) == 1 and rows[0]["id"] == "slugify", rows
+    # Malformed JSON is unmeasurable too — a parse failure is not evidence of an empty baseline.
+    (tmp / rel).write_text("{ not json\n", encoding="utf-8")
+    bad = seed_commit("malformed")
+    assert md._symbols_at_ref(tmp, bad, rel) is None, "malformed JSON must not read as an empty baseline"
+
+
 def test_identifier_tokens_per_language():
     """TOOL-aLexedStripper-1 §4 + -6: one arm per over-strip class, each asserting an identifier the
     LANGUAGE-BLIND chain deleted. Every fixture below was observed RED against the three-regex
@@ -1670,6 +1744,11 @@ def main() -> int:
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "symbols-at-ref: absent is not empty (ABL-bCandidLoupe-2)",
+            lambda: test_symbols_at_ref_absent_is_not_empty(Path(td)),
+        )
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
     failures += check_guarded("identifier tokens: corpus recall + precision floors", test_identifier_tokens_corpus_recall)
     # S2 — EXECUTED and SKIPPED reported separately, always. A single number cannot say which of
