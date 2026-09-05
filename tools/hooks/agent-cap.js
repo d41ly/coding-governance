@@ -1441,9 +1441,15 @@ function capFindings(script) {
 // `Workflow` call per roster unit from a single prompt issues many calls that are each a bounded,
 // single-agent act, and extending the ledger over them would spend a per-prompt budget written for a
 // BURST of verifiers on a SEQUENCE of unit passes — denying such a build partway through its own
-// roster, a refusal with no fan-out behind it. What the ledger enforces is the concurrency bound on
-// one turn's verify stage, not a lifetime quota on dispatches, and only the `Agent` matcher can tell
-// those apart from the payload alone.
+// roster, a refusal with no fan-out behind it.
+//
+// AND THE REASON IS THE LEDGER'S OWN NATURE, stated fifteen lines above and easy to get backwards:
+// this budget is LIFETIME-PER-PROMPT, so it is the TOTAL and never the concurrency bound. A total is
+// exactly the wrong instrument for a dispatch sequence, because the dispatch count is a function of
+// the ROSTER SIZE — the shape that has no budget in it at all — while a verify fan-out's total is
+// what the charter fixes. Two rules, not one; the script rules bound concurrency inside a script and
+// this bounds the total outside one, and only the `Agent` matcher can tell the two populations apart
+// from the payload alone.
 //
 // NO ROSTER SIZE IS STATED HERE, deliberately. A distribution restated in a hook comment rots on the
 // next build, and this file may not name the harness whose shape would settle it.

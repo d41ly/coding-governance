@@ -130,8 +130,9 @@ The script rules bound the fan-out inside one script; the slot ledger bounds the
 one. Neither wants the other's population. A harness that dispatches one `Workflow` call per unit of
 a build issues a SEQUENCE of single-agent acts from one prompt, and a per-prompt slot budget written
 for a BURST of verifiers would deny it partway through its own roster — a refusal with nothing fanned
-out behind it. The ledger enforces the concurrency bound on a verify stage, not a lifetime quota on
-dispatches. Count what carries no script; parse what does.
+out behind it. The slot budget is LIFETIME-PER-PROMPT, so it is the TOTAL and not the concurrency
+bound, and a total is the wrong instrument for a dispatch sequence whose count is a function of the
+roster size. Count what carries no script; parse what does.
 
 ## The authoring rule for kit files
 
