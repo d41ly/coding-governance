@@ -801,5 +801,49 @@ ck "S4 a declared path that is absent does NOT fall back to the rung" \
   "$(printf '%s' "$out" | grep -qF 'which is not a file' && echo 1 || echo 0)"
 rm -rf "$OOTS"; cleanup
 
+# ---- TOOL-aWeldedTribunal-7: WHICH HOOK WILL ACTUALLY RUN --------------------------------------
+# `core.hooksPath` is repo-global and absolute, so a sibling worktree supplies the hook that gates
+# your push. The check REPORTS that as a `note` and must never gate on it: `unwired` decides this
+# script's exit code and `.unattended.conf` makes `--check` an unattended run's precondition, so an
+# UNWIRED line would refuse every unattended run whenever another checkout moved.
+#
+# ARMS PER HOOK AND PER STATE, derived from the same list the check walks, so a third hook added to
+# `GOV_WIRING_HOOKS` arrives with its arms demanded rather than remembered.
+newrepo
+printf '#!/bin/sh\nexit 0\n' > .githooks/pre-push; chmod +x .githooks/pre-push
+git add -A; git commit -q -m "track both hooks"
+OOT=$(mktemp -d); cp .githooks/pre-commit .githooks/pre-push "$OOT/"
+git config core.hooksPath "$OOT"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: identical blobs report no divergence" \
+   "$([ "$(printf '%s' "$out" | grep -c 'DIVERGES')" = 0 ] && [ "$rc" = 0 ] && echo 1 || echo 0)"
+printf '# planted\n' >> "$OOT/pre-push"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: a diverging pre-push is REPORTED, naming both blobs" \
+   "$(printf '%s' "$out" | grep -q 'pre-push DIVERGES' && echo 1 || echo 0)"
+# THE ONE THAT CARRIES THE FORK RESOLUTION. A report that changes the exit code is the option the
+# spec vetoed, shipped under the accepted option's name.
+ck "hooks: a divergence does NOT gate — --check still exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+printf '# planted\n' >> "$OOT/pre-commit"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: the pre-commit half is reported too" \
+   "$(printf '%s' "$out" | grep -q 'pre-commit DIVERGES' && echo 1 || echo 0)"
+ck "hooks: two divergences still exit 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+rm -f "$OOT/pre-push"
+out=$(bash "$SCRIPT" --check 2>&1)
+ck "hooks: an unreadable side is UNKNOWN, never ok" \
+   "$(printf '%s' "$out" | grep -q 'pre-push: UNKNOWN' && echo 1 || echo 0)"
+cleanup
+# A hook this tree does not TRACK is a SKIP. An adopter owning its own pre-commit and shipping no
+# pre-push must not acquire a permanent finding it has no action to clear.
+newrepo
+OOT=$(mktemp -d); cp .githooks/pre-commit "$OOT/"
+git config core.hooksPath "$OOT"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: an untracked hook announces a skip" \
+   "$(printf '%s' "$out" | grep -q 'pre-push is not tracked here' && echo 1 || echo 0)"
+ck "hooks: a tracked-pre-commit-only adopter still exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+cleanup
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

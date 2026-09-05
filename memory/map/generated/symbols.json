@@ -318,6 +318,11 @@
       "file": "tools/workflows/tier2-review.js"
     },
     {
+      "id": "boundedParallel",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
       "id": "branches",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -661,6 +666,11 @@
       "id": "chunk",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "chunk",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
     },
     {
       "id": "claimant_index",
@@ -2053,6 +2063,16 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "parse_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "parse_conf_line",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
       "id": "parse_dossier",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -2496,6 +2516,11 @@
       "id": "renderLivenessNote",
       "kind": "function",
       "file": "tools/workflows/drift-audit-state.js"
+    },
+    {
+      "id": "renderPerLineBlanked",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "renderRoster",

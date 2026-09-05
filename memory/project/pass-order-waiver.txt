@@ -1,0 +1,27 @@
+# pass-order-waiver.txt — units the `pass-order history` leg reds that are DECLARED exceptions.
+# TOOL-aStagedLane-1 S2e. Legalised under `memory/project/` by PROJECT_REGISTRY_EXTRA in
+# `.memory-tree.conf`; that directory is a name-whitelisted closed set and an undeclared file there
+# reds the memory-hygiene leg however correct its contents are.
+#
+# FORMAT: one row per waived unit, `<unit-id><TAB><reason>`. Blank lines and `#` comments ignored.
+#
+# TWO PROPERTIES WORTH KNOWING BEFORE YOU EDIT THIS FILE:
+#   - An ABSENT file waives NOTHING. The default direction is the one that reds, because an exemption
+#     list that exempts everything when it goes missing cannot be told from a clean tree.
+#   - A STALE ROW REDS. A row naming a unit the leg no longer reports has outlived its reason, and
+#     the check says so by name. Delete the row rather than leaving it to widen the surface it was
+#     written to narrow.
+#
+# WHY THESE TWO EXIST. TOOL-aStagedLane-1 widened the leg to builds carrying no run-state file. Run
+# over the tree before it was wired — `check-pass-order.sh --preview`, which exists for exactly this
+# — the widened predicate found these two units already landed on the default branch. History is
+# append-only, so they cannot be fixed; without a declared exemption the widening could not be wired
+# at all. Naming them individually was preferred over moving PASS_ORDER_CUTOFF past 2026-09-01,
+# which would have blanket-exempted every build opened in that window to clear two rows.
+#
+# Both are the same shape: one commit carrying the unit's spec AND its product code, so at that
+# commit's first parent no spec for the id exists. That is the act the leg refuses, committed before
+# the leg could see this build.
+
+DEPL-dGaugedVintage-12	spec and product code in one commit (9ba3757d); landed 2026-09-01, before the leg graded run-state-free builds
+DEPL-dGaugedVintage-13	spec and product code in one commit (34492bb6); landed 2026-09-01, before the leg graded run-state-free builds
