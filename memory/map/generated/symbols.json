@@ -618,6 +618,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "check_path_match",
+      "kind": "function",
+      "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
       "id": "check_path_shaped",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -1926,11 +1931,6 @@
       "id": "match_expr",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
-    },
-    {
-      "id": "match_path",
-      "kind": "function",
-      "file": "tools/codebase-map/replay-phrases.py"
     },
     {
       "id": "measure_corpus_symbols",
