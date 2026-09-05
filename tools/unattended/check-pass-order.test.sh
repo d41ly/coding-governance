@@ -14,6 +14,12 @@
 # suite is not on the bar, so nothing would have reported it.
 set -u
 st=0; n=0
+# THE LEG'S FIXTURE-RELATIVE PATH, written ONCE. Every arm below runs it from inside the fixture
+# tree this suite builds, so `tools/` here is the FIXTURE's own layout and is correct at any
+# install prefix -- the file header says why sweeping it to a derived prefix broke 14 of 19 arms.
+# What this variable changes is only that the path is spelled once rather than in every arm: the
+# carried-prefix BAN counts literals, and thirty copies of a correct literal are still thirty.
+LEG="tools/unattended/check-pass-order.sh"
 SCRIPT="$(cd "$(dirname "$0")" && pwd)/check-pass-order.sh"
 KIT="$(cd "$(dirname "$0")" && pwd)"
 [ -f "$SCRIPT" ] || { echo "FAIL cannot find check-pass-order.sh beside this test"; exit 2; }
@@ -222,7 +228,7 @@ RM3
 # ---- AC6: THE PASSING CASE, first. A refusal with no observed passing case is a gate that cannot be
 # ---- satisfied, and it is the arm most often missing.
 T=$(mkfixture run spec-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "spec BEFORE build: the leg is green" "$rc" "0"
 has  "spec BEFORE build: the unit was graded" "$o" "graded 1 closed unit"
 hasnt "spec BEFORE build: nothing is reported as a violation" "$o" "FAILED"
@@ -231,7 +237,7 @@ rm -rf "$T"
 # ---- AC5: THE FAILING CASE, OBSERVED. This is the arm the whole leg exists for, and until it has
 # ---- been seen RED the leg is an assertion about nothing.
 T=$(mkfixture run build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "build BEFORE spec: the leg REDS" "$rc" "1"
 has  "build BEFORE spec: the message names the unit" "$o" "ARCH-tOrder-1"
 has  "build BEFORE spec: the message says what happened" "$o" "BUILT before a conforming spec"
@@ -242,12 +248,12 @@ rm -rf "$T"
 # ---- liveness line names all three populations this leg walks.
 T=$(mkfixture run build-first)
 ( cd "$T" && sed -i 's/^PASS_ORDER_CUTOFF=.*/PASS_ORDER_CUTOFF=""/' .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "cutoff BLANK: exits 0 over a tree that would otherwise RED" "$rc" "0"
 has  "cutoff BLANK: the skip ANNOUNCES itself" "$o" "the ORDER term is OFF"
 # The grandfathering direction: a build OPENED before the cutoff is skipped and counted.
 ( cd "$T" && sed -i 's/^PASS_ORDER_CUTOFF=.*/PASS_ORDER_CUTOFF="2026-12-01"/' .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "cutoff AFTER the build opened: grandfathered, exits 0" "$rc" "0"
 has  "cutoff AFTER: the skipped build is COUNTED, not silent" "$o" "1 build(s) skipped by the"
 rm -rf "$T"
@@ -258,12 +264,12 @@ rm -rf "$T"
 # ---- with zero output, byte-indistinguishable from a clean tree, and `trap` was worse — the leg
 # ---- PRINTED its own FAILED line and still exited 0. Both siblings met these one incident at a time.
 T=$(mkfixture run build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "hostile-conf control: the fixture reds BEFORE the conf is touched" "$rc" "1"
 ( cd "$T" && printf '
 exit 0
 ' >> .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended \`exit 0\` cannot end the leg at 0"   || { echo "FAIL an appended exit 0 ended the leg at 0 -- the subject silenced its own gate"; st=1; }
 rm -rf "$T"
 
@@ -277,7 +283,7 @@ T=$(mkfixture run build-first)
 ' > tools/unattended/evil.sh    && printf '
 DRIVER="tools/unattended/evil.sh"
 ' >> .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 n=$((n+1)); case "$o" in *OWNED*) echo "FAIL a conf line redirected DRIVER, so the leg eval'd a file the graded run chose"; st=1 ;; *) echo "ok   hostile conf: DRIVER is not assignable from the conf" ;; esac
 same "hostile conf: the honest verdict survives the DRIVER line" "$rc" "1"
 rm -rf "$T"
@@ -286,7 +292,7 @@ T=$(mkfixture run build-first)
 ( cd "$T" && printf "
 trap 'exit 0' EXIT
 " >> .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended EXIT trap cannot force rc 0"   || { echo "FAIL an appended EXIT trap forced rc 0 -- the worse shape, where the leg prints FAILED and exits green"; st=1; }
 rm -rf "$T"
 
@@ -294,7 +300,7 @@ rm -rf "$T"
 # ---- report a clean bill. Staged by breaking the driver's function header in a copy.
 T=$(mkfixture run spec-first)
 ( cd "$T" && sed -i 's/^plan_state()/plan_state_renamed()/' tools/unattended/unattended.sh )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "unsliceable classifier: exits 2 rather than reporting clean" "$rc" "2"
 has  "unsliceable classifier: it says which predicate it lost" "$o" "plan_state"
 rm -rf "$T"
@@ -305,7 +311,7 @@ rm -rf "$T"
 T=$(mkfixture run spec-first)
 ( cd "$T" && printf 'x\n' > tools/other.sh && git add -A >/dev/null \
     && git commit -q -m "ARCH-tOrder-11: a different unit entirely" --no-verify )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "id join is whole-token: a -11 commit does not disturb -1's verdict" "$rc" "0"
 rm -rf "$T"
 
@@ -316,7 +322,7 @@ rm -rf "$T"
 # ---- AC1: a run-state-free build whose unit was built before its spec REDS. Observed before the
 # ---- code that greens it, per the rule that a gate never seen failing is an assertion about nothing.
 T=$(mkfixture norun build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "no RUN.md, build BEFORE spec: the leg REDS" "$rc" "1"
 has  "no RUN.md, build BEFORE spec: the unit is named" "$o" "ARCH-tOrder-1"
 has  "no RUN.md: the build was GRADED, not skipped" "$o" "graded 1 closed unit"
@@ -325,7 +331,7 @@ rm -rf "$T"
 # ---- AC2: the same build, spec first, is green AND graded. A refusal with no observed passing case
 # ---- is a gate that cannot be satisfied.
 T=$(mkfixture norun spec-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "no RUN.md, spec BEFORE build: the leg is green" "$rc" "0"
 has  "no RUN.md, spec BEFORE build: the unit was graded" "$o" "graded 1 closed unit"
 rm -rf "$T"
@@ -333,7 +339,7 @@ rm -rf "$T"
 # ---- AC3/AC11: the liveness line names the new count and no longer carries the retired one. A field
 # ---- with no reachable increment site is a dead probe whatever value it prints.
 T=$(mkfixture norun spec-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1)
+o=$(cd "$T" && bash "$LEG" 2>&1)
 has   "liveness: the run-state-free population is counted by name" "$o" "graded with no run-state file"
 hasnt "liveness: the retired skip count is GONE, not pinned at zero" "$o" "with no pinned run BASE"
 has   "liveness: the pre-anchor population is counted" "$o" "pre-anchor violation"
@@ -343,7 +349,7 @@ rm -rf "$T"
 # ---- AC9: a RUN.md whose `base:` is garbage falls back to the folder anchor rather than exempting
 # ---- the build. Otherwise a build with a broken run-state file is MORE exempt than one with none.
 T=$(mkfixture badbase build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "garbage RUN.md base: still graded, and the violation still REDS" "$rc" "1"
 has  "garbage RUN.md base: graded through the folder anchor" "$o" "graded 1 closed unit"
 rm -rf "$T"
@@ -352,7 +358,7 @@ rm -rf "$T"
 # ---- any folder-derived range. It must RED, not fall into the unbuilt-in-range tally this file's own
 # ---- liveness block warns is not benign.
 T=$(mkfixture preanchor preanchor)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "pre-anchor build commit: the leg REDS" "$rc" "1"
 has  "pre-anchor: the message says the folder did not exist yet" "$o" "BEFORE this build's folder existed"
 has  "pre-anchor: it is counted as its own population" "$o" "1 pre-anchor violation"
@@ -361,7 +367,7 @@ rm -rf "$T"
 # ---- AC12: the false-positive arm, and the reason the pre-anchor probe reuses the WHOLE build-commit
 # ---- predicate. A backlog row naming the unit ordinarily lands before the build folder exists.
 T=$(mkfixture preanchor-record preanchor-record)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "pre-anchor RECORD-only commit: green, because the exclusion still applies" "$rc" "0"
 has  "pre-anchor record-only: reported as unbuilt-in-range, not as a violation" "$o" "unbuilt-in-range"
 rm -rf "$T"
@@ -369,7 +375,7 @@ rm -rf "$T"
 # ---- AC8: the violating commit IS the build folder's first commit. `rev-list A..HEAD` excludes A, so
 # ---- an exclusive anchor drops exactly this one — the boundary the unit exists to police.
 T=$(mkfixture first-commit first-commit)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "violation AT the folder's first commit: the leg REDS" "$rc" "1"
 rm -rf "$T"
 
@@ -377,13 +383,13 @@ rm -rf "$T"
 # ---- `<first>^`, so a pre-anchor window described as "strictly before the anchor" would exclude it
 # ---- twice and leave a one-commit hole. Both ends of the range now have an arm.
 T=$(mkfixture parent-commit parent-commit)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "violation at the PARENT of the folder's first commit: the leg REDS" "$rc" "1"
 rm -rf "$T"
 
 # ---- AC17: a build with no CLOSED unit contributes nothing and must not pass silently.
 T=$(mkfixture no-closed no-closed)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "no CLOSED unit: exits 0" "$rc" "0"
 has  "no CLOSED unit: graded nothing, and says so" "$o" "graded 0 closed unit"
 rm -rf "$T"
@@ -392,13 +398,13 @@ rm -rf "$T"
 # ---- REDS, because an exemption that has outlived its reason widens the surface it was written to
 # ---- narrow. The control comes first: the same fixture reds before the registry exists.
 T=$(mkfixture norun build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "waiver control: the fixture REDS with no registry" "$rc" "1"
 # COMMITTED, because the registry is read from the graded commit. An arm leaving it untracked
 # would exercise the uncommitted path H3 closed, and would pass either way.
 ( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\tthe control arm waives it\n' > memory/project/pass-order-waiver.txt \
     && git add -A >/dev/null && git commit -q -m 'waive it' --no-verify )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "waived violation: green" "$rc" "0"
 has  "waived violation: COUNTED, not silent" "$o" "1 waived by"
 # TWO ROWS, and this arm exists because a ONE-row registry cannot tell a working membership test from
@@ -407,12 +413,12 @@ has  "waived violation: COUNTED, not silent" "$o" "1 waived by"
 # was covered and the class was not.
 ( cd "$T" && printf 'ARCH-tOrder-2\ta row BEFORE the real one\nARCH-tOrder-1\tthe unit that actually violates\n' > memory/project/pass-order-waiver.txt \
     && git add -A >/dev/null && git commit -q -m 'two rows' --no-verify )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 hasnt "MULTI-row waiver: a row that is not the last still waives its unit" "$o" "BUILT at"
 has   "MULTI-row waiver: the stale sibling is still named" "$o" "ARCH-tOrder-2"
 ( cd "$T" && printf 'ARCH-tOrder-99\tnothing matches this\n' > memory/project/pass-order-waiver.txt \
     && git add -A >/dev/null && git commit -q -m 'stale row' --no-verify )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "STALE waiver row: REDS" "$rc" "1"
 has  "stale waiver: names the row that matched nothing" "$o" "ARCH-tOrder-99"
 rm -rf "$T"
@@ -420,7 +426,7 @@ rm -rf "$T"
 # ---- AC13/S2f: `--preview` prints what it finds and sets NO exit status, which is what lets a
 # ---- candidate predicate be run over a real tree before it is wired.
 T=$(mkfixture norun build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh --preview 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" --preview 2>&1); rc=$?
 same "--preview: exit 0 over a tree that REDS without it" "$rc" "0"
 has  "--preview: the violation is still printed" "$o" "ARCH-tOrder-1"
 has  "--preview: it says the status is not set" "$o" "exit status is NOT set"
@@ -437,7 +443,7 @@ T=$(mkfixture preanchor-record preanchor-record)
 ( cd "$T" && printf '
 PASS_ORDER_PREANCHOR_CAP="1"
 ' >> .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 has  "pre-anchor cap: the truncation is COUNTED" "$o" "1 probe(s) truncated"
 has  "pre-anchor cap: the cap it stopped at is named" "$o" "1-commit cap"
 same "pre-anchor cap: a truncated probe does not invent a violation" "$rc" "0"
@@ -446,15 +452,15 @@ rm -rf "$T"
 # ---- S6: the cutoff is read from the COMMIT, so editing the working copy cannot exempt a build.
 # ---- Control first — the same fixture reds before the working tree is touched.
 T=$(mkfixture norun build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "cutoff control: reds before the working copy is edited" "$rc" "1"
 ( cd "$T" && sed -i 's/^opened: .*/opened: 2020-01-01/' memory/builds/tOrder/README.md )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "working-tree opened: back-date does NOT exempt the build" "$rc" "1"
 # AC10 - the COMMITTED value still grandfathers, which is the narrowing this unit makes and not a
 # removal. The header says so; this arm proves the residual is real rather than theoretical.
 ( cd "$T" && git add -A >/dev/null && git commit -q -m "back-date the build" --no-verify )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "COMMITTED opened: back-date still exempts — the declared residual" "$rc" "0"
 rm -rf "$T"
 
@@ -467,10 +473,10 @@ rm -rf "$T"
 # ---- left `base:` on the filesystem, so dropping an untracked run-state file naming HEAD emptied the
 # ---- range and greened the leg. Control first, then the bypass attempt.
 T=$(mkfixture norun build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "B1 control: the fixture REDS before the bypass is attempted" "$rc" "1"
 ( cd "$T" && mkdir -p memory/builds/tOrder && printf '# tOrder\nbase: %s\n' "$(cd "$T" && git rev-parse HEAD)" > memory/builds/tOrder/RUN.md )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "B1: an UNTRACKED RUN.md does not exempt the build" "$rc" "1"
 rm -rf "$T"
 
@@ -478,7 +484,7 @@ rm -rf "$T"
 # ---- That read selects the POPULATION, so it is earlier and worse than the range read.
 T=$(mkfixture norun build-first)
 ( cd "$T" && sed -i 's/ CLOSED / OPEN /' memory/builds/tOrder/README.md )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "B1: an UNCOMMITTED CLOSED-row edit does not drop the unit" "$rc" "1"
 has  "B1: the unit is still graded from the committed region" "$o" "graded 1 closed unit"
 rm -rf "$T"
@@ -487,7 +493,7 @@ rm -rf "$T"
 # ---- its stale-row red can never fire for anybody else, because the file is not in the pushed tree.
 T=$(mkfixture norun build-first)
 ( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\tnever committed\n' > memory/project/pass-order-waiver.txt )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "H3: an UNCOMMITTED waiver does not waive" "$rc" "1"
 rm -rf "$T"
 
@@ -496,7 +502,7 @@ rm -rf "$T"
 # ---- truncation sentinel and the probe could never grade the one commit it exists to reach.
 T=$(mkfixture parent-commit parent-commit)
 ( cd "$T" && printf '\nPASS_ORDER_PREANCHOR_CAP="1"\n' >> .unattended.conf && git add -A >/dev/null && git commit -q -m 'cap 1' --no-verify )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "H1: the violation AT the anchor is graded, not eaten by the cap" "$rc" "1"
 has  "H1: it is reported as a pre-anchor violation" "$o" "1 pre-anchor violation"
 rm -rf "$T"
@@ -506,11 +512,11 @@ rm -rf "$T"
 # ---- value disabled the whole pre-anchor class while reporting zero truncations.
 T=$(mkfixture preanchor preanchor)
 ( cd "$T" && printf '\nPASS_ORDER_PREANCHOR_CAP="not-a-number"\n' >> .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "H2: a non-numeric cap is a REFUSAL, not a silent green" "$rc" "2"
 has  "H2: it says what the value must be" "$o" "must be a non-negative integer"
 ( cd "$T" && sed -i 's/^PASS_ORDER_PREANCHOR_CAP=.*/PASS_ORDER_PREANCHOR_CAP="1+1"/' .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "H2: an arithmetic EXPRESSION is refused rather than evaluated" "$rc" "2"
 rm -rf "$T"
 
@@ -520,10 +526,10 @@ rm -rf "$T"
 # ---- B1 arms change file CONTENT, which leaves the path in the index and cannot reach this line. An
 # ---- arm that cannot see the defect it is written for is the whole reason this one is spelled out.
 T=$(mkfixture norun build-first)
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "R2 control: the fixture REDS before the index is touched" "$rc" "1"
 ( cd "$T" && git rm -q --cached memory/builds/tOrder/README.md >/dev/null )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "R2: an UNCOMMITTED index removal does not drop the build" "$rc" "1"
 has  "R2: the build is still graded from the commit" "$o" "graded 1 closed unit"
 rm -rf "$T"
@@ -532,7 +538,7 @@ rm -rf "$T"
 # ---- leg graded nothing, and it was enumerated the same way.
 T=$(mkfixture norun build-first)
 ( cd "$T" && git rm -q -r --cached memory/builds >/dev/null )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "R2: an index-wide removal does not silence the leg" "$rc" "1"
 rm -rf "$T"
 
@@ -543,7 +549,7 @@ T=$(mkfixture preanchor preanchor)
 ( cd "$T" && printf '
 PASS_ORDER_PREANCHOR_CAP="99999999999999999999"
 ' >> .unattended.conf )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "R2: an all-digit OUT-OF-RANGE cap is refused, not silently accepted" "$rc" "2"
 has  "R2: the refusal says it is a range problem" "$o" "out of range"
 rm -rf "$T"
@@ -555,7 +561,7 @@ T=$(mkfixture preanchor-record preanchor-record)
 ( cd "$T" && printf '
 PASS_ORDER_PREANCHOR_CAP="2"
 ' >> .unattended.conf && git add -A >/dev/null && git commit -q -m 'cap 2' --no-verify )
-o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1)
+o=$(cd "$T" && bash "$LEG" 2>&1)
 hasnt "R2: a COMPLETE walk of a cap-deep window is not called truncated" "$o" "1 probe(s) truncated"
 rm -rf "$T"
 

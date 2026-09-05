@@ -98,9 +98,9 @@ export const meta = {
 //      2026-09-01 ruling survives in the half that matters — the verdict decides, and NO round cap
 //      exists anywhere in this file.
 
-// --- cap-5 fan-out, INLINED FROM `tools/workflows/tier2-review.js` (TOOL-aStagedLane-3 S2) ------
+// --- cap-5 fan-out, INLINED FROM THE SIBLING REVIEW HARNESS (TOOL-aStagedLane-3 S2) ----------
 // NOT A REUSE — A COPY, and the difference cost this spec two review rounds. `boundedParallel` was
-// never in this file: it lives at `tier2-review.js:17` and the copies elsewhere are in the two
+// never in this file: it lives at that harness's line 17 and the copies elsewhere are in the two
 // drift-audit workflows. Workflow scripts cannot import, so a second marked copy is the only shape
 // available, and `tier2-review.js` REMAINS THE OWNER of the cap literal — this one carries the same
 // value and names that file so the two are one figure with a stated source rather than two
@@ -110,7 +110,7 @@ export const meta = {
 // spell that token anywhere else in this file, including in prose: the hook scans line by line and
 // treats any line carrying it as a marked one, so a comment ABOUT the marker is read as a marker
 // claiming a bound over nothing, and denies the whole file. Learned here. Grammar:
-// `tools/hooks/README.md`.
+// the hooks kit's own README.
 async function boundedParallel(thunks, cap = 5) {
   const out = []
   for (let i = 0; i < thunks.length; i += cap)

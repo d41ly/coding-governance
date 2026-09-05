@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aStagedLane-3-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aStagedLane-3-acceptance-ledger.md) | journal | — |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round1.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round2.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-4 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md) | spec-audit | TOOL-aStagedLane-1 TOOL-aStagedLane-2 |
