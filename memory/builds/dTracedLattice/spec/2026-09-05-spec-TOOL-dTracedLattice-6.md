@@ -29,7 +29,10 @@ improvement.
 - **S1** Carry the TRANSITIVE CLOSURE, not the two names rev-1 listed. `resolve_import`
   (`tools/lexicon/lexicon.py:386`) reaches `_resolve_relative` at `:399`/`:408`,
   `_check_path_suffix` at `:417`/`:432`, and `ext_of` at `:396`/`:417`/`:422`/`:432` and
-  transitively at `:382`. **Four MOVE and one COPIES**, and the split is not cosmetic:
+  transitively at `:382`. **Four MOVE and one COPIES** across the TWO builds, and the split is
+  not cosmetic — this unit's own diff copies all five and deletes none, per §4's
+  copy-then-delete disposition; what makes four of them a MOVE is that
+  `TOOL-aSurfacedLexicon-2` S1 deletes those four and not `ext_of`:
   `build_module_index`, `_resolve_relative`, `_check_path_suffix` and `resolve_import` are all on
   `TOOL-aSurfacedLexicon-2` S1's deletion list, so a rescue naming only two ships a resolver whose
   helpers are deleted under it by the unit this rescue exists to beat. `ext_of` is the opposite case:
@@ -61,8 +64,9 @@ improvement.
 - **S4** Sequence against `TOOL-aSurfacedLexicon-2`. That unit's S1 deletes the eight functions and
   its S7 deletes 29 arms; this unit must land first, and that unit's spec gains a pointer saying the
   code moved rather than died.
-- **S5** Leave the lexicon kit's own behaviour unchanged. This is a move plus a pointer, never a
-  rewrite of what P3 decided.
+- **S5** Leave the lexicon kit's own behaviour unchanged, and its FILES unchanged too: per §4
+  this unit copies and deletes nothing, so `tools/lexicon/lexicon.py` is not in its write set
+  at all. This is an addition plus a pointer, never a rewrite of what P3 decided.
 
 ## 3. Non-goals (OUT)
 
@@ -117,16 +121,21 @@ layer rule, both of which carry recorded corrections earned by earlier defects.
 - observability — S3's header is the observability item.
 - risks — the real risk is ordering. If `TOOL-aSurfacedLexicon-2` lands first this unit's subject is
   gone, so S4 is the mitigation and its pointer is the durable half.
-- testing + left-shift gates — the arms that cover `resolve_import` move with it, and an arm asserts
-  the directional rule still refuses what it refused before.
-- migration / rollback — revert restores the functions to the lexicon kit; nothing is deleted here.
+- testing + left-shift gates — the arms that cover `resolve_import` are COPIED alongside it, so
+  the lexicon kit keeps its own until `TOOL-aSurfacedLexicon-2` removes both; AC7's assertion
+  that the moved module imports nothing from `tools/lexicon/` is the new leg, carried by the
+  directional rule S2 preserves, which still refuses what it refused before.
+- migration / rollback — revert deletes the copy and nothing else: per §4 the lexicon kit is
+  untouched by this unit, so there is nothing to restore there. The functions become
+  irrecoverable only after `TOOL-aSurfacedLexicon-2` S1 lands, which is the whole reason for the
+  ordering.
 - user docs — `tools/codebase-map/README.md` gains the resolver in its contents list.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `resolve_import` is called from `tools/codebase-map/` after the move, it returns the
   same candidate paths for the same target and importer as it did from `tools/lexicon/lexicon.py`,
-  asserted by the moved arms over the same fixtures.
+  asserted by the copied arms over the same fixtures.
 - **AC2** — When a JS package specifier carrying a dot is resolved, the importer's extension decides
   the namespace rule, so `lodash.debounce` is not treated as a dotted module path.
 - **AC3** — When the directional layer rule is evaluated after the move, `tools/lexicon/lexicon.py`'s

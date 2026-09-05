@@ -123,8 +123,9 @@ it; neither may be dispatched concurrently with the other, per M6 clause 1.
 
 - **Q1 — tracked artifact, or outside the worktree?** Tracked makes the rows durable, reviewable and
   shipped to adopters, at the cost of a new generated file under the freshness contract and a file
-  that grows monotonically. Outside the worktree — under the git common dir, beside `gate-ledger.tsv`
-  — keeps the tree clean and matches how this repo already stores per-run records, at the cost of
+  that grows monotonically. Outside the worktree — under the git COMMON dir, which is where
+  `tools/memory-recall/query.py:233` writes and NOT where `gate-ledger.tsv` goes; the option was
+  posed citing the ledger and S1 records why that citation is wrong — keeps the tree clean and matches how this repo already stores per-run records, at the cost of
   rows that no review ever sees and that do not travel between nodes. A third option the first
   decision saw: keep the durable destination and TRACK it, which is what F7 chose.
 
