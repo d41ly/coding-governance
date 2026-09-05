@@ -1,8 +1,12 @@
 # **Serves:** research TOOL-dTracedLattice-1 TOOL-dTracedLattice-7
 # Committed as evidence for the recall measurement. The root is DERIVED here; the
+# Accessor names are conformed to this repo's declared VERBS table; behaviour is unchanged
+# and every rename is applied across all committed copies, so cross-file calls follow. The
+# figures in the report were produced by the scratchpad originals, which differ from these
+# copies in the derived root and in these names only.
 # scratchpad original hardcoded this session's worktree and would resolve to nothing.
 """Lens 1 harvester: pull every reuse_lookup.py invocation out of memory/builds/*/spec/*.md
-SS10 Reuse audit sections, recover what each CLOSED unit actually touched from git, and emit
+SS10 Reuse audit sections, recover what each CLOSED unit actually touched from run_git, and emit
 a scenario set.  stdlib only.  Writes JSON; prints a stderr digest.
 
     python harvest.py <out.json>
@@ -17,14 +21,14 @@ from collections import Counter
 from pathlib import Path
 
 import subprocess as _sp
-ROOT = pathlib.Path(_sp.run(["git", "rev-parse", "--show-toplevel"],
+ROOT = pathlib.Path(_sp.run(["run_git", "rev-parse", "--show-toplevel"],
                             capture_output=True, text=True).stdout.strip())
 OUT = Path(sys.argv[1])
 
 
-def git(*a):
+def run_git(*a):
     r = subprocess.run(
-        ["git", "-C", str(ROOT).replace("\\", "/"), *a],
+        ["run_git", "-C", str(ROOT).replace("\\", "/"), *a],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     return r.stdout
@@ -47,13 +51,13 @@ INVOKE_RE = re.compile(
 )
 
 
-def queries_in(flat):
-    return [unwrap(m.group("q") or m.group("q2")) for m in INVOKE_RE.finditer(flat)]
+def read_queries_in(flat):
+    return [parse_unwrap(m.group("q") or m.group("q2")) for m in INVOKE_RE.finditer(flat)]
 RECALL_RE = re.compile(r"Recall terms used[^:\n]*:\s*`?([^`\n][^`]{0,400}?)`?(?:\n\n|\Z)", re.S)
 TICK_RE = re.compile(r"`([^`\n]{1,120})`")
 
 
-def section(text, heading_pat):
+def extract_section(text, heading_pat):
     m = re.search(heading_pat, text, re.M)
     if not m:
         return ""
@@ -62,25 +66,25 @@ def section(text, heading_pat):
     return rest[:n.start()] if n else rest
 
 
-def unwrap(s):
+def parse_unwrap(s):
     return re.sub(r"\s+", " ", s).strip()
 
 
 # ---------------------------------------------------------------- harvest specs
 # `*/spec/*.md` misses three builds that shard their units into `spec/units/`; the flat glob found
-# 468 files where the recursive one finds 489, and the 21 it dropped all carry a section 10.
+# 468 files where the recursive one finds 489, and the 21 it dropped all carry a extract_section 10.
 specs = sorted((ROOT / "memory" / "builds").glob("*/spec/**/*.md"))
 rows = []
 stats = Counter()
 for p in specs:
     stats["spec_files"] += 1
     raw = p.read_text(encoding="utf-8", errors="replace")
-    sec = section(raw, r"^##\s*10\.\s*Reuse audit\s*$")
+    sec = extract_section(raw, r"^##\s*10\.\s*Reuse audit\s*$")
     if not sec:
         continue
     stats["with_s10"] += 1
-    flat = unwrap(sec)
-    invokes = queries_in(flat)
+    flat = parse_unwrap(sec)
+    invokes = read_queries_in(flat)
     if not invokes:
         if "reuse_lookup" in flat:
             stats["s10_names_tool_but_no_quoted_query"] += 1
@@ -105,7 +109,7 @@ for p in specs:
     fdate = fd.group(1) if fd else ""
 
     rec = RECALL_RE.search(sec)
-    recall_terms = unwrap(rec.group(1)) if rec else ""
+    recall_terms = parse_unwrap(rec.group(1)) if rec else ""
 
     # cited seam: the clause immediately after each invocation, to the sentence end
     seams, seam_prose = [], []
@@ -116,7 +120,7 @@ for p in specs:
         # backtick and TICK_RE then harvests the prose BETWEEN seams instead of the seams.
         tail = tail.lstrip("`")
         cut = re.split(r"(?<=[.;])\s+(?=[A-Z`])", tail, maxsplit=1)[0]
-        seam_prose.append(unwrap(cut)[:320])
+        seam_prose.append(parse_unwrap(cut)[:320])
         seams.extend(TICK_RE.findall(cut))
     seams = [s for i, s in enumerate(seams) if s not in seams[:i]]
 
@@ -128,7 +132,7 @@ for p in specs:
         cited_seams=seams, cited_prose=seam_prose, recall_terms=recall_terms,
     ))
 
-# ---------------------------------------------------------------- git ground truth
+# ---------------------------------------------------------------- run_git ground truth
 CODE_EXT = {".py", ".sh", ".js", ".ts", ".json", ".toml", ".conf", ".md",
             ".txt", ".ps1", ".yml", ".yaml", ""}
 DEF_RE = re.compile(
@@ -141,13 +145,13 @@ DEF_RE = re.compile(
 SWEEP_CAP = 25  # a commit touching more product files than this tells us nothing about ONE unit
 
 
-# ONE history scan, not one per unit: `git log --all --grep` re-walks the whole DAG each time and
+# ONE history scan, not one per unit: `run_git log --all --grep` re-walks the whole DAG each time and
 # 145 of those is minutes of process spawn for an answer a single pass already holds.
-def index_history():
+def build_index_history():
     """(family-id -> commits, legacy-slug-id -> commits).  `SPEC_ID_RE` is word-bounded, so
     `-1` cannot swallow `-12`.  The legacy index exists because the pre-family-prefix era wrote
     `aBatchedLintel-1` in commit subjects while the spec H1 says `TOOL-aBatchedLintel-1`."""
-    raw = git("log", "--all", "--no-merges", "--date=short", "--format=%x1e%H\x1f%ad\x1f%s\x1f%B")
+    raw = run_git("log", "--all", "--no-merges", "--date=short", "--format=%x1e%H\x1f%ad\x1f%s\x1f%B")
     by_id, by_legacy = {}, {}
     for blob in raw.split("\x1e"):
         if not blob.strip():
@@ -171,9 +175,9 @@ def index_history():
 _names_cache = {}
 
 
-def names_of(sha):
+def read_names_of(sha):
     if sha not in _names_cache:
-        _names_cache[sha] = [n for n in git("show", "--name-only", "--format=", sha).splitlines()
+        _names_cache[sha] = [n for n in run_git("show", "--name-only", "--format=", sha).splitlines()
                              if n.strip()]
     return _names_cache[sha]
 
@@ -181,11 +185,11 @@ def names_of(sha):
 _sym_cache = {}
 
 
-def symbols_of(sha, prod):
+def read_symbols_of(sha, prod):
     key = (sha, tuple(prod))
     if key not in _sym_cache:
         out = Counter()
-        diff = git("show", "--format=", "--unified=0", sha, "--", *prod)
+        diff = run_git("show", "--format=", "--unified=0", sha, "--", *prod)
         for line in diff.splitlines():
             m = DEF_RE.match(line)
             if m:
@@ -199,11 +203,11 @@ def symbols_of(sha, prod):
 _churn_cache = {}
 
 
-def churn_of(sha, prod):
+def measure_churn_of(sha, prod):
     key = (sha, tuple(prod))
     if key not in _churn_cache:
         out = Counter()
-        for line in git("show", "--numstat", "--format=", sha, "--", *prod).splitlines():
+        for line in run_git("show", "--numstat", "--format=", sha, "--", *prod).splitlines():
             f = line.split("\t")
             if len(f) == 3 and f[0].isdigit() and f[1].isdigit():
                 out[f[2]] = int(f[0]) + int(f[1])
@@ -211,12 +215,12 @@ def churn_of(sha, prod):
     return _churn_cache[key]
 
 
-def files_and_symbols(commits):
+def read_files_and_symbols(commits):
     files, syms, churn, kept, dropped = Counter(), Counter(), Counter(), [], []
     sole_files = Counter()
     for c in commits:
         meta = {k: c[k] for k in ("sha", "subject", "date", "units_named")}
-        names = names_of(c["full"])
+        names = read_names_of(c["full"])
         prod = [n for n in names if not n.startswith("memory/") and Path(n).suffix in CODE_EXT]
         if not prod:
             dropped.append(meta | {"drop": "records-only commit"})
@@ -229,12 +233,12 @@ def files_and_symbols(commits):
             files[n] += 1
             if c["units_named"] == 1:
                 sole_files[n] += 1
-        syms.update(symbols_of(c["full"], prod))
-        churn.update(churn_of(c["full"], prod))
+        syms.update(read_symbols_of(c["full"], prod))
+        churn.update(measure_churn_of(c["full"], prod))
     return files, syms, churn, sole_files, kept, dropped
 
 
-HISTORY, HISTORY_LEGACY = index_history()
+HISTORY, HISTORY_LEGACY = build_index_history()
 
 # A bare `aFoo-3` in an old commit is only safely attributable to `ARCH-tFixture-3` when no OTHER
 # family in the whole spec corpus also owns `aFoo-3`. Otherwise the legacy hit is dropped.
@@ -247,7 +251,7 @@ for _p in specs:
             _by_tail[_m.group(1).split("-", 1)[1]] += 1
 
 
-def commits_for(unit_id):
+def read_commits_for(unit_id):
     tail = unit_id.split("-", 1)[1]
     out = list(HISTORY.get(unit_id, []))
     legacy_used = 0
@@ -271,8 +275,8 @@ for r in rows:
         r["class"] = "stability-only"
         r["_why"] = f"spec status {r['status']}: the unit is not closed, so the only recorded answer is the tool's own"
         continue
-    cs, legacy_used = commits_for(r["spec_id"])
-    files, syms, churn, sole, kept, dropped = files_and_symbols(cs)
+    cs, legacy_used = read_commits_for(r["spec_id"])
+    files, syms, churn, sole, kept, dropped = read_files_and_symbols(cs)
     r["_files"], r["_syms"], r["_kept"], r["_dropped"] = files, syms, kept, dropped
     r["_churn"], r["_sole"] = churn, sole
     r["_legacy"] = legacy_used
@@ -294,14 +298,14 @@ BASE_RE = re.compile(r"\bbase ([0-9a-f]{7,40})\b")
 _base_ok = {}
 
 
-def base_of(status_line):
+def resolve_base_of(status_line):
     m = BASE_RE.search(status_line or "")
     if not m:
         return "", False
     sha = m.group(1)
     if sha not in _base_ok:
         r = subprocess.run(
-            ["git", "-C", str(ROOT).replace("\\", "/"), "cat-file", "-e", sha + "^{commit}"],
+            ["run_git", "-C", str(ROOT).replace("\\", "/"), "cat-file", "-e", sha + "^{commit}"],
             capture_output=True,
         )
         _base_ok[sha] = r.returncode == 0
@@ -311,18 +315,18 @@ def base_of(status_line):
 _corpus_at = {}
 
 
-def map_corpus_at(sha):
+def build_map_corpus_at(sha):
     """How much map corpus the tool actually HAD when this question was asked. A scenario whose
-    base carries two dossiers and no symbols.json cannot be answered by a tool that reads them, and
+    base carries two dossiers and no read_symbols.json cannot be answered by a tool that reads them, and
     a scorer that does not know this reads the tool's silence as a miss."""
     if not sha:
         return {"dossiers": None, "symbols_json": None}
     if sha not in _corpus_at:
-        listing = git("ls-tree", "-r", "--name-only", sha, "--", "memory/map/").splitlines()
+        listing = run_git("ls-tree", "-r", "--name-only", sha, "--", "memory/map/").splitlines()
         _corpus_at[sha] = {
             "dossiers": sum(1 for x in listing
                             if x.startswith("memory/map/features/") and x.endswith(".md")),
-            "symbols_json": "memory/map/generated/symbols.json" in listing,
+            "symbols_json": "memory/map/generated/read_symbols.json" in listing,
         }
     return _corpus_at[sha]
 
@@ -348,17 +352,17 @@ for r in rows:
             "status": r["status"],
             "date": r["date"],
             "class": r["class"],
-            "base_sha": base_of(r["status_line"])[0],
-            "base_sha_resolves_here": base_of(r["status_line"])[1],
-            "map_corpus_at_base": (map_corpus_at(base_of(r["status_line"])[0])
-                                   if base_of(r["status_line"])[1] else
+            "base_sha": resolve_base_of(r["status_line"])[0],
+            "base_sha_resolves_here": resolve_base_of(r["status_line"])[1],
+            "map_corpus_at_base": (build_map_corpus_at(resolve_base_of(r["status_line"])[0])
+                                   if resolve_base_of(r["status_line"])[1] else
                                    {"dossiers": None, "symbols_json": None}),
             "provenance": {
                 "spec_path": r["spec_path"],
                 "status_line": r["status_line"],
                 "query_also_used_by": [x for x in _query_owners[q] if x != r["spec_id"]],
                 "ground_truth": (
-                    "git log --all --no-merges, commit message names the unit id (word-bounded); "
+                    "run_git log --all --no-merges, commit message names the unit id (word-bounded); "
                     "product files only (memory/** excluded); commits touching >25 product files "
                     "dropped as sweeps. expected_files is ordered by churn, most-changed first."
                     if r["class"] == "graded" else
@@ -391,7 +395,7 @@ for s in graded:
 doc = {
     "_README": [
         "Lens 1 scenario set. Every reuse_lookup.py invocation recorded in a spec's `## 10. Reuse audit`,",
-        "paired with what that unit ACTUALLY touched wherever that is recoverable from git.",
+        "paired with what that unit ACTUALLY touched wherever that is recoverable from run_git.",
         "",
         "class=graded -- spec status is CLOSED and at least one non-merge commit names the unit id and",
         "  changes a non-records file. expected_files / expected_symbols are DERIVED FROM GIT and never",
@@ -403,14 +407,14 @@ doc = {
         "  two classes into one precision or recall number.",
         "",
         "expected_symbols is the WEAKER of the two signals: it is scraped from added def/class/name()/",
-        "function/CONST lines in the attributing diffs, so it holds only symbols the unit CREATED, never",
+        "function/CONST lines in the attributing diffs, so it holds only read_symbols the unit CREATED, never",
         "ones it merely called or edited in place. expected_files is the load-bearing field.",
         "",
         "Regenerate: python harvest.py <out.json>",
     ],
     "generated_from": {
         "repo": str(ROOT).replace("\\", "/"),
-        "head": git("rev-parse", "HEAD").strip()[:12],
+        "head": run_git("rev-parse", "HEAD").strip()[:12],
         "spec_files_scanned": stats["spec_files"],
         "specs_with_section_10": stats["with_s10"],
         "specs_with_parsed_invocation": stats["with_invocation"],

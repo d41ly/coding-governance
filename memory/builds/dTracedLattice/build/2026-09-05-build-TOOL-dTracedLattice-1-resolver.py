@@ -1,5 +1,9 @@
 # **Serves:** research TOOL-dTracedLattice-1 TOOL-dTracedLattice-7
 # Committed as evidence for the recall measurement. The root is DERIVED here; the
+# Accessor names are conformed to this repo's declared VERBS table; behaviour is unchanged
+# and every rename is applied across all committed copies, so cross-file calls follow. The
+# figures in the report were produced by the scratchpad originals, which differ from these
+# copies in the derived root and in these names only.
 # scratchpad original hardcoded this session's worktree and would resolve to nothing.
 """A stdlib-ast import+reference resolver prototype over the SAME file set the heuristic scans.
 Measures: how much of a true reference graph is reachable with `ast` alone, and what necessarily
@@ -10,13 +14,13 @@ from pathlib import Path
 import harness as h
 
 ROOT = h.ROOT
-rows = h.symbols()
+rows = h.read_symbols()
 sym_files = sorted({r["file"] for r in rows})
-scanned = [p.relative_to(ROOT).as_posix() for p in h.scanned_files()]
+scanned = [p.relative_to(ROOT).as_posix() for p in h.scan_files()]
 py = [f for f in scanned if f.endswith(".py")]
 js = [f for f in scanned if f.endswith(".js")]
 
-# defs from symbols.json (the map's own export set) + a full ast def set (incl. private names)
+# defs from read_symbols.json (the map's own export set) + a full ast def set (incl. private names)
 defs_by_file = collections.defaultdict(set)
 for r in rows:
     defs_by_file[r["file"]].add(r["id"])

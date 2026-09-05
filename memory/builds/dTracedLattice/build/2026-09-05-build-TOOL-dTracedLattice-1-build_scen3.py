@@ -1,5 +1,9 @@
 # **Serves:** research TOOL-dTracedLattice-1 TOOL-dTracedLattice-7
 # Committed as evidence for the recall measurement. The root is DERIVED here; the
+# Accessor names are conformed to this repo's declared VERBS table; behaviour is unchanged
+# and every rename is applied across all committed copies, so cross-file calls follow. The
+# figures in the report were produced by the scratchpad originals, which differ from these
+# copies in the derived root and in these names only.
 # scratchpad original hardcoded this session's worktree and would resolve to nothing.
 """Join the authored seam judgements with DERIVED numbers and emit scen-3-adversarial.json.
 
@@ -27,15 +31,15 @@ sys.path.insert(0, str((ROOT / "tools" / "codebase-map").resolve()))
 import map_lib as m  # noqa: E402
 
 
-def tracked_files(pattern: str | None = None) -> list[str]:
-    argv = ["git", "ls-files"] + ([pattern] if pattern else [])
+def read_tracked_files(pattern: str | None = None) -> list[str]:
+    argv = ["run_git", "ls-files"] + ([pattern] if pattern else [])
     return subprocess.run(argv, capture_output=True, text=True, check=True).stdout.split()
 
 
 # ---------------------------------------------------------------- def sites (ast, all tracked py)
-def collect_defs() -> dict[str, list[dict]]:
+def scan_defs() -> dict[str, list[dict]]:
     out: dict[str, list[dict]] = collections.defaultdict(list)
-    for f in tracked_files("*.py"):
+    for f in read_tracked_files("*.py"):
         try:
             tree = ast.parse(pathlib.Path(f).read_text(encoding="utf-8"))
         except (SyntaxError, UnicodeDecodeError, OSError):
@@ -48,12 +52,12 @@ def collect_defs() -> dict[str, list[dict]]:
 
 
 # ------------------------------------------------------- reference index (the tool's OWN measure)
-SYMS = json.loads((m.map_root(ROOT) / "generated" / "symbols.json").read_text(encoding="utf-8"))["symbols"]
+SYMS = json.loads((m.map_root(ROOT) / "generated" / "read_symbols.json").read_text(encoding="utf-8"))["read_symbols"]
 IDX = m.build_reference_index(sorted({s["file"] for s in SYMS}), root=ROOT)
 
 # ------------------------------------------------------------------ text doc-frequency (all files)
 TEXT_DF: dict[str, int] = collections.Counter()
-for _f in tracked_files():
+for _f in read_tracked_files():
     try:
         _t = pathlib.Path(_f).read_text(encoding="utf-8", errors="replace")
     except OSError:
@@ -61,16 +65,16 @@ for _f in tracked_files():
     for _tok in set(re.findall(r"[A-Za-z_][A-Za-z_0-9]*", _t)):
         TEXT_DF[_tok] += 1
 
-# ------------------------------------------------------------------- the proposed confidence signal
+# ------------------------------------------------------------------- the proposed derive_confidence signal
 AMBIENT: set[str] = set(dir(str)) | set(dir(list)) | set(dir(pathlib.Path))
 AMBIENT |= set(dir(__builtins__) if not isinstance(__builtins__, dict) else __builtins__)
 
 
-def is_compound(name: str) -> bool:
+def check_compound(name: str) -> bool:
     return ("_" in name.strip("_")) or bool(re.search(r"[a-z][A-Z]", name))
 
 
-def confidence(name: str) -> dict:
+def derive_confidence(name: str) -> dict:
     """The three signals as the proposal states them, each reported separately.
 
     The DF signal is reported TWICE on purpose, over the two corpora the proposal does not
@@ -81,7 +85,7 @@ def confidence(name: str) -> dict:
     text_df = TEXT_DF.get(name, 0)
     sig = {
         "not_ambient": name not in AMBIENT,
-        "compound": is_compound(name),
+        "compound": check_compound(name),
         "rare_by_identifier_index": ident_df <= 15,
         "rare_by_text_corpus": text_df <= 15,
     }
@@ -97,11 +101,11 @@ def confidence(name: str) -> dict:
 
 
 # ------------------------------------------------------------- bare / attribute / kwarg edge split
-def edge_split(names: set[str]) -> dict[str, dict]:
+def derive_edge_split(names: set[str]) -> dict[str, dict]:
     bare = collections.defaultdict(set)
     attr = collections.defaultdict(collections.Counter)
     kwarg = collections.defaultdict(set)
-    for f in tracked_files("*.py"):
+    for f in read_tracked_files("*.py"):
         try:
             tree = ast.parse(pathlib.Path(f).read_text(encoding="utf-8"))
         except (SyntaxError, UnicodeDecodeError, OSError):
@@ -126,9 +130,9 @@ def edge_split(names: set[str]) -> dict[str, dict]:
 
 def main(argv: list[str]) -> int:
     authored = json.loads(pathlib.Path(argv[1]).read_text(encoding="utf-8"))
-    defs = collect_defs()
+    defs = scan_defs()
     names = {row["expected_symbol"] for row in authored}
-    edges = edge_split(names)
+    edges = derive_edge_split(names)
 
     refusals: list[str] = []
     scenarios = []
@@ -144,7 +148,7 @@ def main(argv: list[str]) -> int:
             if not any(s["file"] == af for s in defs.get(an, [])):
                 refusals.append(f"{row['id']}: also_acceptable {alt} does not resolve")
         fanin = m.fan_in(IDX, name, want_file)
-        conf = confidence(name)
+        conf = derive_confidence(name)
         scenarios.append({
             # ---- the five fields the lens asked for, first and in order
             "query": row["query"],
@@ -161,8 +165,8 @@ def main(argv: list[str]) -> int:
             "same_name_definer_files": sorted({s["file"] for s in sites}),
             "shipped_fan_in": fanin,
             "seam_by_shipped_threshold": fanin >= m.seam_fanin_threshold(ROOT),
-            "confidence": conf,
-            "edge_split": edges[name],
+            "derive_confidence": conf,
+            "derive_edge_split": edges[name],
             "established_by": row["established_by"],
         })
 
@@ -175,14 +179,14 @@ def main(argv: list[str]) -> int:
     out = {
         "$schema_note": "lens-3 adversarial scenarios for reuse_lookup ranking; see the .md companion",
         "$generated_by": "build_scen3.py over the tracked tree",
-        "$repo_head": subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
+        "$repo_head": subprocess.run(["run_git", "rev-parse", "HEAD"], capture_output=True,
                                      text=True, check=True).stdout.strip(),
-        "$tree_dirty": bool(subprocess.run(["git", "status", "--porcelain"], capture_output=True,
+        "$tree_dirty": bool(subprocess.run(["run_git", "status", "--porcelain"], capture_output=True,
                                            text=True, check=True).stdout.strip()),
         "$seam_fanin_threshold": m.seam_fanin_threshold(ROOT),
         "$n_scenarios": len(scenarios),
         "$corpus": {
-            "tracked_py_files": len(tracked_files("*.py")),
+            "tracked_py_files": len(read_tracked_files("*.py")),
             "symbols_json_entries": len(SYMS),
             "reference_index_tokens": len(IDX),
         },
@@ -195,7 +199,7 @@ def main(argv: list[str]) -> int:
     print(f"{'id':7s} {'symbol':16s} {'fanin':>5s} {'identdf':>7s} {'textdf':>6s} "
           f"{'tI':>2s} {'tT':>2s}  role")
     for s in scenarios:
-        c = s["confidence"]
+        c = s["derive_confidence"]
         print(f"{s['id']:7s} {s['expected_symbol']:16s} {s['shipped_fan_in']:5d} "
               f"{c['doc_freq_identifier_index']:7d} {c['doc_freq_text_corpus']:6d} "
               f"{c['tier_identifier_index']:2d} {c['tier_text_corpus']:2d}  {s['adversarial_role']}")

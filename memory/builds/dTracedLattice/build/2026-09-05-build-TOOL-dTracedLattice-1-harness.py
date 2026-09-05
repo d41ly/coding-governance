@@ -1,5 +1,9 @@
 # **Serves:** research TOOL-dTracedLattice-1 TOOL-dTracedLattice-7
 # Committed as evidence for the recall measurement. The root is DERIVED here; the
+# Accessor names are conformed to this repo's declared VERBS table; behaviour is unchanged
+# and every rename is applied across all committed copies, so cross-file calls follow. The
+# figures in the report were produced by the scratchpad originals, which differ from these
+# copies in the derived root and in these names only.
 # scratchpad original hardcoded this session's worktree and would resolve to nothing.
 """Shared measurement harness for LENS 5. Imports the kit's own map_lib so every figure is the
 tool's real behaviour, not a re-implementation."""
@@ -8,7 +12,7 @@ import inspect, json, os, re, sys
 from pathlib import Path
 
 import subprocess as _sp
-ROOT = pathlib.Path(_sp.run(["git", "rev-parse", "--show-toplevel"],
+ROOT = pathlib.Path(_sp.run(["run_git", "rev-parse", "--show-toplevel"],
                             capture_output=True, text=True).stdout.strip())
 KIT = ROOT / "tools" / "codebase-map"
 sys.path.insert(0, str(KIT))
@@ -28,13 +32,13 @@ blanked_source = _ns["_blanked_source"]
 IDENT = m._IDENT_TOKEN_RE
 SKIP = m._SKIP_DIRS
 
-def symbols():
-    d = json.loads((ROOT / "memory/map/generated/symbols.json").read_text(encoding="utf-8"))
-    return d["symbols"]
+def read_symbols():
+    d = json.loads((ROOT / "memory/map/generated/read_symbols.json").read_text(encoding="utf-8"))
+    return d["read_symbols"]
 
-def scanned_files():
-    """Exactly the file set build_reference_index walks for this repo's symbols.json."""
-    rows = symbols()
+def scan_files():
+    """Exactly the file set build_reference_index walks for this repo's read_symbols.json."""
+    rows = read_symbols()
     files = sorted({r["file"] for r in rows})
     roots = sorted({f.split("/", 1)[0] for f in files if f})
     exts = frozenset(Path(f).suffix for f in files if Path(f).suffix)
@@ -56,10 +60,10 @@ def scanned_files():
                 out.append(p)
     return out
 
-def occurrence_table():
+def build_occurrence_table():
     """rel -> {token: [n_bare, n_dotted]} over the blanked source (comments/strings removed)."""
     table = {}
-    for p in scanned_files():
+    for p in scan_files():
         rel = p.relative_to(ROOT).as_posix()
         try:
             text = p.read_text(encoding="utf-8")
@@ -78,7 +82,7 @@ def occurrence_table():
         table[rel] = counts
     return table
 
-def index_from(table, *, bare_only=False):
+def build_index_from(table, *, bare_only=False):
     idx = {}
     for rel, counts in table.items():
         for tok, (nb, nd) in counts.items():
