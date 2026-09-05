@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-9 — a recall fixture that can tell the two-set ensemble from its records half
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -158,6 +158,33 @@ substrate cannot retrieve either is a question no configuration answers, and adm
 the set with rows that make every ensemble look equally bad. Every declared target of a question must
 sit in an unanchored file — not merely one of them — or the question is not admitted, since a single
 anchored target reintroduces a reachable `records` document and breaks the guarantee for that row.
+
+### The candidate pool, measured before the unit was built
+
+S3 samples from the live query log, and whether that log HAS a usable pool is a fact the spec
+should not have left to the builder to discover. Measured on 2026-09-05 by joining the log against
+`extract_records`:
+
+| Figure | Value |
+|---|---|
+| query rows in the log | 199 |
+| distinct questions | 179 |
+| questions carrying a `results` array | 179 |
+| questions with at least one CHUNK hit in an UNANCHORED file | **165** |
+
+So the pool is 92% of the corpus rather than a scraping of the barrel, and S4 can pick its n on
+quality rather than on availability. The `results` array carries `set`, `path`, `line` and `id` per
+slot, capped at `RESULT_CAP = 5`, which is what makes the join possible: the `set` label identifies
+a chunk hit and the path is checked for anchored records directly.
+
+The hits land where §4 predicts — `memory/guides/UNATTENDED-PROTOCOL.md`, `memory/HYGIENE.md`,
+`memory/map/features/*.md` and `memory/gotchas/*.md` — the long, unanchored documents where a
+passage is the right answer and returning the file is useless. That is the population S1 describes,
+confirmed rather than assumed.
+
+**What this does NOT settle** is F1's judgement work: which shown passage actually answers each
+sampled question. The pool makes the set POSSIBLE; an author still has to read and decide, at the
+declared spot-check rate. That is the expensive half and it is untouched by this measurement.
 
 ### Files touched (estimate)
 
@@ -342,6 +369,11 @@ then pins against a named population rather than one that can silently grow.
   resolutions cite AC1, AC4 and AC5 and check 23 reds at CLOSED. M2 — §7 pointed at S6's "arm" when
   S6 is a report; it now names the `selftest.py` arm AC8 actually requires. M7 — §5 restored to the
   full ten labelled lines, which surfaced the distribution risk H3 found independently.
+- rev-5 · 2026-09-05 · the CANDIDATE POOL measured and recorded in §4, by the unattended run that
+  did not go on to build this unit. S3 assumed the live log could supply a sampling frame and never
+  said whether it does; it does — 165 of 179 distinct questions carry a chunk hit in an unanchored
+  file, and they land on exactly the long documents §4 predicts. No scope, acceptance or gate text
+  moved. The judgement half F1 resolved is untouched and is still the expensive part.
 - rev-4 · 2026-09-05 · round-2 spec audit folded, findings B1, H3, H7, M1, M2 and M7 — all six in
   rev-3's own fold. B1: AC7 asked `--audit-fixture` for an overlap number it cannot produce for this
   fixture. `measure_run` grades in the PIN's set (`docs = bench.load(data, pin["set"])`, `:179`) and
