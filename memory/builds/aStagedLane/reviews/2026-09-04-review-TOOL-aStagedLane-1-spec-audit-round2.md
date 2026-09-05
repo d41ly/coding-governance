@@ -217,7 +217,7 @@ RECORD SURFACE**" — the build folder plus `GENERATED_INDEXES` plus `SHARED_REC
 non-goal forbids changing that definition.
 
 So S2c either redefines the build commit, violating its own non-goal, or drops the exclusion by
-accident. The concrete cost of the second: a commit `backlog(TOOL-xFoo-1): open the row` touching
+accident. The concrete cost of the second: a commit `backlog(<unit-id>): open the row` touching
 only `memory/backlog/TOOL.md` normally lands *before* the build folder exists. S2c's search finds it
 in the pre-anchor window, calls it a VIOLATION, and reds the merge bar on a build that did nothing
 wrong. The pre-anchor window admits only product commits (true positives) or record commits (false

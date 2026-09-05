@@ -48,7 +48,7 @@ unattended builds alone, which means the rule it enforces is unenforced everywhe
   match AND a path touched outside the record surface** — the build's own folder, plus
   `GENERATED_INDEXES`, plus `SHARED_RECORDS`, which `.unattended.conf` sets to
   `memory/DECISIONS.md memory/backlog`. Rev-3 wrote only the first half, which would have made the
-  probe a false-positive engine: a `backlog(TOOL-xFoo-1): open the row` commit touching only
+  probe a false-positive engine: a `backlog(<unit-id>): open the row` commit touching only
   `memory/backlog/TOOL.md` ordinarily lands before the build folder exists, and a predicate without
   the exclusion reports it as a violation and reds the bar on a build that did nothing wrong. The
   script's own comment records that dropping this exclusion once "made a CONFORMING run unlandable",

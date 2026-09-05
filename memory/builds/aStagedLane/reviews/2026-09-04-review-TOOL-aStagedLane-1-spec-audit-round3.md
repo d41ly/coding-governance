@@ -70,11 +70,11 @@ is squarely in the widened population: it has no `RUN.md` (`memory/builds/dGauge
 `PASS_ORDER_CUTOFF="2026-09-01"` at `.unattended.conf:212`, and the leg's `sort -C` admits
 `opened == cutoff`. Grading from the S2 folder anchor:
 
-- `DEPL-dGaugedVintage-12` — build commit `9ba3757d`, which ADDS
+- Unit `DEPL-dGaugedVintage-12` — build commit `9ba3757d`, which ADDS
   `memory/builds/dGaugedVintage/spec/2026-09-01-spec-DEPL-dGaugedVintage-12.md` in the same commit
   that changes `tools/check-install-prefix.sh` and `tools/install-prefix-carried.txt`. Its parent
   `ff12039f` holds specs 1–11 and no spec-12.
-- `DEPL-dGaugedVintage-13` — build commit `34492bb6`, which ADDS its own spec-13 alongside
+- Unit `DEPL-dGaugedVintage-13` — build commit `34492bb6`, which ADDS its own spec-13 alongside
   `tools/drift-audit/drift_report.py`, `drift_signals.py` and `selftest.py`. Its parent is
   `9ba3757d`, which holds 1–12 and no spec-13.
 
