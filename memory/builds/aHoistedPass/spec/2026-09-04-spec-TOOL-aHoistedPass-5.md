@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -166,7 +166,7 @@ exits 1 on that `MapError` traceback. The floor is deliberate and fail-closed, a
 assertion of exactly the kind §7 of the charter demands, so it is not a bug to route around.
 
 **S6 is the resolution: one top-level definition.** The candidate spends eight near-identical lines on
-`if (!cfg.<key>) throw new Error(…)`; one `function need(key, why)` replaces the seven that share a
+`if (!cfg.<key>) throw new Error(…)`; one `function check(key, why)` replaces the seven that share a
 shape, satisfies rule 1 of `JS_DEFINITION_RULES`, and makes the file shorter. Observed with that one
 function added: the `MapError` is gone and the leg reports only its two ordinary obligations — the
 unclaimed key and the stale generated artifacts. With `"unattended-unit.js"` added to
@@ -342,7 +342,21 @@ versioning contract the file does not have.
   `undefined`, so AC14's eight refusals would fire on a request that was in fact complete — the
   failure mode this criterion exists to distinguish from a genuinely missing key.
 
+- **AC16** — When the landed `tools/workflows/unattended-unit.js` is grepped, its PROMPT names each of
+  S4's five acts by name: the read-both-documents-whole step, the change-the-spec-first divergence
+  rule, `--dispatch` with `--writes`, `--brief`, and the checklist command token. **S4 had five acts
+  and no criterion until rev-5.** AC10 is the only other criterion that reads the prompt string and it
+  reads S5's status flip and `--plan`; section 7 states that no standing leg calls this file at all,
+  so a prompt shipped without the `--brief` instruction would have been observable nowhere — while
+  `TOOL-aHoistedPass-7`'s whole leg grades that a brief row exists at the build commit, and the only
+  thing that writes one is this prompt.
+
 ## 7. Gates
+
+**`lexicon naming predicates`** — `python tools/lexicon/lexicon.py --check`, guard `tools/`, so the
+commit landing this file RUNS it. It is listed here because rev-4 omitted it while fold-confirming a
+`function` definition by name, and the verb pin has zero headroom: one definition outside the table
+reds the bar. Section 8 carries the measurement and the naming decision.
 
 Legs this unit must keep green, all read from `tools/gate-legs.json` at this base:
 
@@ -366,7 +380,7 @@ top-level `function` and no `=>`; `map_lib.py:474` raises on any `.js` under `to
 definition, and `codebase-map coverage + freshness` runs unguarded on every bar. Both constraints are
 real and they are incompatible as written.
 
-- **(a) The child yields.** One top-level `function need(key, why)` replaces seven near-identical
+- **(a) The child yields.** One top-level `function check(key, why)` replaces seven near-identical
   argument refusals. Cost: one clause of a five-clause style rule that nothing enforces, and the file
   header stops claiming it. Benefit: no edit to another kit, no widening of a fail-closed floor, and
   the file gets shorter. Measured green end to end at this base.
@@ -383,7 +397,21 @@ Widening a fail-closed check so a style preference can survive is the trade this
 making. If the owner prefers (b), it is a separate unit against the codebase-map kit and this unit
 lands unchanged behind it.
 
-RESOLVED (agent, 2026-09-05, delegated): **F1 — (a), the child yields.** One top-level `function need(key, why)` replaces the
+**THE DEFINITION IS NAMED `check` AND NOT `need`, and that is not style — it is the merge bar.**
+Measured in this worktree: `python tools/lexicon/lexicon.py --check` reports
+`P1 verb graded=1060 offenders=467` against `VERB_OFFENDER_PIN="467"`, which is EXACTLY AT ITS
+CEILING with zero headroom, and the checker reds when the count exceeds the pin. `.lexicon.conf`
+declares `js:js-regex:probe`, so the probe's functions pattern grades a `function <name>(` in this
+very file, and the leg `lexicon naming predicates` is guarded on `tools/`, which means the commit
+landing this file runs it and reaches 468. `--suggest need` answers that `need` is not in the
+declared table; `--suggest check` answers `OK — check leads with 'check', which the declaration
+carries`, and "assert a predicate and return a verdict" is exactly what the eight argument refusals
+do. So the name is the fix and no pin is raised. The alternative — raising
+`VERB_OFFENDER_PIN` 467 to 468 with the offender named and attributed — is REFUSED here: a pin
+raised so one function may keep a name outside the table is the table becoming a synonym list, which
+is the failure mode the lexicon's own rules name.
+
+RESOLVED (agent, 2026-09-05, delegated): **F1 — (a), the child yields.** One top-level `function check(key, why)` replaces the
 seven near-identical argument refusals, and the file header stops claiming a style rule it no longer
 keeps. Option (b) is discarded under M3 veto 2: it edits a fail-closed liveness floor in ANOTHER
 kit's public surface (`map_extractors.py`, `map_lib.py`), which is not this unit's ratified scope and
@@ -486,6 +514,24 @@ making. If the owner prefers (b) it is a separate unit and this one lands unchan
   states that no standing leg covers the args contract. NO kit-version bump is taken here and none is
   proposed: the `review-harness` 1.6-to-1.7 move belongs to `TOOL-aHoistedPass-6` by fork resolution,
   on the ground that this spec names no bump, and that stays true.
+
+- rev-5 - 2026-09-05 - folded round-2 spec-audit findings H11 and M1, both before the code pass.
+  **H11 is a guaranteed merge-bar RED that rev-4 created while resolving F1.** Its resolution
+  fold-confirmed `function need(key, why)` by name in three places, and `need` is not one of the
+  twenty-three verbs `.lexicon.conf` declares. Measured live: `lexicon.py --check` reports
+  `P1 verb graded=1060 offenders=467` against `VERB_OFFENDER_PIN="467"` - AT the ceiling, zero
+  headroom - and the leg is guarded on `tools/`, so the commit landing this file would have reached
+  468 and redded. Section 7 named the leg nowhere and the words "lexicon", "verb table" and "naming
+  predicates" appeared nowhere in the file. The definition is renamed `check`, which the table
+  carries and whose gloss is exactly what the eight refusals do; the leg is now listed with its
+  guard; and raising the pin is refused in writing, because a pin raised so one name may sit outside
+  the table turns the table into a synonym list. **M1** - S4 specifies five acts the prompt must
+  perform and no criterion read any of them; AC10 was the only criterion touching the prompt string
+  and it read S5's status flip plus `--plan`. Section 7 states that no standing leg calls this file
+  at all, so a prompt shipped without the `--brief` instruction was observable NOWHERE - while
+  `TOOL-aHoistedPass-7`'s entire leg grades that a brief row exists at the build commit, and the only
+  thing that writes one is this prompt. AC16 greps the landed prompt for each of the five acts by
+  name.
 
 ## 10. Reuse audit
 

@@ -125,7 +125,8 @@
       "drift-audit-code.js",
       "drift-audit-state.js",
       "tier2-review.js",
-      "unattended-build.js"
+      "unattended-build.js",
+      "unattended-unit.js"
     ],
     "skill-engines": [
       "deploy-governance",

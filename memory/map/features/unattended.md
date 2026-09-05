@@ -11,7 +11,7 @@ decisions = []
 gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history"]
 kits = ["unattended"]
 git-hooks = []
-workflow-scripts = ["unattended-build.js"]
+workflow-scripts = ["unattended-build.js", "unattended-unit.js"]
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
 gotcha-classes = ["text-mode-read-eats-a-bare-cr.md",
@@ -216,12 +216,11 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-*Re-derived 2026-08-20 against the tree rather than carried forward. The authored region
-carries twelve facts — it said seven here, and eleven in the protocol pair, and five in the driver's own
-resume comment, all at the same time. Three carriers, three values, none of them counted by any gate, which is why the unit that added the twelfth fact enumerated the
-carriers by path rather than trusting a builder to find them. Dossier prose is ungated — only the
-claims tables above are — so this section rots silently and is worth re-deriving whenever the feature
-is touched.*
+*Re-derived 2026-08-20 against the tree rather than carried forward. The authored region carries
+twelve facts, and three carriers gave three different counts at once — seven here, eleven in the
+protocol pair, five in the driver's resume comment — none counted by any gate, which is why the unit
+that added the twelfth enumerated the carriers by path. Dossier prose is ungated, so this section
+rots silently and is worth re-deriving whenever the feature is touched.*
 
 - **A run has been driven end to end, and it exposed two defects rather than confirming the
   design.** `aSealedCaravan` preflighted, built, and landed at `7a4f904` with the full bar green.

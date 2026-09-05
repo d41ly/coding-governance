@@ -60,3 +60,7 @@ base: e828f7784ce1fc713a9d008a82d524bb62dcb6a1
 2026-09-05T08:46:21Z brief · item TOOL-aHoistedPass-2 · reason 942332860ee6 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-2-brief.md
 
 2026-09-05T09:20:16Z dispatch · item f13c071a TOOL-aHoistedPass-2 · reason tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/install-prefix-carried.txt memory/guides/SESSION-KICKOFF.md tools/template-size-highwater.txt memory/project/unarmed-branches.txt memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-2-brief.md memory/builds/aHoistedPass/spec/2026-09-04-spec-TOOL-aHoistedPass-2.md memory/builds/aHoistedPass/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-05T10:05:03Z dispatch · item 8c759e50 TOOL-aHoistedPass-5 · reason tools/workflows/unattended-unit.js memory/map memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-brief.md memory/builds/aHoistedPass/spec/2026-09-04-spec-TOOL-aHoistedPass-5.md memory/builds/aHoistedPass/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-05T10:05:06Z brief · item TOOL-aHoistedPass-5 · reason 74463b6c5354 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-brief.md
