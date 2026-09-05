@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-9 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-8
+unpushed-at-landing: 0
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
-witness: 839601f37d79d1f603d36867b04973a50ecc38b4
-phase: LANDING
+witness: bfd2316aabf90dce00d7bcc06b05497f2ab2e351
+phase: LANDED
 mode: slug
 anchor-kind: default-branch
 keepalive: 6ced7a37
