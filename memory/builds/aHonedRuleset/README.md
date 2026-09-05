@@ -87,7 +87,7 @@ ids TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRu
 | [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-04 |
 | [TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement](spec/2026-09-04-spec-TOOL-aHonedRuleset-4.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-04 |
 | [TOOL-aHonedRuleset-5 — the last-audit stamp rule gets exactly one home](spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-04 |
-| [TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter](spec/2026-09-04-spec-TOOL-aHonedRuleset-8.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter](spec/2026-09-04-spec-TOOL-aHonedRuleset-8.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-04 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).

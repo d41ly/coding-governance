@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base 94958534 · streams deployer · order 4
+**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 94958534 · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
@@ -71,6 +71,11 @@ the deployer at this unit's base, that is false in its literal form and true in 
 So the gate ships, installs, and executes against a deployed charter, and a merge-bar leg proves it.
 The defect is narrower and entirely in the SELECTION layer.
 
+**One caveat on that last row, added at rev-2.** The proof is manufactured by a harness typing the
+id: `SCRATCH_KITS` is a hand-written list, so the matrix installs an entry no operator's command
+reaches. The evidence that the gate RUNS is real; the evidence that anyone would ever GET it is not,
+and that is the defect restated from the other side.
+
 ### The defect, measured
 
 Resolved live through `govkit.read_descriptors` and `govkit.resolve_selection` rather than read off
@@ -87,9 +92,21 @@ that does not name this one. An operator therefore reaches the gate only by typi
 `--kits`, and the id appears nowhere an operator reads: `git grep -l check-microformats` returns no
 hit in `WIRE-INTO-PROJECT.md`, and the runbook's §2 kit menu does not offer it.
 
-`govkit selfcheck` is silent about this by design. Its arm 7b at `tools/govkit/govkit.py:1349-1353`
+`govkit selfcheck` is silent about this by design. Its arm 7b at `tools/govkit/govkit.py:1350-1353`
 fails an entry "reached by no selection and is not marked conditional" — the conditional mark is
 exactly the escape this entry takes, so the state is declared rather than undetected.
+
+**`--kits` REPLACES the default set; it does not add to it.** Added at rev-2, because S3's
+justification turns on it and rev-1 did not state it. `resolve_selection`'s `mode == "kits"` branch
+at `tools/govkit/govkit.py:559-568` returns `derive_install_order(sorted(kits), descs)` and consults
+neither the default set nor the target's `deploy.toml`; `cmd_intake` calls the resolver with no
+`deploy` argument at all (`:8131`). `WIRE-INTO-PROJECT.md:82` — the §2 command an operator copies —
+passes `--kits` explicitly. **So S1 alone does not reach an operator who follows the runbook**, and
+S3's id is what closes that, not merely what documents it.
+
+A second consequence, noted rather than acted on: gov's own `.governance/deploy.toml:18-22` declares
+19 kits explicitly and takes the target's-own-list branch, so S1 changes nothing about gov's own
+install. The default set's audience is a fresh adopter with no declaration, and gov is not one.
 
 ### Why the mark is wrong
 
@@ -160,18 +177,23 @@ would leave the runbook describing a selection that does not exist yet.
   producing a registry where `--all` installs strictly less than the default in one respect. Two
   reachability answers for one entry is the shape this repo's own declarations exist to prevent.
 - **Teach the deployer that a conditional entry is implied when everything it `requires` is
-  selected.** This is the class-shaped fix and §8 F2 rejects it: the rule would fire for a second
-  entry (`check-agent-cap-restatement`, whenever `agent-cap` is selected) whose descriptor's stated
-  reason for being conditional is not a dependency question at all, and it points the deployer the
-  opposite way from `DEPL-aHoistedPass-1`, which is SPECCED to REFUSE a selection with an unsatisfied
-  `requires` rather than to complete it.
+  selected.** This is the class-shaped fix and §8 F2 rejects it. Corrected at rev-2: as worded the
+  rule fires for FOUR of the five conditional entries over the default selection and all five over
+  `--all`, because an absent or empty `requires` satisfies it vacuously — it deletes the conditional
+  class rather than adding one entry. It also points the deployer the opposite way from
+  `DEPL-aHoistedPass-1`, which is SPECCED to REFUSE a selection with an unsatisfied `requires` rather
+  than to complete it, and the owner has already ruled refuse-not-expand (see §8 F2).
 - **Ship the gate through `tools/playbook/adopt-playbook.sh` instead.** That adopter renders the
   charter region and copies nothing else; giving it a payload would create a second install path
   beside the registry for a file the registry already declares, which is the two-answers-to-one-question
   shape `registry.toml`'s own header opens with.
-- **Add a runbook bullet to the "What the renderer cannot decide for you" list.** That list is about
-  render-time judgement calls, and a gate is not one. The sentence goes beside the `--kits` command
-  it changes.
+- **Add a runbook bullet to the "What the renderer cannot decide for you" list.** Rejected, but the
+  rev-1 reason was wrong and is replaced here. That list is not confined to render-time judgement
+  calls: its own intro at `WIRE-INTO-PROJECT.md:91-92` calls it "the answers `intake` will ask for,
+  and the kits whose blocks the charter carries", and it already carries a gate kit in drop-it-if
+  terms at `:115` (`gate-lint`). The real reason is the §4 carried-prefix constraint: a bullet in
+  that list SPELLS A PATH, which is exactly what the carried-prefix ban fires on. The sentence goes
+  beside the `--kits` command it changes, and names the bare id.
 
 ## 5. Production-readiness checklist
 
@@ -260,48 +282,226 @@ deployer contract change smuggled into a two-line declaration edit.
 ## 8. Open questions
 
 - **F1 — is this one script's problem, or does the playbook adopter have no general answer for gov
-  scripts that gate the charter's own claims?** The question was answered by reading, not reasoned
-  about, and the answer is that the class is already handled. `tools/govkit/registry.toml` is the
-  general mechanism, and every gov script in this family already carries a decided row in it:
-  `check-placeholders` and `check-line-length` are entries that ship, while `check-playbook-parity.sh`,
-  `check-template-size.sh` and the four declaration files those two read are `[[exempt]]` rows whose
-  reasons all turn on one distinction — they grade GOV's own product, whose subject does not exist in
-  an adopter tree. `govkit selfcheck` asserts that population in both directions and reds on an
-  unclaimed path, so a new gate cannot land undeclared. There is no missing class answer; there is one
-  entry whose selection is wrong. *Recommendation: treat it as the instance it is, land S1 to S3, and
-  FILE the regression guard rather than build it.* The guard worth filing is a `selftest.py` arm
-  asserting that an entry whose `requires` name a default-set member is itself default-reachable —
-  that is the class predicate, it has one member today, and adding a govkit contract assertion inside
-  this unit is the scope creep `TOOL-aPacedTurnstile-1` §8 fork B declined for the identical shape,
-  producing `TOOL-aPacedTurnstile-11`.
+  scripts that gate the charter's own claims?** *Recommendation: treat it as the instance it is, land
+  S1 to S3, and FILE the regression guard rather than build it.* **The recommendation stands. Four of
+  rev-1's premises for it do not, and are corrected below — do not ratify this fork on the rev-1
+  reading.** What survives: `tools/govkit/registry.toml` IS the general mechanism, 25 `[[entry]]` rows
+  and 23 `[[exempt]]` rows, asserted in both directions by selfcheck arm 8
+  (`tools/govkit/govkit.py:1896-1932`), which reds on an unclaimed tracked path, on an exemption
+  naming a path that no longer exists, and on a claim that is not tracked. Measured live:
+  `surface 64 tracked path(s) · 25 entr(y|ies) · 23 exemption(s) · 0 unclaimed`. Of the five
+  conditional entries, only this one's stated reason fails on measurement, so the class is not
+  systematically broken.
+  - **Correction 1 — `check-placeholders` and `check-line-length` do NOT ship.** Both carry
+    `selectable = "conditional"` (`check-placeholders.kit.toml:17`, `check-line-length.kit.toml:16`),
+    so neither reaches the default set nor `--all`; an operator gets them only by typing the id, the
+    identical state this unit is fixing. §4's own inventory table says so and the rev-1 bullet
+    contradicted it. Their stated reasons DO survive measurement, unlike this entry's:
+    `check-line-length` grades a declaration that is gov's own (`tools/line-length-limits.txt`, and
+    `matrix.py:66` pins its install-day verdict as `NOT ADOPTED — no declaration at`), and
+    `check-placeholders` hardcodes `TEMPLATE="coding-governance-agents.template.md"`.
+  - **Correction 2 — THREE declaration files, not four.** `tools/template-size-limits.txt` and
+    `tools/template-size-highwater.txt` (`check-template-size.sh:54` and `:96`) and
+    `tools/playbook-kit-waivers.txt` (`check-playbook-parity.sh:40`). Counting the two self-tests
+    gives five.
+  - **Correction 3 — the exemption reasons do not share one distinction.** `registry.toml:223` and
+    `:231` do rest on the subject being absent from an adopter tree ("an adopter's instantiated
+    playbook has no kit population to check"). `:178` and `:239` rest on something else entirely: the
+    adopter's instantiated charter EXISTS, and what it lacks is a DECLARED SIZE CEILING. The gov-only
+    conclusion survives; the unifying sentence does not.
+  - **Correction 4 — the filed guard's population is wrong, and this one matters most.** rev-1 wrote
+    the predicate as "an entry whose `requires` name a default-set member is itself default-reachable"
+    and claimed one member. Resolved live, SIX entries have a `requires` naming a default-set member —
+    `check-microformats`, `codebase-map`, `drift-audit`, `memory-recall`, `playbook-render`,
+    `unattended` — and FOUR of those sit outside the default set. Read literally the guard demands
+    `drift-audit`, `playbook-render` and `unattended` join it; `playbook-render` declares
+    `requires = ["playbook"]` exactly as this entry does and is deliberately `--all`-only. **File the
+    row as "reachable by SOME selection", never "default-reachable"** — under that reading the
+    violating set has exactly one member today, and under the literal one the arm somebody builds in
+    three months is the wrong arm.
+  - **Correction 5 — "a new gate cannot land undeclared" is true of DECLARATION only.** Arm 8 grades
+    declaration completeness. REACHABILITY is arm 7b at `govkit.py:1350-1353`, whose predicate is
+    `e not in derived_all and selectable != "conditional"` — the conditional mark is the explicit
+    escape. A new charter-grading gate can land fully declared, reach no adopter, and red nothing.
+    That is the gap that let this entry sit unreachable for its entire life while `matrix.py:48`
+    hand-named it in `SCRATCH_KITS`. It belongs in the filed row.
+  - **Missing option, added at rev-2 — gate the conditional mark's REASON instead of its `requires`
+    edge.** `why_conditional` is free text that NOTHING reads: it appears in three descriptors, in no
+    code path and in no gate. The two entries that OMIT it are `check-line-length` and
+    `check-microformats` — the latter being precisely the one whose justification just failed
+    measurement. `registry.toml` already applies this exact discipline to the other escape hatch: arm
+    8 reds an `[[exempt]]` row with an empty reason, "an omission wearing a label"
+    (`govkit.py:1913-1915`). A one-arm selfcheck addition requiring a non-empty `why_conditional` on
+    every `selectable = "conditional"` entry is cheaper than the `requires`-edge arm, has an
+    immediately observable failing case (two violators today, so the charter §7 stage-the-break rule
+    is satisfiable on the spot), and never touches the `requires` edge — so it cannot collide with F2
+    or with `DEPL-aHoistedPass-1`. It is the guard that would have caught THIS defect at the moment
+    the mark was written, by forcing its argument into a field somebody could grade. **Owner rules
+    which of the two guards is filed, or both.**
+  - The filing precedent is unchanged and holds verbatim: `TOOL-aPacedTurnstile-1` §8 fork B declined
+    the identical shape ("add the runner to the default selection, add a selfcheck arm ... or rely on
+    the wiring leg"), producing `TOOL-aPacedTurnstile-11` at `memory/backlog/TOOL.md:179`, still OPEN.
 - **F2 — should the deployer INFER the selection instead, so a conditional entry is pulled in when
-  everything it `requires` is selected?** This is the tempting general fix and it should be rejected
-  for two reasons rather than one. It would fire for `check-agent-cap-restatement` whenever `agent-cap`
-  is selected, and that entry's `why_conditional` says it is for a target that "writes governance prose
-  of its own" — a project property no dependency edge encodes, so the inference would install it on
-  evidence it does not have. And it points the opposite way from `DEPL-aHoistedPass-1`, SPECCED at
-  `order 2` on this repo's own board, whose arm B REFUSES a selection whose `requires` are unsatisfied
-  instead of completing it. Two rules reading the same edge in opposite directions is worse than the
-  gap either one closes. *Recommendation: reject; keep `requires` an ORDERING and a REFUSAL edge, and
-  keep selection a declaration.*
+  everything it `requires` is selected?** *Recommendation: reject; keep `requires` an ORDERING edge
+  and keep selection a declaration.* **The recommendation stands and the question is in fact already
+  owner-ruled**, which rev-1 failed to say. Three supporting statements need correcting.
+  - **The ruling rev-1 did not cite.**
+    `memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md` records
+    **D4 (owner, 2026-09-04, "CORRECTED AND RE-DECIDED THE SAME DAY")**: the owner was told the
+    earlier framing was FALSE, that `resolve_selection` "never expands a selection at any of its four
+    call sites", and chose the edge plus install-time validation plus a gate-time announcement.
+    `DEPL-aHoistedPass-1` §3 states the consequence flatly: "the owner ruled refuse, not expand." F2
+    is therefore a request to REVISIT a standing ruling, not an open design question, and arguing it
+    from "a specced sibling points the other way" is the weaker of the two available fact bases.
+  - **Correction 1 — the count.** "It would fire for a second entry" understates the rule's reach. An
+    absent or empty `requires` is satisfied vacuously: `check-install-prefix` and `check-placeholders`
+    declare `requires = []`, `check-line-length` declares no `requires` key at all. Measured, the rule
+    as worded fires for FOUR of the five conditional entries over the default selection and for ALL
+    FIVE over `--all`. It does not add one entry; it DELETES the conditional class. Note also that
+    `agent-cap` is not in the default set, so the harm rev-1 names arises only under `--all` or an
+    explicit selection.
+  - **Correction 2 — the tense.** rev-1 says the rejection preserves `requires` as "an ORDERING and a
+    REFUSAL edge". At this base it is ORDERING ONLY. `requires` is read at exactly one place,
+    `govkit.py:504` inside `derive_install_order`, filtered `if d in want` so an out-of-selection edge
+    is dropped before it constrains anything, and the only `Refusal` that function raises is a cycle.
+    The refusal half is `DEPL-aHoistedPass-1`'s specced arm B and does not exist yet. Written in the
+    present tense it invites the owner to believe a control is already in place that is not.
+  - **Correction 3 — "two rules reading the same edge in opposite directions" is loose.** Arm B fires
+    when the dependency is ABSENT; inference would fire when it is PRESENT. The triggers are disjoint,
+    so the two rules are logically compatible and could coexist. What actually forbids inference is
+    D4, not a logical conflict.
+  - **The kill rev-1 does not make.** Simulate the post-S1/S2 registry: `all_kits` becomes 21, the
+    default becomes 7, and the inference rule's entire remaining population is
+    `check-agent-cap-restatement` over `--all` — the one case rev-1 itself calls harmful. Once S1
+    lands, the general rule has zero beneficiaries and exactly one victim. `check-agent-cap-restatement`'s
+    `why_conditional` (`kit.toml:8`, "writes governance prose of its own") is confirmed verbatim, and
+    the harm is worse than rev-1 states: `check-agent-cap-restatement.sh:119` enumerates the target's
+    whole tracked markdown, and its descriptor seeds the waiver registry EMPTY on purpose, so an
+    inferred install into a target that also took `playbook` would RED that target's bar on install
+    day rather than sit inert. That last step is reasoned from source, not observed — the entry is
+    absent from `matrix.py`'s `SCRATCH_KITS`, so no shape runs it in a scratch adopter.
+  - **Missing option, added at rev-2 — OPT-IN inference.** Let an entry DECLARE itself inferable (a
+    new descriptor key, or a third `selectable` value) and expand only on that declaration.
+    Mechanically real: `selectable` is consumed at exactly two places, `govkit.py:483` and `:1351`,
+    both as `!= "conditional"` with no closed value set, and no descriptor key schema exists that
+    would reject a new key. It escapes BOTH of rev-1's reasons — `check-agent-cap-restatement` simply
+    would not carry the declaration, and an explicit key is not the `requires` edge
+    `DEPL-aHoistedPass-1` governs. **§3's ban on `implied_by` is therefore currently justified by an
+    argument that does not reach the shape §3 names.** It still loses, on COST rather than on
+    argument: a descriptor key, a `resolve_selection` branch, a selfcheck arm (without one a
+    mis-spelled key is invisible, the exact class `DEPL-aHoistedPass-1` §3 already files) and selftest
+    arms, to serve a population of ONE that the one-token edit at `registry.toml:36` already serves.
+    **Owner says explicitly whether this is filed or dropped, rather than leaving it silently out.**
 - **F3 — now that the gate reaches adopters, should the rendered charter name it?**
   `TOOL-aHonedRuleset-2` §4 deliberately left its connective path-free and routed this question here.
-  *Recommendation: no.* The entry is declinable by construction, so a charter naming the gate is a
-  dangling pointer in every target that declines it — the exact objection unit 2 raised, and removing
-  the mark does not remove it. The bytes land in two carriers this build exists to shrink, against
-  `tools/template-size-highwater.txt`'s recorded 48378 and 60930, and `§7` of the charter already
-  routes a session to the leg manifest for leg names. The `{{MICROFORMAT_GATE}}` placeholder variant
-  costs a descriptor key and an answer from every adopter for the same dangling pointer.
-- **F4 — do S3's bytes earn their place in an uncapped 69030-byte document?** `WIRE-INTO-PROJECT.md`
-  is the subject of `TOOL-aScouredKit-23`, which records it as one of two instruction documents with
-  no declared ceiling anywhere, and `TOOL-dSpentCeiling-4` is the adjacent row about a kit spending an
-  adopter's read budget. Neither is answered here. *Recommendation: keep S3, at one id and one
-  sentence.* Without it the only way an operator learns the entry exists is reading `registry.toml`,
-  and a payload nobody is told about is the same defect as a payload that does not ship. Holding the
-  addition to the existing code block plus one sentence is the smallest form that closes it.
+  *Recommendation: no.* **The recommendation stands, but THREE of rev-1's four supporting claims are
+  false at source and are struck below.** The two facts that actually earn the ruling were mis-cited
+  or unstated, and are supplied here.
+  - **The rule that settles it is §16, not §7.** `coding-governance-agents.template.md:354`, inside
+    §16 (§16 opens at `:347`; §7 spans `:165-:223`), reads: "the expected set is whatever the gate
+    manifest defines, READ at emission time, never a list typed into this document or into a
+    project's charter." That is a direct prohibition on the thing this fork asks about, and it is
+    stronger than rev-1's paraphrase ("routes a session to the leg manifest"). A single leg name is
+    the degenerate case of the list it bans. `TOOL-aHonedRuleset-2` §8 F3 carries the same wrong
+    section number and should be corrected there too.
+  - **The binding number is the CEILING, not the high-water.** `tools/template-size-highwater.txt`'s
+    48378 and 60930 are ADVISORY: `check-template-size.sh` emits `TEMPLATE-SIZE WARN` and never
+    changes the exit code, and both records are already exceeded. The HARD fail is
+    `tools/template-size-limits.txt:27` (49152) and `:54` (64512). Measured with the gate's own
+    LF-normalized rule: the template is 49144, **8 bytes free**; `AGENTS.md` is 64481, 31 free (6 at
+    this spec's base). Any charter sentence naming the gate reds the bar today. That is dispositive
+    on its own and rev-1 did not use it.
+  - **STRUCK — "dangling pointer".** False. `render_playbook.py:387-389` drops every `kit:` fence
+    whose name the target's `deploy.toml` `kits` omits, and `remove_fenced` (`:228-247`) deletes the
+    body AND the markers. `check-microformats` is a registry entry id, so `check_fences` (`:204`)
+    accepts `<!-- kit:check-microformats -->` as legal. The template already carries five such fences
+    and the rendered `AGENTS.md` shows none surviving. A fenced mention dangles nowhere.
+  - **STRUCK — "an answer from every adopter".** False. Only `class = "asked"` refuses on an absent
+    answer (`render_playbook.py:420-426`); `derived` runs a probe (`:400-419`) and `defaulted` takes a
+    declared default (`:427-433`). `LEXICON_CONF` at `tools/govkit/entries/playbook.kit.toml:111-116`
+    is already exactly this shape — a `derived` placeholder living inside a conditional kit block —
+    and ships today.
+  - **STRUCK — "for the same dangling pointer".** False. Substitution runs strictly AFTER fence
+    removal (`render_playbook.py:389` then `:394`), so a placeholder inside a dropped fence is never
+    found, never resolved and never emitted. Placeholders are conditional the way kit blocks are.
+  - **Missing option, added at rev-2 — a FENCED sentence with NO placeholder.** Two fence lines plus
+    one sentence in the template. It costs no descriptor key, no adopter answer and produces no
+    dangling pointer, which is to say it defeats every argument rev-1 actually made; rev-1 named the
+    placeholder variant, dismissed it on two false grounds, and never named the cheaper one at all.
+    **It still loses, on the two facts above.** The markers alone are ~65 bytes carried by the SOURCE
+    template for every target whether or not anyone selects the entry, against 8 bytes of headroom.
+    §16:354 forbids the sentence in words. And gov's own `.governance/deploy.toml:18-22` does not
+    list `check-microformats`, so a fenced block would drop out of gov's own `AGENTS.md` until that
+    array is edited — a fourth file in a unit whose §3 promises three.
+  - The option already taken is S3: `WIRE-INTO-PROJECT.md` carries the mention, and the charter does
+    not need to be the carrier.
+- **F4 — do S3's bytes earn their place in an uncapped document?** `WIRE-INTO-PROJECT.md` is the
+  subject of `TOOL-aScouredKit-23` (`memory/backlog/TOOL.md:302`, OPEN, cited exactly as recorded —
+  though its own figure of 59833 B is now 68069 B, which strengthens its concern). Neither that row
+  nor `TOOL-dSpentCeiling-4` is answered here. *Recommendation: keep S3.* **It stands, but the
+  sentence rev-1 hung it on is FALSE and the load-bearing reason was missing.**
+  - **STRUCK — "the only way an operator learns the entry exists is reading `registry.toml`".** After
+    S1, four surfaces name it and none of them is the registry: `govkit plan` prints
+    `selection: …` on its first line (`govkit.py:2625`); `plan` prints the payload rows
+    `write  [engine       ] tools/check-microformats.sh`; `intake` WRITES the id into the target's own
+    committed `.governance/deploy.toml` `kits` list (`govkit.py:8158`), the file govkit's own help
+    calls the standing authorization; and the entry's two `[[gate_leg]]` rows land in the target's own
+    `tools/gate-legs.json`. The operator is told four times, in files they own.
+  - **What actually earns S3 — and it is stronger than what was struck.** `--kits` REPLACES the
+    default set (§4, added at rev-2), and `WIRE-INTO-PROJECT.md:82` is a `--kits` command. An operator
+    following the runbook's own documented charter-install path bypasses S1 entirely, so **the id at
+    line 82 is not documentation of S1; it is what makes S1 reach the runbook's reader.** Without it
+    this unit ships a default-set change the runbook's copy-paste command silently excludes.
+  - **Consequence for S3's two halves, which are not one atom.** Measured on a copy: the id is 19
+    bytes and the sentence ~193, 212 on disk in total, 0.31% of the document, and the carried-prefix
+    occurrence count does not move either way (AC6 holds; §4's constraint on the wording is real and
+    correctly stated — staging a sentence that spells `tools/check-microformats.sh` was observed to
+    red the gate with `ROSE  WIRE-INTO-PROJECT.md 47 -> 48`, and the printed remedy excludes
+    `--write-ratchet` for a ROSE verdict). **The ID is mandatory** for the reason above. **The
+    SENTENCE, 91% of the cost, now rests on a consistency argument** — an unglossed id in a
+    copy-paste list is the first thing an operator trims, and every other selectable kit in §2 gets a
+    sentence — **not on the defect-closing one rev-1 claimed. Owner rules the sentence knowing that.**
+  - **Correction — `TOOL-dSpentCeiling-4` is cited at the wrong population.** That row
+    (`memory/backlog/TOOL.md:245`) is about RENDERED kit docs spending an adopter's read budget,
+    measured over `memory/guides/BUILD-METHOD.md` and `memory/guides/UNATTENDED-PROTOCOL.md`.
+    `WIRE-INTO-PROJECT.md` is neither rendered from a kit template nor inside govkit's declared
+    shipping surface (`registry.toml`'s `[surface]` globs are `tools/*`, `.githooks/**`,
+    `skills/session-kickoff/**` and the root template), so S3's bytes land in no adopter's read budget
+    at all. The row is still correctly left unanswered; it simply does not contain this file.
+  - **Correction — the byte figure is node-local.** 69030 is the CRLF on-disk size on node `a`; the
+    committed blob is 68069 (961 CR bytes, no `eol=lf` row). The file is byte-identical at this
+    spec's base and at HEAD.
+  - **Missing option, added at rev-2 — ANCHOR it.** The runbook's own machine-readable convention for
+    "this deployable exists" is `<!-- govkit:entry <id> -->`, present 7 times, and
+    `tools/govkit/check_runbook_parity.py` asserts that population in both directions with a
+    non-empty-body liveness half. Run today it exits 1 with 18 problems, one of them by name:
+    `runbook-parity: registry entry 'check-microformats' has no anchored runbook section`. S3 as
+    specced adds prose that this repo's own convention cannot see. An anchor is ~40 bytes and the
+    sentence S3 already budgets can be its body, so it closes the machine gap for ~40 bytes more.
+  - **Missing option, added at rev-2 — DECLARE IT EXEMPT.** `check_runbook_parity.py:41-49` reads a
+    `[[runbook_exempt]]` table from `registry.toml`, requiring a non-empty `why` and refusing a row
+    naming a dead entry. That is this repo's first-class way of answering "does this entry need
+    runbook bytes?" with NO, at zero runbook bytes and with the reason recorded where a future reader
+    finds it. Zero rows exist today — the table is defined and unused.
+  - **Flagged, explicitly NOT in this unit's scope.** `check_runbook_parity.py` is tracked, sits in no
+    row of `tools/gate-legs.json`, is invoked by nothing, and is RED. An unwired red gate on exactly
+    the question this fork asks is the green-by-absence shape the charter §7 exists to prevent, and it
+    wants its own backlog row rather than a scope expansion here.
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-04 · fork-verification pass, one verifier per §8 fork, every correction re-checked
+  against source before it was written in. **All four forks stay OPEN and unsigned; every
+  recommendation survives, and none is ratified here.** Struck as false at source: F1's
+  "`check-placeholders` and `check-line-length` are entries that ship", its "four declaration files",
+  its single unifying exemption reason and its one-member guard predicate; F2's "a second entry" and
+  its present-tense "REFUSAL edge"; F3's dangling-pointer, adopter-answer and same-pointer claims and
+  its `§7` citation; F4's "the only way an operator learns the entry exists". Added: the `--kits`
+  REPLACES fact in §4, which is what actually makes S3's id load-bearing rather than merely
+  informative; four options rev-1 omitted (a `why_conditional` reason gate, opt-in inference, a fenced
+  charter sentence, and the `govkit:entry` anchor plus its `[[runbook_exempt]]` counterpart); the D4
+  owner ruling F2 argues around without citing; and one out-of-scope flag, that
+  `tools/govkit/check_runbook_parity.py` is unwired and red. No scope item changed.
 - rev-1 · 2026-09-04 · initial draft. Written after the owner's `TOOL-aHonedRuleset-2` §8 F3 ruling of
   2026-09-04 to close the adopter gap rather than accept it, and separated from unit 2 per BUILD-METHOD
   M2. The design pass corrected that ruling's premise: the gate already ships and already runs in a
