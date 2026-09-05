@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-9 — the owner-declarable PATTERNS block
 
-**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
+**Status:** SPECCED · rev-7 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -58,7 +58,7 @@ vocabulary-and-convention apparatus then grades filenames or nothing. Owner ruli
   which tells an implementer to expect fewer sites rather than none of these three; a collapsed site
   still needs the mapping threaded through it and a deleted one needs nothing.
 - **S5** — `KNOWN_EXTS` stops deciding which languages an adopter may arm. It survives as the
-  no-declaration fallback it already is at `tools/lexicon/lexicon.py:1072`, and the scaffold's language
+  no-declaration fallback it already is in `tools/lexicon/lexicon.py`, and the scaffold's language
   proposal keeps reading it (`tools/lexicon/scaffold_lexicon.py:39`, `:72`, `:74`, `:116`, `:126`,
   `:128`), but no armed path consults it to decide whether an extension may be graded.
 - **S6** — The DEAD PROBE arm's POPULATION widens to declared sets. The refusal itself already
@@ -472,6 +472,8 @@ is not one, so no `memory/project/testsuite-count-waivers.txt` row is owed eithe
   promotes the arm — which is why it needed no edit when the ownership did move.
 - rev-6 · 2026-09-05 · cross-spec rev pin dropped from §3; the rev-log line keeps its own, which is where a
   historical read belongs.
+- rev-7 · 2026-09-05 · a line citation into `tools/lexicon/lexicon.py` symbol-anchored: the build shrinks that
+  file and a line number into it rots by construction.
 
 ## 10. Reuse audit
 

@@ -730,8 +730,8 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     conf = r / ".lexicon.conf"
     conf.write_text(
         'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
-        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
-        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n\nLAYERS:\n  src/* -> vendor/*\n',
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n',
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
@@ -810,8 +810,8 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (r / ".lexicon.conf").write_text(
         'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
-        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
-        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n\nLAYERS:\n  src/* -> vendor/*\n',
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n',
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
@@ -885,9 +885,8 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     (b / ".lexicon.conf").write_text(
         'BANNED_SUFFIXES="Manager"' + chr(10) + 'LANGS="py:python-ast:parser"' + chr(10)
         + 'VERB_OFFENDER_PIN="99"' + chr(10) + 'SUFFIX_OFFENDER_PIN="0"' + chr(10)
-        + 'LAYER_OFFENDER_PIN="0"' + chr(10) + 'ratified="2999-01-01 node t"' + chr(10) + chr(10)
-        + "VERBS:" + chr(10) + "  build  make a thing" + chr(10) + chr(10)
-        + "LAYERS:" + chr(10) + "  src/* -> vendor/*" + chr(10),
+        + 'ratified="2999-01-01 node t"' + chr(10) + chr(10)
+        + "VERBS:" + chr(10) + "  build  make a thing" + chr(10),
         encoding="utf-8", newline=chr(10))
     run(["git", "add", "-A"], b)
     run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], b)

@@ -1,11 +1,12 @@
 # TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes
 
-**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
+**Status:** CLOSED · rev-7 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aSurfacedLexicon-2-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-2-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-2 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-4 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-4 |
 
@@ -26,7 +27,7 @@ and all three confessions are still in the source.
   `MIN_LIVE_TOKEN` constants. Measured at 166 lines by AST spans at writing time.
 - **S2** — Delete `run_probe`, measured at 84 lines by the same method.
 - **S3** — Drop `--brief` and `--probe` from the `main` dispatcher at
-  `tools/lexicon/lexicon.py:1164-1197`, including the mode tuple, the usage block and the
+  `tools/lexicon/lexicon.py`’s dispatcher, including the mode tuple, the usage block and the
   argument-count guard that special-cases them.
 - **S4** — Add `scan_corpus(root, declared)`, one generator yielding each armed file with its
   extracted definitions, and route every surviving walk through it.
@@ -66,7 +67,8 @@ and all three confessions are still in the source.
 - Wiring `--suggest` to the canon, or adding `--as <cell>`. That is `TOOL-aSurfacedLexicon-8` at
   build order 6, and this unit is order 1, so the Skill runs on the per-identifier route alone for
   five build orders. The route deleted is the one the source calls PRIMARY: the comment above
-  `tools/lexicon/lexicon.py:984` says `--brief` on an uncommitted file "is the lexicon Skill's
+  `tools/lexicon/lexicon.py` said, in `run_brief` at BASE, that `--brief` on an uncommitted file
+  "is the lexicon Skill's
   PRIMARY path, since the whole point is naming something before you commit it". Nothing in this
   build restores a per-FILE reading at all; `TOOL-aSurfacedLexicon-8` restores the per-NAME one with
   the canon behind it. That is the size of the gap, stated rather than softened.
@@ -185,7 +187,7 @@ it here and re-add it there. Silence is not an option, because silence is exactl
 will give.
 
 **The deletion also forecloses the cheapest route for a unit that is not being built.** `run_probe`
-at `tools/lexicon/lexicon.py:1053-1136` already implements unit 10's S3 candidate computation and
+in `run_probe`, as it stood at BASE, already implements unit 10's S3 candidate computation and
 its S4 unruled tail, in S4's own framing, and unit 10 sits at build order 6 — so deleting these 84
 lines makes unit 10 re-implement roughly two thirds of them. Unit 10's own F1 is PARKED for an owner
 turn, no option having survived its veto ladder, so unit 10 is not built by this run. This unit
@@ -314,13 +316,21 @@ one place is cheaper than a gated copy, and cheaper still than a gated copy nobo
   zero today and an unstaged arm would be an assertion about nothing.
 - **AC5** — When `python tools/codebase-map/selftest.py` runs with its `DEAD_TOKENS` arm deleted, it
   is green, and `grep -c DEAD_TOKENS tools/codebase-map/selftest.py` returns `0`.
-- **AC6** — When `python tools/lexicon/selftest.py` runs, it is green and its printed arm count
-  equals what `grep -c "check(" tools/lexicon/selftest.py` reports on the landed tree. The expected
-  number is RECOMPUTED by that grep at build time and is never carried from a figure typed into this
-  spec. Rev-1 asked for a drop "by exactly the arms S6 removes" and inherited an off-by-2: it
-  counted 4 probe arms where `grep -n -- "--probe\|run_probe" tools/lexicon/selftest.py` returns
-  TWO, at `:744` and `:746`. Any arithmetic anchored to a spec-side constant inherits that class of
-  error, so the criterion is written to derive its own expectation.
+- **AC6** — When `python tools/lexicon/selftest.py` runs it is GREEN, and the arm count it prints is
+  read off that run and recorded in this unit's acceptance ledger rather than predicted anywhere.
+  **The failing case is a DE-COLLECTED arm, not an arithmetic mismatch.** When any single arm is
+  commented out and the suite re-run, the printed count DROPS and the ledger figure no longer
+  matches; unstaged, it returns. That is the green-by-absence guard this criterion is actually for —
+  a suite that silently stops running an arm still exits 0, and only a count that MOVES catches it.
+  Both states are observed.
+  Two earlier formulations are recorded because each failed in its own way and the second failed
+  silently. Rev-1 asked for a drop "by exactly the arms S6 removes" and inherited an off-by-2, having
+  counted four probe arms where the tree carries TWO. Rev-6 replaced that with an equality against
+  `grep -c "check(" tools/lexicon/selftest.py`, which is UNSATISFIABLE BY CONSTRUCTION: on the landed
+  tree the grep returns 104 and the suite prints 131, because the grep counts the `def check(`
+  definition line and counts a loop-bound call site once however many times the loop runs it. A
+  criterion that cannot pass is the same defect as one that cannot fail, and the build found this one
+  only when a verifier ran both halves instead of reasoning about them.
 - **AC7** — When `bash tools/lexicon/adopt-lexicon.sh --check` runs, the `lexicon wiring` leg is
   green, which asserts `.claude/skills/lexicon/SKILL.md` byte-compares against a fresh render after
   `BRIEF_CLI` left `tools/lexicon/kit.toml:38`.
@@ -508,6 +518,13 @@ at stake and the scaffold route already covers it.
   force a total run. The cross-kit-deletion conclusion is unchanged for the same reason.
 - rev-6 · 2026-09-05 · §8’s fork became a `###` sub-head, for the reason its order-1 sibling records: a bold
   run-in lead is not an item to either reader, so a resolved section read FORKED.
+- rev-7 · 2026-09-05 · AC6 replaced after the build proved it unsatisfiable. Its equality against
+  `grep -c "check("` cannot hold on any tree — 104 against a printed 131 — because the grep counts
+  the definition line and counts a loop-bound call site once. The criterion now observes the
+  property it was always for, a DE-COLLECTED arm, by staging one out and watching the printed count
+  drop. Also: every line citation into `tools/lexicon/lexicon.py` was symbol-anchored, because this
+  unit shrinks that file from 1201 lines to 859 and a line number into a file the build rewrites is
+  a reference that rots by construction — the `spec tokens` leg caught nine of them across the set.
 
 ## 10. Reuse audit
 

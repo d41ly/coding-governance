@@ -107,7 +107,6 @@ render_skill() { # -> stdout
   out=${out//$'\r'/}
   out=${out//\{\{VERBS_TABLE\}\}/"$verbs"}
   out=${out//\{\{SUGGEST_CLI\}\}/"python3 $KITREL/lexicon.py --suggest"}   # gov:literal-python
-  out=${out//\{\{BRIEF_CLI\}\}/"python3 $KITREL/lexicon.py --brief"}       # gov:literal-python
   out=${out//\{\{GATE_CLI\}\}/"python3 $KITREL/lexicon.py"}                # gov:literal-python
   out=${out//\{\{CONF\}\}/".lexicon.conf"}
   out=${out//\{\{KIT_VERSION\}\}/"$KIT_VERSION"}

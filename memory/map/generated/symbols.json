@@ -408,6 +408,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_kit_copy",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "build_lang_mode_findings",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -421,11 +426,6 @@
       "id": "build_live_backlog_rows",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
-    },
-    {
-      "id": "build_module_index",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "build_negatives",
@@ -598,11 +598,6 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
-      "id": "check_layer_violation",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
-    },
-    {
       "id": "check_marker_line",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -611,6 +606,11 @@
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_pass",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "check_path_shaped",
@@ -631,6 +631,11 @@
       "id": "check_read_path",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "check_self_containment",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "check_slot_table",
@@ -1913,6 +1918,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "measure_pass",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "measure_plan_marks",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -2333,16 +2343,6 @@
       "file": "tools/memory-recall/query.py"
     },
     {
-      "id": "read_object",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
-    },
-    {
-      "id": "read_object_state",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
-    },
-    {
       "id": "read_set",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -2371,11 +2371,6 @@
       "id": "read_timings",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
-    },
-    {
-      "id": "read_token_is_live",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "read_tracked",
@@ -2698,11 +2693,6 @@
       "file": "tools/settings-merge.py"
     },
     {
-      "id": "resolve_import",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
-    },
-    {
       "id": "resolve_kit_homes",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
@@ -2903,11 +2893,6 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
-      "id": "run_brief",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
-    },
-    {
       "id": "run_case",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -2946,11 +2931,6 @@
       "id": "run_kit_check",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "run_probe",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "run_rm3",
@@ -3008,6 +2988,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "scan_corpus",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "scan_definition_carriers",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -3036,11 +3021,6 @@
       "id": "scan_unarmed_slots",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
-      "id": "scan_unselective_rules",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "scan_written_destinations",

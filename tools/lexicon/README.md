@@ -1,8 +1,9 @@
 <!-- gov:kit lexicon@1.1 -->
 # lexicon — a declared naming vocabulary, gated
 
-An OPT-IN kit that gates three naming predicates against a per-repo DECLARATION. It is inert until
-`.lexicon.conf` exists at the repo root, and removing that file un-adopts it.
+An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import
+that would make the kit itself non-portable. It is inert until `.lexicon.conf` exists at the repo
+root, and removing that file un-adopts it.
 
 **What it is for, since it is not typo-catching.** A closed verb table makes "which verb is this"
 answerable only when a function has ONE responsibility. A name that will not fit the table is
@@ -15,16 +16,33 @@ adopted the declaration and HEAD, both operands produced by this kit's own extra
 The kit stays OPT-IN — that did not change — but it is opt-in because adopting a vocabulary is a
 choice, not because nobody could tell whether it works.
 
-## The three predicates
+## The two predicates
 
 | | Asserts | Scope |
 |---|---|---|
 | **P1** | every function or method DEFINED in the corpus leads with a verb from the declared `VERBS` table | definition sites |
 | **P2** | no type DEFINED in the corpus ends with a declared `BANNED_SUFFIXES` entry | definition sites only — never an imported type, a parameter name, or a parameter type |
-| **P3** | no module under a declared layer imports from a layer the declared direction forbids | tracked source |
 
-P3 with an empty `LAYERS` reports `NOT ARMED` and **reds**. It never passes green over an absent
-declaration: an unarmed predicate that exits 0 is indistinguishable from a satisfied one.
+## ...and the refusal that is not a predicate
+
+Every `--check` and `--measure` run also asserts that the kit is SELF-CONTAINED: every non-relative
+import in a `.py` file beside `lexicon.py` names either a stdlib top-level module or another `.py`
+file in that same directory. It is not declared, not waivable and not pinned, because it is a
+property of the KIT rather than of your corpus — an install that imports a neighbour kit stops
+working the moment somebody takes this one on its own, which is why `subtokens.py` is a PORT of a
+`codebase-map` function rather than an import of it.
+
+There was a third DECLARED predicate, `P3 layer`, reading a `LAYERS` block of forbidden import
+directions. `TOOL-aSurfacedLexicon-2` deleted it: 164 engine lines and 29 self-test arms, four review
+rounds of blockers in its glob matcher and its import resolver, to enforce one declared rule whose
+offender pin never left `"0"`. The refusal above is what it was really holding, and it is stronger —
+it refuses ANY foreign module, not one named directory — while resolving nothing and globbing
+nothing. A `LAYERS` block in an existing `.lexicon.conf` is now an unknown block key and the reader
+REFUSES it by name; delete the block and the `LAYER_OFFENDER_PIN` scalar beside it.
+
+The refusal carries its own liveness assertion: a walk that judges ZERO imports reds as `DEAD PROBE`
+rather than reporting a clean zero, because zero offenders over an empty population is exactly what a
+broken probe prints. Every run prints the population it judged for the same reason.
 
 ## Coverage modes — the law this obeys
 
@@ -104,7 +122,6 @@ owns it rots between changes. Read it from the signal.
 
 ```bash
 python tools/lexicon/lexicon.py --suggest <identifier>   # one line, no corpus pass, ~45 ms
-python tools/lexicon/lexicon.py --brief <path>           # how the corpus already spells this file's objects
 bash tools/lexicon/adopt-lexicon.sh --render             # re-render the Skill after a declaration edit
 ```
 
@@ -112,15 +129,27 @@ bash tools/lexicon/adopt-lexicon.sh --render             # re-render the Skill a
 negative that bans what you tried — `use load_remote — the declaration says load, NOT fetch: read a
 store into memory` — which is why the NOT clauses are the product rather than decoration.
 
-`--brief` keys on the OBJECTS the file already names and reports every leading token live for each
-across the corpus, flagging any object spelled more than one way. Not a directory histogram: one
-adopter test directory carries 750 distinct off-table leading tokens, so a truncated list shows about
-1% of the vocabulary and the truncation that bounds the cost voids the signal. On a `dark` extension
-it REFUSES, because an empty "established here" section reads as invent-freely.
-
-**Neither verb is a gate, structurally.** Neither can exit 1, neither prints a pin, and nothing in
-`scaffold_lexicon.py` imports either — so what the corpus DOES has no code path to becoming what it
+**It is not a gate, structurally.** It cannot exit 1, it prints no pin, and nothing in
+`scaffold_lexicon.py` imports it — so what the corpus DOES has no code path to becoming what it
 SHOULD do. A promise would not survive a refactor; the absence of a return path does.
+
+`TOOL-aSurfacedLexicon-3` deleted two further modes: a per-FILE reading, which reported how the
+corpus already spelled one file's objects, and a pre-adoption report over the shipped canon. Nothing
+in this kit restores a per-FILE reading; `TOOL-aSurfacedLexicon-8` wires `--suggest` to the canon,
+which is the per-NAME half. The pre-adoption reading survives, below.
+
+### Reading a repo BEFORE you adopt
+
+The scaffold takes the DESTINATION path as its argument and derives the repo it reads from
+`git rev-parse` independently, so pointing it outside the tree gives you the whole reading —
+languages, all measured pins, the proposed verb table and the rename debt adopting it would owe —
+and writes nothing into the repo itself:
+
+```bash
+python tools/lexicon/scaffold_lexicon.py /tmp/proposed.lexicon.conf
+```
+
+Read `/tmp/proposed.lexicon.conf`, decide, and only then scaffold into the repo for real.
 
 ### The rendered Skill
 

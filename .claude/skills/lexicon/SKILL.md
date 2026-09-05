@@ -1,6 +1,6 @@
 ---
 name: lexicon
-description: Answer "what should I call this" from THIS repo's declared naming vocabulary, before writing the name. Use when about to name a new function, method, type, module or CLI subcommand; when a name will not fit and you are tempted to invent a verb; when renaming during a refactor; or when a gate has just refused a name and you need the replacement rather than the refusal. Also use before naming anything in an unfamiliar area, to see how the corpus already spells that concept. Routes through `python3 tools/lexicon/lexicon.py --suggest` and `python3 tools/lexicon/lexicon.py --brief`, which read the declaration at `.lexicon.conf` and decide nothing. Do NOT use for ordinary code search — finding a symbol, a caller, a definition or a string is grep's job and this neither replaces nor intercepts it.
+description: Answer "what should I call this" from THIS repo's declared naming vocabulary, before writing the name. Use when about to name a new function, method, type, module or CLI subcommand; when a name will not fit and you are tempted to invent a verb; when renaming during a refactor; or when a gate has just refused a name and you need the replacement rather than the refusal. Also use before naming anything in an unfamiliar area, to see how the corpus already spells that concept. Routes through `python3 tools/lexicon/lexicon.py --suggest`, which reads the declaration at `.lexicon.conf` and decides nothing. Do NOT use for ordinary code search — finding a symbol, a caller, a definition or a string is grep's job and this neither replaces nor intercepts it.
 ---
 
 <!-- gov:kit lexicon@1.1 · RENDERED from tools/lexicon/SKILL.template.md — do not edit -->
@@ -26,16 +26,9 @@ you tried:
 use `load_remote` — the declaration says `load`, NOT `fetch`: read a store into memory
 ```
 
-```bash
-python3 tools/lexicon/lexicon.py --brief <path>
-```
-
-For the OBJECTS the file already names, every leading token live for each across the corpus, flagging
-any object spelled more than one way. It prints what the corpus DOES, never what it should do, and it
-decides nothing. On a language the declaration marks `dark` it REFUSES rather than printing an empty
-section — an empty "established here" is indistinguishable from "invent freely".
-
-Neither verb can exit 1 and neither prints a pin. They are reports, structurally.
+It answers ONE identifier from the declaration alone, with no corpus pass — the whole point is that
+you can ask before you write, and a verb that walks the whole tree to answer one question is a verb
+nobody waits for. It cannot exit 1 and it prints no pin. It is a report, structurally.
 
 ## The table
 

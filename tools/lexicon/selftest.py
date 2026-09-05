@@ -54,16 +54,12 @@ BANNED_SUFFIXES="Manager Helper Util"
 LANGS="py:python-ast:parser conf::dark"
 VERB_OFFENDER_PIN="0"
 SUFFIX_OFFENDER_PIN="0"
-LAYER_OFFENDER_PIN="0"
 ratified="2026-08-16 node d"
 
 VERBS:
   build   create a new value and return it — NOT `create`
   load    read from a store into memory — NOT `fetch`
   add     append to an existing collection — NOT `push`
-
-LAYERS:
-  core/* -> adapters/*
 """
 
 
@@ -81,7 +77,7 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: t
         root = Path(td)
         shutil.copytree(KIT, root / "tools" / "lexicon",
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-        for name in ("lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt", "lexicon-layer-waivers.txt"):
+        for name in ("lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt"):
             (root / "tools" / "lexicon" / name).unlink(missing_ok=True)
         for name, body in (waivers or {}).items():
             (root / "tools" / "lexicon" / name).write_text(body, encoding="utf-8")
@@ -104,14 +100,8 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: t
         return r.returncode, r.stdout + r.stderr
 
 
-# BOTH sides of the declared layer rule exist in every BASE_CONF fixture. The reachability arm reds a
-# rule whose globs select nothing, and these fixtures declared `core/* -> adapters/*` while supplying
-# only one side — so they were unreachable too, and the arm caught its own test data first.
-LAYER_SIDES = {"adapters/db.py": "def build_db():\n    pass\n",
-               "core/thing.py": "def build_thing():\n    pass\n"}
-
 # ---- P1: the verb predicate ---------------------------------------------------------------------
-code, out = run_case({"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}, BASE_CONF)
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n"}, BASE_CONF)
 check("P1 green: a declared verb passes", code == 0, out)
 
 code, out = run_case({"core/a.py": "def frobnicate_index():\n    pass\n"}, BASE_CONF)
@@ -126,95 +116,130 @@ check("P2 red: a type DEFINITION ending in a banned suffix reds", code != 0 and 
 
 # The bare case, which used to be EXEMPT via a `name != suf` guard — the purest instance of "a type
 # nobody scoped" was the one the predicate let through.
-code, out = run_case({"core/a.py": "def build_x():\n    pass\n\n\nclass Manager:\n    pass\n", **LAYER_SIDES}, BASE_CONF)
+code, out = run_case({"core/a.py": "def build_x():\n    pass\n\n\nclass Manager:\n    pass\n"}, BASE_CONF)
 check("P2 red: a type named EXACTLY the banned suffix reds", code != 0 and "P2 suffix" in out, out)
 
 # The F-A3 arm: a blanket ban breaks on contact with imported names and parameters. P2 is scoped to
 # DEFINITION sites only, so neither of these is an offender.
 code, out = run_case(
     {"core/a.py": "from elsewhere import ThingManager\n\n\ndef build_x(widget_manager, other: ThingManager):\n"
-                  "    return ThingManager\n", **LAYER_SIDES},
+                  "    return ThingManager\n"},
     BASE_CONF)
 check("P2 green: an IMPORTED type and a parameter carrying the suffix do not red", code == 0, out)
 
-# ---- P3: the layer predicate --------------------------------------------------------------------
-code, out = run_case({"core/a.py": "import adapters.db\n\n\ndef build_x():\n    pass\n"}, BASE_CONF)
-check("P3 red: a forbidden import direction reds", code != 0 and "P3 layer" in out, out)
+# ---- the self-containment refusal, which replaces the deleted P3 ---------------------------------
+#
+# IT GRADES THE KIT'S OWN DIRECTORY, never the fixture corpus, so these arms point it at a directory
+# they build rather than at a `run_case` repo. That parameterised walk root is the whole reason the
+# empty-population arm below can be STAGED at all: a predicate that can only read its own installed
+# directory has a liveness arm nobody can run, which is the unfalsifiable shape one level up.
+#
+# THE FIRST IN-PROCESS IMPORT IN THIS FILE, so the path insert lives here. Every arm above runs the
+# engine as a SUBPROCESS, which needs no path at all.
+sys.path.insert(0, str(KIT))
+import lexicon as _lex  # noqa: E402
 
-code, out = run_case({"adapters/a.py": "import core.thing\n\n\ndef build_x():\n    pass\n", **LAYER_SIDES}, BASE_CONF)
-check("P3 green: the ALLOWED direction passes", code == 0, out)
 
-# AC3 — an empty LAYERS block must report NOT ARMED and RED, never pass green over an absent
-# declaration. This is the arm that keeps the predicate from being decorative in a fresh adopter.
-code, out = run_case({"core/a.py": "def build_x():\n    pass\n"},
-                     BASE_CONF.split("LAYERS:")[0] + "LAYERS:\n")
-check("P3 unarmed: an empty LAYERS reds", code != 0, out)
-check("P3 unarmed: it says NOT ARMED", "NOT ARMED" in out, out)
+def build_kit_copy(dest, edits=None):
+    """A copy of the INSTALLED kit under `dest`, with `edits` appended to the named modules."""
+    shutil.copytree(KIT, dest, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    for name, extra in (edits or {}).items():
+        f = dest / name
+        f.write_text(f.read_text(encoding="utf-8") + extra, encoding="utf-8", newline="\n")
+    return dest
 
-# AC3b — THE PRODUCTION SHAPE. The arms above use `core/*` -> `adapters/*` with `import adapters.db`,
-# where the namespace happens to spell the path. That coincidence is what let a DEAD rule ship: this
-# repo's real declaration names `tools/codebase-map/`, a directory whose hyphen NO module name can
-# contain, and the flat `sys.path`-insert import that actually reaches it is a bare stem sharing no
-# characters with its directory. Both arms below reproduce that shape, because a fixture easier than
-# production certifies coverage the production rule does not have.
-HYPHEN_CONF = BASE_CONF.split("LAYERS:")[0] + "LAYERS:\n  pkg/consumer/* -> pkg/shared-core/*\n"
-code, out = run_case(
-    {"pkg/consumer/a.py": "import shared_thing\n\n\ndef build_x():\n    pass\n",
-     "pkg/shared-core/shared_thing.py": "def build_y():\n    pass\n"},
-    HYPHEN_CONF)
-check("P3 red: a BARE-STEM import into a HYPHENATED directory is caught", code != 0 and "P3 layer" in out, out)
 
-code, out = run_case(
-    {"pkg/consumer/a.py": "import unrelated_thing\n\n\ndef build_x():\n    pass\n",
-     "pkg/consumer/unrelated_thing.py": "def build_z():\n    pass\n",
-     "pkg/shared-core/shared_thing.py": "def build_y():\n    pass\n"},
-    HYPHEN_CONF)
-check("P3 green: a bare-stem import NOT under the forbidden dir is silent", code == 0, out)
+# GREEN, over the kit as installed. This is the control: without it every red arm below could be
+# passing because the predicate reds on everything.
+_probs, _mods, _imps = _lex.check_self_containment()
+check("self-containment: the installed kit is silent", not _probs, str(_probs[:2]))
+check("self-containment: ...over a NON-EMPTY population, or the green above means nothing",
+      _mods >= 2 and _imps >= 2, f"{_mods} module(s), {_imps} import(s)")
 
-# The reachability arm — the third vacuity defence. `NOT ARMED` tests whether LAYERS is EMPTY and
-# DEAD PROBE tests whether an extractor selects anything; neither tests whether a NON-EMPTY rule can
-# ever fire. A rule naming a directory that does not exist is the checkable form of that.
-code, out = run_case({"core/a.py": "def build_x():\n    pass\n"},
-                     BASE_CONF.split("LAYERS:")[0] + "LAYERS:\n  core/* -> nowhere/at-all/*\n")
-check("P3 unselective: a rule whose TO glob matches no tracked file reds", code != 0, out)
-check("P3 unselective: it says UNSELECTIVE", "UNSELECTIVE" in out, out)
+# RED — a foreign import. `map_lib` is the real one this rule exists to forbid: `subtokens.py` is a
+# PORT of a `codebase-map` function precisely so this import never has to exist.
+with build_tempdir() as _td:
+    _kit = build_kit_copy(Path(_td) / "lexicon", {"scaffold_lexicon.py": "\nimport map_lib\n"})
+    _probs, _mods, _imps = _lex.check_self_containment(_kit)
+    _hit = [x for x in _probs if "NOT SELF-CONTAINED" in x]
+    check("self-containment: a foreign import REDS", len(_hit) == 1, str(_probs))
+    check("self-containment: ...and the refusal names the file, the line and the target",
+          bool(_hit) and "scaffold_lexicon.py" in _hit[0] and "map_lib" in _hit[0]
+          and any(c.isdigit() for c in _hit[0].split("scaffold_lexicon.py:")[-1][:4]), str(_hit))
 
-# The OTHER end of the same check. Both branches need an arm or one of them is a claim nobody tests.
-code, out = run_case({"core/a.py": "def build_x():\n    pass\n", **LAYER_SIDES},
-                     BASE_CONF.split("LAYERS:")[0] + "LAYERS:\n  nowhere/at-all/* -> adapters/*\n")
-check("P3 unselective: a rule whose FROM glob matches no tracked file reds",
-      code != 0 and "UNSELECTIVE" in out, out)
+# THE DEDUPE, and it is a real shape rather than a hypothetical: `_python_defs` emits BOTH `map_lib`
+# and `map_lib._STOPWORDS` for this statement, so an undeduped refusal names one import twice.
+with build_tempdir() as _td:
+    _kit = build_kit_copy(Path(_td) / "lexicon",
+                          {"scaffold_lexicon.py": "\nfrom map_lib import _STOPWORDS\n"})
+    _probs, _, _ = _lex.check_self_containment(_kit)
+    check("self-containment: `from x import y` reds ONCE, not once per emitted target",
+          len([x for x in _probs if "NOT SELF-CONTAINED" in x]) == 1, str(_probs))
 
-# H1 — the stem lookup is SCOPED. Unscoped it returned every tracked file sharing a basename, so a
-# LOCAL sibling import resolved into the forbidden directory it never touches. The only escape would
-# have been a waiver, which then permanently silences the genuine violation it was hiding.
-code, out = run_case(
-    {"pkg/consumer/a.py": "import helper\n\n\ndef build_x():\n    pass\n",
-     "pkg/consumer/helper.py": "def build_local():\n    pass\n",
-     "pkg/shared-core/helper.py": "def build_far():\n    pass\n"},
-    HYPHEN_CONF)
-check("P3 green: an importer-local file WINS over a same-stem file in the forbidden dir", code == 0, out)
+# A RELATIVE import cannot leave the directory, so it is not judged. Without this arm the predicate
+# could red every `from . import x` in an adopter's kit and no fixture would say so.
+with build_tempdir() as _td:
+    _kit = build_kit_copy(Path(_td) / "lexicon",
+                          {"scaffold_lexicon.py": "\nfrom . import canon\nimport subprocess\n"})
+    _probs, _, _ = _lex.check_self_containment(_kit)
+    check("self-containment: a RELATIVE import and a stdlib import are both silent",
+          not [x for x in _probs if "NOT SELF-CONTAINED" in x], str(_probs))
 
-# And the extension half of that scoping: a `.py` import never denotes a `.md`.
-code, out = run_case(
-    {"pkg/consumer/a.py": "import notes\n\n\ndef build_x():\n    pass\n",
-     "pkg/shared-core/notes.md": "# not a module\n"},
-    HYPHEN_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
-                        'LANGS="py:python-ast:parser conf::dark md::dark"'))
-check("P3 green: a same-stem file of a DIFFERENT extension is not a resolution", code == 0, out)
+# THE LIVENESS ARM. Zero offenders over zero imports is exactly the clean green a broken probe
+# prints, which is what the deleted `P3 NOT ARMED` refusal was bought to keep distinguishable. Both
+# empty shapes are staged: no modules at all, and modules that yield no imports.
+with build_tempdir() as _td:
+    _empty = Path(_td) / "nothing"
+    _empty.mkdir()
+    _probs, _mods, _imps = _lex.check_self_containment(_empty)
+    check("self-containment: a directory with NO modules REDS as DEAD PROBE",
+          any("DEAD PROBE" in x for x in _probs) and _mods == 0 and _imps == 0, str(_probs))
+    _quiet = Path(_td) / "importless"
+    _quiet.mkdir()
+    (_quiet / "a.py").write_text("def build_x():\n    pass\n", encoding="utf-8", newline="\n")
+    _probs, _mods, _imps = _lex.check_self_containment(_quiet)
+    check("self-containment: modules that yield NO imports RED too, and the refusal counts them",
+          any("DEAD PROBE" in x for x in _probs) and _mods == 1 and _imps == 0, str(_probs))
 
-# H1 — a RELATIVE specifier must resolve against the IMPORTER's directory. Swapping dots for slashes
-# mangles `../shared-core/x.js` into `///shared-core/x/js` and matches nothing, which made the
-# predicate structurally incapable for the commonest JS import shape.
-JS_CONF = ('BANNED_SUFFIXES="Manager"\nLANGS="js:js-regex:probe conf::dark"\n'
-           'VERB_OFFENDER_PIN="9"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
-           'ratified="2026-08-16 node d"\n\nVERBS:\n  build  make a thing\n\n'
-           'LAYERS:\n  pkg/consumer/* -> pkg/shared-core/*\n')
-code, out = run_case(
-    {"pkg/consumer/a.js": "import x from '../shared-core/thing.js'\nexport function buildA(){}\n",
-     "pkg/shared-core/thing.js": "export function buildB(){}\n"},
-    JS_CONF)
-check("P3 red: a RELATIVE js specifier resolves against the importer's dir", code != 0 and "P3 layer" in out, out)
+# END TO END, and through BOTH modes. The refusal sits above the `measure_mode` return so `--check`
+# and `--measure` see the same thing; this file's own history has three refusals that landed on the
+# wrong side of it, each armed and unreachable from one mode.
+with build_tempdir() as _td:
+    _r = Path(_td)
+    build_kit_copy(_r / "tools" / "lexicon", {"scaffold_lexicon.py": "\nimport map_lib\n"})
+    (_r / "core").mkdir(parents=True, exist_ok=True)
+    (_r / "core" / "a.py").write_text("def build_index():\n    pass\n", encoding="utf-8", newline="\n")
+    (_r / ".lexicon.conf").write_text(BASE_CONF, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "add", "--", "core/a.py", ".lexicon.conf"], cwd=_r, check=True,
+                   capture_output=True)
+    _both = {}
+    for _mode in ("--check", "--measure"):
+        _got = subprocess.run([sys.executable, "tools/lexicon/lexicon.py", _mode], cwd=_r,
+                              capture_output=True, text=True)
+        _both[_mode] = (_got.returncode, _got.stdout + _got.stderr)
+    for _mode, (_rc, _o) in _both.items():
+        check(f"self-containment: {_mode} exits 1 on a foreign import in the installed kit",
+              _rc == 1, f"rc={_rc} {_o[-300:]}")
+        check(f"self-containment: ...and {_mode} names the file and the target",
+              "scaffold_lexicon.py" in _o and "map_lib" in _o, _o[-300:])
+
+# ...and the population is REPORTED on a green run, so the absence of a refusal is a measurement.
+# A printed zero would still be a green, which is why the arm above reds on an empty population.
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n"}, BASE_CONF)
+check("self-containment: a green run prints the population it judged",
+      code == 0 and "self-contained — judged" in out and "module(s)" in out, out)
+
+# THE TWO EXTRACTOR PROPERTIES THE REFUSAL RESTS ON. Both were pinned by the deleted P3 case table
+# and neither is testable from the fixture side: `_python_defs` must emit the imported NAME as well
+# as its package (which is what the dedupe above exists to handle) and must keep a relative import's
+# leading dots (which is how the walk tells relative from bare).
+_frm = _lex._python_defs("from pkg.shared_core import helper\n")[2]
+check("extract: `from a.b import c` yields a target naming c, not just a.b",
+      any(t.endswith("helper") for t, _ln in _frm), f"{_frm}")
+_rel = _lex._python_defs("from . import helper\n")[2]
+check("extract: a relative `from . import x` keeps its level as leading dots",
+      any(t.startswith(".") for t, _ln in _rel), f"{_rel}")
 
 # ---- S6 / AC4: the DEAD PROBE arm ---------------------------------------------------------------
 # A declared parser/probe language whose definition population is EMPTY, against a corpus that
@@ -230,13 +255,13 @@ check("undeclared extension reds by name", code != 0 and "md" in out, out)
 check("undeclared extension says UNDECLARED", "UNDECLARED EXTENSIONS" in out, out)
 
 # ---- S8 / AC8: waivers key on matched TEXT ------------------------------------------------------
-code, out = run_case({"core/a.py": "def frobnicate_index():\n    pass\n", **LAYER_SIDES}, BASE_CONF,
+code, out = run_case({"core/a.py": "def frobnicate_index():\n    pass\n"}, BASE_CONF,
                      {"lexicon-verb-waivers.txt": "frobnicate_index  deliberate, see the spec\n"})
 check("a waiver on the matched TEXT silences its offender", code == 0, out)
 
 # The whole reason for text keying: `install-prefix-waivers.txt` keys on <path>:<line>, so any edit
 # ABOVE a waived line unpins it and reds a merge that touched nothing the waiver guards.
-code, out = run_case({"core/a.py": "# a new comment line added above\n# and another\ndef frobnicate_index():\n    pass\n", **LAYER_SIDES},
+code, out = run_case({"core/a.py": "# a new comment line added above\n# and another\ndef frobnicate_index():\n    pass\n"},
                      BASE_CONF, {"lexicon-verb-waivers.txt": "frobnicate_index  deliberate, see the spec\n"})
 check("an edit ABOVE a waived occurrence does NOT unpin it", code == 0, out)
 
@@ -278,150 +303,6 @@ for pset, src in SENTINELS.items():
     check(f"sentinel {pset}: functions found", len(funcs) >= 2, f"{funcs}")
     check(f"sentinel {pset}: types found", len(types_) >= 1, f"{types_}")
     check(f"sentinel {pset}: imports found", len(imports) >= 2, f"{imports}")
-
-# ---- CASE TABLES over the two helpers that carry P3's whole correctness --------------------------
-# THIS IS THE LEFT-SHIFT, and it is the arm whose absence let three review rounds through. Every P3
-# defect so far lived in `_glob_match` or `resolve_import`, and NOT ONE was visible to an end-to-end
-# fixture: reverting the `_glob_match` rewrite verbatim left all 48 fixture arms green while the live
-# gate stayed at exit 0. A fixture exercises a PATH through the engine; a case table exercises the
-# FUNCTION. Both are needed and only one of them was here.
-import lexicon as _lex  # noqa: E402
-
-GLOB_CASES = [
-    # (path, pattern, expected, why this row exists)
-    ("tools/lexicon/a.py", "tools/lexicon/*", True, "the plain depth-1 case"),
-    ("tools/lexicon/deep/a.py", "tools/lexicon/*", True, "a `<dir>/*` pattern covers nesting"),
-    ("tools/other/a.py", "tools/lexicon/*", False, "a sibling directory must not match"),
-    # THE B2 ROW. A wildcard EARLIER in the pattern used to be escaped literally by the nesting
-    # branch, so this pair red at depth 1 and passed GREEN at depth 2.
-    ("apps/a/internal/x.py", "apps/*/internal/*", True, "wildcard before the trailing /*, depth 1"),
-    ("apps/a/internal/deep/x.py", "apps/*/internal/*", True, "the same pattern must still nest"),
-    ("apps/a/public/x.py", "apps/*/internal/*", False, "the earlier wildcard is not a free pass"),
-    # THE ANCHORING ROWS. The unanchored fallback accepted any path sharing a literal PREFIX, with
-    # no path boundary required — this is the pair that catches it, and it is a real corpus shape.
-    ("tools/lexicon-extra/a.py", "tools/lexicon/*", False, "a prefix that is not a path boundary"),
-    ("tools/lexicon-extra", "tools/lexicon*", True, "a single * matches within one segment"),
-    ("tools/lexicon-extra/a.py", "tools/lexicon*", False, "and a single * never crosses a slash"),
-    # NOT a row: a doubled-slash path. `git ls-files` never emits one and the only thing that ever
-    # produced it here was the deleted reachability synthetic. Treating it as nested is correct and
-    # asserting otherwise would be testing malformed input the corpus cannot contain. Written down
-    # because the first draft of this table DID assert it, and the table caught the author.
-    ("tools/lexicon", "tools/lexicon/*", False, "the bare directory is not a member of `<dir>/*`"),
-]
-for path, pattern, want, why in GLOB_CASES:
-    got = _lex._glob_match(path, pattern)
-    check(f"glob: {path} vs {pattern} -> {want} ({why})", got == want, f"got {got}")
-
-# `resolve_import` — what an import target may DENOTE. The index is a small fixed corpus so each row
-# states the whole world it resolves against.
-RI_INDEX = _lex.build_module_index([
-    "src/pkg/consumer/a.py",
-    "src/pkg/consumer/helper.py",
-    "src/pkg/shared_core/helper.py",
-    "src/pkg/shared_core/only_there.py",
-    "src/pkg/shared_core/notes.md",
-    "web/consumer/a.js",
-    "web/shared/thing.js",
-    # These three exist so the rows below can FAIL. Without them the arms passed because the corpus
-    # held nothing to match, not because the code was right — a vacuous row is worse than no row,
-    # and three of these were vacuous when first written.
-    "web/shared/debounce.js",
-    "web/shared/thingamajig/thing.js",
-    "outside/thing.js",
-])
-IMPORTER_PY = "src/pkg/consumer/a.py"
-TARGET_GLOB = "src/pkg/shared_core/*"
-
-
-def _check_reaches(target, importer=IMPORTER_PY, glob=TARGET_GLOB):  # noqa: E302
-    return any(_lex._glob_match(c, glob) for c in _lex.resolve_import(target, importer, RI_INDEX))
-
-
-# THE B1 ROW. Importer-local precedence was applied to a FULLY-QUALIFIED dotted import, where the
-# language grants the importer's directory none — so the genuine crossing resolved to the local
-# sibling and vanished.
-check("resolve: a FULLY-QUALIFIED dotted import reaches the forbidden layer even with a same-stem "
-      "local sibling", _check_reaches("pkg.shared_core.helper"), "the B1 false negative is back")
-check("resolve: a BARE import prefers the importer-local sibling",
-      not _check_reaches("helper"), "importer-local precedence lost")
-check("resolve: a bare import with NO local sibling still resolves across",
-      _check_reaches("only_there"), "the stem lookup stopped working")
-check("resolve: a same-stem file of a DIFFERENT extension is not a resolution",
-      not _check_reaches("notes"), "extension scoping lost")
-check("resolve: a relative js specifier resolves against the importer's dir",
-      _check_reaches("../shared/thing.js", "web/consumer/a.js", "web/shared/*"),
-      "relative resolution lost")
-check("resolve: an unresolvable/external target denotes nothing",
-      not _check_reaches("json"), "an external import must not resolve into the corpus")
-
-# ---- round-4 rows. Written BEFORE the code that satisfies them. -----------------------------------
-# The rev-9 fix keyed precedence on `"." in target`, which is a PYTHON namespace rule applied to
-# every language, and gave a dotted target no directory scoping at all. It fixed one false negative
-# and bought two false positives. These rows pin the design that replaces it: a dotted target
-# resolves only to a candidate whose path is CONSISTENT with the dots.
-
-# B1 — `from <pkg> import <name>`. The parser kept only `node.module`, discarding the imported NAME,
-# so the commonest Python crossing spelling resolved to nothing.
-_frm = _lex._python_defs("from pkg.shared_core import helper\n")[2]
-check("extract: `from a.b import c` yields a target naming c, not just a.b",
-      any(t.endswith("helper") for t, _ln in _frm), f"{_frm}")
-check("resolve: `from pkg.shared_core import helper` reaches the forbidden layer",
-      any(_check_reaches(t) for t, _ln in _frm), f"{_frm}")
-
-# H1/H2 — the false positives that fix bought. Neither import touches this repo.
-check("resolve: a dotted target whose PATH does not match is NOT a crossing (concurrent.helper)",
-      not _check_reaches("concurrent.helper"), "false positive: any same-stem file matched")
-check("resolve: nor thirdparty.helper", not _check_reaches("thirdparty.helper"),
-      "false positive: any same-stem file matched")
-check("resolve: a dotted target whose path DOES match is still a crossing",
-      _check_reaches("pkg.shared_core.helper"), "path-consistent dotted resolution lost")
-
-# H2 — a JS specifier is not a Python namespace. NOTE ON WHAT THIS ROW PINS: it is satisfied by the
-# path-consistency rule as well as by the language branch, so it does NOT on its own prove the branch
-# exists — verified by reverting the branch and watching this row stay green. It is kept because the
-# behaviour is worth pinning; the row BELOW is the one that distinguishes the branch.
-check("resolve: a JS bare specifier containing a dot does not resolve into the corpus",
-      not _check_reaches("lodash.debounce", "web/consumer/a.js", "web/shared/*"),
-      "a dotted JS specifier resolved onto a same-stem file")
-
-# THE ROW THAT PINS THE LANGUAGE BRANCH. A leading dot means RELATIVE-TO-PACKAGE in Python and
-# nothing of the sort elsewhere, and only the Python branch decodes `node.level`. `from . import
-# helper` must resolve to the importer's OWN package, never to a same-stem file in the forbidden one.
-_rel = _lex._python_defs("from . import helper\n")[2]
-check("extract: a relative `from . import x` keeps its level as leading dots",
-      any(t.startswith(".") for t, _ln in _rel), f"{_rel}")
-check("resolve: `from . import helper` stays in the importer's own package",
-      not any(_check_reaches(t) for t, _ln in _rel), f"{_rel}")
-check("resolve: and it DOES resolve locally rather than to nothing",
-      any(_check_reaches(t, IMPORTER_PY, "src/pkg/consumer/*") for t, _ln in _rel), f"{_rel}")
-
-# A relative specifier that walks ABOVE the repo root is EXTERNAL, not clamped back in — clamping
-# fabricates a candidate inside the repo and can invent a violation.
-check("resolve: a relative specifier escaping the repo root denotes nothing",
-      not _check_reaches("../../../outside/thing.js", "web/consumer/a.js", "outside/*"),
-      "the walk was clamped at the root instead of failing")
-
-# H3 — the relative branch matched on a bare `startswith`, with no path boundary: the exact defect
-# class the glob anchoring removed, alive in the sibling helper.
-# The exploit needs a DIRECTORY sharing the prefix, not a same-stem sibling: the stem index already
-# constrains candidates to an exact basename, so `thingamajig.js` could never reach the comparison.
-# The first version of this row asserted the wrong shape and passed under both implementations —
-# caught by reverting the fix and seeing the suite stay green.
-check("resolve: a relative specifier matches on a PATH BOUNDARY, not a prefix",
-      not _check_reaches("../shared/thing", "web/consumer/a.js", "web/shared/thingamajig/*"),
-      "boundary-free prefix match in the relative branch")
-
-# H4 — `**` collapsed to `[^/]*[^/]*`, so it could not cross a slash and `<dir>/**` selected
-# strictly LESS than `<dir>/*`.
-for path, pattern, want, why in [
-    ("a/b/c.py", "a/**", True, "** crosses slashes"),
-    ("a/b.py", "a/**", True, "and still matches at depth 1"),
-    ("z/b/c.py", "a/**", False, "but not another tree"),
-    ("a/bc.py", "a/b?.py", True, "? matches exactly one character"),
-    ("a/bcd.py", "a/b?.py", False, "and not two"),
-]:
-    got = _lex._glob_match(path, pattern)
-    check(f"glob: {path} vs {pattern} -> {want} ({why})", got == want, f"got {got}")
 
 # ---- the --scaffold path, end to end -------------------------------------------------------------
 # Nothing exercised this before, which is how a scaffolder that could emit a row its OWN reader
@@ -508,7 +389,7 @@ with build_tempdir() as td:
 # spec forbids moving an exit code except `--measure`'s. So every arm below reads OUTPUT, and the two
 # that read an exit code read `--measure`'s, which is the one this unit is allowed to move.
 
-_U2 = {"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}
+_U2 = {"core/a.py": "def build_index():\n    pass\n"}
 
 code, out = run_case(_U2, BASE_CONF)
 check("counts on GREEN: every predicate reports graded/offenders/waived",
@@ -552,7 +433,7 @@ check("--measure names the undeclared extension",
 
 # ---- TOOL-dScaffoldedMirror-6: the coverage sniffer, its fraction, and its liveness --------------
 
-_U6 = {"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}
+_U6 = {"core/a.py": "def build_index():\n    pass\n"}
 
 code, out = run_case(_U6, BASE_CONF)
 check("coverage: the fraction prints on a GREEN run",
@@ -564,7 +445,7 @@ _SH_CONF = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
                              'LANGS="py:python-ast:parser conf::dark sh::dark"')
 code, out2 = run_case({**_U6, "scripts/go.sh": "build_it() {\n  :\n}\n"}, _SH_CONF)
 check("coverage: an unarmed definition-carrying file LOWERS the fraction",
-      code == 0 and "armed 3 of 4" in out2, out2)
+      code == 0 and "armed 1 of 2" in out2, out2)
 
 # The PROSE judgement, armed. A fenced example inside documentation is not a definition, and counting
 # it made a number that moves when somebody writes a tutorial. Measured on the real tree: including
@@ -574,7 +455,7 @@ _MD_CONF = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
                              'LANGS="py:python-ast:parser conf::dark md::dark"')
 code, out3 = run_case({**_U6, "docs/guide.md": _MD}, _MD_CONF)
 check("coverage: a fenced code block in PROSE does not join the denominator",
-      code == 0 and "armed 3 of 3" in out3, out3)
+      code == 0 and "armed 1 of 1" in out3, out3)
 
 # S6 — the liveness. What it asserts is AGREEMENT: every file an armed extractor found a definition
 # in must also sniff positive. Staged by blinding the sniffer inside a fixture copy of the kit.
@@ -610,7 +491,7 @@ with build_tempdir() as _td:
 
 _S6_OK = BASE_CONF   # every row in BASE_CONF already carries a NOT clause
 
-code, out = run_case({"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}, _S6_OK)
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n"}, _S6_OK)
 check("S6: a table whose every row carries a negative is silent",
       code == 0 and "carrying no negative" not in out, out)
 
@@ -618,14 +499,14 @@ check("S6: a table whose every row carries a negative is silent",
 _S6_BARE = _S6_OK.replace("  load    read from a store into memory \u2014 NOT `fetch`",
                           "  load    read from a store into memory")
 check("S6 fixture really differs (or the next arm proves nothing)", _S6_BARE != _S6_OK, "replace missed")
-code, out = run_case({"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}, _S6_BARE)
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n"}, _S6_BARE)
 check("S6: a row with NO negative is a finding", code != 0 and "carrying no negative" in out, out)
 check("S6: ...and it names the row", "load" in out.split("carrying no negative")[1][:80], out)
 
 # A token that is both banned and declared bans and permits itself at once.
 _S6_CLASH = _S6_OK.replace("NOT `fetch`", "NOT `add`")
 check("S6 clash fixture really differs", _S6_CLASH != _S6_OK, "replace missed")
-code, out = run_case({"core/a.py": "def build_index():\n    pass\n", **LAYER_SIDES}, _S6_CLASH)
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n"}, _S6_CLASH)
 check("S6: a banned token that is itself a row is a finding",
       code != 0 and "itself a row" in out, out)
 check("S6: ...and it names the token", "add" in out.split("itself a row")[1][:60], out)
@@ -637,7 +518,7 @@ check("S6: ...and it names the token", "add" in out.split("itself a row")[1][:60
 # 1 is a gate with a softer name.
 
 _U10 = {"core/a.py": "def build_index():\n    pass\n",
-        "core/b.py": "def render_index():\n    pass\n", **LAYER_SIDES}
+        "core/b.py": "def render_index():\n    pass\n"}
 
 code, out = run_case(_U10, BASE_CONF, args=("--suggest", "build_index"))
 check("--suggest: a declared verb answers OK and exits 0", code == 0 and out.startswith("OK"), out)
@@ -653,30 +534,11 @@ check("--suggest: a token NO row bans says so, and still exits 0",
       code == 0 and "no row bans it by name" in out, out)
 
 # S6 — the structural guards. A report that can exit 1, or that prints a pin, is a gate.
-for _v in (("--suggest", "fetch_remote"), ("--brief", "core/a.py")):
+for _v in (("--suggest", "fetch_remote"),):
     code, out = run_case(_U10, BASE_CONF, args=_v)
     check(f"S6: {_v[0]} never exits 1", code != 1, f"rc={code} {out}")
     check(f"S6: {_v[0]} prints no pin figure",
           "_OFFENDER_PIN" not in out and "over pin" not in out, out)
-
-# --brief keys on the OBJECTS this file names, and reports every spelling live for each.
-code, out = run_case(_U10, BASE_CONF, args=("--brief", "core/a.py"))
-check("--brief: reports the file's object", code == 0 and "index:" in out, out)
-check("--brief: names EVERY spelling live for that object across the corpus",
-      "build" in out and "render" in out, out)
-check("--brief: and flags an object spelled more than one way",
-      "SPELLED MORE THAN ONE WAY" in out, out)
-check("--brief: says it decides nothing", "decides nothing" in out, out)
-
-# S3 — a dark extension REFUSES rather than printing an empty section, which would read as
-# "nothing is established, invent freely" and is byte-identical to "this language is not extracted".
-_DARK = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
-                          'LANGS="py:python-ast:parser conf::dark sh::dark"')
-code, out = run_case({**_U10, "scripts/go.sh": "build_it() {\n  :\n}\n"}, _DARK,
-                     args=("--brief", "scripts/go.sh"))
-check("--brief: a dark extension is a NAMED refusal, not an empty section",
-      code == 2 and "COVERAGE: dark" in out, out)
-check("--brief: ...and it says why an empty section would be worse", "invent freely" in out, out)
 
 # ---- TOOL-dScaffoldedMirror-8: the canon, and the rule that makes it worth having ----------------
 
@@ -737,15 +599,6 @@ with build_tempdir() as _td:
     check("POLARITY: ...and proposes NEITHER spelling the corpus actually wrote",
           "\n  get " not in _conf and "\n  fetch " not in _conf, _conf[-400:])
 
-    # --probe is legal against a repo with NO declaration and exits 0 either way.
-    (_r / ".lexicon.conf").unlink()
-    _got = subprocess.run([sys.executable, "tools/lexicon/lexicon.py", "--probe"],
-                          cwd=_r, capture_output=True, text=True)
-    check("--probe: legal with NO declaration, and exits 0",
-          _got.returncode == 0 and "NO .lexicon.conf" in _got.stdout, _got.stdout[-300:])
-    check("--probe: says it decides nothing",
-          "corpus only decides which appear" in _got.stdout, _got.stdout[:300])
-
 # S8 — `conf` is seeded whether or not the corpus contains one, because the scaffold runs before the
 # file it writes is tracked.
 with build_tempdir() as _td:
@@ -762,11 +615,14 @@ with build_tempdir() as _td:
           "conf::dark" in _conf, [l for l in _conf.split(chr(10)) if l.startswith("LANGS=")])
     # The conf grammar forbids a comment after a value on the same line, and the first cut of the
     # canon scaffold put one there -- the reader then REFUSED the file the scaffold had just written.
-    _pin_lines = [l for l in _conf.split(chr(10)) if l.startswith(("VERB_OFFENDER_PIN",
-                                                                  "SUFFIX_OFFENDER_PIN",
-                                                                  "LAYER_OFFENDER_PIN"))]
-    check("S8: all three pins are emitted, each on a line carrying no trailing comment",
-          len(_pin_lines) == 3 and not any("#" in l for l in _pin_lines), str(_pin_lines))
+    # THE EXPECTED SET IS `PIN_KEYS`, not a list retyped here. It read three when the kit declared
+    # three predicates, and a literal beside a population is wrong on the commit that moves it.
+    _pin_lines = [l for l in _conf.split(chr(10)) if l.startswith(tuple(lex.PIN_KEYS.values()))]
+    check("S8: every declared pin is emitted, each on a line carrying no trailing comment",
+          len(_pin_lines) == len(lex.PIN_KEYS) and not any("#" in l for l in _pin_lines),
+          str(_pin_lines))
+    check("S8: ...and a DEAD pin key is not emitted either",
+          "LAYER_OFFENDER_PIN" not in _conf, _conf[:200])
 
 # ---- closing-review left-shifts (round 1) --------------------------------------------------------
 #
@@ -790,7 +646,7 @@ ZZZ_STALE = "zzz_gone_symbol  a waiver whose target text is gone" + chr(10)
 # on either line. That disagreement between extractor and sniffer IS the DEAD SNIFFER condition, and
 # it is the only shape in this file that produces it.
 BLIND_DEF = "def " + chr(92) + chr(10) + "build_thing():" + chr(10) + "    pass" + chr(10)
-_AGREE = {"core/a.py": "def build_index():" + chr(10) + "    pass" + chr(10), **LAYER_SIDES}
+_AGREE = {"core/a.py": "def build_index():" + chr(10) + "    pass" + chr(10)}
 for _label, _files, _waiv, _reason in (
         ("a clean tree", _AGREE, None, None),
         ("a STALE waiver", _AGREE, {"lexicon-verb-waivers.txt": ZZZ_STALE}, "STALE WAIVERS"),
@@ -819,6 +675,58 @@ _c, _ = run_case({**_AGREE, "core/blind.py": BLIND_DEF}, BASE_CONF)
 _m, _ = run_case({**_AGREE, "core/blind.py": BLIND_DEF}, BASE_CONF, args=("--measure",))
 check("...and the DEAD SNIFFER case is a NON-trivial agreement (both non-zero)",
       _c != 0 and _m != 0, f"check={_c} measure={_m}")
+
+# ---- TOOL-aSurfacedLexicon-3 AC4: the two modes see ONE refusal set ------------------------------
+#
+# THE CLASS, not the three instances. `lexicon.py` confessed three separate times to a refusal
+# written BELOW the `measure_mode` return: armed from `--check`, unreachable from `--measure`, so one
+# mode could not fail while its sibling redded the same tree by name. Each was repaired by hoisting
+# one `.append` above that return, which fixes an instance and leaves the next author one `return`
+# away from re-earning it. `measure_pass` now computes every refusal before either mode branches, and
+# THIS is the arm that fails if a later edit unpicks that.
+#
+# THE LIVE POPULATION OF THE DEFECT IS ZERO, so this arm was watched red against a STAGED break and
+# not against the tree: a `problems.append` inserted into `run()`'s `--measure` branch, which made
+# the two sets differ by one and redded both arms below by name.
+#
+# THE CHECK-SIDE REFUSAL SET IS DERIVED, never a list of refusal headers typed here — a hand-kept
+# vocabulary of refusals is one fact in two places and goes stale on the next refusal added. `--check`
+# prints its report lines and its refusals under ONE prefix, so its refusals are exactly what a
+# CONTROL run over the same tree does not print. `--measure` prints its own under `#   `.
+_CTRL = {"core/a.py": "def build_index():" + chr(10) + "    pass" + chr(10)}
+_DIRTY = {**_CTRL, "notes.R": "x <- 1" + chr(10)}
+_SETS = {}
+_RCS = {}
+for _tag, _files, _waiv in (("control", _CTRL, None),
+                            ("dirty", _DIRTY, {"lexicon-verb-waivers.txt": ZZZ_STALE})):
+    _cr, _cout = run_case(_files, BASE_CONF, _waiv)
+    _mr, _mout = run_case(_files, BASE_CONF, _waiv, args=("--measure",))
+    _RCS[_tag] = (_cr, _mr)
+    _SETS[_tag] = (
+        {ln[len("lexicon: "):] for ln in _cout.splitlines() if ln.startswith("lexicon: ")},
+        {ln[4:] for ln in _mout.splitlines() if ln.startswith("#   ")},
+    )
+_check_refusals = _SETS["dirty"][0] - _SETS["control"][0]
+_measure_refusals = _SETS["dirty"][1]
+check("--check and --measure see ONE refusal set; a refusal only one mode can reach is the "
+      "armed-but-unreachable class",
+      _check_refusals == _measure_refusals,
+      "only --check: " + str(sorted(_check_refusals - _measure_refusals))
+      + "; only --measure: " + str(sorted(_measure_refusals - _check_refusals)))
+# ...over a NON-EMPTY set naming BOTH staged refusals. Set equality over two empty sets is a fixture
+# passing by finding nothing, and it is the shape this whole suite exists to refuse.
+check("...over a non-empty set that names both refusals the fixture stages",
+      len(_measure_refusals) == 2
+      and any("STALE WAIVERS" in _r for _r in _measure_refusals)
+      and any("UNDECLARED EXTENSIONS" in _r for _r in _measure_refusals),
+      str(sorted(_measure_refusals)))
+# ...and the CONTROL tree is clean in BOTH modes. Measured blind spot, not a hypothetical: the
+# subtraction above cancels a refusal that fires on EVERY tree, so a `problems` entry appended inside
+# `check_pass` alone was staged and this pair stayed green while twelve other arms redded. An exit
+# code of 0 in each mode is the assertion that closes it, because `problems` non-empty forces 1 in
+# both — so no refusal at all reached either mode on a tree the subtraction is about to trust.
+check("...and the CONTROL tree those sets are measured against is clean in BOTH modes",
+      _RCS["control"] == (0, 0), str(_RCS["control"]))
 
 # H3 — every call of a function that can fail must be checked. `adopt-lexicon.sh` runs under `set -u`
 # and NOT `-e`, so a bare call takes the next command's status: the --scaffold path printed
@@ -923,25 +831,6 @@ for _bad, _want in (
 # separate defects and watched both stay green through all of them. An exact assertion on the swap
 # makes an absence assertion beside it redundant by construction.
 
-# M3 — an unparseable target is a NAMED refusal with its own exit code, never a traceback. `--brief`
-# called the extractor with no guard while the corpus loop beside it caught and skipped, so the one
-# mode pointed at a single file was the one mode that died on a file mid-edit.
-_c, _o = run_case({"core/broken.py": "def build_x(:" + chr(10)}, BASE_CONF,
-                  args=("--brief", "core/broken.py"))
-check("--brief on an unreadable file refuses by name and exits 2 (not 1, not a traceback)",
-      _c == 2 and "core/broken.py" in _o and "cannot be read as source" in _o,
-      f"exit={_c} {_o[:200]}")
-# ...and the guard catches the SAME exception pair the corpus loop 30 lines below it does. Round 1
-# caught `(SyntaxError, ValueError)` against the loop's `(SyntaxError, OSError)`: it missed the
-# unreadable-file case and swallowed any internal `ValueError` as "this file does not parse".
-# Two readers of one question, differing. Asserted on the SOURCE, since no fixture reaches both.
-_src = (KIT / "lexicon.py").read_text(encoding="utf-8")
-check("...and it catches the same exception pair the corpus loop does",
-      _src.count("except (SyntaxError, OSError)") >= 3,
-      f"{_src.count(chr(101)+chr(120)+chr(99)+chr(101)+chr(112)+chr(116))} except clauses total")
-check("...and exit 1 stays reserved for VERDICTS, so a refusal cannot read as a finding",
-      "Traceback" not in _o, _o[:200])
-
 # M7 — ONE extension catalog, asserted by IDENTITY. The two copies had already diverged on the `py`
 # pattern-set id inside a single build, which is what makes an equality assertion too weak here: a
 # future re-fork that happens to start equal would pass it and drift on the next edit.
@@ -995,78 +884,6 @@ with tempfile.TemporaryDirectory(dir=str(KIT.parent.parent)) as _td:
           _r.returncode != 0, f"exit={_r.returncode} {(_r.stdout + _r.stderr)[:200]}")
     check("...and says which file it could not read it from",
           "KIT_LEXICON_VERSION" in (_r.stdout + _r.stderr), (_r.stdout + _r.stderr)[:200])
-
-# ---- TOOL-dPromptedSeam-3 — read_object_state, and the false rows it exists to stop -------------
-#
-# FOUR STATE ARMS, and they are FOUR because two rules decide the verdict and either alone passes
-# half of them. `pin_of` dies by MEMBERSHIP; `boundedK` dies by LENGTH, and `k` is in no stopword
-# list. A predicate carrying only the membership half answers `pin_of` correctly and `boundedK`
-# wrong, which is the defect the spec's two-rule statement exists to make observable.
-check("read_object_state: an all-stopword object is dead (membership)",
-      lex.read_object_state("pin_of") == "dead", lex.read_object_state("pin_of"))
-# SYNTHETIC, and saying so is the point. The only identifier in this repo that exercises the length
-# rule is `boundedK` in tools/hooks/agent-cap.js, which is JavaScript and outside the Python corpus
-# every other arm here walks. An arm over a population of zero would be a fixture that passes by
-# finding nothing, so this one names its own syntheticity instead of implying coverage.
-check("read_object_state: a one-character object is dead (length, SYNTHETIC — no python instance)",
-      lex.read_object_state("boundedK") == "dead", lex.read_object_state("boundedK"))
-check("read_object_state: a real object is live (the control that stops 'everything is dead')",
-      lex.read_object_state("build_index") == "live", lex.read_object_state("build_index"))
-check("read_object_state: a single-token name has NO object, which is not the same as dead",
-      lex.read_object_state("main") == "none", lex.read_object_state("main"))
-# ...and the three states must be THREE. A two-valued helper that maps `none` onto `dead` passes
-# every arm above except this one, and that collapse is exactly what `run_brief`'s truthiness filter
-# used to do.
-check("...and the three states are distinct, so no two collapse",
-      len({lex.read_object_state(n) for n in ("pin_of", "build_index", "main")}) == 3,
-      str([lex.read_object_state(n) for n in ("pin_of", "build_index", "main")]))
-
-# THE SET EQUALS map_lib's, and the REAL parity arm is in `tools/codebase-map/selftest.py`, which
-# may import both kits because the layer ban is directional and file-scoped. These two arms assert
-# only the SHAPE — a count and the members this corpus trips on — because this file cannot import
-# map_lib and must not pretend to. An earlier version of this comment said a parity gate could not
-# exist at all, which was false and closed the spec question that would have built it.
-check("the restated stopword set is 21 words, as map_lib declares",
-      len(lex.DEAD_TOKENS) == 21, str(len(lex.DEAD_TOKENS)))
-check("...and holds the members the corpus actually trips on",
-      {"of", "at", "in", "for", "with"} <= lex.DEAD_TOKENS, str(sorted(lex.DEAD_TOKENS)[:8]))
-# THE LENGTH HALF IS COPIED TOO, and it was ungated while the membership half was not. `map_lib`
-# drops tokens shorter than two characters by a rule separate from its stopword set, so the constant
-# restating it is a second copied fact and deserves the same arm. Round-2 M2.
-check("the restated minimum token length is map_lib's 2, not a number of this kit's own",
-      lex.MIN_LIVE_TOKEN == 2, str(lex.MIN_LIVE_TOKEN))
-
-# THE MARKER, both directions in one fixture. A dead shared object prints its row and must NOT claim
-# a shared concept; a live shared object must. One arm cannot pass while the other fails on a build
-# that suppresses the marker everywhere, which is the cheap wrong fix.
-_BRIEF_SRC = """def build_index():
-    pass
-
-
-def render_index():
-    pass
-
-
-def pin_of():
-    pass
-
-
-def cache_of():
-    pass
-
-
-def main():
-    pass
-"""
-_BRIEF = {"core/a.py": _BRIEF_SRC, **LAYER_SIDES}
-_c, _o = run_case(_BRIEF, BASE_CONF, args=("--brief", "core/a.py"))
-check("--brief keeps the marker on a LIVE shared object",
-      "index:" in _o and "SPELLED MORE THAN ONE WAY" in _o.split("index:")[1].split(chr(10))[0], _o)
-check("--brief WITHHOLDS the marker on a dead shared object, and still prints the row",
-      "of:" in _o and "SPELLED MORE THAN ONE WAY" not in _o.split("of:")[1].split(chr(10))[0]
-      and "DEAD tail" in _o.split("of:")[1].split(chr(10))[0], _o)
-check("--brief reports the definitions with no object at all, rather than dropping them",
-      "no object at all" in _o, _o)
 
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")

@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-11 — the canon overlay and its stamp
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6
+**Status:** SPECCED · rev-6 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -135,7 +135,7 @@ representative deletes the shipped cluster of that name and takes no alternative
 and `render_negative` each grow an optional `clusters=CLUSTERS` parameter that defaults to the shipped
 tuple. Every existing call site compiles unchanged and the frozen-by-default posture is the module's
 default rather than a caller's discipline. Two survive to this unit's landing, not three:
-`tools/lexicon/lexicon.py:1065` sits inside `run_probe`, whose AST span is `:1053-1136` and which
+that call sat inside `run_probe` in `tools/lexicon/lexicon.py` at BASE, which
 `TOOL-aSurfacedLexicon-3` deletes at build order 1, five orders before this unit. rev-2 corrected that
 arithmetic in S2 and left this sentence saying three; rev-3 corrects the sentence.
 
@@ -160,7 +160,7 @@ before it. Re-derived at base `6c670b02` with
 | the DEBT/UNRULED offender line, same file, same graft | `build_form_index` and `read_gloss` | YES |
 | `build_seed`, `tools/lexicon/scaffold_lexicon.py:121`, `:147`, `:192` | `build_form_index`, `CLUSTERS`, `read_gloss` + `render_negative` | NO |
 | `tools/lexicon/selftest.py:686`, `:689`, `:696`, `:698` | all four | NO by default; its own arms pass one explicitly |
-| `run_probe`, `tools/lexicon/lexicon.py:1065`, `:1101`, `:1114` | `build_form_index` and `CLUSTERS` | deleted at order 1 |
+| `run_probe`, in `tools/lexicon/lexicon.py` at BASE, its three canon call sites | `build_form_index` and `CLUSTERS` | deleted at order 1 |
 
 **Why the scaffold not receiving the overlay is acceptable, stated rather than assumed.** It has no
 declaration to read. `scaffold_lexicon.py`'s `main` takes exactly one argument, a destination PATH
@@ -492,6 +492,8 @@ second line of that selection's comment.
   `delegated` or nothing — so both readers scored a conforming-looking mark as no mark at all and
   the whole section read unresolved. F2 was genuinely open and is ratified as the targeted
   attribution line, with AC13 added because a report line nobody observes can ship absent.
+- rev-6 · 2026-09-05 · two line citations into `tools/lexicon/lexicon.py` symbol-anchored; the build rewrites
+  that file, so a line number into it is a rotting reference.
 
 ## 10. Reuse audit
 

@@ -13,11 +13,10 @@ The seed is still marked PROPOSED with `ratified` empty, because a canon-sourced
 starting vocabulary and not a curated one — but it is no longer the hand-kept mirror companion §12
 bans, because its vocabulary comes from outside the tree it grades.
 
-`LAYERS` is deliberately seeded EMPTY. There is no `--scaffold` proposal for P3: an import-direction
-map is a statement about intended architecture, and a frequency count cannot observe intent. An
-empty `LAYERS` makes the engine report NOT ARMED and red, which is the fail-closed behaviour the
-unit spec requires — a fresh adopter gets a refusal that names what to declare, never a green run
-over a predicate that is not checking anything.
+THERE IS NO IMPORT-DIRECTION SEED, and since TOOL-aSurfacedLexicon-2 there is nothing to seed: the
+declared `LAYERS` predicate is deleted. The one constraint it really held — the kit imports nothing
+outside the stdlib and its own directory — is now a refusal inside the engine, derived from the
+kit's own source, so it needs no declaration and cannot be scaffolded wrong.
 """
 
 import collections
@@ -63,20 +62,18 @@ HEADER = """\
 BANNED_SUFFIXES = ("Manager", "Helper", "Util", "Utils", "Handler", "Processor", "Data", "Info")
 
 
-def _measure_suffix_offenders(root, files) -> int:
-    """Type definitions ending in a banned suffix, over the same corpus the verb pin uses."""
+def _measure_suffix_offenders(scanned) -> int:
+    """Type definitions ending in a banned suffix, over the SAME scan the verb pin uses.
+
+    It takes the scan rather than the repo root, and that is the whole of this unit's change here.
+    It used to walk the corpus a second time — its own `git ls-files`, its own `extract` per file —
+    to answer a question the first walk already had the definitions for. Two walks over one tree is
+    also two chances to disagree about which files are armed.
+    """
     banned = BANNED_SUFFIXES
     n = 0
-    for rel in files:
-        ext = lex.ext_of(rel)
-        if ext not in KNOWN:
-            continue
-        pset, mode = KNOWN[ext]
-        try:
-            got = lex.extract(root / rel, mode, pset)
-        except (SyntaxError, OSError):
-            continue
-        if not got:
+    for _rel, _ext, got, _problem in scanned:
+        if got is None:
             continue
         for name, _ln in got[1]:
             if any(name.endswith(b) for b in banned):
@@ -105,9 +102,18 @@ def main(argv: list[str]) -> int:
     dest = Path(argv[1])
     root = Path(subprocess.run(["git", "rev-parse", "--show-toplevel"],
                                capture_output=True, text=True, check=True).stdout.strip())
-    files = lex.tracked_files(root)
+    # THE ONE WALK, and every figure below comes out of it. There used to be two — this function's
+    # and `_measure_suffix_offenders`'s — each re-deriving which extensions are armed and each
+    # SWALLOWING an extraction failure, so an unparseable file was invisible here while `run()`
+    # refused the same file by name. `scan_corpus` owns that decision now and reports it; nothing
+    # below is allowed to drop it on the floor.
+    scanned = list(lex.scan_corpus(root, KNOWN))
+    files = [rel for rel, _e, _d, _p in scanned]
+    refused = [p for _r, _e, _d, p in scanned if p]
+    for _p in refused:
+        sys.stderr.write(f"scaffold: NOT EXTRACTED - {_p}\n")
 
-    exts = sorted({lex.ext_of(f) for f in files})
+    exts = sorted({ext for _r, ext, _d, _p in scanned})
     # S8 — `conf` is seeded UNCONDITIONALLY, present or not. This scaffold runs BEFORE the file it
     # writes is tracked, so the extension it is about to create cannot be in `exts` — and the
     # adopter's very first `git add .lexicon.conf` then reds with UNDECLARED EXTENSIONS. Every fresh
@@ -121,16 +127,8 @@ def main(argv: list[str]) -> int:
     forms = canon.build_form_index()
     counts: collections.Counter = collections.Counter()   # surface form -> live sites
     types_seen = 0
-    for rel in files:
-        ext = lex.ext_of(rel)
-        if ext not in KNOWN:
-            continue
-        pset, mode = KNOWN[ext]
-        try:
-            got = lex.extract(root / rel, mode, pset)
-        except (SyntaxError, OSError):
-            continue
-        if not got:
+    for _rel, _ext, got, _problem in scanned:
+        if got is None:
             continue
         funcs, types_, _ = got
         types_seen += len(types_)
@@ -140,7 +138,7 @@ def main(argv: list[str]) -> int:
                 counts[v] += 1
 
     total_defs = sum(counts.values())
-    suffix_offenders = _measure_suffix_offenders(root, files)
+    suffix_offenders = _measure_suffix_offenders(scanned)
     # A cluster enters when ANY of its forms has a live site. The corpus votes on membership and
     # nothing else: it cannot promote a spelling, and a token in no cluster cannot enter at all.
     live = {forms[v] for v in counts if v in forms}
@@ -159,8 +157,8 @@ def main(argv: list[str]) -> int:
     body.append("# here with no declaration is a named refusal, never a silent skip.")
     body.append(f'LANGS="{" ".join(langs)}"')
     body.append("")
-    body.append("# ALL THREE MEASURED against this corpus at scaffold time. The verb pin counts every")
-    body.append("# definition whose leading token is outside the proposal; the other two count their own")
+    body.append("# BOTH MEASURED against this corpus at scaffold time. The verb pin counts every")
+    body.append("# definition whose leading token is outside the proposal; the suffix pin counts its own")
     body.append("# offenders. They used to be hardcoded `0` under a comment that called them measured, so")
     body.append("# a corpus with one `Manager` type scaffolded green and redded on its first gate run,")
     body.append("# against a pin the tool itself had written (TOOL-dScaffoldedMirror-1).")
@@ -168,10 +166,6 @@ def main(argv: list[str]) -> int:
     body.append("# Shrink-only thereafter: the count may fall, never rise.")
     body.append(f'VERB_OFFENDER_PIN="{verb_offenders}"')
     body.append(f'SUFFIX_OFFENDER_PIN="{suffix_offenders}"')
-    body.append("# LAYERS ships EMPTY below, so no layer offender can exist yet. This comment is on its")
-    body.append("# OWN line deliberately: the conf grammar forbids one after a value, and the first cut of")
-    body.append("# this scaffold put it inline and made the reader refuse the file it had just written.")
-    body.append('LAYER_OFFENDER_PIN="0"')
     body.append("")
     body.append("# The date and node that CURATED the seed below. While this is empty,")
     body.append("# `adopt-lexicon.sh --check` reds: an underived table nobody edited is a mirror of the")
@@ -208,12 +202,6 @@ def main(argv: list[str]) -> int:
         body.append("# RENAMES THIS TABLE WILL OWE: none. Every live site of a seeded concept already")
         body.append("# uses the representative spelling.")
     body.append("")
-    body.append("# FORBIDDEN import directions, `<glob> -> <glob>`. Seeded EMPTY and the gate REDS until")
-    body.append("# you declare one: a frequency count cannot observe intended architecture, so there is")
-    body.append("# no derived proposal for this predicate. Declare the direction you actually mean, e.g.")
-    body.append("#   src/core/* -> src/adapters/*")
-    body.append("LAYERS:")
-    body.append("")
 
     # newline="" — write LF, never the platform default. `write_text` translates `\n` to `\r\n` on
     # Windows, and a CRLF conf INVERTS the unratified-seed refusal: `adopt-lexicon.sh` strips the
@@ -223,7 +211,8 @@ def main(argv: list[str]) -> int:
     with open(dest, "w", encoding="utf-8", newline="") as fh:
         fh.write("\n".join(body))
     print(f"scaffold: {len(seeded)} verb(s) proposed from {total_defs} definition(s); "
-          f"VERB_OFFENDER_PIN={verb_offenders}; {types_seen} type definition(s) scanned")
+          f"VERB_OFFENDER_PIN={verb_offenders}; {types_seen} type definition(s) scanned"
+          + (f"; {len(refused)} file(s) NOT EXTRACTED, named on stderr" if refused else ""))
     return 0
 
 

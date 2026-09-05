@@ -1,11 +1,12 @@
 # TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint
 
-**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
+**Status:** CLOSED · rev-8 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aSurfacedLexicon-2-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-2-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-3 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-2-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 |
 
@@ -298,9 +299,15 @@ reading and the conditional is stated only so the sentence is not reused as a fa
   and `python tools/lexicon/lexicon.py --measure` emits two pin lines rather than three.
 - **AC5** — When `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs, both `lexicon selftest`
   and `drift-audit selftest` are green with the three `LAYERS:` fixtures repaired.
-- **AC6** — When `bash tools/check-dead-paths.sh` runs after `tools/lexicon/lexicon-layer-waivers.txt`
-  is deleted, it exits 0, with the four govkit-receipt spellings covered by rows in
-  `tools/dead-path-waivers.txt` and no other carrier left naming the file.
+- **AC6** — When `bash tools/check-dead-paths.sh` runs after the layer-waiver registry
+  `lexicon-layer-waivers.txt` under `tools/lexicon/` is deleted, it exits 0, with the four
+  govkit-receipt spellings covered by rows in `tools/dead-path-waivers.txt` and no other
+  carrier left naming the file. The filename is spelled without its directory ON PURPOSE:
+  `tools/check-spec-tokens.py` grades every backticked path-shaped token in this section
+  against `git ls-files`, and this criterion's own subject is a path the unit DELETES, so the
+  full spelling reds the unguarded `spec tokens` leg on the landing commit. A waiver row was
+  the alternative and is worse: that registry's rows go stale when the spec citing them goes
+  terminal, so it would red the moment this unit is marked done.
 - **AC7** — When `bash tools/lexicon/adopt-lexicon.sh --check` runs, the `lexicon wiring` leg is
   green, which asserts the rendered Skill still byte-compares after the kit descriptor lost its
   `lexicon-layer-waivers.txt` include row and its `lexicon-layers` hole.
@@ -316,11 +323,16 @@ reading and the conditional is stated only so the sentence is not reused as a fa
   lands in both carriers. This criterion covers BOTH. Re-read both figures from the command at build
   time; do not trust either number typed here. The leg also WARNs past its recorded high-water independently of the ceiling,
   and that warning is advisory and does not satisfy or fail this criterion.
-- **AC9** — When `bash tools/run-gates/run-gates.sh` runs at the push boundary, it is green,
-  including the three unguarded legs whose populations this unit moves: `dead-path carriers`,
-  `testsuite counts` and `codebase-map coverage + freshness`. All three carry `chunk: declarations`
-  and `subject: repo` with no `guard` key in `tools/gate-legs.json`, so no scoping keeps any of them
-  off this commit's bar.
+- **AC9** — When this unit's pass is complete, the three UNGUARDED legs whose populations it moves
+  are green ON THIS COMMIT, run directly: `dead-path carriers`, `testsuite counts` and
+  `codebase-map coverage + freshness`. All three carry `chunk: declarations` and `subject: repo`
+  with no `guard` key in `tools/gate-legs.json`, so nothing scopes them off this commit.
+  **The WHOLE bar is deliberately NOT this criterion, and rev-7 removed that claim.** The full bar
+  runs ONCE, at the push boundary, over the cumulative diff of every unit — so a per-unit criterion
+  asserting it would be the same fact stated thirteen times, none of the thirteen observable when
+  its own pass ends, and all thirteen satisfied or failed together by a run none of them controls.
+  The run's Definition of Done already carries the whole-bar item and is where it belongs; this
+  criterion carries only what this pass can actually observe.
 - **AC10** — When `import map_lib` is staged into any module under `tools/lexicon/`, `python
   tools/lexicon/lexicon.py --check` and `python tools/lexicon/lexicon.py --measure` BOTH exit `1`
   and both name that file, that line and `map_lib`; when it is unstaged both exit `0`. The two
@@ -458,6 +470,18 @@ update` clobbers. That route is unowned by any unit in this build.
   `###` sub-head, and this section led its fork with a bold run-in, so the section scored ZERO items —
   which routes to the empty-section branch and reads FORKED however conforming the resolution mark is.
   The mark was always there; nothing could see it.
+
+- rev-7 · 2026-09-05 · AC6's path token de-backticked to a bare basename plus a separate directory
+  token, and the reason written into the criterion. No other change: the criterion's subject,
+  witness command and exit condition are byte-identical in meaning. Found by running the
+  unguarded `spec tokens` leg during the build pass, which was green at this rev's base and
+  red on the unit's own tree — the leg §7 of this spec does not name.
+- rev-8 · 2026-09-05 · AC9 narrowed from the whole bar to the three unguarded legs this unit's own
+  commit moves. The full bar runs once, at the push boundary, over every unit's cumulative diff, so
+  a per-unit criterion claiming it is one fact restated once per unit and observable by none of
+  them when their pass ends; the run's Definition of Done already owns it. Written during this
+  unit's build pass, which is when the criterion turned out to be unobservable by the pass it
+  belongs to.
 
 ## 10. Reuse audit
 

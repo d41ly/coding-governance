@@ -2,7 +2,7 @@
 
 ```toml
 feature = "lexicon"
-title = "Three naming predicates over a per-repo DECLARATION, portable into a repo whose language set is unknown"
+title = "Two naming predicates over a per-repo DECLARATION plus a self-containment refusal, portable into a repo whose language set is unknown"
 status = "shipped"
 streams = ["tooling", "playbook"]
 decisions = []
@@ -83,21 +83,26 @@ reds until a human stamps it. This paragraph and the one above it were the SAME 
 carriers, and the round-1 fix rewrote the other; that is this file confessing to the class it
 confesses to two paragraphs down, twice.
 
-**Vacuity is pushed back on three ways, and the third is narrower than it first shipped.** The
-corpus-side arm is `DEAD PROBE`: a `parser` or `probe` language whose definition population is empty
-against a corpus containing that extension is a refusal. That arm is itself defeated by an empty
-corpus, so the kit-side arm is a frozen SENTINEL fixture per shipped pattern set in `selftest.py`.
-The third is `UNSELECTIVE LAYERS RULE` — a rule whose FROM or TO glob matches no tracked file.
+**Vacuity is pushed back on three ways.** The corpus-side arm is `DEAD PROBE`: a `parser` or
+`probe` language whose definition population is empty against a corpus containing that extension is a
+refusal. That arm is itself defeated by an empty corpus, so the kit-side arm is a frozen SENTINEL
+fixture per shipped pattern set in `selftest.py`. The third is `check_self_containment`'s own
+`DEAD PROBE`: a self-containment walk that judges NO imports reds rather than reporting the clean
+zero a broken probe prints. The third USED to be `UNSELECTIVE LAYERS RULE`, over a declared rule
+whose globs selected nothing; it went with the predicate that read it.
 
-**Reachability itself is NOT proved, and the failed attempt is the more useful record.** The kit's
-first real declaration named a hyphenated directory no import could resolve into, so P3's offender
-pin read a confident 0 that no edit could move. The first fix added a construction-based reachability
-proof, and a review measured it a tautology: every synthetic derived from a target's PATH round-trips
-through the resolver's own path-mirroring reading, so restoring the pre-fix blind resolver still
-certified the rule REACHABLE. It was removed rather than patched. What P3's correctness rests on is
-`resolve_import`, an OBSERVED failing case, and fixtures in the PRODUCTION shape — a hyphenated
-directory reached by a bare-stem import, which is precisely the shape a path-shaped fixture cannot
-represent. See `armed-but-unreachable-rule`.
+**P3 IS DELETED, and its failed reachability proof is the record worth keeping.** The predicate,
+its `LAYERS` declaration, its glob dialect and its import resolver were removed by
+`TOOL-aSurfacedLexicon-2`; nothing below describes live code. The kit's first real declaration named
+a hyphenated directory no import could resolve into, so P3's offender pin read a confident 0 that no
+edit could move. The first fix ADDED a construction-based reachability proof, and a review measured
+it a tautology: every synthetic derived from a target's PATH round-tripped through the resolver's own
+path-mirroring reading, so restoring the pre-fix blind resolver still certified the rule REACHABLE.
+It was removed rather than patched. What P3's correctness rested on was `resolve_import`, an OBSERVED
+failing case, and fixtures in the PRODUCTION shape — a hyphenated directory reached by a bare-stem
+import, which is precisely the shape a path-shaped fixture cannot represent. The transferable half
+outlived the predicate: no construction-based proof can establish that a declared rule can fire. See
+`armed-but-unreachable-rule`.
 
 **Coverage is DECLARED per extension, and an undeclared one is a named refusal.**
 `map_extractors.py` refuses to ship a regex extractor for shell and declares that language dark
@@ -106,9 +111,13 @@ forgot. That law binds here. `dark` is the honest cheap declaration for the many
 carry no definitions at all, and declaring them is what makes the undeclared-extension refusal
 meaningful rather than noisy.
 
-**An unarmed predicate REDS.** An empty `LAYERS` reports `NOT ARMED` and exits non-zero; there is no
-derived proposal for P3 because a frequency count cannot observe intended architecture. A predicate
-that is satisfied and one that was never asked must not produce the same exit code.
+**A predicate that is satisfied and one that was never asked must not produce the same exit code.**
+The written form of that used to be `P3 NOT ARMED`, over an empty `LAYERS` block nothing could
+derive a proposal for. With the declaration gone the same rule binds the refusal that replaced it:
+`check_self_containment` derives its own population and REDS as `DEAD PROBE` when that population is
+empty, because zero offenders over zero imports is exactly the clean green a broken walk prints. Its
+walk root is a PARAMETER so that arm can be staged; a predicate that can only read its own installed
+directory has a liveness arm nobody can run.
 
 **P2 is scoped to DEFINITION sites only.** A blanket suffix ban breaks on contact with imported names
 and with parameters — Go's `context` is the standing example — so an imported `ThingManager` and a
@@ -168,23 +177,29 @@ the gate exists to catch. `tools/lib/resolve-python.sh` is the precedent for tha
 - **No `memory/gotchas/` class for naming violations.** Companion §7 requires a failing case OBSERVED
   before a gate lands, and a class authored ahead of its first instance is the gate-discipline error
   this repo names. The first confirmed P1 or P2 finding becomes one.
-- **P3 resolves an import to candidate PATHS, but it is not a full module resolver.** It tries the
-  dotted-namespace-as-path reading, the last segment as a module stem against the tracked corpus, and
-  relative specifiers normalised against the importer's directory. That covers the shapes this tree
-  and its adopters actually write. It does NOT follow build-tool path aliases, `package.json`
-  `exports` maps, or re-export barrels, so an aliased import into a forbidden layer is not caught.
-  The earlier version compared the raw namespace against a path glob and was structurally incapable:
-  the first real rule declared — naming a HYPHENATED directory no module name can contain — could
-  never match, and P3 reported an unfalsifiable 0.
-- **P3 took three adversarial rounds and four blockers to get right, all in two helper functions.**
-  Every one lived in `_glob_match` or `resolve_import`, and none was visible to an end-to-end
-  fixture — reverting the `_glob_match` rewrite verbatim left all 48 fixture arms green while the
-  live gate stayed at exit 0. The last two were a `<dir>/*` glob whose earlier wildcard was escaped
-  literally, so nesting stopped below depth 1, and importer-local precedence applied to
-  fully-qualified dotted imports where the language grants none. Both are fixed and each is pinned
-  by a CASE TABLE row keyed to the defect. The transferable finding is that a predicate's
-  correctness concentrates in its helpers, and fixtures do not reach them: extend the tables, not
-  just the fixtures. P1, P2 and the placeholder gate were never implicated.
+- **P3 RESOLVED an import to candidate PATHS and was never a full module resolver — history, not a
+  live gap.** It tried the dotted-namespace-as-path reading, the last segment as a module stem
+  against the tracked corpus, and relative specifiers normalised against the importer's directory. It
+  did NOT follow build-tool path aliases, `package.json` `exports` maps, or re-export barrels, so an
+  aliased import into a forbidden layer was never caught. The version before that compared the raw
+  namespace against a path glob and was structurally incapable: the first real rule declared — naming
+  a HYPHENATED directory no module name can contain — could never match, and P3 reported an
+  unfalsifiable 0. `check_self_containment` inherits none of this, because it resolves nothing: it
+  reads an import's top-level name and asks whether a `.py` file of that name sits beside the engine.
+  What it inherits instead is a narrower reach — it judges the KIT's own directory and no other
+  population, which is the whole of what the deleted rule was ever relied on for.
+- **P3 TOOK three adversarial rounds and four blockers to get right, all in two helper functions,
+  and that is the finding this kit paid for.** Every one lived in `_glob_match` or `resolve_import`,
+  and none was visible to an end-to-end fixture — reverting the `_glob_match` rewrite verbatim left
+  all 48 fixture arms green while the live gate stayed at exit 0. The last two were a `<dir>/*` glob
+  whose earlier wildcard was escaped literally, so nesting stopped below depth 1, and importer-local
+  precedence applied to fully-qualified dotted imports where the language grants none. Both were
+  fixed, each pinned by a CASE TABLE row keyed to its defect, and all of it was deleted with the
+  predicate by `TOOL-aSurfacedLexicon-2` — 164 engine lines and 29 arms for one declared rule whose
+  pin never left `"0"`. The transferable finding survives the code: a predicate's correctness
+  concentrates in its helpers and fixtures do not reach them, so a predicate that NEEDS helpers is
+  buying a maintenance surface. The replacement refusal has none, which is the argument for its
+  shape. P1, P2 and the placeholder gate were never implicated.
 - **Both halves of this bullet are SUPERSEDED, and it is rewritten rather than trimmed because it
   carried two dead premises in one sentence.** It read "the benefit is unmeasurable by construction,
   which is why the kit is opt-in and why the retirement condition is written down: retire P1 if it

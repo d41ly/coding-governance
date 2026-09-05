@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-13 — the prefix selector, routing a subset of a cell to a second convention
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 5
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -95,7 +95,7 @@ So every criterion in section 6 that grades a cell is measured against a SCRATCH
 each one says so, the way `TOOL-aSurfacedLexicon-5` phrases its own after the identical defect
 was raised against it. A scratch declaration is a `CELLS` block written into the working-tree
 `.lexicon.conf` and never committed: the engine resolves the repo root with
-`git rev-parse --show-toplevel` at `tools/lexicon/lexicon.py:1184` and opens `root / CONF_NAME`
+`git rev-parse --show-toplevel` in `main()` of `tools/lexicon/lexicon.py` and opens `root / CONF_NAME`
 (`:89`, read at `:792` and `:935`), so it takes no `--conf` flag and no fixture repo is needed. The
 corpus stays the real tracked tree, which is why the denominators below are still this repo's own,
 and `.lexicon.conf` still changes for nothing at landing.
@@ -411,6 +411,7 @@ row and no `testsuite-count-waivers.txt` entry.
   `TOOL-aSurfacedLexicon-6`, `TOOL-aSurfacedLexicon-7` and `memory/guides/BUILD-METHOD.md` were
   opened for this revision.
 - rev-3 · 2026-09-05 · two cross-spec rev pins dropped.
+- rev-4 · 2026-09-05 · a line citation into `tools/lexicon/lexicon.py` symbol-anchored.
 
 ## 10. Reuse audit
 

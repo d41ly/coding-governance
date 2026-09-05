@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-10 — `--expand`, the one-time widening the canon bounds
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -344,7 +344,7 @@ ratified here. "Second entry point" and "mode flag" are separable: `scaffold_lex
 cleanly with no side effects, so an importable `derive_candidates(...)` beside line 146, reached
 from `lexicon.py`'s existing six-mode dispatcher, keeps AC5's locus exactly and touches no guard.
 That is not a listed option and cannot be ratified under M3. A third route also exists and nobody
-listed it: `lexicon.py:1053-1136` (`run_probe`) already implements S3's candidate computation and
+listed it: `run_probe` in `lexicon.py`, as it stood at BASE, already implements S3's candidate computation and
 S4's unruled tail with S4's own framing — but `TOOL-aSurfacedLexicon-3` deletes `run_probe` at build
 order 1, five orders before this unit needs it, and neither spec cross-references the other.
 
@@ -429,6 +429,8 @@ that reintroduces CRLF.
   say plainly that this unit does not move. §10 records the probe-blindness finding behind its own "no
   seam fits" conclusion. Base re-pinned from `d0a18683` to `6c670b02`, and the §4 unruled-tail figure
   re-measured there at 267, replacing a stale 258.
+- rev-4 · 2026-09-05 · two line citations into `tools/lexicon/lexicon.py` symbol-anchored, for the reason the
+  order-1 sibling records — the build rewrites that file and the `spec tokens` leg caught the drift.
 
 ## 10. Reuse audit
 
@@ -450,7 +452,7 @@ plus `canon.build_form_index` at `tools/lexicon/canon.py:84-95`, which the earli
 ranking above has drifted — re-running the query puts `corpus_files [tools/memory-recall/extract.py |
 fan-in 2]` on top and `seed_affordances` no longer appears — and "no seam fits" is true of the MAP but
 false of the TREE. `python tools/codebase-map/reuse_lookup.py "run_probe"` returns `run_probe` at
-fan-in 0, and `run_probe` at `tools/lexicon/lexicon.py:1053-1136` is the closest existing
+fan-in 0, and `run_probe` in `tools/lexicon/lexicon.py`, as it stood at BASE, is the closest existing
 implementation of S3 and S4 that exists anywhere in this repo. The semantic query could not
 STRUCTURALLY have returned it: a zero-fan-in entry point is not ranked as a seam, so an audit that gets
 "no seam" back over one is reporting the index's shape rather than the tree's. Read that as

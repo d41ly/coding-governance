@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 6ee7d96a5a797f29d94309b504d9a5f64637cb1a
+witness: 8674f4f044b5a185988b2c457ccb4f738568ca79
 phase: BUILDING
 mode: slug
 anchor-kind: default-branch
@@ -70,3 +70,5 @@ base: 6c670b024644bf6bbcc28ee74d2265c0efd453c6
 2026-09-05T01:56:13Z review · item TOOL-aSurfacedLexicon-11 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
 2026-09-05T01:56:14Z review · item TOOL-aSurfacedLexicon-12 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-05T02:01:00Z dispatch · item 8674f4f0 TOOL-aSurfacedLexicon-2 · reason tools/lexicon/lexicon.py tools/lexicon/selftest.py tools/lexicon/kit.toml tools/lexicon/README.md tools/lexicon/LEXICON.md tools/lexicon/adopt-lexicon.sh tools/lexicon/SKILL.template.md .claude/skills/lexicon/SKILL.md .lexicon.conf memory/map/features/lexicon.md memory/map/generated/symbols.json coding-governance-agents.template.md AGENTS.md

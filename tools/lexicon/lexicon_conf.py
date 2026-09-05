@@ -28,8 +28,10 @@ import re
 import sys
 from pathlib import Path
 
-#: Keys whose value is an indented block rather than a single line.
-BLOCK_KEYS = ("VERBS", "LAYERS")
+#: Keys whose value is an indented block rather than a single line. ONE key since
+#: TOOL-aSurfacedLexicon-2 deleted `LAYERS` with the predicate that read it; the grammar is
+#: unchanged and still block-capable, which is what a later key would need.
+BLOCK_KEYS = ("VERBS",)
 
 _SCALAR_RE = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*)=(.*)$')
 _BLOCK_RE = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*):[ \t]*$')
@@ -41,7 +43,7 @@ class ConfError(Exception):
 
 
 def load_conf(path: str | Path) -> dict:
-    """Parse `.lexicon.conf` into `{scalars..., "VERBS": {verb: meaning}, "LAYERS": [(from, to)]}`.
+    """Parse `.lexicon.conf` into `{scalars..., "VERBS": {verb: meaning}}`.
 
     Raises ConfError on an unreadable file or a malformed line. It does NOT validate that any
     particular key is present — arming is the engine's question, and a reader that refuses an
@@ -53,7 +55,7 @@ def load_conf(path: str | Path) -> dict:
     except OSError as e:
         raise ConfError(f"{p}: cannot read: {e}") from e
 
-    out: dict = {k: ({} if k == "VERBS" else []) for k in BLOCK_KEYS}
+    out: dict = {k: {} for k in BLOCK_KEYS}
     lines = raw.splitlines()
     i = 0
     while i < len(lines):
@@ -97,26 +99,19 @@ def load_conf(path: str | Path) -> dict:
 
 
 def _parse_block(key: str, rows: list[tuple[int, str]], p: Path):
-    if key == "VERBS":
-        table: dict[str, str] = {}
-        for lineno, body in rows:
-            parts = body.split(None, 1)
-            verb = parts[0].rstrip(":")
-            if not verb.isalpha():
-                raise ConfError(f"{p}:{lineno}: a verb must be alphabetic, got {verb!r}")
-            table[verb.lower()] = parts[1].strip() if len(parts) > 1 else ""
-        return table
-
-    pairs: list[tuple[str, str]] = []
+    """ONE BRANCH, because `BLOCK_KEYS` holds one key. The glob-pair branch that only `LAYERS`
+    reached went with it. An unknown key REFUSES rather than falling off the end returning `None`:
+    this reader never degrades a declaration into an empty one."""
+    if key != "VERBS":
+        raise ConfError(f"{p}: no block parser for {key!r}")
+    table: dict[str, str] = {}
     for lineno, body in rows:
-        if "->" not in body:
-            raise ConfError(f"{p}:{lineno}: a LAYERS row is `<glob> -> <glob>`, got {body!r}")
-        lhs, rhs = body.split("->", 1)
-        lhs, rhs = lhs.strip(), rhs.strip()
-        if not lhs or not rhs:
-            raise ConfError(f"{p}:{lineno}: a LAYERS row needs a glob on both sides, got {body!r}")
-        pairs.append((lhs, rhs))
-    return pairs
+        parts = body.split(None, 1)
+        verb = parts[0].rstrip(":")
+        if not verb.isalpha():
+            raise ConfError(f"{p}:{lineno}: a verb must be alphabetic, got {verb!r}")
+        table[verb.lower()] = parts[1].strip() if len(parts) > 1 else ""
+    return table
 
 
 

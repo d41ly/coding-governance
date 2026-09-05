@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-14 — a real shell parser, arming the shell function cell
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -502,7 +502,7 @@ corpus is where a denominator goes wrong.
 - **AC9** — When the parser is run over the whole tree BEFORE the cell is armed, by the direct call
   S7 quotes rather than by any shipped mode, its hits and its near-misses are recorded in this
   build's record. Rev-1 pointed this at `python tools/lexicon/lexicon.py --measure`, which is the pin
-  emitter per its own usage block at `tools/lexicon/lexicon.py:1175` and which cannot reach a `dark`
+  emitter per its own usage block in `tools/lexicon/lexicon.py` and which cannot reach a `dark`
   language in any case, so the criterion had no surface to observe. The record must state the file
   count the run covered, the hit count, the near-miss count with S7's definition of the term, and
   what the run caught that this spec did not predict — a record reporting no near-misses states that
@@ -606,6 +606,7 @@ recorded that it did not run that leg and that the figure circulating for it sho
   a heredoc-aware refinement of the same pattern returns 336 rather than 608. S8 raises by what the
   PARSER measures at landing. Also: `TOOL-aSurfacedLexicon-13` left build order 4 during the same
   fold, so the deferral-risk paragraph no longer names it as a co-resident.
+- rev-4 · 2026-09-05 · a line citation into `tools/lexicon/lexicon.py` symbol-anchored.
 
 ## 10. Reuse audit
 

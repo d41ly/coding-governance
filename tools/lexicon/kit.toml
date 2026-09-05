@@ -17,13 +17,13 @@ version_from = { file = "lexicon.py", pattern = "^KIT_LEXICON_VERSION = " }
 include = "**"
 role = "engine"
 
-# The three waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a
+# The waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a
 # fresh install has somewhere to record its first deliberate exception, but their CONTENT is
 # per-repo and must never be overwritten by an upgrade — a waiver list copied from a larger tree is
 # the same defect as a pin copied from one. `seed` is the role that expresses "copied ONCE, then the
 # target owns it"; `project-owned` alone would still be written on every apply.
 [[files]]
-include = ["lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt", "lexicon-layer-waivers.txt"]
+include = ["lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt"]
 role = "seed"
 to = "{kit}/{relpath}"
 
@@ -35,7 +35,7 @@ to = "{kit}/{relpath}"
 include = ["SKILL.template.md"]
 role = "rendered"
 to = ".claude/skills/lexicon/SKILL.md"
-placeholders = ["VERBS_TABLE", "SUGGEST_CLI", "BRIEF_CLI", "GATE_CLI", "CONF", "KIT_VERSION"]
+placeholders = ["VERBS_TABLE", "SUGGEST_CLI", "GATE_CLI", "CONF", "KIT_VERSION"]
 
 [config]
 file = ".lexicon.conf"
@@ -98,14 +98,6 @@ blocks_adopt = false
 blocks_gate = true
 why = "`--scaffold` takes each verb's SPELLING from the kit's frozen canon and asks the adopter's corpus only which concepts are live, so the seed is prescriptive rather than the hand-kept mirror companion §12 bans. It is still not CURATED: the canon's negatives are generic and the domain rows are missing. The seed ships marked PROPOSED with an empty `ratified` key, and the stamp is the checkable form of `a human read this table`."
 discharge = { command = ["bash", "{kit}/adopt-lexicon.sh", "--check"] }
-
-[[hole]]
-id = "lexicon-layers"
-kind = "authoring"
-blocks_adopt = false
-blocks_gate = true
-why = "LAYERS ships EMPTY because a frequency count cannot observe intended architecture, so there is no derived proposal for P3. An empty declaration makes the engine report NOT ARMED and red rather than green: an unarmed predicate that exits 0 is indistinguishable from a satisfied one, and this is the hole where that distinction is bought."
-discharge = { command = ["python", "{kit}/lexicon.py"] }
 
 [[hole]]
 id = "lexicon-pins"
