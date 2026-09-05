@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-04
 streams: tooling+playbook+kickoff+deployer
 roster: TOOL
-ids: TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7
+ids: TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8
 ---
 
 # aHonedRuleset — measure what is actually redundant in the governing prose, before trimming any of it
@@ -27,7 +27,7 @@ one build and called it a pattern rather than a coincidence; its population was 
 ## Detriments if this is not built
 - Trims land by taste, on whichever file a session happens to have open.
 - The edit-locked carriers stay locked, and the next rule landing in one is funded by a guess.
-- `TOOL-aScouredKit-23`'s uncapped-document finding stays at the two files it happened to name.
+- `TOOL-aScouredKit-23`'s uncapped-document finding keeps whatever population nobody measured.
 
 ## Build-level rules
 - **The census measures and edits no protocol prose.** Cuts are separate units the owner selects
@@ -38,21 +38,22 @@ one build and called it a pattern rather than a coincidence; its population was 
 - **Authored sources only.** Five of the six named documents are rendered from kit templates and
   byte-compared by parity legs. A cut is made in the template and rendered down; hand-editing the
   copy under `memory/guides/` reds the leg and loses the edit at the next render.
-- **Five units re-stamp one line, and two pairs of them run in parallel.** Each stages a watched
-  pathspec, so units 2, 3, 4 and 6 all bundle the `memory/guides/SESSION-KICKOFF.md` `last-audit`
-  re-stamp unit 5 already carried. Units 2 and 3 share `order 1` and units 4 and 5 share `order 2`,
-  so each pair rewrites that line on two branches and the merge conflicts BY CONSTRUCTION. The
-  charter's kickoff-manifest merge exception governs it, and the follow-up re-stamp is the
-  Definition of Done of whichever unit in the pair lands SECOND.
+- **Four units re-stamp one line, and both parallel steps contain a colliding pair.** Each stages a
+  watched pathspec, so units 2, 3, 4 and 6 all bundle the `memory/guides/SESSION-KICKOFF.md`
+  `last-audit` re-stamp unit 5 already carried. After the owner's 2026-09-04 re-order the pairs are
+  **2 with 6 at `order 1`** and **4 with 5 at `order 3`**; unit 3 is alone at `order 2` and collides
+  with nobody. Each pair rewrites that one line on two branches, so the merge conflicts BY
+  CONSTRUCTION. The charter's kickoff-manifest merge exception governs it, and the follow-up
+  re-stamp is the Definition of Done of whichever unit in that pair lands SECOND.
 - **The script states what it cannot see, where it reports.** Shingle matching finds copied text and
   is blind to a rule restated in different words, which is the costly half. A pair reported at zero
   shared bytes is not a pair with no duplicated meaning, and the header says so.
 
 ## Parked decisions
-- **Whether `BUILD-METHOD`'s budget becomes a declared row.** The file sets its own `≤24 KB` in
-  prose, says at its line 16 that no gate enforces the pair, and sits twelve bytes under it. Making
-  it a `tools/template-size-limits.txt` row is a one-line change with an owner call behind it, and
-  it belongs to whoever rules on the uncapped set rather than to this census.
+- **RULED, 2026-09-04, and kept here because the reason it was parked still binds.** The owner took
+  `TOOL-aHonedRuleset-6` F1 option (b): the budget passage is DELETED rather than declared. The
+  consequence the ruling accepted is that `tools/memory-tree/BUILD-METHOD.template.md` then has no
+  declared ceiling at all, which ADDS a file to `TOOL-aScouredKit-23`'s population.
 - **Whether the uncapped documents get ceilings.** `TOOL-aScouredKit-23` owns that question and
   names two files; the census measures the real count. Raising it here would answer someone else's
   open row from inside a measurement pass.
@@ -69,29 +70,31 @@ one build and called it a pattern rather than a coincidence; its population was 
 | 3 | `TOOL-aHonedRuleset-3` | SPECCED | the kickoff engine's unattended exits move to the kit that owns them |
 | 4 | `TOOL-aHonedRuleset-4` | SPECCED | the charter's agent-cap bullet keeps its pointer and drops the restatement |
 | 5 | `TOOL-aHonedRuleset-5` | SPECCED | the last-audit stamp rule collapses to one prose home and one machine home |
-| 6 | `TOOL-aHonedRuleset-6` | SPECCED | BUILD-METHOD's self-declared budget becomes enforceable or goes away |
+| 6 | `TOOL-aHonedRuleset-6` | SPECCED | BUILD-METHOD's self-declared budget is deleted, per the owner's F1(b) |
+| 8 | `TOOL-aHonedRuleset-8` | SPECCED | the micro-format gate reaches the adopter who takes the charter |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 6 unit(s) · node a · opened 2026-09-04 · streams tooling+playbook+kickoff+deployer
-ids TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7
+**Build status:** SPECCED · 7 unit(s) · node a · opened 2026-09-04 · streams tooling+playbook+kickoff+deployer
+ids TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aHonedRuleset-1 — the prose census](spec/2026-09-04-spec-TOOL-aHonedRuleset-1.md) | 0 | 1 | CLOSED | rev-1 | 2026-09-04 |
-| [TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds](spec/2026-09-04-spec-TOOL-aHonedRuleset-2.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-04 |
-| [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-04 |
-| [TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement](spec/2026-09-04-spec-TOOL-aHonedRuleset-4.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-04 |
-| [TOOL-aHonedRuleset-5 — the last-audit stamp rule gets exactly one home](spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-04 |
-| [TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away](spec/2026-09-04-spec-TOOL-aHonedRuleset-6.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds](spec/2026-09-04-spec-TOOL-aHonedRuleset-2.md) | 1 | 2 | SPECCED | rev-5 | 2026-09-04 |
+| [TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away](spec/2026-09-04-spec-TOOL-aHonedRuleset-6.md) | 1 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement](spec/2026-09-04-spec-TOOL-aHonedRuleset-4.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [TOOL-aHonedRuleset-5 — the last-audit stamp rule gets exactly one home](spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-04 |
+| [TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter](spec/2026-09-04-spec-TOOL-aHonedRuleset-8.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-04 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aHonedRuleset-8.
 
-Ids no `spec-audit` record has ever named: TOOL-aHonedRuleset-1.
+Ids no `spec-audit` record has ever named: TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -99,9 +102,10 @@ Ids no `spec-audit` record has ever named: TOOL-aHonedRuleset-1.
 | Step | Units | Parallel |
 |---|---|---|
 | 0 | `TOOL-aHonedRuleset-1` | no |
-| 1 | `TOOL-aHonedRuleset-2`, `TOOL-aHonedRuleset-3` | yes |
-| 2 | `TOOL-aHonedRuleset-4`, `TOOL-aHonedRuleset-5` | yes |
-| 3 | `TOOL-aHonedRuleset-6` | no |
+| 1 | `TOOL-aHonedRuleset-2`, `TOOL-aHonedRuleset-6` | yes |
+| 2 | `TOOL-aHonedRuleset-3` | no |
+| 3 | `TOOL-aHonedRuleset-4`, `TOOL-aHonedRuleset-5` | yes |
+| 4 | `TOOL-aHonedRuleset-8` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
