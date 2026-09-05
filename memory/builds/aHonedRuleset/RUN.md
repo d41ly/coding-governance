@@ -30,3 +30,5 @@ base: 6ec402bd3eb7f9cb5ce6257b0f60348ae3e593fc
 2026-09-05T22:58:46Z review · item TOOL-aHonedRuleset-5 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
 2026-09-05T22:58:52Z review · item TOOL-aHonedRuleset-6 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-05T23:38:30Z review · item TOOL-aHonedRuleset-8 · reason verdict BLOCKED · blockers 2

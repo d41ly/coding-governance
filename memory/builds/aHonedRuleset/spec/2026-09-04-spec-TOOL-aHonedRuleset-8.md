@@ -1,10 +1,12 @@
 # TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter
 
-**Status:** SPECCED · rev-5 · 2026-09-06 · node a · Tier-2 · base 94958534 · streams deployer · order 4 · ratified 2026-09-06
+**Status:** SPECCED · rev-6 · 2026-09-06 · node a · Tier-2 · base 94958534 · streams deployer · order 4 · ratified 2026-09-06
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -25,24 +27,50 @@ from an operator's install command to them.
   the descriptor's header paragraph at lines 6 to 8, whose argument is the `--all` exclusion this
   scope item removes; the replacement states why the gate now travels with the charter and how a
   target that does not want it declines. `requires = ["playbook"]` at line 15 stays exactly as it is.
-- **S3 — the runbook names the entry, ANCHORED.** Two edits to `WIRE-INTO-PROJECT.md`, resolved by
-  §8 F4 in favour of the anchored form rev-2 recommended against. First, `WIRE-INTO-PROJECT.md:82` is
-  the `intake --kits` example an operator copies; it gains `check-microformats` in the id list.
+- **S3 — the runbook names the entry, ANCHORED, PLACED and WIRED.** Three edits to
+  `WIRE-INTO-PROJECT.md`, resolved by §8 F4 in favour of the anchored form rev-2 recommended against.
+  First, the `intake --kits` example an operator copies gains `check-microformats` in its id list.
   Second, the mention is carried under a `<!-- govkit:entry check-microformats -->` anchor, which is
   this repo's own machine-readable convention for "this deployable exists" and the key
   `tools/govkit/check_runbook_parity.py` joins on. One sentence sits under the anchor as its body,
   saying the gate arrives with the charter and grades its definition block. **The sentence names the
   ENTRY ID and no file path** — see the §4 carried-prefix constraint, which makes that a correctness
   requirement rather than a style choice.
+
+  **PLACEMENT is pinned against the EXISTING anchors, never against the `--kits` line.** The new
+  anchor goes at the END of the `playbook` section, immediately ABOVE
+  `<!-- govkit:entry memory-tree -->`. `check_runbook_parity.py:71-81` derives a section body as
+  every line from one anchor to the NEXT, and the runbook's anchors sit at `:55 :73 :150 :215 :299
+  :357 :497`; the `--kits` example is mid-`playbook` between `:73` and `:150`, so an anchor beside it
+  would RE-PARENT roughly sixty lines — the `adopt-playbook.sh` invocations, the
+  `<!-- governance-template: vN.N -->` note and the whole *What the renderer cannot decide for you*
+  list — into `check-microformats`, leaving the `playbook` body as the intake command alone. Both
+  bodies stay non-empty, the census still reads 8, and rev-5's AC11 could not see any of it. rev-5
+  priced only the end-of-file swallow and its own *beside the command* instruction steered into the
+  one placement that breaks a neighbour.
+
+  **Third, the WIRING step.** The anchored body also carries the wire-this-leg-into-your-gate-runner-
+  and-CI instruction that every other kit section in this runbook carries — confirmed at `:178`,
+  `:262`, `:351`, `:402`, `:525` and `:786` — because without it the runbook path installs the payload
+  and runs nothing. §4's *What the runbook path actually yields* states the mechanism. The instruction
+  keeps S3's entry-id-and-no-file-path discipline: it names the leg by the id an operator already
+  typed, exactly as the sibling sections name theirs.
 - **S4 — the `why_conditional` REASON gate**, the first of the two guards §8 F1 rules must be BUILT
-  here. One arm in `cmd_selfcheck` at `tools/govkit/govkit.py`, failing any `selectable =
+  here. One arm in `selfcheck()` at `tools/govkit/govkit.py`, failing any `selectable =
   "conditional"` entry whose `why_conditional` is absent or blank. Its second half is forced by its
   first: `tools/govkit/entries/check-line-length.kit.toml` gains a `why_conditional`, because with
   S2 landed that descriptor is the arm's one remaining violator and the arm would otherwise red the
   bar on its own landing commit. The value is not new prose — that descriptor's header at lines 6 to
   10 already carries the argument, and the field lifts it into a place a machine can grade.
+- **S6 — the refusal-join pin ledger records the two new branches.**
+  `tools/govkit/refusal_join.py`'s ledger convention at `:42-115` is that every unit adding refusal
+  branches names them and states armed or unarmed; S4 and S5 add two and rev-5 carried no scope item
+  for it. A ledger comment names both, with AC16's selftest arms as what reaches them.
+  **`BRANCH_PIN` itself does NOT move**: it is shrink-only at 217 against a live 244, so growth cannot
+  red it, which is precisely why the growth needs its own written record. See §7 for why the rev-5
+  claim that these arms sit outside the counted population was false.
 - **S5 — the reachability arm on the `requires` edge**, the second guard §8 F1 rules must be BUILT.
-  One arm in `cmd_selfcheck` beside S4's, failing any entry whose `requires` names a member of the
+  One arm in `selfcheck()` beside S4's, failing any entry whose `requires` names a member of the
   declared default set while the entry itself is **reachable by no declared selection**. The
   quantifier is load-bearing and §4 establishes what it means mechanically; the literal reading
   "default-reachable" is a different and wrong arm.
@@ -64,7 +92,7 @@ from an operator's install command to them.
   an open question. Nothing in this unit turned on the answer in any case: S1 and S2 land identically
   either way.
 - **The two guards this unit BUILDS assert, they do not expand.** S4 and S5 are `r.fail` arms in
-  `cmd_selfcheck`. They read declarations and grade them; neither adds a member to any selection,
+  `selfcheck()`. They read declarations and grade them; neither adds a member to any selection,
   writes a descriptor key, or touches `resolve_selection`. That distinction is what keeps S5 clear of
   F2 and of `DEPL-aHoistedPass-1`.
 - **The other four conditional entries keep their CLASSIFICATION.** `check-agent-cap-restatement`,
@@ -135,6 +163,37 @@ A second consequence, noted rather than acted on: gov's own `.governance/deploy.
 19 kits explicitly and takes the target's-own-list branch, so S1 changes nothing about gov's own
 install. The default set's audience is a fresh adopter with no declaration, and gov is not one.
 
+### What the runbook path actually yields, and why S3 needs a third edit
+
+**Added at rev-6 as a BLOCKER fold. The paragraph above says S3's id "closes" the runbook gap; on its
+own it does not, and the gap it leaves is this unit's own defect one layer down.** A `--kits`
+selection reaching `apply` gets its legs EMITTED only when the selection carries an entry declaring
+`[gate_runner_seed]`. That key is declared in exactly ONE file, `tools/run-gates/kit.toml:105`, and
+`govkit.py:8172-8176` is where it is read. Neither `run-gates` nor `gate_runner` appears anywhere in
+`WIRE-INTO-PROJECT.md` — grep returns zero.
+
+So an operator following the edited runbook writes a `deploy.toml` with no `[gate_runner]`, `apply`
+takes the ordered-not-emitted branch at `govkit.py:5064-5107`, writes the two microformat legs into
+`.governance/outbox/gate-legs.md`, prints `gate legs: ORDERED, not emitted`, and **exits 0**. The
+payload lands and no leg runs — the deployer's own comment at `:8165` calls that branch "the
+silent-green direction this deployer refuses by name everywhere else". It compounds twice:
+`cmd_intake` REFUSES to rewrite an existing `deploy.toml`, so the runbook's command is that target's
+PERMANENT selection; and every other kit section in this runbook carries an explicit wiring step
+while rev-5's S3 carried none.
+
+**The disposition, and its bound.** S3 gains the wiring instruction its six siblings carry, which is
+reuse of an established pattern rather than new mechanism. What it does NOT do is fix the runbook's
+missing gate RUNNER: `run-gates` is absent from the runbook's `--kits` example for EVERY kit, not
+just this one, so that is a pre-existing runbook defect wider than this unit and it is filed as
+`TOOL-aHonedRuleset-15` rather than fixed here. §3 records the boundary and AC17 observes which of
+the two outcomes the install actually produces, so the unit ships knowing the answer instead of
+assuming it.
+
+The DEFAULT adopter is unaffected by all of this and the distinction is worth keeping: `run-gates` IS
+in the default selection (`registry.toml:36`), so a default install does get emitted legs, exactly as
+§5's perf bullet says. The runbook adopter is the one who does not, and the runbook adopter is S3's
+entire audience.
+
 ### Why the mark is wrong
 
 The descriptor's own header argues the mark from `--all`: an adopter who does not take the charter
@@ -167,7 +226,7 @@ may genuinely lack, and this one is conditional on something the default install
 
 ### S4's seam — the `why_conditional` reason gate
 
-The seam is copied, not invented. `cmd_selfcheck`'s arm 8 already applies exactly this discipline to
+The seam is copied, not invented. `selfcheck()`'s arm 8 already applies exactly this discipline to
 the registry's OTHER escape hatch: at `tools/govkit/govkit.py:1910-1917` it walks every `[[exempt]]`
 row and fails one whose `why` strips to empty, with the reason "an exemption without one is an
 omission wearing a label". The same sentence is spelled twice more in the file, at `:1575` for
@@ -194,7 +253,7 @@ it is why S4 is specified as two halves rather than one.
 
 ### S5's seam — and what "reachable" has to mean
 
-The seam is `cmd_selfcheck`'s arm 7b, which already grades reachability and already carries the
+The seam is `selfcheck()`'s arm 7b, which already grades reachability and already carries the
 comment explaining why (`an entry cannot exist that no selection reaches — the state the unattended
 kit was found in`). S5 sits beside it as the case 7b cannot see: 7b exempts a conditional entry
 outright, so an entry can be declared, claimed, payload-complete, gate-emitting and reachable by
@@ -280,7 +339,7 @@ between them. Six files, one atom.
 | `tools/govkit/registry.toml` | S1 — one id added to `[selection] default` at line 36 |
 | `tools/govkit/entries/check-microformats.kit.toml` | S2 — line 14 deleted, header paragraph at lines 6 to 8 rewritten |
 | `WIRE-INTO-PROJECT.md` | S3 — the id added to the `--kits` example at line 82, plus an anchor line and one sentence as its body |
-| `tools/govkit/govkit.py` | S4 + S5 — two arms in `cmd_selfcheck`, beside arms 7b and 8 |
+| `tools/govkit/govkit.py` | S4 + S5 — two arms in `selfcheck()` at `:976`, beside arms 7b and 8 |
 | `tools/govkit/entries/check-line-length.kit.toml` | S4 second half — a `why_conditional` value, lifted from the descriptor's own header |
 | `tools/govkit/selftest.py` | S4 + S5 — the arms that exercise both guards' failing cases |
 
@@ -308,13 +367,34 @@ review consequence rather than only the edit count.
   rev-1 reason was wrong and is replaced here. That list is not confined to render-time judgement
   calls: its own intro at `WIRE-INTO-PROJECT.md:91-92` calls it "the answers `intake` will ask for,
   and the kits whose blocks the charter carries", and it already carries a gate kit in drop-it-if
-  terms at `:115` (`gate-lint`). The real reason is the §4 carried-prefix constraint: a bullet in
-  that list SPELLS A PATH, which is exactly what the carried-prefix ban fires on. The sentence goes
-  beside the `--kits` command it changes, and names the bare id.
+  terms (`gate-lint`). **The rev-3 reason was ALSO wrong and is replaced in turn at rev-6.** It read
+  "a bullet in that list SPELLS A PATH, which is exactly what the carried-prefix ban fires on" — but
+  every bullet in that list names a bare kit directory (`codebase-map/`, `drift-audit/`,
+  `memory-recall/`, `agent-instructions/`, `pytest-parallel-guardrails/`, `gate-lint/`, `govkit/`,
+  `lexicon/`, `unattended/`) and not one spells a `tools/` segment. The epoch-2 predicate needs a
+  literal `tools/` prefix AND an extension, so a bullet in that list's own style matches neither arm —
+  which is what §4 already establishes two paragraphs earlier for S3's own sentence. **The true
+  reason is placement, not prefix:** the mention belongs beside the `--kits` command it changes, and
+  F4's anchored form already satisfies `check_runbook_parity.py`, so the list bullet would be a second
+  carrier of one fact rather than a cheaper one. Recorded this way because F3 in this same section
+  sets the standard that a right answer resting on wrong facts is a right answer nobody can
+  re-derive, and this bullet had now failed it twice.
+
+- **Wiring the runbook adopter's GATE RUNNER.** S3 tells an operator to wire the microformat leg in;
+  it does not add `run-gates` to the runbook's `--kits` example. That example omits the gate runner
+  for every kit it lists, so a runbook adopter has been getting ordered-not-emitted legs across the
+  board — a pre-existing runbook defect this unit measured and did not cause. It is filed as
+  `TOOL-aHonedRuleset-15` and left to its owner; widening this unit to fix it would answer someone
+  else's question inside a selection fix.
 
 ## 5. Production-readiness checklist
 
-- security — N/A. Three declaration edits; no write path, no new surface, no credential handling.
+- security — N/A, re-priced at rev-6 against §4's SIX files rather than rev-2's three: two
+  declaration edits, one runbook edit, and two `r.fail` arms plus their selftest arms. The verdict is
+  unchanged and the premise is what moved — the arms READ declarations and write nothing, so there is
+  still no write path, no new surface and no credential handling. The rev-3 F1 fold updated every
+  other bullet in this section to six files and left this one at three, four bullets above a risks
+  entry that contradicted it.
 - perf / scale — a default install gains two engine files and two emitted gate legs. One of them,
   `micro-format gate selftest`, carries `subject = "kit"`, so an adopter's runner holds it by default
   the way gov's does.
@@ -350,7 +430,9 @@ review consequence rather than only the edit count.
   to `govkit selfcheck`'s arm 7b. The residual gap rev-2 identified — nothing stops a future edit
   re-adding the conditional mark — is now CLOSED by S5 rather than filed, and S4 closes the wider one
   arm 7b could never see: a conditional mark whose stated reason nobody grades. Both are `r.fail`
-  arms, so neither adds a `Refusal` branch and the `govkit refusal join` floor is unmoved; both are
+  arms, so neither adds a `raise Refusal` branch — but both ARE counted by `refusal_join.py`, whose
+  second channel is the bare `.fail(...)` call, so the population grows 244 to 246 and only the
+  shrink-only pin keeps the leg green; §7 states the corrected mechanism and S6 records the growth. Both are
   Python, so `tools/memory-tree/check-arms.py` does not see them either — its `discover()` at line 127
   reads tracked `.sh` files only, verified rather than assumed.
 - migration / rollback — `git revert` of one commit restores all six files, and reverts both halves
@@ -375,22 +457,51 @@ review consequence rather than only the edit count.
 - **AC5** — When `python tools/govkit/selftest.py` runs, it exits 0, and specifically the arm named
   `the default selection previews exactly 4 SIDE|rendered rows` is `ok`.
 - **AC6** — When `bash tools/check-install-prefix.sh` runs, it exits 0 and prints
-  `carried-prefix clean`, and `git diff -- tools/install-prefix-carried.txt` is empty — so S3's
-  sentence raised no file's recorded count, and `WIRE-INTO-PROJECT.md` still stands at 47.
-- **AC7** — When `git diff -- coding-governance-agents.template.md AGENTS.md` runs at the end of the
-  unit, it is empty, proving this unit moved no charter byte and left `TOOL-aHonedRuleset-2`'s subject
-  alone.
+  `carried-prefix clean`, and `git diff 94958534..HEAD -- tools/install-prefix-carried.txt` is empty
+  — so S3's sentence raised no file's recorded count, and `WIRE-INTO-PROJECT.md` still stands at 47.
+- **AC7** — When `git diff 94958534..HEAD -- coding-governance-agents.template.md AGENTS.md` runs
+  after the commit, it is empty, proving this unit moved no charter byte and left
+  `TOOL-aHonedRuleset-2`'s subject alone.
 - **AC8** — When every change is staged and `bash skills/session-kickoff/manifest-check.sh --staged`
-  runs, it exits 0 with `git diff -- memory/guides/SESSION-KICKOFF.md` empty — proving no watched
-  pathspec was touched and no `last-audit` re-stamp was owed or taken.
+  runs, it exits 0 with `git diff --cached -- memory/guides/SESSION-KICKOFF.md` empty — proving no
+  watched pathspec was touched and no `last-audit` re-stamp was owed or taken.
+
+  **The revision is load-bearing in all three, and rev-5 omitted it in all three.** A bare
+  `git diff -- <path>` compares WORKING TREE to INDEX, so it is empty for every path once the change
+  is staged or committed; AC8 stages first and then asserted its own tautology. That is not academic
+  here: measured live with the gate's own LF-normalised rule, `coding-governance-agents.template.md`
+  stands at 49144 B against its 49152 ceiling — **8 free bytes** — and `AGENTS.md` at 64481 against
+  64512, **31 free**. AC7 is the only thing between that headroom and an accidental charter edit, and
+  as written it could not fail. The one partial mitigation, recorded so the correction is not
+  overstated: the charter template IS on the manifest `watch:` list, so `manifest-check.sh` check 5
+  would have caught a staged template edit with no re-stamp. `AGENTS.md` is only in `verify-paths`
+  and nothing guarded it at all.
 - **AC9** — When `grep -c '^selectable' tools/govkit/entries/check-microformats.kit.toml` runs, it
   returns 0, and `grep -c 'check-microformats' WIRE-INTO-PROJECT.md` returns at least 3 against the 0
   measured at base — the `--kits` id, the anchor and the sentence.
-- **AC11** — When `python tools/govkit/check_runbook_parity.py` runs, its output no longer contains
-  `registry entry 'check-microformats' has no anchored runbook section`, and its census line reports
-  `8 anchored section(s)` against the 7 measured at base. The checker still exits 1 on the other 17
-  problems, which this unit does not touch and §8 F4 flags separately — so the observation is the
-  named line's absence, never the exit code.
+- **AC11** — When `python tools/govkit/check_runbook_parity.py` runs, **NO `runbook-parity:` line
+  names `check-microformats` at all** — not merely the `has no anchored runbook section` line — its
+  problem count falls from 18 to 17, and its census line reports `8 anchored section(s)` against the
+  7 measured at base. **And the `playbook` section's derived body still contains the renderer list**,
+  observed by grepping that body for `What the renderer cannot decide for you`. The checker still
+  exits 1 on the other 17 problems, which this unit does not touch and §8 F4 flags separately — so
+  the observation is the named lines' absence, never the exit code.
+
+  **Both strengthenings answer criteria that could not fail.** rev-5 asserted one line's absence plus
+  a census of 8; an anchor landing with an EMPTY body removes that line, raises the census, adds a
+  distinct `EMPTY body` problem and passes the criterion word for word — while §8 F4 itself calls the
+  non-empty body "the half that makes the anchor mean anything". The no-line-names-it form covers
+  presence, uniqueness and non-empty body in one observation. The renderer-list clause is what
+  observes S3's PLACEMENT: an anchor beside the `--kits` line re-parents ~60 lines of the `playbook`
+  section into this one, both bodies stay non-empty, and nothing rev-5 wrote could see it.
+- **AC17** — When a scratch target is installed with the runbook's own command, the outcome is
+  OBSERVED rather than assumed: either `apply` emits the two microformat legs into the target's gate
+  runner, or it prints `gate legs: ORDERED, not emitted` and writes them to
+  `.governance/outbox/gate-legs.md`. Whichever it prints, that is what §4's *What the runbook path
+  actually yields* must say, and this criterion is what keeps the two in agreement. Recorded as an
+  observation with two admissible outcomes on purpose — the defect this unit exists to remove is a
+  payload that lands while nothing runs, and a criterion asserting the outcome it hopes for would
+  reproduce it.
 - **AC12 — S4's staged break, confirmed RED before the arm is trusted.** When
   `why_conditional` is removed from `tools/govkit/entries/check-placeholders.kit.toml` and `python
   tools/govkit/govkit.py selfcheck` is run, it exits non-zero naming `check-placeholders`; when the
@@ -424,7 +535,7 @@ review consequence rather than only the edit count.
 Leg names as `tools/gate-legs.json` spells them:
 
 - `govkit selfcheck` — `chunk: declarations`, `subject: repo`, unguarded, so it runs on every bar.
-  **This is the leg both new guards belong to.** S4 and S5 are arms inside `cmd_selfcheck`, so they
+  **This is the leg both new guards belong to.** S4 and S5 are arms inside `selfcheck()`, so they
   need no manifest row of their own and inherit an unguarded leg that runs on every bar — which is
   the right home for an assertion about declarations that any commit can break. Its arm 7b is also
   the predicate whose input S1 and S2 change. Green at base, must stay green, and AC12 through AC15
@@ -438,11 +549,21 @@ Leg names as `tools/gate-legs.json` spells them:
   evidence behind AC4.
 - `govkit selftest` — guarded on `tools/govkit/` and `subject: kit`, so a default bar HOLDS it. AC10
   is what runs it, and this unit is kit work, so the held run is owed rather than optional.
-- `govkit refusal join` — guarded on `tools/govkit/`. It is a shrink-only branch floor over `Refusal`
-  call sites, which `refusal_join.py:133` matches by ast node name. S4 and S5 are `r.fail` arms and
-  raise nothing, so the floor is unmoved even though this unit now edits `govkit.py`. Verified rather
-  than assumed, because "we added two arms and the branch floor did not move" is exactly the claim a
-  reader should distrust.
+- `govkit refusal join` — guarded on `tools/govkit/`. **Corrected at rev-6: the rev-5 negative here
+  was stamped "verified" on a FALSE mechanism, and this is the correction.** `_is_refusal` matches
+  TWO channels, and its own docstring at `:130` says so: `raise Refusal(...)` at `:131-134`, and a
+  bare `<obj>.fail(...)` expression statement at `:135-138`. rev-5 cited `:133` — the raise half —
+  and stopped four lines short of the half that counts its own arms. `r.fail` sites are the MAJORITY
+  of the population, not outside it: measured live `refusal-join: 244 branch(es) across 4 module(s)`,
+  exit 0, against `BRANCH_PIN = 217` at `:41`. **S4 and S5 take it to 246, which is GROWTH.** Nothing
+  reds, but for a different reason than rev-5 recorded: the pin is shrink-only and already 27 behind,
+  so it cannot detect growth at all. S6 is the written record that a shrink-only floor structurally
+  cannot be. Two further consequences, budgeted here rather than discovered later: the join half at
+  `:175-181` reports both new branches as reached by NO arm the moment a reached-set is passed, and
+  the anchor is `(module, function, ordinal-within-function)`, so inserting arms mid-`selfcheck()`
+  renumbers every later branch in it should a reached-set ever be committed. A negative stated with a
+  false mechanism and stamped "verified" is the false-confidence class charter §7 names by hand, and
+  it would have taught the next reader that `r.fail` sites license skipping arms.
 - `harness arms (fail branches armed or pinned)` — unguarded, `subject: repo`. Named to record a
   NEGATIVE that would otherwise look like an oversight: it does not cover the new arms.
   `check-arms.py:127` builds its population from tracked `.sh` files, so `govkit.py`'s fail branches
@@ -482,12 +603,24 @@ three are the owner's and one is delegated, and each mark says which.
     regression guard rather than build it.* It is preserved verbatim because a recommendation quietly
     edited to agree with the ruling teaches a later reader that the two never differed, and the
     disagreement here is the useful part of the record.
-  - **It also overrides a precedent, deliberately.** `TOOL-aPacedTurnstile-1` §8 fork B declined a
-    govkit contract assertion inside a unit for this identical shape — "add the runner to the default
-    selection, add a selfcheck arm ... or rely on the wiring leg" — shipping the default-selection
+  - **It also overrides a precedent, deliberately — and rev-6 corrects BOTH the precedent's
+    authority and its ground.** The source mark reads `RESOLVED (agent, 2026-08-18, delegated)` at
+    `memory/builds/aPacedTurnstile/spec/2026-08-18-spec-TOOL-aPacedTurnstile-1.md:360-364`, quoted
+    with its full `(actor, date, authority)` triple because a paraphrase drops exactly the field that
+    decides how much authority an override needs. rev-3 framed this as the owner overruling an
+    earlier OWNER ruling, which is a harder override than the one that actually happened. And the
+    ground the source rested on was M3 **veto 2** — "adding the arm inside this spec would change
+    another kit's contract mid-unit, which M3 veto 2 reaches as a governance carrier change" — which
+    rev-3 dropped in favour of the backlog row's paraphrase. That matters here specifically: veto 2 is
+    an OWNER TURN, and **the owner's 2026-09-04 F1 ruling IS that turn**, which is what clears it for
+    a govkit contract assertion inside this unit. F2 one fork later invokes the same veto to DISCARD
+    the opt-in build, and the two dispositions are consistent for exactly this reason — F1 has an
+    owner turn clearing it and F2 has none. `TOOL-aPacedTurnstile-1` §8 fork B declined a govkit
+    contract assertion inside a unit for this identical shape — "add the runner to the default
+    selection, add a selfcheck arm ... or rely on the wiring leg", shipping the default-selection
     line and deferring the arm, on the reasoning that "adding the arm there would change govkit's
     contract inside a unit that only moves the runner". That produced `TOOL-aPacedTurnstile-11`
-    (`memory/backlog/TOOL.md:179`), which is still OPEN today and still unbuilt. The precedent is
+    (`memory/backlog/TOOL.md`, OPEN), which is still unbuilt today and still unbuilt. The precedent is
     therefore cited as OVERRIDDEN, not distinguished: the shapes match, the earlier ruling went the
     other way, and the owner has ruled the other way here. §5's first risk bullet prices what the
     override costs at review time, and `TOOL-aPacedTurnstile-11` is untouched by this unit — it asks
@@ -717,7 +850,8 @@ three are the owner's and one is delegated, and each mark says which.
   - The option taken is S3: `WIRE-INTO-PROJECT.md` carries the mention, and the charter does not need
     to be the carrier. §3's "the charter does not name the gate" holds, and AC7 observes it.
 - **F4 — do S3's bytes earn their place in an uncapped document?** `WIRE-INTO-PROJECT.md` is the
-  subject of `TOOL-aScouredKit-23` (`memory/backlog/TOOL.md:302`, OPEN, cited exactly as recorded —
+  subject of `TOOL-aScouredKit-23` (`memory/backlog/TOOL.md`, OPEN, cited by id because that shard is
+  edited in place and a line pin into it is stale by construction —
   though its own figure of 59833 B is now 68069 B, which strengthens its concern). Neither that row
   nor `TOOL-dSpentCeiling-4` is answered here. **RESOLVED (owner, 2026-09-04): keep S3 and ANCHOR IT,
   using the runbook's own `<!-- govkit:entry <id> -->` convention.** The spec recommended an
@@ -781,22 +915,35 @@ three are the owner's and one is delegated, and each mark says which.
     non-empty body, so the sentence is now load-bearing for the anchor rather than optional beside
     the id.
   - **Correction — `TOOL-dSpentCeiling-4` is cited at the wrong population.** That row
-    (`memory/backlog/TOOL.md:245`) is about RENDERED kit docs spending an adopter's read budget,
+    (`memory/backlog/TOOL.md`, by id) is about RENDERED kit docs spending an adopter's read budget,
     measured over `memory/guides/BUILD-METHOD.md` and `memory/guides/UNATTENDED-PROTOCOL.md`.
     `WIRE-INTO-PROJECT.md` is neither rendered from a kit template nor inside govkit's declared
     shipping surface (`registry.toml`'s `[surface]` globs are `tools/*`, `.githooks/**`,
     `skills/session-kickoff/**` and the root template), so S3's bytes land in no adopter's read budget
     at all. The row is still correctly left unanswered; it simply does not contain this file.
-  - **Correction — the byte figure is node-local.** 69030 is the CRLF on-disk size on node `a`; the
-    committed blob is 68069 (961 CR bytes, no `eol=lf` row). The file is byte-identical at this
-    spec's base and at HEAD.
+  - **Correction — the byte figure is node-local, and the byte-IDENTITY claim was false.** 69030 was
+    the CRLF on-disk size on node `a` when rev-3 measured; the committed blob at this spec's base
+    `94958534` is `0d217e3d`, 68069 B. **rev-5 asserted the file is byte-identical at base and at
+    HEAD; it is not.** At HEAD the blob is `22383488`, 68747 B — 11 lines added by `36af6f9f`
+    (`TOOL-aTunedCompass-6`, 2026-09-05 12:33), during this spec's own life and 48 minutes after
+    rev-3 landed. F4's own restatement of `TOOL-aScouredKit-23`'s figure as 68069 is likewise now
+    68747. Nothing in the ruling flips — re-measured at rev-6, the anchor census is still 7, the
+    `--kits` example line is unmoved, `tools/install-prefix-carried.txt` still records 47, and
+    `bash tools/check-install-prefix.sh` is green at `118 recorded file(s), 5 hand-justified, none
+    rising` — so AC6 and AC11 hold as written. What was wrong was an asserted identity in the bullet
+    whose whole job is to tell a builder the figures need no re-check, pinned against the MOVING ref
+    `HEAD`, which charter §14 bans outright.
   - **The option TAKEN, raised at rev-2 as a missing one.** The anchor convention is present 7 times
-    in the runbook today (`:55`, `:73`, `:150`, `:215`, `:299`, `:346`, `:486`, for
-    `kickoff-manifest`, `playbook`, `memory-tree`, `drift-audit`, `codebase-map`, `memory-recall` and
-    `push-main`), so S3 joins an established pattern rather than inventing one. Placement matters and
-    is a build-time detail worth stating once: the checker reads a section's body as every line from
-    the anchor to the NEXT anchor, so S3's anchor goes immediately above its own sentence and not at
-    the end of the file, where it would swallow everything after it.
+    in the runbook today, for `kickoff-manifest`, `playbook`, `memory-tree`, `drift-audit`,
+    `codebase-map`, `memory-recall` and `push-main` — cited by ENTRY ID at rev-6, because rev-3's line
+    pins `:346` and `:486` for the last two are already 11 lines stale after `36af6f9f`. So S3 joins an
+    established pattern rather than inventing one. **Placement is NOT merely a build-time detail and
+    rev-5's rule for it was wrong**: the checker reads a section's body as every line from the anchor
+    to the NEXT anchor, and "immediately above its own sentence" puts the anchor mid-`playbook`, where
+    it re-parents that section's body into this one. The rule is now stated in S2's own placement
+    paragraph and pinned against the EXISTING anchors — immediately above `memory-tree`'s — and AC11
+    observes it. Rev-5 priced only the end-of-file swallow, which is the failure mode that is easy to
+    see.
   - **The option REJECTED — DECLARE IT EXEMPT.** `check_runbook_parity.py:41-49` reads a
     `[[runbook_exempt]]` table from `registry.toml`, requiring a non-empty `why` and refusing a row
     naming a dead entry. That is this repo's first-class way of answering "does this entry need
@@ -806,10 +953,21 @@ three are the owner's and one is delegated, and each mark says which.
     does not need this id, and the runbook's own install command is precisely the path that fails
     without it. Exempting the one entry whose absence breaks the documented flow would be the
     exemption-is-not-coverage shape charter §7 names.
-  - **Flagged, explicitly NOT in this unit's scope.** `check_runbook_parity.py` is tracked, sits in no
-    row of `tools/gate-legs.json`, is invoked by nothing, and is RED. An unwired red gate on exactly
-    the question this fork asks is the green-by-absence shape the charter §7 exists to prevent, and it
-    wants its own backlog row rather than a scope expansion here.
+  - **Flagged, explicitly NOT in this unit's scope — and it already HAS rows, which rev-5 did not
+    cite.** `check_runbook_parity.py` is tracked, sits in no row of `tools/gate-legs.json`, is invoked
+    by nothing, and is RED. An unwired red gate on exactly the question this fork asks is the
+    green-by-absence shape the charter §7 exists to prevent. **What it does NOT want is a fresh row.**
+    `TOOL-dScaffoldedMirror-15` (DEFERRED, verified 2026-08-24) records this checker exiting 1 with
+    the same 18 problems, zero callers and absence from the leg manifest, and carries the context that
+    the unwired checker is the mechanical reason an adopter is never told a kit is deployable.
+    `TOOL-dRetiredFork-28` (OPEN) records the same fact. And
+    `memory/builds/aScouredKit/reviews/2026-08-30-review-TOOL-aScouredKit-1-wave1-lens-unwired.md:42-44`
+    explicitly DECLINED to re-report it as new *because* that row exists — a decision this fork then
+    made again in ignorance of it. rev-5's run duly filed a THIRD, `TOOL-aHonedRuleset-9`, so one
+    measured fact sat in three rows with three framings and none citing another. At rev-6
+    `TOOL-aHonedRuleset-9` is rewritten to lead with the two prior rows and to state the only thing it
+    adds — that AC11 of this unit becomes a criterion graded by nothing on the bar. The wiring question
+    stays where `TOOL-dScaffoldedMirror-15` already had it.
 
 ## 9. Revision log
 
@@ -893,6 +1051,43 @@ three are the owner's and one is delegated, and each mark says which.
   sense under the old status, left behind. It now states what F2 decided and why the ban does not
   reach the opt-in shape. The ban itself is unchanged.
 
+- rev-6 · 2026-09-06 · **round-1 spec audit folded — 2 blockers, 5 HIGH, 6 MEDIUM, 1 LOW, all
+  fourteen.** Report:
+  `memory/builds/aHonedRuleset/reviews/2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit.md`.
+  **B1** — §4 said S3's id "closes" the runbook gap; it does not. A `--kits` selection gets legs
+  EMITTED only if it carries the one `[gate_runner_seed]` entry (`tools/run-gates/kit.toml:105`), and
+  `run-gates` appears nowhere in the runbook, so the operator gets `ORDERED, not emitted` and exit 0 —
+  this unit's own defect one layer down, on the path §4 elevates to load-bearing. New §4 section
+  states the mechanism, S3 gains the WIRING step its six sibling sections carry, §3 records that
+  fixing the runbook's missing gate RUNNER is out (filed as `TOOL-aHonedRuleset-15`), and AC17
+  observes which outcome an install actually produces. **B2** — S3's "anchor beside the `--kits`
+  command" places it MID-`playbook`, and `check_runbook_parity.py:71-81` derives a body anchor-to-next-
+  anchor, so ~60 lines including the renderer list re-parent into this entry with both bodies
+  non-empty and rev-5's AC11 blind to it. Placement is now pinned above `memory-tree`'s anchor and
+  AC11 grades the `playbook` body. **H1** — AC6, AC7 and AC8 all ran revisionless `git diff`, which is
+  empty once staged; AC8 staged first and asserted its own tautology. Pinned to `94958534..HEAD` and
+  `--cached`. This guards 8 free charter bytes and 31 in `AGENTS.md`. **H2** — AC11 could not fail on
+  an EMPTY-body anchor; restated as no `runbook-parity:` line naming the entry, plus 18 to 17.
+  **H3** — §7's refusal-join negative was stamped "verified" on a false mechanism: `_is_refusal`
+  matches `.fail(...)` at `:135-138` as well as `raise` at `:131-134`, live 244 against a shrink-only
+  pin of 217, and S4/S5 take it to 246, which is GROWTH. Both bullets rewritten, S6 added for the pin
+  ledger, and the join and ordinal-renumber consequences budgeted. **H4** — F4 asked for a backlog row
+  that has had one since 2026-08-24 (`TOOL-dScaffoldedMirror-15`, plus `TOOL-dRetiredFork-28`, plus a
+  2026-08-30 review that declined to re-report it); rev-5's run filed a third. F4 now cites the prior
+  art and `TOOL-aHonedRuleset-9` is rewritten to lead with it. **H5** — the overridden precedent's mark
+  is `(agent, 2026-08-18, delegated)`, not an owner ruling, and its ground was M3 veto 2; both restored,
+  with the sentence recording that the owner's F1 ruling IS the owner turn veto 2 requires — which is
+  why F1 and F2 apply the same veto to opposite dispositions. **M1/M3** — §10 said the unit writes no
+  code (false since the rev-3 F1 fold) and that it FOLLOWS the fork-B precedent (F1 says in bold it
+  OVERRIDES it); both corrected and §4's function seams carried in. **M2** — §5's security bullet
+  priced three files against §4's six. **M4** — `cmd_selfcheck` does not exist; the function is
+  `selfcheck()` at `govkit.py:976`, wrong in seven places including both scope items. **M5** — the
+  alternatives bullet's carried-prefix ground is false (no bullet in that list spells a `tools/`
+  segment); replaced with the real one. **M6/L1** — three backlog line pins and two runbook anchor pins
+  had drifted, and the byte-identical claim was false: base blob `0d217e3d` 68069 B, HEAD `22383488`
+  68747 B, 11 lines added by `36af6f9f` during this spec's life. All pins now cite by id. No fork was
+  re-opened and no ruling reversed.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "ship the charter micro-format gate to an adopter through
@@ -900,13 +1095,22 @@ the deployer registry selection"` names the seam this unit extends directly: `re
 the declaration that owns which entries an install reaches. Two adjacent affordance seams came back
 with it and both were read rather than assumed — `check-template-size.sh [playbook]` and
 `check-dead-paths.sh [install-prefix]`, which are the exemption side of the same registry and are what
-§8 F1's class answer rests on. No function seam fits, and that is the correct answer here: the
-extension point is a data row in `tools/govkit/registry.toml` plus a key in
-`tools/govkit/entries/check-microformats.kit.toml`, and this unit writes no code. The corpus probe
-supplied the governing precedent, `TOOL-aPacedTurnstile-1` §8 fork B — "add the runner to the default
-selection, add a selfcheck arm ... or rely on the wiring leg", resolved as the default-selection line
-with the arm filed as its own govkit unit — which is the shape §8 F1 follows and the source of the
-two-sided acceptance criterion AC1 uses.
+§8 F1's class answer rests on. The DECLARATION extension point is a data row in
+`tools/govkit/registry.toml` plus a key in `tools/govkit/entries/check-microformats.kit.toml`.
+**And since the rev-3 F1 ruling this unit also writes CODE, which this section asserted it did not
+until rev-6** — S4 and S5 are two arms in `tools/govkit/govkit.py` plus their exercising arms in
+`tools/govkit/selftest.py`, which is why §4's Rollout reads *three files at rev-2, six at rev-3*.
+The function seams they extend, found by hand in §4 and carried here because finding a seam is this
+section's job: the `[[exempt]]` empty-reason loop at `govkit.py:1910-1917`, whose "an omission wearing
+a label" sentence is spelled again at `:1575` and `:2508`, is the seam S4 copies; and arm 7b at
+`:1350-1353` is the reachability seam S5 sits BESIDE rather than modifies.
+
+The corpus probe supplied the governing precedent, `TOOL-aPacedTurnstile-1` §8 fork B — "add the
+runner to the default selection, add a selfcheck arm ... or rely on the wiring leg", resolved as the
+default-selection line with the arm filed as its own govkit unit. **§8 F1 OVERRIDES that shape rather
+than following it**, deliberately and in bold, and rev-5 recorded it here as followed — the reading a
+future session would grep this section for. The two-sided acceptance criterion AC1 uses is what
+survives from the precedent and is unaffected by the override.
 
 Recall terms used: `python tools/memory-recall/query.py "why is the micro-format gate a conditional
 govkit entry rather than part of the adopter default selection" --terms "govkit registry selection
