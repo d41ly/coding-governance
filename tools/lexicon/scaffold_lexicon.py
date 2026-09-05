@@ -61,6 +61,23 @@ HEADER = """\
 #: declaration did not carry. Closing review L2.
 BANNED_SUFFIXES = ("Manager", "Helper", "Util", "Utils", "Handler", "Processor", "Data", "Info")
 
+#: `(ext, surface) -> convention`, PRESCRIPTIVE and from OUTSIDE the corpus, exactly like the verb
+#: spellings the canon supplies. Each row is what that language's own published style says — PEP 8
+#: for Python, the ES/TS house style for JavaScript, the shell convention for script filenames — and
+#: NOT a ranking of what the adopting tree already does. A convention derived from the graded
+#: population is the mirror shape §12 bans, and it is the reason there is a table here rather than a
+#: `collections.Counter` over `classify()`.
+#:
+#: A pair with no row is seeded `dark`, which is a declaration and not a gap: the row is written, it
+#: is named on every run, and arming it is one word.
+SEED_CONVENTIONS = {
+    ("py", "function"): "snake",
+    ("py", "type"): "pascal",
+    ("js", "function"): "camel",
+    ("js", "type"): "pascal",
+    ("sh", "function"): "snake",
+}
+
 
 def _measure_suffix_offenders(scanned) -> int:
     """Type definitions ending in a banned suffix, over the SAME scan the verb pin uses.
@@ -142,11 +159,18 @@ def main(argv: list[str]) -> int:
     # answered both with the corpus, which is why it legalised whatever a repo already did most.
     forms = canon.build_form_index()
     counts: collections.Counter = collections.Counter()   # surface form -> live sites
+    # `(ext, predicate) -> extracted definitions`, which is the population `UNDECLARED CELL` grades
+    # and therefore the population the seeded `CELLS` block must cover. Keyed on the PREDICATE and
+    # mapped through `lex.PREDICATE_SURFACES` at emission, so this walk and that refusal read one
+    # mapping rather than two spellings of it.
+    cell_pops: collections.Counter = collections.Counter()
     types_seen = 0
     for _rel, _ext, got, _problem in scanned:
         if got is None:
             continue
         funcs, types_, _ = got
+        cell_pops[(_ext, "verb")] += len(funcs)
+        cell_pops[(_ext, "suffix")] += len(types_)
         types_seen += len(types_)
         for name, _ln in funcs:
             v = lex.leading_verb(name)
@@ -220,6 +244,62 @@ def main(argv: list[str]) -> int:
         body.append("# RENAMES THIS TABLE WILL OWE: none. Every live site of a seeded concept already")
         body.append("# uses the representative spelling.")
     body.append("")
+
+    # ---- THE CELLS MATRIX AND ITS MEASURED PINS (closing review B3) ------------------------------
+    #
+    # THE SCAFFOLD EMITTED NEITHER, and that made a freshly adopted repo unable to run the one
+    # command the Skill it had just installed documents. `--as <ext>.<surface>` is REQUIRED since
+    # TOOL-aSurfacedLexicon-8 and `resolve_cell` refuses any spec no `CELLS` row names, so
+    # `--suggest fetch_thing --as py.function` exited 2 with "Declared cells: none" on every fresh
+    # adoption. Nothing surfaced the gap: `kit.toml` declared holes for `ratified` and the pins only,
+    # and the README's Adopting section never mentioned cells. The kit's own canon-overlay fixture
+    # hand-writes a `CELLS` block — the same hole seen from the inside.
+    #
+    # ONE ROW PER (ext, surface) THE WALK ACTUALLY EXTRACTED, which is the same population
+    # `UNDECLARED CELL` refuses over, so the seed satisfies that arm by construction rather than by
+    # an author remembering to. Surfaces with no extracted population (`file`, `constant`) are NOT
+    # seeded: a cell whose population rule selects nothing is a `DEAD CELL` refusal, so proposing
+    # one would hand the adopter a declaration their first gate run reds on.
+    #
+    # THE `.conv` PINS ARE MEASURED, never asserted, for the reason the two scalar pins above are:
+    # an armed cell is a two-sided equality, and a pin the tool wrote without measuring is either
+    # vacuous or permanently red. `measure_conventions` is the ENGINE's own function over the SAME
+    # walk, so the number the seed carries is the number the first `--check` computes.
+    seeded_cells = {}
+    for (_e, _kind), _n in sorted(cell_pops.items()):
+        if not _n:
+            continue
+        seeded_cells[f"{_e}.{lex.PREDICATE_SURFACES[_kind]}"] = SEED_CONVENTIONS.get(
+            (_e, lex.PREDICATE_SURFACES[_kind]), "dark")
+    if seeded_cells:
+        _rows = {k: (v, frozenset()) for k, v in seeded_cells.items()}
+        _measured, _ = lex.measure_conventions(scanned, {"CELLS": _rows, "PINS": {}}, root, declared)
+        body.append("# The (language, surface) matrix. The CONVENTION in each row is PRESCRIPTIVE —")
+        body.append("# each language's own published style, from outside this tree — and never a")
+        body.append("# ranking of what this corpus already does, which would make the gate certify")
+        body.append("# the habit it was installed to change. A pair this kit has no prescription for")
+        body.append("# is seeded `dark`, which is a declared refusal to grade and not a gap.")
+        body.append("#")
+        body.append("# ARM WHAT YOU MEAN: change a `dark` row to a convention, or add the `vocab`")
+        body.append("# flag to a `function` row to ratchet its DEBT/UNRULED split per cell. Every")
+        body.append("# change here moves the matching `.conv` pin below; `--measure` reprints them.")
+        body.append("CELLS:")
+        for _k, _v in seeded_cells.items():
+            body.append(f"  {_k:<14} {_v}")
+        body.append("")
+        _pins = [(k, len(r["verdicts"])) for k, r in _measured.items()
+                 if r["graded"] and r["convention"] != "dark"]
+        if _pins:
+            body.append("# MEASURED over this corpus, like the two scalar pins above, and two-sided in")
+            body.append("# the same way. ONE BLANK LINE between rows is a REFUSAL in the reader, not a")
+            body.append("# style: it is the context line that lets two branches draining neighbouring")
+            body.append("# cells merge clean.")
+            body.append("PINS:")
+            for _i, (_k, _n) in enumerate(_pins):
+                if _i:
+                    body.append("")
+                body.append(f"  {_k}.conv  {_n}")
+            body.append("")
 
     # newline="" — write LF, never the platform default. `write_text` translates `\n` to `\r\n` on
     # Windows, and a CRLF conf INVERTS the unratified-seed refusal: `adopt-lexicon.sh` strips the

@@ -325,7 +325,47 @@ if [ "$MODE" = "--check" ]; then
   fi
 
   check_skill || fail=1
-  [ "$fail" -eq 0 ] && echo "lexicon-adopt OK — .lexicon.conf parses, ratified, $verbs verb(s) declared, Skill in sync"
+
+  # B1 OF THE CLOSING REVIEW — THE DECLARATION IS GRADED ON A LEG A CONF-ONLY COMMIT CANNOT SKIP.
+  #
+  # Every ratchet this kit owns lives in `.lexicon.conf`: the two scalar pins, the `CELLS`
+  # conventions, the `PINS` rows, the `CANON` overlay's effect on the DEBT/UNRULED split. The leg
+  # that computes those verdicts (`lexicon naming predicates`) is guarded on `tools/` and three
+  # sibling dirs, and `.lexicon.conf` is at the repo ROOT — so a branch whose whole diff is the
+  # declaration skipped its own verifier. Raising `VERB_OFFENDER_PIN` to any number, or flipping a
+  # cell to `dark`, landed with no verdict computed. A ratchet whose drain is invisible on the
+  # commit that drains it is not a ratchet, and the tool's own red text instructs the author to
+  # produce exactly that commit shape ("Paste this row into .lexicon.conf").
+  #
+  # THE GUARD IS NOT THE FIX, and that was tried twice and STRUCK twice. govkit partitions every
+  # declared guard into classes — memory-root-relative, verbatim-repo-root, renamed, exempt,
+  # kit-relative — and a root-level conf is in none of them, so declaring one reds `govkit
+  # selfcheck` rather than scoping anything. That ruling is written into this kit's own `kit.toml`.
+  # What was left was this script: it is the argv of `lexicon wiring`, the one leg in this kit
+  # carrying an EMPTY guard, and it already reads the declaration on every bar.
+  #
+  # THE OTHER LEG STAYS, and it is not made redundant by this. It runs the same engine SCOPED,
+  # which is an early signal under its own name in the leg log; this arm is the one that binds at
+  # the merge. The two share an argv, which the "ONE LEG, NOT TWO" ruling above warns about — but
+  # what that ruling struck was two legs with the same argv and DIFFERENT guards, where the guarded
+  # copy could never say anything the unguarded one had not. Here the unguarded copy is the
+  # authority and the guarded one is the fast fail; deleting either is a `gate-legs.json` and a map
+  # edit, not a behaviour change.
+  #
+  # COST: one corpus walk. Measured on node `a` from `<git-dir>/gate-ledger.tsv`, the row named
+  # `lexicon naming predicates`; read it there rather than from a number written here.
+  grade_out=$(cd "$ROOT" && "$PY" "$KIT_DIR/lexicon.py" 2>&1)
+  grade_rc=$?
+  if [ "$grade_rc" -ne 0 ]; then
+    echo "lexicon-adopt: THE DECLARATION DOES NOT GRADE — \`$PY $KITREL/lexicon.py\` exited"
+    echo "lexicon-adopt: $grade_rc over this corpus. Every pin in .lexicon.conf is a two-sided"
+    echo "lexicon-adopt: equality, so this is either a name that moved or a pin nobody re-measured."
+    echo "lexicon-adopt: The engine's own output follows; it names the row to paste."
+    printf '%s\n' "$grade_out"
+    fail=1
+  fi
+
+  [ "$fail" -eq 0 ] && echo "lexicon-adopt OK — .lexicon.conf parses, ratified, $verbs verb(s) declared, Skill in sync, declaration grades clean"
   exit "$fail"
 fi
 

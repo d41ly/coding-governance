@@ -50,9 +50,16 @@ whole point.
 
 ## What the gate does with it
 
-`{{GATE_CLI}}` reds when an unwaived offender count exceeds the declared pin. It also reports, every
-run, the graded population and offender count PER PREDICATE, and the armed share of the files that
-carry a definition at all. A zero there is printed rather than hidden.
+`{{GATE_CLI}}` grades every pin as a TWO-SIDED EQUALITY. A count that RISES above the declared pin
+reds, and a count that FALLS below it reds just as loudly, printing the exact row to paste — a drain
+lands in the declaration or it is not landed. Do not read a red as "somebody added an offender".
+
+Every declared `CELLS` row is graded the same way: `<cell>.conv` counts the names in that cell that
+miss its convention, and it is two-sided too, as are the `<cell>.debt` and `<cell>.unruled` rows on
+a cell carrying the `vocab` flag.
+
+It also reports, every run, the graded population and offender count PER PREDICATE, and the armed
+share of the files that carry a definition at all. A zero there is printed rather than hidden.
 
 Reserved rows behave differently from ordinary ones: `main` is a module's one CLI entry point, `cmd`
 a subcommand entry point one level down, and `test` a function a harness collects. They name a

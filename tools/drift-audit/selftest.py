@@ -809,6 +809,32 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     check("...and the signal stays LIVE over that widened population", armed["live"] is True,
           f"{armed}")
 
+    # H1 OF THE CLOSING REVIEW — AN UNSHIPPED `parser` ID MUST NOT TAKE THE WHOLE REPORT DOWN.
+    #
+    # `_build_armed_exts` dropped `dark` rows and unknown-`probe` rows and KEPT a `parser` row whose
+    # pattern-set id the kit does not ship, so `extract_text` reached `PARSERS[pset]` and raised
+    # `KeyError`. Neither `except` tuple downstream covered it and `main()` evaluates every signal
+    # unguarded, so ONE legal-looking `LANGS` row cost all eight signals and printed a traceback —
+    # on a leg that carries no guard and runs on every bar. The engine's own `scan_corpus` refuses
+    # the same row by name, so the two readers of one declaration disagreed; `_load_lexicon`'s
+    # docstring promises "never a raise and never a red" for exactly this class.
+    #
+    # A TYPO IS THE WHOLE POPULATION. Nothing validates the id upstream — `langs()` checks the MODE
+    # token, `check_declaration` checks the CELLS/PINS cross-references — so an adopter is one
+    # mistyped set id away from a dead report.
+    conf.write_text(conf.read_text(encoding="utf-8")
+                    .replace("py:python-ast:parser", "py:bogus-parser:parser"),
+                    encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "a parser id the kit does not ship", "--no-verify"], r)
+    _raw = run([sys.executable, "drift-audit/drift_report.py", "--json"], r)
+    check("H1: an unshipped `parser` pattern-set id does not raise out of the report",
+          "Traceback" not in _raw.stderr and "KeyError" not in _raw.stderr,
+          _raw.stderr.strip()[-400:])
+    check("H1: ...and the report still returns every signal rather than none",
+          _raw.returncode == 0 and _raw.stdout.strip().startswith("["),
+          f"rc={_raw.returncode} {_raw.stdout.strip()[:200]}")
+
 
 def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     """The marginal-offense-rate signal: four states, and each one must be distinguishable.

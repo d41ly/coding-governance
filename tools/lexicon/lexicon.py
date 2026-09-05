@@ -30,9 +30,16 @@ function sitting inside a bash heredoc, AND a heredoc-aware refinement of that s
 real definitions to a quoted run of `<` characters it mistakes for an opener. Two regex readings of
 one population, each wrong where the other is not, which is the whole argument for tokenizing.
 NO FIGURE IS QUOTED HERE and the omission is deliberate: this header and the kit README each
-carried a number for that loss, they disagreed with each other, and the refinement that produced
-either was never committed, so neither could be re-derived. The reproducible one is the naive
-count, and it lives in the build record with the command. TOOL-aSurfacedLexicon-14.
+carried a number for that loss and they disagreed with each other, which is one fact with two
+carriers and no gate between them. The reason this used to give — that the refinement "was never
+committed, so no reader could re-derive either" — is FALSE about the commit that carried it: the
+refinement ships as a runnable snippet in `memory/builds/aSurfacedLexicon/spec/`'s unit-14 spec,
+tracked in the same build. Corrected at the closing review (M5), which is worth its own sentence
+because a comment justifying an omission by asserting a record does not exist is a claim about the
+tree, and this kit's own `KNOWN_EXTS` comment states the rule it broke: a fix comment is read as
+provenance, so an overstated one is worse than none. Both counts are re-derivable from that
+snippet; the reproducible one for a reader in a hurry is the naive count, in the build record with
+its command. TOOL-aSurfacedLexicon-14.
 
 VACUITY IS THE DOMINANT FAILURE MODE, not false positives — a predicate that selects an empty
 population passes green forever and tells you nothing. Three checks push back:
@@ -1276,6 +1283,11 @@ def measure_conventions(scanned: list, conf: dict, root: Path, declared: dict) -
         names = graded_names.get(cell, [])
         row = {
             "convention": conv,
+            # THE POPULATION ITSELF, not only its size. The cross-surface arm (closing review, the
+            # one left-shift worth more than the seventeen fixes) asks `--suggest` about every name
+            # this cell grades and asserts the two verbs agree; over VIOLATIONS alone it goes blind
+            # on a clean cell, which is the population where a routing bug hides best.
+            "names": names,
             "population": len(names),
             "denominator": denominator,
             "rule": rule[1] if rule is not None else None,
@@ -1288,7 +1300,12 @@ def measure_conventions(scanned: list, conf: dict, root: Path, declared: dict) -
             for path, line, name in names:
                 verdict, message = check_convention(name, conv)
                 if verdict != "SATISFIED":
-                    row["verdicts"].append((path, line, verdict, message))
+                    # THE NAME RIDES ALONG, and it is not decoration. The closing review's one
+                    # cross-surface arm feeds every graded offence back through `--suggest` and
+                    # asserts the two surfaces agree; without the name here that arm can only be
+                    # written over P1/P2 offenders, which is the half of the population where the
+                    # cell partition — the thing most likely to disagree — does not exist.
+                    row["verdicts"].append((path, line, name, verdict, message))
             row["teeth"] = {
                 alt: sum(1 for _p, _l, n in names if check_convention(n, alt)[0] != "SATISFIED")
                 for alt in GRADED_CONVENTIONS if alt != conv
@@ -1599,6 +1616,39 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict, clusters=Non
     vocab_cells, vocab_problems = measure_vocab_cells(unwaived_by["verb"], declared_cells)
     problems.extend(vocab_problems)
 
+    # --- UNREAD PIN: a declared row no verdict path consumes -----------------------------------
+    #
+    # Closing review M2. Three well-formed `PINS` shapes parsed, passed `check_declaration`, and
+    # were graded by NOTHING: `<cell>.suffix` on any cell (no reader anywhere — the predicate has
+    # since left `PIN_PREDICATES`), `<cell>.debt`/`<cell>.unruled` on a cell lacking `vocab` (the
+    # census only populates `vocab` cells), and `<cell>.conv` on a `dark` cell (the comparison sits
+    # below the `dark` branch's `continue`). Observed: a declaration carrying all three produced no
+    # line at all about any of them, while the same `conv` pin on a non-dark cell redded. A pin that
+    # cannot fire reads as a ratchet and is a decoration.
+    #
+    # THE SET IS DERIVED, NOT ENUMERATED, which is why this is one arm and not three. It is the
+    # declared keys minus the keys a verdict path actually consumes, so the next predicate somebody
+    # adds to the closed set reds by this arm until something reads it — no shape list to keep in
+    # step. There is a `STALE WAIVERS` arm here and there was no `STALE PIN` one.
+    #
+    # THE TWO CONDITIONS BELOW ARE `check_pass`'s TWO `continue`s, and that coupling is the one cost:
+    # the conv row is consumed exactly where that loop does NOT skip (graded, and not `dark`), and
+    # the debt/unruled pair exactly where `measure_vocab_cells` emitted a row. A selftest arm holds
+    # them in step by staging each shape and asserting the refusal names it.
+    read_pins = set()
+    for _cell, _row in cells.items():
+        if _row["graded"] and _row["convention"] != "dark":
+            read_pins.add(f"{_cell}.conv")
+    for _cell in vocab_cells:
+        read_pins.update((f"{_cell}.debt", f"{_cell}.unruled"))
+    unread_pins = sorted(k for k in (conf.get("PINS") or {}) if k not in read_pins)
+    if unread_pins:
+        problems.append(
+            "UNREAD PIN (the row parses and is graded by nothing, so it can never fire; wire the "
+            "predicate or delete the row): " + ", ".join(unread_pins)
+            + ". A `.conv` row on a `dark` cell, or a `.debt`/`.unruled` row on a cell without the "
+              "`vocab` flag, is declared past the point its verdict path returns.")
+
     # S7 — THE REPORT'S LIVENESS, asserted as PARITY against the parsed block rather than as
     # `> 0`, so it catches the single row that goes missing as well as the table that empties.
     # A declared row that never reaches the printer is a reporting bug, and an empty table under a
@@ -1617,7 +1667,8 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict, clusters=Non
     for cell, row in cells.items():
         if row["rule"] is None:
             problems.append(
-                f"UNRULED SURFACE — the cell `{cell}` names surface `{cell.split('.')[1]}`, which "
+                f"UNRULED SURFACE — the cell `{cell}` names surface "
+                f"`{parse_cell_key(cell)[1]}`, which "
                 f"is declarable but carries no row in CELL_POPULATION_RULES, so the cell would "
                 f"grade nothing while reporting a clean zero. Declare its population rule, or drop "
                 f"the surface from the closed set in lexicon_conf.py.")
@@ -1634,7 +1685,7 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict, clusters=Non
         # adopter passes through, and redding a cell for it would make this refusal disagree with
         # its own sibling about the same tree.
         if (row["convention"] != "dark" and not row["population"]
-                and cell.split(".")[0] in present_exts):
+                and parse_cell_key(cell)[0] in present_exts):
             problems.append(
                 f"DEAD CELL — `{cell}` is armed at `{row['convention']}` and its population rule "
                 f"({row['rule']}) selected NOTHING. A cell grading an empty population passes green "
@@ -1744,8 +1795,9 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     # indistinguishable from one whose predicate never ran.
     for cell, row in measured["cells"].items():
         if not row["graded"]:
-            print(f"lexicon: {cell}.conv UNRULED — the `{cell.split('.')[1]}` surface carries no "
-                  f"population rule, so this cell is refused rather than reported at zero")
+            print(f"lexicon: {cell}.conv UNRULED — the `{parse_cell_key(cell)[1]}` surface "
+                  f"carries no population rule, so this cell is refused rather than reported at "
+                  f"zero")
             continue
         # S4 — THE POPULATION RULE, on every row and beside every count. A count with no rule reads
         # as coverage when it is only a scope, and the denominator is printed with it because a row
@@ -1757,12 +1809,12 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
                   f"{row['population']} name(s), which is a refusal and not a skip; {pop}")
             continue
         bad = row["verdicts"]
-        n_amb = sum(1 for _p, _l, v, _m in bad if v == "AMBIGUOUS")
+        n_amb = sum(1 for _p, _l, _n, v, _m in bad if v == "AMBIGUOUS")
         teeth = " ".join(f"{a}={n}" for a, n in sorted(row["teeth"].items()))
         print(f"lexicon: {cell}.conv {len(bad)} of {row['population']} against "
               f"{row['convention']} — violation {len(bad) - n_amb}, ambiguous {n_amb}, "
               f"teeth {teeth}; {pop}")
-        for path, line, _v, message in bad[:40]:
+        for path, line, _n, _v, message in bad[:40]:
             print(f"  {path}:{line}: {message}")
         if len(bad) > 40:
             print(f"  … and {len(bad) - 40} more")
@@ -2056,17 +2108,42 @@ def read_routed_cell(cells: dict, cell: str, name: str) -> tuple:
     and is applied here. A `decorator` selector is NOT — `--suggest` sees no decorator — so a cell
     carrying one answers in the parent's convention and the caller is TOLD, rather than left with a
     confident answer the gate may disagree with.
+
+    `name` IS THE GRADED STRING, not the caller's raw argument, and the parameter is named for what
+    it is because passing the wrong one is invisible. Closing review M1: this was handed the raw
+    `--suggest` argument while the grader's `scan_routes` matches on the STEM, so
+    `tools/codebase-map/test_codebase_map.py` missed a `+prefix:test` row here and hit it there —
+    one file, two cells, two verdicts.
+
+    EVERY MATCHING SELECTOR IS COLLECTED AND A SECOND ONE IS REFUSED, never resolved by declaration
+    order. `scan_routes` calls that resolution disqualifying in its own words — "a naming gate whose
+    verdict depends on which row the reader saw first is not a declaration" — and this verb used to
+    do exactly it, returning the first dict-order hit while `--check` refused the same name as
+    `AMBIGUOUS SELECTOR` and graded it by neither. Closing review M3.
     """
     note = ""
+    hits = []
     for key, (conv, flags) in cells.items():
         if not key.startswith(cell + "+"):
             continue
         _e, _s, kind, lit = parse_cell_key(key)
         if kind == "prefix" and name.startswith(lit):
-            return key, conv, flags, ""
+            hits.append((key, conv, flags, lit))
         if kind == "decorator":
             note = (f"cell `{cell}` also declares a `decorator` selector (`{lit}`), which cannot be "
                     f"resolved from an identifier — this answer is the parent cell's")
+    if len(hits) > 1:
+        raise ConfError(
+            f"AMBIGUOUS SELECTOR — the name `{name}` matches {len(hits)} selectors on cell "
+            f"`{cell}`: " + " ".join(f"+prefix:{lit}" for _k, _c, _f, lit in hits)
+            + ". Which convention it is graded against would depend on which row the reader saw "
+              "first, so it is graded by NEITHER and the overlap is refused where it is written — "
+              "the same refusal `--check` prints over the corpus.")
+    if hits:
+        key, conv, flags, _lit = hits[0]
+        # THE `decorator` NOTE IS DROPPED WITH THE PARENT, not carried onto the routed row: the note
+        # says "this answer is the parent cell's", and once a prefix row claims the name it is not.
+        return key, conv, flags, ""
     return cell, cells[cell][0], cells[cell][1], note
 
 
@@ -2089,15 +2166,25 @@ def run_suggest(root: Path, name: str, cell_spec: str) -> int:
     caller who did not think about it. A surface-blind suggestion is how this verb handed back
     `loadUserData` for a cell declaring snake — a name its own gate reds.
 
-    AT MOST THREE CHECKS, IN THIS ORDER: the banned tail where the cell arms `notail`, the leading
-    token where it arms `vocab`, and the convention always. The re-casing is applied to whatever
+    AT MOST THREE CHECKS, IN THIS ORDER: the banned tail on the surface P2 grades, the leading
+    token on the surface P1 grades, and the convention always. The re-casing is applied to whatever
     name the earlier checks produced, so the printed name is legal under every armed predicate of
     that cell at once rather than under the last one to run.
 
-    THE TAIL-BEFORE-VERB ORDER IS DEFENSIVE OVER AN EMPTY POPULATION, which is stated rather than
-    implied: no cell in this repo's declaration arms both flags, so nothing here can distinguish this
-    ordering from its reverse. A declaration that arms both on one cell gives the rule a population
-    and owes an arm whose input hits both.
+    WHICH SURFACE ARMS WHICH PREDICATE IS READ FROM `PREDICATE_SURFACES`, not from a per-cell flag,
+    and closing review B2 is why that sentence is worth its own paragraph. The two checks used to be
+    gated on the cell's `vocab` and `notail` flags while the GRADER arms neither — P1 walks every
+    extracted function and P2 every extracted type, whatever any `CELLS` row says. So a declaration
+    arming no flag (this repo's, and every scaffolded adopter's) got `OK` here for names the merge
+    bar reds on, and the installed Skill tells every agent to trust this answer. `vocab` survives as
+    what it always graded, the per-cell DEBT/UNRULED ratchet in `measure_vocab_cells`; `notail` had
+    no reader but the defect and is gone from the grammar.
+
+    THE TAIL-BEFORE-VERB ORDER IS DEFENSIVE OVER DISJOINT POPULATIONS, which is stated rather than
+    implied: `PREDICATE_SURFACES` maps the two predicates onto DIFFERENT surfaces, so no cell can
+    reach both branches and nothing here can distinguish this ordering from its reverse. A predicate
+    added on a surface another already grades gives the rule a population and owes an arm whose
+    input hits both.
     """
     try:
         conf = load_conf(root / CONF_NAME)
@@ -2109,11 +2196,39 @@ def run_suggest(root: Path, name: str, cell_spec: str) -> int:
         print("lexicon: no VERBS declared; nothing to suggest against")
         return 2
     try:
-        cell, conv, flags = resolve_cell(conf.get("CELLS") or {}, cell_spec)
+        # `flags` is deliberately DISCARDED. Per-cell arming flags used to gate what this mode
+        # checked, which is the B2 defect the closing review found: the grader reads no such flag,
+        # so a name the bar reds on came back OK here. The predicate set is now PREDICATE_SURFACES
+        # and both surfaces read it, which is why nothing below wants the flags.
+        cell, conv, _flags = resolve_cell(conf.get("CELLS") or {}, cell_spec)
     except ConfError as exc:
         print(f"lexicon: {exc}")
         return 2
-    cell, conv, flags, routing = read_routed_cell(conf.get("CELLS") or {}, cell, name)
+
+    # S8 — WHAT A `file` CELL'S ARGUMENT IS. `--suggest` takes an identifier, so a `file` cell takes
+    # a BASENAME and grades the stem `read_stem` cuts from it — the grader's own seam, reused rather
+    # than re-derived, because a suggester that stems differently from the checker is the
+    # surface-blindness this unit exists to remove, one level down. `_SUBTOKEN_RE` shreds `.` and `/`
+    # into separate tokens and cannot compute that stem at all.
+    #
+    # COMPUTED ABOVE THE ROUTING, AND THROUGH `parse_cell_key`. Both halves are closing-review
+    # fixes and they are one edit because they are one ordering. M1: `read_routed_cell` was handed
+    # the RAW argument while the grader routes on the stem, so a path-shaped argument missed a
+    # `+prefix:` row the grader hits. H3: the surface test was `cell.split(".")[1]`, run AFTER
+    # routing had reassigned `cell` to `py.file+prefix:test`, so it compared against
+    # `file+prefix:test`, never took the stem, and left `graded` carrying the `.py` extension — a
+    # name no convention can spell, so the advisor emitted a false refusal on a stem the gate
+    # SATISFIES. `parse_cell_key` is the one reader of a cell key in this kit and the `.split(".")`
+    # idiom is now gone from this file; a selftest arm holds it gone.
+    surface = parse_cell_key(cell)[1]
+    graded = (read_stem(name.replace("\\", "/").rsplit("/", 1)[-1])
+              if surface == "file" else name)
+
+    try:
+        cell, conv, flags, routing = read_routed_cell(conf.get("CELLS") or {}, cell, graded)
+    except ConfError as exc:
+        print(f"lexicon: {exc}")
+        return 2
     try:
         clusters = canon.build_clusters(conf.get("CANON") or {})
     except ValueError as exc:
@@ -2124,24 +2239,29 @@ def run_suggest(root: Path, name: str, cell_spec: str) -> int:
     # quiet unfreeze in the one place it would be least visible.
     print_canon_posture(conf)
 
-    # S8 — WHAT A `file` CELL'S ARGUMENT IS. `--suggest` takes an identifier, so a `file` cell takes
-    # a BASENAME and grades the stem `read_stem` cuts from it — the grader's own seam, reused rather
-    # than re-derived, because a suggester that stems differently from the checker is the
-    # surface-blindness this unit exists to remove, one level down. `_SUBTOKEN_RE` shreds `.` and `/`
-    # into separate tokens and cannot compute that stem at all.
-    graded = read_stem(name.replace("\\", "/").rsplit("/", 1)[-1]) if cell.split(".")[1] == "file" \
-        else name
-
     lines = []
     if routing:
         lines.append(f"note — {routing}")
 
-    if "notail" in flags:
+    # WHICH PREDICATES ARE ARMED IS A PROPERTY OF THE SURFACE, NEVER OF A PER-CELL FLAG, and that is
+    # closing review B2 — the blocker this whole verb was found guilty of. P1 and P2 grade the
+    # corpus UNCONDITIONALLY: every extracted function is checked against `VERBS`, every extracted
+    # type against `BANNED_SUFFIXES`, and no `CELLS` row can arm or disarm either. This verb gated
+    # the same two checks on the cell's `vocab` and `notail` flags, so on a declaration that armed
+    # neither — this repo's, and every scaffolded adopter's — `--suggest fetch_remote --as
+    # py.function` answered `OK` for a name `--check` reds on by name. The installed Skill tells
+    # every agent here to trust that answer.
+    #
+    # `PREDICATE_SURFACES` IS THE MAPPING and it is read rather than restated: it already declares
+    # which surface each predicate's population IS, which is what stops the tail check firing on a
+    # `file` cell P2 never grades. A cell whose surface no predicate grades gets the convention
+    # check alone, which is exactly what the grader does to it.
+    if surface == PREDICATE_SURFACES["suffix"]:
         for suf in tuple(t for t in (conf.get("BANNED_SUFFIXES") or "").split() if t):
             if graded.endswith(suf):
-                print(f"`{graded}` ends with the banned suffix `{suf}`, which cell `{cell}` bans "
-                      f"with its `notail` flag — the question is what this thing IS, and `{suf}` "
-                      f"answers that with a role nobody scoped.")
+                print(f"`{graded}` ends with the banned suffix `{suf}`, which P2 bans on the "
+                      f"`{surface}` surface cell `{cell}` grades — the question is what this thing "
+                      f"IS, and `{suf}` answers that with a role nobody scoped.")
                 for line in lines:
                     print(line)
                 return 0
@@ -2166,7 +2286,8 @@ def run_suggest(root: Path, name: str, cell_spec: str) -> int:
     # is `init`. An arm in `selftest.py` reds if the last such disagreement ever leaves the
     # declaration. TOOL-aSurfacedLexicon-7.
     want, gloss, source = "", "", ""
-    if "vocab" in flags and verb not in verbs:
+    graded_by_p1 = surface == PREDICATE_SURFACES["verb"] and bool(verbs)
+    if graded_by_p1 and verb not in verbs:
         if verb in banned:
             want = banned[verb]
             gloss = (verbs.get(want) or "").strip()
@@ -2203,7 +2324,7 @@ def run_suggest(root: Path, name: str, cell_spec: str) -> int:
 
     if want:
         print(f"use `{answer}` — {source} `{want}`, NOT `{verb}`: {gloss}")
-    elif "vocab" in flags and verb not in verbs:
+    elif graded_by_p1 and verb not in verbs:
         print(f"`{verb}` is not in the declared table, no row bans it by name, and the shipped "
               f"canon holds no cluster for it — so this is a SCOPING question, not a spelling one. "
               f"Declared verbs: {' '.join(sorted(verbs))}")
@@ -2212,7 +2333,7 @@ def run_suggest(root: Path, name: str, cell_spec: str) -> int:
     elif not recased:
         print(f"`{graded}` does not satisfy {conv} for cell `{cell}`, and this verb will not "
               f"re-spell it")
-    elif "vocab" in flags:
+    elif graded_by_p1:
         print(f"OK — {graded} leads with `{verb}`, which the declaration carries, and satisfies "
               f"{conv} for cell `{cell}`")
     else:

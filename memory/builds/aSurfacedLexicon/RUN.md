@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 8674f4f044b5a185988b2c457ccb4f738568ca79
-phase: BUILDING
+witness: 672ae990251509d8bb4042af0f01829397d48b79
+phase: REVIEWING
 mode: slug
 anchor-kind: default-branch
 keepalive: 7c71fd36
@@ -78,3 +78,7 @@ base: 6c670b024644bf6bbcc28ee74d2265c0efd453c6
 2026-09-05T05:49:23Z dispatch · item e354db0a TOOL-aSurfacedLexicon-14 · reason tools/lexicon/lexicon.py tools/lexicon/selftest.py tools/lexicon/README.md .lexicon.conf
 
 2026-09-05T12:03:59Z dispatch · item 2d487019 TOOL-aSurfacedLexicon-11 · reason tools/lexicon/lexicon.py tools/lexicon/canon.py tools/lexicon/lexicon_conf.py tools/lexicon/selftest.py .lexicon.conf tools/lexicon/README.md
+
+2026-09-05T21:26:36Z review · item aSurfacedLexicon · reason verdict BLOCKED · blockers 7
+
+2026-09-05T22:56:07Z review · item aSurfacedLexicon · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED

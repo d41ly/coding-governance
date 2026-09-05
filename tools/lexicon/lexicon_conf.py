@@ -40,7 +40,14 @@ BLOCK_KEYS = ("VERBS", "CELLS", "PINS", "PATTERNS", "CANON")
 #: one of these is a refusal naming the file and the line, never a skip.
 SURFACES = ("function", "type", "file", "constant")
 CONVENTIONS = ("snake", "screaming", "camel", "pascal", "kebab", "dark")
-PIN_PREDICATES = ("debt", "unruled", "suffix", "conv")
+#: `suffix` LEFT THIS SET at the closing review (M2). It parsed, it passed `check_declaration`,
+#: and no code path anywhere read it: two runs over one fixture corpus, one carrying
+#: `py.type.suffix 99` and one not, produced byte-identical output at the same exit code. A
+#: declarable predicate that grades nothing is worse than an absent one — it reads as coverage.
+#: Dropping it makes a `suffix` row the same named refusal every other typo gets, and the
+#: general `UNREAD PIN` arm in `lexicon.py` catches whatever is added here next without
+#: needing this comment.
+PIN_PREDICATES = ("debt", "unruled", "conv")
 
 #: The extractor parts a `PATTERNS` row may name — the three lists `extract` returns, in its order.
 #: A closed set here for the same reason `SURFACES` is one: a typo'd part would arm nothing and
@@ -66,10 +73,17 @@ SELECTOR_KINDS = ("prefix", "decorator")
 #: which is why the restriction costs an adopter nothing.
 _SEL_LIT_RE = re.compile(r"^[A-Za-z0-9_]+$")
 
-#: Per-cell flags. `vocab` grades the row's names against the verb table; `notail` bans a trailing
-#: type suffix. Both are declared here rather than accepted freely so a typo reds instead of
-#: silently arming nothing.
-_CELL_FLAGS = ("vocab", "notail")
+#: Per-cell flags. Declared here rather than accepted freely so a typo reds instead of silently
+#: arming nothing. `vocab` arms the row's per-cell DEBT/UNRULED ratchet in
+#: `measure_vocab_cells`; it has never armed P1 itself, which grades every extracted function
+#: whatever any row says.
+#:
+#: `notail` LEFT THIS SET at the closing review (B2). Its ONLY reader was the `--suggest`
+#: branch that gated the banned-tail check on it — while P2 grades every extracted type
+#: unconditionally — so the flag's whole effect was to make the advisor DISAGREE with the
+#: gate. That branch now reads the surface, so the flag armed nothing and was removed rather
+#: than left declarable and inert.
+_CELL_FLAGS = ("vocab",)
 
 _SCALAR_RE = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*)=(.*)$')
 _BLOCK_RE = re.compile(r'^([A-Za-z_][A-Za-z0-9_]*):[ \t]*$')

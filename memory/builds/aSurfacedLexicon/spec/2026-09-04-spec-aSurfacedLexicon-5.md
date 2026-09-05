@@ -9,6 +9,8 @@
 | [2026-09-05-build-TOOL-aSurfacedLexicon-4-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-4-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-9 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-6 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-6 |
+| [2026-09-06-review-TOOL-aSurfacedLexicon-2-diff-review-round1.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-2-diff-review-round1.md) | diff-review | TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 |
+| [2026-09-06-review-TOOL-aSurfacedLexicon-2-diff-review-round2.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-2-diff-review-round2.md) | diff-review | TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 |
 
 <!-- /gen:spec-records -->
 

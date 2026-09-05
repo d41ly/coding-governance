@@ -33,12 +33,12 @@ here; a header outside that set is a refusal by name, not a silent skip.
 | Block | Row | Means |
 |---|---|---|
 | `VERBS` | `<verb>  <gloss>` | the closed verb table P1 grades against; the gloss carries the NOT clause |
-| `CELLS` | `<ext>.<surface>[+<kind>:<literal>]  <convention> [vocab] [notail]` | which case convention this (language, surface) cell asks for |
+| `CELLS` | `<ext>.<surface>[+<kind>:<literal>]  <convention> [vocab]` | which case convention this (language, surface) cell asks for |
 | `PINS` | `<cell>.<predicate>  <count>` | the declared offender count for one cell and one predicate |
 | `CANON` | `[-]<representative>  <alternative>...` | the OWNER's overlay over the frozen shipped canon; see below |
 
 `surface` is one of `function` `type` `file` `constant`; `convention` is one of `snake` `screaming`
-`camel` `pascal` `kebab` `dark`; `predicate` is one of `debt` `unruled` `suffix` `conv`. A token
+`camel` `pascal` `kebab` `dark`; `predicate` is one of `debt` `unruled` `conv`. A token
 outside its closed set names the file and the line. `dot` is deliberately NOT a declarable
 convention: it is a classifier form the report uses so a dotted name is reported as satisfying
 something, and no language convention is "identifiers contain dots".
@@ -144,9 +144,16 @@ predicate never ran, and the teeth are what tell the two apart on a green run.
 **Every row also prints the POPULATION RULE that selected its denominator**, because a count with no
 rule beside it reads as coverage when it is only a scope:
 
-    lexicon: py.constant.conv 0 of 352 against screaming — violation 0, ambiguous 0,
-    teeth camel=352 kebab=352 pascal=241 snake=352;
-    population 352 of 736 (rule: public simple module-body assignments)
+    lexicon: py.constant.conv <bad> of <graded> against screaming — violation <v>, ambiguous <a>,
+    teeth camel=<n> kebab=<n> pascal=<n> snake=<n>;
+    population <graded> of <denominator> (rule: public simple module-body assignments)
+
+The figures are PLACEHOLDERS on purpose. This block carried a literal transcript, and all five of
+its numbers were already wrong on the day it landed — while `.lexicon.conf` carries the same two
+figures under a selftest arm that reads them out of the conf by anchored regex and compares them
+against what `--check` prints. One gated carrier and one ungated copy of one fact, disagreeing, in
+the file an adopter reads first (closing review M6). For the real numbers run the gate:
+`python tools/lexicon/lexicon.py`.
 
 The denominator is the WIDER population the rule narrowed, not the graded count restated. A row
 whose two figures are equal is legal and common — every `function` cell narrows nothing — and the
@@ -239,13 +246,16 @@ ratchet finding on a strengthening edit.
 A tokenizer rather than a regex, and the reason is measured rather than argued. Over the 94
 tracked `.sh` files in this repo the naive same-line pattern reads 608 definitions, and a
 heredoc-aware refinement of the SAME pattern reads substantially fewer — two regex readings of one
-population, each wrong where the other is not. Only the naive count is quoted, because it is the
-only one that reproduces: an earlier revision of this page and the engine header each carried a
-figure for the refinement, the two disagreed, and the refinement itself was never committed, so
-no reader could re-derive either. The refinement loses real definitions to a `grep` for a merge
-conflict marker, whose run of `<` it takes for a heredoc
-opener; the naive pattern gains a JavaScript `function f() { … }` sitting inside a `<<'EOF'`
-body. A number a second regex moves by half is not a population.
+population, each wrong where the other is not. Only the naive count is quoted, because an earlier
+revision of this page and the engine header each carried a figure for the REFINEMENT and the two
+disagreed — one fact, two carriers, no gate between them. The reason both used to give for the
+omission, that the refinement was never committed, is false: it ships as a runnable snippet in the
+unit-14 spec under `memory/builds/aSurfacedLexicon/spec/`, landed in this same build, and either
+figure re-derives from it. Corrected at the closing review (M5).
+
+The refinement loses real definitions to a `grep` for a merge conflict marker, whose run of `<` it
+takes for a heredoc opener; the naive pattern gains a JavaScript `function f() { … }` sitting inside
+a `<<'EOF'` body. A number a second regex moves by half is not a population.
 
 It tracks single quotes, double quotes as a STATE, `$'…'`, backslash escapes and line
 continuations, `#` comments at a word boundary, `${…}` and `$((…))`, backticks, command
@@ -383,11 +393,20 @@ the answer is spelled in. A surface-blind suggestion is how this verb answered `
 cell declaring snake — a name its own gate reds — so the flag is not defaulted, because a default
 answers the surface question silently for a caller who did not think about it.
 
-At most three checks run, in this order: the banned TAIL where the cell arms `notail`, the leading
-TOKEN where it arms `vocab`, and the CONVENTION always. The re-casing is applied to whatever name the
-earlier checks produced, so the printed name is legal under every armed predicate of that cell at
-once. On a `file` cell the argument is a BASENAME and the graded string is `read_stem`'s — the
-basename up to its FIRST dot, the grader's own seam rather than a second stemming rule.
+At most three checks run, in this order: the banned TAIL on the surface P2 grades, the leading
+TOKEN on the surface P1 grades, and the CONVENTION always. The re-casing is applied to whatever name
+the earlier checks produced, so the printed name is legal under every armed predicate of that cell at
+once. On a `file` cell the argument is a BASENAME OR A PATH and the graded string is `read_stem`'s —
+the basename up to its FIRST dot, the grader's own seam rather than a second stemming rule — and the
+stemming happens BEFORE the selector routing, so a routed cell claims the same name here that it
+claims at the gate.
+
+**Which predicates are armed is a property of the SURFACE, never of a per-cell flag.** P1 grades
+every extracted function and P2 every extracted type, whatever any `CELLS` row says, so this verb
+reads `PREDICATE_SURFACES` and not the row. It used to gate both checks on `vocab` and `notail`, and
+a declaration arming neither — this repo's, and every scaffolded one — got `OK` here for names the
+merge bar reds on (closing review B2). `vocab` survives as what it always graded: the per-cell
+DEBT/UNRULED ratchet. `notail` had no reader but that defect and is gone from the grammar.
 
 Four refusals are distinct and separately worded, because a caller who typed a cell that does not
 exist, a `dark` cell, a key that is not a cell, and a BARE SURFACE have four different problems. The
@@ -512,9 +531,27 @@ byte-compares, so a declaration edit nobody re-rendered REDS with `DRIFTED`. The
 (`lexicon wiring`) carries NO guard — its answer changes when the declaration moves, and a
 kit-directory guard would leave exactly that edit unchecked.
 
+### Which leg grades the declaration
+
+`lexicon wiring` does, and that is a correction rather than a description. `lexicon naming
+predicates` runs the engine over the corpus, but it is guarded on `tools/` and three sibling
+directories while `.lexicon.conf` sits at the repo ROOT — so a branch whose entire diff was the
+declaration skipped the only leg that would have graded it. Raising `VERB_OFFENDER_PIN`, flipping a
+cell to `dark`, or deleting a `PINS` row together with its cell all landed with no verdict computed,
+and the gate's own red text tells an author to produce exactly that commit shape.
+
+The guard could not simply be widened. `govkit` partitions every declared guard into classes —
+memory-root-relative, verbatim-repo-root, renamed, exempt, kit-relative — and a root-level conf falls
+into none of them, so declaring one reds `govkit selfcheck` instead of scoping anything; that ruling
+is written into this kit's `kit.toml` and was struck twice during the build. What was left was
+`adopt-lexicon.sh --check`, which is the argv of the leg with the empty guard and already reads the
+declaration on every bar. It now runs `lexicon.py` too and fails on a non-zero grade. The guarded leg
+stays as the fast fail on a `tools/` diff. Closing review B1.
+
 ## Waivers
 
-Three registries beside this file, keyed on the matched **TEXT** rather than `<path>:<line>`. Keying
+The waiver registries beside this file are keyed on the matched **TEXT** rather than on
+`<path>:<line>`. Keying
 on position means any edit ABOVE a waived line unpins it, which reds a merge that touched nothing
 the waiver guards — that was hit on `install-prefix-waivers.txt`'s first real merge. A waiver whose
 text is gone reds as STALE, so a registry cannot quietly outlive what it excuses. Shrink-only.
@@ -538,6 +575,15 @@ The seed is still marked `PROPOSED` and **wants curating before you ratify** —
 are generic, your domain rows are missing, and a starting vocabulary is not a curated one. `--check`
 reds while `ratified` is empty, so an uncurated seed cannot reach the merge bar disguised as a
 vocabulary.
+
+`--scaffold` also seeds the `CELLS` matrix — one row per `(language, surface)` pair the walk
+actually extracted — and the `.conv` pin each armed row measures to. The CONVENTIONS there are
+prescriptive, taken from each language's own published style and never from a ranking of what your
+corpus already does; a pair the kit has no prescription for is seeded `dark`, which is a declared
+refusal to grade rather than a gap. Arming one is a one-word edit and `--measure` reprints the pins
+it moves. Before the closing review the seed emitted no matrix at all, so a fresh adopter's first
+`--suggest` — the one command the Skill it had just installed documents — exited 2 with
+"Declared cells: none" (B3).
 
 Pins are MEASURED against the adopting corpus at scaffold and are never inherited: a pin copied from
 a larger tree is either vacuous or permanently red.

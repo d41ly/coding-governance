@@ -60,9 +60,15 @@ means = "adopted"
 # The conf itself is deliberately NOT a guard pathspec. govkit partitions every guard into declared
 # classes — memory-root-relative, verbatim-repo-root, renamed, exempt, kit-relative — and a root-level
 # conf falls into none of them, so declaring one reds `selfcheck` rather than scoping anything.
-# Widening that taxonomy is a change to a different kit's contract. The cost of the narrower guard is
-# an early signal on a conf-only diff, never a merge verdict: the pre-push hook sets GATE_FULL=1,
-# which bypasses every guard, so the authoritative run stays total.
+# Widening that taxonomy is a change to a different kit's contract.
+#
+# SO THIS LEG IS THE EARLY SIGNAL AND NOT THE AUTHORITY, which is a correction to what this comment
+# used to claim. It said the cost was "an early signal on a conf-only diff, never a merge verdict"
+# because the pre-push hook bypasses every guard — but that force is bounded now (GATE_FULL_MAX_LAG),
+# so a scoped push inside the lag landed a raised pin with NO verdict computed. Closing review B1.
+# The grade moved onto `lexicon wiring` below, which carries an empty guard and already read the
+# declaration; the leg here keeps its guard and keeps saying the same thing sooner, under its own
+# name in the leg log.
 [[gate_leg]]
 name = "lexicon naming predicates"
 subject = "repo"
@@ -85,6 +91,13 @@ guard = ["{kit}/"]
 # guarded copy could never say anything the unguarded copy had not already said. Found by the closing
 # review; the map's gate-legs inventory had also gained an unclaimed key for the redundant leg, which
 # disappeared with it.
+#
+# AND SINCE CLOSING REVIEW B1 THIS LEG ALSO GRADES THE CORPUS, by running `{kit}/lexicon.py` from
+# `--check`. That is deliberately the same engine the guarded leg above runs, and it does NOT
+# re-earn the two-legs defect: what was struck there were two legs with one argv and different
+# guards, where neither could ever out-say the other. Here the unguarded copy is the merge verdict
+# and the guarded one is the fast fail on a `tools/` diff. Cost is one corpus walk, recorded per leg
+# in `<git-dir>/gate-ledger.tsv`.
 [[gate_leg]]
 name = "lexicon wiring"
 subject = "repo"

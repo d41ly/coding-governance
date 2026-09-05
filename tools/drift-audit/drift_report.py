@@ -838,19 +838,23 @@ def signal_lexicon_verbs_unused(ctx) -> dict:
     if not verbs:
         return _build_not_asked(name, ".lexicon.conf declares no VERBS; nothing to judge")
 
-    declared = {ext: (pset, mode) for ext, pset, mode in _langs({"LANGS": _l})}
+    # THE ARMED SET COMES FROM `_build_armed_exts` RATHER THAN FROM A SECOND COPY OF ITS CONDITION.
+    # This loop re-derived "which extensions can actually be read" inline, which is how the H1 crash
+    # reached two call sites from one defect: the sibling gained the unshipped-parser drop and this
+    # one would not have. `KeyError` joins the `except` tuple as the belt to that braces — the
+    # promise `_load_lexicon` makes is that a bad declaration never raises out of a signal, and a
+    # promise carried by one guard is a promise one edit away from being false.
     sets = _resolve_lexicon_sets(ctx, lex)
+    declared = _build_armed_exts(_l, lex, _langs, sets)
     used: set[str] = set()
     for rel in lex.tracked_files(ctx.root):
         ext = lex.ext_of(rel)
         if ext not in declared:
             continue
         pset, mode = declared[ext]
-        if mode == "dark" or (mode == "probe" and pset not in sets):
-            continue
         try:
             got = lex.extract(ctx.root / rel, mode, pset, sets=sets)
-        except (SyntaxError, OSError):
+        except (SyntaxError, OSError, KeyError):
             continue
         if not got:
             continue
@@ -910,10 +914,25 @@ def _build_armed_exts(langs_value, lex, _langs, sets):
 
     `sets` is the RESOLVED mapping and is required rather than defaulted: the shipped constant was
     what this test read before, and reading it silently narrowed the population to the languages the
-    kit happens to ship. A default here would let a future caller re-earn that by omission."""
+    kit happens to ship. A default here would let a future caller re-earn that by omission.
+
+    AN UNSHIPPED `parser` ID IS DROPPED HERE TOO, and that arm is closing review H1. This function
+    dropped `dark` and unknown-`probe` rows and KEPT a `parser` row naming a pattern set the kit does
+    not ship — the engine ships `python-ast` and `shell-tokens` only — so `extract_text` reached
+    `PARSERS[pset]` and raised `KeyError`. Neither `except` tuple downstream covers that and
+    `main()` evaluates every signal unguarded, so ONE legal-looking `LANGS` row cost all eight
+    signals and a traceback, on a leg carrying no guard. `_load_lexicon`'s docstring promises "never
+    a raise and never a red" for exactly this class, and the engine's own `scan_corpus` already
+    refuses the same row by name — so the two readers of one declaration disagreed. The crash path
+    is new: before TOOL-aSurfacedLexicon-14 the `parser` arm ignored its set id entirely.
+
+    `lex.PARSERS` IS READ, NEVER RESTATED. A second copy of the shipped parser ids here is the
+    two-carriers class inside the fix for two readers disagreeing."""
     out = {}
     for ext, pset, mode in _langs({"LANGS": langs_value}):
         if mode == "dark" or (mode == "probe" and pset not in sets):
+            continue
+        if mode == "parser" and pset not in lex.PARSERS:
             continue
         out[ext] = (pset, mode)
     return out
@@ -961,7 +980,7 @@ def _read_defs_at_sha(ctx, sha, armed, lex, sets):
         pset, mode = armed[lex.ext_of(path)]
         try:
             got = lex.extract_text(src, mode, pset, sets=sets)
-        except (SyntaxError, ValueError):
+        except (SyntaxError, ValueError, KeyError):
             continue
         if got:
             for nm, _ln in got[0]:

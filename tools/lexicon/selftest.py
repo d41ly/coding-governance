@@ -49,6 +49,126 @@ KIT = Path(__file__).resolve().parent
 FAILURES: list[str] = []
 PASSES = 0
 
+
+# =================================================================================================
+# THE CROSS-SURFACE ARM — every graded name, both verbs, one verdict.
+#
+# THE CLOSING REVIEW'S ONE STRUCTURAL FINDING, and it is worth more than the seventeen fixes under
+# it: this kit's SUPPLY surface (`--suggest`, the scaffolder, the rendered Skill) was tested against
+# SCRATCH declarations while its DEMAND surface (`--check`) was tested against the real tree. Every
+# blocker and three of four highs lived in that gap. Three of them were one defect wearing three
+# faces — the advisor gating P1 on a `vocab` flag the grader does not read (B2), routing on the raw
+# argument while the grader routes on the stem (M1), and testing the surface AFTER routing had
+# rewritten the cell key (H3) — and no arm anywhere could see any of them, because no arm ever asked
+# the two verbs about ONE name.
+#
+# WHAT IT ASSERTS, over EVERY name an armed cell grades and not merely over the offenders:
+#
+#   1. VERDICT. `--suggest` says `OK` for a name exactly when the grader finds no offence in it —
+#      no offence being (no convention violation in its cell) AND (not a P1 verb offender, where
+#      the cell's surface is the one P1 grades) AND (not a P2 suffix offender, likewise).
+#   2. CELL. Where the answer names the cell it answered in, that cell is the one the grader routed
+#      the name into — selector and all. A `file` cell is asked with the PATH, which is what an
+#      author holds and what forces the stemming and the routing to happen in the right order.
+#
+# THE POPULATION IS EVERY GRADED NAME, DELIBERATELY. Over offenders alone the arm goes blind on a
+# clean cell, which is precisely the population a routing bug hides in — the routed cell that
+# disagrees today may hold nothing that offends today. It also gives the arm a live population on a
+# green tree, so `0 disagreements` is a measurement rather than an empty set.
+#
+# IT RUNS AS A SUBPROCESS AGAINST A ROOT so it can be pointed at a kit copy `run_case` has PATCHED.
+# The break has to be staged inside the engine — no fixture corpus can reach an ordering defect —
+# and two engines cannot be imported into one interpreter, because `lexicon.py` reaches its siblings
+# through `sys.path`.
+# =================================================================================================
+
+
+def read_surface_disagreements(root):
+    """`(verdict_rows, cell_rows, asked, cell_assertions)` for one repo root.
+
+    Imports the engine from `root/tools/lexicon`, so the caller chooses WHICH engine is graded.
+    Nothing here prints and nothing here decides; the `--agree` block below is the only reporter.
+    """
+    import contextlib as _ctx
+    import io as _sio
+    import re as _re
+    root = Path(root).resolve()
+    kit = root / "tools" / "lexicon"
+    sys.path.insert(0, str(kit))
+    import lexicon as _lex
+
+    conf = _lex.load_conf(root / _lex.CONF_NAME)
+    declared = {e: (p, m) for e, p, m in _lex.langs(conf)}
+    measured = _lex.measure_pass(root, kit, conf, declared,
+                                 _lex.canon.build_clusters(conf.get("CANON") or {}))
+    cells = conf.get("CELLS") or {}
+
+    # THE GRADER'S OFFENCES, keyed on `(ext, surface, name)` so a predicate reaches only the surface
+    # it actually grades. `PREDICATE_SURFACES` is read rather than restated, for the reason
+    # `run_suggest` reads it: a second copy of that mapping is a second answer waiting to disagree.
+    offence = set()
+    for kind in _lex.KINDS:
+        surf = _lex.PREDICATE_SURFACES[kind]
+        for o in measured["offenders"][kind]:
+            offence.add((_lex.ext_of(o.path), surf, o.text))
+    for cell, row in measured["cells"].items():
+        if not row["graded"] or row["convention"] == "dark":
+            continue
+        ext, surf, _k, _l = _lex.parse_cell_key(cell)
+        for _p, _l2, nm, _v, _m in row["verdicts"]:
+            offence.add((ext, surf, nm))
+
+    asks = []
+    for cell, row in measured["cells"].items():
+        if not row["graded"] or row["convention"] == "dark":
+            continue
+        ext, surf, _k, _l = _lex.parse_cell_key(cell)
+        parent = f"{ext}.{surf}"
+        # `--as` ADDRESSES THE PARENT and refuses a selector, so a selector'd row is asked through
+        # its parent — which is exactly the ask an author makes and exactly where the routing has to
+        # agree. A parent the declaration does not carry, or carries `dark`, has no answerable ask.
+        if parent not in cells or cells[parent][0] == "dark":
+            continue
+        for path, _l2, nm in row["names"]:
+            asks.append((path if surf == "file" else nm, parent, cell,
+                         (ext, surf, nm) in offence))
+
+    verdict_rows, cell_rows, seen, assertions = [], [], set(), 0
+    for asked_name, parent, grader_cell, is_offence in asks:
+        if (asked_name, parent) in seen:
+            continue
+        seen.add((asked_name, parent))
+        buf = _sio.StringIO()
+        with _ctx.redirect_stdout(buf):
+            _lex.run_suggest(root, asked_name, parent)
+        out = buf.getvalue()
+        # `OK — ` AT THE HEAD OF A LINE IS THE SUPPLY VERB'S ONLY GREEN SHAPE. Asserted on the line
+        # head rather than as a substring: the notes this verb appends can carry the word.
+        said_ok = any(ln.startswith("OK — ") for ln in out.splitlines())
+        if said_ok == is_offence:
+            verdict_rows.append((asked_name, parent,
+                                 "grader:offence" if is_offence else "grader:clean",
+                                 (out.strip().splitlines() or ["<silent>"])[-1]))
+        m = _re.search(r"cell `([^`]+)`", out)
+        if m:
+            assertions += 1
+            if m.group(1) != grader_cell:
+                cell_rows.append((asked_name, parent, grader_cell, m.group(1)))
+    return verdict_rows, cell_rows, len(seen), assertions
+
+
+if len(sys.argv) > 2 and sys.argv[1] == "--agree":
+    # NOT A USER-FACING MODE. It exists so the arm can be pointed at a PATCHED kit copy; the suite
+    # itself is still `python tools/lexicon/selftest.py` with no arguments.
+    _v, _c, _asked, _assertions = read_surface_disagreements(sys.argv[2])
+    print(f"AGREE asked={_asked} cell_assertions={_assertions} "
+          f"verdict_bad={len(_v)} cell_bad={len(_c)}")
+    for _r in _v[:15]:
+        print("  VERDICT " + " | ".join(str(x) for x in _r))
+    for _r in _c[:15]:
+        print("  CELL " + " | ".join(str(x) for x in _r))
+    raise SystemExit(1 if (_v or _c) else 0)
+
 BASE_CONF = """\
 BANNED_SUFFIXES="Manager Helper Util"
 LANGS="py:python-ast:parser conf::dark"
@@ -87,11 +207,14 @@ CELLS:
   js.type      pascal  vocab
   py.constant  screaming  vocab
   md.file      kebab  vocab
-  py.type      pascal  notail
+  py.type      pascal
   py.file      snake
   sh.file      dark
   py.function+prefix:cmd_  camel  vocab
   py.function+decorator:route  snake
+  py.function+prefix:Fetch  pascal
+  py.function+prefix:FETCH  screaming
+  sh.function  kebab
 """
 
 
@@ -622,6 +745,68 @@ with build_tempdir() as td:
           r.returncode != 0, out)
     check("scaffold: and still names it unratified rather than passing", "ratified" in out, out)
 
+    # ---- B3: THE SCAFFOLDED ADOPTER'S FIRST `--suggest` HAS TO WORK ---------------------------
+    #
+    # The seed emitted `LANGS`, `VERBS` and both scalar pins and NO `CELLS` block, while `--as
+    # <ext>.<surface>` is REQUIRED and `resolve_cell` refuses any spec no `CELLS` row names. So the
+    # very command the Skill this same `--scaffold` run installs documents exited 2 with "Declared
+    # cells: none", on every fresh adoption, and nothing surfaced the gap. This arm binds the
+    # scaffolder to the Skill it installs, which is the actual contract.
+    #
+    # THE CELL IS READ OUT OF THE SEED, never spelled here: an arm naming `py.function` would pass
+    # on a scaffolder that emitted that one row and nothing else, and would red on an adopter whose
+    # corpus is JavaScript. What is asserted is that the seed carries an ANSWERABLE cell at all.
+    _seed = load_conf(root / ".lexicon.conf") if (root / ".lexicon.conf").read_text(
+        encoding="utf-8").strip() else {}
+    _seed_cells = {k: v for k, v in (_seed.get("CELLS") or {}).items()
+                   if v[0] != "dark" and "+" not in k}
+    check("B3: --scaffold emits a CELLS block with at least one ARMED cell",
+          bool(_seed_cells), f"CELLS={_seed.get('CELLS')}")
+    if _seed_cells:
+        _cell = sorted(_seed_cells)[0]
+        _r = subprocess.run([sys.executable, "tools/lexicon/lexicon.py",
+                             "--suggest", "fetch_thing", "--as", _cell],
+                            cwd=root, capture_output=True, text=True)
+        _o = _r.stdout + _r.stderr
+        check(f"B3: ...and the Skill's documented invocation succeeds on it (--as {_cell})",
+              _r.returncode == 0 and "UNDECLARED" not in _o, f"rc={_r.returncode} {_o}")
+
+    # ---- B1: THE DECLARATION IS GRADED ON THE UNGUARDED LEG -----------------------------------
+    #
+    # The only leg that computed a verdict over `.lexicon.conf` was guarded on `tools/` and three
+    # sibling dirs, and the conf is at the repo ROOT — so a branch whose entire diff was the
+    # declaration skipped its own verifier, and the tool's own red text instructs an author to
+    # produce exactly that commit ("Paste this row into .lexicon.conf"). The guard could not be
+    # widened: govkit's guard taxonomy has no class for a root-level conf and declaring one reds
+    # `govkit selfcheck`, a ruling written into this kit's `kit.toml`. So the grade moved into
+    # `adopt-lexicon.sh --check`, which is the argv of the one leg here carrying an EMPTY guard.
+    #
+    # RATIFIED FIRST, because the unratified-seed refusal above would otherwise supply the red and
+    # this arm would pass on the wrong refusal — the fixture-reds-for-another-reason class.
+    _conf_p = root / ".lexicon.conf"
+    _conf_p.write_text(_conf_p.read_text(encoding="utf-8")
+                       .replace('ratified=""', 'ratified="2026-09-06 node a"'),
+                       encoding="utf-8", newline="\n")
+    subprocess.run(["git", "add", "--", ".lexicon.conf"], cwd=root, capture_output=True)
+    subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--render"], cwd=root,
+                   capture_output=True, text=True)
+    _r = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--check"], cwd=root,
+                        capture_output=True, text=True)
+    _o = _r.stdout + _r.stderr
+    check("B1 control: a ratified scaffolded seed passes --check, grade included",
+          _r.returncode == 0 and "declaration grades clean" in _o, _o)
+    # THE CONF-ONLY EDIT, which is the whole shape of the finding: nothing under `tools/` moves.
+    _conf_p.write_text(_conf_p.read_text(encoding="utf-8")
+                       .replace('VERB_OFFENDER_PIN="', 'VERB_OFFENDER_PIN="9'),
+                       encoding="utf-8", newline="\n")
+    _r = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--check"], cwd=root,
+                        capture_output=True, text=True)
+    _o = _r.stdout + _r.stderr
+    check("B1: a CONF-ONLY pin change reds --check, which is the leg no guard scopes off a bar",
+          _r.returncode != 0 and "THE DECLARATION DOES NOT GRADE" in _o, _o)
+    check("B1: ...and the engine's own output rides along, naming the row to paste",
+          "pin" in _o and "VERB_OFFENDER_PIN=" in _o, _o)
+
     # A FLAG IS NOT A PATH. This script guarded its argv by ARITY alone, so
     # `scaffold_lexicon.py --help` is a well-formed one-argument call and `--help` became the
     # DESTINATION: the run derived a whole seed and wrote it to a file literally named `--help`.
@@ -1121,9 +1306,16 @@ for _bad, _want, _cell in (
         ("fetch_2fa", "load_2fa", "py.function"),           # digit boundary at the head of a token
         ("fetchXMLParser", "loadXMLParser", "js.function"),  # acronym run: was `loadXmlParser`
         ("fetchHTTPServerData", "loadHTTPServerData", "js.function"),
-        ("FetchUserData", "LoadUserData", "js.type"),       # PascalCase: the verb inherits the case
-        ("FETCH_USER_DATA", "LOAD_USER_DATA", "py.constant"),   # SCREAMING_SNAKE, likewise
-        ("fetch-user-data", "load-user-data", "md.file"),   # kebab: the separator is the caller's
+        # THESE THREE ASK A `function` CELL, and they used to ask a `type`, a `constant` and a
+        # `file` one. Since closing review B2 the verb swap runs on the surface P1 grades and
+        # nowhere else, which is what the GRADER does — `measure_vocab_cells` refuses a `vocab`
+        # flag on any of those three surfaces by name, so the old rows were measured against a
+        # declaration `--check` would have redded. The first two route through a `+prefix:`
+        # selector, which buys the routing a live population here as a side effect; the third asks
+        # a shell function cell, where a kebab name is legal shell and not a contrivance.
+        ("FetchUserData", "LoadUserData", "py.function"),   # PascalCase: the verb inherits the case
+        ("FETCH_USER_DATA", "LOAD_USER_DATA", "py.function"),   # SCREAMING_SNAKE, likewise
+        ("fetch-user-data", "load-user-data", "sh.function"),   # kebab: the separator is the caller's
         ("fetch_conf_", "load_conf_", "py.function"),       # trailing underscore survives
         ("__fetch__", "__load__", "py.function"),           # ...on both ends
 ):
@@ -1467,12 +1659,12 @@ code, out = run_case({"core/a.py": "def build_index():\n    pass\n"},
 check("AC2 green: ...and it greens once LANGS declares it", code == 0, out)
 
 code, out = run_case({"core/a.py": "def build_index():\n    pass\n"},
-                     BASE_CONF + "\nCELLS:\n  py.file  kebab\n\nPINS:\n  py.function.debt  3\n")
+                     BASE_CONF + "\nCELLS:\n  py.file  kebab\n\nPINS:\n  py.function.conv  0\n")
 check("AC6: a PINS row with no CELLS row reds --check by cell",
       code != 0 and "py.function" in out and "has no CELLS row" in out, out)
 code, out = run_case({"core/a.py": "def build_index():\n    pass\n"},
                      BASE_CONF + "\nCELLS:\n  py.file  kebab\n\n  py.function  snake\n\n"
-                                 "PINS:\n  py.function.debt  3\n")
+                                 "PINS:\n  py.function.conv  0\n")
 check("AC6 green: ...and it greens once the CELLS row is added", code == 0, out)
 
 # ---- AC10: the pin is a TWO-SIDED equality ------------------------------------------------------
@@ -1501,7 +1693,7 @@ with build_tempdir() as _td:
     _base = ("CELLS:\n"
              "  py.file  kebab\n\n  py.function  snake\n\n  py.type  pascal\n\n"
              "PINS:\n"
-             "  py.file.conv  7\n\n  py.function.debt  9\n\n  py.type.suffix  4\n")
+             "  py.file.conv  7\n\n  py.function.debt  9\n\n  py.type.conv  4\n")
     _cf = _r / ".lexicon.conf"
     _cf.write_text(_base, encoding="utf-8", newline="\n")
     subprocess.run(["git", "init", "-q", "-b", "main"], cwd=_r, check=True, capture_output=True)
@@ -2741,12 +2933,18 @@ def read_suggestion(out: str) -> str:
     return ""
 
 
-# AC1 — the banned TAIL, on a `notail` cell, named in the answer. `FooManager` leads with `foo`,
-# which is neither declared nor banned, so before this unit it exited on the "not in the declared
-# table" branch answering about the wrong end of the name entirely.
+# AC1 — the banned TAIL, named in the answer. `FooManager` leads with `foo`, which is neither
+# declared nor banned, so before this unit it exited on the "not in the declared table" branch
+# answering about the wrong end of the name entirely.
+#
+# THE ARMING IS THE SURFACE, NOT A FLAG, since closing review B2: P2 grades every extracted type
+# whatever any `CELLS` row says, so `--suggest` runs the tail check on any `type` cell and the
+# `notail` flag — whose only reader was the branch that made the two surfaces disagree — is gone from
+# the grammar. This row now declares `py.type  pascal` and nothing else, and the arm reads the
+# message the surface arming prints.
 _c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "FooManager", "--as", "py.type"))
-check("AC1: a notail cell answers about the banned SUFFIX, naming it",
-      _c == 0 and "`Manager`" in _o and "notail" in _o, _o)
+check("AC1: a `type` cell answers about the banned SUFFIX, naming it",
+      _c == 0 and "`Manager`" in _o and "P2 bans on the `type` surface" in _o, _o)
 check("AC1: ...and does not answer about the leading token instead",
       "not in the declared table" not in _o, _o)
 
@@ -2964,6 +3162,325 @@ _c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetchUserData", "--as"
 check("STAGED: ...while AC2's banned-verb arm stays GREEN through that same break, which is why "
       "AC12 had to exist",
       read_suggestion(_o) == "load_user_data", f"got {read_suggestion(_o)!r} | {_o}")
+
+# ---- closing-review left-shifts (the CODE review, round 1) --------------------------------------
+#
+# One arm per finding, each with its own staged break where a break is stageable. The grouping is
+# the review's, not this file's, so a reader holding the report can find the row.
+
+# M3 — `--suggest` used to RESOLVE an overlap the grader REFUSES. `read_routed_cell` returned the
+# first prefix selector in dict order while `scan_routes` calls that resolution disqualifying in its
+# own docstring and grades the name by NEITHER cell. Two verdicts, one name, and the confident one
+# came from the verb an author reads BEFORE writing.
+_AMBIG_CONF = ('BANNED_SUFFIXES="Manager"\n'
+               'LANGS="py:python-ast:parser conf::dark"\n'
+               'VERB_OFFENDER_PIN="1"\nSUFFIX_OFFENDER_PIN="0"\n'
+               'ratified="2026-09-06 node a"\n\n'
+               'CELLS:\n'
+               '  py.function  snake\n\n'
+               '  py.function+prefix:Test  pascal\n\n'
+               '  py.function+prefix:Te  camel\n\n'
+               'VERBS:\n'
+               '  build   create a new value and return it - NOT `create`\n')
+_AMBIG_FILES = {"core/a.py": "def TestThing():\n    pass\n"}
+_c, _o = run_case(_AMBIG_FILES, _AMBIG_CONF)
+check("M3: --check refuses an overlapping-selector name as AMBIGUOUS SELECTOR",
+      _c != 0 and "AMBIGUOUS SELECTOR" in _o and "graded by NEITHER" in _o, _o)
+_c, _o = run_case(_AMBIG_FILES, _AMBIG_CONF, args=("--suggest", "TestThing", "--as", "py.function"))
+check("M3: ...and --suggest refuses the SAME name with the SAME wording rather than picking a row",
+      _c == 2 and "AMBIGUOUS SELECTOR" in _o and "+prefix:Test" in _o and "+prefix:Te" in _o, _o)
+_c, _o = run_case(_AMBIG_FILES, _AMBIG_CONF, args=("--suggest", "TestThing", "--as", "py.function"),
+                  patch=("lexicon.py", "    if len(hits) > 1:", "    if False:"))
+check("STAGED: collapsing the overlap check to the FIRST hit makes --suggest answer confidently "
+      "where --check refuses",
+      _c == 0 and "AMBIGUOUS" not in _o, f"rc={_c} {_o}")
+
+# M2 — three `PINS` shapes that parsed, passed `check_declaration`, and were graded by nothing. The
+# refusal is DERIVED (declared keys minus consumed keys), so each shape below is an instance of one
+# arm rather than three hand-written cases.
+_M2_FILES = {"core/a.py": "def build_x():\n    pass\n\n\nclass Widget:\n    pass\n"}
+_M2_BASE = ('BANNED_SUFFIXES="Manager"\n'
+            'LANGS="py:python-ast:parser conf::dark"\n'
+            'VERB_OFFENDER_PIN="0"\nSUFFIX_OFFENDER_PIN="0"\n'
+            'ratified="2026-09-06 node a"\n\n'
+            'VERBS:\n  build   create a new value and return it - NOT `create`\n\n')
+_c, _o = run_case(_M2_FILES, _M2_BASE + "CELLS:\n  py.function  snake\n\n  py.type  dark\n\n"
+                                        "PINS:\n  py.type.conv  777\n")
+check("M2: a `.conv` pin on a `dark` cell is refused as an UNREAD PIN",
+      _c != 0 and "UNREAD PIN" in _o and "py.type.conv" in _o, _o)
+_c, _o = run_case(_M2_FILES, _M2_BASE + "CELLS:\n  py.function  snake\n\n  py.type  pascal\n\n"
+                                        "PINS:\n  py.function.debt  9999\n\n"
+                                        "  py.function.unruled  4242\n")
+check("M2: a `.debt`/`.unruled` pair on a cell with no `vocab` flag is refused the same way",
+      _c != 0 and "UNREAD PIN" in _o
+      and "py.function.debt" in _o and "py.function.unruled" in _o, _o)
+# THE CONTROL, and it is the half that stops this arm redding every honest declaration: the SAME
+# rows on a cell that DOES arm `vocab` are consumed, so they must not appear in the refusal.
+_c, _o = run_case(_M2_FILES, _M2_BASE + "CELLS:\n  py.function  snake  vocab\n\n  py.type  pascal\n\n"
+                                        "PINS:\n  py.function.debt  0\n\n"
+                                        "  py.function.unruled  0\n")
+check("M2 control: the same pair on a `vocab` cell is consumed and NOT reported unread",
+      "UNREAD PIN" not in _o, _o)
+check("M2: and the third shape cannot be declared at all — `suffix` left PIN_PREDICATES",
+      "suffix" not in _lc.PIN_PREDICATES, str(_lc.PIN_PREDICATES))
+
+# H4 — the `PATTERNS REPLACES` report had exactly one arm and it asserted ABSENCE, so it passed
+# precisely when the mechanism was deleted. This is the positive twin, over a SHIPPED key.
+_JS_REPLACE = (BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
+                                 'LANGS="py:python-ast:parser conf::dark js:js-regex:probe"')
+               + "\nPATTERNS:\n"
+                 r"  js-regex.types  ^\s*class\s+([A-Za-z_$][\w$]*)" "\n"
+               + "\nCELLS:\n  py.function  dark\n  js.function  dark\n  js.type  dark\n")
+_c, _o = run_case({"core/a.py": "def build_x():\n    pass\n",
+                   "web/w.js": "class Widget {}\n"}, _JS_REPLACE)
+check("H4: a PATTERNS row landing on a SHIPPED extractor key PRINTS the REPLACES line, naming it",
+      "PATTERNS REPLACES a SHIPPED extractor key" in _o and "js-regex.types" in _o, _o)
+_c, _o = run_case({"core/a.py": "def build_x():\n    pass\n",
+                   "web/w.js": "class Widget {}\n"}, _JS_REPLACE,
+                  patch=("lexicon.py",
+                         "        over = [k for k in patterns if k.split(\".\")[0] in PATTERN_SETS]",
+                         "        over = []"))
+check("STAGED: deleting the REPLACES computation reds that arm rather than passing green",
+      "PATTERNS REPLACES a SHIPPED extractor key" not in _o, _o)
+
+# M4 — `render_swapped_name`'s case-inheritance branches. Replacing the three-branch block with
+# `cased = want` left the whole suite green and both CLI modes byte-identical, because every AC
+# input is lowercase-leading and `--suggest` re-cases the answer afterwards, masking the difference.
+# The one unmasked consumer is the P1 DEBT detail line, so the arm reads THAT.
+_M4_FILES = {"core/a.py": "def FetchThing():\n    pass\n\n\ndef GETData():\n    pass\n"}
+_M4_CONF = ('BANNED_SUFFIXES="Manager"\n'
+            'LANGS="py:python-ast:parser conf::dark"\n'
+            'VERB_OFFENDER_PIN="2"\nSUFFIX_OFFENDER_PIN="0"\n'
+            'ratified="2026-09-06 node a"\n\n'
+            'CELLS:\n  py.function  dark\n\n'
+            'VERBS:\n  build   create a new value and return it - NOT `create`\n')
+_c, _o = run_case(_M4_FILES, _M4_CONF, args=("--list",))
+check("M4: the DEBT rename inherits a PASCAL-led caller's case", "`LoadThing`" in _o, _o)
+check("M4: ...and a SCREAMING-led caller's", "`READData`" in _o, _o)
+_c, _o = run_case(_M4_FILES, _M4_CONF, args=("--list",),
+                  patch=("lexicon.py", "    return lead + cased + rest",
+                         "    return lead + want + rest"))
+check("STAGED: dropping the case-inheritance branches reds BOTH M4 arms",
+      "`LoadThing`" not in _o and "`READData`" not in _o, _o)
+
+# L1 — the `<<-` tab-stripping terminator match. `git grep -l -- '<<-' -- '*.sh'` returns nothing in
+# this repo, so the branch was correct code with zero coverage; reverted, the tokenizer runs past the
+# heredoc into the next definition and raises `unterminated heredoc`, which the walk turns into a
+# `declared 'parser' but does not parse` refusal — a red gate for any adopter whose shell uses `<<-`.
+_L1_SH = ("run_it() {\n"
+          "\tcat <<-EOF\n"
+          "\tbody line\n"
+          "\tEOF\n"
+          "}\n"
+          "\n"
+          "build_after() {\n"
+          "\t:\n"
+          "}\n")
+_L1_CONF = ('BANNED_SUFFIXES="Manager"\n'
+            'LANGS="sh:shell-tokens:parser conf::dark"\n'
+            'VERB_OFFENDER_PIN="1"\nSUFFIX_OFFENDER_PIN="0"\n'
+            'ratified="2026-09-06 node a"\n\n'
+            'CELLS:\n  sh.function  snake\n\n'
+            'VERBS:\n  build   create a new value and return it - NOT `create`\n')
+_c, _o = run_case({"bin/x.sh": _L1_SH}, _L1_CONF)
+check("L1: a `<<-` heredoc with a TAB-indented terminator parses, and the definition after it is "
+      "reached", _c == 0 and "does not parse" not in _o, _o)
+_c, _o = run_case({"bin/x.sh": _L1_SH}, _L1_CONF,
+                  patch=("lexicon.py", r'(raw.lstrip("\t") if strip else raw) == delim',
+                         "raw == delim"))
+check("STAGED: dropping the tab strip turns that file into an unterminated heredoc refusal",
+      _c != 0 and "does not parse" in _o, _o)
+
+# L3 — `check_self_containment`'s UNJUDGED branch. Every SIBLING branch is staged; this one reads as
+# covered by association and its failing case had never been observed. It decides whether a broken
+# sibling module degrades the walk silently or reds.
+with build_tempdir() as _td:
+    _kit = build_kit_copy(Path(_td) / "kitL3")
+    _victim = _kit / "subtokens.py"
+    _victim.write_text(_victim.read_text(encoding="utf-8") + "\ndef (:\n",
+                       encoding="utf-8", newline="\n")
+    _problems, _mods, _imports = lex.check_self_containment(_kit)
+    check("L3: a sibling module that will not parse is reported UNJUDGED, naming the file",
+          any("UNJUDGED" in p and "subtokens.py" in p for p in _problems), str(_problems))
+
+# L4 — the `cannot be read as source` refusal, split from the SyntaxError one precisely because the
+# two say different things. Nothing exercised the distinction, so a future edit re-merging them reds
+# nothing. Reachable in the wild: `tracked_files` does not filter for existence.
+with build_tempdir() as _td:
+    _rr = Path(_td)
+    shutil.copytree(KIT, _rr / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (_rr / "core").mkdir()
+    (_rr / "core" / "a.py").write_text("def build_x():\n    pass\n", encoding="utf-8", newline="\n")
+    (_rr / "core" / "gone.py").write_text("def build_y():\n    pass\n", encoding="utf-8",
+                                          newline="\n")
+    (_rr / ".lexicon.conf").write_text(_L4_CONF := _M2_BASE + "CELLS:\n  py.function  snake\n",
+                                       encoding="utf-8", newline="\n")
+    subprocess.run(["git", "init", "-q"], cwd=_rr, check=True)
+    subprocess.run(["git", "add", "--", "core", ".lexicon.conf"], cwd=_rr, check=True,
+                   capture_output=True)
+    (_rr / "core" / "gone.py").unlink()          # TRACKED, and no longer on disk
+    _r = subprocess.run([sys.executable, "tools/lexicon/lexicon.py"], cwd=_rr,
+                        capture_output=True, text=True)
+    _o = _r.stdout + _r.stderr
+    check("L4: a tracked file missing from the worktree is refused as `cannot be read as source`",
+          _r.returncode != 0 and "cannot be read as source" in _o and "gone.py" in _o, _o)
+    check("L4: ...and NOT as `does not parse`, which is the distinction the split bought",
+          "gone.py: declared `parser` but does not parse" not in _o, _o)
+
+# H3 — THE IDIOM IS BANNED, not the instance. `cell.split(".")[1]` reads a cell key by position and
+# is wrong for every selector'd row: on `py.file+prefix:test` it answers `file+prefix:test`. That
+# defect was live in `run_suggest` (a false refusal on a stem the gate SATISFIES) and mis-labelling
+# in two `check_pass` messages, which is three instances of one habit — so the arm gates the habit.
+# `parse_cell_key` is the one reader of a cell key in this kit.
+_ENGINE_LINES = (KIT / "lexicon.py").read_text(encoding="utf-8").splitlines()
+_SPLIT_HITS = [f"{_i}: {_ln.strip()}" for _i, _ln in enumerate(_ENGINE_LINES, 1)
+               if not _ln.lstrip().startswith("#") and "cell.split(" in _ln]
+check("H3: `cell.split(` appears in no CODE line of lexicon.py — parse_cell_key is the one reader",
+      not _SPLIT_HITS, "; ".join(_SPLIT_HITS))
+# ...and the predicate is shown to MATCH, over a synthetic line rather than over the tracked file.
+# A ban asserted only by its own silence is the arm-that-cannot-fail shape one level up: a typo in
+# the needle would read exactly like a clean tree.
+check("H3: ...and the predicate actually matches that idiom when it is present",
+      "cell.split(" in '    ext = cell.split(".")[0]'
+      and not '    ext = cell.split(".")[0]'.lstrip().startswith("#"))
+check("H3: ...and does not fire on a COMMENT naming it, which this file and the engine both do",
+      '    # the surface test was cell.split(".")[1]'.lstrip().startswith("#"))
+
+# H2 — the rendered Skill described the pin as one-sided long after every pin became a two-sided
+# equality, and `--check` byte-compares a render against a render, so the sentence was GATED AS
+# CORRECT and could not drift into notice. The template is the source; this arm reads it.
+_TPL = (KIT / "SKILL.template.md").read_text(encoding="utf-8")
+check("H2: the Skill template describes no pin as one-sided",
+      "exceeds the declared pin" not in _TPL and "over the declared pin" not in _TPL, _TPL[:400])
+check("H2: ...and says TWO-SIDED, in the section that grades",
+      "TWO-SIDED EQUALITY" in _TPL, _TPL[:400])
+
+
+# ---- the cross-surface arm's call sites, and the breaks that red it -----------------------------
+#
+# THE REAL TREE IS THE FIRST CALL SITE and it is the point of the whole arm: the supply half was
+# only ever measured against scratch declarations, so it answered `OK` for names this repo's own bar
+# reds on. Asked here against THIS declaration and THIS corpus.
+
+
+def read_agreement(root, patch=None):
+    """`(rc, output)` from the cross-surface arm over `root`, optionally against a PATCHED kit copy.
+
+    `patch` is `(kit-file, old, new)` and is applied to a COPY, never to this tree. The replacement
+    is ASSERTED, like `run_case`'s: a patch whose `old` has moved would leave the arm grading an
+    unmodified engine and scoring a pass, which is the arm-that-cannot-fail class the break exists
+    to disprove.
+    """
+    if patch is None:
+        _r = subprocess.run([sys.executable, str(KIT / "selftest.py"), "--agree", str(root)],
+                            capture_output=True, text=True)
+        return _r.returncode, _r.stdout + _r.stderr
+    _rel, _old, _new = patch
+    _f = Path(root) / "tools" / "lexicon" / _rel
+    _src = _f.read_text(encoding="utf-8")
+    if _old not in _src:
+        raise SystemExit(f"selftest: agreement patch target not found in {_rel}: {_old!r}")
+    _f.write_text(_src.replace(_old, _new), encoding="utf-8", newline="\n")
+    _r = subprocess.run([sys.executable, str(Path(root) / "tools" / "lexicon" / "selftest.py"),
+                         "--agree", str(root)], capture_output=True, text=True)
+    _f.write_text(_src, encoding="utf-8", newline="\n")
+    return _r.returncode, _r.stdout + _r.stderr
+
+
+def read_agree_field(out, key):
+    """One `key=<int>` field out of the arm's summary line, or -1 if the line never printed."""
+    _m = re.search(rf"\b{key}=(\d+)\b", out)
+    return int(_m.group(1)) if _m else -1
+
+
+_GOV_ROOT = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True,
+                           cwd=str(KIT))
+_GOV_ROOT = Path(_GOV_ROOT.stdout.strip()) if _GOV_ROOT.returncode == 0 else None
+if _GOV_ROOT is not None and (_GOV_ROOT / ".lexicon.conf").is_file():
+    _rc, _out = read_agreement(_GOV_ROOT)
+    check("AGREE: --check and --suggest agree on THIS repo's own corpus, verdict and cell",
+          _rc == 0, _out)
+    # A LIVENESS ASSERTION ON BOTH COUNTERS, because an arm reporting zero disagreements over zero
+    # names is indistinguishable from a clean run and is the whole class this file exists against.
+    check("AGREE: ...and the arm actually asked this repo something",
+          read_agree_field(_out, "asked") > 0, _out)
+    check("AGREE: ...and made at least one CELL assertion, not verdicts alone",
+          read_agree_field(_out, "cell_assertions") > 0, _out)
+else:
+    # THE SKIP ANNOUNCES ITSELF rather than passing. An adopter running this suite in a tree with no
+    # declaration has not exercised the arm, and a green row there would say otherwise.
+    check("AGREE: SKIPPED over the host repo — no .lexicon.conf at its root, so the arm's real-tree "
+          "half went UNEXERCISED on this run (reported, not a pass)", True)
+
+
+# THE SECOND CALL SITE IS A FIXTURE WITH A ROUTED `file` CELL, and it exists because this repo's own
+# declaration carries no selector at all — H3, M1 and M3 are three defects on a code path with zero
+# in-corpus population. `core/check_arms.py` stems to `check_arms`, which the `+prefix:check` row
+# claims and `kebab` reds, while the parent row would call it clean: one file, two cells, and the
+# only fixture shape in which the two surfaces can be caught disagreeing.
+_ROUTED_CONF = ('BANNED_SUFFIXES="Manager"\n'
+                'LANGS="py:python-ast:parser conf::dark"\n'
+                'VERB_OFFENDER_PIN="0"\nSUFFIX_OFFENDER_PIN="0"\n'
+                'ratified="2026-09-06 node a"\n\n'
+                'CELLS:\n'
+                '  py.function  snake\n\n'
+                '  py.file  snake\n\n'
+                '  py.file+prefix:check  kebab\n\n'
+                'VERBS:\n'
+                '  build   create a new value and return it - NOT `create`\n')
+with build_tempdir() as _td:
+    _rr = Path(_td)
+    shutil.copytree(KIT, _rr / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (_rr / "core").mkdir()
+    (_rr / "core" / "check_arms.py").write_text("def build_thing():\n    pass\n",
+                                                encoding="utf-8", newline="\n")
+    # `fetch_thing` IS THIS FIXTURE'S P1 OFFENDER, and it is here because BREAK B needs one. Without
+    # it every function in the corpus leads with a declared verb, so gating P1 on a flag nothing arms
+    # changes no answer and the break scores a pass. Measured rather than assumed: the first cut of
+    # this fixture carried only `build_*` names and BREAK B came back GREEN.
+    (_rr / "core" / "plain_mod.py").write_text(
+        "def build_other():\n    pass\n\n\ndef fetch_thing():\n    pass\n",
+        encoding="utf-8", newline="\n")
+    (_rr / ".lexicon.conf").write_text(_ROUTED_CONF, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "init", "-q"], cwd=_rr, check=True)
+    subprocess.run(["git", "add", "--", "core", ".lexicon.conf"], cwd=_rr, check=True,
+                   capture_output=True)
+
+    _rc, _out = read_agreement(_rr)
+    check("AGREE: the two surfaces agree over a corpus with a ROUTED file cell", _rc == 0, _out)
+    check("AGREE: ...and the routed fixture made cell assertions of its own",
+          read_agree_field(_out, "cell_assertions") > 0, _out)
+
+    # BREAK A — M1, restored as the one line it was: route on the caller's RAW argument instead of
+    # on the graded stem. The grader's `scan_routes` matches on the stem, so a `file` cell asked
+    # with a path misses the `+prefix:` row here and hits it there. Both halves of the arm red, and
+    # they red for different reasons — the verdict half because the parent's `snake` calls
+    # `check_arms` clean, the cell half because the answer names the parent rather than the routed
+    # row. The sibling defect H3 (the surface tested with `cell.split(".")[1]` AFTER routing) is not
+    # separately stageable: once the stemming precedes the routing there is no ordering left for it
+    # to occupy. It was staged by hand at the fix and is recorded in the closing-review fold.
+    _rc, _out = read_agreement(_rr, patch=(
+        "lexicon.py",
+        'read_routed_cell(conf.get("CELLS") or {}, cell, graded)',
+        'read_routed_cell(conf.get("CELLS") or {}, cell, name)'))
+    check("STAGED: routing on the caller's RAW argument rather than the graded stem REDS the arm",
+          _rc != 0, _out)
+    check("STAGED: ...on the VERDICT half", read_agree_field(_out, "verdict_bad") > 0, _out)
+    check("STAGED: ...and on the CELL half, which is the one no verdict could show",
+          read_agree_field(_out, "cell_bad") > 0, _out)
+
+    # BREAK B — the B2 defect itself: P1 gated on the cell's `vocab` flag, which the grader does not
+    # read. The routed fixture declares no flag on any row, so every function in it becomes a name
+    # the grader calls an offender and the advisor calls OK.
+    _rc, _out = read_agreement(_rr, patch=(
+        "lexicon.py",
+        '    graded_by_p1 = surface == PREDICATE_SURFACES["verb"] and bool(verbs)',
+        '    graded_by_p1 = "vocab" in flags'))
+    check("STAGED: gating P1 on the `vocab` flag the grader never reads REDS the arm",
+          _rc != 0 and read_agree_field(_out, "verdict_bad") > 0, _out)
+
 
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")

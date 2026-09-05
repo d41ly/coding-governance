@@ -2298,6 +2298,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "read_agree_field",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_agreement",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "read_bindings",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2444,6 +2454,11 @@
     },
     {
       "id": "read_suggestion",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_surface_disagreements",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
     },
