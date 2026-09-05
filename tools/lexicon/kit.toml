@@ -104,7 +104,7 @@ id = "lexicon-pins"
 kind = "measurement"
 blocks_adopt = false
 blocks_gate = true
-why = "The three offender pins are MEASURED against the adopting corpus at scaffold and are shrink-only. A pin copied from a larger tree is either vacuous or permanently red, which `.memory-tree.conf` states in its own words. The probe is the gate itself: an unmeasured pin set fails it."
+why = "The offender pins are MEASURED against the adopting corpus at scaffold and are a TWO-SIDED equality thereafter: a rise reds and so does an unrecorded drain. A pin copied from a larger tree is either vacuous or permanently red, which `.memory-tree.conf` states in its own words. The probe is the gate itself: an unmeasured pin set fails it."
 discharge = { command = ["python", "{kit}/lexicon.py"] }
 
 [[lf_pin]]

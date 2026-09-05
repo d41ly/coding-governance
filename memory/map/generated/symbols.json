@@ -583,6 +583,16 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_convention",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "check_declaration",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
       "id": "check_entry_producer",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -681,6 +691,11 @@
       "id": "classify",
       "kind": "function",
       "file": "tools/govkit/census.py"
+    },
+    {
+      "id": "classify",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
     },
     {
       "id": "classify",
@@ -1908,6 +1923,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "measure_conventions",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "measure_orphans",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -2268,6 +2288,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_core",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
+    },
+    {
       "id": "read_declared_keys",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -2356,6 +2381,11 @@
       "id": "read_stale_header_waiver",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_stem",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
     },
     {
       "id": "read_text",
@@ -2701,6 +2731,11 @@
       "id": "resolve_measurer_currency",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_pattern_sets",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "resolve_posix_shell",

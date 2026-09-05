@@ -781,6 +781,34 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     check("...and the signal is LIVE by derivation, not a hardcoded True",
           stale["live"] is True, f"{stale}")
 
+    # THE PATTERNS RESOLUTION, ARMED, and nothing armed it before. Both lexicon signals read
+    # `lex.PATTERN_SETS` — the SHIPPED constant — and skipped any extension whose pattern set was not
+    # in it, so a language armed only through a `PATTERNS:` row was passed over file by file while
+    # the signal reported a confident number with `live` still true off the Python half. That is
+    # green-by-absence on a gateable signal. Reverting `_resolve_lexicon_sets` back to the constant
+    # left this whole suite green, which is the defect this arm exists to make impossible.
+    #
+    # `vanish` is declared above and used by nothing. Its ONLY definition site now lives in a
+    # language reachable only through the declaration, so the signal falls to 0 exactly when the
+    # resolution is read and stays at 1 when it is not.
+    (r / "web").mkdir()
+    (r / "web" / "widget.ts").write_text("export function vanishThing() {}\n",
+                                         encoding="utf-8", newline="\n")
+    conf.write_text(
+        conf.read_text(encoding="utf-8").replace(
+            'LANGS="py:python-ast:parser js:js-regex:probe"',
+            'LANGS="py:python-ast:parser js:js-regex:probe ts:ts-regex:probe"')
+        + "\nPATTERNS:\n"
+        + r"  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)" + "\n",
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "arm a language through PATTERNS alone", "--no-verify"], r)
+    armed = report(r)["lexicon_verbs_declared_but_unused"]
+    check("a language armed ONLY by a PATTERNS row is read: the verb it defines stops being unused",
+          armed["value"] == 0, f"{armed}")
+    check("...and the signal stays LIVE over that widened population", armed["live"] is True,
+          f"{armed}")
+
 
 def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     """The marginal-offense-rate signal: four states, and each one must be distinguishable.
@@ -868,6 +896,40 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
           after["value"] == before["value"], f"before={before['value']} after={after['value']}")
     check("...and the population grew by the CONTROL alone, so the ungradeable name left both operands",
           after["of"] == before["of"] + 1, f"before={before['of']} after={after['of']}")
+
+    # THE SECOND RESOLUTION SITE. It was ungated until a re-verification pass reverted it ALONE and
+    # watched both suites stay green. `build_lexicon_marginal_offense_rate` reads the resolved pattern
+    # sets in three places -- the armed-extension set and both per-sha reads -- and the arm covering
+    # the OTHER lexicon signal reaches none of them. Two call sites and one arm between them is the
+    # same green-by-absence shape that sibling arm exists to abolish, one signal over.
+    #
+    # THE POPULATION IS THE OPERAND THAT MOVES. A language armed only through a `PATTERNS:` row is
+    # invisible to the shipped constant, so its definitions never enter `of`. One gradeable definition
+    # in that language must raise `of` by exactly one; with the resolution dropped it raises it by
+    # nothing and the signal reports a confident rate over the Python half alone. Asserting `value`
+    # holds STILL is the other half: a population that grew while the rate moved would mean the added
+    # name was graded off-table, which would make this arm pass for the wrong reason.
+    (r / "web").mkdir()
+    (r / "web" / "panel.ts").write_text(
+        "export function buildPanel() {}" + chr(10), encoding="utf-8", newline=chr(10))
+    ts_regex = r"  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)"
+    conf_p = r / ".lexicon.conf"
+    conf_p.write_text(
+        conf_p.read_text(encoding="utf-8").replace(
+            'LANGS="py:python-ast:parser"', 'LANGS="py:python-ast:parser ts:ts-regex:probe"')
+        + chr(10) + "PATTERNS:" + chr(10) + ts_regex + chr(10),
+        encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "arm a second language through PATTERNS alone", "--no-verify"], r)
+    widened = report(r)[name]
+    check("the marginal rate READS a language armed only by a PATTERNS row: its population grows",
+          widened["of"] == after["of"] + 1,
+          f"of before={after['of']} after={widened['of']} -- a population that did not grow means "
+          "build_lexicon_marginal_offense_rate never resolved the declared pattern sets")
+    check("...and the rate itself did not move, so the population grew by an ON-TABLE name",
+          widened["value"] == after["value"],
+          f"value before={after['value']} after={widened['value']}")
+
 
     # ...and a window in which EVERY added definition is ungradeable must say so rather than read as
     # a clean measured window. The round-1 L4 fix pointed every operand at `gradeable` and left the

@@ -51,8 +51,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lexicon_conf import ConfError, langs, load_conf, build_negatives  # noqa: E402
-from subtokens import leading_verb, subtokens  # noqa: E402
+from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, langs, load_conf,  # noqa: E402
+                          build_negatives)
+from subtokens import check_convention, leading_verb, read_stem, subtokens  # noqa: E402
 
 KIT_LEXICON_VERSION = "1.1"
 
@@ -79,6 +80,12 @@ KINDS = ("verb", "suffix")
 
 #: The shipped `probe` pattern sets. Each one MUST have a frozen sentinel fixture in `selftest.py`
 #: that yields a non-zero definition count, so a set going inert fails there rather than here.
+#:
+#: SHIPPED, NOT RESOLVED, and the two names are kept apart on purpose. This kit installs under
+#: `role = "engine"`, so an upgrade overwrites this file: an adopter arming TypeScript, Go or C# by
+#: editing the dict below would lose it on the next `apply`, which is why the extractor set is
+#: DECLARABLE in `.lexicon.conf` and merged over this one by `resolve_pattern_sets`. Nothing
+#: mutates this constant. TOOL-aSurfacedLexicon-9.
 PATTERN_SETS = {
     "js-regex": {
         "functions": [
@@ -216,8 +223,34 @@ def _python_defs(src: str):
     return funcs, types_, imports
 
 
-def _probe_defs(src: str, pset: str):
-    spec = PATTERN_SETS[pset]
+def resolve_pattern_sets(conf: dict) -> dict:
+    """The SHIPPED sets with every declared `PATTERNS` row merged over them. A NEW mapping, always.
+
+    NOTHING MUTATES `PATTERN_SETS`, and that is a contract rather than tidiness: `selftest.py`
+    compares its frozen SENTINELS against that constant to prove every SHIPPED set has a fixture
+    yielding a non-zero count, so a declared set folded into it would red the kit's own vacuity arm
+    on any repo whose conf declares one. Shipped and resolved are two questions with two answers.
+
+    THE MERGE IS PER KEY, not per set. A declared `js-regex.types` row replaces the shipped `types`
+    list for `js-regex` and leaves its `functions` and `imports` standing. Replacement rather than
+    append is what lets an adopter FIX a shipped regex, which is the case that motivates the block at
+    all — and per-key rather than per-set is what stops fixing one part silently disarming the other
+    two. The distinction is invisible on a declaration that only ever adds a NEW set, so the arm that
+    guards it declares over the shipped one; every run also PRINTS the replaced keys, because a set
+    weakened rather than emptied is otherwise inferred rather than seen.
+
+    A row naming an UNSHIPPED set builds that set from empty parts, so a declaration arming only
+    `functions` still answers the three-list contract `_probe_defs` reads.
+    """
+    out = {pid: dict(spec) for pid, spec in PATTERN_SETS.items()}
+    for rowkey, rx in (conf.get("PATTERNS") or {}).items():
+        pid, part = rowkey.split(".")
+        out.setdefault(pid, {k: [] for k in PATTERN_PARTS})[part] = [rx]
+    return out
+
+
+def _probe_defs(src: str, pset: str, sets: dict | None = None):
+    spec = (sets if sets is not None else PATTERN_SETS)[pset]
 
     def hits(key):
         out = []
@@ -229,7 +262,7 @@ def _probe_defs(src: str, pset: str):
     return hits("functions"), hits("types"), hits("imports")
 
 
-def extract_text(src: str, mode: str, pset: str):
+def extract_text(src: str, mode: str, pset: str, *, sets: dict | None = None):
     """`(functions, types, imports)` for SOURCE TEXT, or `None` when the mode declares no extractor.
 
     Split out of `extract` so a caller holding BYTES rather than a path uses the SAME extractor.
@@ -237,22 +270,28 @@ def extract_text(src: str, mode: str, pset: str):
     and never writes a tree; a second implementation there would be the
     `second-implementation-is-not-a-second-opinion` class inside the one instrument whose entire
     value is that both of its operands come from one extractor. TOOL-dScaffoldedMirror-7 S4.
+
+    `sets` IS KEYWORD-ONLY AND DEFAULTS TO THE SHIPPED CONSTANT, which is the whole shape of the
+    change TOOL-aSurfacedLexicon-9 was allowed to make here. The positional contract is frozen —
+    `drift_report.py` calls both of these positionally against git blobs — so the resolution arrives
+    beside it rather than inside it, and an adopter who never passes one is on exactly the previous
+    behaviour by the default.
     """
     if mode == "dark":
         return None
     if mode == "parser":
         return _python_defs(src)
-    return _probe_defs(src, pset)
+    return _probe_defs(src, pset, sets)
 
 
-def extract(path: Path, mode: str, pset: str):
+def extract(path: Path, mode: str, pset: str, *, sets: dict | None = None):
     """`(functions, types, imports)` for one file, or `None` when the mode declares no extractor."""
     if mode == "dark":
         return None
-    return extract_text(path.read_text(encoding="utf-8", errors="replace"), mode, pset)
+    return extract_text(path.read_text(encoding="utf-8", errors="replace"), mode, pset, sets=sets)
 
 
-def scan_corpus(root: Path, declared: dict):
+def scan_corpus(root: Path, declared: dict, sets: dict | None = None):
     """THE corpus walk. Yields `(rel, ext, defs, problem)` for every TRACKED file, in `git ls-files`
     order. `defs` is `extract`'s `(functions, types, imports)` and is set only for an ARMED file;
     `problem` is a refusal text; an unarmed file carries neither.
@@ -274,18 +313,23 @@ def scan_corpus(root: Path, declared: dict):
     with `list(...)`; that is still one walk, and it is the only shape in which `tracked_files` and
     `extract` have exactly one call site each in this kit.
     """
+    # THE RESOLVED SETS, not the shipped constant — and the refusal below is why every caller has to
+    # pass them. A set an adopter declared through `PATTERNS:` was refused HERE, one line before the
+    # DEAD PROBE arm and the coverage fraction could see the extension at all, so a declared language
+    # could never be graded and never be reported inert either. TOOL-aSurfacedLexicon-9.
+    sets = sets if sets is not None else PATTERN_SETS
     for rel in tracked_files(root):
         ext = ext_of(rel)
         pset, mode = declared.get(ext, ("", "dark"))
         if mode == "dark":
             yield rel, ext, None, None
             continue
-        if mode == "probe" and pset not in PATTERN_SETS:
+        if mode == "probe" and pset not in sets:
             yield rel, ext, None, (f"LANGS declares pattern set {pset!r} for .{ext}, which this kit "
-                                   f"does not ship")
+                                   f"does not ship and no PATTERNS: row declares")
             continue
         try:
-            defs = extract(root / rel, mode, pset)
+            defs = extract(root / rel, mode, pset, sets=sets)
         except SyntaxError as exc:
             yield rel, ext, None, f"{rel}: declared `{mode}` but does not parse: {exc}"
             continue
@@ -385,6 +429,65 @@ def check_self_containment(kit_dir: Path = Path(__file__).resolve().parent):
     return problems, len(mods), judged
 
 
+#: The conventions a CELLS row may declare and this walk may grade against. `dark` is a declared
+#: refusal to grade and never a form; `dot` is a classifier form the messages use and is not
+#: declarable, so neither belongs in a teeth figure.
+GRADED_CONVENTIONS = tuple(c for c in CONVENTIONS if c != "dark")
+
+#: `<ext>.<surface>` -> the population that surface names. `constant` is DECLARABLE and has no
+#: extractor in this kit yet, so a `constant` cell is ANNOUNCED as unexercised rather than reported
+#: at zero: TOOL-aSurfacedLexicon-6 owns that population and its rule. A skip that looks like a pass
+#: is the one outcome this whole report exists to prevent.
+CELL_SURFACES = ("function", "type", "file")
+
+
+def measure_conventions(scanned: list, conf: dict) -> dict:
+    """Per declared CELLS row: the population, the verdicts and the alternate-convention teeth.
+
+    NO VERDICT AND NO PRINT, like everything else in the measurement half. It returns one dict per
+    cell and `check_pass` decides what any of it means.
+
+    THE TEETH ARE NOT A NICETY. A cell that prints `0 violations` and nothing else is
+    indistinguishable from a cell that CANNOT fail, which is the green-by-absence class one level up
+    from the predicate itself. So every armed cell also reports how many of the SAME names each other
+    convention would have failed — a figure that is zero everywhere only if the population really is
+    ungradeable, and which no implementation can produce by accident.
+    """
+    cells = conf.get("CELLS") or {}
+    pins = conf.get("PINS") or {}
+    out: dict[str, dict] = {}
+    for cell, (conv, _flags) in cells.items():
+        ext, surface = cell.split(".")
+        names: list[tuple[str, int, str]] = []          # (path, line, graded string)
+        for rel, e, got, _p in scanned:
+            if e != ext:
+                continue
+            if surface == "file":
+                names.append((rel, 0, read_stem(rel.rsplit("/", 1)[-1])))
+            elif got is not None and surface in ("function", "type"):
+                for name, lineno in got[0 if surface == "function" else 1]:
+                    names.append((rel, lineno, name))
+        row = {
+            "convention": conv,
+            "population": len(names),
+            "graded": surface in CELL_SURFACES,
+            "pin": pins.get(f"{cell}.conv", 0),
+            "verdicts": [],
+            "teeth": {},
+        }
+        if conv != "dark" and row["graded"]:
+            for path, line, name in names:
+                verdict, message = check_convention(name, conv)
+                if verdict != "SATISFIED":
+                    row["verdicts"].append((path, line, verdict, message))
+            row["teeth"] = {
+                alt: sum(1 for _p, _l, n in names if check_convention(n, alt)[0] != "SATISFIED")
+                for alt in GRADED_CONVENTIONS if alt != conv
+            }
+        out[cell] = row
+    return out
+
+
 def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
     """THE MEASUREMENT HALF: one corpus walk, every refusal, and NO verdict.
 
@@ -402,9 +505,14 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
     verbs = conf.get("VERBS") or {}
     banned = tuple(t for t in (conf.get("BANNED_SUFFIXES") or "").split() if t)
 
+    # RESOLVED ONCE, HERE, and handed down. Every reader below asks the same question of the same
+    # mapping, which is what stops a language being armed for the extractor and unarmed for the
+    # coverage fraction — two answers to one question, in the two halves of one run.
+    sets = resolve_pattern_sets(conf)
+
     # THE ONE WALK, materialised because the population is read four times below — for the declared
     # surface, for the DEAD PROBE corpus test, for the coverage denominator and for the OK line.
-    scanned = list(scan_corpus(root, declared))
+    scanned = list(scan_corpus(root, declared, sets))
     files = [rel for rel, _e, _d, _p in scanned]
     scan_problems = [p for _r, _e, _d, p in scanned if p]
 
@@ -511,6 +619,16 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
                             + " and the corpus contains it, but the extractor found NO definitions. "
                               "An extractor that selects an empty population passes green forever.")
 
+    # S7 — THE OTHER ZERO POPULATION, and it is reported differently on purpose. DEAD PROBE's guard
+    # requires the corpus to CONTAIN the extension, which is correct — an empty population cannot
+    # prove an extractor inert — but it means a `LANGS` row arming a language this repo does not
+    # carry falls through SILENTLY and is indistinguishable from one that grades. A REPORT and not a
+    # refusal: declaring a language before the first file of it is written is a legal state, and one
+    # a scaffolded adopter passes through. What is not legal is nobody being able to tell.
+    present_exts = {e for _r, e, _d, _p in scanned}
+    inert = [f".{ext}={mode}" + (f" ({pset})" if pset else "")
+             for ext, (pset, mode) in sorted(declared.items()) if ext not in present_exts]
+
     # THE WAIVERS, THE STALE DETECTION AND THE PIN PARSE, and H1 of the closing review is why they
     # sit in the measurement rather than beside the verdict. They used to live BELOW the
     # `measure_mode` return, so `--measure` printed its pins and exited 0 over a tree carrying dead
@@ -567,12 +685,16 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
 
     return {
         "problems": problems,
+        "cells": measure_conventions(scanned, conf),
         "graded": graded,
         "offenders": offenders,
         "waivers": waived_by,
         "unwaived": unwaived_by,
         "pins": pins_by_kind,
         "declared": declared,
+        "sets": sets,
+        "patterns": conf.get("PATTERNS") or {},
+        "inert": inert,
         "files": files,
         "carriers": carriers,
         "self_mods": self_mods,
@@ -604,6 +726,12 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
 
         tally[kind] = (sum(v for (_e, k), v in graded.items() if k == kind),
                        len(unwaived), len(found) - len(unwaived))
+        # A TWO-SIDED EQUALITY, and the two directions call for opposite actions, which is why they
+        # print different things. A RISE is the ratchet everybody expects: name the offenders. A
+        # FALL used to be silent, and that silence is what let the pin sit eleven moves above a
+        # corpus that had already drained under it — a number nobody was obliged to re-measure is a
+        # number nobody re-measured. A fall now reds too, and prints the exact replacement row, so
+        # clearing it is a paste rather than an investigation.
         pin = measured["pins"][kind]
         if len(unwaived) > pin:
             exit_code = 1
@@ -612,6 +740,45 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
                 print(f"  {o}")
             if len(unwaived) > 40:
                 print(f"  … and {len(unwaived) - 40} more")
+        elif len(unwaived) < pin:
+            exit_code = 1
+            print(f"lexicon: {kind} offenders {len(unwaived)} UNDER pin {pin} — the pin is an "
+                  f"equality in both directions, so a drain lands in the declaration or it is not "
+                  f"landed. Paste this row into .lexicon.conf, naming what left:")
+            print(f'  {PIN_KEYS[kind]}="{len(unwaived)}"')
+
+    # --- the convention cells, one block per declared row -------------------------------------
+    #
+    # THE ROW IS PRINTED ON GREEN TOO, with its population and its teeth, for the same reason the
+    # `P1`/`P2` rows below are: a green row is a measurement or it is a mood. A cell reporting `0 of
+    # 976` beside `teeth camel=736` has been shown to bite; the same cell with no teeth clause is
+    # indistinguishable from one whose predicate never ran.
+    for cell, row in measured["cells"].items():
+        if not row["graded"]:
+            print(f"lexicon: {cell}.conv SKIPPED — this kit ships no extractor for the "
+                  f"`{cell.split('.')[1]}` surface, so the cell is declared and UNEXERCISED")
+            continue
+        if row["convention"] == "dark":
+            print(f"lexicon: {cell}.conv dark — declared unGRADED over "
+                  f"{row['population']} name(s), which is a refusal and not a skip")
+            continue
+        bad = row["verdicts"]
+        n_amb = sum(1 for _p, _l, v, _m in bad if v == "AMBIGUOUS")
+        teeth = " ".join(f"{a}={n}" for a, n in sorted(row["teeth"].items()))
+        print(f"lexicon: {cell}.conv {len(bad)} of {row['population']} against "
+              f"{row['convention']} — violation {len(bad) - n_amb}, ambiguous {n_amb}, "
+              f"teeth {teeth}")
+        for path, line, _v, message in bad[:40]:
+            print(f"  {path}:{line}: {message}")
+        if len(bad) > 40:
+            print(f"  … and {len(bad) - 40} more")
+        # THE SAME TWO-SIDED EQUALITY the pins above carry, and for the same reason: a `conv` pin
+        # that only ratchets upward lets a cell drain without anybody re-measuring it.
+        if len(bad) != row["pin"]:
+            exit_code = 1
+            print(f"lexicon: {cell}.conv {len(bad)} against declared pin {row['pin']} — the pin is "
+                  f"an equality in both directions. Paste this row into .lexicon.conf under PINS:")
+            print(f"  {cell}.conv  {len(bad)}")
 
     for p in problems:
         print(f"lexicon: {p}")
@@ -642,7 +809,7 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     # carry a definition, which is the number a `LANGS` edit moves and nothing else reported.
     carriers = measured["carriers"]
     armed_exts = {e for e, (ps, m) in declared.items()
-                  if m == "parser" or (m == "probe" and ps in PATTERN_SETS)}
+                  if m == "parser" or (m == "probe" and ps in measured["sets"])}
     armed_carriers = {f for f in carriers if ext_of(f) in armed_exts}
     pct = (100.0 * len(armed_carriers) / len(carriers)) if carriers else 0.0
     print(f"lexicon: coverage — armed {len(armed_carriers)} of {len(carriers)} "
@@ -651,6 +818,30 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     empty = [f".{e} {k}=0" for (e, k), v in sorted(graded.items()) if v == 0]
     if empty:
         print("lexicon: armed but grading nothing (reported, not a refusal): " + ", ".join(empty))
+
+    # S7 — the declaration that arms nothing because the corpus carries none of it. Reported, never
+    # a refusal; see the comment beside the measurement.
+    if measured["inert"]:
+        # THE TWO NAMES ARE KEPT APART IN THE TEXT AS WELL AS IN THE LOGIC. This line used to spell
+        # the sibling refusal to explain itself, which put that refusal's name in the output of a run
+        # where it had not fired — and the arm asserting the two are distinguishable read it and
+        # failed. A report that cannot be told from the thing it is not is the whole defect here.
+        print("lexicon: INERT DECLARATION (declared, but the corpus carries no file of that "
+              "extension, so nothing is graded and the empty-population refusal cannot judge it "
+              "either): " + ", ".join(measured["inert"]))
+
+    # S3 — the declared extractor rows, on every run, and the REPLACED keys named separately. A
+    # declared row that lands on a SHIPPED set silently retires the regex it replaces, and a set
+    # weakened rather than emptied grades a smaller population while reporting a clean run. Printing
+    # the two apart is what makes that a reading rather than an inference.
+    patterns = measured["patterns"]
+    if patterns:
+        print(f"lexicon: PATTERNS — {len(patterns)} declared extractor row(s): "
+              + " ".join(patterns))
+        over = [k for k in patterns if k.split(".")[0] in PATTERN_SETS]
+        if over:
+            print("lexicon: PATTERNS REPLACES a SHIPPED extractor key, so the shipped regex for it "
+                  "no longer runs: " + " ".join(over))
 
     if exit_code == 0:
         modes = ", ".join(f".{e}={m}" for e, (_, m) in sorted(declared.items()))

@@ -1,11 +1,12 @@
 # TOOL-aSurfacedLexicon-5 — the convention predicate
 
-**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
+**Status:** CLOSED · rev-6 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aSurfacedLexicon-4-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-4-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-9 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-6 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-6 |
 
@@ -17,7 +18,7 @@ Build the naming-convention predicate the kit's README has promised since adopti
 a classifier that answers which case conventions an identifier satisfies, and a verdict that reds when
 the convention its cell declares is not among them. Verified at writing time, no case-style predicate
 exists anywhere in `tools/lexicon/` — the only case-aware code is `run_suggest`'s re-caser at
-`tools/lexicon/lexicon.py:837-838`, which re-cases an answer rather than grading a name.
+`run_suggest` in `tools/lexicon/lexicon.py`, which re-cases an answer rather than grading a name.
 
 ## 2. Scope (IN)
 
@@ -37,8 +38,8 @@ exists anywhere in `tools/lexicon/` — the only case-aware code is `run_suggest
 - **S5** — the AMBIGUOUS verdict. A name whose set is empty REDS, with a message distinct from
   `VIOLATION`, per the owner's Q7 ruling as extended by F1: the empty core reds under the same
   message rather than being skipped. The NON-EMPTY-core half ships exercised only by a staged
-  fixture, because its measured in-corpus population is zero — 0 of the 1017 Python definitions at
-  base `6c670b02`. The EMPTY-core half has a live in-corpus population of NINE, the tracked files
+  fixture, because its measured in-corpus population is zero — 0 of the 1021 Python definitions in
+  the working tree at base `6c670b02`, by §6's **CMD-1**. The EMPTY-core half has a live in-corpus population of NINE, the tracked files
   whose basename begins with a dot, listed under `### The empty-core population` in §4.
 - **S6** — file cells grade the basename up to its FIRST dot. `map_extractors.template.py` grades on
   `map_extractors`; `check-arms.test.sh` grades on `check-arms`.
@@ -118,11 +119,14 @@ the population is named, which is worth stating because the three figures look l
 | py functions + py types + js functions, 1086 names | 255 | research record, its `m1.py` |
 | py functions + py types + js functions seen by two regexes, 1064 names | 245 | prototype record |
 | py functions + py types only, 964 names at `d0a18683` | 235 | re-measured for this spec at rev-1 |
-| the same population at `6c670b02`, 1017 names | NOT re-measured | see the note below |
+| the same population in the working tree at `6c670b02`, 1021 names | NOT re-measured | see the note below |
 
-The Python population MOVED between rev-1's base and this revision's: 976 `py.function` plus 41
-`py.type` is 1017 definitions over 49 tracked files at `6c670b02`, against 925 plus 39 over 47 files
-at `d0a18683`. Counts from the same reconstruction rev-1 used — the kit's Python-AST definition
+The Python population MOVED between rev-1's base and this revision's, and then moved AGAIN: 980
+`py.function` plus 41 `py.type` is 1021 definitions over 49 tracked files in the working tree at
+`6c670b02`, against 976 plus 41 at that sha COMMITTED, and 925 plus 39 over 47 files at `d0a18683`.
+The four-definition gap between the last two is this build's own three uncommitted units, which is
+why a figure dated to a committed sha was the wrong figure for a criterion evaluated in the tree.
+Counts from §6's **CMD-1**, the same reconstruction rev-1 used — the kit's Python-AST definition
 extraction over `git ls-files "*.py"` — which rev-1 validated independently by reproducing AC6's
 camel figure byte for byte. The multi-convention count was not re-run at the new base, so 235 of 964
 is left standing as a rev-1 figure and is NOT restated as current. The argument does not turn on the
@@ -151,8 +155,11 @@ for having a compound extension.
 tracked scripts plus 3 frozen dated build-repro scripts = 49", arithmetic that closed exactly. At
 this base the two numbers are 49 tracked `*.test.sh` scripts and 53 last-dot `sh.file` violations, a
 remainder of 4 whose composition this run did not enumerate. The remainder is therefore UNVERIFIED.
-What the rule turns on survives the collapse untouched: every one of the 49 test scripts is a
-last-dot violation and a first-dot pass, which is a ten-fold swing on its own.
+What the rule turns on survives both the collapse and AC7's struck universal: all 49 test scripts are
+last-dot violations, and 48 of the 49 are first-dot passes — `tools/run-gates/profile_bar.test.sh`
+stems to `profile_bar` and is a genuine kebab violation either way. A 49-to-1 swing rather than a
+49-to-0 one, which is the same argument with one fewer decimal place. Measured by §6's **CMD-2** and,
+for the last-dot half, by the same command with `read_stem` replaced by `rsplit('.', 1)[0]`.
 
 One figure pair in this section is UNVERIFIABLE and is marked so rather than repeated. Rev-1 wrote
 "the 213 files in the armed file cells: first-dot and last-dot stems classify differently on 65 of
@@ -303,7 +310,7 @@ a floor for the classifier alone and says nothing about the walk or the report.
   case-aware predicate in the tree and it answers a different question: it groups PowerShell
   identifiers by their lowercased form to find names that collide under case-insensitive comparison.
   It classifies nothing and has no notion of a convention.
-- **Reusing `run_suggest`'s re-caser at `lexicon.py:837-838`.** It makes a replacement token inherit
+- **Reusing `run_suggest`'s re-caser in `lexicon.py`.** It makes a replacement token inherit
   the case of the token it replaces. It reads a name's case in order to copy it, never to grade it,
   and it has no vocabulary of named conventions to grade against.
 
@@ -311,8 +318,8 @@ a floor for the classifier alone and says nothing about the walk or the report.
 
 - security — N/A. Pure functions over identifier strings already read from tracked files.
 - perf / scale — six anchored regex matches per graded name. The measured graded population at base
-  `6c670b02` is 1017 Python definitions, 976 `py.function` plus 41 `py.type`, over the 49 files
-  `git ls-files "*.py" | wc -l` reports, plus the basenames of the armed file cells. The cost is
+  `6c670b02` is 1021 Python definitions, 980 `py.function` plus 41 `py.type` by §6's **CMD-1**, over
+  the 49 files `git ls-files "*.py" | wc -l` reports, plus the basenames of the armed file cells. The cost is
   bounded by the corpus walk that already runs, not by the classifier. The `lexicon naming
   predicates` ceiling of 300 s is not at risk.
 - a11y — N/A. No user interface.
@@ -367,6 +374,23 @@ criteria to grade. Rev-2 phrased seven of them against the tracked declaration, 
 seven — including both observed-RED obligations — could be observed at all. The corpus is unchanged
 either way, so every denominator below is still the real tracked tree's.
 
+**THE BASE, AND THE TWO COMMANDS THAT PRODUCE EVERY FIGURE BELOW.** The base is the WORKING TREE at
+`6c670b02` with `TOOL-aSurfacedLexicon-4`, `-5` and `-9` present and uncommitted, which is the tree
+these criteria are graded against — and the reason the earlier denominators moved at all is that
+those three units add definitions to the corpus they are measured over. Naming a committed sha alone
+was the defect: it dated a figure to a tree the criterion is never evaluated in. Both commands import
+the SHIPPED classifier rather than restating its regexes, so what they count is what a `CELLS` row
+grading the same cell would print.
+
+- **CMD-1**, the Python populations and their verdicts, printing `functions classes total snake-bad
+  pascal-bad camel-bad`:
+  `python -c "import ast,subprocess,sys; sys.path.insert(0,'tools/lexicon'); from subtokens import check_convention as k; G=lambda t: [n.name for f in subprocess.run(['git','ls-files','*.py'],capture_output=True,text=True).stdout.split() for n in ast.walk(ast.parse(open(f,encoding='utf-8').read())) if isinstance(n,t)]; F=G((ast.FunctionDef,ast.AsyncFunctionDef)); C=G(ast.ClassDef); print(len(F),len(C),len(F)+len(C),sum(1 for n in F if k(n,'snake')[0]!='SATISFIED'),sum(1 for n in C if k(n,'pascal')[0]!='SATISFIED'),sum(1 for n in F if k(n,'camel')[0]!='SATISFIED'))"`
+  → `980 41 1021 0 0 739`
+- **CMD-2**, the `*.test.sh` first-dot kebab population, printing `tracked passing` then each failing
+  path:
+  `python -c "import subprocess,sys,os; sys.path.insert(0,'tools/lexicon'); from subtokens import check_convention as k, read_stem as s; T=subprocess.run(['git','ls-files','*.test.sh'],capture_output=True,text=True).stdout.split(); B=[f for f in T if k(s(os.path.basename(f)),'kebab')[0]!='SATISFIED']; print(len(T),len(T)-len(B),*B)"`
+  → `49 48 tools/run-gates/profile_bar.test.sh`
+
 - **AC1** — With a scratch declaration arming `py.function snake` and `def loadUserData` staged into
   a tracked `.py` file, `python tools/lexicon/lexicon.py --check` REDS `py.function` with the message
   `VIOLATION  loadUserData  satisfies camel, not snake`; unstaging the definition returns the run to
@@ -377,12 +401,13 @@ either way, so every denominator below is still the real tracked tree's.
   tracked `.py` file, `--check` REDS `py.type` with `VIOLATION  user_record  satisfies snake, not
   pascal`; unstaging returns to that declaration's baseline.
 - **AC3** — With a scratch declaration arming `py.function snake` and `py.type pascal` and nothing
-  staged, `python tools/lexicon/lexicon.py --check` reports `py.function` at 0 violations of 976 and
+  staged, `python tools/lexicon/lexicon.py --check` reports `py.function` at 0 violations of 980 and
   `py.type` at 0 of 41, and `__init__` and `_build_index` are among the passing names rather than the
-  offenders. Re-measured at `693bcf96` by an `ast` walk over the 49 files `git ls-files "*.py"`
-  returns, stripping affixes with S2's `_AFFIX` before matching: 976 function definitions, 41
-  classes, 0 snake violations. Rev-1's denominators, 925 and 39, are stale and were corrected at
-  rev-2; the zero itself has never moved.
+  offenders. Re-measured by **CMD-1**: 980 function definitions, 41 classes, 0 snake violations over the
+  49 files `git ls-files "*.py"` returns. Rev-1's denominators, 925 and 39, are stale; rev-2's
+  correction to 976 is stale in turn, because this unit's own three-unit working tree adds four
+  function definitions to the population the criterion is graded over. The zero itself has never
+  moved through any of it, which is the point: the denominator is what this spec kept getting wrong.
 - **AC4** — With a scratch declaration arming `py.file snake` and `sh.file kebab` and nothing staged,
   the same command reports `py.file.conv 8` naming exactly `aiosqlite-seam-conftest.py`,
   `check-arms.py`, `check-kit-placeholders.py`, `check-recall.py`, `check-spec-tokens.py`,
@@ -394,31 +419,40 @@ either way, so every denominator below is still the real tracked tree's.
   is scratch.
 - **AC5** — With a scratch declaration arming `py.function snake` and `def FAMILY_of` staged — an
   identifier whose core is non-empty and whose convention set is empty — `--check` REDS with a
-  message naming AMBIGUOUS and NOT the word VIOLATION. Re-measured at `693bcf96`, 0 of the 1017
-  Python definitions return a non-empty core with an empty set, so THIS arm has no in-corpus
+  message naming AMBIGUOUS and NOT the word VIOLATION. Re-measured by **CMD-1**, whose `total` is 1021:
+  0 of those 1021 Python definitions return a non-empty core with an empty set, so THIS arm has no in-corpus
   population and its only exercise is the staged fixture; every report of a green run states that.
   **That statement is scoped to the non-empty core and no further.** The empty-core arm is AC10 and
   its in-corpus population is nine, not zero.
 - **AC6** — the teeth arm, and at rev-3 it observes the SHIPPED line rather than the figure behind
   it. With a scratch declaration arming `py.function snake` and nothing staged, `--check` reports
-  that cell at 0 violations of 976 AND prints S8's teeth line beside the row, and that line reports
-  736 for `camel` over the same 976. A second arm in `tools/lexicon/selftest.py` REDS when an armed
-  cell's row carries a violation count with no teeth figure beside it. Re-measured at `693bcf96` by
-  the same `ast` walk as AC3, matching the camel form against the affix-stripped core: 736 of 976.
-  Rev-1's `691 of 925` is stale. **Rev-2's version asserted only the 736, from a one-off
+  that cell at 0 violations of 980 AND prints S8's teeth line beside the row, and that line reports
+  739 for `camel` over the same 980. A second arm in `tools/lexicon/selftest.py` REDS when an armed
+  cell's row carries a violation count with no teeth figure beside it. Re-measured by **CMD-1**, whose
+  last field is the camel form matched against the affix-stripped core: 739 of 980.
+  Rev-1's `691 of 925` and rev-3's `736 of 976` are both stale. **Rev-2's version asserted only the teeth figure, from a one-off
   re-declaration of `py.function` as `camel`** — a hand-run experiment producing the number the teeth
   line would print, which an implementation shipping no teeth line at all satisfied. That left S8 as
   the only scope item in this spec with no criterion, which is H3 of the round-1 audit; folding the
   observation into this criterion closes it here rather than adding an eleventh arm for a line AC6
-  was already about. This is also what makes AC3's 0-of-976 a measurement rather than an assertion
+  was already about. This is also what makes AC3's 0-of-980 a measurement rather than an assertion
   about nothing.
-- **AC7** — With a scratch declaration arming `sh.file kebab` and nothing staged, all 49 files matched
-  by `git ls-files "*.test.sh"` pass, and the same declaration built on last-dot stems instead
-  reports `sh.file.conv 53`. Re-measured at `693bcf96`; rev-1's `46` and `49` are stale. Rev-1 also
-  reconciled the two numbers as "46 tracked scripts plus 3 frozen dated build-repro scripts = 49"; at
-  49 and 53 that arithmetic no longer closes and it is RESTATED rather than patched — the remainder
-  of 4 is UNVERIFIED and this criterion does not claim to account for it. What the criterion actually
-  gates is the pair: every test script passes first-dot and fails last-dot.
+- **AC7** — With a scratch declaration arming `sh.file kebab` and nothing staged, 48 of the 49 files
+  matched by `git ls-files "*.test.sh"` pass, the ONE exception being
+  `tools/run-gates/profile_bar.test.sh`, and the same declaration built on last-dot stems instead
+  reports `sh.file.conv 53`. Re-measured by §6's **CMD-2**; rev-1's `46` and `49` are stale, and so is
+  every earlier revision's "all 49 pass".
+  **THE UNIVERSAL CLAIM WAS FALSE AND IS STRUCK, not softened.** `profile_bar.test.sh` stems to
+  `profile_bar`, which satisfies snake and not kebab, so the classifier reds it — correctly, and by
+  the rule S6 states. It was false at every base this spec has carried, because the file is older than
+  rev-1 and this spec's own AC4 has listed it among the five `sh.file` first-dot violations since
+  rev-2. Two criteria in one document contradicted each other for four revisions and neither was
+  re-derived; a universal quantifier nobody enumerated is exactly the shape that survives that long.
+  Rev-1 also reconciled the two numbers as "46 tracked scripts plus 3 frozen dated build-repro
+  scripts = 49"; at 49 and 53 that arithmetic no longer closes and it is RESTATED rather than
+  patched — the remainder of 4 is UNVERIFIED and this criterion does not claim to account for it.
+  What the criterion actually gates is the SWING, which survives the correction with room to spare:
+  48 of 49 pass first-dot and 49 of 49 fail last-dot.
 - **AC8** — When `classify` is asked about `run`, it returns a set containing at least `snake`,
   `camel` and `kebab`; when asked about `_build_index` it returns a set containing `snake`. Both are
   selftest arms on the function directly, so the set contract is gated at the seam and not only
@@ -526,8 +560,8 @@ pure-underscore names and on the empty string and diverge everywhere else: `变�
 bought.
 
 **And the population is not zero.** Rev-1 measured 0 of the Python definitions with an empty core and
-0 with a non-empty core and an empty set, and that half re-measures unchanged at base `6c670b02`: 0
-and 0 of 1017. But S6 puts filenames in this unit's scope, and nine tracked files have a dot-leading
+0 with a non-empty core and an empty set, and that half re-measures unchanged in the working tree at
+base `6c670b02` by §6's **CMD-1**: 0 and 0 of 1021. But S6 puts filenames in this unit's scope, and nine tracked files have a dot-leading
 basename whose first-dot stem is the empty string. They are enumerated with their command under
 `### The empty-core population`. So the fork has a live in-corpus population of NINE, and rev-1's
 "any arm built for it is synthetic" applies to the Python half only.
@@ -579,9 +613,9 @@ beginning with a dot, so every one stems to the EMPTY STRING: `.codebase-map.con
 `.gitignore`, `.lexicon.conf`, `.memory-tree.conf`, `.unattended.conf`, and the three `*.conf.example`
 files under `tools/`. All four extensions are already declared in LANGS. "The population is zero" is
 true of the Python DEFINITIONS and false of the filename half of this unit's own scope. That
-denominator is `1017` at the run's base `6c670b02` (976 function + 41 type, by an `ast` walk over
-the 49 files `git ls-files "*.py"` returns) and was `964` at `d0a18683`, where this mark was
-drafted; the count of empty cores is 0 at both, so only the denominator moved.
+denominator is `1021` in the working tree at the run's base `6c670b02` (980 function + 41 type, by
+§6's **CMD-1** over the 49 files `git ls-files "*.py"` returns) and was `964` at `d0a18683`, where
+this mark was drafted; the count of empty cores is 0 at both, so only the denominator moved.
 
 That population decides it. Under ungradeable, arming any of those cells silently skips nine files
 while the per-cell coverage report shows the cell clean — the green-by-absence class and the
@@ -660,6 +694,22 @@ lands ungated, which is a gate nobody has ever seen fail.
   `TOOL-aSurfacedLexicon-12` as the order-7 conf rewrite. Both specs agree on which unit arms the
   first cell and when. No figure moved, so nothing was re-measured.
 - rev-5 · 2026-09-05 · cross-spec rev pin dropped; the fact it carried is unchanged and re-verified.
+- rev-6 · 2026-09-05 · closing-review defect D4, the stale denominators, FIXED rather than annotated —
+  rev-3 and rev-4 both noticed figures had moved and neither re-ran them. §6 gains **CMD-1** and
+  **CMD-2**, the two runnable commands every figure in this spec now cites, both importing the
+  shipped classifier rather than restating its regexes; every corrected number in this revision is
+  their stdout. The base is restated as the WORKING TREE at `6c670b02` with units 4, 5 and 9 present:
+  a figure dated to a committed sha was the wrong figure for a criterion the build evaluates in the
+  tree, and the three uncommitted units are themselves what moved the population. AC3's denominator
+  976 → 980, AC5's 1017 → 1021, AC6's teeth `736 of 976` → `739 of 980`, and the same two
+  denominators corrected in §2's S5, §4's multi-convention table and its note, §5's perf bullet and
+  §8's empty-core mark. **AC7's universal claim is STRUCK as false, not softened**: 48 of the 49
+  tracked `*.test.sh` pass first-dot kebab, and `tools/run-gates/profile_bar.test.sh` does not — it
+  stems to `profile_bar`, which satisfies snake. It was false at every base this spec has carried,
+  and this spec's own AC4 has listed that basename among the five first-dot `sh.file` violations
+  since rev-2, so two criteria contradicted each other for four revisions. §4's first-dot subsection
+  restated to the 49-to-1 swing it actually measures. The last-dot half re-measured and unchanged at
+  53 of 94 and 49 of 49.
 
 ## 10. Reuse audit
 
@@ -670,7 +720,7 @@ camel pascal kebab conventions it satisfies"` returns `case_collisions` in
 one of them is at fan-in 0 or 1, so the lookup surfaced NO seam at its own threshold of 3.
 **No existing seam fits, and the evidence is a direct source check as well as the lookup:**
 `grep -inE "snake|camel|pascal|kebab|screaming" tools/lexicon/*.py` returns only `run_suggest`'s
-re-caser at `lexicon.py:837-838` and selftest fixtures, so the kit contains no convention predicate
+re-caser inside `run_suggest` and selftest fixtures, so the kit contains no convention predicate
 to extend. The two nearest candidates are rejected by name in `§4 Alternatives rejected` —
 `case_collisions` groups identifiers by their lowercased form to find case-insensitive collisions and
 classifies nothing, and `check-arms.classify` sorts gate arms. What this unit EXTENDS rather than

@@ -1,5 +1,6 @@
 # lexicon verb waivers — deliberate exceptions to predicate P1.
-# One MATCHED TEXT per row, reason after whitespace. SHRINK-ONLY: the count may fall, never rise.
+# One MATCHED TEXT per row, reason after whitespace. The pin is a TWO-SIDED EQUALITY: a count that
+# falls reds exactly as one that rises does, so a drain lands in the declaration or it is not landed.
 #
 # Keyed on the matched TEXT, not on <path>:<line>. install-prefix-waivers.txt keys on position, and
 # any edit ABOVE a waived line unpins it — that reds a merge which touched nothing the waiver

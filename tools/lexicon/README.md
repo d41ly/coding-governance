@@ -23,6 +23,85 @@ choice, not because nobody could tell whether it works.
 | **P1** | every function or method DEFINED in the corpus leads with a verb from the declared `VERBS` table | definition sites |
 | **P2** | no type DEFINED in the corpus ends with a declared `BANNED_SUFFIXES` entry | definition sites only — never an imported type, a parameter name, or a parameter type |
 
+## The declaration grammar
+
+`.lexicon.conf` is the sibling `KEY=VALUE` form plus BLOCK keys — a `KEY:` header followed by indented
+rows, ending at the first non-indented line. Blank lines inside a block are skipped rather than
+terminating it. Three block keys are declared, and a header outside that set is a refusal by name,
+not a silent skip.
+
+| Block | Row | Means |
+|---|---|---|
+| `VERBS` | `<verb>  <gloss>` | the closed verb table P1 grades against; the gloss carries the NOT clause |
+| `CELLS` | `<ext>.<surface>  <convention> [vocab] [notail]` | which case convention this (language, surface) cell asks for |
+| `PINS` | `<ext>.<surface>.<predicate>  <count>` | the declared offender count for one cell and one predicate |
+
+`surface` is one of `function` `type` `file` `constant`; `convention` is one of `snake` `screaming`
+`camel` `pascal` `kebab` `dark`; `predicate` is one of `debt` `unruled` `suffix` `conv`. A token
+outside its closed set names the file and the line. `dot` is deliberately NOT a declarable
+convention: it is a classifier form the report uses so a dotted name is reported as satisfying
+something, and no language convention is "identifiers contain dots".
+
+Two refusals are CROSS-BLOCK and run after the whole file is parsed, because `LANGS` may be declared
+below `CELLS` and a reader that refuses on line order refuses a legal file. A `CELLS` row naming an
+extension `LANGS` does not declare reds, and a `PINS` row naming a cell with no `CELLS` row reds.
+
+**Pin rows are BLANK-SEPARATED, and the reader refuses a dense pair.** That whitespace is a merge
+property rather than a formatting preference: two branches each draining a neighbouring cell conflict
+when the rows are adjacent, and neighbouring cells are the likeliest concurrent pair because related
+cells sit together. One blank line gives git the context line that makes those merges clean. A
+comment line between two rows satisfies the rule too.
+
+**Every pin is a TWO-SIDED equality.** A count that falls reds exactly as one that rises does. The
+rise names the new offenders; the fall prints the exact replacement row to paste, because the two
+directions call for opposite actions. A one-sided ratchet lets a pin sit above a corpus that already
+drained under it, which is a number nobody is obliged to re-measure and therefore a number nobody
+re-measures.
+
+## The convention predicate
+
+A `CELLS` row arms it. For every name in that cell's population the classifier strips leading and
+trailing underscores — they are privacy markers, not case — and reports the SET of forms the
+remaining core satisfies. Three verdicts and no fourth:
+
+| Verdict | When | Reds |
+|---|---|---|
+| `SATISFIED` | the declared convention is IN the set | no |
+| `VIOLATION` | the set is non-empty and the declared convention is not in it | yes, naming what the name DOES satisfy |
+| `AMBIGUOUS` | the set is EMPTY, whether or not the core is | yes, under a message distinct from `VIOLATION` |
+
+**The set is the design, not a defensive shape.** `run` satisfies `snake`, `camel`, `kebab` and
+`dot` at once, and hundreds of this repo's Python definitions satisfy two or more forms, so a
+single-label classifier reports a violation for every one of them the moment the declared cell is
+not the label it happened to pick. A VIOLATION is therefore "the convention is not IN the set", never
+"it is not the set's first member".
+
+**The classifier is `subtokens()`'s sibling, not its consumer.** That splitter LOWERCASES, so
+`BuildIndex` and `build_index` are indistinguishable after it and no case question survives it. The
+convention check reads the RAW name. The two also disagree about what "no word characters" means and
+the divergence is deliberate: `leading_verb` calls such a name UNGRADEABLE, the convention check reds
+it as AMBIGUOUS. A name that is nothing but underscores is a legal Python definition and skipping it
+would be a skip wearing a pass's clothes.
+
+**A `file` cell grades the basename up to its FIRST dot.** `map_extractors.template.py` grades on
+`map_extractors` and `check-arms.test.sh` on `check-arms`. Last-dot stemming would keep the interior
+dot and red every compound extension in a tree on day one — measured here, 5 violations become 53,
+and 49 of the arrivals are this repo's own shell test scripts. The consequence to know before arming
+one: a DOT-LEADING basename stems to the empty string and reds AMBIGUOUS, so `.gitignore` is
+correctly named by every convention anyone would declare and would still red. That is the classifier
+saying it was handed nothing to grade, and the answer at arming time is a dotfile stem rule or an
+explicit `dark` declaration — not a silent skip.
+
+**Every armed cell also prints TEETH**: how many of the SAME names each other convention would have
+failed. A cell reporting zero violations and nothing else is indistinguishable from a cell whose
+predicate never ran, and the teeth are what tell the two apart on a green run.
+
+`constant` is a declarable surface with no extractor in this kit yet, so a `constant` cell prints
+`SKIPPED … UNEXERCISED` rather than a clean zero. `screaming` and `pascal` are declarable;
+`dot` is a classifier form only. Shell and markdown are dark in this repo's own `LANGS`, so no cell
+over them can be armed at all — a `sh.file` cell is legal because `sh` is DECLARED dark, while
+`sh.function` would grade an empty population, which is why the row prints its denominator.
+
 ## ...and the refusal that is not a predicate
 
 Every `--check` and `--measure` run also asserts that the kit is SELF-CONTAINED: every non-relative
@@ -60,6 +139,43 @@ undeclared one is a named refusal.
 `dark` is the honest cheap declaration, not a cop-out: most extensions in a tree carry no
 definitions at all, and declaring them dark is what makes the undeclared-extension refusal
 meaningful rather than noisy.
+
+### Arming a language this kit does not ship
+
+`probe` needs a pattern set, and the kit ships exactly one — `js-regex`. Before this, a TypeScript,
+Go, Rust or C# adopter could only declare their language `dark`, so the whole vocabulary-and-
+convention apparatus graded nothing; the alternative was editing `PATTERN_SETS` inside
+`lexicon.py`, which is an `engine`-role file the next `apply` overwrites.
+
+Declare the extractor instead. A `PATTERNS:` block holds one row per
+`<pattern-set-id>.<functions|types|imports>`, and the rest of the row is one Python regex, taken
+verbatim to end of line and compiled with `re.M` exactly as the shipped sets are:
+
+    LANGS="... ts:ts-regex:probe"
+
+    PATTERNS:
+      ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)
+      ts-regex.types      ^\s*(?:export\s+)?(?:interface|class)\s+([A-Za-z_$][\w$]*)
+
+EXACTLY ONE CAPTURING GROUP per row, and it captures the NAME. Zero groups, two groups, a regex that
+does not compile, or a repeated row key is a refusal naming the file and the line — never a dropped
+row. The kit reads group 1 and nothing else, so a zero-group row would raise mid-walk with no line
+number and a two-group row would confidently grade the wrong half of every name it matched.
+
+Rows merge over the shipped sets PER KEY. A `js-regex.types` row replaces that one list and leaves
+`functions` and `imports` standing, which is what lets an adopter FIX a shipped regex without
+disarming the rest of the set; a row naming an unshipped id builds a new set whose unnamed parts are
+empty. Nothing mutates the shipped constant, and every run prints which shipped keys a declaration
+replaced, so a set weakened rather than emptied is read rather than inferred.
+
+THE BOUNDARY. This buys grading, never a lexer. A declared set is a `probe` on exactly the terms the
+table above states — incomplete by construction, reported as such every run — and the law at the top
+of this section still binds: if a regex over a language would look like coverage while silently
+skipping what it forgot, `dark` is the honest declaration. Two vacuity arms watch a declared set: an
+extension whose declared extractor finds nothing across a corpus that CONTAINS it is `DEAD PROBE`,
+and an extension declared in `LANGS` that the corpus carries no file of at all is reported
+`INERT DECLARATION` — a different state, reported differently, because a declaration arming a
+language the repo does not have was previously skipped in silence.
 
 ## What every run reports, and what a zero there means
 

@@ -107,7 +107,23 @@ def main(argv: list[str]) -> int:
     # SWALLOWING an extraction failure, so an unparseable file was invisible here while `run()`
     # refused the same file by name. `scan_corpus` owns that decision now and reports it; nothing
     # below is allowed to drop it on the floor.
-    scanned = list(lex.scan_corpus(root, KNOWN))
+    # RE-SCAFFOLDING A REPO THAT ALREADY DECLARES ONE. The seed below is proposed from `KNOWN_EXTS`
+    # either way — this script chooses no regexes on an owner's behalf — but the pins it MEASURES
+    # have to be measured over what the existing declaration actually arms, or a repo that armed
+    # TypeScript through a `PATTERNS:` row gets pins derived over a corpus with its TypeScript
+    # silently missing. Absent conf is the first-adoption case and is byte-for-byte the old walk.
+    declared, sets = dict(KNOWN), None
+    conf_path = root / lex.CONF_NAME
+    if conf_path.is_file():
+        try:
+            conf = lex.load_conf(conf_path)
+        except lex.ConfError as exc:
+            sys.stderr.write(f"scaffold: the existing {lex.CONF_NAME} does not parse ({exc}); "
+                             f"measuring against the shipped extractors alone\n")
+        else:
+            declared.update({e: (ps, m) for e, ps, m in lex.langs(conf)})
+            sets = lex.resolve_pattern_sets(conf)
+    scanned = list(lex.scan_corpus(root, declared, sets))
     files = [rel for rel, _e, _d, _p in scanned]
     refused = [p for _r, _e, _d, p in scanned if p]
     for _p in refused:
@@ -163,7 +179,9 @@ def main(argv: list[str]) -> int:
     body.append("# a corpus with one `Manager` type scaffolded green and redded on its first gate run,")
     body.append("# against a pin the tool itself had written (TOOL-dScaffoldedMirror-1).")
     body.append("# Re-measure after curating: python tools/lexicon/lexicon.py --measure")
-    body.append("# Shrink-only thereafter: the count may fall, never rise.")
+    body.append("# The pin is a TWO-SIDED equality thereafter: a count that RISES reds, and a count")
+    body.append("# that FALLS reds too, printing the row to paste. A drain lands in the declaration")
+    body.append("# or it is not landed -- an unrecorded drain leaves a pin nothing can ever meet.")
     body.append(f'VERB_OFFENDER_PIN="{verb_offenders}"')
     body.append(f'SUFFIX_OFFENDER_PIN="{suffix_offenders}"')
     body.append("")

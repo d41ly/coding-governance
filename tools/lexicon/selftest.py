@@ -382,6 +382,51 @@ with build_tempdir() as td:
         check(f"scaffold: no file named {flag} is left behind",
               not (root / flag).exists(), f"{flag} exists in {root}")
 
+# ---- RE-SCAFFOLDING MEASURES OVER THE EXISTING DECLARATION, and this arm is the gate for it -------
+#
+# NOTHING EXERCISED IT. Reverting `scan_corpus(root, declared, sets)` in `scaffold_lexicon.py` to the
+# shipped `scan_corpus(root, KNOWN)` left every arm in this file green, so a mechanism the unit
+# reports as satisfied was carried by no check at all. The failure it prevents: a repo that armed a
+# language through a `PATTERNS:` row gets re-scaffolded, that language is silently outside the walk,
+# and every pin the scaffolder MEASURES is derived over a corpus with it missing — a number the tool
+# itself wrote, against a population the tool itself could not see.
+#
+# The `.ts` file carries the ONLY definition of a verb the `.py` corpus never spells, so the seeded
+# table holds it exactly when the declaration was read. Both revert flavours red here: dropping
+# `declared` leaves `.ts` unarmed, and dropping `sets` alone makes `scan_corpus` refuse `ts-regex` as
+# an unshipped set one line earlier, which is why the NOT EXTRACTED assertion rides along.
+with build_tempdir() as td:
+    root = Path(td)
+    shutil.copytree(KIT, root / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (root / "src").mkdir()
+    (root / "src" / "a.py").write_text("def build_x():\n    pass\n", encoding="utf-8", newline="\n")
+    (root / "web").mkdir()
+    (root / "web" / "widget.ts").write_text("export function loadWidget() {}\n",
+                                            encoding="utf-8", newline="\n")
+    (root / ".lexicon.conf").write_text(
+        'BANNED_SUFFIXES="Manager"\n'
+        'LANGS="py:python-ast:parser ts:ts-regex:probe conf::dark"\n'
+        'VERB_OFFENDER_PIN="0"\nSUFFIX_OFFENDER_PIN="0"\n'
+        'ratified="2026-09-04 node a"\n\n'
+        'VERBS:\n  build   create a new value and return it — NOT `create`\n\n'
+        'PATTERNS:\n'
+        r'  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)' '\n',
+        encoding="utf-8", newline="\n")
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "--", "src/a.py", "web/widget.ts", ".lexicon.conf"],
+                   cwd=root, check=True, capture_output=True)
+    r = subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", str(root / "seed.conf")],
+                       cwd=root, capture_output=True, text=True)
+    check("re-scaffold: exits 0 over an existing declaration", r.returncode == 0, r.stdout + r.stderr)
+    check("re-scaffold: the PATTERNS-armed language is not refused as unextractable",
+          "NOT EXTRACTED" not in (r.stdout + r.stderr), r.stdout + r.stderr)
+    _seeded = load_conf(root / "seed.conf")["VERBS"]
+    check("re-scaffold: a verb defined ONLY in the PATTERNS-armed language reaches the seed",
+          "load" in _seeded, f"seeded={sorted(_seeded)} stderr={r.stderr!r}")
+    check("re-scaffold: ...and the Python half is still seeded beside it",
+          "build" in _seeded, f"seeded={sorted(_seeded)}")
+
 # ---- verdict ------------------------------------------------------------------------------------
 # ---- TOOL-dScaffoldedMirror-2: per-predicate populations, counts on green, an honest --measure ----
 #
@@ -884,6 +929,522 @@ with tempfile.TemporaryDirectory(dir=str(KIT.parent.parent)) as _td:
           _r.returncode != 0, f"exit={_r.returncode} {(_r.stdout + _r.stderr)[:200]}")
     check("...and says which file it could not read it from",
           "KIT_LEXICON_VERSION" in (_r.stdout + _r.stderr), (_r.stdout + _r.stderr)[:200])
+
+
+# ---- TOOL-aSurfacedLexicon-4: the CELLS and PINS declaration grammar -----------------------------
+#
+# EVERY REFUSAL BELOW IS GATED AS A CLASS, over a table of row shapes, rather than on the one row
+# that happened to be typed first. The reds are run through `load_conf` in-process because that is
+# where the refusals live -- S5 and S10 put them at the tail of the READER, not in a verdict path,
+# so all four consumers of this module inherit them and a conf-only commit reaches them on a leg
+# with no guard. The two arms that go end to end through the engine are the ones whose criteria are
+# written against `lexicon.py --check`.
+import lexicon_conf as _lc  # noqa: E402
+
+_CELLS_HEAD = BASE_CONF + "\nCELLS:\n"
+
+# The GENERIC splitter, asserted directly: `<row-key> <rest>` on the first run of whitespace, with
+# no alphabetic test. That missing test is the whole reason `py.function` can be written down now,
+# and it is what a later PATTERNS or CANON block rides.
+_rows = _lc._parse_rows([(5, "a.b  x y"), (7, "c")], Path("x"))
+check("_parse_rows keeps a DOTTED row key and carries the line number",
+      _rows == {"a.b": (5, "x y"), "c": (7, "")}, repr(_rows))
+
+with build_tempdir() as _td:
+    _cp = Path(_td) / "c.conf"
+
+    # AC1 — the CELLS row parses, and `--print-rows CELLS` emits it.
+    _cp.write_text(_CELLS_HEAD + "  py.function  snake vocab\n", encoding="utf-8", newline="\n")
+    _c = _lc.load_conf(_cp)
+    check("AC1: a CELLS row parses to (convention, flags)",
+          _c["CELLS"] == {"py.function": ("snake", frozenset({"vocab"}))}, repr(_c.get("CELLS")))
+    _r = subprocess.run([sys.executable, str(KIT / "lexicon_conf.py"), "--print-rows", "CELLS",
+                         str(_cp)], capture_output=True, text=True)
+    check("AC1: --print-rows CELLS prints the row",
+          _r.returncode == 0 and _r.stdout.split() == ["py.function", "snake", "vocab"],
+          f"rc={_r.returncode} {_r.stdout!r} {_r.stderr!r}")
+
+    # AC9 — with NO block key it is byte-identical to what it printed before this unit, which is
+    # what keeps `adopt-lexicon.sh`'s Skill render in sync.
+    _r2 = subprocess.run([sys.executable, str(KIT / "lexicon_conf.py"), "--print-rows", str(_cp)],
+                         capture_output=True, text=True)
+    check("AC9: --print-rows with no block key still prints the VERBS rows",
+          _r2.returncode == 0 and _r2.stdout.startswith("build\t") and "load\t" in _r2.stdout,
+          f"rc={_r2.returncode} {_r2.stdout!r}")
+
+    # AC3 + S3 + S4 — the row-grammar refusals, as a table.
+    for _label, _body, _want in (
+            ("an unknown surface", "CELLS:\n  py.frobnicate  snake\n", "unknown surface"),
+            ("an unknown convention", "CELLS:\n  py.function  wiggly\n", "unknown convention"),
+            ("`dot`, which is a classifier form", "CELLS:\n  py.function  dot\n",
+             "not a declarable convention"),
+            ("an unknown cell flag", "CELLS:\n  py.function  snake vocub\n", "unknown cell flag"),
+            ("a key that is not <ext>.<surface>", "CELLS:\n  pyfunction  snake\n",
+             "a CELLS row key is"),
+            ("a row declaring no convention", "CELLS:\n  py.function\n", "declares no convention"),
+            ("a duplicate row key", "CELLS:\n  py.function  snake\n\n  py.function  camel\n",
+             "duplicate row key"),
+            ("AC3: a non-integer pin count",
+             "CELLS:\n  py.file  kebab\n\nPINS:\n  py.file.conv  seven\n",
+             "must be a non-negative integer"),
+            ("an unknown pin predicate",
+             "CELLS:\n  py.file  kebab\n\nPINS:\n  py.file.frobbed  7\n",
+             "unknown pin predicate"),
+            ("a pin key that is not <ext>.<surface>.<predicate>",
+             "CELLS:\n  py.file  kebab\n\nPINS:\n  py.file  7\n", "a PINS row key is"),
+            ("AC2: a CELLS extension LANGS does not declare", "CELLS:\n  rs.function  snake\n",
+             "which LANGS does not declare"),
+            ("AC6: a PINS row whose cell has no CELLS row",
+             "CELLS:\n  py.file  kebab\n\nPINS:\n  py.function.debt  3\n", "which has no CELLS row"),
+            ("S10: two PINS rows on consecutive lines",
+             "CELLS:\n  py.file  kebab\n\n  py.function  snake\n\n"
+             "PINS:\n  py.file.conv  7\n  py.function.debt  3\n", "are adjacent"),
+    ):
+        _cp.write_text(BASE_CONF + "\n" + _body, encoding="utf-8", newline="\n")
+        try:
+            _lc.load_conf(_cp)
+            _msg = "<NO REFUSAL>"
+        except _lc.ConfError as _e:
+            _msg = str(_e)
+        check(f"grammar red: {_label}", _want in _msg, _msg)
+
+    # THE CROSS-BLOCK REFUSALS NAME THE LINE, not just the file. They run after every parsed value
+    # shape has dropped its line number, so these two were the only ROW-LEVEL refusals in this module
+    # printing a bare filename while every other one printed a position.
+    # The expected line is DERIVED from the row's real position in the text just written, so an
+    # implementation that hardcodes a number, or that reports the block header instead of the row,
+    # cannot pass this.
+    for _label, _body, _row in (
+            ("a CELLS extension LANGS does not declare",
+             "CELLS:\n  rs.function  snake\n", "rs.function  snake"),
+            ("a PINS row whose cell has no CELLS row",
+             "CELLS:\n  py.file  kebab\n\nPINS:\n  py.function.debt  3\n", "py.function.debt  3"),
+    ):
+        _text = BASE_CONF + "\n" + _body
+        _cp.write_text(_text, encoding="utf-8", newline="\n")
+        _want_ln = [i for i, l in enumerate(_text.splitlines(), 1) if l.strip() == _row][0]
+        try:
+            _lc.load_conf(_cp)
+            _msg = "<NO REFUSAL>"
+        except _lc.ConfError as _e:
+            _msg = str(_e)
+        check(f"the refusal for {_label} names the ROW's line, not just the file",
+              f":{_want_ln}:" in _msg, f"want line {_want_ln} in: {_msg}")
+
+    # THE DISPATCH IS THE GUARD. `_BLOCK_PARSERS.get(key, _parse_rows)` sat under a membership test
+    # against `BLOCK_KEYS` that had already raised for every key outside it, so the default could not
+    # be taken by any input — dead code reading as a safety net, and one that would have parsed an
+    # unvalidated block silently had it ever been reachable. Guarding on the parser table instead
+    # makes the state observable: a key listed as a block with no parser written is now a named
+    # refusal. Monkeypatched, because no declaration a user can write reaches it.
+    _saved_keys = _lc.BLOCK_KEYS
+    try:
+        _lc.BLOCK_KEYS = _saved_keys + ("FROBS",)
+        _cp.write_text(BASE_CONF + "\nFROBS:\n  a b\n", encoding="utf-8", newline="\n")
+        try:
+            _lc.load_conf(_cp)
+            _msg = "<NO REFUSAL>"
+        except _lc.ConfError as _e:
+            _msg = str(_e)
+        check("a block key with NO parser refuses by name rather than falling back to a generic one",
+              "no block parser for 'FROBS'" in _msg, _msg)
+    finally:
+        _lc.BLOCK_KEYS = _saved_keys
+
+    # The GREEN counterparts, so none of the reds above is passing because everything reds.
+    _cp.write_text(BASE_CONF + "\nCELLS:\n  py.file  kebab\n\n  py.function  snake vocab\n\n"
+                              "PINS:\n  py.file.conv  7\n\n  py.function.debt  0\n",
+                   encoding="utf-8", newline="\n")
+    _c = _lc.load_conf(_cp)
+    check("AC3 green: a PINS count parses to the INTEGER, not the string",
+          _c["PINS"] == {"py.file.conv": 7, "py.function.debt": 0}, repr(_c.get("PINS")))
+    check("S10 green: blank-separated PINS rows parse", len(_c["CELLS"]) == 2, repr(_c["CELLS"]))
+
+    # ...and a comment line separates two rows just as well, because the block scanner drops `#`
+    # rows while still advancing the line counter. Without this arm the refusal would be a ban on
+    # commenting a pin row rather than a merge property.
+    _cp.write_text(BASE_CONF + "\nCELLS:\n  py.file  kebab\n\n  py.function  snake\n\n"
+                              "PINS:\n  py.file.conv  7\n  # drained by TOOL-x-1\n"
+                              "  py.function.debt  0\n", encoding="utf-8", newline="\n")
+    check("S10 green: a COMMENT line separates two pin rows too",
+          _lc.load_conf(_cp)["PINS"] == {"py.file.conv": 7, "py.function.debt": 0}, "")
+
+    # AC4 — the regression arm on widening BLOCK_KEYS: an unlisted header must still refuse.
+    _cp.write_text(BASE_CONF + "\nFOO:\n  bar baz\n", encoding="utf-8", newline="\n")
+    try:
+        _lc.load_conf(_cp)
+        _msg = "<NO REFUSAL>"
+    except _lc.ConfError as _e:
+        _msg = str(_e)
+    check("AC4: an unknown block header still refuses after BLOCK_KEYS widened",
+          "'FOO:'" in _msg, _msg)
+
+    # A declaration written BEFORE these blocks existed parses exactly as it did: an absent block
+    # resolves to its empty container rather than to a refusal.
+    _cp.write_text(BASE_CONF, encoding="utf-8", newline="\n")
+    _c = _lc.load_conf(_cp)
+    check("migration: a conf with no CELLS/PINS parses, both empty",
+          _c["CELLS"] == {} and _c["PINS"] == {}, repr((_c.get("CELLS"), _c.get("PINS"))))
+
+# AC2 + AC6 END TO END, through the engine rather than through the reader, because those two
+# criteria are written against `lexicon.py --check`.
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n"},
+                     BASE_CONF + "\nCELLS:\n  rs.function  snake\n")
+check("AC2: an undeclared CELLS extension reds --check by name",
+      code != 0 and "rs" in out and "LANGS does not declare" in out, out)
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n"},
+                     BASE_CONF + "\nCELLS:\n  py.function  snake\n")
+check("AC2 green: ...and it greens once LANGS declares it", code == 0, out)
+
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n"},
+                     BASE_CONF + "\nCELLS:\n  py.file  kebab\n\nPINS:\n  py.function.debt  3\n")
+check("AC6: a PINS row with no CELLS row reds --check by cell",
+      code != 0 and "py.function" in out and "has no CELLS row" in out, out)
+code, out = run_case({"core/a.py": "def build_index():\n    pass\n"},
+                     BASE_CONF + "\nCELLS:\n  py.file  kebab\n\n  py.function  snake\n\n"
+                                 "PINS:\n  py.function.debt  3\n")
+check("AC6 green: ...and it greens once the CELLS row is added", code == 0, out)
+
+# ---- AC10: the pin is a TWO-SIDED equality ------------------------------------------------------
+# One offender in the fixture corpus. The pin is walked one step in each direction, and BOTH steps
+# must red: a count that FALLS was silent before this unit, which is how a pin sits eleven moves
+# above a corpus that already drained under it.
+_U4 = {"core/a.py": "def frobnicate_index():\n    pass\n"}
+code, out = run_case(_U4, BASE_CONF.replace('VERB_OFFENDER_PIN="0"', 'VERB_OFFENDER_PIN="1"'))
+check("AC10 control: offenders == pin is green", code == 0, out)
+code, out = run_case(_U4, BASE_CONF.replace('VERB_OFFENDER_PIN="0"', 'VERB_OFFENDER_PIN="0"'))
+check("AC10 rise: a count ABOVE the pin reds and names the offenders",
+      code != 0 and "over pin 0" in out and "frobnicate_index" in out, out)
+code, out = run_case(_U4, BASE_CONF.replace('VERB_OFFENDER_PIN="0"', 'VERB_OFFENDER_PIN="2"'))
+check("AC10 fall: a count BELOW the pin reds too",
+      code != 0 and "UNDER pin 2" in out, out)
+check("AC10 fall: ...and prints the exact replacement row to paste",
+      'VERB_OFFENDER_PIN="1"' in out, out)
+
+# ---- AC5: two branches draining DIFFERENT pin rows merge clean ----------------------------------
+# The property fork F1 ratified option (c) for. It is a standing arm that performs the merge, not a
+# one-time measurement -- but its INPUT is a block this arm writes, so it merges clean however dense
+# the tracked declaration becomes and it can never observe a later tidying edit. That hazard is
+# S10's refusal above, over the tracked file, on a leg with no guard.
+with build_tempdir() as _td:
+    _r = Path(_td)
+    _base = ("CELLS:\n"
+             "  py.file  kebab\n\n  py.function  snake\n\n  py.type  pascal\n\n"
+             "PINS:\n"
+             "  py.file.conv  7\n\n  py.function.debt  9\n\n  py.type.suffix  4\n")
+    _cf = _r / ".lexicon.conf"
+    _cf.write_text(_base, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=_r, check=True, capture_output=True)
+    for _k, _v in (("user.email", "s@e"), ("user.name", "s")):
+        subprocess.run(["git", "config", _k, _v], cwd=_r, check=True, capture_output=True)
+    subprocess.run(["git", "add", "-A"], cwd=_r, check=True, capture_output=True)
+    subprocess.run(["git", "commit", "-qm", "base"], cwd=_r, check=True, capture_output=True)
+    # ADJACENT CELLS -- the likeliest concurrent pair, because related cells sit together, and the
+    # pair a dense block conflicts on.
+    for _br, _old, _new in (("drainA", "py.file.conv  7", "py.file.conv  6"),
+                            ("drainB", "py.function.debt  9", "py.function.debt  8")):
+        subprocess.run(["git", "checkout", "-q", "-b", _br, "main"], cwd=_r, check=True,
+                       capture_output=True)
+        _cf.write_text(_base.replace(_old, _new), encoding="utf-8", newline="\n")
+        subprocess.run(["git", "commit", "-qam", _br], cwd=_r, check=True, capture_output=True)
+    subprocess.run(["git", "checkout", "-q", "drainA"], cwd=_r, check=True, capture_output=True)
+    _m = subprocess.run(["git", "merge", "--no-edit", "drainB"], cwd=_r, capture_output=True,
+                        text=True)
+    _merged = _cf.read_text(encoding="utf-8")
+    check("AC5: two branches draining ADJACENT cells merge with no conflict",
+          _m.returncode == 0 and "<<<<<<<" not in _merged,
+          f"rc={_m.returncode} {_m.stdout}{_m.stderr}")
+    check("AC5: ...and BOTH drains survive the merge",
+          "py.file.conv  6" in _merged and "py.function.debt  8" in _merged, _merged)
+
+# ---- TOOL-aSurfacedLexicon-5: the convention predicate -------------------------------------------
+#
+# THE FORM TABLE IS GATED AS A TABLE, not on the one spelling that happened to be typed first, and
+# every row carries a NEGATIVE. A form asserted only by what it matches cannot be told apart from a
+# looser form that also matches it — `^[a-z].*$` passes every positive `snake` row in this block and
+# is not snake. The negatives are the whole predicate.
+from subtokens import check_convention, classify, read_core, read_stem  # noqa: E402
+
+for _form, _yes, _no in (
+        ("snake", ("build_index", "run", "x2"), ("buildIndex", "Build_Index")),
+        ("screaming", ("PIN_KEYS", "RUN"), ("Pin_Keys", "pin_keys")),
+        ("camel", ("buildIndex", "run"), ("BuildIndex", "build_index")),
+        ("pascal", ("BuildIndex", "Run"), ("buildIndex", "Build_Index")),
+        ("kebab", ("check-arms", "run"), ("checkArms", "check_arms")),
+        ("dot", ("gate.legs", "run"), ("Gate.Legs", "gate_legs")),
+):
+    for _n in _yes:
+        check(f"form {_form} matches {_n}", _form in classify(_n), repr(sorted(classify(_n))))
+    for _n in _no:
+        check(f"form {_form} does NOT match {_n}", _form not in classify(_n),
+              repr(sorted(classify(_n))))
+
+# AC8 — the SET contract at the seam, not only through the report. `run` satisfying four forms at
+# once is the whole reason `classify` returns a set: a single-label classifier would have to pick one
+# and report a violation against the other three.
+check("AC8: classify('run') is set-valued and holds snake, camel and kebab",
+      {"snake", "camel", "kebab"} <= classify("run"), repr(sorted(classify("run"))))
+check("AC8: classify('_build_index') strips the affix and holds snake",
+      "snake" in classify("_build_index"), repr(sorted(classify("_build_index"))))
+check("the affix strip is why: without it __init__ would be a snake violation",
+      "snake" in classify("__init__") and read_core("__init__") == "init", read_core("__init__"))
+
+# S6 — the stem splits at the FIRST dot. The last-dot alternative is what would red every compound
+# extension in the tree, so the arm asserts the property rather than one filename.
+for _base, _stem in (("map_extractors.template.py", "map_extractors"),
+                     ("check-arms.test.sh", "check-arms"),
+                     ("plain", "plain"),
+                     (".gitignore", "")):
+    check(f"read_stem({_base!r}) is {_stem!r}", read_stem(_base) == _stem, read_stem(_base))
+
+# AC10 second arm — the empty core, called directly. `def _():` is legal Python and the classifier
+# has nothing to grade, which is AMBIGUOUS and not a skip. Its in-corpus population is NOT zero: nine
+# tracked files in this repo have a dot-leading basename and therefore an empty first-dot stem, so
+# the same verdict fires on a filename the day one of those cells is armed.
+check("AC10: read_core('_') is the empty string", read_core("_") == "", repr(read_core("_")))
+check("AC10: an EMPTY core is AMBIGUOUS, not a fall-through that prints nothing",
+      check_convention("_", "snake")[0] == "AMBIGUOUS", repr(check_convention("_", "snake")))
+check("AC5: a NON-empty core satisfying nothing is AMBIGUOUS too",
+      check_convention("FAMILY_of", "snake")[0] == "AMBIGUOUS",
+      repr(check_convention("FAMILY_of", "snake")))
+check("AMBIGUOUS never says VIOLATION", "VIOLATION" not in check_convention("_", "snake")[1])
+check("a VIOLATION names what the name DOES satisfy",
+      check_convention("loadUserData", "snake") == (
+          "VIOLATION", "VIOLATION  loadUserData  satisfies camel, not snake"),
+      repr(check_convention("loadUserData", "snake")))
+# ...and it names ALL of them, comma-joined and sorted. FOUND BY STAGING THE BREAK: with only the
+# single-form `loadUserData` and `user_record` arms above, replacing the join with `sorted(forms)[0]`
+# left this whole file GREEN — a message arm that cannot fail on the one input shape it exists for.
+check("a VIOLATION names EVERY form the name satisfies, not just the first",
+      check_convention("run", "pascal") == (
+          "VIOLATION", "VIOLATION  run  satisfies camel, dot, kebab, snake, not pascal"),
+      repr(check_convention("run", "pascal")))
+check("SATISFIED is membership, NOT being the set's only member",
+      check_convention("run", "kebab")[0] == "SATISFIED" and len(classify("run")) > 1,
+      repr(sorted(classify("run"))))
+
+# END TO END through the engine, which is where AC1, AC2, AC5 and AC10 are written.
+_CELL_PY = BASE_CONF + "\nCELLS:\n  py.function  snake\n\n  py.type  pascal\n"
+_CLEAN = {"core/a.py": "def build_index():\n    pass\n\n\nclass BuildIndex:\n    pass\n"}
+code, out = run_case(_CLEAN, _CELL_PY)
+check("cells green: a conforming corpus passes both cells", code == 0, out)
+check("...and the row is printed on GREEN with its population",
+      "py.function.conv 0 of 1" in out and "py.type.conv 0 of 1" in out, out)
+
+code, out = run_case({"core/a.py": "def loadUserData():\n    pass\n"}, _CELL_PY)
+check("AC1: a camelCase function reds a snake cell",
+      code != 0 and "VIOLATION  loadUserData  satisfies camel, not snake" in out, out)
+code, out = run_case({"core/a.py": "class user_record:\n    pass\n"}, _CELL_PY)
+check("AC2: a snake_case class reds a pascal cell",
+      code != 0 and "VIOLATION  user_record  satisfies snake, not pascal" in out, out)
+code, out = run_case({"core/a.py": "def FAMILY_of():\n    pass\n"}, _CELL_PY)
+check("AC5: a name satisfying NO form reds as AMBIGUOUS",
+      code != 0 and "AMBIGUOUS  FAMILY_of" in out, out)
+code, out = run_case({"core/a.py": "def _():\n    pass\n"}, _CELL_PY)
+check("AC10: an EMPTY core reds as AMBIGUOUS through the engine",
+      code != 0 and "AMBIGUOUS  _ " in out, out)
+check("AC10: ...and NOT as a VIOLATION, and NOT by printing nothing",
+      "VIOLATION" not in out and "py.function.conv 1 of 1" in out, out)
+
+# The FILE cell, and with it the dot-leading basename. `run_case` writes `.lexicon.conf` into the
+# fixture and stages it, so the fixture's own declaration IS the empty-stem instance — the same shape
+# as this repo's nine tracked dotfiles, exercised rather than described.
+code, out = run_case(_CLEAN, BASE_CONF + "\nCELLS:\n  conf.file  kebab\n")
+check("a dot-leading basename stems to nothing and reds AMBIGUOUS on a file cell",
+      code != 0 and ".lexicon.conf" in out and "AMBIGUOUS" in out, out)
+code, out = run_case({**_CLEAN, "core/loadUser.py": "def build_x():\n    pass\n"},
+                     BASE_CONF + "\nCELLS:\n  py.file  snake\n")
+check("a file cell grades the BASENAME, not the path",
+      code != 0 and "VIOLATION  loadUser  satisfies camel, not snake" in out, out)
+
+# AC6 — the TEETH, observed as the printed line rather than as the figure behind it. A cell that
+# prints a violation count and nothing else is indistinguishable from a cell that cannot fail, so
+# the arm is a predicate over every `.conv` row in the output. It is staged against a copy of that
+# output with the teeth clause deleted, because a predicate nobody has seen fail is an assertion
+# about nothing.
+_conv_rows = [ln for ln in out.splitlines() if ".conv " in ln and " of " in ln]
+_teeth_ok = bool(_conv_rows) and all(" teeth " in ln for ln in _conv_rows)
+check("AC6: every armed cell row carries a teeth figure beside its count", _teeth_ok,
+      repr(_conv_rows))
+_stripped = [ln.split(" teeth ")[0] for ln in _conv_rows]
+check("AC6: ...and that same predicate REDS on a row with the teeth clause removed",
+      not all(" teeth " in ln for ln in _stripped), repr(_stripped))
+
+code, out = run_case(_CLEAN, BASE_CONF + "\nCELLS:\n  py.function  camel\n")
+check("AC6: the teeth report what the OTHER conventions would fail",
+      "teeth" in out and "camel=" not in out.split("teeth")[1].split("\n")[0], out)
+
+# The declared-but-unexercised surface ANNOUNCES itself. `constant` is in the closed surface set and
+# this kit ships no extractor for it, so a cell naming it must say so rather than report a clean 0 —
+# the population and its rule belong to the unit that arms `py.constant`.
+code, out = run_case(_CLEAN, BASE_CONF + "\nCELLS:\n  py.constant  screaming\n")
+check("a surface with no extractor is announced as UNEXERCISED, not reported at zero",
+      "py.constant.conv SKIPPED" in out and "UNEXERCISED" in out, out)
+
+# A `dark` cell is a declared refusal to grade, and it too prints rather than vanishing.
+code, out = run_case({"core/a.py": "def loadUserData():\n    pass\n"},
+                     BASE_CONF + "\nCELLS:\n  py.function  dark\n")
+check("a dark cell grades nothing and says so, and does not red", code == 0 and "dark" in out, out)
+
+# The `conv` pin is the same TWO-SIDED equality the other pins carry.
+code, out = run_case({"core/a.py": "def loadUserData():\n    pass\n"},
+                     BASE_CONF + "\nCELLS:\n  py.function  snake\n\nPINS:\n  py.function.conv  1\n")
+check("a declared conv pin equal to the count is green", code == 0, out)
+code, out = run_case(_CLEAN, BASE_CONF + "\nCELLS:\n  py.function  snake\n\n"
+                                         "PINS:\n  py.function.conv  1\n")
+check("a conv count BELOW its declared pin reds and prints the replacement row",
+      code != 0 and "py.function.conv  0" in out, out)
+
+# ---- TOOL-aSurfacedLexicon-9: the owner-declarable PATTERNS block --------------------------------
+#
+# THE FIXTURE ARMS A LANGUAGE THIS KIT DOES NOT SHIP, which is the whole capability. `ts-regex` is
+# not in `PATTERN_SETS` and is not becoming one: choosing TypeScript regexes on an adopter's behalf
+# is the ruling this kit defers to the owner who has that corpus. So every arm below runs through the
+# DECLARATION and none of them through a second shipped set.
+#
+# The `ts` CELLS rows cost one line each and buy order-independence: the (extension, surface) matrix
+# reds an UNDECLARED cell with a non-empty population once that arm is promoted from a report, and
+# this fixture's `ts.function` population is non-empty by construction. They declare `camel` and
+# `pascal` rather than `snake` — those are the conventions the fixture's own TypeScript actually
+# uses, so the arming moves no verdict here and both cells sit at zero against a zero pin.
+_TS_PATTERNS = (
+    "\nPATTERNS:\n"
+    r"  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)" "\n"
+    r"  ts-regex.types      ^\s*(?:export\s+)?(?:interface|class)\s+([A-Za-z_$][\w$]*)" "\n"
+)
+_TS_CELLS = "\nCELLS:\n  ts.function  camel\n  ts.type      pascal\n"
+_TS_BASE = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
+                             'LANGS="py:python-ast:parser conf::dark ts:ts-regex:probe"')
+TS_CONF = _TS_BASE + _TS_PATTERNS + _TS_CELLS
+TS_FILES = {
+    "core/a.py": "def build_x():\n    pass\n",
+    "web/widget.ts": ("export function buildWidget(a: number): number { return a }\n"
+                      "export interface WidgetSpec { id: string }\n"),
+}
+_armed_of = lambda o: re.search(r"coverage — armed (\d+) of (\d+)", o)   # noqa: E731
+
+# AC7, first half — the SHIPPED refusal, with the LANGS triple and NO extractor rows. This is the
+# state every adopter of an unshipped language is in today, and it is the reason the block exists:
+# the language is declared, no set answers it, and the walk refuses one line before any predicate.
+code, out = run_case(TS_FILES, _TS_BASE)
+check("PATTERNS absent: a LANGS row naming an unshipped set is still refused",
+      code != 0 and "does not ship" in out and "'ts-regex'" in out, out)
+_before = _armed_of(out)
+
+# AC7, second half, and AC1 — the SAME command over the SAME files, with the two rows added and
+# NOTHING else changed. The coverage numerator is what site `:726` decides, and it moves by exactly
+# the one file while the denominator does not: the empty diff against the engine is a supporting
+# clause, this is the observation.
+code, out = run_case(TS_FILES, TS_CONF)
+check("AC1: a PATTERNS-declared set grades its language and the run is green", code == 0, out)
+_after = _armed_of(out)
+check("AC7: the declared extension enters the ARMED coverage numerator",
+      bool(_before) and bool(_after)
+      and int(_after.group(1)) == int(_before.group(1)) + 1
+      and _after.group(2) == _before.group(2),
+      f"before={_before and _before.group(0)!r} after={_after and _after.group(0)!r}")
+check("AC1: the run names the declared extractor rows",
+      "PATTERNS — 2 declared extractor row(s)" in out and "ts-regex.functions" in out, out)
+check("a declaration touching no SHIPPED key prints no REPLACES line", "REPLACES" not in out, out)
+
+# AC2 — the offender. The point of arming a language at all: its definitions are graded by the same
+# predicate everything else is, and the refusal names the file and the line.
+_off = dict(TS_FILES)
+_off["web/widget.ts"] = TS_FILES["web/widget.ts"] + "export function frobnicateWidget() {}\n"
+code, out = run_case(_off, TS_CONF)
+check("AC2: an undeclared leading token in the DECLARED language reds",
+      code != 0 and "P1 verb" in out and "frobnicateWidget" in out, out)
+check("AC2: the red names the file and the line", "web/widget.ts:3" in out, out)
+
+# AC3 — DEAD PROBE over a DECLARED set. The arm is shipped code and this unit widens its POPULATION:
+# before the merge, `scan_corpus` refused the extension one line earlier, so the arm had never
+# graded a declared set at all. Which refusal fires is the whole observation.
+code, out = run_case(TS_FILES, _TS_BASE + "\nPATTERNS:\n"
+                     r"  ts-regex.functions  ^\s*fn\s+([A-Za-z_]\w*)" "\n" + _TS_CELLS)
+check("AC3: a declared set that matches NOTHING reds as DEAD PROBE",
+      code != 0 and "DEAD PROBE" in out and "ts-regex" in out, out)
+check("AC3: and NOT for the unshipped-set reason", "does not ship" not in out, out)
+
+# AC4 — the OTHER zero population, reported differently on purpose. `.ts` is declared, the corpus
+# carries none of it, so DEAD PROBE's guard correctly cannot judge it — and silence there is
+# indistinguishable from a language being graded.
+code, out = run_case({"core/a.py": "def build_x():\n    pass\n"}, TS_CONF)
+_inert = [ln for ln in out.splitlines() if "INERT DECLARATION" in ln]
+check("AC4: a declaration with no file of that extension is reported INERT",
+      bool(_inert) and ".ts=probe" in _inert[0], out)
+check("AC4: and is NOT reported as DEAD PROBE", "DEAD PROBE" not in out, out)
+check("AC4: INERT is a report, not a refusal", code == 0, out)
+
+# AC9 — a duplicated row key REFUSES rather than taking the last one. A repeated key in a hand-edited
+# declaration is a typo far more often than an intent, and last-wins silently retires the row the
+# owner believes is live.
+code, out = run_case(TS_FILES, _TS_BASE + _TS_PATTERNS
+                     + r"  ts-regex.functions  ^\s*fn\s+([A-Za-z_]\w*)" "\n" + _TS_CELLS)
+check("AC9: a duplicate PATTERNS row key refuses and names the first line",
+      code != 0 and "duplicate row key" in out and "ts-regex.functions" in out, out)
+
+# AC6 — the regex validation, at PARSE time and never as a dropped row. Zero groups raises inside the
+# walk with no line number; two groups grades the wrong half of every name it matches and reports a
+# clean run. Both become one refusal naming the file and the line.
+for _rows, _label, _needle in (
+    (r"  ts-regex.functions  ^\s*function\s+[A-Za-z_]\w*", "zero capturing groups", "0 capturing group"),
+    (r"  ts-regex.functions  ^(\s*)function\s+([A-Za-z_]\w*)", "two capturing groups", "2 capturing group"),
+    (r"  ts-regex.functions  ^\s*function\s+([A-Za-z_]\w*", "an uncompilable regex", "not a Python regex"),
+):
+    code, out = run_case(TS_FILES, _TS_BASE + "\nPATTERNS:\n" + _rows + "\n")
+    check(f"AC6: {_label} refuses", code != 0 and _needle in out, out)
+    check(f"AC6: the refusal for {_label} names the line", ".lexicon.conf:" in out, out)
+
+# AC6, through the CLI the bash adopter uses. One reader, two output shapes — a refusal that only
+# fired on the engine path would leave `adopt-lexicon.sh` green over a declaration the engine reds.
+with build_tempdir() as _td:
+    _conf = Path(_td) / ".lexicon.conf"
+    _conf.write_text(_TS_BASE + "\nPATTERNS:\n"
+                     r"  ts-regex.functions  ^\s*function\s+[A-Za-z_]\w*" "\n", encoding="utf-8")
+    _r = subprocess.run([sys.executable, str(KIT / "lexicon_conf.py"), "--print-rows", "PATTERNS",
+                         str(_conf)], capture_output=True, text=True)
+    check("AC6: --print-rows PATTERNS raises the same ConfError, naming the file and the line",
+          _r.returncode != 0 and "capturing group" in _r.stderr and ".lexicon.conf:" in _r.stderr,
+          _r.stdout + _r.stderr)
+
+# ---- the MERGE itself, which no end-to-end fixture above can distinguish -------------------------
+#
+# EVERY ARM ABOVE DECLARES A NEW SET, and a per-key merge and a per-set replacement behave
+# identically on one of those. The risk this unit actually carries is the merge landing on a SHIPPED
+# set, where a per-set replacement silently retires the two keys the owner did not name — an
+# extractor grading a smaller population while reporting a clean run. These arms are the gate for
+# that, and they FAIL if the merge goes wrong rather than merely exercising it.
+_shipped_js = lex.PATTERN_SETS["js-regex"]
+_resolved = lex.resolve_pattern_sets(
+    {"PATTERNS": {"js-regex.types": re.compile(r"^\s*type\s+([A-Za-z_$][\w$]*)", re.M)}})
+check("the merge REPLACES the key the row names",
+      [r.pattern for r in _resolved["js-regex"]["types"]] == [r"^\s*type\s+([A-Za-z_$][\w$]*)"],
+      f"{_resolved['js-regex']['types']}")
+check("the merge leaves the UNNAMED keys of a shipped set standing",
+      _resolved["js-regex"]["functions"] == _shipped_js["functions"]
+      and _resolved["js-regex"]["imports"] == _shipped_js["imports"],
+      f"functions={len(_resolved['js-regex']['functions'])} "
+      f"imports={len(_resolved['js-regex']['imports'])}")
+check("the merge does NOT mutate the shipped constant",
+      [r.pattern for r in lex.PATTERN_SETS["js-regex"]["types"]]
+      == [r"^\s*(?:export\s+)?class\s+([A-Za-z_$][\w$]*)"],
+      f"{lex.PATTERN_SETS['js-regex']['types']}")
+
+# AC5 — with nothing declared, the resolution IS the shipped mapping. An adopter who writes no block
+# is on exactly the previous behaviour, asserted rather than assumed.
+check("AC5: no PATTERNS declared resolves to the shipped sets exactly",
+      lex.resolve_pattern_sets({}) == lex.PATTERN_SETS, f"{lex.resolve_pattern_sets({})}")
+
+# A set reachable ONLY through the declaration still answers the three-list contract `_probe_defs`
+# reads, so a row arming `functions` alone cannot raise a KeyError halfway through a walk.
+_partial = lex.resolve_pattern_sets(
+    {"PATTERNS": {"ts-regex.functions": re.compile(r"^fn ([a-z]+)", re.M)}})
+check("a declared set arming ONE part still carries all three",
+      sorted(_partial["ts-regex"]) == ["functions", "imports", "types"],
+      f"{sorted(_partial['ts-regex'])}")
+check("and its unnamed parts are EMPTY rather than absent",
+      _partial["ts-regex"]["types"] == [] and _partial["ts-regex"]["imports"] == [],
+      f"{_partial['ts-regex']}")
 
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")

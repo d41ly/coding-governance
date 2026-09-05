@@ -1,11 +1,12 @@
 # TOOL-aSurfacedLexicon-9 — the owner-declarable PATTERNS block
 
-**Status:** SPECCED · rev-7 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
+**Status:** CLOSED · rev-7 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aSurfacedLexicon-4-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-4-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round1.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 |
 | [2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round2.md](../reviews/2026-09-04-review-TOOL-aSurfacedLexicon-5-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 |
 

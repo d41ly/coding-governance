@@ -84,7 +84,9 @@ both: the reader refuses an unknown block key by name rather than ignoring it.
 
 ## Pins are a starting position, not a target
 
-The two offender pins are MEASURED at scaffold and are shrink-only. A non-zero day-one pin is
+The two offender pins are MEASURED at scaffold and are a TWO-SIDED EQUALITY. A count that rises reds
+and a count that FALLS reds too, printing the replacement row, because a drain nobody records leaves a
+pin no tree can meet again. A non-zero day-one pin is
 honest; `ORPHAN_ID_PIN` is the precedent for a pin that is legitimately non-zero on arrival. What the
 kit does NOT have is a guard against lowering a pin for the wrong reason — a `probe`-mode extractor
 that matches less than it should produces a smaller offender set that looks like repair. The mode is

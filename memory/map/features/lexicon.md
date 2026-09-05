@@ -2,7 +2,7 @@
 
 ```toml
 feature = "lexicon"
-title = "Two naming predicates over a per-repo DECLARATION plus a self-containment refusal, portable into a repo whose language set is unknown"
+title = "Naming predicates over a per-repo DECLARATION — a closed verb table, a banned-suffix list and a set-valued case-convention classifier — plus a self-containment refusal, portable into a repo whose language set is unknown"
 status = "shipped"
 streams = ["tooling", "playbook"]
 decisions = []
@@ -152,12 +152,33 @@ file — the engine, the bash adopter, `map_extractors.py`'s `lexicon-verbs` inv
 `KEY=VALUE` form PLUS indented block keys, because a closed verb table with prose meanings cannot fit
 a line-based conf and `map_lib.load_conf()` has no multi-line support.
 
+That reader now also decides WHICH LANGUAGES ARE ARMED, which moved a seam. `PATTERN_SETS` in
+`lexicon.py` used to be the whole answer, and it sits in an `engine`-role file an upgrade
+overwrites — so an adopter with TypeScript, Go or C# could only declare their language `dark`.
+A `PATTERNS:` block in the declaration now carries `<pattern-set-id>.<part>` rows, and
+`resolve_pattern_sets` merges them over the shipped constant PER KEY into a new mapping that every
+reader takes: the engine's one corpus walk, the coverage fraction, the scaffold's measured pins, and
+`drift-audit`'s two lexicon signals. The shipped constant is never mutated — `selftest.py` compares
+its frozen sentinels against it to prove every SHIPPED set has a fixture, so shipped and resolved
+have to stay two names. The two out-of-kit read sites are the reason this is a seam and not a
+detail: both tested membership against the shipped constant and skipped, so a declared language was
+passed over file by file while each signal reported a clean number with `live` still true.
+TOOL-aSurfacedLexicon-9.
+
 `tools/lexicon/subtokens.py` is a PORT of `map_lib.subtokens()`, not an import, and the direction of
 truth is deliberate: the lexicon owns its copy so the kit ships self-contained and an adopter taking
 it without `codebase-map` gets a working kit. The parity leg that keeps the two honest is
 gov-internal and never ships — a shipped parity leg would compare against a file the adopter does not
 have, so it would red forever or be silently skipped, and a silently skipped parity leg is the drift
 the gate exists to catch. `tools/lib/resolve-python.sh` is the precedent for that shape.
+
+That module now holds TWO predicates that never call each other, and the reason is worth carrying:
+`subtokens()` LOWERCASES, so no case question survives it, and `TOOL-aSurfacedLexicon-5`'s convention
+classifier therefore reads the RAW name as its SIBLING rather than consuming its output. The two also
+disagree about what "no word characters" MEANS — `leading_verb` strips leading underscores and runs
+ASCII subtoken classes, `read_core` strips underscores at both ends and nothing else — so the same
+name is UNGRADEABLE for vocabulary and AMBIGUOUS for convention. One rule across both was never
+available: they agree only on pure-underscore names and the empty string.
 
 ## Gaps
 
@@ -214,7 +235,10 @@ the gate exists to catch. `tools/lib/resolve-python.sh` is the precedent for tha
 seam: lexicon.subtokens — reuse to split an identifier into lowercase word pieces across camelCase,
 snake_case, kebab, path and digit boundaries, keeping acronym runs intact; extend by calling
 `leading_verb` when the FIRST token is the question, and note that an identifier with no word
-characters returns `""` and must be treated as ungradeable rather than as a violation.
+characters returns `""` and must be treated as ungradeable rather than as a violation. Do NOT reach
+for it to answer a CASE question — it lowercases, so `BuildIndex` and `build_index` are one string
+after it; `classify` in the same module is the sibling for that, returning the SET of case forms an
+affix-stripped core satisfies rather than a single label.
 seam: lexicon.text-keyed-waivers — reuse the shape whenever a waiver registry must survive edits to
 the file it waives: key each row on the MATCHED TEXT, red when a row's text is absent from the
 current findings, and never on `<path>:<line>`, which unpins on any edit above the waived line.
