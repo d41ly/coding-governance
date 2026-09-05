@@ -19,9 +19,13 @@ Every later unit writes comments that must obey it, so it lands first.
 
 ## 2. Scope (IN)
 
-- **S1** A new guide at `memory/guides/ANNOTATION-STYLE.md`, rendered by the memory-tree kit from a
-  `ANNOTATION-STYLE.template.md` beside `BUILD-METHOD.template.md`, wired into
-  `tools/memory-tree/adopt-memory-tree.sh` at the same seam that renders the build method.
+- **S1** A new annotation-style guide beside `memory/guides/BUILD-METHOD.md`, rendered by the
+  memory-tree kit from a template beside that guide's own, and wired into
+  `tools/memory-tree/adopt-memory-tree.sh` at the same seam that renders the build method. The two
+  new filenames are deliberately NOT backticked anywhere in this spec: the spec-token leg grades a
+  backticked path against `git ls-files`, and its waiver registry is shrink-only, so a spec cannot
+  name the file its own unit creates without redding a leg nobody may waive. Choose the names at
+  build time, mirroring the build-method pair.
 - **S2** The guide carries exactly four things and nothing else: the MUST / MAY / MUST NOT list; the
   three dispositions under which a number is safe in a comment (frozen by its conditions, gated by a
   pin, pointed at its owner); the delete-the-id test; and the statement that annotation is voluntary,
@@ -94,9 +98,10 @@ everywhere.
 ## 6. Acceptance criteria
 
 - **AC1** When `bash tools/memory-tree/adopt-memory-tree.sh` is run against a scratch clone, the
-  target tree holds a rendered `memory/guides/ANNOTATION-STYLE.md` whose bytes match the render of
-  `ANNOTATION-STYLE.template.md`.
-- **AC2** When `memory/guides/ANNOTATION-STYLE.md` is read, it carries all four of the MUST/MAY/MUST-NOT list, the three
+  target tree holds the rendered annotation-style guide beside its rendered
+  `memory/guides/BUILD-METHOD.md`, byte-identical to a render of its template.
+- **AC2** When the rendered guide beside `memory/guides/BUILD-METHOD.md` is read, it carries all
+  four of the MUST/MAY/MUST-NOT list, the three
   number dispositions, the delete-the-id test, and the voluntary-annotation statement with its
   reason — and nothing that duplicates the charter's derived-count ban beyond naming it.
 - **AC3** When `python memory/builds/aKeyedAnnotation/build/2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py`
