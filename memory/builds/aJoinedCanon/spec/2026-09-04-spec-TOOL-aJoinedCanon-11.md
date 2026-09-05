@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-11 — the base sha resolves to a real object
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 11 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 11 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -20,47 +20,116 @@ transposed digit is caught by the bar instead of by a reviewer.
 
 ## 2. Scope (IN)
 
-- **S1** — a new cutoff key `BASE_RESOLVE_CUTOFF` in `.memory-tree.conf`, preset blank in
+Every item below names the criterion that observes it. Round 3's H4 found S1 through S5 and S7
+untagged after a fold that tagged S6 alone — the address-not-class close this build's README bans —
+so the tags are here as a set, not one at a time.
+
+- **S1** *(Observed by AC9 and AC6)* — a new cutoff key `BASE_RESOLVE_CUTOFF` in `.memory-tree.conf`, preset blank in
   `tools/memory-tree/check-memory-hygiene.sh` above the conf source, and shipped blank in
   `tools/memory-tree/.memory-tree.conf.example`. It takes the three rule cutoffs' semantics: blank
   means off. All three carriers move in one commit: the self-test's engine-preset parity arm derives
   its key set from the engine, so an undeclared key reds this unit's own landing commit on the
   `memory-hygiene self-test` leg S2 already owes — and, unfixed, leaves an adopter a dead arm
   reading as armed.
-- **S2** — a check-12 arm that resolves the `base` sha of every selected spec whose filename date is
-  on or after that cutoff and whose status is not `CLOSED` or `WONTDO`, failing when the sha names
-  no commit in this object database.
-- **S3** — the resolution runs as ONE `git cat-file --batch-check` for the whole population, driven
-  by a sentinel record the existing awk emits, not by a fork per spec.
-- **S4** — a shallow repository is detected once and the arm announces its own skip rather than
-  passing silently or redding every spec.
-- **S5** — two fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`, named from this unit's
-  `tFixture-190` block upward per the build's `order`-allocated number space: a post-cutoff live spec
-  whose base does not resolve (red, observed before landing) and one whose base is the scratch
-  repo's own `HEAD` (silent).
+- **S2** *(Observed by AC1, AC2 and AC3)* — a check-12 arm that resolves the `base` sha of every
+  selected spec whose filename date is on or after that cutoff and whose status is not `CLOSED` or
+  `WONTDO`, failing when the sha names no commit in this object database. **BOTH TIERS.** The
+  emission sits ABOVE the `if (hdr ~ /Tier-1/) next` line in that awk, not below it, because `base`
+  is a status-header field a Tier-1 spec carries exactly as a Tier-2 one does; §4 states the
+  placement and AC1 observes it on a Tier-1 fixture.
+- **S3** *(Observed by AC12)* — the resolution runs as ONE `git cat-file --batch-check` for the whole
+  population, driven by a sentinel record the existing awk emits, not by a fork per spec.
+- **S4** *(Observed by AC5 and AC11)* — a shallow repository is detected once and the arm announces
+  its own skip on stderr rather than passing silently or redding every spec, and
+  `tools/memory-tree/check-memory-hygiene.sh`'s header states what each stream now carries: stdout
+  for findings, stderr for announced skips AND for `resolve_python`'s refusal under a set-but-unusable
+  `GOV_PYTHON`. The header half is here because AC11 graded it while no scope item built it — the
+  same missing-owner shape as M4's dossier row, found by running that predicate over this section
+  instead of over the table.
+- **S5** *(Observed by AC1, AC2, AC3 and AC12)* — the fixtures and scratch trees every criterion
+  needs, all of them, in `tools/memory-tree/check-memory-hygiene.test.sh`. Round 3's H5 found this
+  item building two while three criteria needed artefacts nothing constructed, so it now enumerates
+  the set against the criteria that read it. Fixture names come from this unit's `tFixture-190`
+  block upward per the build's `order`-allocated number space:
+  - `tFixture-190` — post-cutoff, LIVE, **Tier-1**, base `0123abcd`, which resolves to nothing. Red,
+    observed before landing. Tier-1 by construction, so a branch placed below the Tier-1 cut goes
+    silent on it; that is AC1's stated break, and `tFixture-54` and `tFixture-84` are the two
+    existing fixtures built for the same purpose against other arms.
+  - `tFixture-191` — post-cutoff, LIVE, base = the scratch repo's own `git rev-parse --short=8 HEAD`.
+    Silent. Written after the fixtures commit, per "The green fixture's base" in §4.
+  - `tFixture-192` — post-cutoff, **CLOSED**, base `0123abcd`. Silent, which is the terminal-status
+    exemption AC3 grades and the only observation of grandfathering this unit makes.
+  - The `BASE_RESOLVE_CUTOFF` declaration in the scratch conf that
+    `check-memory-hygiene.test.sh` writes, dated one day ahead of the newest fixture filename date in
+    that file — derived at build time, not pinned here, because six lower-`order` units add fixtures
+    to the same file. Every pre-existing fixture is therefore grandfathered and 190 to 192 are dated
+    after it.
+  - A SECOND scratch tree for AC5, built by `git clone --depth 1 "file://$PWD"` from a scratch repo,
+    because a `--depth 1` clone from a plain local path is not shallow at all. §4's "The probe that
+    cannot move" carries the measurement.
+  - A blank-key run for AC6, riding the existing blank-cutoff section of that self-test — the one
+    that already rewrites the scratch `.memory-tree.conf` with a subset of keys and asserts the
+    matching arms stay dark.
 - **S6** *(Observed by AC10)* — the `base` bullet in `memory/TEMPLATE-SPEC.md` and its byte-compared twin
   `tools/memory-tree/SPEC-TEMPLATE.template.md` gains the resolution rule and names the cutoff, in
   one commit, with the kit version marker moved in every carrier that holds it.
-- **S7** — check 12's catalog entry in `memory/HYGIENE.md` and its byte-compared twin
+- **S7** *(Observed by AC8)* — check 12's catalog entry in `memory/HYGIENE.md` and its byte-compared twin
   `tools/memory-tree/HYGIENE.template.md` state the live-only population AND the gap it accepts:
   a spec whose base does not resolve can be silenced by closing it, and a unit that goes `SPECCED`
   to `CLOSED` in one commit is never graded at all. It sits beside that entry's existing
   `SHAPE only` caveat, in the same commit as S2, because a check whose own description omits what
   it does not check is the shape charter §7 refuses.
+- **S8** *(Observed by AC13)* — `memory/guides/SESSION-KICKOFF.md` is re-stamped: `last-audit` moves
+  to a fresh `<ISO datetime> @ <sha>` per that manifest's own stamping rule, which this spec does not
+  restate. Three of this unit's write-set paths — `tools/memory-tree/check-memory-hygiene.sh`,
+  `.memory-tree.conf` and `memory/guides/BUILD-METHOD.md` — are `watch:` pathspecs of that manifest,
+  and check C5 of `skills/session-kickoff/manifest-check.sh` is topological: it reds when the newest
+  watch-touching commit is not an ancestor of the re-stamp, whatever the body says. So this landing
+  reds an unguarded every-bar leg without S8. `last-body-change` does NOT move and §B gains no delta
+  line: this unit changes no gate command, entrypoint, layout convention or front-loaded claim, and
+  the charter's rule is "no delta → no touch". Round 3's H2: eight of the eleven units in this build
+  edit a watched path and none carried this.
+- **S9** *(Observed by AC14)* — `memory/map/features/memory-tree-hygiene.md` states the new arm: its
+  conf key, the live-only population, and the accepted never-graded bypass S7 names. Charter §5 makes
+  refreshing a touched dossier a Definition-of-Done item, and nothing on the bar notices dossier
+  prose going stale — `codebase-map coverage + freshness` grades key claims, pinned headings and
+  artifact freshness, not whether the prose still describes the engine. Round 3's M4: this was a
+  Files-touched row with no scope item, no criterion and no leg, which is the same shape the round-2
+  fold closed elsewhere in this spec.
 
 **What this arm buys, stated plainly because the honest answer is small.** All 22 spec files carrying
-an unresolvable base are CLOSED, so this catches nothing that exists. Re-derived at `750ca0ca`:
-477 tracked specs carry a base over 87 distinct values, 9 of which resolve to nothing, across
-`aBatchedTribunal`, `aDrainedSluice`, `aRelaxedShard`, `aUnmannedHelm` and `cSettledDocket`. The
-live population is 43 specs, 42 of them carrying a base, and **every one of those 42 resolves**. The
-arm is purely forward-looking and its whole value is that it stops the next one.
+an unresolvable base are CLOSED, so this catches nothing that exists. The arm is purely
+forward-looking and its whole value is that it stops the next one.
+
+Figures re-derived at `750ca0ca` for this revision, after round 3 found the rev-4 block reproducing
+at neither that sha nor HEAD. The population selector is **S2's own**, not `check-spec-tokens`'
+four-status LIVE set: a spec file's first `**Status:**` line, live iff its status word is neither
+`CLOSED` nor `WONTDO`. At `750ca0ca`, 474 spec files carry a status header, all 474 carry a base,
+over 86 distinct values; 40 of the 474 are live, all 40 carry a base, and **every one of those 40
+resolves**. 9 distinct base values resolve to nothing, held by 22 files, every one of them `CLOSED`,
+across `aBatchedTribunal`, `aDrainedSluice`, `aRelaxedShard`, `aUnmannedHelm` and `cSettledDocket`.
+At HEAD the same derivation gives 485 files, 87 distinct values, 51 live — the corpus moves, the
+9-over-22-all-CLOSED shape does not. The deriving command is beside the figures so the next fold
+re-runs it rather than trusting the label:
+
+```sh
+git grep -n -E '^\*\*Status:\*\*' <rev> -- 'memory/builds/*/spec/*.md' \
+  | sed -E "s#^<rev>:##" | sed -E 's#^([^:]+):[0-9]+:#\1\t#' | awk -F'\t' '!seen[$1]++'
+```
+
+then one record per file, status word from the header and `base [0-9a-f]{8}` from the same line, with
+the distinct base values piped through `git cat-file --batch-check` suffixed `^{commit}`.
 
 The class is not hypothetical, and it has a measured price in review time rather than in gate time.
-`memory/builds/aRelaxedShard/reviews/2026-08-18-review-TOOL-aRelaxedShard-4.md:436` is finding M3: a
-declared base of `86eefd8f` against a real commit `86eefd8e`, a transposed eighth character, found by
-a human lens and explicitly noting that check 12's grammar validates shape alone.
-`memory/builds/dCarriedReceipt/reviews/2026-08-26-review-DEPL-dCarriedReceipt-5-diff-review-round2.md:3`
-is the same defect on a review's own range, again caught by a person.
+In `memory/builds/aRelaxedShard/reviews/2026-08-18-review-TOOL-aRelaxedShard-4.md`, finding M3 opens
+`git rev-parse 86eefd8f` → "fatal: ambiguous argument" and records a declared base of `86eefd8f`
+against a real commit `86eefd8e` — a transposed eighth character, found by a human lens and
+explicitly noting that check 12's grammar validates shape alone. In
+`memory/builds/dCarriedReceipt/reviews/2026-08-26-review-DEPL-dCarriedReceipt-5-diff-review-round2.md`
+the same defect lands on a review's own range, in the paragraph opening `The base sha as handed to
+this reviewer does not resolve in this repo`, again caught by a person. Both are anchored by text
+rather than by line: round 3's M5 found this spec's two `path:line` pins landing on headings, four
+and twenty-three lines short of the sentences they were cited for.
 
 ## 3. Non-goals (OUT)
 
@@ -106,9 +175,17 @@ which is the could-not-fail shape the unit exists to close.
 The value is set strictly ahead of the newest committed spec filename date, enumerated across
 `git for-each-ref refs/heads` at build time rather than trusted from this branch. The newest tracked
 spec filename date on this branch is 2026-09-04, which is this build's own date, so the cutoff lands
-after it and this build's own specs are grandfathered. That also grandfathers all 26 existing
-`base 0123abcd` fixtures in the self-test for free, which is why S5 needs two new ones rather than a
-sweep of the old.
+after it and this build's own specs are grandfathered.
+
+The self-test's scratch conf is a SEPARATE declaration with its own value, and the same property is
+what grandfathers the fixtures already in that file: every existing `base` fixture there is dated on
+or before the newest fixture filename date, and S5 sets the scratch `BASE_RESOLVE_CUTOFF` one day
+ahead of that date, derived at build time. So none of them changes and S5's three fixtures are dated
+after it. No count of those fixtures appears here: rev-4 claimed 26 and the literal `base 0123abcd`
+reproduces on 23 lines and 33 times at this base, and six lower-`order` units add fixtures to that
+same file before this one builds, so the number would be stale either way. The PROPERTY is what the
+argument needs — that the existing fixtures fall on the grandfathered side — and it survives every
+fixture those six units add.
 
 ### Inventory
 
@@ -127,6 +204,27 @@ section-canon excerpt, and the `case "$bad12_raw" in` post-pass rebuilds it in t
 because reimplementing a shell capability inside awk is how two implementations drift. This arm
 extends that seam rather than opening a second one.
 
+**Where the branch sits, and the one thing it must NOT copy from that prior art.** The `\001`
+sentinel lives BELOW the `if (hdr ~ /Tier-1/) next` line, inside the Tier-2-only band, because the
+section canon is a Tier-2 rule. `base` is not: it is a status-header field both tiers carry, and S2
+says both tiers. So the `\002` emission goes ABOVE that `next`, in the every-tier band the file's own
+comment marks — the one reading "these two run for EVERY TIER, so they sit ABOVE the Tier-1 cut",
+where the streams, witness and §9-rev assertions already live. The idiom is copied; the placement is
+not. This matters because `next` is a PREFIX cut, so the failure is silent and asymmetric: below the
+cut, every Tier-1 spec's base goes unresolved while `BASE_RESOLVE_CUTOFF` reads as armed — four of
+this build's own eleven units are Tier-1. `tFixture-190` is Tier-1 for exactly this reason and AC1
+names the misplacement as its break, which is the standard `tFixture-54` and `tFixture-84` already
+set for two other arms in this file.
+
+**The binding is named `bcut`, and that name is claimed.** `canon`, `canon10`, `cut10`, `mroot`,
+`discalt`, `scut`, `wcut`, `fcut` and `ecut` are the nine `-v` bindings this awk invocation carries
+today, and the siblings in this build have claimed `jcut` (unit 3), `mcut` (unit 4) and `rcut`
+(unit 9), with unit 1 taking a fourth after round 3 found it colliding with unit 4 on `mcut`. `bcut`
+is free of all of them, verified by grepping every spec in this build's own `spec/` folder as well as
+the engine — which is the check round 3's blocker proved nobody was running, since a second `-v` of
+the same name is last-wins for the whole program and silently regrades one arm by the other's key.
+The name is registered in `TOOL-aJoinedCanon-3`'s namespace survey.
+
 The post-pass splits `bad12_raw` on the `\002` tag, feeds the distinct shas to ONE
 `git cat-file --batch-check='%(objectname) %(objecttype)'` with each line suffixed `^{commit}`, and
 turns every `missing` or `ambiguous` answer back into a finding line addressed to the existing
@@ -136,8 +234,12 @@ on its own line rather than on stderr. The `^{commit}` peel is what stops an eig
 happens to name a tree or a blob from passing.
 
 **Cost.** One process for the whole run, whatever the population. A `git cat-file -e` per spec would
-be 43 forks today and one per live spec forever, which is the shape the batched awk was built to
-delete — its own header records replacing roughly 13 forks per spec and 42.88s of an 81.77s run.
+be one fork per live spec forever — 40 at `750ca0ca` and 51 at HEAD under S2's own selector, by the
+derivation in §2 — which is the shape the batched awk was built to delete; its own header records
+replacing roughly 13 forks per spec and 42.88s of an 81.77s run. This is the unit's central
+implementation decision and AC12 is what observes it: round 3's H4 found every one of the eleven
+criteria satisfied by a fork-per-spec build, which left this paragraph and §5's perf row resting on
+an unobserved property.
 
 ### The probe that cannot move
 
@@ -163,10 +265,23 @@ before this unit writes a line — the could-not-fail shape pointed at prose ins
 amendment this unit makes is the true one: stdout carries findings, and stderr carries announced
 skips AND the resolver's refusal to run under a broken override. Observed by AC11.
 
-Prior art worth reading before touching this: `memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-7.md:106`
-measured that in a `--depth 1` clone a derived-commit probe does not fail and does not return
-nothing — it returns the shallow root, which resolves perfectly. The lesson carried here is that the
-shallow case must be DETECTED rather than inferred from what git answers.
+**Constructing a shallow repository is not what it looks like, and rev-4 got this wrong.**
+`git clone --depth 1 <local path>` produces a repository that is NOT shallow: git prints
+`warning: --depth is ignored in local clones; use file:// instead` and `--is-shallow-repository` then
+answers `false`. Measured here on 2026-09-05, and every scratch tree in
+`tools/memory-tree/check-memory-hygiene.test.sh` is a local `git init`, so this is the only form an
+AC5 fixture can take. The form that works is `git clone --depth 1 "file://$PWD"`, measured the same
+day against a one-commit scratch repo: `--is-shallow-repository` answers `true` and
+`git rev-list --count HEAD` answers 1. Round 3's H6 is the finding — AC5 as rev-4 wrote it asserted a
+`true` in a tree its own command could not build, so the only conjunct a builder could satisfy was
+"exits 0", which every non-shallow run satisfies too. AC5 now asserts the probe as a PRECONDITION.
+
+Prior art worth reading before touching this: `TOOL-dScaffoldedMirror-7`'s spec, in the section
+headed `The base, and the failing case that replaces the research's`, measured that in a `--depth 1`
+clone a derived-commit probe does not fail and does not return nothing — it returns the shallow root,
+which resolves perfectly, observed as a derived base of `37bfdd19` against a true adoption commit of
+`b0626152`. The lesson carried here is that the shallow case must be DETECTED rather than inferred
+from what git answers.
 
 A blobless partial clone (`--filter=blob:none`) still holds every commit, so commit resolution is
 unaffected and no separate branch is needed for it.
@@ -178,13 +293,18 @@ unaffected and no separate branch is needed for it.
 | `.memory-tree.conf` | S1, the declaration and its reasoning comment |
 | `tools/memory-tree/.memory-tree.conf.example` | S1, the same key, shipped blank |
 | `tools/memory-tree/check-memory-hygiene.sh` | S1 preset, S2/S3 arm and post-pass, S4 probe, the header contract comment |
-| `tools/memory-tree/check-memory-hygiene.test.sh` | S5, two fixtures after the `git add -A && git commit -q -m fixtures` line |
+| `tools/memory-tree/check-memory-hygiene.test.sh` | S5's whole set: the scratch-conf key, `tFixture-190` to `-192`, the shallow scratch tree, the blank-key arm, and AC12's `git` shim |
 | `memory/TEMPLATE-SPEC.md` | S6, the `base` bullet |
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | S6, the same bytes |
 | `memory/HYGIENE.md` | check 12's catalog entry gains the clause and S7's accepted-gap sentence |
 | `tools/memory-tree/HYGIENE.template.md` | the same bytes |
 | `tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUILD-METHOD.md` | kit version marker only |
-| `memory/map/features/memory-tree-hygiene.md` | dossier prose, refreshed on touch |
+| `memory/map/features/memory-tree-hygiene.md` | S9, the dossier prose |
+| `memory/guides/SESSION-KICKOFF.md` | S8, the `last-audit` re-stamp only; no body delta |
+
+Every row above is named by a scope item or by a criterion. That is round 3's M4 closed over its
+class rather than at its address: the dossier row was the one with no owner, and the same predicate
+run over the whole table is what put S8's row here.
 
 The kit version row is the trap this repo has hit twice, recorded as `TOOL-aSiftedFork-5` and
 `TOOL-dSettledRoster-4`. The carrier set is the tracked non-record files matching
@@ -219,7 +339,8 @@ unit exists to close.
 ## 5. Production-readiness checklist
 
 - **security** — N/A. The arm reads the local object database and writes nothing.
-- **perf / scale** — one added process per run, independent of population size. The `memory hygiene`
+- **perf / scale** — one added process per run, independent of population size, which AC12 observes
+  rather than asserts after round 3 found this row resting on nothing. The `memory hygiene`
   leg's ceiling in `tools/gate-legs.json` is 12720 and is not expected to move; measure it against
   `<git-dir>/gate-ledger.tsv` rather than asserting it.
 - **a11y** — N/A. A shell gate with no user interface.
@@ -233,22 +354,29 @@ unit exists to close.
   legal remedy, since editing a ratified record is forbidden. Restricting the population to live
   specs is what bounds this, per the owner's ruling on F1. The residual risk is the bypass that
   ruling accepts — a bad base silenced by closing the spec — which S7 documents rather than closes.
-- **testing + left-shift gates** — S5's two fixtures. The red one is staged, confirmed red, and kept
-  as a fixture rather than unstaged, which is what the self-test is for.
+- **testing + left-shift gates** — S5's set: three fixtures, a shallow scratch tree, a blank-key run
+  and AC12's process count. `tFixture-190` is staged, confirmed red, and kept as a fixture rather
+  than unstaged, which is what the self-test is for.
 - **migration / rollback** — blanking `BASE_RESOLVE_CUTOFF` turns the arm off completely, and the
   rest of check 12 is untouched.
-- **user docs** — `memory/TEMPLATE-SPEC.md` and `memory/HYGIENE.md`, with both twins.
+- **user docs** — `memory/TEMPLATE-SPEC.md` and `memory/HYGIENE.md`, with both twins, plus the
+  dossier `memory/map/features/memory-tree-hygiene.md` under S9.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the self-test's new post-cutoff fixture carries a live status and a base of
-  `0123abcd`, `bash tools/memory-tree/check-memory-hygiene.test.sh` observes check 12 reporting that
-  file and that sha; the red is observed before the arm lands, per the build's own rule.
-- **AC2** — When the sibling fixture carries the scratch repo's own `git rev-parse --short=8 HEAD`,
+- **AC1** — When `tFixture-190` carries a **Tier-1** live status, a post-cutoff filename date and a
+  base of `0123abcd`, `bash tools/memory-tree/check-memory-hygiene.test.sh` observes check 12
+  reporting that file and that sha; the red is observed before the arm lands, per the build's own
+  rule. **The break that turns this red:** placing the `\002` emission below
+  `if (hdr ~ /Tier-1/) next` in `tools/memory-tree/check-memory-hygiene.sh`. A Tier-1 fixture is the
+  only thing that can tell the two placements apart, and the arm stays silently dark on every Tier-1
+  spec if it is wrong.
+- **AC2** — When `tFixture-191` carries the scratch repo's own `git rev-parse --short=8 HEAD`,
   the same run reports nothing for it.
-- **AC3** — When an unresolvable base sits on a `CLOSED` fixture dated after the cutoff, check 12 is
-  silent on it, so the terminal-status exemption in `check-memory-hygiene.sh` is exercised rather
-  than assumed.
+- **AC3** — When `tFixture-192` carries an unresolvable base on a `CLOSED` status with a post-cutoff
+  filename date, check 12 is silent on it, so the terminal-status exemption in
+  `tools/memory-tree/check-memory-hygiene.sh` is exercised rather than assumed. This is the unit's
+  only observation of grandfathering, per AC4.
 - **AC4** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over this tracked tree, it
   stays green. **What this can and cannot prove, stated because the earlier wording claimed more
   than it observes:** every spec carrying an unresolvable base is CLOSED, so S2's terminal-status
@@ -256,8 +384,13 @@ unit exists to close.
   guaranteed by that conjunct and is NOT evidence that grandfathering works. It observes only that
   the arm adds no regression. The grandfathering itself is observed by AC3, on a fixture built for
   it.
-- **AC5** — When the gate runs in a `git clone --depth 1` scratch tree, `git rev-parse
-  --is-shallow-repository` answers `true`, the skip line appears on stderr, and the process exits 0.
+- **AC5** — When the scratch tree is built with `git clone --depth 1 "file://$PWD"`, the criterion
+  first asserts its own PRECONDITION — `git rev-parse --is-shallow-repository` prints `true` — and
+  only then that the skip line appears on stderr and the process exits 0. A precondition, not a
+  setup step: rev-4 built the tree with a plain local `git clone --depth 1`, which git ignores with a
+  warning, so the tree was never shallow and the criterion could not go green. Asserting the state
+  before grading it is what turns a silently non-shallow clone into an AC5 failure instead of an AC5
+  pass. Measured 2026-09-05: the `file://` form answers `true` even on a one-commit source repo.
 - **AC6** — When `BASE_RESOLVE_CUTOFF` is set to `""`, the arm emits no sentinel and the run is
   byte-identical to the pre-change run over the same tree.
 - **AC7** — When `python tools/memory-tree/check-arms.py --report` is run twice over
@@ -289,24 +422,56 @@ unit exists to close.
   `resolve_python`'s refusal under a set-but-unusable `GOV_PYTHON`. Observed by reading the file, and
   falsified by the header as this unit finds it, which mentions neither stream. The refusal block is
   the file's only `>&2` today.
+- **AC12** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs in the self-test's scratch
+  tree with a shim named `git` first on `PATH` — one that appends its own argv to a log and then
+  execs the real git — the log carries EXACTLY ONE `cat-file` invocation, over a population of at
+  least two post-cutoff live specs carrying two DISTINCT base shas, which `tFixture-190` and
+  `tFixture-191` already are. This is S3's observer and nothing else in §6 is. **The break that turns
+  it red:** implementing the resolution as `git cat-file -e` per spec, or as one batch per distinct
+  sha — both give two, and both satisfy every other criterion in this section. The shim is why the
+  count is observed rather than asserted: `tools/memory-tree/check-memory-hygiene.sh` invokes `git`
+  unqualified throughout, so `PATH` reaches every call site.
+- **AC13** — When `bash skills/session-kickoff/manifest-check.sh` runs on the landing commit it
+  exits 0, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` names a sha at or after the commit
+  that edits `tools/memory-tree/check-memory-hygiene.sh`. **The break:** revert S8 alone — keep the
+  engine and conf edits, restore the old stamp — and check C5, `no unaudited watch drift`, reds
+  naming the watched file changed with no re-stamp. `last-body-change` holds the SAME sha before and
+  after, which is the half of this criterion that observes the "no delta → no touch" side of the
+  rule rather than the re-stamp side.
+- **AC14** — When `grep -c BASE_RESOLVE_CUTOFF memory/map/features/memory-tree-hygiene.md` is run
+  after the change it returns a non-zero count, and the dossier prose names the live-only population
+  and the accepted never-graded bypass. It returns 0 at this base, so the criterion is red before the
+  edit and green after. **The break:** landing the arm with the dossier untouched, which no gate leg
+  catches — `codebase-map coverage + freshness` grades key claims and artifact freshness, not prose,
+  so this criterion IS the coverage and §7 says so.
 
 ## 7. Gates
 
 Leg names are read from `tools/gate-legs.json`, never from a list typed here.
 
 - `memory hygiene` — `tools/memory-tree/check-memory-hygiene.sh`, the changed gate itself.
-- `memory-hygiene self-test` — `tools/memory-tree/check-memory-hygiene.test.sh`, which carries S5
-  and, through its engine-preset parity arm, S1's third carrier as AC9 observes it.
+- `memory-hygiene self-test` — `tools/memory-tree/check-memory-hygiene.test.sh`, which carries all of
+  S5 — the three fixtures, the shallow scratch tree, the blank-key run and AC12's process count — and,
+  through its engine-preset parity arm, S1's third carrier as AC9 observes it.
 - `harness arms (fail branches armed or pinned)` — the leg that grades this file's arm pin, which
   AC7 asserts this unit leaves where it found it.
 - `kit/dogfood doc parity` — `tools/memory-tree/kit-dogfood-parity.test.sh`, which byte-compares
-  `memory/TEMPLATE-SPEC.md` against `tools/memory-tree/SPEC-TEMPLATE.template.md` and both
-  `HYGIENE` and `BUILD-METHOD` pairs at `:53`.
+  `memory/TEMPLATE-SPEC.md` against `tools/memory-tree/SPEC-TEMPLATE.template.md` and both the
+  `HYGIENE` and `BUILD-METHOD` pairs, all three named on the `PAIRS` assignment in that file. Cited
+  by that name and not by line: rev-4 pinned `:53`, and `TOOL-aJoinedCanon-9` edits that same file at
+  `order` 9, two steps before this unit builds. A bare `:<n>` also escapes the citation sweep the
+  siblings ran, which needs a filename before the colon.
 - `kit version markers` — the leg `tools/check-kit-versions.sh` runs, named because the two backlog
   rows above record the carrier set being missed twice. The count of carriers is not written here;
   that script is the authority on it.
 - `verdict epoch (kit version dates the engine)` — this unit changes the engine, so the epoch leg
   binds it. Round 2 found this leg missing from the §7 of every unit that touches the engine.
+- `kickoff-manifest ratchet` — `subject = repo`, no guard, so it runs on every bar. It is here
+  because three of this unit's write-set paths are `watch:` pathspecs of
+  `memory/guides/SESSION-KICKOFF.md`; S8 carries the re-stamp and AC13 names the observed red.
+- `codebase-map coverage + freshness` — named for what it does NOT cover. It grades key claims,
+  pinned headings and artifact freshness, so S9's dossier prose is invisible to it. AC14 is the
+  compensating check, and it is a documented manual one, not a leg.
 - `bash tools/run-gates/run-gates.sh` at the push boundary. This is kit work, so the Definition of
   Done owes `GATE_FULL=1 GATE_SELFTESTS=1`.
 
@@ -333,13 +498,6 @@ No new gate leg. The arm is a finding inside check 12, which is already on the b
 
 - rev-1 · 2026-09-04 · initial draft.
 - rev-2 · 2026-09-05 · §8 · §2 · §3 · §4 · §5 · §6 · folded the owner's ruling on F1: live specs
-- rev-4 · 2026-09-05 · §2 · §4 · §6 · §7 · folded spec-audit round 2: H4 (S6 had no
-  observer — added AC10), M4 (§7 carried a script path where a leg name belongs, and omitted
-  `verdict epoch`), M7 (AC4's green was guaranteed by S2's terminal-status conjunct and proved
-  nothing about grandfathering — now says what it can and cannot show, with AC3 carrying the real
-  observation), M8 (the prescribed header amendment was false of the file before writing, because
-  stderr already carries `resolve_python`'s refusal — added AC11). Class sweep over all 23: also
-  converted the `run-gates.sh:1110-1111` pin to a text anchor per the build's citation rule.
   only, and the bypass it accepts became a requirement — S7 states it in check 12's catalog entry
   and its twin, AC8 grades it, §3 and §4 stop calling the widening an open decision, and §5's risk
   bullet names the residual rather than the fork.
@@ -353,7 +511,34 @@ No new gate leg. The arm is a finding inside check 12, which is already on the b
   `check-memory-hygiene.sh` and its self-test are cited by literal source text instead of line
   number in §4 and §10, the kit-version carrier count is derived with `grep -rl` instead of pinned
   at seven, and S5's fixtures are allocated from this unit's `tFixture-190` block.
-
+- rev-4 · 2026-09-05 · §2 · §4 · §6 · §7 · folded spec-audit round 2: H4 (S6 had no
+  observer — added AC10), M4 (§7 carried a script path where a leg name belongs, and omitted
+  `verdict epoch`), M7 (AC4's green was guaranteed by S2's terminal-status conjunct and proved
+  nothing about grandfathering — now says what it can and cannot show, with AC3 carrying the real
+  observation), M8 (the prescribed header amendment was false of the file before writing, because
+  stderr already carries `resolve_python`'s refusal — added AC11). Class sweep over all 23: also
+  converted the `run-gates.sh:1110-1111` pin to a text anchor per the build's citation rule.
+  THIS ENTRY WAS SPLICED INTO THE MIDDLE OF rev-2's by a hand-fold and rev-5 rejoined it; the two
+  halves under rev-2 above are rev-2's own work, not this revision's.
+- rev-5 · 2026-09-05 · §2 · §4 · §5 · §6 · §7 · §9 · §10 · folded spec-audit round 3, the TERMINATING
+  fold: ten findings, all ten disposed here. H1 rebuilt this log — rev-4's entry had been spliced
+  into the middle of rev-2's and logged before rev-3, so rev-2's two halves are rejoined and the
+  order is now 1, 2, 3, 4, 5. H7: S2 and §4 now state that the sentinel emission sits ABOVE
+  `if (hdr ~ /Tier-1/) next`, `tFixture-190` is Tier-1, and AC1 names the misplacement as its break.
+  H6: AC5 builds its shallow tree with `git clone --depth 1 "file://$PWD"` and asserts
+  `--is-shallow-repository` as a PRECONDITION; §4 carries the measurement that the local form is
+  ignored with a warning. H4: AC12 added — a `git` shim counting exactly one `cat-file` invocation
+  over two distinct shas, which is S3's only observer — and `Observed by` tags now sit on S1 to S9.
+  H5: S5 enumerates its whole artefact set, three fixtures plus the shallow tree plus the blank-key
+  run, and running H5's reverse join over §6 found AC11 grading a header amendment no scope item
+  built — folded into S4. M1: the figures block is re-derived at `750ca0ca` under S2's own selector, with the deriving
+  command beside it — 474 files, 86 distinct values, 40 live and all resolving, 9 unresolvable values
+  over 22 CLOSED files. M2: the fixture count is replaced by the property that grandfathers them.
+  M3: §7 cites the `PAIRS` assignment by name instead of `:53`. M4: the dossier is S9 with AC14,
+  and every Files-touched row is now named by a scope item. M5: the four `path:line` citations in
+  §2, §4 and §10 became text anchors. Cross-unit: H2's `last-audit` re-stamp is S8 with AC13 and
+  the `kickoff-manifest ratchet` leg, and B1's namespace rule is answered in §4 — `bcut` checked
+  against the engine's nine bindings and every sibling's claim.
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "resolve a commit sha cited in a record against the
@@ -365,10 +550,13 @@ extends is instead the one the probe cannot see because it is not a symbol: the 
 f` sentinel and the `case "$bad12_raw" in` post-pass that rebuilds it, which exists for exactly this
 reason — keeping a shell capability in the shell instead of reimplementing it inside awk. The recall
 probe found the design prior art the map does not index:
-`memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-9.md:205` already reasons
+`memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-9.md` already reasons
 about an absent sha, a shallow clone and a blobless partial clone resolving to a named dead probe
-rather than a green line, and `-7.md:106` carries the measurement that a `--depth 1` clone returns
-its shallow root instead of failing. Both are cited in §4.
+rather than a green line — in the `error / empty / loading states` row of its §5, not at the section
+heading rev-4 pinned — and `TOOL-dScaffoldedMirror-7`'s spec, in the section headed `The base, and
+the failing case that replaces the research's`, carries the measurement that a `--depth 1` clone
+returns its shallow root instead of failing. Both are cited in §4, both by text: round 3's M5 found
+both pins landing on headings rather than on the sentences cited.
 
 Recall terms used: `base sha status header check 12 hygiene resolve cat-file cutoff grandfather
 shallow clone spec format`.

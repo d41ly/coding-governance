@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 10 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 10 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -39,6 +39,21 @@ the cheapest kind of drift to fix and the most expensive kind to leave standing.
 - **S3** — both halves move together. `memory/TEMPLATE-SPEC.md` is rendered from
   `tools/memory-tree/SPEC-TEMPLATE.template.md`, so the template is the edited file and the live
   copy is regenerated rather than hand-edited.
+- **S4** — `memory/guides/SESSION-KICKOFF.md` is re-stamped: `last-audit` moves to a fresh
+  `<ISO datetime> @ <sha>` per that manifest's own stamping rule, which this spec does not restate.
+  `.memory-tree.conf` is a `watch:` pathspec of that manifest, verified on its audit block at HEAD,
+  so S2's one added declaration is a watched change, and check C5 of
+  `skills/session-kickoff/manifest-check.sh` — `no unaudited watch drift` — reds when the newest
+  watch-touching commit is not an ancestor of the newest commit that changed the `last-audit` value.
+  The obligation is per-landing and a sibling's stamp does not discharge it: C5 compares against the
+  NEWEST watch-touching commit, so a stamp from a lower-`order` unit sits behind this unit's conf
+  edit and reds exactly as an absent stamp would. `last-body-change` does NOT move and §B gains no
+  delta line — the charter's rule is "no delta → no touch", and this unit changes no gate command,
+  entrypoint, layout convention or front-loaded claim. §B's one sentence naming this key,
+  ``a key that must not be skippable is captured BEFORE the source and restored after; `SPEC10_CUTOFF`
+  is the seam``, was re-read against S2 and stays true: S2 sets the key to the value the capture
+  already restores, so the mechanism it describes is untouched and a blank in the conf still resolves
+  forward.
 
 ## 3. Non-goals (OUT)
 
@@ -55,7 +70,8 @@ the cheapest kind of drift to fix and the most expensive kind to leave standing.
   files it. Leaving the rest is a knowingly deferred instance of the same class, said plainly rather
   than implied away.
 - No change to check 12, to the canon selection, or to `SPEC10_CUTOFF`'s value. This unit moves
-  prose and one inert declaration; the gate must grade every spec in the tree exactly as it does now.
+  prose, one inert declaration and one manifest stamp; the gate must grade every spec in the tree
+  exactly as it does now.
 - No `KIT_MEMORY_TREE_VERSION` bump, and BOTH gates that could demand one were read rather than
   assumed. `tools/check-kit-versions.sh` derives the population with
   `git ls-files 'tools/memory-tree/*.template.md'` and reds any member whose
@@ -134,6 +150,7 @@ wrote it, which is why S1 deletes the count rather than correcting it.
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | the `SPEC10_CUTOFF` section's location sentence, the authored edit |
 | `memory/TEMPLATE-SPEC.md` | the same sentence, written by `--render`, never by hand |
 | `.memory-tree.conf` | one added declaration (S2) |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp only; no body delta (S4) |
 
 ### Alternatives rejected
 
@@ -188,6 +205,14 @@ wrote it, which is why S1 deletes the count rather than correcting it.
   leaves no half-bumped marker. The second leg is named because a no-bump argument resting on the
   equality gate alone has read half the evidence, and the leg that would actually contradict it is
   the half that was missing.
+- **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs on the landing commit it exits
+  0, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` names a sha at or after the commit that
+  edits `.memory-tree.conf`. The failing case is the revert of S4 alone: keep S2's declaration,
+  restore the old stamp, and check C5 — `no unaudited watch drift` — reds naming `.memory-tree.conf`
+  as a watched file changed with no re-stamp at or after the change. `last-body-change` is the SAME
+  sha before and after, which is the half of the criterion that observes the "no delta → no touch"
+  side of the rule rather than the re-stamp side. Run at base: the checker exits 0 today with no
+  output, so a red under this criterion is this unit's own work rather than a standing one.
 
 ## 7. Gates
 
@@ -198,6 +223,10 @@ wrote it, which is why S1 deletes the count rather than correcting it.
   of what this diff touches. The third is listed because AC5 now reads it: it is the only leg that
   can demand a version move, and §3's no-bump decision is worth exactly as much as the gate that
   could contradict it.
+- `kickoff-manifest ratchet` — `subject = repo`, no `guard` key in `tools/gate-legs.json`, so it runs
+  on every bar. It is on this list because `.memory-tree.conf` is a `watch:` pathspec of the manifest
+  S4 re-stamps; see AC6 for the observed red. This is the leg that would have caught the omission
+  this unit's rev-5 closes, and it would have caught it on the bar rather than in a review.
 - No new gate. `.memory-tree.conf` is a repo-root file that no leg guard can select, recorded as
   `TOOL-aWalkedCorpus-5`; S2 therefore relies on the unguarded legs above rather than on a guard of
   its own, and this is stated so a reviewer does not read the absent guard as an oversight.
@@ -266,6 +295,27 @@ wrote it, which is why S1 deletes the count rather than correcting it.
   this spec carries no block. §1, §2, §4, §5 and §8 were re-read under the five-row table and need
   nothing: the fold changed what AC5 OBSERVES and what §3 argues, never what the unit DOES, so the
   scope items, the files-touched table and the fork record all stand as written.
+- rev-5 · 2026-09-05 · §2 · §3 · §4 · §6 · §7 · folded spec-audit round 3, the TERMINATING fold.
+  One finding was addressed to this unit and it applies: H2. `.memory-tree.conf` is on the
+  manifest's `watch:` line — read off the audit block at HEAD, not remembered — and S2 declares a
+  key in it, so S2 was a watched change with no owner. Added S4 for the `last-audit` re-stamp
+  including the "no delta → no touch" half, a Files-touched row, AC6 in AC10's shape naming check C5
+  `no unaudited watch drift` as the observed red, and `kickoff-manifest ratchet` in §7. AC6's command
+  was RUN at base rather than read: `bash skills/session-kickoff/manifest-check.sh` exits 0 today
+  with no output, C5's ancestor comparison and its message text were read at source, and the leg's
+  `subject = repo` with no `guard` key was read out of `tools/gate-legs.json`. §3's "moves prose and
+  one inert declaration" now says "and one manifest stamp", because the fold made that clause false
+  by one item. Round 3's blocker B1 does NOT reach this unit and nothing was changed for it: this
+  unit introduces no awk `-v` binding, no function and no fixture, which `TOOL-aJoinedCanon-3`'s
+  namespace register states from the other end — it lists this spec among the units that add none.
+  The re-read table earned its place twice: §2→§3 caught that §3 clause, and §4→§7 is what put the
+  ratchet leg beside the Files-touched row rather than leaving AC6 to name a leg §7 never listed.
+  §1, §5, §8 and §10 were re-read and need nothing — S4 adds no code path, no input and no surface,
+  so §5's rows stay N/A and its "no new arm" line stays true, and the fork record is untouched by a
+  bookkeeping obligation neither option changed. Nothing is left parked by this fold. The one
+  knowingly deferred item is unchanged and already disposed in §3: the remaining prose counts in the
+  same template section go to a `TOOL` backlog row, worded with no figure of its own, and that is a
+  promotion to follow-up rather than a deferral to a round that does not exist.
 
 ## 10. Reuse audit
 

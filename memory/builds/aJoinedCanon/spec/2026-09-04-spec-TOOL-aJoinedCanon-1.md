@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-1 — the revision log becomes a structured entry
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -34,13 +34,15 @@ almost nothing about where, which is the mechanism behind the corpus's dominant 
   ONLY date guard — it does not nest inside another cutoff's block. Observed by AC1–AC5 for the
   behaviour and by AC15 for the independence.
 - **S4** — The `REV_SCOPE_CUTOFF` key in all THREE of its carriers: preset blank in
-  `check-memory-hygiene.sh` above the conf source, bound into the one batched awk as `-v` and
-  guarded by an explicit non-empty test; declared in `.memory-tree.conf` with the evidence for the
-  date chosen; and shipped blank in `tools/memory-tree/.memory-tree.conf.example`. §4's Migration
-  says why the third carrier is not bookkeeping. Observed by AC13 for the shipped example ONLY;
-  the preset and the `-v` binding are observed by AC1 and AC6, which are what make the arm fire
-  under a valued key and fall silent under a blank one, and an unpreset key aborts the gate before
-  any criterion runs at all.
+  `check-memory-hygiene.sh` above the conf source, bound into the one batched awk as
+  `-v revscopecut="$REV_SCOPE_CUTOFF"` and guarded by an explicit non-empty test; declared in
+  `.memory-tree.conf` with the evidence for the date chosen; and shipped blank in
+  `tools/memory-tree/.memory-tree.conf.example`. §4's Migration says why the third carrier is not
+  bookkeeping, and §4's "The binding" says why the awk name is spelled out in full and where this
+  unit claims it. Observed by AC13 for the shipped example ONLY; the preset and the `-v` binding
+  are observed by AC1 and AC6, which are what make the arm fire under a valued key and fall silent
+  under a blank one, and an unpreset key aborts the gate before any criterion runs at all; AC16
+  observes that the name is this unit's alone on that invocation.
 - **S5** — A zero-population notice on the same footing as the §10 evidence arm's, so an arm that
   grades no spec in this corpus says so instead of printing a silent green. Observed by AC12.
 - **S6** — Fixtures in `check-memory-hygiene.test.sh` covering the red, the pre-cutoff
@@ -75,6 +77,13 @@ almost nothing about where, which is the mechanism behind the corpus's dominant 
 - **The two arms `TOOL-dUnstalledConvoy-14` proposes** — that rev numbers in a log are unique and
   that they descend. Same section, same walk, different mechanism, and BUILD-METHOD M2 gives a unit
   one. The entry accumulator S3 builds is what that row needs, so it gets cheaper, not done.
+  Round 3 supplied the reachability evidence that row was missing — a sibling spec's §9 with rev-4
+  spliced into rev-2 and logged before rev-3, ungated because check 12 compares only the maximum
+  `rev-[0-9]+` it sees — and the audit's left-shift proposes bolting the assertion onto this unit.
+  It stays out, and this is the disposition rather than a deferral: that evidence belongs on
+  `TOOL-dUnstalledConvoy-14`, the OPEN backlog row that already owns the proposal and now has a
+  live instance to cite. Adding it here would make this unit two mechanisms in the round that has
+  no further audit to catch the second one.
 - **Retrofitting the corpus.** No landed spec is edited. Measured below: under the ratified cutoff
   `2026-09-06`, zero landed specs change.
 - **The fold procedure's re-read set.** That is `TOOL-aJoinedCanon-2`, and it is the half of B1 that
@@ -115,8 +124,8 @@ It rides the walk that already exists: in `check-memory-hygiene.sh`, the loop op
 
 **Where it sits, stated as an exclusion.** That walk is ALREADY outside every cutoff guard — the
 comment above it says so in the engine's own words, `these two run for EVERY TIER, so they sit ABOVE
-the Tier-1 cut` — and this arm goes in it, at the same nesting depth, guarded by `mcut != ""` and by
-nothing else. It does NOT go inside the `if (wcut != "" && fdate != "" && fdate >= wcut) {` block
+the Tier-1 cut` — and this arm goes in it, at the same nesting depth, guarded by
+`revscopecut != ""` and by nothing else. It does NOT go inside the `if (wcut != "" && fdate != "" && fdate >= wcut) {` block
 that ends in `print f " (acceptance bullets naming no backticked witness…`. That is a live trap and
 not a hypothetical one: this build's round-1 blocker and its round-2 blocker are both a new arm
 nested in that guard, whose real population becomes the INTERSECTION of two cutoffs while its own
@@ -125,6 +134,41 @@ key reads as armed. Here the intersection would be invisible in this repo — `S
 first — and visible only in an adopter that arms one key and not the other, which is the case with
 no local witness. AC15 is that witness. Being outside the `if (hdr ~ /Tier-1/) next` cut also makes
 it a both-tiers arm for free, as `STREAMS_CUTOFF` and `SPEC_WITNESS_CUTOFF` are.
+
+**The binding, and who owns the name.** The key rides in on `-v revscopecut="$REV_SCOPE_CUTOFF"`,
+appended to the single check-12 invocation that today opens
+`awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M"`
+and continues `-v discalt -v scut -v wcut -v fcut -v ecut`. Verified at HEAD: that is one `awk`
+program, so every `-v` on it shares ONE variable namespace and a repeated name is last-wins for the
+whole program, silently.
+
+The name is spelled out rather than abbreviated, and that is the whole point of it. Round 3's
+blocker was this unit and `TOOL-aJoinedCanon-4` both taking `mcut` on this invocation, for two
+different cutoff keys — invisible locally, because in this repo both keys hold `2026-09-06`, and
+invisible to both specs' criteria, because each blanks its own key and thereby blanks the shared
+binding and turns BOTH arms off. The mechanism was not bad luck: several units of this build each
+need a cutoff binding on this one invocation, the engine's live names there are `scut`, `wcut`,
+`fcut`, `ecut` and `cut10`, and an `<initial>cut` space that small, with that many claimants,
+collides by construction. The audit's Fix offered `rvcut`, which is free; this fold declines the
+abbreviation and not the fix, because `rvcut` sits one letter from the `rcut` that same Fix records
+as already spoken for, and so reproduces the shape that caused the blocker. `revscopecut` is
+derived from `REV_SCOPE_CUTOFF` letter for letter and cannot be
+confused with a sibling's. Confirmed on node `a`: zero hits for `revscopecut` anywhere in the tree,
+and `awk -v revscopecut=…` binds and reads it.
+
+**Claimed, so a sibling can see it.** This unit claims `revscopecut` on the check-12 awk for the
+whole build, per the build README's one-owner-per-shared-engine-name rule. `TOOL-aJoinedCanon-3` §4
+carries this build's namespace register — the paragraph whose opening words are "The binding is
+named", cited by that text and not by line — and that paragraph is where the taken list lives, so
+this spec states its OWN claim and does not restate the others: a copy of a four-name list beside
+the register that owns it is the paraphrase class this repo refuses, and it would already be stale,
+because `TOOL-aJoinedCanon-4` renamed its own binding in this same round. Round 3's proof that
+nobody looked is that the register named unit 4 as the sole claimant of `mcut` while this unit,
+three `order` steps EARLIER, was taking it too. AC16 is the observation, and it is mechanical
+rather than a reading:
+no name may be bound twice on that invocation. It costs one assertion in the self-test and it reds
+at the commit that introduces a duplicate rather than in an adopter's tree, which is where the
+collision was otherwise going to be found.
 
 Three decisions inside it, each measured at `base 750ca0ca` over the 476 date-named specs there —
 which is the population check 12's selector grades, and is the 479 files under `spec/` less the
@@ -230,11 +274,12 @@ strings changed.
 | `memory/TEMPLATE-SPEC.md` | RENDERED from the above, never hand-edited |
 | `tools/memory-tree/HYGIENE.template.md` | S7, 2 sentences in the check-12 entry |
 | `memory/HYGIENE.md` | RENDERED |
-| `tools/memory-tree/check-memory-hygiene.sh` | preset key, `-v` binding, the arm, the notice |
-| `tools/memory-tree/check-memory-hygiene.test.sh` | fixtures 90-95 and their assertions |
+| `tools/memory-tree/check-memory-hygiene.sh` | preset key, the `-v revscopecut=` binding, the arm, the notice |
+| `tools/memory-tree/check-memory-hygiene.test.sh` | fixtures 90-95, their assertions, and AC16's duplicate-binding assertion |
 | `.memory-tree.conf` | the key and its evidence block |
 | `tools/memory-tree/.memory-tree.conf.example` | the same key, blank |
-| `memory/guides/BUILD-METHOD.md` + template | version marker ONLY, no prose |
+| `tools/memory-tree/BUILD-METHOD.template.md` | version marker ONLY, no prose |
+| `memory/guides/BUILD-METHOD.md` | RENDERED from the above; marker only |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp |
 
 Every doc pair is byte-compared after a render substituting `{{KIT_DIR}}` and `{{TOOL_ROOT}}`, by
@@ -289,7 +334,9 @@ a small, real constraint on how a spec discusses the template it edits.
   filename date on every ref, so no branch reds on merge. Rollback is blanking one conf key.
 - testing + left-shift gates: S6, with the red observed before landing per the build's own rule.
   AC15 is the second observed red and it costs no fixture — it rides the self-test's existing
-  blank-`SPEC_WITNESS_CUTOFF` run over the same fixture tree.
+  blank-`SPEC_WITNESS_CUTOFF` run over the same fixture tree. AC16 is the third and also costs no
+  fixture: it reads the engine's own awk invocation, and its red is staged by duplicating one `-v`
+  name. AC9's two reds are the fourth and fifth.
 - migration / rollback: dated cutoff, blank means off, no corpus edit.
 - user docs: the template and `HYGIENE.md` are where an author reads this; both are in scope, and
   AC14 grades what they SAY rather than only that both halves of each pair moved together. No gate
@@ -320,8 +367,18 @@ a small, real constraint on how a spec discusses the template it edits.
   `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0, and it exits 1 if only one half did.
   This is a SAMENESS check and nothing more: it compares a render of the template against the live
   copy and has no opinion about what either says. AC14 is the criterion that reads the content.
-- **AC9** When `KIT_MEMORY_TREE_VERSION` is bumped in the same range as the engine edit,
-  `bash tools/memory-tree/check-verdict-epoch.sh` exits 0.
+- **AC9** When `KIT_MEMORY_TREE_VERSION` is bumped in the same range as the engine edit AND every
+  `gov:kit memory-tree@` carrier has moved with it, `bash tools/memory-tree/check-verdict-epoch.sh`
+  and `bash tools/check-kit-versions.sh` both exit 0. Two legs, two failure modes, two reds staged
+  and observed SEPARATELY, because neither leg catches the other's: revert the constant alone and
+  `verdict epoch` reds, since its rule is topological and the bump must be at or after the commit
+  that last moved a behaviour-bearing line; move one carrier and leave the rest and `kit version
+  markers` reds, since `tools/check-kit-versions.sh` enumerates
+  `git ls-files 'tools/memory-tree/*.template.md'` and reds any member whose marker disagrees with
+  the constant — while `verdict epoch` stays green throughout, an advanced constant with a stale
+  marker satisfying it exactly. S8 demands the carrier sweep and §4 warns the carrier set is easy
+  to undercount, so the leg that grades the sweep is named here rather than assumed. Confirmed on
+  node `a` that `tools/check-kit-versions.sh` is tracked and exits 0 at this fold's tree.
 - **AC10** When the arm has landed, `python tools/memory-tree/check-arms.py --check` exits 0 with
   `ARMS_FLOORS` unchanged, because no shell `fail` call site was added.
 - **AC11** When `memory/guides/SESSION-KICKOFF.md` has been re-stamped for the watched files this
@@ -357,12 +414,47 @@ a small, real constraint on how a spec discusses the template it edits.
   inside the `wcut` guard, in which case blanking the unrelated key silently disarms this one while
   its own key still reads as armed. No new fixture: the run and the fixture tree both exist, and
   this is one assertion added beside the three already there.
+- **AC16** When `check-memory-hygiene.test.sh` extracts the check-12 awk invocation from
+  `check-memory-hygiene.sh` — the line carrying the literal `bad12_raw=$(printf`, cited by that
+  text because sibling units edit this engine at a lower `order` — and runs
+  `grep -o -- ' -v [a-z0-9]*=' | sort | uniq -d` over it, the output is EMPTY: no name is bound
+  twice on the one invocation that all five of this build's cutoff arms share. Red when: two units
+  bind the same `-v` name, which is round 3's blocker and is last-wins for the whole awk program,
+  so one arm answers to the other's key while its own conf key reads as armed. The red is staged
+  and observed before landing by duplicating one existing `-v` name in a scratch copy. Confirmed on
+  node `a` at this fold: the predicate over the real line prints nothing, and the same line with
+  ` -v wcut=` duplicated prints ` -v wcut=`, so the check both passes on the tree and can actually
+  fire. **Liveness:** if the locator matches no line, or more than one, the assertion REFUSES and
+  says so rather than reporting zero duplicates — the `-v` list is one physical line today, and a
+  later unit wrapping it would otherwise turn this into a check that passes because it looked at
+  nothing. Read honestly about its reach: at this unit's own landing only `revscopecut` is new, so
+  the criterion cannot go red for a real collision until a later `order` lands a second binding on
+  this invocation — and whichever name that turns out to be is the register's business, not this
+  criterion's, because the predicate reads the invocation and names nothing. Its value is that
+  it reds at THAT commit rather than in an adopter's tree, and the staged duplicate is what proves
+  it will.
 
 ## 7. Gates
 
 The named legs from `tools/gate-legs.json` this unit must keep green: `memory hygiene`,
-`kit/dogfood doc parity`, `verdict epoch (kit version dates the engine)`, `harness arms (fail
-branches armed or pinned)`, and `kickoff-manifest ratchet`.
+`kit/dogfood doc parity`, `verdict epoch (kit version dates the engine)`, `kit version markers`,
+`harness arms (fail branches armed or pinned)`, `spec tokens (a spec's own names resolve)`, and
+`kickoff-manifest ratchet`.
+
+`spec tokens (a spec's own names resolve)` is here because this section just became a longer list
+of leg names, and that leg is `subject: repo` with no guard — it runs on every bar and grades the
+backticked names in this document, so a leg name typed wrong in the line above reds this unit's own
+landing commit. Found by sweeping H3's class rather than by a finding of its own.
+
+`kit version markers` is `bash tools/check-kit-versions.sh`, unguarded, and it is the OTHER half of
+S8's version obligation: the constant and every `gov:kit memory-tree@` carrier move together. It was
+missing from this list while S8 demanded the marker moved in every carrier and §4 spent a paragraph
+on how easily that set is undercounted — `verdict epoch` cannot cover the gap, because an advanced
+constant with a stale marker satisfies the epoch rule exactly. The leg's population is whatever
+`git ls-files 'tools/memory-tree/*.template.md'` returns at build time, no count of it is written
+here, and every member of it appears in §4's Files-touched table — which is what makes this leg
+owed rather than incidental. Observed by AC9, which now runs both scripts and names the two staged
+reds separately.
 
 This is KIT work, so the DoD also owes the self-test chunk that the bar holds by default:
 `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, whose relevant leg is
@@ -449,6 +541,31 @@ its four greps are written out in full so that running it takes no judgement.
   corrected without a finding: 1,683 rev heads was 1,682, "476 tracked specs" now says which
   population it counts, and three entry-level percentages became rates because a re-derivation at
   this fold disagreed with them by about a point.
+- rev-5 · 2026-09-05 · §2 S4 · §3 · §4 · §5 · §6 AC9 AC16 · §7 · folded spec-audit round 3, the
+  TERMINATING fold: findings B1 and H3, both disposed here, nothing parked. B1, the blocker and
+  half this unit's: the awk binding for `REV_SCOPE_CUTOFF` is named `revscopecut`, spelled from the
+  key rather than abbreviated, and the single `mcut` this document carried is gone. S4 and §4's
+  Files-touched row name the binding; §4 gains "The binding, and who owns the name", which states
+  the claim for `TOOL-aJoinedCanon-3`'s register to carry, records that the audit's `rvcut` was
+  declined for sitting one letter from an already-taken `rcut`, and verifies at HEAD that the
+  check-12 `-v` list is one awk program with one namespace. New AC16 is the observation the round
+  said neither spec had: no name bound twice on that invocation, with a liveness refusal if the
+  locator matches no line, a staged red run at this fold, and an honest note that it cannot red for
+  a real collision until `order` 4. H3: §7 gains `kit version markers` with the reason it is not
+  covered by `verdict epoch`, and AC9 now runs `check-kit-versions.sh` beside
+  `check-verdict-epoch.sh` with the two staged reds named separately. Swept for H3's class — a leg
+  that reds on this landing and §7 does not name — and it HIT once more: `spec tokens (a spec's own
+  names resolve)` is unguarded, grades this document's own backticked names, and was absent. Swept
+  for B1's class, a shared engine resource taken without a register, and it did not hit again: this
+  unit adds no shell function, and its fixture block is already allocated by the build README.
+  Also corrected without a finding: the fix text says "both `mcut` occurrences" and this document
+  held one; `TOOL-aJoinedCanon-4` independently renamed its own binding to `fmcut` in this round,
+  so the collision is closed from both ends; the Files-touched table now names
+  `tools/memory-tree/BUILD-METHOD.template.md` by path, which §7's claim about that leg's
+  population needed; and two derived counts written while drafting this fold were caught and
+  replaced by the derivation, which is the rule this document keeps re-breaking. §3's
+  `TOOL-dUnstalledConvoy-14` non-goal records that round 3's H1 gave that backlog row its missing
+  reachability evidence, and states that the evidence goes to the row rather than into this unit.
 
 ## 10. Reuse audit
 

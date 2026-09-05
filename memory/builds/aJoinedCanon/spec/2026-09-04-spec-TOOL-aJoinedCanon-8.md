@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 8 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 8 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -42,7 +42,8 @@ absence from the graded set is a different answer from disagreement inside it.
   whose §3 carries no `### Edges` block, and reds a bullet inside that block whose head is neither
   verb. It reads ONE file and joins nothing, so it is the only arm here that stays live under
   `--staged`, where it is the committer's own file it grades. **The branch sits OUTSIDE every other
-  cutoff guard on that awk path and tests `SPEC_EDGES_CUTOFF` and nothing else**, so its population
+  cutoff guard on that awk path, on its own `-v edgecut=` binding, and tests `SPEC_EDGES_CUTOFF`
+  and nothing else**, so its population
   is its own key rather than an intersection with `SPEC_WITNESS_CUTOFF` or any sibling's; an arm
   nested inside a neighbour's guard reads as armed in an adopter conf that arms only this key and
   never executes. Observed by AC1, AC2 and AC12.
@@ -96,6 +97,22 @@ absence from the graded set is a different answer from disagreement inside it.
   it are different answers and the arm gives different ones. This is what makes a correct Tier-2 to
   Tier-1 edge quiet rather than a red on honest work, and §3 records the resulting gap as skipped by
   a named test rather than as an unenforceable hope. Observed by AC13.
+- **S15** — `memory/guides/SESSION-KICKOFF.md` is re-stamped: `last-audit` moves to a fresh
+  `<ISO datetime> @ <sha>` per that manifest's own stamping rule, which this spec does not restate.
+  THREE of this unit's write-set paths are `watch:` pathspecs of that manifest, and the third is the
+  one a per-spec sweep misses: `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf`
+  are named on the `watch:` line outright, and `memory/guides/BUILD-METHOD.md` arrives through
+  S10b — `PAIRS` in `tools/memory-tree/kit-dogfood-parity.test.sh` binds it to
+  `BUILD-METHOD.template.md` and `render_doc` copies the whole file including its line-1
+  `gov:kit memory-tree@` marker, so advancing the constant re-renders a watched file this unit never
+  otherwise opens. Check C5 of `skills/session-kickoff/manifest-check.sh`, `no unaudited watch
+  drift`, is TOPOLOGICAL: it reds when the newest watch-touching commit is not an ancestor of the
+  newest commit that changed the `last-audit` value, whatever the body says. `last-body-change` does
+  NOT move and §B gains no delta line — this unit changes no gate command, entrypoint, layout
+  convention or front-loaded claim of that file, and the charter's rule is "no delta → no touch".
+  Not an edge and not a handoff: every unit that edits a watched path re-stamps at its own landing,
+  so units 1 and 2 carrying the same obligation hand this unit nothing and take nothing from it.
+  Observed by AC17.
 
 ## 3. Non-goals (OUT)
 
@@ -146,10 +163,12 @@ absence from the graded set is a different answer from disagreement inside it.
 
 ### The evidence
 
-450 of 479 specs (94%) sit in multi-spec build folders, 60 of the 89 folders holding a spec. The
+450 of 479 specs (94%) sit in multi-spec build folders. The
 template's only cross-unit field is the permitted `order <n>`, carried by 159 of 479. Those are the
-research record's post-skeptic figures, quoted as the record's, and they are the only three numbers
-this section holds. The live corpus is DERIVED rather than restated: count it with
+research record's post-skeptic figures under finding A4, quoted as the record's, and they are the
+only two numbers this section holds. An earlier rev added a third — "60 of the 89 folders holding a
+spec" — inside the same attribution: A4 does not carry it, and it does not reproduce live either.
+The live corpus is DERIVED rather than restated: count it with
 `git ls-files 'memory/builds/*/spec/*.md'`, group by the folder segment for the multi-spec share,
 and `git grep -lE '^\*\*Status:\*\*.*· order [0-9]'` over the same set for the `order` share. Every
 earlier rev pinned a live re-measurement beside the record's figures, and the pin was stale within a
@@ -160,14 +179,19 @@ day because this build's own specs land into the population it counts.
 own S1 population is the shipped test and selftest files and whose §3 excludes everything else. The
 outward-facing half is finding 27: seven confirmed amendments where a criterion rested on something
 the unit does not build, four of them in one spec. That spec is `dScaffoldedMirror-8`, whose AC1,
-AC2, AC3 and AC5 all name `--probe --write`, and whose §9 rev-1 status line records the owner cutting
-`--probe --write` from the unit. Four criteria died in place and nothing in the format had asked what
-they rested on.
+AC2, AC3 and AC5 all rest on `--probe --write` — AC1 and AC5 name the verb, AC2 runs "the same
+command" and AC3 reads the ledger AC2's run writes — and whose §9 rev-1 status line records the owner
+cutting `--probe --write` from the unit. Four criteria died in place and nothing in the format had
+asked what they rested on. Two of the four never spell the verb, which is why the join has to be
+declared rather than grepped.
 
 Three separate reviews have already proposed this arm as a left-shift, which is the strongest
 argument for building it once rather than re-deriving it per build. `dRetiredFork` round 1 proposes a
-cross-spec handoff join at H4 and reaches for it again at H8, and `dFoldedVerdict` round 1 proposes
-the same join at `:110`.
+cross-spec handoff join at H4 and reaches for it again at H8, whose left-shift says in terms that the
+same join proposed at H4 covers it. `dFoldedVerdict` round 1 proposes it in H4's own left-shift
+paragraph, the one opening `A cross-spec arm, and this build is the argument for building it`, and
+reaches for that paragraph twice more in the same record. An earlier rev cited it as `:110`, which is
+a blank line.
 
 ### Data model
 
@@ -212,6 +236,15 @@ The shape arm is a branch in the batched awk that check 12 runs over `c12_sel`, 
 only. That position is OUTSIDE every cutoff guard on the path: the cut and the two walks below it sit
 at the top level of the record body, the `scut`, `wcut` and `fcut` blocks all close above it, and the
 `ecut` §10-evidence block below it is a sibling rather than an enclosure.
+**The binding is `-v edgecut=`, and the name is claimed rather than assumed.** Check 12's awk opens
+with exactly `-v canon -v canon10 -v cut10 -v mroot -v discalt -v scut -v wcut -v fcut -v ecut`
+today, and the siblings adding to that same invocation take `revscopecut` (unit 1), `jcut` (unit 3),
+`mcut` and `fmcut` (unit 4), `rcut` and `rrows` (unit 9) and `bcut` (unit 11); `grep -rn edgecut`
+over the tree returns nothing. It is spelled out rather than shortened to `ecut`-adjacent bytes on
+purpose — `ecut` is `SPEC10_EVIDENCE_CUTOFF` and a one-character neighbour in a nine-name `-v` list
+is a rebind nobody reads. A second `-v` of one name is last-wins for the whole program, which is
+round 3's B1 and the reason build rule 6 exists; `TOOL-aJoinedCanon-3` §4's namespace survey owes a
+row for this name, and until it carries one the taken list there is incomplete.
 The branch therefore carries its own `SPEC_EDGES_CUTOFF` liveness test and inherits no neighbour's,
 which is what keeps its population from becoming an intersection of two keys — the defect round 2
 recorded as B1 against a sibling, where an arm anchored on a print INSIDE the `wcut` guard would
@@ -221,7 +254,13 @@ inline like the other per-file findings in that pass, so it adds no `fail` branc
 exactly one file.
 
 The three join arms accumulate in that same pass and emit in its END block, tagged the way the
-canon-diff arm tags its excerpt request with a `\001` sentinel record. The `case "$bad12_raw" in`
+canon-diff arm tags its excerpt request with a sentinel record. **The tag is `\003`, and it is a
+claimed name for the same reason the `-v` binding is.** `\001` is taken: the canon-diff arm emits
+`print "\001\t" f` and the `case "$bad12_raw" in` post-pass already matches `*$'\001'*`, so a second
+emitter of that byte is not a second class, it is the excerpt path consuming these records.
+`TOOL-aJoinedCanon-11` has claimed `\002`. One byte carries all three join classes with the class
+name as the first tab field; three bytes would be three routes to write and nothing to buy. The
+`case "$bad12_raw" in`
 post-pass below the awk learns the tag and routes each class into its own accumulator, and three
 `fail 12` calls report them — the shape check 23 already uses for its three ledger-join classes.
 Each of the three then owes an armed fixture signature, and `ARMS_FLOORS` for this gate is
@@ -287,9 +326,13 @@ of the Tier-1 residual §3 records, and it is a declared blind spot rather than 
   in the same language. Charter §12 says to derive that live and commit nothing. The arm reads the
   specs directly. If a reader later wants the graph rendered, it is a follow-up unit and the field
   is already the single source it would render from.
-- **Extending the unattended kit's order gate.** `tools/unattended/unattended.sh:4611-4653` already
-  resolves sibling units and blocks a `--dispatch` that runs ahead of its declared order, reading
-  `order_verb_of` and `unit_ids_of`. It is live prior art and it is deliberately not extended: it
+- **Extending the unattended kit's order gate.** `tools/unattended/unattended.sh` already resolves
+  sibling units and blocks a `--dispatch` that runs ahead of its declared order — the block reading
+  `order_verb_of` and `unit_ids_of` and ending in the `fail 49` whose message opens `--dispatch
+  declares a build pass out of the build's own declared order`. Cited by symbol and by message text:
+  an earlier rev pinned it as `:4611-4653`, and a line range into a live driver this unit does not
+  own is stale on someone else's commit. It is live prior art and it is deliberately not
+  extended: it
   grades SEQUENCE rather than an edge, it runs only on unattended runs while the hygiene gate runs on
   every bar, and it is a different copy-installed kit, which under charter §12 may not learn another
   kit's paths.
@@ -313,6 +356,8 @@ rather than resolving forward.
 | `tools/memory-tree/check-memory-hygiene.test.sh` | the fixtures, in the `tFixture-160` block, including a `--staged` scratch-tree case beside the existing one |
 | `.memory-tree.conf` | the cutoff key and the re-measured `ARMS_FLOORS` |
 | `tools/memory-tree/.memory-tree.conf.example` | the same key, blank, with its adopter comment |
+| `memory/guides/BUILD-METHOD.md` | its line-1 marker only, re-rendered by the version bump; no prose change (S15) |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp only; no body delta, `last-body-change` unmoved (S15) |
 | every `gov:kit memory-tree@` marker carrier | `KIT_MEMORY_TREE_VERSION` advanced and the marker moved; the set is DERIVED below, never listed here |
 
 The version row is S10b and its observer is AC16. Derive the carrier set with
@@ -321,6 +366,10 @@ The version row is S10b and its observer is AC16. Derive the carrier set with
 verdicts, so `verdict epoch (kit version dates the engine)` is the leg that reds on an unmoved
 constant; `kit version markers` reds on a carrier left behind while its siblings moved. Two legs,
 two different failures, and rev-3 declared the obligation in this table with no criterion behind it.
+That derived set is also how a third `watch:` path enters a write set that never opens it by name:
+`memory/guides/BUILD-METHOD.md` carries the marker and is bound to its template by `PAIRS` in
+`kit-dogfood-parity.test.sh`, so the version bump re-renders it. S15 is the obligation that follows
+and AC17 observes it.
 
 ## 5. Production-readiness checklist
 
@@ -433,13 +482,22 @@ two different failures, and rev-3 declared the obligation in this table with no 
   and `verdict epoch (kit version dates the engine)` reds; move the constant in one carrier and not
   the rest and `kit version markers` reds. Both restored before the commit. This is S10b, split out
   of S10 because AC11 runs `check-arms.py` and reaches neither script.
+- **AC17** — When `bash skills/session-kickoff/manifest-check.sh` runs on the landing commit it
+  exits 0, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` names a sha at or after the newest
+  commit touching a watched path in this write set. The failing case is the revert of S15 alone:
+  keep the engine, conf and marker edits, restore the old stamp, and check C5 —
+  `no unaudited watch drift` — reds naming those files as watched files changed with no re-stamp at
+  or after the change. `last-body-change` is the SAME sha before and after, which is the half of the
+  criterion that observes the "no delta → no touch" side of the rule rather than the re-stamp side.
+  Graded on the landing commit and not under `--staged`: the staged leg runs C5s, which that
+  script's own comment narrows because a blocking pre-commit cannot see a future follow-up stamp.
 
 ## 7. Gates
 
 - `memory hygiene` · `memory-hygiene self-test`
 - `kit/dogfood doc parity` · `kit version markers`
 - `harness arms (fail branches armed or pinned)` · `verdict epoch (kit version dates the engine)`
-- `spec tokens (a spec's own names resolve)`
+- `spec tokens (a spec's own names resolve)` · `kickoff-manifest ratchet`
 
 This unit adds no leg. The arm's home is check 12 inside `tools/memory-tree/check-memory-hygiene.sh`,
 which the `memory hygiene` leg already runs. Its fixtures live in
@@ -454,6 +512,10 @@ and AC16 observes both, with a separate staged red for each because they fail on
 AC11 observes the move against a deleted assertion rather than against a green. `spec tokens (a
 spec's own names resolve)` grades this document's own leg names; every name in the list above was
 checked against `tools/gate-legs.json` and resolves, and no script path stands in for one.
+`kickoff-manifest ratchet` is `subject = repo` with NO guard in that manifest, verified there, so it
+runs on every bar rather than only on a diff that touches the kickoff skill — three of this unit's
+write-set paths are `watch:` pathspecs of `memory/guides/SESSION-KICKOFF.md`, and without S15 this
+landing reds an unguarded leg on every subsequent bar. AC17 is the observed red.
 
 One exemption, stated with its compensating check. S13 takes the three join arms off the pre-commit
 `--staged` run entirely, so the only bar that grades them is the full `memory hygiene` leg, which
@@ -520,6 +582,27 @@ what keeps the pre-commit silence from reading as a pass.
   (`--render`, `--check`, `--report` and all seven §7 leg names run or resolve against
   `tools/gate-legs.json`), H8, H9 (no `check-memory-hygiene.sh` line pin survives), M2, M3, M5
   (unit 6 does not touch the `check 23 HELD under --staged` line this unit copies), M8.
+- rev-5 · 2026-09-05 · §2 · §4 · §6 · §7 · §10 · folded spec-audit round 3, the TERMINATING fold —
+  H2, plus the eight build rules swept over this document. H2 — S15, AC17, two Files-touched rows
+  and the `kickoff-manifest ratchet` leg carry the `last-audit` re-stamp this spec owed and named
+  nowhere; the sweep found the finding UNDERSTATED for this unit, because a third `watch:` path,
+  `memory/guides/BUILD-METHOD.md`, enters the write set through S10b's version bump via `PAIRS` in
+  `kit-dogfood-parity.test.sh` rather than through any row the spec had written. RULE 6, twice, both
+  the round-3 blocker's class in this document: the `-v` binding was introduced un-named and is now
+  `edgecut`, checked free against the nine bound on that invocation today and against all seven
+  names the siblings claim; and the END-block sentinel was described only as "the way the canon-diff
+  arm tags" its `\001` record, which is the byte that arm's post-pass already routes, so the tag is
+  now `\003` with `\002` recorded as unit 11's. RULE 8 and round 3's M3/M5 classes: the
+  `unattended.sh:4611-4653` range in §4 and §10 became a symbol-and-message citation, and the
+  `dFoldedVerdict` round 1 `:110` pin was verified to land on a BLANK line and became a text anchor
+  on H4's left-shift paragraph. RULE 1: "60 of the 89 folders holding a spec" was attributed to
+  finding A4, which does not carry it, and does not reproduce live either — dropped, the two figures
+  A4 does carry kept. One over-claim corrected: `dScaffoldedMirror-8`'s AC2 and AC3 rest on
+  `--probe --write` by reference rather than naming it. NOT FIXED HERE, and it is cross-unit by
+  construction: `TOOL-aJoinedCanon-3` §4's namespace survey still lists no row for `edgecut`, which
+  this document states where the name is claimed. SWEPT AND CLEAN: rules 2, 3, 4, 5 and 7 — the
+  cutoff is declared in both confs, every arm names its staged red, the fixtures stay in the
+  README-allocated `tFixture-160` block, and no literal a lower-`order` unit moves is pinned.
 
 ## 10. Reuse audit
 
@@ -530,9 +613,10 @@ units in one build"` returned the build-README region machinery as its nearest s
 reason §4 Alternatives rejected records. The seam it does extend is check 12's batched awk over
 `c12_sel` in `tools/memory-tree/check-memory-hygiene.sh`, which the map does not index because it
 holds no shell symbols. The recall probe found the live prior art the map could not:
-`tools/unattended/unattended.sh:4611-4653` already resolves sibling units by their `order` verb and
-blocks a dispatch that runs ahead of them, which is sequence rather than an edge, and it is a
-different kit on a different trigger.
+`order_verb_of` and `unit_ids_of` in `tools/unattended/unattended.sh` already resolve sibling units
+by their `order` verb and block a dispatch that runs ahead of them, which is sequence rather than an
+edge, and it is a different kit on a different trigger. Cited by symbol here for the reason §4's
+Alternatives entry gives.
 
 Recall terms used: `spec unit sibling handoff order verb build roster cross-spec join hygiene check
 12 cutoff edge`.

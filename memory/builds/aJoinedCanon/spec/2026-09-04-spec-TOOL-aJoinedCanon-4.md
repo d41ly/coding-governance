@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -76,7 +76,13 @@ therefore neither find it nor check it.
   collision silently makes one unit's assertions grade a sibling's file. Five ride the harness's
   shared scratch tree, whose conf pins BOTH `SPEC_WITNESS_CUTOFF` and `SPEC_FAILURE_MODE_CUTOFF`.
   The sixth needs the witness key ABSENT, so it takes its own scratch tree and its own conf, which is
-  the idiom the §10-evidence and check-6 arms in that harness already use. The six are the WHOLE
+  the idiom the §10-evidence and check-6 arms in that harness already use. That sixth conf declares
+  `SPEC_FAILURE_MODE_CUTOFF` and NO other rule cutoff on check 12's awk — not `SPEC_WITNESS_CUTOFF`
+  and not `REV_SCOPE_CUTOFF`, `TOOL-aJoinedCanon-1`'s key, which is landed by `order` 1 and so exists
+  by the time this unit builds. It costs nothing to widen: those confs are written by a `printf` that
+  names each key it wants, so a key it omits is already blank. It buys a second observation on the
+  same fixture — AC14, the one-key-armed run — and that is the only criterion in either spec that can
+  tell a shared `-v` binding from two independent ones. The six are the WHOLE
   coverage rather than a supplement to it: §8's resolved cutoff sits ahead of every dated spec on
   every ref, so the arm grades zero live specs on the day it lands and the real corpus cannot
   exercise it at all.
@@ -89,6 +95,20 @@ therefore neither find it nor check it.
   HYGIENE sentence and by AC13 for the version bump. Both halves of this item had no observer at all
   before rev-4 while §7 stated the version obligation outright, which is how an author-facing
   deliverable ships absent with every fixture green.
+- **S8** — `memory/guides/SESSION-KICKOFF.md` is re-stamped: `last-audit` moves to a fresh
+  `<ISO datetime> @ <sha>` per that manifest's own stamping rule, which this spec does not restate.
+  Not optional and not bookkeeping to taste. Both `tools/memory-tree/check-memory-hygiene.sh` and
+  `.memory-tree.conf` sit on that manifest's `watch:` line — read there, not assumed — and this unit
+  edits both, so its landing is a watched change, and check C5 of
+  `skills/session-kickoff/manifest-check.sh` (`no unaudited watch drift`) is TOPOLOGICAL: it reds
+  when the newest watch-touching commit is not an ancestor of the re-stamp, whatever the body delta.
+  The `kickoff-manifest ratchet` leg carrying it is `subject: repo` with no `guard` in
+  `tools/gate-legs.json`, so it runs on every bar and no scoping avoids the red. `last-body-change`
+  does NOT move and §B gains no delta line: this unit changes no gate command, no entrypoint, no
+  layout convention and no claim §B front-loads — the manifest names check 12's skeleton scan, a
+  different arm, and enumerates none of check 12's rule-cutoff keys — and the charter's rule is
+  "no delta → no touch". Observed by AC15. Eight of this build's eleven units owe this and none
+  carried it before rev-5.
 
 ## 3. Non-goals (OUT)
 
@@ -114,6 +134,22 @@ therefore neither find it nor check it.
 - **Widening the marker to the phrasings the corpus already uses in prose.** Follow-up: reopen only
   if the fixtures or a later measurement show the single spelling rejecting honest criteria.
 - **A new gate leg.** The arm rides check 12, which the `memory hygiene` leg already runs.
+- **A self-test arm that grades the check-12 awk `-v` namespace for duplicates.** This is spec-audit
+  round 3's left-shift for its blocker, and it is NOT built here. Two reasons, and both are stated
+  rather than parked, because this build has no round 4. First, subject: it grades the ENGINE's awk
+  invocation, not the spec format, so it belongs beside the harness's other structural self-tests
+  and not inside the unit whose subject is `## 6. Acceptance criteria`. Second, the predicate the
+  review proposed does not work as written, and this was found by running it rather than by reading
+  it, per charter §7. `grep -o ' -v [a-z0-9]*=' tools/memory-tree/check-memory-hygiene.sh | sort |
+  uniq -d` returns ` -v bp=`, ` -v cut=`, ` -v famalt=` and ` -v m=` on the tree at this unit's base:
+  those are re-uses across DIFFERENT awk invocations, which are legal and correct, so the arm would
+  red on a clean tree from the commit it landed. The predicate has to be scoped to a single
+  invocation — the same command against the one `bad12_raw=` line alone returns empty today — and
+  scoping it means teaching the arm where each invocation begins and ends, which is a real design
+  question and not a one-liner. **Follow-up:** a `TOOL` backlog row against
+  `tools/memory-tree/check-memory-hygiene.test.sh`, carrying both findings above so the next author
+  does not re-run the same false-red. The build README's one-owner-per-shared-engine-name rule is the
+  interim control, and `TOOL-aJoinedCanon-3`'s namespace registry is where it is written down.
 
 ## 4. Design
 
@@ -141,8 +177,23 @@ string compares earlier than every date. The accumulator loop runs when EITHER b
 is skipped otherwise, so a tree with both keys blank pays exactly what it pays today. At each bullet
 close the loop asks two questions of the SAME `acc` string and answers them into two lists: the
 backtick test under the witness boolean, the `red when:` test under this unit's. The new cutoff
-rides in on its own `-v` binding on the existing check-12 awk, named `mcut` because `fcut` is
-already `FORK_MARK_CUTOFF`.
+rides in on its own `-v` binding on the existing check-12 awk, named **`fmcut`** — failure mode —
+and CLAIMED as this unit's alone in `TOOL-aJoinedCanon-3`'s namespace registry.
+
+**Why the name changed at rev-5, and it is the round-3 blocker.** rev-4 said `mcut`, "because `fcut`
+is already `FORK_MARK_CUTOFF`". So did `TOOL-aJoinedCanon-1`, for `REV_SCOPE_CUTOFF`, three `order`
+steps earlier and on the SAME awk invocation, and a second `-v mcut=` is last-wins for the whole
+program: from `order` 4 onward one arm would be graded by the other arm's key while its own conf key
+still read as armed. Neither spec's AC6 could see it — each blanks its own key, which under a shared
+binding blanks both arms, so both criteria pass with both arms dark. That is this build's own subject
+shipped as a defect, in its third disguise. Verified at base before renaming:
+`grep -c mcut tools/memory-tree/check-memory-hygiene.sh` is 0, so both units introduce the name and
+neither inherits it; the invocation binds `canon canon10 cut10 mroot discalt scut wcut fcut ecut`
+today; `fmcut` is free in the tree and in all eleven specs. Unit 1 takes its own distinct name. The
+one-letter-plus-`cut` convention is what made the collision reachable — it has four claimants in this
+build alone (`jcut`, `rcut`, `bcut`, and this) — so this name is spelled from the KEY and not from a
+free letter. AC14 is the observation, and it exists because the review was right that nothing else
+here could distinguish a rebind from a correct build.
 
 There is no `N/A` escape and no second form. That is the acceptance ledger's own ruling applied one
 level up: in `memory/HYGIENE.md`, the bullet headed `**TWO forms and no third.**` allows exactly two
@@ -157,11 +208,12 @@ all there is IS the finding — that is the "criteria that could not fail reache
 |---|---|
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | one paragraph in the §6 body, beside the paragraph that begins `Once a spec's filename date reaches` |
 | `memory/TEMPLATE-SPEC.md` | regenerated by `kit-dogfood-parity.test.sh --render`, never hand-edited |
-| `tools/memory-tree/check-memory-hygiene.sh` | the blank preset, one `-v mcut=` on the existing check-12 awk, S3's hoist of the accumulator out of the `wcut` guard, and one test plus one message inside the hoisted loop |
+| `tools/memory-tree/check-memory-hygiene.sh` | the blank preset, one `-v fmcut=` on the existing check-12 awk, S3's hoist of the accumulator out of the `wcut` guard, and one test plus one message inside the hoisted loop |
 | `.memory-tree.conf` | `SPEC_FAILURE_MODE_CUTOFF` with its date and the reason for that date |
 | `tools/memory-tree/.memory-tree.conf.example` | the same key, shipped blank, beside its declared siblings |
-| `tools/memory-tree/check-memory-hygiene.test.sh` | `tFixture-120` through `tFixture-125`, their `hit`/`miss` assertions, and one extra scratch tree for the witness-blank fixture |
+| `tools/memory-tree/check-memory-hygiene.test.sh` | `tFixture-120` through `tFixture-125`, their `hit`/`miss` assertions, and one extra scratch tree whose conf declares this unit's cutoff and no other rule cutoff |
 | `tools/memory-tree/HYGIENE.template.md` | one sentence in item 12; `memory/HYGIENE.md` regenerated |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp only; no body delta and no `last-body-change` move (S8) |
 | kit version | `KIT_MEMORY_TREE_VERSION` one minor forward, in the engine constant and in every `gov:kit memory-tree@` carrier `grep -rl` finds at build time |
 
 **The pre-change baseline AC12 grades against.** `grep -c 'Red when:'` returns **0** on both
@@ -214,12 +266,14 @@ diff.
 - **A section-level minimum — §6 mentions one break somewhere.** One line would satisfy ten criteria.
   That is the vacuous-selector class the charter names, and BUILD-METHOD M3's counter-rule refuses an
   observation that passes by matching nothing.
-- **Widening the marker to `reds when`, `would red` or `fails when`.** Measured 2026-09-05 with
-  `git grep -cil '<phrase>' -- 'memory/**/spec/*.md' | wc -l`: `would red` appears in 97 specs,
-  `staged break` in 44, `reds when` in 34, `red-first` in 19. Those are counts of a population this
-  build's own eleven specs already moved and every later spec moves again — re-derive with the
-  command, never quote the figures, and note that the rev-3 numbers here were five, one, one and one
-  low for exactly that reason. The argument does not rest on the sizes: all four spellings are prose,
+- **Widening the marker to `reds when`, `would red` or `fails when`.** Each spelling's incidence is
+  DERIVED, never written here:
+  `git grep -cil '<phrase>' -- 'memory/**/spec/*.md' | wc -l` per phrase, run when the question is
+  asked. rev-3 pinned four integers and rev-4 replaced them with four fresher integers while telling
+  the reader in the same sentence to re-derive rather than quote; re-running the command at rev-5
+  found one of those four already moved, one round later, which settles the argument the rev-4 text
+  was making against itself. Every spec landed after any measurement moves this population, and this
+  build lands eleven. The argument does not rest on the sizes: all four spellings are prose,
   and admitting them would let an incidental sentence satisfy the arm. The §10 terms arm took this exact decision and recorded the reason in its own
   comment head, `THE TERMS ARM ACCEPTS TWO SPELLINGS AND WAS DELIBERATELY NOT WIDENED`: a false red
   names its own remedy, a false pass is silent.
@@ -243,9 +297,13 @@ diff.
 - observability — the finding names the offending bullet's label and the cutoff key, matching the
   witness message that prints `(acceptance bullets naming no backticked witness, required at/after`.
 - risks — two. The first is a false-red risk rather than a data risk: a cutoff set behind a live
-  spec's filename date reds landed work. §8's resolved date forecloses that at landing, because no
-  spec on any ref is dated at or after it, so the residual exposure is a LATER lowering of the key
-  and not this landing. Rollback is blanking the key. The second arrived with S3's hoist and is the
+  spec's filename date reds landed work. §8's resolved date forecloses that at landing — re-derived
+  at rev-5, nothing on any ref is dated at or after `2026-09-06` — but the foreclosure is a
+  PROPERTY that expires, not a permanent one, and the margin is now one day rather than the two §8
+  was ruled with. Re-derive the newest spec filename date on the actual landing day; if it has
+  reached the declared value, the ruled property obliges raising the key, not landing under it. The
+  residual exposure is therefore a LATER lowering of the key, or a landing that outruns the date.
+  Rollback is blanking the key. The second arrived with S3's hoist and is the
   only way this unit can break something that already works: the hoist edits the walk an ARMED arm
   runs in, so a mistake there moves acceptance-witness verdicts across the live corpus. AC8 is its
   observer and the harness's existing witness fixtures are its regression net. There is no
@@ -256,6 +314,9 @@ diff.
   cover the engine and nothing else, so the author-facing half — the template paragraph, the HYGIENE
   sentence, the version bump — is covered by AC12 and AC13 instead, as content greps and two gate
   legs. Those three deliverables had zero coverage while all eleven earlier criteria were green.
+  Two more deliverables joined at rev-5 and each names its own observer rather than leaning on the
+  fixtures: the `-v` binding's exclusive ownership (AC14, on the AC7 tree with every other rule
+  cutoff absent) and S8's manifest re-stamp (AC15, on the `kickoff-manifest ratchet` leg).
 - migration / rollback — see §4. Blank the key.
 - user docs — the §6 body of `memory/TEMPLATE-SPEC.md` and item 12 of `memory/HYGIENE.md`, both
   rendered from their kit templates, both observed by AC12.
@@ -286,13 +347,14 @@ diff.
   `.memory-tree.conf` — the AC1 fixture stops being reported and
   `bash tools/memory-tree/check-memory-hygiene.sh` prints no failure-mode finding over that tree.
   Red when: the blank string compares earlier than every date and arms the rule over the whole corpus,
-  which is the `mcut != ""` conjunct every rule cutoff in this engine carries.
+  which is the `fmcut != ""` conjunct every rule cutoff in this engine carries.
   The tree is named because this criterion cannot be graded on the real one: under §8's ratified
   2026-09-06 cutoff the arm grades zero live specs, so a whole-tree run is green with the key set and
   green with it blank, and a criterion whose two arms are indistinguishable observes nothing.
 - **AC7** — When a fixture dated on or after `SPEC_FAILURE_MODE_CUTOFF` carries a clauseless AC
-  bullet in a scratch tree whose conf declares that key and declares NO `SPEC_WITNESS_CUTOFF`,
-  `bash tools/memory-tree/check-memory-hygiene.sh` still exits 1 naming `tFixture-125`.
+  bullet in a scratch tree whose conf declares that key and declares NO `SPEC_WITNESS_CUTOFF` and no
+  other check-12 rule cutoff, `bash tools/memory-tree/check-memory-hygiene.sh` still exits 1 naming
+  `tFixture-125`.
   Red when: the accumulator stays nested inside the witness guard, so this arm's real population is
   the intersection of two cutoffs and an adopter arming this key alone gets a dead arm whose own key
   reads as armed. Observed before the arm lands, per AC11.
@@ -335,6 +397,26 @@ diff.
   criterion, staged deliberately before the bump, since `check-verdict-epoch.sh`'s rule is
   topological and a bump made in an earlier commit than the engine edit does not satisfy it.
   §7 stated this obligation outright while §6 had nothing behind it.
+- **AC14** — When the AC7 scratch tree is run — the one whose conf declares `SPEC_FAILURE_MODE_CUTOFF`
+  and no other rule cutoff on check 12's awk, `SPEC_WITNESS_CUTOFF` and `REV_SCOPE_CUTOFF` both
+  absent — `bash tools/memory-tree/check-memory-hygiene.sh` still exits 1 naming `tFixture-125`, and
+  `bash tools/memory-tree/check-memory-hygiene.test.sh` exits 0.
+  Red when: this arm's `-v` binding is shared with another arm's, so blanking the OTHER arm's key
+  blanks this one and the run goes silent with its own key armed. That is the rev-4 `mcut` collision
+  with `TOOL-aJoinedCanon-1` exactly, and it is the reason this criterion exists rather than a
+  hypothetical: nothing else in either spec can distinguish a shared binding from two independent
+  ones, because AC6 and unit 1's AC6 each blank their own key and a shared binding turns both arms
+  dark, which reads as a pass on both sides. The criterion sits here and not in unit 1 because
+  `order` decides it — unit 1 builds at `order` 1, when this unit's key does not exist and blanking
+  it is vacuous.
+- **AC15** — When the landing commit is HEAD, `bash skills/session-kickoff/manifest-check.sh` exits 0
+  and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` names a sha at or after the commit that edits
+  `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf`. `last-body-change` is the SAME
+  sha before and after, which is the half of this criterion that observes S8's "no delta → no touch".
+  Red when: the engine and conf edits land with the old stamp — check C5, `no unaudited watch drift`,
+  reds naming the watched file changed with no re-stamp at or after it. That is the observed red, and
+  it is staged by reverting S8 alone. The leg is `kickoff-manifest ratchet`, which is `subject: repo`
+  with no guard, so this fires on every bar rather than on a scoped one.
 
 ## 7. Gates
 
@@ -353,6 +435,10 @@ diff.
 - `kit version markers` — `bash tools/check-kit-versions.sh`, the other half of S7's version
   obligation: the constant and every `gov:kit memory-tree@` carrier move together. Also AC13. The
   leg was missing from this list entirely while §7's prose demanded the bump.
+- `kickoff-manifest ratchet` — `subject: repo` with no `guard` in `tools/gate-legs.json`, so it runs
+  on every bar. It is on this list because `tools/memory-tree/check-memory-hygiene.sh` and
+  `.memory-tree.conf` are both `watch:` pathspecs of the manifest S8 re-stamps; see AC15 for the
+  observed red. The leg was absent from this list while the unit's write set has always owed it.
 - `spec tokens (a spec's own names resolve)` — this spec's own backticked names must resolve.
 - No new leg, and no new `fail` branch: this arm appends to check 12's existing finding list and
   reaches the tree through the single `fail 12` site, the line beginning `[ -n "$bad12" ] && fail 12`.
@@ -390,6 +476,17 @@ diff.
   whole coverage. The counter-argument above LOST and stays on the record — the witness ratchet did
   make its own spec the first subject and did buy an example the fixtures cannot, and that was
   weighed rather than overlooked.
+
+  NOTE (rev-5, 2026-09-05) — appended, not spliced: the ruling above is untouched and still holds,
+  and one figure inside it no longer reproduces. It says the newest spec filename date on any ref
+  "is 2026-09-04". Re-derived at rev-5 with
+  `git log --all --name-only --format= -- 'memory/**/spec/*' | grep -oE '/spec/[0-9-]{10}' | sort -r`:
+  the newest is now **2026-09-05**, and eleven specs carrying it are already on `main`
+  (`aKeyedAnnotation`, `dTracedLattice`). Nothing on any ref is dated at or after `2026-09-06`, so
+  the ruled VALUE still satisfies the ruled PROPERTY — strictly past every spec filename date and
+  strictly past today — and the decision needs no re-opening. What changed is the margin: two days
+  became one. §5's first risk now carries the expiry condition and the remedy, because a foreclosure
+  that rests on a date is not permanent and the rev-4 text read as though it were.
 
 ## 9. Revision log
 
@@ -439,6 +536,35 @@ diff.
   M10 (no `Observed by` tag is claimed for more than it covers). Every literal this spec cites into
   `check-memory-hygiene.sh` was re-grepped at base and each one resolves; no count of them is written
   here, for the same reason §3's corpus figure is gone.
+- rev-5 · 2026-09-05 · §2 · §3 · §4 · §5 · §6 · §7 · §8 · folded spec-audit round 3, the TERMINATING
+  fold — the audit loop exited on M4's convergence rule, so both findings are disposed here and
+  nothing is deferred to a further round. **B1, the blocker, half of it this unit's:** the `-v`
+  binding is renamed `mcut` → `fmcut`, spelled from the key rather than from a free letter, because
+  `TOOL-aJoinedCanon-1` claims `mcut` for `REV_SCOPE_CUTOFF` on the same check-12 awk invocation at
+  `order` 1 and the last `-v` wins. §4 gains "Why the name changed", which records the collision, the
+  verification that `grep -c mcut` over the engine is 0 so both units introduce it, and the claim for
+  `TOOL-aJoinedCanon-3`'s registry; the Inventory row and AC6's conjunct follow. S6 widens the sixth
+  scratch tree's conf to declare this key and NO other check-12 rule cutoff, which costs nothing
+  because those confs are `printf`-written key by key, and AC14 rides it as the one criterion in
+  either spec that can tell a shared binding from two independent ones — placed here and not in unit
+  1 because at `order` 1 this key does not yet exist. **H2:** both
+  `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf` are on the kickoff manifest's
+  `watch:` line, read there, so S8 is the `last-audit` re-stamp with `last-body-change` held, AC15 is
+  its criterion with check C5 as the observed red, and `kickoff-manifest ratchet` joins §7.
+  **PROMOTED, not fixed:** round 3's left-shift for B1 — a self-test arm grading the awk `-v`
+  namespace — is a §3 non-goal with a named destination, a `TOOL` backlog row against
+  `check-memory-hygiene.test.sh`. It is not this unit's subject, and the predicate the review
+  proposed was run over the tree and false-reds: unscoped it returns ` -v bp=`, ` -v cut=`,
+  ` -v famalt=` and ` -v m=`, legal re-uses across different invocations; scoped to the one
+  `bad12_raw=` line it is empty. Both facts are written into the non-goal so the next author does not
+  re-run it. **Found by the re-read table, not by the review:** §8 → §5 fired, and §8's ruling states
+  the newest spec filename date on any ref "is 2026-09-04", which no longer reproduces — it is
+  2026-09-05, with eleven such specs on `main`. The ratified ruling is left intact and carries an
+  appended dated note instead; the ruled value still satisfies the ruled property, the margin fell
+  from two days to one, and §5's first risk now names the expiry condition and the remedy rather than
+  presenting a dated foreclosure as permanent. §4's four `git grep` phrase counts are also gone: they
+  were re-derived at rev-5, one of the four had already moved a round after being "re-measured", and
+  the deriving command replaces all four integers.
 
 ## 10. Reuse audit
 

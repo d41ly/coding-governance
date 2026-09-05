@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 9 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 9 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -41,7 +41,12 @@ answered.
   that token, and the prose above the skeleton states where the rows now live. `memory/TEMPLATE-SPEC.md`
   is re-rendered from it, never hand-edited.
 - **S4** — `tools/memory-tree/kit.toml` declares `READINESS_ROWS` in the `SPEC-TEMPLATE.template.md`
-  rule's `placeholders`, and both new keys in its `[config]` key lists.
+  rule's `placeholders`, and each new key in EXACTLY ONE `[config]` list, chosen here rather than left
+  to the builder: `READINESS_ROWS` in `required_keys_render`, because §4's blank-value table has
+  `adopt-memory-tree.sh` refusing to render without it, and `READINESS_ROWS_CUTOFF` in
+  `optional_keys`, because blank means the arm is off. rev-4 said only "both new keys in its
+  `[config]` key lists" and its AC1 then read both names out of `optional_keys` — a criterion the
+  implementation this spec prescribes cannot satisfy.
 - **S5** — check 12 gains a §5 row-presence arm inside its existing awk: for every declared row, the
   §5 body must contain that row's label. Gated by `READINESS_ROWS_CUTOFF`, blank means off. The
   branch sits at the SAME NESTING LEVEL as the §10 evidence arm and outside its `ecut` guard, so this
@@ -76,6 +81,18 @@ answered.
   tracked tree, never counted here. AC12 observes it, and the leg that reds without it is
   `verdict epoch` rather than `kit version markers`, because an unbumped constant leaves every
   carrier agreeing with every other.
+- **S11** — `memory/guides/SESSION-KICKOFF.md` is re-stamped: `last-audit` moves to a fresh
+  `<ISO datetime> @ <sha>` per that manifest's own stamping rule, which this spec does not restate.
+  This unit writes TWO of that manifest's `watch:` pathspecs — `.memory-tree.conf` and
+  `tools/memory-tree/check-memory-hygiene.sh`, both verified on its `watch:` line — and check C5 of
+  `skills/session-kickoff/manifest-check.sh`, `no unaudited watch drift`, is TOPOLOGICAL: it reds when
+  the newest watch-touching commit is not an ancestor of the stamp, whatever the body delta is. The
+  leg is `kickoff-manifest ratchet`, `subject = repo` with no guard, so it runs on every bar and this
+  landing would red it for an obligation nothing in rev-4 named. `last-body-change` does NOT move and
+  §B gains no delta line: this unit changes no gate command, entrypoint, layout convention or
+  front-loaded claim — the manifest's two bullets that touch this engine, check 12's skeleton scan and
+  the pre-set-then-source conf idiom, both stay true of the arm this unit adds. That is the charter's
+  "no delta → no touch" half, and AC15 observes both sides.
 
 ## 3. Non-goals (OUT)
 
@@ -223,6 +240,16 @@ eighteen keys in gov's own conf that appear in none of the memory-tree descripto
 the leg exits 0. So declaring both keys there buys a readable surface and a future arm's input, not a
 verdict, and AC1 grades it as the documented check it is.
 
+That is also why S4 can choose the lists on MEANING rather than on consequence, and why the choice
+still has to be written down. `required_keys_render` is read by exactly ONE arm in the tracked tree —
+`tools/govkit/govkit.py`'s `requires_if` resolver at its check 7, which only asks whether a condition
+key resolves in some list of the same entry — so putting `READINESS_ROWS` there declares the blank
+refusal that S2's own edit to `adopt-memory-tree.sh` implements; it does not obtain it. The
+`optional_keys` placement for `READINESS_ROWS_CUTOFF` says the same about blank meaning off. Neither
+is a verdict, both are readable, and each key is in one list rather than in "the key lists" — which
+is the whole of H8: rev-4 left the placement unchosen in S4 and let AC1 pick, and AC1 picked the list
+the design rules out.
+
 ### The check-12 arm
 
 It sits in the Tier-2 block, after the empty-body walk, as a SIBLING `if` of the §10 evidence arm at
@@ -235,6 +262,15 @@ suite's main fixture conf arms every cutoff at once. AC11 is what tells them apa
 the §10 arm's SHAPE and nothing else about its position: a section blob, `index()` over lowercased
 text rather than a regex, and four conjuncts of its own on the guard —
 `want == canon10`, the blank-means-off test, the `fdate != ""` sibling test, and `fdate >= rcut`.
+
+This unit adds exactly two `-v` names to that single awk invocation — `rrows` for the declared row
+list and `rcut` for the cutoff — and CLAIMS them here under the build README's one-owner rule, since
+the last `-v` binding of a name wins and a collision is silent. Both were checked against the two
+populations that rule names. On this branch the check-12 awk binds `canon canon10 cut10 mroot discalt
+scut wcut fcut ecut` and neither new name is among them. Across the other ten specs of this build, as
+they stand at this fold, the `-v` names claimed are `jcut` (unit 3), `mcut` (units 1 and 4 — the
+collision that blocked round 3), `alcut` (unit 6) and `bcut` (unit 11), plus the pre-existing `wcut`
+several of them read; no sibling claims `rrows` or `rcut`.
 
 For each declared row, both the declared TOKEN and the §5 body are lowercased and stripped of every
 non-alphanumeric byte; the row is present when the squashed token is a substring of the squashed
@@ -329,11 +365,12 @@ is regenerated, never edited, so there is no third thing to undo.
 | `tools/lib/render-doc.sh` | the token and the one transform |
 | `tools/memory-tree/adopt-memory-tree.sh` | the same block byte-identically, plus the blank refusal |
 | `tools/memory-tree/kit-dogfood-parity.test.sh` | the same block byte-identically, plus the exit-2 path |
-| `tools/memory-tree/kit.toml` | `placeholders`, `required_keys_render`, `optional_keys` |
+| `tools/memory-tree/kit.toml` | `READINESS_ROWS` into the SPEC-TEMPLATE rule's `placeholders` and into `required_keys_render`; `READINESS_ROWS_CUTOFF` into `optional_keys` (S4) |
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | §5 skeleton rows become the token; the prose above the fence explains the declaration |
 | `memory/TEMPLATE-SPEC.md` | re-rendered by `--render` |
-| `tools/memory-tree/check-memory-hygiene.sh` | preset, `-v` bindings, the arm, the version marker |
+| `tools/memory-tree/check-memory-hygiene.sh` | the two blank presets, the `-v rrows=` and `-v rcut=` bindings claimed above, the arm, the version marker |
 | `tools/memory-tree/check-memory-hygiene.test.sh` | fixture conf keys, one red fixture, one green twin, and AC11's one-cutoff run |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp only; no body delta and no `last-body-change` move (S11) |
 | every `gov:kit memory-tree@` carrier | the version bump of S10, the set derived by `grep -rl` at build time |
 
 The kit version bump is S10 and AC12 rather than this paragraph's advice, because rev-3 left it as
@@ -411,13 +448,18 @@ reason as the preset above: sibling units at a lower `order` edit that file firs
 
 ## 6. Acceptance criteria
 
-- **AC1** (S4) — When `tools/memory-tree/kit.toml` is PARSED on the landing commit and its
-  `[config] optional_keys` list is read, that list holds both `READINESS_ROWS` and
-  `READINESS_ROWS_CUTOFF` — a two-line `tomllib` read, not a grep, so a name in a comment or in a
-  neighbouring list cannot satisfy it. Deleting either name from the list is the observed red, and it
-  is observed by running the same read against the deletion. This is a DOCUMENTED
-  CHECK and §7 carries its compensating step, because §4 establishes that no gate joins a conf key to
-  a descriptor's key lists. rev-3 asserted the opposite through
+- **AC1** (S4) — When `tools/memory-tree/kit.toml` is PARSED on the landing commit,
+  `[config] required_keys_render` holds `READINESS_ROWS` and `[config] optional_keys` holds
+  `READINESS_ROWS_CUTOFF` — a `tomllib` read of those two lists, not a grep, so a name in a comment or
+  in a neighbouring list cannot satisfy it. Each key is read in the ONE list S4 puts it in, and
+  reading either name out of the other list is a FAIL rather than a pass: rev-4 demanded both names in
+  `optional_keys`, which the implementation §4 prescribes cannot produce, because a key
+  `adopt-memory-tree.sh` refuses to render without is a `required_keys_render` key. That was round 3's
+  H8 — the sole observer of S4 redding on the correct build. Deleting either name from its own list is
+  the observed red, and it is observed by running the same read against the deletion. S4's
+  `placeholders` half is NOT graded here; AC4 grades it and that half IS gated. These two lists are a
+  DOCUMENTED CHECK and §7 carries their compensating step, because §4 establishes that no gate joins a
+  conf key to a descriptor's key lists. rev-3 asserted the opposite through
   `python tools/govkit/govkit.py --selfcheck`, which is not a subcommand — it prints
   `govkit: unknown subcommand '--selfcheck'` and exits 2 — while the real verb, the `govkit selfcheck`
   leg, exits 0 today with eighteen conf keys declared in no list at all.
@@ -479,6 +521,13 @@ reason as the preset above: sibling units at a lower `order` edit that file firs
   skeleton names `READINESS_ROWS` and where it is declared: `grep -c READINESS_ROWS` over that file
   returns 0 before this change and non-zero after. AC2 cannot observe this — it renders and
   byte-compares a pair, and is equally green when neither half moved.
+- **AC15** (S11) — When `bash skills/session-kickoff/manifest-check.sh` runs on the landing commit it
+  exits 0, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` names a sha at or after the commit
+  that edits `.memory-tree.conf` and `tools/memory-tree/check-memory-hygiene.sh`. The failing case is
+  the revert of S11 alone: keep this unit's edits, restore the old stamp, and check C5 —
+  `no unaudited watch drift` — reds naming a watched file changed with no re-stamp at or after it.
+  `last-body-change` is the SAME sha before and after, which is the half of the criterion that
+  observes the "no delta → no touch" side of the rule rather than the re-stamp side.
 - **AC14** (S6) — When `.memory-tree.conf` is read after the edit, the comment beside
   `READINESS_ROWS_CUTOFF` carries S6's pre-wiring measurement: the graded total, the count missing at
   least one row, and the near-miss note, in the shape the sibling cutoff comments already use. The
@@ -493,7 +542,7 @@ reason as the preset above: sibling units at a lower `order` edit that file firs
 `kit placeholders (a declared token its adopter substitutes)` · `kit-placeholders self-test` ·
 `govkit selfcheck` ·
 `spec tokens (a spec's own names resolve)` · `harness arms (fail branches armed or pinned)` ·
-`marker contracts`
+`marker contracts` · `kickoff-manifest ratchet`
 
 The new arm adds no leg. It lands inside check 12, whose leg is `memory hygiene` and whose self-test
 leg is guarded on the kit directory, so a records-only commit still runs the first and skips the
@@ -504,6 +553,14 @@ it here is inert — and `TOOL-aJoinedCanon-7` resolves manifest names BEFORE th
 `order` 7, two steps before this unit builds, after which the name grades like any other. rev-3 kept
 it out on the strength of a checker behaviour a lower-`order` sibling deletes. `govkit selfcheck` is
 listed because this unit edits `tools/memory-tree/kit.toml`, which that leg parses.
+
+`kickoff-manifest ratchet` arrives with rev-5 and is the leg S11 exists for. It is `subject = repo`
+with no guard in `tools/gate-legs.json`, so it runs on every bar — and this unit writes two of
+`memory/guides/SESSION-KICKOFF.md`'s `watch:` pathspecs, `.memory-tree.conf` and
+`tools/memory-tree/check-memory-hygiene.sh`. Check C5's test is topological rather than semantic, so
+"the body did not change" is no defence: without the re-stamp the landing reds a leg every other run
+passes. AC15 carries the observed red, and the `last-body-change` half of the same criterion is what
+keeps the re-stamp from becoming a body edit nobody owed.
 
 F1's added scope adds no leg either, and two of its criteria are DOCUMENTED CHECKS rather than gated
 ones, named here so the exemption travels with its compensating step. AC9 is observed by hand
@@ -516,9 +573,10 @@ re-reads both, which is where an adopter looks first and the checker is where th
 look.
 
 Two more documented checks arrive with rev-4, and both exist because their subject has no gate at
-all. AC1 reads `tools/memory-tree/kit.toml`'s `[config]` list directly, since §4 establishes that no
-leg joins a conf key to a descriptor's key lists; the compensating check is that any diff adding a
-conf key re-runs that read, and the real fix is the `govkit selfcheck` arm §3 parks as a follow-up.
+all. AC1 reads `tools/memory-tree/kit.toml`'s `required_keys_render` and `optional_keys` lists
+directly — the two S4 chooses, one key in each — since §4 establishes that no leg joins a conf key to
+a descriptor's key lists; the compensating check is that any diff adding a conf key re-runs that read,
+and the real fix is the `govkit selfcheck` arm §3 parks as a follow-up.
 AC14 reads a comment, which nothing grades either; its compensating check rides AC1's, because both
 fire on the same event — a new conf key landing.
 
@@ -618,6 +676,24 @@ bar stayed green.
   sibling units edit that file" was wrong at base (at least five do) and is now uncounted; M4 —
   `govkit selfcheck` joined §7, which this unit's `kit.toml` edit runs; M10 — AC1 lost its false
   `S1` tag, which AC10 now carries for real.
+- rev-5 · 2026-09-05 · §2 · §4 · §6 · §7 · §9 · folded spec-audit round 3, the TERMINATING fold —
+  both findings addressed to this unit are fixed in the document and neither is promoted to a
+  follow-up. H8 (AC1 was the sole observer of S4 and read both keys out of `optional_keys`, which the
+  design rules out for `READINESS_ROWS`): S4 now places each key in exactly ONE `[config]` list —
+  `READINESS_ROWS` in `required_keys_render` because §4's blank table has the adopter refusing to
+  render without it, `READINESS_ROWS_CUTOFF` in `optional_keys` — the `kit.toml` Files-touched row
+  names those placements instead of listing three lists, AC1 reads the two lists S4 chooses and calls
+  the wrong list a fail, and §4 gains a paragraph on why the placement is chosen on meaning:
+  `required_keys_render` is read by exactly one arm in the tracked tree, `govkit.py`'s `requires_if`
+  resolver, so the declaration documents the blank refusal S2 implements rather than obtaining it.
+  H2 (the `watch:` re-stamp): this unit writes two of the manifest's `watch:` pathspecs,
+  `.memory-tree.conf` and `tools/memory-tree/check-memory-hygiene.sh`, so §2 gains S11, §4 gains a
+  Files-touched row, §6 gains AC15 with check C5 as the observed red and the `last-body-change`
+  no-move as its second half, and §7 gains `kickoff-manifest ratchet` with the reason it binds. Under
+  the build README's one-owner rule, §4 now NAMES both `-v` bindings this unit adds to check 12's awk
+  — `rrows` and `rcut`, where rev-4's Files-touched row said only "`-v` bindings" and left one of them
+  unnamed — and records the two population checks: neither is among that awk's nine existing bindings,
+  and no sibling spec claims either.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 3 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 3 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -87,6 +87,16 @@ build, and because the answer is doc-local: it needs no tree access and no secon
   `tools/memory-tree/check-memory-hygiene.sh`, so a ratchet absent from it is a ratchet no reader of
   the catalog can find, and the four sibling ratchets are each named there today. Observed by AC6
   for the render and AC14 for the content.
+- **S10** — `memory/guides/SESSION-KICKOFF.md` is re-stamped: `last-audit` moves to a fresh
+  `<ISO datetime> @ <sha>` per that manifest's own stamping rule, which this spec does not restate.
+  `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf` are both `watch:` pathspecs of
+  that manifest, read off its own audit block, and S1 and S4 edit both — so this unit's landing is a
+  watched change, and check C5 of `skills/session-kickoff/manifest-check.sh`, `no unaudited watch
+  drift`, reds on a watched change with no re-stamp at or after it. `last-body-change` does NOT move
+  and §B gains no delta line: this unit changes no gate command, entrypoint, layout convention or
+  front-loaded claim, and the manifest's own rule is "no delta → no touch". §B's bullet beginning
+  `The hygiene engine PRE-SETS its conf keys` already describes the preset-plus-blank mechanism S1
+  uses, so nothing that file front-loads becomes false. Observed by AC15.
 
 ## 3. Non-goals (OUT)
 
@@ -111,6 +121,16 @@ build, and because the answer is doc-local: it needs no tree access and no secon
   into §6 and read what it says, which is the semantic step no substring test reaches. It stays a
   follow-up for a unit that can see §6. H9's Fix — an observation that fails when the rule text is
   absent — is folded, and it is what closes the instance.
+- **The three widenings spec-audit round 3 proposed for this arm.** Four of that round's left-shifts
+  name this unit as their mechanism: grade a Files-touched row against the scope item or criterion
+  that owns it (H2's second half, M4), grade a criterion's named artefact against the scope item that
+  constructs it (H5), and grade each CLAUSE of a scope item rather than the item (M7). None is a
+  widened predicate of this arm, because each walks a different population — a table's rows, §6's
+  bullets, a sentence's clauses — and the third needs the semantic step the first non-goal above
+  rules out. They are recorded rather than parked, because this build has no round 4.
+  **Follow-up:** a `TOOL` backlog row against `tools/memory-tree/check-memory-hygiene.sh`, opened at
+  this build's landing, carrying all four with the population each needs. This unit discharges its
+  OWN instance of H2 by hand, as S10.
 
 ## 4. Design
 
@@ -161,11 +181,55 @@ moves an accumulator this arm never reads. The §2 walk is separate code over a 
 its own state and no shared string, so there is nothing for a hoist to free — independence is bought
 by PLACEMENT and by reading only `jcut`. Two hoists, two blocks, one class.
 
-The binding is named `jcut` because `scut`, `wcut`, `fcut`, `ecut` and `cut10` are taken in this awk
-invocation today and `TOOL-aJoinedCanon-4` has claimed `mcut`. AC11 is the observation: a scratch
-tree that arms this key and NO witness key, still red. It is also the regression net for unit 4's
-hoist one step later, since it reds if any later restructuring of the neighbouring block draws this
-branch back inside a guard.
+**The binding is named `jcut`, and this paragraph is this build's namespace registry.** The rule the
+build README hands this unit: a unit introducing an awk binding, a function name or a fixture number
+CLAIMS it HERE before a sibling reads it, and a sibling CITES this register rather than copying it —
+a copied list is stale the moment any unit renames, which is what the three surviving copies show —
+units 8, 9 and 11 each restate a taken list and all three still say `mcut`. Nine
+names are bound on the one check-12 awk invocation today, verified at source on the `bad12_raw=` line:
+`canon`, `canon10`, `cut10`, `mroot`, `discalt`, `scut`, `wcut`, `fcut`, `ecut`. Check 23 is a
+SEPARATE invocation with its own namespace — its `-v cut=` carries the shell's `alcut` — so an arm
+added there cannot collide here and nothing here can collide there. The `tFixture` number space is
+NOT restated in this register: the README allocates it by formula at `80 + 10N`, so it derives and
+this would only rot.
+
+| Name | Claimant | Key it carries |
+|---|---|---|
+| `revscopecut` | `TOOL-aJoinedCanon-1` | `REV_SCOPE_CUTOFF` |
+| `jcut` | `TOOL-aJoinedCanon-3` | `SCOPE_JOIN_CUTOFF` |
+| `fmcut` | `TOOL-aJoinedCanon-4` | `SPEC_FAILURE_MODE_CUTOFF` |
+| `rrows` and `rcut` | `TOOL-aJoinedCanon-9` | `READINESS_ROWS` and `READINESS_ROWS_CUTOFF` |
+| `edgecut` | `TOOL-aJoinedCanon-8` | `SPEC_EDGES_CUTOFF` |
+| `bcut` | `TOOL-aJoinedCanon-11` | `BASE_RESOLVE_CUTOFF` |
+
+Read off each sibling's own text at this fold, not remembered; every one of them is at rev-5 bar
+`TOOL-aJoinedCanon-10`, which adds no binding. Units 2, 5, 7 and 10 add none either. Check 23's
+`alsel` invocation is the separate namespace named above and `TOOL-aJoinedCanon-6` claims `lcut` and
+`tcut` on it, for `LEDGER_LABEL_CUTOFF` and `LEDGER_TOKEN_CUTOFF`; they are recorded here because the
+rule is one owner per shared ENGINE name, and they cannot collide with the table above.
+
+`edgecut` arrived during this same fold — rev-4 of that spec named no spelling at all, and its rev-5
+both picks one and says this register "owes a row for this name". That is the register working at the
+only speed it can: a sibling claims, this file records, and the claim is checked against the table
+rather than against a copy of it.
+
+**Round 3's blocker was this register being WRONG rather than absent.** It named
+`TOOL-aJoinedCanon-4` as the sole claimant of `mcut` while `TOOL-aJoinedCanon-1`, three `order` steps
+EARLIER, was taking the same name on the same invocation. Last `-v` wins for the whole awk program, so
+from `order` 4 one arm would have been graded by the other's key with its own conf key still reading
+as armed — this build's own subject, shipped as a defect. Both renamed at rev-5, off the
+one-letter-plus-`cut` convention that made the collision reachable and onto names spelled from their
+keys. `jcut` was never in that collision and does not move. One disagreement survives and is recorded
+here because there is no round 4 to settle it: `TOOL-aJoinedCanon-1` builds the mechanical check as
+its AC16, a self-test assertion that the extracted check-12 invocation binds no name twice, while
+`TOOL-aJoinedCanon-4`'s §3 declines to build that arm and routes it to a backlog row. Unit 1 lands at
+`order` 1, so the assertion exists before unit 4 needs it; the register is the interim control either
+way.
+
+AC11 is this unit's own observation: a scratch tree that arms this key and NO witness key, still red.
+It is also the regression net for unit 4's hoist one step later, since it reds if any later
+restructuring of the neighbouring block draws this branch back inside a guard. It does NOT see a
+rebind of `jcut` itself, and nothing else in this spec does either — that is unit 1's AC16, above.
 
 The message names each offending item the way the witness arm names each offending label in its own
 `print`.
@@ -245,6 +309,7 @@ None for existing specs. The cutoff is the migration.
 | `tools/memory-tree/.memory-tree.conf.example` | the same key, blank, with its adopter comment |
 | `tools/memory-tree/HYGIENE.template.md` | S9, one sentence in the check-12 entry |
 | `memory/HYGIENE.md` | re-rendered from it, never hand-edited |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp only; no body delta (S10) |
 | every `gov:kit memory-tree@` marker carrier | the version marker; the set is derived below, never listed here |
 
 Both template halves move in one commit: `tools/memory-tree/kit-dogfood-parity.test.sh` renders
@@ -372,14 +437,22 @@ while `kit version markers` is what reds when the constant advances and a carrie
   `grep -c 'SCOPE_JOIN_CUTOFF' memory/HYGIENE.md` as 0 before the edit, in both halves of the pair,
   so this cannot be green until the sentence exists — which is what AC6's byte-compare can never tell
   you about the HYGIENE pair, on exactly the terms it cannot tell you about the template pair.
+- **AC15** — When `bash skills/session-kickoff/manifest-check.sh` runs on the landing commit it exits
+  0, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` names a sha at or after the commit that
+  edits `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf`. The break it stages is
+  the revert of S10 alone: keep the engine and conf edits, restore the old stamp, and check C5 — `no
+  unaudited watch drift` — reds naming those two files as watched changes with no re-stamp at or
+  after them. `last-body-change` is the SAME sha before and after, which is the half that observes
+  the "no delta → no touch" side of the rule rather than the re-stamp side. That command was run on
+  the unedited tree at this fold and exits 0, so a red is this unit's edit and not a standing one.
 
 ## 7. Gates
 
 - `memory hygiene` · `memory-hygiene self-test` · `kit version markers`
 - `verdict epoch (kit version dates the engine)` · `harness arms (fail branches armed or pinned)`
-- `spec tokens (a spec's own names resolve)` · `kit/dogfood doc parity`
+- `spec tokens (a spec's own names resolve)` · `kit/dogfood doc parity` · `kickoff-manifest ratchet`
 
-Every name above is a leg NAME in `tools/gate-legs.json`, checked against that manifest at rev-4,
+Every name above is a leg NAME in `tools/gate-legs.json`, checked against that manifest at rev-5,
 and not a script path. The join in `tools/check-spec-tokens.py` grades NAMES; a path is not one and
 does not become one when `TOOL-aJoinedCanon-7` widens what resolves at `order` 7, so a path written
 here would contribute no graded leg either before or after that unit.
@@ -390,6 +463,12 @@ reasons and AC13 states which: `verdict epoch` reds when this unit changes the e
 `KIT_MEMORY_TREE_VERSION` does not move, and `kit version markers` reds when the constant moves and a
 `gov:kit memory-tree@` carrier is left behind. This unit adds no new leg; the arm lives inside check
 12, which is already on the bar.
+
+`kickoff-manifest ratchet` is the one leg here this unit does not itself exercise. Read at HEAD it
+carries `subject: repo` and no `guard`, so it runs on every bar whatever this unit does, and its
+`argv` is exactly the command AC15 runs. It is on the list because S1 and S4 edit two `watch:`
+pathspecs of `memory/guides/SESSION-KICKOFF.md`, which makes S10's re-stamp the thing that keeps it
+green; AC15 is the observed red.
 
 ## 8. Open questions
 
@@ -455,6 +534,37 @@ reasons and AC13 states which: `verdict epoch` reds when this unit changes the e
   line goes to stdout like every sibling announcement and this spec prescribes no header contract
   (M8); the claims this spec makes about siblings were re-read against their own rev-3 text (M9); and
   no criterion grades a retrieval result the edit does not drive (H8).
+- rev-5 · 2026-09-05 · §2 · §3 · §4 · §6 · §7 · folded spec-audit round 3, the TERMINATING fold:
+  there is no round 4, so every item below is fixed here or has a stated destination. H2: S10, a
+  Files-touched row, AC15 and the `kickoff-manifest ratchet` leg carry the
+  `memory/guides/SESSION-KICKOFF.md` `last-audit` re-stamp. S1 and S4 edit
+  `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf`, both read off that manifest's
+  own `watch:` line, and check C5 `no unaudited watch drift` is the observed red; `last-body-change`
+  does not move, with the reason stated rather than assumed. B1's unit-3 half: §4's binding paragraph
+  becomes this build's namespace REGISTER, as a table — it had named `TOOL-aJoinedCanon-4` as the sole
+  claimant of `mcut` while `TOOL-aJoinedCanon-1` was taking it three `order` steps earlier, which is
+  the fact that made the blocker invisible. The table now carries `revscopecut`, `jcut`, `fmcut`,
+  `edgecut`, `rrows`/`rcut` and `bcut` against their keys, each read off the sibling's own current
+  text and not remembered, with check 23's `lcut`/`tcut` recorded as the separate namespace they are;
+  the nine pre-existing names were re-verified on the engine's `bad12_raw=` line. The register also
+  states its own rule — claim here first, CITE this table rather than copy it, since the three siblings
+  that copied it instead all still say `mcut` — declines to restate the `tFixture` space the README allocates by
+  formula, and records the one thing no round can now settle: `TOOL-aJoinedCanon-1` builds the
+  duplicate-`-v` self-test as its AC16 while `TOOL-aJoinedCanon-4`'s §3 routes that arm to a backlog
+  row. `TOOL-aJoinedCanon-8` claimed `edgecut` during this same fold, having named no spelling at
+  rev-4, and its row went in on a re-scan rather than on the first pass. PROMOTED, not parked: §3
+  gains the disposition of round 3's four left-shifts that name this arm as their mechanism — the
+  Files-touched join (H2's second half, M4), the criterion-to-fixture reverse join (H5) and
+  clause-level coverage (M7) — each walking a population this arm does not, so each goes to a `TOOL`
+  backlog row opened at this build's landing, named there and not numbered here. Re-read table fired
+  §2→§3,§6 and §4→§2,§6,§7 and §6→§2,§7 and §7→§6. It caught two things a per-section edit
+  would have left: §7's "checked against that manifest at rev-4" stamp, which had to move with the
+  leg added on the line above it, and AC15, which §2→§6 forced rather than letting S10 ship as the
+  unobserved scope item this unit's whole subject is. RUN, not asserted:
+  `bash skills/session-kickoff/manifest-check.sh` exits 0 on the unedited tree, so AC15's red will be
+  this edit's; that leg's `argv`, `subject: repo` and absent `guard` were read out of
+  `tools/gate-legs.json`; and §4's three pre-change baselines were re-measured and are still 0 in
+  both halves of each pair.
 
 ## 10. Reuse audit
 

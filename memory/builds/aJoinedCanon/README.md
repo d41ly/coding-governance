@@ -37,25 +37,26 @@ log that names a section in 29.5% of its lines.
 ## Build-level rules
 
 - **Every unit cites its finding**, at its post-skeptic numbers.
-- **UNITS ARE SEQUENCED, NOT PARALLEL.** Six write to `memory/TEMPLATE-SPEC.md` and its byte-compared
-  twin `tools/memory-tree/SPEC-TEMPLATE.template.md`; four more to `check-memory-hygiene.sh`. Clause
-  1 of the parallelism rule fails across the set, so `order` is a chain. Both halves of a template
-  edit move together — editing one is a red bar.
-- **Every template change is a DATED CUTOFF, never a retrofit.** 414 of 479 specs are CLOSED; a new
-  required field with no cutoff reds landed work. Each key is declared in `.memory-tree.conf` AND in
+- **UNITS ARE SEQUENCED, NOT PARALLEL.** Six write `memory/TEMPLATE-SPEC.md` and its byte-compared
+  twin; four more write `check-memory-hygiene.sh`. `order` is a chain, and both halves of a template
+  edit move together.
+- **Every template change is a DATED CUTOFF, never a retrofit**, declared in `.memory-tree.conf` AND
   `tools/memory-tree/.memory-tree.conf.example`, or an adopter gets a dead arm reading as armed.
-- **A new arm owes its failing case OBSERVED before it lands**, and the spec says which fixture
-  stages it. Charter §7.
-- **One owner for the `tFixture` number space:** unit N takes `tFixture-(80 + 10N)` upward.
-- **No unit pins a literal a lower-`order` unit moves first.** Five shipped. Cite the source that
-  owns the value, or mark it derived-at-build-time.
-- **A FINDING IS CLOSED OVER ITS CLASS, NEVER ITS ADDRESS.** Round 2 measured 65% of its own
-  defects as the previous fold's work, and fourteen of fifteen were one shape: a ruling applied
-  where the finding pointed, never swept to the sibling carrying the same defect. Round 1's blocker
-  came back as round 2's, three `order` steps earlier. Closing a finding means re-running its own
-  predicate over ALL eleven specs.
-- **Inside a shared write set, cite by literal TEXT, not line number.** Every number a later unit
-  quotes is stale by the time it builds; round 1 found two already wrong.
+- **A new arm owes its failing case OBSERVED before it lands**, and the spec names the fixture.
+- **A finding is closed over its CLASS, never its address** — re-run its own predicate over all
+  eleven specs. Round 2 measured 65% of its defects as the prior fold's work, fourteen of fifteen
+  this shape; round 3 measured the rule working.
+- **ONE OWNER PER SHARED ENGINE NAME.** Round 3's blocker: units 1 and 4 both bind `mcut` on the one
+  check-12 awk invocation, to different cutoff keys, and last `-v` wins. A unit introducing an awk
+  binding, a function or a fixture number claims it in `TOOL-aJoinedCanon-3`'s namespace registry
+  first. Three rounds produced one class — an arm whose population is narrower than its spec
+  believes — through three mechanisms; this is the third.
+- **A unit editing a `watch:` path of `memory/guides/SESSION-KICKOFF.md` owes the `last-audit`
+  re-stamp**, with a scope item, a criterion and the `kickoff-manifest ratchet` leg. Eight units
+  edit one; none carried it.
+- **`tFixture` blocks by `order`:** unit N takes `80 + 10N` upward.
+- **No unit pins a literal a lower-`order` unit moves first**, and inside a shared write set cite by
+  literal TEXT, not line number.
 
 ## Parked decisions
 
@@ -100,17 +101,17 @@ ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCano
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aJoinedCanon-1 — the revision log becomes a structured entry](spec/2026-09-04-spec-TOOL-aJoinedCanon-1.md) | 1 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set](spec/2026-09-04-spec-TOOL-aJoinedCanon-2.md) | 2 | 1 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it](spec/2026-09-04-spec-TOOL-aJoinedCanon-3.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red](spec/2026-09-04-spec-TOOL-aJoinedCanon-4.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed](spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md) | 5 | 1 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion](spec/2026-09-04-spec-TOOL-aJoinedCanon-6.md) | 6 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives](spec/2026-09-04-spec-TOOL-aJoinedCanon-7.md) | 7 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions](spec/2026-09-04-spec-TOOL-aJoinedCanon-8.md) | 8 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration](spec/2026-09-04-spec-TOOL-aJoinedCanon-9.md) | 9 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there](spec/2026-09-04-spec-TOOL-aJoinedCanon-10.md) | 10 | 1 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-aJoinedCanon-11 — the base sha resolves to a real object](spec/2026-09-04-spec-TOOL-aJoinedCanon-11.md) | 11 | 1 | SPECCED | rev-4 | 2026-09-05 |
+| [TOOL-aJoinedCanon-1 — the revision log becomes a structured entry](spec/2026-09-04-spec-TOOL-aJoinedCanon-1.md) | 1 | 2 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set](spec/2026-09-04-spec-TOOL-aJoinedCanon-2.md) | 2 | 1 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it](spec/2026-09-04-spec-TOOL-aJoinedCanon-3.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red](spec/2026-09-04-spec-TOOL-aJoinedCanon-4.md) | 4 | 2 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed](spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md) | 5 | 1 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion](spec/2026-09-04-spec-TOOL-aJoinedCanon-6.md) | 6 | 2 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives](spec/2026-09-04-spec-TOOL-aJoinedCanon-7.md) | 7 | 2 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions](spec/2026-09-04-spec-TOOL-aJoinedCanon-8.md) | 8 | 2 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration](spec/2026-09-04-spec-TOOL-aJoinedCanon-9.md) | 9 | 2 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there](spec/2026-09-04-spec-TOOL-aJoinedCanon-10.md) | 10 | 1 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-11 — the base sha resolves to a real object](spec/2026-09-04-spec-TOOL-aJoinedCanon-11.md) | 11 | 1 | SPECCED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 2 record folder(s).

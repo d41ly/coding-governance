@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 5 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 5 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -319,8 +319,9 @@ reached the rendered file — the content half AC1's sameness compare cannot sup
   `memory/TEMPLATE-SPEC.md` fails this criterion rather than satisfying it.
 - **AC2** — When `grep -ciE 'cost|budget|minutes|hours' memory/TEMPLATE-SPEC.md` is run after the
   change, it returns a count greater than the `0` it returned before.
-  figure: the `0` is DERIVED, measured on this branch at base `750ca0ca` on 2026-09-04, not
-  inherited from the finding; re-derive it on the pre-change tree if the after-count is disputed.
+  figure: the `0` is DERIVED, measured on this branch at base `750ca0ca` on 2026-09-04 and re-run
+  unchanged at HEAD `7ad96e60` on 2026-09-05, not inherited from the finding; re-derive it on the
+  pre-change tree if the after-count is disputed.
 - **AC3** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over the whole tree, it exits
   0, and no spec in `memory/builds/*/spec/` is newly named by check 12. **This green is a regression
   guard and not an observation of the added text, and the difference is stated because a green that
@@ -346,19 +347,26 @@ reached the rendered file — the content half AC1's sameness compare cannot sup
   is run after the change, it returns a count greater than the `0` it returns before, so the second
   carrier F2's ruling requires exists and is in the Writing rules rather than only in §6. AC1
   through AC5 all observe the §6 half; without this one the wider placement ships ungraded.
-  figure: the `0` is DERIVED, re-measured on this branch at base `750ca0ca` on 2026-09-05. The
-  whole-file count of `PINNED` or `DERIVED` is not `0` today — the `order` bullet ending
-  `DERIVED from this field, which is why the order belongs on the spec and not in README prose.`
-  already carries one — which is why the range is scoped and an unscoped grep would not fail before
-  the change.
+  figure: the `0` is DERIVED, re-run on this branch on 2026-09-05 at HEAD `7ad96e60` and again at
+  base `750ca0ca`; both return `0`, and they agree because the two template files are byte-identical
+  across that range. **The range is scoped for the AFTER direction, and rev-4's stated reason for it
+  was false of this command.** That reason claimed an unscoped grep "would not fail before the
+  change" because the whole-file count of `PINNED` or `DERIVED` is not `0`. This command greps
+  `PINNED` alone, whole-file `grep -cF PINNED` returns `0` too, and the single whole-file `DERIVED` —
+  the `order` bullet ending `DERIVED from this field, which is why the order belongs on the spec and
+  not in README prose.` — sits outside the Writing-rules range, so the scoping does not exclude it
+  either. The true reason is the other direction: S1's own §6 block contains the word `PINNED`, so
+  after the change an unscoped grep goes non-zero from the §6 half alone and would read green with
+  S1b never written. Scoping the range is what makes this criterion observe S1b rather than S1.
   fixture: a no-match `grep -c` exits non-zero while printing `0`, so this reads the printed count
   and never a `&&` chain's exit status.
 - **AC7** — When
   ``sed -n '/^## 6. Acceptance criteria/,/^## 7. Gates/p' memory/TEMPLATE-SPEC.md | grep -cE '`(cost|permission|fixture|figure):`'``
   is run after the render, it returns 4 — one for each spelling the owner's F1 ruling names, inside
   the §6 skeleton block rather than anywhere in the file.
-  figure: the pre-change count is DERIVED, measured as `0` on this branch at base `750ca0ca` on
-  2026-09-05, so this cannot be green until the four fields exist. AC2's whole-file `cost` grep is
+  figure: the pre-change count is DERIVED, measured as `0` on this branch at base `750ca0ca` and
+  re-run unchanged at HEAD `7ad96e60`, both on 2026-09-05, so this cannot be green until the four
+  fields exist. AC2's whole-file `cost` grep is
   the finding's own silence measure and reaches one of the four; this criterion is the one that
   fails when a rendering spells them otherwise, which §4 calls a failed landing of the ruling.
 
@@ -374,6 +382,16 @@ both; this unit touches no engine file, so `verdict epoch` sees no behaviour-bea
 editing a template body without moving `KIT_MEMORY_TREE_VERSION` leaves every `gov:kit
 memory-tree@` carrier in agreement, so `kit version markers` stays green on its own terms rather
 than by omission. §4's Files-touched note carries the same finding where a builder reads it.
+
+**The two cross-unit rules this build added after round 3 were both checked against this unit's
+write set, and neither binds it.** It introduces no awk binding, no function name and no fixture
+number, so it claims nothing in `TOOL-aJoinedCanon-3`'s namespace registry and cannot collide with a
+sibling on the check-12 invocation — it writes no arm at all. And neither
+`tools/memory-tree/SPEC-TEMPLATE.template.md` nor `memory/TEMPLATE-SPEC.md` appears in the `watch:`
+line of `memory/guides/SESSION-KICKOFF.md`, read out of that file on 2026-09-05, so no `last-audit`
+re-stamp is owed and `kickoff-manifest ratchet` stays green without one. Both checks are recorded
+rather than left silent, because eight sibling units DO edit a watched path and a reader comparing
+specs must be able to tell a checked exemption from an overlooked obligation.
 
 **This unit adds no gate, and neither ruling of 2026-09-05 changes that.** The charter binds a
 new arm to an observed failing case, and there is no failing case to observe. Four named fields make
@@ -476,6 +494,23 @@ this spec will say for the shape it did not recommend. It is still not smuggled 
   the H1/M4 shape — §4 and §7 record that `kit version markers` and `verdict epoch` are not owed
   here and why, verified at both scripts' source. §4's `1,404` and §10's probe counts are now marked
   PINNED with the date they were measured, which is this unit's own rule applied to itself.
+- rev-5 · 2026-09-05 · §6 · §7 · §9 · the TERMINATING fold, round 3 having exited the audit loop on
+  convergence. **M6, the only finding against this unit:** AC6's `figure:` justified its scoped sed
+  range with a premise that is false of the command AC6 runs. The premise said an unscoped grep
+  "would not fail before the change"; the command greps `PINNED` alone, whole-file
+  `grep -cF PINNED` returns `0`, and the one whole-file `DERIVED` sits outside the Writing-rules
+  range and is not what the command matches. AC6 now states the true reason — S1's own §6 block
+  contains `PINNED`, so an unscoped grep would go green from the §6 half alone AFTER the change, and
+  the scoping is what makes AC6 observe S1b rather than S1. Every pre-change baseline this spec
+  states was re-run rather than re-read: AC2's `0`, AC6's `0` and AC7's `0` all reproduce at HEAD
+  `7ad96e60` and at base `750ca0ca`, which agree because the two template files are byte-identical
+  across that range, and each of the three criteria now names the shas it was re-run at. §7 gained
+  the check of the two cross-unit rules added after round 3: this unit introduces no awk binding to
+  claim in unit 3's registry, and neither file it writes is a `watch:` path of
+  `memory/guides/SESSION-KICKOFF.md`, so no `last-audit` re-stamp is owed. The fold's re-read set
+  fired §6 → §2, §7 and §7 → §6: S1b's `Observed by AC6` tag and §7's "AC6 grades that the bullet
+  EXISTS" sentence both survive unchanged, because M6 moved a justification and never the command.
+  Nothing is left parked and nothing is promoted to a follow-up; the finding is disposed here.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 6 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 6 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -68,6 +68,18 @@ the answer that claims to evidence it.
   set is filtered by `alcut` before either arm sees it. That dependency is written into each new
   key's comment in both confs and is OBSERVED, not asserted — it is the one shape this build's
   round-1 blocker and round-2 blocker were both instances of. Observed by AC13 and AC15.
+- **S10** — `memory/guides/SESSION-KICKOFF.md` is re-stamped: `last-audit` moves to a fresh
+  `<ISO datetime> @ <sha>` per that manifest's own stamping rule, which this spec does not restate.
+  Owed because TWO paths in this unit's write set are `watch:` pathspecs of that manifest —
+  `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf`, both verified on its `watch:`
+  line at base — and check C5 of `skills/session-kickoff/manifest-check.sh`, `no unaudited watch
+  drift`, is TOPOLOGICAL: it reds when the newest watch-touching commit is not an ancestor of the
+  commit that changed the stamp, whatever the body delta. `last-body-change` does NOT move and §B
+  gains no delta line: this unit changes no gate command, no entrypoint, no layout convention and no
+  claim the manifest front-loads — it adds two conf keys and two branches inside a check the manifest
+  already names — and the charter's rule is "no delta → no touch". Copied from
+  `TOOL-aJoinedCanon-2`'s S10 because the reason is the write set's, not that sibling's. Observed by
+  AC16.
 
 ## 3. Non-goals (OUT)
 
@@ -119,6 +131,25 @@ A backtick is the field separator inside a token list because the extractor is `
 captured token therefore cannot contain one. The `U` row carries the era flags rather than the
 filename date, so the date comparison stays in awk beside the one `alcut` already does and bash
 reads booleans.
+
+**The two new `-v` bindings, claimed here under the build README's one-owner rule.** The era flags
+mean `alsel`'s awk has to be told both dates, so this unit adds exactly two names to that
+invocation — `lcut` for `LEDGER_LABEL_CUTOFF` and `tcut` for `LEDGER_TOKEN_CUTOFF` — and the last
+`-v` binding of a name wins silently, which is the mechanism that blocked round 3. Both were checked
+against the two populations that rule names. That invocation is `alsel=$(printf '%s\n' "$alspecs" |
+grep . | awk -v cut="$alcut"`, and the names bound on it today are `cut` and `grand` and nothing
+else; neither `lcut` nor `tcut` appears anywhere in the engine as a standalone name (`grep 'lcut'`
+returns only the four `alcut` substrings, `grep 'tcut'` returns nothing). Across the other ten specs
+of this build, only units 3, 4 and 8 mention check 23 at all and all three do so to declare it OUT
+of their scope, so no sibling binds a name on this awk. The claim is recorded HERE rather than in
+`TOOL-aJoinedCanon-3`'s namespace registry for two reasons, and the second is a limitation, not a
+convenience: that registry surveys check 12's awk invocation, whose taken set is a disjoint one, so a
+name on this invocation cannot collide with anything it lists; and this fold edits one file, so the
+registry entry itself is a follow-up the unit-3 folder owns, not something this document can land.
+No new criterion is owed for the pair: AC6 already arms one key while blanking the other and
+requires the armed arm to keep reding, which is the one observation a rebind cannot survive — under a
+shared name, blanking either key would blank the binding and take BOTH arms dark, and AC6 reds. That
+is the criterion round 3 found missing on units 1 and 4, and it happens to already be here.
 
 Both new fields are BULLET-scoped, and on the ledger side that is a change of kind rather than an
 extra capture: `alledger` prints on the line matching `^- *(\*\*)?AC[0-9]+` and classifies `form`
@@ -263,12 +294,13 @@ false-positive rate while arm A, whose corpus-wide hit count is 1, stays armed.
 
 | File | Change |
 |---|---|
-| `tools/memory-tree/check-memory-hygiene.sh` | two awk emitters, two bash walks, two `fail 23` branches, two announce lines, the two blank presets, and `KIT_MEMORY_TREE_VERSION` advanced by one minor |
+| `tools/memory-tree/check-memory-hygiene.sh` | two awk emitters, the `-v lcut=` and `-v tcut=` bindings on `alsel`'s invocation, two bash walks, two `fail 23` branches, two announce lines, the two blank presets, and `KIT_MEMORY_TREE_VERSION` advanced by one minor |
 | `tools/memory-tree/check-memory-hygiene.test.sh` | fixtures for both arms plus their `hit` assertions; the fixture conf the harness printf-writes gains both keys |
 | `.memory-tree.conf` | two keys with their reasons, each comment naming S9's `ACCEPTANCE_LEDGER_CUTOFF` dependency |
 | `tools/memory-tree/.memory-tree.conf.example` | the same two keys, blank, with the same dependency in each comment (AC13) |
 | `memory/HYGIENE.md` | the token rule under `## Acceptance ledger` |
 | `tools/memory-tree/HYGIENE.template.md` | the same bytes — `tools/memory-tree/kit-dogfood-parity.test.sh` compares the pair |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp only; no body delta and `last-body-change` unmoved (S10) |
 
 The commit also owes the `gov:kit memory-tree@` bump in every carrier, because both arms change what
 the engine verdicts and `verdict epoch (kit version dates the engine)` reads that constant's newest
@@ -400,9 +432,28 @@ a remediation message naming three carriers when more existed.
   key, which is how the arm reports that an adopter cannot discover it. A second half, because the
   parity arm grades the DECLARATION and never the comment beside it: the comment block introducing
   each new key — the contiguous `#` lines above its own `KEY=` row, which do not exist before this
-  edit — names `ACCEPTANCE_LEDGER_CUTOFF` as the switch that disarms that arm regardless (S9). A
-  whole-file grep will not do, since the example already declares that key elsewhere. Without this
-  half, the sentence an adopter needs most is the one nothing observes.
+  edit — names `ACCEPTANCE_LEDGER_CUTOFF` as the switch that disarms that arm regardless (S9). That
+  half runs over BOTH confs, because S4 declares the comment in both and the shipped example is only
+  the adopter's copy: the gov `.memory-tree.conf` is what a session on THIS repo reads when it wonders
+  why a valued `LEDGER_TOKEN_CUTOFF` grades nothing, which is the confusion S9 exists to prevent.
+  Four observations, then, one per (conf, key):
+
+  ```bash
+  awk '/^LEDGER_TOKEN_CUTOFF=/{printf "%s", b; exit} /^#/{b = b $0 "\n"; next} {b=""}' <conf> \
+    | grep -c ACCEPTANCE_LEDGER_CUTOFF
+  ```
+
+  non-zero for each, and the same with `LEDGER_LABEL_CUTOFF`, against `.memory-tree.conf` and
+  `tools/memory-tree/.memory-tree.conf.example`. A whole-file grep will not do in EITHER conf, since
+  both already declare `ACCEPTANCE_LEDGER_CUTOFF` elsewhere — verified at base, where it sits at its
+  own comment block and row in each. The extractor was RUN at base against that existing key in both
+  files and returns the contiguous block above it, so the predicate is known to select what this
+  criterion says it selects rather than to be plausible prose. The break: delete the
+  `ACCEPTANCE_LEDGER_CUTOFF` sentence from any one of the four blocks and that block's grep returns
+  0 while the key's own declaration still stands, which is the exact state — armed key, undocumented
+  dependency — this half exists to catch. Nothing on the bar grades it in either conf; it is a read
+  of the landing diff, stated as one rather than left as a claim S4 makes and no criterion covers.
+  Without it, the sentence a reader needs most is the one nothing observes.
 - **AC14** — When the token rule lands under `memory/HYGIENE.md`'s
   `## Acceptance ledger — how a built unit evidences its criteria` heading, that section states that
   an answer shares a backticked token with the criterion it evidences and NAMES the key that
@@ -418,6 +469,13 @@ a remediation message naming three carriers when more existed.
   nothing at all; setting `ACCEPTANCE_LEDGER_CUTOFF` in that same tree reds it. That is S9's nesting,
   observed rather than assumed, and the blank-`ACCEPTANCE_LEDGER_CUTOFF` shape is what
   `tools/memory-tree/.memory-tree.conf.example` ships to every adopter.
+- **AC16** — When `bash skills/session-kickoff/manifest-check.sh` runs on the landing commit it
+  exits 0, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` names a sha at or after the commit
+  that edits `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf`. The failing case is
+  the revert of S10 alone: keep both engine edits, restore the old stamp, and check C5 —
+  `no unaudited watch drift` — reds with `watched files changed since last-audit with no re-stamp
+  at/after the change` and lists both paths. `last-body-change` is the SAME sha before and after,
+  which is the half that observes the "no delta → no touch" side rather than the re-stamp side.
 
 ## 7. Gates
 
@@ -450,6 +508,11 @@ a remediation message naming three carriers when more existed.
   leg is owed by the change itself and not by the file being touched. Observed by AC12.
 - `kit version markers` — `bash tools/check-kit-versions.sh`, unguarded, and the leg that reds if
   the constant advances and a `gov:kit memory-tree@` carrier is left behind. Observed by AC12.
+- `kickoff-manifest ratchet` — `bash skills/session-kickoff/manifest-check.sh`, `subject = repo`
+  with no guard in `tools/gate-legs.json`, so it runs on every bar. It is on this list because
+  `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf` are both `watch:` pathspecs of
+  the manifest S10 re-stamps; see AC16 for the observed red. Its check C5 is topological, so a
+  landing that skips the re-stamp reds this leg on its own commit however small the engine delta is.
 - No new leg. Both arms live inside a check that already has one, and both legs above already exist
   and already run on every bar.
 
@@ -548,6 +611,34 @@ a remediation message naming three carriers when more existed.
   build's own landing adds rows). M8 (this unit prescribes no header or contract sentence about its
   own file). M9 (the only sibling claim made here is that units 1, 3 and 4 edit the engine first,
   re-verified against their specs; unit 5 was checked and adds no arm and no cutoff).
+- rev-5 · 2026-09-05 · header status line · §2 S10 new · §4 Data model, Files touched · §6 AC13 ·
+  §6 AC16 new · §7 one bullet · folded spec-audit round 3, the TERMINATING fold — there is no round
+  4, so both findings are disposed here and nothing is parked. H2 — two paths in this unit's write
+  set, `tools/memory-tree/check-memory-hygiene.sh` and `.memory-tree.conf`, are `watch:` pathspecs of
+  `memory/guides/SESSION-KICKOFF.md`, verified on its `watch:` line at base, and the `last-audit`
+  re-stamp they oblige was carried by no scope item, no Files-touched row, no criterion and no leg.
+  Added as S10, a table row, AC16 naming check C5's own failure text as the observed red, and the
+  `kickoff-manifest ratchet` leg — verified in `tools/gate-legs.json` as `subject: repo` with no
+  guard, so it runs on every bar and this landing would have red it. M7 — S4's "in BOTH confs" half
+  was observed in one conf only, because AC13 was scoped to the shipped example. AC13's second half
+  now runs four observations, one per (conf, key), over a contiguous-comment-block extractor that was
+  RUN at base against the existing `ACCEPTANCE_LEDGER_CUTOFF` block in both files and returns that
+  block, and it states its own break. S4 is unchanged: the review offered narrowing it as the
+  alternative and the write set already declares both confs, so widening the observer is the fix that
+  keeps the two agreeing.
+  The build README's one-owner rule fired where no finding pointed. §4 required the cutoff comparison
+  to happen in awk and named no `-v` binding at all, which is the state that produced round 3's
+  blocker one invocation over. This unit's bindings sit on check 23's `alsel` awk, whose taken names
+  are `cut` and `grand`; `lcut` and `tcut` are claimed in §4 and were checked against the engine
+  (`lcut` matches only the four `alcut` substrings, `tcut` matches nothing) and against the other ten
+  specs, of which only units 3, 4 and 8 mention check 23 and all three place it outside their scope.
+  No new criterion was needed: AC6 already blanks one key while arming the other, which no shared
+  binding survives.
+  NOT FIXED HERE, and it goes to the `TOOL-aJoinedCanon-3` folder rather than to a later round: the
+  namespace registry in that unit's §4 lists `mcut` and `jcut` and does not list `lcut` or `tcut`.
+  This fold edits one file and cannot add the entry. The claim above is the record until it does, and
+  the two names cannot collide with anything that registry holds, since it surveys check 12's
+  invocation and this unit binds on check 23's.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 2 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 2 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -28,8 +28,10 @@ invalidated.
   supply.
 - **S2** — the re-read table has one row per section a fold actually lands in, and each row lists the
   sections to re-read before the rev is bumped. The four rows are §2, §4, §6 and §7; the sets are
-  derived in §4 below from the finding's own round-level distribution and from `A5`'s amended-arm
-  count, not invented.
+  derived in §4 below from the finding's own round-level distribution, from `A5`'s amended-arm count
+  and — for §6's row alone — from a worked instance round 3 found inside this build, not invented.
+  §6's row also names the TARGET inside each section it sends you to, which the other three do not;
+  §4 says why that difference is real and not decoration.
 - **S2b** — a FIFTH row, `§8`, whose set is §2, §4, §6 and every criterion naming an `F<n>` or a
   `Q<n>`. BOTH spellings, because this build uses both: most of its §8 forks are labelled `F<n>` and
   this spec's own is `Q1`, so an `F<n>`-only clause would have skipped the criteria of
@@ -138,7 +140,7 @@ M4's fold sentence gains this, in M4's own voice:
 > |---|---|
 > | §2 Scope | §3 Non-goals · §6 Acceptance |
 > | §4 Design | §2 Scope · §6 Acceptance · §7 Gates |
-> | §6 Acceptance | §2 Scope · §7 Gates |
+> | §6 Acceptance | §2 Scope, the item this criterion observes · §4 Design, the paragraph that placed it · §7 Gates |
 > | §7 Gates | §6 Acceptance |
 > | §8 Open questions | §2 Scope · §4 Design · §6 Acceptance · every criterion naming an `F<n>` or a `Q<n>` |
 >
@@ -156,6 +158,18 @@ the misplacement surfaced only at the closing review after 42 of 85 legs had sil
 profile. §3 sits only in §2's set, because a scope item moving is the one edit that moves a cut-line.
 §5 and §9 are deliberately absent: §5 is a fixed row sweep a fold rarely invalidates, and §9 is
 written by the fold itself.
+
+**§6's row names targets rather than sections, and that came from a third kind of evidence.** Round 3
+found a sibling in this build, `TOOL-aJoinedCanon-9`, whose sole observer of a scope item had been
+rewritten by the previous fold to close a round-2 finding — and the replacement pinned a placement
+that scope item had never chosen, so the only grade on the item reds on the implementation the same
+spec prescribes. The fold that wrote it re-read neither the scope item the criterion observes nor the
+design paragraph that placed it. A bare `§2 · §7` row does not stop that: re-reading §2 as a section is
+re-reading every item in it, and the one that matters is the single item this criterion answers. So
+that row names the target, and §4 joins it — the design paragraph is where a criterion's placement is
+actually decided, and a criterion rewritten against a design it did not re-read is the shape found.
+Round 3 nominated this unit as where that left-shift belongs, so it is folded here rather than
+promoted.
 
 **The §8 row was earned differently, and the difference matters.** The four rows above come from
 B1's measured round-level distribution. The §8 row comes from RUNNING those four rows on a real fold
@@ -236,8 +250,11 @@ LIVE, and hand-editing the live copy is what the leg exists to catch.
   M7's regrounding step 3 is `**This file, whole.**` at every pass boundary. The reader wins.
 - **Spell the pointer as the repo-relative path `memory/guides/BUILD-METHOD.md`.** Verified cost:
   `tools/memory-tree/check-method-carriers.sh` selects carriers with `grep -lF -- "BUILD-METHOD.md"`
-  over every tracked file outside `memory/`, excluding only `BUILD-METHOD.template.md` itself, and
-  `tools/memory-tree/SPEC-TEMPLATE.template.md` is not in `memory/project/method-carriers.txt`. The
+  over the tracked tree minus the exclusions its own population comment declares with a reason each —
+  read them there, since a restatement of that list here is a second copy that can go stale, and the
+  rev-4 text had already gone stale by naming one of the four. What this argument needs from them is
+  one fact: `tools/memory-tree/SPEC-TEMPLATE.template.md` matches none of them, and it is not in
+  `memory/project/method-carriers.txt`. The
   path spelling would therefore red the `method carriers (every pointer declared)` leg until a
   registry row is added. Rejected in favour of the pathless `BUILD-METHOD M4` spelling the same file
   already uses in its §10 bullet, `BUILD-METHOD M7's regrounding step 5 re-runs the query FROM that
@@ -295,13 +312,14 @@ LIVE, and hand-editing the live copy is what the leg exists to catch.
 
 - **AC1** — When M4 of `memory/guides/BUILD-METHOD.md` is read at HEAD, its fold sentence is followed
   by a re-read table with one row each for `§2`, `§4`, `§6`, `§7` and `§8`; the §4 row lists §2, §6
-  and §7; the §8 row lists §2, §4, §6 and criteria naming an `F<n>` OR a `Q<n>`; and the block
+  and §7; the §6 row lists §4 as well as §2 and §7, and names the scope item the criterion observes
+  rather than §2 bare; the §8 row lists §2, §4, §6 and criteria naming an `F<n>` OR a `Q<n>`; and the block
   states that every section the fold ends up editing fires its own row, not only the first. The
   block also contains the literal `fold-text-is-unreviewed-surface` and closes by deferring the log
   line to §9's own rule without spelling a rev-line grammar of its own, which are S1's pointer and
   S5's deferral — the two halves of this unit no other criterion reads. Both are red before the
   edit: `grep -c fold-text-is-unreviewed-surface memory/guides/BUILD-METHOD.md` returns 0 at base,
-  measured at rev-4, and no fold procedure exists there to defer anything.
+  re-run at rev-5, and no fold procedure exists there to defer anything.
 - **AC2** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs on the landing commit, it
   exits 0. This is a SAMENESS compare and nothing more: it proves each live copy is the `--render`
   of its template rather than a hand-edit, and it is equally green when neither half moved. Every
@@ -310,7 +328,7 @@ LIVE, and hand-editing the live copy is what the leg exists to catch.
   `Review corrections fold in here; bump the header rev and log it in §9.` — is read, it names
   `BUILD-METHOD` M4 and contains no row of the table, so
   `grep -c 'Re-read, in this order' memory/TEMPLATE-SPEC.md` returns 0 while the same grep over
-  `memory/guides/BUILD-METHOD.md` returns 1. Both greps return 0 at base, measured at rev-4, so the
+  `memory/guides/BUILD-METHOD.md` returns 1. Both greps return 0 at base, re-run at rev-5, so the
   BUILD-METHOD half of this pair is red before the edit.
 - **AC4** — When `bash tools/memory-tree/check-method-carriers.sh` runs after the edit, it exits 0.
   The `SPEC-TEMPLATE.template.md` pointer adds no row, because it uses the pathless
@@ -335,7 +353,9 @@ LIVE, and hand-editing the live copy is what the leg exists to catch.
 - **AC7** — When `tools/workflows/tier2-review.js` is read at HEAD, its round-above-1 `isSpec`
   priming names `memory/guides/BUILD-METHOD.md` M4's re-read table and tells the lens to check the
   neighbours it names, while the `else` branch of that same ternary — the diff-review priming — is
-  byte-identical to its rev-2 text.
+  byte-identical to its text at `base` 750ca0ca. Dated by a sha and not by a revision of THIS
+  document, which is what it said at rev-4: `git diff 750ca0ca HEAD -- tools/workflows/tier2-review.js`
+  is empty at rev-5, so the comparison has a real object on both sides.
 - **AC8** — When `bash tools/check-kit-versions.sh` runs after the edit, it exits 0, and
   `grep -oE "1\.7" tools/workflows/tier2-review.js | wc -l` returns 3, so `meta.version` and both
   `gov:kit` markers moved together. Moving any one of the three alone reds that gate, which is the
@@ -478,6 +498,38 @@ lands. The exemption's compensating check is recorded in §5's testing row, per 
   §3's non-goals survive S10, since it adds no arm and no conf key; §4 fired §2, §6 and §7, which is
   what caught that the new obligation needed all three; §6 fired §2 and §7; §7 fired §6. §5 is in no
   fired row and is deliberately untouched.
+- rev-5 · 2026-09-05 · §2 · §4 · §6 · the TERMINATING fold of spec-audit round 3. There is no round
+  4, so nothing below is parked. L1, the only finding against this unit: §4's "Verified cost" said
+  `check-method-carriers.sh` excludes "only `BUILD-METHOD.template.md`", and that script's population
+  comment declares FOUR exclusions with a reason each. The entry now POINTS at that comment block
+  instead of restating it — L1's own left-shift and the charter's "point at the source" rule — and
+  keeps the one fact the argument rests on: `tools/memory-tree/SPEC-TEMPLATE.template.md` matches
+  none of the four, so the path spelling really would red check 3. FOLDED FROM ANOTHER UNIT'S
+  FINDING: H8's left-shift names this unit's mechanism by name. Round 2's fold rewrote
+  `TOOL-aJoinedCanon-9`'s sole observer without re-reading the scope item it observes or the design
+  paragraph that placed it, and a bare `§2 · §7` row does not stop that. The §6 row now names §4 and
+  names the scope item rather than §2 bare; §4 records that third derivation and says why it is not
+  decoration; S2 says the §6 set was not derived like the other three; AC1 pins the row, so the new
+  content has an observer. THE TWO NEW BUILD RULES, both checked rather than assumed. One owner per
+  shared engine name: this unit introduces no awk `-v` binding, no engine function name and no
+  `tFixture` number, so it claims nothing in `TOOL-aJoinedCanon-3`'s namespace registry — §3 forbids
+  the arm that would need one. The `watch:` re-stamp: already folded at rev-4 as S10, AC10 and the
+  `kickoff-manifest ratchet` leg, and re-verified here against the manifest's own `watch:` line,
+  where `memory/guides/BUILD-METHOD.md` is this unit's only write-set member.
+  RE-DERIVED AT HEAD, not restated. AC1's and AC3's three base greps each return 0. `1.6` occurs
+  exactly three times in `tools/workflows/tier2-review.js` and `1.7` not at all, so AC8's post-bump
+  count of 3 is what that file yields. `check-kit-versions.sh` matches its version token against a
+  REGEX rather than a constant and `tools/workflows/kit.toml` carries
+  `version_from = { file = "tier2-review.js" }`, so S9's "no fourth carrier" holds.
+  `check-verdict-epoch.sh` scans `ENGINE` plus a six-name `DELEGATES` list holding neither template
+  this unit edits, and `kit version markers` compares every `tools/memory-tree/*.template.md` marker
+  to `KIT_MEMORY_TREE_VERSION`, which this unit does not move — both §7 claims stand. Units 1 and 11
+  also write `tools/memory-tree/BUILD-METHOD.template.md`, both for the version marker only and
+  neither for method prose, so S1's quoted fold sentence is not a literal a lower-`order` unit moves
+  first. RE-READ TABLE, run on itself: §4 fired §7, which is what sent me back to the two version
+  gates; §6 fired §2 and §7, and caught AC7 dating a file's bytes by a revision of THIS document —
+  "byte-identical to its rev-2 text" now names `base` 750ca0ca, verified as an empty `git diff` on
+  that file; §2 fired §3, whose non-goals survive a table cell. §5 is in no fired row and is untouched.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 7 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 7 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -83,6 +83,19 @@ thing this arm reds.
   stale-waiver refusal keeps a cleared one from surviving. A blank or absent key turns the arm off,
   and the report line says which. Four test arms: the post-cutoff red, its pre-cutoff twin green,
   the blank-key off, and AC11's post-cutoff Tier-1 spec with no Gates heading staying silent.
+- **S8** — `memory/guides/SESSION-KICKOFF.md` is re-stamped: `last-audit` moves to a fresh
+  `<ISO datetime> @ <sha>` per that manifest's own stamping rule, which this spec does not restate.
+  `.memory-tree.conf` is a `watch:` pathspec of that manifest — read off its `watch:` line at HEAD,
+  not assumed — and S7 writes a key into it, so this unit's diff is a watched change, and check C5
+  of `skills/session-kickoff/manifest-check.sh` reds on a watched change with no re-stamp at or
+  after it. The `kickoff-manifest ratchet` leg carries `subject: repo` and NO guard in
+  `tools/gate-legs.json`, so it runs on every bar and no scoping avoids the red. The re-stamp is
+  BUNDLED into the commit that writes the conf key rather than following it, because the pre-commit
+  fast leg runs C5s, whose staged form compares the staged manifest's stamp against HEAD's and
+  cannot see a follow-up commit. `last-body-change` does NOT move and §B gains no delta line:
+  this unit changes no gate command, entrypoint, layout convention or front-loaded claim — §B
+  names no spec-format cutoff key and no §B claim is derived from the one S7 adds — and the
+  charter's rule is "no delta → no touch".
 
 ## 3. Non-goals (OUT)
 
@@ -151,9 +164,13 @@ being trusted from here. Re-derive them at the start of this unit's build pass; 
 which of them is true, not on the digits.
 
 - **27 of the 42 live specs carry no `LEG_LINE` at all**, and **31 of the 42 contribute no graded leg
-  token** — the five between them have a list line whose every token is excluded by shape. Derived by
-  running `LIVE`, the Gates-heading regex, `LEG_LINE` and `NOT_A_LEG` over the tracked spec glob, which is
-  what S4's new report field turns into a printed number so this stops being a research pass.
+  token** — the four between them have a list line whose every token is excluded by shape.
+  Re-derived at this fold by running `LIVE`, `LEG_LINE`, `NOT_A_TOKEN` and `NOT_A_LEG` over the
+  §7 body of every spec the tracked glob holds; the body is taken by ORDINAL, which bullet 4
+  shows is the same body the heading-text location finds on this corpus. That derivation is what
+  S4's new report field turns into a printed number, so this stops being a research pass. It is also
+  this section's ONLY statement of these two figures — the third bullet cites them rather than
+  restating a digit, which is the defect rev-4 half-corrected and then logged as done.
 - **Nine of the eleven `aJoinedCanon` specs contribute zero.** They were written by agents who
   had each read the finding that says §7 is silently ungraded, and the house style most of them used —
   `- ` bulleted leg names — is precisely the shape `LEG_LINE` cannot match. That is
@@ -161,11 +178,13 @@ which of them is true, not on the digits.
   are this unit, which is about the defect, and unit 9. The figure is a fold-time measurement over a
   population the siblings' own folds move — round 2 rules a §7 leg list onto `TOOL-aJoinedCanon-11`,
   which is one of the nine — so re-derive it, never quote it.
-- **The figures moved with the corpus and not with the predicate.** The findings record's
-  post-skeptic number was 18 of 31; the design pass measured 20 of 33; the fold measures 26 of 42.
-  `750ca0ca` names the tree the design READ, not the tree as committed. The ratio held while the
-  corpus grew by eleven specs in a day, which is the argument for a cutoff over a retrofit: the
-  population S7 would have to red is not shrinking on its own.
+- **The figures moved with the corpus and not with the predicate.** All three are the no-`LEG_LINE`
+  count: the findings record's post-skeptic number was 18 of 31, the design pass measured 20 of 33,
+  and the fold measures the first figure in bullet 1 — not restated here, because a derived figure
+  written twice in one section is exactly how rev-4 came to correct one copy and log the pair.
+  `750ca0ca` names the tree the design READ, not the tree as committed. The live population went
+  from 33 to 42 in a day and the ratio did not fall, which is the argument for a cutoff over a
+  retrofit: the population S7 would have to red is not shrinking on its own.
 - **Every live spec today carries its Gates section at `## 7.`, and ten terminal specs carry no Gates
   heading at all.** So the heading-text location S4 adds changes no verdict on the corpus as it
   stands, and buys exactly the Tier-1 headroom §3's first non-goal is written around.
@@ -292,6 +311,7 @@ engine, the exception dies with it and the key owes both carriers.
 | `.memory-tree.conf` | the `SPEC_LEGLINE_CUTOFF` key and its comment |
 | `tools/check-spec-tokens.test.sh` | eight arms and the floor |
 | `memory/map/features/spec-tokens.md` | the two new fields, the heading-text location, the S7 arm and its key, and the three limits |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp only; no body delta (S8) |
 
 The two template halves are one edit and the direction is fixed: edit
 `tools/memory-tree/SPEC-TEMPLATE.template.md`, then run
@@ -437,12 +457,23 @@ every carrier, the carrier set derived with `grep -rl` rather than listed.
   every Tier-1 spec for it; that row prescribes the same remedy this criterion observes — key on the
   heading title, which is what the titles are for. This unit closes the class in its own checker and
   leaves that row where it is.
+- **AC12** — When `bash skills/session-kickoff/manifest-check.sh` runs on this unit's landing
+  commit it exits 0, and `memory/guides/SESSION-KICKOFF.md`'s `last-audit` names a sha at or after
+  the commit that writes `SPEC_LEGLINE_CUTOFF` into `.memory-tree.conf`. The failing case is the
+  revert of S8 alone: keep the conf key, restore the old stamp, and check C5 — `no unaudited watch
+  drift` — reds naming `.memory-tree.conf` as a watched file changed with no re-stamp at or after
+  the change. `last-body-change` is the SAME sha before and after, which is the half of the criterion
+  that observes the "no delta → no touch" side of the rule rather than the re-stamp side. Read at
+  source rather than assumed: that command exits 0 on this tree today, `.memory-tree.conf` sits on
+  the manifest's `watch:` line, and C5 is topological — it reds when the newest watch-touching
+  commit is not an ancestor of the commit that changed the stamp VALUE, so a body-only manifest edit
+  does not satisfy it.
 
 ## 7. Gates
 
 `memory hygiene` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` ·
 `kit version markers` · `kit/dogfood doc parity` ·
-`testsuite counts (every bar self-test prints one)`
+`testsuite counts (every bar self-test prints one)` · `kickoff-manifest ratchet`
 
 New arm: `tools/check-spec-tokens.test.sh` · scratch repos staging each of AC4, AC5, AC10, AC8's two
 cutoff twins, AC9's blank key and AC11's two Tier-1 fixtures, all run against the unpatched checker
@@ -461,6 +492,11 @@ arms in `spec-tokens self-test`, both already in `tools/gate-legs.json`, so the 
 move. The self-test leg carries `subject: kit` and the guard `tools/`, so the default bar holds it —
 this is kit work and its DoD owes
 `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`.
+
+`kickoff-manifest ratchet` is on the list because S7 writes a key into `.memory-tree.conf`, a
+`watch:` pathspec of `memory/guides/SESSION-KICKOFF.md`, which is what S8 re-stamps and AC12
+observes. That leg is `subject: repo` with no guard, so it runs on every bar and a missing re-stamp
+reds every gate run this unit's landing touches, not a scoped one.
 
 ## 8. Open questions
 
@@ -537,6 +573,26 @@ this is kit work and its DoD owes
   no argument here rests on a behaviour a lower-`order` sibling changes), M6, M7, M8, M9, M10, and L2
   (the one `path:line` in this file, the `dUnstalledConvoy-26-2` ledger at `:12`, is correct and
   points into a frozen terminal record).
+- rev-5 · 2026-09-05 · §2 · §4 · §6 · §7 · folded spec-audit round 3, the terminating fold. H9:
+  §4 carried two values for one derived figure — bullet 1's `27 of the 42` and bullet 3's
+  `26 of 42` — and rev-4's log claimed the correction while only one of the two sites got it. Both
+  are re-derived at this fold with the checker's own predicates over the tracked glob: 42 live specs,
+  27 carrying no `LEG_LINE`, 31 contributing no graded leg token, so the gap is FOUR and bullet 1's
+  "five" was wrong too. Bullet 3 now cites bullet 1 instead of carrying a second digit, and its
+  "grew by eleven specs" is now the 33-to-42 the two figures actually show. H2, the build's new
+  cross-unit rule: S7 writes a key into `.memory-tree.conf`, which is on
+  `memory/guides/SESSION-KICKOFF.md`'s `watch:` line at HEAD, and no part of this spec owned the
+  `last-audit` re-stamp that check C5 of `manifest-check.sh` demands — added as S8, a Files-touched
+  row, AC12 with C5 as the observed red and C5s's bundle constraint, and `kickoff-manifest ratchet`
+  on §7's leg line with a sentence saying why. Swept for both classes and CLEAN, each checked
+  rather than assumed: every other derived figure in §4 was re-derived here and each is stated once
+  (93 manifest names, exactly one carrying a `/` and exactly one led by a command verb, ten terminal
+  specs with no Gates heading, seven `_CUTOFF` keys, and no live spec whose Gates section sits
+  anywhere but §7); the checker header's quoted `270 hits, 271 of them` does appear in both §3
+  and §8, byte-identical and labelled as a quotation of that header, so it is not a second
+  derivation; B1's namespace class does not reach this unit, which introduces no awk binding, no
+  engine function name and no `tFixture` number, as §7 already recorded; and `.memory-tree.conf` is
+  the only path in §4's Files-touched table that is on the manifest's `watch:` line.
 
 ## 10. Reuse audit
 
