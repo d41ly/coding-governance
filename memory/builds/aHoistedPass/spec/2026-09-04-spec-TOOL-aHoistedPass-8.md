@@ -6,7 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -64,7 +64,7 @@ which one is right, because no recipe-mode build has ever existed.
 ### The population
 
 At `c4fcf5ad`, `memory/builds/` holds 93 folders. Searching the whole memory tree for a
-`authorized-by: recipe` value returns exactly one file, `memory/builds/aHoistedPass/build/2026-09-04-build-aHoistedPass-1-design-pass.md`,
+`authorized-by: recipe` value returns exactly one file, `memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md`,
 which is this build's own design document quoting the key. **Zero build READMEs declare `recipe`.**
 Every `authorized-by:` value in the corpus is `prompt`.
 
@@ -210,7 +210,7 @@ No file under `tools/` is touched, and no gate leg is added or moved.
   `[ "$sc" != all ] && [ "$sc" != "${AUTH_MODE:-}" ]`, a single-token equality against `all` or one
   member of `AUTH_MODES`, so no mode list is expressible.
 - **AC7** — When the memory tree is searched for `authorized-by:[[:space:]]*recipe` at `c4fcf5ad`, the
-  only hit is `memory/builds/aHoistedPass/build/2026-09-04-build-aHoistedPass-1-design-pass.md` and no
+  only hit is `memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md` and no
   build README matches.
 - **AC8** — When the record lands at
   `memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-8-recipe-probe.md` carrying

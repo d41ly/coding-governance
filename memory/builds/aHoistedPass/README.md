@@ -95,9 +95,33 @@ rows byte-identical to what a harnessed run writes, so those rows witness nothin
   including a pure re-render — and `check-kit-versions.sh` requires a `gov:kit` marker in every tracked
   `tools/unattended/*.template.md`, which means every unattended kit-version bump edits it.
 
-- **The design of record is `build/2026-09-04-build-aHoistedPass-1-design-pass.md`.** Eight
+- **The design of record is `build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md`.** Eight
   revisions, three adversarial rounds and two over-claim audits sit behind it; every unit below derives
   from it rather than restating it.
+
+## Parked decisions
+
+- **The slot byte ceilings are not met.** This README's problem, improvements and build-rules slots
+  each sit over their declared ceiling, so `memory/project/readme-contract.txt` carries it as EXEMPT
+  rather than BOUND. Trimming that prose is this build's owner's call; the row drains when they do.
+  The structural faults that bind every build README regardless of that split were repaired by the
+  `aKeyedAnnotation` session, which is what let the bar bind again.
+
+<!-- roster:units -->
+
+| # | Unit | Status | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aHoistedPass-1` | OPEN | the record catches up with the verdicts that superseded it |
+| 2 | `TOOL-aHoistedPass-2` | OPEN | the route a run can find, and the ratchet that keeps it findable |
+| 3 | `TOOL-aHoistedPass-3` | OPEN | the build-method budget becomes a number a gate reads |
+| 4 | `TOOL-aHoistedPass-4` | OPEN | the loop ban learns the two spellings that walk past it |
+| 5 | `TOOL-aHoistedPass-5` | OPEN | the child that builds one unit and holds nothing else |
+| 6 | `TOOL-aHoistedPass-6` | OPEN | the harness hands out a roster and stops driving the build |
+| 7 | `TOOL-aHoistedPass-7` | OPEN | a brief on disk before the code that cites it |
+| 8 | `TOOL-aHoistedPass-8` | OPEN | the recipe-mode question, measured instead of argued |
+| 9 | `TOOL-aHoistedPass-9` | OPEN | the adopter without the harness is told, on every bar |
+| 10 | `DEPL-aHoistedPass-1` | OPEN | a declared kit dependency that is actually checked |
+<!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 10 unit(s) · node a · opened 2026-09-04 · streams tooling+deployer
@@ -124,9 +148,6 @@ Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aHoistedPass-1 TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9.
 <!-- /gen:build-index -->
-
-<!-- gen:build-units -->
-<!-- /gen:build-units -->
 
 <!-- gen:build-order -->
 

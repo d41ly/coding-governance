@@ -6,7 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 

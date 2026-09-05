@@ -6,7 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-04-build-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -333,7 +333,7 @@ lands unchanged behind it.
 
 - rev-1 · 2026-09-04 · initial draft, written against `origin/main` = `c4fcf5ad` with every line number
   re-opened locally and every exit code re-measured in this worktree. Five corrections to the design of
-  record, `build/2026-09-04-build-aHoistedPass-1-design-pass.md`:
+  record, `build/2026-09-04-build-TOOL-aHoistedPass-1-design-pass.md`:
   1. **The design names two boundaries for this unit and there are five.** It lists `workflow script
      syntax` and `verifier fan-out`; measured, the file also lands on `review-join ban (no ref-keyed
      join)` (by PATH, not by marker), `install-prefix (shipped surface)` (once tracked), and
