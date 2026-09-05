@@ -1,12 +1,24 @@
 # TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-5 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-dTracedLattice-1-baseline_ranks.py](../build/2026-09-05-build-TOOL-dTracedLattice-1-baseline_ranks.py) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-build_scen3.py](../build/2026-09-05-build-TOOL-dTracedLattice-1-build_scen3.py) | research | TOOL-dTracedLattice-7 |
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-grade.py](../build/2026-09-05-build-TOOL-dTracedLattice-1-grade.py) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-harness.py](../build/2026-09-05-build-TOOL-dTracedLattice-1-harness.py) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-harvest.py](../build/2026-09-05-build-TOOL-dTracedLattice-1-harvest.py) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-meas-cost-and-regression.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-meas-cost-and-regression.md) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-meas-memory-recall-recall.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-meas-memory-recall-recall.md) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-meas-reuse-lookup-recall.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-meas-reuse-lookup-recall.md) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-meas-shared-mechanism.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-meas-shared-mechanism.md) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-recall-report.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-recall-report.md) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-resolver.py](../build/2026-09-05-build-TOOL-dTracedLattice-1-resolver.py) | research | TOOL-dTracedLattice-7 |
+| [2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md) | research | TOOL-dTracedLattice-7 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 
@@ -20,46 +32,59 @@ scores 14.5% precision overall and 7.2% in the fan-in band that `reuse_lookup` p
 
 ## 2. Scope (IN)
 
-- **S1** Subtract same-name definers in `fan_in`: the referencing-file set loses every file that also
-  DEFINES the symbol, not only the one definition file passed as `def_file`. The caller already holds
-  `symbols.json` and can supply the definer set.
-- **S2** Add a receiver-binding pass so a dotted occurrence counts when its receiver binds to a repo
-  module. `import map_lib as m` followed by `m.fan_in(...)` is a real reference and the current index
-  cannot distinguish it from `Path(p).read_text()`.
-- **S3** Report the index's own coverage on every call: how many attribute sites were bound, how many
-  were left unresolved, and which language layers were not scanned at all.
-- **S4** Re-declare the wall-clock ceiling for every entrypoint whose cost moves, with the reading
-  that justifies it.
-- **S5** Amend `TOOL-aScouredKit-16` in place with the measurement that rejects its second proposal,
-  so the row is not later built as written. This unit is the ONLY one that edits that row, and it
-  therefore carries `TOOL-dTracedLattice-3` S3's three corrections as well: the reinvention backlog
-  is NOT tracked, the fiction is NOT permanent, and it does NOT ship to adopters. All three clauses
-  are live at `memory/backlog/TOOL.md:294`, and `git ls-files | grep reinvention` returns nothing,
-  so two of them are checkably false today. Rev-2 declared the sole-editor rule and did not widen
-  this item to receive what the other unit stopped doing, which left the corrections owned by nobody.
-- **S6** Land the scoring instrument as tracked files under `tools/codebase-map/`: the variant
-  harness that AC1 and AC2 are scored by, plus the ground-truth corpus as a FIXTURE rather than as a
-  remembered number. The AST ground-truth resolver is NOT built here — `TOOL-dTracedLattice-6`
-  rescues it from the lexicon kit at order 1 and this item extends what that unit lands. The harness
-  and corpus exist today only in a scratchpad this build's README records as unreproducible, so
-  without this item the unit's headline criteria can be satisfied only by assertion.
-- **S7** Update `tools/codebase-map/map_diff.py`, which calls `fan_in` at line 204 and computes the
-  dead-export figure at 207. It is in this unit's write set, not unit 3's, because the signature S1
-  changes is the one that line passes.
-- **S8** Re-derive `SEAM_FANIN_THRESHOLD` against the new metric, or record with the measurement that
-  `3` still means what it meant. Definer subtraction rescales the seam population for all three
-  consumers, and a tuned adopter value does not travel with this fix.
+Ordered by MEASURED value. The ordering changed at rev-5: what led this list for four revisions was
+a precision fix, and scenario-based recall showed precision does not predict the answer.
+
+- **S1** The name-merge defect. `Candidate.file: str` becomes `files: tuple[str, ...]` and
+  `load_corpus` stops keeping `file or prev.file`, so a symbol defined in several files is reachable
+  through every definer instead of through one arbitrary winner. 124 of 769 definitions (16.1%) are
+  unreachable today; `repo_root` has four definers and the shortlist prints one. This is not a
+  ranking change and it is worth more than every ranking change measured.
+- **S2** Retrieval: a behaviour-phrase to seam bridge. 17 of 17 misses on the adversarial set and
+  roughly 15% of the graded replays fail on an EMPTY STEM INTERSECTION between the phrase a session
+  types and the symbol's name — unreachable at any K, and lifting `NEIGHBOUR_CAP` to infinity reaches
+  none of them. Cheapest credible probes, both stdlib and both to be MEASURED rather than assumed:
+  stem the query against each candidate's docstring first line as well as its name, and match on
+  stem prefixes for names not otherwise matched.
+- **S3** A stem-specificity SECONDARY sort key, derived from `build_reference_index`'s own output at
+  STEM granularity — 4934 tokens to 1924 stems in 0.0164 s, nothing committed, drift structurally
+  impossible. NOT the identifier document frequency, which is `fan_in` itself. Lands only if it
+  clears AC3's chance control, because its margin is currently indistinguishable from a random seed
+  shuffle at r@20.
+- **S4** Report a miss as a miss. A harness that folds an unfound answer in as `rank = len(shortlist)`
+  reads a recall failure as a ranking change, which is how the rev-4 design mistook one for the other.
+- **S5** Subtract same-name definers in `fan_in`. Retained from rev-1 and DEMOTED: it raises
+  ast-edge precision from 14.5% to 33.8%, and that yardstick is now known not to predict the answer.
+  It has never been scored against the scenario sets, so it lands only under the same ACs as S3.
+- **S6** Report the index's own coverage on every call: attribute sites bound, sites left unresolved,
+  and every language layer not scanned at all.
+- **S7** Amend `TOOL-aScouredKit-16` with the measurement rejecting its dot-prefix proposal, and
+  carry `TOOL-dTracedLattice-3` S3's three corrections to the same row. This unit is the ONLY one
+  that edits it.
+- **S8** Land the scoring instruments as tracked files under `tools/codebase-map/`: the variant
+  harness, the scenario sets, and the graded corpus as FIXTURES rather than as remembered numbers.
+  The AST resolver comes from `TOOL-dTracedLattice-6` at order 1. A fixture measured against THIS
+  corpus is withheld from adopters, the way `recall-fixture.json` is.
+- **S9** Update `tools/codebase-map/map_diff.py`, which calls `fan_in` at `:204` and computes the
+  dead-export figure at `:207`.
 
 ## 3. Non-goals (OUT)
 
-- No committed relation artifact. That question is answered in this build's README on `AGENTS.md` §12
-  grounds, and reversing it is not this unit's business.
-- No change to `symbols.json`, its schema, or the freshness gate — `TOOL-dTracedLattice-2` owns the
-  gate.
+- **No confidence re-ranking, and this is a REVERSAL.** Rev-4's successor design proposed sorting by
+  a tier built from name shape and token frequency. Measured against scenarios it takes recall@5 on
+  the adversarial set from 11/28 to 2/28, nine answers move down and none moves up, McNemar exact
+  p = 0.0039. §4 records why it looked right.
+- **No re-derivation of `SEAM_FANIN_THRESHOLD`.** Rev-3 added that as S8 and rev-5 removes it: the
+  threshold is shared with `--converge` and `seed_affordances` and answers a different question, so
+  redefining a seam to fix a sort order breaks the convergence worklist.
+- No committed relation artifact; that is answered in this build's README on `AGENTS.md` §12 grounds.
+- No change to `symbols.json`, its schema, or the freshness gate — `TOOL-dTracedLattice-2` owns the gate.
 - No type inference. A receiver that cannot be bound by import analysis alone stays unresolved and is
   REPORTED as unresolved.
-- No re-basing of `dead_exports`; that population changes as a consequence and its repair is a
-  follow-up, named in §8.
+- No receiver-binding pass in this unit. It was rev-1's S2; the measurements put it behind S1 and S2
+  and it needs its own spec once those have landed and moved the numbers.
+- No re-keying of `seed_affordances`, and no fix to `bench.run_rm3` — that is
+  `TOOL-dTracedLattice-7`, in a different kit.
 
 ## 4. Design
 
@@ -91,6 +116,27 @@ discards 198 of 211 verified edges because this repo's dominant idiom is aliased
 S1 alone scores 33.8% precision at 82.9% recall and 0.46 mean absolute error against the shipped 1.38.
 S1 plus S2 is the design; S1 alone is the fallback if S2 does not pay for its cost.
 
+### Alternatives rejected — the confidence re-rank
+
+Sorting by a tier built from name shape and token frequency, ahead of fan-in. It is recorded here
+rather than deleted because it was measured twice with opposite results, and the second measurement
+is the one that counts.
+
+Against ast-resolved import edges it looked decisive: precision@5 rose from 1.6% to 80.0%, and that
+lift is real and transfers to the per-query shortlist, 28.3% to 81.7% against a 39.6% random-order
+control. Against SCENARIOS it loses: recall@5 on the 28-row adversarial set falls from 11/28 to 2/28,
+nine answers move down and none moves up, McNemar exact p = 0.0039, and the sign is negative at @1
+and @5 across all four arm and predicate combinations of the graded replay.
+
+Both are true, and the reconciliation is the lesson: **edge precision and answer hit-rate measure two
+different objects, and only the second is the question a session asks.** Three of the tier's own terms
+also failed independently. The `token df <= 15` term is `fan_in <= 14` over the corpus the tool
+already holds — identifier-DF minus `fan_in` is +1 for 645 of 645 symbols, rho +1.0000 — so a
+proposal reading "tier, then fan-in" was "fan-in, then fan-in" in its third term. The `ambient` filter
+discriminates 4 names of 645 and its only catch among the seven highest-fan-in common names is
+`resolve`, a false positive costing rank 1 to rank 83. And a raw-text spelling of document frequency
+costs 1.554 s per query and demotes `boundedParallel` for being documented.
+
 ### Rollout
 
 S1 first and alone, because it is the measured floor and needs no new pass. S2 behind the same
@@ -113,33 +159,44 @@ entrypoint, landing dark in the sense that it can be disabled to recover S1-only
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the harness S6 lands is run over the fixture corpus S6 pins, `fan_in` with S1 scores
-  at least `33.8%` precision at no less than `82.9%` recall, against the shipped `14.5%` / `100%`.
-  Both the harness and the corpus are tracked paths named in S6, so the criterion is scorable by
-  something in the tree.
-- **AC2** — When mean absolute error is scored by that same tracked harness, S1 reports at most `0.46`
-  against the shipped `1.38`.
-- **AC3** — When `python tools/codebase-map/reuse_lookup.py` is run on any query, its output names the
-  count of bound and unresolved attribute sites and every unscanned layer, so a reader can tell a
-  thin answer from a confident one.
-- **AC4** — When a symbol defined in more than one file is ranked, its fan-in counts only files that
-  do not themselves define it; `load_conf`, defined in nine files, drops from `18` to its
-  definer-subtracted value.
-- **AC5** — When the dot-prefix-only variant is requested, `tools/codebase-map/selftest.py` fails,
-  because an arm pins the measurement that rejects it.
-- **AC6** — When `memory/backlog/TOOL.md` is read, `TOOL-aScouredKit-16` carries the amendment naming
-  the rejected half and the measurement that rejected it, AND no longer claims the reinvention
-  backlog is tracked, that the fiction is permanent, or that it ships to adopters — the three
-  corrections `TOOL-dTracedLattice-3` S3 supplies and this unit applies.
-- **AC9** — When S8 lands, the seam threshold is either re-derived with the reading that justifies the
-  new value, or `.codebase-map.conf`'s `SEAM_FANIN_THRESHOLD` comment records the measurement showing
-  `3` still means what it meant. AC7's fixture pin is a regression guard at a FIXED threshold and
-  cannot grade this, so without AC9 the whole of S8 could be skipped with AC7 green.
-- **AC7** — When `seed_affordances` is run on the fixture corpus at threshold `3` before and after S1,
-  the seam population is pinned at both readings, so any later change to `fan_in` that moves the seam
-  set reds rather than drifting.
-- **AC8** — When `python tools/codebase-map/map_diff.py --converge` runs after S7, its dead-export
-  figure reports the new population beside the old, so the movement is attributable.
+Thresholds are the measured shipped baselines, so a change that does not beat them is not landed.
+
+- **AC1 — do not lose on the adversarial set.** recall@5 over the 28 rows in
+  `2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md` is at least the shipped `11/28`.
+  The rejected confidence re-rank scores `2/28`.
+- **AC2 — S1 recovers the unreachable definers.** After the name-merge fix, every one of the 124
+  definitions currently unreachable is reachable, asserted by an arm over `symbols.json` that fails
+  when any `id` with several definers yields fewer candidates than it has definers.
+- **AC3 — beat chance, not merely the shipped key.** Any ranking change is scored against 200 random
+  seed-shuffles of the same shortlist and clears the 95th percentile at the k claimed. Shipped sits
+  at the 5th percentile at `r@20`, so beating shipped at depth is not evidence.
+- **AC4 — paired significance with the discordant count.** McNemar exact or a 20000-trial paired
+  permutation, and no delta with fewer than `6` discordant pairs is reported as a finding.
+- **AC5 — score under BOTH resolutions.** Strict, def-file only, and resolved through
+  `[paths].globs`. At @20 over the 132 graded scenarios shipped scores `32` strict and `97` resolved;
+  a change winning one and losing the other has been framed, not measured.
+- **AC6 — replay at each spec's own `base_sha`, not only at HEAD.** 129 of 132 graded scenarios
+  resolve one, and rank one changes on 48.1% of scenarios between base and HEAD, so a HEAD-only
+  measurement credits the tool with dossiers the graded unit itself wrote.
+- **AC7 — quote the predicate.** Any name-shape or frequency predicate is pinned by source in this
+  spec and any harness re-implementation is byte-compared against it; two spellings of `compound`
+  disagreeing on 12 of 839 candidates moved a headline by 10 scenarios.
+- **AC8 — cost ceiling.** At most `0.05` s added to a roughly 1 s command, and no second
+  full-corpus scan. The stem-posting key adds `0.0164` s; a raw-text document-frequency spelling adds
+  `1.554` s and fails this criterion alone.
+- **AC9 — beat the constant-answer control.** Leave-one-out, the K most-frequently-changed files,
+  query ignored, scores `.098/.515/.720/.841` at K=1/5/10/20. Any file-granularity recall figure that
+  does not beat it establishes nothing.
+- **AC10 — disclose citation churn.** Report how many of the 92 resolvable seams cited in a
+  `## 10. Reuse audit` and currently in a shipped top 5 leave it, and how many sit in live specs. A
+  disclosure, not a blocker.
+- **AC11 — the amendment lands.** `memory/backlog/TOOL.md`'s `TOOL-aScouredKit-16` names the rejected
+  dot-prefix half with the measurement rejecting it, and no longer claims the reinvention backlog is
+  tracked, permanent, or shipped to adopters.
+
+`precision@5` over the global symbol list is a DIAGNOSTIC and never an acceptance criterion. It is a
+real measurement that transfers to the shortlist — `28.3%` to `81.7%` against a `39.6%` chance
+control — and it still does not predict whether the shortlist named a file the unit changed.
 
 ## 7. Gates
 
@@ -168,6 +225,12 @@ Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice design pass and its skeptic round.
+- rev-5 · 2026-09-05 · folded the scenario-based recall measurement, which REVERSED the successor
+  design this spec was heading toward. The confidence re-rank is refused in §3 and recorded in §4
+  with both measurements. Scope is re-ordered by measured value: the name-merge defect leads, the
+  retrieval bridge is second, the precision fix is demoted to S5, and rev-3's
+  `SEAM_FANIN_THRESHOLD` re-derivation is removed. §6 is rewritten against measured baselines and
+  `precision@5` is demoted to a diagnostic.
 - rev-4 · 2026-09-05 · the owner ratified the lexicon rescue, so S6 extends
   `TOOL-dTracedLattice-6`'s resolver instead of building one, and this unit moves to order 2.
 - rev-3 · 2026-09-05 · folded the round-2 spec audit: B1 (S5 and AC6 widened to RECEIVE the three
