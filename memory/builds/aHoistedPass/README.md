@@ -99,10 +99,10 @@ ids DEPL-aHoistedPass-1 TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPas
 | [TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else](spec/2026-09-04-spec-TOOL-aHoistedPass-5.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-05 |
 | [TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build](spec/2026-09-04-spec-TOOL-aHoistedPass-6.md) | 5 | 2 | SPECCED | rev-5 | 2026-09-05 |
 | [TOOL-aHoistedPass-9 — the adopter without the harness is told, on every bar](spec/2026-09-04-spec-TOOL-aHoistedPass-9.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-05 |
-| [TOOL-aHoistedPass-7 — a brief on disk before the code that cites it](spec/2026-09-04-spec-TOOL-aHoistedPass-7.md) | 7 | 2 | SPECCED | rev-4 | 2026-09-05 |
+| [TOOL-aHoistedPass-7 — a brief on disk before the code that cites it](spec/2026-09-04-spec-TOOL-aHoistedPass-7.md) | 7 | 2 | SPECCED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 4 record folder(s).
+Records: 3 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

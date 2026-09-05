@@ -1,6 +1,12 @@
 # TOOL-aHoistedPass-7 — a brief on disk before the code that cites it
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
+
+**Every `tools/unattended/check-pass-order.sh` address in this document is derived at the run's BASE
+`e828f778`, not at the drafting base above, and each is cited BY NAME with the line number as a
+convenience only.** rev-3 recorded that the file moved substantially between the two bases and rev-4
+re-derived §8 alone; rev-5 finished the job. The rule the siblings adopted holds here: a name survives
+a rebase, a span does not.
 
 <!-- gen:spec-records -->
 
@@ -8,6 +14,7 @@
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 | [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -21,15 +28,24 @@ itself carries a `brief · item <id>` row whose hash still joins to a tracked fi
 ## 2. Scope (IN)
 
 - **S1** — `tools/unattended/check-brief-recorded.sh`, the leg. Same skeleton as
-  `tools/unattended/check-pass-order.sh`: the `GIT_GRAFT_FILE=/dev/null` pin (`:34`), the pinned `GIT`
-  wrapper from `lib-unattended.sh:27` at every sha dereference, the subshell conf import (`:59-102`)
-  with its own key allow-list, the dated cutoff (`:132-145`), the four-count liveness line plus the
-  printed exclusion set (`:245-263`), and exit 0 clean / 1 violation / 2 misconfigured.
+  `tools/unattended/check-pass-order.sh`, each block named rather than spanned: the
+  `export GIT_GRAFT_FILE=/dev/null` pin (`:43`), the pinned `GIT` wrapper from `lib-unattended.sh:27`
+  at every sha dereference, the subshell conf import — from the `MEMORY_ROOT=""` key declarations
+  through the `__CONF_IMPORT_OK__` sentinel test and the `MEMORY_ROOT="${MEMORY_ROOT:-memory}"`
+  default (`:75-121`) — with its own key allow-list, the `THE CUTOFF` block (`:153-166`), the closing
+  liveness `echo` and the exclusion-set `echo` beneath the `SIX COUNTS` comment (`:463-464`), and
+  exit 0 clean / 1 violation / 2 misconfigured.
 - **S2** — `build_commit()` in `tools/unattended/lib-unattended.sh`: the build-commit selection
-  currently inlined at `check-pass-order.sh:172-215`, moved whole with its exclusion-set rationale
-  comment, taking `base · unit-id · build-dir · generated-indexes · shared-records` and printing the
-  sha or returning 1.
-- **S3** — `check-pass-order.sh` calls `build_commit` instead of its inlined copy. Behaviour
+  currently inlined in `check-pass-order.sh` as `_find_build_commit()` (`:337-377`), moved whole with
+  its `ONE PREDICATE, TWO WINDOWS` header comment (`:334-336`) and the
+  `THE EXCLUSION IS THE BUILD'S WHOLE FOLDER PLUS THE GENERATED INDEXES` rationale comment and its
+  `_gen_ex` assembly (`:299-324`), taking `base · unit-id · build-dir · generated-indexes ·
+  shared-records` and printing the sha or returning 1.
+- **S3** — `check-pass-order.sh` calls `build_commit` instead of its inlined copy, at both call
+  sites and only those two, measured at BASE:
+  `build_c=$(_find_build_commit "${base:+$base..}HEAD" "" "--reverse")` (`:378`) and
+  `pre_c=$(_find_build_commit "$base" "$PREANCHOR_CAP" "")` (`:395`). A third caller present when
+  this is built means the file moved again and S2 is re-derived before the lift. Behaviour
   unchanged; `tools/unattended/check-pass-order.test.sh` is the regression check and stays green
   without an edit to a single arm.
 - **S4** — the two terms of §4, existential over rows with the LAST row winning.
@@ -39,8 +55,8 @@ itself carries a `brief · item <id>` row whose hash still joins to a tracked fi
 - **S6** — a grammar liveness assertion: the leg refuses with `DEAD PROBE` when the driver no longer
   spells the row shape it matches.
 - **S7** — `tools/unattended/check-brief-recorded.test.sh`, carrying the arms of §6, and its two
-  rows in `tools/unattended/run-unattended-gates.sh` beside `pass-order history` at `:197` and
-  `pass-order selftest` at `:204`.
+  rows in `tools/unattended/run-unattended-gates.sh` beside the `run_one "pass-order history"` row
+  (`:217`) and the `run_one "pass-order selftest"` row (`:224`).
 - **S8** — the five-declaration act of §4's Inventory, plus the fourth entry in
   `check-kit-versions.sh:169`'s script list — `tools/unattended/check-brief-recorded.sh` joins
   `unattended.sh`, `check-unattended.sh` and `check-pass-order.sh` in the loop that requires each to
@@ -79,7 +95,8 @@ itself carries a `brief · item <id>` row whose hash still joins to a tracked fi
 
 `--brief` STAGES its row rather than committing it: `park` at `unattended.sh:4225` appends the line
 and `stage_or_fail` at `:4226` stages it, so the row lands in the same commit as the pass. The
-sibling leg anchors on the build commit's FIRST PARENT (`check-pass-order.sh:217-221`), which is
+sibling leg anchors on the build commit's FIRST PARENT — `parent=$(GIT rev-parse "$build_c^" …)`
+(`check-pass-order.sh:415`), under the comment that states the reason at `:412-414` — which is
 correct for a spec — the build method requires a run to author a missing spec, so the spec must
 predate the code — and wrong for a brief, which the same pass writes.
 
@@ -123,23 +140,31 @@ CHANGED. The last row is therefore the newest hash, which is the file the builde
 
 ### The liveness line and the dead probe
 
-Four counts and the exclusion set, copied from `check-pass-order.sh:262-263`:
+Four counts and the exclusion set, in the SHAPE of the sibling's two closing `echo` lines
+(`check-pass-order.sh:463-464`) — shape, not field count. **The sibling prints seven fields, not
+four**, and the comment above them says so in the words `SIX COUNTS` (`:459-462`), the discrepancy
+being that `graded` is not one of the populations that comment counts. Four is what THIS leg walks;
+the byte-comparability claim in Alternatives-rejected is corrected accordingly.
 
 ```
 brief-recorded: graded N closed unit(s) · X build(s) skipped by the <date> cutoff · Y with no pinned run BASE · Z unit(s) unbuilt-in-range
 brief-recorded: the record surface excluded from build-commit selection was: <build folder> <GENERATED_INDEXES> <SHARED_RECORDS>
 ```
 
-`graded` increments BEFORE the build-commit selection, exactly as the sibling's does at `:173`, so a
+`graded` increments BEFORE the build-commit selection, exactly as the sibling's `graded=$((graded+1))`
+does (`check-pass-order.sh:293`, ahead of the selection at `:337`), so a
 unit graded by nothing still counts as graded. That is copied deliberately and it is a hole: the
 count that proves term 1 actually ran is `graded − unbuilt`, not `graded`, and the leg's own header
 says so in those words. AC4 asserts on the difference and not on `graded`.
 
-The exclusion set is printed for the sibling's reason (`:255-261`): it is composed from two conf keys
+The exclusion set is printed for the sibling's reason, stated in its
+`THE EXCLUSION SET IS PRINTED, and that is not decoration` comment (`:452-458`): it is composed from two conf keys
 the graded run can commit, so widening `GENERATED_INDEXES` turns a real violation green and the only
 other trace is a count a reader has been taught to ignore. Printing it buys a trace, not a guard.
 
-The sibling's DEAD PROBE (`:120-130`) guards a classifier sliced out of the driver by line span. This
+The sibling's DEAD PROBE — its `THE LIVENESS PROBE` block, refusing at
+`echo "pass-order: DEAD PROBE — the sliced classifier returned no known state…"` (`:138-151`, the
+refusal itself at `:149`) — guards a classifier sliced out of the driver by line span. This
 leg slices nothing, so that probe has no counterpart — what it has instead is a GRAMMAR coupling.
 The row shape this leg matches is written by one function in one file. If the driver stops spelling
 it, every unit reds with "no brief row", which is a wrong verdict wearing a finding's clothes. So
@@ -169,13 +194,13 @@ The five-declaration act, with a `[[gate_leg]]` because this leg is a script the
 | # | Where | What |
 |---|---|---|
 | 1 | `tools/gate-legs.json` | `{"name": "brief-recorded", "argv": ["bash", "tools/unattended/check-brief-recorded.sh"], "chunk": "declarations", "subject": "repo", "guard": [], "ceiling": 900}` |
-| 2 | `tools/unattended/kit.toml` | a `[[gate_leg]]` with `subject = "repo"`, `argv = ["bash", "{kit}/check-brief-recorded.sh"]`, `guard = []`, `red_after_land = true`, beside the four at `:107-133` |
+| 2 | `tools/unattended/kit.toml` | a `[[gate_leg]]` with `subject = "repo"`, `argv = ["bash", "{kit}/check-brief-recorded.sh"]`, `guard = []`, `red_after_land = true`, beside the four `[[gate_leg]]` blocks whose `name =` lines read `unattended kit gate` (`:108`), `playbook validity gate` (`:118`), `pass-order history` (`:125`) and `unattended skill wiring` (`:132`) |
 | 3 | `tools/govkit/subject-pins.tsv` | one `<name>\t<subject>\t<chunk>` row, written by `python tools/govkit/govkit.py selfcheck --write` |
 | 4 | `memory/map/features/unattended.md` | the leg name added to the `gate-legs` claim, which today holds three |
 | 5 | the map artifacts | regenerated in the same commit |
 
 **No guard, and that is a correction to the design.** `pass-order history` carries `guard = []`
-(`tools/unattended/kit.toml:126-129`, `tools/gate-legs.json:713-722`) for the reason the playbook
+(`tools/unattended/kit.toml:124-129`, `tools/gate-legs.json:713-722`) for the reason the playbook
 leg's comment at `:115-117` states: a leg whose subject is the REPOSITORY's records goes stale with
 nobody editing the kit, and a guard scoped to the kit dir would skip it on exactly the commits that
 add a brief row — a build commit that touches no kit file at all. Ceiling 900 copies the sibling.
@@ -225,22 +250,27 @@ back — and it must name the carrier, not the bump.
 ### Alternatives rejected
 
 - **Copy the build-commit selection into the new leg.** Rejected. It is instance #2 of one predicate,
-  and the sibling's own header (`check-pass-order.sh:106-108`) forbids exactly this: *"a second copy
-  here would be two answers to one question"*. The selection is also the half that has already been
-  wrong twice — `:179-196` records an exclusion set that made a CONFORMING run unlandable, twice over
-  — so a second copy is a second chance to get the same thing wrong, in a file whose test suite runs
+  and the selection's own `ONE PREDICATE, TWO WINDOWS` comment (`check-pass-order.sh:334-336`)
+  forbids exactly this in those words: *"A second copy would be two answers to one question, and the
+  copy would be the one that drifts."* The classifier above it says the same thing about `plan_state`
+  (`:125`). The selection is also the half that has already been wrong twice — the
+  `THE EXCLUSION IS THE BUILD'S WHOLE FOLDER` comment (`:299-318`) records an exclusion set that made
+  a CONFORMING run unlandable, twice over — so a second copy is a second chance to get the same thing wrong, in a file whose test suite runs
   on no bar. Extracting it leaves ONE answer and the sibling's 19-arm suite as the regression check.
 - **Anchor on the first parent, as the sibling does.** Rejected by measurement: 25 of 26 conforming
   units red.
 - **Assert the brief preceded the code.** Rejected under §3; the record is one commit.
 - **A fifth printed count for units that reached term 1.** Rejected. `graded − unbuilt` is already
   derivable from the printed line, so the arithmetic costs a reader one subtraction and costs the
-  leg nothing, and the sibling's four-count shape stays byte-comparable with this one.
+  leg nothing, and the two lines stay comparable in SHAPE — one `graded … · … · …` sentence plus one
+  exclusion-set sentence. Not in field count: the sibling prints seven fields at BASE and this leg
+  walks four populations, so a byte comparison between them was never available and rev-5 stops
+  claiming it.
 
 ## 5. Production-readiness checklist
 
 - security — the conf is IMPORTED in a subshell and never sourced into the leg's shell, with a
-  NUL-delimited stream and a sentinel, copied from `check-pass-order.sh:59-102`; the key allow-list
+  NUL-delimited stream and a sentinel, copied from `check-pass-order.sh`'s subshell conf import (`:75-121`); the key allow-list
   is this leg's own declared four and nothing else, because the sibling's blanket assignment was
   itself a reproduced takeover of its `DRIVER` variable.
 - perf / scale — zero builds walked on day one; the sibling leg over the same commit ranges measures
@@ -315,7 +345,7 @@ back — and it must name the carrier, not the bump.
 The new leg, `brief-recorded`, chunk `declarations`, subject `repo`, unguarded, ceiling 900.
 
 Standing legs this unit must keep green: `unattended kit gate` — the new script joins `KIT_SH`
-(`check-unattended.sh:2321-2325`) with no edit, so check 28c's bare-git ban applies to it from the
+(`check-unattended.sh:2320-2325`) with no edit, so check 28c's bare-git ban applies to it from the
 first commit, which is why every dereference goes through the `GIT` wrapper. `pass-order history`,
 which the S2 extraction moves under. `kit version markers`. `govkit selfcheck`. `codebase-map
 coverage + freshness`. `install-prefix (shipped surface)`. `memory hygiene`, for this spec and the
@@ -390,7 +420,7 @@ result reported, and AC7 asserts the four liveness counts are byte-identical acr
   `check-arms.py --report` enumerates ten gates without it. §7 states the real position — the arms
   live in the sibling test file and no boundary runs it.
   **(2)** Design §7's U6 row calls the leg "guarded on the kit dir with its reason". Corrected to
-  unguarded, matching `pass-order history` (`tools/unattended/kit.toml:126-129`,
+  unguarded, matching `pass-order history` (`tools/unattended/kit.toml:124-129`,
   `tools/gate-legs.json:713-722`): the subject is the repository's run-state records, and a kit-dir
   guard would skip the leg on exactly the commits that add a brief row.
   **(3)** Design §7's U6 row says the unit moves `check-unattended.sh` for the conf key. It does not:
@@ -399,7 +429,7 @@ result reported, and AC7 asserts the four liveness counts are byte-identical acr
   (`:2415-2418`), for `check-playbook.sh`. `check-unattended.sh` is still touched, but by the version
   bump, not by the key.
   **(4)** Design §6 names no reuse seam. §4 and §10 name it and S2 extracts it, because a second copy
-  of the build-commit selection is the class `check-pass-order.sh:106-108` forbids in its own words.
+  of the build-commit selection is the class `check-pass-order.sh:334-336` forbids in its own words.
   Two further figures were re-derived rather than carried: the first-parent anchor reds 25 of 26
   conforming units (the design asserted the failure without a count), and all 26 rows join their
   blobs, which is why AC3 is a staged arm.
@@ -435,6 +465,29 @@ result reported, and AC7 asserts the four liveness counts are byte-identical acr
   the classification is re-derived from the carriers this unit edits - none of them on the veto-2
   list, so it is not an owner turn on that ground.
 
+- rev-5 - 2026-09-05 - **the round-2 spec-audit BLOCKER B1, folded as the M4 exit disposition.** The
+  finding: every `tools/unattended/check-pass-order.sh:<span>` this spec built on was a `c4fcf5ad`
+  address naming unrelated code at BASE `e828f778`, and S1 and S2 told the builder to lift those
+  spans whole - `:172-215`, described as the build-commit selection, is the WAIVER REGISTRY prose and
+  the `PREANCHOR_CAP` range validation at BASE, so a literal reading ships an exemption registry
+  inside a pass-order leg. rev-4 had the file open at BASE for §8 and re-derived that section alone,
+  leaving S1, S2, §4 and §10 in the old frame. Re-derived at BASE and re-cited BY NAME, the rule
+  `TOOL-aHoistedPass-5` rev-4 and `TOOL-aHoistedPass-6` rev-4 adopted after the identical round-1
+  finding: the selection is `_find_build_commit()` (`:337-377`) with its two callers at `:378` and
+  `:395`; the graft pin is `:43`; the conf import `:75-121`; the cutoff `:153-166`; the DEAD PROBE
+  block `:138-151`; the first-parent read `:415`; the closing liveness and exclusion `echo` lines
+  `:463-464`; the `graded` increment `:293`; the second-copy prohibition `:334-336`, not a header
+  sentence. **One measured correction rides with the re-citation:** the sibling's liveness line prints
+  SEVEN fields at BASE, not four, so Alternatives-rejected no longer claims the two lines are
+  byte-comparable - they are comparable in shape only, and this leg's four counts are its own. Three
+  siblings were re-derived at BASE in the same pass and were WRONG rather than stale:
+  `run-unattended-gates.sh`'s two rows are `:217` and `:224` (not `:197`/`:204`), and
+  `check-unattended.sh`'s `KIT_SH` assembly starts at `:2320`. Verified unchanged at BASE and left
+  alone: `unattended.sh`'s `park()` `:3830`, `:4203`, `:4204`, `:4217`, `:4226`;
+  `.unattended.conf.example:218`; `check-kit-versions.sh:169` and `:179-192`;
+  `install-prefix-carried.txt:104-105`; `lib-unattended.sh:27`. No scope item, criterion, gate or
+  fork resolution changed - this rev moves addresses and one false comparability claim, nothing else.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "brief row recorded in the run-state file, graded at the
@@ -448,11 +501,14 @@ surface is the right seam, as an affordance-seam row rather than a symbol:
 rows to source found the reuse target this unit takes: `tools/unattended/lib-unattended.sh`, the
 kit's shared-predicate library that
 already holds `pass_commit`, `next_anchor`, `pinned_units` and `baseline_units` for precisely this
-reason, and `tools/unattended/check-pass-order.sh:172-215`, whose build-commit selection becomes
+reason, and `tools/unattended/check-pass-order.sh`'s `_find_build_commit()` (`:337-377` at BASE),
+whose build-commit selection becomes
 `build_commit()` in that library with two callers instead of two copies. The conf-import block
-(`:59-102`), the cutoff block (`:132-145`) and the liveness line (`:245-263`) are reused as the
+(`:75-121`), the `THE CUTOFF` block (`:153-166`) and the two closing liveness `echo` lines
+(`:463-464`) are reused as the
 sibling reuses them from `check-unattended.sh` — copied deliberately, because each is a per-leg
-declaration of ITS OWN keys and counts, and the sibling's comment at `:82-89` records the incident
+declaration of ITS OWN keys and counts, and the sibling's `AN ALLOW-LIST, NOT A GLOB` comment
+(`:100-106`) records the incident
 where sharing that block verbatim let a tracked conf line take over the leg.
 
 Recall terms used: `brief run-state park build-commit first-parent cutoff liveness dead-probe
