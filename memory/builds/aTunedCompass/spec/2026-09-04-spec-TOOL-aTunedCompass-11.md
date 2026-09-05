@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-11 — the map log gains the run-state reader a closed unit's acceptance claimed
 
-**Status:** SPECCED · rev-1 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -100,6 +100,14 @@ the record must say so rather than reporting them green from an ordinary bar.
 
 ## 8. Open questions
 
+**F1 RESOLVED (agent, 2026-09-05, delegated): annotate both, as superseding notes rather than edits.**
+The two narrower options are vetoed on this spec's own acceptance text: AC6 requires the correction
+lines from S4 AND S5 to be present, so annotating only the ledger, or neither, fails a criterion
+already written here. Nothing in the second veto is tripped either — a closed build's spec and its
+acceptance ledger are build records, not one of the governance carriers M11 names, and a superseding
+note is exactly the act the append-only rule contemplates: the ratified decision is not rewritten, a
+reader meeting the claim meets the correction beside it. `TOOL-aClosedDocket-2` stays CLOSED, per §3.
+
 - **F1 — does the correction belong on the closed unit, or only in this build's record?** S4 and S5
   annotate a CLOSED, ratified unit and its acceptance ledger. Options: annotate both, so a reader
   meeting the claim meets the correction; annotate only the ledger, since that is where the false
@@ -115,6 +123,9 @@ the record must say so rather than reporting them green from an ordinary bar.
 - rev-1 · 2026-09-05 · first draft. Added by the restructure recorded in the build README, after the
   owner chose to land the missing reader before shipping `TOOL-aTunedCompass-8`'s new field. Scope
   grew beyond the reader once the closed unit's acceptance claim was checked and found false.
+- rev-2 · 2026-09-05 · F1 resolved under the standing mandate, M3's rule. The two narrower options
+  fail AC6, which names both correction lines; the survivor trips no veto, since a build record is
+  not a governance carrier. No scope, acceptance or gate text moved.
 
 ## 10. Reuse audit
 

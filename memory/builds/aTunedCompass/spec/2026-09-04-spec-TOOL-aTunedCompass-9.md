@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-9 — a recall fixture that can tell the two-set ensemble from its records half
 
-**Status:** SPECCED · rev-1 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -100,6 +100,21 @@ The kit's own self-test suite is `subject = kit` and is held by default, so exer
 
 ## 8. Open questions
 
+**F1 RESOLVED (agent, 2026-09-05, delegated): agent judgement, recorded per question, with a declared
+spot-check rate the owner reads at the wrap-up.** The owner-authors option cannot be executed by a run
+with no owner turn, and restricting to the 17 `in_shown: true` rows is refused on the unit's own
+terms: S4 requires a defensible n and §8 already calls 17 "probably too few", so that option risks
+failing AC1 by leaving too small a set to demonstrate non-saturation. The surviving option is also the
+most feature-rich — it keeps S3's sampling, satisfies AC4's per-question `qid` traceability, and adds
+the spot-check rate as a stated number rather than an implied one. The judgement for each question is
+written into the fixture record so it can be re-read and overturned without re-deriving the set.
+
+**F2 RESOLVED (agent, 2026-09-05, delegated): a second file beside the existing fixture.** This was the
+recommendation and it is also the only option AC5 makes safe: the existing floor must still exit 0 on
+the existing fixture, and a single merged corpus with a per-question kind field puts that guarantee at
+the mercy of every later edit. A second file makes AC5 true by construction, and `TOOL-aTunedCompass-3`
+then pins against a named population rather than one that can silently grow.
+
 - **F1 — who judges which shown passage answered a sampled question?** The log gives the question and
   what was shown, never which hit the session used — the `opened` rows are heuristic and one per
   query at best. So an author still has to read and decide. Options: an agent judges and a human
@@ -120,6 +135,10 @@ The kit's own self-test suite is `subject = kit` and is held by default, so exer
 - rev-1 · 2026-09-05 · first draft. Added by the restructure recorded in the build README after the
   owner blocked `TOOL-aTunedCompass-2` and `-3` on a discriminating fixture rather than pin a floor
   against saturation. Drains the backlog row `TOOL-aWeighedCompass-18`.
+- rev-2 · 2026-09-05 · F1 and F2 resolved under the standing mandate, M3's rule. F1's owner-authors
+  option is unexecutable in a run with no owner turn and the 17-row restriction risks AC1; F2's
+  single-corpus option puts AC5 at the mercy of later edits. Both survivors were the fork's own
+  recommendation. No scope, acceptance or gate text moved.
 
 ## 10. Reuse audit
 

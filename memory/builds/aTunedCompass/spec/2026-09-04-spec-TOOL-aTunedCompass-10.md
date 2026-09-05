@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-10 — the neighbour predicate selects a pool a cap can meaningfully bound
 
-**Status:** SPECCED · rev-1 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -96,6 +96,16 @@ arms need `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` and the record mu
 
 ## 8. Open questions
 
+**F1 RESOLVED (agent, 2026-09-05, delegated): accept the empty pool, and let S4's reason string make it
+legible.** Both alternatives are vetoed on the spec's own text rather than on preference. AC1 requires
+that the same-kind arm return no neighbour from another kit directory; the unnarrowed fallback and the
+widen-to-tool-root variant each return exactly that, in exactly the case they fire, so both fail an
+acceptance criterion already written here. AC2 confirms the survivor was the shape this unit was
+specced around — it asks for non-emptiness only where a kit directory holds more than one symbol,
+which is the one-symbol case conceded. The fork's own argument stands unaltered: a fallback that
+reinstates a 95%-of-corpus pool whenever the good predicate returns nothing makes the narrowing
+untestable.
+
 - **F1 — what happens to a seed in a kit directory with one symbol?** Its narrowed neighbour pool is
   empty, so the probe returns seeds and shared-seam hits only. Options: accept it, since an empty
   neighbour list is honest where the old one was noise; fall back to the unnarrowed arm when the
@@ -111,6 +121,9 @@ arms need `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` and the record mu
 - rev-1 · 2026-09-05 · first draft. Added by the restructure recorded in the build README: the owner
   chose to narrow the predicate rather than ship unit 6's reorder alone, then chose to split the
   narrowing into its own unit so M2's one-mechanism rule holds.
+- rev-2 · 2026-09-05 · F1 resolved under the standing mandate, M3's rule. Both fallback options fail
+  AC1, which forbids a cross-kit neighbour through this arm, so only the fork's recommendation
+  survived the first veto. No scope, acceptance or gate text moved.
 
 ## 10. Reuse audit
 
