@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-4 — the loop ban learns the two spellings that walk past it
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -97,23 +97,25 @@ stdin, with the exit code captured WITHOUT a pipe, at `c4fcf5ad`.
 
 A silent exit 0 is what a run sees. There is no partial verdict and no warning channel.
 
-### Data model
+### Data model - ~~as designed~~, and as it LANDED
 
-Two module-level constants, declared once beside the other file constants.
+**This block is restated to the shipped shape rather than left as the two-constant design**, because
+a Data model naming symbols the tree does not carry sends a builder to rewrite landed constants under
+dead names. That is the same `amendment-leaves-its-other-half-standing` class section 6 was rewritten
+for; rev-3 fixed section 6 and left section 4. What `TOOL-aWeldedTribunal-1` shipped, read at BASE
+`e828f778`, `tools/hooks/agent-cap.js:476-479`:
 
 ```js
-// The loop-opener predicate, ONE spelling instead of six. `for await (` and a `do { … } while ()`
-// block each walked past the six inline literals this replaces, measured at exit 0 with no output.
-// A `do` opener is anchored on a non-member prefix so an `obj.do` property is not a loop.
-// LOOP_HEAD is NEVER given the `g` flag in place: a shared global regex carries `lastIndex` between
-// calls. The one counting site derives a fresh one from `.source`.
-const LOOP_HEAD = /\b(?:for(?:\s+await)?|while)\s*\(|(?:^|[^.\w$])do\s*\{/
-const LOOP_TAIL = /\b(?:for(?:\s+await)?|while)\s*$/
+const LOOP_KEYWORDS = 'for(?:\\s+await)?|while'
+const LOOP_HEADER = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{')
+const LOOP_HEADER_G = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{', 'g')
+const LOOP_KEYWORD_TAIL = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*$')
 ```
 
-`LOOP_HEAD` replaces the literal at `:705`, `:738`, `:934` and `:944`. `:711` becomes
-`(ch.match(new RegExp(LOOP_HEAD.source, 'g')) || []).length > 1`. `LOOP_TAIL` replaces `:910`, with
-no `do` arm, because a `do` opener never precedes the paren that site scans for.
+Three derived forms, not two: the opener walk tests the text BEFORE a paren, so a pattern ending in
+`\(` can never match there and needs its own constant. The `g` form is a SEPARATE constant rather
+than a fresh `new RegExp` per call site, which is a different answer to the `lastIndex` footgun than
+this spec proposed and is equally stateless per construction. **This unit builds none of it.**
 
 The `do` arm matters at `:944` and `:934`. The brace walk at `:939-946` climbs to the line whose
 brace opened the block, finds `do {`, and today tests a predicate that line cannot satisfy — the
@@ -125,12 +127,14 @@ A `do {` header carrying a `gov:sequential-agents` marker is still refused, and 
 already refuses `while`: `:717` requires a `for (const x of <identifier>)` header and a `do` is not
 one. The marker path therefore gains a correct refusal message and no new admission.
 
-### The count is the acceptance, not the eye
+### The count is the acceptance, not the eye - and the count is ONE, not zero
 
-A five-of-six widening closes three quarters of a hole and reports closed. After this unit the raw
-literal `(for|while)` does not appear in `tools/hooks/agent-cap.js` at all, because both constants
-spell it `(?:for(?:\s+await)?|while)`. That makes "did every site move" a `grep` rather than a
-reading, and §6 asserts it that way.
+A five-of-six widening closes three quarters of a hole and reports closed, so completeness is a
+`grep` rather than a reading. The number that grep returns is **1**, not 0: `LOOP_KEYWORDS` spells
+the keywords as `for(?:\s+await)?|while`, so no PREDICATE carries the raw literal, but the comment at
+`tools/hooks/agent-cap.js:461` that documents the fix does. AC4 asserts the observed 1 and names the
+`absence-assertion-over-whole-file-text` class; a criterion written to 0 is a ban that reds on its
+own explanation. rev-3 corrected AC4 and left this paragraph asserting the unreachable zero.
 
 ### The candidate predicate, run over the real tree before wiring
 
@@ -180,7 +184,7 @@ untouched. A revert is the same two constants going back to six literals.
 |---|---|
 | `tools/hooks/agent-cap.js` | the two constants, the six sites, the RULE 4 note, `KIT_AGENT_CAP_VERSION` and its same-line marker |
 | `tools/hooks/scratch-guard.js` | its `gov:kit agent-cap@` marker alone; `KIT_SCRATCH_GUARD_VERSION` is its own and does not move |
-| `tools/hooks/agent-cap.test.sh` | four DENY arms, three control arms |
+| ~~`tools/hooks/agent-cap.test.sh`~~ | ~~four DENY arms, three control arms~~ — **LANDED under `TOOL-aWeldedTribunal-1`.** AC7 requires this unit's commit to touch neither this file nor the predicate block, and AC8 counts exactly THREE files under `tools/`, so booking this one contradicts both. |
 | `tools/hooks/README.md` | the note under `## Direct spawns are COUNTED, not parsed` |
 | `memory/backlog/TOOL.md` | `TOOL-dFoldedVerdict-8` to CLOSED |
 
@@ -216,9 +220,11 @@ a symbol and `memory/map/generated/symbols.json` gains no row.
 - **risks (concurrency, data-loss, rollback hazards)** — The `g`-flag `lastIndex` footgun is the one
   real hazard, and it is removed by construction rather than by comment: no global regex is stored.
   Rollback is a revert of one file.
-- **testing + left-shift gates** — Four DENY arms and three control arms in
-  `tools/hooks/agent-cap.test.sh`, staged RED before the widening lands. §7 states plainly which
-  boundary runs them, because none does.
+- **testing + left-shift gates** — Four DENY arms and three control arms already sit in
+  `tools/hooks/agent-cap.test.sh`, and **this run cannot stage their RED**: the widening is in the
+  tree, so the failing case is no longer observable from here. Section 6 records that as a LOSS and
+  this bullet no longer claims the staged break. What the run does instead is execute the suite by
+  hand at the landing BASE. §7 states plainly which boundary runs them, because none does.
 - **migration / rollback** — N/A — no state, no format, no adopter action beyond the version bump.
 - **user docs** — `tools/hooks/README.md` gains the mutual-exclusivity note. The DENIES section
   needs no change: it already names the loop ban without enumerating spellings.
@@ -261,10 +267,14 @@ covered.
   re-runs this: section 7 states why.
 - **AC6** — When `bash tools/workflows/check-verifier-fanout.sh` runs it exits `0` over all eight
   tracked JavaScript files, so no tracked workflow script is denied by the shipped predicate.
-- **AC7** — When `git log --oneline -1 -- tools/hooks/agent-cap.js` is read, the landing of S1 to S3
-  is attributable to `TOOL-aWeldedTribunal-1` and not to this unit, and this unit's own commit
-  touches neither `tools/hooks/agent-cap.js`'s predicate block nor `tools/hooks/agent-cap.test.sh`'s
-  arms.
+- **AC7** — When `git log -S 'LOOP_KEYWORDS' --oneline -- tools/hooks/agent-cap.js` is read, it names
+  `cc8776b8 TOOL-aWeldedTribunal-1`, so the landing of S1 to S3 is attributable to that unit and not
+  to this one; and this unit's own commit touches neither `tools/hooks/agent-cap.js`'s predicate block
+  nor `tools/hooks/agent-cap.test.sh`'s arms. **The witness is a pickaxe search and not
+  `git log --oneline -1`**, for two measured reasons: `-1` returns `4b13ecac records+kit(aWeldedTribunal)`
+  at BASE rather than the unit that landed the constants, eight commits back; and S4 and S5 both edit
+  this file, so after this unit commits, `-1` returns THIS unit and the criterion refutes its own
+  claim. The "not this unit" half is the diff assertion AC8 already makes.
 - **AC8** — When this unit's diff is read, the files it changes under `tools/` are exactly **three**:
   `tools/hooks/agent-cap.js` (the S4 note and the S5 version constant), `tools/hooks/README.md` (the
   S4 note), and `tools/hooks/scratch-guard.js` (**the `gov:kit agent-cap@` marker at `:41` and
@@ -284,6 +294,13 @@ covered.
 - **AC12** — When `grep -n "slot ledger" tools/hooks/agent-cap.js tools/hooks/README.md` runs, the
   mutual-exclusivity note is found in the `RULE 4` comment block and under
   `## Direct spawns are COUNTED, not parsed`, in both files.
+- **AC14** — When `grep -n "TOOL-dFoldedVerdict-8" memory/backlog/TOOL.md` runs on the landing tree it
+  returns exactly one row, whose status field is `CLOSED` and whose text names the widening that
+  answers it. **S6 had no criterion at all until rev-5**, so the unit whose narrowed purpose is S4,
+  S5 and S6 could have landed with the row it exists to answer still `OPEN`, on a green bar: AC13's
+  `check-memory-hygiene.sh` grades row shape and ids rather than the status token, so it passes on
+  `OPEN` and `CLOSED` alike. The sibling convention is unanimous the other way - DEPL-1 AC14,
+  TOOL-1 AC3 and AC8, TOOL-6 AC24 each grade their own backlog scope item.
 - **AC13** — When `python3 tools/codebase-map/test_codebase_map.py` and
   `bash tools/memory-tree/check-memory-hygiene.sh` run after the change, both exit `0` with no
   regenerated artifact in the diff.
@@ -376,6 +393,23 @@ none
   AC8 now names three files and says why the third is not optional. The two counts that collided
   are of different things and the criterion now says which: S5's TWO is the marker-carrier
   population, AC8's THREE is the diff's file set.
+
+- rev-5 - 2026-09-05 - folded round-2 spec-audit findings H6, H7 and H2, all three read BEFORE this
+  unit's code pass rather than after it. **H6 is rev-3's own other half.** rev-2 struck S1 to S3 as
+  landed and rev-3 rewrote section 6 to verification; section 4 and section 5 kept specifying the
+  struck build. Its Data model declared `LOOP_HEAD`/`LOOP_TAIL`, which the tree does not carry - the
+  landed shape is four constants at `:476-479` - so a builder working from section 4 would rewrite
+  shipped constants under dead names. Its count paragraph asserted the raw literal appears zero
+  times, which AC4 had already overturned as an observed 1. Its Files-touched table booked
+  `agent-cap.test.sh` for arms AC7 forbids this unit to touch and AC8's three-file count excludes.
+  Section 5's testing bullet claimed a staged RED section 6 records as a LOSS. All four restated to
+  what shipped, the struck ones annotated rather than deleted. **H7** - AC7's witness could not show
+  what AC7 claimed: `git log --oneline -1 -- tools/hooks/agent-cap.js` returns `4b13ecac` at BASE,
+  not `TOOL-aWeldedTribunal-1`, and S4 and S5 both edit that file, so after this unit's own commit
+  the same read returns THIS unit and the criterion reads as a refutation of itself. Replaced by
+  `git log -S 'LOOP_KEYWORDS'`, which names `cc8776b8` and survives the commit. **H2** - S6 closed a
+  backlog row that no criterion read, and AC13's hygiene run grades row shape rather than the status
+  token, so the unit could land green with `TOOL-dFoldedVerdict-8` still OPEN. AC14 grades it.
 
 ## 10. Reuse audit
 

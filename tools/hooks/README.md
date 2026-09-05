@@ -125,6 +125,14 @@ outside a workflow script, which is why the matcher must name both tools.
 `AGENT_CAP` in the environment is REFUSED, not honoured — the bound is a file constant. A ready-made
 harness that satisfies every rule above ships at `tools/workflows/tier2-review.js`.
 
+**The two mechanisms are mutually exclusive, and the slot ledger must not be extended to `Workflow`.**
+The script rules bound the fan-out inside one script; the slot ledger bounds the spawns made without
+one. Neither wants the other's population. A harness that dispatches one `Workflow` call per unit of
+a build issues a SEQUENCE of single-agent acts from one prompt, and a per-prompt slot budget written
+for a BURST of verifiers would deny it partway through its own roster — a refusal with nothing fanned
+out behind it. The ledger enforces the concurrency bound on a verify stage, not a lifetime quota on
+dispatches. Count what carries no script; parse what does.
+
 ## The authoring rule for kit files
 
 *Here because the charter template had no room for it: it sits within a few hundred bytes of its
