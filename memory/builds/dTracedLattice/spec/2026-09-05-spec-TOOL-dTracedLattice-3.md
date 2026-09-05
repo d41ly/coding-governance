@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 
 <!-- /gen:spec-records -->
 
@@ -53,8 +54,15 @@ this go unnoticed.
 
 ### Rollout
 
-S3 first and alone: correcting a false claim costs nothing and stops the row misleading the unit that
+S3 first and alone: supplying the wording costs nothing and stops the row misleading the unit that
 cites it. S1 and S2 after the fork resolves.
+
+**This unit and `TOOL-dTracedLattice-1` both write `tools/codebase-map/map_diff.py`, and that
+collision cannot be removed — only sequenced.** Unit 1 owns the `fan_in` call at `:204` and the
+dead-export figure at `:207`; this unit owns the backlog write path at `:171`, `:175` and `:187`,
+inside the same `_converge` function. Rev-2 claimed the file was reassigned to unit 1, which moved
+the collision rather than removing it. The build order puts unit 1 first and this unit rebases onto
+it; neither may be dispatched concurrently with the other, per M6 clause 1.
 
 ## 5. Production-readiness checklist
 
@@ -94,6 +102,8 @@ cites it. S1 and S2 after the fork resolves.
 `codebase-map kit selftest` · `memory hygiene` · `dead-path carriers (deleted files still named)` ·
 `harness arms (fail branches armed or pinned)`.
 
+Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit-subject legs and are HELD on a plain bar; a builder verifying this unit needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. The runner names every held leg, so they are announced rather than silent.
+
 ## 8. Open questions
 
 - **Q1 — tracked artifact, or outside the worktree?** Tracked makes the rows durable, reviewable and
@@ -114,6 +124,9 @@ cites it. S1 and S2 after the fork resolves.
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-3 · 2026-09-05 · folded the round-2 spec audit: H2 (rev-2's reassignment of `map_diff.py` to
+  unit 1 moved the collision rather than removing it — both units write that file, in the same
+  function, and the rollout now says so and sequences them), M1 (§7 discloses the held kit legs).
 - rev-2 · 2026-09-05 · folded the round-1 spec audit: B1 (S3 hands the backlog amendment to unit 1
   rather than editing the same row), H3 (AC1 split into a branch-neutral AC1a and a branch-specific
   AC1b so no criterion pre-commits Q1), H4 (S4 and AC5 narrowed to the true claim, three tracked files

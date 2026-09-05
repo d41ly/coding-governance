@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 
 <!-- /gen:spec-records -->
 
@@ -30,7 +31,12 @@ scores 14.5% precision overall and 7.2% in the fan-in band that `reuse_lookup` p
 - **S4** Re-declare the wall-clock ceiling for every entrypoint whose cost moves, with the reading
   that justifies it.
 - **S5** Amend `TOOL-aScouredKit-16` in place with the measurement that rejects its second proposal,
-  so the row is not later built as written. This unit is the ONLY one that edits that row.
+  so the row is not later built as written. This unit is the ONLY one that edits that row, and it
+  therefore carries `TOOL-dTracedLattice-3` S3's three corrections as well: the reinvention backlog
+  is NOT tracked, the fiction is NOT permanent, and it does NOT ship to adopters. All three clauses
+  are live at `memory/backlog/TOOL.md:294`, and `git ls-files | grep reinvention` returns nothing,
+  so two of them are checkably false today. Rev-2 declared the sole-editor rule and did not widen
+  this item to receive what the other unit stopped doing, which left the corrections owned by nobody.
 - **S6** Land the scoring instrument as tracked files under `tools/codebase-map/`: the AST
   ground-truth resolver and the variant harness that AC1 and AC2 are scored by, plus the ground-truth
   corpus as a FIXTURE rather than as a remembered number. Both exist today only in a scratchpad this
@@ -63,12 +69,17 @@ and for attribute form, the receiver name. A second pass resolves receiver names
 the import statements already parseable with `ast`. `fan_in` then takes a definer set rather than a
 single `def_file`.
 
-`fan_in` has FOUR call sites in three files, not one: `map_diff.py:204`, `reuse_lookup.py:264` and
-`:274`, and `selftest.py:936`. Each must supply the definer set, and `detect_collisions` is the hard
-case — it sees only the union of base and new rows, never the head symbol table, so it cannot build a
-definer set for the head tree. Either it is given one by its caller or its call keeps the old
-signature behind a named compatibility path; the design picks the former and says so here because a
-silent fallback to the old behaviour at one call site is how a precision fix half-lands.
+`fan_in` has FOUR PRODUCTION call sites across THREE files: `map_diff.py:204`, `map_lib.py:1240`,
+and `reuse_lookup.py:264` and `:274`. `selftest.py` holds five more, at `:898` through `:901` and
+`:936`. Each production site must supply the definer set.
+
+`map_lib.py:1240` is the hard case and rev-2's enumeration omitted it while the sentence beside it
+called `detect_collisions` "the hard case" — naming a problem and not locating it. That call sits
+INSIDE `detect_collisions`, which sees only the union of base and new rows and never the head symbol
+table, so it cannot build a head definer set itself. It is therefore given one by its caller; keeping
+the old signature there behind a compatibility path is rejected, because a silent fallback to the old
+behaviour at one call site is exactly how a precision fix half-lands — which is what rev-2's own
+omission would have caused.
 
 ### Alternatives rejected
 
@@ -116,7 +127,13 @@ entrypoint, landing dark in the sense that it can be disabled to recover S1-only
 - **AC5** — When the dot-prefix-only variant is requested, `tools/codebase-map/selftest.py` fails,
   because an arm pins the measurement that rejects it.
 - **AC6** — When `memory/backlog/TOOL.md` is read, `TOOL-aScouredKit-16` carries the amendment naming
-  the rejected half and the measurement that rejected it.
+  the rejected half and the measurement that rejected it, AND no longer claims the reinvention
+  backlog is tracked, that the fiction is permanent, or that it ships to adopters — the three
+  corrections `TOOL-dTracedLattice-3` S3 supplies and this unit applies.
+- **AC9** — When S8 lands, the seam threshold is either re-derived with the reading that justifies the
+  new value, or `.codebase-map.conf`'s `SEAM_FANIN_THRESHOLD` comment records the measurement showing
+  `3` still means what it meant. AC7's fixture pin is a regression guard at a FIXED threshold and
+  cannot grade this, so without AC9 the whole of S8 could be skipped with AC7 green.
 - **AC7** — When `seed_affordances` is run on the fixture corpus at threshold `3` before and after S1,
   the seam population is pinned at both readings, so any later change to `fan_in` that moves the seam
   set reds rather than drifting.
@@ -127,6 +144,8 @@ entrypoint, landing dark in the sense that it can be disabled to recover S1-only
 
 `codebase-map kit selftest` · `codebase-map coverage + freshness` · `memory hygiene` ·
 `harness arms (fail branches armed or pinned)`. No new leg: the arms join the kit's existing selftest.
+
+Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit-subject legs and are HELD on a plain bar; a builder verifying this unit needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. The runner names every held leg, so they are announced rather than silent.
 
 ## 8. Open questions
 
@@ -148,6 +167,11 @@ entrypoint, landing dark in the sense that it can be disabled to recover S1-only
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice design pass and its skeptic round.
+- rev-3 · 2026-09-05 · folded the round-2 spec audit: B1 (S5 and AC6 widened to RECEIVE the three
+  corrections unit 3 S3 hands over — rev-2 declared the sole-editor rule and left them owned by
+  nobody), B2 (§4's call-site list was false in both directions and omitted `map_lib.py:1240`, the
+  very call it called the hard case), H1 (AC9 grades S8, which AC7 could not), M1 (§7 discloses that
+  the kit legs are held).
 - rev-2 · 2026-09-05 · folded the round-1 spec audit: B2 (S6 lands the scoring instrument AC1 and AC2
   are scored by), H1 (§4 names `fan_in`'s four call sites and the `detect_collisions` case), H6 (§8 Q1
   cites `TOOL-aScouredKit-17`), H7 (S8 re-derives `SEAM_FANIN_THRESHOLD`, AC7 pins the seam

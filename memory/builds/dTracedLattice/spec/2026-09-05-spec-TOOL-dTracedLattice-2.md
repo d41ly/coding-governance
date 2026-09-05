@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 
 <!-- /gen:spec-records -->
 
@@ -92,6 +93,8 @@ and needs its failing case observed on a fixture that has a committed artifact a
 `codebase-map coverage + freshness` · `codebase-map kit selftest` ·
 `harness arms (fail branches armed or pinned)`.
 
+Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit-subject legs and are HELD on a plain bar; a builder verifying this unit needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. The runner names every held leg, so they are announced rather than silent.
+
 ## 8. Open questions
 
 - **Q1 — does the template copy move too?** `test_codebase_map.template.py` is byte-identical to the
@@ -104,6 +107,8 @@ and needs its failing case observed on a fixture that has a committed artifact a
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round, which staged the break
   and observed the gate pass with the symbol tier absent.
+- rev-3 · 2026-09-05 · folded the round-2 spec audit: M1 (§7 discloses that the kit legs are held,
+  which round 1's M2 asked for in every spec and rev-2 landed in unit 4 only).
 - rev-2 · 2026-09-05 · folded the round-1 spec audit: H2 (AC4 graded a population of one and could not
   fail; restated as an added-tier criterion) and M1 (S5 and AC5 make the template twin a write target
   with an arm comparing the pair, which Q1 assumed and nothing enforced).

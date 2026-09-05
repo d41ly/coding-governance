@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 |
 
 <!-- /gen:spec-records -->
 
@@ -24,7 +25,11 @@ to claim it is not making that failure.
 - **S1** Derive the language layers PRESENT in the corpus, from the same file walk the index already
   performs, rather than trusting a declaration.
 - **S2** Compare derived-present against declared-dark and against the extractors actually
-  registered, and refuse when a present layer is neither covered nor declared dark.
+  registered, and refuse when a present layer is neither covered nor declared dark. **The derived set
+  is filtered to DEFINITION-CARRYING extensions first.** Without that filter the refusal fires on
+  every data and prose extension in the tree — `.md`, `.json`, `.toml`, `.txt` and the rest — which
+  is a refusal nobody can clear and which would make the check unusable on its first run.
+  `tools/lexicon/lexicon.py:167` already carries this filter and is the prior art to follow.
 - **S3** The refusal names the layer, the file count, and the two ways to clear it — register an
   extractor, or declare it dark — so the remedy is in the message.
 - **S4** Supply the derived set to `reuse_lookup`'s banner. `TOOL-dTracedLattice-1` AC3 owns the
@@ -68,10 +73,15 @@ class, and it puts the check somewhere other than where the answer is produced.
 
 **The lexicon kit already ships this design and rev-1 did not cite it.** `AGENTS.md` §12 requires a
 declared COVERAGE MODE per language — parser, probe, or explicitly dark — with an undeclared one a
-named refusal, and `tools/lexicon/` implements exactly that. This unit deliberately keeps a TWO-state
-model rather than adopting the three-mode vocabulary, because codebase-map has no probe tier to
-declare: an extractor either exists for a layer or it does not. That is a narrowing of a landed
-sibling's design, taken knowingly, and not an independent invention.
+named refusal, and `tools/lexicon/` implements exactly that. This unit ADOPTS the three-mode
+vocabulary rather than narrowing it.
+
+Rev-2 justified a two-state model by asserting codebase-map has no probe tier. That is false:
+`tools/codebase-map/map_extractors.py:226` labels `kit-js` an "Export scan UNION definition probe",
+and its own comment records that one half alone indexed 3 of 33. So the kit already ships one parser
+tier (`kit-py`, real `ast`) and one probe tier (`kit-js`), and the two-state model would have
+mislabelled the JS layer as covered when it is a documented floor. The three modes map exactly:
+parser, probe, dark.
 
 ### Rollout
 
@@ -116,6 +126,8 @@ set would print a derived number beside an authored one.
 `codebase-map kit selftest` · `codebase-map coverage + freshness` ·
 `harness arms (fail branches armed or pinned)`.
 
+Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit-subject legs and are HELD on a plain bar; a builder verifying this unit needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. The runner names every held leg, so they are announced rather than silent.
+
 ## 8. Open questions
 
 - **Q1 — re-declaring `RECALL_DARK_LAYERS` as extensions.** §4 picks extension as the only vocabulary
@@ -134,6 +146,10 @@ set would print a derived number beside an authored one.
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-3 · 2026-09-05 · folded the round-2 spec audit: H3 (rev-2's "no probe tier" was false against
+  `map_extractors.py:226`, so the unit now ADOPTS the lexicon kit's three modes instead of narrowing
+  them on a false premise), H4 (S2 gains the definition-carrier filter without which the refusal fires
+  on every data extension, citing `lexicon.py:167`), M1 (§7 discloses the held kit legs).
 - rev-2 · 2026-09-05 · folded the round-1 spec audit: B3 (§4 picks the extension vocabulary and states
   its cost, Q1 is un-resolved as the owner turn it always was, AC2 and AC4 re-worded, AC5 added to red
   on the shipped value, and §5's false migration row corrected), H8 (§4 and §10 cite the lexicon kit's
