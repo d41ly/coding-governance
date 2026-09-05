@@ -132,9 +132,11 @@ everywhere.
   absent file, which the adopter script's existing conditional already tolerates.
 - risks — the real risk is drift: the guide restating something the charter or the extractor owns.
   S3 is the control, and §6 asserts it by name.
-- testing + left-shift gates — no new leg. The existing memory-hygiene and kit-version legs grade the
-  files this unit touches; a new leg for a prose guide would be the structural-check-reads-as-semantic
-  shape the charter warns about. Two left-shifts the round-1 audit named and this unit owns: extend
+- testing + left-shift gates — no new leg. The existing memory-hygiene, kit-version and codebase-map
+  coverage legs grade the files this unit touches; the third is load-bearing because S8's two new
+  inventory keys are what it counts, and it was not named here until the round-2 audit found the
+  scope bound forbidding the claim that satisfies it. A new leg for a prose guide would be the
+  structural-check-reads-as-semantic shape the charter warns about. Two left-shifts the round-1 audit named and this unit owns: extend
   the existing dangling-citation gotcha record with the backlog-row disposition — head defines, body
   orphans, prose escapes — so the class is SELECTED before such a row is written rather than after
   the bar reds; and add a bug-class row for the criterion shape this audit found five times, that an

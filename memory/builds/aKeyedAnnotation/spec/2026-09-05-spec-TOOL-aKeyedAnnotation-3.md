@@ -60,7 +60,12 @@ no waiver list at all.
   a source population would force either a pin raise the kit's own ratchet list treats as weakening,
   or a waiver registry on day one. The design pass records the guard blast radius as the second
   reason: the legs guarded on that kit are among the most expensive on the bar.
-- **No gate.** The signal reports. Promoting it is a later decision with its own measurement.
+- **No gate.** The SIGNAL reports and stays ungateable; promoting it is a later decision with its
+  own measurement. This bounds the signal's own verdict and NOT its pin: S7's ratchet row makes an
+  unjustified RAISE of the pin red, which is a different question from whether crossing the pin
+  blocks a merge, and sibling unit 4 draws the same line for the same kit. An earlier revision of
+  this bullet said only "No gate", which read as forbidding the one mechanism that makes S4's
+  shrink-only word true.
 - **No repair of what it finds.** Unit 1 repairs the citation it already knows about; anything else
   this signal surfaces becomes a backlog row.
 - **No path-based test-file exclusion.** Measured on this tree: this repo puts selftest arms inside
@@ -83,7 +88,8 @@ report-only signal drainable rather than decorative.
 ### Inventory
 
 One signal function, one registry row, one pin row, one ratchet row, one dependency declaration and
-four self-test arms. No new file, no new leg, no new committed artifact — the answer is derived live
+five self-test arms — S6's two plus the three §6 wires, which is where they are enumerated rather
+than counted again here. No new file, no new leg, no new committed artifact — the answer is derived live
 on each run, which is the repo's stated preference when the only consumer is same-language.
 
 **The definitions map crosses a KIT BOUNDARY and that is a declaration, not an implementation
@@ -188,6 +194,15 @@ deliberately cheaper than a leg, and the leg it rides is unguarded so it already
   RESOLVED (agent, 2026-09-05, delegated): shrink-only. A tolerance pin permits the
   population to sit where it is forever, which fails §4's stated intent that the pin be a
   drain target from the first commit — a criterion the other option cannot satisfy.
+- **F3 — whether the two findings are repaired by this build.** They belong to another node's build
+  whose records were never written, so repairing them means writing records for work this session did
+  not do. Recommendation: file them as backlog rows against that build and let the signal carry them
+  until its owner drains it; unit 1 repairs only the comment prose it touches. RESOLVED
+  (agent, 2026-09-05, delegated): backlog rows, and no records invented. Writing records for
+  another node's unbuilt work would put fiction into the corpus that every consumer in this
+  build then reads as truth, and unit 1's S4 already commits to the same disposition —
+  resolving this fork the other way would leave two specs in disagreement.
+
 - **F4 — how the definitions map crosses the kit boundary.** Drift-audit is copy-installed and must
   not hard-import a kit an adopter may not have; the memory-tree corpus walker raises when the recall
   extractor is absent. Options: (a) adopt sibling unit 2's F1 resolution by reference — import when
@@ -202,14 +217,6 @@ deliberately cheaper than a leg, and the leg it rides is unguarded so it already
   a walk that already exists where (a) reuses it, and AC5c is written against (a)'s dead-report
   behaviour. The dependency edge is still declared, so the descriptor stops permitting a
   configuration the code cannot serve.
-- **F3 — whether the two findings are repaired by this build.** They belong to another node's build
-  whose records were never written, so repairing them means writing records for work this session did
-  not do. Recommendation: file them as backlog rows against that build and let the signal carry them
-  until its owner drains it; unit 1 repairs only the comment prose it touches. RESOLVED
-  (agent, 2026-09-05, delegated): backlog rows, and no records invented. Writing records for
-  another node's unbuilt work would put fiction into the corpus that every consumer in this
-  build then reads as truth, and unit 1's S4 already commits to the same disposition —
-  resolving this fork the other way would leave two specs in disagreement.
 
 ## 9. Revision log
 
