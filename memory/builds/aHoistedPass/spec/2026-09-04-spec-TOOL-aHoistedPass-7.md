@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-7 — a brief on disk before the code that cites it
 
-**Status:** CLOSED · rev-8 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
+**Status:** CLOSED · rev-9 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
 
 **Every `tools/unattended/check-pass-order.sh` address in this document is derived at the run's BASE
 `e828f778`, not at the drafting base above, and each is cited BY NAME with the line number as a
@@ -267,6 +267,20 @@ than quietly dropped. What this unit edits is `tools/unattended/lib-unattended.s
 `kit.toml` and the map dossier. None is on D1's veto-2 list, so **the unit is not an owner turn on
 that ground.** If a later pass finds it editing a listed carrier after all, the classification moves
 back — and it must name the carrier, not the bump.
+
+**IT DID, AND THE CLASSIFICATION MOVES BACK. rev-9. The carrier is `UNATTENDED-PROTOCOL` (template +
+render), which is pair two of D1's five.** The paragraph above set the test correctly and this pass
+failed it: rev-7's amendment put S5's key row into the protocol's section 8 binding table, because
+check 22 of `tools/unattended/check-unattended.sh` joins every DECLARED conf key against that table in
+both directions and `BRIEF_RECORDED_CUTOFF` set and undocumented is a hard red on `unattended kit
+gate`. So the key S5 requires and the carrier D1 protects are the same obligation, and there is no
+spelling of this unit that lands a working leg without touching it. **`TOOL-aHoistedPass-7` is an
+owner turn.** The three options and why (a) was taken are parked through the driver at
+`TOOL-aHoistedPass-7-owner-turn`, which is where `--status` counts a decision the owner is owed; the
+short version is that the alternatives were a leg permanently switched OFF in this repo, or the unit
+unbuilt at order 7 with nine siblings closed. The edit is ONE table row, adds no rule and rewrites no
+existing row, and the rendered half was re-installed by `adopt-unattended.sh` rather than hand-edited,
+which is the distinction D1's §4.4c draws and `unattended skill wiring` catches.
 
 ### Alternatives rejected
 
@@ -563,6 +577,17 @@ result reported, and AC7 asserts the four liveness counts are byte-identical acr
   `BUDGET_brief_recorded` and its `tools/gate-legs.json` ceiling are both 900, and the sibling's own
   note two lines up says those two numbers are DIFFERENT bounds that must not be edited to match — so
   the coincidence is now labelled as arithmetic rather than left to read as a claim.
+
+- rev-9 - 2026-09-05 - **the classification moved BACK, exactly as section 4 said it would, and it
+  names the CARRIER.** rev-7 amended S5 to put the new conf key into the protocol's section 8 binding
+  table, because check 22 makes a declared-and-undocumented key a hard red on `unattended kit gate`.
+  `UNATTENDED-PROTOCOL` (template + render) is pair two of ruling D1's five-pair veto-2 list, which
+  M3 says a standing mandate's delegation does not reach — so **this unit is an owner turn**, on the
+  ground its own section 4 set in advance rather than on the bump it was wrongly derived from at
+  rev-1. The three options, and why the row was written anyway, are parked through the driver at
+  `TOOL-aHoistedPass-7-owner-turn`; the two rejected ones were a leg permanently OFF in this repo and
+  a unit left unbuilt at order 7 with nine siblings closed. Nothing about the design changed at this
+  rev: it records a classification and the turn it owes.
 
 ## 10. Reuse audit
 

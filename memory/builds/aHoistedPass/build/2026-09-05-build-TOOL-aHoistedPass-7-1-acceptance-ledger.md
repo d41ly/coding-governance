@@ -185,6 +185,28 @@ this node — and the two checks the fold could reach were verified directly ins
 key NAMES and the key is unchanged, check 10 byte-compares the protocol pair and the adopter reports
 it in sync.
 
+## THE OWNER TURN THIS UNIT TURNED OUT TO OWE
+
+Spec section 4 wrote the test in advance: *"If a later pass finds it editing a listed carrier after
+all, the classification moves back — and it must name the carrier, not the bump."* It did, and the
+carrier is `UNATTENDED-PROTOCOL` (template + render), pair two of ruling D1's five-pair veto-2 list,
+which M3 says a standing mandate's delegation does not reach.
+
+The chain is short and has no slack in it. S5 requires `BRIEF_RECORDED_CUTOFF` in `.unattended.conf`,
+because a blank cutoff switches the leg off. Check 22 joins every DECLARED conf key against the
+protocol's section 8 binding table in both directions. So the key and the carrier are one obligation,
+and no spelling of this unit lands a working leg without touching a listed carrier.
+
+Parked through the driver at `TOOL-aHoistedPass-7-owner-turn`, which is where `--status` counts a
+decision the owner is owed, with the three options and the reason. The two rejected: omit the key and
+land the leg permanently OFF in this repo, which is an assertion about nothing and fails S5 and AC10;
+or park the unit unbuilt at order 7 with nine siblings already closed.
+
+What the edit actually is, because the size of it matters to the turn: ONE row in the section 8 key
+table, adding no rule and rewriting no existing row. The rendered half was re-installed by
+`bash tools/unattended/adopt-unattended.sh`, never hand-edited — the distinction D1's §4.4c draws,
+and the one `unattended skill wiring` catches.
+
 ## What this unit did not do
 
 - **It did not move the kit version.** `S8`'s bump half was struck at rev-4 and `DEPL-aHoistedPass-1`
