@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds
 
-**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 1 · ratified 2026-09-04
+**Status:** SPECCED · rev-6 · 2026-09-05 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 1 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -133,8 +133,10 @@ than as a list with holes in it:
 It names no script and no path. The charter is a template an adopter renders, and
 `tools/check-microformats.sh` is declinable by an adopter at this unit's base — `grep -c check-microformats`
 returns 5 over `tools/gate-legs.json` and 0 over `WIRE-INTO-PROJECT.md`. Naming it would
-ship a dangling pointer to every adopter, and `§7` already routes a gov session to the leg manifest
-for leg names. Measured at 86 bytes.
+ship a dangling pointer to every adopter, and `§16`'s gates bullet is stronger than a routing
+convention: the expected leg set is "whatever the gate manifest defines, READ at emission time,
+never a list typed into this document or into a project's charter" — a ban that names the charter
+itself. Measured at 86 bytes.
 
 The owner's §8 F3 ruling of 2026-09-04 sends that gate to adopters under `TOOL-aHonedRuleset-8`,
 which retires the dangling-pointer argument once unit 8 lands but does not change what this unit
@@ -382,6 +384,15 @@ removes is the one that script already holds.
   not ship" and §4 twice called it gov-internal; both are false at source — it ships through the
   govkit registry and is merely declinable. F3's CONCLUSION survives on that different ground,
   which is the ground `TOOL-aHonedRuleset-8` argues from, so the owner's ruling is unaffected.
+
+- rev-6 · 2026-09-05 · a factual correction inside an already-ratified fork, and nothing more. §4's
+  connective block — the text F3 rules on — cited `§7` as the place that routes a gov session to the
+  leg manifest for leg names. That citation is wrong and the paraphrase understates the rule: it is
+  `§16`'s gates bullet, and it says the expected leg set is "whatever the gate manifest defines, READ
+  at emission time, never a list typed into this document or into a project's charter" — a ban that
+  names the charter itself rather than a routing convention. Citation and paraphrase corrected in
+  place. F3's RESOLVED line, the owner's pick and every option text are untouched, and no scope item,
+  acceptance criterion or gate moved.
 
 ## 10. Reuse audit
 
