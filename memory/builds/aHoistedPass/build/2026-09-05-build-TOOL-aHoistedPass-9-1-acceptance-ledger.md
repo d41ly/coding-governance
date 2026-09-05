@@ -136,7 +136,7 @@ The rest are filed rather than fixed. Fixing another build's fixture debt inside
 
 `bash tools/memory-tree/check-memory-hygiene.sh` exits **1**, on check 23: an acceptance-ledger AC
 line must carry a backticked token on its OWN first line, or name `amended rev-N`, or be a checkbox —
-the classifier at `tools/memory-tree/check-memory-hygiene.sh:1430` reads that one line and nothing
+the classifier in `tools/memory-tree/check-memory-hygiene.sh` at line 1430 reads that one line and nothing
 below it. Seventeen entries were named. **Nine were mine and are fixed**: AC2, AC3, AC5, AC6, AC7,
 AC10, AC12, AC13 and AC15 carried their evidence on a continuation line, and each now names it up
 front. No claim changed.
@@ -150,8 +150,8 @@ that unit's evidence and deciding what it was, which is rewriting another unit's
 from the outside. The remedy is one line each and belongs to whoever closes that unit or the build.
 
 The other two hygiene lines are REPORTED rather than gated: a check 16 read-path finding about
-`memory/map/baseline.toml`, and a check 15 citation in `memory/backlog/TOOL.md:372`
-(`TOOL-aHoistedPass-33`, not this pass's row).
+`memory/map/baseline.toml`, and a check 15 citation in `memory/backlog/TOOL.md`
+for `TOOL-aHoistedPass-33`, which is not this pass's row.
 
 ## What this unit did not do
 
