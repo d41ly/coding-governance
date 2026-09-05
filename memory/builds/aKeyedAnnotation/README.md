@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-05
 streams: tooling
 roster: TOOL
-ids: TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8 TOOL-aKeyedAnnotation-9
+ids: TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8 TOOL-aKeyedAnnotation-9 TOOL-aKeyedAnnotation-10 TOOL-aKeyedAnnotation-11 TOOL-aKeyedAnnotation-12 TOOL-aKeyedAnnotation-13
 ---
 
 # aKeyedAnnotation — the annotation layer this repo already has, made correct instead of made bigger
@@ -20,7 +20,8 @@ therefore not the integration the question implied. It repairs the reader that e
 validated field that already owns the code-to-decision link, and writes the convention down once.
 
 ## Expected improvements
-- The one source citation resolving to no record is repaired, and its comment survives the id.
+- BOTH source citations resolving to no record are repaired, each surviving its id. This said
+  ONE, true only of the product population; a second sits in a test file.
 - The repo has one id regex rather than two, and a `.test.sh` citation stops certifying a spec as
   shipped.
 - The dossier `decisions` field stops being a validated inert key nothing fills.
@@ -43,8 +44,14 @@ validated field that already owns the code-to-decision link, and writes the conv
   comments that must obey it, and it is the only deliverable a reader of the record will look for.
 - **Every unit here touches a signal or a pin, so every unit re-measures it in the same commit.**
   A pin copied rather than measured is vacuous or permanently red, and both have shipped here.
-- **Units 2 and 3 are sequenced.** Both write `tools/drift-audit/drift_report.py`; clause 1 of the
-  parallelism rule is unsatisfied. Unit 4 is disjoint from both and may run beside either.
+- **Units 2, 3 and 4 are ALL sequenced, and unit 4 only became so at the round-1 fold.** Units 2 and
+  3 both write `tools/drift-audit/drift_report.py`, so clause 1 of the parallelism rule was already
+  unsatisfied for that pair. The audit then established that unit 4's shrink-only pin has no
+  mechanism without a ratchet row, and that row lives in `tools/drift-audit/drift_signals.py` —
+  which unit 2 also writes, for its narrowed globs and its pin comment. Unit 4 was declared disjoint
+  from both and is not. Nothing in this build may now run in parallel, which is a smaller build
+  rather than a broken one, and is recorded here because a stale disjointness claim is exactly what
+  the `--dispatch` declaration would have been checked against.
 
 ## Parked decisions
 - **The `gov:` marker vocabulary is unclosed.** Ten kinds are in use with their own consumers and
@@ -71,23 +78,24 @@ validated field that already owns the code-to-decision link, and writes the conv
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 4 unit(s) · node a · opened 2026-09-05 · streams tooling
-ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8 TOOL-aKeyedAnnotation-9
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-09-05 · streams tooling
+ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8 TOOL-aKeyedAnnotation-9 TOOL-aKeyedAnnotation-10 TOOL-aKeyedAnnotation-11 TOOL-aKeyedAnnotation-12
+ids TOOL-aKeyedAnnotation-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-1.md) | 1 | 2 | OPEN | rev-1 | 2026-09-05 |
-| [TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-05 |
-| [TOOL-aKeyedAnnotation-3 — a report-only signal for a source-cited id that resolves to no record](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-05 |
-| [TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-4.md) | 4 | 2 | OPEN | rev-1 | 2026-09-05 |
+| [TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-1.md) | 1 | 2 | CLOSED | rev-7 | 2026-09-05 |
+| [TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-2.md) | 2 | 2 | CLOSED | rev-7 | 2026-09-05 |
+| [TOOL-aKeyedAnnotation-3 — a report-only signal for a source-cited id that resolves to no record](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-05 |
+| [TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-4.md) | 4 | 2 | CLOSED | rev-6 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 11 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

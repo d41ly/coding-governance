@@ -5,7 +5,7 @@ feature = "build-method"
 title = "The build method: how to spec, review and build, rendered from the memory-tree kit"
 status = "shipped"
 streams = ["tooling"]
-decisions = []
+decisions = ["TOOL-aWrittenMethod-1"]
 
 [claims]
 gate-legs = ["method carriers (every pointer declared)", "method-carriers self-test"]
@@ -15,7 +15,7 @@ workflow-scripts = []
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-other-half-standing.md",
-  "one-value-field-records-a-mixed-outcome.md"]
+  "one-value-field-records-a-mixed-outcome.md", "criterion-asserts-what-its-own-command-cannot-show.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []

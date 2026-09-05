@@ -20,6 +20,9 @@ seams whose names you would never have guessed.
 The CLI prints a ranked shortlist, not an answer:
 
 - **candidates (ranked)** — each line is `name  [kind | file | fan-in N | SEAM]  (why it is listed)`.
+  - a candidate the map surfaces through a DOSSIER carries a second, indented `decisions:` line
+    holding every unit id that dossier declares — the reasoning behind the seam, not just the seam.
+    Absent where the owning dossier declares none, rather than printed empty.
   - **seeds** (top of the list) share a token stem with your query.
   - **neighbours** live in the same FILE as a seed, or are the same kind IN THE SAME DIRECTORY — the tool widens beyond a
     literal name match on purpose (a pure top-K lexical cut has ~0% behavioural recall).

@@ -77,11 +77,48 @@ class Candidate:
     detail: str = ""                # inventory id / owning dossier — human context
 
 
+# MULTI-LINE and COMMENTED arrays are legal TOML. This corpus has NEITHER today — measured, and
+# said plainly, because an earlier revision of this comment claimed it had both in the build that
+# shipped the rule against assertions with no observation behind them. The handling is kept anyway:
+# the field is authored by hand, both shapes are legal, and without the strip a `# why` comment was
+# emitted as an id and the real id on the next line was swallowed with it. That is a guard against a
+# shape the corpus may grow, declared as such rather than dressed up as a shape it already has.
+_DECISIONS_RE = re.compile(r"^decisions\s*=\s*\[([^\]]*)\]", re.M | re.S)
+# THE AUTHORITY, not a retype of it. This was a hand-copied byte-identical duplicate of the same
+# pattern in `map_lib`, in a module that already imports `map_lib` — a second reader of one rule
+# with nothing comparing the pair, which is the defect this same build fixed one kit over.
+#
+# IT DOES NOT PICK UP A PROJECT OVERRIDE, and an earlier revision of this comment said it did. The
+# override lives in the project-side extractor and every other reader resolves it with a `getattr`
+# against that module; this one deliberately imports no project layer, which is the portability
+# property the decisions read was written to preserve in the first place. So an adopter who
+# overrides the grammar gets the default here. That is a KNOWN limitation of reading the field
+# without the project layer, stated rather than claimed away — the alternative ends the portability.
+_ID_SHAPE = m.DEFAULT_DECISION_ID_RE
+
+
+def _parse_dossier_decisions(text: str) -> tuple:
+    """The unit ids a dossier declares, read from its front matter TEXT.
+
+    A front-matter read rather than a parse, so this module keeps needing no project layer.
+    An absent or empty list yields an empty tuple, which prints no clause at all -- an empty
+    clause would be noise on the dossiers that declare none, which `DOSSIER_DECISIONS_EMPTY_PIN`
+    in `.codebase-map.conf` counts. No figure here: it is a live count and it has already moved.
+    """
+    m_ = _DECISIONS_RE.search(text)
+    if not m_:
+        return ()
+    body = re.sub(r"#[^\n]*", "", m_.group(1))
+    toks = (t.strip().strip('"').strip("\'") for t in body.split(","))
+    return tuple(t for t in toks if _ID_SHAPE.match(t))
+
+
 @dataclass
 class Corpus:
     candidates: dict[str, Candidate]        # name -> merged candidate
     shared_seams: dict[str, str]            # feature -> `## Shared seams` prose
     symbol_files: list[str]                 # symbols.json file list (reference-scan roots)
+    decisions_by_feature: dict = None       # feature -> the unit ids that dossier declares
     recall_dark: tuple[str, ...] = ()       # layers declared uncovered in .codebase-map.conf
     threshold: int = m.SEAM_FANIN_THRESHOLD_DEFAULT
     has_symbols: bool = False               # was symbols.json present (recall tier adopted)?
@@ -173,7 +210,18 @@ def load_corpus(root: Path | None = None) -> Corpus:
                 merge(key, "inventory", detail=inv_id)
 
     shared_seams: dict[str, str] = {}
+    # KEYED BY FEATURE, not carried on the candidate, and that is the whole fix for two defects at
+    # once. A candidate merges across sources under a per-field last-write rule, so a seam name
+    # declared by two dossiers kept one dossier's label and the other's ids. And the synthetic
+    # `<feature> (## Shared seams)` candidate is constructed elsewhere, so a per-candidate field
+    # left it empty and a dossier surfaced as ITSELF could never print its own ids. One carrier,
+    # looked up by the label the line already prints, cannot do either.
+    decisions_by_feature: dict[str, tuple] = {}
     for feature, text in m.load_dossier_texts(map_dir).items():
+        # The ids come out of the dossier TEXT, not a parsed dossier. That is the whole reason
+        # this is a front-matter read: the parsed form needs the project-side extractor, and
+        # this module's header declares it portable precisely so it needs none.
+        decisions_by_feature[feature] = _parse_dossier_decisions(text)
         for seam in m.parse_affordance(text).seams:
             merge(seam, "affordance-seam", detail=feature)
         prose = _section_body(text, "## Shared seams")
@@ -184,6 +232,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
     return Corpus(
         candidates=candidates,
         shared_seams=shared_seams,
+        decisions_by_feature=decisions_by_feature,
         symbol_files=sorted(set(symbol_files)),
         recall_dark=recall_dark,
         threshold=m.seam_fanin_threshold(root),
@@ -385,7 +434,7 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
     else:
         out.append("## candidates (ranked - read these before building)")
         for r in shortlist.ranked:
-            out.append(_line(r))
+            out.append(_line(r, corpus))
         out.append("")
         out.append("## sources to open")
         for line in _sources(shortlist, corpus):
@@ -408,7 +457,7 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
     return "\n".join(out) + "\n"
 
 
-def _line(r: Ranked) -> str:
+def _line(r: Ranked, corpus: "Corpus | None" = None) -> str:
     c = r.candidate
     bits = []
     if c.kind:
@@ -424,7 +473,15 @@ def _line(r: Ranked) -> str:
     meta = " | ".join(bits)
     tag = "" if r.is_seed else " (neighbour)"
     src = "/".join(c.sources)
-    return f"- {c.name}{tag}  [{meta}]  ({r.reason}; via {src})" if meta else f"- {c.name}{tag}  ({r.reason}; via {src})"
+    head = (f"- {c.name}{tag}  [{meta}]  ({r.reason}; via {src})" if meta
+            else f"- {c.name}{tag}  ({r.reason}; via {src})")
+    # EVERY id, not the first few. The range digest truncates because it prints one line per
+    # feature over a whole commit range; here the reader is deciding whether to extend this
+    # seam, and a hidden id is a hidden reason.
+    ids = (corpus.decisions_by_feature or {}).get(c.detail, ()) if corpus else ()
+    if ids:
+        head += "\n    decisions: " + " ".join(ids)
+    return head
 
 
 def _scan_sources(shortlist: Shortlist):

@@ -247,6 +247,10 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
         # the two 2026-02-02 specs, so one spec is grandfathered and two are judged.
         "TRACE_CUTOFF = '2026-01-15'\n"
         "TRACE_GLOBS = ['src']\n"
+        # Signal 2's own population, and NARROWER than PRODUCT_GLOBS on purpose:
+        # `conf/` stays outside it, so an engine that read PRODUCT_GLOBS here would
+        # be caught rather than passing by coincidence.
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']\n"
         "SHRINK_ONLY = {'shrinkme.txt': 'a list that promises to shrink'}\n"
         "HANDKEPT = []\n"
         # PINS stays EMPTY and is spelled exactly `PINS = {}`: the pin-semantics arm below rewrites
@@ -1700,6 +1704,327 @@ def test_harness_liveness_note_is_derived(tmp: pathlib.Path) -> None:
               len({got["clean"][1], got["partial"][1], got["dead"][1]}) == 3)
 
 
+
+# ---------------------------------------------------------------------------------------------
+# The shipped-evidence oracle: one grammar, its own population, and a liveness half that can see
+# that population collapse. Five arms, one per criterion that observes a change this unit makes.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_evidence_oracle(tmp: pathlib.Path) -> None:
+    r = make_repo(tmp, name="evidence")
+    proj = r / "drift-audit" / "drift_signals.py"
+    conf = r / ".memory-tree.conf"
+    spec_dir = r / SPEC_DIR_FOR_FIXTURE
+
+    def add(rel: str, body: str, msg: str) -> None:
+        p = r / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(body, encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
+
+    def read_signal(*extra: str) -> dict:
+        return report(r, *extra)["non_terminal_specs_cited_by_product_source"]
+
+    # ---- ARM 1: the correction-form id. Its seq carries a trailing lowercase letter, which the
+    # hand-typed digits-then-boundary pattern could not match at all -- so the spec scored UNKEYED
+    # and the probe declined to judge it, silently. Observed RED against that pattern: the spec was
+    # absent from the judgeable population entirely.
+    before = read_signal()["of"]
+    add(str(pathlib.Path(SPEC_DIR_FOR_FIXTURE) / "2026-01-02-spec-aFixed-1b.md").replace("\\", "/"),
+        "# TOOL-aFixed-1b \u2014 a ratified correction\n\n"
+        "**Status:** SPECCED \u00b7 rev-1 \u00b7 2026-01-02 \u00b7 node a \u00b7 Tier-2 \u00b7 base 0000000\n",
+        "spec(aFixed): a correction-form id")
+    check("evidence: a correction-form id is JUDGED, not silently unkeyed",
+          read_signal()["of"] == before + 1,
+          f"population {before} -> {read_signal()['of']}, wanted +1")
+
+    # ---- ARM 2: a citation from a TEST file is the house's own bookkeeping certifying the
+    # bookkeeping, so it must not count as evidence a unit shipped. The same id cited from a
+    # PRODUCT file must count. Both halves, because only the pair discriminates.
+    add("src/thing.test.sh", "# cites TOOL-aThing-1 from a test file\n",
+        "test: cite a spec id from a test file")
+    check("evidence: a test-file citation is not evidence a unit shipped",
+          all(row["id"] != "TOOL-aThing-1" for row in read_signal()["detail"]),
+          f"detail: {[row['id'] for row in read_signal()['detail']]}")
+    add("src/thing.py", "# cites TOOL-aThing-1 from product source\n",
+        "feat: cite the same id from product source")
+    check("evidence: a product-file citation IS evidence a unit shipped",
+          any(row["id"] == "TOOL-aThing-1" for row in read_signal()["detail"]),
+          f"detail: {[row['id'] for row in read_signal()['detail']]}")
+
+    # ---- ARM 3: the drain. Remove every remaining product citation and the VALUE reaches zero,
+    # while the judgeable population does NOT -- they are different fields, and an arm asserting on
+    # the population would be green whatever the citations did.
+    (r / "src" / "thing.py").unlink()
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: drop the product citation", "--no-verify"], r)
+    drained = read_signal()
+    check("evidence: the value drains to zero when the product citations go",
+          drained["value"] == 0, f"value {drained['value']}")
+    check("evidence: the judgeable population does NOT drain with it",
+          drained["of"] > 0, f"of {drained['of']}")
+
+    # ---- ARM 4: the second liveness half. Empty the declaration and the signal must report itself
+    # DEAD rather than a clean zero. Observed RED against the pre-change engine, whose only liveness
+    # half counts specs and is computed before any glob is read -- it stayed True at full size.
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']", "EVIDENCE_GLOBS = ['no-such-directory']"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: empty the evidence declaration", "--no-verify"], r)
+    dead = read_signal()
+    check("evidence: a declaration resolving to no file reports DEAD, not a clean zero",
+          dead["live"] is False and dead["evidence_files"] == 0,
+          f"live={dead['live']} evidence_files={dead['evidence_files']}")
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['no-such-directory']", "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: restore the evidence declaration", "--no-verify"], r)
+
+    # ---- ARM 5: the grammar is bound to the TREE, not to the repo this kit lives in. A family this
+    # repo does not declare must still be classified in a tree that declares it. Observed RED
+    # against a module-constant binding, which reads the installing repo's family list and reports a
+    # confident zero over a corpus full of ids it cannot see.
+    conf.write_text("MEMORY_ROOT=memory\nFAMILIES=\"widget:WDGT\"\n",
+                    encoding="utf-8", newline="\n")
+    add(str(pathlib.Path(SPEC_DIR_FOR_FIXTURE) / "2026-01-03-spec-aWidget-1.md").replace("\\", "/"),
+        "# WDGT-aWidget-1 \u2014 a foreign family\n\n"
+        "**Status:** SPECCED \u00b7 rev-1 \u00b7 2026-01-03 \u00b7 node a \u00b7 Tier-2 \u00b7 base 0000000\n",
+        "spec(aWidget): an id in a family this kit's own repo does not declare")
+    add("src/widget.py", "# cites WDGT-aWidget-1 from product source\n",
+        "feat: cite the foreign-family id")
+    check("evidence: the grammar is bound to the tree, so a foreign family is classified",
+          any(row["id"] == "WDGT-aWidget-1" for row in read_signal()["detail"]),
+          f"detail: {[row['id'] for row in read_signal()['detail']]}")
+
+
+def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
+    """The local fallback is not a second grammar, and this is what keeps it honest.
+
+    The report falls back to a local copy of the id alternation when the recall extractor is not
+    importable, which is the only way a copy-installed kit can run in a tree without it. A copy
+    nobody compares is a second grammar with extra steps, so compare it -- here, where this repo
+    HAS the extractor, against what the extractor itself produces for this same tree.
+    """
+    import importlib.util
+
+    extractor = KIT.parent / "memory-recall" / "extract.py"
+    if not extractor.exists():
+        skip("local grammar equals the extractor's", "no memory-recall kit beside this one")
+        return
+    spec = importlib.util.spec_from_file_location("_drift_report_probe", KIT / "drift_report.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    root = KIT.parent.parent
+    families = mod._read_families(mod.load_conf(root))
+    # AGAINST THE EXTRACTOR ITSELF, not against the accessor. The accessor falls back to the local
+    # copy on ANY import failure, so comparing the two compared the copy to itself and passed for
+    # free -- reproduced by forcing the import to raise. The arm now imports the extractor by path
+    # and lets an import failure FAIL rather than quietly satisfy it.
+    espec = importlib.util.spec_from_file_location("_recall_extract_probe", extractor)
+    emod = importlib.util.module_from_spec(espec)
+    sys.path.insert(0, str(extractor.parent))
+    try:
+        espec.loader.exec_module(emod)
+        shipped = emod.grammar_for(root).ID
+    finally:
+        try:
+            sys.path.remove(str(extractor.parent))
+        except ValueError:
+            pass
+    check("local grammar equals the extractor's for this tree",
+          mod._build_local_ident(families) == shipped,
+          "the local fallback has diverged from the shipped alternation")
+
+
+# ---------------------------------------------------------------------------------------------
+# The source-citation signal: slug-resolvability as the discriminator, and two liveness halves.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_source_cited_ids(tmp: pathlib.Path) -> None:
+    NL = chr(10)
+    r = make_repo(tmp, name="citations")
+    conf = r / ".memory-tree.conf"
+    proj = r / "drift-audit" / "drift_signals.py"
+
+    def run_commit(msg: str) -> None:
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
+
+    def read_signal(*extra: str) -> dict:
+        return report(r, *extra)["source_cited_ids_resolving_to_no_record"]
+
+    base = read_signal()
+    check("citations: the signal is live on a fixture with records and source",
+          base["live"] and base["known_slugs"] > 0 and base["scanned_source_files"] > 0,
+          f"slugs={base['known_slugs']} files={base['scanned_source_files']}")
+
+    # ---- THE DISCRIMINATOR, both directions. A fabricated id under a slug that ANCHORS a record is
+    # a real dangling citation; the same shape under a slug no record anchors is a fixture. Only the
+    # pair proves the discriminator discriminates -- one half alone passes for a signal that counts
+    # everything, and the other for a signal that counts nothing.
+    before = read_signal()["value"]
+    (r / "src" / "resolving.py").write_text(
+        "# cites TOOL-aThing-999, whose slug anchors a record\n", encoding="utf-8", newline="\n")
+    run_commit("chore: cite a fabricated id under a RESOLVING slug")
+    check("citations: a dangling id under a known slug is a finding",
+          read_signal()["value"] == before + 1, f"value {before} -> {read_signal()['value']}, wanted +1")
+
+    mid = read_signal()["value"]
+    (r / "src" / "fixture.py").write_text(
+        "# cites TOOL-zNoSuchSlug-1, whose slug anchors nothing\n", encoding="utf-8", newline="\n")
+    run_commit("chore: cite a fabricated id under a slug no record anchors")
+    check("citations: a dangling id under an UNKNOWN slug is a fixture, not a finding",
+          read_signal()["value"] == mid, f"value {mid} -> {read_signal()['value']}, wanted no movement")
+
+    # ---- LIVENESS HALF ONE: no records, so no slugs. The signal must say it is dead rather than
+    # report a clean zero over a corpus it cannot see.
+    keep = {}
+    for p in sorted((r / FIXTURE_MEMORY_ROOT).rglob("*.md")):
+        keep[p] = p.read_text(encoding="utf-8")
+        p.unlink()
+    run_commit("chore: empty the memory root")
+    dead = read_signal()
+    check("citations: an empty memory root reports DEAD, not zero findings",
+          dead["live"] is False and dead["known_slugs"] == 0,
+          f"live={dead['live']} slugs={dead['known_slugs']}")
+    for p, text in keep.items():
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    run_commit("chore: restore the memory root")
+
+    # ---- LIVENESS HALF TWO, and it is NOT the scanned-file count. That count can never reach zero
+    # in a tree with this kit installed, because the report is itself a tracked non-memory file --
+    # measured, by writing the arm the obvious way and watching it fail to go dead. What CAN collapse
+    # is the CITED set: bind the grammar to a family nothing uses and every file is still scanned
+    # while nothing matches, which is a confident zero over a corpus full of ids the signal cannot
+    # see. That is the hazard, and this is the arm for it.
+    conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="nothing:ZZZZ"' + NL,
+                    encoding="utf-8", newline=NL)
+    run_commit("chore: bind the grammar to a family nothing uses")
+    blind = read_signal()
+    check("citations: a grammar matching nothing reports DEAD, not a clean zero",
+          blind["live"] is False and blind["of"] == 0 and blind["scanned_source_files"] > 0,
+          f"live={blind['live']} of={blind['of']} files={blind['scanned_source_files']}")
+
+    # ---- THE FAMILY ENUM IS READ, NOT SPELLED, and the arm runs in the NARROWING direction. With no
+    # FAMILIES declared the engine falls back to a permissive family pattern, so declaring an enum
+    # can only narrow -- an arm that declared a family and expected the count to RISE would pass on
+    # an engine that ignored the conf entirely, which is how it was first written.
+    (r / "src" / "foreign.py").write_text(
+        "# cites WDGT-aThing-7, in a family the conf may or may not declare" + NL,
+        encoding="utf-8", newline=NL)
+    run_commit("chore: cite an id in a foreign family")
+    conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="tooling:TOOL"' + NL,
+                    encoding="utf-8", newline=NL)
+    run_commit("chore: declare TOOL only")
+    narrow = read_signal()["value"]
+    conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="widget:WDGT tooling:TOOL"' + NL,
+                    encoding="utf-8", newline=NL)
+    run_commit("chore: declare the foreign family too")
+    check("citations: the family enum is READ from the conf, not spelled in the engine",
+          read_signal()["value"] == narrow + 1,
+          f"value {narrow} -> {read_signal()['value']}, wanted +1 once the family was declared")
+
+    # ---- THE WHOLE REPORT SURVIVES A TREE WITH NO RECALL KIT. This fixture has never had one, so
+    # the assertion is that the run RETURNS at all rather than raising and taking the other signals
+    # with it -- the failure mode is a dead leg for that adopter, not a missing signal.
+    check("citations: the report returns in a tree with drift-audit and no recall kit",
+          not (r / "memory-recall").exists() and read_signal()["signal"],
+          "the fixture unexpectedly has a recall kit beside it")
+
+
+# ---------------------------------------------------------------------------------------------
+# The two closing-review repairs, each with the arm it landed without.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None:
+    """A report-only signal at exactly its pinned value prints a CALM status, not an over one.
+
+    The display branch for a non-gateable signal compared against the bare `tolerance` while both
+    gateable branches compared against the resolved `pin`, so a report-only signal WITH a pin
+    announced itself over at the very value its pin ratifies. A signal whose only product is its
+    status line cannot afford that: it trains a reader to ignore the column.
+    """
+    r = make_repo(tmp, name="pinned")
+    proj = r / "drift-audit" / "drift_signals.py"
+    NL = chr(10)
+
+    def read_human_table() -> str:
+        out = run([sys.executable, "drift-audit/drift_report.py"], r)
+        assert out.returncode == 0, out.stderr[:300]
+        return out.stdout
+
+    # A REPORT-ONLY SIGNAL WITH A NON-ZERO VALUE, built rather than assumed. The first version of
+    # this arm reached for a signal the fixture leaves at 0, so pinning it at its value pinned it at
+    # zero and the two checks below passed over nothing -- the fixture-passes-by-finding-nothing
+    # class, in the arm written to catch a reporting defect. The premise is asserted first now.
+    (r / "src" / "dangling.py").write_text(
+        "# cites TOOL-aThing-404, whose slug anchors a record but whose seq does not" + NL,
+        encoding="utf-8", newline=NL)
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: plant a dangling citation", "--no-verify"], r)
+
+    name = "source_cited_ids_resolving_to_no_record"
+    value = report(r)[name]["value"]
+    check("report-only: the fixture's report-only signal has a value to pin",
+          value > 0, f"value {value} -- the arm below would pin at zero and prove nothing")
+
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "PINS = {}", "PINS = {'" + name + "': " + str(value) + "}"),
+        encoding="utf-8", newline=NL)
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: pin the report-only signal at its value", "--no-verify"], r)
+
+    line = [ln for ln in read_human_table().splitlines() if name in ln]
+    check("report-only: a signal AT its pin does not report itself over",
+          bool(line) and "over" not in line[0],
+          f"status line: {line[0].strip() if line else '(absent)'}")
+    check("report-only: and it NAMES the pin rather than printing a bare ok",
+          bool(line) and ("pin " + str(value)) in line[0],
+          f"status line: {line[0].strip() if line else '(absent)'}")
+
+
+def test_evidence_globs_exclude_test_templates(tmp: pathlib.Path) -> None:
+    """A `.test-template` file is a test that is neither `.test.sh` nor named `fixture`.
+
+    The exclusion list was collapsed to a single fixture predicate and silently lost this shape,
+    re-admitting a template to the evidence population under a comment claiming total coverage.
+    """
+    r = make_repo(tmp, name="templates")
+    proj = r / "drift-audit" / "drift_signals.py"
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']",
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh', ':(exclude)*fixture*', "
+        "':(exclude)*.test-template.*']"),
+        encoding="utf-8", newline="\n")
+    (r / "src" / "thing.test-template.py").write_text(
+        "# cites TOOL-aThing-1 from a test TEMPLATE\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: cite a spec id from a test template", "--no-verify"], r)
+
+    sig = report(r)["non_terminal_specs_cited_by_product_source"]
+    check("evidence: a `.test-template` citation is not evidence a unit shipped",
+          all(row["id"] != "TOOL-aThing-1" for row in sig["detail"]),
+          f"detail: {[row['id'] for row in sig['detail']]}")
+
+    # AND THE SHIPPED DECLARATION CARRIES IT. The arm above writes its own glob list into the
+    # fixture's project layer, so it proves the PATHSPEC works and guards nothing about what this
+    # repo actually declares -- measured, by deleting the shipped line and watching the arm stay
+    # green. This half reads the shipped list directly, which is the only thing that reds when the
+    # exclusion is dropped from it.
+    shipped = KIT / "drift_signals.py"
+    globs = [ln.strip().strip(",").strip('"').strip("'")
+             for ln in shipped.read_text(encoding="utf-8").splitlines()]
+    check("evidence: the SHIPPED declaration excludes the test-template shape",
+          ":(exclude)*.test-template.*" in globs,
+          "the shipped EVIDENCE_GLOBS lost the exclusion the arm above only proves is honoured")
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -1716,6 +2041,11 @@ def main() -> int:
         test_ratchet_lookback(tmp)
         test_ratchet_message_states_its_window(tmp)
         test_lang_mode_ratchet(tmp)
+        test_evidence_oracle(tmp)
+        test_local_grammar_matches_the_extractor(tmp)
+        test_source_cited_ids(tmp)
+        test_report_only_signal_is_judged_against_its_pin(tmp)
+        test_evidence_globs_exclude_test_templates(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")

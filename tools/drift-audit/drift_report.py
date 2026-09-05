@@ -432,9 +432,150 @@ _STATUS = re.compile(r"^\*\*Status:\*\*\s*([A-Za-z]+)", re.M)
 # tried upstream and over-flagged 107/126: one shipped unit made all 14 siblings of its multi-spec
 # build look stale, because every id of a build shares the slug. The seq is the discriminator.
 #
-# Group 2 is the slug, for `signal_closed_specs_untraceable` — which asks a BUILD-level question the
-# slug answers correctly. Group 1 is untouched, so `signal_spec_status` reads exactly what it did.
-_OWN_ID = re.compile(r"^#\s+([A-Z]+-([a-zA-Z]+)-\d+)\b", re.M)
+# ONE GRAMMAR, AND IT IS THE RECALL EXTRACTOR'S. This was a hand-typed pattern of the shape
+# family-dash-slug-dash-digits, which is a second spelling of a published alternation and had already
+# diverged from it: the session era admits a trailing lowercase correction suffix that a
+# digits-then-boundary form cannot match, so a correction-form spec scored UNKEYED and the probe
+# silently declined to judge it rather than reporting anything.
+#
+# BOUND TO THE TREE BEING CLASSIFIED, never to the repo this kit is installed in. The extractor's
+# module-level constants anchor on the extractor's own file, which is right for its own CLI and
+# wrong for a caller classifying a different tree: a grammar that recognises nothing yields an empty
+# classification, and an empty classification is exactly what a clean corpus yields. The recorded
+# class is `memory/gotchas/grammar-bound-to-the-wrong-root.md`, which names the per-root accessor as
+# the fix. This kit's own self-test copies the report into scratch trees carrying fixture ids and no
+# memory-tree conf, which is precisely where the wrong binding reports a confident zero.
+#
+# IMPORTABLE OR NOT. drift-audit is copy-installed and must keep running in a tree that has no
+# memory-recall, so the accessor answers when it imports and a LOCAL COPY answers when it does not.
+# That copy is not a second grammar by stealth: the self-test asserts it still equals what the
+# extractor produces whenever the extractor is present, so a divergence fails loudly here instead of
+# silently in an adopter. This is unit 2's F1 resolution, and unit 3 adopts it by reference rather
+# than deciding the same boundary twice.
+_NODE_TAG_CLASS = "a-z"
+_FAMILY_SHAPE = re.compile(r"^[A-Z][A-Z0-9]*$")
+
+
+def _build_local_ident(families) -> str:
+    """The LOCAL COPY of the shipped id alternation, for a tree with no recall kit.
+
+    Byte-compared against the extractor's own output by this kit's self-test whenever that kit is
+    present, which is what keeps "fallback" from meaning "second grammar".
+    """
+    node = _NODE_TAG_CLASS
+    eras = (r"\d{3}", rf"[{node}]\d{{2,3}}", rf"[{node}][A-Za-z]{{2,}}-\d+[a-z]*")
+    # A conf declaring NO families must not narrow the grammar to nothing: that is the blind
+    # oracle this unit exists to remove, reintroduced through the fallback. The permissive form
+    # below is what the hand-typed pattern did, so an undeclared tree keeps exactly the coverage
+    # it had rather than silently losing all of it.
+    fam = "|".join(families) if families else r"[A-Z]{2,6}"
+    return r"(?:" + fam + r")-(?:" + "|".join(eras) + r")"
+
+
+def _resolve_ident(root, families) -> str:
+    """The shipped alternation for THIS tree, from the recall extractor where it is importable."""
+    kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
+    if not (kit / "extract.py").exists():
+        return _build_local_ident(families)
+    added = str(kit)
+    sys.path.insert(0, added)
+    try:
+        import extract  # type: ignore
+        return extract.grammar_for(root).ID
+    except Exception:
+        # A present-but-unusable sibling is the fallback case, never a crash. Every signal is
+        # evaluated in one unguarded comprehension, so a raise here takes the whole report down.
+        return _build_local_ident(families)
+    finally:
+        try:
+            sys.path.remove(added)
+        except ValueError:
+            pass
+
+
+
+def _build_local_anchors(ident: str):
+    """The LOCAL COPY of the four anchor shapes, for a tree with no recall kit.
+
+    UNGUARDED, and said so rather than claimed otherwise. The sibling `_build_local_ident` IS
+    byte-compared against the extractor by this kit's self-test; these anchor patterns are NOT.
+    MEASURED, because this docstring has now been wrong twice: the flags are EQUAL on all four
+    (`_resolve_anchors` re-compiles the extractor's with the same multiline flag), and two of the
+    four `.pattern` strings are byte-identical. What differs on the other two is escape SPELLING of
+    the same character classes. So a byte-compare would red today on a difference that is
+    cosmetic, and an equivalence compare is a second grammar deciding what "equivalent" means. The
+    first revision asserted a comparison nobody wrote; the second blamed a flag that matches. Both
+    are the "assertion with no observation behind it" this build's own annotation guide bans, which
+    is why this one carries the measurement instead of a reason. An anchor is a line that DEFINES a record, as
+    opposed to one that merely cites it, and the distinction is the whole of the signal below — a
+    head-anchored id is DEFINED, so a record complaining about a missing unit would silently create
+    it. That class is `memory/gotchas/record-citing-a-foreign-id-defines-or-orphans-it.md`.
+    """
+    return (
+        re.compile(r"^#{2,6}\s+[`*]*(" + ident + r")\b", re.M),
+        re.compile(r"^\s*[-*]\s+[`*]*(" + ident + r")\b[`*]*\s*[-\u2014:\u00b7]", re.M),
+        re.compile(r"^\|\s*[`*]*(" + ident + r")\b[^|]*\|", re.M),
+        re.compile(r"^\s*[-*]\s+[`*]*(" + ident + r")\b[`*]*\s*[\u00b7|]", re.M),
+    )
+
+
+def _resolve_anchors(root, families):
+    """The anchor patterns for THIS tree, from the recall extractor where it is importable."""
+    kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
+    if not (kit / "extract.py").exists():
+        return _build_local_anchors(_build_local_ident(families))
+    added = str(kit)
+    sys.path.insert(0, added)
+    try:
+        import extract  # type: ignore
+        return tuple(re.compile(a.pattern, a.flags | re.M) for a in extract.grammar_for(root).anchors)
+    except Exception:
+        return _build_local_anchors(_build_local_ident(families))
+    finally:
+        try:
+            sys.path.remove(added)
+        except ValueError:
+            pass
+
+
+def _build_own_id_re(root, families):
+    return re.compile(r"^#\s+(" + _resolve_ident(root, families) + r")\b", re.M)
+
+
+def _read_families(conf) -> tuple:
+    """The id FAMILY allowlist, from the memory-tree conf this kit already reads.
+
+    Declared as `discipline:FAMILY` pairs; the uppercase half is the allowlist. Read rather
+    than spelled, so a tree declaring a family this repo does not still classifies its own ids.
+    """
+    pairs = (conf.get("FAMILIES", "") or "").split()
+    # DECLARATION ORDER, not sorted. The alternation must be byte-identical to the one the
+    # extractor builds or the self-test that keeps this copy honest compares two spellings of
+    # the same grammar and reports a divergence that is not one.
+    # THE SAME RULE THE RECALL CONF USES, and it is not "split on a colon". That reader takes the
+    # part after the LAST colon and keeps only tokens shaped like a family. A discipline-free entry
+    # is therefore ADMITTED by both — `rpartition` returns the whole token when no colon is present
+    # — and that is stated because an earlier revision of this comment claimed both readers dropped
+    # it, which is the opposite of what the same hunk had just made true. What the shape filter
+    # drops is a token that is not family-shaped, including one carrying a regex metacharacter,
+    # which would otherwise reach `re.compile` below as a traceback rather than a named refusal.
+    out = []
+    for pair in pairs:
+        fam = pair.rpartition(":")[2]
+        if _FAMILY_SHAPE.match(fam) and fam not in out:
+            out.append(fam)
+    return tuple(out)
+
+
+def _parse_slug(uid: str):
+    """The slug PROJECTION of a matched id, or None for an era that has none.
+
+    DERIVED, not captured. The shipped alternation carries no groups of its own and exposes no
+    per-era parts, so a second capture group would mean re-deriving the session era's shape here —
+    the second grammar the import above exists to remove.
+    """
+    parts = uid.split("-")
+    return parts[1] if len(parts) == 3 else None
 NON_TERMINAL = frozenset({"OPEN", "SPECCED", "BLOCKED", "INPROGRESS"})
 
 
@@ -449,7 +590,7 @@ def signal_spec_status(ctx) -> dict:
         m = _STATUS.search(head)
         if not m or m.group(1).upper() not in NON_TERMINAL:
             continue
-        own = _OWN_ID.search(head)
+        own = ctx.own_id_re.search(head)
         if not own:
             unkeyed += 1  # the probe cannot judge this spec. Counted, never guessed.
             continue
@@ -463,7 +604,7 @@ def signal_spec_status(ctx) -> dict:
         # `-1` was reported with three citations, all of them `-11`'s, on a build whose ids ran
         # past 10. The over-count GROWS with the build: a 30-unit build mis-attributes ids 1, 2
         # and 3 to twenty siblings, each reading as a stale status header nobody can find.
-        hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.product_globs)
+        hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.evidence_globs)
         if hit.returncode == 0 and hit.stdout.strip():
             suspect.append({
                 "file": str(p.relative_to(ctx.root)).replace("\\", "/"),
@@ -471,13 +612,21 @@ def signal_spec_status(ctx) -> dict:
                 "status": m.group(1).upper(),
                 "cited_in": hit.stdout.strip().splitlines()[:3],
             })
+    # THE SECOND LIVENESS HALF, and the first one cannot substitute for it. `checked` counts
+    # non-terminal keyed specs and is computed above before any glob is read, so an EVIDENCE_GLOBS
+    # set that resolves to no tracked file leaves `live` True and `of` at full size while `value`
+    # falls to 0 — the reassuring zero, wearing a live flag. This counts what the narrowed
+    # declaration actually resolves to, which is the only number that moves when it collapses.
+    seen = ctx.git.run("ls-files", "--", *ctx.evidence_globs)
+    evidence_files = len(seen.stdout.split()) if seen.returncode == 0 else 0
     return {
         "signal": "non_terminal_specs_cited_by_product_source",
         "value": len(suspect),
         "of": checked,
+        "evidence_files": evidence_files,
         "tolerance": 0,
         "gateable": True,
-        "live": checked > 0,
+        "live": checked > 0 and evidence_files > 0,
         "unjudgeable": unkeyed,
         "detail": suspect,
     }
@@ -700,15 +849,21 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         m = _STATUS.search(head)
         if not m or m.group(1).upper() not in TERMINAL:
             continue
-        own, when = _OWN_ID.search(head), _HEADER_DATE.search(head)
+        own, when = ctx.own_id_re.search(head), _HEADER_DATE.search(head)
         if not own or not when:
             unjudged += 1  # no id or no header date: the probe cannot judge it. Counted, not guessed.
             continue
         if when.group(1) < ctx.trace_cutoff:
             unjudged += 1  # grandfathered: it closed before the convention it would be judged by.
             continue
+        uid, slug = own.group(1), _parse_slug(own.group(1))
+        if slug is None:
+            unjudged += 1  # an era with no slug: this BUILD-level question has no key here.
+            continue
+        # AFTER the guard, never before it. The two earlier unjudged paths `continue` above this
+        # line; the slug guard was added below it, so a pre-slug-era id landed in BOTH the judged
+        # denominator and the unjudged count, and a corpus that was entirely pre-slug read as live.
         checked += 1
-        uid, slug = own.group(1), own.group(2)
         # SLUG ONLY, and that is not a narrowing: `\bslug\b` already matches inside
         # `FAMILY-slug-seq`, because the hyphens either side of the slug are non-word bytes.
         # An `id or slug` disjunct reads like a two-key oracle and is one unfalsifiable clause;
@@ -1138,10 +1293,14 @@ def build_live_backlog_rows(ctx) -> dict:
         # split per-gate to avoid.
         "value": max((r["live"] for r in judgeable), default=0),
         "of": len(rows),
-        # The threshold comes from the project layer, and for a NON-GATEABLE signal the status line
-        # compares against `tolerance` rather than `pin` (see the report loop), so it is read here.
-        # Absent, it is 0 and every non-empty shard reads "out of tolerance" — which trains a reader
-        # to ignore the line, the failure mode this signal is supposed to cure.
+        # The threshold comes from the project layer. It is read into `tolerance` here because that
+        # is this signal's declared floor; the status line now compares against the RESOLVED `pin`,
+        # exactly as the gateable branches do, and `pin` falls back to `tolerance` when PINS declares
+        # none — so this read still decides the verdict for this signal either way. The clause that
+        # used to sit here said the report loop compares against `tolerance` rather than `pin`, which
+        # a closing review found true until the same fold made it false and left this sentence
+        # standing. Absent, the threshold is 0 and every non-empty shard reads as over — which trains
+        # a reader to ignore the line, the failure mode this signal is supposed to cure.
         "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
         "gateable": False,
         # A tree with no backlog shards at all cannot move this signal, so it reports DEAD rather than
@@ -1390,7 +1549,7 @@ def build_backlog_rows_outliving_specs(ctx) -> dict:
     suspect, checked = [], 0
     for sp in sorted(ctx.root.glob(f"{ctx.memory_root}/builds/*/spec/**/*.md")):
         head = sp.read_text(encoding="utf-8", errors="replace")[:4000]
-        st, own = _STATUS.search(head), _OWN_ID.search(head)
+        st, own = _STATUS.search(head), ctx.own_id_re.search(head)
         if not st or not own:
             continue
         if st.group(1).upper() not in _TERMINAL_STATUSES:
@@ -1420,12 +1579,117 @@ def build_backlog_rows_outliving_specs(ctx) -> dict:
     }
 
 
+
+# --------------------------------------------------------------------------------------------
+# Signal — a unit id cited by tracked SOURCE that no record defines
+#
+# THE HALF NOTHING HAD. The memory-tree orphan check counts ids cited-but-not-defined WITHIN the
+# memory tree; its population is the memory tree by construction, so its honest zero says nothing
+# about code. Product source cites unit ids densely and one of those pointers had resolved to no
+# record for its entire life without anything noticing.
+#
+# THE DISCRIMINATOR IS SLUG-RESOLVABILITY, NOT A PATH PREDICATE, and that is measured rather than
+# preferred. This repo puts self-test arms inside product modules and fixture ids inside test
+# helpers, so a path split is wrong in whichever direction it is set. An id whose SLUG anchors at
+# least one record is a real citation of a real build; an id whose slug anchors none is a fixture.
+# The fixture ids in this tree are `tOne`, `tRun`, `tRos`, `zFix` and friends — slugs no record
+# anchors — so they drop out with no waiver list at all, which is what makes this population small
+# and every member actionable.
+#
+# REPORT-ONLY, and shrink-only through the ratchet row its pin carries. `gateable: False` means it
+# can never enter the over-tolerance set, so the ONLY thing holding the pin is that raising it lands
+# in RATCHETS and needs a reason written in place.
+# --------------------------------------------------------------------------------------------
+
+
+def build_source_cited_ids_with_no_record(ctx) -> dict:
+    name = "source_cited_ids_resolving_to_no_record"
+    grammar_re, anchors = ctx.id_re, ctx.anchors
+    mem = ctx.memory_root + "/"
+
+    tracked = ctx.git.run("ls-files")
+    if tracked.returncode != 0:
+        return _build_not_asked(name, "git could not list tracked files")
+    paths = [p for p in tracked.stdout.splitlines() if p.strip()]
+
+    # DEFINITIONS: an id on an anchor line anywhere under the memory root, PLUS a spec's own H1.
+    # Anchors, not citations - the whole discriminator rests on the difference. The H1 half is
+    # not optional and is easy to miss: the recall grammar's heading anchor deliberately starts
+    # at two hashes, so a spec titling itself with its own id is NOT anchored by it. Without the
+    # H1 pattern the memory-tree corpus checker also carries, every spec id in the tree reads as
+    # undefined and this signal reports a hundred-odd phantom findings. Measured that way first.
+    defined, slugs = set(), set()
+    for rel in paths:
+        if not rel.startswith(mem):
+            continue
+        try:
+            text = (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for anchor in anchors + (ctx.own_id_re,):
+            for m in anchor.finditer(text):
+                uid = m.group(1)
+                defined.add(uid)
+                s = _parse_slug(uid)
+                if s:
+                    slugs.add(s)
+
+    # CITATIONS: any id anywhere in tracked source OUTSIDE the memory root. Deliberately the whole
+    # tracked non-memory population rather than the product globs: the question here is citation
+    # integrity, and a dangling id in a test file is as wrong as one in a module.
+    cited: dict[str, set] = {}
+    scanned = 0
+    for rel in paths:
+        if rel.startswith(mem):
+            continue
+        try:
+            text = (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
+        except (OSError, UnicodeDecodeError):
+            continue
+        scanned += 1
+        for m in grammar_re.finditer(text):
+            cited.setdefault(m.group(0), set()).add(rel)
+
+    findings = []
+    for uid in sorted(cited):
+        if uid in defined:
+            continue
+        s = _parse_slug(uid)
+        if not s or s not in slugs:
+            continue  # a slug no record anchors: a fixture, not a finding
+        findings.append({"id": uid, "cited_in": sorted(cited[uid])[:3]})
+
+    # LIVENESS, and the second half is NOT the one it looks like it should be. The obvious pair is
+    # the slug set and the scanned-file count, and the file count is VACUOUS: this report is
+    # itself a tracked non-memory file, so a tree with the kit installed always has source to
+    # scan and that half can never read zero. Found by trying to observe it RED and failing,
+    # which is the only way that class ever surfaces.
+    #
+    # What CAN collapse is the CITED set. A grammar bound to the wrong families matches nothing,
+    # every file is still scanned, and the signal reports a confident zero over a corpus full of
+    # ids it cannot see. So `live` keys on the slug set and the cited set; the file count stays
+    # REPORTED, because it is the denominator a reader needs, but it decides nothing.
+    return {
+        "signal": name,
+        "value": len(findings),
+        "of": len(cited),
+        "known_slugs": len(slugs),
+        "scanned_source_files": scanned,
+        "tolerance": 0,
+        "gateable": False,
+        "live": bool(slugs) and bool(cited),
+        "unjudgeable": 0,
+        "detail": findings[:20],
+    }
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
            build_live_backlog_rows, build_readme_mechanism_drift,
-           build_backlog_rows_outliving_specs]
+           build_backlog_rows_outliving_specs,
+           build_source_cited_ids_with_no_record]
 
 
 # --------------------------------------------------------------------------------------------
@@ -1450,6 +1714,18 @@ class Ctx:
         # kickoff manifest, and a records commit touching those would certify the record.
         self.trace_cutoff = (getattr(proj, "TRACE_CUTOFF", "") or "").strip()
         self.trace_globs = list(getattr(proj, "TRACE_GLOBS", None) or proj.PRODUCT_GLOBS)
+        # EVIDENCE_GLOBS — signal 2's own population, narrower than PRODUCT_GLOBS for the same
+        # reason TRACE_GLOBS is: a citation from a test file is the house's own bookkeeping
+        # certifying the bookkeeping. getattr-and-fallback, so an older adopter's project layer
+        # — which declares neither name — keeps working instead of tripping a required-attribute
+        # refusal, and visibly gets the old unnarrowed behaviour until they fill it.
+        self.evidence_globs = list(getattr(proj, "EVIDENCE_GLOBS", None) or proj.PRODUCT_GLOBS)
+        fams = _read_families(conf)
+        self.own_id_re = _build_own_id_re(root, fams)
+        # ONE accessor for both projections, so the citation scan and the definition scan
+        # cannot drift apart into two spellings of the same grammar.
+        self.id_re = re.compile(_resolve_ident(root, fams))
+        self.anchors = _resolve_anchors(root, fams)
         self.shrink_only = dict(proj.SHRINK_ONLY)
         self.handkept = list(proj.HANDKEPT)
         self.pins = dict(proj.PINS)
@@ -1556,10 +1832,19 @@ def main(argv: list[str] | None = None) -> int:
                 status = f"OVER PIN {s['pin']} — gateable"
             elif s["gateable"]:
                 status = f"ok (pin {s['pin']}" + (", drain it" if s["pin"] else ")") + (")" if s["pin"] else "")
-            elif s["value"] > s["tolerance"]:
-                status = "out of tolerance (report only)"
+            elif s["value"] > s["pin"]:
+                # AGAINST THE PIN, not the bare tolerance. `pin` defaults to `tolerance` where PINS
+                # declares none, so this changes nothing for a signal without one — but a
+                # report-only signal WITH a pin could otherwise never print a calm status at its own
+                # declared floor. A signal whose only product is its status line was reporting
+                # "over" at exactly the value its pin ratifies, which trains a reader to ignore the
+                # column. The two gateable branches above already compare against `pin`.
+                status = f"over pin {s['pin']} (report only)"
             else:
-                status = "ok"
+                # NAMING THE PIN, like the gateable branch does. A bare `ok` beside a sibling that
+                # prints its pin and a drain hint reads as "nothing declared here", which is the
+                # opposite of true for a signal whose pin is the only thing holding it.
+                status = (f"ok (pin {s['pin']}, drain it)" if s["pin"] else "ok")
             print(f"  {s['signal']:<48} {s['value']:>7} {s['of']:>6}  {status}")
         print("\n# detail: rerun with --json")
 

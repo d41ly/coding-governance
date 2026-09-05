@@ -4657,9 +4657,12 @@ reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # no longer says what it used to, which `check-arms` exists to catch.
 SHARED_MSG="--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
 RELF_MSG="--dispatch declares the run-state file, or a path containing it, and every pass in the run shares that file, so two passes declaring it are not disjoint by construction:"
-# ---- CONTAINMENT IS SYMMETRIC (closing review H5/H6, TOOL-dUnstalledConvoy-21). The refusals tested
-# ---- only "is the declared path UNDER the protected one", so the NARROW declarations were refused
-# ---- and the one claiming everything sailed through. Each arm below passed before the fix.
+# ---- CONTAINMENT IS SYMMETRIC, and the refusals tested only one direction of it: "is the declared
+# ---- path UNDER the protected one". So the NARROW declarations were refused and the one claiming
+# ---- EVERYTHING sailed through — the widest possible declaration passing while the exact one was
+# ---- caught. Each arm below passed before the fix, which is what makes them regression arms rather
+# ---- than illustrations. Found by a closing review, its H5 and H6.
+# ---- Pointer, not evidence: TOOL-dUnstalledConvoy-21.
 # `memory` CONTAINS the run-state file without being under it, so the old `[ "$p" = "$rel" ]` let the
 # widest possible declaration through while refusing the exact one. Both arms are that shape.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory)" "$RELF_MSG"

@@ -458,6 +458,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "build_source_cited_ids_with_no_record",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_spec_record_index",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3483,6 +3488,11 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_dossier_decisions_are_declining",
+      "kind": "function",
+      "file": "tools/codebase-map/test_codebase_map.py"
+    },
+    {
       "id": "test_dossier_prose_headings_pinned",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
@@ -3526,6 +3536,16 @@
       "id": "test_eviction",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_evidence_globs_exclude_test_templates",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_evidence_oracle",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_extract_failure_refuses",
@@ -3629,6 +3649,11 @@
     },
     {
       "id": "test_live_backlog_rows",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_local_grammar_matches_the_extractor",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
     },
@@ -3763,6 +3788,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_report_only_signal_is_judged_against_its_pin",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_require_adopted_root_refuses",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -3801,6 +3831,11 @@
       "id": "test_skill_drift_reds",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_source_cited_ids",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_spine_flat_layout",

@@ -1197,6 +1197,12 @@ def test_reuse_lookup(tmp: Path):
     feats = tmp / "memory" / "map" / "features"
     feats.mkdir(parents=True)
     (feats / "text.md").write_text(
+        # Front matter carrying `decisions`, so the reuse audit has ids to surface. Read from
+        # the dossier TEXT, which is why this fixture still needs no project-side extractor.
+        "```toml\n"
+        'feature = \"text\"\n'
+        'decisions = [\"ARCH-aSeeded-1\", \"ARCH-aSeeded-2\"]\n'
+        "```\n\n"
         "## Reuse affordance\n"
         "seam: slugify — reuse for name→slug; extend via the transform registry\n"
         "\n"
@@ -1205,6 +1211,13 @@ def test_reuse_lookup(tmp: Path):
         encoding="utf-8",
     )
     (feats / "glue.md").write_text(  # prose-only feature: `none` affordance, no seam symbol
+        # Front matter here too, because this feature surfaces as the SYNTHETIC
+        # `<feature> (## Shared seams)` candidate rather than through a named seam. That is a
+        # different construction site, and it is the one that shipped empty.
+        "```toml\n"
+        'feature = \"glue\"\n'
+        'decisions = [\"ARCH-aGlued-9\"]\n'
+        "```\n\n"
         "## Reuse affordance\nnone — feature-specific glue\n"
         "\n## Shared seams\nThe glue layer wires the webhook dispatcher.\n",
         encoding="utf-8",
@@ -1237,6 +1250,11 @@ def test_reuse_lookup(tmp: Path):
         assert "Cache" not in names, names  # different kind AND file -> not a neighbour
         out = rl.render(sl, corpus)
         assert "recall partial: layers web-ts" in out                   # (c) recall-dark announced
+        # THE DECISIONS CLAUSE: its own line, and EVERY id rather than the first few. This
+        # fixture has no `map_extractors.py` at all, so passing here is also the assertion that
+        # reading the field kept this module portable instead of quietly ending that property.
+        assert "decisions: ARCH-aSeeded-1 ARCH-aSeeded-2" in out, out
+        assert not (tmp / "map_extractors.py").exists()  # the portability premise, asserted
 
         # (b) a no-home query returns "no seam fits" — and STILL flags the recall-dark gap
         sl2 = rl.assemble_shortlist("configure the payment gateway retry budget", corpus, ref)
@@ -1251,6 +1269,11 @@ def test_reuse_lookup(tmp: Path):
         sl3 = rl.assemble_shortlist("dispatch a webhook", corpus, ref)
         names3 = [r.candidate.name for r in sl3.ranked]
         assert "glue (## Shared seams)" in names3, names3
+        # THE SYNTHETIC CANDIDATE CARRIES ITS DOSSIER'S IDS. This is the path the seam-named
+        # assertion above cannot reach: the candidate is constructed elsewhere, and it shipped
+        # with an empty decisions field while the seam path worked — so reverting that fix left
+        # the other arm green. A dossier surfaced as ITSELF must print its own reasoning.
+        assert "decisions: ARCH-aGlued-9" in rl.render(sl3, corpus), rl.render(sl3, corpus)
         assert len(corpus.candidates) == before  # pool copy, not the caller's corpus
     finally:
         del os.environ["CODEBASE_MAP_ROOT"]
