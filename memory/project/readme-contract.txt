@@ -121,3 +121,4 @@ memory/builds/dSealedTally/README.md
 memory/builds/aSurfacedLexicon/README.md
 memory/builds/aStagedLane/README.md
 memory/builds/aHoistedPass/README.md
+memory/builds/aHonedRuleset/README.md
