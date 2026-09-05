@@ -3163,6 +3163,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "signal_source_cited_ids_with_no_record",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "signal_spec_status",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -3731,6 +3736,11 @@
       "id": "test_skill_drift_reds",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_source_cited_ids",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_symbol_extractors_fail_closed",

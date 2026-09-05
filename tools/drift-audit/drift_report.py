@@ -492,6 +492,43 @@ def _grammar_ident(root, families) -> str:
             pass
 
 
+
+def _local_anchors(ident: str):
+    """The LOCAL COPY of the four anchor shapes, for a tree with no recall kit.
+
+    Same discipline as `_local_ident`: byte-compared against the extractor's own anchors by this
+    kit's self-test whenever that kit is present. An anchor is a line that DEFINES a record, as
+    opposed to one that merely cites it, and the distinction is the whole of the signal below — a
+    head-anchored id is DEFINED, so a record complaining about a missing unit would silently create
+    it. That class is `memory/gotchas/record-citing-a-foreign-id-defines-or-orphans-it.md`.
+    """
+    return (
+        re.compile(r"^#{2,6}\s+[`*]*(" + ident + r")\b", re.M),
+        re.compile(r"^\s*[-*]\s+[`*]*(" + ident + r")\b[`*]*\s*[-\u2014:\u00b7]", re.M),
+        re.compile(r"^\|\s*[`*]*(" + ident + r")\b[^|]*\|", re.M),
+        re.compile(r"^\s*[-*]\s+[`*]*(" + ident + r")\b[`*]*\s*[\u00b7|]", re.M),
+    )
+
+
+def _grammar_anchors(root, families):
+    """The anchor patterns for THIS tree, from the recall extractor where it is importable."""
+    kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
+    if not (kit / "extract.py").exists():
+        return _local_anchors(_local_ident(families))
+    added = str(kit)
+    sys.path.insert(0, added)
+    try:
+        import extract  # type: ignore
+        return tuple(re.compile(a.pattern, a.flags | re.M) for a in extract.grammar_for(root).anchors)
+    except Exception:
+        return _local_anchors(_local_ident(families))
+    finally:
+        try:
+            sys.path.remove(added)
+        except ValueError:
+            pass
+
+
 def _own_id_re(root, families):
     return re.compile(r"^#\s+(" + _grammar_ident(root, families) + r")\b", re.M)
 
@@ -1521,12 +1558,117 @@ def build_backlog_rows_outliving_specs(ctx) -> dict:
     }
 
 
+
+# --------------------------------------------------------------------------------------------
+# Signal — a unit id cited by tracked SOURCE that no record defines
+#
+# THE HALF NOTHING HAD. The memory-tree orphan check counts ids cited-but-not-defined WITHIN the
+# memory tree; its population is the memory tree by construction, so its honest zero says nothing
+# about code. Product source cites unit ids densely and one of those pointers had resolved to no
+# record for its entire life without anything noticing.
+#
+# THE DISCRIMINATOR IS SLUG-RESOLVABILITY, NOT A PATH PREDICATE, and that is measured rather than
+# preferred. This repo puts self-test arms inside product modules and fixture ids inside test
+# helpers, so a path split is wrong in whichever direction it is set. An id whose SLUG anchors at
+# least one record is a real citation of a real build; an id whose slug anchors none is a fixture.
+# The fixture ids in this tree are `tOne`, `tRun`, `tRos`, `zFix` and friends — slugs no record
+# anchors — so they drop out with no waiver list at all, which is what makes this population small
+# and every member actionable.
+#
+# REPORT-ONLY, and shrink-only through the ratchet row its pin carries. `gateable: False` means it
+# can never enter the over-tolerance set, so the ONLY thing holding the pin is that raising it lands
+# in RATCHETS and needs a reason written in place.
+# --------------------------------------------------------------------------------------------
+
+
+def signal_source_cited_ids_with_no_record(ctx) -> dict:
+    name = "source_cited_ids_resolving_to_no_record"
+    grammar_re, anchors = ctx.id_re, ctx.anchors
+    mem = ctx.memory_root + "/"
+
+    tracked = ctx.git.run("ls-files")
+    if tracked.returncode != 0:
+        return _build_not_asked(name, "git could not list tracked files")
+    paths = [p for p in tracked.stdout.splitlines() if p.strip()]
+
+    # DEFINITIONS: an id on an anchor line anywhere under the memory root, PLUS a spec's own H1.
+    # Anchors, not citations - the whole discriminator rests on the difference. The H1 half is
+    # not optional and is easy to miss: the recall grammar's heading anchor deliberately starts
+    # at two hashes, so a spec titling itself with its own id is NOT anchored by it. Without the
+    # H1 pattern the memory-tree corpus checker also carries, every spec id in the tree reads as
+    # undefined and this signal reports a hundred-odd phantom findings. Measured that way first.
+    defined, slugs = set(), set()
+    for rel in paths:
+        if not rel.startswith(mem):
+            continue
+        try:
+            text = (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        for anchor in anchors + (ctx.own_id_re,):
+            for m in anchor.finditer(text):
+                uid = m.group(1)
+                defined.add(uid)
+                s = _slug_of(uid)
+                if s:
+                    slugs.add(s)
+
+    # CITATIONS: any id anywhere in tracked source OUTSIDE the memory root. Deliberately the whole
+    # tracked non-memory population rather than the product globs: the question here is citation
+    # integrity, and a dangling id in a test file is as wrong as one in a module.
+    cited: dict[str, set] = {}
+    scanned = 0
+    for rel in paths:
+        if rel.startswith(mem):
+            continue
+        try:
+            text = (ctx.root / rel).read_text(encoding="utf-8", errors="replace")
+        except (OSError, UnicodeDecodeError):
+            continue
+        scanned += 1
+        for m in grammar_re.finditer(text):
+            cited.setdefault(m.group(0), set()).add(rel)
+
+    findings = []
+    for uid in sorted(cited):
+        if uid in defined:
+            continue
+        s = _slug_of(uid)
+        if not s or s not in slugs:
+            continue  # a slug no record anchors: a fixture, not a finding
+        findings.append({"id": uid, "cited_in": sorted(cited[uid])[:3]})
+
+    # LIVENESS, and the second half is NOT the one it looks like it should be. The obvious pair is
+    # the slug set and the scanned-file count, and the file count is VACUOUS: this report is
+    # itself a tracked non-memory file, so a tree with the kit installed always has source to
+    # scan and that half can never read zero. Found by trying to observe it RED and failing,
+    # which is the only way that class ever surfaces.
+    #
+    # What CAN collapse is the CITED set. A grammar bound to the wrong families matches nothing,
+    # every file is still scanned, and the signal reports a confident zero over a corpus full of
+    # ids it cannot see. So `live` keys on the slug set and the cited set; the file count stays
+    # REPORTED, because it is the denominator a reader needs, but it decides nothing.
+    return {
+        "signal": name,
+        "value": len(findings),
+        "of": len(cited),
+        "known_slugs": len(slugs),
+        "scanned_source_files": scanned,
+        "tolerance": 0,
+        "gateable": False,
+        "live": bool(slugs) and bool(cited),
+        "unjudgeable": 0,
+        "detail": findings[:20],
+    }
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
            signal_lexicon_verbs_unused, signal_lexicon_ratified_stale,
            build_live_backlog_rows, build_readme_mechanism_drift,
-           build_backlog_rows_outliving_specs]
+           build_backlog_rows_outliving_specs,
+           signal_source_cited_ids_with_no_record]
 
 
 # --------------------------------------------------------------------------------------------
@@ -1557,7 +1699,12 @@ class Ctx:
         # — which declares neither name — keeps working instead of tripping a required-attribute
         # refusal, and visibly gets the old unnarrowed behaviour until they fill it.
         self.evidence_globs = list(getattr(proj, "EVIDENCE_GLOBS", None) or proj.PRODUCT_GLOBS)
-        self.own_id_re = _own_id_re(root, _families_of(conf))
+        fams = _families_of(conf)
+        self.own_id_re = _own_id_re(root, fams)
+        # ONE accessor for both projections, so the citation scan and the definition scan
+        # cannot drift apart into two spellings of the same grammar.
+        self.id_re = re.compile(_grammar_ident(root, fams))
+        self.anchors = _grammar_anchors(root, fams)
         self.shrink_only = dict(proj.SHRINK_ONLY)
         self.handkept = list(proj.HANDKEPT)
         self.pins = dict(proj.PINS)

@@ -1824,6 +1824,104 @@ def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
           mod._local_ident(families) == mod._grammar_ident(root, families),
           "the local fallback has diverged from the shipped alternation")
 
+
+# ---------------------------------------------------------------------------------------------
+# The source-citation signal: slug-resolvability as the discriminator, and two liveness halves.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_source_cited_ids(tmp: pathlib.Path) -> None:
+    NL = chr(10)
+    r = make_repo(tmp, name="citations")
+    conf = r / ".memory-tree.conf"
+    proj = r / "drift-audit" / "drift_signals.py"
+
+    def commit(msg: str) -> None:
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
+
+    def sig(*extra: str) -> dict:
+        return report(r, *extra)["source_cited_ids_resolving_to_no_record"]
+
+    base = sig()
+    check("citations: the signal is live on a fixture with records and source",
+          base["live"] and base["known_slugs"] > 0 and base["scanned_source_files"] > 0,
+          f"slugs={base['known_slugs']} files={base['scanned_source_files']}")
+
+    # ---- THE DISCRIMINATOR, both directions. A fabricated id under a slug that ANCHORS a record is
+    # a real dangling citation; the same shape under a slug no record anchors is a fixture. Only the
+    # pair proves the discriminator discriminates -- one half alone passes for a signal that counts
+    # everything, and the other for a signal that counts nothing.
+    before = sig()["value"]
+    (r / "src" / "resolving.py").write_text(
+        "# cites TOOL-aThing-999, whose slug anchors a record\n", encoding="utf-8", newline="\n")
+    commit("chore: cite a fabricated id under a RESOLVING slug")
+    check("citations: a dangling id under a known slug is a finding",
+          sig()["value"] == before + 1, f"value {before} -> {sig()['value']}, wanted +1")
+
+    mid = sig()["value"]
+    (r / "src" / "fixture.py").write_text(
+        "# cites TOOL-zNoSuchSlug-1, whose slug anchors nothing\n", encoding="utf-8", newline="\n")
+    commit("chore: cite a fabricated id under a slug no record anchors")
+    check("citations: a dangling id under an UNKNOWN slug is a fixture, not a finding",
+          sig()["value"] == mid, f"value {mid} -> {sig()['value']}, wanted no movement")
+
+    # ---- LIVENESS HALF ONE: no records, so no slugs. The signal must say it is dead rather than
+    # report a clean zero over a corpus it cannot see.
+    keep = {}
+    for p in sorted((r / FIXTURE_MEMORY_ROOT).rglob("*.md")):
+        keep[p] = p.read_text(encoding="utf-8")
+        p.unlink()
+    commit("chore: empty the memory root")
+    dead = sig()
+    check("citations: an empty memory root reports DEAD, not zero findings",
+          dead["live"] is False and dead["known_slugs"] == 0,
+          f"live={dead['live']} slugs={dead['known_slugs']}")
+    for p, text in keep.items():
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    commit("chore: restore the memory root")
+
+    # ---- LIVENESS HALF TWO, and it is NOT the scanned-file count. That count can never reach zero
+    # in a tree with this kit installed, because the report is itself a tracked non-memory file --
+    # measured, by writing the arm the obvious way and watching it fail to go dead. What CAN collapse
+    # is the CITED set: bind the grammar to a family nothing uses and every file is still scanned
+    # while nothing matches, which is a confident zero over a corpus full of ids the signal cannot
+    # see. That is the hazard, and this is the arm for it.
+    conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="nothing:ZZZZ"' + NL,
+                    encoding="utf-8", newline=NL)
+    commit("chore: bind the grammar to a family nothing uses")
+    blind = sig()
+    check("citations: a grammar matching nothing reports DEAD, not a clean zero",
+          blind["live"] is False and blind["of"] == 0 and blind["scanned_source_files"] > 0,
+          f"live={blind['live']} of={blind['of']} files={blind['scanned_source_files']}")
+
+    # ---- THE FAMILY ENUM IS READ, NOT SPELLED, and the arm runs in the NARROWING direction. With no
+    # FAMILIES declared the engine falls back to a permissive family pattern, so declaring an enum
+    # can only narrow -- an arm that declared a family and expected the count to RISE would pass on
+    # an engine that ignored the conf entirely, which is how it was first written.
+    (r / "src" / "foreign.py").write_text(
+        "# cites WDGT-aThing-7, in a family the conf may or may not declare" + NL,
+        encoding="utf-8", newline=NL)
+    commit("chore: cite an id in a foreign family")
+    conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="tooling:TOOL"' + NL,
+                    encoding="utf-8", newline=NL)
+    commit("chore: declare TOOL only")
+    narrow = sig()["value"]
+    conf.write_text("MEMORY_ROOT=memory" + NL + 'FAMILIES="widget:WDGT tooling:TOOL"' + NL,
+                    encoding="utf-8", newline=NL)
+    commit("chore: declare the foreign family too")
+    check("citations: the family enum is READ from the conf, not spelled in the engine",
+          sig()["value"] == narrow + 1,
+          f"value {narrow} -> {sig()['value']}, wanted +1 once the family was declared")
+
+    # ---- THE WHOLE REPORT SURVIVES A TREE WITH NO RECALL KIT. This fixture has never had one, so
+    # the assertion is that the run RETURNS at all rather than raising and taking the other signals
+    # with it -- the failure mode is a dead leg for that adopter, not a missing signal.
+    check("citations: the report returns in a tree with drift-audit and no recall kit",
+          not (r / "memory-recall").exists() and sig()["signal"],
+          "the fixture unexpectedly has a recall kit beside it")
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -1842,6 +1940,7 @@ def main() -> int:
         test_lang_mode_ratchet(tmp)
         test_evidence_oracle(tmp)
         test_local_grammar_matches_the_extractor(tmp)
+        test_source_cited_ids(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")

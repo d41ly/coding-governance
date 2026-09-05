@@ -276,6 +276,19 @@ PINS: dict[str, int] = {
     # as the read-path ceiling in that same reconcile, one budget over — that ceiling has since been
     # retired (TOOL-dSpentCeiling-1) and its RATCHETS row deleted with it.
     "live_backlog_rows_per_shard": 89,
+    # MEASURED at the unit that added the signal, on this corpus, and expected to be small: the
+    # slug discriminator drops every fixture id with no waiver list at all, so what remains is
+    # actionable rather than tolerated. A drain target from the first commit, which is why it is
+    # shrink-only rather than a tolerance — and shrink-only means the RATCHETS row below, not
+    # this sentence.
+    # 2 - MEASURED on this corpus at the unit that added the signal: 400 distinct ids cited from
+    # 255 tracked non-memory source files, against 108 slugs anchored by a record. Both
+    # survivors belong to one foreign build whose records were minted and never written, and
+    # both are already filed as a backlog row. Every other dangling citation in the tree is a
+    # fixture id under a slug no record anchors, and the discriminator drops all of them with
+    # NO waiver list - which is the property that makes this population drainable rather than
+    # decorative. A drain target from the first commit.
+    "source_cited_ids_resolving_to_no_record": 2,
     "lexicon_ratified_older_than_language_surface": 0,
 }
 
@@ -320,6 +333,11 @@ RATCHETS: list[dict] = [
      "key": "handkept_inventories_disagreeing_with_source", "weakens": "up"},
     {"file": "tools/drift-audit/drift_signals.py",
      "key": "live_backlog_rows_per_shard", "weakens": "up"},
+    # The signal is report-only, so crossing this pin never blocks a merge. What the row buys is
+    # that RAISING it needs a reason written in place — which is the whole of "shrink-only" for
+    # an ungateable pin, and without it the word is a comment.
+    {"file": "tools/drift-audit/drift_signals.py",
+     "key": "source_cited_ids_resolving_to_no_record", "weakens": "up"},
 ]
 
 CHARTER = "AGENTS.md"
