@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs
 
-**Status:** OPEN · rev-3 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
+**Status:** OPEN · rev-4 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -186,15 +186,22 @@ typed here. No new leg.
   seeds `memory/project/method-carriers.txt` by grepping every file OUTSIDE the memory root
   for a literal reference to the build method, so the RENDERED guide lands inside that root
   and never joins the registry — no registration is demanded. The half it does demand is the
-  TEMPLATE, which lands in the kit dir where the seed does look: it must either avoid that
-  literal or gain a skip case beside the two already in that block. Liveness: the probe can
+  TEMPLATE, which lands in the kit dir where the seed does look. Liveness: the probe can
   return no obligation, and on the first half it did.
+  AMENDED by the round-1 spec audit, which found this resolution incomplete in both directions.
+  The exclusion list exists in TWO files, not one: the seeder block the probe read, and the gate
+  `tools/memory-tree/check-method-carriers.sh`, which is `subject = repo` with no guard and so runs
+  on every bar in every adopting tree — a seeder-only patch would leave gov red on the new template
+  and a fresh adopter red at install. Rather than patch both, which is one rule in two hand-kept
+  spellings, S1 now bans the literal from the template outright, and AC8 observes the gate green
+  with no skip case added anywhere. The skip-case route is withdrawn, not merely unused.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 - rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
+- rev-4 · 2026-09-05 · §8 F2's withdrawn skip-case route closed behind S1's ban.
 
 ## 10. Reuse audit
 

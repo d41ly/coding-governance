@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself
 
-**Status:** OPEN · rev-3 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
+**Status:** OPEN · rev-4 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -55,11 +55,16 @@ reader before anything else is built on it.
   citations that none of the three touches. The recorded line must SAY so. Three identical readings
   are then a confirmed result rather than evidence the change did not work — which is how the earlier
   wording here, that each step moves the population independently, would have been read.
-- **S5** A regression arm per change, in the kit's existing self-test, each observed RED before it is
-  wired: a correction-form spec header that the old pattern scores unkeyed; a spec cited only from a
-  test file; and, for S3, a scratch tree with EVERY remaining product citation of both pinned ids
-  deleted — the set enumerated by the invocation AC4 prints, never a count typed into this spec —
-  asserting the signal's VALUE reaches zero while its judgeable population does not.
+- **S5** FIVE regression arms in the kit's existing self-test, each observed RED before it is wired,
+  one per criterion that observes a change this unit makes: a correction-form spec header that the
+  old pattern scores unkeyed; a spec cited only from a test file; for S3, a scratch tree with EVERY
+  remaining product citation of both pinned ids deleted — the set enumerated by the invocation AC4
+  prints, never a count typed into this spec — asserting the signal's VALUE reaches zero while its
+  judgeable population does not; for S6, a scratch tree with the narrowed declaration EMPTIED,
+  asserting the signal reports itself dead rather than a live zero; and a scratch fixture declaring
+  an id family this repo does not declare, asserting S1's pattern still classifies it. The count is
+  stated in three places in this spec and they must agree; an earlier draft said three here and four
+  below, which is the two-answers-to-one-question class inside one document.
 - **S6** A SECOND liveness half, owned by the narrowed declaration: the count of tracked files those
   globs actually resolve to. The signal's existing half counts non-terminal keyed SPECS and is
   computed before any glob is read, so a glob set matching nothing leaves it live and full-sized
@@ -122,7 +127,7 @@ arguably INPROGRESS — is real and a later reader needs it.
 - risks — the real hazard is a silent population collapse: a narrowed glob that matches nothing
   reports a reassuring zero. S6's second liveness half is the control; the pre-existing one is not,
   and §6 asserts the difference by emptying the declaration in a scratch tree.
-- testing + left-shift gates — four regression arms, each observed RED first, plus two left-shifts
+- testing + left-shift gates — five regression arms, each observed RED first, plus two left-shifts
   the round-1 audit named and this unit owns: a self-test arm that, for EVERY signal whose
   declaration is a glob set, empties that declaration and asserts its liveness flag goes False —
   which gates the class rather than this instance — and a ban-grep so no module outside the recall
@@ -151,7 +156,7 @@ arguably INPROGRESS — is real and a later reader needs it.
   shipped-evidence signal reports a live, non-empty judgeable population AND a non-empty count of the
   files its narrowed globs resolve to, and its pin equals the re-measured value with the movement
   recorded beside it.
-- **AC6** When `python tools/drift-audit/selftest.py` is run it exits 0 with the four new arms
+- **AC6** When `python tools/drift-audit/selftest.py` is run it exits 0 with the five new arms
   present, and each arm has been observed failing against the pre-change code.
 - **AC7** When `bash tools/run-gates/run-gates.sh` is run on this unit's commit it is green.
 - **AC8** When the narrowed glob declaration is emptied in a scratch tree and
@@ -205,6 +210,7 @@ No new leg.
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 - rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
+- rev-4 · 2026-09-05 · the regression-arm count reconciled across §2, §5 and §6.
 
 ## 10. Reuse audit
 

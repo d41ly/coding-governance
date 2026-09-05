@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only
 
-**Status:** OPEN · rev-3 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
+**Status:** OPEN · rev-4 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -126,7 +126,10 @@ copy with no cross-language consumer.
 - risks — the main one is S5 becoming guesswork. The control is that only dossiers whose decisions
   this build actually read may be filled, and §6 names the evidence for each.
 - testing + left-shift gates — one new check inside the existing test module, with its failing case
-  observed per S6. No new leg.
+  observed per S6, plus S8's ratchet row and the raise-without-a-marker observation AC9 makes, and
+  the portability arm AC8 makes permanent. No new leg. Note that S8 puts a second kit,
+  `tools/drift-audit/`, into this unit's write set; §3's non-goals bound what may change there to
+  the one ratchet row.
 - migration / rollback — additive; the pin row and the check revert together.
 - user docs — the kit README's dossier-format section gains one line saying the field is read and
   graded, replacing whatever it says about the field being informational.
@@ -200,6 +203,7 @@ runs, and that leg is unguarded so it runs on every bar.
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 - rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
+- rev-4 · 2026-09-05 · §5 carries S8's second kit and the two arms the fold added.
 
 ## 10. Reuse audit
 
