@@ -115,7 +115,7 @@ Tier-2 spec with no Files-touched table cannot be read for what it forgot to nam
 | `memory/guides/SESSION-KICKOFF.md` | the `last-audit` re-stamp S10 owes for the watched file above |
 | the unattended kit's test suite | S6's three arms |
 | `memory/builds/aClosedDocket/build/2026-08-31-build-TOOL-aClosedDocket-1-acceptance-ledger.md` | S4's correction |
-| `TOOL-aClosedDocket-2`'s spec | S5's correction |
+| the closed aClosedDocket unit 2 spec | S5's correction, as a superseding note |
 
 ## 5. Production-readiness checklist
 

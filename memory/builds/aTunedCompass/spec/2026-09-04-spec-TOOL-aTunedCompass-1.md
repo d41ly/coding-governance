@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-1 — the two records this build's parent refuted are corrected in place
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
