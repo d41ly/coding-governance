@@ -17,6 +17,15 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
 F="$HERE/unattended-build.js"
 [ -f "$F" ] || { echo "FAIL cannot find unattended-build.js beside this test"; exit 2; }
+# THE CHILD IS IN THIS SUITE'S SCOPE, and it has no suite of its own. The parent hands out a roster
+# and the child builds one unit off it, so the two halves of the mode contract — the parent PUTTING
+# the mode in `dispatch.args` and the child BRANCHING on it — are one property split across two
+# files. Arming only the parent's half is what let the child go mode-blind. Both paths are derived
+# from `$HERE`, so nothing here spells an install prefix.
+C="$HERE/unattended-unit.js"
+[ -f "$C" ] || { echo "FAIL cannot find unattended-unit.js beside this test"; exit 2; }
+# The driver, for the DERIVED refusal set the child arms read. `$KIT_REL` above is the one knob.
+DRV="$ROOT/$KIT_REL/unattended/unattended.sh"
 
 same() { n=$((n+1)); if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 -- got '$2' want '$3'"; st=1; fi }
 has()  { n=$((n+1)); case "$2" in *"$3"*) echo "ok   $1" ;; *) echo "FAIL $1 -- output lacked '$3'"; st=1 ;; esac }
@@ -26,7 +35,9 @@ hasnt_(){ n=$((n+1)); case "$2" in *"$3"*) echo "FAIL $1 -- output carried '$3' 
 # THE RUNNER. Evaluates the script the way its runtime does, with stub hooks that RECORD rather than
 # spawn. `$1` is a JS expression for `args`; `$2` is a JS object literal mapping a stage label prefix
 # to the value its agent returns, or the string `null` to simulate a dead stage.
-run_wf() { # args-expr · returns-expr -> prints the trace, then RESULT/THROW
+# `$3` is the SCRIPT, defaulting to the parent — the child runs on the same runtime with the same
+# stubs, so pointing this at `$C` is the whole child-side harness.
+run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RESULT/THROW
   node -e '
     const fs = require("fs")
     const src = fs.readFileSync(process.argv[1], "utf8").replace(/^\s*export\s+const\s+meta\s*=/m, "const meta =")
@@ -68,7 +79,7 @@ run_wf() { # args-expr · returns-expr -> prints the trace, then RESULT/THROW
     fn(JSON.parse(process.argv[2]), agent, parallel, pipeline, phase, log, budget, workflow)
       .then((r) => { console.log(trace.join("\n")); console.log("RESULT " + JSON.stringify(r)) })
       .catch((e) => { console.log(trace.join("\n")); console.log("THROW " + e.message) })
-  ' "$F" "$1" "$2" 2>&1
+  ' "${3:-$F}" "$1" "$2" 2>&1
 }
 
 UNITS='{"repo":"/tmp/r","slug":"tB","subjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
@@ -505,11 +516,88 @@ hasnt_ "AC8 the child never receives the roster list" "$d" '"roster"'
 
 # ---- S4: the keys the old BUILD return carried are GONE, not left reading zero. A caller that
 # ---- still read `built` would see a number that means nothing.
-hasnt_ "S4 the return no longer carries a `built` count" "$o" '"built":'
-hasnt_ "S4 the return no longer carries an `unbuilt` list" "$o" '"unbuilt":'
+# SINGLE-QUOTED LABELS, and that is not style. Double-quoted, the backticks below are COMMAND
+# SUBSTITUTION: the shell ran `built` and `unbuilt` while composing the label, printed two
+# `command not found` lines to stderr and left both verdicts naming nothing. The suite still exited
+# 0, which is why it survived a landing. The same trap is recorded against `_bm31` in
+# check-unattended.test.sh, where it cost a 50-minute run to find.
+hasnt_ 'S4 the return no longer carries a `built` count' "$o" '"built":'
+hasnt_ 'S4 the return no longer carries an `unbuilt` list' "$o" '"unbuilt":'
 # ...and the run-integrity fields every return at BASE carried are still on it.
 has "S4 the mode still travels on the hand-out" "$o" '"mode":"unattended"'
 has "S4 skippedTerminal still travels on the hand-out" "$o" '"skippedTerminal":'
+
+
+# ========================= F2 (closing review, BLOCKER) — THE MODE REACHES THE CHILD
+# The child was MODE-BLIND and ordered `--dispatch` and `--brief` unconditionally, both of which
+# `fail 49` without a run-state file — which is the state attended mode is DEFINED by — while
+# telling the child a refusal is BINDING. So every attended dispatch halted at unit one. That is the
+# failure the plan-state grading twelve screens up was moved forward to prevent, arriving one layer
+# down.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
+d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
+has "F2 dispatch.args carries the mode — unattended" "$d" '"mode":"unattended"'
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
+d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
+has "F2 dispatch.args carries the mode — attended" "$d" '"mode":"attended"'
+
+# THE GENERAL FORM, not a substring arm. The refusal set is DERIVED from the driver itself — every
+# verb whose body refuses with `fail 4N "no run-state file` — so this keeps holding when a seventh
+# verb joins it, which a hand-typed list of two would not. The needle is the INSTRUCTION form
+# `--<verb> <slug>` and never the bare word: the attended text NAMES three of these verbs in the
+# sentence explaining that they are unavailable, and an arm aimed at the word would fail on the
+# explanation. That trap is already recorded against the attended preamble arm above.
+CHILD_ARGS='{"repo":"/tmp/r","slug":"tB","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. ","checklist":"CK","mode":"%s"}'
+childU=$(run_wf "$(printf "$CHILD_ARGS" unattended)" '{}' "$C")
+childA=$(run_wf "$(printf "$CHILD_ARGS" attended)" '{}' "$C")
+norun_verbs=''
+[ -f "$DRV" ] && norun_verbs=$(awk '
+  /^verb_[a-z]+\(\)/ { v = $0; sub(/^verb_/, "", v); sub(/\(\).*/, "", v); next }
+  v != "" && /fail 4[0-9] "no run-state file/ { print "--" v; v = "" }
+' "$DRV" | sort -u)
+# A DERIVED SET THAT CAME BACK EMPTY IS NOT A CLEAN PASS. Without this the loop below iterates zero
+# times and every absence arm silently ceases to exist — the vacuous-selector shape, inside the arm.
+n=$((n+1)); nv=$(printf '%s\n' "$norun_verbs" | grep -c .)
+if [ "$nv" -ge 3 ]; then echo "ok   F2 the no-run-state refusal set derived $nv verb(s) from the driver"
+else echo "FAIL F2 the no-run-state refusal set derived $nv verb(s) — the absence arms below would be vacuous"; st=1; fi
+
+# THE POSITIVE HALF FIRST. An absence assertion over the attended prompt passes just as well when
+# the whole clause is empty, so the unattended prompt is armed for the same instructions BEING there.
+has "F2 the UNATTENDED child prompt orders --dispatch" "$childU" "--dispatch tB"
+has "F2 the UNATTENDED child prompt orders --brief" "$childU" "--brief tB"
+has "F2 the UNATTENDED child prompt still says a refusal is BINDING" "$childU" "A REFUSAL FROM IT IS BINDING"
+has "F2 the ATTENDED child prompt says the recording verbs are unavailable" "$childA" "recording verbs are unavailable"
+has "F2 the ATTENDED child prompt orders the paths written down instead" "$childA" "Write down the paths"
+for verb in $norun_verbs; do
+  hasnt_ "F2 the ATTENDED child prompt issues no $verb instruction" "$childA" "$verb tB"
+done
+# AND THE MODE IS A CLOSED SET IN THE CHILD TOO. A typo silently selecting the unattended text by
+# default is this same defect wearing a different hat, so the child refuses rather than defaults.
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. ","checklist":"CK","mode":"atttended"}' '{}' "$C")
+has "F2 the child REFUSES a mode outside the closed set" "$o" "THROW"
+has "F2 ...and names the value it was given" "$o" '"atttended"'
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. ","checklist":"CK"}' '{}' "$C")
+has "F2 the child REFUSES an absent mode rather than defaulting one" "$o" "THROW"
+
+# ========================= F4 (closing review, HIGH) — DISPOSED-BUT-STANDING IS NOT DISPOSED
+# `{disposed:true, standing:['b1']}` validated against DISPOSAL_SCHEMA, cleared a guard that tested
+# only `disposed !== true`, logged `disposal: done` and handed out the FULL roster over an undisposed
+# blocker — under a prompt whose own words are NAME in `standing` every blocker you did NOT dispose.
+# Reachable on exactly the two verdicts that structurally guarantee standing blockers.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":true,"standing":["b1"],"summary":"x"}')")
+has "F4 disposed:true with a standing blocker: the roster is EMPTY" "$o" '"roster":[]'
+has "F4 disposed:true with a standing blocker: the note is DEGRADED" "$o" "DEGRADED — blockers were not disposed"
+has "F4 disposed:true with a standing blocker: the blocker is NAMED" "$o" "were not disposed: b1"
+hasnt_ "F4 disposed:true with a standing blocker: disposal is NOT logged done" "$o" "disposal: done"
+# CEILING is the other verdict that reaches the stage, and it takes the same path.
+o=$(run_wf "$UNITS" "$(returns CEILING 4 '{"disposed":true,"standing":["b2"],"summary":"x"}')")
+has "F4 the same pairing under CEILING hands out no roster" "$o" '"roster":[]'
+# AND WHAT STOOD TRAVELS OUT. `standing` never reached the hand-out at all, which is
+# degradation-known-but-unreported — a class this harness names three times in its own comments. It
+# is a REQUIRED field and never an absence: an empty list said out loud is not the same fact as a
+# missing key, which is indistinguishable from a stage that never ran.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
+has "F4 the hand-out carries what stood, empty and explicit" "$o" '"standing":[]'
 
 echo "--- $n arms, exit $st"
 exit $st

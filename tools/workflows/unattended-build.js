@@ -718,6 +718,10 @@ if (verdict === 'CONVERGING') {
 // from coverage, and an absent `agent:dispose:` line alone would read the same over a stage that was
 // never written.
 phase('Disposal')
+// WHAT STOOD IS HOISTED OUT OF THE STAGE so the hand-out can report it. It never reached the return
+// at all, which is `degradation-known-but-unreported` — the class this file names three times in
+// its own comments and then committed one screen below.
+let stood = []
 if (verdict === 'CONVERGED') {
   log('disposal: skipped — the verdict is CONVERGED, so the driver reported zero standing blockers')
 } else {
@@ -736,9 +740,18 @@ if (verdict === 'CONVERGED') {
   // NO PARTIAL HAND-OUT. Deciding which units a standing blocker touches needs the tree, which this
   // runtime does not have, so an empty roster is the honest refusal. `d.disposed !== true` covers a
   // dead stage and a negative answer alike.
-  if (!d || d.disposed !== true) {
-    const standing = (d && Array.isArray(d.standing) && d.standing.length)
-      ? d.standing.join(', ')
+  //
+  // AND A NON-EMPTY `standing` REFUSES TOO, WHATEVER `disposed` CLAIMS. `{disposed: true, standing:
+  // ['b1']}` validates against DISPOSAL_SCHEMA, and on the disposed-only test it cleared this guard,
+  // logged done and handed out the FULL roster over an undisposed blocker — under a prompt whose own
+  // words are NAME in `standing` every blocker you did NOT dispose. The pairing is self-contradictory
+  // and the stage's report of what it did NOT do outranks its summary of what it did. This is the
+  // third impossible pairing this file refuses by name; the other two are twelve lines above the
+  // audit gate, and this guard simply did not get the pattern.
+  stood = Array.isArray(d && d.standing) ? d.standing : []
+  if (!d || d.disposed !== true || stood.length) {
+    const standing = stood.length
+      ? stood.join(', ')
       : 'the disposal stage returned nothing at all'
     log('disposal: NOT done — ' + standing)
     return {
@@ -812,11 +825,12 @@ if (attended) {
   if (planRefusal) throw new Error(planRefusal)
   if (skippedDone.length) log('attended mode: SKIPPING ' + skippedDone.length + ' terminal unit(s) — ' + skippedDone.join(', '))
 }
-// ONE INSTRUCTION IS LOST RATHER THAN MOVED, and saying so is cheaper than letting a reader find
-// it. `driverSteps`' ATTENDED branch told the pass to write down the paths it would touch before
-// touching them, because the driver's recording verbs are unavailable with no run-state file. That
-// is a PER-PASS instruction and the child owns per-pass instructions; this file does not re-home it,
-// so an attended run under the hand-out loses it unless the child carries it.
+// `driverSteps` IS RE-HOMED IN THE CHILD, both branches. This comment used to say its ATTENDED
+// branch — write down the paths you will touch, because the recording verbs are unavailable with no
+// run-state file — was LOST rather than moved, and understated what had actually gone: the child was
+// handed the UNATTENDED branch in both modes, so an attended run was ordered to call two verbs that
+// `fail 49` without a run-state file, under a prompt saying a refusal is binding. What this file owes
+// the child is the MODE, which now travels in `dispatch.args` below; the two texts are the child's.
 //
 // THE SKIP HAS TO REACH THE ROSTER. `skippedDone` was computed, logged as SKIPPING and returned in
 // `skippedTerminal`, and then the BUILD agent was handed the UNFILTERED roster — so an attended run
@@ -868,6 +882,11 @@ return {
   blockers: au.blockers,
   lastReport: lastReport,
   skippedTerminal: skippedDone,
+  // WHAT STOOD, and it is REQUIRED rather than conditional. The guard above means this is always
+  // empty by the time the hand-out is reached — that is the point: an empty list said out loud is a
+  // different fact from a missing key, which is indistinguishable from a disposal stage that never
+  // ran. Same rule DISPOSAL_SCHEMA applies to the stage's own return, applied to this one.
+  standing: stood,
   roster: buildUnits.map(function (u) {
     return { id: u.id, order: u.order, specPath: u.specPath || '', briefPath: u.briefPath || '' }
   }),
@@ -878,7 +897,14 @@ return {
   // anything; nothing hashes a prompt string.
   dispatch: {
     scriptPath: 'tools/workflows/unattended-unit.js',
-    args: { repo: repo, slug: slug, driver: DRIVER, ground: GROUND, checklist: CHECKLIST },
+    // THE MODE IS AN INVARIANT AND IT TRAVELS. Left off, the child was mode-blind and ordered
+    // `--dispatch` and `--brief` unconditionally — both `fail 49` without a run-state file, which is
+    // the state attended mode is DEFINED by, under a child prompt saying a refusal is BINDING. So
+    // attended runs halted at unit one: the exact failure the plan-state grading above was moved
+    // forward to prevent, one layer down. `GROUND` already tells an attended child those verbs are
+    // unavailable, so without this key the child received two contradictory instructions in one
+    // prompt.
+    args: { repo: repo, slug: slug, mode: mode, driver: DRIVER, ground: GROUND, checklist: CHECKLIST },
     perUnit: ['unitId', 'specPath', 'briefPath'],
     resolvePathsWith: DRIVER + ' --plan ' + slug + ' --paths',
   },

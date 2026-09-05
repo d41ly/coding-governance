@@ -80,6 +80,21 @@ check('driver', 'The driver invocation is the caller\'s to spell, because this f
 check('ground', 'The grounding preamble is the parent\'s; the child does not re-derive it.')
 check('checklist', 'The per-pass bug-class command is owed after every commit, and a sidechain agent does not inherit the unattended Skill.')
 
+// `mode` IS NOT A `check()` CALL, and the closed set is the reason. `check` asserts truthiness, and
+// truthiness is satisfied by `"atttended"` — which would then select the UNATTENDED text by falling
+// through a ternary, silently, which is the defect this key exists to close. The parent refuses an
+// unknown mode against this same pair; that guard does not travel to a child the caller composes
+// args for, so the child makes it again rather than trusting it. One refusal, stronger than the
+// contract above, and no second definition.
+if (cfg.mode !== 'attended' && cfg.mode !== 'unattended') {
+  throw new Error(
+    'unattended-unit: args must carry an explicit `mode` of either attended or unattended, got ' +
+      JSON.stringify(cfg.mode) + '. It decides which driver verbs this unit is ordered to call, and ' +
+      'the two sets are not compatible: `--dispatch` and `--brief` both refuse without a run-state ' +
+      'file, which is the state attended mode is defined by. Refusing rather than defaulting.',
+  )
+}
+
 // `why` is REQUIRED and is never an absence: an empty result with no reason is indistinguishable
 // from a clean pass over nothing.
 const UNIT_SCHEMA = {
@@ -96,21 +111,42 @@ const UNIT_SCHEMA = {
 
 phase('Unit')
 
+// THE DRIVER STEPS ARE MODE-BRANCHED, and this is the one thing in this file that is not optional.
+// `--dispatch` and `--brief` both `fail 49` without a run-state file, and attended mode's DEFINING
+// premise is that no run-state file exists — so an unconditional order to call them, under the next
+// sentence's rule that a refusal is BINDING, halts every attended run at unit one. It did.
+//
+// BOTH TEXTS ARE RECOVERED from the `driverSteps` ternary `TOOL-aHoistedPass-6` deleted from the
+// parent, not re-invented: the attended branch is verbatim, because it was reviewed once already.
+// The unattended branch keeps the CORRECTED order-gate wording this build wrote and not the deleted
+// spelling, which claimed `--dispatch` refuses an out-of-order unit unconditionally — the false
+// claim the same unit fixed. Restoring the old bytes there would re-open a closed finding.
+//
+// It is a ternary and not a second definition: the codebase-map JS liveness floor counts the one
+// definition above, and this file keeps exactly one.
+const DRIVER_STEPS =
+  cfg.mode === 'attended'
+    ? 'This run has NO run-state file, so the driver\'s recording verbs are unavailable and you must ' +
+      'not call them: --dispatch, --brief and --rescope all refuse without one. Write down the paths ' +
+      'each pass will touch before you touch them anyway — the declaration is what makes disjointness ' +
+      'checkable, and here only you can check it.\n'
+    : 'Declare the write set with `' + cfg.driver + ' --dispatch ' + cfg.slug + ' --pass ' + cfg.unitId +
+      ' --writes <path>` before you write anything. A REFUSAL FROM IT IS BINDING — read it and stop. ' +
+      'ITS SILENCE IS NOT A CLEARANCE: it refuses this unit only for having no tracked spec or a THIN ' +
+      'one, plus the shape of the paths you declared; its ORDER gate runs only where this unit AND the ' +
+      'blocking sibling both carry an `order` verb, and a sibling that merely declared a dispatch stops ' +
+      'blocking whether or not it was ever built. Order is the parent roster you were dispatched from, ' +
+      'not something this verb proves.\n' +
+      'Record what you were handed with `' + cfg.driver + ' --brief ' + cfg.slug + ' --unit ' + cfg.unitId +
+      ' --path ' + cfg.briefPath + '`.\n'
+
 const PROMPT =
   cfg.ground +
   '\n\nBuild exactly ONE unit: ' + cfg.unitId + '. You are handed two documents and you read both ' +
   'whole before you touch code: the BRIEF at ' + cfg.briefPath + ' and the SPEC at ' + cfg.specPath +
   '. The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
   'section 9 line, then write the code.\n' +
-  'Declare the write set with `' + cfg.driver + ' --dispatch ' + cfg.slug + ' --pass ' + cfg.unitId +
-  ' --writes <path>` before you write anything. A REFUSAL FROM IT IS BINDING — read it and stop. ' +
-  'ITS SILENCE IS NOT A CLEARANCE: it refuses this unit only for having no tracked spec or a THIN ' +
-  'one, plus the shape of the paths you declared; its ORDER gate runs only where this unit AND the ' +
-  'blocking sibling both carry an `order` verb, and a sibling that merely declared a dispatch stops ' +
-  'blocking whether or not it was ever built. Order is the parent roster you were dispatched from, ' +
-  'not something this verb proves.\n' +
-  'Record what you were handed with `' + cfg.driver + ' --brief ' + cfg.slug + ' --unit ' + cfg.unitId +
-  ' --path ' + cfg.briefPath + '`.\n' +
+  DRIVER_STEPS +
   'Commit with the unit id in the subject. IN THAT SAME COMMIT, set this unit\'s spec status header ' +
   'to CLOSED — or to WONTDO with a reason. That header is the only fact the driver\'s --plan verb ' +
   'reads to decide a unit is finished, so a unit built without it leaves the run\'s own loop counter ' +
