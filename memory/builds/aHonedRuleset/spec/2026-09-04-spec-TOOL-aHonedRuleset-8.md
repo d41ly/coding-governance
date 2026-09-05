@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 94958534 · streams deployer · order 4
+**Status:** SPECCED · rev-5 · 2026-09-06 · node a · Tier-2 · base 94958534 · streams deployer · order 4 · ratified 2026-09-06
 
 <!-- gen:spec-records -->
 
@@ -463,12 +463,13 @@ own row rather than adopting it here.
 
 ## 8. Open questions
 
-**THREE OF FOUR ARE RESOLVED AND F2 IS NOT. Do not read this section's marks as covering it.** Both
-machine readers grade §8 as ONE whitespace-squeezed string and neither grades per item — the gap
-`memory/TEMPLATE-SPEC.md` pins in its own §8 guidance — so the three conforming marks below make this
-section read RESOLVED to a machine while F2 is genuinely open. That is why the header carries no
-`ratified` token and why the status stays SPECCED: **the status is the only honest signal here, and
-flipping it to a terminal token would let a real open fork through.**
+**ALL FOUR ARE NOW RESOLVED, and the last of them was resolved by a run rather than by the owner.**
+Both machine readers grade §8 as ONE whitespace-squeezed string and neither grades per item — the gap
+`memory/TEMPLATE-SPEC.md` pins in its own §8 guidance — so while F2 stood open this section already
+read RESOLVED to a machine and the status header was the only honest signal. F2's mark below names
+its resolver and its authority; the header now carries `ratified` and the two signals agree for the
+first time. **The header's `ratified` token therefore does not mean the owner ratified all four** —
+three are the owner's and one is delegated, and each mark says which.
 
 - **F1 — is this one script's problem, or does the playbook adopter have no general answer for gov
   scripts that gate the charter's own claims?** **RESOLVED (owner, 2026-09-04): BUILD BOTH GUARDS, IN
@@ -560,10 +561,31 @@ flipping it to a terminal token would let a real open fork through.**
     candidate gate predicate over the real tree before wiring it" paying out exactly as advertised —
     a live instance the original symptom never reached.
 - **F2 — should the deployer INFER the selection instead, so a conditional entry is pulled in when
-  everything it `requires` is selected?** **STILL OPEN. The owner RE-OPENED this fork on 2026-09-04**,
-  declining to close it against their own prior ruling and asking specifically that the OPT-IN
-  inference variant be considered on its merits rather than left as a footnote. It is elevated out of
-  the "missing option" position below and stated as the live alternative it is.
+  everything it `requires` is selected?** **RESOLVED (agent, 2026-09-06, delegated): NO — reject
+  inference in both its automatic and its opt-in forms, which is the direction this spec's own
+  recommendation already carried.** The owner RE-OPENED this fork on 2026-09-04, declining to close it
+  against their own prior ruling and asking specifically that the OPT-IN inference variant be
+  considered on its merits rather than left as a footnote. That consideration is the record below, it
+  is what this mark ratifies, and the alternative stays stated as the live option it was rather than
+  being demoted back to a footnote.
+  - **Why a run may resolve this one.** `memory/guides/BUILD-METHOD.md` M3 ratifies the most
+    feature-rich option that survives its three vetoes. The opt-in build is a new descriptor key or a
+    third `selectable` value, a `resolve_selection` branch, a selfcheck arm and its selftest arms — a
+    NEW PUBLIC SURFACE on the deployer, which veto 2 discards before any of its merits are weighed.
+    Rejection trips no veto: it builds no surface, needs no dependency, widens nothing, and leaves the
+    standing D4 ruling exactly where the owner put it. One survivor, and it is also the option leaving
+    fewest follow-ups open, so the tie-break never runs. **A veto is not a licence to take the vetoed
+    option** — this mark declines the expansion, it does not authorize it, and the park rule does not
+    fire because the survivor is not the vetoed one.
+  - **What this mark does NOT decide.** Whether `resolve_selection` should ever expand is D4's
+    question and stays the owner's. This decides only that THIS unit does not build the expansion,
+    which is what the fork asked. Nothing downstream moves either way: S1 and S2 land byte-identically
+    under both answers, S4 and S5 are `r.fail` assertions that never touch `resolve_selection`, and
+    §3's ban stays scoped to `implied_by` exactly as rev-3 left it.
+  - **The cost argument below is unchanged and is the substance of the answer.** A mechanism with no
+    current member is a mechanism its first member would define, and post-S1/S2 the opt-in rule has
+    zero beneficiaries and zero victims because nothing would carry the declaration. The veto is why a
+    run may write the mark; the cost is why the mark reads NO.
   - **The live alternative — an entry DECLARES itself inferable**, via a new descriptor key or a
     third `selectable` value, and the deployer expands only on that declaration. It is mechanically
     real at this base and that was verified at source rather than assumed: `selectable` is consumed at
@@ -850,6 +872,20 @@ flipping it to a terminal token would let a real open fork through.**
   citation read `check-template-size.sh:103`, a blank line; the measurement is at `:101`, and it
   sits in the paragraph this ruling rests on. The header stamped 2026-09-04 for an edit made on
   2026-09-05, against `TEMPLATE-SPEC.md`'s last-change-date rule.
+
+- rev-5 · 2026-09-06 · **F2 RESOLVED by the unattended run under its delegated resolver authority,
+  and nothing else changed.** The answer is the direction rev-3's recommendation already pointed —
+  reject inference in both forms — but it is now a mark rather than a recommendation, and it records
+  the AUTHORITY as well as the answer. The route is `memory/guides/BUILD-METHOD.md` M3: the opt-in
+  build is a new public surface on the deployer, so veto 2 discards it; rejection trips no veto and is
+  the sole survivor, which is the case M3 ratifies rather than the case it parks. The mark states
+  explicitly what it does not decide — D4's expand-versus-refuse question stays the owner's — because
+  a delegated mark that reads like a governance ruling is the failure mode M3's two bounds exist to
+  prevent. §8's preamble is rewritten from *three of four* to *all four*, and it now says the header's
+  `ratified` token covers three owner marks and one delegated one rather than four owner marks. The
+  header gains `ratified 2026-09-06` and the status stays SPECCED, which is now the accurate pair:
+  every fork carries a conforming mark and no code has been written. No scope item, acceptance
+  criterion, design section or figure moved.
 
 ## 10. Reuse audit
 
