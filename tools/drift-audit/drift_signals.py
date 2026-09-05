@@ -84,13 +84,13 @@ EVIDENCE_GLOBS: list[str] = [
     ":(exclude)*.test.sh",
     ":(exclude)*/selftest.py",
     ":(exclude)*/test_*.py",
-    # FIXTURE DIRECTORIES, not just test FILENAMES. The three lines above name three spellings of
-    # "a test file" and left every fixture tree inside the population this list exists to narrow,
-    # which is the gate-the-instance-not-the-class shape. Re-measured in the same commit.
-    ":(exclude)*/fixtures/*",
-    ":(exclude)*/fixture-*/*",
-    ":(exclude)*.fixture.md",
-    ":(exclude)*.test-template.py",
+    # FIXTURE ANYTHING, in ONE predicate. The three lines above name three spellings of "a test
+    # file"; an earlier revision of this block answered that with four more literal spellings of
+    # "a fixture", which is the same gate-the-instance shape one level along and left two fixture
+    # files inside the population anyway — one of them carrying a dozen real unit ids. A single
+    # substring match over the path covers every spelling the tree uses now and every one it grows
+    # later. Re-measured in the same commit that changed it.
+    ":(exclude)*fixture*",
 ]
 
 # --------------------------------------------------------------------------------------------

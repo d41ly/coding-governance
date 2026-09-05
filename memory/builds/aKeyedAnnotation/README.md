@@ -95,7 +95,7 @@ ids TOOL-aKeyedAnnotation-13
 | [TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-4.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

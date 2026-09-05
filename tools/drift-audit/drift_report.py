@@ -498,11 +498,15 @@ def _local_anchors(ident: str):
     """The LOCAL COPY of the four anchor shapes, for a tree with no recall kit.
 
     UNGUARDED, and said so rather than claimed otherwise. The sibling `_local_ident` IS
-    byte-compared against the extractor by this kit's self-test; these anchor patterns are NOT,
-    because the extractor builds them without the multiline flag this module needs and the two
-    `.pattern` strings are therefore not equal. An earlier revision of this docstring asserted the
-    comparison anyway, which is precisely the "an assertion with no observation behind it" the
-    annotation guide this same build shipped lists as a MUST NOT. An anchor is a line that DEFINES a record, as
+    byte-compared against the extractor by this kit's self-test; these anchor patterns are NOT.
+    MEASURED, because this docstring has now been wrong twice: the flags are EQUAL on all four
+    (`_grammar_anchors` re-compiles the extractor's with the same multiline flag), and two of the
+    four `.pattern` strings are byte-identical. What differs on the other two is escape SPELLING of
+    the same character classes. So a byte-compare would red today on a difference that is
+    cosmetic, and an equivalence compare is a second grammar deciding what "equivalent" means. The
+    first revision asserted a comparison nobody wrote; the second blamed a flag that matches. Both
+    are the "assertion with no observation behind it" this build's own annotation guide bans, which
+    is why this one carries the measurement instead of a reason. An anchor is a line that DEFINES a record, as
     opposed to one that merely cites it, and the distinction is the whole of the signal below — a
     head-anchored id is DEFINED, so a record complaining about a missing unit would silently create
     it. That class is `memory/gotchas/record-citing-a-foreign-id-defines-or-orphans-it.md`.
@@ -549,11 +553,12 @@ def _families_of(conf) -> tuple:
     # extractor builds or the self-test that keeps this copy honest compares two spellings of
     # the same grammar and reports a divergence that is not one.
     # THE SAME RULE THE RECALL CONF USES, and it is not "split on a colon". That reader takes the
-    # part after the LAST colon and keeps only tokens shaped like a family, so a discipline-free
-    # entry and a token carrying a regex metacharacter are both dropped rather than one being
-    # silently admitted here and rejected there. Two readers of one conf that disagree either way
-    # is the recorded class; an unvalidated token also reaches `re.compile` below, where it is a
-    # traceback rather than a named refusal.
+    # part after the LAST colon and keeps only tokens shaped like a family. A discipline-free entry
+    # is therefore ADMITTED by both — `rpartition` returns the whole token when no colon is present
+    # — and that is stated because an earlier revision of this comment claimed both readers dropped
+    # it, which is the opposite of what the same hunk had just made true. What the shape filter
+    # drops is a token that is not family-shaped, including one carrying a regex metacharacter,
+    # which would otherwise reach `re.compile` below as a traceback rather than a named refusal.
     out = []
     for pair in pairs:
         fam = pair.rpartition(":")[2]
@@ -1823,7 +1828,13 @@ def main(argv: list[str] | None = None) -> int:
                 status = f"OVER PIN {s['pin']} — gateable"
             elif s["gateable"]:
                 status = f"ok (pin {s['pin']}" + (", drain it" if s["pin"] else ")") + (")" if s["pin"] else "")
-            elif s["value"] > s["tolerance"]:
+            elif s["value"] > s["pin"]:
+                # AGAINST THE PIN, not the bare tolerance. `pin` defaults to `tolerance` where PINS
+                # declares none, so this changes nothing for a signal without one — but a
+                # report-only signal WITH a pin could otherwise never print a calm status at its own
+                # declared floor. A signal whose only product is its status line was reporting
+                # "out of tolerance" at exactly the value its pin ratifies, which trains a reader to
+                # ignore the column. The two gateable branches above already compare against `pin`.
                 status = "out of tolerance (report only)"
             else:
                 status = "ok"

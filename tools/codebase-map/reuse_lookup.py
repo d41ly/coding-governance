@@ -66,11 +66,20 @@ class Candidate:
     detail: str = ""                # inventory id / owning dossier — human context
 
 
-# MULTI-LINE and COMMENTED arrays are legal TOML and this corpus has both, so the body is stripped
-# of comments before it is split and every token is shape-checked. Without that a `# why` comment
-# was emitted as an id and the real id on the next line was swallowed with it.
+# MULTI-LINE and COMMENTED arrays are legal TOML. This corpus has NEITHER today — measured, and
+# said plainly, because an earlier revision of this comment claimed it had both in the build that
+# shipped the rule against assertions with no observation behind them. The handling is kept anyway:
+# the field is authored by hand, both shapes are legal, and without the strip a `# why` comment was
+# emitted as an id and the real id on the next line was swallowed with it. That is a guard against a
+# shape the corpus may grow, declared as such rather than dressed up as a shape it already has.
 _DECISIONS_RE = re.compile(r"^decisions\s*=\s*\[([^\]]*)\]", re.M | re.S)
-_ID_SHAPE = re.compile(r"^[A-Z][A-Z0-9]{1,11}-[A-Za-z0-9][A-Za-z0-9-]*$")
+# THE AUTHORITY, not a retype of it. This was a hand-copied byte-identical duplicate of the same
+# pattern in `map_lib`, in a module that already imports `map_lib` — a second reader of one rule
+# with nothing comparing the pair, which is the defect this same build fixed one kit over. Taking
+# it from the module also picks up a project override where one is declared, where a copy silently
+# would not: this reader DROPS a token it does not match, so a divergence loses ids in silence
+# where the authority fails loud.
+_ID_SHAPE = m.DEFAULT_DECISION_ID_RE
 
 
 def _dossier_decisions(text: str) -> tuple:

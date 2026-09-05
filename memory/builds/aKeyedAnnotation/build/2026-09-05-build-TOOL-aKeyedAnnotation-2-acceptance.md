@@ -22,9 +22,12 @@
   at 1.
 - AC5 — `python tools/drift-audit/drift_report.py --json` — after this unit the signal reports value
   2 against its pin of 2, with both liveness halves non-empty and live true. The two population
-  figures are DERIVED by that command and not copied here: they moved once during this build, when
-  the closing review found the narrowing named three test-file spellings and left every fixture
-  DIRECTORY inside the population it was written to narrow.
+  figures are DERIVED by that command and not copied here. Only ONE of them can move when the globs
+  narrow — the evidence-file count — and it did, twice, as the closing review tightened the
+  exclusions. The judgeable population counts non-terminal keyed specs and is computed BEFORE any
+  glob is read, so it moves when the grammar changes and never when the population declaration
+  does. An earlier revision of this line credited the narrowing with both, which is the same
+  conflation AC4 exists to keep apart.
 - AC6 — `python tools/drift-audit/selftest.py` — exit 0 with eight new checks present: the five arms,
   their two control halves, and the byte-compare. Every arm observed RED against the mechanism it
   guards, by staging each pre-change form in turn and confirming which arms flipped.
