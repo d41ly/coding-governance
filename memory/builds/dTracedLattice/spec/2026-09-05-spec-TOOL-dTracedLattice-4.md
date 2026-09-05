@@ -1,12 +1,13 @@
 # TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved
 
-**Status:** SPECCED · rev-1 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-5 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-5 |
 
 <!-- /gen:spec-records -->
 
@@ -86,9 +87,14 @@ vocabulary and therefore lands with them. S4 last, recording whatever hole remai
 
 ## 7. Gates
 
-`codebase-map kit selftest` · `kit version markers` · `kit/dogfood doc parity` ·
+`codebase-map kit selftest` · `codebase-map adopter e2e` · `kit version markers` ·
 `kit placeholders (a declared token its adopter substitutes)` ·
 `harness arms (fail branches armed or pinned)`.
+
+`kit/dogfood doc parity` was listed at rev-1 and is dropped: its guard never intersects this unit's
+write set, so naming it claimed coverage the diff cannot trigger. `codebase-map adopter e2e` replaces
+it as the leg whose subject IS the adopter. Both kit-subject legs are HELD on a plain bar and need
+`GATE_SELFTESTS=1`, so a builder running `bash tools/run-gates/run-gates.sh` sees them silently held.
 
 ## 8. Open questions
 
@@ -103,6 +109,8 @@ vocabulary and therefore lands with them. S4 last, recording whatever hole remai
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-2 · 2026-09-05 · folded the round-1 spec audit: M2 (§7 named a leg guarded out of this unit's
+  diff and omitted the leg whose subject is the adopter, and did not say the kit legs are held).
 
 ## 10. Reuse audit
 

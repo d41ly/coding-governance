@@ -43,9 +43,13 @@ defects in the map kit were observed while measuring, none of them about relatio
 - **No unit re-files an existing row.** `TOOL-aScouredKit-16` is AMENDED by unit 1's measurement;
   `TOOL-aProvenReuse-4` records its own refusal and its own cheap shape, and no unit re-proposes it.
   `drift_report.py` flags `live_backlog_rows_per_shard` at 268/4, so findings ride specs, not rows.
-- **Units 2 to 5 are independent of unit 1 and of each other.** Their write sets do not intersect, so
-  M6 clause 1 is satisfied and they may run concurrently. Unit 1 touches `map_lib.py` and
-  `reuse_lookup.py`; unit 2 the gate; unit 3 `map_diff.py`; unit 4 the adopter; unit 5 the conf reader.
+- **The units are SEQUENCED, not concurrent, and an earlier revision of this bullet said the
+  opposite.** The write sets intersect: unit 1 must edit `map_diff.py:204`, which is the only place
+  its own dead-export figure is computed; units 1 and 5 both rewrite `reuse_lookup.py`'s banner; and
+  units 1 and 3 both amend one row of `memory/backlog/TOOL.md`, which M6 clause 3 forbids two passes
+  to touch at all. Clauses 2 and 3 govern here, not clause 1, and the generated build-order block
+  below is the authority. Collisions were removed rather than documented: the `TOOL-aScouredKit-16`
+  amendment belongs to unit 1 alone, and unit 1 owns the banner that unit 5 feeds.
 
 ## Parked decisions
 - **`TOOL-aSurfacedLexicon-2` is SPECCED at order 1 to delete this tree's only AST import resolver** —
@@ -78,18 +82,18 @@ ids TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTrac
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references](spec/2026-09-05-spec-TOOL-dTracedLattice-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-05 |
-| [TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare](spec/2026-09-05-spec-TOOL-dTracedLattice-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-05 |
-| [TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory](spec/2026-09-05-spec-TOOL-dTracedLattice-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-05 |
-| [TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved](spec/2026-09-05-spec-TOOL-dTracedLattice-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-05 |
-| [TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose](spec/2026-09-05-spec-TOOL-dTracedLattice-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-05 |
+| [TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references](spec/2026-09-05-spec-TOOL-dTracedLattice-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare](spec/2026-09-05-spec-TOOL-dTracedLattice-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory](spec/2026-09-05-spec-TOOL-dTracedLattice-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved](spec/2026-09-05-spec-TOOL-dTracedLattice-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose](spec/2026-09-05-spec-TOOL-dTracedLattice-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

@@ -1,12 +1,13 @@
 # TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references
 
-**Status:** SPECCED · rev-1 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 
 <!-- /gen:spec-records -->
 
@@ -29,7 +30,18 @@ scores 14.5% precision overall and 7.2% in the fan-in band that `reuse_lookup` p
 - **S4** Re-declare the wall-clock ceiling for every entrypoint whose cost moves, with the reading
   that justifies it.
 - **S5** Amend `TOOL-aScouredKit-16` in place with the measurement that rejects its second proposal,
-  so the row is not later built as written.
+  so the row is not later built as written. This unit is the ONLY one that edits that row.
+- **S6** Land the scoring instrument as tracked files under `tools/codebase-map/`: the AST
+  ground-truth resolver and the variant harness that AC1 and AC2 are scored by, plus the ground-truth
+  corpus as a FIXTURE rather than as a remembered number. Both exist today only in a scratchpad this
+  build's README already records as unreproducible, so without this item the unit's headline criteria
+  can be satisfied only by assertion.
+- **S7** Update `tools/codebase-map/map_diff.py`, which calls `fan_in` at line 204 and computes the
+  dead-export figure at 207. It is in this unit's write set, not unit 3's, because the signature S1
+  changes is the one that line passes.
+- **S8** Re-derive `SEAM_FANIN_THRESHOLD` against the new metric, or record with the measurement that
+  `3` still means what it meant. Definer subtraction rescales the seam population for all three
+  consumers, and a tuned adopter value does not travel with this fix.
 
 ## 3. Non-goals (OUT)
 
@@ -50,6 +62,13 @@ scores 14.5% precision overall and 7.2% in the fan-in band that `reuse_lookup` p
 and for attribute form, the receiver name. A second pass resolves receiver names to repo modules using
 the import statements already parseable with `ast`. `fan_in` then takes a definer set rather than a
 single `def_file`.
+
+`fan_in` has FOUR call sites in three files, not one: `map_diff.py:204`, `reuse_lookup.py:264` and
+`:274`, and `selftest.py:936`. Each must supply the definer set, and `detect_collisions` is the hard
+case — it sees only the union of base and new rows, never the head symbol table, so it cannot build a
+definer set for the head tree. Either it is given one by its caller or its call keeps the old
+signature behind a named compatibility path; the design picks the former and says so here because a
+silent fallback to the old behaviour at one call site is how a precision fix half-lands.
 
 ### Alternatives rejected
 
@@ -82,11 +101,12 @@ entrypoint, landing dark in the sense that it can be disabled to recover S1-only
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the precision harness is run against the AST resolver over the same 127 rows and 329
-  edges, `fan_in` with S1 scores at least `33.8%` precision at no less than `82.9%` recall, against
-  the shipped `14.5%` / `100%`.
-- **AC2** — When mean absolute error is scored the same way, S1 reports at most `0.46` against the
-  shipped `1.38`.
+- **AC1** — When the harness S6 lands is run over the fixture corpus S6 pins, `fan_in` with S1 scores
+  at least `33.8%` precision at no less than `82.9%` recall, against the shipped `14.5%` / `100%`.
+  Both the harness and the corpus are tracked paths named in S6, so the criterion is scorable by
+  something in the tree.
+- **AC2** — When mean absolute error is scored by that same tracked harness, S1 reports at most `0.46`
+  against the shipped `1.38`.
 - **AC3** — When `python tools/codebase-map/reuse_lookup.py` is run on any query, its output names the
   count of bound and unresolved attribute sites and every unscanned layer, so a reader can tell a
   thin answer from a confident one.
@@ -97,6 +117,11 @@ entrypoint, landing dark in the sense that it can be disabled to recover S1-only
   because an arm pins the measurement that rejects it.
 - **AC6** — When `memory/backlog/TOOL.md` is read, `TOOL-aScouredKit-16` carries the amendment naming
   the rejected half and the measurement that rejected it.
+- **AC7** — When `seed_affordances` is run on the fixture corpus at threshold `3` before and after S1,
+  the seam population is pinned at both readings, so any later change to `fan_in` that moves the seam
+  set reds rather than drifting.
+- **AC8** — When `python tools/codebase-map/map_diff.py --converge` runs after S7, its dead-export
+  figure reports the new population beside the old, so the movement is attributable.
 
 ## 7. Gates
 
@@ -108,10 +133,12 @@ entrypoint, landing dark in the sense that it can be disabled to recover S1-only
 - **Q1 — the `dead_exports` disposition.** S1 grows the fan-in-0 population from 451 to 532, and the
   hint is already weak: it is a bare scalar with no list, and its 451 rows are dominated by 120
   selftest definitions, 13 name-dispatched `cmd_*` handlers and a block of module-private dataclasses
-  that read dead only because `fan_in` subtracts the definition file. Options: re-base the number,
-  narrow the population to actual exports, or retire the hint. RESOLVED (agent, 2026-09-05): narrow
-  the population is out of scope here and becomes a follow-up; this unit REPORTS the new figure beside
-  the old so the movement is attributable, and files nothing.
+  that read dead only because `fan_in` subtracts the definition file. **The follow-up already exists:**
+  `TOOL-aScouredKit-17` owns the dead-export disposition and says it should land with `-16`, the row
+  S5 amends. Its `412` was measured at `093730e4` and reads `451` at `c4fcf5ad`, so its next reader is
+  not comparing two trees. RESOLVED (agent, 2026-09-05): the disposition belongs to
+  `TOOL-aScouredKit-17`; this unit reports the movement per AC8 and declines the co-landing, because
+  narrowing the population is a second mechanism and M2 forbids two mechanisms in one spec.
 - **Q2 — whether S2 pays for its cost.** FACT-QUESTION · the probe is the precision harness of AC1 run
   with and without S2, and the observation that decides it is whether S2's precision exceeds S1's by
   more than the ratio its wall clock grows. LIVENESS: the harness already distinguishes four variants
@@ -121,6 +148,10 @@ entrypoint, landing dark in the sense that it can be disabled to recover S1-only
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice design pass and its skeptic round.
+- rev-2 · 2026-09-05 · folded the round-1 spec audit: B2 (S6 lands the scoring instrument AC1 and AC2
+  are scored by), H1 (§4 names `fan_in`'s four call sites and the `detect_collisions` case), H6 (§8 Q1
+  cites `TOOL-aScouredKit-17`), H7 (S8 re-derives `SEAM_FANIN_THRESHOLD`, AC7 pins the seam
+  population), and B1's reassignment of `map_diff.py` into this unit's write set as S7 with AC8.
 
 ## 10. Reuse audit
 

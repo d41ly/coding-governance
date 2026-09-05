@@ -1,12 +1,13 @@
 # TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare
 
-**Status:** SPECCED · rev-1 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 
 <!-- /gen:spec-records -->
 
@@ -26,6 +27,9 @@ nothing is indistinguishable from a gate that compared and agreed.
 - **S3** Every other conditional tier in the same function gets the same treatment, found by reading
   the function rather than by fixing the one instance — the class, not the instance.
 - **S4** The gate's own header states what it does not check, per `AGENTS.md` §7.
+- **S5** `tools/codebase-map/test_codebase_map.template.py` is an explicit write target. It is
+  byte-identical to the installed gate today and no leg compares the pair, so editing one without the
+  other ships a divergence silently.
 
 ## 3. Non-goals (OUT)
 
@@ -74,9 +78,14 @@ and needs its failing case observed on a fixture that has a committed artifact a
   FAILS naming the tier, and this arm is observed RED before the fix lands.
 - **AC3** — When `tools/codebase-map/test_codebase_map.py` is read, its header states which staleness
   classes it does not detect.
-- **AC4** — When every conditional tier in `test_generated_artifacts_are_fresh` is enumerated, each
-  one reports run-or-skipped, verified by an arm that removes a tier's population and greps the
-  output for that tier's name.
+- **AC4** — When a tier is ADDED to `test_generated_artifacts_are_fresh` with a conditional
+  population, it reports run-or-skipped without its author writing a reporting line, verified by an
+  arm that introduces a second conditional tier in a fixture and asserts the output names it. The
+  criterion is written this way deliberately: `test_codebase_map.py:141` is the ONLY conditional tier
+  today, so an enumeration criterion would grade a population of one and could not fail.
+- **AC5** — When `tools/codebase-map/test_codebase_map.py` and `test_codebase_map.template.py` are
+  compared after this unit lands, they are byte-identical, asserted by a selftest arm — gov is not an
+  adopter here, since its `GATE_FILE` points inside the kit directory.
 
 ## 7. Gates
 
@@ -95,6 +104,9 @@ and needs its failing case observed on a fixture that has a committed artifact a
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round, which staged the break
   and observed the gate pass with the symbol tier absent.
+- rev-2 · 2026-09-05 · folded the round-1 spec audit: H2 (AC4 graded a population of one and could not
+  fail; restated as an added-tier criterion) and M1 (S5 and AC5 make the template twin a write target
+  with an arm comparing the pair, which Q1 assumed and nothing enforced).
 
 ## 10. Reuse audit
 

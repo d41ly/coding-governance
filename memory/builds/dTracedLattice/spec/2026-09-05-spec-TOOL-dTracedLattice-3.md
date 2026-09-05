@@ -1,12 +1,13 @@
 # TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory
 
-**Status:** SPECCED · rev-1 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 
 <!-- /gen:spec-records -->
 
@@ -24,10 +25,14 @@ describe it as tracked and shipping to adopters, and all three are false at HEAD
   `gate-ledger.tsv` and `recall/queries.jsonl`. §8 carries the fork.
 - **S2** Whichever disposition wins, `--converge` leaves the worktree in a state the memory-hygiene
   gate and `git status` both expect — no untracked file appearing inside a gated directory.
-- **S3** Correct `TOOL-aScouredKit-16`'s three false clauses in place, since a backlog row is mutable
-  and this one is cited as authority for work in this build.
-- **S4** State in the kit README that nothing invokes `--converge` on this tree, so a reader does not
-  infer that the convergence loop runs.
+- **S3** Supply the three corrections `TOOL-aScouredKit-16` needs — it is not tracked, the fiction is
+  not permanent, it does not ship to adopters — to `TOOL-dTracedLattice-1`, which is the ONLY unit
+  that edits that row. Two units amending one backlog row is what M6 clause 3 forbids, and rev-1 had
+  both doing it.
+- **S4** State in the kit README the TRUE claim, which is narrower than rev-1's: no gate leg and no
+  hook runs `--converge` as a merge-bar step. It is not unreferenced — `WIRE-INTO-PROJECT.md`
+  prescribes it, `reuse-lookup.agent.md:59` prescribes it to an agent at review time, and
+  `selftest.py:220` invokes it as a refusal arm.
 
 ## 3. Non-goals (OUT)
 
@@ -67,15 +72,22 @@ cites it. S1 and S2 after the fork resolves.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/codebase-map/map_diff.py <range> --converge` runs in a clean fixture
-  worktree, `git status --porcelain` is empty afterwards, and this arm is observed RED before the fix.
+- **AC1a** — Whichever way Q1 lands: when `python tools/codebase-map/map_diff.py <range> --converge`
+  runs in a clean fixture worktree, no UNTRACKED file appears inside `memory/map/`, and this arm is
+  observed RED before the fix.
+- **AC1b** — Under the outside-the-worktree branch of Q1 only: `git status --porcelain` is empty after
+  that run. This criterion is marked branch-specific because rev-1 stated it unconditionally, which
+  pre-committed a fork §8 reserves to the owner — under the tracked-artifact branch the file is a
+  tracked modification and porcelain is correctly non-empty.
 - **AC2** — When the run produces zero flags, no `reinvention-backlog.md` is created.
 - **AC3** — When the run produces flags, the stdout of `map_diff.py --converge` names the path it
   wrote them to.
-- **AC4** — When `memory/backlog/TOOL.md` is read, `TOOL-aScouredKit-16` no longer claims the backlog
-  is tracked, that the fiction is permanent, or that it ships to adopters.
-- **AC5** — When `tools/codebase-map/README.md` is read, it states that no gate leg or script invokes
-  `--converge` in this repository.
+- **AC4** — When `TOOL-dTracedLattice-1` lands, `memory/backlog/TOOL.md`'s `TOOL-aScouredKit-16` row
+  no longer claims the backlog is tracked, that the fiction is permanent, or that it ships to
+  adopters. This unit supplies the wording per S3 and does not edit the file.
+- **AC5** — When `tools/codebase-map/README.md` is read, it states that no gate leg and no hook runs
+  `--converge` as a merge-bar step, and names `WIRE-INTO-PROJECT.md` and `reuse-lookup.agent.md` as
+  the places that DO prescribe it at review time.
 
 ## 7. Gates
 
@@ -88,15 +100,25 @@ cites it. S1 and S2 after the fork resolves.
   shipped to adopters, at the cost of a new generated file under the freshness contract and a file
   that grows monotonically. Outside the worktree — under the git common dir, beside `gate-ledger.tsv`
   — keeps the tree clean and matches how this repo already stores per-run records, at the cost of
-  rows that no review ever sees and that do not travel between nodes. Recommendation: outside the
-  worktree, because the rows are a per-run report rather than a shared record, and because nothing
-  currently runs `--converge` so no durable corpus is being lost. NOT RESOLVED — this changes a kit's
-  shipped output contract, which is veto 2 in `memory/guides/BUILD-METHOD.md` M3, so it is an owner
-  turn.
+  rows that no review ever sees and that do not travel between nodes. A third option the first
+  decision saw: keep the durable destination and TRACK it, which is what F7 chose.
+
+  **This is a REVERSAL of a landed decision, not an open choice.** `bConvergentLodestar` F7 posed this
+  question, decided for the durable deduped destination, and BUILT it as `append_backlog`. Neither
+  rev-1 of this spec nor the dossier named that, which made a decided fork look open. The honest case
+  for reversing is an observation about practice rather than a defect in F7's reasoning: the rows have
+  never been reviewed by anyone, because the file has never existed. NOT RESOLVED — reversing a landed
+  decision AND changing a kit's shipped output contract is veto 2 in `memory/guides/BUILD-METHOD.md`
+  M3, so it is an owner turn.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-2 · 2026-09-05 · folded the round-1 spec audit: B1 (S3 hands the backlog amendment to unit 1
+  rather than editing the same row), H3 (AC1 split into a branch-neutral AC1a and a branch-specific
+  AC1b so no criterion pre-commits Q1), H4 (S4 and AC5 narrowed to the true claim, three tracked files
+  having falsified the rev-1 wording), H5 (Q1 names `bConvergentLodestar` F7 and restates itself as a
+  reversal, with the third option restored).
 
 ## 10. Reuse audit
 
