@@ -20,7 +20,12 @@ therefore not the integration the question implied. It repairs the reader that e
 validated field that already owns the code-to-decision link, and writes the convention down once.
 
 ## Expected improvements
-- The one source citation resolving to no record is repaired, and its comment survives the id.
+- BOTH source citations resolving to no record are repaired, and each comment survives its id.
+  This said ONE, which was true only of the product-source population the design pass had
+  measured: a second sits in a test file, and unit 3's signal reads the whole tracked
+  non-memory tree, so it reports two. Both blocks now name their evidence in prose and carry
+  the id on a trailing line of its own, which is the delete-the-id test the dangling one had
+  been failing for its entire life.
 - The repo has one id regex rather than two, and a `.test.sh` citation stops certifying a spec as
   shipped.
 - The dossier `decisions` field stops being a validated inert key nothing fills.
