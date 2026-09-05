@@ -77,7 +77,7 @@ validated field that already owns the code-to-decision link, and writes the conv
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 4 unit(s) · node a · opened 2026-09-05 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-09-05 · streams tooling
 ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8 TOOL-aKeyedAnnotation-9 TOOL-aKeyedAnnotation-10 TOOL-aKeyedAnnotation-11
 
 <!-- gen:build-units -->
@@ -86,10 +86,10 @@ ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL
 | [TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-1.md) | 1 | 2 | CLOSED | rev-7 | 2026-09-05 |
 | [TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-2.md) | 2 | 2 | CLOSED | rev-7 | 2026-09-05 |
 | [TOOL-aKeyedAnnotation-3 — a report-only signal for a source-cited id that resolves to no record](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-05 |
-| [TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-4.md) | 4 | 2 | OPEN | rev-5 | 2026-09-05 |
+| [TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-4.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
