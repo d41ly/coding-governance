@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself
 
-**Status:** OPEN · rev-2 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
+**Status:** OPEN · rev-3 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -23,24 +23,48 @@ reader before anything else is built on it.
 ## 2. Scope (IN)
 
 - **S1** Replace the hand-typed `_OWN_ID` pattern in `tools/drift-audit/drift_report.py` with one
-  built from the shipped id grammar the recall extractor owns, keeping both capture groups: group 1
-  the unit id, group 2 the slug. The session era in the shipped grammar admits a trailing lowercase
+  built from the shipped id grammar the recall extractor owns — via the extractor's per-root grammar
+  ACCESSOR, bound to the tree being classified, and never the module-level constants, which bind at
+  import to the repo the KIT lives in. `memory/gotchas/grammar-bound-to-the-wrong-root.md` records
+  the measured incident and names that accessor as the fix, one accessor and no second grammar. The
+  hazard is live inside this unit's own harness: the kit self-test copies the report into a scratch
+  tree carrying fixture ids and no memory-tree conf, which is exactly where a wrongly-bound grammar
+  reports a confident zero, and two of the criteria below run there. Keep both capture groups: group
+  1 the unit id, group 2 the slug. The session era in the shipped grammar admits a trailing lowercase
   correction suffix that the hand-typed digits-then-boundary form cannot match; adopting the shipped
   grammar inherits that fix rather than re-deriving it.
 - **S2** Give the shipped-evidence oracle its own narrower globs, on the same reasoning already
   written beside the trace globs in `tools/drift-audit/drift_signals.py`: a citation from a test file
   is the house's own bookkeeping certifying the bookkeeping. The narrowing is declared beside the
-  existing one, never inlined at the call site.
+  existing one, never inlined at the call site — and in BOTH carriers the trace globs already use.
+  `drift_signals.py` is the kit descriptor's `role = "project-owned"` file; the `role = "seed"` file
+  adopters actually receive is `tools/drift-audit/drift_signals.template.py`, which carries the trace
+  globs as an empty row with its own documentation block. A declaration added only to the first
+  reaches this repo and nobody else, so every copy-installed drift-audit would keep the
+  self-certifying oracle this unit exists to correct while the kit README advertises the correction.
+  The template row ships EMPTY, and the reader takes the name with getattr-and-fallback to the
+  product globs exactly as the trace globs do, so an older adopter's project layer does not trip the
+  required-attribute check.
 - **S3** Stop the pin comment in `drift_signals.py` from spelling the ids it counts. Verified at this
   base: `drift_signals.py` is itself in the citation set returned for BOTH pinned ids, so the pin
   cannot be drained by removing the annotations it describes. Route the reader to the report's own
   detail output instead of naming the ids in a file inside the population.
 - **S4** Re-measure the pin in the same commit as the change, and record what moved and why beside it.
-  S1, S2 and S3 each move the population independently.
+  MEASURED AT THIS BASE, and stated here so a builder is not misled by it: S1, S2 and S3 are each
+  expected to move the value by ZERO on this corpus, because both pinned ids keep non-test product
+  citations that none of the three touches. The recorded line must SAY so. Three identical readings
+  are then a confirmed result rather than evidence the change did not work — which is how the earlier
+  wording here, that each step moves the population independently, would have been read.
 - **S5** A regression arm per change, in the kit's existing self-test, each observed RED before it is
   wired: a correction-form spec header that the old pattern scores unkeyed; a spec cited only from a
-  test file; and, for S3, deleting the two real product annotations and asserting the population
-  actually reaches zero.
+  test file; and, for S3, a scratch tree with EVERY remaining product citation of both pinned ids
+  deleted — the set enumerated by the invocation AC4 prints, never a count typed into this spec —
+  asserting the signal's VALUE reaches zero while its judgeable population does not.
+- **S6** A SECOND liveness half, owned by the narrowed declaration: the count of tracked files those
+  globs actually resolve to. The signal's existing half counts non-terminal keyed SPECS and is
+  computed before any glob is read, so a glob set matching nothing leaves it live and full-sized
+  while the value falls to zero — the reassuring zero, wearing a live flag. Only a count of what the
+  narrowed globs resolve to can see that hazard.
 
 ## 3. Non-goals (OUT)
 
@@ -65,8 +89,11 @@ returning.
 
 ### Inventory
 
-Three sites: the pattern definition, the oracle's grep call, and the pin comment. The globs
-declaration joins the existing one in the signals module, not the report module.
+Four sites: the pattern definition, the oracle's grep call, the pin comment, and the globs
+declaration — which lands TWICE. It joins the existing declaration in the project-owned signals
+module, not the report module, AND ships as an empty documented row in that module's seed template,
+which is the copy adopters receive. The trace globs already ship in exactly that pair, so this
+follows a precedent rather than inventing one.
 
 ### Migration
 
@@ -86,12 +113,20 @@ arguably INPROGRESS — is real and a later reader needs it.
 - perf / scale — the greps are per-spec and already run; narrowing the globs can only shrink them.
 - a11y — N/A.
 - i18n — N/A.
-- error / empty / loading states — the signal already carries a liveness half; S2 must not shrink the
-  judgeable population to zero, and §6 asserts it stays non-empty.
+- error / empty / loading states — the signal's EXISTING liveness half cannot see S2's hazard, and
+  saying otherwise was the defect. It counts non-terminal keyed specs before any glob is read, so a
+  narrowed set matching nothing leaves it True at full size while only the value falls. S6's second
+  half is the control that can see it, and §6 asserts both — the judgeable population stays
+  non-empty, and emptying the declaration makes the signal report itself dead.
 - observability — the report prints the population and the pin on every run; that is the observation.
 - risks — the real hazard is a silent population collapse: a narrowed glob that matches nothing
-  reports a reassuring zero. The liveness assertion is the control.
-- testing + left-shift gates — three regression arms, each observed RED first. No new leg.
+  reports a reassuring zero. S6's second liveness half is the control; the pre-existing one is not,
+  and §6 asserts the difference by emptying the declaration in a scratch tree.
+- testing + left-shift gates — four regression arms, each observed RED first, plus two left-shifts
+  the round-1 audit named and this unit owns: a self-test arm that, for EVERY signal whose
+  declaration is a glob set, empties that declaration and asserts its liveness flag goes False —
+  which gates the class rather than this instance — and a ban-grep so no module outside the recall
+  extractor imports its module-level grammar constants. No new leg.
 - migration / rollback — pure revert; the pin value moves with the code that changed it.
 - user docs — the kit README records both corrections it already carries; this adds the third.
 
@@ -105,15 +140,31 @@ arguably INPROGRESS — is real and a later reader needs it.
   shipped-evidence signal does not count it; when the same id is cited from a product file, it does.
 - **AC3** When `git grep -l -w -F` is run for each id named by the pin comment after this unit, the
   file holding that comment is not in the result.
-- **AC4** When the two real product annotations for the pinned ids are removed in a scratch tree and
-  `python tools/drift-audit/drift_report.py --check` is run, the
-  signal's population reaches zero — proving the pin is drainable, which it is not at this base.
+- **AC4** When, in a scratch tree, EVERY remaining product citation of both pinned ids is deleted and
+  `python tools/drift-audit/drift_report.py --check` is run, the shipped-evidence signal's VALUE
+  reaches zero while its judgeable population stays at its measured size. The criterion PRINTS the
+  `git grep -l -w -F` invocation over the narrowed globs that enumerates the set, so the population
+  is derived at run time and no count is typed here. The value is what citations move; the judgeable
+  population counts non-terminal keyed specs and nothing done to annotations touches it, which is
+  what lets AC5 demand that same number stay non-empty without contradicting this one.
 - **AC5** When `python tools/drift-audit/drift_report.py --check` is run after this unit, the
-  shipped-evidence signal reports a live, non-empty judgeable population, and its pin equals the
-  re-measured value with the movement recorded beside it.
-- **AC6** When `python tools/drift-audit/selftest.py` is run it exits 0 with the three new arms
+  shipped-evidence signal reports a live, non-empty judgeable population AND a non-empty count of the
+  files its narrowed globs resolve to, and its pin equals the re-measured value with the movement
+  recorded beside it.
+- **AC6** When `python tools/drift-audit/selftest.py` is run it exits 0 with the four new arms
   present, and each arm has been observed failing against the pre-change code.
 - **AC7** When `bash tools/run-gates/run-gates.sh` is run on this unit's commit it is green.
+- **AC8** When the narrowed glob declaration is emptied in a scratch tree and
+  `python tools/drift-audit/drift_report.py --check` is run, the shipped-evidence signal reports
+  itself DEAD rather than reporting zero findings. Observed RED against the pre-change code, where
+  the same emptying yields a live zero.
+- **AC9** When `python tools/drift-audit/selftest.py` is run against a scratch fixture declaring an
+  id FAMILY this repo does not declare, the new pattern classifies that fixture's ids — proving the
+  grammar is bound to the tree under test and not to the kit's own repo. Observed failing against a
+  module-constant binding.
+- **AC10** When the seed template is read after this unit it carries the narrowed-glob row empty with
+  its documentation block, and a scratch adopter tree whose project layer declares neither name still
+  runs `python tools/drift-audit/drift_report.py --check` without a required-attribute refusal.
 
 ## 7. Gates
 
@@ -153,6 +204,7 @@ No new leg.
 
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
+- rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
 
 ## 10. Reuse audit
 

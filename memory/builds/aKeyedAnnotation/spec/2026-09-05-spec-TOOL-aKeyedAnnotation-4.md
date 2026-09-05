@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only
 
-**Status:** OPEN · rev-2 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
+**Status:** OPEN · rev-3 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -15,23 +15,51 @@
 ## 1. Goal
 
 The code-to-decision link this build was asked to invent already exists: every codebase-map dossier
-carries a required, shape-checked `decisions` list of unit ids. Measured at this base, most dossiers
-declare it empty, no consumer reads it, it appears in neither generated artifact, and the scaffolder
-seeds a new dossier with an empty one. Make it live, so an orienting agent running the reuse audit
-gets the seam AND the reasoning behind it.
+carries a required, shape-checked `decisions` list of unit ids. Measured at this base, 17 of 20
+dossiers declare it empty and the scaffolder seeds a new one empty. ONE consumer reads it —
+`tools/codebase-map/map_diff.py` prints the first few ids per feature in the range digest — and the
+orientation path this build cares about, the reuse audit, does not. An earlier draft of this
+sentence said no consumer reads it at all, which the tree refutes and which would have made the
+unit's causal story rest on a false premise. Make the field live on the reuse-audit path too, so an
+orienting agent gets the seam AND the reasoning behind it.
 
 ## 2. Scope (IN)
 
-- **S1** The reuse audit prints a dossier-sourced candidate's `decisions` ids. The dossier loader in
-  `tools/codebase-map/reuse_lookup.py` already has the parsed dossier in hand and the candidate
-  already carries a human-context detail field; this extends that field rather than adding one.
+- **S1** The reuse audit prints a dossier-sourced candidate's `decisions` ids, read from the dossier
+  TEXT the module already loads and carried in a NEW candidate field printed on its own line. Both
+  premises an earlier draft stated here were false against the file. That module loads dossier text
+  WITHOUT parsing the toml claims, deliberately — its header declares it portable, needing no
+  project-side extractor — so reaching for the parsed `decisions` tuple would drag in exactly the
+  project code the module disclaims. And its `detail` field is a single OVERLOADED string branched on
+  per source to resolve a candidate back to its dossier or inventory, so extending it corrupts that
+  branch. A front-matter read of the already-loaded text costs neither. S1 states the truncation
+  policy explicitly: print every id, where the range digest truncates to the first few, because the
+  audit's reader is deciding whether to extend a seam and a hidden id is a hidden reason.
 - **S2** A new CHECK inside the existing codebase-map test module, not a new leg: the count of
   dossiers whose `decisions` list is empty, pinned shrink-only. The manifest records that a check
   inside an existing gate is far cheaper than a leg, and the leg that carries it is unguarded and
-  among the cheapest on the bar.
-- **S3** The pin is MEASURED on this corpus and recorded with its reading beside it. An adopter
-  scaffolding the kit gets the row with no value, the way the kit's other measured pins ship — a
-  number copied from this tree is either vacuous or permanently red elsewhere.
+  among the cheapest on the bar. **That module is a byte-identical PAIR and the check lands in the
+  TEMPLATE**, `tools/codebase-map/test_codebase_map.template.py`, with the dogfood copy re-copied in
+  the same commit — the template is what the kit's adopter script installs, so a check landing only
+  in the dogfood copy is run by this repo and received by no adopter, while §5 ships a kit-README
+  line claiming the field is graded. Nothing on the bar compares the two files: the memory-tree
+  parity leg's pair list covers only that kit's docs, so codebase-map has no parity leg at all, and
+  the copy relation can end silently. A sibling build makes the template an explicit write target for
+  this same reason.
+- **S3** The pin is MEASURED on this corpus — 17 empty of 20 dossiers at this base — and recorded
+  with its reading beside it. An adopter scaffolding the kit gets the row with no value: a number
+  copied from this tree is either vacuous or permanently red elsewhere. The kit conf carries no other
+  measured pin today, so this is the first rather than one more of a set, and an earlier draft
+  claiming otherwise is corrected in §8.
+- **S8** SHRINK-ONLY NEEDS A MECHANISM, and naming it in a comment is not one. The only mechanism in
+  this repo is a ratchet row in the drift-audit signals module, read during that report's check pass,
+  which reds a raise unless a nearby marker spells the old and new values. Without one, anyone raises
+  the number with no justification and no gate — the invisible-raise defect that ratchet was built to
+  close — and §4's claim that the pin converts "legal" into "declining" does not hold. This unit
+  lands that row naming the kit conf and the new key, and records what an adopter WITHOUT drift-audit
+  gets: a declared pin and no enforcement, which is a documented gap rather than a silent one. The
+  kit's own registry idiom under the map root was not taken because it exempts NAMED subjects from a
+  rule, where this is a COUNT that must decline; the two are not interchangeable.
 - **S4** The scaffold template in `tools/codebase-map/gen_map.py` stops emitting an empty list as the
   finished state. It either emits the key with a comment naming what belongs there, or the check's
   message names the scaffold as the source when a fresh dossier trips it — whichever keeps the
@@ -64,9 +92,11 @@ parse time. What changes is that something reads it and something grades how man
 ### The vacuous-selector shape being closed
 
 An empty list passes validation, so nothing has ever failed on the field, so nobody fills it, so the
-reuse audit returns a seam with no rationale. That is the repo's own vacuous-selector class: a rule
-that binds nothing reports clean forever. The shrink-only pin is what converts "legal" into
-"declining", and it is the same idiom the memory-tree kit already uses for its orphan population.
+reuse audit returns a seam with no rationale — and the one consumer that does read it, the range
+digest, prints an empty clause for 17 of 20 features. That is the repo's own vacuous-selector class:
+a rule that binds nothing reports clean forever. The shrink-only pin converts "legal" into
+"declining", and it is the same idiom the memory-tree kit already uses for its orphan population —
+but only once S8's ratchet row exists, because a pin with no ratchet behind it is a comment.
 
 ### Rollout
 
@@ -108,6 +138,7 @@ copy with no cross-language consumer.
   those ids, and one from an empty dossier prints no decisions clause rather than an empty one.
 - **AC2** When `python tools/codebase-map/test_codebase_map.py` is run, the new check reports the
   measured count of empty-`decisions` dossiers against a pin equal to that measurement, and exits 0.
+  The check itself is authored in the template sibling and copied to this path, per S2.
 - **AC3** When the `decisions` list is blanked on the dossier that carries several ids today, the
   check REDS; when restored, it exits 0. Observed before the check is wired, per S6.
 - **AC4** When `python tools/codebase-map/test_codebase_map.py` is run against a map root holding no
@@ -119,6 +150,17 @@ copy with no cross-language consumer.
   resolves to a record that genuinely governs that dossier's feature — recorded per id in the unit's
   acceptance ledger, not asserted in bulk.
 - **AC7** When `bash tools/run-gates/run-gates.sh` is run on this unit's commit it is green.
+- **AC8** When `python tools/codebase-map/reuse_lookup.py` is run in a scratch tree with the
+  project-side extractor REMOVED, it still runs and still prints the decisions line — the observation
+  that proves S1 preserved the module's declared portability instead of quietly ending it. A declared
+  property with no arm asserting it is a comment.
+- **AC9** When the new pin is raised in the kit conf with no old-to-new marker beside it and
+  `python tools/drift-audit/drift_report.py --check` is run, the `drift-audit records` signal REDS;
+  with the marker present it does not. Observed both ways, which is what makes S8's ratchet row a
+  mechanism rather than a claim.
+- **AC10** When `cmp tools/codebase-map/test_codebase_map.py tools/codebase-map/test_codebase_map.template.py`
+  is run after this unit it reports the two files identical — the observation that catches a check
+  landing in one copy and not the other, which nothing else on the bar would notice.
 
 ## 7. Gates
 
@@ -157,6 +199,7 @@ runs, and that leg is unguarded so it runs on every bar.
 
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
+- rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
 
 ## 10. Reuse audit
 

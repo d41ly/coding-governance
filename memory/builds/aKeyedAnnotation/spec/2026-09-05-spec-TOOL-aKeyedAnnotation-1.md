@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs
 
-**Status:** OPEN · rev-2 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -27,6 +27,12 @@ Every later unit writes comments that must obey it, so it lands first.
   backticked path against `git ls-files`, and its waiver registry is shrink-only, so a spec cannot
   name the file its own unit creates without redding a leg nobody may waive. Choose the names at
   build time, mirroring the build-method pair.
+  **The new TEMPLATE must not contain the literal build-method filename anywhere.** Two files keep a
+  hand-written exclusion list over exactly that literal — the seeder block in
+  `tools/memory-tree/adopt-memory-tree.sh` and the gate `tools/memory-tree/check-method-carriers.sh`,
+  which is `subject = repo` with no guard and therefore runs on every bar in every adopting tree.
+  Spelling the literal would need a skip case in BOTH, which is the same rule in two hand-kept
+  spellings; not spelling it needs neither.
 - **S2** The guide carries exactly four things and nothing else: the MUST / MAY / MUST NOT list; the
   three dispositions under which a number is safe in a comment (frozen by its conditions, gated by a
   pin, pointed at its owner); the delete-the-id test; and the statement that annotation is voluntary,
@@ -39,11 +45,30 @@ Every later unit writes comments that must obey it, so it lands first.
   comment and the id is a trailing pointer. Each block must read completely with its id deleted.
   The ids belong to another node's build and its records were never written, so this unit repairs
   the PROSE and files the missing records as a backlog row rather than inventing them.
+  **THAT ROW MAY SPELL NO ID OF THE FOREIGN BUILD, ANYWHERE, AND THE CONSTRAINT IS NOT STYLISTIC.**
+  A backlog row's head is an ANCHOR under the recall extractor's dash rule, so an id there DEFINES
+  it — which resolves it, and unit 3's report-only signal needs it to resolve to nothing, so the row
+  would quietly delete that unit's only real finding. An id in the row's BODY is a bare citation
+  instead, and the memory-tree orphan check counts cited-never-defined against a pin sitting at zero
+  with a waiver file empty by its own declaration, so the bar reds; raising that pin trips the
+  shrink-only ratchet row that marks it. AC6's green bar cannot hold either way. The only escape the
+  design pass measured is to name the foreign BUILD and its SEQ RANGE in prose, which no grammar
+  matches. The row is minted under one of this build's own reserved ids.
 - **S5** Delete the mechanism paragraphs that two gotcha records absorbed verbatim from call-site
   comments, leaving each record its class name, its frozen incident and its reach. The design pass
   names both records and establishes direction from git.
 - **S6** Register the guide as a method carrier if and only if the kit's carrier registry demands it;
   read `tools/memory-tree/adopt-memory-tree.sh` for whether a second guide joins that population.
+- **S7** A rendered memory-tree guide is declared in THREE carriers beyond the render line, and all
+  three are in scope: a `[[files]] role = "rendered"` stanza in `tools/memory-tree/kit.toml` carrying
+  `to` and `placeholders` — without it the template falls to the catch-all `role = "engine"` and
+  ships to adopters with no render destination; a fourth row in the hand-kept `PAIRS` literal in
+  `tools/memory-tree/kit-dogfood-parity.test.sh` — without it the dogfood copy may diverge from its
+  template forever while the leg prints green; and the new rendered path in that leg's `guard` list
+  in `tools/gate-legs.json`, which today names the three existing rendered paths explicitly. The
+  decision log records this same registration verbatim for the build method, and `kit.toml` already
+  carries a comment recording the same two-carrier miss, so this is a documented failure repeated
+  rather than a novel one.
 
 ## 3. Non-goals (OUT)
 
@@ -67,8 +92,11 @@ one document a session already loads.
 ### Rollout
 
 The kit's adopter script renders the build-method guide from a template beside it. The annotation
-guide rides that seam exactly: one template file, one render line, and whatever the carrier registry
-requires. Nothing else in the kit changes.
+guide rides that seam — one template file and one render line — plus the three declaration carriers
+S7 names: the rendered-role stanza in the kit descriptor, the parity leg's hand-kept pair list, and
+that leg's guard in the gate manifest. Nothing BEYOND those changes. The earlier wording here said
+"nothing else in the kit changes", which was false in three places and is exactly the assert-over-
+derive shape the round-1 audit found running through this whole spec set.
 
 ### Alternatives rejected
 
@@ -91,7 +119,13 @@ everywhere.
   S3 is the control, and §6 asserts it by name.
 - testing + left-shift gates — no new leg. The existing memory-hygiene and kit-version legs grade the
   files this unit touches; a new leg for a prose guide would be the structural-check-reads-as-semantic
-  shape the charter warns about.
+  shape the charter warns about. Two left-shifts the round-1 audit named and this unit owns: extend
+  the existing dangling-citation gotcha record with the backlog-row disposition — head defines, body
+  orphans, prose escapes — so the class is SELECTED before such a row is written rather than after
+  the bar reds; and add a bug-class row for the criterion shape this audit found five times, that an
+  acceptance criterion stating a numeral over a derived population must name the command deriving it,
+  must assert on the field that command actually moves, and must not hold unchanged when its scope
+  item is skipped.
 - migration / rollback — the guide is additive; deleting it restores the prior state exactly. The two
   record deletions are ordinary reverts.
 - user docs — the guide IS the doc.
@@ -111,9 +145,20 @@ everywhere.
 - **AC4** When each repaired block in `tools/unattended/lib-unattended.sh` and
   `tools/unattended/unattended.test.sh` is read with its trailing id removed, its evidence is still named
   and the paragraph still states the incident it records.
-- **AC5** When `python tools/memory-tree/gotchas.py --check` is run after the two record deletions it
-  exits 0, and each edited record still carries its class name and its incident.
+- **AC5** When each of the two edited gotcha records is read after this unit, the specific mechanism
+  paragraphs S5 names are ABSENT — named sentence by sentence in the unit's acceptance ledger, so the
+  criterion observes the removal rather than the residue — while each record still carries its class
+  name, its frozen incident and its reach. `python tools/memory-tree/gotchas.py --check` exits 0,
+  which is an invariant across the change and is therefore recorded as a guard, never as the proof.
 - **AC6** When `bash tools/run-gates/run-gates.sh` is run on this unit's commit it is green.
+- **AC7** When `bash tools/memory-tree/kit-dogfood-parity.test.sh` is run after this unit it reports
+  one more pair than it does at this base — a count the test already prints — and editing the
+  rendered guide away from its template REDS it. Both observed.
+- **AC8** When `bash tools/memory-tree/check-method-carriers.sh` is run after this unit it is green,
+  with no skip case added to either of the two files that keep an exclusion list.
+- **AC9** When `python tools/memory-tree/corpus_ids.py --report` is run after the backlog row lands,
+  the orphan count is 0 and the definitions set for the foreign build's seq range is unchanged from
+  this base — the observation that proves S4's prose-only constraint was actually honoured.
 
 ## 7. Gates
 
@@ -149,6 +194,7 @@ typed here. No new leg.
 
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
+- rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
 
 ## 10. Reuse audit
 
