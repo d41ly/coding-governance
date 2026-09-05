@@ -1178,6 +1178,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "empty_spine_diagnosis",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
       "id": "ensure_cache",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -3433,6 +3438,11 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_durable_derives_families",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_empty_alias",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -3451,6 +3461,11 @@
       "id": "test_empty_graded_set_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_empty_spine_is_loud",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_every_inventory_key_is_claimed_or_baselined",
@@ -3719,6 +3734,16 @@
     },
     {
       "id": "test_skill_drift_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_spine_flat_layout",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_spine_nested_layout",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },

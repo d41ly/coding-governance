@@ -47,6 +47,17 @@ floor on the merge bar.
 - **`bench.py` and `union.py` are byte-pinned** in `verbatim.json` and asserted by `selftest.py`. The
   floor gate therefore IMPORTS their scoring functions rather than extending them; `bench.py` always
   returns 0 and its flag set is closed, so the exit code has to live somewhere else.
+- **`DURABLE` admits BOTH memory layouts, and its family alternation is DERIVED.** The `spine` set is
+  the definition-home filter over `records`, and its pattern takes the directory segment below the
+  root as OPTIONAL — upstream's tree is `<root>/<dir>/DECISIONS.md`, this kit's own adopter writes a
+  FLAT `<root>/DECISIONS.md`, and a pattern requiring the segment matched nothing here. Measured
+  before the fix: 0 files of 1325; after: 9 index files, and `spine` went 0 documents to 755. An
+  index named for an id FAMILY is admitted beside `DECISIONS`/`BACKLOG`, and that alternation is
+  built from `CONF.families` rather than typed, so an adopter's prefixes are their own.
+- **An empty `spine` beside non-empty `records` ANNOUNCES itself** on stderr and exits 0, matching
+  `zero_record_diagnosis` rather than inventing a second shape. Unlike zero records, that state has
+  no honest reading: records exist, so the root and the id grammar both work, and the only remaining
+  cause is a pattern describing a layout the tree does not have. It was silent for a month.
 - **The graded corpus is the SERVED corpus.** `extract.CHUNK_MAX` is 2400 and the live index is built
   at 600, so `check-recall.py` imports `query.CHUNK_MAX` rather than restating it — grading at the
   extractor's default would pin a substrate no session is served.

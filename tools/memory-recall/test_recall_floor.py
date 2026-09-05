@@ -258,12 +258,18 @@ def test_all_miss_fixture():
 
 @check("an EMPTY graded set refuses (the branch that replaced one that could not fail)")
 def test_empty_graded_set_refuses():
-    p = run_check("--data-dir", str(build_filtered()),
-                  conf_floor='RECALL_FLOOR="spine:fts5:r@5>=0.81"')
+    # The set is emptied SYNTHETICALLY, by dropping every records row. This arm used to pin a floor
+    # over `spine` and lean on that set extracting to zero docs in this repo -- which was a live
+    # DEFECT in `DURABLE`, not a property, so the arm passed BECAUSE of a bug and went red the
+    # moment the bug was fixed. A test whose green depends on a defect elsewhere is not a test of
+    # the branch it names; emptying a set on purpose exercises the same `is EMPTY` refusal and
+    # cannot be un-armed by repairing something else.
+    p = run_check("--data-dir", str(build_filtered(drop=lambda r: True)),
+                  conf_floor='RECALL_FLOOR="records:fts5:r@5>=0.81"')
     out = read_lines(p)
     assert p.returncode == 2, f"expected 2, got {p.returncode}\n{out}"
-    assert "is EMPTY" in out and "spine" in out, out
-    return "REFUSED — spine extracts to zero docs, so a floor over it grades nothing"
+    assert "is EMPTY" in out and "records" in out, out
+    return "REFUSED — a synthetically emptied set grades nothing, and the floor says so"
 
 
 @check("an ABSENT pin reds naming the key, with no default")
