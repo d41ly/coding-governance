@@ -63,6 +63,38 @@ VERBS:
 """
 
 
+#: BASE_CONF plus the CELLS block `--suggest --as` needs, and SEPARATE FROM IT on purpose
+#: (TOOL-aSurfacedLexicon-8). A `CELLS` block arms the convention predicate over the fixture corpus,
+#: so folding these rows into `BASE_CONF` would re-grade the hundred-odd arms that use it for
+#: `--check` and change what they measure. `--suggest` returns before the corpus walk, so nothing
+#: here is ever walked.
+#:
+#: The `vocab` rows span five conventions because the shape table below asks each name for the cell
+#: whose convention it ALREADY satisfies — which is what keeps every expected answer in that table
+#: byte-identical to what it was before `--as` existed, while additionally proving each answer is
+#: legal in the cell it was asked for.
+SUGGEST_CONF = BASE_CONF.replace(
+    'LANGS="py:python-ast:parser conf::dark"',
+    'LANGS="py:python-ast:parser js:js-regex:probe md::dark sh:shell-tokens:parser conf::dark"'
+).replace(
+    "  add     append to an existing collection — NOT `push`",
+    "  cmd     a subcommand entry point one level down — NOT `command`\n"
+    "  add     append to an existing collection — NOT `push`"
+) + """
+CELLS:
+  py.function  snake  vocab
+  js.function  camel  vocab
+  js.type      pascal  vocab
+  py.constant  screaming  vocab
+  md.file      kebab  vocab
+  py.type      pascal  notail
+  py.file      snake
+  sh.file      dark
+  py.function+prefix:cmd_  camel  vocab
+  py.function+decorator:route  snake
+"""
+
+
 def check(label: str, cond: bool, detail: str = "") -> None:
     global PASSES
     if cond:
@@ -72,7 +104,7 @@ def check(label: str, cond: bool, detail: str = "") -> None:
 
 
 def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: tuple = (),
-             patch: tuple | None = None):
+             patch: tuple | None = None, drop: tuple = ()):
     """Build a throwaway repo, run the engine in it, return (exit_code, output).
 
     `patch` is `(old, new)` applied to the COPIED `lexicon.py` before the run, and it exists for the
@@ -82,17 +114,30 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: t
     this tree. The replacement is ASSERTED to have happened — a `patch` whose `old` is not present
     would leave the arm running unmodified code and scoring a pass, which is the arm-that-cannot-
     fail class every staged break in this file exists to avoid.
+
+    `drop` names kit files to DELETE from the copy, and it exists for the guards whose failing case
+    is an ABSENT subject rather than a wrong one. Like `patch`, the deletion is ASSERTED: naming a
+    file that is not there would leave the arm grading an untouched kit and scoring a pass.
     """
     with build_tempdir() as td:
         root = Path(td)
         shutil.copytree(KIT, root / "tools" / "lexicon",
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         if patch is not None:
-            _engine = root / "tools" / "lexicon" / "lexicon.py"
+            # A 3-tuple names the kit FILE to patch; a 2-tuple keeps the original `lexicon.py`
+            # default byte for byte. The scaffold's S7 guard reads a sibling module, so the staged
+            # break that proves it has to land in that file rather than in the engine.
+            _rel, _old, _new = patch if len(patch) == 3 else ("lexicon.py", patch[0], patch[1])
+            _engine = root / "tools" / "lexicon" / _rel
             _src = _engine.read_text(encoding="utf-8")
-            if patch[0] not in _src:
-                raise SystemExit(f"selftest: patch target not found in lexicon.py: {patch[0]!r}")
-            _engine.write_text(_src.replace(patch[0], patch[1]), encoding="utf-8", newline="\n")
+            if _old not in _src:
+                raise SystemExit(f"selftest: patch target not found in {_rel}: {_old!r}")
+            _engine.write_text(_src.replace(_old, _new), encoding="utf-8", newline="\n")
+        for name in drop:
+            _victim = root / "tools" / "lexicon" / name
+            if not _victim.is_file():
+                raise SystemExit(f"selftest: drop target not present in the kit copy: {name}")
+            _victim.unlink()
         for name in ("lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt"):
             (root / "tools" / "lexicon" / name).unlink(missing_ok=True)
         for name, body in (waivers or {}).items():
@@ -435,19 +480,30 @@ def test_shell_refusals():
     # after it never reaches that loop at all — the queue is still full when the scan ends, and the
     # only thing that refuses it is the tail check after the loop. Deleting that tail check leaves
     # every other arm in this file green and launders a truncated file into a clean parse.
-    for label, src in (
-            ("an unterminated single quote", "f() {\n  echo 'oops\n}\n"),
-            ("an unterminated double quote", 'f() {\n  echo "oops\n}\n'),
-            ("an unterminated heredoc", "f() {\n  cat <<EOF\nbody\n}\n"),
-            ("a heredoc opened on the FINAL line, with no newline after it", "f() {\n  cat <<EOF"),
-            ("an unterminated ${", "f() {\n  echo ${x\n")):
+    # THE THIRD COLUMN IS THE POINT. Every message here starts "unterminated ", so an arm asserting
+    # only that, or only that a line is named, scores a pass whenever ANY sibling refusal fires
+    # first — which is how `$((` sat unarmed while five neighbours looked covered. Each row names
+    # the CONSTRUCT its refusal must print, and no two of those needles are substrings of another.
+    for label, src, needle in (
+            ("an unterminated single quote", "f() {\n  echo 'oops\n}\n", "unterminated ' quote"),
+            ("an unterminated double quote", 'f() {\n  echo "oops\n}\n', 'unterminated " quote'),
+            ("an unterminated heredoc", "f() {\n  cat <<EOF\nbody\n}\n",
+             "unterminated heredoc <<EOF"),
+            ("a heredoc opened on the FINAL line, with no newline after it", "f() {\n  cat <<EOF",
+             "unterminated heredoc <<EOF"),
+            ("an unterminated ${", "f() {\n  echo ${x\n", "unterminated ${"),
+            # The sixth construct, and the one with no fixture until now: `$((` is found by a plain
+            # `find("))")` whose miss is the ONLY thing standing between a truncated arithmetic
+            # expansion and a silently short definition list. Its whole body is swallowed into one
+            # token, so nothing downstream reds — the refusal is the entire signal.
+            ("an unterminated $((", "f() {\n  echo $((1 + 2\n}\n", "unterminated $((")):
         try:
             lex.parse_shell_defs(src)
         except SyntaxError as exc:
-            check(f"shell refusal: {label} RAISES and names its line", "line" in str(exc),
-                  str(exc))
+            check(f"shell refusal: {label} RAISES, names the CONSTRUCT and its line",
+                  needle in str(exc) and "line" in str(exc), str(exc))
         else:
-            check(f"shell refusal: {label} RAISES and names its line", False,
+            check(f"shell refusal: {label} RAISES, names the CONSTRUCT and its line", False,
                   "returned a list instead of raising")
 
     got = [n for n, _l in lex.parse_shell_defs(
@@ -775,21 +831,21 @@ check("S6: ...and it names the token", "add" in out.split("itself a row")[1][:60
 _U10 = {"core/a.py": "def build_index():\n    pass\n",
         "core/b.py": "def render_index():\n    pass\n"}
 
-code, out = run_case(_U10, BASE_CONF, args=("--suggest", "build_index"))
+code, out = run_case(_U10, SUGGEST_CONF, args=("--suggest", "build_index", "--as", "py.function"))
 check("--suggest: a declared verb answers OK and exits 0", code == 0 and out.startswith("OK"), out)
 
-code, out = run_case(_U10, BASE_CONF, args=("--suggest", "fetch_remote"))
+code, out = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetch_remote", "--as", "py.function"))
 check("--suggest: an off-table token names the REPLACEMENT from the NOT clause",
       code == 0 and "load_remote" in out and "`load`" in out and "`fetch`" in out, out)
 check("--suggest: ...and quotes the negative definition rather than only the token",
       "NOT `fetch`" in out, out)
 
-code, out = run_case(_U10, BASE_CONF, args=("--suggest", "frobnicate_thing"))
+code, out = run_case(_U10, SUGGEST_CONF, args=("--suggest", "frobnicate_thing", "--as", "py.function"))
 check("--suggest: a token NO row bans says so, and still exits 0",
       code == 0 and "no row bans it by name" in out, out)
 
 # S6 — the structural guards. A report that can exit 1, or that prints a pin, is a gate.
-for _v in (("--suggest", "fetch_remote"),):
+for _v in (("--suggest", "fetch_remote", "--as", "py.function"),):
     code, out = run_case(_U10, BASE_CONF, args=_v)
     check(f"S6: {_v[0]} never exits 1", code != 1, f"rc={code} {out}")
     check(f"S6: {_v[0]} prints no pin figure",
@@ -1043,28 +1099,35 @@ check("...and the predicate rejects a call made conditional by a PRECEDING &&",
 # and `getUserData` came back as `read_UserData` (an underscore glued in front of a camelCase tail).
 # Each row asserts the two properties a rename must preserve whatever the shape: every non-verb
 # subtoken survives, and the separator style the caller wrote is the one they get back.
-for _bad, _want in (
-        ("fetch_remote", "load_remote"),
-        ("_fetch_conf", "_load_conf"),
-        ("__fetch_conf", "__load_conf"),
-        ("fetchRemoteThing", "loadRemoteThing"),
-        ("_fetchRemoteThing", "_loadRemoteThing"),
-        ("fetch", "load"),
-        ("_fetch", "_load"),
+#
+# EACH ROW NOW CARRIES ITS CELL, and the cell is the one whose convention the answer ALREADY
+# satisfies (TOOL-aSurfacedLexicon-8). Every expected value below is byte-identical to what it was
+# before `--as` existed, which is the point: a name that already satisfies its cell's convention must
+# come back untouched, so these sixteen rows now gate the re-caser's do-nothing path as well as the
+# swap's shape preservation. A row asked for a cell it does NOT satisfy is re-cased instead, and that
+# is the table further down.
+for _bad, _want, _cell in (
+        ("fetch_remote", "load_remote", "py.function"),
+        ("_fetch_conf", "_load_conf", "py.function"),
+        ("__fetch_conf", "__load_conf", "py.function"),
+        ("fetchRemoteThing", "loadRemoteThing", "js.function"),
+        ("_fetchRemoteThing", "_loadRemoteThing", "js.function"),
+        ("fetch", "load", "py.function"),
+        ("_fetch", "_load", "py.function"),
         # The shapes the round-2 review measured, where rebuilding the tail from `subtokens()` lost
         # information the original surface carried. Each was CORRECT before round 1 touched it, or
         # correct in neither version; all are correct now because the tail is sliced, not rebuilt.
-        ("fetch_v2_data", "load_v2_data"),          # digit boundary: was `load_v_2_data`
-        ("fetch_2fa", "load_2fa"),                  # digit boundary at the head of a token
-        ("fetchXMLParser", "loadXMLParser"),        # acronym run: was `loadXmlParser`
-        ("fetchHTTPServerData", "loadHTTPServerData"),
-        ("FetchUserData", "LoadUserData"),          # PascalCase: the verb inherits the case
-        ("FETCH_USER_DATA", "LOAD_USER_DATA"),      # SCREAMING_SNAKE, likewise
-        ("fetch-user-data", "load-user-data"),      # kebab: the separator is the caller's
-        ("fetch_conf_", "load_conf_"),              # trailing underscore survives
-        ("__fetch__", "__load__"),                  # ...on both ends
+        ("fetch_v2_data", "load_v2_data", "py.function"),   # digit boundary: was `load_v_2_data`
+        ("fetch_2fa", "load_2fa", "py.function"),           # digit boundary at the head of a token
+        ("fetchXMLParser", "loadXMLParser", "js.function"),  # acronym run: was `loadXmlParser`
+        ("fetchHTTPServerData", "loadHTTPServerData", "js.function"),
+        ("FetchUserData", "LoadUserData", "js.type"),       # PascalCase: the verb inherits the case
+        ("FETCH_USER_DATA", "LOAD_USER_DATA", "py.constant"),   # SCREAMING_SNAKE, likewise
+        ("fetch-user-data", "load-user-data", "md.file"),   # kebab: the separator is the caller's
+        ("fetch_conf_", "load_conf_", "py.function"),       # trailing underscore survives
+        ("__fetch__", "__load__", "py.function"),           # ...on both ends
 ):
-    _c, _o = run_case(_U10, BASE_CONF, args=("--suggest", _bad))
+    _c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", _bad, "--as", _cell))
     # EVERY ROW MUST ACTUALLY REACH THE REJOIN. `BASE_CONF` declares three verbs and bans exactly
     # one token, so a row naming any other off-table token gets "no row bans it by name" and its
     # negative sibling below would then pass by finding nothing -- this repo's own
@@ -1076,7 +1139,7 @@ for _bad, _want in (
     # by replacing the whole `swap` expression with a constant and watching that one row stay green.
     # L1's own class, reproduced inside the fix for L1. Found by the round-2 review.
     _got = _o.split("`")[1] if _o.startswith("use `") else "<no suggestion>"
-    check(f"--suggest preserves shape and object: {_bad} -> {_want}",
+    check(f"--suggest preserves shape and object: {_bad} --as {_cell} -> {_want}",
           _c == 0 and _got == _want, f"got {_got!r} | {_o}")
 
 # The two arms that used to sit here are DELETED rather than repaired. Each asserted that a specific
@@ -1296,6 +1359,103 @@ with build_tempdir() as _td:
     check("migration: a conf with no CELLS/PINS parses, both empty",
           _c["CELLS"] == {} and _c["PINS"] == {}, repr((_c.get("CELLS"), _c.get("PINS"))))
 
+    # ---- the reader's remaining unarmed refusals -------------------------------------------------
+    #
+    # A REVERT SWEEP FOUND EACH OF THESE GREEN WITH ITS `raise` REMOVED. Every needle below names
+    # the offending TOKEN as well as the rule, because this module also refuses a non-alphabetic
+    # CANON representative and a non-alphabetic CANON alternative: an arm matching only
+    # "alphabetic", or only "LANGS", cannot tell which refusal fired.
+
+    # The unreadable declaration. It is the one refusal here with no line to name, so the arm asserts
+    # the FILE instead — a message that dropped the path would leave the reader saying only that
+    # something, somewhere, could not be read.
+    _missing = Path(_td) / "no-such-declaration.conf"
+    try:
+        _lc.load_conf(_missing)
+        _msg = "<NO REFUSAL>"
+    except _lc.ConfError as _e:
+        _msg = str(_e)
+    check("reader red: an unreadable declaration refuses, naming the file it could not read",
+          "cannot read" in _msg and "no-such-declaration.conf" in _msg, _msg)
+
+    # A non-alphabetic VERBS key. The verb table is a CLOSED set of words the corpus is graded
+    # against; a row keyed `b3ild` would enter that set and grade names by a token no gloss can
+    # define. `_parse_verbs` splits its own rows, so this red is appended INSIDE the VERBS block
+    # rather than added as a second one.
+    _cp.write_text(BASE_CONF + "  b3ild   not a word — NOT `build`\n", encoding="utf-8",
+                   newline="\n")
+    try:
+        _lc.load_conf(_cp)
+        _msg = "<NO REFUSAL>"
+    except _lc.ConfError as _e:
+        _msg = str(_e)
+    check("reader red: a non-alphabetic VERBS key refuses as a VERB, naming the token",
+          "a verb must be alphabetic" in _msg and "'b3ild'" in _msg, _msg)
+    check("reader red: ...and is NOT the CANON refusal, which says the same word",
+          "CANON" not in _msg, _msg)
+
+    # The two PATTERNS row-key halves, each refused by its own rule. Both rows are otherwise
+    # well-formed — one capturing group, a compilable regex — so the only thing either arm can be
+    # observing is the key check it is named for.
+    # The last two rows were not on the sweep's list; they sit one and four lines from the two that
+    # were, in the same parser, and were unarmed for the same reason. Each `_want` names its BLOCK,
+    # because `CELLS` and `PINS` refuse a bad row key and an empty value with sentences of the same
+    # shape and an arm matching only "row key is" cannot tell the three apart.
+    for _label, _row, _want in (
+            ("a pattern-set id outside `[A-Za-z0-9_-]+`", r"  b@d.functions  ^\s*fn\s+(\w+)",
+             "pattern-set id 'b@d'"),
+            ("an extractor part outside the closed set", r"  ts-regex.frobs  ^\s*fn\s+(\w+)",
+             "unknown extractor part 'frobs'"),
+            ("a row key that is not <pattern-set-id>.<part>", r"  functions  ^\s*fn\s+(\w+)",
+             "a PATTERNS row key is"),
+            ("a row declaring no regex at all", "  ts-regex.functions",
+             "PATTERNS row 'ts-regex.functions' declares no regex"),
+    ):
+        _cp.write_text(BASE_CONF + "\nPATTERNS:\n" + _row + "\n", encoding="utf-8", newline="\n")
+        try:
+            _lc.load_conf(_cp)
+            _msg = "<NO REFUSAL>"
+        except _lc.ConfError as _e:
+            _msg = str(_e)
+        except Exception as _e:  # noqa: BLE001 — see the LANGS arms below for why this is caught
+            _msg = f"<{type(_e).__name__} instead of ConfError: {_e}>"
+        check(f"reader red: {_label} refuses, naming the offending part of the row",
+              _want in _msg, _msg)
+
+# The `LANGS` refusals, called directly. `check_declaration` only reaches `langs()` when a CELLS
+# block exists, so a declaration carrying neither would carry a malformed LANGS all the way to the
+# engine's dispatcher — and an unrecognised MODE arriving there is a coverage claim nobody made:
+# `parser`, `probe` and `dark` mean three different things about what a green run proves, and a
+# fourth word means none of them while still reporting a clean scan.
+for _label, _langs, _want in (
+        ("a LANGS entry that is not <ext>:<pattern-set-id>:<mode>", "py:python-ast",
+         "LANGS entry must be"),
+        ("a LANGS entry carrying a FOURTH field", "py:python-ast:parser:extra",
+         "LANGS entry must be"),
+        ("an unrecognised LANGS mode", "py:python-ast:skim", "LANGS mode must be"),
+):
+    # ANY exception that is not a ConfError is caught and scored as a FAILED arm rather than left to
+    # propagate. Removing the first refusal below does not make `langs` permissive — it makes the
+    # very next line unpack a two-element list into three names — and an unhandled ValueError would
+    # red this suite with a traceback naming a line in the reader instead of the arm that knows
+    # which refusal went missing.
+    try:
+        _lc.langs({"LANGS": _langs})
+        _msg = "<NO REFUSAL>"
+    except _lc.ConfError as _e:
+        _msg = str(_e)
+    except Exception as _e:  # noqa: BLE001
+        _msg = f"<{type(_e).__name__} instead of ConfError: {_e}>"
+    check(f"reader red: {_label} refuses, naming the offending entry",
+          _want in _msg and repr(_langs) in _msg, _msg)
+
+# ...and the green counterpart, so none of the three above is passing because `langs` reds on
+# everything. `dark` with an empty pattern-set id is the shape the reds must not have swallowed.
+check("LANGS green: a well-formed declaration still parses to its triples",
+      _lc.langs({"LANGS": "py:python-ast:parser conf::dark"})
+      == [("py", "python-ast", "parser"), ("conf", "", "dark")],
+      repr(_lc.langs({"LANGS": "py:python-ast:parser conf::dark"})))
+
 # AC2 + AC6 END TO END, through the engine rather than through the reader, because those two
 # criteria are written against `lexicon.py --check`.
 code, out = run_case({"core/a.py": "def build_index():\n    pass\n"},
@@ -1490,7 +1650,7 @@ check("AC6: the teeth report what the OTHER conventions would fail",
 # itself as UNEXERCISED is retired here rather than left asserting an absence this unit filled.
 _CONSTS = {"core/a.py": "PUBLIC_ONE = 1\n_private = 2\nA, B = 3, 4\n_d = {}\n_d['k'] = 5\n"
                         "TYPED: int = 6\n\n\ndef build_x():\n    LOCAL_ONLY = 7\n    return LOCAL_ONLY\n"}
-code, out = run_case(_CONSTS, BASE_CONF + "\nCELLS:\n  py.constant  screaming\n")
+code, out = run_case(_CONSTS, BASE_CONF + "\nCELLS:\n  py.constant  screaming\n  py.function  dark\n")
 check("S5: a constant cell grades the PUBLIC SIMPLE targets and narrows from every bound target",
       code == 0 and "py.constant.conv 0 of 2" in out and "population 2 of 6" in out, out)
 check("S5: ...and it names its population RULE beside the count",
@@ -1523,7 +1683,7 @@ check("AC1 green: ...and with the row removed the same corpus exits 0", code == 
 # A `dark` row is EXEMPT by construction: its population is zero because nothing extracts it, and
 # redding it would make the honest declaration the failing one. Staged against the arm above, which
 # reds the identical corpus one convention away.
-code, out = run_case(_NOTYPES, BASE_CONF + "\nCELLS:\n  py.type  dark\n")
+code, out = run_case(_NOTYPES, BASE_CONF + "\nCELLS:\n  py.type  dark\n  py.function  dark\n")
 check("AC1: a DARK cell at zero population is exempt from DEAD CELL",
       code == 0 and "DEAD CELL — " not in out and "py.type.conv dark" in out, out)
 
@@ -1533,6 +1693,7 @@ check("AC1: a DARK cell at zero population is exempt from DEAD CELL",
 _TSCONF = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
                             'LANGS="py:python-ast:parser ts:ts-regex:probe conf::dark"')
 code, out = run_case(_CLEAN, _TSCONF + "\nCELLS:\n  ts.function  camel\n"
+                     "  py.function  dark\n  py.type  dark\n"
                      "\nPATTERNS:\n  ts-regex.functions  ^fn ([a-z]+)\n")
 check("AC1: a cell on an INERT extension is exempt from DEAD CELL, like its sibling report",
       code == 0 and "DEAD CELL — " not in out and "INERT DECLARATION" in out, out)
@@ -1590,8 +1751,11 @@ code, out = run_case(_CONSTS, BASE_CONF + "\nCELLS:\n  py.constant  screaming\n"
 check("a declarable surface carrying no population rule REDS as UNRULED SURFACE",
       code != 0 and "UNRULED SURFACE" in out and "py.constant" in out, out)
 
-# AC2 / S1 — UNDECLARED CELL. It lands REPORT-ONLY behind a default-OFF constant, so BOTH halves are
-# observed here: the report that refuses nothing, and the refusal the flip buys.
+# AC2 / S1 — UNDECLARED CELL. It landed REPORT-ONLY behind a default-OFF constant and
+# TOOL-aSurfacedLexicon-12 ARMED it with the full matrix, so the two halves swapped which one needs
+# staging: the refusal is now the shipped behaviour and runs unpatched, and the report-only half is
+# reached by patching the constant back OFF. Both are still observed, which is the whole point of
+# writing them as a pair — an arm that only ever saw one of them proves nothing about the other.
 _JS = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
                         'LANGS="py:python-ast:parser js:js-regex:probe conf::dark"')
 _MATRIX = (_JS + "\nCELLS:\n  py.function  snake\n\n  py.type  pascal\n\n  js.function  camel\n")
@@ -1600,18 +1764,29 @@ code, out = run_case(_JSFILES, _MATRIX)
 check("AC2 green: a complete matrix over the extracted space names no undeclared cell",
       code == 0 and "UNDECLARED CELL — 0 extracted population(s)" in out, out)
 code, out = run_case({**_JSFILES, "web/b.js": "class Cap {}\n"}, _MATRIX)
-check("AC2: an extracted population with no CELLS row is REPORTED and does not red",
-      code == 0 and "js.type at 1" in out and "[reported, not a refusal]" in out, out)
+check("AC2: an extracted population with no CELLS row REFUSES, naming js.type",
+      code != 0 and "UNDECLARED CELL (an extracted population" in out and "js.type at 1" in out,
+      out)
 check("AC2: ...and the report states what it does NOT check",
       "NOT CHECKED by that list — the `file` and `constant` surfaces" in out, out)
 code, out = run_case({**_JSFILES, "web/b.js": "class Cap {}\n"}, _MATRIX,
-                     patch=("UNDECLARED_CELL_ARMED = False", "UNDECLARED_CELL_ARMED = True"))
-check("AC2: ...and with the promotion constant forced ON it REFUSES, naming js.type",
-      code != 0 and "UNDECLARED CELL (an extracted population" in out and "js.type at 1" in out,
-      out)
-code, out = run_case(_JSFILES, _MATRIX,
-                     patch=("UNDECLARED_CELL_ARMED = False", "UNDECLARED_CELL_ARMED = True"))
-check("AC2: ...and the armed run greens again once nothing is undeclared", code == 0, out)
+                     patch=("UNDECLARED_CELL_ARMED = True", "UNDECLARED_CELL_ARMED = False"))
+check("AC2: ...and with the promotion constant forced back OFF it only REPORTS",
+      code == 0 and "js.type at 1" in out and "[reported, not a refusal]" in out, out)
+
+# THE ARMED REFUSAL'S OWN BOUNDARY, and it is the same one the DEAD CELL REPORT arm above draws: a
+# declaration carrying NO `CELLS` block is a legal inert state and must not red, or arming this
+# promotes every adopter that installed the kit before cells existed straight to a broken bar. The
+# pair is what makes it a boundary rather than a hole — the same corpus reds the moment ONE cell is
+# declared, because from there the matrix is the owner's and an incomplete one is a real gap.
+# TOOL-aSurfacedLexicon-12.
+code, out = run_case(_JSFILES, _JS)
+check("a declaration with NO CELLS block does not fire the armed UNDECLARED CELL refusal",
+      code == 0 and "py.function at 1" in out and "[reported, not a refusal]" in out, out)
+code, out = run_case(_JSFILES, _JS + "\nCELLS:\n  py.function  snake\n")
+check("...and the SAME corpus reds once one cell is declared and js.function is not",
+      code != 0 and "UNDECLARED CELL (an extracted population" in out
+      and "js.function at 1" in out, out)
 
 # AC5 — THE DECLARATION'S OWN COMMENT. It is the carrier of the three readings and the counting rule
 # that produced them, and the armed row's figure is asserted against it rather than typed here, so
@@ -1679,7 +1854,11 @@ _TS_PATTERNS = (
     r"  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)" "\n"
     r"  ts-regex.types      ^\s*(?:export\s+)?(?:interface|class)\s+([A-Za-z_$][\w$]*)" "\n"
 )
-_TS_CELLS = "\nCELLS:\n  ts.function  camel\n  ts.type      pascal\n"
+#: `py.function  dark` is not decoration. The fixture corpus carries `core/a.py`, so its `py.function`
+#: population is non-empty, and since TOOL-aSurfacedLexicon-12 armed `UNDECLARED_CELL_ARMED` a
+#: declaration that opens a `CELLS` block owes a row for every surface it extracts. `dark` is the
+#: row that declares "not graded here", which is what these arms mean: they are about `ts`.
+_TS_CELLS = "\nCELLS:\n  ts.function  camel\n  ts.type      pascal\n  py.function  dark\n"
 _TS_BASE = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
                              'LANGS="py:python-ast:parser conf::dark ts:ts-regex:probe"')
 TS_CONF = _TS_BASE + _TS_PATTERNS + _TS_CELLS
@@ -2089,16 +2268,16 @@ check("AC8: ...and the representative it names is the cluster's, not the token i
 # S3 — THE PRECEDENCE, in a fixture that MANUFACTURES the disagreement, so this arm holds in an
 # adopter's tree whatever their declaration says. `install` is `init`'s cluster-mate in the canon;
 # the fixture declares `add … NOT install`, and the declaration must win.
-_PREC_CONF = BASE_CONF.replace("add     append to an existing collection — NOT `push`",
-                               "add     append to an existing collection — NOT `install`")
+_PREC_CONF = SUGGEST_CONF.replace("add     append to an existing collection — NOT `push`",
+                                  "add     append to an existing collection — NOT `install`")
 _c, _prec = run_case({"core/a.py": "def build_x():\n    pass\n"}, _PREC_CONF,
-                     args=("--suggest", "install_thing"))
+                     args=("--suggest", "install_thing", "--as", "py.function"))
 check("AC3: --suggest follows the DECLARATION where it and the canon disagree",
       "use `add_thing`" in _prec and "the declaration says" in _prec, _prec)
 check("AC3: ...and it does NOT answer the canon's representative for that token",
       "init_thing" not in _prec, _prec)
-_c, _canon_only = run_case({"core/a.py": "def build_x():\n    pass\n"}, BASE_CONF,
-                           args=("--suggest", "install_thing"))
+_c, _canon_only = run_case({"core/a.py": "def build_x():\n    pass\n"}, SUGGEST_CONF,
+                           args=("--suggest", "install_thing", "--as", "py.function"))
 check("AC3: ...while with NO clause naming it, the canon answers instead",
       "use `init_thing`" in _canon_only and "the shipped canon says" in _canon_only, _canon_only)
 # Fork F2, decided as its recommendation: the canon's representative is proposed even where the
@@ -2106,8 +2285,8 @@ check("AC3: ...while with NO clause naming it, the canon answers instead",
 # leaves the author with a refusal and nothing else.
 check("F2: a canon representative absent from the declaration is proposed AND flagged",
       "use `init_thing`" in _canon_only and "carries NO row for it" in _canon_only, _canon_only)
-_c, _scope = run_case({"core/a.py": "def build_x():\n    pass\n"}, BASE_CONF,
-                      args=("--suggest", "frobnicate_thing"))
+_c, _scope = run_case({"core/a.py": "def build_x():\n    pass\n"}, SUGGEST_CONF,
+                      args=("--suggest", "frobnicate_thing", "--as", "py.function"))
 check("AC6: --suggest names a token in neither source a SCOPING question, and proposes nothing",
       "SCOPING question" in _scope and "use `" not in _scope, _scope)
 
@@ -2129,8 +2308,43 @@ if _PREC_PATH.exists():
           f"has no observable case here; declare a negative the canon does not already supply")
     if _DISAGREE:
         _tok = _DISAGREE[0]
-        _sr = subprocess.run([sys.executable, str(KIT / "lexicon.py"), "--suggest",
-                              f"{_tok}_thing"], cwd=_PREC_ROOT, capture_output=True, text=True)
+        # THIS TREE'S DECLARATION, PLUS THE ONE CELL THAT MAKES THE VERB PATH ASKABLE. `--as` became
+        # required at TOOL-aSurfacedLexicon-8 and the leading-token check runs only on a cell arming
+        # `vocab`; this repo's tracked CELLS block arms none until TOOL-aSurfacedLexicon-12 writes
+        # the matrix, so a run against the tracked file as it stands would observe an
+        # undeclared-cell refusal rather than the precedence this arm exists to grade. The NEGATIVE
+        # is still read from the tracked declaration — `_rban` above is parsed from it — so the arm
+        # keeps grading the file it names and only the CELL is supplied.
+        _PCONF = _load_conf(_PREC_PATH)
+        _PCELLS = _PCONF.get("CELLS") or {}
+        _vocab_cell = next((c for c, (_cv, _fl) in _PCELLS.items()
+                            if "vocab" in _fl and "+" not in c and c.endswith(".function")), "")
+        _prec_text = _PREC_PATH.read_text(encoding="utf-8")
+        if not _vocab_cell:
+            # The cell is SYNTHESISED from the declaration's own LANGS rather than spelled here: a
+            # CELLS row naming an extension LANGS does not declare is a `load_conf` refusal, so a
+            # literal `py.function` would work on this repo and refuse on an adopter declaring no
+            # python. The first declared extension with no `function` row is the one that cannot
+            # collide with a row already there.
+            from lexicon_conf import langs as _langs  # noqa: E402
+
+            _ext = next((e for e, _ps, _md in _langs(_PCONF)
+                         if f"{e}.function" not in _PCELLS), "")
+            _vocab_cell = f"{_ext}.function" if _ext else ""
+            _prec_text = _prec_text.replace("\nCELLS:\n",
+                                            f"\nCELLS:\n  {_vocab_cell}  snake  vocab\n\n", 1)
+    if _DISAGREE and not _vocab_cell:
+        check("AC8: SKIPPED — this declaration arms no `vocab` function cell and every extension it "
+              "declares already carries a `function` row, so the precedence arm has no cell to ask "
+              "through", True)
+    elif _DISAGREE:
+        with build_tempdir() as _ptd:
+            _proot = Path(_ptd)
+            subprocess.run(["git", "init", "-q"], cwd=_proot, check=True, capture_output=True)
+            (_proot / ".lexicon.conf").write_text(_prec_text, encoding="utf-8", newline="\n")
+            _sr = subprocess.run([sys.executable, str(KIT / "lexicon.py"), "--suggest",
+                                  f"{_tok}_thing", "--as", _vocab_cell],
+                                 cwd=_proot, capture_output=True, text=True)
         check("AC8: ...and --suggest answers the DECLARATION's verb for it, not the canon's",
               f"use `{_rban[_tok]}_thing`" in _sr.stdout
               and f"use `{_FORMS[_tok]}_thing`" not in _sr.stdout,
@@ -2202,6 +2416,554 @@ code, out = run_case(_SPLIT_FILES,
                                    "  py.function+prefix:fetch  dark vocab\n")
 check("S4: `vocab` on a ROUTED subset is a NAMED refusal, not a parent's count under its name",
       code != 0 and "VOCAB ON A ROUTED SUBSET" in out, out)
+
+# ---- TOOL-aSurfacedLexicon-11: the canon overlay, and the stamp that records it ------------------
+#
+# THE MERGE IS ASSERTED THROUGH ALL THREE ACCESSORS, never through the index alone. Two of the three
+# iterate `CLUSTERS` themselves and never call `build_form_index`, so an arm checking only the index
+# is the probe that missed this unit's design defect for two revisions of its own spec.
+
+# AC5 — with NO overlay, every accessor returns exactly what the SHIPPED tuple gives it. Compared
+# against the module's own constant in this process, not against a reading remembered at a sha.
+_MERGED_NOOP = _canon.build_clusters({})
+check("AC5: an EMPTY overlay leaves the cluster tuple identical to canon.CLUSTERS",
+      _MERGED_NOOP == _canon.CLUSTERS, repr(_MERGED_NOOP[:2]))
+check("AC5: ...and all three accessors answer identically with it and with no argument",
+      _canon.build_form_index(_MERGED_NOOP) == _canon.build_form_index()
+      and all(_canon.read_gloss(r, _MERGED_NOOP) == _canon.read_gloss(r)
+              and _canon.render_negative(r, _MERGED_NOOP) == _canon.render_negative(r)
+              for r, _g, _o in _canon.CLUSTERS))
+
+# AC6 — the three row directions, each through build_form_index AND read_gloss AND render_negative.
+#
+# EVERY INDEX READ IS A `.get()`, NEVER A SUBSCRIPT, and that is not style. Reverting the merge was
+# the staged break these arms exist to fail under, and with a subscript the revert raised `KeyError`
+# instead: the suite CRASHED and failed no NAMED arm, which is the one outcome the build rule
+# behind this file forbids. Found by running exactly that revert.
+_REPLACED = _canon.build_clusters({"load": ("siphon",)})
+check("AC6: a row naming an existing representative REPLACES that cluster's alternatives",
+      _canon.build_form_index(_REPLACED).get("siphon") == "load"
+      and "fetch" not in _canon.build_form_index(_REPLACED),
+      repr(_canon.build_form_index(_REPLACED).get("fetch")))
+check("AC6: ...and the other two accessors read the replacement, not the shipped tuple",
+      _canon.render_negative("load", _REPLACED) == " — NOT `siphon`"
+      and _canon.read_gloss("load", _REPLACED) == _canon.read_gloss("load"),
+      repr(_canon.render_negative("load", _REPLACED)))
+
+_ADDED = _canon.build_clusters({"frobnicate": ("frob", "fnord")})
+check("AC6: a row naming a NEW representative ADDS a cluster",
+      _canon.build_form_index(_ADDED).get("frob") == "frobnicate"
+      and "frob" not in _canon.build_form_index(),
+      repr(_canon.build_form_index(_ADDED).get("frob")))
+check("AC6: ...and an ADDED cluster renders a negative but carries NO gloss, which is the "
+      "limit S8 records",
+      _canon.render_negative("frobnicate", _ADDED) == " — NOT `frob`"
+      and _canon.read_gloss("frobnicate", _ADDED) == "",
+      repr((_canon.render_negative("frobnicate", _ADDED),
+            _canon.read_gloss("frobnicate", _ADDED))))
+
+_DELETED = _canon.build_clusters({"-measure": ()})
+check("AC6: a row leading with a minus DELETES a shipped cluster",
+      "measure" not in _canon.build_form_index(_DELETED)
+      and "count" not in _canon.build_form_index(_DELETED)
+      and "measure" in _canon.build_form_index(),
+      repr(_canon.build_form_index(_DELETED).get("count")))
+check("AC6: ...and the other two accessors answer for a deleted cluster as for one never shipped",
+      _canon.read_gloss("measure", _DELETED) == ""
+      and _canon.render_negative("measure", _DELETED) == "",
+      repr((_canon.read_gloss("measure", _DELETED),
+            _canon.render_negative("measure", _DELETED))))
+
+
+def read_canon_refusal(rows):
+    """The refusal message `build_clusters` raises for `rows`, or `""` where it does not raise."""
+    try:
+        _canon.build_clusters(rows)
+    except ValueError as exc:
+        return str(exc)
+    return ""
+
+
+# AC7 — the FOUR refusals, each asserted to be TEXTUALLY DISTINCT from the other three. A config
+# grammar with an undefined branch grows one by accident, and four refusals that read alike are
+# one refusal wearing four hats.
+#
+# FOUR, not the three this block used to carry. `build_clusters`'s own docstring has named four
+# since the door landed, and the missing one was the minus row that ALSO carries alternatives:
+# deleting that branch left this whole suite green, because a `-build frobnicate` row then deletes
+# the cluster and silently discards the alternatives the owner typed — an overlay row half of which
+# did nothing, with no refusal and no report.
+_DUPE = read_canon_refusal({"frobnicate": ("fetch",)})
+_NOALT = read_canon_refusal({"frobnicate": ()})
+_ABSENT = read_canon_refusal({"-frobnicate": ()})
+_MINUSALT = read_canon_refusal({"-build": ("frobnicate",)})
+check("AC7: an overlay row putting one form in TWO clusters raises",
+      "two clusters" in _DUPE and "'fetch'" in _DUPE, _DUPE)
+check("AC7: an ADD row carrying no alternative raises",
+      "no alternative" in _NOALT, _NOALT)
+check("AC7: a minus row naming no shipped cluster raises, rather than silently doing nothing",
+      "does not carry" in _ABSENT, _ABSENT)
+# THE ALTERNATIVES ARE NAMED BACK, which is the half a bare exit-code assertion would miss: an
+# owner who typed a delete and a replacement on one row has to be told WHICH tokens the grammar
+# will not honour, or the refusal sends them back to guess.
+check("AC7: a minus row that ALSO carries alternatives raises, rather than deleting the cluster "
+      "and discarding the alternatives it was handed",
+      "must carry no alternatives" in _MINUSALT and "frobnicate" in _MINUSALT, _MINUSALT)
+check("AC7: ...and the four messages are pairwise distinct",
+      len({_DUPE, _NOALT, _ABSENT, _MINUSALT}) == 4
+      and all((_DUPE, _NOALT, _ABSENT, _MINUSALT)),
+      repr((_DUPE, _NOALT, _ABSENT, _MINUSALT)))
+
+# AC7, ONE LEVEL UP: the two token-shape refusals in the DECLARATION READER, which are a different
+# guard in a different module from the four above. `_parse_canon` validates the row's token shape and
+# nothing else — the merge owns every rule about what a row MEANS — so these are the only refusals
+# standing between a punctuation-carrying row and `build_clusters`. Both were revertible with the
+# whole suite green: `if not head.isalpha()` replaced by `if False` let `bui-ld` reach the merge as a
+# representative naming a cluster that cannot exist, and an empty `bad` list let `frob-nicate` land
+# as an alternative no corpus token can ever equal. Each arm reads the file-and-line prefix too,
+# because a refusal that cannot say WHERE sends the owner to grep their own declaration.
+_CANON_STAMP = '\ncanon_unfrozen="2026-09-05 node a — the arms that grade the row shape"\n'
+_c, _o = run_case({"core/a.py": "def build_x():\n    pass\n"},
+                  BASE_CONF + _CANON_STAMP + "\nCANON:\n  bui-ld  frobnicate\n")
+check("CANON: a row KEY carrying punctuation is refused at the line, rather than reaching the "
+      "cluster builder as a representative no shipped cluster can match",
+      _c != 0 and "a CANON representative is alphabetic" in _o and "'bui-ld'" in _o,
+      f"rc={_c} {_o}")
+# THE POSITION PREFIX, matched as a SHAPE rather than by the declaration's filename. The refusal is
+# `f"{p}:{lineno}: …"` and what the owner needs from it is a file and a line to open, so the shape is
+# the whole assertion; the filename is the run's own scratch path and naming it here would also put
+# a root-install spelling in a kit file, which is what the install-prefix ban keeps out.
+check("CANON: ...and the refusal carries the file-and-line prefix the owner has to open",
+      bool(re.search(r"\S+:\d+: a CANON representative", _o)), _o)
+_c, _o = run_case({"core/a.py": "def build_x():\n    pass\n"},
+                  BASE_CONF + _CANON_STAMP + "\nCANON:\n  build  frob-nicate\n")
+check("CANON: a row naming a non-alphabetic ALTERNATIVE is refused, naming the offending token",
+      _c != 0 and "non-alphabetic alternative(s)" in _o and "frob-nicate" in _o, f"rc={_c} {_o}")
+check("CANON: ...and that refusal is textually distinct from the row-key one, so an owner who "
+      "typed punctuation on either half is told which half",
+      "a CANON representative is alphabetic" not in _o, _o)
+
+# THE MERGE REACHES THE PRODUCT, end to end, through the two calls `run_suggest` actually makes.
+_OVERLAY_TAIL = '\ncanon_unfrozen="2026-09-05 node a — the arm that proves the door"\n' \
+                "\nCANON:\n  build  frobnicate\n"
+_OVERLAY_CONF = BASE_CONF + _OVERLAY_TAIL
+# TWO OVERLAY CONFS, and the split is not cosmetic. `--suggest --as` needs a CELLS block; a `--check`
+# run over a one-function fixture with that same block reds on DEAD CELL for every row the fixture
+# has no population for, which would make the posture arms below pass or fail for the wrong reason.
+_OVERLAY_SUGGEST_CONF = SUGGEST_CONF + _OVERLAY_TAIL
+_c, _ov = run_case({"core/a.py": "def build_x():\n    pass\n"}, _OVERLAY_SUGGEST_CONF,
+                   args=("--suggest", "frobnicate_thing", "--as", "py.function"))
+check("S2: --suggest answers the OVERLAY's representative for a form the shipped canon cannot "
+      "resolve", "use `build_thing`" in _ov, _ov)
+# THE OFFSETS ARE SEARCHED, NEVER `.index()`d: a revert that removes either string would make
+# `.index()` raise, and a suite that CRASHES has failed no NAMED arm.
+_POSTURE_AT, _ANSWER_AT = _ov.find("CANON UNFROZEN"), _ov.find("use `build_thing`")
+check("S4: ...with the posture line, naming the row count and the stamp, ABOVE the answer",
+      _POSTURE_AT >= 0 and _ANSWER_AT >= 0 and _POSTURE_AT < _ANSWER_AT
+      and "1 owner row(s)" in _ov and "the arm that proves the door" in _ov, _ov)
+_c, _frozen = run_case({"core/a.py": "def build_x():\n    pass\n"}, SUGGEST_CONF,
+                       args=("--suggest", "frobnicate_thing", "--as", "py.function"))
+check("S4: ...and with NO block declared the posture line is ABSENT, so it reports a state rather "
+      "than decorating every run", "CANON UNFROZEN" not in _frozen, _frozen)
+
+# S4 on the GATE path too, green and red alike, and above the counts on both.
+_c, _ov_check = run_case({"core/a.py": "def build_x():\n    pass\n"}, _OVERLAY_CONF)
+_CHK_POSTURE, _CHK_COUNTS = _ov_check.find("CANON UNFROZEN"), _ov_check.find("P1 verb")
+check("AC4: the posture line prints on a --check run that exits 0, above the P1 count line",
+      _c == 0 and _CHK_POSTURE >= 0 and _CHK_COUNTS >= 0 and _CHK_POSTURE < _CHK_COUNTS,
+      f"rc={_c} {_ov_check}")
+_c, _ov_red = run_case({"core/a.py": "def build_x():\n    pass\n\n\ndef frobnicate_it():\n    pass\n"},
+                       _OVERLAY_CONF)
+check("AC4: ...and on a run that exits non-zero",
+      _c != 0 and "CANON UNFROZEN" in _ov_red, f"rc={_c} {_ov_red}")
+check("AC4: ...where the overlay has made the offender DEBT rather than UNRULED, which is the "
+      "merge reaching the offender line and not only the index",
+      "rename to `build_it`" in _ov_red, _ov_red)
+
+# S2 — THE PAIRING ITSELF: `read_debt_gloss` resolves the representative out of the merged INDEX and
+# reads the gloss out of the merged TUPLE, and both arguments have to travel together. Passing a
+# merged index beside the shipped tuple was the defect two revisions of this unit's spec carried,
+# and every arm above is blind to it: on a REPLACE row the gloss is the shipped one either way, and
+# an ADD row carries no gloss at all in either tuple. The ONE overlay that separates them deletes a
+# shipped cluster and re-adds it under the same representative — legal in this grammar, two rows —
+# which drops the shipped gloss while leaving the representative standing. `measure` is the cluster
+# because `BASE_CONF` declares no row for it, so the declaration cannot supply the gloss instead.
+_REGLOSS_CONF = BASE_CONF \
+    + '\ncanon_unfrozen="2026-09-05 node a — the arm that pairs the index with the tuple"\n' \
+      "\nCANON:\n  -measure\n  measure  count\n"
+_c, _regloss = run_case({"core/a.py": "def count_rows():\n    pass\n"}, _REGLOSS_CONF)
+check("S2: the DEBT line resolves its representative through the MERGED index",
+      _c != 0 and "rename to `measure_rows`" in _regloss, _regloss)
+check("S2: ...and reads its gloss out of the MERGED tuple, not the shipped one",
+      "no gloss declared" in _regloss and "count a population" not in _regloss, _regloss)
+
+# AC13 — F2's attribution line, observed in BOTH directions. An arm that only ever sees the line
+# cannot tell it from the bare mismatch the ratchet already prints.
+_AC13_FILES = {"core/a.py": "def frobnicate_a():\n    pass\n\n\ndef fetch_b():\n    pass\n"}
+_c, _no_cause = run_case(_AC13_FILES, _PINNED_VOCAB)
+check("AC13: without an overlay this fixture is GREEN, so the movement below is the overlay's",
+      _c == 0, _no_cause)
+# THE PHRASE, not the word. A bare `"CAUSE" not in …` matches inside `BECAUSE` and would report on
+# a string this arm does not gate — the same defect one level down as an arm searching a whole file
+# for its figure.
+_CAUSE_LINE = "CAUSE — the CANON overlay is unfrozen"
+check("AC13: ...and no CAUSE line is printed on it", _CAUSE_LINE not in _no_cause, _no_cause)
+_AC13_OVERLAY = _PINNED_VOCAB \
+    + '\ncanon_unfrozen="2026-09-05 node a — the arm that proves the cause"\n' \
+      "\nCANON:\n  build  frobnicate\n"
+_c, _cause = run_case(_AC13_FILES, _AC13_OVERLAY)
+check("AC13: a stamped overlay MOVES the P1 pins, exactly as owner ruling Q2 makes it",
+      _c != 0 and "py.function.debt MOVED 1 -> 2" in _cause
+      and "py.function.unruled MOVED 1 -> 0" in _cause, _cause)
+check("AC13: ...and the run names the OVERLAY as the cause, not the bare mismatch alone",
+      _CAUSE_LINE in _cause and "1 owner row(s)" in _cause, _cause)
+# The redistribution fixture from AC9 above moves the same two rows with NO overlay declared. This
+# is the arm that stops the CAUSE line from decaying into a second spelling of "MOVED".
+check("AC13: ...while the SAME two rows moving with no overlay carry no CAUSE line",
+      "MOVED" in _redis and _CAUSE_LINE not in _redis, _redis)
+
+# S7 — the structural guard, and its own failing case. The scaffold derives from the corpus; an
+# overlay it proposed would be the mirror arriving through the door built for a human.
+_c, _guard_green = run_case(_SPLIT_FILES, _SPLIT_CONF)
+check("AC8: with no `CANON:` header in the scaffold's emitted body, the run exits 0",
+      _c == 0 and "SCAFFOLD EMITS" not in _guard_green, _guard_green)
+_c, _guard_red = run_case(
+    _SPLIT_FILES, _SPLIT_CONF,
+    patch=("scaffold_lexicon.py", 'body.append("")',
+           'body.append("CANON:")\n    body.append("")'))
+check("AC8: ...and with one staged into it the run exits non-zero, naming the file and the line",
+      _c != 0 and "SCAFFOLD EMITS A `CANON:` BLOCK HEADER" in _guard_red
+      and "scaffold_lexicon.py:" in _guard_red, _guard_red)
+# THE THIRD STATE, and it was a SILENT PASS. The guard's `if _scaffold.is_file()` carried no `else`,
+# so deleting or renaming the file it reads turned a structural refusal into a green run that said
+# nothing — a skip wearing a pass's clothes, over the one arm standing between the scaffold and the
+# canon door. The kit copy is run with that file DROPPED, which is the only way this branch is
+# reachable at all: the guard reads the installed kit, never a fixture corpus.
+check("AC8: ...and with the file PRESENT nothing is announced, so the line below reports a state",
+      "SCAFFOLD GUARD SKIPPED" not in _guard_green, _guard_green)
+# THIS FILE GOES WITH IT, and the reason is worth a line: `selftest.py` imports `scaffold_lexicon`
+# for the shared-catalog arm, so dropping the scaffolder alone reds the SELF-CONTAINMENT guard on a
+# dangling sibling import — a real refusal, but a different one, and an arm asserting the run stays
+# green would have been measuring that instead. The pair is what an adopter who took the kit without
+# the scaffolder actually has.
+_c, _guard_gone = run_case(_SPLIT_FILES, _SPLIT_CONF,
+                           drop=("scaffold_lexicon.py", "selftest.py"))
+check("AC8: an ABSENT scaffold ANNOUNCES the skip and names the file it could not read",
+      "SCAFFOLD GUARD SKIPPED" in _guard_gone and "scaffold_lexicon.py" in _guard_gone,
+      _guard_gone)
+check("AC8: ...and says the arm went UNEXERCISED rather than letting a green row read as verified",
+      "UNEXERCISED" in _guard_gone, _guard_gone)
+check("AC8: ...and it is a REPORT, so an adopter who took the kit without the scaffolder is green",
+      _c == 0, f"rc={_c} {_guard_gone}")
+# AC9 — the NEAR-MISS the narrowed predicate deliberately does not count, pinned here so a later
+# reader knows the loose form's count of 1 is by design rather than an oversight.
+_SCAFFOLD_SRC = (KIT / "scaffold_lexicon.py").read_text(encoding="utf-8").splitlines()
+_LOOSE = [i + 1 for i, ln in enumerate(_SCAFFOLD_SRC) if "CANON" in ln]
+_NARROW = [i + 1 for i, ln in enumerate(_SCAFFOLD_SRC) if _lex._CANON_HEADER_RE.search(ln)]
+check("AC9: the narrowed predicate matches nothing in the shipped scaffold", not _NARROW,
+      repr(_NARROW))
+check("AC9: ...while the LOOSE form matches exactly one line, the descriptive comment it would "
+      "have forced a rewording of", len(_LOOSE) == 1
+      and "PROPOSED from the SHIPPED CANON" in _SCAFFOLD_SRC[_LOOSE[0] - 1], repr(_LOOSE))
+
+# S5 — THE RECORDED HALF OF THE DOOR, on `adopt-lexicon.sh --check`, and it was the largest hole in
+# this unit. NOTHING exercised either stamp refusal: this repo declares no `CANON:` block, so the
+# row-count guard arming them is false on every real bar, and replacing that guard with a constant
+# false deleted BOTH refusals with every leg in the suite still green. The mechanism that enforces
+# RECORDING is the one mechanism that must not be silently removable, because a quiet unfreeze is
+# the mirror defect with an extra step.
+#
+# EVERY CASE RUNS THE SCRIPT and asserts its MESSAGE, never its exit code: `check_skill` reds in a
+# sandbox that carries no rendered Skill, so all four runs are non-zero whatever the stamp says and
+# an exit-code arm here would pass on the Skill and prove nothing about the door.
+_STAMP: dict = {}
+for _label, _tail in (
+        ("empty", "\nCANON:\n  build  frobnicate\n  load  hydrate\n"),
+        ("noreason", '\ncanon_unfrozen="2026-09-05 node a"\n\nCANON:\n  build  frobnicate\n'),
+        ("stamped", '\ncanon_unfrozen="2026-09-05 node a — our stores are `hydrate`"\n'
+                    "\nCANON:\n  load  hydrate\n"),
+        ("frozen", "\n")):
+    with build_tempdir() as _td:
+        _sroot = Path(_td)
+        shutil.copytree(KIT, _sroot / "tools" / "lexicon",
+                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        (_sroot / ".lexicon.conf").write_text(BASE_CONF + _tail, encoding="utf-8", newline="\n")
+        subprocess.run(["git", "init", "-q"], cwd=_sroot, check=True)
+        _sr = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--check"], cwd=_sroot,
+                             capture_output=True, text=True)
+        _STAMP[_label] = _sr.stdout + _sr.stderr
+_EMPTY_STAMP_MSG = "declares a CANON: overlay"
+_NO_REASON_MSG = "stamp carries no REASON"
+check("S5: a `CANON:` block with an EMPTY `canon_unfrozen` is REFUSED by the wiring leg",
+      _EMPTY_STAMP_MSG in _STAMP["empty"], _STAMP["empty"])
+# THE COUNT IS THE GUARD. A refusal that fires is not evidence the ROWS were read — the two-row
+# fixture is what separates a derived count from a constant, and the derivation is the half a
+# `if false` revert removes.
+check("S5: ...and the refusal reports the row count it read through the declaration reader",
+      "(2 row(s))" in _STAMP["empty"], _STAMP["empty"])
+check("S5: a stamp carrying a date and a node but NO reason is refused, under its own wording",
+      _NO_REASON_MSG in _STAMP["noreason"] and _EMPTY_STAMP_MSG not in _STAMP["noreason"],
+      _STAMP["noreason"])
+check("S5: ...so the two refusals are distinguishable rather than one refusal wearing two hats",
+      _EMPTY_STAMP_MSG in _STAMP["empty"] and _EMPTY_STAMP_MSG not in _STAMP["noreason"]
+      and _NO_REASON_MSG in _STAMP["noreason"] and _NO_REASON_MSG not in _STAMP["empty"],
+      repr((_STAMP["empty"][:80], _STAMP["noreason"][:80])))
+check("S5: a reason-bearing stamp draws NEITHER refusal, so the two above are not a wall",
+      _EMPTY_STAMP_MSG not in _STAMP["stamped"] and _NO_REASON_MSG not in _STAMP["stamped"],
+      _STAMP["stamped"])
+check("S5: ...and a declaration with no block draws neither either, which is the FROZEN state "
+      "every adopter who is not the author sits in",
+      _EMPTY_STAMP_MSG not in _STAMP["frozen"] and _NO_REASON_MSG not in _STAMP["frozen"],
+      _STAMP["frozen"])
+
+# AC12 gets NO arm here, and that is deliberate rather than missed: it is a `grep` over two
+# documents, one of which is an adopter's own curated declaration. An arm asserting a sentence in
+# that file would red every adopter whose conf predates this kit version — a gate on prose nobody
+# but this repo can satisfy. §7 of the spec files it as a landing observation for the same reason.
+
+# ---- TOOL-aSurfacedLexicon-8: `--suggest` becomes surface-aware -----------------------------------
+#
+# EVERY ARM BELOW NAMES THE DECLARATION IT IS MEASURED AGAINST, which is `SUGGEST_CONF` and never the
+# tracked one: the tracked declaration arms two cells, so a criterion phrased against any other cell
+# would observe this unit's OWN undeclared-cell refusal instead of the behaviour it asserts.
+
+
+def read_suggestion(out: str) -> str:
+    """The name `--suggest` proposed, as the FIRST backticked token of a `use ...` line, or `""`.
+
+    Asserting the answer by VALUE rather than by substring, for the reason the round-2 review found
+    one level up: the message template always prints the verb it wants, so a substring assertion
+    passes on the template rather than on the suggestion.
+    """
+    for line in out.splitlines():
+        if line.startswith("use `"):
+            return line.split("`")[1]
+    return ""
+
+
+# AC1 — the banned TAIL, on a `notail` cell, named in the answer. `FooManager` leads with `foo`,
+# which is neither declared nor banned, so before this unit it exited on the "not in the declared
+# table" branch answering about the wrong end of the name entirely.
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "FooManager", "--as", "py.type"))
+check("AC1: a notail cell answers about the banned SUFFIX, naming it",
+      _c == 0 and "`Manager`" in _o and "notail" in _o, _o)
+check("AC1: ...and does not answer about the leading token instead",
+      "not in the declared table" not in _o, _o)
+
+# AC2 — the everyday defect this unit exists to remove: the swap answered in the CALLER's case on a
+# cell that declares another one.
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetchUserData", "--as", "py.function"))
+check("AC2: a camel name on a snake cell comes back re-cased, verb swapped",
+      _c == 0 and read_suggestion(_o) == "load_user_data", f"got {read_suggestion(_o)!r} | {_o}")
+
+# AC3 — `--as` is REQUIRED. Asserted on the exit code AND on the REQUIRED-flag wording, because the
+# obvious form was satisfied by the wrong refusal: with the guard in `main` deleted, `cell_spec` is
+# the empty string, `resolve_cell` refuses it as a malformed cell key, and that message spells
+# `--as` too — so an arm greping for the bare flag scored a pass on a run that had no guard at all.
+# A message that passes for the wrong reason is the fixture-passes-by-finding-nothing class, so
+# both halves are asserted: the wording only the guard prints, and the ABSENCE of the refusal that
+# stands in for it.
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetchUserData"))
+check("AC3: --suggest with no --as exits 2 under the REQUIRED-flag refusal",
+      _c == 2 and "--as is REQUIRED" in _o, f"rc={_c} {_o}")
+check("AC3: ...and not under the malformed-cell refusal, which names the same flag",
+      "MALFORMED" not in _o and "BARE SURFACE" not in _o, _o)
+
+# AC4 — THE ROUND-2 REGRESSION CORPUS, asserted by value on a camel cell.
+#
+# WHICH ARM PROVES WHAT, corrected: `getUserURLs` NEVER REACHES THE SPAN LOOP. The swap answers
+# `readUserURLs`, `classify` already calls that camel, and `render_convention` returns it untouched
+# on its own first line — so that row grades `render_swapped_name` and says nothing whatever about
+# the re-caser's span rebuild. It is kept, because the splice is exactly what round 1 broke; the
+# fourth row below is the one that carries the CASE claim, and it was missing.
+_AC4 = (("getUserURLs", "readUserURLs"),     # the SWAP; the re-caser returns this one unchanged
+        ("fetch_v2_data", "loadV2Data"),     # separators: re-supplied, so dropped rather than refused
+        # THE SPAN PATH, with case to lose. The swap gives `load_userURLs`, which satisfies no
+        # convention at all, so the loop runs — and the acronym run is a NON-LEADING span whose
+        # interior case only survives because the renderer re-cases the first character and passes
+        # the rest of the caller's own surface through. Rebuilding the span instead answers
+        # `loadUserUrLs`, which is still legal camel, so no self-check and no classifier can catch
+        # it: this row is the only thing standing between that spelling and the product.
+        ("fetch_userURLs", "loadUserURLs"),
+        # LAST ON PURPOSE — the arm below this loop reads the FINAL iteration's output.
+        ("create$data", "build$data"))       # `$`: NOT re-supplied, so refused rather than re-spelled
+for _bad, _want in _AC4:
+    _c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", _bad, "--as", "js.function"))
+    check(f"AC4: {_bad} --as js.function -> {_want}",
+          _c == 0 and read_suggestion(_o) == _want, f"got {read_suggestion(_o)!r} | {_o}")
+check("AC4: ...and the refused one SAYS it was not re-cased, rather than answering silently",
+      "NOT re-cased" in _o, _o)
+
+# AC4a — THE RENDERER'S OWN FINAL GUARD, which nothing reached. `create$data` above is refused one
+# test EARLIER, at the unseen-character check, so `return out if convention in classify(out) else ""`
+# could be cut to `return out` and every arm in this file stayed green. `2fa_check` is the input that
+# lands on it: every character outside a span is an underscore, so the character test passes and the
+# loop builds `2FaCheck` — which no camel name may be, because camel opens with a lower-case letter
+# and this opens with a digit. Called DIRECTLY, because both refusals print the one `NOT re-cased`
+# line and only the return value tells them apart.
+check("AC4a: a render the convention does not accept is REFUSED rather than printed",
+      _lex.render_convention("2fa_check", "camel") == "",
+      repr(_lex.render_convention("2fa_check", "camel")))
+check("AC4a: ...and it is the CLASSIFIER refusing the renderer's OWN output, which is the guard",
+      "camel" not in _lex.classify("2FaCheck") and not _lex.classify("2fa_check"),
+      repr((sorted(_lex.classify("2FaCheck")), sorted(_lex.classify("2fa_check")))))
+
+# AC5 — a `file` cell takes a BASENAME and grades `read_stem`'s stem: the basename up to its FIRST
+# dot. `map_extractors.template.py` is the input that makes the rule visible — a last-dot rule would
+# grade `map_extractors.template` and answer differently.
+_c, _o = run_case(_U10, SUGGEST_CONF,
+                  args=("--suggest", "checkKitPlaceholders.py", "--as", "py.file"))
+check("AC5: a file cell re-cases the STEM of the basename",
+      _c == 0 and read_suggestion(_o) == "check_kit_placeholders",
+      f"got {read_suggestion(_o)!r} | {_o}")
+_c, _o = run_case(_U10, SUGGEST_CONF,
+                  args=("--suggest", "map_extractors.template.py", "--as", "py.file"))
+check("AC5: ...stemming at the FIRST dot, so a compound extension answers unchanged",
+      _c == 0 and "map_extractors" in _o and "map_extractors.template" not in _o, _o)
+check("AC5: ...and a cell arming neither flag runs no verb check at all",
+      "not in the declared table" not in _o and "NOT `" not in _o, _o)
+
+# AC6 — the `dark` refusal. Distinct from the undeclared one, which AC9 compares it against.
+_c, _DARK = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetchUserData", "--as", "sh.file"))
+check("AC6: a dark cell refuses rather than answering, and exits non-zero",
+      _c != 0 and "dark" in _DARK, f"rc={_c} {_DARK}")
+
+# AC7 — `leading_verb`'s contract, preserved. Its population is the underscore-only and the
+# non-ASCII names; a DIGIT-leading name is graded rather than refused.
+for _u in ("__", "_", "é"):
+    _c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", _u, "--as", "py.function"))
+    check(f"AC7: {_u!r} is UNGRADEABLE and nothing is re-spelled for it",
+          _c == 0 and "ungradeable" in _o and read_suggestion(_o) == "", _o)
+
+# AC9 — the UNDECLARED refusal, and its second half: with the cell's row gone, the same run refuses.
+_c, _UNDECL = run_case(_U10, SUGGEST_CONF, args=("--suggest", "FooBar", "--as", "ts.type"))
+check("AC9: an undeclared cell refuses, exits non-zero, names the cell and says UNDECLARED",
+      _c != 0 and "ts.type" in _UNDECL and "UNDECLARED" in _UNDECL, f"rc={_c} {_UNDECL}")
+_c, _o = run_case(_U10, BASE_CONF, args=("--suggest", "FooBar", "--as", "py.type"))
+check("AC9: ...and a declaration carrying NO CELLS block refuses every cell the same way",
+      _c != 0 and "UNDECLARED" in _o, f"rc={_c} {_o}")
+check("AC9: ...and that refusal is TEXTUALLY DISTINCT from the dark one",
+      _UNDECL != _DARK and _UNDECL and _DARK, f"{_UNDECL!r} vs {_DARK!r}")
+
+# AC10 — MALFORMED, over a table of shapes rather than the one that was typed first. The selector'd
+# key is the S9 boundary: `--as` addresses the parent cell and the selector is applied from the name.
+_MALFORMED = []
+for _spec in ("py..function", "pyfunction", "py.function.extra", "py.function+prefix:cmd_"):
+    _c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetchUserData", "--as", _spec))
+    _MALFORMED.append(_o)
+    check(f"AC10: `--as {_spec}` refuses as MALFORMED and exits non-zero",
+          _c != 0 and "MALFORMED" in _o, f"rc={_c} {_o}")
+check("AC10: ...and the malformed refusal differs from the undeclared one",
+      all(_m != _UNDECL for _m in _MALFORMED), _MALFORMED[0])
+
+# AC11 — the BARE SURFACE refusal is a MENU. The cell list is the clause that makes it one, so the
+# arm reads the list rather than only the exit code.
+_c, _BARE = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetchUserData", "--as", "function"))
+check("AC11: a bare surface refuses, exits non-zero, and LISTS the declared cells carrying it",
+      _c != 0 and "BARE SURFACE" in _BARE and "py.function" in _BARE and "js.function" in _BARE,
+      f"rc={_c} {_BARE}")
+check("AC11: ...and does not list a cell on another surface",
+      "py.type" not in _BARE and "md.file" not in _BARE, _BARE)
+check("AC11: ...and its message differs from the malformed one",
+      all(_m != _BARE for _m in _MALFORMED), _BARE)
+
+# AC12 — THE CONVENTION-ONLY PATH. Nothing is wrong with this name but its case, and the leading
+# token IS declared, so before this unit it returned an `OK` line before any convention check ran.
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "buildUserIndex", "--as", "py.function"))
+check("AC12: a declared verb in the wrong case still gets an answer",
+      _c == 0 and read_suggestion(_o) == "build_user_index", f"got {read_suggestion(_o)!r} | {_o}")
+check("AC12: ...and the answer names the convention the input currently satisfies",
+      "camel" in _o and "snake" in _o, _o)
+
+# S9 — a `prefix` selector is applied FROM THE NAME, the way the grader applies it, so a cell can
+# answer differently for `cmd_*` than for its complement. A `decorator` selector cannot be resolved
+# from an identifier, so the parent answers and SAYS SO.
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "cmd_fetch_thing", "--as", "py.function"))
+check("S9: a name matching a prefix selector is answered in the SELECTOR's convention",
+      _c == 0 and read_suggestion(_o) == "cmdFetchThing", f"got {read_suggestion(_o)!r} | {_o}")
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetch_thing", "--as", "py.function"))
+check("S9: ...while its complement is answered in the parent's",
+      _c == 0 and read_suggestion(_o) == "load_thing", f"got {read_suggestion(_o)!r} | {_o}")
+check("S9: a decorator selector on the cell is DISCLOSED rather than silently ignored",
+      "decorator" in _o and "cannot be resolved from an identifier" in _o, _o)
+
+# THE AFFIX THE RE-CASER PUTS BACK. `render_convention` splits the name into a leading run of
+# underscores, a core and a trailing run, re-cases the core alone, and re-attaches both runs. Every
+# arm above passes a name with no affix at all, so dropping either re-attachment left the whole
+# suite green while the tool answered `_load_user_data` as `load_user_data` — a suggestion that
+# renames a module-private function into a public one, in a re-caser whose own docstring calls
+# itself the one place in the kit that WRITES a name instead of grading one.
+#
+# TWO ARMS, ONE PER RUN, because one name carrying both affixes cannot tell the two re-attachments
+# apart: it reds whichever is dropped and names neither.
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "_fetchUserData", "--as", "py.function"))
+check("affix: a LEADING underscore survives the re-case, so a private name stays private",
+      _c == 0 and read_suggestion(_o) == "_load_user_data", f"got {read_suggestion(_o)!r} | {_o}")
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetchUserData_", "--as", "py.function"))
+check("affix: a TRAILING underscore survives the re-case, so a keyword-avoiding name keeps the "
+      "character that avoids the keyword",
+      _c == 0 and read_suggestion(_o) == "load_user_data_", f"got {read_suggestion(_o)!r} | {_o}")
+
+# ---- the three STAGED BREAKS, each redding a NAMED arm ------------------------------------------
+#
+# A mechanism is not landed until reverting it reds an arm by name. Each break below is applied to a
+# copy of the kit in a throwaway repo and the arm it is supposed to red is re-run there.
+
+# BREAK 1 — the re-caser rebuilds from `subtokens()` instead of from the spans. This is the round-1
+# body, verbatim in its behaviour: no already-satisfies early return, no unseen-character refusal,
+# and every token lowercased.
+_SPAN_BODY = """    if convention in classify(name):
+        return name
+    lead, core, trail = _AFFIX.match(name).group(1, 2, 3)
+    spans = list(_SUBTOKEN_RE.finditer(core))
+    if not spans:
+        return ""
+    covered = {i for m in spans for i in range(*m.span())}
+    if any(c not in _SEPARATORS for i, c in enumerate(core) if i not in covered):
+        return ""
+    toks = []
+    for i, m in enumerate(spans):
+        t = m.group(0)"""
+_REBUILD_BODY = """    lead, core, trail = _AFFIX.match(name).group(1, 2, 3)
+    spans = list(_SUBTOKEN_RE.finditer(core))
+    if not spans:
+        return ""
+    toks = []
+    for i, t in enumerate(subtokens(core)):
+        t = t"""
+for _bad, _want in (_AC4[0], _AC4[2]):
+    _c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", _bad, "--as", "js.function"),
+                      patch=("subtokens.py", _SPAN_BODY, _REBUILD_BODY))
+    check(f"STAGED: a subtokens-rebuild re-caser REDS the AC4 arm for {_bad}",
+          read_suggestion(_o) != _want, f"stayed green with {read_suggestion(_o)!r} | {_o}")
+# `fetch_v2_data` is deliberately NOT in that loop and the omission is measured rather than assumed:
+# its expected answer is byte-identical under a slice and under a lowercased rebuild, because every
+# character it carries is already lowercase. It is redded by BREAK 2 instead, and an arm that cannot
+# fail under a break is worth naming rather than counting.
+
+# BREAK 2 — the refusal predicate WIDENED to every unseen character, which is the form fork F1
+# rejected. It refuses every separator-bearing name asked for in a camel cell and hands back the
+# caller's own snake spelling, which the camel predicate then reds.
+for _bad, _want in (("fetch_v2_data", "loadV2Data"), ("fetch_remote", "loadRemote")):
+    _c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", _bad, "--as", "js.function"),
+                      patch=("subtokens.py", '_SEPARATORS = "_-"', '_SEPARATORS = ""'))
+    check(f"STAGED: the WIDE unseen-character refusal REDS the camel answer for {_bad}",
+          read_suggestion(_o) != _want, f"stayed green with {read_suggestion(_o)!r} | {_o}")
+
+# BREAK 3 — the renderer wired ONLY into the banned-verb branch, which is what a reader of the old
+# Inventory would have built. Every other arm here greens through it; AC12's `:806`-equivalent exit
+# is the one that reds.
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "buildUserIndex", "--as", "py.function"),
+                  patch=("lexicon.py", "    recased = render_convention(answer, conv)",
+                         "    recased = render_convention(answer, conv) if want else answer"))
+check("STAGED: a renderer reached only from the banned-verb branch REDS AC12",
+      read_suggestion(_o) != "build_user_index", f"stayed green | {_o}")
+_c, _o = run_case(_U10, SUGGEST_CONF, args=("--suggest", "fetchUserData", "--as", "py.function"),
+                  patch=("lexicon.py", "    recased = render_convention(answer, conv)",
+                         "    recased = render_convention(answer, conv) if want else answer"))
+check("STAGED: ...while AC2's banned-verb arm stays GREEN through that same break, which is why "
+      "AC12 had to exist",
+      read_suggestion(_o) == "load_user_data", f"got {read_suggestion(_o)!r} | {_o}")
 
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")

@@ -81,29 +81,98 @@ CLUSTERS = (
 )
 
 
-def build_form_index() -> dict:
+def build_clusters(overlay_rows, clusters=CLUSTERS) -> tuple:
+    """The SHIPPED tuple with an owner's `CANON:` rows merged over it. THE DOOR, and it is one.
+
+    `overlay_rows` is `{representative: (alternative, ...)}` — PLAIN ROWS, never a conf object, so
+    this module still imports nothing and the kit's layering stays what it claims. Three directions,
+    all of them in the row key: a key naming a shipped representative REPLACES that cluster's
+    alternatives, a key naming a new one ADDS a cluster, and a leading minus DELETES a shipped one.
+
+    THE MERGE POINT IS THE TUPLE, NOT THE INDEX, and that is the correction this function exists to
+    carry. Two of the three accessors below never call `build_form_index` — they iterate `CLUSTERS`
+    themselves — so an overlay merged inside the index would resolve a form to an owner-declared
+    representative and then print the SHIPPED gloss for it, or the empty string.
+
+    FOUR REFUSALS, because a config grammar with an undefined branch grows one by accident:
+    a minus row naming no shipped cluster, a minus row carrying alternatives, any row carrying NO
+    alternative (a cluster that can never render a negative is one the gate reds on), and a merge
+    that would leave one form in two clusters. The last is asserted rather than assumed: an overlay
+    row is the first way a duplicate form can enter at all, and a duplicate makes the answer depend
+    on iteration order.
+
+    THE MIRROR IS NOT CLOSED BY THIS FUNCTION and cannot be. An owner may fill the block from their
+    corpus's commonest spellings, which reinstates precisely the defect this file exists to close.
+    What the door buys is VISIBILITY and attribution, not proof — see the honest limit in
+    `.lexicon.conf` and `tools/lexicon/README.md`. TOOL-aSurfacedLexicon-11.
+    """
+    shipped = {rep for rep, _g, _o in clusters}
+    for key, others in overlay_rows.items():
+        if key.startswith("-"):
+            if key[1:] not in shipped:
+                raise ValueError(
+                    f"CANON row {key!r} deletes a cluster the shipped canon does not carry. A "
+                    f"typo'd delete that quietly did nothing would still count as an owner "
+                    f"declaration on the posture line while changing nothing.")
+            if others:
+                raise ValueError(f"CANON row {key!r} deletes a cluster and must carry no "
+                                 f"alternatives, got {' '.join(others)!r}")
+        elif not others:
+            raise ValueError(
+                f"CANON row {key!r} carries no alternative. A representative with no alternatives "
+                f"is a cluster that can never render a negative, and a row carrying no negative is "
+                f"one the gate refuses.")
+
+    out = []
+    pending = dict(overlay_rows)
+    for rep, gloss, others in clusters:
+        if pending.pop("-" + rep, None) is not None:
+            continue
+        replaced = pending.pop(rep, None)
+        out.append((rep, gloss, tuple(replaced) if replaced is not None else others))
+    for key, others in pending.items():
+        # An ADD row carries no GLOSS: a `CANON:` row declares a cluster and a gloss is a `VERBS`
+        # row's job. `read_gloss` returns `""` for an added representative and the advice half
+        # prints the negative alone until the owner writes the matching row. A limit, not a bug.
+        out.append((key, "", tuple(others)))
+
+    seen: dict = {}
+    for rep, _gloss, others in out:
+        for form in (rep,) + tuple(others):
+            if form in seen and seen[form] != rep:
+                raise ValueError(
+                    f"CANON overlay puts the form {form!r} in two clusters, {seen[form]!r} and "
+                    f"{rep!r}. Which one answers would depend on iteration order.")
+            seen[form] = rep
+    return tuple(out)
+
+
+def build_form_index(clusters=CLUSTERS) -> dict:
     """`{surface form: representative}` over every cluster, including each representative itself.
 
     A form appearing in two clusters would make the answer depend on iteration order, so the
     selftest asserts the forms are disjoint rather than leaving it to review.
+
+    `clusters` defaults to the SHIPPED tuple, so a caller with no declaration gets the frozen answer
+    and the frozen-by-default posture is this module's default rather than a caller's discipline.
     """
     out = {}
-    for rep, _gloss, others in CLUSTERS:
+    for rep, _gloss, others in clusters:
         out[rep] = rep
         for form in others:
             out[form] = rep
     return out
 
 
-def read_gloss(rep: str) -> str:
+def read_gloss(rep: str, clusters=CLUSTERS) -> str:
     """The declared gloss for a representative, or `""` when it names no cluster."""
-    for r, gloss, _others in CLUSTERS:
+    for r, gloss, _others in clusters:
         if r == rep:
             return gloss
     return ""
 
 
-def render_negative(rep: str) -> str:
+def render_negative(rep: str, clusters=CLUSTERS) -> str:
     r"""The NOT clause for a representative, from its own cluster's first alternative.
 
     A SEED THAT CARRIES NO NEGATIVE IS BORN FAILING THE GATE. The assert in `lexicon.py` refuses a
@@ -112,7 +181,7 @@ def render_negative(rep: str) -> str:
     existed: fourteen rows, fourteen findings. The cluster already knows the boundary word, so the
     seed states it and the curator sharpens it rather than inventing it.
     """
-    for r, _gloss, others in CLUSTERS:
+    for r, _gloss, others in clusters:
         if r == rep:
             return " — NOT `%s`" % others[0] if others else ""
     return ""

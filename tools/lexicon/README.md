@@ -27,14 +27,15 @@ choice, not because nobody could tell whether it works.
 
 `.lexicon.conf` is the sibling `KEY=VALUE` form plus BLOCK keys — a `KEY:` header followed by indented
 rows, ending at the first non-indented line. Blank lines inside a block are skipped rather than
-terminating it. Three block keys are declared, and a header outside that set is a refusal by name,
-not a silent skip.
+terminating it. The declared block keys are `BLOCK_KEYS` in `lexicon_conf.py` and are not counted
+here; a header outside that set is a refusal by name, not a silent skip.
 
 | Block | Row | Means |
 |---|---|---|
 | `VERBS` | `<verb>  <gloss>` | the closed verb table P1 grades against; the gloss carries the NOT clause |
 | `CELLS` | `<ext>.<surface>[+<kind>:<literal>]  <convention> [vocab] [notail]` | which case convention this (language, surface) cell asks for |
 | `PINS` | `<cell>.<predicate>  <count>` | the declared offender count for one cell and one predicate |
+| `CANON` | `[-]<representative>  <alternative>...` | the OWNER's overlay over the frozen shipped canon; see below |
 
 `surface` is one of `function` `type` `file` `constant`; `convention` is one of `snake` `screaming`
 `camel` `pascal` `kebab` `dark`; `predicate` is one of `debt` `unruled` `suffix` `conv`. A token
@@ -178,10 +179,15 @@ legal inert state every adopter passes through, and refusing it would red every 
 this kit before the block existed.
 
 **`UNDECLARED CELL`** — an (extension, surface) pair the extractors produced a non-empty population
-for, with no `CELLS` row. It **REPORTS and does not refuse** while `UNDECLARED_CELL_ARMED` is
-`False` in `lexicon.py`, which is how it ships: armed against a declaration whose matrix is
-incomplete it would refuse populations nobody has ruled on yet. Whichever change first writes a full
-matrix flips that constant in the same commit. **It does not check** the `file` and `constant`
+for, with no `CELLS` row. It **REFUSES**, and it ships that way: `UNDECLARED_CELL_ARMED` is `True` in
+`lexicon.py`, flipped there in the same commit that first wrote a full matrix into a declaration.
+It landed report-only for exactly one build order, because arming it against a declaration whose
+matrix was still incomplete would have refused populations nobody had ruled on yet. **It does not
+check** a declaration carrying no `CELLS` block at all — the same boundary `DEAD CELL REPORT` draws
+above, and for the same reason: that is the inert state every adopter passes through, and refusing
+it would red every tree that installed this kit before cells existed. Declare your FIRST cell and
+the matrix becomes yours to complete; from there an undeclared population reds and is named.
+**It does not check** the `file` and `constant`
 surfaces. Their populations are computed by a declared cell's own selector, so an undeclared one of
 those has no population to be non-empty and this arm cannot see it — the run says so on the line
 below the list, every time. A reader who takes that list for the whole undeclared population is
@@ -361,7 +367,7 @@ it, which is the rule this repo breaks most often — a value stated in prose be
 owns it rots between changes. Read it from the signal.
 
 ```bash
-python tools/lexicon/lexicon.py --suggest <identifier>   # one line, no corpus pass, ~45 ms
+python tools/lexicon/lexicon.py --suggest <identifier> --as <ext>.<surface>   # one line, no corpus pass
 bash tools/lexicon/adopt-lexicon.sh --render             # re-render the Skill after a declaration edit
 ```
 
@@ -370,6 +376,34 @@ precedence, and from no corpus at all. Off-table, it names the REPLACEMENT and q
 that bans what you tried — `use load_remote — the declaration says load, NOT fetch: read a store
 into memory` — which is why the NOT clauses are the product rather than decoration. Where no row
 bans the token by name the canon answers instead, and the line says which source spoke.
+
+**`--as` is REQUIRED and takes a full `<ext>.<surface>` cell** (`TOOL-aSurfacedLexicon-8`). The
+surface is the whole question: it decides which predicates are armed on the name and which convention
+the answer is spelled in. A surface-blind suggestion is how this verb answered `loadUserData` for a
+cell declaring snake — a name its own gate reds — so the flag is not defaulted, because a default
+answers the surface question silently for a caller who did not think about it.
+
+At most three checks run, in this order: the banned TAIL where the cell arms `notail`, the leading
+TOKEN where it arms `vocab`, and the CONVENTION always. The re-casing is applied to whatever name the
+earlier checks produced, so the printed name is legal under every armed predicate of that cell at
+once. On a `file` cell the argument is a BASENAME and the graded string is `read_stem`'s — the
+basename up to its FIRST dot, the grader's own seam rather than a second stemming rule.
+
+Four refusals are distinct and separately worded, because a caller who typed a cell that does not
+exist, a `dark` cell, a key that is not a cell, and a BARE SURFACE have four different problems. The
+bare-surface refusal is a MENU: it lists the declared cells carrying that surface. A cell whose row
+carries a `prefix` selector is routed FROM THE NAME, the way the grader routes it; a `decorator`
+selector cannot be resolved from an identifier at all, so such a cell answers in the parent's
+convention and SAYS SO rather than answering confidently.
+
+The re-caser is SPAN-ANCHORED and it REFUSES rather than inventing. It builds from
+`_SUBTOKEN_RE.finditer` spans and regenerates exactly two things — the separator the convention
+supplies, and the case of a span's first character where the convention demands a different one. A
+name carrying a character outside a span that the target convention does not itself re-supply (`$`,
+an accented letter) is NOT re-spelled; the verb prints its finding and says why. Separators ARE
+re-supplied, which is why `fetch_remote --as js.function` comes back as `loadRemote` and not as a
+refusal. Rebuilding a tail from `subtokens()` instead returns `getUserURLs` as `readUserUrLs`, a name
+with zero unseen characters, so the loss there is CASE and no unseen-character rule would catch it.
 
 **It is not a gate, structurally.** It cannot exit 1, it prints no pin, and nothing in
 `scaffold_lexicon.py` imports it — so what the corpus DOES has no code path to becoming what it
@@ -409,6 +443,53 @@ every armed `vocab` cell, blank-separated because `PINS` refuses two adjacent ro
 no `CELLS` row gets no pin row at all. The scalar `VERB_OFFENDER_PIN` keeps grading the whole
 population beside them: it is a single bucket over two populations, so a rename moving a definition
 from DEBT to UNRULED inside one cell holds the total and greens there while both cell rows red.
+
+### The canon door — a `CANON:` overlay, and the stamp that records it
+
+The canon ships FROZEN, and freezing it is what stops a proposed table becoming a mirror of the code
+it grades. But welded is not frozen: `canon.py` is `role = "engine"`, so an adopter who disagrees
+with a cluster cannot edit it and cannot durably re-role it either. The door is a block in the
+declaration, which is the file the owner already curates.
+
+| Row | Direction |
+|---|---|
+| `load  hydrate rehydrate` | the representative is shipped — REPLACES that cluster's alternatives |
+| `frobnicate  frob fnord` | the representative is new — ADDS a cluster |
+| `-measure` | a leading minus — DELETES a shipped cluster, and takes no alternatives |
+
+`canon.build_clusters` merges the block over the shipped tuple and refuses four things: a minus row
+naming no shipped cluster, a minus row carrying alternatives, any row carrying no alternative, and a
+merge that would leave one form in two clusters. A minus row naming nothing is a refusal rather than
+a no-op on purpose — a typo that quietly changed nothing would still count as an owner declaration
+on the posture line, which is a posture that lies in the one place this door exists to make honest.
+
+**The unfreeze is stamped or it is refused.** A `CANON:` block with an empty `canon_unfrozen`, or one
+carrying a date and a node but no REASON, reds `bash tools/lexicon/adopt-lexicon.sh --check` — a leg
+with no guard, so a conf-only commit reaches it. **And it prints on every run**, green as well as
+red, above the counts and above a `--suggest` answer. There is no state in which the canon is
+quietly overridden.
+
+**The honest limit.** No machine check can tell a considered overlay from a mirror. An owner may
+unfreeze the canon and fill the block from their corpus's commonest spellings, reinstating precisely
+the defect `canon.py` closes, and the difference is why the rows were chosen — which the tool cannot
+see. What the door buys is visibility and attribution, not proof: the choice is one tracked line, it
+is attributed to a node and a date, it is refused without a reason, and it is printed on every run.
+The blast radius is bounded by the canon grading nothing — it decides what may be PROPOSED and how
+an offender is labelled — so an unfrozen canon cannot legalise a name by itself. Only a `VERBS` row
+a human wrote does that.
+
+A second limit, smaller and concrete: an ADDED cluster has no GLOSS. A `CANON:` row declares a
+cluster and a gloss is a `VERBS` row's job, so the advice half prints the negative alone until the
+owner writes the matching row.
+
+One consequence worth meeting on purpose rather than as a surprise: both P1 pins are two-sided
+equalities and an overlay moves definitions between the DEBT and UNRULED buckets, so the first run
+after declaring one reds until those rows are re-pasted. The run says so, naming the overlay as the
+cause rather than leaving a bare mismatch to be read as a fault in the ratchet.
+
+`scaffold_lexicon.py` may never emit a `CANON:` block header, and that is asserted on the
+`lexicon naming predicates` leg rather than promised here. The scaffold derives from the corpus; an
+overlay it proposed would be the mirror arriving through the one door built for a human.
 
 ### Reading a repo BEFORE you adopt
 

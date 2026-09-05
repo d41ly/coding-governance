@@ -1,11 +1,12 @@
 # TOOL-aSurfacedLexicon-8 — `--suggest` becomes surface-aware and answers in the declared convention
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6
+**Status:** CLOSED · rev-6 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aSurfacedLexicon-8-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-8-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 |
 
@@ -381,8 +382,14 @@ where "a new predicate is not landed until its failing case has been observed" i
   `--suggest fetchUserData` returns `loadUserData`, verified by direct run at this rev, and that name
   reds the `py.function` snake cell.
 - **AC3** — When `python tools/lexicon/lexicon.py --suggest fetchUserData` runs with no `--as`, it
-  exits 2 and the message names `--as`. The refusal is asserted on the exit code and on the text, so a
-  future default cannot slip in past a test that only reads stdout.
+  exits 2 under the REQUIRED-flag refusal, whose wording is `--as is REQUIRED`, and that same run
+  prints NEITHER `MALFORMED` nor `BARE SURFACE`. Both halves are graded, and the second half is the
+  correction rather than an addition: "the message names `--as`" is satisfied by the wrong refusal.
+  With the guard in `main` deleted, `cell_spec` is the empty string, `resolve_cell` refuses it as a
+  malformed cell key, and that message spells `--as` too — so a criterion reading only for the flag
+  scores a pass on a run that has no guard at all, which is the fixture-passes-by-finding-nothing
+  class. Asserted on the exit code and on both texts, so a future default cannot slip in past a
+  criterion that only reads stdout.
 - **AC4** — With a scratch declaration carrying `js.function camel vocab`, when the round-2 regression
   names `getUserURLs`, `fetch_v2_data` and `create$data` are run
   through `--suggest ... --as js.function`, each answer is asserted by VALUE: `create$data` refuses on
@@ -657,6 +664,13 @@ without a signal.
 - rev-5 · 2026-09-05 · the outstanding-obligation sentence about `TOOL-aSurfacedLexicon-11` corrected: that
   spec carries its half, discharged in the same batch that recorded the debt. Cross-spec rev pins
   dropped in favour of the id alone, since a sibling's rev number rots within the hour here.
+- rev-6 · 2026-09-05 · AC3 re-keyed onto the refusal the arm actually asserts. It described the
+  refusal the arm was moved OFF: "exits 2 and the message names `--as`" is satisfied by the
+  malformed-cell refusal, which names the same flag, so the criterion passed on a run with the guard
+  deleted. The arm in `tools/lexicon/selftest.py` grades the `--as is REQUIRED` wording AND the
+  absence of `MALFORMED` and `BARE SURFACE`; the criterion now says that. This is the same false-
+  acceptance class the previous pass corrected in `TOOL-aSurfacedLexicon-12`'s AC2 and AC4 and left
+  standing here.
 
 ## 10. Reuse audit
 

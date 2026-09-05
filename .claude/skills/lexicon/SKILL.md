@@ -1,6 +1,6 @@
 ---
 name: lexicon
-description: Answer "what should I call this" from THIS repo's declared naming vocabulary, before writing the name. Use when about to name a new function, method, type, module or CLI subcommand; when a name will not fit and you are tempted to invent a verb; when renaming during a refactor; or when a gate has just refused a name and you need the replacement rather than the refusal. Also use before naming anything in an unfamiliar area, to see how the corpus already spells that concept. Routes through `python3 tools/lexicon/lexicon.py --suggest`, which reads the declaration at `.lexicon.conf` and the frozen canon beside it, and decides nothing. Do NOT use for ordinary code search — finding a symbol, a caller, a definition or a string is grep's job and this neither replaces nor intercepts it.
+description: Answer "what should I call this" from THIS repo's declared naming vocabulary, before writing the name. Use when about to name a new function, method, type, module or CLI subcommand; when a name will not fit and you are tempted to invent a verb; when renaming during a refactor; or when a gate has just refused a name and you need the replacement rather than the refusal. Also use before naming anything in an unfamiliar area, to see how the corpus already spells that concept. Routes through `python3 tools/lexicon/lexicon.py --suggest <identifier> --as <cell>`, which takes the SURFACE the name is for, reads the declaration at `.lexicon.conf` and the frozen canon beside it, and decides nothing. Do NOT use for ordinary code search — finding a symbol, a caller, a definition or a string is grep's job and this neither replaces nor intercepts it.
 ---
 
 <!-- gov:kit lexicon@1.1 · RENDERED from tools/lexicon/SKILL.template.md — do not edit -->
@@ -16,7 +16,7 @@ has become a synonym list and is buying nothing.
 ## Ask before you write
 
 ```bash
-python3 tools/lexicon/lexicon.py --suggest <identifier>
+python3 tools/lexicon/lexicon.py --suggest <identifier> --as <ext>.<surface>
 ```
 
 One line, no corpus pass. Either `OK`, or the replacement and the negative definition that bans what
@@ -25,6 +25,14 @@ you tried:
 ```
 use `load_remote` — the declaration says `load`, NOT `fetch`: read a store into memory
 ```
+
+**`--as` is REQUIRED and takes the full cell, never a bare surface.** The surface is the whole
+question: it decides which predicates are armed on that name and which convention the answer is
+spelled in. `--as py.function` answers in snake where the cell declares snake; the same name asked
+for as `--as js.function` comes back in camel. Without it the tool would hand you a name in whatever
+case you happened to type, which is how it used to suggest names its own gate refuses. A cell with no
+`CELLS` row is refused rather than guessed at, and so is a surface with no language on it — the
+refusal lists the cells that carry that surface.
 
 It answers ONE identifier from two tables in a fixed precedence — this repo's declaration first,
 then the canon the kit ships, asked only where no declared row bans the token by name — and from no

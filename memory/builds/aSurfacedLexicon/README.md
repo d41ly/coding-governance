@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-04
 streams: tooling
 roster: TOOL
-ids: TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16 TOOL-aSurfacedLexicon-17
+ids: TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16 TOOL-aSurfacedLexicon-17 TOOL-aSurfacedLexicon-18 TOOL-aSurfacedLexicon-19 TOOL-aSurfacedLexicon-20 TOOL-aSurfacedLexicon-21
 ---
 
 # aSurfacedLexicon — the lexicon stops grading two surfaces and starts declaring all of them
@@ -102,7 +102,7 @@ of the same.
 <!-- gen:build-index -->
 **Build status:** SPECCED · 14 unit(s) · node a · opened 2026-09-04 · streams tooling
 ids TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12
-ids TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16 TOOL-aSurfacedLexicon-17
+ids TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16 TOOL-aSurfacedLexicon-17 TOOL-aSurfacedLexicon-18 TOOL-aSurfacedLexicon-19 TOOL-aSurfacedLexicon-20 TOOL-aSurfacedLexicon-21
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -118,12 +118,12 @@ ids TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 T
 | [TOOL-aSurfacedLexicon-13 — the prefix selector, routing a subset of a cell to a second convention](spec/2026-09-04-spec-aSurfacedLexicon-13.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-7 — P1 splits into DEBT and UNRULED, and DEBT names its replacement](spec/2026-09-04-spec-aSurfacedLexicon-7.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-10 — `--expand`, the one-time widening the canon bounds](spec/2026-09-04-spec-aSurfacedLexicon-10.md) | 6 | 2 | SPECCED | rev-4 | 2026-09-04 |
-| [TOOL-aSurfacedLexicon-11 — the canon overlay and its stamp](spec/2026-09-04-spec-aSurfacedLexicon-11.md) | 6 | 2 | SPECCED | rev-6 | 2026-09-05 |
-| [TOOL-aSurfacedLexicon-8 — `--suggest` becomes surface-aware and answers in the declared convention](spec/2026-09-04-spec-aSurfacedLexicon-8.md) | 6 | 2 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aSurfacedLexicon-12 — the conf rewrite, the owed records, and the spec-template cell line](spec/2026-09-04-spec-aSurfacedLexicon-12.md) | 7 | 2 | SPECCED | rev-7 | 2026-09-05 |
+| [TOOL-aSurfacedLexicon-11 — the canon overlay and its stamp](spec/2026-09-04-spec-aSurfacedLexicon-11.md) | 6 | 2 | CLOSED | rev-7 | 2026-09-05 |
+| [TOOL-aSurfacedLexicon-8 — `--suggest` becomes surface-aware and answers in the declared convention](spec/2026-09-04-spec-aSurfacedLexicon-8.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-05 |
+| [TOOL-aSurfacedLexicon-12 — the conf rewrite, the owed records, and the spec-template cell line](spec/2026-09-04-spec-aSurfacedLexicon-12.md) | 7 | 2 | CLOSED | rev-9 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 3 record folder(s).
+Records: 16 bound to this build, across 3 record folder(s).
 
 Ids no record names: TOOL-aSurfacedLexicon-10.
 

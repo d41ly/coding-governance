@@ -63,9 +63,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import canon  # noqa: E402
-from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, langs, load_conf,  # noqa: E402
-                          build_negatives, parse_cell_key)
-from subtokens import check_convention, leading_verb, read_stem, subtokens  # noqa: E402
+from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, SURFACES, langs,  # noqa: E402
+                          load_conf, build_negatives, parse_cell_key)
+from subtokens import (check_convention, classify, leading_verb, read_stem,  # noqa: E402
+                       render_convention, subtokens)
 
 KIT_LEXICON_VERSION = "1.1"
 
@@ -90,6 +91,12 @@ PIN_KEYS = {"verb": "VERB_OFFENDER_PIN", "suffix": "SUFFIX_OFFENDER_PIN"}
 #: "suffix", "layer")` tuples in `run()` and a fifth in the tally loop — deleting a predicate meant
 #: finding all of them.
 KINDS = ("verb", "suffix")
+
+#: The S7 guard's predicate: a string literal in `scaffold_lexicon.py` that BEGINS `CANON:`, which
+#: is what an emitted block header looks like. Deliberately not the bare token — that matches the
+#: file's own `# PROPOSED from the SHIPPED CANON` comment, and a guard whose pass condition is a
+#: comment's wording is the gate-satisfied-by-its-own-prose class. TOOL-aSurfacedLexicon-11.
+_CANON_HEADER_RE = re.compile(r"""["']\s*CANON:""")
 
 #: The shipped `probe` pattern sets. Each one MUST have a frozen sentinel fixture in `selftest.py`
 #: that yields a non-zero definition count, so a set going inert fails there rather than here.
@@ -195,7 +202,23 @@ class Offender:
         return f"{self.path}:{self.line}: {self.kind}: {self.text} — {self.detail}"
 
 
-def read_debt_gloss(verb: str, forms: dict | None = None) -> tuple[str, str]:
+def print_canon_posture(conf: dict) -> None:
+    """The UNFREEZE, on EVERY run and above everything else this file prints. S4.
+
+    A run that prints nothing here means the canon is frozen, and there is no state in which it is
+    quietly overridden. Green output is where a reader stops looking, so that is where the fact
+    sits — a posture visible only on a red run is the quiet unfreeze with an extra step, which is
+    the mirror defect this door was designed not to become. TOOL-aSurfacedLexicon-11.
+    """
+    rows = conf.get("CANON") or {}
+    if not rows:
+        return
+    print(f"lexicon: CANON UNFROZEN — {len(rows)} owner row(s) merged over the shipped clusters; "
+          f"stamp {(conf.get('canon_unfrozen') or '').strip()!r}")
+
+
+def read_debt_gloss(verb: str, forms: dict | None = None,
+                    clusters=None) -> tuple[str, str]:
     """`(representative, gloss)` for a token the shipped canon holds a cluster for; `("", "")` else.
 
     THE SPLIT'S WHOLE CLASSIFIER, and it is one dict lookup on purpose. A P1 offender whose leading
@@ -209,10 +232,17 @@ def read_debt_gloss(verb: str, forms: dict | None = None) -> tuple[str, str]:
 
     `forms` is the resolved index, passed by the corpus walk so 968 offenders do not rebuild it 968
     times; `--suggest` grades one name and lets it default.
+
+    `clusters` is the MERGED tuple where an owner declared a `CANON:` overlay, and BOTH arguments
+    have to travel together: `forms` decides the representative and `clusters` is what the gloss is
+    read out of, so passing a merged index with the shipped tuple resolves an owner's form and then
+    prints the shipped gloss for it, or the empty string. That pairing is the defect two revisions
+    of this unit's spec carried. TOOL-aSurfacedLexicon-11.
     """
-    forms = canon.build_form_index() if forms is None else forms
+    clusters = canon.CLUSTERS if clusters is None else clusters
+    forms = canon.build_form_index(clusters) if forms is None else forms
     rep = forms.get(verb, "")
-    return (rep, canon.read_gloss(rep)) if rep else ("", "")
+    return (rep, canon.read_gloss(rep, clusters)) if rep else ("", "")
 
 
 def render_swapped_name(name: str, want: str) -> str:
@@ -1150,13 +1180,20 @@ CELL_POPULATION_RULES = {
 #: population rather than asserted beside it.
 PREDICATE_SURFACES = {"verb": "function", "suffix": "type"}
 
-#: DEFAULT-OFF, and the flip is owed to whichever unit first writes a full `CELLS` matrix into
-#: `.lexicon.conf` — TOOL-aSurfacedLexicon-12 accepted it as its S14/AC14. Armed at this build order
-#: the arm would fire three refusals on the commit that lands it, against a declaration whose matrix
-#: does not exist yet. So it lands REPORT-ONLY: computed on every run, printed on every run, and
-#: refusing nothing. A matrix that lands with this constant left `False` ships an arm that reports
-#: and can never refuse, which is the failure this whole unit was written against.
-UNDECLARED_CELL_ARMED = False
+#: ARMED by TOOL-aSurfacedLexicon-12, in the SAME commit as the full `CELLS` matrix in
+#: `.lexicon.conf`, which is the only commit where both halves are true at once. It landed
+#: REPORT-ONLY under TOOL-aSurfacedLexicon-6 because arming it at that build order would have fired
+#: refusals against a declaration whose matrix did not exist yet — computed on every run, printed on
+#: every run, refusing nothing. A matrix that lands with this left `False` ships an arm that reports
+#: and can never refuse, which is the failure that whole unit was written against, so the two edits
+#: are one change and this comment is where that is recorded.
+#:
+#: IT IS A KIT DEFAULT AND IT GRADES THE ADOPTER'S DECLARATION, not this repo's, so arming it here
+#: reds every adopter that arms a language in `LANGS=` and then declares no cell for the surfaces
+#: that language extracted. That is the state it exists to refuse and the refusal names each pair;
+#: an adopter arming nothing extracts nothing and still passes. The cost is real and is paid on
+#: purpose: the alternative is a report every run that no tree is ever obliged to act on.
+UNDECLARED_CELL_ARMED = True
 
 
 def measure_conventions(scanned: list, conf: dict, root: Path, declared: dict) -> dict:
@@ -1260,7 +1297,7 @@ def measure_conventions(scanned: list, conf: dict, root: Path, declared: dict) -
     return out, problems
 
 
-def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
+def measure_pass(root: Path, kit: Path, conf: dict, declared: dict, clusters=None) -> dict:
     """THE MEASUREMENT HALF: one corpus walk, every refusal, and NO verdict.
 
     IT IS A SEPARATE FUNCTION SO THAT NO RETURN CAN SIT INSIDE IT. The file this replaces confessed
@@ -1275,6 +1312,7 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
     decides.
     """
     verbs = conf.get("VERBS") or {}
+    clusters = canon.CLUSTERS if clusters is None else clusters
     banned = tuple(t for t in (conf.get("BANNED_SUFFIXES") or "").split() if t)
 
     # RESOLVED ONCE, HERE, and handed down. Every reader below asks the same question of the same
@@ -1333,6 +1371,45 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
     self_problems, self_mods, self_imports = check_self_containment()
     problems.extend(self_problems)
 
+    # --- S7 of TOOL-aSurfacedLexicon-11: the mirror may not return through the proposal path -----
+    #
+    # `scaffold_lexicon.py` proposes a table from the corpus. It may propose which CONCEPTS are
+    # live; it may never propose the CANON those concepts are spelled from — a scaffold emitting a
+    # `CANON:` block would hand an adopter an owner-declared overlay derived from their own code,
+    # which is the mirror this whole file exists to keep out, arriving through the one door built
+    # for a human.
+    #
+    # THE PREDICATE IS NARROWED, AND THE NEAR-MISS IS NAMED HERE RATHER THAN LEFT TO BE REDISCOVERED.
+    # The obvious form — any occurrence of `CANON` in that file — matches its own explanatory comment
+    # `# PROPOSED from the SHIPPED CANON`, so a guard asserting zero would red the tree it shipped
+    # against and the fix would be degrading a sentence to dodge a substring. What is matched is an
+    # emitted BLOCK HEADER: a string literal that BEGINS `CANON:`. That comment is not one, because
+    # what it appends begins with `#` and carries no colon.
+    #
+    # WHAT THIS DOES NOT CHECK: it reads the scaffold's SOURCE, not its output. A header assembled
+    # from pieces at runtime would pass this and is out of its reach; the arm that would catch that
+    # is a scaffold run, which costs a corpus walk on every bar.
+    #
+    # AND THE SKIP ANNOUNCES ITSELF. This `if` carried no `else`, so renaming or deleting the file
+    # it reads turned the guard into a pass with nothing said — a skip wearing a pass's clothes,
+    # which is the one shape the charter names by hand. It is REPORTED rather than refused: this
+    # kit's own `check_self_containment` reds on an empty population because the population is its
+    # subject, whereas the scaffolder is a sibling command an adopter may not have installed, and a
+    # red nobody can fix in their own tree is a red they learn to bypass.
+    _scaffold = kit / "scaffold_lexicon.py"
+    scaffold_skip = "" if _scaffold.is_file() else _scaffold.name
+    if _scaffold.is_file():
+        hits = [i + 1 for i, ln in enumerate(
+            _scaffold.read_text(encoding="utf-8", errors="replace").splitlines())
+            if _CANON_HEADER_RE.search(ln)]
+        if hits:
+            problems.append(
+                "THE SCAFFOLD EMITS A `CANON:` BLOCK HEADER, at "
+                + ", ".join(f"{_scaffold.name}:{n}" for n in hits)
+                + ". The canon overlay is an OWNER declaration and the scaffold derives from the "
+                  "corpus, so a proposed overlay is the mirror this kit exists to keep out arriving "
+                  "through the one door built for a human. Remove the emission.")
+
     # --- extraction, with the vacuity arm ----------------------------------------------------
     offenders: dict[str, list[Offender]] = {k: [] for k in KINDS}
     # S1 — keyed on (extension, PREDICATE), never on extension alone. The fold this replaces
@@ -1349,7 +1426,12 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
     # RESOLVED ONCE, like `sets` above and for the same reason: the P1 split asks this index one
     # membership question per offending definition, and rebuilding a 120-key dict per question is a
     # second answer waiting to disagree with the first.
-    forms = canon.build_form_index()
+    #
+    # THE MERGED TUPLE, and it travels with the index rather than beside it. `clusters` is the
+    # SHIPPED tuple on a frozen tree, in which case every line below is byte-identical. It is merged
+    # by the caller rather than here so its four refusals land where `run()` already names a
+    # declaration refusal, above the corpus walk. TOOL-aSurfacedLexicon-11.
+    forms = canon.build_form_index(clusters)
 
     for rel, ext, got, _problem in scanned:
         if got is None:
@@ -1369,7 +1451,7 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
                 # there, and a gate that says no and nothing else gets waived rather than obeyed:
                 # 79 of this tree's 968 offenders have a canon cluster naming the rename they owe,
                 # and the message named none of them.
-                rep, gloss = read_debt_gloss(verb, forms)
+                rep, gloss = read_debt_gloss(verb, forms, clusters)
                 detail = f"leading token {verb!r} is not in the declared VERBS table"
                 if rep:
                     # THE REPLACEMENT IDENTIFIER, not just the representative. A refusal naming
@@ -1568,7 +1650,18 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
     undeclared_cells = [f"{ext}.{PREDICATE_SURFACES[kind]} at {n}"
                         for (ext, kind), n in sorted(graded.items())
                         if n and f"{ext}.{PREDICATE_SURFACES[kind]}" not in declared_cells]
-    if undeclared_cells and UNDECLARED_CELL_ARMED:
+    #
+    # THE REFUSAL IS GATED ON `declared_cells` BEING NON-EMPTY, which is the SAME boundary the
+    # `DEAD CELL REPORT` arm forty lines up already draws and states: a declaration carrying no
+    # `CELLS` block at all is a legal inert state, every adopter passes through it, and refusing it
+    # would red every tree that installed this kit before the block existed. Two arms in one
+    # function disagreeing about that would be the two-answers-to-one-question class inside a
+    # single predicate. What the gate buys once an owner declares their FIRST cell is completeness:
+    # a partial matrix reds, naming each pair. The boundary is measured rather than reasoned: armed
+    # without this clause, the fixtures that red are the ones declaring `LANGS` and no cells, which
+    # is exactly the adopter state it describes. No count is written here — it moves with every
+    # fixture this kit's selftest adds, and the one that was written here did not reproduce.
+    if undeclared_cells and UNDECLARED_CELL_ARMED and declared_cells:
         problems.append(
             "UNDECLARED CELL (an extracted population with no CELLS row grades nothing and is "
             "invisible to every cell verdict; declare each, `dark` if it should not be graded): "
@@ -1588,11 +1681,13 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict) -> dict:
         "declared": declared,
         "sets": sets,
         "patterns": conf.get("PATTERNS") or {},
+        "canon_overlay": conf.get("CANON") or {},
         "inert": inert,
         "files": files,
         "carriers": carriers,
         "self_mods": self_mods,
         "self_imports": self_imports,
+        "scaffold_skip": scaffold_skip,
     }
 
 
@@ -1685,8 +1780,8 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     # keeps grading the whole unwaived population above; these rows grade the two halves of each
     # DECLARED vocab cell. Both bind, and that is the point rather than a transition cost: a rename
     # moving a definition from DEBT to UNRULED inside one cell holds the total, so the scalar greens
-    # and only these rows can see it. TOOL-aSurfacedLexicon-12 retires the scalar when it writes the
-    # full matrix; until then a tree with no vocab cell has exactly the ratchet it had before.
+    # and only these rows can see it. A tree with no vocab cell has exactly the ratchet it had
+    # before.
     #
     # TWO-SIDED, like every other pin here. A fall reds as loudly as a rise, because a drain nobody
     # was obliged to re-measure is a drain nobody re-measured.
@@ -1702,6 +1797,18 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
                       f"directions. Paste this row into .lexicon.conf under PINS:, separated from "
                       f"its neighbour by one blank line:")
                 print(f"  {key}  {got}")
+                # F2, ratified — THE ATTRIBUTION, and it is the difference between a diagnosis and a
+                # bug report. An owner who has just unfrozen the canon and is then handed the bare
+                # mismatch above reads it as a fault in the ratchet: the overlay moves definitions
+                # between the DEBT and UNRULED buckets by construction, and both rows are two-sided
+                # pins, so this red is the design working. Printed only where an overlay exists, so
+                # the line tells a reader something the mismatch alone does not.
+                if measured["canon_overlay"]:
+                    print(f"lexicon:   CAUSE — the CANON overlay is unfrozen "
+                          f"({len(measured['canon_overlay'])} owner row(s)), which reclassifies "
+                          f"leading tokens between DEBT and UNRULED. This movement is that "
+                          f"reclassification, not a fault in the ratchet; deleting the CANON: "
+                          f"block restores the shipped classification.")
 
     for p in problems:
         print(f"lexicon: {p}")
@@ -1731,6 +1838,13 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     # printing alone is not enough, which is why a zero here is a `DEAD PROBE` refusal above.
     print(f"lexicon: self-contained — judged {measured['self_imports']} import(s) over "
           f"{measured['self_mods']} module(s) beside the engine")
+
+    # THE STRUCTURAL GUARD THAT READ NOTHING SAYS SO, per the charter's skip-announces-itself rule.
+    # Silence here would be indistinguishable from a guard that ran and found nothing.
+    if measured["scaffold_skip"]:
+        print(f"lexicon: SCAFFOLD GUARD SKIPPED — no `{measured['scaffold_skip']}` beside the "
+              f"engine, so the arm refusing a scaffold that emits a `CANON:` block header read no "
+              f"file this run and went UNEXERCISED (reported, not a refusal)")
 
     # S2 — a REPORT, not a refusal. An armed pair that grades nothing is NAMED so the zero is
     # legible; it does not red. `.js` here is armed and has no classes at all, which is a repo
@@ -1764,7 +1878,11 @@ def check_pass(measured: dict, list_mode: bool = False) -> int:
     print(f"lexicon: UNDECLARED CELL — {len(measured['undeclared_cells'])} extracted population(s) "
           f"with no CELLS row"
           + (": " + ", ".join(measured["undeclared_cells"]) if measured["undeclared_cells"] else "")
-          + (" [REFUSED above]" if UNDECLARED_CELL_ARMED else " [reported, not a refusal]"))
+          # THE LABEL READS THE SAME CONDITION THE REFUSAL DOES, both halves of it. A run over a
+          # declaration with no `CELLS` block is armed and still does not refuse, and printing
+          # `[REFUSED above]` there would be a label describing the constant rather than the run.
+          + (" [REFUSED above]" if UNDECLARED_CELL_ARMED and measured["cells"]
+             else " [reported, not a refusal]"))
     print("lexicon:   NOT CHECKED by that list — the `file` and `constant` surfaces. Their "
           "populations are computed by a declared cell's own selector, so an UNDECLARED one of "
           "those has no population to be non-empty and this arm cannot see it.")
@@ -1810,11 +1928,19 @@ def run(root: Path, list_mode: bool = False, measure_mode: bool = False) -> int:
     try:
         conf = load_conf(conf_path)
         declared = {ext: (pset, mode) for ext, pset, mode in langs(conf)}
-    except ConfError as e:
+        # ValueError joins ConfError here and nowhere wider. `build_clusters` is in `canon.py`,
+        # which imports nothing on purpose, so it cannot raise the reader's own exception — and its
+        # four refusals are declaration refusals, which belong beside the reader's rather than in a
+        # traceback out of the corpus walk. TOOL-aSurfacedLexicon-11.
+        clusters = canon.build_clusters(conf.get("CANON") or {})
+    except (ConfError, ValueError) as e:
         print(f"lexicon: {e}")
         return 1
 
-    measured = measure_pass(root, kit, conf, declared)
+    # ABOVE THE COUNTS, on every run, red and green alike (S4).
+    print_canon_posture(conf)
+
+    measured = measure_pass(root, kit, conf, declared, clusters)
     problems = measured["problems"]
 
     if measure_mode:
@@ -1882,7 +2008,69 @@ def build_banned_index(conf: dict) -> dict:
     return out
 
 
-def run_suggest(root: Path, name: str) -> int:
+def resolve_cell(cells: dict, spec: str) -> tuple:
+    """`(cell, convention, flags)` for one `--as` argument, or a ConfError naming WHICH refusal.
+
+    FOUR REFUSALS, SEPARATELY WORDED, and the wording is the product (TOOL-aSurfacedLexicon-8 S2). A
+    caller who typed a cell that does not exist, a cell the owner declared `dark`, a key that is not
+    a cell at all, and a BARE SURFACE have four different problems, and one message for all four
+    tells none of them what to do next. The bare-surface refusal is a MENU: it lists the declared
+    cells carrying that surface, which is fork F2's ratified ruling and the clause that keeps the
+    refusal from being a wall.
+
+    Checked in that order because the shapes overlap: `file` is malformed AS A CELL KEY, so the bare
+    surface has to be recognised before the generic malformed refusal can claim it.
+    """
+    if spec in SURFACES:
+        carriers = sorted(c for c in cells if parse_cell_key(c)[1] == spec)
+        menu = (" ".join(carriers) if carriers else
+                "none — this declaration carries no cell for that surface")
+        raise ConfError(f"`--as {spec}` names a BARE SURFACE, and a surface is not a cell: this "
+                        f"declaration may arm two languages on it and the answer differs by "
+                        f"language. Declared `{spec}` cells: {menu}")
+    try:
+        _ext, _surface, kind, _lit = parse_cell_key(spec)
+    except ConfError as exc:
+        raise ConfError(f"`--as {spec}` is MALFORMED: {exc}") from exc
+    if kind:
+        raise ConfError(f"`--as {spec}` is MALFORMED: it carries a selector. `--as` addresses the "
+                        f"parent `<ext>.<surface>` cell; a selector is applied FROM THE NAME, the "
+                        f"way the grader applies it.")
+    if spec not in cells:
+        raise ConfError(f"cell `{spec}` is UNDECLARED — no CELLS row names it, so there is no "
+                        f"convention to answer in. Declared cells: "
+                        + (" ".join(sorted(cells)) or "none"))
+    conv, flags = cells[spec]
+    if conv == "dark":
+        raise ConfError(f"cell `{spec}` is declared `dark`, which is the owner saying this surface "
+                        f"is deliberately ungraded here. There is no convention to answer in.")
+    return spec, conv, flags
+
+
+def read_routed_cell(cells: dict, cell: str, name: str) -> tuple:
+    """The row `name` is actually graded in — the parent, or a selector'd row that claims the name.
+
+    S9. `--as` takes the plain cell and never a selector'd key, but the grader partitions that cell
+    by selector, so answering in the PARENT's convention for a name the grader routes elsewhere is
+    the same surface-blindness one level down. A `prefix` selector is resolvable from an identifier
+    and is applied here. A `decorator` selector is NOT — `--suggest` sees no decorator — so a cell
+    carrying one answers in the parent's convention and the caller is TOLD, rather than left with a
+    confident answer the gate may disagree with.
+    """
+    note = ""
+    for key, (conv, flags) in cells.items():
+        if not key.startswith(cell + "+"):
+            continue
+        _e, _s, kind, lit = parse_cell_key(key)
+        if kind == "prefix" and name.startswith(lit):
+            return key, conv, flags, ""
+        if kind == "decorator":
+            note = (f"cell `{cell}` also declares a `decorator` selector (`{lit}`), which cannot be "
+                    f"resolved from an identifier — this answer is the parent cell's")
+    return cell, cells[cell][0], cells[cell][1], note
+
+
+def run_suggest(root: Path, name: str, cell_spec: str) -> int:
     """S1 — one deterministic line for ONE identifier, from the declaration and the SHIPPED CANON.
 
     TWO SOURCES, IN THE FIXED PRECEDENCE the body below states: the declaration's own inverted NOT
@@ -1893,6 +2081,23 @@ def run_suggest(root: Path, name: str) -> int:
     NO CORPUS PASS, deliberately and measurably: the whole value is that an author can ask before
     writing, and a verb that walks 900 files to answer one question is a verb nobody waits for.
     Both sources are tables that ship with the kit, so this stays true wherever it is installed.
+    `--as` adds a THIRD table read and no walk at all.
+
+    SURFACE-AWARE (TOOL-aSurfacedLexicon-8). `cell_spec` is the `--as` argument and it is REQUIRED,
+    because the surface is the whole question: which predicates are armed and which convention the
+    answer is spelled in are both properties of the cell, and a default answers that silently for a
+    caller who did not think about it. A surface-blind suggestion is how this verb handed back
+    `loadUserData` for a cell declaring snake — a name its own gate reds.
+
+    AT MOST THREE CHECKS, IN THIS ORDER: the banned tail where the cell arms `notail`, the leading
+    token where it arms `vocab`, and the convention always. The re-casing is applied to whatever
+    name the earlier checks produced, so the printed name is legal under every armed predicate of
+    that cell at once rather than under the last one to run.
+
+    THE TAIL-BEFORE-VERB ORDER IS DEFENSIVE OVER AN EMPTY POPULATION, which is stated rather than
+    implied: no cell in this repo's declaration arms both flags, so nothing here can distinguish this
+    ordering from its reverse. A declaration that arms both on one cell gives the rule a population
+    and owes an arm whose input hits both.
     """
     try:
         conf = load_conf(root / CONF_NAME)
@@ -1903,13 +2108,50 @@ def run_suggest(root: Path, name: str) -> int:
     if not verbs:
         print("lexicon: no VERBS declared; nothing to suggest against")
         return 2
+    try:
+        cell, conv, flags = resolve_cell(conf.get("CELLS") or {}, cell_spec)
+    except ConfError as exc:
+        print(f"lexicon: {exc}")
+        return 2
+    cell, conv, flags, routing = read_routed_cell(conf.get("CELLS") or {}, cell, name)
+    try:
+        clusters = canon.build_clusters(conf.get("CANON") or {})
+    except ValueError as exc:
+        print(f"lexicon: {exc}")
+        return 2
+    # S4 — the posture, ABOVE the answer, on this surface too. `--suggest` is the verb an author
+    # reads before writing a name, so an overlay steering that answer with nothing saying so is the
+    # quiet unfreeze in the one place it would be least visible.
+    print_canon_posture(conf)
 
-    verb = leading_verb(name)
+    # S8 — WHAT A `file` CELL'S ARGUMENT IS. `--suggest` takes an identifier, so a `file` cell takes
+    # a BASENAME and grades the stem `read_stem` cuts from it — the grader's own seam, reused rather
+    # than re-derived, because a suggester that stems differently from the checker is the
+    # surface-blindness this unit exists to remove, one level down. `_SUBTOKEN_RE` shreds `.` and `/`
+    # into separate tokens and cannot compute that stem at all.
+    graded = read_stem(name.replace("\\", "/").rsplit("/", 1)[-1]) if cell.split(".")[1] == "file" \
+        else name
+
+    lines = []
+    if routing:
+        lines.append(f"note — {routing}")
+
+    if "notail" in flags:
+        for suf in tuple(t for t in (conf.get("BANNED_SUFFIXES") or "").split() if t):
+            if graded.endswith(suf):
+                print(f"`{graded}` ends with the banned suffix `{suf}`, which cell `{cell}` bans "
+                      f"with its `notail` flag — the question is what this thing IS, and `{suf}` "
+                      f"answers that with a role nobody scoped.")
+                for line in lines:
+                    print(line)
+                return 0
+
+    verb = leading_verb(graded)
     if not verb:
-        print(f"lexicon: {name} has no word characters, so it is ungradeable rather than wrong")
-        return 0
-    if verb in verbs:
-        print(f"OK — {name} leads with `{verb}`, which the declaration carries")
+        # AC7 — `leading_verb`'s contract, preserved rather than re-spelled around. Its population is
+        # the underscore-only and the non-ASCII names; a DIGIT-leading name is graded, because
+        # `_SUBTOKEN_RE` carries `[0-9]+` and `leading_verb("1")` returns `"1"`.
+        print(f"lexicon: {graded} has no word characters, so it is ungradeable rather than wrong")
         return 0
 
     banned = build_banned_index(conf)
@@ -1924,28 +2166,59 @@ def run_suggest(root: Path, name: str) -> int:
     # is `init`. An arm in `selftest.py` reds if the last such disagreement ever leaves the
     # declaration. TOOL-aSurfacedLexicon-7.
     want, gloss, source = "", "", ""
-    if verb in banned:
-        want = banned[verb]
-        gloss = (verbs.get(want) or "").strip()
-        source = "the declaration says"
-    else:
-        rep, canon_gloss = read_debt_gloss(verb)
-        if rep:
-            want = rep
-            gloss = (verbs.get(rep) or canon_gloss).strip()
-            # Fork F2, decided as its recommendation: propose the representative even where this
-            # declaration does not carry it, and SAY SO. Suppressing the advice leaves the author
-            # with a refusal and nothing else, which is the defect this whole path exists to close;
-            # proposing it silently hands them a name the gate reds on the next run.
-            source = ("the shipped canon says" if rep in verbs else
-                      "the shipped canon says (and this declaration carries NO row for it, so it "
-                      "needs one first)")
+    if "vocab" in flags and verb not in verbs:
+        if verb in banned:
+            want = banned[verb]
+            gloss = (verbs.get(want) or "").strip()
+            source = "the declaration says"
+        else:
+            rep, canon_gloss = read_debt_gloss(verb, None, clusters)
+            if rep:
+                want = rep
+                gloss = (verbs.get(rep) or canon_gloss).strip()
+                # Fork F2 of TOOL-aSurfacedLexicon-7, decided as its recommendation: propose the
+                # representative even where this declaration does not carry it, and SAY SO.
+                # Suppressing the advice leaves the author with a refusal and nothing else, which is
+                # the defect this whole path exists to close; proposing it silently hands them a
+                # name the gate reds on the next run.
+                source = ("the shipped canon says" if rep in verbs else
+                          "the shipped canon says (and this declaration carries NO row for it, so "
+                          "it needs one first)")
+
+    answer = render_swapped_name(graded, want) if want else graded
+    # THE RENDERER IS REACHED FROM EVERY EXIT, not only from the banned-verb branch. A name whose
+    # leading token IS declared used to return here with an `OK` line before any convention check
+    # ran, and that quiet everyday path — nothing wrong but the case — is the one this verb answers
+    # most often. F1, ratified as option A: a name the round trip cannot carry is NOT re-spelled.
+    recased = render_convention(answer, conv)
+    if recased and recased != answer:
+        lines.append(f"re-cased to {conv} for cell `{cell}`, which `{answer}` does not satisfy"
+                     + (f" (it satisfies {', '.join(sorted(classify(answer)))})"
+                        if classify(answer) else ""))
+        answer = recased
+    elif not recased:
+        lines.append(f"NOT re-cased: `{answer}` cannot be spelled in {conv} without inventing bytes "
+                     f"the caller did not write — a character the splitter cannot see and {conv} "
+                     f"does not re-supply, or a core no convention can carry. Fix it by hand.")
+
     if want:
-        print(f"use `{render_swapped_name(name, want)}` — {source} `{want}`, NOT `{verb}`: {gloss}")
-    else:
+        print(f"use `{answer}` — {source} `{want}`, NOT `{verb}`: {gloss}")
+    elif "vocab" in flags and verb not in verbs:
         print(f"`{verb}` is not in the declared table, no row bans it by name, and the shipped "
               f"canon holds no cluster for it — so this is a SCOPING question, not a spelling one. "
               f"Declared verbs: {' '.join(sorted(verbs))}")
+    elif answer != graded:
+        print(f"use `{answer}` — cell `{cell}` declares {conv}, and `{graded}` does not satisfy it")
+    elif not recased:
+        print(f"`{graded}` does not satisfy {conv} for cell `{cell}`, and this verb will not "
+              f"re-spell it")
+    elif "vocab" in flags:
+        print(f"OK — {graded} leads with `{verb}`, which the declaration carries, and satisfies "
+              f"{conv} for cell `{cell}`")
+    else:
+        print(f"OK — {graded} satisfies {conv} for cell `{cell}`")
+    for line in lines:
+        print(line)
     return 0
 
 
@@ -1986,11 +2259,22 @@ def main(argv: list[str]) -> int:
             "  --check            assert; non-zero on an unwaived offender\n"
             "  --list             print every offender, waived or not (authoring aid)\n"
             "  --measure          print the pins THIS conf produces; decide nothing\n"
-            "  --suggest <name>   one line for ONE identifier, no corpus pass\n")
+            "  --suggest <name> --as <ext>.<surface>\n"
+            "                     one line for ONE identifier, no corpus pass\n")
         return 2
-    if mode == "--suggest" and len(argv) < 3:
-        sys.stderr.write(f"usage: python {me} --suggest <identifier>\n")
-        return 2
+    cell_spec = ""
+    if mode == "--suggest":
+        # `--as` IS REQUIRED AND IS NOT DEFAULTED (S1). The surface decides which predicates are
+        # armed and which convention the answer is spelled in, so a default answers the whole
+        # question silently for a caller who did not think about it.
+        rest = argv[3:]
+        if len(argv) > 3 and rest[0] == "--as" and len(rest) > 1:
+            cell_spec = rest[1]
+        if len(argv) < 3 or argv[2].startswith("--") or not cell_spec:
+            sys.stderr.write(f"usage: python {me} --suggest <identifier> --as <ext>.<surface>\n"
+                             "  --as is REQUIRED: the surface decides which predicates are armed "
+                             "and which convention the answer is spelled in.\n")
+            return 2
     out = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True)
     if out.returncode != 0:
         sys.stderr.write("lexicon: not a git repo\n")
@@ -1999,7 +2283,7 @@ def main(argv: list[str]) -> int:
     # The SUPPLY verb returns before `run()`, which is what keeps it off the gate path: it cannot
     # reach a pin, a waiver or an exit code of 1 even by accident.
     if mode == "--suggest":
-        return run_suggest(root, argv[2])
+        return run_suggest(root, argv[2], cell_spec)
     return run(root, list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))
 
 

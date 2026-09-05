@@ -76,3 +76,5 @@ base: 6c670b024644bf6bbcc28ee74d2265c0efd453c6
 2026-09-05T03:27:36Z dispatch · item e6af6206 TOOL-aSurfacedLexicon-4 · reason tools/lexicon/lexicon.py tools/lexicon/lexicon_conf.py tools/lexicon/subtokens.py tools/lexicon/selftest.py tools/lexicon/README.md .lexicon.conf memory/map/features/lexicon.md
 
 2026-09-05T05:49:23Z dispatch · item e354db0a TOOL-aSurfacedLexicon-14 · reason tools/lexicon/lexicon.py tools/lexicon/selftest.py tools/lexicon/README.md .lexicon.conf
+
+2026-09-05T12:03:59Z dispatch · item 2d487019 TOOL-aSurfacedLexicon-11 · reason tools/lexicon/lexicon.py tools/lexicon/canon.py tools/lexicon/lexicon_conf.py tools/lexicon/selftest.py .lexicon.conf tools/lexicon/README.md

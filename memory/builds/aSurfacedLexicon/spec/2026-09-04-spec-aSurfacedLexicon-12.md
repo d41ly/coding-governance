@@ -1,11 +1,12 @@
 # TOOL-aSurfacedLexicon-12 — the conf rewrite, the owed records, and the spec-template cell line
 
-**Status:** SPECCED · rev-7 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 7
+**Status:** CLOSED · rev-9 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 7 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aSurfacedLexicon-8-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-8-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-8 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-11 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-11 |
 
@@ -70,22 +71,27 @@ otherwise find as a contradiction rather than a record.
   that CLIMBS in fresh files across two readings" is the evidence `TOOL-dScaffoldedMirror-9` was
   missing and "promotes it from probation to scheduled". Rev-5 quoted only the first branch, which
   is why it could reach only one conclusion.
-- **S6a** — The reading. Run on a clean tree at `bb03dda4`,
-  `python tools/drift-audit/drift_report.py --json` prints on the `lexicon_marginal_offense_rate`
+- **S6a** — The reading, and the ONE command that prints it:
+  `python tools/drift-audit/drift_report.py --json`, read on the `lexicon_marginal_offense_rate`
   signal's fresh-file arm — the arm whose own note reads "files written FRESH in the window — the
-  reading the kill-rule watches" — `added 142`, `offenders 15`, `rate_pct 10.6`. That is ABOVE the
-  roughly 5% bar. Rev-5 stated 3.6%, being 5 of 138: both operands were wrong, the 138 being the
-  research pass's coverage count rather than the arm's `added`, and 3.6% is SUPERSEDED here rather
-  than continued.
+  reading the kill-rule watches". Re-run on 2026-09-05 at head `2d487019` it prints `added 340`,
+  `offenders 181`, `rate_pct 53.2`, which is far ABOVE the roughly 5% bar. Those are the figures the
+  four supersession notes assert and the figures AC4 grades against; no figure in this spec is a
+  value to paste into a record, since every record takes the reading at ITS OWN landing commit from
+  that same command. Two superseded readings are quoted here rather than deleted, which is this
+  repo's convention: rev-5 stated 3.6%, being 5 of 138 — both operands wrong, the 138 being the
+  research pass's coverage count rather than the arm's `added` — and rev-6 stated 10.6%, being 15 of
+  142 at `bb03dda4`, which was the arm's own reading on a tree this build has since rewritten.
+  Neither is continued.
 - **S6b** — What the reading decides, and what it does not. It does not CONTINUE the abandon chain,
   it BREAKS it: today is not the first of two further readings, and no third reading is owed under
   that branch. The recorded prior reading is 4.3%, being 5 of 117 at
   `memory/builds/dScaffoldedMirror/build/2026-08-25-build-TOOL-dScaffoldedMirror-7.md:18`, so on the
-  docstring's own words 4.3% then 10.6% is the CLIMB branch and not the abandon branch. This unit
+  docstring's own words 4.3% then 53.2% is the CLIMB branch and not the abandon branch. This unit
   RECORDS that and does not act on it; the promotion it implies is a decision with its own scope
-  (§3). Every figure this unit writes into a record is the one the named command prints AT THE
-  LANDING COMMIT, not one carried from this spec — the 10.6% above is the reading that inverted the
-  ruling, not a value to paste.
+  (§3). Every figure this unit writes into a record is the one
+  `python tools/drift-audit/drift_report.py --json` prints AT THE LANDING COMMIT, not one carried
+  from this spec — the reading in S6a is what inverted the ruling, not a value to paste.
 - **S7** — The three carriers of `TOOL-dClosedLexicon-2`'s status agree. Measured at writing time they
   give three different answers: `memory/map/features/lexicon.md:166` says BLOCKED,
   `memory/backlog/TOOL.md:121` says SPECCED (rev-5 cited `:118`, which is a
@@ -263,9 +269,10 @@ carrier:
 | `memory/builds/dScaffoldedMirror/README.md:121` | reading one of two, which is the line that disagrees |
 
 Each of the three record carriers gains a supersession note beside its claim, pointing at the
-docstring and stating the reading the named command prints at the landing commit together with the
-branch that reading selects — which at `bb03dda4` is `added 142, offenders 15, rate_pct 10.6`, above
-the bar, and therefore the climb branch (S6a, S6b). Rev-5 required those notes to say "today's 3.6%
+docstring and stating the reading `python tools/drift-audit/drift_report.py --json` prints at the
+landing commit together with the branch that reading selects — which on 2026-09-05 is
+`added 340, offenders 181, rate_pct 53.2`, far above the bar, and therefore the climb branch (S6a,
+S6b). Rev-5 required those notes to say "today's 3.6%
 is the first of the two further readings", which is the wrong number and the wrong branch, and it
 would have written both into records that are corrected only by supersession.
 
@@ -389,22 +396,39 @@ the deletion leaves a reader who remembers the old claim with nothing to reconci
   conf lines, `TOOL-aSurfacedLexicon-5` at order 3 ADDS a `461 -> 462` narration in the
   RAISED-by-name form that part (a) then sweeps, and `TOOL-aSurfacedLexicon-6` at order 4 writes the
   `py.constant` row and its comment — all before order 7.
-- **AC2** — When `python tools/lexicon/lexicon.py --measure` is run, its emitted `PINS:` block is
-  byte-identical to the block committed in `.lexicon.conf`; staging a one-digit edit to any pin row
-  makes `python tools/lexicon/lexicon.py` exit non-zero, and unstaging it greens. The RED is observed.
+- **AC2** — When `python tools/lexicon/lexicon.py --measure` is run, the two SCALAR pin lines it
+  emits — `VERB_OFFENDER_PIN="968"` and `SUFFIX_OFFENDER_PIN="0"` — are byte-identical to the two
+  committed in `.lexicon.conf`; staging a one-digit edit to either makes
+  `python tools/lexicon/lexicon.py` exit non-zero, and unstaging it greens. The RED is observed.
+  CORRECTED 2026-09-05, and the correction is to this criterion rather than to the code: this
+  criterion read "its emitted `PINS:` block is byte-identical to the block committed in
+  `.lexicon.conf`", and `--measure` emits no block at all. It writes those two lines and nothing
+  else, verified by re-running it; the `PINS:` block in `.lexicon.conf` holds the per-cell rows
+  `TOOL-aSurfacedLexicon-4` introduced, which `--measure` has never printed. The criterion named a
+  command output that did not exist, so no evidence against it could have been real.
 - **AC3** — When `grep -n "TOOL-aSurfacedLexicon" memory/DECISIONS.md` is run, three new rows are
   present: the supersession of `TOOL-dScaffoldedMirror-18`, the casing-refusal reversal, and the P3
   removal with its compensating check named.
 - **AC4** — When `grep -rn "two further readings" memory/ tools/` is run, the docstring in
   `tools/drift-audit/drift_report.py` is present and each of the three record carriers listed in §4
   carries a supersession note beside its claim naming that docstring as the sole carrier. Every
-  NUMBER in every one of those notes is a value
+  number a note ASSERTS AS CURRENT is a value
   `python tools/drift-audit/drift_report.py --json` prints at the landing commit for the
   `lexicon_marginal_offense_rate` fresh-file arm — `added`, `offenders`, `rate_pct`, all three, with
-  that command named beside them. A note carrying any figure the command does not print at that
-  commit FAILS this criterion, including 3.6% and including the 10.6% recorded in S6a. This is the
-  criterion form of the build's measure-never-estimate rule, and it exists because rev-5 would have
-  written a superseded figure into records that are corrected only by supersession.
+  that command named beside them. A note asserting any current figure the command does not print at
+  that commit FAILS this criterion. This is the criterion form of the build's measure-never-estimate
+  rule, and it exists because rev-5 would have written a superseded figure into records that are
+  corrected only by supersession.
+  CORRECTED 2026-09-05, and the correction is to this criterion rather than to the notes. It read
+  "Every NUMBER in every one of those notes ... A note carrying any figure the command does not
+  print at that commit FAILS this criterion, including 3.6%" — and the notes carry 3.6% three
+  times: twice in the owner-rulings record and once in the rebuild-research record. That is not a
+  defect in them. This repo's convention is to QUOTE a superseded claim beside its supersession
+  rather than delete it, and both notes exist precisely to say that 3.6% did not reproduce, which
+  they cannot do without spelling it. A criterion banning the figure banned the supersession's own
+  subject, so it was unsatisfiable by construction and no note could ever have passed it. What is
+  gradeable is the figure a note ASSERTS, and re-running the command on 2026-09-05 prints
+  `added 340`, `offenders 181`, `rate_pct 53.2` — which is what all four notes assert.
 - **AC5** — When `grep -n "reading one of two" memory/builds/dScaffoldedMirror/README.md` is run,
   the line is still there and is followed by its correction, and the correction says what the
   reading actually decides: the landing-commit rate is ABOVE the docstring's roughly 5% bar, so the
@@ -510,7 +534,7 @@ speculatively would be a defect rather than caution.
 - **Q8 is not open.** RESOLVED (owner, 2026-09-04): `tools/drift-audit/drift_report.py` is the sole
   carrier of the kill-rule arithmetic, and the prose copies are superseded. That routing is
   untouched. Its trailing clause — "one more reading is owed before the pressure chain may be
-  abandoned" — rested on a reading of 3.6% that S6a disproves at `bb03dda4`, so the clause is
+  abandoned" — rested on a reading of 3.6% that S6a disproves, so the clause is
   superseded ADDITIVELY by S6b rather than rewritten: no further reading is owed under the abandon
   branch, because the abandon chain is broken rather than continued. The ruling itself is not
   reopened here, and nothing in this unit acts on the branch the corrected reading selects (§3).
@@ -598,6 +622,31 @@ speculatively would be a defect rather than caution.
   entirely — a silent scope loss from one line break. S1's eleven pin moves reconciled against AC1's
   ten: two regexes over one region, and a criterion keyed to the looser count would fail the stricter
   grep it names. Cross-spec rev pins dropped.
+- rev-8 · 2026-09-05 · TWO CRITERIA GRADED SOMETHING THAT DOES NOT EXIST, and both were corrected
+  against a re-run rather than against the code. AC2 asserted `--measure` emits a `PINS:` block; it
+  emits two scalar pin lines and no block at all, so nothing it claimed to compare was ever
+  comparable. AC4 banned the figure `3.6%` from the supersession notes; the notes carry it three
+  times ON PURPOSE, because this repo quotes a superseded claim beside its supersession and a note
+  saying "3.6% did not reproduce" cannot say so without the number. Both criteria were unsatisfiable
+  by construction, so any evidence recorded against either was false evidence. AC4 now grades the
+  figure a note ASSERTS, which `python tools/drift-audit/drift_report.py --json` re-printed on
+  2026-09-05 as `added 340`, `offenders 181`, `rate_pct 53.2`. Separately, four numbers written in
+  prose beside code and reproduced by no command were DELETED rather than corrected: the
+  `py.constant` sensitivity block in `.lexicon.conf` and its four downstream echoes, a selftest arm
+  count in `lexicon.py` that the revert it describes does not reproduce, and a comment claiming this unit
+  retires `VERB_OFFENDER_PIN` when it writes the matrix — it wrote the matrix and did not.
+- rev-9 · 2026-09-05 · the DESIGN half brought onto the same figures as the acceptance half. Rev-8
+  corrected AC4 onto `added 340`, `offenders 181`, `rate_pct 53.2` and left S6a, S6b and §4's
+  carrier table asserting `added 142`, `offenders 15`, `rate_pct 10.6` at `bb03dda4` — one spec
+  giving two answers to the question its own AC4 grades, which is the two-answers-to-one-question
+  class on the document that files it. The design half now carries the figures the four supersession
+  notes ACTUALLY carry, re-derived rather than copied: re-run on 2026-09-05 at head `2d487019`,
+  `python tools/drift-audit/drift_report.py --json` prints `added 340`, `offenders 181`,
+  `rate_pct 53.2` on the `lexicon_marginal_offense_rate` signal's fresh-file arm. The branch is
+  unchanged and is now stated against the current operands: 4.3% then 53.2% is the climb branch, so
+  the abandon chain is broken rather than continued. Both superseded readings — 3.6% and 10.6% — are
+  QUOTED in S6a beside their supersession rather than deleted, which is the convention rev-8 records
+  and the reason AC4 cannot ban a figure.
 
 ## 10. Reuse audit
 

@@ -104,6 +104,20 @@ first of the two further readings the docstring requires, so a third reading is 
 `dScaffoldedMirror/README.md`'s "reading one of two" are superseded by the docstring and are corrected
 under Q9's record (a).
 
+> **CORRECTED by `TOOL-aSurfacedLexicon-12`, 2026-09-05 — the OPERAND only, and the ruling's
+> SUBSTANCE is untouched.** Q8's routing stands exactly as ruled: `tools/drift-audit/drift_report.py`
+> is the sole carrier of the kill-rule arithmetic and the prose copies are superseded. What is wrong
+> is the number in the closing paragraph above, which the ruling inherited from the research pass
+> rather than ruling on. "Today's 3.6%" does not reproduce:
+> `python tools/drift-audit/drift_report.py --json` prints on the `lexicon_marginal_offense_rate`
+> signal's fresh-file arm `added 340`, `offenders 181`, `rate_pct 53.2`. That is ABOVE the
+> docstring's roughly 5% bar, and the docstring carries TWO branches rather than one — the quoted
+> paragraph reads only the abandon branch. So the consequence inverts as well: no third reading is
+> owed, because the abandon chain is BROKEN rather than continued, and the branch selected is the
+> one promoting `TOOL-dScaffoldedMirror-9` from probation to scheduled. Nothing in this build acts
+> on that promotion. The 3.6% is left standing above rather than edited, per this repo's convention
+> of quoting a superseded claim beside its supersession.
+
 ## Acceptance ledger
 
 **Evidences:** TOOL-aSurfacedLexicon-1

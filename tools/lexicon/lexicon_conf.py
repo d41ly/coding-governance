@@ -30,10 +30,11 @@ from pathlib import Path
 
 #: Keys whose value is an indented block rather than a single line. `LAYERS` left with the
 #: predicate that read it (TOOL-aSurfacedLexicon-2); `CELLS` and `PINS` arrived with the
-#: (language, surface) matrix (TOOL-aSurfacedLexicon-4). Widening this tuple does NOT make every
+#: (language, surface) matrix (TOOL-aSurfacedLexicon-4); `CANON` is the owner's overlay over the
+#: frozen shipped clusters (TOOL-aSurfacedLexicon-11). Widening this tuple does NOT make every
 #: identifier-shaped header legal: an unlisted header still falls through to the refusal in
 #: `load_conf`, which is the regression AC4 stands on.
-BLOCK_KEYS = ("VERBS", "CELLS", "PINS", "PATTERNS")
+BLOCK_KEYS = ("VERBS", "CELLS", "PINS", "PATTERNS", "CANON")
 
 #: The closed sets the `CELLS` and `PINS` rows are graded against. A row naming a token outside
 #: one of these is a refusal naming the file and the line, never a skip.
@@ -316,6 +317,34 @@ def _parse_patterns(rows: list[tuple[int, str]], p: Path) -> dict[str, "re.Patte
     return out
 
 
+def _parse_canon(rows: list[tuple[int, str]], p: Path) -> dict[str, tuple]:
+    """`{"build": ("create", "make")}` from `<representative> <alternative>...`, whitespace split.
+
+    THE OWNER'S DOOR ONTO A FROZEN TABLE (TOOL-aSurfacedLexicon-11), and the shape is deliberately
+    the one `canon.CLUSTERS` already has. A leading minus on the row key deletes a shipped cluster
+    and takes no alternatives. What each direction MEANS, and every refusal, lives in
+    `canon.build_clusters` — this arm parses and validates nothing beyond the token shape, because
+    a second copy of the merge's rules here is the two-answers-to-one-question class.
+
+    A row key is checked for shape and nothing else: the block is an overlay over a table of ASCII
+    verbs, so a key carrying punctuation could only ever name a cluster that does not exist, and
+    saying so at the line beats a `KeyError` from the merge with no file in it.
+    """
+    out: dict[str, tuple] = {}
+    for rowkey, (lineno, rest) in _parse_rows(rows, p).items():
+        head = rowkey[1:] if rowkey.startswith("-") else rowkey
+        if not head.isalpha():
+            raise ConfError(f"{p}:{lineno}: a CANON representative is alphabetic, optionally "
+                            f"preceded by one `-` to delete a shipped cluster, got {rowkey!r}")
+        forms = rest.split()
+        bad = [f for f in forms if not f.isalpha()]
+        if bad:
+            raise ConfError(f"{p}:{lineno}: CANON row {rowkey!r} names non-alphabetic "
+                            f"alternative(s) {' '.join(bad)!r}")
+        out[rowkey] = tuple(forms)
+    return out
+
+
 #: The dispatch, and it is also the GUARD. A new block key costs ONE row here plus its row parser.
 #: There is no default: `_BLOCK_PARSERS.get(key, _parse_rows)` sat under a membership test against
 #: `BLOCK_KEYS` that had already raised for every key outside it, so the fallback could not be taken
@@ -325,7 +354,7 @@ def _parse_patterns(rows: list[tuple[int, str]], p: Path) -> dict[str, "re.Patte
 #: live: a key added to `BLOCK_KEYS` with no parser written is now a named ConfError instead of a
 #: `KeyError` with no file in it.
 _BLOCK_PARSERS = {"VERBS": _parse_verbs, "CELLS": _parse_cells, "PINS": _parse_pins,
-                  "PATTERNS": _parse_patterns}
+                  "PATTERNS": _parse_patterns, "CANON": _parse_canon}
 
 
 def _parse_block(key: str, rows: list[tuple[int, str]], p: Path):
@@ -444,6 +473,13 @@ def _main(argv: list[str]) -> int:
         for rowkey, val in (conf.get(block) or {}).items():   # DECLARATION order, which the Skill preserves
             if block == "CELLS":
                 val = " ".join([val[0], *sorted(val[1])])
+            elif block == "CANON":
+                # THE DETECTION ROUTE for `adopt-lexicon.sh`'s stamp refusals, and it is this flag
+                # rather than a grep. `--print-rows CANON` prints one overlay row per line and
+                # exits 0 with NO output where no block is declared, which is the whole predicate
+                # the stamp arm needs. `adopt-lexicon.sh` already rules a second parser out by
+                # name; this is the shell-out it rules in. TOOL-aSurfacedLexicon-11.
+                val = " ".join(val)
             elif block == "PATTERNS":
                 # The COMPILED object is what the block holds, so print the source it was compiled
                 # from. `str(re.compile(...))` is a repr, and a repr is not the row an owner typed.

@@ -118,6 +118,67 @@ def read_stem(basename: str) -> str:
     return basename.split(".", 1)[0]
 
 
+#: The bytes a convention SUPPLIES for itself, keyed by the convention it belongs to. `camel` and
+#: `pascal` supply the empty string, which is why they DELETE a separator rather than refusing one.
+_JOINERS = {"snake": "_", "screaming": "_", "kebab": "-", "camel": "", "pascal": ""}
+
+#: The separator class every convention owns. A character outside a subtoken span that is one of
+#: these is the renderer's to emit or drop; anything else is a character the round trip cannot carry
+#: and `render_convention` refuses rather than inventing a spelling for it (TOOL-aSurfacedLexicon-8
+#: fork F1). NARROW on purpose: a predicate refusing EVERY unseen character refuses `fetch_remote`
+#: asked for in a camel cell and hands back `load_remote`, which the camel predicate then reds —
+#: verbatim the surface-blind suggestion this unit exists to remove, on every separator-bearing name.
+_SEPARATORS = "_-"
+
+
+def render_convention(name: str, convention: str) -> str:
+    """`name` re-spelled in `convention`, or `""` when the round trip cannot carry it.
+
+    THE INVERSE OF `classify`, and it lives here so the two share `_AFFIX` and `_SUBTOKEN_RE` rather
+    than drifting apart in two files (TOOL-aSurfacedLexicon-8 S6).
+
+    SPAN-ANCHORED, which is the whole of its correctness and was earned by two review rounds on the
+    sibling splice in `render_swapped_name`. It builds from `_SUBTOKEN_RE.finditer` spans and
+    regenerates exactly two things: the separator between spans, which the convention itself supplies,
+    and the CASE OF EACH SPAN'S FIRST CHARACTER where the convention demands a different one. Every
+    other byte a span covers is the caller's own surface, passed through. A renderer that rebuilds
+    from `subtokens()` instead returns `getUserURLs` as `readUserUrLs` — a name with ZERO characters
+    the splitter cannot see, so the loss there is CASE, not a character, and no unseen-character rule
+    catches it.
+
+    Returns `name` UNCHANGED when it already satisfies the convention, before any span work at all:
+    the cheapest way to preserve a surface is not to touch it.
+
+    The final guard is the classifier itself. A rendering that does not satisfy the convention it was
+    asked for is refused rather than printed, because this is the one place in the kit that WRITES a
+    name instead of grading one, and a wrong name carries the tool's authority with it.
+    """
+    if convention not in _JOINERS:
+        return ""
+    if convention in classify(name):
+        return name
+    lead, core, trail = _AFFIX.match(name).group(1, 2, 3)
+    spans = list(_SUBTOKEN_RE.finditer(core))
+    if not spans:
+        return ""
+    covered = {i for m in spans for i in range(*m.span())}
+    if any(c not in _SEPARATORS for i, c in enumerate(core) if i not in covered):
+        return ""
+    toks = []
+    for i, m in enumerate(spans):
+        t = m.group(0)
+        if convention in ("snake", "kebab"):
+            toks.append(t.lower())
+        elif convention == "screaming":
+            toks.append(t.upper())
+        elif convention == "camel" and i == 0:
+            toks.append(t[:1].lower() + t[1:])
+        else:
+            toks.append(t[:1].upper() + t[1:])
+    out = lead + _JOINERS[convention].join(toks) + trail
+    return out if convention in classify(out) else ""
+
+
 def check_convention(name: str, convention: str) -> tuple:
     """`(verdict, message)` for ONE name against ONE declared convention. Three verdicts, no fourth.
 

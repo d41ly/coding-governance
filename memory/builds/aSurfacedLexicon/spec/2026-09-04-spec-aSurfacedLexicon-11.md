@@ -1,11 +1,12 @@
 # TOOL-aSurfacedLexicon-11 — the canon overlay and its stamp
 
-**Status:** SPECCED · rev-6 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6
+**Status:** CLOSED · rev-7 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aSurfacedLexicon-8-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aSurfacedLexicon-8-acceptance-ledger.md) | journal | TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-12 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-12 |
 | [2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round2.md) | spec-audit | TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-12 |
 
@@ -315,16 +316,33 @@ changes what may be proposed; it does not write the sentence that says what the 
 
 ## 6. Acceptance criteria
 
+*AC1, AC2 and AC3 are RE-KEYED ONTO THE MESSAGE, and the three of them share one reason. Each was
+written against the EXIT CODE of `bash tools/lexicon/adopt-lexicon.sh --check`, and no fixture this
+spec can build ever produces an informative one: `check_skill` reds in any sandbox carrying no
+rendered Skill, so every run of that script in a scratch tree is non-zero whatever the stamp says.
+"Exits non-zero" was therefore true of all of them and evidence about none — an assertion that
+cannot fail — and "it exits 0" named a state the fixture can never reach at all. The arms in
+`tools/lexicon/selftest.py` assert the MESSAGES for exactly this reason, and these three criteria now
+say what those arms grade. The exit code stays gradeable where a real tree carries a rendered Skill,
+which is AC10's job.*
+
 - **AC1** — When `.lexicon.conf` carries a `CANON:` block and `canon_unfrozen=""`,
-  `bash tools/lexicon/adopt-lexicon.sh --check` exits non-zero naming the empty stamp; when the stamp is
-  filled with a date, a node and a reason it exits 0. The RED is observed before the arm is called
-  landed.
+  `bash tools/lexicon/adopt-lexicon.sh --check` PRINTS the empty-stamp refusal, and that refusal
+  reports the row count it read through the declaration reader — two rows for a two-row block, which
+  is what separates a derived count from a constant. When the stamp is filled with a date, a node and
+  a reason, the same run prints NEITHER stamp refusal, so the guard is not a wall. Both states are
+  observed before the arm is called landed.
 - **AC2** — When the stamp carries a date and a node but no reason,
-  `bash tools/lexicon/adopt-lexicon.sh --check` exits non-zero with a message distinct from the
-  empty-stamp one.
-- **AC3** — When the conf is rewritten with CRLF line endings and an empty `canon_unfrozen=""`,
-  `bash tools/lexicon/adopt-lexicon.sh --check` still exits non-zero, so a carriage return cannot
-  launder an empty stamp into a non-empty value.
+  `bash tools/lexicon/adopt-lexicon.sh --check` prints the no-reason refusal and does NOT print the
+  empty-stamp one, and the empty-stamp case does NOT print the no-reason one. The distinctness is
+  graded in BOTH directions, because one refusal wearing two hats passes a one-directional check.
+- **AC3** — When the conf is rewritten with CRLF line endings and an empty `canon_unfrozen=""`, the
+  same run still prints the empty-stamp refusal, so a carriage return cannot launder an empty stamp
+  into a non-empty value — the stamp read in `adopt-lexicon.sh` pipes the conf through `tr -d '\r'`
+  before its `grep -E '^canon_unfrozen='`, which is the clause that does it. Observed by
+  direct run rather than by a suite arm, the way AC12 is: both endings print
+  `declares a CANON: overlay (2 row(s)) with an EMPTY` and both exit 1 on the unrendered Skill, which
+  is the same run that shows why the exit code decides nothing here.
 - **AC4** — When a stamped `CANON:` block declares one row, `python tools/lexicon/lexicon.py` prints the
   unfrozen posture line with the owner row count and the stamp ABOVE the counts, on a run that exits 0
   as well as one that exits non-zero. Both cases are observed, and the route to the exit-0 case is
@@ -348,8 +366,12 @@ changes what may be proposed; it does not write the sentence that says what the 
   checks only the index is the probe that missed this defect for two revisions.
 - **AC7** — When an overlay row would put one form in two clusters, `build_clusters` raises rather than
   resolving by iteration order; when an ADD row carries no alternative it raises; when a minus row
-  names no shipped cluster it raises. Three `tools/lexicon/selftest.py` arms, each asserting the raise
-  and each asserting a message distinct from the other two.
+  names no shipped cluster it raises; and when a minus row ALSO carries alternatives it raises, naming
+  the alternatives back. Four `tools/lexicon/selftest.py` arms, each asserting the raise and each
+  asserting a message distinct from the other three. FOUR, matching `build_clusters`'s own docstring:
+  the fourth had no arm through rev-6, and deleting that branch left every one of the suite's 454 arms
+  green while a `-build frobnicate` row deleted the cluster and silently discarded the alternatives
+  the owner typed.
 - **AC8** — When a `CANON:` header is staged into the body `tools/lexicon/scaffold_lexicon.py` emits,
   `python tools/lexicon/lexicon.py` exits non-zero; when unstaged it exits 0. The predicate is NOT the
   bare `grep -c CANON tools/lexicon/scaffold_lexicon.py` the research record proposed: run at writing
@@ -494,6 +516,18 @@ second line of that selection's comment.
   attribution line, with AC13 added because a report line nobody observes can ship absent.
 - rev-6 · 2026-09-05 · two line citations into `tools/lexicon/lexicon.py` symbol-anchored; the build rewrites
   that file, so a line number into it is a rotting reference.
+- rev-7 · 2026-09-05 · AC1, AC2 and AC3 re-keyed off the EXIT CODE and onto the message, under one
+  preamble stating the shared reason. All three graded
+  `bash tools/lexicon/adopt-lexicon.sh --check` by its return value, and no fixture this spec builds
+  can produce an informative one: `check_skill` reds in a sandbox with no rendered Skill, so every
+  scratch-tree run is non-zero whatever the stamp says. AC1's "it exits 0" named a state its own
+  fixture can never reach; AC2's and AC3's "exits non-zero" were true on every run and evidence about
+  none. The S5 arms in `tools/lexicon/selftest.py` already assert the messages for exactly this
+  reason and carried the whole criterion; the criteria now say what those arms grade, and AC1 picks
+  up the row-count clause that separates a derived count from a constant. AC3 additionally records
+  the CRLF run's own output, since no suite arm carries it. Also this rev: `build_clusters`'s FOURTH
+  refusal — a minus row that also carries alternatives — gets a named arm beside AC7's other three,
+  which had no arm and was revertible with all 454 arms green.
 
 ## 10. Reuse audit
 

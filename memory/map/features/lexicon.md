@@ -77,6 +77,18 @@ definition site. What it is CALLED comes from `canon.py`, twenty frozen clusters
 the representative unconditionally. The corpus cannot promote a spelling and cannot nominate a verb
 the canon does not hold, so the seed is prescriptive at the moment it is written.
 
+**FROZEN IS NOT WELDED, and the difference is one declared block.** `canon.py` is `role = "engine"`,
+so an adopter who disagrees with a cluster could not edit it and could not durably re-role it either
+— a posture nobody chose. `TOOL-aSurfacedLexicon-11` opens a door in the file the owner already
+curates: a `CANON:` block whose rows REPLACE, ADD or (with a leading minus) DELETE a cluster, merged
+by `canon.build_clusters` at the cluster TUPLE rather than inside the form index, because two of the
+canon's three accessors iterate `CLUSTERS` themselves and never call that index. The unfreeze is
+refused without a reason-bearing `canon_unfrozen` stamp on the wiring leg, and it PRINTS on every
+run of the engine, green as well as red — a quiet unfreeze would be the mirror defect with an extra
+step. What the door buys is visibility and attribution, never proof: no machine check can tell a
+considered overlay from one filled from the corpus's commonest spellings, and the kit says so in
+both `.lexicon.conf` and its README rather than leaving a reader to find it.
+
 The `ratified` arm survives and is no longer the RESOLUTION, only the second half: a canon-sourced
 seed is a starting vocabulary and not a curated one, so it ships `PROPOSED` with `ratified` empty and
 reds until a human stamps it. This paragraph and the one above it were the SAME claim in two
@@ -193,8 +205,10 @@ available: they agree only on pure-underscore names and the empty string.
 - **The verb table is closed only by CONVENTION.** Nothing stops it growing a verb per exception until
   it is a synonym list, and nothing notices when a verb outlives the code that justified it. Wiring
   the table into the `codebase-map` ratchet and the `drift-audit` signal set is `TOOL-dClosedLexicon-2`,
-  which is BLOCKED on a parked scope fork — the two ways to declare those signals differ in what gets
-  built, and one of them changes a shipped kit's public surface.
+  which is CLOSED and whose wiring is LIVE: `memory/map/generated/inventories.json` carries the
+  `lexicon-verbs` inventory and `tools/drift-audit/drift_report.py` carries the signals. This line
+  said BLOCKED on a parked scope fork until `TOOL-aSurfacedLexicon-12` read the three carriers of
+  that unit's status against each other and against the tree.
 - **No `memory/gotchas/` class for naming violations.** Companion §7 requires a failing case OBSERVED
   before a gate lands, and a class authored ahead of its first instance is the gate-discipline error
   this repo names. The first confirmed P1 or P2 finding becomes one.

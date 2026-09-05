@@ -373,6 +373,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "build_clusters",
+      "kind": "function",
+      "file": "tools/lexicon/canon.py"
+    },
+    {
       "id": "build_cutoff",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -2178,6 +2183,11 @@
       "file": "tools/govkit/refusal_join.py"
     },
     {
+      "id": "print_canon_posture",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "print_last",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -2298,6 +2308,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "read_canon_refusal",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "read_conf",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -2403,6 +2418,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "read_routed_cell",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_set",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -2421,6 +2441,11 @@
       "id": "read_stem",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_suggestion",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "read_text",
@@ -2598,6 +2623,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_convention",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
+    },
+    {
       "id": "render_edges",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2731,6 +2761,11 @@
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "resolve_cell",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "resolve_declaration_paths",
