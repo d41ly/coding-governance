@@ -24,8 +24,9 @@
 #     grading one would red mid-build on every run including the one that must land it.
 #   - whether the WAIVER REGISTRY's rows deserve their waivers. It grades that each waived unit is
 #     still a violation (a stale row REDS) and never why the waiver was granted.
-#   - whether a build's COMMITTED `opened:` is honest. TOOL-aStagedLane-1 S6 moved the read from the
-#     working tree to the graded commit, which closes the edit-and-run bypass and NOT the class: the
+#   - whether a build's COMMITTED `opened:` is honest. EVERY read in this file now comes from the
+#     graded commit — the records, the waiver registry, and the SELECTOR that decides which builds
+#     are read at all — which closes the edit-and-run bypass and NOT the class: the
 #     graded run still authors the value it commits. Narrowing, not removal, and it is said here
 #     because a gate's header states what it does not check.
 #
@@ -138,7 +139,10 @@ declare -F plan_state >/dev/null || { echo "pass-order: plan_state did not survi
 # A PROBE THAT CANNOT MOVE SAYS SO. The classifier must return a real token on a real spec before a
 # single verdict is trusted; without this the whole leg reports a clean bill when the slice breaks,
 # which is indistinguishable from a clean run and is how a green bar stops meaning anything.
-_probe=$(git ls-files "$MEMORY_ROOT/builds/*/spec/*.md" 2>/dev/null | head -1)
+# FROM THE GRADED COMMIT, like every other read in this file. `git ls-files` enumerates the INDEX,
+# so a staged-but-uncommitted `git rm --cached` of the spec tree emptied this probe and the DEAD
+# PROBE guard — the one whose job is to say the leg graded nothing — skipped silently.
+_probe=$(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/null | grep -E "/spec/.*\.md$" | head -1)
 if [ -n "$_probe" ]; then
   case "$(plan_state "$_probe")" in
     MISSING|THIN|FORKED|READY) ;;
@@ -200,11 +204,31 @@ PREANCHOR_CAP="${PASS_ORDER_PREANCHOR_CAP:-400}"
 case "$PREANCHOR_CAP" in
   ''|*[!0-9]*) echo "pass-order: PASS_ORDER_PREANCHOR_CAP must be a non-negative integer, and a cap nothing can compare disables the pre-anchor probe silently: $PASS_ORDER_PREANCHOR_CAP"; exit 2 ;;
 esac
+# AND IT MUST BE IN RANGE, not merely all-digits. `99999999999999999999` passes a character-class
+# test, and then `git rev-list --max-count=<huge>` answers `fatal: not an integer` into the
+# 2>/dev/null, `[ 0 -ge <huge> ]` errors and evaluates false, and the leg exits 0 with both
+# counters at zero — verbatim the silent green the character-class check was added to close. A
+# validator that admits a value the consumer refuses has moved the failure, not removed it.
+[ "${#PREANCHOR_CAP}" -le 9 ] && [ "$PREANCHOR_CAP" -le 100000 ] || {
+  echo "pass-order: PASS_ORDER_PREANCHOR_CAP is out of range (max 100000), and git refuses a --max-count it cannot parse, which turns this probe off while reporting nothing: $PREANCHOR_CAP"
+  exit 2
+}
 
 graded=0; skipped_cutoff=0; norun_graded=0; unbuilt=0; preanchor_hits=0; waived_n=0; truncated=0
 violations=""; waived_seen=""; previews=""
 
-for readme in $(git ls-files "$MEMORY_ROOT/builds/*/README.md" 2>/dev/null); do
+# THE POPULATION COMES FROM THE GRADED COMMIT TOO, and this line was the last one left behind.
+# The fold moved four record READS to `HEAD:` and left the SELECTOR that decides which builds are
+# read at all on `git ls-files`, which enumerates the INDEX. So one `git rm --cached` of a build
+# README — staged, nothing committed — dropped that whole build from grading, and doing it across
+# the tree silenced the leg entirely while it reported a clean bill. That is the same
+# sibling-left-behind shape the fold existed to close, one level earlier and strictly wider: the
+# earlier fix protected what is read, this protects WHETHER IT IS READ.
+#
+# The self-test arms could not see it either. They mutate file CONTENT with `sed -i`, which leaves
+# the path in the index; only an INDEX mutation reaches this line, so the arm below uses
+# `git rm --cached`.
+for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/null | grep -E "/README\.md$"); do
   bdir=${readme%/README.md}
   slug=${bdir##*/}
   # S6 - THE CUTOFF IS READ FROM THE COMMIT BEING GRADED, not the working tree. Reading it from disk
@@ -332,9 +356,15 @@ $1" ;;
       #
       # Truncation is therefore reported AFTER the walk, on the count actually emitted.
       local _range="$1" _cap="$2" _ord="$3" _c _subj _n=0 _mc=""
-      [ -n "$_cap" ] && _mc="--max-count=$_cap"
+      # `cap+1` FETCHED, `cap` GRADED, so truncation is EXACT. With `--max-count=$_cap` a complete
+      # walk of an exactly-cap-deep window is indistinguishable from a truncated one, and the leg
+      # reported TRUNCATED for a probe that had in fact seen everything. Fetching one extra is the
+      # only way to know there was more.
+      [ -n "$_cap" ] && _mc="--max-count=$((_cap+1))"
       for _c in $(GIT rev-list $_ord $_mc $_range 2>/dev/null); do
         _n=$((_n+1))
+        # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
+        if [ -n "$_cap" ] && [ "$_n" -gt "$_cap" ]; then printf 'TRUNCATED'; return 0; fi
         _subj=$(GIT log -1 --format=%s "$_c" 2>/dev/null)
         case " $(printf '%s' "$_subj" | tr -c 'A-Za-z0-9-' ' ') " in *" $id "*) ;; *) continue ;; esac
         # Did it touch anything outside this build's own record surface?
@@ -343,9 +373,6 @@ $1" ;;
           printf '%s' "$_c"; return 0
         fi
       done
-      # TRUNCATION IS REPORTED AFTER THE WALK, on the count actually emitted. A probe that gave up
-      # and a probe that found nothing print the same thing otherwise.
-      [ -n "$_cap" ] && [ "$_n" -ge "$_cap" ] && { printf 'TRUNCATED'; return 0; }
       return 0
     }
     build_c=$(_find_build_commit "${base:+$base..}HEAD" "" "--reverse")

@@ -769,7 +769,14 @@ if (attended && !buildUnits.length) {
     slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
     specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
     lastReport: lastReport, skippedTerminal: skippedDone, built: 0, unbuilt: [],
-    note: 'complete for ATTENDED mode — every unit was already terminal, so the BUILD stage was ' +
+    // THE DEGRADED TERM IS NOT SKIPPED HERE. This return was written with a hard-coded clean note,
+    // which bypasses the composition the main return performs — and `specRefused` is live on this
+    // path, so a run that refused specs and then found nothing to build reported 'complete'.
+    note:
+      (specRefused.length
+        ? 'DEGRADED — ' + specRefused.length + ' spec(s) refused. '
+        : '') +
+      'complete for ATTENDED mode — every unit was already terminal, so the BUILD stage was ' +
       'not spawned rather than handed an empty roster',
   }
 }

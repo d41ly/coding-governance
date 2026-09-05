@@ -11,6 +11,7 @@
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round3.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 |
 | [2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round4.md](../reviews/2026-09-04-review-TOOL-aStagedLane-1-spec-audit-round4.md) | spec-audit | TOOL-aStagedLane-2 TOOL-aStagedLane-3 |
 | [2026-09-05-review-TOOL-aStagedLane-1-diff-review-round1.md](../reviews/2026-09-05-review-TOOL-aStagedLane-1-diff-review-round1.md) | diff-review | TOOL-aStagedLane-2 TOOL-aStagedLane-3 |
+| [2026-09-05-review-TOOL-aStagedLane-1-diff-review-round2.md](../reviews/2026-09-05-review-TOOL-aStagedLane-1-diff-review-round2.md) | diff-review | TOOL-aStagedLane-2 TOOL-aStagedLane-3 |
 
 <!-- /gen:spec-records -->
 

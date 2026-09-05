@@ -514,5 +514,50 @@ o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
 same "H2: an arithmetic EXPRESSION is refused rather than evaluated" "$rc" "2"
 rm -rf "$T"
 
+# ---- ROUND 2's BLOCKER: the POPULATION SELECTOR. The round-1 fold moved four record READS to the
+# ---- graded commit and left the selector that decides which builds are read at all on `git ls-files`,
+# ---- which enumerates the INDEX. THE MUTATION HERE IS `git rm --cached`, not `sed -i`: the existing
+# ---- B1 arms change file CONTENT, which leaves the path in the index and cannot reach this line. An
+# ---- arm that cannot see the defect it is written for is the whole reason this one is spelled out.
+T=$(mkfixture norun build-first)
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "R2 control: the fixture REDS before the index is touched" "$rc" "1"
+( cd "$T" && git rm -q --cached memory/builds/tOrder/README.md >/dev/null )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "R2: an UNCOMMITTED index removal does not drop the build" "$rc" "1"
+has  "R2: the build is still graded from the commit" "$o" "graded 1 closed unit"
+rm -rf "$T"
+
+# ---- The same mutation must not silence the DEAD PROBE guard either — that guard exists to say the
+# ---- leg graded nothing, and it was enumerated the same way.
+T=$(mkfixture norun build-first)
+( cd "$T" && git rm -q -r --cached memory/builds >/dev/null )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "R2: an index-wide removal does not silence the leg" "$rc" "1"
+rm -rf "$T"
+
+# ---- ROUND 2's HIGH: the cap must be validated for RANGE, not only for digits. An all-digit
+# ---- out-of-range value passed the character class, git refused the --max-count into a 2>/dev/null,
+# ---- and the leg exited 0 with both counters at zero — the silent green the check was added to close.
+T=$(mkfixture preanchor preanchor)
+( cd "$T" && printf '
+PASS_ORDER_PREANCHOR_CAP="99999999999999999999"
+' >> .unattended.conf )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "R2: an all-digit OUT-OF-RANGE cap is refused, not silently accepted" "$rc" "2"
+has  "R2: the refusal says it is a range problem" "$o" "out of range"
+rm -rf "$T"
+
+# ---- ROUND 2's LOW: truncation must be EXACT. `--max-count=cap` cannot tell "exactly cap exist" from
+# ---- "cap shown, more behind", so a complete walk of an exactly-cap-deep window reported TRUNCATED.
+# ---- cap+1 is fetched and the extra one is the sentinel.
+T=$(mkfixture preanchor-record preanchor-record)
+( cd "$T" && printf '
+PASS_ORDER_PREANCHOR_CAP="2"
+' >> .unattended.conf && git add -A >/dev/null && git commit -q -m 'cap 2' --no-verify )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1)
+hasnt "R2: a COMPLETE walk of a cap-deep window is not called truncated" "$o" "1 probe(s) truncated"
+rm -rf "$T"
+
 echo "--- $n arms, exit $st"
 exit $st
