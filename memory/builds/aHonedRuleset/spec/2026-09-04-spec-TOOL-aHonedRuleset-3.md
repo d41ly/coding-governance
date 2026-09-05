@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
+**Status:** SPECCED · rev-5 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 | [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 
 <!-- /gen:spec-records -->
 
@@ -48,11 +49,15 @@ other unattended rule already lives.
   8-18, so by the time this unit runs they sit at `:49` and `:263`. Match on the quoted strings in
   §4's inventory, never on these numbers.
 - **S7 — the kickoff manifest is re-stamped in the same commit.** `memory/guides/SESSION-KICKOFF.md`
-  gets its `last-audit` re-stamp bundled into this unit's commit, because three files this unit
-  stages are `watch:` pathspecs on line 6 of that file: `skills/session-kickoff/SKILL.md`,
-  `.unattended.conf` and `memory/guides/BUILD-METHOD.md`. `.githooks/pre-commit` runs
-  `manifest-check.sh --staged` unconditionally, so a commit that stages a watched file without the
-  bundled re-stamp is refused before it exists.
+  gets its re-stamp bundled into this unit's commit, because three files this unit stages are
+  `watch:` pathspecs on line 6 of that file: `skills/session-kickoff/SKILL.md`, `.unattended.conf`
+  and `memory/guides/BUILD-METHOD.md`. `.githooks/pre-commit` runs `manifest-check.sh --staged`
+  unconditionally, so a commit that stages a watched file without the bundled re-stamp is refused
+  before it exists. **BOTH stamp keys, not one — `last-audit` alone does not clear check 9, which counts watched commits since `last-body-change` and fails at 10.** The re-derivation
+  command, the measured counter and the two prior builds where this was ruled a blocker are stated in
+  full at `TOOL-aHonedRuleset-5` S8, which this item points at rather than copying. This unit stages
+  THREE watched pathspecs in one commit, so it moves the counter by one like any other commit but is
+  the one most likely to be read as moving it by three.
 
 - **S8 — `KIT_UNATTENDED_VERSION` moves from 1.17 to 1.18 in this same commit.** The owner ruled the
   bump owed, against this spec's own recommendation (§8 F3). The constant is declared at
@@ -300,8 +305,12 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   new section and the rewritten `KICKOFF_EXITS` row present.
 - **AC5** — When one numbered exit is deleted from BOTH protocol copies through the
   `check-unattended.test.sh` `pedit` helper, `bash tools/unattended/check-unattended.sh` fails naming
-  check 12 and printing `5 against 6`; restoring it returns the leg to exit 0. Staged, observed RED,
-  unstaged.
+  check 12 and printing `5 against 6`, **and that printed failure names
+  `UNATTENDED-PROTOCOL.md`** — the document it now counts in — rather than the engine. Restoring the
+  exit returns the leg to exit 0. Staged, observed RED, unstaged. The message clause is graded because
+  S3's fourth requirement is the rewritten failure text, and `check-arms.py` catches a message edited
+  without its assertion, never a message left unedited; the whole point of moving the count is that
+  the next debugger is sent to the right document.
 - **AC6** — When the engine's Step 5b heading or the READY prompt string is deleted,
   `bash tools/unattended/check-unattended.sh` still fails check 12 with its existing two messages, so
   moving the count did not disarm the other two arms.
@@ -335,12 +344,20 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   `memory/builds/` and `memory/archive/`. This criterion exists because AC8's `Step 5b exit` pattern
   does not match line 274's wording — verified at base, where that pattern matches line 60 of
   `BUILD-METHOD.template.md` and never line 274, so line 274 could be left untouched with AC8 green.
-- **AC14** — When the key's documented meaning is corrected,
-  `grep -c 'MEASURE it against your own engine' tools/unattended/.unattended.conf.example` PRINTS 0.
-  It prints 1 at base, at line 78. A zero count exits non-zero, so terminate the probe with `;` or
-  `|| true` rather than chaining it — a passing check reads as a failure otherwise. Check 22 cannot carry this: its own header at
-  `tools/unattended/check-unattended.sh:1379-1381` states it grades presence of the key name in the
-  table region and that a row whose prose is wrong is green there.
+- **AC14** — When the key's documented meaning is corrected, the correction is graded as a CLASS over
+  all three prose carriers rather than one instance.
+  `grep -rn 'engine' tools/unattended/PROTOCOL.template.md tools/unattended/.unattended.conf.example
+  .unattended.conf`, restricted to each file's `KICKOFF_EXITS` row and its comment, returns NOTHING;
+  and `grep -c 'MEASURE it against your own engine' tools/unattended/.unattended.conf.example` PRINTS
+  0, where it prints 1 at base at line 78. **Widened at rev-5**: S3 requires three carriers corrected
+  and the rev-3 fold gated the one instance round 1 happened to name, leaving
+  `tools/unattended/PROTOCOL.template.md:464` (*how many interactive exits that engine resolves*) and
+  `.unattended.conf:52-54` (*how many interactive exits the engine enumerates*) both false-after-the-move
+  and both unobserved. A zero count exits non-zero, so terminate the probe with `;` or `|| true`
+  rather than chaining it — a passing check reads as a failure otherwise. Check 22 cannot carry this:
+  its own header at `tools/unattended/check-unattended.sh:1379-1381` states it grades presence of the
+  key name in the table region and that a row whose prose is wrong is green there. AC9's render
+  parity cannot carry it either, since a render only makes the copy match a stale template.
 - **AC15** — When S8's bump has landed, `bash tools/check-kit-versions.sh` exits 0 and
   `git grep -c 'gov:kit unattended@1\.18' -- tools/unattended memory/guides .claude/skills/unattended`
   lists 14 files while the same command for `1\.17` lists none and, finding nothing, exits non-zero
@@ -477,6 +494,18 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
 - rev-4 · 2026-09-04 · S5's two `BUILD-METHOD.template.md` addresses were stated at base while the
   spec declares it runs after `TOOL-aHonedRuleset-6` deletes eleven lines above them. Recorded the
   post-unit-6 addresses and told a builder to match on the quoted strings instead.
+
+- rev-5 · 2026-09-06 · **round-2 spec audit folded: H3 and M1.** **H3** — S7 said `last-audit` and
+  this build named `last-body-change` nowhere; S7 now names both keys and points at
+  `TOOL-aHonedRuleset-5` S8 for the mechanism, the re-derivation command and the measured counter,
+  rather than carrying a copy. It also states that staging three watched pathspecs in one commit moves
+  check 9's counter by one, not three. **M1** — S3 corrects the `KICKOFF_EXITS` meaning in three
+  prose carriers and AC14 greped ONE, gating the instance round 1 named instead of the class; both
+  `tools/unattended/PROTOCOL.template.md:464` and `.unattended.conf:52-54` were verified
+  false-after-the-move at base and unobserved. AC14 is widened to a class grep over all three, and
+  AC5 gains the clause that check 12's printed failure must NAME `UNATTENDED-PROTOCOL.md` — S3's
+  fourth requirement, which `check-arms.py` structurally cannot catch, since it sees a message edited
+  without its assertion and not a message left unedited. No scope item, fork or figure moved.
 
 ## 10. Reuse audit
 

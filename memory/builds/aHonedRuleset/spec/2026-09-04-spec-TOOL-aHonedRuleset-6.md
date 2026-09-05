@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling · order 1 · ratified 2026-09-04
+**Status:** SPECCED · rev-5 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 1 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
 | [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
+| [2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 |
 
 <!-- /gen:spec-records -->
 
@@ -30,9 +31,11 @@ Three items, all selected by the §8 F1 ruling and none of them conditional on a
   `No gate enforces the pair` admission. Nothing is relocated and no replacement pointer is written.
 - **S2** — re-render `memory/guides/BUILD-METHOD.md` from the edited template in the same commit,
   via the kit's own render path rather than by hand-editing the copy.
-- **S3** — `memory/guides/SESSION-KICKOFF.md` gets its `last-audit` re-stamp bundled into the same
-  commit, §B re-verified first. S2 stages `memory/guides/BUILD-METHOD.md`, which is the tenth
-  `watch:` entry on line 6 of that manifest, so the obligation fires on this commit.
+- **S3** — `memory/guides/SESSION-KICKOFF.md` gets its re-stamp bundled into the same commit, §B
+  re-verified first. S2 stages `memory/guides/BUILD-METHOD.md`, which is the tenth `watch:` entry on
+  line 6 of that manifest, so the obligation fires on this commit. **BOTH stamp keys, not one — `last-audit` alone does not clear check 9, which counts watched commits since `last-body-change` and fails at 10.** The re-derivation command, the measured counter and the two prior builds
+  where this was ruled a blocker are stated in full at `TOOL-aHonedRuleset-5` S8, which this item
+  points at rather than copying.
 
 ## 3. Non-goals (OUT)
 
@@ -216,9 +219,11 @@ because the product of this ruling is that nothing measures this file.
 - **AC8** — When `grep -n 'No gate enforces the pair' tools/memory-tree/BUILD-METHOD.template.md`
   runs it returns no hit, and `grep -n 'Budget:'` on the same file returns no hit either. Both halves
   of the claim are gone, not one.
-- **AC9** — When `bash skills/session-kickoff/manifest-check.sh` runs after the commit, it exits 0,
-  proving the S3 `last-audit` re-stamp landed in the same commit as `memory/guides/BUILD-METHOD.md`,
-  the watched pathspec this unit stages.
+- **AC9** — When `bash skills/session-kickoff/manifest-check.sh` runs after the commit, it exits 0
+  **with no check-9 failure**, proving the S3 re-stamp landed in the same commit as
+  `memory/guides/BUILD-METHOD.md`, the watched pathspec this unit stages, and that S3's both-keys
+  clause was honoured. Check 9 is excluded from the staged pre-commit leg, so this unstaged run is
+  where it binds.
 
 ## 7. Gates
 
@@ -344,6 +349,14 @@ at half the size, and the file's own measurement says the line half never binds.
 - rev-4 · 2026-09-04 · restored the measured premise under F2's MOOT mark. Inserting the mark
   had deleted the three sentences establishing that no seam could enforce `≤350 lines`, while the
   mark itself claimed the analysis was kept — found by the ratification verify pass.
+
+- rev-5 · 2026-09-06 · **round-2 spec audit folded: H3, the set-wide finding, and nothing else** —
+  no finding in that round addressed this spec's own text, and its four absence-asserting criteria
+  survived the audit unchanged. S3 said `last-audit`, and `grep -rn last-body-change` over the whole
+  build returned zero. S3 now names both keys and points at `TOOL-aHonedRuleset-5` S8 for the
+  mechanism, the re-derivation command and the measured counter; AC9 gains the explicit no-check-9-
+  failure clause, since check 9 is excluded from the staged pre-commit leg and this unstaged run is
+  the only place in this unit where it binds.
 
 ## 10. Reuse audit
 
