@@ -1,3 +1,4 @@
 AGENTS.md	60930
 coding-governance-agents.template.md	48378
+memory/guides/BUILD-METHOD.md	25338
 skills/session-kickoff/SKILL.md	18215

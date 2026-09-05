@@ -11,6 +11,7 @@
       "branch-guard self-test",
       "build README slot contract",
       "build-index selftest",
+      "build-method size",
       "charter size",
       "check-arms selftest",
       "check-wiring self-test",

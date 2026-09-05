@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-3 — the build-method budget becomes a number a gate reads
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -299,6 +299,20 @@ the argument is good.
   `check-kit-versions.sh` grades presence and agreement while `check-verdict-epoch.sh`'s scan set
   excludes templates, so skipping the bump left every leg green and — with no AC — no ledger line
   recording the skip either.
+- **AC16** — When `tools/check-template-size.sh`'s header exit-code list is read on the landing tree,
+  it names 4 and 6 alongside 1, 2, 3 and 5, and its FAILURE codes — every `Exit <n> =` above `set -u`
+  MINUS the 0 that documents success — EQUAL the distinct `FAIL_CODE` values the file assigns.
+  **The "minus 0" clause is a correction this pass made to its own criterion before grading it.** The
+  first spelling compared the whole header set to the `FAIL_CODE` set and was false by construction:
+  the header documents exit 0, which is not a failure and can never be a `FAIL_CODE`. A criterion that
+  cannot pass is not a strict criterion, it is a broken one, and the fix is stated rather than folded
+  in silently. Measured on the landing tree: header failure codes `[1,2,3,4,5,6]`, assigned
+  `FAIL_CODE` values `[1,2,3,4,5,6]`, equal. **S6 had no criterion at all until rev-4.** AC3, AC4 and AC7 exercise the
+  new branch's behaviour, its message and its armed-ness; `check-arms.py`'s population is `fail() {`
+  definitions and `fail <n> "` call sites and it never reads a comment, so no gate substitutes. A gate
+  whose own header misreports its exit codes is the checker-whose-record-does-not-describe-it class
+  this whole build exists to remove, and rev-3 folded three findings of exactly this shape into this
+  file while leaving this one.
 - **AC2** — When filler is appended to a scratch copy of `memory/guides/BUILD-METHOD.md` until it
   exceeds 27648 bytes and the gate is run against it, it exits `1` with the message
   `the file is over its size budget`, naming the file, the measured bytes and the overage. Staged,
@@ -449,6 +463,15 @@ and that one edits the same template at `order 3`; the second asserts
   replacement; AC14 greps the phrase to 0 in both halves and asserts what the new sentence must say.
   A fork resolution can create work no criterion reaches, so the gate this class argues for must read
   section-8 resolutions as scope and not only `S<n>` rows.
+- rev-4 - 2026-09-05 - folded round-2 spec-audit finding M2, read before this unit's code pass. S6
+  adds exit 6 AND the already-omitted exit 4 to the header's exit-code list, and no criterion read
+  that block: AC3 and AC4 grade the new branch's behaviour and message, AC7 grades `check-arms.py`'s
+  armed/branch counts, AC6 the suite. `check-arms.py` never reads a comment, so nothing substituted.
+  AC16 grades the header, and grades it as a SET EQUALITY against the file's own distinct `FAIL_CODE`
+  values rather than as a list of literals - a header that must be retyped whenever a branch lands is
+  the same defect one turn later. **Amended in the same pass:** AC16's first spelling compared the
+  header's WHOLE exit set to the `FAIL_CODE` set, which cannot hold — the header documents exit 0
+  and 0 is never a `FAIL_CODE`. Restated to the failure codes alone, and measured equal.
 
 ## 10. Reuse audit
 

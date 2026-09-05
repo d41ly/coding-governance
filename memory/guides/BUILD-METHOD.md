@@ -1,21 +1,28 @@
-<!-- gov:kit memory-tree@2.60 -->
+<!-- gov:kit memory-tree@2.61 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `tools/run-gates/run-gates.sh`.
-**Budget: ≤24 KB, ≤350 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
+**Budget: ≤27648 bytes, ≤350 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
-It rose from ≤20 KB / ≤250 lines when M12 landed, to ≤24 KB / ≤310 on 2026-08-21, and the LINE half to
-≤350 on 2026-08-25 — all owner calls, because the figure is a stated constraint of a document rather
-than a measurement of one. The 2026-08-21 raise: two builds added rules concurrently and both parents
-fitted the old cap alone, so nothing was droppable and the constraint moved instead of the content.
-The 2026-08-25 raise cleared a two-line breach; a trim was offered and declined.
-**The BYTE half binds first** — at this file's ~100 B prose line the bytes run out near line 316, so
-most of the line figure is headroom the bytes do not grant. No gate enforces the pair, which is why
-exceeding it silently was the one option not taken, and whether one is ever added is a SEPARATE
-question nobody has ruled.
+It rose from ≤20 KB / ≤250 lines when M12 landed, to ≤24 KB / ≤310 on 2026-08-21, the LINE half to
+≤350 on 2026-08-25, and the BYTE half to ≤27648 on 2026-09-05 — all owner calls, because the figure is
+a stated constraint of a document rather than a measurement of one. The 2026-08-21 raise: two builds
+added rules concurrently and both parents fitted the old cap alone, so nothing was droppable and the
+constraint moved instead of the content. The 2026-08-25 raise cleared a two-line breach; a trim was
+offered and declined. **The 2026-09-05 raise is the first one a checker can read**, and it is written
+in BYTES for that reason: ≤24 KB was ambiguous between 24576 and 24000, and this file measured 24553,
+which is under one reading and over the other. 27648 is 27 KiB, matching the KiB-round convention of
+the rows already declared beside it, and it funds the M6 route sentence and the directive anchors.
+**The BYTE half binds first** — at this file's ~100 B prose line the bytes run out well before the
+line figure does, so most of that figure is headroom the bytes do not grant. **The gate is
+`build-method size`**, which measures this file's RENDER against the ceiling declared for it, and its
+PAIR TERM reds when the figure above disagrees with that declaration — including when the prose is
+rewritten to a form the gate cannot parse as bytes, because a document that can move its own prose
+and pass is the thing this term exists to stop. **What it does NOT cover is the LINE half**, which no
+checker reads: a document that grew in lines without growing in bytes still passes.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
 stated anywhere else in this repo — every generic obligation is POINTED AT via M11, and a rule appearing both here

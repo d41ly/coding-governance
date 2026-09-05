@@ -1128,6 +1128,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "derive_unsatisfied_requires",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_width",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"

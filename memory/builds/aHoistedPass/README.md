@@ -96,7 +96,7 @@ ids TOOL-aHoistedPass-19 TOOL-aHoistedPass-20 TOOL-aHoistedPass-21 TOOL-aHoisted
 | [TOOL-aHoistedPass-4 — the loop ban learns the two spellings that walk past it](spec/2026-09-04-spec-TOOL-aHoistedPass-4.md) | 1 | 1 | SPECCED | rev-5 | 2026-09-05 |
 | [TOOL-aHoistedPass-8 — the recipe-mode question, measured instead of argued](spec/2026-09-04-spec-TOOL-aHoistedPass-8.md) | 1 | 1 | SPECCED | rev-4 | 2026-09-05 |
 | [DEPL-aHoistedPass-1 — a declared kit dependency that is actually checked](spec/2026-09-04-spec-DEPL-aHoistedPass-1.md) | 2 | 2 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aHoistedPass-3 — the build-method budget becomes a number a gate reads](spec/2026-09-04-spec-TOOL-aHoistedPass-3.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-05 |
+| [TOOL-aHoistedPass-3 — the build-method budget becomes a number a gate reads](spec/2026-09-04-spec-TOOL-aHoistedPass-3.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-05 |
 | [TOOL-aHoistedPass-2 — the route a run can find, and the ratchet that keeps it findable](spec/2026-09-04-spec-TOOL-aHoistedPass-2.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-05 |
 | [TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else](spec/2026-09-04-spec-TOOL-aHoistedPass-5.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-05 |
 | [TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build](spec/2026-09-04-spec-TOOL-aHoistedPass-6.md) | 5 | 2 | SPECCED | rev-5 | 2026-09-05 |
