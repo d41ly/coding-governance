@@ -318,6 +318,11 @@
       "file": "tools/workflows/tier2-review.js"
     },
     {
+      "id": "boundedParallel",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
+    },
+    {
       "id": "branches",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -661,6 +666,11 @@
       "id": "chunk",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "chunk",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.js"
     },
     {
       "id": "claimant_index",

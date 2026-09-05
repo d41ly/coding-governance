@@ -5,7 +5,7 @@ opened: 2026-09-04
 streams: tooling
 roster: TOOL
 parents: dBriefedPass
-ids: TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4
+ids: TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 TOOL-aStagedLane-5 TOOL-aStagedLane-6
 ---
 
 # aStagedLane — the deterministic route for spec work, and the gate that binds a session which never takes it
@@ -67,30 +67,30 @@ accident. The classifier that would ground it already runs without a run-state f
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aStagedLane-1` | OPEN | the pass-order leg grades builds that carry no run-state file |
-| 2 | `TOOL-aStagedLane-2` | OPEN | an attended mode on the harness, so the stage order needs no mandate |
-| 3 | `TOOL-aStagedLane-3` | OPEN | the spec stage fans over slices, each writer holding only its brief |
-| 4 | `TOOL-aStagedLane-4` | OPEN | the carriers name the classifier and the attended route |
+| 1 | `TOOL-aStagedLane-1` | CLOSED | the pass-order leg grades builds that carry no run-state file |
+| 2 | `TOOL-aStagedLane-2` | CLOSED | an attended mode on the harness, so the stage order needs no mandate |
+| 3 | `TOOL-aStagedLane-3` | CLOSED | the spec stage fans over slices, each writer holding only its brief |
+| 4 | `TOOL-aStagedLane-4` | WONTDO | the carriers name the classifier and the attended route — RETIRED, does not fit the method's byte budget; parked for the owner |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-09-04 · streams tooling
-ids TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-09-04 · streams tooling
+ids TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 TOOL-aStagedLane-5 TOOL-aStagedLane-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file](spec/2026-09-04-spec-TOOL-aStagedLane-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-04 |
-| [TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate](spec/2026-09-04-spec-TOOL-aStagedLane-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-04 |
-| [TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief](spec/2026-09-04-spec-TOOL-aStagedLane-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-04 |
-| [TOOL-aStagedLane-4 — the carriers name the classifier and the attended route](spec/2026-09-04-spec-TOOL-aStagedLane-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-04 |
+| [TOOL-aStagedLane-1 — the pass-order leg grades builds that carry no run-state file](spec/2026-09-04-spec-TOOL-aStagedLane-1.md) | 1 | 2 | CLOSED | rev-6 | 2026-09-04 |
+| [TOOL-aStagedLane-2 — an attended mode on the harness, so the stage order needs no mandate](spec/2026-09-04-spec-TOOL-aStagedLane-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-04 |
+| [TOOL-aStagedLane-3 — the spec stage fans over slices, each writer holding only its brief](spec/2026-09-04-spec-TOOL-aStagedLane-3.md) | 3 | 2 | CLOSED | rev-6 | 2026-09-04 |
+| [TOOL-aStagedLane-4 — the carriers name the classifier and the attended route](spec/2026-09-04-spec-TOOL-aStagedLane-4.md) | 4 | 2 | WONTDO | rev-4 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 9 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
