@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-1 — the record catches up with the verdicts that superseded it
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -29,22 +29,29 @@ knowingly leaves open a durable, greppable home instead of a paragraph in a desi
 - **S3** — File one backlog row per residual bullet of the design record's §10, each carrying the token
   `aHoistedPass-residual` plus that bullet's ordinal, routed to `TOOL.md` or `DEPL.md` by the carrier it
   names.
-- **S4** — File one further backlog row for the four tracked non-memory carriers that state the
-  superseded verdict in the present tense, naming all four and what each owes. This unit does not edit
-  them (§3).
+- **S4** — File one further backlog row for the tracked non-memory carriers that state the superseded
+  verdict in the present tense, naming every one and what each owes. **The population is DERIVED, never
+  typed:** `git grep -ln "parallelism route: none" -- tools/` returns FIVE at BASE `e828f778`. This unit
+  does not edit them (§3).
 - **S5** — Regenerate the memory tree's derived artifacts in the SAME commit as S1–S4, because the ids
   minted by those rows change this build's generated roster (§4).
 
 ## 3. Non-goals (OUT)
 
-- **The four live carriers are not edited here.** `tools/hooks/agent-cap.js:412`,
-  `tools/hooks/README.md:63`, `tools/hooks/agent-cap.test.sh:177` and
-  `tools/workflows/unattended-build.js:34-37` all quote the superseded verdict, the last of them as a
-  present-tense description of the very backlog row S2 rewrites. Correcting them makes a records unit
-  edit three files of the `agent-cap` kit and one of `review-harness`; `tools/hooks/agent-cap.js` is a
-  governance carrier, so M3 veto 2 (`memory/guides/BUILD-METHOD.md:84`) makes the unit an owner turn,
-  and each edited kit owes a version bump. **S4's row carries all four, and NO unit of this build
-  takes any of them — including the `unattended-build.js` one.**
+- **The live carriers are not edited here, and there are FIVE of them, not four.** Re-derived at BASE
+  `e828f778` with `git grep -n "parallelism route: none" -- tools/`, which is the command S4 runs rather
+  than a count carried in prose: `tools/hooks/README.md:63`, `tools/hooks/agent-cap.js:444`,
+  `tools/hooks/agent-cap.test.sh:328`, `tools/workflows/unattended-build.js:64` and `:333`, and
+  `tools/workflows/unattended-build.test.sh:187`, `:194` and `:421` — eight sites across five files.
+  rev-1 through rev-3 said four, and cited `agent-cap.js:412`, `agent-cap.test.sh:177` and
+  `unattended-build.js:34-37`, which were exact at `c4fcf5ad` and name unrelated prose at BASE. The
+  fifth file is the one the count missed rather than the one the addresses moved: its `:194` asserts in
+  the present tense that E3 and E4 "failed", the exact claim `TOOL-dUnstalledConvoy-7` overturned by
+  RUNNING them. Correcting the set makes a records unit edit three files of the `agent-cap` kit and two
+  of `review-harness`; `tools/hooks/agent-cap.js` is a governance carrier, so M3 veto 2
+  (`memory/guides/BUILD-METHOD.md:84`) makes the unit an owner turn, and each edited kit owes a version
+  bump. **S4's row carries all five, and NO unit of this build takes any of them — including the
+  `unattended-build.js` one.**
 
   That last clause is a correction, not a restatement. rev-1 said "the design's U5 already opens
   `unattended-build.js` and is the cheapest home for that one", U5 in the design's section 7 table is
@@ -89,7 +96,7 @@ record: the count is 28, unchanged, so only the path was wrong and every figure 
 | what actually cleared it | `memory/builds/dUnstalledConvoy/build/2026-08-21-build-TOOL-dUnstalledConvoy-7-1-parallelism-criteria.md:5` | `parallelism route: cleared` |
 | the two specs behind it | `.../spec/2026-08-20-spec-TOOL-dUnstalledConvoy-7.md`, `...-8.md` | both `CLOSED`, `ratified 2026-08-20` |
 | the shipped consequence | `memory/guides/BUILD-METHOD.md:184` | "Parallelism is REQUIRED where disjointness is PROVEN" |
-| the stale backlog row | `memory/backlog/TOOL.md:137` | `OPEN`, 199 chars, says E3 and E4 "never were" run |
+| the stale backlog row | `TOOL-cBriefedPilot-28` in `memory/backlog/TOOL.md` — by id, because rows move and ids do not | `OPEN`, 199 chars, says E3 and E4 "never were" run |
 | residual bullets to file | `awk '/^## §10/{f=1} /^## Appendix/{f=0} f' <the design record> \| grep -c '^- '` | 28 — 21 above the adopter-block paragraph, 7 below it |
 
 The clearance is not a re-argument of the same evidence. `TOOL-cBriefedPilot-21` rejected R2 because E3
@@ -221,9 +228,11 @@ excludes, so its own citations are unconstrained.
 - **AC6** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs on the landed tree, it exits 0,
   with check 14 clean: no id this unit cites is left undefined, and no id it mints is cited before its
   row exists.
-- **AC7** — When the S4 row is read, it names all four carriers — `agent-cap.js`, the hooks `README.md`,
-  `agent-cap.test.sh` and `unattended-build.js` — and says which owes a version bump and which is
-  governance-carrier work under veto 2.
+- **AC7** — When the S4 row is read, it names every file
+  `git grep -ln "parallelism route: none" -- tools/` returns — `agent-cap.js`, the hooks `README.md`,
+  `agent-cap.test.sh`, `unattended-build.js` and `unattended-build.test.sh`, five at BASE — and says
+  which owes a version bump and which is governance-carrier work under veto 2. The criterion asserts
+  the row equals the command's output, so a later carrier cannot fall silently outside the population.
 - **AC8** — When `grep -c "they never were" memory/backlog/TOOL.md` is run after S2, it returns `0`, and
   `grep -n "TOOL-cBriefedPilot-28" memory/backlog/TOOL.md` still returns exactly one row, still `OPEN`.
 
@@ -302,6 +311,22 @@ than by a pick.
   Section 4's rejected alternative keeps its "UNTRACKED at this base" clause, which is explicitly
   qualified to `c4fcf5ad` and is true there; the review refuted that half of the finding and it is
   left standing as the model for how the other half should have been written.
+
+- rev-4 - 2026-09-05 - **built-pass correction, folding round-2 findings M7, M6 and L1**, all three in
+  S4's neighbourhood and all three surfaced again by the `amendment-leaves-its-other-half-standing`
+  class the post-commit checklist selected over this unit's own diff. **M7 is the substantive one and
+  it is a MEASUREMENT error, not staleness:** `git grep -ln "parallelism route: none" -- tools/`
+  returns FIVE files at BASE and returned five at `c4fcf5ad` too, so "the four tracked non-memory
+  carriers" was wrong when it was written. The missed file is
+  `tools/workflows/unattended-build.test.sh`, whose `:194` asserts in the present tense that E3 and E4
+  failed - the exact claim this unit's S1 records as overturned - and which carries three sites, with
+  `unattended-build.js` carrying two, for eight sites across five files. S4 and AC7 now DERIVE the
+  population by command instead of naming a count, which is section 7's "no count of a derived
+  population is written in prose" applied to a spec. **M6** - three of section 3's four addresses were
+  `c4fcf5ad` addresses naming unrelated prose at BASE; all are re-derived and the two extra sites
+  added. **L1** - section 4's inventory cited the amended backlog row at `:137` while this spec's own
+  rev-2 log and its own rejected-alternative both say to cite it by id; it now does. The S4 backlog row
+  was rewritten in the same commit to match, so the spec and the artifact do not disagree.
 
 ## 10. Reuse audit
 
