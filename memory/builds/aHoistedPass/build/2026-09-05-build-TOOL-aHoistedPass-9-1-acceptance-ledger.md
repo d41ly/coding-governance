@@ -24,7 +24,7 @@ predate this unit and a reader owes the attribution.
   `1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 24 25 26 27 28 29 30 31`, and
   `git grep -c 'fail 23'` on that file returns 0, so 23 is still claimed only by `report` and
   `printf` labels.
-- **AC2** — MET — the failing case was observed RED before the check landed and twice over. The
+- **AC2** — MET — the failing case for `fail 31` was observed RED before the check landed, twice. The
   block's own bytes, extracted from the landed file by its own markers and run against the real tree
   with `tools/workflows/unattended-unit.js` moved aside and its directory left in place, printed
   `UNATTENDED check 31 FAILED — … : tools/workflows/unattended-unit.js` and set `status=1`; the file
@@ -32,7 +32,7 @@ predate this unit and a reader owes the attribution.
   real checker. **That observation was taken on the SHIPPED carrier, which names TWO route scripts,
   and the verdict named only the deleted one** — the per-path property, witnessed on the real value
   rather than on a one-path fixture.
-- **AC3** — MET — with the section naming the route and its directory absent, the default run prints
+- **AC3** — MET — with the section naming the route and its directory absent, `bash tools/unattended/check-unattended.sh` prints
   no `check 31` line and `GOV_UNATTENDED_REPORT=1` prints
   `check 31 skipped for <path> — the directory that would hold it is absent`. Observed at both the
   kit's own prefix and a foreign one.
@@ -40,13 +40,13 @@ predate this unit and a reader owes the attribution.
   tree exits 0 and `grep -c 'check 31'` over its whole output returns **0**. The three outcomes are
   byte-distinguishable: nothing, an `unattended-report:` line, a stdout `FAILED` line with
   `status=1`.
-- **AC5** — MET — with the carrier removed, the REPORT run prints
+- **AC5** — MET — with `memory/guides/BUILD-METHOD.md` removed, the REPORT run prints
   `check 31 skipped for <root>/guides/BUILD-METHOD.md — this tree carries no build-method carrier …`
   and no `fail 31` appears.
-- **AC6** — MET — with the section present and naming no backticked route, the REPORT run prints
+- **AC6** — MET — with the section present and naming no backticked route, `GOV_UNATTENDED_REPORT=1` prints
   `check 31 skipped for <carrier> — M6 names no backticked route script …`. The section token in that
   line came out of the registry, not out of the check.
-- **AC7** — MET, in both directions. With the section rewritten to
+- **AC7** — MET, in both directions, on `vendor/harness/workflows/unattended-unit.js`. With the section rewritten to
   `vendor/harness/workflows/unattended-unit.js` and that directory absent, the verdict is the skip;
   with `mkdir -p vendor/harness/workflows` and no file, it is `fail 31` naming that same foreign
   path. The check spells no install prefix — the directory under test is `dirname` of the path the
@@ -64,7 +64,7 @@ predate this unit and a reader owes the attribution.
   Filed as `TOOL-aHoistedPass-37`, parked through the driver, and NOT repaired here: the one-token
   fix trades a crash for a silent skip of check 30's whole corpus walk, which is the class this build
   exists to remove.
-- **AC10** — NOT MET, and the rest of this line is the reason rather than an excuse. The suite does
+- **AC10** — NOT MET, and `tools/unattended/check-unattended.test.sh` is the reason rather than an excuse. The suite does
   not report PASS in either shard, and it did not before this unit either. Shard 1/2 ran to
   COMPLETION — `rc=1`, 12 failures, the closing C21 arms and the shard notice both printed, and no
   assertion-floor failure, so it met its floor of 83. Shard 2/2 was re-run after the AC15 repair and
@@ -78,12 +78,12 @@ predate this unit and a reader owes the attribution.
   line, and that is the point: `DEPL-aHoistedPass-1` rev-5 parked the `unattended` bump to the owner,
   so order 2 moved nothing and every carrier still agrees at whatever it agreed at before. The
   checker grades agreement, not movement, and this unit moved neither.
-- **AC12** — MET, after one RED that was mine and is the reason the arms look the way they do.
+- **AC12** — MET, after one RED from `bash tools/check-install-prefix.sh` that was mine and is the reason the arms look the way they do.
   `bash tools/check-install-prefix.sh` first refused: `ROSE tools/unattended/check-unattended.test.sh
   3 -> 9`, because six arms spelled `tools/workflows/…` literally. That gate is a BAN, not a ratchet.
   The arms now derive the route from the suite's own `KIT_REL`, the gate exits 0, and both rows in
   `tools/install-prefix-carried.txt` still read 3.
-- **AC13** — MET as restated at rev-5. The leg exits 0 and its default-channel stdout is
+- **AC13** — MET as restated at rev-5. `bash tools/unattended/check-unattended.sh` exits 0 and its default-channel stdout is
   **byte-identical** before and after: 42 lines, 18276 bytes, `diff` silent. Both runs were taken on
   the same git state, uncommitted, so the comparison isolates check 31 rather than measuring this
   pass's own commit through check 23. "No output" was struck because check 7's EXCLUDED notices and
@@ -92,7 +92,7 @@ predate this unit and a reader owes the attribution.
   `— the directive registry names no passes-harnessed handle this leg can read`, the default run
   prints no `check 31` line, and no `fail 31` appears. This is the branch `--only 28` would have
   reached if check 30 let it.
-- **AC15** — MET, and it is the rev-5 AMEND. The suite's derived build-method carrier now emits each
+- **AC15** — MET, the rev-5 AMEND in `tools/unattended/check-unattended.test.sh`. Its derived build-method carrier now emits each
   section's handles as well as its heading, both counted from the registry: **10 sections, 17
   distinct handles, against a registry of 17**. Before the repair the carrier named 0 of 17, so
   check 16's body term fired seventeen times and check 17's green control failed on a message about
@@ -131,6 +131,27 @@ The failures are pre-existing and attributed by measurement, not by assumption:
 
 The rest are filed rather than fixed. Fixing another build's fixture debt inside a unit about check
 31 is scope creep, and the `DISPOSITION_CUTOFF` one is not obviously a fixture bug at all.
+
+## The bar, and one red on it that is not this unit's
+
+`bash tools/memory-tree/check-memory-hygiene.sh` exits **1**, on check 23: an acceptance-ledger AC
+line must carry a backticked token on its OWN first line, or name `amended rev-N`, or be a checkbox —
+the classifier at `tools/memory-tree/check-memory-hygiene.sh:1430` reads that one line and nothing
+below it. Seventeen entries were named. **Nine were mine and are fixed**: AC2, AC3, AC5, AC6, AC7,
+AC10, AC12, AC13 and AC15 carried their evidence on a continuation line, and each now names it up
+front. No claim changed.
+
+**The other eight are `TOOL-aHoistedPass-6`'s**, and this leg was already RED before this pass began.
+Measured at the pass base `c0a6d5ae`: AC2b, AC7, AC10, AC15, AC17, AC21, AC22 and AC23 of that
+ledger were already in the bad form, and `git diff c0a6d5ae..HEAD` shows this pass never touched that
+file. They are filed as `TOOL-aHoistedPass-39` rather than repaired here. Repairing them is NOT
+mechanical: each line's evidence sits in its continuation prose, so choosing the token means reading
+that unit's evidence and deciding what it was, which is rewriting another unit's conformance claim
+from the outside. The remedy is one line each and belongs to whoever closes that unit or the build.
+
+The other two hygiene lines are REPORTED rather than gated: a check 16 read-path finding about
+`memory/map/baseline.toml`, and a check 15 citation in `memory/backlog/TOOL.md:372`
+(`TOOL-aHoistedPass-33`, not this pass's row).
 
 ## What this unit did not do
 
