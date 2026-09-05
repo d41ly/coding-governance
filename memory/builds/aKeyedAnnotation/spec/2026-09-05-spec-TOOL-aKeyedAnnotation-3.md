@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-3 — a report-only signal for a source-cited id that resolves to no record
 
-**Status:** OPEN · rev-3 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 3
+**Status:** CLOSED · rev-4 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-4 |
+| [2026-09-05-build-TOOL-aKeyedAnnotation-3-acceptance.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-3-acceptance.md) | journal | — |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-4 |
 
@@ -30,9 +31,15 @@ no waiver list at all.
   corpus is a finding; an id whose slug anchors none is a fixture and is filtered. Derived from the
   definitions map the memory-tree walk already builds — never from a directory listing, which goes
   stale the first time a build is archived.
-- **S3** A liveness assertion the signal carries on every run: the count of known slugs and the count
-  of scanned source files. A zero finding count is only meaningful beside a non-empty slug set and a
-  non-empty file set; with either empty the signal reports itself dead rather than clean.
+- **S3** A liveness assertion the signal carries on every run. **CORRECTED at build time, because
+  the obvious second half is vacuous.** The pair was to be the count of known slugs and the count of
+  scanned source files; the file count can never reach zero in a tree with this kit installed, since
+  the report is itself a tracked non-memory file. That was found by writing the arm to observe it RED
+  and watching it refuse to go dead — the only way the vacuous-selector class ever surfaces. The
+  half that CAN collapse is the CITED set: a grammar bound to the wrong families matches nothing
+  while every file is still scanned, which is the confident zero this signal exists to refuse. So
+  liveness keys on the slug set and the cited set, and the scanned-file count stays REPORTED as the
+  denominator a reader needs while deciding nothing.
 - **S4** Report-only, with its own SHRINK-ONLY pin, in the shape the kit already ships for signals
   that are true but not yet gateable. It gates nothing and adds no leg. The word matters and an
   earlier revision had it wrong: this item said "tolerance pin" while §8 F2 resolves the fork to
@@ -162,10 +169,15 @@ rejected with the marker. Excluding by path was rejected on the measurement abov
   adopter configuration this kit's own descriptor permits — the signal reports itself DEAD and the
   `drift-audit records` leg still returns. It must not raise, and it must not take the other signals
   with it. Observed against the unguarded form first, which does.
-- **AC5d** When the new pin is raised with no old-to-new marker beside it and
-  `python tools/drift-audit/drift_report.py --check` is run, the ratchet S7 lands REDS; with the
-  marker present it does not. Observed both ways, which is what makes shrink-only a mechanism here
-  rather than a word.
+- **AC5d** When the new pin is raised with no old-to-new marker beside it, `python
+  tools/drift-audit/drift_report.py --check` REDS naming both values; with the marker present it
+  does not. Observed both ways, which is what makes shrink-only a mechanism here rather than a word.
+  **The observation needs a BASE that already carries the pin**, and that is a property of the
+  ratchet rather than a quirk of the test: it compares the working value against the value at the
+  base ref and skips a key the base does not have, so a pin is UNRATCHETED on the very branch that
+  introduces it and binds from the next one onward. Stated because the obvious way to observe this
+  criterion — raise the pin on this branch and expect a red — passes green and looks like a broken
+  ratchet.
 - **AC6** When `bash tools/run-gates/run-gates.sh` is run on this unit's commit it is green, and the
   `drift-audit records` leg's recorded seconds are compared against its declared ceiling.
 
@@ -223,6 +235,7 @@ deliberately cheaper than a leg, and the leg it rides is unguarded so it already
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 - rev-3 · 2026-09-05 · round-2 fixes folded: the ratchet row, the kit-boundary fork, and two liveness arms.
+- rev-4 · 2026-09-05 · AC5d states the base condition the ratchet needs; §4's liveness pair corrected at build time.
 
 ## 10. Reuse audit
 
