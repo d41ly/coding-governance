@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs
 
-**Status:** OPEN · rev-4 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
+**Status:** OPEN · rev-5 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py) | research | TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md) | research | TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md) | spec-audit | TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
+| [2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md) | spec-audit | TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 
 <!-- /gen:spec-records -->
 
@@ -59,16 +60,28 @@ Every later unit writes comments that must obey it, so it lands first.
   names both records and establishes direction from git.
 - **S6** Register the guide as a method carrier if and only if the kit's carrier registry demands it;
   read `tools/memory-tree/adopt-memory-tree.sh` for whether a second guide joins that population.
-- **S7** A rendered memory-tree guide is declared in THREE carriers beyond the render line, and all
-  three are in scope: a `[[files]] role = "rendered"` stanza in `tools/memory-tree/kit.toml` carrying
-  `to` and `placeholders` — without it the template falls to the catch-all `role = "engine"` and
-  ships to adopters with no render destination; a fourth row in the hand-kept `PAIRS` literal in
+- **S7** A rendered memory-tree guide is declared in FOUR carriers beyond the render line, and all
+  four are in scope. An earlier revision of this item said three and missed the one that SHIPS.
+  (i) A `[[files]] role = "rendered"` stanza in `tools/memory-tree/kit.toml` carrying `to` and
+  `placeholders` — without it the template falls to the catch-all `role = "engine"` and reaches
+  adopters with no render destination. (ii) A fourth row in the hand-kept `PAIRS` literal in
   `tools/memory-tree/kit-dogfood-parity.test.sh` — without it the dogfood copy may diverge from its
-  template forever while the leg prints green; and the new rendered path in that leg's `guard` list
-  in `tools/gate-legs.json`, which today names the three existing rendered paths explicitly. The
-  decision log records this same registration verbatim for the build method, and `kit.toml` already
-  carries a comment recording the same two-carrier miss, so this is a documented failure repeated
-  rather than a novel one.
+  template forever while the leg prints green. (iii) The new rendered path in that leg's `guard`
+  list in `tools/gate-legs.json`, which today names the three existing rendered paths explicitly.
+  (iv) The `[[gate_leg]]` block's OWN `guard` list inside `tools/memory-tree/kit.toml`, which is a
+  separate carrier from (i) and from (iii): the deployer copies a descriptor's declared guard
+  verbatim into a target, so patching this repo's manifest alone leaves the half that ships open and
+  EXPORTS the hole rather than fixing it. The comment under that guard says exactly this, and it is
+  the comment this item cites as its precedent — which is how an earlier revision came to repeat,
+  in its own text, the failure it was quoting.
+- **S8** The two new files this unit lands both fall under GLOB-DERIVED codebase-map inventories —
+  the rendered guide under the guides inventory, and S5's bug-class record under the gotcha-class
+  one — so each mints an inventory key that a dossier must claim, and the coverage leg reds until it
+  does. `memory/map/baseline.toml` is not the escape: its own header says it only ever shrinks and
+  that new keys belong in a dossier. `memory/map/features/build-method.md` is the precedent and the
+  shape to copy — it already claims the build method's guides key and covers the template and the
+  rendered copy as one pair. This unit claims both new keys the same way and regenerates the map
+  artifacts under `memory/map/generated/` in the same commit.
 
 ## 3. Non-goals (OUT)
 
@@ -92,11 +105,13 @@ one document a session already loads.
 ### Rollout
 
 The kit's adopter script renders the build-method guide from a template beside it. The annotation
-guide rides that seam — one template file and one render line — plus the three declaration carriers
-S7 names: the rendered-role stanza in the kit descriptor, the parity leg's hand-kept pair list, and
-that leg's guard in the gate manifest. Nothing BEYOND those changes. The earlier wording here said
-"nothing else in the kit changes", which was false in three places and is exactly the assert-over-
-derive shape the round-1 audit found running through this whole spec set.
+guide rides that seam — one template file and one render line — plus the four declaration carriers
+S7 names and the map claims S8 names. Nothing beyond THOSE. This sentence has now been wrong twice
+in the same direction: it first said "nothing else in the kit changes", which was false in three
+places, and its repair then bounded the unit to three carriers and no dossier claim, which forbade
+the very thing AC6's green bar requires. Both were the assert-over-derive shape the round-1 audit
+found running through this set, and the second was written while repairing the first. The bound now
+points at the enumerations rather than restating a number.
 
 ### Alternatives rejected
 
@@ -156,16 +171,36 @@ everywhere.
   rendered guide away from its template REDS it. Both observed.
 - **AC8** When `bash tools/memory-tree/check-method-carriers.sh` is run after this unit it is green,
   with no skip case added to either of the two files that keep an exclusion list.
-- **AC9** When `python tools/memory-tree/corpus_ids.py --report` is run after the backlog row lands,
-  the orphan count is 0 and the definitions set for the foreign build's seq range is unchanged from
-  this base — the observation that proves S4's prose-only constraint was actually honoured.
+- **AC8b** One observation per carrier S7 names that no other criterion reaches, because AC1 and AC6
+  see none of them: AC1 renders from a hardcoded line in the adopter script, so it passes with or
+  without the descriptor stanza, and the deployer walks only rows already declared `rendered`, so an
+  ABSENT stanza declares nothing and reds nothing. Deleting the `[[files]]` stanza must make a
+  deployer run REFUSE; deleting either `guard` row must make a diff touching ONLY the rendered guide
+  produce a leg selection that omits `kit/dogfood doc parity`, where the unmodified tree includes it.
+  Each observed by staging the deletion, confirming the refusal or the omission, and unstaging.
+  The permanent close for this whole class — deriving the pair list and both guards from the
+  descriptor's rendered stanzas, so four carriers become one — is filed as a backlog row rather than
+  built here, because deriving kit parity is outside this build's goal.
+- **AC8c** When the codebase-map coverage check is run after this unit it is clean, with both new
+  inventory keys claimed by a dossier and none added to `memory/map/baseline.toml`, and the
+  generated map artifacts reproduce from the tree at that commit.
+- **AC9** S4's constraint has TWO failure modes and they need two observations, because one number
+  covers neither. HEAD case: when the set of ids of the foreign build appearing anywhere under the
+  memory root is enumerated with `git grep` and sorted, it is byte-identical before and after the row
+  lands. An id in a row's head ANCHORS, so it lands in the definitions set and the orphan count stays
+  0 — the earlier form of this criterion named the orphan count alone and was therefore green on
+  exactly the violation it exists to catch. BODY case: `python tools/memory-tree/corpus_ids.py
+  --report` shows an orphan count of 0, which is what catches a bare citation. The criterion names
+  which clause catches which mode; it does not assert on a per-build definitions set, because that
+  command prints none.
 
 ## 7. Gates
 
-Existing legs that must stay green: the full bar. Load-bearing here — `memory hygiene`,
-`kit versions`, `codebase-map coverage + freshness`, `drift-audit records`, and whichever legs
-`tools/gate-legs.json` guards on `tools/memory-tree/`. Read the manifest for the names; none is
-typed here. No new leg.
+Existing legs that must stay green: the full bar. Load-bearing here are the memory-hygiene leg, the
+kit-version leg, the codebase-map coverage and freshness leg, the drift-audit records leg, and
+whichever legs `tools/gate-legs.json` guards on `tools/memory-tree/`. Read the manifest for the
+names; none is typed here. An earlier revision typed four of them under that very sentence and got
+one wrong, which is the sentence's own point made the expensive way. No new leg.
 
 ## 8. Open questions
 
@@ -202,6 +237,7 @@ typed here. No new leg.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 - rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
 - rev-4 · 2026-09-05 · §8 F2's withdrawn skip-case route closed behind S1's ban.
+- rev-5 · 2026-09-05 · round-2 fixes folded: the map claim, four carriers, and an AC9 that can fail.
 
 ## 10. Reuse audit
 

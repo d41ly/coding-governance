@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself
 
-**Status:** OPEN · rev-4 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
+**Status:** OPEN · rev-5 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
+| [2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 
 <!-- /gen:spec-records -->
 
@@ -44,7 +45,13 @@ reader before anything else is built on it.
   self-certifying oracle this unit exists to correct while the kit README advertises the correction.
   The template row ships EMPTY, and the reader takes the name with getattr-and-fallback to the
   product globs exactly as the trace globs do, so an older adopter's project layer does not trip the
-  required-attribute check.
+  required-attribute check. **An empty row falling back to the product globs hands the adopter the
+  unnarrowed oracle — the outcome this item exists to prevent — so the empty row is declared as a
+  HOLE in `tools/drift-audit/kit.toml`, with a discharge probe, beside the two that kit already
+  carries for exactly this shape.** Without that, adopters receive the declaration and no forcing
+  function to fill it, while §5 has the kit README record the correction as shipped. The kit's
+  existing hole for its trace cutoff is worded "correct on day one, and permanently inert if nobody
+  ever fills it", which is the same sentence about this row.
 - **S3** Stop the pin comment in `drift_signals.py` from spelling the ids it counts. Verified at this
   base: `drift_signals.py` is itself in the citation set returned for BOTH pinned ids, so the pin
   cannot be drained by removing the annotations it describes. Route the reader to the report's own
@@ -102,8 +109,13 @@ follows a precedent rather than inventing one.
 
 ### Migration
 
-The population moves under each of S1, S2 and S3. The order that keeps every movement attributable is
-one change, one measurement, one recorded line — never all three then a single reading.
+The one-change-one-measurement-one-recorded-line order stands, but not for the reason this paragraph
+used to give. It opened "The population moves under each of S1, S2 and S3", which is the exact
+wording S4 was rewritten to repudiate and which AC4 refutes in the spec's own vocabulary: the
+judgeable population counts non-terminal keyed specs, and nothing done to annotations touches it.
+The expected movement of the VALUE under each of S1, S2 and S3 is ZERO on this corpus, so three
+identical readings are the confirmed result. The discipline exists so that an UNEXPECTED movement is
+attributable to one change, not because movement is expected.
 
 ### Alternatives rejected
 
@@ -211,6 +223,7 @@ No new leg.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 - rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
 - rev-4 · 2026-09-05 · the regression-arm count reconciled across §2, §5 and §6.
+- rev-5 · 2026-09-05 · round-2 fixes folded: §4 Migration reconciled with S4, and the seed row declared a hole.
 
 ## 10. Reuse audit
 

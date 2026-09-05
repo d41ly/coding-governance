@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-3 — a report-only signal for a source-cited id that resolves to no record
 
-**Status:** OPEN · rev-2 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-4 |
+| [2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-4 |
 
 <!-- /gen:spec-records -->
 
@@ -32,8 +33,20 @@ no waiver list at all.
 - **S3** A liveness assertion the signal carries on every run: the count of known slugs and the count
   of scanned source files. A zero finding count is only meaningful beside a non-empty slug set and a
   non-empty file set; with either empty the signal reports itself dead rather than clean.
-- **S4** Report-only, with its own tolerance pin, in the shape the kit already ships for signals that
-  are true but not yet gateable. It gates nothing and adds no leg.
+- **S4** Report-only, with its own SHRINK-ONLY pin, in the shape the kit already ships for signals
+  that are true but not yet gateable. It gates nothing and adds no leg. The word matters and an
+  earlier revision had it wrong: this item said "tolerance pin" while §8 F2 resolves the fork to
+  shrink-only by name and treats the two as distinct shapes, and §4 Rollout independently calls the
+  pin a drain target rather than a permanent tolerance. One spec, three sections, one answer now.
+- **S7** SHRINK-ONLY NEEDS A MECHANISM. A report-only signal is `gateable: False`, so it can never
+  enter the report's over-tolerance set or its dead set, and the check pass's only remaining lever is
+  a ratchet row: the kit says so in prose beside its one existing report-only pin, whose gloss is
+  that being ungateable is precisely what makes RAISING it land in the ratchet list. That list is an
+  explicit opt-in — sibling pin keys carry no row — so a new pin is unratcheted by default and can be
+  raised silently in the same commit that raises the population, which would make §4's "a drain
+  target from the first commit" false. This unit lands the ratchet row naming the signals module and
+  the new key, weakening upward, and §4's Inventory carries it. Sibling unit 4 spends a scope item
+  and a criterion on this same rule in this same kit in this same build; both units now agree.
 - **S5** The family enum is read from the memory-tree conf rather than spelled, so a foreign family
   cited in shipped adopter-facing text cannot make the signal permanently red in a tree that does not
   declare it.
@@ -69,9 +82,24 @@ report-only signal drainable rather than decorative.
 
 ### Inventory
 
-One signal function, one registry row, one pin row, two self-test arms. No new file, no new leg, no
-new committed artifact — the answer is derived live on each run, which is the repo's stated
-preference when the only consumer is same-language.
+One signal function, one registry row, one pin row, one ratchet row, one dependency declaration and
+four self-test arms. No new file, no new leg, no new committed artifact — the answer is derived live
+on each run, which is the repo's stated preference when the only consumer is same-language.
+
+**The definitions map crosses a KIT BOUNDARY and that is a declaration, not an implementation
+detail.** The report module imports stdlib only and says so at its head, deliberately COPYING a
+sibling kit's conf loader rather than importing it. Reaching straight into the memory-tree corpus
+walker breaks that: its grammar accessor raises outright when the recall extractor is absent, and it
+shells out to the hygiene script through a bash resolver that is itself a named failure path on a
+node where no bash resolves. Drift-audit's descriptor requires memory-tree and declares no
+memory-recall edge, and memory-tree puts memory-recall behind a conditional that is FALSE at apply
+time because the pins ship blank — so the adopter configuration this kit's own requires permits is
+exactly the one where that walk raises. The blast radius is the whole leg, not one signal: the report
+evaluates every signal in one unguarded comprehension, so an exception there takes `drift-audit
+records` down for that adopter instead of producing the dead-signal report S3 promises. §8 F4
+resolves how the boundary is crossed; the kit's existing optional-kit idiom — a guarded import with
+a not-asked verdict — is the shape, and the dependency edge is declared in
+`tools/drift-audit/kit.toml`.
 
 ### Rollout
 
@@ -117,6 +145,21 @@ rejected with the marker. Excluding by path was rejected on the measurement abov
   population changes accordingly — proving the enum is read and not spelled.
 - **AC5** When `python tools/memory-tree/corpus_ids.py --report` is run after this unit, its orphan
   count is unchanged from this base — proving the memory-side check was not widened.
+- **AC5b** S3 declares TWO liveness counts and AC3 exercises only one. In a scratch tree where the
+  signal's SOURCE WALK resolves to no tracked file — the slug set left full — running
+  `python tools/drift-audit/drift_report.py --check` reports the signal DEAD rather than zero
+  findings. That is the unit's own stated hazard, a false zero from an empty population, and it is
+  the half no other criterion reached. Observed RED first, and wired as a self-test arm beside S6's
+  two, mirroring the criterion sibling unit 2 carries for the same class.
+- **AC5c** When `python tools/drift-audit/drift_report.py --check` is run in a scratch tree holding
+  drift-audit and memory-tree and NOTHING ELSE — no recall extractor, pins blank, which is the
+  adopter configuration this kit's own descriptor permits — the signal reports itself DEAD and the
+  `drift-audit records` leg still returns. It must not raise, and it must not take the other signals
+  with it. Observed against the unguarded form first, which does.
+- **AC5d** When the new pin is raised with no old-to-new marker beside it and
+  `python tools/drift-audit/drift_report.py --check` is run, the ratchet S7 lands REDS; with the
+  marker present it does not. Observed both ways, which is what makes shrink-only a mechanism here
+  rather than a word.
 - **AC6** When `bash tools/run-gates/run-gates.sh` is run on this unit's commit it is green, and the
   `drift-audit records` leg's recorded seconds are compared against its declared ceiling.
 
@@ -145,6 +188,20 @@ deliberately cheaper than a leg, and the leg it rides is unguarded so it already
   RESOLVED (agent, 2026-09-05, delegated): shrink-only. A tolerance pin permits the
   population to sit where it is forever, which fails §4's stated intent that the pin be a
   drain target from the first commit — a criterion the other option cannot satisfy.
+- **F4 — how the definitions map crosses the kit boundary.** Drift-audit is copy-installed and must
+  not hard-import a kit an adopter may not have; the memory-tree corpus walker raises when the recall
+  extractor is absent. Options: (a) adopt sibling unit 2's F1 resolution by reference — import when
+  importable, fall back to a local copy the kit self-test byte-compares against the original, and
+  report the signal DEAD rather than raising when neither is available; (b) rebuild the definitions
+  map inside drift-audit from the grammar unit 2's S1 already binds; (c) declare a hard dependency
+  edge and let the leg fail for adopters without it. RESOLVED (agent, 2026-09-05, delegated): (a),
+  BY REFERENCE and not by re-deciding. F1 of unit 2 settled this exact boundary question one unit
+  earlier in this same build and this same kit, and answering it differently here would leave two
+  units applying two rules to one boundary. (c) fails veto 1 outright — it breaks a leg the spec's
+  own §7 requires green. (b) survives the vetoes but satisfies strictly fewer criteria: it duplicates
+  a walk that already exists where (a) reuses it, and AC5c is written against (a)'s dead-report
+  behaviour. The dependency edge is still declared, so the descriptor stops permitting a
+  configuration the code cannot serve.
 - **F3 — whether the two findings are repaired by this build.** They belong to another node's build
   whose records were never written, so repairing them means writing records for work this session did
   not do. Recommendation: file them as backlog rows against that build and let the signal carry them
@@ -158,6 +215,7 @@ deliberately cheaper than a leg, and the leg it rides is unguarded so it already
 
 - rev-1 · 2026-09-05 · initial draft, from the `aKeyedAnnotation` design pass.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
+- rev-3 · 2026-09-05 · round-2 fixes folded: the ratchet row, the kit-boundary fork, and two liveness arms.
 
 ## 10. Reuse audit
 

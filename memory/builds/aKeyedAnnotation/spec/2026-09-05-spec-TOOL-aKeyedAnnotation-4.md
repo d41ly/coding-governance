@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only
 
-**Status:** OPEN · rev-4 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
+**Status:** OPEN · rev-5 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 |
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 |
+| [2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 |
 
 <!-- /gen:spec-records -->
 
@@ -49,8 +50,17 @@ orienting agent gets the seam AND the reasoning behind it.
 - **S3** The pin is MEASURED on this corpus — 17 empty of 20 dossiers at this base — and recorded
   with its reading beside it. An adopter scaffolding the kit gets the row with no value: a number
   copied from this tree is either vacuous or permanently red elsewhere. The kit conf carries no other
-  measured pin today, so this is the first rather than one more of a set, and an earlier draft
-  claiming otherwise is corrected in §8.
+  measured pin today, so this is the first rather than one more of a set, and §8 F1's resolution now
+  says so too.
+  **The adopter's carrier is named and the unset behaviour is specified, because neither was.** The
+  row lands in `tools/codebase-map/.codebase-map.conf.example`, which the kit's adopter script copies
+  to an adopting repo's root, carrying an empty value and its documentation comment — the same
+  dogfood-versus-shipped split S2 closes one file over. With the key ABSENT OR EMPTY the check reports
+  the count as UNGRADED and says so on stdout: never a bare zero, which is the vacuous selector this
+  unit exists to close, and never a red, which would break a fresh adopter's first gate run and the
+  kit's own self-test, since that self-test execs the gate template from scratch trees carrying no
+  conf at all. Announcing an ungraded count is the repo's existing idiom for a check that was not
+  asked.
 - **S8** SHRINK-ONLY NEEDS A MECHANISM, and naming it in a comment is not one. The only mechanism in
   this repo is a ratchet row in the drift-audit signals module, read during that report's check pass,
   which reds a raise unless a nearby marker spells the old and new values. Without one, anyone raises
@@ -81,6 +91,10 @@ orienting agent gets the seam AND the reasoning behind it.
 - **No bulk backfill of every empty dossier.** The pin drains as dossiers are touched by the work that
   can fill them honestly. Filling twenty in one commit is guesswork dressed as coverage.
 - **No change to the dossier schema.** The field is already required and already validated.
+- **No change in `tools/drift-audit/` beyond the single ratchet row S8 names.** S8 puts a second
+  copy-installed kit into this unit's write set, and §5 cited this section as the bound on it while
+  this section said nothing about that kit at all — a control asserted rather than written, which is
+  this build's recurring shape. It is written now, so the citation resolves.
 
 ## 4. Design
 
@@ -153,10 +167,17 @@ copy with no cross-language consumer.
   resolves to a record that genuinely governs that dossier's feature — recorded per id in the unit's
   acceptance ledger, not asserted in bulk.
 - **AC7** When `bash tools/run-gates/run-gates.sh` is run on this unit's commit it is green.
-- **AC8** When `python tools/codebase-map/reuse_lookup.py` is run in a scratch tree with the
-  project-side extractor REMOVED, it still runs and still prints the decisions line — the observation
-  that proves S1 preserved the module's declared portability instead of quietly ending it. A declared
-  property with no arm asserting it is a comment.
+- **AC8** When `python tools/codebase-map/selftest.py` is run it exits 0 with a NEW ARM that runs the
+  reuse audit in a scratch tree with the project-side extractor REMOVED, asserting it still runs and
+  still prints the decisions line. The arm is what makes the property permanent; an earlier form of
+  this criterion described a one-off build-time run and called it permanent, which its own closing
+  sentence condemns — a declared property with no arm asserting it is a comment. Observed RED against
+  a decisions line that reads the parsed dossier. That module ships as a pair, so the arm lands in
+  the copy adopters receive and the dogfood copy is re-copied, exactly as S2 requires of the gate.
+- **AC8b** When `bash tools/codebase-map/adopt-codebase-map.sh` is run into a scratch adopter tree
+  and the installed gate is then run with the new pin UNSET, it reports the count as ungraded and
+  says so, rather than a traceback, a bare zero or a red — S3's adopter behaviour, observed on the
+  path an adopter actually takes.
 - **AC9** When the new pin is raised in the kit conf with no old-to-new marker beside it and
   `python tools/drift-audit/drift_report.py --check` is run, the `drift-audit records` signal REDS;
   with the marker present it does not. Observed both ways, which is what makes S8's ratchet row a
@@ -179,9 +200,15 @@ runs, and that leg is unguarded so it runs on every bar.
   (b) the memory-tree conf, keeping every corpus pin together. Recommendation: (a) — the kit is
   copy-installed and its pin must travel with it, and an adopter without memory-tree must still be
   able to declare it. RESOLVED (agent, 2026-09-05, delegated): (a), the kit's own
-  conf. Verified at this base that the file exists and already carries this kit's other
-  measured pins, so (a) extends a seam where (b) would create a cross-kit read an adopter
-  without the memory-tree kit could not satisfy at all.
+  conf, on ONE ground: the kit is copy-installed, so its pin must travel with it, where (b) would
+  create a cross-kit read an adopter without the memory-tree kit could not satisfy at all.
+  An earlier form of this resolution added a second ground — that the file already carries this
+  kit's other measured pins — and stamped it "verified at this base". It is false. That conf holds
+  a map root, a gate file, a digest command, a dark-layers list, a clone-count path and a fan-in
+  threshold whose own comment says it was never re-measured. This is the conf's FIRST measured pin,
+  which is exactly why S3 spells out that an adopter gets the row with no value. S3 announced this
+  correction before it was made, so for one revision the false claim stood while a sibling section
+  certified it fixed; the pick itself never depended on it.
 - **F2 — how S4 keeps a new dossier landable.** A scaffolded dossier legitimately has no decisions
   yet, so a check that reds on it blocks the map's own convergence rule. Options: (a) the scaffold
   emits the key with a comment and the check counts it like any other empty, since the pin is
@@ -204,6 +231,7 @@ runs, and that leg is unguarded so it runs on every bar.
 - rev-2 · 2026-09-05 · §8 forks resolved under the standing mandate; no scope change.
 - rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
 - rev-4 · 2026-09-05 · §5 carries S8's second kit and the two arms the fold added.
+- rev-5 · 2026-09-05 · round-2 fixes folded: F1's false ground removed, the adopter carrier named, the arm made permanent.
 
 ## 10. Reuse audit
 

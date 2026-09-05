@@ -83,13 +83,13 @@ ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-1.md) | 1 | 2 | OPEN | rev-4 | 2026-09-05 |
-| [TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-2.md) | 2 | 2 | OPEN | rev-4 | 2026-09-05 |
-| [TOOL-aKeyedAnnotation-3 — a report-only signal for a source-cited id that resolves to no record](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-3.md) | 3 | 2 | OPEN | rev-2 | 2026-09-05 |
-| [TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-4.md) | 4 | 2 | OPEN | rev-4 | 2026-09-05 |
+| [TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-1.md) | 1 | 2 | OPEN | rev-5 | 2026-09-05 |
+| [TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-2.md) | 2 | 2 | OPEN | rev-5 | 2026-09-05 |
+| [TOOL-aKeyedAnnotation-3 — a report-only signal for a source-cited id that resolves to no record](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-3.md) | 3 | 2 | OPEN | rev-3 | 2026-09-05 |
+| [TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-4.md) | 4 | 2 | OPEN | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
