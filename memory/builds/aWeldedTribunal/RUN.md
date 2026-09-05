@@ -9,8 +9,10 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: cd51decdb943630f934f50441fb4b4bc2ff8e6ff
-phase: REVIEWING
+keepalive-reaped: yes
+parked-surfaced: yes, 0 surfaced — both spec-audit rounds and all four closing-review rounds were DISPOSED by fold, never parked
+witness: 267c90bad05713006ecbfcba034639b2c5a9a436
+phase: VERIFYING
 branch-sha: 9b5ae68820500aafb32d0edde32936991472980c
 branch-ref: refs/heads/branch/backlog-items-build-c4c36b
 mode: prompt
