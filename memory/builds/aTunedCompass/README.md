@@ -104,11 +104,11 @@ ids TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCo
 | [TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran](spec/2026-09-04-spec-TOOL-aTunedCompass-8.md) | 3 | 2 | BLOCKED | rev-3 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aTunedCompass-1 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aTunedCompass-1 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
