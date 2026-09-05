@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-2 — the route a run can find, and the ratchet that keeps it findable
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

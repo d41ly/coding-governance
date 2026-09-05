@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

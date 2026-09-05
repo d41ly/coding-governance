@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-1 — the record catches up with the verdicts that superseded it
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

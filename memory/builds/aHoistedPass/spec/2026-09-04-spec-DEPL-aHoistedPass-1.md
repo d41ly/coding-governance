@@ -1,6 +1,6 @@
 # DEPL-aHoistedPass-1 — a declared kit dependency that is actually checked
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
 
 <!-- gen:spec-records -->
 

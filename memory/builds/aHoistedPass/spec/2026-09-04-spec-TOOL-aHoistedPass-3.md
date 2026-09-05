@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-3 — the build-method budget becomes a number a gate reads
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-4 — the loop ban learns the two spellings that walk past it
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

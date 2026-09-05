@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-8 — the recipe-mode question, measured instead of argued
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
