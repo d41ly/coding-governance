@@ -5,7 +5,7 @@ opened: 2026-09-04
 streams: tooling
 roster: TOOL
 parents: dBriefedPass
-ids: TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4
+ids: TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 TOOL-aStagedLane-5 TOOL-aStagedLane-6
 ---
 
 # aStagedLane — the deterministic route for spec work, and the gate that binds a session which never takes it
@@ -75,7 +75,7 @@ accident. The classifier that would ground it already runs without a run-state f
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-09-04 · streams tooling
-ids TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4
+ids TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4 TOOL-aStagedLane-5 TOOL-aStagedLane-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
