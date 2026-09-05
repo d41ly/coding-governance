@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes
 
-**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
+**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -388,7 +388,7 @@ no new gate leg and no new ceiling. It adds one self-test arm to an existing sui
 
 ## 8. Open questions
 
-**F1 — `--probe` is the only pre-adoption reading the kit has. Delete it, or replace it?**
+### F1 — `--probe` is the only pre-adoption reading the kit has. Delete it, or replace it?
 `run_probe` is documented as legal against a repo with no declaration at all, read-only, and
 unconditionally exit 0, with two self-test arms at `tools/lexicon/selftest.py:744` and `:746`
 asserting exactly that. The research record calls it derivable from `--measure` plus the canon, and
@@ -506,6 +506,8 @@ at stake and the scaffold route already covers it.
   half, found by the bug-class checklist rather than by the review.
 - rev-5 · 2026-09-04 · same correction as the sibling at this build order — the pre-push hook DECIDES whether to
   force a total run. The cross-kit-deletion conclusion is unchanged for the same reason.
+- rev-6 · 2026-09-05 · §8’s fork became a `###` sub-head, for the reason its order-1 sibling records: a bold
+  run-in lead is not an item to either reader, so a resolved section read FORKED.
 
 ## 10. Reuse audit
 

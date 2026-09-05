@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint
 
-**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
+**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -363,7 +363,7 @@ no new ceiling; it moves one refusal into a leg that already exists.
 
 ## 8. Open questions
 
-**F1 — does the self-containment refusal ship to adopters, or stay gov-local?**
+### F1 — does the self-containment refusal ship to adopters, or stay gov-local?
 The `lexicon naming predicates` leg's argv is `["python", "tools/lexicon/lexicon.py"]` with no mode
 flag, so a check on that leg necessarily runs inside `run()` and therefore inside every adopter's
 copy of the kit. Option A is exactly that: the kit asserts its own self-containment wherever it is
@@ -454,6 +454,10 @@ update` clobbers. That route is unowned by any unit in this build.
 - rev-5 · 2026-09-05 · AC8 extended to the RENDERED charter. The pair is byte-capped on both sides and the
   rendered one is TIGHTER — `bash tools/check-template-size.sh AGENTS.md` reports six free bytes
   against the template's eight — so a §12 edit measured only on the template can still red the bar.
+- rev-6 · 2026-09-05 · §8’s fork became a `###` sub-head. Both machine readers count a fork as a bullet or a
+  `###` sub-head, and this section led its fork with a bold run-in, so the section scored ZERO items —
+  which routes to the empty-section branch and reads FORKED however conforming the resolution mark is.
+  The mark was always there; nothing could see it.
 
 ## 10. Reuse audit
 

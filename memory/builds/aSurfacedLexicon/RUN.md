@@ -10,7 +10,7 @@ with its anchor evidence, and the parked decisions.
 
 ## Run facts
 witness: 6ee7d96a5a797f29d94309b504d9a5f64637cb1a
-phase: REVIEWING
+phase: BUILDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 7c71fd36

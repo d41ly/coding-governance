@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-11 — the canon overlay and its stamp
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -380,6 +380,16 @@ changes what may be proposed; it does not write the sentence that says what the 
 - **AC12** — `grep` finds the honest-limit sentence in BOTH `.lexicon.conf` and
   `tools/lexicon/README.md`. S8 requires two carriers and rev-2 graded neither, so an implementation
   shipping the merge, the refusals and the posture line passed with the limit written nowhere.
+- **AC13** — the attribution line F2 ratified, which would otherwise ship absent with nothing
+  noticing. When a stamped `CANON:` overlay moves a P1 pin, the run prints a line naming the
+  OVERLAY as the cause of the movement, and that line is asserted by a selftest arm that stages an
+  overlay, observes the pin mismatch, and REDS if the report carries only the bare mismatch the
+  ratchet already prints. Both states are observed: with the overlay staged the line is present,
+  and with it unstaged the same run does not print it — an arm that only ever sees the line cannot
+  tell the line from the ratchet. The arm rides `lexicon selftest`, which is chunk `selftests` and
+  invisible to the push boundary, so this unit’s Definition of Done runs it explicitly under
+  `GATE_SELFTESTS=1` rather than trusting the push bar — the same disclosure §7 makes for every
+  other criterion in this spec.
 
 ## 7. Gates
 
@@ -415,9 +425,11 @@ second line of that selection's comment.
 
 ## 8. Open questions
 
-- **The canon-door ruling is not open.** RESOLVED (owner, 2026-09-04, recorded at
-  `memory/builds/aSurfacedLexicon/README.md:47-49` and elaborated as `R2` in the research record at
-  `…-1-rebuild-research.md:510`): the canon ships frozen and the owner can unfreeze it, through a
+- **The canon-door ruling is not open.** RESOLVED (owner, 2026-09-04) — recorded in the build README
+  and elaborated as `R2` in the research record. The third field of that mark is a CLOSED grammar,
+  `delegated` or nothing; rev-3 put a provenance clause there, which both readers score as a
+  non-conforming mark and therefore as no mark at all. The provenance now sits after the mark, where
+  it costs nothing. The ruling: the canon ships frozen and the owner can unfreeze it, through a
   `CANON:` block plus a reason-bearing stamp rather than a `role = "seed"` flip.
 - **F1 — what shape does the S7 guard predicate take? CLOSED at rev-3, by refutation rather than by
   signature.** The research record specified `grep -c CANON tools/lexicon/scaffold_lexicon.py` equal to
@@ -438,6 +450,17 @@ second line of that selection's comment.
   line naming the overlay as the cause. Recommendation: the targeted line. An owner who has just
   unfrozen the canon and is then handed a pin mismatch with no attribution will read it as a bug in the
   ratchet, and diagnosing it costs more than printing it.
+
+  **RESOLVED (agent, 2026-09-05, delegated): F2 — the targeted line, naming the overlay as the cause
+  of the pin movement.** Neither option is vetoed: no acceptance criterion observes this fork, no §3
+  non-goal is touched, and a report line is not a dependency, an install location, a public surface or
+  a write. So the pick is the feature-richness test and the targeted line wins it outright — the bare
+  mismatch is what the ratchet ALREADY prints, so that option delivers nothing this unit is not
+  getting for free, and it leaves the attribution question open for whoever meets the red.
+  It also serves this unit’s own purpose better: the build rule is that the unfreeze must be VISIBLE
+  on every run, and a pin mismatch with no attribution is precisely the quiet unfreeze that rule
+  exists to prevent — the mirror defect with an extra step. The line owes an acceptance criterion,
+  because a report line nobody observes is a report line that can ship absent.
 
 ## 9. Revision log
 
@@ -464,6 +487,11 @@ second line of that selection's comment.
 - rev-4 · 2026-09-05 · the research-record cite now names the CLAIM rather than a line number that lands on
   its middle — the quoted sentence spans two lines there. Cross-spec rev pins dropped, and the
   false clause saying the order-6 sibling still owes its half is corrected: it carries it.
+- rev-5 · 2026-09-05 · §8 made READABLE by the two machine readers that grade it, and F2 RESOLVED.
+  The canon-door mark carried a provenance clause in the third field, which is a closed grammar —
+  `delegated` or nothing — so both readers scored a conforming-looking mark as no mark at all and
+  the whole section read unresolved. F2 was genuinely open and is ratified as the targeted
+  attribution line, with AC13 added because a report line nobody observes can ship absent.
 
 ## 10. Reuse audit
 
