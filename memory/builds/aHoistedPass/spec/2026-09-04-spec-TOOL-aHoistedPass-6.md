@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -86,8 +86,10 @@ fan-out hook sees at all, and the three surviving stages stop claiming an enforc
   with, and the note warning against it belongs to the `tools/hooks/` unit at `order 1`.
 - **Verifying anything about the tree from inside the script.** A workflow script has no filesystem
   and the file's own header says so at `:23-28`. The disposal stage reports; it does not confirm.
-- **The `unattended` kit version.** `TOOL-aHoistedPass-2` at `order 3` takes 1.17 to 1.18 and this
+- **The `unattended` kit version.** `DEPL-aHoistedPass-1` at `order 2` takes 1.17 to 1.18 and this
   unit lands inside that release. See §4 for why no second bump is owed or possible to grade.
+  (rev-1 through rev-4 named `TOOL-aHoistedPass-2` as the owner; section 8's fork sweep moved it to
+  `DEPL-aHoistedPass-1` and stood that unit down. The conclusion is unchanged — the owner is not.)
 
 ## 4. Design
 
@@ -385,7 +387,7 @@ close it.
 
 `check-kit-versions.sh` requires the three `unattended` engine constants and the five tracked
 `tools/unattended/*.template.md` markers to agree — eight carriers, all reading 1.17 here.
-`TOOL-aHoistedPass-2` at `order 3` takes them to 1.18, and this unit at `order 5` lands inside that
+`DEPL-aHoistedPass-1` at `order 2` takes them to 1.18, and this unit at `order 5` lands inside that
 release. No branch of `check-kit-versions.sh` reads a diff, so a second bump within one build's
 landing range is neither required nor gradeable. **This unit is therefore NOT owner-gated**, and the
 design of record marks it gated on the strength of a bump it does not owe. `VERBS.template.md` is not
@@ -682,8 +684,8 @@ line is the record of which one does.
     MOVES into `CHECKLIST` in `dispatch.args`, because the child spells zero `tools/` literals. Same
     number, different arithmetic, and the row's reason has to say which.
   - **This unit is NOT owner-gated, and the design marks it gated.** Its stated route is the
-    `unattended` 1.17 to 1.18 bump reaching `SKILL.template.md`'s marker. `TOOL-aHoistedPass-2` at
-    `order 3` takes that bump; `check-kit-versions.sh` grades presence and agreement with no branch
+    `unattended` 1.17 to 1.18 bump reaching `SKILL.template.md`'s marker. `DEPL-aHoistedPass-1` at
+    `order 2` takes that bump; `check-kit-versions.sh` grades presence and agreement with no branch
     reading a diff; and `VERBS.template.md`, the only `*.template.md` this unit touches, is not on
     the veto-2 list.
   - **`--paths` cannot be a top-loop flag.** The `--plan` arm exits inside the parse loop at `:4892`,
@@ -791,6 +793,14 @@ line is the record of which one does.
     identical `pass-order history` claim is deliberately untouched here: this spec NARROWS at
     `:26-27` and the sibling is being corrected to match, so the wording is kept quotable rather than
     converted to a strike. Nothing outside this spec file was edited, and nothing was committed.
+- rev-5 - 2026-09-05 - the other half of rev-4's fold, caught by the bug-class checklist over that
+  commit: `amendment-leaves-its-other-half-standing`. Three passages named `TOOL-aHoistedPass-2` at
+  `order 3` as the owner of the `unattended` 1.17-to-1.18 bump this unit lands inside. Section 8's
+  fork sweep had already moved that move to `DEPL-aHoistedPass-1` at `order 2` and stood the sibling
+  down, and rev-4's fold brief never told the pass so. Owner and order corrected in all three. The
+  CONCLUSION each passage draws is untouched and still holds: this unit is NOT owner-gated, because
+  it owes no bump and `VERBS.template.md`, the only `*.template.md` it touches, is not on the veto-2
+  list.
 
 ## 10. Reuse audit
 

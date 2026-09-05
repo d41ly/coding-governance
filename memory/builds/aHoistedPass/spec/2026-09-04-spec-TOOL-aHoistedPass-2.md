@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-2 — the route a run can find, and the ratchet that keeps it findable
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -269,6 +269,12 @@ thing that refuses an early stop, with `--override build-complete` as its escape
 
 ### Migration
 
+**Neither bump below is this unit's work any more — section 8's sweep gave the `unattended` move to
+`DEPL-aHoistedPass-1` and the `memory-tree` move to `TOOL-aHoistedPass-3`, both at `order 2`. The
+derivations are KEPT as the reference those two units read, and because the ninth-marker gap and the
+render list below are findings in their own right that no other spec of this build states. Nothing in
+this subsection is an edit this unit makes.**
+
 **The `unattended` bump, 1.17 to 1.18, has EIGHT machine-graded carriers, derived here.**
 `check-kit-versions.sh:169-178` loops over `unattended.sh`, `check-unattended.sh` and
 `check-pass-order.sh`, asserting both the `KIT_UNATTENDED_VERSION` constant and the same-line
@@ -287,7 +293,8 @@ carries exactly one. Three constants plus five markers is eight.
 `check-kit-versions.sh` never sees it. It goes stale silently. Move it in the same commit, and file
 the gap rather than claiming the checker covers it.
 
-**The `memory-tree` bump, 2.59 to 2.60, has FOUR machine-graded carriers.** The constant at
+**The `memory-tree` bump — `2.60` to `2.61` at BASE, not the `2.59` to `2.60` this paragraph was
+written for — has FOUR machine-graded carriers.** The constant at
 `check-memory-hygiene.sh:20`, asserted by the `need` row at `check-kit-versions.sh:21`, plus one
 marker in each of the three tracked `tools/memory-tree/*.template.md` files, asserted at `:135-150`.
 Their three renders are `memory/guides/BUILD-METHOD.md`, `memory/HYGIENE.md` and
@@ -558,6 +565,14 @@ further, the same shape `DEPL-aHoistedPass-1`'s F1 sets for the `unattended` ver
   sentences at `:635-637` that become false under the hoist, had no criterion at all; AC9's
   byte-identity check holds whether or not they were rewritten, so the false sentence could have
   survived the landing green. AC18 added.
+- rev-4 - 2026-09-05 - the other half of rev-3's fold, caught by the bug-class checklist over that
+  commit: `amendment-leaves-its-other-half-standing`. rev-3 struck S11 and cut eleven rows from
+  Files-touched, and left section 4's Migration subsection deriving both bumps as though this unit
+  still performed them - one of them at `2.59 to 2.60`, a figure BASE had already passed. The
+  derivations are kept, because the eight-carrier count, the five-render list and the ninth ungraded
+  marker at `tools/unattended/README.md:1` are findings no other spec of this build states, and the
+  two units that now own the moves are their readers. What changed is that the subsection opens by
+  saying so, and the `memory-tree` figure reads `2.60 to 2.61`.
 
 ## 10. Reuse audit
 
