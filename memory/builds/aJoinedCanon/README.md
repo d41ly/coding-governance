@@ -36,21 +36,23 @@ log that names a section in 29.5% of its lines.
 
 ## Build-level rules
 
-- **Every unit cites its finding.** A unit whose evidence is not one of `aWeighedCanon`'s 29
-  confirmed findings does not belong in this build. The findings record is the ground truth and its
-  post-skeptic numbers are the ones that bind.
-- **UNITS ARE SEQUENCED, NOT PARALLEL.** Six of the eleven write to `memory/TEMPLATE-SPEC.md` AND
-  its shipped twin `tools/memory-tree/SPEC-TEMPLATE.template.md`; four more write to
-  `tools/memory-tree/check-memory-hygiene.sh`. Clause 1 of the parallelism rule is unsatisfied
-  across almost the whole set, so `order` is a chain and not a grouping.
-- **Every template change is a DATED CUTOFF, never a retrofit.** The corpus is 479 specs and 414 are
-  CLOSED. A new required field with no cutoff reds landed work, which is the one outcome that would
-  make this build a net loss. Each cutoff key is declared in `.memory-tree.conf` beside its
-  siblings — and unit 10 exists because the template already lies about one that is not.
-- **A new arm owes its failing case OBSERVED before it lands.** Charter §7. Staged red, confirmed,
-  unstaged — and the spec says which fixture stages it.
-- **Both halves of every template edit move together.** `memory/TEMPLATE-SPEC.md` and
-  `tools/memory-tree/SPEC-TEMPLATE.template.md` are a byte-compared pair; editing one is a red bar.
+- **Every unit cites its finding**, one of `aWeighedCanon`'s 29 confirmed findings, at its
+  post-skeptic numbers. Those are the ones that bind.
+- **UNITS ARE SEQUENCED, NOT PARALLEL.** Six write to `memory/TEMPLATE-SPEC.md` and its byte-compared
+  twin `tools/memory-tree/SPEC-TEMPLATE.template.md`; four more to `check-memory-hygiene.sh`. Clause
+  1 of the parallelism rule fails across the set, so `order` is a chain. Both halves of a template
+  edit move together — editing one is a red bar.
+- **Every template change is a DATED CUTOFF, never a retrofit.** 414 of 479 specs are CLOSED; a new
+  required field with no cutoff reds landed work. Each key is declared in `.memory-tree.conf` AND in
+  `tools/memory-tree/.memory-tree.conf.example`, or an adopter gets a dead arm reading as armed.
+- **A new arm owes its failing case OBSERVED before it lands**, and the spec says which fixture
+  stages it. Charter §7.
+- **One owner for the `tFixture` number space.** Units 1, 3 and 4 each claimed the same block. Unit
+  N takes `tFixture-(80 + 10N)` upward; round-1 high-water was 86.
+- **No unit pins a literal a lower-`order` unit moves first.** Five shipped. Cite the source that
+  owns the value, or mark it derived-at-build-time.
+- **Inside a shared write set, cite by literal TEXT, not line number.** Every number a later unit
+  quotes is stale by the time it builds; round 1 found two already wrong.
 
 ## Parked decisions
 
@@ -95,17 +97,17 @@ ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCano
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aJoinedCanon-1 — the revision log becomes a structured entry](spec/2026-09-04-spec-TOOL-aJoinedCanon-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-aJoinedCanon-1 — the revision log becomes a structured entry](spec/2026-09-04-spec-TOOL-aJoinedCanon-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-05 |
 | [TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set](spec/2026-09-04-spec-TOOL-aJoinedCanon-2.md) | 2 | 1 | SPECCED | rev-3 | 2026-09-05 |
-| [TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it](spec/2026-09-04-spec-TOOL-aJoinedCanon-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red](spec/2026-09-04-spec-TOOL-aJoinedCanon-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it](spec/2026-09-04-spec-TOOL-aJoinedCanon-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-05 |
+| [TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red](spec/2026-09-04-spec-TOOL-aJoinedCanon-4.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-05 |
 | [TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed](spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md) | 5 | 1 | SPECCED | rev-3 | 2026-09-05 |
-| [TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion](spec/2026-09-04-spec-TOOL-aJoinedCanon-6.md) | 6 | 2 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives](spec/2026-09-04-spec-TOOL-aJoinedCanon-7.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions](spec/2026-09-04-spec-TOOL-aJoinedCanon-8.md) | 8 | 2 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration](spec/2026-09-04-spec-TOOL-aJoinedCanon-9.md) | 9 | 2 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there](spec/2026-09-04-spec-TOOL-aJoinedCanon-10.md) | 10 | 1 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aJoinedCanon-11 — the base sha resolves to a real object](spec/2026-09-04-spec-TOOL-aJoinedCanon-11.md) | 11 | 1 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion](spec/2026-09-04-spec-TOOL-aJoinedCanon-6.md) | 6 | 2 | SPECCED | rev-3 | 2026-09-05 |
+| [TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives](spec/2026-09-04-spec-TOOL-aJoinedCanon-7.md) | 7 | 2 | SPECCED | rev-3 | 2026-09-05 |
+| [TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions](spec/2026-09-04-spec-TOOL-aJoinedCanon-8.md) | 8 | 2 | SPECCED | rev-3 | 2026-09-05 |
+| [TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration](spec/2026-09-04-spec-TOOL-aJoinedCanon-9.md) | 9 | 2 | SPECCED | rev-3 | 2026-09-05 |
+| [TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there](spec/2026-09-04-spec-TOOL-aJoinedCanon-10.md) | 10 | 1 | SPECCED | rev-3 | 2026-09-05 |
+| [TOOL-aJoinedCanon-11 — the base sha resolves to a real object](spec/2026-09-04-spec-TOOL-aJoinedCanon-11.md) | 11 | 1 | SPECCED | rev-3 | 2026-09-05 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).

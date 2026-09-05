@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-11 — the base sha resolves to a real object
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 11 · ratified 2026-09-05
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 11 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -19,8 +19,12 @@ transposed digit is caught by the bar instead of by a reviewer.
 ## 2. Scope (IN)
 
 - **S1** — a new cutoff key `BASE_RESOLVE_CUTOFF` in `.memory-tree.conf`, preset blank in
-  `tools/memory-tree/check-memory-hygiene.sh` above the conf source, taking the three rule cutoffs'
-  semantics: blank means off.
+  `tools/memory-tree/check-memory-hygiene.sh` above the conf source, and shipped blank in
+  `tools/memory-tree/.memory-tree.conf.example`. It takes the three rule cutoffs' semantics: blank
+  means off. All three carriers move in one commit: the self-test's engine-preset parity arm derives
+  its key set from the engine, so an undeclared key reds this unit's own landing commit on the
+  `memory-hygiene self-test` leg S2 already owes — and, unfixed, leaves an adopter a dead arm
+  reading as armed.
 - **S2** — a check-12 arm that resolves the `base` sha of every selected spec whose filename date is
   on or after that cutoff and whose status is not `CLOSED` or `WONTDO`, failing when the sha names
   no commit in this object database.
@@ -28,7 +32,8 @@ transposed digit is caught by the bar instead of by a reviewer.
   by a sentinel record the existing awk emits, not by a fork per spec.
 - **S4** — a shallow repository is detected once and the arm announces its own skip rather than
   passing silently or redding every spec.
-- **S5** — two fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`: a post-cutoff live spec
+- **S5** — two fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`, named from this unit's
+  `tFixture-190` block upward per the build's `order`-allocated number space: a post-cutoff live spec
   whose base does not resolve (red, observed before landing) and one whose base is the scratch
   repo's own `HEAD` (silent).
 - **S6** — the `base` bullet in `memory/TEMPLATE-SPEC.md` and its byte-compared twin
@@ -79,10 +84,22 @@ One conf key, following `SPEC10_EVIDENCE_CUTOFF`'s comment shape in `.memory-tre
 BASE_RESOLVE_CUTOFF="<date strictly ahead of every committed spec filename date>"
 ```
 
-Preset as `BASE_RESOLVE_CUTOFF=""` in `check-memory-hygiene.sh` beside its five siblings at
-`:32-56`, above the conf source. That placement is load-bearing rather than tidy: the script runs
-`set -u` and `adopt-memory-tree.sh` never back-fills a key into an existing conf, so without the
-preset the gate aborts on an unbound variable in every adopter tree whose conf predates the key.
+Preset as `BASE_RESOLVE_CUTOFF=""` in `check-memory-hygiene.sh`, in the block of `*_CUTOFF` presets
+that opens at `STREAMS_CUTOFF=""` and ends above the conf source — anchored by that text rather than
+by line, because units at a lower `order` edit this same file first. That placement is load-bearing
+rather than tidy: the script runs `set -u` and `adopt-memory-tree.sh` never back-fills a key into an
+existing conf, so without the preset the gate aborts on an unbound variable in every adopter tree
+whose conf predates the key.
+
+The third carrier is `tools/memory-tree/.memory-tree.conf.example`, and it is not optional. The
+self-test's engine-preset parity arm derives the engine's key set with a `grep -oE
+'^[A-Z][A-Z0-9_]*_CUTOFF='` over the comment-stripped script, unions it with the `${NAME:-}` read
+form, exempts only `GOV_PYTHON` and `MAP_ROOT`, and fails naming any remaining key the shipped
+example does not declare, on the ground that an adopter cannot discover it. All existing engine
+presets are declared there today, and that arm's own comment records this hole swallowing
+`FORK_MARK_CUTOFF` and `REVIEW_VERDICT_CUTOFF` once already. For THIS unit the omission is
+especially pointed: an adopter's `BASE_RESOLVE_CUTOFF` would read as armed and never resolve a sha,
+which is the could-not-fail shape the unit exists to close.
 
 The value is set strictly ahead of the newest committed spec filename date, enumerated across
 `git for-each-ref refs/heads` at build time rather than trusted from this branch. The newest tracked
@@ -93,23 +110,25 @@ sweep of the old.
 
 ### Inventory
 
-The arm rides the batched awk at `check-memory-hygiene.sh:956`, which already parses `hdr` and the
-filename date. It takes one more `-v bcut="$BASE_RESOLVE_CUTOFF"` binding and, for each spec that
-qualifies, emits a sentinel record instead of resolving anything itself:
+The arm rides the batched awk in `check-memory-hygiene.sh` — the one assigning `bad12_raw=$(printf
+'%s\n' "$c12_sel" | awk`, cited by that text and not by line because units at a lower `order` edit
+this file first — which already parses `hdr` and the filename date. It takes one more
+`-v bcut="$BASE_RESOLVE_CUTOFF"` binding and, for each spec that qualifies, emits a sentinel record
+instead of resolving anything itself:
 
 ```
 print "\002\t" f "\t" sha
 ```
 
-That sentinel idiom is not new here. `:1181` already emits `"\001\t" f` for the section-canon
-excerpt and the post-pass at `:1272-1290` rebuilds it in the shell, precisely because reimplementing
-a shell capability inside awk is how two implementations drift. This arm extends that seam rather
-than opening a second one.
+That sentinel idiom is not new here. The same awk already emits `print "\001\t" f` for the
+section-canon excerpt, and the `case "$bad12_raw" in` post-pass rebuilds it in the shell, precisely
+because reimplementing a shell capability inside awk is how two implementations drift. This arm
+extends that seam rather than opening a second one.
 
 The post-pass splits `bad12_raw` on the `\002` tag, feeds the distinct shas to ONE
 `git cat-file --batch-check='%(objectname) %(objecttype)'` with each line suffixed `^{commit}`, and
 turns every `missing` or `ambiguous` answer back into a finding line addressed to the existing
-`fail 12` at `:1291`. Verified at `750ca0ca`: `1da67d9c^{commit}` answers `missing` and
+`[ -n "$bad12" ] && fail 12` site. Verified at `750ca0ca`: `1da67d9c^{commit}` answers `missing` and
 `750ca0ca^{commit}` answers a full objectname plus `commit`, and an ambiguous abbreviation answers
 on its own line rather than on stderr. The `^{commit}` peel is what stops an eight-hex prefix that
 happens to name a tree or a blob from passing.
@@ -132,7 +151,7 @@ HYGIENE check 12: base-resolution arm SKIPPED — shallow repository, no base sh
 
 Stderr, not stdout, because the script's contract is that anything on stdout is a hygiene
 regression. `run-gates.sh:1110-1111` merges both streams into the per-leg log, so the skip is
-durable and readable where the leg's output is read. The script's own header line at `:17` is
+durable and readable where the leg's output is read. The script's own header comment is
 amended in the same commit to say that stdout carries findings and stderr carries announced skips,
 because a contract that a change quietly widens is worse than the change.
 
@@ -149,8 +168,9 @@ unaffected and no separate branch is needed for it.
 | File | What moves |
 |---|---|
 | `.memory-tree.conf` | S1, the declaration and its reasoning comment |
-| `tools/memory-tree/check-memory-hygiene.sh` | S1 preset, S2/S3 arm and post-pass, S4 probe, `:17` contract line |
-| `tools/memory-tree/check-memory-hygiene.test.sh` | S5, two fixtures after the `git commit` at `:573` |
+| `tools/memory-tree/.memory-tree.conf.example` | S1, the same key, shipped blank |
+| `tools/memory-tree/check-memory-hygiene.sh` | S1 preset, S2/S3 arm and post-pass, S4 probe, the header contract comment |
+| `tools/memory-tree/check-memory-hygiene.test.sh` | S5, two fixtures after the `git add -A && git commit -q -m fixtures` line |
 | `memory/TEMPLATE-SPEC.md` | S6, the `base` bullet |
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | S6, the same bytes |
 | `memory/HYGIENE.md` | check 12's catalog entry gains the clause and S7's accepted-gap sentence |
@@ -159,17 +179,21 @@ unaffected and no separate branch is needed for it.
 | `memory/map/features/memory-tree-hygiene.md` | dossier prose, refreshed on touch |
 
 The kit version row is the trap this repo has hit twice, recorded as `TOOL-aSiftedFork-5` and
-`TOOL-dSettledRoster-4`. Verified at `750ca0ca`: six tracked non-record files carry
-`gov:kit memory-tree@`, and `KIT_MEMORY_TREE_VERSION` in `check-memory-hygiene.sh:20` is a seventh
-carrier of the same number. All seven move together or `tools/check-kit-versions.sh` reds.
+`TOOL-dSettledRoster-4`. The carrier set is the tracked non-record files matching
+`grep -rl 'gov:kit memory-tree@'` plus `KIT_MEMORY_TREE_VERSION` in `check-memory-hygiene.sh`, which
+holds the same number in a form that grep does not find; it measured seven at `750ca0ca` and is
+re-derived at the start of this unit's build pass rather than trusted from here. They move together
+or `tools/check-kit-versions.sh` reds. The constant advances by one minor in this landing, in every
+carrier; no value is named here, because units at a lower `order` bump it first.
 
 ### The green fixture's base
 
-The scratch repo commits once at `check-memory-hygiene.test.sh:573`. The green fixture is therefore
-written AFTER that line, with its base substituted from `git rev-parse --short=8 HEAD`, then added
-with a single `git add` — the idiom already used at `:859`. Writing it before the commit is not an
-option: there is no object to name yet, and a fixture whose green arm is green because nothing
-resolved would be the could-not-fail shape this unit exists to close.
+The scratch repo commits once, at `check-memory-hygiene.test.sh`'s `git add -A && git commit -q -m
+fixtures` line. The green fixture is therefore written AFTER that line, with its base substituted
+from `git rev-parse --short=8 HEAD`, then added with a single `git add` — the idiom already used for
+`tFixture-4`. Writing it before the commit is not an option: there is no object to name yet, and a
+fixture whose green arm is green because nothing resolved would be the could-not-fail shape this
+unit exists to close.
 
 ### Alternatives rejected
 
@@ -224,20 +248,32 @@ resolved would be the could-not-fail shape this unit exists to close.
   --is-shallow-repository` answers `true`, the skip line appears on stderr, and the process exits 0.
 - **AC6** — When `BASE_RESOLVE_CUTOFF` is set to `""`, the arm emits no sentinel and the run is
   byte-identical to the pre-change run over the same tree.
-- **AC7** — When `python tools/memory-tree/check-arms.py --report` runs after the change,
-  `tools/memory-tree/check-memory-hygiene.sh` still reports `20:20`, confirming the arm adds a
-  finding to the existing `fail 12` branch rather than a new unarmed one.
+- **AC7** — When `python tools/memory-tree/check-arms.py --report` is run twice over
+  `tools/memory-tree/check-memory-hygiene.sh` — once on the tree as this unit finds it, before any
+  edit, and once after — the pair it reports for that file is UNCHANGED between the two runs,
+  confirming the arm adds a finding to the existing `fail 12` site rather than a new unarmed branch.
+  figure: DERIVED at observation time. The pair is deliberately not named here: units at a lower
+  `order` add `fail` branches to this same file, so any literal typed now is stale before this unit
+  builds, and `--report` prints the discovered counts rather than the pin.
 - **AC8** — When check 12's catalog entry is read in `memory/HYGIENE.md` after the change, it states
   both the live-only population and the never-graded bypass S7 names, and
   `bash tools/memory-tree/kit-dogfood-parity.test.sh` passes, proving
   `tools/memory-tree/HYGIENE.template.md` carries those same bytes.
+- **AC9** — When `grep -qE '^BASE_RESOLVE_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` runs
+  after the edit it exits 0, and `bash tools/memory-tree/check-memory-hygiene.test.sh` exits 0 with
+  its engine-preset parity arm satisfied. The key is absent from the shipped example today, so the
+  grep is red before the edit, and that arm reds from the moment the engine gains the preset until
+  the example declares it — the third carrier of S1 that no other criterion reaches.
 
 ## 7. Gates
 
 Leg names are read from `tools/gate-legs.json`, never from a list typed here.
 
 - `memory hygiene` — `tools/memory-tree/check-memory-hygiene.sh`, the changed gate itself.
-- `memory-hygiene self-test` — `tools/memory-tree/check-memory-hygiene.test.sh`, which carries S5.
+- `memory-hygiene self-test` — `tools/memory-tree/check-memory-hygiene.test.sh`, which carries S5
+  and, through its engine-preset parity arm, S1's third carrier as AC9 observes it.
+- `harness arms (fail branches armed or pinned)` — the leg that grades this file's arm pin, which
+  AC7 asserts this unit leaves where it found it.
 - `kit/dogfood doc parity` — `tools/memory-tree/kit-dogfood-parity.test.sh`, which byte-compares
   `memory/TEMPLATE-SPEC.md` against `tools/memory-tree/SPEC-TEMPLATE.template.md` and both
   `HYGIENE` and `BUILD-METHOD` pairs at `:53`.
@@ -272,6 +308,16 @@ No new gate leg. The arm is a finding inside check 12, which is already on the b
   only, and the bypass it accepts became a requirement — S7 states it in check 12's catalog entry
   and its twin, AC8 grades it, §3 and §4 stop calling the widening an open decision, and §5's risk
   bullet names the residual rather than the fork.
+- rev-3 · 2026-09-05 · §2 · §4 · §6 · §7 · §10 · folded spec-audit round 1, findings H2 and H3.
+  H3: S1 gains `tools/memory-tree/.memory-tree.conf.example` as its third carrier, §4 states the
+  self-test's engine-preset parity arm that enforces it, the Files-touched table gains its row, AC9
+  observes the grep and the self-test, and §7 names the leg that carries it. H2: AC7 stops pinning
+  `20:20` and instead asserts the reported pair is unchanged across a before-and-after `--report`,
+  marked `figure: DERIVED at observation time`, with `harness arms` added to §7 as the leg that
+  grades the pin. Under the build's new rules, three smaller moves: anchors into
+  `check-memory-hygiene.sh` and its self-test are cited by literal source text instead of line
+  number in §4 and §10, the kit-version carrier count is derived with `grep -rl` instead of pinned
+  at seven, and S5's fixtures are allocated from this unit's `tFixture-190` block.
 
 ## 10. Reuse audit
 
@@ -280,8 +326,8 @@ object database"` returns no seam that resolves a git object: its ranked hits ar
 path resolvers (`resolve` in `tools/memory-recall/recall_conf.py` at fan-in 26, `resolve_root` in
 `tools/memory-tree/row_grammar.py`, `resolve_bash` in `tools/run-gates/profile_bar.py`), none of
 which touches the object database. **No existing seam fits for sha resolution.** The seam this unit
-extends is instead the one the probe cannot see because it is not a symbol: the awk sentinel plus
-shell post-pass at `check-memory-hygiene.sh:1181` and `:1272-1290`, which exists for exactly this
+extends is instead the one the probe cannot see because it is not a symbol: the awk `print "\001\t"
+f` sentinel and the `case "$bad12_raw" in` post-pass that rebuilds it, which exists for exactly this
 reason — keeping a shell capability in the shell instead of reimplementing it inside awk. The recall
 probe found the design prior art the map does not index:
 `memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-9.md:205` already reasons

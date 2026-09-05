@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 9 · ratified 2026-09-05
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 9 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -26,7 +26,8 @@ answered.
 
 ## 2. Scope (IN)
 
-- **S1** — `.memory-tree.conf` declares `READINESS_ROWS`, a `|`-separated list of the §5 row labels,
+- **S1** — `.memory-tree.conf` declares `READINESS_ROWS`, a `|`-separated list of the §5 row TOKENS
+  in their short form per F3 (`risks`, not the parenthesised label the skeleton used to carry),
   and `READINESS_ROWS_CUTOFF`, the date from which the presence arm grades a spec. The kit's
   `tools/memory-tree/.memory-tree.conf.example` ships both, with the ten current rows as the value an
   adopter starts from, and the key's comment states that the value is the ADOPTER's to change and
@@ -45,7 +46,8 @@ answered.
   near-misses, and the result is recorded in the conf comment beside the key.
 - **S7** — `tools/memory-tree/check-memory-hygiene.test.sh` gains a red fixture (a post-cutoff Tier-2
   spec missing one declared row) and a green twin, and the red is OBSERVED failing before the arm
-  lands.
+  lands. Both take their `tFixture` numbers from this unit's block in the build README's allocation,
+  which owns that number space; the file's own high-water is not consulted.
 - **S8** — gov's own `.memory-tree.conf` declares EIGHT rows, dropping `a11y` and `i18n` per F1. The
   kit example keeps all ten. That divergence is the point rather than a defect to reconcile: it is
   the first demonstration that the key is per-project, and it is safe because no gate compares the
@@ -97,16 +99,21 @@ gov swept down to under F1:
 
 ```
 # tools/memory-tree/.memory-tree.conf.example — all ten, the adopter's starting value
-READINESS_ROWS="security|perf / scale|a11y|i18n|error / empty / loading states|observability|risks (concurrency, data-loss, rollback hazards)|testing + left-shift gates|migration / rollback|user docs"
+READINESS_ROWS="security|perf / scale|a11y|i18n|error / empty / loading states|observability|risks|testing|migration|user docs"
 
 # .memory-tree.conf (gov's own) — eight; a11y and i18n dropped per F1
-READINESS_ROWS="security|perf / scale|error / empty / loading states|observability|risks (concurrency, data-loss, rollback hazards)|testing + left-shift gates|migration / rollback|user docs"
+READINESS_ROWS="security|perf / scale|error / empty / loading states|observability|risks|testing|migration|user docs"
 ```
 
-Each field is the row label byte-for-byte as the skeleton writes it, `risks` carrying its
-parenthetical and all, because AC7 compares the rendered bullets to these fields directly. That is
-NOT the token the measurement below was taken with, and the note under that table is the
-reconciliation the builder owes.
+Each field is the SHORT token the pre-wiring measurement below was taken with — `risks`, not
+`risks (concurrency, data-loss, rollback hazards)` — which is F3's ruling. So the declared value and
+the predicate the arm is sized against are one thing rather than two, which is what rev-2 got wrong.
+
+F3 is paid for by the RENDERED skeleton, and the price is stated here rather than discovered at
+build time: three rows arrive shorter than the skeleton used to write them, losing the risks
+parenthetical, `+ left-shift gates` and `/ rollback`. That guidance is not re-homed anywhere by this
+unit. It is the acknowledged cost of declaring the tokens the corpus actually writes, and AC7
+observes the loss so a reviewer reads it as the ruling rather than as a render bug.
 
 A `|` list on one line rather than a multi-line value, for two reasons that are properties of this
 tree. Every other multi-item key in this conf is a single line (`FAMILIES`, `ARMS_FLOORS`,
@@ -136,8 +143,11 @@ unaffected: their rendered `memory/TEMPLATE-SPEC.md` already exists, `adopt-memo
 to overwrite a tree carrying the marker, and the arm is off until they declare a cutoff.
 
 All three readers still PRESET the variable above their conf source. That is not a default, it is
-`set -u` safety, and the reason is recorded at `check-memory-hygiene.sh:52-56`: without the preset
-the gate ABORTS rather than fails in every adopter tree whose conf predates the key.
+`set -u` safety, and the reason is already recorded in `check-memory-hygiene.sh` — the comment
+opening `PRESET HERE, above the conf source, and that is load-bearing rather than tidy`, above the
+existing cutoff presets: without the preset the gate ABORTS rather than fails in every adopter tree
+whose conf predates the key. Cited by its text because four sibling units of this build edit that
+file at a lower `order`, so any line number here is stale before the builder reads it.
 
 ### How an adopter changes the set (F1's second half)
 
@@ -172,8 +182,9 @@ out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
 ```
 
 The transform sits INSIDE the marked block rather than in the callers, so it is covered by the
-parity table already gating that block (`tools/lib/resolve-python.test.sh:88-91`, the `render_doc`
-row). A transform written per-caller would be a second duplication that nothing compares: gov's live
+parity table already gating that block — the `render_doc|` row of `PARITY_ROWS` in
+`tools/lib/resolve-python.test.sh`, cited by its text because rev-2 pinned it at `:88-91`, which is
+the comment and two other rows. A transform written per-caller would be a second duplication that nothing compares: gov's live
 copy is written by the parity test's `--render` and an adopter's by the adopter, so the two
 formatters never meet and no gate would see them diverge.
 
@@ -188,9 +199,10 @@ It sits in the Tier-2 block, after the empty-body walk and beside the §10 evide
 follows that arm's shape: a section blob, `index()` over lowercased text rather than a regex, and
 four conjuncts on the guard.
 
-For each declared row, both the label and the §5 body are lowercased and stripped of every
-non-alphanumeric byte; the row is present when the squashed label is a substring of the squashed
-body. Squashing is what makes the corpus's real spellings agree: it takes the bolded form, the
+For each declared row, both the declared TOKEN and the §5 body are lowercased and stripped of every
+non-alphanumeric byte; the row is present when the squashed token is a substring of the squashed
+body. Under F3 that token is the short form, so the squash no longer has to survive a parenthetical
+the corpus does not restate. Squashing is what makes the corpus's real spellings agree: it takes the bolded form, the
 `-`-led form, and the COMBINED row (`- a11y / i18n — N/A.` and `- a11y — N/A. i18n — N/A.`) that a
 line grep counts once. That combined form is why finding C3's own denominators differ, 397 for a11y
 against 282 for i18n, and it is an artifact rather than a fact about the corpus: 38 Tier-2 specs in
@@ -243,16 +255,14 @@ its pinned base and is not restated with tip numbers.
   so not one drops out. That is why §3's non-goal, §5's risks row and AC6 all keep the figure — they
   were checked rather than assumed, because a count that only made sense under the ten-row set is
   exactly the half this build's own gotcha record says gets left standing.
-- The table's LABELS are the short tokens `risks`, `testing` and `migration`, and the declared value
-  above carries the long ones. Under the arm as specified — squash the declared label, substring it
+- The table's LABELS are the short tokens `risks`, `testing` and `migration`, and rev-2's declared
+  value carried the long ones. Under the arm as specified — squash the declared token, substring it
   against the squashed body — the long `risks (concurrency, data-loss, rollback hazards)` is missing
-  from 324 of 364 Tier-2 specs, because almost nobody restates the parenthetical. So the declared
-  value and this measurement do not describe the same predicate. It is inert while the cutoff is
-  forward and it is fatal the first time anyone sets the cutoff backwards, AC6's own second sentence
-  included. The builder reconciles it before wiring, under S6, and records which form the arm
-  matches: either the declaration carries the short tokens and AC7's byte-identity is dropped, or the
-  arm matches a label PREFIX up to its first parenthesis. This spec does not pick — it is a design
-  question the measurement raised, not a fork the owner ruled on.
+  from 324 of 364 Tier-2 specs, because almost nobody restates the parenthetical. That measurement
+  is the EVIDENCE F3 was ruled on, and the declaration above now carries the short tokens, so the
+  declared value and this table describe one predicate. Nothing is left for the builder to pick: S6
+  remains a measurement step and the choice it used to carry is §8's F3, RESOLVED. The rejected
+  branch is in Alternatives below rather than here, because a rejected design lives with the others.
 
 ### Migration
 
@@ -288,14 +298,20 @@ is regenerated, never edited, so there is no third thing to undo.
 | `tools/memory-tree/check-memory-hygiene.sh` | preset, `-v` bindings, the arm, the version marker |
 | `tools/memory-tree/check-memory-hygiene.test.sh` | fixture conf keys, one red fixture, one green twin |
 
-The kit version bump rides in the same commit and touches SIX `gov:kit memory-tree@` carriers, not
-the three that `check-verdict-epoch.sh`'s remediation message names. That is an open defect in the
-message, recorded twice as `TOOL-aSiftedFork-5` and `TOOL-dSettledRoster-4`, and following the
-message alone costs a second full-bar cycle.
+The kit version bump rides in the same commit and touches every `gov:kit memory-tree@` carrier, which
+is more than the three `check-verdict-epoch.sh`'s remediation message names. The builder DERIVES the
+set rather than reading a number here — `grep -rl 'gov:kit memory-tree@'` over the tracked tree, plus
+the `KIT_MEMORY_TREE_VERSION` constant in `check-memory-hygiene.sh`, whose line carries both the
+constant and a marker. The message's undercount is an open defect, recorded twice as
+`TOOL-aSiftedFork-5` and `TOOL-dSettledRoster-4`, and following it costs a second full-bar cycle;
+rev-2 stated a count of its own here and got it wrong in the same direction, which is why this
+paragraph now names the command instead.
 
-The arm adds no `fail` call site — check 12 has exactly one, at
-`tools/memory-tree/check-memory-hygiene.sh:1291`, and the arm prints into the same collected stream.
-So `ARMS_FLOORS` and the harness-arms leg are unmoved.
+The arm adds no `fail` call site — check 12 has exactly one, the
+`[ -n "$bad12" ] && fail 12` line at the end of the check in
+`tools/memory-tree/check-memory-hygiene.sh`, and the arm prints into the same collected stream.
+So `ARMS_FLOORS` and the harness-arms leg are unmoved. Cited by text for the same reason as the
+preset above: four sibling units edit that file first.
 
 ### Alternatives rejected
 
@@ -307,6 +323,13 @@ So `ARMS_FLOORS` and the harness-arms leg are unmoved.
   leaves the row set as uncheckable as it is today. F1 is NOT this alternative arriving by another
   route, and the difference is the whole ruling: the owner dropped the two rows for gov AND required
   that an adopter can declare their own set, which is the key rather than a deletion.
+- **Declare the skeleton's long labels and match a PREFIX up to the first parenthesis.** This is F3's
+  losing branch. It keeps the rendered skeleton's guidance intact and keeps AC7's byte-identity, and
+  it pays for both with a matching rule nobody can predict from the declared value: the reader of
+  `READINESS_ROWS` would have to know that `risks (concurrency, data-loss, rollback hazards)` grades
+  as `risks` while `testing + left-shift gates` grades as all of itself, because only one of the two
+  carries a paren. A declaration whose fields do not mean what they say is the same defect as two
+  carriers of one fact, one indirection deeper.
 - **Grade the N/A RATE rather than row presence.** It measures the thing the finding actually
   observed, and it is unimplementable as a merge-bar leg: 26.9% of §5 bullets across the corpus carry
   `N/A` and a threshold over that would red honest specs for having little to sweep.
@@ -360,12 +383,17 @@ So `ARMS_FLOORS` and the harness-arms leg are unmoved.
   fails check 12 with a message naming both the missing row and `READINESS_ROWS_CUTOFF`, and its
   green twin is silent. The red is observed BEFORE the arm lands, by staging the fixture against the
   unmodified checker and confirming it passes there.
-- **AC6** (S5, S6) — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over the tracked
+- **AC6** (S5, S6, F3) — When `bash tools/memory-tree/check-memory-hygiene.sh` runs over the tracked
   tree with the cutoff armed at the enumerated date, it reports no §5 row finding, because every
-  spec that would trip it predates the cutoff. Setting the cutoff to `2026-01-01` instead reports 48.
-- **AC7** (S3) — When `memory/TEMPLATE-SPEC.md` is read after the render, its §5 skeleton rows are
-  byte-identical to the `|`-fields of `READINESS_ROWS`, in order. A row edited in the rendered file
-  by hand is reverted by the next `--render` and reported by AC2's gate.
+  spec that would trip it predates the cutoff. Setting the cutoff to `2026-01-01` instead reports the
+  48 of §4's table — the SHORT-token predicate's count, which under F3 is the only one the
+  declaration can produce. Re-derived at build time against the tree then, not trusted from the
+  pinned base.
+- **AC7** (S3, F3) — When `memory/TEMPLATE-SPEC.md` is read after the render, its §5 rows are the
+  `|`-fields of `READINESS_ROWS` in order, in their short form: `grep -n 'left-shift gates'` over
+  that file matches nothing, and neither does `grep -n 'rollback hazards'`. Byte-identity with the
+  skeleton's FORMER labels is not asserted — it is what F3 traded away, and this criterion observes
+  the trade rather than the tautology that a rendered file matches what it was rendered from.
 - **AC8** (S8) — When `bash tools/run-gates/run-gates.sh` runs with gov's `.memory-tree.conf`
   declaring EIGHT rows and `tools/memory-tree/.memory-tree.conf.example` declaring ten, the bar is
   green and `memory/TEMPLATE-SPEC.md` §5 carries eight bullets with no `a11y` and no `i18n` line.
@@ -406,6 +434,13 @@ touching `adopt-memory-tree.sh:47-60` re-runs AC9's two halves. AC10 is prose in
 re-reads the README's conf list, which is where an adopter looks first and the checker is where they
 must not have to look.
 
+F3 adds no leg either. Its render half rides `kit/dogfood doc parity` through AC2, which grades the
+pair whatever the rows say. Its second half — the two greps in AC7, which observe that the skeleton's
+long labels are GONE — is a documented check, because no leg knows the difference between a label
+this unit deliberately shortened and one a later edit dropped by accident. The compensating check is
+that any diff touching `READINESS_ROWS` in either conf re-runs AC7's greps against the re-rendered
+file.
+
 `tools/memory-tree/hygiene-parity.test.sh` is NOT on the bar — it appears in no row of
 `tools/gate-legs.json` — but it copies the LIVE `.memory-tree.conf` into its fixture repos and its
 spec fixtures are dated 2026-08-01. A cutoff set in the past would red it on demand while the merge
@@ -441,6 +476,18 @@ bar stayed green.
   set would have made an earlier cutoff safe, and no earlier cutoff is being taken. The
   `ACCEPTANCE_LEDGER_CUTOFF` counter-argument is accepted as the price, and §4's Migration paragraph
   is the procedure.
+- **F3 · Does `READINESS_ROWS` carry the skeleton's long labels or the short tokens the arm matches
+  on?** rev-2 declared the long labels and sized the arm against a measurement taken with the short
+  ones, which are not the same predicate: `risks (concurrency, data-loss, rollback hazards)` is
+  missing from 324 of 364 Tier-2 specs because nobody restates the parenthetical. Inert while the
+  cutoff is forward, fatal the first time anyone sets it backwards. Short tokens make the declaration
+  mean what it says and cost the rendered skeleton three long labels; long labels with a
+  prefix-matching arm keep the skeleton and cost the declaration its readability.
+  **RESOLVED (owner, 2026-09-05): the declaration carries the SHORT tokens, and AC7's byte-identity
+  with the skeleton's former labels is DROPPED as the acknowledged cost.** The rendered §5 therefore
+  reads `- risks`, `- testing` and `- migration`; the parenthetical, `+ left-shift gates` and
+  `/ rollback` are not re-homed by this unit. The prefix-matching branch is recorded in §4's
+  Alternatives as rejected. AC6 states the short-token count and AC7 now observes the loss.
 
 ## 9. Revision log
 
@@ -452,6 +499,17 @@ bar stayed green.
   gov's eight-row value beside the example's ten, a subsection on the adopter path, and two
   re-measurements; §5 restated the a11y, i18n, testing and user-docs rows under the ruling; §6
   gained AC8-AC10; §7 recorded the two documented checks the added scope brought with no leg.
+- rev-3 · 2026-09-05 · §8 · §2 · §4 · §6 · §7 · §9 · folded spec-audit round 1: M1 (the live
+  predicate fork parked in §4 became §8's F3, RESOLVED by the owner as SHORT tokens with AC7's
+  byte-identity dropped — §4's declared value, its re-measurement note and its arm paragraph now
+  carry the short form and stop saying the spec does not pick, S1 says tokens rather than labels, AC6
+  states the short-token count, AC7 observes the traded-away labels, §7 records F3's documented
+  check, and the rejected prefix-matching branch joined §4's Alternatives); M6 (§4 Files touched
+  stopped restating the carrier undercount and names the derivation instead). Also under the build
+  README's rules, which post-date rev-2: the two `check-memory-hygiene.sh` line pins in §4 became
+  literal-text citations, S7 points at the README's `tFixture` allocation, and the
+  `resolve-python.test.sh:88-91` pin — wrong by four lines, the `render_doc` row is not in that
+  range — became a citation of the `render_doc|` row of `PARITY_ROWS`.
 
 ## 10. Reuse audit
 

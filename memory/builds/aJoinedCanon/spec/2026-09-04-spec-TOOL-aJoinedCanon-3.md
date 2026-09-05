@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 3 · ratified 2026-09-05
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 3 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -20,7 +20,8 @@ Finding A1 measures a CITATION RATE: over the 460 specs carrying both numbered l
 ids (13.3%) are named anywhere in their own §6, and 260 specs (56.5%) name none at all. That is a
 measure of HABIT, not of coverage. A spec can observe every one of its scope items without ever
 writing an S id, and many do. What the number establishes is that the template's own stated reason
-for numbering both lists — so they can be cited stably, `memory/TEMPLATE-SPEC.md:93` — buys almost
+for numbering both lists — so they can be cited stably, the `Number scope and acceptance items`
+bullet in `memory/TEMPLATE-SPEC.md` — buys almost
 nothing today.
 
 The evidence that scope items genuinely go unobserved is the review corpus, not the citation rate.
@@ -32,27 +33,33 @@ build, and because the answer is doc-local: it needs no tree access and no secon
 ## 2. Scope (IN)
 
 - **S1** — a new cutoff key `SCOPE_JOIN_CUTOFF`, declared in `.memory-tree.conf` beside its
-  siblings, defaulted blank in `tools/memory-tree/check-memory-hygiene.sh` where
-  `SPEC10_EVIDENCE_CUTOFF` is defaulted at `:55`, and shipped blank in
+  siblings, defaulted blank in `tools/memory-tree/check-memory-hygiene.sh` in the preset block whose
+  `SPEC10_EVIDENCE_CUTOFF=""` line ends `blank = never required`, and shipped blank in
   `tools/memory-tree/.memory-tree.conf.example`. Blank means off, taking `STREAMS_CUTOFF`
-  semantics rather than `SPEC10_CUTOFF`'s forward resolution. Observed by AC3 and AC7.
+  semantics rather than `SPEC10_CUTOFF`'s forward resolution. Observed by AC3, AC7 and AC10.
 - **S2** — the rule stated in `tools/memory-tree/SPEC-TEMPLATE.template.md`: one paragraph in the
-  skeleton's §2 body at `:173`, parallel to the acceptance-witness paragraph at `:210`, plus a
-  clause on the numbering bullet at `:93`. Observed by AC6.
+  skeleton's §2 body, under the line beginning `What this unit builds, as a bounded numbered list`,
+  parallel to the acceptance-witness paragraph that opens `Once a spec's filename date reaches
+  SPEC_WITNESS_CUTOFF`, plus a clause on the numbering bullet that begins `Number scope and
+  acceptance items`. Observed by AC6 for the render and AC9 for the content.
 - **S3** — `memory/TEMPLATE-SPEC.md` re-rendered from that template, never hand-edited. Observed by
-  AC6.
-- **S4** — a new branch in check 12's awk body, placed after the acceptance-witness arm that ends at
-  `tools/memory-tree/check-memory-hygiene.sh:1048` and therefore above the Tier-1 cut at `:1172`.
+  AC6, and only in company with AC9: a byte-compare is equally green when neither half moved.
+- **S4** — a new branch in check 12's awk body, placed after the acceptance-witness arm, whose last
+  statement prints `acceptance bullets naming no backticked witness`, and therefore above the
+  Tier-1 cut, the `if (hdr ~ /Tier-1/) next` line that opens the section canon.
   It walks §2's column-0 items and reports every item whose own text names neither an `AC<n>` token
   nor the escape. Observed by AC1, AC2 and AC4.
 - **S5** — the arm's population guards: both section headings matched by HEADING TEXT rather than by
   number, and the arm silent unless both are present. Observed by AC5.
-- **S6** — the zero-population announcement, modelled on the §10 evidence arm's at
-  `tools/memory-tree/check-memory-hygiene.sh:1303`. At adoption this arm grades no tracked spec, and
-  a skip that looks like a pass is indistinguishable from coverage. Observed by AC7.
-- **S7** — red and green fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`, in the free
-  block from `tFixture-90` (the highest in the file today is `tFixture-86`), and the staged-red run
-  against the real tree that build rule 4 requires. Observed by AC1 through AC5 and AC8.
+- **S6** — the zero-population announcement, modelled on the §10 evidence arm's in
+  `tools/memory-tree/check-memory-hygiene.sh`, the line printing `the §10 reuse-evidence arm graded
+  NO spec`. At adoption this arm grades no tracked spec, and a skip that looks like a pass is
+  indistinguishable from coverage. Observed by AC7.
+- **S7** — red and green fixtures in `tools/memory-tree/check-memory-hygiene.test.sh`, in this
+  unit's declared block `tFixture-110` upward. The build README's rules own that number space and
+  hand `order` 3 the block at 80 + 10·3; no spec re-derives it from the file's high-water, which is
+  true only for whichever of the three units sharing this harness lands first. Plus the staged-red
+  run against the real tree that build rule 4 requires. Observed by AC1 through AC5 and AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -71,6 +78,12 @@ build, and because the answer is doc-local: it needs no tree access and no secon
   resolution, which is `TOOL-aJoinedCanon-7`.
 - **The four specs whose §2 carries no column-0 bullet.** They stay ungraded. §4 names them as a
   pinned gap rather than widening the walker to prose.
+- **A deny-list of parity-only observers inside this arm.** Review H9's left-shift proposes the arm
+  refuse an item whose named criterion runs nothing but a byte-compare. That is the first non-goal
+  above wearing a different hat: to classify a criterion's commands the arm must resolve the label
+  into §6 and read what it says, which is the semantic step no substring test reaches. It stays a
+  follow-up for a unit that can see §6. H9's Fix — an observation that fails when the rule text is
+  absent — is folded, and it is what closes the instance.
 
 ## 4. Design
 
@@ -79,21 +92,22 @@ build, and because the answer is doc-local: it needs no tree access and no secon
 The rule, as an author reads it: every column-0 item in `## N. Scope (IN)` names in its own text at
 least one acceptance criterion by label, spelled `AC` followed by digits, or carries the marker
 `NOT OBSERVED` followed by the reason. One escape spelling, deliberately not widened, for the
-reason the §10 terms arm records at `tools/memory-tree/check-memory-hygiene.sh:1224`: a false red
-names its own remedy and the template states the accepted spelling, while a false pass is silent.
+reason the §10 terms arm records in its own comment, the one reading `A false red names its own
+remedy`: the template states the accepted spelling, while a false pass is silent.
 
 `SCOPE_JOIN_CUTOFF` gates it by FILENAME date, exactly as `SPEC_WITNESS_CUTOFF` does. Blank turns
 the arm off. The value is set at landing time strictly ahead of every spec dated on every live
 branch, enumerated with `git for-each-ref refs/heads`, which is the idiom `.memory-tree.conf`
-records for `SPEC10_EVIDENCE_CUTOFF` at `:93` and the reason that cutoff is 2026-09-01 rather than
-its build date.
+records for `SPEC10_EVIDENCE_CUTOFF` under its `WHY 2026-09-01 AND NOT THE LANDING DAY` comment,
+and the reason that cutoff is 2026-09-01 rather than its build date.
 
 ### The walk
 
 An ITEM is a column-0 `- ` or `* ` line plus every following line until the next column-0 bullet,
 the next `## ` heading, or the next `### ` sub-head. An indented bullet is a continuation, so an
 item may enumerate its criteria as sub-bullets and still be graded as one item. Fenced content never
-reaches the walk: the `_unfenced` machine at `tools/memory-tree/check-memory-hygiene.sh:961` builds
+reaches the walk: the `_unfenced` fence machine in `tools/memory-tree/check-memory-hygiene.sh`,
+the block headed `the _unfenced fence machine, verbatim: CR strip, marker-matched fences`, builds
 the body array with fenced lines excluded, so a `- ` inside a code block is not an item and an `AC1`
 inside one cannot satisfy anything.
 
@@ -107,7 +121,8 @@ spec that legitimately writes no acceptance section is untouched rather than tol
 The heading regexes are copied from the sibling witness arm verbatim, literal-tab character class
 included, so the two agree by construction rather than by coincidence.
 
-The message names each offending item the way the witness arm names each offending label at `:1048`.
+The message names each offending item the way the witness arm names each offending label in its own
+`print`.
 An item carrying an `S<n>` label is named by that label. An unlabelled item is named by its ordinal
 within the section, because a message that names only the file leaves the author to re-derive which
 of a median seven items it meant.
@@ -130,11 +145,17 @@ specs for exactly that reason.
 | Items naming an `AC<n>` in their own text | 110 (3.4%) |
 | Items containing the string `not observed` | 0 |
 | Tier-1 share, graded under F1 | 114 specs · 519 items |
+| `NOT OBSERVED` in `memory/TEMPLATE-SPEC.md` and its template today | 0 in each |
+| `^SCOPE_JOIN_CUTOFF=` in `tools/memory-tree/.memory-tree.conf.example` today | 0 |
 
 Three things follow. The corpus passes this predicate at 3.4%, so the cutoff carries everything and
 the arm grades no landed spec on day one — S6 exists because of that number. The escape spelling is
 unclaimed, so it cannot pass an item by accident. And grading the bullet rather than the label costs
 61 items over the corpus, which is the price of not being opt-out-able by deleting two characters.
+
+The last two rows are the pre-change baselines AC9 and AC10 need. Both are 0 today, so neither grep
+can be green before the edit lands — which is the whole difference between those two criteria and a
+byte-compare that is equally green when nothing moved.
 
 The near-miss worth reporting: closing an item on a `### ` sub-head rather than only on `## `
 changes the item count by 2 across the whole corpus. It is kept because a sub-head between items
@@ -170,7 +191,7 @@ None for existing specs. The cutoff is the migration.
 |---|---|
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | the rule, in the §2 body and the numbering bullet |
 | `memory/TEMPLATE-SPEC.md` | re-rendered, never hand-edited |
-| `tools/memory-tree/check-memory-hygiene.sh` | the arm, its `-v` binding on `:956`, the default, the announcement |
+| `tools/memory-tree/check-memory-hygiene.sh` | the arm, its `-v` binding on check 12's awk invocation, the default, the announcement |
 | `tools/memory-tree/check-memory-hygiene.test.sh` | the fixtures and their `hit`/`miss` assertions |
 | `.memory-tree.conf` | the declaration |
 | `tools/memory-tree/.memory-tree.conf.example` | the same key, blank |
@@ -188,7 +209,7 @@ same defect being hit twice, the second time costing a full extra bar cycle.
 ### Alternatives rejected
 
 - **Host the rule in `tools/check-spec-tokens.py`.** It is the repo's other spec-section joiner and
-  it already scopes by heading. Rejected on population: its `LIVE` selector at `:64` grades only
+  it already scopes by heading. Rejected on population: its `LIVE` status regex grades only
   OPEN, SPECCED, INPROGRESS and BLOCKED specs, so a rule hosted there stops grading a spec the
   moment it goes CLOSED. Check 12 grades every post-cutoff spec at any status, which is what a
   format rule needs.
@@ -216,7 +237,8 @@ same defect being hit twice, the second time costing a full extra bar cycle.
   legal spec shape, which is what the pre-wiring corpus run and the Tier-1 fixture exist to bound.
 - testing + left-shift gates — the fixtures in S7 are the coverage, because the corpus exercises
   nothing on day one. `check-arms.py` cannot force them: check 12 aggregates every awk finding into
-  one `fail 12` call site at `tools/memory-tree/check-memory-hygiene.sh:1291`, so the arm requirement
+  one `fail 12` call site, the `[ -n "$bad12" ] && fail 12` line in
+  `tools/memory-tree/check-memory-hygiene.sh`, so the arm requirement
   does not reach a new awk branch and the discipline is this spec plus build rule 4.
 - migration / rollback — see §4. No spec is edited.
 - user docs — N/A. The template IS the user doc for this rule and S2 changes it.
@@ -239,14 +261,25 @@ same defect being hit twice, the second time costing a full extra bar cycle.
   from `dUnstalledConvoy`. A Tier-1 fixture carrying BOTH headings and one unjoined item reds, as a
   `hit` line, pinning F1's both-tiers ruling.
 - **AC6** — When `bash tools/memory-tree/kit-dogfood-parity.test.sh` runs after the edit, it exits 0,
-  proving `memory/TEMPLATE-SPEC.md` was re-rendered from
-  `tools/memory-tree/SPEC-TEMPLATE.template.md` rather than hand-edited.
+  proving `memory/TEMPLATE-SPEC.md` matches `tools/memory-tree/SPEC-TEMPLATE.template.md` rather than
+  having been hand-edited. It grades SAMENESS, and is equally green when neither file was touched, so
+  it observes S2 and S3 only in company with AC9, which supplies the content half.
 - **AC7** — When the cutoff is ahead of every tracked spec, a full run prints the zero-population
   announcement naming `SCOPE_JOIN_CUTOFF`, and when it is not, the announcement is absent.
 - **AC8** — When the cutoff is temporarily lowered to a date the corpus reaches and
   `bash tools/memory-tree/check-memory-hygiene.sh` is run against the real tree, it reds naming
   tracked specs, and the §4 measurement predicts it names essentially all of them at a 3.4% pass
   rate. The lowering is unstaged before the commit and the transcript goes in the build record.
+- **AC9** — When `memory/TEMPLATE-SPEC.md` is read after the render, `grep -c 'NOT OBSERVED'` on it
+  returns non-zero, its §2 body names the `AC<n>` spelling, and the numbering bullet beginning
+  `Number scope and acceptance items` carries the new clause. §4's inventory derives the pre-change
+  count as 0 in both `memory/TEMPLATE-SPEC.md` and its template, so this grep cannot be green until
+  the rule text exists — which is the observation S2 lacked while AC6 was its only observer.
+- **AC10** — When `grep -qE '^SCOPE_JOIN_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` runs
+  after the edit it exits 0, and `bash tools/memory-tree/check-memory-hygiene.test.sh` exits 0 with
+  its engine-preset parity arm satisfied. The key is absent today, per §4, so the grep is red before
+  the edit and that self-test arm reds from the moment the engine gains the preset until the shipped
+  example declares it — the third of S1 that no criterion previously reached.
 
 ## 7. Gates
 
@@ -262,7 +295,8 @@ adds no new leg; the arm lives inside check 12, which is already on the bar.
 
 - **F1 · Does the arm run on both tiers, or on Tier-2 only?** RESOLVED (owner, 2026-09-05): both
   tiers, guarded by the both-headings precondition, so the 114 Tier-1 specs and their 519 items are
-  in the graded population. Both-tiers is the acceptance-witness arm's own answer, recorded at `tools/memory-tree/check-memory-hygiene.sh:1014` as "a Tier-1 spec
+  in the graded population. Both-tiers is the acceptance-witness arm's own answer, recorded in that
+  arm's own comment in `tools/memory-tree/check-memory-hygiene.sh` as "a Tier-1 spec
   is exempt from the canon, not from meaning what it writes", and the conf records that narrowing
   that arm to Tier-2 left its harness byte-identical until a fixture existed. Against it: Tier-1 is
   the light profile the template calls "ceremony is conditional", and the evidence for this join is
@@ -288,6 +322,14 @@ adds no new leg; the arm lives inside check 12, which is already on the bar.
   tiers, so the 114 Tier-1 specs and 519 items are in the graded population and AC5's Tier-1 fixture
   is a `hit` line rather than a fixture whose tier scope the fork still decided. F2: grandfather this
   build's own eleven specs, which §3 now states as a non-goal in its own right.
+- rev-3 · 2026-09-05 · §1 · §2 · §3 · §4 · §5 · §6 · §8 · §10 · folded spec-audit round 1. H1: S7 moves
+  to the README-allocated block `tFixture-110` upward and drops the file-high-water claim that was
+  true only for whichever of three units lands first. H9: AC9 and AC10 are new, observing the rule
+  text in the rendered template and the key in the shipped example conf, both against a pre-change
+  count of 0 now recorded in §4; AC6 is rewritten to say that a byte-compare grades sameness and is
+  green when neither file moved; S1, S2 and S3 name the new observers. §3 declines H9's left-shift
+  deny-list with its reason. Every line number this spec pinned in a file a lower-`order` unit moves
+  first became a citation by literal text, per the build's rule.
 
 ## 10. Reuse audit
 
@@ -296,7 +338,8 @@ item's own text"` returned 645 symbols, 188 inventory keys, 19 affordance seams 
 its ranked candidates were `extract_section` in `tools/check-spec-tokens.py` and `parse_spec` in
 `tools/memory-tree/gen_build_index.py`. Neither is the seam. The seam this unit extends is not in
 the symbol index at all, because it is an inline awk block rather than a named function: the
-acceptance-witness label walker at `tools/memory-tree/check-memory-hygiene.sh:1020-1048`, which
+acceptance-witness label walker in `tools/memory-tree/check-memory-hygiene.sh`, the block that ends
+in the print naming `SPEC_WITNESS_CUTOFF`, which
 already solves continuation lines, the three sanctioned label spellings and the phantom-head bug
 that a cross-reference on a continuation line used to cause. This unit is that walker with a
 different heading, a different label prefix and a different per-item predicate. The recall probe

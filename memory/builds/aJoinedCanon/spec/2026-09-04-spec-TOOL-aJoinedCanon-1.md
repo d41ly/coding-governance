@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-1 — the revision log becomes a structured entry
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -27,14 +27,19 @@ almost nothing about where, which is the mechanism behind the corpus's dominant 
 - **S3** — A check-12 arm: for a spec whose FILENAME date is at or after `REV_SCOPE_CUTOFF`, every
   §9 entry whose rev number is 2 or greater must carry at least one scope token. The arm is
   per-ENTRY with continuation lines folded in, and it runs on BOTH tiers.
-- **S4** — The `REV_SCOPE_CUTOFF` key: preset blank in `check-memory-hygiene.sh` above the conf
-  source, bound into the one batched awk as `-v`, guarded by an explicit non-empty test, and
-  declared in `.memory-tree.conf` with the evidence for the date chosen.
+- **S4** — The `REV_SCOPE_CUTOFF` key in all THREE of its carriers: preset blank in
+  `check-memory-hygiene.sh` above the conf source, bound into the one batched awk as `-v` and
+  guarded by an explicit non-empty test; declared in `.memory-tree.conf` with the evidence for the
+  date chosen; and shipped blank in `tools/memory-tree/.memory-tree.conf.example`. §4's Migration
+  says why the third carrier is not bookkeeping. Observed by AC13.
 - **S5** — A zero-population notice on the same footing as the §10 evidence arm's, so an arm that
-  grades no spec in this corpus says so instead of printing a silent green.
+  grades no spec in this corpus says so instead of printing a silent green. Observed by AC12.
 - **S6** — Fixtures in `check-memory-hygiene.test.sh` covering the red, the pre-cutoff
   grandfather, the rev-1 exemption, the wrapped continuation, and the blank-cutoff off state. The
-  red is OBSERVED before the arm lands.
+  red is OBSERVED before the arm lands. They take `tFixture-90` upward, which is not a free-block
+  claim measured against the file's high-water but the block the build README's number-space rule
+  allocates to this unit by `order` — `80 + 10N`, N = 1 — so a sibling landing later cannot collide
+  with it whatever the file looks like by then. This unit's whole claim is 90 through 95.
 - **S7** — The check-12 paragraph in `tools/memory-tree/HYGIENE.template.md` gains the arm, in the
   two sentences its sibling ratchets each get.
 - **S8** — The landing bookkeeping this kit's own gates demand: `KIT_MEMORY_TREE_VERSION` bumped
@@ -130,12 +135,22 @@ sibling arm's message takes, and the reason `check-arms.py`'s pin rows are reada
 
 ### Migration
 
-`REV_SCOPE_CUTOFF` is the sixth dated cutoff in this conf and takes the semantics of the four that
+`REV_SCOPE_CUTOFF` is another dated cutoff in this conf and takes the semantics of the ones that
 switch a rule on: blank means OFF, the awk guards it with an explicit `!= ""` test, and it does NOT
 resolve forward the way `SPEC10_CUTOFF` must. It is preset above the conf source for the reason
 `SPEC10_EVIDENCE_CUTOFF`'s comment records — this script runs `set -u` and `adopt-memory-tree.sh`
 never back-fills a key into an existing conf, so an unpreset key aborts the gate in every adopter
 tree whose conf predates it.
+
+The third carrier, `tools/memory-tree/.memory-tree.conf.example`, follows from the same adopter
+argument and is not bookkeeping. The parity arm in `check-memory-hygiene.test.sh` derives every
+`*_CUTOFF` preset out of the comment-stripped engine, unions it with the `${NAME:-}` read form,
+exempts two keys by name, and reds naming any remainder the shipped example does not declare —
+because an adopter cannot discover a key that never reaches it. Every engine preset is declared
+there today, and that arm's own comment records this hole swallowing `FORK_MARK_CUTOFF` and
+`REVIEW_VERDICT_CUTOFF` once already. Omitting the line would red `memory-hygiene self-test` — a leg
+§7 already owes — on this unit's own landing commit, for a reason with nothing to do with the arm
+being built.
 
 The date is `2026-09-06`, ratified by the owner at §8 F1 as one ruling over this whole build: every
 cutoff it introduces sits strictly past the newest spec filename date on any branch. Re-derived at
@@ -165,6 +180,7 @@ count is zero. The new notice is that block with two strings changed.
 | `tools/memory-tree/check-memory-hygiene.sh` | preset key, `-v` binding, the arm, the notice |
 | `tools/memory-tree/check-memory-hygiene.test.sh` | fixtures 90-95 and their assertions |
 | `.memory-tree.conf` | the key and its evidence block |
+| `tools/memory-tree/.memory-tree.conf.example` | the same key, blank |
 | `memory/guides/BUILD-METHOD.md` + template | version marker ONLY, no prose |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp |
 
@@ -228,6 +244,17 @@ line-1 doc markers and the seventh the constant and marker sharing `check-memory
   `ARMS_FLOORS` unchanged, because no shell `fail` call site was added.
 - **AC11** When `memory/guides/SESSION-KICKOFF.md` has been re-stamped for the watched files this
   unit edits, `bash skills/session-kickoff/manifest-check.sh` exits 0.
+- **AC12** When no tracked spec's filename date reaches `REV_SCOPE_CUTOFF`, a full
+  `bash tools/memory-tree/check-memory-hygiene.sh` run prints the zero-population line naming
+  `REV_SCOPE_CUTOFF` on stdout, and still exits 0 — the notice is stdout, not a verdict, so AC7
+  holds beside it. The run must not be `--staged`: the §10 evidence notice this one copies is inside
+  an `[ "$STAGED" = 0 ]` block and a staged run would report the absence of a notice that was never
+  reachable. When the cutoff is temporarily lowered to a date the corpus reaches, the line is
+  absent; the lowering is reverted before the commit.
+- **AC13** When `grep -qE '^REV_SCOPE_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` succeeds
+  and `bash tools/memory-tree/check-memory-hygiene.test.sh` exits 0, the key has reached the shipped
+  example. Deleting that one line and re-running the self-test reds naming `REV_SCOPE_CUTOFF`, which
+  is the failing case observed before the landing commit.
 
 ## 7. Gates
 
@@ -237,7 +264,9 @@ branches armed or pinned)`, and `kickoff-manifest ratchet`.
 
 This is KIT work, so the DoD also owes the self-test chunk that the bar holds by default:
 `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, whose relevant leg is
-`memory-hygiene self-test` (`subject: kit`, guard `tools/memory-tree/`).
+`memory-hygiene self-test` (`subject: kit`, guard `tools/memory-tree/`). That leg is also the home
+of the example-conf parity arm §4's Migration describes, so it is the leg AC13 observes as well as
+the one carrying S6's fixtures.
 
 No new gate leg is added. The arm lives inside check 12, which `tools/gate-legs.json` already
 carries, so the manifest does not move.
@@ -281,6 +310,15 @@ carries, so the manifest does not move.
   working date. §4's Migration and Rollout, §3's retrofit non-goal and §5's risk row state the date
   and its zero-population cost as fact rather than as a pending choice, and AC1's fixture filename
   moved from 2026-09-05 to 2026-09-06 so the observed red is still reachable under the new cutoff.
+- rev-3 · 2026-09-05 · §2 · §4 · §6 · §7 · folded spec-audit round 1, findings H1, H3 and H7. H3:
+  S4, §4's Migration and the Files-touched table add `tools/memory-tree/.memory-tree.conf.example`
+  as the key's third carrier, and new AC13 observes it plus the deletion red. H7: new AC12 observes
+  S5's zero-population notice, which had no criterion at all, and pins that it is a stdout line on a
+  run that still exits 0 and is unreachable under `--staged`. H1: S6 states the `tFixture-90`-upward
+  block as the build README's `80 + 10N` allocation rather than a free-block claim measured against
+  the file's high-water. §7 gains the clause naming `memory-hygiene self-test` as the parity arm's
+  home. §4's Migration also stops calling this the "sixth" dated cutoff in the conf — the count was
+  wrong and nothing derives it.
 
 ## 10. Reuse audit
 
