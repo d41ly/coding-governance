@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-05
 streams: tooling
 roster: TOOL
-ids: TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7
+ids: TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8
 ---
 
 # aKeyedAnnotation — the annotation layer this repo already has, made correct instead of made bigger
@@ -72,7 +72,7 @@ validated field that already owns the code-to-decision link, and writes the conv
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 4 unit(s) · node a · opened 2026-09-05 · streams tooling
-ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7
+ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
