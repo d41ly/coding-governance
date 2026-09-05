@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 5 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -10,21 +10,28 @@
 
 ## 1. Goal
 
-§6 asks for an observation and never asks what the observation needs before it can be made. Add one
+§6 asks for an observation and never asks what the observation needs before it can be made. Add an
 instructional block to §6 telling an author to declare a criterion's preconditions as four named
 sub-fields — its `cost:`, its `permission:`, the `fixture:` or live instance it needs, and whether a
-`figure:` it states is derived or pinned. Finding
+`figure:` it states is derived or pinned — and add one Writing rule stating the derived-or-pinned
+obligation for every measured number a spec pins, in any section, of which `figure:` is §6's
+instance. Finding
 A5 of `memory/builds/aWeighedCanon/build/2026-09-04-build-TOOL-aWeighedCanon-2-what-the-spec-format-is-missing.md`
 measured 81 acceptance criteria amended at build time across 32 records, and 37 of them trace to one
 of those four things going unsaid.
 
 ## 2. Scope (IN)
 
-- **S1** — One instructional block added to §6 of `tools/memory-tree/SPEC-TEMPLATE.template.md`,
+- **S1** — An instructional block added to §6 of `tools/memory-tree/SPEC-TEMPLATE.template.md`,
   inside the skeleton fence, naming the four preconditions as four named sub-fields — `cost:`,
   `permission:`, `fixture:`, `figure:` — written as lines under the criterion's own bullet, and
   stating that a field which does not apply is OMITTED rather than written as `none`.
-- **S2** — The same text present in `memory/TEMPLATE-SPEC.md`, produced by re-rendering the twin
+- **S1b** — One bullet added to the `## Writing rules` list of the same file, OUTSIDE the skeleton
+  fence, stating that a measured number a spec pins says whether it is DERIVED or PINNED, in any
+  section. This is the owner's ruling of 2026-09-05 on §8's F2, against this spec's own
+  recommendation of §6 alone. That bullet OWNS the obligation; §6's `figure:` field points at it and
+  restates none of it, which is the ownership decision §4 records.
+- **S2** — Both edits present in `memory/TEMPLATE-SPEC.md`, produced by re-rendering the twin
   rather than by hand-editing the live copy.
 - **S3** — This spec's own §6 written in the shape S1 proposes, so the first instance of the rule
   exists in the tree on the day the rule lands rather than being asserted about a future author.
@@ -43,6 +50,10 @@ of those four things going unsaid.
 - **Not the ledger side.** This changes what a criterion declares, never what an acceptance ledger
   answers. `TOOL-aJoinedCanon-6` owns the join.
 - **No new §5 row.** The production-readiness row set is `TOOL-aJoinedCanon-9`'s subject.
+- **No edit to any other skeleton section.** The Writing rule added by S1b binds every section,
+  which reads as licence to add a matching line to §4's skeleton prose about its inventories and
+  estimates. It is not. The rule has one home and §6 has the one pointer at it; a third carrier in
+  §4 would be the two-copies drift this build exists to close, one section over.
 
 ## 4. Design
 
@@ -54,6 +65,9 @@ of those four things going unsaid.
 | `permission:` | May THIS run execute the thing that observes it? | Same 23. The unrunnable suite and the boundary an unattended run may not cross are both this class. |
 | `fixture:` | Does the tree contain the live instance this observation needs? | 6 amendments named one it did not contain. `TOOL-dHonouredPark-4` AC10 is the worked case: "zero tracked specs produce a heading whose id does not parse, so the condition has no live instance and its fixture is in the unrunnable suite." |
 | `figure:` | Is a number this criterion states re-derived at observation time, or typed as a literal? | 8 amendments pinned a measured literal that was stale by build time. `TOOL-aNamedGesture-1` AC13 is the worked case, and its repair is the rule: "The witness is now the command, not a number." |
+
+The `figure:` row is the one of the four whose rule is not §6's alone, and the next sub-section says
+which document owns it.
 
 23 plus 8 plus 6 is 37 of the 81. The cost and permission pair is the largest class that bins, and
 that qualifier is load-bearing: 33 of the 81 resist binning, so nothing here claims a largest cause
@@ -73,9 +87,36 @@ bullet must fill, and a criterion carrying none of them is the common case rathe
 under-filled one. That property is not a residue of the losing branch: it is the axis F1 never
 disputed, and §7 depends on it.
 
+### Which document owns the derived-or-pinned rule
+
+The owner ruled on 2026-09-05 that the rule lands in BOTH §6 and the Writing rules, overruling this
+spec's recommendation of §6 alone. That widening carries a cost this spec named while recommending
+against it: the unit now writes to two places in one document, and two copies of one rule in one
+document is exactly the drift this build exists to close. So ONE of the two locations owns the rule
+and the other points at it, the same one-text-one-home split `TOOL-aJoinedCanon-2` makes when
+`tools/memory-tree/SPEC-TEMPLATE.template.md:183` becomes a pointer at BUILD-METHOD M4.
+
+**The Writing rules OWN it. §6's `figure:` field is its instance and restates none of it.** The
+decision is by READER, not by subject. A Writing rule is read by an author filling ANY section; the
+§6 block is read only by an author filling §6. The rule the ruling widened to is precisely one that
+binds outside §6 — a §4 inventory or estimate pins measured literals too — so a home only a §6
+author reads cannot carry it. The reverse split fails on the same test: a general rule parked in §6
+would have to be restated for §4 to reach it, which is the second copy.
+
+That relationship is spelled in both directions rather than left to inference. The Writing rule
+names `figure:` as the field an acceptance criterion answers it in, and §6's `figure:` bullet names
+the Writing rule as where the obligation lives. Neither says what the other says. What §6 keeps is
+the FIELD — its spelling, and that it answers derived-or-pinned for a number the criterion states;
+what moves out is the obligation and its reason, which used to trail that bullet as the clause
+"a pinned literal names when it was measured, because the writing rules verify at writing time".
+Under F1's ruling the four sub-fields already put a derived-vs-pinned answer in §6, so the Writing
+rules half is not a duplicate of `figure:`: it is the general statement of which `figure:` is one
+instance.
+
 ### The text
 
-Added inside the §6 skeleton block, after the acceptance-witness paragraph:
+Two blocks, in two places, saying different things. First, inside the §6 skeleton block, after the
+acceptance-witness paragraph:
 
 ```
 A criterion that cannot be observed for free, by this run, or against today's tree says so with the
@@ -87,17 +128,29 @@ bullet:
 - `permission:` — the suite, boundary or credential that observes it is one THIS run may not execute.
 - `fixture:` — the live instance or path the observation needs, and whether the tree holds one today.
 - `figure:` — whether a number the criterion states is DERIVED at observation time or PINNED as a
-  literal; a pinned literal names when it was measured, because the writing rules verify at writing
-  time and a build outlives its own measurements.
+  literal. The writing rule on measured numbers states the obligation; this field is where a
+  criterion answers it.
 
 Write only the fields that apply and OMIT the rest. A field written as `none` is a blank being
 filled rather than a question being answered, and a criterion whose preconditions are all trivial
 carries no fields at all — the common case. Nothing grades these lines.
 ```
 
+Second, one bullet in the `## Writing rules` list, placed under the existing
+`Verify every claim about existing code against source at writing time` bullet whose seam it closes:
+
+```
+- A measured number a spec pins says whether it is PINNED or DERIVED. The rule above verifies at
+  WRITING time, so a number true when written goes stale in place and nothing re-checks it: a pinned
+  one names when it was measured, a derived one names what re-derives it. This binds every section,
+  §4's inventories and estimates included; §6's `figure:` sub-field is where an acceptance criterion
+  answers it.
+```
+
 Wording is indicative, not byte-exact; the reviewed diff is the authority. The four spellings are
 not indicative: they are the owner's, and a rendering that spells them otherwise has not landed the
-ruling.
+ruling. The ownership direction is not indicative either — a second copy of the obligation under
+`figure:` is a failed landing of F2's ruling, not a stylistic variant of it.
 
 ### Where it goes, and why that placement is not arbitrary
 
@@ -121,17 +174,28 @@ while the criterion sentence itself names nothing. That was already true of any 
 and is not a regression, but four permitted lines widen the surface, and an author reading this
 should put the witness in the criterion and let the fields add to it.
 
+The Writing-rules bullet sits OUTSIDE that fence, at `memory/TEMPLATE-SPEC.md:85`'s list, and none
+of the paragraph above reaches it. The witness arm scans a spec's own §6, and the Writing rules are
+never copied into a spec — they are read while writing one. So the second half carries no arm
+interaction at all, and its only placement constraint is the one it takes for free: it goes directly
+under the writing-time verification bullet, because it is that bullet's seam and a reader must not
+have to hold the two apart.
+
 ### Files touched (estimate)
 
 | File | Change |
 |---|---|
-| `tools/memory-tree/SPEC-TEMPLATE.template.md` | The authored source. Edit here. |
+| `tools/memory-tree/SPEC-TEMPLATE.template.md` | The authored source, in TWO places: the §6 block inside the fence, the Writing-rules bullet outside it. Edit here. |
 | `memory/TEMPLATE-SPEC.md` | Re-rendered from the twin, never hand-edited. |
 
-Roughly 1,100 B added to each, against 16,913 B and 16,906 B today. That figure is an ESTIMATE from
+**F2's ruling widened the text and did not widen this table.** Both halves land in the same two
+files, so the unit still touches two paths, adds no code, crosses no contract and moves no gate —
+which is why the header stays Tier-1 after the fold rather than moving with the scope.
+
+Roughly 1,450 B added to each, against 16,913 B and 16,906 B today. That figure is an ESTIMATE from
 the draft text above and not a measurement; the observation in AC4 derives it rather than repeating
-it. It rose from rev-1's roughly 900 B because the ruling's four named fields cost more template
-prose than the one-line form did, which is the shape's price and not a surprise. Verified 2026-09-04
+it. It rose from rev-1's roughly 900 B for the four named fields, and again at rev-3 for F2's
+Writing-rules bullet net of the clause that bullet takes out of `figure:`. Verified 2026-09-04
 that no size gate binds either file: neither has a row in
 `tools/template-size-limits.txt`, and `bash tools/memory-tree/check-memory-hygiene.sh
 --print-index-set` does not list `memory/TEMPLATE-SPEC.md`, so check 6's per-class caps do not
@@ -157,7 +221,15 @@ repair one instance of.
   have nothing to say get typed as `none` across 1,404 AC lines and the gate then measures typing.
   This is the same rejection rev-1 made against a required `Preconditions:` line, and the ruling
   makes it four times louder rather than retiring it. §7.
-- **Putting the derived-or-pinned rule in the Writing rules instead.** Carried to §8 as a fork.
+- **The derived-or-pinned rule in §6 ALONE.** This spec's own recommendation in §8's F2, and
+  OVERRULED by the owner on 2026-09-05. It leaves a §4 that pins stale literals unaddressed, which
+  the fork text conceded while recommending it. The argument stays in F2 rather than here.
+- **The same text in both places.** The obvious way to obey "both", and the one thing the ruling
+  cannot have meant: two carriers of one rule in one document is the class this build closes. The
+  ownership split above is the answer instead.
+- **§6 owning the rule, with the Writing rules pointing at it.** Rejected on reader: a §4 author
+  never opens §6's skeleton instruction, so the general obligation would have to be restated there
+  to reach them, and the restatement is the second copy again.
 
 ## 5. Production-readiness checklist
 
@@ -168,19 +240,25 @@ repair one instance of.
 - i18n — N/A. Single-language repo documentation.
 - error / empty / loading states — N/A. Nothing executes.
 - observability — N/A. Nothing emits.
-- risks — One, and it is a documentation risk: a later editor moves the paragraph below an author's
-  bullets and weakens the acceptance-witness arm. Recorded in §4 where an editor reads it. Rollback
-  is a revert of two files, and the twin parity gate refuses a revert of only one.
+- risks — Two, both documentation risks, both recorded in §4 where an editor reads them. A later
+  editor moves the §6 paragraph below an author's bullets and weakens the acceptance-witness arm.
+  And a later editor, finding §6's `figure:` bullet terse, restates the Writing rule's obligation
+  under it — which turns the pointer into the second copy F2's ruling was resolved to avoid, and is
+  the more likely of the two because it looks like an improvement. Rollback is a revert of the same
+  two files it was before the ruling, and the twin parity gate refuses a revert of only one.
 - testing + left-shift gates — **No gate, deliberately, and this row names the compensating check.**
   A `cost:` label is greppable — that is what the ruling's four names buy — but "did the author
   declare the cost TRUTHFULLY, and did they notice they had one" is not mechanically distinguishable
-  from prose, so no arm is written and none is claimed. The compensating check is a re-measurement,
-  not a review pass: after
+  from prose, so no arm is written and none is claimed. The Writing-rules half is even further from
+  gradeable — it sits outside the skeleton fence, so no spec-scoped arm reaches it at all. The
+  compensating check is a re-measurement, not a review pass: after
   five more builds close, re-run finding A5's method — count acceptance criteria amended at build
   time, bin them by cost, permission, fixture and stale literal, and compare against the 23, 6 and 8
-  recorded here. If the three classes have not moved, this unit did nothing and should be reverted
-  rather than reinforced. That check is manual, deferred, and owned by whoever next audits the spec
-  format; it is filed as a backlog row at build time, not asserted here as done.
+  recorded here. F2's ruling widens that re-measurement rather than only its subject: the stale-literal
+  bin is counted over §4's pinned figures as well as §6's, because a rule that now binds every section
+  is not measured by a count taken in one. If the classes have not moved, this unit did nothing and
+  should be reverted rather than reinforced. That check is manual, deferred, and owned by whoever next
+  audits the spec format; it is filed as a backlog row at build time, not asserted here as done.
 - migration / rollback — See §4. No cutoff key, no corpus edit, no state to migrate.
 - user docs — N/A. `memory/TEMPLATE-SPEC.md` IS the document; there is no separate `help/` page for
   the memory-tree kit's own rule set.
@@ -189,7 +267,8 @@ repair one instance of.
 
 *This section is written in the shape S1 proposes, which is the owner's ruling of 2026-09-05 on
 §8's F1 and not this spec's recommendation. Each criterion carries only the sub-fields that apply,
-and AC1 and AC5 show what the omission looks like in practice.*
+and AC1 and AC5 show what the omission looks like in practice. AC6 observes S1b, the second carrier
+F2's ruling added on the same day.*
 
 - **AC1** — When the block is added to `tools/memory-tree/SPEC-TEMPLATE.template.md` and the live
   copy is re-rendered, `bash tools/memory-tree/kit-dogfood-parity.test.sh` exits 0.
@@ -205,14 +284,24 @@ and AC1 and AC5 show what the omission looks like in practice.*
   does not substitute — it grades only the diff and would report a green that means nothing here.
 - **AC4** — When `wc -c` is taken over both files before and after, the growth is reported as the
   measured pair rather than as §4's estimate.
-  figure: DERIVED at observation time. §4's roughly 1,100 B is a pinned estimate, restated at rev-2
-  for the four-field text, and is not what this criterion grades.
+  figure: DERIVED at observation time. §4's roughly 1,450 B is a pinned estimate, restated at rev-3
+  for F2's second block, and is not what this criterion grades.
 - **AC5** — When this spec is read at close, its own §6 still carries named sub-fields on the
   criteria that need them, so `git grep -cE '^ +(cost|permission|fixture|figure):' -- memory/builds/aJoinedCanon/spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md`
   returns a non-zero count. This is S3's observation and it is deliberately weak — it grades
   presence, exactly as the witness arm does, and claims nothing about whether the declarations are
   true. No sub-field applies to it, so it carries none, which is the omission rule being obeyed
   rather than a criterion left under-filled.
+- **AC6** — When `sed -n '/^## Writing rules/,/^## Tier profiles/p' memory/TEMPLATE-SPEC.md | grep -c PINNED`
+  is run after the change, it returns a count greater than the `0` it returns before, so the second
+  carrier F2's ruling requires exists and is in the Writing rules rather than only in §6. AC1
+  through AC5 all observe the §6 half; without this one the wider placement ships ungraded.
+  figure: the `0` is DERIVED, re-measured on this branch at base `750ca0ca` on 2026-09-05. The
+  whole-file count of `PINNED` or `DERIVED` is not `0` today — `memory/TEMPLATE-SPEC.md:80` already
+  carries one — which is why the range is scoped and an unscoped grep would not fail before the
+  change.
+  fixture: a no-match `grep -c` exits non-zero while printing `0`, so this reads the printed count
+  and never a `&&` chain's exit status.
 
 ## 7. Gates
 
@@ -220,7 +309,7 @@ Kept green, by name from `tools/gate-legs.json`: `memory hygiene`, `kit/dogfood 
 whole bar is `bash tools/run-gates/run-gates.sh`; those two are the legs this diff can actually
 move.
 
-**This unit adds no gate, and the ruling of 2026-09-05 does not change that.** The charter binds a
+**This unit adds no gate, and neither ruling of 2026-09-05 changes that.** The charter binds a
 new arm to an observed failing case, and there is no failing case to observe. Four named fields make
 the LABEL greppable where one prose line did not — that is the ruling's gain and it is real — but a
 criterion that needed a `cost:` line and omitted it is still byte-identical to one that correctly
@@ -229,6 +318,13 @@ all four on every bullet would grade typing, not declaration, and would be satis
 four times over — the could-not-fail shape one level up, which §7 of the charter names, and the
 ruling multiplies the blanks rather than removing them. §5's testing row carries the compensating
 manual check instead of an arm, and that is the honest trade rather than a gap left open.
+
+F2's Writing-rules half is further from an arm still, and the reason is worth stating rather than
+folding into the sentence above. It sits outside the skeleton fence, so it is not copied into any
+spec and no spec-scoped predicate can find it; what it binds is an author's judgement about a number
+in §4 that no arm can distinguish from a number that was never measured. AC6 grades that the bullet
+EXISTS, which is presence and nothing more, and the wider placement buys no gradeability the §6-only
+branch would not have bought.
 
 If a later unit finds a sub-shape that a machine can grade — a `cost:` figure that must resolve, a
 `fixture:` path that must exist in `git ls-files` — it is a separate unit with its own dated cutoff
@@ -257,7 +353,17 @@ this spec will say for the shape it did not recommend. It is still not smuggled 
   rule leaves those unaddressed. The cost of the Writing-rules placement is that this unit then
   writes to two places in the template, which the fold rule dislikes. **Recommendation: §6 for now,
   because that is where the measured evidence sits, with a one-clause pointer added to the Writing
-  rules only if a later measurement finds the class outside §6.** UNRESOLVED.
+  rules only if a later measurement finds the class outside §6.**
+  RESOLVED (owner, 2026-09-05): BOTH §6 and the Writing rules. The recommendation above LOST, and it
+  lost on its own reasoning: the fork text conceded that the Writing rules already demand
+  writing-time verification and that a stale pinned figure is that rule failing at a seam it does not
+  reach, and it conceded that a spec's §4 pins stale literals a §6-only rule leaves unaddressed.
+  Waiting for a later measurement to confirm a gap the fork had already argued was there is not
+  caution, it is a second measurement of a settled question. The cost the recommendation named —
+  this unit then writing to two places in one document — is accepted and DESIGNED AROUND rather than
+  ignored: §4 records which location owns the rule and which points at it, so the two places carry
+  one text. The Writing rules own it; §6's `figure:` field is its instance. §9 names every section
+  moved.
 
 ## 9. Revision log
 
@@ -270,8 +376,20 @@ this spec will say for the shape it did not recommend. It is still not smuggled 
   roughly 1,100 B, and recorded that a sub-field line folds into its criterion's witness blob; §5's
   testing row now concedes the label is greppable and the truth is not; §6 rewritten to the fields,
   including AC5, whose grep for `Preconditions:` would have matched nothing after this fold; §7
-  restated against four blanks rather than one line. F2 was NOT ruled on and stays UNRESOLVED, so
-  the header carries no `ratified`.
+  restated against four blanks rather than one line. F2 had not been ruled on AT THAT POINT, so
+  rev-2's header carried no `ratified`; rev-3 below resolves it and adds one.
+- rev-3 · 2026-09-05 · §8 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · folded the owner's ruling on F2: BOTH
+  §6 and the Writing rules, overruling this spec's §6-only recommendation, with the Writing rules
+  OWNING the derived-or-pinned obligation and §6's `figure:` field pointing at it. §1's goal names
+  both carriers; §2 gained S1b and S2 now renders both edits; §3 gained a non-goal refusing a third
+  carrier in §4's skeleton; §4 gained the ownership sub-section, a second block in "The text", the
+  out-of-fence placement note, three replacement rejected alternatives where the fork used to be
+  carried, and a raised estimate of roughly 1,450 B; §5's risk row gained the restatement risk and
+  its testing row widens the re-measurement past §6; §6 gained AC6 for the Writing-rules half and
+  AC4's `figure:` line was corrected to the new estimate; §7 states why the second half is further
+  from an arm than the first. The Tier field was re-checked and stays 1: both halves land in the
+  same two files §4 already listed. This entry supersedes rev-2's closing clause, which recorded F2
+  as unresolved and the header as unratified — true at rev-2, false now.
 
 ## 10. Reuse audit
 
@@ -281,9 +399,11 @@ observation needs before it can be run"` returned 645 symbols over 20 dossiers a
 candidates are code seams — `extract_declarations`, `read_declared_keys`, `load_declarations`,
 `declared_in_kits_json` — every one of them a reader of a machine declaration in a conf or a
 registry. There is no seam for a PROSE declaration in a template, because this unit adds no code and
-extends no module. The document seam it does extend is the §6 instructional block of
-`tools/memory-tree/SPEC-TEMPLATE.template.md`, which already carries two such paragraphs and is the
-established home for a rule an author reads while filling the section. The recall probe found the
+extends no module. The document seams it does extend are both in
+`tools/memory-tree/SPEC-TEMPLATE.template.md`: the §6 instructional block, which already carries two
+such paragraphs and is the established home for a rule an author reads while filling the section,
+and the `## Writing rules` list, which already carries the writing-time verification bullet this
+one's second half extends. Neither is a new home; F2's ruling reuses both. The recall probe found the
 corpus solving this by hand, one amendment at a time: `TOOL-aMouldedFolio-2` writes an unprompted
 `Cost` row in its §5 table, and `TOOL-aNamedGesture-1` AC13's repair — "The witness is now the
 command, not a number" — is this unit's derived-or-pinned rule, discovered at amendment cost by a

@@ -96,10 +96,10 @@ ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCano
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aJoinedCanon-1 — the revision log becomes a structured entry](spec/2026-09-04-spec-TOOL-aJoinedCanon-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set](spec/2026-09-04-spec-TOOL-aJoinedCanon-2.md) | 2 | 1 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set](spec/2026-09-04-spec-TOOL-aJoinedCanon-2.md) | 2 | 1 | SPECCED | rev-3 | 2026-09-05 |
 | [TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it](spec/2026-09-04-spec-TOOL-aJoinedCanon-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-09-05 |
 | [TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red](spec/2026-09-04-spec-TOOL-aJoinedCanon-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed](spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md) | 5 | 1 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed](spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md) | 5 | 1 | SPECCED | rev-3 | 2026-09-05 |
 | [TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion](spec/2026-09-04-spec-TOOL-aJoinedCanon-6.md) | 6 | 2 | SPECCED | rev-2 | 2026-09-05 |
 | [TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives](spec/2026-09-04-spec-TOOL-aJoinedCanon-7.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-05 |
 | [TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions](spec/2026-09-04-spec-TOOL-aJoinedCanon-8.md) | 8 | 2 | SPECCED | rev-2 | 2026-09-05 |
