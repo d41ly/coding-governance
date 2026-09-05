@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-6 — the three cell refusals and the per-cell coverage report
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -98,7 +98,7 @@ context reads as coverage when it is only a scope.
   stemming: `git ls-files '*.py' | xargs -n1 basename | cut -d. -f1 | sort -u | grep -cvE
   '^[a-z0-9_]+$'` returns 8, the eighth being `check-kit-placeholders.py`, added by `5169cc8d` after
   the eight were counted. **Rev-2 routed the correction to the wrong file, and
-  `TOOL-aSurfacedLexicon-4` was opened at rev-3 to find that out.** That spec declares no pin VALUE
+  `TOOL-aSurfacedLexicon-4` was opened and read to find that out.** That spec declares no pin VALUE
   at all. `py.file.conv` appears there three times and every occurrence is a shape example, never a
   declared value: once in its section 4 key table, once as a non-integer refusal fixture, and once in
   an indented merge example. The load-bearing half of this sentence is that unit 4 declares no pin
@@ -113,7 +113,7 @@ context reads as coverage when it is only a scope.
   prose.
 - **Widening the `lexicon naming predicates` leg guard to cover `.lexicon.conf`.** This was rev-1's
   AC8 and its F2 recommendation, and it is refused on prior art that design pass should have read.
-  `TOOL-aSurfacedLexicon-4` OWNS the ruling — its own S8 was struck for exactly this at its rev-5,
+  `TOOL-aSurfacedLexicon-4` OWNS the ruling — its own S8 was struck for exactly this,
   its section 3 and its Alternatives carry the measurements — and `tools/lexicon/kit.toml` states it
   in prose directly above the `[[gate_leg]]` block it governs. Re-measured here rather than
   inherited: with the pathspec staged into `tools/gate-legs.json`, `python tools/govkit/govkit.py
@@ -262,7 +262,7 @@ against a declaration whose matrix does not exist until order 7.
 **The promotion is an OWED ITEM rather than a routing, because the receiver has never heard of it.**
 Rev-2 wrote that the promotion belongs to `TOOL-aSurfacedLexicon-12`. Grepped over the whole spec
 set at rev-3: `UNDECLARED CELL`, the report-only landing and the promotion constant appear in no
-sibling spec, and `TOOL-aSurfacedLexicon-12` rev-4 contains no occurrence of `CELLS` at all — its
+sibling spec, and at the time `TOOL-aSurfacedLexicon-12` contained no occurrence of `CELLS` at all — its
 S1 rewrites the `PINS` region and says nothing about the matrix. A hand-off whose receiving spec
 does not carry it is a deferral wearing a routing's clothes, which is the shape this unit exists to
 abolish. So the item is stated here in the words the receiving unit must carry, for the orchestrator
@@ -527,6 +527,9 @@ free, and the current cost is UNVERIFIED here because the research pass did not 
   same sentence that called its guard empty, and one hyphenated-basename count left at seven. The
   UNOWNED promotion is now OWNED — `TOOL-aSurfacedLexicon-12` accepted it as S14/AC14 — and the
   paragraph that reported it unowned stays, as the record of how it got routed.
+- rev-5 · 2026-09-05 · three cross-spec rev pins dropped, and the grep result about the order-7 sibling marked
+  HISTORICAL: that spec now writes the CELLS matrix, so a present-tense "contains no occurrence"
+  reads as false to anyone checking it today.
 
 ## 10. Reuse audit
 

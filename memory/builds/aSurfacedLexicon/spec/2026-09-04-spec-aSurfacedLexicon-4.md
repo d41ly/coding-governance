@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-4 — the CELLS and PINS declaration grammar
 
-**Status:** SPECCED · rev-7 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 2
+**Status:** SPECCED · rev-8 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -579,11 +579,14 @@ remembered. The gating just does not come from AC5, and AC5 now says so in its o
   hook guarantees — the forcing predicates, the ten-commit lag constant read at
   `.githooks/pre-push:184`, and that a scoped push evaluates every guard — so the exemption is
   priced against a bounded early signal rather than against a total run that no longer happens. §4
-  Migration is deliberately UNCHANGED: `TOOL-aSurfacedLexicon-6` rev-2 S5 says this section must be
+  Migration is deliberately UNCHANGED. An earlier revision of `TOOL-aSurfacedLexicon-6` S5 said this section must be
   amended to except its order-4 `py.constant` arming, and it was read here rather than taken on
   trust — Migration says the conf rewrite that pastes the real `CELLS` and `PINS` BODIES is a later
   unit, which one armed row at order 4 does not contradict, and it nowhere carries the sentence
   about no cell being armed that the sibling attributes to it.
+- rev-8 · 2026-09-05 · the claim about `TOOL-aSurfacedLexicon-6` marked HISTORICAL — that spec withdrew it,
+  and stating a withdrawn sibling claim in the present tense is the class three rounds have now been
+  dominated by.
 
 ## 10. Reuse audit
 

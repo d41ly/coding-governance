@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-9 — the owner-declarable PATTERNS block
 
-**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
+**Status:** SPECCED · rev-6 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -106,7 +106,7 @@ vocabulary-and-convention apparatus then grades filenames or nothing. Owner ruli
   and `TOOL-aSurfacedLexicon-6` owns the cell refusals, and this unit adds no cell to
   `.lexicon.conf`. The S9 fixture is the deliberate exception and declares its own `ts` cells.
   Rev-2 routed that case to a sibling that never mentions this fixture, and rev-3 then dated the
-  harm wrongly. Read out of `TOOL-aSurfacedLexicon-6` rev-2 itself: its S1 makes an
+  harm wrongly. Read out of `TOOL-aSurfacedLexicon-6` itself: its S1 makes an
   (extension, surface) pair with a non-empty population and no `CELLS` row `UNDECLARED CELL`, but
   its `### Rollout` lands that arm REPORT-ONLY at build order 4 behind a default-OFF constant,
   because three real pairs would otherwise red the commit that lands it. The promotion to a refusal
@@ -470,6 +470,8 @@ is not one, so no `memory/project/testsuite-count-waivers.txt` row is owed eithe
   `TOOL-aSurfacedLexicon-12` as S14 and AC14. Both places that described the disagreement now
   describe its resolution. Nothing else moved, because this fixture never depended on which commit
   promotes the arm — which is why it needed no edit when the ownership did move.
+- rev-6 · 2026-09-05 · cross-spec rev pin dropped from §3; the rev-log line keeps its own, which is where a
+  historical read belongs.
 
 ## 10. Reuse audit
 

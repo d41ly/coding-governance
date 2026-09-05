@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -310,8 +310,11 @@ reading and the conditional is stated only so the sentence is not reused as a fa
   command at `6c670b02` reports `49144 / 49152 bytes (8 under, 100.0%)`, and `wc -c <
   coding-governance-agents.template.md` agrees. So the headroom is EIGHT bytes, not 285, and this
   criterion is not a formality — the §12 edit must be net-neutral or net-negative in bytes or the
-  `template size` leg REDS. Re-read the figure from the command at build time; do not trust either
-  number typed here. The leg also WARNs past its recorded high-water independently of the ceiling,
+  `template size` leg REDS. **AND THE RENDERED HALF IS TIGHTER, which this criterion missed:** the
+  charter is a rendered PAIR, and `bash tools/check-template-size.sh AGENTS.md` reports
+  `64506 / 64512 bytes (6 under, 100.0%)`. Six is the binding margin, not eight, because a §12 edit
+  lands in both carriers. This criterion covers BOTH. Re-read both figures from the command at build
+  time; do not trust either number typed here. The leg also WARNs past its recorded high-water independently of the ceiling,
   and that warning is advisory and does not satisfy or fail this criterion.
 - **AC9** — When `bash tools/run-gates/run-gates.sh` runs at the push boundary, it is green,
   including the three unguarded legs whose populations this unit moves: `dead-path carriers`,
@@ -448,6 +451,9 @@ update` clobbers. That route is unowned by any unit in this build.
   unconditionally, so the alternatives note no longer states it as a fact about the hook. The
   conclusion it supported is unchanged: `GATE_FULL` bypasses guards and never unlocks a
   `selftests` chunk.
+- rev-5 · 2026-09-05 · AC8 extended to the RENDERED charter. The pair is byte-capped on both sides and the
+  rendered one is TIGHTER — `bash tools/check-template-size.sh AGENTS.md` reports six free bytes
+  against the template's eight — so a §12 edit measured only on the template can still red the bar.
 
 ## 10. Reuse audit
 

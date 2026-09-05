@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-13 — the prefix selector, routing a subset of a cell to a second convention
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -85,14 +85,14 @@ gate whose verdict depends on declaration order is not a declaration.
 ### The declaration every criterion is measured against
 
 This repo's tracked `.lexicon.conf` carries no `CELLS` block at all, so there is no `py.function`
-cell for a selector to hang off. `TOOL-aSurfacedLexicon-6` measured that gap at its rev-4 and names
+cell for a selector to hang off. `TOOL-aSurfacedLexicon-6` measured that gap and names
 `py.function` at 976, `py.type` at 41 and `js.function` at 69 as the non-empty pairs carrying no
 `CELLS` row; the first `py.function` row lands with `TOOL-aSurfacedLexicon-12`'s matrix at order 7,
 two orders after this unit. Rev-1's S6 staged a selector onto that parent anyway, which is a break
 nobody can stage.
 
 So every criterion in section 6 that grades a cell is measured against a SCRATCH DECLARATION, and
-each one says so, the way `TOOL-aSurfacedLexicon-5` rev-4 phrases its own after the identical defect
+each one says so, the way `TOOL-aSurfacedLexicon-5` phrases its own after the identical defect
 was raised against it. A scratch declaration is a `CELLS` block written into the working-tree
 `.lexicon.conf` and never committed: the engine resolves the repo root with
 `git rev-parse --show-toplevel` at `tools/lexicon/lexicon.py:1184` and opens `root / CONF_NAME`
@@ -410,6 +410,7 @@ row and no `testsuite-count-waivers.txt` entry.
   degrade on a leg no boundary reaches. `TOOL-aSurfacedLexicon-4`, `TOOL-aSurfacedLexicon-5`,
   `TOOL-aSurfacedLexicon-6`, `TOOL-aSurfacedLexicon-7` and `memory/guides/BUILD-METHOD.md` were
   opened for this revision.
+- rev-3 · 2026-09-05 · two cross-spec rev pins dropped.
 
 ## 10. Reuse audit
 

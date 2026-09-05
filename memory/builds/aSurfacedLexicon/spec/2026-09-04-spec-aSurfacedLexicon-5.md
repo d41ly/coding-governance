@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-5 — the convention predicate
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -654,11 +654,12 @@ lands ungated, which is a gate nobody has ever seen fail.
   sections already carry, and to say what a revert costs from build order 4 onward. The whole file
   was re-grepped for the same absolute rather than the one line the finding named —
   `grep -n -iE "conf rewrite|arms a cell|arms nothing|inert|until |references the predicate"` over
-  this spec returns no fourth. `TOOL-aSurfacedLexicon-6` was OPENED at its rev-2 rather than
+  this spec returns no fourth. `TOOL-aSurfacedLexicon-6` was OPENED and read rather than
   asserted: its status header reads order 4, its S5 arms `py.constant` as the build's first armed
   cell and names this unit's `screaming` form a hard prerequisite, and its `### Rollout` names
   `TOOL-aSurfacedLexicon-12` as the order-7 conf rewrite. Both specs agree on which unit arms the
   first cell and when. No figure moved, so nothing was re-measured.
+- rev-5 · 2026-09-05 · cross-spec rev pin dropped; the fact it carried is unchanged and re-verified.
 
 ## 10. Reuse audit
 
