@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-8 — acceptance ledger
 
-**Serves:** build TOOL-aWeldedTribunal-8
+**Serves:** journal TOOL-aWeldedTribunal-8
 
 ## What changed
 
@@ -52,3 +52,11 @@ asked about widens a records diff past what anyone reviewed, so they are NAMED i
 shared mutable record and M6 clause 3 forbids pairing one with anything. That is the verb enforcing
 the build method rather than trusting it, and it is the right refusal: a solo pass needs no
 declaration, and a co-declaration would have been the bug.
+
+## Evidence
+
+**Evidences:** TOOL-aWeldedTribunal-8
+- AC1 — `memory/backlog/TOOL.md` — `TOOL-dScaffoldedMirror-22` reads CLOSED with its `unattended.sh` line citation in the tail
+- AC2 — `memory/backlog/TOOL.md` — the same for `TOOL-aGroundedOrientation-4`, `TOOL-aFlaggedScaffold-4` and `TOOL-aScouredKit-25`
+- AC3 — `python tools/memory-tree/row_grammar.py --check` — rc 0 over the edited rows, and `corpus_ids.py --check` rc 0
+- AC4 — `memory/backlog/TOOL.md` — every closure tail names a file and a line, or the unit it duplicates

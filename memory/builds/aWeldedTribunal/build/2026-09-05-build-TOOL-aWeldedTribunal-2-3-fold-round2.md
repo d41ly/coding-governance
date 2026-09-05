@@ -1,6 +1,6 @@
 # The closing review's round 2, folded — and what it says about this build
 
-**Serves:** build TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3
+**Serves:** journal TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3
 
 ## The finding worth leading with
 

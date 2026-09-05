@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-6 — acceptance ledger
 
-**Serves:** build TOOL-aWeldedTribunal-6
+**Serves:** journal TOOL-aWeldedTribunal-6
 
 ## What changed
 
@@ -46,3 +46,16 @@ landing verb, and `TOOL-aWeldedTribunal-8` closes `TOOL-aScouredKit-25` as a dup
 rather than against this unit. An operator who reads `1 undeclined gap` and does nothing is in the
 same state as before; what changed is that the state is legible when the verb runs instead of at the
 next ImportError.
+
+## Evidence
+
+**Evidences:** TOOL-aWeldedTribunal-6
+- AC1 — `python tools/govkit/selftest.py` — the gap pass prints a `GAP` line naming kit, destination and source
+- AC2 — `tools/govkit/govkit.py` — an undeclined gap makes the coverage line say INCOMPLETE
+- AC3 — `tools/govkit/govkit.py` — the coverage line is unconditional, so a zero-gap run prints its zero
+- AC4 — `tools/govkit/govkit.py` — `--kits` narrows the gap selection before the join
+- AC5 — `python tools/govkit/selftest.py` — all arms held, including the escape fixture whose graded refusal an earlier placement turned into a hard abort
+- AC6 — `tools/govkit/govkit.py` — a declined row prints as `declined` and is excluded from the INCOMPLETE count
+- AC6b — `tools/govkit/govkit.py` — the declined row PRINTS rather than vanishing, which is the exclusion-list shape the decline contract exists to prevent
+- AC6c — amended rev-4 — the fork resolved the Report question to a THROWAWAY so decline hygiene cannot fail this verb; the closing review found the same hazard on the coverage call and it was hoisted, logged in section 9
+- AC7 — `python tools/govkit/selftest.py` — all arms held, exit 0

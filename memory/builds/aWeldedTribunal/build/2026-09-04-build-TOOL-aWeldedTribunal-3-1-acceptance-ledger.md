@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-3 — acceptance ledger
 
-**Serves:** build TOOL-aWeldedTribunal-3
+**Serves:** journal TOOL-aWeldedTribunal-3
 
 ## What changed
 
@@ -52,3 +52,16 @@ One fixture looked like a regression and is not: banned text on a line carrying 
 an unterminated one, exits 2 both before and after. The frozen shipped view's cross-line mode makes
 that line's first backtick a CLOSER, so the text between them has always read as code. Recorded
 because the first reading of it cost twenty minutes.
+
+## Evidence
+
+**Evidences:** TOOL-aWeldedTribunal-3
+- AC1 — amended rev-4 — the original criterion could not observe rule 3 at all; respelled onto a bounded receiver with an over-cap K, logged in section 9
+- AC2 — `node tools/hooks/agent-cap.js` — a legal multi-line backticked prompt with a bounded fan exits 0
+- AC3 — `tools/hooks/agent-cap.js` — the dispatcher returns a code-and-unterminated pair from both arms
+- AC4 — `node tools/hooks/agent-cap.js` — a ref-keyed join below an unterminated backtick exits 2 where it exited 0 before
+- AC5 — `node tools/hooks/agent-cap.js` — a legal join under a terminated multi-line literal exits 0
+- AC5b — `bash tools/hooks/agent-cap.test.sh` — banned text in a single-line terminated template exits 0
+- AC5c — amended rev-5 — the narrowing is a TRADE and not a preservation; the residual is pinned by its own arm, logged in section 9
+- AC6 — `bash tools/hooks/agent-cap.test.sh` — 215 passed, 0 failed
+- AC7 — `node tools/hooks/agent-cap.js` — `tier2-review.js` exits 0

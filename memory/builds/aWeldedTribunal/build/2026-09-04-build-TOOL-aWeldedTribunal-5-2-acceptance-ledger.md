@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-5 — acceptance ledger
 
-**Serves:** build TOOL-aWeldedTribunal-5
+**Serves:** journal TOOL-aWeldedTribunal-5
 
 ## What changed
 
@@ -52,3 +52,15 @@ registered **BOUND** — and the slots were MEASURED against their ceilings firs
 Two builds already in that registry were bound without measuring and have reddened the leg ever
 since; their rows say so. Trimming was the right fix rather than a wider ceiling: the material cut
 was duplicated from the specs and the review records, which is where it still lives.
+
+## Evidence
+
+**Evidences:** TOOL-aWeldedTribunal-5
+- AC1 — `python tools/memory-tree/corpus_ids.py --selftest` — every reader returns the intended value for an inline-commented line; the arm grades against a bash source of the same fixture
+- AC2 — `python tools/memory-tree/corpus_ids.py --selftest` — every reader yields the bare key for an `export`-prefixed line
+- AC2b — `python tools/memory-tree/corpus_ids.py --selftest` — `read_declared_keys` and `load_conf` agree on the key set
+- AC3 — `python tools/memory-tree/gotchas.py --check` — under the old parse the memory root resolved to no directory and the checker walked nothing; under the new one it resolves and walks the tree
+- AC4 — `python tools/memory-tree/corpus_ids.py --check` — 28 declared keys on this repo's real conf, zero differences old-versus-new
+- AC5 — `python tools/memory-tree/corpus_ids.py --selftest` — six spellings graded against bash, including a quoted comment character surviving as data
+- AC6 — `tools/memory-tree/corpus_ids.py` — one quote-strip copy remains, in `parse_conf_line`
+- AC7 — `python tools/memory-tree/corpus_ids.py --selftest` — four readers return defaults on an absent conf and `row_grammar.load_conf` still RAISES, the documented difference

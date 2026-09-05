@@ -123,42 +123,42 @@ check "derive from a source that KEEPS its bound → allow" 0 '{"tool_name":"Wor
 #
 # `LENSES` is bounded by its literal; each line grows it; the fan is bounded-looking and must
 # therefore be refused because the receiver is not.
-deny_growth() { # $1 = label, $2 = the mutation line
+arm_growth_denies() { # $1 = label, $2 = the mutation line
   check "deny-corpus: $1" 2 "$(node -e '
     const m = process.argv[1]
     const s = "export const meta={name:\"x\",description:\"y\"}\nconst MAX_VERIFIERS = 5\nconst LENSES = [1,2,3]\n"
             + m + "\nawait boundedParallel(LENSES.map((L) => () => agent(L)), MAX_VERIFIERS)\n"
     process.stdout.write(JSON.stringify({tool_name:"Workflow",tool_input:{script:s}}))' "$2")"
 }
-deny_growth "a plain push"                    'LENSES.push(x)'
-deny_growth "an unshift"                      'LENSES.unshift(x)'
-deny_growth "an inserting splice"             'LENSES.splice(0, 0, x)'
-deny_growth "a splice with a spread"          'LENSES.splice(...more)'
-deny_growth "inside a template interpolation" 'const s = `${LENSES.push(x)}`'
-deny_growth "after a closing paren"           'if (x) LENSES.push(y)'
-deny_growth "nested in another call"          'sink.push(LENSES.push(9))'
-deny_growth "after a semicolon"               'let i = 0; LENSES.push(x)'
-deny_growth "inside an arrow body"            'const f = () => LENSES.push(x)'
-deny_growth "as an expression statement"      '(LENSES.push(x))'
+arm_growth_denies "a plain push"                    'LENSES.push(x)'
+arm_growth_denies "an unshift"                      'LENSES.unshift(x)'
+arm_growth_denies "an inserting splice"             'LENSES.splice(0, 0, x)'
+arm_growth_denies "a splice with a spread"          'LENSES.splice(...more)'
+arm_growth_denies "inside a template interpolation" 'const s = `${LENSES.push(x)}`'
+arm_growth_denies "after a closing paren"           'if (x) LENSES.push(y)'
+arm_growth_denies "nested in another call"          'sink.push(LENSES.push(9))'
+arm_growth_denies "after a semicolon"               'let i = 0; LENSES.push(x)'
+arm_growth_denies "inside an arrow body"            'const f = () => LENSES.push(x)'
+arm_growth_denies "as an expression statement"      '(LENSES.push(x))'
 # THE VIEW AXIS, which is the one every fold of this build broke and the first corpus did not reach.
 # Round 3's blocker: the take-back view stripped block comments over the JOINED text, so a `/*` in a
 # regex literal — this file models none, by standing decision — opened a phantom comment that ate
 # every take-back down to the next real `*/`. Ten spellings of the MUTATION could not see it,
 # because the mutation was never what changed.
-deny_growth "below a regex literal containing a comment opener" 'const re = /[/*]/
+arm_growth_denies "below a regex literal containing a comment opener" 'const re = /[/*]/
 LENSES.push(x)
 const t = 1 /* a later real closer */'
-deny_growth "between two regex literals"      'const a = /[/*]/
+arm_growth_denies "between two regex literals"      'const a = /[/*]/
 LENSES.push(x)
 const b = /[*/]/'
-deny_growth "on the same line as a closed block comment" '/* note */ LENSES.push(x)'
+arm_growth_denies "on the same line as a closed block comment" '/* note */ LENSES.push(x)'
 # ROUND 4's blocker: a regex literal and a REAL closer on the SAME line. Every strip this build
 # tried paired the two; there is no strip now, so the growth is simply visible.
-deny_growth "regex literal and a real closer on one line" 'if (/[/*]/.test(s)) LENSES.push(x) /* ok */'
-deny_growth "regex literal, growth and closer, all one line" 'const re = /[/*]/; LENSES.push(x); const t = 1 /* pad */'
+arm_growth_denies "regex literal and a real closer on one line" 'if (/[/*]/.test(s)) LENSES.push(x) /* ok */'
+arm_growth_denies "regex literal, growth and closer, all one line" 'const re = /[/*]/; LENSES.push(x); const t = 1 /* pad */'
 # ROUND 4's high: a comment in the argument list hid a top-level spread from the arity test. An
 # argument list carrying a comment is no longer graded at all.
-deny_growth "a comment hiding a spread in splice args" 'LENSES.splice(0, /*
+arm_growth_denies "a comment hiding a spread in splice args" 'LENSES.splice(0, /*
 */ ...rest)'
 # The reassignment half of the same view, which round 3 found this fold had newly broken.
 check "deny-corpus: a reassignment below a regex-literal comment opener" 2 "$(node -e '

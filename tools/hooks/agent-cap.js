@@ -302,7 +302,7 @@ function renderShippedBlanks(script) {
 // it is right, because it runs only when the primary scan already ended inside a literal, and a
 // per-line reset cannot carry one line's damage into the next. It preserves the narrowing within
 // each line, which is what the unit's S6 requires.
-function perLineBlanked(script) {
+function renderPerLineBlanked(script) {
   return script.split(/\r?\n/).map((line) => {
     const one = renderBlankedLiterals(line)
     return one.code[0] === undefined ? '' : one.code[0]
@@ -1312,7 +1312,7 @@ function capFindings(script) {
   // `TOOL-aLexedStripper-5` measured that and it denied a legal script carrying a regex literal with
   // a backtick in it.
   const view = renderBlankedLiterals(script)
-  const code = view.unterminated ? perLineBlanked(script) : view.code
+  const code = view.unterminated ? renderPerLineBlanked(script) : view.code
   const { consts, orBound } = intConsts(code)
   const bad = []
 
@@ -1614,7 +1614,7 @@ function scanJoinFindings(script) {
   // went blind below an unterminated literal. The per-line view preserves S2's narrowing WITHIN each
   // line, which `renderStrippedView` would not — it leaves backticks alone.
   const view = renderBlankedLiterals(script)
-  const code = view.unterminated ? perLineBlanked(script) : view.code
+  const code = view.unterminated ? renderPerLineBlanked(script) : view.code
   const out = []
   // S3 - one ban table, tested against every view of the line. It was three inline conditions per
   // view until the M8 closing review found the second view missing; duplicating them per view would

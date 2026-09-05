@@ -1,6 +1,7 @@
 # The owner's prompt — verbatim
 
-**Serves:** history aWeldedTribunal
+**Serves:** research TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8
+**Commissions:** TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8
 
 The value arrived on the `/unattended` invocation line as `--prompt <value>`. It carried whitespace
 and named no readable file, so per the kit's own routing table it IS the prompt and is taken

@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-4 — acceptance ledger
 
-**Serves:** build TOOL-aWeldedTribunal-4
+**Serves:** journal TOOL-aWeldedTribunal-4
 
 ## What changed
 
@@ -36,3 +36,12 @@ every returned counter must appear in a prompt string is satisfied by a comment.
 documented check performed by reading the block, and the left-shift is the record. What the record
 buys is that the next harness's author is told what the block is FOR, rather than which variables it
 happens to hold.
+
+## Evidence
+
+**Evidences:** TOOL-aWeldedTribunal-4
+- AC1 — `tools/workflows/tier2-review.js` — the synthesis prompt interpolates all eight counters of the section 4 inventory, and carries both instruction sentences
+- AC2 — `memory/builds/aWeldedTribunal/reviews/2026-09-04-review-TOOL-aWeldedTribunal-1-8-diff-round1.md` — the block reached a real record: that report and its three successors each carry a RUN INTEGRITY section with the counters
+- AC3 — `memory/gotchas/degradation-known-but-unreported.md` — names this harness as a closed instance, the counter set, and the DoD line
+- AC4 — `node tools/workflows/check-workflow-syntax.js` — 4 workflow scripts parsed clean, exit 0
+- AC5 — `bash tools/run-gates/run-gates.sh` — the `workflow script syntax` leg is green on the full bar

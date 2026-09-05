@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-7 — acceptance ledger
 
-**Serves:** build TOOL-aWeldedTribunal-7
+**Serves:** journal TOOL-aWeldedTribunal-7
 
 ## What changed
 
@@ -51,3 +51,16 @@ It REPORTS a divergence; it does not PREVENT one. A push made after the report s
 checkout's hook. Closing that window needs a refusal inside the hook itself, which changes what the
 push boundary REFUSES — a wider decision than this row opened, and a filed follow-up. The gotcha
 record therefore KEEPS its landing-boundary documented check rather than losing it to this unit.
+
+## Evidence
+
+**Evidences:** TOOL-aWeldedTribunal-7
+- AC1 — `bash tools/check-wiring.sh --check` — a planted pre-push divergence prints a `note` line naming both blobs and the resolved path
+- AC2 — `bash tools/check-wiring.sh --check` — with that divergence present the check exits 0, which is what distinguishes the resolved option from the vetoed one
+- AC3 — `bash tools/check-wiring.test.sh` — a planted pre-commit divergence reports too, and two divergences still exit 0
+- AC4 — `bash tools/check-wiring.sh --check` — with equal blobs no divergence line prints and the existing ok line stands
+- AC5 — `bash tools/check-wiring.test.sh` — a repo tracking a pre-commit and no pre-push prints `skip` and exits 0
+- AC6 — `bash tools/check-wiring.test.sh` — an unreadable resolved hook reports UNKNOWN, never ok
+- AC7 — `.githooks/pre-push` — the header names the repo-global condition instead of claiming there is no staleness class
+- AC8 — `memory/gotchas/hookspath-resolves-into-another-checkout.md` — no paragraph asserts the comparison is unwritten; both halves refreshed
+- AC9 — `bash tools/check-wiring.test.sh` — 92 passed, 0 failed

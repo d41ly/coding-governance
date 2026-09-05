@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-1 — acceptance ledger
 
-**Serves:** build TOOL-aWeldedTribunal-1
+**Serves:** journal TOOL-aWeldedTribunal-1
 
 ## What changed
 
@@ -55,3 +55,13 @@ no keyword before the opener for the tail arm. Named as a residual in §3 of the
 here. The `do` spelling is deliberately absent from `LOOP_KEYWORD_TAIL`, because a `do` block opens
 with a brace and never appears as an enclosing paren opener; putting it there would match nothing and
 imply coverage that does not exist.
+
+## Evidence
+
+**Evidences:** TOOL-aWeldedTribunal-1
+- AC1 — `node tools/hooks/agent-cap.js` — a `for await` thunk-array fan exits 2; it exited 0 against the shipped hook before this unit
+- AC2 — `node tools/hooks/agent-cap.js` — the same fan inside a `do`/`while` block exits 2; it exited 0 before
+- AC3 — `bash tools/hooks/agent-cap.test.sh` — 169 passed, 0 failed BEFORE this unit's arms were added, so no pre-existing arm changed verdict
+- AC4 — `node tools/hooks/agent-cap.js` — all five tracked harnesses still exit 0, compared against the baseline in the pre-wiring measurement record
+- AC5 — `node tools/hooks/agent-cap.js` — a `for await` fan reached through the OPENER walk exits 2, which needed the end-of-text sibling form
+- AC6 — `tools/hooks/agent-cap.js` — one keyword source plus two derived siblings; the six inline literals are gone

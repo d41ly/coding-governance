@@ -1,6 +1,6 @@
 # TOOL-aWeldedTribunal-2 — acceptance ledger
 
-**Serves:** build TOOL-aWeldedTribunal-2
+**Serves:** journal TOOL-aWeldedTribunal-2
 
 ## What changed
 
@@ -45,3 +45,14 @@ Mutation through an alias (`const b = batches; b.push(…)`), and growth by inde
 end or by writing `.length`. Both are named residuals in the spec's §3. The index form is excluded
 deliberately: a regex over `name[<expr>] =` matches every ordinary element write and would deny
 innocent files, which is the direction this whole build's pre-wiring rule exists to prevent.
+
+## Evidence
+
+**Evidences:** TOOL-aWeldedTribunal-2
+- AC1 — `node tools/hooks/agent-cap.js` — the push-plus-inline-map fan exits 2 naming `batches` and the mutation; the same script against the pre-unit blob exits 0
+- AC2 — `node tools/hooks/agent-cap.js` — with the growth removed the script exits 0
+- AC2b — `bash tools/hooks/agent-cap.test.sh` — a push with a DETACHED map fan exits 0, the legal control
+- AC3 — `bash tools/hooks/agent-cap.test.sh` — one arm per new verb: `unshift` and `splice` each exit 2
+- AC4 — `node tools/hooks/agent-cap.js` — all five tracked harnesses exit 0, matching the recorded baseline
+- AC5 — `bash tools/hooks/agent-cap.test.sh` — 215 passed, 0 failed at the closing tree
+- AC6 — amended rev-2 — the shared-source demand was REFUTED by the pre-wiring run and inverted: the two vocabularies are separate constants, logged in section 9

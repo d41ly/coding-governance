@@ -1,6 +1,6 @@
 # What bash actually does with the two spellings, and a STALE claim the backlog row carried
 
-**Serves:** history TOOL-aWeldedTribunal-5
+**Serves:** journal TOOL-aWeldedTribunal-5
 
 Run on node `a`, 2026-09-04, at `711c4c50`. Both probes READ only.
 

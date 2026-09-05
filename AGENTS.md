@@ -538,11 +538,8 @@ read the durable summary instead.
 **The push boundary is where the bar binds.** The tracked `.githooks/pre-push` hook runs
 `tools/run-gates/run-gates.sh` once on a default-branch push and blocks a red one (it classifies on the remote
 ref, the validated tree must be the pushed tip, `GOV_GATE_CMD` overrides the gate for testing, and
-`--no-verify` bypasses). Earlier runs are diff-scoped and are developer-choice. The active hooks are
-the tracked `.githooks/` dir via `core.hooksPath` — but that setting is repo-GLOBAL and ABSOLUTE, so
-in this multi-worktree layout it resolves into whatever the PRIMARY tree has checked out, and the
-hook gating your push can be a different branch's. `check-wiring.sh` check H compares both tracked
-hooks against the resolved ones and REPORTS a divergence as a `note`; it does not prevent one. A tracked pre-commit fast leg sits beside it and also enforces the
+`--no-verify` bypasses). Earlier runs are diff-scoped and are developer-choice. `core.hooksPath` is
+repo-GLOBAL, so the hook gating your push is the PRIMARY tree's; check H REPORTS a divergence. A tracked pre-commit fast leg sits beside it and also enforces the
 branch guard, refusing a primary-tree commit off the default branch (`GOV_DEFAULT_BRANCH` pins it).
 A SessionStart hook runs `tools/check-wiring.sh --session`, which auto-sets an unset
 `core.hooksPath` and never clobbers a set one, so a fresh clone self-heals rather than running with

@@ -1,6 +1,6 @@
 # Candidate-predicate measurement, before any of the three predicates was wired
 
-**Serves:** history TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-4
+**Serves:** journal TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-4
 
 The charter's §7 rule: run a candidate gate predicate over the real tree before wiring it, and print
 hits AND near-misses. Run on node `a`, 2026-09-04, at `4fc4aeb3`, over the 8 tracked `*.js` files.
