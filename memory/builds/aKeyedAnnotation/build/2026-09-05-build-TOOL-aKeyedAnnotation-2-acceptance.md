@@ -21,8 +21,10 @@
   green whatever the citations did. Observed RED against the wide population, where the value stayed
   at 1.
 - AC5 — `python tools/drift-audit/drift_report.py --json` — after this unit the signal reports value
-  2, judgeable population 67, evidence-file count 186, live true, pin 2. Both liveness halves
-  non-empty.
+  2 against its pin of 2, with both liveness halves non-empty and live true. The two population
+  figures are DERIVED by that command and not copied here: they moved once during this build, when
+  the closing review found the narrowing named three test-file spellings and left every fixture
+  DIRECTORY inside the population it was written to narrow.
 - AC6 — `python tools/drift-audit/selftest.py` — exit 0 with eight new checks present: the five arms,
   their two control halves, and the byte-compare. Every arm observed RED against the mechanism it
   guards, by staging each pre-change form in turn and confirming which arms flipped.

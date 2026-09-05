@@ -119,6 +119,12 @@ def test_dossier_affordance_present_or_graced() -> None:
     )
 
 
+# A NEW DOSSIER'S `decisions` LIST STARTS EMPTY AND IS NOT FINISHED THERE. It holds the unit ids
+# that govern the feature, it is graded shrink-only by the check below, and it is filled as those
+# ids are learned rather than guessed — a guessed id RESOLVES, which makes it worse than a visibly
+# empty list. This guidance sits here, beside the check that reads the population, rather than in
+# the scaffolder: the skeleton it was first written into is the one file the dossier loader
+# EXCLUDES from that population, so the check could never see it.
 def test_dossier_decisions_are_declining() -> None:
     """How many dossiers declare NO decisions, against a shrink-only pin.
 

@@ -1820,8 +1820,23 @@ def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
     spec.loader.exec_module(mod)
     root = KIT.parent.parent
     families = mod._families_of(mod.load_conf(root))
+    # AGAINST THE EXTRACTOR ITSELF, not against the accessor. The accessor falls back to the local
+    # copy on ANY import failure, so comparing the two compared the copy to itself and passed for
+    # free -- reproduced by forcing the import to raise. The arm now imports the extractor by path
+    # and lets an import failure FAIL rather than quietly satisfy it.
+    espec = importlib.util.spec_from_file_location("_recall_extract_probe", extractor)
+    emod = importlib.util.module_from_spec(espec)
+    sys.path.insert(0, str(extractor.parent))
+    try:
+        espec.loader.exec_module(emod)
+        shipped = emod.grammar_for(root).ID
+    finally:
+        try:
+            sys.path.remove(str(extractor.parent))
+        except ValueError:
+            pass
     check("local grammar equals the extractor's for this tree",
-          mod._local_ident(families) == mod._grammar_ident(root, families),
+          mod._local_ident(families) == shipped,
           "the local fallback has diverged from the shipped alternation")
 
 

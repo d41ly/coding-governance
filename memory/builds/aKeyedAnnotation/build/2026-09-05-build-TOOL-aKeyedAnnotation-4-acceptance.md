@@ -18,9 +18,13 @@
 - AC4 — `python tools/codebase-map/test_codebase_map.py` — the check asserts a non-empty dossier
   population before reporting any count, so a map root holding none is a named refusal rather than a
   perfect score.
-- AC5 — `python tools/codebase-map/gen_map.py` — the scaffolded key no longer reads as a finished
-  empty declaration: it carries a comment naming what belongs there and stating that the field is
-  graded shrink-only.
+- AC5 — AMENDED, because the mechanism it names does not exist. `tools/codebase-map/gen_map.py`
+  scaffolds only the FOUNDATION file, and that is the ONE file the dossier loader excludes from the
+  population the new check grades — so annotating it, which is what this unit did first, put the
+  guidance where no reader the check could red would ever see it. There is no feature-dossier
+  scaffolder to fix. The guidance now sits beside the check itself, in the module that reads the
+  population, where a dossier author writing a new one is actually looking. The FOUNDATION skeleton
+  is left as it was rather than carrying a comment that would count as the mechanism.
 - AC6 — `git grep -w -F` against the memory root for the ONE id this unit added. It resolves to a
   decision row that governs that dossier directly — the ruling that put the build method in the
   memory-tree kit and made it ride the parity leg as a pair row, which is the same seam unit 1
@@ -41,6 +45,21 @@
   ref does not carry, so a pin is unratcheted on the branch that introduces it.
 - AC10 — `cmp tools/codebase-map/test_codebase_map.py tools/codebase-map/test_codebase_map.template.py`
   — identical after the change.
+
+## Two documented checks, written down rather than waved
+
+Neither has a proportionate machine form, so §7's rule applies: an exemption is recorded with
+its compensating check or it is not an exemption.
+
+- **A dossier-shaped repair names the POPULATION the check reads, not the file the edit
+  touched.** S4's honesty comment first landed in the scaffolder's FOUNDATION skeleton, which
+  is the one file the dossier loader excludes from the population the new check grades — so the
+  guidance could never reach a reader the check would red. It now sits beside the check itself.
+  The criterion should have named the population; that is the check.
+- **A unit that changes the reuse audit's output SHAPE updates its agent-facing doc in the same
+  commit.** The decisions clause is a second line per candidate, and that doc still described a
+  candidate as exactly one line. Nothing breaks and no predicate is proportionate, so this is a
+  Definition-of-Done item on the codebase-map dossier rather than a leg.
 
 ## What this unit broke on its way past, and did not absorb
 

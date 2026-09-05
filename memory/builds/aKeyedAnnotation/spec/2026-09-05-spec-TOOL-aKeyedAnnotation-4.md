@@ -9,6 +9,7 @@
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 |
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 |
 | [2026-09-05-build-TOOL-aKeyedAnnotation-4-acceptance.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-4-acceptance.md) | journal | — |
+| [2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round1.md) | diff-review | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 |
 
@@ -71,7 +72,11 @@ orienting agent gets the seam AND the reasoning behind it.
   gets: a declared pin and no enforcement, which is a documented gap rather than a silent one. The
   kit's own registry idiom under the map root was not taken because it exempts NAMED subjects from a
   rule, where this is a COUNT that must decline; the two are not interchangeable.
-- **S4** The scaffold template in `tools/codebase-map/gen_map.py` stops emitting an empty list as the
+- **S4** AMENDED at build time: the file this item names scaffolds only the FOUNDATION document,
+  which the dossier loader EXCLUDES from the population the check grades, and there is no
+  feature-dossier scaffolder anywhere to change. The guidance therefore lands beside the check that
+  reads the population instead. What follows is the item as written, kept so the amendment has
+  something to be an amendment to. The scaffold template in `tools/codebase-map/gen_map.py` stops emitting an empty list as the
   finished state. It either emits the key with a comment naming what belongs there, or the check's
   message names the scaffold as the source when a fresh dossier trips it — whichever keeps the
   scaffolder honest without making a legitimately new dossier unlandable.

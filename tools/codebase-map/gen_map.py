@@ -73,7 +73,7 @@ feature = "foundation"
 title = "Foundation — shared substrate claimed outside any single feature"
 status = "shipped"
 streams = ["architecture"]
-decisions = []  # unit ids that govern this feature; graded shrink-only, fill as you learn them
+decisions = []
 
 [claims]
 {claims}

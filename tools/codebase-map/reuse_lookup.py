@@ -64,13 +64,13 @@ class Candidate:
     kind: str = ""                  # symbol kind (function/class/component/const-export), else ""
     file: str = ""                  # def file (symbols only) — for fan-in + "read this"
     detail: str = ""                # inventory id / owning dossier — human context
-    # The unit ids the owning dossier declares. A SEPARATE field on purpose: `detail` is one
-    # overloaded string that `_sources` branches on to resolve a candidate back to its dossier
-    # or its inventory, so folding ids into it would corrupt that branch.
-    decisions: tuple = ()
 
 
-_DECISIONS_RE = re.compile(r"^decisions\s*=\s*\[([^\]]*)\]", re.M)
+# MULTI-LINE and COMMENTED arrays are legal TOML and this corpus has both, so the body is stripped
+# of comments before it is split and every token is shape-checked. Without that a `# why` comment
+# was emitted as an id and the real id on the next line was swallowed with it.
+_DECISIONS_RE = re.compile(r"^decisions\s*=\s*\[([^\]]*)\]", re.M | re.S)
+_ID_SHAPE = re.compile(r"^[A-Z][A-Z0-9]{1,11}-[A-Za-z0-9][A-Za-z0-9-]*$")
 
 
 def _dossier_decisions(text: str) -> tuple:
@@ -78,12 +78,15 @@ def _dossier_decisions(text: str) -> tuple:
 
     A front-matter read rather than a parse, so this module keeps needing no project layer.
     An absent or empty list yields an empty tuple, which prints no clause at all -- an empty
-    clause would be noise on every candidate from the 17 dossiers that declare none.
+    clause would be noise on the dossiers that declare none, which `DOSSIER_DECISIONS_EMPTY_PIN`
+    in `.codebase-map.conf` counts. No figure here: it is a live count and it has already moved.
     """
     m_ = _DECISIONS_RE.search(text)
     if not m_:
         return ()
-    return tuple(t.strip().strip('"').strip("\'") for t in m_.group(1).split(",") if t.strip())
+    body = re.sub(r"#[^\n]*", "", m_.group(1))
+    toks = (t.strip().strip('"').strip("\'") for t in body.split(","))
+    return tuple(t for t in toks if _ID_SHAPE.match(t))
 
 
 @dataclass
@@ -91,6 +94,7 @@ class Corpus:
     candidates: dict[str, Candidate]        # name -> merged candidate
     shared_seams: dict[str, str]            # feature -> `## Shared seams` prose
     symbol_files: list[str]                 # symbols.json file list (reference-scan roots)
+    decisions_by_feature: dict = None       # feature -> the unit ids that dossier declares
     recall_dark: tuple[str, ...] = ()       # layers declared uncovered in .codebase-map.conf
     threshold: int = m.SEAM_FANIN_THRESHOLD_DEFAULT
     has_symbols: bool = False               # was symbols.json present (recall tier adopted)?
@@ -154,13 +158,12 @@ def load_corpus(root: Path | None = None) -> Corpus:
 
     candidates: dict[str, Candidate] = {}
 
-    def merge(name: str, source: str, *, kind: str = "", file: str = "", detail: str = "",
-              decisions: tuple = ()) -> None:
+    def merge(name: str, source: str, *, kind: str = "", file: str = "", detail: str = "") -> None:
         if not name:
             return
         prev = candidates.get(name)
         if prev is None:
-            candidates[name] = Candidate(name, (source,), kind, file, detail, decisions)
+            candidates[name] = Candidate(name, (source,), kind, file, detail)
             return
         candidates[name] = Candidate(
             name,
@@ -168,7 +171,6 @@ def load_corpus(root: Path | None = None) -> Corpus:
             kind or prev.kind,
             file or prev.file,
             detail or prev.detail,
-            decisions or prev.decisions,
         )
 
     symbol_files: list[str] = []
@@ -184,13 +186,20 @@ def load_corpus(root: Path | None = None) -> Corpus:
                 merge(key, "inventory", detail=inv_id)
 
     shared_seams: dict[str, str] = {}
+    # KEYED BY FEATURE, not carried on the candidate, and that is the whole fix for two defects at
+    # once. A candidate merges across sources under a per-field last-write rule, so a seam name
+    # declared by two dossiers kept one dossier's label and the other's ids. And the synthetic
+    # `<feature> (## Shared seams)` candidate is constructed elsewhere, so a per-candidate field
+    # left it empty and a dossier surfaced as ITSELF could never print its own ids. One carrier,
+    # looked up by the label the line already prints, cannot do either.
+    decisions_by_feature: dict[str, tuple] = {}
     for feature, text in m.load_dossier_texts(map_dir).items():
         # The ids come out of the dossier TEXT, not a parsed dossier. That is the whole reason
         # this is a front-matter read: the parsed form needs the project-side extractor, and
         # this module's header declares it portable precisely so it needs none.
-        decisions = _dossier_decisions(text)
+        decisions_by_feature[feature] = _dossier_decisions(text)
         for seam in m.parse_affordance(text).seams:
-            merge(seam, "affordance-seam", detail=feature, decisions=decisions)
+            merge(seam, "affordance-seam", detail=feature)
         prose = _section_body(text, "## Shared seams")
         if prose:
             shared_seams[feature] = prose
@@ -199,6 +208,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
     return Corpus(
         candidates=candidates,
         shared_seams=shared_seams,
+        decisions_by_feature=decisions_by_feature,
         symbol_files=sorted(set(symbol_files)),
         recall_dark=recall_dark,
         threshold=m.seam_fanin_threshold(root),
@@ -337,7 +347,7 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
     else:
         out.append("## candidates (ranked - read these before building)")
         for r in shortlist.ranked:
-            out.append(_line(r))
+            out.append(_line(r, corpus))
         out.append("")
         out.append("## sources to open")
         for line in _sources(shortlist, corpus):
@@ -360,7 +370,7 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
     return "\n".join(out) + "\n"
 
 
-def _line(r: Ranked) -> str:
+def _line(r: Ranked, corpus: "Corpus | None" = None) -> str:
     c = r.candidate
     bits = []
     if c.kind:
@@ -381,8 +391,9 @@ def _line(r: Ranked) -> str:
     # EVERY id, not the first few. The range digest truncates because it prints one line per
     # feature over a whole commit range; here the reader is deciding whether to extend this
     # seam, and a hidden id is a hidden reason.
-    if c.decisions:
-        head += "\n    decisions: " + " ".join(c.decisions)
+    ids = (corpus.decisions_by_feature or {}).get(c.detail, ()) if corpus else ()
+    if ids:
+        head += "\n    decisions: " + " ".join(ids)
     return head
 
 

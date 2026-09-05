@@ -9,6 +9,7 @@
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-citation-census.py) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-1-design-pass.md) | research | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-build-TOOL-aKeyedAnnotation-2-acceptance.md](../build/2026-09-05-build-TOOL-aKeyedAnnotation-2-acceptance.md) | journal | — |
+| [2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-2-3-4-closing-diff-round1.md) | diff-review | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round1.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 | [2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md](../reviews/2026-09-05-review-TOOL-aKeyedAnnotation-1-round2.md) | spec-audit | TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 |
 
@@ -154,10 +155,13 @@ arguably INPROGRESS — is real and a later reader needs it.
   test and the import path is covered by one arm in one tree; closing that properly means a fixture
   that installs both kits, which is a bigger change than this unit carries. Stated rather than left
   for the next reader to discover. Below that: five regression arms, each observed RED first, plus two left-shifts
-  the round-1 audit named and this unit owns: a self-test arm that, for EVERY signal whose
-  declaration is a glob set, empties that declaration and asserts its liveness flag goes False —
-  which gates the class rather than this instance — and a ban-grep so no module outside the recall
-  extractor imports its module-level grammar constants. No new leg.
+  the round-1 audit named and this unit DEFERRED rather than owned. Both are recorded as backlog
+  rows rather than dropped, which is the whole difference: a deferral is a decision and a silent
+  drop is not, and the closing review found this §5 still claiming ownership after the unit CLOSED.
+  (i) A self-test arm that, for EVERY signal whose declaration is a glob set, empties that
+  declaration and asserts its liveness flag goes False — the class rather than this instance; this
+  unit shipped the instance for its own signal and no generalisation. (ii) A ban-grep so no module
+  outside the recall extractor imports its module-level grammar constants. No new leg.
 - migration / rollback — pure revert; the pin value moves with the code that changed it.
 - user docs — the kit README records both corrections it already carries; this adds the third.
 

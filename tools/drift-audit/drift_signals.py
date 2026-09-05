@@ -84,6 +84,13 @@ EVIDENCE_GLOBS: list[str] = [
     ":(exclude)*.test.sh",
     ":(exclude)*/selftest.py",
     ":(exclude)*/test_*.py",
+    # FIXTURE DIRECTORIES, not just test FILENAMES. The three lines above name three spellings of
+    # "a test file" and left every fixture tree inside the population this list exists to narrow,
+    # which is the gate-the-instance-not-the-class shape. Re-measured in the same commit.
+    ":(exclude)*/fixtures/*",
+    ":(exclude)*/fixture-*/*",
+    ":(exclude)*.fixture.md",
+    ":(exclude)*.test-template.py",
 ]
 
 # --------------------------------------------------------------------------------------------
@@ -281,8 +288,11 @@ PINS: dict[str, int] = {
     # actionable rather than tolerated. A drain target from the first commit, which is why it is
     # shrink-only rather than a tolerance — and shrink-only means the RATCHETS row below, not
     # this sentence.
-    # 2 - MEASURED on this corpus at the unit that added the signal: 400 distinct ids cited from
-    # 255 tracked non-memory source files, against 108 slugs anchored by a record. Both
+    # 2 - MEASURED on this corpus at the unit that added the signal. NO POPULATION FIGURES HERE,
+    # and that is the correction rather than an omission: an earlier revision stated the cited-id
+    # count and it was wrong at the very commit that wrote it, because the count moves whenever a
+    # record or a source file does. The signal derives and PRINTS its own `of`, `known_slugs` and
+    # `scanned_source_files` on every run; read them there. Both
     # survivors belong to one foreign build whose records were minted and never written, and
     # both are already filed as a backlog row. Every other dangling citation in the tree is a
     # fixture id under a slug no record anchors, and the discriminator drops all of them with

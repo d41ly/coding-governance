@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-05
 streams: tooling
 roster: TOOL
-ids: TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8 TOOL-aKeyedAnnotation-9 TOOL-aKeyedAnnotation-10 TOOL-aKeyedAnnotation-11
+ids: TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8 TOOL-aKeyedAnnotation-9 TOOL-aKeyedAnnotation-10 TOOL-aKeyedAnnotation-11 TOOL-aKeyedAnnotation-12 TOOL-aKeyedAnnotation-13
 ---
 
 # aKeyedAnnotation — the annotation layer this repo already has, made correct instead of made bigger
@@ -83,7 +83,8 @@ validated field that already owns the code-to-decision link, and writes the conv
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-09-05 · streams tooling
-ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8 TOOL-aKeyedAnnotation-9 TOOL-aKeyedAnnotation-10 TOOL-aKeyedAnnotation-11
+ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL-aKeyedAnnotation-4 TOOL-aKeyedAnnotation-5 TOOL-aKeyedAnnotation-6 TOOL-aKeyedAnnotation-7 TOOL-aKeyedAnnotation-8 TOOL-aKeyedAnnotation-9 TOOL-aKeyedAnnotation-10 TOOL-aKeyedAnnotation-11 TOOL-aKeyedAnnotation-12
+ids TOOL-aKeyedAnnotation-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -94,7 +95,7 @@ ids TOOL-aKeyedAnnotation-1 TOOL-aKeyedAnnotation-2 TOOL-aKeyedAnnotation-3 TOOL
 | [TOOL-aKeyedAnnotation-4 — the dossier `decisions` field becomes live and shrink-only](spec/2026-09-05-spec-TOOL-aKeyedAnnotation-4.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 9 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

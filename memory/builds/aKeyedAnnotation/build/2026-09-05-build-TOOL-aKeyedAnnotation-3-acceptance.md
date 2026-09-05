@@ -5,9 +5,12 @@
 
 **Evidences:** TOOL-aKeyedAnnotation-3
 
-- AC1 — `python tools/drift-audit/drift_report.py --json` — the signal reports value 2 over a
-  judgeable population of 400 cited ids, from 255 scanned source files against 108 anchored slugs,
-  and the two are exactly the ids measured at this base. No fixture id among them.
+- AC1 — `python tools/drift-audit/drift_report.py --json` — the signal reports value 2, and the two
+  are exactly the ids measured at this base, with no fixture id among them. The populations it
+  reports beside that value — the cited-id count, the anchored-slug count and the scanned-file count
+  — are DERIVED by the command and deliberately not copied here. An earlier revision of this line
+  copied one and it was already wrong at the commit that wrote it, which is the defect the closing
+  review raised as a blocker: the build about honest annotations shipped a dishonest one.
 - AC2 — `python tools/drift-audit/selftest.py` — both directions. A fabricated id planted under a
   slug that anchors a record raises the count by one; the same shape under a slug that anchors none
   does not move it. One half alone would pass for a signal that counts everything, the other for one

@@ -453,6 +453,7 @@ _STATUS = re.compile(r"^\*\*Status:\*\*\s*([A-Za-z]+)", re.M)
 # silently in an adopter. This is unit 2's F1 resolution, and unit 3 adopts it by reference rather
 # than deciding the same boundary twice.
 _NODE_TAG_CLASS = "a-z"
+_FAMILY_SHAPE = re.compile(r"^[A-Z][A-Z0-9]*$")
 
 
 def _local_ident(families) -> str:
@@ -496,8 +497,12 @@ def _grammar_ident(root, families) -> str:
 def _local_anchors(ident: str):
     """The LOCAL COPY of the four anchor shapes, for a tree with no recall kit.
 
-    Same discipline as `_local_ident`: byte-compared against the extractor's own anchors by this
-    kit's self-test whenever that kit is present. An anchor is a line that DEFINES a record, as
+    UNGUARDED, and said so rather than claimed otherwise. The sibling `_local_ident` IS
+    byte-compared against the extractor by this kit's self-test; these anchor patterns are NOT,
+    because the extractor builds them without the multiline flag this module needs and the two
+    `.pattern` strings are therefore not equal. An earlier revision of this docstring asserted the
+    comparison anyway, which is precisely the "an assertion with no observation behind it" the
+    annotation guide this same build shipped lists as a MUST NOT. An anchor is a line that DEFINES a record, as
     opposed to one that merely cites it, and the distinction is the whole of the signal below — a
     head-anchored id is DEFINED, so a record complaining about a missing unit would silently create
     it. That class is `memory/gotchas/record-citing-a-foreign-id-defines-or-orphans-it.md`.
@@ -543,12 +548,16 @@ def _families_of(conf) -> tuple:
     # DECLARATION ORDER, not sorted. The alternation must be byte-identical to the one the
     # extractor builds or the self-test that keeps this copy honest compares two spellings of
     # the same grammar and reports a divergence that is not one.
+    # THE SAME RULE THE RECALL CONF USES, and it is not "split on a colon". That reader takes the
+    # part after the LAST colon and keeps only tokens shaped like a family, so a discipline-free
+    # entry and a token carrying a regex metacharacter are both dropped rather than one being
+    # silently admitted here and rejected there. Two readers of one conf that disagree either way
+    # is the recorded class; an unvalidated token also reaches `re.compile` below, where it is a
+    # traceback rather than a named refusal.
     out = []
     for pair in pairs:
-        if ":" not in pair:
-            continue
-        fam = pair.split(":")[-1]
-        if fam not in out:
+        fam = pair.rpartition(":")[2]
+        if _FAMILY_SHAPE.match(fam) and fam not in out:
             out.append(fam)
     return tuple(out)
 
@@ -842,11 +851,14 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         if when.group(1) < ctx.trace_cutoff:
             unjudged += 1  # grandfathered: it closed before the convention it would be judged by.
             continue
-        checked += 1
         uid, slug = own.group(1), _slug_of(own.group(1))
         if slug is None:
             unjudged += 1  # an era with no slug: this BUILD-level question has no key here.
             continue
+        # AFTER the guard, never before it. The two earlier unjudged paths `continue` above this
+        # line; the slug guard was added below it, so a pre-slug-era id landed in BOTH the judged
+        # denominator and the unjudged count, and a corpus that was entirely pre-slug read as live.
+        checked += 1
         # SLUG ONLY, and that is not a narrowing: `\bslug\b` already matches inside
         # `FAMILY-slug-seq`, because the hyphens either side of the slug are non-word bytes.
         # An `id or slug` disjunct reads like a two-key oracle and is one unfalsifiable clause;

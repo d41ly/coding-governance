@@ -66,6 +66,11 @@ is at the call site in `tools/check-wiring.sh`, beside the list it acts on, and 
 repeated here: this record owns the CLASS, the call site owns why this instance takes the severity
 it takes. The two used to carry the same paragraph word for word.
 
+The severity matters because `.unattended.conf` makes that check an unattended run's precondition,
+so redding here would refuse a run for a sibling checkout's branch. That path is named rather than
+paraphrased: trimming the duplicated paragraph took this record's only anchor to it, which silently
+stopped the class routing to diffs that touch it.
+
 ## Related
 
 [[fresh-worktree-crlf-reds-the-bar]] is the same shape from the other side — a property of the
