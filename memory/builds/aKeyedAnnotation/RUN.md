@@ -28,3 +28,7 @@ base: 87dbc7dff8258de626a1a8af58c1f1bd9dcb6e4d
 2026-09-05T11:18:55Z review · item TOOL-aKeyedAnnotation-3 · reason verdict CLEAN · blockers 0 · CONVERGED
 
 2026-09-05T11:18:56Z review · item TOOL-aKeyedAnnotation-4 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-05T11:51:50Z review · item TOOL-aKeyedAnnotation-1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold
+
+2026-09-05T11:51:55Z review · item TOOL-aKeyedAnnotation-2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
