@@ -43,7 +43,7 @@ E = C.grammar(ROOT)
 SRC_EXT = (".py", ".sh", ".js", ".json", ".toml", ".txt", ".conf", ".md")
 
 
-def is_test(p: str) -> bool:
+def check_test_path(p: str) -> bool:
     """A file whose ids are FIXTURES, not citations. Deliberately generous: a gate that mistakes a
     fixture for a dangling pointer is a gate nobody can drain, so the split errs toward test."""
     return (
@@ -60,10 +60,10 @@ def main() -> int:
 
     tracked = [p for p in C.run("git", "ls-files", cwd=ROOT).split("\n") if p]
     source = [p for p in tracked if not p.startswith(MEM) and p.endswith(SRC_EXT)]
-    prod_files = [p for p in source if not is_test(p)]
-    test_files = [p for p in source if is_test(p)]
+    prod_files = [p for p in source if not check_test_path(p)]
+    test_files = [p for p in source if check_test_path(p)]
 
-    def cites(paths):
+    def scan_citations(paths):
         by_id, by_file = {}, {}
         for p in paths:
             try:
@@ -78,8 +78,8 @@ def main() -> int:
                 by_file[p] = n
         return by_id, by_file
 
-    prod_ids, prod_by_file = cites(prod_files)
-    test_ids, test_by_file = cites(test_files)
+    prod_ids, prod_by_file = scan_citations(prod_files)
+    test_ids, test_by_file = scan_citations(test_files)
 
     spec_h1 = re.compile(r"^#\s+[`*]*(" + E.ID + r")\b", re.M)
     units = set()
