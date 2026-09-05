@@ -4,7 +4,7 @@ id = "unattended"
 home = "tools/unattended"
 scope = "repo"
 version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
-requires = ["memory-tree"]
+requires = ["memory-tree", "review-harness"]
 
 [[files]]
 include = "**"
