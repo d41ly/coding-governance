@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 87dbc7dff8258de626a1a8af58c1f1bd9dcb6e4d
-phase: RUNNING
+witness: 18d6ae569de4fa6e096c78dddbf30b53854414b6
+phase: SPECCING
 mode: slug
 anchor-kind: default-branch
 keepalive: 00075dc7
@@ -20,3 +20,11 @@ anchor-ref: refs/heads/main
 base: 87dbc7dff8258de626a1a8af58c1f1bd9dcb6e4d
 
 ## Parked
+
+2026-09-05T11:18:51Z review · item TOOL-aKeyedAnnotation-1 · reason verdict BLOCKED · blockers 1
+
+2026-09-05T11:18:53Z review · item TOOL-aKeyedAnnotation-2 · reason verdict BLOCKED · blockers 1
+
+2026-09-05T11:18:55Z review · item TOOL-aKeyedAnnotation-3 · reason verdict CLEAN · blockers 0 · CONVERGED
+
+2026-09-05T11:18:56Z review · item TOOL-aKeyedAnnotation-4 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
