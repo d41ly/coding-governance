@@ -13,10 +13,17 @@
 #
 # WHY THE BUILD COMMIT AND NOT ITS FIRST PARENT, which is where the sibling `pass-order` leg anchors.
 # `--brief` STAGES its row rather than committing it, so the row lands in the same commit as the
-# pass. Measured over the three tracked builds that carry brief rows: twenty-six units carry a row at
-# their build commit and exactly ONE of those also carries one at the first parent, so a first-parent
-# anchor reds 25 of 26 CONFORMING units - including `TOOL-dBriefedPass-2`, the unit that built the
-# verb. The anchor is the build commit itself.
+# pass. MEASURED 2026-09-04 at `c4fcf5ad` over the three tracked builds that carried brief rows:
+# twenty-six units carried a row at their build commit and exactly ONE of those also carried one at
+# the first parent, so a first-parent anchor redded 25 of 26 CONFORMING units - including
+# `TOOL-dBriefedPass-2`, the unit that built the verb. That is a dated snapshot of a population that
+# GROWS, which is why it is stated here, once, with its commit, and nowhere else.
+#
+# THE TWO LEGS ARE JOINTLY SATISFIABLE, which a reader meeting them together will want to know before
+# concluding otherwise: `pass-order` wants a conforming spec at the build commit's PARENT and this one
+# wants a brief row AT the build commit, and one conforming pass satisfies both by writing the spec in
+# an earlier commit and the brief row alongside the code. Two guards asking one question two ways is a
+# recorded class in this tree; these ask two questions.
 #
 # WHAT THIS DOES NOT CHECK, stated in the header because a structural check reads as a semantic one
 # to everybody who did not write it:

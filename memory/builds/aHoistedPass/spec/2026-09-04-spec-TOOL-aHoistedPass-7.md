@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-7 — a brief on disk before the code that cites it
 
-**Status:** CLOSED · rev-7 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
+**Status:** CLOSED · rev-8 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
 
 **Every `tools/unattended/check-pass-order.sh` address in this document is derived at the run's BASE
 `e828f778`, not at the drafting base above, and each is cited BY NAME with the line number as a
@@ -236,13 +236,20 @@ right answer at that point rather than now.
 
 ### Files touched (estimate)
 
+**Re-derived at rev-7 from what the build actually touched, and the estimate was wrong in both
+directions.** Three entries were the SPENT bump's and are struck: `tools/unattended/unattended.sh`,
+`tools/unattended/check-unattended.sh` and ~~the five tracked `tools/unattended/*.template.md`
+markers~~ — leaving them standing is the amendment-leaves-its-other-half-standing class, one rev
+after the amendment that spent them. Three were MISSING: the protocol pair and the kickoff manifest.
+
 `tools/unattended/check-brief-recorded.sh` (new) · `tools/unattended/check-brief-recorded.test.sh`
 (new) · `tools/unattended/lib-unattended.sh` · `tools/unattended/check-pass-order.sh` ·
-`tools/unattended/unattended.sh` · `tools/unattended/check-unattended.sh` ·
+`tools/unattended/PROTOCOL.template.md` · `memory/guides/UNATTENDED-PROTOCOL.md` ·
 `tools/unattended/.unattended.conf.example` · `.unattended.conf` ·
-`tools/unattended/run-unattended-gates.sh` · `tools/unattended/kit.toml` · the five tracked
-`tools/unattended/*.template.md` markers · `tools/check-kit-versions.sh` · `tools/gate-legs.json` ·
+`tools/unattended/run-unattended-gates.sh` · `tools/unattended/kit.toml` ·
+`tools/unattended/README.md` · `tools/check-kit-versions.sh` · `tools/gate-legs.json` ·
 `tools/govkit/subject-pins.tsv` · `tools/install-prefix-carried.txt` ·
+`memory/guides/SESSION-KICKOFF.md` (the `last-audit` re-stamp two watched files force) ·
 `memory/map/features/unattended.md` and the regenerated map artifacts.
 
 **This unit is NOT owner-gated by the version bump, and rev-4 re-derives the classification from
@@ -540,6 +547,22 @@ result reported, and AC7 asserts the four liveness counts are byte-identical acr
   than tidied:** the row was written before this rev line, because the failure that required it
   arrived from a gate run and not from reading. S5 and §5 now carry it, and the declared write set
   was WIDENED through `--dispatch` before either file was touched.
+
+- rev-8 - 2026-09-05 - **the bug-class checklist over the unit's own committed diff**, run per M6 on
+  `HEAD~1..HEAD` and folded rather than filed. Four classes it named were live in what had just
+  landed. **two-answers-to-one-question:** the measurement "a first-parent anchor reds 25 of 26" was
+  written into the leg header, `.unattended.conf` and the protocol row — three copies of a SNAPSHOT of
+  a population that grows. It now appears once, in the leg header, dated and with the commit it was
+  measured at; the other two state the RULE and not the number. **two-guards-one-question-two-answers:**
+  nothing said that `pass-order history` and `brief-recorded` are jointly satisfiable, and a reader
+  meeting a parent anchor and a build-commit anchor together has every reason to suspect otherwise.
+  Both the leg header and the conf now say how one conforming pass satisfies both.
+  **amendment-leaves-its-other-half-standing:** §4's file list still named the three carriers rev-4's
+  SPENT-bump amendment removed, and omitted the protocol pair and the kickoff manifest that this pass
+  actually wrote. Re-derived from the commit. **two-answers again, in the budgets:** this leg's
+  `BUDGET_brief_recorded` and its `tools/gate-legs.json` ceiling are both 900, and the sibling's own
+  note two lines up says those two numbers are DIFFERENT bounds that must not be edited to match — so
+  the coincidence is now labelled as arithmetic rather than left to read as a claim.
 
 ## 10. Reuse audit
 

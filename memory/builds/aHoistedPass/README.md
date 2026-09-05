@@ -102,7 +102,7 @@ ids TOOL-aHoistedPass-33 TOOL-aHoistedPass-34 TOOL-aHoistedPass-35 TOOL-aHoisted
 | [TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else](spec/2026-09-04-spec-TOOL-aHoistedPass-5.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-05 |
 | [TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build](spec/2026-09-04-spec-TOOL-aHoistedPass-6.md) | 5 | 2 | CLOSED | rev-7 | 2026-09-05 |
 | [TOOL-aHoistedPass-9 — the adopter without the harness is told, on every bar](spec/2026-09-04-spec-TOOL-aHoistedPass-9.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-05 |
-| [TOOL-aHoistedPass-7 — a brief on disk before the code that cites it](spec/2026-09-04-spec-TOOL-aHoistedPass-7.md) | 7 | 2 | CLOSED | rev-7 | 2026-09-05 |
+| [TOOL-aHoistedPass-7 — a brief on disk before the code that cites it](spec/2026-09-04-spec-TOOL-aHoistedPass-7.md) | 7 | 2 | CLOSED | rev-8 | 2026-09-05 |
 <!-- /gen:build-units -->
 
 Records: 23 bound to this build, across 4 record folder(s).

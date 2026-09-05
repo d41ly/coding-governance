@@ -162,6 +162,29 @@ that file — `git diff --cached --name-only` does not list it — so the growth
 high-water both predate this unit. Reported, not repaired, because re-recording another unit's
 high-water is deciding that its growth was intended.
 
+## The bug-class checklist, folded rather than filed
+
+`python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` over the unit's own commit selected 14
+classes. Four were live in what had just landed and are fixed in a follow-up commit under the same
+unit id, recorded as spec rev-8: the "25 of 26" measurement written in three places when it is a
+dated snapshot of a growing population; nothing anywhere saying `pass-order history` and
+`brief-recorded` are jointly satisfiable, which a reader meeting a parent anchor beside a
+build-commit anchor has every reason to doubt; §4's file list still naming the three carriers rev-4's
+SPENT-bump amendment removed while omitting the protocol pair and the manifest this pass actually
+wrote; and this leg's two 900s — a gate-legs ceiling and a runner budget — coinciding where the
+sibling's own note says those are different bounds that must not be edited to match.
+
+`heredoc-escape-reaches-the-regex` was CHECKED rather than assumed, because the conf and the example
+were appended through heredocs: `git show HEAD:.unattended.conf | tail -4 | cat -A` shows clean `$`
+line ends and no stray escape in either file.
+
+The fold's own diff-scoped gates: memory hygiene 0, install-prefix 0, kit versions 0, govkit
+selfcheck 0, manifest ratchet 0, `adopt-unattended.sh --check` in sync, and the suite re-run at 43
+arms exit 0. **`check-unattended.sh` was NOT re-run for the fold** — it costs about half an hour on
+this node — and the two checks the fold could reach were verified directly instead: check 22 joins
+key NAMES and the key is unchanged, check 10 byte-compares the protocol pair and the adopter reports
+it in sync.
+
 ## What this unit did not do
 
 - **It did not move the kit version.** `S8`'s bump half was struck at rev-4 and `DEPL-aHoistedPass-1`

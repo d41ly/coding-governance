@@ -95,6 +95,11 @@ BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day
                               # taken because this leg's walk IS the sibling's walk plus one blob read
                               # per graded unit, so the honest bound is the one the population grows
                               # into rather than the one an empty population happens to cost.
+                              # IT EQUALS THE gate-legs.json ROW TODAY AND IS NOT THE SAME BOUND. The
+                              # sibling's note above spells the distinction out — that row is a kill
+                              # bound under the 8-wide pool, this one is a cost verdict — and the two
+                              # coinciding here is arithmetic, not a claim. Moving one does not move
+                              # the other, and neither should be edited to match.
 BUDGET_brief_recorded_selftest=600  # measured 115 s IDLE and 177 s under load on node `a`
                               # 2026-09-05, over fixtures that are each a real git repo carrying a
                               # 350 KB driver copy - process creation is the whole cost, so this
