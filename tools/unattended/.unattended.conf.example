@@ -73,6 +73,12 @@ CORE_FLOOR="12:12"
 # dependency.
 RECALL_CLI=""
 
+# OPTIONAL, and the same shape as RECALL_CLI above. The codebase-map probe whose lookup log
+# `reuse-probed` also reads — the OTHER half of the build method's M5 pair. BLANK means that
+# kit is not adopted; the item counts rows from whichever declared logs exist, and announces a
+# skip only when NEITHER CLI is declared.
+MAP_CLI=""
+
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
 # interactive exits that engine resolves without an owner turn — MEASURE it against your own engine,

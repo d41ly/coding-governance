@@ -39,7 +39,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.17   # gov:kit unattended@1.17 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.18   # gov:kit unattended@1.18 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -288,7 +288,7 @@ CONF="$ROOT/.unattended.conf"
 # greps the line below with -A1, and anything inserted between them hides it.
 MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""
 GATE_BOUND=""
 # shellcheck disable=SC1090
 . "$CONF"
@@ -3621,15 +3621,37 @@ $_bcnon"
       #    ratchet (a literal kit path arrives verbatim in an adopter installed at another prefix and
       #    resolves to nothing there), and it was unreachable by the self-test, which runs this driver
       #    from OUTSIDE the tree under test so the probe always found the real repo's copy.
-      if [ -z "$RECALL_CLI" ] || [ ! -f "$ROOT/$RECALL_CLI" ]; then
-        DOD_OUT="skipped — this project declares no readable RECALL_CLI in its .unattended.conf, so no query log can exist and there is nothing this item could observe${RECALL_CLI:+ (declared: $RECALL_CLI)}"
+      #    TWO CLIs, and the same reasoning applies to each. `MAP_CLI` is the codebase-map probe,
+      #    the OTHER half of the build method's M5 pair, and its log was a write-only surface until
+      #    this arm read it: the closed unit that specced this reader shipped the logger and not the
+      #    reader, and its acceptance ledger asserted a gate had accepted a declaration that did not
+      #    exist anywhere in the product.
+      _probe_kits=0
+      [ -n "$RECALL_CLI" ] && [ -f "$ROOT/$RECALL_CLI" ] && _probe_kits=$((_probe_kits + 1))
+      [ -n "$MAP_CLI" ] && [ -f "$ROOT/$MAP_CLI" ] && _probe_kits=$((_probe_kits + 1))
+      if [ "$_probe_kits" -eq 0 ]; then
+        DOD_OUT="skipped — this project declares no readable RECALL_CLI or MAP_CLI in its .unattended.conf, so no probe log can exist and there is nothing this item could observe${RECALL_CLI:+ (RECALL_CLI declared: $RECALL_CLI)}${MAP_CLI:+ (MAP_CLI declared: $MAP_CLI)}"
         return 0
       fi
       # 3. THE LOG. Located the way its two existing readers locate it -- query.py's own log_path()
       #    and recall-opened.js -- never as a path literal.
-      _rl="$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd)/recall/queries.jsonl"
-      if [ ! -f "$_rl" ]; then
-        DOD_OUT="the recall query log is ABSENT at $_rl, so this item cannot answer its question rather than answering it with a zero — run a probe, or override with a reason"
+      _cd="$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd)"
+      _rl="$_cd/recall/queries.jsonl"
+      _ml="$_cd/codebase-map/lookups.jsonl"
+      # A log counts only where its CLI is declared: an undeclared kit's stray log is not evidence
+      # that this project's probe ran. The two facts stay apart in the message, because "absent"
+      # and "not adopted" are different states and an operator who confuses them hunts the wrong bug.
+      _want=""; _have=""
+      if [ -n "$RECALL_CLI" ] && [ -f "$ROOT/$RECALL_CLI" ]; then
+        _want="$_want $_rl"
+        [ -f "$_rl" ] && _have="$_have $_rl"
+      fi
+      if [ -n "$MAP_CLI" ] && [ -f "$ROOT/$MAP_CLI" ]; then
+        _want="$_want $_ml"
+        [ -f "$_ml" ] && _have="$_have $_ml"
+      fi
+      if [ -z "$(printf '%s' "$_have" | tr -d '[:space:]')" ]; then
+        DOD_OUT="every declared probe log is ABSENT, so this item cannot answer its question rather than answering it with a zero — looked for:$_want. Run a declared probe, or override with a reason"
         return 1
       fi
       # 4. THE JOIN, and every step of it was a review blocker.
@@ -3647,16 +3669,27 @@ $_bcnon"
       # $ROOT already holds --show-toplevel (set at :274). Re-deriving it here would be a second
       # reader of one value, which is the class this repo files as two-readers-of-one-config.
       _rt=$(printf '%s' "$ROOT" | tr -s '/')
-      _rn=$(grep '"type": "query"' "$_rl" 2>/dev/null \
-            | grep -o '"worktree": "[^"]*"' \
-            | sed 's/^"worktree": "//; s/"$//' \
-            | tr '\134' '/' | tr -s '/' \
-            | grep -cxF "$_rt" || true)
-      if [ "${_rn:-0}" -lt 1 ]; then
-        DOD_OUT="the recall query log holds no query for this tree ($_rt), so no reuse probe is recorded as having run — run the declared recall probe ($RECALL_CLI) with a question and 8-14 terms, or override with a reason"
+      # ONE counter, two logs. The map logger emits the same row grammar the recall one does --
+      # `type`, `at`, `query`, `worktree` -- which is why this is a second PATH to count and not a
+      # second parser. That compatibility is recorded in the closed unit's own spec, and it is what
+      # makes the reader a few lines rather than a rewrite.
+      _count_rows() {  # $1 = log path, $2 = the row `type` that log writes
+        [ -f "$1" ] || { printf '0'; return; }
+        grep "\"type\": \"$2\"" "$1" 2>/dev/null \
+          | grep -o '"worktree": "[^"]*"' \
+          | sed 's/^"worktree": "//; s/"$//' \
+          | tr '\134' '/' | tr -s '/' \
+          | grep -cxF "$_rt" || true
+      }
+      _rn=0; _mn=0
+      if [ -n "$RECALL_CLI" ] && [ -f "$ROOT/$RECALL_CLI" ]; then _rn=$(_count_rows "$_rl" query); fi
+      if [ -n "$MAP_CLI" ] && [ -f "$ROOT/$MAP_CLI" ]; then _mn=$(_count_rows "$_ml" lookup); fi
+      _tn=$(( ${_rn:-0} + ${_mn:-0} ))
+      if [ "$_tn" -lt 1 ]; then
+        DOD_OUT="no declared probe log holds a row for this tree ($_rt), so no reuse probe is recorded as having run — run a declared probe (${RECALL_CLI:-<no RECALL_CLI>}${MAP_CLI:+, $MAP_CLI}), or override with a reason"
         return 1
       fi
-      DOD_OUT="$_rn recall quer$([ "$_rn" = 1 ] && echo y || echo ies) recorded for this tree"
+      DOD_OUT="$_tn probe row(s) recorded for this tree: ${_rn:-0} recall, ${_mn:-0} map"
       return 0 ;;
     keepalive-reaped)
       grep -qE '^keepalive-reaped: (yes|true)' "$rel" ;;

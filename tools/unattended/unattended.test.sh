@@ -879,20 +879,20 @@ sed -i 's|^RECALL_CLI=.*|RECALL_CLI="fake-recall-cli.py"|' .unattended.conf
 #    thing.
 rm -f "$(_rp_log)"
 out=$(_rp_close)
-hit "$out" "the recall query log is ABSENT"
-miss "$out" "holds no query for this tree"
+hit "$out" "every declared probe log is ABSENT"
+miss "$out" "holds a row for this tree"
 
 # 3. ZERO — a log that exists and names only ANOTHER tree. UNMET, and it names the remedy.
 mkdir -p "$(dirname "$(_rp_log)")"
 printf '{"qid": 1, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc /c/somewhere/else)" > "$(_rp_log)"
 out=$(_rp_close)
-hit "$out" "holds no query for this tree"
+hit "$out" "no declared probe log holds a row for this tree"
 miss "$out" "is ABSENT"
 
 # 4. MET — one row naming THIS tree, escaped as json.dumps writes it. The count rides the message.
 printf '{"qid": 2, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc "$(git rev-parse --show-toplevel)")" >> "$(_rp_log)"
 out=$(_rp_close)
-hit "$out" "1 recall query recorded for this tree"
+hit "$out" "1 probe row(s) recorded for this tree: 1 recall, 0 map"
 # ...and the PREFIX arm, which is the whole reason the compare is `grep -xF` and not a substring.
 # THE EXTRA ROW IS A CHILD OF THIS TREE, NOT ITS PARENT, and the direction is the entire arm. A
 # parent row is SHORTER than this tree's path, so a substring test does not match it either and the
@@ -901,8 +901,51 @@ hit "$out" "1 recall query recorded for this tree"
 # makes the count read 2 and the arm reds. Measured both ways before this was rewritten.
 printf '{"qid": 3, "type": "query", "query": "q", "worktree": "%s"}\n' "$(_rp_esc "$(git rev-parse --show-toplevel)/nested-worktree")" >> "$(_rp_log)"
 out=$(_rp_close)
-hit "$out" "1 recall query recorded for this tree"
-miss "$out" "2 recall queries recorded for this tree"
+hit "$out" "1 probe row(s) recorded for this tree: 1 recall, 0 map"
+miss "$out" "2 probe row(s)"
+
+# ---- MAP_CLI: the three outcomes the closed unit specced and never shipped a reader for.
+# ---- Its acceptance ledger asserted a merge-bar run had accepted this declaration, and the key
+# ---- appeared nowhere in the product -- so these arms are the evidence that claim needed.
+_rp_maplog() { printf '%s/codebase-map/lookups.jsonl' "$(cd "$(git rev-parse --git-common-dir)" && pwd)"; }
+
+# 4c. NOT DECLARED — MAP_CLI blank while RECALL_CLI is adopted. The map half contributes nothing
+#     and says so with a zero, rather than being silently absent from the count.
+rm -f "$(_rp_maplog)"
+out=$(_rp_close)
+hit "$out" "0 map"
+
+# 4d. ADOPTED AND EMPTY — the state that silently passed before. MAP_CLI declared and readable, its
+#     log absent, and the recall log absent too: UNMET, and the message NAMES BOTH logs it looked
+#     for, so an unmet item is diagnosable rather than merely red.
+sed -i 's|^MAP_CLI=.*||' .unattended.conf
+printf 'MAP_CLI="fake-map-cli.py"\n' >> .unattended.conf
+: > fake-map-cli.py
+rm -f "$(_rp_log)" "$(_rp_maplog)"
+out=$(_rp_close)
+hit "$out" "every declared probe log is ABSENT"
+hit "$out" "recall/queries.jsonl"
+hit "$out" "codebase-map/lookups.jsonl"
+
+# 4e. ADOPTED AND PRESENT — a map log naming THIS tree, and NO recall log. MET on the map half
+#     alone, which is the arm the closed unit claimed and never had: before this reader existed the
+#     map log was a write-only surface and this state was UNMET.
+mkdir -p "$(dirname "$(_rp_maplog)")"
+printf '{"type": "lookup", "query": "q", "n_shown": 3, "worktree": "%s"}\n' "$(_rp_esc "$(git rev-parse --show-toplevel)")" > "$(_rp_maplog)"
+out=$(_rp_close)
+hit "$out" "1 probe row(s) recorded for this tree: 0 recall, 1 map"
+miss "$out" "ABSENT"
+
+# ...and a map row naming ANOTHER tree does not count, on the same exact-compare rule the recall
+# half uses. Without this the map arm would be the one place a foreign row leaked into the count.
+printf '{"type": "lookup", "query": "q", "n_shown": 3, "worktree": "%s"}\n' "$(_rp_esc /c/somewhere/else)" > "$(_rp_maplog)"
+out=$(_rp_close)
+hit "$out" "no declared probe log holds a row for this tree"
+
+# Restore the single-CLI shape the waived arm below was written against.
+sed -i 's|^MAP_CLI=.*|MAP_CLI=""|' .unattended.conf
+rm -f "$(_rp_maplog)"
+
 
 # 5. WAIVED — short-circuits every arm above, INCLUDING a log that would have said zero. This is the
 #    arm that ends the silent waiver, so it asserts the reason reaches the message.
@@ -911,7 +954,7 @@ printf '\n2026-08-31T00:00:00Z waiver · item reuse-first · reason the owner sa
 out=$(_rp_close)
 hit "$out" "the reuse-first directive was waived at preflight"
 hit "$out" "the owner said so"
-miss "$out" "the recall query log is ABSENT"
+miss "$out" "every declared probe log is ABSENT"
 
 reset_tree; git push -q -f origin unit:main
 

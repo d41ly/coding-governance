@@ -42,6 +42,19 @@ so `reuse-probed` observes one of the two probes the `reuse-first` directive nam
   The resolution still sits INSIDE the `try`, because `log_event`'s `p = log_path(repo)` sits outside
   its own and that is a hole worth not copying; a failure to LOCATE the log warns and answers exactly
   as a failure to write it does.
+
+> **CORRECTION, 2026-09-05, recorded by the aTunedCompass build, unit 11.** S4 and S5 below
+> describe work that was NOT in the tree when this unit closed. The logging half of the unit
+> shipped; the DECLARATION and the READER did not — `grep -rn "MAP_CLI" tools/ .unattended.conf`
+> returned nothing — so the map log was a write-only surface, and this unit's acceptance ledger
+> line for AC8 asserted a merge-bar join accepting a key that did not exist. That ledger line
+> carries its own correction beside it.
+>
+> The unit STAYS CLOSED and nothing here is rewritten: an id in a units region may not leave it,
+> and a ratified record is annotated rather than edited. S4 and S5 were implemented on 2026-09-05
+> exactly as written below, which is why this is a superseding note and not a defect report — the
+> design was right and only the claim that it had landed was wrong.
+
 - **S4** — a `MAP_CLI` declaration in `.unattended.conf`, optional and blank by default, in
   `kit.toml`'s `optional_keys` and the protocol's §8 key table. Same shape and same reason as
   `RECALL_CLI`: a kit path spelled into the driver arrives verbatim in an adopter at another prefix
