@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-6 — the reuse probe ranks its neighbour pool before it truncates it
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -33,8 +33,21 @@ name sorts late is discarded before it can ever be ranked.
 - **S5** — the probe's output header states what the neighbour ranking does NOT mean. Twelve
   high-fan-in names read as twelve seams to everybody who did not write the ranker, and
   `TOOL-aScouredKit-16` already records that the fan-in count resolves no symbols.
-- **S6** — a one-time before-and-after measurement over the phrase corpus, recorded in this build's
-  folder. §4 says what it grades and §8 F2 carries what is unresolved about it.
+- **S6** — the before-and-after over the phrase corpus is produced by a COMMITTED replay harness, not
+  a one-off. F2 resolved this: the harness is a tracked, registered, on-demand script that no merge-bar
+  leg runs, on the same split the owner ruled for a kit's self-tests. §4 says what it grades. It lands
+  at `tools/codebase-map/replay-phrases.py`.
+- **S7** — that path is claimed EXPLICITLY in `tools/codebase-map/kit.toml` as
+  `role = "project-owned"`. The kit's `[[files]] include = "**" role = "engine"` rule means an
+  unclaimed new file under this directory ships verbatim to every adopter, and `govkit.py`'s
+  `LANDABLE_ROLES` is `(engine, seed)`. What would ship here is a harness that parses THIS repo's
+  build records for probe phrases — useless to an adopter and exactly the shape
+  `memory/gotchas/pin-copied-from-another-corpus.md` names. The memory-recall kit already withholds
+  its three gov-only files this way, and that precedent is the one being copied.
+- **S8** — the harness DECLARES a wall-clock ceiling, in the script itself, the way the unattended
+  kit's on-demand runner carries its budget. This repo reds a suite that arrives without one, and F2's
+  resolution names the obligation explicitly. It is a suite on no leg, so the ceiling is enforced by
+  the runner that owns it rather than by the bar.
 
 ## 3. Non-goals (OUT)
 
@@ -56,8 +69,9 @@ Also out:
   hit` or `same kind`. §8 F1 is where that decision is put to the owner.
 - Not fixing the fan-in signal itself. `TOOL-aScouredKit-16` records that it counts bare identifier
   tokens with no symbol resolution; S5 discloses that rather than repairing it.
-- Not making the phrase-set replay a merge-bar leg. It grades a corpus, costs a probe per phrase,
-  and has no ceiling anyone has declared.
+- Not making the phrase-set replay a merge-bar leg. It grades a corpus and costs a probe per phrase.
+  It is on no bar and runs on demand, which is F2's resolution; S8 gives it the declared ceiling that
+  status obliges, so "no ceiling anyone has declared" is no longer the reason and is no longer true.
 
 ## 4. Design
 
@@ -136,9 +150,16 @@ joins wrapped invocations is the difference between grading 74 phrases and gradi
 ### Files touched (estimate)
 
 `tools/codebase-map/reuse_lookup.py`, `tools/codebase-map/selftest.py`,
-`tools/codebase-map/map_lib.py` for the `KIT_CODEBASE_MAP_VERSION` marker AC7 asserts, and
-`memory/map/features/codebase-map.md` for the dossier refresh §5 owes, plus one record under
-this build's folder holding the replay. Four source files.
+`tools/codebase-map/map_lib.py` for the `KIT_CODEBASE_MAP_VERSION` marker AC7 asserts,
+`memory/map/features/codebase-map.md` for the dossier refresh §5 owes,
+`tools/codebase-map/replay-phrases.py` as the committed harness S6 names, and
+`tools/codebase-map/kit.toml` for the `project-owned` rule S7 requires so that harness does not ship.
+Six source files, plus one record under this build's folder holding the replay's output.
+
+rev-3 resolved F2 to a committed harness and left this table at four files naming no script, §3
+still calling the replay unceilinged, and S6 still describing the one-off the owner rejected — so a
+builder could not tell which file to create, and `TOOL-aTunedCompass-10`'s own criterion depends on
+an artifact this unit's scope did not produce.
 
 ### Alternatives rejected
 
@@ -189,6 +210,15 @@ in two places and the ordering key would exist twice, which is the drift S2 exis
   the phrase count it actually graded. A neutral or negative delta is recorded as the result.
 - **AC5** — When `python tools/codebase-map/reuse_lookup.py "<any phrase>"` runs, its header names
   what the neighbour ranking does not mean, alongside the `recall partial` line it already prints.
+- **AC9** — When `git ls-files tools/codebase-map/replay-phrases.py` runs it returns the path, the
+  script prints its declared wall-clock ceiling when invoked with no arguments, and the runner that
+  owns it reds on a breach. A suite arriving without a ceiling reds by that fact in this repo, and
+  this one is on no leg, so its own runner is what enforces it.
+- **AC10** — When `bash tools/govkit/govkit.sh selfcheck` (or the kit's declared equivalent) runs and
+  when an `apply` is performed against a scratch target, `replay-phrases.py` is NOT written into that
+  target, and `tools/codebase-map/kit.toml` names it with an explicit `project-owned` role. The
+  observation that matters is the apply, not the descriptor: the descriptor is the mechanism and the
+  absent file is the property.
 - **AC6** — When `python3 tools/codebase-map/selftest.py` and
   `python3 tools/codebase-map/test_codebase_map.py` run, both are green.
 - **AC7** — When `bash tools/check-kit-versions.sh` runs, it is green with
@@ -259,6 +289,18 @@ and it therefore owes a declared wall-clock ceiling like any suite here.
 - rev-3 · 2026-09-05 · both forks resolved by the owner. The predicate narrowing becomes
   `TOOL-aTunedCompass-10` rather than a backlog row, so the non-goals now name a sibling unit; the
   replay harness is committed as an on-demand script with a declared ceiling.
+- rev-4 · 2026-09-05 · round-1 spec audit folded, finding B3 — and B3 is precisely rev-3's second
+  clause never leaving §8. The resolution committed a tracked, registered, on-demand harness with a
+  declared ceiling; S6 still described the recorded one-off the owner had rejected, §3 still called
+  the replay unceilinged, §4 Files-touched named four files and no script, and no criterion observed
+  the harness at all. A builder could not tell which file to create or where the ceiling lived, and
+  `TOOL-aTunedCompass-10`'s AC4 depends on an artifact this unit's scope did not produce. S6 now names
+  `tools/codebase-map/replay-phrases.py`; S7 claims it `project-owned` in `tools/codebase-map/kit.toml`,
+  because that kit's `include = "**" role = "engine"` rule would otherwise ship a harness that parses
+  THIS repo's build records to every adopter — the defect
+  `memory/gotchas/pin-copied-from-another-corpus.md` names, and the reason the memory-recall kit
+  withholds its own three files; S8 carries the ceiling; AC9 and AC10 observe the path, the ceiling
+  and the withholding, with AC10 asserting on the APPLY rather than on the descriptor.
 
 ## 10. Reuse audit
 
