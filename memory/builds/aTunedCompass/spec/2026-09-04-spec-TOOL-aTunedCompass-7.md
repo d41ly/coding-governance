@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-7 — the manifest declares the recall kit and narrows the tooling entrypoint
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -195,6 +195,21 @@ is real and is not closed here.
 
 ## 8. Open questions
 
+
+**F1 RESOLVED (owner, 2026-09-05): evict the second dated correction, 617 bytes.** The owner did NOT take
+this fork's recommendation of the first correction. The same objection applies and must be recorded
+rather than glossed: that entry's prune-when condition has not held either, so this is a deliberate
+exception to the manifest's own prune rule and the eviction is recorded as a decision, not a lapse.
+What the choice buys is headroom — it frees roughly 617 bytes against the 206 the edit needs, leaving
+about 380 spare, where the recommended option left about 4. The backlog records this squeeze
+recurring across three carriers, and a cap acting silently as an editor is the failure mode that
+headroom prevents.
+
+**F2 RESOLVED (owner, 2026-09-05): the entrypoint rule lives in the pointer-map row.** This was the fork's
+recommendation, held open only because the row costs about 30 bytes more than the fence and F1 might
+not have had them to spend. F1's answer frees enough that the objection is gone, so the machine-read
+location wins over the cheaper one.
+
 - **F1 — which bytes leave to pay for the addition?** Measured at writing time:
   `wc -c memory/guides/SESSION-KICKOFF.md` is 25571 against the 25600-byte cap in
   `skills/session-kickoff/manifest-check.sh` (`:169`), so the file has 29 bytes of headroom. The
@@ -223,6 +238,9 @@ is real and is not closed here.
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, authored by the aTunedCompass spec pass.
+- rev-2 · 2026-09-05 · both forks resolved by the owner. The second dated correction is evicted rather than
+  the first, against this spec's recommendation, and the exception to the prune rule is recorded as
+  such; the entrypoint rule goes in the pointer-map row, which F1's headroom now affords.
 
 ## 10. Reuse audit
 

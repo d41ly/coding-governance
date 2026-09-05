@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-3 — the recall floor grades the two-set ensemble the CLI serves
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** BLOCKED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -190,6 +190,17 @@ kit work. No new leg is added.
 
 ## 8. Open questions
 
+
+**F1 RESOLVED (owner, 2026-09-05): pin nothing until `TOOL-aTunedCompass-9` reports.** The owner rejected
+both deriving at a smaller `k` and accepting a ceiling-hugging pin at `k=20`, taking the option this
+fork itself called the honest alternative. That costs the build this unit for now, which the fork
+text already priced, and it is why the status is BLOCKED rather than SPECCED.
+
+**F2 REMAINS OPEN, deliberately.** It was not put to the owner with the others, because a unit that
+cannot be built until unit 9 reports does not need its internal design settled today, and answering
+it now would fix a `union.py` decision against a fixture that does not yet exist. It is resolved when
+this unit unblocks.
+
 - **F1 — what value should the ensemble pin carry, and on what evidence?** The floor's derivation is
   the one-retirement worst case `(h-1)/(R-1)` over the graded fixture, which is why the shipped
   `0.81` is not a taste judgment. The problem is the fixture: with terms at `k=20`, `records:fts5`
@@ -222,6 +233,8 @@ kit work. No new leg is added.
   unit and exists to make `spine` non-empty — that spec's own S5 removes the identical dependence
   from `test_recall_floor.py`. This spec was the document that disagreed; both now construct the
   empty member with `build_filtered`.
+- rev-3 · 2026-09-05 · F1 resolved by the owner: pin nothing, block on `TOOL-aTunedCompass-9`. Status to
+  BLOCKED. F2 left open on purpose and now says so, so a later reader does not read it as missed.
 
 ## 10. Reuse audit
 

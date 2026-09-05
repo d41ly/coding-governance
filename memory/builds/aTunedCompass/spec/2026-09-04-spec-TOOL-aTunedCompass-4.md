@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-4 — the chunk source becomes the rollup, which also de-duplicates the slots
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -192,6 +192,14 @@ touch. The full bar is `bash tools/run-gates/run-gates.sh`, and the kit self-tes
 
 ## 8. Open questions
 
+
+**F1 RESOLVED (owner, 2026-09-05): land on the de-duplication result alone, and move the unit to order 1.**
+The de-duplication is measured from the live query log's own `results` field and does not depend on
+the fixture's headroom at all, so it does not wait on `TOOL-aTunedCompass-9`. The recall comparison
+does need a `k` with headroom, so AC5 is explicitly deferred until unit 9 reports and this unit
+claims nothing about ensemble recall in the meantime. The rollup's effect on recall becomes a bonus
+the record states honestly either way, which is what this fork recommended.
+
 - **F1 — FACT-QUESTION · does the rollup still buy +0.000 in a two-set ensemble once the queries
   carry terms?** `run_rollup`'s docstring says it does and advises against expecting otherwise, but
   that measurement was taken on the bare question, and the terms-carrying run at `k=20` cannot test
@@ -208,6 +216,9 @@ touch. The full bar is `bash tools/run-gates/run-gates.sh`, and the kit self-tes
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft.
+- rev-2 · 2026-09-05 · F1 resolved by the owner: the unit's claim is the de-duplication, AC5's recall
+  comparison defers to after `TOOL-aTunedCompass-9`, and the unit moves from order 3 to order 1
+  because nothing it now claims depends on the fixture.
 
 ## 10. Reuse audit
 

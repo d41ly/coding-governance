@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-5 — `DURABLE` matches a flat memory root, so `spine` stops being empty
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -214,6 +214,18 @@ legs.
 
 ## 8. Open questions
 
+
+**F1 RESOLVED (owner, 2026-09-05): admit backlog shards, keeping upstream parity.** The owner took this
+fork's recommendation and its stated cost with it. On this corpus `spine` becomes 81% of `records`,
+405 of 748 documents, so the layer is not a precision layer today and no session should tune against
+it as though it were. Re-pricing it waits until it can be measured at all, which is only possible
+once it is non-empty.
+
+**F2 RESOLVED (owner, 2026-09-05): print on stderr and exit 0.** Not a refusal. The reasoning the owner
+accepted is this fork's own: the defect was invisible because nothing SAID anything, not because
+nothing refused, so a print closes it and a refusal would block an adopter mid-migration whose repo
+was working a minute earlier. The print matches `zero_record_diagnosis` exactly.
+
 - **F1 — do backlog shards belong in `spine`?** Upstream's `DURABLE` admits `BACKLOG.md` by design,
   and a backlog row genuinely is a record's definition home. On this corpus that decision is what
   makes `spine` 81% of `records`: 405 of the 748 documents are backlog rows, and the tooling shard
@@ -247,6 +259,9 @@ legs.
   green having never run them. Also reds `spec tokens (a spec's own names resolve)`: §4's layout
   table and AC3 backticked `memory/<dir>/…` as if it were a repo path, and the leg graded it as one.
   Both now carry the `<MEMORY_ROOT>` placeholder `memory/TEMPLATE-SPEC.md` itself uses.
+- rev-3 · 2026-09-05 · both forks resolved by the owner. Backlog shards are admitted for upstream parity,
+  with the 81%-of-records consequence recorded in scope; an empty `spine` prints on stderr and exits
+  0 rather than refusing.
 
 ## 10. Reuse audit
 

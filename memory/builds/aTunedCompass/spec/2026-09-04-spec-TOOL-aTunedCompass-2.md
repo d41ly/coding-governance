@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-2 — the recall fixture carries the terms every real query supplies
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** BLOCKED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -34,9 +34,13 @@ all 148 queries in the live log supplied them at a mean of 12.8.
   than a fault, and no ceiling derived from twelve hand-written term lists would be honest.
 - **S6** — each question's `hits` field is re-derived from the measurement with terms, because the
   audit reds on a disagreement between the declared value and the measured one.
-- **S7** — `h` and `R` are re-derived, `RECALL_FLOOR` in `.memory-tree.conf` (`:286`) is re-derived
-  subject to F1, and the literal assertions in `tools/memory-recall/test_recall_floor.py` (`:306`
-  and the three single-direction arms) are updated in the same commit.
+- **S7** — `h` and `R` are re-derived and the literal assertions in
+  `tools/memory-recall/test_recall_floor.py` (`:306` and the three single-direction arms) are
+  updated in the same commit. `RECALL_FLOOR` in `.memory-tree.conf` (`:286`) is NOT moved, per F1.
+  What changes beside that key is its comment block alone, which today carries the measured `h`, `R`
+  and worst case as literals and would otherwise describe a derivation the new fixture refutes. The
+  restated block names the new figures, states that the held pin is now conservative by the
+  difference, and points the re-derivation at the units that own it.
 - **S8** — the fixture's `_README` gains the terms rule beside its provenance rule: what the terms
   are, the band, how they are authored, and that `query` is the composed string every instrument
   grades. `tools/memory-recall/README.md`'s recall-floor section gains one line naming that field.
@@ -56,8 +60,14 @@ all 148 queries in the live log supplied them at a mean of 12.8.
 - Not moving the pinned cell off `records:fts5`. Grading the two-set ensemble the CLI serves is
   `TOOL-aTunedCompass-3`, and it is sequenced after this unit for the reason the build README gives.
 - Not switching the chunk substrate to `roll`. That is `TOOL-aTunedCompass-4`.
-- Not adding, removing or rewriting questions. n stays 12; a fixture that can discriminate the chunk
-  half is `TOOL-aWeighedCompass-18` and an owner call.
+- Not adding, removing or rewriting questions. n stays 12. The fixture that can discriminate the
+  chunk half is `TOOL-aTunedCompass-9`, which this unit is BLOCKED on, and whose backlog row is
+  `TOOL-aWeighedCompass-18`.
+- Not moving `RECALL_FLOOR`, and not re-deriving it. The floor is `TOOL-aTunedCompass-9`'s business
+  first, because a pin derived against a fixture that saturates at records-alone is a pin derived
+  from saturation, and then `TOOL-aTunedCompass-3`'s, which grades the ensemble the CLI actually
+  serves and sets the pin against it. This unit hands both of them a fixture whose query shape is
+  the served one and claims nothing about the floor.
 - Not shipping the fixture to adopters. `tools/memory-recall/kit.toml` withholds it, the floor is a
   gov-only leg, and that stays true.
 - Not re-measuring the parent's tables. This unit cites them and produces exactly the new numbers
@@ -153,9 +163,12 @@ vocabulary, which trades a real property for a bookkeeping convenience.
   function's own comment records.
 - observability — `--audit-fixture` prints the term count and the question-half overlap per
   question, so a reader can see which half moved.
-- risks — moving `h` moves the derived pin, and a pin re-derived on twelve questions is a pin
-  derived from twelve questions; F1 puts that to the owner. The second risk is the authorship bias
-  above, bounded by pre-registration and not removed by it.
+- risks — moving `h` moves the DERIVATION under a pin this unit no longer touches, per F1. The
+  residual is one-directional and is checked rather than assumed: the held `0.81` stays safe while
+  the re-derived worst case sits above it, and AC5 is what observes that. Should the re-derivation
+  come back BELOW the held value, this unit stops and reports rather than moving the pin, because
+  moving it is what the owner blocked. The second risk is the authorship bias above, bounded by
+  pre-registration and not removed by it.
 - testing + left-shift gates — S9's three arms, each with its RED observed before the arm lands.
   The class being left-shifted is "the fixture grades a shape the CLI does not send", and after this
   unit that class fails a gate instead of being noticed by a research pass.
@@ -201,6 +214,12 @@ adds no leg: the three new refusals are arms on legs that already exist.
 
 ## 8. Open questions
 
+
+**F1 RESOLVED (owner, 2026-09-05): pin nothing, and block this unit on `TOOL-aTunedCompass-9`.** The owner
+declined all three options this fork offered and took a fourth: no floor is derived from a fixture
+that saturates at records-alone. `RECALL_FLOOR` therefore does not move here, and the terms work is
+correct on its own and unchanged. What this unit no longer claims is any movement of the pin.
+
 - **F1 — does `RECALL_FLOOR` move with the fixture?** With terms the parent measured `records:fts5`
   at a perfect recall@20 against 0.83 bare, so `h` at the pinned `r@5` cell is expected to rise and
   the current 0.81 becomes conservative. The pin's definition is the one-retirement worst case
@@ -221,6 +240,9 @@ adds no leg: the three new refusals are arms on legs that already exist.
   `memory/map/features/memory-recall.md` refresh. This spec edits three files that dossier claims
   and carried neither obligation, so it was the document that disagreed. S11, two entries in Files
   touched and two leg names added.
+- rev-4 · 2026-09-05 · F1 resolved by the owner against all three offered options: pin nothing and block on
+  the new `TOOL-aTunedCompass-9`. Status to BLOCKED, `RECALL_FLOOR` removed from scope, and the
+  non-goals now name unit 9 as the blocker rather than a backlog row.
 
 ## 10. Reuse audit
 

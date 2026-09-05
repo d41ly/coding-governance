@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** BLOCKED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -202,6 +202,17 @@ invents, and it is stated here so a green bar is not read as having exercised th
 
 ## 8. Open questions
 
+
+**F1 RESOLVED (owner, 2026-09-05): land the missing run-state reader first.** The owner did not take this
+fork's recommendation of shipping the field with no reader. That reader is now
+`TOOL-aTunedCompass-11`, a unit of this build, and this unit is BLOCKED on it and sequenced after it.
+The field lands against a reader that exists, so the log is never a write-only surface.
+
+**F2 RESOLVED (owner, 2026-09-05): add no extra attribution now, and record the deferral.** The owner chose
+to wait until an analysis needs it rather than decline it, so a backlog row is owed rather than
+silence. That row carries the cost this fork named: adding a field later is a second migration of a
+log that has no schema, and the row exists so that cost is a planned one.
+
 - **F1 — does this log need a reader, and if so where?** Three pieces of evidence, and they do not
   all point the same way. First, the recall log accumulated 219 rows over a month before anybody read
   it, and the parent report's entire first section exists because somebody finally did — a log with
@@ -240,6 +251,9 @@ invents, and it is stated here so a green bar is not read as having exercised th
   `TOOL-aTunedCompass-6` not to land in one pass, while the header carried `order 1` — the same
   value that unit carries, which `memory/TEMPLATE-SPEC.md` defines as the parallel group. The header
   was the half that disagreed with the body, so the order moves to 2 and §3 says why.
+- rev-3 · 2026-09-05 · both forks resolved by the owner. The unit is BLOCKED on the new
+  `TOOL-aTunedCompass-11` and moves to order 3; the extra attribution is deferred to a backlog row
+  rather than declined.
 
 ## 10. Reuse audit
 

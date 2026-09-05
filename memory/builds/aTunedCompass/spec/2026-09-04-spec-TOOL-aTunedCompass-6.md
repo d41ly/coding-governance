@@ -1,6 +1,6 @@
 # TOOL-aTunedCompass-6 — the reuse probe ranks its neighbour pool before it truncates it
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -205,6 +205,21 @@ already a leg, and S6's replay is deliberately not wired as one.
 
 ## 8. Open questions
 
+
+**F1 RESOLVED (owner, 2026-09-05): the predicate moves, but as its own unit.** The owner first chose to
+narrow `same kind` rather than ship the reorder alone, then chose to split that narrowing into a
+separate unit so M2's one-mechanism rule holds. This unit therefore keeps the reorder alone and its
+scope is unchanged; what changes is that the predicate is no longer deferred to a backlog row but is
+`TOOL-aTunedCompass-10`, which sequences immediately after this unit and lands in the same pass. The
+two are not provably disjoint under M6, so they are sequenced rather than parallel.
+
+**F2 RESOLVED (owner, 2026-09-05): commit the replay harness as an on-demand script that no bar runs.** The
+owner did not take this fork's recommendation of a recorded one-off, and the reason is that the
+owner's answer to F1 makes the measurement load-bearing: a unit that changes the neighbour predicate
+needs a re-runnable before-and-after, not a method somebody must rebuild. It takes the same split
+this repo's owner ruled for a kit's self-tests — in the tree, registered, run on demand, on no leg —
+and it therefore owes a declared wall-clock ceiling like any suite here.
+
 - **F1 — does the reorder ship alone, or does the neighbour PREDICATE move with it?** Measured
   above: the `same kind` arm admits 634 of 645 candidates for a phrase whose seeds include one
   class, so the neighbour pool is very nearly the whole corpus and no cap over it selects
@@ -239,6 +254,9 @@ already a leg, and S6's replay is deliberately not wired as one.
   `tools/codebase-map/map_lib.py` and §5 promised a dossier refresh, neither of which was listed;
   `TOOL-aTunedCompass-8` carries both for the same kit and was the document that agreed with itself.
   §7 also named two `subject = kit` legs without the `GATE_SELFTESTS=1` clause its siblings state.
+- rev-3 · 2026-09-05 · both forks resolved by the owner. The predicate narrowing becomes
+  `TOOL-aTunedCompass-10` rather than a backlog row, so the non-goals now name a sibling unit; the
+  replay harness is committed as an on-demand script with a declared ceiling.
 
 ## 10. Reuse audit
 
