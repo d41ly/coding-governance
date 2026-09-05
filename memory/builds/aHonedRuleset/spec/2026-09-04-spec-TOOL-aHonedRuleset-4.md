@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 2
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 3 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -16,10 +16,14 @@
 
 The `§8` agent-cap bullet in `coding-governance-agents.template.md` already states that the marker
 spellings and the full resolvable-bound grammar belong to `tools/hooks/README.md`, and then restates
-that grammar behind its own pointer. Delete the restatement and keep the two rules, the five
-parity-pinned values and the pointer, recovering 378 measured bytes. The file had 8 bytes free at
-base `102e98f0`; `TOOL-aHonedRuleset-2` is `order 1` on the same carrier, so this unit starts from
-whatever headroom that unit leaves rather than from the base figure.
+that grammar behind its own pointer. Two neighbouring `§8` bullets then restate the enforcement
+location a third and fourth time. Delete the restatement, fold those two bullets into one, and keep
+the two rules, the parity-pinned values and the pointer, recovering 533 measured bytes. The file had
+8 bytes free at base `102e98f0`; `TOOL-aHonedRuleset-2` is `order 1` on the same carrier, so this
+unit starts from whatever headroom that unit leaves rather than from the base figure.
+
+The same pass corrects the wrong array-literal sentence on both of its carriers, closing the OPEN
+backlog row `TOOL-dFramedEntrypoint-1`.
 
 ## 2. Scope (IN)
 
@@ -37,9 +41,10 @@ whatever headroom that unit leaves rather than from the base figure.
 - **S4** — The text `at most 5 verify agents TOTAL` stays live in the tree, because
   `tools/agent-cap-restatement-waivers.txt` keys a waiver row on exactly that string and the gate
   reds on a row whose text matches nothing.
-- **S5** — The array-literal clause stops asserting a bare `passes unmarked` exemption. It is
-  rewritten to say the literal is a receiver the hook can size, which is what
-  `tools/hooks/agent-cap.js` actually applies and what `tools/hooks/README.md:53-60` describes.
+- **S5** — The array-literal clause in the charter stops asserting a bare `passes unmarked`
+  exemption. It is rewritten to say the literal is a receiver the hook can size, which is what
+  `tools/hooks/agent-cap.js` actually applies and what the README's own `What the hook DENIES`
+  section already describes as one of the three ways a receiver branch qualifies.
 - **S6** — `memory/guides/SESSION-KICKOFF.md` gets its `last-audit` re-stamp in the same commit,
   because `coding-governance-agents.template.md` is a watched pathspec on line 6 of that file and
   `.githooks/pre-commit:53-55` runs `manifest-check.sh --staged` unconditionally. Its staged arm at
@@ -47,15 +52,35 @@ whatever headroom that unit leaves rather than from the base figure.
   and the staged manifest's block stamp still equals HEAD's, so the bundle is the only green path
   through a blocking pre-commit. The §B claims those two files feed are re-verified before the
   re-stamp; this is unit 5's S8 mechanism applied to this unit's own watched carrier.
+- **S7** — The two neighbouring `§8` bullets at `coding-governance-agents.template.md:251` and
+  `:252` collapse into one. What survives is the restricted-runtime fact, the instruction to inline
+  the schema discipline as a snippet, the fact that a sidechain agent holds NEITHER tool so the
+  capability is ABSENT rather than policed, that it inherits the governing doc and that hooks fire in
+  it, and the reason the cap sits at the main loop. What goes is their third and fourth statement of
+  the enforcement location, which S1's surviving text already carries once. The `PreToolUse`
+  parenthetical goes with them: `tools/hooks/README.md:3` and `memory/guides/REVIEW-PROTOCOL.md:98-102`
+  both hold that mechanism, so this is a restatement dropped and not a fact deleted.
+- **S8** — `tools/hooks/README.md:117` is corrected to the same fact S5 states. The sentence today
+  reads `An array LITERAL of ≤5 elements — the finder-lens fan — passes unmarked and needs no
+  helper.`, which asserts a blanket exemption; the allowance the hook applies is a property of the
+  RECEIVER of an `agent(` fan, and a raw `parallel([...])` over five literal elements is still denied.
+  This is ONE correction written into the two files that carry it, not two mechanisms: both sentences
+  are copies of a single wrong claim about `tools/hooks/agent-cap.js`, and correcting one carrier
+  while leaving the other is the `amendment-leaves-its-other-half-standing` class this build audits.
+  That is what separates S8 from S7, which folds two independent bullets.
+- **S9** — The backlog row `TOOL-dFramedEntrypoint-1` in `memory/backlog/TOOL.md:40` flips from
+  `OPEN` to `CLOSED` in the same commit, with a pointer at `builds/aHonedRuleset/`. Its stated fix is
+  "two sentences, in the file that owns each", and S5 and S8 are those two sentences, so the row has
+  nothing left open. The flip is part of this unit, not a follow-up.
 
 ## 3. Non-goals (OUT)
 
-- Editing `tools/hooks/README.md`. The grammar already lives there in full, and the README's own
-  half of the array-literal defect is owned by the OPEN backlog row `TOOL-dFramedEntrypoint-1`.
-  This unit closes only the charter half and claims nothing about that row's disposition.
-- Touching the two neighbouring `§8` bullets at `coding-governance-agents.template.md:251` and
-  `:252`, which restate the enforcement location a third and fourth time. Real overlap, different
-  bullets, and folding them here would make one diff out of two mechanisms. Follow-up if wanted.
+- Editing `tools/hooks/README.md` beyond the one sentence at `:117`. The grammar already lives there
+  in full and is correct where it is stated properly, including the three receiver-qualifying shapes
+  in its `What the hook DENIES` section. S8 corrects a sentence; it does not restructure the file.
+- Bumping `KIT_AGENT_CAP_VERSION`. `tools/check-kit-versions.sh` requires the constant to be present,
+  well-formed and in agreement with its paired markers, and demands no bump when a kit file changes.
+  A README correction moves no shipped behaviour.
 - Touching `§0`'s TL;DR line at `coding-governance-agents.template.md:22`, which repeats the
   two-rules sentence and the batching clause. That is the census's proposed drop `D1` and an owner
   call.
@@ -68,11 +93,17 @@ whatever headroom that unit leaves rather than from the base figure.
 
 ## 4. Design
 
-### Inventory — the bullet, claim by claim
+### Inventory — the bullets, claim by claim
 
-Measured at base `102e98f0`. The whole bullet is `sed -n '230,245p' coding-governance-agents.template.md`
-and is 1488 bytes on disk across sixteen lines. Each fragment below was extracted and measured
-individually; the thirteen sum to 1470 bytes, and the missing 18 bytes are joining whitespace.
+Measured at base `102e98f0` with `wc -c`. The cut spans two non-adjacent regions of `§8`. The cap
+bullet is `sed -n '230,245p' coding-governance-agents.template.md` at 1488 bytes across sixteen
+lines, and the two sidechain bullets are `sed -n '251,252p'` at 580 bytes, 313 and 267 individually.
+The five bullets between them, `246,250p` at 863 bytes, are untouched, and 1488 + 863 + 580 = 2931
+confirms the three regions partition `230,252p`. The edited source is therefore 2068 bytes.
+
+Fragments `A` through `M` are the cap bullet; each was extracted and measured individually and the
+thirteen sum to 1470 bytes, the missing 18 being joining whitespace. Fragments `N` and `O` are the
+two sidechain bullets, measured whole because each is a single unwrapped line.
 
 | # | Fragment | Bytes | Already stated in `tools/hooks/README.md` | Verdict |
 |---|---|---|---|---|
@@ -89,9 +120,13 @@ individually; the thirteen sum to 1470 bytes, and the missing 18 bytes are joini
 | K | fires on the exact matcher pair, `Workflow` alone is blind | 112 | `:16-17` | COMPRESS to the pinned token |
 | L | five values machine-compared, retyping reds the bar | 170 | nowhere | KEEP, minus the count |
 | M | the pointer at the README, and the harness beside it | 141 | n/a — it is the pointer | KEEP |
+| N | sidechain restricted runtime, schema snippet, and the cap enforced at both tool calls | 313 | `:3` for the `PreToolUse` mechanism | COMPRESS — the enforcement clause is `F` and `K` again |
+| O | a sidechain holds neither tool, inherits the doc, hooks fire, cap at the main loop | 267 | nowhere | KEEP, merged into `N` |
 
-Fragments `G` and `H` are pure restatement and come out whole, which is 211 bytes. The remaining 167
-bytes come from compressing `E`, `F`, `I`, `J`, `K`, `L` and `M` around the tokens that must survive.
+Fragments `G` and `H` are pure restatement and come out whole, which is 211 bytes. A further 167
+bytes come from compressing `E`, `F`, `I`, `J`, `K`, `L` and `M` around the tokens that must survive,
+which is the 378 bytes this unit was scoped against before `§8` `F3` was resolved. Folding `N` and
+`O` into one bullet recovers 155 more: 580 bytes of source become 425.
 
 ### The five parity-compared values, individually
 
@@ -147,10 +182,18 @@ against the reproduced pattern and produces the same single hit and no other.
 
 ### The replacement, measured
 
-The candidate text is 1110 bytes on disk against the current 1488, a recovery of **378 bytes**. The
-census estimated 300-400 B for this cut, so the measurement lands inside its range and supersedes it.
-The census also says the bullet "spends a third of its length" on the grammar; measured, the
-removable half is 25.4% of it, and that figure supersedes the estimate too.
+The candidate text is two bullets, 1110 and 425 bytes on disk, against the 1488 and 580 they replace.
+That is 1535 against 2068, a recovery of **533 bytes**. Both halves were written to a file and
+measured with `wc -c`; the widened figure is a fresh measurement and not the old 378 scaled up.
+
+The census estimated 300-400 B for the cap bullet alone, and the 378 bytes fragments `A` through `M`
+account for lands inside that range and supersedes it. The census also says the bullet "spends a
+third of its length" on the grammar; measured over the whole edited region, the removable share is
+25.8%, and that figure supersedes the estimate too.
+
+The five bullets at `246,250p` sit between the two replacements and are not reproduced here. The
+second bullet takes the position the pair at `:251-252` occupies today, so the diff stays local and
+nothing between them moves.
 
 ```markdown
 - **CONCURRENCY IS CAPPED, ALWAYS, and the verify-stage TOTAL is capped too — two rules, not one.**
@@ -167,8 +210,19 @@ removable half is 25.4% of it, and that figure supersedes the estimate too.
   `tools/hooks/README.md`; a ready harness ships beside it.
 ```
 
-Its longest line is 101 characters against the 450 declared for this file in
-`tools/line-length-limits.txt:23`. The builder may re-wrap freely subject to S2.
+```markdown
+- Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports), so inline the schema discipline as a snippet. A sidechain agent holds NEITHER tool and cannot fan out at all — the capability is ABSENT, not policed — though it DOES inherit the governing doc and hooks DO fire in it, both measured. That is why the cap sits at the main loop, where the fan-out decision is MADE.
+```
+
+The first block's longest line is 102 bytes and the second is one unwrapped line of 424, both against
+the 450 declared for this file in `tools/line-length-limits.txt`. The second is left unwrapped
+because its five neighbours at `246,250p` are unwrapped single lines and it takes their position. The
+builder may re-wrap freely subject to S2, which binds the first block only.
+
+`tools/hooks/README.md:117` is replaced by one sentence stating the same fact S5 states: the
+array-literal allowance sizes the RECEIVER of an `agent(` fan and is not an exemption from the
+raw-primitive ban above it. That file carries no size ceiling in `tools/template-size-limits.txt` and
+no row in `tools/line-length-limits.txt`, so the sentence is not measured here.
 
 ### Why this cut was planned once and did not land
 
@@ -187,29 +241,33 @@ than proposing a new one.
 
 ### Files touched (estimate)
 
-This unit is `order 2` and `TOOL-aHonedRuleset-2` is `order 1` on the same two carriers, so the
-absolute figures below are stated against the post-unit-2 tree, not against base. Unit 2's own §8 F1
-and F2 are unresolved and move that starting point, so the table is given on its recommended branch
-and the other two branches are stated underneath. This unit's own delta is −378 bytes per carrier
-under every branch.
+This unit is `order 3` and `TOOL-aHonedRuleset-2` is `order 1` on the same two carriers, so the
+absolute figures below are stated against the post-unit-2 tree, not against base. Unit 2's own §8
+moves that starting point, so the table is given on its recommended branch and the other two branches
+are stated underneath. This unit's own delta is −533 bytes per carrier under every branch, because
+neither edited region contains a `{{…}}` placeholder and the render therefore moves byte for byte.
 
 | File | Before this unit | After | Ceiling | Free after |
 |---|---|---|---|---|
-| `coding-governance-agents.template.md` | 49018 | 48640 | 49152 | 512 |
-| `AGENTS.md` (regenerated, not hand-edited) | 64380 | 64002 | 64512 | 510 |
+| `coding-governance-agents.template.md` | 49018 | 48485 | 49152 | 667 |
+| `AGENTS.md` (regenerated, not hand-edited) | 64380 | 63847 | 64512 | 665 |
 
-A third file is touched and is absent from the table because it carries no size ceiling:
-`memory/guides/SESSION-KICKOFF.md`, where S6 re-verifies the §B claims and re-stamps `last-audit`.
+Three more files are touched and are absent from the table because none carries a size ceiling:
+`memory/guides/SESSION-KICKOFF.md`, where S6 re-verifies the §B claims and re-stamps `last-audit`;
+`tools/hooks/README.md`, where S8 corrects one sentence; and `memory/backlog/TOOL.md`, where S9 flips
+the row.
 
-Both ceilings are declared in `tools/template-size-limits.txt`. Base was measured with `wc -c` at
-`102e98f0` as 49144 and 64506, which is 8 and 6 bytes free; unit 2 recommends a 126-byte recovery per
-carrier, which is the 49018 and 64380 above. Everything right of that column is arithmetic, not a
-measurement. If unit 2 does not land, this unit lands at 48766 and 64128 with 386 and 384 free; if
-unit 2 also drops its 86-byte connective under its F2, at 48556 and 63918 with 596 and 594 free.
+Both ceilings are declared in `tools/template-size-limits.txt` and were read there. Base was measured
+with `wc -c` at `102e98f0` as 49144 and 64506, which is 8 and 6 bytes free; unit 2 recommends a
+126-byte recovery per carrier, which is the 49018 and 64380 above. Everything right of that column is
+arithmetic, not a measurement. If unit 2 does not land, this unit lands at 48611 and 63973 with 541
+and 539 free; if unit 2 also drops its 86-byte connective, at 48399 and 63761 with 753 and 751 free.
 
 The advisory `TEMPLATE-SIZE WARN` about growth past the recorded high-water of 48378 survives this
-cut on every one of those branches, because the smallest of them, 48556, is still above it. Clearing
-that WARN is not this unit's job.
+cut on every one of those branches, because the smallest of them, 48399, is still above it. The
+margin is 21 bytes, down from 178 before `F3` widened the cut, so a fourth cut on this carrier could
+take the template under its high-water and clear the WARN as a side effect. Clearing it is still not
+this unit's job, and dropping below a high-water reds nothing.
 
 ### Alternatives rejected
 
@@ -223,6 +281,14 @@ that WARN is not this unit's job.
 - **Keep `passes unmarked` verbatim to minimise the diff.** Rejected: `TOOL-dFramedEntrypoint-1`
   reproduced a five-thunk literal fan being DENIED, so the sentence is wrong, and rewriting the
   words around a known-wrong clause while leaving the clause is the class this build is auditing for.
+- **Correct the charter carrier only and leave `tools/hooks/README.md:117` to its backlog row.** This
+  spec recommended it at `§8` `F2` and the owner overruled it on 2026-09-04. The recommendation was
+  scope hygiene; the ruling is that a half-applied correction leaves the wrong sentence live in the
+  file that OWNS the rule, which is the worse of the two carriers to leave standing.
+- **Leave the two sidechain bullets at `:251-252` for a follow-up.** This spec recommended it at
+  `§8` `F3` and the owner overruled it on 2026-09-04. The recommendation weighed diff hygiene; the
+  ruling weighed that the third and fourth statements of one enforcement location are the same defect
+  as the first, and a follow-up that never gets raised leaves them standing forever.
 
 ## 5. Production-readiness checklist
 
@@ -238,14 +304,18 @@ that WARN is not this unit's job.
   and `tools/check-playbook-parity.sh` reds that by name rather than reporting agreement, so the
   failure is loud. The second risk is forgetting the re-render, which `playbook render wiring`
   catches. The third is forgetting S6's re-stamp, which the pre-commit hook blocks on rather than
-  letting through. Rollback is `git revert` of one commit touching three files.
+  letting through. The fourth arrived with `F2`: S5 and S8 must say the same thing, and nothing gates
+  the agreement of two prose carriers, so the builder writes both in one edit and reads them side by
+  side. Rollback is `git revert` of one commit touching five files.
 - testing + left-shift gates — no new gate. Two gates already hold this bullet, which is why this
   spec enumerates their pins rather than adding a third. `tools/check-agent-cap-restatement.sh`
   cannot see a bound written with no noun beside it and says so in its own header, and that blind
   spot is unchanged by this edit.
-- migration / rollback — none. Adopters receive the template on their next `govkit` update, and the
-  removed sentences are already carried by `tools/hooks/README.md`, which ships in the same kit.
-- user docs — N/A. `tools/hooks/README.md` is the doc, and it already holds the moved content.
+- migration / rollback — none. Adopters receive both files on their next `govkit` update, and the
+  removed sentences are already carried by `tools/hooks/README.md`, which ships in the same kit. No
+  version constant moves, so nothing changes about how a target detects the kit.
+- user docs — `tools/hooks/README.md` is the doc, and S8 corrects one wrong sentence in it. Nothing
+  else moves there: the grammar the charter points at is already stated in full and correctly.
 
 ## 6. Acceptance criteria
 
@@ -256,25 +326,37 @@ that WARN is not this unit's job.
   `tools/check-playbook-parity.sh` each have their stated-side extraction run against
   `coding-governance-agents.template.md` on its own, each returns a NON-EMPTY value, proving no
   phrase was broken by a wrap rather than merely proving the gate is green. The rows are cited by
-  label because `TOOL-aHonedRuleset-5` shares this unit's `order 2` and its S7 adds two rows and two
+  label because `TOOL-aHonedRuleset-5` shares this unit's `order 3` and its S7 adds two rows and two
   header lines to that same list, which moves every line number in it.
 - **AC3** — When `bash tools/check-agent-cap-restatement.sh` runs, it exits `0` and reports `clean`,
   with the waiver count unchanged at `2`, so the `at most 5 verify agents TOTAL` row is still live
   and no new bare-number carrier was introduced.
 - **AC4** — When `bash tools/check-template-size.sh` runs, `coding-governance-agents.template.md`
-  measures at most `48766` bytes, which is at least `378` below its base measurement of `49144`.
+  measures at most `48611` bytes, which is at least `533` below its base measurement of `49144`. The
+  bound is stated against base rather than against the post-unit-2 tree so that it holds whichever
+  branch `TOOL-aHonedRuleset-2` lands on.
 - **AC5** — When `bash tools/playbook/adopt-playbook.sh --target . --check` runs, it prints
   `region matches a fresh render`, proving `AGENTS.md` was regenerated in the same commit.
 - **AC6** — When `bash tools/check-line-length.sh coding-governance-agents.template.md` runs, it
   exits `0` against the declared `450` in `tools/line-length-limits.txt`.
-- **AC7** — When `grep -c 'passes unmarked' coding-governance-agents.template.md` runs, it returns
-  `0`, and `grep -n 'array LITERAL of ≤5 elements' coding-governance-agents.template.md` still
-  returns exactly one line.
-- **AC8** — When `git diff --stat` is read on the landing commit, exactly three files are touched —
-  `coding-governance-agents.template.md`, `AGENTS.md` and `memory/guides/SESSION-KICKOFF.md` — and
-  `tools/hooks/README.md` is not among them. The third file is S6's bundled re-stamp, which the
-  pre-commit hook requires; the excluded file is what this criterion is actually about.
+- **AC7** — When `grep -rc 'passes unmarked' coding-governance-agents.template.md AGENTS.md
+  tools/hooks/README.md` runs, every one of the three returns `0`, and
+  `grep -n 'array LITERAL of ≤5 elements' coding-governance-agents.template.md` still returns exactly
+  one line. Both carriers of the wrong claim are corrected, which is what closes
+  `TOOL-dFramedEntrypoint-1`.
+- **AC8** — When `git diff --stat` is read on the landing commit, exactly five files are touched:
+  the two carriers `coding-governance-agents.template.md` and `AGENTS.md`, S6's bundled re-stamp of
+  `memory/guides/SESSION-KICKOFF.md` which the pre-commit hook requires, S8's
+  `tools/hooks/README.md`, and S9's `memory/backlog/TOOL.md`. No sixth file appears — in particular
+  no kit version constant and no waiver registry moves.
 - **AC9** — When `bash tools/run-gates/run-gates.sh` runs at the push boundary, it exits green.
+- **AC10** — When `grep -c 'both fire a main-loop' coding-governance-agents.template.md` runs it
+  returns `0`, and the `§8` bullets between `- Persist each Tier-2 run` and `- Verify before "done"`
+  number exactly one. That observes the widened cut `F3` ordered: two bullets became one, and the
+  third and fourth statements of the enforcement location are gone rather than merely reworded.
+- **AC11** — When `grep -n 'TOOL-dFramedEntrypoint-1' memory/backlog/TOOL.md` runs, the row reads
+  `CLOSED` and points at `builds/aHonedRuleset/`, and `bash tools/memory-tree/check-memory-hygiene.sh`
+  exits `0` over the edited backlog.
 
 ## 7. Gates
 
@@ -290,12 +372,22 @@ that WARN is not this unit's job.
   inside a template whose markers that gate counts.
 - `kickoff-manifest ratchet` — `bash skills/session-kickoff/manifest-check.sh`. Owed because
   `coding-governance-agents.template.md` is a watched pathspec, and satisfied by S6.
-- `memory hygiene` — `bash tools/memory-tree/check-memory-hygiene.sh`. Owed because S6 puts a
-  `memory/` file in the commit, which is also what arms the hook's staged leg.
-- No new gate. Both pins on this bullet already exist and both were run at base. Every leg named
-  above carries no `guard` in `tools/gate-legs.json`, so none of them can be skipped by this diff's
-  shape; that is a property of the manifest and not of this change, which is why no acceptance
-  criterion asserts it.
+- `memory hygiene` — `bash tools/memory-tree/check-memory-hygiene.sh`. Owed because S6 and S9 both
+  put a `memory/` file in the commit, which is also what arms the hook's staged leg.
+- `kit version markers` — `tools/check-kit-versions.sh`, `subject = repo`, unguarded. Named because
+  S8 edits a file under `tools/hooks/`, and to record what it does NOT demand: the constant must be
+  present, well-formed and in agreement with its paired markers, never bumped because a kit file
+  changed.
+- The five self-test legs guarded on `tools/hooks/` in `tools/gate-legs.json` — `agent-cap
+  self-test`, `scratch-guard self-test`, `verifier fan-out self-test`, `review-join self-test` and
+  `hook destinations self-test`. S8 puts a file under that guard, so this diff arms them. They are
+  `chunk = selftests`, which the ordinary bar and `GATE_FULL=1` both hold, so the DoD runs
+  `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` once. None of them reads the sentence S8
+  edits — they build synthetic fixtures — so this is a guard being honoured, not a real coupling.
+- No new gate. Both pins on the cap bullet already exist and both were run at base. Every leg above
+  the `tools/hooks/` group carries no `guard` in `tools/gate-legs.json` and so cannot be skipped by
+  this diff's shape; that is a property of the manifest and not of this change, which is why no
+  acceptance criterion asserts it.
 
 ## 8. Open questions
 
@@ -306,6 +398,8 @@ that WARN is not this unit's job.
   own, because it does not say WHICH five and an editor must open the script regardless. *Recommend
   dropping the word*, which the §4 candidate text does, saving 5 bytes and one ungated number. The
   owner may prefer to keep it as a louder warning.
+  RESOLVED (owner, 2026-09-04): drop the word FIVE. This matches the recommendation, so the §4
+  candidate text stands unchanged and S1 keeps the parity sentence without its count.
 - **F2 — how far does the array-literal correction reach?** `TOOL-dFramedEntrypoint-1` is OPEN and
   names two carriers, `AGENTS.md §8` and `tools/hooks/README.md:117`, and its stated fix is "two
   sentences, in the file that owns each". S5 rewrites the charter carrier as a side effect of the
@@ -314,11 +408,23 @@ that WARN is not this unit's job.
   leaving the row OPEN against its README half*, rather than either widening this unit into the
   hooks kit or preserving a known-wrong sentence to keep the row tidy. The owner may prefer this unit
   make no correction at all and hand both carriers to that row.
+  RESOLVED (owner, 2026-09-04): fix BOTH carriers and close `TOOL-dFramedEntrypoint-1`. This goes
+  AGAINST the recommendation above, which is left standing as written. §2 gains S8 for
+  `tools/hooks/README.md:117` and S9 for the row's status flip, §3 drops the non-goal that forbade
+  the README, AC7 now checks all three carriers of the phrase, AC8 counts five files, and AC11
+  observes the closed row. The two edits are ONE correction on two carriers of a single wrong claim
+  about `tools/hooks/agent-cap.js`, not two mechanisms — which is why they belong in one diff, and
+  why this ruling reads differently from `F3`'s.
 - **F3 — do the neighbouring `§8` bullets at `:251` and `:252` join this unit?** They restate the
   enforcement location a third and fourth time, and `:251` also repeats the matcher pair in prose.
   Folding them in would recover more, and would also put two mechanisms in one diff.
   *Recommend leaving them out* and raising a follow-up if the recovered bytes are wanted; the
   measured 378 already clears the pressure this unit was scoped against.
+  RESOLVED (owner, 2026-09-04): fold them in. This goes AGAINST the recommendation above, which is
+  left standing as written. §2 gains S7, §4's byte arithmetic was re-measured over the widened
+  `230,252p` range with `wc -c` rather than scaled from the old figure — 2068 bytes of source become
+  1535, a recovery of 533 — and AC10 observes the widened cut directly rather than inferring it from
+  the size gate.
 
 ## 9. Revision log
 
@@ -344,6 +450,25 @@ that WARN is not this unit's job.
   same reason — `TOOL-aHonedRuleset-5`'s S7 moves that span at the same `order 2`. Both now name
   the `PAIRS` list without a span.
 
+- rev-4 · 2026-09-04 · owner rulings applied; header stamped `ratified 2026-09-04` and the order verb
+  moved from `order 2` to `order 3`, which changes AC2's and §4's citation of the unit this one runs
+  beside without changing that it is `TOOL-aHonedRuleset-5`. F1 resolved to dropping the word `FIVE`,
+  matching the recommendation, so nothing downstream moved. F2 resolved AGAINST the recommendation:
+  both carriers are fixed and `TOOL-dFramedEntrypoint-1` closes, which added S8 and S9, deleted the
+  §3 non-goal forbidding `tools/hooks/README.md`, added a §3 non-goal against a version bump and
+  against restructuring that file, widened AC7 to all three carriers of the phrase, moved AC8 from
+  three files to five, added AC11, added the `kit version markers` leg and the five `tools/hooks/`
+  guarded self-test legs to §7 with the `GATE_SELFTESTS=1` run they oblige, added the two-carrier
+  agreement risk to §5, and widened §10's dossier-staleness claim to cover the README. F3 also
+  resolved AGAINST the recommendation: the bullets at `:251` and `:252` fold in, which added S7,
+  added inventory rows `N` and `O`, added the second candidate block, and forced §4's arithmetic to
+  be RE-MEASURED rather than scaled. Every figure touched was re-measured with `wc -c` at base
+  `102e98f0`: the cap bullet 1488, the sidechain pair 580 as 313 plus 267, the untouched five 863,
+  the three summing to 2931 over `230,252p`; the replacements 1110 and 425 for 1535; recovery 533,
+  which is 25.8% of the edited region. Ceilings 49152 and 64512 read from
+  `tools/template-size-limits.txt`, high-water 48378 from `tools/template-size-highwater.txt`,
+  leaving 21 bytes of margin on the narrowest branch instead of the previous 178.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "charter bullet restating the agent-cap hook grammar that
@@ -353,8 +478,11 @@ tools/hooks/README.md owns"` returned the `agent-cap` affordance seam and named 
 numbers in this exact bullet, and `tools/check-playbook-parity.sh` already pins its five values, so
 this unit adds no mechanism and instead edits prose inside two existing ones. The dossier for that
 seam is `memory/map/features/agent-cap.md`; `grep -n "charter|AGENTS.md|§8"` over it finds only a
-pointer at `memory/guides/REVIEW-PROTOCOL.md` and no description of the charter's wording, so no
-dossier prose goes stale from this edit and no new inventory key is claimed.
+pointer at `memory/guides/REVIEW-PROTOCOL.md` and no description of the charter's wording, and
+`grep -n "README"` over the same file returns nothing, so neither S5 nor S8 makes dossier prose stale
+and no new inventory key is claimed. What the dossier does describe is the hook's array-literal
+element counter, which this unit does not touch — the mechanism was always right and only the two
+prose copies of it were wrong.
 
 The recall probe surfaced the two records that changed this spec's shape, neither of which the census
 cites: `memory/builds/aFusedCharter/README.md:75-77`, which already ruled this cut and did not land

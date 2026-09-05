@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -41,14 +41,31 @@ other unattended rule already lives.
   assertions match check 12's new failure text so `check-arms.py` still sees the branch armed.
 - **S5 — the three cross-references that name the old location are repointed.**
   `tools/memory-tree/BUILD-METHOD.template.md:60` and `:274`, and
-  `tools/unattended/SKILL.template.md:258`, each name "Step 5b exit 5" or "Step 5b … per exit". Each
-  is repointed at the protocol section, subject to the byte budget in §4.
+  `tools/unattended/SKILL.template.md:258`, each name "Step 5b exit 5" or "Step 5b … per exit". All
+  three are repointed at the protocol section, unconditionally: §8 F2's byte squeeze was ruled moot
+  and §4 says why. **Those two BUILD-METHOD addresses are stated at THIS build's base and are not
+  the addresses you will find.** `TOOL-aHonedRuleset-6` is `order 1` and deletes that file's lines
+  8-18, so by the time this unit runs they sit at `:49` and `:263`. Match on the quoted strings in
+  §4's inventory, never on these numbers.
 - **S7 — the kickoff manifest is re-stamped in the same commit.** `memory/guides/SESSION-KICKOFF.md`
   gets its `last-audit` re-stamp bundled into this unit's commit, because three files this unit
   stages are `watch:` pathspecs on line 6 of that file: `skills/session-kickoff/SKILL.md`,
   `.unattended.conf` and `memory/guides/BUILD-METHOD.md`. `.githooks/pre-commit` runs
   `manifest-check.sh --staged` unconditionally, so a commit that stages a watched file without the
   bundled re-stamp is refused before it exists.
+
+- **S8 — `KIT_UNATTENDED_VERSION` moves from 1.17 to 1.18 in this same commit.** The owner ruled the
+  bump owed, against this spec's own recommendation (§8 F3). The constant is declared at
+  `tools/unattended/unattended.sh:42` and repeated at `tools/unattended/check-unattended.sh:40` and
+  `tools/unattended/check-pass-order.sh:29`. The `gov:kit unattended@` marker sits in 14 tracked
+  carriers, listed by
+  `git grep -l 'gov:kit unattended@' -- tools/unattended memory/guides .claude/skills/unattended`,
+  and three of those carriers hold the marker on the same line as the constant. All fourteen move
+  together, because three separate mechanisms compare them: `tools/check-kit-versions.sh` pairs each
+  constant with its same-line marker and asserts one in every `tools/unattended/*.template.md`,
+  `govkit selfcheck` 5c compares every marker under the entry's own claimed files against the
+  constant, and the four rendered destinations carry the marker inside the bytes their parity checks
+  compare.
 
 There is no S6. Rev-1 numbered the engine's high-water bump S6, this revision deleted it, and the
 slot is left vacant so a citation of the removed item still lands on nothing rather than on a
@@ -66,13 +83,14 @@ different rule. §3 says where that decision went and §9 records the removal.
 - The other four ranked cut-list entries are not touched. This unit is one mechanism.
 - No ceiling is created, raised or lowered, and `BUILD-METHOD`'s ungated prose budget is not
   converted to a registry row. `TOOL-aHonedRuleset-6` is that question, in this same build, and the
-  README's parked owner decision is now that unit's §8 F1. This unit routes the question there rather
-  than back to the README.
+  README's parked owner decision is that unit's §8 F1. The owner ruled it on 2026-09-04 and moved
+  that unit to `order 1`, so it lands before this one; this unit still routes the question there
+  rather than answering it.
 - The `skills/session-kickoff/SKILL.md` high-water row in `tools/template-size-highwater.txt` is NOT
-  re-recorded here. `TOOL-aHonedRuleset-5` §8 F1 is the owner call on that row, unit 5 is `order 2`
-  and this unit is `order 1`, and two siblings state the no-bump-on-a-shrink rule with a reason —
-  unit 2 §3 and unit 4 §3. A bump taken at order 1 would record a figure order 2 immediately
-  supersedes.
+  re-recorded here. `TOOL-aHonedRuleset-5` §8 F1 is the owner call on that row and this unit does not
+  pre-empt it, and two siblings state the no-bump-on-a-shrink rule with a reason — unit 2 §3 and
+  unit 4 §3. The argument is ownership rather than sequence, so it does not move with the
+  2026-09-04 re-order that put this unit at `order 2`.
 - Section 5's parked-field rule, the ABORT verb and the hand-back trigger stay in the engine. Only
   the enumeration moves.
 
@@ -88,7 +106,7 @@ different rule. §3 says where that decision went and §9 records the removal.
 | the block that moves (lines 223–241) | 1467 B | `sed -n '223,241p' … \| wc -c` |
 | protocol size / cap | 54772 B of `GUIDE_CAP_BYTES` 61440, 6668 free | `wc -c`; cap at `check-memory-hygiene.sh:63` |
 | protocol lines / cap | 649 of `GUIDE_CAP_LINES` 750 | `wc -l` |
-| `BUILD-METHOD.template.md` | 24564 B of a self-declared 24576, 12 free | `wc -c`; budget at its own line 8 |
+| `BUILD-METHOD.template.md` | 24564 B of a self-declared 24576, 12 free — at base only, see below | `wc -c`; budget at its own line 8 |
 | exits matching the counter today | 6, all in Step 5b | `grep -cE '^[0-9]+\. \*\*Step ' skills/session-kickoff/SKILL.md` |
 | same pattern in the protocol today | 0 | `grep -cE '^[0-9]+\. \*\*Step ' tools/unattended/PROTOCOL.template.md` |
 
@@ -159,7 +177,9 @@ written down: `tools/memory-tree/check-arms.py`'s own docstring refuses aggregat
 "an aggregate total lets one gate's DELETED guard be masked by another gate's added one". A sum lets
 an exit deleted from the protocol be masked by an unrelated numbered line appearing in the engine.
 
-**Whether the arm stays gated on `KICKOFF_ENGINE` is a fork** — see §8 F1.
+**The arm stays inside the `if [ -n "$KICKOFF_ENGINE" ]` block.** Owner ruling, 2026-09-04, recorded
+at §8 F1. The blank-turns-it-off contract documented in the §8 key table therefore stands unchanged,
+and this repo declares `KICKOFF_ENGINE`, so the floor keeps binding here.
 
 ### The three stale cross-references
 
@@ -173,12 +193,19 @@ None of them breaks outright — Step 5b survives as a forwarding pointer, so a 
 late rather than nowhere. They are in scope anyway because leaving them is the
 `amendment-leaves-its-other-half-standing` class the census named for unit 1.
 
-`BUILD-METHOD.template.md` has **12 bytes free** against a budget its own line 8 declares and its own
-line 16 admits no gate enforces. Its house convention, stated at its line 20, is that `§<n>` names a
-section of another document, so `protocol §13` is the correct spelling there. The repoint must be
-measured, not assumed to fit: `wc -c tools/memory-tree/BUILD-METHOD.template.md` must stay at or
-below 24576 after the edit. `tools/unattended/SKILL.template.md` has no ceiling anywhere and is
-unconstrained. §8 F2 carries the branch for a repoint that will not fit.
+All three repoints happen, and none of them is squeezed. At base `102e98f0`
+`BUILD-METHOD.template.md` measured 24564 B against a budget its own line 8 declared and its own
+line 16 admitted no gate enforced, leaving 12 bytes — the squeeze §8 F2 was written about.
+`TOOL-aHonedRuleset-6` now holds `order 1` under the owner's 2026-09-04 re-order and lands first, and
+the option (b) the owner took there deletes that file's lines 8–18 outright: 1101 B measured by
+`sed -n '8,18p' tools/memory-tree/BUILD-METHOD.template.md | wc -c`. That passage IS the budget
+declaration, so after unit 6 lands the file carries neither the constraint nor the bytes it was
+short of, and unit 6's option (b) adds no `tools/template-size-limits.txt` row in its place. A
+builder who reaches this unit and still finds that declaration at line 8 is on a tree where the
+declared order did not hold, and should stop rather than improvise. `BUILD-METHOD.template.md`'s
+house convention, stated at its line 20, is that `§<n>` names a section of another document, so
+`protocol §13` is the correct spelling there. `tools/unattended/SKILL.template.md` has no ceiling
+anywhere and was never constrained.
 
 ### Migration
 
@@ -191,7 +218,9 @@ There is no data migration. Two ordering constraints:
    or the `kit/dogfood doc parity` leg, and the edit is lost at the next render.
 2. The checker, the checker's test and both halves of the protocol move in ONE commit. A commit that
    moves the prose without moving the counter is red, and one that moves the counter without the
-   prose is red the other way.
+   prose is red the other way. S8's version bump rides the same commit for the same reason: all 14
+   marker carriers and the three constants are compared against each other, so a partial sweep is
+   red however few files it leaves behind.
 
 `tools/unattended/check-unattended.test.sh` already ships the seam for step 2's staging: `pedit()` at
 line 1576 mutates both protocol copies through `mutate`, which fails loudly when its locator stops
@@ -209,9 +238,10 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
 | `tools/unattended/check-unattended.test.sh` | fixture + two assertions |
 | `tools/unattended/.unattended.conf.example` | the key's comment |
 | `.unattended.conf` | the key's comment |
-| `tools/memory-tree/BUILD-METHOD.template.md` | two pointers, ≤12 B net |
+| `tools/memory-tree/BUILD-METHOD.template.md` | two pointers, no byte constraint left to fit inside |
 | `tools/unattended/SKILL.template.md` | one pointer |
 | `.claude/skills/unattended/SKILL.md`, `memory/guides/BUILD-METHOD.md` | rendered |
+| the 14 `gov:kit unattended@` carriers | S8 — marker 1.17 → 1.18, and the three same-line `KIT_UNATTENDED_VERSION=` constants with them |
 | `memory/guides/SESSION-KICKOFF.md` | S7 — re-verify §B, re-stamp `last-audit` |
 | `memory/map/features/session-kickoff.md`, `memory/map/features/unattended.md` | dossier prose refreshed on touch |
 
@@ -247,7 +277,8 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
 - observability — the check-12 failure message is the only signal, and it must name the file it
   actually read or the next reader debugs the wrong document.
 - risks — the whole risk is a partial landing. Prose moved without the counter reds the bar; counter
-  moved without the prose reds it differently. One commit, per §4 Migration.
+  moved without the prose reds it differently; S8's marker sweep left half-done reds a third way.
+  One commit, per §4 Migration.
 - testing + left-shift gates — no new gate. The existing check 12 branch 4 stays armed by moving its
   fixture with its subject; `python3 tools/memory-tree/check-arms.py --check` is what catches a
   message edited without its assertion.
@@ -277,13 +308,13 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
 - **AC7** — When the suite runs, `bash tools/unattended/check-unattended.test.sh` passes and
   `python3 tools/memory-tree/check-arms.py --check` exits 0 with check 12 branch 4 reported ARMED by
   `--report`.
-- **AC8** — When the cross-references are repointed, `wc -c tools/memory-tree/BUILD-METHOD.template.md`
-  reports at most 24576, and `grep -rn 'Step 5b exit' tools/ memory/guides/ .claude/` returns, outside
-  `memory/builds/` and `memory/archive/`, exactly what the §8 F2 ruling permits: nothing at all if F2
-  goes the all-three-repoints way, or only `tools/memory-tree/BUILD-METHOD.template.md:60` and its
-  render `memory/guides/BUILD-METHOD.md:60` if F2 goes the fallback way. Under either branch
-  `tools/unattended/SKILL.template.md` and `.claude/skills/unattended/SKILL.md` return no hit, because
-  that repoint is unconditional.
+- **AC8** — When the cross-references are repointed,
+  `grep -rn 'Step 5b exit' tools/ memory/guides/ .claude/` returns nothing outside `memory/builds/`
+  and `memory/archive/`. All three repoints happen, so `tools/memory-tree/BUILD-METHOD.template.md`,
+  `tools/unattended/SKILL.template.md` and both of their renders each return no hit. No byte
+  assertion rides this criterion: `TOOL-aHonedRuleset-6` lands at `order 1` and its ruled option (b)
+  deletes the self-declared budget, so there is no ceiling on
+  `tools/memory-tree/BUILD-METHOD.template.md` left to observe.
 - **AC9** — When the renders are re-run, `bash tools/memory-tree/kit-dogfood-parity.test.sh` and
   `bash tools/unattended/adopt-unattended.sh --check` both exit 0.
 - **AC10** — When the shipped surface is scanned, `bash tools/check-install-prefix.sh` reports
@@ -300,11 +331,9 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   returns at least 1. Measured at base it returns 0, because the engine names that document nowhere,
   so a build that deletes the block and leaves no pointer fails this.
 - **AC13** — When the cross-references are repointed,
-  `grep -rn 'Step 5b says which one per exit' tools/ memory/guides/ .claude/` returns, outside
-  `memory/builds/` and `memory/archive/`, nothing if §8 F2 goes the all-three-repoints way, or only
-  `tools/memory-tree/BUILD-METHOD.template.md:274` and its render `memory/guides/BUILD-METHOD.md:274`
-  if F2 goes the fallback way. This criterion exists because AC8's `Step 5b exit` pattern does not
-  match line 274's wording — verified at base, where that pattern matches line 60 of
+  `grep -rn 'Step 5b says which one per exit' tools/ memory/guides/ .claude/` returns nothing outside
+  `memory/builds/` and `memory/archive/`. This criterion exists because AC8's `Step 5b exit` pattern
+  does not match line 274's wording — verified at base, where that pattern matches line 60 of
   `BUILD-METHOD.template.md` and never line 274, so line 274 could be left untouched with AC8 green.
 - **AC14** — When the key's documented meaning is corrected,
   `grep -c 'MEASURE it against your own engine' tools/unattended/.unattended.conf.example` PRINTS 0.
@@ -312,6 +341,14 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   `|| true` rather than chaining it — a passing check reads as a failure otherwise. Check 22 cannot carry this: its own header at
   `tools/unattended/check-unattended.sh:1379-1381` states it grades presence of the key name in the
   table region and that a row whose prose is wrong is green there.
+- **AC15** — When S8's bump has landed, `bash tools/check-kit-versions.sh` exits 0 and
+  `git grep -c 'gov:kit unattended@1\.18' -- tools/unattended memory/guides .claude/skills/unattended`
+  lists 14 files while the same command for `1\.17` lists none and, finding nothing, exits non-zero
+  the way AC14's probe does. The whole sweep is observed in one command rather than file by file,
+  because a partial sweep is exactly the failure mode: the same 14 carriers answer to `1\.17` before
+  the commit, so a count landing anywhere between the two is a half-bumped kit.
+  `python tools/govkit/govkit.py selfcheck` is the second observation and exits 0 with no 5c failure
+  naming entry `unattended`.
 
 ## 7. Gates
 
@@ -323,7 +360,12 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
 - `harness arms (fail branches armed or pinned)` — `python3 tools/memory-tree/check-arms.py --check`
 - `install-prefix (shipped surface)` — `bash tools/check-install-prefix.sh`
 - `kit placeholders (a declared token its adopter substitutes)` — `python tools/check-kit-placeholders.py`
-- `kit version markers` — `bash tools/check-kit-versions.sh`
+- `kit version markers` — `bash tools/check-kit-versions.sh`. S8 puts this leg on the critical path
+  rather than merely keeping it green: it pairs each `KIT_UNATTENDED_VERSION` constant with its
+  same-line marker and demands one in every `tools/unattended/*.template.md`.
+- `govkit selfcheck` — `python tools/govkit/govkit.py selfcheck`. Its arm 5c compares every
+  `gov:kit unattended@` marker under the entry's own claimed files against the constant, which is the
+  other half of S8's sweep.
 - `kickoff-manifest ratchet` — `bash skills/session-kickoff/manifest-check.sh`. Three files this unit
   stages are `watch:` pathspecs on line 6 of `memory/guides/SESSION-KICKOFF.md`:
   `skills/session-kickoff/SKILL.md`, `.unattended.conf` and `memory/guides/BUILD-METHOD.md`. S7 is
@@ -336,7 +378,11 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
 
 ## 8. Open questions
 
-- **F1 — does the exit-count arm stay inside `if [ -n "$KICKOFF_ENGINE" ]`?** Once the enumeration is
+- **F1 — does the exit-count arm stay inside `if [ -n "$KICKOFF_ENGINE" ]`?**
+  **RESOLVED (owner, 2026-09-04): keep the arm inside the block.** This matches the recommendation
+  below. The arm's subject changes to `$LIVEDOC` but its enclosing condition does not move, so the
+  documented blank-turns-it-off contract in the §8 key table survives untouched and the diff stays
+  the smaller one. §4's counter paragraph states the ruling as the design. Once the enumeration is
   kit-owned, its shrink is a kit regression whether or not the adopting project ships a kickoff
   skill, which argues for lifting the arm out of that block. Against: an adopter with no kickoff
   engine has no interactive exits to protect, `.unattended.conf.example` ships
@@ -344,20 +390,41 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   documented in the §8 key table. **Recommendation: keep it inside the block.** It is the smaller
   diff, it preserves the documented off-switch, and this repo declares `KICKOFF_ENGINE`, so the floor
   keeps binding here either way.
-- **F2 — the `BUILD-METHOD` repoint against its last 12 bytes.** Two pointers must be rewritten in a
+- **F2 — the `BUILD-METHOD` repoint against its last 12 bytes.**
+  **RESOLVED (owner, 2026-09-04): MOOT, by re-order rather than by judgment.** The owner moved
+  `TOOL-aHonedRuleset-6` to `order 1` and this unit to `order 2`, so unit 6 lands first, and took
+  that unit's option (b), which deletes `tools/memory-tree/BUILD-METHOD.template.md` lines 8–18
+  entirely. Those eleven lines measure 1101 B and ARE the self-declared budget, so by the time this
+  unit runs there is no 24576 ceiling and no twelve-byte squeeze to fit inside. All three repoints
+  happen; AC8 and AC13 were rewritten unconditionally and §4's cross-reference paragraph now states
+  the single outcome. Nothing below was weighed differently — the fork simply stopped existing. Two
+  pointers must be rewritten in a
   file with 24564 of a self-declared 24576 bytes. A spelling like "the unattended protocol's §13
   exit 5" is roughly one byte longer than "the kickoff engine's Step 5b exit 5", and line 274's
   rewrite costs a few more; the pair plausibly fits, and plausibly does not. **Recommendation:**
   attempt the repoint, measure with `wc -c`, and if it does not fit within 24576, repoint only
   `tools/unattended/SKILL.template.md:258` and leave BUILD-METHOD's two pointers forwarding through
-  Step 5b's stub — then say so in the build record. AC8 and AC13 are written against both branches,
-  so neither outcome makes the acceptance set unsatisfiable. **Landing `TOOL-aHonedRuleset-6` first
+  Step 5b's stub — then say so in the build record. AC8 and AC13 were written against both branches
+  at rev-2, so neither outcome made the acceptance set unsatisfiable; rev-3 collapsed both to the one
+  outcome the ruling leaves. **Landing `TOOL-aHonedRuleset-6` first
   makes this fork moot:** that unit is the carrier for the parked budget question, it edits the same
   file's lines 8–18, and either of its branches frees roughly 950 B (option a) or 1101 B (option b) —
   disjoint from the lines 60 and 274 this unit repoints. With that space recovered the 12-byte
-  squeeze disappears and the repoint simply fits. Unit 6 is `order 3` and this unit is `order 1`, so
-  under the declared order the fork is live; a re-order is the owner's to make, not this spec's.
-- **F3 — bump `KIT_UNATTENDED_VERSION` from 1.17, or not?** The kit's shipped contract gains a
+  squeeze disappears and the repoint simply fits. At rev-2 unit 6 was `order 3` and this unit was
+  `order 1`, so under the order declared then the fork was live; a re-order was the owner's to make,
+  not this spec's — and on 2026-09-04 the owner made it.
+- **F3 — bump `KIT_UNATTENDED_VERSION` from 1.17, or not?**
+  **RESOLVED (owner, 2026-09-04): BUMP it, to 1.18. This goes AGAINST the recommendation below,
+  which said do not bump; the recommendation stands as written and is not retro-edited.** The owner's
+  reading is that stamping a kit release is a bookkeeping obligation of kit work rather than a second
+  mechanism, so it folds into this unit rather than becoming a follow-up. It enters §2 as **S8**, §4
+  as a files-touched row and a Migration clause, §7 as two named legs, and §6 as **AC15**. The
+  carrier figure below was also wrong and is corrected here: the marker sits in **14** tracked
+  carriers, not 16, measured by
+  `git grep -l 'gov:kit unattended@' -- tools/unattended memory/guides .claude/skills/unattended`;
+  ten of those fourteen are what `govkit selfcheck` 5c itself can see, because the entry claims its
+  own `tools/unattended` home and not the four rendered destinations, which are held instead by the
+  render byte-compares. The kit's shipped contract gains a
   section and its checker changes a subject, which is an argument for a bump; against it,
   `tools/check-kit-versions.sh` asserts presence and marker agreement rather than movement, no
   verdict-epoch gate covers this kit (`check-verdict-epoch.sh` scans only
@@ -386,6 +453,30 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   **52471 B** — 48767 was `TOOL-aScouredKit-23`'s figure for the RENDERED
   `.claude/skills/unattended/SKILL.md`, which measures 53234 B today. No §8 fork was resolved; F1, F2
   and F3 remain UNRESOLVED and unsigned.
+- rev-3 · 2026-09-04 · the owner ratified every §8 fork and re-ordered the build. Header: `rev-3`,
+  `order 1` became `order 2`, and the tail gained `ratified 2026-09-04`.
+  **F1 — RESOLVED, as recommended:** the exit-count arm stays inside `if [ -n "$KICKOFF_ENGINE" ]`.
+  §4's counter paragraph stopped announcing a fork and now states the ruling as the design.
+  **F2 — RESOLVED as MOOT by the re-order**, not by a judgment on its own terms:
+  `TOOL-aHonedRuleset-6` moved to `order 1` and lands first, and the owner took its option (b), which
+  deletes `tools/memory-tree/BUILD-METHOD.template.md` lines 8–18 — 1101 B re-measured here, and the
+  self-declared 24576 budget is inside them, so neither the ceiling nor the twelve-byte squeeze
+  survives. All three repoints therefore happen. **AC8** dropped its `wc -c` clause and its
+  either-branch wording and now asserts a single empty `grep`; **AC13** dropped the same
+  conditionality. §4's cross-reference paragraph was rewritten from the squeeze to the single
+  outcome, and its files-touched row lost `≤12 B net`. §3's high-water bullet no longer argues from
+  `order 1` versus `order 2`, because that argument was ownership dressed as sequence and the
+  re-order falsified the sequence half; §3's ceiling bullet records that unit 6 now lands first.
+  **F3 — RESOLVED AGAINST the recommendation:** `KIT_UNATTENDED_VERSION` bumps 1.17 → 1.18, folded
+  into this unit as a bookkeeping obligation of kit work. That added **S8** to §2, a files-touched
+  row and a Migration clause to §4, a third partial-landing failure mode to §5's risks line, the
+  `govkit selfcheck` leg and a widened `kit version markers` note to §7, and **AC15** to §6. The
+  fork's own carrier figure was corrected against source: **14** tracked carriers, not 16, and ten
+  of them rather than all fourteen are what `govkit selfcheck` 5c can see.
+
+- rev-4 · 2026-09-04 · S5's two `BUILD-METHOD.template.md` addresses were stated at base while the
+  spec declares it runs after `TOOL-aHonedRuleset-6` deletes eleven lines above them. Recorded the
+  post-unit-6 addresses and told a builder to match on the quoted strings instead.
 
 ## 10. Reuse audit
 

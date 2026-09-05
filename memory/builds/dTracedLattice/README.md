@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-05
 streams: tooling
 roster: TOOL
-ids: TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6
+ids: TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7
 ---
 
 # dTracedLattice — whether the codebase map should carry relations, and what its relation data is actually worth
@@ -33,26 +33,25 @@ defects in the map kit were observed while measuring, none of them about relatio
 - The map kit keeps writing an untracked file into a tracked directory.
 
 ## Build-level rules
-- **The relations question is ANSWERED, and the answer is no.** Not on staleness grounds — those were
-  measured weak at every granularity — but on `AGENTS.md` §12: every consumer is same-language and
-  in-process, derivation is sub-second, and the artifact would be five kit-to-kit rows. No unit here
-  commits a relation artifact, and a unit that wants to must first reverse §12, not finding 4.
+- **The relations question is ANSWERED, and the answer is no.** Not on staleness grounds, which
+  measured weak at every granularity, but on `AGENTS.md` §12: every consumer is same-language and
+  in-process, derivation is sub-second, and the artifact would be five rows. A unit that wants one
+  must first reverse §12, not finding 4.
 - **Rev-1 of the dossier is wrong and is kept.** It recommended a committed graph on a measurement
   that described a different artifact. What was refuted is the build's main value, not clutter.
+- **A SECOND reversal, and the load-bearing lesson.** A confidence re-rank lifted precision@5 from
+  1.6% to 80.0% against ast edges and still took recall@5 from 11/28 to 2/28 against scenarios
+  (p=0.0039). Edge precision and answer hit-rate are two objects and only the second is the question
+  a session asks. No unit may gate on the first; unit 1 §4 carries both.
 - **No unit re-files an existing row.** Unit 1 AMENDS `TOOL-aScouredKit-16`; nothing re-proposes
-  `TOOL-aProvenReuse-4`, which records its own refusal. `drift_report.py` already flags this repo's
-  backlog over budget, so findings ride specs rather than new rows.
-- **Three owner rulings, 2026-09-05, and each one closed a fork a run may not take.** The lexicon
-  kit's AST import resolver is RESCUED into `codebase-map` before `TOOL-aSurfacedLexicon-2` deletes
-  it, which is why unit 6 exists and takes order 1 across two builds. `RECALL_DARK_LAYERS` is
-  re-declared in EXTENSIONS, with a migration and a refusal on the old spelling. The reinvention
-  backlog moves OUTSIDE the worktree, reversing `bConvergentLodestar` F7: nobody has read rows in a
-  file that never existed.
-- **The units are SEQUENCED, and an earlier revision of this bullet claimed the opposite.** The write
-  sets intersect on `map_diff.py`, on `reuse_lookup.py`'s banner, and on one row of
-  `memory/backlog/TOOL.md` that M6 clause 3 forbids two passes to touch at all. Clauses 2 and 3
-  govern, not clause 1, and the generated build-order block below is the authority. Each spec names
-  the collision it carries.
+  `TOOL-aProvenReuse-4`. The backlog is already over budget, so findings ride specs, not rows.
+- **Three owner rulings, 2026-09-05, each closing a fork a run may not take.** The lexicon resolver
+  is RESCUED before `TOOL-aSurfacedLexicon-2` deletes it, which is why unit 6 takes order 1 across
+  two builds; `RECALL_DARK_LAYERS` becomes EXTENSIONS with a migration; the reinvention backlog moves
+  OUTSIDE the worktree, reversing `bConvergentLodestar` F7. Each mark is in its own §8.
+- **The units are SEQUENCED, and an earlier revision of this bullet claimed the opposite.** Write
+  sets intersect on `map_diff.py`, on `reuse_lookup.py`'s banner, and on one `memory/backlog/TOOL.md`
+  row M6 clause 3 forbids two passes to touch. The build-order block below is the authority.
 
 ## Parked decisions
 - **Map coverage is capped by rule, not by effort.** 1303 of 1510 tracked files are unmapped, and
@@ -73,28 +72,30 @@ defects in the map kit were observed while measuring, none of them about relatio
 | 4 | `TOOL-dTracedLattice-4` | OPEN | an adopter's frozen gate copy is compared against the template that moved |
 | 5 | `TOOL-dTracedLattice-5` | OPEN | a dark layer is derived from the corpus instead of asserted in prose |
 | 6 | `TOOL-dTracedLattice-6` | OPEN | the AST import resolver is rescued before the lexicon kit deletes it |
+| 7 | `TOOL-dTracedLattice-7` | OPEN | a merge-bar substrate stops scoring differently on each run |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 6 unit(s) · node d · opened 2026-09-05 · streams tooling
-ids TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6
+**Build status:** SPECCED · 7 unit(s) · node d · opened 2026-09-05 · streams tooling
+ids TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dTracedLattice-6 — the AST import resolver is rescued into codebase-map before P3 deletes it](spec/2026-09-05-spec-TOOL-dTracedLattice-6.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-05 |
-| [TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references](spec/2026-09-05-spec-TOOL-dTracedLattice-1.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-05 |
+| [TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references](spec/2026-09-05-spec-TOOL-dTracedLattice-1.md) | 2 | 2 | SPECCED | rev-6 | 2026-09-05 |
 | [TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare](spec/2026-09-05-spec-TOOL-dTracedLattice-2.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-05 |
 | [TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory](spec/2026-09-05-spec-TOOL-dTracedLattice-3.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-05 |
 | [TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved](spec/2026-09-05-spec-TOOL-dTracedLattice-4.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-05 |
 | [TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose](spec/2026-09-05-spec-TOOL-dTracedLattice-5.md) | 6 | 2 | SPECCED | rev-4 | 2026-09-05 |
+| [TOOL-dTracedLattice-7 — a merge-bar substrate whose score depends on the hash seed](spec/2026-09-05-spec-TOOL-dTracedLattice-7.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 15 bound to this build, across 3 record folder(s).
 
 Ids no record names: TOOL-dTracedLattice-6.
 
-Ids no `spec-audit` record has ever named: TOOL-dTracedLattice-6.
+Ids no `spec-audit` record has ever named: TOOL-dTracedLattice-6 TOOL-dTracedLattice-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -107,6 +108,7 @@ Ids no `spec-audit` record has ever named: TOOL-dTracedLattice-6.
 | 4 | `TOOL-dTracedLattice-3` | no |
 | 5 | `TOOL-dTracedLattice-4` | no |
 | 6 | `TOOL-dTracedLattice-5` | no |
+| 7 | `TOOL-dTracedLattice-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
