@@ -394,7 +394,10 @@ rm -rf "$T"
 T=$(mkfixture norun build-first)
 o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
 same "waiver control: the fixture REDS with no registry" "$rc" "1"
-( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\tthe control arm waives it\n' > memory/project/pass-order-waiver.txt )
+# COMMITTED, because the registry is read from the graded commit. An arm leaving it untracked
+# would exercise the uncommitted path H3 closed, and would pass either way.
+( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\tthe control arm waives it\n' > memory/project/pass-order-waiver.txt \
+    && git add -A >/dev/null && git commit -q -m 'waive it' --no-verify )
 o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
 same "waived violation: green" "$rc" "0"
 has  "waived violation: COUNTED, not silent" "$o" "1 waived by"
@@ -402,11 +405,13 @@ has  "waived violation: COUNTED, not silent" "$o" "1 waived by"
 # one that only ever matches the last line. The shipped registry has two rows and waived NOTHING
 # until the id list was flattened, while the single-row arm above passed throughout — the instance
 # was covered and the class was not.
-( cd "$T" && printf 'ARCH-tOrder-2\ta row BEFORE the real one\nARCH-tOrder-1\tthe unit that actually violates\n' > memory/project/pass-order-waiver.txt )
+( cd "$T" && printf 'ARCH-tOrder-2\ta row BEFORE the real one\nARCH-tOrder-1\tthe unit that actually violates\n' > memory/project/pass-order-waiver.txt \
+    && git add -A >/dev/null && git commit -q -m 'two rows' --no-verify )
 o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
 hasnt "MULTI-row waiver: a row that is not the last still waives its unit" "$o" "BUILT at"
 has   "MULTI-row waiver: the stale sibling is still named" "$o" "ARCH-tOrder-2"
-( cd "$T" && printf 'ARCH-tOrder-99\tnothing matches this\n' > memory/project/pass-order-waiver.txt )
+( cd "$T" && printf 'ARCH-tOrder-99\tnothing matches this\n' > memory/project/pass-order-waiver.txt \
+    && git add -A >/dev/null && git commit -q -m 'stale row' --no-verify )
 o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
 same "STALE waiver row: REDS" "$rc" "1"
 has  "stale waiver: names the row that matched nothing" "$o" "ARCH-tOrder-99"
@@ -451,6 +456,62 @@ same "working-tree opened: back-date does NOT exempt the build" "$rc" "1"
 ( cd "$T" && git add -A >/dev/null && git commit -q -m "back-date the build" --no-verify )
 o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
 same "COMMITTED opened: back-date still exempts — the declared residual" "$rc" "0"
+rm -rf "$T"
+
+# ============================================ THE CLOSING REVIEW'S FINDINGS — B1, H1, H2, H3
+# Every arm below covers a defect the closing diff review found in code this build had already
+# committed and self-tested. They share one shape: a read that should come from the graded COMMIT was
+# coming from the working tree, or a bound was tested one step too early.
+
+# ---- B1: an UNTRACKED RUN.md must not change the verdict. S6 moved the `opened:` read to HEAD and
+# ---- left `base:` on the filesystem, so dropping an untracked run-state file naming HEAD emptied the
+# ---- range and greened the leg. Control first, then the bypass attempt.
+T=$(mkfixture norun build-first)
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "B1 control: the fixture REDS before the bypass is attempted" "$rc" "1"
+( cd "$T" && mkdir -p memory/builds/tOrder && printf '# tOrder\nbase: %s\n' "$(cd "$T" && git rev-parse HEAD)" > memory/builds/tOrder/RUN.md )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "B1: an UNTRACKED RUN.md does not exempt the build" "$rc" "1"
+rm -rf "$T"
+
+# ---- B1, second read: an UNCOMMITTED deletion of a CLOSED row must not drop the unit from grading.
+# ---- That read selects the POPULATION, so it is earlier and worse than the range read.
+T=$(mkfixture norun build-first)
+( cd "$T" && sed -i 's/ CLOSED / OPEN /' memory/builds/tOrder/README.md )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "B1: an UNCOMMITTED CLOSED-row edit does not drop the unit" "$rc" "1"
+has  "B1: the unit is still graded from the committed region" "$o" "graded 1 closed unit"
+rm -rf "$T"
+
+# ---- H3: an UNCOMMITTED waiver must not waive. Otherwise the waiver works for whoever wrote it and
+# ---- its stale-row red can never fire for anybody else, because the file is not in the pushed tree.
+T=$(mkfixture norun build-first)
+( cd "$T" && mkdir -p memory/project && printf 'ARCH-tOrder-1\tnever committed\n' > memory/project/pass-order-waiver.txt )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "H3: an UNCOMMITTED waiver does not waive" "$rc" "1"
+rm -rf "$T"
+
+# ---- H1: the violation sits AT the anchor with a cap SMALLER than the window behind it. `--reverse`
+# ---- puts the anchor LAST, so testing the cap at the top of the loop consumed the anchor as the
+# ---- truncation sentinel and the probe could never grade the one commit it exists to reach.
+T=$(mkfixture parent-commit parent-commit)
+( cd "$T" && printf '\nPASS_ORDER_PREANCHOR_CAP="1"\n' >> .unattended.conf && git add -A >/dev/null && git commit -q -m 'cap 1' --no-verify )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "H1: the violation AT the anchor is graded, not eaten by the cap" "$rc" "1"
+has  "H1: it is reported as a pre-anchor violation" "$o" "1 pre-anchor violation"
+rm -rf "$T"
+
+# ---- H2: the cap is validated before it reaches arithmetic. A tracked conf the graded run commits
+# ---- reached `$(( ))` unchecked, which is code execution in this leg's own shell, and a non-numeric
+# ---- value disabled the whole pre-anchor class while reporting zero truncations.
+T=$(mkfixture preanchor preanchor)
+( cd "$T" && printf '\nPASS_ORDER_PREANCHOR_CAP="not-a-number"\n' >> .unattended.conf )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "H2: a non-numeric cap is a REFUSAL, not a silent green" "$rc" "2"
+has  "H2: it says what the value must be" "$o" "must be a non-negative integer"
+( cd "$T" && sed -i 's/^PASS_ORDER_PREANCHOR_CAP=.*/PASS_ORDER_PREANCHOR_CAP="1+1"/' .unattended.conf )
+o=$(cd "$T" && bash tools/unattended/check-pass-order.sh 2>&1); rc=$?
+same "H2: an arithmetic EXPRESSION is refused rather than evaluated" "$rc" "2"
 rm -rf "$T"
 
 echo "--- $n arms, exit $st"

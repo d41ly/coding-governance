@@ -86,7 +86,7 @@ ids TOOL-aStagedLane-1 TOOL-aStagedLane-2 TOOL-aStagedLane-3 TOOL-aStagedLane-4
 | [TOOL-aStagedLane-4 — the carriers name the classifier and the attended route](spec/2026-09-04-spec-TOOL-aStagedLane-4.md) | 4 | 2 | WONTDO | rev-4 | 2026-09-04 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 2 record folder(s).
+Records: 5 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

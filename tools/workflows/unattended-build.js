@@ -127,7 +127,11 @@ function chunk(a, n) {
 // { repo: "/abs/path/to/worktree",                 // REQUIRED
 //   slug: "<build slug>",                           // REQUIRED
 //   base: "<immutable sha>",                        // the review anchor, for the record
-//   units: [{ id, order, specPath, briefPath }],    // ORDERED by the caller, from --plan
+//   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
+//            specBriefPath,                        //   optional: the per-unit SPEC brief
+//            planState }],                         //   REQUIRED in attended mode, from --plan
+//   mode: "unattended" | "attended",              // DEFAULTS to "unattended"
+//   runStateExists: <bool>,                         // caller-supplied; this script cannot detect it
 //   briefDir: "memory/builds/<slug>/prompts",
 //   reviewDir: "memory/builds/<slug>/reviews",
 //   round: <integer>                                // which audit round this invocation is
@@ -336,10 +340,11 @@ const GROUND =
 // second of the two rules the charter insists are not one rule, and it is the receiver shape
 // `agent-cap.js` can prove bounded.
 //
-// SO A WRITER HOLDS A GROUP, WHICH ABOVE THE CAP IS MORE THAN ONE SLICE. At seven slices and a cap
-// of five there are five groups, two of them carrying two slices. The unit's headline property is
-// that a writer holds ITS OWN group's briefs and nothing outside it — not that it holds exactly
-// one slice.
+// SO A WRITER HOLDS A GROUP, WHICH ABOVE THE CAP IS MORE THAN ONE SLICE. `chunk` splits by SIZE
+// `ceil(N/K)`, so the group COUNT is at most K and is often less: at seven slices and a cap of five
+// the size is two, giving FOUR groups of 2, 2, 2 and 1. The guarantee is the bound, not the
+// equality — and the headline property is that a writer holds ITS OWN group's briefs and nothing
+// outside it, never that it holds exactly one slice.
 phase('Spec')
 const SPEC_WRITERS = 5 // the cap `tier2-review.js` owns; this copy carries the same value
 const sliceKeys = []
@@ -642,6 +647,10 @@ if (verdict === 'CONVERGING') {
   log('audit is still CONVERGING — BUILD is not reachable this invocation; fold, then re-invoke at round ' + (roundNo + 1))
   return {
     slug: slug,
+    // THE MODE TRAVELS ON THIS RETURN TOO. It is the path an attended run takes on every
+    // non-terminal round, and the terminal return's own comment says the field exists so a caller
+    // can tell the modes apart — which it could not do here.
+    mode: mode,
     base: base,
     round: roundNo,
     units: ordered.length,
@@ -650,12 +659,14 @@ if (verdict === 'CONVERGING') {
     verdict: verdict,
     blockers: au.blockers,
     lastReport: lastReport,
+    skippedTerminal: [],
     built: 0,
     unbuilt: allIds,
     nextAction:
       'FOLD the confirmed findings in ' + lastReport + ' as rev-N bumps with their section 9 lines, ' +
       'then re-invoke this harness with round: ' + (roundNo + 1) + '. Do not build.',
-    note: 'HELD AT AUDIT — the review loop has not ended, so no unit was built',
+    note: 'HELD AT AUDIT — the review loop has not ended, so no unit was built' +
+      (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
   }
 }
 
@@ -700,9 +711,11 @@ log('build stage: ' + ordered.length + ' unit(s), one at a time, each from its b
 // AND THE ENTRY-TIME VALUE IS STALE BY CONSTRUCTION for the units stage 1 authors: a fresh build
 // reports MISSING for every one of them. So a unit this invocation SPECCED is treated as READY
 // whatever it reported at entry — otherwise the stage refuses the build it just specced.
-const speccedNow = []
-  .concat(Array.isArray(specced.authored) ? specced.authored : [])
-  .concat(Array.isArray(specced.alreadyPresent) ? specced.alreadyPresent : [])
+// `authored` ALONE, and the distinction is the whole point of the exemption. Only the units THIS
+// invocation wrote have a stale entry-time state; a unit the stage reported as `alreadyPresent` is
+// one it did NOT touch, so its entry-time grade is current and exempting it would bypass the
+// THIN/FORKED refusal on an agent's say-so.
+const speccedNow = Array.isArray(specced.authored) ? specced.authored : []
 let planRefusal = ''
 const skippedDone = []
 if (attended) {
@@ -745,11 +758,27 @@ const driverSteps = attended
     ' --brief ' + slug + ' --unit <unit-id> --path <the brief>`. THAT DISPATCH IS THE ORDER GATE: it ' +
     'refuses a unit that is MISSING, THIN or out of the declared order, and a refusal is this ' +
     'harness telling you the order is wrong. Read it and stop — do not work around it. '
+// THE SKIP HAS TO REACH THE ROSTER. `skippedDone` was computed, logged as SKIPPING and returned in
+// `skippedTerminal`, and then the BUILD agent was handed the UNFILTERED roster — so an attended run
+// told its operator it had skipped the terminal units and told its agent to build them. The full
+// roster stays with the subject resolver, which legitimately wants every spec.
+const buildUnits = ordered.filter(function (u) { return skippedDone.indexOf(u.id) === -1 })
+if (attended && !buildUnits.length) {
+  log('attended mode: every unit is already terminal — nothing to build')
+  return {
+    slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
+    specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
+    lastReport: lastReport, skippedTerminal: skippedDone, built: 0, unbuilt: [],
+    note: 'complete for ATTENDED mode — every unit was already terminal, so the BUILD stage was ' +
+      'not spawned rather than handed an empty roster',
+  }
+}
+const buildRoster = renderRoster(buildUnits, slug, briefDir)
 const built = await agent(
   GROUND +
     disposal +
     'BUILD every unit below, ONE AT A TIME and IN THIS ORDER. Never start one before the previous ' +
-    'has committed:\n' + roster + '\n\n' +
+    'has committed:\n' + buildRoster + '\n\n' +
     'For each unit you are handed exactly two documents and you read both before touching code: its ' +
     'BRIEF and its SPEC, both named in the roster. The spec is the design; where you must diverge ' +
     'from it, CHANGE THE SPEC FIRST as a `rev-N` bump with its section 9 line, then write the code. ' +

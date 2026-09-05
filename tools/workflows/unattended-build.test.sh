@@ -277,10 +277,17 @@ has  "attended, FORKED unit: names the state" "$o" "FORKED"
 # ---- AC11: the terminal-unit SKIP, with the vocabulary --plan actually emits. `DONE (FORKED)` is
 # ---- what a closed build reports for a unit whose underlying grade was not READY, and a five-token
 # ---- allow-list halts on it — round-1's halt-at-unit-one, for the third time.
-D_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE (FORKED)"},{"id":"A-tB-2","order":2,"specPath":"s2","planState":"DONE"}]}'
+D_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE (FORKED)"},{"id":"A-tB-2","order":2,"specPath":"s2","planState":"READY"}]}'
 o=$(run_wf "$D_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
-has  "attended, DONE (FORKED): SKIPPED, not refused" "$o" "SKIPPING 2 terminal unit"
+has  "attended, DONE (FORKED): SKIPPED, not refused" "$o" "SKIPPING 1 terminal unit"
 has  "attended, terminal units: still reaches BUILD" "$o" "agent:build:tB"
+# H4 - the skip must reach the ROSTER the agent is handed, not only the log line. This arm reads
+# the composed build prompt: a run that reports a skip and then orders the build is worse than one
+# that never claimed to skip.
+ob=$(printf '%s
+' "$o" | grep '^prompt:build:tB:')
+hasnt_ "attended: a SKIPPED unit is absent from the build prompt" "$ob" "A-tB-1"
+has   "attended: a surviving unit is still IN the build prompt" "$ob" "A-tB-2"
 
 # ---- AC13: a state outside every arm refuses BY NAME. Neither building nor skipping an unknown state
 # ---- is safe, and this vocabulary has been mis-transcribed twice already.
@@ -301,10 +308,15 @@ has  "attended, no planState: names the field" "$o" "planState"
 # ---- construction and the stage must not refuse the build it just specced.
 N_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"MISSING"}]}'
 o=$(run_wf "$N_UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":["A-tB-1"],"unbuilt":[],"summary":"b"}}')
-has  "attended, unit specced THIS invocation: builds despite entry-time MISSING" "$o" "agent:build:tB"
+has  "attended, unit AUTHORED this invocation: builds despite entry-time MISSING" "$o" "agent:build:tB"
 # and the control: the same MISSING state, NOT specced by stage 1, must still refuse.
 o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":["A-tB-1"],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended, MISSING and NOT specced: still refuses" "$o" "THROW"
+# M1 - `alreadyPresent` must NOT exempt. Those are the units the stage did NOT touch, so their
+# entry-time grade is current; exempting them bypassed the THIN/FORKED refusal on an agent's
+# say-so. Only `authored` is stale by construction.
+o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
+has  "attended, MISSING but only alreadyPresent: still refuses" "$o" "THROW"
 
 # ---- S1: the mode is a CLOSED pair. A typo must not fall back to a default that hands the caller
 # ---- fewer checks than they asked for.

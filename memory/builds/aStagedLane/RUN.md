@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 31b6eed025abb630f590caada633d495f1302fc8
-phase: BUILDING
+witness: 387d51e0e4d03554f2db8badd343d10e36394a1a
+phase: REVIEWING
 mode: slug
 anchor-kind: default-branch
 keepalive: 92d609a5
@@ -38,3 +38,5 @@ base: c4fcf5add1d0a553097f9eef70935a056896cf16
 2026-09-04T22:03:04Z dispatch · item 8e508e65 TOOL-aStagedLane-2 · reason tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh
 
 2026-09-04T22:08:05Z dispatch · item 31b6eed0 TOOL-aStagedLane-3 · reason tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh
+
+2026-09-05T01:07:16Z review · item aStagedLane · reason verdict BLOCKED · blockers 1
