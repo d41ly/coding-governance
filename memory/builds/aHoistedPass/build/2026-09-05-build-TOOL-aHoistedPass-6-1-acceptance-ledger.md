@@ -160,6 +160,43 @@ suites by hand, and nothing standing re-checks them. Their exit codes are below.
   with nothing left over on either side. Nothing on the bar grades that join, and a future edit to
   either half will not be told.
 
+## The bug-class checklist over this unit's own commit
+
+`python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` selected 17 classes. Four of them
+landed on this diff and were acted on; the rest were read and did not.
+
+- **`fixture-passes-by-finding-nothing`** — hit TWICE. The `AC5 … standing blocker is NAMED` arm
+  grepped for a bare `b1` and was GREEN against the unchanged source, satisfied by the fixture's own
+  `"briefPath":"b1"`; tightened to the note's text before the source landed. And the `--paths` arms
+  in `unattended.test.sh` were never staged red, so they were measured against the PRE-CHANGE driver
+  afterwards: it prints the padded table and `awk -F'\t' '{print NF}'` over a unit row returns **1**,
+  where the changed driver returns **4**. The arms do fail without the change.
+- **`absence-assertion-over-whole-file-text`** — hit, and it is why the deleted schema's tombstone
+  comment does not spell `BUILD_SCHEMA`. Two of this unit's criteria are whole-file absence greps
+  (AC3 and AC15's `\bspent\b|\bbudget\b`), and both red on a comment that documents the very change
+  they grade. The criteria were kept and the comments worded around them, which is the trade this
+  class names; a future author adding either word to a comment in that file will red AC15 for no
+  defect.
+- **`amendment-leaves-its-other-half-standing`** — hit, and this is why the diff is bigger than the
+  spec's Files-touched. Deleting the BUILD stage left NINE sentences elsewhere in
+  `unattended-build.js` still describing it as reachable — the WHY block's "BUILD is unreachable
+  except through both", the convergence-loop item, the spec-fan's disjointness note, the all-dead-fan
+  refusal text, the token-enum refusal, the audit gate's comment and log line, and the attended
+  every-unit-terminal note. All rewritten around the hand-out. The tenth was OUTSIDE the file: the
+  map dossier `memory/map/features/unattended.md` still said the harness "drives SPEC then AUDIT then
+  BUILD"; the write set was WIDENED to `memory/map` and the paragraph refreshed, which is §1's
+  dossier-on-touch item and was owed whether or not the checklist named it. **That refresh did not
+  fit.** The dossier was 20390 B against hygiene check 6's 20480 B cap — 90 bytes of headroom — and
+  the correction that also named WHY the hoist matters measured 20806 B and was refused, correctly.
+  What landed is the minimal true correction at 20452 B, so the sentence about the fan-out hook seeing
+  each dispatch is NOT in the dossier. 28 bytes remain and the next sentence anybody owes that file
+  needs it split first. Parked in `RUN.md` with the three options and the one taken.
+- **`id-matched-as-a-substring`** — noted, not acted on. `TOOL-aHoistedPass-33`, `-34` and `-35`
+  all carry `TOOL-aHoistedPass-3` — a real unit of this build — as a prefix. The corpus already had
+  that shape (`-30` through `-32` beside the same unit) and both the kit gate and the hygiene leg
+  run green over it, so the readers anchor correctly. It is written down because an unanchored grep
+  by a human will not.
+
 ## The hand-run, with exit codes
 
 - `bash tools/workflows/unattended-build.test.sh` — **exit 0**, 124 arms, 0 FAIL.

@@ -44,12 +44,13 @@ written by the run, and why reachability from the pinned BASE is part of the con
 author its own authorization has none, and every gate downstream would certify it.
 
 **THE HARNESS BUYS STAGE ORDER AND CANNOT BUY ENFORCEMENT.** `tools/workflows/unattended-build.js`
-drives SPEC then AUDIT then BUILD as stages of one program, so BUILD is unreachable except through
-both and on a TERMINAL `--review` verdict — control flow, not a rule an agent remembers. It
+runs SPEC then AUDIT then DISPOSAL and hands the run an ordered ROSTER it dispatches one `Workflow`
+call per unit, so the hand-out is unreachable except through all three and on a TERMINAL `--review`
+verdict — control flow, not a rule an agent remembers. It
 verifies nothing: a Workflow script has no filesystem, so every observation is a claim its own agent
 returned, and the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denied an
-`agent()` in any loop body until `TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: each stage is
-ONE agent over the ordered list, and the convergence LOOP sits in the caller while the harness holds
+`agent()` in any loop body until `TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: DISPOSAL is
+ONE agent over the whole set, and the convergence LOOP sits in the caller while the harness holds
 the GATE, its iteration count being data-dependent and so unboundable.
 
 **PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor
