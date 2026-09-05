@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Ask the memory tree a question and get the records that answer it.
 
-FORKED from inCMS ``scripts/recall/query.py`` at 5318064 (file last changed fd6274d). Six
-constructs are edited and the rest is upstream's byte for byte, so a re-pull is a three-way merge:
+FORKED from inCMS ``scripts/recall/query.py`` at 5318064 (file last changed fd6274d).
+Seven constructs are edited and the rest is upstream's byte for byte, so a re-pull is a three-way merge:
 (1) ``corpus_files()`` and the id grammar derive from ``.memory-tree.conf`` via ``recall_conf``;
 (2) ``sys.dont_write_bytecode`` above the ``sys.path`` insert; (3) every printed invocation derives
 from ``__file__`` and launches ``python3``, and the ``--terms`` refusal's worked example is a
@@ -10,7 +10,9 @@ generic one rather than the source project's domain vocabulary; (4) ``--export``
 log under the common git dir and requires ``--tag``; (5) the cache manifest carries ``conf_digest``
 and ``worktree``, which drive freshness and eviction; (6) an empty record arm, an empty corpus,
 or an alias layer that joins to nothing is diagnosed out loud, and the manifest carries the join
-counts the third one reads.
+counts the third one reads; (7) the served chunk arm is ROLLED UP through ``run_rollup`` and
+the two fusion call sites are collapsed into one ``fuse()``, so a rollup cannot be applied to
+the healthy path and not the cache-rebuild path.
 
 Standard library only. Two derived FTS5 indexes -- one per anchored record, one per 600-char
 heading-bounded chunk -- cached under the COMMON git directory and rebuilt when the corpus moves.
@@ -41,6 +43,14 @@ Why the ranking looks the way it does, in one place so it cannot drift from the 
     ``bm25()`` scores are not comparable -- different corpora, different IDF, different document
     lengths -- and a raw concatenation gives a merged top-20 that is ~80% chunks, because that set
     is 22x larger.
+  * The CHUNK arm is ROLLED UP: it reads ``k * ROLLUP_DEPTH`` deep and keeps the best hit per
+    parent before fusion, so a top-k cannot be several slices of one document. It is what
+    ``bench.run_rollup`` grades as the ``roll`` substrate, and with terms at the live chunk width
+    that substrate is the only chunk configuration that beats grep. What it costs is the deeper
+    read; what it buys is slot diversity, which is the same thing the duplicate-path rate measures.
+    ``run_rollup``'s own docstring in ``bench.py`` advises against expecting an ensemble gain from
+    this, and that advice was measured on the BARE question -- it is not evidence about the served
+    shape, which carries terms. The records arm is untouched, where the rollup is a no-op.
   * An id in the question is matched as a PHRASE. ``bench.terms()`` drops tokens of two characters
     or fewer and anything not starting with a letter, so ``ARCH-169`` reaches FTS5 as ``arch`` and
     the governing record ranks 523rd.
@@ -109,6 +119,17 @@ CLI = "python3 " + _self_path()
 __doc__ = (__doc__ or "").replace("{cli}", CLI)
 
 CHUNK_MAX = 600  # pinned by the parent spec: 2400 and 300 both measured worse
+# How deep the chunk arm reads before it is rolled up to `k`. MIRRORS the `k * 8` literal inside
+# `bench.run_rollup` (`tools/memory-recall/bench.py` :147), which is the instrument this serving
+# path is being aligned with -- named rather than re-derived, because the two must agree and
+# `bench.py` is byte-pinned in `verbatim.json` so the literal there cannot move to meet this one.
+# Collapsing several hits from one parent leaves fewer than `k` distinct parents from a `k`-deep
+# read, which is the whole reason the arm reads deeper than it returns.
+ROLLUP_DEPTH = 8
+# The reason the last rebuild happened, for the line that reports it. A list because it is written
+# inside `ensure_cache` and read by `main`, and a module global keeps the function signature that
+# three callers already use.
+REBUILD_CAUSE: list[str] = []
 CACHE_VERSION = 3  # bump when extraction or schema changes, so an old cache is never queried
 # 1 -> 2 on 2026-08-02 (ARCH-aGrittedFlagstone-3): records now carry the committed alias layer, so
 # every cache built before the join must rebuild rather than keep serving an alias-free index.
@@ -603,8 +624,31 @@ def ensure_cache(repo: pathlib.Path, force: bool = False) -> tuple[pathlib.Path,
         and (dirp / "records.db").exists()
         and (dirp / "chunks.db").exists()
     )
+    # WHY a rebuild happened, named rather than left to be guessed. Every clause above is a
+    # separate reason and they are not interchangeable: `conf_digest` moving is a KIT VERSION or
+    # conf edit and costs exactly one rebuild per node, while `digest` moving is the corpus
+    # changing and is routine. Without this an acceptance criterion about caching can only assert
+    # THAT a rebuild happened, which is why one in this build was written asserting the opposite of
+    # what its own kit-version bump forces.
+    if man is None:
+        cause = "no manifest"
+    elif force:
+        cause = "forced"
+    elif man.get("version") != CACHE_VERSION:
+        cause = "CACHE_VERSION"
+    elif man.get("chunk_max") != CHUNK_MAX:
+        cause = "chunk_max"
+    elif man.get("conf_digest") != CONF.digest():
+        cause = "conf_digest"
+    elif man.get("alias_digest") != alias_digest():
+        cause = "alias_digest"
+    elif man.get("digest") != corpus_digest(repo, files + declared):
+        cause = "corpus digest"
+    else:
+        cause = "a missing database"
     if fresh:
         return dirp, man, False
+    REBUILD_CAUSE.append(cause)
     built = build_cache(repo, dirp, files, declared)
     # Dead-worktree eviction FIRST and unconditionally — it is free correctness. The budget is a
     # second pass over whatever survives, and both run only AFTER a successful build: a cache is
@@ -688,6 +732,53 @@ def rrf(rankings: list[list[dict]]) -> list[dict]:
             if hit["set"] == "records":
                 slot[1] = hit
     return [h for _, (_, h) in sorted(scored.items(), key=lambda kv: -kv[1][0])]
+
+
+def run_rollup(hits: list[dict], k: int) -> list[dict]:
+    """Keep the best hit per PARENT, in rank order, capped at ``k``.
+
+    ``bench.run_rollup`` does the same thing over its own in-memory ``docs`` list and a
+    ``bench.build_index`` connection; this one serves the dictionaries ``search()`` returns, joined
+    against the cache's own ``meta`` table. The two cannot be one function -- different inputs,
+    different connections -- so what is shared is the PARENT KEY, and it is spelled the way
+    ``bench.parent_of`` spells it: ``hit["id"] or hit["path"]``.
+
+    THE PARENT KEY IS THE PATH FOR ALMOST EVERYTHING, and calling this a per-record rollup would be
+    wrong. ``extract_chunks`` sets a chunk's ``rec`` only when a HEADING LINE itself defines a record
+    id, and the heading pattern requires ``#{2,6}``, so an H1, a bold-list anchor and a table anchor
+    all leave it unset. Measured over the tracked corpus: 129 of 20056 chunk documents carry a
+    ``rec`` -- 0.6%. For the other 99.4% this is a per-PATH cap, at most one hit per file, which is
+    exactly what the duplicate-slot problem needs. The per-record behaviour is the rare case, and
+    both branches carry a self-test arm because an arm on the 0.6% certifies nothing about the rest.
+    """
+    best: dict = {}
+    for hit in hits:
+        key = hit.get("id") or hit["path"]
+        if key not in best:
+            best[key] = hit
+        if len(best) >= k:
+            break
+    return list(best.values())[:k]
+
+
+def fuse(dirp: pathlib.Path, expr: str, k: int) -> list[dict]:
+    """The served fusion: the records arm as-is, the chunk arm rolled up to one hit per parent.
+
+    ONE call site, deliberately. This was two identical expressions -- the first attempt and the
+    rebuild after a ``sqlite3.DatabaseError`` -- and a rollup applied to only one of them would make
+    the served shape depend on whether the cache happened to be healthy, surfacing only on a
+    corrupted cache in a live session. Every acceptance arm runs the healthy path, so the
+    duplication was unobservable by construction; deleting it is smaller than gating it.
+
+    The chunk arm pulls ``k * ROLLUP_DEPTH`` before rolling up, because collapsing several hits from
+    one parent leaves fewer than ``k`` distinct parents from a ``k``-deep read. The records arm is
+    untouched: ``bench.parent_of`` returns a record's own id there, so the rollup is a no-op and the
+    extra depth would be paid for nothing.
+    """
+    return rrf([
+        search(dirp, "records", expr, k),
+        run_rollup(search(dirp, "chunks", expr, k * ROLLUP_DEPTH), k),
+    ])
 
 
 # ---------------------------------------------------------------------------------- emission
@@ -1174,11 +1265,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
-        hits = rrf([search(dirp, "records", expr, k), search(dirp, "chunks", expr, k)])
+        hits = fuse(dirp, expr, k)
     except sqlite3.DatabaseError:
         shutil.rmtree(dirp, ignore_errors=True)
         dirp, man, rebuilt = ensure_cache(repo, force=True)
-        hits = rrf([search(dirp, "records", expr, k), search(dirp, "chunks", expr, k)])
+        hits = fuse(dirp, expr, k)
 
     live_files = len(E.corpus_files(repo, include_untracked=True))
     notices = []
@@ -1194,7 +1285,7 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(man, indent=1))
     print(
         f"index {man['counts']['records']} records + {man['counts']['chunks']} chunks "
-        f"({'rebuilt ' + str(man['built_s']) + 's' if rebuilt else 'cached ' + man['built_at']})"
+        f"({'rebuilt ' + str(man['built_s']) + 's, cause ' + (REBUILD_CAUSE[-1] if REBUILD_CAUSE else '?') if rebuilt else 'cached ' + man['built_at']})"
     )
     # AFTER the index line and on EVERY path that can produce it -- the counts come from the
     # manifest, so this fires identically on a fresh build and on a cache hit. Upstream printed the

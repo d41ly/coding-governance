@@ -45,6 +45,7 @@ for _leak in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTOR
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 
 import recall_conf  # noqa: E402
+import query  # noqa: E402
 
 KIT = pathlib.Path(__file__).resolve().parent
 SHIPPED = ("recall_conf.py", "extract.py", "bench.py", "union.py", "query.py", "selftest.py")
@@ -418,6 +419,54 @@ def test_empty_spine_is_loud():
             cleanup(out)
     finally:
         cleanup(root)
+
+
+
+@check("the served chunk arm is ROLLED UP: at most one hit per parent, both key branches")
+def test_chunk_arm_rolls_up():
+    """`run_rollup` keeps the best hit per parent, and BOTH branches of the parent key are covered.
+
+    The key is `hit["id"] or hit["path"]`. Measured over the tracked corpus, 129 of 20056 chunk
+    documents carry a record id, so for 99.4% of the served arm this is a per-PATH cap and an arm
+    over the 0.6% would certify nothing about the rest.
+
+    Corpus-independent: it drives `query.run_rollup` on synthetic hit dicts, so it cannot rot with
+    the memory tree, and it is a pure function so no index is built.
+    """
+    rr = query.run_rollup
+
+    # (a) ANCHORED — several hits sharing one record id collapse to the first, and a second record
+    #     survives. The id, not the path, is doing the work: all three sit in one file.
+    anchored = [
+        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 1},
+        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 40},
+        {"id": "TOOL-x-1", "path": "memory/a.md", "line": 90},
+        {"id": "TOOL-x-2", "path": "memory/a.md", "line": 120},
+    ]
+    got = rr(anchored, 20)
+    assert [h["id"] for h in got] == ["TOOL-x-1", "TOOL-x-2"], got
+    assert got[0]["line"] == 1, "the rollup must keep the BEST-RANKED hit, not the last"
+
+    # (b) UNANCHORED — the branch the corpus actually takes. No `id` at all, so the key degrades to
+    #     the path and the cap is one hit per FILE.
+    unanchored = [
+        {"path": "memory/guides/long.md", "line": 1},
+        {"path": "memory/guides/long.md", "line": 200},
+        {"path": "memory/guides/long.md", "line": 400},
+        {"path": "memory/guides/other.md", "line": 5},
+    ]
+    got = rr(unanchored, 20)
+    assert [h["path"] for h in got] == ["memory/guides/long.md", "memory/guides/other.md"], got
+    assert got[0]["line"] == 1, got
+
+    # (c) the cap still bounds the result, and a MIXED list keys each hit on its own branch.
+    mixed = anchored + unanchored
+    assert len(rr(mixed, 2)) == 2, "k must bound the rolled-up list"
+    assert len(rr(mixed, 20)) == 4, rr(mixed, 20)
+
+    # (d) an empty ranking rolls up to an empty list rather than raising.
+    assert rr([], 20) == []
+    return "one hit per parent on both key branches, capped"
 
 
 @check("mis-declared FAMILIES is LOUD: zero records diagnosed, not reported as success")
@@ -1513,7 +1562,7 @@ def main() -> int:
 
     order = [
         test_parser_vs_bash, test_no_conf_query, test_no_conf_adopt, test_empty_alias,
-        test_spine_flat_layout, test_spine_nested_layout, test_durable_derives_families,
+        test_spine_flat_layout, test_spine_nested_layout, test_durable_derives_families, test_chunk_arm_rolls_up,
         test_empty_spine_is_loud,
         test_zero_records_is_loud, test_empty_corpus_names_memory_root,
         test_conf_digest_both_directions, test_digest_covers_kit_version, test_writes_nothing_in_worktree,
