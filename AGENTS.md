@@ -511,10 +511,10 @@ always manifest order, so output is byte-stable whatever the width and a corrupt
 clock only. **A KIT'S SELF-TESTS ARE NOT ON THIS BAR.** Owner ruling, 2026-08-23, and the first kit to take it is
 `unattended`: a suite that stages breaks into a copy of a checker has a job only when that checker's
 source changes, and none at all in an adopter's repo that copy-installs the kit and never edits it.
-Its seven `*.test.sh` legs left both `tools/gate-legs.json` and the kit's own `kit.toml`, so adopters
+Its `*.test.sh` legs left both `tools/gate-legs.json` and the kit's own `kit.toml`, so adopters
 stop receiving them too. What stayed are the legs whose subject is the REPOSITORY rather than the
-kit, because those go stale with nobody editing the kit; read which — and how many — off the
-`tools/unattended/` entries in `tools/gate-legs.json`. On demand:
+kit, because those go stale with nobody editing it; which, and how many, are its
+`tools/unattended/` rows in `tools/gate-legs.json`. On demand:
 `bash tools/unattended/run-unattended-gates.sh`. The compensating check is written into that kit's
 descriptor, because an exemption is not coverage (§7).
 

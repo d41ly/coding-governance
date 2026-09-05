@@ -118,4 +118,7 @@ memory/builds/dFoldedVerdict/README.md
 memory/builds/dRetiredFork/README.md
 memory/builds/dRatifiedSeam/README.md
 memory/builds/dSealedTally/README.md
+memory/builds/aSurfacedLexicon/README.md
+memory/builds/aStagedLane/README.md
+memory/builds/aHoistedPass/README.md
 memory/builds/aWeldedTribunal/README.md
