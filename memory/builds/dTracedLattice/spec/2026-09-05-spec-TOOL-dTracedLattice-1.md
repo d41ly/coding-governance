@@ -139,18 +139,22 @@ costs 1.554 s per query and demotes `boundedParallel` for being documented.
 
 ### Rollout
 
-S1 first and alone, because it is the measured floor and needs no new pass. S2 behind the same
-entrypoint, landing dark in the sense that it can be disabled to recover S1-only behaviour.
+S1 first and alone: it is the largest measured gain, it changes no ranking, and it needs no new
+pass. S2 second, because retrieval failures are unreachable at any K and no ordering change touches
+them. S3 and S5 only after both, and only if they clear AC3's chance control — they are the two
+items whose value is currently indistinguishable from a random shuffle at depth.
 
 ## 5. Production-readiness checklist
 
 - security — N/A, no new input surface; the scan reads tracked source it already reads.
 - perf / scale — the receiver-binding pass measured a median 1.761 s against `build_reference_index`'s
-  0.595 s, taking the on-demand path to roughly 2.4 s. S4 owns the re-declaration.
+  0.595 s. AC8 is the ceiling now: at most 0.05 s added, and no second full-corpus scan. Rev-4 gave
+  the re-declaration to a scope item; rev-5 makes it an acceptance criterion instead, because a
+  ceiling nothing grades is a ceiling nobody meets.
 - a11y — N/A, a CLI.
 - i18n — N/A.
 - error / empty / loading states — an unparseable file is skipped fail-open, as today, because this
-  feeds a ranking and not a gate. The skip is counted and reported by S3.
+  feeds a ranking and not a gate. The skip is counted and reported by S6.
 - observability — S3 is the observability item.
 - risks — the fan-in-0 population grows, so `dead_exports` inflates; §8 carries the disposition.
 - testing + left-shift gates — arms in `tools/codebase-map/selftest.py`, each observed RED first.
