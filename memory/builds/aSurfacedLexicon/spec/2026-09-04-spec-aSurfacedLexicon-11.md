@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aSurfacedLexicon-8-spec-audit-round1.md) | spec-audit | TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-12 |
 
 <!-- /gen:spec-records -->
 
