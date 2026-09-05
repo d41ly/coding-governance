@@ -130,7 +130,11 @@ suites by hand, and nothing standing re-checks them. Their exit codes are below.
 - **AC24** — MET — `memory/backlog/TOOL.md` carries `TOOL-aHoistedPass-33` (the
   `gov:kit unattended-build@` marker paired against no constant), `-34` (the ungraded `meta` pair)
   and `-35` (the hand-out's empty `specPath`). Ids minted by this session off its own high-water,
-  which was `TOOL-aHoistedPass-32`.
+  which was `TOOL-aHoistedPass-32`. A FOURTH row, `-36`, is filed beyond S13 and is not one of the
+  three: it records that the driver's own suite cannot be run to completion in either mode. It is
+  there because §7's own rule is that a deliberate gate exemption is documented together with its
+  compensating check, this kit's exemption names a hand-run as that check, and a hand-run of a suite
+  that aborts is not one.
 - **AC25** — MET — suite arms. With the attended fixture holding one `DONE (FORKED)` unit and one
   `READY` one, the returned `roster` names only `A-tB-2`, `skippedTerminal` is `["A-tB-1"]`, and
   `units` is `2`. The two are different arrays, which is what rev-6 corrected and what no earlier
@@ -212,9 +216,20 @@ landed on this diff and were acted on; the rest were read and did not.
   region-one state, which is the exact hazard the suite's own shard-contract comment names and says
   has no gate. **This is a finding about the suite, not about this unit, and it is not this unit's
   to fix.**
-- `bash tools/unattended/unattended.test.sh` UNSHARDED — started, and it is the run that covers
-  region one. See the closing line: whatever state it is in when this pass ends is stated there
-  rather than reported as a green nobody saw.
+- `bash tools/unattended/unattended.test.sh` UNSHARDED — **exit 1, and it ABORTS rather than
+  finishing.** Three FAILs, all three of them among the pristine baseline's 54 (the `--brief`
+  newline, field-separator and bypass-flag arms), and then bash dies:
+  `tools/unattended/unattended.test.sh: line 4064: $1: unbound variable`. One arm spells a bare `$1`
+  inside a `case` pattern — the driver's own message parameter, interpolated into the test by
+  accident — and under `set -u` with no positional parameters that is fatal. Reproduced in isolation
+  with `bash -c 'set -u; case x in *"$1 y"*) ;; esac'`. The arm is BYTE-IDENTICAL at `e4c7dd4d`, so
+  it predates this unit, and every arm after it is unreachable in the invocation a developer types.
+  `--shard` survives it only because the flag makes `$1` the literal `--shard`.
+  **What this run DID reach matters:** region one completed with no failure at all, the `--paths`
+  arms at line 1957 are far ahead of the abort and produced none, and two of the region-two
+  `--dispatch` arms that FAIL under `--shard 2/2` pass here — which is the direct evidence that the
+  shard failures are region-two arms depending on region-one state. Filed as
+  `TOOL-aHoistedPass-36` and parked, with both stops and both attributions.
 - **The one region-one exposure of the driver change, checked by hand instead.** Region one holds a
   `--plan` arm at line 1555 — the `--waive` refusal that proves `--plan` exits INSIDE the parse loop,
   which is the very property the `--paths` flag had to be parsed around. Three shapes were run
