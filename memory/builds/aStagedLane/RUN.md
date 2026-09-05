@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 witness: 387d51e0e4d03554f2db8badd343d10e36394a1a
-phase: REVIEWING
+phase: LANDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 92d609a5
@@ -44,3 +44,5 @@ base: c4fcf5add1d0a553097f9eef70935a056896cf16
 2026-09-05T01:07:16Z review · item aStagedLane · reason verdict BLOCKED · blockers 1
 
 2026-09-05T02:34:55Z review · item aStagedLane · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · disposition fold
+
+2026-09-05T04:14:33Z override · item gates-green · reason One leg red and it is not this build's: 'lexicon naming predicates' reports 463 verb offenders over a pin of 461. Measured PRE-EXISTING — I re-ran the check with this build's entire working set stashed and it still reported 463, so the overrun predates this branch and no unit here caused or moved it. The other four legs that were red when --close first ran are FIXED, not overridden: memory hygiene (acceptance ledgers written for all three closed units, and two of this build's own records were claiming another build's ids and citing an id-shaped example), install-prefix (both raised carried-literal counts DERIVED away rather than justified, one row falling 14 to 5), and codebase-map freshness (symbols.json regenerated). The pass-order leg this build rewrote is GREEN on the bar. Filed as TOOL-aStagedLane-6 rather than silently raising the pin: that file's own convention is that a raise NAMES the names it admits, and a pin moved by whoever happens to be pushing is a pin nobody can read.
