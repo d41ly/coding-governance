@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-7 — a merge-bar substrate whose score depends on the hash seed
 
-**Status:** SPECCED · rev-1 · 2026-09-05 · node d · Tier-2 · base 22d75b31 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base 22d75b31 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -120,12 +120,26 @@ announced rather than silent.
   questions harvested from the corpus, against a ceiling of `1.0000` — so the shortfall is retrieval,
   not unreachable targets, and 50 of 95 questions return nothing at any k. Widening the fixture would
   make the floor describe the corpus rather than twelve curated questions, and it would also almost
-  certainly fail on the day it landed. That is a `RECALL_FLOOR` re-declaration, which is the adopting
-  project's call and not a run's. NOT RESOLVED — recorded here because this unit is the one that
-  measured it, and it needs its own spec.
+  certainly fail on the day it landed.
+
+  **It does not need its own spec: three already exist.** `TOOL-aTunedCompass-2` makes the graded set
+  send the query shape a session actually sends, since the fixture carries no terms while `query.py`
+  refuses a query without them and all 148 live queries supplied them. `TOOL-aTunedCompass-3` makes
+  the floor grade the two-set ensemble the CLI serves rather than the one set it grades today.
+  `TOOL-aTunedCompass-9` builds a set that can tell the ensemble from its `records` half at all.
+  RESOLVED (agent, 2026-09-05, delegated): this unit files nothing and points instead.
+
+  The 83-question figure measured here is EVIDENCE FOR `-9` rather than a competing finding, and the
+  two readings need reconciling by whoever builds it: `-9` reports `records:fts5` scoring recall
+  1.000 by itself with terms at k=20, while this measurement reports 0.3012 at r@5 over 83 harvested
+  questions against a ceiling of 1.0000. Different k, different question set, and nobody has run
+  them against each other.
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-05 · Q1 resolved by pointing: `TOOL-aTunedCompass-2`, `-3` and `-9` already own
+  the fixture and floor question this unit had parked, and the 83-question figure is re-framed as
+  evidence for `-9` with the k and question-set difference named.
 - rev-1 · 2026-09-05 · initial draft, from the scenario-based recall measurement, which found the
   defect while establishing a control for the substrate comparison.
 

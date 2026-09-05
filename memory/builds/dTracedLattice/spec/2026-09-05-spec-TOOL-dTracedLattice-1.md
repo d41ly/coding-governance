@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-6 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -46,6 +46,16 @@ a precision fix, and scenario-based recall showed precision does not predict the
   none of them. Cheapest credible probes, both stdlib and both to be MEASURED rather than assumed:
   stem the query against each candidate's docstring first line as well as its name, and match on
   stem prefixes for names not otherwise matched.
+
+  **This is ADJACENT to two units node `a` has already specced, and the boundary is worth stating
+  because all three touch `reuse_lookup`'s candidate pool.** `TOOL-aTunedCompass-6` moves the
+  neighbour cap to AFTER the ranking, so the twelve slots go to the twelve the ranking would keep
+  rather than the twelve whose names sort earliest. `TOOL-aTunedCompass-10` narrows the `same kind`
+  arm, which today admits almost the whole symbol corpus. Both change candidates that are ALREADY IN
+  the pool. S2 is about candidates that never enter it at any pool size, which is what the 17 of 17
+  measurement establishes — and that measurement is evidence FOR `-10`, since a cap over a pool
+  admitting the whole corpus is spent before relevance is consulted. S2 must not re-implement either;
+  if they land first it extends them, and if it lands first it leaves the pool and the cap alone.
 - **S3** A stem-specificity SECONDARY sort key, derived from `build_reference_index`'s own output at
   STEM granularity — 4934 tokens to 1924 stems in 0.0164 s, nothing committed, drift structurally
   impossible. NOT the identifier document frequency, which is `fan_in` itself. Lands only if it
@@ -115,6 +125,28 @@ scored against 329 AST-verified edges over 127 rows, the bare-only variant score
 discards 198 of 211 verified edges because this repo's dominant idiom is aliased-module dotted calls.
 S1 alone scores 33.8% precision at 82.9% recall and 0.46 mean absolute error against the shipped 1.38.
 S1 plus S2 is the design; S1 alone is the fallback if S2 does not pay for its cost.
+
+### What node `a` measured independently, and where we differ
+
+`aWeighedCompass` graded 170 recorded reuse phrases against two ground truths and landed CLOSED on
+2026-09-04, before this unit's measurement existed. The two passes agree where it counts and the
+agreement is the strongest evidence either produces, because the harnesses, the node and the scoring
+were all different: their `hit@1` against files the unit changed is 6.0% over n=133 and this unit's
+is 6.8% over n=132.
+
+Two of their findings refine figures here and are carried rather than re-derived. **The hit rate is
+size-biased**: 37.5% for a unit touching three product files or fewer against 66.0% for one touching
+eight or more, because a larger truth set gives the probe more targets. So the corpus-weighted
+figure flatters exactly the large unit the charter's "keep units small" rule discourages, and the
+number that matters for a small focused unit is the lower one. And **the probe's top is better than
+its bulk**: graded against the seam a §10 author actually chose, the median correct hit sits at rank
+2, against rank 6 when graded against files eventually edited.
+
+That last figure sits in TENSION with this unit's band analysis, which found ast-edge precision of
+7.2% in the highest fan-in band. Both can hold — they measure different objects, one the edges under
+a symbol and the other the position of the first correct path — but nobody has reconciled them, and
+a unit that changes the ranking should not proceed as though only one exists. Recorded as a known
+disagreement rather than resolved by preferring the convenient number.
 
 ### Alternatives rejected — the confidence re-rank
 
@@ -231,6 +263,10 @@ Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice design pass and its skeptic round.
+- rev-6 · 2026-09-05 · reconciled against node `a`'s `aWeighedCompass` and `aTunedCompass`, landed
+  on main while this build was in flight. S2 names `TOOL-aTunedCompass-6` and `-10` and states the
+  boundary; §4 carries their independent `hit@1` corroboration, their size-bias refinement, and the
+  unreconciled tension between their rank-2 median and this unit's 7.2% top band.
 - rev-5 · 2026-09-05 · folded the scenario-based recall measurement, which REVERSED the successor
   design this spec was heading toward. The confidence re-rank is refused in §3 and recorded in §4
   with both measurements. Scope is re-ordered by measured value: the name-merge defect leads, the
