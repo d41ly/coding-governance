@@ -290,6 +290,25 @@ function renderShippedBlanks(script) {
   return out
 }
 
+// TOOL-aWeldedTribunal-3 — THE FALLBACK VIEW for the blanked readers, and it is NOT
+// `renderStrippedView`. Rule 2's fallback uses that one, which leaves backticks ALONE; the two rules
+// that read the blanked view were given a view that blanks template CONTENTS as a deliberate
+// narrowing (TOOL-dTieredTribunal-14 S2, pinned by two self-test fixtures), and falling back to a
+// view that keeps those contents would regain exactly the false-positive class those fixtures exist
+// to pin — `runBothViews` UNIONS the views, so a false positive under either DENIES.
+//
+// So the fallback is the SAME scan with the mode reset PER LINE. That is wrong as the primary view,
+// because it un-blanks the second and later lines of every legal multi-line template; as a fallback
+// it is right, because it runs only when the primary scan already ended inside a literal, and a
+// per-line reset cannot carry one line's damage into the next. It preserves the narrowing within
+// each line, which is what the unit's S6 requires.
+function renderPerLineBlanked(script) {
+  return script.split(/\r?\n/).map((line) => {
+    const one = renderBlankedLiterals(line)
+    return one.code[0] === undefined ? '' : one.code[0]
+  })
+}
+
 // ---------------------------------------------------------------------------
 // TOOL-dMispairedQuote-3 — the NO-REGRESSION guarantee, as a DISPATCHER.
 //
@@ -319,7 +338,20 @@ function renderCodeView(script) {
 }
 
 function renderBlankedLiterals(script) {
-  return VIEW_MODE === 'shipped' ? renderShippedBlanks(script) : renderBlankedView(script)
+  // TOOL-aWeldedTribunal-3 — both arms return `{ code, unterminated }`, and the SHIPPED arm is
+  // hard-coded `false` rather than reporting. That is not an oversight and not a shortcut.
+  //
+  // The three `renderShipped*` bodies are FROZEN: a self-test arm byte-compares them against BASE,
+  // because they ARE the no-regression baseline that makes `runBothViews`'s union sound. Editing one
+  // to add a report would break exactly the guarantee this whole dispatcher exists to provide — the
+  // suite caught the first attempt at it, which is the arm working as designed.
+  //
+  // Nothing is lost. `runBothViews` UNIONS the two passes, so the corrected view's fallback ADDS the
+  // findings the frozen view cannot see, and the frozen view keeps behaving exactly as it always
+  // has. The improvement belongs to the corrected view; the baseline stays a baseline.
+  return VIEW_MODE === 'shipped'
+    ? { code: renderShippedBlanks(script), unterminated: false }
+    : renderBlankedView(script)
 }
 
 // Run one rule over BOTH views and merge. The mode is restored before returning, so a rule that
@@ -424,6 +456,27 @@ const SEQ_MARK = 'gov:sequential-agents'
 // Every array method that can carry an agent() call once per element. The list is closed and
 // generous on purpose: a method missing from it used to mean ALLOW, which is the fail-open direction.
 const ITER_CALL = /\.\s*(map|flatMap|forEach|filter|reduce|reduceRight|some|every|find|findIndex|sort|flat)\s*$/
+
+// TOOL-aWeldedTribunal-1 — THE LOOP KEYWORD SET, spelled ONCE. Six sites in this file used to ask
+// "is this a loop" and each held its own `/\b(for|while)\s*\(/`, which is two answers to one
+// question six times over. Two ordinary spellings matched none of them and were MEASURED at exit 0
+// carrying an unmarked thunk-array fan past this hook (TOOL-dFoldedVerdict-8): `for await (` puts an
+// identifier between the keyword and the paren, and a `do { … } while (…)` block's opening line
+// carries no keyword at all because its `while` sits after the closing brace.
+//
+// THREE FORMS, because three sites ask the question differently and a single regex cannot serve all
+// of them. `LOOP_HEADER` matches an opener anywhere on a line. `LOOP_HEADER_G` is the same with the
+// global flag, for the site that COUNTS openers. `LOOP_KEYWORD_TAIL` matches a keyword at
+// END-of-text, for the opener walk, which tests the text BEFORE a paren — a pattern ending in `\(`
+// or `do\s*\{` can never match there. The `do` spelling is deliberately absent from the tail form: a
+// `do` block opens with a BRACE, so it never appears as an enclosing paren opener.
+//
+// Measured before wiring, over all eight tracked *.js: ZERO lines match the widened form and not the
+// old one, so nothing currently admitted becomes denied. The widening reaches the evasions only.
+const LOOP_KEYWORDS = 'for(?:\\s+await)?|while'
+const LOOP_HEADER = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{')
+const LOOP_HEADER_G = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\\{', 'g')
+const LOOP_KEYWORD_TAIL = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*$')
 
 // `K` resolved against this file: an integer literal, or an identifier bound to one.
 function boundedK(tok, consts) {
@@ -680,6 +733,9 @@ function fanoutFindings(script) {
   const ok = new Set()
   // S4 - one reason per refused marked assignment, keyed by the name it binds.
   const markedWhy = new Map()
+  // TOOL-aWeldedTribunal-2, closing-review fold: which bounded names a blessing LEANED ON, so a
+  // take-back can follow the derivation instead of stopping at the mutated name.
+  const derivedFrom = new Map()
   // TOOL-dFoldedVerdict-4: candidates admitted by `gov:sequential-agents`, judged again after the
   // scan by the one-call sweep. Collected rather than cleared immediately, because the ninth
   // condition is about a GROUP and no per-line pass can see one.
@@ -702,13 +758,13 @@ function fanoutFindings(script) {
     const ch = code[h] || ''
     // C5: the SHAPE is read from the literal-blanked view, so a marker sitting inside a quoted
     // string on a line that is not really a loop header blesses nothing.
-    if (!/\b(for|while)\s*\(/.test(ch)) return ` — the marked line is not a loop header in the code view, so the marker sits inside a string and blesses nothing`
+    if (!LOOP_HEADER.test(ch)) return ` — the marked line is not a loop header in the code view, so the marker sits inside a string and blesses nothing`
     // C6: THE CLAUSE THAT CARRIES THE WEIGHT. The bound is the author's claim; a receiver this file
     // already proves bounded is what makes the total real.
     // TWO OPENERS ON ONE LINE CANNOT BE ATTRIBUTED. `for (const g of OK) for (const f of ALL)`
     // put a bounded token on the header of a loop that iterates something else, and the brace walk
     // stops at the shared line so the inner loop never gets its own header. Refused outright.
-    if ((ch.match(/\b(?:for|while)\s*\(/g) || []).length > 1) return ` — the marked header carries more than one loop opener, and this scan cannot tell which of them the call belongs to`
+    if ((ch.match(LOOP_HEADER_G) || []).length > 1) return ` — the marked header carries more than one loop opener, and this scan cannot tell which of them the call belongs to`
     // A STRICT for-of HEADER, matched as a whole from the `for (` itself. The earlier form read the
     // first `of <ident>)` ANYWHERE on the line, so a block comment, a guard clause or an outer loop
     // supplied the bounded token for free — measured, four ways. `while` is refused with no special
@@ -735,7 +791,7 @@ function fanoutFindings(script) {
         if (ch2 === '}') ob++
         else if (ch2 === '{') ob--
       }
-      if (ob < 0 && k !== h && /\b(for|while)\s*\(/.test(code[k])) return ` — the marked loop is itself inside a loop opened at line ${k + 1}, which multiplies its bound by a count nothing here can size`
+      if (ob < 0 && k !== h && LOOP_HEADER.test(code[k])) return ` — the marked loop is itself inside a loop opened at line ${k + 1}, which multiplies its bound by a count nothing here can size`
       if (ob < 0) ob = 0
     }
     return null
@@ -760,6 +816,17 @@ function fanoutFindings(script) {
       const branches = parseBranches(rhs)
       const bad0 = branches.find((b) => !boundedBranch(b, name, consts, ok))
       if (!grows && branches.length && bad0 === undefined) {
+        // TOOL-aWeldedTribunal-2, closing-review fold. RECORD WHAT THIS BLESSING LEANED ON. A
+        // derivation like `const groups = batches.filter(Boolean)` is bounded only because
+        // `batches` was; when a later take-back removes `batches`, `groups` kept a bound nothing
+        // supported any more, and an unbounded agent-per-finding fan was admitted one `.filter()`
+        // away. The cascade below drops the derived name too.
+        const srcs = new Set()
+        for (const br of branches) {
+          const lead = /^\s*([A-Za-z_$][\w$]*)/.exec(String(br))
+          if (lead && lead[1] !== name && ok.has(lead[1])) srcs.add(lead[1])
+        }
+        if (srcs.size) derivedFrom.set(name, srcs)
         ok.add(name)
         // D10 - the reason is a CACHE and both scan passes write it. A name refused on pass 1 for a
         // declaration-order reason and ACCEPTED on pass 2 kept the pass-1 text, so a later refusal
@@ -827,10 +894,41 @@ function fanoutFindings(script) {
   }
   lines.forEach(scan)
   lines.forEach(scan)
+
+  // THE TAKE-BACK SWEEPS READ `code` DIRECTLY, WITH NO COMMENT STRIP, and the four review rounds
+  // that led here are the reason — this comment is the finding, not decoration.
+  //
+  // The closing review's round 1 reported a FALSE DENY: `/* never do LENSES.push(x) */` revoked a
+  // legal bound, because `renderCodeView` deliberately does not blank block comments. Three separate
+  // fixes for that cosmetic complaint each bought a FAIL-OPEN on the only mechanical control this
+  // repo has against an agent burst:
+  //
+  //   round 2 — the blanked view erases `${…}` bodies, so `` `${LENSES.push(x)}` `` went invisible
+  //   round 3 — a joined-text strip paired a regex literal's `/*` with the next real `*/` below it
+  //   round 4 — a per-line strip did the same thing within one line
+  //
+  // The common cause is not any of those regexes. It is that THIS FILE MODELS NO REGEX LITERAL, by
+  // a standing decision `renderLexedView`'s own header records, so every comment strip built on top
+  // of it inherits that blindness in a new shape. Closing the class needs a regex-literal-aware
+  // lexer, which this file has never had and which is not this unit's scope.
+  //
+  // So the strip is GONE and the false deny is ACCEPTED. That is the fail-CLOSED direction and the
+  // charter's stated posture: a construct this rule cannot prove bounded is denied, and the burden
+  // is on the fan-out rather than on the gate. Weighed plainly — a comment mentioning a growth costs
+  // an author one reworded comment; a fail-open costs an unbounded agent burst nothing.
+  //
+  // THE RESIDUAL, named: a comment or a string that mentions `<bounded>.push(` revokes that name's
+  // bound and denies the script. No tracked harness writes one — all five still exit 0 — and this is
+  // exactly the behaviour that shipped before this build, so it is a preserved property rather than
+  // a new cost. `memory/gotchas/` carries the class.
+  const takeBackView = code
+
   // A BARE REASSIGNMENT invalidates the bound. `let items = [1, 2]` then `items = allFindings` was a
   // measured bypass: the whitelist was keyed on a name and nothing ever took the name back. The
   // protocol publishes "assigned exactly once", so anything assigned twice loses the claim.
-  code.forEach((l) => {
+  // R6: it reads the comment-free view too. The first fold gave that to the growth sweep alone, so a
+  // block-commented reassignment still denied a legal harness — the same class, one sweep over.
+  takeBackView.forEach((l) => {
     const m = /(?:^|[;{}]\s*)([A-Za-z_$][\w$]*)\s*=[^=]/.exec(l)
     if (m && !/\b(const|let|var)\s+$/.test(l.slice(0, m.index + m[0].indexOf(m[1])))) {
       if (!/\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=/.test(l)) {
@@ -849,7 +947,93 @@ function fanoutFindings(script) {
     }
   })
 
+  // TOOL-aWeldedTribunal-2 — A GROWTH CALL TAKES THE BOUND BACK, exactly as a reassignment does.
+  // `const batches = []` counts zero elements and is blessed by the array-literal case above; a
+  // later `batches.push(...)` grows it to one entry per finding with the bound still standing
+  // (TOOL-aCandidStub-1). Runs AFTER both scan passes and beside the reassignment sweep, for that
+  // sweep's own stated reason: a name accepted on pass 2 and taken back earlier would fall through
+  // to whatever pass 1 wrote.
+  //
+  // NOT THE RIGHT-HAND-SIDE VOCABULARY, and the difference was MEASURED rather than reasoned. The
+  // marked-branch veto lists `concat|push|flat|flatMap|fill|repeat`, and three of those are
+  // NON-MUTATING: `concat`, `flat` and `flatMap` return a NEW array and leave the receiver exactly
+  // as long as it was. Run over this tree, that list took the bound back from `ALL_LENSES` on the
+  // strength of a `.concat` that changes nothing. The two answer different questions — the RHS one
+  // asks whether an expression can PRODUCE something bigger, this one whether a statement GROWS the
+  // array named — so they share this comment and not a constant.
+  //
+  // RESIDUALS, named rather than implied: a mutation through an alias (`const b = batches; b.push`)
+  // is not tracked, because this file tracks names and not values; and `batches[i] = x` past the end
+  // and `batches.length = n` both grow an array and are not here, because a regex over
+  // `name[<expr>] =` matches every ordinary element write and denies innocent files.
+  // THE LEFT GUARD IS ZERO-WIDTH, and it took two rounds to get there. `\b` alone captured the LAST
+  // segment of a member chain, so `state.lenses.push(x)` withdrew the bound from an unrelated
+  // top-level `lenses`. The obvious repair — a consuming class `[^.\w$)\]]` — leaked TWICE from one
+  // regex: it excluded `)` and `]`, so `if (x) LENSES.push(y)` never matched at all; and because it
+  // CONSUMES the character it inspects, under `/g` a receiver sitting right after a previous match's
+  // `(` was unreachable, so `sink.push(LENSES.push(9))` escaped. Both close with the LOOKBEHIND form
+  // this file already uses in `offendingLines`: it asserts without consuming, and it excludes only
+  // what actually makes a name a member — a dot or a name character.
+  const GROWS_RECEIVER = /(?<![.\w$])([A-Za-z_$][\w$]*)\s*\.\s*(?:push|unshift|splice)\s*\(/g
+  takeBackView.forEach((l, li) => {
+    let g
+    GROWS_RECEIVER.lastIndex = 0
+    while ((g = GROWS_RECEIVER.exec(l))) {
+      // Scoped to a name that HAD a bound, mirroring the reassignment sweep's `hadBound` guard:
+      // announcing that a bound was withdrawn from a name that never had one is that guard's own
+      // recorded defect, right verdict and false reason.
+      if (!ok.has(g[1])) continue
+      // A REMOVAL-ONLY `splice` SHRINKS. `LENSES.splice(0, 2)` takes two elements OUT, and revoking
+      // a bound for that is a denial whose stated reason — "was GROWN" — is false about the array it
+      // names. Only a 3-plus-argument splice inserts.
+      //
+      // TWO CORRECTIONS FROM ROUND 2, both fail-OPEN. The line was resolved by VALUE
+      // (`indexOf(l)`), so two textually identical splice lines graded the later one against the
+      // earlier one's arguments — the free `forEach` index is the whole fix. And counting top-level
+      // commas cannot see through a SPREAD, so `LENSES.splice(...more)` read as a two-argument
+      // shrink; a spread is unbounded growth, which the marked-branch veto forty lines above already
+      // says, so it is treated as growth here rather than measured.
+      if (/\.\s*splice\s*\($/.test(l.slice(0, g.index + g[0].length))) {
+        // The spread test is over the TOP-LEVEL arguments, not the whole call text. Scanning the
+        // text made `LENSES.splice(0, Math.min(...ns))` read as growth — a spread nested inside an
+        // argument grows nothing, and denying it states "was GROWN" about an array that shrank.
+        //
+        // AND AN ARGUMENT LIST CARRYING A COMMENT IS NOT GRADED AT ALL. `splice(0, /*…*/ ...rest)`
+        // put the comment in front of the spread, so a prefix test saw a two-argument shrink and
+        // admitted a growth. Since this file models no regex literal, no comment strip here can be
+        // trusted — that is the whole lesson of rounds 2 through 4 — so a call this scan cannot read
+        // cleanly is DENIED rather than measured. Fail-closed, on a shape nothing writes.
+        const call = joinCall(takeBackView, li, g.index + g[0].length - 1)
+        const args = call && !/\/\*|\/\//.test(call.text) ? topLevelArgs(call.text) : null
+        if (args && !args.some((a) => a.trim().startsWith('...')) && args.length < 3) continue
+      }
+      ok.delete(g[1])
+      markedWhy.set(g[1], `\`${g[1]}\` was GROWN by a mutation after its bounded assignment, which takes the bound back`)
+    }
+  })
+
+  // THE CASCADE. Both take-back sweeps above remove the name they matched and stop there, so a
+  // DERIVED name kept a bound its source no longer has: `const groups = batches.filter(Boolean)`
+  // with the marker still exits 0 after `batches.push(...)` revoked `batches`. Iterated to a fixed
+  // point rather than one pass, because a derivation can lean on a derivation. The pre-existing
+  // reassignment sweep had the same hole and is covered here too, since both write to the same
+  // `ok` set and this runs after both.
+  for (let pass = 0; pass < derivedFrom.size + 1; pass++) {
+    let moved = false
+    derivedFrom.forEach((srcs, n) => {
+      if (!ok.has(n)) return
+      srcs.forEach((s) => {
+        if (ok.has(s)) return
+        ok.delete(n)
+        markedWhy.set(n, `\`${n}\` was derived from \`${s}\`, whose bound was taken back, so this one no longer holds either`)
+        moved = true
+      })
+    })
+    if (!moved) break
+  }
+
   const bad = []
+
   lines.forEach((raw, i) => {
     const l = code[i]
     if (!/\bagent\s*\(/.test(l)) return
@@ -907,7 +1091,12 @@ function fanoutFindings(script) {
         break
       }
       if (/\bArray\s*\.\s*from\s*$/.test(before)) { hit = { kind: 'from' }; break }
-      if (/\b(for|while)\s*$/.test(before)) { hit = { kind: 'loop' }; break }
+      // The TAIL form: this tests the text BEFORE an opener position, so a pattern ending in `\(`
+      // can never match here. `for await (` used to miss, leaving `hit` null so the walk continued
+      // OUTWARD — and if the next enclosing opener was a bounded `.map(` receiver already in `ok`,
+      // the call-site arm returned with no finding and the loop arms below were never reached.
+      // A fail-open the header widening alone does not close (TOOL-aWeldedTribunal-1, H3).
+      if (LOOP_KEYWORD_TAIL.test(before)) { hit = { kind: 'loop' }; break }
     }
     if (hit && hit.kind === 'iter') {
       if (hit.name === null) {
@@ -931,7 +1120,7 @@ function fanoutFindings(script) {
     let braceless = false
     // A BRACELESS loop body: `for (const f of all) out.push(await agent(f))`. The brace walk below
     // cannot see it — there is no brace — and it was one of the measured bypasses.
-    if (/\b(for|while)\s*\(/.test(l.slice(0, c))) { h = i; braceless = true }
+    if (LOOP_HEADER.test(l.slice(0, c))) { h = i; braceless = true }
     else {
       // A loop BODY is a brace block, not a paren, so it never shows up as an enclosing opener.
       // Judged separately: an unclosed `for (`/`while (` block whose brace is still open above.
@@ -941,7 +1130,7 @@ function fanoutFindings(script) {
           if (ch === '}') braces++
           else if (ch === '{') braces--
         }
-        if (braces < 0 && /\b(for|while)\s*\(/.test(code[k])) { h = k; break }
+        if (braces < 0 && LOOP_HEADER.test(code[k])) { h = k; break }
         if (braces < 0) braces = 0 // a different block opened here; keep looking outward
       }
     }
@@ -1069,7 +1258,10 @@ function renderBlankedView(script) {
     }
     out.push(res)
   }
-  return out
+  // TOOL-aWeldedTribunal-3 — same report as the shipped sibling, so the dispatcher's two arms return
+  // one shape. A dispatcher whose arms differ is a defect every caller has to know about, which is
+  // the thing a dispatcher exists to prevent.
+  return { code: out, unterminated: mode !== 'code' }
 }
 
 // Join forward from the `(` at code[i][col] until the parens BALANCE, and return the inside. The
@@ -1114,7 +1306,13 @@ function topLevelArgs(text) {
 
 function capFindings(script) {
   const lines = script.split(/\r?\n/)
-  const code = renderBlankedLiterals(script)
+  // TOOL-aWeldedTribunal-3 — an UNTERMINATED scan falls back to the per-line blanked view. The
+  // primary view carries its mode across lines, so one unterminated backtick blanked every line
+  // below it and this rule saw nothing under it (TOOL-aLexedStripper-4). Not a fail-closed branch:
+  // `TOOL-aLexedStripper-5` measured that and it denied a legal script carrying a regex literal with
+  // a backtick in it.
+  const view = renderBlankedLiterals(script)
+  const code = view.unterminated ? renderPerLineBlanked(script) : view.code
   const { consts, orBound } = intConsts(code)
   const bad = []
 
@@ -1410,7 +1608,13 @@ function guardAgentSpawn(data) {
 // excludes this file from its own population - the ban table below would otherwise match itself.
 function scanJoinFindings(script) {
   const raws = script.split(/\r?\n/)
-  const code = renderBlankedLiterals(script)
+  // TOOL-aWeldedTribunal-3 — the SAME fallback rule 3 takes, for the same reason and over the same
+  // view. Giving rule 3 the fallback and not this one would be the gate-the-class-not-the-instance
+  // failure one level up: both read `renderBlankedLiterals` through the same dispatcher and both
+  // went blind below an unterminated literal. The per-line view preserves S2's narrowing WITHIN each
+  // line, which `renderStrippedView` would not — it leaves backticks alone.
+  const view = renderBlankedLiterals(script)
+  const code = view.unterminated ? renderPerLineBlanked(script) : view.code
   const out = []
   // S3 - one ban table, tested against every view of the line. It was three inline conditions per
   // view until the M8 closing review found the second view missing; duplicating them per view would
