@@ -1418,12 +1418,30 @@ git checkout -q main
 # directive redded the GREEN CONTROL of an unrelated arm — a fixture falling behind the thing it
 # exists to support, reported as a failure of whatever ran next. The MISSING-section case keeps its
 # own hand-written carrier at arm 6 above, which is where that negative belongs.
+#
+# IT FELL BEHIND ANYWAY, in exactly the way the paragraph above predicts, and this is the repair.
+# `TOOL-aHoistedPass-2` landed check 16's BODY term: a section must now name its own handles in
+# backticks, not merely exist. A carrier of bare headings satisfies arm B and reds the body term
+# SEVENTEEN times, so the green control below - "a tree whose waiver was taken at preflight exits 0"
+# - failed on a check-16 message that has nothing to do with waivers. Measured while building
+# `TOOL-aHoistedPass-9`, on shard 2/2, with that unit's own edits reverted; the derivation now emits
+# each section's handles as well as its heading, and both halves still come out of the registry.
 { printf '# method\n'
-  grep -m1 '^DIRECTIVES_CORE=' $KIT_REL/unattended.sh \
-    | grep -oE ':M[0-9]+' | tr -d ':' | sort -u | while read -r _sec; do printf '\n## %s\n' "$_sec"; done
+  _reg=$(grep -m1 '^DIRECTIVES_CORE=' $KIT_REL/unattended.sh | sed 's/^DIRECTIVES_CORE="//; s/"$//')
+  for _sec in $(printf '%s\n' $_reg | cut -d: -f2 | sort -u); do
+    printf '\n## %s\n\n' "$_sec"
+    for _h in $(printf '%s\n' $_reg | awk -F: -v s="$_sec" '$2 == s { print $1 }'); do printf '`%s` ' "$_h"; done
+    printf 'state their rules in this section.\n'
+  done
 } > memory/guides/BUILD-METHOD.md
 n=$((n+1)); [ "$(grep -c '^## M' memory/guides/BUILD-METHOD.md)" -ge 8 ] \
   || { echo "FAIL the derived build-method carrier holds too few sections to satisfy the registry"; st=1; }
+# ...and the ANCHORS, counted, because the section list alone is what stopped being enough. Without
+# this the fixture can fall behind a THIRD time and the report will again be a message about whatever
+# ran next. Both sides derive from the registry, so neither can be typed out of date.
+_want_h=$(printf '%s\n' $_reg | grep -c .)
+n=$((n+1)); [ "$(grep -oE '`[a-z][a-z-]*`' memory/guides/BUILD-METHOD.md | sort -u | grep -c .)" -ge "$_want_h" ] \
+  || { echo "FAIL the derived build-method carrier names fewer directive handles than the registry declares, so check 16's body term reds every arm below it"; st=1; }
 mkdir -p memory/builds/tWaive
 cat > memory/builds/tWaive/README.md <<'RM'
 ---
@@ -1577,6 +1595,95 @@ Ratified centrally. Not a unit spec, and carries no status header.
 ' > memory/builds/tPlanOk/spec/contracts.md
 git add memory/builds/tPlanOk/spec/contracts.md
 hit "$(run)" "a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it: tPlanOk"
+
+# ---- 31 (TOOL-aHoistedPass-9): the route the `passes-harnessed` directive names RESOLVES in this
+# ---- tree, and every case the check cannot COMPARE announces itself on the REPORT channel instead
+# ---- of passing silently. SIX breaks and one green control, one per branch of the check.
+# ----
+# ---- The fixture ships no build-method carrier, so each arm writes one through `_bm_sections` -
+# ---- the same helper arm 6b uses. That keeps every OTHER cited section present, so these arms grade
+# ---- check 31 rather than grading arm B's missing-section refusal.
+# ----
+# ---- THE ROUTE PATH IS DERIVED, NEVER SPELLED. `install-prefix` is a BAN on this file, not a
+# ---- ratchet: a literal kit path in a shipped body arrives verbatim in a target installed at
+# ---- another prefix and resolves to nothing there. Six literal spellings here moved this file's
+# ---- ratchet row 3 -> 9 and the gate refused them, correctly. The route's home is the SIBLING of
+# ---- this suite's own `KIT_REL`, which is where `mutate` and `cp` already reach the kit under test.
+# ---- At a root install `KIT_REL` has no directory part and this resolves to `./workflows`, which
+# ---- the check's own `(^|/)workflows/` key still matches and `dirname` still walks.
+_c31_dir="$(dirname "$KIT_REL")/workflows"
+_c31_route="$_c31_dir/unattended-unit.js"
+# The M6 body, built through printf so the BACKTICKS come from a single-quoted format while the path
+# comes from the derived variable. A backtick inside a double-quoted string in this suite is command
+# substitution, and the fixture would then be written by whatever it ran - the trap `mkconf` carries
+# a loud comment about, which cost a 50-minute run to find.
+_bm31() { # [route path]; with no argument the section names no route at all
+  local body
+  body=$(printf '\n`parallel-when-disjoint` `passes-committed` `passes-harnessed`')
+  [ $# -gt 0 ] && body=$(printf '%s — the route is `%s`' "$body" "$1")
+  _bm_sections "$body" > memory/guides/BUILD-METHOD.md
+}
+
+# branch F1, and this is the POSITIVE assertion `fail 31` owes under check-arms: the section names a
+# script this tree does not carry while the directory that would hold it IS present, which is a kit
+# that was taken and a route that is broken. The kit's own parent exists in the fixture because the
+# kit installs under it; the route directory is created by this arm and by nothing else.
+reset_tree
+_bm31 "$_c31_route"
+mkdir -p "$_c31_dir"
+hit "$(run)" "the build-method section naming the harnessed-pass route names a script this tree does not carry while the directory that holds it IS present, so the route's kit was taken and its route is broken: $_c31_route"
+
+# branch S5, and the split against F1 above IS the ruling: an absent DIRECTORY means the route's kit
+# was never installed here, which is an install decision a standing bar cannot undo. It announces on
+# REPORT and stays silent on the default channel, which is what makes a skip byte-distinguishable
+# from a pass. `govkit apply` is where that same gap is refused, at the act that creates it.
+reset_tree
+_bm31 "$_c31_route"
+miss "$(run)" "check 31"
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for $_c31_route — the directory that would hold it is absent"
+
+# branch S2, the carrier absent. Check 16 arm B is SILENT on this exact state by design - it guards
+# its whole loop on `[ -f … ]` - and this line is the announcement arm B does not make. The fixture
+# ships no carrier, so this arm breaks nothing and that is the point: the silent state is the shipped
+# one. No `mutate` here for the same reason; there is no file to no-op against.
+reset_tree
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for memory/guides/BUILD-METHOD.md — this tree carries no build-method carrier"
+
+# branch S4, the section resolving but naming no route at all. This is the state of every adopter
+# tree whose render predates the M6 route sentence, which is the whole population this check exists
+# to reach - so an arm for it is not a corner case, it is the common one.
+reset_tree
+_bm31
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for memory/guides/BUILD-METHOD.md — M6 names no backticked route script"
+
+# branches S5 then F1 at a FOREIGN PREFIX, which is what says the verdict follows the named path's
+# own `dirname` rather than an install-prefix literal. TOOL_ROOT renders to the empty string at a
+# root install, so a literal would be wrong in an adopter tree in BOTH directions - failing a correct
+# route installed elsewhere, or skipping forever over a broken one. This prefix is not a kit path,
+# so spelling it here carries nothing an adopter would have to repath.
+reset_tree
+_bm31 vendor/harness/workflows/unattended-unit.js
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for vendor/harness/workflows/unattended-unit.js — the directory that would hold it is absent"
+mkdir -p vendor/harness/workflows
+hit "$(run)" "so the route's kit was taken and its route is broken: vendor/harness/workflows/unattended-unit.js"
+
+# branch S1, the registry itself unreadable, so the section holding the route is unnamed. Reached by
+# EMPTYING the driver's core set rather than by `--only 28`: that flag leaves `$core` unset for the
+# same reason, but the leg dies at check 30's `MEMORY_ROOT: unbound variable` twenty lines earlier
+# and check 31 never runs. Measured at e828f778, filed as TOOL-aHoistedPass-37, not this unit's.
+reset_tree
+mutate $KIT_REL/unattended.sh 's/^DIRECTIVES_CORE=.*/DIRECTIVES_CORE=""/'
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "— the directive registry names no passes-harnessed handle this leg can read"
+miss "$(run)" "check 31"
+
+# ...and the GREEN CONTROL, which is the arm that makes the six above mean anything: with the route
+# actually resolving, check 31 says nothing on EITHER channel. Without it, six announcing arms are
+# equally consistent with a check that announces unconditionally.
+reset_tree
+_bm31 "$_c31_route"
+mkdir -p "$_c31_dir" && : > "$_c31_route"
+miss "$(GOV_UNATTENDED_REPORT=1 run)" "check 31"
+reset_tree
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): the generated-units pair is REQUIRED on every tracked build
 # ---- README. The corpus is clean, so a check with no red fixture here proves nothing - it would be

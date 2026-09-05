@@ -1,12 +1,13 @@
 # TOOL-aHoistedPass-9 — the adopter without the harness is told, on every bar
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 DEPL-aHoistedPass-1 |
+| [2026-09-05-build-TOOL-aHoistedPass-9-1-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aHoistedPass-9-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-prompt-TOOL-aHoistedPass-9-brief.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-9-brief.md) | journal | — |
 | [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 DEPL-aHoistedPass-1 |
 | [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 DEPL-aHoistedPass-1 |
@@ -35,8 +36,14 @@ the population the install-time arm can never reach.
   present.
 - **S5.** The directory under test is derived with `dirname` from the path the section itself names,
   never from a literal install prefix.
-- **S6.** Four staged-break arms plus one green control in `tools/unattended/check-unattended.test.sh`,
-  of which one is the positive assertion `fail 31` owes under the arms meta-gate.
+- **S6.** Staged-break arms plus one green control in `tools/unattended/check-unattended.test.sh`,
+  of which one is the positive assertion `fail 31` owes under the arms meta-gate. **The count is
+  SIX, not the four rev-1 wrote**, and the four was never consistent with this document's own §6:
+  AC7 alone demands two observations (a foreign prefix whose directory is absent and one whose
+  directory the arm creates), and AC2, AC3, AC5 and AC6 demand one each. The arms are one per branch
+  of the §4 table that a fixture can reach — F1, S5, S2, S4, and S5-then-F1 at a foreign prefix —
+  plus S1, which is armed by emptying the driver's `DIRECTIVES_CORE` rather than by a scoped run;
+  §4's Placement paragraph says why that route and not the other.
 - **S7.** ~~The `unattended` kit version bump 1.17 → 1.18 the payload change owes: three engine
   constants and the marker in all five tracked `tools/unattended/*.template.md`.~~ — **SPENT.**
   `DEPL-aHoistedPass-1`'s section 8 F1 takes that single move at `order 2`; this unit is at `order 6`
@@ -151,16 +158,33 @@ available.
 
 ### Placement, and what it costs
 
-Check 31 goes after check 30 (`:2885`–`:2903`) and before `exit "$status"` at `:2905`. That is
-outside both scope guards: the `only28` block is `:110`–`:2305` and the `skip28` block is
-`:2307`–`:2873`. Consequences, both deliberate:
+Check 31 goes after check 30 and before `exit "$status"`, outside both scope guards. The line
+numbers rev-1 recorded moved: at the run's BASE `e828f778` the file is 2952 lines, check 30 spans
+`:2923`–`:2951`, `exit "$status"` is `:2952`, the `only28` block is `:110`–`:2352` and the `skip28`
+block is `:2354`–`:2920`. The PLACEMENT is unchanged; only the citations moved. Consequences:
 
-- Check 31 runs under `--only 28` and `--skip 28` alike, exactly as check 30 does. Its cost is one
-  `awk` over one file plus two filesystem tests, against a leg whose declared ceiling in
-  `tools/gate-legs.json` is 16040.
+- Check 31 is outside both guards, so it runs under `--skip 28` as well as on a default bar. Its
+  cost is one `awk` over one file plus two filesystem tests per named path, against a leg whose
+  declared ceiling in `tools/gate-legs.json` is 16040.
 - `$core` is built INSIDE the `only28` block, so under `--only 28` it is unset and `set -u` would
-  kill the script. The check reads `${core:-}` and treats an empty value as branch S1 — which means a
-  `--only 28` run announces a skip rather than passing silently, which is the correct answer.
+  kill the script. The check reads `${core:-}` and treats an empty value as branch S1.
+
+**`--only 28` DOES NOT REACH CHECK 31 TODAY, and rev-4 asserted that it did.** Measured on this
+branch at `e828f778`: `bash tools/unattended/check-unattended.sh --only 28` exits **1** printing
+`tools/unattended/check-unattended.sh: line 2932: MEMORY_ROOT: unbound variable`. Check 30 sits
+outside both guards and opens with `[ -d "$MEMORY_ROOT/builds" ]`, while `MEMORY_ROOT` is assigned
+from the conf INSIDE the `only28` block — so under that flag the leg dies at check 30, twenty lines
+before check 31 exists. This is a defect in check 30 (`TOOL-dHonouredPark`) and not in this unit, it
+predates this unit, and it is filed as `TOOL-aHoistedPass-37` rather than fixed here: the one-token
+fix `${MEMORY_ROOT:-}` trades a crash for a SILENT skip of check 30's corpus walk, which is the
+class this whole build exists to remove, so the repair is a unit with its own reasoning.
+
+Two things follow, and both are what this rev changes rather than assertions carried forward.
+`${core:-}` is KEPT — not because it makes `--only 28` work, which nothing in this unit can, but
+because it is what stops check 31 being the SECOND crash on that path the day check 30's is fixed.
+And S1 is armed by emptying the driver's `DIRECTIVES_CORE` in the fixture, which reaches the same
+branch by its own subject — a registry with no readable `passes-harnessed` handle — on a default
+run that the suite can actually execute.
 
 ### The arms meta-gate, priced
 
@@ -248,7 +272,7 @@ the five tracked `tools/unattended/*.template.md` for their `gov:kit unattended@
 - **risks** — no concurrency, no writes, no rollback hazard. The one real risk is that the backtick
   key stops matching a reworded M6 sentence and the check degrades to a silent-by-default skip; §8
   fork F1 carries it.
-- **testing + left-shift gates** — four staged arms and a green control, of which one is the positive
+- **testing + left-shift gates** — six staged arms and a green control, of which one is the positive
   arm `fail 31` owes. Their execution is off the bar by the 2026-08-23 ruling and rides
   `bash tools/unattended/run-unattended-gates.sh --selftests` by hand.
 - **migration / rollback** — none owed; deleting the block reverts it.
@@ -287,10 +311,17 @@ the five tracked `tools/unattended/*.template.md` for their `gov:kit unattended@
   `python tools/memory-tree/check-arms.py --report` shows check 31 branch 1 as ARMED for
   `tools/unattended/check-unattended.test.sh`, with no row added to
   `memory/project/unarmed-branches.txt` and no edit to `ARMS_FLOORS` in `.memory-tree.conf`.
-- **AC9** — When `bash tools/unattended/check-unattended.sh --only 28` and the same command with
-  `--skip 28` are both run on the intact tree, both exit 0, and under
-  `GOV_UNATTENDED_REPORT=1` the `--only 28` run prints check 31's registry-unreadable skip rather than
-  nothing.
+- **AC9** — When `bash tools/unattended/check-unattended.sh --skip 28` is run on the intact tree it
+  exits 0 and emits no `check 31` line, so the check is reached and silent outside the 28 region.
+  **The `--only 28` half of this criterion is struck**, and the observation replaces it: that run
+  exits 1 at `line 2932: MEMORY_ROOT: unbound variable` in check 30, before check 31, both before
+  and after this unit lands. Rerun it to confirm the number is unchanged by this unit — the failure
+  is check 30's and is filed as `TOOL-aHoistedPass-37`. The registry-unreadable branch is witnessed
+  instead by AC14.
+- **AC14** — When the fixture empties the driver's `DIRECTIVES_CORE`,
+  `GOV_UNATTENDED_REPORT=1 bash tools/unattended/check-unattended.sh` prints
+  `check 31 skipped for ` naming the driver as its subject and saying no `passes-harnessed` handle is
+  readable, and no `fail 31` appears.
 - **AC10** — When `bash tools/unattended/check-unattended.test.sh` is run to completion, sharded as
   `--shard 1/2` and `--shard 2/2`, it reports PASS with a raised assertion count and no existing
   `GOV_UNATTENDED_REPORT=1` arm flips on the new line.
@@ -305,7 +336,18 @@ the five tracked `tools/unattended/*.template.md` for their `gov:kit unattended@
   `tools/install-prefix-carried.txt` still records 3 for this checker, because the block spells no
   install-prefixed literal.
 - **AC13** — When `bash tools/unattended/check-unattended.sh` runs on the landed tree with the route
-  present, it exits 0 with no output — the leg this unit changes is green on its own subject.
+  present, it exits 0 and its stdout is byte-identical to the same run before this unit landed. **Not
+  "with no output", which rev-1 wrote and which is false of this repo for reasons that predate this
+  unit**: check 7's EXCLUDED notices and check 23's dispatch-join notices both print on the DEFAULT
+  channel by design — the two exceptions the file's own header at `:14`–`:28` names — and neither
+  sets `status`. The claim worth making is that this unit adds nothing to that stream and does not
+  move the verdict, which a before/after byte comparison says and "no output" cannot.
+
+- **AC15** — When the suite's derived build-method carrier is rendered, it names every section the
+  registry cites AND every handle that cites one, both counted from the registry rather than typed,
+  and check 17's green control at `tools/unattended/check-unattended.test.sh` exits 0 again. This is
+  the rev-5 AMEND, not part of the original design; it is here because a criterion nobody wrote down
+  is a repair nobody re-checks.
 
 ## 7. Gates
 
@@ -410,6 +452,41 @@ build exists to remove.
   `DEPL-aHoistedPass-1` rev-5 PARKED the `unattended` bump to the owner as an M3 veto-2 owner turn, so
   order 2 sets nothing either. This unit's assertion is unaffected - `check-kit-versions.sh` grades
   agreement rather than movement, and every carrier still agrees at `1.17`.
+
+- rev-5 - 2026-09-05 - the BUILD pass, and every change here is a measurement this document
+  contradicted rather than a preference. THREE corrections, none of them cosmetic.
+  **(1) `--only 28` does not reach check 31 and never did.** rev-1's Placement paragraph called a
+  `--only 28` skip announcement "the correct answer"; measured at `e828f778` that command exits 1 at
+  `line 2932: MEMORY_ROOT: unbound variable`, because check 30 reads a variable the `only28` guard
+  skips assigning. AC9's `--only 28` half is struck and replaced by the observation, `${core:-}` is
+  kept for the reason it is actually worth keeping, S1 gains an arm that a default run can reach,
+  and the check-30 defect is filed as `TOOL-aHoistedPass-37` rather than repaired inside this unit -
+  the one-token repair swaps a crash for a silent skip of a corpus walk, which is this build's own
+  subject and owes its own reasoning.
+  **(2) AC13 asked for "no output" from a leg that is documented to print.** Check 7's EXCLUDED
+  notices and check 23's dispatch-join notices are the two DEFAULT-channel exceptions the file's own
+  header names, and this repo's corpus emits both today. A criterion no landing tree can satisfy is
+  not a bar, it is a line nobody will read twice; it is restated as a before/after byte comparison of
+  the leg's stdout, which is the claim this unit can actually make.
+  **(3) S6's arm count disagreed with section 6.** Four staged arms cannot witness AC2, AC3, AC5,
+  AC6 and AC7, the last of which needs two observations by its own wording. Six.
+  **(4) AN AMEND, in this unit's own write set: the suite's derived build-method carrier had fallen
+  behind check 16's body term.** `tools/unattended/check-unattended.test.sh:1416` builds a carrier
+  DERIVED from the registry, with a comment saying it is derived precisely so it cannot fall behind
+  the thing it must satisfy. `TOOL-aHoistedPass-2` then made "satisfy" mean more than a heading, and
+  a carrier of bare headings reds the body term seventeen times - MEASURED, all seventeen - so
+  check 17's green control failed on a check-16 message about waivers it has nothing to do with.
+  Observed on shard 2/2 and attributed at HEAD `c0a6d5ae` with this unit's edits reverted: the
+  checker there already carries the body term and the fixture builder is byte-identical to BASE, so
+  the arm was red before this pass began. The derivation now emits each section's handles as well as
+  its heading, and a second counted assertion holds it there. AC15 is the criterion. This is an M2
+  AMEND rather than scope creep: the file is in this unit's declared write set, the repair is the
+  fixture's own stated intent, and leaving it would mean claiming a green from a suite that is the
+  compensating check for this whole kit under the 2026-08-23 ruling.
+  Line citations that MOVED between `c4fcf5ad` and `e828f778` and are now re-derived in place: check
+  30, `exit "$status"`, and both scope-block spans. The citations re-opened and CONFIRMED unchanged:
+  `fail()` at `:93`, `report()` at `:591` behind `REPORT=` at `:590`, and 31 still the first free
+  `fail` number.
 
 ## 10. Reuse audit
 

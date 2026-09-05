@@ -2949,4 +2949,77 @@ if [ -d "$MEMORY_ROOT/builds" ]; then
   [ -z "$_pv_bad" ] || fail 30 "a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it:$_pv_bad"
 fi
 
+
+# ---- check 31 - the adopter whose ROUTE does not resolve is TOLD, on every bar. TOOL-aHoistedPass-9,
+# the gate-time half of ruling D4: `govkit apply` refuses the same gap at the act that CREATES it and
+# only for installs made after it lands, while this runs on every bar of every adopter forever -
+# including the whole population that arm can never reach. Neither subsumes the other.
+#
+# THE SECTION COMES OUT OF THE REGISTRY, never typed here. `passes-harnessed` names its carrier
+# section in the driver's DIRECTIVES_CORE, and a literal section token in this block would go on
+# grading a section the directive no longer names the day the handle is re-pointed.
+#
+# FIVE ANNOUNCED SKIPS, one per case this check cannot COMPARE, each naming its OWN subject. A guard
+# that a binding pair EXISTS is not a guard that it COVERS, and an absence-only assertion passes when
+# the subject was never there - so a check that cannot compare SAYS so rather than reporting a
+# reassuring zero. The announcement is therefore this check's liveness assertion and no separate
+# vacuity branch is owed. ONE LINE PER UNRESOLVED PATH: a skip whose subject is a SET leaves a reader
+# unable to say which path it was about, which is the shape this build exists to remove.
+#
+# SKIP, NOT FAIL, ON AN ABSENT DIRECTORY, and that split IS the ruling. An absent directory means the
+# route's kit was never installed here - an install decision a standing bar cannot undo, and redding
+# it punishes the wrong act on the wrong day. A missing FILE inside a present directory means the kit
+# WAS taken and its route is broken, which is a defect in that tree and theirs to fix.
+#
+# NOT A WHOLE-LEG SKIP. None of the other numbered checks needs the route to exist, so skipping the
+# leg would discard every one of their verdicts to announce this one - green-by-absence, one level up.
+#
+# WHAT THIS DOES NOT CHECK, said here because a structural check reads as a semantic one to everybody
+# who did not write it: whether the route script WORKS, or whether the sentence around it is true
+# about it. It grades that a path the section names IN BACKTICKS resolves in this tree, and a present
+# but broken script passes. Check 16's body term - not this one - grades the section for stating a
+# rule at all. Backticks rather than bare tokens, because a bare match would take a prose mention or
+# a fenced example as a subject to grade.
+#
+# `${core:-}` AND `${M:-}` ARE DELIBERATE. Both are assigned inside the `only28` guard, so under
+# `--only 28` they are unset and `set -u` would kill the script right here. That flag does not reach
+# this block today for an unrelated reason - check 30 above reads `$MEMORY_ROOT` under the same guard
+# and dies first, measured at e828f778 and filed as TOOL-aHoistedPass-37 - and these two spellings
+# are what stop this check becoming the SECOND crash on that path the day the first one is fixed.
+_c31_sec=$(printf '%s\n' ${core:-} | awk -F: -v h=passes-harnessed '$1 == h { print $2; exit }')
+_c31_bm="${M:-}/guides/BUILD-METHOD.md"
+if [ -z "$_c31_sec" ]; then
+  report "check 31 skipped for $DRIVER — the directive registry names no passes-harnessed handle this leg can read, so the section holding the route is unnamed and there is nothing to resolve"
+elif [ ! -f "$_c31_bm" ]; then
+  report "check 31 skipped for $_c31_bm — this tree carries no build-method carrier, so the section naming the route cannot be opened; check 16 arm B is silent on the same absence and this line is the announcement it does not make"
+elif ! grep -qE "^## $_c31_sec( |\$)" "$_c31_bm"; then
+  report "check 31 skipped for $_c31_bm — it carries no $_c31_sec heading, so the route cannot be read out of it; check 16 arm B owns that refusal and two legs answering one question is what this file's header exists to remove"
+else
+  # The section slice, then the BACKTICKED tokens in it that have a route script's shape. Both greps
+  # exit non-zero on no match and that is an ANSWER here rather than a failure - the empty branch
+  # below is what says so, and neither grep sits in an `&&` chain that could read it as one.
+  _c31_paths=$(awk -v s="^## $_c31_sec( |\$)" '
+      $0 ~ s { inb = 1; next }
+      inb && /^## / { exit }
+      inb' "$_c31_bm" \
+    | grep -oE '`[^`]+`' | tr -d '`' \
+    | grep -E '(^|/)workflows/[A-Za-z0-9_.-]+\.js$' | sort -u)
+  if [ -z "$_c31_paths" ]; then
+    report "check 31 skipped for $_c31_bm — $_c31_sec names no backticked route script, so this tree states no route for a run to resolve and there is nothing to test; an adopter whose render predates the route sentence is in exactly this state"
+  else
+    # PER PATH, so a tree carrying one of two named scripts fails on the one it lacks and says
+    # nothing about the one it has. The directory under test is `dirname` of the path the section
+    # ITSELF names: TOOL_ROOT renders to the empty string at a root install, so an install-prefix
+    # literal here would be wrong in an adopter tree in both directions.
+    for _c31_p in $_c31_paths; do
+      [ -f "$_c31_p" ] && continue
+      if [ -d "$(dirname "$_c31_p")" ]; then
+        fail 31 "the build-method section naming the harnessed-pass route names a script this tree does not carry while the directory that holds it IS present, so the route's kit was taken and its route is broken: $_c31_p"
+      else
+        report "check 31 skipped for $_c31_p — the directory that would hold it is absent, so the route's kit was never installed in this tree and a standing bar cannot undo an install decision"
+      fi
+    done
+  fi
+fi
+
 exit "$status"
