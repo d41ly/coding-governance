@@ -432,9 +432,99 @@ _STATUS = re.compile(r"^\*\*Status:\*\*\s*([A-Za-z]+)", re.M)
 # tried upstream and over-flagged 107/126: one shipped unit made all 14 siblings of its multi-spec
 # build look stale, because every id of a build shares the slug. The seq is the discriminator.
 #
-# Group 2 is the slug, for `signal_closed_specs_untraceable` — which asks a BUILD-level question the
-# slug answers correctly. Group 1 is untouched, so `signal_spec_status` reads exactly what it did.
-_OWN_ID = re.compile(r"^#\s+([A-Z]+-([a-zA-Z]+)-\d+)\b", re.M)
+# ONE GRAMMAR, AND IT IS THE RECALL EXTRACTOR'S. This was a hand-typed pattern of the shape
+# family-dash-slug-dash-digits, which is a second spelling of a published alternation and had already
+# diverged from it: the session era admits a trailing lowercase correction suffix that a
+# digits-then-boundary form cannot match, so a correction-form spec scored UNKEYED and the probe
+# silently declined to judge it rather than reporting anything.
+#
+# BOUND TO THE TREE BEING CLASSIFIED, never to the repo this kit is installed in. The extractor's
+# module-level constants anchor on the extractor's own file, which is right for its own CLI and
+# wrong for a caller classifying a different tree: a grammar that recognises nothing yields an empty
+# classification, and an empty classification is exactly what a clean corpus yields. The recorded
+# class is `memory/gotchas/grammar-bound-to-the-wrong-root.md`, which names the per-root accessor as
+# the fix. This kit's own self-test copies the report into scratch trees carrying fixture ids and no
+# memory-tree conf, which is precisely where the wrong binding reports a confident zero.
+#
+# IMPORTABLE OR NOT. drift-audit is copy-installed and must keep running in a tree that has no
+# memory-recall, so the accessor answers when it imports and a LOCAL COPY answers when it does not.
+# That copy is not a second grammar by stealth: the self-test asserts it still equals what the
+# extractor produces whenever the extractor is present, so a divergence fails loudly here instead of
+# silently in an adopter. This is unit 2's F1 resolution, and unit 3 adopts it by reference rather
+# than deciding the same boundary twice.
+_NODE_TAG_CLASS = "a-z"
+
+
+def _local_ident(families) -> str:
+    """The LOCAL COPY of the shipped id alternation, for a tree with no recall kit.
+
+    Byte-compared against the extractor's own output by this kit's self-test whenever that kit is
+    present, which is what keeps "fallback" from meaning "second grammar".
+    """
+    node = _NODE_TAG_CLASS
+    eras = (r"\d{3}", rf"[{node}]\d{{2,3}}", rf"[{node}][A-Za-z]{{2,}}-\d+[a-z]*")
+    # A conf declaring NO families must not narrow the grammar to nothing: that is the blind
+    # oracle this unit exists to remove, reintroduced through the fallback. The permissive form
+    # below is what the hand-typed pattern did, so an undeclared tree keeps exactly the coverage
+    # it had rather than silently losing all of it.
+    fam = "|".join(families) if families else r"[A-Z]{2,6}"
+    return r"(?:" + fam + r")-(?:" + "|".join(eras) + r")"
+
+
+def _grammar_ident(root, families) -> str:
+    """The shipped alternation for THIS tree, from the recall extractor where it is importable."""
+    kit = pathlib.Path(__file__).resolve().parent.parent / "memory-recall"
+    if not (kit / "extract.py").exists():
+        return _local_ident(families)
+    added = str(kit)
+    sys.path.insert(0, added)
+    try:
+        import extract  # type: ignore
+        return extract.grammar_for(root).ID
+    except Exception:
+        # A present-but-unusable sibling is the fallback case, never a crash. Every signal is
+        # evaluated in one unguarded comprehension, so a raise here takes the whole report down.
+        return _local_ident(families)
+    finally:
+        try:
+            sys.path.remove(added)
+        except ValueError:
+            pass
+
+
+def _own_id_re(root, families):
+    return re.compile(r"^#\s+(" + _grammar_ident(root, families) + r")\b", re.M)
+
+
+def _families_of(conf) -> tuple:
+    """The id FAMILY allowlist, from the memory-tree conf this kit already reads.
+
+    Declared as `discipline:FAMILY` pairs; the uppercase half is the allowlist. Read rather
+    than spelled, so a tree declaring a family this repo does not still classifies its own ids.
+    """
+    pairs = (conf.get("FAMILIES", "") or "").split()
+    # DECLARATION ORDER, not sorted. The alternation must be byte-identical to the one the
+    # extractor builds or the self-test that keeps this copy honest compares two spellings of
+    # the same grammar and reports a divergence that is not one.
+    out = []
+    for pair in pairs:
+        if ":" not in pair:
+            continue
+        fam = pair.split(":")[-1]
+        if fam not in out:
+            out.append(fam)
+    return tuple(out)
+
+
+def _slug_of(uid: str):
+    """The slug PROJECTION of a matched id, or None for an era that has none.
+
+    DERIVED, not captured. The shipped alternation carries no groups of its own and exposes no
+    per-era parts, so a second capture group would mean re-deriving the session era's shape here —
+    the second grammar the import above exists to remove.
+    """
+    parts = uid.split("-")
+    return parts[1] if len(parts) == 3 else None
 NON_TERMINAL = frozenset({"OPEN", "SPECCED", "BLOCKED", "INPROGRESS"})
 
 
@@ -449,7 +539,7 @@ def signal_spec_status(ctx) -> dict:
         m = _STATUS.search(head)
         if not m or m.group(1).upper() not in NON_TERMINAL:
             continue
-        own = _OWN_ID.search(head)
+        own = ctx.own_id_re.search(head)
         if not own:
             unkeyed += 1  # the probe cannot judge this spec. Counted, never guessed.
             continue
@@ -463,7 +553,7 @@ def signal_spec_status(ctx) -> dict:
         # `-1` was reported with three citations, all of them `-11`'s, on a build whose ids ran
         # past 10. The over-count GROWS with the build: a 30-unit build mis-attributes ids 1, 2
         # and 3 to twenty siblings, each reading as a stale status header nobody can find.
-        hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.product_globs)
+        hit = ctx.git.run("grep", "-l", "-w", "-F", own.group(1), "--", *ctx.evidence_globs)
         if hit.returncode == 0 and hit.stdout.strip():
             suspect.append({
                 "file": str(p.relative_to(ctx.root)).replace("\\", "/"),
@@ -471,13 +561,21 @@ def signal_spec_status(ctx) -> dict:
                 "status": m.group(1).upper(),
                 "cited_in": hit.stdout.strip().splitlines()[:3],
             })
+    # THE SECOND LIVENESS HALF, and the first one cannot substitute for it. `checked` counts
+    # non-terminal keyed specs and is computed above before any glob is read, so an EVIDENCE_GLOBS
+    # set that resolves to no tracked file leaves `live` True and `of` at full size while `value`
+    # falls to 0 — the reassuring zero, wearing a live flag. This counts what the narrowed
+    # declaration actually resolves to, which is the only number that moves when it collapses.
+    seen = ctx.git.run("ls-files", "--", *ctx.evidence_globs)
+    evidence_files = len(seen.stdout.split()) if seen.returncode == 0 else 0
     return {
         "signal": "non_terminal_specs_cited_by_product_source",
         "value": len(suspect),
         "of": checked,
+        "evidence_files": evidence_files,
         "tolerance": 0,
         "gateable": True,
-        "live": checked > 0,
+        "live": checked > 0 and evidence_files > 0,
         "unjudgeable": unkeyed,
         "detail": suspect,
     }
@@ -700,7 +798,7 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         m = _STATUS.search(head)
         if not m or m.group(1).upper() not in TERMINAL:
             continue
-        own, when = _OWN_ID.search(head), _HEADER_DATE.search(head)
+        own, when = ctx.own_id_re.search(head), _HEADER_DATE.search(head)
         if not own or not when:
             unjudged += 1  # no id or no header date: the probe cannot judge it. Counted, not guessed.
             continue
@@ -708,7 +806,10 @@ def signal_closed_specs_untraceable(ctx) -> dict:
             unjudged += 1  # grandfathered: it closed before the convention it would be judged by.
             continue
         checked += 1
-        uid, slug = own.group(1), own.group(2)
+        uid, slug = own.group(1), _slug_of(own.group(1))
+        if slug is None:
+            unjudged += 1  # an era with no slug: this BUILD-level question has no key here.
+            continue
         # SLUG ONLY, and that is not a narrowing: `\bslug\b` already matches inside
         # `FAMILY-slug-seq`, because the hyphens either side of the slug are non-word bytes.
         # An `id or slug` disjunct reads like a two-key oracle and is one unfalsifiable clause;
@@ -1390,7 +1491,7 @@ def build_backlog_rows_outliving_specs(ctx) -> dict:
     suspect, checked = [], 0
     for sp in sorted(ctx.root.glob(f"{ctx.memory_root}/builds/*/spec/**/*.md")):
         head = sp.read_text(encoding="utf-8", errors="replace")[:4000]
-        st, own = _STATUS.search(head), _OWN_ID.search(head)
+        st, own = _STATUS.search(head), ctx.own_id_re.search(head)
         if not st or not own:
             continue
         if st.group(1).upper() not in _TERMINAL_STATUSES:
@@ -1450,6 +1551,13 @@ class Ctx:
         # kickoff manifest, and a records commit touching those would certify the record.
         self.trace_cutoff = (getattr(proj, "TRACE_CUTOFF", "") or "").strip()
         self.trace_globs = list(getattr(proj, "TRACE_GLOBS", None) or proj.PRODUCT_GLOBS)
+        # EVIDENCE_GLOBS — signal 2's own population, narrower than PRODUCT_GLOBS for the same
+        # reason TRACE_GLOBS is: a citation from a test file is the house's own bookkeeping
+        # certifying the bookkeeping. getattr-and-fallback, so an older adopter's project layer
+        # — which declares neither name — keeps working instead of tripping a required-attribute
+        # refusal, and visibly gets the old unnarrowed behaviour until they fill it.
+        self.evidence_globs = list(getattr(proj, "EVIDENCE_GLOBS", None) or proj.PRODUCT_GLOBS)
+        self.own_id_re = _own_id_re(root, _families_of(conf))
         self.shrink_only = dict(proj.SHRINK_ONLY)
         self.handkept = list(proj.HANDKEPT)
         self.pins = dict(proj.PINS)

@@ -78,6 +78,14 @@ why = "TRACE_CUTOFF ships empty and the engine then returns gateable:False for c
 discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(0 if (getattr(d, 'TRACE_CUTOFF', '') or '').strip() else 1)"] }
 
 [[hole]]
+id = "drift-evidence-globs"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "EVIDENCE_GLOBS ships empty and the engine then falls back to PRODUCT_GLOBS, which is the UNNARROWED population signal 2 was corrected away from \u2014 so an unfilled hole leaves the adopter with the self-certifying oracle while the kit README records the correction as shipped. Same shape as drift-product-globs rather than drift-trace-cutoff: an unfilled hole here INVENTS an answer instead of staying silent, which is the worse of the two failure modes."
+discharge = { command = ["python", "-c", "import sys; sys.path.insert(0, '{kit}'); import drift_signals as d; sys.exit(0 if (getattr(d, 'EVIDENCE_GLOBS', None) or []) else 1)"] }
+
+[[hole]]
 id = "drift-pins"
 kind = "measurement"
 blocks_adopt = false

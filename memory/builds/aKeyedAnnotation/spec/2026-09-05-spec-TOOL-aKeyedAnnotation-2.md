@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-2 — the shipped-evidence oracle reads one grammar and stops certifying itself
 
-**Status:** OPEN · rev-5 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
+**Status:** OPEN · rev-7 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -30,8 +30,14 @@ reader before anything else is built on it.
   the measured incident and names that accessor as the fix, one accessor and no second grammar. The
   hazard is live inside this unit's own harness: the kit self-test copies the report into a scratch
   tree carrying fixture ids and no memory-tree conf, which is exactly where a wrongly-bound grammar
-  reports a confident zero, and two of the criteria below run there. Keep both capture groups: group
-  1 the unit id, group 2 the slug. The session era in the shipped grammar admits a trailing lowercase
+  reports a confident zero, and two of the criteria below run there. Keep both PROJECTIONS — the
+  unit id and the slug — but not as two regex groups, which is a build-time correction to this item.
+  The shipped alternation carries no capture of its own and exposes no per-era parts, so capturing
+  the slug inside it would mean re-deriving the session era's shape here: a second grammar, which is
+  the one thing this item exists to remove. The slug is therefore DERIVED from the matched id in
+  Python, which is one line, keeps the single grammar, and gives the two callers exactly what they
+  read today. It also returns None on an era that has no slug, where the old hand-typed pattern
+  simply failed to match such an id at all. The session era in the shipped grammar admits a trailing lowercase
   correction suffix that the hand-typed digits-then-boundary form cannot match; adopting the shipped
   grammar inherits that fix rather than re-deriving it.
 - **S2** Give the shipped-evidence oracle its own narrower globs, on the same reasoning already
@@ -139,7 +145,14 @@ arguably INPROGRESS — is real and a later reader needs it.
 - risks — the real hazard is a silent population collapse: a narrowed glob that matches nothing
   reports a reassuring zero. S6's second liveness half is the control; the pre-existing one is not,
   and §6 asserts the difference by emptying the declaration in a scratch tree.
-- testing + left-shift gates — five regression arms, each observed RED first, plus two left-shifts
+- testing + left-shift gates — KNOWN COVERAGE GAP, found by observing the arms RED rather than by
+  reading: the kit self-test's fixture has no recall kit beside it, so the import branch of the
+  grammar accessor is never taken there and no arm can reach it. Only the byte-compare arm exercises
+  it, and only because that arm runs in THIS repo, where the sibling exists. Breaking the accessor
+  flips nothing in the fixture, which was measured. The fallback path is therefore the one under
+  test and the import path is covered by one arm in one tree; closing that properly means a fixture
+  that installs both kits, which is a bigger change than this unit carries. Stated rather than left
+  for the next reader to discover. Below that: five regression arms, each observed RED first, plus two left-shifts
   the round-1 audit named and this unit owns: a self-test arm that, for EVERY signal whose
   declaration is a glob set, empties that declaration and asserts its liveness flag goes False —
   which gates the class rather than this instance — and a ban-grep so no module outside the recall
@@ -224,6 +237,8 @@ No new leg.
 - rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
 - rev-4 · 2026-09-05 · the regression-arm count reconciled across §2, §5 and §6.
 - rev-5 · 2026-09-05 · round-2 fixes folded: §4 Migration reconciled with S4, and the seed row declared a hole.
+- rev-6 · 2026-09-05 · S1 corrected at build time: one grammar means the slug is derived, not captured twice.
+- rev-7 · 2026-09-05 · §5 records the coverage gap the RED observations exposed in the fixture.
 
 ## 10. Reuse audit
 

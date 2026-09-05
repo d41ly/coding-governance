@@ -247,6 +247,10 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
         # the two 2026-02-02 specs, so one spec is grandfathered and two are judged.
         "TRACE_CUTOFF = '2026-01-15'\n"
         "TRACE_GLOBS = ['src']\n"
+        # Signal 2's own population, and NARROWER than PRODUCT_GLOBS on purpose:
+        # `conf/` stays outside it, so an engine that read PRODUCT_GLOBS here would
+        # be caught rather than passing by coincidence.
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']\n"
         "SHRINK_ONLY = {'shrinkme.txt': 'a list that promises to shrink'}\n"
         "HANDKEPT = []\n"
         # PINS stays EMPTY and is spelled exactly `PINS = {}`: the pin-semantics arm below rewrites
@@ -1700,6 +1704,126 @@ def test_harness_liveness_note_is_derived(tmp: pathlib.Path) -> None:
               len({got["clean"][1], got["partial"][1], got["dead"][1]}) == 3)
 
 
+
+# ---------------------------------------------------------------------------------------------
+# The shipped-evidence oracle: one grammar, its own population, and a liveness half that can see
+# that population collapse. Five arms, one per criterion that observes a change this unit makes.
+# ---------------------------------------------------------------------------------------------
+
+
+def test_evidence_oracle(tmp: pathlib.Path) -> None:
+    r = make_repo(tmp, name="evidence")
+    proj = r / "drift-audit" / "drift_signals.py"
+    conf = r / ".memory-tree.conf"
+    spec_dir = r / SPEC_DIR_FOR_FIXTURE
+
+    def add(rel: str, body: str, msg: str) -> None:
+        p = r / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(body, encoding="utf-8", newline="\n")
+        run(["git", "add", "-A"], r)
+        run(["git", "commit", "-q", "-m", msg, "--no-verify"], r)
+
+    def sig(*extra: str) -> dict:
+        return report(r, *extra)["non_terminal_specs_cited_by_product_source"]
+
+    # ---- ARM 1: the correction-form id. Its seq carries a trailing lowercase letter, which the
+    # hand-typed digits-then-boundary pattern could not match at all -- so the spec scored UNKEYED
+    # and the probe declined to judge it, silently. Observed RED against that pattern: the spec was
+    # absent from the judgeable population entirely.
+    before = sig()["of"]
+    add(str(pathlib.Path(SPEC_DIR_FOR_FIXTURE) / "2026-01-02-spec-aFixed-1b.md").replace("\\", "/"),
+        "# TOOL-aFixed-1b \u2014 a ratified correction\n\n"
+        "**Status:** SPECCED \u00b7 rev-1 \u00b7 2026-01-02 \u00b7 node a \u00b7 Tier-2 \u00b7 base 0000000\n",
+        "spec(aFixed): a correction-form id")
+    check("evidence: a correction-form id is JUDGED, not silently unkeyed",
+          sig()["of"] == before + 1,
+          f"population {before} -> {sig()['of']}, wanted +1")
+
+    # ---- ARM 2: a citation from a TEST file is the house's own bookkeeping certifying the
+    # bookkeeping, so it must not count as evidence a unit shipped. The same id cited from a
+    # PRODUCT file must count. Both halves, because only the pair discriminates.
+    add("src/thing.test.sh", "# cites TOOL-aThing-1 from a test file\n",
+        "test: cite a spec id from a test file")
+    check("evidence: a test-file citation is not evidence a unit shipped",
+          all(row["id"] != "TOOL-aThing-1" for row in sig()["detail"]),
+          f"detail: {[row['id'] for row in sig()['detail']]}")
+    add("src/thing.py", "# cites TOOL-aThing-1 from product source\n",
+        "feat: cite the same id from product source")
+    check("evidence: a product-file citation IS evidence a unit shipped",
+          any(row["id"] == "TOOL-aThing-1" for row in sig()["detail"]),
+          f"detail: {[row['id'] for row in sig()['detail']]}")
+
+    # ---- ARM 3: the drain. Remove every remaining product citation and the VALUE reaches zero,
+    # while the judgeable population does NOT -- they are different fields, and an arm asserting on
+    # the population would be green whatever the citations did.
+    (r / "src" / "thing.py").unlink()
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: drop the product citation", "--no-verify"], r)
+    drained = sig()
+    check("evidence: the value drains to zero when the product citations go",
+          drained["value"] == 0, f"value {drained['value']}")
+    check("evidence: the judgeable population does NOT drain with it",
+          drained["of"] > 0, f"of {drained['of']}")
+
+    # ---- ARM 4: the second liveness half. Empty the declaration and the signal must report itself
+    # DEAD rather than a clean zero. Observed RED against the pre-change engine, whose only liveness
+    # half counts specs and is computed before any glob is read -- it stayed True at full size.
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']", "EVIDENCE_GLOBS = ['no-such-directory']"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: empty the evidence declaration", "--no-verify"], r)
+    dead = sig()
+    check("evidence: a declaration resolving to no file reports DEAD, not a clean zero",
+          dead["live"] is False and dead["evidence_files"] == 0,
+          f"live={dead['live']} evidence_files={dead['evidence_files']}")
+    proj.write_text(proj.read_text(encoding="utf-8").replace(
+        "EVIDENCE_GLOBS = ['no-such-directory']", "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']"),
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "chore: restore the evidence declaration", "--no-verify"], r)
+
+    # ---- ARM 5: the grammar is bound to the TREE, not to the repo this kit lives in. A family this
+    # repo does not declare must still be classified in a tree that declares it. Observed RED
+    # against a module-constant binding, which reads the installing repo's family list and reports a
+    # confident zero over a corpus full of ids it cannot see.
+    conf.write_text("MEMORY_ROOT=memory\nFAMILIES=\"widget:WDGT\"\n",
+                    encoding="utf-8", newline="\n")
+    add(str(pathlib.Path(SPEC_DIR_FOR_FIXTURE) / "2026-01-03-spec-aWidget-1.md").replace("\\", "/"),
+        "# WDGT-aWidget-1 \u2014 a foreign family\n\n"
+        "**Status:** SPECCED \u00b7 rev-1 \u00b7 2026-01-03 \u00b7 node a \u00b7 Tier-2 \u00b7 base 0000000\n",
+        "spec(aWidget): an id in a family this kit's own repo does not declare")
+    add("src/widget.py", "# cites WDGT-aWidget-1 from product source\n",
+        "feat: cite the foreign-family id")
+    check("evidence: the grammar is bound to the tree, so a foreign family is classified",
+          any(row["id"] == "WDGT-aWidget-1" for row in sig()["detail"]),
+          f"detail: {[row['id'] for row in sig()['detail']]}")
+
+
+def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
+    """The local fallback is not a second grammar, and this is what keeps it honest.
+
+    The report falls back to a local copy of the id alternation when the recall extractor is not
+    importable, which is the only way a copy-installed kit can run in a tree without it. A copy
+    nobody compares is a second grammar with extra steps, so compare it -- here, where this repo
+    HAS the extractor, against what the extractor itself produces for this same tree.
+    """
+    import importlib.util
+
+    extractor = KIT.parent / "memory-recall" / "extract.py"
+    if not extractor.exists():
+        skip("local grammar equals the extractor's", "no memory-recall kit beside this one")
+        return
+    spec = importlib.util.spec_from_file_location("_drift_report_probe", KIT / "drift_report.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    root = KIT.parent.parent
+    families = mod._families_of(mod.load_conf(root))
+    check("local grammar equals the extractor's for this tree",
+          mod._local_ident(families) == mod._grammar_ident(root, families),
+          "the local fallback has diverged from the shipped alternation")
+
 def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
@@ -1716,6 +1840,8 @@ def main() -> int:
         test_ratchet_lookback(tmp)
         test_ratchet_message_states_its_window(tmp)
         test_lang_mode_ratchet(tmp)
+        test_evidence_oracle(tmp)
+        test_local_grammar_matches_the_extractor(tmp)
     print()
     if SKIPS:
         print(f"drift-audit selftest: {len(SKIPS)} SKIPPED — {', '.join(SKIPS)}")

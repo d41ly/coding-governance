@@ -3463,6 +3463,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_evidence_oracle",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_extract_failure_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -3564,6 +3569,11 @@
     },
     {
       "id": "test_live_backlog_rows",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_local_grammar_matches_the_extractor",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
     },
