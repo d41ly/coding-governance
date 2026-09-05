@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds
 
-**Status:** SPECCED · rev-3 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 1
+**Status:** SPECCED · rev-5 · 2026-09-04 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 1 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -58,6 +58,12 @@ charter, on a pair that is already gated.
   "doc-binding plus a gate over the definitions", with a Stop-hook emission validator named as a
   follow-up and deliberately left behind. That ruling is the reason the emission half must survive in
   prose, and reopening it here would answer someone else's question.
+- **The adopter payload is out of THIS unit because `TOOL-aHonedRuleset-8` has it.** The owner's §8
+  F3 ruling of 2026-09-04 is to ship `tools/check-microformats.sh` to adopters, so the gap this
+  spec's §8 recommended accepting is now OWNED rather than accepted. It is a separate unit with its
+  own id and spec because BUILD-METHOD M2 makes a separate adopter payload a separate unit, and
+  because two mechanisms in one spec make a "unit built" pass unreviewable. Nothing here waits on it:
+  this cut lands on its own, and unit 8's landing moves no byte of the paragraph this unit edits.
 
 ## 4. Design
 
@@ -125,10 +131,16 @@ than as a list with holes in it:
 `A gate holds the block's own syntax; what follows binds EMISSION, which no gate sees. `
 
 It names no script and no path. The charter is a template an adopter renders, and
-`tools/check-microformats.sh` is gov-internal — it appears in `tools/gate-legs.json` and in
-`WIRE-INTO-PROJECT.md` nowhere, verified by `grep -n check-microformats` over both. Naming it would
+`tools/check-microformats.sh` is declinable by an adopter at this unit's base — `grep -c check-microformats`
+returns 5 over `tools/gate-legs.json` and 0 over `WIRE-INTO-PROJECT.md`. Naming it would
 ship a dangling pointer to every adopter, and `§7` already routes a gov session to the leg manifest
 for leg names. Measured at 86 bytes.
+
+The owner's §8 F3 ruling of 2026-09-04 sends that gate to adopters under `TOOL-aHonedRuleset-8`,
+which retires the dangling-pointer argument once unit 8 lands but does not change what this unit
+writes. The connective must be correct in an adopter's tree at the moment THIS unit lands, and unit 8
+is a separate landing. Whether the rendered charter should then name the gate is unit 8's question to
+answer, on unit 8's own byte budget. The 86 bytes and the 126-byte recovery are unchanged either way.
 
 ### The measured recovery, against the census estimate
 
@@ -186,8 +198,9 @@ bar reds.
 - **Move the emission half into `R1`.** `R1` is already a distinct rule about markdown framing, and
   merging two bullets to save the second bullet's `- ` marker recovers a handful of bytes for a
   restructure this unit's mechanism does not justify.
-- **Name `tools/check-microformats.sh` in the connective.** Rejected above: gov-internal path in an
-  adopter-facing template.
+- **Name `tools/check-microformats.sh` in the connective.** Rejected above: a declinable path in an
+  adopter-facing template. Still rejected after the §8 F3 ruling, because the gate reaches adopters
+  in a later unit and this connective has to be true when this unit lands.
 - **Add a `{{MICROFORMAT_GATE}}` placeholder** so an adopter's own gate can be named. It needs a
   descriptor key, a value for every adopter, and it costs bytes in a file with eight free. The
   definition block is twenty lines below the paragraph and `R1` already says to copy it.
@@ -209,7 +222,9 @@ bar reds.
 - testing + left-shift gates — no new gate. `tools/check-microformats.sh` is the pre-existing
   left-shift for the half being removed; that is the whole mechanism. The half that stays is
   doc-bound by owner ruling `PLAY-aFusedCharter-2` §8 F1 and remains ungated after this unit, which
-  is stated here rather than left for a reader to infer from a green bar.
+  is stated here rather than left for a reader to infer from a green bar. In an ADOPTER's tree that
+  left-shift is absent until `TOOL-aHonedRuleset-8` ships the gate, per the owner's §8 F3 ruling; in
+  this repo it is present today, which is what this unit leans on.
 - migration / rollback — `git revert` of one commit restores both carriers.
 - user docs — N/A. The charter is the doc.
 
@@ -291,19 +306,40 @@ removes is the one that script already holds.
   a sentence and one that can. The rank-2 row moves 1200 to 1400 bytes out of a different carrier and
   is unaffected by this measurement, so the re-ranking question is the census's to answer, not this
   unit's.
+  RESOLVED (owner, 2026-09-04): land it anyway, and re-rank separately — the recommendation stands.
+  The unit proceeds on its measured 126 bytes per carrier rather than the census's 900-to-1150
+  estimate, and no scope item or acceptance criterion changes on that basis. Re-ordering the census's
+  ranked list is out of this unit and belongs to whoever owns the census.
 - **F2 — does the connective survive, at 86 bytes?** Dropping it lifts the recovery from 126 bytes
   to roughly 210, the exact figure depending on how the range re-wraps without it. *Recommendation: keep it.* Its job is to stop the next editor re-adding `G3`, `G5` and `G6`
   on the reasonable-looking grounds that the paragraph reads incomplete without them, and to mark the
   gated/ungated boundary that is this cut's whole risk. Eighty-six bytes to prevent the cut being
   silently reverted is cheap.
+  RESOLVED (owner, 2026-09-04): keep the connective — the recommendation stands. S2 ships as written
+  at 86 bytes, the recovery stays 126 bytes per carrier rather than the roughly 210 that dropping it
+  would buy, and AC2 keeps expecting exactly one added sentence.
 - **F3 — an adopter's rendered charter loses the grammar and has no gate to replace it.**
-  `tools/check-microformats.sh` does not ship; the adopter receives the definition block, `R1`, and
+  `tools/check-microformats.sh` is DECLINABLE rather than unshipped — corrected at rev-5, the fork
+  having been argued and ratified on the false premise that it does not ship at all.
+  `tools/govkit/registry.toml:44` declares the entry and `tools/govkit/entries/check-microformats.kit.toml`
+  ships the script and its test as `role = "engine"`. What is true is that the entry is absent from
+  `[selection] default` and is `selectable = "conditional"`, so an adopter can decline it and a
+  declining adopter receives the definition block, `R1`, and
   the surviving emission rules, and nothing grades their block if they add a shape to it.
   *Recommendation: accept, and do not build for it here.* An adopter's block arrives rendered and
   correct, `R1`'s closing instruction is to copy a bullet rather than to compose one, and the
   alternative is shipping a gate no adopter asked for. If the owner wants it covered, it is a
   deployer-stream unit about which top-level gov scripts join the adopter payload, which is adjacent
   to `TOOL-aScouredKit-23` and not to this cut.
+  RESOLVED (owner, 2026-09-04): ship the gate to adopters, AGAINST this spec's recommendation to
+  accept the gap. The gap is now OWNED rather than accepted. The work is NOT in this unit:
+  `TOOL-aHonedRuleset-8` carries it as a separate unit with its own id and spec, because BUILD-METHOD
+  M2 makes a separate adopter payload a separate unit and because two mechanisms in one spec make a
+  "unit built" pass unreviewable. What changed here is the record, not the build: §3 now says the
+  adopter payload is out of THIS unit because unit 8 has it, §4 keeps the connective path-free
+  because it must be true in an adopter's tree when this unit lands, and §5 names unit 8 as where the
+  adopter's missing left-shift arrives. This unit's scope, acceptance criteria and gates are
+  unchanged, and it does not wait on unit 8.
 
 ## 9. Revision log
 
@@ -327,6 +363,25 @@ removes is the one that script already holds.
 - rev-3 · 2026-09-04 · fold-verification nits: AC9's 102-character line list dropped line 368
   (101 characters, 102 bytes); §4's cut table now states why the 210 − 86 decomposition is 2 bytes
   short of the measured 126, and F2's 210 is marked approximate for the same reason.
+
+- rev-4 · 2026-09-04 · the owner ratified all three §8 forks; header gains `ratified 2026-09-04` and
+  the status stays SPECCED at `order 1`. **F1** RESOLVED as land it anyway and re-rank separately,
+  matching the recommendation — the unit proceeds on its measured 126 bytes per carrier and no scope
+  or acceptance item moved. **F2** RESOLVED as keep the connective, matching the recommendation — S2
+  ships at 86 bytes unchanged. **F3** RESOLVED as ship the gate to adopters, AGAINST this spec's
+  recommendation to accept the gap; the recommendation text is left standing rather than retro-edited
+  to agree. That ruling forced three downstream edits, none of which changes what this unit builds:
+  §3 gains a non-goal recording the adopter payload as out of THIS unit because
+  `TOOL-aHonedRuleset-8` carries it under BUILD-METHOD M2; §4's connective block and its
+  alternatives-rejected bullet now say why the path-free connective survives a ruling that retires
+  the dangling-pointer argument, and the gov-internal claim carries its `grep -c` counts of 5 and 0
+  at this unit's base; §5's testing line names unit 8 as where an adopter's missing left-shift
+  arrives. Nothing in §2, §6 or §7 changed, because nothing there was written for a losing branch.
+
+- rev-5 · 2026-09-04 · corrected F3's premise. The fork said `tools/check-microformats.sh` "does
+  not ship" and §4 twice called it gov-internal; both are false at source — it ships through the
+  govkit registry and is merely declinable. F3's CONCLUSION survives on that different ground,
+  which is the ground `TOOL-aHonedRuleset-8` argues from, so the owner's ruling is unaffected.
 
 ## 10. Reuse audit
 
