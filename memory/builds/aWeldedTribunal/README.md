@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-04
 streams: tooling
 roster: TOOL
-ids: TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 TOOL-aWeldedTribunal-9 TOOL-aWeldedTribunal-10 TOOL-aWeldedTribunal-11
+ids: TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 TOOL-aWeldedTribunal-9 TOOL-aWeldedTribunal-10 TOOL-aWeldedTribunal-11 TOOL-aWeldedTribunal-12
 authorized-by: prompt
 ---
 
@@ -78,7 +78,7 @@ records are under `reviews/`, and each unit's §9 names the findings it folded.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 8 unit(s) · node a · opened 2026-09-04 · streams tooling
-ids TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 TOOL-aWeldedTribunal-9 TOOL-aWeldedTribunal-10 TOOL-aWeldedTribunal-11
+ids TOOL-aWeldedTribunal-1 TOOL-aWeldedTribunal-2 TOOL-aWeldedTribunal-3 TOOL-aWeldedTribunal-4 TOOL-aWeldedTribunal-5 TOOL-aWeldedTribunal-6 TOOL-aWeldedTribunal-7 TOOL-aWeldedTribunal-8 TOOL-aWeldedTribunal-9 TOOL-aWeldedTribunal-10 TOOL-aWeldedTribunal-11 TOOL-aWeldedTribunal-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
