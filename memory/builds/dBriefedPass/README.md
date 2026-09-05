@@ -108,5 +108,5 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 
 <!-- gen:build-edges -->
 
-- **Child builds:** [aStagedLane](../aStagedLane/README.md)
+- **Child builds:** [aHoistedPass](../aHoistedPass/README.md), [aStagedLane](../aStagedLane/README.md)
 <!-- /gen:build-edges -->

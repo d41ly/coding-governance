@@ -504,6 +504,26 @@ const synth = await agent(
       : '  (none)') +
     `\n\nWrite a markdown report (severity-ranked, blockers first, each with ${isSpec ? 'its file and section address' : 'file:line'} + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
     `State the review shape near the top — raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision.toFixed(2)}. ` +
+    // TOOL-aWeldedTribunal-4 — RUN INTEGRITY. This harness computes every counter below and logged
+    // them to stdout, which is not the record; the AGENT writes the record, so a run whose lenses
+    // half died wrote a durable report that could not say so. The two drift-audit siblings were
+    // given this block by TOOL-dTieredTribunal-3 and the reference harness they were copied from
+    // was not. Class: memory/gotchas/degradation-known-but-unreported.md.
+    //
+    // THE TWO SENTENCES ARE THE POINT, not the numbers. A report that prints every counter and still
+    // opens with "no issues found" has reported nothing, so the instruction not to call the run
+    // complete and the clause that a zero is not evidence of absence both ship with the counts.
+    //
+    // `conflicts` is here and `downgrades` is not: this file computes the first (line ~434, findings
+    // whose skeptics disagreed and were demoted to UNVERIFIED) and does not compute the second.
+    // Interpolating a counter nothing derives would put an invented number in a durable record.
+    `\n\nRUN INTEGRITY - state these in the report and do NOT describe this run as complete if any is non-zero:\n` +
+    `lenses ${liveResults.length}/${LENSES.length} returned, ${lensesDead} DIED; ` +
+    `skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ` +
+    `${conflicts.size} contradictory verdict(s) demoted to unverified, ` +
+    `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s).\n` +
+    `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
+    `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value
     // reaches the record without a human remembering to type it. HONEST LIMIT: `base` defaults to
     // the REF 'origin/main', and a caller who lets it stand writes a line carrying no sha, which

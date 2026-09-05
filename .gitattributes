@@ -45,6 +45,9 @@ tools/run-gates/gate-profiles.txt text eol=lf
 # (`check-memory-hygiene.sh --print-index-set`): a new backlog shard, guide, or build README joins
 # it with no edit here. A pin that must be remembered is the pin that gets forgotten.
 memory/**/*.md text eol=lf
+# Measurement scripts live beside the build record that ran them (`*.sh` is pinned globally above;
+# `.py` was not, and a build-record script is read and re-run the same way a shell one is).
+memory/**/*.py text eol=lf
 memory/**/*.toml text eol=lf
 memory/**/*.txt text eol=lf
 
@@ -108,6 +111,7 @@ skills/session-kickoff/SKILL.md text eol=lf
 # of the checkout with 350 CR bytes and the shipped Tier-2 harness could not be launched at all,
 # while its own syntax leg stayed green. The committed blobs were already LF; `* text=auto` plus
 # core.autocrlf smudged every unpinned path on the way out.
+tools/hooks/*.js text eol=lf
 tools/workflows/*.js text eol=lf
 
 # codebase-map determinism (this repo dogfoods the kit). The gate's freshness leg BYTE-COMPARES the
