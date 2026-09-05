@@ -1,6 +1,7 @@
+**Serves:** journal TOOL-aHoistedPass-5
+
 # Brief — TOOL-aHoistedPass-5, folding round-1 spec-audit findings 33 and 7
 
-**Serves:** history TOOL-aHoistedPass-5
 
 *What the round-1 fold pass was handed for this unit, recorded because "which instructions produced
 this diff" must have an answer on disk rather than in a transcript nobody kept. The pass ran as a

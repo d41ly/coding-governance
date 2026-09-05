@@ -1,6 +1,7 @@
+**Serves:** journal TOOL-aHoistedPass-6
+
 # Brief — TOOL-aHoistedPass-6, folding round-1's BLOCKER plus findings 6 and 25
 
-**Serves:** history TOOL-aHoistedPass-6
 
 *What the round-1 fold pass was handed for this unit, recorded because "which instructions produced
 this diff" must have an answer on disk rather than in a transcript nobody kept. The pass ran as a

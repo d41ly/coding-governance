@@ -7,6 +7,9 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-build-TOOL-aHoistedPass-5-1-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aHoistedPass-5-1-acceptance-ledger.md) | journal | — |
+| [2026-09-05-prompt-TOOL-aHoistedPass-5-brief.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-brief.md) | journal | — |
+| [2026-09-05-prompt-TOOL-aHoistedPass-5-fold-round1.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-fold-round1.md) | journal | — |
 | [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 | [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
