@@ -252,6 +252,11 @@ after the amendment that spent them. Three were MISSING: the protocol pair and t
 `memory/guides/SESSION-KICKOFF.md` (the `last-audit` re-stamp two watched files force) ·
 `memory/map/features/unattended.md` and the regenerated map artifacts.
 
+**IT IS AN OWNER TURN — read the rev-9 block at the end of this subsection first.** What follows is
+rev-4's reasoning about the BUMP, kept because the two grounds are different and the distinction is
+the whole subject: the unit is not owner-gated by the version bump, and it IS owner-gated by a
+carrier, which is the test the last paragraph here sets and the rev-9 block answers.
+
 **This unit is NOT owner-gated by the version bump, and rev-4 re-derives the classification from
 the carriers it actually edits.** rev-1 argued: the kit's version comes from `unattended.sh`'s
 constant, a new shipped script plus moved bytes in three shipped files owes 1.17 → 1.18, and
