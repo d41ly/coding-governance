@@ -280,6 +280,7 @@
       "memory/HYGIENE.md",
       "memory/TEMPLATE-SPEC.md",
       "memory/guides/BUILD-METHOD.md",
+      "memory/guides/ANNOTATION-STYLE.md",
       "tools/lib/",
       "tools/memory-tree/"
     ],

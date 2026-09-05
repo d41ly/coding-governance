@@ -15,7 +15,7 @@ workflow-scripts = []
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-other-half-standing.md",
-  "one-value-field-records-a-mixed-outcome.md"]
+  "one-value-field-records-a-mixed-outcome.md", "criterion-asserts-what-its-own-command-cannot-show.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []

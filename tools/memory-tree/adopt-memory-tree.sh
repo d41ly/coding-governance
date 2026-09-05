@@ -91,6 +91,9 @@ if [ -f "$HERE/SPEC-TEMPLATE.template.md" ]; then render_doc "$HERE/SPEC-TEMPLAT
 # The build method joins the same rendered set: an adopter that receives the spec format and the
 # hygiene rules but not the method for using them has been handed two thirds of one contract.
 if [ -f "$HERE/BUILD-METHOD.template.md" ]; then render_doc "$HERE/BUILD-METHOD.template.md" > "$M/guides/BUILD-METHOD.md"; fi
+# The annotation-style guide rides the same seam. It is a WRITING convention for comments that cite
+# a record: nothing grades it, which is why it is a rendered guide and not a gate.
+if [ -f "$HERE/ANNOTATION-STYLE.template.md" ]; then render_doc "$HERE/ANNOTATION-STYLE.template.md" > "$M/guides/ANNOTATION-STYLE.md"; fi
 { echo "# $M/ — project memory index"; echo
   echo "Structured, machine-linted project memory. Shape + rules: [HYGIENE.md](HYGIENE.md)."
   echo "Generated index: [LIVE.md](LIVE.md) + \`ledger/<month>.md\` shards ($KIT_REL/gen_build_index.py)."; echo

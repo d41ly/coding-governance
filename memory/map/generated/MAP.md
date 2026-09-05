@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 93 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 38 · guides: 6 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 93 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 40 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -173,6 +173,7 @@ Inventories: gate-legs: 93 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 ·
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
 | `concurrency-is-not-a-budget.md` | baseline |
 | `containment-tested-one-way.md` | unattended |
+| `criterion-asserts-what-its-own-command-cannot-show.md` | build-method |
 | `degradation-known-but-unreported.md` | review-harnesses |
 | `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
@@ -187,6 +188,7 @@ Inventories: gate-legs: 93 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 ·
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `process-creation-is-the-suite-cost.md` | unattended |
+| `record-citing-a-foreign-id-defines-or-orphans-it.md` | memory-tree-hygiene |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
 | `spec-names-code-its-base-lacks.md` | unattended |
 | `staged-break-substitutes-a-synthetic-value.md` | unattended |
@@ -205,6 +207,7 @@ Inventories: gate-legs: 93 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 ·
 
 | key | claimant |
 |---|---|
+| `ANNOTATION-STYLE.md` | annotation-style |
 | `BUILD-METHOD.md` | build-method |
 | `PLAYBOOK-TEMPLATE.md` | playbook-mode |
 | `REVIEW-PROTOCOL.md` | agent-cap |

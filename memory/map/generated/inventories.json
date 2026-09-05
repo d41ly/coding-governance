@@ -148,6 +148,7 @@
       "bounded-through-a-pipe-is-unbounded.md",
       "concurrency-is-not-a-budget.md",
       "containment-tested-one-way.md",
+      "criterion-asserts-what-its-own-command-cannot-show.md",
       "degradation-known-but-unreported.md",
       "fallback-fabricates-the-passing-value.md",
       "fixture-inherits-ambient-machine-state.md",
@@ -162,6 +163,7 @@
       "one-value-field-records-a-mixed-outcome.md",
       "pin-copied-from-another-corpus.md",
       "process-creation-is-the-suite-cost.md",
+      "record-citing-a-foreign-id-defines-or-orphans-it.md",
       "second-implementation-is-not-a-second-opinion.md",
       "spec-names-code-its-base-lacks.md",
       "staged-break-substitutes-a-synthetic-value.md",
@@ -177,6 +179,7 @@
       "vacuous-selector-empty-population.md"
     ],
     "guides": [
+      "ANNOTATION-STYLE.md",
       "BUILD-METHOD.md",
       "PLAYBOOK-TEMPLATE.md",
       "REVIEW-PROTOCOL.md",

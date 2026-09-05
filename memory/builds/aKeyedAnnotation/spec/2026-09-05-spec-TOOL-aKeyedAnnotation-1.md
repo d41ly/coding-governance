@@ -1,6 +1,6 @@
 # TOOL-aKeyedAnnotation-1 — the annotation convention, written once, and the citation it repairs
 
-**Status:** OPEN · rev-5 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
+**Status:** OPEN · rev-7 · 2026-09-05 · node a · Tier-2 · base 0d7d9414 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -55,9 +55,19 @@ Every later unit writes comments that must obey it, so it lands first.
   shrink-only ratchet row that marks it. AC6's green bar cannot hold either way. The only escape the
   design pass measured is to name the foreign BUILD and its SEQ RANGE in prose, which no grammar
   matches. The row is minted under one of this build's own reserved ids.
-- **S5** Delete the mechanism paragraphs that two gotcha records absorbed verbatim from call-site
-  comments, leaving each record its class name, its frozen incident and its reach. The design pass
-  names both records and establishes direction from git.
+- **S5** Delete the mechanism prose that a bug-class record absorbed verbatim from a call-site
+  comment, leaving the record its class name, its frozen incident and its reach. **AMENDED at build
+  time, because both of this item's factual claims were wrong and the build measured them rather
+  than inheriting them.** It said TWO records and said the design pass names both; that record names
+  no bug-class file at all, and the measurement finds exactly ONE, carrying a run absorbed from
+  `tools/check-wiring.sh`. Method, so the next reader can re-run it rather than trust this sentence:
+  split every record into sentences, squeeze whitespace and comment markers, and look for each run
+  of 60 characters or more inside tracked source. One record hits at 60 and the same one at 90, so
+  the count is not an artefact of the threshold. There is NO direction to establish: `git log -S`
+  over the shared run returns the SAME commit for the record and for the call site, so the two
+  copies were born together rather than one absorbing the other. This item claimed git established a
+  direction; git refutes that as well. The disposition is unchanged and the reason is better — one
+  fact in one place, and the call site is where the decision it describes is acted on.
 - **S6** Register the guide as a method carrier if and only if the kit's carrier registry demands it;
   read `tools/memory-tree/adopt-memory-tree.sh` for whether a second guide joins that population.
 - **S7** A rendered memory-tree guide is declared in FOUR carriers beyond the render line, and all
@@ -143,8 +153,8 @@ everywhere.
   acceptance criterion stating a numeral over a derived population must name the command deriving it,
   must assert on the field that command actually moves, and must not hold unchanged when its scope
   item is skipped.
-- migration / rollback — the guide is additive; deleting it restores the prior state exactly. The two
-  record deletions are ordinary reverts.
+- migration / rollback — the guide is additive; deleting it restores the prior state exactly. The
+  record deletion is an ordinary revert.
 - user docs — the guide IS the doc.
 
 ## 6. Acceptance criteria
@@ -162,9 +172,9 @@ everywhere.
 - **AC4** When each repaired block in `tools/unattended/lib-unattended.sh` and
   `tools/unattended/unattended.test.sh` is read with its trailing id removed, its evidence is still named
   and the paragraph still states the incident it records.
-- **AC5** When each of the two edited gotcha records is read after this unit, the specific mechanism
-  paragraphs S5 names are ABSENT — named sentence by sentence in the unit's acceptance ledger, so the
-  criterion observes the removal rather than the residue — while each record still carries its class
+- **AC5** When the edited bug-class record is read after this unit, the specific mechanism prose
+  S5 names is ABSENT — named sentence by sentence in the unit's acceptance ledger, so the
+  criterion observes the removal rather than the residue — while the record still carries its class
   name, its frozen incident and its reach. `python tools/memory-tree/gotchas.py --check` exits 0,
   which is an invariant across the change and is therefore recorded as a guard, never as the proof.
 - **AC6** When `bash tools/run-gates/run-gates.sh` is run on this unit's commit it is green.
@@ -173,17 +183,24 @@ everywhere.
   rendered guide away from its template REDS it. Both observed.
 - **AC8** When `bash tools/memory-tree/check-method-carriers.sh` is run after this unit it is green,
   with no skip case added to either of the two files that keep an exclusion list.
-- **AC8b** One observation per carrier S7 names that no other criterion reaches, because AC1 and AC6
-  see none of them: AC1 renders from a hardcoded line in the adopter script, so it passes with or
-  without the descriptor stanza, and the deployer walks only rows already declared `rendered`, so an
-  ABSENT stanza declares nothing and reds nothing. Deleting the `[[files]]` stanza must make a
-  deployer run REFUSE; deleting either `guard` row must make a diff touching ONLY the rendered guide
-  produce a leg selection that omits `kit/dogfood doc parity`, where the unmodified tree includes it.
-  Each observed by staging the deletion, confirming the refusal or the omission, and unstaging.
-  The permanent close for this whole class — deriving the pair list and both guards from the
-  descriptor's rendered stanzas, so four carriers become one — is filed as a backlog row rather than
-  built here, because deriving kit parity is outside this build's goal.
-- **AC8c** When the codebase-map coverage check is run after this unit it is clean, with both new
+- **AC8b** The `PAIRS` carrier is OBSERVED both ways, and it is the only one of the four that can
+  be: with the row present, a rendered guide edited away from its template REDS
+  `kit-dogfood-parity.test.sh`; with the row deleted and the same divergence in place, that leg
+  reports GREEN over one pair fewer. Stage the divergence, take both readings, restore.
+- **AC8c** **The other three carriers have NO mechanism that reds on their absence, and this
+  criterion RECORDS that rather than asserting one.** An earlier revision of AC8b demanded that
+  deleting the descriptor's `[[files]]` stanza make a deployer run REFUSE. It does not — measured,
+  `govkit.py selfcheck` exits 0 with the stanza and exits 0 without it, because the deployer walks
+  rows already declared `rendered` and an absent stanza declares nothing. AC1 cannot see it either,
+  since the adopter script renders from a hardcoded line. The two `guard` rows are worse still: they
+  change only which legs a SCOPED run selects, so observing them costs a full bar on a
+  single-file diff. So the disposition is the one the charter asks for when a check cannot be
+  mechanised — the exemption is documented together with its compensating manual check. The
+  compensating check is the four-carrier enumeration in S7, read whenever a rendered guide is added,
+  and the gap is recorded in this feature's map dossier. The permanent close is deriving the pair
+  list and both guards from the descriptor's rendered stanzas, filed as a backlog row rather than
+  built here because deriving kit parity is outside this build's goal.
+- **AC8d** When the codebase-map coverage check is run after this unit it is clean, with both new
   inventory keys claimed by a dossier and none added to `memory/map/baseline.toml`, and the
   generated map artifacts reproduce from the tree at that commit.
 - **AC9** S4's constraint has TWO failure modes and they need two observations, because one number
@@ -240,6 +257,8 @@ one wrong, which is the sentence's own point made the expensive way. No new leg.
 - rev-3 · 2026-09-05 · round-1 spec-audit fixes folded in.
 - rev-4 · 2026-09-05 · §8 F2's withdrawn skip-case route closed behind S1's ban.
 - rev-5 · 2026-09-05 · round-2 fixes folded: the map claim, four carriers, and an AC9 that can fail.
+- rev-6 · 2026-09-05 · S5 corrected at build time: one record, not two, and measured rather than cited.
+- rev-7 · 2026-09-05 · AC8b demanded a deployer refusal that measurement shows does not exist.
 
 ## 10. Reuse audit
 
