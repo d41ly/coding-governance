@@ -961,17 +961,32 @@ def test_lookup_row_carries_sources(tmp: Path):
         "MAP_ROOT=memory/map\nSEAM_FANIN_THRESHOLD=3\n", encoding="utf-8")
     gen = tmp / "memory" / "map" / "generated"
     gen.mkdir(parents=True)
-    (tmp / "memory" / "map" / "features").mkdir(parents=True)
+    # A DOSSIER, and it is the whole point of this fixture. The first version of this arm had none,
+    # so `corpus: … 0 affordance seams | 0 dossiers` and the dossier branch of `derive_source_paths`
+    # was never entered — the (a2) containment assertion below then passed byte-for-byte against the
+    # very defect it was written to gate. Caught by the closing review, which staged the break and
+    # watched the arm stay green. A regression gate whose fixture cannot reach the regression is the
+    # `fixture-passes-by-finding-nothing` class wearing the costume of a fix.
+    feats = tmp / "memory" / "map" / "features"
+    feats.mkdir(parents=True)
+    (feats / "text.md").write_text(
+        "## Reuse affordance\n"
+        "seam: slugify — reuse for name->slug; extend via the transform registry\n"
+        "\n## Shared seams\nThe text module normalises display names into url slugs.\n",
+        encoding="utf-8",
+    )
     # BOTH symbols in ONE file, deliberately: `n_shown` counts ranked CANDIDATES and `n_sources`
     # counts distinct source PATHS, so a fixture giving each symbol its own file makes the two
     # numbers coincide and cannot test either. They must differ for the arm to mean anything.
     syms = [{"id": "slugify", "kind": "function", "file": "src/text.py"},
+            {"id": "slug_case", "kind": "function", "file": "src/text.py"},
             {"id": "slug_helper", "kind": "function", "file": "src/text.py"}]
     (gen / "symbols.json").write_text(m.render_symbols_json(syms), encoding="utf-8")
     src = tmp / "src"
     src.mkdir()
     (src / "text.py").write_text(
         "def slugify(s):\n    return s\n"
+        "def slug_case(s):\n    return s\n"
         "def slug_helper(s):\n    return s\n", encoding="utf-8")
     subprocess.run(["git", "-c", "init.defaultBranch=main", "init", "-q", str(tmp)],
                    check=True, capture_output=True)

@@ -127,6 +127,22 @@ def extract_phrases(root: pathlib.Path, rel: str) -> list[tuple[str, list[str]]]
 
 
 def _parse_section10_paths(text: str) -> list[str]:
+    """Every backticked path-shaped token in a spec's section 10.
+
+    KNOWN LIMITATION, declared rather than left for a reader to discover: this has NO notion of
+    negation. A section 10 saying "the probe returned `map_lib.py`, which is NOT the seam"
+    contributes that path as ground TRUTH, so a phrase whose author recorded a MISS can score as a
+    hit. The corpus contains such sections -- an author writing down what the probe got wrong is
+    doing the right thing, and this harvester reads it backwards.
+
+    The effect INFLATES the hit rate, so every figure here is an upper bound on the ranker's
+    quality rather than an estimate of it. That is tolerable for the BEFORE/AFTER deltas this
+    harness exists to produce, because the same bias sits on both sides; it is not tolerable as an
+    absolute claim, and nothing should quote it as one.
+
+    Fixing it needs the spec set to MARK a section-10 citation as a miss -- a convention, not a
+    parser -- which is a change to `TEMPLATE-SPEC` and therefore its own unit.
+    """
     mo = _SEC10.search(text)
     if not mo:
         return []
@@ -136,13 +152,26 @@ def _parse_section10_paths(text: str) -> list[str]:
     return sorted(set(_PATH.findall(body)))
 
 
+def check_path_match(candidate: str, target: str) -> bool:
+    """Does a ranked path satisfy a ground-truth target? ONE predicate, read twice.
+
+    `measure_phrase` uses it to find a hit and the unreachable count uses it to ask whether any
+    hit is possible at all. Those two were byte-identical hand-copies for one commit, which makes
+    the denominator and the numerator able to disagree about what a match IS -- and a hit rate
+    whose two halves disagree is worse than no hit rate.
+    """
+    return (candidate == target
+            or candidate.endswith("/" + target)
+            or target.endswith("/" + candidate))
+
+
 def measure_phrase(corpus, ref, phrase: str, truth: list[str]) -> dict:
     """Rank one phrase and locate the first ground-truth path in the shortlist."""
     sl = rl.assemble_shortlist(phrase, corpus, ref)
     files = [(r.candidate.file or "") for r in sl.ranked]
     rank = None
     for i, f in enumerate(files, 1):
-        if f and any(f == t or f.endswith("/" + t) or t.endswith("/" + f) for t in truth):
+        if f and any(check_path_match(f, t) for t in truth):
             rank = i
             break
     return {
@@ -194,8 +223,8 @@ def main() -> int:
     corpus_files = {c.file for c in corpus.candidates.values() if c.file}
     unreachable = sum(
         1 for _, t in graded
-        if not any(f == x or f.endswith("/" + x) or x.endswith("/" + f)
-                   for x in t for f in corpus_files)
+        if not any(check_path_match(f, x)
+               for x in t for f in corpus_files)
     )
     hits = [r for r in rows if r["hit"]]
     ranks = sorted(r["rank"] for r in hits)

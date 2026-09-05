@@ -19,7 +19,7 @@ Measured precisely, over the same 140 phrases:
 | hit rate | 0.600 | **0.586** |
 | hit@5 | 0.371 | 0.371 |
 | hit@10 | 0.400 | 0.400 |
-| median rank of first correct | 2 | 2 |
+| upper-median rank of first correct | 2 | 2 |
 
 Two phrases lose their hit and **none is gained**. Their ranks BEFORE were **31 and 27** — both far
 below the twelve-slot neighbour cap, so neither answer was ever printed to a reader. Among phrases

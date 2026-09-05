@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-05-build-TOOL-aTunedCompass-10-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aTunedCompass-10-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-11 |
 | [2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md) | spec-audit | TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9 TOOL-aTunedCompass-11 |
 
 <!-- /gen:spec-records -->
@@ -129,7 +130,7 @@ derivation, which is what makes them re-checkable rather than re-assertable.
   the kit dirs and recorded in the unit's journal.
 - **AC3** — `bash tools/codebase-map/selftest.py` or the kit's declared self-test entrypoint passes
   with S5's two new arms, and each arm was observed RED before it was written.
-- **AC4** — The replay harness from `TOOL-aTunedCompass-6` reports hit rate and median rank before
+- **AC4** — The replay harness from `TOOL-aTunedCompass-6` reports hit rate and upper-median rank before
   and after, over the phrase set that harness actually grades, and the record states BOTH the two
   figures and the phrase count they were computed over. No count is pinned here: unit 6's own AC4
   declines to pin one, and a criterion naming a number its sibling does not commit to producing is

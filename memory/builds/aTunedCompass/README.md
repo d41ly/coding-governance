@@ -37,22 +37,12 @@ before it sorts by fan-in. Two records state facts their own sources refute.
 - **M2 classification, recorded before acting: every unit is MISSING.** No conforming spec carries
   any of these ids at BASE; each is authored by this build and is therefore unreviewed by definition,
   so M4's spec audit is owed before any code.
-- **The FIRST pass built nothing** — the units landed at `SPECCED` awaiting owner scope approval,
-  because a Tier-2 DoR is a design pass and approval precedes building. That approval has since
-  happened: it is the restructure recorded three bullets down. The unattended run of 2026-09-05
-  carries the build from there, so this rule is history rather than a live constraint, and it is
-  reworded rather than deleted because the sentence "nothing here is built in this pass" read as
-  binding on every later pass.
-- **The roster below carries no Status column, and that is deliberate.** Status is DERIVED — the
-  generated region a few lines down renders it from the spec headers. The authored roster held a
-  Status cell per row until the round-1 audit found eight of the eleven disagreeing with the
-  generated table in the same file. One fact in one place; a column that cannot exist cannot go
-  stale.
 - **Unit 1 is the only records-only unit and it corrects two documents, not one.** Both are the same
   mechanism — a record asserting a fact its own source refutes — applied to two files. Splitting one
   mechanism across two units to satisfy a document count would make the closing diff less readable,
   which is what M2's rule exists to protect.
-- **RESTRUCTURED at scope approval, under M3.** Twelve forks went to the owner; eleven are answered
+- **RESTRUCTURED at scope approval, under M3.** The first pass built nothing and stopped at the
+  spec set; approval then came. Twelve forks went to the owner; eleven are answered
   and unit 3's second stays open with the unit it belongs to. Three units were ADDED: 9 builds the
   discriminating fixture that 2 and 3 are now BLOCKED on, 10 takes the predicate narrowing that would
   have made 6 two mechanisms, 11 lands the reader 8 is blocked on. Unit 4 moved to order 1 on the
@@ -62,29 +52,8 @@ before it sorts by fan-in. Two records state facts their own sources refute.
   each spec cites it rather than re-deriving. A unit that needs a NEW number says so in its §8.
 - **This build sets no floor.** The owner blocked pinning on unit 9 rather than derive one from a
   saturated 12-question fixture. A figure quoted anywhere here carries its n.
-
-- **WHAT THE UNATTENDED RUN OF 2026-09-05 BUILT, and what it did not.** Seven units CLOSED: 1, 4,
-  5, 6, 7, 8, 10. Unit 11 is IMPLEMENTED and committed but its spec stays `SPECCED`, because its
-  verification did not complete — see the next rule. Units 2, 3 and 9 are UNBUILT: 2 and 3 are
-  blocked on 9, and 9 is the largest single piece in the build, so starting it without finishing it
-  would have left a half-authored fixture that `TOOL-aTunedCompass-3` is due to pin the merge bar
-  against. The run stopped building rather than start it. Unit 9's spec gained a measured candidate
-  pool at rev-5 so the next run does not rediscover it.
-- **UNIT 11 IS UNVERIFIED, and this is the run's largest caveat.** Its reader, its six declaration
-  carriers and its record corrections are committed, and `unattended kit gate`, `memory hygiene`,
-  `spec tokens`, `dead paths`, `kit version markers`, `install prefix`, `lexicon` and wiring are all
-  green over it. What did NOT run is the kit's own driver suite, which carries the three new MAP_CLI
-  arms and eight existing arms this unit re-worded. Two attempts were made; each produced ZERO
-  output and was killed at its bound, one at 50 minutes and one at 90. A pristine-tree baseline
-  behaved identically for the first 100 seconds, so the silence is buffering rather than a hang
-  introduced here — but that is not the same as knowing the suite passes, and the difference is why
-  the spec is not CLOSED. The one live exercise the run did get is its own `--close`, which
-  evaluates `reuse-probed` against this tree with both CLIs declared and both logs present.
-- **The spec audit ran TWO rounds and exited NON-CONVERGENT.** Round 1 over all eleven specs: 20
-  distinct defects, 3 blockers. Round 2 over the three that carried a blocker: 16 defects, 2
-  blockers, and fifteen of the sixteen were created by round 1's own fold. The count did not
-  strictly shrink, so M4 stops the loop; both standing blockers were FOLDED, and the disposition is
-  recorded on the exiting round. Precision was 0.47 in both rounds.
+- **This run's outcome is a RECORD, not a rule**:
+  `build/2026-09-05-build-TOOL-aTunedCompass-1-run-outcome.md`.
 
 ## Parked decisions
 - **Whether the chunk set earns its place at all is still NOT decided.** `union.py` puts
@@ -136,7 +105,7 @@ ids TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCo
 | [TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran](spec/2026-09-04-spec-TOOL-aTunedCompass-8.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

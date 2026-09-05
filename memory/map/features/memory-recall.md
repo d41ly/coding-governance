@@ -59,7 +59,7 @@ floor on the merge bar.
   no honest reading: records exist, so the root and the id grammar both work, and the only remaining
   cause is a pattern describing a layout the tree does not have. It was silent for a month.
 - **The served CHUNK arm is ROLLED UP, and its parent key is the PATH for 99.4% of the corpus.**
-  `fuse()` reads the chunk arm `k * ROLLUP_DEPTH` deep and keeps the best hit per parent before
+  `run_fusion()` reads the chunk arm `k * ROLLUP_DEPTH` deep and keeps the best hit per parent before
   fusion, which is what `bench.run_rollup` grades as the `roll` substrate. Measured: 129 of 20056
   chunk documents carry a `rec`, because `extract_chunks` sets one only from an `#{2,6}` heading
   that defines a record id — so calling this a per-RECORD rollup would be wrong, and both branches

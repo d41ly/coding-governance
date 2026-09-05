@@ -58,3 +58,5 @@ base: 22d75b31296a3a4fe28cf53a85c51076b8e6d798
 2026-09-05T13:15:32Z decision · item Units 2, 3 and 9 are UNBUILT and the run stopped rather than start unit 9. · reason 2 and 3 are blocked on 9, and 9 is the largest single piece in the build: a sampled, agent-judged fixture plus engine changes binding the audit's graded set to each fixture. Starting it without finishing would leave a half-authored question set that TOOL-aTunedCompass-3 is due to pin the merge bar against, which is worse than none. What the run did instead: unit 9's spec gained a MEASURED candidate pool at rev-5 — 165 of 179 distinct logged questions carry a chunk hit in an unanchored file — so the next run inherits the sampling frame rather than rediscovering it. The judgement half F1 resolved is untouched.
 
 2026-09-05T13:45:54Z review · item aTunedCompass · reason verdict BLOCKED · blockers 2
+
+2026-09-05T14:32:54Z review · item aTunedCompass · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED

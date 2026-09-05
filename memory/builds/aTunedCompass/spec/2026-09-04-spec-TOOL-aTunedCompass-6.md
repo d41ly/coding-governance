@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-05-build-TOOL-aTunedCompass-6-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aTunedCompass-6-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round1.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-closing-diff-round2.md) | diff-review | TOOL-aTunedCompass-1 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
 | [2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md) | spec-audit | TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
 | [2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md) | spec-audit | TOOL-aTunedCompass-4 TOOL-aTunedCompass-9 |
 
@@ -148,7 +149,7 @@ better of the parent's two, because it grades against a seam a human picked rath
 every file a unit happened to edit, and it needs no commit-to-id join.
 
 The replay runs each recorded phrase against the shipped ordering and against the reordered one at
-the same base sha, and reports hit rate, hit@5, hit@10 and the median rank of the first correct
+the same base sha, and reports hit rate, hit@5, hit@10 and the upper-median rank of the first correct
 path, before and after. A neutral or negative delta is a legal result and is recorded as the result.
 The reorder touches only the neighbour tail of each shortlist, so a small delta is the expected
 outcome and a large one would itself be worth explaining.
@@ -226,7 +227,7 @@ in two places and the ordering key would exist twice, which is the drift S2 exis
 - **AC3** — When the same replay is inspected, the SEED half of the shortlist is byte-identical
   before and after, which is the observation that `_rank` and the seed arm were not disturbed.
 - **AC4** — When the replay over the recorded phrase corpus runs, graded against the seam each
-  spec's own §10 names, it records hit rate, hit@5, hit@10 and the median rank of the first correct
+  spec's own §10 names, it records hit rate, hit@5, hit@10 and the upper-median rank of the first correct
   path for both orderings, in a record under `memory/builds/aTunedCompass/build/`, together with
   the phrase count it actually graded. A neutral or negative delta is recorded as the result.
 - **AC5** — When `python tools/codebase-map/reuse_lookup.py "<any phrase>"` runs, its header names

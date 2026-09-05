@@ -78,9 +78,9 @@ repo-wide python-launcher seam rather than anything this feature owns.
   twelve names that sorted earliest, and the ranking ran on a pool the alphabet had already chosen.
   Measured at base `c4fcf5ad`: the twelve retained summed to fan-in 8, the twelve the ranking keeps
   sum to 271, and the two sets do not intersect.
-- **What the reorder is worth, measured rather than assumed.** Replayed over 140 recorded probe
+- **What the reorder is worth, measured rather than assumed.** Replayed at `36af6f9f` over 140 probe
   phrases graded against the seam each spec's own §10 names: hit rate 0.579 → 0.600, while hit@5,
-  hit@10 and the median rank of the first correct answer are all UNCHANGED at 0.371, 0.400 and 2.
+  hit@10 and the upper-median rank of the first correct answer are all UNCHANGED at 0.371, 0.400 and 2.
   So the change is correct at source and its effect on the ranks a reader actually looks at is
   nil on this corpus. The instrument is `replay-phrases.py`, which is `project-owned` and on no leg.
 - **The printed header discloses what the ranking does not mean.** Fan-in counts name tokens and
@@ -92,7 +92,7 @@ repo-wide python-launcher seam rather than anything this feature owns.
   `_derive_dir`, not a "kit" concept — so it needs no declaration and means the same in an adopter's tree.
 - **What the narrowing COSTS, measured and not buried.** Replayed at `6aad7751` over 140 phrases, the
   hit rate falls 0.600 → 0.586: two phrases lose their hit, at ranks **31 and 27**. hit@5, hit@10
-  and the median rank are unchanged, one phrase's rank improves and none worsens. So what the
+  and the upper-median rank are unchanged, one phrase's rank improves and none worsens. So what the
   narrowing discards sat far below the twelve-slot cap, where no reader reaches; what it buys is a
   pool a cap can bound. A seed whose directory holds no other symbol of its kind gets an EMPTY
   neighbour list, which the reason string makes legible — measured here, no directory is in that
@@ -105,7 +105,8 @@ repo-wide python-launcher seam rather than anything this feature owns.
   pointed a reader at, in shortlist order; `n_sources` is that count BEFORE `SOURCE_PATHS_CAP`, so
   a truncated list is visible AS truncated rather than as a short one.
 - **`n_shown` was NOT redefined.** It still counts RANKED CANDIDATES, which is a different number
-  from the path count — measured on one live row, 39 ranked against 10 sources. An analysis joining
+  from the path count. Measured on one live row BEFORE the dossier branch landed, 39 ranked against
+  10 sources; the same shape holds after it, at a larger source count. An analysis joining
   old rows to new ones must not find a field silently changing what it counts.
 - **ONE derivation, read twice.** `derive_source_paths()` produces the set; `_sources()` labels it for a
   human and `write_lookup()` records it. Nothing parses rendered output for paths.

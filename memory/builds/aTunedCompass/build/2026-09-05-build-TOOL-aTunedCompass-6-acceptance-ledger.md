@@ -13,7 +13,7 @@ changed the criterion. There is no third form.
 The reorder is proven correct at source: the cap now slices the pool the ranking ordered, and the
 ordering key is stated once and read twice. Its MEASURED effect on this corpus, over 140 recorded
 probe phrases, is a hit-rate move of 0.579 → 0.600 and **no change at all** to hit@5 (0.371), hit@10
-(0.400) or the median rank of the first correct answer (2). So the change fixes a defect that was
+(0.400) or the upper-median rank of the first correct answer (2). So the change fixes a defect that was
 real — twelve slots were going to the twelve alphabetically-first names — and buys almost nothing in
 the ranks a reader actually reads. That is the unit's own §4 prediction holding: it substitutes one
 set of low-value names for another, and the pool it selects from is what unit 10 narrows.
@@ -36,7 +36,7 @@ set of low-value names for another, and the pool it selects from is what unit 10
   neighbours changed. The criterion is about seeds.
 - AC4 — `python tools/codebase-map/replay-phrases.py`, run before and after — **140 phrases graded**
   (39 more carried no §10 ground truth and are excluded rather than counted as misses). hit rate
-  0.579 → 0.600; hit@5 0.371 → 0.371; hit@10 0.400 → 0.400; median rank of first correct 2 → 2. The
+  0.579 → 0.600; hit@5 0.371 → 0.371; hit@10 0.400 → 0.400; upper-median rank of first correct 2 → 2. The
   count is reported rather than pinned, per this criterion's own wording: the parent's 133 is not a
   target and this harness reaches 140 because its invocation pattern joins WRAPPED phrases.
 - AC5 — `python tools/codebase-map/reuse_lookup.py "<any phrase>"` — the header now carries two

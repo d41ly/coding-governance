@@ -55,13 +55,13 @@ NEIGHBOUR_CAP = 12
 # How many source paths a log row carries. `n_sources` records the count BEFORE this cap, so a
 # truncated list is visible AS truncated rather than as a short one.
 #
-# 40, and the number is measured rather than picked. The logged list is the deduped SOURCE set,
-# not the ranked candidates: the parent build measured a mean of ~17 file-backed sources per probe
-# against ~71 ranked entries, so this is comfortably above the mean and below the 188-candidate
-# outlier. At a nominal 40 bytes per path, ~17 paths add ~700 B to a row that measures ~255 B
-# today, and a capped worst case adds ~1.6 KB — against the recall log, the comparator, which runs
-# at a 2150 B mean row and nobody has called it expensive. Cheap to raise, because `n_sources`
-# records what was cut.
+# 40, and the number is measured rather than picked -- but measured against the SYMBOL-ONLY
+# derivation that shipped first, so it is a FLOOR rather than a fitted value: the set now also
+# carries dossiers, which grew it by roughly half on live queries (14->26, 18->36, 9->13). The
+# parent measured ~17 file-backed sources per probe against ~71 ranked entries; at a nominal 40
+# bytes per path a capped worst case adds ~1.6 KB, against a recall log running at a 2150 B mean
+# row that nobody has called expensive. Re-measure before trusting it. Cheap to raise, since
+# `n_sources` records what was cut.
 SOURCE_PATHS_CAP = 40
 
 
@@ -427,40 +427,48 @@ def _line(r: Ranked) -> str:
     return f"- {c.name}{tag}  [{meta}]  ({r.reason}; via {src})" if meta else f"- {c.name}{tag}  ({r.reason}; via {src})"
 
 
-def derive_source_paths(shortlist: Shortlist) -> list[str]:
-    """The file-backed sources the answer points a reader at, deduped, in shortlist order.
+def _scan_sources(shortlist: Shortlist):
+    """The ONE walk over a shortlist's sources, yielding `(kind, value)` in shortlist order.
 
-    ONE derivation, read twice: `_sources` LABELS these for a human and `write_lookup` records
-    them. That claim has to be TRUE, and the first cut made it false -- it collected only
-    `candidate.file`, so every dossier a shared-seam or affordance candidate contributes was
-    dropped from the log while the reader was still shown it. Measured on one live query: 6 of 19
-    entries missing. The closing review caught it because the acceptance criterion tested
-    containment in ONE direction only, which is this repo's `containment-tested-one-way` class.
+    `kind` is `symbol`, `dossier` or `inventory`; only the first two are openable PATHS.
 
-    Repo-relative and forward-slashed, because that is how a later analysis joins them to the tree.
-    An inventory key with no file contributes nothing here, exactly as it contributes no openable
-    path there.
+    THE single derivation, and it is single by CONSTRUCTION rather than by two functions agreeing.
+    `_sources` labels these for a human and `derive_source_paths` records the file-backed ones.
+    Those were two hand-copied walks for one commit each way: the first dropped every dossier from
+    the log while the reader was still shown it (measured: 6 of 19 entries on one live query), and
+    the fix for THAT made the two walks agree by copying, which is the same defect one move later.
+    Two readers of one fact is the class; one walk with two views is the answer.
     """
     try:
         root_name = m.map_root().relative_to(m.repo_root()).as_posix()
     except ValueError:
         root_name = m.map_root().name
-    out: list[str] = []
-    seen: set[str] = set()
-
-    def add(p: str) -> None:
-        p = p.replace("\\", "/")
-        if p and p not in seen:
-            seen.add(p)
-            out.append(p)
-
     for r in shortlist.ranked:
         c = r.candidate
         if c.file:
-            add(c.file)
+            yield "symbol", c.file.replace("\\", "/")
         if ("affordance-seam" in c.sources or "shared-seams" in c.sources) and c.detail:
             where = "FOUNDATION.md" if c.detail == "foundation" else f"features/{c.detail}.md"
-            add(f"{root_name}/{where}")
+            yield "dossier", f"{root_name}/{where}"
+        elif "inventory" in c.sources and not c.file:
+            yield "inventory", c.detail
+
+
+def derive_source_paths(shortlist: Shortlist) -> list[str]:
+    """The file-backed sources the answer points a reader at, deduped, in shortlist order.
+
+    A thin view over `_scan_sources`, which `_sources` also reads. Repo-relative and
+    forward-slashed, because that is how a later analysis joins them to the tree. An inventory key
+    with no file contributes nothing here, exactly as it contributes no openable path there.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for kind, value in _scan_sources(shortlist):
+        if kind == "inventory":
+            continue
+        if value and value not in seen:
+            seen.add(value)
+            out.append(value)
     return out
 
 
@@ -483,15 +491,13 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
             seen.add(line)
             lines.append(line)
 
-    for r in shortlist.ranked:
-        c = r.candidate
-        if c.file:
-            add(f"symbol def: {c.file}")
-        if ("affordance-seam" in c.sources or "shared-seams" in c.sources) and c.detail:
-            where = "FOUNDATION.md" if c.detail == "foundation" else f"features/{c.detail}.md"
-            add(f"dossier: {root_name}/{where}")
-        elif "inventory" in c.sources and not c.file:
-            add(f"inventory `{c.detail}` (see {root_name}/generated/MAP.md)")
+    for kind, value in _scan_sources(shortlist):
+        if kind == "symbol":
+            add(f"symbol def: {value}")
+        elif kind == "dossier":
+            add(f"dossier: {value}")
+        else:
+            add(f"inventory `{value}` (see {root_name}/generated/MAP.md)")
     return lines or ["(no file-backed sources - inspect the candidates above)"]
 
 
