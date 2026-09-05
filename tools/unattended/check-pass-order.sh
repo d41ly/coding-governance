@@ -311,28 +311,26 @@ $1" ;;
     # definition and both the in-range walk and the pre-anchor probe call it. A second copy would be
     # two answers to one question, and the copy would be the one that drifts.
     _find_build_commit() {
-      # THE CAP BOUNDS THE ENUMERATION TOO, not only the loop body. `for _c in $(rev-list ...)` runs
-      # the whole traversal in a command substitution BEFORE the first iteration, so a loop-only cap
+      # THE CAP BOUNDS THE ENUMERATION, not only the loop body. `for _c in $(rev-list ...)` runs the
+      # whole traversal in a command substitution BEFORE the first iteration, so a loop-only cap
       # bounds the VERDICT and not the WORK — the `bounded-through-a-pipe-is-unbounded` class. The
-      # pre-anchor window is the entire history behind the anchor, so `--max-count` is what keeps it
-      # bounded; with `--reverse` git applies the count to the traversal and reverses after, which
-      # yields the commits NEAREST the anchor, and any violating commit there is a violation.
-      # The loop-body counter stays as the liveness half: it is what reports TRUNCATED.
-      # THE CAP TEST COMES AFTER THE BODY, and the order is the whole correctness of this probe.
-      # `rev-list --reverse --max-count=N <anchor>` applies the count during traversal and reverses
-      # after, so the ANCHOR is the LAST element returned. Testing the cap at the TOP of the
-      # iteration consumed entry `cap+1` — the anchor itself — as the truncation sentinel, so the
-      # one commit this probe exists to reach was structurally ungradeable whenever the history
-      # behind it was deeper than the cap. The truncation arm could not see it either: it uses the
-      # record-only fixture, where the correct and the broken behaviour give the same verdict.
-      # THE TWO WINDOWS WALK IN OPPOSITE DIRECTIONS, and that is the fix rather than the cap test.
-      # The IN-RANGE walk wants the EARLIEST build commit, so it is `--reverse`. The PRE-ANCHOR
-      # probe wants any violating commit behind the anchor, and the nearest is both the likeliest
-      # and the one that must survive truncation -- so it walks NEWEST-FIRST and truncates the FAR
-      # end. Reversed, the anchor itself is the LAST element of the window and was dropped by the
-      # cap whenever the history behind it was deeper: the one commit the probe exists to reach was
-      # structurally ungradeable. Moving the cap test after the body was not enough; the ORDER was
-      # the defect.
+      # pre-anchor window is the entire history behind the anchor, so `--max-count` is what bounds it.
+      #
+      # THE TWO WINDOWS WALK IN OPPOSITE DIRECTIONS, and getting that wrong is what made the probe
+      # unable to see its own target. The IN-RANGE walk wants the EARLIEST build commit, so it is
+      # `--reverse`. The PRE-ANCHOR probe wants ANY violating commit behind the anchor, and the
+      # nearest is both the likeliest and the one that must survive truncation — so it walks
+      # NEWEST-FIRST and truncates the FAR end.
+      #
+      # WHAT WENT WRONG, because it is worth one reader's minute. `rev-list --reverse --max-count=N`
+      # applies the count during traversal and reverses AFTER, so the anchor is the LAST element of
+      # the window, not the first. The probe was written `--reverse` for both windows on the belief
+      # that it yielded the commits nearest the anchor; it yields the farthest. So the one commit the
+      # probe exists to reach was dropped by the cap whenever the history behind it was deeper — and
+      # the truncation arm could not see that, because it used the record-only fixture, where the
+      # correct and the broken behaviour give the same verdict.
+      #
+      # Truncation is therefore reported AFTER the walk, on the count actually emitted.
       local _range="$1" _cap="$2" _ord="$3" _c _subj _n=0 _mc=""
       [ -n "$_cap" ] && _mc="--max-count=$_cap"
       for _c in $(GIT rev-list $_ord $_mc $_range 2>/dev/null); do
