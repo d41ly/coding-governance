@@ -9,6 +9,7 @@
       "agent-instructions self-test",
       "agent-instructions wiring",
       "branch-guard self-test",
+      "brief-recorded",
       "build README slot contract",
       "build-index selftest",
       "build-method size",

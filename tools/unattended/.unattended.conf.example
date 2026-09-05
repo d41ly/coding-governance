@@ -228,3 +228,15 @@ PASS_ORDER_CUTOFF=""
 # back-catalogue from a day their tree knows nothing about. Blank turns the term OFF and the leg
 # announces that it did.
 DISPOSITION_CUTOFF=""
+
+# BRIEF_RECORDED_CUTOFF - the date from which the `brief-recorded` leg grades a CLOSED unit on
+# whether its BUILD COMMIT carries a `brief · item <id>` row whose hash still joins to a tracked file
+# at that commit. Graded on the build README's `opened:` date. The anchor is the build commit itself
+# and not its first parent, unlike PASS_ORDER_CUTOFF above: `--brief` STAGES its row, so the row
+# lands in the same commit as the pass it describes.
+#
+# BLANK in the example, like every sibling cutoff here, and for the same reason: a date is a
+# per-adopter fact, and shipping THIS repo's landing date would grade an adopter's whole
+# back-catalogue from a day their tree knows nothing about. Blank turns the term OFF and the leg
+# announces that it did.
+BRIEF_RECORDED_CUTOFF=""

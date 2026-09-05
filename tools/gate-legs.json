@@ -732,6 +732,17 @@
     "ceiling": 2400
   },
   {
+    "name": "brief-recorded",
+    "argv": [
+      "bash",
+      "tools/unattended/check-brief-recorded.sh"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "guard": [],
+    "ceiling": 900
+  },
+  {
     "name": "playbook validity gate",
     "argv": [
       "bash",

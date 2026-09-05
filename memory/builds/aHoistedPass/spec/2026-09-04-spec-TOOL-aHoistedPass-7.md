@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-7 — a brief on disk before the code that cites it
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
+**Status:** CLOSED · rev-7 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 7
 
 **Every `tools/unattended/check-pass-order.sh` address in this document is derived at the run's BASE
 `e828f778`, not at the drafting base above, and each is cited BY NAME with the line number as a
@@ -13,6 +13,7 @@ a rebase, a span does not.
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-build-TOOL-aHoistedPass-7-1-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aHoistedPass-7-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-prompt-TOOL-aHoistedPass-7-brief.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-7-brief.md) | journal | — |
 | [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 | [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
@@ -40,8 +41,14 @@ itself carries a `brief · item <id>` row whose hash still joins to a tracked fi
   currently inlined in `check-pass-order.sh` as `_find_build_commit()` (`:337-377`), moved whole with
   its `ONE PREDICATE, TWO WINDOWS` header comment (`:334-336`) and the
   `THE EXCLUSION IS THE BUILD'S WHOLE FOLDER PLUS THE GENERATED INDEXES` rationale comment and its
-  `_gen_ex` assembly (`:299-324`), taking `base · unit-id · build-dir · generated-indexes ·
-  shared-records` and printing the sha or returning 1.
+  `_gen_ex` assembly (`:299-324`), taking `rev-range · unit-id · build-dir · generated-indexes ·
+  shared-records` and printing the sha or returning 1 — **plus two OPTIONAL trailing window
+  parameters, `cap` and `order`, which default to the unbounded `--reverse` in-range walk.** rev-6
+  corrects this: the five named above are what the IN-RANGE caller passes and they cannot express the
+  second window at all, and the whole point of the header comment being moved with the code is that
+  ONE predicate serves TWO windows. A five-argument helper would have deleted the pre-anchor
+  violation class rather than lifted it. The first argument is the rev-range the caller already
+  builds (`${base:+$base..}HEAD` at one site, a bare `$base` at the other), not a bare base.
 - **S3** — `check-pass-order.sh` calls `build_commit` instead of its inlined copy, at both call
   sites and only those two, measured at BASE:
   `build_c=$(_find_build_commit "${base:+$base..}HEAD" "" "--reverse")` (`:378`) and
@@ -53,6 +60,12 @@ itself carries a `brief · item <id>` row whose hash still joins to a tracked fi
 - **S5** — `BRIEF_RECORDED_CUTOFF` in `.unattended.conf`, dated at the landing, and
   `BRIEF_RECORDED_CUTOFF=""` in `tools/unattended/.unattended.conf.example` beside
   `PASS_ORDER_CUTOFF=""` at `:218`. Blank turns the leg off and the leg announces that it is off.
+  **AND its row in the protocol's section 8 binding key table, in BOTH halves of the pair** — rev-7,
+  amended from the build. Check 22 of `tools/unattended/check-unattended.sh` joins the declared conf
+  against that table in both directions and reds on a key that is set and undocumented, so the key
+  alone is not landable. The pair is `tools/unattended/PROTOCOL.template.md` and the copy
+  `tools/unattended/adopt-unattended.sh` installs at `memory/guides/UNATTENDED-PROTOCOL.md`; check 10
+  byte-compares them, so the template is edited and the adopter re-run.
 - **S6** — a grammar liveness assertion: the leg refuses with `DEAD PROBE` when the driver no longer
   spells the row shape it matches.
 - **S7** — `tools/unattended/check-brief-recorded.test.sh`, carrying the arms of §6, and its two
@@ -290,8 +303,13 @@ back — and it must name the carrier, not the bump.
   failures observed RED before the leg lands; the sibling suite re-run unchanged for the extraction.
 - migration / rollback — additive. Reverting is deleting the manifest row and the two files; no data
   shape changes and no run-state byte is rewritten.
-- user docs — `tools/unattended/README.md`'s leg list gains the row; `memory/guides/UNATTENDED-PROTOCOL.md`
-  is NOT edited by this unit, because the protocol pair is `TOOL-aHoistedPass-2`'s carrier.
+- user docs — `tools/unattended/README.md`'s leg list gains the row. ~~`memory/guides/UNATTENDED-PROTOCOL.md`
+  is NOT edited by this unit, because the protocol pair is `TOOL-aHoistedPass-2`'s carrier.~~
+  **WRONG, and corrected at rev-7 from the build.** The protocol pair carries section 8's BINDING
+  conf-key table, and check 22 joins it against the declared conf in both directions, so a key that
+  is set and undocumented is a hard red. The edit is one table ROW and touches nothing
+  `TOOL-aHoistedPass-2` owns; the two units' claims on that carrier are disjoint, which is what the
+  original sentence should have said instead of claiming exclusivity.
 
 ## 6. Acceptance criteria
 
@@ -488,6 +506,40 @@ result reported, and AC7 asserts the four liveness counts are byte-identical acr
   `.unattended.conf.example:218`; `check-kit-versions.sh:169` and `:179-192`;
   `install-prefix-carried.txt:104-105`; `lib-unattended.sh:27`. No scope item, criterion, gate or
   fork resolution changed - this rev moves addresses and one false comparability claim, nothing else.
+
+- rev-6 - 2026-09-05 - **two divergences the build pass hit and changed the spec for before writing
+  the code**, both in the same place: S2's signature.
+  **(1)** S2 named FIVE arguments, `base · unit-id · build-dir · generated-indexes · shared-records`,
+  and that set cannot express the second window. The two call sites S3 names pass different windows —
+  `"${base:+$base..}HEAD"` unbounded and `--reverse`, and a bare `"$base"` capped and newest-first —
+  and the header comment S2 orders moved with the code says `ONE PREDICATE, TWO WINDOWS` in those
+  words. A five-argument helper would therefore have deleted the pre-anchor violation class rather
+  than lifting it, and AC7's byte-identical-counts test would have caught it as
+  `pre-anchor violation(s)` moving to zero. The lifted `build_commit` takes the five S2 names, the
+  first re-spelled as the REV-RANGE the caller already builds, plus `cap` and `order` as OPTIONAL
+  trailing arguments defaulting to the in-range walk. AC14 is unchanged and still literally true: the
+  in-range window IS the five-argument call.
+  **(2)** S6's grammar probe was specified as one literal, ` brief · item ` with a LEADING space.
+  Measured in the driver at BASE, that literal occurs exactly once — as the argument to `verb_brief`'s
+  own `grep -F` at `:4237` — so asserting it alone couples the leg to the driver's READER rather than
+  to its writer, and a writer that changed its grammar while the reader lagged would pass the probe.
+  The leg asserts two literals instead: `brief · item ` glued, which is `verb_brief`'s `want=` line at
+  `:4231` and its own spelling of the row it is about to write, and ` · reason `, which is `park()`'s
+  line-final reason field that the hash and the path ride on. Both halves of what this leg parses,
+  both from the writing side. AC6 is unchanged; the staged break removes both.
+
+- rev-7 - 2026-09-05 - **an M2 AMEND, uncovered by building and recorded rather than absorbed.**
+  §5's user-docs line said `memory/guides/UNATTENDED-PROTOCOL.md` is NOT edited by this unit. The kit
+  gate says otherwise, and it says it as a hard failure: **check 22** joins every key the project
+  DECLARES against the protocol's section 8 binding key table in BOTH directions, so
+  `BRIEF_RECORDED_CUTOFF` set and undocumented reds `unattended kit gate` — which S5 makes
+  unavoidable, since the key is the leg's on/off switch. Observed:
+  `UNATTENDED check 22 FAILED — … undocumented in the protocol: BRIEF_RECORDED_CUTOFF`. The edit is
+  ONE table row in `tools/unattended/PROTOCOL.template.md`, re-installed to the rendered half by
+  `adopt-unattended.sh` because check 10 byte-compares the pair. **The ORDER is stated plainly rather
+  than tidied:** the row was written before this rev line, because the failure that required it
+  arrived from a gate run and not from reading. S5 and §5 now carry it, and the declared write set
+  was WIDENED through `--dispatch` before either file was touched.
 
 ## 10. Reuse audit
 

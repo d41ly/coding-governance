@@ -5,9 +5,11 @@
 # have different subjects:
 #
 #   * the RECORD AND WIRING checks read the REPOSITORY — run-state records, the shipped skill's
-#     wiring. They can go stale without anyone editing this kit, so they stay merge-bar legs:
-#     `unattended kit gate`, `playbook validity gate`, `unattended skill wiring`. Nothing here
-#     replaces them and they are listed below only so one command answers for the whole kit.
+#     wiring. They can go stale without anyone editing this kit, so they stay merge-bar legs.
+#     WHICH ones is the `checks` rows below and nothing else: the three names that used to be typed
+#     here had already fallen behind by one leg before this line was rewritten, which is what a
+#     hand-kept list of a machine-readable population always does. Nothing here replaces them and
+#     they are listed below only so one command answers for the whole kit.
 #   * the SELF-TESTS read THIS KIT. Each stages a break into a copy of a checker and asserts the
 #     checker still catches it. Their subject is the checker, so they have a job only when the source
 #     under this directory changes — and none at all in an adopter's repo that copy-installs the kit
@@ -87,6 +89,19 @@ BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to bu
                               # bound under the 8-wide pool (TOOL-dRetiredFork-40) and this one is a
                               # cost verdict. The claim that they are one figure was deleted with
                               # this edit.
+BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day it landed, when the
+                              # cutoff drops every build before any rev-list runs. 900 is NOT that
+                              # measurement plus headroom - it is the sibling's declared ceiling,
+                              # taken because this leg's walk IS the sibling's walk plus one blob read
+                              # per graded unit, so the honest bound is the one the population grows
+                              # into rather than the one an empty population happens to cost.
+BUDGET_brief_recorded_selftest=600  # measured 115 s IDLE and 177 s under load on node `a`
+                              # 2026-09-05, over fixtures that are each a real git repo carrying a
+                              # 350 KB driver copy - process creation is the whole cost, so this
+                              # scales with the arm count and not with the work per arm. NO ARM COUNT
+                              # IS TYPED HERE: the suite prints its own on the `--- N arms` line, and
+                              # it moved once inside the pass that wrote this comment. 600 keeps this
+                              # file's measured-plus-headroom habit and matches the sibling suite.
 BUDGET_pass_order_selftest=600 # measured 149 s on node `a` 2026-09-05, up from 41 s: TOOL-aStagedLane-1
                               # roughly tripled the suite, and every arm builds a real fixture
                               # repository, so the cost is git PROCESS CREATION and scales with the arm
@@ -102,7 +117,7 @@ case "$ONLY" in
   --selftests) ONLY=selftests ;;
   -h|--help)
     echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--checks|--all]"
-    echo "  --selftests  the five suites that stage breaks into this kit (default), and the only"
+    echo "  --selftests  every suite that stages breaks into this kit (default), and the only"
     echo "               thing that exercises them since none is a bar leg."
     # THE BUDGET IS DERIVED, NEVER TYPED. Round 7's low 2: this help text quoted ~60 minutes beside a
     # ceiling this same unit had just re-declared, in the same file - a value stated in prose beside
@@ -126,7 +141,7 @@ case "$ONLY" in
     echo "               in a timeout below that - a killed suite prints no PASS and no FAIL, and"
     echo "               greping for a verdict then reads a kill as silence. This script reads the"
     echo "               EXIT CODE for that reason."
-    echo "  --checks     the three record/wiring checks, which are ALSO merge-bar legs. Their own"
+    echo "  --checks     the record/wiring checks, which are ALSO merge-bar legs. Their own"
     echo "               ceilings are in the same BUDGET_* block; no wall figure is typed here,"
     echo "               because the one that was is what round 8 filed."
     echo "  --all        both"
@@ -215,6 +230,7 @@ run_one "kit gate"                  checks bash "$HERE/check-unattended.sh"
 run_one "playbook validity gate"    checks bash "$HERE/check-playbook.sh"
 run_one "skill wiring"              checks bash "$HERE/adopt-unattended.sh" --check
 run_one "pass-order history"        checks bash "$HERE/check-pass-order.sh"
+run_one "brief-recorded"            checks bash "$HERE/check-brief-recorded.sh"
 
 run_one "gate selftest"             selftests bash "$HERE/check-unattended.test.sh"
 run_one "driver selftest"           selftests bash "$HERE/unattended.test.sh"
@@ -222,6 +238,7 @@ run_one "playbook validity selftest" selftests bash "$HERE/check-playbook.test.s
 run_one "cross-component"           selftests bash "$HERE/cross-component.test.sh"
 run_one "adopter e2e"               selftests bash "$HERE/adopt-unattended.test.sh"
 run_one "pass-order selftest"       selftests bash "$HERE/check-pass-order.test.sh"
+run_one "brief-recorded selftest"   selftests bash "$HERE/check-brief-recorded.test.sh"
 
 # LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a clean
 # sweep are indistinguishable from the outside, which is the class this kit has spent six review

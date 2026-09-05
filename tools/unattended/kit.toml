@@ -128,6 +128,20 @@ argv = ["bash", "{kit}/check-pass-order.sh"]
 guard = []
 red_after_land = true
 
+# the brief-recorded leg. No guard, for `pass-order history`'s reason: its subject is the
+# REPOSITORY's run-state records, so it goes stale with nobody editing this kit, and a guard scoped
+# to this kit dir would skip it on exactly the commits that add a brief row — a build commit that
+# touches no kit file at all. Its ceiling is declared in the leg manifest and copied from the
+# sibling's, whose own
+# measured cost already sits at 73% of it: when the graded population catches up, that ceiling is the
+# next thing to red, and re-declaring it with a reason is the right answer then rather than now.
+[[gate_leg]]
+name = "brief-recorded"
+subject = "repo"
+argv = ["bash", "{kit}/check-brief-recorded.sh"]
+guard = []
+red_after_land = true
+
 [[gate_leg]]
 name = "unattended skill wiring"
 subject = "repo"
