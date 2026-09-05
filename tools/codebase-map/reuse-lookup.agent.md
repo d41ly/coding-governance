@@ -21,7 +21,7 @@ The CLI prints a ranked shortlist, not an answer:
 
 - **candidates (ranked)** — each line is `name  [kind | file | fan-in N | SEAM]  (why it is listed)`.
   - **seeds** (top of the list) share a token stem with your query.
-  - **neighbours** live in the same file or are the same kind as a seed — the tool widens beyond a
+  - **neighbours** live in the same FILE as a seed, or are the same kind IN THE SAME DIRECTORY — the tool widens beyond a
     literal name match on purpose (a pure top-K lexical cut has ~0% behavioural recall).
   - **SEAM** marks a symbol whose fan-in is at/above the repo's threshold — a hot, already-reused
     seam. Prefer wiring through a SEAM over a cold symbol.

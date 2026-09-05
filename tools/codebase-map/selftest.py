@@ -962,13 +962,17 @@ def test_lookup_row_carries_sources(tmp: Path):
     gen = tmp / "memory" / "map" / "generated"
     gen.mkdir(parents=True)
     (tmp / "memory" / "map" / "features").mkdir(parents=True)
+    # BOTH symbols in ONE file, deliberately: `n_shown` counts ranked CANDIDATES and `n_sources`
+    # counts distinct source PATHS, so a fixture giving each symbol its own file makes the two
+    # numbers coincide and cannot test either. They must differ for the arm to mean anything.
     syms = [{"id": "slugify", "kind": "function", "file": "src/text.py"},
-            {"id": "slug_helper", "kind": "function", "file": "src/util.py"}]
+            {"id": "slug_helper", "kind": "function", "file": "src/text.py"}]
     (gen / "symbols.json").write_text(m.render_symbols_json(syms), encoding="utf-8")
     src = tmp / "src"
     src.mkdir()
-    (src / "text.py").write_text("def slugify(s):\n    return s\n", encoding="utf-8")
-    (src / "util.py").write_text("def slug_helper(s):\n    return s\n", encoding="utf-8")
+    (src / "text.py").write_text(
+        "def slugify(s):\n    return s\n"
+        "def slug_helper(s):\n    return s\n", encoding="utf-8")
     subprocess.run(["git", "-c", "init.defaultBranch=main", "init", "-q", str(tmp)],
                    check=True, capture_output=True)
 
@@ -985,6 +989,19 @@ def test_lookup_row_carries_sources(tmp: Path):
         assert all("\\" not in p for p in paths), f"not forward-slashed: {paths}"
         assert "src/text.py" in paths, paths
 
+        # (a2) CONTAINMENT IN BOTH DIRECTIONS. A one-way subset assertion is what let the first
+        #      cut of this field ship dropping every dossier source: `shown_paths` was a strict
+        #      subset of what the reader saw, and a subset assertion cannot see that. The reverse
+        #      direction is the whole gate.
+        shown = rl._sources(sl, corpus)
+        labelled = set()
+        for line in shown:
+            if line.startswith("symbol def: "):
+                labelled.add(line[len("symbol def: "):])
+            elif line.startswith("dossier: "):
+                labelled.add(line[len("dossier: "):])
+        assert set(paths) <= labelled, f"logged a path the reader was never shown: {set(paths) - labelled}"
+        assert labelled <= set(paths), f"showed a source the log dropped: {labelled - set(paths)}"
         # (b) the row carries both fields, and n_shown keeps its OLD meaning -- the ranked count,
         #     which is a different number from the path count.
         rl.write_lookup(m.repo_root(), "q", len(sl.ranked), paths)
@@ -1003,6 +1020,18 @@ def test_lookup_row_carries_sources(tmp: Path):
         assert row["n_sources"] == len(many), row["n_sources"]
         assert row["n_sources"] > len(row["shown_paths"]), "truncation is invisible"
 
+        # (c2) THE REAL CALL SITE, end to end. Everything above drives `write_lookup` with values
+        #      the test itself computed, which cannot catch `main()` passing the wrong ones -- and
+        #      that is exactly what a defaulted `paths` argument would have hidden. Run the CLI.
+        before = log.read_text(encoding="utf-8").strip().splitlines()
+        assert rl.main(["normalise a display name into a url slug"]) == 0
+        after = log.read_text(encoding="utf-8").strip().splitlines()
+        assert len(after) == len(before) + 1, "main() wrote no row"
+        real = json.loads(after[-1])
+        assert real["n_sources"] == len(real["shown_paths"]), real
+        assert real["n_sources"] > 0, "main() logged an EMPTY source set — the argument was dropped"
+        assert real["n_shown"] != real["n_sources"], (
+            "this fixture cannot tell the two fields apart, so it proves nothing about either")
         # (d) NEVER FATAL: a write that cannot happen must not change the exit code. The root is
         #     pointed at a tree with no git dir at all, which is the real resolution failure.
         nogit = tmp / "nogit"

@@ -71,7 +71,7 @@ repo-wide python-launcher seam rather than anything this feature owns.
 
 ## How the neighbour cap selects
 
-- **The cap slices the RANKED pool, and the ordering key is stated ONCE.** `_shortlist_key` is read
+- **The cap slices the RANKED pool, and the ordering key is stated ONCE.** `_derive_shortlist_key` is read
   twice — to cap the neighbours, and to sort the shortlist that prints — because a retyped second
   copy is how the two came to disagree: the cap sliced `sorted(neighbours.items())`, which is
   ALPHABETICAL, while the sort below it ordered by fan-in. `_rank` therefore only ever saw the
@@ -88,9 +88,9 @@ repo-wide python-launcher seam rather than anything this feature owns.
 - **The same-kind arm is DIRECTORY-SCOPED, and the axis is the defining file's own directory.** Kind
   alone admitted 619 of 648 kinded candidates — 95% — so no cap over it selected by anything.
   Scoped to the seed's directory the same pool falls to 134 / 133 / 101 / 81 across the four
-  largest, a reach reduction of 4.6x to 7.6x. The axis is `os.path.dirname`, not a "kit" concept, so
-  it needs no declaration and means the same thing in an adopter's tree.
-- **What the narrowing COSTS, measured and not buried.** Replayed over the same 140 phrases, the
+  largest, a reach reduction of 4.6x to 7.6x. The axis is the defining file's own directory, via
+  `_derive_dir`, not a "kit" concept — so it needs no declaration and means the same in an adopter's tree.
+- **What the narrowing COSTS, measured and not buried.** Replayed at `6aad7751` over 140 phrases, the
   hit rate falls 0.600 → 0.586: two phrases lose their hit, at ranks **31 and 27**. hit@5, hit@10
   and the median rank are unchanged, one phrase's rank improves and none worsens. So what the
   narrowing discards sat far below the twelve-slot cap, where no reader reaches; what it buys is a

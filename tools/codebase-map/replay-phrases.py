@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Replay the reuse probe over this repo's own recorded phrases, and measure_phrase it.
+"""Replay the reuse probe over this repo's own recorded phrases, and grade it.
 
 WHAT THIS IS FOR. `reuse_lookup.py` is an orientation instrument, and until this harness existed
 the only way to say whether a change to it made the answers better was to run a few phrases by hand
@@ -20,9 +20,9 @@ fixed, slowness that fails is fixed or re-declared -- so the run is timed and a 
 NON-ZERO. `--ceiling` re-declares it for a deliberately larger corpus; there is no way to disable it.
 
 Usage:
-    {cli}            # measure_phrase every phrase, print the summary
+    {cli}            # grade every phrase, print the summary
     {cli} --json     # the same, machine-readable
-    {cli} --limit 20 # a sample, for a quick before/after
+    {cli} --limit 20 # grade only the first N, for a quick before/after
     {cli}            # with no args it also prints the ceiling
 """
 
@@ -159,7 +159,7 @@ def measure_phrase(corpus, ref, phrase: str, truth: list[str]) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--json", action="store_true", help="machine-readable output")
-    ap.add_argument("--limit", type=int, default=0, help="measure_phrase only the first N phrases")
+    ap.add_argument("--limit", type=int, default=0, help="grade only the first N phrases")
     ap.add_argument("--ceiling", type=float, default=CEILING_S,
                     help=f"wall-clock ceiling in seconds (declared: {CEILING_S:g})")
     args = ap.parse_args()
@@ -186,18 +186,32 @@ def main() -> int:
     ref = m.build_reference_index(corpus.symbol_files)
     rows = [measure_phrase(corpus, ref, p, t) for p, t in graded]
 
+    # THE DENOMINATOR IS DECLARED. A phrase whose ground-truth paths are not in the ranked corpus
+    # at all -- a spec citing a file the symbol index does not carry -- can never register a hit,
+    # so it depresses `hit_rate` for a reason that has nothing to do with the ranker. It is counted
+    # and REPORTED rather than silently dropped: dropping it would flatter the figure, and hiding
+    # it would leave two ranker changes measured against an undeclared floor.
+    corpus_files = {c.file for c in corpus.candidates.values() if c.file}
+    unreachable = sum(
+        1 for _, t in graded
+        if not any(f == x or f.endswith("/" + x) or x.endswith("/" + f)
+                   for x in t for f in corpus_files)
+    )
     hits = [r for r in rows if r["hit"]]
     ranks = sorted(r["rank"] for r in hits)
+    # The UPPER of the two middle values on an even count. Named honestly rather than averaged:
+    # a rank is an ordinal position, so the mean of two ranks is not a rank.
     median = ranks[len(ranks) // 2] if ranks else None
     elapsed = time.monotonic() - t0
 
     summary = {
         "phrases_graded": len(rows),
         "phrases_without_ground_truth": ungraded,
+        "phrases_truth_unreachable": unreachable,
         "hit_rate": round(len(hits) / len(rows), 3) if rows else None,
         "hit5_rate": round(sum(r["hit5"] for r in rows) / len(rows), 3) if rows else None,
         "hit10_rate": round(sum(r["hit10"] for r in rows) / len(rows), 3) if rows else None,
-        "median_rank_of_first_correct": median,
+        "upper_median_rank_of_first_correct": median,
         "elapsed_s": round(elapsed, 1),
         "ceiling_s": args.ceiling,
         "corpus_symbols": measure_corpus_symbols(corpus),
@@ -211,7 +225,9 @@ def main() -> int:
         print(f"hit rate                    {summary['hit_rate']}")
         print(f"hit@5                       {summary['hit5_rate']}")
         print(f"hit@10                      {summary['hit10_rate']}")
-        print(f"median rank of first correct {summary['median_rank_of_first_correct']}")
+        print(f"upper-median rank of first correct {summary['upper_median_rank_of_first_correct']}")
+        print(f"phrases that CANNOT hit (truth outside the corpus) "
+              f"{summary['phrases_truth_unreachable']}")
         print(f"elapsed                     {summary['elapsed_s']}s against a {args.ceiling:g}s ceiling")
 
     if not rows:

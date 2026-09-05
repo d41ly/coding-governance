@@ -63,6 +63,29 @@ before it sorts by fan-in. Two records state facts their own sources refute.
 - **This build sets no floor.** The owner blocked pinning on unit 9 rather than derive one from a
   saturated 12-question fixture. A figure quoted anywhere here carries its n.
 
+- **WHAT THE UNATTENDED RUN OF 2026-09-05 BUILT, and what it did not.** Seven units CLOSED: 1, 4,
+  5, 6, 7, 8, 10. Unit 11 is IMPLEMENTED and committed but its spec stays `SPECCED`, because its
+  verification did not complete — see the next rule. Units 2, 3 and 9 are UNBUILT: 2 and 3 are
+  blocked on 9, and 9 is the largest single piece in the build, so starting it without finishing it
+  would have left a half-authored fixture that `TOOL-aTunedCompass-3` is due to pin the merge bar
+  against. The run stopped building rather than start it. Unit 9's spec gained a measured candidate
+  pool at rev-5 so the next run does not rediscover it.
+- **UNIT 11 IS UNVERIFIED, and this is the run's largest caveat.** Its reader, its six declaration
+  carriers and its record corrections are committed, and `unattended kit gate`, `memory hygiene`,
+  `spec tokens`, `dead paths`, `kit version markers`, `install prefix`, `lexicon` and wiring are all
+  green over it. What did NOT run is the kit's own driver suite, which carries the three new MAP_CLI
+  arms and eight existing arms this unit re-worded. Two attempts were made; each produced ZERO
+  output and was killed at its bound, one at 50 minutes and one at 90. A pristine-tree baseline
+  behaved identically for the first 100 seconds, so the silence is buffering rather than a hang
+  introduced here — but that is not the same as knowing the suite passes, and the difference is why
+  the spec is not CLOSED. The one live exercise the run did get is its own `--close`, which
+  evaluates `reuse-probed` against this tree with both CLIs declared and both logs present.
+- **The spec audit ran TWO rounds and exited NON-CONVERGENT.** Round 1 over all eleven specs: 20
+  distinct defects, 3 blockers. Round 2 over the three that carried a blocker: 16 defects, 2
+  blockers, and fifteen of the sixteen were created by round 1's own fold. The count did not
+  strictly shrink, so M4 stops the loop; both standing blockers were FOLDED, and the disposition is
+  recorded on the exiting round. Precision was 0.47 in both rounds.
+
 ## Parked decisions
 - **Whether the chunk set earns its place at all is still NOT decided.** `union.py` puts
   `records:fts5` alone at the same recall as the live two-set ensemble for 116% fewer snippet bytes,
@@ -113,7 +136,7 @@ ids TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCo
 | [TOOL-aTunedCompass-8 — the map log records what a probe returned, not only that it ran](spec/2026-09-04-spec-TOOL-aTunedCompass-8.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

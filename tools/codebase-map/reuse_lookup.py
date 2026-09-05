@@ -6,9 +6,9 @@ Assembles a candidate corpus from the map's four recall sources — generated/sy
 ids/kinds, generated/inventories.json keys, every dossier's `## Reuse affordance` seam line,
 and every `## Shared seams` prose block — and prints a ranked SHORTLIST for an agent to read.
 The shortlist is NOT a hard top-K lexical cut (that scores ~0% behavioural recall): it is the
-UNION of token-stem matches (the seeds) AND a capped set of structural neighbours (same kind or
-same file as a seed), so a seam whose name doesn't literally contain the query word still
-surfaces for the agent to judge. Fan-in is computed ON DEMAND here (never committed) to rank
+UNION of token-stem matches (the seeds) AND a capped set of structural neighbours (same file as a
+seed, or the same kind in the same DIRECTORY), so a seam whose name doesn't literally contain
+the query word still surfaces for the agent to judge. Fan-in is computed ON DEMAND here to rank
 hot seams. A recall-dark layer (declared in .codebase-map.conf) prints a partial-recall notice
 so an empty result is never a falsely-confident "no seam fits".
 
@@ -200,8 +200,8 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     """The pure heart: query + corpus + reference index -> a ranked shortlist. Seeds = every
     candidate sharing a token stem with the query, PLUS the dossier of any `## Shared seams`
     prose that shares a stem (behavioural recall beyond names). Structural neighbours = symbols
-    with the same kind OR the same file as a symbol seed, capped. Ranked seeds-first, then by
-    fan-in desc, then name — deterministic. Empty seeds -> empty shortlist -> 'no seam fits'."""
+    in the same FILE as a symbol seed, or of the same kind IN THE SAME DIRECTORY, capped. Ranked
+    seeds-first, then fan-in desc, then name — deterministic. Empty seeds -> 'no seam fits'."""
     qstems = m.stems(query)
     if not qstems:
         return Shortlist(query, [], corpus.recall_dark, corpus.threshold, _counts(corpus))
@@ -235,7 +235,7 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
             pool.setdefault(name, Candidate(name, ("shared-seams",), detail=feature))
             seeds[name] = f"shared-seams prose ({feature}): {', '.join(sorted(shared))}"
 
-    # structural neighbours of the symbol seeds — same kind OR same def file, capped.
+    # structural neighbours of the symbol seeds — same def file, or same kind in the same dir.
     seed_syms = [pool[n] for n in seeds if pool[n].kind]
     seed_kinds = {c.kind for c in seed_syms}
     seed_files = {c.file for c in seed_syms if c.file}
@@ -428,22 +428,39 @@ def _line(r: Ranked) -> str:
 
 
 def derive_source_paths(shortlist: Shortlist) -> list[str]:
-    """The file-backed paths the answer points a reader at, deduped, in shortlist order.
+    """The file-backed sources the answer points a reader at, deduped, in shortlist order.
 
-    ONE derivation, read twice: `_sources` LABELS these for a human, and `write_lookup` records
-    them. Nothing parses rendered output for paths — a second derivation would drift from the
-    first, and the whole value of the row is that it says what the reader was actually shown.
+    ONE derivation, read twice: `_sources` LABELS these for a human and `write_lookup` records
+    them. That claim has to be TRUE, and the first cut made it false -- it collected only
+    `candidate.file`, so every dossier a shared-seam or affordance candidate contributes was
+    dropped from the log while the reader was still shown it. Measured on one live query: 6 of 19
+    entries missing. The closing review caught it because the acceptance criterion tested
+    containment in ONE direction only, which is this repo's `containment-tested-one-way` class.
 
-    Repo-relative and forward-slashed, because that is how every candidate carries its file and
-    how a later analysis will join them against the tree.
+    Repo-relative and forward-slashed, because that is how a later analysis joins them to the tree.
+    An inventory key with no file contributes nothing here, exactly as it contributes no openable
+    path there.
     """
+    try:
+        root_name = m.map_root().relative_to(m.repo_root()).as_posix()
+    except ValueError:
+        root_name = m.map_root().name
     out: list[str] = []
     seen: set[str] = set()
+
+    def add(p: str) -> None:
+        p = p.replace("\\", "/")
+        if p and p not in seen:
+            seen.add(p)
+            out.append(p)
+
     for r in shortlist.ranked:
-        f = (r.candidate.file or "").replace("\\", "/")
-        if f and f not in seen:
-            seen.add(f)
-            out.append(f)
+        c = r.candidate
+        if c.file:
+            add(c.file)
+        if ("affordance-seam" in c.sources or "shared-seams" in c.sources) and c.detail:
+            where = "FOUNDATION.md" if c.detail == "foundation" else f"features/{c.detail}.md"
+            add(f"{root_name}/{where}")
     return out
 
 
@@ -508,7 +525,7 @@ def _resolve_git_dir(root: Path) -> Path | None:
     return gitdir
 
 
-def write_lookup(root: Path, query: str, n_shown: int, paths: list[str] | None = None) -> None:
+def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None:
     """Append one JSONL row recording that this probe RAN. Never fatal, never gating.
 
     WHY: ``BUILD-METHOD`` M5 names two reuse probes and only the recall one left evidence, so a
@@ -533,7 +550,8 @@ def write_lookup(root: Path, query: str, n_shown: int, paths: list[str] | None =
         common = _resolve_git_dir(root)
         if common is None:
             return
-        paths = paths or []
+        # REQUIRED, not defaulted: an optional `paths` turns a dropped argument into a row that
+        # logs zero sources and looks merely quiet. A TypeError at the one call site is louder.
         path = common / "codebase-map" / "lookups.jsonl"
         path.parent.mkdir(parents=True, exist_ok=True)
         row = {

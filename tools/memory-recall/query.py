@@ -613,39 +613,31 @@ def ensure_cache(repo: pathlib.Path, force: bool = False) -> tuple[pathlib.Path,
     dirp = cache_dir(repo)
     files, declared = E.corpus_inputs(repo, include_untracked=True)
     man = read_manifest(dirp)
-    fresh = (
-        not force
-        and man is not None
-        and man.get("version") == CACHE_VERSION
-        and man.get("chunk_max") == CHUNK_MAX
-        and man.get("digest") == corpus_digest(repo, files + declared)
-        and man.get("alias_digest") == alias_digest()
-        and man.get("conf_digest") == CONF.digest()
-        and (dirp / "records.db").exists()
-        and (dirp / "chunks.db").exists()
-    )
-    # WHY a rebuild happened, named rather than left to be guessed. Every clause above is a
-    # separate reason and they are not interchangeable: `conf_digest` moving is a KIT VERSION or
-    # conf edit and costs exactly one rebuild per node, while `digest` moving is the corpus
-    # changing and is routine. Without this an acceptance criterion about caching can only assert
-    # THAT a rebuild happened, which is why one in this build was written asserting the opposite of
-    # what its own kit-version bump forces.
-    if man is None:
-        cause = "no manifest"
-    elif force:
-        cause = "forced"
-    elif man.get("version") != CACHE_VERSION:
-        cause = "CACHE_VERSION"
-    elif man.get("chunk_max") != CHUNK_MAX:
-        cause = "chunk_max"
-    elif man.get("conf_digest") != CONF.digest():
-        cause = "conf_digest"
-    elif man.get("alias_digest") != alias_digest():
-        cause = "alias_digest"
-    elif man.get("digest") != corpus_digest(repo, files + declared):
-        cause = "corpus digest"
-    else:
-        cause = "a missing database"
+    # ONE derivation of freshness AND of the reason, as an ordered list of (clause, name). The
+    # first FAILING name is the cause and `fresh` is "no clause failed", so the two cannot drift
+    # apart and a new clause is impossible to add to one side only.
+    #
+    # It was two hand-kept spellings for about an hour: a boolean `and`-chain and an `elif` ladder
+    # repeating every clause. Worse, the ladder ran BEFORE the early return, so a warm cache paid
+    # `corpus_digest` -- a walk of the whole corpus -- TWICE on the exact path the cache exists to
+    # make fast. Both halves are the same mistake: a second reader of one fact.
+    #
+    # Laziness matters here: the tuple is built with the cheap clauses first, and `corpus_digest`
+    # is called AT MOST ONCE because the generator stops at the first failure.
+    def _derive_clauses():
+        yield (not force, "forced")
+        yield (man is not None, "no manifest")
+        if man is not None:
+            yield (man.get("version") == CACHE_VERSION, "CACHE_VERSION")
+            yield (man.get("chunk_max") == CHUNK_MAX, "chunk_max")
+            yield (man.get("conf_digest") == CONF.digest(), "conf_digest")
+            yield (man.get("alias_digest") == alias_digest(), "alias_digest")
+            yield ((dirp / "records.db").exists(), "a missing database")
+            yield ((dirp / "chunks.db").exists(), "a missing database")
+            yield (man.get("digest") == corpus_digest(repo, files + declared), "corpus digest")
+
+    cause = next((name for ok, name in _derive_clauses() if not ok), None)
+    fresh = cause is None
     if fresh:
         return dirp, man, False
     REBUILD_CAUSE.append(cause)
@@ -740,8 +732,13 @@ def run_rollup(hits: list[dict], k: int) -> list[dict]:
     ``bench.run_rollup`` does the same thing over its own in-memory ``docs`` list and a
     ``bench.build_index`` connection; this one serves the dictionaries ``search()`` returns, joined
     against the cache's own ``meta`` table. The two cannot be one function -- different inputs,
-    different connections -- so what is shared is the PARENT KEY, and it is spelled the way
-    ``bench.parent_of`` spells it: ``hit["id"] or hit["path"]``.
+    different connections -- so what is shared is the PARENT KEY, and the two spellings are NOT
+    identical: ``bench.parent_of`` is ``rec or id or path`` while this is ``id or path``. They agree
+    only because ``_write_set`` folds the two into one column -- it writes ``meta.id`` as
+    ``d.get("id") or d.get("rec")`` -- so a chunk row arrives here with its parent record id
+    already IN ``id``. That fold is the load-bearing step and it is named here because nothing
+    else names it and no arm tests it: change ``_write_set``'s column and this rollup silently
+    becomes a per-path cap for the anchored 0.6% as well.
 
     THE PARENT KEY IS THE PATH FOR ALMOST EVERYTHING, and calling this a per-record rollup would be
     wrong. ``extract_chunks`` sets a chunk's ``rec`` only when a HEADING LINE itself defines a record

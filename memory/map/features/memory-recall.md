@@ -65,7 +65,7 @@ floor on the merge bar.
   that defines a record id — so calling this a per-RECORD rollup would be wrong, and both branches
   carry a self-test arm. Measured effect on the served shape: the duplicate-path rate over
   `shown_paths` falls 0.467 to 0.369 over four questions.
-- **There is ONE fusion call site.** It was two identical expressions, the first attempt and the
+- **There is ONE fusion call site, `run_fusion`.** It was two identical expressions, the first attempt and the
   rebuild after a `sqlite3.DatabaseError`, so a change applied to one and not the other made the
   served shape depend on whether the cache was healthy — a state every acceptance arm misses,
   because they all run the healthy path.
