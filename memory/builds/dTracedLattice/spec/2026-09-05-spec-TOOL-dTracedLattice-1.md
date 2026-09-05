@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -37,11 +37,12 @@ scores 14.5% precision overall and 7.2% in the fan-in band that `reuse_lookup` p
   are live at `memory/backlog/TOOL.md:294`, and `git ls-files | grep reinvention` returns nothing,
   so two of them are checkably false today. Rev-2 declared the sole-editor rule and did not widen
   this item to receive what the other unit stopped doing, which left the corrections owned by nobody.
-- **S6** Land the scoring instrument as tracked files under `tools/codebase-map/`: the AST
-  ground-truth resolver and the variant harness that AC1 and AC2 are scored by, plus the ground-truth
-  corpus as a FIXTURE rather than as a remembered number. Both exist today only in a scratchpad this
-  build's README already records as unreproducible, so without this item the unit's headline criteria
-  can be satisfied only by assertion.
+- **S6** Land the scoring instrument as tracked files under `tools/codebase-map/`: the variant
+  harness that AC1 and AC2 are scored by, plus the ground-truth corpus as a FIXTURE rather than as a
+  remembered number. The AST ground-truth resolver is NOT built here — `TOOL-dTracedLattice-6`
+  rescues it from the lexicon kit at order 1 and this item extends what that unit lands. The harness
+  and corpus exist today only in a scratchpad this build's README records as unreproducible, so
+  without this item the unit's headline criteria can be satisfied only by assertion.
 - **S7** Update `tools/codebase-map/map_diff.py`, which calls `fan_in` at line 204 and computes the
   dead-export figure at 207. It is in this unit's write set, not unit 3's, because the signature S1
   changes is the one that line passes.
@@ -167,6 +168,8 @@ Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice design pass and its skeptic round.
+- rev-4 · 2026-09-05 · the owner ratified the lexicon rescue, so S6 extends
+  `TOOL-dTracedLattice-6`'s resolver instead of building one, and this unit moves to order 2.
 - rev-3 · 2026-09-05 · folded the round-2 spec audit: B1 (S5 and AC6 widened to RECEIVE the three
   corrections unit 3 S3 hands over — rev-2 declared the sole-editor rule and left them owned by
   nobody), B2 (§4's call-site list was false in both directions and omitted `map_lib.py:1240`, the

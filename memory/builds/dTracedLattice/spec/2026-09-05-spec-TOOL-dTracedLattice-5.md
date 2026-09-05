@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 5
+**Status:** SPECCED · rev-4 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 6 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -30,6 +30,11 @@ to claim it is not making that failure.
   every data and prose extension in the tree — `.md`, `.json`, `.toml`, `.txt` and the rest — which
   is a refusal nobody can clear and which would make the check unusable on its first run.
   `tools/lexicon/lexicon.py:167` already carries this filter and is the prior art to follow.
+- **S6** Ship the migration the owner's ruling requires. `RECALL_DARK_LAYERS` values become
+  EXTENSIONS: this repo's conf changes, the kit fixture's `web-ts` becomes a set of extensions, and
+  `.codebase-map.conf.example` states the new vocabulary where an adopter reads it. A value in the
+  old spelling is a REFUSAL naming the extension it should become, never a silent reinterpretation —
+  an adopter whose conf still says `bash` must be told, not guessed at.
 - **S3** The refusal names the layer, the file count, and the two ways to clear it — register an
   extractor, or declare it dark — so the remedy is in the message.
 - **S4** Supply the derived set to `reuse_lookup`'s banner. `TOOL-dTracedLattice-1` AC3 owns the
@@ -117,9 +122,12 @@ set would print a derived number beside an authored one.
 - **AC4** — When `python tools/codebase-map/reuse_lookup.py` runs on this tree AFTER the Q1 migration,
   its dark-layer notice is derived from the corpus walk and names `.sh` because those files are
   present and uncovered, not because `.codebase-map.conf` says so.
-- **AC5** — When an arm asserts that every `RECALL_DARK_LAYERS` token is either a registered extractor
-  key or an extension present in the corpus, it reds on this tree TODAY against the shipped value, and
-  that red is observed before the migration lands.
+- **AC5** — When an arm asserts that every `RECALL_DARK_LAYERS` token is an extension present in the
+  corpus, it reds on this tree TODAY against the shipped value, and that red is observed before the
+  migration lands.
+- **AC6** — When a `.codebase-map.conf` still carrying the old language-name spelling is read after
+  S6, the run REFUSES and names the extension that value should become, rather than reinterpreting
+  it.
 
 ## 7. Gates
 
@@ -137,15 +145,20 @@ Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit
   so it is an owner turn and this run does not take it. Options: re-declare as extensions and ship a
   migration; keep language names and add the extension-to-language table §4 argues against; or accept
   both spellings for a deprecation window. Recommendation: re-declare, with AC5's arm reddening first
-  so the decision is forced before the unit lands rather than after. **NOT RESOLVED.**
+  so the decision is forced before the unit lands rather than after. RESOLVED (owner, 2026-09-05):
+  re-declare as extensions and ship the migration, which S6 owns.
 
-  Rev-1 marked this RESOLVED and picked the extractor-registry vocabulary. That was wrong twice: the
-  registry keys live in a project-owned file so they are not a shared vocabulary at all, and the
-  resolution silently contradicted AC2, AC4 and the §5 migration row.
+  Rev-1 marked this RESOLVED by an agent and picked the extractor-registry vocabulary. That was wrong
+  twice: the registry keys live in a project-owned file so they are not a shared vocabulary at all,
+  and the resolution silently contradicted AC2, AC4 and the §5 migration row. It is recorded here
+  because the owner's ruling and an agent's earlier guess must not be indistinguishable afterwards.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-4 · 2026-09-05 · the owner ratified Q1 for the extension vocabulary, so S6 owns the migration,
+  AC6 pins the refusal on an un-migrated conf, AC5 drops the registry-key alternative the ruling
+  closed, and the unit moves to order 6.
 - rev-3 · 2026-09-05 · folded the round-2 spec audit: H3 (rev-2's "no probe tier" was false against
   `map_extractors.py:226`, so the unit now ADOPTS the lexicon kit's three modes instead of narrowing
   them on a false premise), H4 (S2 gains the definition-carrier filter without which the refusal fires

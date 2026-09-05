@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -113,6 +113,8 @@ hides anything.
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-4 · 2026-09-05 · moved to order 5; the owner's lexicon-rescue ruling inserted a unit ahead of
+  the set and nothing else in this spec changed.
 - rev-3 · 2026-09-05 · folded the round-2 spec audit: M2 (rev-2's "silently held" was false against
   `run-gates.sh:1175`, `:1256` and `:1383`, which name, explain and refuse).
 - rev-2 · 2026-09-05 · folded the round-1 spec audit: M2 (§7 named a leg guarded out of this unit's

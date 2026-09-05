@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-05
 streams: tooling
 roster: TOOL
-ids: TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5
+ids: TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6
 ---
 
 # dTracedLattice — whether the codebase map should carry relations, and what its relation data is actually worth
@@ -37,25 +37,24 @@ defects in the map kit were observed while measuring, none of them about relatio
   measured weak at every granularity — but on `AGENTS.md` §12: every consumer is same-language and
   in-process, derivation is sub-second, and the artifact would be five kit-to-kit rows. No unit here
   commits a relation artifact, and a unit that wants to must first reverse §12, not finding 4.
-- **Rev-1 of the dossier is wrong and is kept.** It recommended committing a coarse import graph on a
-  measurement that described a different artifact. The record of what was refuted is the build's main
-  value and is not to be tidied away.
-- **No unit re-files an existing row.** `TOOL-aScouredKit-16` is AMENDED by unit 1's measurement;
-  `TOOL-aProvenReuse-4` records its own refusal and its own cheap shape, and no unit re-proposes it.
-  `drift_report.py` flags `live_backlog_rows_per_shard` at 268/4, so findings ride specs, not rows.
-- **The units are SEQUENCED, not concurrent, and an earlier revision of this bullet said the
-  opposite.** The write sets intersect: unit 1 must edit `map_diff.py:204`, which is the only place
-  its own dead-export figure is computed; units 1 and 5 both rewrite `reuse_lookup.py`'s banner; and
-  units 1 and 3 both amend one row of `memory/backlog/TOOL.md`, which M6 clause 3 forbids two passes
-  to touch at all. Clauses 2 and 3 govern here, not clause 1, and the generated build-order block
-  below is the authority. Collisions were removed rather than documented: the `TOOL-aScouredKit-16`
-  amendment belongs to unit 1 alone, and unit 1 owns the banner that unit 5 feeds.
+- **Rev-1 of the dossier is wrong and is kept.** It recommended a committed graph on a measurement
+  that described a different artifact. What was refuted is the build's main value, not clutter.
+- **No unit re-files an existing row.** Unit 1 AMENDS `TOOL-aScouredKit-16`; nothing re-proposes
+  `TOOL-aProvenReuse-4`, which records its own refusal. `drift_report.py` already flags this repo's
+  backlog over budget, so findings ride specs rather than new rows.
+- **Three owner rulings, 2026-09-05, and each one closed a fork a run may not take.** The lexicon
+  kit's AST import resolver is RESCUED into `codebase-map` before `TOOL-aSurfacedLexicon-2` deletes
+  it, which is why unit 6 exists and takes order 1 across two builds. `RECALL_DARK_LAYERS` is
+  re-declared in EXTENSIONS, with a migration and a refusal on the old spelling. The reinvention
+  backlog moves OUTSIDE the worktree, reversing `bConvergentLodestar` F7: nobody has read rows in a
+  file that never existed.
+- **The units are SEQUENCED, and an earlier revision of this bullet claimed the opposite.** The write
+  sets intersect on `map_diff.py`, on `reuse_lookup.py`'s banner, and on one row of
+  `memory/backlog/TOOL.md` that M6 clause 3 forbids two passes to touch at all. Clauses 2 and 3
+  govern, not clause 1, and the generated build-order block below is the authority. Each spec names
+  the collision it carries.
 
 ## Parked decisions
-- **`TOOL-aSurfacedLexicon-2` is SPECCED at order 1 to delete this tree's only AST import resolver** —
-  `resolve_import` plus seven functions, 164 lines, with a directional kit-to-kit rule. If a relation
-  capability is ever wanted, that is the code. Rescuing it into `codebase-map` or letting it go is a
-  cross-build decision this run has no authority to take, and the deletion is scheduled first.
 - **Map coverage is capped by rule, not by effort.** 1303 of 1510 tracked files are unmapped, and
   `memory/map/README.md` says path globs are digest-only and shared mega-modules are never
   glob-claimed. So no path-keyed orientation feature can be worth much until that contract changes.
@@ -73,38 +72,41 @@ defects in the map kit were observed while measuring, none of them about relatio
 | 3 | `TOOL-dTracedLattice-3` | OPEN | the reinvention backlog is tracked, or is not written into a tracked directory |
 | 4 | `TOOL-dTracedLattice-4` | OPEN | an adopter's frozen gate copy is compared against the template that moved |
 | 5 | `TOOL-dTracedLattice-5` | OPEN | a dark layer is derived from the corpus instead of asserted in prose |
+| 6 | `TOOL-dTracedLattice-6` | OPEN | the AST import resolver is rescued before the lexicon kit deletes it |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 5 unit(s) · node d · opened 2026-09-05 · streams tooling
-ids TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5
+**Build status:** SPECCED · 6 unit(s) · node d · opened 2026-09-05 · streams tooling
+ids TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references](spec/2026-09-05-spec-TOOL-dTracedLattice-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-05 |
-| [TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare](spec/2026-09-05-spec-TOOL-dTracedLattice-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-05 |
-| [TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory](spec/2026-09-05-spec-TOOL-dTracedLattice-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-05 |
-| [TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved](spec/2026-09-05-spec-TOOL-dTracedLattice-4.md) | 4 | 2 | SPECCED | rev-3 | 2026-09-05 |
-| [TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose](spec/2026-09-05-spec-TOOL-dTracedLattice-5.md) | 5 | 2 | SPECCED | rev-3 | 2026-09-05 |
+| [TOOL-dTracedLattice-6 — the AST import resolver is rescued into codebase-map before P3 deletes it](spec/2026-09-05-spec-TOOL-dTracedLattice-6.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-05 |
+| [TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references](spec/2026-09-05-spec-TOOL-dTracedLattice-1.md) | 2 | 2 | SPECCED | rev-4 | 2026-09-05 |
+| [TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare](spec/2026-09-05-spec-TOOL-dTracedLattice-2.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-05 |
+| [TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory](spec/2026-09-05-spec-TOOL-dTracedLattice-3.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-05 |
+| [TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved](spec/2026-09-05-spec-TOOL-dTracedLattice-4.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-05 |
+| [TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose](spec/2026-09-05-spec-TOOL-dTracedLattice-5.md) | 6 | 2 | SPECCED | rev-4 | 2026-09-05 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dTracedLattice-6.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dTracedLattice-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-dTracedLattice-1` | no |
-| 2 | `TOOL-dTracedLattice-2` | no |
-| 3 | `TOOL-dTracedLattice-3` | no |
-| 4 | `TOOL-dTracedLattice-4` | no |
-| 5 | `TOOL-dTracedLattice-5` | no |
+| 1 | `TOOL-dTracedLattice-6` | no |
+| 2 | `TOOL-dTracedLattice-1` | no |
+| 3 | `TOOL-dTracedLattice-2` | no |
+| 4 | `TOOL-dTracedLattice-3` | no |
+| 5 | `TOOL-dTracedLattice-4` | no |
+| 6 | `TOOL-dTracedLattice-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** SPECCED · rev-4 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 4 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -21,9 +21,10 @@ describe it as tracked and shipping to adopters, and all three are false at HEAD
 
 ## 2. Scope (IN)
 
-- **S1** Decide and implement one of two dispositions for the file: tracked and rendered like every
-  other map artifact, or written outside the worktree the way this repo already writes
-  `gate-ledger.tsv` and `recall/queries.jsonl`. §8 carries the fork.
+- **S1** Write the reinvention backlog OUTSIDE the worktree, under the git common dir, beside
+  `gate-ledger.tsv` and `recall/queries.jsonl`. Ratified by the owner on 2026-09-05. The path is
+  derived through `--git-common-dir` and never `--git-dir`, because the two differ in a linked
+  worktree and every existing consumer uses the former.
 - **S2** Whichever disposition wins, `--converge` leaves the worktree in a state the memory-hygiene
   gate and `git status` both expect — no untracked file appearing inside a gated directory.
 - **S3** Supply the three corrections `TOOL-aScouredKit-16` needs — it is not tracked, the fiction is
@@ -80,13 +81,14 @@ it; neither may be dispatched concurrently with the other, per M6 clause 1.
 
 ## 6. Acceptance criteria
 
-- **AC1a** — Whichever way Q1 lands: when `python tools/codebase-map/map_diff.py <range> --converge`
-  runs in a clean fixture worktree, no UNTRACKED file appears inside `memory/map/`, and this arm is
-  observed RED before the fix.
-- **AC1b** — Under the outside-the-worktree branch of Q1 only: `git status --porcelain` is empty after
-  that run. This criterion is marked branch-specific because rev-1 stated it unconditionally, which
-  pre-committed a fork §8 reserves to the owner — under the tracked-artifact branch the file is a
-  tracked modification and porcelain is correctly non-empty.
+- **AC1** — When `python tools/codebase-map/map_diff.py <range> --converge` runs in a clean fixture
+  worktree, `git status --porcelain` is empty afterwards and no untracked file appears inside
+  `memory/map/`. Observed RED before the fix. The unconditional spelling is correct now that the
+  owner has ratified the outside-the-worktree disposition; rev-2 split this criterion in two only
+  because the fork was open.
+- **AC6** — When the same run happens inside a LINKED WORKTREE, the file lands under the git COMMON
+  dir, asserted by an arm that resolves both `--git-dir` and `--git-common-dir` and shows the write
+  followed the latter.
 - **AC2** — When the run produces zero flags, no `reinvention-backlog.md` is created.
 - **AC3** — When the run produces flags, the stdout of `map_diff.py --converge` names the path it
   wrote them to.
@@ -117,13 +119,17 @@ Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit
   question, decided for the durable deduped destination, and BUILT it as `append_backlog`. Neither
   rev-1 of this spec nor the dossier named that, which made a decided fork look open. The honest case
   for reversing is an observation about practice rather than a defect in F7's reasoning: the rows have
-  never been reviewed by anyone, because the file has never existed. NOT RESOLVED — reversing a landed
-  decision AND changing a kit's shipped output contract is veto 2 in `memory/guides/BUILD-METHOD.md`
-  M3, so it is an owner turn.
+  never been reviewed by anyone, because the file has never existed. RESOLVED (owner, 2026-09-05):
+  outside the worktree. This REVERSES `bConvergentLodestar` F7, and the reversal is recorded as such
+  rather than as a fresh decision — F7's reasoning about durability was sound for a file somebody
+  reads, and the ground for reversing is three years of nobody reading one that never existed.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-4 · 2026-09-05 · the owner ratified Q1 for the outside-the-worktree disposition, so S1 states
+  it, AC1a and AC1b collapse to an unconditional AC1, AC6 pins the linked-worktree case, and the unit
+  moves to order 4.
 - rev-3 · 2026-09-05 · folded the round-2 spec audit: H2 (rev-2's reassignment of `map_diff.py` to
   unit 1 moved the collision rather than removing it — both units write that file, in the same
   function, and the rollout now says so and sequences them), M1 (§7 discloses the held kit legs).

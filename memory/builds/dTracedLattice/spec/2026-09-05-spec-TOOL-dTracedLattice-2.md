@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -107,6 +107,8 @@ Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round, which staged the break
   and observed the gate pass with the symbol tier absent.
+- rev-4 · 2026-09-05 · moved to order 3; the owner's lexicon-rescue ruling inserted a unit ahead of
+  the set and nothing else in this spec changed.
 - rev-3 · 2026-09-05 · folded the round-2 spec audit: M1 (§7 discloses that the kit legs are held,
   which round 1's M2 asked for in every spec and rev-2 landed in unit 4 only).
 - rev-2 · 2026-09-05 · folded the round-1 spec audit: H2 (AC4 graded a population of one and could not
