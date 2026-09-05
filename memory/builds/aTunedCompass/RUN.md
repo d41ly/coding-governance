@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 witness: 839601f37d79d1f603d36867b04973a50ecc38b4
-phase: BUILDING
+phase: LANDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 6ced7a37
@@ -62,3 +62,5 @@ base: 22d75b31296a3a4fe28cf53a85c51076b8e6d798
 2026-09-05T13:45:54Z review · item aTunedCompass · reason verdict BLOCKED · blockers 2
 
 2026-09-05T14:32:54Z review · item aTunedCompass · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-05T16:32:39Z override · item build-complete · reason Seven of eleven units are CLOSED (1, 4, 5, 6, 7, 8, 10) and four are not. Unit 11 is IMPLEMENTED and committed but its spec stays SPECCED: the unattended kit's driver suite, which carries its three new MAP_CLI arms and eight arms it re-worded, never completed — two attempts, zero output, killed at 50 and 90 minutes. A pristine-tree baseline was equally silent early, so the silence is that suite's buffering rather than a hang this build introduced, but buffering is not evidence of passing. Every other leg over unit 11 is green, and this close's own reuse-probed item exercised its new reader live: '31 probe row(s) recorded for this tree: 15 recall, 16 map'. Units 2, 3 and 9 are UNBUILT by decision: 2 and 3 are blocked on 9, and 9 is the build's largest piece — a sampled, agent-judged fixture plus engine changes binding the audit's graded set per fixture. Starting it without finishing would leave a half-authored question set that unit 3 is due to pin the merge bar against, which is worse than none. Unit 9's spec instead gained a MEASURED candidate pool at rev-5: 165 of 179 distinct logged questions carry a chunk hit in an unanchored file, so the next run inherits the sampling frame. The full account is memory/builds/aTunedCompass/build/2026-09-05-build-TOOL-aTunedCompass-1-run-outcome.md.
