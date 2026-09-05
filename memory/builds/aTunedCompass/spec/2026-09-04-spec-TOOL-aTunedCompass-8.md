@@ -189,8 +189,9 @@ dossier says so, because a zero would read as "the probe pointed at nothing".
 - **AC4** — When the command is run with `CODEBASE_MAP_ROOT` pointed at a scratch tree holding no
   `.git` (or whose `.git` file names a missing gitdir), it still prints its candidates and exits 0,
   no row is written anywhere, and this repository's own `lookups.jsonl` is byte-unchanged across the
-  run. The environment variable is named deliberately: the resolution is `root/.git` plus
-  `commondir`, and `GIT_DIR` reaches none of it — see §4.
+  run. The environment variable is named deliberately: the resolution walks from the map root to its
+  git directory and then through `commondir`, and `GIT_DIR` reaches none of it — see §4, which
+  spells the path form.
 - **AC5** — When `python tools/codebase-map/selftest.py` runs, the new arm passes, and the real
   log's hash is unchanged by the suite run — the arm wrote into its scratch repository, not this one.
 - **AC6** — When `bash tools/check-install-prefix.sh` runs, it stays green: the diff adds no sibling

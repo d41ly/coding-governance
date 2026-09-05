@@ -1,12 +1,13 @@
 # TOOL-aTunedCompass-9 — a recall fixture that can tell the two-set ensemble from its records half
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md) | spec-audit | TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md) | spec-audit | TOOL-aTunedCompass-4 TOOL-aTunedCompass-6 |
 
 <!-- /gen:spec-records -->
 
@@ -39,9 +40,14 @@ owner blocked `TOOL-aTunedCompass-2` and `TOOL-aTunedCompass-3` on this unit.
   there is no record document to return, and the same mechanism discriminates perfectly. No second
   expectation vocabulary is invented; the population is narrowed instead.
 - **S2b** — the sampled questions are FILTERED BY MEASUREMENT before they enter the set: a candidate
-  is kept only when `records:fts5` alone fails to retrieve the judged answer at the report's `k`
-  while `chunks:fts5` retrieves it. AC1 is then true by construction rather than by ranking luck,
-  which is what "a set that saturates has failed this unit's only real requirement" actually demands.
+  is kept only when `chunks:fts5` actually retrieves the judged answer at the report's `k`. The
+  records-side half of this filter is deleted, because it cannot reject anything: every declared
+  target of every admitted question sits in an unanchored file by S1, so `expected_by_target` records
+  no target at all, `score()` takes `want` as the empty set, and `records` scores 0.000 for the
+  question — not "below 1.000 if the ranking cooperates", but zero by construction. A filter that
+  cannot reject a member of its own population is a check that cannot fail. What remains is the half
+  that CAN reject: a question whose passage the chunk substrate does not retrieve either is a
+  question about nothing, and it is dropped.
 - **S3** — questions are SAMPLED from the live query log rather than hand-authored. The log at the
   git common dir holds 130 distinct real questions with the terms their session supplied and the
   paths each was shown. Sampling from it removes the authorship bias the parent report flagged in its
@@ -66,6 +72,22 @@ owner blocked `TOOL-aTunedCompass-2` and `TOOL-aTunedCompass-3` on this unit.
   this, a second fixture is unaudited on the day it lands and stays unaudited until somebody
   remembers to widen a constant — and `TOOL-aTunedCompass-3` is to pin the merge bar against this
   population, so an unaudited set would become the bar's basis. Derive over author.
+- **S5c-i** — and the audit grades each fixture against THE SET ITS TARGETS LIVE IN, which is the
+  half that makes S5c safe rather than fatal. Today `measure_run` does `docs = bench.load(data,
+  pin["set"])` (`:179`) and the pin is `records:fts5:r@5>=0.81`, so the audit always grades in
+  `records`. This unit's set is built so that NO question resolves a `records` target — that is S1,
+  and it is the whole point — and `check_audit` turns an unresolved target into a failure reading
+  "resolves no target ... DEAD PROBE rather than a passing 0.000" (`:259`-`:261`). So auditing this
+  fixture against the pin's set reds every question of it, and widening the iteration without this
+  clause also reds `test_audit_green` in `tools/memory-recall/test_recall_floor.py` (`:301`) the day
+  the fixture lands, taking the `recall floor arms` leg with it. Each fixture therefore DECLARES the
+  set its targets resolve in, the audit reads that declaration instead of the pin, and the committed
+  fixture declares `records`, which is what it has always been graded as. The coupling being removed
+  is a coincidence — that the pin's set happened to match the only fixture — not a design.
+- **S5c-ii** — an arm pinning the DEAD PROBE branch itself, so the widened audit cannot pass by
+  finding nothing. A fixture whose declared set resolves no target for any question REDS. Without it,
+  S5c-i's declaration is a knob that can silently disable the audit it was added to preserve, which is
+  the green-by-absence shape this build exists to remove.
 - **S5d** — the new fixture path is claimed as `role = "project-owned"` in
   `tools/memory-recall/kit.toml`, beside the three gov-only files already withheld there, and added
   to the removal line at `WIRE-INTO-PROJECT.md` (`:364`). That kit claims its directory with
@@ -76,6 +98,10 @@ owner blocked `TOOL-aTunedCompass-2` and `TOOL-aTunedCompass-3` on this unit.
 - **S6** — a report, recorded as this build's journal, giving the ensemble comparison the parent
   report could not: `records:fts5` alone against `records:fts5+chunks:fts5` and against
   `records:fts5+chunks:roll`, at a `k` with headroom, over the new set.
+- **S7** — `KIT_MEMORY_RECALL_VERSION` moves, with the paired `gov:kit memory-recall@` marker in
+  `tools/memory-recall/README.md`. S5c, S5c-i and S5c-ii change engine behaviour in
+  `check-recall.py`, which is what the marker exists to record, and `tools/check-kit-versions.sh` reds
+  unless the constant and the marker agree.
 
 ## 3. Non-goals (OUT)
 
@@ -119,11 +145,37 @@ the ten largest run from 71 KB to 205 KB and are review reports, design passes a
 are the documents a passage question is worth asking about, and the ones where returning "the file"
 is the least useful possible answer.
 
-The second half of the design is S2b's filter. Structural unsatisfiability makes a records-alone
-answer impossible for the TARGET; it does not by itself guarantee `records:fts5` scores below 1.000,
-since recall is measured per question over whatever targets that question declares. Keeping only
-candidates that records-alone demonstrably misses at the report's `k` is what turns AC1 from a
-measurement that might come out right into a property the set is built to have.
+**And the guarantee is stronger than rev-3 claimed, which changes what S2b is for.** rev-3 said
+structural unsatisfiability "does not by itself guarantee `records:fts5` scores below 1.000". At
+source it does: `expected_by_target` records a target only `if hits`, so a question all of whose
+targets are unreachable in a set contributes NO entry; `score()` then takes `want` as the empty set
+and returns `0.0` for that question in that set. So AC1 follows from S1 alone, and every question of
+this set scores `records` at exactly 0.000 — which is also what AC3 asserts as a ceiling.
+
+S2b therefore is not the thing that makes AC1 true; S1 is. What S2b still buys is the OTHER
+direction, and it is worth keeping for that alone: a sampled question whose passage the chunk
+substrate cannot retrieve either is a question no configuration answers, and admitting it would pad
+the set with rows that make every ensemble look equally bad. Every declared target of a question must
+sit in an unanchored file — not merely one of them — or the question is not admitted, since a single
+anchored target reintroduces a reachable `records` document and breaks the guarantee for that row.
+
+### Files touched (estimate)
+
+| File | Why |
+|---|---|
+| the new fixture, beside `tools/memory-recall/recall-fixture.json` | the set itself, per F2 |
+| its `_README` section | S5 and S5b: what discriminates, and the provenance actually used |
+| `tools/memory-recall/check-recall.py` | S5c, S5c-i and S5c-ii: iterate every fixture, grade against the declared set, red on a dead one |
+| `tools/memory-recall/test_recall_floor.py` | the `test_audit_green` arm S5c-i must keep green, plus S5c-ii's new arm |
+| `tools/memory-recall/selftest.py` | AC8's arm |
+| `tools/memory-recall/kit.toml` | S5d's `project-owned` claim |
+| `WIRE-INTO-PROJECT.md` | S5d's removal line at `:364` |
+| `tools/memory-recall/recall_conf.py` | `KIT_MEMORY_RECALL_VERSION`, per S7 |
+| `tools/memory-recall/README.md` | the paired `gov:kit memory-recall@` marker |
+
+rev-3 carried no such table, which is how S5c's engine edit came to sit under a §5 line claiming the
+rollback was "deleting one file and one `kit.toml` rule" and under a §7 naming a version-marker leg
+that nothing in the unit fed.
 
 Sampling from the live log matters for a reason beyond bias. The log records what was SHOWN for each
 question, so a sampled question arrives with a candidate answer set already attached, and the
@@ -144,11 +196,12 @@ costs 116% more snippet bytes is worth more than an unmeasured decision to keep 
   declared n, and the report states the cost it measured.
 - a11y — N/A. No user-facing surface.
 - i18n — N/A. The questions are English, sampled from an English corpus; no localisation surface.
-- error / empty / loading states — the state that matters is a fixture question whose targets resolve
-  to NOTHING in a set, which `bench.py` reports as a `ceiling` below 1.00. AC2 reads that number
-  rather than assuming the passages exist.
+- error / empty / loading states — the state that matters is a question whose targets resolve to
+  nothing in the CHUNKS set, reported as a `chunks` ceiling below 1.00: that is a passage the fixture
+  claims and the substrate cannot reach. A `records` ceiling of 0.00 is NOT that hazard — it is the
+  property AC3 requires, and rev-3 wrote the two the same way round.
 - observability — the report in S6 states its n beside every figure, per the build README's rule, and
-  AC4 makes every question traceable to the `qid` it was sampled from.
+  AC5 makes every question traceable to the `qid` it was sampled from.
 - risks — the honest one is that the chunk half still adds nothing once the set discriminates, and the
   answer is then to drop it from the ensemble. That is a legitimate outcome and the unit is worth
   building for it. The second is provenance: agent judgement is weaker than the committed fixture's
@@ -157,8 +210,11 @@ costs 116% more snippet bytes is worth more than an unmeasured decision to keep 
   `records` alone, which is the property the whole unit creates and the one a later edit could
   silently destroy. The durable left-shift is S5c: `--audit-fixture` iterating every fixture rather
   than one constant, so a second set is audited the day it lands.
-- migration / rollback — none; the set is additive and the committed fixture is untouched, which AC5
-  observes. Rollback is deleting one file and one `kit.toml` rule.
+- migration / rollback — the SET is additive and the committed fixture is untouched, which AC6
+  observes; but the unit is not additive-only, because S5c and S5c-i change `check-recall.py`'s
+  grading behaviour. The revert set is the §4 Files-touched table, and the engine half of it is the
+  part that matters: reverting the fixture alone would leave a widened audit iterating a file that is
+  no longer there.
 - user docs — N/A. `help/` pages cover user-facing features; the fixture's own `_README` is the
   documentation, and S5 requires it to state what makes a question discriminating.
 
@@ -166,11 +222,12 @@ costs 116% more snippet bytes is worth more than an unmeasured decision to keep 
 
 - **AC1** — The new set is graded by `bench.py` and `records:fts5` alone does NOT score 1.000 on it
   at the `k` the report uses. A set that saturates has failed this unit's only real requirement.
-- **AC2** — EVERY question in the new set names an `expected_paths` target whose file contributes no
+- **AC2** — EVERY DECLARED TARGET of every question in the new set names a file that contributes no
   document to the `records` set, verified by running `extract_records` over that file and observing
-  zero. That is the S1 restriction stated as an observation, and it replaces rev-1's criterion — a
-  `chunks` ceiling of 1.00 — which was true of any file that has chunks at that path, i.e. every
-  file, and so could not fail.
+  zero. Every target, not merely one per question: a single anchored target reintroduces a reachable
+  `records` document and breaks the guarantee for that row. That is the S1 restriction stated as an
+  observation, and it replaces rev-1's criterion — a `chunks` ceiling of 1.00 — which was true of any
+  file that has chunks at that path, i.e. every file, and so could not fail.
 - **AC3** — `bench.py`'s `ceiling` for the `records` set over the new questions is 0.00 and for the
   `chunks` set is 1.00. The pair is the discrimination made numeric: the expected documents are
   unreachable in one set and present in the other. A `records` ceiling above 0.00 means a question
@@ -184,8 +241,16 @@ costs 116% more snippet bytes is worth more than an unmeasured decision to keep 
 - **AC6** — `python tools/memory-recall/check-recall.py` still exits 0 on the existing fixture. This
   unit adds a set and must not disturb the floor that already passes.
 - **AC7** — `python tools/memory-recall/check-recall.py --audit-fixture` audits the NEW fixture
-  without being told its name, and every question in it is under `OVERLAP_MAX`. The first half is
-  S5c's derivation; the second is the anti-tautology bound the committed set already carries.
+  without being told its name, grades it against the set that fixture DECLARES, and reports a
+  MEASURED overlap below `OVERLAP_MAX` for every question, with no `NOT MEASURED` row. The
+  no-dead-row half is the load-bearing one: graded against the pin's `records` set this fixture
+  produces a DEAD PROBE for every question by construction, so a criterion asking only for "no
+  failures" would be describing a red run. `python tools/memory-recall/test_recall_floor.py` stays
+  green with the widened audit, `test_audit_green` included.
+- **AC7b** — When a fixture declares a set in which no question resolves any target,
+  `python tools/memory-recall/check-recall.py --audit-fixture` REDS and names that fixture. Observed
+  by staging such a fixture, seeing the red, and unstaging it. This is the arm that stops S5c-i's
+  declaration from becoming a switch that turns the audit off.
 - **AC8** — The fixture's `_README` states what makes a question discriminating, including the
   unanchored-file restriction and the provenance the set actually has, and an arm in
   `tools/memory-recall/selftest.py` fails if a question is added whose target file contributes a
@@ -193,14 +258,25 @@ costs 116% more snippet bytes is worth more than an unmeasured decision to keep 
 - **AC9** — When `govkit` applies the memory-recall kit to a scratch target, the new fixture is NOT
   written there, `tools/memory-recall/kit.toml` names it `project-owned` beside the existing three,
   and `WIRE-INTO-PROJECT.md`'s removal line names it.
+- **AC10** — `bash tools/check-kit-versions.sh` exits 0 with `KIT_MEMORY_RECALL_VERSION` moved and
+  the `gov:kit memory-recall@` marker in `tools/memory-recall/README.md` moved to match. S5c changes
+  engine behaviour, and that leg reds unless the constant and the marker agree.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh`, with `recall floor`, `memory hygiene` and `kit version markers`
-the legs that bind. The kit's own self-test suite is `subject = kit` and is held by default, so
-exercising the `selftest.py` arm AC8 requires — which is S5's arm, not S6's; S6 is a report and has no
-arm — needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, and the record must say it was run
-that way.
+`bash tools/run-gates/run-gates.sh`, with `recall floor`, `recall floor arms`,
+`memory-recall kit selftest`, `memory hygiene`, `kit version markers`,
+`spec tokens (a spec's own names resolve)` and `govkit selfcheck` the legs that bind. The last four
+were added at rev-4 and each is fed by something in the unit: `kit version markers` by S7's constant
+and its paired marker, `spec tokens` because §6 names paths and that leg is `subject = repo` with no
+guard, `govkit selfcheck` because S5d edits a `kit.toml`, and `recall floor arms` because S5c-i must
+keep `test_audit_green` green — the arm the widened audit would otherwise red the day the fixture
+lands.
+
+`memory-recall kit selftest` and `recall floor arms` are `subject = kit` / `chunk = selftests` and are
+held by default, so exercising AC8's `selftest.py` arm — S5's arm, not S6's; S6 is a report and has no
+arm — and AC7b's dead-probe arm needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, and the
+record must say it was run that way.
 
 ## 8. Open questions
 
@@ -209,14 +285,14 @@ spot-check rate the owner reads at the wrap-up.** The owner-authors option canno
 with no owner turn, and restricting to the 17 `in_shown: true` rows is refused on the unit's own
 terms: S4 requires a defensible n and §8 already calls 17 "probably too few", so that option risks
 failing AC1 by leaving too small a set to demonstrate non-saturation. The surviving option is also the
-most feature-rich — it keeps S3's sampling, satisfies AC4's per-question `qid` traceability, and adds
+most feature-rich — it keeps S3's sampling, satisfies AC5's per-question `qid` traceability, and adds
 the spot-check rate as a stated number rather than an implied one. The judgement for each question is
 written into the fixture record so it can be re-read and overturned without re-deriving the set.
 
 **F2 RESOLVED (agent, 2026-09-05, delegated): a second file beside the existing fixture.** This was the
-recommendation and it is also the only option AC5 makes safe: the existing floor must still exit 0 on
+recommendation and it is also the only option AC6 makes safe: the existing floor must still exit 0 on
 the existing fixture, and a single merged corpus with a per-question kind field puts that guarantee at
-the mercy of every later edit. A second file makes AC5 true by construction, and `TOOL-aTunedCompass-3`
+the mercy of every later edit. A second file makes AC6 true by construction, and `TOOL-aTunedCompass-3`
 then pins against a named population rather than one that can silently grow.
 
 - **F1 — who judges which shown passage answered a sampled question?** The log gives the question and
@@ -241,7 +317,7 @@ then pins against a named population rather than one that can silently grow.
   against saturation. Drains the backlog row `TOOL-aWeighedCompass-18`.
 - rev-2 · 2026-09-05 · F1 and F2 resolved under the standing mandate, M3's rule. F1's owner-authors
   option is unexecutable in a run with no owner turn and the 17-row restriction risks AC1; F2's
-  single-corpus option puts AC5 at the mercy of later edits. Both survivors were the fork's own
+  single-corpus option puts what is now AC6 at the mercy of later edits. Both survivors were the fork's own
   recommendation. No scope, acceptance or gate text moved.
 - rev-3 · 2026-09-05 · round-1 spec audit folded, findings B1, H3, M1, M2, M3 and M7. B1 was the
   set's hardest: `expected_paths` resolves by whole-FILE equality (`bench.py` `:362`-`:365`) and a
@@ -266,6 +342,27 @@ then pins against a named population rather than one that can silently grow.
   resolutions cite AC1, AC4 and AC5 and check 23 reds at CLOSED. M2 — §7 pointed at S6's "arm" when
   S6 is a report; it now names the `selftest.py` arm AC8 actually requires. M7 — §5 restored to the
   full ten labelled lines, which surfaced the distribution risk H3 found independently.
+- rev-4 · 2026-09-05 · round-2 spec audit folded, findings B1, H3, H7, M1, M2 and M7 — all six in
+  rev-3's own fold. B1: AC7 asked `--audit-fixture` for an overlap number it cannot produce for this
+  fixture. `measure_run` grades in the PIN's set (`docs = bench.load(data, pin["set"])`, `:179`) and
+  the pin is `records`, while S1 builds a set no question of which resolves a `records` target — so
+  every row returns `None` and `check_audit` turns each into a DEAD PROBE failure. Worse, S5c's
+  widening would have red `test_audit_green` on the committed set the day the fixture landed, taking
+  the `recall floor arms` leg with it. S5c-i binds the graded set to the FIXTURE rather than to the
+  pin, and S5c-ii reds a fixture whose declared set resolves nothing, so the declaration cannot become
+  a switch that turns the audit off. M2 corrected the design's own claim in the stronger direction:
+  rev-3 said structural unsatisfiability does not guarantee a sub-1.000 records score, and at source
+  it does — `expected_by_target` records a target only `if hits`, so `score()` takes an empty `want`
+  and returns 0.000. AC1 follows from S1 alone; S2b's records-side half could reject nothing in its
+  own population and is deleted, keeping the chunks-side half, which can. AC2 now requires EVERY
+  declared target to be unanchored, since one anchored target breaks the guarantee for that row. H3
+  and M1: the fold inserted a new AC2 and renumbered §6 without re-pointing the citations, so both §8
+  resolutions and three §5 lines resolved cleanly to the WRONG criteria — repointed to AC5, AC6 and
+  AC3, and §5's error/empty line rewritten, since it named a 0.00 `records` ceiling as the hazard when
+  that is the property AC3 requires. H7: no Files-touched table at all, a rollback line calling the
+  unit additive when S5c edits the engine, and `kit version markers` in §7 with nothing feeding it —
+  a table is added, S7 moves the constant and its paired README marker, AC10 observes it. M7: §7 named
+  three of the seven legs this unit actually binds.
 
 ## 10. Reuse audit
 

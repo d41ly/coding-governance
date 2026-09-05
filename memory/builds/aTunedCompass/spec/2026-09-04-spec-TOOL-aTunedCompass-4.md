@@ -1,12 +1,13 @@
 # TOOL-aTunedCompass-4 — the chunk source becomes the rollup, which also de-duplicates the slots
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md) | spec-audit | TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-5 TOOL-aTunedCompass-6 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
+| [2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md) | spec-audit | TOOL-aTunedCompass-6 TOOL-aTunedCompass-9 |
 
 <!-- /gen:spec-records -->
 
@@ -44,10 +45,13 @@ the same mechanism that collapses the repeated paths filling half of every resul
   `TOOL-aTunedCompass-9` reports, and this unit claims nothing about ensemble recall meanwhile. rev-2
   left this item mandating the measurement the same revision's resolution deferred, so a builder
   could not tell whether the unit was done without it.
-- **S7** — a corpus-independent arm in `tools/memory-recall/selftest.py`: over a synthetic fixture
-  where one anchored record holds several matching chunks, the served result set carries that record
-  at most once from the chunk source, and a second record's chunk is present. The arm is observed
-  RED against the pre-change code before it is wired.
+- **S7** — TWO corpus-independent arms in `tools/memory-recall/selftest.py`, one per branch of the
+  parent key, because §4 measures the branches at 0.6% and 99.4% and an arm on the rare one certifies
+  nothing about the common one. (a) ANCHORED: over a synthetic fixture where one anchored record holds
+  several matching chunks, the served result set carries that record at most once from the chunk
+  source, and a second record's chunk is present. (b) UNANCHORED: over a synthetic file with no
+  record anchor at all, several of whose chunks match, the served result set carries that FILE at most
+  once from the chunk source. Each arm is observed RED against the pre-change code before it is wired.
 - **S8** — the duplicate-path rate is measured before and after over the fixture questions, from the
   `shown_paths` field the log already writes, and the delta is recorded with the unit. The measured
   quantity is the TOTAL duplicate-path rate over that field, not a per-source one: `shown_paths` is
@@ -99,10 +103,28 @@ such in §6 rather than left to a reader to infer from a resolved fork.
 
 `_write_set` in `query.py` writes `meta.id` as the document's `id` or its `rec`, and `extract_chunks`
 gives a chunk a `rec` naming the anchored record it sits inside. So for a chunk hit, `hit["id"]` is
-already the parent record id, and `hit["id"] or hit["path"]` is `bench.parent_of` expressed over the
-row shape `search()` returns. The two cannot be a single function: `bench.run_rollup` takes the
-in-memory `docs` list and a `bench.build_index` connection, while `query.py` serves dictionaries
+the parent record id WHERE ONE EXISTS, and `hit["id"] or hit["path"]` is `bench.parent_of` expressed
+over the row shape `search()` returns. The two cannot be a single function: `bench.run_rollup` takes
+the in-memory `docs` list and a `bench.build_index` connection, while `query.py` serves dictionaries
 joined against its own `meta` table.
+
+**The path branch is the OPERATING MODE, not a fallback, and rev-3 had this backwards.** A chunk gets
+`rec` only when a heading line ITSELF defines a record id, and `A_HEADING` requires `#{2,6}`, so an
+H1, a bold-list anchor and a table anchor all leave it unset. Measured over the tracked corpus by
+running `extract_chunks` across every `memory/**/*.md`:
+
+| Chunk documents | Carrying a `rec` | Keyed by path |
+|---|---|---|
+| 20056 | 129 (0.6%) | 19927 (99.4%) |
+
+So for 99.4% of the served chunk arm this change is a PER-PATH cap — at most one hit per file — and
+the per-record behaviour the section is named for is the 0.6% case. That does not sink the unit: a
+per-path cap is exactly what the duplicate-slot problem needs, and S8's measurement is over paths for
+the same reason. What it changes is what may be CLAIMED, and it changes what must be tested: S7's
+arm exercises the 0.6% branch, so a second arm over an UNANCHORED synthetic file is required, or the
+branch the corpus actually takes ships unobserved. The figures above are derived, not authored — the
+command is the one named at the head of this paragraph, and §7's left-shift is to have `extract`
+print the share rather than have a spec retype it.
 
 ### What the fallback costs, stated rather than discovered
 
@@ -133,10 +155,19 @@ assumed. This is AC4 and AC5.
 
 ### Files touched (estimate)
 
-`tools/memory-recall/query.py` and `tools/memory-recall/selftest.py`, plus
-`memory/map/features/memory-recall.md` for the dossier prose refresh a touch owes. The kit version
-constant in `recall_conf.py` bumps with the body change, in every carrier the govkit stamp check
-names.
+| File | Why |
+|---|---|
+| `tools/memory-recall/query.py` | `run_rollup`, `ROLLUP_DEPTH`, the single fused call site S3 extracts, the docstring blocks S4 and S5 |
+| `tools/memory-recall/selftest.py` | S7's two arms, one per parent-key branch |
+| `tools/memory-recall/recall_conf.py` | `KIT_MEMORY_RECALL_VERSION`, which AC9 is built on |
+| `tools/memory-recall/README.md` | the paired `gov:kit memory-recall@` marker at `:3` |
+| `memory/map/features/memory-recall.md` | the dossier prose refresh a touch owes |
+
+The last two rows are not bookkeeping. `tools/check-kit-versions.sh` (`:199`-`:205`) greps
+`KIT_MEMORY_RECALL_VERSION` out of `recall_conf.py` and REDS unless the `gov:kit memory-recall@`
+marker in that README matches it, so the version bump AC9's whole argument rests on has a paired
+carrier that must move in the same commit. rev-3 wrote "in every carrier the govkit stamp check
+names", which names no carrier and left the pair invisible.
 
 ### Migration
 
@@ -208,13 +239,14 @@ sequence rather than asserting a cache hit the version bump forbids.
   `roll` scores above `fts5` at recall@20. That fixture is created by `TOOL-aTunedCompass-2`, which is
   order 2 and BLOCKED, so this criterion is not part of an order-1 Definition of Done and is answered
   when unit 2 lands.
-- **AC5** — **DEFERRED — `TOOL-aTunedCompass-9`.** When
-  `python tools/memory-recall/union.py <data-dir> tools/memory-recall/recall-fixture.json` is run at a
-  `--k` where `records:fts5` alone scores below 1.000, comparing `records:fts5+chunks:fts5` against
-  `records:fts5+chunks:roll`, the result is recorded in the build record, and the §4 paragraph naming
-  the docstring's ensemble claim is rewritten to state which way it came out. F1's resolution defers
-  this until unit 9's discriminating fixture exists; no `--k` on the committed fixture leaves
-  headroom, which is the condition unit 9 was opened to remove.
+- **AC5** — **DEFERRED — `TOOL-aTunedCompass-9`.** When `python tools/memory-recall/union.py` is run
+  over the DISCRIMINATING fixture that unit produces — not the committed one — comparing
+  `records:fts5+chunks:fts5` against `records:fts5+chunks:roll`, the result is recorded in the build
+  record and the §4 paragraph naming the docstring's ensemble claim is rewritten to state which way it
+  came out. The fixture is named here once unit 9 names it. rev-3 left this criterion pointing at
+  `recall-fixture.json` while its own tail said no `--k` on that file leaves headroom, so it stayed
+  unsatisfiable even after the unit it waits on lands — a deferral to an unblocker that does not
+  unblock it.
 - **AC6** — When the module docstring of `tools/memory-recall/query.py` is read, its ranking
   rationale block names the rollup on the chunk arm, and its FORKED header counts the constructs
   including this one.
@@ -250,8 +282,13 @@ touch. The full bar is `bash tools/run-gates/run-gates.sh`, and the kit self-tes
 
 
 **F1 RESOLVED (owner, 2026-09-05): land on the de-duplication result alone, and move the unit to order 1.**
-The de-duplication is measured from the live query log's own `results` field and does not depend on
-the fixture's headroom at all, so it does not wait on `TOOL-aTunedCompass-9`. The recall comparison
+The de-duplication is measured from the live query log's own `shown_paths` field and does not depend
+on the fixture's headroom at all, so it does not wait on `TOOL-aTunedCompass-9`.
+[rev-4 note: the owner's resolution as originally written named the `results` field. S8 corrected
+the field to `shown_paths` at rev-3 — `results` is truncated at `RESULT_CAP = 5` and so answers a
+five-slot prefix rather than the served list — and this clause is amended to match rather than left
+naming a field the same fold refuted. The decision itself, to land on the de-duplication alone, is
+the owner's and is unchanged.] The recall comparison
 does need a `k` with headroom, so AC5 is explicitly deferred until unit 9 reports and this unit
 claims nothing about ensemble recall in the meantime. The rollup's effect on recall becomes a bonus
 the record states honestly either way, which is what this fork recommended.
@@ -292,6 +329,20 @@ the record states honestly either way, which is what this fork recommended.
   S3 required both fusion call sites to change together and then observed neither, so a half-applied
   rollup passed every criterion and would surface only on a corrupted cache; the two call sites are
   now extracted into one, which is the smaller diff and the root-cause fix, and AC10 observes it.
+- rev-4 · 2026-09-05 · round-2 spec audit folded, findings H1, H2, H4 and H6 — all four in rev-3's
+  own fold. H4 is the material one: §4 called the path branch a FALLBACK, and measuring
+  `extract_chunks` over the tracked corpus gives 129 of 20056 chunks carrying a `rec`, so the path
+  branch is 99.4% of the served arm and the per-record behaviour the section is named for is the
+  0.6% case. The unit survives — a per-path cap is what the duplicate-slot problem needs — but the
+  claim is restated and S7 gains a second arm over an UNANCHORED file, because rev-3's single arm
+  exercised only the rare branch. H1 — the F1 RESOLVED block still named `results` after the same
+  fold moved the measurement to `shown_paths`, so the binding resolution contradicted the scope it
+  authorised; amended in place with a bracketed note, the owner's decision left verbatim. H2 — AC5
+  deferred to unit 9 while still naming `recall-fixture.json`, whose lack of headroom is the reason
+  for the deferral, so it stayed unsatisfiable after its unblocker lands; it now names unit 9's
+  discriminating fixture. H6 — Files-touched said "every carrier the govkit stamp check names",
+  naming none; it is now a table, and it carries `README.md`, whose `gov:kit` marker
+  `check-kit-versions.sh` reds on unless it moves with the constant AC9 rests on.
 
 ## 10. Reuse audit
 
