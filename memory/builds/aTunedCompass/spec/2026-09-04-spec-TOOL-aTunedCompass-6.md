@@ -1,11 +1,12 @@
 # TOOL-aTunedCompass-6 — the reuse probe ranks its neighbour pool before it truncates it
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-05-build-TOOL-aTunedCompass-6-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aTunedCompass-6-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-1-spec-audit-round1.md) | spec-audit | TOOL-aTunedCompass-1 TOOL-aTunedCompass-2 TOOL-aTunedCompass-3 TOOL-aTunedCompass-4 TOOL-aTunedCompass-5 TOOL-aTunedCompass-7 TOOL-aTunedCompass-8 TOOL-aTunedCompass-9 TOOL-aTunedCompass-10 TOOL-aTunedCompass-11 |
 | [2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aTunedCompass-4-spec-audit-round2.md) | spec-audit | TOOL-aTunedCompass-4 TOOL-aTunedCompass-9 |
 

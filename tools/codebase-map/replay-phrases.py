@@ -1,0 +1,217 @@
+#!/usr/bin/env python3
+"""Replay the reuse probe over this repo's own recorded phrases, and grade it.
+
+WHAT THIS IS FOR. `reuse_lookup.py` is an orientation instrument, and until this harness existed
+the only way to say whether a change to it made the answers better was to run a few phrases by hand
+and squint. The build records are a ready-made graded corpus: a spec that ran the probe records the
+literal phrase it used, and that spec's section 10 names the seam its author actually chose. That
+pairing is the ground truth -- a human picked the seam, so it grades against judgement rather than
+against every file a unit happened to edit, and it needs no commit-to-id join.
+
+ON NO MERGE-BAR LEG, BY OWNER RULING (2026-08-23, the kit-self-tests split). It grades a corpus and
+costs one probe per phrase, so it is a tool you run when you change the ranker, not a gate. It is
+registered as `project-owned` in `kit.toml` and removed by the copy-install runbook, because a
+harness that parses THIS repo's build records is worth nothing in an adopter's tree and shipping it
+is the `pin-copied-from-another-corpus` defect by another route.
+
+THE CEILING IS ENFORCED HERE, by this script, because there is no runner to inherit it from. A suite
+on no leg still owes a declared wall-clock bound in this repo -- slowness that annoys is never
+fixed, slowness that fails is fixed or re-declared -- so the run is timed and a breach EXITS
+NON-ZERO. `--ceiling` re-declares it for a deliberately larger corpus; there is no way to disable it.
+
+Usage:
+    python tools/codebase-map/replay-phrases.py            # grade every phrase, print the summary
+    python tools/codebase-map/replay-phrases.py --json     # the same, machine-readable
+    python tools/codebase-map/replay-phrases.py --limit 20 # a sample, for a quick before/after
+    python tools/codebase-map/replay-phrases.py            # with no args it also prints the ceiling
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import json
+import pathlib
+import re
+import subprocess
+import sys
+import time
+
+sys.dont_write_bytecode = True  # never leave bytecode in the worktree this kit is installed in
+
+# `abspath`, never `resolve()`: this kit is reachable through a junction, and `resolve()` follows it
+# to the link target, so this entrypoint would disagree with `map_lib.kit_dir()` about the install
+# prefix the two of them stamp into byte-compared artifacts. The kit's own selftest asserts it.
+KIT = pathlib.Path(os.path.abspath(__file__)).parent
+sys.path.insert(0, str(KIT))
+
+import map_lib as m  # noqa: E402
+import reuse_lookup as rl  # noqa: E402
+
+# THE DECLARED CEILING, in seconds, for the whole run. MEASURED, not guessed: the full corpus of
+# 140 phrases grades in ~3s, because the corpus is loaded ONCE and each phrase is an in-process
+# rank rather than a subprocess. 60s is ~20x that -- room for the corpus to grow severalfold, and
+# still low enough to FIRE if a change makes the ranker pathological.
+#
+# The first draft of this line said 600s "because the probe is ~1.1s and a full replay is minutes",
+# which was reasoning about a subprocess-per-phrase design this file does not have. A 600s ceiling
+# over a 3s run is a bound that cannot fail, which is the shape this repo gates hardest against.
+# Re-declare it with --ceiling and say why; do not quietly raise it.
+CEILING_S = 60.0
+
+# A probe invocation inside a build record. The phrase may WRAP across lines, which is the whole
+# reason this is a parser and not a grep: the parent measurement graded 133 phrases and a
+# single-line pattern reaches only about half of them.
+_INVOKE = re.compile(r'reuse_lookup\.py\s+"([^"]*)"', re.S)
+# A placeholder rather than a real phrase -- `"<behaviour>"`, `"<any phrase>"`.
+_PLACEHOLDER = re.compile(r"^\s*<[^>]*>\s*$")
+# Section 10's backticked path-shaped tokens: the seam the author chose.
+_SEC10 = re.compile(r"^##\s*10\.", re.M)
+_NEXTSEC = re.compile(r"^##\s+", re.M)
+_PATH = re.compile(r"`([A-Za-z0-9_./-]+\.(?:py|sh|js|md|json|toml))`")
+
+
+def _repo_root() -> pathlib.Path:
+    return m.repo_root()
+
+
+def tracked_specs(root: pathlib.Path) -> list[str]:
+    out = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "--", "memory/builds"],
+        capture_output=True, text=True, check=True,
+    ).stdout.split()
+    return [p for p in out if p.endswith(".md")]
+
+
+def phrases_from(root: pathlib.Path, rel: str) -> list[tuple[str, list[str]]]:
+    """Every (phrase, ground-truth paths) pair a spec carries.
+
+    The ground truth is the section-10 path set for the WHOLE document, which is the seam its
+    author recorded. A spec running several probes shares one section 10, and that is correct:
+    the author chose one seam after running them.
+    """
+    try:
+        text = (root / rel).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    # Join wrapped invocations: the phrase is whatever sits between the quotes, newlines and the
+    # markdown continuation indent collapsed to single spaces.
+    found = []
+    for mo in _INVOKE.finditer(text):
+        raw = mo.group(1)
+        phrase = " ".join(raw.split())
+        if not phrase or _PLACEHOLDER.match(phrase):
+            continue
+        found.append(phrase)
+    if not found:
+        return []
+    truth = _section10_paths(text)
+    return [(p, truth) for p in dict.fromkeys(found)]
+
+
+def _section10_paths(text: str) -> list[str]:
+    mo = _SEC10.search(text)
+    if not mo:
+        return []
+    rest = text[mo.end():]
+    nxt = _NEXTSEC.search(rest)
+    body = rest[: nxt.start()] if nxt else rest
+    return sorted(set(_PATH.findall(body)))
+
+
+def grade(corpus, ref, phrase: str, truth: list[str]) -> dict:
+    """Rank one phrase and locate the first ground-truth path in the shortlist."""
+    sl = rl.assemble_shortlist(phrase, corpus, ref)
+    files = [(r.candidate.file or "") for r in sl.ranked]
+    rank = None
+    for i, f in enumerate(files, 1):
+        if f and any(f == t or f.endswith("/" + t) or t.endswith("/" + f) for t in truth):
+            rank = i
+            break
+    return {
+        "phrase": phrase,
+        "truth": truth,
+        "n_ranked": len(sl.ranked),
+        "rank": rank,
+        "hit": rank is not None,
+        "hit5": rank is not None and rank <= 5,
+        "hit10": rank is not None and rank <= 10,
+    }
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--json", action="store_true", help="machine-readable output")
+    ap.add_argument("--limit", type=int, default=0, help="grade only the first N phrases")
+    ap.add_argument("--ceiling", type=float, default=CEILING_S,
+                    help=f"wall-clock ceiling in seconds (declared: {CEILING_S:g})")
+    args = ap.parse_args()
+
+    if not args.json:
+        print(f"# replay-phrases: declared wall-clock ceiling {args.ceiling:g}s "
+              f"(default {CEILING_S:g}s) — a breach EXITS NON-ZERO")
+
+    t0 = time.monotonic()
+    root = _repo_root()
+    pairs: list[tuple[str, list[str]]] = []
+    for rel in tracked_specs(root):
+        pairs.extend(phrases_from(root, rel))
+    # de-duplicate on the phrase, keeping the first ground truth seen
+    seen: dict[str, list[str]] = {}
+    for p, t in pairs:
+        seen.setdefault(p, t)
+    graded = [(p, t) for p, t in seen.items() if t]
+    ungraded = len(seen) - len(graded)
+    if args.limit:
+        graded = graded[: args.limit]
+
+    corpus = rl.load_corpus()
+    ref = m.build_reference_index(corpus.symbol_files)
+    rows = [grade(corpus, ref, p, t) for p, t in graded]
+
+    hits = [r for r in rows if r["hit"]]
+    ranks = sorted(r["rank"] for r in hits)
+    median = ranks[len(ranks) // 2] if ranks else None
+    elapsed = time.monotonic() - t0
+
+    summary = {
+        "phrases_graded": len(rows),
+        "phrases_without_ground_truth": ungraded,
+        "hit_rate": round(len(hits) / len(rows), 3) if rows else None,
+        "hit5_rate": round(sum(r["hit5"] for r in rows) / len(rows), 3) if rows else None,
+        "hit10_rate": round(sum(r["hit10"] for r in rows) / len(rows), 3) if rows else None,
+        "median_rank_of_first_correct": median,
+        "elapsed_s": round(elapsed, 1),
+        "ceiling_s": args.ceiling,
+        "corpus_symbols": corpus_symbol_count(corpus),
+    }
+
+    if args.json:
+        print(json.dumps({"summary": summary, "rows": rows}, indent=2, sort_keys=True))
+    else:
+        print(f"# graded {summary['phrases_graded']} phrase(s); "
+              f"{summary['phrases_without_ground_truth']} carried no section-10 ground truth")
+        print(f"hit rate                    {summary['hit_rate']}")
+        print(f"hit@5                       {summary['hit5_rate']}")
+        print(f"hit@10                      {summary['hit10_rate']}")
+        print(f"median rank of first correct {summary['median_rank_of_first_correct']}")
+        print(f"elapsed                     {summary['elapsed_s']}s against a {args.ceiling:g}s ceiling")
+
+    if not rows:
+        print("replay-phrases: REFUSING — graded 0 phrases, so every figure above is vacuous. "
+              "A run that finds nothing is not a passing run.", file=sys.stderr)
+        return 2
+    if elapsed > args.ceiling:
+        print(f"replay-phrases: CEILING BREACHED — {elapsed:.1f}s against {args.ceiling:g}s. "
+              "Fix the cost or re-declare the ceiling with a reason; do not raise it quietly.",
+              file=sys.stderr)
+        return 1
+    return 0
+
+
+def corpus_symbol_count(corpus) -> int:
+    return sum(1 for c in corpus.candidates.values() if c.kind)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

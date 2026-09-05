@@ -240,10 +240,26 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     ranked: list[Ranked] = []
     for name, reason in seeds.items():
         ranked.append(_rank(pool, corpus.threshold, ref_index, name, True, reason))
-    for name, reason in sorted(neighbours.items())[:NEIGHBOUR_CAP]:
-        ranked.append(_rank(pool, corpus.threshold, ref_index, name, False, reason))
 
-    ranked.sort(key=lambda r: (not r.is_seed, -r.fanin, r.candidate.name))
+    # RANK THE WHOLE NEIGHBOUR POOL, THEN CAP. The cap used to slice `sorted(neighbours.items())`,
+    # which is ALPHABETICAL, so the twelve slots went to the twelve names that sort earliest and
+    # `_rank` only ever saw those twelve -- the sort below then ordered a pool the alphabet had
+    # already chosen. Measured at base c4fcf5ad on the phrase this unit's spec records: every class
+    # name here starts uppercase and every function name does not, ASCII orders uppercase first, so
+    # a seed set containing one class filled all twelve slots from the 28 class names before any of
+    # the 616 functions was considered. The twelve retained summed to fan-in 8; the twelve the
+    # ranking keeps sum to 271, and the two sets do not intersect.
+    #
+    # Cost: `_rank` is one `fan_in` lookup per name, so this ranks the pool rather than a slice of
+    # it. That is the price of the cap meaning anything, and it is paid once per probe.
+    neighbour_ranked = [
+        _rank(pool, corpus.threshold, ref_index, name, False, reason)
+        for name, reason in sorted(neighbours.items())
+    ]
+    neighbour_ranked.sort(key=_shortlist_key)
+    ranked.extend(neighbour_ranked[:NEIGHBOUR_CAP])
+
+    ranked.sort(key=_shortlist_key)
     return Shortlist(query, ranked, corpus.recall_dark, corpus.threshold, _counts(corpus))
 
 
@@ -266,6 +282,18 @@ def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -
             scored.append((cand, fanin))
     scored.sort(key=lambda cf: (-cf[1], cf[0].name))
     return scored[:top]
+
+
+def _shortlist_key(r: Ranked) -> tuple:
+    """THE ordering key, stated once and read twice: once to CAP the neighbour pool, once to sort
+    the shortlist that is printed.
+
+    A second, retyped copy is exactly how the cap came to select by a criterion nobody chose --
+    the slice was alphabetical while the sort was by fan-in, so the two disagreed silently and the
+    ranking only ever ran on what the alphabet had already kept. Seeds sort first and are never
+    capped; within a group it is descending fan-in, then name for a stable tie-break.
+    """
+    return (not r.is_seed, -r.fanin, r.candidate.name)
 
 
 def _rank(pool: dict[str, Candidate], threshold: int, ref_index: dict[str, set[str]],
@@ -302,6 +330,13 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
         f"# corpus: {cc.get('symbol', 0)} symbols | {cc.get('inventory', 0)} inventory keys | "
         f"{cc.get('affordance-seam', 0)} affordance seams | {cc.get('shared-seams', 0)} dossiers",
         f"# a seam = fan-in >= {shortlist.threshold} (SEAM_FANIN_THRESHOLD)",
+        # What the neighbour ranking does NOT mean. Twelve high-fan-in names read as twelve SEAMS
+        # to everybody who did not write the ranker, and the fan-in behind them counts bare
+        # identifier tokens with no symbol resolution (TOOL-aScouredKit-16) -- so a common short
+        # name scores high for reasons that have nothing to do with reuse. The line discloses the
+        # signal's limit rather than repairing it, which is a different unit.
+        "# neighbours are ranked by fan-in, which counts NAME TOKENS and resolves no symbols:",
+        "# a high rank means 'this name appears a lot', never 'this is the seam you want'",
         "",
     ]
     if shortlist.empty:

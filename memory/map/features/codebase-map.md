@@ -69,6 +69,23 @@ repo-wide python-launcher seam rather than anything this feature owns.
   define the same names in two files, and `fan_in()` counts the twin as a reference. Measured: with
   the templates indexed, two `test_*` functions outranked `walk_dir_keys` in the reuse shortlist.
 
+## How the neighbour cap selects
+
+- **The cap slices the RANKED pool, and the ordering key is stated ONCE.** `_shortlist_key` is read
+  twice — to cap the neighbours, and to sort the shortlist that prints — because a retyped second
+  copy is how the two came to disagree: the cap sliced `sorted(neighbours.items())`, which is
+  ALPHABETICAL, while the sort below it ordered by fan-in. `_rank` therefore only ever saw the
+  twelve names that sorted earliest, and the ranking ran on a pool the alphabet had already chosen.
+  Measured at base `c4fcf5ad`: the twelve retained summed to fan-in 8, the twelve the ranking keeps
+  sum to 271, and the two sets do not intersect.
+- **What the reorder is worth, measured rather than assumed.** Replayed over 140 recorded probe
+  phrases graded against the seam each spec's own §10 names: hit rate 0.579 → 0.600, while hit@5,
+  hit@10 and the median rank of the first correct answer are all UNCHANGED at 0.371, 0.400 and 2.
+  So the change is correct at source and its effect on the ranks a reader actually looks at is
+  nil on this corpus. The instrument is `replay-phrases.py`, which is `project-owned` and on no leg.
+- **The printed header discloses what the ranking does not mean.** Fan-in counts name tokens and
+  resolves no symbols, so a high rank means "this name appears a lot", never "this is your seam".
+
 ## Reuse affordance
 
 seam: map_lib — reuse for dossier/baseline parsing, deterministic rendering, coverage asserts and

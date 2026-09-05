@@ -14,6 +14,18 @@ role = "engine"
 include = ["map_extractors.py"]
 role = "project-owned"
 
+# The replay harness is GOV-ONLY. It parses THIS repo's build records for probe phrases and their
+# section-10 ground truth, so in an adopter's tree it grades a corpus that does not exist — the
+# `pin-copied-from-another-corpus` shape by another route. Withheld by CLAIMING its destination,
+# exactly as `map_extractors.py` above: govkit has no `exclude` key, a `**` rule's pool drops only
+# what another rule owns, and `project-owned` is absent from LANDABLE_ROLES so `apply` never writes
+# it. NOTE THE SCOPE, and it is the half a reader misses: this withholds it from `govkit apply`
+# ONLY. The copy-install path WIRE-INTO-PROJECT.md documents is a plain `cp -r` of the kit dir and
+# does not read this file, so that runbook removes it separately.
+[[files]]
+include = ["replay-phrases.py"]
+role = "project-owned"
+
 [[files]]
 include = ["map_extractors.template.py"]
 role = "seed"

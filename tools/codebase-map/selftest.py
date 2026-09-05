@@ -947,6 +947,68 @@ def test_reuse_shared_primitives(tmp: Path):
         pass
 
 
+def test_neighbour_cap_ranks_before_truncating(tmp: Path):
+    """The neighbour cap slices the RANKED pool, not the alphabetical one.
+
+    The fixture is built so the two orderings cannot agree: `zzz_hub` has the highest fan-in in the
+    pool and sorts LAST by name, while a run of `aa_*` names with fan-in 0 sorts first. Under the
+    shipped code the cap took `sorted(neighbours.items())[:CAP]`, so `_rank` never even saw
+    `zzz_hub` and the printed shortlist was the twelve alphabetically-first names ordered by a
+    fan-in that had already been thrown away.
+
+    Observed RED against the shipped ordering before it was written: `zzz_hub` was absent from the
+    shortlist and the zero-fan-in filler was present.
+    """
+    import os
+
+    cap = rl.NEIGHBOUR_CAP
+    (tmp / ".codebase-map.conf").write_text(
+        "MAP_ROOT=memory/map\nSEAM_FANIN_THRESHOLD=3\n", encoding="utf-8")
+    gen = tmp / "memory" / "map" / "generated"
+    gen.mkdir(parents=True)
+
+    # One seed (matched by name stem), then MORE THAN `cap` same-kind neighbours whose names sort
+    # before `zzz_hub`. Filler count is derived from the cap so the arm cannot rot if the cap moves.
+    filler = [f"aa_pad_{i:02d}" for i in range(cap + 3)]
+    syms = [{"id": "slugify", "kind": "function", "file": "src/text.py"}]
+    syms += [{"id": n, "kind": "function", "file": f"src/{n}.py"} for n in filler]
+    syms += [{"id": "zzz_hub", "kind": "function", "file": "src/hub.py"}]
+    (gen / "symbols.json").write_text(m.render_symbols_json(syms), encoding="utf-8")
+    (tmp / "memory" / "map" / "features").mkdir(parents=True)
+
+    src = tmp / "src"
+    src.mkdir()
+    (src / "text.py").write_text("def slugify(s):\n    return s\n", encoding="utf-8")
+    (src / "hub.py").write_text("def zzz_hub(s):\n    return s\n", encoding="utf-8")
+    for n in filler:
+        (src / f"{n}.py").write_text(f"def {n}(s):\n    return s\n", encoding="utf-8")
+    # zzz_hub is referenced from many files -> the highest fan-in in the pool. The filler is
+    # referenced from none -> fan-in 0. Nothing references slugify, so the seed stays a seed.
+    for i in range(6):
+        (src / f"ref{i}.py").write_text("from hub import zzz_hub\nx = zzz_hub(1)\n", encoding="utf-8")
+
+    os.environ["CODEBASE_MAP_ROOT"] = str(tmp)
+    try:
+        corpus = rl.load_corpus()
+        ref = m.build_reference_index(corpus.symbol_files)
+        sl = rl.assemble_shortlist("normalise a display name into a url slug", corpus, ref)
+        neighbours = [r for r in sl.ranked if not r.is_seed]
+        names = [r.candidate.name for r in neighbours]
+
+        assert neighbours, "the fixture produced no neighbours at all — it proves nothing"
+        assert len(neighbours) <= cap, f"the cap was not applied: {len(neighbours)} > {cap}"
+        assert "zzz_hub" in names, (
+            "the highest-fan-in neighbour was truncated before it could be ranked — the cap is "
+            f"still slicing the alphabetical pool: {names}"
+        )
+        assert names[0] == "zzz_hub", f"the ranked cap must keep fan-in order: {names}"
+        # and the ordering is descending fan-in, which is the key the shortlist sort also reads
+        fanins = [r.fanin for r in neighbours]
+        assert fanins == sorted(fanins, reverse=True), fanins
+    finally:
+        os.environ.pop("CODEBASE_MAP_ROOT", None)
+
+
 def test_reuse_lookup(tmp: Path):
     """AC3 on a portable FIXTURE repo (no host-repo paths): a planted `slugify` seam is ranked
     above unrelated symbols for a behaviour query; a no-home query returns 'no seam fits'; and a
@@ -1400,6 +1462,11 @@ def main() -> int:
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check("reuse-lookup shortlist (AC3 fixture)", lambda: test_reuse_lookup(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check(
+            "the neighbour cap slices the RANKED pool, not the alphabetical one",
+            lambda: test_neighbour_cap_ranks_before_truncating(Path(td)),
+        )
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "closing loop: collisions + backlog dedup (S5 / AC4)", lambda: test_detect_collisions_and_backlog(Path(td))
