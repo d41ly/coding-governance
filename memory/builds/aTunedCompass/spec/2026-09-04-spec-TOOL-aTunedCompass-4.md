@@ -54,8 +54,12 @@ the same mechanism that collapses the repeated paths filling half of every resul
   documented in-code as "Paths only" (`tools/memory-recall/query.py` `:1251`) and carries no `set`
   label, so the records arm contributes the same path indistinguishably. The only field carrying
   `set` is `results`, and it is truncated at `RESULT_CAP = 5` (`:136`, emitted at `:1241`), so it
-  answers a five-slot prefix rather than the served list. One field, one population, and the
-  qualifier "from the chunk source" is dropped wherever it appeared — see §4.
+  answers a five-slot prefix rather than the served list. One field, one population.
+
+  **The per-source qualifier is dropped from the LOG-DERIVED criteria only** — AC1 and AC3. S7's arm
+  keeps it, and legitimately: that arm builds its own synthetic fixture, so it knows which record each
+  slot came from without needing a label the log does not carry. A measurement over live rows and an
+  assertion over a constructed one are not the same observation, and only the first is blind here.
 
 ## 3. Non-goals (OUT)
 
@@ -178,8 +182,9 @@ sequence rather than asserting a cache hit the version bump forbids.
   measurement that already prices it. A second risk is asserting the ensemble result instead of
   measuring it, which S6 and AC5 exist to prevent.
 - testing + left-shift gates — S7 and S8, with the arm's red observed before it is wired.
-- migration / rollback — no cache version bump, no index change, and the diff is confined to one
-  helper and two call sites, so a revert is a revert.
+- migration / rollback — no CACHE_VERSION bump and no index change; one forced rebuild attributable
+  to `conf_digest`, which §4 Migration prices and AC9 observes. The diff is confined to `run_rollup`
+  and the single fused call site S3 extracts, so a revert is a revert.
 - user docs — the rendered Skill describes the CLI's arguments and not its substrates, so it is
   unchanged. The module docstring is the carrier per S4.
 
