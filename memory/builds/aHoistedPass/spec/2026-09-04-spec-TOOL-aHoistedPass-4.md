@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-4 — the loop ban learns the two spellings that walk past it
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -223,30 +223,49 @@ a symbol and `memory/map/generated/symbols.json` gains no row.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When the pre-change fixtures are fed to `node tools/hooks/agent-cap.js` with the exit
-  code captured without a pipe, `for await (` and `do { … } while ()` both exit `0` with zero bytes
-  of output while the byte-identical plain `for` and `while` bodies both exit `2`. Observed at
-  `c4fcf5ad` before this spec was written, and re-run at the landing BASE.
-- **AC2** — When the same `for await (` fixture is fed to the widened hook, it exits `2` and stderr
-  names `agent() inside a loop body`.
-- **AC3** — When the braceless `for await (const u of units) await agent(…)` fixture is fed to the
-  widened hook, it exits `2` and stderr names `agent() in a braceless loop body`.
-- **AC4** — When the `do { await agent(…) } while (…)` fixture is fed to the widened hook, it exits
-  `2`.
-- **AC5** — When `grep -cE '\(for\|while\)' tools/hooks/agent-cap.js` runs, it returns `0`, and
-  `grep -nE 'LOOP_HEAD|LOOP_TAIL' tools/hooks/agent-cap.js` names two declarations plus six use
-  sites at the former line numbers `705`, `711`, `738`, `910`, `934` and `944`. All six moved, and
-  the observation is a count rather than a reading.
-- **AC6** — When the four DENY arms are staged into `tools/hooks/agent-cap.test.sh` WITHOUT the
-  widening, `bash tools/hooks/agent-cap.test.sh` fails naming all four. Unstage, land the widening,
-  and it exits `0`. A gate whose failing case has not been observed is an assertion about nothing.
-- **AC7** — When the control arms run, a `obj.do({ … agent(x) … })` member call and a `do {`
-  appearing inside a prompt STRING both still exit `0`, and the plain `for` and `while` arms still
-  exit `2`. The widened predicate denies more and nothing else.
-- **AC8** — When `git ls-files -z '*.js' | xargs -0 grep -nE 'for[[:space:]]+await|(^|[^.[:alnum:]_$])do[[:space:]]*\{'`
-  runs after the change, it still reports zero hits over all eight tracked JavaScript files, and
-  `bash tools/workflows/check-verifier-fanout.sh` exits `0`. No tracked workflow script is newly
-  denied.
+**AC1 to AC8 were written for a widening this unit no longer builds, and are REWRITTEN here rather
+than left standing.** Leaving them would be the `amendment-leaves-its-other-half-standing` class the
+checklist selected for this very commit: the scope items were struck at rev-2 and these criteria
+still demanded the struck work, one of them (old AC5) naming symbols that do not exist and asserting
+a count that cannot be reached. What replaces them is VERIFICATION at the run's BASE, which is what
+section 2 says this unit now owes for S1 to S3.
+
+**The loss, stated rather than papered over.** Old AC6 required the failing case to be observed —
+arms staged without the widening, RED, then unstaged. That is unobservable now: the widening is
+already in the tree. `TOOL-aWeldedTribunal-1` made that observation and this run did not, so this
+unit inherits the arms without inheriting the proof that they can fail. It is written here because a
+gate whose failing case nobody in this run has seen is exactly what this repo refuses to call
+covered.
+
+- **AC1** — When `tools/hooks/agent-cap.js` is read at the landing BASE, `LOOP_KEYWORDS`,
+  `LOOP_HEADER`, `LOOP_HEADER_G` and `LOOP_KEYWORD_TAIL` are declared consecutively at `:476-479`,
+  `LOOP_KEYWORDS` is the single source of the keyword set, and the `do` spelling is present in
+  `LOOP_HEADER` and `LOOP_HEADER_G` and absent from `LOOP_KEYWORD_TAIL`.
+- **AC2** — When the four fixtures are fed to `node tools/hooks/agent-cap.js` with the exit code
+  captured WITHOUT a pipe, all four exit `2`: the `for await (` thunk array, the `do { … } while ()`
+  thunk array, the braceless `for await (const u of units) await agent(…)`, and the inline
+  `do { await agent(…) } while (…)`. A pipe returns the pipe's status, which is how the backlog row
+  this unit closes came to describe a method that cannot have measured what it reports.
+- **AC3** — When the string control is fed to the same hook — the words `for await (x of y)` inside
+  a string literal, with a marked bounded fan alongside — it exits `0`. The predicate denies more
+  and nothing else.
+- **AC4** — When `grep -cE '\(for\|while\)' tools/hooks/agent-cap.js` runs it returns **`1`, not
+  `0`**, and the single hit is the comment at `:461` that documents the fix. This is the
+  `absence-assertion-over-whole-file-text` class named as such: a ban that greps whole file text reds
+  on its own explanation, so the criterion is written to the observed number and not to the
+  aspirational one.
+- **AC5** — When `bash tools/hooks/agent-cap.test.sh` is run BY HAND at the landing BASE it exits
+  `0`, and the four DENY arms plus the string control are present at `:59-67`. Nothing standing
+  re-runs this: section 7 states why.
+- **AC6** — When `bash tools/workflows/check-verifier-fanout.sh` runs it exits `0` over all eight
+  tracked JavaScript files, so no tracked workflow script is denied by the shipped predicate.
+- **AC7** — When `git log --oneline -1 -- tools/hooks/agent-cap.js` is read, the landing of S1 to S3
+  is attributable to `TOOL-aWeldedTribunal-1` and not to this unit, and this unit's own commit
+  touches neither `tools/hooks/agent-cap.js`'s predicate block nor `tools/hooks/agent-cap.test.sh`'s
+  arms.
+- **AC8** — When this unit's diff is read, the only files it changes under `tools/` are the two the
+  residual needs: `tools/hooks/agent-cap.js` (the S4 note and the S5 version constant) and
+  `tools/hooks/README.md` (the S4 note). Every other edit is under `memory/`.
 - **AC9** — When `git grep -lE "gov:kit agent-cap@" -- '*.js'` runs, every file it names carries
   `1.13`, `KIT_AGENT_CAP_VERSION` reads `1.13`, and `bash tools/check-kit-versions.sh` exits `0`.
   With only one carrier moved it exits non-zero naming the other.
@@ -283,9 +302,11 @@ workflow script to this same hook and reports what the hook says (its header, `:
 tracked script contains either spelling — measured, zero of eight — that leg can only ever catch the
 widening reddening an innocent file. It can never observe either new denial.
 
-This unit adds no gate leg. It adds arms to a suite that already exists, on a kit whose self-tests
-were taken off the bar by owner ruling on 2026-08-23, and the compensating check is the hand-run in
-the landing report.
+This unit adds no gate leg, and at rev-3 it adds no arms either — the arms landed with the widening
+under `TOOL-aWeldedTribunal-1`. What it does is RUN that suite by hand at the landing BASE and report
+the result, on a kit whose self-tests were taken off the bar by owner ruling on 2026-08-23. The
+compensating check is that hand-run, and its weakness is stated in section 6: this run inherits arms
+whose failing case it has not itself observed.
 
 ## 8. Open questions
 
@@ -329,6 +350,17 @@ none
   is therefore NARROWED to that residual and to recording the supersession; the M2 route for a
   divergence is to change the spec first, which this row is. Section 8 stays `none`: nothing here is
   a fork.
+- rev-3 - 2026-09-05 - the other half of rev-2's amendment, caught by this build's own bug-class
+  checklist over rev-2's commit: `amendment-leaves-its-other-half-standing`. Section 2 struck S1 to
+  S3 and section 6 still demanded them, so AC1 to AC8 are rewritten to VERIFICATION at the run's
+  BASE. Two defects the rewrite had to fix rather than restate. Old AC5 named `LOOP_HEAD` and
+  `LOOP_TAIL`, which do not exist - the landed shape is `LOOP_KEYWORDS`, `LOOP_HEADER`,
+  `LOOP_HEADER_G` and `LOOP_KEYWORD_TAIL` at `:476-479` - and it asserted
+  `grep -cE '\(for\|while\)'` returns 0, which is UNREACHABLE: the comment at `:461` documenting
+  the fix carries the literal, so the observed count is 1. That is the
+  `absence-assertion-over-whole-file-text` class and AC4 now names it. Old AC6's staged-break is
+  recorded as a LOSS rather than dropped silently: this run cannot observe a failing case for arms
+  that are already in the tree. Section 7's closing paragraph amended with it.
 
 ## 10. Reuse audit
 

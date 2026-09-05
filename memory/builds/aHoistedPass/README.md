@@ -91,7 +91,7 @@ ids DEPL-aHoistedPass-1 TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPas
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aHoistedPass-1 — the record catches up with the verdicts that superseded it](spec/2026-09-04-spec-TOOL-aHoistedPass-1.md) | 1 | 1 | SPECCED | rev-2 | 2026-09-05 |
-| [TOOL-aHoistedPass-4 — the loop ban learns the two spellings that walk past it](spec/2026-09-04-spec-TOOL-aHoistedPass-4.md) | 1 | 1 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-aHoistedPass-4 — the loop ban learns the two spellings that walk past it](spec/2026-09-04-spec-TOOL-aHoistedPass-4.md) | 1 | 1 | SPECCED | rev-3 | 2026-09-05 |
 | [TOOL-aHoistedPass-8 — the recipe-mode question, measured instead of argued](spec/2026-09-04-spec-TOOL-aHoistedPass-8.md) | 1 | 1 | SPECCED | rev-3 | 2026-09-05 |
 | [DEPL-aHoistedPass-1 — a declared kit dependency that is actually checked](spec/2026-09-04-spec-DEPL-aHoistedPass-1.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-05 |
 | [TOOL-aHoistedPass-3 — the build-method budget becomes a number a gate reads](spec/2026-09-04-spec-TOOL-aHoistedPass-3.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-05 |
