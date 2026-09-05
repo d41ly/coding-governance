@@ -1,12 +1,13 @@
 # TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build
 
-**Status:** SPECCED · rev-6 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
+**Status:** CLOSED · rev-7 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-build-TOOL-aHoistedPass-6-1-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aHoistedPass-6-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-prompt-TOOL-aHoistedPass-6-brief.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-6-brief.md) | journal | — |
 | [2026-09-05-prompt-TOOL-aHoistedPass-6-fold-round1.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-6-fold-round1.md) | journal | — |
 | [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
@@ -850,6 +851,40 @@ line is the record of which one does.
   option of taking the correction here considered and REFUSED in writing: `TOOL-aHoistedPass-1` has
   now FILED the residual as a row asserting that no unit of this build edits one, and falsifying a
   landed backlog row to save a follow-up is the drift this build exists to end.
+
+- rev-7 - 2026-09-05 - the build pass. Four divergences from rev-6, and the first three were found
+  while implementing rather than before it, so this line is folded in the SAME commit as the code
+  rather than ahead of it. Saying that plainly is cheaper than implying an ordering the git history
+  would contradict.
+  - **Exit four's `note` composes a prefix the section 4 table does not carry.** The table gives it
+    as `prologue complete; N unit(s) to dispatch` flat. The file's own `degradation-known-but-
+    unreported` rule and a LIVE arm in `unattended-build.test.sh` both require a run that refused
+    specs, or reached a non-CONVERGED verdict, or ran ATTENDED, to say so on the return — so the
+    note is that clause, then ` · `, then the table's sentence. Dropping the clause to match the
+    table literally would have deleted a working arm and re-opened the class the file spends four
+    comment lines on. AC7's `prologue complete` grep is unaffected either way.
+  - **The deleted schema's tombstone comment does not spell its identifier.** AC3 grades
+    `grep -c "BUILD_SCHEMA"` at `0`, unanchored, which is the stronger criterion — it also catches a
+    stale `schema:` option still pointing at the gone constant — and the file's house style for a
+    removed schema is a named tombstone (`AUDIT_SCHEMA` above). The two collide. The criterion won
+    and the tombstone says so in its own words, because an anchored grep would have bought a
+    prettier comment at the cost of the arm that matters.
+  - **Two test arms were retired rather than re-pointed, and section 4's LOST-instruction paragraph
+    is why.** `attended prompt: the per-unit build instruction SURVIVES` and the arm reading
+    `recording verbs are unavailable` out of the BUILD prompt both graded `driverSteps`, which S2
+    deletes. The first is now the child's property and has no witness here at all; the second is
+    re-pointed at `GROUND`, where the attended honesty sentence actually lives and which every stage
+    still carries. A third arm, `AC5 failed disposal: the standing blocker is NAMED`, was written as
+    a bare grep for `b1` and observed GREEN against the unchanged source — the fixture's own
+    `"briefPath":"b1"` satisfied it — so it was tightened to assert the note's text before the source
+    change landed.
+  - **`--dispatch` REFUSED `memory/backlog/TOOL.md`, so S13's own scope item is undeclared.** Check
+    49: a path overlapping a declared `SHARED_RECORDS` entry, `memory/backlog/TOOL.md` against
+    `memory/backlog`. Observed rather than predicted — the declaration was run WITH the path first
+    and refused, then re-run without it. The refusal is about a DISJOINTNESS claim between concurrent
+    passes and this pass is sequential and alone, so no declaration can ever carry the path; the
+    residual, that a unit whose scope files a backlog row has a write no dispatch row records, is
+    parked in `RUN.md`. `TOOL-aHoistedPass-4` took the same route at `4c255e61` earlier in this run.
 
 ## 10. Reuse audit
 

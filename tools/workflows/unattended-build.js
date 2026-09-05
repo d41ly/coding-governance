@@ -2,11 +2,11 @@ export const meta = {
   name: 'unattended-build',
   version: '1.0', // gov:kit unattended-build@1.0 — engine identity (deployed verbatim)
   description:
-    'Drives a build SPEC -> AUDIT -> BUILD as ordered stages of ONE program, so pass order is a property of control flow rather than of an agent recollection across a context that compacts. BUILD is unreachable unless the audit verdict is terminal.',
+    'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal.',
   phases: [
     { title: 'Spec', detail: 'author every missing spec, in the declared order, no code' },
     { title: 'Audit', detail: 'delegate to tier2-review.js as a spec-audit; record the round' },
-    { title: 'Build', detail: 'the units, one at a time, each from its brief and its spec' },
+    { title: 'Disposal', detail: 'dispose every blocker still standing over the whole spec set, then hand out the roster' },
   ],
 }
 
@@ -14,17 +14,20 @@ export const meta = {
 // WHAT THIS BUYS AND WHAT IT CANNOT BUY, first, because the second half is the one a reader will
 // otherwise assume away.
 //
-// IT BUYS STAGE ORDER. The SPEC stage's await completes before the AUDIT stage begins, and BUILD is
-// unreachable except through both AND through a terminal audit verdict. That is JS control flow, not
-// a rule anybody remembers, and it is the whole mechanism: a unit cannot be built before it is
-// specced inside a harnessed run. It is the defect the owner's prompt reports — "build can run
+// IT BUYS STAGE ORDER. The SPEC stage's await completes before the AUDIT stage begins, and the
+// ROSTER HAND-OUT is unreachable except through both AND through a terminal audit verdict. That is
+// JS control flow, not a rule anybody remembers, and it is the whole mechanism: a unit cannot be
+// dispatched before it is specced inside a harnessed run. It is the defect the owner's prompt reports — "build can run
 // BEFORE they are specced with spec written postfactum" — and the one this file closes.
 //
 // IT CANNOT BUY ENFORCEMENT. A Workflow script has NO FILESYSTEM. Every observation it makes is a
 // claim its own agent returned, so nothing here can verify that a spec exists, that a gate passed, or
 // that a commit happened. The refusal that makes the order real lives in the driver, where the tree
-// is readable: `--dispatch` refuses a MISSING, THIN or out-of-order unit, and the `pass-order
-// history` leg refuses a unit whose build commit predates its spec. A stage in this file claiming to
+// is readable — and it refuses LESS than this sentence used to claim. `--dispatch` refuses a unit no
+// tracked spec defines (MISSING) and one whose spec grades THIN, both unconditionally; it grades
+// ORDER only where THIS unit AND the sibling ahead of it BOTH carry an `order` verb, so the order arm
+// is CONDITIONAL and a sibling carrying none stops blocking. The `pass-order history` leg refuses a
+// CLOSED unit whose build commit predates a conforming spec for it. A stage in this file claiming to
 // VERIFY the tree would be the could-not-fail shape this repo names.
 //
 // ---------------------------------------------------------------------------------------------
@@ -41,16 +44,18 @@ export const meta = {
 //   1. the `--review` ROUND RECORD. Nothing records that an audit round happened; the review
 //      artifact under the build's reviews folder is the only trace, and nothing here refuses a run
 //      that never files one.
-//   2. `--dispatch`'s ORDER REFUSAL — the tree-reading check that a unit is not MISSING, THIN or
-//      out of order. What replaces it is weaker BY CONSTRUCTION: an agent's claim about a state
-//      the caller resolved, not a refusal the driver made against the tree.
+//   2. `--dispatch`'s SPEC-STATE AND ORDER REFUSAL — the tree-reading checks that a unit is neither
+//      MISSING nor THIN, plus an order check that fires only where this unit and the sibling ahead
+//      of it BOTH carry an `order` verb. What replaces it is weaker BY CONSTRUCTION: an agent's
+//      claim about a state the caller resolved, not a refusal the driver made against the tree.
 //   3. `--dispatch`'s WRITE-SET RECORD. No declaration of what a pass will write exists.
 //   4. `--brief`'s record of what each pass was handed.
 //   5. `--rescope`'s amendment row.
 //
-// AND M4's BLOCKER-DISPOSAL CLAUSE IS UNREACHABLE HERE. `disposal` below is composed only for a
-// non-CONVERGED verdict, and attended mode reaches BUILD only at zero blockers, which is the
-// terminal one. So a run that must PROMOTE a standing blocker has no route through this mode.
+// AND M4's BLOCKER-DISPOSAL CLAUSE IS UNREACHABLE HERE. The DISPOSAL STAGE below runs only on a
+// non-CONVERGED verdict, and attended mode computes its verdict from the blocker count, so it
+// reaches the hand-out only at zero blockers, which is the CONVERGED one. So a run that must
+// PROMOTE a standing blocker has no route through this mode.
 //
 // THE S7 WARNING DEPENDS ON THE CALLER AND NOT ON DETECTION. A workflow script has no filesystem,
 // so this file cannot see whether a run-state file exists; `runStateExists` is a fact the caller
@@ -81,11 +86,15 @@ export const meta = {
 // the owner rather than worked around, because restructuring a call into a helper the loop invokes
 // would be textually indistinguishable from the evasion the rule names.
 //
-//   1. THE BUILD STAGE IS ONE AGENT holding the ordered unit list, rather than one agent per unit.
-//      The stage order stays structural; per-unit order moves onto `--dispatch`'s refusal, which
-//      reads the tree and is therefore a STRONGER check than a JS loop rather than a weaker one.
-//      SCOPED TO BUILD AT TOOL-aStagedLane-3, which made the SPEC stage a bounded parallel fan of
-//      writers over groups of slices. That does not contradict the ratified `parallelism route:
+//   1. THE DISPOSAL STAGE IS ONE AGENT over the whole spec set, rather than one per blocker — and
+//      since TOOL-aHoistedPass-6 it is the ONLY stage the one-agent shape applies to. The BUILD
+//      stage that held the ordered unit list is GONE: the units are handed back to the caller as an
+//      ordered roster, and the caller makes one main-loop `Workflow` call per unit, which is a call
+//      the fan-out hook actually sees. Per-unit order rests on `--dispatch`'s refusal, which reads
+//      the tree — stronger than a JS loop where it fires, and CONDITIONAL on both this unit and the
+//      sibling ahead of it carrying an `order` verb.
+//      THE SPEC STAGE IS A BOUNDED PARALLEL FAN at TOOL-aStagedLane-3, of writers over groups of
+//      slices. That does not contradict the ratified `parallelism route:
 //      none` above: the verdict failed on E4, two passes COMMITTING without racing one index, and
 //      the spec writers author and never commit — the caller commits once after they return.
 //      Leaving this claim unscoped would have left the file's own header describing a shape it no
@@ -93,8 +102,8 @@ export const meta = {
 //
 //   2. THE CONVERGENCE LOOP LIVES IN THE CALLER, and this file holds the GATE. A convergence loop's
 //      iteration count is data-dependent by definition, so unlike case 1 there is no bounded unroll.
-//      What had to be structural still is: a `CONVERGING` verdict RETURNS without reaching BUILD, so
-//      no caller error can build on a spec set the review is still working through. The owner's
+//      What had to be structural still is: a `CONVERGING` verdict RETURNS an EMPTY roster, so no
+//      caller error can build on a spec set the review is still working through. The owner's
 //      2026-09-01 ruling survives in the half that matters — the verdict decides, and NO round cap
 //      exists anywhere in this file.
 
@@ -181,9 +190,10 @@ const reviewDir = a.reviewDir || 'memory/builds/' + slug + '/reviews'
 const units = Array.isArray(a.units) ? a.units : []
 if (!units.length) {
   throw new Error(
-    'unattended-build: args carries no `units`. The caller derives them from `--plan`, which takes ' +
-      'its set and ORDER from the generated units region; a harness with an empty set would report a ' +
-      'clean run over nothing, which is the vacuous-selector shape this repo refuses.',
+    'unattended-build: args carries no `units`. The caller derives them from `--plan <slug> --paths`, ' +
+      'which takes its set and ORDER from the generated units region and emits each unit\'s spec ' +
+      'path beside it; a harness with an empty set would report a clean run over nothing, which is ' +
+      'the vacuous-selector shape this repo refuses.',
   )
 }
 const roundNo = Number.isInteger(a.round) && a.round > 0 ? a.round : 1
@@ -213,6 +223,10 @@ if (attended && a.runStateExists === true) {
 }
 
 const DRIVER = 'bash tools/unattended/unattended.sh'
+// THE BUG-CLASS CHECKLIST TRAVELS IN `dispatch.args`. It used to be spelled inside the BUILD prompt
+// this unit deletes, and the child cannot carry it: a shipped kit file names nothing outside itself
+// by literal, so the parent that already spells `tools/` paths is where it lives.
+const CHECKLIST = 'python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD'
 const ordered = units.slice().sort(function (x, y) {
   const ox = Number.isInteger(x.order) ? x.order : 1e9
   const oy = Number.isInteger(y.order) ? y.order : 1e9
@@ -233,7 +247,6 @@ function renderRoster(list, buildSlug, briefRoot) {
     .join('\n')
 }
 const roster = renderRoster(ordered, slug, briefDir)
-const allIds = ordered.map(function (u) { return u.id })
 
 // --- the stage return schemas -----------------------------------------------------------------
 // EVERY stage agent returns a schema-validated object, so a stage that cannot answer REFUSES rather
@@ -295,13 +308,22 @@ const SUBJECTS_SCHEMA = {
 // leaving it would be a declaration nothing reads — but its `enum` was load-bearing, so that
 // moved to `REVIEW_TOKENS` at the check rather than being lost with the constant. Deleting a
 // dead schema and silently dropping its enum is how a check gets weaker while looking tidier.
-const BUILD_SCHEMA = {
+// THE BUILD STAGE'S RETURN SCHEMA LIVED HERE AND IS GONE TOO (TOOL-aHoistedPass-6), for the same
+// reason: it bound an AGENT return this program no longer produces. Unlike the one above, nothing
+// of it was load-bearing — the roster is a plain return and the caller's own child validates its
+// unit — so there is no enum to rescue. Its identifier is deliberately NOT spelled here: an absence
+// grep over it is what proves no `schema:` option still points at a constant that is gone.
+//
+// The DISPOSAL stage's return follows the rule two paragraphs up: the list of what it did NOT do is
+// its own required field, never an absence. An empty `standing` with no key at all is
+// indistinguishable from a stage that disposed everything.
+const DISPOSAL_SCHEMA = {
   type: 'object',
-  required: ['committed', 'unbuilt', 'summary'],
+  required: ['disposed', 'standing', 'summary'],
   additionalProperties: true,
   properties: {
-    committed: { type: 'array', items: { type: 'string' } },
-    unbuilt: { type: 'array', items: { type: 'string' } },
+    disposed: { type: 'boolean' },
+    standing: { type: 'array', items: { type: 'string' } },
     summary: { type: 'string' },
   },
 }
@@ -332,7 +354,8 @@ const GROUND =
 // would contend on one git index, which is the recorded experiment E4 that
 // `TOOL-cBriefedPilot-21` ratified `parallelism route: none` on and `TOOL-cBriefedPilot-28`
 // records as never actually run. Authoring-only keeps this stage clear of that verdict instead of
-// contradicting it unremarked; BUILD dispatch stays strictly sequential.
+// contradicting it unremarked; PER-UNIT DISPATCH IS STRICTLY SEQUENTIAL and is the caller's, made
+// one main-loop `Workflow` call at a time off the roster this program returns.
 //
 // SLICES COME FROM THE CALLER, grouped by the declared `order` verb — this runtime has no
 // filesystem and cannot derive a grouping. The caller's slice count bounds NOTHING, so the slices
@@ -408,7 +431,7 @@ const specResults = await boundedParallel(
 //
 // AND AN ALL-DEAD FAN THROWS. The old guard was `if (!specced) throw` on a falsy return; a merged
 // object is always truthy, so without this an entirely dead spec stage would present as a clean
-// object with empty arrays and reach AUDIT and BUILD on whatever specs already existed. That is
+// object with empty arrays and reach AUDIT and the hand-out on whatever specs already existed. That is
 // the refusal this file spends six lines justifying, deleted by accident.
 const specced = { authored: [], alreadyPresent: [], refused: [], summary: '' }
 let liveWriters = 0
@@ -429,7 +452,7 @@ if (!specResults.length || liveWriters === 0) {
   throw new Error(
     'unattended-build: EVERY spec writer returned nothing (' + specGroups.length + ' group(s)), so ' +
       'no unit is known to have a design. That is a refusal and not an empty pass: continuing ' +
-      'would put the BUILD stage on a spec set nothing confirmed exists. A merged return is always ' +
+      'hand out a roster over a spec set nothing confirmed exists. A merged return is always ' +
       'truthy, so this is checked on the LIVE WRITER COUNT and not on the object.',
   )
 }
@@ -464,8 +487,13 @@ phase('Audit')
 // THE FIX IS NOT A BETTER PROMPT. No wording gives an agent a tool it does not hold. But THIS FILE
 // is a workflow script, and the script runtime provides `workflow({scriptPath}, args)` for running
 // another workflow inline as a sub-step. So the spawn does not need to leave the harness — it needs
-// to stop being delegated to something that cannot perform it. Nesting is one level deep and this
-// harness is invoked at the top by the main loop, so the one level is available and is spent here.
+// to stop being delegated to something that cannot perform it. Nesting is a DEPTH limit and not a
+// ration one caller uses up: a parent may make several sequential nested calls at the same depth.
+// The evidence is `wf_9b984206-816`, whose three sequential `await workflow()` calls all returned —
+// CARRIED from an earlier pass and NOT re-run here, which is said rather than asserted as measured.
+// Under the roster hand-out the point is close to moot, since each unit is dispatched by the caller
+// at depth zero; which is exactly why a stale sentence about it would sit unread until it misled
+// somebody.
 //
 // FIRST CALLER IN THE REPO. `grep -rnE '\bworkflow\(' tools/workflows/*.js` returned nothing before
 // this line, which is why S4 OBSERVES the route end to end rather than asserting it.
@@ -614,14 +642,14 @@ if (!rv || typeof rv.token !== 'string') {
 }
 // THE ENUM IS RESTORED. `AUDIT_SCHEMA` carried it and my replacement checked only that the verdict
 // was a non-empty string, so `"ok"` would have passed, failed the `=== 'CONVERGING'` test, and
-// fallen straight through to BUILD. That is weaker than what it replaced, in the direction that
+// fallen straight through to the hand-out. That is weaker than what it replaced, in the direction that
 // matters.
 const REVIEW_TOKENS = ['CONVERGING', 'CONVERGED', 'NON-CONVERGENT', 'CEILING']
 if (REVIEW_TOKENS.indexOf(rv.token) === -1) {
   throw new Error(
     'unattended-build: the driver returned "' + rv.token + '", which is not one of ' +
       REVIEW_TOKENS.join(', ') + '. An unknown token is not CONVERGING, so it would fall through ' +
-      'to BUILD — refusing instead.',
+      'to DISPOSAL and the hand-out — refusing instead.',
   )
 }
 const au = { verdict: rv.token, blockers: auRaw.blockers, reportPath: lastReport }
@@ -638,13 +666,13 @@ if (au.verdict === 'CONVERGING' && au.blockers === 0) {
 const verdict = au.verdict
 log('audit round ' + roundNo + ': ' + verdict + ' · blockers ' + au.blockers)
 
-// THE GATE. `CONVERGING` means the review loop has not ended, so BUILD is UNREACHABLE and this
+// THE GATE. `CONVERGING` means the review loop has not ended, so the ROSTER IS EMPTY and this
 // returns to the caller with what it needs to fold and come back. The three terminal states admit
-// it; what the two NON-CLEAN ones additionally carry is M4's disposal instruction, built into the
-// BUILD prompt below rather than asserted here. An earlier revision of this comment claimed the
-// promotion happened and no line of the program did it.
+// the hand-out; what the two NON-CLEAN ones additionally carry is M4's disposal instruction, which
+// is the DISPOSAL STAGE below rather than a claim asserted here. An earlier revision of this comment
+// claimed the promotion happened and no line of the program did it.
 if (verdict === 'CONVERGING') {
-  log('audit is still CONVERGING — BUILD is not reachable this invocation; fold, then re-invoke at round ' + (roundNo + 1))
+  log('audit is still CONVERGING — no roster this invocation; fold, then re-invoke at round ' + (roundNo + 1))
   return {
     slug: slug,
     // THE MODE TRAVELS ON THIS RETURN TOO. It is the path an attended run takes on every
@@ -660,8 +688,11 @@ if (verdict === 'CONVERGING') {
     blockers: au.blockers,
     lastReport: lastReport,
     skippedTerminal: [],
-    built: 0,
-    unbuilt: allIds,
+    // EVERY NON-THROWING EXIT CARRIES `roster`, so `roster.length === 0` is the caller's whole stop
+    // condition. This return carried no such key at all, while the Skill bullet told the run that an
+    // empty roster is the refusal — a caller reading `roster.length` read a property of `undefined`
+    // and threw. `built` and `unbuilt` left with the stage that produced them.
+    roster: [],
     nextAction:
       'FOLD the confirmed findings in ' + lastReport + ' as rev-N bumps with their section 9 lines, ' +
       'then re-invoke this harness with round: ' + (roundNo + 1) + '. Do not build.',
@@ -670,39 +701,72 @@ if (verdict === 'CONVERGING') {
   }
 }
 
-// ============================================================== STAGE 3 — BUILD
-// ONE AGENT holding the ordered list. Sequential is still the contract and the agent is told so
-// explicitly; what ENFORCES it is `--dispatch`, which reads the tree and refuses a unit that is
-// MISSING, THIN or out of the build's declared order.
+// ============================================================== STAGE 3 — DISPOSAL
+// A WHOLE-SET ACT, and that is why it is its own stage rather than an instruction carried into the
+// first unit's pass. Disposal is authority over EVERY unit's spec, not over one unit's: carrying it
+// into the first child would place it on whichever unit happens to be first, and a resumed run whose
+// first roster element is already built would place it on a child that does nothing.
 //
-// ON A NON-CLEAN TERMINAL VERDICT THE BLOCKERS ARE DISPOSED FIRST, and that instruction is CARRIED
-// rather than asserted. The comment above the gate used to claim promotion happened at the exit and
-// nothing did it: control fell from a CONVERGING-only early return straight into this stage, the
-// report path was computed and discarded, and the BUILD prompt never mentioned a blocker. So on
-// `NON-CONVERGENT` and `CEILING` — the two states that structurally guarantee standing blockers,
-// since the driver emits CONVERGED only at a count of 0 — the harness built a spec set with open
-// blockers. This build itself exited NON-CONVERGENT at round 3, so the path is reached rather than
-// hypothetical.
-const disposal =
-  verdict === 'CONVERGED'
-    ? ''
-    : 'BEFORE ANY UNIT IS BUILT, DISPOSE of every blocker still standing in `' + lastReport + '` — ' +
-      'the audit exited ' + verdict + ' with ' + au.blockers + ' confirmed. BUILD-METHOD M4 admits ' +
-      'exactly two dispositions and no third: FOLD one that is a defect in a document the review ' +
-      'already read, as a rev-N bump with its section 9 line; PROMOTE one needing a MECHANISM this ' +
-      'build lacks, through `' + DRIVER + ' --rescope ' + slug + ' --act add --item <id>`, then spec ' +
-      'it at its tier and build it like any other. Never parked, never waived, never retired, never ' +
-      're-reviewed. Report what you did with each. '
-phase('Build')
-log('build stage: ' + ordered.length + ' unit(s), one at a time, each from its brief and its spec')
+// The instruction used to be a string prepended to the BUILD prompt, so it was carried by the agent
+// TOOL-aHoistedPass-6 deletes. Before that it was not carried at all: the comment above the gate
+// claimed promotion happened at the exit and no line of the program did it. So on `NON-CONVERGENT`
+// and `CEILING` — the two states that structurally guarantee standing blockers, since the driver
+// emits CONVERGED only at a count of 0 — the harness built a spec set with open blockers. This build
+// itself exited NON-CONVERGENT at round 3, so the path is reached rather than hypothetical.
+//
+// ON `CONVERGED` THE STAGE ANNOUNCES ITS SKIP. A skip that looks like a pass is indistinguishable
+// from coverage, and an absent `agent:dispose:` line alone would read the same over a stage that was
+// never written.
+phase('Disposal')
+if (verdict === 'CONVERGED') {
+  log('disposal: skipped — the verdict is CONVERGED, so the driver reported zero standing blockers')
+} else {
+  const d = await agent(
+    GROUND +
+      'BEFORE ANY UNIT IS DISPATCHED, DISPOSE of every blocker still standing in `' + lastReport +
+      '` — the audit exited ' + verdict + ' with ' + au.blockers + ' confirmed. BUILD-METHOD M4 ' +
+      'admits exactly two dispositions and no third: FOLD one that is a defect in a document the ' +
+      'review already read, as a rev-N bump with its section 9 line; PROMOTE one needing a ' +
+      'MECHANISM this build lacks, through `' + DRIVER + ' --rescope ' + slug +
+      ' --act add --item <id>`, then spec it at its tier so it is built like any other. Never ' +
+      'parked, never waived, never retired, never re-reviewed. Report what you did with each, and ' +
+      'NAME in `standing` every blocker you did NOT dispose.',
+    { label: 'dispose:' + slug, phase: 'Disposal', schema: DISPOSAL_SCHEMA },
+  )
+  // NO PARTIAL HAND-OUT. Deciding which units a standing blocker touches needs the tree, which this
+  // runtime does not have, so an empty roster is the honest refusal. `d.disposed !== true` covers a
+  // dead stage and a negative answer alike.
+  if (!d || d.disposed !== true) {
+    const standing = (d && Array.isArray(d.standing) && d.standing.length)
+      ? d.standing.join(', ')
+      : 'the disposal stage returned nothing at all'
+    log('disposal: NOT done — ' + standing)
+    return {
+      slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
+      specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
+      lastReport: lastReport, skippedTerminal: [],
+      roster: [],
+      note: 'DEGRADED — blockers were not disposed: ' + standing + '. No roster is handed out: a ' +
+        'roster minus the units a blocker touches is a judgement this runtime cannot make.',
+    }
+  }
+  log('disposal: done — ' + (typeof d.summary === 'string' ? d.summary : ''))
+}
+// ==================================================== THE HAND-OUT, and what is graded before it
 // S4/S4b - THE PER-UNIT REFUSAL, and in attended mode it happens HERE rather than at `--dispatch`.
-// Three verbs the unattended prompt names hard-refuse without a run-state file — `--dispatch`
-// (fail 49), `--brief` (fail 49) and `--rescope` (fail 48) — and the prompt tells the agent that a
-// refusal means the order is wrong and to STOP. Left unchanged, attended mode would halt at unit
-// one AFTER units were already being written: strictly worse than the refusal it traded away.
+// IT DID NOT LEAVE WITH THE BUILD AGENT (TOOL-aHoistedPass-6): it grades which units may be
+// DISPATCHED, so it belongs to the hand-out and moved ahead of it.
+// Three verbs an unattended pass is told to call hard-refuse without a run-state file — `--dispatch`
+// (fail 49), `--brief` (fail 49) and `--rescope` (fail 48) — and a refusal means the order is wrong
+// and the pass must STOP. Left ungraded here, attended mode would halt at unit one AFTER units were
+// already being written: strictly worse than the refusal it traded away. THE INSTRUCTION now sits in
+// the child rather than in a prompt of this file's, which is why this comment names the verbs and no
+// longer names a prompt that carried them.
 //
 // THE STATE COMES FROM THE CALLER, resolved ONCE from `--plan` at entry, because this script has
-// no shell and there is no point between the stages at which a caller could re-run it.
+// no shell and there is no point between the stages at which a caller could re-run it. A caller that
+// re-resolves it — `--plan <slug> --paths` between dispatches — gets a fresher answer than this
+// grading, which is what the resume contract does and what this file cannot do for it.
 //
 // MATCHED AS A PREFIX ON `DONE`, never against a closed token set. `--plan` prints `DONE ($state)`
 // for a terminal unit whose underlying grade is not READY, so the live vocabulary includes
@@ -735,7 +799,7 @@ if (attended) {
     if (st === 'MISSING' || st === 'THIN' || st === 'FORKED') {
       planRefusal =
         'unattended-build: attended mode refuses ' + u.id + ' — `--plan` grades it ' + st + ', and ' +
-        'this stage builds only a unit that is READY or already terminal. This is the refusal ' +
+        'this stage rosters only a unit that is READY or already terminal. This is the refusal ' +
         '`--dispatch` would have made against the tree; here it is a claim about a state the caller ' +
         'resolved, which is weaker.'
       break
@@ -748,27 +812,25 @@ if (attended) {
   if (planRefusal) throw new Error(planRefusal)
   if (skippedDone.length) log('attended mode: SKIPPING ' + skippedDone.length + ' terminal unit(s) — ' + skippedDone.join(', '))
 }
-const driverSteps = attended
-  ? 'This run has NO run-state file, so the driver\'s recording verbs are unavailable and you must ' +
-    'not call them: --dispatch, --brief and --rescope all refuse without one. Write down the paths ' +
-    'each pass will touch before you touch them anyway — the declaration is what makes disjointness ' +
-    'checkable, and here only you can check it. '
-  : 'Before writing, declare the write set with `' + DRIVER + ' --dispatch ' + slug +
-    ' --pass <unit-id> --writes <path>`, and record what you were handed with `' + DRIVER +
-    ' --brief ' + slug + ' --unit <unit-id> --path <the brief>`. THAT DISPATCH IS THE ORDER GATE: it ' +
-    'refuses a unit that is MISSING, THIN or out of the declared order, and a refusal is this ' +
-    'harness telling you the order is wrong. Read it and stop — do not work around it. '
+// ONE INSTRUCTION IS LOST RATHER THAN MOVED, and saying so is cheaper than letting a reader find
+// it. `driverSteps`' ATTENDED branch told the pass to write down the paths it would touch before
+// touching them, because the driver's recording verbs are unavailable with no run-state file. That
+// is a PER-PASS instruction and the child owns per-pass instructions; this file does not re-home it,
+// so an attended run under the hand-out loses it unless the child carries it.
+//
 // THE SKIP HAS TO REACH THE ROSTER. `skippedDone` was computed, logged as SKIPPING and returned in
 // `skippedTerminal`, and then the BUILD agent was handed the UNFILTERED roster — so an attended run
-// told its operator it had skipped the terminal units and told its agent to build them. The full
-// roster stays with the subject resolver, which legitimately wants every spec.
+// told its operator it had skipped the terminal units and told its agent to build them. The handed-
+// out roster maps THIS array and never `ordered`, or the same defect returns one layer over, in a
+// per-unit dispatch loop. The full prose roster stays with the subject resolver, which legitimately
+// wants every spec.
 const buildUnits = ordered.filter(function (u) { return skippedDone.indexOf(u.id) === -1 })
 if (attended && !buildUnits.length) {
   log('attended mode: every unit is already terminal — nothing to build')
   return {
     slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
     specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
-    lastReport: lastReport, skippedTerminal: skippedDone, built: 0, unbuilt: [],
+    lastReport: lastReport, skippedTerminal: skippedDone, roster: [],
     // THE DEGRADED TERM IS NOT SKIPPED HERE. This return was written with a hard-coded clean note,
     // which bypasses the composition the main return performs — and `specRefused` is live on this
     // path, so a run that refused specs and then found nothing to build reported 'complete'.
@@ -776,36 +838,24 @@ if (attended && !buildUnits.length) {
       (specRefused.length
         ? 'DEGRADED — ' + specRefused.length + ' spec(s) refused. '
         : '') +
-      'complete for ATTENDED mode — every unit was already terminal, so the BUILD stage was ' +
-      'not spawned rather than handed an empty roster',
+      'complete for ATTENDED mode — every unit was already terminal, so the roster is empty by ' +
+      'FILTERING rather than by this program finding nothing',
   }
 }
-const buildRoster = renderRoster(buildUnits, slug, briefDir)
-const built = await agent(
-  GROUND +
-    disposal +
-    'BUILD every unit below, ONE AT A TIME and IN THIS ORDER. Never start one before the previous ' +
-    'has committed:\n' + buildRoster + '\n\n' +
-    'For each unit you are handed exactly two documents and you read both before touching code: its ' +
-    'BRIEF and its SPEC, both named in the roster. The spec is the design; where you must diverge ' +
-    'from it, CHANGE THE SPEC FIRST as a `rev-N` bump with its section 9 line, then write the code. ' +
-    driverSteps +
-    'Commit at the end of each pass with the unit id in the subject, then run ' +
-    '`python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` and act on what it names before ' +
-    'the next unit begins. NAME every unit you did not commit, in `unbuilt`, and why.',
-  { label: 'build:' + slug, phase: 'Build', schema: BUILD_SCHEMA },
-)
-if (!built) {
-  throw new Error(
-    'unattended-build: the BUILD stage returned nothing, so no unit is known to have been built and ' +
-      'none is known to have been skipped. Reported as a refusal rather than as zero units built.',
-  )
-}
-const unbuilt = Array.isArray(built.unbuilt) ? built.unbuilt : []
+log('hand-out: ' + buildUnits.length + ' unit(s) to dispatch, one main-loop Workflow call each')
 
 // THE RUN-INTEGRITY BLOCK. `memory/gotchas/degradation-known-but-unreported` is the class where a
 // pipeline computes how badly its own run degraded and then fails to say so where it matters. Every
 // count below is carried OUT of this harness rather than left in a log nobody reads.
+//
+// `units` COUNTS `ordered` AND `roster` MAPS `buildUnits`, on purpose. The first is the SET SIZE and
+// the second is the WORK LIST, and they differ exactly when attended mode has some-but-not-all
+// terminal units.
+//
+// `specPath` IS EMPTY FOR EVERY UNIT THE SPEC STAGE JUST AUTHORED, and this program cannot fix it:
+// `units` arrives in `args` and nothing here writes the field back. It is carried so a caller that
+// already had a path does not lose it, and `resolvePathsWith` names the command that resolves the
+// rest. A run that dispatches straight off this array hands a child an empty spec path.
 return {
   slug: slug,
   mode: mode,
@@ -818,18 +868,31 @@ return {
   blockers: au.blockers,
   lastReport: lastReport,
   skippedTerminal: skippedDone,
-  built: Array.isArray(built.committed) ? built.committed.length : 0,
-  unbuilt: unbuilt,
+  roster: buildUnits.map(function (u) {
+    return { id: u.id, order: u.order, specPath: u.specPath || '', briefPath: u.briefPath || '' }
+  }),
+  // WHAT THE CALLER DISPATCHES, and what each child is given. `args` carries the INVARIANTS and
+  // `perUnit` names the three fields that vary — the roster is not among them, which is the whole
+  // shape change: a child receives its own unit and never the list. Nothing beyond a unit's spec
+  // reaches it except through its BRIEF file, because `--brief` is the only carrier that hashes
+  // anything; nothing hashes a prompt string.
+  dispatch: {
+    scriptPath: 'tools/workflows/unattended-unit.js',
+    args: { repo: repo, slug: slug, driver: DRIVER, ground: GROUND, checklist: CHECKLIST },
+    perUnit: ['unitId', 'specPath', 'briefPath'],
+    resolvePathsWith: DRIVER + ' --plan ' + slug + ' --paths',
+  },
   // THE MODE IS PART OF THE RUN-INTEGRITY REPORT, not decoration. `degradation-known-but-unreported`
   // is the class where a pipeline computes how weak its own run was and then does not say so where a
   // reader looks. An attended run that returns a bare 'complete' has skipped five checks an
   // unattended one performs, and the caller cannot tell the two apart from this field.
   note:
-    specRefused.length || unbuilt.length || verdict !== 'CONVERGED'
-      ? 'DEGRADED — ' + specRefused.length + ' spec(s) refused, ' + unbuilt.length +
-        ' unit(s) unbuilt, verdict ' + verdict + (attended ? ' · ATTENDED, so no driver-side check ran' : '')
+    (specRefused.length || verdict !== 'CONVERGED'
+      ? 'DEGRADED — ' + specRefused.length + ' spec(s) refused, verdict ' + verdict +
+        (attended ? ' · ATTENDED, so no driver-side check ran' : '') + ' · '
       : attended
-        ? 'complete for ATTENDED mode — stage order held, and none of the five driver-side records or ' +
-          'refusals ran; this is NOT the guarantee an unattended run gives'
-        : 'complete',
+        ? 'ATTENDED mode — stage order held, and none of the five driver-side records or refusals ' +
+          'ran; this is NOT the guarantee an unattended run gives · '
+        : '') +
+    'prologue complete; ' + buildUnits.length + ' unit(s) to dispatch',
 }

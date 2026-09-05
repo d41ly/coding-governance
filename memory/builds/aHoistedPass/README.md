@@ -5,7 +5,7 @@ opened: 2026-09-04
 streams: tooling+deployer
 roster: TOOL+DEPL
 parents: dBriefedPass dRatifiedSeam
-ids: DEPL-aHoistedPass-1 DEPL-aHoistedPass-2 DEPL-aHoistedPass-3 DEPL-aHoistedPass-4 DEPL-aHoistedPass-5 DEPL-aHoistedPass-6 DEPL-aHoistedPass-7 DEPL-aHoistedPass-8 DEPL-aHoistedPass-9 DEPL-aHoistedPass-10 TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 TOOL-aHoistedPass-10 TOOL-aHoistedPass-11 TOOL-aHoistedPass-12 TOOL-aHoistedPass-13 TOOL-aHoistedPass-14 TOOL-aHoistedPass-15 TOOL-aHoistedPass-16 TOOL-aHoistedPass-17 TOOL-aHoistedPass-18 TOOL-aHoistedPass-19 TOOL-aHoistedPass-20 TOOL-aHoistedPass-21 TOOL-aHoistedPass-22 TOOL-aHoistedPass-23 TOOL-aHoistedPass-24 TOOL-aHoistedPass-25 TOOL-aHoistedPass-26 TOOL-aHoistedPass-27 TOOL-aHoistedPass-28 TOOL-aHoistedPass-29 TOOL-aHoistedPass-30 TOOL-aHoistedPass-31 TOOL-aHoistedPass-32
+ids: DEPL-aHoistedPass-1 DEPL-aHoistedPass-2 DEPL-aHoistedPass-3 DEPL-aHoistedPass-4 DEPL-aHoistedPass-5 DEPL-aHoistedPass-6 DEPL-aHoistedPass-7 DEPL-aHoistedPass-8 DEPL-aHoistedPass-9 DEPL-aHoistedPass-10 TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 TOOL-aHoistedPass-10 TOOL-aHoistedPass-11 TOOL-aHoistedPass-12 TOOL-aHoistedPass-13 TOOL-aHoistedPass-14 TOOL-aHoistedPass-15 TOOL-aHoistedPass-16 TOOL-aHoistedPass-17 TOOL-aHoistedPass-18 TOOL-aHoistedPass-19 TOOL-aHoistedPass-20 TOOL-aHoistedPass-21 TOOL-aHoistedPass-22 TOOL-aHoistedPass-23 TOOL-aHoistedPass-24 TOOL-aHoistedPass-25 TOOL-aHoistedPass-26 TOOL-aHoistedPass-27 TOOL-aHoistedPass-28 TOOL-aHoistedPass-29 TOOL-aHoistedPass-30 TOOL-aHoistedPass-31 TOOL-aHoistedPass-32 TOOL-aHoistedPass-33 TOOL-aHoistedPass-34 TOOL-aHoistedPass-35
 ---
 
 # aHoistedPass — the harnessed build pass, actually reachable, actually per-unit, and a ratchet that keeps it reachable
@@ -88,6 +88,7 @@ Every rule below is argued in the design record; this slot is the index, not the
 ids DEPL-aHoistedPass-1 DEPL-aHoistedPass-2 DEPL-aHoistedPass-3 DEPL-aHoistedPass-4 DEPL-aHoistedPass-5 DEPL-aHoistedPass-6 DEPL-aHoistedPass-7 DEPL-aHoistedPass-8 DEPL-aHoistedPass-9 DEPL-aHoistedPass-10 TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4
 ids TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 TOOL-aHoistedPass-10 TOOL-aHoistedPass-11 TOOL-aHoistedPass-12 TOOL-aHoistedPass-13 TOOL-aHoistedPass-14 TOOL-aHoistedPass-15 TOOL-aHoistedPass-16 TOOL-aHoistedPass-17 TOOL-aHoistedPass-18
 ids TOOL-aHoistedPass-19 TOOL-aHoistedPass-20 TOOL-aHoistedPass-21 TOOL-aHoistedPass-22 TOOL-aHoistedPass-23 TOOL-aHoistedPass-24 TOOL-aHoistedPass-25 TOOL-aHoistedPass-26 TOOL-aHoistedPass-27 TOOL-aHoistedPass-28 TOOL-aHoistedPass-29 TOOL-aHoistedPass-30 TOOL-aHoistedPass-31 TOOL-aHoistedPass-32
+ids TOOL-aHoistedPass-33 TOOL-aHoistedPass-34 TOOL-aHoistedPass-35
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -99,12 +100,12 @@ ids TOOL-aHoistedPass-19 TOOL-aHoistedPass-20 TOOL-aHoistedPass-21 TOOL-aHoisted
 | [TOOL-aHoistedPass-3 — the build-method budget becomes a number a gate reads](spec/2026-09-04-spec-TOOL-aHoistedPass-3.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-05 |
 | [TOOL-aHoistedPass-2 — the route a run can find, and the ratchet that keeps it findable](spec/2026-09-04-spec-TOOL-aHoistedPass-2.md) | 3 | 2 | CLOSED | rev-5 | 2026-09-05 |
 | [TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else](spec/2026-09-04-spec-TOOL-aHoistedPass-5.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-05 |
-| [TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build](spec/2026-09-04-spec-TOOL-aHoistedPass-6.md) | 5 | 2 | SPECCED | rev-6 | 2026-09-05 |
+| [TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build](spec/2026-09-04-spec-TOOL-aHoistedPass-6.md) | 5 | 2 | CLOSED | rev-7 | 2026-09-05 |
 | [TOOL-aHoistedPass-9 — the adopter without the harness is told, on every bar](spec/2026-09-04-spec-TOOL-aHoistedPass-9.md) | 6 | 2 | SPECCED | rev-4 | 2026-09-05 |
 | [TOOL-aHoistedPass-7 — a brief on disk before the code that cites it](spec/2026-09-04-spec-TOOL-aHoistedPass-7.md) | 7 | 2 | SPECCED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 4 record folder(s).
+Records: 19 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

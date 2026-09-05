@@ -1954,6 +1954,59 @@ miss "$out" "the authored pair names no id of this build"
 miss "$out" "ARCH-tPlan-1"
 git reset -q --hard HEAD~1; git clean -qfd
 
+# ---- TOOL-aHoistedPass-6: `--plan <slug> --paths`, the TSV mode. `verb_plan` already resolves each
+# ---- unit's spec path internally and discards it; the harness that hands out a roster needs it
+# ---- back. ONE emitter serves both modes, so they cannot disagree about which rows are units.
+reset_tree; readme tPlan
+mkspec tPlan ARCH-tPlan-1 SPECCED "S1 a thing" "AC1 it works" "the bar" "none"
+printf '# not a spec
+
+no status header here.
+' > memory/builds/tPlan/spec/2026-08-01-spec-notaunit.md
+roster tPlan "1. ARCH-tPlan-1 the specced one
+2. ARCH-tPlan-7 the one nobody has specced"
+fixture
+out=$(run --plan tPlan)
+paths=$(run --plan tPlan --paths)
+TAB=$(printf '\t')
+# AC10 - the DEFAULT output is UNTOUCHED. The padded human table carries no TAB in any row class,
+# which is the durable half of "byte-identical to the pre-change tree" — the by-hand diff against
+# the pre-change bytes is in this unit's acceptance ledger, and cannot be re-run from inside here.
+same "--plan default: not one TAB anywhere in the padded table" \
+  "$(printf '%s\n' "$out" | grep -cF "$TAB")" "0"
+# AC11 - a graded unit row carries exactly three TABs, and its fourth field is the spec path.
+same "--plan --paths: the graded unit row carries exactly four fields" \
+  "$(printf '%s\n' "$paths" | grep '^ARCH-tPlan-1' | awk -F'\t' '{print NF}')" "4"
+same "--plan --paths: the fourth field is the spec's repo-relative path" \
+  "$(printf '%s\n' "$paths" | grep '^ARCH-tPlan-1' | cut -f4)" \
+  "memory/builds/tPlan/spec/2026-08-01-spec-tPlan-1.md"
+# ...and a MISSING unit's path field is EMPTY rather than ABSENT, so a four-field split still yields
+# four. An absent field would shift every caller's index by one on exactly the rows it cannot see.
+same "--plan --paths: a MISSING unit still carries four fields" \
+  "$(printf '%s\n' "$paths" | grep '^ARCH-tPlan-7' | awk -F'\t' '{print NF}')" "4"
+same "--plan --paths: a MISSING unit's path field is EMPTY" \
+  "$(printf '%s\n' "$paths" | grep '^ARCH-tPlan-7' | cut -f4)" ""
+# AC13 - the two NOT A UNIT diagnostics are keyed on a FILENAME, not an id, so they keep their padded
+# shape in both modes: ZERO TABs, and a four-field split skips them.
+hit "$paths" "NOT A UNIT (no status header)"
+same "--plan --paths: a NOT A UNIT diagnostic carries no TAB at all" \
+  "$(printf '%s\n' "$paths" | grep -F 'NOT A UNIT' | grep -cF "$TAB")" "0"
+# The roster and next lines are untouched, so ONE invocation answers both "which unit is next" and
+# "where is its spec" — which is what makes this the resume path's single source.
+hit "$paths" "roster: the README roster region"
+hit "$paths" "next: ARCH-tPlan-1 (READY - build it)"
+# AC12 - ORDER comes free. Both modes take their set and order from the generated units region, so
+# the two listings are the same lines in the same sequence and no sort was added.
+same "--plan --paths: the same line count as the padded table" \
+  "$(printf '%s\n' "$paths" | grep -c .)" "$(printf '%s\n' "$out" | grep -c .)"
+same "--plan --paths: the ids appear in the padded table's order" \
+  "$(printf '%s\n' "$paths" | cut -f1 | awk '{print $1}' | tr '\n' ' ')" \
+  "$(printf '%s\n' "$out" | awk '{print $1}' | tr '\n' ' ')"
+# A TRAILING flag that is NOT --paths leaves the human table alone rather than being read as one.
+same "--plan <slug> <anything else>: still the padded table" \
+  "$(run --plan tPlan --frobnicate | grep -cF "$TAB")" "0"
+git reset -q --hard HEAD~1; git clean -qfd
+
 # ---- check 14: an unknown argument. The verbs are a closed set.
 out=$(run --frobnicate tRun)
 hit "$out" "unknown argument; the verbs are "
