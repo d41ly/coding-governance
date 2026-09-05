@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-9 — the adopter without the harness is told, on every bar
 
-**Status:** SPECCED · rev-3 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
+**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -311,9 +311,16 @@ the five tracked `tools/unattended/*.template.md` for their `gov:kit unattended@
 `unattended kit gate` · `harness arms (fail branches armed or pinned)` · `kit version markers` · `unattended skill wiring` · `install-prefix (shipped surface)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The first two are the ones that bind: `unattended kit gate` is the leg being changed, and both it and
-the arms gate are chunk `declarations`, subject `repo`, with no guard, so both run on every bar. The
-version-marker bump is what pulls in `unattended skill wiring`. No new leg is registered and no map
-claim moves, so `codebase-map coverage + freshness` is unaffected and is deliberately not listed.
+the arms gate are chunk `declarations`, subject `repo`, with no guard, so both run on every bar.
+`unattended skill wiring` is listed for its REAL footing, corrected at rev-4: its guard is empty, so
+it runs on every bar whatever this unit touches. rev-1 justified it by "the version-marker bump is
+what pulls in `unattended skill wiring`", and rev-3 struck S7 — the Rollout now states that this unit
+no longer touches a template marker at all and the Files-touched table dropped the two constant rows
+and the five-template-marker row. That sentence was the single surviving statement in this document
+asserting a marker move the unit does not make, sitting in the section whose job is to justify the
+leg list, one section from the paragraph rev-3 rewrote to kill exactly that derivation. No new leg is
+registered and no map claim moves, so `codebase-map coverage + freshness` is unaffected and is
+deliberately not listed.
 
 This unit adds no gate leg. It adds one `fail` branch to an existing leg, and that branch's failing
 case is AC2 — staged, observed RED, unstaged, before the check lands.
@@ -390,6 +397,18 @@ build exists to remove.
   land this unit without an owner. Re-derived from the carriers this unit actually edits -
   `check-unattended.sh` and its test file, neither on the veto-2 list - it is not an owner turn.
   Files-touched loses the two constant rows and the five template-marker row.
+
+- rev-4 - 2026-09-05 - folded round-2 spec-audit finding M5, before any code. Section 7 justified
+  `unattended skill wiring` by "the version-marker bump is what pulls in" it, and rev-3 had already
+  struck S7 as SPENT - `DEPL-aHoistedPass-1`'s section 8 F1 took that single move at `order 2`, the
+  Rollout states this unit no longer touches a template marker at all, and the Files-touched table
+  lost the two constant rows and the five-template-marker row. rev-3's own entry enumerated the
+  strike's consequences and missed this one, so the sentence was the last statement in the file
+  asserting a marker move the unit does not make. The leg keeps its place and gains its real footing:
+  its guard is empty, so it runs on every bar regardless. **The premise moved again after that fold:**
+  `DEPL-aHoistedPass-1` rev-5 PARKED the `unattended` bump to the owner as an M3 veto-2 owner turn, so
+  order 2 sets nothing either. This unit's assertion is unaffected - `check-kit-versions.sh` grades
+  agreement rather than movement, and every carrier still agrees at `1.17`.
 
 ## 10. Reuse audit
 

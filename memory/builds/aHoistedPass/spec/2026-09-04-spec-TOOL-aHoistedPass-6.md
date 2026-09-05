@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-6 — the harness hands out a roster and stops driving the build
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
+**Status:** SPECCED · rev-6 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -76,8 +76,20 @@ fan-out hook sees at all, and the three surviving stages stop claiming an enforc
   This unit names its path in `dispatch.scriptPath` and asserts nothing about its contents.
 - **The M6 route sentence, `UNATTENDED-PROTOCOL.md` §12, and the Skill's loop bullet.** Those are
   `TOOL-aHoistedPass-2` at `order 3`, and two of the three are owner-gated veto-2 carriers.
-- **`unattended-build.js:63-67`**, the superseded `parallelism route: none` citation.
-  `TOOL-aHoistedPass-1` at `order 1` owns that correction by name and this unit must not race it.
+- **`unattended-build.js:63-67` and `:330-335`**, the superseded `parallelism route: none`
+  citations. **rev-6 corrects what this bullet claimed.** It said `TOOL-aHoistedPass-1` "owns that
+  correction by name"; that unit's own section 3 says the opposite in bold — S4's row carries all the
+  carriers and NO unit of this build takes any of them, including this file's. The two specs
+  disclaimed to each other and the edit fell between them, which nothing on the bar would have
+  caught, because no leg grades whether a decision row's quotation is still true. The BASE fact:
+  `TOOL-aHoistedPass-1` FILED the residual as a backlog row naming every carrier `git grep -ln
+  "parallelism route: none" -- tools/` returns — five files, eight sites, `unattended-build.js` and
+  `unattended-build.test.sh` among them — and this unit takes none of them either. **Taking the
+  correction here was considered and refused**: this unit already edits both files and already owns
+  the `review-harness` bump, so the carriers would cost it no extra move, but the filed row asserts
+  that no unit of this build edits one, and a unit that quietly falsified a landed backlog row to
+  save itself a follow-up is the record-drift this build exists to end. The row stays true and the
+  correction stays filed.
 - **Making anything refuse a FORKED unit, a re-dispatch, or the successor of a failed pass.** §4
   enumerates what `--dispatch` does refuse; adding a refusal is a separate unit with its own arm.
 - **Any concurrent dispatch path.** The return carries `order` so a future caller can group by it.
@@ -251,7 +263,7 @@ return {
   units: ordered.length, specced: speccedCount, specRefused: specRefused,
   verdict: verdict, blockers: au.blockers, lastReport: lastReport,
   skippedTerminal: skippedDone,
-  roster: ordered.map(function (u) {
+  roster: buildUnits.map(function (u) {
     return { id: u.id, order: u.order, specPath: u.specPath || '', briefPath: u.briefPath || '' }
   }),
   dispatch: {
@@ -263,6 +275,17 @@ return {
   note: /* as the table above */,
 }
 ```
+
+**THE ROSTER MAPS `buildUnits`, NOT `ordered`, and rev-6 corrected the block rather than the KEEP
+row.** The two said different things: the KEEP row calls `buildUnits` "the roster filter" while the
+block spelled `ordered.map(...)`, and they cannot both be implemented whenever attended mode has
+some-but-not-all terminal units. Written as the block spelled it, the attended `planState` refusal
+S2 deliberately KEEPS would have filtered nothing and every already-terminal unit would have been
+handed out for dispatch — which is verbatim the defect `unattended-build.js`'s own comment above
+`buildUnits` records: "the BUILD agent was handed the UNFILTERED roster", so the run told its
+operator it had skipped the terminal units and told its agent to build them. Handing the same
+unfiltered array to a per-unit dispatch loop reproduces it one layer over. `units:` still counts
+`ordered`, because that field is the SET SIZE and not the work list. AC25 grades the difference.
 
 `mode` and `skippedTerminal` are in that block because EVERY return at BASE carries them and the
 design of record predates both. `mode` is a run-integrity field — its own comment at `:823-826` says
@@ -606,6 +629,13 @@ entry in the CHILD's unit, not here.
   minted by the filing session. Before this rev the unit's Files-touched booked
   `memory/backlog/TOOL.md` while no scope item filed anything into it.
 
+- **AC25** — When the attended fixture has some-but-not-all units terminal, every id in
+  `skippedTerminal` is ABSENT from the returned `roster`, and `units` still counts the whole ordered
+  set. **The two are different arrays and section 4 spelled them as one until rev-6.** No existing
+  criterion distinguished them: AC7 grades three objects in order sequence and AC8 grades only
+  `dispatch.args` keys, so a roster built from `ordered` would have passed both while handing every
+  already-terminal unit out for dispatch.
+
 ## 7. Gates
 
 Green on the landing commit, every one of them chunk `declarations`, `product`, `wiring` or `records`
@@ -802,6 +832,22 @@ line is the record of which one does.
   CONCLUSION each passage draws is untouched and still holds: this unit is NOT owner-gated, because
   it owes no bump and `VERBS.template.md`, the only `*.template.md` it touches, is not on the veto-2
   list.
+
+- rev-6 - 2026-09-05 - folded round-2 spec-audit findings H8 and H10, before any code. **H8** -
+  section 4's KEEP row said `buildUnits` "becomes the roster filter" and its normative return block
+  spelled `roster: ordered.map(...)`; the two cannot both be implemented whenever attended mode has
+  some-but-not-all terminal units, and written as the block spelled it the refusal S2 deliberately
+  KEEPS filters nothing. That is the defect the live comment above `buildUnits` already records - the
+  BUILD agent handed the UNFILTERED roster - reproduced one layer over in a per-unit dispatch loop.
+  The block now maps `buildUnits`, `units:` is stated to count `ordered` on purpose, and AC25 grades
+  the difference, which no existing criterion could: AC7 grades order sequence and AC8 grades
+  `dispatch.args` keys. **H10** - section 3's third non-goal said `TOOL-aHoistedPass-1` "owns that
+  correction by name", and that spec's section 3 says in bold that NO unit of this build takes any of
+  the carriers. Two specs disclaiming to each other left the cheapest carrier owned by nobody, with
+  nothing on the bar grading a decision quotation's truth. Rewritten to the BASE fact, with the
+  option of taking the correction here considered and REFUSED in writing: `TOOL-aHoistedPass-1` has
+  now FILED the residual as a row asserting that no unit of this build edits one, and falsifying a
+  landed backlog row to save a follow-up is the drift this build exists to end.
 
 ## 10. Reuse audit
 
