@@ -104,7 +104,7 @@ ids TOOL-aHoistedPass-21 TOOL-aHoistedPass-22 TOOL-aHoistedPass-23 TOOL-aHoisted
 | [TOOL-aHoistedPass-7 — a brief on disk before the code that cites it](spec/2026-09-04-spec-TOOL-aHoistedPass-7.md) | 7 | 2 | SPECCED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

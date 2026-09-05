@@ -40,3 +40,7 @@ base: e828f7784ce1fc713a9d008a82d524bb62dcb6a1
 2026-09-05T07:30:54Z dispatch · item 8219a504 TOOL-aHoistedPass-4 · reason tools/hooks/agent-cap.js tools/hooks/README.md tools/hooks/scratch-guard.js memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-4-brief.md memory/builds/aHoistedPass/spec/2026-09-04-spec-TOOL-aHoistedPass-4.md memory/builds/aHoistedPass/README.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-05T07:30:55Z brief · item TOOL-aHoistedPass-4 · reason 10924309fe81 memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-4-brief.md
+
+2026-09-05T07:53:52Z dispatch · item 7eb2f60a TOOL-aHoistedPass-8 · reason memory/builds/aHoistedPass/build/2026-09-04-build-TOOL-aHoistedPass-8-recipe-probe.md memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-8-brief.md memory/builds/aHoistedPass/spec/2026-09-04-spec-TOOL-aHoistedPass-8.md memory/builds/aHoistedPass/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-05T07:53:53Z brief · item TOOL-aHoistedPass-8 · reason 8d2662b376ce memory/builds/aHoistedPass/prompts/2026-09-05-prompt-TOOL-aHoistedPass-8-brief.md
