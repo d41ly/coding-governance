@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-9 — the adopter without the harness is told, on every bar
 
-**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
+**Status:** CLOSED · rev-6 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -46,17 +46,22 @@ the population the install-time arm can never reach.
   §4's Placement paragraph says why that route and not the other.
 - **S7.** ~~The `unattended` kit version bump 1.17 → 1.18 the payload change owes: three engine
   constants and the marker in all five tracked `tools/unattended/*.template.md`.~~ — **SPENT.**
-  `DEPL-aHoistedPass-1`'s section 8 F1 takes that single move at `order 2`; this unit is at `order 6`
-  and the version is already `1.18` by the time it runs. What this unit owes instead is an
-  ASSERTION: `bash tools/check-kit-versions.sh` exits 0 at whatever version the earlier order set,
+  `DEPL-aHoistedPass-1`'s section 8 F1 took that single move at `order 2` — and then rev-5 of THAT
+  spec PARKED it to the owner as an M3 veto-2 turn, so order 2 moved nothing and the tree is still at
+  `1.17` when this unit runs. rev-3 wrote "already `1.18` by the time it runs" here and rev-4 recorded
+  the park without coming back for this sentence; the assertion below never depended on the number,
+  which is why it survived both. What this unit owes is an
+  ASSERTION: `bash tools/check-kit-versions.sh` exits 0 at whatever version the tree carries,
   and this unit moves it no further. A kit version is a release, not a per-commit stamp, so a second
   bump inside one build records a release that never shipped.
 
 ## 3. Non-goals (OUT)
 
-- **Not a whole-leg skip.** The leg carries thirty numbered checks and 174 `fail` branches, and not
-  one of the other twenty-nine needs the route to exist. A whole-leg skip would discard twenty-nine
-  verdicts to announce one, which is the green-by-absence class one level up.
+- **Not a whole-leg skip.** Not one of the leg's other numbered checks needs the route to exist, so a
+  whole-leg skip would discard every one of their verdicts to announce this one — the
+  green-by-absence class, one level up. The counts rev-1 wrote here are gone: the file's own header
+  gives the recipe for the `fail`-number set and `check-arms.py --report` gives the branch pair, and
+  both had already moved under this paragraph before the unit landed.
 - **Not a refusal.** An absent route directory means the adopter never installed the kit that holds
   it. Redding a standing bar over an install decision the bar cannot undo punishes the wrong act on
   the wrong day; the refusal belongs at `govkit apply`, which is `DEPL-aHoistedPass-1`.
@@ -197,10 +202,12 @@ the branch is reachable by deleting one file in a fixture.
 
 **What it does NOT owe, measured rather than assumed.** `.memory-tree.conf:203` declares
 `ARMS_FLOORS="… tools/unattended/check-unattended.sh:101:100 …"`, and
-`python tools/memory-tree/check-arms.py --report` prints **174 branches, 166 armed** for that gate
-today. The floor comparison at `tools/memory-tree/check-arms.py:288-291` is `got < want`, one-sided
-upward, so adding one armed branch cannot breach it and **no `ARMS_FLOORS` edit is owed.** Raising the
-floor to track reality is a separate act with its own reasoning and is not smuggled into this unit.
+the pin for that gate is `101:100`. The floor comparison at
+`tools/memory-tree/check-arms.py:288-291` is `got < want`, one-sided upward, so adding one armed
+branch cannot breach it and **no `ARMS_FLOORS` edit is owed.** Raising the floor to track reality is a
+separate act with its own reasoning and is not smuggled into this unit. rev-1 wrote the live pair —
+174 branches, 166 armed — into this paragraph and it was wrong by two before this unit's own commit,
+because `TOOL-aHoistedPass-2` added a branch in between. `--report` owns that pair; ask it.
 
 The arm's own EXECUTION is off the bar. `tools/unattended/check-unattended.test.sh` is not a leg —
 `grep -c` against `tools/gate-legs.json` returns 0 — under the 2026-08-23 self-test ruling. The
@@ -487,6 +494,19 @@ build exists to remove.
   30, `exit "$status"`, and both scope-block spans. The citations re-opened and CONFIRMED unchanged:
   `fail()` at `:93`, `report()` at `:591` behind `REPORT=` at `:590`, and 31 still the first free
   `fail` number.
+
+- rev-6 - 2026-09-05 - the post-commit bug-class checklist over this unit's own diff selected
+  `amendment-leaves-its-other-half-standing`, and it was right. Two counts of a derived population
+  were left standing in prose that rev-5's amendments had already falsified: §3's "thirty numbered
+  checks and 174 `fail` branches" (31 and 176 once this unit lands) and §4's "prints **174 branches,
+  166 armed** ... today" (176 and 168, and already wrong by two BEFORE this unit, because
+  `TOOL-aHoistedPass-2` added a branch in between). Both now point at the source that owns the
+  figure instead of restating it, which is the rule §7 of the charter states and which this document
+  broke twice in one section. A THIRD of the same class was found in the same sweep: S7 still said
+  the version is "already `1.18` by the time it runs", which `DEPL-aHoistedPass-1` rev-5's park made
+  false and rev-4 recorded without coming back for the sentence. It survived because AC11 had already
+  been rewritten to depend on no number — the amendment landed on the criterion and not on the scope
+  item that motivated it. No code changed.
 
 ## 10. Reuse audit
 

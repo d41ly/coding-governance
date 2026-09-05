@@ -2,7 +2,7 @@
 
 # Acceptance ledger — TOOL-aHoistedPass-9
 
-Tier-2 · node a · 2026-09-05 · spec rev-5 · pass base `c0a6d5ae`
+Tier-2 · node a · 2026-09-05 · spec rev-6 · pass base `c0a6d5ae`
 
 Check 31 lands in `tools/unattended/check-unattended.sh`. When the route the `passes-harnessed`
 directive names does not resolve in the tree being graded, the leg now says which case it could not
@@ -29,7 +29,9 @@ predate this unit and a reader owes the attribution.
   with `tools/workflows/unattended-unit.js` moved aside and its directory left in place, printed
   `UNATTENDED check 31 FAILED — … : tools/workflows/unattended-unit.js` and set `status=1`; the file
   was restored and `git status` confirmed it. The suite's F1 arm stages the same break inside the
-  real checker.
+  real checker. **That observation was taken on the SHIPPED carrier, which names TWO route scripts,
+  and the verdict named only the deleted one** — the per-path property, witnessed on the real value
+  rather than on a one-path fixture.
 - **AC3** — MET — with the section naming the route and its directory absent, the default run prints
   no `check 31` line and `GOV_UNATTENDED_REPORT=1` prints
   `check 31 skipped for <path> — the directory that would hold it is absent`. Observed at both the
