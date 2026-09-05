@@ -26,7 +26,13 @@
 # every run. TOOL-dFramedEntrypoint-7 converts rows to bound, one build at a time, and lowers the pin
 # in the same commit as the file it describes.
 
-exempt-pin: 67
+# RAISED 67 -> 68 by TOOL-aKeyedAnnotation's session, 2026-09-05. Not a drain reversal: the
+# aHoistedPass merge landed a build README naming no row at all, which the FORWARD direction
+# refuses, so this leg has been RED on main since that merge and could bind nothing. Tested as
+# BOUND first and it fails seven ways (three slots over ceiling, a missing canonical slot, no
+# authored roster pair, authored content after the first generated marker), so exempt is the only
+# state that is both true and unblocking. It drains when that build's owner conforms the file.
+exempt-pin: 68
 
 !memory/builds/aBatchedLintel/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBatchedTribunal/README.md - predates the contract; drains when its build's owner conforms it
@@ -120,3 +126,5 @@ memory/builds/dRatifiedSeam/README.md
 memory/builds/dSealedTally/README.md
 memory/builds/aSurfacedLexicon/README.md
 memory/builds/aStagedLane/README.md
+memory/builds/aKeyedAnnotation/README.md
+!memory/builds/aHoistedPass/README.md - landed by a merge naming no contract row, so the leg was red for every session; BOUND fails seven ways today. Drains when its build's owner conforms the README to the slot canon
