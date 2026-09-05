@@ -1338,6 +1338,47 @@ reset_tree; printf '# method
 hit "$(run)" "a directive points at a build-method section that does not exist, so the handle names a rule no reader can reach:"
 rm -f memory/guides/BUILD-METHOD.md
 
+# arm 6b: THE BODY TERM (TOOL-aHoistedPass-2). Arm 6 above proves the section EXISTS check; this one
+# proves the term that opens it. FOUR FIXTURES, because the block-wise comment strip is the whole
+# point of the term and only the fourth separates it from the naive line-prefix filter that was
+# measured ADMITTING that evasion.
+_bm_sections() { printf '# method
+
+## M2
+
+## M3
+
+## M4
+
+## M5
+
+## M6
+%s
+## M7
+
+## M8
+
+## M9
+
+## M10
+
+## M12
+' "$1"; }
+# every section present, every handle absent from every body -> RED, naming the pair
+reset_tree; _bm_sections "" > memory/guides/BUILD-METHOD.md
+hit "$(run)" "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment"
+# the anchor present ONLY inside a SINGLE-line HTML comment -> still RED
+reset_tree; _bm_sections '
+<!-- anchors: `passes-harnessed` `passes-committed` `parallel-when-disjoint` -->' > memory/guides/BUILD-METHOD.md
+hit "$(run)" "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment"
+# the anchor present ONLY inside a MULTI-line HTML comment, on its SECOND line -> still RED.
+# THIS is the fixture the naive filter passes: it drops the comment's first line and keeps line two.
+reset_tree; _bm_sections '
+<!-- anchors:
+     `passes-harnessed` `passes-committed` `parallel-when-disjoint` -->' > memory/guides/BUILD-METHOD.md
+hit "$(run)" "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment"
+rm -f memory/guides/BUILD-METHOD.md
+
 # arm 7: the floor undeclared.
 reset_tree; sed -i '/^DIRECTIVES_FLOOR=/d' .unattended.conf
 hit "$(run)" "DIRECTIVES_FLOOR is undeclared in .unattended.conf, and with no floor a deleted directive is indistinguishable from a set that never had one"

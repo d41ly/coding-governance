@@ -1592,6 +1592,53 @@ else
       grep -qE "^## $sec( |\$)" "$M/guides/BUILD-METHOD.md" \
         || fail 16 "a directive points at a build-method section that does not exist, so the handle names a rule no reader can reach: $pair"
     done
+    # ---- THE BODY TERM (TOOL-aHoistedPass-2). Existence is not a route. Arm B above asserts the
+    # ---- cited section EXISTS and never opens it, so 17 of 17 handles pointed at real sections
+    # ---- that stated no rule about them — measured, and it is the defect this term closes: a run
+    # ---- resolving `passes-harnessed` read M6, found nothing, and built inline.
+    # ----
+    # ---- CORE-ONLY, on `corescope`'s own principle. A project's DIRECTIVES_EXTRA rows are
+    # ---- hand-authored and must not red an adopter for prose the kit never asked them to write.
+    # ---- The list is the one already parsed for arm A, so no second spelling of the handle set
+    # ---- exists to drift — which is the class this whole build is about.
+    # ----
+    # ---- BACKTICKS, NOT A WORD BOUNDARY, and that closes two holes with one token shape. A bare
+    # ---- `<!-- anchors: … -->` satisfies a naive term while the section states no rule, and
+    # ---- `researched` is an ordinary English past participle a future prose edit would satisfy by
+    # ---- accident, certifying a section that says nothing.
+    # ----
+    # ---- THE COMMENT STRIP IS BLOCK-WISE, SPANNING LINES, and that is the whole point of the term
+    # ---- rather than a detail of it. A filter dropping lines that MATCH `^[[:space:]]*<!--` drops
+    # ---- only a comment's FIRST line, so a multi-line comment carrying the anchor on line two
+    # ---- satisfies it. Measured on four fixtures built from the real file: the naive form PASSES
+    # ---- that evasion and this form REDS it, with an honest rule sentence green in both.
+    # ----
+    # ---- WHAT IT DOES NOT CHECK, said here because a structural check reads as a semantic one to
+    # ---- everybody who did not write it: it grades that the section NAMES its handle in a form a
+    # ---- comment cannot fake. It does not grade that the sentence around the name states the rule,
+    # ---- so a dead anchor inside a real sentence still passes. Strictly stronger than
+    # ---- existence-only, strictly weaker than semantics.
+    for pair in $core; do
+      hnd=${pair%%:*}; sec=${pair#*:}
+      _body=$(awk -v s="^## $sec( |\$)" '
+        $0 ~ s { inb = 1; next }
+        inb && /^## / { exit }
+        inb {
+          line = $0
+          while (1) {
+            if (incm) { i = index(line, "-->"); if (i == 0) { line = ""; break }
+                        line = substr(line, i + 3); incm = 0; continue }
+            i = index(line, "<!--"); if (i == 0) break
+            pre = substr(line, 1, i - 1); rest = substr(line, i + 4)
+            j = index(rest, "-->")
+            if (j == 0) { line = pre; incm = 1; break }
+            line = pre substr(rest, j + 3)
+          }
+          print line
+        }' "$M/guides/BUILD-METHOD.md")
+      printf '%s' "$_body" | grep -qF -- "\`$hnd\`" \
+        || fail 16 "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment: $pair"
+    done
   fi
 fi
 # ---- 16d: the NON-OVERRIDABLE Definition-of-Done set, joined to the Skill an agent reads, in BOTH

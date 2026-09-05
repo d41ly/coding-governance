@@ -98,7 +98,7 @@ tools/run-gates/run-gates.test.sh	5	(loose),lib
 tools/run-gates/run-gates.turnstile.test.sh	1	(loose)
 tools/settings-merge.py	4	(loose),hooks
 tools/unattended/.unattended.conf.example	6	(loose),memory-tree,run-gates
-tools/unattended/SKILL.template.md	1	memory-tree
+tools/unattended/SKILL.template.md	3	memory-tree,workflows	RAISED 1 -> 3 BY HAND, TOOL-aHoistedPass-2, and the ratchet is a BAN so `--write-ratchet` refuses to absorb it. The loop bullet names `tools/workflows/unattended-build.js` and `tools/workflows/unattended-unit.js` as LITERALS because `adopt-unattended.sh` substitutes seven placeholders and TOOL_ROOT is not one of them — a {{TOOL_ROOT}} spelling would ship brace text into every adopter's rendered Skill, which the renderer's own surviving-placeholder arm reds. The count is OCCURRENCES per path, not hit lines, so two script paths raise it by two.
 tools/unattended/adopt-unattended.sh	2	unattended
 tools/unattended/adopt-unattended.test.sh	2	unattended
 tools/unattended/check-pass-order.sh	2	unattended

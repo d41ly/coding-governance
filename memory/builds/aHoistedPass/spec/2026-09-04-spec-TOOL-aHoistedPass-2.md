@@ -1,6 +1,6 @@
 # TOOL-aHoistedPass-2 — the route a run can find, and the ratchet that keeps it findable
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -333,11 +333,11 @@ pre-commit.
 |---|---|
 | `tools/memory-tree/BUILD-METHOD.template.md` | M6 sentence, 17 anchors — **not the marker** |
 | `memory/guides/BUILD-METHOD.md` | regenerated |
-| `tools/unattended/check-unattended.sh` | arm B's body term, header, constant and marker |
+| `tools/unattended/check-unattended.sh` | arm B's body term and its header — **not the constant and not the marker** |
 | `tools/unattended/check-unattended.test.sh` | the four-fixture arm |
-| `tools/unattended/PROTOCOL.template.md` | §12 both corrections, §9's clauses, marker |
+| `tools/unattended/PROTOCOL.template.md` | §12 both corrections, §9's clauses — **not the marker** |
 | `memory/guides/UNATTENDED-PROTOCOL.md` | the same, byte-identical |
-| `tools/unattended/SKILL.template.md` | loop bullet, prompt-path read step, marker |
+| `tools/unattended/SKILL.template.md` | loop bullet, prompt-path read step — **not the marker** |
 | `.claude/skills/unattended/SKILL.md` | regenerated |
 | `tools/unattended/README.md` | the ungraded marker, as a NOTE — not an edit |
 
@@ -416,7 +416,7 @@ the `memory-tree` marker and render rows, the `check-memory-hygiene.sh` constant
   force the phrase to 0, which would have deleted the sentence `memory/DECISIONS.md:125` ratifies. A
   spec that strikes text quoted in a ratified decision row must cite a superseding id, and this one
   had none.
-- **AC18** — When `grep -c "unreachable except through both"` runs over
+- **AC19** — When `grep -c "unreachable except through both"` runs over
   `memory/guides/UNATTENDED-PROTOCOL.md` and `tools/unattended/PROTOCOL.template.md`, it returns `0`
   for each, and the sentences that replaced §12's first two NAME `DISPOSAL` as the third stage and
   state that what the program holds is the ROSTER HAND-OUT rather than the build's reachability.
@@ -425,7 +425,11 @@ the `memory-tree` marker and render rows, the `check-memory-hygiene.sh` constant
   which holds whether or not the sentences were rewritten. So the live carrier could have kept
   claiming that BUILD is unreachable except through both stages and on a terminal verdict, through
   the landing, with every leg green — a false claim in a carrier the charter calls binding, which is
-  the exact defect this build exists to remove.
+  the exact defect this build exists to remove. **Labelled AC19 at rev-5**, because rev-3
+  inserted it as a SECOND AC18 beside the pre-existing one grading S7's residual clauses. Two criteria
+  under one id means one verdict row can be reported as satisfying both obligations, and whichever is
+  checked the other ships unobserved - one of them being this rewrite, added precisely because the
+  false text could otherwise survive a green landing.
 - **AC9** — When `diff` compares the two protocol halves CR-normalised, it prints nothing, and both
   are under `INDEX_CAP_BYTES="61440"`.
 - **AC10** — When §12's state-refusal sentence is read in both halves, it names MISSING and THIN and
@@ -488,7 +492,17 @@ existing leg. Its failing case is staged and observed as AC1 and AC2 before the 
   Naming it early leaves a dangling path for the length of the build; deferring the names splits one
   bullet across two units and leaves the route sentence describing half a mechanism. Nothing catches
   the dangling path in that window — check 31 is a later unit, and no standing leg resolves a
-  backticked path in M6. **Recommendation: name both paths now, and record the window as held by the
+  backticked path in M6.
+
+  **There are TWO dangling references, not one, and rev-5 adds the second.** The bullet orders a
+  re-read of `--plan <slug> --paths` between dispatches, and `--paths` is built by
+  `TOOL-aHoistedPass-6` at `order 5`. Measured at BASE: `--paths` exists nowhere in the tree, and
+  `verb_plan`'s dispatch arm consumes `--plan` and exits on its return, so a trailing `--paths` is
+  silently DISCARDED — the run gets the padded table, no spec paths, exit 0, and no refusal. Between
+  this unit's `order 3` and that unit's `order 5` the rendered Skill instructs a run to call a flag
+  the driver ignores. The dangling PATH was disclosed here and in sections 3 and 5; the dangling VERB
+  MODE was disclosed nowhere, and a silent discard is worse than a missing file because a missing
+  file at least fails. **Recommendation: name both paths now, and record the window as held by the
   run rather than by any check.**
 - **F3 — whether `last-body-change` advances with `last-audit`.** Check 5 makes the `last-audit`
   re-stamp machine-required; C9's two counters both read 0 today, so nothing forces the body stamp.
@@ -502,9 +516,12 @@ existing leg. Its failing case is staged and observed as AC1 and AC2 before the 
 
 RESOLVED (agent, 2026-09-05, delegated): **all four forks taken at their recommendations.** **F1** — the AC17 dispatch targets
 `tools/workflows/unattended-build.js`, which exists at BASE; the premise under test is whether a
-Skill bullet authorizes a `Workflow` call at all. **F2** — both script paths are named now, and the
-dangling-path window is HELD BY THE RUN rather than by any check, which is disclosed here because
-nothing catches it. **F3** — `last-audit` advances unconditionally, `last-body-change` only if the
+Skill bullet authorizes a `Workflow` call at all. **F2** — both script paths AND the `--plan <slug> --paths` mode are named
+now, and both dangling windows are HELD BY THE RUN rather than by any check, disclosed here because
+nothing catches either. The order dependency on `TOOL-aHoistedPass-6` is stated the way section 3
+already states the one on `TOOL-aHoistedPass-3`. **The cheaper permanent fix is named and not taken
+here:** make `verb_plan` refuse an unrecognised trailing argument instead of discarding it, so a
+dangling mode is loud rather than silent. That is a driver edit section 3 excludes. **F3** — `last-audit` advances unconditionally, `last-body-change` only if the
 re-audit actually changed the body, both counters re-derived at commit time. **F4** — woven, not
 listed.
 
@@ -574,6 +591,23 @@ further, the same shape `DEPL-aHoistedPass-1`'s F1 sets for the `unattended` ver
   marker at `tools/unattended/README.md:1` are findings no other spec of this build states, and the
   two units that now own the moves are their readers. What changed is that the subsection opens by
   saying so, and the `memory-tree` figure reads `2.60 to 2.61`.
+
+- rev-5 - 2026-09-05 - folded round-2 spec-audit findings H1, H5 and M4, all read before this unit's
+  code pass. **H1** - two criteria carried the label AC18: rev-3's insertion grading S5's rewritten
+  sentences, and the pre-existing one grading S7's three residual clauses. The spec keys its own
+  acceptance ledger on these ids - rev-3's log walks "AC1 to AC17" by number - so one verdict row
+  could be reported as satisfying both obligations and whichever was checked, the other shipped
+  unobserved. The S5 criterion is now AC19. **H5** - section 4's Files-touched table still moved
+  three carriers S11 was struck to disclaim: `check-unattended.sh` read "constant and marker",
+  `PROTOCOL.template.md` and `SKILL.template.md` each read "marker". A builder following the table at
+  `order 3` would move a constant and two markers `order 2` already set, breaking marker-to-constant
+  agreement and redding the very leg AC15 requires green. All three now read the way the
+  `BUILD-METHOD.template.md` row already did. **M4** - fork F2 disclosed the dangling script PATH and
+  nothing disclosed the dangling VERB MODE: the bullet orders `--plan <slug> --paths`, `--paths` is
+  built two orders later, and `verb_plan` silently DISCARDS an unrecognised trailing argument rather
+  than refusing it. Between `order 3` and `order 5` the rendered Skill instructs a run to call a flag
+  the driver ignores, at exit 0 with no refusal. Disclosed in F2, in its resolution, and with the
+  cheaper permanent fix named as out of scope.
 
 ## 10. Reuse audit
 
