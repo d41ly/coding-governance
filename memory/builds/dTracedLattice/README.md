@@ -49,6 +49,13 @@ defects in the map kit were observed while measuring, none of them about relatio
   is RESCUED before `TOOL-aSurfacedLexicon-2` deletes it, which is why unit 6 takes order 1 across
   two builds; `RECALL_DARK_LAYERS` becomes EXTENSIONS with a migration; the reinvention backlog moves
   OUTSIDE the worktree, reversing `bConvergentLodestar` F7. Each mark is in its own §8.
+- **The spec-audit loop ENDED NON-CONVERGENT at round 3, and every blocker was FOLDED.** Rounds 1, 2
+  and 3 confirmed 3, 2 and 3 blockers, so round 3's count was not strictly smaller and M4 stops the
+  loop there. All twenty of its distinct defects are defects in documents the review read, so the
+  recorded disposition is `fold` and not `promote`: no blocker needed a mechanism this build lacks.
+  Round 3 was the first to clear the ~0.5 precision floor (0.53), and the first to read specs 6 and
+  7 at all. The specs are not re-reviewed after this fold — M4 forbids it — so the closing diff
+  review is the next and last review pass.
 - **The units are SEQUENCED, and an earlier revision of this bullet claimed the opposite.** Write
   sets intersect on `map_diff.py`, on `reuse_lookup.py`'s banner, and on one `memory/backlog/TOOL.md`
   row M6 clause 3 forbids two passes to touch. The build-order block below is the authority.
@@ -82,20 +89,20 @@ ids TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTrac
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dTracedLattice-6 — the AST import resolver is rescued into codebase-map before P3 deletes it](spec/2026-09-05-spec-TOOL-dTracedLattice-6.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-05 |
-| [TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references](spec/2026-09-05-spec-TOOL-dTracedLattice-1.md) | 2 | 2 | SPECCED | rev-6 | 2026-09-05 |
-| [TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare](spec/2026-09-05-spec-TOOL-dTracedLattice-2.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory](spec/2026-09-05-spec-TOOL-dTracedLattice-3.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved](spec/2026-09-05-spec-TOOL-dTracedLattice-4.md) | 5 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose](spec/2026-09-05-spec-TOOL-dTracedLattice-5.md) | 6 | 2 | SPECCED | rev-4 | 2026-09-05 |
-| [TOOL-dTracedLattice-7 — a merge-bar substrate whose score depends on the hash seed](spec/2026-09-05-spec-TOOL-dTracedLattice-7.md) | 7 | 2 | SPECCED | rev-2 | 2026-09-05 |
+| [TOOL-dTracedLattice-6 — the AST import resolver is rescued into codebase-map before P3 deletes it](spec/2026-09-05-spec-TOOL-dTracedLattice-6.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-06 |
+| [TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references](spec/2026-09-05-spec-TOOL-dTracedLattice-1.md) | 2 | 2 | SPECCED | rev-7 | 2026-09-06 |
+| [TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare](spec/2026-09-05-spec-TOOL-dTracedLattice-2.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-06 |
+| [TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory](spec/2026-09-05-spec-TOOL-dTracedLattice-3.md) | 4 | 2 | SPECCED | rev-5 | 2026-09-06 |
+| [TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved](spec/2026-09-05-spec-TOOL-dTracedLattice-4.md) | 5 | 2 | SPECCED | rev-5 | 2026-09-06 |
+| [TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose](spec/2026-09-05-spec-TOOL-dTracedLattice-5.md) | 6 | 2 | SPECCED | rev-5 | 2026-09-06 |
+| [TOOL-dTracedLattice-7 — a merge-bar substrate whose score depends on the hash seed](spec/2026-09-05-spec-TOOL-dTracedLattice-7.md) | 7 | 2 | SPECCED | rev-3 | 2026-09-06 |
 <!-- /gen:build-units -->
 
-Records: 15 bound to this build, across 3 record folder(s).
+Records: 16 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-dTracedLattice-6.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dTracedLattice-6 TOOL-dTracedLattice-7.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

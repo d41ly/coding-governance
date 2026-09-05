@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 6 · ratified 2026-09-05
+**Status:** SPECCED · rev-5 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 6 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
 
 <!-- /gen:spec-records -->
 
@@ -37,17 +38,24 @@ to claim it is not making that failure.
   an adopter whose conf still says `bash` must be told, not guessed at.
 - **S3** The refusal names the layer, the file count, and the two ways to clear it — register an
   extractor, or declare it dark — so the remedy is in the message.
-- **S4** Supply the derived set to `reuse_lookup`'s banner. `TOOL-dTracedLattice-1` AC3 owns the
-  banner rewrite; this unit provides the value it prints. Rev-1 had both units rewriting the same
-  output, which is why this unit is sequenced after unit 1.
+- **S4** Supply the derived set to `reuse_lookup`'s banner at `tools/codebase-map/reuse_lookup.py:443`
+  and own its dark-layer wording OUTRIGHT, graded by this unit's own AC2 and AC4. Rev-2 handed the
+  rewrite to `TOOL-dTracedLattice-1` AC3, which is that unit's 200-shuffle chance control and never
+  mentioned a banner — an ungraded handover between two sequenced units, which is what M6 clause 3
+  exists to catch. Unit 1 grades no banner content at rev-7, so there is nothing to hand to. This
+  unit stays sequenced after unit 1 because unit 1's S6 lands the coverage LINE this set is printed
+  on.
 
 ## 3. Non-goals (OUT)
 
 - No new extractors. This unit makes an uncovered layer visible; covering it is separate work per
   language.
 - No change to `map_extractors.py`'s interface or to what counts as a symbol.
-- Not the coverage reporting inside `fan_in` — `TOOL-dTracedLattice-1` S3 owns that, and the two must
-  not both report the same fact in different words.
+- Not the index-coverage LINE itself — `TOOL-dTracedLattice-1` S6 lands it and AC12 grades it, and
+  the two must not both report the same fact in different words. Rev-2 named that unit's S3, which is
+  its stem-specificity sort key; unit 1's rev-5 renumbering moved the item and this pointer stayed
+  put. The boundary: unit 1 prints the line from the ASSERTED conf set, and this unit, sequenced
+  after it, replaces that set with a derived one and owns the dark-layer wording per S4.
 
 ## 4. Design
 
@@ -113,8 +121,11 @@ set would print a derived number beside an authored one.
 ## 6. Acceptance criteria
 
 - **AC1** — When a fixture corpus contains a layer with no registered extractor and no
-  `RECALL_DARK_LAYERS` entry, the run REFUSES naming that layer and its file count, and this arm is
-  observed RED before the fix lands.
+  `RECALL_DARK_LAYERS` entry, the run REFUSES naming that layer, its file count, AND both ways to
+  clear it — register an extractor, or add the extension to `RECALL_DARK_LAYERS`, with the conf key
+  spelled as an adopter would type it. All three, because S3 requires three and rev-4 graded two: a
+  refusal naming a problem and no repair is what §5's risks row forbids. This arm is observed RED
+  before the fix lands.
 - **AC2** — When that layer's EXTENSION is added to `RECALL_DARK_LAYERS`, the run passes and the
   banner names it as dark.
 - **AC3** — When a layer named in `RECALL_DARK_LAYERS` is absent from the corpus entirely, the run
@@ -134,7 +145,7 @@ set would print a derived number beside an authored one.
 `codebase-map kit selftest` · `codebase-map coverage + freshness` ·
 `harness arms (fail branches armed or pinned)`.
 
-Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit-subject legs and are HELD on a plain bar; a builder verifying this unit needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. The runner names every held leg, so they are announced rather than silent.
+`codebase-map kit selftest` is a `subject: kit` leg and is HELD on a plain bar, so a builder verifying this unit needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` to reach it; the runner names every held leg, so it is announced rather than silent. `codebase-map coverage + freshness` is NOT held — `tools/gate-legs.json` gives it `subject: repo`, `chunk: declarations` and no guard, and `tools/run-gates/run-gates.sh` holds a leg only when `subject = kit` OR `chunk = selftests` — so it runs on every bar here and in every adopter, and a red there fails the bar of every commit. Read the classification from `tools/gate-legs.json`, never from this sentence.
 
 ## 8. Open questions
 
@@ -156,6 +167,13 @@ Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-5 · 2026-09-06 · folded the round-3 spec audit: H5 (both handoffs into unit 1 named items that own
+  something else — S4 cited an AC that is a chance control and §3 an S-item that is a sort key — so
+  this unit owns the banner's dark-layer wording outright under AC2 and AC4, and §3 fences against
+  unit 1's S6/AC12 line instead), H6 (the held-legs sentence was false about
+  `codebase-map coverage + freshness`), H8 (§10's closing paragraph still ordered the two-state design
+  rev-3 retracted, citing as its ground the section that refutes it), M1 (AC1 graded two of the three
+  elements S3 requires, leaving the remedy half of the refusal ungraded).
 - rev-4 · 2026-09-05 · the owner ratified Q1 for the extension vocabulary, so S6 owns the migration,
   AC6 pins the refusal on an un-migrated conf, AC5 drops the registry-key alternative the ruling
   closed, and the unit moves to order 6.
@@ -181,7 +199,11 @@ existing filter is therefore reuse; adding a parallel scan would not be.
 
 Prior art not cited at rev-1: `tools/lexicon/` implements `AGENTS.md` §12's declared-coverage-mode
 rule — parser, probe, or explicitly dark, with an undeclared mode a named refusal — and this unit
-narrows that three-mode design to two states for the reason §4 gives.
+ADOPTS all three modes rather than narrowing them. Rev-2 justified a two-state model by asserting
+codebase-map has no probe tier; that is false against `tools/codebase-map/map_extractors.py:226`,
+whose `kit-js` entry is labelled "Export scan UNION definition probe", and rev-3 retracted the
+narrowing in §4 while this paragraph kept citing §4 as its ground. `tools/lexicon/lexicon.py:167`'s
+definition-carrier filter is S2's prior art.
 
 Recall terms used: recall dark layers declaration extractor coverage liveness probe corpus extension
 bash uncovered banner reuse_lookup
