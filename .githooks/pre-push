@@ -3,10 +3,18 @@
 # FULL gate (tools/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes do nothing.
 # Install once per clone: git config core.hooksPath .githooks. Override: git push --no-verify.
 #
-# Drift note: the ACTIVE hook here is the TRACKED .githooks/ dir (core.hooksPath), not an out-of-tree
-# copy, so tracked == active by construction — no staleness class for THIS repo, and check-wiring.sh
-# auto-wires an unset core.hooksPath. (The WIRE-INTO-PROJECT.md copy-install path DOES reintroduce the
-# drift; a hash-of-tracked-vs-installed signal there is a scoped follow-up, not handled here.)
+# Drift note: the ACTIVE hook is the TRACKED .githooks/ dir (core.hooksPath), and check-wiring.sh
+# auto-wires an unset core.hooksPath. That is NOT the same as "tracked == active by construction",
+# which this note used to claim: `core.hooksPath` is repo-global and ABSOLUTE, so in a multi-worktree
+# layout it resolves into whatever the PRIMARY tree has checked out. The hook that gates YOUR push
+# comes from that checkout, not from the tree you are pushing. Measured at TOOL-dUnstalledConvoy-26's
+# landing: the primary tree was on a contrib branch, so the push ran that branch's pre-push — no
+# gate-env sourcing, no predicate 8, and the boundary's coverage check absent. Nothing wrong shipped,
+# because a separate full bar had verified the pushed tree; the BOUNDARY was not the one that shipped.
+# check-wiring.sh check H now compares the resolved hooks against this tree's tracked blobs and
+# REPORTS a divergence as a `note` (TOOL-aWeldedTribunal-7). It reports; it does not prevent.
+# (The WIRE-INTO-PROJECT.md copy-install path reintroduces the drift a second way; the same check
+# covers it, since it compares whatever core.hooksPath resolves to.)
 set -u
 
 # ---- S2 (TOOL-dScrubbedConduit-1): SCRUB THE ENVIRONMENT GIT INJECTS INTO THIS HOOK ---------------

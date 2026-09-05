@@ -15,6 +15,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | Class | Kind | Anchors | Universal | Description |
 |---|---|---:|---|---|
 | [a-pair-exists-and-it-is-the-wrong-one](a-pair-exists-and-it-is-the-wrong-one.md) | class | 2 |  | a scanner that pairs a delimiter with the next one of its kind finds a pair for a delimiter that opens nothing, and the span it then blanks is where the defect hides |
+| [a-view-fix-trades-one-blindness-for-another](a-view-fix-trades-one-blindness-for-another.md) | class | 3 |  | a scanner that grades source through a rendered view has a blind spot, and building a better view moves it rather than closing it, each move a new fail-open or false-deny |
 | [absence-assertion-over-whole-file-text](absence-assertion-over-whole-file-text.md) | class | 3 |  | a ban that greps whole file text reds on the comment documenting its own fix |
 | [allowlist-narrower-than-the-root-it-guards](allowlist-narrower-than-the-root-it-guards.md) | class | 7 |  | a guard keyed on a path prefix denies the sanctioned destination too, because on this platform the sanctioned destination is INSIDE the prefix |
 | [amendment-leaves-its-other-half-standing](amendment-leaves-its-other-half-standing.md) | class | 2 |  | a criterion is amended and the clause, scope item or log line that only made sense under the old wording is left behind, so one rule now returns two verdicts |
@@ -24,7 +25,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 6 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
 | [concurrency-is-not-a-budget](concurrency-is-not-a-budget.md) | class | 3 |  | a per-item verify fan-out passes a concurrency cap and still spawns one agent per finding |
 | [containment-tested-one-way](containment-tested-one-way.md) | class | 5 |  | a guard asking only "is this path under the protected one" refuses the narrow declarations and admits the one that claims everything |
-| [degradation-known-but-unreported](degradation-known-but-unreported.md) | class | 4 |  | a pipeline computes how badly its own run degraded and then fails to say so where it matters, so a degraded run produces a clean bill |
+| [degradation-known-but-unreported](degradation-known-but-unreported.md) | class | 5 |  | a pipeline computes how badly its own run degraded and then fails to say so where it matters, so a degraded run produces a clean bill |
 | [fallback-fabricates-the-passing-value](fallback-fabricates-the-passing-value.md) | class | 1 |  | a degraded-mode substitute spelled with the value some assertion reads as clean turns a broken subject into a silent green |
 | [fixture-inherits-ambient-machine-state](fixture-inherits-ambient-machine-state.md) | class | 2 |  | a hermetic-looking fixture silently reads machine-global config, so it passes everywhere it was written and fails where it was not |
 | [fixture-passes-by-finding-nothing](fixture-passes-by-finding-nothing.md) | class | 1 | yes | a test arm whose fixture never triggers the rule passes, and proves nothing |
@@ -32,7 +33,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [gate-green-by-accident-on-generated-bytes](gate-green-by-accident-on-generated-bytes.md) | class | 2 |  | a byte-compare gate over a generated file is CRLF-red on Windows and green only right after a render |
 | [grammar-bound-to-the-wrong-root](grammar-bound-to-the-wrong-root.md) | class | 2 |  | a module-level grammar resolved at import describes the repo the KIT lives in, not the tree being classified |
 | [heredoc-escape-reaches-the-regex](heredoc-escape-reaches-the-regex.md) | class | 0 | yes | source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem |
-| [hookspath-resolves-into-another-checkout](hookspath-resolves-into-another-checkout.md) | class | 5 |  | core.hooksPath is repo-global and absolute, so in a multi-worktree layout every push is gated by whatever the primary tree currently has checked out |
+| [hookspath-resolves-into-another-checkout](hookspath-resolves-into-another-checkout.md) | class | 6 |  | core.hooksPath is repo-global and absolute, so in a multi-worktree layout every push is gated by whatever the primary tree currently has checked out |
 | [id-matched-as-a-substring](id-matched-as-a-substring.md) | class | 3 |  | every id ending in a 1-up sequence is a prefix of nine others, so an unanchored match joins the wrong record |
 | [inputs-inside-the-subjects-reach](inputs-inside-the-subjects-reach.md) | class | 2 |  | a check whose inputs are all supplied by the thing it distrusts is not a check, however sound its logic |
 | [one-value-field-records-a-mixed-outcome](one-value-field-records-a-mixed-outcome.md) | class | 1 |  | a per-subject field holding ONE value has to record an outcome that was mixed — take the value that DEMANDS something, never the one that demands nothing |
@@ -52,6 +53,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-37 record(s): 37 class, 0 note, 0 superseded · 4 universal · 0 unanchored
+38 record(s): 38 class, 0 note, 0 superseded · 4 universal · 0 unanchored
 
 <!-- END GENERATED -->

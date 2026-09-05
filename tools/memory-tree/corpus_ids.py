@@ -102,6 +102,84 @@ def read(path) -> str:
         return fh.read().decode("utf-8", "replace").replace("\r\n", "\n")
 
 
+def parse_conf_line(line: str):
+    """One `.memory-tree.conf` line -> `(key, value)`, or `None` for a line that declares nothing.
+
+    TOOL-aScouredKit-19. SIX readers in this kit held this body and the shell gate SOURCES the same
+    file in bash, so any spelling bash accepts and the python half mis-reads REMOVES coverage while
+    the gate stays green. Reproduced: `MEMORY_ROOT=memory   # note` took `gotchas.py --check` from
+    rc=1 to rc=0 over an identical planted violation, because the python half then walked a directory
+    that does not exist. Coverage removed, not failed closed.
+
+    TWO SPELLINGS BASH ACCEPTS THAT THE OLD BODY DID NOT, both measured against `set -a; . conf`:
+
+        MEMORY_ROOT=memory   # note   ->  memory        (an unquoted inline comment is stripped)
+        export FAMILIES="TOOL DEPL"   ->  TOOL DEPL     (the export prefix is not part of the key)
+
+    AND ONE IT MUST NOT BREAK, which is why the comment strip is not unconditional:
+
+        QUOTED="a # b"                ->  a # b         (a `#` inside quotes is DATA)
+
+    Stripping `#` unconditionally would turn that into `a`, a silent wrong value where today's bug is
+    at least a loud directory miss. So the strip runs BEFORE the quote peel and only on an unquoted
+    `#` that begins a word, which is bash's own rule.
+
+    NOT a general shell grammar, and deliberately: command substitution, parameter expansion, line
+    continuations and quoted whitespace are all legal bash and none is in scope. These two are the
+    spellings an adopter actually writes and the ones the kit's own example neither shows nor forbids.
+    """
+    line = line.strip()
+    if not line or line.startswith("#") or "=" not in line:
+        return None
+    k, _, v = line.partition("=")
+    k = k.strip()
+    if k.startswith("export ") or k.startswith("export\t"):
+        k = k[len("export"):].strip()
+    if not k:
+        return None
+    v = v.strip()
+    # A QUOTED VALUE AND AN UNQUOTED ONE NEED DIFFERENT SCANS, and the first cut of this function
+    # had only the second — so `KEY="v"  # note` kept both the comment AND a stray quote, which is
+    # live on five lines of this kit's own shipped `.memory-tree.conf.example`. Found by the closing
+    # diff review, reproduced against `set -a; . conf`.
+    #
+    # QUOTED: take the text between the opening quote and its MATCH, then treat only the remainder
+    # as comment territory. That is what makes `Q="a # b"` keep its `#` while `Q="a"  # note` loses
+    # its trailing one — the two directions this parser has to get right at once.
+    if v[:1] in ("'", '"'):
+        q = v[0]
+        end = v.find(q, 1)
+        if end >= 0:
+            return k, v[1:end]
+        # An UNTERMINATED quote is not something to guess at. Fall through to the unquoted scan,
+        # which is what the old body did for every value, so this is no worse than before for a
+        # spelling bash itself would reject.
+    # UNQUOTED: a `#` that begins a word starts a comment, including at position 0 — `X=   # note`
+    # is an empty value in bash, not the literal `# note`.
+    cut = -1
+    for i, ch in enumerate(v):
+        if ch == "#" and (i == 0 or v[i - 1].isspace()):
+            cut = i
+            break
+    if cut >= 0:
+        v = v[:cut].strip()
+    return k, v.strip('"').strip("'")
+
+
+def parse_conf(text: str, conf: dict) -> dict:
+    """Merge every declaration in `text` into `conf`, which carries the caller's OWN defaults.
+
+    The defaults stay per-reader on purpose: they differ (`CHARTER` and the pins for this module, the
+    universal budget for gotchas, the arms floors for check-arms), and one merged dict would give
+    every reader keys it has no use for and hide which reader depends on which.
+    """
+    for line in text.split("\n"):
+        kv = parse_conf_line(line)
+        if kv is not None:
+            conf[kv[0]] = kv[1]
+    return conf
+
+
 def load_conf(root: str) -> dict:
     conf = {
         "MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": "", "CHARTER": DEFAULT_CHARTER,
@@ -110,12 +188,7 @@ def load_conf(root: str) -> dict:
     }
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
-        for line in read(p).split("\n"):
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            k, _, v = line.partition("=")
-            conf[k.strip()] = v.strip().strip('"').strip("'")
+        parse_conf(read(p), conf)
     return conf
 
 
@@ -130,10 +203,14 @@ def read_declared_keys(root: str) -> set:
     out = set()
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
+        # TOOL-aWeldedTribunal-5 S3b. THE SIXTH READER, and it must agree with `load_conf` on keys
+        # or the retired-key and undeclared-CHARTER checks disagree with the parser inside one file.
+        # The docstring above claims it "cannot drift from it — same file, same rule", which the
+        # `export ` handling would have made false the moment only one of the two learned it.
         for line in read(p).split("\n"):
-            line = line.strip()
-            if line and not line.startswith("#") and "=" in line:
-                out.add(line.partition("=")[0].strip())
+            kv = parse_conf_line(line)
+            if kv is not None:
+                out.add(kv[0])
     return out
 
 
@@ -729,6 +806,27 @@ def cmd_selftest() -> int:
         t = os.path.join(base, "clean"); os.makedirs(t)
         c = _scratch(t)
         arm("a clean corpus produces no finding", None, lambda: checks(walk(t, c)))
+
+        # ---- TOOL-aWeldedTribunal-5: the conf parser, graded against BASH rather than asserted.
+        # ---- bash is the reference because bash is what the format IS; the python half is the copy,
+        # ---- and six readers held an identical naive one. Each pair below was measured with
+        # ---- `set -a; . conf` before it was written here.
+        for _line, _want in [
+            ("MEMORY_ROOT=memory   # note", ("MEMORY_ROOT", "memory")),
+            ("export FAMILIES=\"TOOL DEPL\"", ("FAMILIES", "TOOL DEPL")),
+            # THE TWO DIRECTIONS THIS PARSER HAS TO GET RIGHT AT ONCE, and the closing diff review
+            # found the first cut got only one: a `#` INSIDE quotes is data, a `#` after the closing
+            # quote is a comment. Getting the first alone kept a trailing comment and a stray quote,
+            # live on five lines of this kit's own shipped conf example.
+            ("Q=\"a # b\"", ("Q", "a # b")),
+            ("R=\"v\"  # note", ("R", "v")),
+            ("T=   # empty", ("T", "")),
+            ("S=plain", ("S", "plain")),
+        ]:
+            arm("conf parse agrees with bash: %s" % _line, repr(_want),
+                (lambda ln=_line: repr(parse_conf_line(ln))))
+        arm("a blank line declares nothing", "None", lambda: repr(parse_conf_line("   ")))
+        arm("a full-line comment declares nothing", "None", lambda: repr(parse_conf_line("# x=1")))
 
         # 13 — two build folders claiming one id.
         t2 = os.path.join(base, "coll"); os.makedirs(t2)

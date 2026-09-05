@@ -28,6 +28,7 @@ gotcha-classes = [
   "trailing-comma-counted-as-an-element.md",
   "allowlist-narrower-than-the-root-it-guards.md",
   "a-pair-exists-and-it-is-the-wrong-one.md",
+  "a-view-fix-trades-one-blindness-for-another.md",
 ]
 guides = ["REVIEW-PROTOCOL.md"]
 backlog-shards = []

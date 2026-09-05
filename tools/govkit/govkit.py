@@ -7479,6 +7479,83 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     print(f"govkit update — verify: verified {n_verified} · unverified {n_unverified} · "
           f"not-run {len(not_run)} · rolled back {n_rolled} · pre-existing red {n_preexisting}")
 
+    # ---- TOOL-aWeldedTribunal-6. THE GAP SET: what gov SHIPS for a kit this target claims and this
+    # ---- target does not hold. The classification loop above iterates the RECEIPT, so a file gov
+    # ---- newly ships is not in its iteration space AT ALL -- the verb reported the install clean and
+    # ---- the adopter found out at the next ImportError. Measured on a live adopter: the lexicon
+    # ---- kit's `canon.py` was claimed by `include = "**"`, present in gov at the sha that adopter
+    # ---- pulled, reported as a GAP by `plan --coverage`, and still left out by `update --write`;
+    # ---- `lexicon.py` imports it at MODULE level, so every entry point of that kit died for six
+    # ---- days under a green bar.
+    # ----
+    # ---- IT REPORTS, IT DOES NOT LAND. Landing a source with no receipt row means inventing the row
+    # ---- -- its role, its commit, its gov_oid, whether the target ever declined it -- and this verb
+    # ---- has evidence for none of those. `apply` is not the workaround either: it also runs the
+    # ---- kit's [adopt], which for a target holding a kit deliberately INERT is a posture flip.
+    # ----
+    # ---- IT RUNS AFTER EVERY REFUSAL THIS VERB ALREADY MAKES, and the placement is a MEASURED
+    # ---- correction rather than a preference. The first cut ran it right after `load_deploy`, and
+    # ---- `planned_writes` raised on the `-11` escape fixture's out-of-tree prefix -- turning that
+    # ---- fixture's GRADED refusal into a hard abort and taking its self-test arm down with it. That
+    # ---- is the class `index_read`'s own header records for out-of-tree paths in this same file. A
+    # ---- report may never pre-empt a refusal, and it is wrapped so it cannot raise at all.
+    _gap_open: list = []
+    try:
+        _gap_selection = [e for e in (receipt.get("kits") or []) if e in descs]
+        if kits:
+            _gap_selection = [e for e in _gap_selection if e in set(kits)]
+        # THE THROWAWAY REPORT IS HOISTED ABOVE **BOTH** CONSUMERS, and the closing diff review is
+        # why. The first cut gave it to `decline_findings` alone and handed `coverage_rows` the run's
+        # own `r` -- but `coverage_rows` reaches `planned_writes`, which `r.fail`s on a malformed
+        # descriptor, so a coverage PROBE could fail `update --write` AFTER the bytes landed and
+        # suppress the receipt re-stamp. The comment two paragraphs down claimed the refusal surface
+        # was unchanged while the line above it changed exactly that. A report that can fail the verb
+        # is not a report.
+        _gr = Report()
+        _gaps = coverage_rows(root, target, deploy, descs, _gap_selection, _gr)
+        # A DECLINE MAY ONLY HIDE A GAP IN A RUN THAT ALSO GRADES IT. `coverage_rows` does NOT
+        # consult the decline registry -- its body filters on kind/missing/tracked and nothing else
+        # -- and BOTH existing call sites grade the result themselves. Ungraded, this would print
+        # every deliberately declined file as a gap and pin the summary to INCOMPLETE forever for any
+        # target with a registry: the crying-wolf failure the decline contract's own header names.
+        #
+        # THE GRADER GETS A THROWAWAY REPORT (this unit's section 8, F1). `decline_findings` calls
+        # `r.fail` on twelve arms and this function returns `r.emit()` on every exit path, so passing
+        # the run's own Report would make a malformed or stale [[decline]] row FAIL a write verb
+        # operators run constantly, for a defect that has nothing to do with the update. Its problems
+        # are PRINTED instead, so nothing is hidden and this verb's refusal surface is unchanged.
+        # `check` and `plan` pass their own Report because grading IS their job; this verb's is not.
+        _gap_declined: dict = {}
+        if _gaps or deploy.get("decline"):
+            _gcommit = git(root, "rev-parse", "HEAD").strip()
+            _gap_declined = decline_findings(root, target, deploy, descs, _gap_selection,
+                                             _gcommit, _gaps, _gr)
+        for _p in _gr.problems:
+            print(f"govkit update --   probe finding (NOT a verb failure): {_p}")
+        _gap_open = [g for g in _gaps if _gap_declined.get((g["kit"], g["dest"])) is None]
+        for _g in _gaps:
+            _st = _gap_declined.get((_g["kit"], _g["dest"]))
+            if _st is None:
+                print(f"govkit update --   GAP      [{_g['kit']}] {_g['dest']}   <- {_g['src']}")
+            else:
+                # A DECLINED ROW PRINTS, never vanishes. A gap that disappears from a report without
+                # saying why is the exclusion-list shape DEPL-dCarriedReceipt-5 exists to prevent,
+                # and the reference call site goes out of its way to avoid it.
+                print(f"govkit update --   declined {_st}: [{_g['kit']}] {_g['dest']}")
+        # `gap 0` PRINTS. A clean run that printed nothing is indistinguishable from a coverage join
+        # that did not run -- `plan --coverage` states that rule and this inherits it.
+        print(f"govkit update -- coverage: {len(_gap_open)} undeclined gap(s) of {len(_gaps)} "
+              f"across {len(_gap_selection)} claimed entr(y|ies)"
+              + ("" if not _gap_open else " -- this install is INCOMPLETE: gov ships these and this "
+                                          "target does not hold them. This verb reports them; "
+                                          "landing them is a verb that does not exist yet"))
+    except Exception as _ge:
+        # LIVENESS. A probe that cannot run SAYS SO rather than printing a reassuring zero, which is
+        # the difference between "no gaps" and "the join never ran". It never changes this verb's
+        # exit code: a coverage report is not a merge verdict.
+        print(f"govkit update -- coverage: UNAVAILABLE ({type(_ge).__name__}: {_ge}). "
+              f"That is NOT the same fact as zero gaps -- run `govkit plan --coverage` to see them")
+
     # EVERY COUNT PRINTS, INCLUDING THE ZEROS, for the reason the verify tally above gives: an
     # absence is never coverage, and a silent zero here would be indistinguishable from a verb that
     # never looked. The read-only run says `would land` because it did not.
