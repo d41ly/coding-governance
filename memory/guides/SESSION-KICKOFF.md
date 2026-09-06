@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-06T16:09:38+03:00 @ 6ec402bd3eb7f9cb5ce6257b0f60348ae3e593fc
+last-audit: 2026-09-06T16:57:08+03:00 @ 0131eeedae08fb79b2c7bb3d704f20751defb0c2
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 22d75b31296a3a4fe28cf53a85c51076b8e6d798
+last-body-change: 0131eeedae08fb79b2c7bb3d704f20751defb0c2
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -19,7 +19,7 @@ here is short — `AGENTS.md` (the charter) holds the substance.
 - Every unit that changed what this file front-loads (a gate command, entrypoint, governing doc, a
   trap hit, a doc/memory claim found stale, or a fact re-derived it should have front-loaded) re-stamps
   `last-audit` with a delta line in the commit message; no delta → no touch.
-- Stamp rule: sha = `HEAD` on `main`, else `git merge-base origin/main HEAD`; datetime always advances.
+- Stamp rule: sha = `HEAD` on any branch; datetime always advances.
 - Dated entries carry a prune-when condition and are deleted once it holds.
 
 ## §A — Task (the agent DERIVES this per kickoff — the user does NOT fill it)

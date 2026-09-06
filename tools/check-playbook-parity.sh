@@ -122,7 +122,7 @@ agent-cap hook matcher~$TEMPLATE~sed -n 's/.*matcher \`\([A-Za-z|]*\)\`.*/\1/p'~
 verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 bounded-helper width~$TEMPLATE~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 resolved-K ceiling~$TEMPLATE~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
-stamp rule sha expression~skills/session-kickoff/MANIFEST-TEMPLATE.md~sed -n 's/.*Stamp rule: sha = .*else \`\([^\`]*\)\`.*/\1/p'~skills/session-kickoff/manifest-check.sh~sed -n 's/^STAMP_SHA_RULE=.*else .\$(\([^)]*\)).*/\1/p'
+stamp rule sha expression~skills/session-kickoff/MANIFEST-TEMPLATE.md~sed -n 's/.*Stamp rule: sha = \`\([A-Z]*\)\` on any branch.*/\1/p'~skills/session-kickoff/manifest-check.sh~sed -n 's/^STAMP_SHA_RULE=\"sha = \([A-Z]*\) on any branch\".*/\1/p'
 "
 
 # The pair loop runs in a subshell (it is the right-hand side of a pipe), so its findings have to

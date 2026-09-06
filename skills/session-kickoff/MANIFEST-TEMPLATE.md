@@ -26,9 +26,11 @@ multi-node ruleset (if adopted) lives in the governance doc, referenced — not 
   a delta line (`manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp:
   <n>`, n counted from the OLD stamp before re-stamping) in the commit message; the gate goes red
   whenever `watch` files move past the stamp.
-- Stamp rule: sha = `HEAD` on the default branch, else `git merge-base <remote>/<default> HEAD`;
-  no remote → `git merge-base <local-default> HEAD` (a branch sha would be orphaned by a
-  squash-merge); the datetime always advances.
+- Stamp rule: sha = `HEAD` on any branch; the datetime always advances. It was `HEAD` on the
+  default branch and a merge-base elsewhere until `KICK-cSettledDocket-1` recorded that the
+  merge-base cannot satisfy this checker's own check 5 on a feature branch — the sha it names is
+  not the commit §B was verified against. The no-remote fallback went with it: it existed only
+  because `merge-base` needs a remote ref to resolve, and `HEAD` needs none.
 - Dated entries (corrections, traps) carry a prune-when condition and are DELETED once it holds.
 - A claim whose truth lives in another repo is tagged `(cross-repo — verify at use)` and sits
   outside the `last-audit` assertion — watch pathspecs are single-repo.
