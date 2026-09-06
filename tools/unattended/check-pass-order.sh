@@ -98,8 +98,11 @@ while IFS= read -r -d '' _ck; do
   case "$_ck" in
     __CONF_IMPORT_OK__) _conf_ok=1 ;;
     # AN ALLOW-LIST, NOT A GLOB, and this is where the spliced block had to be adapted rather than
-    # copied. The sibling assigns EVERY uppercase key it sees, which is safe THERE because that
-    # script sets nothing it cares about above the import. This one sets DRIVER at :51 — the path it
+    # copied. `check-unattended.sh` CARRIED the same open glob and had to stop for the same reason:
+    # it sets HERE, DRIVER, CONF and SCOPE above its own import, and two exploits were reproduced
+    # through exactly that gap before it took a declared key list of its own. Both legs now carry
+    # one. The sentence here used to say the glob was safe THERE, which described neither the code
+    # nor the risk and is the reasoning that produced the hole. This one sets DRIVER at :51 — the path it
     # eval's the classifier out of — so one tracked conf line `DRIVER="tools/unattended/evil.sh"`
     # made the leg eval an attacker-chosen file and exit 0 with its own FAILED line printed.
     # Reproduced end to end before this line existed. Only the keys this leg DECLARES are assignable,

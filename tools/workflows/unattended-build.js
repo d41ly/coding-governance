@@ -759,6 +759,13 @@ if (verdict === 'CONVERGED') {
       specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
       lastReport: lastReport, skippedTerminal: [],
       roster: [],
+      // THE ONE PATH WHERE `stood` CAN BE NON-EMPTY, and it is the one the field was missing from.
+      // F4 added `standing` to the hand-out alone, where the guard above proves it always `[]` — the
+      // field was placed exactly where it can never say anything and omitted exactly where it
+      // carries the payload. A caller applying the hand-out's own stated rule reads `undefined`
+      // here and concludes disposal never ran, which is the inverted reading the key exists to
+      // prevent. Round-2 finding 1.
+      standing: stood,
       note: 'DEGRADED — blockers were not disposed: ' + standing + '. No roster is handed out: a ' +
         'roster minus the units a blocker touches is a judgement this runtime cannot make.',
     }
@@ -845,6 +852,9 @@ if (attended && !buildUnits.length) {
     slug: slug, mode: mode, base: base, round: roundNo, units: ordered.length,
     specced: speccedCount, specRefused: specRefused, verdict: verdict, blockers: au.blockers,
     lastReport: lastReport, skippedTerminal: skippedDone, roster: [],
+    // POST-DISPOSAL, so `stood` is in scope and the key belongs here for the same reason it belongs
+    // on the DEGRADED return: every non-throwing exit past the stage says what stood, out loud.
+    standing: stood,
     // THE DEGRADED TERM IS NOT SKIPPED HERE. This return was written with a hard-coded clean note,
     // which bypasses the composition the main return performs — and `specRefused` is live on this
     // path, so a run that refused specs and then found nothing to build reported 'complete'.

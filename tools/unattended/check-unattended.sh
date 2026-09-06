@@ -159,8 +159,11 @@ while IFS= read -r -d '' _ck; do
     # driver enforced something else. `SCOPE="skip28"` deleted the whole 28 region including 28c's
     # pinned-git-read enforcement. `.unattended.conf` is a tracked file an unattended run commits
     # itself, and this is an unguarded merge-bar leg. The two sibling importers - check-pass-order
-    # and check-brief-recorded - already close it, and the comment above the latter's list names
-    # THIS leg's hole as its reason.
+    # and check-brief-recorded - already close it. `check-brief-recorded.sh`'s own comment names a
+    # sibling that sets DRIVER above its import and evals a classifier out of it: that is
+    # `check-pass-order.sh`, not this leg, which evals nothing but its own import assignment. An
+    # earlier revision of this paragraph claimed that comment named THIS hole; it does not, and the
+    # attribution is corrected rather than left to mislead the next reader.
     #
     # THE SET IS THE INTERSECTION of the keys initialised above with the keys the shipped
     # `.unattended.conf.example` declares, which is what "the keys this leg reads FROM THE CONF"
@@ -171,10 +174,16 @@ while IFS= read -r -d '' _ck; do
     # advertisement, and the initialiser exists only so `set -u` survives the path where that parse
     # did not run. Assigning it from the conf is not a feature being kept, it is the same hole
     # wearing a different key.
+    # THE SENTINELS BELOW NAME THIS BLOCK FOR A JOIN THAT IS NOT YET WIRED - see check 22, which
+    # records why it was withdrawn. They are BARE on purpose: an anchored range over them must not be
+    # able to match the extractor's own source line, which is how the first draft of that join read 38
+    # keys instead of 20 and swept in heredoc markers and phase names.
+    # gov:conf-allow-begin
     MEMORY_ROOT|LANDER|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
     PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
     HALT_FLOOR|UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
+    # gov:conf-allow-end
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
           for _n in $_conf_names; do eval "_cval=\${$_n:-}"; printf '%s\0%s\0' "$_n" "$_cval"; done
@@ -1439,6 +1448,20 @@ elif [ -f "$LIVEDOC" ]; then
   else
     proj_extra=""
   fi
+  # THE FOURTH SPELLING IS NOT JOINED, AND THAT IS A KNOWN GAP RATHER THAN AN OVERSIGHT.
+  # The import's allow-list at the top of this file is a fourth hand-typed spelling of this leg's
+  # conf key set - beside the initialiser block, this example and section 8's table - and it is the
+  # only one of the four nothing reads. A key added to the other three and forgotten there is dropped
+  # SILENTLY: it keeps its initialised default and every gate stays green.
+  #
+  # The join was WRITTEN and then WITHDRAWN unlanded, for a reason worth more than the check: its two
+  # refusal branches each owe an arm under the harness meta-gate, the only suite that can carry one is
+  # on no bar and could not complete a run on the node that wrote this, and a refusal whose failing
+  # case nobody has observed is exactly what this leg's own header calls an assertion about nothing.
+  # The predicate itself WAS measured over the tracked tree before it was withdrawn - the keys this
+  # example declares AND this file initialises, minus the allow-list, is EMPTY, with no near-miss in
+  # either direction - so there is no live instance today and the hazard is the next key, not this
+  # tree. TOOL-aHoistedPass-40 carries the predicate, the sentinel design and that measurement.
   if [ -n "$(printf '%s' "$undocumented$phantom$proj_extra" | tr -d '[:space:]')" ]; then
     fail 22 "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol: ${undocumented:-none} | documented but in no example: ${phantom:-none} | set by this project and undocumented: ${proj_extra:-none}"
   fi
@@ -3001,7 +3024,9 @@ fi
 # section in the driver's DIRECTIVES_CORE, and a literal section token in this block would go on
 # grading a section the directive no longer names the day the handle is re-pointed.
 #
-# FIVE ANNOUNCED SKIPS, one per case this check cannot COMPARE, each naming its OWN subject. A guard
+# ONE ANNOUNCED SKIP PER CASE this check cannot COMPARE, each naming its OWN subject. The BRANCHES
+# are the count and no numeral is typed beside them: F6 added the two Skill cases and left a `FIVE`
+# here that was two short, in a header whose enumeration is load-bearing. A guard
 # that a binding pair EXISTS is not a guard that it COVERS, and an absence-only assertion passes when
 # the subject was never there - so a check that cannot compare SAYS so rather than reporting a
 # reassuring zero. The announcement is therefore this check's liveness assertion and no separate

@@ -1660,7 +1660,8 @@ hit "$(run)" "a build's --plan reports NOT A UNIT rows AND claims every tracked 
 
 # ---- 31 (TOOL-aHoistedPass-9): the route the `passes-harnessed` directive names RESOLVES in this
 # ---- tree, and every case the check cannot COMPARE announces itself on the REPORT channel instead
-# ---- of passing silently. SIX breaks and one green control, one per branch of the check.
+# ---- of passing silently. ONE BREAK PER BRANCH plus a green control; the arms are the count and
+# ---- no numeral is typed beside them, for the reason the leg's own header now gives.
 # ----
 # ---- The fixture ships no build-method carrier, so each arm writes one through `_bm_sections` -
 # ---- the same helper arm 6b uses. That keeps every OTHER cited section present, so these arms grade

@@ -75,10 +75,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   the handles are written here — that is the drift the pointer design exists to avoid. Two invert
   the reflex: a discovery is ADOPTED not parked; the keepalive precedes orienting. §11 and §5.
 
-- **`passes-harnessed` RESOLVES now and did not before `aHoistedPass`.** All seventeen core handles
-  are anchored in the sections they cite and check 16 arm B reads the BODY, not just existence. The
-  route MOVED too: the harness returns a roster and the run makes one `Workflow` call per unit. M6
-  owns it and check 31 grades it — do not restate it here.
+- **`passes-harnessed` RESOLVES now and did not before `aHoistedPass`.** Every core handle is
+  anchored in the section it cites, and check 16's BODY TERM grades that — arm B only asserts the
+  section exists. The route MOVED too: the harness returns a roster and the run makes one `Workflow`
+  call per unit. M6 owns it and check 31 grades it; no count is typed here.
 
 - **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`.** A breach is KILLED, and `gates-green`
   then says the bar never RETURNED — not the same fact as a leg FAILING. `TOOL-aBoundedCeiling-6`.

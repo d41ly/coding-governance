@@ -492,6 +492,7 @@ has "AC6 the CONVERGING exit carries an empty roster" "$o" '"roster":[]'
 T_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE"}]}'
 o=$(run_wf "$T_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has "AC6 the attended every-unit-terminal exit carries an empty roster" "$o" '"roster":[]'
+has "R2F1 the attended every-unit-terminal exit says what stood" "$o" '"standing":'
 has "AC6 ...and still says why" "$o" "every unit was already terminal"
 
 # ---- AC7/AC8: the hand-out itself. The roster is asserted WHOLE — key set, key order, values and
@@ -588,6 +589,11 @@ o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":true,"standing":["b
 has "F4 disposed:true with a standing blocker: the roster is EMPTY" "$o" '"roster":[]'
 has "F4 disposed:true with a standing blocker: the note is DEGRADED" "$o" "DEGRADED — blockers were not disposed"
 has "F4 disposed:true with a standing blocker: the blocker is NAMED" "$o" "were not disposed: b1"
+# ROUND 2, finding 1: the DEGRADED return is the ONE path where `stood` can be non-empty, and it
+# carried no `standing` key at all. The arm below asserts the payload, not the empty case. The
+# hand-out arm further down asserts `[]` and passes on a fixture that could not have produced
+# anything else, so it proves the key is PRESENT there and nothing about its value.
+has "F4 the DEGRADED return names what stood, as a key and not only in prose" "$o" '"standing":["b1"]'
 hasnt_ "F4 disposed:true with a standing blocker: disposal is NOT logged done" "$o" "disposal: done"
 # CEILING is the other verdict that reaches the stage, and it takes the same path.
 o=$(run_wf "$UNITS" "$(returns CEILING 4 '{"disposed":true,"standing":["b2"],"summary":"x"}')")

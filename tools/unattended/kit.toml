@@ -14,7 +14,7 @@ role = "engine"
 include = ["SKILL.template.md"]
 role = "rendered"
 to = ".claude/skills/unattended/SKILL.md"
-placeholders = ["KIT_DIR", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL", "ANCHOR_SCOPE", "AUTH_PARAM"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL", "ANCHOR_SCOPE", "AUTH_PARAM"]
 
 [[files]]
 include = ["PROTOCOL.template.md"]
@@ -45,9 +45,12 @@ placeholders = []
 # `check-playbook.sh` exited 1 for any adopter installed at another prefix and the suite above it
 # could not follow a variable the fixture did not have. TOOL-dScrubbedConduit-2.
 #
-# ONE token, and deliberately not two. `TOOL_ROOT` is computed only by the memory-tree adopter;
-# this kit's adopter never computes it, so declaring it here would ship an unresolved brace to every
-# adopter. All five spellings sat under the kit directory, so `KIT_DIR` covers every one.
+# ONE token here, and the reason stands on its own ground: all five spellings in the FIXTURE sit
+# under the kit directory, so `KIT_DIR` covers every one of them. The clause this comment used to
+# carry - that `TOOL_ROOT` is computed only by the memory-tree adopter and declaring it would ship an
+# unresolved brace - was true when it was written and is false now: `adopt-unattended.sh` derives and
+# substitutes `TOOL_ROOT`, and the SKILL row above declares it. A stale premise is what the next
+# author reads before touching this rule.
 [[files]]
 include = ["playbook.fixture.template.md"]
 role = "rendered"
