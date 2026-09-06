@@ -257,7 +257,7 @@ printf '# t84\n\n**Status:** OPEN · rev-1 · 2026-08-25 · node a · Tier-1 · 
 # ---- the engine prints a zero-population notice — so these five fixtures are its ENTIRE coverage.
 # ---- Tier-1 throughout, deliberately: the arm sits above the Tier-1 cut and a Tier-1 fixture keeps
 # ---- the section canon out of the way, so a red here can only be this arm.
-revspec() { # $1 = fixture number, $2 = filename date, $3.. = the §9 entry lines
+write_rev_spec() { # $1 = fixture number, $2 = filename date, $3.. = the §9 entry lines
   local num="$1" date="$2"; shift 2
   { printf '# t%s\n\n**Status:** OPEN · rev-%s · %s · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 9. Revision log\n\n' \
       "$num" "$([ $# -gt 1 ] && echo 2 || echo 1)" "$date"
@@ -266,18 +266,18 @@ revspec() { # $1 = fixture number, $2 = filename date, $3.. = the §9 entry line
   } > "$D/spec/$date-spec-tFixture-$num.md"
 }
 # 90 — post-cutoff, a rev-2 entry naming no section, scope id or acceptance id -> RED
-revspec 90 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review corrections.'
+write_rev_spec 90 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review corrections.'
 # 91 — the same entry once it gains a section token -> silent
-revspec 91 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · §4 · folded the review corrections.'
+write_rev_spec 91 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · §4 · folded the review corrections.'
 # 92 — PRE-cutoff twin of 90. Without it "no landed spec goes retroactively red" is an untested claim.
-revspec 92 2026-08-10 '- rev-1 · 2026-08-10 · initial draft.' '- rev-2 · 2026-08-10 · folded the review corrections.'
+write_rev_spec 92 2026-08-10 '- rev-1 · 2026-08-10 · initial draft.' '- rev-2 · 2026-08-10 · folded the review corrections.'
 # 93 — post-cutoff, rev-1 ONLY. A first draft moved the whole document, so it is exempt; without this
 #      fixture the exemption is asserted rather than observed, and it is 488 entries of the corpus.
-revspec 93 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.'
+write_rev_spec 93 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.'
 # 94 — post-cutoff, the token on a WRAPPED continuation line rather than the head. This is the whole
 #      reason the arm accumulates per ENTRY: per LINE it marks about 30% of the corpus and reds half
 #      the specs that already do the right thing, because this house style wraps at ~100 columns.
-revspec 94 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review
+write_rev_spec 94 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review
   corrections, which moved §4 and the acceptance criteria beneath it.'
 
 # ---- TOOL-aJoinedCanon-3: the §2 scope-JOIN arms. SCOPE_JOIN_CUTOFF is declared at 2026-08-20 in
@@ -285,26 +285,26 @@ revspec 94 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026
 # ---- every branch, so the real corpus grades nothing and these six fixtures are the whole coverage.
 # ---- Tier-1 throughout: the arm is both-tiers by placement above the Tier-1 cut, and a Tier-1
 # ---- fixture keeps the section canon out of the way so a red here can only be this arm.
-joinspec() { # $1 = num, $2 = date, $3 = the §2 body, $4 = the §6 body (empty string = NO §6 heading)
+write_join_spec() { # $1 = num, $2 = date, $3 = the §2 body, $4 = the §6 body (empty string = NO §6 heading)
   { printf '# t%s\n\n**Status:** OPEN · rev-1 · %s · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n%s\n\n' "$1" "$2" "$3"
     [ -n "$4" ] && printf '## 6. Acceptance criteria\n\n%s\n\n' "$4"
     printf '## 9. Revision log\n\n- rev-1 · %s · initial draft.\n\n## 10. Reuse audit\n\nNothing here.\n' "$2"
   } > "$D/spec/$2-spec-tFixture-$1.md"; }
 # 110 — post-cutoff, an item naming neither an AC label nor the escape -> RED, named by its S label
-joinspec 110 2026-08-25 '- **S1** — the thing this unit builds.' '- **AC1** — `token` — the observation.'
+write_join_spec 110 2026-08-25 '- **S1** — the thing this unit builds.' '- **AC1** — `token` — the observation.'
 # 111 — the same item once it names AC1 -> silent
-joinspec 111 2026-08-25 '- **S1** — the thing this unit builds. Observed by AC1.' '- **AC1** — `token` — the observation.'
+write_join_spec 111 2026-08-25 '- **S1** — the thing this unit builds. Observed by AC1.' '- **AC1** — `token` — the observation.'
 # 112 — PRE-cutoff twin of 110. Without it "no landed spec goes retroactively red" is untested.
-joinspec 112 2026-08-10 '- **S1** — the thing this unit builds.' '- **AC1** — `token` — the observation.'
+write_join_spec 112 2026-08-10 '- **S1** — the thing this unit builds.' '- **AC1** — `token` — the observation.'
 # 113 — the escape, with its reason -> silent. The prose spelling is NOT the escape; 114 pins that.
-joinspec 113 2026-08-25 '- **S1** — the thing this unit builds. NOT OBSERVED — it ships no observable.' '- **AC1** — `token` — the observation.'
+write_join_spec 113 2026-08-25 '- **S1** — the thing this unit builds. NOT OBSERVED — it ships no observable.' '- **AC1** — `token` — the observation.'
 # 114 — the same sentence in ordinary lower case is NOT the escape and still reds. One spelling, and
 #       the corpus measured 0 of 3,207 items carrying it, so nothing landed is caught by the case.
-joinspec 114 2026-08-25 '- **S2** — the thing this unit builds. not observed in this build.' '- **AC1** — `token` — the observation.'
+write_join_spec 114 2026-08-25 '- **S2** — the thing this unit builds. not observed in this build.' '- **AC1** — `token` — the observation.'
 # 115 — a Scope heading and NO Acceptance heading -> silent. This is dUnstalledConvoy M13: two closed
 #       Tier-1 specs number their criteria under §5 and carry Gates at §6, so an ordinal-keyed
 #       population reds a spec that is legal under the format.
-joinspec 115 2026-08-25 '- **S1** — the thing this unit builds.' ''
+write_join_spec 115 2026-08-25 '- **S1** — the thing this unit builds.' ''
 # 116 — the item enumerates its criteria as SUB-bullets, which are continuations of the one item.
 { printf '# t116\n\n**Status:** OPEN · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n'
   printf -- '- **S1** — the thing this unit builds.\n  - observed by AC1 for the arm\n  - and by AC2 for the render\n\n'
@@ -316,7 +316,7 @@ joinspec 115 2026-08-25 '- **S1** — the thing this unit builds.' ''
 # ---- of every dated spec on every branch, so these six fixtures are the arm's whole coverage.
 # ---- 125 is deliberately NOT here: it needs the witness key ABSENT and so takes its own scratch
 # ---- tree and its own conf, further down, which is what makes AC7 a real observation of the hoist.
-fmspec() { # $1 = num, $2 = date, $3 = tier, $4.. = the §6 bullet lines
+write_failmode_spec() { # $1 = num, $2 = date, $3 = tier, $4.. = the §6 bullet lines
   local num="$1" date="$2" tier="$3"; shift 3
   { printf '# t%s
 
@@ -338,22 +338,22 @@ Nothing here.
 ' "$date"
   } > "$D/spec/$date-spec-tFixture-$num.md"; }
 # 120 — post-cutoff, a bullet with no Red when: clause -> RED, named by its AC label
-fmspec 120 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-120`.'
+write_failmode_spec 120 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-120`.'
 # 121 — the same bullet once it gains the clause -> silent
-fmspec 121 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-121`. Red when: the arm stays silent.'
+write_failmode_spec 121 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-121`. Red when: the arm stays silent.'
 # 122 — PRE-cutoff twin of 120, dated strictly inside [SPEC_FORMAT_CUTOFF, SPEC_FAILURE_MODE_CUTOFF)
-fmspec 122 2026-08-10 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-122`.'
+write_failmode_spec 122 2026-08-10 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-122`.'
 # 123 — the clause on a CONTINUATION line rather than the opening line -> silent. This is the arm
 #       reading the ACCUMULATED bullet and not the head line, which is this corpus's wrap style.
-fmspec 123 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-123`.
+write_failmode_spec 123 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-123`.
   Red when: the test is applied to the opening line instead of to the accumulated bullet.'
 # 124 — TIER-1, post-cutoff, no clause -> still RED. The arm sits above the `hdr ~ /Tier-1/ next`
 #       cut, so a Tier-1 spec is exempt from the canon and not from meaning what it writes.
-fmspec 124 2026-08-25 1 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-124`.'
+write_failmode_spec 124 2026-08-25 1 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-124`.'
 # 125 — the SIXTH, for AC7. It rides the same tree, but its assertion runs under a conf that arms
 #       THIS key and no other check-12 rule cutoff, further down. That run is the only thing in
 #       either spec that can tell a shared -v binding from two independent ones.
-fmspec 125 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-125`.'
+write_failmode_spec 125 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-125`.'
 
 # ---- TOOL-cSettledDocket-3: Tier-1 twins for the two assertions HOISTED above the Tier-1 cut.
 # ---- Before the hoist every one of these was silent, because `next` cut the record first.
@@ -671,7 +671,7 @@ ledspec 146 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observe
 # ---- TOOL-aJoinedCanon-8: the four §3 EDGE arms. SPEC_EDGES_CUTOFF is 2026-08-20 in the shared
 # ---- conf. These are Tier-2 by construction: the arm sits BELOW the `hdr ~ /Tier-1/ next` cut,
 # ---- because declaring edges is a Tier-2 obligation and the light profile is exempt from it.
-edgespec() {   # $1 num · $2 date-day · $3 order · $4 edges body (empty = NO Edges block)
+write_edge_spec() {   # $1 num · $2 date-day · $3 order · $4 edges body (empty = NO Edges block)
   { printf '# ARCH-tFixture-%s — a unit
 
 ' "$1"
@@ -695,34 +695,34 @@ none.
   } > "$D/spec/2026-08-$2-spec-tFixture-$1.md"
 }
 # 160 — no Edges block at all. The SHAPE arm, and the only one that runs under --staged.
-edgespec 160 25 1 ''
+write_edge_spec 160 25 1 ''
 # 161 — a declared `none`. Silent: an absent declaration and a declared absence are different bytes.
-edgespec 161 25 2 'none'
+write_edge_spec 161 25 2 'none'
 # 162 <-> 163 — a mutual pair, both directions declared. Silent.
-edgespec 162 25 3 '- **hands-off** `ARCH-tFixture-163` — the second half.'
-edgespec 163 25 4 '- **consumes-from** `ARCH-tFixture-162` — the first half.'
+write_edge_spec 162 25 3 '- **hands-off** `ARCH-tFixture-163` — the second half.'
+write_edge_spec 163 25 4 '- **consumes-from** `ARCH-tFixture-162` — the first half.'
 # 164 -> 165 — one end declared and the other silent. RECIPROCITY.
-edgespec 164 25 5 '- **hands-off** `ARCH-tFixture-165` — the second half.'
-edgespec 165 25 6 'none'
+write_edge_spec 164 25 5 '- **hands-off** `ARCH-tFixture-165` — the second half.'
+write_edge_spec 165 25 6 'none'
 # 166 <-> 167 — mutual, and pointing the wrong way through the build order. ORDER, both directions.
-edgespec 166 25 7 '- **consumes-from** `ARCH-tFixture-167` — taken.'
-edgespec 167 25 8 '- **hands-off** `ARCH-tFixture-166` — given.'
+write_edge_spec 166 25 7 '- **consumes-from** `ARCH-tFixture-167` — taken.'
+write_edge_spec 167 25 8 '- **hands-off** `ARCH-tFixture-166` — given.'
 # 168 — a bullet whose head is the cut third verb. SHAPE again, and it names the offending head.
-edgespec 168 25 9 '- **depends-on** `ARCH-tFixture-161` — the verb this format does not have.'
+write_edge_spec 168 25 9 '- **depends-on** `ARCH-tFixture-161` — the verb this format does not have.'
 # 169 — PRE-cutoff, no Edges block. Nothing landed goes retroactively red.
-edgespec 169 10 10 ''
+write_edge_spec 169 10 10 ''
 # 170 — an `external` payload. Legal, and joined to nothing.
-edgespec 170 25 11 '- **consumes-from** external — a precondition nobody in this build builds.'
+write_edge_spec 170 25 11 '- **consumes-from** external — a precondition nobody in this build builds.'
 # 171 — a bullet with a legal verb and NO payload. The third join arm.
-edgespec 171 25 12 '- **hands-off** — something, somewhere.'
+write_edge_spec 171 25 12 '- **hands-off** — something, somewhere.'
 # 172 — an `external` payload whose PROSE names a sibling in this build. A joinable edge written
 #       as an unjoinable one, which both joins would otherwise skip in silence.
-edgespec 172 25 13 '- **consumes-from** external — in practice the work `ARCH-tFixture-161` does.'
+write_edge_spec 172 25 13 '- **consumes-from** external — in practice the work `ARCH-tFixture-161` does.'
 
 # ---- TOOL-aJoinedCanon-9: the §5 declared-row arm. The scratch conf declares a THREE-row set, not
 # ---- gov's eight, so the fixtures stay short and the arm is sized against the declaration rather
 # ---- than against a literal that would have to be kept in step with the conf.
-rowspec() {    # $1 num · $2 date-day · $3 the §5 body
+write_rows_spec() {    # $1 num · $2 date-day · $3 the §5 body
   { printf '# ARCH-tFixture-%s — a unit
 
 ' "$1"
@@ -741,14 +741,14 @@ rowspec() {    # $1 num · $2 date-day · $3 the §5 body
   } > "$D/spec/2026-08-$2-spec-tFixture-$1.md"
 }
 # 180 — a declared row missing from §5. RED, and it NAMES the row rather than the file alone.
-rowspec 180 25 '- security
+write_rows_spec 180 25 '- security
 - observability'
 # 181 — every declared row present. Silent.
-rowspec 181 25 '- security
+write_rows_spec 181 25 '- security
 - observability
 - risks'
 # 182 — PRE-cutoff twin of 180. Nothing landed goes retroactively red.
-rowspec 182 10 '- security
+write_rows_spec 182 10 '- security
 - observability'
 { printf '# ledger two
 
@@ -817,7 +817,7 @@ printf '**Serves:** spec-audit ARCH-tFixture-1\n\nno verdict, and dated BEFORE t
 # ---- TOOL-aJoinedCanon-11: the `base` sha resolves to a real commit. BASE_RESOLVE_CUTOFF is
 # ---- 2026-08-26 in the shared conf, one day past the newest fixture filename date in this file, so
 # ---- every pre-existing `base 0123abcd` fixture is grandfathered and only these are graded.
-basespec() {   # $1 num · $2 date-day · $3 status · $4 tier · $5 base sha
+write_base_spec() {   # $1 num · $2 date-day · $3 status · $4 tier · $5 base sha
   printf '# ARCH-tFixture-%s — a unit
 
 **Status:** %s · rev-1 · 2026-08-%s · node a · Tier-%s · base %s · streams architecture
@@ -829,19 +829,19 @@ basespec() {   # $1 num · $2 date-day · $3 status · $4 tier · $5 base sha
 }
 # 190 — LIVE, TIER-1, a base that resolves to nothing. Tier-1 deliberately: the arm sits ABOVE the
 #       `hdr ~ /Tier-1/ next` cut, and below it this fixture goes silent while the key reads armed.
-basespec 190 26 OPEN 1 0123abcd
+write_base_spec 190 26 OPEN 1 0123abcd
 # 192 — CLOSED with the same dead base. Silent: a landed record is frozen and is not rewritten to
 #       clear a hit, so the population is the specs a build can still change.
-basespec 192 26 CLOSED 2 0123abcd
+write_base_spec 192 26 CLOSED 2 0123abcd
 # 193 — PRE-cutoff twin of 190. Nothing landed goes retroactively red.
-basespec 193 10 OPEN 2 0123abcd
+write_base_spec 193 10 OPEN 2 0123abcd
 
 git add -A && git commit -q -m fixtures --no-verify
 # 191 — the green twin, and it can only be written HERE: its base must name a commit that exists,
 #       which is not true of any sha until the fixtures commit above has been made. It commits
 #       BEFORE the rm below: `git add -A` would otherwise stage tFixture-13's deletion and
 #       destroy the tracked-but-absent state the very next arm grades.
-basespec 191 26 OPEN 2 "$(git rev-parse --short=8 HEAD)"
+write_base_spec 191 26 OPEN 2 "$(git rev-parse --short=8 HEAD)"
 git add -A && git commit -q -m base-green --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 

@@ -1363,6 +1363,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_gates",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "extract_phrases",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -2441,6 +2446,11 @@
       "id": "read_conf",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_conf_key",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "read_contract_registry",

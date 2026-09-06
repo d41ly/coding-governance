@@ -122,7 +122,7 @@ READINESS_ROWS_CUTOFF=""
 # never required; set it strictly ahead of your corpus as with the cutoffs above.
 BASE_RESOLVE_CUTOFF=""
 
-# Section-7 leg-line ratchet, read by `tools/check-spec-tokens.py` rather than by the hygiene engine:
+# Section-7 leg-line ratchet, read by the spec-tokens checker rather than by the hygiene engine:
 # from this date a LIVE spec that CARRIES a `## N. Gates` heading must contribute at least one leg
 # name your gate manifest resolves. A spec with no Gates heading is silent, which is the whole Tier-1
 # accommodation. Blank = never required. Declared here because a key that reaches only the shipping

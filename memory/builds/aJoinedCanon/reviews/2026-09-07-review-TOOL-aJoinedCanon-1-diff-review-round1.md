@@ -4,6 +4,8 @@
 
 ## Verdict: CLEAN WITH FIXES
 
+*Round 2 appended after the full bar; four further findings, all fixed. Read that section first.*
+
 Node `a`, 2026-09-07. Range `274aa39b..HEAD`, 37 files, 2475 insertions, 397 deletions. Ten units
 built, one retired.
 
@@ -84,6 +86,52 @@ Each of these is a predicate that could have printed something and did not.
 | dead variables left by the fold | none (`extids` removed with its block) |
 | `check-arms.py --check` | green at 26:26 |
 | build README rules against what shipped | 9 of 9 hold; F3 is the exception |
+
+## Round 2 — what the FULL BAR found that the predicates did not
+
+The first close ran the merge bar and it came back RED, 4 of 42 legs. That is the honest verdict on
+the predicate pass above: it checked what it thought to check, and the bar checked more.
+
+### F4 — the verb pin, breached by six fixture helpers — CONFIRMED, FIXED
+
+`lexicon naming predicates` exits 0 at BASE and 1 at HEAD with the SAME four violations, so the
+violations are pre-existing and the EXIT is not. The cause is the shrink-only verb pin: offenders
+978 at BASE, 984 at HEAD. Exactly six, and exactly the six shell fixture helpers this build added —
+`revspec`, `joinspec`, `fmspec`, `edgespec`, `rowspec`, `basespec`. None leads with a declared verb.
+
+`lexicon.py --suggest` answers that this is a SCOPING question rather than a spelling one and prints
+the declared table. These helpers WRITE a fixture spec file, so they are now `write_rev_spec`,
+`write_join_spec`, `write_failmode_spec`, `write_edge_spec`, `write_rows_spec`, `write_base_spec`.
+Offenders back to 978, leg green.
+
+**This is the finding the predicate pass most deserved to miss**: nothing above graded a name, and
+the branch bar skips this leg as unchanged-versus-main, so it can only fail at the lander.
+
+### F5 — a shipped kit file spelling a path outside itself — CONFIRMED, FIXED
+
+`install-prefix` reported `tools/memory-tree/.memory-tree.conf.example` UNRECORDED. Isolated by
+restoring the BASE version of that one file, which turned the leg green: the cause was mine. The
+added `SPEC_LEGLINE_CUTOFF` comment spelled `tools/check-spec-tokens.py`, and a shipped kit file may
+name nothing outside itself by literal — an adopter installing kits at another prefix receives a
+dead path, because `apply` writes gov's bytes verbatim. Reworded to name the checker without a path.
+
+### F6 — a second line-keyed waiver moved out from under its literal — CONFIRMED, FIXED
+
+`tools/install-prefix-waivers.txt` keys on `<path>:<line>`. The README additions pushed the waived
+`merge-rows.sh` literal from line 109 to 117 and the leg redded. Re-keyed, never re-waived — which
+is the recorded remedy for this class.
+
+### F7 — the generated map went stale — CONFIRMED, FIXED
+
+`codebase-map coverage + freshness` failed `test_generated_artifacts_are_fresh`: `symbols.json` did
+not carry the functions this build added. Regenerated; the leg passes all six of its tests.
+
+### What did NOT change: the two lexicon legs are also red on `main`
+
+Measured against a detached BASE worktree: the four naming VIOLATIONS in `hygiene-parity.test.sh`,
+`check-playbook.sh` and `lib-unattended.sh` are present at BASE and in files this diff never touches.
+`TOOL-aWeldedTribunal-12` is the OPEN row recording that the verb pin is breached on `main` and
+refuses every landing. This build neither caused nor cleared it, and the lander will meet it.
 
 ## Left-shift summary
 
