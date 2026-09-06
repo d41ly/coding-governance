@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement
 
-**Status:** SPECCED · rev-5 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 3 · ratified 2026-09-04
+**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 3 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -263,8 +263,14 @@ neither edited region contains a `{{…}}` placeholder and the render therefore 
 
 | File | Before this unit | After | Ceiling | Free after |
 |---|---|---|---|---|
-| `coding-governance-agents.template.md` | 49018 | 48485 | 49152 | 667 |
-| `AGENTS.md` (regenerated, not hand-edited) | 64380 | 63847 | 64512 | 665 |
+| `coding-governance-agents.template.md` | 49018 | 48531 | 49152 | 621 |
+| `AGENTS.md` (regenerated, not hand-edited) | 64355 | 63868 | 64512 | 644 |
+
+*MEASURED at rev-6, after the build. The `After` column held the PREDICTED 48485/63847, which
+assumed a 533-byte recovery; the built cut recovers **487** — the replacement prose came out 46
+bytes fatter than the §4 candidate once every parity phrase was held on its own physical line,
+which is a constraint the candidate block did not have to satisfy. AC4 asks for at most 48611 and
+the landing is 48531, so the criterion holds on the measurement rather than on the estimate.*
 
 Three more files are touched and are absent from the table because none carries a size ceiling:
 `memory/guides/SESSION-KICKOFF.md`, where S6 re-verifies the §B claims and re-stamps `last-audit`;
@@ -281,8 +287,11 @@ The advisory `TEMPLATE-SIZE WARN` about growth past the recorded high-water of 4
 cut. **Restated at rev-5 from the RATIFIED path only**, because the rev-4 arithmetic hung its margin
 off the if-unit-2-drops-its-connective branch, and `TOOL-aHonedRuleset-2` §8 F2 was RESOLVED on
 2026-09-04 as *keep the connective — S2 ships as written at 86 bytes*. Under the ratified plan the
-landing is 49144 − 126 − 533 = **48485**, so the margin over the 48378 high-water is **107 bytes**,
-five times the figure rev-4 stated. A fourth cut on this carrier could still take the template under
+landing MEASURED at **48531** — 613 below the base 49144, of which 126 is unit 2's and **487** is
+this unit's — so the margin over the 48378 high-water is **153 bytes**, seven times the 21 rev-4
+stated. rev-5 predicted 48485 and 107 from an assumed 533-byte cut; rev-6 replaces both with what
+the build actually produced, because a prediction left standing beside a measurement is the same
+class this unit's own §5 warns about. A fourth cut on this carrier could still take the template under
 its high-water and clear the WARN as a side effect; clearing it is not this unit's job, and dropping
 below a high-water reds nothing. The live figure is what
 `bash tools/check-template-size.sh` reports, and a later session sizing a cut should read it there
@@ -501,7 +510,8 @@ rather than trust this line.
   the three summing to 2931 over `230,252p`; the replacements 1110 and 425 for 1535; recovery 533,
   which is 25.8% of the edited region. Ceilings 49152 and 64512 read from
   `tools/template-size-limits.txt`, high-water 48378 from `tools/template-size-highwater.txt`.
-  The margin figure this bullet carried was corrected at rev-5 to **107 bytes** on the ratified path;
+  The margin figure this bullet carried was corrected at rev-5 to a predicted 107 bytes and at rev-6
+  to the MEASURED **153 bytes**;
   see the `Files touched` paragraph above for why the old 21 was arithmetic off a closed fork.
 
 - rev-5 · 2026-09-06 · **round-2 spec audit folded: H3, M2, M4, M5, L1 and L2.** **H3** — S6 said
@@ -520,6 +530,19 @@ rather than trust this line.
   pin was wrong at this spec's own base and names a plausible CLOSED neighbour today; the row is now
   addressed by id, as AC11 already did. No fork re-opened, no scope item removed, no acceptance
   criterion weakened.
+
+- rev-6 · 2026-09-06 · **built; every figure replaced by its measurement, and the unit CLOSED.**
+  The cut recovers **487** bytes, not the 533 §4 estimated: holding each of the five parity-pinned
+  phrases on its own physical line — S2's requirement, and the thing a `sed`-per-line extraction
+  actually needs — cost 46 bytes the §4 candidate block never had to spend. The template lands at
+  **48531** against AC4's ceiling of 48611, so the criterion holds on the measurement. §4's
+  files-touched table, its high-water paragraph and the Alternatives bullet all carried the predicted
+  48485/107; all three now carry 48531/153, because a prediction left standing beside a measurement is
+  `amendment-leaves-its-other-half-standing`, which is the class the M6 checklist selected on this
+  unit's own build commit and was right about. `AGENTS.md`'s before-column also moves, 64380 to 64355,
+  since unit 2 landed first. Every acceptance criterion was run: AC2's five extractions were executed
+  ALONE against the template and each returned non-empty, which is what proves no phrase was broken by
+  a wrap — the first draft broke two of them and the build script now refuses that tree outright.
 
 ## 10. Reuse audit
 
