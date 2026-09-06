@@ -217,12 +217,15 @@ esac
 # ------------------------------------------------------------------- THE SUBJECT CACHE
 # ONE PASS OVER HISTORY, then no process inside any per-commit loop. This is a performance change
 # with no verdict in it, and it is written here rather than left to be rediscovered because the
-# shape it replaces cost 10184 s — 2.8 hours — against a declared ceiling of 5400, which redded the
-# whole bar on COST while passing on CONTENT. `_find_build_commit` ran TWO processes per commit
-# walked: `git log -1 --format=%s` for the subject and a `printf | tr` subshell to tokenise it. Over
-# 89 graded units, each walking up to a full `base..HEAD` window and a 401-commit pre-anchor window,
-# that is on the order of 35000 spawns, and a process spawn on Windows costs ~100 ms. The git work
-# itself was always trivial; the SPAWNS were the leg.
+# shape it replaces cost 10184 s — 2.8 hours — against a declared ceiling this leg had already been
+# re-declared once to clear, which reds the whole bar on COST while passing on CONTENT.
+# `_find_build_commit` ran TWO processes per commit walked: `git log -1 --format=%s` for the subject
+# and a `printf | tr` subshell to tokenise it. Each unit walks its own `base..HEAD` window and, when
+# that finds nothing, a capped pre-anchor window, so the spawn count is the walked depth times the
+# graded population — and BOTH of those only grow. Measured on node `a`, 2026-09-06: that pair of
+# spawns costs 751 ms per commit walked under this Cygwin bash, which is the whole leg. The git work
+# itself was always trivial; the SPAWNS were the leg. Do not read a commit COUNT out of this
+# paragraph — the walk short-circuits at the first build commit, so the depth is not the range size.
 #
 # THE TOKENISATION IS DONE HERE, BY THE SAME `tr` SET, so the cached value is byte-identical to what
 # the per-commit substitution produced — including its leading and trailing space, which is what the
