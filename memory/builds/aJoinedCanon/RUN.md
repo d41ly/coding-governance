@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: af68d5e237624e1a76d364cf2b81414a068e6080
+witness: d0fcadcb8b972facaa672cb5352ab723a39bb082
 phase: BUILDING
 mode: slug
 anchor-kind: default-branch
@@ -28,3 +28,5 @@ base: 274aa39b786c886991726896927337c0e3048e0c
 2026-09-06T13:55:23Z rescope · item retire TOOL-aJoinedCanon-2 · reason M1's byte budget on memory/guides/BUILD-METHOD.md leaves 12 B and S1's fold procedure needs 1046 B, measured at build time. Raising that number is an owner call M3 puts outside the mandate by name, the only trim of that size is M1's own record of the prior owner budget calls, and the pointer alternative fails AC1 and AC3. Parked in full with the measurement and the three options; the owner's ruling reopens it as a new unit.
 
 2026-09-06T13:57:26Z dispatch · item 323703f7 TOOL-aJoinedCanon-3 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh .memory-tree.conf tools/memory-tree/.memory-tree.conf.example tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/HYGIENE.template.md memory/TEMPLATE-SPEC.md memory/HYGIENE.md memory/guides/SESSION-KICKOFF.md
+
+2026-09-06T14:35:20Z dispatch · item d0fcadcb TOOL-aJoinedCanon-4 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh .memory-tree.conf tools/memory-tree/.memory-tree.conf.example tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/HYGIENE.template.md memory/TEMPLATE-SPEC.md memory/HYGIENE.md memory/guides/SESSION-KICKOFF.md

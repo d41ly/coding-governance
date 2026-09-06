@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.63 -->
+<!-- gov:kit memory-tree@2.64 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -247,6 +247,18 @@ bullet must carry at least one **backticked token** — the command, file, flag 
 observation. The gate reads SHAPE only: it asserts the bullet names something, never that the named
 thing exists or that the build satisfied it. The label may be written `- **AC1** — `, `- AC1. ` or
 `**AC1** `; the rule does not care which, and does not require the bold.
+
+Once a spec's filename date reaches `SPEC_FAILURE_MODE_CUTOFF` (`.memory-tree.conf`; blank turns it
+off), every numbered criterion also names the BREAK that would turn it red, in a clause marked
+`Red when:`. The clause may sit on the bullet's opening line or on any continuation line beneath it,
+which is the latitude the witness rule already grants and matches this corpus's wrap style. There is
+no `N/A` and no second form: a criterion whose break is merely its own negation costs one clause to
+write, and an author discovering that the negation is all there is has found something.
+
+```markdown
+- **AC1** — When `check-memory-hygiene.sh` runs over the fixture tree, it names `tFixture-120`.
+  Red when: the fixture carries no clause and the arm stays silent.
+```
 
 ## 7. Gates
 

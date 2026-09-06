@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.63 -->
+<!-- gov:kit memory-tree@2.64 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -183,6 +183,9 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     Every acceptance bullet must name a witness in backticks once the filename date reaches
     `SPEC_WITNESS_CUTOFF`, on either tier. SHAPE only — that a bullet names something, never
     that the named thing exists.
+    Every numbered acceptance bullet must also name the BREAK that would turn it red, in a clause
+    marked `Red when:`, once the filename date reaches `SPEC_FAILURE_MODE_CUTOFF`, on either tier.
+    The per-bullet walk is shared with the witness arm above and each reads only its own key.
     Every §2 scope item must name the acceptance criterion that observes it, or carry `NOT OBSERVED`
     and a reason, once the filename date reaches `SCOPE_JOIN_CUTOFF`, on either tier — and only for a
     spec carrying BOTH headings, matched by heading TEXT rather than by ordinal. SHAPE only.

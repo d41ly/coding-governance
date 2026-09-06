@@ -73,6 +73,14 @@ REV_SCOPE_CUTOFF=""
 # zero-population notice for as long as that leaves the arm grading nothing.
 SCOPE_JOIN_CUTOFF=""
 
+# Failure-mode ratchet (check 12): from this date, every numbered acceptance bullet must name the
+# break that would turn it red, in a clause marked `Red when:`, matched case-insensitively as a
+# substring so it may sit on a continuation line. No `N/A` and no second form. It reads THIS key and
+# no other — the per-bullet walk it rides is hoisted out of the acceptance-witness guard, so arming
+# this key while SPEC_WITNESS_CUTOFF stays blank gives you a live arm rather than a silent one.
+# Blank = never required; set it strictly ahead of your corpus as with the cutoffs above.
+SPEC_FAILURE_MODE_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.

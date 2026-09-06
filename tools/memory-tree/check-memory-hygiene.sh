@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.63   # gov:kit memory-tree@2.63 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.64   # gov:kit memory-tree@2.64 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -58,6 +58,8 @@ SPEC10_EVIDENCE_CUTOFF=""   # date; a Tier-2 spec dated >= this must RECORD its 
 REV_SCOPE_CUTOFF=""     # date; specs dated >= this must give every rev-2+ §9 entry a §n/Sn/ACn scope token (check 12); blank = never required
 # The SEVENTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-3).
 SCOPE_JOIN_CUTOFF=""    # date; specs dated >= this must have every §2 scope item name an AC label or NOT OBSERVED (check 12); blank = never required
+# The EIGHTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-4).
+SPEC_FAILURE_MODE_CUTOFF="" # date; specs dated >= this must give every acceptance bullet a `Red when:` clause (check 12); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -958,7 +960,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1022,12 +1024,28 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     # ---- spec in the tree, which would have made the both-tiers claim decorative.
     # ---- SHAPE ONLY: this asserts a bullet NAMES something, never that the named thing exists or
     # ---- that the build satisfied it. memory/TEMPLATE-SPEC.md says so where an author reads it.
-    if (wcut != "" && fdate != "" && fdate >= wcut) {
-      inac = 0; lab = ""; acc = ""; wbad = ""; nwb = 0
+    # ---- TOOL-aJoinedCanon-4 HOISTED this loop out of the witness guard, and the hoist is the whole
+    # ---- reason the failure-mode arm below has ONE gate rather than two. Written the obvious way
+    # ---- its population would be the INTERSECTION of SPEC_WITNESS_CUTOFF and
+    # ---- SPEC_FAILURE_MODE_CUTOFF, silently — and worst in the tree that cannot see it, because
+    # ---- .memory-tree.conf.example ships the witness key BLANK, so an adopter arming only the new
+    # ---- key would receive an arm that never runs while its own key reads as armed.
+    # ---- Two liveness booleans, computed once from the same fdate. The loop runs when EITHER is
+    # ---- live and is skipped otherwise, so a tree with both keys blank pays what it pays today.
+    # ---- At each bullet close the SAME acc string answers two independent questions into two
+    # ---- independent lists, each under the predicate of its own arm alone. The union guard is COST,
+    # ---- never population: no verdict of either arm can depend on the other key.
+    wlive = (wcut != "" && fdate != "" && fdate >= wcut)
+    fmlive = (fmcut != "" && fdate != "" && fdate >= fmcut)
+    if (wlive || fmlive) {
+      inac = 0; lab = ""; acc = ""; wbad = ""; nwb = 0; fmbad = ""; nfm = 0
       for (i = 1; i <= n; i++) {
         L = body[i]
         if (L ~ /^## /) {
-          if (inac && lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+          if (inac && lab != "") {
+            if (wlive && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+            if (fmlive && index(tolower(acc), "red when:") == 0) { nfm++; fmbad = (nfm == 1) ? lab : fmbad ", " lab }
+          }
           inac = (L ~ /^## [0-9]+[.] Acceptance criteria[ 	]*$/); lab = ""; acc = ""; continue
         }
         if (!inac) continue
@@ -1042,15 +1060,30 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
         # invented a phantom one, so a spec whose every criterion carried a witness could red
         # naming a label the file does not contain.
         if (L ~ /^([ 	]*(-|\*)[ 	]*)?(\*\*)?AC[0-9]+[a-z]?(\*\*)?([^A-Za-z0-9]|$)/) {
-          if (lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+          if (lab != "") {
+            if (wlive && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+            if (fmlive && index(tolower(acc), "red when:") == 0) { nfm++; fmbad = (nfm == 1) ? lab : fmbad ", " lab }
+          }
           lab = L; sub(/^[ 	]*(-|\*)?[ 	]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
           acc = L; continue
         }
         if (lab != "") acc = acc " " L
       }
-      if (inac && lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+      if (inac && lab != "") {
+        if (wlive && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
+        if (fmlive && index(tolower(acc), "red when:") == 0) { nfm++; fmbad = (nfm == 1) ? lab : fmbad ", " lab }
+      }
       if (nwb > 0)
         print f " (acceptance bullets naming no backticked witness, required at/after SPEC_WITNESS_CUTOFF): " wcut " -- " wbad
+      # ---- TOOL-aJoinedCanon-4: every criterion names the BREAK that would turn it red. One marker,
+      # ---- one spelling, matched case-insensitively as a substring over the accumulated bullet, so
+      # ---- the clause may sit on a continuation line and there is no regex dialect surface at all.
+      # ---- No N/A and no second form, which is the ruling the acceptance ledger itself makes, one level up: a
+      # ---- third form is how an evidence field becomes a checkbox exercise. A criterion whose break
+      # ---- is merely its own negation costs one clause to write, and the author discovering that
+      # ---- the negation is all there is IS the finding.
+      if (nfm > 0)
+        print f " (acceptance bullets naming no failure mode, required at/after SPEC_FAILURE_MODE_CUTOFF " fmcut "): " fmbad
     }
     # ---- TOOL-aJoinedCanon-3: a §2 scope item names the criterion that OBSERVES it, spelled AC
     # ---- followed by digits, or carries the marker NOT OBSERVED and a reason. ONE escape spelling,
@@ -1407,6 +1440,12 @@ if [ "$STAGED" = 0 ] && [ -n "$SCOPE_JOIN_CUTOFF" ]; then
   _sj_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SCOPE_JOIN_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_sj_n:-0}" -gt 0 ] || echo "memory-hygiene: the §2 scope-join arm graded NO spec — SCOPE_JOIN_CUTOFF is $SCOPE_JOIN_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
+fi
+# Same notice, same footing, for the §6 failure-mode arm (TOOL-aJoinedCanon-4).
+if [ "$STAGED" = 0 ] && [ -n "$SPEC_FAILURE_MODE_CUTOFF" ]; then
+  _fm_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_FAILURE_MODE_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_fm_n:-0}" -gt 0 ] || echo "memory-hygiene: the §6 failure-mode arm graded NO spec — SPEC_FAILURE_MODE_CUTOFF is $SPEC_FAILURE_MODE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
 fi
 fi
 

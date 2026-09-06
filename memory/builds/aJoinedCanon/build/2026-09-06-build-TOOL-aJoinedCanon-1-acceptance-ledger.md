@@ -1,6 +1,6 @@
 # aJoinedCanon — acceptance ledger
 
-**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3
+**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4
 
 Node `a`, 2026-09-06, base `274aa39b`. One `**Evidences:**` block per unit, appended as each unit
 lands. Two forms and no third: OBSERVED carries a backticked token naming what made the observation,
@@ -42,6 +42,24 @@ AMENDED names the revision that changed the criterion.
 - AC13 — `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh` — both exit 0; the epoch gate reports `34 line(s) moved` against the 2.61 → 2.62 bump, and this landing carries 2.62 → 2.63.
 - AC14 — `grep -c 'SCOPE_JOIN_CUTOFF' memory/HYGIENE.md` — 0 → 1, in the check-12 entry, with the SHAPE-only caveat and the both-headings precondition beside it.
 - AC15 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T17:05:19+03:00 @ 274aa39b`; `last-body-change` is the same sha before and after, which is the "no delta → no touch" half.
+
+**Evidences:** TOOL-aJoinedCanon-4
+
+- AC1 — `bash tools/memory-tree/check-memory-hygiene.sh` — scratch tree at `SPEC_FAILURE_MODE_CUTOFF="2026-08-20"`, `tFixture-120` reds: `(acceptance bullets naming no failure mode, required at/after SPEC_FAILURE_MODE_CUTOFF 2026-08-20): AC1`. Named by its label, and the cutoff rides the message. Red observed before the arm landed.
+- AC2 — `tFixture-121` — the same bullet with `Red when:` on its opening line is silent.
+- AC3 — `tFixture-122` — the identical clauseless bullet dated `2026-08-10`, strictly inside `[SPEC_FORMAT_CUTOFF, SPEC_FAILURE_MODE_CUTOFF)`, is silent.
+- AC4 — `tFixture-123` — the clause on a CONTINUATION line is silent, so the test reads the accumulated bullet and not the opening line.
+- AC5 — `tFixture-124` — a Tier-1 spec with a clauseless bullet still reds. The arm sits above the `hdr ~ /Tier-1/ next` cut: a Tier-1 spec is exempt from the canon, not from meaning what it writes.
+- AC6 — `out3` — the disabled-when-blank run emits no failure-mode finding while check 12 is armed.
+- AC7 — `out3f` — THE HOIST, OBSERVED. A conf arming `SPEC_FAILURE_MODE_CUTOFF` and no other check-12 rule cutoff — no `SPEC_WITNESS_CUTOFF`, no `SCOPE_JOIN_CUTOFF`, no `REV_SCOPE_CUTOFF` — still reds three fixtures including `tFixture-125`, and `no backticked witness` appears zero times in the same run. Nested inside the witness guard this run would have been silent with its own key armed, which is the adopter's ordinary state because the shipped example conf ships the witness key blank.
+- AC8 — `grep -qF "required at/after SPEC_WITNESS_CUTOFF): 2026-08-08"` — the witness arm still reports on its own cutoff after the hoist, and no existing assertion naming `acceptance bullets naming no backticked witness` was edited. The repair was to the code, not to the baseline.
+- AC9 — `grep -qE '^SPEC_FAILURE_MODE_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` — succeeds, with the adopter comment above it naming the rule, the blank-means-off semantics and the hoist.
+- AC10 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — exits 0 after `--render`, 4 pairs. Sameness only; AC12 supplies the content half.
+- AC11 — the six fixtures were each observed on the scratch tree before the arm landed: 120, 124 and 125 red, 121, 122 and 123 silent. Read honestly — they were observed as a SET in one run per conf, not staged and unstaged one at a time, which is the weaker form of what this criterion asks.
+- AC12 — `grep -c 'Red when:' memory/TEMPLATE-SPEC.md` — 0 → 2, against the baseline re-derived on this branch immediately before the edit. `grep -c 'SPEC_FAILURE_MODE_CUTOFF' memory/HYGIENE.md` — 0 → 1, in item 12 beside the witness sentence.
+- AC13 — `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh` — both exit 0; the epoch gate reports `41 line(s) moved` against the 2.61 → 2.63 range, and this landing carries 2.63 → 2.64. The deliberate pre-bump red was not staged: the bump was made before the gate was run, so this is a green rather than the observed failing case the criterion asks for.
+- AC14 — `out3f` again, and this is the criterion nothing else in either spec can supply: the arm answers to `fmcut` alone. A shared `-v` binding — the rev-4 `mcut` collision with unit 1 — would have turned this run silent with its own key armed, and both units' AC6 would still have passed, because each blanks its own key and a shared binding darkens both arms.
+- AC15 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` re-stamped for the watched engine and conf edits; `last-body-change` is the same sha before and after.
 
 ## What the date re-derivation changed
 

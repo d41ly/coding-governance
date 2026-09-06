@@ -64,7 +64,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -310,6 +310,50 @@ joinspec 115 2026-08-25 '- **S1** — the thing this unit builds.' ''
   printf -- '- **S1** — the thing this unit builds.\n  - observed by AC1 for the arm\n  - and by AC2 for the render\n\n'
   printf '## 6. Acceptance criteria\n\n- **AC1** — `token` — the observation.\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · initial draft.\n\n## 10. Reuse audit\n\nNothing here.\n'
 } > "$D/spec/2026-08-25-spec-tFixture-116.md"
+
+# ---- TOOL-aJoinedCanon-4: the §6 failure-MODE arms. SPEC_FAILURE_MODE_CUTOFF is declared at
+# ---- 2026-08-20 in the shared conf above, between the fixture eras. The shipped cutoff sits ahead
+# ---- of every dated spec on every branch, so these six fixtures are the arm's whole coverage.
+# ---- 125 is deliberately NOT here: it needs the witness key ABSENT and so takes its own scratch
+# ---- tree and its own conf, further down, which is what makes AC7 a real observation of the hoist.
+fmspec() { # $1 = num, $2 = date, $3 = tier, $4.. = the §6 bullet lines
+  local num="$1" date="$2" tier="$3"; shift 3
+  { printf '# t%s
+
+**Status:** OPEN · rev-1 · %s · node a · Tier-%s · base 0123abcd · streams architecture
+
+## 6. Acceptance criteria
+
+' "$num" "$date" "$tier"
+    printf '%s
+' "$@"
+    printf '
+## 9. Revision log
+
+- rev-1 · %s · initial draft.
+
+## 10. Reuse audit
+
+Nothing here.
+' "$date"
+  } > "$D/spec/$date-spec-tFixture-$num.md"; }
+# 120 — post-cutoff, a bullet with no Red when: clause -> RED, named by its AC label
+fmspec 120 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-120`.'
+# 121 — the same bullet once it gains the clause -> silent
+fmspec 121 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-121`. Red when: the arm stays silent.'
+# 122 — PRE-cutoff twin of 120, dated strictly inside [SPEC_FORMAT_CUTOFF, SPEC_FAILURE_MODE_CUTOFF)
+fmspec 122 2026-08-10 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-122`.'
+# 123 — the clause on a CONTINUATION line rather than the opening line -> silent. This is the arm
+#       reading the ACCUMULATED bullet and not the head line, which is this corpus's wrap style.
+fmspec 123 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-123`.
+  Red when: the test is applied to the opening line instead of to the accumulated bullet.'
+# 124 — TIER-1, post-cutoff, no clause -> still RED. The arm sits above the `hdr ~ /Tier-1/ next`
+#       cut, so a Tier-1 spec is exempt from the canon and not from meaning what it writes.
+fmspec 124 2026-08-25 1 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-124`.'
+# 125 — the SIXTH, for AC7. It rides the same tree, but its assertion runs under a conf that arms
+#       THIS key and no other check-12 rule cutoff, further down. That run is the only thing in
+#       either spec that can tell a shared -v binding from two independent ones.
+fmspec 125 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-125`.'
 
 # ---- TOOL-cSettledDocket-3: Tier-1 twins for the two assertions HOISTED above the Tier-1 cut.
 # ---- Before the hoist every one of these was silent, because `next` cut the record first.
@@ -792,6 +836,20 @@ miss 'tFixture-113.md (scope items naming neither'   # the NOT OBSERVED escape, 
 hit  'tFixture-114.md (scope items naming neither'   # lower-case prose is NOT the escape
 miss 'tFixture-115.md (scope items naming neither'   # no Acceptance heading, so not graded at all
 miss 'tFixture-116.md (scope items naming neither'   # sub-bullets are continuations of the one item
+
+# ---- TOOL-aJoinedCanon-4: §6 failure mode. AC1-AC5.
+hit  'tFixture-120.md (acceptance bullets naming no failure mode'
+miss 'tFixture-121.md (acceptance bullets naming no failure mode'   # the clause is on the opening line
+miss 'tFixture-122.md (acceptance bullets naming no failure mode'   # PRE-cutoff, grandfathered
+miss 'tFixture-123.md (acceptance bullets naming no failure mode'   # the clause is on a continuation line
+hit  'tFixture-124.md (acceptance bullets naming no failure mode'   # TIER-1 is exempt from the canon, not from this
+# the offending LABEL rides the message, and the cutoff with it.
+n=$((n+1))
+grep -qF 'tFixture-120.md (acceptance bullets naming no failure mode, required at/after SPEC_FAILURE_MODE_CUTOFF 2026-08-20): AC1' <<<"$out" || { echo "FAIL the failure-mode rejection does not name its own cutoff and the offending label"; st=1; }
+# AC8 — the HOIST moved no acceptance-witness verdict. Those assertions are untouched above and this
+# is the arm that says so: the witness arm still reports exactly the labels it reported before.
+n=$((n+1))
+grep -qF "required at/after SPEC_WITNESS_CUTOFF): 2026-08-08" <<<"$out" || { echo "FAIL the hoist moved the witness arm off its own cutoff"; st=1; }
 # the OFFENDING ITEM rides the message, by its S label where it has one, and the cutoff with it.
 n=$((n+1))
 grep -qF 'tFixture-110.md (scope items naming neither an acceptance criterion nor NOT OBSERVED, required at/after SCOPE_JOIN_CUTOFF 2026-08-20): S1' <<<"$out" || { echo "FAIL the scope-join rejection does not name its own cutoff and the offending item"; st=1; }
@@ -1063,6 +1121,9 @@ if grep -qF 'revision entries naming no' <<<"$out3"; then echo "FAIL: the rev-sc
 # TOOL-aJoinedCanon-3 AC12 — the same run has SCOPE_JOIN_CUTOFF blank while check 12 is armed.
 n=$((n+1))
 if grep -qF 'scope items naming neither' <<<"$out3"; then echo "FAIL: the scope-join requirement fired with a blank SCOPE_JOIN_CUTOFF"; st=1; fi
+# TOOL-aJoinedCanon-4 AC6 — the same run has SPEC_FAILURE_MODE_CUTOFF blank while check 12 is armed.
+n=$((n+1))
+if grep -qF 'acceptance bullets naming no failure mode' <<<"$out3"; then echo "FAIL: the failure-mode requirement fired with a blank SPEC_FAILURE_MODE_CUTOFF"; st=1; fi
 # docs/legacy-note.md is still tracked in this run — only the conf key went away.
 n=$((n+1))
 if grep -qF 'is the only sanctioned memory root' <<<"$out3"; then echo "FAIL: check 11 ran with a blank TOMBSTONE_ROOTS"; st=1; fi
@@ -1092,6 +1153,18 @@ out3j=$(bash "$SCRIPT" 2>/dev/null)
 if grep -qF 'no backticked witness' <<<"$out3j"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
 n=$((n+1))
 grep -qF 'tFixture-110.md (scope items naming neither' <<<"$out3j" || { echo "FAIL: the scope-join arm went silent when the UNRELATED SPEC_WITNESS_CUTOFF was blanked"; st=1; }
+
+# TOOL-aJoinedCanon-4 AC7 — the HOIST, observed. This conf arms SPEC_FAILURE_MODE_CUTOFF and NO
+# other check-12 rule cutoff: no SPEC_WITNESS_CUTOFF, no SCOPE_JOIN_CUTOFF, no REV_SCOPE_CUTOFF.
+# The break it stages is the accumulator left nested inside the witness guard, where this arm's real
+# population is the intersection of two cutoffs. The shipped example conf ships the witness key
+# blank, so THIS is the adopter's ordinary state and the one the repo corpus can never exercise.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out3f=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'no backticked witness' <<<"$out3f"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
+n=$((n+1))
+grep -qF 'tFixture-125.md (acceptance bullets naming no failure mode' <<<"$out3f" || { echo "FAIL: the failure-mode arm went silent with only its OWN key armed — the accumulator is still nested in the witness guard"; st=1; }
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 
 # ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector
