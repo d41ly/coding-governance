@@ -75,7 +75,7 @@ from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, SURFACES, langs
 from subtokens import (check_convention, classify, leading_verb, read_stem,  # noqa: E402
                        render_convention, subtokens)
 
-KIT_LEXICON_VERSION = "1.1"
+KIT_LEXICON_VERSION = "1.2"
 
 CONF_NAME = ".lexicon.conf"
 WAIVER_FILES = {
@@ -912,6 +912,25 @@ def load_waivers(kit: Path, kind: str) -> dict[str, str]:
     return out
 
 
+#: Siblings this engine may name in an import and must nevertheless survive WITHOUT. Exactly one,
+#: and it is named rather than inferred: an import outside this tuple is still a hard refusal, so
+#: this is a DECLARED exception and not a hole in the rule.
+#:
+#: WHY IT EXISTS. `--expand` reads the anti-mirror closure out of `scaffold_lexicon.py` rather than
+#: copying it, which is the whole point of the mode; but the kit deliberately supports an adopter who
+#: took the engine without the scaffolder, and the scaffold guard's absent-file branch REPORTS for
+#: exactly that reason. Without this line the same adopter's `--check` reds on a dependency they
+#: cannot satisfy, which is the red-nobody-can-fix that branch was written to avoid.
+#:
+#: WHAT IT DOES NOT BUY, and this is the load-bearing half: it says nothing about HOW the import is
+#: written. A module-level `import scaffold_lexicon` would pass this list and then break the engine
+#: at import time for that same adopter. The property that actually holds is armed at RUNTIME rather
+#: than asserted here — one arm runs `--check` against a kit copy with the file deleted and requires
+#: green, another runs `--expand` there and requires a named report rather than a traceback. Adding a
+#: name here without arming both is how this tuple becomes the hole it is written not to be.
+OPTIONAL_SIBLINGS = ("scaffold_lexicon",)
+
+
 def check_self_containment(kit_dir: Path = Path(__file__).resolve().parent):
     """`(problems, modules walked, imports judged)` — the ONE constraint the deleted P3 really held.
 
@@ -944,7 +963,7 @@ def check_self_containment(kit_dir: Path = Path(__file__).resolve().parent):
     """
     kit = Path(kit_dir)
     mods = sorted(kit.glob("*.py"))
-    siblings = {p.stem for p in mods}
+    siblings = {p.stem for p in mods} | set(OPTIONAL_SIBLINGS)
     problems: list[str] = []
     judged = 0
     for path in mods:
@@ -1730,6 +1749,11 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict, clusters=Non
         "unwaived": unwaived_by,
         "pins": pins_by_kind,
         "declared": declared,
+        # THE WALK ITSELF, so a caller that needs the population rather than a verdict does not pay
+        # for a second one. `--expand` derives its proposal set from this list; without it that mode
+        # would walk the corpus again, and two walks over one tree is two chances to disagree about
+        # which files are armed. TOOL-aSurfacedLexicon-10.
+        "scanned": scanned,
         "sets": sets,
         "patterns": conf.get("PATTERNS") or {},
         "canon_overlay": conf.get("CANON") or {},
@@ -2343,6 +2367,126 @@ def run_suggest(root: Path, name: str, cell_spec: str) -> int:
     return 0
 
 
+def run_expand(root: Path) -> int:
+    """`--expand` — the one-time widening of the declared table, bounded by the frozen clusters.
+
+    THE ONLY DIRECTION THIS KIT WILL PROPOSE IN. The corpus decides which concepts are LIVE here and
+    decides nothing else; every proposed row is spelled by `canon.py`, element 0, at every frequency.
+    A leading token no cluster holds cannot enter a proposal by any path, which is why the tail below
+    is printed as EVIDENCE for an owner rather than offered as a candidate list. That closure is the
+    whole difference between widening a vocabulary and legalising a habit, and it is what makes the
+    guard three paragraphs up — that nothing here can turn what the corpus DOES into what it SHOULD
+    do — survive a mode that exists to propose rows.
+
+    READ-ONLY, and it returns before `check_pass` the way `--suggest` does: it prints no pin, cannot
+    reach a waiver, and exits 0 on any tree it can read. The `expanded=` stamp and the
+    already-expanded refusal both live in `adopt-lexicon.sh`, so the engine keeps NO write path to
+    the file it grades — the risk tier this unit was priced at is "writes at most one scalar", and
+    the scalar is not written here. TOOL-aSurfacedLexicon-10.
+    """
+    # LAZY, AND IT HAS TO BE — two reasons, and the first one is fatal rather than stylistic.
+    # `scaffold_lexicon` imports THIS module at its own module scope and then reads `lex.KNOWN_EXTS`
+    # in its module BODY, above which lexicon.py's own definition sits; a top-level import here
+    # therefore raises `AttributeError` out of the sibling and lexicon.py stops importing at all,
+    # reddening every leg that touches the kit. Second, a landed arm runs `--check` against a kit
+    # copy with `scaffold_lexicon.py` DELETED and asserts it is green, so the import must not exist
+    # on the default path either.
+    #
+    # AND IT LOADS A SECOND COPY OF THIS MODULE, which is worth knowing before somebody debugs it.
+    # Run as a script this file is `__main__`, so the sibling's `import lexicon` finds nothing in
+    # `sys.modules` and imports lexicon.py again under its own name. Harmless today — this module's
+    # body is assignments and a `sys.path.insert`, with no I/O — but `lex.KNOWN_EXTS` inside the
+    # scaffold is then a DIFFERENT object from the one this function holds, so nothing across that
+    # boundary may be compared by identity.
+    try:
+        import scaffold_lexicon
+    except ImportError as e:
+        # The kit ships without the scaffolder in an adopter who took only the engine, and that is
+        # a supported install rather than a defect. REPORTED, never a traceback, and never a silent
+        # zero: the same posture `measure_pass` takes for its scaffold guard.
+        print(f"lexicon: SCAFFOLDER ABSENT — `--expand` derives its proposal set from the same "
+              f"closure the scaffolder uses, and that file is not installed beside this one ({e}). "
+              f"Nothing was measured; this is not an empty proposal.")
+        return 2
+
+    kit = Path(__file__).resolve().parent
+    conf_path = root / CONF_NAME
+    if not conf_path.exists():
+        # Carried from `run()` rather than inherited: a mode dispatched beside `--suggest` never
+        # reaches run()'s NOT ADOPTED branch, and `load_conf` on a missing file raises.
+        print(f"lexicon: NOT ADOPTED — no {CONF_NAME} at the repo root, so there is no table to "
+              f"widen; the kit is opt-in and inert without one")
+        return 0
+    try:
+        conf = load_conf(conf_path)
+        declared = {ext: (pset, mode) for ext, pset, mode in langs(conf)}
+        clusters = canon.build_clusters(conf.get("CANON") or {})
+    except (ConfError, ValueError) as e:
+        print(f"lexicon: {e}")
+        return 1
+
+    # ABOVE EVERYTHING, exactly as `run()` does it. A mode whose entire subject is what the frozen
+    # clusters permit must not be the one run that stays silent about an owner having opened them.
+    print_canon_posture(conf)
+
+    verbs = conf.get("VERBS") or {}
+    measured = measure_pass(root, kit, conf, declared, clusters)
+    derived = scaffold_lexicon.derive_candidates(measured["scanned"], declared=verbs,
+                                                 clusters=clusters)
+    candidates, live = derived["candidates"], derived["live"]
+
+    if candidates:
+        print(f"EXPAND — {len(candidates)} cluster(s) have a live site in this corpus and no row in "
+              f"the declared table. Paste them INSIDE the `VERBS:` block, indented, and SHARPEN "
+              f"every negative first: the glosses below are the shipped ones, and a row nobody "
+              f"edited is the seed's problem arriving one table later.")
+        for v in candidates:
+            print(f"  {v:<9} {canon.read_gloss(v, clusters)}{canon.render_negative(v, clusters)}")
+    else:
+        print(f"EXPAND — nothing to propose. All {len(live)} cluster(s) with a live site in this "
+              f"corpus already carry a row, so a widening bounded by the clusters can offer nothing "
+              f"this declaration does not hold. That is the NORMAL result on an adopted repo and "
+              f"not a run that failed to measure.")
+
+    # THE TAIL, from the ENGINE's own classification and not a second predicate. `unruled` already
+    # means "a leading token no cluster holds and no row names" everywhere else in this file, and it
+    # is the number `--check` prints on every bar; re-deriving it here would be two answers to one
+    # question with the copy nobody grades.
+    tail: dict = {}
+    for off in measured["offenders"]["verb"]:
+        if off.cls == "unruled" and off.verb:
+            tail[off.verb] = tail.get(off.verb, 0) + 1
+    rows = sorted(tail.items(), key=lambda kv: (-kv[1], kv[0]))
+
+    print("")
+    print(f"NOT PROPOSALS — {len(rows)} leading token(s) across {sum(tail.values())} definition(s) "
+          f"lead with a word no cluster holds and no row names. THIS VERB WILL NEVER OFFER THEM, at "
+          f"any frequency. A row here would be the corpus voting on its own commonest spellings, "
+          f"which is the one shape a naming gate must not have, and it is the defect this kit was "
+          f"rebuilt to close. They are printed as EVIDENCE: a token near the top is a house idiom "
+          f"that either earns a hand-written row with a hand-written negative, or gets renamed "
+          f"everywhere.")
+    for v, n in rows[:20]:
+        print(f"  {v:<14} {n} definition(s)")
+    if len(rows) > 20:
+        print(f"  ...and {len(rows) - 20} more; `--list` prints every one with its site.")
+
+    print("")
+    # THE COST, named rather than left for the next red bar to teach. NO PIN IS SPELLED HERE: the
+    # scalars and the per-cell rows a declaration carries move with the units that add them, and a
+    # message enumerating them is wrong on the commit after the one that wrote it. `--measure`
+    # prints exactly the rows this conf produces, which is the same reason it exists.
+    print(f"COST — every row you paste moves a pin. A newly declared verb stops being an offender, "
+          f"so the offender scalars fall and so does every armed vocab cell's row; each pin is a "
+          f"TWO-SIDED equality, so a drain nobody records reds the bar exactly as a rise does. "
+          f"Re-measure and paste what it prints: python {resolve_self_path()} --measure")
+    if measured["problems"]:
+        print(f"NOTE — this declaration already reports {len(measured['problems'])} problem(s) that "
+              f"`--check` names. The proposal above came off the same walk and is unaffected by "
+              f"them, but a table that does not grade is a table to fix before widening.")
+    return 0
+
+
 def resolve_self_path() -> str:
     """This file's path AS THE OPERATOR WOULD TYPE IT, derived from `__file__` (S5).
 
@@ -2371,17 +2515,30 @@ def resolve_self_path() -> str:
 def main(argv: list[str]) -> int:
     me = resolve_self_path()
     mode = argv[1] if len(argv) > 1 else "--check"
-    if mode not in ("--check", "--list", "--measure", "--suggest"):
+    if mode not in ("--check", "--list", "--measure", "--suggest", "--expand"):
         # THE USAGE BLOCK LIVES HERE AND NOWHERE ELSE. It moved out of the module docstring, whose
         # copy spelled the install prefix six times and reached every adopter unchanged.
         sys.stderr.write(
             f"usage: python {me} "
-            "[--check|--list|--measure|--suggest <name>]\n"
+            "[--check|--list|--measure|--suggest <name>|--expand]\n"
             "  --check            assert; non-zero on an unwaived offender\n"
             "  --list             print every offender, waived or not (authoring aid)\n"
             "  --measure          print the pins THIS conf produces; decide nothing\n"
             "  --suggest <name> --as <ext>.<surface>\n"
-            "                     one line for ONE identifier, no corpus pass\n")
+            "                     one line for ONE identifier, no corpus pass\n"
+            "  --expand           propose the live clusters this table does not declare; writes\n"
+            "                     nothing. The stamp lives in adopt-lexicon.sh --expand --stamp\n")
+        return 2
+    if mode == "--expand" and len(argv) > 2:
+        # REFUSED RATHER THAN IGNORED. Every other mode here reads `argv[1]` and drops the rest, so
+        # `--expand --stamp` would run a full expansion, write nothing, and report success — and
+        # `--stamp` is exactly the word an operator will reach for, because the wrapper takes it.
+        # A flag that silently does nothing is worse than one that does not exist.
+        sys.stderr.write(f"usage: python {me} --expand\n"
+                         f"  --expand takes no further arguments and writes nothing. The stamp is "
+                         f"the WRAPPER's: adopt-lexicon.sh --expand --stamp, which also holds the "
+                         f"refusal on a table that was already expanded.\n"
+                         f"  got: {' '.join(argv[2:])!r}\n")
         return 2
     cell_spec = ""
     if mode == "--suggest":
@@ -2405,6 +2562,10 @@ def main(argv: list[str]) -> int:
     # reach a pin, a waiver or an exit code of 1 even by accident.
     if mode == "--suggest":
         return run_suggest(root, argv[2], cell_spec)
+    # The WIDENING verb returns here for the same reason the supply verb above does: it must not be
+    # able to reach a pin, a waiver or an exit code of 1 by any path, however the file is refactored.
+    if mode == "--expand":
+        return run_expand(root)
     return run(root, list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))
 
 

@@ -3488,6 +3488,215 @@ with build_tempdir() as _td:
           _rc != 0 and read_agree_field(_out, "verdict_bad") > 0, _out)
 
 
+# ---- TOOL-aSurfacedLexicon-10 — `--expand`, the one-time widening --------------------------------
+#
+# EVERY ARM HERE IS FIXTURE-ONLY EXCEPT AC6, and that is a property of this tree rather than a
+# preference. `.lexicon.conf` carries no `expanded=` key, so the once-refusal has an EMPTY population
+# here and cannot be observed without a fixture conf; and all twenty clusters with a live site are
+# already declared, so the candidate set on this repo is EMPTY and a subset assertion over it would
+# be vacuously true. Both were measured before the criteria were written, which is why they moved
+# onto a synthetic fixture instead of asserting over this corpus.
+
+import canon as _canon  # noqa: E402
+
+#: A deliberately SHORT table — two rows against twenty clusters — so `live - declared` is non-empty
+#: and the subset assertion has something to be true OF. `fetch_w` is the load-bearing definition:
+#: `fetch` is an ALTERNATIVE spelling of `load`, so a proposal naming `load` proves the closure
+#: resolved a form to its representative rather than echoing the corpus's own word back at it.
+EXPAND_CONF = """\
+BANNED_SUFFIXES="Manager Helper Util"
+LANGS="py:python-ast:parser conf::dark"
+VERB_OFFENDER_PIN="0"
+SUFFIX_OFFENDER_PIN="0"
+ratified="2026-09-06 node a"
+
+VERBS:
+  build   create a new value and return it — NOT `create`
+  read    pull bytes from a named source — NOT `get`
+"""
+EXPAND_FILES = {"src/a.py": ("def build_x():\n    pass\n\n\n"
+                             "def read_y():\n    pass\n\n\n"
+                             "def write_z():\n    pass\n\n\n"
+                             "def parse_q():\n    pass\n\n\n"
+                             "def fetch_w():\n    pass\n\n\n"
+                             "def frobnicate_v():\n    pass\n\n\n"
+                             "def demand_u():\n    pass\n")}
+_REPS = {_rep for _rep, _g, _o in _canon.CLUSTERS}
+
+
+def read_expand_rows(out: str) -> list:
+    """The PROPOSED representatives, read out of the block the verb printed.
+
+    Read rather than re-derived: an arm that recomputes the candidate set and compares it against
+    itself grades nothing. The tail's rows are indented too, so this stops at the tail header rather
+    than collecting every indented line in the output.
+    """
+    rows, inside = [], False
+    for line in out.splitlines():
+        if line.startswith("EXPAND —"):
+            inside = True
+            continue
+        if line.startswith("NOT PROPOSALS"):
+            break
+        if inside and line.startswith("  ") and line.strip():
+            rows.append(line.split()[0])
+    return rows
+
+
+def run_expand_wrapper(root, *args):
+    """`adopt-lexicon.sh --expand` in a fixture repo — the SHELL surface, where the guard lives."""
+    r = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--expand", *args],
+                       cwd=root, capture_output=True, text=True)
+    return r.returncode, r.stdout + r.stderr
+
+
+_c, _ex = run_case(EXPAND_FILES, EXPAND_CONF, args=("--expand",))
+_props = read_expand_rows(_ex)
+check("AC3: --expand exits 0 against a short declared table", _c == 0, _ex)
+check("AC3: ...over a NON-EMPTY proposal set, or the subset arm below is vacuously true",
+      len(_props) > 0, _ex)
+check("AC3: ...and every proposal is a canon cluster representative",
+      set(_props) <= _REPS, f"{_props} not within {sorted(_REPS)}")
+check("AC3: ...including one reached through an ALTERNATIVE spelling, so the closure resolved a "
+      "form to its representative rather than proposing the corpus's own word",
+      "load" in _props and "fetch" not in _props, f"{_props}")
+check("AC3: ...and a row the table already declares is not re-proposed",
+      "build" not in _props and "read" not in _props, f"{_props}")
+check("AC3: ...and each row carries its NEGATIVE, so what is pasted is what the reader accepts",
+      _ex.count("— NOT `") >= len(_props), _ex)
+
+_tail = [ln.split()[0] for ln in _ex.split("NOT PROPOSALS", 1)[-1].splitlines()
+         if ln.startswith("  ") and ln.strip()]
+check("AC4: the unruled tail is NON-EMPTY on this fixture", len(_tail) > 0, _ex)
+check("AC4: ...and NO token in it appears in the proposal list",
+      not (set(_tail) & set(_props)), f"tail={_tail} props={_props}")
+check("AC4: ...and the fixture's own off-canon tokens are the ones in it",
+      "frobnicate" in _tail and "demand" in _tail, f"{_tail}")
+check("AC4: ...and the header above it says in words that these are not proposals and never will be",
+      "NOT PROPOSALS" in _ex and "WILL NEVER OFFER THEM" in _ex, _ex)
+
+# AC5 — THE ONE STAGED BREAK, and it is the only proof the subset arm grades the closure rather than
+# the fixture. Deleting `if v in forms` instead would raise `KeyError` on the first off-canon token,
+# so the arm would red BY EXCEPTION and certify nothing about the predicate; `forms.get(v, v)` keeps
+# the comprehension total and admits exactly the tokens the closure exists to exclude.
+_c, _broken = run_case(EXPAND_FILES, EXPAND_CONF, args=("--expand",), patch=(
+    "scaffold_lexicon.py",
+    "live = {forms[v] for v in counts if v in forms}",
+    "live = {forms.get(v, v) for v in counts}"))
+_bp = read_expand_rows(_broken)
+check("AC5: STAGED — admitting a token in no cluster into `live` BREAKS the subset assertion",
+      not (set(_bp) <= _REPS), f"{_bp}")
+check("AC5: ...and the proposal list then names the fixture's off-canon token itself",
+      "frobnicate" in _bp, f"{_bp}")
+
+# THE SCAFFOLDER IS AN OPTIONAL INSTALL, and a landed arm asserts `--check` is green without it. The
+# widening verb cannot be, since it reads that file's closure — so it REPORTS, and says nothing was
+# measured, because an absent proposal read as an empty one is the worst answer this verb can give.
+_c, _o = run_case(EXPAND_FILES, EXPAND_CONF, args=("--expand",), drop=("scaffold_lexicon.py",))
+check("--expand without the scaffolder installed reports rather than raising",
+      _c == 2 and "SCAFFOLDER ABSENT" in _o, _o)
+check("...and says nothing was measured, so the absence cannot read as an empty proposal",
+      "not an empty proposal" in _o, _o)
+# ...while `--check` STAYS GREEN for that same adopter, which is the property `OPTIONAL_SIBLINGS`
+# exists to keep. THAT ARM IS NOT REPEATED HERE — the AC8 block above already runs `--check` against a
+# kit copy with the scaffolder dropped and requires zero, over a fixture whose pin actually matches.
+# The short-table fixture below cannot stand in for it: it declares two verbs against a corpus with
+# five off-table leading tokens, so its `--check` reds on the PIN and would prove nothing about
+# imports. What is armed here is the half no landed arm covers — that the allowance is LOAD-BEARING.
+# Emptying the tuple puts the engine's own import back outside the rule, and the refusal is asserted
+# by NAME so a red for the pin cannot be mistaken for a red for the dependency.
+_c, _o = run_case(EXPAND_FILES, EXPAND_CONF, drop=("scaffold_lexicon.py",), patch=(
+    "lexicon.py", 'OPTIONAL_SIBLINGS = ("scaffold_lexicon",)', "OPTIONAL_SIBLINGS = ()"))
+check("STAGED: emptying OPTIONAL_SIBLINGS reds that adopter's run with the self-containment refusal",
+      _c != 0 and "NOT SELF-CONTAINED" in _o and "scaffold_lexicon" in _o, _o)
+
+_c, _o = run_case(EXPAND_FILES, EXPAND_CONF, args=("--expand", "--stamp"))
+check("--expand REFUSES a trailing argument rather than ignoring it as every other mode does",
+      _c == 2, _o)
+check("...and points at the wrapper, which is where --stamp actually lives",
+      "adopt-lexicon.sh" in _o, _o)
+
+# ---- the SHELL surface: the guard, the stamp, and the CRLF inversion -----------------------------
+with build_tempdir() as td:
+    _root = Path(td)
+    shutil.copytree(KIT, _root / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (_root / "src").mkdir()
+    (_root / "src" / "a.py").write_text(EXPAND_FILES["src/a.py"], encoding="utf-8", newline="\n")
+    (_root / ".lexicon.conf").write_text(EXPAND_CONF, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "init", "-q"], cwd=_root, check=True)
+    # NOT `-A`. The kit is copied in UNTRACKED on purpose, and staging it would put its own
+    # identifiers into the corpus these arms grade — and would also defeat the whole point of the
+    # dirty-predicate arm below.
+    subprocess.run(["git", "add", "--", "src/a.py", ".lexicon.conf"], cwd=_root, check=True,
+                   capture_output=True)
+    # AN IDENTITY, EXPLICITLY. The commit is what gives `--stamp` a sha to write; a fixture relying
+    # on the machine's global git identity is green on this node and fails on any runner without
+    # one, which is a green that proves nothing about an adopter.
+    subprocess.run(["git", "config", "user.email", "selftest@example.invalid"], cwd=_root, check=True)
+    subprocess.run(["git", "config", "user.name", "lexicon selftest"], cwd=_root, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", "fixture"], cwd=_root, check=True, capture_output=True)
+
+    # THE DIRTY REFUSAL, staged before the stamp because the once-guard would otherwise fire first.
+    (_root / "src" / "a.py").write_text(EXPAND_FILES["src/a.py"] + "\n\ndef scan_more():\n    pass\n",
+                                        encoding="utf-8", newline="\n")
+    _c, _o = run_expand_wrapper(_root, "--stamp")
+    check("F2: --stamp REFUSES on a tracked working-tree change", _c != 0 and "DIRTY TREE" in _o, _o)
+    check("F2: ...and says why a dirty tree has no sha to name", "was measured against" in _o, _o)
+    (_root / "src" / "a.py").write_text(EXPAND_FILES["src/a.py"], encoding="utf-8", newline="\n")
+
+    # AND THE PREDICATE IS THE TRACKED-ONLY TWO-SIDED DIFF, which this arm exists to pin. `git
+    # status --porcelain` is non-empty in EVERY fixture of this kit — tools/lexicon/ is copied in
+    # untracked by design — so a refusal built on porcelain could never be exercised at all, and
+    # AC7 would be unobservable for the life of the kit. Asserted rather than argued.
+    _porc = subprocess.run(["git", "status", "--porcelain"], cwd=_root,
+                           capture_output=True, text=True).stdout
+    check("AC7: `git status --porcelain` is NON-EMPTY on a clean fixture, which is why the dirty "
+          "test is the tracked two-sided diff and not porcelain", _porc.strip() != "", repr(_porc[:200]))
+
+    _c, _o = run_expand_wrapper(_root, "--stamp")
+    check("AC7: --expand --stamp exits 0 on that same tree", _c == 0, _o)
+    _conf_bytes = (_root / ".lexicon.conf").read_bytes()
+    check("AC7: ...and the conf it rewrote carries NO CR bytes",
+          b"\r" not in _conf_bytes, repr(_conf_bytes[:120]))
+    _stamped = [ln for ln in _conf_bytes.decode("utf-8").splitlines() if ln.startswith("expanded=")]
+    check("AC7: ...as EXACTLY ONE `expanded=` line, since the reader takes the last of a repeated "
+          "scalar while the guard reads the first", len(_stamped) == 1, f"{_stamped}")
+    check("AC7: ...carrying a date and a full sha",
+          bool(re.match(r'^expanded="\d{4}-\d{2}-\d{2} [0-9a-f]{40}"$', _stamped[0] if _stamped else "")),
+          f"{_stamped}")
+
+    _c, _o = run_expand_wrapper(_root)
+    check("AC1: a second --expand REFUSES", _c != 0, _o)
+    check("AC1: ...naming the stamp it read",
+          "ALREADY EXPANDED" in _o and (_stamped[0].split('"')[1] if _stamped else "\0") in _o, _o)
+
+    # AC2 — THE INVERSION, which is the failure this whole read shape exists to prevent: an anchored
+    # `s/"$//` cannot strip a quote a carriage return follows, so a CRLF conf yields the residue
+    # `"\r` — a NON-EMPTY value read as EMPTY by nothing, or an empty one read as non-empty — and a
+    # refusal built on emptiness fires exactly when it must not, or passes exactly when it must fire.
+    # The VERDICT is asserted and not just the exit code, because a non-zero for another reason
+    # would satisfy the weaker arm.
+    (_root / ".lexicon.conf").write_bytes(_conf_bytes.replace(b"\n", b"\r\n"))
+    _c, _o = run_expand_wrapper(_root)
+    check("AC2: the refusal STILL fires through a CRLF conf", _c != 0, _o)
+    check("AC2: ...and it is the ALREADY EXPANDED verdict, not an incidental non-zero",
+          "ALREADY EXPANDED" in _o, _o)
+
+# AC6 — THE ONE ARM OVER THIS REPO, and it is asserted as a MESSAGE. A run that proposed nothing and
+# printed nothing would pass an assertion on silence, and an empty proposal is the normal state of an
+# adopted tree rather than a failure — so the sentence has to exist and has to name a non-zero count.
+# It reds if a later commit un-declares a live cluster, which is the correct behaviour for an
+# inventory claim and is the reason it is not written as prose in a document instead.
+_r = subprocess.run([sys.executable, str(KIT / "lexicon.py"), "--expand"],
+                    cwd=str(KIT.parent.parent), capture_output=True, text=True)
+_ac6 = _r.stdout + _r.stderr
+check("AC6: --expand over THIS repo exits 0", _r.returncode == 0, _ac6[:400])
+check("AC6: ...and says in words that it proposes nothing, rather than printing silence",
+      "nothing to propose" in _ac6 and "already carry a row" in _ac6, _ac6[:400])
+check("AC6: ...naming a NON-ZERO live-cluster count, or the sentence is true of an empty corpus too",
+      bool(re.search(r"All [1-9][0-9]* cluster\(s\)", _ac6)), _ac6[:400])
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

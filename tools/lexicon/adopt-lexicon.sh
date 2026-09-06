@@ -179,8 +179,27 @@ write_skill() {
   echo "lexicon: rendered $SKILL"
 }
 
+read_conf_scalar() {
+  # ONE READER FOR A CONF SCALAR, and `tr -d '\r'` runs FIRST. Both halves are needed and the
+  # ORDERING is the whole mechanism: an anchored `s/"$//` cannot strip a quote that a carriage
+  # return follows, so a CRLF conf yields the residue `"\r` -- a NON-EMPTY value -- and every
+  # refusal built on emptiness passes exactly when it should fire. Callers test emptiness with
+  # `[ -z "${v// /}" ]`, so an all-whitespace value refuses too.
+  #
+  # A FUNCTION AT THE THIRD CALLER, not the second, which is one later than the rule wants. It read
+  # `ratified` alone, then `canon_unfrozen` copied it, and `expanded` would have been the third
+  # verbatim copy of a pipeline whose correctness lives entirely in the order of its stages.
+  #
+  # AND IT CANNOT BE PROVEN BY REVERT ON A GIT-BASH NODE, which is worth writing down beside it
+  # rather than leaving for whoever next tries. MSYS `grep` reads in text mode and drops the CR
+  # before `sed` ever sees it, so removing this `tr` changes NOTHING here: measured on node `a`,
+  # both forms red identically on a wholly-CRLF conf. On a GNU-coreutils node the CR survives grep
+  # and the `tr` is the whole mechanism. Kept for that node; unexercisable on this one.
+  tr -d '\r' < "$CONF" | grep -E "^$1=" | head -1 | sed -E "s/^$1=//; s/^\"//; s/\"\$//"
+}
+
 MODE="${1:---check}"
-case "$MODE" in --scaffold|--check|--render) ;; *) echo "usage: $(basename "$0") [--scaffold|--check|--render]"; exit 2 ;; esac
+case "$MODE" in --scaffold|--check|--render|--expand) ;; *) echo "usage: $(basename "$0") [--scaffold|--check|--render|--expand [--stamp]]"; exit 2 ;; esac
 
 # --render exists because --scaffold REFUSES on an existing declaration, so without it the only
 # remedy for a DRIFTED Skill would be deleting the conf and re-deriving the table. A refusal whose
@@ -188,6 +207,89 @@ case "$MODE" in --scaffold|--check|--render) ;; *) echo "usage: $(basename "$0")
 if [ "$MODE" = "--render" ]; then
   [ -f "$CONF" ] || { echo "lexicon-adopt: no .lexicon.conf; nothing to render from"; exit 1; }
   write_skill || exit 1
+  exit 0
+fi
+
+# ---- --expand ------------------------------------------------------------------------------------
+# THE SECOND AND LAST SUPPORTED TRANSITION. `--scaffold` refuses once a declaration exists, so an
+# adopter who needs a concept the seed missed had no tool-supported route at all and edited by hand
+# with nothing bounding what they added. This one is BOUNDED: the engine proposes only cluster
+# representatives with a live site in this corpus, and a leading token no cluster holds cannot enter
+# a proposal by any path. Proposals go to stdout and an owner pastes them, which keeps the curation
+# step where the whole design puts it -- the gate reds any VERBS row carrying no negative, so a
+# hand-pasted row is born failing until a human writes one. TOOL-aSurfacedLexicon-10.
+if [ "$MODE" = "--expand" ]; then
+  [ -f "$CONF" ] || {
+    echo "lexicon-adopt: NOT ADOPTED — no .lexicon.conf at the repo root, so there is no table to"
+    echo "lexicon-adopt: widen. Run --scaffold to derive the first one."
+    exit 1
+  }
+  # `${2:-}` because `set -u` is on and `-e` is not, so a bare `$2` is fatal the moment somebody
+  # runs --expand with no second word. REFUSED rather than ignored: every other mode in this file
+  # drops argv[2] silently, and `--stmap` would then be an unstamped run that reported success.
+  STAMP=0
+  case "${2:-}" in
+    "") ;;
+    --stamp) STAMP=1 ;;
+    *) echo "lexicon-adopt: unknown argument '${2:-}' — --expand takes --stamp, or nothing."; exit 2 ;;
+  esac
+  # S2 — THE ONCE REFUSAL, and it is a stamp rather than a lock. An absent key and an empty one both
+  # read as "never expanded", which is the correct verdict for each; the message distinguishes them
+  # and the verdict does not.
+  expanded="$(read_conf_scalar expanded)"
+  if [ -n "${expanded// /}" ]; then
+    echo "lexicon-adopt: ALREADY EXPANDED — .lexicon.conf carries \`expanded=\"$expanded\"\`, so this"
+    echo "lexicon-adopt: table has had its one widening. Once is the design: a vocabulary that grows"
+    echo "lexicon-adopt: whenever the corpus grows is the mirror this kit exists to refuse, and the"
+    echo "lexicon-adopt: second expansion is always the one that legalises a habit. Clearing that line"
+    echo "lexicon-adopt: re-opens it and nothing running under your own uid can stop you — what the"
+    echo "lexicon-adopt: stamp buys is a visible edit in a tracked file, never a lock."
+    exit 1
+  fi
+  "$PY" "$KIT_DIR/lexicon.py" --expand || exit 1
+  if [ "$STAMP" = 0 ]; then
+    echo ""
+    echo "lexicon-adopt: NOT STAMPED. Paste the rows you mean to keep, sharpen every negative, commit"
+    echo "lexicon-adopt: that, then re-run with --stamp to record the widening and refuse a second."
+    exit 0
+  fi
+  # F2 — REFUSE ON A DIRTY TREE, with the predicate NAMED: this repo's own tracked-only two-sided
+  # diff, and deliberately NOT `git status --porcelain`. The sha's whole job is to name the tree the
+  # proposal was measured against, and a clean tree's worktree IS its HEAD tree; a dirty one has no
+  # such sha, so HEAD would name a tree this run did not read.
+  #
+  # THE WEAKER OF THE TWO DEFINITIONS THIS REPO CARRIES, ON PURPOSE. `tools/run-gates` treats
+  # untracked files as dirt and has an arm asserting it. That definition cannot be used here: a kit
+  # fixture copies this directory in UNTRACKED by design, so porcelain is non-empty there forever
+  # and a refusal built on it could never be exercised — the arm would be unobservable for the life
+  # of the kit, which is a check that certifies nothing. govkit already owns this definition and
+  # wrote down the same reasoning.
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "lexicon-adopt: DIRTY TREE — refusing to stamp. The sha in \`expanded=\` names the tree the"
+    echo "lexicon-adopt: proposal was measured against; a worktree with uncommitted TRACKED changes"
+    echo "lexicon-adopt: has no such sha. Commit what you pasted, then re-run --expand --stamp."
+    echo "lexicon-adopt: Untracked files are not dirt here — the test is the two-sided tracked diff."
+    exit 1
+  fi
+  sha="$(git rev-parse HEAD 2>/dev/null)" || sha=""
+  if [ -z "$sha" ]; then
+    echo "lexicon-adopt: NO COMMIT — refusing to stamp. \`git rev-parse HEAD\` names nothing on an"
+    echo "lexicon-adopt: unborn branch, so there is no tree for the stamp to point at."
+    exit 1
+  fi
+  # IN PLACE, NEVER APPENDED, and `awk`'s END clause covers the absent-key case in the same pass.
+  # `load_conf` takes the LAST occurrence of a repeated scalar and refuses no duplicate, while the
+  # guard above reads the FIRST — so an appended second stamp would leave the two readers disagreeing
+  # and the once-only refusal silently off. A freshly scaffolded conf also ends WITHOUT a trailing
+  # newline, which is the other way an append corrupts the line above it.
+  tmp="$(mktemp)" || { echo "lexicon-adopt: no writable temp dir; NOT stamping"; exit 1; }
+  awk -v repl="expanded=\"$(date +%Y-%m-%d) $sha\"" \
+      '/^expanded=/ && !seen {print repl; seen=1; next} {print} END {if (!seen) print repl}' \
+      "$CONF" > "$tmp" || { rm -f "$tmp"; echo "lexicon-adopt: the stamp rewrite failed"; exit 1; }
+  cat "$tmp" > "$CONF" || { rm -f "$tmp"; echo "lexicon-adopt: the stamp write failed"; exit 1; }
+  rm -f "$tmp"
+  echo ""
+  echo "lexicon-adopt: STAMPED $(read_conf_scalar expanded) — this table has had its widening."
   exit 0
 fi
 
@@ -219,10 +321,9 @@ if [ "$MODE" = "--check" ]; then
     fail=1
   fi
   # S10 — the unratified-seed refusal. This is the arm that makes "the human curated it" checkable.
-  # `tr -d '\r'` FIRST. Both halves of this are needed and the pin alone is not enough: an anchored
-  # `s/"$//` cannot strip a quote that a carriage return follows, so a CRLF conf yields `"\r` — a
-  # NON-EMPTY value — and the unratified-seed refusal passes exactly when it should fire.
-  ratified=$(tr -d '\r' < "$CONF" | grep -E '^ratified=' | head -1 | sed -E 's/^ratified=//; s/^"//; s/"$//')
+  # The CRLF hardening that keeps it from passing exactly when it should fire lives in
+  # `read_conf_scalar`, with the reasoning; this was its first caller.
+  ratified=$(read_conf_scalar ratified)
   if [ -z "${ratified// /}" ]; then
     echo "lexicon-adopt: .lexicon.conf carries an EMPTY \`ratified\` key. --scaffold takes each verb's"
     echo "lexicon-adopt: SPELLING from the kit's frozen canon and asks your corpus only which concepts"
@@ -241,18 +342,9 @@ if [ "$MODE" = "--check" ]; then
   # line and exits 0 with no output where no block exists. A second parser for this grammar in this
   # script is the class the shell-out three lines above already rules out by name.
   #
-  # `tr -d '\r'` FIRST, for the reason the `ratified` arm above states: an anchored `s/"$//` cannot
-  # strip a quote a carriage return follows, so a CRLF conf would yield `"\r` — a NON-EMPTY value —
-  # and this refusal would pass exactly when it should fire.
-  #
-  # AND IT CANNOT BE PROVEN BY REVERT ON A GIT-BASH NODE, which is worth writing down beside it
-  # rather than leaving for whoever next tries. MSYS `grep` reads in text mode and drops the CR
-  # before `sed` ever sees it, so removing this `tr` changes NOTHING here: measured on node `a`,
-  # both forms red identically on a wholly-CRLF conf. On a GNU-coreutils node the CR survives grep
-  # and the `tr` is the whole mechanism. Kept for that node; unexercisable on this one.
   canon_rows=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-rows CANON "$CONF" 2>/dev/null | grep -c . || true)
   if [ "${canon_rows:-0}" -gt 0 ]; then
-    stamp=$(tr -d '\r' < "$CONF" | grep -E '^canon_unfrozen=' | head -1 | sed -E 's/^canon_unfrozen=//; s/^"//; s/"$//')
+    stamp=$(read_conf_scalar canon_unfrozen)
     if [ -z "${stamp// /}" ]; then
       echo "lexicon-adopt: .lexicon.conf declares a CANON: overlay ($canon_rows row(s)) with an EMPTY"
       echo "lexicon-adopt: \`canon_unfrozen\` stamp. The canon ships FROZEN and an owner may open it —"

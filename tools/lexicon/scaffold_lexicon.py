@@ -98,6 +98,68 @@ def _measure_suffix_offenders(scanned) -> int:
     return n
 
 
+def derive_candidates(scanned, declared=(), clusters=canon.CLUSTERS) -> dict:
+    """The cluster-bounded proposal set, and the corpus tail that can never enter it.
+
+    S2 — WHICH CONCEPTS enter is decided by the corpus; WHICH FORM represents one is decided by the
+    frozen table in `canon.py`, always element 0. Two questions, two deciders. The frequency ranking
+    this replaces answered both with the corpus, which is why it legalised whatever a repo already
+    did most.
+
+    ONE HOME FOR THE ANTI-MIRROR CLOSURE, and this function exists to give `live` a second CALLER
+    rather than a second copy. `--scaffold` reads it through `main` below; `--expand` reads it
+    through `lexicon.py`'s dispatcher. A copy in either would be two answers to the one question
+    this kit exists to answer once, and the arm that grades the closure would then certify whichever
+    copy it happened to import (TOOL-aSurfacedLexicon-10, AC5).
+
+    `candidates` comes off `live` DIRECTLY and not off `clusters`, which is load-bearing rather than
+    stylistic. Filtering the proposal through the shipped tuple would make `candidates` a subset of
+    the representatives BY CONSTRUCTION AT THE WRONG PLACE: breaking the closure would then leave
+    the subset arm green, and the arm would be grading its fixture instead of the mechanism.
+
+    `clusters` is a PARAMETER because an owner may have opened the door. `lexicon.py` resolves the
+    merged tuple through `canon.build_clusters` before it grades anything, and a bare
+    `build_form_index()` here would propose from the frozen table while the same repo's gate graded
+    against the merged one -- an adopter's own added cluster would be invisible to the only tool
+    that could propose it. The default is the shipped tuple, so `--scaffold` keeps its behaviour
+    byte for byte.
+
+    `scanned` is ITERATED, not walked: the corpus walk happened once in `scan_corpus` and this
+    reads the list it returned. Taking the scan rather than the root is `_measure_suffix_offenders`'s
+    rule above, for its reason -- two walks over one tree is two chances to disagree about which
+    files are armed.
+    """
+    forms = canon.build_form_index(clusters)
+    counts: collections.Counter = collections.Counter()   # surface form -> live sites
+    for _rel, _ext, got, _problem in scanned:
+        if got is None:
+            continue
+        for name, _ln in got[0]:
+            v = lex.leading_verb(name)
+            if v:
+                counts[v] += 1
+    # A cluster enters when ANY of its forms has a live site. The corpus votes on membership and
+    # nothing else: it cannot promote a spelling, and a token in no cluster cannot enter at all.
+    live = {forms[v] for v in counts if v in forms}
+    declared = set(declared)
+    # THE UNRULED TAIL IS NOT COMPUTED HERE, deliberately. `--expand` prints the leading tokens no
+    # cluster holds and no declared row names, and the engine's `measure_pass` already classifies
+    # exactly that population as `unruled` on every bar. A second predicate for it here would be two
+    # answers to one question with the copy nobody grades, so the caller reads the engine's own
+    # offenders instead.
+    return {
+        "counts": counts,
+        "forms": forms,
+        "live": live,
+        "seeded": [rep for rep, _gloss, _others in clusters if rep in live],
+        # DEBT, which is the corpus's one other job here: every live site spelled as a non-first
+        # form of a concept the table already holds.
+        "debt": sorted(((v, n) for v, n in counts.items() if v in forms and forms[v] != v),
+                       key=lambda kv: (-kv[1], kv[0])),
+        "candidates": sorted(live - declared),
+    }
+
+
 def main(argv: list[str]) -> int:
     # A FLAG IS NOT A PATH, and the guard here used to be an ARITY check alone.
     # `scaffold_lexicon.py --help` is a well-formed one-argument call, so `--help` became the
@@ -154,11 +216,6 @@ def main(argv: list[str]) -> int:
     exts = sorted(set(exts) | {"conf"})
     langs = [f"{e}:{KNOWN[e][0]}:{KNOWN[e][1]}" if e in KNOWN else f"{e}::dark" for e in exts]
 
-    # S2 — WHICH CLUSTERS enter is decided by the corpus; WHICH FORM represents one is decided by
-    # the canon, always element 0. Two questions, two deciders. The frequency ranking this replaces
-    # answered both with the corpus, which is why it legalised whatever a repo already did most.
-    forms = canon.build_form_index()
-    counts: collections.Counter = collections.Counter()   # surface form -> live sites
     # `(ext, predicate) -> extracted definitions`, which is the population `UNDECLARED CELL` grades
     # and therefore the population the seeded `CELLS` block must cover. Keyed on the PREDICATE and
     # mapped through `lex.PREDICATE_SURFACES` at emission, so this walk and that refusal read one
@@ -172,20 +229,18 @@ def main(argv: list[str]) -> int:
         cell_pops[(_ext, "verb")] += len(funcs)
         cell_pops[(_ext, "suffix")] += len(types_)
         types_seen += len(types_)
-        for name, _ln in funcs:
-            v = lex.leading_verb(name)
-            if v:
-                counts[v] += 1
+
+    # THE VOCABULARY, through the one function that owns it. Seeding passes no declared table --
+    # there is not one yet, which is the whole point of a seed -- so `candidates` and `unruled` come
+    # back measured against the empty set and this branch reads neither. A second iteration over an
+    # already-materialised list is not a second corpus walk, and collapsing it back into the loop
+    # above would put the closure in two files again.
+    derived = derive_candidates(scanned)
+    counts, forms = derived["counts"], derived["forms"]
+    seeded, debt = derived["seeded"], derived["debt"]
 
     total_defs = sum(counts.values())
     suffix_offenders = _measure_suffix_offenders(scanned)
-    # A cluster enters when ANY of its forms has a live site. The corpus votes on membership and
-    # nothing else: it cannot promote a spelling, and a token in no cluster cannot enter at all.
-    live = {forms[v] for v in counts if v in forms}
-    seeded = [rep for rep, _gloss, _others in canon.CLUSTERS if rep in live]
-    # DEBT, which is the corpus's one other job here: every live site spelled as a non-first form.
-    debt = sorted(((v, n) for v, n in counts.items() if v in forms and forms[v] != v),
-                  key=lambda kv: (-kv[1], kv[0]))
     verb_offenders = sum(n for v, n in counts.items() if v not in set(seeded))
 
     body = [HEADER, ""]

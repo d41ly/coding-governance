@@ -1063,6 +1063,11 @@
       "file": "tools/codebase-map/map_diff.py"
     },
     {
+      "id": "derive_candidates",
+      "kind": "function",
+      "file": "tools/lexicon/scaffold_lexicon.py"
+    },
+    {
       "id": "derive_carried",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -2478,6 +2483,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "read_expand_rows",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "read_fixture",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
@@ -3191,6 +3201,16 @@
       "id": "run_dense",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "run_expand",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "run_expand_wrapper",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "run_fts",
