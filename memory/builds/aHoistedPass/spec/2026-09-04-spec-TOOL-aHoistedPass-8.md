@@ -1,12 +1,18 @@
 # TOOL-aHoistedPass-8 — the recipe-mode question, measured instead of argued
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-05 · node a · Tier-1 · base c4fcf5ad · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-04-build-TOOL-aHoistedPass-8-recipe-probe.md](../build/2026-09-04-build-TOOL-aHoistedPass-8-recipe-probe.md) | research | — |
+| [2026-09-05-prompt-TOOL-aHoistedPass-8-brief.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-8-brief.md) | journal | — |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round1.md) | diff-review | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round2.md](../reviews/2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round2.md) | diff-review | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -63,10 +69,19 @@ which one is right, because no recipe-mode build has ever existed.
 
 ### The population
 
-At `c4fcf5ad`, `memory/builds/` holds 93 folders. Searching the whole memory tree for a
-`authorized-by: recipe` value returns exactly one file, `memory/builds/aHoistedPass/build/2026-09-04-build-aHoistedPass-1-design-pass.md`,
-which is this build's own design document quoting the key. **Zero build READMEs declare `recipe`.**
-Every `authorized-by:` value in the corpus is `prompt`.
+At `c4fcf5ad`, `memory/builds/` holds 93 folders and searching the whole memory tree for an
+`authorized-by: recipe` value returns **no hit at all** — this build's folder does not exist there.
+That zero is the CONTROL and it is not the measurement.
+
+On the LANDING tree the pattern hits only inside this build's own folder, and the files are named by
+the `gen:spec-records` table rather than retyped here: the design of record, this spec, and the
+round-1 spec-audit record. **Zero build READMEs declare `recipe`**, which is the finding; every
+`authorized-by:` value carried by a README in the corpus is `prompt`.
+
+**No count is written into this paragraph, deliberately.** rev-1 stated one hit, rev-2 corrected AC7
+to two and left this paragraph at one, and by the time round 1's review record landed the true figure
+was three — a number that moves every time this build writes a record about itself. What AC7 grades
+is CONTAINMENT, not arithmetic, and this paragraph now says the same thing the criterion does.
 
 ### What the driver requires of a recipe build
 
@@ -88,7 +103,7 @@ directory. Exit codes were captured without a pipe.
 |---|---|---|
 | 1 | `--plan` on the recipe fixture | **exit 1**, `UNATTENDED check 19 FAILED — no tracked spec under this build, so every planned unit is MISSING …: memory/builds/<slug>/spec` |
 | 2 | control: `--plan dBriefedPass` in the same snapshot | **exit 0**, `next: none - every tracked spec is terminal` |
-| 3 | the harness with `units: []` | **throws** the `unattended-build.js:118-124` message, which opens `unattended-build: args carries no` |
+| 3 | the harness with `units: []` | **throws** the `unattended-build.js` empty-`units` refusal, whose message opens `unattended-build: args carries no` |
 | 4 | control: the harness with one unit | passes that refusal, throws later at the spec-audit's empty-subject-set message |
 
 Observation 2 makes observation 1 attributable to the fixture rather than to the snapshot.
@@ -97,7 +112,7 @@ Observation 4 makes observation 3 attributable to the empty set rather than to t
 **Observation 3 was made under a shim, and that is stated rather than glossed.** A workflow script has
 no node entrypoint: the runtime supplies `args`, `agent`, `workflow`, `phase` and `log`, and permits a
 top-level `return`. The shim supplies those five and wraps the file's body in an `async function`; it
-edits nothing else. The refusal it exercises is `unattended-build.js:118-124`, which is module-scope
+edits nothing else. The refusal it exercises is `unattended-build.js`'s empty-`units` throw, which is module-scope
 control flow reached before any `agent()` call, so the shim reaches it by the same path the runtime
 would. It is a measurement of the predicate, not of the runtime.
 
@@ -116,8 +131,9 @@ build folder for a shape the mode is defined to have. Repairing it is not in thi
 
 ### Finding 2 — the harness throws, second
 
-If a run gets past `--plan` and hands the harness the empty set anyway, `unattended-build.js:118-124`
-throws with its message at `:120-122`. So the route is closed twice over, and the first closure is the
+If a run gets past `--plan` and hands the harness the empty set anyway, `unattended-build.js`'s
+empty-`units` guard throws, and its message opens `unattended-build: args carries no`. So the route is
+closed twice over, and the first closure is the
 driver's, not the harness's.
 
 ### Finding 3 — the scope grammar compares for equality against one token
@@ -199,10 +215,15 @@ No file under `tools/` is touched, and no gate leg is added or moved.
   beginning `next:`.
 - **AC2** — When the same snapshot runs `--plan dBriefedPass`, it exits 0 and prints
   `next: none - every tracked spec is terminal`, so AC1's refusal is attributable to the fixture.
-- **AC3** — When `tools/workflows/unattended-build.js` is evaluated with `units: []`, it throws the
-  message at `:120-122` beginning `unattended-build: args carries no`.
-- **AC4** — When the same evaluation is given one unit, it passes `:118-124` and refuses later with
-  the spec-audit's `no spec subjects could be pinned` message, so AC3 is attributable to the empty set.
+- **AC3** — When `tools/workflows/unattended-build.js` is evaluated with `units: []`, it throws a
+  message beginning `unattended-build: args carries no`. **The criterion asserts the MESSAGE and no
+  line span**, because a span rots between authoring and landing and this one already did: rev-1 cited
+  `:118-124` with the message at `:120-122`, correct at `c4fcf5ad`, and at BASE `e828f778` the guard
+  is at `:182-188` with its message at `:184-186`. An acceptance criterion is executable, so it may
+  not be anchored on a line range.
+- **AC4** — When the same evaluation is given one unit, it passes that same guard and refuses later
+  with the spec-audit's `no spec subjects could be pinned` message, so AC3 is attributable to the
+  empty set.
 - **AC5** — When `scope_of` is evaluated against the shipped `DIRECTIVES_CORE`, `passes-harnessed`
   prints `all` and `researched` prints `prompt`, confirming the entry at `unattended.sh:469` carries
   no scope segment.
@@ -210,8 +231,10 @@ No file under `tools/` is touched, and no gate leg is added or moved.
   `[ "$sc" != all ] && [ "$sc" != "${AUTH_MODE:-}" ]`, a single-token equality against `all` or one
   member of `AUTH_MODES`, so no mode list is expressible.
 - **AC7** — When the tracked memory tree is searched for `authorized-by:[[:space:]]*recipe` on the
-  landing tree, every hit sits inside this build's own folder — its design of record and this spec —
-  and no `memory/builds/*/README.md` matches, so the value has no live subject. At `c4fcf5ad` the
+  landing tree, **every hit sits inside this build's own folder** and no `memory/builds/*/README.md`
+  matches, so the value has no live subject. The criterion asserts CONTAINMENT and neither a count nor
+  an enumeration: rev-1 said one file, rev-2 said two, and round 1's own review record made it three
+  without any of them being wrong about the fact that matters. At `c4fcf5ad` the
   pattern has no hit at all, this build's folder not existing there; that is the control, and rev-2
   corrects rev-1, which named a hit at a base where the file did not exist.
 - **AC8** — When the probe record lands in this build's `build/` folder carrying
@@ -261,6 +284,21 @@ No file under `tools/` is touched, and no gate leg is added or moved.
   the grammar, is the work. **Option (c) is the honest fallback if that price is refused**, and it
   should then be written down as a deliberate choice rather than left as the default nobody picked.
 
+RESOLVED (agent, 2026-09-05, delegated): **F1 is NOT TAKEN, and that is the resolution rather than a deferral by omission.**
+Two independent reasons, and either alone is sufficient. **First, this spec forbids it**: section 3
+says "This unit is not the fix", "No other unit of this build takes a side, and this one does not
+either. It reports", and AC9 requires the unit's commit to touch no path under `tools/`. Taking any
+option here would fail M3 veto 1 against this unit's own acceptance. **Second, option (a) trips M3
+veto 2**: it moves `SKILL.template.md`'s Scope cell and its prose, and ruling D1 put that file and
+its render on the veto-2 list, which the mandate's delegation does not reach. Option (b) is already
+refuted by finding 5.
+
+**So what ships is option (c) — leave both — and this line is the deliberate record of that choice
+rather than the default nobody picked**, which is precisely what the option's own text asks for. The
+carrier/registry disagreement stays live on the bar exactly as section 3 says it does, and the fork
+is PARKED to the owner in this run's run-state file so it reaches the wrap-up as a decision they
+still hold.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, written against `c4fcf5ad` with S1–S4 performed during the
@@ -277,7 +315,9 @@ No file under `tools/` is touched, and no gate leg is added or moved.
   - Every design citation this unit depends on was re-opened at `c4fcf5ad` and **holds**:
     `unattended.sh:469`, `:478`, `:505-514`, `:1163-1179` with the comparison at `:1172` and `fail 45`
     at `:1173`, `:2043`, `unattended-build.js:118-124` with its message at `:120-122`,
-    `UNATTENDED-PROTOCOL.md:637`, `SKILL.template.md:95`. No line number needed moving.
+    `UNATTENDED-PROTOCOL.md:637`, `SKILL.template.md:95`. No line number needed moving. **rev-4 marks
+    one of those as since-expired: the `unattended-build.js` pair moved to `:182-188` and `:184-186`
+    at BASE. The rest were re-derived at BASE by rev-3 and hold.**
 - rev-2 · 2026-09-05 · AC7 CORRECTED, not merely re-pointed, and the correction is the reason this
   rev exists. rev-1 claimed that searching the memory tree for `authorized-by:[[:space:]]*recipe` at
   `c4fcf5ad` yields the design of record as its only hit. Re-run rather than re-read, that claim is
@@ -292,6 +332,27 @@ No file under `tools/` is touched, and no gate leg is added or moved.
   until the unit lands, onto `bash tools/memory-tree/check-memory-hygiene.sh`, which is what grades
   that filename against the naming rule. Its `rev-1` self-reference is updated to `rev-2` to match
   this header, the pairing the hygiene gate checks.
+- rev-3 - 2026-09-05 - M3 fork sweep under the standing mandate. F1 marked RESOLVED as NOT
+  TAKEN, with both grounds recorded: this spec's own section 3 and AC9, and M3 veto 2 over
+  `SKILL.template.md` under ruling D1. Option (c) ships and is written down as the choice. The fork
+  is additionally parked to the owner through the driver, so it surfaces in the wrap-up. Premises
+  re-derived at the run's BASE `e828f778` and BOTH HOLD, with exact line numbers: `DIRECTIVES_CORE`
+  at `tools/unattended/unattended.sh:469` still carries `passes-harnessed:M6` with no scope segment,
+  and `memory/guides/UNATTENDED-PROTOCOL.md:637` still reads "Recipe mode does not take it: its
+  pieces are not specs."
+- rev-4 - 2026-09-05 - folded round-1 spec-audit findings 36 and 30, both of them the same defect in
+  two places: a citation that outlived its base, inside a unit whose entire product is a record a
+  later reader re-opens. **36** - section 4 and AC3 anchored the harness's empty-`units` refusal at
+  `unattended-build.js:118-124` with its message at `:120-122`, correct at `c4fcf5ad`; at BASE
+  `e828f778` that guard is at `:182-188` with its message at `:184-186`, and `:118` reads
+  `return out`. Every one of those spans is now gone from the prose and from the criterion, which
+  asserts the MESSAGE TEXT the shim actually exercised - cite by NAME, not by span, because an AC is
+  executable and a line range rots between authoring and landing. rev-3's own claim that no line
+  number needed moving is marked as since-expired in place rather than deleted. **30** - section 4's
+  population paragraph named a path that has never been tracked and a hit count rev-2 had already
+  superseded. Rewritten, and rewritten WITHOUT a count: rev-1 said one, rev-2 said two, and round 1's
+  review record made it three, so AC7 is restated to grade CONTAINMENT and the paragraph now says
+  what the criterion says. Neither fold touches a path under `tools/`, so AC9 is unaffected.
 
 ## 10. Reuse audit
 

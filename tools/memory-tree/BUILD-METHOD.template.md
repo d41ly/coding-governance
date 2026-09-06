@@ -5,17 +5,19 @@
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
 this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `{{TOOL_ROOT}}run-gates/run-gates.sh`.
-**Budget: ≤24 KB, ≤350 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
+**Budget: ≤27648 bytes, ≤350 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
-It rose from ≤20 KB / ≤250 lines when M12 landed, to ≤24 KB / ≤310 on 2026-08-21, and the LINE half to
-≤350 on 2026-08-25 — all owner calls, because the figure is a stated constraint of a document rather
-than a measurement of one. The 2026-08-21 raise: two builds added rules concurrently and both parents
-fitted the old cap alone, so nothing was droppable and the constraint moved instead of the content.
-The 2026-08-25 raise cleared a two-line breach; a trim was offered and declined.
-**The BYTE half binds first** — at this file's ~100 B prose line the bytes run out near line 316, so
-most of the line figure is headroom the bytes do not grant. No gate enforces the pair, which is why
-exceeding it silently was the one option not taken, and whether one is ever added is a SEPARATE
-question nobody has ruled.
+It rose from ≤20 KB / ≤250 lines when M12 landed, to ≤24 KB / ≤310 on 2026-08-21, the LINE half to
+≤350 on 2026-08-25, and the BYTE half to ≤27648 on 2026-09-05 — all owner calls, because the figure is
+a stated constraint of a document rather than a measurement of one. The 2026-08-21 raise: two builds
+added rules concurrently and both parents fitted the old cap alone, so nothing was droppable and the
+constraint moved instead of the content. The 2026-08-25 raise cleared a two-line breach; a trim was
+offered and declined. **The 2026-09-05 raise is the first one a checker can read**, and it is written
+in BYTES for that reason: ≤24 KB was ambiguous between 24576 and 24000, and this file measured 24553,
+which is under one reading and over the other. 27648 is 27 KiB, matching the KiB-round convention of
+the rows already declared beside it, and it funds the M6 route sentence and the directive anchors.
+**The BYTE half binds first** — at this file's ~100 B prose line the bytes run out well before the
+line figure does, so most of that figure is headroom the bytes do not grant.
 
 `M<n>` is a section of THIS file, `§<n>` of another document. **The one rule about this file:** nothing here is
 stated anywhere else in this repo — every generic obligation is POINTED AT via M11, and a rule appearing both here
@@ -60,7 +62,7 @@ written last. When ACCEPTANCE or GATES cannot be *derived* from the goal, the co
 disposition is the kickoff engine's Step 5b exit 5 — read it there. This file does not restate it and must not
 contradict it.
 
-**Sub-specs must AGREE with the main spec.** Before the first code pass, cross-read on four axes: **scope** (nothing
+**Sub-specs must AGREE with the main spec** — the `sub-specced` directive's rule, and it is here. Before the first code pass, cross-read on four axes: **scope** (nothing
 a sub-spec puts IN is OUT in the overview or a sibling) · **interface** (any name, path, signature or config key
 spelled twice is spelled identically) · **ordering** (no sub-spec depends on a unit sequenced after it) ·
 **acceptance** (the overview's is implied by the union of the sub-specs'). A disagreement is a defect in exactly ONE
@@ -69,7 +71,8 @@ code arbitrate between two specs; a disagreement that is a choice rather than an
 
 ## M3 — Forks — the decision rule, and the limit of your authority
 
-Sweep §8 across the whole set before any code, including forks M2 just created. Resolved mid-build is a rewrite;
+Sweep §8 across the whole set before any code, including forks M2 just created; `forks-resolved` is
+that sweep and it is discharged here or not at all. Resolved mid-build is a rewrite;
 resolved before it, a decision.
 
 **What is delegated.** A standing mandate delegates the owner's resolver authority for the named build only —
@@ -110,7 +113,7 @@ item present ONLY a conforming mark resolves it, the first line does not vote, a
 
 ## M4 — The spec audit — review every unreviewed spec before its code
 
-**Which.** Every spec with no review record naming it. A spec whose rev moved since its last review, or that you
+**Which**, and this is what `specs-reviewed` measures. Every spec with no review record naming it. A spec whose rev moved since its last review, or that you
 authored this run, is unreviewed.
 
 **The harness needs a DECLARED subject.** `tier2-review.js` audits a spec only when the call
@@ -138,7 +141,7 @@ line), then **STOP**: once a synthesis pass calls the design clean, stop reviewi
 
 ## M5 — Recall and reuse
 
-The obligation is `memory/TEMPLATE-SPEC.md` §10 and is machine-checked there. Satisfy it once for the SET, not per
+The obligation is `reuse-first`, written as `memory/TEMPLATE-SPEC.md` §10 and machine-checked there. Satisfy it once for the SET, not per
 spec, in this order — map dossier first, decision records second:
 
 ```bash
@@ -163,7 +166,8 @@ started from an owner's prose has not chosen yet, and M12 is how it does.
 **A PASS is exactly one of:** a spec authored · a spec reviewed · a review's fixes folded in · a unit built · the
 closing diff review. Nothing else is a pass.
 
-**Commit at the end of every pass**, on the run's branch, with the unit id in the subject. Then run the bug-class
+**Commit at the end of every pass**, on the run's branch, with the unit id in the subject —
+`passes-committed`, and the subject line is what joins the pass to its unit. Then run the bug-class
 checklist over what you just committed, and act on it before the next pass begins:
 
 ```bash
@@ -181,7 +185,8 @@ followed by another: fix it, or park it with the reason. A pass that produced no
 build's authored record. A bare "parked" is indistinguishable from "forgotten", and M9 is where the owner gets the
 turn you did not take.
 
-**Parallelism is REQUIRED where disjointness is PROVEN; sequence is the fallback.** Two passes MUST run
+**`parallel-when-disjoint`: parallelism is REQUIRED where disjointness is PROVEN; sequence is the
+fallback.** Two passes MUST run
 concurrently when, and may only when: (1) their WRITE sets — actual paths, written down before dispatch — do
 not intersect; (2) neither writes a file the other reads as a contract (conf, template, interface, generator
 input) or as an acceptance input, and neither depends on the other's output either way; (3) neither touches a
@@ -191,6 +196,16 @@ sequence it. Both lists are RECORDED, not merely written: the unattended kit's `
 
 The fan-out and concurrency CEILINGS are the review protocol's; this is about WHICH work is parallel, never HOW
 MUCH. Why clause 3 is worded as it is, and the vacuous form it replaced, is in the memory-tree README.
+
+**`passes-harnessed` — the route, and what it does NOT buy.** A build may be driven as ONE program
+rather than as an agent's recollection across a context that compacts:
+`{{TOOL_ROOT}}workflows/unattended-build.js` runs SPEC, AUDIT and DISPOSAL as ordered stages and
+hands out the ordered roster only on a terminal `--review` verdict, and
+`{{TOOL_ROOT}}workflows/unattended-unit.js` builds ONE unit from its brief and its spec. **What that
+buys is ORDER and not ENFORCEMENT.** Control flow is what makes the audit precede the first line of
+code; nothing in either script refuses a pass. What refuses is `--dispatch` at the moment of the act,
+on a MISSING or THIN unit and on nothing else, and the pass-order history leg afterwards, which
+refuses spec-after-code for CLOSED units. The route is the harness's; the refusals are not.
 
 ## M7 — Regrounding
 
@@ -208,14 +223,15 @@ anything was compacted. Read in this order, and nothing else:
 4. The CURRENT sub-spec, whole — that one, not the set, which was read in M2 and is on disk.
 5. Re-run the recall probe with the terms recorded in that spec's §10.
 
-Then continue. **Regrounding never re-opens a resolved fork and never re-reviews a clean spec** — the §8 marks and
+Then continue, and `playbook-followed` is discharged by doing so rather than by asserting it.
+**Regrounding never re-opens a resolved fork and never re-reviews a clean spec** — the §8 marks and
 the review records outrank your recollection. Keep passes small: a compaction landing mid-pass is not caught until the next boundary.
 
 ## M8 — Closing the build
 
 Bug classes FIRST — the M6 checklist over `<BASE>..HEAD`, ALWAYS that full range and on EVERY round: a class a
 fold REINTRODUCES stays selected even where the fold's own files would not select it, and the probe costs seconds.
-Its output is a lens brief, not a report filed after. Then ONE adversarial review — round 1 from the run's pinned
+Its output is a lens brief, not a report filed after. Then ONE adversarial review, which is `diff-reviewed` — round 1 from the run's pinned
 BASE (an immutable sha, never a moving ref) to the tip; round N>1 from round N-1's RECORDED TIP, so it reads the
 FOLD that round introduced instead of re-reading fixes, and passes that round's confirmed set as `priorFindings`.
 The harness refuses a base that is not a sha once the round is above 1. Per-pass reviews do not substitute: they
@@ -240,14 +256,16 @@ park, not a waiver, and its unit does not close. Left-shift every confirmed find
 
 **Re-read the build README against the code before closing** — every owner ruling and every sentence naming a shipped mechanism. `readme_mechanism_drift` reports only the pairs that spell it identically; the fold owns the rest.
 
-**Landing** —
-merge and push authorization, the lander, the bypass ban, conflict reconciliation, when a build may land — is
-template §1 Landing and
-`memory/guides/UNATTENDED-PROTOCOL.md`.
+**Landing** — `land-once-done` and `conflicts-reconciled` between them: merge and push
+authorization, the lander, the bypass ban, additive reconciliation of a shared record, and when a
+build may land at all. Both are template §1 Landing and
+`memory/guides/UNATTENDED-PROTOCOL.md`; neither is restated here.
 
 ## M9 — The wrap-up — a derivation, not a recollection
 
-Composed last, read first, after every fact is on disk. **Derive each row. If you cannot name the file a line came
+Composed last, read first, after every fact is on disk. `wrap-up-derived` is this section, and
+`pieces-recorded` is its recipe-mode sibling — a run whose vocabulary is pieces records them the way
+a unit run records units. **Derive each row. If you cannot name the file a line came
 from, the line does not go in.**
 
 | item | derived from |
@@ -268,10 +286,11 @@ apply: §16 budgets a completion message, and this is the only turn the owner ge
 Three deltas, and no others. The contract — mandate, run state, phases, witnesses, DoD, keepalive, landing — is
 `memory/guides/UNATTENDED-PROTOCOL.md`, deliberately not paraphrased here.
 
-- **Nobody reads the transcript.** Speak only when it changes what happens next: a refusal, an abort, a park, the
+- **Nobody reads the transcript**, which is `minimal-prose`. Speak only when it changes what happens
+  next: a refusal, an abort, a park, the
   wrap-up. Anything you would have said goes to a file — a park to the run-state file, a decision to the spec, a
   finding to a review record. **Never ask:** there is nobody to answer, so a question is a stall. The substitutes
-  are derive, ADOPT (§11), park and abort; Step 5b says which one per exit.
+  are derive, ADOPT — `discoveries-adopted`, §11 — park and abort; Step 5b says which one per exit.
 - **The keepalive is yours on both ends** — the store is in-memory and session-scoped, so no script can reach it.
   Create it FIRST, reap it before the wrap-up. Both halves: protocol §5.
 - **A directive recorded as waived at preflight is relaxed for that run only.** The vocabulary, the waiver act,
@@ -297,12 +316,12 @@ the passes that set does name — it is what "a spec authored" costs when the sp
 first — and under a mandate the run occupies the `RESEARCHING` and `TESTING` positions while doing it. Commit
 boundaries and reground points stay exactly where M6 and M7 put them.
 
-**Find CANDIDATES, plural.** One candidate is not a choice, it is the first idea with a record attached. Two or
+**`researched` means find CANDIDATES, plural.** One candidate is not a choice, it is the first idea with a record attached. Two or
 three differing in MECHANISM is the shape; stop where a further candidate would differ only in detail. "Only one
 mechanism exists here" is a legitimate answer to RECORD, never a quota to fill — and it is a claim, so it owes the
 same evidence a pick does.
 
-**TEST before choosing, and test what DISCRIMINATES.** A candidate is tested by the smallest artifact that could
+**`solution-tested`: test before choosing, and test what DISCRIMINATES.** A candidate is tested by the smallest artifact that could
 refute it — a probe, a fixture, a measurement against the real tree — never by argument, and never by a test every
 candidate passes. Write down what would make each candidate LOSE before running anything: a test whose result
 cannot change the pick is not a test, it is a rehearsal. A test that cannot fail is the same defect the merge bar

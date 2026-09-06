@@ -114,6 +114,17 @@
     "ceiling": 710
   },
   {
+    "name": "build-method size",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "memory/guides/BUILD-METHOD.md"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "kickoff engine size <=18KiB",
     "argv": [
       "bash",
@@ -733,6 +744,17 @@
     "subject": "repo",
     "guard": [],
     "ceiling": 5400
+  },
+  {
+    "name": "brief-recorded",
+    "argv": [
+      "bash",
+      "tools/unattended/check-brief-recorded.sh"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "guard": [],
+    "ceiling": 900
   },
   {
     "name": "playbook validity gate",

@@ -112,6 +112,90 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   return 1
 }
 
+# ------------------------------------------------------------- which commit BUILT this unit, once
+# ONE PREDICATE, TWO WINDOWS. This is the whole build-commit definition and every caller passes its
+# own window rather than its own copy. A second copy would be two answers to one question, and the
+# copy would be the one that drifts.
+#
+# LIFTED OUT OF `check-pass-order.sh` BY TOOL-aHoistedPass-7, and the lift is the work rather than
+# the bookkeeping. It lived there as `_find_build_commit`, INDENTED inside that leg's per-unit loop
+# together with the only other function that file has, so neither existed until the block ran and no
+# sibling could source the file and call either. The symbol was reusable and the SEAM was not, which
+# a grep for the name cannot tell apart. Sourcing the file and invoking the name can, and that is the
+# test this move owes.
+#
+# THE WINDOW ARGUMENTS ARE OPTIONAL AND DEFAULT TO THE IN-RANGE WALK — unbounded, `--reverse` —
+# because that is the question every caller but one asks. Dropping them to fit a five-argument
+# signature would have deleted the pre-anchor violation class rather than moved it.
+#
+# THE EXCLUSION IS THE BUILD'S WHOLE FOLDER PLUS THE GENERATED INDEXES AND THE SHARED RECORDS, and
+# getting this wrong made a CONFORMING run unlandable, twice. It was `spec/` and `reviews/` alone,
+# and a spec pass legitimately writes more than those two: the regenerated index, the build README,
+# the run-state file and the month ledger all sit outside them. So a SPEC commit naming the unit id
+# won the selection and its caller then graded ITS parent — where, correctly, no spec exists yet.
+# `SHARED_RECORDS` was omitted after that and it is not a corner: template section 1 MANDATES a
+# backlog row, so a conforming spec-first run writes `memory/backlog/<FAMILY>.md` in the same commit,
+# which put the commit back outside the exclusion and redded the run that followed the method
+# exactly. `GENERATED_INDEXES` arrives as `index:generator` pairs; only the index half is an excluded
+# path, because a commit touching the GENERATOR is touching product code.
+build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · shared-records · [cap] · [order]
+  _bc_range=$1; _bc_id=$2; _bc_dir=$3; _bc_gen=$4; _bc_shared=$5
+  _bc_cap=${6:-}
+  # `$#` AND NOT `${7:-...}`: the pre-anchor caller passes an EMPTY order deliberately, meaning
+  # newest-first, and a `:-` default cannot tell that from an absent argument.
+  if [ "$#" -ge 7 ]; then _bc_ord=$7; else _bc_ord=--reverse; fi
+  _bc_ex=""
+  for _bc_i in $_bc_gen; do
+    _bc_p=${_bc_i%%:*}
+    [ -n "$_bc_p" ] && _bc_ex="$_bc_ex -e ^$_bc_p"
+  done
+  for _bc_s in $_bc_shared; do
+    [ -n "$_bc_s" ] && _bc_ex="$_bc_ex -e ^$_bc_s"
+  done
+  # THE CAP BOUNDS THE ENUMERATION, not only the loop body. `for _c in $(rev-list ...)` runs the
+  # whole traversal in a command substitution BEFORE the first iteration, so a loop-only cap bounds
+  # the VERDICT and not the WORK — the `bounded-through-a-pipe-is-unbounded` class. The pre-anchor
+  # window is the entire history behind an anchor, so `--max-count` is what bounds it.
+  #
+  # THE TWO WINDOWS WALK IN OPPOSITE DIRECTIONS, and getting that wrong is what made the pre-anchor
+  # probe unable to see its own target. The IN-RANGE walk wants the EARLIEST build commit, so it is
+  # `--reverse`. The PRE-ANCHOR probe wants ANY violating commit behind the anchor, and the nearest
+  # is both the likeliest and the one that must survive truncation — so it walks NEWEST-FIRST and
+  # truncates the FAR end.
+  #
+  # WHAT WENT WRONG, because it is worth one reader's minute. `rev-list --reverse --max-count=N`
+  # applies the count during traversal and reverses AFTER, so the anchor is the LAST element of the
+  # window, not the first. The probe was written `--reverse` for both windows on the belief that it
+  # yielded the commits nearest the anchor; it yields the farthest. So the one commit the probe
+  # exists to reach was dropped by the cap whenever the history behind it was deeper — and the
+  # truncation arm could not see that, because it used the record-only fixture, where the correct and
+  # the broken behaviour give the same verdict.
+  #
+  # Truncation is therefore reported AFTER the walk, on the count actually emitted.
+  #
+  # `cap+1` FETCHED, `cap` GRADED, so truncation is EXACT. With `--max-count=$cap` a complete walk of
+  # an exactly-cap-deep window is indistinguishable from a truncated one, and the caller reported
+  # TRUNCATED for a probe that had in fact seen everything. Fetching one extra is the only way to
+  # know there was more.
+  _bc_n=0; _bc_mc=""
+  [ -n "$_bc_cap" ] && _bc_mc="--max-count=$((_bc_cap+1))"
+  for _bc_c in $(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null); do
+    _bc_n=$((_bc_n+1))
+    # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
+    if [ -n "$_bc_cap" ] && [ "$_bc_n" -gt "$_bc_cap" ]; then printf 'TRUNCATED'; return 0; fi
+    _bc_subj=$(GIT log -1 --format=%s "$_bc_c" 2>/dev/null)
+    # THE WHOLE-TOKEN MATCH is `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up
+    # sequence is a prefix of nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
+    case " $(printf '%s' "$_bc_subj" | tr -c 'A-Za-z0-9-' ' ') " in *" $_bc_id "*) ;; *) continue ;; esac
+    # Did it touch anything outside this build's own record surface?
+    if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \
+       | grep -v '^$' | grep -qv -e "^$_bc_dir/" $_bc_ex; then
+      printf '%s' "$_bc_c"; return 0
+    fi
+  done
+  return 1
+}
+
 # THE NEXT ANCHOR for a unit after <anchor>, or empty when this is the unit's last row. Chosen by
 # ANCESTRY rather than by the order rows appear in the file: the record is append-only and a run may
 # park rows in any order, so file order is not history order. The earliest strict descendant wins,

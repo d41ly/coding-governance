@@ -135,20 +135,55 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""
 # ----
 # ---- So nothing from that file executes in this shell at all. It is sourced inside a subshell, and
 # ---- the DECLARED KEYS come back as a NUL-delimited name/value stream terminated by a sentinel. A
-# ---- trap, a redefined function, an `exit`, a `set -x` - none of it crosses the boundary; the worst
-# ---- a hostile conf can now do is fail to deliver the sentinel, which is a refusal.
+# ---- trap, a redefined function, an `exit`, a `set -x` - none of it crosses the boundary. What DOES
+# ---- cross is a value per declared key, and the allow-list below is what bounds THAT channel: the
+# ---- worst a hostile conf can do is give one of those keys a hostile value, which is the cost the
+# ---- protocol concedes when it says a leg reads its subject's answer. It does not get to name a
+# ---- different subject.
 # ----
-# ---- THE NAMES ARE READ AS TEXT AND VALIDATED, never taken from the file's own output: only
-# ---- `[A-Z][A-Z0-9_]*` is assignable, so the stream cannot introduce a name this leg does not expect.
-# ---- A key the file spells in some other shape keeps the default initialised above, which is exactly
-# ---- what a `sed`-based reader would have done with it.
+# ---- THE NAMES ARE READ AS TEXT AND VALIDATED, never taken from the file's own output. A key the
+# ---- file spells in some other shape keeps the default initialised above, which is exactly what a
+# ---- `sed`-based reader would have done with it.
 _conf_names=$(sed -n 's/^[[:space:]]*\(export[[:space:]][[:space:]]*\)\{0,1\}\([A-Z][A-Z0-9_]*\)=.*/\2/p' "$CONF" | sort -u)
 _conf_ok=0
 while IFS= read -r -d '' _ck; do
   IFS= read -r -d '' _cv || break
   case "$_ck" in
     __CONF_IMPORT_OK__) _conf_ok=1 ;;
-    [A-Z][A-Z0-9_]*) eval "$_ck=\$_cv" ;;
+    # AN ALLOW-LIST, NOT A GLOB, and this half of the amendment was left standing for a round. The
+    # open `[A-Z][A-Z0-9_]*` arm assigned EVERY uppercase key the conf declared, and this leg sets
+    # `HERE` and `DRIVER` ABOVE the import - the file it parses every core set out of, and the
+    # directory it byte-compares the playbook leg from. Reproduced twice on the live tree: a tracked
+    # `DRIVER="/dev/null"` made check 1 refuse for an unreadable `AUTH_MODES`, and a decoy carrying
+    # plausible declarations made checks 1, 2, 16, 26, 28 and 31 grade the decoy while the real
+    # driver enforced something else. `SCOPE="skip28"` deleted the whole 28 region including 28c's
+    # pinned-git-read enforcement. `.unattended.conf` is a tracked file an unattended run commits
+    # itself, and this is an unguarded merge-bar leg. The two sibling importers - check-pass-order
+    # and check-brief-recorded - already close it. `check-brief-recorded.sh`'s own comment names a
+    # sibling that sets DRIVER above its import and evals a classifier out of it: that is
+    # `check-pass-order.sh`, not this leg, which evals nothing but its own import assignment. An
+    # earlier revision of this paragraph claimed that comment named THIS hole; it does not, and the
+    # attribution is corrected rather than left to mislead the next reader.
+    #
+    # THE SET IS THE INTERSECTION of the keys initialised above with the keys the shipped
+    # `.unattended.conf.example` declares, which is what "the keys this leg reads FROM THE CONF"
+    # means. `UNITS_REGION_CUTOFF` is in it and is initialised nowhere above - it is read at its two
+    # sites through `${UNITS_REGION_CUTOFF:-}` - so a list transcribed from the initialiser block
+    # alone would have silently stopped it being configurable. `ADV_NAME` is NOT in it and is
+    # initialised above: it is this leg's own derived value, parsed out of the remote's HEAD
+    # advertisement, and the initialiser exists only so `set -u` survives the path where that parse
+    # did not run. Assigning it from the conf is not a feature being kept, it is the same hole
+    # wearing a different key.
+    # THE SENTINELS BELOW NAME THIS BLOCK FOR A JOIN THAT IS NOT YET WIRED - see check 22, which
+    # records why it was withdrawn. They are BARE on purpose: an anchored range over them must not be
+    # able to match the extractor's own source line, which is how the first draft of that join read 38
+    # keys instead of 20 and swept in heredoc markers and phase names.
+    # gov:conf-allow-begin
+    MEMORY_ROOT|LANDER|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
+    PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
+    KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
+    HALT_FLOOR|UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
+    # gov:conf-allow-end
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
           for _n in $_conf_names; do eval "_cval=\${$_n:-}"; printf '%s\0%s\0' "$_n" "$_cval"; done
@@ -1413,6 +1448,20 @@ elif [ -f "$LIVEDOC" ]; then
   else
     proj_extra=""
   fi
+  # THE FOURTH SPELLING IS NOT JOINED, AND THAT IS A KNOWN GAP RATHER THAN AN OVERSIGHT.
+  # The import's allow-list at the top of this file is a fourth hand-typed spelling of this leg's
+  # conf key set - beside the initialiser block, this example and section 8's table - and it is the
+  # only one of the four nothing reads. A key added to the other three and forgotten there is dropped
+  # SILENTLY: it keeps its initialised default and every gate stays green.
+  #
+  # The join was WRITTEN and then WITHDRAWN unlanded, for a reason worth more than the check: its two
+  # refusal branches each owe an arm under the harness meta-gate, the only suite that can carry one is
+  # on no bar and could not complete a run on the node that wrote this, and a refusal whose failing
+  # case nobody has observed is exactly what this leg's own header calls an assertion about nothing.
+  # The predicate itself WAS measured over the tracked tree before it was withdrawn - the keys this
+  # example declares AND this file initialises, minus the allow-list, is EMPTY, with no near-miss in
+  # either direction - so there is no live instance today and the hazard is the next key, not this
+  # tree. TOOL-aHoistedPass-40 carries the predicate, the sentinel design and that measurement.
   if [ -n "$(printf '%s' "$undocumented$phantom$proj_extra" | tr -d '[:space:]')" ]; then
     fail 22 "the protocol's binding key table and the declared conf disagree, so a key is either configurable and undocumented or documented and dead. undocumented in the protocol: ${undocumented:-none} | documented but in no example: ${phantom:-none} | set by this project and undocumented: ${proj_extra:-none}"
   fi
@@ -1471,7 +1520,14 @@ tmpl="$HERE/SKILL.template.md"
 # ONE splitter, here, rather than one per consumer. `corescope` is built from the CORE set alone: a
 # project's DIRECTIVES_EXTRA_TABLE rows are hand-authored and carry no scope column, and the join
 # below must not red an adopter for a column the kit never asked them to write.
-core=""; corescope=""
+#
+# THREE lists, not two, and the third is `coresec` - the CORE handle:section pairs. The body term
+# below is the strictest thing in this leg and it iterated `core`, which is core PLUS extra, while
+# its own rationale promised core-only. An adopter declaring the documented `DIRECTIVES_EXTRA`
+# knob then got a permanent `fail 16` on a rendered carrier they cannot edit, because the
+# memory-tree kit ships BUILD-METHOD.md with `role = "rendered"` and the doc-parity leg
+# byte-compares it. No route to green, on an unguarded merge-bar leg. Closing-review F3.
+core=""; corescope=""; coresec=""
 for _de in $DIRECTIVES_CORE $DIRECTIVES_EXTRA; do
   _dh=${_de%%:*}; _dr=${_de#*:}; _ds=${_dr%%:*}; _dc=${_dr#*:}
   [ "$_dc" = "$_dr" ] && _dc=all
@@ -1479,13 +1535,16 @@ for _de in $DIRECTIVES_CORE $DIRECTIVES_EXTRA; do
 "
 done
 for _de in $DIRECTIVES_CORE; do
-  _dh=${_de%%:*}; _dr=${_de#*:}; _dc=${_dr#*:}
+  _dh=${_de%%:*}; _dr=${_de#*:}; _ds=${_dr%%:*}; _dc=${_dr#*:}
   [ "$_dc" = "$_dr" ] && _dc=all
   corescope="$corescope$_dh:$_dc
+"
+  coresec="$coresec$_dh:$_ds
 "
 done
 core=$(printf '%s' "$core" | grep . | sort -u)
 corescope=$(printf '%s' "$corescope" | grep . | sort -u)
+coresec=$(printf '%s' "$coresec" | grep . | sort -u)
 if [ ! -f "$tmpl" ]; then
   fail 16 "the kit ships no SKILL.template.md, so the directive table an agent reads cannot be joined to the registry it is supposed to mirror; a shipped kit always has one, so this is a broken install rather than a project choice"
 else
@@ -1591,6 +1650,59 @@ else
       sec=${pair#*:}
       grep -qE "^## $sec( |\$)" "$M/guides/BUILD-METHOD.md" \
         || fail 16 "a directive points at a build-method section that does not exist, so the handle names a rule no reader can reach: $pair"
+    done
+    # ---- THE BODY TERM (TOOL-aHoistedPass-2). Existence is not a route. Arm B above asserts the
+    # ---- cited section EXISTS and never opens it, so 17 of 17 handles pointed at real sections
+    # ---- that stated no rule about them — measured, and it is the defect this term closes: a run
+    # ---- resolving `passes-harnessed` read M6, found nothing, and built inline.
+    # ----
+    # ---- CORE-ONLY, on `corescope`'s own principle, and it iterates `coresec` rather than `core`
+    # ---- because `core` is core PLUS extra. A project's DIRECTIVES_EXTRA rows are hand-authored
+    # ---- and must not red an adopter for prose the kit never asked them to write — and the rendered
+    # ---- carrier is byte-compared by the doc-parity leg, so an adopter redded here has no route to
+    # ---- green at all. This paragraph said CORE-ONLY for a round while the loop below said
+    # ---- otherwise; the arm under `an extra handle is graded for EXISTENCE and not for BODY` is
+    # ---- what now decides which of the two is true. Closing-review F3.
+    # ----
+    # ---- `coresec` is split from the SAME registry parse as `core` and `corescope`, so no second
+    # ---- spelling of the handle set exists to drift — which is the class this whole build is about.
+    # ----
+    # ---- BACKTICKS, NOT A WORD BOUNDARY, and that closes two holes with one token shape. A bare
+    # ---- `<!-- anchors: … -->` satisfies a naive term while the section states no rule, and
+    # ---- `researched` is an ordinary English past participle a future prose edit would satisfy by
+    # ---- accident, certifying a section that says nothing.
+    # ----
+    # ---- THE COMMENT STRIP IS BLOCK-WISE, SPANNING LINES, and that is the whole point of the term
+    # ---- rather than a detail of it. A filter dropping lines that MATCH `^[[:space:]]*<!--` drops
+    # ---- only a comment's FIRST line, so a multi-line comment carrying the anchor on line two
+    # ---- satisfies it. Measured on four fixtures built from the real file: the naive form PASSES
+    # ---- that evasion and this form REDS it, with an honest rule sentence green in both.
+    # ----
+    # ---- WHAT IT DOES NOT CHECK, said here because a structural check reads as a semantic one to
+    # ---- everybody who did not write it: it grades that the section NAMES its handle in a form a
+    # ---- comment cannot fake. It does not grade that the sentence around the name states the rule,
+    # ---- so a dead anchor inside a real sentence still passes. Strictly stronger than
+    # ---- existence-only, strictly weaker than semantics.
+    for pair in $coresec; do
+      hnd=${pair%%:*}; sec=${pair#*:}
+      _body=$(awk -v s="^## $sec( |\$)" '
+        $0 ~ s { inb = 1; next }
+        inb && /^## / { exit }
+        inb {
+          line = $0
+          while (1) {
+            if (incm) { i = index(line, "-->"); if (i == 0) { line = ""; break }
+                        line = substr(line, i + 3); incm = 0; continue }
+            i = index(line, "<!--"); if (i == 0) break
+            pre = substr(line, 1, i - 1); rest = substr(line, i + 4)
+            j = index(rest, "-->")
+            if (j == 0) { line = pre; incm = 1; break }
+            line = pre substr(rest, j + 3)
+          }
+          print line
+        }' "$M/guides/BUILD-METHOD.md")
+      printf '%s' "$_body" | grep -qF -- "\`$hnd\`" \
+        || fail 16 "a directive's cited build-method section states nothing about it, so a run resolving the handle reads that section and finds no rule — absent in backticks outside every HTML comment: $pair"
     done
   fi
 fi
@@ -2900,6 +3012,106 @@ if [ -d "$MEMORY_ROOT/builds" ]; then
   # of this check resolved the driver path wrongly, walked zero builds, and this line caught it.
   [ "$_pv_seen" -gt 0 ] || fail 30 "check 30 walked no build whose --plan returned a verdict, so a clean result here is about an empty population rather than about the corpus: $MEMORY_ROOT/builds"
   [ -z "$_pv_bad" ] || fail 30 "a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it:$_pv_bad"
+fi
+
+
+# ---- check 31 - the adopter whose ROUTE does not resolve is TOLD, on every bar. TOOL-aHoistedPass-9,
+# the gate-time half of ruling D4: `govkit apply` refuses the same gap at the act that CREATES it and
+# only for installs made after it lands, while this runs on every bar of every adopter forever -
+# including the whole population that arm can never reach. Neither subsumes the other.
+#
+# THE SECTION COMES OUT OF THE REGISTRY, never typed here. `passes-harnessed` names its carrier
+# section in the driver's DIRECTIVES_CORE, and a literal section token in this block would go on
+# grading a section the directive no longer names the day the handle is re-pointed.
+#
+# ONE ANNOUNCED SKIP PER CASE this check cannot COMPARE, each naming its OWN subject. The BRANCHES
+# are the count and no numeral is typed beside them: F6 added the two Skill cases and left a `FIVE`
+# here that was two short, in a header whose enumeration is load-bearing. A guard
+# that a binding pair EXISTS is not a guard that it COVERS, and an absence-only assertion passes when
+# the subject was never there - so a check that cannot compare SAYS so rather than reporting a
+# reassuring zero. The announcement is therefore this check's liveness assertion and no separate
+# vacuity branch is owed. ONE LINE PER UNRESOLVED PATH: a skip whose subject is a SET leaves a reader
+# unable to say which path it was about, which is the shape this build exists to remove.
+#
+# SKIP, NOT FAIL, ON AN ABSENT DIRECTORY, and that split IS the ruling. An absent directory means the
+# route's kit was never installed here - an install decision a standing bar cannot undo, and redding
+# it punishes the wrong act on the wrong day. A missing FILE inside a present directory means the kit
+# WAS taken and its route is broken, which is a defect in that tree and theirs to fix.
+#
+# NOT A WHOLE-LEG SKIP. None of the other numbered checks needs the route to exist, so skipping the
+# leg would discard every one of their verdicts to announce this one - green-by-absence, one level up.
+#
+# WHAT THIS DOES NOT CHECK, said here because a structural check reads as a semantic one to everybody
+# who did not write it: whether the route script WORKS, or whether the sentence around it is true
+# about it. It grades that a path the section names IN BACKTICKS resolves in this tree, and a present
+# but broken script passes. Check 16's body term - not this one - grades the section for stating a
+# rule at all. Backticks rather than bare tokens, because a bare match would take a prose mention or
+# a fenced example as a subject to grade.
+#
+# `${core:-}` AND `${M:-}` ARE DELIBERATE. Both are assigned inside the `only28` guard, so under
+# `--only 28` they are unset and `set -u` would kill the script right here. That flag does not reach
+# this block today for an unrelated reason - check 30 above reads `$MEMORY_ROOT` under the same guard
+# and dies first, measured at e828f778 and filed as TOOL-aHoistedPass-37 - and these two spellings
+# are what stop this check becoming the SECOND crash on that path the day the first one is fixed.
+#
+# TWO CARRIERS, and the second half is the closing review's F6. This check read the build-method
+# render alone while the SKILL - the carrier an agent actually reads, and the one that mandates
+# `scriptPath` calls - spelled the same two scripts as install-prefix LITERALS. At a root install
+# those resolve to nothing, and this check passed over exactly that half: it certified the carrier
+# that was already right. `_c31_hit` is ONE resolver called twice rather than two loops, so the two
+# carriers cannot be graded on different terms.
+_c31_hit() { # <carrier> <path>...
+  local _c31_who="$1" _c31_p; shift
+  for _c31_p in "$@"; do
+    [ -f "$_c31_p" ] && continue
+    if [ -d "$(dirname "$_c31_p")" ]; then
+      fail 31 "a carrier of the harnessed-pass route names a script this tree does not carry while the directory that holds it IS present, so the route's kit was taken and its route is broken: $_c31_p named by $_c31_who"
+    else
+      report "check 31 skipped for $_c31_p — the directory that would hold it is absent, so the route's kit was never installed in this tree and a standing bar cannot undo an install decision"
+    fi
+  done
+}
+# The backticked tokens with a route script's shape. Both greps exit non-zero on no match and that
+# is an ANSWER here rather than a failure - the empty branches below are what say so, and neither
+# grep sits in an `&&` chain that could read it as one.
+_c31_routes() { grep -oE '`[^`]+`' | tr -d '`' | grep -E '(^|/)workflows/[A-Za-z0-9_.-]+\.js$' | sort -u; }
+_c31_sec=$(printf '%s\n' ${core:-} | awk -F: -v h=passes-harnessed '$1 == h { print $2; exit }')
+_c31_bm="${M:-}/guides/BUILD-METHOD.md"
+# THE SKILL'S PATH IS THE ADOPTER'S, spelled the one way `adopt-unattended.sh` writes it. It is not a
+# kit path and carries no install prefix: `.claude/skills/` is the harness's own convention and is
+# the same at every prefix, which is why it can be named here at all.
+_c31_skill=".claude/skills/unattended/SKILL.md"
+if [ ! -f "$_c31_skill" ]; then
+  report "check 31 skipped for $_c31_skill — this tree carries no rendered Skill, so the carrier an agent actually reads states no route to resolve; the adopter renders it, and a tree without one has taken this kit only halfway"
+else
+  _c31_spaths=$(_c31_routes < "$_c31_skill")
+  if [ -z "$_c31_spaths" ]; then
+    report "check 31 skipped for $_c31_skill — the rendered Skill names no backticked route script, so this carrier states no route for a run to resolve and there is nothing to test"
+  else
+    _c31_hit "$_c31_skill" $_c31_spaths
+  fi
+fi
+if [ -z "$_c31_sec" ]; then
+  report "check 31 skipped for $DRIVER — the directive registry names no passes-harnessed handle this leg can read, so the section holding the route is unnamed and there is nothing to resolve"
+elif [ ! -f "$_c31_bm" ]; then
+  report "check 31 skipped for $_c31_bm — this tree carries no build-method carrier, so the section naming the route cannot be opened; check 16 arm B is silent on the same absence and this line is the announcement it does not make"
+elif ! grep -qE "^## $_c31_sec( |\$)" "$_c31_bm"; then
+  report "check 31 skipped for $_c31_bm — it carries no $_c31_sec heading, so the route cannot be read out of it; check 16 arm B owns that refusal and two legs answering one question is what this file's header exists to remove"
+else
+  # The section slice, then its route tokens through the same extractor the Skill arm uses.
+  _c31_paths=$(awk -v s="^## $_c31_sec( |\$)" '
+      $0 ~ s { inb = 1; next }
+      inb && /^## / { exit }
+      inb' "$_c31_bm" | _c31_routes)
+  if [ -z "$_c31_paths" ]; then
+    report "check 31 skipped for $_c31_bm — $_c31_sec names no backticked route script, so this tree states no route for a run to resolve and there is nothing to test; an adopter whose render predates the route sentence is in exactly this state"
+  else
+    # PER PATH, so a tree carrying one of two named scripts fails on the one it lacks and says
+    # nothing about the one it has. The directory under test is `dirname` of the path the carrier
+    # ITSELF names: TOOL_ROOT renders to the empty string at a root install, so an install-prefix
+    # literal here would be wrong in an adopter tree in both directions.
+    _c31_hit "$_c31_bm" $_c31_paths
+  fi
 fi
 
 exit "$status"

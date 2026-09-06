@@ -554,6 +554,27 @@ definition, so the absence is a decision and not an oversight.
   a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
   pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
   commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
+- **Drive the build as ONE program, and know exactly what that buys.** The harness is
+  `tools/workflows/unattended-build.js`, which runs SPEC, AUDIT and DISPOSAL as ordered stages
+  and hands back the ordered roster only on a terminal `--review` verdict; each unit is then built by
+  `tools/workflows/unattended-unit.js`, one unit per call, holding that unit's brief and spec and
+  nothing else. **Every call is made by `scriptPath` and never by `name`** — the fan-out guard's
+  read-window narrowing is conditional on `scriptPath`, and a `name:` call exits it at zero.
+  **Read the build method WHOLE before the first call**, because the child is handed one unit and the
+  method is what tells it what a pass is.
+
+  Between dispatches, re-read `bash tools/unattended/unattended.sh --plan <slug> --paths` rather than
+  trusting a list you are holding, and branch on all four shapes it prints:
+  `next: <id> (READY - build it)` dispatches that unit; `(MISSING - spec it first)`, `(THIN)` and
+  `(FORKED)` do NOT; `next: none - every tracked spec is terminal` means the loop is done; and
+  `next: none - no tracked spec grades as a unit` means it is NOT done — halt and read the NOT A UNIT
+  rows, because that line is printed when nothing graded as a unit at all and the verb still exits 0.
+  A child returning `committed:false` stops the loop.
+
+  **Nothing refuses the next dispatch for you**, and that is the honest statement rather than a
+  caveat: the order gate treats an earlier unit's declaration row as dispatched, so a row the verb
+  itself wrote un-blocks the step. The one thing that refuses an early stop is `build-complete` at
+  `--close`, and its escape is a recorded `--override build-complete`.
 - **Run the bug-class checklist after every commit, and act on it before the next pass begins.** It
   is the one per-pass quality act on CODE, the build method mandates it per pass and again over the
   whole range on every closing round, and until now no carrier this kit ships even named it:

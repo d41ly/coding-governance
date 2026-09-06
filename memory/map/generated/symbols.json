@@ -563,6 +563,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "check",
+      "kind": "function",
+      "file": "tools/workflows/unattended-unit.js"
+    },
+    {
       "id": "checkCommand",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -1206,6 +1211,11 @@
       "id": "derive_targets",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "derive_unsatisfied_requires",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_width",
@@ -2121,6 +2131,11 @@
       "id": "meta",
       "kind": "const-export",
       "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "meta",
+      "kind": "const-export",
+      "file": "tools/workflows/unattended-unit.js"
     },
     {
       "id": "missing_bom",

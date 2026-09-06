@@ -120,6 +120,37 @@ printf '%s	%s
 ' "$TMP/undeclared" "not-a-number" > "$TMP/limits-bad"
 expect_out "A19 a non-numeric declared limit is a NAMED failure"   "the declared size limit for this subject is not a number: '" 5   bash "$GATE" "$TMP/undeclared" "" "" "$TMP/limits-bad"
 
+# --- A20/A21 · THE PAIR TERM (TOOL-aHoistedPass-3) ----------------------------------------------
+# A subject may state its own budget in its own prose, and the ceiling is ALSO in a declaration.
+# Check 6 reds when the two disagree. THE KEY IS THE ABSOLUTE POSIX PATH for a subject outside the
+# repo, computed the way the gate computes it — writing the drive-letter form the shell was handed
+# makes every row MISS, the gate falls through to its 49152 default, and an arm written that way
+# passes while proving nothing. Measured: that is exactly what the first cut of these arms did.
+_pair_dir=$(cd "$TMP" && pwd)
+printf '**Budget: <=27648 bytes, <=350 lines**\nbody\n' > "$TMP/pair-prose"
+printf '**Budget: <=27648 bytes, <=350 lines**\nbody\n' > "$TMP/pair-kb"
+sed -i 's/<=27648 bytes/<=27 KB/' "$TMP/pair-kb"
+printf '%s\t%s\n' "$_pair_dir/pair-prose" 30000 >  "$TMP/limits-pair"
+printf '%s\t%s\n' "$_pair_dir/pair-kb"    27648 >> "$TMP/limits-pair"
+expect_out "A20 a budget line disagreeing with its declared row reds at check 6" \
+  "the subject states its own budget and disagrees with its declaration" 6 \
+  bash "$GATE" "$TMP/pair-prose" "" "$TMP/hw-pair" "$TMP/limits-pair"
+# A21 is the half that keeps the term from being disarmed by a rewrite: a prose figure this gate
+# cannot parse as BYTES is not equal to any declared row, so it reds through the same branch rather
+# than falling silently out of the comparison.
+expect_out "A21 a budget line the gate cannot parse as bytes reds too, naming it" \
+  "'no bytes figure'" 6 \
+  bash "$GATE" "$TMP/pair-kb" "" "$TMP/hw-pair" "$TMP/limits-pair"
+# THE CONTROL, and it is the arm that proves the two above are not vacuous. A subject whose prose
+# AGREES with its row passes, and a subject carrying no budget line at all is never compared — which
+# is the second guard, and the reason the three shipped subjects are untouched by this term.
+printf '%s\t%s\n' "$_pair_dir/pair-prose" 27648 > "$TMP/limits-pair-ok"
+expect_absent "A22 an agreeing pair is not a check 6" "check 6" 0 \
+  bash "$GATE" "$TMP/pair-prose" "" "$TMP/hw-pair" "$TMP/limits-pair-ok"
+printf '%s\t%s\n' "$_pair_dir/undeclared" 4096 > "$TMP/limits-nobudget"
+expect_absent "A23 a declared subject with NO budget line is never compared" "check 6" 0 \
+  bash "$GATE" "$TMP/undeclared" "" "$TMP/hw-pair" "$TMP/limits-nobudget"
+
 # --- A1 · a file of exactly MAX_BYTES ----------------------------------------------------------
 mkfile "$LIMIT" "$TMP/at"
 expect_out "A1 at the limit exits 0" "template-size OK" 0 bash "$GATE" "$TMP/at"
