@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-parked-surfaced: yes, 1 surfaced
+parked-surfaced: yes, 5 surfaced
 keepalive-reaped: yes
 witness: 672ae990251509d8bb4042af0f01829397d48b79
 phase: LANDING
@@ -96,3 +96,5 @@ base: 6c670b024644bf6bbcc28ee74d2265c0efd453c6
 2026-09-06T09:24:36Z review · item TOOL-aSurfacedLexicon-10 · reason verdict CLEAN WITH FIXES · blockers 1
 
 2026-09-06T10:14:15Z review · item TOOL-aSurfacedLexicon-10 · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · disposition fold
+
+2026-09-06T13:55:44Z override · item specs-audited · reason TOOL-aSurfacedLexicon-1 arrived CLOSED at the pinned BASE: it is the design pass, built and closed by the session that wrote this spec set, before this run existed. Its code predates this run and no spec-audit record names it. Writing one now would claim a pre-code review that did not happen, which is the one thing an audit record must not do. UNCHANGED FROM THE PREVIOUS CLOSE and narrower than it: that close carried this override for TWO units, -1 and -10. TOOL-aSurfacedLexicon-10 now HAS its spec-audit record, written before its code on the owner turn that resolved its fork, so this override covers -1 alone. Every other unit this run built was audited before its code, both rounds recorded under the build reviews folder.
