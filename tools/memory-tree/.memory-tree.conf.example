@@ -122,6 +122,13 @@ READINESS_ROWS_CUTOFF=""
 # never required; set it strictly ahead of your corpus as with the cutoffs above.
 BASE_RESOLVE_CUTOFF=""
 
+# Section-7 leg-line ratchet, read by `tools/check-spec-tokens.py` rather than by the hygiene engine:
+# from this date a LIVE spec that CARRIES a `## N. Gates` heading must contribute at least one leg
+# name your gate manifest resolves. A spec with no Gates heading is silent, which is the whole Tier-1
+# accommodation. Blank = never required. Declared here because a key that reaches only the shipping
+# repo's conf leaves an adopter a dead arm reading as armed.
+SPEC_LEGLINE_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.
