@@ -4,10 +4,9 @@ node: a
 opened: 2026-09-06
 streams: tooling
 roster: TOOL
-status: OPEN
 parents: aBoundedCeiling
 authorized-by: prompt
-ids: TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-5
+ids: TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7
 ---
 
 # aQuenchedHarness — self-checks that cannot wedge a build, and that adopters never run
@@ -71,23 +70,39 @@ copy-installs a kit runs that kit's self-tests on every bar.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-06 · streams tooling
-ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-5
+**Build status:** OPEN · 7 unit(s) · node a · opened 2026-09-06 · streams tooling
+ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aQuenchedHarness-1 — the bar's own wall, so a wedged run dies with a verdict](spec/2026-09-06-spec-TOOL-aQuenchedHarness-1.md) | 1 | 2 | OPEN | rev-1 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-2 — leg ceilings derived from the ledger, not guessed at ten times](spec/2026-09-06-spec-TOOL-aQuenchedHarness-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-3 — a self-test leg never reaches an adopter's manifest](spec/2026-09-06-spec-TOOL-aQuenchedHarness-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-4 — one on-demand runner for every kit's self-tests, budget-graded](spec/2026-09-06-spec-TOOL-aQuenchedHarness-4.md) | 4 | 2 | OPEN | rev-1 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-5 — a self-test harness whose unit of cost is not a process](spec/2026-09-06-spec-TOOL-aQuenchedHarness-5.md) | 5 | 2 | OPEN | rev-1 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved](spec/2026-09-06-spec-TOOL-aQuenchedHarness-6.md) | 6 | 2 | OPEN | rev-1 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches](spec/2026-09-06-spec-TOOL-aQuenchedHarness-7.md) | 7 | 2 | OPEN | rev-1 | 2026-09-06 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aQuenchedHarness-1` | no |
+| 2 | `TOOL-aQuenchedHarness-2` | no |
+| 3 | `TOOL-aQuenchedHarness-3` | no |
+| 4 | `TOOL-aQuenchedHarness-4` | no |
+| 5 | `TOOL-aQuenchedHarness-5` | no |
+| 6 | `TOOL-aQuenchedHarness-6` | no |
+| 7 | `TOOL-aQuenchedHarness-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
