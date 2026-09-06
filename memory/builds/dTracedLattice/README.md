@@ -91,7 +91,7 @@ ids TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTrac
 | [TOOL-dTracedLattice-7 — a merge-bar substrate whose score depends on the hash seed](spec/2026-09-05-spec-TOOL-dTracedLattice-7.md) | 7 | 2 | CLOSED | rev-4 | 2026-09-06 |
 <!-- /gen:build-units -->
 
-Records: 25 bound to this build, across 3 record folder(s).
+Records: 26 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

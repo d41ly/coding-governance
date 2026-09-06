@@ -1108,6 +1108,11 @@
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
     },
     {
+      "id": "derive_live_rows",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
       "id": "derive_memory_disciplines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"

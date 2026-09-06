@@ -2314,9 +2314,15 @@ def test_every_advertised_gen_map_mode_runs():
         assert "Traceback" not in proc.stderr, proc.stderr
         if prints:
             assert proc.stdout.strip(), f"gen_map.py {' '.join(argv)} printed nothing"
-            assert "fan-in" in proc.stdout, (
-                "the printer ran but named no candidate, so this arm would pass over the crash "
-                f"it exists to catch:\n{proc.stdout}")
+            # A CANDIDATE ROW, not the header. `_seed_affordances` prints its
+            # `# seed-affordances: top N ...` line unconditionally and BEFORE the loop that
+            # crashed, so a needle satisfied by the header greens over a printer that never ran —
+            # verified with `--top 0`: exit 0, header, zero rows, arm passes.
+            rows = [ln for ln in proc.stdout.splitlines()
+                    if ln.startswith("- ") and "fan-in" in ln]
+            assert rows, (
+                "the header printed and no candidate row followed it, so the printer this arm "
+                f"exists to exercise never ran:\n{proc.stdout}")
 
 
 def test_present_layers_see_outside_the_symbol_roots(tmp: Path):
@@ -2336,6 +2342,15 @@ def test_present_layers_see_outside_the_symbol_roots(tmp: Path):
         "a layer outside the symbol corpus's roots is invisible to the present-layer tally, so the "
         f"dark-layer check would report it covered: {present}")
     assert present.get(".py") == 1, present
+    # AND THE CALL SITE, which is where the defect lived: the helper can be correct while
+    # `build_reference_index` still fills `stats` from its own roots-scoped loop. Symbols under
+    # `src/` only, so `roots == ['src']` and the `.ts` under `web/` is reachable ONLY through the
+    # widened population.
+    stats: dict = {}
+    m.build_reference_index(["src/text.py"], root=tmp, stats=stats)
+    assert ".ts" in stats.get("present_extensions", ()), (
+        "build_reference_index still reports the roots-scoped population, so every reader of "
+        f"`stats` sees the old answer however correct the helper is: {stats}")
     # And the verdict built from it must REFUSE rather than report the correct declaration stale.
     scan = {"extensions": [".py"], "present_extensions": sorted(present),
             "present_counts": present, "files_scanned": 1, "parse_skips": 0}
@@ -2360,6 +2375,18 @@ def test_no_scan_is_not_an_empty_corpus():
 def test_gate_coverage_refuses_a_gate_file_that_names_nothing(tmp: Path):
     """F6's class. "GATE_FILE unset" and "GATE_FILE names a path that is not there" were one return
     value and one exit 0 — a benign state and a broken configuration reported identically."""
+    # FIRST, the function F6 actually changed. Monkeypatching it away and asserting on `main`
+    # alone left the whole suite green with the resolver half reverted, which is the arm grading a
+    # stand-in for the thing under test.
+    (tmp / "tests").mkdir()
+    (tmp / ".codebase-map.conf").write_text(
+        "MAP_ROOT=map\nGATE_FILE=tests/moved_gate.py\n", encoding="utf-8")
+    resolved = cg.resolve_gate_path(tmp)
+    assert resolved is not None, (
+        "a GATE_FILE that is SET must not resolve to None; that collapses a broken configuration "
+        "into the benign unset state")
+    assert not resolved.is_file() and resolved.name == "moved_gate.py", resolved
+
     missing = tmp / "tests" / "moved_gate.py"
     real = cg.resolve_gate_path
     cg.resolve_gate_path = lambda root: missing
@@ -2398,14 +2425,33 @@ def test_the_control_and_the_measurement_share_a_denominator():
     spec.loader.exec_module(rh)
     # DERIVED, not spelled: a kit file naming its own install path by literal is what the
     # carried-prefix ban exists to stop, and an arm is a shipped file like any other.
-    rows = [{"id": "A", "query": "q", "expected_file": f"{m.kit_rel()}/map_lib.py"},
+    # Row A's target is one of the repo's most-CHANGED files, so the churn control HITS it and the
+    # two denominators give different numbers; row B's target is absent, so it is a DEAD probe and
+    # is the difference between them. Both properties are asserted below rather than assumed.
+    rows = [{"id": "A", "query": "q", "expected_file": "memory/backlog/TOOL.md"},
             {"id": "B", "query": "q", "expected_file": "no/such/file/anywhere.py"}]
     scored, dead = rh.measure_ranks(rows, m.repo_root())
     assert dead == ["B"], f"the fixture must carry a DEAD probe or this arm proves nothing: {dead}"
     assert len(scored) == 1, scored
-    live_ids = {sc["id"] for sc in scored}
-    live_rows = [r for r in rows if r["id"] in live_ids]
-    assert len(live_rows) == len(scored), (live_rows, scored)
+    # THE RENDERED REPORT, which is the CALL SITE. The first cut of this arm rebuilt the filter
+    # inside the test and asserted the rebuild agreed with itself — a tautology that stayed
+    # green with the shipped fix reverted. What has to hold is that the line a reader sees uses
+    # the same denominator the measured rate does.
+    import types
+    live_rows = rh.derive_live_rows(rows, scored)
+    assert len(live_rows) == len(scored) == 1 and live_rows[0]["id"] == "A", (live_rows, scored)
+    args = types.SimpleNamespace(scenarios="<fixture>", control="constant", trials=1, k=20)
+    text = rh.render_report(rows, scored, dead, args, m.repo_root())
+    # The control is scored over ONE live row here. Over both rows the same hit count divides by
+    # two, so the two spellings cannot print the same number unless the fix is in place.
+    want = rh.run_constant_control(live_rows, m.repo_root(), 20)
+    other = rh.run_constant_control(rows, m.repo_root(), 20)
+    assert want != other, (
+        "the fixture does not discriminate between the two denominators, so this arm would "
+        f"pass on either implementation: {want} vs {other}")
+    assert f"{want:.3f}" in text, (
+        "the constant control was scored over a different population than `measure_recall` "
+        f"divides by:\n{text}")
 
 
 def test_no_tracked_carrier_still_names_the_old_backlog_destination():
@@ -2420,10 +2466,13 @@ def test_no_tracked_carrier_still_names_the_old_backlog_destination():
     # self-matching predicate reds forever and the obvious repair — excluding this file — would
     # blind the arm to a real hit here.
     needle = "MAP_ROOT>/" + "reinvention-backlog.md"
-    out = subprocess.run(["git", "-C", str(root), "grep", "-n", "-F", needle,
-                          "--", ":!memory/builds/"],
-                         capture_output=True, text=True).stdout
-    hits = [ln for ln in out.splitlines() if ln.strip()]
+    proc = subprocess.run(["git", "-C", str(root), "grep", "-n", "-F", needle,
+                           "--", ":!memory/builds/"], capture_output=True, text=True)
+    # `git grep` exits 1 on NO MATCH and 128 on a usage or repository error, and both print nothing
+    # — so discarding the code made a broken invocation indistinguishable from a clean tree.
+    assert proc.returncode in (0, 1), (
+        f"git grep failed (rc={proc.returncode}), so this arm measured nothing: {proc.stderr}")
+    hits = [ln for ln in proc.stdout.splitlines() if ln.strip()]
     assert not hits, (
         "a tracked carrier still names the pre-2026-09-06 backlog destination; the record lives "
         "under the git common dir now:\n" + "\n".join(hits))

@@ -524,7 +524,14 @@ def render_layer_refusal(verdict: dict) -> str:
     """The refusal text, or `""` when there is nothing to refuse. S3: it names the layer, its file
     count, and BOTH ways to clear it, so the message carries the repair and not only the problem."""
     if verdict["legacy"]:
-        avail = ", ".join(verdict["uncovered"]) or "(none — every present layer is covered)"
+        # `uncovered == []` means TWO different things and only one of them is a coverage claim: no
+        # layer is uncovered, or no walk ran at all. Saying "every present layer is covered" over a
+        # corpus nothing looked at is the affirmative false claim this whole unit exists to stop —
+        # one function further out than where it was found the first time.
+        if not verdict["counts"]:
+            avail = "(not measured — no corpus walk ran for this invocation)"
+        else:
+            avail = ", ".join(verdict["uncovered"]) or "(none — every present layer is covered)"
         return (f"RECALL_DARK_LAYERS carries the OLD language-name spelling "
                 f"{', '.join(verdict['legacy'])}. Values are EXTENSIONS now, with a leading dot, "
                 f"and nothing here reinterprets one — a guess that reads `bash` as `.sh` is right "

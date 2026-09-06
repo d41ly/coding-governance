@@ -98,6 +98,18 @@ def measure_ranks(rows: list[dict], root: Path) -> tuple[list[dict], list[str]]:
     return scored, dead
 
 
+def derive_live_rows(rows: list[dict], scored: list[dict]) -> list[dict]:
+    """The rows that were actually SCORED — the denominator `measure_recall` divides by.
+
+    One function, two callers, so a control and the measurement cannot drift onto different
+    populations. They did: the control divided by every row while the measured rate divided by the
+    live ones, so a dead probe shrank one and not the other and the comparison flattered the
+    ranking. A control that is not comparable is not a control.
+    """
+    live = {s["id"] for s in scored}
+    return [r for r in rows if r["id"] in live]
+
+
 def measure_recall(scored: list[dict], k: int) -> float:
     """Fraction of LIVE scenarios whose target appears in the top `k` files. A miss is a miss."""
     if not scored:
@@ -173,13 +185,7 @@ def render_report(rows, scored, dead, args, root) -> str:
                    f"p95={p95:.3f} | measured={real:.3f} | "
                    + ("CLEARS the 95th percentile" if real > p95 else "DOES NOT clear the 95th percentile"))
     elif args.control == "constant":
-        # THE SAME DENOMINATOR the measured rate uses. `measure_recall` divides by the LIVE
-        # scenarios; handing the control every row divided by a larger number and quietly flattered
-        # the comparison. A dead probe must change neither rate's divisor or the two are not
-        # comparable, which is the whole job of a control.
-        live_ids = {s["id"] for s in scored}
-        live_rows = [r for r in rows if r["id"] in live_ids]
-        c = run_constant_control(live_rows, root, args.k)
+        c = run_constant_control(derive_live_rows(rows, scored), root, args.k)
         real = measure_recall(scored, args.k)
         if c != c:  # nan
             out.append(f"constant control @{args.k}: UNAVAILABLE (git could not answer) — not a 0")

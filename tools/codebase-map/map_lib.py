@@ -37,6 +37,7 @@ from __future__ import annotations
 import ast
 import json
 import os
+import subprocess
 import re
 import tomllib
 from dataclasses import dataclass, field
@@ -815,15 +816,32 @@ def derive_present_layers(root: Path, skip_dirs: frozenset[str] = _SKIP_DIRS) ->
     answer agree with the extractors by construction — a dark-layer check that cannot see a layer
     nobody extracts is a dark-layer check that reports every layer covered.
 
-    It READS NOTHING: it counts dirents, so a second traversal costs a stat walk and no I/O.
+    THE POPULATION IS THE TRACKED FILE LIST, and that bound is the whole of the fix this function
+    needed. A bare walk from the root has none: `.claude/worktrees/` holds a checkout per branch, so
+    on a primary tree the first cut counted sixteen sibling worktrees as "this repository" —
+    `{.js: 145, .py: 880, .sh: 1579}` against this tree's `{.js: 8, .py: 61, .sh: 94}`, with
+    `.claude` contributing 2444 of 2604 files. Inflated counts print in a refusal, and one `.ts` on
+    any sibling branch would make `reuse_lookup` exit 2 repo-wide. `git ls-files` is bounded by
+    construction and is the same population every other check in this kit grades.
+
+    It READS NOTHING either way: it counts names, so this costs one `git` call and no I/O. Where git
+    cannot answer it FALLS BACK to a walk — with `.claude` skipped, because that directory is the
+    measured cause — and an adopter's export tarball still gets an answer rather than a crash.
     """
     out: dict[str, int] = {}
-    for dirpath, dirnames, names in os.walk(root):
-        dirnames[:] = [d for d in dirnames if d not in skip_dirs]
-        for name in names:
-            suffix = Path(name).suffix
-            if suffix in DEFINITION_CARRYING_EXTS:
-                out[suffix] = out.get(suffix, 0) + 1
+    try:
+        listing = subprocess.run(["git", "-C", str(root), "ls-files", "-z"],
+                                 capture_output=True, check=True).stdout
+        names = [n for n in listing.decode("utf-8", "replace").split("\0") if n]
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        names = []
+        for dirpath, dirnames, filenames in os.walk(root):
+            dirnames[:] = [d for d in dirnames if d not in skip_dirs and d != ".claude"]
+            names.extend(filenames)
+    for name in names:
+        suffix = Path(name).suffix
+        if suffix in DEFINITION_CARRYING_EXTS:
+            out[suffix] = out.get(suffix, 0) + 1
     return out
 
 

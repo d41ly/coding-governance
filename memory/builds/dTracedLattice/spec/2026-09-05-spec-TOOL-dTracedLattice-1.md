@@ -25,6 +25,7 @@
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
 | [2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md](../reviews/2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md) | diff-review | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
+| [2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round2.md](../reviews/2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round2.md) | diff-review | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
 
 <!-- /gen:spec-records -->
 

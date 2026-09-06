@@ -7,7 +7,7 @@
 # legacy, preserved for adopters carrying a pre-1.1 gate file the maintenance rule never overwrites.
 
 .githooks/pre-commit:48                 dual-spelling: the hygiene leg locates its gate at either prefix
-tools/codebase-map/map_lib.py:1475      REGEN_CMD legacy, deliberate: a pre-1.1 GATE_FILE is project-owned and never overwritten
+tools/codebase-map/map_lib.py:1493      REGEN_CMD legacy, deliberate: a pre-1.1 GATE_FILE is project-owned and never overwritten
 tools/codebase-map/gen_map.py:47        prose quoting that legacy literal
 tools/codebase-map/adopt-codebase-map.sh:155  prose quoting that legacy literal
 tools/memory-tree/README.md:109         the PUBLISHED root-prefix driver command; check-wiring.test.sh AC12 derives and requires it
