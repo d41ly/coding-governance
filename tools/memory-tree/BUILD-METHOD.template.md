@@ -62,8 +62,8 @@ Sweep §8 across the whole set before any code, including forks M2 just created.
 resolved before it, a decision.
 
 **What is delegated.** A standing mandate delegates the owner's resolver authority for the named build only —
-the forks its specs state, AND that build's own scope by M2's AMEND acts. Two bounds: the README's GOAL statement is what a run may not amend (under a canon it IS the immutable description slot, folded there because two slots that must agree are one fact twice), and the delegation does not reach veto 2's governance-carrier clause,
-M1's own budget included. Vetoes 1 and 3 stand. A fork the goal cannot survive is still not yours — park it.
+the forks its specs state, AND that build's own scope by M2's AMEND acts. Two bounds: the README's GOAL statement is what a run may not amend (under a canon it IS the immutable description slot, folded there because two slots that must agree are one fact twice), and the delegation does not reach veto 2's governance-carrier clause.
+Vetoes 1 and 3 stand. A fork the goal cannot survive is still not yours — park it.
 With no mandate, forks go to the owner and this is preparation.
 
 **Ratify the most FEATURE-RICH option** — most stated acceptance criteria satisfied, fewest follow-ups left open —
@@ -193,7 +193,7 @@ anything was compacted. Read in this order, and nothing else:
 1. `git log --oneline -5` — under a mandate, `bash {{TOOL_ROOT}}unattended/unattended.sh --resume <slug>`.
 2. The build's authored record whole (under a mandate `memory/builds/<slug>/RUN.md`, which survived compaction and
    process death where your context did not) — mandate, phase, witness, parked entries.
-3. **This file, whole.** It is capped so this stays cheap.
+3. **This file, whole.**
 4. The CURRENT sub-spec, whole — that one, not the set, which was read in M2 and is on disk.
 5. Re-run the recall probe with the terms recorded in that spec's §10.
 

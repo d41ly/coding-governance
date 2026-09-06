@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away
 
-**Status:** SPECCED · rev-5 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 1 · ratified 2026-09-04
+**Status:** SPECCED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 1 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -26,7 +26,12 @@ have.
 Three items, all selected by the §8 F1 ruling and none of them conditional on anything.
 
 - **S1** — delete lines 8 through 18 of `tools/memory-tree/BUILD-METHOD.template.md`, the whole
-  budget passage: the `**Budget: ≤24 KB, ≤350 lines**` declaration and its reason, the three raises
+  budget passage, **AND the two sentences elsewhere in the file that only made sense while it stood**
+  — M3's `M1's own budget included` clause and M7's `It is capped so this stays cheap`. Added at
+  rev-6, found by the M6 bug-class checklist on the build commit rather than by re-reading: leaving a
+  document asserting a cap it no longer declares is `amendment-leaves-its-other-half-standing`, and
+  completing the deletion is doing S1 rather than diverging from it. Neither removal relocates
+  anything or writes a replacement pointer. The passage itself is: the `**Budget: ≤24 KB, ≤350 lines**` declaration and its reason, the three raises
   and the argument for each, the `**The BYTE half binds first**` sentence, and the
   `No gate enforces the pair` admission. Nothing is relocated and no replacement pointer is written.
 - **S2** — re-render `memory/guides/BUILD-METHOD.md` from the edited template in the same commit,
@@ -213,9 +218,14 @@ because the product of this ruling is that nothing measures this file.
 - **AC6** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs, check 6 passes on the
   re-rendered `memory/guides/BUILD-METHOD.md`.
 - **AC7** — When `wc -c tools/memory-tree/BUILD-METHOD.template.md` is run after the cut it reports
-  23463, exactly 1101 below the base measurement of 24564, and `wc -l` reports 306 against a base of
-  317. Both are exact rather than a floor, because one branch now exists and its recovery is the
-  measured weight of the deleted passage.
+  **23403**, exactly 1161 below the base measurement of 24564, and `wc -l` reports **306** against a
+  base of 317 — the LINE count is unchanged by S1's second half, because both sentences were removed
+  from within lines rather than as lines. Both are exact rather than a floor, because one branch now exists and its recovery is
+  the measured weight of what is deleted. **The figures moved at rev-6 with S1's second half**: the
+  budget passage alone is 1101 bytes over 11 lines and was observed at exactly 23463 / 306 before the
+  two dangling sentences went, which is what rev-5 recorded and what a reader comparing revisions
+  should expect to see. Only the BYTE figure moved. Updating the criterion in the same pass as the code is the point — fixing the
+  file and leaving the number is the same class the checklist just caught, one level up.
 - **AC8** — When `grep -n 'No gate enforces the pair' tools/memory-tree/BUILD-METHOD.template.md`
   runs it returns no hit, and `grep -n 'Budget:'` on the same file returns no hit either. Both halves
   of the claim are gone, not one.
@@ -357,6 +367,17 @@ at half the size, and the file's own measurement says the line half never binds.
   mechanism, the re-derivation command and the measured counter; AC9 gains the explicit no-check-9-
   failure clause, since check 9 is excluded from the staged pre-commit leg and this unstaged run is
   the only place in this unit where it binds.
+
+- rev-6 · 2026-09-06 · **S1 gains its second half and AC7 its new figures, both from the M6
+  bug-class checklist run on this unit's own build commit.** The checklist selected
+  `amendment-leaves-its-other-half-standing` and the class was live: with the budget passage deleted,
+  M3 still read "the delegation does not reach veto 2's governance-carrier clause, M1's own budget
+  included" and M7 still read "**This file, whole.** It is capped so this stays cheap" — two sentences
+  asserting a cap the file no longer declares. Both removed, the guide re-rendered, and AC7's exact
+  byte figure moved 23463 to 23403 in the same pass (the line count is unchanged at 306, since both
+  sentences came out from within lines), because fixing the file and leaving the
+  criterion is that same class one level up. §3's ban on giving the template a ceiling elsewhere is
+  untouched and nothing was relocated: this is the deletion finished, not widened.
 
 ## 10. Reuse audit
 
