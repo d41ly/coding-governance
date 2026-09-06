@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them
 
-**Status:** SPECCED · rev-5 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
+**Status:** SPECCED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -59,7 +59,20 @@ other unattended rule already lives.
   THREE watched pathspecs in one commit, so it moves the counter by one like any other commit but is
   the one most likely to be read as moving it by three.
 
-- **S8 — `KIT_UNATTENDED_VERSION` moves from 1.17 to 1.18 in this same commit.** The owner ruled the
+- **S8 — the kit version is ALREADY at the number the owner ruled for, and what this unit owes is
+  that its edits do not STRAND a carrier.** Measured 2026-09-06: `KIT_UNATTENDED_VERSION=1.18` at
+  `tools/unattended/unattended.sh:42`, `check-unattended.sh:40` and `check-pass-order.sh:38`, and
+  `git grep -c 'gov:kit unattended@1\.17'` over the three carrier trees returns NOTHING. The move
+  landed on `main` in `d19b4e40` (`TOOL-aTunedCompass-11`), between this spec's base `102e98f0` —
+  where the constant reads 1.17 — and this build's base `6ec402bd`. **The owner's F3 ruling named
+  1.18 and 1.18 is what the tree carries, so the ruling is SATISFIED, by another build.** §8 F4
+  records why this unit does not re-target it to 1.19. What S8 requires is therefore the half that is
+  still live and still failable: this unit edits three marker-bearing carriers
+  (`tools/unattended/PROTOCOL.template.md`, `skills/session-kickoff/SKILL.md` and
+  `tools/unattended/check-unattended.sh`), and all fourteen must still agree afterwards, which is
+  AC15's rewritten job. The original scope text follows, kept because F3's ruling is quoted from it.
+
+  The owner ruled the
   bump owed, against this spec's own recommendation (§8 F3). The constant is declared at
   `tools/unattended/unattended.sh:42` and repeated at `tools/unattended/check-unattended.sh:40` and
   `tools/unattended/check-pass-order.sh:29`. The `gov:kit unattended@` marker sits in 14 tracked
@@ -358,12 +371,18 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   its own header at `tools/unattended/check-unattended.sh:1379-1381` states it grades presence of the
   key name in the table region and that a row whose prose is wrong is green there. AC9's render
   parity cannot carry it either, since a render only makes the copy match a stale template.
-- **AC15** — When S8's bump has landed, `bash tools/check-kit-versions.sh` exits 0 and
-  `git grep -c 'gov:kit unattended@1\.18' -- tools/unattended memory/guides .claude/skills/unattended`
-  lists 14 files while the same command for `1\.17` lists none and, finding nothing, exits non-zero
-  the way AC14's probe does. The whole sweep is observed in one command rather than file by file,
-  because a partial sweep is exactly the failure mode: the same 14 carriers answer to `1\.17` before
-  the commit, so a count landing anywhere between the two is a half-bumped kit.
+- **AC15** — **Rewritten at rev-6, because the form below could no longer fail.** The count is taken
+  BEFORE this unit's first edit and again after the commit, and the two must be EQUAL:
+  `git grep -l 'gov:kit unattended@' -- tools/unattended memory/guides .claude/skills/unattended | wc -l`
+  is 14 on both sides, every one of them answering to `1\.18` and none to `1\.17`, and
+  `bash tools/check-kit-versions.sh` exits 0 after the commit. **A DELTA of zero across this unit's
+  own edits, not an absolute state.** The absolute form — 14 files at `1\.18`, none at `1\.17` — was
+  already true at this build's base `6ec402bd`, since `d19b4e40` moved the constant before this run
+  began, so as written the criterion graded another build's work and would have passed had this unit
+  stranded a carrier outright. The failure mode it now catches is the live one: this unit edits THREE
+  marker-bearing carriers (`tools/unattended/PROTOCOL.template.md`,
+  `skills/session-kickoff/SKILL.md`, `tools/unattended/check-unattended.sh`), and an edit that drops
+  or duplicates a marker moves the before/after pair apart. §8 F4 records why no bump is taken.
   `python tools/govkit/govkit.py selfcheck` is the second observation and exits 0 with no 5c failure
   naming entry `unattended`.
 
@@ -450,8 +469,46 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   **Recommendation: do not bump.** Nothing mechanically owes it, and a sixteen-file stamp sweep
   inside a prose-move unit is a second mechanism.
 
+- **F4 — the ruled version number was taken by another build before this unit ran. Re-target to
+  1.19, or record the ruling as satisfied?** **RESOLVED (agent, 2026-09-06, delegated): record it as
+  SATISFIED and bump nothing.** A fact-question decided by a probe, then a choice decided by
+  `memory/guides/BUILD-METHOD.md` M3.
+  - **The probe, and its liveness.** `git show 102e98f0:tools/unattended/unattended.sh` reads 1.17 at
+    `:42`; `git show 6ec402bd:` the same path reads 1.18; `git log -S` names `d19b4e40` as the commit
+    that moved it. The probe can produce a negative — had the constant still read 1.17, F4 would not
+    exist and S8 would stand as written.
+  - **Why not 1.19, which is the more feature-rich-looking option.** THREE builds are in flight
+    against this constant. `TOOL-aUnblockedFleet-3` carries a `KIT_UNATTENDED_VERSION` bump in its
+    own files-touched table and that build is BUILDING; `TOOL-aHoistedPass-2` asserts the constant
+    and its same-line marker and still cites `gov:kit unattended@1.17` in two places. A unit that
+    claims 1.19 today is the `TOOL-aHonedRuleset-8` H5 shape exactly — two specced units writing one
+    absolute into one file, whichever lands second landing false — and this build's own round-2 audit
+    of unit 8 blocked on that class one round ago. Taking the number would be repeating a defect this
+    run has already paid to find.
+  - **And the ruling does not ask for it.** F3's words are *BUMP it, to 1.18*. The owner named a
+    number, not a rule for deriving one at build time; 1.18 is what the tree carries, so the stated
+    target is met. Reading it as *whatever is next when you get there* is inference, and inference
+    that re-targets an owner's explicit value is not what a delegated mark may do — M3 bounds the
+    delegation at the build's own scope and its stated forks.
+  - **The cost, stated rather than buried.** This unit ships no version stamp of its own, so a reader
+    diffing the kit will find its prose move inside a release stamped for another build's work. That
+    is the honest consequence of the ruling being satisfied early, and it is why AC15 is rewritten
+    rather than deleted: the failable claim left is that this unit's three marker-bearing edits leave
+    all fourteen carriers in agreement.
+
 ## 9. Revision log
 
+- rev-6 · 2026-09-06 · **F4 added and resolved; S8 and AC15 restated. Building uncovered what
+  speccing could not, which is M2's AMEND path rather than a divergence.** The kit version is already
+  1.18 — `d19b4e40` (`TOOL-aTunedCompass-11`) moved it between this spec's base and this build's, and
+  `git grep` for the 1.17 marker returns nothing — so S8's *moves from 1.17 to 1.18* had no work left
+  in it and AC15, which greps for exactly that end state, was a criterion that could not fail. F4
+  records the probe and takes the literal reading of F3: the owner named 1.18, the tree carries 1.18,
+  the ruling is satisfied. 1.19 was refused because three builds are in flight against this constant
+  and claiming an absolute would repeat the `TOOL-aHonedRuleset-8` H5 defect this run found one round
+  ago. S8 now requires the half that is still failable and AC15 observes it: this unit edits three
+  marker-bearing carriers and all fourteen must still agree afterwards. No scope removed, no §4 figure
+  moved, and F3's text is untouched.
 - rev-1 · 2026-09-04 · initial draft. Every figure in §4 measured at base `102e98f0`; the census's
   1200–1400 B estimate for this cut was confirmed at 1467 B moved.
 - rev-2 · 2026-09-04 · folded the round-1 spec audit
