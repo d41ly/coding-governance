@@ -461,7 +461,7 @@ where this document says it may:
 | `PHASES_EXTRA` | project phase members, appended to the core set |
 | `DOD_EXTRA` | project DoD items, appended to the core set |
 | `KICKOFF_ENGINE` | the kickoff engine whose hand-back the gate reads; BLANK turns that check off |
-| `KICKOFF_EXITS` | a shrink-only floor on how many interactive exits that engine resolves without an owner turn |
+| `KICKOFF_EXITS` | a shrink-only floor on how many of those interactive exits section 13 of THIS contract enumerates a no-owner-turn resolution for |
 | `HALT_CODES_EXTRA` | project halt codes, appended to the core set |
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
@@ -648,3 +648,28 @@ and the run-state file joins the two halves.
 answer on disk, **and is DECLARED through `--dispatch`**, which makes the refusal reachable on a
 sequential pass and not only a concurrent one — a rule enforced only where two passes race misses
 every ordinary build.
+
+## 13. The kickoff engine's interactive exits, and how each resolves with no owner turn
+
+This section is the CONTRACT's, not the engine's. It moved here from the kickoff engine's Step 5b
+under `TOOL-aHonedRuleset-3`: the engine is a universal, project-agnostic skill against a declared
+ceiling, and every other unattended rule already lives in this file. The engine keeps a pointer.
+
+**The six interactive exits, and how each resolves with no owner turn.** An unattended run that
+still stops at any of these has not been made unattended, it has been made stuck:
+
+1. **Step 0 · ambiguous worktree parent** ("Ask only if ambiguous") → resolve to the checkout holding
+   the default branch; if still ambiguous, ABORT and record why. Guessing a repo is worse than
+   stopping.
+2. **Step 0 · no git anywhere** ("scope-only kickoff, or stop") → ABORT. A mandate authorizes landing,
+   and there is nothing to land into.
+3. **Step 1 · the STOP conditions** (foreign `MERGE_HEAD`/`UU`, a failed ff-merge, a branch violating
+   conventions) → ABORT and record the condition verbatim. These are the states where continuing is
+   how a run destroys work; the mandate does not reach them.
+4. **Step 2 · no manifest, offer to scaffold** → do NOT scaffold. Proceed with the generic steps and
+   park the offer as a decision the owner gets at the wrap-up.
+5. **Step 3 · a field that cannot be derived** → park it with the question, the options seen, and the
+   reason, then proceed on the most conservative reading. If ACCEPTANCE or GATES is the unfillable
+   field, ABORT: a unit with no acceptance check is not Ready, and an unattended run cannot split it.
+6. **Step 5 · the READY stop** → replaced by this step's hand-back. That replacement is the ONLY one
+   the mandate buys; the other five resolve by aborting or parking, never by guessing.

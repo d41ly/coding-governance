@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-04
 streams: tooling+playbook+kickoff+deployer
 roster: TOOL
-ids: TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8 TOOL-aHonedRuleset-9 TOOL-aHonedRuleset-10 TOOL-aHonedRuleset-11 TOOL-aHonedRuleset-12 TOOL-aHonedRuleset-13 TOOL-aHonedRuleset-14 TOOL-aHonedRuleset-15
+ids: TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8 TOOL-aHonedRuleset-9 TOOL-aHonedRuleset-10 TOOL-aHonedRuleset-11 TOOL-aHonedRuleset-12 TOOL-aHonedRuleset-13 TOOL-aHonedRuleset-14 TOOL-aHonedRuleset-15 TOOL-aHonedRuleset-16
 ---
 
 # aHonedRuleset — measure what is actually redundant in the governing prose, before trimming any of it
@@ -77,7 +77,7 @@ one build and called it a pattern rather than a coincidence; its population was 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 7 unit(s) · node a · opened 2026-09-04 · streams tooling+playbook+kickoff+deployer
 ids TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-3 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-7 TOOL-aHonedRuleset-8 TOOL-aHonedRuleset-9 TOOL-aHonedRuleset-10 TOOL-aHonedRuleset-11 TOOL-aHonedRuleset-12 TOOL-aHonedRuleset-13
-ids TOOL-aHonedRuleset-14 TOOL-aHonedRuleset-15
+ids TOOL-aHonedRuleset-14 TOOL-aHonedRuleset-15 TOOL-aHonedRuleset-16
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -85,7 +85,7 @@ ids TOOL-aHonedRuleset-14 TOOL-aHonedRuleset-15
 | [TOOL-aHonedRuleset-1 — the prose census](spec/2026-09-04-spec-TOOL-aHonedRuleset-1.md) | 0 | 1 | CLOSED | rev-1 | 2026-09-04 |
 | [TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds](spec/2026-09-04-spec-TOOL-aHonedRuleset-2.md) | 1 | 2 | CLOSED | rev-7 | 2026-09-06 |
 | [TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away](spec/2026-09-04-spec-TOOL-aHonedRuleset-6.md) | 1 | 2 | CLOSED | rev-6 | 2026-09-06 |
-| [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 2 | 2 | SPECCED | rev-6 | 2026-09-06 |
+| [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 2 | 2 | SPECCED | rev-7 | 2026-09-06 |
 | [TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement](spec/2026-09-04-spec-TOOL-aHonedRuleset-4.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-06 |
 | [TOOL-aHonedRuleset-5 — the last-audit stamp rule gets exactly one home](spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-06 |
 | [TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter](spec/2026-09-04-spec-TOOL-aHonedRuleset-8.md) | 4 | 2 | SPECCED | rev-8 | 2026-09-06 |

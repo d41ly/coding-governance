@@ -961,12 +961,23 @@ sed -i "/Ready — say go/d" skills/session-kickoff/SKILL.md
 hit "$(run)" "the kickoff engine no longer carries the READY prompt string, so the DEFAULT stop is gone and every attended kickoff would run on unasked"
 
 # ...an exit dropped from the enumeration: the count is the only thing that notices a run silently
-# regaining a place to stop.
+# regaining a place to stop. TOOL-aHonedRuleset-3 MOVED that enumeration out of the engine and into
+# the contract, so the break is staged in the PROTOCOL PAIR -- template and installed copy, the way
+# pedit does it below -- and no longer in the synthetic engine fixture, which does not carry the
+# exits any more. `mutate` fails loudly on a no-op, so an arm that stopped reaching its subject
+# reports as a broken fixture rather than as a passing check.
 git checkout -q -- skills/session-kickoff/SKILL.md
-sed -i '/^4\. \*\*Step 2/d' skills/session-kickoff/SKILL.md
+mutate $KIT_REL/PROTOCOL.template.md '/^4\. \*\*Step 2/d'
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^4\. \*\*Step 2/d'
 out=$(run)
-hit "$out" "the kickoff engine enumerates fewer interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop"
+hit "$out" "the installed protocol enumerates fewer of the kickoff engine's interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop"
 hit "$out" "5 against 6"
+
+# ...and the floor declared with no installed protocol to count in. Without this arm the move above
+# turns a missing contract into a zero count, which reads exactly like a dropped exit.
+reset_tree
+rm -f memory/guides/UNATTENDED-PROTOCOL.md
+hit "$(run)" "KICKOFF_EXITS declares a floor on the kickoff engine's interactive exits, which now live in the installed protocol, and there is no protocol at"
 
 # ...and a declared engine that is not there. Without this the whole check is skipped by a typo.
 git checkout -q -- skills/session-kickoff/SKILL.md

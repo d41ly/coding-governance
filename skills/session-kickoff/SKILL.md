@@ -220,24 +220,10 @@ Before the first pass, load the project's build method if it ships one — `<MEM
 rendered by the memory-tree kit. It carries the spec set, the fork rule, the pass loop and the
 regrounding procedure, none of which this engine states.
 
-**The six interactive exits, and how each resolves with no owner turn.** An unattended run that
-still stops at any of these has not been made unattended, it has been made stuck:
-
-1. **Step 0 · ambiguous worktree parent** ("Ask only if ambiguous") → resolve to the checkout holding
-   the default branch; if still ambiguous, ABORT and record why. Guessing a repo is worse than
-   stopping.
-2. **Step 0 · no git anywhere** ("scope-only kickoff, or stop") → ABORT. A mandate authorizes landing,
-   and there is nothing to land into.
-3. **Step 1 · the STOP conditions** (foreign `MERGE_HEAD`/`UU`, a failed ff-merge, a branch violating
-   conventions) → ABORT and record the condition verbatim. These are the states where continuing is
-   how a run destroys work; the mandate does not reach them.
-4. **Step 2 · no manifest, offer to scaffold** → do NOT scaffold. Proceed with the generic steps and
-   park the offer as a decision the owner gets at the wrap-up.
-5. **Step 3 · a field that cannot be derived** → park it with the question, the options seen, and the
-   reason, then proceed on the most conservative reading. If ACCEPTANCE or GATES is the unfillable
-   field, ABORT: a unit with no acceptance check is not Ready, and an unattended run cannot split it.
-6. **Step 5 · the READY stop** → replaced by this step's hand-back. That replacement is the ONLY one
-   the mandate buys; the other five resolve by aborting or parking, never by guessing.
+**Six other steps of this engine also stop to ask, and a mandated run that stops at one is stuck, not
+unattended.** `<MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md` §13 enumerates them and how each resolves
+with no owner turn; this step's hand-back is the only one of the six the mandate buys. Not restated
+here — a paraphrase and its source are two answers to one question.
 
 An ABORT is a VERB, not a decision to stop typing: the unattended kit's `--abort <slug> --reason
 "<why>"` writes the reason into the run-state file's parked region, records a terminal phase with a

@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them
 
-**Status:** SPECCED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
+**Status:** SPECCED · rev-7 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -327,9 +327,31 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
 - **AC6** — When the engine's Step 5b heading or the READY prompt string is deleted,
   `bash tools/unattended/check-unattended.sh` still fails check 12 with its existing two messages, so
   moving the count did not disarm the other two arms.
-- **AC7** — When the suite runs, `bash tools/unattended/check-unattended.test.sh` passes and
-  `python3 tools/memory-tree/check-arms.py --check` exits 0 with check 12 branch 4 reported ARMED by
-  `--report`.
+- **AC7** — **SPLIT at rev-7, because its first half was unsatisfiable on this tree for reasons that
+  pre-date this build.** The half that binds: `python3 tools/memory-tree/check-arms.py --check` exits
+  0 with check 12 branch 4 reported ARMED by `--report`, which is what observes that S4's re-armed
+  break is still joined to its message.
+
+  The half that is WAIVED, with its evidence: `bash tools/unattended/check-unattended.test.sh` does
+  NOT pass, and did not pass before this unit touched it. Measured 2026-09-06 over a full run: **26
+  arms FAIL and ZERO of them touch check 12, the exit count, or any line this unit edits** — verified
+  by grepping the run log for `check 12`, `interactive exits`, `5 against 6` and the floor message,
+  which returns 0. Two pre-existing causes, both reproduced at this build's BASE `6ec402bd` rather
+  than in the working tree:
+  **(i)** the fixture seds for the literal `Ten kit-owned core items`, and the shipped protocol says
+  **Twelve** — `git show 6ec402bd:tools/unattended/PROTOCOL.template.md | grep -c 'Ten kit-owned core
+  items'` returns **0**, so those arms are `fixture no-op` failures against a string that has not
+  existed for some time;
+  **(ii)** the fixture's baseline conf declares no `DISPOSITION_CUTOFF`, so every arm asserting a
+  silent tree instead receives check 2's warning about it. `DISPOSITION_CUTOFF` appears **0** times in
+  this unit's diff.
+  **This does not lower the bar this unit is graded by.** `AGENTS.md` records the owner ruling of
+  2026-08-23 that a kit's self-tests are NOT on the merge bar, and `unattended` is the first kit to
+  take it — so this suite is not a leg of `run-gates.sh` and its state neither blocks nor certifies a
+  landing. What DOES bind is AC4 (the gate green) and AC5 (the moved branch observed RED with its new
+  message), both of which were run and both of which hold. The fixture rot is filed as
+  `TOOL-aHonedRuleset-16` rather than repaired here: it is a defect in a suite this unit did not
+  break, and repairing it would put a fixture rewrite inside a prose-move unit.
 - **AC8** — When the cross-references are repointed,
   `grep -rn 'Step 5b exit' tools/ memory/guides/ .claude/` returns nothing outside `memory/builds/`
   and `memory/archive/`. All three repoints happen, so `tools/memory-tree/BUILD-METHOD.template.md`,
@@ -563,6 +585,21 @@ definition or writes the two-file edit inline — the helper is the reuse, its c
   AC5 gains the clause that check 12's printed failure must NAME `UNATTENDED-PROTOCOL.md` — S3's
   fourth requirement, which `check-arms.py` structurally cannot catch, since it sees a message edited
   without its assertion and not a message left unedited. No scope item, fork or figure moved.
+
+- rev-7 · 2026-09-06 · **AC7 SPLIT: its `check-unattended.test.sh` half waived with measured
+  evidence, its `check-arms.py` half kept.** The suite fails 26 arms and did so before this unit
+  existed. Both causes reproduce at BASE `6ec402bd`: the fixture seds for `Ten kit-owned core items`
+  against a protocol that says `Twelve` (0 hits at base), and its baseline conf declares no
+  `DISPOSITION_CUTOFF` so arms expecting silence get check 2's warning instead. ZERO of the 26 touch
+  check 12, the exit count, or any line this unit edits — grepped, not assumed. The suite is also not
+  a merge-bar leg: `AGENTS.md` carries the owner's 2026-08-23 ruling that a kit's self-tests are off
+  the bar, with `unattended` the first kit to take it. So the waiver removes nothing this landing was
+  ever graded by, and AC4 and AC5 — both RUN, both holding, one of them the staged RED — remain the
+  criteria that bind. Fixture rot filed as `TOOL-aHonedRuleset-16`.
+  **Recorded because the run wasted most of a day on it**: the suite was left running for NINE HOURS
+  under contention from a second session's `--shard 2/2` run and several bare `check-unattended.sh`
+  invocations, its log frozen for the last three, while this run reported itself as merely waiting. A
+  liveness check on a background job is one command and was not run.
 
 ## 10. Reuse audit
 

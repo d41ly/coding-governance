@@ -1439,9 +1439,19 @@ if [ -n "$KICKOFF_ENGINE" ]; then
     grep -qF "Ready — say go and I'll start, or adjust any field." <<<"$eng" \
       || fail 12 "the kickoff engine no longer carries the READY prompt string, so the DEFAULT stop is gone and every attended kickoff would run on unasked: $KICKOFF_ENGINE"
     if [ -n "$KICKOFF_EXITS" ]; then
-      nex=$(grep -cE '^[0-9]+\. \*\*Step ' <<<"$eng" || true)
-      [ "$nex" -ge "$KICKOFF_EXITS" ] \
-        || fail 12 "the kickoff engine enumerates fewer interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop: $nex against $KICKOFF_EXITS"
+      # TOOL-aHonedRuleset-3: the exits MOVED to the contract, so the floor follows its subject
+      # and counts in the INSTALLED protocol rather than in the engine. The arm stays inside the
+      # KICKOFF_ENGINE block deliberately (that unit's section 8 F1): the floor is about a
+      # kickoff engine's stops, so a repo with no engine owes no count, and reading the protocol
+      # does not change who the key is about. A repo declaring KICKOFF_EXITS with an engine but
+      # no installed protocol gets a NAMED refusal, never a zero count that reads as a shrink.
+      if [ ! -f "$LIVEDOC" ]; then
+        fail 12 "KICKOFF_EXITS declares a floor on the kickoff engine's interactive exits, which now live in the installed protocol, and there is no protocol at $LIVEDOC to count them in -- the count would read zero and every exit would look dropped"
+      else
+        nex=$(tr -d '\r' < "$LIVEDOC" | grep -cE '^[0-9]+\. \*\*Step ' || true)
+        [ "$nex" -ge "$KICKOFF_EXITS" ] \
+          || fail 12 "the installed protocol enumerates fewer of the kickoff engine's interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop: $nex against $KICKOFF_EXITS in $LIVEDOC"
+      fi
     fi
   fi
 fi

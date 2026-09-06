@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 64456e4a54961cded8229d266d3e352f9bcca0a7
+witness: 1e352f9d681ce5e2f7538df816513b67696968eb
 phase: BUILDING
 mode: slug
 anchor-kind: default-branch
@@ -36,3 +36,7 @@ base: 6ec402bd3eb7f9cb5ce6257b0f60348ae3e593fc
 2026-09-06T00:12:12Z review · item TOOL-aHonedRuleset-8 · reason verdict BLOCKED · blockers 1
 
 2026-09-06T00:53:42Z review · item TOOL-aHonedRuleset-8 · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · disposition fold
+
+2026-09-06T01:43:46Z dispatch · item 1e352f9d TOOL-aHonedRuleset-3 · reason tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md skills/session-kickoff/SKILL.md tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md .unattended.conf tools/unattended/.unattended.conf.example tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md memory/guides/SESSION-KICKOFF.md
+
+2026-09-06T01:44:17Z brief · item TOOL-aHonedRuleset-3 · reason 744fd41d496d memory/builds/aHonedRuleset/spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md
