@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.md) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 | [2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py](../build/2026-09-04-build-TOOL-aHonedRuleset-1-prose-census.py) | research | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
+| [2026-09-06-build-TOOL-aHonedRuleset-3-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aHonedRuleset-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md](../reviews/2026-09-04-review-TOOL-aHonedRuleset-2-spec-audit.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |
 | [2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-1-2-3-4-5-6-8-closing-diff-round1.md) | diff-review | TOOL-aHonedRuleset-1 TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 TOOL-aHonedRuleset-8 |
 | [2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-2-spec-audit-round2.md) | spec-audit | TOOL-aHonedRuleset-2 TOOL-aHonedRuleset-4 TOOL-aHonedRuleset-5 TOOL-aHonedRuleset-6 |

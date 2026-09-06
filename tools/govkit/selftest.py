@@ -1093,12 +1093,12 @@ user_skills = "/tmp/gk-fake-skills"
         git(gcopy, "add", "-A")
         git(gcopy, "commit", "-qm", "arms")
 
-        def _selfcheck_in(root):
+        def _run_selfcheck(root):
             return subprocess.run(
                 [sys.executable, str(root / "tools" / "govkit" / "govkit.py"), "selfcheck"],
                 capture_output=True, text=True)
 
-        base = _selfcheck_in(gcopy)
+        base = _run_selfcheck(gcopy)
         check("the gov copy is green before either arm is provoked", base.returncode == 0,
               base.stdout + base.stderr)
 
@@ -1107,13 +1107,13 @@ user_skills = "/tmp/gk-fake-skills"
         keep = d.read_text(encoding="utf-8")
         d.write_text("\n".join(l for l in keep.split("\n")
                                 if not l.startswith("why_conditional")), encoding="utf-8")
-        r7d = _selfcheck_in(gcopy)
+        r7d = _run_selfcheck(gcopy)
         check("7d reds a conditional entry with no why_conditional",
               r7d.returncode != 0 and "carries no why_conditional" in (r7d.stdout + r7d.stderr),
               r7d.stdout + r7d.stderr)
         d.write_text(keep, encoding="utf-8")
         check("and is green again once the reason is restored",
-              _selfcheck_in(gcopy).returncode == 0, "")
+              _run_selfcheck(gcopy).returncode == 0, "")
 
         # --- 7e: an entry requiring a default-set member, reachable by no declared selection. This
         #     is check-microformats' own state before TOOL-aHonedRuleset-8 moved it.
@@ -1128,7 +1128,7 @@ user_skills = "/tmp/gk-fake-skills"
         cl.insert(ci, 'why_conditional = "selftest fixture: 7e needs a conditional dependent"')
         cl.insert(ci, 'selectable = "conditional"')
         cm.write_text("\n".join(cl), encoding="utf-8")
-        r7e = _selfcheck_in(gcopy)
+        r7e = _run_selfcheck(gcopy)
         check("7e reds an entry that requires a default-set member and no selection reaches",
               r7e.returncode != 0
               and "requires a default-set member but is reached by no declared" in (r7e.stdout + r7e.stderr),
@@ -1136,7 +1136,7 @@ user_skills = "/tmp/gk-fake-skills"
         reg.write_text(rkeep, encoding="utf-8")
         cm.write_text(ckeep, encoding="utf-8")
         check("and is green again once the entry rejoins the default selection",
-              _selfcheck_in(gcopy).returncode == 0, "")
+              _run_selfcheck(gcopy).returncode == 0, "")
 
         # ===== unit 4: the gate-runner declaration, end to end =====
         # The interpreter is spelled by PATH, never by name. A bare `python` inside the fixture's

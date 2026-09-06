@@ -91,7 +91,7 @@ ids TOOL-aHonedRuleset-13 TOOL-aHonedRuleset-14 TOOL-aHonedRuleset-15 TOOL-aHone
 | [TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter](spec/2026-09-04-spec-TOOL-aHonedRuleset-8.md) | 4 | 2 | CLOSED | rev-9 | 2026-09-06 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 3 record folder(s).
+Records: 14 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
