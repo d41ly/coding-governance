@@ -20,6 +20,7 @@
 | [2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md) | research | TOOL-dTracedLattice-1 |
 | [2026-09-06-build-TOOL-dTracedLattice-7-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-dTracedLattice-7-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 |
+| [2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md](../reviews/2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md) | diff-review | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 |
 
 <!-- /gen:spec-records -->
 

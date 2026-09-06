@@ -17,7 +17,8 @@ no human remembering. Commit the rewritten file with the change.
 --converge (S5): the closing loop. Reports the convergence signals over the range —
 `collision_flags` (each NEW exported symbol that resembles an existing high-fan-in seam of the
 same kind it did NOT wire through — shipped reinvention, over ALL new code) routed as a review
-WARN to <MAP_ROOT>/reinvention-backlog.md (deduped), plus `new_clones` (the adopted
+WARN to <git-common-dir>/codebase-map/reinvention-backlog.md (deduped; it falls back into
+<MAP_ROOT>/ only where git cannot answer at all), plus `new_clones` (the adopted
 clone-ratchet's count, or null) — and the demoted hygiene hints affordance_coverage_% /
 dead_exports (explicitly NOT the convergence signal). A REPORT + WARN, never a gate (F5): a
 convergence metric that hard-fails false-fails on legitimate feature churn. Always exits 0.
@@ -131,7 +132,10 @@ def render_legacy_note(legacy: Path, current: Path, root: Path) -> str:
     never reaches it. Nothing here DELETES: the file may hold rows nobody has read, and a tool
     that silently removes a durable record is the shape this unit exists to stop.
     """
-    if not legacy.is_file():
+    # `legacy == current` on the fail-open path, where git could not answer and the destination
+    # fell back into the map tree. Naming the file the run just wrote to, and telling the reader to
+    # delete it, is worse than saying nothing.
+    if not legacy.is_file() or legacy == current:
         return ""
     where = legacy.relative_to(root).as_posix() if legacy.is_relative_to(root) else legacy.as_posix()
     return (f"\nnote: {where} is a LEGACY location and is NO LONGER WRITTEN. Nothing here deletes "

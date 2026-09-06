@@ -123,6 +123,7 @@ CHUNK_MAX = 600  # pinned by the parent spec: 2400 and 300 both measured worse
 # `bench.run_rollup` (the sibling module, imported here as `B`), which is the instrument this serving
 # path is being aligned with -- named rather than re-derived, because the two must agree and
 # `bench.py` is byte-pinned in `verbatim.json` so the literal there cannot move to meet this one.
+# (It is FORKED rather than verbatim since `TOOL-dTracedLattice-7`; the pin still holds it still.)
 # Collapsing several hits from one parent leaves fewer than `k` distinct parents from a `k`-deep
 # read, which is the whole reason the arm reads deeper than it returns.
 ROLLUP_DEPTH = 8

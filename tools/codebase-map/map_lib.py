@@ -806,6 +806,27 @@ def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
     return set(_IDENT_TOKEN_RE.findall("".join(out)))
 
 
+def derive_present_layers(root: Path, skip_dirs: frozenset[str] = _SKIP_DIRS) -> dict[str, int]:
+    """`{extension: file count}` over every DEFINITION-CARRYING layer under ``root``.
+
+    `TOOL-dTracedLattice-5` S1, widened by that build's closing review. It walks the WHOLE root
+    rather than the symbol corpus's top-level dirs, because the question is "what languages are in
+    this repository" and answering it over a population shaped by the symbol extractors makes the
+    answer agree with the extractors by construction — a dark-layer check that cannot see a layer
+    nobody extracts is a dark-layer check that reports every layer covered.
+
+    It READS NOTHING: it counts dirents, so a second traversal costs a stat walk and no I/O.
+    """
+    out: dict[str, int] = {}
+    for dirpath, dirnames, names in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in skip_dirs]
+        for name in names:
+            suffix = Path(name).suffix
+            if suffix in DEFINITION_CARRYING_EXTS:
+                out[suffix] = out.get(suffix, 0) + 1
+    return out
+
+
 def build_reference_index(
     files: list[str], *, root: Path | None = None, skip_dirs: frozenset[str] = _SKIP_DIRS,
     stats: dict | None = None,
@@ -827,7 +848,14 @@ def build_reference_index(
     exts = frozenset(Path(f).suffix for f in files if Path(f).suffix)
     index: dict[str, set[str]] = {}
     scanned = skips = 0
-    present: dict[str, int] = {}
+    # THE PRESENT-LAYER TALLY WALKS THE WHOLE ROOT, not `roots`. `roots` is derived from the SYMBOL
+    # file list, so a language layer living in any other top-level directory would never be counted
+    # as present — and everything downstream reads "not counted" as "not there", which turns a
+    # dark-layer check into an affirmative false claim that every present layer is covered. Found by
+    # this build's own closing review, reproduced with symbols under `src/` and an unextracted
+    # `web/text.ts`: no refusal, no partial-recall paragraph, and the correct declaration reported
+    # STALE. The walk reads no file — it counts dirents — so the second traversal is cheap.
+    present = derive_present_layers(root, skip_dirs)
     for top in roots:
         base = root / top
         if not base.is_dir():
@@ -835,14 +863,7 @@ def build_reference_index(
         for dirpath, dirnames, names in os.walk(base):
             dirnames[:] = [d for d in dirnames if d not in skip_dirs]
             for name in sorted(names):
-                suffix = Path(name).suffix
-                # RECORDED BEFORE THE FILTER, which is the whole point: the filter admits only the
-                # extensions the symbol corpus already covers, so a layer with no extractor is
-                # invisible downstream of it. `TOOL-dTracedLattice-5` S1 — derived from the walk
-                # that already happens, never a second scan.
-                if suffix in DEFINITION_CARRYING_EXTS:
-                    present[suffix] = present.get(suffix, 0) + 1
-                if exts and suffix not in exts:
+                if exts and Path(name).suffix not in exts:
                     continue
                 path = Path(dirpath) / name
                 try:

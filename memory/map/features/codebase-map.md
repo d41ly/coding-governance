@@ -62,10 +62,12 @@ plainly that it cannot tell a deliberate omission from a stale one.
 `map_imports.py` is this tree's ONE AST import resolver, rescued out of the lexicon kit's P3
 predicate by `TOOL-dTracedLattice-6` ahead of that predicate's deletion. It is a seam, not private
 code: it returns CANDIDATE repo paths for an import target, branched on the importer's extension,
-and it resolves import statements only — no call sites, no attribute receivers, no counting. Until
-`TOOL-aSurfacedLexicon-2` lands, a byte-identical copy still lives in the lexicon kit and a selftest
-arm compares the two on every run; after it lands, that arm skips with a named reason rather than
-passing on an absent comparison.
+and it resolves import statements only — no call sites, no attribute receivers, no counting. Its own
+module header states its provenance and the ONE way it differs from the original it was copied from;
+read it there rather than here, because a dossier sentence restating that claim is a second copy
+that can disagree with the source and did. Until `TOOL-aSurfacedLexicon-2` lands the original still
+exists and a selftest arm compares the two BEHAVIOURALLY on every run; after it lands, that arm
+skips with a named reason rather than passing on an absent comparison.
 
 `tools/lib/resolve-python.sh` is inlined byte-identically into `adopt-codebase-map.sh`, which is the
 repo-wide python-launcher seam rather than anything this feature owns.

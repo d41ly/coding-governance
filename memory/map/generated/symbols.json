@@ -1123,6 +1123,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_present_layers",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "derive_primary_tree",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -3643,6 +3648,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_every_advertised_gen_map_mode_runs",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_every_co_defined_symbol_reaches_every_definer",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -3714,6 +3724,11 @@
     },
     {
       "id": "test_gate_coverage_passes_a_customised_gate",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_refuses_a_gate_file_that_names_nothing",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
@@ -3808,6 +3823,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_legacy_note_is_silent_when_it_would_name_its_own_destination",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_lexicon_marginal_rate",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -3883,9 +3903,19 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_no_scan_is_not_an_empty_corpus",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_no_signal_hardcodes_live",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_no_tracked_carrier_still_names_the_old_backlog_destination",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_one_retirement_is_free",
@@ -3926,6 +3956,11 @@
       "id": "test_per_id_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_present_layers_see_outside_the_symbol_roots",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_printed_invocations_resolve",
@@ -4061,6 +4096,11 @@
       "id": "test_tautological_fixture_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_the_control_and_the_measurement_share_a_denominator",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_the_gate_and_its_template_are_byte_identical",

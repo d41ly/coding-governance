@@ -1680,6 +1680,23 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
+    failures += check("rank_harness: control and measurement share a denominator (review F5)",
+                      test_the_control_and_the_measurement_share_a_denominator)
+    failures += check("no carrier names the old backlog destination (review F7)",
+                      test_no_tracked_carrier_still_names_the_old_backlog_destination)
+    failures += check("gen_map: every advertised read-only mode runs (review F1)",
+                      test_every_advertised_gen_map_mode_runs)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("dark layers: present layers see outside the symbol roots (review F2)",
+                          lambda: test_present_layers_see_outside_the_symbol_roots(Path(td)))
+    failures += check("dark layers: no scan is not an empty corpus (review F3)",
+                      test_no_scan_is_not_an_empty_corpus)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: a GATE_FILE naming nothing REFUSES (review F6)",
+                          lambda: test_gate_coverage_refuses_a_gate_file_that_names_nothing(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("backlog: the legacy note never names its own destination (review F8)",
+                          lambda: test_legacy_note_is_silent_when_it_would_name_its_own_destination(Path(td)))
     failures += check("dark layers: an undeclared layer refuses with both remedies (AC1)",
                       test_undeclared_layer_refuses_with_both_remedies)
     failures += check("dark layers: the banner is derived, not declared (AC2/AC4)",
@@ -2270,6 +2287,146 @@ def test_every_declared_layer_is_present_on_this_tree():
     for token in declared:
         assert token.startswith("."), f"{token} is the OLD language-name spelling"
         assert token in present, f"{token} is declared dark and is not present in the corpus"
+
+
+# --- left-shifts from the closing diff review (dTracedLattice round 1) ----------------------------
+def test_every_advertised_gen_map_mode_runs():
+    """F1's class, not F1's line. `--seed-affordances` shipped BROKEN through a data-model rename
+    because the only arm covering it drove the library function and never the printer, and its own
+    docstring conceded "the CLI is thin glue over this". A suite green over a dead entrypoint is the
+    green-by-absence shape.
+
+    READ-ONLY modes only, in a subprocess against the real tree. `--write` and the three seeding
+    modes mutate, and running them here would make the suite a writer; they are exercised by the
+    build's own regen and by `codebase-map adopter e2e`. Stated rather than implied: this arm covers
+    `--check` and `--seed-affordances`, and those are the two whose output is a PRINTER over the
+    candidate data model, which is the surface the rename broke.
+    """
+    import subprocess
+    kit = Path(os.path.abspath(__file__)).parent
+    # `prints` says whether the mode has a PRINTER at all: `--check` is a gate and is silent
+    # when it passes, so asserting output there would grade the wrong thing and red on a clean
+    # tree.
+    for argv, prints in ((["--check"], False), (["--seed-affordances", "--top", "3"], True)):
+        proc = subprocess.run([sys.executable, str(kit / "gen_map.py"), *argv],
+                              capture_output=True, text=True, cwd=str(m.repo_root()))
+        assert proc.returncode == 0, f"gen_map.py {' '.join(argv)} exited {proc.returncode}\n{proc.stderr}"
+        assert "Traceback" not in proc.stderr, proc.stderr
+        if prints:
+            assert proc.stdout.strip(), f"gen_map.py {' '.join(argv)} printed nothing"
+            assert "fan-in" in proc.stdout, (
+                "the printer ran but named no candidate, so this arm would pass over the crash "
+                f"it exists to catch:\n{proc.stdout}")
+
+
+def test_present_layers_see_outside_the_symbol_roots(tmp: Path):
+    """F2's class. The tally used to sit inside a walk over the SYMBOL corpus's top-level dirs, so a
+    layer in any other directory was never counted present — and everything downstream reads "not
+    counted" as "not there", which turns a dark-layer check into an affirmative claim that every
+    present layer is covered.
+
+    The fixture is shaped like the repro: symbols under `src/`, an unextracted layer under `web/`.
+    """
+    (tmp / "src").mkdir()
+    (tmp / "web").mkdir()
+    (tmp / "src" / "text.py").write_text("def build_slug():\n    return 1\n", encoding="utf-8")
+    (tmp / "web" / "text.ts").write_text("export function buildSlug() { return 1 }\n", encoding="utf-8")
+    present = m.derive_present_layers(tmp)
+    assert present.get(".ts") == 1, (
+        "a layer outside the symbol corpus's roots is invisible to the present-layer tally, so the "
+        f"dark-layer check would report it covered: {present}")
+    assert present.get(".py") == 1, present
+    # And the verdict built from it must REFUSE rather than report the correct declaration stale.
+    scan = {"extensions": [".py"], "present_extensions": sorted(present),
+            "present_counts": present, "files_scanned": 1, "parse_skips": 0}
+    v = rl.derive_layer_verdict(scan, ())
+    assert v["undeclared"] == [".ts"], v
+    assert rl.render_layer_refusal(v), "an undeclared present layer must refuse"
+
+
+def test_no_scan_is_not_an_empty_corpus():
+    """F3's class. An empty-seed query and a corpus with no symbol file list both skip the walk, and
+    reading that as "no layer is present" marked every correct declaration STALE and told the
+    operator to delete the one thing protecting them."""
+    v = rl.derive_layer_verdict({}, (".sh",))
+    assert v["stale"] == [], v
+    assert v["undeclared"] == [], v
+    assert rl.render_layer_refusal(v) == "", v
+    # The MIGRATION check still fires: it reads the declaration only, and a legacy value is owed a
+    # refusal whether or not a walk ran.
+    assert rl.derive_layer_verdict({}, ("bash",))["legacy"] == ("bash",)
+
+
+def test_gate_coverage_refuses_a_gate_file_that_names_nothing(tmp: Path):
+    """F6's class. "GATE_FILE unset" and "GATE_FILE names a path that is not there" were one return
+    value and one exit 0 — a benign state and a broken configuration reported identically."""
+    missing = tmp / "tests" / "moved_gate.py"
+    real = cg.resolve_gate_path
+    cg.resolve_gate_path = lambda root: missing
+    import contextlib, io as _io
+    out, err = _io.StringIO(), _io.StringIO()
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = cg.main([])
+    finally:
+        cg.resolve_gate_path = real
+    assert code == 2, (code, out.getvalue(), err.getvalue())
+    assert "does not exist" in err.getvalue(), err.getvalue()
+    assert "not the benign unset state" in err.getvalue(), err.getvalue()
+
+
+def test_legacy_note_is_silent_when_it_would_name_its_own_destination(tmp: Path):
+    """F8's class. On the fail-open path the destination falls back INTO the map tree, so the legacy
+    file and the current one are the same path — and the note then told the reader to delete the
+    file the run had just written to."""
+    same = tmp / "reinvention-backlog.md"
+    same.write_text("# rows\n", encoding="utf-8")
+    assert md.render_legacy_note(same, same, tmp) == "", "the note named the file it just wrote"
+    other = tmp / "elsewhere.md"
+    assert md.render_legacy_note(same, other, tmp) != "", "and it must still fire for a real legacy"
+
+
+def test_the_control_and_the_measurement_share_a_denominator():
+    """F5's class. `measure_recall` divides by the LIVE scenarios; the constant control divided by
+    ALL rows, so a dead probe shrank one rate and not the other and the comparison flattered the
+    ranking. A control that is not comparable is not a control.
+    """
+    import importlib.util
+    kit = Path(os.path.abspath(__file__)).parent
+    spec = importlib.util.spec_from_file_location("_rank_harness", kit / "rank_harness.py")
+    rh = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rh)
+    # DERIVED, not spelled: a kit file naming its own install path by literal is what the
+    # carried-prefix ban exists to stop, and an arm is a shipped file like any other.
+    rows = [{"id": "A", "query": "q", "expected_file": f"{m.kit_rel()}/map_lib.py"},
+            {"id": "B", "query": "q", "expected_file": "no/such/file/anywhere.py"}]
+    scored, dead = rh.measure_ranks(rows, m.repo_root())
+    assert dead == ["B"], f"the fixture must carry a DEAD probe or this arm proves nothing: {dead}"
+    assert len(scored) == 1, scored
+    live_ids = {sc["id"] for sc in scored}
+    live_rows = [r for r in rows if r["id"] in live_ids]
+    assert len(live_rows) == len(scored), (live_rows, scored)
+
+
+def test_no_tracked_carrier_still_names_the_old_backlog_destination():
+    """F7's class. The destination moved and four carriers restated it; a grep is the whole gate.
+
+    The ONE sanctioned mention is `derive_backlog_path`'s own fail-open branch, which really does
+    write there when git cannot answer.
+    """
+    import subprocess
+    root = m.repo_root()
+    # The needle is BUILT rather than written, so this arm's own source does not contain it. A
+    # self-matching predicate reds forever and the obvious repair — excluding this file — would
+    # blind the arm to a real hit here.
+    needle = "MAP_ROOT>/" + "reinvention-backlog.md"
+    out = subprocess.run(["git", "-C", str(root), "grep", "-n", "-F", needle,
+                          "--", ":!memory/builds/"],
+                         capture_output=True, text=True).stdout
+    hits = [ln for ln in out.splitlines() if ln.strip()]
+    assert not hits, (
+        "a tracked carrier still names the pre-2026-09-06 backlog destination; the record lives "
+        "under the git common dir now:\n" + "\n".join(hits))
 
 if __name__ == "__main__":
     sys.exit(main())

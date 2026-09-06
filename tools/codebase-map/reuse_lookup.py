@@ -495,6 +495,13 @@ def derive_layer_verdict(scan: dict, declared: tuple[str, ...]) -> dict:
     Returns `{"uncovered", "undeclared", "stale", "legacy", "counts"}`. It DECIDES nothing — the
     caller refuses or reports — so this stays a pure function an arm can drive.
     """
+    # NO SCAN IS NOT AN EMPTY CORPUS. An empty-seed query and a corpus with no symbol file list both
+    # skip the walk, and reading that as "no layer is present" made every correct declaration STALE
+    # and told the operator to delete the one thing protecting them. The legacy check below still
+    # fires: it reads the declaration only, and a migration is owed whether or not a walk ran.
+    if scan.get("present_extensions") is None:
+        return {"uncovered": [], "undeclared": [], "stale": [],
+                "legacy": tuple(d for d in declared if not d.startswith(".")), "counts": {}}
     present = set(scan.get("present_extensions", ()))
     covered = set(scan.get("extensions", ()))
     counts = scan.get("present_counts", {})
@@ -563,11 +570,12 @@ def _scan_line(shortlist: Shortlist) -> str:
     # DERIVED, not the declaration. `TOOL-dTracedLattice-5` S4: this unit owns the banner's
     # dark-layer wording, and what it prints is the set the corpus walk found uncovered — which the
     # declaration must now agree with, or the run refuses before reaching here.
+    # ONE reading. The declaration fallback lived here as well as in `_derive_dark`, and production
+    # cannot reach it: this line is only rendered after the `files_scanned` guard above, which the
+    # no-scan case never passes. A branch nothing can reach, graded by a fixture in a shape nothing
+    # emits, is coverage that is not there — so it is deleted rather than kept for symmetry.
     uncovered = _derive_dark(shortlist)
-    if (shortlist.scan or {}).get("present_extensions") is None:
-        dark = ", ".join(shortlist.recall_dark) if shortlist.recall_dark else "none declared"
-    else:
-        dark = ", ".join(uncovered) if uncovered else "none — every present layer has an extractor"
+    dark = ", ".join(uncovered) if uncovered else "none — every present layer has an extractor"
     return (f"# scan coverage: {sc['files_scanned']} files scanned"
             f" | {sc['parse_skips']} parse skips"
             f" | unscanned layers: {dark}")

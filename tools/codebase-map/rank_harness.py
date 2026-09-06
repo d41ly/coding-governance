@@ -144,7 +144,7 @@ def run_constant_control(rows: list[dict], root: Path, k: int, since: str = "HEA
         if line:
             counts[line] = counts.get(line, 0) + 1
     top = [f for f, _ in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:k]]
-    if not top:
+    if not top or not rows:
         return float("nan")
     hits = sum(1 for row in rows if derive_targets(row) & set(top))
     return hits / len(rows)
@@ -173,7 +173,13 @@ def render_report(rows, scored, dead, args, root) -> str:
                    f"p95={p95:.3f} | measured={real:.3f} | "
                    + ("CLEARS the 95th percentile" if real > p95 else "DOES NOT clear the 95th percentile"))
     elif args.control == "constant":
-        c = run_constant_control(rows, root, args.k)
+        # THE SAME DENOMINATOR the measured rate uses. `measure_recall` divides by the LIVE
+        # scenarios; handing the control every row divided by a larger number and quietly flattered
+        # the comparison. A dead probe must change neither rate's divisor or the two are not
+        # comparable, which is the whole job of a control.
+        live_ids = {s["id"] for s in scored}
+        live_rows = [r for r in rows if r["id"] in live_ids]
+        c = run_constant_control(live_rows, root, args.k)
         real = measure_recall(scored, args.k)
         if c != c:  # nan
             out.append(f"constant control @{args.k}: UNAVAILABLE (git could not answer) — not a 0")

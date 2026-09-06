@@ -54,13 +54,18 @@ def scan_artifacts(text: str) -> set[str]:
 
 
 def resolve_gate_path(root: Path) -> Path | None:
-    """The installed gate, from `.codebase-map.conf` GATE_FILE. `None` when it is unset or absent."""
+    """The installed gate, from `.codebase-map.conf` GATE_FILE. `None` ONLY when it is unset.
+
+    A path that is SET and does not exist comes back as a `Path` that is not a file, because those
+    are two different states and one return value for both made a broken configuration exit 0
+    alongside a benign one. An unset key is a project that has not adopted the tier; a key naming
+    nothing is a gate that moved and a conf nobody updated.
+    """
     value = (m.load_conf(root) or {}).get("GATE_FILE", "").strip()
     if not value:
         return None
     path = Path(value)
-    path = path if path.is_absolute() else (root / value)
-    return path if path.is_file() else None
+    return path if path.is_absolute() else (root / value)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -82,10 +87,15 @@ def main(argv: list[str] | None = None) -> int:
 
     gate_path = resolve_gate_path(root)
     if gate_path is None:
-        print(f"gate-coverage: skipped — GATE_FILE is unset in .codebase-map.conf or names no "
-              f"existing file, so there is no installed gate to compare. The engine writes "
+        print(f"gate-coverage: skipped — GATE_FILE is unset in .codebase-map.conf, so this project "
+              f"has not adopted a gate for this check to grade. The engine writes "
               f"{len(engine)} artifact(s): {', '.join(sorted(engine))}")
         return 0
+    if not gate_path.is_file():
+        print(f"gate-coverage REFUSED — GATE_FILE names {gate_path}, which does not exist. The gate "
+              f"this check grades is not installed where the conf says, so nothing was compared. "
+              f"That is a broken configuration, not the benign unset state.", file=sys.stderr)
+        return 2
 
     installed = scan_artifacts(gate_path.read_text(encoding="utf-8"))
     rel = gate_path.relative_to(root).as_posix() if gate_path.is_relative_to(root) else gate_path.as_posix()

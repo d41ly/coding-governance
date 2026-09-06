@@ -176,14 +176,8 @@ def measure_phrase(corpus, ref, phrase: str, truth: list[str]) -> dict:
     # hit@5 0.462 -> 0.378, and by candidate position it reads 0.385 -> 0.385 with hit@10 up from
     # 0.420 to 0.441 and the hit rate up from 0.587 to 0.615. The first reading is a metric artifact
     # of the data-model change; the second is the object the tool is for.
-    files: list[str] = []
-    rank = None
-    for i, r in enumerate(sl.ranked, 1):
-        if rank is None and any(check_path_match(f, t) for f in r.candidate.files for t in truth):
-            rank = i
-        for f in r.candidate.files:
-            if f and f not in files:
-                files.append(f)
+    rank = next((i for i, r in enumerate(sl.ranked, 1)
+                 if any(check_path_match(f, t) for f in r.candidate.files for t in truth)), None)
     return {
         "phrase": phrase,
         "truth": truth,

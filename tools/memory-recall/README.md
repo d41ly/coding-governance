@@ -21,7 +21,7 @@ Ported from the inCMS `scripts/recall/` implementation at `5318064`.
 | `recall_conf.py` | the project layer — reads `.memory-tree.conf`, exposes `MEMORY_ROOT`, `FAMILIES`, the node-tag class, and `Conf.digest()`; carries `KIT_MEMORY_RECALL_VERSION`. Run it directly to print the resolved values (or the refusal). |
 | `query.py` | the CLI. **Forked** from upstream — see Maintenance. |
 | `extract.py` | record + chunk extraction and the alias join. **Forked**. |
-| `bench.py` | the FTS5 index builder and the retrieval-substrate harness. **Verbatim** upstream. |
+| `bench.py` | the FTS5 index builder and the retrieval-substrate harness. **Forked** — one delta, see Maintenance. |
 | `union.py` | the two-source ensemble scorer. **Verbatim** upstream. |
 | `selftest.py` | the kit's contract gate — 18 checks, every arm inside a throwaway repo. |
 | `adopt-memory-recall.sh` | renders the Skill from the conf (`--scaffold`), and reds when it drifts (`--check`). |
@@ -203,12 +203,19 @@ measures their own value.
 
 ## Maintenance — three categories, three different stories
 
-- **Verbatim** — `bench.py`, `union.py`. Zero coupling on the query path, so they are re-pulled
-  **wholesale** from upstream on any fix and never merged. Two caveats, stated rather than patched
-  out, because patching them would end the wholesale re-pull: their usage strings name the *upstream*
-  script path (`scripts/recall/bench.py`), and `bench.main()` / `union.main()` are the upstream
-  benchmark harnesses, which are **inert here** — they need a graded `fixture.json` that this kit
-  deliberately does not ship. `selftest.py` pins both files' digests, so an edit reds.
+- **Verbatim** — `union.py`. Zero coupling on the query path, so it is re-pulled **wholesale** from
+  upstream on any fix and never merged. Two caveats, stated rather than patched out, because
+  patching them would end the wholesale re-pull: its usage string names the *upstream* script path,
+  and `union.main()` is the upstream benchmark harness, which is **inert here** — it needs a graded
+  `fixture.json` that this kit deliberately does not ship. `selftest.py` pins its digest, so an edit
+  reds.
+- **Forked, one delta** — `bench.py`. It WAS verbatim and is not any more: `TOOL-dTracedLattice-7`
+  made `run_rm3`'s expansion-term selection independent of `PYTHONHASHSEED`, because `rm3` is a
+  legal `RECALL_FLOOR` substrate and a project pinned to it had a gate whose verdict moved between
+  runs on an unchanged tree. **A wholesale re-pull would revert that fix and the digest pin would go
+  green over the revert**, which is why this line moved rather than staying comfortable: a re-pull
+  is now a MERGE, and the one hunk to keep is the `(-count, term)` sort in `run_rm3`. Every other
+  verbatim caveat above still applies to it.
 - **Forked** — `extract.py`, `query.py`, `recall-opened.js`. Each carries a header naming the
   upstream path and the sha it was taken from, and enumerates its edits, so a re-pull is a
   three-way merge rather than archaeology.

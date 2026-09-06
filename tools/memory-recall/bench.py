@@ -45,6 +45,11 @@ import time
 from collections import Counter
 
 HEAD_WEIGHT = 8.0
+# FORKED, one delta, and it is stated here because the digest pin cannot say WHY it moved.
+# `TOOL-dTracedLattice-7` made `run_rm3`'s expansion-term selection independent of PYTHONHASHSEED —
+# see the comment in that function. Everything else is the upstream file. A re-pull is a MERGE:
+# overwriting this wholesale reverts the fix, and `verbatim.json`'s pin would then go green over the
+# revert, which is why README.md's Maintenance section moved this file out of the Verbatim class.
 RM3_DOCS = 3
 RM3_TERMS = 8
 
@@ -183,13 +188,17 @@ def run_rm3(db: sqlite3.Connection, docs: list[dict], query: str, k: int) -> lis
     seed = run_fts(db, query, RM3_DOCS, False)
     if not seed:
         return []
-    # DETERMINISTIC, and both halves are needed. `set(...)` iterates in an order that depends on
-    # PYTHONHASHSEED, so `Counter.update` saw the terms in a different order every run; and
-    # `most_common` breaks ties on INSERTION order, so that seed reached the selected terms. `rm3`
-    # is a legal `RECALL_FLOOR` substrate, so a project pinned to it got a gate whose verdict moved
-    # between runs on an unchanged tree. Sorting the deduped terms fixes the insertion order, and
-    # the explicit `(-count, term)` key makes the tie-break a stated rule rather than an inherited
-    # one — either alone leaves the other free. `TOOL-dTracedLattice-7`.
+    # DETERMINISTIC. `set(...)` iterates in an order that depends on PYTHONHASHSEED, so
+    # `Counter.update` saw the terms in a different order every run, and `most_common` breaks ties
+    # on INSERTION order — so the seed reached the selected terms. `rm3` is a legal `RECALL_FLOOR`
+    # substrate, so a project pinned to it got a gate whose verdict moved between runs on an
+    # unchanged tree.
+    #
+    # THE EXPLICIT `(-count, term)` KEY IS WHAT FIXES IT: a total order over the items leaves the
+    # insertion order with nothing to decide. The `sorted()` in `update` is belt-and-braces against
+    # a future reader reintroducing `most_common`, and an earlier revision of this comment claimed
+    # both halves were needed, which is false and would have survived a wholesale re-pull.
+    # `TOOL-dTracedLattice-7`.
     df: Counter = Counter()
     for i in seed:
         df.update(sorted(set(terms(docs[i]["text"])[:400])))
