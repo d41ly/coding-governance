@@ -1,161 +1,206 @@
 # TOOL-aQuenchedHarness-4 — one on-demand runner for every kit's self-tests, budget-graded
 
-**Status:** OPEN · rev-1 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-Give the whole held population one command, with a DECLARED budget per suite that REDS on breach.
-`tools/unattended/run-unattended-gates.sh` already does this for one kit under the owner ruling of
-2026-08-23; every other kit's self-tests have no runner at all, so the compensating check that
-replaces a bar leg exists for one kit and is imaginary for the rest.
+Give the whole self-test population one command, with a DECLARED budget per suite that REDS on
+breach. `tools/unattended/run-unattended-gates.sh` already does this for one kit under the owner
+ruling of 2026-08-23; every other kit's self-tests have no runner at all, so the compensating check
+that replaces a bar leg exists for one kit and is imaginary for the rest.
 
 ## 2. Scope (IN)
 
-- **S1** — `tools/run-gates/run-selftests.sh`, which runs exactly the legs the bar HOLDS, taking that
-  set from `tools/gate-legs.json` through the same hold predicate the runner uses. The population is
-  DERIVED; no list of suite names is typed anywhere.
-- **S2** — a declared budget per suite in `tools/run-gates/selftest-budgets.txt`, each carrying the
-  reading it was set against, in the idiom `run-unattended-gates.sh` already uses in prose and
-  `gate-profiles.txt` uses as a data file.
+- **S1** — the POPULATION IS DECLARED, in `tools/run-gates/selftest-budgets.txt`: one row per suite
+  carrying its name, its argv and its budget. Rev-1 derived the population from held manifest legs;
+  the audit measured that the six suites `tools/unattended/run-unattended-gates.sh` runs are in
+  NEITHER `tools/gate-legs.json` NOR `tools/unattended/kit.toml`, because the 2026-08-23 ruling
+  removed them from both. A derivation over the manifest cannot see a suite the manifest was told to
+  forget.
+- **S2** — the declaration is asserted in BOTH directions and the assertion is a gate leg. Forward:
+  every leg the bar HOLDS has a row. Reverse: every row whose name is not a held leg names an argv
+  whose first file argument is TRACKED, so a row cannot name a suite that does not exist. Either
+  direction failing is a refusal.
 - **S3** — a MISSING budget is a FAILURE, not an exemption. A suite added without one would be exempt
-  from the rule by the act of arriving, which is how every population in this repo has previously
-  gone quiet. This rule is lifted verbatim from `run-unattended-gates.sh`, where it already exists.
-- **S4** — a `--kit <dir>` filter, so kit work can run only the suites for the kit it touched, and a
-  liveness refusal when the filter matches nothing: an unknown filter and a clean sweep are
-  indistinguishable from outside.
-- **S5** — the total budget is DERIVED and printed, never typed. The sum of the declared ceilings is
-  what the operator is being asked to spend, and a figure typed beside the declarations that own it
-  is the defect this repo keeps re-filing.
-- **S6** — `tools/unattended/run-unattended-gates.sh` becomes a thin `--kit tools/unattended` call
-  into this runner, so its budgets and its split survive as data rather than as a second
-  implementation. Its record-and-wiring checks stay bar legs, unchanged.
-- **S7** — arms staging: a suite over budget, a suite with no budget, a filter matching nothing, and
-  a green sweep.
+  from the rule by the act of arriving. Lifted verbatim from `run-unattended-gates.sh`, where it
+  already exists.
+- **S4** — `tools/run-gates/run-selftests.sh` runs the declared population, times each suite, and REDS
+  on a breach naming the suite, its seconds and its ceiling.
+- **S5** — a `--kit <dir>` filter over the declaration, and a liveness refusal when it matches
+  nothing: an unknown filter and a clean sweep are indistinguishable from outside.
+- **S6** — the total is DERIVED and printed, never typed. The sum of the declared ceilings is what
+  the operator is being asked to spend, and a figure typed beside the declarations that own it is the
+  defect this repo keeps re-filing.
+- **S7** — `tools/unattended/run-unattended-gates.sh` delegates its `--selftests` half to this runner
+  and KEEPS its `--checks` half unchanged, along with the four repo-leg budgets that half owns
+  (`BUDGET_kit_gate`, `BUDGET_playbook_validity_gate`, `BUDGET_skill_wiring`,
+  `BUDGET_pass_order_history`). Rev-1 dissolved the whole file into a `--kit` call; the audit measured
+  that its four `--checks` rows are all `subject = repo` and therefore in no held population, that
+  `tools/unattended/kit.toml` declares `--all` as this kit's compensating check, and that
+  `TOOL-aQuenchedHarness-7` AC4 invokes both by name.
+- **S8** — THE COMPOSITE WIDTH IS DECLARED. This runner resolves the profile row's width W, runs
+  suites at an outer width, and EXPORTS the inner arm-pool width as `max(1, W / outer)` in a named
+  variable `TOOL-aQuenchedHarness-5` S3 reads. Two pools each reading W independently would give
+  W squared — 64 concurrent processes at node `a`'s width 8, on a host where a bare spawn costs
+  319 ms.
+- **S9** — arms staging: a suite over budget, a suite with no budget, a declared row whose argv names
+  no tracked file, a held leg with no row, a filter matching nothing, and a sweep whose observed
+  concurrent-process count exceeds W.
 
 ## 3. Non-goals (OUT)
 
-- Not changing WHICH legs are held. That predicate is `TOOL-aQuenchedHarness-3`'s.
-- Not making anything run on a bar. No boundary sets `GATE_SELFTESTS`, that is an owner ruling of
-  2026-08-27 recorded in `AGENTS.md`, and this unit does not disturb it.
-- Not a hang bound: a budget is a COST verdict. The hang bounds are units 1 and 2, and
+- Not changing WHICH legs the bar holds. That is `TOOL-aQuenchedHarness-3`, and after its rev-2 the
+  answer is "exactly today's set".
+- Not making anything run on a bar. No boundary sets `GATE_SELFTESTS`; that is an owner ruling of
+  2026-08-27 recorded in `AGENTS.md`, verified at source — `.githooks/gate-env.sh` refuses a bare
+  assignment and `govkit.py:1735` gates the pattern.
+- Not a hang bound: a budget is a COST verdict. The hang bounds are units 1, 2 and 8, and
   `run-unattended-gates.sh` already records why the two figures must not be confused.
 - Not making the suites faster. That is units 5, 6 and 7; this unit is what makes their result
   legible and what stops the next regression from being invisible.
+- Not budgeting repo-subject legs. Those keep their budgets where they already live, in
+  `run-unattended-gates.sh` per S7. `TOOL-aQuenchedHarness-7` H5's join question is settled there,
+  not here.
 
 ## 4. Design
 
 ### Data model
 
-`tools/run-gates/selftest-budgets.txt` — `<leg name>\t<seconds>\t<the reading it was set against>`,
-one row per held leg, comments carrying the argument. Rows are keyed by the leg NAME from
-`tools/gate-legs.json`, so the join is exact and a renamed leg reds as unbudgeted rather than
-silently losing its ceiling.
+`tools/run-gates/selftest-budgets.txt` — `<name>\t<budget seconds>\t<argv>\t<the reading it was set
+against>`, one row per suite, comments carrying the argument. Rows whose name matches a held leg in
+`tools/gate-legs.json` take their argv from the manifest and leave the field empty; rows that do not
+carry their own argv, which is how the six unattended suites become nameable at all.
 
-### The split, restated as data
+### The split, and why it is not re-expressed
 
 `run-unattended-gates.sh`'s header states the split that justifies the whole ruling: RECORD AND
-WIRING checks read the REPOSITORY and stay bar legs, because they go stale with nobody editing the
-kit; SELF-TESTS read the KIT and have a job only when kit source changes. That split is already
-expressed in `tools/gate-legs.json` as `subject`, so this runner needs no second expression of it —
-it runs what the bar holds, and the bar holds by subject and chunk.
+WIRING checks read the REPOSITORY and stay bar legs; SELF-TESTS read the KIT and have a job only when
+kit source changes. The first half lives in `tools/gate-legs.json` as `subject`. The second half
+lives, for the unattended kit, nowhere machine-readable — which is the gap S1 fills.
 
 ### Rollout
 
-The runner lands first and is green over the current population at whatever the current population
-costs. The budgets land with it, seeded from the ledger, so the first run is a measurement rather
-than a wall of red. Units 5, 6 and 7 then lower the readings, and each lowering is a visible edit to
-this file.
+The runner and the declaration land together, seeded from whatever readings exist, so the first run
+is a measurement rather than a wall of red. Units 5, 6 and 7 then lower the readings, and each
+lowering is a visible edit to this file.
 
 ### Inventory
 
 - `tools/run-gates/run-selftests.sh` — the runner.
-- `tools/run-gates/selftest-budgets.txt` — the declarations.
-- `--kit` — the filter verb.
+- `tools/run-gates/selftest-budgets.txt` — the declaration and the population.
+- `SELFTEST_INNER_WIDTH` — the exported inner-pool width, S8's named variable.
+- `every held leg is budgeted, every budget row resolves` — the new gate leg's name.
 
 ### Files touched (estimate)
 
 `tools/run-gates/run-selftests.sh` (new) · `tools/run-gates/selftest-budgets.txt` (new) ·
-`tools/unattended/run-unattended-gates.sh` (reduced to a delegation) · `tools/run-gates/kit.toml` ·
-`AGENTS.md` · a self-test beside the runner.
+`tools/unattended/run-unattended-gates.sh` (its `--selftests` half only) · `tools/gate-legs.json` ·
+`tools/run-gates/kit.toml` · `AGENTS.md` · a self-test beside the runner.
 
 ### Alternatives rejected
 
-A `--selftests` MODE of `tools/run-gates/run-gates.sh` was rejected: the bar's runner is 1480 lines
+**Deriving the population from held manifest legs** — rev-1's design — was rejected on measurement:
+the ten suites the delegation targets contain zero held legs, so `--kit tools/unattended` resolved to
+nothing and S5's own liveness refusal would have fired on the filter the spec mandated.
+
+**A `--selftests` MODE of `tools/run-gates/run-gates.sh`** was rejected: that runner is 1480 lines
 carrying a turnstile, a profile table, a reuse key and a run record, and a mode that suppresses most
-of it would make the bar's own control flow depend on a flag that exists for a different purpose.
-A second, small entry point that reads the same manifest is the cheaper seam and cannot destabilise
-the bar.
+of it would make the bar's control flow depend on a flag that exists for a different purpose.
 
 ## 5. Production-readiness checklist
 
-- security — runs the same executables the bar would; no new surface.
-- perf / scale — the runner adds one process; the cost is the suites, which is the point of the
-  budgets.
+- security — runs the same executables the bar would; no new surface. S2's reverse direction requires
+  a row's argv to name a TRACKED file, which is what stops the declaration becoming a way to run
+  arbitrary paths.
+- perf / scale — S8's composite bound is the scale question and is answered there rather than left to
+  two specs each believing they honour one width.
 - a11y — N/A.
 - i18n — N/A.
-- error / empty / loading states — over budget, no budget, no match, and green are four distinct
-  lines. The no-match case exits non-zero.
+- error / empty / loading states — over budget, no budget, unresolvable row, no match, and green are
+  five distinct lines. The no-match case exits non-zero.
 - observability — a per-suite line with its seconds and its ceiling, and a derived total.
-- risks — a budget calibrated idle will breach on a busy box, which `run-unattended-gates.sh`
-  already records at 2.4x for this node. The remedy stated there is kept: read a breach by re-running
-  on an idle box, and the file says so rather than absorbing the load into a bigger number.
-- testing + left-shift gates — S7's arms, each observed RED before landing.
+- risks — a budget calibrated idle will breach on a busy box, which `run-unattended-gates.sh` records
+  at 2.4x for this node. The remedy stated there is kept: read a breach by re-running on an idle box,
+  and say so rather than absorbing the load into a bigger number.
+- testing + left-shift gates — S9's arms, each observed RED before landing, plus S2's both-direction
+  leg.
 - migration / rollback — deleting the runner restores today's state, in which only one kit has one.
-- user docs — `AGENTS.md`'s bar section gains the command; the budgets file carries its own header.
+  `run-unattended-gates.sh` keeps its `--checks` half throughout, so nothing that depends on it
+  breaks mid-migration.
+- user docs — `AGENTS.md`'s bar section gains the command; the declaration carries its own header.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When `bash tools/run-gates/run-selftests.sh` runs, the suites it executes are exactly the
-  legs a default `bash tools/run-gates/run-gates.sh` reports as held, compared set-to-set.
-- **AC2** — When a suite exceeds its declared budget, the runner prints `OVER BUDGET` naming the suite,
-  its seconds and its ceiling, and exits non-zero.
-- **AC3** — When a held leg has no row in `tools/run-gates/selftest-budgets.txt`, the runner fails
-  naming it, so a suite cannot arrive exempt.
-- **AC4** — When `--kit tools/nosuchkit` matches nothing, the runner exits non-zero saying it graded
+  rows of `tools/run-gates/selftest-budgets.txt`, and that set CONTAINS the six unattended suites by
+  name, so the delegation S7 makes is non-empty.
+- **AC2** — When a suite exceeds its declared budget, the runner prints `OVER BUDGET` naming the
+  suite, its seconds and its ceiling, and exits non-zero.
+- **AC3** — When a held leg in `tools/gate-legs.json` has no row, the
+  `every held leg is budgeted, every budget row resolves` leg reds naming it.
+- **AC4** — When a budget row's argv names a file `git ls-files` does not carry, the same leg reds —
+  the reverse direction, so a row cannot name a suite that is not there.
+- **AC5** — When `--kit tools/nosuchkit` matches nothing, the runner exits non-zero saying it graded
   nothing, rather than printing a green line.
-- **AC5** — When the help text is printed, its total is the sum of the rows in
-  `selftest-budgets.txt` computed at run time, and editing a row changes the printed total.
-- **AC6** — When `bash tools/unattended/run-unattended-gates.sh --selftests` runs, it produces the
-  same verdicts as before this unit, proving the delegation preserved the kit's own behaviour.
+- **AC6** — When `bash tools/unattended/run-unattended-gates.sh --all` runs, it produces the same
+  verdicts as before this unit for BOTH halves, `--checks` and `--selftests`, and
+  `BUDGET_kit_gate` still exists and still binds.
+- **AC7** — When a sweep of `bash tools/run-gates/run-selftests.sh` runs, the observed peak count of
+  concurrent descendant processes is at most the profile row's declared width, asserted by an arm
+  rather than by the two specs each assuming it.
 
 ## 7. Gates
 
-`bash tools/run-gates/run-gates.sh` · `unattended kit gate` and `unattended skill wiring`, which
-grade the script this unit reduces · the new runner's own self-test, held like every other ·
+`bash tools/run-gates/run-gates.sh` · the new `every held leg is budgeted, every budget row resolves`
+leg · `unattended kit gate` and `unattended skill wiring`, which grade the script this unit edits ·
 `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at the Definition of Done, because this is kit
-work.
+work · `bash tools/unattended/run-unattended-gates.sh --all`, this kit's declared compensating check.
 
 ## 8. Open questions
 
-- **F1 — does the runner run suites concurrently?** RESOLVED (agent, 2026-09-06, delegated): yes,
-  through the same bounded-width idea the bar uses, because a serial sweep of the held population is
-  the hour-long compensating check `run-unattended-gates.sh` records being abandoned twice. The width
-  is read from the same `gate-profiles.txt` row rather than declared again.
+- **F1 — does the runner run suites concurrently?** RESOLVED (agent, 2026-09-06, delegated): yes, at
+  an OUTER width, with the inner arm pool bounded by S8's exported `max(1, W / outer)`. A serial
+  sweep is the hour-long compensating check `run-unattended-gates.sh` records being abandoned twice;
+  two unbounded pools are the 64-process sweep the audit measured. Neither is acceptable and the
+  composite is declared rather than assumed.
 - **F2 — where do the initial budget readings come from?** RESOLVED (agent, 2026-09-06, delegated):
-  from `<git-dir>/gate-ledger.tsv`, the same source `TOOL-aQuenchedHarness-2` derives ceilings from,
-  and each row records that its reading was taken UNDER LOAD where it was. A reading whose conditions
-  are unstated is the thing `run-unattended-gates.sh` had to apologise for in prose.
+  from `<git-dir>/gate-run/<runid>/<i>.leg` where the suite is a held leg, and from a direct timed
+  invocation where it is not — the six unattended suites have no manifest row and therefore no leg
+  file. Each row records the conditions its reading was taken under, because a reading whose
+  conditions are unstated is the thing `run-unattended-gates.sh` had to apologise for in prose.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-2 · 2026-09-06 · folded spec-audit round 1. B2: the population is now DECLARED rather than
+  derived from held manifest legs, because the ten suites the delegation targets contain zero held
+  legs — the 2026-08-23 ruling removed them from the manifest and the descriptor both — and the
+  delegation would have matched nothing; S7 now keeps `run-unattended-gates.sh`'s `--checks` half and
+  its four repo budgets rather than dissolving the file, which unit 7 AC4 and
+  `tools/unattended/kit.toml` both depend on. H4: S8 declares the composite width, since unit 5 S3
+  and this unit's F1 each read the same profile width and would have squared it. AC6 now exercises
+  `--all`, not `--selftests` alone. AC7 added for the process-count observation.
 
 ## 10. Reuse audit
 
-The seam is `tools/unattended/run-unattended-gates.sh`, which already implements this exact mechanism
-for one kit — the split, the per-suite `BUDGET_*` ceilings, the missing-budget failure, the derived
-total and the liveness refusal — under an owner ruling recorded in `AGENTS.md`. This unit generalises
-that file rather than authoring a second one, and reduces it to a delegation so the two cannot
-diverge. `tools/codebase-map/reuse_lookup.py` returned `.unattended.conf` [unattended] and
+The seam is `tools/unattended/run-unattended-gates.sh`, which already implements this mechanism for
+one kit — the split, the per-suite `BUDGET_*` ceilings, the missing-budget failure, the derived total
+and the liveness refusal — under an owner ruling recorded in `AGENTS.md`. This unit generalises the
+SELF-TEST half of that file and leaves its `--checks` half in place, so the two cannot diverge on the
+half that moves and nothing that depends on the half that stays is broken.
+`tools/codebase-map/reuse_lookup.py` returned `.unattended.conf` [unattended] and
 `KITDIR`/`ROOTN`/`KITREL`/`LEGS_FILE` [run-gates] as the affordance seams. The declared-value file
-shape is `tools/run-gates/gate-profiles.txt`'s, which itself cites `tools/template-size-limits.txt`
-as this tree's settled answer.
+shape is `tools/run-gates/gate-profiles.txt`'s, which itself cites `tools/template-size-limits.txt`.
+What rev-1 got wrong and the audit corrected: the seam's own suites are declared in that file's
+`run_one` literals and nowhere machine-readable, which is the gap S1 fills rather than assumes away.
 
 Recall terms used: `selftest gate leg ceiling guard GATE_SELFTESTS run-gates scratch repo mktemp
 spawn wall-clock adopter kit.toml`
