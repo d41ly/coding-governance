@@ -79,7 +79,7 @@ placeholder from the target's own `deploy.toml` and drops the conditional blocks
 kit for. Run it rather than copying by hand.
 
 ```bash
-python <gov>/tools/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,…
+python <gov>/tools/govkit/govkit.py intake --target <project> --kits playbook,playbook-render,check-microformats,…
 bash  <gov>/tools/playbook/adopt-playbook.sh --target <project>
 bash  <gov>/tools/playbook/adopt-playbook.sh --target <project> --check   # wire as a gate leg
 ```
@@ -146,6 +146,18 @@ Declaring one the adopter never computes ships an unresolved `{{TOKEN}}` brace i
 committed tree, and they can only fix it by forking the descriptor. `python
 tools/check-kit-placeholders.py` is the join and reds on it; a kit that legitimately has no adopter
 says so with `why_no_adopter` in its `[adopt]` block.
+
+<!-- govkit:entry check-microformats -->
+### 2a — The micro-format definition gate
+
+`check-microformats` arrives with the charter and grades the micro-format DEFINITION block inside
+it, so a target that renders the charter gets the gate that keeps that block honest. It is in the
+default selection; decline it by naming a selection that omits it.
+
+Wire the leg into your gate runner and CI as `micro-format definitions`, running
+`bash {prefix}/check-microformats.sh <playbook>` — the argv the descriptor declares, with
+`{prefix}` resolved to your install prefix. The token form is deliberate: a literal `tools/` path
+here would raise this file's carried-prefix count and red `install-prefix`.
 
 <!-- govkit:entry memory-tree -->
 ## 3 — Adopt the memory-tree kit (if chosen in §0)

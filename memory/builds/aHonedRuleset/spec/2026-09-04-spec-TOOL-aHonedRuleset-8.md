@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter
 
-**Status:** SPECCED · rev-8 · 2026-09-06 · node a · Tier-2 · base 94958534 · streams deployer · order 4 · ratified 2026-09-06
+**Status:** SPECCED · rev-9 · 2026-09-06 · node a · Tier-2 · base 94958534 · streams deployer · order 4 · ratified 2026-09-06
 
 <!-- gen:spec-records -->
 
@@ -557,7 +557,14 @@ review consequence rather than only the edit count.
 - **AC4** — When `python tools/govkit/matrix.py` runs, it exits 0 and shape 5 still reports the
   `micro-format definitions` leg printing `microformats OK —` from a scratch install.
 - **AC5** — When `python tools/govkit/selftest.py` runs, it exits 0, and specifically the arm named
-  `the default selection previews exactly 4 SIDE|rendered rows` is `ok`.
+  `the default selection previews exactly 5 SIDE|rendered rows` is `ok`. **FIVE, not the four rev-8
+  wrote, and the arm was RENAMED to match at rev-9.** Both figures are TREE-STATE snapshots and the
+  arm's own comment says so — *the count is a MEASUREMENT of this tree and moves when the tree does*
+  — so S1 putting one more entry in the default selection moves them by construction: measured live,
+  `SIDE|rendered` goes 4 to 5 and `ORDER|project-owned` in the sibling arm goes 4 to 5, each by
+  exactly the one entry. The counts were left at four by every rev of this spec, which would have
+  reds this unit's own landing on two arms that are working correctly. Naming the arm by its post-
+  landing spelling is what keeps this criterion checkable; the comment beside it records the cause.
 - **AC6** — When `bash tools/check-install-prefix.sh` runs, it exits 0 and prints
   `carried-prefix clean`, and `git diff 94958534..HEAD -- tools/install-prefix-carried.txt` is empty
   — so S3's sentence raised no file's recorded count, and `WIRE-INTO-PROJECT.md` still stands at 47.
@@ -1334,6 +1341,27 @@ three are the owner's and one is delegated, and each mark says which.
   the three" is refuted by its own next clause. **L4** — the `[[exempt]]` sentence is at `:1916-1917`,
   not `:1913-1915`. Three defects reached outside this spec into
   `memory/backlog/TOOL.md` and are corrected in the same commit.
+
+- rev-9 · 2026-09-06 · **built. One acceptance criterion moved, and it was the build that found
+  it.** AC5 named the selftest arm `…exactly 4 SIDE|rendered rows`; S1 adds an entry to the default
+  selection, so that count and its sibling `ORDER|project-owned` each rise by one. Both are declared
+  tree-state snapshots — the arm's own comment says the count moves when the tree does — so the arms
+  were updated to 5 and the criterion now names the post-landing spelling. No rev of this spec caught
+  it, and it would have red the unit's own landing on two arms behaving correctly.
+  **Everything else landed as specced and every guard was observed RED before it was trusted.**
+  S4's arm found its predicted violator on the live tree the moment it was wired — `check-line-length`,
+  the entry the original defect never pointed at — and AC12 staged its break on `check-placeholders`,
+  a descriptor this unit does not otherwise edit. S5's arm was proven by restoring this unit's OWN
+  base state, and AC15 holds: its violating set over the live registry is empty, naming none of
+  `drift-audit`, `playbook-render` or `unattended`, which is what proves the specified quantifier
+  shipped rather than the literal `default-reachable` reading. AC18's delta is exact: refusal-join
+  reports 246 against the 244 measured before, and `BRANCH_PIN` is unmoved at 217 with S6's ledger
+  entry naming both branches and the sibling ruling that defers the raise.
+  **Two build-time facts.** A literal `tools/` path in unit 5's hoisted comment raised this repo's
+  carried-prefix count and red `install-prefix`; it was derived instead, and this unit's own wiring
+  sentence uses the `{prefix}` argv form for the same reason. And the first selftest fixture copied
+  gov without `.git`, so `selfcheck` could not walk its surface — caught by the liveness half of the
+  arm, which asserts the copy is green BEFORE either break is provoked.
 
 ## 10. Reuse audit
 

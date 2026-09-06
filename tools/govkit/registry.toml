@@ -33,7 +33,8 @@ globs = [
 # The DEFAULT selection, declared here rather than in the engine. `--all` is DERIVED (every
 # non-conditional entry) and is deliberately not written down anywhere.
 [selection]
-default = ["playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memory-recall", "run-gates"]
+default = ["playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memory-recall", "run-gates",
+           "check-microformats"]
 
 # ---------------------------------------------------------------- entries: kits with a directory
 [[entry]]
