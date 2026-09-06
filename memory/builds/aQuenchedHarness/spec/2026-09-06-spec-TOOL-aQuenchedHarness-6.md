@@ -1,12 +1,13 @@
 # TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved
 
-**Status:** OPEN · rev-2 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
+**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-7 |
+| [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
 
 <!-- /gen:spec-records -->
 
@@ -31,6 +32,14 @@ come from measurement.
 - **S3** — select in descending recorded seconds until the selected set holds a DECLARED majority
   share of the population's summed seconds. The share is declared in the budgets file's header with
   its reading; the SET is computed, so it moves when the readings move.
+- **S3a** — THE RANKING NEEDS COMPARABLE READINGS. S3 sorts by recorded seconds, and after
+  `TOOL-aQuenchedHarness-4` F2 those readings come from two sources under two conditions: `gate-run`
+  leg files for held legs, and direct timed invocations for the six suites carrying no manifest row.
+  Sorting them together ranks the conditions as much as the suites. Either every row is re-read under
+  ONE stated condition before the ranking, or the ranking is done on the SPAWN COUNT, which
+  `TOOL-aQuenchedHarness-5` S6 produces and which the recorded gotcha names as the claim to write
+  down. The ranking prints the condition each reading came from, and REDS when a row's condition is
+  unstated.
 - **S4** — extract each selected suite's ARM INVENTORY before touching it — the staged break, the
   subject invoked, the expected verdict, one row per arm — into a tracked artifact under
   `memory/builds/aQuenchedHarness/build/`.
@@ -93,7 +102,10 @@ commit message. A batch port would make a failed diff ambiguous across suites.
 Porting by hand and asserting equivalence in prose was rejected: this repo's own record shows a
 derived equivalence claim wrong by 2.6x and unnoticed because nobody could falsify it
 (`tools/unattended/run-unattended-gates.sh`, the `TOOL-dNarrowedAnchor-1` note). A diffable artifact
-is the cheapest thing that makes the claim falsifiable.
+is the cheapest thing that makes the claim falsifiable. The METHOD to copy is the one landed in this
+build's own base at `274aa39b` — one pass over history into a cache, byte-identical summary, spawn
+count as the claim — which took `check-pass-order.sh` from 10184 s to 510 s and is the larger of the
+two prior instances this build cites.
 
 ## 5. Production-readiness checklist
 
@@ -129,6 +141,9 @@ is the cheapest thing that makes the claim falsifiable.
 - **AC5** — When the build closes, the selected set satisfies the majority share declared in
   `tools/run-gates/selftest-budgets.txt`'s header, computed over the declared population rather than
   over the local ledger, and shown in the wrap-up.
+- **AC7** — When the port ranking runs over `tools/run-gates/selftest-budgets.txt`, every row prints
+  the condition its reading was taken under, and a row whose condition is unstated REDS rather than
+  being sorted against rows measured differently.
 - **AC6** — When a suite's arms cannot be extracted, `bash tools/lib/extract-arms.sh` reports
   `UNEXTRACTABLE` naming it, and that suite appears in the unported remainder rather than being
   silently skipped.
@@ -160,6 +175,10 @@ which grades the per-suite build records this unit writes.
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-3 · 2026-09-06 · folded spec-audit round 2. M5: S3a adds the comparability rule the ranking
+  needed — after unit 4 F2 the readings come from two sources under two conditions, and sorting them
+  together ranks the conditions; the ranking now prints each row's condition and reds on an unstated
+  one. M3: §4 names the larger and closer prior art, `274aa39b`, as the method to copy.
 - rev-2 · 2026-09-06 · folded spec-audit round 1. B5: the population is the DECLARED one rather than
   the local ledger's rows — this worktree backs 7 of 49 held legs against the primary's 45, so the
   majority share was computable against wherever the build sat; S2 adds the refusal on missing

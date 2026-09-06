@@ -81,21 +81,21 @@ ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aQuenchedHarness-8 — the turnstile stops reaping a live holder, so two bars stop running as one](spec/2026-09-06-spec-TOOL-aQuenchedHarness-8.md) | 1 | 2 | OPEN | rev-1 | 2026-09-06 |
-| [TOOL-aQuenchedHarness-1 — the bar's own wall, so a wedged run dies with a verdict](spec/2026-09-06-spec-TOOL-aQuenchedHarness-1.md) | 2 | 2 | OPEN | rev-2 | 2026-09-06 |
-| [TOOL-aQuenchedHarness-3 — a self-test never reaches an adopter, as a leg or as a file](spec/2026-09-06-spec-TOOL-aQuenchedHarness-3.md) | 3 | 2 | OPEN | rev-2 | 2026-09-06 |
-| [TOOL-aQuenchedHarness-2 — a leg ceiling carries the reading it was set against, in the tree](spec/2026-09-06-spec-TOOL-aQuenchedHarness-2.md) | 4 | 2 | OPEN | rev-2 | 2026-09-06 |
-| [TOOL-aQuenchedHarness-4 — one on-demand runner for every kit's self-tests, budget-graded](spec/2026-09-06-spec-TOOL-aQuenchedHarness-4.md) | 5 | 2 | OPEN | rev-2 | 2026-09-06 |
-| [TOOL-aQuenchedHarness-5 — a self-test harness whose unit of cost is not a process](spec/2026-09-06-spec-TOOL-aQuenchedHarness-5.md) | 6 | 2 | OPEN | rev-2 | 2026-09-06 |
-| [TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved](spec/2026-09-06-spec-TOOL-aQuenchedHarness-6.md) | 7 | 2 | OPEN | rev-2 | 2026-09-06 |
-| [TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches](spec/2026-09-06-spec-TOOL-aQuenchedHarness-7.md) | 8 | 2 | OPEN | rev-2 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-8 — the turnstile stops reaping a live holder, so two bars stop running as one](spec/2026-09-06-spec-TOOL-aQuenchedHarness-8.md) | 1 | 2 | OPEN | rev-2 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-1 — the bar's own wall, so a wedged run dies with a verdict](spec/2026-09-06-spec-TOOL-aQuenchedHarness-1.md) | 2 | 2 | OPEN | rev-3 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-3 — a self-test never reaches an adopter, as a leg or as a file](spec/2026-09-06-spec-TOOL-aQuenchedHarness-3.md) | 3 | 2 | OPEN | rev-3 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-2 — a leg ceiling carries the reading it was set against, in the tree](spec/2026-09-06-spec-TOOL-aQuenchedHarness-2.md) | 4 | 2 | OPEN | rev-3 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-4 — one on-demand runner for every kit's self-tests, budget-graded](spec/2026-09-06-spec-TOOL-aQuenchedHarness-4.md) | 5 | 2 | OPEN | rev-3 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-5 — a self-test harness whose unit of cost is not a process](spec/2026-09-06-spec-TOOL-aQuenchedHarness-5.md) | 6 | 2 | OPEN | rev-3 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved](spec/2026-09-06-spec-TOOL-aQuenchedHarness-6.md) | 7 | 2 | OPEN | rev-3 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches](spec/2026-09-06-spec-TOOL-aQuenchedHarness-7.md) | 8 | 2 | OPEN | rev-3 | 2026-09-06 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-8.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

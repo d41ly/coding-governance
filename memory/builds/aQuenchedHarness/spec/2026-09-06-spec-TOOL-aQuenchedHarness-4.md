@@ -1,12 +1,13 @@
 # TOOL-aQuenchedHarness-4 — one on-demand runner for every kit's self-tests, budget-graded
 
-**Status:** OPEN · rev-2 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 5
+**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
+| [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
 
 <!-- /gen:spec-records -->
 
@@ -51,6 +52,19 @@ that replaces a bar leg exists for one kit and is imaginary for the rest.
   variable `TOOL-aQuenchedHarness-5` S3 reads. Two pools each reading W independently would give
   W squared — 64 concurrent processes at node `a`'s width 8, on a host where a bare spawn costs
   319 ms.
+- **S10** — BOTH NEW FILES ARE WITHHELD FROM ADOPTERS. `tools/run-gates/run-selftests.sh` and
+  `tools/run-gates/selftest-budgets.txt` are gov-only: the budgets file is a declaration of GOV's own
+  corpus whose rows name paths no adopter has, and the runner reads it. They are claimed with
+  `role = "project-owned"` in `tools/run-gates/kit.toml`, exactly as that descriptor already withholds
+  `run-gates.gov.test.sh`, and the new gate leg is declared with an `[[exempt_leg]]` row rather than a
+  `[[gate_leg]]` one. Without this the descriptor's `include = "**"` rule ships both, and an adopter's
+  bar reds on first invocation against a population that is not theirs.
+- **S11** — the profile width is resolved through a SHARED reader, not re-implemented. Profile
+  selection is inline in `tools/run-gates/run-gates.sh` today and is unreachable from another script,
+  so S8's "this runner resolves the profile row's width W" needs a seam that does not exist: either a
+  `--print-profile` verb on `run-gates.sh` that emits the selected row, or a
+  `tools/run-gates/lib-profile.sh` both scripts source. One resolver, two readers; two resolvers is
+  the drift class this build cites elsewhere by name.
 - **S9** — arms staging: a suite over budget, a suite with no budget, a declared row whose argv names
   no tracked file, a held leg with no row, a filter matching nothing, and a sweep whose observed
   concurrent-process count exceeds W.
@@ -102,8 +116,10 @@ lowering is a visible edit to this file.
 ### Files touched (estimate)
 
 `tools/run-gates/run-selftests.sh` (new) · `tools/run-gates/selftest-budgets.txt` (new) ·
-`tools/unattended/run-unattended-gates.sh` (its `--selftests` half only) · `tools/gate-legs.json` ·
-`tools/run-gates/kit.toml` · `AGENTS.md` · a self-test beside the runner.
+`tools/run-gates/run-gates.sh` (S11's shared profile reader) · `tools/unattended/run-unattended-gates.sh`
+(its `--selftests` half only) · `tools/gate-legs.json` · `tools/run-gates/kit.toml` (the
+`project-owned` rules and the `[[exempt_leg]]` row) · `.lexicon.conf`, for the `VERB_OFFENDER_PIN`
+move any new shell function forces · `AGENTS.md` · a self-test beside the runner.
 
 ### Alternatives rejected
 
@@ -153,6 +169,11 @@ of it would make the bar's control flow depend on a flag that exists for a diffe
 - **AC6** — When `bash tools/unattended/run-unattended-gates.sh --all` runs, it produces the same
   verdicts as before this unit for BOTH halves, `--checks` and `--selftests`, and
   `BUDGET_kit_gate` still exists and still binds.
+- **AC8** — When `govkit` applies to a fixture target, neither `run-selftests.sh` nor
+  `selftest-budgets.txt` is present and the new leg is in no emitted manifest row.
+- **AC9** — When `bash tools/run-gates/run-selftests.sh` resolves its width, the value is byte-equal to
+  the one `bash tools/run-gates/run-gates.sh` prints on its own profile line, on the same host — one
+  resolver, two readers.
 - **AC7** — When a sweep of `bash tools/run-gates/run-selftests.sh` runs, the observed peak count of
   concurrent descendant processes is at most the profile row's declared width, asserted by an arm
   rather than by the two specs each assuming it.
@@ -160,7 +181,9 @@ of it would make the bar's control flow depend on a flag that exists for a diffe
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` · the new `every held leg is budgeted, every budget row resolves`
-leg · `unattended kit gate` and `unattended skill wiring`, which grade the script this unit edits ·
+leg · `profile-bar selftest`, which owns the width-resolution comparison S11 introduces · the
+`lexicon naming predicates` leg, which grades the new runner's function names ·
+`unattended kit gate` and `unattended skill wiring`, which grade the script this unit edits ·
 `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at the Definition of Done, because this is kit
 work · `bash tools/unattended/run-unattended-gates.sh --all`, this kit's declared compensating check.
 
@@ -180,6 +203,12 @@ work · `bash tools/unattended/run-unattended-gates.sh --all`, this kit's declar
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-3 · 2026-09-06 · folded spec-audit round 2. B7: both new files were shipping to adopters
+  through `tools/run-gates/kit.toml`'s `include = "**"` rule — a declaration of gov's own corpus whose
+  rows name paths no adopter has — so S10 withholds them with `role = "project-owned"` and declares
+  the leg `[[exempt_leg]]`. H6: profile selection is inline in `run-gates.sh` and unreachable from
+  another script, so S8's width resolution had no seam; S11 names one and AC9 asserts byte-equality
+  between the two readers. H3: §7 names the lexicon leg and Files touched carries `.lexicon.conf`.
 - rev-2 · 2026-09-06 · folded spec-audit round 1. B2: the population is now DECLARED rather than
   derived from held manifest legs, because the ten suites the delegation targets contain zero held
   legs — the 2026-08-23 ruling removed them from the manifest and the descriptor both — and the

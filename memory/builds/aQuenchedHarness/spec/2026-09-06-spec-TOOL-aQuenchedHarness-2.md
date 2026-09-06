@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-2 — a leg ceiling carries the reading it was set against, in the tree
 
-**Status:** OPEN · rev-2 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 4
+**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md](../build/2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md) | research | TOOL-aQuenchedHarness-8 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
+| [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
 
 <!-- /gen:spec-records -->
 
@@ -28,6 +29,10 @@ measurement in this build's own research record refuted that.
   PER RUN and therefore holds repeated readings. `<git-dir>/gate-ledger.tsv` is a single-reading
   fallback and is labelled as one in the report. Both are untracked and node-local, which is why
   neither is a gate input.
+- **S3a** — `--write` IS MONOTONE. A row moves to `max(existing row, observed)` and is never lowered
+  by an ordinary write, because `gate-run` keeps only a handful of run directories: a pruned or reused
+  window would otherwise silently lower an evidenced maximum and, with it, the floor the gate holds
+  the ceiling above. Lowering a row takes an explicit `--reset <leg>` that records why and by whom.
 - **S3** — `--write` refreshes a TRACKED evidence file, `tools/run-gates/ceiling-evidence.txt`: one
   row per leg carrying the maximum recorded seconds, the number of readings behind it, and the node
   and date it was read on. This is the artifact that makes the relation checkable from the tree.
@@ -137,6 +142,8 @@ property of the tree is not a gate.
   reads only tracked files, so a fresh clone with no local history is not red.
 - **AC4** — When a leg has exactly one reading, `tools/run-gates/ceiling-evidence.txt` records
   `readings 1` and the report says so, rather than presenting it as a measured range.
+- **AC6** — When `--write` runs over a population whose observed maximum is BELOW the committed row,
+  the row is unchanged and the report says the observed population was below the record.
 - **AC5** — When an evidence row names a leg `tools/gate-legs.json` no longer carries, the gate
   reports the stale row, so the artifact cannot silently widen the surface it narrows.
 
@@ -145,7 +152,8 @@ property of the tree is not a gate.
 `bash tools/run-gates/run-gates.sh` · the new `leg ceilings clear their evidenced maximum` leg ·
 `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for the `run-gates canary`, which asserts the
 manifest's pinned key set and is HELD off a default bar, so naming it without the variable would name
-a leg that does not run.
+a leg that does not run · the `lexicon naming predicates` leg, which guards on `tools/` and grades the
+new verb's function names.
 
 ## 8. Open questions
 
@@ -163,6 +171,10 @@ a leg that does not run.
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-3 · 2026-09-06 · folded spec-audit round 2. H8: `--write` is now MONOTONE (S3a) — `gate-run`
+  retains only a few run directories, so a pruned or reused window would have silently lowered an
+  evidenced maximum and with it the floor the gate enforces; lowering takes an explicit `--reset`.
+  H3: §7 names the lexicon leg.
 - rev-2 · 2026-09-06 · folded spec-audit round 1, and this unit changed more than any other. B4: the
   ratio band is gone — `gate-ledger.tsv` holds one row per leg, so its probe had an empty population;
   the readings now come from `<git-dir>/gate-run/*/*.leg` and the shape is a flat margin, which

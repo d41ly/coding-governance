@@ -1,12 +1,13 @@
 # TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches
 
-**Status:** OPEN · rev-2 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 8
+**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 |
+| [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-8 |
 
 <!-- /gen:spec-records -->
 
@@ -30,9 +31,13 @@ cliff `TOOL-aQuenchedHarness-8` fixes reachable in the first place.
   post-change spawn count, both written into §2 with the reading they were derived from, and a
   requirement that `BUDGET_kit_gate` be LOWER after this unit than the 240 it carries now. Without a
   declared figure every acceptance criterion here passes on a 1.01x change.
-- **S4** — a spawn-count REGRESSION arm pinning the post-change count, so a future edit that
-  reintroduces a per-item spawn REDS instead of merely getting slower. Slowness that only annoys
-  never gets fixed.
+- **S4** — a spawn-count REGRESSION arm pinning a NORMALISED count — spawns per `RUN*.md` walked —
+  with the population size DERIVED at run time and printed beside it. An absolute pin is wrong here
+  and S2 says why: the same spec states the population grows monotonically as builds land, so an
+  absolute number would red on a landing that merely added a build, and would then be raised — in the
+  build that exists because three sessions raised a pin instead of counting spawns. The seconds figure
+  in S3 stays a READING; the normalised spawn figure is the GATE, and its denominator is derived,
+  never typed.
 - **S5** — `check-pass-order.sh` gets the PIN and not the rebuild. Its spawn removal already landed
   and is in this build's base: `4042505a` and `274aa39b` record 10184 s to 591 s to 510 s, one pass
   over history into a subject cache, summary byte-identical, self-test green at 72 arms. This unit
@@ -119,7 +124,8 @@ is the gate-satisfied-by-its-own-comment shape; S3 replaces the prose with a num
 - **AC1** — When `bash tools/unattended/check-unattended.sh` runs over the real tree before and after
   the change, its stdout and exit status are byte-identical, proving no verdict moved.
 - **AC2** — When `bash tools/unattended/check-unattended.sh` is run under the spawn counter after the
-  change, its process count is at or below the figure S3 declares — an absolute number written before the work, not "a factor the build
+  change, its NORMALISED count — spawns divided by the `RUN*.md` population derived at run time — is
+  at or below the figure S3 declares — an absolute number written before the work, not "a factor the build
   record states".
 - **AC3** — When `unattended kit gate` is timed after the change in the conditions S3 names, its
   recorded seconds are at or below S3's declared target, and `BUDGET_kit_gate` in
@@ -128,7 +134,7 @@ is the gate-satisfied-by-its-own-comment shape; S3 replaces the prose with a num
   `tools/unattended/check-unattended.test.sh` reds — the gate's own failing case, observed before
   landing.
 - **AC5** — When `bash tools/unattended/check-pass-order.sh` is run under the spawn counter, its count
-  is at or below the pin S5 records for the ALREADY-LANDED rebuild, so `274aa39b`'s win cannot
+  normalised count is at or below the pin S5 records for the ALREADY-LANDED rebuild, so `274aa39b`'s win cannot
   silently erode. This is a regression assertion, not an improvement claim.
 - **AC6** — When `tools/unattended/run-unattended-gates.sh` and `tools/gate-legs.json` are read, each
   carries a pointer to the other's figure for this leg and one sentence saying why the two differ.
@@ -136,7 +142,9 @@ is the gate-satisfied-by-its-own-comment shape; S3 replaces the prose with a num
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` · `unattended kit gate` and `pass-order history`, the two legs
-this unit touches · `bash tools/unattended/run-unattended-gates.sh --all` at the Definition of Done,
+this unit touches · the `lexicon naming predicates` leg, which grades any new shell function the
+rewrite defines and the `VERB_OFFENDER_PIN` move it forces ·
+`bash tools/unattended/run-unattended-gates.sh --all` at the Definition of Done,
 which is this kit's declared compensating check · `GATE_SELFTESTS=1` for the kit's held suites.
 
 ## 8. Open questions
@@ -158,6 +166,10 @@ which is this kit's declared compensating check · `GATE_SELFTESTS=1` for the ki
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-3 · 2026-09-06 · folded spec-audit round 2. H7: the spawn pin is NORMALISED — spawns per
+  `RUN*.md` walked, denominator derived at run time — because the same spec says the population grows
+  monotonically, so an absolute pin would red on a landing and then be raised, which is the exact
+  habit this unit exists to end. H3: §7 names the lexicon leg.
 - rev-2 · 2026-09-06 · folded spec-audit round 1. H8: S4's `check-pass-order.sh` rebuild ALREADY
   LANDED in this build's base at `4042505a`/`274aa39b`, 10184 s to 510 s; S5 replaces it with a
   regression pin and AC5 is now an assertion against that pin rather than an improvement claim. H7:

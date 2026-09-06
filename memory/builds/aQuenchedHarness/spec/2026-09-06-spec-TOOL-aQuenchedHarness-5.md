@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-5 — a self-test harness whose unit of cost is not a process
 
-**Status:** OPEN · rev-2 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 6
+**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-06-prompt-TOOL-aQuenchedHarness-1.md](../prompts/2026-09-06-prompt-TOOL-aQuenchedHarness-1.md) | research | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
+| [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +69,13 @@ A suite's wall clock is approximately `spawns x per-spawn-cost`. Per-spawn cost 
 node and this repo cannot lower it. Spawn count is the only term this repo owns, and
 `tools/unattended/run-unattended-gates.sh` records the one prior instance of lowering it: 469 spawns
 per invocation became 220 by reading each file once instead of running a `grep` per (item, file).
+**And that is not the only prior instance, nor the largest.** The `check-pass-order.sh` rebuild,
+landed in this build's own base at `4042505a` and `274aa39b`, took 10184 s to 510 s by one pass over
+history into a subject cache — a bigger win than the 469-to-220 one, with the same method and the same
+claim shape: byte-identical summary, spawn count as the evidence. Rev-2 called the earlier one "the
+one prior instance", which was false at HEAD and in this build's own history. Both are inputs to
+§8 F1's candidates C1 and C3.
+
 This harness attacks the OTHER multiplier — the per-arm fixture construction, which is where a suite
 with 200 arms pays 200 `git init`s.
 
@@ -163,7 +171,11 @@ landed.
   - **C1 — one fixture per suite instead of one per arm.** Loses if the ported suite's spawn count
     does not fall, which happens if fixture construction was never the multiplier.
   - **C2 — bounded intra-suite parallelism.** Loses if wall clock does not fall at width N against
-    width 1 on the same arms, or if output ceases to be byte-stable.
+    width 1 on the same arms, or if output ceases to be byte-stable. **NOT decided on a single-shot
+    wall-clock reading**: this build's own research record measures the same leg varying 5.5x median
+    and 47.1x worst across readings on this node, so one loaded stopwatch decides nothing. Take
+    repeated readings at both widths and report S6's SPAWN COUNT beside the seconds, which is the
+    figure `memory/gotchas/process-creation-is-the-suite-cost.md` names as the claim to write down.
   - **C3 — batching the subject invocation** so one checker process grades many staged subjects.
     Loses if the shipped checkers do not accept a multi-subject invocation, which is the likely
     outcome and must be RECORDED rather than assumed.
@@ -187,6 +199,11 @@ landed.
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-3 · 2026-09-06 · folded spec-audit round 2. M3: §4 no longer calls the 469-to-220 reduction
+  "the one prior instance" — the `check-pass-order.sh` rebuild is in this build's own base, is larger,
+  and is now an input to F1's C1 and C3. M4: C2 may not be decided on a single-shot wall clock on a
+  node whose own measurements move 5.5x median across readings; repeated readings plus the spawn count
+  decide it.
 - rev-2 · 2026-09-06 · folded spec-audit round 1. B3: `tools/lib/` ships nothing, which rev-1's F2
   contradicted; resolved by unit 3 rev-2 no longer shipping the suites, so the placement is now
   correct and needs no inline-parity obligation — F3 records the inline canon as prior art considered
