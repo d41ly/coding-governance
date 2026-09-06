@@ -789,17 +789,26 @@ def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
 
 
 def build_reference_index(
-    files: list[str], *, root: Path | None = None, skip_dirs: frozenset[str] = _SKIP_DIRS
+    files: list[str], *, root: Path | None = None, skip_dirs: frozenset[str] = _SKIP_DIRS,
+    stats: dict | None = None,
 ) -> dict[str, set[str]]:
     """token -> {POSIX files mentioning it as an identifier}, scanned over the covered-layer
     source: the top-level dirs of ``files`` (a symbols.json file list), filtered to their
     extension set. This is the on-demand scan behind fan_in — NEVER committed. Fail-open by
     design on an unreadable file (skipped): this feeds a RANKING/WARN, not a gate, so a binary
-    blob must not abort the lookup (the opposite of the extractor law, and deliberately so)."""
+    blob must not abort the lookup (the opposite of the extractor law, and deliberately so).
+
+    ``stats``, when given, is FILLED with what this scan could and could not see — `files_scanned`,
+    `parse_skips` and the sorted `extensions` it was filtered to. `TOOL-dTracedLattice-1` S6: a
+    fail-open skip that reports nothing is the liveness failure `AGENTS.md` §7 names, because a
+    ranking over half a corpus is indistinguishable from a ranking over all of it. An out-parameter
+    rather than a second return value, so no existing caller has to change to keep working — and it
+    counts what the walk already knows rather than adding a pass."""
     root = root or repo_root()
     roots = sorted({f.split("/", 1)[0] for f in files if f})
     exts = frozenset(Path(f).suffix for f in files if Path(f).suffix)
     index: dict[str, set[str]] = {}
+    scanned = skips = 0
     for top in roots:
         base = root / top
         if not base.is_dir():
@@ -813,10 +822,17 @@ def build_reference_index(
                 try:
                     text = path.read_text(encoding="utf-8")
                 except (UnicodeDecodeError, OSError):
+                    skips += 1
                     continue
+                scanned += 1
                 rel = path.relative_to(root).as_posix()
                 for tok in _identifier_tokens(text, path.suffix):
                     index.setdefault(tok, set()).add(rel)
+    if stats is not None:
+        stats["files_scanned"] = scanned
+        stats["parse_skips"] = skips
+        stats["extensions"] = sorted(exts)
+        stats["roots"] = roots
     return index
 
 

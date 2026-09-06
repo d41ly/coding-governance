@@ -144,6 +144,9 @@ class Shortlist:
     recall_dark: tuple[str, ...]
     threshold: int
     corpus_counts: dict[str, int] = field(default_factory=dict)
+    # S6 — what the reference scan behind every fan-in could and could not read. Carried on the
+    # shortlist rather than fetched at render time so the banner reports THIS answer's scan.
+    scan: dict = field(default_factory=dict)
 
     @property
     def empty(self) -> bool:
@@ -253,7 +256,8 @@ def load_corpus(root: Path | None = None) -> Corpus:
 # ======================================================================================
 
 
-def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]]) -> Shortlist:
+def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]],
+                       scan: dict | None = None) -> Shortlist:
     """The pure heart: query + corpus + reference index -> a ranked shortlist. Seeds = every
     candidate sharing a token stem with the query, PLUS the dossier of any `## Shared seams`
     prose that shares a stem (behavioural recall beyond names). Structural neighbours = symbols
@@ -261,7 +265,8 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     seeds-first, then fan-in desc, then name — deterministic. Empty seeds -> 'no seam fits'."""
     qstems = m.stems(query)
     if not qstems:
-        return Shortlist(query, [], corpus.recall_dark, corpus.threshold, _counts(corpus))
+        return Shortlist(query, [], corpus.recall_dark, corpus.threshold, _counts(corpus),
+                         scan or {})
 
     # rank against a LOCAL pool — synthetic prose candidates are added here, never back into the
     # caller's corpus (assemble must be idempotent: two queries on one corpus must not leak).
@@ -292,7 +297,7 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
             pool.setdefault(name, Candidate(name, ("shared-seams",), detail=feature))
             seeds[name] = f"shared-seams prose ({feature}): {', '.join(sorted(shared))}"
 
-    # structural neighbours of the symbol seeds — same def file, or same kind in the same dir.
+    # structural neighbours of the symbol seeds — sharing ANY def file, or same kind in the same dir.
     seed_syms = [pool[n] for n in seeds if pool[n].kind]
     seed_kinds = {c.kind for c in seed_syms}
     seed_files = {f for c in seed_syms for f in c.files}
@@ -347,7 +352,8 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     ranked.extend(neighbour_ranked[:NEIGHBOUR_CAP])
 
     ranked.sort(key=_derive_shortlist_key)
-    return Shortlist(query, ranked, corpus.recall_dark, corpus.threshold, _counts(corpus))
+    return Shortlist(query, ranked, corpus.recall_dark, corpus.threshold, _counts(corpus),
+                     scan or {})
 
 
 def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -> list[tuple[Candidate, int]]:
@@ -435,6 +441,13 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
         # signal's limit rather than repairing it, which is a different unit.
         "# neighbours are ranked by fan-in, which counts NAME TOKENS and resolves no symbols:",
         "# a high rank means 'this name appears a lot', never 'this is the seam you want'",
+        # S6 — WHAT THE SCAN COULD NOT SEE, on every call. A fail-open reference scan that reports
+        # nothing makes a ranking over half a corpus look exactly like a ranking over all of it,
+        # which is the liveness failure `AGENTS.md` §7 names. Three facts, always printed: how many
+        # files the scan read, how many it could not decode, and which language layers it never
+        # entered. `unscanned` is the DECLARED set today; `TOOL-dTracedLattice-5` replaces the
+        # declaration with a set derived from the corpus.
+        _scan_line(shortlist),
         "",
     ]
     if shortlist.empty:
@@ -465,6 +478,20 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
     out.append('Decision: wire the behaviour through one seam above, or reply "no seam fits" '
                "if none matches - then record the reuse decision in the feature's ## Reuse affordance.")
     return "\n".join(out) + "\n"
+
+
+def _scan_line(shortlist: Shortlist) -> str:
+    """The reference scan's own coverage, as one banner line. Never omitted and never abbreviated
+    away: an absent figure reads as "nothing to report", which is the one thing it cannot mean."""
+    sc = shortlist.scan or {}
+    if "files_scanned" not in sc:
+        # The scan did not run at all (an empty corpus takes the early return). Say so rather than
+        # printing zeros, which read as "scanned everything and found nothing".
+        return "# scan coverage: not run (no symbol file list to scan)"
+    dark = ", ".join(shortlist.recall_dark) if shortlist.recall_dark else "none declared"
+    return (f"# scan coverage: {sc['files_scanned']} files scanned"
+            f" | {sc['parse_skips']} parse skips"
+            f" | unscanned layers: {dark}")
 
 
 def _line(r: Ranked, corpus: "Corpus | None" = None) -> str:
@@ -664,8 +691,10 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     corpus = load_corpus()
-    ref_index = m.build_reference_index(corpus.symbol_files) if corpus.symbol_files else {}
-    shortlist = assemble_shortlist(query, corpus, ref_index)
+    scan: dict = {}
+    ref_index = (m.build_reference_index(corpus.symbol_files, stats=scan)
+                 if corpus.symbol_files else {})
+    shortlist = assemble_shortlist(query, corpus, ref_index, scan)
     print(render(shortlist, corpus), end="")
     # AFTER the answer is rendered, so a row means a lookup that ANSWERED. Before it, a crash in
     # render() would leave evidence of a probe whose result nobody ever saw.

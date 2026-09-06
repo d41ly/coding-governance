@@ -3853,6 +3853,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_scan_coverage_line_cannot_go_quiet",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"

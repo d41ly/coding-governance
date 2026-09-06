@@ -924,7 +924,7 @@ def test_reuse_shared_primitives(tmp: Path):
     assert m.stems("normalise a name to a slug") & m.stems("slugify") == {"slug"}
     assert not (m.stems("payment gateway") & m.stems("slugify"))  # unrelated -> no shared stem
 
-    # --- fan-in: distinct referencing files minus the def file, comments/strings excluded ----
+    # --- fan-in: distinct referencing files minus every def file, comments/strings excluded ---
     src = tmp / "src"
     src.mkdir(parents=True)
     (src / "text.py").write_text("def slugify(s):\n    return s\n", encoding="utf-8")
@@ -935,7 +935,7 @@ def test_reuse_shared_primitives(tmp: Path):
     idx = m.build_reference_index(["src/text.py"], root=tmp)
     refs = idx.get("slugify", set())
     assert "src/c.py" not in refs and "src/d.py" not in refs, refs  # string/comment-only dropped
-    assert m.fan_in(idx, "slugify", {"src/text.py"}) == 2  # a.py + b.py, minus the def file
+    assert m.fan_in(idx, "slugify", {"src/text.py"}) == 2  # a.py + b.py, minus the one def file
 
     # --- seam threshold from conf: default, override, fail-closed on a non-int -----------------
     assert m.seam_fanin_threshold(tmp) == m.SEAM_FANIN_THRESHOLD_DEFAULT  # no conf -> default
@@ -1677,6 +1677,8 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
+    failures += check("scan coverage line cannot go quiet (AC12)",
+                      test_scan_coverage_line_cannot_go_quiet)
     failures += check_guarded("every co-defined symbol reaches every definer (AC2)",
                               test_every_co_defined_symbol_reaches_every_definer)
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
@@ -1859,6 +1861,27 @@ def test_every_co_defined_symbol_reaches_every_definer():
         cand = corpus.candidates.get(sid)
         assert cand is not None, f"{sid} is in symbols.json and absent from the corpus"
         assert set(cand.files) >= files, (sid, sorted(files), sorted(cand.files))
+
+
+def test_scan_coverage_line_cannot_go_quiet():
+    """AC12 — S6's coverage line, and it REDS on any of the three facts going missing.
+
+    Rendered from a synthetic shortlist rather than from a live lookup, so the arm grades the LINE
+    rather than this corpus's numbers. Three separate assertions, because a single "line exists"
+    check passes while two thirds of it are gone.
+    """
+    corpus = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                       recall_dark=("sh", "ps1"), has_symbols=True, decisions_by_feature={})
+    scan = {"files_scanned": 41, "parse_skips": 2, "extensions": [".py"], "roots": ["tools"]}
+    sl = rl.Shortlist("q", [], corpus.recall_dark, corpus.threshold, {}, scan)
+    text = rl.render(sl, corpus)
+    assert "41 files scanned" in text, text
+    assert "2 parse skips" in text, text
+    assert "unscanned layers: sh, ps1" in text, text
+    # A scan that never ran must SAY so rather than printing zeros, which read as "scanned
+    # everything and found nothing".
+    quiet = rl.render(rl.Shortlist("q", [], (), corpus.threshold, {}, {}), corpus)
+    assert "scan coverage: not run" in quiet, quiet
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references
 
-**Status:** SPECCED · rev-7 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** SPECCED · rev-8 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -66,7 +66,14 @@ a precision fix, and scenario-based recall showed precision does not predict the
   reads a recall failure as a ranking change, which is how the rev-4 design mistook one for the other.
 - **S5** Subtract same-name definers in `fan_in`. Retained from rev-1 and DEMOTED: it raises
   ast-edge precision from 14.5% to 33.8%, and that yardstick is now known not to predict the answer.
-  It has never been scored against the scenario sets, so it lands only under the same ACs as S3.
+  It has never been scored against the scenario sets.
+
+  **IT IS NOT SEPARABLE FROM S1, and rev-5's rollout assumed it was.** S1 replaces `Candidate.file`
+  with `files`, so there is no single definer left to hand `fan_in`; passing the first of the set
+  would restore the arbitrary-winner rule S1 exists to remove, one level down. The two land
+  together, and what binds them is **AC1, not AC3**: neither claims a ranking WIN, so the criterion
+  they owe is "do not lose on the adversarial set". AC3 binds S3, which does claim one. Recorded at
+  rev-8 by the pass that hit it, rather than resolved by building the half that fits the rollout.
 - **S6** Report the index's own coverage on every call, scoped to what the index can already count
   with no receiver-binding pass: files scanned, every language layer not scanned at all, and parse
   skips. The bound/unresolved attribute-site split is NOT reported — §3 puts the pass that would
@@ -188,8 +195,9 @@ costs 1.554 s per query and demotes `boundedParallel` for being documented.
 
 ### Rollout
 
-S1 first and alone: it is the largest measured gain, it changes no ranking, and it needs no new
-pass. S2 second, because retrieval failures are unreachable at any K and no ordering change touches
+S1 first, WITH S5, which the rev-5 rollout thought was separable and S5 now records is not. It is
+the largest measured gain and it needs no new pass; it does move fan-in values for co-defined
+symbols, so AC1 is the criterion it answers. S2 second, because retrieval failures are unreachable at any K and no ordering change touches
 them. S3 and S5 only after both, and only if they clear AC3's chance control — they are the two
 items whose value is currently indistinguishable from a random shuffle at depth.
 
@@ -296,6 +304,9 @@ control — and it still does not predict whether the shortlist named a file the
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice design pass and its skeptic round.
+- rev-8 · 2026-09-06 · S5 and the rollout record what building S1 uncovered: the definer-set
+  signature `fan_in` needs is S5, S1 leaves no single definer to pass instead, so the two are one
+  landing graded by AC1 rather than two graded separately. No scope was added or dropped.
 - rev-7 · 2026-09-06 · folded the round-3 spec audit, the NON-CONVERGENT exit's `fold` disposition: B1 (§4's
   Data model still described the receiver-binding pass §3 excludes and AC8's 0.05 s ceiling forbids —
   the pass measured +1.166 s — so §4 and S6 now agree with §3), H1 (§10 called the ratified resolver
