@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aBoundedCeiling
 authorized-by: prompt
-ids: TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7
+ids: TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8
 ---
 
 # aQuenchedHarness — self-checks that cannot wedge a build, and that adopters never run
@@ -54,6 +54,10 @@ copy-installs a kit runs that kit's self-tests on every bar.
 - **This build inherits its parent's unfinished half.** `aBoundedCeiling` ran on nearly this prompt
   and shipped the ceilings that are now the hang bound. Its open rows are inputs, not prior art.
 
+- **Unit 8 was ADDED mid-build and takes order 1.** Probing unit 2's ceiling band found the
+  actual cause of the stalls: the bar reaps its own live holder, so bars run concurrently.
+  Cost work is worth less while the bar multiplies itself.
+
 ## Parked decisions
 
 <!-- roster:units -->
@@ -67,16 +71,18 @@ copy-installs a kit runs that kit's self-tests on every bar.
 | 5 | `TOOL-aQuenchedHarness-5` | OPEN | a spawn-cheap self-test harness the suites are rebuilt onto |
 | 6 | `TOOL-aQuenchedHarness-6` | OPEN | the dominant suites rebuilt onto it, arm inventory preserved |
 | 7 | `TOOL-aQuenchedHarness-7` | OPEN | the longest leg on the bar is a repo check the hold never reaches |
+| 8 | `TOOL-aQuenchedHarness-8` | OPEN | the turnstile stops reaping a live holder, so two bars stop running as one |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 7 unit(s) · node a · opened 2026-09-06 · streams tooling
-ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7
+**Build status:** OPEN · 8 unit(s) · node a · opened 2026-09-06 · streams tooling
+ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aQuenchedHarness-1 — the bar's own wall, so a wedged run dies with a verdict](spec/2026-09-06-spec-TOOL-aQuenchedHarness-1.md) | 1 | 2 | OPEN | rev-1 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-8 — the turnstile stops reaping a live holder, so two bars stop running as one](spec/2026-09-06-spec-TOOL-aQuenchedHarness-8.md) | 1 | 2 | OPEN | rev-1 | 2026-09-06 |
 | [TOOL-aQuenchedHarness-2 — leg ceilings derived from the ledger, not guessed at ten times](spec/2026-09-06-spec-TOOL-aQuenchedHarness-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-06 |
 | [TOOL-aQuenchedHarness-3 — a self-test leg never reaches an adopter's manifest](spec/2026-09-06-spec-TOOL-aQuenchedHarness-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-06 |
 | [TOOL-aQuenchedHarness-4 — one on-demand runner for every kit's self-tests, budget-graded](spec/2026-09-06-spec-TOOL-aQuenchedHarness-4.md) | 4 | 2 | OPEN | rev-1 | 2026-09-06 |
@@ -85,18 +91,18 @@ ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL
 | [TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches](spec/2026-09-06-spec-TOOL-aQuenchedHarness-7.md) | 7 | 2 | OPEN | rev-1 | 2026-09-06 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7.
+Ids no record names: TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7.
 
-Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7.
+Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-aQuenchedHarness-1` | no |
+| 1 | `TOOL-aQuenchedHarness-1`, `TOOL-aQuenchedHarness-8` | yes |
 | 2 | `TOOL-aQuenchedHarness-2` | no |
 | 3 | `TOOL-aQuenchedHarness-3` | no |
 | 4 | `TOOL-aQuenchedHarness-4` | no |
