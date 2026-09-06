@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 1 surfaced
 keepalive-reaped: yes
 witness: 84383ffd78a1e8fee9207b15d1f050b68a0e339e
-phase: VERIFYING
+phase: LANDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 62177af0
@@ -54,3 +54,7 @@ base: 6ec402bd3eb7f9cb5ce6257b0f60348ae3e593fc
 2026-09-06T21:22:07Z brief · item TOOL-aHonedRuleset-3 · reason 9b7bbd89fb33 memory/builds/aHonedRuleset/spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md
 
 2026-09-06T21:22:08Z brief · item TOOL-aHonedRuleset-5 · reason 438ecaa24bcd memory/builds/aHonedRuleset/spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md
+
+2026-09-06T23:18:58Z override · item gates-green · reason 1 of 43 legs failed and it is drift-audit records, which is RED AT BASE. Verified by running it in a scratch worktree at 6ec402bd: exit 1 there, exit 1 here, and the two entries are the same two — the .lexicon.conf LANGS ratchet weakened (.sh parser->dark) with no justification beside it, and closed_specs_with_no_product_commit at 2 against a pin of 1. Neither is this build's: git log over .lexicon.conf across 6ec402bd..HEAD is empty. This run introduced two drift regressions of its own and FIXED both — a stale trace-waiver row, and a product-source citation of a still-SPECCED sibling spec — so the leg is back to exactly the base failure set. Fixing what remains means editing another build's ratchet declaration, which M3 veto 2 puts beyond a delegated resolver, and raising the pins would weaken a shrink-only ratchet to make a red look green. Parked as a decision for the owner. Every other leg is green: 43 ran, 1 failed, 1 skipped. Self-tests are HELD by explicit owner directive mid-run, and unit 4 AC12 and unit 8 AC10 record that as a SKIP in their acceptance ledgers rather than as a pass.
+
+2026-09-06T23:18:58Z override · item specs-audited · reason The one unaudited unit is TOOL-aHonedRuleset-1, and its code was written and CLOSED before this run began. It is a Tier-1 prose census whose deliverable is a report and a re-runnable script, landed by an earlier session at a commit predating this run's BASE. M4 requires a spec audit BEFORE the unit's code is written, which is not satisfiable retroactively — auditing its design now would grade a decision already shipped and would be a record of a review that could change nothing. Every unit this run actually BUILT was audited before its code: units 2, 3, 4, 5 and 6 through two rounds (round 1 BLOCKED with 3 blockers, round 2 CLEAN WITH FIXES with 0), and unit 8 through three (2 blockers, then 1, then 1 — non-convergent, so the loop stopped and the surviving blocker was DISPOSED by fold, recorded on its --review row). Nothing this run built is unaudited.
