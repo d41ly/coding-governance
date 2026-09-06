@@ -9,8 +9,9 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 6b8026d310a55317425a1e9ea452bd64ce29656b
-phase: REVIEWING
+parked-surfaced: yes, 11 surfaced
+witness: a1f485950ede5750776bfee0b230002fce54a8ad
+phase: VERIFYING
 mode: slug
 anchor-kind: default-branch
 keepalive: e540bdc0
@@ -122,3 +123,5 @@ base: e828f7784ce1fc713a9d008a82d524bb62dcb6a1
 2026-09-05T21:13:27Z review · item aHoistedPass · reason verdict BLOCKED · blockers 2
 
 2026-09-05T22:53:30Z review · item aHoistedPass · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-06T00:32:49Z decision · item the closing review's round-2 finding 3 is WITHDRAWN unlanded, not fixed: the kit gate's import allow-list is a fourth hand-typed spelling of its conf key set and nothing joins it · reason Options seen: (a) land the join into check 22, which is where every other conf-key join lives — written, syntax-clean, and its predicate measured over the tracked tree at zero hits and zero near-misses; (b) pin its two new refusal branches in memory/project/unarmed-branches.txt, which is a shrink-only registry the drift audit already reports as not shrinking; (c) withdraw it and file the design. Took (c). Each of the two branches owes a positive arm under the harness meta-gate, the only suite that can carry one is on no gate leg by the 2026-08-23 owner ruling and could not complete a run on node a today, and the node itself stopped being able to fork — the kit gate died with 'couldn't create signal pipe' at 74 bash processes across three concurrent unattended runs. Landing a refusal whose failing case nobody has observed, into an unguarded merge-bar leg, is the exact shape this build spent two review rounds removing, so doing it to close a MEDIUM with no live instance would have been the worst trade available. What survives: the block is fenced by a bare gov:conf-allow-begin/-end sentinel pair, the leg's own comment says the join is not wired and why, and TOOL-aHoistedPass-40 carries the predicate, the sentinel design, the measurement and the self-matching-sed trap the first draft hit. Wiring it later is minutes.
