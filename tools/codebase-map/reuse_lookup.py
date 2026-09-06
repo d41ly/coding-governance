@@ -73,7 +73,11 @@ class Candidate:
     name: str
     sources: tuple[str, ...]        # subset of {symbol, inventory, affordance-seam, shared-seams}
     kind: str = ""                  # symbol kind (function/class/component/const-export), else ""
-    file: str = ""                  # def file (symbols only) — for fan-in + "read this"
+    # EVERY def file, not one. `TOOL-dTracedLattice-1` S1: a name merged across sources kept
+    # `file or prev.file`, so a symbol defined in several files was reachable through one arbitrary
+    # winner and the rest were unreachable at any K — 124 of 769 definitions in this repo. Ordered
+    # and deduped by first appearance, so the shortlist is deterministic.
+    files: tuple[str, ...] = ()     # def files (symbols only) — for fan-in + "read this"
     detail: str = ""                # inventory id / owning dossier — human context
 
 
@@ -182,18 +186,22 @@ def load_corpus(root: Path | None = None) -> Corpus:
 
     candidates: dict[str, Candidate] = {}
 
-    def merge(name: str, source: str, *, kind: str = "", file: str = "", detail: str = "") -> None:
+    def merge(name: str, source: str, *, kind: str = "", files: tuple[str, ...] = (),
+              detail: str = "") -> None:
         if not name:
             return
         prev = candidates.get(name)
         if prev is None:
-            candidates[name] = Candidate(name, (source,), kind, file, detail)
+            candidates[name] = Candidate(name, (source,), kind, files, detail)
             return
         candidates[name] = Candidate(
             name,
             tuple(dict.fromkeys(prev.sources + (source,))),
             kind or prev.kind,
-            file or prev.file,
+            # UNION, not `files or prev.files`. The last-write rule that governs the other fields is
+            # what made a co-defined symbol reachable through one definer; def files are the one
+            # field where every value is a real answer rather than a competing label.
+            tuple(dict.fromkeys(prev.files + files)),
             detail or prev.detail,
         )
 
@@ -201,7 +209,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
     has_symbols = (gen / "symbols.json").is_file()
     if has_symbols:
         for s in _read_json(gen / "symbols.json").get("symbols", []):
-            merge(s["id"], "symbol", kind=s["kind"], file=s["file"])
+            merge(s["id"], "symbol", kind=s["kind"], files=(s["file"],))
             symbol_files.append(s["file"])
 
     if (gen / "inventories.json").is_file():
@@ -287,7 +295,7 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     # structural neighbours of the symbol seeds — same def file, or same kind in the same dir.
     seed_syms = [pool[n] for n in seeds if pool[n].kind]
     seed_kinds = {c.kind for c in seed_syms}
-    seed_files = {c.file for c in seed_syms if c.file}
+    seed_files = {f for c in seed_syms for f in c.files}
     # The same-kind arm is narrowed to the seed's own DIRECTORY, which in this repo is the kit dir.
     # Kind alone admits nearly the whole corpus: measured over the pool the arm actually iterates,
     # 619 of 648 kinded candidates are `function`, so a function seed pulled in 95% of everything and
@@ -299,19 +307,21 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     # The reuse question a session asks is nearly always "does this already exist in the code I am
     # about to edit"; a candidate further away reaches the reader better through the same-file arm
     # or a shared-seam hit than through a kind match that would have admitted everything.
-    seed_dirs = {_derive_dir(c.file) for c in seed_syms if c.file}
+    seed_dirs = {_derive_dir(f) for c in seed_syms for f in c.files}
     neighbours: dict[str, str] = {}
     for name, cand in sorted(pool.items()):
         if name in seeds or not cand.kind:
             continue
-        if cand.file and cand.file in seed_files:
-            neighbours[name] = f"neighbour: same file as a hit ({cand.file})"
-        elif cand.kind in seed_kinds and cand.file and _derive_dir(cand.file) in seed_dirs:
+        shared = [f for f in cand.files if f in seed_files]
+        if shared:
+            neighbours[name] = f"neighbour: same file as a hit ({', '.join(shared)})"
+        elif cand.kind in seed_kinds and any(_derive_dir(f) in seed_dirs for f in cand.files):
             # The reason names the NARROWED predicate. A predicate that changes while its printed
             # reason does not is a gate lying quietly, and an empty neighbour list for a small
             # directory has to read as honest rather than broken.
+            where = sorted({_derive_dir(f) for f in cand.files if _derive_dir(f) in seed_dirs})
             neighbours[name] = (
-                f"neighbour: same kind ({cand.kind}) in {_derive_dir(cand.file)}"
+                f"neighbour: same kind ({cand.kind}) in {', '.join(where)}"
             )
 
     ranked: list[Ranked] = []
@@ -350,11 +360,11 @@ def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -
     and --converge so 'a seam' means one thing everywhere."""
     scored: list[tuple[Candidate, int]] = []
     for cand in corpus.candidates.values():
-        if "symbol" not in cand.sources or not cand.file:
+        if "symbol" not in cand.sources or not cand.files:
             continue  # only indexable symbols can have a fan-in / def file to point at
         if "affordance-seam" in cand.sources:
             continue  # already declared — off the worklist
-        fanin = m.fan_in(ref_index, cand.name, cand.file)
+        fanin = m.fan_in(ref_index, cand.name, cand.files)
         if fanin >= corpus.threshold:
             scored.append((cand, fanin))
     scored.sort(key=lambda cf: (-cf[1], cf[0].name))
@@ -387,7 +397,7 @@ def _derive_shortlist_key(r: Ranked) -> tuple:
 def _rank(pool: dict[str, Candidate], threshold: int, ref_index: dict[str, set[str]],
           name: str, is_seed: bool, reason: str) -> Ranked:
     cand = pool[name]
-    fanin = m.fan_in(ref_index, cand.name, cand.file) if cand.file else 0
+    fanin = m.fan_in(ref_index, cand.name, cand.files) if cand.files else 0
     is_seam = bool(cand.kind) and fanin >= threshold
     return Ranked(cand, is_seed, fanin, reason, is_seam)
 
@@ -462,9 +472,12 @@ def _line(r: Ranked, corpus: "Corpus | None" = None) -> str:
     bits = []
     if c.kind:
         bits.append(c.kind)
-    if c.file:
-        bits.append(c.file)
-    if c.file:
+    if c.files:
+        # EVERY definer. Printing one was the visible half of the S1 defect: `repo_root` has four
+        # and the shortlist named one, so three were unreachable to the reader as well as to the
+        # ranking.
+        bits.append(", ".join(c.files))
+    if c.files:
         bits.append(f"fan-in {r.fanin}")
     if r.is_seam:
         bits.append("SEAM")
@@ -502,12 +515,12 @@ def _scan_sources(shortlist: Shortlist):
         root_name = m.map_root().name
     for r in shortlist.ranked:
         c = r.candidate
-        if c.file:
-            yield "symbol", c.file.replace("\\", "/")
+        for f in c.files:
+            yield "symbol", f.replace("\\", "/")
         if ("affordance-seam" in c.sources or "shared-seams" in c.sources) and c.detail:
             where = "FOUNDATION.md" if c.detail == "foundation" else f"features/{c.detail}.md"
             yield "dossier", f"{root_name}/{where}"
-        elif "inventory" in c.sources and not c.file:
+        elif "inventory" in c.sources and not c.files:
             yield "inventory", c.detail
 
 

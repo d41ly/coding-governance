@@ -162,9 +162,18 @@ def _converge(base: str, head: str, files: list[str]) -> int:
     affordance_seams = frozenset(
         seam for t in texts.values() for seam in m.parse_affordance(t).seams
     )
+    # S1 — EVERY definer of an id at head, so `fan_in` subtracts the definitions rather than one
+    # arbitrary winner. Built here because this is the only place the head symbol table is in hand.
+    definers: dict[str, frozenset[str]] = {}
+    _by_id: dict[str, set[str]] = {}
+    for r in head_rows:
+        _by_id.setdefault(r["id"], set()).add(r["file"])
+    definers = {k: frozenset(v) for k, v in _by_id.items()}
+
     flags = m.detect_collisions(
         new_rows, base_rows, ref_index, range_index,
-        threshold=m.seam_fanin_threshold(root), affordance_seams=affordance_seams,
+        threshold=m.seam_fanin_threshold(root), definers=definers,
+        affordance_seams=affordance_seams,
     )
 
     # F7: route each flag to the durable, deduped reinvention backlog.
@@ -201,7 +210,9 @@ def _converge(base: str, head: str, files: list[str]) -> int:
     features = [k for k in texts if k != "foundation"]
     with_block = sum(1 for k in features if m.parse_affordance(texts[k]).has_block)
     cov = f"{100 * with_block // len(features)}% ({with_block}/{len(features)})" if features else "n/a"
-    dead = sum(1 for r in head_rows if m.fan_in(ref_index, r["id"], r["file"]) == 0)
+    # One reading per ID, not per ROW: a symbol with two definers appeared twice here and was
+    # counted twice, on top of the wrong subtraction S1 corrects.
+    dead = sum(1 for sid, dfs in sorted(definers.items()) if m.fan_in(ref_index, sid, dfs) == 0)
     print("\n# hygiene hints (NOT the convergence signal - see spec S5):")
     print(f"affordance_coverage: {cov} of feature dossiers carry a ## Reuse affordance block")
     print(f"dead_exports: {dead} symbol(s) with fan-in 0 (a hint - a used dup is not dead)")

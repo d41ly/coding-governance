@@ -9,6 +9,7 @@ backslash normalization must behave identically on every platform.
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 from pathlib import Path
@@ -896,10 +897,10 @@ def test_seed_affordances(tmp: Path):
     try:
         corpus = rl.load_corpus()
         ref = m.build_reference_index(corpus.symbol_files)
-        assert m.fan_in(ref, "slugify", "src/text.py") == 5
-        assert m.fan_in(ref, "titlecase", "src/text.py") == 4
-        assert m.fan_in(ref, "truncate", "src/text.py") == 3
-        assert m.fan_in(ref, "Cache", "src/cache.py") == 1  # below the threshold -> not a seam
+        assert m.fan_in(ref, "slugify", {"src/text.py"}) == 5
+        assert m.fan_in(ref, "titlecase", {"src/text.py"}) == 4
+        assert m.fan_in(ref, "truncate", {"src/text.py"}) == 3
+        assert m.fan_in(ref, "Cache", {"src/cache.py"}) == 1  # below the threshold -> not a seam
 
         worklist = rl.seed_affordances(corpus, ref, 10)
         # slugify EXCLUDED (already declares a seam) despite fan-in 5; Cache EXCLUDED (fan-in 1 < 3);
@@ -934,7 +935,7 @@ def test_reuse_shared_primitives(tmp: Path):
     idx = m.build_reference_index(["src/text.py"], root=tmp)
     refs = idx.get("slugify", set())
     assert "src/c.py" not in refs and "src/d.py" not in refs, refs  # string/comment-only dropped
-    assert m.fan_in(idx, "slugify", "src/text.py") == 2  # a.py + b.py, minus the def file
+    assert m.fan_in(idx, "slugify", {"src/text.py"}) == 2  # a.py + b.py, minus the def file
 
     # --- seam threshold from conf: default, override, fail-closed on a non-int -----------------
     assert m.seam_fanin_threshold(tmp) == m.SEAM_FANIN_THRESHOLD_DEFAULT  # no conf -> default
@@ -1311,18 +1312,22 @@ def test_detect_collisions_and_backlog(tmp: Path):
     # the range wires through fetchGateway (new2 references it) — an edge added -> not reinvention;
     # slugify has NO edge added in the range -> slugify2 is reinvention.
     range_index = {"fetchGateway": {"src/new2.py"}}
-    flags = m.detect_collisions(new, base, ref, range_index, threshold=3)
+    # S1 — the definer map `detect_collisions` no longer derives. Built from base + new the way
+    # `map_diff` builds it from head rows; `slugify` is deliberately CO-DEFINED so the arm below
+    # exercises the multi-definer subtraction rather than the one-path case.
+    definers = {r["id"]: frozenset({r["file"]}) for r in base + new}
+    flags = m.detect_collisions(new, base, ref, range_index, threshold=3, definers=definers)
     assert [f.new for f in flags] == ["slugify2"], flags               # exactly one collision
     only = flags[0]
     assert only.resembles == "slugify" and only.file == "src/new1.py" and only.fanin == 3
     assert only.kind == "function" and only.confidence == "medium"     # no affordance declared -> medium
     # F8c: when the seam DECLARES an affordance, confidence rises to high.
-    hi = m.detect_collisions(new, base, ref, range_index, threshold=3, affordance_seams=frozenset({"slugify"}))
+    hi = m.detect_collisions(new, base, ref, range_index, threshold=3, definers=definers, affordance_seams=frozenset({"slugify"}))
     assert hi[0].confidence == "high"
     # retryGateway stays clean ONLY because the range wired through fetchGateway — drop that edge and
     # it flags, proving the reference-edge check is load-bearing (not dead code). parseWidget/moneyBag
     # stay clean regardless (below-threshold seam / kind mismatch).
-    flagged_names = {f.new for f in m.detect_collisions(new, base, ref, {}, threshold=3)}
+    flagged_names = {f.new for f in m.detect_collisions(new, base, ref, {}, threshold=3, definers=definers)}
     assert flagged_names == {"slugify2", "retryGateway"}, flagged_names
     # KEYSTONE regression: a SAME-NAME reinvention (new `slugify` in another file) whose only
     # occurrence of the id in the range is its OWN definition must FLAG — a same-id row's
@@ -1330,20 +1335,20 @@ def test_detect_collisions_and_backlog(tmp: Path):
     # duplicate passes clean).
     dup = m.detect_collisions(
         [{"id": "slugify", "kind": "function", "file": "src/dup.py"}],
-        base, ref, {"slugify": {"src/dup.py"}}, threshold=3,
+        base, ref, {"slugify": {"src/dup.py"}}, threshold=3, definers=definers,
     )
     assert [f.new for f in dup] == ["slugify"], dup
     # control: a RENAMED symbol whose own file genuinely references the seam is a wire-through -> clean.
     wired = m.detect_collisions(
         [{"id": "slugify2", "kind": "function", "file": "src/new1.py"}],
-        base, ref, {"slugify": {"src/new1.py"}}, threshold=3,
+        base, ref, {"slugify": {"src/new1.py"}}, threshold=3, definers=definers,
     )
     assert wired == [], wired
     # control: the SAME rename with an edge from an UNRELATED file (not new1.py) still FLAGS —
     # the wire-through is scoped to the new symbol's own file, not the whole range.
     masked = m.detect_collisions(
         [{"id": "slugify2", "kind": "function", "file": "src/new1.py"}],
-        base, ref, {"slugify": {"src/z.py"}}, threshold=3,
+        base, ref, {"slugify": {"src/z.py"}}, threshold=3, definers=definers,
     )
     assert [f.new for f in masked] == ["slugify2"], masked
 
@@ -1671,6 +1676,9 @@ def main() -> int:
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
+    failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
+    failures += check_guarded("every co-defined symbol reaches every definer (AC2)",
+                              test_every_co_defined_symbol_reaches_every_definer)
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
     failures += check("map_imports: the rescued resolver's case table", test_map_imports_resolution)
     failures += check("map_imports: no sibling-kit import (AC7)", test_map_imports_has_no_sibling_kit_import)
@@ -1800,6 +1808,57 @@ def test_map_imports_matches_the_kit_it_was_rescued_from():
         a = mi.resolve_import(target, importer, ours)
         b = lex.resolve_import(target, importer, theirs)
         assert a == b, f"{target!r} from {importer!r}: rescued {a} vs original {b}"
+
+
+# --- S1: fan-in subtracts EVERY definer (TOOL-dTracedLattice-1) -----------------------------------
+def test_fan_in_subtracts_every_definer():
+    """The S1 core, in the smallest form that can fail.
+
+    A symbol defined in two files had ONE arbitrary definer subtracted, so the other definition
+    counted as a reference and the symbol scored fan-in for being defined twice.
+    """
+    ref = {"repo_root": {"a.py", "b.py", "c.py", "x/repo_root.py", "y/repo_root.py"}}
+    both = m.fan_in(ref, "repo_root", {"x/repo_root.py", "y/repo_root.py"})
+    one = len(ref["repo_root"] - {"x/repo_root.py"})
+    assert both == 3, both
+    # The arm is only worth anything if the two readings DIFFER on this fixture; assert that rather
+    # than trusting it, or a later fixture edit could make the row pass by finding nothing.
+    assert one == 4 and one != both, (one, both)
+    # A bare str is REFUSED, not iterated as characters. Python would subtract single letters and
+    # return the un-subtracted count — a wrong number with no error at the exact call sites this
+    # change corrects.
+    try:
+        m.fan_in(ref, "repo_root", "x/repo_root.py")
+    except TypeError as exc:
+        assert "SET of definer paths" in str(exc), str(exc)
+    else:
+        raise AssertionError("fan_in accepted a bare str instead of refusing it")
+
+
+def test_every_co_defined_symbol_reaches_every_definer():
+    """AC2 — after the name-merge fix, no definition is unreachable.
+
+    Guarded on the committed `symbols.json`: an opt-out repo has none, and this arm grades THIS
+    corpus rather than a fixture, so it says so instead of passing on an absent artifact.
+    """
+    root = m.repo_root()
+    gen = m.map_root(root) / "generated" / "symbols.json"
+    if not gen.is_file():
+        raise Skipped("no committed symbols.json, so there is no corpus to grade")
+    rows = json.loads(gen.read_text(encoding="utf-8")).get("symbols", [])
+    by_id: dict = {}
+    for r in rows:
+        by_id.setdefault(r["id"], set()).add(r["file"])
+    multi = {k: v for k, v in by_id.items() if len(v) > 1}
+    # LIVENESS. On a corpus with no co-defined symbol every assertion below is vacuous, and a green
+    # row would report coverage that does not exist. Refuse instead.
+    assert multi, ("no symbol in this corpus has more than one definer, so this arm proves nothing "
+                   "about the defect it exists to pin")
+    corpus = rl.load_corpus(root)
+    for sid, files in sorted(multi.items()):
+        cand = corpus.candidates.get(sid)
+        assert cand is not None, f"{sid} is in symbols.json and absent from the corpus"
+        assert set(cand.files) >= files, (sid, sorted(files), sorted(cand.files))
 
 if __name__ == "__main__":
     sys.exit(main())

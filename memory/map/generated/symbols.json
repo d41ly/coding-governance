@@ -3543,6 +3543,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_every_co_defined_symbol_reaches_every_definer",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_every_inventory_key_is_claimed_or_baselined",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
@@ -3574,6 +3579,11 @@
     },
     {
       "id": "test_extractor_helpers_fail_closed",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_fan_in_subtracts_every_definer",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },

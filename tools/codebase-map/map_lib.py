@@ -820,12 +820,28 @@ def build_reference_index(
     return index
 
 
-def fan_in(index: dict[str, set[str]], symbol_id: str, def_file: str) -> int:
-    """Distinct files referencing ``symbol_id`` as an identifier, minus its own def file (the
-    data-model definition). An import/identifier-scoped HEURISTIC, not a resolved call graph
-    (§3 non-goal): over-counts a common id (`get`), under-counts registry/dynamic dispatch — a
-    documented recall FLOOR used for ranking + a review WARN, never gated."""
-    return len(index.get(symbol_id, set()) - {def_file})
+def fan_in(index: dict[str, set[str]], symbol_id: str, def_files) -> int:
+    """Distinct files referencing ``symbol_id`` as an identifier, minus EVERY file that defines it.
+    An import/identifier-scoped HEURISTIC, not a resolved call graph (§3 non-goal): over-counts a
+    common id (`get`), under-counts registry/dynamic dispatch — a documented recall FLOOR used for
+    ranking + a review WARN, never gated.
+
+    ``def_files`` IS A SET OF PATHS, not one path, and that is `TOOL-dTracedLattice-1` S1. A symbol
+    defined in several files had one arbitrary definer subtracted and the others counted as
+    references, so a homonym scored fan-in for being defined twice. 124 of 769 definitions in this
+    repo have a co-definer.
+
+    **A bare `str` is REFUSED rather than accepted.** Python iterates a string as characters, so the
+    old one-path call site would subtract single letters and silently return the un-subtracted count
+    — a wrong number with no error, at exactly the call sites this change exists to correct. The
+    spec rejects a compatibility path for the same reason: a silent fallback at one site is how a
+    precision fix half-lands."""
+    if isinstance(def_files, str):
+        raise TypeError(
+            "fan_in takes a SET of definer paths, not one path: a str iterates as characters and "
+            f"would subtract letters instead of files (got {def_files!r}). Pass the definer set."
+        )
+    return len(index.get(symbol_id, set()) - set(def_files))
 
 
 def reference_index_for(
@@ -1208,6 +1224,7 @@ def detect_collisions(
     range_index: dict[str, set[str]],
     *,
     threshold: int,
+    definers: dict[str, frozenset[str]],
     affordance_seams: frozenset[str] = frozenset(),
 ) -> list[CollisionFlag]:
     """S5 closing loop (pure, deterministic). For each NEW symbol S, flag it iff it collides with
@@ -1221,7 +1238,13 @@ def detect_collisions(
 
     ``base_symbols`` (present at range base) is the seam POOL: a seam must have existed to be
     reinvented. ``new_symbols`` = head rows absent from base (all public — the extractors already
-    drop private names, so every kind here is an export). A malformed/empty stem yields no flag."""
+    drop private names, so every kind here is an export). A malformed/empty stem yields no flag.
+
+    ``definers`` maps a symbol id to EVERY file defining it at head, and is REQUIRED because this
+    function cannot derive it: it sees the base pool and the new rows, never the head symbol table,
+    so a seam co-defined in a file outside both would keep scoring fan-in for its own definition.
+    The caller owns that table and hands it over. No default, deliberately — a defaulted empty map
+    would silently restore the old, wrong subtraction at the one call site that matters."""
     seams_by_kind: dict[str, list[dict[str, str]]] = {}
     for e in base_symbols:
         seams_by_kind.setdefault(e["kind"], []).append(e)
@@ -1237,7 +1260,7 @@ def detect_collisions(
                 continue  # an identical row is not "new vs existing"
             if not (s_stems & stems(e["id"])):
                 continue
-            fe = fan_in(ref_index, e["id"], e["file"])
+            fe = fan_in(ref_index, e["id"], definers.get(e["id"], (e["file"],)))
             if fe < threshold:
                 continue  # E is not a seam — below the reuse threshold
             # "Wired through" = the NEW symbol's OWN file references E — scoped to s["file"], not
