@@ -5,7 +5,7 @@ opened: 2026-09-04
 streams: tooling
 roster: TOOL
 parents: aWeighedCanon
-ids: TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11
+ids: TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 TOOL-aJoinedCanon-12 TOOL-aJoinedCanon-13 TOOL-aJoinedCanon-14
 ---
 
 # aJoinedCanon — the spec format starts joining what it already numbers
@@ -96,7 +96,7 @@ findings in `memory/builds/aWeighedCanon/build/2026-09-04-build-TOOL-aWeighedCan
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 11 unit(s) · node a · opened 2026-09-04 · streams tooling
-ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11
+ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 TOOL-aJoinedCanon-12 TOOL-aJoinedCanon-13 TOOL-aJoinedCanon-14
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -114,7 +114,7 @@ ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCano
 | [TOOL-aJoinedCanon-11 — the base sha resolves to a real object](spec/2026-09-04-spec-TOOL-aJoinedCanon-11.md) | 11 | 1 | CLOSED | rev-5 | 2026-09-07 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
