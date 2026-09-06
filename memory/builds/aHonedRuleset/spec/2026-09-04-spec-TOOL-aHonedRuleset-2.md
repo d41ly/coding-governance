@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds
 
-**Status:** SPECCED · rev-7 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 1 · ratified 2026-09-04
+**Status:** CLOSED · rev-7 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling+playbook · order 1 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 

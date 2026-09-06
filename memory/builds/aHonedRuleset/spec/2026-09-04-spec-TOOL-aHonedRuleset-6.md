@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away
 
-**Status:** SPECCED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 1 · ratified 2026-09-04
+**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 1 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
