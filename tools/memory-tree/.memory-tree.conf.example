@@ -81,6 +81,19 @@ SCOPE_JOIN_CUTOFF=""
 # Blank = never required; set it strictly ahead of your corpus as with the cutoffs above.
 SPEC_FAILURE_MODE_CUTOFF=""
 
+# Two BRANCHES of check 23 (the acceptance ledger), never independent checks: a blank
+# ACCEPTANCE_LEDGER_CUTOFF disarms both whatever these say. LEDGER_LABEL_CUTOFF walks the LEDGER
+# side and reds an answer whose criterion label the spec does not number — every other arm walks the
+# spec side, so that direction was unwatched. LEDGER_TOKEN_CUTOFF requires an answer to share a
+# backticked token with the criterion it answers, so the two are joined by content rather than by
+# label alone. Case-folded containment either way, and an empty list on either side is silent.
+# Blank = off for each; set them strictly ahead of your corpus as with the cutoffs above.
+LEDGER_LABEL_CUTOFF=""
+# Its own block, not a shared one: the contiguous comment lines directly above a key row are what
+# a reader and the gate both take as that key's documentation. Same rule — a BRANCH of check 23,
+# so a blank ACCEPTANCE_LEDGER_CUTOFF disarms it whatever this key says.
+LEDGER_TOKEN_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.

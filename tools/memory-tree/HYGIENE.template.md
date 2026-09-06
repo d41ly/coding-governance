@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.64 -->
+<!-- gov:kit memory-tree@2.65 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -303,7 +303,10 @@ carry it too:
 ## Acceptance ledger — how a built unit evidences its criteria
 
 Inside a record whose `**Serves:**` kind is `journal`, which is already defined as evidence of what
-was built. One `**Evidences:**` line per unit, and one line per criterion beneath it:
+was built. Two further arms once the SPEC's filename date reaches `LEDGER_LABEL_CUTOFF` and
+`LEDGER_TOKEN_CUTOFF`: an answer whose criterion label the spec does not number is a finding, and an
+answer must share a backticked token with the criterion it answers, case-folded and either way round.
+Both are branches of the same check, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disarms them too. One `**Evidences:**` line per unit, and one line per criterion beneath it:
 
 ```
 **Evidences:** <id>

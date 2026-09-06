@@ -1,6 +1,6 @@
 # aJoinedCanon — acceptance ledger
 
-**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5
+**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6
 
 Node `a`, 2026-09-06, base `274aa39b`. One `**Evidences:**` block per unit, appended as each unit
 lands. Two forms and no third: OBSERVED carries a backticked token naming what made the observation,
@@ -74,6 +74,25 @@ AMENDED names the revision that changed the criterion.
 - AC6 — `sed -n '/^## Writing rules/,/^## Tier profiles/p' memory/TEMPLATE-SPEC.md | grep -c PINNED` — 0 → 1, so the second carrier the owner's F2 ruling requires exists in the Writing rules and not only in §6.
   figure: DERIVED, re-run on the pre-change tree immediately before the edit and returning 0 there.
 - AC7 — `grep -cE '^- .(cost|permission|fixture|figure):' memory/TEMPLATE-SPEC.md` — returns 4, so all four spellings the ruling names reached the rendered file. This is the content half AC1's sameness compare structurally cannot supply.
+
+**Evidences:** TOOL-aJoinedCanon-6
+
+- AC1 — `bash tools/memory-tree/check-memory-hygiene.sh` — `ARCH-tFixture-140/AC9`, a ledger answer labelling a criterion whose §6 stops at AC1, reds: `a journal record evidences a criterion label its own spec does not number`. Its properly-labelled sibling `140/AC1` is silent. Red observed on a scratch tree before the arm landed.
+- AC2 — `ARCH-tFixture-142/AC1` — criterion names `alpha.sh`, answer names only `zulu.py`, and the run reds `a ledger answer shares no backticked token with the criterion it claims to answer`.
+- AC3 — containment, not intersection — `notes.md` on a head line does not disqualify an answer whose wrap names `alpha.sh`; the pair passes because either token containing the other after case folding is a match.
+- AC4 — amended rev-6 — the ledger-side mirror asked for a green on an answer whose ONLY token sits on a continuation line, which is unreachable: `form` is first-line-scoped by §4's own design, so such an answer is `bad` under the pre-existing neither-legal-form branch and reds before arm B runs. The fixture written to the rev-5 wording redded for exactly that reason and is what found it. Amended to a token on the head line and the SHARED token in the wrap, and then observed both ways: `ARCH-tFixture-143` silent, `ARCH-tFixture-144` — the same shape with the continuation token deleted — reds. The SPEC-side half is `ARCH-tFixture-146`, whose criterion names its only token in its own wrap and which stays silent.
+- AC5 — `out6a` — with `LEDGER_LABEL_CUTOFF` set past the fixture spec's filename date, `140/AC9` stops being reported while `ARCH-tFixture-70/AC2` still is, so the rest of check 23's verdict is unchanged.
+- AC6 — `out6b` / `out6c` — blanking `LEDGER_LABEL_CUTOFF` silences the label arm while the token arm still reds `142/AC1`; blanking `LEDGER_TOKEN_CUTOFF` silences the token arm while the label arm still reds `140/AC9`. Each `!= ""` conjunct is exercised, and the pair is what proves the two keys are not one binding. In the self-test and not over the real tree, exactly as the criterion requires: with both cutoffs ahead of the fleet a whole-tree run is green either way.
+- AC7 — `bash tools/memory-tree/check-memory-hygiene.sh` — the landing tree prints both announce lines, `the ledger-LABEL arm graded NO unit` and `the ledger-TOKEN arm graded NO unit`, each naming its own key at `2026-09-07`. On this commit that is not a fixture case: it is what both arms print on the real corpus.
+- AC8 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — exits 0, 4 pairs. Sameness only; AC14 carries the content.
+- AC9 — `python tools/memory-tree/check-arms.py --check` — exits 0 with `ARMS_FLOORS` raised 20:20 → 22:22 for this engine. Both new `fail 23` branches were observed UNARMED first — the checker named each by its own failure text — and armed by the `hit` assertions on those two strings.
+- AC10 — `LEDGER_TOKEN_CUTOFF="2026-08-20"` over the real tree — the run EXITS NON-ZERO and arm B names **414** offending criteria. §4's uncommitted Python probe predicted 315 of 1,241, so the landed arm and the probe disagree by 99 and the landed arm is the authority. Written down rather than smoothed over, per the criterion. The value was reverted in the same session and no commit carries it.
+- AC11 — `<git-dir>/gate-ledger.tsv` — the pre-change `memory hygiene` elapsed row is **154.644 s**, read at this landing. The post-change row is a PUSH-BOUNDARY observation by this repo's own design — the full bar runs once, there, and no unit can produce that row at its own landing — so the pair is completed by the bar this build owes before it lands, and this line records the half that exists now rather than claiming both.
+- AC12 — `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh` — both exit 0; this landing carries `KIT_MEMORY_TREE_VERSION` 2.64 → 2.65 with every `gov:kit memory-tree@` carrier moved.
+- AC13 — `grep -qE '^LEDGER_(LABEL|TOKEN)_CUTOFF='` — both keys declared blank in the shipped example. The second half found a real defect: the extractor `awk '/^LEDGER_TOKEN_CUTOFF=/{printf "%s", b; exit} /^#/{b = b $0 "\n"; next} {b=""}'` returned 0 for the TOKEN key in BOTH confs, because it had no contiguous comment block of its own and inherited the label key's. That is the armed-key-undocumented-dependency state this half exists to catch, found by running the criterion rather than reading the prose. Each key now carries its own block naming `ACCEPTANCE_LEDGER_CUTOFF`, and all four (conf, key) pairs return non-zero.
+- AC14 — `grep -c 'LEDGER_TOKEN_CUTOFF' memory/HYGIENE.md` — 0 → 1, under the Acceptance-ledger heading, naming the key rather than the concept.
+- AC15 — `out6d` — with both new keys armed and `ACCEPTANCE_LEDGER_CUTOFF` BLANK — which is what the shipped example gives every adopter — neither arm fires and `HYGIENE check 23` does not appear at all. S9's nesting, observed.
+- AC16 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T18:19:10+03:00`; `last-body-change` unmoved.
 
 ## What the date re-derivation changed
 

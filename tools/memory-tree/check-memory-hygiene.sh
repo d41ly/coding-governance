@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.64   # gov:kit memory-tree@2.64 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.65   # gov:kit memory-tree@2.65 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -60,6 +60,11 @@ REV_SCOPE_CUTOFF=""     # date; specs dated >= this must give every rev-2+ §9 e
 SCOPE_JOIN_CUTOFF=""    # date; specs dated >= this must have every §2 scope item name an AC label or NOT OBSERVED (check 12); blank = never required
 # The EIGHTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-4).
 SPEC_FAILURE_MODE_CUTOFF="" # date; specs dated >= this must give every acceptance bullet a `Red when:` clause (check 12); blank = never required
+# TOOL-aJoinedCanon-6: two BRANCHES OF CHECK 23, never independent checks — the block they live in
+# opens on `[ "$STAGED" = 0 ] && [ -n "$alcut" ]`, so a blank ACCEPTANCE_LEDGER_CUTOFF disarms both
+# whatever their own keys say. Preset here for the same adopter argument as their siblings.
+LEDGER_LABEL_CUTOFF=""  # date; a ledger answer whose label the spec does not number is a finding (check 23); blank = never required
+LEDGER_TOKEN_CUTOFF=""  # date; a ledger answer must share a backticked token with its own criterion (check 23); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -1563,20 +1568,42 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # operand list would also make awk read stdin; an empty stream is a no-op. TOOL-aThawedCorpus-4.
   alledger=$(git ls-files "$M/builds/*/build/*.md" "$M/builds/*/reviews/*.md" 2>/dev/null | awk '
     { f = $0; if (f == "") next
-      j = 0; u = ""                       # per-RECORD reset; the retired spelling got this free
+      j = 0; u = ""; pu = ""; plab = ""; pform = ""; ptok = ""   # per-RECORD reset
       while ((getline line < f) > 0) {    # from a fresh process per file, and losing it would
         sub(/\r$/, "", line)              # a CRLF worktree on Linux delivers the CR into awk
         $0 = line                         # attribute one record'"'"'s criteria to the next
         if ($0 ~ /^\*\*Serves:\*\*/) j = ($0 ~ /\*\*Serves:\*\* *journal/)
-        if ($0 ~ /^\*\*Evidences:\*\* /) { u = (j ? $2 : ""); continue }
-        if ($0 ~ /^#/) { u = ""; continue }
+        if ($0 ~ /^\*\*Evidences:\*\* /) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
+          u = (j ? $2 : ""); continue }
+        if ($0 ~ /^#/) { if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
+          u = ""; continue }
         if (u != "" && $0 ~ /^- *(\*\*)?AC[0-9]+/) {
+          if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
           lab = $2; gsub(/\*/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
           form = ($0 ~ /`[^`]+`/) ? "obs" : (($0 ~ /amended rev-[0-9]+/) ? "amd" : "bad")
-          print u " " lab " " form
+          pu = u; plab = lab; pform = form; ptok = altoks($0)
+          continue
         }
+        # TOOL-aJoinedCanon-6: the TOKEN list is BULLET-scoped where form is FIRST-LINE-scoped, and
+        # the asymmetry is deliberate rather than an oversight. Widening form would reclassify every
+        # landed answer whose backtick sits in the wrap, which is a verdict change no criterion here
+        # asks for; widening the token list is what lets an answer be joined to its criterion at all,
+        # because this corpus wraps and puts the naming half in the wrap.
+        if (pu != "" && $0 !~ /^[ 	]*$/) ptok = ptok altoks($0)
       }
+      if (pu != "") { print pu " " plab " " pform "	" ptok; pu = "" }
       close(f)
+    }
+    # Backticked tokens, backtick-JOINED. The extractor is `[^`]+` so a captured token cannot itself
+    # contain a backtick, which is what makes the separator safe without an escape.
+    function altoks(s,   r, t) {
+      r = ""
+      while (match(s, /`[^`]+`/)) {
+        t = substr(s, RSTART + 1, RLENGTH - 2)
+        r = r t "`"
+        s = substr(s, RSTART + RLENGTH)
+      }
+      return r
     }')
   alpop=0; algap=""; albad=""; alnolab=""
   alspecs=$(git ls-files "$M/builds/*/spec/*.md" 2>/dev/null || true)
@@ -1600,6 +1627,7 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   # to do — a build's own folder owns its own prose — so the exemption is declared, auditable and
   # shrink-only, with its reason beside it in the conf.
   alsel=$(printf '%s\n' "$alspecs" | grep . | awk -v cut="$alcut" \
+      -v lcut="$LEDGER_LABEL_CUTOFF" -v tcut="$LEDGER_TOKEN_CUTOFF" \
       -v grand=" ${ACCEPTANCE_LEDGER_GRANDFATHER:-} " '
     { f = $0; seq++
       base = f; sub(/^.*\//, "", base)
@@ -1623,7 +1651,8 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
           lab = line
           sub(/^[ \t]*(-|\*)?[ \t]*(\*\*)?/, "", lab); sub(/[^A-Za-z0-9].*$/, "", lab)
           labs[++nlab] = lab
-        }
+          labt[nlab] = altoks(line)
+        } else if (nlab > 0 && line !~ /^[ \t]*$/) labt[nlab] = labt[nlab] altoks(line)
       }
       close(f)
       if (hdr !~ / CLOSED /) next
@@ -1631,33 +1660,97 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
       if (!hasac) next
       if (uid == "") next
       if (index(grand, " " uid " ") > 0) next    # grandfathered leaves the COUNT too, as it did
-      print "U\t" seq "\t" uid
-      for (i = 1; i <= nlab; i++) print "L\t" seq "\t" uid "\t" labs[i]
+      # TOOL-aJoinedCanon-6: the two ERA flags ride the U row rather than the filename date, so the
+      # date comparison stays in awk beside the one alcut already does and bash reads booleans.
+      labera = (lcut != "" && substr(base, 1, 10) >= lcut) ? 1 : 0
+      tokera = (tcut != "" && substr(base, 1, 10) >= tcut) ? 1 : 0
+      print "U\t" seq "\t" uid "\t" labera "\t" tokera
+      for (i = 1; i <= nlab; i++) print "L\t" seq "\t" uid "\t" labs[i] "\t" labt[i]
+    }
+    function altoks(s,   r, t) {
+      r = ""
+      while (match(s, /`[^`]+`/)) {
+        t = substr(s, RSTART + 1, RLENGTH - 2)
+        r = r t "`"
+        s = substr(s, RSTART + RLENGTH)
+      }
+      return r
     }')
   # The ledger as a MAP, built once. FIRST-WINS, because the retired lookup was `grep -m1` and a
   # bash associative array is last-wins; getting that backwards would silently reclassify a unit
   # whose ledger carries two lines for one criterion.
-  declare -A ALFORM
+  declare -A ALFORM ALTOK
   while IFS= read -r _al; do
     [ -n "$_al" ] || continue
-    _alk="${_al% *}"
-    [ -n "${ALFORM[$_alk]+x}" ] || ALFORM["$_alk"]="${_al##* }"
+    # TOOL-aJoinedCanon-6: the row is now `<unit> <label> <form>` TAB `<tokens>`. Split on the
+    # TAB first and then split the triple exactly as before, so the FIRST-WINS map semantics
+    # documented above are unchanged and a record with two lines for one criterion keeps the first.
+    IFS="	" read -r _altriple _altok <<<"$_al"
+    _alk="${_altriple% *}"
+    [ -n "${ALFORM[$_alk]+x}" ] || { ALFORM["$_alk"]="${_altriple##* }"; ALTOK["$_alk"]="$_altok"; }
   done <<<"$alledger"
   alU=$(printf '%s\n' "$alsel" | grep "^U	" || true)
+  # TOOL-aJoinedCanon-6: the two era flags, read BEFORE the label walk because arm B consults them
+  # inside it. A U row now carries `<seq> <uid> <labera> <tokera>`; an older stream carrying neither
+  # reads as 0 and both arms stay silent, which is what blank-means-off has to mean here too.
+  declare -A ALLABERA ALTOKERA
+  while IFS="	" read -r _et _eseq _euid _elab _etok; do
+    [ -n "$_euid" ] || continue
+    ALLABERA["$_euid"]="${_elab:-0}"; ALTOKERA["$_euid"]="${_etok:-0}"
+  done <<<"$alU"
   alpop=$(printf '%s\n' "$alU" | grep -c . || true)
   # Labels sorted per spec, deduplicated, in ONE sort rather than one per spec. `-k2,2n` is the
   # stream order the retired outer loop walked and `-k4,4` is the `sort -u` it applied inside it,
   # so the three failure strings below are built in exactly the order they were before. No LC_ALL,
   # matching the retired `sort -u`, which took the ambient collation.
-  declare -A ALHASLAB
-  while IFS="	" read -r _lt _lseq _luid _llab; do
+  declare -A ALHASLAB ALSPECLAB
+  altokbad=""
+  while IFS="	" read -r _lt _lseq _luid _llab _ltok; do
     [ -n "$_llab" ] || continue
     ALHASLAB["$_lseq"]=1
     _alk="$_luid $_llab"
+    ALSPECLAB["$_alk"]=1
     if [ -z "${ALFORM[$_alk]+x}" ]; then algap="$algap $_luid/$_llab"
     elif [ "${ALFORM[$_alk]}" = bad ]; then albad="$albad $_luid/$_llab"
     fi
+    # ---- TOOL-aJoinedCanon-6 ARM B: the ledger answer is joined to its own criterion by CONTENT,
+    # ---- not by label alone. Today a label match is the whole join, so an answer can name a
+    # ---- different file, command or arm from the criterion it claims to answer and nothing sees it
+    # ---- — provably wrong on a CLOSED, green unit. A pair passes when either token CONTAINS the
+    # ---- other after case folding, which is loose on purpose: a criterion naming a path and an
+    # ---- answer naming that path plus a flag must agree, and only a shared-nothing pair is a
+    # ---- finding. An EMPTY list on either side makes this silent for that criterion: an empty spec
+    # ---- side is check 12's acceptance-witness arm, and an empty ledger side is the `albad` branch
+    # ---- above. Neither is this arm's to re-report, and reporting them here would double-count.
+    if [ "${ALTOKERA[$_luid]:-0}" = 1 ] && [ -n "${ALFORM[$_alk]+x}" ] \
+       && [ -n "$_ltok" ] && [ -n "${ALTOK[$_alk]:-}" ]; then
+      _lhit=0; _lsave=$IFS; IFS='`'
+      for _lsa in $_ltok; do
+        [ -n "$_lsa" ] || continue
+        for _lla in ${ALTOK[$_alk]}; do
+          [ -n "$_lla" ] || continue
+          if [[ ${_lsa,,} == *"${_lla,,}"* || ${_lla,,} == *"${_lsa,,}"* ]]; then _lhit=1; break 2; fi
+        done
+      done
+      IFS=$_lsave
+      [ "$_lhit" = 1 ] || altokbad="$altokbad $_luid/$_llab"
+    fi
   done <<<"$(printf '%s\n' "$alsel" | grep "^L	" | sort -u -t"	" -k2,2n -k4,4)"
+  # ---- TOOL-aJoinedCanon-6 ARM A: a ledger answer whose label the spec does not number. The
+  # ---- existing arms walk the SPEC side and ask what the ledger is missing; nothing walked the
+  # ---- LEDGER side, so an answer labelled AC9 on a unit whose §6 stops at AC7 is invisible — it
+  # ---- satisfies nothing, blocks nothing, and reads as coverage. Bash associative-array key order
+  # ---- is unspecified, so the offenders are SORTED before the string is built; the sibling arms get
+  # ---- byte-stable output from a sorted input stream and this one has to earn it explicitly.
+  alorph=""
+  if [ "${#ALFORM[@]}" -gt 0 ]; then
+    alorph=$(for _ok in "${!ALFORM[@]}"; do
+        _ou="${_ok% *}"
+        [ "${ALLABERA[$_ou]:-0}" = 1 ] || continue
+        [ -n "${ALSPECLAB[$_ok]+x}" ] && continue
+        printf '%s/%s\n' "$_ou" "${_ok#* }"
+      done | sort | while IFS= read -r _or; do printf ' %s' "$_or"; done)
+  fi
   # A CLOSED Tier-2 spec with the heading and no labels cannot be evidenced, and "every criterion
   # is evidenced" is vacuously TRUE over none of them. That vacuity is the whole reason this arm
   # exists rather than being an oversight the check tolerates.
@@ -1668,7 +1761,20 @@ if [ "$STAGED" = 0 ] && [ -n "$alcut" ]; then
   [ -z "$algap" ] || fail 23 "a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable:$algap"
   [ -z "$albad" ] || fail 23 "an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox:$albad"
   [ -z "$alnolab" ] || fail 23 "a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true:$alnolab"
+  [ -z "$alorph" ] || fail 23 "a journal record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage:$alorph"
+  [ -z "$altokbad" ] || fail 23 "a ledger answer shares no backticked token with the criterion it claims to answer, so the two are joined by label alone and may describe different things:$altokbad"
   [ "$alpop" -gt 0 ] || printf 'memory-hygiene: check 23 measured NO unit — every closed Tier-2 spec predates ACCEPTANCE_LEDGER_CUTOFF, so a green verdict here is coverage of nothing\n'
+  # TOOL-aJoinedCanon-6: each new arm announces its OWN empty population. Both cutoffs ship ahead of
+  # the fleet, so on the landing commit each grades nothing, and a skip that looks like a pass is
+  # indistinguishable from coverage. Counted over the same U rows the arms read, by era flag.
+  if [ -n "$LEDGER_LABEL_CUTOFF" ]; then
+    _lgn=0; for _lk in "${!ALLABERA[@]}"; do [ "${ALLABERA[$_lk]}" = 1 ] && _lgn=$((_lgn+1)); done
+    [ "$_lgn" -gt 0 ] || printf 'memory-hygiene: the ledger-LABEL arm graded NO unit — LEDGER_LABEL_CUTOFF is %s and every closed Tier-2 spec predates it. Its coverage is its self-test fixtures, not this corpus.\n' "$LEDGER_LABEL_CUTOFF"
+  fi
+  if [ -n "$LEDGER_TOKEN_CUTOFF" ]; then
+    _tgn=0; for _tk in "${!ALTOKERA[@]}"; do [ "${ALTOKERA[$_tk]}" = 1 ] && _tgn=$((_tgn+1)); done
+    [ "$_tgn" -gt 0 ] || printf 'memory-hygiene: the ledger-TOKEN arm graded NO unit — LEDGER_TOKEN_CUTOFF is %s and every closed Tier-2 spec predates it. Its coverage is its self-test fixtures, not this corpus.\n' "$LEDGER_TOKEN_CUTOFF"
+  fi
 fi
 
 # --- empty-population report (see pop_guard). Reported ONCE, after every check has run, so the

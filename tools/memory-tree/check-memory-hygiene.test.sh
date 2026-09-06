@@ -64,7 +64,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -654,6 +654,62 @@ mkdir -p "$D/build"
   printf '**Evidences:** ARCH-tFixture-72\n- AC1 — it just works.\n\n'
   printf '**Evidences:** ARCH-tFixture-73\n- AC1 — `x` — observed.\n'
 } > "$D/build/2026-08-20-build-ARCH-tFixture-70-1-ledger.md"
+
+# ---- TOOL-aJoinedCanon-6: the two ledger-JOIN arms. LEDGER_LABEL_CUTOFF and LEDGER_TOKEN_CUTOFF are
+# ---- both 2026-08-20 in the shared conf, so these four specs are in the graded era; what each
+# ---- fixture varies is the LEDGER side, which is the side no arm walked before this unit.
+ledspec 140 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `alpha.sh`.'
+ledspec 142 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `alpha.sh`.'
+ledspec 143 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `alpha.sh`.'
+ledspec 145 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing that works.'
+ledspec 144 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `alpha.sh`.'
+# 146 — AC4's SPEC-side half: the CRITERION's only token sits on its own continuation line.
+#       `form` does not reach the spec side at all, so this one needs no head token.
+ledspec 146 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed at length
+  by `alpha.sh`, which is named only here.'
+{ printf '# ledger two
+
+**Serves:** journal ARCH-tFixture-140 ARCH-tFixture-142 ARCH-tFixture-143 ARCH-tFixture-144 ARCH-tFixture-145 ARCH-tFixture-146
+
+'
+  # 140 — an answer labelled AC9 on a unit whose §6 stops at AC1. It satisfies nothing, blocks
+  # nothing, and before ARM A nothing walked the ledger side to notice.
+  printf '**Evidences:** ARCH-tFixture-140
+- AC1 — `alpha.sh` — observed.
+- AC9 — `alpha.sh` — observed a criterion nobody numbered.
+
+'
+  # 142 — the labels agree and the CONTENT does not. This is the defect on a CLOSED, green unit.
+  printf '**Evidences:** ARCH-tFixture-142
+- AC1 — `zulu.py` — observed something else entirely.
+
+'
+  # 143 — the shared token is on the answer CONTINUATION line, which is why the ledger emitter had to
+  # become bullet-scoped: this corpus wraps and puts the naming half in the wrap.
+  printf '**Evidences:** ARCH-tFixture-143
+- AC1 — `notes.md` — observed something, described at length,
+  and the thing observed was `alpha.sh`.
+
+'
+  # 144 — the SAME shape with the continuation token deleted. Its head token still makes it a legal
+  # OBSERVED line, so `form` is happy and only arm B can red it: this is the pair that proves the
+  # continuation accumulation is load-bearing rather than decorative.
+  printf '**Evidences:** ARCH-tFixture-144
+- AC1 — `notes.md` — observed something, described at length,
+  and the thing observed is not named here.
+
+'
+  # 145 — the CRITERION carries no token. That is check 12's acceptance-witness arm, not this one,
+  # and reporting it here would double-count a finding another arm already owns.
+  printf '**Evidences:** ARCH-tFixture-145
+- AC1 — `zulu.py` — observed.
+
+'
+  # 146 — the criterion names its token in ITS wrap and the answer names it on the head line.
+  printf '**Evidences:** ARCH-tFixture-146
+- AC1 — `alpha.sh` — observed.
+'
+} > "$D/build/2026-08-20-build-ARCH-tFixture-140-1-ledger.md"
 # CHECK 22's FIXTURES SIT ABOVE THE COMMIT, and that is load-bearing rather than tidy: the hygiene
 # engine selects its population with `git ls-files`, so a fixture written after this commit is
 # UNTRACKED and invisible to it. Written below, all six were ignored, check 22 graded nothing, and
@@ -710,6 +766,17 @@ miss 'ARCH-tFixture-74'                        # WONTDO owes nothing
 miss 'ARCH-tFixture-75'                        # Tier-1 whose section 6 is Gates: legal, and located by HEADING
 miss 'ARCH-tFixture-76'                        # dated before the cutoff
 hit  'a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable'
+
+# ---- TOOL-aJoinedCanon-6: the two ledger-join arms, and the two `fail 23` branches they add.
+hit  'a journal record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage'
+hit  'ARCH-tFixture-140/AC9'                   # the answer labels a criterion §6 does not number
+miss 'ARCH-tFixture-140/AC1'                   # ...and its properly-labelled sibling is silent
+hit  'a ledger answer shares no backticked token with the criterion it claims to answer, so the two are joined by label alone and may describe different things'
+hit  'ARCH-tFixture-142/AC1'                   # labels agree, content shares nothing
+miss 'ARCH-tFixture-143/AC1'                   # the shared token is on the answer continuation line
+hit  'ARCH-tFixture-144/AC1'                   # ...and deleting that continuation token reds it
+miss 'ARCH-tFixture-146/AC1'                   # the CRITERION names its token in its own wrap
+miss 'ARCH-tFixture-145/AC1'                   # the CRITERION has no token: check 12's arm, not this
 hit  'an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox'
 hit  'a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true'
 
@@ -1165,6 +1232,42 @@ out3f=$(bash "$SCRIPT" 2>/dev/null)
 if grep -qF 'no backticked witness' <<<"$out3f"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
 n=$((n+1))
 grep -qF 'tFixture-125.md (acceptance bullets naming no failure mode' <<<"$out3f" || { echo "FAIL: the failure-mode arm went silent with only its OWN key armed — the accumulator is still nested in the witness guard"; st=1; }
+
+# ---- TOOL-aJoinedCanon-6: the three conf-shaped observations its arms owe. Each writes a conf, runs
+# ---- the engine over the SAME fixture tree, and reads one arm against the other.
+# AC5 — LEDGER_LABEL_CUTOFF set PAST the fixture spec's filename date: the orphan label stops being
+# reported, and the rest of check 23's verdict on that tree is unchanged (140/AC1 stays silent, and
+# the criterion-not-evidenced arm still reports 70/AC2).
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nLEDGER_LABEL_CUTOFF="2026-09-30"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out6a=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'ARCH-tFixture-140/AC9' <<<"$out6a"; then echo "FAIL: the orphan-label arm fired with LEDGER_LABEL_CUTOFF past the spec date"; st=1; fi
+n=$((n+1))
+grep -qF 'ARCH-tFixture-70/AC2' <<<"$out6a" || { echo "FAIL: raising LEDGER_LABEL_CUTOFF changed check 23's other verdicts"; st=1; }
+# AC6 — one new key BLANK, the other ARMED. The blanked arm's own red fixture goes green while the
+# armed arm's still reds. This is the only exercise of each `!= ""` conjunct, and it cannot be done
+# over the real tree: with both cutoffs ahead of the fleet a whole-tree run is green either way, so
+# a real-tree green cannot fail for the reason this criterion gives.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out6b=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'ARCH-tFixture-140/AC9' <<<"$out6b"; then echo "FAIL: the orphan-label arm fired with LEDGER_LABEL_CUTOFF blank"; st=1; fi
+n=$((n+1))
+grep -qF 'ARCH-tFixture-142/AC1' <<<"$out6b" || { echo "FAIL: blanking LEDGER_LABEL_CUTOFF also disarmed the TOKEN arm — the two share a binding"; st=1; }
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nLEDGER_LABEL_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out6c=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'ARCH-tFixture-142/AC1' <<<"$out6c"; then echo "FAIL: the token arm fired with LEDGER_TOKEN_CUTOFF blank"; st=1; fi
+n=$((n+1))
+grep -qF 'ARCH-tFixture-140/AC9' <<<"$out6c" || { echo "FAIL: blanking LEDGER_TOKEN_CUTOFF also disarmed the LABEL arm — the two share a binding"; st=1; }
+# AC15 — S9's NESTING, observed. Both new keys armed and ACCEPTANCE_LEDGER_CUTOFF BLANK, which is what
+# the shipped example conf gives every adopter: check 23 prints nothing at all and neither arm fires.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out6d=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qE 'ARCH-tFixture-140/AC9|ARCH-tFixture-142/AC1' <<<"$out6d"; then echo "FAIL: a ledger-join arm fired with ACCEPTANCE_LEDGER_CUTOFF blank — the arms are not nested in check 23"; st=1; fi
+n=$((n+1))
+if grep -qF 'HYGIENE check 23' <<<"$out6d"; then echo "FAIL: check 23 ran at all with a blank ACCEPTANCE_LEDGER_CUTOFF"; st=1; fi
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 
 # ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector
