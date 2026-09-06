@@ -1448,7 +1448,14 @@ if [ -n "$KICKOFF_ENGINE" ]; then
       if [ ! -f "$LIVEDOC" ]; then
         fail 12 "KICKOFF_EXITS declares a floor on the kickoff engine's interactive exits, which now live in the installed protocol, and there is no protocol at $LIVEDOC to count them in -- the count would read zero and every exit would look dropped"
       else
-        nex=$(tr -d '\r' < "$LIVEDOC" | grep -cE '^[0-9]+\. \*\*Step ' || true)
+        # SECTION-SCOPED, because three declarations promise a section-13 count and a whole-file
+        # count is not that. They agree today only by accident: this protocol already uses the
+        # `N. **Bold` idiom outside section 13, and one such item leading `**Step ` would raise the
+        # numerator and let an exit be dropped from 13 while the shrink-only floor still passed.
+        if ! grep -qE '^## 13[.] ' "$LIVEDOC"; then
+          fail 12 "KICKOFF_EXITS declares a floor counted in section 13 of the installed protocol, and there is no section 13 heading in $LIVEDOC -- the count would read zero and every exit would look dropped"
+        fi
+        nex=$(tr -d '\r' < "$LIVEDOC" | awk '/^## 13[.] /{f=1;next} f&&/^## /{f=0} f' | grep -cE '^[0-9]+\. \*\*Step ' || true)
         [ "$nex" -ge "$KICKOFF_EXITS" ] \
           || fail 12 "the installed protocol enumerates fewer of the kickoff engine's interactive exits than the floor, and a dropped exit is a place an unattended run silently regains to stop: $nex against $KICKOFF_EXITS in $LIVEDOC"
       fi

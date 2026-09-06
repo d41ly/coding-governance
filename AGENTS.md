@@ -137,7 +137,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
 
 **Kickoff-manifest merge exception.**
 
-- The manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD on the default branch, the merge-base otherwise; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
+- The manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
 
 **Unattended runs** *(kit-conditional — drop this block if the project does not adopt the unattended-run kit).*
 

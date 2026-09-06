@@ -218,7 +218,7 @@ Before the first pass, load the project's build method if it ships one — `<MEM
 rendered by the memory-tree kit. It carries the spec set, the fork rule, the pass loop and the
 regrounding procedure, none of which this engine states.
 
-**Six other steps of this engine also stop to ask, and a mandated run that stops at one is stuck, not
+**Six other interactive exits of this engine stop to ask, and a mandated run that stops at one is stuck, not
 unattended.** `<MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md` §13 enumerates them and how each resolves
 with no owner turn; this step's hand-back is the only one of the six the mandate buys. Not restated
 here — a paraphrase and its source are two answers to one question.
