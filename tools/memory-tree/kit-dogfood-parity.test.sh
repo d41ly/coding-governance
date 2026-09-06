@@ -50,7 +50,7 @@ TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
 [ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"
 
 MODE="${1:---check}"
-PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPEC-TEMPLATE.template.md $M/guides/BUILD-METHOD.md:$KITREL/BUILD-METHOD.template.md"
+PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPEC-TEMPLATE.template.md $M/guides/BUILD-METHOD.md:$KITREL/BUILD-METHOD.template.md $M/guides/ANNOTATION-STYLE.md:$KITREL/ANNOTATION-STYLE.template.md"
 
 # NOT "byte-identical IN INTENT" any more, which is what the previous version of this comment
 # claimed while the two spellings sat in two files with two variable names and nothing comparing

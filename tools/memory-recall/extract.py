@@ -22,7 +22,9 @@ version is committed, stdlib-only, and runs anywhere git does.
 
 Three document sets, because they fail differently and the measurement uses all of them:
 
-  spine    one anchored record, definition homes only (DECISIONS.md / decisions/ / BACKLOG.md)
+  spine    one anchored record, definition homes only: DECISIONS.md, BACKLOG.md, an index named
+           for an id FAMILY, anything under decisions/, and rotated archive/<INDEX>.<date>.md --
+           under the root or one directory down, so both the flat and the nested layout match
   records  one anchored record, anywhere -- including builds/, journals and archives
   chunks   heading-bounded slices of the whole corpus, capped at CHUNK_MAX chars
 
@@ -128,11 +130,51 @@ A_DASH = re.compile(r"^\s*[-*]\s+[`*]*(" + ID + r")\b[`*]*\s*[·|]")
 # (below). `anchors.json` is built from `records`, and `check_recall.py` grades `records`+`chunks`,
 # so no gate and no merge-bar floor reads this. `bench.py --sets spine` moves; nothing else does.
 _ROOT = re.escape(CONF.memory_root)  # FORKED: the corpus root is a conf value, not a literal
+# FORKED: the directory segment below the root is OPTIONAL, and an index named for an id FAMILY is
+# admitted beside DECISIONS/BACKLOG. Upstream's tree is nested -- `<root>/<dir>/DECISIONS.md` -- and
+# every alternation required that segment, so on a FLAT root, which is the shape the memory-tree
+# kit's own adopter writes, nothing matched and `spine` was silently empty. Measured here before
+# wiring: 0 files matched the nested-only pattern against 1325 tracked, and the form below matches 9
+# -- the decision log, the four backlog shards and the four rotated archives -- with zero
+# near-misses among index-shaped basenames. Both layouts, one pattern; nothing that matched before
+# stops matching.
+#
+# The family alternation is DERIVED from `CONF.families` and is never a literal list: this repo's
+# four prefixes are not an adopter's, and a literal would ship them into every installed kit.
+_IDX = "(?:DECISIONS|BACKLOG|" + "|".join(re.escape(f) for f in CONF.families) + ")"
 DURABLE = re.compile(
-    rf"{_ROOT}/[^/]+/(DECISIONS|BACKLOG)\.md$"
-    rf"|{_ROOT}/[^/]+/decisions/[^/]+\.md$"
-    rf"|{_ROOT}/[^/]+/archive/(DECISIONS|BACKLOG)\.[^/]+\.md$"
+    rf"{_ROOT}/(?:[^/]+/)?{_IDX}\.md$"
+    rf"|{_ROOT}/(?:[^/]+/)?decisions/[^/]+\.md$"
+    rf"|{_ROOT}/(?:[^/]+/)?archive/{_IDX}\.[^/]+\.md$"
 )
+
+
+def render_empty_spine_diagnosis(n_records: int, n_spine: int) -> str | None:
+    """A non-empty ``records`` beside an empty ``spine``. ``None`` when there is nothing to say.
+
+    Unlike zero records, this state has NO honest reading. Records exist, so the corpus root and the
+    id grammar both work, and the only remaining cause is that ``DURABLE`` describes a layout this
+    tree does not have -- which is exactly what shipped: the pattern required a directory segment
+    the flat layout has none of, and the ``spine`` set was empty here, and in any adopter with a
+    flat memory root, for a month with nothing saying so.
+
+    A PRINT rather than a refusal, matching ``zero_record_diagnosis`` exactly. The defect was
+    invisible because nothing SAID anything, not because nothing refused, and a refusal would block
+    an adopter mid-migration whose repo was working a minute earlier.
+    """
+    if n_spine or not n_records:
+        return None
+    return (
+        f"EMPTY SPINE — {n_records} records extracted but 0 durable homes matched.\n"
+        f"  DURABLE resolved to: {DURABLE.pattern}\n"
+        f"  MEMORY_ROOT resolved to: {CONF.memory_root}\n"
+        f"  FAMILIES resolved to: {' '.join(CONF.families)}\n"
+        "  Records exist, so the root and the id grammar both work. The pattern above is\n"
+        "  describing index files this tree does not have. It looks for, under the root and\n"
+        "  optionally one directory down: DECISIONS.md, BACKLOG.md, <FAMILY>.md, anything under\n"
+        "  decisions/, and rotated archive/<INDEX>.<date>.md. `bench.py --sets spine` grades an\n"
+        "  empty set until this is fixed; nothing else reads it."
+    )
 
 CHUNK_MAX = 2400
 
@@ -657,6 +699,9 @@ def main() -> int:
     diag = zero_record_diagnosis(len(records), len(chunks))
     if diag:
         print(diag, file=sys.stderr)
+    spine_diag = render_empty_spine_diagnosis(len(records), len(spine))
+    if spine_diag:
+        print(spine_diag, file=sys.stderr)
     for n, rows in (("spine", spine), ("records", records), ("chunks", chunks)):
         print(f"{n:<11} {len(rows):>7} docs, {sizes[n]:>10} indexed chars")
     print(f"ids cited   {len(cited):>7}")

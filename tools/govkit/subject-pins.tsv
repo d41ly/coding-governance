@@ -25,6 +25,7 @@ check-arms selftest	kit	selftests
 check-wiring self-test	kit	selftests
 codebase-map adopter e2e	kit	e2e
 codebase-map coverage + freshness	repo	declarations
+codebase-map gate coverage	repo	declarations
 codebase-map kit selftest	kit	selftests
 corpus-ids selftest	kit	selftests
 dead-path carriers (deleted files still named)	repo	declarations

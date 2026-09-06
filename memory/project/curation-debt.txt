@@ -31,12 +31,16 @@ memory/builds/aUnmannedHelm/README.md
 # subject is not a build README. Both parents were legal and within a hair of the cap; the row driver
 # unioned them correctly and the result was over.
 #
-# THE ORIGINAL PREMISE EXPIRED, 2026-08-21: rotation was rejected because exactly ONE row was
-# terminal, so rotating shed less than the rotation note it must add. Re-derived on the same tree,
-# nineteen rows were terminal. Rotation is the live remedy and this row now describes a drain nobody
-# has performed rather than one that cannot be.
+# ROTATION IS NOT THE REMEDY, MEASURED 2026-09-04. An earlier note here said it was, on a re-derivation
+# that counted nineteen terminal rows. Measured by status against the whole shard: rotating EVERY
+# terminal row sheds 56442 B and leaves 203953 B against INDEX_CAP_BYTES=61440 - still 3.3x over. The
+# mass is 247 OPEN rows at a mean of 780 B, so the remedy is a SPLIT of the shard or a sweep shortening
+# rows, and rotation provably cannot reach it. The figures are quoted from
+# memory/builds/aWeighedCompass/build/2026-09-04-build-TOOL-aWeighedCompass-1-findings.md, findings 9
+# and 11, and are measured-at values that drift as rows land - re-measure there rather than trusting
+# this line. The owner call on which remedy to take is carried at TOOL-aWeighedCompass-3.
 # BLAST RADIUS, stated because a debt row is wider than the failure that earned it: this silences
 # checks 6, 7 AND 8 on TOOL.md, not just the byte cap. Check 8 is NOT idle here - with the registry
 # emptied it reds on line 34 - so this row is currently hiding one real status-token fault as well as
-# the width. Drains when the TOOL index is rotated or split.
+# the width. Drains when the TOOL index is split or its rows are shortened.
 memory/backlog/TOOL.md

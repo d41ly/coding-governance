@@ -291,6 +291,7 @@
       "memory/HYGIENE.md",
       "memory/TEMPLATE-SPEC.md",
       "memory/guides/BUILD-METHOD.md",
+      "memory/guides/ANNOTATION-STYLE.md",
       "tools/lib/",
       "tools/memory-tree/"
     ],
@@ -581,6 +582,19 @@
     "ceiling": 300
   },
   {
+    "name": "codebase-map gate coverage",
+    "argv": [
+      "python3",
+      "tools/codebase-map/check_gate_coverage.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "guard": [
+      "tools/codebase-map/"
+    ],
+    "ceiling": 60
+  },
+  {
     "name": "codebase-map coverage + freshness",
     "argv": [
       "python3",
@@ -729,7 +743,7 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 2400
+    "ceiling": 5400
   },
   {
     "name": "brief-recorded",

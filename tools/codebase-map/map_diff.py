@@ -17,7 +17,8 @@ no human remembering. Commit the rewritten file with the change.
 --converge (S5): the closing loop. Reports the convergence signals over the range —
 `collision_flags` (each NEW exported symbol that resembles an existing high-fan-in seam of the
 same kind it did NOT wire through — shipped reinvention, over ALL new code) routed as a review
-WARN to <MAP_ROOT>/reinvention-backlog.md (deduped), plus `new_clones` (the adopted
+WARN to <git-common-dir>/codebase-map/reinvention-backlog.md (deduped; it falls back into
+<MAP_ROOT>/ only where git cannot answer at all), plus `new_clones` (the adopted
 clone-ratchet's count, or null) — and the demoted hygiene hints affordance_coverage_% /
 dead_exports (explicitly NOT the convergence signal). A REPORT + WARN, never a gate (F5): a
 convergence metric that hard-fails false-fails on legitimate feature churn. Always exits 0.
@@ -96,20 +97,32 @@ def _drop_affordance_exempt(touched: dict[str, list[str]]) -> None:
 # ======================================================================================
 
 
-def _symbols_at_ref(root: Path, ref: str, rel: str) -> list[dict]:
-    """symbols.json rows at a git ref (POSIX rel path), fail-open to [] — a range that predates
-    the SYMBOL tier (or a fresh adoption) simply has no baseline, so nothing reads as reinvented
-    (advisory, never a crash)."""
+def _symbols_at_ref(root: Path, ref: str, rel: str) -> list[dict] | None:
+    """symbols.json rows at a git ref (POSIX rel path), or ``None`` when that ref carries no such
+    file at all.
+
+    THE None IS THE POINT (ABL-bCandidLoupe-2, ported from inCMS). This used to fail open to ``[]``
+    for both the absent file and a present-but-empty one, and ``_converge`` cannot tell those apart
+    from a list: with no baseline no seam reaches the fan-in threshold, so ``collision_flags``
+    printed ``0`` on every range whose base predates the SYMBOL tier. Measured on the adopting repo:
+    ``0`` over a range starting before the tier landed, and ``538`` over a base after it — the
+    signal read cleanest exactly where it could see least, which is the confident-empty-answer class
+    ``map_lib`` names at its own line 162 and ``selftest`` already refuses for the mis-rooted CLI.
+
+    Three states, not two: the ref has the file and it holds rows (a list); the ref has the file and
+    it holds none (an empty list, a real measurement of zero); the ref has no file (``None``, not
+    measurable). Callers decide what to do with the third — they may no longer silently average it
+    into the second."""
     out = subprocess.run(
         ["git", "-C", str(root), "show", f"{ref}:{rel}"],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if out.returncode != 0 or not out.stdout.strip():
-        return []
+        return None
     try:
         data = json.loads(out.stdout)
     except json.JSONDecodeError:
-        return []
+        return None
     return data.get("symbols", []) if isinstance(data, dict) else []
 
 
@@ -121,6 +134,58 @@ def _read_symbols(path: Path) -> list[dict]:
     except (json.JSONDecodeError, OSError):
         return []
     return data.get("symbols", []) if isinstance(data, dict) else []
+
+
+def render_legacy_note(legacy: Path, current: Path, root: Path) -> str:
+    """The line an adopter carrying the pre-move file needs, or `""` when there is nothing to say.
+
+    A separate function so it can be ARMED: the migration case exists only because the
+    destination moved, and a `--converge` run in a clean fixture — which is what AC1 grades —
+    never reaches it. Nothing here DELETES: the file may hold rows nobody has read, and a tool
+    that silently removes a durable record is the shape this unit exists to stop.
+    """
+    # `legacy == current` on the fail-open path, where git could not answer and the destination
+    # fell back into the map tree. Naming the file the run just wrote to, and telling the reader to
+    # delete it, is worse than saying nothing.
+    if not legacy.is_file() or legacy == current:
+        return ""
+    where = legacy.relative_to(root).as_posix() if legacy.is_relative_to(root) else legacy.as_posix()
+    return (f"\nnote: {where} is a LEGACY location and is NO LONGER WRITTEN. Nothing here deletes "
+            f"it — it may hold rows nobody has read. Fold or delete it by hand; new rows go to "
+            f"{current.as_posix()}.")
+
+
+def derive_backlog_path(root: Path) -> Path:
+    """Where the reinvention backlog is written: OUTSIDE the worktree, under the git COMMON dir.
+
+    Ratified by the owner on 2026-09-05, reversing `bConvergentLodestar` F7, which chose a tracked
+    destination. The ground for reversing is practice rather than a defect in F7's reasoning: the
+    rows have never been reviewed by anyone, because the file has never been tracked on any branch
+    and was therefore untracked clutter inside the gated memory tree after every `--converge` run.
+
+    `--git-common-dir`, NEVER `--git-dir`, and the tree is not uniform about this so the choice is
+    stated rather than copied. In a LINKED WORKTREE `--git-dir` is `.git/worktrees/<name>`, which
+    `git worktree remove` deletes outright, taking a durable record with it. ONE existing consumer
+    resolves the common dir for exactly that reason — the memory-recall kit's query entrypoint,
+    whose `<git-common-dir>/recall/queries.jsonl` is the spelling followed here; the gate runner and
+    the lander both use `--git-dir` for records that are meant to die with their worktree. The raw value
+    is RELATIVE (a bare `.git`) at the repo root and absolute elsewhere, so it is resolved either
+    way rather than used as given.
+
+    Fails OPEN back into the map tree where git cannot answer at all: this is a WARN path, never a
+    gate, and refusing to report a convergence signal because a subprocess failed would be a worse
+    trade than writing where the old release wrote.
+    """
+    try:
+        raw = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
+                             capture_output=True, text=True, check=True).stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        return m.map_root(root) / "reinvention-backlog.md"
+    if not raw:
+        return m.map_root(root) / "reinvention-backlog.md"
+    gd = Path(raw)
+    gd = gd if gd.is_absolute() else (root / raw)
+    return gd.resolve() / "codebase-map" / "reinvention-backlog.md"
 
 
 def _new_clones(root: Path, conf: dict[str, str]) -> int | None:
@@ -143,13 +208,20 @@ def _converge(base: str, head: str, files: list[str]) -> int:
     map_dir = m.map_root(root)
     sym_rel = f"{conf['MAP_ROOT']}/generated/symbols.json"
 
-    head_rows = _symbols_at_ref(root, head, sym_rel) or _read_symbols(map_dir / "generated" / "symbols.json")
+    # The HEAD fallback is a DIFFERENT and legitimate path: when the head ref is the checkout, the
+    # working-tree file is the honest answer. Only the committed-ref read can be unmeasurable.
+    head_rows = _symbols_at_ref(root, head, sym_rel)
+    if head_rows is None:
+        head_rows = _read_symbols(map_dir / "generated" / "symbols.json")
     print(f"# map-diff --converge {base}..{head}")
     if not head_rows:
         print("no generated/symbols.json (SYMBOL recall tier not adopted) - nothing to converge.")
         return 0
 
     base_rows = _symbols_at_ref(root, base, sym_rel)
+    base_measurable = base_rows is not None
+    if base_rows is None:
+        base_rows = []
     base_key = {(r["id"], r["kind"], r["file"]) for r in base_rows}
     new_rows = [r for r in head_rows if (r["id"], r["kind"], r["file"]) not in base_key]
 
@@ -162,35 +234,75 @@ def _converge(base: str, head: str, files: list[str]) -> int:
     affordance_seams = frozenset(
         seam for t in texts.values() for seam in m.parse_affordance(t).seams
     )
-    flags = m.detect_collisions(
-        new_rows, base_rows, ref_index, range_index,
-        threshold=m.seam_fanin_threshold(root), affordance_seams=affordance_seams,
-    )
+    # S1 — EVERY definer of an id at head, so `fan_in` subtracts the definitions rather than one
+    # arbitrary winner. Built here because this is the only place the head symbol table is in hand.
+    definers: dict[str, frozenset[str]] = {}
+    _by_id: dict[str, set[str]] = {}
+    for r in head_rows:
+        _by_id.setdefault(r["id"], set()).add(r["file"])
+    definers = {k: frozenset(v) for k, v in _by_id.items()}
 
-    # F7: route each flag to the durable, deduped reinvention backlog.
-    backlog_path = map_dir / "reinvention-backlog.md"
+    # BOTH parents' changes, and they are orthogonal. `main` guards the whole collision pass on
+    # `base_measurable`, because a base carrying no `symbols.json` gives every seam an absent
+    # baseline and a count would be 0 over nothing measured. This branch changed WHAT the pass is
+    # given (`definers`) and WHERE its output goes (outside the worktree). Taking either side alone
+    # loses the other, which is the auto-took class the merge rule names.
+    flags: list[m.CollisionFlag] = []
     added: list[m.CollisionFlag] = []
-    if flags:
-        current = backlog_path.read_text(encoding="utf-8") if backlog_path.is_file() else ""
-        new_text, added = m.append_backlog(current, flags)
-        if added:
-            backlog_path.write_text(new_text, encoding="utf-8", newline="\n")
+    backlog_path = derive_backlog_path(root)
+    if base_measurable:
+        flags = m.detect_collisions(
+            new_rows, base_rows, ref_index, range_index,
+            threshold=m.seam_fanin_threshold(root), definers=definers,
+            affordance_seams=affordance_seams,
+        )
+
+        # F7: route each flag to the durable, deduped reinvention backlog — OUTSIDE the worktree.
+        if flags:
+            current = backlog_path.read_text(encoding="utf-8") if backlog_path.is_file() else ""
+            new_text, added = m.append_backlog(current, flags)
+            if added:
+                backlog_path.parent.mkdir(parents=True, exist_ok=True)
+                backlog_path.write_text(new_text, encoding="utf-8", newline="\n")
+
+    # The file this record used to be written to, if a previous release left one behind. NAMED, not
+    # deleted: it is the adopter's file, it may hold rows nobody has read, and a tool that silently
+    # removes a record is the shape this unit exists to stop.
+    legacy = map_dir / "reinvention-backlog.md"
 
     print("# convergence signals (trend to zero = the repo converges); a WARN, never a gate.")
-    print(f"\ncollision_flags: {len(flags)}")
+    if not base_measurable:
+        # NO NUMBER HERE, deliberately. With no baseline every seam is absent from it, so nothing
+        # reaches the fan-in threshold and a count would be 0 over nothing measured — the defect
+        # ABL-bCandidLoupe-2 recorded. The key stays so a reader grepping for it still sees a row;
+        # the VALUE is the status, which is this repo's own instruction about a probe that cannot
+        # measure: say so, rather than print a confident zero.
+        print(
+            f"\ncollision_flags: DEAD PROBE - the base ref carries no {sym_rel}, so there is no "
+            "baseline to resemble and any count would be a number over nothing measured "
+            "(ABL-bCandidLoupe-2). Re-run against a base at or after the SYMBOL tier landed."
+        )
+    else:
+        print(f"\ncollision_flags: {len(flags)}")
     for f in flags:
         print(
             f"- WARN {f.new} [{f.kind}, {f.file}] resembles seam {f.resembles} (fan-in {f.fanin}) "
             f"- built new instead of wiring through it; confidence {f.confidence}"
         )
     if flags:
-        rel = backlog_path.relative_to(root).as_posix() if backlog_path.is_relative_to(root) else backlog_path.name
+        # The path is OUTSIDE the worktree now, so `relative_to(root)` no longer resolves and the
+        # absolute spelling is the useful one — a reader has to be able to open it.
+        rel = (backlog_path.relative_to(root).as_posix()
+               if backlog_path.is_relative_to(root) else backlog_path.as_posix())
         dup = len(flags) - len(added)
         skip = f" ({dup} already recorded, skipped)" if dup else ""
         print(
             f"  -> {len(added)} row(s) appended to {rel}{skip}; fold each into its seam "
             "(or delete the row if genuinely distinct)."
         )
+    note = render_legacy_note(legacy, backlog_path, root)
+    if note:
+        print(note)
 
     clones = _new_clones(root, conf)
     if clones is None:
@@ -201,7 +313,9 @@ def _converge(base: str, head: str, files: list[str]) -> int:
     features = [k for k in texts if k != "foundation"]
     with_block = sum(1 for k in features if m.parse_affordance(texts[k]).has_block)
     cov = f"{100 * with_block // len(features)}% ({with_block}/{len(features)})" if features else "n/a"
-    dead = sum(1 for r in head_rows if m.fan_in(ref_index, r["id"], r["file"]) == 0)
+    # One reading per ID, not per ROW: a symbol with two definers appeared twice here and was
+    # counted twice, on top of the wrong subtraction S1 corrects.
+    dead = sum(1 for sid, dfs in sorted(definers.items()) if m.fan_in(ref_index, sid, dfs) == 0)
     print("\n# hygiene hints (NOT the convergence signal - see spec S5):")
     print(f"affordance_coverage: {cov} of feature dossiers carry a ## Reuse affordance block")
     print(f"dead_exports: {dead} symbol(s) with fan-in 0 (a hint - a used dup is not dead)")

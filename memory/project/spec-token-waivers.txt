@@ -23,7 +23,6 @@ memory/project/IN-FLIGHT.md	[path] another build's live spec; out of TOOL-dRetir
 memory/project/MEMORY.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
 memory/project/README.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
 .claude/SESSION-KICKOFF.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
-.codebase-map.conf:38	[cite] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
 memory/backlog/<FAMILY>.md	[path] another build's live spec; out of TOOL-dRetiredFork-20's scope, not a false positive (aMendedLedger)
 testsuite counts	[leg] REAL and that build's to fix: a leg name truncated in its section 7 (aTetheredScratch)
 review-join ban	[leg] REAL and that build's to fix: a leg name truncated in its section 7 (aTetheredScratch)

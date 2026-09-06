@@ -122,6 +122,17 @@ kill rule: at or below roughly 5% across two further readings, the pressure chai
 A second reading is owed before anyone acts, and this build deliberately took none of the pressure
 work while the question is open.
 
+> **SUPERSEDED by `TOOL-aSurfacedLexicon-12`, 2026-09-05.** "Reading one of two" is quoted above
+> rather than deleted, because the next reading DISQUALIFIED today as one of the two: it did not
+> continue the abandon chain, it BROKE it. The kill rule's sole carrier is
+> `build_lexicon_marginal_offense_rate`'s docstring in `tools/drift-audit/drift_report.py` (owner
+> ruling Q8), and `python tools/drift-audit/drift_report.py --json` prints on its
+> `lexicon_marginal_offense_rate` fresh-file arm `added 340`, `offenders 181`, `rate_pct 53.2` —
+> ABOVE the roughly 5% bar rather than at or below it. The branch the docstring selects is therefore
+> the CLIMB clause, which promotes `TOOL-dScaffoldedMirror-9` from probation to scheduled, and no
+> further reading is owed under the abandon branch because that branch is broken and not pending.
+> The promotion itself is not taken here.
+
 **The stop rule this build did not have.** After the six land: read `-7`'s first standing measurement,
 and run `--probe` read-only against `C:/projects/incms/main`. Those are the two measurements the
 original plan produced and then never made anything depend on. The pressure chain — `-4`, `-9`, and

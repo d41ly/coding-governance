@@ -6,9 +6,9 @@ Assembles a candidate corpus from the map's four recall sources — generated/sy
 ids/kinds, generated/inventories.json keys, every dossier's `## Reuse affordance` seam line,
 and every `## Shared seams` prose block — and prints a ranked SHORTLIST for an agent to read.
 The shortlist is NOT a hard top-K lexical cut (that scores ~0% behavioural recall): it is the
-UNION of token-stem matches (the seeds) AND a capped set of structural neighbours (same kind or
-same file as a seed), so a seam whose name doesn't literally contain the query word still
-surfaces for the agent to judge. Fan-in is computed ON DEMAND here (never committed) to rank
+UNION of token-stem matches (the seeds) AND a capped set of structural neighbours (same file as a
+seed, or the same kind in the same DIRECTORY), so a seam whose name doesn't literally contain
+the query word still surfaces for the agent to judge. Fan-in is computed ON DEMAND here to rank
 hot seams. A recall-dark layer (declared in .codebase-map.conf) prints a partial-recall notice
 so an empty result is never a falsely-confident "no seam fits".
 
@@ -52,6 +52,17 @@ import map_lib as m  # noqa: E402
 #: cap on the structural-neighbour set (seeds are NEVER capped — the whole point is that the
 #: lexical shortlist is not a hard top-K; only the "here's what lives next to a hit" widening is).
 NEIGHBOUR_CAP = 12
+# How many source paths a log row carries. `n_sources` records the count BEFORE this cap, so a
+# truncated list is visible AS truncated rather than as a short one.
+#
+# 40, and the number is measured rather than picked -- but measured against the SYMBOL-ONLY
+# derivation that shipped first, so it is a FLOOR rather than a fitted value: the set now also
+# carries dossiers, which grew it by roughly half on live queries (14->26, 18->36, 9->13). The
+# parent measured ~17 file-backed sources per probe against ~71 ranked entries; at a nominal 40
+# bytes per path a capped worst case adds ~1.6 KB, against a recall log running at a 2150 B mean
+# row that nobody has called expensive. Re-measure before trusting it. Cheap to raise, since
+# `n_sources` records what was cut.
+SOURCE_PATHS_CAP = 40
 
 
 @dataclass(frozen=True)
@@ -62,8 +73,48 @@ class Candidate:
     name: str
     sources: tuple[str, ...]        # subset of {symbol, inventory, affordance-seam, shared-seams}
     kind: str = ""                  # symbol kind (function/class/component/const-export), else ""
-    file: str = ""                  # def file (symbols only) — for fan-in + "read this"
+    # EVERY def file, not one. `TOOL-dTracedLattice-1` S1: a name merged across sources kept
+    # `file or prev.file`, so a symbol defined in several files was reachable through one arbitrary
+    # winner and the rest were unreachable at any K — 124 of 769 definitions in this repo. Ordered
+    # and deduped by first appearance, so the shortlist is deterministic.
+    files: tuple[str, ...] = ()     # def files (symbols only) — for fan-in + "read this"
     detail: str = ""                # inventory id / owning dossier — human context
+
+
+# MULTI-LINE and COMMENTED arrays are legal TOML. This corpus has NEITHER today — measured, and
+# said plainly, because an earlier revision of this comment claimed it had both in the build that
+# shipped the rule against assertions with no observation behind them. The handling is kept anyway:
+# the field is authored by hand, both shapes are legal, and without the strip a `# why` comment was
+# emitted as an id and the real id on the next line was swallowed with it. That is a guard against a
+# shape the corpus may grow, declared as such rather than dressed up as a shape it already has.
+_DECISIONS_RE = re.compile(r"^decisions\s*=\s*\[([^\]]*)\]", re.M | re.S)
+# THE AUTHORITY, not a retype of it. This was a hand-copied byte-identical duplicate of the same
+# pattern in `map_lib`, in a module that already imports `map_lib` — a second reader of one rule
+# with nothing comparing the pair, which is the defect this same build fixed one kit over.
+#
+# IT DOES NOT PICK UP A PROJECT OVERRIDE, and an earlier revision of this comment said it did. The
+# override lives in the project-side extractor and every other reader resolves it with a `getattr`
+# against that module; this one deliberately imports no project layer, which is the portability
+# property the decisions read was written to preserve in the first place. So an adopter who
+# overrides the grammar gets the default here. That is a KNOWN limitation of reading the field
+# without the project layer, stated rather than claimed away — the alternative ends the portability.
+_ID_SHAPE = m.DEFAULT_DECISION_ID_RE
+
+
+def _parse_dossier_decisions(text: str) -> tuple:
+    """The unit ids a dossier declares, read from its front matter TEXT.
+
+    A front-matter read rather than a parse, so this module keeps needing no project layer.
+    An absent or empty list yields an empty tuple, which prints no clause at all -- an empty
+    clause would be noise on the dossiers that declare none, which `DOSSIER_DECISIONS_EMPTY_PIN`
+    in `.codebase-map.conf` counts. No figure here: it is a live count and it has already moved.
+    """
+    m_ = _DECISIONS_RE.search(text)
+    if not m_:
+        return ()
+    body = re.sub(r"#[^\n]*", "", m_.group(1))
+    toks = (t.strip().strip('"').strip("\'") for t in body.split(","))
+    return tuple(t for t in toks if _ID_SHAPE.match(t))
 
 
 @dataclass
@@ -71,6 +122,7 @@ class Corpus:
     candidates: dict[str, Candidate]        # name -> merged candidate
     shared_seams: dict[str, str]            # feature -> `## Shared seams` prose
     symbol_files: list[str]                 # symbols.json file list (reference-scan roots)
+    decisions_by_feature: dict = None       # feature -> the unit ids that dossier declares
     recall_dark: tuple[str, ...] = ()       # layers declared uncovered in .codebase-map.conf
     threshold: int = m.SEAM_FANIN_THRESHOLD_DEFAULT
     has_symbols: bool = False               # was symbols.json present (recall tier adopted)?
@@ -92,6 +144,9 @@ class Shortlist:
     recall_dark: tuple[str, ...]
     threshold: int
     corpus_counts: dict[str, int] = field(default_factory=dict)
+    # S6 — what the reference scan behind every fan-in could and could not read. Carried on the
+    # shortlist rather than fetched at render time so the banner reports THIS answer's scan.
+    scan: dict = field(default_factory=dict)
 
     @property
     def empty(self) -> bool:
@@ -134,18 +189,22 @@ def load_corpus(root: Path | None = None) -> Corpus:
 
     candidates: dict[str, Candidate] = {}
 
-    def merge(name: str, source: str, *, kind: str = "", file: str = "", detail: str = "") -> None:
+    def merge(name: str, source: str, *, kind: str = "", files: tuple[str, ...] = (),
+              detail: str = "") -> None:
         if not name:
             return
         prev = candidates.get(name)
         if prev is None:
-            candidates[name] = Candidate(name, (source,), kind, file, detail)
+            candidates[name] = Candidate(name, (source,), kind, files, detail)
             return
         candidates[name] = Candidate(
             name,
             tuple(dict.fromkeys(prev.sources + (source,))),
             kind or prev.kind,
-            file or prev.file,
+            # UNION, not `files or prev.files`. The last-write rule that governs the other fields is
+            # what made a co-defined symbol reachable through one definer; def files are the one
+            # field where every value is a real answer rather than a competing label.
+            tuple(dict.fromkeys(prev.files + files)),
             detail or prev.detail,
         )
 
@@ -153,7 +212,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
     has_symbols = (gen / "symbols.json").is_file()
     if has_symbols:
         for s in _read_json(gen / "symbols.json").get("symbols", []):
-            merge(s["id"], "symbol", kind=s["kind"], file=s["file"])
+            merge(s["id"], "symbol", kind=s["kind"], files=(s["file"],))
             symbol_files.append(s["file"])
 
     if (gen / "inventories.json").is_file():
@@ -162,7 +221,18 @@ def load_corpus(root: Path | None = None) -> Corpus:
                 merge(key, "inventory", detail=inv_id)
 
     shared_seams: dict[str, str] = {}
+    # KEYED BY FEATURE, not carried on the candidate, and that is the whole fix for two defects at
+    # once. A candidate merges across sources under a per-field last-write rule, so a seam name
+    # declared by two dossiers kept one dossier's label and the other's ids. And the synthetic
+    # `<feature> (## Shared seams)` candidate is constructed elsewhere, so a per-candidate field
+    # left it empty and a dossier surfaced as ITSELF could never print its own ids. One carrier,
+    # looked up by the label the line already prints, cannot do either.
+    decisions_by_feature: dict[str, tuple] = {}
     for feature, text in m.load_dossier_texts(map_dir).items():
+        # The ids come out of the dossier TEXT, not a parsed dossier. That is the whole reason
+        # this is a front-matter read: the parsed form needs the project-side extractor, and
+        # this module's header declares it portable precisely so it needs none.
+        decisions_by_feature[feature] = _parse_dossier_decisions(text)
         for seam in m.parse_affordance(text).seams:
             merge(seam, "affordance-seam", detail=feature)
         prose = _section_body(text, "## Shared seams")
@@ -173,6 +243,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
     return Corpus(
         candidates=candidates,
         shared_seams=shared_seams,
+        decisions_by_feature=decisions_by_feature,
         symbol_files=sorted(set(symbol_files)),
         recall_dark=recall_dark,
         threshold=m.seam_fanin_threshold(root),
@@ -185,15 +256,17 @@ def load_corpus(root: Path | None = None) -> Corpus:
 # ======================================================================================
 
 
-def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]]) -> Shortlist:
+def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]],
+                       scan: dict | None = None) -> Shortlist:
     """The pure heart: query + corpus + reference index -> a ranked shortlist. Seeds = every
     candidate sharing a token stem with the query, PLUS the dossier of any `## Shared seams`
     prose that shares a stem (behavioural recall beyond names). Structural neighbours = symbols
-    with the same kind OR the same file as a symbol seed, capped. Ranked seeds-first, then by
-    fan-in desc, then name — deterministic. Empty seeds -> empty shortlist -> 'no seam fits'."""
+    in the same FILE as a symbol seed, or of the same kind IN THE SAME DIRECTORY, capped. Ranked
+    seeds-first, then fan-in desc, then name — deterministic. Empty seeds -> 'no seam fits'."""
     qstems = m.stems(query)
     if not qstems:
-        return Shortlist(query, [], corpus.recall_dark, corpus.threshold, _counts(corpus))
+        return Shortlist(query, [], corpus.recall_dark, corpus.threshold, _counts(corpus),
+                         scan or {})
 
     # rank against a LOCAL pool — synthetic prose candidates are added here, never back into the
     # caller's corpus (assemble must be idempotent: two queries on one corpus must not leak).
@@ -224,27 +297,63 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
             pool.setdefault(name, Candidate(name, ("shared-seams",), detail=feature))
             seeds[name] = f"shared-seams prose ({feature}): {', '.join(sorted(shared))}"
 
-    # structural neighbours of the symbol seeds — same kind OR same def file, capped.
+    # structural neighbours of the symbol seeds — sharing ANY def file, or same kind in the same dir.
     seed_syms = [pool[n] for n in seeds if pool[n].kind]
     seed_kinds = {c.kind for c in seed_syms}
-    seed_files = {c.file for c in seed_syms if c.file}
+    seed_files = {f for c in seed_syms for f in c.files}
+    # The same-kind arm is narrowed to the seed's own DIRECTORY, which in this repo is the kit dir.
+    # Kind alone admits nearly the whole corpus: measured over the pool the arm actually iterates,
+    # 619 of 648 kinded candidates are `function`, so a function seed pulled in 95% of everything and
+    # a cap of 12 over that is not a selection, whatever it sorts by. Grouped by directory the same
+    # 619 fall to 134 / 133 / 101 / 81 across the four largest, a reach reduction of 4.6x to 7.6x.
+    #
+    # The axis is the DEFINING FILE'S DIRECTORY rather than a "kit" concept, so it needs no literal
+    # and no new declaration, and it means the same thing in an adopter's tree that it means here.
+    # The reuse question a session asks is nearly always "does this already exist in the code I am
+    # about to edit"; a candidate further away reaches the reader better through the same-file arm
+    # or a shared-seam hit than through a kind match that would have admitted everything.
+    seed_dirs = {_derive_dir(f) for c in seed_syms for f in c.files}
     neighbours: dict[str, str] = {}
     for name, cand in sorted(pool.items()):
         if name in seeds or not cand.kind:
             continue
-        if cand.file and cand.file in seed_files:
-            neighbours[name] = f"neighbour: same file as a hit ({cand.file})"
-        elif cand.kind in seed_kinds:
-            neighbours[name] = f"neighbour: same kind ({cand.kind})"
+        shared = [f for f in cand.files if f in seed_files]
+        if shared:
+            neighbours[name] = f"neighbour: same file as a hit ({', '.join(shared)})"
+        elif cand.kind in seed_kinds and any(_derive_dir(f) in seed_dirs for f in cand.files):
+            # The reason names the NARROWED predicate. A predicate that changes while its printed
+            # reason does not is a gate lying quietly, and an empty neighbour list for a small
+            # directory has to read as honest rather than broken.
+            where = sorted({_derive_dir(f) for f in cand.files if _derive_dir(f) in seed_dirs})
+            neighbours[name] = (
+                f"neighbour: same kind ({cand.kind}) in {', '.join(where)}"
+            )
 
     ranked: list[Ranked] = []
     for name, reason in seeds.items():
         ranked.append(_rank(pool, corpus.threshold, ref_index, name, True, reason))
-    for name, reason in sorted(neighbours.items())[:NEIGHBOUR_CAP]:
-        ranked.append(_rank(pool, corpus.threshold, ref_index, name, False, reason))
 
-    ranked.sort(key=lambda r: (not r.is_seed, -r.fanin, r.candidate.name))
-    return Shortlist(query, ranked, corpus.recall_dark, corpus.threshold, _counts(corpus))
+    # RANK THE WHOLE NEIGHBOUR POOL, THEN CAP. The cap used to slice `sorted(neighbours.items())`,
+    # which is ALPHABETICAL, so the twelve slots went to the twelve names that sort earliest and
+    # `_rank` only ever saw those twelve -- the sort below then ordered a pool the alphabet had
+    # already chosen. Measured at base c4fcf5ad on the phrase this unit's spec records: every class
+    # name here starts uppercase and every function name does not, ASCII orders uppercase first, so
+    # a seed set containing one class filled all twelve slots from the 28 class names before any of
+    # the 616 functions was considered. The twelve retained summed to fan-in 8; the twelve the
+    # ranking keeps sum to 271, and the two sets do not intersect.
+    #
+    # Cost: `_rank` is one `fan_in` lookup per name, so this ranks the pool rather than a slice of
+    # it. That is the price of the cap meaning anything, and it is paid once per probe.
+    neighbour_ranked = [
+        _rank(pool, corpus.threshold, ref_index, name, False, reason)
+        for name, reason in sorted(neighbours.items())
+    ]
+    neighbour_ranked.sort(key=_derive_shortlist_key)
+    ranked.extend(neighbour_ranked[:NEIGHBOUR_CAP])
+
+    ranked.sort(key=_derive_shortlist_key)
+    return Shortlist(query, ranked, corpus.recall_dark, corpus.threshold, _counts(corpus),
+                     scan or {})
 
 
 def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -> list[tuple[Candidate, int]]:
@@ -257,21 +366,44 @@ def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -
     and --converge so 'a seam' means one thing everywhere."""
     scored: list[tuple[Candidate, int]] = []
     for cand in corpus.candidates.values():
-        if "symbol" not in cand.sources or not cand.file:
+        if "symbol" not in cand.sources or not cand.files:
             continue  # only indexable symbols can have a fan-in / def file to point at
         if "affordance-seam" in cand.sources:
             continue  # already declared — off the worklist
-        fanin = m.fan_in(ref_index, cand.name, cand.file)
+        fanin = m.fan_in(ref_index, cand.name, cand.files)
         if fanin >= corpus.threshold:
             scored.append((cand, fanin))
     scored.sort(key=lambda cf: (-cf[1], cf[0].name))
     return scored[:top]
 
 
+def _derive_dir(path: str) -> str:
+    """The directory a symbol is defined in, POSIX-normalised. `""` when there is no directory.
+
+    The one place this axis is spelled, because the neighbour predicate and its printed reason must
+    agree by construction: a predicate that narrows while its reason still says `same kind` is the
+    quiet-lie shape this kit's own dossier names.
+    """
+    p = (path or "").replace("\\", "/")
+    return p.rsplit("/", 1)[0] if "/" in p else ""
+
+
+def _derive_shortlist_key(r: Ranked) -> tuple:
+    """THE ordering key, stated once and read twice: once to CAP the neighbour pool, once to sort
+    the shortlist that is printed.
+
+    A second, retyped copy is exactly how the cap came to select by a criterion nobody chose --
+    the slice was alphabetical while the sort was by fan-in, so the two disagreed silently and the
+    ranking only ever ran on what the alphabet had already kept. Seeds sort first and are never
+    capped; within a group it is descending fan-in, then name for a stable tie-break.
+    """
+    return (not r.is_seed, -r.fanin, r.candidate.name)
+
+
 def _rank(pool: dict[str, Candidate], threshold: int, ref_index: dict[str, set[str]],
           name: str, is_seed: bool, reason: str) -> Ranked:
     cand = pool[name]
-    fanin = m.fan_in(ref_index, cand.name, cand.file) if cand.file else 0
+    fanin = m.fan_in(ref_index, cand.name, cand.files) if cand.files else 0
     is_seam = bool(cand.kind) and fanin >= threshold
     return Ranked(cand, is_seed, fanin, reason, is_seam)
 
@@ -302,6 +434,20 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
         f"# corpus: {cc.get('symbol', 0)} symbols | {cc.get('inventory', 0)} inventory keys | "
         f"{cc.get('affordance-seam', 0)} affordance seams | {cc.get('shared-seams', 0)} dossiers",
         f"# a seam = fan-in >= {shortlist.threshold} (SEAM_FANIN_THRESHOLD)",
+        # What the neighbour ranking does NOT mean. Twelve high-fan-in names read as twelve SEAMS
+        # to everybody who did not write the ranker, and the fan-in behind them counts bare
+        # identifier tokens with no symbol resolution (TOOL-aScouredKit-16) -- so a common short
+        # name scores high for reasons that have nothing to do with reuse. The line discloses the
+        # signal's limit rather than repairing it, which is a different unit.
+        "# neighbours are ranked by fan-in, which counts NAME TOKENS and resolves no symbols:",
+        "# a high rank means 'this name appears a lot', never 'this is the seam you want'",
+        # S6 — WHAT THE SCAN COULD NOT SEE, on every call. A fail-open reference scan that reports
+        # nothing makes a ranking over half a corpus look exactly like a ranking over all of it,
+        # which is the liveness failure `AGENTS.md` §7 names. Three facts, always printed: how many
+        # files the scan read, how many it could not decode, and which language layers it never
+        # entered. `unscanned` is the DECLARED set today; `TOOL-dTracedLattice-5` replaces the
+        # declaration with a set derived from the corpus.
+        _scan_line(shortlist),
         "",
     ]
     if shortlist.empty:
@@ -311,16 +457,20 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
     else:
         out.append("## candidates (ranked - read these before building)")
         for r in shortlist.ranked:
-            out.append(_line(r))
+            out.append(_line(r, corpus))
         out.append("")
         out.append("## sources to open")
         for line in _sources(shortlist, corpus):
             out.append(f"- {line}")
 
-    if shortlist.recall_dark:
+    # DERIVED, like the banner line above and for the same reason: a conf naming a layer that is
+    # not there would print a partial-recall warning about a population the walk never saw, and a
+    # conf missing one would print none at all. `TOOL-dTracedLattice-5` S4 owns this wording.
+    derived_dark = _derive_dark(shortlist)
+    if derived_dark:
         out.append("")
         out.append(
-            f"recall partial: layers {', '.join(shortlist.recall_dark)} have no symbol extractor "
+            f"recall partial: layers {', '.join(derived_dark)} have no symbol extractor "
             "- a matching seam THERE would not appear above; check that layer by hand before "
             'concluding "no seam fits".'
         )
@@ -334,14 +484,121 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
     return "\n".join(out) + "\n"
 
 
-def _line(r: Ranked) -> str:
+def derive_layer_verdict(scan: dict, declared: tuple[str, ...]) -> dict:
+    """Compare the layers PRESENT in the corpus against the ones covered and the ones DECLARED dark.
+
+    `TOOL-dTracedLattice-5`. `RECALL_DARK_LAYERS` was an authored string with exactly one consumer,
+    which split it and printed a banner: nothing derived it from the languages actually present and
+    nothing reddened when a layer appeared undeclared. A repo that adds a language and forgets the
+    declaration got a confident answer from a probe that never read that layer.
+
+    Returns `{"uncovered", "undeclared", "stale", "legacy", "counts"}`. It DECIDES nothing — the
+    caller refuses or reports — so this stays a pure function an arm can drive.
+    """
+    # NO SCAN IS NOT AN EMPTY CORPUS. An empty-seed query and a corpus with no symbol file list both
+    # skip the walk, and reading that as "no layer is present" made every correct declaration STALE
+    # and told the operator to delete the one thing protecting them. The legacy check below still
+    # fires: it reads the declaration only, and a migration is owed whether or not a walk ran.
+    if scan.get("present_extensions") is None:
+        return {"uncovered": [], "undeclared": [], "stale": [],
+                "legacy": tuple(d for d in declared if not d.startswith(".")), "counts": {}}
+    present = set(scan.get("present_extensions", ()))
+    covered = set(scan.get("extensions", ()))
+    counts = scan.get("present_counts", {})
+    # THE MIGRATION, S6. Values are EXTENSIONS now, with a leading dot. A legacy language name is
+    # never REINTERPRETED into one: a guess that reads `bash` as `.sh` is right here and wrong for
+    # `c` or `go`, and an adopter whose conf still carries the old spelling has to be TOLD.
+    legacy = tuple(d for d in declared if not d.startswith("."))
+    declared_exts = {d for d in declared if d.startswith(".")}
+    uncovered = sorted(present - covered)
+    return {
+        "uncovered": uncovered,
+        "undeclared": sorted(set(uncovered) - declared_exts),
+        "stale": sorted(declared_exts - present),
+        "legacy": legacy,
+        "counts": counts,
+    }
+
+
+def render_layer_refusal(verdict: dict) -> str:
+    """The refusal text, or `""` when there is nothing to refuse. S3: it names the layer, its file
+    count, and BOTH ways to clear it, so the message carries the repair and not only the problem."""
+    if verdict["legacy"]:
+        # `uncovered == []` means TWO different things and only one of them is a coverage claim: no
+        # layer is uncovered, or no walk ran at all. Saying "every present layer is covered" over a
+        # corpus nothing looked at is the affirmative false claim this whole unit exists to stop —
+        # one function further out than where it was found the first time.
+        if not verdict["counts"]:
+            avail = "(not measured — no corpus walk ran for this invocation)"
+        else:
+            avail = ", ".join(verdict["uncovered"]) or "(none — every present layer is covered)"
+        return (f"RECALL_DARK_LAYERS carries the OLD language-name spelling "
+                f"{', '.join(verdict['legacy'])}. Values are EXTENSIONS now, with a leading dot, "
+                f"and nothing here reinterprets one — a guess that reads `bash` as `.sh` is right "
+                f"once and wrong for `c` or `go`. The uncovered layers present in this corpus are: "
+                f"{avail}. Set RECALL_DARK_LAYERS to the ones you deliberately do not cover.")
+    if verdict["undeclared"]:
+        parts = []
+        for ext in verdict["undeclared"]:
+            n = verdict["counts"].get(ext, 0)
+            parts.append(f"{ext} ({n} file(s))")
+        return ("a language layer is present in this corpus, has NO symbol extractor, and is NOT "
+                f"declared dark: {', '.join(parts)}. Every seam in it is invisible to this probe, "
+                "so a 'no seam fits' answer would be confident about a population never read. "
+                "TWO ways to clear this: register an extractor for it in map_extractors.py, or add "
+                "the extension to RECALL_DARK_LAYERS in .codebase-map.conf — spelled with the "
+                "leading dot, exactly as written above.")
+    return ""
+
+
+def _derive_dark(shortlist: Shortlist) -> list[str]:
+    """The layers this scan could not read: PRESENT in the corpus and covered by no extractor.
+
+    ONE derivation, read by the coverage line and by the partial-recall paragraph. They were two
+    readings of one fact for exactly one commit, and the paragraph kept printing the declaration
+    while the line printed the truth — the same two-answers shape this unit exists to remove, one
+    function lower. Falls back to the DECLARED tuple only when no scan ran at all.
+    """
+    scan = shortlist.scan or {}
+    present = scan.get("present_extensions")
+    if present is None:
+        return list(shortlist.recall_dark)
+    return sorted(set(present) - set(scan.get("extensions", ())))
+
+
+def _scan_line(shortlist: Shortlist) -> str:
+    """The reference scan's own coverage, as one banner line. Never omitted and never abbreviated
+    away: an absent figure reads as "nothing to report", which is the one thing it cannot mean."""
+    sc = shortlist.scan or {}
+    if "files_scanned" not in sc:
+        # The scan did not run at all (an empty corpus takes the early return). Say so rather than
+        # printing zeros, which read as "scanned everything and found nothing".
+        return "# scan coverage: not run (no symbol file list to scan)"
+    # DERIVED, not the declaration. `TOOL-dTracedLattice-5` S4: this unit owns the banner's
+    # dark-layer wording, and what it prints is the set the corpus walk found uncovered — which the
+    # declaration must now agree with, or the run refuses before reaching here.
+    # ONE reading. The declaration fallback lived here as well as in `_derive_dark`, and production
+    # cannot reach it: this line is only rendered after the `files_scanned` guard above, which the
+    # no-scan case never passes. A branch nothing can reach, graded by a fixture in a shape nothing
+    # emits, is coverage that is not there — so it is deleted rather than kept for symmetry.
+    uncovered = _derive_dark(shortlist)
+    dark = ", ".join(uncovered) if uncovered else "none — every present layer has an extractor"
+    return (f"# scan coverage: {sc['files_scanned']} files scanned"
+            f" | {sc['parse_skips']} parse skips"
+            f" | unscanned layers: {dark}")
+
+
+def _line(r: Ranked, corpus: "Corpus | None" = None) -> str:
     c = r.candidate
     bits = []
     if c.kind:
         bits.append(c.kind)
-    if c.file:
-        bits.append(c.file)
-    if c.file:
+    if c.files:
+        # EVERY definer. Printing one was the visible half of the S1 defect: `repo_root` has four
+        # and the shortlist named one, so three were unreachable to the reader as well as to the
+        # ranking.
+        bits.append(", ".join(c.files))
+    if c.files:
         bits.append(f"fan-in {r.fanin}")
     if r.is_seam:
         bits.append("SEAM")
@@ -350,7 +607,60 @@ def _line(r: Ranked) -> str:
     meta = " | ".join(bits)
     tag = "" if r.is_seed else " (neighbour)"
     src = "/".join(c.sources)
-    return f"- {c.name}{tag}  [{meta}]  ({r.reason}; via {src})" if meta else f"- {c.name}{tag}  ({r.reason}; via {src})"
+    head = (f"- {c.name}{tag}  [{meta}]  ({r.reason}; via {src})" if meta
+            else f"- {c.name}{tag}  ({r.reason}; via {src})")
+    # EVERY id, not the first few. The range digest truncates because it prints one line per
+    # feature over a whole commit range; here the reader is deciding whether to extend this
+    # seam, and a hidden id is a hidden reason.
+    ids = (corpus.decisions_by_feature or {}).get(c.detail, ()) if corpus else ()
+    if ids:
+        head += "\n    decisions: " + " ".join(ids)
+    return head
+
+
+def _scan_sources(shortlist: Shortlist):
+    """The ONE walk over a shortlist's sources, yielding `(kind, value)` in shortlist order.
+
+    `kind` is `symbol`, `dossier` or `inventory`; only the first two are openable PATHS.
+
+    THE single derivation, and it is single by CONSTRUCTION rather than by two functions agreeing.
+    `_sources` labels these for a human and `derive_source_paths` records the file-backed ones.
+    Those were two hand-copied walks for one commit each way: the first dropped every dossier from
+    the log while the reader was still shown it (measured: 6 of 19 entries on one live query), and
+    the fix for THAT made the two walks agree by copying, which is the same defect one move later.
+    Two readers of one fact is the class; one walk with two views is the answer.
+    """
+    try:
+        root_name = m.map_root().relative_to(m.repo_root()).as_posix()
+    except ValueError:
+        root_name = m.map_root().name
+    for r in shortlist.ranked:
+        c = r.candidate
+        for f in c.files:
+            yield "symbol", f.replace("\\", "/")
+        if ("affordance-seam" in c.sources or "shared-seams" in c.sources) and c.detail:
+            where = "FOUNDATION.md" if c.detail == "foundation" else f"features/{c.detail}.md"
+            yield "dossier", f"{root_name}/{where}"
+        elif "inventory" in c.sources and not c.files:
+            yield "inventory", c.detail
+
+
+def derive_source_paths(shortlist: Shortlist) -> list[str]:
+    """The file-backed sources the answer points a reader at, deduped, in shortlist order.
+
+    A thin view over `_scan_sources`, which `_sources` also reads. Repo-relative and
+    forward-slashed, because that is how a later analysis joins them to the tree. An inventory key
+    with no file contributes nothing here, exactly as it contributes no openable path there.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for kind, value in _scan_sources(shortlist):
+        if kind == "inventory":
+            continue
+        if value and value not in seen:
+            seen.add(value)
+            out.append(value)
+    return out
 
 
 def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
@@ -372,15 +682,13 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
             seen.add(line)
             lines.append(line)
 
-    for r in shortlist.ranked:
-        c = r.candidate
-        if c.file:
-            add(f"symbol def: {c.file}")
-        if ("affordance-seam" in c.sources or "shared-seams" in c.sources) and c.detail:
-            where = "FOUNDATION.md" if c.detail == "foundation" else f"features/{c.detail}.md"
-            add(f"dossier: {root_name}/{where}")
-        elif "inventory" in c.sources and not c.file:
-            add(f"inventory `{c.detail}` (see {root_name}/generated/MAP.md)")
+    for kind, value in _scan_sources(shortlist):
+        if kind == "symbol":
+            add(f"symbol def: {value}")
+        elif kind == "dossier":
+            add(f"dossier: {value}")
+        else:
+            add(f"inventory `{value}` (see {root_name}/generated/MAP.md)")
     return lines or ["(no file-backed sources - inspect the candidates above)"]
 
 
@@ -414,7 +722,7 @@ def _resolve_git_dir(root: Path) -> Path | None:
     return gitdir
 
 
-def write_lookup(root: Path, query: str, n_shown: int) -> None:
+def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None:
     """Append one JSONL row recording that this probe RAN. Never fatal, never gating.
 
     WHY: ``BUILD-METHOD`` M5 names two reuse probes and only the recall one left evidence, so a
@@ -439,6 +747,8 @@ def write_lookup(root: Path, query: str, n_shown: int) -> None:
         common = _resolve_git_dir(root)
         if common is None:
             return
+        # REQUIRED, not defaulted: an optional `paths` turns a dropped argument into a row that
+        # logs zero sources and looks merely quiet. A TypeError at the one call site is louder.
         path = common / "codebase-map" / "lookups.jsonl"
         path.parent.mkdir(parents=True, exist_ok=True)
         row = {
@@ -447,6 +757,11 @@ def write_lookup(root: Path, query: str, n_shown: int) -> None:
             "query": query,
             "worktree": str(root),
             "n_shown": n_shown,
+            # `n_shown` keeps the meaning it has always had -- the RANKED CANDIDATE count -- and is
+            # deliberately not redefined: an analysis joining old rows to new ones must not find
+            # one field silently changing what it counts. The two new fields are the path view.
+            "shown_paths": paths[:SOURCE_PATHS_CAP],
+            "n_sources": len(paths),
         }
         with path.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -470,12 +785,27 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     corpus = load_corpus()
-    ref_index = m.build_reference_index(corpus.symbol_files) if corpus.symbol_files else {}
-    shortlist = assemble_shortlist(query, corpus, ref_index)
+    scan: dict = {}
+    ref_index = (m.build_reference_index(corpus.symbol_files, stats=scan)
+                 if corpus.symbol_files else {})
+
+    # REFUSE BEFORE ANSWERING. A shortlist rendered over a corpus with an unread layer is a
+    # confident answer about a population nobody looked at, which is the failure this kit claims to
+    # prevent in the mechanism it uses to claim it.
+    verdict = derive_layer_verdict(scan, corpus.recall_dark)
+    refusal = render_layer_refusal(verdict)
+    if refusal:
+        print(f"reuse-lookup refused: {refusal}", file=sys.stderr)
+        return 2
+    for ext in verdict["stale"]:
+        print(f"note: RECALL_DARK_LAYERS declares {ext} dark and no file with that extension is in "
+              f"the corpus. The declaration is stale — delete it rather than carrying a layer that "
+              f"is not there.", file=sys.stderr)
+    shortlist = assemble_shortlist(query, corpus, ref_index, scan)
     print(render(shortlist, corpus), end="")
     # AFTER the answer is rendered, so a row means a lookup that ANSWERED. Before it, a crash in
     # render() would leave evidence of a probe whose result nobody ever saw.
-    write_lookup(m.repo_root(), query, len(shortlist.ranked))
+    write_lookup(m.repo_root(), query, len(shortlist.ranked), derive_source_paths(shortlist))
     return 0  # advisory: a RESULT never fails (never a gate). Only the refusal above exits non-zero.
 
 

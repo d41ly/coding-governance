@@ -25,6 +25,7 @@ is the shipped entry point and not a re-implementation of it.
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import re
 import shutil
@@ -258,12 +259,18 @@ def test_all_miss_fixture():
 
 @check("an EMPTY graded set refuses (the branch that replaced one that could not fail)")
 def test_empty_graded_set_refuses():
-    p = run_check("--data-dir", str(build_filtered()),
-                  conf_floor='RECALL_FLOOR="spine:fts5:r@5>=0.81"')
+    # The set is emptied SYNTHETICALLY, by dropping every records row. This arm used to pin a floor
+    # over `spine` and lean on that set extracting to zero docs in this repo -- which was a live
+    # DEFECT in `DURABLE`, not a property, so the arm passed BECAUSE of a bug and went red the
+    # moment the bug was fixed. A test whose green depends on a defect elsewhere is not a test of
+    # the branch it names; emptying a set on purpose exercises the same `is EMPTY` refusal and
+    # cannot be un-armed by repairing something else.
+    p = run_check("--data-dir", str(build_filtered(drop=lambda r: True)),
+                  conf_floor='RECALL_FLOOR="records:fts5:r@5>=0.81"')
     out = read_lines(p)
     assert p.returncode == 2, f"expected 2, got {p.returncode}\n{out}"
-    assert "is EMPTY" in out and "spine" in out, out
-    return "REFUSED — spine extracts to zero docs, so a floor over it grades nothing"
+    assert "is EMPTY" in out and "records" in out, out
+    return "REFUSED — a synthetically emptied set grades nothing, and the floor says so"
 
 
 @check("an ABSENT pin reds naming the key, with no default")
@@ -451,6 +458,58 @@ def test_malformed_question_refuses():
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
+
+
+# ---------------------------------------------------------------- seed stability (TOOL-dTracedLattice-7)
+
+#: The fixture is built so the EXPANSION CHOICE is observable. `RM3_DOCS` seed docs carry the query
+#: terms plus 24 candidate words at IDENTICAL document frequency, so `Counter.most_common` is
+#: deciding a 24-way tie and nothing but its tie-break separates them. One target doc per candidate
+#: makes the chosen terms visible in the retrieved ids. Without that construction the arm passes on
+#: any implementation, because a corpus with no tie has nothing for a tie-break to get wrong.
+_RM3_PROBE = r"""
+import json, sys
+sys.path.insert(0, %(kit)r)
+import bench
+WORDS = [f"cand{i:02d}alpha" for i in range(24)]
+docs = [{"id": f"seed-{i}", "path": f"seed{i}.md",
+         "text": "reinvention backlog worktree " + " ".join(WORDS)} for i in range(3)]
+docs += [{"id": f"target-{w}", "path": f"{w}.md", "text": f"{w} filler filler filler"} for w in WORDS]
+db = bench.build_index(docs)
+print(json.dumps([docs[i]["id"] for i in bench.run_rm3(db, docs, "reinvention backlog worktree", 12)]))
+"""
+
+
+@check("rm3 is seed-stable (S3 / AC1)")
+def test_rm3_is_seed_stable():
+    """The same query under several `PYTHONHASHSEED` values returns identical rankings.
+
+    A SUBPROCESS per seed, because the interpreter reads that variable at start-up and no in-process
+    fixture can vary it. Five seeds rather than the three the criterion asks for: the pre-fix
+    implementation agreed with itself across some pairs by luck, and a two-seed arm can be green on a
+    broken build.
+    """
+    tmp = pathlib.Path(tempfile.mkdtemp(prefix="rm3seed-"))
+    _SCRATCH.append(tmp)
+    probe = tmp / "probe.py"
+    probe.write_text(_RM3_PROBE % {"kit": str(KIT)}, encoding="utf-8")
+    seeds = ("0", "1", "7", "42", "1234")
+    seen: dict[str, list[str]] = {}
+    for seed in seeds:
+        env = dict(os.environ, PYTHONHASHSEED=seed)
+        proc = subprocess.run([sys.executable, str(probe)], capture_output=True, text=True, env=env)
+        assert proc.returncode == 0, f"probe failed under PYTHONHASHSEED={seed}\n{proc.stderr}"
+        seen[seed] = json.loads(proc.stdout.strip().splitlines()[-1])
+    # LIVENESS: the fixture must actually exercise expansion, or every seed agrees trivially.
+    first = seen[seeds[0]]
+    assert any(d.startswith("target-") for d in first), (
+        "the probe retrieved no expansion target, so this arm would pass on any implementation")
+    distinct = {tuple(v) for v in seen.values()}
+    assert len(distinct) == 1, (
+        "rm3 returned different rankings under different PYTHONHASHSEED values, so a project pinning "
+        f"RECALL_FLOOR to it has a gate whose verdict moves on an unchanged tree: "
+        + " | ".join(f"{k}={v[3:6]}" for k, v in seen.items()))
+    return f"identical across {len(seeds)} seeds"
 
 def main() -> int:
     for state, name, detail in _checks:

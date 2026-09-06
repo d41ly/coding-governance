@@ -9,7 +9,11 @@
 # The driver's copy carried a comment saying it read the question "the same way the leg reads it".
 # It did not — it counted the run-state bookkeeping commit that carries a pass's own declaration, so
 # every pass closed the instant it was declared and the disjointness proof found nobody to collide
-# with. A closing review reproduced that with two controls (TOOL-dUnstalledConvoy-22).
+# with. A closing review reproduced that with two controls: a pass whose ONLY commit was its own
+# declaration read CLOSED to the driver and OPEN to the leg, and adding one product commit made both
+# read closed. So the two spellings disagreed exactly on the case the disjointness proof depends on,
+# and agreed everywhere else — which is why reading them side by side had not shown it.
+# Pointer, not evidence: TOOL-dUnstalledConvoy-22.
 #
 # The lesson is not "be more careful". Two spellings of one rule is [[two-answers-to-one-question]],
 # and the fix for it is one spelling, which is this file.

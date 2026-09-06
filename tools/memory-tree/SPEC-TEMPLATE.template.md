@@ -113,8 +113,9 @@ an absent region cannot be told from a spec nobody has recorded against.
   recordings would collide on a filename, the optional `-<FAMILY>-` qualifier separates them:
   `<date>-spec-<FAMILY>-<slug>-<seq>.md`.
 - **Recurring §4 sub-heads** — use these names, don't invent synonyms: `### Data model` ·
-  `### Inventory` · `### Migration` · `### Rollout` · `### Files touched (estimate)` ·
-  `### Alternatives rejected`.
+  `### Inventory` (name every identifier the unit will MINT, and where this repo declares naming
+  cells, name each one beside the cell that grades it) · `### Migration` · `### Rollout` ·
+  `### Files touched (estimate)` · `### Alternatives rejected`.
 - **Resolved forks:** mark each fork in §8 in place, naming the RESOLVER — `RESOLVED (owner,
   <date>): <pick>` for the owner's own decision, `RESOLVED (agent, <date>, delegated): <pick>` when a
   standing mandate delegated the resolver authority. Never sign as the owner for a decision the owner

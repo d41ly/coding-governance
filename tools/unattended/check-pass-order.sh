@@ -35,7 +35,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.17   # gov:kit unattended@1.17 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.18   # gov:kit unattended@1.18 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong
@@ -217,6 +217,41 @@ esac
   exit 2
 }
 
+# ------------------------------------------------------------------- THE SUBJECT CACHE
+# ONE PASS OVER HISTORY, then no process inside any per-commit loop. This is a performance change
+# with no verdict in it, and it is written here rather than left to be rediscovered because the
+# shape it replaces cost 10184 s — 2.8 hours — against a declared ceiling this leg had already been
+# re-declared once to clear, which reds the whole bar on COST while passing on CONTENT.
+# `_find_build_commit` ran TWO processes per commit walked: `git log -1 --format=%s` for the subject
+# and a `printf | tr` subshell to tokenise it. Each unit walks its own `base..HEAD` window and, when
+# that finds nothing, a capped pre-anchor window, so the spawn count is the walked depth times the
+# graded population — and BOTH of those only grow. Measured on node `a`, 2026-09-06: that pair of
+# spawns costs 751 ms per commit walked under this Cygwin bash, which is the whole leg. The git work
+# itself was always trivial; the SPAWNS were the leg. Do not read a commit COUNT out of this
+# paragraph — the walk short-circuits at the first build commit, so the depth is not the range size.
+#
+# THE TOKENISATION IS DONE HERE, BY THE SAME `tr` SET, so the cached value is byte-identical to what
+# the per-commit substitution produced — including its leading and trailing space, which is what the
+# `*" $id "*` membership test needs on both sides. `tr` is per-character, so one invocation over the
+# whole stream and one per subject cannot differ. `\n` joins the preserved set (a subject never
+# contains one, but the stream's line structure must survive) and the literal `-` moves to the END of
+# the set, because `9-\n` would parse as a reversed range rather than as two members.
+#
+# THE COUNT IS ASSERTED, not assumed. A read loop that truncates leaves a cache that answers "no such
+# commit" for every id, every unit grades unbuilt-in-range, and the leg exits 0 — a silent green of
+# exactly the shape this file's own liveness doctrine exists to refuse. Equality is exact because
+# shas are unique, so this cannot pass on a partial cache.
+declare -A _SUBJ=()
+while IFS= read -r _cl; do
+  _SUBJ[${_cl%% *}]=" ${_cl#* } "
+done < <(GIT log --format='%H %s' HEAD 2>/dev/null | tr -c 'A-Za-z0-9\n-' ' ')
+_n_hist=$(GIT rev-list --count HEAD 2>/dev/null)
+case "$_n_hist" in ''|*[!0-9]*) _n_hist=-1 ;; esac
+if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
+  echo "pass-order: the subject cache holds ${#_SUBJ[@]} commit(s) where history has $_n_hist, so the build-commit walk below would miss commits and report every unit unbuilt-in-range — which is a clean bill this leg has not earned"
+  exit 2
+fi
+
 graded=0; skipped_cutoff=0; norun_graded=0; unbuilt=0; preanchor_hits=0; waived_n=0; truncated=0
 violations=""; waived_seen=""; previews=""
 
@@ -354,7 +389,35 @@ $1" ;;
     # refuse the shape the method mandates. What this anchor refuses is authoring it AFTERWARDS.
     parent=$(GIT rev-parse "$build_c^" 2>/dev/null) || { unbuilt=$((unbuilt+1)); continue; }
     found=""; state=""
+    # THE CANDIDATE FILTER, and it is a filter rather than the selection itself. Reading every spec
+    # blob under the build to find the one naming the id is quadratic in a build's own size: a
+    # 29-unit build reads 29 blobs 29 times, and each read is a `git show` plus a `head | tr`
+    # subshell, so the two largest builds alone owed over a thousand of this leg's process spawns.
+    # One `git grep` answers the same question for the whole build in one process.
+    #
+    # `-n` AND NOT `-l`, and the difference is the whole reason this is exact. `-l` names every spec
+    # that mentions the id ANYWHERE, and in this corpus every sibling spec cross-references its
+    # neighbours — measured on the 29-unit build, `-l` returned 30 of 30 files and filtered nothing.
+    # `-n` carries the LINE NUMBER, so the `<= 5` test below reproduces the `head -5` window the
+    # predicate under it actually grades.
+    #
+    # IT CANNOT CHANGE THE VERDICT. The pattern is the library's own whole-token join, the same one
+    # the tokenised test below applies, so the two agree on which lines carry the id; restricting to
+    # lines 1-5 makes the candidate set equal to — not merely a superset of — what the test accepts.
+    # A token cannot straddle a line break under either reading, because `tr` turns the newline into
+    # a delimiter exactly as `grep` treats the line end as one. The ORDER stays `ls-tree`'s rather
+    # than `git grep`'s, so first-match-wins picks the same spec it always did. And the ORIGINAL test
+    # still decides: this only skips blobs it was going to reject, so a filter that broke would red
+    # every unit loudly rather than green one quietly.
+    _cands=" "
+    while IFS= read -r _g; do
+      _g=${_g#*:}; _gp=${_g%%:*}; _g=${_g#*:}; _gl=${_g%%:*}
+      case "$_gl" in ''|*[!0-9]*) continue ;; esac
+      [ "$_gl" -le 5 ] || continue
+      case "$_cands" in *" $_gp "*) ;; *) _cands="$_cands$_gp " ;; esac
+    done < <(GIT grep -n -E "(^|[^A-Za-z0-9-])$id([^A-Za-z0-9-]|\$)" "$parent" -- "$bdir/spec/" 2>/dev/null)
     for sp in $(GIT ls-tree -r --name-only "$parent" -- "$bdir/spec/" 2>/dev/null); do
+      case "$_cands" in *" $sp "*) ;; *) continue ;; esac
       blob=$(GIT show "$parent:$sp" 2>/dev/null) || continue
       case " $(printf '%s' "$blob" | head -5 | tr -c 'A-Za-z0-9-' ' ') " in *" $id "*) ;; *) continue ;; esac
       tmp=$(mktemp) || exit 2

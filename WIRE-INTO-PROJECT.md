@@ -304,6 +304,20 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
    The NAME is fixed and the prefix is ONE segment: `test_codebase_map.template.py` resolves the kit
    at the root, at `<x>/codebase-map`, and nowhere deeper, and `adopt-codebase-map.sh` refuses a
    two-segment prefix before writing anything. `tools/` is the declared prefix for every kit here.
+
+   **Then delete the GOV-ONLY file that copy brings with it.** `kit.toml` withholds it from
+   `govkit apply`, but a `cp -r` does not read `kit.toml`, so this path needs its own step:
+   ```bash
+   rm -f <project>/tools/codebase-map/{replay-phrases.py,rank_harness.py,scen-adversarial.json}
+   ```
+   All three are gov's own grading instruments. `replay-phrases.py` reads `memory/builds/**` for
+   recorded probe phrases and the seam each spec's §10 names, and grades the ranker against that
+   pair. `scen-adversarial.json` is 28 scenarios whose seams were established by reading THIS
+   repo's code, and `rank_harness.py` is what scores a ranking against them. In your tree the first
+   finds no such corpus and the last two grade a corpus you do not have — the same
+   `memory/gotchas/pin-copied-from-another-corpus.md` shape the memory-recall fixture has. If you
+   want the measurement, point an equivalent at YOUR records: `rank_harness.py` reads any scenario
+   file carrying a `scenarios` array, so the instrument travels even though the set may not.
 2. `cp <kit>/.codebase-map.conf.example .codebase-map.conf` and fill MAP_ROOT · GATE_FILE ·
    MAP_DIFF_CMD (per the §0 decisions). It lives at the project **root** whatever the kit's prefix:
    the kit walks up from its own directory looking for this file, and that is how it finds the root.
@@ -327,8 +341,12 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
    gate then demands its `## Reuse affordance` block (no human remembering). Also run
    `python <kit>/map_diff.py <base>..<head> --converge` (the closing loop) — it WARNs on each
    NEW export that resembles an existing high-fan-in seam of the same kind it did not wire through
-   (shipped reinvention, over ALL new code) and routes each to `<MAP_ROOT>/reinvention-backlog.md`
-   (deduped); it is a report + WARN, never a merge gate (a token-stem collision has false positives).
+   (shipped reinvention, over ALL new code) and routes each to
+   `<git-common-dir>/codebase-map/reinvention-backlog.md` (deduped) — OUTSIDE your worktree, so a
+   `--converge` run never leaves untracked clutter in a gated directory; it falls back into
+   `<MAP_ROOT>/` only where git cannot answer at all. A run that finds a pre-2026-09-06 file at the
+   old location NAMES it and deletes nothing. It is a report + WARN, never a merge gate (a
+   token-stem collision has false positives).
    To converge the active surface up front, `python <kit>/gen_map.py --seed-affordances --top
    <N>` lists the N highest-fan-in seams no dossier yet declares as the backfill worklist.
    Both CLIs read only committed artifacts, so nothing fails closed for them: each exits **2** with
@@ -920,11 +938,13 @@ a `{kit}` token and both the writer and the checker expand it against the fragme
   keeps its old kit-dir walk until you re-copy the template; that is safe at a root install and
   required before moving the kit under a prefix.
 
-- **memory-recall is three maintenance classes, not one** — `bench.py` and `union.py` are byte-identical
-  upstream copies (their sha prefixes are pinned in `verbatim.json` and gated by the kit selftest):
-  overwrite them wholesale. `extract.py`, `query.py` and `recall-opened.js` are FORKS — each carries a
-  header naming the upstream path and sha it was taken from, so a re-pull is a three-way merge, not
-  archaeology. `recall_conf.py`, `selftest.py`, `SKILL.template.md`, `adopt-memory-recall.sh` and the
+- **memory-recall is three maintenance classes, not one** — `union.py` is a byte-identical upstream
+  copy (its sha prefix is pinned in `verbatim.json` and gated by the kit selftest): overwrite it
+  wholesale. `bench.py` is pinned the same way and is NOT a wholesale overwrite any more — it
+  carries one deliberate delta (`TOOL-dTracedLattice-7`, `run_rm3` made hash-seed-independent), so
+  overwriting it reverts that fix and the pin goes green over the revert. `extract.py`, `query.py`
+  and `recall-opened.js` are FORKS — each carries a header naming the upstream path and sha it was
+  taken from, so a re-pull is a three-way merge, not archaeology. `recall_conf.py`, `selftest.py`, `SKILL.template.md`, `adopt-memory-recall.sh` and the
   fragment are this kit's own. Never overwrite the RENDERED `.claude/skills/memory-recall/SKILL.md` by
   hand — re-run `--scaffold`, which is what `--check` grades. After any `FAMILIES`/`MEMORY_ROOT` edit,
   re-run `--scaffold`; the cache invalidates itself on the resolved conf, so no manual purge is needed.

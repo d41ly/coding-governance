@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-06T01:52:00+03:00 @ 6b8026d310a55317425a1e9ea452bd64ce29656b
+last-audit: 2026-09-06T12:00:27+03:00 @ 67232c4f5ed8eb092d0e80872649e2701f5fe5b0
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 6b8026d310a55317425a1e9ea452bd64ce29656b
+last-body-change: 67232c4f5ed8eb092d0e80872649e2701f5fe5b0
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -75,11 +75,6 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   the handles are written here — that is the drift the pointer design exists to avoid. Two invert
   the reflex: a discovery is ADOPTED not parked; the keepalive precedes orienting. §11 and §5.
 
-- **`passes-harnessed` RESOLVES now and did not before `aHoistedPass`.** Every core handle is
-  anchored in the section it cites, and check 16's BODY TERM grades that — arm B only asserts the
-  section exists. The route MOVED too: the harness returns a roster and the run makes one `Workflow`
-  call per unit. M6 owns it and check 31 grades it; no count is typed here.
-
 - **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`.** A breach is KILLED, and `gates-green`
   then says the bar never RETURNED — not the same fact as a leg FAILING. `TOOL-aBoundedCeiling-6`.
 
@@ -119,7 +114,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 |---|---|---|
 | playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `coding-governance-agents.template.md`, ONE file since v3.0, rendered into `AGENTS.md` by `tools/playbook/` · `check-playbook-parity.sh` (read its refusal before editing prose it owns) · `check-template-size.sh` · `check-placeholders.sh` |
 | kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
-| tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | `tools/` — read the dir, not this cell; kits self-describe in their own `README.md` |
+| tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | the `tools/<kit>/` dirs THIS unit touches, not `tools/` — that is what the probes above take; kits self-describe in their own `README.md` |
 | deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
 
 ### Gate commands (the merge bar)
@@ -141,6 +136,8 @@ environment is needed — the engine resolves this repo's `tools/` install prefi
 ```bash
 python tools/codebase-map/map_diff.py <old>..<new>          # Step 1: what a fast-forward brought in
 python tools/codebase-map/reuse_lookup.py "<behaviour>"     # Step 4 / §10: the seam to wire through
+python tools/memory-recall/query.py "<question>" --terms "<8-14 words>"  # Step 4: the records that bind it — REFUSES without --terms
+python tools/memory-tree/gotchas.py --for-paths <the tooling row's entrypoints>  # Step 4: the bug classes for this area
 ```
 
 ### Tier rule
@@ -167,9 +164,6 @@ correction> · prune when <condition>`. Starts empty; prune per-entry, never del
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests` only when they ask. The cost is process creation, not logic:
   `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
-- 2026-08-23 · a KIT'S SELF-TESTS are not merge-bar legs — owner ruling, `TOOL-dScriptedRepeat-5`.
-  Stated in full in the auto-loaded `AGENTS.md`, so this row POINTS and does not copy · prune when a
-  second kit adopts the split, making it a rule not an exception.
 
 
 ### Environment traps worth front-loading
@@ -188,7 +182,7 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 runs to the first interpolation, so lengthening a message always strands it and shortening never
 does — hit three times in one file in one session) · `process-creation-is-the-suite-cost.md` ·
 `trace-profile-measures-itself.md` · `fallback-fabricates-the-passing-value.md` ·
-`two-readers-of-one-config-one-re-derived.md`.
+`two-readers-of-one-config-one-re-derived.md` · `line-keyed-registry-reds-on-a-file-that-grew.md` (a waiver keyed `<path>:<line>`, and the sibling arm that is a BAN rather than a ratchet) · `naming-leg-grades-what-python-named.md` (nested helpers and dunders count, and arming follows `symbols.json`, so it only reds at the lander).
 
 - A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
   CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`

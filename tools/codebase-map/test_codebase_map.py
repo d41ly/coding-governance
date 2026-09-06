@@ -12,6 +12,20 @@ Remedies when this gate fails on your change:
 - claim it in `<MAP_ROOT>/FOUNDATION.md` if it is shared substrate;
 - `baseline.toml` additions are reserved for the initial backfill — do not add new keys;
 - claim edits: regen artifacts with the command the failure prints (`map_lib.regen_cmd()`).
+
+WHAT THIS GATE DOES NOT CHECK, stated here because a structural check reads as a semantic one to
+everybody who did not write it:
+- It does not read your CODE. Coverage is over the keys your extractors ENUMERATE, so a feature
+  whose extractor does not see it is invisible to this gate and to the map.
+- It does not check that a dossier's PROSE is true, only that its headings are present and its
+  claimed keys exist. A dossier can describe a mechanism that was deleted last month.
+- Freshness is a BYTE COMPARE of the artifacts this gate knows how to render. An artifact
+  `gen_map.py` writes and this gate does not list is not compared at all — which is
+  `TOOL-dTracedLattice-4`, a different unit, and it is why the tier list below is explicit rather
+  than derived from the directory.
+- A CONDITIONAL tier whose live population is empty compares nothing, and says so on every run
+  rather than passing quietly. That announcement is not a verdict about your tree: it means this
+  gate had nothing to compare, which is different from having compared and agreed.
 """
 
 from __future__ import annotations
@@ -119,11 +133,59 @@ def test_dossier_affordance_present_or_graced() -> None:
     )
 
 
+# A NEW DOSSIER'S `decisions` LIST STARTS EMPTY AND IS NOT FINISHED THERE. It holds the unit ids
+# that govern the feature, it is graded shrink-only by the check below, and it is filled as those
+# ids are learned rather than guessed — a guessed id RESOLVES, which makes it worse than a visibly
+# empty list. This guidance sits here, beside the check that reads the population, rather than in
+# the scaffolder: the skeleton it was first written into is the one file the dossier loader
+# EXCLUDES from that population, so the check could never see it.
+def test_dossier_decisions_are_declining() -> None:
+    """How many dossiers declare NO decisions, against a shrink-only pin.
+
+    An empty list passes validation, so nothing has ever failed on the field, so nobody fills
+    it, so the reuse audit returns a seam with no rationale. That is the vacuous-selector
+    class: a rule that binds nothing reports clean forever. The pin is what converts "legal"
+    into "declining".
+
+    UNSET OR EMPTY IS UNGRADED, AND SAYS SO. A fresh adopter has no measurement of their own
+    corpus, and a number copied from another tree is either vacuous or permanently red. Reading
+    an absent pin as 0 would red their first run; reading it as "skip" silently would make this
+    check the very thing it exists to close. So it announces.
+    """
+    tree = m.load_map_tree(INVENTORY_IDS, decision_id_re=ID_RE)
+    assert tree.dossiers, "no dossiers under the map root: this check cannot judge an empty population"
+    empty = sorted(d.feature for d in tree.dossiers if not d.decisions)
+    raw = (m.load_conf().get("DOSSIER_DECISIONS_EMPTY_PIN", "") or "").strip()
+    if not raw:
+        print(f"     UNGRADED: {len(empty)} of {len(tree.dossiers)} dossier(s) declare no decisions; "
+              "set DOSSIER_DECISIONS_EMPTY_PIN in the kit conf to a value measured on THIS corpus")
+        return
+    pin = int(raw)
+    assert len(empty) <= pin, (
+        f"{len(empty)} of {len(tree.dossiers)} dossier(s) declare no decisions, over a "
+        f"shrink-only pin of {pin}. Fill one, or lower the pin with the reading beside it.\n"
+        f"empty: {empty}"
+    )
+
+
 def test_path_derived_keys_are_posix() -> None:
     for inv_id, keys in ext.all_inventories().items():
         offenders = [k for k in keys if "\\" in k]
         assert not offenders, f"{inv_id}: non-POSIX keys {offenders}"
 
+
+
+#: CONDITIONAL TIERS — an artifact whose population may legitimately be empty in an adopting repo.
+#: `(tier name, extractor attribute, artifact filename, map_lib renderer)`.
+#:
+#: THE LIST IS THE MECHANISM, and that is `TOOL-dTracedLattice-2` S3. The reporter below walks THIS
+#: list, so adding a tier is adding a row here and nothing else — an author cannot forget to write
+#: the reporting line, because there is no reporting line to write. Before this, the symbol tier was
+#: an `if symbols:` with no `else`, so an empty population compared nothing and the gate passed,
+#: which is indistinguishable from having compared and agreed.
+CONDITIONAL_TIERS: list[tuple[str, str, str, str]] = [
+    ("symbol", "all_symbols", "symbols.json", "render_symbols_json"),
+]
 
 def test_generated_artifacts_are_fresh() -> None:
     inventories = ext.all_inventories()
@@ -134,17 +196,39 @@ def test_generated_artifacts_are_fresh() -> None:
         gen_dir / "inventories.json": m.render_inventories_json(inventories, INVENTORY_IDS),
         gen_dir / "MAP.md": m.render_map_md(inventories, INVENTORY_IDS, owners, tree.baseline),
     }
-    # SYMBOL recall tier (optional): only gated when the project declares symbol extractors.
-    # render_symbols_json is byte-deterministic (sorted ids, POSIX, LF), so this byte-compare
-    # holds identically on Windows and Linux — the AC2 cross-platform claim.
-    symbols = getattr(ext, "all_symbols", list)()
-    if symbols:
-        fresh[gen_dir / "symbols.json"] = m.render_symbols_json(symbols)
+    # CONDITIONAL tiers, one record each. A tier that does not run is REPORTED, never omitted: an
+    # `if population:` with no `else` compares nothing and passes, which reads exactly like a tier
+    # that compared and agreed. Renderers are byte-deterministic (sorted ids, POSIX, LF), so every
+    # byte-compare below holds identically on Windows and Linux.
+    skipped: list[tuple[str, str, bool]] = []
+    for tier, attr, artifact, renderer in CONDITIONAL_TIERS:
+        population = getattr(ext, attr, list)()
+        path = gen_dir / artifact
+        if population:
+            fresh[path] = getattr(m, renderer)(population)
+        else:
+            skipped.append((tier, artifact, path.is_file()))
+
     regen = m.regen_cmd()  # spelled for THIS install's prefix — a remedy must name a real path
+
+    # ANNOUNCE BEFORE COMPARING. A skip printed after the compare loop is swallowed by the first
+    # unrelated staleness failure, and "which tiers did not run" is exactly what a reader needs
+    # when something else is red. The refusal below still runs last, because it is a verdict.
+    orphaned = [(tier, artifact) for tier, artifact, committed in skipped if committed]
+    for tier, artifact, committed in skipped:
+        if not committed:
+            print(f"skipped {tier} tier — this project declares no live population for it, and no "
+                  f"{artifact} is committed, so NOTHING WAS COMPARED for this tier")
+
     for path, expected in fresh.items():
         assert path.is_file(), f"missing generated artifact {path} — regen: {regen}"
         committed = m.lf(path.read_text(encoding="utf-8"))
         assert committed == expected, f"STALE {path.name} — regen: {regen}"
+    assert not orphaned, "\n".join(
+        f"DARK {tier} tier — {artifact} IS committed and the live population is EMPTY, so this gate "
+        f"compared nothing while a generated artifact sits in the tree claiming to be current. "
+        f"Either restore the extractor that produced it, or delete {artifact}. — regen: {regen}"
+        for tier, artifact in orphaned)
 
 
 # ======================================================================================
@@ -157,6 +241,7 @@ if __name__ == "__main__":
         test_every_inventory_key_is_claimed_or_baselined,
         test_dossier_prose_headings_pinned,
         test_dossier_affordance_present_or_graced,
+        test_dossier_decisions_are_declining,
         test_path_derived_keys_are_posix,
         test_generated_artifacts_are_fresh,
     ):

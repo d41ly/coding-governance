@@ -1,6 +1,6 @@
 ---
 name: lexicon
-description: Answer "what should I call this" from THIS repo's declared naming vocabulary, before writing the name. Use when about to name a new function, method, type, module or CLI subcommand; when a name will not fit and you are tempted to invent a verb; when renaming during a refactor; or when a gate has just refused a name and you need the replacement rather than the refusal. Also use before naming anything in an unfamiliar area, to see how the corpus already spells that concept. Routes through `{{SUGGEST_CLI}}` and `{{BRIEF_CLI}}`, which read the declaration at `{{CONF}}` and decide nothing. Do NOT use for ordinary code search — finding a symbol, a caller, a definition or a string is grep's job and this neither replaces nor intercepts it.
+description: Answer "what should I call this" from THIS repo's declared naming vocabulary, before writing the name. Use when about to name a new function, method, type, module or CLI subcommand; when a name will not fit and you are tempted to invent a verb; when renaming during a refactor; or when a gate has just refused a name and you need the replacement rather than the refusal. Also use before naming anything in an unfamiliar area, to see how the corpus already spells that concept. Routes through `{{SUGGEST_CLI}} <identifier> --as <cell>`, which takes the SURFACE the name is for, reads the declaration at `{{CONF}}` and the frozen canon beside it, and decides nothing. Do NOT use for ordinary code search — finding a symbol, a caller, a definition or a string is grep's job and this neither replaces nor intercepts it.
 ---
 
 <!-- gov:kit lexicon@{{KIT_VERSION}} · RENDERED from tools/lexicon/SKILL.template.md — do not edit -->
@@ -16,7 +16,7 @@ has become a synonym list and is buying nothing.
 ## Ask before you write
 
 ```bash
-{{SUGGEST_CLI}} <identifier>
+{{SUGGEST_CLI}} <identifier> --as <ext>.<surface>
 ```
 
 One line, no corpus pass. Either `OK`, or the replacement and the negative definition that bans what
@@ -26,16 +26,19 @@ you tried:
 use `load_remote` — the declaration says `load`, NOT `fetch`: read a store into memory
 ```
 
-```bash
-{{BRIEF_CLI}} <path>
-```
+**`--as` is REQUIRED and takes the full cell, never a bare surface.** The surface is the whole
+question: it decides which predicates are armed on that name and which convention the answer is
+spelled in. `--as py.function` answers in snake where the cell declares snake; the same name asked
+for as `--as js.function` comes back in camel. Without it the tool would hand you a name in whatever
+case you happened to type, which is how it used to suggest names its own gate refuses. A cell with no
+`CELLS` row is refused rather than guessed at, and so is a surface with no language on it — the
+refusal lists the cells that carry that surface.
 
-For the OBJECTS the file already names, every leading token live for each across the corpus, flagging
-any object spelled more than one way. It prints what the corpus DOES, never what it should do, and it
-decides nothing. On a language the declaration marks `dark` it REFUSES rather than printing an empty
-section — an empty "established here" is indistinguishable from "invent freely".
-
-Neither verb can exit 1 and neither prints a pin. They are reports, structurally.
+It answers ONE identifier from two tables in a fixed precedence — this repo's declaration first,
+then the canon the kit ships, asked only where no declared row bans the token by name — and from no
+corpus at all. That is the whole point: you can ask before you write, and a verb that walks the
+whole tree to answer one question is a verb nobody waits for. It cannot exit 1 and it prints no pin.
+It is a report, structurally.
 
 ## The table
 
@@ -47,9 +50,16 @@ whole point.
 
 ## What the gate does with it
 
-`{{GATE_CLI}}` reds when an unwaived offender count exceeds the declared pin. It also reports, every
-run, the graded population and offender count PER PREDICATE, and the armed share of the files that
-carry a definition at all. A zero there is printed rather than hidden.
+`{{GATE_CLI}}` grades every pin as a TWO-SIDED EQUALITY. A count that RISES above the declared pin
+reds, and a count that FALLS below it reds just as loudly, printing the exact row to paste — a drain
+lands in the declaration or it is not landed. Do not read a red as "somebody added an offender".
+
+Every declared `CELLS` row is graded the same way: `<cell>.conv` counts the names in that cell that
+miss its convention, and it is two-sided too, as are the `<cell>.debt` and `<cell>.unruled` rows on
+a cell carrying the `vocab` flag.
+
+It also reports, every run, the graded population and offender count PER PREDICATE, and the armed
+share of the files that carry a definition at all. A zero there is printed rather than hidden.
 
 Reserved rows behave differently from ordinary ones: `main` is a module's one CLI entry point, `cmd`
 a subcommand entry point one level down, and `test` a function a harness collects. They name a

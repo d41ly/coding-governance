@@ -95,6 +95,14 @@ TRACE_CUTOFF: str = ""
 
 TRACE_GLOBS: list[str] = []
 
+# EVIDENCE_GLOBS — signal 2's population, narrower than PRODUCT_GLOBS. A citation from a test
+# file is the house's own bookkeeping certifying the bookkeeping, so signal 2 should not read
+# one as evidence a unit shipped. SHIPS EMPTY and falls back to PRODUCT_GLOBS, which is the
+# unnarrowed behaviour — correct on day one and permanently inert if nobody fills it, which is
+# why the kit descriptor declares it a hole with a discharge probe rather than leaving it to
+# be noticed. Git pathspec magic works here: `:(exclude)*.test.sh` and friends.
+EVIDENCE_GLOBS: list[str] = []
+
 # --------------------------------------------------------------------------------------------
 # PINS — shrink-only ceilings per GATEABLE signal, seeded at the values the report actually measured.
 # `--check` reds when a value exceeds its pin. Lower a pin whenever its population drops; raising one
