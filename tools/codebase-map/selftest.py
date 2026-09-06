@@ -9,7 +9,9 @@ backslash normalization must behave identically on every platform.
 
 from __future__ import annotations
 
+import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -22,6 +24,9 @@ sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 
 import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
+import map_imports as mi  # noqa: E402
+import map_diff as md  # noqa: E402
+import check_gate_coverage as cg  # noqa: E402
 
 IDS = ("flags", "routes")
 INV = {"flags": ["a_flag", "b_flag"], "routes": ["api/x/route.ts"]}
@@ -895,10 +900,10 @@ def test_seed_affordances(tmp: Path):
     try:
         corpus = rl.load_corpus()
         ref = m.build_reference_index(corpus.symbol_files)
-        assert m.fan_in(ref, "slugify", "src/text.py") == 5
-        assert m.fan_in(ref, "titlecase", "src/text.py") == 4
-        assert m.fan_in(ref, "truncate", "src/text.py") == 3
-        assert m.fan_in(ref, "Cache", "src/cache.py") == 1  # below the threshold -> not a seam
+        assert m.fan_in(ref, "slugify", {"src/text.py"}) == 5
+        assert m.fan_in(ref, "titlecase", {"src/text.py"}) == 4
+        assert m.fan_in(ref, "truncate", {"src/text.py"}) == 3
+        assert m.fan_in(ref, "Cache", {"src/cache.py"}) == 1  # below the threshold -> not a seam
 
         worklist = rl.seed_affordances(corpus, ref, 10)
         # slugify EXCLUDED (already declares a seam) despite fan-in 5; Cache EXCLUDED (fan-in 1 < 3);
@@ -922,7 +927,7 @@ def test_reuse_shared_primitives(tmp: Path):
     assert m.stems("normalise a name to a slug") & m.stems("slugify") == {"slug"}
     assert not (m.stems("payment gateway") & m.stems("slugify"))  # unrelated -> no shared stem
 
-    # --- fan-in: distinct referencing files minus the def file, comments/strings excluded ----
+    # --- fan-in: distinct referencing files minus every def file, comments/strings excluded ---
     src = tmp / "src"
     src.mkdir(parents=True)
     (src / "text.py").write_text("def slugify(s):\n    return s\n", encoding="utf-8")
@@ -933,7 +938,7 @@ def test_reuse_shared_primitives(tmp: Path):
     idx = m.build_reference_index(["src/text.py"], root=tmp)
     refs = idx.get("slugify", set())
     assert "src/c.py" not in refs and "src/d.py" not in refs, refs  # string/comment-only dropped
-    assert m.fan_in(idx, "slugify", "src/text.py") == 2  # a.py + b.py, minus the def file
+    assert m.fan_in(idx, "slugify", {"src/text.py"}) == 2  # a.py + b.py, minus the one def file
 
     # --- seam threshold from conf: default, override, fail-closed on a non-int -----------------
     assert m.seam_fanin_threshold(tmp) == m.SEAM_FANIN_THRESHOLD_DEFAULT  # no conf -> default
@@ -1180,7 +1185,7 @@ def test_reuse_lookup(tmp: Path):
     import os
 
     (tmp / ".codebase-map.conf").write_text(
-        'MAP_ROOT=memory/map\nRECALL_DARK_LAYERS="web-ts"\nSEAM_FANIN_THRESHOLD=3\n', encoding="utf-8"
+        'MAP_ROOT=memory/map\nRECALL_DARK_LAYERS=".ts"\nSEAM_FANIN_THRESHOLD=3\n', encoding="utf-8"
     )
     gen = tmp / "memory" / "map" / "generated"
     gen.mkdir(parents=True)
@@ -1249,7 +1254,7 @@ def test_reuse_lookup(tmp: Path):
         assert "affordance-seam" in corpus.candidates["slugify"].sources  # merged symbol + seam
         assert "Cache" not in names, names  # different kind AND file -> not a neighbour
         out = rl.render(sl, corpus)
-        assert "recall partial: layers web-ts" in out                   # (c) recall-dark announced
+        assert "recall partial: layers .ts" in out                   # (c) recall-dark announced
         # THE DECISIONS CLAUSE: its own line, and EVERY id rather than the first few. This
         # fixture has no `map_extractors.py` at all, so passing here is also the assertion that
         # reading the field kept this module portable instead of quietly ending that property.
@@ -1261,7 +1266,7 @@ def test_reuse_lookup(tmp: Path):
         assert sl2.empty, [r.candidate.name for r in sl2.ranked]
         out2 = rl.render(sl2, corpus)
         assert "no seam fits" in out2
-        assert "recall partial: layers web-ts" in out2  # never a falsely-confident "no seam"
+        assert "recall partial: layers .ts" in out2  # never a falsely-confident "no seam"
 
         # `## Shared seams` prose recall: a seam-less feature surfaces via its prose (behavioural
         # recall beyond symbol names), and assembling is IDEMPOTENT (no synthetic leak into corpus).
@@ -1310,18 +1315,22 @@ def test_detect_collisions_and_backlog(tmp: Path):
     # the range wires through fetchGateway (new2 references it) — an edge added -> not reinvention;
     # slugify has NO edge added in the range -> slugify2 is reinvention.
     range_index = {"fetchGateway": {"src/new2.py"}}
-    flags = m.detect_collisions(new, base, ref, range_index, threshold=3)
+    # S1 — the definer map `detect_collisions` no longer derives. Built from base + new the way
+    # `map_diff` builds it from head rows; `slugify` is deliberately CO-DEFINED so the arm below
+    # exercises the multi-definer subtraction rather than the one-path case.
+    definers = {r["id"]: frozenset({r["file"]}) for r in base + new}
+    flags = m.detect_collisions(new, base, ref, range_index, threshold=3, definers=definers)
     assert [f.new for f in flags] == ["slugify2"], flags               # exactly one collision
     only = flags[0]
     assert only.resembles == "slugify" and only.file == "src/new1.py" and only.fanin == 3
     assert only.kind == "function" and only.confidence == "medium"     # no affordance declared -> medium
     # F8c: when the seam DECLARES an affordance, confidence rises to high.
-    hi = m.detect_collisions(new, base, ref, range_index, threshold=3, affordance_seams=frozenset({"slugify"}))
+    hi = m.detect_collisions(new, base, ref, range_index, threshold=3, definers=definers, affordance_seams=frozenset({"slugify"}))
     assert hi[0].confidence == "high"
     # retryGateway stays clean ONLY because the range wired through fetchGateway — drop that edge and
     # it flags, proving the reference-edge check is load-bearing (not dead code). parseWidget/moneyBag
     # stay clean regardless (below-threshold seam / kind mismatch).
-    flagged_names = {f.new for f in m.detect_collisions(new, base, ref, {}, threshold=3)}
+    flagged_names = {f.new for f in m.detect_collisions(new, base, ref, {}, threshold=3, definers=definers)}
     assert flagged_names == {"slugify2", "retryGateway"}, flagged_names
     # KEYSTONE regression: a SAME-NAME reinvention (new `slugify` in another file) whose only
     # occurrence of the id in the range is its OWN definition must FLAG — a same-id row's
@@ -1329,20 +1338,20 @@ def test_detect_collisions_and_backlog(tmp: Path):
     # duplicate passes clean).
     dup = m.detect_collisions(
         [{"id": "slugify", "kind": "function", "file": "src/dup.py"}],
-        base, ref, {"slugify": {"src/dup.py"}}, threshold=3,
+        base, ref, {"slugify": {"src/dup.py"}}, threshold=3, definers=definers,
     )
     assert [f.new for f in dup] == ["slugify"], dup
     # control: a RENAMED symbol whose own file genuinely references the seam is a wire-through -> clean.
     wired = m.detect_collisions(
         [{"id": "slugify2", "kind": "function", "file": "src/new1.py"}],
-        base, ref, {"slugify": {"src/new1.py"}}, threshold=3,
+        base, ref, {"slugify": {"src/new1.py"}}, threshold=3, definers=definers,
     )
     assert wired == [], wired
     # control: the SAME rename with an edge from an UNRELATED file (not new1.py) still FLAGS —
     # the wire-through is scoped to the new symbol's own file, not the whole range.
     masked = m.detect_collisions(
         [{"id": "slugify2", "kind": "function", "file": "src/new1.py"}],
-        base, ref, {"slugify": {"src/z.py"}}, threshold=3,
+        base, ref, {"slugify": {"src/z.py"}}, threshold=3, definers=definers,
     )
     assert [f.new for f in masked] == ["slugify2"], masked
 
@@ -1720,12 +1729,77 @@ def main() -> int:
         )
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
+    failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
+    failures += check("rank_harness: control and measurement share a denominator (review F5)",
+                      test_the_control_and_the_measurement_share_a_denominator)
+    failures += check("no carrier names the old backlog destination (review F7)",
+                      test_no_tracked_carrier_still_names_the_old_backlog_destination)
+    failures += check("gen_map: every advertised read-only mode runs (review F1)",
+                      test_every_advertised_gen_map_mode_runs)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("dark layers: present layers see outside the symbol roots (review F2)",
+                          lambda: test_present_layers_see_outside_the_symbol_roots(Path(td)))
+    failures += check("dark layers: no scan is not an empty corpus (review F3)",
+                      test_no_scan_is_not_an_empty_corpus)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: a GATE_FILE naming nothing REFUSES (review F6)",
+                          lambda: test_gate_coverage_refuses_a_gate_file_that_names_nothing(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("backlog: the legacy note never names its own destination (review F8)",
+                          lambda: test_legacy_note_is_silent_when_it_would_name_its_own_destination(Path(td)))
+    failures += check("dark layers: an undeclared layer refuses with both remedies (AC1)",
+                      test_undeclared_layer_refuses_with_both_remedies)
+    failures += check("dark layers: the banner is derived, not declared (AC2/AC4)",
+                      test_declared_layer_is_named_dark_in_the_banner)
+    failures += check("dark layers: a stale declaration is reported (AC3)",
+                      test_stale_declaration_is_reported_not_honoured)
+    failures += check("dark layers: the legacy spelling refuses (AC6)",
+                      test_legacy_language_name_refuses_and_names_the_extension)
+    failures += check_guarded("dark layers: every declared layer is present here (AC5)",
+                              test_every_declared_layer_is_present_on_this_tree)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: an uncompared artifact fails (AC1)",
+                          lambda: test_gate_coverage_fails_on_an_uncompared_artifact(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: a customised gate passes (AC2)",
+                          lambda: test_gate_coverage_passes_a_customised_gate(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: an unset GATE_FILE is a named skip (AC3)",
+                          lambda: test_gate_coverage_names_its_skip(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: a predicate matching nothing REFUSES",
+                          lambda: test_gate_coverage_refuses_a_predicate_that_matches_nothing(Path(td)))
+    failures += check("gate-coverage: green on this tree",
+                      test_gate_coverage_is_green_on_this_tree)
+    failures += check("backlog: written outside the worktree (AC1)",
+                      test_backlog_path_is_outside_the_worktree)
+    failures += check_guarded("backlog: follows --git-common-dir (AC6)",
+                              test_backlog_path_follows_the_common_dir_not_the_git_dir)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("backlog: the legacy file is named, never deleted (AC7)",
+                          lambda: test_legacy_backlog_is_named_and_never_deleted(Path(td)))
+    failures += check("freshness: an orphaned artifact is a refusal (AC2)",
+                      test_conditional_tier_refuses_an_orphaned_artifact)
+    failures += check("freshness: a NEW conditional tier reports itself (AC1/AC4)",
+                      test_a_new_conditional_tier_reports_itself)
+    failures += check("gate and template are byte-identical (AC5)",
+                      test_the_gate_and_its_template_are_byte_identical)
+    failures += check("gov-only files withheld on both paths (AC13)",
+                      test_gov_only_files_are_withheld_on_both_paths)
+    failures += check("scan coverage line cannot go quiet (AC12)",
+                      test_scan_coverage_line_cannot_go_quiet)
+    failures += check_guarded("every co-defined symbol reaches every definer (AC2)",
+                              test_every_co_defined_symbol_reaches_every_definer)
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "symbols-at-ref: absent is not empty (ABL-bCandidLoupe-2)",
             lambda: test_symbols_at_ref_absent_is_not_empty(Path(td)),
         )
     failures += check("identifier tokens: one arm per over-strip class", test_identifier_tokens_per_language)
+    failures += check("map_imports: the rescued resolver's case table", test_map_imports_resolution)
+    failures += check("map_imports: no sibling-kit import (AC7)", test_map_imports_has_no_sibling_kit_import)
+    failures += check("map_imports: same candidates as the kit it was rescued from (AC1)",
+                      test_map_imports_matches_the_kit_it_was_rescued_from)
     failures += check_guarded("identifier tokens: corpus recall + precision floors", test_identifier_tokens_corpus_recall)
     # S2 — EXECUTED and SKIPPED reported separately, always. A single number cannot say which of
     # the two it is, and the whole defect this unit closes was a report that could not tell them
@@ -1742,6 +1816,733 @@ def main() -> int:
     print("PASS" if not failures else f"{failures} FAILURE(S)")
     return 1 if failures else 0
 
+
+
+# --- map_imports: the rescued AST import resolver (TOOL-dTracedLattice-6) -------------------------
+# The rows below are the lexicon kit's own `resolve_import` case table, carried with the code so the
+# arms that covered it there cover it here. They assert on the CANDIDATE SET directly rather than
+# through a glob matcher, because the candidate set is what this module returns and a glob is the
+# consumer's business. Every fixture path below exists so a row can FAIL: `debounce.js`,
+# `thingamajig/thing.js` and `outside/thing.js` were added upstream after three rows were found to
+# be passing on an empty corpus rather than on correct code.
+RI_FILES = [
+    "src/pkg/consumer/a.py",
+    "src/pkg/consumer/helper.py",
+    "src/pkg/shared_core/helper.py",
+    "src/pkg/shared_core/only_there.py",
+    "src/pkg/shared_core/notes.md",
+    "web/consumer/a.js",
+    "web/shared/thing.js",
+    "web/shared/debounce.js",
+    "web/shared/thingamajig/thing.js",
+    "outside/thing.js",
+]
+PY_IMPORTER = "src/pkg/consumer/a.py"
+JS_IMPORTER = "web/consumer/a.js"
+
+
+def test_map_imports_resolution():
+    idx = mi.build_module_index(RI_FILES)
+
+    def resolve_for(target, importer=PY_IMPORTER):
+        return mi.resolve_import(target, importer, idx)
+
+    # A FULLY-QUALIFIED dotted import reaches the far package even though a same-stem local sibling
+    # exists: the language grants the importer's directory no precedence there. The upstream B1
+    # false negative was exactly this crossing vanishing onto the sibling.
+    assert "src/pkg/shared_core/helper.py" in resolve_for("pkg.shared_core.helper"), resolve_for("pkg.shared_core.helper")
+    assert "src/pkg/consumer/helper.py" not in resolve_for("pkg.shared_core.helper")
+    # A BARE name prefers the importer-local sibling...
+    assert resolve_for("helper") == ["src/pkg/consumer/helper.py"], resolve_for("helper")
+    # ...and FALLS BACK across when there is no local sibling. Not directory-bound.
+    assert resolve_for("only_there") == ["src/pkg/shared_core/only_there.py"], resolve_for("only_there")
+    # Extension scoping: a same-stem file of another language is not a resolution.
+    assert resolve_for("notes") == [], resolve_for("notes")
+    # A dotted target whose PATH is inconsistent with the dots denotes nothing tracked. Both of
+    # these are real imports in this tree that touch nothing in it.
+    for target in ("concurrent.helper", "thirdparty.helper"):
+        assert all(not c.startswith("src/") for c in resolve_for(target)), (target, resolve_for(target))
+    # A relative JS specifier resolves against the importer's directory.
+    assert "web/shared/thing.js" in resolve_for("../shared/thing.js", JS_IMPORTER), resolve_for("../shared/thing.js", JS_IMPORTER)
+    # BOUNDARY, not prefix: `../shared/thing` must not land on `thingamajig/thing.js`.
+    assert "web/shared/thingamajig/thing.js" not in resolve_for("../shared/thing.js", JS_IMPORTER)
+    # Escaping the repo root is EXTERNAL, never clamped back in — clamping fabricates a candidate.
+    assert resolve_for("../../../outside/thing.js", JS_IMPORTER) == [], resolve_for("../../../outside/thing.js", JS_IMPORTER)
+    # THE LANGUAGE BRANCH. A JS package specifier carrying a dot is one name, not a namespace path.
+    assert resolve_for("lodash.debounce", JS_IMPORTER) == ["lodash.debounce"], resolve_for("lodash.debounce", JS_IMPORTER)
+    # And a Python leading dot is relative-to-package: `from . import helper` stays in the importer's
+    # own package and must not reach the same-stem file in the other one.
+    rel = resolve_for(".helper")
+    assert "src/pkg/consumer/helper.py" in rel, rel
+    assert "src/pkg/shared_core/helper.py" not in rel, rel
+    # An unresolvable external target denotes nothing in the corpus.
+    assert all(not c.startswith(("src/", "web/")) for c in resolve_for("json")), resolve_for("json")
+
+
+def test_map_imports_has_no_sibling_kit_import():
+    """AC7 — the rescued module reaches into no sibling kit.
+
+    Asserted over the module's own source rather than by a `LAYERS` rule: the lexicon rule that
+    would state this direction rides on predicate P3, which `TOOL-aSurfacedLexicon-2` deletes, so a
+    rule-based assertion would disappear with the thing it was written to outlive.
+    """
+    src = Path(os.path.abspath(__file__)).parent.joinpath("map_imports.py").read_text(encoding="utf-8")
+    for ln, line in enumerate(src.split("\n"), 1):
+        stripped = line.strip()
+        if stripped.startswith(("import ", "from ")):
+            assert "lexicon" not in stripped, f"map_imports.py:{ln} imports a sibling kit: {stripped}"
+
+
+def test_map_imports_matches_the_kit_it_was_rescued_from():
+    """AC1 — same candidates as the original, over the same fixtures.
+
+    SKIPS LOUDLY once the lexicon kit's copy is gone. That is the designed end state, not a hole:
+    `TOOL-aSurfacedLexicon-2` deletes the original, and after it lands this arm has nothing to
+    compare against and says so instead of reporting a green it did not earn.
+    """
+    origin = Path(os.path.abspath(__file__)).parent.parent / "lexicon" / "lexicon.py"
+    if not origin.exists():
+        raise Skipped("the lexicon kit is not installed here, so the original this module was "
+                      "rescued from cannot be compared against")
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("_lex_origin", origin)
+    lex = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(lex)
+    if not hasattr(lex, "resolve_import"):
+        raise Skipped("the lexicon kit no longer carries `resolve_import`, which is the deletion "
+                      "this module was rescued ahead of")
+    ours, theirs = mi.build_module_index(RI_FILES), lex.build_module_index(RI_FILES)
+    assert ours == theirs, "the module index diverged"
+    cases = [
+        ("pkg.shared_core.helper", PY_IMPORTER), ("helper", PY_IMPORTER),
+        ("only_there", PY_IMPORTER), ("notes", PY_IMPORTER), ("concurrent.helper", PY_IMPORTER),
+        ("thirdparty.helper", PY_IMPORTER), (".helper", PY_IMPORTER), ("json", PY_IMPORTER),
+        ("../shared/thing.js", JS_IMPORTER), ("../../../outside/thing.js", JS_IMPORTER),
+        ("lodash.debounce", JS_IMPORTER), ("thing", JS_IMPORTER),
+    ]
+    for target, importer in cases:
+        a = mi.resolve_import(target, importer, ours)
+        b = lex.resolve_import(target, importer, theirs)
+        assert a == b, f"{target!r} from {importer!r}: rescued {a} vs original {b}"
+
+
+# --- S1: fan-in subtracts EVERY definer (TOOL-dTracedLattice-1) -----------------------------------
+def test_fan_in_subtracts_every_definer():
+    """The S1 core, in the smallest form that can fail.
+
+    A symbol defined in two files had ONE arbitrary definer subtracted, so the other definition
+    counted as a reference and the symbol scored fan-in for being defined twice.
+    """
+    ref = {"repo_root": {"a.py", "b.py", "c.py", "x/repo_root.py", "y/repo_root.py"}}
+    both = m.fan_in(ref, "repo_root", {"x/repo_root.py", "y/repo_root.py"})
+    one = len(ref["repo_root"] - {"x/repo_root.py"})
+    assert both == 3, both
+    # The arm is only worth anything if the two readings DIFFER on this fixture; assert that rather
+    # than trusting it, or a later fixture edit could make the row pass by finding nothing.
+    assert one == 4 and one != both, (one, both)
+    # A bare str is REFUSED, not iterated as characters. Python would subtract single letters and
+    # return the un-subtracted count — a wrong number with no error at the exact call sites this
+    # change corrects.
+    try:
+        m.fan_in(ref, "repo_root", "x/repo_root.py")
+    except TypeError as exc:
+        assert "SET of definer paths" in str(exc), str(exc)
+    else:
+        raise AssertionError("fan_in accepted a bare str instead of refusing it")
+
+
+def test_every_co_defined_symbol_reaches_every_definer():
+    """AC2 — after the name-merge fix, no definition is unreachable.
+
+    Guarded on the committed `symbols.json`: an opt-out repo has none, and this arm grades THIS
+    corpus rather than a fixture, so it says so instead of passing on an absent artifact.
+    """
+    root = m.repo_root()
+    gen = m.map_root(root) / "generated" / "symbols.json"
+    if not gen.is_file():
+        raise Skipped("no committed symbols.json, so there is no corpus to grade")
+    rows = json.loads(gen.read_text(encoding="utf-8")).get("symbols", [])
+    by_id: dict = {}
+    for r in rows:
+        by_id.setdefault(r["id"], set()).add(r["file"])
+    multi = {k: v for k, v in by_id.items() if len(v) > 1}
+    # LIVENESS. On a corpus with no co-defined symbol every assertion below is vacuous, and a green
+    # row would report coverage that does not exist. Refuse instead.
+    assert multi, ("no symbol in this corpus has more than one definer, so this arm proves nothing "
+                   "about the defect it exists to pin")
+    corpus = rl.load_corpus(root)
+    for sid, files in sorted(multi.items()):
+        cand = corpus.candidates.get(sid)
+        assert cand is not None, f"{sid} is in symbols.json and absent from the corpus"
+        assert set(cand.files) >= files, (sid, sorted(files), sorted(cand.files))
+
+
+def test_scan_coverage_line_cannot_go_quiet():
+    """AC12 — S6's coverage line, and it REDS on any of the three facts going missing.
+
+    Rendered from a synthetic shortlist rather than from a live lookup, so the arm grades the LINE
+    rather than this corpus's numbers. Three separate assertions, because a single "line exists"
+    check passes while two thirds of it are gone.
+    """
+    corpus = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                       recall_dark=("sh", "ps1"), has_symbols=True, decisions_by_feature={})
+    scan = {"files_scanned": 41, "parse_skips": 2, "extensions": [".py"], "roots": ["tools"]}
+    sl = rl.Shortlist("q", [], corpus.recall_dark, corpus.threshold, {}, scan)
+    text = rl.render(sl, corpus)
+    assert "41 files scanned" in text, text
+    assert "2 parse skips" in text, text
+    assert "unscanned layers: sh, ps1" in text, text
+    # A scan that never ran must SAY so rather than printing zeros, which read as "scanned
+    # everything and found nothing".
+    quiet = rl.render(rl.Shortlist("q", [], (), corpus.threshold, {}, {}), corpus)
+    assert "scan coverage: not run" in quiet, quiet
+
+
+def test_gov_only_files_are_withheld_on_both_paths():
+    """AC13 — a corpus-specific fixture reaches no adopter, by EITHER install path.
+
+    `kit.toml` declares `include = "**"`, so a new file under this directory ships by default; a
+    `project-owned` claim is what withholds it from `govkit apply`. The copy-install path in
+    `WIRE-INTO-PROJECT.md` is a plain `cp -r` that never reads `kit.toml`, so it needs its own
+    removal row — two carriers, and an omission in either ships the file.
+
+    The population is DERIVED from the descriptor's own `project-owned` claims rather than typed
+    here, so a fourth gov-only file added later is covered the day it is claimed. The seed
+    destination is excluded by name: `map_extractors.py` is `project-owned` because the adopter
+    authors it, and removing it would delete their work.
+
+    WHAT IT DOES NOT CHECK: that a gov-only file was claimed AT ALL. A new corpus-specific file
+    claimed in neither carrier is invisible to this arm — that is the ratchet over `include = "**"`
+    this review named as a left-shift and it is not built here.
+    """
+    kit = Path(os.path.abspath(__file__)).parent
+    toml = (kit / "kit.toml").read_text(encoding="utf-8")
+    claimed: set = set()
+    for block in toml.split("[[files]]")[1:]:
+        head = block.split("[[", 1)[0]
+        if 'role = "project-owned"' not in head:
+            continue
+        for tok in re.findall(r'"([^"]+)"', head.split("include", 1)[1].split("role", 1)[0]):
+            claimed.add(tok)
+    claimed -= {"map_extractors.py"}  # the SEED destination: the adopter authors it
+    assert claimed, "no project-owned claim in kit.toml, so this arm would prove nothing"
+    for expect in ("rank_harness.py", "scen-adversarial.json"):
+        assert expect in claimed, f"{expect} is not withheld from `govkit apply` by kit.toml"
+    runbook = (kit.parent.parent / "WIRE-INTO-PROJECT.md")
+    if not runbook.is_file():
+        raise Skipped("WIRE-INTO-PROJECT.md is not in this tree (an adopter's copy of the kit)")
+    text = runbook.read_text(encoding="utf-8")
+    rm_lines = [ln for ln in text.splitlines() if "rm -f" in ln and "codebase-map" in ln]
+    assert rm_lines, "the runbook has no codebase-map removal row at all"
+    joined = " ".join(rm_lines)
+    for name in sorted(claimed):
+        assert name in joined, (f"{name} is withheld from `govkit apply` but the copy-install "
+                                f"runbook never removes it: {joined}")
+
+
+def _load_gate_module():
+    """The gate file, imported by path. It is not importable by name (a hyphenated kit dir), and
+    gov's own `GATE_FILE` points inside this directory, so there is one copy to grade."""
+    import importlib.util
+    path = Path(os.path.abspath(__file__)).parent / "test_codebase_map.py"
+    spec = importlib.util.spec_from_file_location("_gate_under_test", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _run_gate(gate, *, empty_symbols=False):
+    """Run the freshness gate against the REAL map tree, optionally with an empty symbol
+    population. Returns `(assertion_text_or_None, stdout)`.
+
+    No temp map root: the unconditional tiers need a real dossier tree, and faking one would grade
+    a fixture rather than the gate. What is faked is exactly the one input under test.
+    """
+    import contextlib, io as _io
+    # The ONE attribute under test is swapped on the real extractor module and restored in
+    # `finally`. A proxy class was tried first and its `__getattr__` is graded by the naming leg,
+    # which has no row for a dunder — so the smaller change is also the one that does not argue
+    # with a gate about a method Python named.
+    had = hasattr(gate.ext, "all_symbols")
+    real_all = getattr(gate.ext, "all_symbols", None)
+    if empty_symbols:
+        gate.ext.all_symbols = list
+    out, err = _io.StringIO(), None
+    try:
+        with contextlib.redirect_stdout(out):
+            gate.test_generated_artifacts_are_fresh()
+    except AssertionError as exc:
+        err = str(exc)
+    finally:
+        if empty_symbols:
+            if had:
+                gate.ext.all_symbols = real_all
+            else:
+                del gate.ext.all_symbols
+    return err, out.getvalue()
+
+
+def test_conditional_tier_refuses_an_orphaned_artifact():
+    """AC2 — an empty population WITH a committed artifact is a REFUSAL, not a silent pass.
+
+    That pairing means the extractor went dark under a file it can no longer justify, and before
+    this unit the gate passed over it: `if symbols:` with no `else` compares nothing and returns.
+    """
+    gate = _load_gate_module()
+    err, out = _run_gate(gate, empty_symbols=True)
+    assert err and "DARK symbol tier" in err, (err, out)
+    assert "symbols.json" in err and "regen" in err, err
+
+
+def test_a_new_conditional_tier_reports_itself():
+    """AC1 and AC4 in one arm, because they are one mechanism.
+
+    AC4 first: `symbols.json` is the ONLY conditional tier today, so a criterion that enumerated
+    the tiers would grade a population of one and could not fail. This introduces a SECOND tier in
+    a fixture and asserts it is reported with no reporting line written for it — the list IS the
+    mechanism. AC1 rides on it: that tier's artifact does not exist, so its empty population is a
+    NAMED skip and not a refusal, which is the legal state an adopter declaring no such extractor
+    is in.
+    """
+    gate = _load_gate_module()
+    real = list(gate.CONDITIONAL_TIERS)
+    gate.CONDITIONAL_TIERS.append(("widget", "all_widgets", "widgets.json", "render_symbols_json"))
+    try:
+        err, out = _run_gate(gate)
+        assert "skipped widget tier" in out, (out, err)
+        assert "widgets.json" in out and "NOTHING WAS COMPARED" in out, out
+        assert err is None, f"a tier with no committed artifact must not refuse: {err}"
+    finally:
+        gate.CONDITIONAL_TIERS[:] = real
+
+
+def test_the_gate_and_its_template_are_byte_identical():
+    """AC5 — editing one and not the other ships a divergence no adopter ever sees corrected."""
+    kit = Path(os.path.abspath(__file__)).parent
+    a = (kit / "test_codebase_map.py").read_bytes()
+    b = (kit / "test_codebase_map.template.py").read_bytes()
+    assert a == b, ("the installed gate and its template have diverged; "
+                    f"{len(a)} vs {len(b)} bytes")
+
+
+# --- the reinvention backlog leaves the worktree (TOOL-dTracedLattice-3) --------------------------
+def test_backlog_path_is_outside_the_worktree():
+    """AC1 / S2 — `--converge` cannot leave untracked clutter inside a gated directory.
+
+    Asserted on the DESTINATION rather than by running a converge into a scratch repo: the property
+    the unit is about is where the write goes, and a fixture that ran the whole digest would grade
+    the digest.
+    """
+    import subprocess
+    root = m.repo_root()
+    path = md.derive_backlog_path(root)
+    assert path.name == "reinvention-backlog.md", path
+    # NOT `is_relative_to(root)`. In a PRIMARY checkout the git dir IS `<root>/.git`, so that test
+    # calls a correct destination wrong — measured, by running this suite from the primary tree
+    # during the landing merge. What the unit actually promises is that `--converge` leaves no
+    # untracked clutter in a GATED directory, so the two properties are asserted directly: the write
+    # lands under the git common dir, and nowhere under MAP_ROOT.
+    raw = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
+                         capture_output=True, text=True, check=True).stdout.strip()
+    common = Path(raw)
+    common = (common if common.is_absolute() else (root / raw)).resolve()
+    assert path.is_relative_to(common), f"the backlog is not under the git common dir: {path}"
+    assert not path.is_relative_to(m.map_root(root)), (
+        f"the backlog is inside the gated map tree, which is the defect this unit removed: {path}")
+
+
+def test_backlog_path_follows_the_common_dir_not_the_git_dir():
+    """AC6 — `--git-common-dir`, never `--git-dir`.
+
+    SKIPS LOUDLY where the two are the same path, which is every non-linked checkout: the arm would
+    then pass whichever the code resolved, and a row that cannot tell the two apart is worse than no
+    row. Gov's own bar runs this from a linked worktree, where they differ.
+    """
+    import subprocess
+    root = m.repo_root()
+
+    def read_dir(flag):
+        raw = subprocess.run(["git", "-C", str(root), "rev-parse", flag],
+                             capture_output=True, text=True, check=True).stdout.strip()
+        q = Path(raw)
+        return (q if q.is_absolute() else (root / raw)).resolve()
+
+    common, own = read_dir("--git-common-dir"), read_dir("--git-dir")
+    if common == own:
+        raise Skipped("this checkout is not a linked worktree, so --git-dir and --git-common-dir "
+                      "are the same path and the two cannot be told apart here")
+    path = md.derive_backlog_path(root)
+    assert path.is_relative_to(common), (path, common)
+    assert not path.is_relative_to(own), (
+        f"the backlog landed under --git-dir ({own}), which `git worktree remove` deletes outright")
+
+
+def test_legacy_backlog_is_named_and_never_deleted(tmp: Path):
+    """AC7 — the migration case, which a clean fixture never reaches.
+
+    It exists only because the destination moved, so AC1's clean-worktree criterion cannot grade it.
+    """
+    root = tmp
+    legacy = tmp / "map" / "reinvention-backlog.md"
+    current = tmp / "elsewhere" / "reinvention-backlog.md"
+    assert md.render_legacy_note(legacy, current, root) == "", "a note with no legacy file to name"
+    legacy.parent.mkdir(parents=True)
+    legacy.write_text("# rows nobody has read\n", encoding="utf-8")
+    note = md.render_legacy_note(legacy, current, root)
+    assert "LEGACY location" in note and "NO LONGER WRITTEN" in note, note
+    assert "map/reinvention-backlog.md" in note, note
+    assert current.as_posix() in note, note
+    assert legacy.is_file(), "the note must not delete the file it names"
+
+
+# --- the adopter's frozen gate is compared against the engine (TOOL-dTracedLattice-4) -------------
+def _run_gate_coverage(gate_text, tmp: Path, *, name="test_codebase_map.py"):
+    """Run the real check against a FIXTURE installed gate. Returns `(exit, stdout, stderr)`."""
+    import contextlib, io as _io
+    path = None
+    if gate_text is not None:
+        path = tmp / name
+        path.write_text(gate_text, encoding="utf-8")
+    real = cg.resolve_gate_path
+    cg.resolve_gate_path = lambda root: path
+    out, err = _io.StringIO(), _io.StringIO()
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = cg.main([])
+    finally:
+        cg.resolve_gate_path = real
+    return code, out.getvalue(), err.getvalue()
+
+
+def test_gate_coverage_fails_on_an_uncompared_artifact(tmp: Path):
+    """AC1 — an installed gate missing a tier the engine writes FAILS, naming the artifact."""
+    frozen = 'fresh = {gen_dir / "inventories.json": x, gen_dir / "MAP.md": y}\n'
+    code, out, err = _run_gate_coverage(frozen, tmp)
+    assert code == 1, (code, out, err)
+    assert "symbols.json" in err, err
+    assert "does not compare" in err, err
+    # It must say what it CANNOT decide, or the report reads as a verdict about the adopter.
+    assert "CANNOT TELL A DELIBERATE OMISSION" in err, err
+
+
+def test_gate_coverage_passes_a_customised_gate(tmp: Path):
+    """AC2 — a gate that covers every artifact passes even when it differs byte-for-byte.
+
+    A project is entitled to edit its gate. Reporting a diff would report customisation as
+    staleness, which is the reason this check compares SETS and not bytes.
+    """
+    customised = ('# a project comment the template does not have\n'
+                  'fresh = {gen_dir / "inventories.json": x, gen_dir / "MAP.md": y}\n'
+                  'CONDITIONAL_TIERS = [\n'
+                  '    ("symbol", "all_symbols", "symbols.json", "render_symbols_json"),\n'
+                  ']\n'
+                  'def extra_project_arm(): pass\n')
+    code, out, err = _run_gate_coverage(customised, tmp)
+    assert code == 0, (code, out, err)
+    assert "names every one" in out, out
+    assert "customise" in out, out
+
+
+def test_gate_coverage_names_its_skip(tmp: Path):
+    """AC3 — an unset or absent GATE_FILE is a NAMED skip, never a silent pass."""
+    code, out, err = _run_gate_coverage(None, tmp)
+    assert code == 0, (code, out, err)
+    assert "skipped" in out and "GATE_FILE" in out, out
+    # It still names what the engine writes, so the skip is informative rather than a shrug.
+    assert "symbols.json" in out, out
+
+
+def test_gate_coverage_refuses_a_predicate_that_matches_nothing(tmp: Path):
+    """The liveness refusal: a stale predicate would report every gate as complete.
+
+    That is the vacuous-selector shape, and a check that cannot distinguish "covered" from "matched
+    nothing" is worse than no check because it is cited as coverage.
+    """
+    import re as _re
+    real_art, real_tier = cg.ARTIFACT_RE, cg.TIER_RE
+    cg.ARTIFACT_RE = _re.compile(r"(?!x)x")
+    cg.TIER_RE = _re.compile(r"(?!x)x")
+    try:
+        code, out, err = _run_gate_coverage('fresh = {}\n', tmp)
+    finally:
+        cg.ARTIFACT_RE, cg.TIER_RE = real_art, real_tier
+    assert code == 2, (code, out, err)
+    assert "REFUSED" in err and "predicate" in err, err
+
+
+def test_gate_coverage_is_green_on_this_tree():
+    """gov is its own adopter here: GATE_FILE points inside the kit dir, so the shipped pair is
+    graded on every run rather than only in a fixture."""
+    code = cg.main([])
+    assert code == 0, "this repo's own installed gate does not compare every engine artifact"
+
+
+# --- dark layers are DERIVED, not asserted (TOOL-dTracedLattice-5) --------------------------------
+SCAN_FIXTURE = {"extensions": [".py"], "present_extensions": [".py", ".sh"],
+                "present_counts": {".py": 47, ".sh": 85}, "files_scanned": 47, "parse_skips": 0}
+
+
+def test_undeclared_layer_refuses_with_both_remedies():
+    """AC1 / S3 — the refusal names the layer, its file count, and BOTH ways to clear it.
+
+    Rev-4 graded two of the three. A refusal that names a problem and no repair is what §5's risks
+    row forbids: an adopter meets it and has nowhere to go.
+    """
+    v = rl.derive_layer_verdict(SCAN_FIXTURE, ())
+    text = rl.render_layer_refusal(v)
+    assert ".sh" in text, text
+    assert "85 file(s)" in text, text
+    assert "register an extractor" in text, text
+    assert "RECALL_DARK_LAYERS" in text, text
+    # And it must NOT fire once the layer is declared, or the remedy it prints does not work.
+    assert rl.render_layer_refusal(rl.derive_layer_verdict(SCAN_FIXTURE, (".sh",))) == ""
+
+
+def test_declared_layer_is_named_dark_in_the_banner():
+    """AC2 / AC4 / S4 — the banner's dark set is DERIVED from the corpus walk, not from the conf.
+
+    This unit owns that wording outright: `TOOL-dTracedLattice-1` grades no banner content, and an
+    ungraded handover between two sequenced units is what M6 clause 3 exists to catch.
+    """
+    corpus = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                       recall_dark=(".sh",), has_symbols=True, decisions_by_feature={})
+    sl = rl.Shortlist("q", [], corpus.recall_dark, corpus.threshold, {}, SCAN_FIXTURE)
+    text = rl.render(sl, corpus)
+    assert "unscanned layers: .sh" in text, text
+    # DERIVED means the conf cannot make it lie: declare something absurd and the banner is unmoved.
+    lying = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                      recall_dark=(".nonexistent",), has_symbols=True, decisions_by_feature={})
+    text2 = rl.render(rl.Shortlist("q", [], lying.recall_dark, 3, {}, SCAN_FIXTURE), lying)
+    assert "unscanned layers: .sh" in text2, text2
+    assert ".nonexistent" not in text2, text2
+
+
+def test_stale_declaration_is_reported_not_honoured():
+    """AC3 — a declared layer absent from the corpus is a STALE declaration, not a dark layer."""
+    v = rl.derive_layer_verdict(SCAN_FIXTURE, (".sh", ".rb"))
+    assert v["stale"] == [".rb"], v
+    assert v["undeclared"] == [], v
+    # Stale is a REPORT, never a refusal: it costs an adopter nothing and blocks nothing.
+    assert rl.render_layer_refusal(v) == "", v
+
+
+def test_legacy_language_name_refuses_and_names_the_extension():
+    """AC6 / S6 — the migration. An old value is REFUSED, never reinterpreted.
+
+    Reading `bash` as `.sh` is right on this tree and wrong for `c` or `go`, and an adopter whose
+    conf still carries the old spelling has to be told rather than guessed at.
+    """
+    v = rl.derive_layer_verdict(SCAN_FIXTURE, ("bash",))
+    text = rl.render_layer_refusal(v)
+    assert "OLD language-name spelling" in text and "bash" in text, text
+    assert ".sh" in text, "the refusal must name the uncovered layers it could be"
+    # The legacy check leads: a conf carrying both an old and a new value is still a migration.
+    both = rl.render_layer_refusal(rl.derive_layer_verdict(SCAN_FIXTURE, ("bash", ".sh")))
+    assert "OLD language-name spelling" in both, both
+
+
+def test_every_declared_layer_is_present_on_this_tree():
+    """AC5 — over THIS repo's own conf, not a fixture. It reddened against the shipped `bash`
+    value before the migration landed, which is the observation the criterion asks for."""
+    root = m.repo_root()
+    declared = tuple(t for t in (m.load_conf(root).get("RECALL_DARK_LAYERS", "")).replace(",", " ").split() if t)
+    corpus = rl.load_corpus(root)
+    scan: dict = {}
+    m.build_reference_index(corpus.symbol_files, root=root, stats=scan)
+    present = set(scan.get("present_extensions", ()))
+    assert present, "the walk found no definition-carrying layer at all, so this arm proves nothing"
+    for token in declared:
+        assert token.startswith("."), f"{token} is the OLD language-name spelling"
+        assert token in present, f"{token} is declared dark and is not present in the corpus"
+
+
+# --- left-shifts from the closing diff review (dTracedLattice round 1) ----------------------------
+def test_every_advertised_gen_map_mode_runs():
+    """F1's class, not F1's line. `--seed-affordances` shipped BROKEN through a data-model rename
+    because the only arm covering it drove the library function and never the printer, and its own
+    docstring conceded "the CLI is thin glue over this". A suite green over a dead entrypoint is the
+    green-by-absence shape.
+
+    READ-ONLY modes only, in a subprocess against the real tree. `--write` and the three seeding
+    modes mutate, and running them here would make the suite a writer; they are exercised by the
+    build's own regen and by `codebase-map adopter e2e`. Stated rather than implied: this arm covers
+    `--check` and `--seed-affordances`, and those are the two whose output is a PRINTER over the
+    candidate data model, which is the surface the rename broke.
+    """
+    import subprocess
+    kit = Path(os.path.abspath(__file__)).parent
+    # `prints` says whether the mode has a PRINTER at all: `--check` is a gate and is silent
+    # when it passes, so asserting output there would grade the wrong thing and red on a clean
+    # tree.
+    for argv, prints in ((["--check"], False), (["--seed-affordances", "--top", "3"], True)):
+        proc = subprocess.run([sys.executable, str(kit / "gen_map.py"), *argv],
+                              capture_output=True, text=True, cwd=str(m.repo_root()))
+        assert proc.returncode == 0, f"gen_map.py {' '.join(argv)} exited {proc.returncode}\n{proc.stderr}"
+        assert "Traceback" not in proc.stderr, proc.stderr
+        if prints:
+            assert proc.stdout.strip(), f"gen_map.py {' '.join(argv)} printed nothing"
+            # A CANDIDATE ROW, not the header. `_seed_affordances` prints its
+            # `# seed-affordances: top N ...` line unconditionally and BEFORE the loop that
+            # crashed, so a needle satisfied by the header greens over a printer that never ran —
+            # verified with `--top 0`: exit 0, header, zero rows, arm passes.
+            rows = [ln for ln in proc.stdout.splitlines()
+                    if ln.startswith("- ") and "fan-in" in ln]
+            assert rows, (
+                "the header printed and no candidate row followed it, so the printer this arm "
+                f"exists to exercise never ran:\n{proc.stdout}")
+
+
+def test_present_layers_see_outside_the_symbol_roots(tmp: Path):
+    """F2's class. The tally used to sit inside a walk over the SYMBOL corpus's top-level dirs, so a
+    layer in any other directory was never counted present — and everything downstream reads "not
+    counted" as "not there", which turns a dark-layer check into an affirmative claim that every
+    present layer is covered.
+
+    The fixture is shaped like the repro: symbols under `src/`, an unextracted layer under `web/`.
+    """
+    (tmp / "src").mkdir()
+    (tmp / "web").mkdir()
+    (tmp / "src" / "text.py").write_text("def build_slug():\n    return 1\n", encoding="utf-8")
+    (tmp / "web" / "text.ts").write_text("export function buildSlug() { return 1 }\n", encoding="utf-8")
+    present = m.derive_present_layers(tmp)
+    assert present.get(".ts") == 1, (
+        "a layer outside the symbol corpus's roots is invisible to the present-layer tally, so the "
+        f"dark-layer check would report it covered: {present}")
+    assert present.get(".py") == 1, present
+    # AND THE CALL SITE, which is where the defect lived: the helper can be correct while
+    # `build_reference_index` still fills `stats` from its own roots-scoped loop. Symbols under
+    # `src/` only, so `roots == ['src']` and the `.ts` under `web/` is reachable ONLY through the
+    # widened population.
+    stats: dict = {}
+    m.build_reference_index(["src/text.py"], root=tmp, stats=stats)
+    assert ".ts" in stats.get("present_extensions", ()), (
+        "build_reference_index still reports the roots-scoped population, so every reader of "
+        f"`stats` sees the old answer however correct the helper is: {stats}")
+    # And the verdict built from it must REFUSE rather than report the correct declaration stale.
+    scan = {"extensions": [".py"], "present_extensions": sorted(present),
+            "present_counts": present, "files_scanned": 1, "parse_skips": 0}
+    v = rl.derive_layer_verdict(scan, ())
+    assert v["undeclared"] == [".ts"], v
+    assert rl.render_layer_refusal(v), "an undeclared present layer must refuse"
+
+
+def test_no_scan_is_not_an_empty_corpus():
+    """F3's class. An empty-seed query and a corpus with no symbol file list both skip the walk, and
+    reading that as "no layer is present" marked every correct declaration STALE and told the
+    operator to delete the one thing protecting them."""
+    v = rl.derive_layer_verdict({}, (".sh",))
+    assert v["stale"] == [], v
+    assert v["undeclared"] == [], v
+    assert rl.render_layer_refusal(v) == "", v
+    # The MIGRATION check still fires: it reads the declaration only, and a legacy value is owed a
+    # refusal whether or not a walk ran.
+    assert rl.derive_layer_verdict({}, ("bash",))["legacy"] == ("bash",)
+
+
+def test_gate_coverage_refuses_a_gate_file_that_names_nothing(tmp: Path):
+    """F6's class. "GATE_FILE unset" and "GATE_FILE names a path that is not there" were one return
+    value and one exit 0 — a benign state and a broken configuration reported identically."""
+    # FIRST, the function F6 actually changed. Monkeypatching it away and asserting on `main`
+    # alone left the whole suite green with the resolver half reverted, which is the arm grading a
+    # stand-in for the thing under test.
+    (tmp / "tests").mkdir()
+    (tmp / ".codebase-map.conf").write_text(
+        "MAP_ROOT=map\nGATE_FILE=tests/moved_gate.py\n", encoding="utf-8")
+    resolved = cg.resolve_gate_path(tmp)
+    assert resolved is not None, (
+        "a GATE_FILE that is SET must not resolve to None; that collapses a broken configuration "
+        "into the benign unset state")
+    assert not resolved.is_file() and resolved.name == "moved_gate.py", resolved
+
+    missing = tmp / "tests" / "moved_gate.py"
+    real = cg.resolve_gate_path
+    cg.resolve_gate_path = lambda root: missing
+    import contextlib, io as _io
+    out, err = _io.StringIO(), _io.StringIO()
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = cg.main([])
+    finally:
+        cg.resolve_gate_path = real
+    assert code == 2, (code, out.getvalue(), err.getvalue())
+    assert "does not exist" in err.getvalue(), err.getvalue()
+    assert "not the benign unset state" in err.getvalue(), err.getvalue()
+
+
+def test_legacy_note_is_silent_when_it_would_name_its_own_destination(tmp: Path):
+    """F8's class. On the fail-open path the destination falls back INTO the map tree, so the legacy
+    file and the current one are the same path — and the note then told the reader to delete the
+    file the run had just written to."""
+    same = tmp / "reinvention-backlog.md"
+    same.write_text("# rows\n", encoding="utf-8")
+    assert md.render_legacy_note(same, same, tmp) == "", "the note named the file it just wrote"
+    other = tmp / "elsewhere.md"
+    assert md.render_legacy_note(same, other, tmp) != "", "and it must still fire for a real legacy"
+
+
+def test_the_control_and_the_measurement_share_a_denominator():
+    """F5's class. `measure_recall` divides by the LIVE scenarios; the constant control divided by
+    ALL rows, so a dead probe shrank one rate and not the other and the comparison flattered the
+    ranking. A control that is not comparable is not a control.
+    """
+    import importlib.util
+    kit = Path(os.path.abspath(__file__)).parent
+    spec = importlib.util.spec_from_file_location("_rank_harness", kit / "rank_harness.py")
+    rh = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rh)
+    # DERIVED, not spelled: a kit file naming its own install path by literal is what the
+    # carried-prefix ban exists to stop, and an arm is a shipped file like any other.
+    # Row A's target is one of the repo's most-CHANGED files, so the churn control HITS it and the
+    # two denominators give different numbers; row B's target is absent, so it is a DEAD probe and
+    # is the difference between them. Both properties are asserted below rather than assumed.
+    rows = [{"id": "A", "query": "q", "expected_file": "memory/backlog/TOOL.md"},
+            {"id": "B", "query": "q", "expected_file": "no/such/file/anywhere.py"}]
+    scored, dead = rh.measure_ranks(rows, m.repo_root())
+    assert dead == ["B"], f"the fixture must carry a DEAD probe or this arm proves nothing: {dead}"
+    assert len(scored) == 1, scored
+    # THE RENDERED REPORT, which is the CALL SITE. The first cut of this arm rebuilt the filter
+    # inside the test and asserted the rebuild agreed with itself — a tautology that stayed
+    # green with the shipped fix reverted. What has to hold is that the line a reader sees uses
+    # the same denominator the measured rate does.
+    import types
+    live_rows = rh.derive_live_rows(rows, scored)
+    assert len(live_rows) == len(scored) == 1 and live_rows[0]["id"] == "A", (live_rows, scored)
+    args = types.SimpleNamespace(scenarios="<fixture>", control="constant", trials=1, k=20)
+    text = rh.render_report(rows, scored, dead, args, m.repo_root())
+    # The control is scored over ONE live row here. Over both rows the same hit count divides by
+    # two, so the two spellings cannot print the same number unless the fix is in place.
+    want = rh.run_constant_control(live_rows, m.repo_root(), 20)
+    other = rh.run_constant_control(rows, m.repo_root(), 20)
+    assert want != other, (
+        "the fixture does not discriminate between the two denominators, so this arm would "
+        f"pass on either implementation: {want} vs {other}")
+    assert f"{want:.3f}" in text, (
+        "the constant control was scored over a different population than `measure_recall` "
+        f"divides by:\n{text}")
+
+
+def test_no_tracked_carrier_still_names_the_old_backlog_destination():
+    """F7's class. The destination moved and four carriers restated it; a grep is the whole gate.
+
+    The ONE sanctioned mention is `derive_backlog_path`'s own fail-open branch, which really does
+    write there when git cannot answer.
+    """
+    import subprocess
+    root = m.repo_root()
+    # The needle is BUILT rather than written, so this arm's own source does not contain it. A
+    # self-matching predicate reds forever and the obvious repair — excluding this file — would
+    # blind the arm to a real hit here.
+    needle = "MAP_ROOT>/" + "reinvention-backlog.md"
+    proc = subprocess.run(["git", "-C", str(root), "grep", "-n", "-F", needle,
+                           "--", ":!memory/builds/"], capture_output=True, text=True)
+    # `git grep` exits 1 on NO MATCH and 128 on a usage or repository error, and both print nothing
+    # — so discarding the code made a broken invocation indistinguishable from a clean tree.
+    assert proc.returncode in (0, 1), (
+        f"git grep failed (rc={proc.returncode}), so this arm measured nothing: {proc.stderr}")
+    hits = [ln for ln in proc.stdout.splitlines() if ln.strip()]
+    assert not hits, (
+        "a tracked carrier still names the pre-2026-09-06 backlog destination; the record lives "
+        "under the git common dir now:\n" + "\n".join(hits))
 
 if __name__ == "__main__":
     sys.exit(main())

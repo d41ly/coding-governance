@@ -21,7 +21,7 @@ Ported from the inCMS `scripts/recall/` implementation at `5318064`.
 | `recall_conf.py` | the project layer — reads `.memory-tree.conf`, exposes `MEMORY_ROOT`, `FAMILIES`, the node-tag class, and `Conf.digest()`; carries `KIT_MEMORY_RECALL_VERSION`. Run it directly to print the resolved values (or the refusal). |
 | `query.py` | the CLI. **Forked** from upstream — see Maintenance. |
 | `extract.py` | record + chunk extraction and the alias join. **Forked**. |
-| `bench.py` | the FTS5 index builder and the retrieval-substrate harness. **Verbatim** upstream. |
+| `bench.py` | the FTS5 index builder and the retrieval-substrate harness. **Forked** — one delta, see Maintenance. |
 | `union.py` | the two-source ensemble scorer. **Verbatim** upstream. |
 | `selftest.py` | the kit's contract gate — 18 checks, every arm inside a throwaway repo. |
 | `adopt-memory-recall.sh` | renders the Skill from the conf (`--scaffold`), and reds when it drifts (`--check`). |
@@ -158,7 +158,17 @@ RECALL_FLOOR="records:fts5:r@5>=0.81"
 ```
 
 `fts5` because `query.py` ranks with `bm25(d, 1.0, 1.0, ALIAS_WEIGHT)` and bench's `fts5` is that
-same unweighted expression — the reason is the source, not a score. The value is compared against the
+same unweighted expression — the reason is the source, not a score.
+
+**WHICH SUBSTRATES ARE SEED-STABLE**, because a floor pinned to one that is not is a gate whose
+verdict moves on an unchanged tree, and that is a thing to know when CHOOSING rather than to
+discover from a flaky run. `grep`, `fts5` and `fts5w` were measured byte-identical across
+`PYTHONHASHSEED` values. `rm3` was NOT, until `TOOL-dTracedLattice-7`: it selected its expansion
+terms through `Counter.most_common`, whose ties break on insertion order, and that order came from
+iterating a `set`. It is deterministic now, and `test_recall_floor.py` carries the arm that keeps it
+so — five seeds, one subprocess each, because the interpreter reads that variable at start-up and no
+in-process fixture can vary it. The dense and hybrid substrates are NOT covered by that arm; nobody
+has measured them, and this sentence says so rather than implying they were. The value is compared against the
 CEILING-NORMALISED figure, which reduces exactly to `h/R`: `h` questions that hit, `R` whose targets
 resolve at all.
 
@@ -193,12 +203,19 @@ measures their own value.
 
 ## Maintenance — three categories, three different stories
 
-- **Verbatim** — `bench.py`, `union.py`. Zero coupling on the query path, so they are re-pulled
-  **wholesale** from upstream on any fix and never merged. Two caveats, stated rather than patched
-  out, because patching them would end the wholesale re-pull: their usage strings name the *upstream*
-  script path (`scripts/recall/bench.py`), and `bench.main()` / `union.main()` are the upstream
-  benchmark harnesses, which are **inert here** — they need a graded `fixture.json` that this kit
-  deliberately does not ship. `selftest.py` pins both files' digests, so an edit reds.
+- **Verbatim** — `union.py`. Zero coupling on the query path, so it is re-pulled **wholesale** from
+  upstream on any fix and never merged. Two caveats, stated rather than patched out, because
+  patching them would end the wholesale re-pull: its usage string names the *upstream* script path,
+  and `union.main()` is the upstream benchmark harness, which is **inert here** — it needs a graded
+  `fixture.json` that this kit deliberately does not ship. `selftest.py` pins its digest, so an edit
+  reds.
+- **Forked, one delta** — `bench.py`. It WAS verbatim and is not any more: `TOOL-dTracedLattice-7`
+  made `run_rm3`'s expansion-term selection independent of `PYTHONHASHSEED`, because `rm3` is a
+  legal `RECALL_FLOOR` substrate and a project pinned to it had a gate whose verdict moved between
+  runs on an unchanged tree. **A wholesale re-pull would revert that fix and the digest pin would go
+  green over the revert**, which is why this line moved rather than staying comfortable: a re-pull
+  is now a MERGE, and the one hunk to keep is the `(-count, term)` sort in `run_rm3`. Every other
+  verbatim caveat above still applies to it.
 - **Forked** — `extract.py`, `query.py`, `recall-opened.js`. Each carries a header naming the
   upstream path and the sha it was taken from, and enumerates its edits, so a re-pull is a
   three-way merge rather than archaeology.

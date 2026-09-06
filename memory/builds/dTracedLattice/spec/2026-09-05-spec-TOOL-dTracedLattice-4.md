@@ -1,14 +1,18 @@
 # TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 5
+**Status:** CLOSED · rev-6 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-5 |
+| [2026-09-06-build-TOOL-dTracedLattice-4-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-dTracedLattice-4-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-5 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
+| [2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md](../reviews/2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md) | diff-review | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
+| [2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round2.md](../reviews/2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round2.md) | diff-review | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
 
 <!-- /gen:spec-records -->
 
@@ -85,6 +89,11 @@ vocabulary and therefore lands with them. S4 last, recording whatever hole remai
   rather than passing silently.
 - **AC4** — When `tools/codebase-map/kit.toml` is read, it declares this hole and names the check that
   compensates for it.
+- **AC5** — When the new check's source is read, its header states that it compares the SET of
+  artifacts each side handles and does NOT verify that a named artifact is compared correctly. §8 Q1
+  resolved to shipping that limit in the header rather than implying it away, and until rev-5 no
+  criterion observed the header text; `TOOL-dTracedLattice-2` AC3 grades exactly this disclosure on
+  the same kit, so the two now match.
 
 ## 7. Gates
 
@@ -113,6 +122,14 @@ hides anything.
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-6 · 2026-09-06 · built. `check_gate_coverage.py` compares the SET of artifacts each side
+  names with ONE predicate over both inputs, refuses when that predicate matches nothing on the
+  engine side, and states that it cannot separate a deliberate omission from a stale one. Declared
+  as a `[[hole]]` with its discharge in `kit.toml` and landed as a leg in both the descriptor and
+  the manifest. Status CLOSED.
+- rev-5 · 2026-09-06 · folded the round-3 spec audit: M3 (AC5 grades the header disclosure §8 Q1 resolved
+  to ship, which no criterion observed — `TOOL-dTracedLattice-2` AC3 grades the same disclosure on the
+  same kit).
 - rev-4 · 2026-09-05 · moved to order 5; the owner's lexicon-rescue ruling inserted a unit ahead of
   the set and nothing else in this spec changed.
 - rev-3 · 2026-09-05 · folded the round-2 spec audit: M2 (rev-2's "silently held" was false against

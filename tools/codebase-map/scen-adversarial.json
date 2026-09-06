@@ -1,22 +1,3 @@
-**Serves:** research TOOL-dTracedLattice-1 TOOL-dTracedLattice-7
-
-# The adversarial scenario set — real seams whose names are common words
-
-This is the set that decided the re-ranking question. Every row is a seam established by
-READING THE CODE, paired with the behaviour phrase a session would plausibly type when it
-needed that seam. It is the set on which the confidence re-rank takes recall@5 from 11/28
-to 2/28, and `TOOL-dTracedLattice-1` AC1 requires any ranking change to score at least the
-shipped 11/28 against it.
-
-It is carried here as evidence, fenced rather than as a bare `.json`, because a record
-under `build/` owes a binding line and JSON cannot carry one. The unit that builds AC1
-extracts it to a fixture beside the kit, the way `recall-fixture.json` sits beside
-`memory-recall` — and inherits that fixture's constraint, which is that a set measured
-against THIS corpus must not ship to an adopter who never measured it.
-
-Rows: 28.
-
-```json
 {
  "$schema_note": "lens-3 adversarial scenarios for reuse_lookup ranking; see the .md companion",
  "$generated_by": "build_scen3.py over the tracked tree",
@@ -1305,6 +1286,6 @@ Rows: 28.
   "recall_at_10": 11,
   "file_correct_when_surfaced": 9,
   "note": "a MISS is a recall failure upstream of any ranking; re-ordering cannot fix one"
- }
+ },
+ "$fixture_note": "Extracted from memory/builds/dTracedLattice/build/2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md by TOOL-dTracedLattice-1 S8. GOV-ONLY: every row was established by reading THIS repo's code, so in another tree it grades a corpus that does not exist - the memory/gotchas/pin-copied-from-another-corpus.md shape. kit.toml withholds it from `govkit apply` and WIRE-INTO-PROJECT.md removes it on the copy-install path."
 }
-```

@@ -59,6 +59,7 @@ tools/lexicon/selftest.py	21	lexicon	FIXTURE-INTERNAL PATHS, same class as the `
 tools/memory-recall/README.md	8	memory-recall
 tools/memory-recall/adopt-memory-recall.sh	8	(loose),lib,memory-recall
 tools/memory-recall/recall-fixture.json	1	memory-recall
+tools/codebase-map/scen-adversarial.json	201	(loose),codebase-map,drift-audit,gate-lint,govkit,lexicon,memory-recall,memory-tree,playbook,run-gates	a DATA fixture whose rows ARE repo paths: 28 scenarios naming the seam each behaviour phrase should reach, established by reading THIS tree. There is nothing to derive — the paths are the measurement's subject, not a reference to a file this code runs. It is withheld from both install paths (kit.toml `project-owned`, plus its own row in WIRE-INTO-PROJECT.md's removal step), so no adopter receives it at any prefix. TOOL-dTracedLattice-1 S8.
 tools/memory-recall/recall-opened.js	1	memory-recall
 tools/memory-recall/recall_conf.py	1	memory-tree
 tools/memory-tree/README.md	5	(loose),memory-tree

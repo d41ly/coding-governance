@@ -37,6 +37,7 @@ from __future__ import annotations
 import ast
 import json
 import os
+import subprocess
 import re
 import tomllib
 from dataclasses import dataclass, field
@@ -658,6 +659,24 @@ for _e in (".py", ".pyi"):
 for _e in ".sh .bash .zsh .toml .yaml .yml .cfg .ini .conf".split():
     _LEX_PROFILES[_e] = _PROFILE_SH
 
+#: Extensions `_LEX_PROFILES` knows a comment syntax for but which declare no functions. This is the
+#: ONLY authored half of the definition-carrying set below — the language half is DERIVED from the
+#: profile table, so a language the tokenizer learns is covered the day it is added.
+#:
+#: A SECOND COPY OF A JUDGEMENT, said plainly. The lexicon kit reaches the same conclusion for its
+#: own coverage denominator and argues it at greater length there. It cannot be imported: this repo
+#: relies on a directional layer rule forbidding that kit from importing this one, and the reverse
+#: direction is no better, so the two are independent readings of one question and may diverge.
+_DATA_EXTS = frozenset({".toml", ".yaml", ".yml", ".cfg", ".ini", ".conf"})
+
+#: What this kit believes CAN carry a definition. Derived, minus the data formats above.
+#:
+#: WHAT IT CANNOT SEE: a language `_LEX_PROFILES` has no profile for. `_identifier_tokens` handles
+#: one fail-open, by design, and a dark-layer check built on this set therefore MISSES it rather
+#: than reporting it — a false negative, chosen over the false positive of calling every unknown
+#: extension a source layer.
+DEFINITION_CARRYING_EXTS = frozenset(_LEX_PROFILES) - _DATA_EXTS
+
 _TRIPLE_QUOTES = ('"""', "'''")
 #: String prefix letters Python allows before a quote. Only `f` (any case) turns the
 #: `interpolation_pair` on, but all of them have to be RECOGNISED so `rf"…"` is still seen as
@@ -788,18 +807,73 @@ def _identifier_tokens(source: str, suffix: str = "") -> set[str]:
     return set(_IDENT_TOKEN_RE.findall("".join(out)))
 
 
+def derive_present_layers(root: Path, skip_dirs: frozenset[str] = _SKIP_DIRS) -> dict[str, int]:
+    """`{extension: file count}` over every DEFINITION-CARRYING layer under ``root``.
+
+    `TOOL-dTracedLattice-5` S1, widened by that build's closing review. It walks the WHOLE root
+    rather than the symbol corpus's top-level dirs, because the question is "what languages are in
+    this repository" and answering it over a population shaped by the symbol extractors makes the
+    answer agree with the extractors by construction — a dark-layer check that cannot see a layer
+    nobody extracts is a dark-layer check that reports every layer covered.
+
+    THE POPULATION IS THE TRACKED FILE LIST, and that bound is the whole of the fix this function
+    needed. A bare walk from the root has none: `.claude/worktrees/` holds a checkout per branch, so
+    on a primary tree the first cut counted sixteen sibling worktrees as "this repository" —
+    `{.js: 145, .py: 880, .sh: 1579}` against this tree's `{.js: 8, .py: 61, .sh: 94}`, with
+    `.claude` contributing 2444 of 2604 files. Inflated counts print in a refusal, and one `.ts` on
+    any sibling branch would make `reuse_lookup` exit 2 repo-wide. `git ls-files` is bounded by
+    construction and is the same population every other check in this kit grades.
+
+    It READS NOTHING either way: it counts names, so this costs one `git` call and no I/O. Where git
+    cannot answer it FALLS BACK to a walk — with `.claude` skipped, because that directory is the
+    measured cause — and an adopter's export tarball still gets an answer rather than a crash.
+    """
+    out: dict[str, int] = {}
+    try:
+        listing = subprocess.run(["git", "-C", str(root), "ls-files", "-z"],
+                                 capture_output=True, check=True).stdout
+        names = [n for n in listing.decode("utf-8", "replace").split("\0") if n]
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        names = []
+        for dirpath, dirnames, filenames in os.walk(root):
+            dirnames[:] = [d for d in dirnames if d not in skip_dirs and d != ".claude"]
+            names.extend(filenames)
+    for name in names:
+        suffix = Path(name).suffix
+        if suffix in DEFINITION_CARRYING_EXTS:
+            out[suffix] = out.get(suffix, 0) + 1
+    return out
+
+
 def build_reference_index(
-    files: list[str], *, root: Path | None = None, skip_dirs: frozenset[str] = _SKIP_DIRS
+    files: list[str], *, root: Path | None = None, skip_dirs: frozenset[str] = _SKIP_DIRS,
+    stats: dict | None = None,
 ) -> dict[str, set[str]]:
     """token -> {POSIX files mentioning it as an identifier}, scanned over the covered-layer
     source: the top-level dirs of ``files`` (a symbols.json file list), filtered to their
     extension set. This is the on-demand scan behind fan_in — NEVER committed. Fail-open by
     design on an unreadable file (skipped): this feeds a RANKING/WARN, not a gate, so a binary
-    blob must not abort the lookup (the opposite of the extractor law, and deliberately so)."""
+    blob must not abort the lookup (the opposite of the extractor law, and deliberately so).
+
+    ``stats``, when given, is FILLED with what this scan could and could not see — `files_scanned`,
+    `parse_skips` and the sorted `extensions` it was filtered to. `TOOL-dTracedLattice-1` S6: a
+    fail-open skip that reports nothing is the liveness failure `AGENTS.md` §7 names, because a
+    ranking over half a corpus is indistinguishable from a ranking over all of it. An out-parameter
+    rather than a second return value, so no existing caller has to change to keep working — and it
+    counts what the walk already knows rather than adding a pass."""
     root = root or repo_root()
     roots = sorted({f.split("/", 1)[0] for f in files if f})
     exts = frozenset(Path(f).suffix for f in files if Path(f).suffix)
     index: dict[str, set[str]] = {}
+    scanned = skips = 0
+    # THE PRESENT-LAYER TALLY WALKS THE WHOLE ROOT, not `roots`. `roots` is derived from the SYMBOL
+    # file list, so a language layer living in any other top-level directory would never be counted
+    # as present — and everything downstream reads "not counted" as "not there", which turns a
+    # dark-layer check into an affirmative false claim that every present layer is covered. Found by
+    # this build's own closing review, reproduced with symbols under `src/` and an unextracted
+    # `web/text.ts`: no refusal, no partial-recall paragraph, and the correct declaration reported
+    # STALE. The walk reads no file — it counts dirents — so the second traversal is cheap.
+    present = derive_present_layers(root, skip_dirs)
     for top in roots:
         base = root / top
         if not base.is_dir():
@@ -813,19 +887,44 @@ def build_reference_index(
                 try:
                     text = path.read_text(encoding="utf-8")
                 except (UnicodeDecodeError, OSError):
+                    skips += 1
                     continue
+                scanned += 1
                 rel = path.relative_to(root).as_posix()
                 for tok in _identifier_tokens(text, path.suffix):
                     index.setdefault(tok, set()).add(rel)
+    if stats is not None:
+        stats["files_scanned"] = scanned
+        stats["parse_skips"] = skips
+        stats["extensions"] = sorted(exts)
+        stats["present_extensions"] = sorted(present)
+        stats["present_counts"] = dict(sorted(present.items()))
+        stats["roots"] = roots
     return index
 
 
-def fan_in(index: dict[str, set[str]], symbol_id: str, def_file: str) -> int:
-    """Distinct files referencing ``symbol_id`` as an identifier, minus its own def file (the
-    data-model definition). An import/identifier-scoped HEURISTIC, not a resolved call graph
-    (§3 non-goal): over-counts a common id (`get`), under-counts registry/dynamic dispatch — a
-    documented recall FLOOR used for ranking + a review WARN, never gated."""
-    return len(index.get(symbol_id, set()) - {def_file})
+def fan_in(index: dict[str, set[str]], symbol_id: str, def_files) -> int:
+    """Distinct files referencing ``symbol_id`` as an identifier, minus EVERY file that defines it.
+    An import/identifier-scoped HEURISTIC, not a resolved call graph (§3 non-goal): over-counts a
+    common id (`get`), under-counts registry/dynamic dispatch — a documented recall FLOOR used for
+    ranking + a review WARN, never gated.
+
+    ``def_files`` IS A SET OF PATHS, not one path, and that is `TOOL-dTracedLattice-1` S1. A symbol
+    defined in several files had one arbitrary definer subtracted and the others counted as
+    references, so a homonym scored fan-in for being defined twice. 124 of 769 definitions in this
+    repo have a co-definer.
+
+    **A bare `str` is REFUSED rather than accepted.** Python iterates a string as characters, so the
+    old one-path call site would subtract single letters and silently return the un-subtracted count
+    — a wrong number with no error, at exactly the call sites this change exists to correct. The
+    spec rejects a compatibility path for the same reason: a silent fallback at one site is how a
+    precision fix half-lands."""
+    if isinstance(def_files, str):
+        raise TypeError(
+            "fan_in takes a SET of definer paths, not one path: a str iterates as characters and "
+            f"would subtract letters instead of files (got {def_files!r}). Pass the definer set."
+        )
+    return len(index.get(symbol_id, set()) - set(def_files))
 
 
 def reference_index_for(
@@ -1208,6 +1307,7 @@ def detect_collisions(
     range_index: dict[str, set[str]],
     *,
     threshold: int,
+    definers: dict[str, frozenset[str]],
     affordance_seams: frozenset[str] = frozenset(),
 ) -> list[CollisionFlag]:
     """S5 closing loop (pure, deterministic). For each NEW symbol S, flag it iff it collides with
@@ -1221,7 +1321,13 @@ def detect_collisions(
 
     ``base_symbols`` (present at range base) is the seam POOL: a seam must have existed to be
     reinvented. ``new_symbols`` = head rows absent from base (all public — the extractors already
-    drop private names, so every kind here is an export). A malformed/empty stem yields no flag."""
+    drop private names, so every kind here is an export). A malformed/empty stem yields no flag.
+
+    ``definers`` maps a symbol id to EVERY file defining it at head, and is REQUIRED because this
+    function cannot derive it: it sees the base pool and the new rows, never the head symbol table,
+    so a seam co-defined in a file outside both would keep scoring fan-in for its own definition.
+    The caller owns that table and hands it over. No default, deliberately — a defaulted empty map
+    would silently restore the old, wrong subtraction at the one call site that matters."""
     seams_by_kind: dict[str, list[dict[str, str]]] = {}
     for e in base_symbols:
         seams_by_kind.setdefault(e["kind"], []).append(e)
@@ -1237,7 +1343,7 @@ def detect_collisions(
                 continue  # an identical row is not "new vs existing"
             if not (s_stems & stems(e["id"])):
                 continue
-            fe = fan_in(ref_index, e["id"], e["file"])
+            fe = fan_in(ref_index, e["id"], definers.get(e["id"], (e["file"],)))
             if fe < threshold:
                 continue  # E is not a seam — below the reuse threshold
             # "Wired through" = the NEW symbol's OWN file references E — scoped to s["file"], not

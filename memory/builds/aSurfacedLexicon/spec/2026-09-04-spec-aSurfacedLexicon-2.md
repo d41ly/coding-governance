@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint
 
-**Status:** CLOSED · rev-8 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1 · ratified 2026-09-05
+**Status:** CLOSED · rev-9 · 2026-09-06 · node a · Tier-2 · base 6c670b02 · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -29,6 +29,19 @@ value `"0"` across every commit it has ever had.
   `_check_path_suffix`, `_glob_match`, `build_module_index`, `_resolve_relative`, `resolve_import`,
   `check_layer_violation` and `scan_unselective_rules`. Measured at 164 lines by AST spans over the
   file at writing time.
+
+  **FOUR OF THESE MOVED RATHER THAN DIED, and a reader of this deletion is entitled to know it.**
+  `build_module_index`, `_resolve_relative`, `_check_path_suffix` and `resolve_import` — this tree's
+  only AST import resolver — were copied into `tools/codebase-map/map_imports.py` by
+  `TOOL-dTracedLattice-6`, which the owner ratified on 2026-09-05 and which was built to land BEFORE
+  this unit precisely so the capability would survive. It did not: this unit landed first, so the
+  copy arrived into a tree where the original was already gone, and the rescue's parity arm now
+  SKIPS with a named reason instead of comparing the two — which is its designed end state, one
+  landing earlier than planned. `ext_of` is not on the list above and stays here; the codebase-map
+  copy carries its own, spelled `derive_ext` because that directory is an armed layer for the naming
+  gate and this one is not. So this deletion removed a capability that had already been carried
+  elsewhere, and the arms covering those four are in `tools/codebase-map/selftest.py`. Nothing about
+  this unit's decision changes.
 - **S2** — Remove the `layer` third from the predicate machinery in `run()`: the `WAIVER_FILES` and
   `PIN_KEYS` entries, the `offenders` and `graded` keys, the `tally` and `label` rows, the
   `P3 NOT ARMED` refusal, and the `UNSELECTIVE LAYERS RULE` refusal.
@@ -431,6 +444,13 @@ with a legitimate cross-kit import has no waiver route and must edit an engine t
 update` clobbers. That route is unowned by any unit in this build.
 
 ## 9. Revision log
+
+- rev-9 · 2026-09-06 · S1 gains the pointer `TOOL-dTracedLattice-6` S4 requires and its AC4 grades:
+  four of the eight functions are now in `tools/codebase-map/map_imports.py`, so a reader of this
+  deletion is not told a capability was removed. Added at the merge that brought that build in,
+  which landed AFTER this one rather than before — the ordering the rescue was specced to guarantee
+  did not hold, and the note says so rather than implying it did. Nothing else in this spec changed
+  and this unit's decision is untouched.
 
 - rev-1 · 2026-09-04 · initial draft, written against `d0a18683` with every figure re-measured on
   this worktree.

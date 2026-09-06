@@ -438,6 +438,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_module_index",
+      "kind": "function",
+      "file": "tools/codebase-map/map_imports.py"
+    },
+    {
       "id": "build_negatives",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
@@ -1053,6 +1058,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_backlog_path",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
+    },
+    {
       "id": "derive_carried",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1083,6 +1093,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_ext",
+      "kind": "function",
+      "file": "tools/codebase-map/map_imports.py"
+    },
+    {
       "id": "derive_gate_runner",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -1096,6 +1111,11 @@
       "id": "derive_install_order",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_layer_verdict",
+      "kind": "function",
+      "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
       "id": "derive_lexicon_conf",
@@ -1113,6 +1133,11 @@
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
     },
     {
+      "id": "derive_live_rows",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
       "id": "derive_memory_disciplines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -1126,6 +1151,11 @@
       "id": "derive_node_tag",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "derive_present_layers",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
     },
     {
       "id": "derive_primary_tree",
@@ -1166,6 +1196,11 @@
       "id": "derive_status",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "derive_targets",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
     },
     {
       "id": "derive_width",
@@ -1718,6 +1753,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "load_scenarios",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
       "id": "load_toml",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1750,12 +1790,22 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/codebase-map/check_gate_coverage.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/codebase-map/gen_map.py"
     },
     {
       "id": "main",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
     },
     {
       "id": "main",
@@ -2006,6 +2056,16 @@
       "id": "measure_plan_marks",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "measure_ranks",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "measure_recall",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
     },
     {
       "id": "measure_run",
@@ -2718,6 +2778,16 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_layer_refusal",
+      "kind": "function",
+      "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "render_legacy_note",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
+    },
+    {
       "id": "render_live",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2746,6 +2816,11 @@
       "id": "render_region",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_report",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
     },
     {
       "id": "render_shards",
@@ -2873,6 +2948,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_gate_path",
+      "kind": "function",
+      "file": "tools/codebase-map/check_gate_coverage.py"
+    },
+    {
       "id": "resolve_gov_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -2881,6 +2961,11 @@
       "id": "resolve_hook_path",
       "kind": "function",
       "file": "tools/settings-merge.py"
+    },
+    {
+      "id": "resolve_import",
+      "kind": "function",
+      "file": "tools/codebase-map/map_imports.py"
     },
     {
       "id": "resolve_kit_homes",
@@ -3098,6 +3183,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "run_constant_control",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
       "id": "run_dense",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -3153,6 +3243,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "run_shuffle_control",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
       "id": "run_suggest",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -3181,6 +3276,11 @@
       "id": "scanWriteTargets",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "scan_artifacts",
+      "kind": "function",
+      "file": "tools/codebase-map/check_gate_coverage.py"
     },
     {
       "id": "scan_canon",
@@ -3453,6 +3553,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "test_a_new_conditional_tier_reports_itself",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_absent_fixture_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -3506,6 +3611,16 @@
       "id": "test_audit_reds_on_unresolved_target",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_backlog_path_follows_the_common_dir_not_the_git_dir",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_backlog_path_is_outside_the_worktree",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_baseline_green",
@@ -3568,6 +3683,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_conditional_tier_refuses_an_orphaned_artifact",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_conf_digest_both_directions",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -3601,6 +3721,11 @@
       "id": "test_declared_empty",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_declared_layer_is_named_dark_in_the_banner",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_declared_source_absent_is_skipped",
@@ -3668,6 +3793,21 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_every_advertised_gen_map_mode_runs",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_every_co_defined_symbol_reaches_every_definer",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_every_declared_layer_is_present_on_this_tree",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_every_inventory_key_is_claimed_or_baselined",
       "kind": "function",
       "file": "tools/codebase-map/test_codebase_map.py"
@@ -3703,9 +3843,44 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_fan_in_subtracts_every_definer",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_floor_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_gate_coverage_fails_on_an_uncompared_artifact",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_is_green_on_this_tree",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_names_its_skip",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_passes_a_customised_gate",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_refuses_a_gate_file_that_names_nothing",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_refuses_a_predicate_that_matches_nothing",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_gate_template_boundary",
@@ -3724,6 +3899,11 @@
     },
     {
       "id": "test_glob_brackets_fail_loud_and_escape_works",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gov_only_files_are_withheld_on_both_paths",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
@@ -3778,6 +3958,21 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_legacy_backlog_is_named_and_never_deleted",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_legacy_language_name_refuses_and_names_the_extension",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_legacy_note_is_silent_when_it_would_name_its_own_destination",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_lexicon_marginal_rate",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -3813,6 +4008,21 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_map_imports_has_no_sibling_kit_import",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_map_imports_matches_the_kit_it_was_rescued_from",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_map_imports_resolution",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_neighbour_cap_ranks_before_truncating",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -3838,9 +4048,19 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_no_scan_is_not_an_empty_corpus",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_no_signal_hardcodes_live",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_no_tracked_carrier_still_names_the_old_backlog_destination",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_one_retirement_is_free",
@@ -3881,6 +4101,11 @@
       "id": "test_per_id_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_present_layers_see_outside_the_symbol_roots",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_printed_invocations_resolve",
@@ -3948,9 +4173,19 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_rm3_is_seed_stable",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_scaffold_converges",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_scan_coverage_line_cannot_go_quiet",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_seed_affordances",
@@ -4003,6 +4238,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_stale_declaration_is_reported_not_honoured",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_symbol_extractors_fail_closed",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -4023,9 +4263,24 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_the_control_and_the_measurement_share_a_denominator",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_the_gate_and_its_template_are_byte_identical",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_undeclared_file_stays_out",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_undeclared_layer_refuses_with_both_remedies",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_verbatim_files",
