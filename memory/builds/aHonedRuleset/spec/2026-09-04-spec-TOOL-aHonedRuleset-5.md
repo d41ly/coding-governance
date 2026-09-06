@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-5 — the last-audit stamp rule gets exactly one home
 
-**Status:** SPECCED · rev-5 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 3 · ratified 2026-09-04
+**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 3 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
@@ -574,6 +574,21 @@ No new file, no new gate leg, no inventory key. `tools/gate-legs.json` is not ed
   citation moves, and §2's ordering preamble says S14 rides commit A. **M6** — §10 still said two
   `PAIRS` rows; rev-3 cut it to one. Nothing else moved: no fork re-opened, no figure re-derived, and
   L1 and L2 belong to `TOOL-aHonedRuleset-4`.
+
+- rev-6 · 2026-09-06 · **built as two commits and CLOSED.** Commit A single-homed the rule and armed
+  the parity row; commit B changed what the rule says and the four commit-A pointers inherited the new
+  text with no edit, which is the payoff the split was for. Every criterion was run. AC10 is the one
+  that matters: `manifest-check.sh` exits 0 after commit B ON THIS FEATURE BRANCH with a stamp written
+  by the new rule, which is the exact run `KICK-cSettledDocket-1` records failing three times. S9 and
+  S13 each observed the row RED — once over commit A's pattern, once over the shipped one — and the
+  intermediate state produced a third, unplanned observation: with both sources moved and the row not
+  yet re-anchored, the anti-vacuity arm fired with *an extraction matched NOTHING*.
+  **Two build-time facts worth the record.** AC2's floor of 90 bytes was missed at 84 by the first
+  pointer draft and the pointer was tightened rather than the criterion moved; the engine ends 143
+  bytes down and its high-water is bumped to match at 16991. And check 7's 300-char entry cap is
+  measured by an awk that counts BYTES here — the gate's own header says it does not pin which — so
+  both KICK rows had to be rewritten twice: a 300-CHARACTER row carrying `·`, `§` and `→` measures
+  305 and reds.
 
 ## 10. Reuse audit
 
