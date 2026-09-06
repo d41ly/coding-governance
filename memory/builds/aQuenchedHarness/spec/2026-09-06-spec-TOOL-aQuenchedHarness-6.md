@@ -1,12 +1,13 @@
 # TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved
 
-**Status:** INPROGRESS · rev-5 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
+**Status:** INPROGRESS · rev-6 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-07-build-TOOL-aQuenchedHarness-6-arm-inventory-check-line-length.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-6-arm-inventory-check-line-length.md) | journal | — |
+| [2026-09-07-build-TOOL-aQuenchedHarness-6-portability-survey.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-6-portability-survey.md) | research | — |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-7 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
 
@@ -154,7 +155,16 @@ two prior instances this build cites.
   where any row lacks a reading, it REDS naming the unbacked rows and computes no share at all.
 - **AC5** — When the build closes, the selected set satisfies the majority share declared in
   `tools/run-gates/selftest-budgets.txt`'s header, computed over the declared population rather than
-  over the local ledger, and shown in the wrap-up.
+  over the local ledger, and shown in the wrap-up. **NOT MET, and recorded as not met.** The
+  portability survey — `memory/builds/aQuenchedHarness/build/2026-09-07-build-TOOL-aQuenchedHarness-6-portability-survey.md`
+  — read the twelve costliest rows and found that NONE of them is portable under this unit's own
+  rules without changing them: three are python suites driving module internals with no CLI
+  entrypoint, two print no recoverable inventory, four need arms to share state a per-arm copy
+  destroys, and the rest need assertion verbs the harness does not have. One suite ported, which
+  carries 208 s of a summed population several times that. The share is NOT lowered to fit: S6 exists
+  because rev-1 paired a criterion with a threshold it could not fail, and moving a threshold to
+  match a result is that same defect with the sign flipped. S9's remainder is the survey record and
+  it names every one with its recorded cost.
 - **AC7** — When the port ranking runs over `tools/run-gates/selftest-budgets.txt`, every row prints
   the condition its reading was taken under, and a row whose condition is unstated REDS rather than
   being sorted against rows measured differently.
@@ -189,6 +199,16 @@ which grades the per-suite build records this unit writes.
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-6 · 2026-09-07 · AC5 is recorded as NOT MET rather than met by a smaller number, on the evidence
+  of the portability survey. Two defects in this unit's OWN product were found and fixed in the same
+  pass, both by the survey rather than by a run: `build_fixture` did not reset the batch, so a suite
+  with two base fixtures silently re-ran the first batch's arms against the second batch's snapshot;
+  and `extract-arms.sh` guarded only the EMPTY inventory, so a suite printing 14 readable lines
+  against 289 executed assertions came back as a confident 14-arm inventory at exit 0 — the exact
+  vacuity that file's header claimed to prevent. The extractor now asserts its own coverage against
+  the suite's reported total and has three named refusals, each armed by
+  `tools/lib/extract-arms.test.sh`, whose own first run found a third: the harness's summary line
+  satisfies the arm grammar, so a red suite counted its verdict as an extra arm.
 - rev-5 · 2026-09-07 · the first port landed and it DIVERGED, so this records the divergence rather
   than hiding it. §3 says "not changing any checker under test. Only the suites move" — and the port
   changed `tools/lib/lib-selftest.sh`, which is a sibling unit's product rather than a checker under
