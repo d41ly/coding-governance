@@ -92,7 +92,7 @@ for line in open(sys.argv[1], encoding="utf-8"):
         continue
     if not s:
         continue
-    f = line.rstrip("\n").split("\t")
+    f = line.rstrip("\r\n").split("\t")
     if len(f) < 2:
         continue
     name, reading = f[0], (f[3] if len(f) > 3 else "")
@@ -149,30 +149,38 @@ PY
   exit $?
 fi
 
-# ---- the declaration, read once. Fields: name, budget, argv (empty = from the manifest), reading.
+# ---- the declaration, read once. Emitted as: STATE, name, budget, argv -- in that order.
 # ---- A row whose argv is empty takes it from `tools/gate-legs.json`, so the manifest stays the one
 # ---- place a held leg's command is written and this file carries only what the manifest cannot.
 read_population() {
   "$PYBIN" - "$BUDGETS" "$LEGS" "$FILTER" <<'PY'
 import json, sys
+
+# LF, NOT CRLF, and this is a bug fix rather than tidiness. On Windows `print` translates every
+# newline to CR LF, so each row below reached the shell with a trailing CR. It was INVISIBLE while
+# the state was the LAST field -- `state` merely became "ok<CR>", and nothing compared it
+# successfully anyway -- and it turned fatal the moment the argv moved last, because the final
+# path token then carried the CR into `git ls-files` and every row read as untracked. Two defects
+# hiding each other, and `run-selftests.test.sh` surfaced both on its first run.
+sys.stdout.reconfigure(newline="")
 budgets, legs_path, filt = sys.argv[1], sys.argv[2], sys.argv[3]
 legs = {l["name"]: l for l in json.load(open(legs_path, encoding="utf-8"))}
 for line in open(budgets, encoding="utf-8"):
     if not line.strip() or line.lstrip().startswith("#"):
         continue
-    f = line.rstrip("\n").split("\t")
+    f = line.rstrip("\r\n").split("\t")
     if len(f) < 2:
         continue
     name, budget, argv = f[0], f[1], (f[2] if len(f) > 2 else "")
     if not argv:
         leg = legs.get(name)
         if not leg:
-            print("\t".join([name, budget, "", "UNRESOLVED"]))
+            print("\t".join(["UNRESOLVED", name, budget, ""]))
             continue
         argv = " ".join(leg.get("argv", []))
     if filt and filt not in argv:
         continue
-    print("\t".join([name, budget, argv, "ok"]))
+    print("\t".join(["ok", name, budget, argv]))
 PY
 }
 
@@ -224,7 +232,7 @@ PY
   fi
   # REVERSE: a row that is not a held leg must name a TRACKED file, or the declaration is a way to
   # name a suite that does not exist — and a population nobody can execute grades nothing.
-  while IFS=$'\t' read -r name budget argv state; do
+  while IFS=$'\t' read -r state name budget argv; do
     [ -n "${name:-}" ] || continue
     if [ "$state" = UNRESOLVED ]; then
       echo "run-selftests: row '$name' has no argv and no leg of that name in the manifest" >&2
@@ -246,9 +254,9 @@ fi
 
 # ---- the derived total. NEVER typed: a figure beside the declarations that own it goes stale on the
 # ---- next edit and nobody notices.
-TOTAL=$(printf '%s' "$POP" | awk -F'\t' '{s+=$2} END{print s+0}')
+TOTAL=$(printf '%s' "$POP" | awk -F'\t' '{s+=$3} END{print s+0}')
 if [ "$MODE" = list ]; then
-  printf '%s\n' "$POP" | awk -F'\t' '{printf "  %-46s %6ss  %s\n", $1, $2, $3}'
+  printf '%s\n' "$POP" | awk -F'\t' '{printf "  %-46s %6ss  %s\n", $2, $3, $4}'
   printf 'run-selftests: %s row(s), declared total %ss (%s minutes) at width %s (outer %s, inner %s)\n' \
     "$NROWS" "$TOTAL" "$(( (TOTAL + 59) / 60 ))" "$W" "$OUTER" "$SELFTEST_INNER_WIDTH"
   exit 0
@@ -264,7 +272,7 @@ fi
 
 echo "run-selftests: $NROWS suite(s), declared total $(( (TOTAL + 59) / 60 )) minutes, width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH)"
 st=0; ran=0; over=0
-while IFS=$'\t' read -r name budget argv state; do
+while IFS=$'\t' read -r state name budget argv; do
   [ -n "${name:-}" ] || continue
   ran=$((ran + 1))
   s=$(date +%s)

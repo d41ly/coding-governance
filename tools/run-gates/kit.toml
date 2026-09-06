@@ -37,7 +37,7 @@ role = "engine"
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
 [[files]]
-include = ["adopt-run-gates.test.sh", "profile_bar.test.sh", "run-gates.evidence.test.sh", "run-gates.test.sh", "run-gates.turnstile.test.sh"]
+include = ["adopt-run-gates.test.sh", "profile_bar.test.sh", "run-gates.evidence.test.sh", "run-gates.test.sh", "run-gates.turnstile.test.sh", "run-selftests.test.sh"]
 role = "project-owned"
 
 # THE GOV-ONLY HARNESS IS WITHHELD. Its arms are keyed on THIS repo's corpus — gov's declared chunk
@@ -66,7 +66,7 @@ role = "project-owned"
 include = ["ceiling-evidence.txt", "ceiling-margin.txt"]
 role = "project-owned"
 
-# THE SELF-TEST DECLARATION IS GOV'S TOO. Its 55 rows name this repo's suites and carry
+# THE SELF-TEST DECLARATION IS GOV'S TOO. Its rows name this repo's suites and carry
 # readings taken on this node, so an adopter receiving it gets a population they do not have
 # and a gate that reds on arrival. `run-selftests.sh` itself DOES ship — it is the mechanism
 # the 2026-08-23 ruling always implied, and it refuses with a named message rather than

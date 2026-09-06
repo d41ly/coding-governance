@@ -45,6 +45,24 @@ fi
 waived=""
 [ -f "$WAIVERS" ] && waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" || true)
 
+# THE HARNESS SPELLING, and why it is a second FORM rather than a loophole. `tools/lib/lib-selftest.sh`
+# suites do not print their own count and do not compare their own floor: `run_arms` does both, and it
+# REFUSES a suite that declared fewer arms than its pin before running one of them. The property this
+# leg asserts is unchanged — an executed count, a non-zero floor, and something that compares them —
+# but two of the three now live one file over. What makes that checkable rather than trusted is that
+# `tools/lib/lib-selftest.test.sh` arms the comparison directly: an arm asserts a suite below its
+# floor reds by name, and another asserts an unparseable floor REFUSES instead of defaulting to 0.
+#
+# All three clauses are required and each is anchored, for the reason the classic form's are: an
+# unanchored pattern is satisfied by the string appearing anywhere, including inside a fixture that
+# writes a compliant-looking suite for its own arms.
+check_harness_form() { # file -> 0 when it sources the harness, pins a real floor, and runs the arms
+  grep -qE '^[[:space:]]*\.[[:space:]]+.*lib-selftest\.sh"?[[:space:]]*$' "$1" || return 1
+  grep -qE '^SELFTEST_FLOOR=0+$' "$1" && return 1
+  grep -qE '^SELFTEST_FLOOR=[0-9]+$' "$1" || return 1
+  grep -qE '^[[:space:]]*run_arms([[:space:]]|$)' "$1"
+}
+
 compliant() { # file -> 0 when it prints the agreed shape, pins a real floor, and COMPARES the two
   # ANCHORED on the emitting line. Unanchored, the pattern is satisfied by the string appearing
   # anywhere — including inside a fixture generator that writes a compliant-looking suite for its own
@@ -72,13 +90,17 @@ $f
     fail "the gate manifest names a self-test this leg cannot read, and skipping it silently removes it from the population: $f"
     continue
   fi
-  if compliant "$f"; then
+  if compliant "$f" || check_harness_form "$f"; then
     # A STALE waiver reds. A row whose suite now complies silently widens the surface it was written
     # to narrow — the same rule `install-prefix-waivers.txt` already carries.
     [ "$is_waived" = 0 ] || fail "a testsuite-count waiver names a suite that now complies, so the list has stopped shrinking and the row hides nothing: $f in $WAIVERS"
   else
     if [ "$is_waived" = 0 ]; then
-      if grep -qE '^FLOOR_ASSERTIONS=0+$' "$f"; then
+      if grep -qE '^SELFTEST_FLOOR=0+$' "$f"; then
+        fail "a harness self-test pins SELFTEST_FLOOR of ZERO, which nothing can fall below — a pin that cannot bite is the decoration this leg exists to remove: $f"
+      elif grep -qE '^SELFTEST_FLOOR=[0-9]+$' "$f"; then
+        fail "a harness self-test pins SELFTEST_FLOOR but never reaches run_arms, or does not source the harness, so nothing prints its executed count and nothing reads the pin: $f"
+      elif grep -qE '^FLOOR_ASSERTIONS=0+$' "$f"; then
         fail "a self-test pins a floor of ZERO, which nothing can fall below — a pin that cannot bite is the decoration this leg exists to remove: $f"
       elif grep -qE '^FLOOR_ASSERTIONS=[0-9]+$' "$f"; then
         fail "a self-test pins a floor but does not print the agreed count line, or never compares the two, so nothing reads the pin: $f wants echo \"PASS (\$n assertions)\" and a comparison against it"

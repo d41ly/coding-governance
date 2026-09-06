@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved
 
-**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
+**Status:** INPROGRESS · rev-5 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -171,12 +171,12 @@ which grades the per-suite build records this unit writes.
 
 ## 8. Open questions
 
-- **F1 — what majority share and what minimum factor do the headers declare?** RESOLVED (agent,
-  2026-09-06, delegated): both are declared during the build from the measured distribution, with the
-  reading beside each, and both are declared BEFORE the first port so the first port can fail. The
-  share follows the distribution's shoulder, which this repo's own measurement shows is sharp — a
-  handful of suites and a long tail of nothing. Declaring numbers here before looking would be pins
-  chosen by preference over measurements that can be taken.
+- **F1 — what majority share and what minimum factor do the headers declare?** ANSWERED in the build,
+  2026-09-07, and the numbers are in `tools/run-gates/selftest-budgets.txt`'s header with the reading
+  beside each: **share 0.50**, because that is what "majority" means and a share fitted to whatever
+  got ported is the criterion-that-cannot-fail rev-1 already had to delete; and **factor 3.0x**, read
+  off the first port at 4.03x with 2.35x and 1.37x also measured, so the declared number reds against
+  two conditions this same suite was observed in.
 - **F2 — what happens to a suite whose arms are unextractable?** RESOLVED (agent, 2026-09-06,
   delegated): it is NOT ported in this unit and is named in the remainder. Porting it would mean
   hand-asserting equivalence, which §4's rejected alternative refuses on this repo's own evidence.
@@ -189,6 +189,17 @@ which grades the per-suite build records this unit writes.
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-5 · 2026-09-07 · the first port landed and it DIVERGED, so this records the divergence rather
+  than hiding it. §3 says "not changing any checker under test. Only the suites move" — and the port
+  changed `tools/lib/lib-selftest.sh`, which is a sibling unit's product rather than a checker under
+  test. It had to: the first port measured 62 s against the 32 s of the suite it replaced, because the
+  harness spent eleven processes per arm on bookkeeping around a subject costing one, and its pool's
+  `wait -n || wait` reap collapsed to a barrier per arm. A port cannot clear a factor against a
+  harness that is itself the cost, so the harness was rewritten to three processes per arm and the
+  capability probed once. The same pass corrected `run-selftests.sh`, which divided the declared width
+  by an outer pool of 4 that does not exist. §3's fence still holds where it was written — the GATE
+  under a ported suite is untouched, and the check-line-length gate has not moved a byte.
+  F1's two numbers are now ANSWERED rather than deferred, above.
 - rev-4 · 2026-09-07 · the extractor changed shape BEFORE any code, per M2's "to diverge, change the
   spec first". A survey of the corpus found at least four unrelated arm idioms and several suites
   using none of them, so rev-3's source parser was a large investment that would still grade what the

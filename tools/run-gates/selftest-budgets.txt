@@ -88,6 +88,7 @@ run-gates canary	3660		worst of 12 readings 2436s, x1.5
 run-gates evidence	2250		worst of 12 readings 1500s, x1.5
 run-gates gov canary	60		worst of 11 readings 19s, x1.5
 run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
+run-selftests self-test	60		measured 28s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5
