@@ -56,6 +56,16 @@ role = "project-owned"
 include = ["run-gates.gov.test.sh"]
 role = "project-owned"
 
+# GOV'S OWN CEILING EVIDENCE, withheld for the reason above one line over: these two files
+# carry THIS repo's recorded seconds and the headroom declared against them, so an adopter
+# receiving them gets a pin measured on a corpus they do not have. `derive-ceilings.py`
+# itself DOES ship -- it is the tool, and it refuses rather than defaulting when no headroom
+# is declared, which is the announced-unarmed state rather than a silent one.
+# TOOL-aQuenchedHarness-2.
+[[files]]
+include = ["ceiling-evidence.txt", "ceiling-margin.txt"]
+role = "project-owned"
+
 [adopt]
 argv = ["bash", "{kit}/adopt-run-gates.sh"]
 mutates_index = false

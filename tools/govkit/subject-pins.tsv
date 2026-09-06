@@ -47,6 +47,7 @@ kit placeholders (a declared token its adopter substitutes)	repo	declarations
 kit version markers	repo	declarations
 kit-placeholders self-test	kit	selftests
 kit/dogfood doc parity	repo	declarations
+leg ceilings clear their evidenced maximum	repo	declarations
 lexicon naming predicates	repo	declarations
 lexicon selftest	kit	selftests
 lexicon wiring	repo	wiring

@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-2 — a leg ceiling carries the reading it was set against, in the tree
 
-**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 4
+**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -36,8 +36,17 @@ measurement in this build's own research record refuted that.
 - **S3** — `--write` refreshes a TRACKED evidence file, `tools/run-gates/ceiling-evidence.txt`: one
   row per leg carrying the maximum recorded seconds, the number of readings behind it, and the node
   and date it was read on. This is the artifact that makes the relation checkable from the tree.
-- **S4** — the ceiling is `max recorded + MARGIN`, an absolute number of seconds declared once in
-  `tools/run-gates/ceiling-margin.txt` with the reading it was set against. Flat, not a multiplier:
+- **S4** — the ceiling must clear the evidenced maximum by `max(FLOOR, FRACTION x max)`, both
+  declared in `tools/run-gates/ceiling-margin.txt` with the reading they were set against. **BOTH
+  halves, and running the first cut is what proved it**: a flat floor alone forces every ceiling
+  above the floor, so with a 1800 s margin the report called 31 legs UNDER including a 2.2 s leg
+  whose 300 s ceiling is already 136x headroom. A fraction alone would give that same leg 2.2 s of
+  headroom, which any scheduling hiccup crosses. Declared at 120 s and 1.0.
+  This is NOT the multiplier `TOOL-dRetiredFork-40` rejected, and the distinction is the whole
+  defence: that row rejected predicting a LOADED reading from a QUIET one by multiplying, because
+  the relationship is not a multiplier — it measured 443 s under load against 583 s quiet, the wrong
+  way round. Here the input is already the worst OBSERVED reading and the fraction only sizes
+  headroom above it. The old flat wording is kept below for what it does still settle:
   `TOOL-dRetiredFork-40` measured the memory-hygiene self-test at 443 s under load against 583 s
   quiet and concluded "the relationship is not a multiplier and cannot be guessed", then re-declared
   both legs flat.
@@ -51,6 +60,12 @@ measurement in this build's own research record refuted that.
 - **S7** — arms staging: a ceiling below the relation, a leg with no evidence row, an absent
   `gate-run` directory, a population of exactly one reading, and an evidence file whose row names a
   leg the manifest no longer carries.
+- **S8** — **THE LEG IS GOV-ONLY.** It grades gov's ceilings against gov's own recorded seconds, so
+  `ceiling-evidence.txt` and `ceiling-margin.txt` are withheld with `role = "project-owned"` and the
+  leg is an `[[exempt_leg]]` row rather than a descriptor `[[gate_leg]]`. Shipping this repo's
+  readings under an adopter's name is the pin-copied-from-another-corpus defect
+  `tools/codebase-map/kit.toml` withholds `scen-adversarial.json` for. The TOOL ships, and it
+  REFUSES rather than defaulting when no headroom is declared — the announced-unarmed state.
 
 ## 3. Non-goals (OUT)
 
@@ -171,6 +186,16 @@ new verb's function names.
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-4 · 2026-09-06 · BUILT, and building it corrected S4 within the hour. A flat margin is wrong
+  in one direction that only running it shows: it forces every ceiling above the margin, so at 1800 s
+  the report called 31 legs UNDER — among them a 2.2 s leg with a 300 s ceiling. Headroom is now
+  `max(120s, 1.0 x max)`. S8 records the gov-only disposition, which the earlier revisions had not
+  considered at all: the evidence and the headroom are THIS corpus's numbers and must not ship under
+  an adopter's name. Observed green / staged break / restored, the break being a ceiling lowered
+  below its evidence: `CEILING-EVIDENCE FAILED — run-gates canary: ceiling 1s does not clear its
+  evidenced maximum 2304.8s by the required max(120s, 1.0x) = 2305s (short by 4609s)`.
+  The reading that motivated the whole unit, now visible in the report: `pass-order history` has a
+  declared ceiling of 5400 and a worst recorded reading of 5400.8 — **it was killed by its own bound**.
 - rev-3 · 2026-09-06 · folded spec-audit round 2. H8: `--write` is now MONOTONE (S3a) — `gate-run`
   retains only a few run directories, so a pruned or reused window would have silently lowered an
   evidenced maximum and with it the floor the gate enforces; lowering takes an explicit `--reset`.

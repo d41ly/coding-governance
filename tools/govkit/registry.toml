@@ -498,3 +498,7 @@ why = "it runs `tier2-review.test.sh`, which `tools/workflows/kit.toml` withhold
 [[exempt_leg]]
 name = "review-join self-test"
 why = "it runs `check-review-join.test.sh`, which `tools/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+
+[[exempt_leg]]
+name = "leg ceilings clear their evidenced maximum"
+why = "it grades GOV's ceilings against GOV's own recorded seconds, from `tools/run-gates/ceiling-evidence.txt` and `tools/run-gates/ceiling-margin.txt` -- both withheld with `role = \"project-owned\"` for the reason `tools/codebase-map/kit.toml` withholds `scen-adversarial.json`: a pin measured against one corpus and shipped into a tree that never measured it is either vacuous or permanently red. The TOOL ships and an adopter who wants the check runs `--write` on their own bar and declares their own headroom; what does not ship is this repo's numbers wearing their name. TOOL-aQuenchedHarness-2."
