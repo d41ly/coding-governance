@@ -9,6 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+keepalive-reaped: yes — CronDelete cancelled job e540bdc0 and CronList then reported no scheduled jobs; one job, created and reaped by this run, no resume in between
 parked-surfaced: yes, 11 surfaced
 witness: a1f485950ede5750776bfee0b230002fce54a8ad
 phase: VERIFYING
