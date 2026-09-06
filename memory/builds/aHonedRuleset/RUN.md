@@ -10,7 +10,7 @@ with its anchor evidence, and the parked decisions.
 
 ## Run facts
 parked-surfaced: yes, 1 surfaced
-keepalive-reaped: CronDelete returned 'Cancelled job 62177af0', and CronList then returned 'No scheduled jobs' — reaped and verified empty, not assumed
+keepalive-reaped: yes
 witness: 84383ffd78a1e8fee9207b15d1f050b68a0e339e
 phase: VERIFYING
 mode: slug
