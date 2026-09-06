@@ -23,6 +23,22 @@ rule: if the fresh-file rate stays at or below roughly 5% across two further rea
 `TOOL-dScaffoldedMirror-4`, `-9` and `-11`'s cut fourth pin should be abandoned rather than deferred.
 A second reading is owed before anyone acts on it, and this record is the first.
 
+> **SUPERSEDED by `TOOL-aSurfacedLexicon-12`, 2026-09-05, on the branch and not on the arithmetic.**
+> The claim quoted above — "the 4.3% is reading ONE of the two that abandon the pressure chain" —
+> stands as a record of what that run measured, and the kill rule's SOLE carrier is now
+> `build_lexicon_marginal_offense_rate`'s docstring in `tools/drift-audit/drift_report.py` (owner
+> ruling Q8, 2026-09-04). The next reading did not continue the abandon chain, it BROKE it.
+> `python tools/drift-audit/drift_report.py --json` prints, on the `lexicon_marginal_offense_rate`
+> signal's fresh-file arm — the one whose own note reads "files written FRESH in the window — the
+> reading the kill-rule watches" — `added 340`, `offenders 181`, `rate_pct 53.2`. That is ABOVE the
+> docstring's roughly 5% bar, so no second sub-5% reading exists and no third is owed: the clause
+> the docstring selects is the other one, where a rate CLIMBING in fresh files promotes
+> `TOOL-dScaffoldedMirror-9` from probation to scheduled. `TOOL-aSurfacedLexicon-12` RECORDS that
+> and does not act on it; the promotion is a change to a pressure chain the lexicon rebuild does
+> not build. The climb has a cause inside that rebuild: `TOOL-aSurfacedLexicon-14` armed `sh` with a
+> real tokenizer, so the arm now sees a shell corpus it was structurally blind to before, and the
+> rate it reports is the first honest one over the whole armed surface.
+
 ## Four of the spec's own claims did not survive being built
 
 Recorded here rather than only in the revision log, because the pattern is the finding: every one was

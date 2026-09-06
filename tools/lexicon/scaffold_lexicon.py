@@ -13,11 +13,10 @@ The seed is still marked PROPOSED with `ratified` empty, because a canon-sourced
 starting vocabulary and not a curated one — but it is no longer the hand-kept mirror companion §12
 bans, because its vocabulary comes from outside the tree it grades.
 
-`LAYERS` is deliberately seeded EMPTY. There is no `--scaffold` proposal for P3: an import-direction
-map is a statement about intended architecture, and a frequency count cannot observe intent. An
-empty `LAYERS` makes the engine report NOT ARMED and red, which is the fail-closed behaviour the
-unit spec requires — a fresh adopter gets a refusal that names what to declare, never a green run
-over a predicate that is not checking anything.
+THERE IS NO IMPORT-DIRECTION SEED, and since TOOL-aSurfacedLexicon-2 there is nothing to seed: the
+declared `LAYERS` predicate is deleted. The one constraint it really held — the kit imports nothing
+outside the stdlib and its own directory — is now a refusal inside the engine, derived from the
+kit's own source, so it needs no declaration and cannot be scaffolded wrong.
 """
 
 import collections
@@ -62,21 +61,36 @@ HEADER = """\
 #: declaration did not carry. Closing review L2.
 BANNED_SUFFIXES = ("Manager", "Helper", "Util", "Utils", "Handler", "Processor", "Data", "Info")
 
+#: `(ext, surface) -> convention`, PRESCRIPTIVE and from OUTSIDE the corpus, exactly like the verb
+#: spellings the canon supplies. Each row is what that language's own published style says — PEP 8
+#: for Python, the ES/TS house style for JavaScript, the shell convention for script filenames — and
+#: NOT a ranking of what the adopting tree already does. A convention derived from the graded
+#: population is the mirror shape §12 bans, and it is the reason there is a table here rather than a
+#: `collections.Counter` over `classify()`.
+#:
+#: A pair with no row is seeded `dark`, which is a declaration and not a gap: the row is written, it
+#: is named on every run, and arming it is one word.
+SEED_CONVENTIONS = {
+    ("py", "function"): "snake",
+    ("py", "type"): "pascal",
+    ("js", "function"): "camel",
+    ("js", "type"): "pascal",
+    ("sh", "function"): "snake",
+}
 
-def _measure_suffix_offenders(root, files) -> int:
-    """Type definitions ending in a banned suffix, over the same corpus the verb pin uses."""
+
+def _measure_suffix_offenders(scanned) -> int:
+    """Type definitions ending in a banned suffix, over the SAME scan the verb pin uses.
+
+    It takes the scan rather than the repo root, and that is the whole of this unit's change here.
+    It used to walk the corpus a second time — its own `git ls-files`, its own `extract` per file —
+    to answer a question the first walk already had the definitions for. Two walks over one tree is
+    also two chances to disagree about which files are armed.
+    """
     banned = BANNED_SUFFIXES
     n = 0
-    for rel in files:
-        ext = lex.ext_of(rel)
-        if ext not in KNOWN:
-            continue
-        pset, mode = KNOWN[ext]
-        try:
-            got = lex.extract(root / rel, mode, pset)
-        except (SyntaxError, OSError):
-            continue
-        if not got:
+    for _rel, _ext, got, _problem in scanned:
+        if got is None:
             continue
         for name, _ln in got[1]:
             if any(name.endswith(b) for b in banned):
@@ -105,9 +119,34 @@ def main(argv: list[str]) -> int:
     dest = Path(argv[1])
     root = Path(subprocess.run(["git", "rev-parse", "--show-toplevel"],
                                capture_output=True, text=True, check=True).stdout.strip())
-    files = lex.tracked_files(root)
+    # THE ONE WALK, and every figure below comes out of it. There used to be two — this function's
+    # and `_measure_suffix_offenders`'s — each re-deriving which extensions are armed and each
+    # SWALLOWING an extraction failure, so an unparseable file was invisible here while `run()`
+    # refused the same file by name. `scan_corpus` owns that decision now and reports it; nothing
+    # below is allowed to drop it on the floor.
+    # RE-SCAFFOLDING A REPO THAT ALREADY DECLARES ONE. The seed below is proposed from `KNOWN_EXTS`
+    # either way — this script chooses no regexes on an owner's behalf — but the pins it MEASURES
+    # have to be measured over what the existing declaration actually arms, or a repo that armed
+    # TypeScript through a `PATTERNS:` row gets pins derived over a corpus with its TypeScript
+    # silently missing. Absent conf is the first-adoption case and is byte-for-byte the old walk.
+    declared, sets = dict(KNOWN), None
+    conf_path = root / lex.CONF_NAME
+    if conf_path.is_file():
+        try:
+            conf = lex.load_conf(conf_path)
+        except lex.ConfError as exc:
+            sys.stderr.write(f"scaffold: the existing {lex.CONF_NAME} does not parse ({exc}); "
+                             f"measuring against the shipped extractors alone\n")
+        else:
+            declared.update({e: (ps, m) for e, ps, m in lex.langs(conf)})
+            sets = lex.resolve_pattern_sets(conf)
+    scanned = list(lex.scan_corpus(root, declared, sets))
+    files = [rel for rel, _e, _d, _p in scanned]
+    refused = [p for _r, _e, _d, p in scanned if p]
+    for _p in refused:
+        sys.stderr.write(f"scaffold: NOT EXTRACTED - {_p}\n")
 
-    exts = sorted({lex.ext_of(f) for f in files})
+    exts = sorted({ext for _r, ext, _d, _p in scanned})
     # S8 — `conf` is seeded UNCONDITIONALLY, present or not. This scaffold runs BEFORE the file it
     # writes is tracked, so the extension it is about to create cannot be in `exts` — and the
     # adopter's very first `git add .lexicon.conf` then reds with UNDECLARED EXTENSIONS. Every fresh
@@ -120,19 +159,18 @@ def main(argv: list[str]) -> int:
     # answered both with the corpus, which is why it legalised whatever a repo already did most.
     forms = canon.build_form_index()
     counts: collections.Counter = collections.Counter()   # surface form -> live sites
+    # `(ext, predicate) -> extracted definitions`, which is the population `UNDECLARED CELL` grades
+    # and therefore the population the seeded `CELLS` block must cover. Keyed on the PREDICATE and
+    # mapped through `lex.PREDICATE_SURFACES` at emission, so this walk and that refusal read one
+    # mapping rather than two spellings of it.
+    cell_pops: collections.Counter = collections.Counter()
     types_seen = 0
-    for rel in files:
-        ext = lex.ext_of(rel)
-        if ext not in KNOWN:
-            continue
-        pset, mode = KNOWN[ext]
-        try:
-            got = lex.extract(root / rel, mode, pset)
-        except (SyntaxError, OSError):
-            continue
-        if not got:
+    for _rel, _ext, got, _problem in scanned:
+        if got is None:
             continue
         funcs, types_, _ = got
+        cell_pops[(_ext, "verb")] += len(funcs)
+        cell_pops[(_ext, "suffix")] += len(types_)
         types_seen += len(types_)
         for name, _ln in funcs:
             v = lex.leading_verb(name)
@@ -140,7 +178,7 @@ def main(argv: list[str]) -> int:
                 counts[v] += 1
 
     total_defs = sum(counts.values())
-    suffix_offenders = _measure_suffix_offenders(root, files)
+    suffix_offenders = _measure_suffix_offenders(scanned)
     # A cluster enters when ANY of its forms has a live site. The corpus votes on membership and
     # nothing else: it cannot promote a spelling, and a token in no cluster cannot enter at all.
     live = {forms[v] for v in counts if v in forms}
@@ -159,19 +197,17 @@ def main(argv: list[str]) -> int:
     body.append("# here with no declaration is a named refusal, never a silent skip.")
     body.append(f'LANGS="{" ".join(langs)}"')
     body.append("")
-    body.append("# ALL THREE MEASURED against this corpus at scaffold time. The verb pin counts every")
-    body.append("# definition whose leading token is outside the proposal; the other two count their own")
+    body.append("# BOTH MEASURED against this corpus at scaffold time. The verb pin counts every")
+    body.append("# definition whose leading token is outside the proposal; the suffix pin counts its own")
     body.append("# offenders. They used to be hardcoded `0` under a comment that called them measured, so")
     body.append("# a corpus with one `Manager` type scaffolded green and redded on its first gate run,")
     body.append("# against a pin the tool itself had written (TOOL-dScaffoldedMirror-1).")
     body.append("# Re-measure after curating: python tools/lexicon/lexicon.py --measure")
-    body.append("# Shrink-only thereafter: the count may fall, never rise.")
+    body.append("# The pin is a TWO-SIDED equality thereafter: a count that RISES reds, and a count")
+    body.append("# that FALLS reds too, printing the row to paste. A drain lands in the declaration")
+    body.append("# or it is not landed -- an unrecorded drain leaves a pin nothing can ever meet.")
     body.append(f'VERB_OFFENDER_PIN="{verb_offenders}"')
     body.append(f'SUFFIX_OFFENDER_PIN="{suffix_offenders}"')
-    body.append("# LAYERS ships EMPTY below, so no layer offender can exist yet. This comment is on its")
-    body.append("# OWN line deliberately: the conf grammar forbids one after a value, and the first cut of")
-    body.append("# this scaffold put it inline and made the reader refuse the file it had just written.")
-    body.append('LAYER_OFFENDER_PIN="0"')
     body.append("")
     body.append("# The date and node that CURATED the seed below. While this is empty,")
     body.append("# `adopt-lexicon.sh --check` reds: an underived table nobody edited is a mirror of the")
@@ -208,12 +244,62 @@ def main(argv: list[str]) -> int:
         body.append("# RENAMES THIS TABLE WILL OWE: none. Every live site of a seeded concept already")
         body.append("# uses the representative spelling.")
     body.append("")
-    body.append("# FORBIDDEN import directions, `<glob> -> <glob>`. Seeded EMPTY and the gate REDS until")
-    body.append("# you declare one: a frequency count cannot observe intended architecture, so there is")
-    body.append("# no derived proposal for this predicate. Declare the direction you actually mean, e.g.")
-    body.append("#   src/core/* -> src/adapters/*")
-    body.append("LAYERS:")
-    body.append("")
+
+    # ---- THE CELLS MATRIX AND ITS MEASURED PINS (closing review B3) ------------------------------
+    #
+    # THE SCAFFOLD EMITTED NEITHER, and that made a freshly adopted repo unable to run the one
+    # command the Skill it had just installed documents. `--as <ext>.<surface>` is REQUIRED since
+    # TOOL-aSurfacedLexicon-8 and `resolve_cell` refuses any spec no `CELLS` row names, so
+    # `--suggest fetch_thing --as py.function` exited 2 with "Declared cells: none" on every fresh
+    # adoption. Nothing surfaced the gap: `kit.toml` declared holes for `ratified` and the pins only,
+    # and the README's Adopting section never mentioned cells. The kit's own canon-overlay fixture
+    # hand-writes a `CELLS` block — the same hole seen from the inside.
+    #
+    # ONE ROW PER (ext, surface) THE WALK ACTUALLY EXTRACTED, which is the same population
+    # `UNDECLARED CELL` refuses over, so the seed satisfies that arm by construction rather than by
+    # an author remembering to. Surfaces with no extracted population (`file`, `constant`) are NOT
+    # seeded: a cell whose population rule selects nothing is a `DEAD CELL` refusal, so proposing
+    # one would hand the adopter a declaration their first gate run reds on.
+    #
+    # THE `.conv` PINS ARE MEASURED, never asserted, for the reason the two scalar pins above are:
+    # an armed cell is a two-sided equality, and a pin the tool wrote without measuring is either
+    # vacuous or permanently red. `measure_conventions` is the ENGINE's own function over the SAME
+    # walk, so the number the seed carries is the number the first `--check` computes.
+    seeded_cells = {}
+    for (_e, _kind), _n in sorted(cell_pops.items()):
+        if not _n:
+            continue
+        seeded_cells[f"{_e}.{lex.PREDICATE_SURFACES[_kind]}"] = SEED_CONVENTIONS.get(
+            (_e, lex.PREDICATE_SURFACES[_kind]), "dark")
+    if seeded_cells:
+        _rows = {k: (v, frozenset()) for k, v in seeded_cells.items()}
+        _measured, _ = lex.measure_conventions(scanned, {"CELLS": _rows, "PINS": {}}, root, declared)
+        body.append("# The (language, surface) matrix. The CONVENTION in each row is PRESCRIPTIVE —")
+        body.append("# each language's own published style, from outside this tree — and never a")
+        body.append("# ranking of what this corpus already does, which would make the gate certify")
+        body.append("# the habit it was installed to change. A pair this kit has no prescription for")
+        body.append("# is seeded `dark`, which is a declared refusal to grade and not a gap.")
+        body.append("#")
+        body.append("# ARM WHAT YOU MEAN: change a `dark` row to a convention, or add the `vocab`")
+        body.append("# flag to a `function` row to ratchet its DEBT/UNRULED split per cell. Every")
+        body.append("# change here moves the matching `.conv` pin below; `--measure` reprints them.")
+        body.append("CELLS:")
+        for _k, _v in seeded_cells.items():
+            body.append(f"  {_k:<14} {_v}")
+        body.append("")
+        _pins = [(k, len(r["verdicts"])) for k, r in _measured.items()
+                 if r["graded"] and r["convention"] != "dark"]
+        if _pins:
+            body.append("# MEASURED over this corpus, like the two scalar pins above, and two-sided in")
+            body.append("# the same way. ONE BLANK LINE between rows is a REFUSAL in the reader, not a")
+            body.append("# style: it is the context line that lets two branches draining neighbouring")
+            body.append("# cells merge clean.")
+            body.append("PINS:")
+            for _i, (_k, _n) in enumerate(_pins):
+                if _i:
+                    body.append("")
+                body.append(f"  {_k}.conv  {_n}")
+            body.append("")
 
     # newline="" — write LF, never the platform default. `write_text` translates `\n` to `\r\n` on
     # Windows, and a CRLF conf INVERTS the unratified-seed refusal: `adopt-lexicon.sh` strips the
@@ -223,7 +309,8 @@ def main(argv: list[str]) -> int:
     with open(dest, "w", encoding="utf-8", newline="") as fh:
         fh.write("\n".join(body))
     print(f"scaffold: {len(seeded)} verb(s) proposed from {total_defs} definition(s); "
-          f"VERB_OFFENDER_PIN={verb_offenders}; {types_seen} type definition(s) scanned")
+          f"VERB_OFFENDER_PIN={verb_offenders}; {types_seen} type definition(s) scanned"
+          + (f"; {len(refused)} file(s) NOT EXTRACTED, named on stderr" if refused else ""))
     return 0
 
 

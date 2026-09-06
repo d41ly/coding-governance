@@ -14,7 +14,8 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["record-citing-a-foreign-id-defines-or-orphans-it.md"]
+gotcha-classes = ["inline-fence-swallows-the-rest-of-the-file.md",
+  "record-citing-a-foreign-id-defines-or-orphans-it.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -116,6 +117,14 @@ seam: `--print-index-set` — reuse for any sibling that needs this engine's pop
 guessing it; extend by adding a print mode beside it rather than exporting the variable.
 
 ## Gaps
+
+- **The unfenced-body reader is a TOKENIZER, and a document can grep as complete while it sees
+  something shorter.** It opens a fence on any line matching a leading-whitespace-tolerant
+  triple-backtick or tilde and closes it only on a later line matching the same marker, so a
+  triple-backtick span written INLINE in prose swallows every line to the end of the file. What
+  check 12 then reports is the true consequence — a heading-canon diff, a rev not logged, a §10
+  missing its evidence — and never the truncation, so the message points away from the cause.
+  Class: `inline-fence-swallows-the-rest-of-the-file.md`.
 
 - The `builds/*/README.md` class at 25 KB has no byte-axis arm either — `TOOL-aRelaxedShard-2`. A
   class whose ONLY bound is bytes is currently unarmed.

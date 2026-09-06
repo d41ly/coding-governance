@@ -248,9 +248,10 @@ def ratchet_findings(git: "Git", root: pathlib.Path, ratchets, lookback: int = D
 # that widening explicitly.
 #
 # WHY THIS EXISTS AT ALL: flipping an armed extension to `dark` is a ONE-STRING edit that empties a
-# graded population and, before this, reddened nothing. Measured on this repo — flip `py` from
-# `parser` to `dark` and the armed share of definition-carrying files falls from 42.2% to 7.8%,
-# with the gate still exiting 0.
+# graded population and, before this, reddened nothing. Flip `py` from `parser` to `dark` and the
+# armed share of definition-carrying files falls by tens of points with the gate still exiting 0.
+# The two percentages this comment used to name were measured before the shell cell was armed and
+# were wrong by the time anyone read them; `--check` prints the live share on every run.
 #
 # THE GAP IT DOES NOT CLOSE, said plainly. An extension ARRIVING already-dark is a rise from absent
 # (-1) to dark (0), so it is not a weakening and nothing here fires — yet it lowers coverage exactly
@@ -926,6 +927,26 @@ def _load_lexicon(ctx):
     return (conf.get("VERBS") or {}), (conf.get("ratified") or "").strip(), (conf.get("LANGS") or "")
 
 
+def _resolve_lexicon_sets(ctx, lex):
+    """The lexicon's RESOLVED pattern sets — the shipped ones plus whatever `.lexicon.conf` declares.
+
+    BOTH SIGNALS BELOW MUST READ THE RESOLUTION, never the shipped constant. They each tested
+    `pset not in lex.PATTERN_SETS` and skipped, so a language armed only through a `PATTERNS:` row
+    was passed over file by file while the signal reported a clean number with `live` still true off
+    the Python half. That is green-by-absence on a GATEABLE signal, and it lands inside the one
+    instrument whose whole value is that both of its operands come from one extractor.
+
+    Falls back to the shipped constant on any failure, for the same reason `_load_lexicon` returns
+    None rather than raising: `main()` evaluates every signal in one unguarded comprehension, and an
+    adopter whose conf is momentarily unreadable must not lose the other seven. TOOL-aSurfacedLexicon-9.
+    """
+    try:
+        from lexicon_conf import load_conf
+        return lex.resolve_pattern_sets(load_conf(_resolve_lexicon_conf(ctx)))
+    except Exception:
+        return lex.PATTERN_SETS
+
+
 def _build_not_asked(name, why):
     """NOT ASKED is neither clean nor dead — and it must not RENDER as dead either.
 
@@ -972,18 +993,23 @@ def signal_lexicon_verbs_unused(ctx) -> dict:
     if not verbs:
         return _build_not_asked(name, ".lexicon.conf declares no VERBS; nothing to judge")
 
-    declared = {ext: (pset, mode) for ext, pset, mode in _langs({"LANGS": _l})}
+    # THE ARMED SET COMES FROM `_build_armed_exts` RATHER THAN FROM A SECOND COPY OF ITS CONDITION.
+    # This loop re-derived "which extensions can actually be read" inline, which is how the H1 crash
+    # reached two call sites from one defect: the sibling gained the unshipped-parser drop and this
+    # one would not have. `KeyError` joins the `except` tuple as the belt to that braces — the
+    # promise `_load_lexicon` makes is that a bad declaration never raises out of a signal, and a
+    # promise carried by one guard is a promise one edit away from being false.
+    sets = _resolve_lexicon_sets(ctx, lex)
+    declared = _build_armed_exts(_l, lex, _langs, sets)
     used: set[str] = set()
     for rel in lex.tracked_files(ctx.root):
         ext = lex.ext_of(rel)
         if ext not in declared:
             continue
         pset, mode = declared[ext]
-        if mode == "dark" or (mode == "probe" and pset not in lex.PATTERN_SETS):
-            continue
         try:
-            got = lex.extract(ctx.root / rel, mode, pset)
-        except (SyntaxError, OSError):
+            got = lex.extract(ctx.root / rel, mode, pset, sets=sets)
+        except (SyntaxError, OSError, KeyError):
             continue
         if not got:
             continue
@@ -1036,19 +1062,38 @@ def signal_lexicon_ratified_stale(ctx) -> dict:
             "langs_commit": langs_sha}
 
 
-def _build_armed_exts(langs_value, lex, _langs):
+def _build_armed_exts(langs_value, lex, _langs, sets):
     """`{ext: (pset, mode)}` for the extensions an extractor can actually READ. Dark and
     unknown-pattern-set extensions are dropped here, so both operands are derived over the same
-    population and a `LANGS` edit moves both ends together rather than one."""
+    population and a `LANGS` edit moves both ends together rather than one.
+
+    `sets` is the RESOLVED mapping and is required rather than defaulted: the shipped constant was
+    what this test read before, and reading it silently narrowed the population to the languages the
+    kit happens to ship. A default here would let a future caller re-earn that by omission.
+
+    AN UNSHIPPED `parser` ID IS DROPPED HERE TOO, and that arm is closing review H1. This function
+    dropped `dark` and unknown-`probe` rows and KEPT a `parser` row naming a pattern set the kit does
+    not ship — the engine ships `python-ast` and `shell-tokens` only — so `extract_text` reached
+    `PARSERS[pset]` and raised `KeyError`. Neither `except` tuple downstream covers that and
+    `main()` evaluates every signal unguarded, so ONE legal-looking `LANGS` row cost all eight
+    signals and a traceback, on a leg carrying no guard. `_load_lexicon`'s docstring promises "never
+    a raise and never a red" for exactly this class, and the engine's own `scan_corpus` already
+    refuses the same row by name — so the two readers of one declaration disagreed. The crash path
+    is new: before TOOL-aSurfacedLexicon-14 the `parser` arm ignored its set id entirely.
+
+    `lex.PARSERS` IS READ, NEVER RESTATED. A second copy of the shipped parser ids here is the
+    two-carriers class inside the fix for two readers disagreeing."""
     out = {}
     for ext, pset, mode in _langs({"LANGS": langs_value}):
-        if mode == "dark" or (mode == "probe" and pset not in lex.PATTERN_SETS):
+        if mode == "dark" or (mode == "probe" and pset not in sets):
+            continue
+        if mode == "parser" and pset not in lex.PARSERS:
             continue
         out[ext] = (pset, mode)
     return out
 
 
-def _read_defs_at_sha(ctx, sha, armed, lex):
+def _read_defs_at_sha(ctx, sha, armed, lex, sets):
     """`{(path, name)}` — every function definition an armed extractor sees in the tree at `sha`.
 
     ONE `git cat-file --batch` for the whole tree, not one read per file. Measured on node `d`: the
@@ -1089,8 +1134,8 @@ def _read_defs_at_sha(ctx, sha, armed, lex):
         i = nl + 1 + size + 1
         pset, mode = armed[lex.ext_of(path)]
         try:
-            got = lex.extract_text(src, mode, pset)
-        except (SyntaxError, ValueError):
+            got = lex.extract_text(src, mode, pset, sets=sets)
+        except (SyntaxError, ValueError, KeyError):
             continue
         if got:
             for nm, _ln in got[0]:
@@ -1183,9 +1228,10 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     # The batched read below already costs 0.957 s cold inside a 3.7 s report that is not on the
     # merge bar, so the cache was specced against a cost that no longer exists — and an in-process
     # dict never survives to a second run anyway, which is a moving part with no consumer.
-    armed = _build_armed_exts(langs_value, lex, _langs)
-    at_base = _read_defs_at_sha(ctx, base, armed, lex)
-    at_head = _read_defs_at_sha(ctx, head, armed, lex)
+    sets = _resolve_lexicon_sets(ctx, lex)
+    armed = _build_armed_exts(langs_value, lex, _langs, sets)
+    at_base = _read_defs_at_sha(ctx, base, armed, lex, sets)
+    at_head = _read_defs_at_sha(ctx, head, armed, lex, sets)
     # L2 and L3 — a population that is empty at either end means the extractor is not reading, which
     # is indistinguishable from a clean window unless it is said out loud.
     if at_base is None or at_head is None or not at_base or not at_head:

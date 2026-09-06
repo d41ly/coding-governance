@@ -378,6 +378,11 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "build_clusters",
+      "kind": "function",
+      "file": "tools/lexicon/canon.py"
+    },
+    {
       "id": "build_cutoff",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -413,6 +418,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_kit_copy",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "build_lang_mode_findings",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -426,11 +436,6 @@
       "id": "build_live_backlog_rows",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
-    },
-    {
-      "id": "build_module_index",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "build_negatives",
@@ -593,6 +598,16 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_convention",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "check_declaration",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
       "id": "check_entry_producer",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -608,11 +623,6 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
-      "id": "check_layer_violation",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
-    },
-    {
       "id": "check_marker_line",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -621,6 +631,11 @@
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_pass",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "check_path_match",
@@ -646,6 +661,11 @@
       "id": "check_read_path",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "check_self_containment",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "check_slot_table",
@@ -696,6 +716,11 @@
       "id": "classify",
       "kind": "function",
       "file": "tools/govkit/census.py"
+    },
+    {
+      "id": "classify",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
     },
     {
       "id": "classify",
@@ -1278,6 +1303,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "extract_bound_names",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "extract_chunks",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -1291,6 +1321,11 @@
       "id": "extract_declared",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "extract_decorators",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "extract_phrases",
@@ -1938,6 +1973,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "measure_conventions",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "measure_corpus_symbols",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
@@ -1951,6 +1991,11 @@
       "id": "measure_overlap",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "measure_pass",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "measure_phrase",
@@ -1971,6 +2016,11 @@
       "id": "measure_slot_sizes",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "measure_vocab_cells",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "merge",
@@ -2098,6 +2148,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "parse_cell_key",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
       "id": "parse_conf",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -2143,6 +2198,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "parse_shell_defs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "parse_spec",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2176,6 +2236,11 @@
       "id": "population",
       "kind": "function",
       "file": "tools/govkit/refusal_join.py"
+    },
+    {
+      "id": "print_canon_posture",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "print_last",
@@ -2288,6 +2353,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "read_agree_field",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_agreement",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "read_bindings",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2296,6 +2371,11 @@
       "id": "read_bytes_as_text",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "read_canon_refusal",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "read_conf",
@@ -2311,6 +2391,21 @@
       "id": "read_contract_rows",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_conv_row",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_core",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_debt_gloss",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "read_declared_keys",
@@ -2388,12 +2483,7 @@
       "file": "tools/memory-recall/query.py"
     },
     {
-      "id": "read_object",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
-    },
-    {
-      "id": "read_object_state",
+      "id": "read_routed_cell",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
     },
@@ -2413,6 +2503,21 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "read_stem",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "read_suggestion",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_surface_disagreements",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "read_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2426,11 +2531,6 @@
       "id": "read_timings",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
-    },
-    {
-      "id": "read_token_is_live",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "read_tracked",
@@ -2598,6 +2698,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_convention",
+      "kind": "function",
+      "file": "tools/lexicon/subtokens.py"
+    },
+    {
       "id": "render_edges",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2633,6 +2738,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_pin_rows",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "render_region",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2646,6 +2756,11 @@
       "id": "render_spec_records",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "render_swapped_name",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "render_symbols_json",
@@ -2728,6 +2843,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "resolve_cell",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "resolve_declaration_paths",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -2763,11 +2883,6 @@
       "file": "tools/settings-merge.py"
     },
     {
-      "id": "resolve_import",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
-    },
-    {
       "id": "resolve_kit_homes",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_incms_receipt.py"
@@ -2776,6 +2891,11 @@
       "id": "resolve_measurer_currency",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_pattern_sets",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "resolve_posix_shell",
@@ -2968,11 +3088,6 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
-      "id": "run_brief",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
-    },
-    {
       "id": "run_case",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -3016,11 +3131,6 @@
       "id": "run_kit_check",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "run_probe",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "run_rm3",
@@ -3083,7 +3193,22 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "scan_corpus",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "scan_definition_carriers",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_file_stems",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_function_names",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
     },
@@ -3093,9 +3218,24 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "scan_module_constants",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "scan_produced_destinations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "scan_routes",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "scan_shell_tokens",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "scan_slot_budget",
@@ -3113,14 +3253,14 @@
       "file": "tools/codebase-map/replay-phrases.py"
     },
     {
+      "id": "scan_type_names",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "scan_unarmed_slots",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
-      "id": "scan_unselective_rules",
-      "kind": "function",
-      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "scan_written_destinations",
@@ -3816,6 +3956,21 @@
       "id": "test_seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_shell_constructs",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "test_shell_refusals",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "test_shell_sentinel",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "test_signals_can_move",

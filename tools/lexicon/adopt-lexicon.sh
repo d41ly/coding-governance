@@ -107,7 +107,6 @@ render_skill() { # -> stdout
   out=${out//$'\r'/}
   out=${out//\{\{VERBS_TABLE\}\}/"$verbs"}
   out=${out//\{\{SUGGEST_CLI\}\}/"python3 $KITREL/lexicon.py --suggest"}   # gov:literal-python
-  out=${out//\{\{BRIEF_CLI\}\}/"python3 $KITREL/lexicon.py --brief"}       # gov:literal-python
   out=${out//\{\{GATE_CLI\}\}/"python3 $KITREL/lexicon.py"}                # gov:literal-python
   out=${out//\{\{CONF\}\}/".lexicon.conf"}
   out=${out//\{\{KIT_VERSION\}\}/"$KIT_VERSION"}
@@ -232,14 +231,141 @@ if [ "$MODE" = "--check" ]; then
     echo "lexicon-adopt: Read the table, edit it, then stamp \`ratified=\"<date> node <tag>\"\`."
     fail=1
   fi
+  # S5 of TOOL-aSurfacedLexicon-11 — THE CANON DOOR IS RECORDED OR IT IS REFUSED.
+  #
+  # CONDITIONAL on a block being present: a repo that declares none is the frozen state and the
+  # common one, so this arm must not red for every adopter who is not the author. This repo declares
+  # no block, so the false-refusal branch is exercised by the real bar on every run.
+  #
+  # DETECTED THROUGH THE ONE READER, never a grep: `--print-rows CANON` prints one overlay row per
+  # line and exits 0 with no output where no block exists. A second parser for this grammar in this
+  # script is the class the shell-out three lines above already rules out by name.
+  #
+  # `tr -d '\r'` FIRST, for the reason the `ratified` arm above states: an anchored `s/"$//` cannot
+  # strip a quote a carriage return follows, so a CRLF conf would yield `"\r` — a NON-EMPTY value —
+  # and this refusal would pass exactly when it should fire.
+  #
+  # AND IT CANNOT BE PROVEN BY REVERT ON A GIT-BASH NODE, which is worth writing down beside it
+  # rather than leaving for whoever next tries. MSYS `grep` reads in text mode and drops the CR
+  # before `sed` ever sees it, so removing this `tr` changes NOTHING here: measured on node `a`,
+  # both forms red identically on a wholly-CRLF conf. On a GNU-coreutils node the CR survives grep
+  # and the `tr` is the whole mechanism. Kept for that node; unexercisable on this one.
+  canon_rows=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-rows CANON "$CONF" 2>/dev/null | grep -c . || true)
+  if [ "${canon_rows:-0}" -gt 0 ]; then
+    stamp=$(tr -d '\r' < "$CONF" | grep -E '^canon_unfrozen=' | head -1 | sed -E 's/^canon_unfrozen=//; s/^"//; s/"$//')
+    if [ -z "${stamp// /}" ]; then
+      echo "lexicon-adopt: .lexicon.conf declares a CANON: overlay ($canon_rows row(s)) with an EMPTY"
+      echo "lexicon-adopt: \`canon_unfrozen\` stamp. The canon ships FROZEN and an owner may open it —"
+      echo "lexicon-adopt: but no machine check can tell a considered overlay from a mirror of your own"
+      echo "lexicon-adopt: corpus, so what the door buys is attribution rather than proof. Stamp it:"
+      echo "lexicon-adopt:   canon_unfrozen=\"<date> node <tag> — <why these rows>\""
+      fail=1
+    elif ! printf '%s' "$stamp" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}[[:space:]]+node[[:space:]]+[A-Za-z0-9_]+[[:space:]]+[^[:space:]]'; then
+      echo "lexicon-adopt: the \`canon_unfrozen\` stamp carries no REASON: $stamp"
+      echo "lexicon-adopt: A date and a node record that an unfreeze happened, not why — and why is the"
+      echo "lexicon-adopt: only thing separating a considered overlay from a mirror. The shape is"
+      echo "lexicon-adopt:   canon_unfrozen=\"<date> node <tag> — <why these rows>\""
+      fail=1
+    fi
+  fi
   verbs=$("$PY" "$KIT_DIR/lexicon_conf.py" --print-verbs "$CONF" 2>/dev/null | grep -c . || true)
   if [ "${verbs:-0}" -eq 0 ]; then
     echo "lexicon-adopt: the VERBS table is EMPTY. Every P1 identifier would be an offender, so the"
     echo "lexicon-adopt: pin would absorb the whole corpus and the predicate would assert nothing."
     fail=1
   fi
+  # S9 — THE UNFREEZE, OBSERVED ON A LEG THE PUSH BOUNDARY RUNS, and it exercises ITSELF rather
+  # than depending on this repo declaring anything. Every other arm that touches the merge sits on
+  # `lexicon selftest`, chunk `selftests`, which GATE_FULL=1 does not reach and no boundary sets —
+  # so the unit whose whole subject is a behaviour change would ship its evidence on a leg nobody
+  # runs. This leg carries an EMPTY guard, so nothing scopes it off any bar.
+  #
+  # COST IS BOUNDED BY CONSTRUCTION: `--suggest` walks no corpus, so this is one `git init` and one
+  # declaration read. `frobnicate` is in no shipped cluster, so a run that answers `build_thing`
+  # can only have read the OVERLAY.
+  canon_tmp=$(mktemp -d 2>/dev/null) || canon_tmp=""
+  if [ -n "$canon_tmp" ] && git -C "$canon_tmp" init -q 2>/dev/null; then
+    {
+      echo 'canon_unfrozen="2026-09-05 node a — self-exercising arm for the overlay merge"'
+      echo 'LANGS="py:python-ast:parser"'
+      echo ''
+      echo 'CANON:'
+      echo '  build  frobnicate'
+      echo ''
+      echo 'CELLS:'
+      echo '  py.function  snake  vocab'
+      echo ''
+      echo 'VERBS:'
+      echo '  build  create a new value and return it - NOT `create`'
+    } > "$canon_tmp/.lexicon.conf"
+    # `--as` IS REQUIRED SINCE TOOL-aSurfacedLexicon-8, so the fixture declares the one cell this arm
+    # asks about. `snake` is the convention `build_thing` already satisfies, which keeps the expected
+    # answer byte-identical and keeps this arm about the OVERLAY rather than about the re-caser.
+    canon_out=$(cd "$canon_tmp" && "$PY" "$KIT_DIR/lexicon.py" --suggest frobnicate_thing \
+                                       --as py.function 2>&1)
+    case "$canon_out" in
+      *"CANON UNFROZEN"*) ;;
+      *) echo "lexicon-adopt: THE OVERLAY POSTURE LINE DID NOT PRINT on a stamped CANON: block."
+         echo "lexicon-adopt: A canon opened without saying so on every run is the quiet unfreeze this"
+         echo "lexicon-adopt: door was built not to be. Got: $canon_out"
+         fail=1 ;;
+    esac
+    case "$canon_out" in
+      *'use `build_thing`'*) ;;
+      *) echo "lexicon-adopt: THE OVERLAY DID NOT REACH THE ANSWER. A stamped row mapping"
+         echo "lexicon-adopt: \`frobnicate\` onto \`build\` must make --suggest answer \`build_thing\`;"
+         echo "lexicon-adopt: the shipped canon holds no cluster for that token at all."
+         echo "lexicon-adopt: Got: $canon_out"
+         fail=1 ;;
+    esac
+    rm -rf "$canon_tmp"
+  else
+    echo "lexicon-adopt: SKIPPED the canon-overlay arm — no writable temp dir or git init failed, so"
+    echo "lexicon-adopt: the overlay merge went UNEXERCISED on this run. Not a pass."
+  fi
+
   check_skill || fail=1
-  [ "$fail" -eq 0 ] && echo "lexicon-adopt OK — .lexicon.conf parses, ratified, $verbs verb(s) declared, Skill in sync"
+
+  # B1 OF THE CLOSING REVIEW — THE DECLARATION IS GRADED ON A LEG A CONF-ONLY COMMIT CANNOT SKIP.
+  #
+  # Every ratchet this kit owns lives in `.lexicon.conf`: the two scalar pins, the `CELLS`
+  # conventions, the `PINS` rows, the `CANON` overlay's effect on the DEBT/UNRULED split. The leg
+  # that computes those verdicts (`lexicon naming predicates`) is guarded on `tools/` and three
+  # sibling dirs, and `.lexicon.conf` is at the repo ROOT — so a branch whose whole diff is the
+  # declaration skipped its own verifier. Raising `VERB_OFFENDER_PIN` to any number, or flipping a
+  # cell to `dark`, landed with no verdict computed. A ratchet whose drain is invisible on the
+  # commit that drains it is not a ratchet, and the tool's own red text instructs the author to
+  # produce exactly that commit shape ("Paste this row into .lexicon.conf").
+  #
+  # THE GUARD IS NOT THE FIX, and that was tried twice and STRUCK twice. govkit partitions every
+  # declared guard into classes — memory-root-relative, verbatim-repo-root, renamed, exempt,
+  # kit-relative — and a root-level conf is in none of them, so declaring one reds `govkit
+  # selfcheck` rather than scoping anything. That ruling is written into this kit's own `kit.toml`.
+  # What was left was this script: it is the argv of `lexicon wiring`, the one leg in this kit
+  # carrying an EMPTY guard, and it already reads the declaration on every bar.
+  #
+  # THE OTHER LEG STAYS, and it is not made redundant by this. It runs the same engine SCOPED,
+  # which is an early signal under its own name in the leg log; this arm is the one that binds at
+  # the merge. The two share an argv, which the "ONE LEG, NOT TWO" ruling above warns about — but
+  # what that ruling struck was two legs with the same argv and DIFFERENT guards, where the guarded
+  # copy could never say anything the unguarded one had not. Here the unguarded copy is the
+  # authority and the guarded one is the fast fail; deleting either is a `gate-legs.json` and a map
+  # edit, not a behaviour change.
+  #
+  # COST: one corpus walk. Measured on node `a` from `<git-dir>/gate-ledger.tsv`, the row named
+  # `lexicon naming predicates`; read it there rather than from a number written here.
+  grade_out=$(cd "$ROOT" && "$PY" "$KIT_DIR/lexicon.py" 2>&1)
+  grade_rc=$?
+  if [ "$grade_rc" -ne 0 ]; then
+    echo "lexicon-adopt: THE DECLARATION DOES NOT GRADE — \`$PY $KITREL/lexicon.py\` exited"
+    echo "lexicon-adopt: $grade_rc over this corpus. Every pin in .lexicon.conf is a two-sided"
+    echo "lexicon-adopt: equality, so this is either a name that moved or a pin nobody re-measured."
+    echo "lexicon-adopt: The engine's own output follows; it names the row to paste."
+    printf '%s\n' "$grade_out"
+    fail=1
+  fi
+
+  [ "$fail" -eq 0 ] && echo "lexicon-adopt OK — .lexicon.conf parses, ratified, $verbs verb(s) declared, Skill in sync, declaration grades clean"
   exit "$fail"
 fi
 
