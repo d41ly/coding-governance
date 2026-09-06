@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-04
 streams: tooling
 roster: TOOL
-ids: TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16 TOOL-aSurfacedLexicon-17 TOOL-aSurfacedLexicon-18 TOOL-aSurfacedLexicon-19 TOOL-aSurfacedLexicon-20 TOOL-aSurfacedLexicon-21 TOOL-aSurfacedLexicon-22 TOOL-aSurfacedLexicon-23 TOOL-aSurfacedLexicon-24
+ids: TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12 TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16 TOOL-aSurfacedLexicon-17 TOOL-aSurfacedLexicon-18 TOOL-aSurfacedLexicon-19 TOOL-aSurfacedLexicon-20 TOOL-aSurfacedLexicon-21 TOOL-aSurfacedLexicon-22 TOOL-aSurfacedLexicon-23 TOOL-aSurfacedLexicon-24 TOOL-aSurfacedLexicon-25
 ---
 
 # aSurfacedLexicon — the lexicon stops grading two surfaces and starts declaring all of them
@@ -103,7 +103,7 @@ of the same.
 **Build status:** CLOSED · 14 unit(s) · node a · opened 2026-09-04 · streams tooling
 ids TOOL-aSurfacedLexicon-1 TOOL-aSurfacedLexicon-2 TOOL-aSurfacedLexicon-3 TOOL-aSurfacedLexicon-4 TOOL-aSurfacedLexicon-5 TOOL-aSurfacedLexicon-6 TOOL-aSurfacedLexicon-7 TOOL-aSurfacedLexicon-8 TOOL-aSurfacedLexicon-9 TOOL-aSurfacedLexicon-10 TOOL-aSurfacedLexicon-11 TOOL-aSurfacedLexicon-12
 ids TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 TOOL-aSurfacedLexicon-16 TOOL-aSurfacedLexicon-17 TOOL-aSurfacedLexicon-18 TOOL-aSurfacedLexicon-19 TOOL-aSurfacedLexicon-20 TOOL-aSurfacedLexicon-21 TOOL-aSurfacedLexicon-22 TOOL-aSurfacedLexicon-23
-ids TOOL-aSurfacedLexicon-24
+ids TOOL-aSurfacedLexicon-24 TOOL-aSurfacedLexicon-25
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
