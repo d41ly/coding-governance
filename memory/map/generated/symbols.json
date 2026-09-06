@@ -3368,6 +3368,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "test_a_new_conditional_tier_reports_itself",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_absent_fixture_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -3479,6 +3484,11 @@
     },
     {
       "id": "test_clis_refuse_an_unadopted_root",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_conditional_tier_refuses_an_orphaned_artifact",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
@@ -3951,6 +3961,11 @@
       "id": "test_tautological_fixture_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_the_gate_and_its_template_are_byte_identical",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_undeclared_file_stays_out",

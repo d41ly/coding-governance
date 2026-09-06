@@ -1678,6 +1678,12 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
+    failures += check("freshness: an orphaned artifact is a refusal (AC2)",
+                      test_conditional_tier_refuses_an_orphaned_artifact)
+    failures += check("freshness: a NEW conditional tier reports itself (AC1/AC4)",
+                      test_a_new_conditional_tier_reports_itself)
+    failures += check("gate and template are byte-identical (AC5)",
+                      test_the_gate_and_its_template_are_byte_identical)
     failures += check("gov-only files withheld on both paths (AC13)",
                       test_gov_only_files_are_withheld_on_both_paths)
     failures += check("scan coverage line cannot go quiet (AC12)",
@@ -1927,6 +1933,88 @@ def test_gov_only_files_are_withheld_on_both_paths():
     for name in sorted(claimed):
         assert name in joined, (f"{name} is withheld from `govkit apply` but the copy-install "
                                 f"runbook never removes it: {joined}")
+
+
+def _load_gate_module():
+    """The gate file, imported by path. It is not importable by name (a hyphenated kit dir), and
+    gov's own `GATE_FILE` points inside this directory, so there is one copy to grade."""
+    import importlib.util
+    path = Path(os.path.abspath(__file__)).parent / "test_codebase_map.py"
+    spec = importlib.util.spec_from_file_location("_gate_under_test", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _run_gate(gate, *, empty_symbols=False):
+    """Run the freshness gate against the REAL map tree, optionally with an empty symbol
+    population. Returns `(assertion_text_or_None, stdout)`.
+
+    No temp map root: the unconditional tiers need a real dossier tree, and faking one would grade
+    a fixture rather than the gate. What is faked is exactly the one input under test.
+    """
+    import contextlib, io as _io
+    real_ext = gate.ext
+
+    class _Shim:
+        def __getattr__(self, name):
+            if empty_symbols and name == "all_symbols":
+                return list
+            return getattr(real_ext, name)
+
+    gate.ext = _Shim()
+    out, err = _io.StringIO(), None
+    try:
+        with contextlib.redirect_stdout(out):
+            gate.test_generated_artifacts_are_fresh()
+    except AssertionError as exc:
+        err = str(exc)
+    finally:
+        gate.ext = real_ext
+    return err, out.getvalue()
+
+
+def test_conditional_tier_refuses_an_orphaned_artifact():
+    """AC2 — an empty population WITH a committed artifact is a REFUSAL, not a silent pass.
+
+    That pairing means the extractor went dark under a file it can no longer justify, and before
+    this unit the gate passed over it: `if symbols:` with no `else` compares nothing and returns.
+    """
+    gate = _load_gate_module()
+    err, out = _run_gate(gate, empty_symbols=True)
+    assert err and "DARK symbol tier" in err, (err, out)
+    assert "symbols.json" in err and "regen" in err, err
+
+
+def test_a_new_conditional_tier_reports_itself():
+    """AC1 and AC4 in one arm, because they are one mechanism.
+
+    AC4 first: `symbols.json` is the ONLY conditional tier today, so a criterion that enumerated
+    the tiers would grade a population of one and could not fail. This introduces a SECOND tier in
+    a fixture and asserts it is reported with no reporting line written for it — the list IS the
+    mechanism. AC1 rides on it: that tier's artifact does not exist, so its empty population is a
+    NAMED skip and not a refusal, which is the legal state an adopter declaring no such extractor
+    is in.
+    """
+    gate = _load_gate_module()
+    real = list(gate.CONDITIONAL_TIERS)
+    gate.CONDITIONAL_TIERS.append(("widget", "all_widgets", "widgets.json", "render_symbols_json"))
+    try:
+        err, out = _run_gate(gate)
+        assert "skipped widget tier" in out, (out, err)
+        assert "widgets.json" in out and "NOTHING WAS COMPARED" in out, out
+        assert err is None, f"a tier with no committed artifact must not refuse: {err}"
+    finally:
+        gate.CONDITIONAL_TIERS[:] = real
+
+
+def test_the_gate_and_its_template_are_byte_identical():
+    """AC5 — editing one and not the other ships a divergence no adopter ever sees corrected."""
+    kit = Path(os.path.abspath(__file__)).parent
+    a = (kit / "test_codebase_map.py").read_bytes()
+    b = (kit / "test_codebase_map.template.py").read_bytes()
+    assert a == b, ("the installed gate and its template have diverged; "
+                    f"{len(a)} vs {len(b)} bytes")
 
 if __name__ == "__main__":
     sys.exit(main())

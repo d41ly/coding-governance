@@ -1,12 +1,13 @@
 # TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare
 
-**Status:** SPECCED · rev-5 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** CLOSED · rev-6 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-06-build-TOOL-dTracedLattice-2-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-dTracedLattice-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
@@ -108,6 +109,10 @@ and needs its failing case observed on a fixture that has a committed artifact a
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round, which staged the break
   and observed the gate pass with the symbol tier absent.
+- rev-6 · 2026-09-06 · built. `CONDITIONAL_TIERS` makes the tier list the mechanism, so S3's class
+  fix needs no reporting line per tier; the announcement moved BEFORE the compare loop because the
+  AC1/AC4 arm caught a skip line an unrelated staleness failure had swallowed, and "which tiers did
+  not run" is what a reader needs most when something else is red. Status CLOSED.
 - rev-5 · 2026-09-06 · folded the round-3 spec audit: H6 (the held-legs sentence claimed
   `codebase-map coverage + freshness` is kit-subject and held; `tools/gate-legs.json` gives it
   `subject: repo`, `chunk: declarations` and no guard, so it runs on every bar — and its argv is this
