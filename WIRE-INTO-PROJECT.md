@@ -445,9 +445,8 @@ from §2). Write the manifest to one of those paths so it resolves.
    where work state is READ from, e.g. the generated `memory/LIVE.md`) · the environment traps. Fill the
    **`manifest-audit` block** per the template's Customize notes: `watch` = the pathspecs the gate/layout
    claims derive FROM (never lockfiles; ≤~8); `verify-paths` = the 2–3 tracked anchors; stamp
-   `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha (HEAD on the
-   default branch, else `git merge-base <remote>/<default> HEAD`; no remote →
-   `git merge-base <local-default> HEAD`); tag claims whose truth lives in another repo
+   `last-audit` = ISO-8601 datetime with offset (e.g. `date -Iseconds`) `@` full sha per the stamp
+   rule those notes state; tag claims whose truth lives in another repo
    `(cross-repo — verify at use)`. Keep it SHORT — only what the engine can't derive from
    git/`CLAUDE.md`; reference the playbook, never duplicate it. (§A is derived by the agent per
    kickoff — leave it as the shape, don't fill it.)

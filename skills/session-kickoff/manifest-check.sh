@@ -194,7 +194,11 @@ c8=$(awk '
 $c8"
 
 # C2 — exactly one manifest-audit block, four keys with non-empty, well-formed values.
-RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' (sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (6) bump the marker to v1.3 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
+# The stamp rule's single MACHINE home. TOOL-aHonedRuleset-5 hoisted it above RETROFIT so that
+# string can interpolate it instead of re-typing it, and `tools/check-playbook-parity.sh` compares
+# this expression against the one MANIFEST-TEMPLATE.md states, so the two cannot drift apart again.
+STAMP_SHA_RULE="sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)"
+RETROFIT="retrofit: (1) body deltas — rewrite the §B intro to 're-audited every kickoff; accretes', add the ratchet + dated-corrections (never delete the section) + traps-accrete text; (2) add the manifest-audit block: last-audit '<ISO datetime> @ <full sha>' ($STAMP_SHA_RULE), watch = gate-defining pathspecs, verify-paths = 2-3 anchors, last-body-change = the sha where the BODY was last revised; (2b) paste the sealed task region from --task-skeleton into §A; (3) copy manifest-check.sh in, add the .gitattributes LF rule + the gate-fence line, git add everything; (4) run this check to 0; (5) pull the manifest DoD + reconcile lines into the project's playbook; (6) bump the marker to v1.3 LAST. Full recipe: coding-governance/WIRE-INTO-PROJECT.md §4."
 nblocks=$(grep -c '<!-- manifest-audit' "$MF" || true)
 BLOCK_OK=1
 if [ "$nblocks" -eq 0 ]; then
@@ -262,7 +266,6 @@ if [ "$BLOCK_OK" = 1 ]; then
     fi
   done
 
-  STAMP_SHA_RULE="sha = HEAD on the default branch, else \$(git merge-base <remote>/<default> HEAD)"
   if [ "$STAGED" = 0 ]; then
     SKIP_RANGE=0
     # C3 — anchor sha is real and ours.

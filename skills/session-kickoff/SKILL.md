@@ -115,9 +115,7 @@ On failures, repair NOW as part of kickoff (a ≤2-minute pass — a deep restru
 flagged §A task instead): for each file the drift check lists, re-check the §B claim(s) derived
 from it (gate fence ← CI/scripts · pointer map ← moved dirs · traps/corrections ← toolchain
 files), fix or DELETE stale rows, and delete dated entries whose prune-when condition now holds.
-Re-stamp `last-audit` (ISO datetime with offset · sha = `HEAD` on the default branch, else
-`git merge-base <remote>/<default> HEAD`; no remote → `git merge-base <local-default> HEAD` —
-Step 0 already resolved the local default), and record
+Re-stamp `last-audit` (ISO datetime with offset · sha per the manifest's own stamp rule), and record
 `manifest-audit: delta <none|summary incl. deletions> · watch-commits-since-stamp: <n>`
 (n = `git rev-list --count <old-stamp-sha>..HEAD -- <watch…>`, counted BEFORE re-stamping) in the
 repair commit message AND the READY card. The repair rides the session's unit branch/worktree — never a direct

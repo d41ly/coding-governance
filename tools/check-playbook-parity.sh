@@ -109,12 +109,20 @@ done
 # delimiter that row silently reparsed into the wrong fields and the gate reported "the owning
 # source does not exist: ]*)`.*/\1/p" — a real failure for a fake reason, which is worse than
 # either a pass or an honest red. `~` appears in none of these patterns.
+#
+# The pair list is no longer playbook-only. TOOL-aHonedRuleset-5 added a row whose stated side is
+# the kickoff MANIFEST TEMPLATE, because the value it pins -- the stamp rule's sha expression --
+# has a prose home and a machine home that had already drifted into two spellings.
+# What this row does NOT cover: it compares the stamp rule's sha expression and nothing else about
+# the stamp. The datetime half, whether a stamp is FRESH, and whether the sha it names is reachable
+# are manifest-check.sh's checks 3 and 5, not this gate's.
 PAIRS="
 lens-array bound~$TEMPLATE~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_LENSES = \([0-9]\+\).*/\1/p'
 agent-cap hook matcher~$TEMPLATE~sed -n 's/.*matcher \`\([A-Za-z|]*\)\`.*/\1/p'~.claude/settings.json~sed -n 's/.*\"matcher\": \"\(Workflow[^\"]*\)\".*/\1/p'
 verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 bounded-helper width~$TEMPLATE~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 resolved-K ceiling~$TEMPLATE~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+stamp rule sha expression~skills/session-kickoff/MANIFEST-TEMPLATE.md~sed -n 's/.*Stamp rule: sha = .*else \`\([^\`]*\)\`.*/\1/p'~skills/session-kickoff/manifest-check.sh~sed -n 's/^STAMP_SHA_RULE=.*else .\$(\([^)]*\)).*/\1/p'
 "
 
 # The pair loop runs in a subshell (it is the right-hand side of a pipe), so its findings have to

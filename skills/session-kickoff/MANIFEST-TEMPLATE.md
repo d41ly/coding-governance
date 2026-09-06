@@ -118,10 +118,9 @@ with `grep -nE '\{\{[A-Z]'` — no placeholder may survive):*
 
 - `{{PROJECT_NAME}}` — the project's name.
 - `{{AUDIT_DATETIME}}` / `{{AUDIT_SHA}}` — the stamp at the moment §B was derived and verified:
-  ISO-8601 datetime with offset (e.g. `date -Iseconds`) · full sha per the stamp rule (`HEAD` on
-  the default branch, else `git merge-base <remote>/<default> HEAD`; no remote →
-  `git merge-base <local-default> HEAD`). If the repo has no commits yet, make the initial
-  commit first — an unborn branch has no stampable sha.
+  ISO-8601 datetime with offset (e.g. `date -Iseconds`) · full sha per the stamp rule stated in
+  the ratchet section above, which is this file's single prose home for it. If the repo has no
+  commits yet, make the initial commit first — an unborn branch has no stampable sha.
 - `{{WATCH_PATHSPECS}}` — `;`-separated git pathspecs for the files §B's gate commands and layout
   claims are derived FROM (CI workflow files, `Makefile`, script dirs first; never lockfiles;
   `package.json`-class files only if gates genuinely derive from them — they churn on every dep
