@@ -236,7 +236,24 @@ done
 
 need "KIT_PYTEST_GUARDRAILS_VERSION" tools/pytest-parallel-guardrails/crashprobe.py "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\""
 need "KIT_GOVKIT_VERSION"          tools/govkit/govkit.py                    "^KIT_GOVKIT_VERSION = \"$V\""
-need "KIT_LEXICON_VERSION"         tools/lexicon/lexicon.py                  "^KIT_LEXICON_VERSION = \"$V\""
+# The kit dir, bound ONCE for the same reason `T2R` above is: a literal per use is a regression an
+# adopter pays for, and the carried-prefix ban counts every one of them.
+LXD="tools/lexicon"
+need "KIT_LEXICON_VERSION"         "$LXD/lexicon.py"                         "^KIT_LEXICON_VERSION = \"$V\""
+
+# lexicon: the constant was PRESENCE-checked alone, which is how a bump to 1.2 shipped with all four
+# `gov:kit lexicon@` markers left at 1.1 and only `govkit selfcheck` — at the push boundary — noticing.
+# Two checkers, one question, and the weaker one is the one a session reaches for. Paired here in the
+# shape the guardrails block below already uses, so the cheap branch-local run reds on this class.
+# The Skill is deliberately absent from the list: it is RENDERED from the constant and cannot drift.
+# TOOL-aSurfacedLexicon-10, round-2 review F1.
+lx=$(grep -oE "^KIT_LEXICON_VERSION = \"$V\"" "$LXD/lexicon.py" | head -1 | grep -oE "$V")
+for kept in lexicon.py canon.py README.md LEXICON.md; do
+  if [ -z "$lx" ] || ! grep -qE "gov:kit lexicon@$lx([^0-9.]|\$)" "$LXD/$kept"; then
+    echo "kit-versions: lexicon gov:kit marker in $kept != the constant (${lx:-unreadable})"
+    fails=$((fails+1))
+  fi
+done
 
 # pytest-parallel-guardrails: the constant lives in crashprobe.py, but the probe is a
 # hunt-then-remove diagnostic — the DEPLOYER-side version signal is the gov:kit marker in each

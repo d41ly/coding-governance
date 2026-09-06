@@ -203,8 +203,14 @@ available: they agree only on pure-underscore names and the empty string.
   this kit's private mechanism. What survives is weaker and honest: the mode is declared and reported
   every run, so a reader can see which languages are incomplete, and nothing refuses the lower
   automatically. Related: `TOOL-aNumeralWarden-3`.
-- **The verb table is closed only by CONVENTION.** Nothing stops it growing a verb per exception until
-  it is a synonym list, and nothing notices when a verb outlives the code that justified it. Wiring
+- **The verb table is closed only by CONVENTION — narrowed, not closed, by `--expand`.** Growth now
+  has one supported route and that route is BOUNDED: `TOOL-aSurfacedLexicon-10` proposes only cluster
+  representatives with a live site, so a leading token the frozen table does not hold cannot enter a
+  proposal by any path, and `--expand --stamp` records the widening as a scalar that refuses a second
+  one. Two holes stay open and are the reason this bullet survives. An owner may still paste any row
+  by hand — the mode writes nothing to the block, deliberately — and clearing the stamp re-opens the
+  transition, which the refusal itself says out loud. And nothing notices when a verb outlives the
+  code that justified it: expansion is one-way, and there is no contraction verb. Wiring
   the table into the `codebase-map` ratchet and the `drift-audit` signal set is `TOOL-dClosedLexicon-2`,
   which is CLOSED and whose wiring is LIVE: `memory/map/generated/inventories.json` carries the
   `lexicon-verbs` inventory and `tools/drift-audit/drift_report.py` carries the signals. This line

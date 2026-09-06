@@ -1,10 +1,15 @@
 # TOOL-aSurfacedLexicon-10 — `--expand`, the one-time widening the canon bounds
 
-**Status:** SPECCED · rev-4 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6
+**Status:** CLOSED · rev-5 · 2026-09-04 · node a · Tier-2 · base 6c670b02 · streams tooling · order 6 · ratified 2026-09-06
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-06-build-TOOL-aSurfacedLexicon-10-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aSurfacedLexicon-10-acceptance-ledger.md) | journal | — |
+| [2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round2.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round2.md) | diff-review | — |
+| [2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round3.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round3.md) | diff-review | — |
+| [2026-09-06-review-TOOL-aSurfacedLexicon-10-spec-audit.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -12,24 +17,35 @@
 
 Give an adopted project the second and last supported declaration transition: expand the verb table
 once, per its own needs, from the frozen canon and never from its own corpus. Today
-`tools/lexicon/adopt-lexicon.sh:247-251` refuses outright when a declaration exists, so an adopter who
-needs a concept the seed missed has no tool-supported route at all and edits by hand with nothing
-bounding what they add.
+`tools/lexicon/adopt-lexicon.sh` refuses outright when a declaration exists — the branch printing
+`already exists — refusing to overwrite a curated declaration` — so an adopter who needs a concept
+the seed missed has no tool-supported route at all and edits by hand with nothing bounding what they
+add.
 
 ## 2. Scope (IN)
 
-- **S1** — `--expand` joins the mode allowlist at `tools/lexicon/adopt-lexicon.sh:184` and its usage
-  line, beside `--scaffold`, `--check` and `--render`.
+- **S1** — `--expand` joins the mode allowlist in `tools/lexicon/adopt-lexicon.sh` — the single
+  `case "$MODE" in` line — and its usage string, beside `--scaffold`, `--check` and `--render`. It
+  ALSO needs a mode-guarded block that EXITS above the scaffold path, which is that file's
+  FALL-THROUGH rather than a guarded branch: an allowlist entry with no handler above it makes
+  `--expand` run `--scaffold`, which on an adopted repo prints a plausible-looking refusal that is
+  not the one the operator asked for.
 - **S2** — The guard reads `expanded=` from the conf and refuses when it is non-empty, naming the
-  stamp. The read uses the same CRLF-hardened shape as the `ratified` read at
-  `tools/lexicon/adopt-lexicon.sh:226` — `tr -d '\r'` FIRST, because an anchored `s/"$//` cannot strip
+  stamp. The read uses the same CRLF-hardened shape as the `ratified` read in
+  `tools/lexicon/adopt-lexicon.sh` — `tr -d '\r'` FIRST, because an anchored `s/"$//` cannot strip
   a quote a carriage return follows and the residue `"\r` reads as a non-empty value, which inverts
   the refusal.
 - **S3** — The candidate set is the live canon representatives minus the representatives the `VERBS`
-  table already declares. Liveness is decided by the expression at
-  `tools/lexicon/scaffold_lexicon.py:146`, `live = {forms[v] for v in counts if v in forms}`, which is
-  READ and not edited. A token in no cluster cannot enter a proposal, and that closure is the reason
-  this unit is safe to build at all.
+  table already declares. Liveness is decided by the expression `live = {forms[v] for v in counts if
+  v in forms}` in `tools/lexicon/scaffold_lexicon.py`, whose TEXT is unchanged and whose HOME moves:
+  rev-5 lifts it out of `main` into `derive_candidates` beside it, so the one expression gains a
+  second caller instead of a second copy. Cited as an expression and not a line — it was at `:146`
+  when this was written and at `:184` when it was built, and rev-1 had already corrected the same
+  cite once. A token in no cluster cannot enter a proposal, and that closure is the reason this unit
+  is safe to build at all.
+  The candidate set comes off `live` DIRECTLY and never off `canon.CLUSTERS`. Filtering through the
+  shipped tuple would make the subset property true by construction at the wrong place, and AC5's
+  staged break would then leave the arm green — grading its fixture rather than the closure.
 - **S4** — The unruled tail prints BELOW the proposals, under a header stating in words that these are
   not proposals and that a row here would be the mirror defect the kit was rebuilt to close. It is
   evidence for an owner, never a candidate.
@@ -39,13 +55,15 @@ bounding what they add.
   against a synthetic fixture repo whose `VERBS` table is deliberately short. This arm is the whole
   point of the unit: it is what stops an adopter legalising its own existing mess.
 - **S7** — The output tells the operator that expansion moves pins and that the pins must be
-  re-measured and re-pasted, so an expansion cannot land without its cost showing in the diff. It names
-  the THREE SCALARS the conf actually carries at this unit's build order — `VERB_OFFENDER_PIN`,
-  `SUFFIX_OFFENDER_PIN` and `LAYER_OFFENDER_PIN`, at `.lexicon.conf:164-166`, listed by `grep -n
-  '_OFFENDER_PIN' .lexicon.conf` — and NOT a `PINS:` block. There is no such block at order 6;
-  `TOOL-aSurfacedLexicon-12` introduces it at order 7. That is the resolution of the ordering hazard,
-  written here rather than left open: S7 tracks the scalars, and this unit does NOT move after 12,
-  because moving it changes nothing about the parked fork upstream of it in §8.
+  re-measured and re-pasted, so an expansion cannot land without its cost showing in the diff.
+  **RE-AUTHORED AT rev-5, and the reason is this criterion's own subject.** It used to name the pins
+  by hand: three scalars, one of which (`LAYER_OFFENDER_PIN`) no longer exists at all, at three line
+  numbers that had moved, while insisting no `PINS:` block existed at this build order — a block that
+  now exists, because the unit which introduces it landed while this one sat parked. Every clause was
+  wrong in a different direction, in a criterion whose whole point is that a value written beside the
+  source that owns it rots. So the output NAMES NO PIN. It says that every pasted row moves one,
+  that each is a two-sided equality so an unrecorded drain reds exactly as a rise does, and it points
+  at `--measure`, which prints the rows this declaration actually produces.
 
 ## 3. Non-goals (OUT)
 
@@ -74,8 +92,10 @@ It adds no bar leg, so it owes no wall-clock ceiling and no `testsuite-count-wai
 ### Data model
 
 Three sets. `reps` is the 20 canon representatives from `tools/lexicon/canon.py:55-81`. `live` is the
-representatives with at least one site in the corpus, from the untouched expression at
-`tools/lexicon/scaffold_lexicon.py:146`. `declared` is the keys of the conf's `VERBS` table. The
+representatives with at least one site in the corpus, from the expression
+`live = {forms[v] for v in counts if v in forms}` in `tools/lexicon/scaffold_lexicon.py` — cited
+as an expression, never as a line, for the reason S3 gives. `declared` is the keys of the conf's
+`VERBS` table, folded through the form index first. The
 candidate set is `live - declared`, and `candidates ⊆ reps` holds by construction because `live ⊆ reps`
 by the definition of `forms`.
 
@@ -106,6 +126,18 @@ That is the could-not-fail shape the build README's rule about zero populations 
 subset assertion in S6 must run against a synthetic fixture with a short `VERBS` table, and a second
 arm must assert the candidate set is NON-EMPTY on that fixture, or the subset assertion is vacuously
 true.
+
+**EVERY `--probe` CITATION BELOW IS DEAD, struck at rev-5 rather than deleted so a later reader can
+see what happened to the evidence.** `TOOL-aSurfacedLexicon-3` removed that mode at build order 1,
+five orders before this unit, so the two figures this section offers as its REPRODUCIBLE alternative
+— `417 definition(s) lead with a token in NO cluster and NO row`, and `would propose 20 of 20
+cluster(s)` — cannot be re-derived by anyone. S3's escape hatch, "state its figure in the probe's
+terms", is not available. What replaced them is the shipped verb: `python <engine> --expand` prints
+the candidate count and the tail count it computed, and every load-bearing figure below reproduces
+through it. Measured at rev-5 on the tree the unit was built on: 20 clusters, 20 live, 23 declared
+rows of which three are outside the shipped table, candidate set EMPTY, and a tail of 493 distinct
+tokens over 897 definitions — the second of which is the same number `--check` prints as `unruled=`,
+because the verb now reads that classification instead of re-deriving it.
 
 Measured by a scratchpad script over `lexicon.tracked_files(root)`, importing `canon.CLUSTERS`,
 `canon.build_form_index` and the conf's `VERBS` through `lexicon_conf.load_conf`:
@@ -140,8 +172,12 @@ decoration.
 
 **A correction to the research record, verified against source at writing time.** That record cites
 the anti-mirror closure at `tools/lexicon/scaffold_lexicon.py:143`. At `cd8ab0d2` line 143 is
-`suffix_offenders = _measure_suffix_offenders(root, files)` and the closure is at line 146. The
-expression is byte-identical to the one the record quotes; only the line moved. Cite 146.
+`suffix_offenders = _measure_suffix_offenders(root, files)` and the closure was three lines below
+it. The expression is byte-identical to the one the record quotes; only the line moved — and it
+has moved twice more since, once inside this build. CITE THE EXPRESSION,
+`live = {forms[v] for v in counts if v in forms}`. Every number in this paragraph is a frozen
+quotation of what the research record said at `cd8ab0d2`, not a live instruction: rev-5's first
+cut left the imperative `Cite 146` standing, and by then line 146 was a comment ABOUT the fix.
 
 **A second measured absence.** `.lexicon.conf` carries no `expanded=` key today and no
 `canon_unfrozen=` key either; the only stamp in the file is `ratified="2026-08-24 node d"` at line 183.
@@ -164,14 +200,32 @@ the block is an edit that belongs to whichever unit lands after 12, not to this 
 ### Rollout
 
 `--expand` is additive: an adopter who never runs it sees no change, and `--scaffold`, `--check` and
-`--render` keep their behaviour byte for byte. The mode allowlist edit at
-`tools/lexicon/adopt-lexicon.sh:184` is the only change to an existing code path.
+`--render` keep their BEHAVIOUR byte for byte. **Not their code, and rev-5 corrects that claim.** The
+mode allowlist edit is one change to an existing path; the build made FOUR more, and the fourth is
+the one that matters.
+
+Three are behaviour-preserving refactors. `--check`'s two scalar reads now route through
+`read_conf_scalar`, which is one function where there were two verbatim copies of a pipeline whose
+correctness is entirely in the order of its stages — the third copy was this unit's, which is what
+forced the extraction. `--scaffold` reads its vocabulary through `derive_candidates` rather than
+computing it inline. And the engine's measurement pass returns its own scan so this mode does not
+walk the corpus a second time.
+
+**The fourth is not behaviour-preserving and rev-5's first cut omitted it, which is round-2's F10
+re-earned one item short.** `OPTIONAL_SIBLINGS` PERMANENTLY WIDENS `check_self_containment`: before
+it, that predicate would have flagged the engine's own `import scaffold_lexicon` in a kit copy
+installed without the scaffolder; after it, it never can. That refusal is printed on `--check`, the
+leg that binds at the merge. The allowance is one name, its own comment states what it does not buy —
+nothing about HOW the import is written — and the property it assumes is armed at runtime on both
+modes plus a staged break, because a name added there without those arms is the hole it is written
+not to be. Round-2 F10, corrected at round-3 M3.
 
 ### Files touched (estimate)
 
 `tools/lexicon/adopt-lexicon.sh` (the mode, the guard, the stamp write),
-`tools/lexicon/scaffold_lexicon.py` (a second entry point for the candidate computation, reusing line
-146's expression), `tools/lexicon/selftest.py` (the fixture and its two arms), and
+`tools/lexicon/scaffold_lexicon.py` (a second entry point for the candidate computation, reusing
+the closure expression rather than copying it), `tools/lexicon/selftest.py` (the fixture and its
+arms), and
 `tools/lexicon/README.md`. ESTIMATE on size; nothing comparable ships to measure against.
 
 ### Alternatives rejected
@@ -231,11 +285,11 @@ unaided. Auto-writing would hand back a green file nobody read.
 - **AC4** — When that same `bash tools/lexicon/adopt-lexicon.sh --expand` fixture run prints its
   unruled tail, no token in the tail appears in the proposal list, and the header above the tail
   states in words that these are not proposals.
-- **AC5** — When the expression `live = {forms[v] for v in counts if v in forms}` — at
-  `tools/lexicon/scaffold_lexicon.py:146` today, but cite the EXPRESSION, since
-  `TOOL-aSurfacedLexicon-3` moves code above it at build order 1 — is staged as `live = {forms.get(v,
-  v) for v in counts}`, so that `live` admits a token in no cluster, the subset arm in
-  `tools/lexicon/selftest.py` goes RED; unstaging returns it to green. The RED is observed before this
+- **AC5** — When the expression `live = {forms[v] for v in counts if v in forms}` in
+  `tools/lexicon/scaffold_lexicon.py` — cite the EXPRESSION and not a line; it was `:146` when this
+  was written, `:184` when it was built, and `:143` one revision before that — is staged as
+  `live = {forms.get(v, v) for v in counts}`, so that `live` admits a token in no cluster, the subset
+  arm in `tools/lexicon/selftest.py` goes RED; unstaging returns it to green. The RED is observed before this
   unit is called done, and it is the only proof that the arm grades the closure rather than the
   fixture. The break this criterion named at rev-2 — deleting `if v in forms` from the comprehension —
   does NOT grade the closure and must not be used: building the form index and evaluating `{forms[v]
@@ -265,9 +319,13 @@ unaided. Auto-writing would hand back a green file nobody read.
   `tools/lexicon/scaffold_lexicon.py` is still green, so this unit has not opened the path by which the
   mirror returns through the proposal body. The predicate is that unit's NARROWED one, matching only an
   emitted block header. It is NOT `grep -c CANON tools/lexicon/scaffold_lexicon.py` equal to 0: that
-  command returns **1** on this worktree, matching the descriptive comment at
-  `tools/lexicon/scaffold_lexicon.py:181`, so the research record's bare-grep form would red the tree it
-  ships against. Re-measured for this spec; `TOOL-aSurfacedLexicon-11`'s AC8 and F1 own the predicate.
+  command returns **1** on this worktree, matching the one descriptive line the scaffold carries
+  (`# PROPOSED from the SHIPPED CANON`, at `:181` when this was written and `:217` when it was built),
+  so the research record's bare-grep form would red the tree it ships against.
+  **AND THE COUNT IS RATIONED, which rev-5 found the hard way.** A landed arm asserts the LOOSE form
+  matches EXACTLY ONE line of that file, so the caps substring is spent and no new code or comment in
+  it may use the word. That arm reds before the narrow one this criterion watches, and it is the arm
+  an implementer actually trips. Re-measured for this spec; `TOOL-aSurfacedLexicon-11`'s AC8 and F1 own the predicate.
 
 ## 7. Gates
 
@@ -281,11 +339,12 @@ spec. No new leg, so no new ceiling and no `testsuite-count-waivers.txt` row is 
 
 ## 8. Open questions
 
-**F1 IS PARKED, SO THIS UNIT IS NOT BUILT BY THIS RUN.** Both of its listed options fell to the veto
-ladder, which leaves no resolver the standing mandate delegates and sends the question to an owner
-turn. The status header stays SPECCED for that reason and not because the spec is unfinished. F2 IS
-resolved and its ruling is written into §4, §5 and AC7 above; it simply has nothing to be built into
-until F1 comes back.
+**F1 CAME BACK FROM THE OWNER TURN AND IS RESOLVED; THIS UNIT IS BUILT.** It was parked at rev-3
+because both LISTED options fell to the veto ladder, which left no resolver the standing mandate
+delegates. The owner took the route the park had measured and flagged as unlistable under M3 — an
+importable `derive_candidates`, beside the closure, reached from the engine's dispatcher — and that
+is what rev-5 builds. F2 was already resolved and its ruling is written into §4, §5 and AC7 above;
+it now has something to be built into.
 
 - **F1 — Where does the candidate computation live?**
   The refusal PREDICATE is at `tools/lexicon/scaffold_lexicon.py:98`, `if len(argv) != 2 or
@@ -338,6 +397,36 @@ not a guard.
 
 With rung 1 discarding B and rung 3 discarding A, only vetoed options stand. A veto is not a licence
 to take the vetoed option, so the fork is parked.
+
+**RESOLVED (owner, 2026-09-06): F1 — the importable `derive_candidates`, which was the route the park
+measured and could not itself ratify.**
+
+The park's own closing paragraph named it: "second entry point" and "mode flag" are separable, and
+`scaffold_lexicon.py` imports cleanly, so a function beside the closure reached from the engine's
+existing dispatcher keeps AC5's locus exactly and touches no guard. That is not a listed option and
+M3 does not license one, which is why the fork went to an owner turn rather than being resolved
+against the ladder. The owner ruled it in, and the ladder's two vetoes are both satisfied rather than
+waived: the closure keeps ONE home in `scaffold_lexicon.py`, so AC5's staged break at that expression
+reds the arm as written; and `scaffold_lexicon.py:112`'s flag-arity guard is untouched, because the
+module is IMPORTED and its `argv` never sees a flag at all.
+
+Three facts the build measured that the ladder's reasoning had assumed otherwise, recorded because
+they change what the resolution costs rather than whether it holds:
+
+- The import must be LAZY and function-local, not merely deferred by taste. `scaffold_lexicon` reads
+  `lex.KNOWN_EXTS` in its module BODY, above which the engine's own definition sits, so a top-level
+  `import scaffold_lexicon` in the engine raises `AttributeError` out of the sibling and the engine
+  stops importing at all. A landed arm also runs `--check` against a kit copy with the scaffolder
+  DELETED and asserts it is green, so the import must not exist on the default path either.
+- Reaching the closure through an import loads a SECOND copy of the engine at run time: run as a
+  script the engine is `__main__`, so the sibling's `import lexicon` finds nothing in `sys.modules`
+  and imports it again under its own name. Harmless — that module's body is assignments and a path
+  insert — but nothing may be compared by identity across the boundary, and the suite already
+  asserts one such identity elsewhere.
+- The park's refutation that "the two-readers class exists today, with two members" is now FALSE
+  rather than merely qualified: `TOOL-aSurfacedLexicon-3` deleted `run_probe` at build order 1, so
+  the engine holds no second corpus reader. That strengthens the ruling instead of weakening it —
+  computing candidates in the engine would have RE-CREATED the class the deletion had just closed.
 
 WHAT THE OWNER TURN SHOULD DECIDE, stated because it is cheap and measured, not because it is
 ratified here. "Second entry point" and "mode flag" are separable: `scaffold_lexicon.py` imports
@@ -431,6 +520,24 @@ that reintroduces CRLF.
   re-measured there at 267, replacing a stale 258.
 - rev-4 · 2026-09-05 · two line citations into `tools/lexicon/lexicon.py` symbol-anchored, for the reason the
   order-1 sibling records — the build rewrites that file and the `spec tokens` leg caught the drift.
+- rev-5 · 2026-09-06 · F1 RESOLVED by the owner and the unit BUILT, twelve units after the rest of
+  this build landed. The ruling is the route the park had measured and could not ratify: an
+  importable `derive_candidates` beside the closure, reached from the engine's dispatcher, with the
+  scaffold's flag-arity guard untouched because the module is imported rather than invoked. Every
+  line citation in this spec is STALE by construction — the twelve landed units moved all of them —
+  so the numbers are STRUCK AND NOT REPLACED, and the expressions are cited instead. The first cut of
+  this entry replaced them with re-measured numbers and the round-2 review caught it: five of the six
+  were measured at the PRE-BUILD tree and were stale in the very commit that shipped them, moved by
+  this unit's own insertions above them. Cite `live = {forms[v] for v in counts if v in forms}`,
+  `if len(argv) != 2 or argv[1].startswith("-")`, `# PROPOSED from the SHIPPED CANON`,
+  `already exists — refusing to overwrite`, and `read_conf_scalar ratified`. The one figure that
+  holds is `.lexicon.conf:113` for `ratified`, whose VALUE also changed. §4's three `--probe` citations are struck outright: that mode was
+  deleted at build order 1, so every figure resting on it is unreproducible rather than merely
+  stale. S7 is re-authored — it named three pin scalars where the conf carries two, `LAYER_OFFENDER_PIN`
+  no longer exists, and the `PINS:` block it insisted could not exist at this order does exist,
+  because unit 12 landed. The output names no pin at all now and points at `--measure`, which is the
+  same rule that removed the figures. S4's tail is taken from the engine's own `unruled`
+  classification rather than a second predicate in the scaffold.
 
 ## 10. Reuse audit
 
@@ -444,7 +551,7 @@ seam fits in the map's index — and the evidence for why is that the behaviour 
 a named helper. That is itself the finding: the closure this unit depends on is one line inside a
 141-line `main` (lines 87 to 227, measured by an AST span at writing time), so the unit's first job is
 to give it a caller other than `main` without moving the expression. The seam this unit extends is
-therefore `tools/lexicon/scaffold_lexicon.py:146` by path,
+therefore the closure expression in `tools/lexicon/scaffold_lexicon.py`,
 plus `canon.build_form_index` at `tools/lexicon/canon.py:84-95`, which the earlier probe for
 `TOOL-aSurfacedLexicon-7` returned as a `fan-in 3 | SEAM`.
 

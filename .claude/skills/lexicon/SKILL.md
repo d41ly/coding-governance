@@ -3,7 +3,7 @@ name: lexicon
 description: Answer "what should I call this" from THIS repo's declared naming vocabulary, before writing the name. Use when about to name a new function, method, type, module or CLI subcommand; when a name will not fit and you are tempted to invent a verb; when renaming during a refactor; or when a gate has just refused a name and you need the replacement rather than the refusal. Also use before naming anything in an unfamiliar area, to see how the corpus already spells that concept. Routes through `python3 tools/lexicon/lexicon.py --suggest <identifier> --as <cell>`, which takes the SURFACE the name is for, reads the declaration at `.lexicon.conf` and the frozen canon beside it, and decides nothing. Do NOT use for ordinary code search — finding a symbol, a caller, a definition or a string is grep's job and this neither replaces nor intercepts it.
 ---
 
-<!-- gov:kit lexicon@1.1 · RENDERED from tools/lexicon/SKILL.template.md — do not edit -->
+<!-- gov:kit lexicon@1.2 · RENDERED from tools/lexicon/SKILL.template.md — do not edit -->
 
 # The declared lexicon
 

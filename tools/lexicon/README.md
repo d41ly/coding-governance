@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.1 -->
+<!-- gov:kit lexicon@1.2 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import
@@ -587,6 +587,41 @@ it moves. Before the closing review the seed emitted no matrix at all, so a fres
 
 Pins are MEASURED against the adopting corpus at scaffold and are never inherited: a pin copied from
 a larger tree is either vacuous or permanently red.
+
+### Expanding — the second and last supported transition
+
+`--scaffold` refuses once a declaration exists, so an adopter who later needs a concept the seed
+missed had no tool-supported route at all: they edited the table by hand with nothing bounding what
+they added. `--expand` is that route, and the bound is the same one the seed had.
+
+```bash
+bash {kit}/adopt-lexicon.sh --expand           # propose; writes NOTHING
+bash {kit}/adopt-lexicon.sh --expand --stamp   # record the widening, once
+```
+
+It proposes cluster representatives with a live site in your corpus that your table does not yet
+declare — and nothing else. A leading token no cluster holds cannot enter a proposal by any path,
+which is why the run also prints an UNRULED TAIL below the proposals under a header saying, in
+words, that those are not candidates and never will be. That tail is the interesting half on most
+trees: it is what your corpus would have nominated if frequency were allowed to decide, and the
+whole design is that it is not. Read it as a work list — a token near the top is a house idiom that
+either earns a hand-written row with a hand-written negative, or gets renamed everywhere.
+
+Nothing is written to the `VERBS:` block. You paste the rows you mean, and you sharpen each
+negative first, because the reader reds a row that carries none — a hand-pasted row is born failing
+the gate until a human writes the thing that makes it a definition rather than a synonym.
+
+Every row you paste moves a pin. `--measure` prints the ones this declaration produces.
+
+`--expand --stamp` records the widening as a single `expanded="<date> <sha>"` scalar and refuses a
+second run afterwards. It refuses to stamp a dirty tree, because the sha's whole job is to name the
+tree the proposal was measured against and a worktree with uncommitted TRACKED changes has no such
+sha. Untracked files are deliberately not dirt here: this kit's own fixtures copy it in untracked,
+so a refusal built on `git status --porcelain` could never be exercised at all.
+
+Once is the design, and the honest bound on it is written into the refusal: clearing that line
+re-opens the transition and nothing running under your own uid can stop you. What the stamp buys is
+a visible edit in a tracked file, never a lock.
 
 ## Uninstalling — the ORDER matters
 
