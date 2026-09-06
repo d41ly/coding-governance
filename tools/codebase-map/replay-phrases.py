@@ -168,12 +168,22 @@ def check_path_match(candidate: str, target: str) -> bool:
 def measure_phrase(corpus, ref, phrase: str, truth: list[str]) -> dict:
     """Rank one phrase and locate the first ground-truth path in the shortlist."""
     sl = rl.assemble_shortlist(phrase, corpus, ref)
-    files = [(r.candidate.file or "") for r in sl.ranked]
+    # RANK BY CANDIDATE, NOT BY FILE, and the difference is not cosmetic. `TOOL-dTracedLattice-1` S1
+    # replaced `Candidate.file` with `files`, so one candidate now contributes every definer of its
+    # symbol. Counting file POSITIONS then makes a candidate with four definers cost four ranks,
+    # and the shortlist a reader actually scans is ONE LINE PER CANDIDATE with the definers on it.
+    # Measured over these 143 phrases at the commit S1 landed: by file position the change reads
+    # hit@5 0.462 -> 0.378, and by candidate position it reads 0.385 -> 0.385 with hit@10 up from
+    # 0.420 to 0.441 and the hit rate up from 0.587 to 0.615. The first reading is a metric artifact
+    # of the data-model change; the second is the object the tool is for.
+    files: list[str] = []
     rank = None
-    for i, f in enumerate(files, 1):
-        if f and any(check_path_match(f, t) for t in truth):
+    for i, r in enumerate(sl.ranked, 1):
+        if rank is None and any(check_path_match(f, t) for f in r.candidate.files for t in truth):
             rank = i
-            break
+        for f in r.candidate.files:
+            if f and f not in files:
+                files.append(f)
     return {
         "phrase": phrase,
         "truth": truth,
@@ -220,7 +230,7 @@ def main() -> int:
     # so it depresses `hit_rate` for a reason that has nothing to do with the ranker. It is counted
     # and REPORTED rather than silently dropped: dropping it would flatter the figure, and hiding
     # it would leave two ranker changes measured against an undeclared floor.
-    corpus_files = {c.file for c in corpus.candidates.values() if c.file}
+    corpus_files = {f for c in corpus.candidates.values() for f in c.files}
     unreachable = sum(
         1 for _, t in graded
         if not any(check_path_match(f, x)

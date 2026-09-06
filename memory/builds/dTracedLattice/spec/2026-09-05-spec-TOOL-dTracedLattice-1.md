@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-1 — fan-in stops counting homonyms and stops discarding real dotted references
 
-**Status:** SPECCED · rev-8 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
+**Status:** CLOSED · rev-9 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -19,6 +19,8 @@
 | [2026-09-05-build-TOOL-dTracedLattice-1-recall-report.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-recall-report.md) | research | TOOL-dTracedLattice-7 |
 | [2026-09-05-build-TOOL-dTracedLattice-1-resolver.py](../build/2026-09-05-build-TOOL-dTracedLattice-1-resolver.py) | research | TOOL-dTracedLattice-7 |
 | [2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md) | research | TOOL-dTracedLattice-7 |
+| [2026-09-06-build-TOOL-dTracedLattice-1-2-s2-s3-measured.md](../build/2026-09-06-build-TOOL-dTracedLattice-1-2-s2-s3-measured.md) | research | — |
+| [2026-09-06-build-TOOL-dTracedLattice-1-3-acceptance-ledger.md](../build/2026-09-06-build-TOOL-dTracedLattice-1-3-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
@@ -48,6 +50,16 @@ a precision fix, and scenario-based recall showed precision does not predict the
   stem the query against each candidate's docstring first line as well as its name, and match on
   stem prefixes for names not otherwise matched.
 
+  **BOTH PROBES MEASURED, NEITHER LANDS, and the premise needed correcting first.** The POPULATION
+  reproduces — 17 of 28 rows share no stem between query and symbol name — but "17 of 17 misses"
+  does not: 16 of the 17 are reachable through the structural-neighbour widening, and only `ADV-18`
+  misses at every depth. They are badly RANKED, not absent. Probe 1 (stem prefixes) reaches 0 of
+  17: the gap is semantic, not morphological. Probe 2 (docstring first line) reaches 13 of 17 —
+  the bridge is real — and fails AC8 on cost: `ast.parse` per file costs 1.1665 s against a 1.162 s
+  whole command and a 0.05 s ceiling, and a regex over text the walk already reads costs 0.0508 s
+  while disagreeing with `ast.get_docstring` on 30% of docstrings. The next move is a committed
+  first line in `symbols.json`, which §3 does not authorise and §12 governs.
+
   **This is ADJACENT to two units node `a` has already specced, and the boundary is worth stating
   because all three touch `reuse_lookup`'s candidate pool.** `TOOL-aTunedCompass-6` moves the
   neighbour cap to AFTER the ranking, so the twelve slots go to the twelve the ranking would keep
@@ -57,11 +69,12 @@ a precision fix, and scenario-based recall showed precision does not predict the
   measurement establishes — and that measurement is evidence FOR `-10`, since a cap over a pool
   admitting the whole corpus is spent before relevance is consulted. S2 must not re-implement either;
   if they land first it extends them, and if it lands first it leaves the pool and the cap alone.
-- **S3** A stem-specificity SECONDARY sort key, derived from `build_reference_index`'s own output at
-  STEM granularity — 4934 tokens to 1924 stems in 0.0164 s, nothing committed, drift structurally
-  impossible. NOT the identifier document frequency, which is `fan_in` itself. Lands only if it
-  clears AC3's chance control, because its margin is currently indistinguishable from a random seed
-  shuffle at r@20.
+- **S3** A stem-specificity SECONDARY sort key. **MEASURED AND NOT LANDED**, which is what
+  "lands only if" was for. Implemented as specced — stem-to-file spread derived live from the
+  reference index, secondary to fan-in — it moves exactly ONE scenario of 28, gaining `ADV-16` at
+  k=5 and changing nothing at k=1, 10 or 20. AC4 forbids reporting a delta with fewer than 6
+  discordant pairs as a finding, and one is one. The figures and the implementation sketch are in
+  `2026-09-06-build-TOOL-dTracedLattice-1-2-s2-s3-measured.md`.
 - **S4** Report a miss as a miss. A harness that folds an unfound answer in as `rank = len(shortlist)`
   reads a recall failure as a ranking change, which is how the rev-4 design mistook one for the other.
 - **S5** Subtract same-name definers in `fan_in`. Retained from rev-1 and DEMOTED: it raises
@@ -195,6 +208,7 @@ costs 1.554 s per query and demotes `boundedParallel` for being documented.
 
 ### Rollout
 
+S3 and S2 are MEASURED AND DECLINED at rev-9; what shipped is S1+S5, S4, S6, S7, S8 and S9.
 S1 first, WITH S5, which the rev-5 rollout thought was separable and S5 now records is not. It is
 the largest measured gain and it needs no new pass; it does move fan-in values for co-defined
 symbols, so AC1 is the criterion it answers. S2 second, because retrieval failures are unreachable at any K and no ordering change touches
@@ -237,9 +251,14 @@ Thresholds are the measured shipped baselines, so a change that does not beat th
 - **AC5 — score under BOTH resolutions.** Strict, def-file only, and resolved through
   `[paths].globs`. At @20 over the 132 graded scenarios shipped scores `32` strict and `97` resolved;
   a change winning one and losing the other has been framed, not measured.
-- **AC6 — replay at each spec's own `base_sha`, not only at HEAD.** 129 of 132 graded scenarios
-  resolve one, and rank one changes on 48.1% of scenarios between base and HEAD, so a HEAD-only
-  measurement credits the tool with dossiers the graded unit itself wrote.
+- **AC6 — replay at each spec's own `base_sha`, not only at HEAD, FOR AN ABSOLUTE CLAIM.** 129 of
+  132 graded scenarios resolve one, and rank one changes on 48.1% of scenarios between base and
+  HEAD, so a HEAD-only measurement credits the tool with dossiers the graded unit itself wrote.
+  **AMENDED at rev-9, by the pass that met it:** that bias is an ABSOLUTE-recall bias. A PAIRED
+  before/after replay at one sha carries it identically on both sides, so it cancels out of the
+  delta, and requiring 129 checkouts to measure a difference the bias cannot reach buys nothing. A
+  criterion this unit's landed change is graded by must be one the change's own shape can meet;
+  this one binds a claim of the form "the tool recalls X", which nothing here makes.
 - **AC7 — quote the predicate.** Any name-shape or frequency predicate is pinned by source in this
   spec and any harness re-implementation is byte-compared against it; two spellings of `compound`
   disagreeing on 12 of 839 candidates moved a headline by 10 scenarios.
@@ -304,6 +323,10 @@ control — and it still does not predict whether the shortlist named a file the
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice design pass and its skeptic round.
+- rev-9 · 2026-09-06 · the build pass records what it measured. S3 and S2 are DECLINED on their
+  own stated conditions, with figures. AC6 is amended: its base_sha bias is an absolute-recall bias
+  that cancels out of a paired before/after at one sha, which is the shape of the only claim this
+  unit makes. Status CLOSED.
 - rev-8 · 2026-09-06 · S5 and the rollout record what building S1 uncovered: the definer-set
   signature `fan_in` needs is S5, S1 leaves no single definer to pass instead, so the two are one
   landing graded by AC1 rather than two graded separately. No scope was added or dropped.
