@@ -271,10 +271,34 @@ if [ "$MODE" = "--expand" ]; then
     echo "lexicon-adopt: Untracked files are not dirt here — the test is the two-sided tracked diff."
     exit 1
   fi
+  # AND THE DECLARATION ITSELF MUST BE TRACKED, which the diff above cannot see. The two-sided diff
+  # is tracked-only by design -- a kit fixture copies this directory in untracked, so a porcelain
+  # refusal could never be exercised -- but that exemption swallows `.lexicon.conf` as collateral,
+  # and this is the natural first-adoption path: --scaffold writes the conf, the operator curates it,
+  # and nothing forces a commit before --stamp. Both properties the messages here claim then fail at
+  # once: the sha names a tree containing no declaration at all, and the "visible edit in a tracked
+  # file" the once-refusal promises is an edit to an untracked one. Round-2 review F4.
+  if ! git ls-files --error-unmatch -- "$CONF" >/dev/null 2>&1; then
+    echo "lexicon-adopt: UNTRACKED DECLARATION — refusing to stamp. .lexicon.conf is not tracked, so"
+    echo "lexicon-adopt: the sha below would name a tree that does not contain it, and the stamp's"
+    echo "lexicon-adopt: whole value — a visible edit in a tracked file — would not exist. Commit the"
+    echo "lexicon-adopt: declaration first, then re-run --expand --stamp."
+    exit 1
+  fi
   sha="$(git rev-parse HEAD 2>/dev/null)" || sha=""
+  # AN EMPTY DERIVATION REFUSES, which is this file's rule for every derived value and is why
+  # KIT_VERSION is tested for emptiness sixty lines up rather than trusted. It is NOT a gate with an
+  # observable failing case, and saying so is the point: the state it was written for -- an unborn
+  # branch, where `rev-parse HEAD` exits 128 -- is SUBSUMED by the untracked-declaration refusal
+  # above, because a repo with no commit has nothing tracked and therefore no tracked conf. So this
+  # branch is unreachable through the wrapper's own path and its red has never been seen. It survives
+  # as the empty-derivation guard and not as a checked one; an unreachable refusal that writes
+  # nothing is cheaper than a stamp reading `expanded="<date> "`. Round-2 review F9, resolved by
+  # naming the skip rather than by staging a case that cannot occur.
   if [ -z "$sha" ]; then
-    echo "lexicon-adopt: NO COMMIT — refusing to stamp. \`git rev-parse HEAD\` names nothing on an"
-    echo "lexicon-adopt: unborn branch, so there is no tree for the stamp to point at."
+    echo "lexicon-adopt: NO SHA — refusing to stamp. \`git rev-parse HEAD\` produced nothing, so there"
+    echo "lexicon-adopt: is no tree for the stamp to point at. This should be unreachable: a repo with"
+    echo "lexicon-adopt: no commit has no tracked declaration either, and that is refused above."
     exit 1
   fi
   # IN PLACE, NEVER APPENDED, and `awk`'s END clause covers the absent-key case in the same pass.

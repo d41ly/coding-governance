@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.1
+# gov:kit lexicon@1.2
 """lexicon.py — two naming predicates over a DECLARED vocabulary, plus one self-containment refusal.
 
 THE INVOCATIONS ARE NOT LISTED HERE. Run the file with no recognised mode and it prints them, with
@@ -2378,11 +2378,15 @@ def run_expand(root: Path) -> int:
     guard three paragraphs up — that nothing here can turn what the corpus DOES into what it SHOULD
     do — survive a mode that exists to propose rows.
 
-    READ-ONLY, and it returns before `check_pass` the way `--suggest` does: it prints no pin, cannot
-    reach a waiver, and exits 0 on any tree it can read. The `expanded=` stamp and the
-    already-expanded refusal both live in `adopt-lexicon.sh`, so the engine keeps NO write path to
-    the file it grades — the risk tier this unit was priced at is "writes at most one scalar", and
-    the scalar is not written here. TOOL-aSurfacedLexicon-10.
+    READ-ONLY, and it returns before `check_pass` the way `--suggest` does: it prints no pin and
+    cannot reach a waiver. Its exit codes are 0 on a tree it measured, 1 on a declaration that does
+    not parse, and 2 when it could not measure at all — an absent scaffolder, or a corpus no armed
+    extractor produced a definition from. The non-zero matters: the shell wrapper stops before
+    `--stamp` on it, so a run that measured nothing cannot spend the one supported widening.
+
+    The `expanded=` stamp and the already-expanded refusal both live in `adopt-lexicon.sh`, so the
+    engine keeps NO write path to the file it grades — the risk tier this unit was priced at is
+    "writes at most one scalar", and the scalar is not written here. TOOL-aSurfacedLexicon-10.
     """
     # LAZY, AND IT HAS TO BE — two reasons, and the first one is fatal rather than stylistic.
     # `scaffold_lexicon` imports THIS module at its own module scope and then reads `lex.KNOWN_EXTS`
@@ -2435,6 +2439,28 @@ def run_expand(root: Path) -> int:
                                                  clusters=clusters)
     candidates, live = derived["candidates"], derived["live"]
 
+    # AN EMPTY `live` HAS TWO OPPOSITE CAUSES and the wrong one is the reassuring answer, so it is
+    # separated before either branch prints. Every live cluster is declared -- the normal state of an
+    # adopted tree -- or NOTHING WAS MEASURED, because every language is `dark`, an armed extension
+    # has no files, or an extractor produced nothing. The empty proposal is then the SYMPTOM, and a
+    # message calling it normal is the reassuring zero this repo names by hand: an operator reads a
+    # complete vocabulary off a corpus nobody graded, and can spend the one-shot stamp on it.
+    #
+    # REFUSED rather than reported, and 2 rather than 0, for that last reason: the wrapper's
+    # `|| exit 1` means a non-zero here is what stops `--stamp` writing. `--check` says all of this
+    # already, on the same tree, in `graded=0` and `INERT DECLARATION` -- but this verb returns before
+    # `check_pass` and inherits none of it. Round-2 review F2.
+    graded_defs = sum(n for key, n in measured["graded"].items() if key[1] == "verb")
+    if not graded_defs:
+        print(f"EXPAND — NOTHING MEASURED, so there is nothing to propose FROM. No armed extractor "
+              f"produced a definition over this corpus: every language may be declared `dark`, an "
+              f"armed extension may have no files, or an extractor may have refused them. An empty "
+              f"proposal here is the SYMPTOM, not the normal result — a cluster cannot be voted live "
+              f"by a walk that found nothing. `--check` names the cause on this same tree.")
+        print(f"  armed extension(s): {' '.join(sorted(declared)) or '(none)'}")
+        print(f"  definition(s) extracted: 0 over {len(measured['files'])} tracked file(s)")
+        return 2
+
     if candidates:
         print(f"EXPAND — {len(candidates)} cluster(s) have a live site in this corpus and no row in "
               f"the declared table. Paste them INSIDE the `VERBS:` block, indented, and SHARPEN "
@@ -2452,8 +2478,15 @@ def run_expand(root: Path) -> int:
     # means "a leading token no cluster holds and no row names" everywhere else in this file, and it
     # is the number `--check` prints on every bar; re-deriving it here would be two answers to one
     # question with the copy nobody grades.
+    #
+    # OVER THE UNWAIVED SET, which is the same population `--check` splits and the pins ratchet. The
+    # first cut read every offender and the comment above it still claimed parity with `--check` — so
+    # a repo with one verb waiver got its already-accounted-for exception handed back as an
+    # unresolved house idiom, and the divergence the comment names as the only risk arrived from the
+    # other side of the function. This repo's waiver registry has no rows, so no corpus here can
+    # observe it; a fixture arm pins which population the tail means. Round-2 review F5.
     tail: dict = {}
-    for off in measured["offenders"]["verb"]:
+    for off in measured["unwaived"]["verb"]:
         if off.cls == "unruled" and off.verb:
             tail[off.verb] = tail.get(off.verb, 0) + 1
     rows = sorted(tail.items(), key=lambda kv: (-kv[1], kv[0]))
@@ -2563,7 +2596,11 @@ def main(argv: list[str]) -> int:
     if mode == "--suggest":
         return run_suggest(root, argv[2], cell_spec)
     # The WIDENING verb returns here for the same reason the supply verb above does: it must not be
-    # able to reach a pin, a waiver or an exit code of 1 by any path, however the file is refactored.
+    # able to reach a pin or a waiver by any path, however the file is refactored. It is NOT the
+    # supply verb's exit-code contract, and the parallel was drawn too wide here at first: `--suggest`
+    # returns only 0 and 2, while this one also returns 1 on a declaration that does not parse and 2
+    # on an absent scaffolder. The accurate contract lives on `run_expand` itself, which is where an
+    # exit-code claim belongs. Round-2 review F8.
     if mode == "--expand":
         return run_expand(root)
     return run(root, list_mode=(mode == "--list"), measure_mode=(mode == "--measure"))

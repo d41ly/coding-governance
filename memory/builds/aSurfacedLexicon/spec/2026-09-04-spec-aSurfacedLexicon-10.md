@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-06-build-TOOL-aSurfacedLexicon-10-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aSurfacedLexicon-10-acceptance-ledger.md) | journal | — |
+| [2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round2.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round2.md) | diff-review | — |
 | [2026-09-06-review-TOOL-aSurfacedLexicon-10-spec-audit.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -187,8 +188,15 @@ the block is an edit that belongs to whichever unit lands after 12, not to this 
 ### Rollout
 
 `--expand` is additive: an adopter who never runs it sees no change, and `--scaffold`, `--check` and
-`--render` keep their behaviour byte for byte. The mode allowlist edit at
-`tools/lexicon/adopt-lexicon.sh:184` is the only change to an existing code path.
+`--render` keep their BEHAVIOUR byte for byte. **Not their code, and rev-5 corrects that claim.** The
+mode allowlist edit is one change to an existing path; the build made three more. `--check`'s two
+scalar reads now route through `read_conf_scalar`, which is one function where there were two
+verbatim copies of a pipeline whose correctness is entirely in the order of its stages — the third
+copy was this unit's, which is what forced the extraction. `--scaffold` reads its vocabulary through
+`derive_candidates` rather than computing it inline. And the engine's measurement pass returns its
+own scan so this mode does not walk the corpus a second time. Every one is behaviour-preserving and
+each is on the leg that binds at the merge, which is why they are named rather than counted as
+additive. Round-2 review F10.
 
 ### Files touched (estimate)
 
@@ -493,13 +501,14 @@ that reintroduces CRLF.
   this build landed. The ruling is the route the park had measured and could not ratify: an
   importable `derive_candidates` beside the closure, reached from the engine's dispatcher, with the
   scaffold's flag-arity guard untouched because the module is imported rather than invoked. Every
-  line citation in this spec was re-measured against the tree the build actually runs on and is
-  STALE by construction — the twelve landed units moved all of them — so the numbers are struck and
-  the expressions cited instead: the closure is at `:184` and not `:146`, the flag-arity guard at
-  `:112` and not `:98`, the `CANON` comment at `:217` and not `:181`, the existing-declaration
-  refusal at `adopt-lexicon.sh:373-377` and not `:247-251`, the `ratified` read at `:225`, the
-  staging warning nowhere near `selftest.py:95-99`, and `ratified` itself at `.lexicon.conf:113`
-  carrying a different value. §4's three `--probe` citations are struck outright: that mode was
+  line citation in this spec is STALE by construction — the twelve landed units moved all of them —
+  so the numbers are STRUCK AND NOT REPLACED, and the expressions are cited instead. The first cut of
+  this entry replaced them with re-measured numbers and the round-2 review caught it: five of the six
+  were measured at the PRE-BUILD tree and were stale in the very commit that shipped them, moved by
+  this unit's own insertions above them. Cite `live = {forms[v] for v in counts if v in forms}`,
+  `if len(argv) != 2 or argv[1].startswith("-")`, `# PROPOSED from the SHIPPED CANON`,
+  `already exists — refusing to overwrite`, and `read_conf_scalar ratified`. The one figure that
+  holds is `.lexicon.conf:113` for `ratified`, whose VALUE also changed. §4's three `--probe` citations are struck outright: that mode was
   deleted at build order 1, so every figure resting on it is unreproducible rather than merely
   stale. S7 is re-authored — it named three pin scalars where the conf carries two, `LAYER_OFFENDER_PIN`
   no longer exists, and the `PINS:` block it insisted could not exist at this order does exist,

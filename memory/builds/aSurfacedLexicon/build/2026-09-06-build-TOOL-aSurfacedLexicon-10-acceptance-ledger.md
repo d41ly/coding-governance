@@ -53,6 +53,50 @@ rather than because a review noticed:
   two readers disagreeing and the once-only refusal silently off. A freshly scaffolded conf also ends
   without a trailing newline, which is the other way an append corrupts the line above it.
 
+## What the closing review found, and the shape it shared
+
+Round 2 is `reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round2.md`: **BLOCKED**,
+raw 16, confirmed 13, refuted 3, collapsing to ten distinct defects. Four lenses returned and none
+died, so its central zero — no path by which an off-canon token reaches the proposal list — is
+evidence rather than an unread population. The closure held; everything found sits one ring out.
+
+**The blocker was mine and it was not in the spec at all.** I bumped `KIT_LEXICON_VERSION` to 1.2 and
+left all four `gov:kit lexicon@1.1` markers behind. `govkit selfcheck` carries no guard, so it runs on
+every bar and the unit could not have landed. The branch-local checker that should have caught it
+PRESENCE-checks the constant and pairs no lexicon marker — two checkers, one question, and the weaker
+one is the one a session reaches for. Both are fixed: four markers bumped, and
+`tools/check-kit-versions.sh` now pairs them in the shape it already used for another kit. Its RED was
+observed by reverting one marker.
+
+**Three findings were the mode lying about its own measurement**, which is this repo's own named
+class and the reason the review earns its cost:
+
+- An empty `live` has two OPPOSITE causes and the branch asserted the harmless one over a population
+  it never checked — printing "not a run that failed to measure" on a tree where nothing was measured,
+  including one where `--check` is RED with `DEAD PROBE`. It now REFUSES with 2, naming the empty
+  extraction as the symptom, and the non-zero is what stops the wrapper spending the one-shot stamp.
+- `live` holds representatives while `declared` held raw table keys, so a conf declaring a canon
+  ALTERNATIVE never subtracted its cluster — the mode proposed a row its own reader then refuses,
+  from a legal green state any hand-edited table can reach.
+- The tail read every offender where `--check` reads the unwaived ones, under a comment claiming
+  parity with `--check`. An adopter with a verb waiver got their accounted-for exception handed back
+  as an unresolved idiom.
+
+**Two more were guards with nothing behind them.** The stamp's tracked-only dirty test swallowed
+`.lexicon.conf` itself, so an untracked declaration could be stamped with a sha naming a tree that
+does not contain it — the natural first-adoption path. And the AC2 arm's header called it the proof of
+the CRLF inversion; it is green with or without the mechanism, because for a NON-empty value a CR
+residue makes it more non-empty, never less. The direction that actually inverts is an EMPTY
+`expanded=""`, which now has its own arm, with the half that is unexercisable on a git-bash node
+announced as a skip rather than left in a comment.
+
+**And the citation fix re-created the defect it was closing.** The rev-5 entry replaced the spec's
+stale line numbers with re-measured ones — measured at the PRE-BUILD tree, and stale in the commit
+that shipped them, moved by this unit's own insertions. Struck and not replaced; the criteria cite
+expressions.
+
+Every one of the ten is folded. Five new fixture arms grade the classes that had none.
+
 ## Two things this pass did NOT build, and why
 
 **S4's tail is not computed by the new function.** The engine's measurement pass already classifies

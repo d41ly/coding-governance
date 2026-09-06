@@ -18,7 +18,7 @@ tools/check-agent-cap-restatement.sh	3	(loose),hooks,workflows
 tools/check-agent-cap-restatement.test.sh	1	hooks
 tools/check-install-prefix.sh	9	(loose),govkit,lib
 tools/check-install-prefix.test.sh	25	(loose),memory-tree	FIXTURE-INTERNAL PATHS. `mkfix_source` builds a scratch gov tree containing `tools/demo/` and `tools/govkit/`, and the arms then run the gate INSIDE it -- so `tools/` in this file is the fixture's own layout and is correct at every prefix. The row rose 18 -> 25 when TOOL-dRetiredFork-17's closing review forced the BAN arms to stop re-implementing the gate's awk and invoke the real gate instead, which needs real fixture trees. Same class as the check-pass-order row below: a sweep that rewrites a fixture value is not a repath.
-tools/check-kit-versions.sh	33	(loose),codebase-map,drift-audit,govkit,hooks,lexicon,memory-recall,memory-tree,pytest-parallel-guardrails,run-gates,unattended,workflows
+tools/check-kit-versions.sh	32	(loose),codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,pytest-parallel-guardrails,run-gates,unattended,workflows
 tools/check-line-length.sh	6	(loose),lexicon
 tools/check-line-length.test.sh	2	(loose)
 tools/check-microformats.sh	2	(loose),playbook
@@ -32,6 +32,7 @@ tools/codebase-map/adopt-codebase-map.sh	3	lib
 tools/codebase-map/adopt-codebase-map.test.sh	3	codebase-map,lib
 tools/codebase-map/map_extractors.py	3	(loose),codebase-map,run-gates
 tools/codebase-map/map_lib.py	1	hooks
+tools/codebase-map/scen-adversarial.json	201	(loose),codebase-map,drift-audit,gate-lint,govkit,lexicon,memory-recall,memory-tree,playbook,run-gates	a DATA fixture whose rows ARE repo paths: 28 scenarios naming the seam each behaviour phrase should reach, established by reading THIS tree. There is nothing to derive — the paths are the measurement's subject, not a reference to a file this code runs. It is withheld from both install paths (kit.toml `project-owned`, plus its own row in WIRE-INTO-PROJECT.md's removal step), so no adopter receives it at any prefix. TOOL-dTracedLattice-1 S8.
 tools/codebase-map/selftest.py	5	codebase-map
 tools/drift-audit/README.md	4	(loose),drift-audit
 tools/drift-audit/adopt-drift-audit.sh	5	drift-audit,lib
@@ -59,7 +60,6 @@ tools/lexicon/selftest.py	22	lexicon	FIXTURE-INTERNAL PATHS, same class as the `
 tools/memory-recall/README.md	8	memory-recall
 tools/memory-recall/adopt-memory-recall.sh	8	(loose),lib,memory-recall
 tools/memory-recall/recall-fixture.json	1	memory-recall
-tools/codebase-map/scen-adversarial.json	201	(loose),codebase-map,drift-audit,gate-lint,govkit,lexicon,memory-recall,memory-tree,playbook,run-gates	a DATA fixture whose rows ARE repo paths: 28 scenarios naming the seam each behaviour phrase should reach, established by reading THIS tree. There is nothing to derive — the paths are the measurement's subject, not a reference to a file this code runs. It is withheld from both install paths (kit.toml `project-owned`, plus its own row in WIRE-INTO-PROJECT.md's removal step), so no adopter receives it at any prefix. TOOL-dTracedLattice-1 S8.
 tools/memory-recall/recall-opened.js	1	memory-recall
 tools/memory-recall/recall_conf.py	1	memory-tree
 tools/memory-tree/README.md	5	(loose),memory-tree

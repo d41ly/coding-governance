@@ -141,7 +141,13 @@ def derive_candidates(scanned, declared=(), clusters=canon.CLUSTERS) -> dict:
     # A cluster enters when ANY of its forms has a live site. The corpus votes on membership and
     # nothing else: it cannot promote a spelling, and a token in no cluster cannot enter at all.
     live = {forms[v] for v in counts if v in forms}
-    declared = set(declared)
+    # FOLDED THROUGH THE INDEX BEFORE SUBTRACTING, because `live` holds representatives and a `VERBS`
+    # table may declare a cluster under an ALTERNATIVE spelling. Subtracting raw keys from
+    # representatives crosses two spaces: a table carrying `fetch` never subtracts `load`, so the
+    # widening proposes `load ... NOT `fetch`` -- a row whose own reader then refuses the declaration,
+    # because `fetch` is both a row and the negative of one. That is a green state any hand-edited
+    # table can reach, and it is exactly the population this mode exists to serve. Round-2 review F3.
+    declared = {forms.get(v, v) for v in declared}
     # THE UNRULED TAIL IS NOT COMPUTED HERE, deliberately. `--expand` prints the leading tokens no
     # cluster holds and no declared row names, and the engine's `measure_pass` already classifies
     # exactly that population as `unruled` on every bar. A second predicate for it here would be two

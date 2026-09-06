@@ -46,20 +46,23 @@ that deleted the mode this spec offers as its reproducible evidence.
   written beside its source rots, rotted. Re-authored: the output names no pin and points at
   `--measure`.
 
-**Citations that resolve to the wrong thing.** Cited as expressions from rev-5 on:
+**Citations that resolve to the wrong thing.** Cited as EXPRESSIONS from rev-5 on, and this table
+gives no replacement numbers — the round-2 review found that its first version did, and that those
+replacements were themselves stale in the commit that shipped them, moved by this unit's own
+insertions. A correction that publishes line numbers re-creates the defect it is correcting:
 
-| Cited | Actual | What sits at the cited line now |
-|---|---|---|
-| `scaffold_lexicon.py:146` (the closure) | `:184` | `for _p in refused:` |
-| `scaffold_lexicon.py:98` (the flag-arity guard) | `:112` | inside the guard's own comment |
-| `scaffold_lexicon.py:181` (the descriptive comment) | `:217` | — |
-| `adopt-lexicon.sh:247-251` (the overwrite refusal) | `:373-377` | — |
-| `adopt-lexicon.sh:184` / `:226` | `:183` / `:225` | — |
-| `.lexicon.conf:183` `ratified="2026-08-24 node d"` | `:113`, `"2026-09-05 node a"` | — |
-| `selftest.py:95-99` (the `-A` warning) | `:275-279` | the surface-disagreement scan |
+| Cited, and wrong | Cite this instead |
+|---|---|
+| `scaffold_lexicon.py:146` (the closure) | `live = {forms[v] for v in counts if v in forms}` |
+| `scaffold_lexicon.py:98` (the flag-arity guard) | `if len(argv) != 2 or argv[1].startswith("-")` |
+| `scaffold_lexicon.py:181` (the descriptive comment) | `# PROPOSED from the SHIPPED CANON` |
+| `adopt-lexicon.sh:247-251` (the overwrite refusal) | `already exists — refusing to overwrite` |
+| `adopt-lexicon.sh:184` / `:226` | the mode `case` line; `read_conf_scalar ratified` |
+| `selftest.py:95-99` (the `-A` warning) | the comment above the fixture's `git add --` |
+| `.lexicon.conf:183` `ratified="2026-08-24 node d"` | `:113`, and the VALUE changed too |
 
 rev-1 of this spec congratulated itself on correcting the closure's cite from 143 to 146. It has
-moved twice more since.
+moved twice more since, once inside this build.
 
 ## What the audit found that the spec could not have known
 
