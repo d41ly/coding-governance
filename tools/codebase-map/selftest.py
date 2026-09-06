@@ -1954,15 +1954,14 @@ def _run_gate(gate, *, empty_symbols=False):
     a fixture rather than the gate. What is faked is exactly the one input under test.
     """
     import contextlib, io as _io
-    real_ext = gate.ext
-
-    class _Shim:
-        def __getattr__(self, name):
-            if empty_symbols and name == "all_symbols":
-                return list
-            return getattr(real_ext, name)
-
-    gate.ext = _Shim()
+    # The ONE attribute under test is swapped on the real extractor module and restored in
+    # `finally`. A proxy class was tried first and its `__getattr__` is graded by the naming leg,
+    # which has no row for a dunder — so the smaller change is also the one that does not argue
+    # with a gate about a method Python named.
+    had = hasattr(gate.ext, "all_symbols")
+    real_all = getattr(gate.ext, "all_symbols", None)
+    if empty_symbols:
+        gate.ext.all_symbols = list
     out, err = _io.StringIO(), None
     try:
         with contextlib.redirect_stdout(out):
@@ -1970,7 +1969,11 @@ def _run_gate(gate, *, empty_symbols=False):
     except AssertionError as exc:
         err = str(exc)
     finally:
-        gate.ext = real_ext
+        if empty_symbols:
+            if had:
+                gate.ext.all_symbols = real_all
+            else:
+                del gate.ext.all_symbols
     return err, out.getvalue()
 
 
