@@ -2213,7 +2213,7 @@ def read_conv_row(out: str, cell: str) -> int:
 
 
 # AC8 — the frozen entry shape, asserted the way its two out-of-kit consumers read it.
-# `tools/drift-audit/drift_report.py` runs `for nm, _ln in got[0]` at two call sites, BOTH outside
+# The drift-audit kit's `drift_report.py` runs `for nm, _ln in got[0]` at two call sites, BOTH outside
 # any catch naming `ValueError`, and one of them runs on `drift-audit records` — a leg with no
 # guard, so it reds every bar. Widening the pair to carry decorators would raise there uncaught.
 # This arm exists so that break is caught in this kit's own selftest first.

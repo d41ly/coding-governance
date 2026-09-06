@@ -434,7 +434,7 @@ def scan_shell_tokens(src: str) -> list:
     THE HERE-STRING IS WHY THE STATE MACHINE EXISTS. `<<<` and a literal run of `<` inside a quoted
     grep pattern are indistinguishable to a line regex and trivially distinguishable here: a
     heredoc-aware REFINEMENT of the naive pattern reads `'^<<<<<<< ours$'` in
-    `tools/memory-tree/merge-rows.test.sh` as an opener whose terminator never arrives and blanks
+    the memory-tree kit's `merge-rows.test.sh` as an opener whose terminator never arrives and blanks
     the thousand lines below it, losing ten real definitions. A tokenizer never enters that branch,
     because the run is inside single quotes.
 
@@ -724,7 +724,7 @@ def parse_shell_defs(src: str):
        any static extractor, so pretending otherwise would be the green-by-absence claim this parser
        exists to refuse.
     3. A definition inside a HEREDOC BODY is not a definition and is not returned. This is the one
-       refusal with a confirmed live instance: `tools/hooks/agent-cap.test.sh` embeds a JavaScript
+       refusal with a confirmed live instance: the hooks kit's `agent-cap.test.sh` embeds a JavaScript
        `function f() { … }` inside a `<<'EOF'` body, which the naive same-line pattern reports as a
        shell function.
 
@@ -1087,7 +1087,7 @@ def extract_decorators(scanned: list, root: Path, declared: dict, ext: str) -> d
     third element on each function entry ON PURPOSE. `extract` and `extract_text` return
     `(functions, types, imports)` with each function entry a `(name, lineno)` PAIR, and two call
     sites in ANOTHER kit unpack that pair positionally — `for nm, _ln in got[0]` in
-    `tools/drift-audit/drift_report.py`, both of them OUTSIDE any catch naming `ValueError`.
+    the drift-audit kit's `drift_report.py`, both of them OUTSIDE any catch naming `ValueError`.
     Widening the pair therefore raises uncaught on `drift-audit records`, a leg carrying no guard,
     which means it reds every bar rather than degrading quietly. The shape is frozen; this accessor
     is how a decorator arrives without touching it, and this kit's own selftest asserts the arity so
@@ -2112,7 +2112,7 @@ def read_routed_cell(cells: dict, cell: str, name: str) -> tuple:
     `name` IS THE GRADED STRING, not the caller's raw argument, and the parameter is named for what
     it is because passing the wrong one is invisible. Closing review M1: this was handed the raw
     `--suggest` argument while the grader's `scan_routes` matches on the STEM, so
-    `tools/codebase-map/test_codebase_map.py` missed a `+prefix:test` row here and hit it there —
+    the codebase-map kit's `test_codebase_map.py` missed a `+prefix:test` row here and hit it there —
     one file, two cells, two verdicts.
 
     EVERY MATCHING SELECTOR IS COLLECTED AND A SECOND ONE IS REFUSED, never resolved by declaration

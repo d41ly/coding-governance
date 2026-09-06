@@ -104,7 +104,7 @@ def build_clusters(overlay_rows, clusters=CLUSTERS) -> tuple:
     THE MIRROR IS NOT CLOSED BY THIS FUNCTION and cannot be. An owner may fill the block from their
     corpus's commonest spellings, which reinstates precisely the defect this file exists to close.
     What the door buys is VISIBILITY and attribution, not proof — see the honest limit in
-    `.lexicon.conf` and `tools/lexicon/README.md`. TOOL-aSurfacedLexicon-11.
+    `.lexicon.conf` and this kit's own `README.md`. TOOL-aSurfacedLexicon-11.
     """
     shipped = {rep for rep, _g, _o in clusters}
     for key, others in overlay_rows.items():

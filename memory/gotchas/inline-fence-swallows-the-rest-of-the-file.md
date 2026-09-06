@@ -47,6 +47,11 @@ whitespace allowed — and an ODD count means an unclosed fence:
 grep -cE '^[[:space:]]*(```|~~~)' <file>
 ```
 
+There is **no machine gate** for this class today, and the parity count above is the documented
+check. Nothing in the tree counts fence-shaped lines: the readers that tokenize fences each keep
+their own machine and none of them reports an odd count, which is precisely why the truncation
+surfaces as somebody else's finding.
+
 Run it across the tree the reader scans, not only the file you edited: the same author habit repeats.
 `grep -c '^```'` is NOT the same predicate and will miss the indented case, which is the case that
 actually happens, because an inline span sits inside wrapped prose and prose is indented.

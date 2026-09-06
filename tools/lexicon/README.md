@@ -153,7 +153,7 @@ its numbers were already wrong on the day it landed — while `.lexicon.conf` ca
 figures under a selftest arm that reads them out of the conf by anchored regex and compares them
 against what `--check` prints. One gated carrier and one ungated copy of one fact, disagreeing, in
 the file an adopter reads first (closing review M6). For the real numbers run the gate:
-`python tools/lexicon/lexicon.py`.
+`python {kit}/lexicon.py`.
 
 The denominator is the WIDER population the rule narrowed, not the graded count restated. A row
 whose two figures are equal is legal and common — every `function` cell narrows nothing — and the
@@ -483,7 +483,7 @@ a no-op on purpose — a typo that quietly changed nothing would still count as 
 on the posture line, which is a posture that lies in the one place this door exists to make honest.
 
 **The unfreeze is stamped or it is refused.** A `CANON:` block with an empty `canon_unfrozen`, or one
-carrying a date and a node but no REASON, reds `bash tools/lexicon/adopt-lexicon.sh --check` — a leg
+carrying a date and a node but no REASON, reds `bash {kit}/adopt-lexicon.sh --check` — a leg
 with no guard, so a conf-only commit reaches it. **And it prints on every run**, green as well as
 red, above the counts and above a `--suggest` answer. There is no state in which the canon is
 quietly overridden.

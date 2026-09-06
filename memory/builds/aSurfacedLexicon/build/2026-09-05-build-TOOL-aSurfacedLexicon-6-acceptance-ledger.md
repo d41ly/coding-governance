@@ -29,37 +29,37 @@ a passing suite hid completely.
 
 **Evidences:** TOOL-aSurfacedLexicon-6
 - AC1 — a cell armed over an empty population — RED, `DEAD CELL`, naming the cell and its convention.
-- AC2 — the undeclared-cell report — three extracted populations with no declaration row, each with its count.
-- AC3 — a parity assertion between report rows and parsed rows — reverting it reds two named arms.
-- AC4 — every printed row carries its population RULE — dropping the rule clause reds three named arms. This unit owns population sizes, so a count without its rule is the defect it exists to prevent.
-- AC5 — the census figures in the declaration — read from the ROW that owns each, not by substring over the file. The first cut used a bare substring and a falsified denominator left it green.
-- AC6 — a report that builds no rows — refused rather than printed empty.
-- AC7 — the dead-cell refusal disabled — reds two arms while the dead-probe arm stays untouched, so the two refusals are distinguishable.
+- AC2 — `tools/lexicon/selftest.py` — the undeclared-cell report — three extracted populations with no declaration row, each with its count, and the refusing half observed in the fixture repo with the promotion constant forced on.
+- AC3 — `tools/lexicon/selftest.py` — a parity assertion between report rows and parsed rows — reverting it reds two named arms.
+- AC4 — `tools/lexicon/selftest.py` — every printed row carries its population RULE — dropping the rule clause reds three named arms. This unit owns population sizes, so a count without its rule is the defect it exists to prevent.
+- AC5 — `tools/lexicon/selftest.py` — the census figures in the declaration — read from the ROW that owns each, not by substring over the file. The first cut used a bare substring and a falsified denominator left it green.
+- AC6 — `tools/lexicon/selftest.py` — a report that builds no rows — refused rather than printed empty, and so is one that drops a single row while printing the others.
+- AC7 — `tools/lexicon/selftest.py` — the dead-cell refusal disabled — reds two arms while the dead-probe arm stays untouched, so the two refusals are distinguishable.
 - AC8 — amended rev-2 — STRUCK. Adding the conf to a leg guard reds an unguarded gate, and the kit descriptor had refused that edit in writing.
-- AC9 — the build's FIRST armed cell — green at its measured pin with its population rule beside it.
-- AC10 — the generated map artifact — the failing case observed, then regenerated in this same commit.
+- AC9 — `python tools/lexicon/lexicon.py --check` — the build's FIRST armed cell — green at its measured pin with its population rule beside it, and a staged module-body constant reds it by name.
+- AC10 — `python tools/codebase-map/test_codebase_map.py` — the generated map artifact — the failing case observed, then regenerated in this same commit.
 
 **Evidences:** TOOL-aSurfacedLexicon-13
-- AC1 — a selector routing a subset of a cell to a second convention — RED on the subset while the parent stays green.
-- AC2 — three readings in one session — parent alone, selector alone, and both, each with its own population.
+- AC1 — `python tools/lexicon/lexicon.py --check` — a selector routing a subset of a cell to a second convention — RED on the subset while the parent stays green.
+- AC2 — `python tools/lexicon/lexicon.py --check` — three readings in one session — parent alone, selector alone, and both, each with its own population.
 - AC3 — two overlapping prefixes over one name — `AMBIGUOUS SELECTOR`, refused rather than silently resolved to whichever matched first.
 - AC4 — a selector whose subset is empty — `DEAD CELL`.
-- AC5 — a decorator selector — grades the decorated definitions and nothing else.
-- AC6 — a selector on a probe-mode language — refused at parse time naming the file and line.
-- AC7 — the fixtures are SYNTHETIC and the section says so, with the reason. A fixture that quietly stood in for a real population would be the staged-break-substitutes-a-synthetic-value class.
-- AC8 — the arity arms — non-vacuous, proven by widening the extractor's tuple and watching them red.
-- AC9 — both pin rows pasted blank-separated — green, and the separation is the merge property a sibling ratified rather than formatting.
+- AC5 — `tools/lexicon/selftest.py` — a decorator selector — grades the decorated definitions and nothing else, including a dotted decorator selected by its last segment.
+- AC6 — `tools/lexicon/selftest.py` — a selector on a probe-mode language — refused at parse time naming the language and the mode, while the same selector on a `parser` language parses.
+- AC7 — `tools/lexicon/selftest.py` — the fixtures are SYNTHETIC and the section header says so, with the reason. A fixture that quietly stood in for a real population would be the staged-break-substitutes-a-synthetic-value class.
+- AC8 — `tools/lexicon/selftest.py` — the arity arms — non-vacuous, proven by widening the extractor's tuple and watching them red.
+- AC9 — `tools/lexicon/selftest.py` — both pin rows pasted blank-separated — green, and each row reds on its OWN count with the other left alone, so nothing is folded into the parent.
 
 **Evidences:** TOOL-aSurfacedLexicon-7
 - AC1 — a name whose leading token the canon holds — `--suggest` answers with the canon's spelling and says which it rejected.
-- AC2 — two more of the same shape — both answered, both naming the source of the ruling.
-- AC3 — a token where the DECLARATION and the CANON disagree — the precedence rule decides it, and the criterion is keyed on a token where they actually differ. Its first spelling tested one where both agree, so it could not fail.
-- AC4 — one run against a scratch declaration — the four rows reconcile as an identity between readings taken in that ONE run, with no literal in the criterion.
-- AC5 — a DEBT-leading definition staged — RED naming the file, the line and the replacement.
-- AC6 — an UNRULED-leading definition staged — RED with a different message, because a name no cluster holds is a scoping question rather than a spelling one.
+- AC2 — `python tools/lexicon/lexicon.py --suggest` — two more of the same shape — both answered, both naming the source of the ruling.
+- AC3 — `tools/lexicon/selftest.py` — a token where the DECLARATION and the CANON disagree — the precedence rule decides it, and the criterion is keyed on a token where they actually differ. Its first spelling tested one where both agree, so it could not fail.
+- AC4 — `python tools/lexicon/lexicon.py --check` — one run against a scratch declaration — the four rows reconcile as an identity between readings taken in that ONE run, with no literal in the criterion.
+- AC5 — `tools/lexicon/selftest.py` — a DEBT-leading definition staged — RED naming the file, the line and the replacement identifier rather than only the verb.
+- AC6 — `tools/lexicon/selftest.py` — an UNRULED-leading definition staged — RED with a textually distinct message and no replacement proposed, because a name no cluster holds is a scoping question rather than a spelling one.
 - AC7 — `--measure` emits the four rows blank-separated — verified on the raw lines rather than by eye.
-- AC8 — every canon key classifies DEBT and an absent token UNRULED — reverting the classifier reds it.
-- AC9 — a rename from one class to the other — RED against the pasted pins, in both directions.
+- AC8 — `tools/lexicon/selftest.py` — every canon key classifies DEBT and an absent token UNRULED — reverting the classifier reds it.
+- AC9 — `tools/lexicon/selftest.py` — a rename from one class to the other — RED against the pasted pins, in both directions, while the corpus offender TOTAL is unchanged and the same rename under the single scalar exits 0.
 
 ## What the revert matrix found, and why it is the rule this build keeps re-learning
 

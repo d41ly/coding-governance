@@ -29,7 +29,7 @@ reading is the one recorded.
 - AC1 — `python tools/lexicon/lexicon.py --check` — the surviving verdict lines are byte-identical in shape and the graded figures moved only by this unit's own deletions. NOT observable as a literal before/after diff: the "before" tree is one where the order-1 sibling landed and this unit did not, and that tree was never built. Recorded as a reconstruction rather than a diff, which is what it is.
 - AC2 — `python tools/lexicon/lexicon.py --measure` — exits 0 and every surviving pin is unmoved by this unit. Same reconstruction limit as AC1.
 - AC3 — `python tools/lexicon/lexicon.py --brief` and `--probe` — both print the usage block and exit 2, naming neither flag among the modes accepted.
-- AC4 — a measure-only refusal staged, then its mirror in the check path — BOTH REDS observed by the verifier, in both directions, which is what makes the differential arm a test rather than an assertion.
+- AC4 — `tools/lexicon/selftest.py` — a measure-only refusal staged, then its mirror in the check path — BOTH REDS observed by the verifier, in both directions, which is what makes the differential arm a test rather than an assertion.
 - AC5 — `grep -c DEAD_TOKENS tools/codebase-map/selftest.py` — returns 0, and that suite exits 0 with 26 arms executed.
 - AC6 — amended rev-7 — the equality against `grep -c "check("` is unsatisfiable by construction: 104 against a printed 131, because the grep counts the definition line and counts a loop-bound call site once. Replaced by a de-collected-arm observation, which is the green-by-absence property it was always for. Logged in section 9.
 - AC7 — `bash tools/lexicon/adopt-lexicon.sh --check` and `python tools/check-kit-placeholders.py` — both exit 0.
