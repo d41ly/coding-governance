@@ -3660,8 +3660,18 @@ check("M1: ...and the evidence line reports the type definitions it DID extract,
 _c, _o = run_case(EXPAND_FILES, _DARK_CONF, args=("--expand",))
 check("M2: with every language `dark`, the evidence line says none is armed",
       "(none armed)" in _o, _o)
-check("M2: ...and does not list a dark extension under that word",
-      "armed extension(s): py" not in _o, _o)
+# THE SECOND HALF IS READ OFF THE LINE, not grepped for a prefix. Its first cut asserted
+# `"armed extension(s): py" not in _o`, which is TRUE of the broken output too — that prints
+# `armed extension(s): conf py`, so the substring never matched and the arm passed on the defect it
+# was written to catch. Found by staging all four round-3 mechanisms at once and reading which arms
+# redded: this one did not, and an arm that survives its own break is the class this suite exists to
+# refuse. It now reads the line's VALUE and asserts no extension is named in it.
+_armed_line = [ln.split(":", 1)[1].strip() for ln in _o.splitlines()
+               if ln.strip().startswith("armed extension(s):")]
+check("M2: ...over an armed line the arm actually found, or the assertion below is vacuous",
+      len(_armed_line) == 1, f"{_armed_line}")
+check("M2: ...and that line names NO extension, dark ones included",
+      _armed_line == ["(none armed)"], f"{_armed_line}")
 
 # L1 — WHICH POPULATION THE TAIL'S COUNTS MEAN. Moving to the unwaived set aligned the rows with the
 # offender scalar and misaligned them with the corpus-wide site census `--list` attaches to every

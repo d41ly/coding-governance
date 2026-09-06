@@ -144,6 +144,21 @@ for — a check over this suite's own source banning `check(…, True)` as a ski
 three landed arms belonging to other units, which is a cross-unit refactor rather than this fold;
 filed as `TOOL-aSurfacedLexicon-24` instead, with the three sites named.
 
+## The revert matrix over the round-3 fold, and the arm that survived its own break
+
+Four arms were written in that fold and passed on their first run, which is the state §7 exists to
+refuse: an arm only ever seen passing is an assertion about nothing. All four mechanisms were staged
+as breaks AT ONCE — they touch disjoint branches, printed lines and fixtures, so one run distinguishes
+them by which arms red — and the suite redded six arms: three for the `NOTHING LIVE` branch, one for
+the FUNCTION wording, one for the armed-line filter, one for the tail's waived total.
+
+**One arm did not red, and it was the point of running the matrix.** The second `armed extension(s)`
+arm asserted `"armed extension(s): py" not in <output>`; the BROKEN output prints
+`armed extension(s): conf py`, so the substring never matched and the arm passed on exactly the
+defect it was written to catch. It now reads the line's VALUE — asserting it is `(none armed)` — with
+a liveness sibling asserting the line was found at all. The break was re-staged alone and the
+strengthened pair observed RED.
+
 ## Two things this pass did NOT build, and why
 
 **S4's tail is not computed by the new function.** The engine's measurement pass already classifies
