@@ -463,10 +463,14 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
         for line in _sources(shortlist, corpus):
             out.append(f"- {line}")
 
-    if shortlist.recall_dark:
+    # DERIVED, like the banner line above and for the same reason: a conf naming a layer that is
+    # not there would print a partial-recall warning about a population the walk never saw, and a
+    # conf missing one would print none at all. `TOOL-dTracedLattice-5` S4 owns this wording.
+    derived_dark = _derive_dark(shortlist)
+    if derived_dark:
         out.append("")
         out.append(
-            f"recall partial: layers {', '.join(shortlist.recall_dark)} have no symbol extractor "
+            f"recall partial: layers {', '.join(derived_dark)} have no symbol extractor "
             "- a matching seam THERE would not appear above; check that layer by hand before "
             'concluding "no seam fits".'
         )
@@ -480,6 +484,74 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
     return "\n".join(out) + "\n"
 
 
+def derive_layer_verdict(scan: dict, declared: tuple[str, ...]) -> dict:
+    """Compare the layers PRESENT in the corpus against the ones covered and the ones DECLARED dark.
+
+    `TOOL-dTracedLattice-5`. `RECALL_DARK_LAYERS` was an authored string with exactly one consumer,
+    which split it and printed a banner: nothing derived it from the languages actually present and
+    nothing reddened when a layer appeared undeclared. A repo that adds a language and forgets the
+    declaration got a confident answer from a probe that never read that layer.
+
+    Returns `{"uncovered", "undeclared", "stale", "legacy", "counts"}`. It DECIDES nothing — the
+    caller refuses or reports — so this stays a pure function an arm can drive.
+    """
+    present = set(scan.get("present_extensions", ()))
+    covered = set(scan.get("extensions", ()))
+    counts = scan.get("present_counts", {})
+    # THE MIGRATION, S6. Values are EXTENSIONS now, with a leading dot. A legacy language name is
+    # never REINTERPRETED into one: a guess that reads `bash` as `.sh` is right here and wrong for
+    # `c` or `go`, and an adopter whose conf still carries the old spelling has to be TOLD.
+    legacy = tuple(d for d in declared if not d.startswith("."))
+    declared_exts = {d for d in declared if d.startswith(".")}
+    uncovered = sorted(present - covered)
+    return {
+        "uncovered": uncovered,
+        "undeclared": sorted(set(uncovered) - declared_exts),
+        "stale": sorted(declared_exts - present),
+        "legacy": legacy,
+        "counts": counts,
+    }
+
+
+def render_layer_refusal(verdict: dict) -> str:
+    """The refusal text, or `""` when there is nothing to refuse. S3: it names the layer, its file
+    count, and BOTH ways to clear it, so the message carries the repair and not only the problem."""
+    if verdict["legacy"]:
+        avail = ", ".join(verdict["uncovered"]) or "(none — every present layer is covered)"
+        return (f"RECALL_DARK_LAYERS carries the OLD language-name spelling "
+                f"{', '.join(verdict['legacy'])}. Values are EXTENSIONS now, with a leading dot, "
+                f"and nothing here reinterprets one — a guess that reads `bash` as `.sh` is right "
+                f"once and wrong for `c` or `go`. The uncovered layers present in this corpus are: "
+                f"{avail}. Set RECALL_DARK_LAYERS to the ones you deliberately do not cover.")
+    if verdict["undeclared"]:
+        parts = []
+        for ext in verdict["undeclared"]:
+            n = verdict["counts"].get(ext, 0)
+            parts.append(f"{ext} ({n} file(s))")
+        return ("a language layer is present in this corpus, has NO symbol extractor, and is NOT "
+                f"declared dark: {', '.join(parts)}. Every seam in it is invisible to this probe, "
+                "so a 'no seam fits' answer would be confident about a population never read. "
+                "TWO ways to clear this: register an extractor for it in map_extractors.py, or add "
+                "the extension to RECALL_DARK_LAYERS in .codebase-map.conf — spelled with the "
+                "leading dot, exactly as written above.")
+    return ""
+
+
+def _derive_dark(shortlist: Shortlist) -> list[str]:
+    """The layers this scan could not read: PRESENT in the corpus and covered by no extractor.
+
+    ONE derivation, read by the coverage line and by the partial-recall paragraph. They were two
+    readings of one fact for exactly one commit, and the paragraph kept printing the declaration
+    while the line printed the truth — the same two-answers shape this unit exists to remove, one
+    function lower. Falls back to the DECLARED tuple only when no scan ran at all.
+    """
+    scan = shortlist.scan or {}
+    present = scan.get("present_extensions")
+    if present is None:
+        return list(shortlist.recall_dark)
+    return sorted(set(present) - set(scan.get("extensions", ())))
+
+
 def _scan_line(shortlist: Shortlist) -> str:
     """The reference scan's own coverage, as one banner line. Never omitted and never abbreviated
     away: an absent figure reads as "nothing to report", which is the one thing it cannot mean."""
@@ -488,7 +560,14 @@ def _scan_line(shortlist: Shortlist) -> str:
         # The scan did not run at all (an empty corpus takes the early return). Say so rather than
         # printing zeros, which read as "scanned everything and found nothing".
         return "# scan coverage: not run (no symbol file list to scan)"
-    dark = ", ".join(shortlist.recall_dark) if shortlist.recall_dark else "none declared"
+    # DERIVED, not the declaration. `TOOL-dTracedLattice-5` S4: this unit owns the banner's
+    # dark-layer wording, and what it prints is the set the corpus walk found uncovered — which the
+    # declaration must now agree with, or the run refuses before reaching here.
+    uncovered = _derive_dark(shortlist)
+    if (shortlist.scan or {}).get("present_extensions") is None:
+        dark = ", ".join(shortlist.recall_dark) if shortlist.recall_dark else "none declared"
+    else:
+        dark = ", ".join(uncovered) if uncovered else "none — every present layer has an extractor"
     return (f"# scan coverage: {sc['files_scanned']} files scanned"
             f" | {sc['parse_skips']} parse skips"
             f" | unscanned layers: {dark}")
@@ -694,6 +773,19 @@ def main(argv: list[str] | None = None) -> int:
     scan: dict = {}
     ref_index = (m.build_reference_index(corpus.symbol_files, stats=scan)
                  if corpus.symbol_files else {})
+
+    # REFUSE BEFORE ANSWERING. A shortlist rendered over a corpus with an unread layer is a
+    # confident answer about a population nobody looked at, which is the failure this kit claims to
+    # prevent in the mechanism it uses to claim it.
+    verdict = derive_layer_verdict(scan, corpus.recall_dark)
+    refusal = render_layer_refusal(verdict)
+    if refusal:
+        print(f"reuse-lookup refused: {refusal}", file=sys.stderr)
+        return 2
+    for ext in verdict["stale"]:
+        print(f"note: RECALL_DARK_LAYERS declares {ext} dark and no file with that extension is in "
+              f"the corpus. The declaration is stale — delete it rather than carrying a layer that "
+              f"is not there.", file=sys.stderr)
     shortlist = assemble_shortlist(query, corpus, ref_index, scan)
     print(render(shortlist, corpus), end="")
     # AFTER the answer is rendered, so a row means a lookup that ANSWERED. Before it, a crash in

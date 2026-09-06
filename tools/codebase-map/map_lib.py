@@ -658,6 +658,24 @@ for _e in (".py", ".pyi"):
 for _e in ".sh .bash .zsh .toml .yaml .yml .cfg .ini .conf".split():
     _LEX_PROFILES[_e] = _PROFILE_SH
 
+#: Extensions `_LEX_PROFILES` knows a comment syntax for but which declare no functions. This is the
+#: ONLY authored half of the definition-carrying set below — the language half is DERIVED from the
+#: profile table, so a language the tokenizer learns is covered the day it is added.
+#:
+#: A SECOND COPY OF A JUDGEMENT, said plainly. The lexicon kit reaches the same conclusion for its
+#: own coverage denominator and argues it at greater length there. It cannot be imported: this repo
+#: relies on a directional layer rule forbidding that kit from importing this one, and the reverse
+#: direction is no better, so the two are independent readings of one question and may diverge.
+_DATA_EXTS = frozenset({".toml", ".yaml", ".yml", ".cfg", ".ini", ".conf"})
+
+#: What this kit believes CAN carry a definition. Derived, minus the data formats above.
+#:
+#: WHAT IT CANNOT SEE: a language `_LEX_PROFILES` has no profile for. `_identifier_tokens` handles
+#: one fail-open, by design, and a dark-layer check built on this set therefore MISSES it rather
+#: than reporting it — a false negative, chosen over the false positive of calling every unknown
+#: extension a source layer.
+DEFINITION_CARRYING_EXTS = frozenset(_LEX_PROFILES) - _DATA_EXTS
+
 _TRIPLE_QUOTES = ('"""', "'''")
 #: String prefix letters Python allows before a quote. Only `f` (any case) turns the
 #: `interpolation_pair` on, but all of them have to be RECOGNISED so `rf"…"` is still seen as
@@ -809,6 +827,7 @@ def build_reference_index(
     exts = frozenset(Path(f).suffix for f in files if Path(f).suffix)
     index: dict[str, set[str]] = {}
     scanned = skips = 0
+    present: dict[str, int] = {}
     for top in roots:
         base = root / top
         if not base.is_dir():
@@ -816,7 +835,14 @@ def build_reference_index(
         for dirpath, dirnames, names in os.walk(base):
             dirnames[:] = [d for d in dirnames if d not in skip_dirs]
             for name in sorted(names):
-                if exts and Path(name).suffix not in exts:
+                suffix = Path(name).suffix
+                # RECORDED BEFORE THE FILTER, which is the whole point: the filter admits only the
+                # extensions the symbol corpus already covers, so a layer with no extractor is
+                # invisible downstream of it. `TOOL-dTracedLattice-5` S1 — derived from the walk
+                # that already happens, never a second scan.
+                if suffix in DEFINITION_CARRYING_EXTS:
+                    present[suffix] = present.get(suffix, 0) + 1
+                if exts and suffix not in exts:
                     continue
                 path = Path(dirpath) / name
                 try:
@@ -832,6 +858,8 @@ def build_reference_index(
         stats["files_scanned"] = scanned
         stats["parse_skips"] = skips
         stats["extensions"] = sorted(exts)
+        stats["present_extensions"] = sorted(present)
+        stats["present_counts"] = dict(sorted(present.items()))
         stats["roots"] = roots
     return index
 

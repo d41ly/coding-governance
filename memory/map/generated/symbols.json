@@ -1088,6 +1088,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_layer_verdict",
+      "kind": "function",
+      "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
       "id": "derive_lexicon_conf",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -2658,6 +2663,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_layer_refusal",
+      "kind": "function",
+      "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
       "id": "render_legacy_note",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
@@ -3563,6 +3573,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_declared_layer_is_named_dark_in_the_banner",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_declared_source_absent_is_skipped",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -3629,6 +3644,11 @@
     },
     {
       "id": "test_every_co_defined_symbol_reaches_every_definer",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_every_declared_layer_is_present_on_this_tree",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
@@ -3779,6 +3799,11 @@
     },
     {
       "id": "test_legacy_backlog_is_named_and_never_deleted",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_legacy_language_name_refuses_and_names_the_extension",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
@@ -4013,6 +4038,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_stale_declaration_is_reported_not_honoured",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_symbol_extractors_fail_closed",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -4036,6 +4066,11 @@
       "id": "test_undeclared_file_stays_out",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_undeclared_layer_refuses_with_both_remedies",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_verbatim_files",

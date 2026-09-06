@@ -1,12 +1,13 @@
 # TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose
 
-**Status:** SPECCED · rev-5 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 6 · ratified 2026-09-05
+**Status:** CLOSED · rev-6 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 6 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 |
+| [2026-09-06-build-TOOL-dTracedLattice-5-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-dTracedLattice-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
@@ -167,6 +168,12 @@ set would print a derived number beside an authored one.
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-6 · 2026-09-06 · built. The present-layer set is recorded INSIDE the reference walk before
+  its extension filter, so the derivation costs no second scan; the definition-carrying filter is
+  derived from the tokenizer's profile table minus an authored data-format set. The AC2/AC4 arm
+  caught the `recall partial:` paragraph still reading the declaration while the coverage line read
+  the truth — two readers of one fact, which is this unit's own defect one level down, and both now
+  read one derivation. Status CLOSED.
 - rev-5 · 2026-09-06 · folded the round-3 spec audit: H5 (both handoffs into unit 1 named items that own
   something else — S4 cited an AC that is a chance control and §3 an S-item that is a sort key — so
   this unit owns the banner's dark-layer wording outright under AC2 and AC4, and §3 fences against

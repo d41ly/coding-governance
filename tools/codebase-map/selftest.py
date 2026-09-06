@@ -1185,7 +1185,7 @@ def test_reuse_lookup(tmp: Path):
     import os
 
     (tmp / ".codebase-map.conf").write_text(
-        'MAP_ROOT=memory/map\nRECALL_DARK_LAYERS="web-ts"\nSEAM_FANIN_THRESHOLD=3\n', encoding="utf-8"
+        'MAP_ROOT=memory/map\nRECALL_DARK_LAYERS=".ts"\nSEAM_FANIN_THRESHOLD=3\n', encoding="utf-8"
     )
     gen = tmp / "memory" / "map" / "generated"
     gen.mkdir(parents=True)
@@ -1254,7 +1254,7 @@ def test_reuse_lookup(tmp: Path):
         assert "affordance-seam" in corpus.candidates["slugify"].sources  # merged symbol + seam
         assert "Cache" not in names, names  # different kind AND file -> not a neighbour
         out = rl.render(sl, corpus)
-        assert "recall partial: layers web-ts" in out                   # (c) recall-dark announced
+        assert "recall partial: layers .ts" in out                   # (c) recall-dark announced
         # THE DECISIONS CLAUSE: its own line, and EVERY id rather than the first few. This
         # fixture has no `map_extractors.py` at all, so passing here is also the assertion that
         # reading the field kept this module portable instead of quietly ending that property.
@@ -1266,7 +1266,7 @@ def test_reuse_lookup(tmp: Path):
         assert sl2.empty, [r.candidate.name for r in sl2.ranked]
         out2 = rl.render(sl2, corpus)
         assert "no seam fits" in out2
-        assert "recall partial: layers web-ts" in out2  # never a falsely-confident "no seam"
+        assert "recall partial: layers .ts" in out2  # never a falsely-confident "no seam"
 
         # `## Shared seams` prose recall: a seam-less feature surfaces via its prose (behavioural
         # recall beyond symbol names), and assembling is IDEMPOTENT (no synthetic leak into corpus).
@@ -1680,6 +1680,16 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
+    failures += check("dark layers: an undeclared layer refuses with both remedies (AC1)",
+                      test_undeclared_layer_refuses_with_both_remedies)
+    failures += check("dark layers: the banner is derived, not declared (AC2/AC4)",
+                      test_declared_layer_is_named_dark_in_the_banner)
+    failures += check("dark layers: a stale declaration is reported (AC3)",
+                      test_stale_declaration_is_reported_not_honoured)
+    failures += check("dark layers: the legacy spelling refuses (AC6)",
+                      test_legacy_language_name_refuses_and_names_the_extension)
+    failures += check_guarded("dark layers: every declared layer is present here (AC5)",
+                              test_every_declared_layer_is_present_on_this_tree)
     with tempfile.TemporaryDirectory() as td:
         failures += check("gate-coverage: an uncompared artifact fails (AC1)",
                           lambda: test_gate_coverage_fails_on_an_uncompared_artifact(Path(td)))
@@ -2181,6 +2191,85 @@ def test_gate_coverage_is_green_on_this_tree():
     graded on every run rather than only in a fixture."""
     code = cg.main([])
     assert code == 0, "this repo's own installed gate does not compare every engine artifact"
+
+
+# --- dark layers are DERIVED, not asserted (TOOL-dTracedLattice-5) --------------------------------
+SCAN_FIXTURE = {"extensions": [".py"], "present_extensions": [".py", ".sh"],
+                "present_counts": {".py": 47, ".sh": 85}, "files_scanned": 47, "parse_skips": 0}
+
+
+def test_undeclared_layer_refuses_with_both_remedies():
+    """AC1 / S3 — the refusal names the layer, its file count, and BOTH ways to clear it.
+
+    Rev-4 graded two of the three. A refusal that names a problem and no repair is what §5's risks
+    row forbids: an adopter meets it and has nowhere to go.
+    """
+    v = rl.derive_layer_verdict(SCAN_FIXTURE, ())
+    text = rl.render_layer_refusal(v)
+    assert ".sh" in text, text
+    assert "85 file(s)" in text, text
+    assert "register an extractor" in text, text
+    assert "RECALL_DARK_LAYERS" in text, text
+    # And it must NOT fire once the layer is declared, or the remedy it prints does not work.
+    assert rl.render_layer_refusal(rl.derive_layer_verdict(SCAN_FIXTURE, (".sh",))) == ""
+
+
+def test_declared_layer_is_named_dark_in_the_banner():
+    """AC2 / AC4 / S4 — the banner's dark set is DERIVED from the corpus walk, not from the conf.
+
+    This unit owns that wording outright: `TOOL-dTracedLattice-1` grades no banner content, and an
+    ungraded handover between two sequenced units is what M6 clause 3 exists to catch.
+    """
+    corpus = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                       recall_dark=(".sh",), has_symbols=True, decisions_by_feature={})
+    sl = rl.Shortlist("q", [], corpus.recall_dark, corpus.threshold, {}, SCAN_FIXTURE)
+    text = rl.render(sl, corpus)
+    assert "unscanned layers: .sh" in text, text
+    # DERIVED means the conf cannot make it lie: declare something absurd and the banner is unmoved.
+    lying = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                      recall_dark=(".nonexistent",), has_symbols=True, decisions_by_feature={})
+    text2 = rl.render(rl.Shortlist("q", [], lying.recall_dark, 3, {}, SCAN_FIXTURE), lying)
+    assert "unscanned layers: .sh" in text2, text2
+    assert ".nonexistent" not in text2, text2
+
+
+def test_stale_declaration_is_reported_not_honoured():
+    """AC3 — a declared layer absent from the corpus is a STALE declaration, not a dark layer."""
+    v = rl.derive_layer_verdict(SCAN_FIXTURE, (".sh", ".rb"))
+    assert v["stale"] == [".rb"], v
+    assert v["undeclared"] == [], v
+    # Stale is a REPORT, never a refusal: it costs an adopter nothing and blocks nothing.
+    assert rl.render_layer_refusal(v) == "", v
+
+
+def test_legacy_language_name_refuses_and_names_the_extension():
+    """AC6 / S6 — the migration. An old value is REFUSED, never reinterpreted.
+
+    Reading `bash` as `.sh` is right on this tree and wrong for `c` or `go`, and an adopter whose
+    conf still carries the old spelling has to be told rather than guessed at.
+    """
+    v = rl.derive_layer_verdict(SCAN_FIXTURE, ("bash",))
+    text = rl.render_layer_refusal(v)
+    assert "OLD language-name spelling" in text and "bash" in text, text
+    assert ".sh" in text, "the refusal must name the uncovered layers it could be"
+    # The legacy check leads: a conf carrying both an old and a new value is still a migration.
+    both = rl.render_layer_refusal(rl.derive_layer_verdict(SCAN_FIXTURE, ("bash", ".sh")))
+    assert "OLD language-name spelling" in both, both
+
+
+def test_every_declared_layer_is_present_on_this_tree():
+    """AC5 — over THIS repo's own conf, not a fixture. It reddened against the shipped `bash`
+    value before the migration landed, which is the observation the criterion asks for."""
+    root = m.repo_root()
+    declared = tuple(t for t in (m.load_conf(root).get("RECALL_DARK_LAYERS", "")).replace(",", " ").split() if t)
+    corpus = rl.load_corpus(root)
+    scan: dict = {}
+    m.build_reference_index(corpus.symbol_files, root=root, stats=scan)
+    present = set(scan.get("present_extensions", ()))
+    assert present, "the walk found no definition-carrying layer at all, so this arm proves nothing"
+    for token in declared:
+        assert token.startswith("."), f"{token} is the OLD language-name spelling"
+        assert token in present, f"{token} is declared dark and is not present in the corpus"
 
 if __name__ == "__main__":
     sys.exit(main())
