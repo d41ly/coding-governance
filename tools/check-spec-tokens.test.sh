@@ -12,7 +12,7 @@ set -u
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=12
+FLOOR_ASSERTIONS=20
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
 PY=${PY:-python}
 pass=0; fail=0
@@ -75,6 +75,78 @@ d=$base/cite; scratch "$d"
 sed -i 's|`tools/gate-legs.json` exists|see `tools/gate-legs.json:9999`|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
 git -C "$d" add -A >/dev/null
 arm "a citation beyond end of file REDS" 1 "$d" "lines"
+
+# ---- TOOL-aJoinedCanon-7: the eight arms this unit owes. Each is named by its own criterion.
+# AC4 — a PROSE §7 contributes no leg name and raises the ungraded count, and stays GREEN while the
+#       cutoff is blank. This is the silence the report used to keep to itself.
+d=$base/prose; scratch "$d"
+sed -i 's|^`real leg`\.|The bar, which is the `real leg` leg, plus whatever it drags in.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a prose section 7 contributes nothing and is COUNTED" 0 "$d" "1 live spec(s) carry a Gates heading contributing NO leg name"
+
+# AC5 — a manifest name carrying a `/`. The shape exclusion drops any token with a slash, so before
+#       the manifest-first resolution this leg name was discarded UNREAD and the spec looked prose-y.
+d=$base/slashleg; scratch "$d"
+printf '[{"name":"real leg"},{"name":"tools/thing self-test"}]
+' > "$d/tools/gate-legs.json"
+sed -i 's|^`real leg`\.|`tools/thing self-test`.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a manifest leg name carrying a slash RESOLVES rather than being skipped" 0 "$d" "0 live spec(s) carry a Gates heading contributing NO leg name"
+
+# AC10 — the other excluded shape: a manifest name whose first word is a command verb.
+d=$base/verbleg; scratch "$d"
+printf '[{"name":"real leg"},{"name":"bash the thing"}]
+' > "$d/tools/gate-legs.json"
+sed -i 's|^`real leg`\.|`bash the thing`.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a manifest leg name opening with a command verb RESOLVES" 0 "$d" "0 live spec(s) carry a Gates heading contributing NO leg name"
+
+# AC8 — the dated demand. A post-cutoff spec whose §7 names no leg REDS...
+d=$base/legline; scratch "$d"
+printf 'SPEC_LEGLINE_CUTOFF="2026-09-01"
+' > "$d/.memory-tree.conf"
+sed -i 's|^`real leg`\.|The bar and whatever it drags in.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff section 7 naming no leg REDS" 1 "$d" "contributes no leg name"
+
+# ...and its PRE-cutoff twin is green, so nothing landed goes retroactively red.
+d=$base/leglinepre; scratch "$d"
+printf 'SPEC_LEGLINE_CUTOFF="2026-09-30"
+' > "$d/.memory-tree.conf"
+sed -i 's|^`real leg`\.|The bar and whatever it drags in.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a PRE-cutoff section 7 naming no leg is green" 0 "$d" "carry a Gates heading contributing NO leg name"
+
+# AC9 — a BLANK key turns the arm off over the same tree that reds when it is set.
+d=$base/legblank; scratch "$d"
+printf 'SPEC_LEGLINE_CUTOFF=""
+' > "$d/.memory-tree.conf"
+sed -i 's|^`real leg`\.|The bar and whatever it drags in.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a blank SPEC_LEGLINE_CUTOFF turns the arm off" 0 "$d" "blank (arm off)"
+
+# AC11 — the two TIER-1 fixtures. First: no Gates heading at all, post-cutoff. SILENT, and counted in
+#        its own field, because under the light profile a spec may legally omit the section.
+d=$base/nogates; scratch "$d"
+printf 'SPEC_LEGLINE_CUTOFF="2026-09-01"
+' > "$d/.memory-tree.conf"
+python - "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md" <<'PYEOF'
+import sys
+p = sys.argv[1]; t = open(p, 'rb').read().decode('utf-8')
+open(p, 'wb').write(t.split('## 7. Gates')[0].encode('utf-8'))
+PYEOF
+git -C "$d" add -A >/dev/null
+arm "a post-cutoff spec with NO Gates heading is silent" 0 "$d" "1 carry no Gates heading to grade"
+
+# AC11 second: a Gates section at ANOTHER ordinal is still graded there. This is the M13 class — a
+# Tier-1 spec that drops the production-readiness checklist numbers its Gates section 6.
+d=$base/otherord; scratch "$d"
+printf 'SPEC_LEGLINE_CUTOFF="2026-09-01"
+' > "$d/.memory-tree.conf"
+sed -i 's|^## 7. Gates$|## 6. Gates|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+sed -i 's|^## 6. Acceptance criteria$|## 5. Acceptance criteria|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a Gates section at another ordinal is graded there" 0 "$d" "0 live spec(s) carry a Gates heading contributing NO leg name"
 
 # 5 — an untracked citation path is SKIPPED and COUNTED, never red. Half the real corpus is this.
 d=$base/skip; scratch "$d"

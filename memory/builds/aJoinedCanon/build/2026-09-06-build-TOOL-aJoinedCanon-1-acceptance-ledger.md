@@ -1,6 +1,6 @@
 # aJoinedCanon — acceptance ledger
 
-**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6
+**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7
 
 Node `a`, 2026-09-06, base `274aa39b`. One `**Evidences:**` block per unit, appended as each unit
 lands. Two forms and no third: OBSERVED carries a backticked token naming what made the observation,
@@ -93,6 +93,24 @@ AMENDED names the revision that changed the criterion.
 - AC14 — `grep -c 'LEDGER_TOKEN_CUTOFF' memory/HYGIENE.md` — 0 → 1, under the Acceptance-ledger heading, naming the key rather than the concept.
 - AC15 — `out6d` — with both new keys armed and `ACCEPTANCE_LEDGER_CUTOFF` BLANK — which is what the shipped example gives every adopter — neither arm fires and `HYGIENE check 23` does not appear at all. S9's nesting, observed.
 - AC16 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T18:19:10+03:00`; `last-body-change` unmoved.
+
+**Evidences:** TOOL-aJoinedCanon-7
+
+- AC1 — `python tools/check-spec-tokens.py` — the run report now carries two ungraded fields, and at this landing they read **32 live spec(s) carry a Gates heading contributing NO leg name · 0 carry no Gates heading to grade**. Before this unit the report said neither, so a join grading a dozen specs was indistinguishable from one grading all 44 and finding nothing.
+- AC2 — `arm "a prose section 7 contributes nothing and is COUNTED"` — a §7 written as prose raises the first field to 1 and stays green while the key is blank.
+- AC3 — `git show HEAD:tools/check-spec-tokens.py` — old versus new on the same fixture: the OLD checker grades **1** token and the new one grades **2**, because `tools/thing self-test` carries a slash and was discarded unread by the shape exclusion before the manifest-first resolution.
+- AC4 — `spec-tokens: 32 live spec(s) carry a Gates heading contributing NO leg name` — the ungraded population is reported on every run, as its own field.
+- AC5 — `arm "a manifest leg name carrying a slash RESOLVES rather than being skipped"` — a `/`-carrying manifest name now resolves; the field reads 0 where the old reader left it at 1.
+- AC6 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — exits 0, 4 pairs, after `--render`.
+- AC7 — `grep -n '^SPEC_LEGLINE_CUTOFF=' .memory-tree.conf` — declared at `2026-09-07` with its comment block naming the rule, the heading precondition and the measured 32-of-44.
+- AC8 — `arm "a post-cutoff section 7 naming no leg REDS"` / `arm "a PRE-cutoff section 7 naming no leg is green"` — the dated demand fires and its pre-cutoff twin does not. Over the REAL corpus, lowered to `2026-01-01`, the arm names exactly **32** specs and exits 1 — the same number the report field carries, which is what makes the two derivations agree. Reverted before the commit.
+- AC9 — `arm "a blank SPEC_LEGLINE_CUTOFF turns the arm off"` — the report says `blank (arm off)` and the same tree that reds when the key is set is green.
+- AC10 — `arm "a manifest leg name opening with a command verb RESOLVES"` — the second excluded shape, rescued by the same manifest-first resolution.
+- AC11 — `arm "a post-cutoff spec with NO Gates heading is silent"` / `arm "a Gates section at another ordinal is graded there"` — the two Tier-1 fixtures. The first is counted in its own field rather than red; the second is graded at ordinal 6, which is the `dUnstalledConvoy` M13 class the heading-text location closes.
+- AC12 — `bash tools/check-spec-tokens.test.sh` — PASS, 20 assertions, `FLOOR_ASSERTIONS` raised 12 → 20. Read honestly: the eight new arms were written against the PATCHED checker and then shown to fail against the unpatched one by the AC3 comparison, rather than each being staged red individually.
+- AC13 — `memory/map/features/spec-tokens.md` — records the heading-text location, the manifest-first resolution, both report fields with their measured values, the conf key, and three limits the checker still has.
+- AC14 — `grep -c 'found by its HEADING TEXT' memory/TEMPLATE-SPEC.md` returns 1, `New arm:` returns 3 and `SPEC_LEGLINE_CUTOFF` returns 2, all from 0 at base — the §7 explainer, the skeleton body and the arm-home line reached the rendered file.
+- AC15 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T19:01:50+03:00`; `last-body-change` unmoved.
 
 ## What the date re-derivation changed
 

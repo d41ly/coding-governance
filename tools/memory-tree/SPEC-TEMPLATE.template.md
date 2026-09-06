@@ -130,6 +130,36 @@ an absent region cannot be told from a spec nobody has recorded against.
   and add the `ratified <date>` pointer to the header tail. §8 must read `none` or be fully
   RESOLVED before the status may go CLOSED/WONTDO (machine-checked).
 
+## §7 Gates — the shape the leg join reads, and where a new arm lives
+
+`{{TOOL_ROOT}}check-spec-tokens.py` resolves a §7 gate name against `{{TOOL_ROOT}}gate-legs.json`, and
+it reads only lines that ARE the list: a line carrying nothing but backticked names and `·` or `,`
+separators. A line with a `- ` bullet marker, a prose prefix or a trailing clause is NOT read. Prose
+may sit above or below that line freely.
+
+The section is found by its HEADING TEXT, not by its number. A Tier-1 spec that drops the
+production-readiness checklist slides every later section up one, so an ordinal read would grade
+whatever sits seventh. A spec carrying no Gates heading at all is not graded; a Gates section at
+another ordinal still is.
+
+Only a NON-TERMINAL spec is graded. A landed record is frozen and this repo does not rewrite one to
+clear a hit.
+
+Once a spec's filename date reaches `SPEC_LEGLINE_CUTOFF` (`.memory-tree.conf`; blank turns it off),
+a spec that DOES carry a Gates heading must carry such a line. From that date the shape is a
+requirement rather than only a reading rule — and the heading precondition is the whole of the
+Tier-1 accommodation, so the only spec this can red is one that wrote a Gates section and named no
+leg in it.
+
+**Where a new arm lives.** When a unit adds or moves a gate arm, §7 carries one line per arm:
+
+```
+New arm: <suite path> · <what stages its failing case> · <assertion floor to move, or none>
+```
+
+It is prose, it is not machine-graded, and it never satisfies the rule above — the `New arm:` prefix
+is exactly what keeps it out of the leg join. A §7 carrying only an arm-home line still names no leg.
+
 ## §10 Reuse audit — the two facts, and what satisfies each
 
 Required on a Tier-2 spec whose FILENAME date is on or after `SPEC10_EVIDENCE_CUTOFF`
@@ -286,7 +316,11 @@ carries no fields at all — the common case. Nothing grades these lines.
 
 ## 7. Gates
 
-The named gate legs this unit must keep green, plus any new gate it adds.
+The named gate legs this unit must keep green, plus any new gate it adds. Put the names on a
+line of their own carrying nothing but backticked names and separators — that line is what the
+leg join reads, and from `SPEC_LEGLINE_CUTOFF` onward a spec with this heading must have one.
+Add `New arm: <suite path> · <what stages its failing case> · <floor to move, or none>` per arm
+this unit adds or moves. The rules are the §7 section above this skeleton.
 
 ## 8. Open questions
 
