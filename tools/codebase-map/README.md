@@ -27,6 +27,10 @@ project specifics live in exactly two files the adopting repo owns.
   or unresolvable, which is not an error. It resolves import STATEMENTS only — not call sites, not
   attribute receivers — and counts nothing, so a consumer that reads it as a call graph will be
   wrong. Rescued from the lexicon kit's P3 predicate ahead of that predicate's deletion.
+- `check_gate_coverage.py` — does the INSTALLED gate compare every artifact the engine writes?
+  `--list` prints both sets. The adopter's gate is copied once and never again; the engine upgrades
+  every time. This reports the SET difference, not a byte diff, because a project is entitled to
+  customise its gate — and it states that it cannot tell a deliberate omission from a stale one.
 - `gen_map.py` — CLI: `--scaffold · --write · --check · --seed-baseline · --seed-affordance-baseline
   · --seed-affordances --top N`.
 - `map_diff.py` — the range digest (`<base>..<head>`), plus `--drop-affordance-exempt` (S4a

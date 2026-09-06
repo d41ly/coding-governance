@@ -571,6 +571,19 @@
     "ceiling": 300
   },
   {
+    "name": "codebase-map gate coverage",
+    "argv": [
+      "python3",
+      "tools/codebase-map/check_gate_coverage.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "guard": [
+      "tools/codebase-map/"
+    ],
+    "ceiling": 60
+  },
+  {
     "name": "codebase-map coverage + freshness",
     "argv": [
       "python3",

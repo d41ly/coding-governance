@@ -26,6 +26,7 @@ import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
 import map_imports as mi  # noqa: E402
 import map_diff as md  # noqa: E402
+import check_gate_coverage as cg  # noqa: E402
 
 IDS = ("flags", "routes")
 INV = {"flags": ["a_flag", "b_flag"], "routes": ["api/x/route.ts"]}
@@ -1679,6 +1680,20 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: an uncompared artifact fails (AC1)",
+                          lambda: test_gate_coverage_fails_on_an_uncompared_artifact(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: a customised gate passes (AC2)",
+                          lambda: test_gate_coverage_passes_a_customised_gate(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: an unset GATE_FILE is a named skip (AC3)",
+                          lambda: test_gate_coverage_names_its_skip(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("gate-coverage: a predicate matching nothing REFUSES",
+                          lambda: test_gate_coverage_refuses_a_predicate_that_matches_nothing(Path(td)))
+    failures += check("gate-coverage: green on this tree",
+                      test_gate_coverage_is_green_on_this_tree)
     failures += check("backlog: written outside the worktree (AC1)",
                       test_backlog_path_is_outside_the_worktree)
     failures += check_guarded("backlog: follows --git-common-dir (AC6)",
@@ -2084,6 +2099,88 @@ def test_legacy_backlog_is_named_and_never_deleted(tmp: Path):
     assert "map/reinvention-backlog.md" in note, note
     assert current.as_posix() in note, note
     assert legacy.is_file(), "the note must not delete the file it names"
+
+
+# --- the adopter's frozen gate is compared against the engine (TOOL-dTracedLattice-4) -------------
+def _run_gate_coverage(gate_text, tmp: Path, *, name="test_codebase_map.py"):
+    """Run the real check against a FIXTURE installed gate. Returns `(exit, stdout, stderr)`."""
+    import contextlib, io as _io
+    path = None
+    if gate_text is not None:
+        path = tmp / name
+        path.write_text(gate_text, encoding="utf-8")
+    real = cg.resolve_gate_path
+    cg.resolve_gate_path = lambda root: path
+    out, err = _io.StringIO(), _io.StringIO()
+    try:
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = cg.main([])
+    finally:
+        cg.resolve_gate_path = real
+    return code, out.getvalue(), err.getvalue()
+
+
+def test_gate_coverage_fails_on_an_uncompared_artifact(tmp: Path):
+    """AC1 — an installed gate missing a tier the engine writes FAILS, naming the artifact."""
+    frozen = 'fresh = {gen_dir / "inventories.json": x, gen_dir / "MAP.md": y}\n'
+    code, out, err = _run_gate_coverage(frozen, tmp)
+    assert code == 1, (code, out, err)
+    assert "symbols.json" in err, err
+    assert "does not compare" in err, err
+    # It must say what it CANNOT decide, or the report reads as a verdict about the adopter.
+    assert "CANNOT TELL A DELIBERATE OMISSION" in err, err
+
+
+def test_gate_coverage_passes_a_customised_gate(tmp: Path):
+    """AC2 — a gate that covers every artifact passes even when it differs byte-for-byte.
+
+    A project is entitled to edit its gate. Reporting a diff would report customisation as
+    staleness, which is the reason this check compares SETS and not bytes.
+    """
+    customised = ('# a project comment the template does not have\n'
+                  'fresh = {gen_dir / "inventories.json": x, gen_dir / "MAP.md": y}\n'
+                  'CONDITIONAL_TIERS = [\n'
+                  '    ("symbol", "all_symbols", "symbols.json", "render_symbols_json"),\n'
+                  ']\n'
+                  'def extra_project_arm(): pass\n')
+    code, out, err = _run_gate_coverage(customised, tmp)
+    assert code == 0, (code, out, err)
+    assert "names every one" in out, out
+    assert "customise" in out, out
+
+
+def test_gate_coverage_names_its_skip(tmp: Path):
+    """AC3 — an unset or absent GATE_FILE is a NAMED skip, never a silent pass."""
+    code, out, err = _run_gate_coverage(None, tmp)
+    assert code == 0, (code, out, err)
+    assert "skipped" in out and "GATE_FILE" in out, out
+    # It still names what the engine writes, so the skip is informative rather than a shrug.
+    assert "symbols.json" in out, out
+
+
+def test_gate_coverage_refuses_a_predicate_that_matches_nothing(tmp: Path):
+    """The liveness refusal: a stale predicate would report every gate as complete.
+
+    That is the vacuous-selector shape, and a check that cannot distinguish "covered" from "matched
+    nothing" is worse than no check because it is cited as coverage.
+    """
+    import re as _re
+    real_art, real_tier = cg.ARTIFACT_RE, cg.TIER_RE
+    cg.ARTIFACT_RE = _re.compile(r"(?!x)x")
+    cg.TIER_RE = _re.compile(r"(?!x)x")
+    try:
+        code, out, err = _run_gate_coverage('fresh = {}\n', tmp)
+    finally:
+        cg.ARTIFACT_RE, cg.TIER_RE = real_art, real_tier
+    assert code == 2, (code, out, err)
+    assert "REFUSED" in err and "predicate" in err, err
+
+
+def test_gate_coverage_is_green_on_this_tree():
+    """gov is its own adopter here: GATE_FILE points inside the kit dir, so the shipped pair is
+    graded on every run rather than only in a fixture."""
+    code = cg.main([])
+    assert code == 0, "this repo's own installed gate does not compare every engine artifact"
 
 if __name__ == "__main__":
     sys.exit(main())

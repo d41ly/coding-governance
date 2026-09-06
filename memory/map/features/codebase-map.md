@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = []
 
 [claims]
-gate-legs = ["codebase-map coverage + freshness", "codebase-map kit selftest", "codebase-map adopter e2e"]
+gate-legs = ["codebase-map coverage + freshness", "codebase-map gate coverage", "codebase-map kit selftest", "codebase-map adopter e2e"]
 kits = ["codebase-map"]
 git-hooks = []
 workflow-scripts = []
@@ -52,6 +52,12 @@ again when `codebase-map adopter e2e` arrived from main.
 `gen_map.py`, `map_diff.py`, `reuse_lookup.py`, the gate and `map_extractors.py` all read it. It is
 not glob-claimed by any other dossier, because exclusive glob ownership of a shared module is
 impossible and the keyed plane already carries ownership through the keys each feature registers.
+
+`check_gate_coverage.py` is the compensating check for the one hole this kit DECLARES rather than
+closes: the adopter's gate is copied once and frozen, the engine is upgraded, and a new generated
+artifact then reaches an adopter whose gate has no tier for it. It compares the SET of artifacts
+each side names — never bytes, because a project is entitled to customise its gate — and it says
+plainly that it cannot tell a deliberate omission from a stale one.
 
 `map_imports.py` is this tree's ONE AST import resolver, rescued out of the lexicon kit's P3
 predicate by `TOOL-dTracedLattice-6` ahead of that predicate's deletion. It is a seam, not private

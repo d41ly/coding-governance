@@ -16,6 +16,7 @@
       "check-wiring self-test",
       "codebase-map adopter e2e",
       "codebase-map coverage + freshness",
+      "codebase-map gate coverage",
       "codebase-map kit selftest",
       "corpus-ids selftest",
       "dead-path carriers (deleted files still named)",

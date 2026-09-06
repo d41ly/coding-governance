@@ -1740,6 +1740,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/codebase-map/check_gate_coverage.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/codebase-map/gen_map.py"
     },
     {
@@ -2803,6 +2808,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_gate_path",
+      "kind": "function",
+      "file": "tools/codebase-map/check_gate_coverage.py"
+    },
+    {
       "id": "resolve_gov_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -3136,6 +3146,11 @@
       "id": "scanWriteTargets",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "scan_artifacts",
+      "kind": "function",
+      "file": "tools/codebase-map/check_gate_coverage.py"
     },
     {
       "id": "scan_canon",
@@ -3661,6 +3676,31 @@
       "id": "test_floor_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_gate_coverage_fails_on_an_uncompared_artifact",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_is_green_on_this_tree",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_names_its_skip",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_passes_a_customised_gate",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gate_coverage_refuses_a_predicate_that_matches_nothing",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_gate_template_boundary",
