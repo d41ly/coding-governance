@@ -430,6 +430,11 @@
     {
       "id": "build_module_index",
       "kind": "function",
+      "file": "tools/codebase-map/map_imports.py"
+    },
+    {
+      "id": "build_module_index",
+      "kind": "function",
       "file": "tools/lexicon/lexicon.py"
     },
     {
@@ -1266,6 +1271,11 @@
       "id": "export_text",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "ext_of",
+      "kind": "function",
+      "file": "tools/codebase-map/map_imports.py"
     },
     {
       "id": "ext_of",
@@ -2765,6 +2775,11 @@
     {
       "id": "resolve_import",
       "kind": "function",
+      "file": "tools/codebase-map/map_imports.py"
+    },
+    {
+      "id": "resolve_import",
+      "kind": "function",
       "file": "tools/lexicon/lexicon.py"
     },
     {
@@ -3671,6 +3686,21 @@
       "id": "test_malformed_question_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_map_imports_has_no_sibling_kit_import",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_map_imports_matches_the_kit_it_was_rescued_from",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_map_imports_resolution",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_neighbour_cap_ranks_before_truncating",

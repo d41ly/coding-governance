@@ -15,6 +15,22 @@ which is the strongest form available and expires by design when `TOOL-aSurfaced
 - AC6 — `python tools/lexicon/selftest.py` · `python tools/lexicon/lexicon.py` — the two legs `TOOL-aSurfacedLexicon-2` would break are green at the commit this unit lands, which is what proves the three live callers at `lexicon.py:527`/`:536`/`:595` still reach a resolver. Both are held on a plain bar (`lexicon selftest` is `subject: kit`), so they were run directly rather than through one
 - AC7 — `python3 tools/codebase-map/selftest.py` — the arm `map_imports: no sibling-kit import (AC7)` scans the rescued module's own source and refuses any `import`/`from` line naming a sibling kit. Observed RED with a function-local `import lexicon`: `map_imports.py:96 imports a sibling kit`. A module-level break was tried first and crashes the suite at import instead of reporting, which is why the staged break is function-local
 
+## The negative rows are not vacuous, proven
+
+`gotchas.py` selected `fixture-passes-by-finding-nothing` over this diff, and three of the case
+table's rows are negatives — a same-stem file of another extension resolving to nothing, a
+repo-escaping relative specifier resolving to nothing, and a boundary case that must not land on
+`thingamajig/thing.js`. A negative row passes on an empty corpus, so each was proven able to FAIL by
+a staged break rather than argued about:
+
+- extension scoping removed from the bare-name branch (`hits` unfiltered) — RED with
+  `['src/pkg/shared_core/notes.md']`, so `notes.md` is really in the fixture and really excluded by
+  the code rather than by absence.
+- the repo-escape return replaced with a clamp (`continue` instead of `return []`) — RED with
+  `['outside/thing.js']`, so the escape row is deciding on behaviour, not on an empty corpus.
+
+Both restored, all three arms green after.
+
 ## What this ledger does not evidence
 
 The `dead-path carriers` and `install-prefix` legs were not run in isolation for this unit; they are
