@@ -1,6 +1,6 @@
 # TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint
 
-**Status:** SPECCED · rev-1 · 2026-09-04 · node a · Tier-2 · base d0a18683 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-06 · node a · Tier-2 · base d0a18683 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -22,6 +22,15 @@ had.
   `_check_path_suffix`, `_glob_match`, `build_module_index`, `_resolve_relative`, `resolve_import`,
   `check_layer_violation` and `scan_unselective_rules`. Measured at 164 lines by AST spans over the
   file at writing time.
+
+  **FOUR OF THESE MOVED RATHER THAN DIED, and a reader of this deletion is entitled to know it.**
+  `build_module_index`, `_resolve_relative`, `_check_path_suffix` and `resolve_import` — this tree's
+  only AST import resolver — were copied into `tools/codebase-map/map_imports.py` by
+  `TOOL-dTracedLattice-6`, which the owner ratified on 2026-09-05 and which lands BEFORE this unit
+  precisely so the capability survives. `ext_of` is not on the list above and stays here; the
+  codebase-map copy carries its own. So this deletion removes a duplicate rather than a capability,
+  and the arms covering those four are already carried in `tools/codebase-map/selftest.py`. Nothing
+  about this unit's decision changes — the resolver leaves the lexicon kit exactly as specced.
 - **S2** — Remove the `layer` third from the predicate machinery in `run()`: the `WAIVER_FILES` and
   `PIN_KEYS` entries, the `offenders` and `graded` keys, the `tally` and `label` rows, the
   `P3 NOT ARMED` refusal, and the `UNSELECTIVE LAYERS RULE` refusal.
@@ -240,6 +249,10 @@ It also costs no leg churn and no new declaration.
 
 - rev-1 · 2026-09-04 · initial draft, written against `d0a18683` with every figure re-measured on
   this worktree.
+- rev-2 · 2026-09-06 · S1 gains the pointer `TOOL-dTracedLattice-6` S4 requires and its AC4 grades:
+  four of the eight functions were rescued into `tools/codebase-map/map_imports.py` before this
+  deletion, so the reader is not told a capability was removed. Nothing else in this spec changed
+  and this unit's decision is untouched.
 
 ## 10. Reuse audit
 

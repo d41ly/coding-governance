@@ -21,6 +21,12 @@ project specifics live in exactly two files the adopting repo owns.
   `INVENTORY-DERIVATION.md`.
 - `test_codebase_map.template.py` — the gate; copied into the project's existing test dir
   (zero CI changes: a test file is its own deployment). Also runs standalone (`python <file>`).
+- `map_imports.py` — an import target to the repo paths it may DENOTE, by AST: `resolve_import`
+  plus the module index it resolves against, language-branched on the IMPORTER's extension because a
+  dot means different things in Python and JS. Returns CANDIDATE paths; an empty list means external
+  or unresolvable, which is not an error. It resolves import STATEMENTS only — not call sites, not
+  attribute receivers — and counts nothing, so a consumer that reads it as a call graph will be
+  wrong. Rescued from the lexicon kit's P3 predicate ahead of that predicate's deletion.
 - `gen_map.py` — CLI: `--scaffold · --write · --check · --seed-baseline · --seed-affordance-baseline
   · --seed-affordances --top N`.
 - `map_diff.py` — the range digest (`<base>..<head>`), plus `--drop-affordance-exempt` (S4a

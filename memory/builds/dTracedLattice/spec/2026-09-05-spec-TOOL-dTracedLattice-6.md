@@ -1,11 +1,12 @@
 # TOOL-dTracedLattice-6 — the AST import resolver is rescued into codebase-map before P3 deletes it
 
-**Status:** SPECCED · rev-2 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
+**Status:** CLOSED · rev-2 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-06-build-TOOL-dTracedLattice-6-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-dTracedLattice-6-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-7 |
 
 <!-- /gen:spec-records -->
@@ -122,9 +123,10 @@ layer rule, both of which carry recorded corrections earned by earlier defects.
 - risks — the real risk is ordering. If `TOOL-aSurfacedLexicon-2` lands first this unit's subject is
   gone, so S4 is the mitigation and its pointer is the durable half.
 - testing + left-shift gates — the arms that cover `resolve_import` are COPIED alongside it, so
-  the lexicon kit keeps its own until `TOOL-aSurfacedLexicon-2` removes both; AC7's assertion
-  that the moved module imports nothing from `tools/lexicon/` is the new leg, carried by the
-  directional rule S2 preserves, which still refuses what it refused before.
+  the lexicon kit keeps its own until `TOOL-aSurfacedLexicon-2` removes both; AC7's source scan is
+  the new arm, and the AC1 parity arm compares the two copies for as long as both exist and SKIPS
+  LOUDLY once the original is gone, which is the designed end state rather than a hole. S2's
+  directional rule still refuses what it refused before, untouched.
 - migration / rollback — revert deletes the copy and nothing else: per §4 the lexicon kit is
   untouched by this unit, so there is nothing to restore there. The functions become
   irrecoverable only after `TOOL-aSurfacedLexicon-2` S1 lands, which is the whole reason for the
@@ -153,8 +155,11 @@ layer rule, both of which carry recorded corrections earned by earlier defects.
   lands, `lexicon selftest` and `lexicon naming predicates` are GREEN, proving the three live callers
   at `lexicon.py:527`/`:536`/`:595` still reach a resolver. `lexicon selftest` is `subject: kit` in
   `tools/gate-legs.json` and is HELD on a plain bar, so the plain spelling would not exercise this.
-- **AC7** — When the moved module is read, it imports nothing from `tools/lexicon/`, which is the
-  directional rule S2 preserves, asserted by that rule itself.
+- **AC7** — When the moved module is read, it imports nothing from a sibling kit, asserted by a
+  codebase-map selftest arm over the module's own source. NOT by a `LAYERS` rule: the rule that would
+  state this direction runs on predicate P3, which `TOOL-aSurfacedLexicon-2` deletes, so a
+  rule-based assertion would vanish with the thing it was written to outlive — and S2's rule is the
+  opposite direction besides.
 
 ## 7. Gates
 

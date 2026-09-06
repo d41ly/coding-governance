@@ -101,7 +101,7 @@ ids TOOL-aSurfacedLexicon-13 TOOL-aSurfacedLexicon-14 TOOL-aSurfacedLexicon-15 T
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aSurfacedLexicon-1 — the design pass: measure the kit, then design and judge its rebuild](spec/2026-09-04-spec-aSurfacedLexicon-1.md) | 0 | 2 | CLOSED | rev-1 | 2026-09-04 |
-| [TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint](spec/2026-09-04-spec-aSurfacedLexicon-2.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
+| [TOOL-aSurfacedLexicon-2 — delete P3, keep its one real constraint](spec/2026-09-04-spec-aSurfacedLexicon-2.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-06 |
 | [TOOL-aSurfacedLexicon-3 — one corpus walk, two passes, two fewer modes](spec/2026-09-04-spec-aSurfacedLexicon-3.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-4 — the CELLS and PINS declaration grammar](spec/2026-09-04-spec-aSurfacedLexicon-4.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-04 |
 | [TOOL-aSurfacedLexicon-5 — the convention predicate](spec/2026-09-04-spec-aSurfacedLexicon-5.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-04 |
