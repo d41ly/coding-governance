@@ -23,8 +23,8 @@ PROVENANCE. Copied from the lexicon kit's P3 predicate, which is specced for del
 functions below are byte-identical to their originals — with ONE exception, stated because a
 provenance claim nobody can check is worth nothing: the helper spelled `ext_of` there is
 `derive_ext` here. It is COPIED rather than moved (the lexicon kit reads it at eight further sites
-and keeps its own), and `tools/lexicon/lexicon.py` is not an ARMED layer for the naming gate while
-this directory is, so the copy had to satisfy a table the original was never graded against.
+and keeps its own), and the lexicon kit's engine module is not an ARMED layer for the naming gate
+while this directory is, so the copy had to satisfy a table the original was never graded against.
 Behaviour is unchanged and the parity arm compares it. Rescue recorded as `TOOL-dTracedLattice-6`.
 
 This module imports nothing from a sibling kit, and a selftest arm asserts it.
