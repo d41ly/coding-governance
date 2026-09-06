@@ -13,7 +13,7 @@ by filename date — never retrofit them.
 ## SPEC10_CUTOFF — how §10 is phased in
 
 `§10 Reuse audit` is required only for specs whose FILENAME date is on or after `SPEC10_CUTOFF`,
-DECLARED in `.memory-tree.conf` beside the three other cutoffs and shipped at `2026-08-04`. Specs
+DECLARED in `.memory-tree.conf` beside its sibling cutoffs and shipped at `2026-08-04`. Specs
 dated before it keep the nine-section canon, so adopting the reuse audit never retroactively reds
 landed work. Raising it grandfathers more; lowering it is how you ratchet an existing corpus
 forward. It is a merge-bar knob: changing it changes what the gate demands, so change it in a commit

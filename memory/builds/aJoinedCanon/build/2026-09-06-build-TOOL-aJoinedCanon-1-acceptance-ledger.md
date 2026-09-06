@@ -1,6 +1,6 @@
 # aJoinedCanon — acceptance ledger
 
-**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9
+**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10
 
 Node `a`, 2026-09-06, base `274aa39b`. One `**Evidences:**` block per unit, appended as each unit
 lands. Two forms and no third: OBSERVED carries a backticked token naming what made the observation,
@@ -150,6 +150,14 @@ AMENDED names the revision that changed the criterion.
 - AC13 — `python tools/memory-tree/check-arms.py --check` — exits 0, `ARMS_FLOORS` unchanged: the arm reports through the existing `fail 12` and adds no shell call site, and the refusal is a `status=1` rather than a `fail` branch.
 - AC14 — `grep -n '^READINESS_ROWS' .memory-tree.conf tools/memory-tree/.memory-tree.conf.example` — both keys declared in both confs, gov's with eight rows and the example's with ten.
 - AC15 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T20:59:22+03:00`; `last-body-change` unmoved.
+
+**Evidences:** TOOL-aJoinedCanon-10
+
+- AC1 — `grep -c 'three other cutoffs'` — returns 0 in BOTH `memory/TEMPLATE-SPEC.md` and its template, from 1 in each at base, and the sentence keeps its location claim and its shipped value while putting no number in the count's place. Deleting the count rather than correcting it is the whole argument: sibling units of this build each added a cutoff key, so any figure written there would have been stale by the commit that wrote it.
+- AC2 — `grep -c '^SPEC10_CUTOFF=' .memory-tree.conf` — 0 → 1, at `"2026-08-04"`, which makes the location half of that sentence true in this tree as it already was in a fresh adopter's. Behaviour is unchanged: the value equals the checker's own preset, so the forward resolution below the conf source simply stops firing.
+- AC3 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — exits 0 over 4 pairs, so the live copy moved by `--render` rather than by hand.
+- AC4 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-07T00:34:04+03:00`, at or after this unit's watched `.memory-tree.conf` edit. `last-body-change` is the same sha before and after: this unit changes no gate command, entrypoint, layout convention or front-loaded claim, which is the "no delta → no touch" half.
+- AC5 — `bash tools/memory-tree/check-memory-hygiene.sh` — the whole tree exits 0, so declaring the key changed no verdict. That is the point of choosing a value identical to the preset rather than a new one.
 
 ## OWED BEFORE LANDING: the date must be re-derived once more
 
