@@ -101,6 +101,38 @@ control, so they are evidence about a busy node and not a controlled experiment.
 does not depend on them: it is read from source and from one recorded leg duration, and it would hold
 if every spread figure here were wrong. The spread is what made anyone look.
 
-What is NOT observed: a live capture of two bars holding the beacon at once. The before/after fixture
-`TOOL-aQuenchedHarness-8` §2 S6 requires is that observation, and it is owed by the unit rather than
-claimed here.
+## 7. REPRODUCED, and this section replaces the one that said it had not been
+
+The paragraph that stood here said no live capture of two bars holding the beacon existed and that
+the unit owed one. It exists now, and the honest thing is to say what changed rather than to leave a
+disclaimer standing beside its own refutation.
+
+The probe drives `TS_TTL` down through its own documented override, `GATE_TURNSTILE_TTL`, so a
+thirty-minute cliff is observable in seconds. Nothing else is altered: the runner is the shipped
+file, copied unmodified into a scratch repository with its own git common directory, so the real
+beacon is untouched and the CODE PATH under test is the one that ships. A probe that edits the
+mechanism measures the edit.
+
+Fixture: `TS_TTL` 6 s, one leg sleeping 25 s, `GATE_JOBS=1`. Bar A takes the beacon and enters the
+leg. Bar B arrives ten seconds later, while A is alive and working. Observed:
+
+```
+run-gates: reaping the beacon of a stalled holder (heartbeat 13s old, ttl 6s)
+```
+
+Bar B reaped bar A's beacon and ran alongside it. Both exited 0, which is the part that matters: the
+turnstile did not fail loudly, it silently stopped being a turnstile. A's own log records
+`gate queue: waited 0s`, so nothing in either run reports that two bars ran as one.
+
+The ratio in the fixture is 25/6, a little over 4x. In production it is 3837/1800, a little over 2x,
+so the real bar clears the cliff by less — and clears it on every full run.
+
+**The liveness half, said because a probe that cannot produce a negative proves nothing.** The probe
+prints `NO BEACON — A did not take the turnstile; the probe cannot answer and says so` when bar A
+never acquires, and it reports the not-reaped case explicitly rather than falling through to silence.
+Both branches are in the script; only one fired.
+
+The script is `probe-turnstile.sh`, run from this session's scratchpad and deliberately not committed:
+`TOOL-aQuenchedHarness-8` §2 S6 owes a tracked fixture inside
+`tools/run-gates/run-gates.turnstile.test.sh`, and a scratch probe is evidence for writing that arm,
+never a substitute for it.
