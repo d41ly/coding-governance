@@ -97,20 +97,32 @@ def _drop_affordance_exempt(touched: dict[str, list[str]]) -> None:
 # ======================================================================================
 
 
-def _symbols_at_ref(root: Path, ref: str, rel: str) -> list[dict]:
-    """symbols.json rows at a git ref (POSIX rel path), fail-open to [] — a range that predates
-    the SYMBOL tier (or a fresh adoption) simply has no baseline, so nothing reads as reinvented
-    (advisory, never a crash)."""
+def _symbols_at_ref(root: Path, ref: str, rel: str) -> list[dict] | None:
+    """symbols.json rows at a git ref (POSIX rel path), or ``None`` when that ref carries no such
+    file at all.
+
+    THE None IS THE POINT (ABL-bCandidLoupe-2, ported from inCMS). This used to fail open to ``[]``
+    for both the absent file and a present-but-empty one, and ``_converge`` cannot tell those apart
+    from a list: with no baseline no seam reaches the fan-in threshold, so ``collision_flags``
+    printed ``0`` on every range whose base predates the SYMBOL tier. Measured on the adopting repo:
+    ``0`` over a range starting before the tier landed, and ``538`` over a base after it — the
+    signal read cleanest exactly where it could see least, which is the confident-empty-answer class
+    ``map_lib`` names at its own line 162 and ``selftest`` already refuses for the mis-rooted CLI.
+
+    Three states, not two: the ref has the file and it holds rows (a list); the ref has the file and
+    it holds none (an empty list, a real measurement of zero); the ref has no file (``None``, not
+    measurable). Callers decide what to do with the third — they may no longer silently average it
+    into the second."""
     out = subprocess.run(
         ["git", "-C", str(root), "show", f"{ref}:{rel}"],
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     if out.returncode != 0 or not out.stdout.strip():
-        return []
+        return None
     try:
         data = json.loads(out.stdout)
     except json.JSONDecodeError:
-        return []
+        return None
     return data.get("symbols", []) if isinstance(data, dict) else []
 
 
@@ -196,13 +208,20 @@ def _converge(base: str, head: str, files: list[str]) -> int:
     map_dir = m.map_root(root)
     sym_rel = f"{conf['MAP_ROOT']}/generated/symbols.json"
 
-    head_rows = _symbols_at_ref(root, head, sym_rel) or _read_symbols(map_dir / "generated" / "symbols.json")
+    # The HEAD fallback is a DIFFERENT and legitimate path: when the head ref is the checkout, the
+    # working-tree file is the honest answer. Only the committed-ref read can be unmeasurable.
+    head_rows = _symbols_at_ref(root, head, sym_rel)
+    if head_rows is None:
+        head_rows = _read_symbols(map_dir / "generated" / "symbols.json")
     print(f"# map-diff --converge {base}..{head}")
     if not head_rows:
         print("no generated/symbols.json (SYMBOL recall tier not adopted) - nothing to converge.")
         return 0
 
     base_rows = _symbols_at_ref(root, base, sym_rel)
+    base_measurable = base_rows is not None
+    if base_rows is None:
+        base_rows = []
     base_key = {(r["id"], r["kind"], r["file"]) for r in base_rows}
     new_rows = [r for r in head_rows if (r["id"], r["kind"], r["file"]) not in base_key]
 
@@ -223,21 +242,28 @@ def _converge(base: str, head: str, files: list[str]) -> int:
         _by_id.setdefault(r["id"], set()).add(r["file"])
     definers = {k: frozenset(v) for k, v in _by_id.items()}
 
-    flags = m.detect_collisions(
-        new_rows, base_rows, ref_index, range_index,
-        threshold=m.seam_fanin_threshold(root), definers=definers,
-        affordance_seams=affordance_seams,
-    )
-
-    # F7: route each flag to the durable, deduped reinvention backlog — OUTSIDE the worktree.
-    backlog_path = derive_backlog_path(root)
+    # BOTH parents' changes, and they are orthogonal. `main` guards the whole collision pass on
+    # `base_measurable`, because a base carrying no `symbols.json` gives every seam an absent
+    # baseline and a count would be 0 over nothing measured. This branch changed WHAT the pass is
+    # given (`definers`) and WHERE its output goes (outside the worktree). Taking either side alone
+    # loses the other, which is the auto-took class the merge rule names.
+    flags: list[m.CollisionFlag] = []
     added: list[m.CollisionFlag] = []
-    if flags:
-        current = backlog_path.read_text(encoding="utf-8") if backlog_path.is_file() else ""
-        new_text, added = m.append_backlog(current, flags)
-        if added:
-            backlog_path.parent.mkdir(parents=True, exist_ok=True)
-            backlog_path.write_text(new_text, encoding="utf-8", newline="\n")
+    backlog_path = derive_backlog_path(root)
+    if base_measurable:
+        flags = m.detect_collisions(
+            new_rows, base_rows, ref_index, range_index,
+            threshold=m.seam_fanin_threshold(root), definers=definers,
+            affordance_seams=affordance_seams,
+        )
+
+        # F7: route each flag to the durable, deduped reinvention backlog — OUTSIDE the worktree.
+        if flags:
+            current = backlog_path.read_text(encoding="utf-8") if backlog_path.is_file() else ""
+            new_text, added = m.append_backlog(current, flags)
+            if added:
+                backlog_path.parent.mkdir(parents=True, exist_ok=True)
+                backlog_path.write_text(new_text, encoding="utf-8", newline="\n")
 
     # The file this record used to be written to, if a previous release left one behind. NAMED, not
     # deleted: it is the adopter's file, it may hold rows nobody has read, and a tool that silently
@@ -245,7 +271,19 @@ def _converge(base: str, head: str, files: list[str]) -> int:
     legacy = map_dir / "reinvention-backlog.md"
 
     print("# convergence signals (trend to zero = the repo converges); a WARN, never a gate.")
-    print(f"\ncollision_flags: {len(flags)}")
+    if not base_measurable:
+        # NO NUMBER HERE, deliberately. With no baseline every seam is absent from it, so nothing
+        # reaches the fan-in threshold and a count would be 0 over nothing measured — the defect
+        # ABL-bCandidLoupe-2 recorded. The key stays so a reader grepping for it still sees a row;
+        # the VALUE is the status, which is this repo's own instruction about a probe that cannot
+        # measure: say so, rather than print a confident zero.
+        print(
+            f"\ncollision_flags: DEAD PROBE - the base ref carries no {sym_rel}, so there is no "
+            "baseline to resemble and any count would be a number over nothing measured "
+            "(ABL-bCandidLoupe-2). Re-run against a base at or after the SYMBOL tier landed."
+        )
+    else:
+        print(f"\ncollision_flags: {len(flags)}")
     for f in flags:
         print(
             f"- WARN {f.new} [{f.kind}, {f.file}] resembles seam {f.resembles} (fan-in {f.fanin}) "
