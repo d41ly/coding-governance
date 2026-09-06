@@ -1204,5 +1204,19 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 120
+  },
+  {
+    "name": "selftest harness self-test",
+    "argv": [
+      "bash",
+      "tools/lib/lib-selftest.test.sh"
+    ],
+    "guard": [
+      "tools/lib/lib-selftest.sh",
+      "tools/lib/lib-selftest.test.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 370
   }
 ]

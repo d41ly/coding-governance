@@ -91,6 +91,7 @@ run-gates gov canary	repo	selftests
 run-gates turnstile	kit	selftests
 run-gates wiring	repo	wiring
 scratch-guard self-test	kit	selftests
+selftest harness self-test	kit	selftests
 settings-merge selftest	kit	selftests
 spec tokens (a spec's own names resolve)	repo	declarations
 spec-tokens self-test	kit	selftests

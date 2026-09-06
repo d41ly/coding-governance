@@ -1,11 +1,12 @@
 # TOOL-aQuenchedHarness-5 — a self-test harness whose unit of cost is not a process
 
-**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 6
+**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-07-build-TOOL-aQuenchedHarness-5-candidate-test.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-5-candidate-test.md) | research | — |
 | [2026-09-06-prompt-TOOL-aQuenchedHarness-1.md](../prompts/2026-09-06-prompt-TOOL-aQuenchedHarness-1.md) | research | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
@@ -199,6 +200,22 @@ landed.
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-4 · 2026-09-07 · M12 CANDIDATE TEST RUN, and it inverted §8 F1's framing. Traced
+  `tools/check-line-length.test.sh`: 36 s, 18 arms, 31 python spawns in the outer script alone at
+  773 ms each — and `bash -x` cannot see the subject's own 12 python call sites, so the real count is
+  higher. **The dominant term is the SUBJECT'S cost per invocation**, not the harness and not fixture
+  construction, which is three file writes.
+  C3 REJECTED: each arm asks one question about a different staged break, so a batched checker would
+  need to accept N trees — a public surface added to a shipped checker for its own test. C4 REJECTED:
+  the subjects are shell scripts, so in-process means re-implementing them and grading the
+  re-implementation. **C1 REJECTED AS A COST LEVER AND KEPT AS A PREREQUISITE**, which is the finding
+  the test produced and the reasoning had not: `W="$TMP/repo"` is ONE shared fixture that `reset()`
+  mutates in place before every arm, so C2's parallelism is not merely unhelpful without per-arm
+  isolation, it is WRONG — and wrong in the worst way, because the arms would still pass most of the
+  time. F1 had C1 and C2 as alternatives; they compose, in that order.
+  BUILT and verified: 11 arms in `tools/lib/lib-selftest.test.sh`, all green, including the failing
+  case, the isolation property, byte-identical arm lines at width 1 and width 4, a wedged arm that
+  reds without stalling the suite, and an empty population that refuses.
 - rev-3 · 2026-09-06 · folded spec-audit round 2. M3: §4 no longer calls the 469-to-220 reduction
   "the one prior instance" — the `check-pass-order.sh` rebuild is in this build's own base, is larger,
   and is now an input to F1's C1 and C3. M4: C2 may not be decided on a single-shot wall clock on a

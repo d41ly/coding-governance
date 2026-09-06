@@ -70,6 +70,7 @@ run-gates evidence	2250		worst of 12 readings 1500s, x1.5
 run-gates gov canary	60		worst of 11 readings 19s, x1.5
 run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
+selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5
 spec-tokens self-test	130		worst of 6 readings 80s, x1.5
 template size gate selftest	290		worst of 11 readings 190s, x1.5

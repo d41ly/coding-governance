@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: af7814ae8550e416d819bf9193821e95b95e4685
-phase: BUILDING
+witness: e562af95c4de6011b7ebf78d9bd21ac931b930b8
+phase: TESTING
 branch-sha: faaea5f5693deffbb3d2c44dee2453d9e01fa460
 branch-ref: refs/heads/branch/self-test-gates-performance-7e2cf2
 mode: prompt
