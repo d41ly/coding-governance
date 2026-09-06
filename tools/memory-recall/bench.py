@@ -183,10 +183,18 @@ def run_rm3(db: sqlite3.Connection, docs: list[dict], query: str, k: int) -> lis
     seed = run_fts(db, query, RM3_DOCS, False)
     if not seed:
         return []
+    # DETERMINISTIC, and both halves are needed. `set(...)` iterates in an order that depends on
+    # PYTHONHASHSEED, so `Counter.update` saw the terms in a different order every run; and
+    # `most_common` breaks ties on INSERTION order, so that seed reached the selected terms. `rm3`
+    # is a legal `RECALL_FLOOR` substrate, so a project pinned to it got a gate whose verdict moved
+    # between runs on an unchanged tree. Sorting the deduped terms fixes the insertion order, and
+    # the explicit `(-count, term)` key makes the tie-break a stated rule rather than an inherited
+    # one — either alone leaves the other free. `TOOL-dTracedLattice-7`.
     df: Counter = Counter()
     for i in seed:
-        df.update(set(terms(docs[i]["text"])[:400]))
-    extra = [t for t, _ in df.most_common(RM3_TERMS * 3) if t not in set(terms(query))][:RM3_TERMS]
+        df.update(sorted(set(terms(docs[i]["text"])[:400])))
+    ranked = sorted(df.items(), key=lambda kv: (-kv[1], kv[0]))[:RM3_TERMS * 3]
+    extra = [t for t, _ in ranked if t not in set(terms(query))][:RM3_TERMS]
     return run_fts(db, query + " " + " ".join(extra), k, False)
 
 

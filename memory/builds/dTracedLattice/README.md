@@ -76,7 +76,7 @@ defects in the map kit were observed while measuring, none of them about relatio
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 7 unit(s) · node d · opened 2026-09-05 · streams tooling
+**Build status:** CLOSED · 7 unit(s) · node d · opened 2026-09-05 · streams tooling
 ids TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7
 
 <!-- gen:build-units -->
@@ -88,10 +88,10 @@ ids TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTrac
 | [TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory](spec/2026-09-05-spec-TOOL-dTracedLattice-3.md) | 4 | 2 | CLOSED | rev-6 | 2026-09-06 |
 | [TOOL-dTracedLattice-4 — an adopter's frozen gate copy is compared against the template that moved](spec/2026-09-05-spec-TOOL-dTracedLattice-4.md) | 5 | 2 | CLOSED | rev-6 | 2026-09-06 |
 | [TOOL-dTracedLattice-5 — a dark layer is derived from the corpus instead of asserted in prose](spec/2026-09-05-spec-TOOL-dTracedLattice-5.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-06 |
-| [TOOL-dTracedLattice-7 — a merge-bar substrate whose score depends on the hash seed](spec/2026-09-05-spec-TOOL-dTracedLattice-7.md) | 7 | 2 | SPECCED | rev-3 | 2026-09-06 |
+| [TOOL-dTracedLattice-7 — a merge-bar substrate whose score depends on the hash seed](spec/2026-09-05-spec-TOOL-dTracedLattice-7.md) | 7 | 2 | CLOSED | rev-4 | 2026-09-06 |
 <!-- /gen:build-units -->
 
-Records: 23 bound to this build, across 3 record folder(s).
+Records: 24 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

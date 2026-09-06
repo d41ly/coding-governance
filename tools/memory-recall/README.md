@@ -158,7 +158,17 @@ RECALL_FLOOR="records:fts5:r@5>=0.81"
 ```
 
 `fts5` because `query.py` ranks with `bm25(d, 1.0, 1.0, ALIAS_WEIGHT)` and bench's `fts5` is that
-same unweighted expression — the reason is the source, not a score. The value is compared against the
+same unweighted expression — the reason is the source, not a score.
+
+**WHICH SUBSTRATES ARE SEED-STABLE**, because a floor pinned to one that is not is a gate whose
+verdict moves on an unchanged tree, and that is a thing to know when CHOOSING rather than to
+discover from a flaky run. `grep`, `fts5` and `fts5w` were measured byte-identical across
+`PYTHONHASHSEED` values. `rm3` was NOT, until `TOOL-dTracedLattice-7`: it selected its expansion
+terms through `Counter.most_common`, whose ties break on insertion order, and that order came from
+iterating a `set`. It is deterministic now, and `test_recall_floor.py` carries the arm that keeps it
+so — five seeds, one subprocess each, because the interpreter reads that variable at start-up and no
+in-process fixture can vary it. The dense and hybrid substrates are NOT covered by that arm; nobody
+has measured them, and this sentence says so rather than implying they were. The value is compared against the
 CEILING-NORMALISED figure, which reduces exactly to `h/R`: `h` questions that hit, `R` whose targets
 resolve at all.
 

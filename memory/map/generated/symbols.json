@@ -3993,6 +3993,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_rm3_is_seed_stable",
+      "kind": "function",
+      "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
       "id": "test_scaffold_converges",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
