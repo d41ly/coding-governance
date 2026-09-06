@@ -425,17 +425,16 @@ matched its target population.
 - Readable beats dense — brevity comes from OMITTING items, never compressing prose. Banned in work reports: `·`-chains outside micro-formats, parenthetical inventories (parens hold ≤3 items), multi-clause em-dash trains, one paragraph carrying multiple topics. Keep complete sentences, one idea each; >~5 items becomes a short bulleted list; the rest is omitted and lives in the linked doc. Test: a tired reader parses every line in ONE pass.
 - Micro-formats — MANDATORY, byte-stable, greppable shapes for these events; every other rule binds in substance but its formatting is advisory (wit lives in the freeform sentences, never inside).
 - **The grammar, one statement.** A shape is a HEAD, the joiner, and a TAIL. The head is one keyword
-  from the closed set below, with its case fixed per keyword. The joiner ` — ` appears exactly ONCE
-  and nothing but the head precedes it. Tail fields are separated by ` · ` and by nothing else. No
-  parentheses, except markdown-link syntax. No colon as a joiner or a label — a colon survives only
-  glued to a value, as a port. Placeholders are `<lowercase-name>`, and alternation inside one is the
-  ASCII `|`. A trailing field the shape may omit is wrapped in ASCII square brackets, `[ · <field>]`,
-  which is a notation of the DEFINITION and never appears in an emission. Five glyphs are pinned as
-  STRUCTURE: `—` (U+2014) · `·` (U+00B7) · `→` (U+2192) · `⏳` (U+23F3) · `…` (U+2026); the alternation
-  `|` is ASCII and is deliberately NOT one of them. The grammar binds shape SYNTAX and never value
-  BYTES: an opaque field such as `<subject>`, `<why>` or `<step>` keeps whatever characters it has, so
-  the bans do not reach inside one. A deploy-time `{{…}}` token inside a shape is a VALUE, not
-  structure — it is neither required nor forbidden, and it is not part of the keyword set.
+  from the closed set below, with its case fixed per keyword. Tail fields are separated by ` · ` and
+  by nothing else. Placeholders are `<lowercase-name>`, and alternation inside one is the ASCII `|`.
+  A gate holds the block's own syntax; what follows binds EMISSION, which no gate sees. A trailing
+  field the shape may omit is wrapped in ASCII square brackets, `[ · <field>]`, which is a notation
+  of the DEFINITION and never appears in an emission. Five glyphs are pinned as STRUCTURE: `—`
+  (U+2014) · `·` (U+00B7) · `→` (U+2192) · `⏳` (U+23F3) · `…` (U+2026); the alternation `|` is ASCII
+  and is deliberately NOT one of them. The grammar binds shape SYNTAX and never value BYTES: an
+  opaque field such as `<subject>`, `<why>` or `<step>` keeps whatever characters it has, so the
+  bans do not reach inside one. A deploy-time `{{…}}` token inside a shape is a VALUE, not structure
+  — it is neither required nor forbidden, and it is not part of the keyword set.
 - **R1 — an emitted micro-format is a markdown list item.** `- ` at column 0, then the shape's bytes.
   No backticks, no fence, no bold, no heading. Nothing before the marker and nothing after the last
   field, one shape per line. Two reasons, neither of them taste: backticks and fences defeat the
