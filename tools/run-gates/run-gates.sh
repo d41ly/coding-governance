@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.3   # gov:kit run-gates@1.3
+KIT_RUN_GATES_VERSION=1.4   # gov:kit run-gates@1.4
 # 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
 # the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
 # there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
@@ -423,14 +423,27 @@ if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
 fi
 
 # THE TTL IS DERIVED, never a wall clock copied out of a timing cache. What has to be outlasted is
-# the gap between two heartbeat refreshes, and S4 refreshes at one site: a leg COMPLETING. So the
-# bound is "how long can one leg take", and the runner already has a declared answer for that when
-# the selected profile row sets one — `timeout=<s>`. When it does not, no number here is derivable
-# from anything, and the fallback is deliberately large and says so.
+# the gap between two heartbeat refreshes — and since TOOL-aQuenchedHarness-8 that gap is
+# `TS_TICK_EVERY`, a TIMER, not "how long can one leg take". The distinction is the whole unit:
+# liveness is a property of the PROCESS and is cheap to assert often; progress is a property of the
+# WORK and is what the per-leg ceiling and the whole-bar wall are for. The reaper wants the first.
 #
-# ponytail: a single leg longer than TS_TTL with no per-leg deadline configured is reaped mid-run.
-# That is the named ceiling of the fallback, and the fix is to set `timeout=` on the profile row
-# rather than to raise this constant — a bigger fallback only moves the same cliff further out.
+# WHAT THIS REPLACED, recorded because the cliff was real and measured. `ts_hb` used to be called at
+# exactly ONE site — a leg COMPLETING — so the TTL had to outlast a whole leg. Every shipped profile
+# row sets `timeout=0`, so every real run used the 1800 s fallback, while the longest recorded leg
+# was 3837 s. A bar therefore went stale mid-leg on every full run, the next bar reaped its beacon as
+# "stalled", and both ran. Reproduced in a scratch repo with this file unmodified: bar B printed
+# `reaping the beacon of a stalled holder (heartbeat 13s old, ttl 6s)` while bar A was alive and
+# working, and both exited 0. The old note here said the fix was to set `timeout=` on a profile row;
+# it is not, because that value would have to exceed the longest leg, which puts TS_TTL at three
+# times it and TS_MAXWAIT — a declared TS_TTL * 4 — near thirteen hours.
+#
+# A BACKGROUND TICKER WAS REJECTED ONCE, in `memory/builds/aPacedTurnstile/spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md`,
+# on two premises. The second — "a leg-sized TTL makes it unnecessary" — is refuted by the two
+# numbers above. The first — one more process on a spawn-bound machine — survives and is PRICED: at
+# `TS_TTL / 6` a 4000 s bar ticks about 13 times, two spawns each, at the 319 ms per-spawn cost
+# measured on node `a`; roughly 8 s against a bar that makes tens of thousands. That is the
+# supersession `AGENTS.md` §6 requires, written where the reversal happens.
 if [ "${PROF_TIMEOUT:-0}" -gt 0 ]; then TS_TTL=$(( PROF_TIMEOUT * 3 ))
 else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
 # The bounded wait is a DECLARED MULTIPLE OF THE TTL, so it moves with the one number this unit
@@ -439,6 +452,11 @@ else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
 # releases within an hour.
 TS_MAXWAIT=$(( TS_TTL * 4 ))
 TS_TICK=${GATE_TURNSTILE_TICK:-2}
+# The heartbeat cadence is DERIVED from the TTL and declared nowhere else, so the pair cannot drift —
+# the same rule TS_MAXWAIT above already follows. Six, so a single missed tick cannot trip the reap.
+TS_TICK_EVERY=$(( TS_TTL / 6 )); [ "$TS_TICK_EVERY" -ge 1 ] || TS_TICK_EVERY=1
+TS_TICK_PID=""
+TS_TICK_LIVE=0
 
 ts_now()  { date +%s; }
 ts_hb()   { [ -n "$TS_DIR" ] && printf '%s' "$(ts_now)" > "$TS_DIR/heartbeat.tmp" 2>/dev/null && mv -f "$TS_DIR/heartbeat.tmp" "$TS_DIR/heartbeat" 2>/dev/null || true; }
@@ -454,6 +472,58 @@ ts_release() {
   TS_DIR=""
 }
 ts_drop_ticket() { [ -n "$TS_TICKET" ] && rm -f "$TS_TICKET" 2>/dev/null; TS_TICKET=""; }
+
+# THE HEARTBEAT TICKER. TOOL-aQuenchedHarness-8. Three properties, and each one is a defect this
+# would otherwise have introduced — none of them is decoration:
+#
+# 1. DETACHED FROM JOB CONTROL. The turnstile block and the dispatch pool are the SAME shell (see the
+#    dispatch comment below: one shell owns every worker so it can block on `wait -n`). An undetached
+#    ticker is a live job FOREVER: `live()` counts it, `GATE_JOBS=1` never satisfies
+#    `[ "$(live)" -lt "$JOBS" ]`, and the terminal `wait` never returns. The unit that exists to stop
+#    the bar wedging would wedge every bar, starting with the documented serial rollback. Hence
+#    `disown`, and hence the arm that runs a two-leg fixture bar at GATE_JOBS=1 under an outer bound.
+#
+# 2. NONCE-GUARDED, exactly as `ts_release` above is, and for the same reason one level along. No
+#    trap runs on SIGKILL, and `TS_DIR_C` is a CONSTANT path every later bar recreates — so a killed
+#    holder's orphan would refresh its SUCCESSOR's heartbeat forever, disabling the stale-holder
+#    signal repo-wide. That converts a recoverable wedge into a permanent one, which is strictly
+#    worse than the defect this ticker fixes.
+#
+# 3. PID-CHECKED as well, because the nonce catches a beacon that was replaced and not a holder that
+#    simply died before anything replaced it. Two independent exits, mirroring `ts_try_reap`'s own
+#    two-signal design.
+#
+# The tick is `sleep` then a guarded write, never a write then a sleep: a ticker that writes once
+# before checking anything is a ticker that can refresh a beacon it never owned.
+ts_tick_start() {
+  [ -n "$TS_DIR" ] || return 0
+  local _hp=$$ _d=$TS_DIR _n=$TS_NONCE _every=$TS_TICK_EVERY
+  (
+    while :; do
+      sleep "$_every"
+      [ "$(cat "$_d/nonce" 2>/dev/null)" = "$_n" ] || exit 0
+      kill -0 "$_hp" 2>/dev/null || exit 0
+      printf '%s' "$(ts_now)" > "$_d/heartbeat.tmp" 2>/dev/null \
+        && mv -f "$_d/heartbeat.tmp" "$_d/heartbeat" 2>/dev/null || true
+    done
+  ) &
+  TS_TICK_PID=$!
+  disown "$TS_TICK_PID" 2>/dev/null || true
+  if ts_alive "$TS_TICK_PID"; then
+    TS_TICK_LIVE=1
+  else
+    TS_TICK_PID=""
+    # DEGRADED IS ANNOUNCED. A reaper reading a heartbeat nothing writes is not a reaper, and a run
+    # that proceeds silently under an unrefreshed bound is indistinguishable from one that is fine.
+    echo "run-gates: NOTE - the turnstile heartbeat ticker did not start, so this run's beacon is refreshed only when a leg completes and a leg longer than ${TS_TTL}s can be reaped mid-run" >&2
+  fi
+}
+
+ts_tick_stop() {
+  [ -n "$TS_TICK_PID" ] || return 0
+  kill "$TS_TICK_PID" 2>/dev/null || true
+  TS_TICK_PID=""; TS_TICK_LIVE=0
+}
 
 # Reap a holder that cannot still be holding. TWO independent signals, because each covers a case the
 # other cannot: a dead PID is immediate and certain, and a stale heartbeat catches the holder whose
@@ -612,6 +682,9 @@ if [ -n "$TS_COMMON" ]; then
       printf '%s' "$$"        > "$TS_DIR/pid" 2>/dev/null || true
       printf '%s' "$TS_NONCE" > "$TS_DIR/nonce" 2>/dev/null || true
       TS_HELD=1
+      # STARTED HERE, after the nonce exists and before the traps below, because the ticker's first
+      # act is to compare that nonce. Started earlier it would have nothing to compare against.
+      ts_tick_start
       # THE RELEASE TRAP GOES ON HERE, at the instant the beacon becomes ours, and not with the
       # scratch-dir trap further down. Everything between this line and there — the manifest
       # parse, the fingerprint, the whole run-record setup — is time during which the beacon is
@@ -630,10 +703,15 @@ if [ -n "$TS_COMMON" ]; then
       # lock it had just given away, and running the whole bar unqueued beside whoever claimed
       # next. That is the two-bar condition this unit exists to prevent, arriving through its own
       # cleanup path, which is the same shape the nonce guard was written for.
-      trap 'ts_release; ts_drop_ticket' EXIT
-      trap 'ts_release; ts_drop_ticket; exit 130' INT
-      trap 'ts_release; ts_drop_ticket; exit 143' TERM
-      trap 'ts_release; ts_drop_ticket; exit 129' HUP
+      # `ts_tick_stop` FIRST in every handler: the ticker must stop before the beacon it refreshes
+      # is removed, or a tick can land between the two and recreate a heartbeat inside a directory
+      # this run has just given up. It is a belt over the nonce guard's braces, and it costs one
+      # signal. These handlers do NOT cover SIGKILL — nothing does — which is why the guards inside
+      # the ticker are the real mitigation and this line is only the tidy path.
+      trap 'ts_tick_stop; ts_release; ts_drop_ticket' EXIT
+      trap 'ts_tick_stop; ts_release; ts_drop_ticket; exit 130' INT
+      trap 'ts_tick_stop; ts_release; ts_drop_ticket; exit 143' TERM
+      trap 'ts_tick_stop; ts_release; ts_drop_ticket; exit 129' HUP
       # S4 (TOOL-aShardedFloor-1), and the GUARD is the whole of it. `TS_WAITED` is refreshed at
       # the BOTTOM of this loop and this path breaks above it, so a contended acquire records the
       # previous tick's value and understates the wait by up to one `TS_TICK`.

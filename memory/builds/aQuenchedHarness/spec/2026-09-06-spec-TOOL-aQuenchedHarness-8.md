@@ -1,11 +1,12 @@
 # TOOL-aQuenchedHarness-8 — the turnstile stops reaping a live holder, so two bars stop running as one
 
-**Status:** OPEN · rev-2 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 1
+**Status:** INPROGRESS · rev-2 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-06-build-TOOL-aQuenchedHarness-8-ticker-landed.md](../build/2026-09-06-build-TOOL-aQuenchedHarness-8-ticker-landed.md) | journal | — |
 | [2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md](../build/2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md) | research | TOOL-aQuenchedHarness-2 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 

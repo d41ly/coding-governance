@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-3 — a self-test never reaches an adopter, as a leg or as a file
 
-**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 3
+**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -14,192 +14,183 @@
 
 ## 1. Goal
 
-Stop shipping this repo's kit self-tests into adopter repositories. Enumerated at HEAD rather than
-described: the kit descriptors carry **52** `[[gate_leg]]` rows, **27** of which name a leg whose row
-in `tools/gate-legs.json` satisfies the runner's hold predicate, `subject == kit OR chunk ==
-selftests`. `govkit`'s apply copies all 52 into a target's manifest, because `chunk` reaches no
-adopter manifest and the apply path never opens gov's own. An adopter therefore runs 27 suites that
-grade kit source they never edit, on every bar.
+Stop shipping this repo's kit self-tests into adopter repositories, as bar legs or as files. The leg
+half is far smaller than every prior revision of this spec claimed, and the file half is untouched by
+anything: `tools/run-gates/kit.toml` and its siblings claim `include = "**"`, so every `*.test.sh`,
+`test_*.py` and `selftest.py` lands in an adopter tree on install.
 
 ## 2. Scope (IN)
 
-- **S1** — ONE helper, in `tools/govkit/govkit.py`, that reads `tools/gate-legs.json` and returns the
-  two name-keyed maps `subject` and `chunk`. Both `selfcheck` and `_cmd_apply` call it, so the hold
-  predicate has ONE spelling. Rev-2 said the apply path could read maps `selfcheck` already builds;
-  it cannot — they are locals of `selfcheck`, and `_cmd_apply` (`:4258`) reads `subject` off the
-  DESCRIPTOR and never opens the manifest at all.
-- **S2** — at APPLY time, a descriptor `[[gate_leg]]` row whose gov-manifest twin satisfies the hold
-  predicate is DROPPED. The 27 rows §1 enumerates are that set today.
-- **S3** — at APPLY time, a descriptor row naming a leg the gov manifest does not carry is a REFUSAL,
-  not a shipped row. `selfcheck` already refuses this, but a selfcheck-time property does not bind an
-  apply run, and rev-2 asserted a guarantee from the wrong verb. At HEAD the set is empty, which is
-  why the arm staging one is mandatory rather than optional.
-- **S4** — the self-test FILES are withheld by the mechanism the tree ALREADY uses: a second
-  `[[files]]` rule claiming the self-test paths with `role = "project-owned"`, exactly as
-  `tools/run-gates/kit.toml` already withholds `run-gates.gov.test.sh`. Rev-2 said "drop the claim",
-  which is not an operation `govkit` offers and which states the contract backwards: an unclaimed path
-  is not withheld, it is unowned.
-- **S5** — **THE TWO HALVES ARE JOINED: no emitted leg's argv may name a file the emit does not
-  ship.** Enumerated at HEAD: of the 25 rows that keep shipping, exactly three name a `.test.sh` —
-  `kit/dogfood doc parity` and `marker contracts` (`tools/memory-tree/kit.toml`) and
-  `review-protocol parity (kit vs dogfood)` (`tools/workflows/kit.toml`). All three are
-  `subject = repo` checks an adopter SHOULD run, so their files KEEP SHIPPING and S4's
-  `project-owned` rule must not claim them. That is the disposition, decided by enumeration.
-- **S6** — the apply REPORTS what it withheld, per target: every leg by name and every file by path,
-  with a withheld count of zero printed as a zero rather than as silence.
-- **S7** — a gate leg asserting THREE properties over a freshly emitted fixture target: no emitted leg's
-  gov twin satisfies the hold predicate; no emitted leg's argv names a file the target did not
-  receive (S5's join); and the emitted leg count is strictly less than 52, so a filter that drops
-  nothing cannot report clean.
-- **S8** — `tools/run-gates/run-gates.sh` is NOT touched. The local hold predicate, the set of legs it
-  holds, and `GATE_SELFTESTS` are all exactly as they are today.
-- **S9** — arms staging: a descriptor leg whose twin is `subject = kit`; one whose twin is
-  `chunk = selftests`; one whose twin is neither; one naming a leg the gov manifest does not carry;
-  a `project-owned` file rule; and an emitted manifest hand-edited to contain a held leg.
+- **S1** — each kit descriptor gains a `[[files]]` rule claiming its own self-test paths with
+  `role = "project-owned"`, so the deployer withholds them. `tools/run-gates/kit.toml` already does
+  exactly this for `run-gates.gov.test.sh`, with its reason beside it; this extends that rule to the
+  rest and gives each one a reason of its own.
+- **S2** — THE LEG HALF FALLS OUT OF S1 AND NEEDS NO CODE. `silenced_legs` already refuses to emit a
+  leg whose argv names a path the target does not hold, and `_cmd_apply` already reports each one
+  rather than shipping it. Withholding a self-test FILE therefore silences its LEG through machinery
+  that exists, is tested, and is documented in that function's own docstring. Prior revisions of this
+  spec proposed a manifest read, a shared helper and a filename predicate; none is needed.
+- **S3** — a gate leg asserting the property over a freshly emitted fixture target, in BOTH
+  directions: no emitted leg's argv names a self-test path, AND the emitted leg count is strictly
+  less than the descriptor row count, so a rule that withholds nothing cannot report clean.
+- **S4** — `tools/run-gates/run-gates.sh` is NOT touched, and neither is `tools/govkit/govkit.py`.
+  The local hold predicate, the set of legs the bar holds, and `GATE_SELFTESTS` are exactly as today.
+- **S5** — arms staging: a descriptor whose self-test file is claimed `project-owned`, asserting the
+  file is absent from the target and its leg is absent from the emitted manifest and NAMED in the
+  report; and a descriptor where the claim is removed, asserting both come back.
 
 ## 3. Non-goals (OUT)
 
-- Not adding `chunk` to the descriptor schema. `TOOL-aScouredKit-27` records why that is a
-  five-declaration act against a PINNED key set the `run-gates canary` asserts. S1 makes it
-  unnecessary rather than doing it.
-- Not deriving anything from a filename. Rev-1 did, and the measurement is why it is gone: that
-  predicate selects 53 of 94 legs and four of them are `subject = repo` on purpose, one being the
-  codebase-map coverage gate `AGENTS.md` §5 and §7 forbid exempting.
-- Not withholding the three `subject = repo` test files S5 names. They belong to checks an adopter
-  runs.
-- Not changing which legs run in THIS repo. S8 states it and AC6 measures it as an EQUALITY.
-- Not the on-demand runner, which is `TOOL-aQuenchedHarness-4`.
+- Not adding `chunk` to the descriptor schema, and no longer needing to. `TOOL-aScouredKit-27` scopes
+  that as a five-declaration act; S2 removes the reason to attempt it.
+- Not withholding the three `subject = repo` test files whose legs an adopter SHOULD run —
+  `kit-dogfood-parity.test.sh`, `marker-contract.test.sh` and `check-protocol-parity.test.sh`. Their
+  legs are `subject = repo, chunk = declarations`, they are graded on the ADOPTER's tree, and S1's
+  rules must not claim them. This is the disposition, decided by enumeration.
+- Not changing which legs run in THIS repo. S4 states it and AC5 measures it as an EQUALITY.
 - Not removing an adopter's ability to obtain the withheld suites. They are in the public repository
-  and S4's rule records where; what stops is the automatic copy and the bar leg.
+  and each `project-owned` rule records that.
+- Not the on-demand runner, which is `TOOL-aQuenchedHarness-4`.
 
 ## 4. Design
 
-### Data model
+### What is actually true at HEAD, enumerated
 
-No new key. The fields that decide are `subject` and `chunk` in `tools/gate-legs.json`, and the
-withholding marker is `role = "project-owned"`, which `tools/run-gates/kit.toml` already uses. What is
-NEW, and rev-2 wrongly denied, is one shared reader: `_cmd_apply` does not open the manifest today, so
-the predicate cannot be evaluated there without one. S1 makes it a single helper rather than a second
-spelling, which is §12's single-source rule applied to the thing this build keeps citing.
+Every prior revision of this spec described this population and got it wrong. Measured:
 
-### Rollout
+| fact | count |
+|---|---|
+| `[[gate_leg]]` rows across `tools/*/kit.toml` | 52 |
+| of those, held in gov by `subject == kit OR chunk == selftests` | 27 |
+| held via `subject == kit`, which the apply DOES emit, so an adopter's runner holds them too | 26 |
+| held via `chunk == selftests` alone, so the hold does NOT travel | 1 |
 
-An adopter's next apply produces a manifest with 25 rows instead of 52 and a file set without the
-withheld suites. Nothing in their tree breaks: the removed legs graded files they do not edit, files
-already on disk are not deleted by an apply, and S5's join guarantees no surviving leg names a file
-they no longer receive.
+The one is `run-gates canary`. `subject` already travels — `_cmd_apply` emits it under
+`check_target_reads_subject`, with a comment naming this exact defect as the reason — so 26 of the 27
+are already held on an adopter's bar today.
+
+**`TOOL-aScouredKit-27` is therefore STALE and this unit says so rather than inheriting it.** That row
+names three legs reaching an adopter unheld: `push-main self-test`, `pre-push self-test` and
+`run-gates canary`. The first two are `subject = repo, chunk = selftests` in gov but appear in NO
+descriptor `[[gate_leg]]` row, so they reach no adopter manifest at all. Only the third is live.
+
+### The mechanism, which is a declaration and not code
+
+`silenced_legs` asks of every leg's argv whether the target holds the path it names, and
+`_cmd_apply` drops and REPORTS the ones it does not. So withholding a file withholds its leg, and the
+single leaking leg closes as a side effect of the file rule rather than through a predicate anybody
+has to keep in step with `run-gates.sh`. One mechanism, already tested, already documented.
 
 ### Inventory
 
-- `read_leg_holds` — the shared helper returning the two name-keyed maps; named for what it reads.
+- One `[[files]]` rule per kit that ships self-tests, `role = "project-owned"`, each carrying its own
+  reason line.
 - `no self-test reaches an adopter` — the new gate leg's name in `tools/gate-legs.json`.
 
 ### Files touched (estimate)
 
-`tools/govkit/govkit.py` · every `tools/*/kit.toml` gaining a `project-owned` files rule ·
-`tools/gate-legs.json` · `tools/govkit/selftest.py` · `WIRE-INTO-PROJECT.md`.
+Every `tools/*/kit.toml` that ships a self-test · `tools/gate-legs.json` · `tools/govkit/selftest.py`
+· `WIRE-INTO-PROJECT.md`. **No change to `tools/govkit/govkit.py`.**
 
 ### Alternatives rejected
 
-**A filename-derived predicate** — rev-1's design — rejected by measurement: 53 of 94 legs selected,
-four repository checks held off every bar. It also re-decides by filename the population
-`run-gates.sh:875-885` records as decided by what a FAILURE MEANS, which `TOOL-dUnstalledConvoy-30`
-says "decided four legs wrongly" the last time it was tried.
+**A filename-derived predicate** (rev-1) — measured to select 53 of 94 legs and hold four repository
+checks off every bar, one of them the codebase-map coverage gate the charter forbids exempting.
 
-**Reusing `selfcheck`'s maps from the apply path** — rev-2's design — rejected because they are
-locals of a different verb and the apply path never opens the manifest.
+**Reusing `selfcheck`'s manifest maps from the apply path** (rev-2) — they are locals of another verb
+and the apply path never opens the manifest.
 
-**Dropping the `[[files]]` claim** — rev-2's design — rejected because it is not an operation the
-deployer offers, and because an unclaimed path is unowned rather than withheld.
+**A new shared manifest reader in the apply path** (rev-3) — correct as an implementation and
+UNNECESSARY as a design: S2's existing machinery closes the same gap with no new code, and the
+smaller change is the one that cannot drift from `run-gates.sh`.
 
 ## 5. Production-readiness checklist
 
-- security — an adopter receiving fewer executable legs and fewer executable files is a narrowing.
-  S5's join is what stops the narrowing producing a manifest that points at nothing.
-- perf / scale — one manifest read per apply, two dictionary lookups per descriptor leg.
+- security — an adopter receiving fewer executable files and fewer legs is a narrowing. No new path
+  executes anything new, and no deployer code changes.
+- perf / scale — none: a `[[files]]` rule is read where the others already are.
 - a11y — N/A.
 - i18n — N/A.
-- error / empty / loading states — a descriptor leg with no manifest twin REFUSES at apply time (S3);
-  a withheld count of zero is printed as zero; an unreadable manifest fails rather than shipping
-  everything.
-- observability — S6's per-target report, both counts and both name lists.
-- risks — a false positive now requires a leg to be MIS-DECLARED in `tools/gate-legs.json`, which the
-  `run-gates canary` and `govkit selfcheck` already grade. The residual risk is a leg correctly held
-  here that an adopter wants; S4's rule records where to get it.
-- testing + left-shift gates — S9's arms, each observed RED before landing, plus S7's three-property
+- error / empty / loading states — a withheld leg is REPORTED by the existing `_silenced_found` path,
+  named rather than silently absent; a rule claiming a path no kit holds is a descriptor defect
+  `govkit selfcheck` already grades.
+- observability — the apply's existing silenced-leg report, which now names the withheld self-tests.
+- risks — OVER-REACH is the hazard: a rule that claims one of §3's three `subject = repo` test files
+  would silence a leg an adopter needs. AC4 asserts those three files are still present in a fixture
+  target, which is the direction that catches it.
+- testing + left-shift gates — S5's arms, each observed RED before landing, plus S3's both-direction
   leg.
-- migration / rollback — reverting the helper call sites restores today's apply. No adopter state is
-  written that needs undoing.
+- migration / rollback — removing a `[[files]]` rule restores today's install. Files already on an
+  adopter's disk are not deleted by an apply.
 - user docs — `WIRE-INTO-PROJECT.md` gains one sentence on what adopters no longer receive and where
   the withheld suites live.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `govkit` applies to a fixture target, the emitted manifest carries 25 rows against
-  gov's 52, and no emitted row's gov twin satisfies `subject == kit OR chunk == selftests`.
-- **AC2** — When a descriptor names a leg `tools/gate-legs.json` does not carry, the apply REFUSES
-  naming it, rather than shipping the row.
-- **AC3** — When the manifest `govkit` emits is checked against the emitted file set, no leg's argv
-  names a file the target did not receive — S5's join, asserted over a real fixture emit.
-- **AC4** — When the three `subject = repo` rows S5 names are examined in a fixture target, their
-  `.test.sh` files ARE present, so the withholding did not over-reach.
-- **AC5** — When the filter is made vacuous, the arm in `tools/govkit/selftest.py` reds, because the
-  emitted leg count is not less than 52.
-- **AC6** — When `bash tools/run-gates/run-gates.sh` runs without `GATE_SELFTESTS`, the set of legs it
+- **AC1** — When `govkit` applies to a fixture target, no `*.test.sh`, `test_*.py` or `selftest.py`
+  claimed `project-owned` is present in the target.
+- **AC2** — When that same `govkit apply` runs, the emitted manifest carries no leg whose argv names
+  one of those withheld paths, and each such leg is NAMED in the `silenced_legs` report rather than
+  silently absent.
+- **AC3** — When the emitted leg count is compared with the `[[gate_leg]]` row count across
+  `tools/*/kit.toml`, it is strictly smaller, so a set of rules that withholds nothing cannot report
+  clean.
+- **AC4** — When a fixture target is inspected, `kit-dogfood-parity.test.sh`,
+  `marker-contract.test.sh` and `check-protocol-parity.test.sh` ARE present and their legs ARE
+  emitted — the over-reach direction.
+- **AC5** — When `bash tools/run-gates/run-gates.sh` runs without `GATE_SELFTESTS`, the set of legs it
   holds is EQUAL to today's set, compared name-for-name against a set captured before the change.
-- **AC7** — When `govkit selfcheck` runs after the descriptors gain their `project-owned` rules, it is
-  green. It carries no guard and runs on every bar, so this unit's first commit is where a broken
-  descriptor would otherwise be discovered.
+- **AC6** — When a `project-owned` rule is removed from one descriptor, that kit's self-test file and
+  its leg both return to the fixture target — the guard's own failing case, observed before landing.
 
 ## 7. Gates
 
 `bash tools/run-gates/run-gates.sh` · the new `no self-test reaches an adopter` leg ·
 `govkit selfcheck`, which carries no guard and runs on every bar · `govkit acceptance matrix` and
-`govkit refusal join`, which run when their `tools/govkit/` guard fires, as this unit's edits make it
-· `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for `govkit selftest` and the
-`run-gates canary` at the Definition of Done.
+`govkit refusal join`, which run when their `tools/govkit/` guard fires · `kit version markers` and
+the descriptor-shape legs, which grade every `kit.toml` this unit edits ·
+`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` for `govkit selftest` at the Definition of Done.
 
 ## 8. Open questions
 
-- **F1 — the owner's own either/or.** RESOLVED (agent, 2026-09-06, delegated), revised at rev-2 and
-  unchanged at rev-3: take the FIRST clause. Neither the held legs nor their files ship. The owner's
-  own sentence gives the reason — "adopters do not need to modify this kit, so self-checks are not
-  required there" — and rev-1's middle position created a suite that sources a library an adopter's
-  tree cannot contain.
-- **F2 — how is a file withheld?** RESOLVED (agent, 2026-09-06, delegated), CORRECTED at rev-3: with
-  a `[[files]]` rule carrying `role = "project-owned"`. Rev-2 said no marker was needed and that an
-  unclaimed file is not copied; that states the contract backwards, and the marker it argued away
-  already exists and is already used in this tree.
+- **F1 — the owner's own either/or.** RESOLVED (agent, 2026-09-06, delegated): take the FIRST clause,
+  and note that the SECOND is very nearly true already. 26 of the 27 held legs are held on an
+  adopter's bar today because `subject` travels; withholding the files closes the twenty-seventh and
+  satisfies the first clause at the same time, with one mechanism.
+- **F2 — how is a file withheld?** RESOLVED (agent, 2026-09-06, delegated): `role = "project-owned"`
+  on a `[[files]]` rule, the marker `tools/run-gates/kit.toml` already uses for
+  `run-gates.gov.test.sh`.
 - **F3 — do the three shipping `subject = repo` test files stay?** RESOLVED (agent, 2026-09-06,
-  delegated): yes, enumerated in S5. They belong to checks an adopter runs, so withholding their
-  files would break legs the emit deliberately keeps.
+  delegated): yes, enumerated in §3. Their legs are graded on the adopter's own tree.
+- **F4 — is `TOOL-aScouredKit-27` closed by this unit?** RESOLVED (agent, 2026-09-06, delegated):
+  partly, and the wrap-up says which part. One of its three named legs is live and this unit closes
+  it; the other two reach no adopter manifest, so that half of the row is stale and is corrected in
+  place rather than silently inherited.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
-- rev-2 · 2026-09-06 · folded spec-audit round 1: the filename predicate removed (B1), the
-  shared-reader claim withdrawn (B6), the files stopped shipping (B3), §7's guard claim corrected
-  (U1), AC5 changed from superset to equality.
-- rev-3 · 2026-09-06 · folded spec-audit round 2, which found three blockers in rev-2's own fold text.
-  B4: `manifest_subject`/`manifest_chunk` are locals of `selfcheck` and `_cmd_apply` never opens the
-  manifest, so S1 now adds ONE shared helper both verbs call, and S3 makes the missing-twin refusal an
-  apply-time property rather than one borrowed from another verb. B5: "drop the file claim" is not an
-  operation `govkit` offers and F2 stated the contract backwards; S4 uses `role = "project-owned"`,
-  the marker `tools/run-gates/kit.toml` already uses. B6: S5 joins the two halves and enumerates the
-  three `subject = repo` rows whose files must keep shipping. §1's population is now ENUMERATED — 52
-  descriptor rows, 27 held — where rev-2 carried a stale "thirty".
+- rev-2 · 2026-09-06 · folded spec-audit round 1: the filename predicate removed, the shared-reader
+  claim withdrawn, the files stopped shipping, §7's guard claim corrected.
+- rev-3 · 2026-09-06 · folded spec-audit round 2: the apply path shown never to open the manifest, the
+  `project-owned` marker adopted, the two halves joined, the population stated as 52/27.
+- rev-4 · 2026-09-06 · ENUMERATED before coding, per M2's "to diverge, change the spec first", and the
+  unit collapsed. Of the 27 held descriptor rows, 26 are held via `subject`, which the apply already
+  emits — so exactly ONE leg leaks, `run-gates canary`. And `silenced_legs` already drops a leg whose
+  argv names a path the target lacks, so withholding the FILES withholds the legs with no deployer
+  code at all. Rev-3's shared manifest helper is correct and unnecessary; it is now a rejected
+  alternative. `TOOL-aScouredKit-27` is recorded as two-thirds stale rather than inherited.
 
 ## 10. Reuse audit
 
-The seam is `tools/govkit/govkit.py`'s apply path and the `[[files]]` role vocabulary the tree already
-uses — `role = "project-owned"` in `tools/run-gates/kit.toml`, which withholds
-`run-gates.gov.test.sh` today and is the exact precedent S4 follows. What rev-2 got wrong and the
-round-2 audit corrected is that the manifest maps live in `selfcheck` and not in the apply path, so
-this unit DOES add one reader, declared as a single shared helper rather than a second spelling.
-`tools/codebase-map/reuse_lookup.py` returned `registry.toml` [govkit] and
-`KITDIR`/`ROOTN`/`KITREL`/`LEGS_FILE` [run-gates] as the affordance seams. `TOOL-aScouredKit-27`
-scopes the gap and its warning is why the descriptor-key route stays rejected;
-`TOOL-dUnstalledConvoy-30` is why the filename route stays rejected.
+The seam is the `[[files]]` role vocabulary the tree already uses — `role = "project-owned"` in
+`tools/run-gates/kit.toml`, withholding `run-gates.gov.test.sh` today with its reason beside it — and
+`silenced_legs` in `tools/govkit/govkit.py`, whose docstring states that it exists to stop gov handing
+an adopter a leg naming a file gov never ships. Those two together are the whole unit; the code was
+already written by `DEPL-dCarriedReceipt-6` and this unit supplies the declarations that make it fire.
+`tools/codebase-map/reuse_lookup.py` returned `registry.toml` [govkit] as the affordance seam. The
+prior record `TOOL-aScouredKit-27` was read in full and is corrected in §4 rather than cited as
+current.
 
 Recall terms used: `govkit apply emit descriptor gate_leg files role project-owned adopter manifest
 subject chunk hold withhold`

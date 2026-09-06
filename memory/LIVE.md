@@ -18,7 +18,7 @@ terminal status. Nothing here is edited by hand.
 | [aPacedTurnstile](builds/aPacedTurnstile/README.md) | SPECCED | a | 2026-08-18 | tooling | 16 |
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
-| [aQuenchedHarness](builds/aQuenchedHarness/README.md) | OPEN | a | 2026-09-06 | tooling | 8 |
+| [aQuenchedHarness](builds/aQuenchedHarness/README.md) | INPROGRESS | a | 2026-09-06 | tooling | 8 |
 | [aSurfacedLexicon](builds/aSurfacedLexicon/README.md) | SPECCED | a | 2026-09-04 | tooling | 23 |
 | [aTetheredScratch](builds/aTetheredScratch/README.md) | INPROGRESS | a | 2026-08-20 | tooling | 4 |
 | [aTunedCompass](builds/aTunedCompass/README.md) | BLOCKED | a | 2026-09-04 | tooling | 11 |

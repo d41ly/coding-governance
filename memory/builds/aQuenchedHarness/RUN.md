@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: c3eee6ee9fdf1a200c65b04a110614baf7b9c48d
-phase: REVIEWING
+witness: b91a206a7934514aa3dfa75fad703f6a9da4f65c
+phase: BUILDING
 branch-sha: faaea5f5693deffbb3d2c44dee2453d9e01fa460
 branch-ref: refs/heads/branch/self-test-gates-performance-7e2cf2
 mode: prompt
@@ -28,3 +28,5 @@ base: faaea5f5693deffbb3d2c44dee2453d9e01fa460
 2026-09-06T14:02:12Z review · item TOOL-aQuenchedHarness-1 · reason verdict BLOCKED · blockers 6
 
 2026-09-06T14:45:43Z review · item TOOL-aQuenchedHarness-1 · reason verdict BLOCKED · blockers 8 · NON-CONVERGENT · disposition fold
+
+2026-09-06T14:55:04Z dispatch · item b91a206a TOOL-aQuenchedHarness-8 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.turnstile.test.sh .lexicon.conf

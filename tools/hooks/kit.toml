@@ -21,10 +21,14 @@ include = ["agent-cap.js"]
 role = "engine"
 to = "{prefix}/hooks/agent-cap.js"
 
+# WITHHELD, TOOL-aQuenchedHarness-3: this suite stages a break into a copy of the hook
+# beside it, so its subject is the hook and it has a job only when that source changes.
+# `project-owned` rather than a second carve-out rule, because this home enumerates its
+# files one rule per file and a source claimed twice is the conflict selfcheck reports.
+# `silenced_legs` drops the leg that names it, so both halves close here.
 [[files]]
 include = ["agent-cap.test.sh"]
-role = "engine"
-to = "{prefix}/hooks/agent-cap.test.sh"
+role = "project-owned"
 
 # The descriptor travels with the kit, as it does for every entry whose include is `**`. Without
 # this rule it was the ONE file under a non-flat home that no rule claimed — invisible to the
@@ -53,10 +57,14 @@ include = ["scratch-guard.js"]
 role = "engine"
 to = "{prefix}/hooks/scratch-guard.js"
 
+# WITHHELD, TOOL-aQuenchedHarness-3: this suite stages a break into a copy of the hook
+# beside it, so its subject is the hook and it has a job only when that source changes.
+# `project-owned` rather than a second carve-out rule, because this home enumerates its
+# files one rule per file and a source claimed twice is the conflict selfcheck reports.
+# `silenced_legs` drops the leg that names it, so both halves close here.
 [[files]]
 include = ["scratch-guard.test.sh"]
-role = "engine"
-to = "{prefix}/hooks/scratch-guard.test.sh"
+role = "project-owned"
 
 [[files]]
 include = ["scratch-guard.fragment.json"]
