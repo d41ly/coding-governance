@@ -36,7 +36,7 @@ EVIDENCE = HERE / "ceiling-evidence.txt"
 MARGIN_FILE = HERE / "ceiling-margin.txt"
 
 
-def repo_root() -> pathlib.Path:
+def resolve_repo_root() -> pathlib.Path:
     out = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--show-toplevel"],
                          capture_output=True, text=True)
     if out.returncode != 0:
@@ -44,7 +44,7 @@ def repo_root() -> pathlib.Path:
     return pathlib.Path(out.stdout.strip())
 
 
-def git_dir(root: pathlib.Path) -> pathlib.Path:
+def resolve_git_dir(root: pathlib.Path) -> pathlib.Path:
     out = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-dir"],
                          capture_output=True, text=True)
     return pathlib.Path(out.stdout.strip()) if out.returncode == 0 else root / ".git"
@@ -270,8 +270,8 @@ def main() -> int:
     ap.add_argument("--reset", action="append", metavar="LEG",
                     help="with --write, allow this leg's row to LOWER")
     args = ap.parse_args()
-    root = repo_root()
-    gd = git_dir(root)
+    root = resolve_repo_root()
+    gd = resolve_git_dir(root)
     if not gd.is_absolute():
         gd = root / gd
     if args.report:

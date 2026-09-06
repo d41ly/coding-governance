@@ -502,3 +502,7 @@ why = "it runs `check-review-join.test.sh`, which `tools/workflows/kit.toml` wit
 [[exempt_leg]]
 name = "leg ceilings clear their evidenced maximum"
 why = "it grades GOV's ceilings against GOV's own recorded seconds, from `tools/run-gates/ceiling-evidence.txt` and `tools/run-gates/ceiling-margin.txt` -- both withheld with `role = \"project-owned\"` for the reason `tools/codebase-map/kit.toml` withholds `scen-adversarial.json`: a pin measured against one corpus and shipped into a tree that never measured it is either vacuous or permanently red. The TOOL ships and an adopter who wants the check runs `--write` on their own bar and declares their own headroom; what does not ship is this repo's numbers wearing their name. TOOL-aQuenchedHarness-2."
+
+[[exempt_leg]]
+name = "every held leg is budgeted, every budget row resolves"
+why = "it asserts `tools/run-gates/selftest-budgets.txt` against GOV's own held legs, and that declaration is withheld with `role = \"project-owned\"` because its 55 rows name THIS repo's suites and carry readings taken on THIS node. An adopter receives the runner and seeds their own declaration; what they must not receive is a gate asserting a population they do not have, which would red on arrival and could only ever be silenced. Same disposition and same reason as `leg ceilings clear their evidenced maximum`. TOOL-aQuenchedHarness-4."

@@ -484,6 +484,30 @@ if [ "$CEILINGS_LIVE" != 1 ]; then
   echo "run-gates: NOTE - this host has no runnable 'timeout -k', so EVERY leg's declared ceiling is INERT and every leg runs unbounded this run" >&2
 fi
 PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w; $PROF_TAG)"
+
+# ---- `--print-profile`: ONE RESOLVER, TWO READERS. TOOL-aQuenchedHarness-4 S11 ------------------
+# Profile selection -- the hardware detection, the table walk, the clamp, the GATE_JOBS override --
+# is 200 lines and lives inline here, so any second script wanting the width had to re-implement it.
+# A spec audit caught exactly that: `run-selftests.sh` was specced to run "at a width read from the
+# same gate-profiles.txt row the bar reads", over a seam that did not exist. Two resolvers is the
+# drift class this repo gates elsewhere, so this verb is the seam instead.
+#
+# IT EXITS BEFORE THE TURNSTILE, and that placement is the whole of its safety: a bar that took the
+# beacon to answer a question would serialise every caller behind a real run, and a caller polling it
+# would wedge the repository. It also runs no leg, writes no run record and touches no ledger.
+#
+# TAB-SEPARATED KEY/VALUE, because the caller is a shell script and `read -r k v` is the cheapest
+# correct parse there. Adding a key is safe; a reader takes the keys it knows.
+if [ "${1:-}" = "--print-profile" ]; then
+  printf 'name\t%s\n'      "$PROF_NAME"
+  printf 'width\t%s\n'     "$JOBS"
+  printf 'timeout\t%s\n'   "$PROF_TIMEOUT"
+  printf 'wall\t%s\n'      "$WALL"
+  printf 'ceilings\t%s\n'  "$CEILINGS_LIVE"
+  printf 'line\t%s\n'      "$PROF_LINE"
+  exit 0
+fi
+
 echo "$PROF_LINE"
 
 

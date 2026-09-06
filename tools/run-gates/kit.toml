@@ -66,6 +66,16 @@ role = "project-owned"
 include = ["ceiling-evidence.txt", "ceiling-margin.txt"]
 role = "project-owned"
 
+# THE SELF-TEST DECLARATION IS GOV'S TOO. Its 55 rows name this repo's suites and carry
+# readings taken on this node, so an adopter receiving it gets a population they do not have
+# and a gate that reds on arrival. `run-selftests.sh` itself DOES ship — it is the mechanism
+# the 2026-08-23 ruling always implied, and it refuses with a named message rather than
+# defaulting when no declaration is present, which is the announced-unarmed state.
+# TOOL-aQuenchedHarness-4.
+[[files]]
+include = ["selftest-budgets.txt"]
+role = "project-owned"
+
 [adopt]
 argv = ["bash", "{kit}/adopt-run-gates.sh"]
 mutates_index = false

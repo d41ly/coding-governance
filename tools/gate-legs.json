@@ -1169,6 +1169,17 @@
     "ceiling": 300
   },
   {
+    "name": "every held leg is budgeted, every budget row resolves",
+    "argv": [
+      "bash",
+      "tools/run-gates/run-selftests.sh",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "spec-tokens self-test",
     "argv": [
       "bash",

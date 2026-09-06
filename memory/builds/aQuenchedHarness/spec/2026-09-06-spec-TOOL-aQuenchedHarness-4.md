@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-4 — one on-demand runner for every kit's self-tests, budget-graded
 
-**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 5
+**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -203,6 +203,18 @@ work · `bash tools/unattended/run-unattended-gates.sh --all`, this kit's declar
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-4 · 2026-09-07 · BUILT. S11's shared width resolver is `bash tools/run-gates/run-gates.sh
+  --print-profile`, placed BEFORE the turnstile so asking costs nothing and takes no beacon; the
+  runner reads `width` from it and exports `SELFTEST_INNER_WIDTH` as S8 requires. The declaration is
+  55 rows — 49 held legs plus the six unattended suites that live in no manifest at all, which is the
+  whole reason S1 declares the population rather than deriving it.
+  **THE NUMBER THIS UNIT EXISTS TO MAKE VISIBLE: the declared budgets sum to 42020 s — 11.7 HOURS.**
+  Nobody runs an eleven-hour check, and `TOOL-aQuenchedHarness-9` is what that costs in practice:
+  `govkit selftest` sat with two arms red for long enough that nobody can say when they broke. Units
+  5 and 6 are the answer; this unit is what makes their result legible and what stops the next
+  regression being invisible.
+  Both failing cases observed: a held leg with no row REDs naming it, and a row naming an untracked
+  file REDs naming the path. A filter matching nothing exits 2 rather than printing a green line.
 - rev-3 · 2026-09-06 · folded spec-audit round 2. B7: both new files were shipping to adopters
   through `tools/run-gates/kit.toml`'s `include = "**"` rule — a declaration of gov's own corpus whose
   rows name paths no adopter has — so S10 withholds them with `role = "project-owned"` and declares

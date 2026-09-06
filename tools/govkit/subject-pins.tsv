@@ -31,6 +31,7 @@ dead-path carriers self-test	kit	selftests
 drift-audit records	repo	declarations
 drift-audit selftest	kit	selftests
 drift-audit wiring	repo	wiring
+every held leg is budgeted, every budget row resolves	repo	declarations
 gotchas selftest	kit	selftests
 govkit acceptance matrix	repo	declarations
 govkit refusal join	repo	declarations

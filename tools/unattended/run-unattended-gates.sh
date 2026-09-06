@@ -63,11 +63,6 @@ cd "$ROOT" || exit 2
 BUDGET_kit_gate=240           # measured 187 s IDLE on node `a` 2026-08-26, after TOOL-aCollapsedScan-1
 BUDGET_playbook_validity_gate=120   # measured 13 s
 BUDGET_skill_wiring=60        # measured 0 s
-BUDGET_gate_selftest=3800     # MEASURED 3565 s end to end — TOOL-dNarrowedAnchor-1, see the note below
-BUDGET_driver_selftest=970    # measured 906 s (was 841; +65 s of TOOL-dNarrowedAnchor-1 arms)
-BUDGET_playbook_validity_selftest=300  # measured 140 s
-BUDGET_cross_component=300    # measured 92 s
-BUDGET_adopter_e2e=120        # measured 7 s
 BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to builds carrying no
                               # run-state file and added a pre-anchor probe per unresolved unit.
                               # THREE readings on node `a`, 2026-09-04/05, all with other builds
@@ -87,13 +82,6 @@ BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to bu
                               # bound under the 8-wide pool (TOOL-dRetiredFork-40) and this one is a
                               # cost verdict. The claim that they are one figure was deleted with
                               # this edit.
-BUDGET_pass_order_selftest=600 # measured 149 s on node `a` 2026-09-05, up from 41 s: TOOL-aStagedLane-1
-                              # roughly tripled the suite, and every arm builds a real fixture
-                              # repository, so the cost is git PROCESS CREATION and scales with the arm
-                              # count rather than with the work each arm does. NO ARM COUNT IS TYPED
-                              # HERE: the suite prints its own on the `--- N arms` line, and the
-                              # figure moved three times inside the build that wrote this comment. Node d's AV taxes every
-                              # exec, so the ceiling carries margin over the node-`a` reading
 
 ONLY="${1:---selftests}"
 case "$ONLY" in
@@ -216,12 +204,20 @@ run_one "playbook validity gate"    checks bash "$HERE/check-playbook.sh"
 run_one "skill wiring"              checks bash "$HERE/adopt-unattended.sh" --check
 run_one "pass-order history"        checks bash "$HERE/check-pass-order.sh"
 
-run_one "gate selftest"             selftests bash "$HERE/check-unattended.test.sh"
-run_one "driver selftest"           selftests bash "$HERE/unattended.test.sh"
-run_one "playbook validity selftest" selftests bash "$HERE/check-playbook.test.sh"
-run_one "cross-component"           selftests bash "$HERE/cross-component.test.sh"
-run_one "adopter e2e"               selftests bash "$HERE/adopt-unattended.test.sh"
-run_one "pass-order selftest"       selftests bash "$HERE/check-pass-order.test.sh"
+# THE SELF-TEST HALF IS DELEGATED. TOOL-aQuenchedHarness-4 S7. These six suites are now rows in
+# `tools/run-gates/selftest-budgets.txt` alongside every other kit's, and one runner executes them
+# all -- which is what the 2026-08-23 ruling always implied and what this file could only do for one
+# kit. Their budgets travelled with them; the `--checks` half above keeps its own, because those four
+# are REPOSITORY checks that stay on the merge bar and are not this delegation's business.
+#
+# WHY THEY WERE THE HARD CASE, recorded because it is why the population is declared rather than
+# derived: the ruling removed all six from `tools/gate-legs.json` AND from `tools/unattended/kit.toml`,
+# so they exist in no manifest at all. A runner deriving its population from held manifest legs sees
+# none of them, which a spec audit caught before this was built.
+if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
+  ran=$((ran + 6))
+  bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended || st=1
+fi
 
 # LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a clean
 # sweep are indistinguishable from the outside, which is the class this kit has spent six review
