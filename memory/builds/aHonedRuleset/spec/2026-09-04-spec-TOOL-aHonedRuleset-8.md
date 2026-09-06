@@ -1,11 +1,12 @@
 # TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter
 
-**Status:** SPECCED · rev-6 · 2026-09-06 · node a · Tier-2 · base 94958534 · streams deployer · order 4 · ratified 2026-09-06
+**Status:** SPECCED · rev-7 · 2026-09-06 · node a · Tier-2 · base 94958534 · streams deployer · order 4 · ratified 2026-09-06
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit-round2.md) | spec-audit | — |
 | [2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -49,12 +50,25 @@ from an operator's install command to them.
   priced only the end-of-file swallow and its own *beside the command* instruction steered into the
   one placement that breaks a neighbour.
 
-  **Third, the WIRING step.** The anchored body also carries the wire-this-leg-into-your-gate-runner-
-  and-CI instruction that every other kit section in this runbook carries — confirmed at `:178`,
-  `:262`, `:351`, `:402`, `:525` and `:786` — because without it the runbook path installs the payload
-  and runs nothing. §4's *What the runbook path actually yields* states the mechanism. The instruction
-  keeps S3's entry-id-and-no-file-path discipline: it names the leg by the id an operator already
-  typed, exactly as the sibling sections name theirs.
+  **Third, the WIRING step.** The anchored body also carries a wire-this-leg-into-your-gate-runner-
+  and-CI instruction, because a leg nobody wires is a leg nobody runs, and §4's *What the runbook path
+  actually yields* states what the §2 path does and does not leave behind.
+
+  **It DIVERGES from the sibling sections' form, deliberately, and rev-6 claimed the opposite.** Every
+  sibling wiring step spells a literal `tools/` command — `bash tools/memory-tree/check-memory-hygiene.sh`,
+  `python tools/drift-audit/selftest.py`, `python3 tools/memory-recall/selftest.py`,
+  `bash tools/check-wiring.test.sh` — and not one names a govkit entry id. So "exactly as the sibling
+  sections name theirs" was false at all six lines rev-6 cited, and following it literally writes
+  `bash tools/check-microformats.sh`, which the epoch-2 carried-prefix predicate counts as a loose file
+  directly under `tools/` that exists in the tree, taking `WIRE-INTO-PROJECT.md` from 47 to 48 in
+  `tools/install-prefix-carried.txt` — a `ROSE` verdict `--write-ratchet` cannot absorb, and a straight
+  AC6 failure. The two halves of that sentence could not both be satisfied.
+
+  **The path-free form this unit uses instead**: name the leg by the NAME `tools/gate-legs.json` gives
+  it, `micro-format definitions`, and/or by the `{prefix}`-token argv the descriptor itself declares at
+  `check-microformats.kit.toml:44`. Both are path-free by construction, both are already the spellings
+  the machinery uses, and neither trips the ban. The divergence from the siblings is stated in the
+  runbook sentence itself, so a later editor does not "fix" it back into a literal path.
 - **S4 — the `why_conditional` REASON gate**, the first of the two guards §8 F1 rules must be BUILT
   here. One arm in `selfcheck()` at `tools/govkit/govkit.py`, failing any `selectable =
   "conditional"` entry whose `why_conditional` is absent or blank. Its second half is forced by its
@@ -62,13 +76,45 @@ from an operator's install command to them.
   S2 landed that descriptor is the arm's one remaining violator and the arm would otherwise red the
   bar on its own landing commit. The value is not new prose — that descriptor's header at lines 6 to
   10 already carries the argument, and the field lifts it into a place a machine can grade.
-- **S6 — the refusal-join pin ledger records the two new branches.**
-  `tools/govkit/refusal_join.py`'s ledger convention at `:42-115` is that every unit adding refusal
-  branches names them and states armed or unarmed; S4 and S5 add two and rev-5 carried no scope item
-  for it. A ledger comment names both, with AC16's selftest arms as what reaches them.
-  **`BRANCH_PIN` itself does NOT move**: it is shrink-only at 217 against a live 244, so growth cannot
-  red it, which is precisely why the growth needs its own written record. See §7 for why the rev-5
-  claim that these arms sit outside the counted population was false.
+- **S6 — the refusal-join pin ledger records the two new branches.** A ledger comment in
+  `tools/govkit/refusal_join.py` names both, with AC16's selftest arms as what reaches them, and
+  AC18 observes it.
+
+  **The convention, stated WHOLE at rev-7 — rev-6 stated the half it kept and invoked the file's
+  authority for it.** Read at `refusal_join.py:42-118`, every ledger row in that file's history is an
+  `X -> Y` PIN RAISE: 216→217, 215→216, 214→215, 212→214, 210→212, 208→210, 197→208, 190→197, 185→190,
+  180→185, 161→180, 141→161, 135→141. The convention is name the branches, state armed or unarmed,
+  AND raise the pin. The `141 -> 161` row (`TOOL-dUnstalledConvoy-26`) is the precedent that says why:
+  it calls a trailing floor "the state this file's own convention forbids: a floor that trails the
+  population stops catching the matcher going blind", and raises to the live count for that reason.
+  S6 writes the first row in that file's history that names branches WITHOUT moving the pin, and
+  saying so is the point of this paragraph.
+
+  **This unit DECLINES the raise, on a recorded reason that is not its own.**
+  `memory/builds/aHoistedPass/spec/2026-09-04-spec-DEPL-aHoistedPass-1.md` — SPECCED, same `deployer`
+  stream — makes "Moving `BRANCH_PIN` or `FILE_PIN`" a §3 non-goal at `:47` and gives the reason at
+  `:179-184`: a `217 → 219` move "would write a ledger entry claiming two new branches took the pin to
+  the population, when the population is 246". Re-baselining is its own act with its own reason and
+  that sibling files it as its own row. So the trailing floor is a KNOWN DEFERRAL with an owner, not
+  an acceptable property, and the ledger comment says which row owns it.
+
+  **The count is a DELTA, never the absolute.** `BRANCH_PIN` is 217 and the live population measured
+  for this rev is 244; S4 and S5 add **+2**. The absolute after landing depends on which of the two
+  units lands first, because `DEPL-aHoistedPass-1`'s AC9 at `:262-263` already claims "exactly two
+  higher than the 244 measured at this base" for ITS OWN two branches in the same file. Two SPECCED
+  units each writing 246 means whichever lands second lands with a false figure in its own spec and a
+  ledger comment wrong on the day it is written. Stating the delta and deriving the absolute at
+  landing is what makes both correct. This spec cites `DEPL-aHoistedPass-1` six times and rev-6 still
+  missed its `BRANCH_PIN` non-goal seven lines above a section it quoted, which is the same
+  recall-failure the rev-6 H4 fold corrected for `TOOL-dScaffoldedMirror-15`.
+
+  **What makes the +2 true, and it is a constraint on S4 and S5 rather than on S6.** `_is_refusal` at
+  `refusal_join.py:135-138` matches `<obj>.fail(...)` ONLY as a bare `ast.Expr` statement, so each arm
+  must be written as a bare `r.fail(...)` expression directly in `selfcheck()`. An arm written as an
+  assignment, a ternary, a comprehension, or routed through a helper contributes ZERO and the ledger
+  comment is false the day it lands; and `enumerate_branches` at `:146-153` walks each `FunctionDef`
+  and then its whole subtree, so an arm in a nested helper is double-counted. `selfcheck()` has no
+  nested defs today, so that second shape appears only if the builder introduces one.
 - **S5 — the reachability arm on the `requires` edge**, the second guard §8 F1 rules must be BUILT.
   One arm in `selfcheck()` beside S4's, failing any entry whose `requires` names a member of the
   declared default set while the entry itself is **reachable by no declared selection**. The
@@ -100,13 +146,27 @@ from an operator's install command to them.
   `selectable = "conditional"` and none is re-examined on the merits. S4 adds a `why_conditional`
   value to one of them; that is a field a machine can now grade, not a change to what the entry is.
 - **No `last-audit` re-stamp.** Verified against the `watch:` list at `memory/guides/SESSION-KICKOFF.md:6`:
-  none of this unit's SIX files is on it, and the two added by the F1 ruling
-  (`tools/govkit/govkit.py`, `tools/govkit/selftest.py`) are not on it either. Units 2 through 6 of
+  none of this unit's SEVEN files is on it — re-verified at rev-7 over the widened set, since the
+  rev-6 wording asserted a six-path check while S6 had already made it seven. The two added by the F1
+  ruling (`tools/govkit/govkit.py`, `tools/govkit/selftest.py`) are not on it, and neither is S6's
+  `tools/govkit/refusal_join.py`. Units 2 through 6 of
   this build all bundle that re-stamp and this one must not, or it stamps a line no staged path
   obliged. AC8 re-observes this against the widened file set rather than carrying rev-2's reading.
 - **`TOOL-aScouredKit-23` and `TOOL-dSpentCeiling-4` are cited, not answered.** The first owns whether
   `WIRE-INTO-PROJECT.md` gets a ceiling; the second owns whether a kit may spend an adopter's read
   budget. S3 adds bytes to an uncapped document and §8 F4 prices that, without ruling on either row.
+- **TWO defects in the runbook's own install path are measured here and repaired by neither this unit
+  nor any other.** Added at rev-7, in §3 where it belongs — rev-6 wrote this bullet at the END of §4
+  while three documents said §3 carried it, which is the one copy of that error that escaped the spec.
+  Both are stated in §4's *What the runbook path actually yields*, filed together as
+  `TOOL-aHonedRuleset-15`, and observed by AC17.
+  **(a) No numbered section of the runbook runs `apply` or `update` at all** — `grep -n apply
+  WIRE-INTO-PROJECT.md` returns eight hits and every one is prose — so §2's install leaves a
+  `deploy.toml` naming the entry with NO ENGINE IN THE TREE.
+  **(b) `run-gates` is absent from the `--kits` example**, and it is the sole `[gate_runner_seed]`
+  declarer, so whenever an operator does reach `apply`, the legs are ORDERED and not emitted — for
+  every kit that example lists, not only this one. Repairing either would rewrite an install flow
+  every kit shares, which is answering somebody else's question from inside a selection fix.
 
 ## 4. Design
 
@@ -165,29 +225,41 @@ install. The default set's audience is a fresh adopter with no declaration, and 
 
 ### What the runbook path actually yields, and why S3 needs a third edit
 
-**Added at rev-6 as a BLOCKER fold. The paragraph above says S3's id "closes" the runbook gap; on its
-own it does not, and the gap it leaves is this unit's own defect one layer down.** A `--kits`
-selection reaching `apply` gets its legs EMITTED only when the selection carries an entry declaring
-`[gate_runner_seed]`. That key is declared in exactly ONE file, `tools/run-gates/kit.toml:105`, and
-`govkit.py:8172-8176` is where it is read. Neither `run-gates` nor `gate_runner` appears anywhere in
-`WIRE-INTO-PROJECT.md` — grep returns zero.
+**Added at rev-6 as a BLOCKER fold and REWRITTEN at rev-7, because rev-6 traced the right mechanism
+on the wrong command.** The paragraph above says S3's id "closes" the runbook gap. It does not, and
+what it leaves is measured here rather than assumed.
 
-So an operator following the edited runbook writes a `deploy.toml` with no `[gate_runner]`, `apply`
-takes the ordered-not-emitted branch at `govkit.py:5064-5107`, writes the two microformat legs into
-`.governance/outbox/gate-legs.md`, prints `gate legs: ORDERED, not emitted`, and **exits 0**. The
-payload lands and no leg runs — the deployer's own comment at `:8165` calls that branch "the
-silent-green direction this deployer refuses by name everywhere else". It compounds twice:
-`cmd_intake` REFUSES to rewrite an existing `deploy.toml`, so the runbook's command is that target's
-PERMANENT selection; and every other kit section in this runbook carries an explicit wiring step
-while rev-5's S3 carried none.
+**FIRST, and this is what rev-6 got wrong: the runbook's fresh path never runs `apply` or `update`.**
+`grep -n apply WIRE-INTO-PROJECT.md` returns `:309 :373 :589 :635 :638 :876 :878 :883` and every one
+is PROSE — there is no `govkit.py apply` command block anywhere in the document. §2's install is
+exactly three lines: one `intake --kits …` and two `adopt-playbook.sh` calls. `cmd_intake` writes
+`.governance/deploy.toml` and RETURNS (`govkit.py:8225-8229`); it copies nothing and emits nothing,
+and `adopt-playbook.sh` renders the charter region and copies nothing else, which §4's own
+*Alternatives rejected* bullet already recorded. Every per-kit section installs by hand with `cp -r`.
+Only §5b at `:589` asserts `apply` IS the fresh path, and no numbered section runs it. **So the §2
+outcome today is a `deploy.toml` naming the entry with no engine in the tree at all** — not a leg
+that fails to run, but a script that was never copied.
 
-**The disposition, and its bound.** S3 gains the wiring instruction its six siblings carry, which is
-reuse of an established pattern rather than new mechanism. What it does NOT do is fix the runbook's
-missing gate RUNNER: `run-gates` is absent from the runbook's `--kits` example for EVERY kit, not
-just this one, so that is a pre-existing runbook defect wider than this unit and it is filed as
-`TOOL-aHonedRuleset-15` rather than fixed here. §3 records the boundary and AC17 observes which of
-the two outcomes the install actually produces, so the unit ships knowing the answer instead of
-assuming it.
+**SECOND, the gate-runner gap, which is real and survives the correction.** A selection reaching
+`apply` gets its legs EMITTED only when it carries an entry declaring `[gate_runner_seed]`, a key
+declared in exactly ONE file (`tools/run-gates/kit.toml:105`) and read at `govkit.py:8171-8176`.
+Neither `run-gates` nor `gate_runner` appears anywhere in `WIRE-INTO-PROJECT.md`. And `cmd_intake`
+REFUSES to overwrite an existing `deploy.toml` — that file is the standing authorization — so the
+`--kits` list an operator copies from §2 is that target's PERMANENT selection. Whenever they do reach
+`apply`, by §5b's path or their own, they get the ordered-not-emitted branch at
+`govkit.py:5064-5107`, the legs written to `.governance/outbox/gate-legs.md`, the line
+`gate legs: ORDERED, not emitted` (`:5066` and `:5104`), and **exit 0**. The deployer's own comment at
+`:8165` calls that branch "the silent-green direction this deployer refuses by name everywhere else".
+
+**The disposition, and its bound.** S3 gains a wiring instruction, because a leg nobody wires is a
+leg nobody runs — but it is written for an operator whose engine IS in the tree, and it does not
+pretend the §2 path put it there. Neither runbook defect is repaired here: fixing (a) rewrites the
+install flow every kit in that section shares, and fixing (b) edits a `--kits` example that omits the
+runner for all of them. Both are filed as `TOOL-aHonedRuleset-15`, §3 carries the boundary as a
+non-goal, and AC17 OBSERVES which of three outcomes a scratch install actually produces — emitted,
+ordered, or payload absent — so this unit ships knowing the answer instead of asserting one. Recording
+a third admissible outcome is the point: rev-6 admitted only the two an `apply` run can produce, which
+made its own criterion grade a command the builder would have had to invent.
 
 The DEFAULT adopter is unaffected by all of this and the distinction is worth keeping: `run-gates` IS
 in the default selection (`registry.toml:36`), so a default install does get emitted legs, exactly as
@@ -330,7 +402,9 @@ One commit, and the F1 ruling makes that a requirement rather than a preference.
 the descriptor must move together for `govkit selfcheck` to stay coherent; the runbook sentence
 describes what those two lines do, so splitting it off would leave the runbook describing a selection
 that does not exist yet; and S4's two halves cannot be split at all, because the arm reds the tree
-between them. Six files, one atom.
+between them. SEVEN files, one atom — six at rev-6, and S6's ledger comment in
+`tools/govkit/refusal_join.py` is the seventh, which rev-6 added as a scope item and left out of
+every count in this document.
 
 ### Files touched (estimate)
 
@@ -338,12 +412,14 @@ between them. Six files, one atom.
 |---|---|
 | `tools/govkit/registry.toml` | S1 — one id added to `[selection] default` at line 36 |
 | `tools/govkit/entries/check-microformats.kit.toml` | S2 — line 14 deleted, header paragraph at lines 6 to 8 rewritten |
-| `WIRE-INTO-PROJECT.md` | S3 — the id added to the `--kits` example at line 82, plus an anchor line and one sentence as its body |
+| `WIRE-INTO-PROJECT.md` | S3 — THREE edits: the id in the `--kits` example, the anchor placed above `memory-tree`'s, and a body carrying one sentence plus the path-free wiring instruction |
 | `tools/govkit/govkit.py` | S4 + S5 — two arms in `selfcheck()` at `:976`, beside arms 7b and 8 |
 | `tools/govkit/entries/check-line-length.kit.toml` | S4 second half — a `why_conditional` value, lifted from the descriptor's own header |
 | `tools/govkit/selftest.py` | S4 + S5 — the arms that exercise both guards' failing cases |
+| `tools/govkit/refusal_join.py` | S6 — a ledger comment naming the two new branches; `BRANCH_PIN` unmoved |
 
-Three files at rev-2, six at rev-3. The three added are what the F1 ruling costs, and §5 prices the
+Three files at rev-2, six at rev-3, seven at rev-7. The three added at rev-3 are what the F1 ruling
+costs; the seventh is S6's ledger comment. §5 prices the
 review consequence rather than only the edit count.
 
 ### Alternatives rejected
@@ -380,17 +456,11 @@ review consequence rather than only the edit count.
   sets the standard that a right answer resting on wrong facts is a right answer nobody can
   re-derive, and this bullet had now failed it twice.
 
-- **Wiring the runbook adopter's GATE RUNNER.** S3 tells an operator to wire the microformat leg in;
-  it does not add `run-gates` to the runbook's `--kits` example. That example omits the gate runner
-  for every kit it lists, so a runbook adopter has been getting ordered-not-emitted legs across the
-  board — a pre-existing runbook defect this unit measured and did not cause. It is filed as
-  `TOOL-aHonedRuleset-15` and left to its owner; widening this unit to fix it would answer someone
-  else's question inside a selection fix.
-
 ## 5. Production-readiness checklist
 
-- security — N/A, re-priced at rev-6 against §4's SIX files rather than rev-2's three: two
-  declaration edits, one runbook edit, and two `r.fail` arms plus their selftest arms. The verdict is
+- security — N/A, re-priced at rev-7 against §4's SEVEN files rather than rev-2's three: two
+  declaration edits, one runbook edit, two `r.fail` arms plus their selftest arms, and S6's comment.
+  The verdict is
   unchanged and the premise is what moved — the arms READ declarations and write nothing, so there is
   still no write path, no new surface and no credential handling. The rev-3 F1 fold updated every
   other bullet in this section to six files and left this one at three, four bullets above a risks
@@ -435,7 +505,7 @@ review consequence rather than only the edit count.
   shrink-only pin keeps the leg green; §7 states the corrected mechanism and S6 records the growth. Both are
   Python, so `tools/memory-tree/check-arms.py` does not see them either — its `discover()` at line 127
   reads tracked `.sh` files only, verified rather than assumed.
-- migration / rollback — `git revert` of one commit restores all six files, and reverts both halves
+- migration / rollback — `git revert` of one commit restores all seven files, and reverts both halves
   together for the reason §5's first risk bullet states. A target already installed is unaffected
   until it next runs `govkit update`.
 - user docs — S3 is the doc change, and `WIRE-INTO-PROJECT.md` is the only doc that describes an
@@ -477,13 +547,20 @@ review consequence rather than only the edit count.
   would have caught a staged template edit with no re-stamp. `AGENTS.md` is only in `verify-paths`
   and nothing guarded it at all.
 - **AC9** — When `grep -c '^selectable' tools/govkit/entries/check-microformats.kit.toml` runs, it
-  returns 0, and `grep -c 'check-microformats' WIRE-INTO-PROJECT.md` returns at least 3 against the 0
-  measured at base — the `--kits` id, the anchor and the sentence.
+  returns 0, and `grep -c 'check-microformats' WIRE-INTO-PROJECT.md` returns at least **4** against
+  the 0 measured at base — the `--kits` id, the anchor, the body sentence and the WIRING instruction.
+  **The threshold is derived from S3's edit count and moved with it at rev-7**: rev-6 added S3's third
+  edit and left this criterion enumerating rev-5's two, so a build landing the anchor and its sentence
+  while omitting the wiring step — B1's entire remedy — returned 3 and passed. The enumeration is
+  written out rather than left as a bare integer so the next scope change to S3 is visibly a change to
+  this count. Measured at base — the `--kits` id, the anchor and the sentence.
 - **AC11** — When `python tools/govkit/check_runbook_parity.py` runs, **NO `runbook-parity:` line
   names `check-microformats` at all** — not merely the `has no anchored runbook section` line — its
   problem count falls from 18 to 17, and its census line reports `8 anchored section(s)` against the
-  7 measured at base. **And the `playbook` section's derived body still contains the renderer list**,
-  observed by grepping that body for `What the renderer cannot decide for you`. The checker still
+  7 measured at base. **And the anchor SEQUENCE is
+  `… playbook, check-microformats, memory-tree …`**, observed by `grep -n 'govkit:entry'` and comparing
+  the order, with the `playbook` body's `What the renderer cannot decide for you` grep kept as the
+  corroborating half. The checker still
   exits 1 on the other 17 problems, which this unit does not touch and §8 F4 flags separately — so
   the observation is the named lines' absence, never the exit code.
 
@@ -491,17 +568,39 @@ review consequence rather than only the edit count.
   a census of 8; an anchor landing with an EMPTY body removes that line, raises the census, adds a
   distinct `EMPTY body` problem and passes the criterion word for word — while §8 F4 itself calls the
   non-empty body "the half that makes the anchor mean anything". The no-line-names-it form covers
-  presence, uniqueness and non-empty body in one observation. The renderer-list clause is what
-  observes S3's PLACEMENT: an anchor beside the `--kits` line re-parents ~60 lines of the `playbook`
-  section into this one, both bodies stay non-empty, and nothing rev-5 wrote could see it.
-- **AC17** — When a scratch target is installed with the runbook's own command, the outcome is
-  OBSERVED rather than assumed: either `apply` emits the two microformat legs into the target's gate
-  runner, or it prints `gate legs: ORDERED, not emitted` and writes them to
-  `.governance/outbox/gate-legs.md`. Whichever it prints, that is what §4's *What the runbook path
-  actually yields* must say, and this criterion is what keeps the two in agreement. Recorded as an
-  observation with two admissible outcomes on purpose — the defect this unit exists to remove is a
-  payload that lands while nothing runs, and a criterion asserting the outcome it hopes for would
-  reproduce it.
+  presence, uniqueness and non-empty body in one observation. The sequence clause is what observes S3's
+  PLACEMENT, and at rev-7 it observes the RULE rather than one instance of breaking it. An anchor
+  beside the `--kits` line re-parents ~60 lines of the `playbook` section into this one; but an anchor
+  dropped anywhere AFTER `memory-tree` — end of file, mid-`drift-audit`, mid-`push-main` — leaves the
+  renderer list exactly where it is, keeps both bodies non-empty, takes problems 18 to 17 and the
+  census to 8, and passed every clause rev-6 wrote while re-parenting a DIFFERENT section's tail. The
+  checker grades emptiness only (`check_runbook_parity.py:71-81`) and its anchor regex at `:35` imposes
+  no position, so nothing else covers order; and since that checker is in no `tools/gate-legs.json`
+  row, AC10's bar cannot see it either. Grading the instance rev-6 happened to find, rather than the
+  class S3's rule forbids, is the shape charter §7 names by hand.
+- **AC17** — The runbook path's outcome is OBSERVED rather than assumed, over the exact command
+  sequence, named because rev-6 said "the runbook's own command" and the runbook's own §2 command is
+  `intake` alone. Two runs against a scratch target: **(1)** `govkit.py intake --target <scratch>
+  --kits playbook,playbook-render,check-microformats` — exactly §2's line with this unit's id added —
+  then observe whether `tools/check-microformats.sh` exists in that tree; **(2)** `govkit.py apply
+  --target <scratch>`, the verb §5b names as the fresh path and no numbered section runs, then observe
+  which of the two lines it prints.
+
+  **THREE admissible outcomes, and the third is the one rev-6 could not report**: the legs are
+  EMITTED into the target's gate runner; or `gate legs: ORDERED, not emitted` with them written to
+  `.governance/outbox/gate-legs.md`; or the PAYLOAD IS ABSENT, which is what run (1) alone yields.
+  Whichever is observed is what §4's *What the runbook path actually yields* must say, and this
+  criterion is what keeps the two in agreement. Admitting only the outcomes an `apply` run can produce
+  made rev-6's criterion grade a command the builder had to invent, and asserting the outcome the unit
+  hopes for would reproduce the defect it exists to remove.
+- **AC18 — S6 is observed, and rev-6 was the only scope item with no criterion at all.** After the
+  commit, `python tools/govkit/refusal_join.py` exits 0 and reports a branch count **exactly two
+  higher** than the count measured immediately BEFORE the commit — a delta, taken at landing, for the
+  reason S6 gives — `BRANCH_PIN` is unmoved at 217, and the ledger comment names both new branches
+  with their armed/unarmed status and the row that owns the deferred raise. Modelled on
+  `DEPL-aHoistedPass-1` AC9, which already carries this observation over the same file. **No gate
+  substitutes**: §7 states the pin is shrink-only and 27 behind, so it cannot detect growth at all,
+  and AC10's bar runs the leg only to confirm it still exits 0.
 - **AC12 — S4's staged break, confirmed RED before the arm is trusted.** When
   `why_conditional` is removed from `tools/govkit/entries/check-placeholders.kit.toml` and `python
   tools/govkit/govkit.py selfcheck` is run, it exits non-zero naming `check-placeholders`; when the
@@ -641,7 +740,8 @@ three are the owner's and one is delegated, and each mark says which.
     identical state this unit is fixing. §4's own inventory table says so and the rev-1 bullet
     contradicted it. Their stated reasons DO survive measurement, unlike this entry's:
     `check-line-length` grades a declaration that is gov's own (`tools/line-length-limits.txt`, and
-    `matrix.py:66` pins its install-day verdict as `NOT ADOPTED — no declaration at`), and
+    `matrix.py:63` pins its install-day verdict as `NOT ADOPTED — no declaration at`; rev-6 cited
+    `:66`, which is a blank line, and the pin was wrong when written rather than drifted), and
     `check-placeholders` hardcodes `TEMPLATE="coding-governance-agents.template.md"`.
   - **Correction 2 — THREE declaration files, not four.** `tools/template-size-limits.txt` and
     `tools/template-size-highwater.txt` (`check-template-size.sh:54` and `:96`) and
@@ -845,8 +945,11 @@ three are the owner's and one is delegated, and each mark says which.
     by the SOURCE template for every target whether or not anyone selects the entry, against 8 bytes
     of headroom — so the option is refused by arithmetic before §16:354 refuses the sentence in
     words. And gov's own `.governance/deploy.toml:18-22` does not list `check-microformats`, so a
-    fenced block would drop out of gov's own `AGENTS.md` until that array is edited, adding a seventh
-    file to a unit that already grew from three to six.
+    fenced block would drop out of gov's own `AGENTS.md` until that array is edited, adding one more
+    file to a unit that had already grown from three to six. (rev-7: the unit is now at seven on its
+    own account, so the marginal-file argument is weaker than rev-3 wrote it — the ruling stands on
+    the CEILING, which is the ground F3 says it stands on, and this clause is colour rather than
+    load-bearing.)
   - The option taken is S3: `WIRE-INTO-PROJECT.md` carries the mention, and the charter does not need
     to be the carrier. §3's "the charter does not name the gate" holds, and AC7 observes it.
 - **F4 — do S3's bytes earn their place in an uncapped document?** `WIRE-INTO-PROJECT.md` is the
@@ -900,11 +1003,18 @@ three are the owner's and one is delegated, and each mark says which.
     `<!-- govkit:entry check-microformats -->` carries no `tools/` segment and matches neither
     epoch-2 shape (`check-install-prefix.sh:170-171`: `tools/<kit>/<file>.<ext>`, or a loose file
     directly under `tools/`). AC6 is the observation.
-  - **The real byte cost against what was budgeted.** The `--kits` id is 19 bytes (`,check-microformats`)
-    and the sentence ~193, which is the 212 rev-2 measured. The anchor line is **40 bytes**, 41 with
-    its newline and 42 with a blank line separating it — so the anchored form costs ~254 rather than
-    ~212, a **20% increase on a scope item that was 0.31% of the document**, taking it to roughly
-    0.37%. That is the whole price of closing a machine gap this repo's own convention already
+  - **The real byte cost against what was budgeted, RE-PRICED at rev-7 over all three edits.** The
+    `--kits` id is 19 bytes (`,check-microformats`) and the sentence ~193, which is the 212 rev-2
+    measured. The anchor line is **40 bytes**, 41 with its newline and 42 with a blank line separating
+    it. **The wiring instruction is the edit this bullet was never shown**: it arrived at rev-6 as
+    B1's remedy, and the sibling blocks it is modelled on measure 287 B at `:262-266` and 473 B at
+    `:351-355`, so a comparable step is **~300 B** and the true S3 cost is roughly **550 B**, not 254.
+    Against `WIRE-INTO-PROJECT.md`'s live 68747 B that is about **0.80% of the document**, against
+    0.31% for the rev-2 scope and the 0.37% this bullet claimed. **The ANCHORING ruling does not flip**,
+    and that is stated rather than assumed: the 254-versus-212 comparison is anchored against
+    unanchored, and the wiring step sits on BOTH sides of it, so it cancels. What is understated is
+    `TOOL-aScouredKit-23`'s uncapped-growth concern, by about the same factor — which F4 declines to
+    answer while citing its figure, and which is now cited at the right magnitude. That is the whole price of closing a machine gap this repo's own convention already
     declares, and it is the cheapest of the three options F4 considered: the `[[runbook_exempt]]`
     alternative costs zero runbook bytes but answers the question NO, and the unanchored form costs
     212 and leaves the checker still naming this entry.
@@ -940,7 +1050,7 @@ three are the owner's and one is delegated, and each mark says which.
     established pattern rather than inventing one. **Placement is NOT merely a build-time detail and
     rev-5's rule for it was wrong**: the checker reads a section's body as every line from the anchor
     to the NEXT anchor, and "immediately above its own sentence" puts the anchor mid-`playbook`, where
-    it re-parents that section's body into this one. The rule is now stated in S2's own placement
+    it re-parents that section's body into this one. The rule is now stated in S3's own placement
     paragraph and pinned against the EXISTING anchors — immediately above `memory-tree`'s — and AC11
     observes it. Rev-5 priced only the end-of-file swallow, which is the failure mode that is easy to
     see.
@@ -1006,7 +1116,8 @@ three are the owner's and one is delegated, and each mark says which.
   `check_runbook_parity.py` RUN and its actual output recorded (exit 1, 18 problems, 7 anchored of 25
   entries, naming this entry by name), the false "only registry.toml names it" justification replaced
   by the `--kits`-REPLACES fact verified at `govkit.py:559-568` and `:8131`, and the byte cost
-  re-measured — the 40-byte anchor takes S3 from ~212 to ~254, a 20% rise on 0.31% of the document.
+  re-measured — the 40-byte anchor takes S3 from ~212 to ~254, and rev-7's wiring step to roughly
+  550 B, about 0.80% of the document.
   Scope grew from three files to six; §5 flags the BUILD-METHOD M2 one-mechanism condition this
   creates and what it costs at review time.
 - rev-2 · 2026-09-04 · fork-verification pass, one verifier per §8 fork, every correction re-checked
@@ -1087,6 +1198,47 @@ three are the owner's and one is delegated, and each mark says which.
   had drifted, and the byte-identical claim was false: base blob `0d217e3d` 68069 B, HEAD `22383488`
   68747 B, 11 lines added by `36af6f9f` during this spec's life. All pins now cite by id. No fork was
   re-opened and no ruling reversed.
+
+- rev-7 · 2026-09-06 · **round-2 spec audit folded — 1 blocker, 5 HIGH, 4 MEDIUM, 2 LOW.** Report:
+  `memory/builds/aHonedRuleset/reviews/2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit-round2.md`.
+  Blockers fell 2 to 1, so the loop converged rather than stalling — and the surviving blocker was
+  introduced by the rev-6 fold, not left by it. **B1 — rev-6 traced the right mechanism on the wrong
+  command.** The runbook's fresh path runs no `apply` and no `update`: all eight `apply` hits in
+  `WIRE-INTO-PROJECT.md` are prose, §2's install is one `intake` plus two `adopt-playbook.sh` calls,
+  and `cmd_intake` writes `deploy.toml` and returns. So §2's real outcome is a descriptor naming the
+  entry with NO ENGINE IN THE TREE — not a leg that fails to run. §4's paragraph is rewritten around
+  that, the gate-runner gap is kept because it survives the correction, S3's wiring step is rewritten
+  for an operator whose engine IS present, and AC17 now names the exact two-run command sequence and
+  admits a THIRD outcome, payload absent, which rev-6 could not report. **H2 — three documents said §3
+  carried the boundary and rev-6 wrote it at the end of §4**; it is now a §3 non-goal carrying BOTH
+  runbook defects, and the backlog row that repeated the false pointer outside this spec is corrected
+  in the same commit. **H1 — S6 made this a SEVEN-file unit and every count still read six**; the
+  table gains its row and five counts move, including §3's watch-list verification, which was asserted
+  over seven paths and performed over six (its conclusion holds — `refusal_join.py` is not on the
+  `watch:` list). **H3 — "exactly as the sibling sections name theirs" was false at all six lines it
+  cited**: four spell literal `tools/` paths and none names an entry id, and following it would write
+  `bash tools/check-microformats.sh`, taking the carried-prefix count 47 to 48 and redding AC6. S3 now
+  states that it DIVERGES, and names the two path-free forms it uses instead — the
+  `tools/gate-legs.json` leg name and the descriptor's own `{prefix}` argv. **H4 — AC9 still
+  enumerated rev-5's two edits**, so B1's own remedy could be omitted and the criterion passed at 3;
+  raised to 4 with the enumeration spelled out. **H5 — `DEPL-aHoistedPass-1` already claims 244 → 246
+  for a DIFFERENT pair of branches in the same file**, and this spec cites that sibling six times
+  while missing its `BRANCH_PIN` non-goal seven lines above a section it quotes. S6 now states the
+  count as a **delta of +2** and derives the absolute at landing, so whichever unit lands second is
+  still correct. **M1 — S6 stated half the ledger convention as the whole of it**: every row in that
+  file's history is a pin RAISE, and the `141 -> 161` precedent says why a trailing floor is the state
+  the convention forbids. S6 states the convention whole, then declines the raise explicitly on
+  `DEPL-aHoistedPass-1`'s recorded reason, so the 27-behind floor reads as a deferral with an owner.
+  **M2 — S6 was the only scope item with no criterion and no gate can see it**; AC18 added, modelled on
+  the sibling's AC9, with the constraint that makes its figure true: each arm must be a bare
+  `r.fail(...)` expression statement written directly in `selfcheck()`, because `_is_refusal` matches
+  nothing else. **M3 — AC11 graded the one wrong placement rev-6 found, not the class S3's rule
+  forbids**; it now asserts the anchor SEQUENCE and keeps the renderer-list grep as corroboration.
+  **M4 — F4 priced two edits of a three-edit S3**; re-priced at roughly 550 B and 0.80% of the
+  document, with the note that the anchoring ruling does not flip because the wiring step sits on both
+  sides of that comparison. **L1** — F4's pointer said S2's placement paragraph; it is S3's. **L2** —
+  `matrix.py:66` is a blank line and the pin was wrong when written; re-pinned to `:63`. Nothing was
+  re-opened, no ruling reversed, and no scope item removed.
 
 ## 10. Reuse audit
 

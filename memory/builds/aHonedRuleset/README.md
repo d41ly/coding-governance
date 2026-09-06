@@ -88,10 +88,10 @@ ids TOOL-aHonedRuleset-14 TOOL-aHonedRuleset-15
 | [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 2 | 2 | SPECCED | rev-5 | 2026-09-06 |
 | [TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement](spec/2026-09-04-spec-TOOL-aHonedRuleset-4.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-06 |
 | [TOOL-aHonedRuleset-5 — the last-audit stamp rule gets exactly one home](spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-06 |
-| [TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter](spec/2026-09-04-spec-TOOL-aHonedRuleset-8.md) | 4 | 2 | SPECCED | rev-6 | 2026-09-06 |
+| [TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter](spec/2026-09-04-spec-TOOL-aHonedRuleset-8.md) | 4 | 2 | SPECCED | rev-7 | 2026-09-06 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
