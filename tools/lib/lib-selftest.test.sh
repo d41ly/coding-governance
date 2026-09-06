@@ -20,7 +20,7 @@ nope() { n=$((n+1)); bad=1; printf 'nope %s — %s\n' "$1" "${2:-}"; }
 
 # FLOOR_ASSERTIONS grades whether this SUITE still carries its arms, not whether this box could run
 # them. A suite that silently shrinks reports green over a population it stopped grading.
-FLOOR_ASSERTIONS=14
+FLOOR_ASSERTIONS=17
 
 # run_harness <name> <body> -> writes $TMP/<name>.out, returns the harness's exit status
 run_harness() {
@@ -131,6 +131,23 @@ SELFTEST_FLOOR=lots run_harness floor_junk "$FLOORBODY"
 rc=$?
 [ "$rc" = 2 ] && ok "an unparseable floor REFUSES rather than silently disabling the guard" \
               || nope "a junk floor exited $rc" "$(cat "$TMP/floor_junk.out")"
+
+# ---- 9. TWO BATCHES. A suite needing a second base fixture calls build_fixture again; before the
+# ----    reset landed, batch two silently re-ran batch one's arms against batch two's snapshot.
+run_harness batches 'mkfix1() { printf "ONE
+" > subject.txt; }
+mkfix2() { printf "TWO
+" > subject.txt; }
+build_fixture mkfix1 || exit 2
+arm "batch one arm" 0 "ONE" "true" "cat subject.txt"
+run_arms one
+build_fixture mkfix2 || exit 2
+arm "batch two arm" 0 "TWO" "true" "cat subject.txt"
+run_arms two'
+rc=$?
+[ "$rc" = 0 ] && ok "a second build_fixture starts a second batch rather than replaying the first"               || nope "the second batch exited $rc" "$(cat "$TMP/batches.out")"
+grep -q '^PASS (1 arms' "$TMP/batches.out" && [ "$(grep -c '^PASS (1 arms' "$TMP/batches.out")" = 2 ]   && ok "and each batch reports ONE arm, not the running total"   || nope "the batches did not report one arm each" "$(cat "$TMP/batches.out")"
+[ "$(grep -c '^ok    batch one arm' "$TMP/batches.out")" = 1 ]   && grep -q '^ok    batch two arm' "$TMP/batches.out"   && ok "and batch one's arm is graded ONCE, not replayed against batch two's fixture"   || nope "batch one leaked into batch two" "$(cat "$TMP/batches.out")"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "lib-selftest-test: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

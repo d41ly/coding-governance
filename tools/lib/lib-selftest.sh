@@ -67,8 +67,16 @@ _st_width() { local w=${SELFTEST_INNER_WIDTH:-1}; case "$w" in ''|*[!0-9]*) w=1 
 #
 # The builder is a shell function or command; it is invoked with CWD inside a fresh directory and
 # should populate it. Whatever it leaves behind becomes the snapshot every arm starts from.
+# A SECOND CALL STARTS A SECOND BATCH, and before this reset it silently re-ran the first one. The
+# arrays and the counter survived `run_arms`, so a suite needing two base fixtures — which is most of
+# the suites left to port; one of them needs about twenty-five — declared batch two's arms on top of
+# batch one's and graded the OLD arms against the NEW snapshot. Every one of them would have passed or
+# failed for reasons unrelated to what it was written to ask. Found by reading, not by running, which
+# is why it is fixed here rather than after a port had already been built on it.
 build_fixture() {
   [ $# -ge 1 ] || { echo "lib-selftest: build_fixture needs a builder" >&2; return 2; }
+  _st_n=0
+  _st_labels=(); _st_wantrc=(); _st_wantout=(); _st_setup=(); _st_subject=()
   SELFTEST_ROOT=$(mktemp -d) || { echo "lib-selftest: cannot create a scratch root" >&2; return 2; }
   SELFTEST_SNAPSHOT="$SELFTEST_ROOT/snapshot"
   mkdir -p "$SELFTEST_SNAPSHOT" || return 2
