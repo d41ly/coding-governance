@@ -85,7 +85,7 @@ ids TOOL-aHonedRuleset-14 TOOL-aHonedRuleset-15 TOOL-aHonedRuleset-16
 | [TOOL-aHonedRuleset-1 — the prose census](spec/2026-09-04-spec-TOOL-aHonedRuleset-1.md) | 0 | 1 | CLOSED | rev-1 | 2026-09-04 |
 | [TOOL-aHonedRuleset-2 — the charter stops restating the micro-format grammar a gate holds](spec/2026-09-04-spec-TOOL-aHonedRuleset-2.md) | 1 | 2 | CLOSED | rev-7 | 2026-09-06 |
 | [TOOL-aHonedRuleset-6 — BUILD-METHOD's self-declared budget becomes enforceable or goes away](spec/2026-09-04-spec-TOOL-aHonedRuleset-6.md) | 1 | 2 | CLOSED | rev-6 | 2026-09-06 |
-| [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 2 | 2 | SPECCED | rev-7 | 2026-09-06 |
+| [TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them](spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md) | 2 | 2 | CLOSED | rev-7 | 2026-09-06 |
 | [TOOL-aHonedRuleset-4 — the charter's agent-cap bullet keeps its pointer and drops the restatement](spec/2026-09-04-spec-TOOL-aHonedRuleset-4.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-06 |
 | [TOOL-aHonedRuleset-5 — the last-audit stamp rule gets exactly one home](spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-06 |
 | [TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter](spec/2026-09-04-spec-TOOL-aHonedRuleset-8.md) | 4 | 2 | SPECCED | rev-8 | 2026-09-06 |

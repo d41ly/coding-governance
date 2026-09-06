@@ -1,6 +1,6 @@
 # TOOL-aHonedRuleset-3 — the kickoff engine's unattended exits move to the kit that owns them
 
-**Status:** SPECCED · rev-7 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
+**Status:** CLOSED · rev-7 · 2026-09-06 · node a · Tier-2 · base 102e98f0 · streams tooling · order 2 · ratified 2026-09-04
 
 <!-- gen:spec-records -->
 
