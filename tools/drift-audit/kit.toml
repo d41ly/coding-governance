@@ -71,12 +71,6 @@ probe = { must_exist = "{kit}/drift_signals.py" }
 means = "adopted"
 
 [[gate_leg]]
-name = "drift-audit selftest"
-subject = "kit"
-argv = ["python", "{kit}/selftest.py"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
 name = "drift-audit records"
 subject = "repo"
 argv = ["python", "{kit}/drift_report.py", "--check"]

@@ -113,12 +113,6 @@ none = """
 the adopter accepts only `--scaffold`, measured. The kit ships runnable verifiers, but each is already this kit's own gate leg, so pointing `check` at one would make `check` run a gate. Wiring one anyway is a backlog row, not a silence
 """
 
-[[gate_leg]]
-name = "codebase-map kit selftest"
-subject = "kit"
-argv = ["python3", "{kit}/selftest.py"]
-guard = ["{kit}/"]
-
 [[hole]]
 id = "frozen-gate-vs-moving-engine"
 kind = "upgrade"
@@ -133,15 +127,6 @@ subject = "repo"
 argv = ["python", "{kit}/check_gate_coverage.py"]
 guard = ["{kit}/"]
 
-[[gate_leg]]
-name = "codebase-map adopter e2e"
-subject = "kit"
-argv = ["bash", "{kit}/adopt-codebase-map.test.sh"]
-guard = ["{kit}/"]
-
-# Line-ending pins this kit needs in a TARGET. Emitted into the target's own
-# .gitattributes as one govkit-owned block; the renormalize that follows reads git's
-# answer about which paths they govern, never these pattern strings.
 [[lf_pin]]
 pattern = ".codebase-map.conf"
 why = "a sourced conf: a CR reaches the shell as part of the value"

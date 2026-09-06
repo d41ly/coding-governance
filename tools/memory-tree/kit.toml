@@ -140,24 +140,6 @@ argv = ["bash", "{kit}/check-verdict-epoch.sh"]
 guard = []
 
 [[gate_leg]]
-name = "verdict-epoch self-test"
-subject = "kit"
-argv = ["bash", "{kit}/check-verdict-epoch.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "memory-hygiene self-test"
-subject = "kit"
-argv = ["bash", "{kit}/check-memory-hygiene.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "row-keyed merge driver replay"
-subject = "kit"
-argv = ["bash", "{kit}/merge-rows.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
 name = "kit/dogfood doc parity"
 subject = "repo"
 argv = ["bash", "{kit}/kit-dogfood-parity.test.sh"]
@@ -176,12 +158,6 @@ guard = ["{memory_root}/HYGIENE.md", "{memory_root}/TEMPLATE-SPEC.md", "{memory_
 name = "method carriers (every pointer declared)"
 subject = "repo"
 argv = ["bash", "{kit}/check-method-carriers.sh"]
-guard = []
-
-[[gate_leg]]
-name = "method-carriers self-test"
-subject = "kit"
-argv = ["bash", "{kit}/check-method-carriers.test.sh"]
 guard = []
 
 [[gate_leg]]

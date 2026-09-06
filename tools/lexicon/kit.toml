@@ -98,29 +98,6 @@ argv = ["python", "{kit}/lexicon.py"]
 guard = ["tools/", "skills/session-kickoff/", ".githooks/", ".claude/"]
 
 [[gate_leg]]
-name = "lexicon selftest"
-subject = "kit"
-argv = ["python", "{kit}/selftest.py"]
-guard = ["{kit}/"]
-
-# NO GUARD, and it is the only leg in this kit without one. `--check` now verifies BOTH the
-# declaration and the rendered Skill, and the Skill drifts when `.lexicon.conf` moves -- a file that
-# is not a guard pathspec govkit can express. A kit-dir guard would leave a conf-only edit unchecked,
-# which is exactly the drift this leg exists to catch.
-#
-# ONE LEG, NOT TWO. TOOL-dScaffoldedMirror-10 first added a SECOND leg for the Skill with the same
-# argv as this one, guarded differently -- so the bar ran `adopt-lexicon.sh --check` twice, and the
-# guarded copy could never say anything the unguarded copy had not already said. Found by the closing
-# review; the map's gate-legs inventory had also gained an unclaimed key for the redundant leg, which
-# disappeared with it.
-#
-# AND SINCE CLOSING REVIEW B1 THIS LEG ALSO GRADES THE CORPUS, by running `{kit}/lexicon.py` from
-# `--check`. That is deliberately the same engine the guarded leg above runs, and it does NOT
-# re-earn the two-legs defect: what was struck there were two legs with one argv and different
-# guards, where neither could ever out-say the other. Here the unguarded copy is the merge verdict
-# and the guarded one is the fast fail on a `tools/` diff. Cost is one corpus walk, recorded per leg
-# in `<git-dir>/gate-ledger.tsv`.
-[[gate_leg]]
 name = "lexicon wiring"
 subject = "repo"
 argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]

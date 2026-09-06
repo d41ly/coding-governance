@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-3 — a self-test never reaches an adopter, as a leg or as a file
 
-**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 3
+**Status:** INPROGRESS · rev-5 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -25,11 +25,18 @@ anything: `tools/run-gates/kit.toml` and its siblings claim `include = "**"`, so
   `role = "project-owned"`, so the deployer withholds them. `tools/run-gates/kit.toml` already does
   exactly this for `run-gates.gov.test.sh`, with its reason beside it; this extends that rule to the
   rest and gives each one a reason of its own.
-- **S2** — THE LEG HALF FALLS OUT OF S1 AND NEEDS NO CODE. `silenced_legs` already refuses to emit a
-  leg whose argv names a path the target does not hold, and `_cmd_apply` already reports each one
-  rather than shipping it. Withholding a self-test FILE therefore silences its LEG through machinery
-  that exists, is tested, and is documented in that function's own docstring. Prior revisions of this
-  spec proposed a manifest read, a shared helper and a filename predicate; none is needed.
+- **S2** — THE LEG DECLARATION MOVES OUT OF THE DESCRIPTOR. Each withheld suite's `[[gate_leg]]`
+  block leaves its `kit.toml` and becomes an `[[exempt_leg]]` row in `tools/govkit/registry.toml`
+  with its reason. 21 rows move; the leg stays on GOV's bar and is held there exactly as before.
+  Rev-4 said the leg half "needs no code" because `silenced_legs` would drop it. Measured: it does
+  drop it — and it reports each drop with `r.fail`, because that function exists for gov's own
+  DEFECT (a descriptor naming a file gov forgot to ship). Every adopter apply then exited 1 with one
+  problem per withheld suite. The precedent for the right shape was already written beside
+  `run-gates.gov.test.sh` in `tools/run-gates/kit.toml`: "a descriptor row naming a leg the target's
+  manifest cannot carry is what reds the deployer's selfcheck."
+- **S2b** — `silenced_legs` stays exactly as it is. It is the backstop for the accidental case and
+  this unit must not weaken it into accepting a deliberate one; the fix is to stop creating the
+  condition, not to stop reporting it.
 - **S3** — a gate leg asserting the property over a freshly emitted fixture target, in BOTH
   directions: no emitted leg's argv names a self-test path, AND the emitted leg count is strictly
   less than the descriptor row count, so a rule that withholds nothing cannot report clean.
@@ -85,12 +92,15 @@ has to keep in step with `run-gates.sh`. One mechanism, already tested, already 
 
 - One `[[files]]` rule per kit that ships self-tests, `role = "project-owned"`, each carrying its own
   reason line.
+- 21 `[[exempt_leg]]` rows in `tools/govkit/registry.toml`, one per withheld suite, each naming the
+  file its kit withholds and why.
 - `no self-test reaches an adopter` — the new gate leg's name in `tools/gate-legs.json`.
 
 ### Files touched (estimate)
 
-Every `tools/*/kit.toml` that ships a self-test · `tools/gate-legs.json` · `tools/govkit/selftest.py`
-· `WIRE-INTO-PROJECT.md`. **No change to `tools/govkit/govkit.py`.**
+Every `tools/*/kit.toml` that ships a self-test (a `project-owned` files rule added, its
+`[[gate_leg]]` rows removed) · `tools/govkit/registry.toml` (21 `[[exempt_leg]]` rows) ·
+`tools/govkit/selftest.py` · `WIRE-INTO-PROJECT.md`. **No change to `tools/govkit/govkit.py`.**
 
 ### Alternatives rejected
 
@@ -174,6 +184,15 @@ the descriptor-shape legs, which grade every `kit.toml` this unit edits ·
   claim withdrawn, the files stopped shipping, §7's guard claim corrected.
 - rev-3 · 2026-09-06 · folded spec-audit round 2: the apply path shown never to open the manifest, the
   `project-owned` marker adopted, the two halves joined, the population stated as 52/27.
+- rev-5 · 2026-09-06 · BUILT, and building it found what enumeration had not. Withholding the FILE
+  does silence the LEG — `silenced_legs` drops it exactly as rev-4 said — but that function reports
+  each drop with `r.fail`, because it exists for gov's own defect and not for a deliberate act. Every
+  adopter apply exited 1 with one problem per withheld suite. S2 now moves the 21 declarations to
+  `[[exempt_leg]]` rows, which is the shape `tools/run-gates/kit.toml` already documents beside
+  `run-gates.gov.test.sh`, and S2b records that `silenced_legs` itself must NOT be weakened to accept
+  the deliberate case. Observed armed / broken / restored: with the rule the test file and its leg
+  are absent and the apply exits 0; with the rule removed the file comes back. `run-gates canary`,
+  the one leg §4 measured as actually leaking, is among the 21.
 - rev-4 · 2026-09-06 · ENUMERATED before coding, per M2's "to diverge, change the spec first", and the
   unit collapsed. Of the 27 held descriptor rows, 26 are held via `subject`, which the apply already
   emits — so exactly ONE leg leaks, `run-gates canary`. And `silenced_legs` already drops a leg whose
