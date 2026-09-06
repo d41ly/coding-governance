@@ -177,16 +177,38 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
   # an exactly-cap-deep window is indistinguishable from a truncated one, and the caller reported
   # TRUNCATED for a probe that had in fact seen everything. Fetching one extra is the only way to
   # know there was more.
+  # Does the caller carry a subject cache? Asked ONCE, outside the walk.
+  if declare -p _SUBJ >/dev/null 2>&1; then _bc_cache=1; else _bc_cache=0; fi
   _bc_n=0; _bc_mc=""
   [ -n "$_bc_cap" ] && _bc_mc="--max-count=$((_bc_cap+1))"
   for _bc_c in $(GIT rev-list $_bc_ord $_bc_mc $_bc_range 2>/dev/null); do
     _bc_n=$((_bc_n+1))
     # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
     if [ -n "$_bc_cap" ] && [ "$_bc_n" -gt "$_bc_cap" ]; then printf 'TRUNCATED'; return 0; fi
-    _bc_subj=$(GIT log -1 --format=%s "$_bc_c" 2>/dev/null)
+    # FROM THE CALLER'S SUBJECT CACHE WHEN THERE IS ONE, and this is not an optimisation you may drop.
+    # `check-pass-order.sh` builds `_SUBJ` in one `git log` over all of HEAD and asserts its size
+    # against `rev-list --count`, then walks 10,811 commits through here. Reading a subject per commit
+    # instead costs a `git log` AND a `printf|tr` on every one of them, and the leg's own ledger prices
+    # the difference at 591 s cached against 3977-5401 s uncached — the second of which straddles its
+    # own 5400 s ceiling, so the leg stops being able to answer at all.
+    #
+    # IT WAS ORPHANED BY THE LIFT THAT CREATED THIS FUNCTION. The cache and its reader were one
+    # inline block; the reader moved here and the read did not come with it, so `_SUBJ` was still
+    # BUILT and size-asserted by the caller and consulted by nothing. Caught at the push boundary by
+    # a 6.7x leg-level regression, not by anything that reads the code.
+    #
+    # THE PROBE IS DECLARED-ONCE, not per commit: `declare -p` is a builtin but this loop runs tens of
+    # thousands of times, and a caller that declares no `_SUBJ` must not error under `set -u`.
+    if [ "$_bc_cache" = 1 ]; then _bc_subj=${_SUBJ[$_bc_c]-}; else _bc_subj=""; fi
+    # A cached value is ALREADY tokenised and space-padded on both ends, so an empty read is a MISS
+    # and nothing else — an empty subject caches as two spaces. A miss falls back to the pair of
+    # processes the cache replaced rather than reading as "this commit does not name the id", which
+    # would grade the unit unbuilt and report a clean bill.
+    #
     # THE WHOLE-TOKEN MATCH is `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up
     # sequence is a prefix of nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
-    case " $(printf '%s' "$_bc_subj" | tr -c 'A-Za-z0-9-' ' ') " in *" $_bc_id "*) ;; *) continue ;; esac
+    [ -n "$_bc_subj" ] || _bc_subj=" $(GIT log -1 --format=%s "$_bc_c" 2>/dev/null | tr -c 'A-Za-z0-9-' ' ') "
+    case "$_bc_subj" in *" $_bc_id "*) ;; *) continue ;; esac
     # Did it touch anything outside this build's own record surface?
     if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \
        | grep -v '^$' | grep -qv -e "^$_bc_dir/" $_bc_ex; then
