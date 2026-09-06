@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.62 -->
+<!-- gov:kit memory-tree@2.63 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -183,6 +183,9 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     Every acceptance bullet must name a witness in backticks once the filename date reaches
     `SPEC_WITNESS_CUTOFF`, on either tier. SHAPE only — that a bullet names something, never
     that the named thing exists.
+    Every §2 scope item must name the acceptance criterion that observes it, or carry `NOT OBSERVED`
+    and a reason, once the filename date reaches `SCOPE_JOIN_CUTOFF`, on either tier — and only for a
+    spec carrying BOTH headings, matched by heading TEXT rather than by ordinal. SHAPE only.
     Every §9 revision entry numbered rev-2 or higher must name what it MOVED — a `§<n>`, `S<n>` or
     `AC<n>` token — once the filename date reaches `REV_SCOPE_CUTOFF`, on either tier. Graded per
     ENTRY with continuation lines folded in, because this corpus wraps §9 and puts the detail in the

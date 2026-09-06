@@ -63,6 +63,16 @@ SPEC10_EVIDENCE_CUTOFF=""
 # zero-population notice while that is true, so the silence is announced rather than assumed.
 REV_SCOPE_CUTOFF=""
 
+# Scope-join ratchet (check 12): from this date, every column-0 item in a spec's `## N. Scope (IN)`
+# must name at least one acceptance criterion — `AC` followed by digits — or carry the marker
+# `NOT OBSERVED` and the reason none observes it. One escape spelling and no synonyms, because a
+# false red names its own remedy while a false pass is silent. The arm needs BOTH the Scope and the
+# Acceptance heading present, matched by heading TEXT rather than by ordinal, so a Tier-1 spec that
+# legitimately writes no acceptance section is untouched. Blank = never required. Set it STRICTLY
+# AHEAD of every dated spec on every live branch, as with the cutoffs above; the engine prints a
+# zero-population notice for as long as that leaves the arm grading nothing.
+SCOPE_JOIN_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.

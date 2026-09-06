@@ -1,6 +1,6 @@
 # aJoinedCanon — acceptance ledger
 
-**Serves:** journal TOOL-aJoinedCanon-1
+**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3
 
 Node `a`, 2026-09-06, base `274aa39b`. One `**Evidences:**` block per unit, appended as each unit
 lands. Two forms and no third: OBSERVED carries a backticked token naming what made the observation,
@@ -24,6 +24,24 @@ AMENDED names the revision that changed the criterion.
 - AC14 — `grep -cF` — `<scope>` in `memory/TEMPLATE-SPEC.md` 0 → 2; `REV_SCOPE_CUTOFF` there 0 → 2; `REV_SCOPE_CUTOFF` in `memory/HYGIENE.md` 0 → 1; the §9 skeleton's `rev-2` example line now carries `§4 · AC3` where it carried no `§`. All four were 0 before the render, which is what makes this a content check rather than a sameness one.
 - AC15 — `out3r` — a run whose conf declares `SPEC_FORMAT_CUTOFF` and `REV_SCOPE_CUTOFF` and NO `SPEC_WITNESS_CUTOFF` shows `no backticked witness` absent AND `tFixture-90` still reported. The arm has one date guard, its own; nested in the `wcut` block this assertion is what would red.
 - AC16 — `grep -o -- ' -v [a-z0-9]*=' | sort | uniq -d` — over the one line carrying `bad12_raw=$(printf`, the output is empty. The liveness half refuses rather than reporting a clean zero when the locator matches other than exactly one line. Read honestly about its reach: only `revscopecut` is new at this landing, so the criterion cannot go red for a real collision until a later `order` binds a second name there. The staged duplicate that proves it can fire was run against the shipped line during the fold, not re-staged here.
+
+**Evidences:** TOOL-aJoinedCanon-3
+
+- AC1 — `bash tools/memory-tree/check-memory-hygiene.sh` — scratch tree at `SCOPE_JOIN_CUTOFF="2026-08-20"`, `tFixture-110` reds: `(scope items naming neither an acceptance criterion nor NOT OBSERVED, required at/after SCOPE_JOIN_CUTOFF 2026-08-20): S1`. Named by its `S` label, not merely by file. Red observed before the arm landed.
+- AC2 — `tFixture-111` — the same item once it reads `Observed by AC1.` is silent in that same run.
+- AC3 — `tFixture-112` — the identical item dated `2026-08-10`, before the cutoff, is silent.
+- AC4 — `tFixture-113` / `tFixture-114` — the `NOT OBSERVED` escape with a reason is silent; the same sentence in ordinary lower case still reds, naming `S2`. One spelling, and §4 measured 0 of 3,207 items carrying the prose form, so nothing landed is caught by the case.
+- AC5 — `tFixture-115` / `tFixture-116` — a Scope heading with NO Acceptance heading is silent, which pins the `dUnstalledConvoy` M13 class; and a Tier-1 fixture carrying both headings with one unjoined item reds, which pins F1's both-tiers ruling. `tFixture-116`, whose item enumerates its criteria as sub-bullets, is silent — sub-bullets are continuations of the one item.
+- AC6 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — exits 0 after `--render`, 4 pairs. Sameness only; AC9 and AC14 carry the content half.
+- AC7 — `check-memory-hygiene.sh` — at the shipped cutoff the run prints `the §2 scope-join arm graded NO spec — SCOPE_JOIN_CUTOFF is 2026-09-07` and exits 0; under AC8's lowering the notice is absent.
+- AC8 — `SCOPE_JOIN_CUTOFF="2026-01-01"` — the run over the real tree reds naming **524 of the 539 date-named tracked specs**, a 2.8% pass rate against §4's predicted 3.4%. The lowering was reverted before the commit.
+- AC9 — `grep -c 'NOT OBSERVED' memory/TEMPLATE-SPEC.md` — 0 → 2, and the numbering bullet now carries the join clause (`grep -c 'each scope item names the criterion that observes it'` returns 1).
+- AC10 — `grep -qE '^SCOPE_JOIN_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` — succeeds, and the six comment lines above it name the rule, say blank is off, and say to set the value ahead of the corpus.
+- AC11 — `out3j` — a scratch conf declaring `SCOPE_JOIN_CUTOFF` and NO `SPEC_WITNESS_CUTOFF` still reds `tFixture-110`, and `no backticked witness` is absent from the same run. The arm reads `jcut` and nothing else. This is also the regression net for unit 4's hoist one `order` step later.
+- AC12 — `out3` — the disabled-when-blank run emits no `scope items naming neither` finding while check 12 is armed.
+- AC13 — `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh` — both exit 0; the epoch gate reports `34 line(s) moved` against the 2.61 → 2.62 bump, and this landing carries 2.62 → 2.63.
+- AC14 — `grep -c 'SCOPE_JOIN_CUTOFF' memory/HYGIENE.md` — 0 → 1, in the check-12 entry, with the SHAPE-only caveat and the both-headings precondition beside it.
+- AC15 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T17:05:19+03:00 @ 274aa39b`; `last-body-change` is the same sha before and after, which is the "no delta → no touch" half.
 
 ## What the date re-derivation changed
 

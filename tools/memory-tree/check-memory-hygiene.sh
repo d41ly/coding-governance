@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.62   # gov:kit memory-tree@2.62 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.63   # gov:kit memory-tree@2.63 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -56,6 +56,8 @@ SPEC10_EVIDENCE_CUTOFF=""   # date; a Tier-2 spec dated >= this must RECORD its 
 # The SIXTH cutoff, same semantics as the three RULE cutoffs and preset here for the same adopter
 # argument the paragraph above states (TOOL-aJoinedCanon-1).
 REV_SCOPE_CUTOFF=""     # date; specs dated >= this must give every rev-2+ §9 entry a §n/Sn/ACn scope token (check 12); blank = never required
+# The SEVENTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-3).
+SCOPE_JOIN_CUTOFF=""    # date; specs dated >= this must have every §2 scope item name an AC label or NOT OBSERVED (check 12); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -956,7 +958,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1049,6 +1051,53 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       if (inac && lab != "" && acc !~ /`[^`]+`/) { nwb++; wbad = (nwb == 1) ? lab : wbad ", " lab }
       if (nwb > 0)
         print f " (acceptance bullets naming no backticked witness, required at/after SPEC_WITNESS_CUTOFF): " wcut " -- " wbad
+    }
+    # ---- TOOL-aJoinedCanon-3: a §2 scope item names the criterion that OBSERVES it, spelled AC
+    # ---- followed by digits, or carries the marker NOT OBSERVED and a reason. ONE escape spelling,
+    # ---- deliberately not widened: a false red names its own remedy, a false pass is silent.
+    # ---- OUTSIDE the witness guard that closes on the brace above, at the same nesting level, and
+    # ---- reading jcut and no other key. Nested inside it this arm would grade the INTERSECTION of
+    # ---- two cutoffs, dead for any adopter arming this key while the witness key sits blank --
+    # ---- which is what the shipped example ships -- and dead invisibly, because this key would read
+    # ---- as armed. AC11 is the local witness; the corpus cannot show it, since both keys hold dates
+    # ---- every graded spec clears.
+    # ---- BOTH headings by TEXT, never by ordinal, and silent unless both are present. That is a
+    # ---- defect this corpus already paid for: two closed Tier-1 specs number their criteria under
+    # ---- §5 and carry Gates at §6, so an ordinal population reds a spec that is legal under the
+    # ---- format. The regexes are the sibling witness arm above, one phrase changed.
+    # ---- An ITEM is a column-0 bullet plus every following line to the next column-0 bullet, the
+    # ---- next `## ` or the next `### `, so an item may enumerate its criteria as SUB-bullets and
+    # ---- still be graded as one. Fenced lines never arrive: body[] is built by the fence machine.
+    if (jcut != "" && fdate != "" && fdate >= jcut) {
+      sj_hasS = 0; sj_hasA = 0
+      for (i = 1; i <= n; i++) {
+        if (body[i] ~ /^## [0-9]+[.] Scope \(IN\)[ 	]*$/) sj_hasS = 1
+        else if (body[i] ~ /^## [0-9]+[.] Acceptance criteria[ 	]*$/) sj_hasA = 1
+      }
+      if (sj_hasS && sj_hasA) {
+        sj_in = 0; sj_ni = 0; sj_open = 0
+        for (i = 1; i <= n; i++) {
+          L = body[i]
+          if (L ~ /^## /) { sj_in = (L ~ /^## [0-9]+[.] Scope \(IN\)[ 	]*$/); sj_open = 0; continue }
+          if (!sj_in) continue
+          if (L ~ /^### /) { sj_open = 0; continue }
+          if (L ~ /^(-|\*)[ 	]/) {
+            sj_ni++; sj_txt[sj_ni] = L; sj_open = 1
+            sj_l = L; sub(/^(-|\*)[ 	]*(\*\*)?/, "", sj_l)
+            if (sj_l ~ /^S[0-9]/) { sub(/[^A-Za-z0-9].*$/, "", sj_l); sj_lbl[sj_ni] = sj_l }
+            else sj_lbl[sj_ni] = "item " sj_ni
+          } else if (sj_open && sj_ni > 0) sj_txt[sj_ni] = sj_txt[sj_ni] " " L
+        }
+        sj_bad = ""; sj_nb = 0
+        for (i = 1; i <= sj_ni; i++) {
+          if (sj_txt[i] ~ /(^|[^A-Za-z0-9])AC[0-9]/) continue
+          if (index(sj_txt[i], "NOT OBSERVED") > 0) continue
+          sj_nb++; sj_bad = (sj_nb == 1) ? sj_lbl[i] : sj_bad ", " sj_lbl[i]
+        }
+        if (sj_nb > 0)
+          print f " (scope items naming neither an acceptance criterion nor NOT OBSERVED, required at/after SCOPE_JOIN_CUTOFF " jcut "): " sj_bad
+        for (i = 1; i <= sj_ni; i++) { delete sj_txt[i]; delete sj_lbl[i] }
+      }
     }
     # ---- TOOL-cSettledDocket-3: these two run for EVERY TIER, so they sit ABOVE the Tier-1 cut.
     # ---- TEMPLATE-SPEC calls the fork rule machine-checked; it was checked on Tier-2 alone because
@@ -1352,6 +1401,12 @@ if [ "$STAGED" = 0 ] && [ -n "$REV_SCOPE_CUTOFF" ]; then
   _rs_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$REV_SCOPE_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_rs_n:-0}" -gt 0 ] || echo "memory-hygiene: the §9 rev-scope arm graded NO spec — REV_SCOPE_CUTOFF is $REV_SCOPE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
+fi
+# Same notice, same footing, for the §2 scope-join arm (TOOL-aJoinedCanon-3).
+if [ "$STAGED" = 0 ] && [ -n "$SCOPE_JOIN_CUTOFF" ]; then
+  _sj_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SCOPE_JOIN_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_sj_n:-0}" -gt 0 ] || echo "memory-hygiene: the §2 scope-join arm graded NO spec — SCOPE_JOIN_CUTOFF is $SCOPE_JOIN_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
 fi
 fi
 

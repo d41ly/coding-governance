@@ -64,7 +64,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -279,6 +279,37 @@ revspec 93 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.'
 #      the specs that already do the right thing, because this house style wraps at ~100 columns.
 revspec 94 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review
   corrections, which moved §4 and the acceptance criteria beneath it.'
+
+# ---- TOOL-aJoinedCanon-3: the §2 scope-JOIN arms. SCOPE_JOIN_CUTOFF is declared at 2026-08-20 in
+# ---- the conf above, between the fixture eras. The shipped cutoff sits ahead of every dated spec on
+# ---- every branch, so the real corpus grades nothing and these six fixtures are the whole coverage.
+# ---- Tier-1 throughout: the arm is both-tiers by placement above the Tier-1 cut, and a Tier-1
+# ---- fixture keeps the section canon out of the way so a red here can only be this arm.
+joinspec() { # $1 = num, $2 = date, $3 = the §2 body, $4 = the §6 body (empty string = NO §6 heading)
+  { printf '# t%s\n\n**Status:** OPEN · rev-1 · %s · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n%s\n\n' "$1" "$2" "$3"
+    [ -n "$4" ] && printf '## 6. Acceptance criteria\n\n%s\n\n' "$4"
+    printf '## 9. Revision log\n\n- rev-1 · %s · initial draft.\n\n## 10. Reuse audit\n\nNothing here.\n' "$2"
+  } > "$D/spec/$2-spec-tFixture-$1.md"; }
+# 110 — post-cutoff, an item naming neither an AC label nor the escape -> RED, named by its S label
+joinspec 110 2026-08-25 '- **S1** — the thing this unit builds.' '- **AC1** — `token` — the observation.'
+# 111 — the same item once it names AC1 -> silent
+joinspec 111 2026-08-25 '- **S1** — the thing this unit builds. Observed by AC1.' '- **AC1** — `token` — the observation.'
+# 112 — PRE-cutoff twin of 110. Without it "no landed spec goes retroactively red" is untested.
+joinspec 112 2026-08-10 '- **S1** — the thing this unit builds.' '- **AC1** — `token` — the observation.'
+# 113 — the escape, with its reason -> silent. The prose spelling is NOT the escape; 114 pins that.
+joinspec 113 2026-08-25 '- **S1** — the thing this unit builds. NOT OBSERVED — it ships no observable.' '- **AC1** — `token` — the observation.'
+# 114 — the same sentence in ordinary lower case is NOT the escape and still reds. One spelling, and
+#       the corpus measured 0 of 3,207 items carrying it, so nothing landed is caught by the case.
+joinspec 114 2026-08-25 '- **S2** — the thing this unit builds. not observed in this build.' '- **AC1** — `token` — the observation.'
+# 115 — a Scope heading and NO Acceptance heading -> silent. This is dUnstalledConvoy M13: two closed
+#       Tier-1 specs number their criteria under §5 and carry Gates at §6, so an ordinal-keyed
+#       population reds a spec that is legal under the format.
+joinspec 115 2026-08-25 '- **S1** — the thing this unit builds.' ''
+# 116 — the item enumerates its criteria as SUB-bullets, which are continuations of the one item.
+{ printf '# t116\n\n**Status:** OPEN · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n'
+  printf -- '- **S1** — the thing this unit builds.\n  - observed by AC1 for the arm\n  - and by AC2 for the render\n\n'
+  printf '## 6. Acceptance criteria\n\n- **AC1** — `token` — the observation.\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · initial draft.\n\n## 10. Reuse audit\n\nNothing here.\n'
+} > "$D/spec/2026-08-25-spec-tFixture-116.md"
 
 # ---- TOOL-cSettledDocket-3: Tier-1 twins for the two assertions HOISTED above the Tier-1 cut.
 # ---- Before the hoist every one of these was silent, because `next` cut the record first.
@@ -752,6 +783,18 @@ miss 'tFixture-91.md (revision entries naming no'   # the entry gained a §4 tok
 miss 'tFixture-92.md (revision entries naming no'   # PRE-cutoff, grandfathered
 miss 'tFixture-93.md (revision entries naming no'   # rev-1 only, exempt
 miss 'tFixture-94.md (revision entries naming no'   # the token is on a wrapped continuation line
+
+# ---- TOOL-aJoinedCanon-3: §2 scope-join. AC1-AC5.
+hit  'tFixture-110.md (scope items naming neither an acceptance criterion nor NOT OBSERVED'
+miss 'tFixture-111.md (scope items naming neither'   # the item names AC1
+miss 'tFixture-112.md (scope items naming neither'   # PRE-cutoff, grandfathered
+miss 'tFixture-113.md (scope items naming neither'   # the NOT OBSERVED escape, with its reason
+hit  'tFixture-114.md (scope items naming neither'   # lower-case prose is NOT the escape
+miss 'tFixture-115.md (scope items naming neither'   # no Acceptance heading, so not graded at all
+miss 'tFixture-116.md (scope items naming neither'   # sub-bullets are continuations of the one item
+# the OFFENDING ITEM rides the message, by its S label where it has one, and the cutoff with it.
+n=$((n+1))
+grep -qF 'tFixture-110.md (scope items naming neither an acceptance criterion nor NOT OBSERVED, required at/after SCOPE_JOIN_CUTOFF 2026-08-20): S1' <<<"$out" || { echo "FAIL the scope-join rejection does not name its own cutoff and the offending item"; st=1; }
 # the OFFENDING REV rides the message, not merely the file — a spec with a long §9 is otherwise a
 # search, and the cutoff rides it too, because check 12's own heading names SPEC_FORMAT_CUTOFF.
 n=$((n+1))
@@ -1017,6 +1060,9 @@ if grep -qF 'no backticked witness' <<<"$out3"; then echo "FAIL: the witness req
 # TOOL-aJoinedCanon-1 AC6 — the same run has REV_SCOPE_CUTOFF blank while check 12 is armed.
 n=$((n+1))
 if grep -qF 'revision entries naming no' <<<"$out3"; then echo "FAIL: the rev-scope requirement fired with a blank REV_SCOPE_CUTOFF"; st=1; fi
+# TOOL-aJoinedCanon-3 AC12 — the same run has SCOPE_JOIN_CUTOFF blank while check 12 is armed.
+n=$((n+1))
+if grep -qF 'scope items naming neither' <<<"$out3"; then echo "FAIL: the scope-join requirement fired with a blank SCOPE_JOIN_CUTOFF"; st=1; fi
 # docs/legacy-note.md is still tracked in this run — only the conf key went away.
 n=$((n+1))
 if grep -qF 'is the only sanctioned memory root' <<<"$out3"; then echo "FAIL: check 11 ran with a blank TOMBSTONE_ROOTS"; st=1; fi
@@ -1036,6 +1082,16 @@ if grep -qF 'no backticked witness' <<<"$out3r"; then echo "FAIL: the witness re
 n=$((n+1))
 grep -qF 'tFixture-90.md (revision entries naming no' <<<"$out3r" \
   || { echo "FAIL: the rev-scope arm went silent when the UNRELATED SPEC_WITNESS_CUTOFF was blanked"; st=1; }
+# TOOL-aJoinedCanon-3 AC11 — the same INDEPENDENCE property for the scope-join arm, which needs its
+# own witness because it is a DIFFERENT block: it sits outside the wcut guard and reads only jcut.
+# It is also the regression net for TOOL-aJoinedCanon-4's hoist one order step later, since it reds
+# if any restructuring of the neighbouring block draws this branch back inside a guard.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSCOPE_JOIN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out3j=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'no backticked witness' <<<"$out3j"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
+n=$((n+1))
+grep -qF 'tFixture-110.md (scope items naming neither' <<<"$out3j" || { echo "FAIL: the scope-join arm went silent when the UNRELATED SPEC_WITNESS_CUTOFF was blanked"; st=1; }
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 
 # ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector

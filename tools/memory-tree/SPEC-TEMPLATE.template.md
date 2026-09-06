@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.62 -->
+<!-- gov:kit memory-tree@2.63 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -91,7 +91,8 @@ an absent region cannot be told from a spec nobody has recorded against.
   fenced blocks for commands, code, and schemas.
 - Name things by repo identifier — a file path, flag key, decision id — never "the helper above".
 - Number scope and acceptance items (`S1`, `S2`… / `AC1`, `AC2`…) so reviews and build summaries
-  can cite them stably.
+  can cite them stably — and JOIN them: each scope item names the criterion that observes it, or says
+  `NOT OBSERVED` and why. See the §2 body below; machine-checked from `SCOPE_JOIN_CUTOFF`.
 - No narration, no restating the heading as its first sentence, no marketing adjectives.
 - Verify every claim about existing code against source at writing time; mark the rest `UNVERIFIED`.
 - A section that genuinely doesn't apply keeps its heading with the single line `N/A — <why>`.
@@ -196,6 +197,15 @@ One or two sentences: the change and why it's worth building.
 ## 2. Scope (IN)
 
 What this unit builds, as a bounded numbered list (S1, S2, …). Every item is verifiable at DoD.
+
+Once a spec's filename date reaches `SCOPE_JOIN_CUTOFF` (`.memory-tree.conf`; blank turns it off),
+every item here NAMES the acceptance criterion that observes it, spelled `AC` followed by digits —
+or carries the marker `NOT OBSERVED` and the reason none does. One escape spelling and no synonyms:
+a false red names its own remedy, a false pass is silent. An item is the column-0 bullet plus every
+line beneath it, so listing the criteria as sub-bullets satisfies it. The arm is silent unless the
+spec carries BOTH this heading and an Acceptance criteria heading, found by heading TEXT rather than
+by number, so a Tier-1 spec that legitimately writes no acceptance section is untouched. SHAPE only:
+it asserts the item names a label, never that the criterion so named actually observes it.
 
 ## 3. Non-goals (OUT)
 
