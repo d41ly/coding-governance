@@ -17,17 +17,22 @@
 
 Give an adopted project the second and last supported declaration transition: expand the verb table
 once, per its own needs, from the frozen canon and never from its own corpus. Today
-`tools/lexicon/adopt-lexicon.sh:247-251` refuses outright when a declaration exists, so an adopter who
-needs a concept the seed missed has no tool-supported route at all and edits by hand with nothing
-bounding what they add.
+`tools/lexicon/adopt-lexicon.sh` refuses outright when a declaration exists — the branch printing
+`already exists — refusing to overwrite a curated declaration` — so an adopter who needs a concept
+the seed missed has no tool-supported route at all and edits by hand with nothing bounding what they
+add.
 
 ## 2. Scope (IN)
 
-- **S1** — `--expand` joins the mode allowlist at `tools/lexicon/adopt-lexicon.sh:184` and its usage
-  line, beside `--scaffold`, `--check` and `--render`.
+- **S1** — `--expand` joins the mode allowlist in `tools/lexicon/adopt-lexicon.sh` — the single
+  `case "$MODE" in` line — and its usage string, beside `--scaffold`, `--check` and `--render`. It
+  ALSO needs a mode-guarded block that EXITS above the scaffold path, which is that file's
+  FALL-THROUGH rather than a guarded branch: an allowlist entry with no handler above it makes
+  `--expand` run `--scaffold`, which on an adopted repo prints a plausible-looking refusal that is
+  not the one the operator asked for.
 - **S2** — The guard reads `expanded=` from the conf and refuses when it is non-empty, naming the
-  stamp. The read uses the same CRLF-hardened shape as the `ratified` read at
-  `tools/lexicon/adopt-lexicon.sh:226` — `tr -d '\r'` FIRST, because an anchored `s/"$//` cannot strip
+  stamp. The read uses the same CRLF-hardened shape as the `ratified` read in
+  `tools/lexicon/adopt-lexicon.sh` — `tr -d '\r'` FIRST, because an anchored `s/"$//` cannot strip
   a quote a carriage return follows and the residue `"\r` reads as a non-empty value, which inverts
   the refusal.
 - **S3** — The candidate set is the live canon representatives minus the representatives the `VERBS`
