@@ -9,6 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes, 1 surfaced
+keepalive-reaped: CronDelete returned 'Cancelled job 62177af0', and CronList then returned 'No scheduled jobs' — reaped and verified empty, not assumed
 witness: 84383ffd78a1e8fee9207b15d1f050b68a0e339e
 phase: VERIFYING
 mode: slug
@@ -46,3 +48,9 @@ base: 6ec402bd3eb7f9cb5ce6257b0f60348ae3e593fc
 2026-09-06T13:29:01Z brief · item TOOL-aHonedRuleset-5 · reason 36a4b8a1e0cb memory/builds/aHonedRuleset/spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md
 
 2026-09-06T16:02:33Z review · item aHonedRuleset · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-06T21:21:46Z decision · item The merge bar cannot go green on this branch: tools/drift-audit/drift_report.py --check exits 1 at BASE 6ec402bd and at HEAD, on two signals this build did not cause — .lexicon.conf's LANGS ratchet moved .sh parser->dark with no justification beside it, and closed_specs_with_no_product_commit sits at 2 against a pin of 1. Should this run fix another build's ratchet to land, or land on an override naming them? · reason REFUSED to fix them. Both are outside this build's stated goal, and the .lexicon.conf ratchet is a governance-carrier declaration owned by whoever weakened it, which M3 veto 2 puts beyond a delegated resolver. Widening a prose-trim build into someone else's ratchet repair would answer an open question that is not this build's, which is exactly what this build's own README forbids. The alternative considered and rejected: raising the drift pins, which weakens a shrink-only ratchet to make a red look green and is the one move the signal exists to prevent. Landing therefore goes through a gates-green override that NAMES both signals and records that each reproduces at base, so the next reader can tell a pre-existing red from one this build introduced. Verified by running the leg in a scratch worktree at 6ec402bd: exit 1 there, exit 1 here, and the two entries are the same two.
+
+2026-09-06T21:22:07Z brief · item TOOL-aHonedRuleset-3 · reason 9b7bbd89fb33 memory/builds/aHonedRuleset/spec/2026-09-04-spec-TOOL-aHonedRuleset-3.md
+
+2026-09-06T21:22:08Z brief · item TOOL-aHonedRuleset-5 · reason 438ecaa24bcd memory/builds/aHonedRuleset/spec/2026-09-04-spec-TOOL-aHonedRuleset-5.md
