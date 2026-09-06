@@ -91,7 +91,7 @@ ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL
 | [TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches](spec/2026-09-06-spec-TOOL-aQuenchedHarness-7.md) | 8 | 2 | OPEN | rev-3 | 2026-09-06 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
