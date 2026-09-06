@@ -49,13 +49,6 @@ defects in the map kit were observed while measuring, none of them about relatio
   is RESCUED before `TOOL-aSurfacedLexicon-2` deletes it, which is why unit 6 takes order 1 across
   two builds; `RECALL_DARK_LAYERS` becomes EXTENSIONS with a migration; the reinvention backlog moves
   OUTSIDE the worktree, reversing `bConvergentLodestar` F7. Each mark is in its own §8.
-- **The spec-audit loop ENDED NON-CONVERGENT at round 3, and every blocker was FOLDED.** Rounds 1, 2
-  and 3 confirmed 3, 2 and 3 blockers, so round 3's count was not strictly smaller and M4 stops the
-  loop there. All twenty of its distinct defects are defects in documents the review read, so the
-  recorded disposition is `fold` and not `promote`: no blocker needed a mechanism this build lacks.
-  Round 3 was the first to clear the ~0.5 precision floor (0.53), and the first to read specs 6 and
-  7 at all. The specs are not re-reviewed after this fold — M4 forbids it — so the closing diff
-  review is the next and last review pass.
 - **The units are SEQUENCED, and an earlier revision of this bullet claimed the opposite.** Write
   sets intersect on `map_diff.py`, on `reuse_lookup.py`'s banner, and on one `memory/backlog/TOOL.md`
   row M6 clause 3 forbids two passes to touch. The build-order block below is the authority.

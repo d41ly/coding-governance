@@ -104,7 +104,8 @@ it; neither may be dispatched concurrently with the other, per M6 clause 1.
   no longer claims the backlog is tracked, that the fiction is permanent, or that it ships to
   adopters. This unit supplies the wording per S3 and does not edit the file.
 - **AC7** — When `--converge` runs in a fixture worktree that ALREADY carries an untracked
-  `memory/map/reinvention-backlog.md` from a previous release, the run names that legacy path, states
+  `reinvention-backlog.md` inside `memory/map/` from a previous release, the run names that legacy
+  path, states
   it is no longer written, leaves the file in place, and `git status` still shows it. Observed before
   the fix so the silent case is seen once. This is the migration §5's risks row obliges and rev-4's
   ratification created; AC1 is scoped to a CLEAN fixture and reaches none of it.
