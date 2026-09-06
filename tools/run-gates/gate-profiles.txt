@@ -25,6 +25,17 @@
 #                runner now captures through a file and adds a kill-after, and the canary grades
 #                the elapsed time against an untimed control rather than the message.
 #
+#   wall=<s>     a WHOLE-RUN wall-clock bound, 0 = off. The per-leg `timeout` bounds ONE leg; this
+#                bounds the RUN, so a bar's worst case stops being the sum of every ceiling it can
+#                reach. A breach KILLS the outstanding legs and REDS naming them -- never a skip,
+#                never a green, and the runner survives the kill so it can print that verdict. It is
+#                NOT a process-group kill: this runner enables no job control and `setsid` is absent
+#                on node `a`, so every leg shares the runner's group and a group kill would take the
+#                verdict down with the legs. Recorded per-leg pids and their descendants instead,
+#                collected from ONE `ps` snapshot BEFORE anything is killed, because killing a
+#                parent reparents its children out from under the walk. `GATE_WALL=<s>` overrides
+#                the row's value alone.
+#
 # OVERRIDES: `GATE_PROFILE=<name>` selects a row by name and skips detection. `GATE_PROFILES=<path>`
 # points at a different table; a path that does not exist falls back to the built-in formula, which
 # is the documented rollback for this whole mechanism. `GATE_JOBS=<n>` overrides the WIDTH alone and
@@ -43,7 +54,16 @@
 # figure, and a 16-core / 8 GB VM selecting this row is the thrash this table exists to stop.
 # Width 8 is MEASURED, not guessed: at 16 each leg dilates under load faster than the extra worker
 # repays. Node `a` (16 cores, 32693 MB) selects this row, so its behaviour does not move.
-capable	8	24000	width=8,timeout=0
+
+# THE WALL, declared per row against the readings this repo holds rather than chosen. The costliest
+# bar measurable here is `GATE_FULL=1 GATE_SELFTESTS=1`: 13644 s of leg-sum across 94 legs with its
+# longest leg at 3837 s, so at width 8 the wall clock floor is the longest leg and the pool term is
+# 13644/8 = 1706 s -- about 4000 s end to end. 10800 is 2.7x that. It is deliberately NOT tight: a
+# bound that fires on a healthy bar turns a passing run red and teaches everyone to ignore the
+# verdict, which `TOOL-dRetiredFork-40` records as strictly worse than a loose one. What it buys is
+# that a WEDGED bar is bounded at three hours instead of at the sum of every ceiling it can reach.
+# The lower rows scale with the pool term, which is the only part that moves with the width.
+capable	8	24000	width=8,timeout=0,wall=10800
 
 # --- the 4-core class ------------------------------------------------------------------------------
 # Deliberately BEHAVIOUR-NEUTRAL: the built-in formula already yields width 4 there. Moving the
@@ -51,11 +71,11 @@ capable	8	24000	width=8,timeout=0
 # matters, and a knob whose first landing is also its first behaviour change has no control. This
 # row's PURPOSE is its RAM threshold of zero paired with the row above: it is what a high-core,
 # low-RAM box falls to.
-modest	4	0	width=4,timeout=0
+modest	4	0	width=4,timeout=0,wall=14400
 
 # --- the catch-all, and the detection-failure row --------------------------------------------------
 # Zero thresholds, so it can never fail to match. Width 2 rather than 1 because unknown hardware is
 # slow, not serial-only. Removing this row is an operator error and the runner refuses rather than
 # silently falling through to the built-in formula: absent and unmatchable are different states and
 # only one of them is a mistake.
-minimal	0	0	width=2,timeout=0
+minimal	0	0	width=2,timeout=0,wall=21600

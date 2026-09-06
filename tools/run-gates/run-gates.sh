@@ -16,10 +16,17 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.4   # gov:kit run-gates@1.4
+KIT_RUN_GATES_VERSION=1.5   # gov:kit run-gates@1.5
 # 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
 # the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
 # there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
+# 1.4 -> 1.5: `gate-profiles.txt` gained the `wall` knob and the runner gained `KNOWN_KNOBS`
+# entry for it. THE SKEW IS ASYMMETRIC AND FATAL IN ONE DIRECTION: a 1.4 runner reading a 1.5
+# table hits `prof_die` on the first row and exits 2 having run ZERO legs -- every bar, not
+# some. A 1.5 runner reading a 1.4 table is fine, because an absent knob defaults. The two
+# files ship in one kit and one `include = "**"` rule, so an ordinary apply moves them
+# together; what is NOT covered is a partial update or a hand copy of one file, and unlike the
+# 1.1 case above no govkit floor withholds the table today. TOOL-aQuenchedHarness-1.
 # THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
 # cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
 # `bash ../tools/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
@@ -174,7 +181,7 @@ TIMINGS="$LEDGER"
 # slower, and it may turn an unbounded hang into a bounded RED. It may never make the bar check less.
 # KNOWN_KNOBS is the whole implemented set; the canary PINS the same set separately, which is what
 # stops a coverage knob being added without an author reading this paragraph.
-KNOWN_KNOBS="width timeout"
+KNOWN_KNOBS="width timeout wall"
 PROFILES="${GATE_PROFILES:-$KITREL/gate-profiles.txt}"
 prof_die() { echo "run-gates: $*" >&2; exit 2; }
 
@@ -259,7 +266,7 @@ det_ram_capped() {
   return 0
 }
 
-PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_TAG=""; PROF_WHERE=""
+PROF_NAME=""; PROF_WIDTH=""; PROF_TIMEOUT=0; PROF_WALL=0; PROF_TAG=""; PROF_WHERE=""
 if [ -f "$PROFILES" ]; then
   # GATE_PROFILE names a row and SKIPS detection; otherwise the first row both thresholds satisfy.
   if [ -n "${GATE_PROFILE:-}" ]; then PROF_WHERE="detection skipped"
@@ -315,7 +322,8 @@ if [ -f "$PROFILES" ]; then
   PROF_NAME=$sel
   IFS=, read -ra kv <<<"$selknobs"
   for k in "${kv[@]}"; do
-    case "${k%%=*}" in width) PROF_WIDTH=${k#*=} ;; timeout) PROF_TIMEOUT=${k#*=} ;; esac
+    case "${k%%=*}" in width) PROF_WIDTH=${k#*=} ;; timeout) PROF_TIMEOUT=${k#*=} ;;
+                        wall) PROF_WALL=${k#*=} ;; esac
   done
   [ -n "$PROF_WIDTH" ] || prof_die "$PROFILES: row '$sel' declares no width knob"
   PROF_TAG="detected"
@@ -330,7 +338,7 @@ else
   # still agreeing loudly enough that nobody checks.
   det_cores; det_ram_capped
   bi=$DET_CORES; [ "$bi" -gt 0 ] || bi=4
-  PROF_NAME="built-in"; PROF_WIDTH=$(( bi < 8 ? bi : 8 )); PROF_TIMEOUT=0; PROF_TAG="built-in default"
+  PROF_NAME="built-in"; PROF_WIDTH=$(( bi < 8 ? bi : 8 )); PROF_TIMEOUT=0; PROF_WALL=0; PROF_TAG="built-in default"
   # A pin the operator set and this branch cannot honour. WARNED, not refused: refusing would block
   # the documented rollback for anyone carrying GATE_PROFILE in their environment. Silence is the one
   # option ruled out — the same typo is FATAL against a present table, so staying quiet here turns a
@@ -395,13 +403,87 @@ prof_t=off; [ "$PROF_TIMEOUT" -gt 0 ] && prof_t="${PROF_TIMEOUT}s"
 # the line saying only `timeout off` while 85 legs carried a ceiling was the opposite lie, so the
 # regime is reported beside the knob rather than instead of it. TOOL-aBoundedCeiling-1.
 prof_c=live; [ "$CEILINGS_LIVE" = 1 ] || prof_c=INERT
+
+# ---- THE WHOLE-RUN WALL. TOOL-aQuenchedHarness-1. The per-leg ceiling bounds ONE leg; nothing
+# ---- bounded the RUN, so a bar's worst case was the sum of every ceiling it could reach. This is a
+# ---- HANG bound and never a cost verdict: a breach is RED, naming the legs that had not returned.
+#
+# IT IS NOT A PROCESS-GROUP KILL, and that is the load-bearing sentence. This runner never enables
+# job control -- `set -u` only, no `set -m`, no `setsid` (absent on node `a`, `command -v setsid`
+# returns rc=1) -- and legs are dispatched as plain `runleg "$k" &` from the single dispatch/report
+# shell. So every leg is in the RUNNER's own process group, and a group kill would take down the
+# reader loop and the shell that has to render the verdict: the run would die signalled and silent
+# instead of exiting non-zero with a summary. The wall kills RECORDED PER-LEG PIDS and their
+# descendants, touching nothing outside that set.
+#
+# THE DESCENDANTS ARE COLLECTED BEFORE ANYTHING IS KILLED. Measured on this host: killing a parent
+# REPARENTS its children, so they no longer match the ppid you were about to walk. One `ps` snapshot,
+# the whole tree from it, then the kills.
+WALL=${GATE_WALL:-$PROF_WALL}
+case "$WALL" in ''|*[!0-9]*) WALL=0 ;; esac
+WALL_ARMED=0; WALL_PID=""
+
+# The descendant set of a pid, from ONE snapshot. Depth-bounded rather than "until the frontier is
+# empty": a ps table that disagrees with itself mid-write must cost a truncated tree, never a spin.
+scan_descendants() {
+  local root=$1 snap=$2 out=$1 frontier=$1 next depth=0
+  while [ -n "$frontier" ] && [ "$depth" -lt 8 ]; do
+    # `$3+0 == $3` and the `$2` guard are not defensiveness: cygwin `ps -ef` prints argv RAW, so a
+    # command line containing a newline splits one process across rows whose field 2 and 3 are
+    # attacker-or-accident-chosen text. Snapshots on this box already carry about ten such
+    # continuation rows from other sessions' multi-line `bash -c`. Without the guard this walk feeds
+    # arbitrary text to `kill -9`.
+    next=$(awk -v ps="$frontier" 'BEGIN{n=split(ps,a," ");for(i=1;i<=n;i++)P[a[i]]=1}
+                                  NR>1 && $2 ~ /^[0-9]+$/ && $3 ~ /^[0-9]+$/ && ($3 in P) {print $2}' "$snap" 2>/dev/null | tr '\n' ' ')
+    next=${next% }
+    [ -n "$next" ] || break
+    out="$out $next"; frontier=$next; depth=$((depth+1))
+  done
+  printf '%s' "$out"
+}
+
+remove_descendants() {
+  local snap; snap=$(mktemp 2>/dev/null) || return 0
+  ps -ef > "$snap" 2>/dev/null || : > "$snap"
+  local p left=""
+  for p in $(scan_descendants "$1" "$snap"); do
+    case "$p" in ''|*[!0-9]*) continue ;; esac
+    kill -9 "$p" 2>/dev/null || true
+  done
+  rm -f "$snap" 2>/dev/null || true
+  # WHAT IT COULD NOT KILL IS REPORTED, and this is where the wall's liveness assertion lives now.
+  # A host where the walk cannot reach a leg's descendants says so with the pids, at the moment the
+  # fact matters, instead of a startup probe guessing at it for every run that never breaches.
+  for p in $(scan_descendants "$1" "$snap" 2>/dev/null); do
+    case "$p" in ''|*[!0-9]*) continue ;; esac
+    kill -0 "$p" 2>/dev/null && left="$left $p"
+  done
+  [ -n "$left" ] && printf 'run-gates: the wall could not reach these descendants of %s, so they are still running:%s\n' "$1" "$left" >&2
+  return 0
+}
+
+# THERE IS NO STARTUP LIVENESS PROBE, and its removal is the single most load-bearing correction in
+# this unit. One shipped, and it GRADED NOTHING on every host: it built its subject as
+# `( ( sleep 90 & ) ; sleep 90 ) &`, and bash exec-replaces a subshell's last command, so `$!` WAS
+# the sleep and had no children at all. The intended grandchild was reparented to PPID 1 before the
+# snapshot was taken. `scan_descendants` therefore returned a one-element set on every run, the survivor
+# check saw only the pid that had just been SIGKILLed, and `WALL_LIVE` was pinned at 1 with the
+# INERT branch unreachable dead code. Reproduced 14/14. It cost 4.2 s quiet and 12-16 s loaded per
+# bar, twice over -- two `ps -ef` walks at 0.4-3.2 s each -- to answer a question it could not ask,
+# and it leaked one orphaned `sleep 90` per bar because nothing could reach the reparented child.
+#
+# THE ASSERTION MOVED TO THE BREACH PATH, which is the only moment the answer is needed and the only
+# moment a REAL tree exists to grade. `remove_descendants` reports what it could not kill, so a host
+# where the walk cannot reach a descendant says so with the pids it left behind, at the instant that
+# fact matters, and costs nothing on the runs where the wall never fires.
+prof_w=off; [ "$WALL" -gt 0 ] && prof_w="${WALL}s"
 # ON STDERR, and independent of PROF_TIMEOUT. The pre-existing INERT notice at the profile probe is
 # gated on a knob every shipped row sets to 0, so it can never fire; without this line the only
 # signal that all 85 ceilings are dead would be a stdout suffix nobody reads for warnings.
 if [ "$CEILINGS_LIVE" != 1 ]; then
   echo "run-gates: NOTE - this host has no runnable 'timeout -k', so EVERY leg's declared ceiling is INERT and every leg runs unbounded this run" >&2
 fi
-PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c; $PROF_TAG)"
+PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w; $PROF_TAG)"
 echo "$PROF_LINE"
 
 
@@ -1158,6 +1240,10 @@ fi
 
 runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the completion signal)
   local i=$1 s e out rc
+  # THE WALL'S HANDLE ON THIS LEG. `$BASHPID`, never `$$`: inside a backgrounded function `$$` is
+  # still the RUNNER's pid, and a wall that killed that would kill the shell that has to print the
+  # verdict. Written before anything else so a leg that wedges on its first line is still reachable.
+  printf '%s' "$BASHPID" > "$WORK/$i.pid" 2>/dev/null || true
   local argv; IFS=$'\x1f' read -ra argv <<<"${argvs[$i]}"
   case "${argv[0]}" in python|python3) argv[0]=$PYBIN ;; esac   # the manifest stores the canonical python3; run under the resolved PYBIN
   s=$(date +%s%N)
@@ -1328,6 +1414,13 @@ chunk_close() {   # emit the verdict for the chunk just finished
   # The rule above was already correct and already stated; what it lacked was reachability from the
   # newer skip kind, which is worse than a missing rule because the comment asserts it. A chunk of
   # nothing but kit self-tests closed GREEN on every switch-off bar. TOOL-dUnstalledConvoy-32.
+  # A CHUNK THE WALL EMPTIED IS `killed`, NEVER `green`. A killed leg writes no `.rc`, so it
+  # increments none of the five counters below and the chunk fell straight through to the `else`.
+  # Observed: `---- chunk product: green  (0 ran, 0 failed, 0 skipped, 0 reused, 0 held)` over a
+  # chunk whose every leg the wall had just SIGKILLed. This is TOOL-dUnstalledConvoy-32's rule --
+  # the one the comment above already states for held legs -- reaching the newer kind of
+  # did-not-run, which is exactly the reachability failure that row records.
+  elif [ -f "$WORK/wall.breach" ] && [ "$c_ran" = 0 ] && [ "$c_fail" = 0 ]; then verdict="killed"
   elif [ "$c_ran" = 0 ] && [ "$c_reuse" = 0 ] && { [ "$c_skip" -gt 0 ] || [ "${c_ondemand:-0}" -gt 0 ]; }; then verdict="skipped"
   else verdict="green"; fi
   # HELD IS ITS OWN TALLY and not folded into `skipped`, for the reason the leg verb is its own verb:
@@ -1341,8 +1434,69 @@ chunk_close() {   # emit the verdict for the chunk just finished
   CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${c_ondemand:-0}\t${secs}\n"
   cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_t0=$(date +%s)
 }
+# S2. ARMED AT THE FIRST DISPATCH AND NOT AT PROCESS START. Everything above this point -- the
+# turnstile wait most of all -- is a bar waiting for its turn rather than a bar running, and a wall
+# that counted the queue would kill a run for being polite. The queue has its own bound, TS_MAXWAIT.
+#
+# THE WATCHER KILLS; it does not merely mark. The reader blocks on `wait -n`, so a marker alone would
+# never be read: the whole point is that every leg is wedged. Killing the outstanding legs is what
+# returns the reader to a state where it can see the marker and render a verdict.
+#
+# DETACHED, for the reason `ts_tick_start` above is: this shell owns the pool and counts its own jobs.
+arm_wall() {
+  [ "$WALL" -gt 0 ] || return 0
+  [ "$WALL_ARMED" = 0 ] || return 0
+  WALL_ARMED=1
+  local _w=$WALL _work=$WORK _me=$$
+  (
+    # A DEADLINE, NOT A COUNTER. The first cut slept 1 second `$WALL` times, and `sleep` is external:
+    # measured on this box, 20 nominal seconds took 32.9 s and 30 took 58.0 s -- a 1.65x to 1.93x
+    # drift, entirely spawn cost, which made `wall=10800` fire somewhere between 4h56m and 5h48m
+    # while the profile line printed 3h. A knob whose declared value is not its delivered value is
+    # worse than no knob. `EPOCHSECONDS` is a bash builtin and costs nothing; the 30 s poll cuts the
+    # watcher from ~0.64 spawns per elapsed second of the bar to ~0.033.
+    # THE POLL SCALES WITH THE WALL, so the spawn count is bounded at about ten per run whatever the
+    # wall is, and the overshoot stays proportional instead of absolute. A flat 30 s poll made an 8 s
+    # fixture wall fire at 30 s -- 375% over -- while a flat 1 s poll cost 10800 spawns on the shipped
+    # 3-hour row. Tenth-of-the-wall, floored at 1 s and capped at 30 s, is both: 8 spawns for the
+    # fixture, 360 across three hours for the shipped value.
+    _poll=$(( _w / 10 )); [ "$_poll" -ge 1 ] || _poll=1; [ "$_poll" -le 30 ] || _poll=30
+    _end=$(( EPOCHSECONDS + _w ))
+    while [ "$EPOCHSECONDS" -lt "$_end" ]; do
+      sleep "$_poll"
+      kill -0 "$_me" 2>/dev/null || exit 0
+      [ -f "$_work/wall.disarm" ] && exit 0
+    done
+    # BREACHED. THE MARKER IS WRITTEN FIRST, BEFORE A SINGLE KILL, and the order is the whole
+    # correctness of the breach path. Written last -- as it was -- the kill loop runs a
+    # `remove_descendants` per stuck leg, seconds to tens of seconds wide, during which the reader loop
+    # is free to report the killed legs and dispatch fresh ones. Measured with the marker last: an
+    # 8 s wall, two wedged legs, and a THIRD leg started 57 s after the breach and ran to completion,
+    # 149 s against an 8 s bound. Writing the marker first also collapses the race that decided
+    # whether the durable run record said RED or GREEN.
+    printf '%s' "$EPOCHSECONDS" > "$_work/wall.breach" 2>/dev/null || true
+    for _f in "$_work"/*.pid; do
+      [ -e "$_f" ] || continue
+      _i=${_f##*/}; _i=${_i%.pid}
+      [ -f "$_work/$_i.rc" ] && continue
+      _p=$(cat "$_f" 2>/dev/null) || continue
+      [ -n "$_p" ] && remove_descendants "$_p"
+    done
+  ) &
+  WALL_PID=$!
+  disown "$WALL_PID" 2>/dev/null || true
+}
+
+remove_wall_watcher() {
+  [ "$WALL_ARMED" = 1 ] || return 0
+  : > "$WORK/wall.disarm" 2>/dev/null || true
+  [ -n "$WALL_PID" ] && kill "$WALL_PID" 2>/dev/null
+  WALL_PID=""; WALL_ARMED=0
+}
+
 live() { jobs -rp | wc -l; }
 while [ "$wi" -lt "$nwalk" ]; do
+  [ -f "$WORK/wall.breach" ] && break
   next=${WALK[$wi]}
   # THE CHUNK BOUNDARY. The walk is grouped, so a change of chunk here is the end of the previous
   # one — every leg of it has printed, because the reader never advances past a leg with no result.
@@ -1351,6 +1505,7 @@ while [ "$wi" -lt "$nwalk" ]; do
   while [ "$di" -lt "$ndisp" ] && [ "$(live)" -lt "$JOBS" ]; do
     k=${disp[$di]}; di=$((di+1))
     { [ -z "${names[$k]}" ] || [ -f "$WORK/$k.rc" ]; } && continue   # sentinel, or already decided by the guard pass
+    arm_wall
     runleg "$k" &
   done
   if [ -f "$WORK/$next.rc" ]; then report_one "$next"; wi=$((wi+1)); continue; fi
@@ -1380,6 +1535,7 @@ while [ "$wi" -lt "$nwalk" ]; do
   report_one "$next"; wi=$((wi+1))         # genuinely no result: report it, never hang
 done
 wait
+remove_wall_watcher
 chunk_close                                # the last chunk has no successor to close it
 
 # THE LEDGER. It replaces the old `gate-timings.tsv` rather than sitting beside it: two stores of
@@ -1437,6 +1593,36 @@ ran=$((n-skips-${ondemands:-0}))
 # run over an untouched tree legitimately executes nothing. This fires only when the on-demand hold
 # is the SOLE reason: nothing ran, nothing was skipped, nothing was reused, and something was held.
 # Exit 2, the runner's own configuration-refusal code, never 0 and never 1. TOOL-dUnstalledConvoy-26.
+# THE BREACH VERDICT COMES FIRST, above every other exit path, and the ordering is a fix rather than
+# a preference. A breach leaves `fails` at 0 and `ran` at 0 on the break path, so on a manifest whose
+# walked legs were all held self-tests it satisfied every clause of the refusal below and exited 2
+# announcing "this run executed NOTHING" -- a hang reported as operator error. Hoisted here it cannot.
+if [ -f "$WORK/wall.breach" ]; then
+  WALL_STUCK=""
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    [ -f "$WORK/$i.rc" ] && continue
+    [ -f "$WORK/$i.pid" ] || continue
+    WALL_STUCK="${WALL_STUCK}  still running at the wall: ${names[$i]}
+"
+  done
+  [ -n "$WALL_STUCK" ] || WALL_STUCK="  (no leg was still marked running — the wall fired as the last leg returned)
+"
+  [ -n "$sfile" ] && { printf '%s
+' "$PROF_LINE"; printf '%s
+' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%b' "$WALL_STUCK"; printf 'gates RED — the %ss wall fired; the run was killed, not the legs
+' "$WALL"; } >"$sfile" 2>/dev/null || true
+  if [ -n "$gd" ]; then
+    { printf '%s
+' "$PROF_LINE"; printf '%s
+' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%b' "$WALL_STUCK"; printf 'gates RED — the %ss wall fired; the run was killed, not the legs
+' "$WALL"; } >"$gd/gate-last-failure.txt" 2>/dev/null || true
+  fi
+  printf '%b' "$WALL_STUCK"
+  echo "gates RED — the ${WALL}s wall fired; the run was killed, not the legs"
+  exit 1
+fi
+
 if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
    && [ "$skips" = 0 ] && [ "${reuses:-0}" = 0 ]; then
   echo "run-gates: every leg in this manifest is subject=kit and the self-tests were not asked for,"
@@ -1470,7 +1656,14 @@ reuses=${reuses:-0}
 FPRINT_END=$(fingerprint)
 tree_moved=no
 [ -n "$FPRINT_START" ] && [ -n "$FPRINT_END" ] && [ "$FPRINT_START" != "$FPRINT_END" ] && tree_moved=yes
+# THE BREACH IS READ HERE, from the marker and not from `fails`. A killed leg writes no `.rc`, so
+# whether `fails` moved at all is a RACE between the watcher's kill and the reader's report -- both
+# outcomes were reproduced. The marker is the only fact that is true on every path, so the durable
+# record reads it directly. Without this line the run record wrote `verdict GREEN / ran 0 / failed 0`
+# over a bar whose legs the wall had just SIGKILLed, and that file's absence is this runner's
+# documented crash signal: a breach left a plausible green one instead.
 gate_verdict=GREEN; [ "$fails" = 0 ] || gate_verdict=RED
+[ -f "$WORK/wall.breach" ] && gate_verdict=RED
 
 if [ -n "$RUNDIR" ]; then
   # WRITTEN LAST, and its ABSENCE is the crash signal — the only one needed. A run that dies
@@ -1500,7 +1693,12 @@ fi
 # The last one is the one a spec audit found missing. A developer's ordinary full run on a dirty
 # tree would otherwise stamp a green that the push boundary later treats as proof about a tree
 # nobody ever tested.
+# A SIXTH PRECONDITION, and it is deliberately the MARKER rather than `fails`: a wall breach leaves
+# `fails` at zero, because a killed leg writes no `.rc`. The verdict block above already exits on a
+# breach, so this can never fire today — and that is exactly why it is here. A guard that reads the
+# same state the bug corrupts is disabled by the bug it exists to catch.
 if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
+   && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ]; then
   {
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"

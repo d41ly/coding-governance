@@ -1,11 +1,12 @@
 # TOOL-aQuenchedHarness-1 — the bar's own wall, so a wedged run dies with a verdict
 
-**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 2
+**Status:** INPROGRESS · rev-5 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-06-build-TOOL-aQuenchedHarness-1-wall-landed.md](../build/2026-09-06-build-TOOL-aQuenchedHarness-1-wall-landed.md) | journal | — |
 | [2026-09-06-prompt-TOOL-aQuenchedHarness-1.md](../prompts/2026-09-06-prompt-TOOL-aQuenchedHarness-1.md) | research | TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-5 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
@@ -16,7 +17,10 @@
 
 Give `tools/run-gates/run-gates.sh` a whole-run wall-clock wall, so a bar that wedges is killed and
 REDs naming what was still running, instead of stalling an unattended build for hours. Today the only
-bound is per-leg, so a run's worst case is the sum of every ceiling it can reach.
+bound is per-leg. Rev-1 to rev-4 called the worst case "the sum of every ceiling it can reach", which
+is 42.06 h across the 94 declared ceilings and is WRONG by 4.6x: at width 8 the list-scheduling worst
+case is 9.16 h. The wall tightens 9.2 h to the declared value, which is still worth having and is a
+smaller claim than this spec used to make.
 
 ## 2. Scope (IN)
 
@@ -39,12 +43,19 @@ bound is per-leg, so a run's worst case is the sum of every ceiling it can reach
   their descendants, touching no process outside that set. It does not use `timeout` either; rev-1's
   claim that it reuses the per-leg ceiling's `timeout -k` path was wrong, because that call at
   `run-gates.sh:1110` wraps exactly one command, not a pool. The per-leg ceiling is untouched.
-- **S5** — `WALL_LIVE` is set by a probe OF THE WALL'S OWN MECHANISM, not of `timeout`. At startup the
-  runner arms a sub-second wall over a sleeping child that has itself spawned a grandchild, and
-  observes whether the group kill reaches both. `CEILINGS_LIVE` stays a separate flag set by its own
-  separate probe. A host where the group kill cannot reach a surviving grandchild — the MSYS
-  condition `memory/builds/aPacedTurnstile/reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md`
-  blocker B1 records — reports the wall INERT, which reading `timeout`'s probe could never do.
+- **S5** — **THERE IS NO STARTUP LIVENESS PROBE, and its withdrawal is this spec's largest
+  correction.** Rev-4 specced one and it GRADED NOTHING on every host: it built its subject as
+  `( ( sleep 90 & ) ; sleep 90 ) &`, and bash exec-replaces a subshell's last command, so `$!` WAS
+  the sleep and had no children — the intended grandchild was reparented to PID 1 before the
+  snapshot. `wall_tree` returned a one-element set every time, the survivor check saw only the pid
+  it had just SIGKILLed, `WALL_LIVE` was pinned at 1, and the INERT branch was unreachable dead
+  code. Reproduced 14/14 by four independent reviewers. It cost 4.2 s quiet and 12–16 s loaded per
+  bar, and leaked one orphaned `sleep 90` per bar, to answer a question it could not ask. That is
+  the reassuring-zero class, inside the scope item whose own text cited it.
+  **The assertion MOVES TO THE BREACH PATH**, which is the only moment a real tree exists and the
+  only moment the answer is needed: `wall_kill_tree` re-checks what it killed and REPORTS by pid
+  what it could not reach. A host where the walk cannot reach a leg's descendants says so with the
+  evidence, at the instant that matters, and costs nothing on the runs that never breach.
 - **S6** — `GATE_WALL=<s>` overrides the selected row's value alone, mirroring `GATE_JOBS`.
 - **S7** — arms in `tools/run-gates/run-gates.test.sh`: a leg that outlives the wall, asserted on the
   RUNNER'S EXIT STATUS and the presence of the RED summary line, because an arm that only greps for
@@ -52,6 +63,34 @@ bound is per-leg, so a run's worst case is the sum of every ceiling it can reach
   time is the wall and not the leg; an off (`wall=0`) run; a run whose wall is INERT; a leg whose child
   spawns a grandchild that outlives it, asserted killed by pid; and a bar that WAITS behind a held
   beacon for longer than the declared wall and then runs a short leg, which must complete GREEN.
+- **S9** — **THE BREACH MARKER IS WRITTEN BEFORE THE FIRST KILL.** Written last — as rev-4 had it —
+  the watcher's kill loop runs a `wall_kill_tree` per stuck leg, seconds to tens of seconds wide,
+  and the reader is free to report the killed legs and DISPATCH FRESH ONES throughout. Measured: an
+  8 s wall, two wedged legs, and a third leg started 57 s after the breach and ran to completion —
+  149 s against an 8 s bound, 18.6x. The wall bounded nothing once it had fired. Writing the marker
+  first also collapses the race that decided whether the durable record said RED or GREEN.
+- **S10** — **THE WALL IS A DEADLINE, NOT A COUNTER.** Rev-4 slept 1 second `$WALL` times, and
+  `sleep` is external: measured, 20 nominal seconds took 32.9 s and 30 took 58.0 s, a 1.65–1.93x
+  drift that is entirely spawn cost. `wall=10800` would have fired between 4h56m and 5h48m while the
+  profile line printed 3 h. `EPOCHSECONDS` is a bash builtin; the poll is a tenth of the wall,
+  floored at 1 s and capped at 30 s, so the spawn count is about ten per run whatever the wall is
+  and the overshoot stays proportional rather than absolute.
+- **S11** — **A BREACH REACHES ITS VERDICT BEFORE ANY OTHER EXIT PATH, and the durable record reads
+  the MARKER rather than `fails`.** A killed leg writes no `.rc`, so whether `fails` moves at all is
+  a race — both outcomes were reproduced. Rev-4's placement let a breach write
+  `verdict GREEN / ran 0 / failed 0` into the run record whose ABSENCE is this runner's documented
+  crash signal, and on the break path it could satisfy the empty-population refusal and exit 2
+  announcing "this run executed NOTHING" — a hang reported as operator error.
+- **S12** — **A CHUNK THE WALL EMPTIED REPORTS `killed`, never `green`.** A killed leg increments
+  none of the five chunk counters, so it fell straight through to the green branch. Observed:
+  `---- chunk product: green (0 ran, 0 failed, 0 skipped, 0 reused, 0 held)` over a chunk whose every
+  leg had just been SIGKILLed. This is `TOOL-dUnstalledConvoy-32`'s rule reaching a newer kind of
+  did-not-run, which is the reachability failure that row exists to record.
+- **S13** — **THE KIT VERSION MOVES WITH THE TABLE.** `gate-profiles.txt` gaining `wall` makes the
+  skew asymmetric and fatal in one direction: a runner below the bump reads a walled table, hits
+  `prof_die` on the first row, and exits 2 having run ZERO legs — every bar, not some. The precedent
+  is four lines below the constant (`TOOL-dUnstalledConvoy-26`, the `subject` key). `1.4 -> 1.5`,
+  with the note beside it.
 - **S8** — the wall's elapsed measurement is asserted to START AT FIRST DISPATCH. S2 says so and
   nothing in rev-2 measured it, so the dangerous first draft — arming at process start and killing a
   bar for queueing — passed every criterion. S7's last arm is that measurement.
@@ -96,8 +135,12 @@ the wall live. That is the reassuring-zero class, inside the unit that cites it.
 
 - `wall` — the profile knob, in `tools/run-gates/gate-profiles.txt`; graded by the canary's pin.
 - `GATE_WALL` — the environment override.
-- `WALL_LIVE` — the wall's own liveness flag, set by its own probe, named beside `CEILINGS_LIVE` and
-  deliberately not derived from it.
+- `scan_descendants` · `remove_descendants` · `arm_wall` · `remove_wall_watcher` — the four shell
+  functions, every one leading with a verb `.lexicon.conf` declares. Checked with
+  `python tools/lexicon/lexicon.py --suggest <name> --as sh.function` BEFORE they were written here.
+  A first cut named them `wall_*` and moved `VERB_OFFENDER_PIN` by four; renaming is the fix §12
+  requires, and unlike the `ts_*` pair there was no existing family to stay consistent with.
+- There is NO `WALL_LIVE` flag. Rev-4 declared one and rev-5 withdrew it with the probe that set it.
 - The breach marker file, under the existing per-run work directory; no new location.
 
 ### Files touched (estimate)
@@ -142,9 +185,16 @@ bar does not have.
 - **AC3** — When the wall fires, the elapsed time measured by the arm in
   `tools/run-gates/run-gates.test.sh` is bounded by the wall and compared against an untimed control
   run in the same arm, so a bound applied through a pipe cannot pass.
-- **AC4** — When the wall's own startup probe cannot kill a grandchild, the run prints that the wall
-  is `INERT` and the profile line says so; and when `timeout -k` is absent but the group kill works,
-  the wall is reported LIVE while `ceilings` is reported INERT — two flags, two verdicts.
+- **AC4** — When a breach cannot reach a leg's descendants, `bash tools/run-gates/run-gates.sh`
+  prints the pids it left running. There is no startup probe and no `WALL_LIVE` flag; the assertion
+  is made where a real tree exists.
+- **AC9** — When the wall fires, `bash tools/run-gates/run-gates.sh` exits **1** — not 0, and not 2.
+  Two is the configuration refusal, which is how rev-4 could misreport a hang as operator error.
+- **AC10** — When the wall fires, the run record under `<git-dir>/gate-run/` carries
+  `gate_verdict RED`. A breach must not leave a plausible green in the file whose absence is this
+  runner's crash signal.
+- **AC11** — When the wall fires with legs still outstanding, NO further leg is dispatched after
+  `$WORK/wall.breach` appears, asserted by comparing the dispatched-leg count across the breach.
 - **AC5** — When a knob is added to `gate-profiles.txt` without updating `KNOWN_KNOBS`, the
   `run-gates canary` leg reds, so the pin cannot drift.
 - **AC7** — When the wall fires, `bash tools/run-gates/run-gates.sh` SURVIVES long enough to print the
@@ -167,9 +217,13 @@ it is a held self-test leg.
 
 ## 8. Open questions
 
-- **F1 — what value does each profile row declare?** RESOLVED (agent, 2026-09-06, delegated): a
-  per-row figure, declared against the recorded leg-sum for that width and carrying the reading
-  beside it. A single figure cannot be right for a cost that is node-relative, which
+- **F1 — what value does each profile row declare?** RESOLVED (agent, 2026-09-06, delegated), and
+  BUILT: `capable` 10800, `modest` 14400, `minimal` 21600, each carrying its reading in
+  `gate-profiles.txt`'s header. Derived from the costliest bar this repo can measure —
+  `GATE_FULL=1 GATE_SELFTESTS=1`, 13644 s of leg-sum with its longest leg at 3837 s, so at width 8
+  the pool term is 1706 s and the floor is the longest leg: about 4000 s end to end. 10800 is 2.7x
+  that, and deliberately loose, because a bound that fires on a healthy bar is strictly worse than a
+  loose one. The lower rows scale with the pool term, which is the only part the width moves. A single figure cannot be right for a cost that is node-relative, which
   `TOOL-aCollapsedScan-4` records; and shipping it off everywhere would land a knob that has never
   fired, which charter §7 refuses.
 - **F2 — is the wall sized before or after `TOOL-aQuenchedHarness-8`?** RESOLVED (agent, 2026-09-06,
@@ -180,6 +234,32 @@ it is a held self-test leg.
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-5 · 2026-09-06 · folded an adversarial forensic review of the BUILT code — 55 findings, 37
+  confirmed. Twelve defects, six of them landing blockers, and one of them retracts a measurement
+  this build reported to the owner as fact.
+  **The retraction first:** the "+44 s per bar, 6.4x" regression reported earlier DOES NOT EXIST. The
+  A/B that produced it paired HEAD's runner with the NEW profile table; HEAD does not carry the
+  `wall` knob, so that arm hit `prof_die` and exited 2 in ~8 s having run ZERO legs, and 8 s read as
+  a fast bar. Re-measured with each arm carrying its own table and every arm asserted to have printed
+  `gates GREEN`: old 25679/25867/27082 ms against new 22520/23026/29312 ms — no measurable difference.
+  The check that was owed is one `grep -q '^gates GREEN'` per arm.
+  **The blockers:** S5's startup probe graded nothing and is WITHDRAWN (it also leaked a process per
+  bar); S9 moves the breach marker before the kills, because a third leg was measured starting 57 s
+  after an 8 s wall fired; S10 makes the wall a deadline, because `sleep 1` drift put `wall=10800` at
+  ~5 h; S11 hoists the verdict and makes the durable record read the marker, because a breach could
+  write GREEN or exit 2 as a refusal; S12 stops a killed chunk reporting green; S13 bumps the kit
+  version, without which any adopter taking the table without the runner reds 100% of bars.
+  Also folded: a numeric guard on the `ps` walk, since cygwin prints argv raw and this box already
+  carries ~10 malformed continuation rows per snapshot; and the tracked arm, which was red 3/3 for a
+  property of the box, now bounds both runs and grades a 30 s margin against a 112 s designed gap.
+  §1's "the sum of every ceiling it can reach" overstated the worst case by 4.6x — at width 8 it is
+  9.2 h, not 42 h — and the wall is a real tightening of that, not of 42 h.
+- rev-4 · 2026-09-06 · BUILT, with two corrections the build found. §5's liveness sentence still said
+  "the group kill" after rev-3's S4 stopped using one — my own amendment-leaves-its-other-half-standing,
+  fixed here. And the probe is THREE deep rather than two, graded over every pid it collected rather
+  than over the root: a two-deep probe would have graded a mechanism simpler than the shipped case,
+  and checking only the root would call a kill LIVE that left a grandchild behind. F1's values are
+  now declared rather than deferred.
 - rev-3 · 2026-09-06 · folded spec-audit round 2. B3: the wall does NOT kill a process group. The
   runner never enables job control, so there is one group and the runner is in it, and `setsid` is
   absent on this node (rc=1, verified) — S4 now kills recorded per-leg pids and their descendants, and
