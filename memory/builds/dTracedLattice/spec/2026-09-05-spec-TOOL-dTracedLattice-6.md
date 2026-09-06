@@ -40,6 +40,12 @@ improvement.
   it is read at eight further lexicon sites (`:171`, `:521`, `:551`, `:611`, `:727`, `:940`, `:995`,
   `:1077`), is NOT on that deletion list, and cannot leave — so the rescued module carries its own
   copy, which this item authorises explicitly and §3's "no new capability" is not stretched to cover.
+  **That copy is SPELLED `derive_ext`, and the rename is forced rather than chosen.**
+  `tools/lexicon/lexicon.py` is not an armed layer for `lexicon naming predicates` and
+  `tools/codebase-map/` is, so the copy is graded against a table the original was never graded
+  against and `ext_of` leads with a token the table does not carry. Behaviour is unchanged, the
+  parity arm compares it, and the module header states the exception so the byte-identity claim
+  beside it stays checkable.
   The language-aware branch travels intact: a recorded correction already fixed it once, because a
   dot means different things in Python and JS and the importer's extension is what says which.
 - **S2** Preserve the DIRECTIONAL layer rule the lexicon kit built on top of it. A rule of the form

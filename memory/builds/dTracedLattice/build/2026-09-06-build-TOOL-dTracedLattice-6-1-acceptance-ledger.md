@@ -15,6 +15,17 @@ which is the strongest form available and expires by design when `TOOL-aSurfaced
 - AC6 — `python tools/lexicon/selftest.py` · `python tools/lexicon/lexicon.py` — the two legs `TOOL-aSurfacedLexicon-2` would break are green at the commit this unit lands, which is what proves the three live callers at `lexicon.py:527`/`:536`/`:595` still reach a resolver. Both are held on a plain bar (`lexicon selftest` is `subject: kit`), so they were run directly rather than through one
 - AC7 — `python3 tools/codebase-map/selftest.py` — the arm `map_imports: no sibling-kit import (AC7)` scans the rescued module's own source and refuses any `import`/`from` line naming a sibling kit. Observed RED with a function-local `import lexicon`: `map_imports.py:96 imports a sibling kit`. A module-level break was tried first and crashes the suite at import instead of reporting, which is why the staged break is function-local
 
+## One rename, forced by the destination
+
+`ext_of` is spelled `derive_ext` in the rescued copy. `tools/lexicon/lexicon.py` is not an ARMED
+layer for `lexicon naming predicates` and `tools/codebase-map/` is, so the copy is graded against a
+table the original was never graded against: `ext` is not a declared verb and `derive` is, per
+`python3 tools/lexicon/lexicon.py --suggest`. Measured, and it is the reason the leg moved
+`offenders=468` against a `467` pin the moment `map_imports.py` entered `symbols.json` — arming
+follows the map, so the file was ungraded until the map was regenerated. Behaviour unchanged; the
+AC1 parity arm compares the two `resolve_import` implementations and stays green. AC5's header
+states the exception rather than leaving a byte-identity claim nobody can check.
+
 ## The negative rows are not vacuous, proven
 
 `gotchas.py` selected `fixture-passes-by-finding-nothing` over this diff, and three of the case

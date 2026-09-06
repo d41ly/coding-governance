@@ -19,15 +19,18 @@ receivers, not types. It counts nothing and reports no coverage. **A consumer th
 as a call graph will be wrong**, and the figures sometimes quoted for attribute-site resolution
 belong to a research prototype under `memory/builds/dTracedLattice/build/`, not to this module.
 
-PROVENANCE. Copied verbatim from the lexicon kit's P3 predicate, which is specced for deletion; the
-five functions below are byte-identical to their originals so the arms that covered them there cover
-them here. `ext_of` is COPIED rather than moved — the lexicon kit reads it at eight further sites and
-keeps its own. Rescue recorded as `TOOL-dTracedLattice-6`.
+PROVENANCE. Copied from the lexicon kit's P3 predicate, which is specced for deletion. The five
+functions below are byte-identical to their originals — with ONE exception, stated because a
+provenance claim nobody can check is worth nothing: the helper spelled `ext_of` there is
+`derive_ext` here. It is COPIED rather than moved (the lexicon kit reads it at eight further sites
+and keeps its own), and `tools/lexicon/lexicon.py` is not an ARMED layer for the naming gate while
+this directory is, so the copy had to satisfy a table the original was never graded against.
+Behaviour is unchanged and the parity arm compares it. Rescue recorded as `TOOL-dTracedLattice-6`.
 
 This module imports nothing from a sibling kit, and a selftest arm asserts it.
 """
 
-def ext_of(path: str) -> str:
+def derive_ext(path: str) -> str:
     """The extension used for a LANGS lookup. A file with no dot in its BASENAME reports `<none>`,
     which must be declared like any other: two such files are tracked here, and letting them fall
     through unnamed is exactly the silent skip the fail-closed law refuses."""
@@ -88,7 +91,7 @@ def _resolve_relative(spec: str, here: str, index, ext: str) -> list[str]:
     # BOUNDARY, not prefix: a bare `startswith` is the same defect the glob anchoring removed, and
     # it let `../shared/thing` resolve onto `web/shared/thingamajig.js`.
     out.extend(p for p in index.get(cand.rsplit("/", 1)[-1], [])
-               if ext_of(p) == ext and _check_path_suffix(p, cand))
+               if derive_ext(p) == ext and _check_path_suffix(p, cand))
     return out
 
 
@@ -102,7 +105,7 @@ def resolve_import(target: str, importer: str, index: dict[str, list[str]]) -> l
     languages and the importer's extension is what says which.
     """
     here = importer.rsplit("/", 1)[0] if "/" in importer else ""
-    ext = ext_of(importer)
+    ext = derive_ext(importer)
 
     if target.startswith("./") or target.startswith("../"):
         return _resolve_relative(target, here, index, ext)
@@ -123,12 +126,12 @@ def resolve_import(target: str, importer: str, index: dict[str, list[str]]) -> l
             dotted = target.replace(".", "/")
             out = [dotted]
             out.extend(p for p in index.get(target.rsplit(".", 1)[-1], [])
-                       if ext_of(p) == ext and _check_path_suffix(p, dotted))
+                       if derive_ext(p) == ext and _check_path_suffix(p, dotted))
             return out
 
         # A BARE name is the flat `sys.path`-insert shape — the commonest one in this tree, and the
         # only one where the importer's own directory legitimately wins.
-        hits = [p for p in index.get(target, []) if ext_of(p) == ext]
+        hits = [p for p in index.get(target, []) if derive_ext(p) == ext]
         local = [p for p in hits if (p.rsplit("/", 1)[0] if "/" in p else "") == here]
         return local or hits
 
@@ -138,5 +141,5 @@ def resolve_import(target: str, importer: str, index: dict[str, list[str]]) -> l
     out = [target]
     tail = target.rsplit("/", 1)[-1]
     stem = tail.rsplit(".", 1)[0] if "." in tail else tail
-    out.extend(p for p in index.get(stem, []) if ext_of(p) == ext and _check_path_suffix(p, target))
+    out.extend(p for p in index.get(stem, []) if derive_ext(p) == ext and _check_path_suffix(p, target))
     return out

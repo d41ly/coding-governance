@@ -1063,6 +1063,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "derive_ext",
+      "kind": "function",
+      "file": "tools/codebase-map/map_imports.py"
+    },
+    {
       "id": "derive_gate_runner",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -1271,11 +1276,6 @@
       "id": "export_text",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
-    },
-    {
-      "id": "ext_of",
-      "kind": "function",
-      "file": "tools/codebase-map/map_imports.py"
     },
     {
       "id": "ext_of",
