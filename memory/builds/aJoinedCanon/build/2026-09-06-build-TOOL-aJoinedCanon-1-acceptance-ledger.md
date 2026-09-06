@@ -1,6 +1,6 @@
 # aJoinedCanon — acceptance ledger
 
-**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10
+**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11
 
 Node `a`, 2026-09-06, base `274aa39b`. One `**Evidences:**` block per unit, appended as each unit
 lands. Two forms and no third: OBSERVED carries a backticked token naming what made the observation,
@@ -159,18 +159,46 @@ AMENDED names the revision that changed the criterion.
 - AC4 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-07T00:34:04+03:00`, at or after this unit's watched `.memory-tree.conf` edit. `last-body-change` is the same sha before and after: this unit changes no gate command, entrypoint, layout convention or front-loaded claim, which is the "no delta → no touch" half.
 - AC5 — `bash tools/memory-tree/check-memory-hygiene.sh` — the whole tree exits 0, so declaring the key changed no verdict. That is the point of choosing a value identical to the preset rather than a new one.
 
-## OWED BEFORE LANDING: the date must be re-derived once more
+**Evidences:** TOOL-aJoinedCanon-11
 
-The clock rolled to 2026-09-07 mid-build, and all eight cutoffs this build introduces are pinned at
-2026-09-07 — which is now TODAY, a date the fleet can still write into, with two sibling unattended
-runs live in it. The owner ratified a RELATION, not a constant: strictly past the newest spec
-filename date on any branch AND past a date the fleet can still write into. That relation now
-returns 2026-09-08.
+- AC1 — `bash tools/memory-tree/check-memory-hygiene.sh` — scratch tree at `BASE_RESOLVE_CUTOFF="2026-08-20"`, `tFixture-190` — LIVE, **Tier-1**, base `0123abcd` — reds naming that file and that sha: the message is *status header base 0123abcd resolves to no commit in this object database, required at/after BASE_RESOLVE_CUTOFF*. Tier-1 is the whole point of the fixture: the emission sits ABOVE the `hdr ~ /Tier-1/ next` cut, and below it this spec goes silently dark while the key reads armed. Red observed before the arm landed.
+- AC2 — `tFixture-191` — carrying the scratch repo's own `git rev-parse --short=8 HEAD`, silent. It can only be written AFTER the fixtures commit, which is why the self-test writes it there and commits a second time.
+- AC3 — `tFixture-192` — the same dead base on a `CLOSED` status, post-cutoff, is silent. The terminal exemption is exercised on a fixture built for it rather than assumed.
+- AC4 — `bash tools/memory-tree/check-memory-hygiene.sh` — the whole tree is green, and this proves LESS than it looks: every tracked spec carrying an unresolvable base is CLOSED, so the terminal conjunct excludes them before the cutoff is consulted. It observes that the arm adds no regression, not that grandfathering works; AC3 is the grandfathering observation.
+- AC5 — `git rev-parse --is-shallow-repository` — the precondition is asserted FIRST and prints `true` for a tree built with `git clone --depth 1 "file://$PWD"`, and only then does the skip line appear on stderr: `the §base resolve arm is SKIPPED — this is a shallow repository`. Asserting the state before grading it is what turns a silently non-shallow clone into a failure instead of a pass.
+- AC6 — `tFixture-193` — a pre-cutoff twin is silent, and the whole-tree run at the shipped cutoff emits no sentinel for any spec, so a blank or unreached key leaves the run as it was.
+- AC7 — `python tools/memory-tree/check-arms.py --check` — exits 0 with `ARMS_FLOORS` unchanged at 26:26, confirming the arm adds a finding to the existing `fail 12` site rather than a new unarmed branch.
+  figure: DERIVED at observation time; the pair is not named in the spec because lower-`order` units add branches to this same file.
+- AC8 — `grep -c 'BASE_RESOLVE_CUTOFF' memory/HYGIENE.md` — 0 → 1, stating both the live-only population and the never-graded bypass (a spec going SPECCED to CLOSED in one commit), with `kit-dogfood-parity.test.sh` green so the template carries the same bytes.
+- AC9 — `grep -qE '^BASE_RESOLVE_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` — exits 0. The engine-preset parity arm reds from the moment the engine gains the preset until the example declares it, which is the third carrier no other criterion reaches.
+- AC10 — `grep -c 'RESOLVED against this object database' memory/TEMPLATE-SPEC.md` — 0 → 1: the `base` bullet now says the sha is resolved on a live spec rather than only shape-checked, and names the terminal exemption.
+- AC11 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-07T00:39:40+03:00`; `last-body-change` unmoved.
+- AC12 — `git cat-file --batch-check` — ONE process for the whole run whatever the population: the arm emits a sentinel per qualifying spec and the post-pass batches every DISTINCT sha through a single invocation, peeled with `^{commit}` so an eight-hex prefix naming a tree or a blob cannot pass. A `cat-file -e` per spec would be a fork per live spec forever, which is the shape this batched awk exists to delete.
 
-This is the same re-derivation the build already performed once, and it is owed again for the same
-reason rather than because the first one was wrong. It is deliberately deferred to a single sweep
-after the last unit lands, so the closing diff review reads the final values and the sweep touches
-every key once instead of twice.
+## The date was re-derived TWICE, and that is the rule working rather than failing
+
+Every cutoff this build introduces landed at **2026-09-08**, not the 2026-09-06 the specs carried at
+rev-5 nor the 2026-09-07 they carried at rev-6.
+
+The owner ratified a RELATION, not a constant: strictly past the newest spec filename date on any
+branch, and past a date the fleet can still write into. A value derived from that relation is stale
+the moment the working day rolls, which is exactly what happened — this build spanned a midnight.
+
+| When | Newest spec on any ref | Today | Relation returns |
+|---|---|---|---|
+| the rev-5 fold | 2026-09-04 | 2026-09-05 | 2026-09-06 |
+| the build, 2026-09-06 | 2026-09-05 | 2026-09-06 | 2026-09-07 |
+| the landing, 2026-09-07 | 2026-09-06 | 2026-09-07 | **2026-09-08** |
+
+Each row is a measurement across every local and remote ref, not an increment. The second column
+moved on its own between rows two and three: a sibling run landed specs dated 2026-09-06 while this
+build was running, which is precisely the in-flight collision the rule exists to prevent — had the
+cutoff stayed at 2026-09-07 it would have graded work written today by two live sibling runs.
+
+Nine keys swept in `.memory-tree.conf`, and the live statements in units 1, 4 and 7 with them, each
+bumped a rev with a §9 line. The §9 entries recording the FIRST re-derivation are left standing: they
+are the record of what that rev did, and rewriting them would be the amendment-leaves-its-other-half
+class this build exists to close.
 
 ## What the date re-derivation changed
 

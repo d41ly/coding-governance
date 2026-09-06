@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.67 -->
+<!-- gov:kit memory-tree@2.68 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -186,6 +186,11 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     Every numbered acceptance bullet must also name the BREAK that would turn it red, in a clause
     marked `Red when:`, once the filename date reaches `SPEC_FAILURE_MODE_CUTOFF`, on either tier.
     The per-bullet walk is shared with the witness arm above and each reads only its own key.
+    A LIVE spec must have the `base` sha in its status header RESOLVE to a real commit once the
+    filename date reaches `BASE_RESOLVE_CUTOFF`, on either tier. TERMINAL specs are excluded, so a
+    spec that goes SPECCED to CLOSED in one commit is never graded at all — a known bypass, named
+    here rather than implied away. Skipped with a stderr line in a shallow clone, where every
+    commit outside the fetch depth answers `missing`.
     A Tier-2 spec must carry a `### Edges` block in §3 once the filename date reaches
     `SPEC_EDGES_CUTOFF`: one bullet per edge, `**consumes-from**` or `**hands-off**` plus a
     backticked sibling id or the bare word `external`, or the single word `none`. The SHAPE arm

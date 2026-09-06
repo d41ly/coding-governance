@@ -1,12 +1,12 @@
 # TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives
 
-**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 750ca0ca · streams tooling · order 7 · ratified 2026-09-05
+**Status:** CLOSED · rev-7 · 2026-09-07 · node a · Tier-2 · base 750ca0ca · streams tooling · order 7 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md) | journal | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 |
+| [2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md) | journal | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
@@ -74,7 +74,7 @@ thing this arm reds.
   that omits its Gates section is silent by design — so the dossier does not describe a checker that
   no longer exists.
 - **S7** — The dated demand, which is the owner's ruling on §8's fork. `.memory-tree.conf` declares
-  `SPEC_LEGLINE_CUTOFF="2026-09-07"`; `tools/check-spec-tokens.py` reads that one key; a live spec
+  `SPEC_LEGLINE_CUTOFF="2026-09-08"`; `tools/check-spec-tokens.py` reads that one key; a live spec
   whose filename date is at or after it, which CARRIES a Gates heading, and whose Gates section
   contributes no graded leg name becomes a hit. The Gates-heading precondition is the whole of the
   Tier-1 accommodation and it is S4's heading-text location doing the work: under the light profile a
@@ -254,7 +254,7 @@ Three edits inside the existing per-spec walk over `specs`:
 
 ### The cutoff, and the conf read it costs
 
-`SPEC_LEGLINE_CUTOFF="2026-09-07"`, in this repo's `.memory-tree.conf` beside the dated cutoffs
+`SPEC_LEGLINE_CUTOFF="2026-09-08"`, in this repo's `.memory-tree.conf` beside the dated cutoffs
 already there — seven at the fold, and the count is a
 `grep -cE '^[A-Z][A-Z0-9_]*_CUTOFF=' .memory-tree.conf` rather than a number this spec keeps fresh.
 The character class is the engine's own: `check-memory-hygiene.test.sh` derives `_engpresets` with
@@ -524,7 +524,7 @@ reds every gate run this unit's landing touches, not a scoped one.
     whose §7 contributes no leg name becomes a hit. Branch B loses and its text stays as the record
     of what was weighed, including its measured cost. The carrying argument is the recommendation's:
     the failure is SILENCE, which branch B cannot see — 31 of the 42 live specs name no leg at all at
-    the fold. The cutoff takes this build's own ruling, `SPEC_LEGLINE_CUTOFF="2026-09-07"`, strictly
+    the fold. The cutoff takes this build's own ruling, `SPEC_LEGLINE_CUTOFF="2026-09-08"`, strictly
     past the newest spec filename date on any branch, so the 31 stay green and the arm grades nothing
     on day one. Folded into S1, S2, S5, the new S7, §3's first non-goal, §4's cutoff section, §5, AC3,
     AC4, AC8, AC9 and §7's arm line.
@@ -533,7 +533,7 @@ reds every gate run this unit's landing touches, not a scoped one.
 
 - rev-1 · 2026-09-04 · initial draft.
 - rev-2 · 2026-09-05 · §8 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §10 · folded the owner's ruling on
-  FORK 1: branch A, a dated `SPEC_LEGLINE_CUTOFF="2026-09-07"` under which a §7 naming no leg reds.
+  FORK 1: branch A, a dated `SPEC_LEGLINE_CUTOFF="2026-09-08"` under which a §7 naming no leg reds.
   Added S7 and AC8–AC9, inverted §3's first non-goal, re-measured §4's population at the fold
   (31 of 42), and corrected §5, §7's arm line and §10, each of which described a checker that could
   not red.
@@ -599,6 +599,8 @@ reds every gate run this unit's landing touches, not a scoped one.
   `SPEC_LEGLINE_CUTOFF` takes `2026-09-07`, and §4's derivation paragraph stops asserting the
   fold's measurement as current — it points at `TOOL-aJoinedCanon-1`, which owns it, and states
   today's numbers.
+- rev-7 · 2026-09-07 · §2 · §4 · §8 · re-derived the build-wide date at LANDING:
+  `SPEC_LEGLINE_CUTOFF` takes `2026-09-08`. `TOOL-aJoinedCanon-1` §4 owns the measurement.
 
 ## 10. Reuse audit
 

@@ -1,12 +1,12 @@
 # TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red
 
-**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4 · ratified 2026-09-05
+**Status:** CLOSED · rev-7 · 2026-09-07 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md) | journal | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 |
+| [2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md) | journal | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
@@ -471,7 +471,7 @@ diff.
   lands strictly past the newest spec filename date on any ref, which is 2026-09-04 across every
   branch and remote-tracking ref in this tree, and strictly past today as well, because a spec
   minted today would carry today's date and would not sit behind a cutoff set at it. The declared
-  value is therefore `SPEC_FAILURE_MODE_CUTOFF="2026-09-07"`. The twenty specs dated 2026-09-04,
+  value is therefore `SPEC_FAILURE_MODE_CUTOFF="2026-09-08"`. The twenty specs dated 2026-09-04,
   eleven of them this build's own, are NOT its first subjects. The accepted cost is now a fact
   rather than a tradeoff: the arm grades zero specs on the day it lands, and S6's fixtures are its
   whole coverage. The counter-argument above LOST and stays on the record — the witness ratchet did
@@ -570,6 +570,8 @@ diff.
   2026-09-06, a date this fleet can still write into, so `SPEC_FAILURE_MODE_CUTOFF` takes
   `2026-09-07`. `TOOL-aJoinedCanon-1` §4 owns the measurement; rev-5's appended NOTE is untouched
   and its ruled PROPERTY still holds under the new value.
+- rev-7 · 2026-09-07 · §4 · re-derived the build-wide date at LANDING: `SPEC_FAILURE_MODE_CUTOFF`
+  takes `2026-09-08`. `TOOL-aJoinedCanon-1` §4 owns the measurement and its rev-7 entry states it.
 
 ## 10. Reuse audit
 

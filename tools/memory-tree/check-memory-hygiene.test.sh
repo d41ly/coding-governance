@@ -64,7 +64,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\nSPEC_EDGES_CUTOFF="2026-08-20"\nREADINESS_ROWS="security|observability|risks"\nREADINESS_ROWS_CUTOFF="2026-08-20"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\nSPEC_EDGES_CUTOFF="2026-08-20"\nREADINESS_ROWS="security|observability|risks"\nREADINESS_ROWS_CUTOFF="2026-08-20"\nBASE_RESOLVE_CUTOFF="2026-08-26"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -814,7 +814,35 @@ printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: BLOCKED - 2 blocke
 printf '**Serves:** spec-audit ARCH-tFixture-1\n\nno verdict, and dated BEFORE the cutoff\n' \
   > "$D/reviews/2026-08-01-review-ARCH-tFixture-1-6.md"            # grandfathered -> silent
 
+# ---- TOOL-aJoinedCanon-11: the `base` sha resolves to a real commit. BASE_RESOLVE_CUTOFF is
+# ---- 2026-08-26 in the shared conf, one day past the newest fixture filename date in this file, so
+# ---- every pre-existing `base 0123abcd` fixture is grandfathered and only these are graded.
+basespec() {   # $1 num · $2 date-day · $3 status · $4 tier · $5 base sha
+  printf '# ARCH-tFixture-%s — a unit
+
+**Status:** %s · rev-1 · 2026-08-%s · node a · Tier-%s · base %s · streams architecture
+
+## 9. Revision log
+
+- rev-1 · 2026-08-%s · initial draft.
+'     "$1" "$3" "$2" "$4" "$5" "$2" > "$D/spec/2026-08-$2-spec-tFixture-$1.md"
+}
+# 190 — LIVE, TIER-1, a base that resolves to nothing. Tier-1 deliberately: the arm sits ABOVE the
+#       `hdr ~ /Tier-1/ next` cut, and below it this fixture goes silent while the key reads armed.
+basespec 190 26 OPEN 1 0123abcd
+# 192 — CLOSED with the same dead base. Silent: a landed record is frozen and is not rewritten to
+#       clear a hit, so the population is the specs a build can still change.
+basespec 192 26 CLOSED 2 0123abcd
+# 193 — PRE-cutoff twin of 190. Nothing landed goes retroactively red.
+basespec 193 10 OPEN 2 0123abcd
+
 git add -A && git commit -q -m fixtures --no-verify
+# 191 — the green twin, and it can only be written HERE: its base must name a commit that exists,
+#       which is not true of any sha until the fixtures commit above has been made. It commits
+#       BEFORE the rm below: `git add -A` would otherwise stage tFixture-13's deletion and
+#       destroy the tracked-but-absent state the very next arm grades.
+basespec 191 26 OPEN 2 "$(git rev-parse --short=8 HEAD)"
+git add -A && git commit -q -m base-green --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 
 out=$(bash "$SCRIPT" 2>/dev/null)
@@ -883,6 +911,12 @@ hit  'tFixture-172.md (§3 **consumes-from** external, and its prose names the s
 hit  'tFixture-180.md (§5 is missing declared READINESS_ROWS, required at/after READINESS_ROWS_CUTOFF 2026-08-20): risks'
 miss 'tFixture-181.md (§5 is missing declared'   # every declared row present
 miss 'tFixture-182.md (§5 is missing declared'   # PRE-cutoff, grandfathered
+
+# ---- TOOL-aJoinedCanon-11: the base-resolve arm.
+hit  'tFixture-190.md (status header `base 0123abcd` resolves to no commit in this object database'
+miss 'tFixture-191.md (status header `base'   # its base names the fixtures commit
+miss 'tFixture-192.md (status header `base'   # CLOSED: a frozen record is not graded
+miss 'tFixture-193.md (status header `base'   # PRE-cutoff, grandfathered
 miss 'ARCH-tFixture-145/AC1'                   # the CRITERION has no token: check 12's arm, not this
 hit  'an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox'
 hit  'a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true'

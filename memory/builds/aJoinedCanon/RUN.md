@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 16809e5aa56ba357afef81cecb51cf3e28cbbbd0
+witness: b2eff8bc2e01d73cd9331e8f82d60b3f7c7861c6
 phase: BUILDING
 mode: slug
 anchor-kind: default-branch
@@ -40,3 +40,5 @@ base: 274aa39b786c886991726896927337c0e3048e0c
 2026-09-06T17:49:08Z dispatch · item 769a62d6 TOOL-aJoinedCanon-9 · reason tools/lib/render-doc.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/kit.toml tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh .memory-tree.conf tools/memory-tree/.memory-tree.conf.example tools/memory-tree/README.md memory/guides/SESSION-KICKOFF.md
 
 2026-09-06T21:33:39Z dispatch · item 16809e5a TOOL-aJoinedCanon-10 · reason tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md .memory-tree.conf memory/guides/SESSION-KICKOFF.md
+
+2026-09-06T21:36:48Z dispatch · item b2eff8bc TOOL-aJoinedCanon-11 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh .memory-tree.conf tools/memory-tree/.memory-tree.conf.example memory/guides/SESSION-KICKOFF.md

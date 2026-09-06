@@ -114,6 +114,14 @@ READINESS_ROWS="security|perf / scale|a11y|i18n|error / empty / loading states|o
 # Blank = never required; set it strictly ahead of your corpus as with the cutoffs above.
 READINESS_ROWS_CUTOFF=""
 
+# Base-resolve ratchet (check 12): from this date a LIVE spec must have the `base` sha in its status
+# header resolve to a real commit here. Both tiers — `base` is a field both carry. Terminal specs are
+# excluded, because a landed record is frozen. Every distinct sha goes through ONE
+# `git cat-file --batch-check`, and the arm SKIPS itself with a stderr line in a shallow clone, where
+# every commit outside the fetch depth answers `missing` and it could only red honest work. Blank =
+# never required; set it strictly ahead of your corpus as with the cutoffs above.
+BASE_RESOLVE_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.

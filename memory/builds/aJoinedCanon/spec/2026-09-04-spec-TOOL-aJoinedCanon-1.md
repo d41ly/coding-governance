@@ -1,12 +1,12 @@
 # TOOL-aJoinedCanon-1 — the revision log becomes a structured entry
 
-**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
+**Status:** CLOSED · rev-7 · 2026-09-07 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md) | journal | TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 |
+| [2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md) | journal | TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md) | spec-audit | TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md) | spec-audit | TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md) | spec-audit | TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
@@ -266,7 +266,7 @@ would have armed the arm against a sibling branch landing a spec today.
 
 ### Rollout
 
-Under `REV_SCOPE_CUTOFF="2026-09-07"` the arm grades no spec in this corpus on day one, and the S6
+Under `REV_SCOPE_CUTOFF="2026-09-08"` the arm grades no spec in this corpus on day one, and the S6
 fixtures are its entire coverage. That is the ratified cost rather than a tradeoff still being
 weighed, and it is the state `STREAMS_CUTOFF`, `SPEC_WITNESS_CUTOFF` and `SPEC10_EVIDENCE_CUTOFF`
 each shipped in and each recorded. S5 is why it is not a silent green: the notice already exists for
@@ -368,7 +368,7 @@ a small, real constraint on how a spec discusses the template it edits.
 - **AC6** When `.memory-tree.conf` declares `REV_SCOPE_CUTOFF=""`, the blank-cutoff run in
   `check-memory-hygiene.test.sh` emits no `revision entries naming no` finding at all.
 - **AC7** When `bash tools/memory-tree/check-memory-hygiene.sh` runs over this tree at the landing
-  sha, it exits 0. Read honestly: under `REV_SCOPE_CUTOFF="2026-09-07"` the arm grades no spec, so
+  sha, it exits 0. Read honestly: under `REV_SCOPE_CUTOFF="2026-09-08"` the arm grades no spec, so
   this criterion CANNOT go red for the reason "a landed spec was redded by the new arm" — no such
   spec exists to red. What it does observe is that the engine edit broke nothing ELSE in check 12,
   which is a real failure mode and the one the `-v` binding and the awk dialect surface actually
@@ -504,7 +504,7 @@ its four greps are written out in full so that running it takes no judgement.
     could back-fill its OWN units and this one cannot back-fill another node's branch.
   - RESOLVED (owner, 2026-09-05): ahead of the fleet, ruled across the whole build at once — every
     cutoff this build introduces sits strictly past the newest spec filename date on any branch, so
-    nothing landed and nothing in flight goes red. `REV_SCOPE_CUTOFF="2026-09-07"`. The date is
+    nothing landed and nothing in flight goes red. `REV_SCOPE_CUTOFF="2026-09-08"`. The date is
     RE-DERIVED and not the one the option above names: that bullet was written on 2026-09-04, when
     2026-09-05 was tomorrow, and today is 2026-09-05, so it is now the fleet's own working date
     rather than a date ahead of it. Measured at the fold across all 44 local and remote refs — newest
@@ -585,6 +585,13 @@ its four greps are written out in full so that running it takes no judgement.
   beside the fold's, the §8 mark records that the rule was ratified and the date derived from it,
   and AC1's fixture filename moved to 2026-09-07 so the observed red stays reachable. The fold's
   own measurement sentences are left standing as the record of what was measured then.
+- rev-7 · 2026-09-07 · §4 · §6 AC7 · §8 · re-derived the ratified date AT LANDING, which is the
+  second time this build has had to and for the same reason: the owner ratified a RELATION to the
+  fleet working day, not a constant, so a value carried across a day boundary is stale by
+  construction. The clock rolled to 2026-09-07 mid-build, a sibling run landed specs dated
+  2026-09-06, and today is itself a date the fleet can still write into. The relation returns
+  `REV_SCOPE_CUTOFF="2026-09-08"`. The rev-6 entry below is left standing as the record of the
+  first re-derivation.
 
 ## 10. Reuse audit
 

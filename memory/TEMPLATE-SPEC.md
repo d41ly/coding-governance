@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.67 -->
+<!-- gov:kit memory-tree@2.68 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -66,7 +66,10 @@ an absent region cannot be told from a spec nobody has recorded against.
 - `rev-<N>` bumps on ANY material content change (review fold-ins included) and every rev gets a
   §9 line — §9 is the rev high-water a resumed session reads; the header rev being absent from §9
   is machine-checked. A pure status flip moves the date, not the rev.
-- `base` is the immutable default-branch sha (8+ hex chars) the design was grounded against.
+- `base` is the immutable default-branch sha (8+ hex chars) the design was grounded against. On a
+  LIVE spec dated at or after `BASE_RESOLVE_CUTOFF` it is RESOLVED against this object database,
+  not merely shape-checked — an eight-hex string that names nothing is a finding. A terminal spec
+  is exempt, because a landed record is frozen and is not rewritten to clear a hit.
 - `streams` names the discipline(s) this spec served, `+`-joined, each one a legal `DISCIPLINES`
   value. See the cutoff section above for when it becomes mandatory.
 - The tail holds POINTERS and DECLARED VERBS only — a review workflow id, `ratified <date>`,

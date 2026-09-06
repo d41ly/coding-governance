@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.67   # gov:kit memory-tree@2.67 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.68   # gov:kit memory-tree@2.68 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -72,6 +72,8 @@ SPEC_EDGES_CUTOFF=""    # date; Tier-2 specs dated >= this must carry a `### Edg
 # REFUSAL below, because an armed rule with no row set grades nothing and would pass silently.
 READINESS_ROWS=""
 READINESS_ROWS_CUTOFF="" # date; Tier-2 specs dated >= this must carry every declared §5 row (check 12); blank = never required
+# The TENTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-11).
+BASE_RESOLVE_CUTOFF=""  # date; a LIVE spec dated >= this must have its `base` sha resolve to a real commit (check 12); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -979,7 +981,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v rcut="$READINESS_ROWS_CUTOFF" -v stg="$STAGED" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v bcut="$BASE_RESOLVE_CUTOFF" -v rcut="$READINESS_ROWS_CUTOFF" -v stg="$STAGED" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1179,6 +1181,21 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       }
     }
     if (!seen || hrev + 0 > mx) print f " (header rev-" hrev " not logged in the §9 Revision log)"
+    # ---- TOOL-aJoinedCanon-11: the `base` sha resolves to a real commit. ABOVE the Tier-1 cut, in
+    # ---- the every-tier band, because `base` is a status-header field BOTH tiers carry. The section
+    # ---- canon sentinel sits below that cut and this arm deliberately does not copy the
+    # ---- placement: `next` is a PREFIX cut, so below it every Tier-1 spec would go unresolved while
+    # ---- this key still read as armed, and four of the eleven units in this build are Tier-1.
+    # ---- TERMINAL specs are excluded. A landed record is frozen and this repo does not rewrite one
+    # ---- to clear a hit, so the population is the specs a build can still change.
+    # ---- The arm RESOLVES NOTHING here: it emits a sentinel and the post-pass batches every sha
+    # ---- through ONE `git cat-file --batch-check`. A fork per spec is the shape this batched awk
+    # ---- was built to delete.
+    if (bcut != "" && fdate != "" && fdate >= bcut && hdr !~ /^\*\*Status:\*\* (CLOSED|WONTDO)/) {
+      bp = index(hdr, "· base "); bsha = ""
+      if (bp > 0) { bsha = substr(hdr, bp + length("· base ")); sub(/[^0-9a-fA-F].*$/, "", bsha) }
+      if (bsha != "" && stg == 0) print "	" f "	" bsha
+    }
     # ---- TOOL-aJoinedCanon-1: a §9 entry names WHAT it moved. Sits here, at the same nesting depth
     # ---- as the high-water walk above and so OUTSIDE every other guard, with revscopecut as its ONLY
     # ---- date guard. Nesting it inside a sibling cutoff block would make its real population an
@@ -1534,6 +1551,30 @@ esac
 # ---- developer committing one spec of a correctly declared pair would see the other end reported
 # ---- missing — a red on honest work. The per-file shape arm stays live under --staged, because a
 # ---- truncated corpus cannot change its answer about the one file it reads.
+# ---- TOOL-aJoinedCanon-11: resolve every emitted `base` sha in ONE batch. A `git cat-file -e` per
+# ---- spec would be one fork per live spec forever, which is the shape this batched awk exists to
+# ---- delete. `^{commit}` is the peel that stops an eight-hex prefix naming a tree or a blob from
+# ---- passing, and an ambiguous abbreviation answers on its own line rather than on stderr.
+base12=$(printf '%s\n' "$bad12_raw" | grep $'^\002\t' || true)
+bad12=$(printf '%s\n' "$bad12" | grep -v $'^\002\t' || true)
+if [ -n "$base12" ]; then
+  # THE PROBE THAT CANNOT MOVE. In a shallow clone every commit outside the fetch depth answers
+  # `missing`, so this arm would either red honestly-written specs or, written to ignore `missing`,
+  # pass on a clone where it can never fail. Announced on STDERR and skipped, rather than either.
+  if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = true ]; then
+    echo "memory-hygiene: the §base resolve arm is SKIPPED — this is a shallow repository, where every commit outside the fetch depth answers 'missing' and the arm could only red honest specs or pass on a tree it cannot grade." >&2
+  else
+    _bres=$(printf '%s\n' "$base12" | awk -F'\t' '{ print $3 }' | sort -u | sed 's/$/^{commit}/' \
+      | git cat-file --batch-check='%(objectname) %(objecttype)' 2>/dev/null || true)
+    _bbad=$(printf '%s\n' "$_bres" | awk '$2 != "commit" { s = $1; sub(/\^\{commit\}$/, "", s); print s }')
+    if [ -n "$_bbad" ]; then
+      basebad=$(printf '%s\n' "$base12" | awk -F'\t' -v bad="$(printf '%s\n' "$_bbad" | tr '\n' ' ')" '
+        BEGIN { n = split(bad, a, " "); for (i = 1; i <= n; i++) if (a[i] != "") m[a[i]] = 1 }
+        ($3 in m) { print $2 " (status header `base " $3 "` resolves to no commit in this object database, required at/after BASE_RESOLVE_CUTOFF)" }')
+      [ -z "$basebad" ] || bad12=$(printf '%s\n%s' "$bad12" "$basebad")
+    fi
+  fi
+fi
 edge12=$(printf '%s\n' "$bad12_raw" | grep $'^\003\t' || true)
 bad12=$(printf '%s\n' "$bad12" | grep -v $'^\003\t' || true)
 if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
