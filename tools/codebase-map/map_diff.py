@@ -123,6 +123,55 @@ def _read_symbols(path: Path) -> list[dict]:
     return data.get("symbols", []) if isinstance(data, dict) else []
 
 
+def render_legacy_note(legacy: Path, current: Path, root: Path) -> str:
+    """The line an adopter carrying the pre-move file needs, or `""` when there is nothing to say.
+
+    A separate function so it can be ARMED: the migration case exists only because the
+    destination moved, and a `--converge` run in a clean fixture — which is what AC1 grades —
+    never reaches it. Nothing here DELETES: the file may hold rows nobody has read, and a tool
+    that silently removes a durable record is the shape this unit exists to stop.
+    """
+    if not legacy.is_file():
+        return ""
+    where = legacy.relative_to(root).as_posix() if legacy.is_relative_to(root) else legacy.as_posix()
+    return (f"\nnote: {where} is a LEGACY location and is NO LONGER WRITTEN. Nothing here deletes "
+            f"it — it may hold rows nobody has read. Fold or delete it by hand; new rows go to "
+            f"{current.as_posix()}.")
+
+
+def derive_backlog_path(root: Path) -> Path:
+    """Where the reinvention backlog is written: OUTSIDE the worktree, under the git COMMON dir.
+
+    Ratified by the owner on 2026-09-05, reversing `bConvergentLodestar` F7, which chose a tracked
+    destination. The ground for reversing is practice rather than a defect in F7's reasoning: the
+    rows have never been reviewed by anyone, because the file has never been tracked on any branch
+    and was therefore untracked clutter inside the gated memory tree after every `--converge` run.
+
+    `--git-common-dir`, NEVER `--git-dir`, and the tree is not uniform about this so the choice is
+    stated rather than copied. In a LINKED WORKTREE `--git-dir` is `.git/worktrees/<name>`, which
+    `git worktree remove` deletes outright, taking a durable record with it. ONE existing consumer
+    resolves the common dir for exactly that reason — the memory-recall kit's query entrypoint,
+    whose `<git-common-dir>/recall/queries.jsonl` is the spelling followed here; the gate runner and
+    the lander both use `--git-dir` for records that are meant to die with their worktree. The raw value
+    is RELATIVE (a bare `.git`) at the repo root and absolute elsewhere, so it is resolved either
+    way rather than used as given.
+
+    Fails OPEN back into the map tree where git cannot answer at all: this is a WARN path, never a
+    gate, and refusing to report a convergence signal because a subprocess failed would be a worse
+    trade than writing where the old release wrote.
+    """
+    try:
+        raw = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
+                             capture_output=True, text=True, check=True).stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        return m.map_root(root) / "reinvention-backlog.md"
+    if not raw:
+        return m.map_root(root) / "reinvention-backlog.md"
+    gd = Path(raw)
+    gd = gd if gd.is_absolute() else (root / raw)
+    return gd.resolve() / "codebase-map" / "reinvention-backlog.md"
+
+
 def _new_clones(root: Path, conf: dict[str, str]) -> int | None:
     """new_clones (§4): the adopted verbatim-clone-ratchet's count, read from the file named by
     CLONE_COUNT_FILE (relative to the repo root) — whatever clone kit is adopted writes its count
@@ -176,14 +225,20 @@ def _converge(base: str, head: str, files: list[str]) -> int:
         affordance_seams=affordance_seams,
     )
 
-    # F7: route each flag to the durable, deduped reinvention backlog.
-    backlog_path = map_dir / "reinvention-backlog.md"
+    # F7: route each flag to the durable, deduped reinvention backlog — OUTSIDE the worktree.
+    backlog_path = derive_backlog_path(root)
     added: list[m.CollisionFlag] = []
     if flags:
         current = backlog_path.read_text(encoding="utf-8") if backlog_path.is_file() else ""
         new_text, added = m.append_backlog(current, flags)
         if added:
+            backlog_path.parent.mkdir(parents=True, exist_ok=True)
             backlog_path.write_text(new_text, encoding="utf-8", newline="\n")
+
+    # The file this record used to be written to, if a previous release left one behind. NAMED, not
+    # deleted: it is the adopter's file, it may hold rows nobody has read, and a tool that silently
+    # removes a record is the shape this unit exists to stop.
+    legacy = map_dir / "reinvention-backlog.md"
 
     print("# convergence signals (trend to zero = the repo converges); a WARN, never a gate.")
     print(f"\ncollision_flags: {len(flags)}")
@@ -193,13 +248,19 @@ def _converge(base: str, head: str, files: list[str]) -> int:
             f"- built new instead of wiring through it; confidence {f.confidence}"
         )
     if flags:
-        rel = backlog_path.relative_to(root).as_posix() if backlog_path.is_relative_to(root) else backlog_path.name
+        # The path is OUTSIDE the worktree now, so `relative_to(root)` no longer resolves and the
+        # absolute spelling is the useful one — a reader has to be able to open it.
+        rel = (backlog_path.relative_to(root).as_posix()
+               if backlog_path.is_relative_to(root) else backlog_path.as_posix())
         dup = len(flags) - len(added)
         skip = f" ({dup} already recorded, skipped)" if dup else ""
         print(
             f"  -> {len(added)} row(s) appended to {rel}{skip}; fold each into its seam "
             "(or delete the row if genuinely distinct)."
         )
+    note = render_legacy_note(legacy, backlog_path, root)
+    if note:
+        print(note)
 
     clones = _new_clones(root, conf)
     if clones is None:

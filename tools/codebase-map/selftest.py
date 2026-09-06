@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
 import map_imports as mi  # noqa: E402
+import map_diff as md  # noqa: E402
 
 IDS = ("flags", "routes")
 INV = {"flags": ["a_flag", "b_flag"], "routes": ["api/x/route.ts"]}
@@ -1678,6 +1679,13 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
+    failures += check("backlog: written outside the worktree (AC1)",
+                      test_backlog_path_is_outside_the_worktree)
+    failures += check_guarded("backlog: follows --git-common-dir (AC6)",
+                              test_backlog_path_follows_the_common_dir_not_the_git_dir)
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("backlog: the legacy file is named, never deleted (AC7)",
+                          lambda: test_legacy_backlog_is_named_and_never_deleted(Path(td)))
     failures += check("freshness: an orphaned artifact is a refusal (AC2)",
                       test_conditional_tier_refuses_an_orphaned_artifact)
     failures += check("freshness: a NEW conditional tier reports itself (AC1/AC4)",
@@ -2018,6 +2026,64 @@ def test_the_gate_and_its_template_are_byte_identical():
     b = (kit / "test_codebase_map.template.py").read_bytes()
     assert a == b, ("the installed gate and its template have diverged; "
                     f"{len(a)} vs {len(b)} bytes")
+
+
+# --- the reinvention backlog leaves the worktree (TOOL-dTracedLattice-3) --------------------------
+def test_backlog_path_is_outside_the_worktree():
+    """AC1 / S2 — `--converge` cannot leave untracked clutter inside a gated directory.
+
+    Asserted on the DESTINATION rather than by running a converge into a scratch repo: the property
+    the unit is about is where the write goes, and a fixture that ran the whole digest would grade
+    the digest.
+    """
+    root = m.repo_root()
+    path = md.derive_backlog_path(root)
+    assert not path.is_relative_to(root), f"the backlog is still inside the worktree: {path}"
+    assert path.name == "reinvention-backlog.md", path
+
+
+def test_backlog_path_follows_the_common_dir_not_the_git_dir():
+    """AC6 — `--git-common-dir`, never `--git-dir`.
+
+    SKIPS LOUDLY where the two are the same path, which is every non-linked checkout: the arm would
+    then pass whichever the code resolved, and a row that cannot tell the two apart is worse than no
+    row. Gov's own bar runs this from a linked worktree, where they differ.
+    """
+    import subprocess
+    root = m.repo_root()
+
+    def read_dir(flag):
+        raw = subprocess.run(["git", "-C", str(root), "rev-parse", flag],
+                             capture_output=True, text=True, check=True).stdout.strip()
+        q = Path(raw)
+        return (q if q.is_absolute() else (root / raw)).resolve()
+
+    common, own = read_dir("--git-common-dir"), read_dir("--git-dir")
+    if common == own:
+        raise Skipped("this checkout is not a linked worktree, so --git-dir and --git-common-dir "
+                      "are the same path and the two cannot be told apart here")
+    path = md.derive_backlog_path(root)
+    assert path.is_relative_to(common), (path, common)
+    assert not path.is_relative_to(own), (
+        f"the backlog landed under --git-dir ({own}), which `git worktree remove` deletes outright")
+
+
+def test_legacy_backlog_is_named_and_never_deleted(tmp: Path):
+    """AC7 — the migration case, which a clean fixture never reaches.
+
+    It exists only because the destination moved, so AC1's clean-worktree criterion cannot grade it.
+    """
+    root = tmp
+    legacy = tmp / "map" / "reinvention-backlog.md"
+    current = tmp / "elsewhere" / "reinvention-backlog.md"
+    assert md.render_legacy_note(legacy, current, root) == "", "a note with no legacy file to name"
+    legacy.parent.mkdir(parents=True)
+    legacy.write_text("# rows nobody has read\n", encoding="utf-8")
+    note = md.render_legacy_note(legacy, current, root)
+    assert "LEGACY location" in note and "NO LONGER WRITTEN" in note, note
+    assert "map/reinvention-backlog.md" in note, note
+    assert current.as_posix() in note, note
+    assert legacy.is_file(), "the note must not delete the file it names"
 
 if __name__ == "__main__":
     sys.exit(main())

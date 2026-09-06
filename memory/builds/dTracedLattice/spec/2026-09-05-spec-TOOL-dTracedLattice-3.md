@@ -1,12 +1,13 @@
 # TOOL-dTracedLattice-3 — the reinvention backlog is tracked, or is not written into a tracked directory
 
-**Status:** SPECCED · rev-5 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 4 · ratified 2026-09-05
+**Status:** CLOSED · rev-6 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 4 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-06-build-TOOL-dTracedLattice-3-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-dTracedLattice-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
@@ -142,6 +143,9 @@ it; neither may be dispatched concurrently with the other, per M6 clause 1.
 ## 9. Revision log
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round.
+- rev-6 · 2026-09-06 · built. `derive_backlog_path` writes under the git COMMON dir; the migration
+  note became its own function so AC7 could be ARMED rather than asserted about, since a clean
+  fixture never reaches the case. Status CLOSED.
 - rev-5 · 2026-09-06 · folded the round-3 spec audit: H10 (S1's "every existing consumer uses
   `--git-common-dir`" is false — one does, the gate runner and the lander use `--git-dir` — and
   "beside `gate-ledger.tsv`" resolves under `--git-dir` and would red this unit's own AC6, so the

@@ -32,8 +32,20 @@ project specifics live in exactly two files the adopting repo owns.
 - `map_diff.py` — the range digest (`<base>..<head>`), plus `--drop-affordance-exempt` (S4a
   touch-drop) and `--converge` (S5 closing loop): WARNs on each NEW export that resembles an existing
   high-fan-in seam of the same kind it did not wire through — shipped reinvention, over ALL new code —
-  and routes each to `<MAP_ROOT>/reinvention-backlog.md` (deduped by `{new, resembles}`), alongside
-  `new_clones` and the demoted hygiene hints. A report + WARN at review, never a merge gate.
+  and routes each to `<git-common-dir>/codebase-map/reinvention-backlog.md` (deduped by
+  `{new, resembles}`), alongside `new_clones` and the demoted hygiene hints.
+
+  **The record lives OUTSIDE the worktree**, under the git COMMON dir beside the recall query
+  log — never `--git-dir`, which in a linked worktree is `.git/worktrees/<name>` and is deleted
+  outright by `git worktree remove`. It was written into `<MAP_ROOT>/` until 2026-09-06, where
+  it had never been tracked on any branch and was not gitignored, so every `--converge` run left
+  untracked clutter inside the gated memory tree. A run that finds the old file NAMES it and
+  deletes nothing.
+
+  **NO GATE LEG AND NO HOOK RUNS `--converge`.** It is a report and a WARN at review time, never
+  a merge gate. It is not unreferenced, which is a different claim: `WIRE-INTO-PROJECT.md`
+  prescribes it, `reuse-lookup.agent.md` prescribes it to an agent at review time, and
+  `selftest.py` invokes it as a refusal arm.
 - `reuse_lookup.py` + `reuse-lookup.agent.md` — the behaviour→seam lookup (S3): a portable CLI that
   ranks a reuse shortlist from the map's four recall sources (symbols · inventory keys · affordance
   seams · shared-seams prose), plus the agent-instruction that turns it into a decision. Run it

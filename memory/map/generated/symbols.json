@@ -1033,6 +1033,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_backlog_path",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
+    },
+    {
       "id": "derive_carried",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -2648,6 +2653,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_legacy_note",
+      "kind": "function",
+      "file": "tools/codebase-map/map_diff.py"
+    },
+    {
       "id": "render_live",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3428,6 +3438,16 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_backlog_path_follows_the_common_dir_not_the_git_dir",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_backlog_path_is_outside_the_worktree",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
       "id": "test_baseline_green",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -3716,6 +3736,11 @@
       "id": "test_lang_mode_ratchet",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_legacy_backlog_is_named_and_never_deleted",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_lexicon_marginal_rate",
