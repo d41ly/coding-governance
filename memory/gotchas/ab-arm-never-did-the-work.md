@@ -77,3 +77,12 @@ thing being timed.
 
 Not fixed by more rounds, more interleaving, or a quieter box. Those address variance. This is bias,
 and it survives every one of them.
+
+## The gate
+
+There is **no machine gate** for this class and a general one would be a lie: nothing in a tree can
+know what a given A/B arm was supposed to do. What replaces it is a documented check, and it is one
+line — **every arm of a comparison asserts the WORK it did, not only the time it took.** A timing arm
+whose subject can refuse must assert the subject's own success verdict alongside its seconds; an arm
+that reports a duration and nothing else is reporting how long it took to fail. Run it as part of
+the recurring-bug-class checklist over any diff that adds a measurement.

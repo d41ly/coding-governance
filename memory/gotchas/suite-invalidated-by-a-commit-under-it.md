@@ -72,3 +72,12 @@ suite is a test OF.
 Not flakiness. It is perfectly deterministic given the commit timing, which is what makes it so
 convincing: the failures are stable across the run and they cluster in one subsystem, so they read
 like a real regression in that subsystem.
+
+## The gate
+
+There is **no machine gate** for this class, because the defect is a race between a suite and the
+session running it, and no state in the tree records that the two overlapped. What replaces it is a
+documented check with a cheap mechanical form: **run a long suite on a FROZEN CLONE, never on the
+tree you are editing** — `git clone --local --no-hardlinks <tree> <short-temp-path>` and run there.
+The clone pins the commit the suite grades, so a commit landing mid-run cannot reach it. See
+[[run-long-suites-on-a-frozen-clone]] for the invocation and the MAX_PATH trap that goes with it.

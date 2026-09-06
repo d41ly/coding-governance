@@ -16,6 +16,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 |---|---|---:|---|---|
 | [a-pair-exists-and-it-is-the-wrong-one](a-pair-exists-and-it-is-the-wrong-one.md) | class | 2 |  | a scanner that pairs a delimiter with the next one of its kind finds a pair for a delimiter that opens nothing, and the span it then blanks is where the defect hides |
 | [a-view-fix-trades-one-blindness-for-another](a-view-fix-trades-one-blindness-for-another.md) | class | 3 |  | a scanner that grades source through a rendered view has a blind spot, and building a better view moves it rather than closing it, each move a new fail-open or false-deny |
+| [ab-arm-never-did-the-work](ab-arm-never-did-the-work.md) | class | 3 |  | a timing A/B whose arms are not each asserted to have DONE the work measures a refusal against a run, and the fast arm looks like the good one |
 | [absence-assertion-over-whole-file-text](absence-assertion-over-whole-file-text.md) | class | 3 |  | a ban that greps whole file text reds on the comment documenting its own fix |
 | [allowlist-narrower-than-the-root-it-guards](allowlist-narrower-than-the-root-it-guards.md) | class | 7 |  | a guard keyed on a path prefix denies the sanctioned destination too, because on this platform the sanctioned destination is INSIDE the prefix |
 | [amendment-leaves-its-other-half-standing](amendment-leaves-its-other-half-standing.md) | class | 2 |  | a criterion is amended and the clause, scope item or log line that only made sense under the old wording is left behind, so one rule now returns two verdicts |
@@ -50,6 +51,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [status-set-in-a-subshell](status-set-in-a-subshell.md) | class | 2 |  | a gate that prints FAILED from inside a pipeline sets a status the parent never sees, so it reports the violation and exits 0 |
 | [structured-record-split-on-whitespace](structured-record-split-on-whitespace.md) | class | 1 |  | a multi-field record iterated with an unquoted shell expansion degenerates into its first field, and every assertion built on the later fields becomes unfalsifiable |
 | [subprocess-resolves-a-different-shell](subprocess-resolves-a-different-shell.md) | class | 4 |  | Python subprocess resolving the bare name bash finds the WSL launcher, which sees another filesystem |
+| [suite-invalidated-by-a-commit-under-it](suite-invalidated-by-a-commit-under-it.md) | class | 1 |  | a suite that pins gov's revision at import and stamps fixtures from live HEAD is silently invalidated by any commit made while it runs, and the failures name the product |
 | [text-mode-read-eats-a-bare-cr](text-mode-read-eats-a-bare-cr.md) | class | 2 |  | reading a CRLF worktree file in text mode turns a bare CR inside a regex into a newline |
 | [trace-profile-measures-itself](trace-profile-measures-itself.md) | class | 1 |  | a per-line set -x profile charges its own write overhead to the next line, so its seconds rank by call count and an optimisation aimed at them moves nothing |
 | [trailing-comma-counted-as-an-element](trailing-comma-counted-as-an-element.md) | class | 5 |  | a counter scoring one-plus-every-top-level-comma reads a trailing comma as a real item, so every multi-line literal measures one too many |
@@ -58,6 +60,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-43 record(s): 43 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+45 record(s): 45 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

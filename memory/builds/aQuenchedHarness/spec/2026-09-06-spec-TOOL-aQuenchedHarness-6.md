@@ -1,11 +1,12 @@
 # TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved
 
-**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
+**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-07-build-TOOL-aQuenchedHarness-6-arm-inventory-check-line-length.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-6-arm-inventory-check-line-length.md) | journal | — |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-7 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
 
@@ -66,12 +67,25 @@ come from measurement.
 
 ### The inventory extractor
 
-`extract_arms`, a reader that walks a suite and emits one row per arm: the arm's label, the subject
-argv, and the expected verdict. It reads the suite's own arm-shaped call sites, so it works on the
-pre-port suite and the post-port suite alike — which is what makes the diff meaningful. Where a
-suite's arms are not extractable, the suite is reported as UNEXTRACTABLE and is not ported in this
-unit: porting a suite whose inventory cannot be compared would be exactly the unfalsifiable claim
-this design exists to prevent.
+Rev-3 specced a reader that parses a suite's arm-shaped CALL SITES. Surveying the corpus refuted it
+before a line was written: the suites use at least four unrelated idioms — `arm "label" rc want ...`,
+`ok`/`nope`, `check(...)`, `say_ok`/`say_fail` — and several use none this survey could name. A parser
+for all of them is a large investment in a safety property, and it would grade what the source SAYS
+rather than what the suite RAN.
+
+**The inventory comes from the suite's OWN OUTPUT instead.** Run it, keep the per-arm verdict lines,
+strip the verdict token and any timing, sort the remaining labels. That set is the arm inventory, and
+comparing it across a port is the safety property.
+
+It is better on every axis that matters. UNIVERSAL — any suite printing one line per arm is covered,
+whatever its internal idiom. STRONGER — it compares the arms that actually EXECUTED, so an arm lost
+to a mis-scoped `if` is caught where a source parse would still see its call site. And FREE — S7
+already requires running the suite on both sides for the seconds and the spawn count, so the
+inventory rides along.
+
+The escape survives unchanged in shape: a suite whose output carries no per-arm line is reported
+UNEXTRACTABLE and is not ported in this unit, because porting a suite whose inventory cannot be
+compared is exactly the unfalsifiable claim this design exists to prevent.
 
 ### Why a floor, and not just a budget
 
@@ -87,8 +101,8 @@ commit message. A batch port would make a failed diff ambiguous across suites.
 
 ### Inventory
 
-- `extract_arms` — the inventory extractor, checked against the lexicon before naming
-  (`python tools/lexicon/lexicon.py --suggest extract_arms --as sh.function` returns OK).
+- `tools/lib/extract-arms.sh` — the inventory extractor: runs a suite, normalises its per-arm
+  verdict lines, emits the sorted label set. Named against the lexicon before it was written.
 - `memory/builds/aQuenchedHarness/build/<date>-build-TOOL-aQuenchedHarness-6-arm-inventory-<suite>.md`
   — one tracked artifact per ported suite, holding both inventories, the diff and the readings.
 
@@ -175,6 +189,11 @@ which grades the per-suite build records this unit writes.
 ## 9. Revision log
 
 - rev-1 · 2026-09-06 · initial draft.
+- rev-4 · 2026-09-07 · the extractor changed shape BEFORE any code, per M2's "to diverge, change the
+  spec first". A survey of the corpus found at least four unrelated arm idioms and several suites
+  using none of them, so rev-3's source parser was a large investment that would still grade what the
+  source says rather than what ran. The inventory now comes from the suite's own OUTPUT — universal,
+  stronger, and free, because S7 already runs the suite on both sides.
 - rev-3 · 2026-09-06 · folded spec-audit round 2. M5: S3a adds the comparability rule the ranking
   needed — after unit 4 F2 the readings come from two sources under two conditions, and sorting them
   together ranks the conditions; the ranking now prints each row's condition and reds on an unstated

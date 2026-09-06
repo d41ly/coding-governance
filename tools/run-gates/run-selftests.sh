@@ -38,6 +38,10 @@ usage: bash tools/run-gates/run-selftests.sh [--kit <dir>] [--check] [--list]
   --check     the gate: assert the declaration against tools/gate-legs.json in
               BOTH directions, run nothing
   --list      print the population and the derived total, run nothing
+  --rank      rank the population by its RECORDED seconds and mark the set that
+              carries the declared majority share; REFUSES if any row's reading
+              states no condition, because ranking two conditions together ranks
+              the conditions
 USAGE
 }
 
@@ -47,12 +51,103 @@ while [ $# -gt 0 ]; do
     --kit)   FILTER=${2:-}; shift 2 ;;
     --check) MODE=check; shift ;;
     --list)  MODE=list; shift ;;
+    --rank)  MODE=rank; shift ;;
     -h|--help) print_usage; exit 0 ;;
     *) echo "run-selftests: unknown argument '$1'"; print_usage; exit 2 ;;
   esac
 done
 
 [ -f "$BUDGETS" ] || { echo "run-selftests: no declaration at $BUDGETS"; exit 2; }
+
+# ---- --rank: which suites carry the cost, and therefore which are worth rebuilding -------------
+# ---- It runs BEFORE the width resolution below, because ranking is a read of a text file and has
+# ---- no business paying for a profile probe.
+if [ "$MODE" = rank ]; then
+  "$PYBIN" - "$BUDGETS" <<'PY'
+import re, sys
+
+# THE CONDITION VOCABULARY IS CLOSED, and that is the whole point of this verb. Spec 6 S3a: the
+# readings in this file come from two sources under two conditions — retained `gate-run` windows for
+# a held leg, and a direct timed invocation for a suite with no manifest row — so sorting them
+# together ranks the CONDITIONS as much as the suites. A phrasing not listed here is not ranked
+# leniently; it is reported as unbacked. Adding one is a deliberate edit, which is the point.
+CONDS = [
+    (re.compile(r"worst of (\d+) readings (\d+)s"),
+     lambda m: (int(m.group(2)), "worst of %s gate-run windows" % m.group(1))),
+    (re.compile(r"measured (\d+)s (?:on )?(.+?)(?:,|$)"),
+     lambda m: (int(m.group(1)), "direct, %s" % m.group(2).strip())),
+]
+
+share = factor = None
+rows, unbacked = [], []
+for line in open(sys.argv[1], encoding="utf-8"):
+    s = line.strip()
+    if s.startswith("#"):
+        m = re.match(r"#\s*port-majority-share:\s*([0-9.]+)", s)
+        if m:
+            share = float(m.group(1))
+        m = re.match(r"#\s*port-minimum-factor:\s*([0-9.]+)", s)
+        if m:
+            factor = float(m.group(1))
+        continue
+    if not s:
+        continue
+    f = line.rstrip("\n").split("\t")
+    if len(f) < 2:
+        continue
+    name, reading = f[0], (f[3] if len(f) > 3 else "")
+    for rx, take in CONDS:
+        m = rx.search(reading)
+        if m:
+            secs, cond = take(m)
+            rows.append((secs, cond, name))
+            break
+    else:
+        unbacked.append((name, reading))
+
+# A THRESHOLD THAT IS NOT DECLARED IS NOT A THRESHOLD. Defaulting it here would let the file lose its
+# declaration and the ranking carry on reporting a selected set against a number nobody wrote.
+missing = [k for k, v in (("port-majority-share", share), ("port-minimum-factor", factor)) if v is None]
+if missing:
+    print("run-selftests: the declaration states no " + " and no ".join(missing) + ", so a selected")
+    print("run-selftests: set could not be computed against anything. Declare them in the header of")
+    print("run-selftests: %s beside the reading each was taken from." % sys.argv[1])
+    raise SystemExit(1)
+
+if unbacked:
+    print("run-selftests: these row(s) carry no reading whose CONDITION this verb recognises, so they")
+    print("run-selftests: cannot be ranked against rows that do — and a denominator missing its")
+    print("run-selftests: largest members is not a majority of anything. NO share was computed.")
+    for name, reading in unbacked:
+        print("  %-46s %s" % (name, reading or "(no reading at all)"))
+    print("run-selftests: produce them with  GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh")
+    print("run-selftests: and, for a row with no manifest leg, a direct timed run of its argv; then")
+    print("run-selftests: write the seconds and the condition into this file's fourth column.")
+    raise SystemExit(1)
+
+if not rows:
+    print("run-selftests: the declaration ranked NO row at all, so this verb graded nothing")
+    raise SystemExit(2)
+
+total = sum(r[0] for r in rows)
+rows.sort(key=lambda r: (-r[0], r[2]))
+print("run-selftests: %d row(s), %d s of recorded time; the declared majority share is %.0f%% and"
+      % (len(rows), total, share * 100))
+print("run-selftests: the declared minimum port factor is %.2fx." % factor)
+cum, cut = 0, None
+for i, (secs, cond, name) in enumerate(rows, 1):
+    cum += secs
+    frac = cum / float(total)
+    mark = " "
+    if cut is None and frac >= share:
+        cut, mark = i, "<"
+    print("  %2d  %6d s  cum %5.1f%% %s  %-30s  %s" % (i, secs, frac * 100, mark, cond, name))
+print("----")
+print("run-selftests: the declared share is carried by the TOP %d suite(s) — %d s of %d, %.1f%%."
+      % (cut, sum(r[0] for r in rows[:cut]), total, sum(r[0] for r in rows[:cut]) / float(total) * 100))
+PY
+  exit $?
+fi
 
 # ---- the declaration, read once. Fields: name, budget, argv (empty = from the manifest), reading.
 # ---- A row whose argv is empty takes it from `tools/gate-legs.json`, so the manifest stays the one
@@ -87,11 +182,18 @@ PY
 # ---- turnstile, so asking costs nothing and takes no beacon.
 W=$(bash "$HERE/run-gates.sh" --print-profile 2>/dev/null | awk -F'\t' '$1=="width"{print $2}')
 case "${W:-}" in ''|*[!0-9]*) W=2 ;; esac
-# THE COMPOSITE BOUND. A spec audit caught this unit and the harness unit each reading the same
-# declared width, which at width 8 is 8 suites x 8 arms = 64 concurrent processes on a host where a
-# bare spawn costs 319 ms — during exactly the sweep this exists to make affordable. The outer pool
-# takes at most 4 and EXPORTS what is left, so the product never exceeds the row's declared width.
-OUTER=$(( W < 4 ? W : 4 )); [ "$OUTER" -ge 1 ] || OUTER=1
+# THE COMPOSITE BOUND: outer x inner never exceeds the profile row's declared width. A spec audit
+# caught this unit and the harness unit each reading that width independently, which at width 8 would
+# be 8 suites x 8 arms = 64 concurrent processes on a host where a bare spawn costs 319 ms.
+#
+# THE OUTER POOL IS 1 BECAUSE THE RUN LOOP BELOW IS SERIAL, and it is serial on purpose: this runner
+# grades each suite against its OWN declared budget, so two suites racing would charge each of them
+# the other's contention and a breach would name the wrong one. An earlier draft divided by a pool of
+# 4 that does not exist, which handed every ported suite a quarter of the width it was entitled to —
+# measured on `check-line-length.test.sh`: 13.6 s at the width that division produced against 7.9 s
+# at the declared one. RE-DIVIDE HERE if the loop ever runs suites concurrently; the invariant is the
+# product, not this constant.
+OUTER=1
 export SELFTEST_INNER_WIDTH=$(( W / OUTER )); [ "$SELFTEST_INNER_WIDTH" -ge 1 ] || SELFTEST_INNER_WIDTH=1
 
 POP=$(read_population)
