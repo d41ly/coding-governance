@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-06T10:50:27+03:00 @ d19f6dc62a955a875bef8bf20880565bb28d7d81
+last-audit: 2026-09-06T12:00:27+03:00 @ 67232c4f5ed8eb092d0e80872649e2701f5fe5b0
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 22d75b31296a3a4fe28cf53a85c51076b8e6d798
+last-body-change: 67232c4f5ed8eb092d0e80872649e2701f5fe5b0
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -182,7 +182,7 @@ composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a chec
 runs to the first interpolation, so lengthening a message always strands it and shortening never
 does — hit three times in one file in one session) · `process-creation-is-the-suite-cost.md` ·
 `trace-profile-measures-itself.md` · `fallback-fabricates-the-passing-value.md` ·
-`two-readers-of-one-config-one-re-derived.md`.
+`two-readers-of-one-config-one-re-derived.md` · `line-keyed-registry-reds-on-a-file-that-grew.md` (a waiver keyed `<path>:<line>`, and the sibling arm that is a BAN rather than a ratchet) · `naming-leg-grades-what-python-named.md` (nested helpers and dunders count, and arming follows `symbols.json`, so it only reds at the lander).
 
 - A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
   CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`

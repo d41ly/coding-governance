@@ -20,7 +20,8 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = ["lexicon"]
-gotcha-classes = ["armed-but-unreachable-rule.md"]
+gotcha-classes = ["armed-but-unreachable-rule.md", "naming-leg-grades-what-python-named.md",
+  "line-keyed-registry-reds-on-a-file-that-grew.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = [
