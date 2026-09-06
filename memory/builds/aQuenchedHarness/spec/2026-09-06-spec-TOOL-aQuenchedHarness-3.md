@@ -184,6 +184,14 @@ the descriptor-shape legs, which grade every `kit.toml` this unit edits ·
   claim withdrawn, the files stopped shipping, §7's guard claim corrected.
 - rev-3 · 2026-09-06 · folded spec-audit round 2: the apply path shown never to open the manifest, the
   `project-owned` marker adopted, the two halves joined, the population stated as 52/27.
+- rev-6 · 2026-09-07 · VERIFIED. All 10 arms pass in `tools/govkit/selftest.py`, measured on a FROZEN
+  CLONE of this branch: 1124 ok, 2 failed — the identical 2 that fail at the pre-session baseline
+  `274aa39b`, filed as `TOOL-aQuenchedHarness-9`. This unit adds ten arms and no failures.
+  The first run of that suite reported 28 failures and none of them was real: it ran against the live
+  worktree while this session committed four times, and the suite pins gov's vintage at module import
+  while `_cmd_apply` stamps each fixture receipt from live HEAD. Recorded as
+  `memory/gotchas/suite-invalidated-by-a-commit-under-it.md`, because it cost two wrong attributions
+  before anyone read the refusal message.
 - rev-5 · 2026-09-06 · BUILT, and building it found what enumeration had not. Withholding the FILE
   does silence the LEG — `silenced_legs` drops it exactly as rev-4 said — but that function reports
   each drop with `r.fail`, because it exists for gov's own defect and not for a deliberate act. Every
