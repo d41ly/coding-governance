@@ -101,7 +101,7 @@ ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCano
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aJoinedCanon-1 — the revision log becomes a structured entry](spec/2026-09-04-spec-TOOL-aJoinedCanon-1.md) | 1 | 2 | SPECCED | rev-6 | 2026-09-06 |
+| [TOOL-aJoinedCanon-1 — the revision log becomes a structured entry](spec/2026-09-04-spec-TOOL-aJoinedCanon-1.md) | 1 | 2 | CLOSED | rev-6 | 2026-09-06 |
 | [TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set](spec/2026-09-04-spec-TOOL-aJoinedCanon-2.md) | 2 | 1 | SPECCED | rev-5 | 2026-09-05 |
 | [TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it](spec/2026-09-04-spec-TOOL-aJoinedCanon-3.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-05 |
 | [TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red](spec/2026-09-04-spec-TOOL-aJoinedCanon-4.md) | 4 | 2 | SPECCED | rev-6 | 2026-09-06 |
@@ -114,7 +114,7 @@ ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCano
 | [TOOL-aJoinedCanon-11 — the base sha resolves to a real object](spec/2026-09-04-spec-TOOL-aJoinedCanon-11.md) | 11 | 1 | SPECCED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
