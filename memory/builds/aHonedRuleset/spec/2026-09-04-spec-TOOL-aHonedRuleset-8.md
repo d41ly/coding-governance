@@ -1,12 +1,13 @@
 # TOOL-aHonedRuleset-8 — the micro-format gate reaches the adopter who takes the charter
 
-**Status:** SPECCED · rev-7 · 2026-09-06 · node a · Tier-2 · base 94958534 · streams deployer · order 4 · ratified 2026-09-06
+**Status:** SPECCED · rev-8 · 2026-09-06 · node a · Tier-2 · base 94958534 · streams deployer · order 4 · ratified 2026-09-06
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit-round2.md) | spec-audit | — |
+| [2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit-round3.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit-round3.md) | spec-audit | — |
 | [2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit.md](../reviews/2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -64,10 +65,15 @@ from an operator's install command to them.
   `tools/install-prefix-carried.txt` — a `ROSE` verdict `--write-ratchet` cannot absorb, and a straight
   AC6 failure. The two halves of that sentence could not both be satisfied.
 
-  **The path-free form this unit uses instead**: name the leg by the NAME `tools/gate-legs.json` gives
-  it, `micro-format definitions`, and/or by the `{prefix}`-token argv the descriptor itself declares at
-  `check-microformats.kit.toml:44`. Both are path-free by construction, both are already the spellings
-  the machinery uses, and neither trips the ban. The divergence from the siblings is stated in the
+  **The path-free form this unit uses instead — ONE spelling is REQUIRED, not two offered.** The
+  instruction spells the `{prefix}`-token argv the descriptor itself declares at
+  `check-microformats.kit.toml:44`, `bash {prefix}/check-microformats.sh <playbook>`. The leg NAME
+  `tools/gate-legs.json` gives it, `micro-format definitions`, may be named IN ADDITION and never
+  instead. **rev-7 offered the two with an `and/or` and that made two of its own folds
+  unsatisfiable**: `gate-legs.json:34` carries no `check-microformats` substring while the argv does,
+  `grep -c` counts LINES, so a builder taking the first option lands all three S3 edits and returns
+  **3** against AC9's threshold of 4 — reddening the criterion by following the scope item exactly.
+  Both are path-free by construction and neither trips the ban. The divergence from the siblings is stated in the
   runbook sentence itself, so a later editor does not "fix" it back into a literal path.
 - **S4 — the `why_conditional` REASON gate**, the first of the two guards §8 F1 rules must be BUILT
   here. One arm in `selfcheck()` at `tools/govkit/govkit.py`, failing any `selectable =
@@ -111,10 +117,13 @@ from an operator's install command to them.
   **What makes the +2 true, and it is a constraint on S4 and S5 rather than on S6.** `_is_refusal` at
   `refusal_join.py:135-138` matches `<obj>.fail(...)` ONLY as a bare `ast.Expr` statement, so each arm
   must be written as a bare `r.fail(...)` expression directly in `selfcheck()`. An arm written as an
-  assignment, a ternary, a comprehension, or routed through a helper contributes ZERO and the ledger
-  comment is false the day it lands; and `enumerate_branches` at `:146-153` walks each `FunctionDef`
-  and then its whole subtree, so an arm in a nested helper is double-counted. `selfcheck()` has no
-  nested defs today, so that second shape appears only if the builder introduces one.
+  assignment, a ternary or a comprehension contributes ZERO and the ledger comment is false the day it
+  lands. **rev-7 also wrote "or routed through a helper" and that half is FALSE**, corrected at rev-8:
+  `enumerate_branches` at `:146-153` walks EVERY `FunctionDef`, so a bare call in a module-level helper
+  still counts once — what the subtree walk causes is DOUBLE-counting for a NESTED def, not zero for a
+  sibling one. `selfcheck()` has no nested defs today, so that shape appears only if the builder
+  introduces one. The constraint AC18's exact-+2 actually rests on is the `ast.Expr` shape, and that is
+  the one stated positively above.
 - **S5 — the reachability arm on the `requires` edge**, the second guard §8 F1 rules must be BUILT.
   One arm in `selfcheck()` beside S4's, failing any entry whose `requires` names a member of the
   declared default set while the entry itself is **reachable by no declared selection**. The
@@ -160,13 +169,24 @@ from an operator's install command to them.
   while three documents said §3 carried it, which is the one copy of that error that escaped the spec.
   Both are stated in §4's *What the runbook path actually yields*, filed together as
   `TOOL-aHonedRuleset-15`, and observed by AC17.
-  **(a) No numbered section of the runbook runs `apply` or `update` at all** — `grep -n apply
-  WIRE-INTO-PROJECT.md` returns eight hits and every one is prose — so §2's install leaves a
-  `deploy.toml` naming the entry with NO ENGINE IN THE TREE.
+  **(a) No fenced command block in the runbook invokes `govkit.py apply`** — narrowed at rev-8 from a
+  universal that did not reproduce. `update` IS run, at `:602` inside `## 5b`, whose documented
+  sequence is intake → adopt → adopt --write → update and which is the path that lands bytes;
+  `cmd_update` at `govkit.py:5722` emits no `gate legs:` line at all. §2 — the section an operator
+  following the charter install copies — runs neither verb. **And §2's three lines do not run as
+  written**: `grep -c -- '--answer' WIRE-INTO-PROJECT.md` is **0**, so the copy-paste line REFUSES
+  before writing anything, which is a third defect in the same install path and is why this bullet
+  says three and not two. With answers supplied the descriptor lands and the payload is still absent
+  until `apply`. (The rev-7 evidence for this bullet was `grep -n apply`, which returns **TEN** hits
+  and not the eight rev-7 counted — `:309 :373 :589 :635 :638 :843 :847 :876 :878 :883`, the two extra
+  being `git apply --check` prose on the contribute path — and which does not test the `update` half at
+  all. The narrowed claim above is what the fenced blocks at `:81-85` and `:598-603` actually show.)
   **(b) `run-gates` is absent from the `--kits` example**, and it is the sole `[gate_runner_seed]`
   declarer, so whenever an operator does reach `apply`, the legs are ORDERED and not emitted — for
-  every kit that example lists, not only this one. Repairing either would rewrite an install flow
-  every kit shares, which is answering somebody else's question from inside a selection fix.
+  every kit that example lists, not only this one.
+  **(c) The `--answer` requirement is documented nowhere in the runbook**, which is what makes (a)'s
+  §2 line refuse. Repairing any of the three would rewrite an install flow every kit shares, which is
+  answering somebody else's question from inside a selection fix.
 
 ## 4. Design
 
@@ -231,8 +251,16 @@ what it leaves is measured here rather than assumed.
 
 **FIRST, and this is what rev-6 got wrong: the runbook's fresh path never runs `apply` or `update`.**
 `grep -n apply WIRE-INTO-PROJECT.md` returns `:309 :373 :589 :635 :638 :876 :878 :883` and every one
-is PROSE — there is no `govkit.py apply` command block anywhere in the document. §2's install is
-exactly three lines: one `intake --kits …` and two `adopt-playbook.sh` calls. `cmd_intake` writes
+is PROSE — there is no `govkit.py apply` command block anywhere in the document. (Ten, not the eight
+rev-7 wrote: `:843` and `:847` are `git apply --check` prose on the contribute path. And that grep
+tests only one of the two verbs rev-7's §3 quantified over — `update` IS run, at `:602` inside `## 5b`,
+whose sequence is intake → adopt → adopt --write → update and whose `cmd_update` at `govkit.py:5722`
+emits no `gate legs:` line at all. §3 carries the narrowed claim.) §2's install is exactly three
+lines: one `intake --kits …` and two `adopt-playbook.sh` calls — **and as written they do not run**:
+`grep -c -- '--answer' WIRE-INTO-PROJECT.md` is 0, `needed_answers` returns `['playbook_path']` for
+that selection, and `cmd_intake` refuses at `govkit.py:8139-8145` before writing anything. So the
+literal §2 outcome is no descriptor at all; with the answer supplied it is a descriptor and no
+engine. `cmd_intake` writes
 `.governance/deploy.toml` and RETURNS (`govkit.py:8225-8229`); it copies nothing and emits nothing,
 and `adopt-playbook.sh` renders the charter region and copies nothing else, which §4's own
 *Alternatives rejected* bullet already recorded. Every per-kit section installs by hand with `cp -r`.
@@ -248,7 +276,9 @@ REFUSES to overwrite an existing `deploy.toml` — that file is the standing aut
 `--kits` list an operator copies from §2 is that target's PERMANENT selection. Whenever they do reach
 `apply`, by §5b's path or their own, they get the ordered-not-emitted branch at
 `govkit.py:5064-5107`, the legs written to `.governance/outbox/gate-legs.md`, the line
-`gate legs: ORDERED, not emitted` (`:5066` and `:5104`), and **exit 0**. The deployer's own comment at
+`gate legs: ORDERED, not emitted` (`:5066` and `:5104`), and **exit 0**. Reaching `apply` is on them:
+§5b's documented path ends at `update`, which emits no such line, so neither of those outcomes comes
+from following the runbook. The deployer's own comment at
 `:8165` calls that branch "the silent-green direction this deployer refuses by name everywhere else".
 
 **The disposition, and its bound.** S3 gains a wiring instruction, because a leg nobody wires is a
@@ -458,8 +488,9 @@ review consequence rather than only the edit count.
 
 ## 5. Production-readiness checklist
 
-- security — N/A, re-priced at rev-7 against §4's SEVEN files rather than rev-2's three: two
-  declaration edits, one runbook edit, two `r.fail` arms plus their selftest arms, and S6's comment.
+- security — N/A, re-priced against §4's SEVEN files rather than rev-2's three: THREE declaration
+  edits, one runbook edit, two `r.fail` arms plus their selftest arms, and S6's comment — a list that
+  sums to the seven it claims, which the rev-7 wording did not.
   The verdict is
   unchanged and the premise is what moved — the arms READ declarations and write nothing, so there is
   still no write path, no new surface and no credential handling. The rev-3 F1 fold updated every
@@ -481,7 +512,7 @@ review consequence rather than only the edit count.
   ASSERTIONS (S4, S5 — new arms that can red gov's own bar) inside one atom. The cost lands at review
   time and it is specific: **a closing diff cannot tell which half a finding belongs to.** A reviewer
   who reds on the reachability arm's quantifier and a reviewer who reds on the default set growing are
-  reading the same commit, and there is no smaller thing to revert — §4's Rollout establishes the six
+  reading the same commit, and there is no smaller thing to revert — §4's Rollout establishes the seven
   files cannot be split, because S4's two halves red the tree between them. The concrete exposure is
   that a defect in either half forces a revert of both, which puts a proven adopter fix back in the
   drawer over a guard's wording. Accepted on the owner's ruling, recorded here so nobody re-derives it
@@ -501,8 +532,9 @@ review consequence rather than only the edit count.
   re-adding the conditional mark — is now CLOSED by S5 rather than filed, and S4 closes the wider one
   arm 7b could never see: a conditional mark whose stated reason nobody grades. Both are `r.fail`
   arms, so neither adds a `raise Refusal` branch — but both ARE counted by `refusal_join.py`, whose
-  second channel is the bare `.fail(...)` call, so the population grows 244 to 246 and only the
-  shrink-only pin keeps the leg green; §7 states the corrected mechanism and S6 records the growth. Both are
+  second channel is the bare `.fail(...)` call, so the population grows BY TWO and only the
+  shrink-only pin keeps the leg green; §7 states the corrected mechanism and S6 records the growth, and
+  S6 is also why this reads as a delta and not as an absolute. Both are
   Python, so `tools/memory-tree/check-arms.py` does not see them either — its `discover()` at line 127
   reads tracked `.sh` files only, verified rather than assumed.
 - migration / rollback — `git revert` of one commit restores all seven files, and reverts both halves
@@ -546,14 +578,20 @@ review consequence rather than only the edit count.
   overstated: the charter template IS on the manifest `watch:` list, so `manifest-check.sh` check 5
   would have caught a staged template edit with no re-stamp. `AGENTS.md` is only in `verify-paths`
   and nothing guarded it at all.
-- **AC9** — When `grep -c '^selectable' tools/govkit/entries/check-microformats.kit.toml` runs, it
-  returns 0, and `grep -c 'check-microformats' WIRE-INTO-PROJECT.md` returns at least **4** against
-  the 0 measured at base — the `--kits` id, the anchor, the body sentence and the WIRING instruction.
-  **The threshold is derived from S3's edit count and moved with it at rev-7**: rev-6 added S3's third
-  edit and left this criterion enumerating rev-5's two, so a build landing the anchor and its sentence
-  while omitting the wiring step — B1's entire remedy — returned 3 and passed. The enumeration is
-  written out rather than left as a bare integer so the next scope change to S3 is visibly a change to
-  this count. Measured at base — the `--kits` id, the anchor and the sentence.
+- **AC9** — Three observations over the two files S2 and S3 touch.
+  **(i)** `grep -c 'selectable = "conditional"' tools/govkit/entries/check-microformats.kit.toml`
+  returns 0 with comments included — a WHOLE-FILE grep at rev-8, where the rev-7 form was anchored
+  `^selectable` and a descriptor whose header still argued for the mark it no longer carries shipped
+  green. **(ii)** A POSITIVE grep asserts the rewritten header names the default selection, so S2's
+  second half is observed present and not only its first half observed absent — S2 was the last scope
+  item with an unobserved half. **(iii)** `grep -c 'check-microformats' WIRE-INTO-PROJECT.md` returns
+  at least **4** against the 0 measured at base — the `--kits` id, the anchor, the body sentence and
+  the WIRING instruction, which S3 now REQUIRES in its `{prefix}`-argv form and which therefore
+  carries the substring. **The threshold is derived from S3's edit count and moves with it**: rev-6
+  added S3's third edit and left this criterion enumerating rev-5's two, so omitting the wiring step —
+  B1's entire remedy — returned 3 and passed; and rev-7 raised the threshold while independently
+  making the wiring spelling optional, so the two folds graded each other into an unsatisfiable pair.
+  rev-8 closes it in S3 rather than here, and (iii) states which of S3's forms it is written against.
 - **AC11** — When `python tools/govkit/check_runbook_parity.py` runs, **NO `runbook-parity:` line
   names `check-microformats` at all** — not merely the `has no anchored runbook section` line — its
   problem count falls from 18 to 17, and its census line reports `8 anchored section(s)` against the
@@ -593,6 +631,20 @@ review consequence rather than only the edit count.
   criterion is what keeps the two in agreement. Admitting only the outcomes an `apply` run can produce
   made rev-6's criterion grade a command the builder had to invent, and asserting the outcome the unit
   hopes for would reproduce the defect it exists to remove.
+
+  **AND RUN (1) NEEDS `--answer`, which rev-7 omitted and the round-3 audit EXECUTED.** Spelled as
+  rev-7 wrote it, `intake` exits **2** with *the selected kits need answer(s) playbook_path and none
+  was supplied* and writes no `.governance/` at all — `needed_answers` returns `['playbook_path']` for
+  this selection and `cmd_intake` refuses at `govkit.py:8139-8145` before writing anything — so run (2)
+  then exits 2 with *no target descriptor* and NONE of the three outcomes was reachable. The criterion
+  added so the outcome would be observed named a command that refuses, which is the defect it was
+  folded in to remove, reproduced by the fold. **Run (1) is therefore whatever `needed_answers`
+  returns for the selection, supplied as `--answer key=value`** — today that is
+  `--answer playbook_path=<file>`, and the general form is written rather than the literal one because
+  a future kit's new token would silently re-break a literal. Verified working end to end by the
+  audit: with the answer supplied `intake` exits 0, `tools/check-microformats.sh` is ABSENT from the
+  target (outcome three, observable at last), and `apply` then exits 0 printing
+  `gate legs: ORDERED, not emitted` (outcome two).
 - **AC18 — S6 is observed, and rev-6 was the only scope item with no criterion at all.** After the
   commit, `python tools/govkit/refusal_join.py` exits 0 and reports a branch count **exactly two
   higher** than the count measured immediately BEFORE the commit — a delta, taken at landing, for the
@@ -654,8 +706,11 @@ Leg names as `tools/gate-legs.json` spells them:
   bare `<obj>.fail(...)` expression statement at `:135-138`. rev-5 cited `:133` — the raise half —
   and stopped four lines short of the half that counts its own arms. `r.fail` sites are the MAJORITY
   of the population, not outside it: measured live `refusal-join: 244 branch(es) across 4 module(s)`,
-  exit 0, against `BRANCH_PIN = 217` at `:41`. **S4 and S5 take it to 246, which is GROWTH.** Nothing
-  reds, but for a different reason than rev-5 recorded: the pin is shrink-only and already 27 behind,
+  exit 0, against `BRANCH_PIN = 217` at `:41`. **S4 and S5 add TWO branches, which is GROWTH; the
+  absolute is derived at landing, because `DEPL-aHoistedPass-1` adds two of its own to the same file
+  (S6).** rev-7 rewrote S6 to forbid the absolute and left `246` standing here and in §5 — the two
+  sections a builder reads immediately before writing the ledger comment S6 exists to keep true.
+  Nothing reds, but for a different reason than rev-5 recorded: the pin is shrink-only and already 27 behind,
   so it cannot detect growth at all. S6 is the written record that a shrink-only floor structurally
   cannot be. Two further consequences, budgeted here rather than discovered later: the join half at
   `:175-181` reports both new branches as reached by NO arm the moment a reached-set is passed, and
@@ -780,7 +835,7 @@ three are the owner's and one is delegated, and each mark says which.
     `check-microformats` — the latter being precisely the one whose justification just failed
     measurement. `registry.toml` already applies this exact discipline to the other escape hatch: arm
     8 reds an `[[exempt]]` row with an empty reason, "an omission wearing a label"
-    (`govkit.py:1913-1915`). A one-arm selfcheck addition requiring a non-empty `why_conditional` on
+    (`govkit.py:1916-1917`; the loop is `:1910-1917`). A one-arm selfcheck addition requiring a non-empty `why_conditional` on
     every `selectable = "conditional"` entry is cheaper than the `requires`-edge arm, has an
     immediately observable failing case (two violators today, so the charter §7 stage-the-break rule
     is satisfiable on the spot), and never touches the `requires` edge — so it cannot collide with F2
@@ -1015,9 +1070,11 @@ three are the owner's and one is delegated, and each mark says which.
     unanchored, and the wiring step sits on BOTH sides of it, so it cancels. What is understated is
     `TOOL-aScouredKit-23`'s uncapped-growth concern, by about the same factor — which F4 declines to
     answer while citing its figure, and which is now cited at the right magnitude. That is the whole price of closing a machine gap this repo's own convention already
-    declares, and it is the cheapest of the three options F4 considered: the `[[runbook_exempt]]`
-    alternative costs zero runbook bytes but answers the question NO, and the unanchored form costs
-    212 and leaves the checker still naming this entry.
+    declares. **rev-8 strikes "the cheapest of the three options F4 considered", which its own next
+    clause refutes**: of the three it is the only one that
+    CLOSES the machine gap, and it is the more expensive of the two that put bytes in the runbook. The
+    `[[runbook_exempt]]` alternative costs zero runbook bytes precisely BECAUSE it answers the question
+    NO, and the unanchored form costs 212 and leaves the checker still naming this entry.
   - **The consistency argument the sentence now also rests on**, stated so the ruling is not read as
     resting on it alone: an unglossed id in a copy-paste list is the first thing an operator trims,
     and every other selectable kit in §2 gets a sentence. Under the anchored form this stops being
@@ -1240,6 +1297,44 @@ three are the owner's and one is delegated, and each mark says which.
   `matrix.py:66` is a blank line and the pin was wrong when written; re-pinned to `:63`. Nothing was
   re-opened, no ruling reversed, and no scope item removed.
 
+- rev-8 · 2026-09-06 · **round-3 spec audit folded — 1 blocker, 3 HIGH, 4 MEDIUM, 4 LOW — and this
+  is the LOOP'S EXIT.** Report:
+  `memory/builds/aHonedRuleset/reviews/2026-09-06-review-TOOL-aHonedRuleset-8-spec-audit-round3.md`.
+  Blockers went 2 → 1 → 1: not strictly smaller, so under BUILD-METHOD M4 the loop is NON-CONVERGENT
+  and STOPS. B1 is DISPOSED by **FOLD** — a defect in this document, needing no mechanism this build
+  lacks — and the disposition is recorded on the run's `--review` row. Nothing is promoted, parked or
+  waived, and there is no round 4.
+  **B1 — the criterion added so the outcome would be OBSERVED named a command that REFUSES.** The
+  auditors executed it: AC17's run (1) as rev-7 spelled it exits 2 with *the selected kits need
+  answer(s) playbook_path and none was supplied* and writes nothing, so run (2) exits 2 with *no target
+  descriptor* and none of the three outcomes was reachable. `grep -c -- '--answer'
+  WIRE-INTO-PROJECT.md` is 0, so the runbook's own §2 line refuses identically — which makes §4's and
+  §3(a)'s "a `deploy.toml` naming the entry with no engine" false in the OTHER direction: there is no
+  descriptor either. AC17 now takes whatever `needed_answers` returns, written as the general form
+  because a future kit's token would silently re-break a literal; §4 and §3 carry the measured
+  outcome; and the `--answer` gap becomes defect (c) of `TOOL-aHonedRuleset-15`. This is round 2's B1
+  surviving its own fold a second time, which is what a non-convergent loop looks like from inside.
+  **H1 — two rev-7 folds graded each other into an unsatisfiable pair.** The H3 fold made S3's wiring
+  spelling `and/or`, and only the `{prefix}` argv carries the `check-microformats` substring; the H4
+  fold independently raised AC9 to 4 counting that line. A builder taking the first option returns 3
+  and reds AC9 by following the scope item exactly. S3 now REQUIRES the argv form and permits the leg
+  name only as an addition. **H2 — §3(a)'s universal was false for `update`**: `:602` runs it inside
+  `## 5b`, whose path is intake → adopt → adopt --write → update and whose `cmd_update` emits no
+  `gate legs:` line at all, so §5b produces neither outcome §4 routed the reader to. Narrowed to what
+  reproduces. **H3 — rev-7 rewrote S6 to forbid the absolute and left `246` in §5 and §7**, the two
+  sections read immediately before writing the ledger comment S6 exists to keep true. Both are deltas
+  now. **M1** — `grep -n apply` returns TEN hits, not eight, in four carriers. **M2** — the last two
+  of the seven-file counts, one of which said SEVEN and then listed six. **M3** — S2's header rewrite
+  had no criterion and AC9's `^selectable` grep was anchored, so a self-contradicting descriptor could
+  ship green; AC9 gains a whole-file zero AND a positive assertion. **M4** — S6's "routed through a
+  helper contributes ZERO" is false: `enumerate_branches` walks every `FunctionDef`, so a module-level
+  helper counts once and the subtree walk causes DOUBLE-counting for a nested def, not zero. AC18's
+  exact-+2 rests on the `ast.Expr` shape, which is now the constraint stated. **L1** — AC9's orphaned
+  pre-fold enumeration deleted. **L2** — §10 misquoted and misattributed §4. **L3** — F4's "cheapest of
+  the three" is refuted by its own next clause. **L4** — the `[[exempt]]` sentence is at `:1916-1917`,
+  not `:1913-1915`. Three defects reached outside this spec into
+  `memory/backlog/TOOL.md` and are corrected in the same commit.
+
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "ship the charter micro-format gate to an adopter through
@@ -1251,7 +1346,8 @@ with it and both were read rather than assumed — `check-template-size.sh [play
 `tools/govkit/registry.toml` plus a key in `tools/govkit/entries/check-microformats.kit.toml`.
 **And since the rev-3 F1 ruling this unit also writes CODE, which this section asserted it did not
 until rev-6** — S4 and S5 are two arms in `tools/govkit/govkit.py` plus their exercising arms in
-`tools/govkit/selftest.py`, which is why §4's Rollout reads *three files at rev-2, six at rev-3*.
+`tools/govkit/selftest.py`, which is why §4's *Files touched (estimate)* reads *three files at rev-2,
+six at rev-3, seven at rev-7*.
 The function seams they extend, found by hand in §4 and carried here because finding a seam is this
 section's job: the `[[exempt]]` empty-reason loop at `govkit.py:1910-1917`, whose "an omission wearing
 a label" sentence is spelled again at `:1575` and `:2508`, is the seam S4 copies; and arm 7b at
