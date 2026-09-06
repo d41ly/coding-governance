@@ -1,12 +1,19 @@
 # TOOL-aHoistedPass-5 — the child that builds one unit and holds nothing else
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-build-TOOL-aHoistedPass-5-1-acceptance-ledger.md](../build/2026-09-05-build-TOOL-aHoistedPass-5-1-acceptance-ledger.md) | journal | — |
+| [2026-09-05-prompt-TOOL-aHoistedPass-5-brief.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-brief.md) | journal | — |
+| [2026-09-05-prompt-TOOL-aHoistedPass-5-fold-round1.md](../prompts/2026-09-05-prompt-TOOL-aHoistedPass-5-fold-round1.md) | journal | — |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round1.md) | diff-review | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
+| [2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round2.md](../reviews/2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round2.md) | diff-review | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 DEPL-aHoistedPass-1 |
 
 <!-- /gen:spec-records -->
 
@@ -51,8 +58,15 @@ dispatch and the hoist has no callee.
 - Any Skill, protocol or BUILD-METHOD edit. The dispatch loop, the `scriptPath` pin, the per-dispatch
   re-read step and the four `next:` branches are `TOOL-aHoistedPass-2`'s; this file is named by them,
   never the other way round.
-- Widening the fan-out predicate. The two loop spellings that walk past it are
-  `TOOL-aHoistedPass-4`; this unit takes `agent-cap.js` exactly as it stands at `c4fcf5ad`.
+- Widening the fan-out predicate. This unit takes `tools/hooks/agent-cap.js` exactly as it stands at
+  the run's BASE `e828f778`, AFTER `TOOL-aWeldedTribunal-1`'s widening — not as it stood at this
+  spec's own base. The move is PROVED rather than asserted:
+  `git log --oneline c4fcf5ad..e828f778 -- tools/hooks/agent-cap.js` returns eight commits
+  (`TOOL-aWeldedTribunal-1`, `-2`, `-3` and five follow-ups) and the file goes 1610 to 1814 lines
+  across them. Re-measured at BASE, `for await (…) { await agent(…) }` and
+  `do { await agent(…) } while (…)` BOTH exit 2, so the two loop spellings this unit was told to leave
+  alone have already landed; whatever remains for `TOOL-aHoistedPass-4` is that unit's to state. This
+  unit still widens nothing.
 - Teaching the codebase-map JS liveness floor about the export scan. That is F1 option (b) and it is
   not taken here; it is a backlog row if the fork is ever reopened.
 - Concurrent dispatch of an `order` group. M6 will name the permission; nothing in this file or in
@@ -87,17 +101,40 @@ Nothing hashes a prompt string.
 
 ### Inventory — every declared property, and what actually holds it
 
-Measured at `c4fcf5ad` in this worktree. Every fixture is the candidate plus one appended construct,
-dispatched by `scriptPath` in Windows form to `node tools/hooks/agent-cap.js`, exit codes captured by
-redirecting to a file rather than through a pipe.
+RE-MEASURED at BASE `e828f778` in this worktree, against the WIDENED `agent-cap.js` — the rev-1
+figures were taken at `c4fcf5ad` against the narrower predicate. The subject is the candidate
+verbatim, re-extracted from Appendix A of the design pass and checked at 110 lines and 6933 bytes,
+plus one appended construct per fixture. Each is handed to `node tools/hooks/agent-cap.js` on stdin
+as `{"tool_name":"Workflow","tool_input":{"script":…}}` and the exit code is read from the process's
+own status, never through a pipe. The pristine candidate exits 0 in `script` mode and in Windows-form
+`scriptPath` mode alike, so the two input modes still agree and the mode is not doing the work.
+
+Every agent-cap exit code below was re-observed at BASE, and every one reproduced its rev-1 value:
+the widening added loop SPELLINGS without moving a single figure this table already carried. Row 1's
+two arms were re-run too, on the extracted candidate — exit 0 with `1 workflow script(s) parsed
+clean`, and exit 1 with `SyntaxError: Unexpected token 'export'`. So were the three population
+counts, likewise unchanged: `check-workflow-syntax.js` and `check-verifier-fanout.sh` each still
+discover **4** scripts, `check-install-prefix.sh` still reports **180** shipped files, which is what
+AC1, AC3 and AC7 hang their deltas on.
+
+**Two things below were NOT re-run at BASE**, because observing either means STAGING the candidate at
+its real path and this revision may write only this spec: row 4's `181` and `UNRECORDED` arms, and the
+whole `codebase-map coverage + freshness` row. Both carry rev-1's readings, both are flagged where
+they sit, and `check-install-prefix.sh`, `map_lib.py` and `map_extractors.py` are byte-identical
+between `c4fcf5ad` and BASE — which is a reason to EXPECT those readings hold and is not an
+observation that they do.
+
+**The holders below are cited by NAME.** rev-1 cited them by line address, and 66 commits later every
+one of those addresses pointed at unrelated code; a named target survives the next shift. The BASE
+line is given once, as a convenience, and it is the part that will rot.
 
 | declared property | what holds it | measured |
 |---|---|---|
 | a BARE top-level script, never `export default` | **`workflow script syntax`**, on every bar | the candidate → exit 0, `1 workflow script(s) parsed clean`; the same file rewritten as `export default async function run()` → **exit 1**, `SyntaxError: Unexpected token 'export'` |
-| no spawn once per item — as a loop, or as an array-method receiver | **`agent-cap.js:1521`, per dispatch** | `for (const u of cfg.units) { await agent(…) }` → **exit 2**; `await Promise.all(cfg.units.map((u) => agent(…)))` → **exit 2**; `cfg.units.map((u) => agent(…))` alone → **exit 2** |
-| no raw `parallel(` / `pipeline(` | **`agent-cap.js:1562`, per dispatch** | `await parallel([agent(…), agent(…)])` → **exit 2** |
-| it spells no `tools/` literal | **`install-prefix (shipped surface)`**, on every bar, once the file is TRACKED | clean child staged → exit 0, `181 shipped files` (180 without it); the same file plus one `bash tools/unattended/unattended.sh` literal → **exit 1**, `UNRECORDED  tools/workflows/unattended-unit.js	1` |
-| at least one top-level definition | **`codebase-map coverage + freshness`**, on every bar | see the next sub-head — the candidate as written REDS this leg |
+| no spawn once per item — as a loop, or as an array-method receiver | **`fanoutFindings`, through `runBothViews`, per dispatch** (`agent-cap.js:1725` at BASE) | `for (const u of cfg.units) { await agent(…) }` → **exit 2**; `await Promise.all(cfg.units.map((u) => agent(…)))` → **exit 2**; `cfg.units.map((u) => agent(…))` alone → **exit 2**; and, new since `TOOL-aWeldedTribunal-1`, `for await (const u of cfg.units) { await agent(…) }` → **exit 2** and `do { await agent(…) } while (…)` → **exit 2** |
+| no raw `parallel(` / `pipeline(` | **`offendingLines`, through `runBothViews`, per dispatch** (`agent-cap.js:1766` at BASE) | `await parallel([agent(…), agent(…)])` → **exit 2** |
+| it spells no `tools/` literal | **`install-prefix (shipped surface)`**, on every bar, once the file is TRACKED | clean child staged → exit 0, `181 shipped files`; the same file plus one `bash tools/unattended/unattended.sh` literal → **exit 1**, `UNRECORDED  tools/workflows/unattended-unit.js	1`. Both arms are **rev-1's readings, NOT re-run at BASE** — they need the candidate staged. The `180 without it` half WAS re-derived at BASE and holds |
+| at least one top-level definition | **`codebase-map coverage + freshness`**, on every bar | see the next sub-head — the candidate as written REDS this leg. **rev-1's reading, NOT re-run at BASE**: observing it means staging the candidate to its real path. `map_lib.py` and `map_extractors.py` are byte-identical between `c4fcf5ad` and BASE, which is a reason to expect it holds and is not an observation that it does |
 | a plain loop, a `function`, a `=>`, a non-receiver `.map()`, a bare `Promise.all` | **NOTHING. A file-style rule with no gate.** | all five fixtures → **exit 0** |
 | exactly ONE `agent()` | **NOTHING.** The run holds it. | a second `agent()` with an unrelated prompt → **exit 0** |
 | it never NESTS | **NOTHING.** The run holds it. | `await workflow({scriptPath: …}, {})` appended → **exit 0**; and `grep -c "workflow(" tools/hooks/agent-cap.js` = **0**, so the hook contains no occurrence of the nesting call form at all. A nested call fired from inside this sidechain reaches no hook either (`agent-cap.js:9`) |
@@ -105,11 +142,14 @@ redirecting to a file rather than through a pipe.
 | the prompt's content, between dispatches | **NOTHING.** The run holds it. | the second-`agent()` and rewritten-prompt fixtures both admit |
 
 Two of the nine rows are the whole of what the per-dispatch re-read buys, and they are ONE rule plus
-one: `fanoutFindings` at `:1521` catches a spawn once per item however it is spelled — a loop or an
-array-method receiver — and `offendingLines` at `:1562` catches the raw primitive. A loop with no
-spawn inside admits (**exit 0**, measured), so "no loop" is not the rule; "no spawn per item" is.
-Rules 2 and 5 (`:1541` an unresolvable bound, `:1593` the ref-keyed verdict join) are in the same
-scan and this file trips neither.
+one: `fanoutFindings` catches a spawn once per item however it is spelled — a loop or an
+array-method receiver — and `offendingLines` catches the raw primitive. A loop with no spawn inside
+admits (**exit 0**, re-measured at BASE, and so do a bare `for await` and a bare `do`-block), so "no
+loop" is not the rule; "no spawn per item" is. `TOOL-aWeldedTribunal-1` widened WHICH spellings count
+as a loop and left that distinction intact. Rules 2 and 5 — `capFindings`, the unresolvable bound,
+and `scanJoinFindings`, the ref-keyed verdict join — are in the same scan and this file trips
+neither. All four holders are dispatched from adjacent `runBothViews(…)` calls, at
+`agent-cap.js:1725`, `:1745`, `:1766` and `:1797` at BASE.
 
 ### The correction the design of record missed: the `kit-js` liveness floor
 
@@ -131,7 +171,7 @@ exits 1 on that `MapError` traceback. The floor is deliberate and fail-closed, a
 assertion of exactly the kind §7 of the charter demands, so it is not a bug to route around.
 
 **S6 is the resolution: one top-level definition.** The candidate spends eight near-identical lines on
-`if (!cfg.<key>) throw new Error(…)`; one `function need(key, why)` replaces the seven that share a
+`if (!cfg.<key>) throw new Error(…)`; one `function check(key, why)` replaces the seven that share a
 shape, satisfies rule 1 of `JS_DEFINITION_RULES`, and makes the file shorter. Observed with that one
 function added: the `MapError` is gone and the leg reports only its two ordinary obligations — the
 unclaimed key and the stale generated artifacts. With `"unattended-unit.js"` added to
@@ -207,9 +247,10 @@ versioning contract the file does not have.
   (`agent-cap.js:9`). The loop belongs to the run.
 - **Hand the child the roster so it can check its own order.** The order it would check is the order it
   was handed; the parent holds both.
-- **Dispatch by `name:` instead of `scriptPath`.** Measured: `{tool_name:'Workflow',
-  tool_input:{name:'somewf'}}` → exit 0 with nothing read (`agent-cap.js:1519`). Every rule in the
-  inventory above evaporates. The pin is `TOOL-aHoistedPass-2`'s to write.
+- **Dispatch by `name:` instead of `scriptPath`.** Re-measured at BASE: `{tool_name:'Workflow',
+  tool_input:{name:'somewf'}}` → exit 0 with nothing read, at the `if (!script) process.exit(0)`
+  guard (`agent-cap.js:1723` at BASE). Every rule in the inventory above evaporates. The pin is
+  `TOOL-aHoistedPass-2`'s to write.
 - **Teach the codebase-map floor about the export scan.** F1 option (b); see §8.
 
 ## 5. Production-readiness checklist
@@ -232,7 +273,10 @@ versioning contract the file does not have.
 - **testing + left-shift gates** — three standing legs already cover the file the day it lands
   (`workflow script syntax`, `verifier fan-out`, `review-join ban`), plus
   `codebase-map coverage + freshness` and `install-prefix (shipped surface)`. This unit adds NO new
-  gate; §6 names the breaks to stage against the ones it joins.
+  gate; §6 names the breaks to stage against the ones it joins. The S2 args contract is covered by
+  NONE of them — `workflow script syntax` PARSES the file and never calls it — so AC14 and AC15 are
+  landing-time observations, held after that by review alone, the same standing as the three §4 rows
+  with no enforcer.
 - **migration / rollback** — additive. Deleting the file restores the tree, minus the map claim and the
   regenerated artifacts, which come out in the same commit.
 - **user docs** — none. The file is agent-facing and reached only by a `Workflow` dispatch; the route
@@ -287,8 +331,37 @@ versioning contract the file does not have.
 - **AC13** — When the file's own header is read after S8, no sentence claims an enforcer the inventory
   in §4 does not name, and the `function` clause is gone. The header's `export const meta` paragraph
   states that the marker SELECTS and does not require.
+- **AC14** — When the landed script is EVALUATED the way the runtime evaluates it — the export strip
+  `check-workflow-syntax.js:74` applies, then `new AsyncFunction(...HOOKS, body)` over the same
+  `HOOKS` list that file declares at `:26` — and called once per key with that key deleted from an
+  otherwise complete `args` and the rest present, each of the EIGHT runs throws, each message names
+  the omitted key, and the stub `agent` records that it was NEVER called. Eight runs, eight distinct
+  refusals, zero spawns. A run that proceeds on a defaulted value is a RED however green the schema
+  looks, and `repo` is the one that costs most: defaulting it to the process cwd is how a sibling
+  harness reviewed the wrong repository (§4). S2 is half of what this file IS, and AC11 asserts only
+  the ABSENCE of `roster` and `reportPath` — an absence cannot witness a refusal.
+- **AC15** — When `args` is handed to that same evaluation as a JSON STRING carrying all eight keys,
+  the script takes the `JSON.parse` path and reaches the `agent()` call; when it is handed a string
+  that is not JSON, it throws an error naming the parse failure and refusing to default, and reaches
+  no spawn. Both arms observed. Without the guard a string payload leaves every key reading
+  `undefined`, so AC14's eight refusals would fire on a request that was in fact complete — the
+  failure mode this criterion exists to distinguish from a genuinely missing key.
+
+- **AC16** — When the landed `tools/workflows/unattended-unit.js` is grepped, its PROMPT names each of
+  S4's five acts by name: the read-both-documents-whole step, the change-the-spec-first divergence
+  rule, `--dispatch` with `--writes`, `--brief`, and the checklist command token. **S4 had five acts
+  and no criterion until rev-5.** AC10 is the only other criterion that reads the prompt string and it
+  reads S5's status flip and `--plan`; section 7 states that no standing leg calls this file at all,
+  so a prompt shipped without the `--brief` instruction would have been observable nowhere — while
+  `TOOL-aHoistedPass-7`'s whole leg grades that a brief row exists at the build commit, and the only
+  thing that writes one is this prompt.
 
 ## 7. Gates
+
+**`lexicon naming predicates`** — `python tools/lexicon/lexicon.py --check`, guard `tools/`, so the
+commit landing this file RUNS it. It is listed here because rev-4 omitted it while fold-confirming a
+`function` definition by name, and the verb pin has zero headroom: one definition outside the table
+reds the bar. Section 8 carries the measurement and the naming decision.
 
 Legs this unit must keep green, all read from `tools/gate-legs.json` at this base:
 
@@ -312,7 +385,7 @@ top-level `function` and no `=>`; `map_lib.py:474` raises on any `.js` under `to
 definition, and `codebase-map coverage + freshness` runs unguarded on every bar. Both constraints are
 real and they are incompatible as written.
 
-- **(a) The child yields.** One top-level `function need(key, why)` replaces seven near-identical
+- **(a) The child yields.** One top-level `function check(key, why)` replaces seven near-identical
   argument refusals. Cost: one clause of a five-clause style rule that nothing enforces, and the file
   header stops claiming it. Benefit: no edit to another kit, no widening of a fail-closed floor, and
   the file gets shorter. Measured green end to end at this base.
@@ -328,6 +401,28 @@ collides with is the one clause of the child's style rule with neither an enforc
 Widening a fail-closed check so a style preference can survive is the trade this build exists to stop
 making. If the owner prefers (b), it is a separate unit against the codebase-map kit and this unit
 lands unchanged behind it.
+
+**THE DEFINITION IS NAMED `check` AND NOT `need`, and that is not style — it is the merge bar.**
+Measured in this worktree: `python tools/lexicon/lexicon.py --check` reports
+`P1 verb graded=1060 offenders=467` against `VERB_OFFENDER_PIN="467"`, which is EXACTLY AT ITS
+CEILING with zero headroom, and the checker reds when the count exceeds the pin. `.lexicon.conf`
+declares `js:js-regex:probe`, so the probe's functions pattern grades a `function <name>(` in this
+very file, and the leg `lexicon naming predicates` is guarded on `tools/`, which means the commit
+landing this file runs it and reaches 468. `--suggest need` answers that `need` is not in the
+declared table; `--suggest check` answers `OK — check leads with 'check', which the declaration
+carries`, and "assert a predicate and return a verdict" is exactly what the eight argument refusals
+do. So the name is the fix and no pin is raised. The alternative — raising
+`VERB_OFFENDER_PIN` 467 to 468 with the offender named and attributed — is REFUSED here: a pin
+raised so one function may keep a name outside the table is the table becoming a synonym list, which
+is the failure mode the lexicon's own rules name.
+
+RESOLVED (agent, 2026-09-05, delegated): **F1 — (a), the child yields.** One top-level `function check(key, why)` replaces the
+seven near-identical argument refusals, and the file header stops claiming a style rule it no longer
+keeps. Option (b) is discarded under M3 veto 2: it edits a fail-closed liveness floor in ANOTHER
+kit's public surface (`map_extractors.py`, `map_lib.py`), which is not this unit's ratified scope and
+is not a change the mandate delegates. The recommendation's own argument is the deciding one -
+widening a fail-closed check so a style preference can survive is the trade this build exists to stop
+making. If the owner prefers (b) it is a separate unit and this one lands unchanged behind it.
 
 ## 9. Revision log
 
@@ -368,6 +463,80 @@ lands unchanged behind it.
   and AC10 keep their grep patterns verbatim, which is the load-bearing half, and run them over the
   landed script instead of naming it as an operand. The §2 and §4 literals are untouched: the path is
   still spelled once, where the unit declares what it builds. No criterion was weakened or dropped.
+- rev-3 - 2026-09-05 - M3 fork sweep under the standing mandate: F1 marked RESOLVED at (a),
+  with veto 2 recorded as what discards (b) rather than leaving it a preference. Premise re-derived
+  at the run's BASE `e828f778`: `tools/workflows/unattended-unit.js` still does not exist, so this
+  unit still has a file to land and the hoist still has no callee without it.
+- rev-4 - 2026-09-05 - spec-audit findings 33 (high, §3 and §4) and 7 (medium, §2 against §6) folded.
+  Finding 33: §3 claimed this unit takes `agent-cap.js` "exactly as it stands at `c4fcf5ad`", an
+  unverified negative. `git log --oneline c4fcf5ad..e828f778 -- tools/hooks/agent-cap.js` returns
+  EIGHT commits - `TOOL-aWeldedTribunal-1`, `-2`, `-3` and five follow-ups - moving the file 1610 to
+  1814 lines, so every `agent-cap.js:<line>` in §4 had drifted onto unrelated code. §3 now names that
+  command as its evidence rather than asserting the negative. Eight anchors re-derived by opening the
+  file at BASE and re-cited by NAME, with the BASE line kept only as a convenience: `:1521` ->
+  `fanoutFindings` (`:1725`), `:1562` -> `offendingLines` (`:1766`), `:1541` -> `capFindings`
+  (`:1745`), `:1593` -> `scanJoinFindings` (`:1797`), `:1519` -> the `if (!script) process.exit(0)`
+  guard (`:1723`), `:1509` -> the `readFileSync(spath, 'utf8')` re-read (`:1713`), `:1494` -> the
+  `data.tool_name === 'Agent'` branch (`:1698`), `:403` -> `const MAX_VERIFIERS = 5` (`:435`). Only
+  `:9` survived unmoved. The last three appear at BASE solely in rev-1's citation list, which is
+  history and is left verbatim. Every fixture was RE-RUN at BASE against the widened hook, fed on
+  stdin as `{"tool_name":"Workflow","tool_input":{"script":…}}` with the exit code read from the
+  process status and not through a pipe, over the candidate re-extracted from Appendix A of the
+  design pass and checked at 110 lines / 6933 bytes. Observed: pristine 0; for-of around a spawn 2;
+  `Promise.all(map(spawn))` 2; bare `map(spawn)` 2; raw `parallel(` 2; plain loop with no spawn 0;
+  `function` 0; `=>` 0; non-receiver `.map()` 0; bare `Promise.all` 0; a second `agent()` 0; a nested
+  `workflow()` 0; a `name:`-only dispatch 0. NOT ONE EXIT CODE CHANGED from the value §4 already
+  claimed - the widening added spellings without moving a figure - and the two new spellings were
+  measured for the first time here: `for await` around a spawn 2, a `do`-block around a spawn 2, and
+  both of them with no spawn inside 0, which confirms the rule is still "no spawn per item" rather
+  than "no loop". The `scriptPath` mode rev-1 used and the `script` mode used here agree on the
+  pristine file, so the mode is not carrying the result. Row 1's two arms also re-run and also
+  unchanged: exit 0 with `1 workflow script(s) parsed clean`, exit 1 with
+  `SyntaxError: Unexpected token 'export'`. Three population counts re-derived at BASE and likewise
+  unchanged: 4 workflow scripts from `check-workflow-syntax.js`, 4 from `check-verifier-fanout.sh`,
+  180 shipped files from `check-install-prefix.sh`, so AC1, AC3 and AC7 keep their baselines.
+  COULD NOT VERIFY, and now flagged in place rather than read as measured: row 4's `181` and
+  `UNRECORDED` arms, and the whole `codebase-map coverage + freshness` row. Both need the candidate
+  STAGED at its real path and this revision may write only this file, so both keep rev-1's readings.
+  `check-install-prefix.sh`, `map_lib.py` and `map_extractors.py` are byte-identical between
+  `c4fcf5ad` and BASE, which is a reason to expect those readings hold and is not an observation that
+  they do. Also re-checked and unchanged between the two bases:
+  `check-review-join.sh`, `unattended.sh`, `check-workflow-syntax.js`, `check-verifier-fanout.sh`,
+  `check-install-prefix.sh`, so every non-`agent-cap` anchor in this file still resolves;
+  `unattended-build.js` moved by 368 lines but still carries its `gov:kit` marker at `:3`;
+  `gate-legs.json` moved by one `ceiling` value, touching no leg §7 names. Premise that MOVED and is
+  recorded rather than acted on: the two loop spellings §3 assigned to `TOOL-aHoistedPass-4` have
+  ALREADY landed under `TOOL-aWeldedTribunal-1`; §3 now says so and leaves what remains of that unit
+  for that unit to state. Finding 7: the S2 args contract - eight keys refused by name behind a
+  `JSON.parse` guard - had no acceptance criterion, AC11 observing only the absence of `roster` and
+  `reportPath` and the schema's required keys, so a child shipped with `repo` defaulted or the parse
+  guard missing passed all of §6. AC14 (eight omit-one runs, each refusing by name with the spawn
+  never reached) and AC15 (a JSON string parses and reaches the spawn; a non-JSON string refuses
+  naming the parse failure) are added, both spelled against the evaluation the runtime actually
+  performs - the export strip at `check-workflow-syntax.js:74` and `new AsyncFunction(...HOOKS, body)`
+  over the `HOOKS` list at `:26` - so they are runnable rather than aspirational; that harness shape
+  was exercised against the extracted candidate, which satisfies both today. §5's testing bullet now
+  states that no standing leg covers the args contract. NO kit-version bump is taken here and none is
+  proposed: the `review-harness` 1.6-to-1.7 move belongs to `TOOL-aHoistedPass-6` by fork resolution,
+  on the ground that this spec names no bump, and that stays true.
+
+- rev-5 - 2026-09-05 - folded round-2 spec-audit findings H11 and M1, both before the code pass.
+  **H11 is a guaranteed merge-bar RED that rev-4 created while resolving F1.** Its resolution
+  fold-confirmed `function need(key, why)` by name in three places, and `need` is not one of the
+  twenty-three verbs `.lexicon.conf` declares. Measured live: `lexicon.py --check` reports
+  `P1 verb graded=1060 offenders=467` against `VERB_OFFENDER_PIN="467"` - AT the ceiling, zero
+  headroom - and the leg is guarded on `tools/`, so the commit landing this file would have reached
+  468 and redded. Section 7 named the leg nowhere and the words "lexicon", "verb table" and "naming
+  predicates" appeared nowhere in the file. The definition is renamed `check`, which the table
+  carries and whose gloss is exactly what the eight refusals do; the leg is now listed with its
+  guard; and raising the pin is refused in writing, because a pin raised so one name may sit outside
+  the table turns the table into a synonym list. **M1** - S4 specifies five acts the prompt must
+  perform and no criterion read any of them; AC10 was the only criterion touching the prompt string
+  and it read S5's status flip plus `--plan`. Section 7 states that no standing leg calls this file
+  at all, so a prompt shipped without the `--brief` instruction was observable NOWHERE - while
+  `TOOL-aHoistedPass-7`'s entire leg grades that a brief row exists at the build commit, and the only
+  thing that writes one is this prompt. AC16 greps the landed prompt for each of the five acts by
+  name.
 
 ## 10. Reuse audit
 

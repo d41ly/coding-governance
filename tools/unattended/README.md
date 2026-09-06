@@ -62,6 +62,7 @@ adopt-unattended.sh --check      # the five artifacts are installed and in sync
 check-unattended.sh              # the kit gate
 check-playbook.sh                # playbook validity, including the fixture
 check-pass-order.sh              # refuses a unit built before it was specced
+check-brief-recorded.sh          # refuses a closed unit whose build commit records no brief
 run-unattended-gates.sh          # the kit's self-tests, ON DEMAND ONLY
 ```
 

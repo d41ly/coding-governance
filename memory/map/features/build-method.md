@@ -8,7 +8,7 @@ streams = ["tooling"]
 decisions = ["TOOL-aWrittenMethod-1"]
 
 [claims]
-gate-legs = ["method carriers (every pointer declared)", "method-carriers self-test"]
+gate-legs = ["method carriers (every pointer declared)", "method-carriers self-test", "build-method size"]
 kits = []
 git-hooks = []
 workflow-scripts = []

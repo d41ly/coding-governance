@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 94 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 43 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 96 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 43 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -16,8 +16,10 @@ Inventories: gate-legs: 94 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 ·
 | `agent-instructions self-test` | baseline |
 | `agent-instructions wiring` | baseline |
 | `branch-guard self-test` | baseline |
+| `brief-recorded` | unattended |
 | `build README slot contract` | build-readme-surface |
 | `build-index selftest` | baseline |
+| `build-method size` | build-method |
 | `charter size` | playbook |
 | `check-arms selftest` | baseline |
 | `check-wiring self-test` | baseline |
@@ -142,6 +144,7 @@ Inventories: gate-legs: 94 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 ·
 | `drift-audit-state.js` | review-harnesses |
 | `tier2-review.js` | review-harnesses |
 | `unattended-build.js` | unattended |
+| `unattended-unit.js` | unattended |
 
 ## skill-engines
 

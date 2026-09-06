@@ -41,7 +41,7 @@ import subprocess
 import sys
 import time
 
-KIT_GOVKIT_VERSION = "1.9"  # gov:kit govkit@1.9 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.10"  # gov:kit govkit@1.10 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
 
@@ -492,8 +492,12 @@ def derive_install_order(ids: list[str], descs: dict[str, tuple[dict, str]]) -> 
     govkit could not classify that code, and the default-selection apply arm failed on every node.
     Running the same adopter by hand a moment later exited 0 — the ordering was the whole defect.
 
-    A dependency OUTSIDE the selection is not an error: `--kits drift-audit` is a legal install and
-    orders one entry. Only the edges among the selected ids constrain the order.
+    A dependency OUTSIDE the selection is not an error HERE: `--kits drift-audit` orders one entry
+    and this function raises nothing. It is an error one layer up — `apply` refuses a selection whose
+    `requires` target is neither selected nor already claimed by the target's receipt, via
+    `derive_unsatisfied_requires` below, and `plan` prints the same finding without moving its exit
+    code. So `--kits drift-audit` is no longer a legal APPLY, while this sentence stays literally
+    true about this function: only the edges among the selected ids constrain the order.
 
     Kahn with an alphabetical ready-queue, so the result is deterministic and reduces to today's
     alphabetical order whenever no edge applies. A cycle REFUSES rather than falling back to
@@ -516,6 +520,32 @@ def derive_install_order(ids: list[str], descs: dict[str, tuple[dict, str]]) -> 
         out.extend(ready)
         placed.update(ready)
     return out
+
+
+def derive_unsatisfied_requires(selection: list[str], descs: dict[str, tuple[dict, str]],
+                                receipt: dict | None) -> list[tuple[str, str]]:
+    """Every (kit, dependency) edge in this selection whose target is neither selected nor installed.
+
+    ONE PREDICATE, TWO CALLERS, and that is the whole reason this is a function. `apply` REFUSES on a
+    non-empty result and `plan` PRINTS it; a second copy would be two answers to one question, and the
+    copy that drifted would be the preview — which is the half nobody re-runs to check.
+
+    The satisfied set is `selection | receipt.kits` and needs no probe of its own, because `apply`'s
+    AC8 block has already killed the run for any registry kit PRESENT in the target that the receipt
+    does not claim. So by the time this is consulted, "resolvable in the target" and "claimed by the
+    receipt" name the same set. `plan` reads the receipt only to compute this, and passes None where
+    there is none, which yields the empty set through the same `or` guard `derive_install_order` uses.
+
+    It RETURNS rather than raising: a predicate that refuses cannot be reused by the verb whose whole
+    contract is not to.
+    """
+    installed = set(selection) | set((receipt or {}).get("kits") or [])
+    return sorted(
+        (eid, dep)
+        for eid in selection
+        for dep in (descs[eid][0].get("requires") or [])
+        if dep != eid and dep not in installed
+    )
 
 
 def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
@@ -1324,9 +1354,18 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 r.fail(f"entry '{eid}' hole '{hid}' carries no reason")
 
     # ---- 7: a requires_if condition names keys that resolve in the named kit's config lists, and
-    #         names a kit that is a registry entry.
+    #         names a kit that is a registry entry. PLAIN `requires` gets the same name arm, because
+    #         check 7 is already the single place a dependency edge's kit NAME is graded and splitting
+    #         `requires` into its own number would put one class in two places. A typo in a plain
+    #         `requires` named nothing and redded nothing until this arm existed: the edge is dropped
+    #         by `derive_install_order`'s `if d in want` before it can constrain anything, which is
+    #         how it was found rather than reported.
     key_lists = ("required_keys_gate", "required_keys_render", "optional_keys", "conditional_keys")
     for eid, (d, _dpath) in descs.items():
+        for dep in d.get("requires") or []:
+            if dep not in descs:
+                r.fail(f"entry '{eid}' requires '{dep}', which is not a registry entry — the edge "
+                       f"then orders nothing and reds nothing. Fix the id, or add the entry")
         for edge in d.get("requires_if", []):
             other = edge.get("kit")
             if other and other not in descs:
@@ -2646,6 +2685,19 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
             descs, selection, target, deploy,
             set(tracked(target)) | {x["dest"] for x in rows if x["kind"] == "write"}):
         print(f"  SILENT [{_eid:<13}] leg '{_nm}' names {', '.join(_bad)}, which no kit ships here")
+    # ---- S4. THE SAME PREDICATE `apply` REFUSES ON, PRINTED. A preview that promises an apply which
+    # ---- will then refuse is the defect class this unit exists for. It is a bare `print` and never an
+    # ---- `r.fail`: `cmd_plan` returns `r.emit()`, so a finding here would move an exit code this unit
+    # ---- is not moving, and `WIRE-INTO-PROJECT.md` states the convention — a gap never changes the
+    # ---- exit code, it is a state of the world rather than a fault in the run. The `SILENT` row above
+    # ---- is the precedent, and this row adds no refusal branch.
+    _plan_receipt_path = target / ".governance" / "install.json"
+    _plan_receipt = (json.loads(_plan_receipt_path.read_text(encoding="utf-8"))
+                     if _plan_receipt_path.is_file() else None)
+    for _eid, _dep in derive_unsatisfied_requires(selection, descs, _plan_receipt):
+        print(f"  UNMET  [{_eid:<13}] requires '{_dep}', which is neither in this selection nor "
+              f"claimed by the target's receipt — apply REFUSES this; add '{_dep}' to --kits, or "
+              f"install it first")
     holes = [(eid, h.get("id")) for eid in selection for h in descs[eid][0].get("hole", [])]
     for eid, hid in holes:
         print(f"  ORDER  [hole         ] .governance/outbox/{hid}.md   <- {eid}")
@@ -4285,6 +4337,23 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
             "the target already carries " + ", ".join(sorted(foreign)) + " and this target's "
             "receipt does not claim it. Converging a repo that already has kits is a stated "
             "non-goal; refusing before writing anything"
+        )
+
+    # ---- ARM B: a declared dependency that is neither selected nor installed. HERE, immediately
+    # ---- after AC8 and before `demand_writable_target`, because nothing has been written yet and a
+    # ---- refusal about the SELECTION must not queue behind one about the target's writability.
+    # ---- `requires` bought install ORDER and nothing else, so a selection could name a kit whose
+    # ---- declared dependency was absent, install it against a tree missing what it declares it
+    # ---- needs, and exit 0. Refuse, never auto-expand: the owner ruled that the selection is the
+    # ---- operator's statement of intent and widening it silently is a different verb.
+    unmet = derive_unsatisfied_requires(selection, descs, receipt)
+    if unmet:
+        raise Refusal(
+            "; ".join(f"'{eid}' requires '{dep}'" for eid, dep in unmet)
+            + " — and that dependency is neither in this selection nor claimed by this target's "
+            "receipt, so the kit would install against a tree without what its descriptor declares "
+            "it needs. Add the missing id to --kits, or install it first and re-run; govkit does "
+            "not widen a selection on your behalf"
         )
 
     # ---- THE WRITE PRECONDITIONS (DEPL-dCarriedReceipt-12), steps 1 and 2 of the build's

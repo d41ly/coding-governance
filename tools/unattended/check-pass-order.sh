@@ -98,8 +98,11 @@ while IFS= read -r -d '' _ck; do
   case "$_ck" in
     __CONF_IMPORT_OK__) _conf_ok=1 ;;
     # AN ALLOW-LIST, NOT A GLOB, and this is where the spliced block had to be adapted rather than
-    # copied. The sibling assigns EVERY uppercase key it sees, which is safe THERE because that
-    # script sets nothing it cares about above the import. This one sets DRIVER at :51 — the path it
+    # copied. `check-unattended.sh` CARRIED the same open glob and had to stop for the same reason:
+    # it sets HERE, DRIVER, CONF and SCOPE above its own import, and two exploits were reproduced
+    # through exactly that gap before it took a declared key list of its own. Both legs now carry
+    # one. The sentence here used to say the glob was safe THERE, which described neither the code
+    # nor the risk and is the reasoning that produced the hole. This one sets DRIVER at :51 — the path it
     # eval's the classifier out of — so one tracked conf line `DRIVER="tools/unattended/evil.sh"`
     # made the leg eval an attacker-chosen file and exit 0 with its own FAILED line printed.
     # Reproduced end to end before this line existed. Only the keys this leg DECLARES are assignable,
@@ -331,32 +334,11 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
     # `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up sequence is a prefix of
     # nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
     #
-    # THE EXCLUSION IS THE BUILD'S WHOLE FOLDER PLUS THE GENERATED INDEXES, and getting this wrong
-    # made a CONFORMING run unlandable. It was `spec/` and `reviews/` alone, and a spec pass
-    # legitimately writes more than those two: the regenerated index, the build README, the run-state
-    # file and the month ledger all sit outside them. So a SPEC commit naming the unit id won the
-    # selection and step 2 then graded ITS parent — where, correctly, no spec exists yet — and the leg
-    # reported "the spec was written after the code" about a run that did the opposite. Reproduced on
-    # the spec-first fixture. The shape is this corpus's norm rather than a corner: `spec(<slug>):
-    # <id> ...` subjects are everywhere, and this build escaped only because its own spec commit
-    # named the slug and no unit id. With `red_after_land = true` and history append-only, the next
-    # conforming run would have been unlandable short of a bypass.
-    #
-    # `GENERATED_INDEXES` is read from the conf as `index:generator` pairs; only the index half is an
-    # excluded path, because a commit touching the GENERATOR is touching product code.
-    # THE RECORD SURFACE a spec pass legitimately writes: this build's folder, the generated indexes,
-    # AND the SHARED RECORDS. The last was omitted at first and it is not a corner — template section
-    # 1 MANDATES a backlog row, so a conforming spec-first run writes `memory/backlog/<FAMILY>.md`
-    # in the same commit, which put the commit back outside the exclusion and redded the run that
-    # followed the method exactly. Reproduced on this kit's own fixture.
-    _gen_ex=""
-    for _gi in $GENERATED_INDEXES; do
-      _gp=${_gi%%:*}
-      [ -n "$_gp" ] && _gen_ex="$_gen_ex -e ^$_gp"
-    done
-    for _sr in $SHARED_RECORDS; do
-      [ -n "$_sr" ] && _gen_ex="$_gen_ex -e ^$_sr"
-    done
+    # THE EXCLUSION SET AND THE SELECTION BOTH LIVE IN `build_commit`, in the kit library, since
+    # TOOL-aHoistedPass-7. What used to sit here — the `_gen_ex` assembly and the whole
+    # `_find_build_commit` body — was INDENTED inside this loop, so it existed only while this block
+    # ran and no sibling script could source this file and reuse it. The rationale comments moved
+    # with the code rather than being left behind as prose about somewhere else.
     _report() {
       previews="$previews
 $1"
@@ -366,60 +348,9 @@ $1"
 $1" ;;
       esac
     }
-    # ONE PREDICATE, TWO WINDOWS. `_find_build_commit <rev-range>` is the whole build-commit
-    # definition and both the in-range walk and the pre-anchor probe call it. A second copy would be
-    # two answers to one question, and the copy would be the one that drifts.
-    _find_build_commit() {
-      # THE CAP BOUNDS THE ENUMERATION, not only the loop body. `for _c in $(rev-list ...)` runs the
-      # whole traversal in a command substitution BEFORE the first iteration, so a loop-only cap
-      # bounds the VERDICT and not the WORK — the `bounded-through-a-pipe-is-unbounded` class. The
-      # pre-anchor window is the entire history behind the anchor, so `--max-count` is what bounds it.
-      #
-      # THE TWO WINDOWS WALK IN OPPOSITE DIRECTIONS, and getting that wrong is what made the probe
-      # unable to see its own target. The IN-RANGE walk wants the EARLIEST build commit, so it is
-      # `--reverse`. The PRE-ANCHOR probe wants ANY violating commit behind the anchor, and the
-      # nearest is both the likeliest and the one that must survive truncation — so it walks
-      # NEWEST-FIRST and truncates the FAR end.
-      #
-      # WHAT WENT WRONG, because it is worth one reader's minute. `rev-list --reverse --max-count=N`
-      # applies the count during traversal and reverses AFTER, so the anchor is the LAST element of
-      # the window, not the first. The probe was written `--reverse` for both windows on the belief
-      # that it yielded the commits nearest the anchor; it yields the farthest. So the one commit the
-      # probe exists to reach was dropped by the cap whenever the history behind it was deeper — and
-      # the truncation arm could not see that, because it used the record-only fixture, where the
-      # correct and the broken behaviour give the same verdict.
-      #
-      # Truncation is therefore reported AFTER the walk, on the count actually emitted.
-      local _range="$1" _cap="$2" _ord="$3" _c _subj _n=0 _mc=""
-      # `cap+1` FETCHED, `cap` GRADED, so truncation is EXACT. With `--max-count=$_cap` a complete
-      # walk of an exactly-cap-deep window is indistinguishable from a truncated one, and the leg
-      # reported TRUNCATED for a probe that had in fact seen everything. Fetching one extra is the
-      # only way to know there was more.
-      [ -n "$_cap" ] && _mc="--max-count=$((_cap+1))"
-      for _c in $(GIT rev-list $_ord $_mc $_range 2>/dev/null); do
-        _n=$((_n+1))
-        # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
-        if [ -n "$_cap" ] && [ "$_n" -gt "$_cap" ]; then printf 'TRUNCATED'; return 0; fi
-        # FROM THE CACHE, already tokenised and already space-padded on both ends. A cached subject
-        # is never the empty string — an empty subject caches as two spaces — so an empty read is a
-        # MISS and nothing else, and a miss falls back to the pair of processes this cache replaced
-        # rather than reading as "this commit does not name the id", which would grade the unit
-        # unbuilt and report a clean bill. Every commit either window walks is reachable from HEAD
-        # (`base..HEAD` by definition, and the pre-anchor anchor is `<first>^` where `<first>` is
-        # itself HEAD-reachable), so the fallback is unreachable today; it is here so that widening a
-        # window later cannot turn a cache miss into a silent pass.
-        _subj=${_SUBJ[$_c]-}
-        [ -n "$_subj" ] || _subj=" $(GIT log -1 --format=%s "$_c" 2>/dev/null | tr -c 'A-Za-z0-9-' ' ') "
-        case "$_subj" in *" $id "*) ;; *) continue ;; esac
-        # Did it touch anything outside this build's own record surface?
-        if GIT show --pretty=format: --name-only "$_c" 2>/dev/null \
-           | grep -v '^$' | grep -qv -e "^$bdir/" $_gen_ex; then
-          printf '%s' "$_c"; return 0
-        fi
-      done
-      return 0
-    }
-    build_c=$(_find_build_commit "${base:+$base..}HEAD" "" "--reverse")
+    # THE IN-RANGE WINDOW, which is `build_commit`'s default: unbounded, `--reverse`, so the
+    # EARLIEST qualifying commit wins.
+    build_c=$(build_commit "${base:+$base..}HEAD" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")
     if [ -z "$build_c" ]; then
       # S2c - THE PRE-ANCHOR PROBE, and it runs ONLY for the derived-range population. A commit that
       # writes product code for a unit touches nothing under the build folder, so it sits STRICTLY
@@ -436,7 +367,7 @@ $1" ;;
       # S2d - BOUNDED BY CONSTRUCTION, because the miss rate over the widened population could not be
       # measured before this landed. A probe that gives up is COUNTED, never reported as a miss.
       if [ "$norun" = 1 ] && [ -n "$base" ]; then
-        pre_c=$(_find_build_commit "$base" "$PREANCHOR_CAP" "")
+        pre_c=$(build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
         if [ "$pre_c" = TRUNCATED ]; then
           truncated=$((truncated+1))
         elif [ -n "$pre_c" ]; then

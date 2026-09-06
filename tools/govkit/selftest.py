@@ -452,7 +452,7 @@ def main() -> int:
         # receipt called it `engine`. The arm asserts the BYTES, not just the role: a role that is
         # right about the wrong file is the failure this replaces.
         cm = make_target(tmp / "u1a", DEPLOY_FULL)
-        p = run("apply", "--target", str(cm), "--kits", "codebase-map")
+        p = run("apply", "--target", str(cm), "--kits", "codebase-map,memory-tree")
         rec = json.loads((cm / ".governance" / "install.json").read_text(encoding="utf-8"))
         govroot = HERE.parents[1]
         # S5. AT THE PIN, not at HEAD: a pinned `update` writes the PIN's bytes, so an arm
@@ -484,7 +484,7 @@ def main() -> int:
         # to a claimed path, so an uncommitted edit here would make the re-apply refuse — and
         # both arms below would then pass on an apply that never ran.
         settle(cm, "the target edits its seed")
-        p = run("apply", "--target", str(cm), "--kits", "codebase-map")
+        p = run("apply", "--target", str(cm), "--kits", "codebase-map,memory-tree")
         check("a re-apply leaves an edited seed byte-identical",
               (cm / "tools" / "codebase-map" / "map_extractors.py").read_bytes()
               == b"# TARGET EDITED\n", "")
@@ -540,7 +540,7 @@ def main() -> int:
 
         # AC4 — plan promises exactly the file set gov owns. NOT keyed on `written`: that flag is a
         # per-RUN fact, and on a re-apply a seed that exists is a row gov owns and did not write.
-        pl = run("plan", "--target", str(cm), "--kits", "codebase-map")
+        pl = run("plan", "--target", str(cm), "--kits", "codebase-map,memory-tree")
         plan_writes, plan_skips = set(), set()
         for line in pl.stdout.splitlines():
             # THE MARK VOCABULARY IS THE ENGINE'S, NOT A LITERAL HERE. This read `SKIP`, which
@@ -1507,7 +1507,7 @@ user_skills = "/tmp/gk-fake-skills"
         # --- The detection keys on the ROLE, never on the kit id, which is what makes it a class
         # --- assertion while exactly one `forked` rule ships.
         inc = make_target(tmp / "incomplete", DEPLOY_FULL)
-        p = run("apply", "--target", str(inc), "--kits", "memory-recall")
+        p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
         out = p.stdout + p.stderr
         check("[dGV-3] apply reports an entry INCOMPLETE when its forked files are absent",
               "INCOMPLETE memory-recall" in out, out[-900:])
@@ -1524,7 +1524,7 @@ user_skills = "/tmp/gk-fake-skills"
         (_mr / "query.py").write_text("# the adopter's own" + NLp, encoding="utf-8", newline=NLp)
         (_mr / "extract.py").write_text("# own" + NLp, encoding="utf-8", newline=NLp)
         (_mr / "recall-opened.js").write_text("// own" + NLp, encoding="utf-8", newline=NLp)
-        p = run("apply", "--target", str(inc), "--kits", "memory-recall")
+        p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
         check("[dGV-3] a target that ALREADY holds its forked files is not reported incomplete",
               "INCOMPLETE memory-recall" not in (p.stdout + p.stderr), (p.stdout + p.stderr)[-700:])
         check("[dGV-3] and apply left the adopter's own bytes alone",
@@ -1532,7 +1532,7 @@ user_skills = "/tmp/gk-fake-skills"
               (_mr / "query.py").read_text(encoding="utf-8"))
 
         pg = pin_target("u6p1", b"*.sh text eol=lf")          # deliberately no trailing newline
-        run("apply", "--target", str(pg), "--kits", "memory-recall")
+        run("apply", "--target", str(pg), "--kits", "memory-recall,memory-tree")
         lines = (pg / ".gitattributes").read_text(encoding="utf-8").split(NLp)
         check("an append to an attributes file with no trailing newline does not join two lines",
               lines[0] == "*.sh text eol=lf", str(lines[:2]))
@@ -1548,7 +1548,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The block is written EARLY and the renormalize runs LAST. On a first install the pinned
         # population does not exist yet, so a one-phase design either refuses every install or
         # reports success over nothing.
-        pa = run("apply", "--target", str(pin_target("u6p2", None)), "--kits", "memory-recall")
+        pa = run("apply", "--target", str(pin_target("u6p2", None)), "--kits", "memory-recall,memory-tree")
         idx_att = pa.stdout.index("/ATTRIBUTES]")
         check("the ATTRIBUTES step runs before LAND", idx_att < pa.stdout.index("/LAND]"), pa.stdout)
         check("and the RENORMALIZE step runs after CONFIGURE",
@@ -2245,7 +2245,7 @@ user_skills = "/tmp/gk-fake-skills"
             tmp3 = pathlib.Path(td3)
             t = make_target(tmp3, None)
             run("intake", "--target", str(t), "--kits", "drift-audit")
-            first = run("apply", "--target", str(t), "--kits", "drift-audit")
+            first = run("apply", "--target", str(t), "--kits", "drift-audit,memory-tree")
             owned = t / "tools" / "drift-audit" / "drift_signals.py"
             check("apply lands the kit at all",
                   owned.is_file() and "landed" in first.stdout, first.stdout + first.stderr)
@@ -2265,7 +2265,7 @@ user_skills = "/tmp/gk-fake-skills"
             # ran — which is the exact vacuity the arm below was written to close.
             settle(t, "the adopter edits a seeded file")
             seeded = t / "tools" / "drift-audit" / "drift_signals.py"
-            second = run("apply", "--target", str(t), "--kits", "drift-audit")
+            second = run("apply", "--target", str(t), "--kits", "drift-audit,memory-tree")
             # THE RE-APPLY MUST HAVE SUCCEEDED. Both protection arms are satisfied by an apply that
             # REFUSED and wrote nothing — "the edit survived" is trivially true when nothing ran —
             # so the exit code is asserted FIRST. Demonstrated by injecting a refusal and watching
@@ -2301,7 +2301,7 @@ user_skills = "/tmp/gk-fake-skills"
             # so the arm could not have been written any other way. That is now one predicate in both
             # verbs, and the filter is gone: a `write` row that apply does not land, from ANY role,
             # fails here.
-            plan_out = run("plan", "--target", str(t), "--kits", "drift-audit")
+            plan_out = run("plan", "--target", str(t), "--kits", "drift-audit,memory-tree")
             # FILTERED ON THE RECEIPT SIDE, AND THAT IS NOT THE FILTER THIS ARM DROPPED. The role
             # filter removed above was on the PLAN side, where it hid apply/plan disagreement. This
             # one is a schema fact: under schema 1 every receipt row carried gov bytes, so the whole
@@ -2429,6 +2429,26 @@ user_skills = "/tmp/gk-fake-skills"
             check("...and a `requires` CYCLE refuses rather than picking an order",
                   _cycled, "a cycle fell through to some arbitrary order")
 
+            # ---- DEPL-aHoistedPass-1 ARM B. `derive_install_order` DROPS an out-of-selection edge
+            # ---- before it can constrain anything, which is correct for an ORDER and is exactly why
+            # ---- an edge could name a dependency nothing ever installed. The predicate below is the
+            # ---- one `apply` refuses on and `plan` prints, keyed on the FUNCTION for the reason the
+            # ---- block above states: no entry edit can hide it.
+            check("an out-of-selection `requires` target is UNSATISFIED",
+                  _gk.derive_unsatisfied_requires(["b-kit"], _descs2, None) == [("b-kit", "z-kit")],
+                  str(_gk.derive_unsatisfied_requires(["b-kit"], _descs2, None)))
+            check("...and it is satisfied when the selection carries it",
+                  _gk.derive_unsatisfied_requires(["b-kit", "z-kit"], _descs2, None) == [],
+                  "an edge inside the selection is not a gap")
+            # THE RECEIPT HALF, and it is the one a lazier arm would skip: an edge is satisfied by a
+            # kit this target already installed, so a second apply of a dependent kit alone is legal.
+            check("...and it is satisfied when the target's receipt already claims it",
+                  _gk.derive_unsatisfied_requires(["b-kit"], _descs2, {"kits": ["z-kit"]}) == [],
+                  "the receipt carve-out did not apply")
+            check("...and a None receipt is the empty set, never a crash",
+                  _gk.derive_unsatisfied_requires(["a-kit"], _descs2, None) == [],
+                  "a kit with no `requires` key must yield nothing")
+
             # AN ACCEPTED STOP IS NOT A FAILURE. `memory-tree` seeds the conf and stops by design, so
             # every correct first install exits 1 there; calling that a failure made a default-selection
             # apply unable to return 0, and the arm asserting it does landed RED rather than being read
@@ -2487,7 +2507,7 @@ user_skills = "/tmp/gk-fake-skills"
             # so it skips nothing to name — this arm was reading the role the landed-zero-bytes
             # defect wore. codebase-map's `map_extractors.py` is a real project-owned skip.
             t3 = make_target(tmp3 / "skips", DEPLOY_FULL)
-            sk = run("apply", "--target", str(t3), "--kits", "codebase-map")
+            sk = run("apply", "--target", str(t3), "--kits", "codebase-map,memory-tree")
             check("apply names each skipped rule, its role and its destination",
                   "SKIPPED [project-owned] tools/codebase-map/map_extractors.py" in sk.stdout,
                   sk.stdout)

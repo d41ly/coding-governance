@@ -1,12 +1,18 @@
 # DEPL-aHoistedPass-1 — a declared kit dependency that is actually checked
 
-**Status:** SPECCED · rev-2 · 2026-09-04 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
+**Status:** CLOSED · rev-5 · 2026-09-05 · node a · Tier-2 · base c4fcf5ad · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md](../build/2026-09-04-build-TOOL-aHoistedPass-1-1-design-pass.md) | research | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 |
+| [2026-09-05-build-DEPL-aHoistedPass-1-1-acceptance-ledger.md](../build/2026-09-05-build-DEPL-aHoistedPass-1-1-acceptance-ledger.md) | journal | — |
+| [2026-09-05-prompt-DEPL-aHoistedPass-1-brief.md](../prompts/2026-09-05-prompt-DEPL-aHoistedPass-1-brief.md) | journal | — |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round1.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 |
+| [2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aHoistedPass-1-spec-audit-round2.md) | spec-audit | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 |
+| [2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round1.md](../reviews/2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round1.md) | diff-review | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 |
+| [2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round2.md](../reviews/2026-09-06-review-TOOL-aHoistedPass-1-closing-diff-round2.md) | diff-review | TOOL-aHoistedPass-1 TOOL-aHoistedPass-2 TOOL-aHoistedPass-3 TOOL-aHoistedPass-4 TOOL-aHoistedPass-5 TOOL-aHoistedPass-6 TOOL-aHoistedPass-7 TOOL-aHoistedPass-8 TOOL-aHoistedPass-9 |
 
 <!-- /gen:spec-records -->
 
@@ -32,8 +38,35 @@ arm in `selfcheck`, and an installed-set refusal in the verb that actually insta
 - **S6.** Arms for both new branches, at the existing `requires` seam in `tools/govkit/selftest.py`
   (`:2405-2430`), plus repair of the nine existing `--kits` call sites arm B newly refuses.
 - **S7.** Both refusal strings name the REMEDY, and neither spells a `tools/` path literal.
-- **S8.** The version bumps the changed payload owes: `KIT_GOVKIT_VERSION` (`govkit.py:44`) and the
-  `unattended` kit version, the latter subject to fork F1.
+- **S9.** File the THREE backlog rows this spec's own sections defer to, in
+  `memory/backlog/DEPL.md`: the mis-spelled `require` key class, the stale `BRANCH_PIN` /
+  `FILE_PIN` re-baseline, and — added at rev-5 — the `unattended` version carrier that sits OUTSIDE
+  both populations `check-kit-versions.sh` reads.
+
+  **TWO of the three are MINTED here and the first is not, because it already exists.**
+  `TOOL-aHoistedPass-1` S3 filed the mis-spelled-key class as `DEPL-aHoistedPass-5` at `order 1`,
+  from the design record's own section 10, and it is the same defect in the same words. Minting a
+  second row for it would be the `two-answers-to-one-question` class inside the scope item that
+  exists to stop a finding being held by nobody. S9 is satisfied by that row plus the two new ones,
+  and AC14 grades all three by id rather than by count. That third one was measured by
+  `TOOL-aHoistedPass-2` while it still owned the bump, written into its prose as "move it in the same
+  commit, and file the gap", and assigned to nobody when the bump moved here. A finding stated only in
+  a spec's kept-for-reference prose is a finding nobody holds. Both are already booked in section 4's Files-touched table and both are
+  arguments this design leans on to justify narrowing its own scope, so neither may be left as an
+  implied record. The sibling `TOOL-aHoistedPass-1` S3 is the convention: filing a backlog row is an
+  explicit scope item, never a side effect of a deferral sentence.
+- **S8.** `KIT_GOVKIT_VERSION` (`govkit.py:44`), `1.9` to `1.10` — the bump this unit's own engine
+  change owes, asserted at `check-kit-versions.sh:238`.
+
+  ~~and the `unattended` kit version, subject to fork F1~~ — **PARKED TO THE OWNER at rev-5, and not
+  taken by this unit or by any unit of this build.** The move edits `tools/unattended/SKILL.template.md`'s
+  marker, which ruling D1 put on the M3 veto-2 list, and `memory/guides/BUILD-METHOD.md:76` says the
+  standing mandate's delegation does not reach that clause. rev-3 resolved F1 to this unit while
+  asserting the picks "add no carrier beyond ratified scope"; that assertion is false against the
+  tree, and a resolution no resolver was authorized to make is withdrawn rather than honoured. F1 is
+  re-opened and parked in section 8 with the full carrier list. **The disclosed cost is stated in AC10
+  and it is real:** this unit changes a shipped `unattended` payload — `kit.toml`'s `requires` array —
+  and leaves the kit's version at `1.17`.
 
 ## 3. Non-goals (OUT)
 
@@ -162,10 +195,18 @@ rather than assumed:
 - **The exit code does not move.** Measured into scratch targets: `apply --kits codebase-map` exits 0,
   and `apply --kits codebase-map,memory-tree` also exits 0. `memory-tree`'s seed-and-stop is a
   declared accepted outcome and does not turn a passing arm into a failing one.
-- **No arm asserts an absolute count that a larger selection would move.** The nine sites' assertions
-  key on receipt rows BY PATH, on stdout substrings, or on `>=` thresholds. The one count-sensitive
-  assertion in range, after `:487`, is the relative idempotency compare
-  `len(rec["files"]) == len(rec2b["files"])`, which survives a larger selection.
+- ~~**No arm asserts an absolute count that a larger selection would move.**~~ — **FALSE, and the
+  by-hand run at rev-5 is what found it.** Three arms assert SET EQUALITY between a `plan`'s marked
+  rows and the receipt an `apply` wrote, and a larger apply selection is exactly what moves that:
+  `plan's write set equals the receipt rows carrying gov bytes` and
+  `plan's SKIP set equals the resolver rows carrying none` (both against the `:487` receipt), and
+  `plan's write set equals the receipt rows CARRYING BYTES, any role` (against the `:2268` one). Each
+  failed with the whole of `memory-tree` in `applied-only`. **The repair is the paired PLAN call, not
+  the arm**: an arm whose subject is plan/apply agreement must give both verbs the same selection, and
+  it only ever passed because the two happened to be equal. `:543` and `:2304` move with their
+  partners, so the nine repairs are eleven. The relative idempotency compare after `:487`,
+  `len(rec["files"]) == len(rec2b["files"])`, does survive a larger selection and was the only
+  count-sensitive assertion this bullet got right.
 
 **What `refusal_join.py` actually demands, corrected.** It does not demand a named arm for a new
 refusal branch. Its join half runs only when argv names a reached-set file (`:175-176`), and the leg's
@@ -194,10 +235,10 @@ announcement unit, not this one.
 
 | file | change |
 |---|---|
-| `tools/unattended/kit.toml` | `:7` gains `review-harness` |
+| `tools/unattended/kit.toml` | `:7` gains `review-harness`. **The version marker in this kit does NOT move** — see S8 and section 8's parked F1. |
 | `tools/govkit/govkit.py` | check 7 arm, `_cmd_apply` refusal, `cmd_plan` row and receipt read, `:495-496` clause, `KIT_GOVKIT_VERSION` |
 | `tools/govkit/selftest.py` | two new arms at the `:2405-2430` seam, nine `--kits` repairs |
-| `memory/backlog/DEPL.md` | the mis-spelled-key row and the stale-pin row |
+| `memory/backlog/DEPL.md` | the mis-spelled-key row, the stale-pin row, and the ungraded-carrier row |
 
 `tools/install-prefix-carried.txt` does NOT move. `tools/unattended/kit.toml` carries a row at `:111`
 at count 2, and a kit id in a `requires` array is not a path literal. `govkit.py` and `selftest.py`
@@ -261,8 +302,34 @@ path — the ratchet is a BAN (`check-install-prefix.sh:315-319`), so any rise i
   was run by hand and gives the exit code.
 - **AC9** — When `python tools/govkit/refusal_join.py` runs, it exits 0 and reports a branch count
   exactly two higher than the 244 measured at this base, with `BRANCH_PIN` unmoved at 217.
-- **AC10** — When `bash tools/check-kit-versions.sh` runs, it exits 0 with `KIT_GOVKIT_VERSION` and
-  every `unattended` carrier agreeing.
+- **AC10** — When `bash tools/check-kit-versions.sh` runs, it exits 0 with `KIT_GOVKIT_VERSION` at
+  **`1.10`**; and when `govkit.py`'s constant is staged back to `1.9` against its own same-line marker,
+  it exits non-zero NAMING that disagreement. That staged failing case is observed before landing.
+
+  **The eight `unattended` carriers stay at `1.17`, deliberately, and the checker still exits 0.** It
+  grades marker PRESENCE (`:17-19`) and marker/constant AGREEMENT (`:164-192`); no branch of it reads a
+  diff to ask whether a body change earned a bump. So a green bar here is NOT evidence that the version
+  is right, and this criterion says so rather than borrowing the green. **What ships is a changed
+  `unattended` payload at an unchanged `unattended` version**, which is exactly the class
+  `TOOL-aHoistedPass-31` records — a forgotten bump reds nothing, and under D1 a forgotten bump also
+  silently skips the owner turn the marker coupling creates. Here it is not forgotten: it is parked,
+  named, and handed to the owner in section 8.
+
+  **The target numbers and the staged failing case are both load-bearing, and their absence was the
+  defect.** rev-2's AC10 asserted only that the checker "exits 0 with `KIT_GOVKIT_VERSION` and every
+  `unattended` carrier agreeing", which is satisfied at `1.9`/`1.17` exactly as at `1.10`/`1.18` —
+  this spec's own F1 says why, because `check-kit-versions.sh` grades marker presence and
+  marker/constant agreement and no branch of it reads a diff. Since section 8's F1 makes THIS the unit
+  that performs the `unattended` move for the whole build and stands `TOOL-aHoistedPass-2` down on the
+  strength of it, both units could have shipped green with the kit still at `1.17`. The
+  `KIT_GOVKIT_VERSION` half was named nowhere in the build at all. This is §7's rule — a new gate is
+  not landed until its failing case has been observed — applied to an acceptance criterion: an AC
+  whose only observation is that a checker exits 0 is an assertion about nothing.
+- **AC14** — When `memory/backlog/DEPL.md` is read on the landing tree, all THREE rows S9 names are
+  present BY ID, each carrying its reason: the mis-spelled-`require`-key row is
+  `DEPL-aHoistedPass-5`, filed at `order 1` and not re-minted here, and this unit mints the stale-pin
+  row and the ungraded-carrier row. Graded by id and never by a count, because a count cannot tell a
+  row that already existed from one nobody filed.
 - **AC11** — When `bash tools/check-install-prefix.sh` runs, it exits 0 and
   `tools/install-prefix-carried.txt` is unchanged, because the two new strings name kit ids and no
   `tools/` path.
@@ -287,6 +354,14 @@ path — the ratchet is a BAN (`check-install-prefix.sh:315-319`), so any rise i
   behaviour and NO boundary runs it, not even `GATE_FULL=1`, which holds every `subject = kit` or
   `chunk = selftests` leg. It needs `GATE_SELFTESTS=1` or a hand run. This is a disclosed exemption,
   and AC8's by-hand run is its compensating check.
+
+- **`unattended skill wiring`** — chunk `wiring`, subject `repo`, guard `None`, so every bar. It
+  renders five carriers from `adopt-unattended.sh` and `--check` byte-compares them. **This unit owes
+  it nothing, and that is a consequence of the park rather than an omission:** the leg reds when a
+  template marker moves without its render moving, and this unit moves no template marker. Had the
+  `unattended` bump been taken here, five renders would have had to be regenerated BY THE ADOPTER in
+  the same commit, and section 7 named neither this leg nor `kit/dogfood doc parity`. That gap is now
+  the parked fork's to carry, and section 8 carries it.
 
 This unit adds no gate leg and registers nothing in `tools/gate-legs.json` or `registry.toml`.
 
@@ -316,6 +391,49 @@ This unit adds no gate leg and registers nothing in `tools/gate-legs.json` or `r
   ignore nine times over is exactly the dead declaration this unit exists to end — but the owner sees
   the number at scope approval, not in the landing report.
 
+RESOLVED (agent, 2026-09-05, delegated): **F2 — REFUSE stands, and the nine repairs land inside this
+unit**, as recommended: the evidence that gov's own suite ignores the edge nine times over strengthens
+the ruling it was offered against. Taken under the standing mandate's delegated resolver authority;
+the pick is this spec's own recommendation and it adds no carrier beyond ratified scope.
+
+PARKED (agent, 2026-09-05): **F1 — the `unattended` 1.17 to 1.18 bump is NOT TAKEN by this unit, and
+is not this run's to take.** rev-3 resolved it here, under the same delegated authority, on the
+sentence that the picks "add no carrier beyond this unit's ratified scope". **Measured against the
+tree, that sentence is false.** The move's eight graded carriers are three engine constants
+(`unattended.sh`, `check-unattended.sh`, `check-pass-order.sh`) and five `tools/unattended/*.template.md`
+markers, and `tools/unattended/SKILL.template.md` is one of the five. Ruling D1 put that file and its
+render on the M3 veto-2 list; `memory/guides/BUILD-METHOD.md:76` says the mandate's delegation does not
+reach veto 2's governance-carrier clause, and M3 collapses that onto the park rule rather than leaving
+it beside one — if the only surviving option trips veto 2, no resolver the mandate delegates exists and
+the fork is parked exactly as if nothing had survived. So rev-3's resolution is WITHDRAWN, not
+honoured, and this is the record of the withdrawal.
+
+**What the owner is handed, in full, because a park that hides the work is a deferral wearing a
+park's clothes.** The move is fourteen carriers and a leg, not eight carriers:
+
+- **Eight GRADED** by `tools/check-kit-versions.sh:164-192` — the three engine constants above, each
+  with its same-line `gov:kit unattended@` marker, and the five tracked `*.template.md` markers.
+- **Five RENDERED**, which nothing in the eight covers: `.claude/skills/unattended/SKILL.md`,
+  `memory/guides/UNATTENDED-PROTOCOL.md`, `memory/guides/PLAYBOOK-TEMPLATE.md`,
+  `memory/guides/UNATTENDED-VERBS.md` and `tools/unattended/playbook.fixture.md`.
+  `tools/unattended/adopt-unattended.sh` renders them and `--check` byte-compares them, which is the
+  leg `unattended skill wiring` — guard `None`, chunk `wiring`, so it runs on every bar. **Bump the
+  eight and skip the re-render and the bar reds at a boundary this spec never mentioned.** The renders
+  are regenerated by the adopter, never hand-edited.
+- **A NINTH carrier outside both populations**: `tools/unattended/README.md:1`. It is in neither set
+  `check-kit-versions.sh` reads, so after any bump the shipped kit README advertises the old version
+  while every graded carrier reads the new one, and nothing reds. Filed as an S9 backlog row so the gap
+  outlives this fork.
+
+**And the consequence for three siblings, which is the part that cannot wait for the owner.**
+`TOOL-aHoistedPass-2` S11, `TOOL-aHoistedPass-7` S8 and `TOOL-aHoistedPass-9` S7 were each struck to a
+bare assertion — "`bash tools/check-kit-versions.sh` exits 0 at whatever value order 2 sets" — on the
+strength of this unit performing the move. **Order 2 now sets nothing.** Those three assertions stay
+TRUE, because the checker grades agreement rather than movement and every carrier still agrees at
+`1.17`; what is no longer true is the premise that some unit of this build performs the bump. Each of
+the three lands correctly and none of them ships the version. The build closes with the `unattended`
+kit's payload changed and its version unmoved, and this paragraph is where the owner reads that.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-04 · initial draft, grounded on `origin/main` at `c4fcf5ad` with every cited line
@@ -342,6 +460,53 @@ This unit adds no gate leg and registers nothing in `tools/gate-legs.json` or `r
   repo will never hold. It now names the receipt by role and cites the read at `govkit.py:4275-4276`,
   which is the seam the carve-out actually exercises. No criterion was weakened or dropped, and the
   set of things AC5 observes is unchanged.
+- rev-3 - 2026-09-05 - M3 fork sweep under the standing mandate: F1 and F2 marked RESOLVED in
+  place at their recommendations. No scope, acceptance or design text moved. Re-derived at the run's
+  BASE `e828f778` rather than at `c4fcf5ad`: `tools/unattended/kit.toml:7` still reads
+  `requires = ["memory-tree"]` and `KIT_UNATTENDED_VERSION=1.17` still stands at
+  `tools/unattended/unattended.sh:42`, so both premises hold 66 commits on.
+- rev-4 - 2026-09-05 - folded round-1 spec-audit findings 2 and 24. **2** - AC10 was
+  green-by-construction over the one move section 8's F1 resolution had just made this unit's
+  responsibility for the whole build. It asserted agreement and named no target, and
+  `check-kit-versions.sh` grades agreement rather than movement, so `1.9`/`1.17` satisfied it exactly
+  as `1.10`/`1.18` would - and `TOOL-aHoistedPass-2` had already stood down from the same move on
+  the strength of this unit taking it. AC10 now names both target values AND a staged failing case,
+  which is the charter's observed-failing-case rule applied to an acceptance criterion rather than to
+  a gate. **24** - two backlog rows that section 3 and section 4 both defer to, and that section 4's
+  Files-touched table already books, had no scope item and no criterion; a green landing would have
+  closed the unit with both residuals unrecorded, one of them the stale-pin argument AC9 leans on to
+  accept `BRANCH_PIN` at 217 against a live 244. Added as S9 with AC14 witnessing it, following the
+  sibling convention that filing a backlog row is an explicit scope item.
+
+- rev-5 - 2026-09-05 - **F1 WITHDRAWN AND PARKED, and the unit narrowed to what the mandate's
+  authority reaches.** Folded round-2 spec-audit findings H4, H3 and M3, which are one defect seen
+  from three sides. **H4** is the load-bearing one: rev-3 resolved F1 to this unit while asserting the
+  picks add no carrier beyond ratified scope, and `tools/unattended/SKILL.template.md:5` is one of the
+  eight carriers the move edits. Ruling D1 puts that file on the M3 veto-2 list, which
+  `BUILD-METHOD.md:76` says the delegation does not reach, so the resolution was not the resolver's to
+  make. M3 collapses a veto-2 survivor onto the park rule, so F1 is parked and S8 is narrowed to
+  `KIT_GOVKIT_VERSION` alone. **The unit is therefore NOT an owner turn**, because it now touches no
+  veto-2 carrier - which is the classification H4 said sat nowhere, and it now sits here and beside
+  the carrier list. **H3** - section 4 booked four files for a move that has fourteen carriers and a
+  leg. Rather than correct a Files-touched table for work this unit no longer does, the full set is
+  written into the parked fork where the owner will read it: eight graded, five rendered by
+  `adopt-unattended.sh` and byte-compared by the unguarded `unattended skill wiring` leg, and a ninth
+  outside both populations. Section 7 gains that leg with the reason it is owed nothing here. **M3** -
+  that ninth carrier, `tools/unattended/README.md:1`, was measured by `TOOL-aHoistedPass-2` while it
+  owned the bump, written into its prose as "file the gap", and assigned to nobody when the bump
+  moved. S9 now files it and AC14 grades three rows rather than two. **AC10 rewritten**: it asserted
+  eight carriers at `1.18`, which this unit no longer sets. It now grades the `govkit` half with its
+  own staged failing case, and states plainly that the checker's green is not evidence the
+  `unattended` version is right - because it grades agreement, never movement.
+  **Amended in the same pass, before any code:** S9's mis-spelled-key row already existed as
+  `DEPL-aHoistedPass-5`, filed by `TOOL-aHoistedPass-1` S3 at `order 1` from the same design-record
+  bullet. S9 and AC14 now name it rather than minting a duplicate, and AC14 grades three rows by
+  ID instead of by a count that cannot tell a pre-existing row from a missing one.
+  **And the by-hand `govkit selftest` run required by AC8 refuted section 4's own claim that no arm
+  moves under a larger selection.** Three did, all of them plan-versus-apply set equalities. The
+  bullet is struck in place with the measurement, and the repair is eleven call sites rather than
+  nine: each paired `plan` moves with its `apply`. This is why AC8 is a by-hand run and not a
+  claim - nothing on any bar would have reported it.
 
 ## 10. Reuse audit
 

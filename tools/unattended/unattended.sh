@@ -3,7 +3,7 @@
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
 #   unattended.sh --preflight <slug> --keepalive-id <id>   # assert, pin, record, render
-#   unattended.sh --plan <slug>                            # per-unit state, and the next unit
+#   unattended.sh --plan <slug> [--paths]                  # per-unit state, and the next unit
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --resume <slug>                          # the same line, plus the next action
@@ -314,6 +314,10 @@ esac
 # supplying the item nobody typed.
 PK_ITEM=""; PK_STEP=""
 HALT_CODE=""
+# `--plan --paths` is an OUTPUT MODE on an existing verb, not a verb: check 26 joins every declared
+# verb to three carriers, so a new one would owe a header line, a VERBS entry and a Skill invocation
+# for a change that swaps one printf. Empty is the padded human table; `paths` is the TSV.
+PLAN_PATHS=""
 RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
@@ -2007,6 +2011,17 @@ units_refusal() { # build README path
   printf 'the build README carries no single well-formed %s pair, so the unit list cannot be read (absent, duplicated or transposed): %s\n  repair: the --write mode of tools/memory-tree/gen_build_index.py\n' "$UNITS_OPEN" "$1"
 }
 
+# ONE EMITTER FOR EVERY ROW THAT NAMES A UNIT ID, so the two modes cannot disagree about which rows
+# are units. PATHS mode swaps the shape and nothing else: four TAB-separated fields, id, status,
+# state and the spec's repo-relative path, the fourth EMPTY for a unit no tracked spec defines. A
+# caller splits on TAB and skips any line with fewer than four fields - which is how the two
+# `NOT A UNIT` diagnostics, keyed on a FILENAME rather than an id, stay skippable: they keep their
+# padded shape in both modes and carry no TAB at all.
+plan_row() { # id · status · state · specPath
+  if [ -n "$PLAN_PATHS" ]; then printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"
+  else printf '%-34s %-11s %s\n' "$1" "$2" "$3"; fi
+}
+
 verb_plan() { # slug
   local slug="$1" dir specs spec id st state next="" miss nmiss=0
   check_slug "$slug" || return 1
@@ -2129,7 +2144,7 @@ verb_plan() { # slug
     # FROM those specs, but S1 makes it representable and a row that fell through would be invisible.
     # Distinct from the authored pair's MISSING, which is about a PLANNED unit nobody has specced.
     if [ -z "$spec" ]; then
-      printf '%-34s %-11s %s\n' "$id" "-" "NO TRACKED SPEC (rendered row without one)"
+      plan_row "$id" "-" "NO TRACKED SPEC (rendered row without one)" ""
       continue
     fi
     # The status comes from the spec the id resolved to. Its two unparseable shapes were reported by
@@ -2142,7 +2157,7 @@ verb_plan() { # slug
     # a complete spec, and the one predicate that knew otherwise was discarded at the moment the
     # answer mattered. `build-complete`'s sixth term is the refusal; this is the human half.
     case "$st" in CLOSED|WONTDO) [ "$state" = "READY" ] && state="DONE" || state="DONE ($state)" ;; esac
-    printf '%-34s %-11s %s\n' "$id" "${st:-?}" "$state"
+    plan_row "$id" "${st:-?}" "$state" "$spec"
     _graded=1
     case "$state" in
       THIN|FORKED) [ -n "$next" ] || next="$id ($state)" ;;
@@ -2152,8 +2167,7 @@ verb_plan() { # slug
   # The planned units nobody has specced. These are what M2 calls MISSING, and until this
   # unit they were simply absent from the listing rather than reported.
   for miss in $(missing_units "$slug" "$dir"); do
-    printf '%-34s %-11s %s
-' "$miss" "-" "MISSING"
+    plan_row "$miss" "-" "MISSING" ""
     nmiss=$((nmiss + 1))
     [ -n "$next" ] || next="$miss (MISSING - spec it first)"
   done
@@ -4922,7 +4936,10 @@ while [ $# -gt 0 ]; do
     --subject)      RV_SUBJECT="${2:-}"; shift 2 || shift ;;
     --blockers)     RV_BLOCKERS="${2:-}"; shift 2 || shift ;;
     --disposition)  RV_DISPOSITION="${2:-}"; shift 2 || shift ;;
-    --plan)         shift; refuse_waive_unless_preflight --plan || exit 1; verb_plan "${1:-}"; exit $? ;;
+    --plan)         shift; refuse_waive_unless_preflight --plan || exit 1
+                    PL_SLUG=${1:-}; shift 2>/dev/null || true
+                    PLAN_PATHS=""; [ "${1:-}" = "--paths" ] && PLAN_PATHS=paths
+                    verb_plan "$PL_SLUG"; exit $? ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
