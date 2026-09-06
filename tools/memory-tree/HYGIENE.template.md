@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.65 -->
+<!-- gov:kit memory-tree@2.66 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -186,6 +186,10 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     Every numbered acceptance bullet must also name the BREAK that would turn it red, in a clause
     marked `Red when:`, once the filename date reaches `SPEC_FAILURE_MODE_CUTOFF`, on either tier.
     The per-bullet walk is shared with the witness arm above and each reads only its own key.
+    A Tier-2 spec must carry a `### Edges` block in §3 once the filename date reaches
+    `SPEC_EDGES_CUTOFF`: one bullet per edge, `**consumes-from**` or `**hands-off**` plus a
+    backticked sibling id or the bare word `external`, or the single word `none`. The SHAPE arm
+    runs under `--staged`; the reciprocity, order and payload JOINS are held there and announce it.
     Every §2 scope item must name the acceptance criterion that observes it, or carry `NOT OBSERVED`
     and a reason, once the filename date reaches `SCOPE_JOIN_CUTOFF`, on either tier — and only for a
     spec carrying BOTH headings, matched by heading TEXT rather than by ordinal. SHAPE only.

@@ -94,6 +94,15 @@ LEDGER_LABEL_CUTOFF=""
 # so a blank ACCEPTANCE_LEDGER_CUTOFF disarms it whatever this key says.
 LEDGER_TOKEN_CUTOFF=""
 
+# Sibling-edge ratchet (check 12): from this date a Tier-2 spec carries a `### Edges` sub-head inside
+# §3, holding one bullet per edge or the single word `none` — `**consumes-from**` or `**hands-off**`,
+# then a backticked sibling unit id or the bare word `external`. The SHAPE arm reads one spec and
+# runs under `--staged` too; the reciprocity, order and payload JOINS are held there and say so,
+# because the staged selection would report one end of a correct pair as missing. A join whose target
+# is outside the graded population is silent by design, not passing. Blank = never required; set it
+# strictly ahead of your corpus as with the cutoffs above.
+SPEC_EDGES_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.

@@ -64,7 +64,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\nSPEC_EDGES_CUTOFF="2026-08-20"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -667,6 +667,57 @@ ledspec 144 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observe
 #       `form` does not reach the spec side at all, so this one needs no head token.
 ledspec 146 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed at length
   by `alpha.sh`, which is named only here.'
+
+# ---- TOOL-aJoinedCanon-8: the four §3 EDGE arms. SPEC_EDGES_CUTOFF is 2026-08-20 in the shared
+# ---- conf. These are Tier-2 by construction: the arm sits BELOW the `hdr ~ /Tier-1/ next` cut,
+# ---- because declaring edges is a Tier-2 obligation and the light profile is exempt from it.
+edgespec() {   # $1 num · $2 date-day · $3 order · $4 edges body (empty = NO Edges block)
+  { printf '# ARCH-tFixture-%s — a unit
+
+' "$1"
+    printf '**Status:** OPEN · rev-1 · 2026-08-%s · node a · Tier-2 · base 1234abcd · streams architecture · order %s
+
+' "$2" "$3"
+    printf '## 3. Non-goals (OUT)
+
+none.
+
+'
+    [ -n "$4" ] && printf '### Edges
+
+%s
+
+' "$4"
+    printf '## 9. Revision log
+
+- rev-1 · 2026-08-%s · initial draft.
+' "$2"
+  } > "$D/spec/2026-08-$2-spec-tFixture-$1.md"
+}
+# 160 — no Edges block at all. The SHAPE arm, and the only one that runs under --staged.
+edgespec 160 25 1 ''
+# 161 — a declared `none`. Silent: an absent declaration and a declared absence are different bytes.
+edgespec 161 25 2 'none'
+# 162 <-> 163 — a mutual pair, both directions declared. Silent.
+edgespec 162 25 3 '- **hands-off** `ARCH-tFixture-163` — the second half.'
+edgespec 163 25 4 '- **consumes-from** `ARCH-tFixture-162` — the first half.'
+# 164 -> 165 — one end declared and the other silent. RECIPROCITY.
+edgespec 164 25 5 '- **hands-off** `ARCH-tFixture-165` — the second half.'
+edgespec 165 25 6 'none'
+# 166 <-> 167 — mutual, and pointing the wrong way through the build order. ORDER, both directions.
+edgespec 166 25 7 '- **consumes-from** `ARCH-tFixture-167` — taken.'
+edgespec 167 25 8 '- **hands-off** `ARCH-tFixture-166` — given.'
+# 168 — a bullet whose head is the cut third verb. SHAPE again, and it names the offending head.
+edgespec 168 25 9 '- **depends-on** `ARCH-tFixture-161` — the verb this format does not have.'
+# 169 — PRE-cutoff, no Edges block. Nothing landed goes retroactively red.
+edgespec 169 10 10 ''
+# 170 — an `external` payload. Legal, and joined to nothing.
+edgespec 170 25 11 '- **consumes-from** external — a precondition nobody in this build builds.'
+# 171 — a bullet with a legal verb and NO payload. The third join arm.
+edgespec 171 25 12 '- **hands-off** — something, somewhere.'
+# 172 — an `external` payload whose PROSE names a sibling in this build. A joinable edge written
+#       as an unjoinable one, which both joins would otherwise skip in silence.
+edgespec 172 25 13 '- **consumes-from** external — in practice the work `ARCH-tFixture-161` does.'
 { printf '# ledger two
 
 **Serves:** journal ARCH-tFixture-140 ARCH-tFixture-142 ARCH-tFixture-143 ARCH-tFixture-144 ARCH-tFixture-145 ARCH-tFixture-146
@@ -776,6 +827,25 @@ hit  'ARCH-tFixture-142/AC1'                   # labels agree, content shares no
 miss 'ARCH-tFixture-143/AC1'                   # the shared token is on the answer continuation line
 hit  'ARCH-tFixture-144/AC1'                   # ...and deleting that continuation token reds it
 miss 'ARCH-tFixture-146/AC1'                   # the CRITERION names its token in its own wrap
+
+# ---- TOOL-aJoinedCanon-8: the four §3 edge arms and the three `fail 12` branches the joins add.
+hit  'tFixture-160.md (§3 carries no `### Edges` block'
+miss 'tFixture-161.md (§3 carries no `### Edges` block'   # a declared `none`
+miss 'tFixture-169.md (§3 carries no `### Edges` block'   # PRE-cutoff, grandfathered
+hit  'tFixture-168.md (§3 `### Edges` bullets whose head is neither'
+hit  '**depends-on**'                                     # ...and it NAMES the offending head
+hit  'a §3 edge names a sibling that declares no matching edge back, so one author read the handoff and the other never saw it'
+hit  'tFixture-164.md (§3 declares **hands-off** `ARCH-tFixture-165` and that unit declares no matching **consumes-from**'
+miss 'tFixture-162.md (§3 declares'                       # the mutual pair is silent both ways
+miss 'tFixture-163.md (§3 declares'
+hit  'a §3 edge runs against the build order its own status headers declare'
+hit  'tFixture-166.md (§3 **consumes-from** `ARCH-tFixture-167`, whose `order` 8 is AFTER this unit at 7)'
+hit  'tFixture-167.md (§3 **hands-off** `ARCH-tFixture-166`, whose `order` 7 is BEFORE this unit at 8)'
+hit  'a §3 edge bullet carries no payload, so it names no sibling and declares nothing'
+hit  'tFixture-171.md (§3 `### Edges` bullet with no payload'
+miss 'tFixture-170.md (§3'                                # an `external` payload joins to nothing
+hit  'a §3 edge declares an external payload while its own prose names a sibling in this build, so a joinable edge was written as an unjoinable one'
+hit  'tFixture-172.md (§3 **consumes-from** external, and its prose names the sibling `ARCH-tFixture-161` in this build'
 miss 'ARCH-tFixture-145/AC1'                   # the CRITERION has no token: check 12's arm, not this
 hit  'an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox'
 hit  'a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true'

@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.65 -->
+<!-- gov:kit memory-tree@2.66 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -130,6 +130,39 @@ an absent region cannot be told from a spec nobody has recorded against.
   and add the `ratified <date>` pointer to the header tail. §8 must read `none` or be fully
   RESOLVED before the status may go CLOSED/WONTDO (machine-checked).
 
+## §3 Edges — what this unit takes, and what it leaves
+
+Required on a Tier-2 spec whose FILENAME date is on or after `SPEC_EDGES_CUTOFF` (`.memory-tree.conf`;
+blank turns it off). A `### Edges` sub-head inside `## 3. Non-goals (OUT)`, holding one bullet per
+edge or the single word `none` — an absent declaration and a declared absence are different bytes.
+
+```markdown
+### Edges
+
+- **consumes-from** `<unit-id>` — what this unit takes, and what breaks without it
+- **hands-off** `<unit-id>` — what this unit leaves for that unit to do
+- **consumes-from** external — the precondition this unit does not build
+- **hands-off** external — the work this unit defers outside this build
+```
+
+Two verbs, one payload rule: a backticked unit id whose spec sits under the same
+`builds/<slug>/spec/` prefix, or the bare token `external` followed by prose. The marker bytes are
+ASCII on purpose — a multibyte dash crosses the writing tool, the shell and the gate's regex parser,
+and only the last of the three has an opinion about encoding.
+
+`order` is not an edge. It expresses SEQUENCE, and the defects this closes are edges: a criterion
+resting on something the unit does not build. The measured case is one spec whose AC1, AC2, AC3 and
+AC5 all rested on a verb the owner had cut from its scope; two of the four never spell the verb,
+which is why an edge is DECLARED and not grepped.
+
+**Three of the four arms are JOINS and are HELD under `--staged`**, with an announce line, because
+there the selection is the staged set and one end of a correctly declared pair would report the other
+as missing. The shape arm reads one file and stays live. A join whose target is outside the graded
+population — a Tier-1 sibling, or a spec the cutoff grandfathered — is silent by design: absence is
+not disagreement. And reciprocity proves the other author WROTE the line, never that their scope
+covers the work; a rubber-stamped reciprocal passes, and it is worth having because writing the line
+requires reading the handoff.
+
 ## §7 Gates — the shape the leg join reads, and where a new arm lives
 
 `{{TOOL_ROOT}}check-spec-tokens.py` resolves a §7 gate name against `{{TOOL_ROOT}}gate-legs.json`, and
@@ -245,6 +278,13 @@ it asserts the item names a label, never that the criterion so named actually ob
 ## 3. Non-goals (OUT)
 
 The explicit cut-line: what an eager builder might include but must not. Name follow-ups.
+
+### Edges
+
+- **consumes-from** `<unit-id>` — what this unit takes, and what breaks without it
+- **hands-off** `<unit-id>` — what this unit leaves for that unit to do
+
+Or the single word `none`. Rules: the §3 section above this skeleton.
 
 ## 4. Design
 

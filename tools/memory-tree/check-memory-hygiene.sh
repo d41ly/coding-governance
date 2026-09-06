@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.65   # gov:kit memory-tree@2.65 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.66   # gov:kit memory-tree@2.66 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -65,6 +65,8 @@ SPEC_FAILURE_MODE_CUTOFF="" # date; specs dated >= this must give every acceptan
 # whatever their own keys say. Preset here for the same adopter argument as their siblings.
 LEDGER_LABEL_CUTOFF=""  # date; a ledger answer whose label the spec does not number is a finding (check 23); blank = never required
 LEDGER_TOKEN_CUTOFF=""  # date; a ledger answer must share a backticked token with its own criterion (check 23); blank = never required
+# The NINTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-8).
+SPEC_EDGES_CUTOFF=""    # date; Tier-2 specs dated >= this must carry a `### Edges` block in §3 (check 12); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -965,7 +967,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v stg="$STAGED" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1300,6 +1302,78 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
     }
 
     if (hdr ~ /Tier-1/) next
+    # ---- TOOL-aJoinedCanon-8: SIBLING EDGES. A `### Edges` sub-head inside §3, one bullet per edge
+    # ---- or the single word `none`. 94% of specs sit in multi-spec builds and the ONE cross-unit field the format has
+    # ---- is the optional `order`, which expresses SEQUENCE and never an EDGE — so
+    # ---- a criterion resting on something the unit does not build had nowhere to say so. The
+    # ---- measured case: one spec whose AC1, AC2, AC3 and AC5 all rested on a verb the owner cut
+    # ---- from its scope. Four criteria died in place and nothing had asked what they rested on.
+    # ---- Two of the four never spell the verb, which is why the join is DECLARED and not grepped.
+    # ---- BELOW the Tier-1 cut because this is a Tier-2 obligation, and OUTSIDE every cutoff guard
+    # ---- on the path: it carries its own edgecut liveness test and inherits no neighbour.
+    # ---- The marker bytes are ASCII on purpose: a multibyte dash crosses the writing tool, the
+    # ---- shell and the awk regex parser, and only the last has an opinion about encoding.
+    if (edgecut != "" && fdate != "" && fdate >= edgecut) {
+      # Four values, all read from what this pass already holds. Nothing re-reads a file.
+      eg_slug = f; sub(/\/spec\/.*$/, "", eg_slug); sub(/^.*\//, "", eg_slug)
+      eg_uid = ""
+      for (i = 1; i <= n; i++) if (body[i] ~ /^# [A-Z][A-Za-z0-9-]* /) {
+        eg_uid = body[i]; sub(/^# /, "", eg_uid); sub(/ .*$/, "", eg_uid); break
+      }
+      # A header carrying something order-shaped that does not conform reads as UNORDERED here, and
+      # that is safe rather than silent: gen_build_index.py REFUSES such a value and hygiene check 9
+      # runs it, so the tree cannot carry one past the bar.
+      eg_ord = ""; eg_p = index(hdr, "· order ")
+      if (eg_p > 0) {
+        eg_ord = substr(hdr, eg_p + length("· order "))
+        sub(/[^0-9].*$/, "", eg_ord)
+      }
+      eg_in3 = 0; eg_ined = 0; eg_has = 0; eg_n = 0; eg_bad = ""; eg_nb = 0; eg_none = 0
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (L ~ /^## /) { eg_in3 = (L ~ /^## [0-9]+[.] Non-goals/); eg_ined = 0; continue }
+        if (!eg_in3) continue
+        if (L ~ /^### /) { eg_ined = (L ~ /^### Edges[ 	]*$/); if (eg_ined) eg_has = 1; continue }
+        if (!eg_ined) continue
+        if (L ~ /^[ 	]*$/) continue
+        if (L ~ /^none[.]?[ 	]*$/) { eg_none = 1; continue }
+        if (L !~ /^(-|\*)[ 	]/) continue
+        eg_n++
+        # The two verbs, and nothing else. A bullet whose head is neither is a finding rather than
+        # a silent skip: a mis-spelled verb is exactly how a declared edge stops being declared.
+        if (L !~ /^(-|\*)[ 	]*\*\*(consumes-from|hands-off)\*\*[ 	]/) {
+          eg_nb++; eg_h = L; sub(/^(-|\*)[ 	]*/, "", eg_h); sub(/[ 	].*$/, "", eg_h)
+          eg_bad = (eg_nb == 1) ? eg_h : eg_bad ", " eg_h
+          continue
+        }
+        eg_v = L; sub(/^(-|\*)[ 	]*\*\*/, "", eg_v); sub(/\*\*.*$/, "", eg_v)
+        eg_t = L; sub(/^[^*]*\*\*[^*]*\*\*[ 	]*/, "", eg_t)
+        if (eg_t ~ /^`/) { sub(/^`/, "", eg_t); sub(/`.*$/, "", eg_t) }
+        else { sub(/[^A-Za-z0-9_-].*$/, "", eg_t) }
+        # ONE sentinel byte for all three join classes, with the class name as the first tab field.
+        # \001 is the canon-diff excerpt request and \002 is claimed by a sibling; three bytes would
+        # be three routes to write and nothing to buy.
+        # The bullet PROSE rides along, backtick-joined, so the external-payload arm can ask whether
+        # a bullet that says `external` names a sibling in its own words. Two of the four criteria in
+        # the measured case never spelled the verb they rested on, which is why that is a real shape.
+        eg_pr = ""; eg_rest = L
+        while (match(eg_rest, /`[^`]+`/)) {
+          eg_pr = eg_pr substr(eg_rest, RSTART + 1, RLENGTH - 2) "`"
+          eg_rest = substr(eg_rest, RSTART + RLENGTH)
+        }
+        if (stg == 0) print "\003\tE\t" eg_slug "\t" eg_uid "\t" eg_ord "\t" eg_v "\t" eg_t "\t" f "\t" eg_pr
+      }
+      if (!eg_has)
+        print f " (§3 carries no `### Edges` block, required at/after SPEC_EDGES_CUTOFF " edgecut "; write `none` when there are no edges)"
+      else if (eg_n == 0 && !eg_none)
+        print f " (§3 `### Edges` is empty; write `none` when there are no edges, so an absent declaration and a declared absence are different bytes)"
+      if (eg_nb > 0)
+        print f " (§3 `### Edges` bullets whose head is neither **consumes-from** nor **hands-off**): " eg_bad
+      # The pass REGISTERS this spec, so the joins below can tell "the sibling refused the edge" from
+      # "the sibling was never graded" — a Tier-1 spec is `next`-ed above and a grandfathered one
+      # never reaches here, and both are legitimate absences rather than disagreements.
+      if (stg == 0) print "\003\tU\t" eg_slug "\t" eg_uid "\t" eg_ord "\t\t\t" f
+    }
     # ---- Tier-2 body assertions ----
     ng = 0; got = ""
     for (i = 1; i <= n; i++) if (body[i] ~ /^## /) { got = (++ng == 1) ? body[i] : got "\n" body[i] }
@@ -1418,6 +1492,64 @@ case "$bad12_raw" in
     done) ;;
   *) bad12=$bad12_raw ;;
 esac
+# ---- TOOL-aJoinedCanon-8: the three EDGE JOINS, routed out of the \003 sentinel records the pass
+# ---- above emits. They are HELD under --staged and say so: c12_sel is the STAGED set there, so a
+# ---- developer committing one spec of a correctly declared pair would see the other end reported
+# ---- missing — a red on honest work. The per-file shape arm stays live under --staged, because a
+# ---- truncated corpus cannot change its answer about the one file it reads.
+edge12=$(printf '%s\n' "$bad12_raw" | grep $'^\003\t' || true)
+bad12=$(printf '%s\n' "$bad12" | grep -v $'^\003\t' || true)
+if [ "$STAGED" = 1 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
+  echo "memory-hygiene: the §3 edge JOINS are held under --staged — the selection is the staged set, so one end of a correctly declared pair would report the other as missing. The shape arm still ran; the push-boundary run is where the joins bind."
+elif [ -n "$edge12" ]; then
+  edgebad=$(printf '%s\n' "$edge12" | awk -F'\t' '
+    $2 == "U" { pop[$3 SUBSEP $4] = 1; ord[$3 SUBSEP $4] = $5; file[$3 SUBSEP $4] = $8; next }
+    $2 == "E" { k = ++ne; eslug[k] = $3; euid[k] = $4; eord[k] = $5; everb[k] = $6; etgt[k] = $7; efile[k] = $8
+                eprose[k] = $9
+                seen[$3 SUBSEP $4 SUBSEP $6 SUBSEP $7] = 1 }
+    END {
+      for (k = 1; k <= ne; k++) {
+        s = eslug[k]; u = euid[k]; v = everb[k]; t = etgt[k]
+        # EXTERNAL payload: legal, and the only check is that it is not a SIBLING wearing the wrong
+        # payload. An id in this build reached by `external` is a declared edge nobody can join, and
+        # both joins below would skip it silently — which is the shape this arm exists to refuse.
+        if (t == "external") {
+          np = split(eprose[k], pr, "`")
+          for (pi = 1; pi <= np; pi++) {
+            if (pr[pi] == "" || pr[pi] == u) continue
+            if ((s SUBSEP pr[pi]) in pop)
+              print "\003X\t" efile[k] " (§3 **" v "** external, and its prose names the sibling `" pr[pi] "` in this build; use **" v "** `" pr[pi] "` so the edge can be joined)"
+          }
+          continue
+        }
+        if (t == "") { print "\003E\t" efile[k] " (§3 `### Edges` bullet with no payload: name a sibling unit id in backticks, or the bare word `external`)"; continue }
+        # ABSENCE IS NOT DISAGREEMENT. A target outside the registered population is a Tier-1
+        # sibling or a grandfathered spec, and both are legitimate. Silent, and declared as such.
+        if (!((s SUBSEP t) in pop)) continue
+        mirror = (v == "hands-off") ? "consumes-from" : "hands-off"
+        if (!((s SUBSEP t SUBSEP mirror SUBSEP u) in seen))
+          print "\003R\t" efile[k] " (§3 declares **" v "** `" t "` and that unit declares no matching **" mirror "** `" u "` back)"
+        if (eord[k] != "" && ord[s SUBSEP t] != "") {
+          if (v == "consumes-from" && ord[s SUBSEP t] + 0 > eord[k] + 0)
+            print "\003O\t" efile[k] " (§3 **consumes-from** `" t "`, whose `order` " ord[s SUBSEP t] " is AFTER this unit at " eord[k] ")"
+          if (v == "hands-off" && ord[s SUBSEP t] + 0 < eord[k] + 0)
+            print "\003O\t" efile[k] " (§3 **hands-off** `" t "`, whose `order` " ord[s SUBSEP t] " is BEFORE this unit at " eord[k] ")"
+        }
+      }
+    }')
+  _er=$(printf '%s\n' "$edgebad" | grep $'^\003R\t' | sed $'s/^\003R\t//' || true)
+  _eo=$(printf '%s\n' "$edgebad" | grep $'^\003O\t' | sed $'s/^\003O\t//' || true)
+  _ee=$(printf '%s\n' "$edgebad" | grep $'^\003E\t' | sed $'s/^\003E\t//' || true)
+  _ex=$(printf '%s\n' "$edgebad" | grep $'^\003X\t' | sed $'s/^\003X\t//' || true)
+  [ -z "$_ex" ] || fail 12 "a §3 edge declares an external payload while its own prose names a sibling in this build, so a joinable edge was written as an unjoinable one:
+$_ex"
+  [ -z "$_er" ] || fail 12 "a §3 edge names a sibling that declares no matching edge back, so one author read the handoff and the other never saw it:
+$_er"
+  [ -z "$_eo" ] || fail 12 "a §3 edge runs against the build order its own status headers declare:
+$_eo"
+  [ -z "$_ee" ] || fail 12 "a §3 edge bullet carries no payload, so it names no sibling and declares nothing:
+$_ee"
+fi
 [ -n "$bad12" ] && fail 12 "spec files dated >= $SPEC_FORMAT_CUTOFF not conforming to $M/TEMPLATE-SPEC.md:
 $bad12"
 # ---- THE §10 EVIDENCE ARM ANNOUNCES A ZERO POPULATION. At adoption its cutoff is set strictly
@@ -1451,6 +1583,15 @@ if [ "$STAGED" = 0 ] && [ -n "$SPEC_FAILURE_MODE_CUTOFF" ]; then
   _fm_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_FAILURE_MODE_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_fm_n:-0}" -gt 0 ] || echo "memory-hygiene: the §6 failure-mode arm graded NO spec — SPEC_FAILURE_MODE_CUTOFF is $SPEC_FAILURE_MODE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
+fi
+# Same notice, same footing, for the §3 edge arms (TOOL-aJoinedCanon-8). Load-bearing here rather
+# than a nicety: under the ratified cutoff the whole LIVE CORPUS is the grandfather case, so a green
+# with a graded population of zero and a green with a graded population of hundreds are the same
+# byte, and this line is the only thing that tells them apart.
+if [ "$STAGED" = 0 ] && [ -n "$SPEC_EDGES_CUTOFF" ]; then
+  _eg_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC_EDGES_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_eg_n:-0}" -gt 0 ] || echo "memory-hygiene: the §3 edge arms graded NO spec — SPEC_EDGES_CUTOFF is $SPEC_EDGES_CUTOFF and every tracked spec predates it. That is the intended state at adoption; their coverage is the self-test fixtures, not this corpus."
 fi
 fi
 

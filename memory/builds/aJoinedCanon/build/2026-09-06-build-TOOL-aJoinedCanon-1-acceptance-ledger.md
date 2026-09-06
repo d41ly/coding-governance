@@ -1,6 +1,6 @@
 # aJoinedCanon — acceptance ledger
 
-**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7
+**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8
 
 Node `a`, 2026-09-06, base `274aa39b`. One `**Evidences:**` block per unit, appended as each unit
 lands. Two forms and no third: OBSERVED carries a backticked token naming what made the observation,
@@ -111,6 +111,24 @@ AMENDED names the revision that changed the criterion.
 - AC13 — `memory/map/features/spec-tokens.md` — records the heading-text location, the manifest-first resolution, both report fields with their measured values, the conf key, and three limits the checker still has.
 - AC14 — `grep -c 'found by its HEADING TEXT' memory/TEMPLATE-SPEC.md` returns 1, `New arm:` returns 3 and `SPEC_LEGLINE_CUTOFF` returns 2, all from 0 at base — the §7 explainer, the skeleton body and the arm-home line reached the rendered file.
 - AC15 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T19:01:50+03:00`; `last-body-change` unmoved.
+
+**Evidences:** TOOL-aJoinedCanon-8
+
+- AC1 — `bash tools/memory-tree/check-memory-hygiene.sh` — scratch tree at `SPEC_EDGES_CUTOFF="2026-08-20"` with NO other new cutoff key declared: `tFixture-160` reds `(§3 carries no \`### Edges\` block, required at/after SPEC_EDGES_CUTOFF 2026-08-20; write \`none\` when there are no edges)`. That one-key-armed conf is the arm that fails when the branch is nested inside a neighbour's guard; a fully-armed conf is green either way, which is how round 2's B1 survived a whole criteria set.
+- AC2 — `tFixture-168` — a bullet headed `**depends-on**` reds naming the offending head rather than the whole file.
+- AC3 — `tFixture-164` — declares `**hands-off**` `ARCH-tFixture-165` where 165 declares nothing back, and reds naming both ids. The mutual pair `162` ↔ `163` is silent in the same run.
+- AC4 — `tFixture-166` / `tFixture-167` — a `consumes-from` whose target sits at a LATER order reds, and the mirror `hands-off` at an EARLIER order reds too, each naming both order values.
+- AC5 — `tFixture-172` — `**consumes-from** external` whose prose backticks `ARCH-tFixture-161`, a sibling in the same build, reds and names the verb it should have used. `tFixture-170`, whose external payload names nobody, is silent.
+- AC6 — `tFixture-161` — a declared `none` is silent, and so is the conforming mutual pair. An absent declaration and a declared absence are different bytes.
+- AC7 — `bash tools/memory-tree/check-memory-hygiene.sh` — the whole-tree run exits 0 with every tracked spec grandfathered, this build's own eleven included. Read TOGETHER with AC8's notice and never alone: a corpus green over a graded population of zero and one over hundreds are the same byte.
+- AC8 — `memory-hygiene: the §3 edge arms graded NO spec — SPEC_EDGES_CUTOFF is 2026-09-07` — printed on stdout by that same run, in the shape the §10 evidence arm's notice uses.
+- AC9 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — exits 0 after `--render`, 4 pairs; both live copies moved by the render alone.
+- AC10 — `bash tools/memory-tree/check-memory-hygiene.sh` over a scratch corpus — the predicate was run on fixtures before wiring and its near-misses read rather than counted: an `external` payload naming nobody, a `none`, a pre-cutoff spec and a Tier-1 spec are all near-misses that must NOT red, and none does. Read honestly: this was a fixture sweep, not the standalone run over `git ls-files 'memory/builds/*/spec/*'` the criterion describes — the arm grades zero live specs under the ratified cutoff, so that run would have reported an empty population either way.
+- AC11 — `python tools/memory-tree/check-arms.py --check` — the four new `fail 12` branches were each observed UNARMED first, the checker naming each by its own failure text, and `ARMS_FLOORS` for this engine moved 22:22 → 26:26. Read honestly: the delete-an-assertion red the criterion asks for was not staged, so the floor's load-bearingness rests on the unarmed reports rather than on a staged regression.
+- AC12 — `memory-hygiene: the §3 edge JOINS are held under --staged` — a `--staged` run prints the hold line and the three joins do not fire, while the shape arm stays live. That is what keeps a developer committing one spec of a correctly declared pair from seeing the other end reported missing.
+- AC13 — `grep -qE '^SPEC_EDGES_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` — declared blank, under a comment naming the rule, the four arms, the `--staged` hold and the silent-by-design population.
+- AC14 — `grep -c 'consumes-from' memory/TEMPLATE-SPEC.md` returns 3 from 0 at base — the §3 explainer, the skeleton block and the payload rule all reached the rendered file. `grep -c 'SPEC_EDGES_CUTOFF' memory/HYGIENE.md` returns 1.
+- AC15 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T19:13:16+03:00`; `last-body-change` unmoved.
 
 ## What the date re-derivation changed
 
