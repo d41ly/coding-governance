@@ -1220,6 +1220,21 @@
     "ceiling": 370
   },
   {
+    "name": "extract-arms self-test",
+    "argv": [
+      "bash",
+      "tools/lib/extract-arms.test.sh"
+    ],
+    "guard": [
+      "tools/lib/extract-arms.sh",
+      "tools/lib/extract-arms.test.sh",
+      "tools/lib/lib-selftest.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "run-selftests self-test",
     "argv": [
       "bash",

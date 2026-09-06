@@ -58,6 +58,7 @@ codebase-map adopter e2e	70		worst of 7 readings 46s, x1.5
 codebase-map kit selftest	60		worst of 9 readings 27s, x1.5
 corpus-ids selftest	1080		worst of 10 readings 715s, x1.5
 dead-path carriers self-test	900		worst of 11 readings 599s, x1.5
+extract-arms self-test	60		measured 11s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
 drift-audit selftest	1290		worst of 8 readings 855s, x1.5
 gotchas selftest	90		worst of 10 readings 54s, x1.5
 govkit selftest	1600		worst of 7 readings 1065s, x1.5
