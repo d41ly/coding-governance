@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 7 · ratified 2026-09-05
+**Status:** SPECCED · rev-6 · 2026-09-06 · node a · Tier-2 · base 750ca0ca · streams tooling · order 7 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -73,7 +73,7 @@ thing this arm reds.
   that omits its Gates section is silent by design — so the dossier does not describe a checker that
   no longer exists.
 - **S7** — The dated demand, which is the owner's ruling on §8's fork. `.memory-tree.conf` declares
-  `SPEC_LEGLINE_CUTOFF="2026-09-06"`; `tools/check-spec-tokens.py` reads that one key; a live spec
+  `SPEC_LEGLINE_CUTOFF="2026-09-07"`; `tools/check-spec-tokens.py` reads that one key; a live spec
   whose filename date is at or after it, which CARRIES a Gates heading, and whose Gates section
   contributes no graded leg name becomes a hit. The Gates-heading precondition is the whole of the
   Tier-1 accommodation and it is S4's heading-text location doing the work: under the light profile a
@@ -253,17 +253,18 @@ Three edits inside the existing per-spec walk over `specs`:
 
 ### The cutoff, and the conf read it costs
 
-`SPEC_LEGLINE_CUTOFF="2026-09-06"`, in this repo's `.memory-tree.conf` beside the dated cutoffs
+`SPEC_LEGLINE_CUTOFF="2026-09-07"`, in this repo's `.memory-tree.conf` beside the dated cutoffs
 already there — seven at the fold, and the count is a
 `grep -cE '^[A-Z][A-Z0-9_]*_CUTOFF=' .memory-tree.conf` rather than a number this spec keeps fresh.
 The character class is the engine's own: `check-memory-hygiene.test.sh` derives `_engpresets` with
 exactly that shape. It is not cosmetic. The `^[A-Z_]+` this spec carried through rev-3 cannot match a
 digit, so it returned six by silently dropping `SPEC10_EVIDENCE_CUTOFF` — the one key the next
 paragraph cites as this arm's own precedent. A derivation that omits its own witness is the
-could-not-fail shape inside the remedy for it. The date is the build-wide one and is not re-derived here: `TOOL-aJoinedCanon-1`'s
-fold measured it across all 44 local and remote refs and all 15 live worktrees — newest spec filename
-date 2026-09-04, nothing dated 2026-09-05 anywhere — so 2026-09-06 is the first date this fleet can
-no longer write into. Every cutoff this build introduces takes it.
+could-not-fail shape inside the remedy for it. The date is the build-wide one and is not re-derived here: `TOOL-aJoinedCanon-1`
+owns the derivation and re-ran it at build time on 2026-09-06 across every local and remote ref —
+the newest spec filename date is now 2026-09-05 and today is itself a date this fleet can still
+write into, so 2026-09-07 is the first date it cannot. Every cutoff this build introduces takes it,
+and that spec's §4 Migration carries the measurement rather than this one restating it.
 
 The accepted cost is therefore a fact and not a trade: **the arm grades zero specs on day one**, and
 S5's three fixtures are its entire coverage. That is the same state `STREAMS_CUTOFF`,
@@ -364,7 +365,7 @@ every carrier, the carrier set derived with `grep -rl` rather than listed.
   could find.
 - risks: low, and no longer zero — S7 gives this checker its first way to red a spec. The blast
   radius is bounded by the cutoff rather than by argument: no spec in the corpus is dated at or after
-  2026-09-06, so day one grades nothing, and the first spec it can red is one written after the rule
+  2026-09-07, so day one grades nothing, and the first spec it can red is one written after the rule
   exists and after the skeleton states it. The template edit still adds no requirement a gate reads
   BELOW the cutoff, so no landed spec changes verdict. The real risk is unchanged and is the fold-in
   order: EVERY unit at a lower `order` that lists
@@ -522,7 +523,7 @@ reds every gate run this unit's landing touches, not a scoped one.
     whose §7 contributes no leg name becomes a hit. Branch B loses and its text stays as the record
     of what was weighed, including its measured cost. The carrying argument is the recommendation's:
     the failure is SILENCE, which branch B cannot see — 31 of the 42 live specs name no leg at all at
-    the fold. The cutoff takes this build's own ruling, `SPEC_LEGLINE_CUTOFF="2026-09-06"`, strictly
+    the fold. The cutoff takes this build's own ruling, `SPEC_LEGLINE_CUTOFF="2026-09-07"`, strictly
     past the newest spec filename date on any branch, so the 31 stay green and the arm grades nothing
     on day one. Folded into S1, S2, S5, the new S7, §3's first non-goal, §4's cutoff section, §5, AC3,
     AC4, AC8, AC9 and §7's arm line.
@@ -531,7 +532,7 @@ reds every gate run this unit's landing touches, not a scoped one.
 
 - rev-1 · 2026-09-04 · initial draft.
 - rev-2 · 2026-09-05 · §8 · §1 · §2 · §3 · §4 · §5 · §6 · §7 · §10 · folded the owner's ruling on
-  FORK 1: branch A, a dated `SPEC_LEGLINE_CUTOFF="2026-09-06"` under which a §7 naming no leg reds.
+  FORK 1: branch A, a dated `SPEC_LEGLINE_CUTOFF="2026-09-07"` under which a §7 naming no leg reds.
   Added S7 and AC8–AC9, inverted §3's first non-goal, re-measured §4's population at the fold
   (31 of 42), and corrected §5, §7's arm line and §10, each of which described a checker that could
   not red.
@@ -593,6 +594,10 @@ reds every gate run this unit's landing touches, not a scoped one.
   derivation; B1's namespace class does not reach this unit, which introduces no awk binding, no
   engine function name and no `tFixture` number, as §7 already recorded; and `.memory-tree.conf` is
   the only path in §4's Files-touched table that is on the manifest's `watch:` line.
+- rev-6 · 2026-09-06 · §2 · §4 · §6 · §8 · re-derived the build-wide date at BUILD time:
+  `SPEC_LEGLINE_CUTOFF` takes `2026-09-07`, and §4's derivation paragraph stops asserting the
+  fold's measurement as current — it points at `TOOL-aJoinedCanon-1`, which owns it, and states
+  today's numbers.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4 · ratified 2026-09-05
+**Status:** SPECCED · rev-6 · 2026-09-06 · node a · Tier-2 · base 750ca0ca · streams tooling · order 4 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -298,7 +298,7 @@ diff.
   witness message that prints `(acceptance bullets naming no backticked witness, required at/after`.
 - risks — two. The first is a false-red risk rather than a data risk: a cutoff set behind a live
   spec's filename date reds landed work. §8's resolved date forecloses that at landing — re-derived
-  at rev-5, nothing on any ref is dated at or after `2026-09-06` — but the foreclosure is a
+  at rev-5, nothing on any ref is dated at or after `2026-09-07` — but the foreclosure is a
   PROPERTY that expires, not a permanent one, and the margin is now one day rather than the two §8
   was ruled with. Re-derive the newest spec filename date on the actual landing day; if it has
   reached the declared value, the ruled property obliges raising the key, not landing under it. The
@@ -349,7 +349,7 @@ diff.
   Red when: the blank string compares earlier than every date and arms the rule over the whole corpus,
   which is the `fmcut != ""` conjunct every rule cutoff in this engine carries.
   The tree is named because this criterion cannot be graded on the real one: under §8's ratified
-  2026-09-06 cutoff the arm grades zero live specs, so a whole-tree run is green with the key set and
+  2026-09-07 cutoff the arm grades zero live specs, so a whole-tree run is green with the key set and
   green with it blank, and a criterion whose two arms are indistinguishable observes nothing.
 - **AC7** — When a fixture dated on or after `SPEC_FAILURE_MODE_CUTOFF` carries a clauseless AC
   bullet in a scratch tree whose conf declares that key and declares NO `SPEC_WITNESS_CUTOFF` and no
@@ -470,7 +470,7 @@ diff.
   lands strictly past the newest spec filename date on any ref, which is 2026-09-04 across every
   branch and remote-tracking ref in this tree, and strictly past today as well, because a spec
   minted today would carry today's date and would not sit behind a cutoff set at it. The declared
-  value is therefore `SPEC_FAILURE_MODE_CUTOFF="2026-09-06"`. The twenty specs dated 2026-09-04,
+  value is therefore `SPEC_FAILURE_MODE_CUTOFF="2026-09-07"`. The twenty specs dated 2026-09-04,
   eleven of them this build's own, are NOT its first subjects. The accepted cost is now a fact
   rather than a tradeoff: the arm grades zero specs on the day it lands, and S6's fixtures are its
   whole coverage. The counter-argument above LOST and stays on the record — the witness ratchet did
@@ -482,7 +482,7 @@ diff.
   "is 2026-09-04". Re-derived at rev-5 with
   `git log --all --name-only --format= -- 'memory/**/spec/*' | grep -oE '/spec/[0-9-]{10}' | sort -r`:
   the newest is now **2026-09-05**, and eleven specs carrying it are already on `main`
-  (`aKeyedAnnotation`, `dTracedLattice`). Nothing on any ref is dated at or after `2026-09-06`, so
+  (`aKeyedAnnotation`, `dTracedLattice`). Nothing on any ref is dated at or after `2026-09-07`, so
   the ruled VALUE still satisfies the ruled PROPERTY — strictly past every spec filename date and
   strictly past today — and the decision needs no re-opening. What changed is the margin: two days
   became one. §5's first risk now carries the expiry condition and the remedy, because a foreclosure
@@ -565,6 +565,10 @@ diff.
   presenting a dated foreclosure as permanent. §4's four `git grep` phrase counts are also gone: they
   were re-derived at rev-5, one of the four had already moved a round after being "re-measured", and
   the deriving command replaces all four integers.
+- rev-6 · 2026-09-06 · §2 · §4 · §6 · re-derived the build-wide date at BUILD time: today is
+  2026-09-06, a date this fleet can still write into, so `SPEC_FAILURE_MODE_CUTOFF` takes
+  `2026-09-07`. `TOOL-aJoinedCanon-1` §4 owns the measurement; rev-5's appended NOTE is untouched
+  and its ruled PROPERTY still holds under the new value.
 
 ## 10. Reuse audit
 

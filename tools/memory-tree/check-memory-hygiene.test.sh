@@ -64,7 +64,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -249,6 +249,36 @@ good10 | sed "s/base 0123abcd/base 0123abcd · streams architecture/" \
 # `if (hdr ~ /Tier-1/) next` cut, and without this fixture that scoping is asserted, not observed.
 printf '# t84\n\n**Status:** OPEN · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · fixture.\n\n## 10. Reuse audit\n\nNothing here.\n' \
   > "$D/spec/2026-08-25-spec-tFixture-84.md"
+
+# ---- TOOL-aJoinedCanon-1: the §9 rev-SCOPE arms. REV_SCOPE_CUTOFF is declared at 2026-08-20 in the
+# ---- conf above, between the two fixture eras, exactly as STREAMS_CUTOFF and SPEC_WITNESS_CUTOFF
+# ---- separate theirs. The real corpus cannot exercise this arm at all — the shipped cutoff sits
+# ---- strictly ahead of every dated spec on every branch, which is the ratified state and the reason
+# ---- the engine prints a zero-population notice — so these five fixtures are its ENTIRE coverage.
+# ---- Tier-1 throughout, deliberately: the arm sits above the Tier-1 cut and a Tier-1 fixture keeps
+# ---- the section canon out of the way, so a red here can only be this arm.
+revspec() { # $1 = fixture number, $2 = filename date, $3.. = the §9 entry lines
+  local num="$1" date="$2"; shift 2
+  { printf '# t%s\n\n**Status:** OPEN · rev-%s · %s · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 9. Revision log\n\n' \
+      "$num" "$([ $# -gt 1 ] && echo 2 || echo 1)" "$date"
+    printf '%s\n' "$@"
+    printf '\n## 10. Reuse audit\n\nNothing here.\n'
+  } > "$D/spec/$date-spec-tFixture-$num.md"
+}
+# 90 — post-cutoff, a rev-2 entry naming no section, scope id or acceptance id -> RED
+revspec 90 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review corrections.'
+# 91 — the same entry once it gains a section token -> silent
+revspec 91 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · §4 · folded the review corrections.'
+# 92 — PRE-cutoff twin of 90. Without it "no landed spec goes retroactively red" is an untested claim.
+revspec 92 2026-08-10 '- rev-1 · 2026-08-10 · initial draft.' '- rev-2 · 2026-08-10 · folded the review corrections.'
+# 93 — post-cutoff, rev-1 ONLY. A first draft moved the whole document, so it is exempt; without this
+#      fixture the exemption is asserted rather than observed, and it is 488 entries of the corpus.
+revspec 93 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.'
+# 94 — post-cutoff, the token on a WRAPPED continuation line rather than the head. This is the whole
+#      reason the arm accumulates per ENTRY: per LINE it marks about 30% of the corpus and reds half
+#      the specs that already do the right thing, because this house style wraps at ~100 columns.
+revspec 94 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review
+  corrections, which moved §4 and the acceptance criteria beneath it.'
 
 # ---- TOOL-cSettledDocket-3: Tier-1 twins for the two assertions HOISTED above the Tier-1 cut.
 # ---- Before the hoist every one of these was silent, because `next` cut the record first.
@@ -715,6 +745,32 @@ hit  'tFixture-85.md (§10 Reuse audit does not record the recall terms used AND
 # count. This arm is the one that fails if the probe blob ever goes back to a per-line cut.
 hit  'tFixture-86.md (§10 Reuse audit does not record the probe result'
 miss 'tFixture-84.md (header rev-1 not logged'  # and it reds for no OTHER reason either
+
+# ---- TOOL-aJoinedCanon-1: §9 rev-scope. AC1-AC5.
+hit  'tFixture-90.md (revision entries naming no section, scope id or acceptance id'
+miss 'tFixture-91.md (revision entries naming no'   # the entry gained a §4 token
+miss 'tFixture-92.md (revision entries naming no'   # PRE-cutoff, grandfathered
+miss 'tFixture-93.md (revision entries naming no'   # rev-1 only, exempt
+miss 'tFixture-94.md (revision entries naming no'   # the token is on a wrapped continuation line
+# the OFFENDING REV rides the message, not merely the file — a spec with a long §9 is otherwise a
+# search, and the cutoff rides it too, because check 12's own heading names SPEC_FORMAT_CUTOFF.
+n=$((n+1))
+grep -qF 'tFixture-90.md (revision entries naming no section, scope id or acceptance id, required at/after REV_SCOPE_CUTOFF 2026-08-20): rev-2' <<<"$out" \
+  || { echo "FAIL the rev-scope rejection does not name its own cutoff and the offending rev"; st=1; }
+# AC16 — no `-v` NAME is bound twice on the one check-12 awk invocation. Every cutoff arm in this
+# build binds a key there, it is ONE awk program so a repeated name is last-wins for the whole of it
+# SILENTLY, and each arm blanking its own key would then blank a sibling's binding too. Located by
+# the literal `bad12_raw=$(printf` rather than by line, because sibling units edit this engine.
+# LIVENESS: zero or several matches is a REFUSAL, not a clean zero — a later unit wrapping that
+# invocation would otherwise turn this into a check that passes because it looked at nothing.
+n=$((n+1))
+v12=$(grep -F 'bad12_raw=$(printf' "$SCRIPT")
+if [ "$(printf '%s\n' "$v12" | grep -c .)" != 1 ]; then
+  echo "FAIL the check-12 awk invocation locator matched $(printf '%s\n' "$v12" | grep -c .) lines, expected exactly 1 — this assertion cannot answer"; st=1
+else
+  dupv=$(printf '%s\n' "$v12" | grep -o -- ' -v [a-z0-9]*=' | sort | uniq -d)
+  [ -z "$dupv" ] || { echo "FAIL a -v name is bound twice on the one check-12 awk invocation:$dupv"; st=1; }
+fi
 miss 'tFixture-55.md ('   # the witness is on a continuation line and counts for its bullet
 miss 'tFixture-56.md ('   # a continuation opening with an AC reference is not a new bullet head
 # the cutoff rides the message: check 12's own heading names SPEC_FORMAT_CUTOFF, which is the wrong
@@ -958,6 +1014,9 @@ out3=$(bash "$SCRIPT" 2>/dev/null)
 if grep -qF 'on/after STREAMS_CUTOFF' <<<"$out3"; then echo "FAIL: the streams requirement fired with a blank STREAMS_CUTOFF"; st=1; fi
 n=$((n+1))
 if grep -qF 'no backticked witness' <<<"$out3"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
+# TOOL-aJoinedCanon-1 AC6 — the same run has REV_SCOPE_CUTOFF blank while check 12 is armed.
+n=$((n+1))
+if grep -qF 'revision entries naming no' <<<"$out3"; then echo "FAIL: the rev-scope requirement fired with a blank REV_SCOPE_CUTOFF"; st=1; fi
 # docs/legacy-note.md is still tracked in this run — only the conf key went away.
 n=$((n+1))
 if grep -qF 'is the only sanctioned memory root' <<<"$out3"; then echo "FAIL: check 11 ran with a blank TOMBSTONE_ROOTS"; st=1; fi
@@ -965,6 +1024,18 @@ if grep -qF 'is the only sanctioned memory root' <<<"$out3"; then echo "FAIL: ch
 n=$((n+1))
 grep -qF 'tFixture-20.md (streams value(s) outside the enum' <<<"$out3" \
   || { echo "FAIL: an illegal streams value went unchecked with a blank STREAMS_CUTOFF"; st=1; }
+# TOOL-aJoinedCanon-1 AC15 — INDEPENDENCE. The rev-scope arm has exactly ONE date guard, its own.
+# Nested inside the SPEC_WITNESS_CUTOFF block its real population would be the intersection of two
+# keys, so blanking an unrelated key would silently disarm it while its own key still read as armed.
+# That is round 1's blocker and round 2's blocker, and this run is the only local witness to it:
+# in the shipped conf both keys hold dates every graded spec clears, so the nesting is invisible.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nREV_SCOPE_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out3r=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'no backticked witness' <<<"$out3r"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
+n=$((n+1))
+grep -qF 'tFixture-90.md (revision entries naming no' <<<"$out3r" \
+  || { echo "FAIL: the rev-scope arm went silent when the UNRELATED SPEC_WITNESS_CUTOFF was blanked"; st=1; }
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 
 # ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector

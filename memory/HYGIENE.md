@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.61 -->
+<!-- gov:kit memory-tree@2.62 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -183,6 +183,11 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     Every acceptance bullet must name a witness in backticks once the filename date reaches
     `SPEC_WITNESS_CUTOFF`, on either tier. SHAPE only — that a bullet names something, never
     that the named thing exists.
+    Every §9 revision entry numbered rev-2 or higher must name what it MOVED — a `§<n>`, `S<n>` or
+    `AC<n>` token — once the filename date reaches `REV_SCOPE_CUTOFF`, on either tier. Graded per
+    ENTRY with continuation lines folded in, because this corpus wraps §9 and puts the detail in the
+    wrap; rev-1 is exempt, and the engine announces a zero population rather than passing silently
+    while the cutoff sits ahead of the corpus.
 
 13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
     and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so

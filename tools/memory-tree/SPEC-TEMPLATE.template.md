@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.61 -->
+<!-- gov:kit memory-tree@2.62 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -158,6 +158,30 @@ Before this arm existed the section was graded on presence and non-emptiness alo
 a citation naming the wrong seam satisfies it. That liveness belongs to whatever observes that a
 probe actually ran, which is outside this file.
 
+## REV_SCOPE_CUTOFF — a revision entry names what it MOVED
+
+Required on a spec of EITHER tier whose FILENAME date is on or after `REV_SCOPE_CUTOFF`
+(`.memory-tree.conf`; blank turns it off). An entry is one rev line plus every non-blank line that
+follows it, so a scope token may sit on a wrapped continuation and still counts.
+
+```
+- rev-<N> · <YYYY-MM-DD> · <scope> · <what moved>
+```
+
+`<scope>` is one or more `§<n>`, `S<n>` or `AC<n>` tokens, separated by spaces, commas or the `·`
+this corpus already writes its status fields with. The separator is house style rather than grammar:
+the gate reads PRESENCE. The field sits AFTER the date and never before it — `drift_report.py`
+anchors its revision-log signal on the rev number followed by the date, so a scope field inserted
+ahead of the date drops the entry out of that population.
+
+**rev-1 is exempt.** A first draft moved the whole document, so a scope list on it names everything
+and says nothing. Every entry numbered rev-2 or higher is graded.
+
+**SHAPE ONLY.** The arm asserts an entry NAMES a section, a scope id or an acceptance id — never
+that the fold actually touched what it names, exactly as the acceptance-witness arm grades a
+backticked token and not the thing the token points at. What it buys is that a resumed session, or
+the next round's folder, can re-read what a fold invalidated instead of re-reading the whole spec.
+
 ## The skeleton (copy everything below this line)
 
 ```markdown
@@ -254,7 +278,7 @@ an item resolved and never suppresses a mark on the same item.
 ## 9. Revision log
 
 - rev-1 · YYYY-MM-DD · initial draft.
-- rev-2 · YYYY-MM-DD · folded review wf_<id> corrections.   <!-- example shape -->
+- rev-2 · YYYY-MM-DD · §4 · AC3 · folded review wf_<id> corrections.   <!-- example shape -->
 
 ## 10. Reuse audit
 

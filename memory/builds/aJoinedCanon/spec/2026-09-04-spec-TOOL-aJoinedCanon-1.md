@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-1 — the revision log becomes a structured entry
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
+**Status:** SPECCED · rev-6 · 2026-09-06 · node a · Tier-2 · base 750ca0ca · streams tooling · order 1 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
@@ -85,7 +85,7 @@ almost nothing about where, which is the mechanism behind the corpus's dominant 
   live instance to cite. Adding it here would make this unit two mechanisms in the round that has
   no further audit to catch the second one.
 - **Retrofitting the corpus.** No landed spec is edited. Measured below: under the ratified cutoff
-  `2026-09-06`, zero landed specs change.
+  `2026-09-07`, zero landed specs change.
 - **The fold procedure's re-read set.** That is `TOOL-aJoinedCanon-2`, and it is the half of B1 that
   edits `memory/guides/BUILD-METHOD.md`. This unit writes no method PROSE — it touches that pair
   only for the kit-version marker, which §4's Files-touched table declares and which the parity test
@@ -130,7 +130,7 @@ that ends in `print f " (acceptance bullets naming no backticked witness…`. Th
 not a hypothetical one: this build's round-1 blocker and its round-2 blocker are both a new arm
 nested in that guard, whose real population becomes the INTERSECTION of two cutoffs while its own
 key reads as armed. Here the intersection would be invisible in this repo — `SPEC_WITNESS_CUTOFF` is
-`2026-08-15` and `REV_SCOPE_CUTOFF` is `2026-09-06`, so every spec reaching the second passes the
+`2026-08-15` and `REV_SCOPE_CUTOFF` is `2026-09-07`, so every spec reaching the second passes the
 first — and visible only in an adopter that arms one key and not the other, which is the case with
 no local witness. AC15 is that witness. Being outside the `if (hdr ~ /Tier-1/) next` cut also makes
 it a both-tiers arm for free, as `STREAMS_CUTOFF` and `SPEC_WITNESS_CUTOFF` are.
@@ -144,7 +144,7 @@ whole program, silently.
 
 The name is spelled out rather than abbreviated, and that is the whole point of it. Round 3's
 blocker was this unit and `TOOL-aJoinedCanon-4` both taking `mcut` on this invocation, for two
-different cutoff keys — invisible locally, because in this repo both keys hold `2026-09-06`, and
+different cutoff keys — invisible locally, because in this repo both keys hold `2026-09-07`, and
 invisible to both specs' criteria, because each blanks its own key and thereby blanks the shared
 binding and turns BOTH arms off. The mechanism was not bad luck: several units of this build each
 need a cutoff binding on this one invocation, the engine's live names there are `scut`, `wcut`,
@@ -246,17 +246,26 @@ there today, and that arm's own comment records this hole swallowing `FORK_MARK_
 §7 already owes — on this unit's own landing commit, for a reason with nothing to do with the arm
 being built.
 
-The date is `2026-09-06`, ratified by the owner at §8 F1 as one ruling over this whole build: every
+The date is `2026-09-07`, ratified by the owner at §8 F1 as one ruling over this whole build: every
 cutoff it introduces sits strictly past the newest spec filename date on any branch. Re-derived at
 the fold rather than carried over — across all 44 local and remote refs the newest spec filename
 date is 2026-09-04, no spec dated 2026-09-05 exists on any ref or in any of the 15 live worktrees,
-and today is 2026-09-05, so today is a date this fleet can still write into and 2026-09-06 is the
+and today is 2026-09-05, so today is a date this fleet can still write into and 2026-09-07 is the
 first one it cannot. `SPEC10_EVIDENCE_CUTOFF` is the precedent for that correction: measured
 2026-08-31, it took 2026-09-01 because sibling branches held specs dated on the measuring day.
 
+**Re-derived again at BUILD time, which is what "re-derived rather than carried over" obliges.** The
+paragraph above measured on 2026-09-05 and is left standing as the record of that measurement. Today
+is 2026-09-06: specs dated 2026-09-05 now exist on `main` and on eight other live branches, so the
+newest spec filename date on any ref has moved a day, and today is again a date this fleet can still
+write into — two unattended runs are live in it. Applying the ratified rule to today's measurement
+gives `2026-09-07`, and that is the value every carrier below carries. The date moved because the
+rule is a relation to the fleet's working day and not a constant; a value carried over from the fold
+would have armed the arm against a sibling branch landing a spec today.
+
 ### Rollout
 
-Under `REV_SCOPE_CUTOFF="2026-09-06"` the arm grades no spec in this corpus on day one, and the S6
+Under `REV_SCOPE_CUTOFF="2026-09-07"` the arm grades no spec in this corpus on day one, and the S6
 fixtures are its entire coverage. That is the ratified cost rather than a tradeoff still being
 weighed, and it is the state `STREAMS_CUTOFF`, `SPEC_WITNESS_CUTOFF` and `SPEC10_EVIDENCE_CUTOFF`
 each shipped in and each recorded. S5 is why it is not a silent green: the notice already exists for
@@ -330,7 +339,7 @@ a small, real constraint on how a spec discusses the template it edits.
   loud by design.
 - observability: the failure message names the file, the rev numbers and the cutoff.
 - risks (concurrency, data-loss, rollback hazards): the only real hazard was a cutoff that reds
-  in-flight branches on merge, and §8's ratified date retires it — `2026-09-06` sits past every spec
+  in-flight branches on merge, and §8's ratified date retires it — `2026-09-07` sits past every spec
   filename date on every ref, so no branch reds on merge. Rollback is blanking one conf key.
 - testing + left-shift gates: S6, with the red observed before landing per the build's own rule.
   AC15 is the second observed red and it costs no fixture — it rides the self-test's existing
@@ -344,7 +353,7 @@ a small, real constraint on how a spec discusses the template it edits.
 
 ## 6. Acceptance criteria
 
-- **AC1** When fixture `2026-09-06-spec-tFixture-90.md` carries a rev-2 entry naming no section,
+- **AC1** When fixture `2026-09-07-spec-tFixture-90.md` carries a rev-2 entry naming no section,
   scope id or acceptance id, `bash tools/memory-tree/check-memory-hygiene.sh` reds and its check-12
   output names that file and its rev number. The red is staged, confirmed and unstaged BEFORE the
   arm lands.
@@ -358,7 +367,7 @@ a small, real constraint on how a spec discusses the template it edits.
 - **AC6** When `.memory-tree.conf` declares `REV_SCOPE_CUTOFF=""`, the blank-cutoff run in
   `check-memory-hygiene.test.sh` emits no `revision entries naming no` finding at all.
 - **AC7** When `bash tools/memory-tree/check-memory-hygiene.sh` runs over this tree at the landing
-  sha, it exits 0. Read honestly: under `REV_SCOPE_CUTOFF="2026-09-06"` the arm grades no spec, so
+  sha, it exits 0. Read honestly: under `REV_SCOPE_CUTOFF="2026-09-07"` the arm grades no spec, so
   this criterion CANNOT go red for the reason "a landed spec was redded by the new arm" — no such
   spec exists to red. What it does observe is that the engine edit broke nothing ELSE in check 12,
   which is a real failure mode and the one the `-v` binding and the awk dialect surface actually
@@ -494,15 +503,17 @@ its four greps are written out in full so that running it takes no judgement.
     could back-fill its OWN units and this one cannot back-fill another node's branch.
   - RESOLVED (owner, 2026-09-05): ahead of the fleet, ruled across the whole build at once — every
     cutoff this build introduces sits strictly past the newest spec filename date on any branch, so
-    nothing landed and nothing in flight goes red. `REV_SCOPE_CUTOFF="2026-09-06"`. The date is
+    nothing landed and nothing in flight goes red. `REV_SCOPE_CUTOFF="2026-09-07"`. The date is
     RE-DERIVED and not the one the option above names: that bullet was written on 2026-09-04, when
     2026-09-05 was tomorrow, and today is 2026-09-05, so it is now the fleet's own working date
     rather than a date ahead of it. Measured at the fold across all 44 local and remote refs — newest
     spec filename date 2026-09-04, no spec dated 2026-09-05 on any ref or in any of the 15 live
-    worktrees — 2026-09-06 is the first date this fleet can no longer write into.
+    worktrees — 2026-09-06 was the first date this fleet could no longer write into.
     `SPEC10_EVIDENCE_CUTOFF` is the precedent for the same correction. The accepted cost is now a
     fact rather than a tradeoff: the arm grades zero specs on day one, and its S6 fixtures are its
-    entire coverage.
+    entire coverage. The RULE is what the owner ratified and the DATE is derived from it, so the
+    derivation was re-run at build time on 2026-09-06 and returned `2026-09-07` — §4's Migration
+    carries that measurement, and every carrier in this build takes the same value.
 
 ## 9. Revision log
 
@@ -566,6 +577,13 @@ its four greps are written out in full so that running it takes no judgement.
   replaced by the derivation, which is the rule this document keeps re-breaking. §3's
   `TOOL-dUnstalledConvoy-14` non-goal records that round 3's H1 gave that backlog row its missing
   reachability evidence, and states that the evidence goes to the row rather than into this unit.
+- rev-6 · 2026-09-06 · §4 · §6 AC1 AC7 AC12 · §8 · re-derived the ratified date at BUILD time,
+  which §4's Migration obliges: specs dated 2026-09-05 now sit on `main` and eight other live
+  branches, and today is 2026-09-06 with two unattended runs live in it, so the rule the owner
+  ratified returns `REV_SCOPE_CUTOFF="2026-09-07"`. §4's Migration carries the new measurement
+  beside the fold's, the §8 mark records that the rule was ratified and the date derived from it,
+  and AC1's fixture filename moved to 2026-09-07 so the observed red stays reachable. The fold's
+  own measurement sentences are left standing as the record of what was measured then.
 
 ## 10. Reuse audit
 

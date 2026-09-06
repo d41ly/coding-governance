@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.61   # gov:kit memory-tree@2.61 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.62   # gov:kit memory-tree@2.62 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -53,6 +53,9 @@ _SPEC10_SHIPPED="$SPEC10_CUTOFF"   # captured BEFORE the source, so the fallback
 # every adopter tree whose .memory-tree.conf predates the key, which is a checker that fails to RUN
 # rather than one that fails. Its four siblings are preset above for exactly this reason.
 SPEC10_EVIDENCE_CUTOFF=""   # date; a Tier-2 spec dated >= this must RECORD its reuse audit (check 12); blank = never required
+# The SIXTH cutoff, same semantics as the three RULE cutoffs and preset here for the same adopter
+# argument the paragraph above states (TOOL-aJoinedCanon-1).
+REV_SCOPE_CUTOFF=""     # date; specs dated >= this must give every rev-2+ §9 entry a §n/Sn/ACn scope token (check 12); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -953,7 +956,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1075,6 +1078,46 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       }
     }
     if (!seen || hrev + 0 > mx) print f " (header rev-" hrev " not logged in the §9 Revision log)"
+    # ---- TOOL-aJoinedCanon-1: a §9 entry names WHAT it moved. Sits here, at the same nesting depth
+    # ---- as the high-water walk above and so OUTSIDE every other guard, with revscopecut as its ONLY
+    # ---- date guard. Nesting it inside a sibling cutoff block would make its real population an
+    # ---- intersection of two keys while its own key still read as armed -- the class this build
+    # ---- exists to close, and the shape of both of its own audit blockers. Being above the
+    # ---- `hdr ~ /Tier-1/ next` cut makes it a both-tiers arm for free, as the two walks above are.
+    # ---- PER ENTRY, not per line: this corpus wraps §9 at its house width and puts the detail in the
+    # ---- wrap, so a line-oriented predicate marks about 30% of lines and reds half the specs that
+    # ---- already do the right thing. Folding continuations halves that. rev-1 is EXEMPT: a first
+    # ---- draft moved the whole document, so a scope list on it names everything and says nothing.
+    # ---- The section-sign half is index()+substr() rather than a regex because the byte is multibyte
+    # ---- and length() returns 2 on a byte-oriented awk and 1 on gawk in a UTF-8 locale; substr counts
+    # ---- in whatever unit length just returned, so the pair is consistent in either interpreter.
+    # ---- (No apostrophe below this line: the whole awk program is one single-quoted shell string.)
+    if (revscopecut != "" && fdate != "" && fdate >= revscopecut) {
+      rs_in9 = 0; rs_ne = 0
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (L ~ /^## [0-9]+[.] Revision log/) { rs_in9 = 1; continue }
+        if (rs_in9 && L ~ /^## /) rs_in9 = 0
+        if (!rs_in9) continue
+        # The optional list marker is what stops an INDENTED continuation opening a phantom entry --
+        # the same defect the acceptance-witness selector above records against its own label.
+        if (L ~ /^([ 	]*(-|\*)[ 	]*)?(\*\*)?rev-[0-9]+/) {
+          rs_ne++; rs_txt[rs_ne] = L
+          rs_v = L; sub(/^[ 	]*(-|\*)?[ 	]*(\*\*)?rev-/, "", rs_v); sub(/[^0-9].*$/, "", rs_v)
+          rs_num[rs_ne] = rs_v + 0
+        } else if (rs_ne > 0 && L !~ /^[ 	]*$/) rs_txt[rs_ne] = rs_txt[rs_ne] " " L
+      }
+      rs_bad = ""; rs_nb = 0
+      for (i = 1; i <= rs_ne; i++) {
+        if (rs_num[i] < 2) continue
+        rs_E = rs_txt[i]; rs_p = index(rs_E, "§")
+        rs_has = (rs_p > 0 && substr(rs_E, rs_p + length("§"), 1) ~ /[0-9]/) || (rs_E ~ /(^|[^A-Za-z0-9])(S|AC)[0-9]/)
+        if (!rs_has) { rs_nb++; rs_bad = (rs_nb == 1) ? "rev-" rs_num[i] : rs_bad ", rev-" rs_num[i] }
+      }
+      if (rs_nb > 0)
+        print f " (revision entries naming no section, scope id or acceptance id, required at/after REV_SCOPE_CUTOFF " revscopecut "): " rs_bad
+      for (i = 1; i <= rs_ne; i++) { delete rs_txt[i]; delete rs_num[i] }
+    }
     # ---- terminal status needs a resolved §8. Reproduces `sed -n "/A/,/B/p" | sed "1d;$d"`: the
     # ---- range RESTARTS on a later opener, runs to EOF when §9 never follows, and yields nothing
     # ---- when shorter than three lines because both deletes land inside it.
@@ -1301,6 +1344,14 @@ if [ "$STAGED" = 0 ] && [ -n "$SPEC10_EVIDENCE_CUTOFF" ]; then
   _ev_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$SPEC10_EVIDENCE_CUTOFF" \
     '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
   [ "${_ev_n:-0}" -gt 0 ] || echo "memory-hygiene: the §10 reuse-evidence arm graded NO spec — SPEC10_EVIDENCE_CUTOFF is $SPEC10_EVIDENCE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
+fi
+# Same notice, same footing, for the §9 rev-scope arm (TOOL-aJoinedCanon-1). An arm that grades no
+# spec prints a silent green otherwise, which is indistinguishable from one that graded the corpus
+# and found nothing.
+if [ "$STAGED" = 0 ] && [ -n "$REV_SCOPE_CUTOFF" ]; then
+  _rs_n=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v e="$REV_SCOPE_CUTOFF" \
+    '$1 == "P" { b = $2; sub(/.*\//, "", b); if (substr(b, 1, 10) >= e) c++ } END { print c + 0 }')
+  [ "${_rs_n:-0}" -gt 0 ] || echo "memory-hygiene: the §9 rev-scope arm graded NO spec — REV_SCOPE_CUTOFF is $REV_SCOPE_CUTOFF and every tracked spec predates it. That is the intended state at adoption; the arm's coverage is its self-test fixtures, not this corpus."
 fi
 fi
 
