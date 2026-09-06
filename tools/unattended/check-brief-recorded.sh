@@ -46,7 +46,7 @@
 # nothing still counts as graded. That is copied deliberately and it is a hole; naming it here is the
 # whole remedy, and the arms assert on the difference.
 set -u
-KIT_UNATTENDED_VERSION=1.17   # gov:kit unattended@1.17 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.18   # gov:kit unattended@1.18 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
