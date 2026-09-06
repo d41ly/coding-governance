@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: d0fcadcb8b972facaa672cb5352ab723a39bb082
+witness: 0e8164a28ed278ba5e4217d299c3aa3c80cb2b55
 phase: BUILDING
 mode: slug
 anchor-kind: default-branch
@@ -30,3 +30,5 @@ base: 274aa39b786c886991726896927337c0e3048e0c
 2026-09-06T13:57:26Z dispatch · item 323703f7 TOOL-aJoinedCanon-3 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh .memory-tree.conf tools/memory-tree/.memory-tree.conf.example tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/HYGIENE.template.md memory/TEMPLATE-SPEC.md memory/HYGIENE.md memory/guides/SESSION-KICKOFF.md
 
 2026-09-06T14:35:20Z dispatch · item d0fcadcb TOOL-aJoinedCanon-4 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh .memory-tree.conf tools/memory-tree/.memory-tree.conf.example tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/HYGIENE.template.md memory/TEMPLATE-SPEC.md memory/HYGIENE.md memory/guides/SESSION-KICKOFF.md
+
+2026-09-06T15:08:39Z dispatch · item 0e8164a2 TOOL-aJoinedCanon-5 · reason tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md

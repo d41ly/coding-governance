@@ -1,6 +1,6 @@
 # aJoinedCanon — acceptance ledger
 
-**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4
+**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5
 
 Node `a`, 2026-09-06, base `274aa39b`. One `**Evidences:**` block per unit, appended as each unit
 lands. Two forms and no third: OBSERVED carries a backticked token naming what made the observation,
@@ -55,11 +55,25 @@ AMENDED names the revision that changed the criterion.
 - AC8 — `grep -qF "required at/after SPEC_WITNESS_CUTOFF): 2026-08-08"` — the witness arm still reports on its own cutoff after the hoist, and no existing assertion naming `acceptance bullets naming no backticked witness` was edited. The repair was to the code, not to the baseline.
 - AC9 — `grep -qE '^SPEC_FAILURE_MODE_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` — succeeds, with the adopter comment above it naming the rule, the blank-means-off semantics and the hoist.
 - AC10 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — exits 0 after `--render`, 4 pairs. Sameness only; AC12 supplies the content half.
-- AC11 — the six fixtures were each observed on the scratch tree before the arm landed: 120, 124 and 125 red, 121, 122 and 123 silent. Read honestly — they were observed as a SET in one run per conf, not staged and unstaged one at a time, which is the weaker form of what this criterion asks.
+- AC11 — `bash tools/memory-tree/check-memory-hygiene.sh` — the six fixtures were each observed on the scratch tree before the arm landed: 120, 124 and 125 red, 121, 122 and 123 silent. Read honestly — they were observed as a SET in one run per conf, not staged and unstaged one at a time, which is the weaker form of what this criterion asks.
 - AC12 — `grep -c 'Red when:' memory/TEMPLATE-SPEC.md` — 0 → 2, against the baseline re-derived on this branch immediately before the edit. `grep -c 'SPEC_FAILURE_MODE_CUTOFF' memory/HYGIENE.md` — 0 → 1, in item 12 beside the witness sentence.
 - AC13 — `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh` — both exit 0; the epoch gate reports `41 line(s) moved` against the 2.61 → 2.63 range, and this landing carries 2.63 → 2.64. The deliberate pre-bump red was not staged: the bump was made before the gate was run, so this is a green rather than the observed failing case the criterion asks for.
 - AC14 — `out3f` again, and this is the criterion nothing else in either spec can supply: the arm answers to `fmcut` alone. A shared `-v` binding — the rev-4 `mcut` collision with unit 1 — would have turned this run silent with its own key armed, and both units' AC6 would still have passed, because each blanks its own key and a shared binding darkens both arms.
 - AC15 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` re-stamped for the watched engine and conf edits; `last-body-change` is the same sha before and after.
+
+**Evidences:** TOOL-aJoinedCanon-5
+
+- AC1 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — exits 0 after `--render`, 4 pairs, so `memory/TEMPLATE-SPEC.md` is the render of its template and not a hand-edit.
+  fixture: the live copy is the rendered one; `--render` was run before the compare.
+- AC2 — `grep -ciE 'cost|budget|minutes|hours' memory/TEMPLATE-SPEC.md` — 1 → 2.
+  figure: DERIVED, and the pre-change value is NOT the `0` §4 recorded. It was 0 at base `750ca0ca`; by the time this unit built, `TOOL-aJoinedCanon-4`'s own §6 paragraph had landed the word "costs" in that file, so the honest baseline re-derived immediately before this edit is 1. The criterion says re-derive on the pre-change tree if the after-count is disputed, and that is what this line records.
+- AC3 — `bash tools/memory-tree/check-memory-hygiene.sh` — whole-tree run exits 0 and no spec is newly named by check 12. Stated as the spec states it: this is a regression guard, not an observation of the added text — the section canon is the hardcoded `SPEC_CANON` constant, so no template edit can red a landed spec through this check. The run DID red once, on `TOOL-aJoinedCanon-4/AC11` in this very ledger, which was in neither legal acceptance-ledger form; fixed and re-run green.
+- AC4 — `wc -c` — template 20201 → 21915 B, live 20194 → 21908 B; 1714 B on each half.
+  figure: DERIVED at observation time, against §4's pinned ~1,450 B estimate, which this criterion does not grade.
+- AC5 — `git grep -cE '^ +(cost|permission|fixture|figure):' -- memory/builds/aJoinedCanon/spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md` — returns 7, so this spec's own §6 is written in the shape it proposes. Deliberately weak: it grades presence and claims nothing about whether the declarations are true.
+- AC6 — `sed -n '/^## Writing rules/,/^## Tier profiles/p' memory/TEMPLATE-SPEC.md | grep -c PINNED` — 0 → 1, so the second carrier the owner's F2 ruling requires exists in the Writing rules and not only in §6.
+  figure: DERIVED, re-run on the pre-change tree immediately before the edit and returning 0 there.
+- AC7 — `grep -cE '^- .(cost|permission|fixture|figure):' memory/TEMPLATE-SPEC.md` — returns 4, so all four spellings the ruling names reached the rendered file. This is the content half AC1's sameness compare structurally cannot supply.
 
 ## What the date re-derivation changed
 

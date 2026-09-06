@@ -95,6 +95,11 @@ an absent region cannot be told from a spec nobody has recorded against.
   `NOT OBSERVED` and why. See the §2 body below; machine-checked from `SCOPE_JOIN_CUTOFF`.
 - No narration, no restating the heading as its first sentence, no marketing adjectives.
 - Verify every claim about existing code against source at writing time; mark the rest `UNVERIFIED`.
+- A measured number a spec pins says whether it is PINNED or DERIVED. The rule above verifies at
+  WRITING time, so a number true when written goes stale in place and nothing re-checks it: a pinned
+  one names when it was measured, a derived one names what re-derives it. This binds every section,
+  §4's inventories and estimates included; §6's `figure:` sub-field is where an acceptance criterion
+  answers it.
 - A section that genuinely doesn't apply keeps its heading with the single line `N/A — <why>`.
   Headings never disappear, and empty bodies are machine-rejected: an absent or hollow section is
   indistinguishable from a forgotten one.
@@ -259,6 +264,25 @@ write, and an author discovering that the negation is all there is has found som
 - **AC1** — When `check-memory-hygiene.sh` runs over the fixture tree, it names `tFixture-120`.
   Red when: the fixture carries no clause and the arm stays silent.
 ```
+
+A criterion that cannot be observed for free, by this run, or against today's tree says so with the
+criterion instead of leaving the next session to discover it. Four things go unsaid and get paid for
+in build-time amendments. Declare whichever of them apply as named lines under the criterion's own
+bullet:
+
+- `cost:` — what the observation costs, when it is not seconds.
+- `permission:` — the suite, boundary or credential that observes it is one THIS run may not execute.
+- `fixture:` — the live instance or path the observation needs, and whether the tree holds one today.
+  A criterion observing a gate arm names every cutoff key its fixture conf arms: an arm sitting
+  inside a second key's guard is graded by nobody when that second key is blank, and the fixture
+  that arms both cannot tell you so.
+- `figure:` — whether a number the criterion states is DERIVED at observation time or PINNED as a
+  literal. The writing rule on measured numbers states the obligation; this field is where a
+  criterion answers it.
+
+Write only the fields that apply and OMIT the rest. A field written as `none` is a blank being
+filled rather than a question being answered, and a criterion whose preconditions are all trivial
+carries no fields at all — the common case. Nothing grades these lines.
 
 ## 7. Gates
 
