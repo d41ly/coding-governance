@@ -48,13 +48,14 @@ mkdir -p memory/guides tools/unattended .claude/skills/unattended
 # that leaves both checks reading what they were written to read.
 cp "$HERE/unattended.sh" "$HERE/check-unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" \
    "$HERE/SKILL.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" \
-   "$HERE/.unattended.conf.example" tools/unattended/
+   "$HERE/.unattended.conf.example" "$HERE/VERBS.template.md" tools/unattended/
 cp "$HERE/../../memory/guides/BUILD-METHOD.md" memory/guides/
 cp "$HERE/../../memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
+cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
 sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|tools/unattended|g' \
     -e 's|{{KEEPALIVE_CREATE}}|CronCreate|g' -e 's|{{KEEPALIVE_DELETE}}|CronDelete|g' \
     -e 's|{{KEEPALIVE_INTERVAL}}|every 10 minutes|g' -e 's|{{LANDER}}|bash tools/push-main.sh|g' \
-    -e 's|{{ANCHOR_SCOPE}}|published|g' -e 's|{{AUTH_PARAM}}|--prompt|g'     "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
+    -e 's|{{ANCHOR_SCOPE}}|published|g' -e 's|{{TOOL_ROOT}}|tools/|g' -e 's|{{AUTH_PARAM}}|--prompt|g'     "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
 # TOOL-aNamedGesture-1 - this chain is a SECOND hand-kept renderer, and nothing downstream reads the
 # file it writes closely enough to notice a placeholder nobody added an entry for. So the fixture
 # asserts its own render, which is what turns an omission here into a failure instead of a silent
@@ -95,6 +96,22 @@ mk() { # slug · optional extra front-matter line
   printf '# ARCH-%s-1 the unit
 
 **Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams tooling
+
+## 2. Scope
+
+- the unit writes `work/build`.
+
+## 5. Acceptance criteria
+
+- AC1: `work/build` exists on the run branch.
+
+## 7. Gates
+
+- the leg is silent over the tree the pass produced.
+
+## 8. Open questions
+
+none
 ' "$1" > "memory/builds/$1/spec/one.md"
 }
 
