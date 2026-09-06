@@ -308,13 +308,16 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
    **Then delete the GOV-ONLY file that copy brings with it.** `kit.toml` withholds it from
    `govkit apply`, but a `cp -r` does not read `kit.toml`, so this path needs its own step:
    ```bash
-   rm -f <project>/tools/codebase-map/replay-phrases.py
+   rm -f <project>/tools/codebase-map/{replay-phrases.py,rank_harness.py,scen-adversarial.json}
    ```
-   It is gov's own grading harness: it reads `memory/builds/**` for recorded probe phrases and the
-   seam each spec's §10 names, and grades the ranker against that pair. In your tree it finds no
-   such corpus, so it grades nothing and says so — the same
+   All three are gov's own grading instruments. `replay-phrases.py` reads `memory/builds/**` for
+   recorded probe phrases and the seam each spec's §10 names, and grades the ranker against that
+   pair. `scen-adversarial.json` is 28 scenarios whose seams were established by reading THIS
+   repo's code, and `rank_harness.py` is what scores a ranking against them. In your tree the first
+   finds no such corpus and the last two grade a corpus you do not have — the same
    `memory/gotchas/pin-copied-from-another-corpus.md` shape the memory-recall fixture has. If you
-   want the measurement, point an equivalent at YOUR records.
+   want the measurement, point an equivalent at YOUR records: `rank_harness.py` reads any scenario
+   file carrying a `scenarios` array, so the instrument travels even though the set may not.
 2. `cp <kit>/.codebase-map.conf.example .codebase-map.conf` and fill MAP_ROOT · GATE_FILE ·
    MAP_DIFF_CMD (per the §0 decisions). It lives at the project **root** whatever the kit's prefix:
    the kit walks up from its own directory looking for this file, and that is how it finds the root.

@@ -1153,6 +1153,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "derive_targets",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
       "id": "derive_width",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -1693,6 +1698,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "load_scenarios",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
       "id": "load_toml",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -1731,6 +1741,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/codebase-map/map_diff.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
     },
     {
       "id": "main",
@@ -1971,6 +1986,16 @@
       "id": "measure_plan_marks",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "measure_ranks",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "measure_recall",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
     },
     {
       "id": "measure_run",
@@ -2648,6 +2673,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_report",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
       "id": "render_shards",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2998,6 +3028,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "run_constant_control",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
       "id": "run_dense",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -3056,6 +3091,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "run_shuffle_control",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
     },
     {
       "id": "run_suggest",
@@ -3609,6 +3649,11 @@
     },
     {
       "id": "test_glob_brackets_fail_loud_and_escape_works",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_gov_only_files_are_withheld_on_both_paths",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },

@@ -26,6 +26,15 @@ role = "project-owned"
 include = ["replay-phrases.py"]
 role = "project-owned"
 
+# The ranking harness and its scenario set, withheld for the same reason and by the same mechanism.
+# `scen-adversarial.json`'s 28 rows are seams established by reading THIS repo's code, so an adopter
+# receives a set that grades a corpus they do not have; `rank_harness.py` without it grades nothing.
+# `TOOL-dTracedLattice-1` S8/AC13. Same scope caveat as above: this withholds them from `govkit
+# apply` ONLY, and the copy-install path in WIRE-INTO-PROJECT.md removes them separately.
+[[files]]
+include = ["rank_harness.py", "scen-adversarial.json"]
+role = "project-owned"
+
 [[files]]
 include = ["map_extractors.template.py"]
 role = "seed"

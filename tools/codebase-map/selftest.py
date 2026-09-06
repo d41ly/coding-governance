@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -1677,6 +1678,8 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         failures += check("new_clones reader (S5 / AC4)", lambda: test_new_clones_reader(Path(td)))
     failures += check("fan-in subtracts every definer (S1)", test_fan_in_subtracts_every_definer)
+    failures += check("gov-only files withheld on both paths (AC13)",
+                      test_gov_only_files_are_withheld_on_both_paths)
     failures += check("scan coverage line cannot go quiet (AC12)",
                       test_scan_coverage_line_cannot_go_quiet)
     failures += check_guarded("every co-defined symbol reaches every definer (AC2)",
@@ -1882,6 +1885,48 @@ def test_scan_coverage_line_cannot_go_quiet():
     # everything and found nothing".
     quiet = rl.render(rl.Shortlist("q", [], (), corpus.threshold, {}, {}), corpus)
     assert "scan coverage: not run" in quiet, quiet
+
+
+def test_gov_only_files_are_withheld_on_both_paths():
+    """AC13 — a corpus-specific fixture reaches no adopter, by EITHER install path.
+
+    `kit.toml` declares `include = "**"`, so a new file under this directory ships by default; a
+    `project-owned` claim is what withholds it from `govkit apply`. The copy-install path in
+    `WIRE-INTO-PROJECT.md` is a plain `cp -r` that never reads `kit.toml`, so it needs its own
+    removal row — two carriers, and an omission in either ships the file.
+
+    The population is DERIVED from the descriptor's own `project-owned` claims rather than typed
+    here, so a fourth gov-only file added later is covered the day it is claimed. The seed
+    destination is excluded by name: `map_extractors.py` is `project-owned` because the adopter
+    authors it, and removing it would delete their work.
+
+    WHAT IT DOES NOT CHECK: that a gov-only file was claimed AT ALL. A new corpus-specific file
+    claimed in neither carrier is invisible to this arm — that is the ratchet over `include = "**"`
+    this review named as a left-shift and it is not built here.
+    """
+    kit = Path(os.path.abspath(__file__)).parent
+    toml = (kit / "kit.toml").read_text(encoding="utf-8")
+    claimed: set = set()
+    for block in toml.split("[[files]]")[1:]:
+        head = block.split("[[", 1)[0]
+        if 'role = "project-owned"' not in head:
+            continue
+        for tok in re.findall(r'"([^"]+)"', head.split("include", 1)[1].split("role", 1)[0]):
+            claimed.add(tok)
+    claimed -= {"map_extractors.py"}  # the SEED destination: the adopter authors it
+    assert claimed, "no project-owned claim in kit.toml, so this arm would prove nothing"
+    for expect in ("rank_harness.py", "scen-adversarial.json"):
+        assert expect in claimed, f"{expect} is not withheld from `govkit apply` by kit.toml"
+    runbook = (kit.parent.parent / "WIRE-INTO-PROJECT.md")
+    if not runbook.is_file():
+        raise Skipped("WIRE-INTO-PROJECT.md is not in this tree (an adopter's copy of the kit)")
+    text = runbook.read_text(encoding="utf-8")
+    rm_lines = [ln for ln in text.splitlines() if "rm -f" in ln and "codebase-map" in ln]
+    assert rm_lines, "the runbook has no codebase-map removal row at all"
+    joined = " ".join(rm_lines)
+    for name in sorted(claimed):
+        assert name in joined, (f"{name} is withheld from `govkit apply` but the copy-install "
+                                f"runbook never removes it: {joined}")
 
 if __name__ == "__main__":
     sys.exit(main())
