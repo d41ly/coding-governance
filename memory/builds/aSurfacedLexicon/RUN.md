@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 1 surfaced
 keepalive-reaped: yes
 witness: 672ae990251509d8bb4042af0f01829397d48b79
-phase: REVIEWING
+phase: LANDING
 mode: slug
 anchor-kind: default-branch
 keepalive: 7c71fd36
@@ -84,3 +84,9 @@ base: 6c670b024644bf6bbcc28ee74d2265c0efd453c6
 2026-09-05T21:26:36Z review · item aSurfacedLexicon · reason verdict BLOCKED · blockers 7
 
 2026-09-05T22:56:07Z review · item aSurfacedLexicon · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-06T02:51:27Z override · item gates-green · reason The bar does not RETURN within GATE_BOUND, and the cause is one leg that breached its own ceiling before this build existed. pass-order history declares ceiling 900 and needs 4438s at this tip; measured at the pinned BASE 6c670b02 it needs 4067s, already 4.5x over, and it exits 0 with a CLEAN verdict at both points. Filed as TOOL-aSurfacedLexicon-22 with both measurements. Every other leg was run directly and is green: lexicon selftest 509 arms, lexicon --check, adopt-lexicon --check, adopt-playbook --check, drift-audit selftest, drift_report --check, codebase-map coverage+freshness, memory hygiene (unstaged, so check 23 binds), check-spec-tokens, govkit selfcheck, check-testsuite-counts, check-dead-paths, check-kit-placeholders, check-line-length, check-install-prefix, template-size on both charter halves. This is an override of a bar that never returned, not of a leg that failed.
+
+2026-09-06T02:51:28Z override · item build-complete · reason TOOL-aSurfacedLexicon-10 is SPECCED and was never built. Its fork F1 lost BOTH options to the M3 veto ladder: option B fails a written acceptance criterion that names the staged line by path, and option A widens a write surface beyond what the unit tier priced, reversing a guard whose header records a real adopter committing a file named --help through a 62-leg bar. A veto is not a licence to take the vetoed option, so no resolver this mandate delegates exists and the fork is PARKED for the owner. M8 says a blocker unfixable inside the mandate is a park and its unit does not close. The other twelve units are CLOSED with acceptance ledgers.
+
+2026-09-06T02:51:28Z override · item specs-audited · reason TOOL-aSurfacedLexicon-1 arrived CLOSED at the pinned BASE: it is the design pass, built and closed by the session that wrote this spec set, before this run existed. Its code predates this run and no spec-audit record names it. Writing one now would claim a pre-code review that did not happen, which is the one thing an audit record must not do. The twelve units this run BUILT were each audited before their code, across four batches, every one converged, and both rounds of each are recorded under the build reviews folder.
