@@ -287,18 +287,21 @@ if [ "$MODE" = "--expand" ]; then
   fi
   sha="$(git rev-parse HEAD 2>/dev/null)" || sha=""
   # AN EMPTY DERIVATION REFUSES, which is this file's rule for every derived value and is why
-  # KIT_VERSION is tested for emptiness sixty lines up rather than trusted. It is NOT a gate with an
-  # observable failing case, and saying so is the point: the state it was written for -- an unborn
-  # branch, where `rev-parse HEAD` exits 128 -- is SUBSUMED by the untracked-declaration refusal
-  # above, because a repo with no commit has nothing tracked and therefore no tracked conf. So this
-  # branch is unreachable through the wrapper's own path and its red has never been seen. It survives
-  # as the empty-derivation guard and not as a checked one; an unreachable refusal that writes
-  # nothing is cheaper than a stamp reading `expanded="<date> "`. Round-2 review F9, resolved by
-  # naming the skip rather than by staging a case that cannot occur.
+  # KIT_VERSION is tested for emptiness rather than trusted. It is NOT a gate with an observable
+  # failing case, and saying so is the point rather than an apology.
+  #
+  # THE STATE IT WAS WRITTEN FOR -- an unborn branch, where `rev-parse HEAD` exits 128 -- is
+  # unreachable from here, and it takes BOTH refusals above to make it so, not the one this comment
+  # first credited. A repo with no commit either has something STAGED, in which case the two-sided
+  # diff sees a staged change against the empty tree and DIRTY TREE fires; or it has nothing staged,
+  # in which case the conf is untracked and UNTRACKED DECLARATION fires. Neither alone closes it.
+  #
+  # So its red has never been seen and cannot be. It survives as the empty-derivation guard rather
+  # than as a checked one: an unreachable refusal that writes nothing is cheaper than a stamp reading
+  # `expanded="<date> "`. Round-2 F9, corrected at round-3 L2.
   if [ -z "$sha" ]; then
     echo "lexicon-adopt: NO SHA — refusing to stamp. \`git rev-parse HEAD\` produced nothing, so there"
-    echo "lexicon-adopt: is no tree for the stamp to point at. This should be unreachable: a repo with"
-    echo "lexicon-adopt: no commit has no tracked declaration either, and that is refused above."
+    echo "lexicon-adopt: is no tree for the stamp to point at."
     exit 1
   fi
   # IN PLACE, NEVER APPENDED, and `awk`'s END clause covers the absent-key case in the same pass.

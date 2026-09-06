@@ -97,6 +97,53 @@ expressions.
 
 Every one of the ten is folded. Five new fixture arms grade the classes that had none.
 
+## Round 3, over the fold's own diff — and half of the blocker had not landed
+
+**IT IS NOT A LOOP ROUND, and the driver is right to say so.** `--review` refused to record it:
+round 2 exited NON-CONVERGENT, which is TERMINAL, so the loop ended there and a third round would
+rewrite that history. What this was is a POST-FOLD VERIFICATION PASS over the commit that discharged
+round 2's disposition — the fold added a refusal branch, a guard, a pairing gate and five arms that
+no review had seen. The record is bound to the unit and named in its generated records table; the
+run-state carries two rounds, which is the truth about the loop.
+
+`reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round3.md`: **BLOCKED**, raw 19,
+confirmed 13, refuted 6, eight distinct defects. Four lenses, five skeptic batches, zero died.
+
+**The blocker is round 2's F2 surviving its own fix.** The new refusal gated on definitions
+EXTRACTED, which is a different population from `live`: a walk can read plenty and put nothing in
+`live`, because no leading token is in any cluster. That corpus reached the benign sentence and
+exited 0 — and the exit code is the harm, since the wrapper's `|| exit 1` is what stops `--stamp`
+spending the one supported widening. Round 2 had written the missing half in words and it was not
+implemented. The branch is now split THREE ways: nothing extracted, nothing live, and the one benign
+case. A fixture arm covers the middle one, which no arm could reach before — AC6's only guard runs
+against this repo, which can never reach zero.
+
+**The high is a skip that was a comment wearing a check's clothes.** `check(<label>, True)` prints
+nothing (only failures reach the output), cannot fail, was emitted unconditionally, and raised the
+arm count — while the record above claimed the skip was "announced rather than left in a comment".
+Worse, the platform premise holds on every registered node, so the CR-hardening those two F6 arms
+exist to grade is unexercised wherever the leg runs. It is now PROBED — a CRLF file through the
+platform's own `grep`, read as bytes so universal-newline decoding cannot answer the question wrong —
+and announced with the `print` idiom this file already uses.
+
+**Two were false diagnostics printed by the new refusal.** Its predicate reads FUNCTION definitions
+while its message spoke for the whole extraction, so a corpus of nothing but type definitions was
+told no extractor produced a definition and sent to `--check`, which prints `lexicon OK` on that same
+tree. And the evidence line listed every DECLARED extension under the word "armed", `dark` ones
+included — contradicting, in the one diagnostic block written to stop a misleading zero, the first
+cause the sentence above it offers.
+
+**And two records re-earned the class they were correcting.** The corrected Rollout enumerated three
+changes to existing paths and missed the fourth — `OPTIONAL_SIBLINGS`, the only one that is NOT
+behaviour-preserving, since it permanently widens a refusal printed on the merge-binding leg. And the
+citation fix struck `146` from the audit table and the rev log while leaving four live in the body,
+one of them the imperative `Cite 146` — pointing, by then, at a comment the fix itself had added.
+
+All eight folded, with four more fixture arms. What is NOT built here is the meta-arm round 3 asks
+for — a check over this suite's own source banning `check(…, True)` as a skip claim. It would red
+three landed arms belonging to other units, which is a cross-unit refactor rather than this fold;
+filed as `TOOL-aSurfacedLexicon-24` instead, with the three sites named.
+
 ## Two things this pass did NOT build, and why
 
 **S4's tail is not computed by the new function.** The engine's measurement pass already classifies

@@ -2439,26 +2439,49 @@ def run_expand(root: Path) -> int:
                                                  clusters=clusters)
     candidates, live = derived["candidates"], derived["live"]
 
-    # AN EMPTY `live` HAS TWO OPPOSITE CAUSES and the wrong one is the reassuring answer, so it is
-    # separated before either branch prints. Every live cluster is declared -- the normal state of an
-    # adopted tree -- or NOTHING WAS MEASURED, because every language is `dark`, an armed extension
-    # has no files, or an extractor produced nothing. The empty proposal is then the SYMPTOM, and a
-    # message calling it normal is the reassuring zero this repo names by hand: an operator reads a
-    # complete vocabulary off a corpus nobody graded, and can spend the one-shot stamp on it.
+    # AN EMPTY `live` HAS THREE CAUSES AND ONLY ONE OF THEM IS BENIGN, so the branch is split three
+    # ways rather than two. Round 2 named the reassuring zero and round 3 found HALF its fix landed:
+    # the guard gated on definitions EXTRACTED, which is a different population from `live`, so a
+    # corpus whose walk read plenty of definitions and whose leading tokens are all off-canon sailed
+    # past it into the benign sentence — a vacuously-true universal over an empty set, closing with
+    # an explicit denial of the failure mode actually occurring. Two fixture corpora reach it.
     #
-    # REFUSED rather than reported, and 2 rather than 0, for that last reason: the wrapper's
-    # `|| exit 1` means a non-zero here is what stops `--stamp` writing. `--check` says all of this
-    # already, on the same tree, in `graded=0` and `INERT DECLARATION` -- but this verb returns before
-    # `check_pass` and inherits none of it. Round-2 review F2.
+    # REFUSED rather than reported, and 2 rather than 0: the wrapper's `|| exit 1` means the non-zero
+    # here is the only thing stopping `--stamp` spending the ONE supported widening on a corpus in
+    # which nothing is live, which the already-expanded refusal then makes permanent.
+    #
+    # THE PREDICATE READS FUNCTION DEFINITIONS AND THE WORDS SAY SO. The first cut summed the verb
+    # half and then spoke for the whole extraction, so a corpus of nothing but type definitions was
+    # told no extractor produced a definition and sent to `--check`, which prints `graded=2` and
+    # `lexicon OK` on that same tree. Round-2 F2, round-3 B1 and M1.
     graded_defs = sum(n for key, n in measured["graded"].items() if key[1] == "verb")
+    types_seen = sum(n for key, n in measured["graded"].items() if key[1] == "suffix")
+    # ARMED means armed, and `declared` is every declared row including the `dark` ones. Printing all
+    # of them under that word contradicted the sentence above it in exactly the state the refusal
+    # exists for — the first cause it offers is "every language may be declared `dark`", and the
+    # evidence line appeared to rule that out. Derived the way `run()` derives its coverage fraction,
+    # from the mode rather than from the key. Round-3 M2.
+    armed = sorted(e for e, (ps, m) in declared.items()
+                   if m == "parser" or (m == "probe" and ps in measured["sets"]))
+    evidence = (f"  armed extension(s): {' '.join(armed) or '(none armed)'}\n"
+                f"  extracted: {graded_defs} function definition(s) and {types_seen} type "
+                f"definition(s) over {len(measured['files'])} tracked file(s)")
     if not graded_defs:
         print(f"EXPAND — NOTHING MEASURED, so there is nothing to propose FROM. No armed extractor "
-              f"produced a definition over this corpus: every language may be declared `dark`, an "
-              f"armed extension may have no files, or an extractor may have refused them. An empty "
-              f"proposal here is the SYMPTOM, not the normal result — a cluster cannot be voted live "
-              f"by a walk that found nothing. `--check` names the cause on this same tree.")
-        print(f"  armed extension(s): {' '.join(sorted(declared)) or '(none)'}")
-        print(f"  definition(s) extracted: 0 over {len(measured['files'])} tracked file(s)")
+              f"produced a FUNCTION definition over this corpus: every language may be declared "
+              f"`dark`, an armed extension may have no files, or an extractor may have refused them. "
+              f"An empty proposal here is the SYMPTOM, not the normal result — a cluster cannot be "
+              f"voted live by a walk that found nothing to vote with.")
+        print(evidence)
+        return 2
+    if not live:
+        print(f"EXPAND — NOTHING LIVE, so there is nothing to propose FROM. The walk read "
+              f"{graded_defs} function definition(s) and NOT ONE of them leads with a token any "
+              f"cluster holds, so no concept is live here and the table cannot be widened from a "
+              f"corpus that votes for nothing. The empty proposal is the SYMPTOM, and what this "
+              f"corpus owes is renames rather than rows: `--list` prints every one of those "
+              f"definitions with its site.")
+        print(evidence)
         return 2
 
     if candidates:
@@ -2490,9 +2513,23 @@ def run_expand(root: Path) -> int:
         if off.cls == "unruled" and off.verb:
             tail[off.verb] = tail.get(off.verb, 0) + 1
     rows = sorted(tail.items(), key=lambda kv: (-kv[1], kv[0]))
+    # AND THE WAIVED COUNT IS STATED, because moving to the unwaived set aligned these rows with the
+    # offender scalar and MISALIGNED them with the corpus-wide site census the engine attaches to
+    # every unruled offender — two numbers for one question, printed by one tool. `check_pass` prints
+    # `waived=N` on its own line for the same reason; an operator sizing a rename off an unqualified
+    # tail undercounts by exactly the waived sites, which are still definitions leading with that
+    # token. Round-3 L1.
+    # The SAME predicate `measure_pass` splits on, spelled once here rather than a second membership
+    # rule: an offender is waived exactly when its matched text is a key of the registry.
+    _waived_texts = measured["waivers"]["verb"]
+    waived_unruled = sum(1 for off in measured["offenders"]["verb"]
+                         if off.cls == "unruled" and off.verb and off.text in _waived_texts)
 
     print("")
-    print(f"NOT PROPOSALS — {len(rows)} leading token(s) across {sum(tail.values())} definition(s) "
+    print(f"NOT PROPOSALS — {len(rows)} leading token(s) across {sum(tail.values())} UNWAIVED "
+          f"definition(s), with {waived_unruled} further definition(s) waived and not counted here "
+          f"or in the rows below; `--list` counts a token's sites corpus-wide, waivers included, so "
+          f"the two differ by exactly that number. They "
           f"lead with a word no cluster holds and no row names. THIS VERB WILL NEVER OFFER THEM, at "
           f"any frequency. A row here would be the corpus voting on its own commonest spellings, "
           f"which is the one shape a naming gate must not have, and it is the defect this kit was "

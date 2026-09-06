@@ -3629,6 +3629,55 @@ check("F5: a WAIVED offender is absent from the unruled tail, as it is from --ch
 check("F5: ...while an unwaived one is still there, so the arm is not passing on an empty tail",
       "demand" in _wt, f"{_wt}")
 
+# B1 — THE HALF OF F2's FIX THAT DID NOT LAND. Gating on definitions EXTRACTED is a different
+# population from `live`: a walk can read plenty and put nothing in `live`, because no leading token
+# is in any cluster. That corpus sailed past the refusal into the benign sentence with exit 0 — and
+# the exit code is the harm, since the wrapper's `|| exit 1` is what stops `--stamp` spending the one
+# supported widening on a corpus in which nothing is live.
+_NOLIVE_FILES = {"src/a.py": "def frobnicate_v():\n    pass\n\n\ndef demand_u():\n    pass\n"}
+_c, _o = run_case(_NOLIVE_FILES, EXPAND_CONF, args=("--expand",))
+check("B1: a corpus whose walk read definitions but voted NO cluster live REFUSES", _c != 0, _o)
+check("B1: ...saying NOTHING LIVE rather than the benign sentence",
+      "NOTHING LIVE" in _o and "NORMAL result" not in _o, _o)
+check("B1: ...and the evidence line reports the definitions it DID read, not a zero",
+      "2 function definition(s)" in _o, _o)
+
+# M1 — THE PREDICATE READS VERBS; THE WORDS USED TO SPEAK FOR THE WHOLE EXTRACTION. A corpus of
+# nothing but type definitions was told no extractor produced a definition, and sent to `--check`,
+# which prints `graded=2` and `lexicon OK` on that same tree.
+_TYPES_FILES = {"src/a.py": "class Alpha:\n    pass\n\n\nclass Beta:\n    pass\n"}
+_c, _o = run_case(_TYPES_FILES, EXPAND_CONF, args=("--expand",))
+check("M1: a corpus with type definitions and no function definitions REFUSES", _c != 0, _o)
+check("M1: ...naming FUNCTION definitions, since that is the population the predicate read",
+      "FUNCTION definition" in _o, _o)
+check("M1: ...and the evidence line reports the type definitions it DID extract, so the diagnosis "
+      "cannot be contradicted by --check on the same tree", "2 type definition(s)" in _o, _o)
+
+# M2 — `armed` MEANS ARMED. The evidence line printed every DECLARED extension, `dark` ones included,
+# directly under a sentence offering "every language may be declared `dark`" as the first cause — so
+# the one diagnostic block whose purpose is to stop a misleading zero appeared to rule out its own
+# leading explanation.
+_c, _o = run_case(EXPAND_FILES, _DARK_CONF, args=("--expand",))
+check("M2: with every language `dark`, the evidence line says none is armed",
+      "(none armed)" in _o, _o)
+check("M2: ...and does not list a dark extension under that word",
+      "armed extension(s): py" not in _o, _o)
+
+# L1 — WHICH POPULATION THE TAIL'S COUNTS MEAN. Moving to the unwaived set aligned the rows with the
+# offender scalar and misaligned them with the corpus-wide site census `--list` attaches to every
+# unruled offender: two numbers for one question, from one tool. The header now states the waived
+# total, the way `--check` prints `waived=N`, so the two surfaces reconcile by subtraction.
+_WAIVE_FILES = {"src/a.py": ("def build_x():\n    pass\n\n\ndef demand_one():\n    pass\n\n\n"
+                             "def demand_two():\n    pass\n\n\ndef demand_three():\n    pass\n")}
+_c, _o = run_case(_WAIVE_FILES, EXPAND_CONF, args=("--expand",),
+                  waivers={"lexicon-verb-waivers.txt": "demand_one  deliberate, this fixture's own\n"})
+check("L1: the tail row counts the UNWAIVED sites of a token, not all of them",
+      "demand         2 definition(s)" in _o, _o)
+check("L1: ...and the header states the waived total, so the two surfaces reconcile",
+      "1 further definition(s) waived" in _o, _o)
+check("L1: ...over a population that is actually waiver-split, or the two arms above are vacuous",
+      "3 UNWAIVED" not in _o and "2 UNWAIVED" in _o, _o)
+
 # THE SCAFFOLDER IS AN OPTIONAL INSTALL, and a landed arm asserts `--check` is green without it. The
 # widening verb cannot be, since it reads that file's closure — so it REPORTS, and says nothing was
 # measured, because an absent proposal read as an empty one is the worst answer this verb can give.
@@ -3741,8 +3790,28 @@ with build_tempdir() as td:
     check("F6: an EMPTY `expanded=` in a CRLF conf PROCEEDS rather than reading as already expanded",
           "ALREADY EXPANDED" not in _o, _o)
     check("F6: ...and the run actually reached the widening report", "NOT PROPOSALS" in _o, _o)
-    check("F6: SKIPPED on this node — MSYS grep drops the CR before sed, so the arm above cannot "
-          "tell the CRLF-hardened read from an unhardened one here; it binds on a GNU node", True)
+    # THE SKIP IS PROBED, NOT ASSERTED, and it is a `print` rather than a `check`. The first cut was
+    # `check(<label>, True)`: unconditional, unfailable, and INVISIBLE — `check` prints labels only
+    # for failures, so a passing skip claim reaches no output on a green run or a red one. A comment
+    # wearing a check's clothes, in a file whose subject is checks that cannot fail, while the build
+    # record claimed the skip was "announced rather than left in a comment". The working idiom is the
+    # bare `print` this file already uses for its other skip, which does reach the reader.
+    #
+    # AND THE PREMISE IS MEASURED rather than trusted: `text=False`, because universal-newline
+    # decoding would translate the CR away and the probe would answer its own question wrong. Round-3
+    # review H1.
+    _probe = _root / "crlf-probe.txt"
+    _probe.write_bytes(b'expanded="x"\r\n')
+    _pr = subprocess.run(["bash", "-c", "grep -E '^expanded=' \"$1\"", "_", str(_probe)],
+                         capture_output=True)
+    if b"\r" not in _pr.stdout:
+        print("lexicon selftest SKIP — F6's CR-residue half: this platform's `grep` drops the CR "
+              "before `sed` sees it, so `read_conf_scalar`'s `tr -d '\\r'` is UNEXERCISED here and "
+              "the two F6 arms above pass on either implementation. Two arms unexercised.")
+    else:
+        check("F6: ...and the CR SURVIVES grep on this platform, so the two arms above grade the "
+              "CR-hardened read rather than the shell's own text mode",
+              b"\r" in _pr.stdout, repr(_pr.stdout[:80]))
 
 # F4 — A STAMP NAMING A TREE WITH NO DECLARATION IN IT. The dirty test is tracked-only by design, and
 # that exemption swallowed `.lexicon.conf` itself: with the conf untracked the two-sided diff reads

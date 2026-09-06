@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-06-build-TOOL-aSurfacedLexicon-10-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aSurfacedLexicon-10-acceptance-ledger.md) | journal | — |
 | [2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round2.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round2.md) | diff-review | — |
+| [2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round3.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-diff-review-round3.md) | diff-review | — |
 | [2026-09-06-review-TOOL-aSurfacedLexicon-10-spec-audit.md](../reviews/2026-09-06-review-TOOL-aSurfacedLexicon-10-spec-audit.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
@@ -86,8 +87,10 @@ It adds no bar leg, so it owes no wall-clock ceiling and no `testsuite-count-wai
 ### Data model
 
 Three sets. `reps` is the 20 canon representatives from `tools/lexicon/canon.py:55-81`. `live` is the
-representatives with at least one site in the corpus, from the untouched expression at
-`tools/lexicon/scaffold_lexicon.py:146`. `declared` is the keys of the conf's `VERBS` table. The
+representatives with at least one site in the corpus, from the expression
+`live = {forms[v] for v in counts if v in forms}` in `tools/lexicon/scaffold_lexicon.py` — cited
+as an expression, never as a line, for the reason S3 gives. `declared` is the keys of the conf's
+`VERBS` table, folded through the form index first. The
 candidate set is `live - declared`, and `candidates ⊆ reps` holds by construction because `live ⊆ reps`
 by the definition of `forms`.
 
@@ -164,8 +167,12 @@ decoration.
 
 **A correction to the research record, verified against source at writing time.** That record cites
 the anti-mirror closure at `tools/lexicon/scaffold_lexicon.py:143`. At `cd8ab0d2` line 143 is
-`suffix_offenders = _measure_suffix_offenders(root, files)` and the closure is at line 146. The
-expression is byte-identical to the one the record quotes; only the line moved. Cite 146.
+`suffix_offenders = _measure_suffix_offenders(root, files)` and the closure was three lines below
+it. The expression is byte-identical to the one the record quotes; only the line moved — and it
+has moved twice more since, once inside this build. CITE THE EXPRESSION,
+`live = {forms[v] for v in counts if v in forms}`. Every number in this paragraph is a frozen
+quotation of what the research record said at `cd8ab0d2`, not a live instruction: rev-5's first
+cut left the imperative `Cite 146` standing, and by then line 146 was a comment ABOUT the fix.
 
 **A second measured absence.** `.lexicon.conf` carries no `expanded=` key today and no
 `canon_unfrozen=` key either; the only stamp in the file is `ratified="2026-08-24 node d"` at line 183.
@@ -189,20 +196,31 @@ the block is an edit that belongs to whichever unit lands after 12, not to this 
 
 `--expand` is additive: an adopter who never runs it sees no change, and `--scaffold`, `--check` and
 `--render` keep their BEHAVIOUR byte for byte. **Not their code, and rev-5 corrects that claim.** The
-mode allowlist edit is one change to an existing path; the build made three more. `--check`'s two
-scalar reads now route through `read_conf_scalar`, which is one function where there were two
-verbatim copies of a pipeline whose correctness is entirely in the order of its stages — the third
-copy was this unit's, which is what forced the extraction. `--scaffold` reads its vocabulary through
-`derive_candidates` rather than computing it inline. And the engine's measurement pass returns its
-own scan so this mode does not walk the corpus a second time. Every one is behaviour-preserving and
-each is on the leg that binds at the merge, which is why they are named rather than counted as
-additive. Round-2 review F10.
+mode allowlist edit is one change to an existing path; the build made FOUR more, and the fourth is
+the one that matters.
+
+Three are behaviour-preserving refactors. `--check`'s two scalar reads now route through
+`read_conf_scalar`, which is one function where there were two verbatim copies of a pipeline whose
+correctness is entirely in the order of its stages — the third copy was this unit's, which is what
+forced the extraction. `--scaffold` reads its vocabulary through `derive_candidates` rather than
+computing it inline. And the engine's measurement pass returns its own scan so this mode does not
+walk the corpus a second time.
+
+**The fourth is not behaviour-preserving and rev-5's first cut omitted it, which is round-2's F10
+re-earned one item short.** `OPTIONAL_SIBLINGS` PERMANENTLY WIDENS `check_self_containment`: before
+it, that predicate would have flagged the engine's own `import scaffold_lexicon` in a kit copy
+installed without the scaffolder; after it, it never can. That refusal is printed on `--check`, the
+leg that binds at the merge. The allowance is one name, its own comment states what it does not buy —
+nothing about HOW the import is written — and the property it assumes is armed at runtime on both
+modes plus a staged break, because a name added there without those arms is the hole it is written
+not to be. Round-2 F10, corrected at round-3 M3.
 
 ### Files touched (estimate)
 
 `tools/lexicon/adopt-lexicon.sh` (the mode, the guard, the stamp write),
-`tools/lexicon/scaffold_lexicon.py` (a second entry point for the candidate computation, reusing line
-146's expression), `tools/lexicon/selftest.py` (the fixture and its two arms), and
+`tools/lexicon/scaffold_lexicon.py` (a second entry point for the candidate computation, reusing
+the closure expression rather than copying it), `tools/lexicon/selftest.py` (the fixture and its
+arms), and
 `tools/lexicon/README.md`. ESTIMATE on size; nothing comparable ships to measure against.
 
 ### Alternatives rejected
@@ -528,7 +546,7 @@ seam fits in the map's index — and the evidence for why is that the behaviour 
 a named helper. That is itself the finding: the closure this unit depends on is one line inside a
 141-line `main` (lines 87 to 227, measured by an AST span at writing time), so the unit's first job is
 to give it a caller other than `main` without moving the expression. The seam this unit extends is
-therefore `tools/lexicon/scaffold_lexicon.py:146` by path,
+therefore the closure expression in `tools/lexicon/scaffold_lexicon.py`,
 plus `canon.build_form_index` at `tools/lexicon/canon.py:84-95`, which the earlier probe for
 `TOOL-aSurfacedLexicon-7` returned as a `fan-in 3 | SEAM`.
 
