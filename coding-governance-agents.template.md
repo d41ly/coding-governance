@@ -228,28 +228,23 @@ matched its target population.
 - Scope Tier-2 to the diff at an immutable SHA plus its immediate callers/callees, reviewed at the integration boundary ONCE (the cumulative diff landing on `{{DEFAULT_BRANCH}}`) — per-increment reviews re-scan overlapping code.
 - Default Tier-2 shape (ROI-tuned): a parallel fan of 3–6 primed finder lenses (security · correctness · data-integrity · dead-code · integration-seams) → a skeptic prompted to REFUTE each finding → one synthesis pass; drop any finding a skeptic refutes unless reachability + impact re-established.
 - **CONCURRENCY IS CAPPED, ALWAYS, and the verify-stage TOTAL is capped too — two rules, not one.**
-  A wide fan trips the SERVER rate limiter and kills whole phases for millions of tokens; a
-  harness auto-cap does NOT protect you. Concurrency bounds how many run together; the total
-  bounds how many exist. **CONSOLIDATE before you fan out:** batching grows the batch, never the
-  agent count — at most 5 verify agents TOTAL. Route Workflow fan-out through the bounded
-  helpers, inlined because scripts cannot import: `boundedParallel(thunks, 5)` and its pipeline
-  sibling. Enforce it mechanically at the tool call rather than inside the script, where no hook
-  reaches — the `agent-cap` hook denies a raw primitive and any fan-out over a receiver it
-  cannot PROVE bounded, and counts direct spawns, which is the only enforcement reaching a
-  fan-out made outside a workflow script. It resolves a bound wherever it is written and denies
-  any K it cannot resolve to an integer ≤5; an array LITERAL of ≤5 elements (the lens fan)
-  passes unmarked, and it fires on matcher `Workflow|Agent`, the exact pair — `Workflow` alone
-  leaves direct spawns unguarded. FIVE of these values are machine-compared against the sources
-  that own them by `tools/check-playbook-parity.sh`; retyping one wrong reds the bar rather than
-  drifting. The marker spellings and the full resolvable-bound grammar are the hook's own, in
-  `tools/hooks/README.md`; a ready harness ships beside it.
+  A wide fan trips the SERVER rate limiter and kills whole phases for millions of tokens; a harness
+  auto-cap does NOT protect you. Concurrency bounds how many run together; the total bounds how many
+  exist. **CONSOLIDATE before you fan out:** batching grows the batch, never the agent count —
+  at most 5 verify agents TOTAL. Route Workflow fan-out through the bounded helpers, inlined
+  because scripts cannot import: `boundedParallel(thunks, 5)` and its pipeline sibling. Enforcement
+  sits at the tool call, on matcher `Workflow|Agent` — the exact pair, since `Workflow` alone
+  leaves direct spawns unguarded. The hook denies any K it cannot resolve to an integer ≤5, and
+  an array LITERAL of ≤5 elements is a receiver it can size. FIVE of these values are
+  machine-compared against the sources that own them by `tools/check-playbook-parity.sh`; retyping
+  one wrong reds the bar rather than drifting. The marker spellings and the full resolvable-bound
+  grammar are the hook's own, in `tools/hooks/README.md`; a ready harness ships beside it.
 - Finders emit CONCRETE findings — `file:line` + repro/impact + proposed fix — so skeptics can actually verify them.
 - Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics; past ~25 agents returns diminish.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.
 - Match intensity to target richness: heavy multi-lens earns its tokens on fresh/complex write paths; over hardened code it manufactures refuted noise — review light or skip.
 - Persist each Tier-2 run as an in-repo artifact folder (`{{REVIEW_DIR}}`); periodically re-audit the corpus (token cost vs severity-weighted confirmed-finding value) to retune these defaults.
-- Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet; the cap is enforced at the `Workflow` tool-call AND at the `Agent` one (both fire a main-loop `PreToolUse`), never inside the script, where no hook reaches.
-- A sidechain agent holds NEITHER tool, so it cannot fan out at all — the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
+- Orchestration scripts run in sidechains, in a restricted runtime (plain JS — no type syntax, no imports) — inline the schema discipline as a snippet. A sidechain agent holds NEITHER tool, so it cannot fan out at all: the capability is ABSENT, not policed. It DOES inherit the governing doc and hooks DO fire in it, both measured; the cap sits at the main loop because that is where the fan-out decision is MADE.
 - Verify before "done": a check that exercises THIS change (its own/affected test, or the relevant gate) — an unrelated green gate is not proof; failures reported with output, skipped steps named.
 - Commit freely as you go (branch/worktree, or local `{{DEFAULT_BRANCH}}` for doc-only per §3); landing is §1's rule, not restated here.
 
