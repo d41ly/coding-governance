@@ -17,11 +17,11 @@ sentences elsewhere in the file that only made sense while the budget stood.
 - AC1 — MET — `grep -c 'BUILD-METHOD.template.md' tools/template-size-limits.txt` returns 0 and the
   same grep over `tools/gate-legs.json` returns 0. Asserted rather than assumed, because the
   ruling's whole product is that nothing measures this file
-- AC2 — **NAMED SKIP, and its witness is the absence.** This unit adds no gate, so §7's
+- AC2 — **NAMED SKIP**, witnessed by `tools/gate-legs.json`. This unit adds no gate, so §7's
   stage-the-break rule has no subject and no RED is owed. The witness that nothing was added:
-  `grep -c 'check-template-size.sh' tools/gate-legs.json` returns 3, unchanged from base. Recorded
-  as a skip rather than omitted, because a skip that looks like a pass is indistinguishable from
-  coverage
+  `grep -c 'check-template-size.sh' tools/gate-legs.json` returns 3, unchanged from base.
+  Recorded as a skip rather than omitted, because a skip that looks like a pass is
+  indistinguishable from coverage
 - AC3 — MET — `python tools/govkit/govkit.py selfcheck` exits 0 and
   `git diff --stat -- tools/govkit/subject-pins.tsv` is empty: no leg was added, so no pin moved
 - AC4 — MET — the census prints the template with source `NONE`, a `-` ceiling and a `-` free

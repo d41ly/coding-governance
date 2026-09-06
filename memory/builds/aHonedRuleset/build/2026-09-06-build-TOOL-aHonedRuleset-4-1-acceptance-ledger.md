@@ -23,8 +23,9 @@ bullets folded into one, and the wrong array-literal claim was corrected on both
   physical line, so the failure mode is structurally unreachable rather than merely avoided
 - AC3 — MET — `bash tools/check-agent-cap-restatement.sh` exits 0 reporting `clean — 86 markdown
   file(s) scanned, 2 waiver(s)`, so the `at most 5 verify agents TOTAL` waiver row is still live
-- AC4 — MET — the template measures **48531**, against a ceiling of 48611 and a base of 49144. 613
-  below base, of which 126 is `TOOL-aHonedRuleset-2`'s and **487** is this unit's
+- AC4 — MET — `bash tools/check-template-size.sh` reports the template at **48531**, against a
+  ceiling of 48611 and a base of 49144. 613 below base, of which 126 is
+  `TOOL-aHonedRuleset-2`'s and **487** is this unit's
 - AC5 — MET — `adopt-playbook.sh --target . --check` prints `region matches a fresh render`
 - AC6 — MET — `bash tools/check-line-length.sh` exits 0, `0 over 450 characters`
 - AC7 — MET in BOTH halves. `grep -rc 'passes unmarked'` returns 0 for the template, `AGENTS.md` and
@@ -36,16 +37,17 @@ bullets folded into one, and the wrong array-literal claim was corrected on both
   the two charter carriers, `memory/guides/SESSION-KICKOFF.md`, `tools/hooks/README.md` and
   `memory/backlog/TOOL.md`. The unit-3 records were split into their own commit precisely so this
   assertion stayed about the code
-- AC9 — **NOT MET AS WRITTEN.** The push-boundary bar came back RED on four legs, none on this unit's
-  subject: three reproduce at base and the fourth was check 23, which this ledger answers
+- AC9 — **NOT MET AS WRITTEN.** `bash tools/run-gates/run-gates.sh` came back RED on four legs,
+  none on this unit's subject: three reproduce at base and the fourth was hygiene check 23,
+  which this ledger answers
 - AC10 — MET in both halves — `grep -c 'both fire a main-loop'` returns 0, and exactly one bullet
   survives between `- Persist each Tier-2 run` and `- Verify before "done"`
 - AC11 — MET — the `TOOL-dFramedEntrypoint-1` row reads CLOSED and names `builds/aHonedRuleset/`
-- AC12 — **SKIPPED, on an explicit owner directive mid-run: "skip self-tests".** The
-  `GATE_SELFTESTS=1` run this criterion asks for did not happen, so the five `tools/hooks/` self-test
-  legs are UNOBSERVED by this build. Stated plainly rather than left to read as green. What bounds it:
-  this unit's diff touches `tools/hooks/README.md` only — no hook behaviour, no constant, no matcher
-  — and `check-agent-cap-restatement` (AC3) and `playbook parity` (AC1) both grade the surviving
+- AC12 — **SKIPPED**, on an explicit owner directive mid-run. The `GATE_SELFTESTS=1` run this
+  criterion asks for did not happen, so the five `tools/hooks/` self-test legs are UNOBSERVED
+  by this build. Stated plainly rather than left to read as green. What bounds it: this unit's
+  diff touches `tools/hooks/README.md` only — no hook behaviour, no constant, no matcher — and
+  `check-agent-cap-restatement` (AC3) and `playbook parity` (AC1) both grade the surviving
   prose and both are green
 
 ## Figures replaced by measurement

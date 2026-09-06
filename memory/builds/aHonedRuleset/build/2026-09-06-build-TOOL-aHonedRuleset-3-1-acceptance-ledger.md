@@ -15,26 +15,27 @@ follows its subject.
 
 - AC1 — MET — `grep -cE '^[0-9]+\. \*\*Step '` returns **6** over
   `tools/unattended/PROTOCOL.template.md` and **0** over `skills/session-kickoff/SKILL.md`
-- AC2 — MET — the engine measures 16998 / 18432, **1434 bytes under**, against a floor of 1200 and
-  the 207 measured at base. The first pointer draft came in at 84 bytes of recovery against AC2's
-  90-byte sibling floor in `TOOL-aHonedRuleset-5`; the pointer was tightened rather than the
-  criterion moved
+- AC2 — MET — `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` reports
+  16998 / 18432, **1434 bytes under**, against a floor of 1200 and the 207 measured at base.
+  The first pointer draft recovered 84 bytes against the 90-byte sibling floor in
+  `TOOL-aHonedRuleset-5`; the pointer was tightened rather than the criterion moved
 - AC3 — MET — `bash tools/memory-tree/check-memory-hygiene.sh --staged` exits 0, so the rendered
   protocol is inside `GUIDE_CAP_BYTES` and `GUIDE_CAP_LINES`
 - AC4 — MET — `bash tools/unattended/check-unattended.sh` exits 0 with the new section and the
   rewritten `KICKOFF_EXITS` row present
-- AC5 — MET, **observed RED before the arm was trusted.** With one numbered exit deleted from BOTH
-  protocol copies, the gate exits 1 printing
-  `5 against 6 in memory/guides/UNATTENDED-PROTOCOL.md` — the new message, naming the document it now
-  reads rather than the engine. Restored, and the leg returns to exit 0
+- AC5 — MET, **observed RED** before the arm was trusted: the gate prints `5 against 6`. With one
+  numbered exit deleted from BOTH protocol copies it exits 1 printing
+  `5 against 6 in memory/guides/UNATTENDED-PROTOCOL.md` — the new message, naming the document
+  it now reads rather than the engine. Restored, and the leg returns to exit 0
 - AC6 — MET — `check-arms.py --report` shows check 12 branches 2 and 3 (the Step 5b heading and the
   READY prompt string) still ARMED, so moving the count disarmed neither
-- AC7 — **SPLIT at rev-7; one half MET, one half WAIVED with evidence.** MET:
-  `python3 tools/memory-tree/check-arms.py --check` exits 0 with check 12 branch 4 reported ARMED.
-  WAIVED: `check-unattended.test.sh` fails 26 arms and did so BEFORE this unit existed — the fixture
-  seds for `Ten kit-owned core items` against a protocol saying `Twelve` (0 hits at base `6ec402bd`),
-  and its baseline conf declares no `DISPOSITION_CUTOFF`. Zero of the 26 touch check 12, the exit
-  count, or any line this unit edits, grepped rather than assumed. Filed as `TOOL-aHonedRuleset-16`
+- AC7 — **SPLIT at rev-7.** MET: `python3 tools/memory-tree/check-arms.py --check` exits 0 with
+  check 12 branch 4 reported ARMED.
+  WAIVED: `check-unattended.test.sh` fails 26 arms and did so BEFORE this unit existed — the
+  fixture seds for `Ten kit-owned core items` against a protocol saying `Twelve` (0 hits at
+  base `6ec402bd`), and its baseline conf declares no `DISPOSITION_CUTOFF`. Zero of the 26
+  touch check 12, the exit count, or any line this unit edits, grepped rather than assumed.
+  Filed as `TOOL-aHonedRuleset-16`
 - AC8 — MET — `grep -rn 'Step 5b exit' tools/ memory/guides/ .claude/` returns nothing outside build
   records
 - AC9 — MET — `kit-dogfood-parity.test.sh` and `adopt-unattended.sh --check` both exit 0

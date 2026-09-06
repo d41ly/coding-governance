@@ -25,26 +25,28 @@ carrier, because only three of the paragraph's eleven sentences map to a predica
   phrase returned 0 in both carriers because it straddled lines 369–370
 - AC4 — MET — `bash tools/check-microformats.sh` exits 0 printing
   `microformats OK — 11 definition(s) graded, 11 keyword(s) derived`, unchanged from the pre-edit run
-- AC5 — MET — the template measures 49018 / 49152, **134 bytes under**, against the 8 measured before
-  this unit. More than 100, as asked
+- AC5 — MET — `bash tools/check-template-size.sh` reports the template at 49018 / 49152,
+  **134 bytes under**, against the 8 measured before this unit. More than 100, as asked
 - AC6 — MET — `AGENTS.md` measures 64355 / 64512, **157 under**, and its delta from base is 126,
   equal to the template's, because the paragraph is byte-identical in both
 - AC7 — MET — `bash tools/playbook/adopt-playbook.sh --target . --check` exits 0, proving `AGENTS.md`
   was regenerated rather than hand-edited
 - AC8 — MET — `bash tools/check-playbook-parity.sh` exits 0 printing `pairs in agreement`, so none of
   the five S2 extractions was disturbed
-- AC9 — MET — the re-wrapped range's longest line is **100 characters**, against the documented
-  ceiling of 102. Measured by decoding UTF-8, not by `awk 'length'`, because awk counts bytes here
+- AC9 — MET — the longest re-wrapped line is **100 characters**, measured NOT with `awk`,
+  against a documented ceiling of 102. The decode matters: awk counts BYTES here and the
+  range carries multi-byte pinned glyphs, so it would over-report
 - AC10 — MET — `git diff -- tools/template-size-highwater.txt` is empty on this unit's commit: no
   `--bump` was taken to make a shrinking file look intentional
-- AC11 — **NOT MET AS WRITTEN, and recorded rather than glossed.** The push-boundary bar came back
-  RED on four legs. Three are pre-existing at base (`.lexicon.conf`'s LANGS ratchet, an
-  already-over-pin drift list, and a `pass-order` TIMEOUT under contention); the fourth was check 23,
-  which this ledger and its five siblings exist to answer. No leg failed on this unit's own subject
-- AC12 — MET, **in BOTH halves**, which is the point. With the template staged ALONE,
-  `manifest-check.sh --staged` exits 1 naming check 5 and `coding-governance-agents.template.md`.
-  With the `memory/guides/SESSION-KICKOFF.md` re-stamp bundled, it exits 0. The failing half is what
-  makes S5's obligation proven rather than assumed
+- AC11 — **NOT MET AS WRITTEN**: `bash tools/run-gates/run-gates.sh` came back RED, and it
+  is recorded rather than glossed. Four legs failed. Three reproduce at base
+  `6ec402bd` — the `.lexicon.conf` LANGS ratchet, an already-over-pin drift list, and a
+  `pass-order` TIMEOUT under contention — and the fourth was hygiene check 23, which this
+  ledger and its five siblings exist to answer. No leg failed on this unit's own subject
+- AC12 — MET, **in BOTH halves**. With the template staged ALONE, `manifest-check.sh` exits
+  1 naming check 5 and the
+  template; with the `memory/guides/SESSION-KICKOFF.md` re-stamp bundled it exits 0. The
+  failing half is what makes S5's obligation proven rather than assumed
 
 ## Later movement on this unit's subject
 
