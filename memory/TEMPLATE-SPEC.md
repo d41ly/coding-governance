@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.66 -->
+<!-- gov:kit memory-tree@2.67 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -294,17 +294,17 @@ Review corrections fold in here; bump the header rev and log it in §9.
 
 ## 5. Production-readiness checklist
 
-The cross-cutting sweep, one line each (what's needed, or N/A — <why>):
+The cross-cutting sweep, one line each (what's needed, or N/A — <why>). The ROW SET is declared,
+not written here: `READINESS_ROWS` in `.memory-tree.conf`, a `|`-separated list in skeleton order,
+rendered into the bullets below. It is the ADOPTER's to change — edit that one string and re-render.
 
 - security
 - perf / scale
-- a11y
-- i18n
 - error / empty / loading states
 - observability
-- risks (concurrency, data-loss, rollback hazards)
-- testing + left-shift gates
-- migration / rollback
+- risks
+- testing
+- migration
 - user docs
 
 For Tier-2, unresolved items become the owner scope menu.

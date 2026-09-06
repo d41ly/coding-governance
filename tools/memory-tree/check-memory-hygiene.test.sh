@@ -64,7 +64,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\nSPEC_EDGES_CUTOFF="2026-08-20"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\nSPEC_EDGES_CUTOFF="2026-08-20"\nREADINESS_ROWS="security|observability|risks"\nREADINESS_ROWS_CUTOFF="2026-08-20"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -718,6 +718,38 @@ edgespec 171 25 12 '- **hands-off** — something, somewhere.'
 # 172 — an `external` payload whose PROSE names a sibling in this build. A joinable edge written
 #       as an unjoinable one, which both joins would otherwise skip in silence.
 edgespec 172 25 13 '- **consumes-from** external — in practice the work `ARCH-tFixture-161` does.'
+
+# ---- TOOL-aJoinedCanon-9: the §5 declared-row arm. The scratch conf declares a THREE-row set, not
+# ---- gov's eight, so the fixtures stay short and the arm is sized against the declaration rather
+# ---- than against a literal that would have to be kept in step with the conf.
+rowspec() {    # $1 num · $2 date-day · $3 the §5 body
+  { printf '# ARCH-tFixture-%s — a unit
+
+' "$1"
+    printf '**Status:** OPEN · rev-1 · 2026-08-%s · node a · Tier-2 · base 1234abcd · streams architecture
+
+' "$2"
+    printf '## 5. Production-readiness checklist
+
+%s
+
+' "$3"
+    printf '## 9. Revision log
+
+- rev-1 · 2026-08-%s · initial draft.
+' "$2"
+  } > "$D/spec/2026-08-$2-spec-tFixture-$1.md"
+}
+# 180 — a declared row missing from §5. RED, and it NAMES the row rather than the file alone.
+rowspec 180 25 '- security
+- observability'
+# 181 — every declared row present. Silent.
+rowspec 181 25 '- security
+- observability
+- risks'
+# 182 — PRE-cutoff twin of 180. Nothing landed goes retroactively red.
+rowspec 182 10 '- security
+- observability'
 { printf '# ledger two
 
 **Serves:** journal ARCH-tFixture-140 ARCH-tFixture-142 ARCH-tFixture-143 ARCH-tFixture-144 ARCH-tFixture-145 ARCH-tFixture-146
@@ -846,6 +878,11 @@ hit  'tFixture-171.md (§3 `### Edges` bullet with no payload'
 miss 'tFixture-170.md (§3'                                # an `external` payload joins to nothing
 hit  'a §3 edge declares an external payload while its own prose names a sibling in this build, so a joinable edge was written as an unjoinable one'
 hit  'tFixture-172.md (§3 **consumes-from** external, and its prose names the sibling `ARCH-tFixture-161` in this build'
+
+# ---- TOOL-aJoinedCanon-9: the §5 declared-row arm.
+hit  'tFixture-180.md (§5 is missing declared READINESS_ROWS, required at/after READINESS_ROWS_CUTOFF 2026-08-20): risks'
+miss 'tFixture-181.md (§5 is missing declared'   # every declared row present
+miss 'tFixture-182.md (§5 is missing declared'   # PRE-cutoff, grandfathered
 miss 'ARCH-tFixture-145/AC1'                   # the CRITERION has no token: check 12's arm, not this
 hit  'an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox'
 hit  'a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true'
@@ -1644,8 +1681,15 @@ n=$((n+1))
 A=$TMP/scaffolded
 mkdir -p "$A"
 ( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
-  bash "$HERE/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1
+  # READINESS_ROWS is a `required_keys_render` key (TOOL-aJoinedCanon-9), so this stand-in conf
+  # declares it exactly as a real adopter's does — theirs is seeded from .memory-tree.conf.example,
+  # which ships the key. Without it the scaffolder REFUSES rather than rendering a §5 holding one
+  # empty bullet, and that refusal is the reader-table behaviour rather than a fixture accident.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nREADINESS_ROWS="security|risks|testing"\n' > .memory-tree.conf
+  # `&&` to the scaffold, which it was not: the subshell's status came from the commit alone, so a
+  # scaffolder that refused outright still reported "did not complete" as a PASS and the five
+  # registry arms below carried the whole diagnosis. That cost two wrong diagnoses in this build.
+  bash "$HERE/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 &&
   git add -A && git commit -q -m scaffolded --no-verify ) || { echo "FAIL adopt-memory-tree.sh --scaffold did not complete"; st=1; }
 # The retired session machinery: five names under project/ the gate no longer admits, so writing any
 # of them would hand every new adopter a red tree on their first run. The prefix is interpolated
@@ -1677,7 +1721,10 @@ B=$TMP/scaffolded-inside
 mkdir -p "$B/tools"
 cp -r "$HERE" "$B/tools/" 2>/dev/null
 ( cd "$B" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+  # Declares READINESS_ROWS for the reason the sibling arm above states: it is a
+  # `required_keys_render` key, and without it the scaffolder refuses before it reaches the ceiling
+  # strip this arm exists to observe.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nREADINESS_ROWS="security|risks|testing"\n' > .memory-tree.conf
   bash "tools/$(basename "$HERE")/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 ) || true
 _lim="$B/tools/$(basename "$HERE")/build-readme-slot-limits.txt"
 if [ -f "$_lim" ]; then

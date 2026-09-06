@@ -1,6 +1,6 @@
 # aJoinedCanon — acceptance ledger
 
-**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8
+**Serves:** journal TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9
 
 Node `a`, 2026-09-06, base `274aa39b`. One `**Evidences:**` block per unit, appended as each unit
 lands. Two forms and no third: OBSERVED carries a backticked token naming what made the observation,
@@ -131,6 +131,38 @@ AMENDED names the revision that changed the criterion.
 - AC15 — `grep -c '^SPEC_EDGES_CUTOFF=' tools/memory-tree/.memory-tree.conf.example` — returns 1 from 0 at base, blank-valued, under an adopter comment saying blank means off. The example conf is the file an adopter reads and edits; a key in this repo's conf and absent from the shipped example is build rule 3's exact failure.
 - AC16 — `bash tools/check-kit-versions.sh` and `bash tools/memory-tree/check-verdict-epoch.sh` — both exit 0 at the landing commit, with `KIT_MEMORY_TREE_VERSION` 2.65 → 2.66 and every `gov:kit memory-tree@` carrier moved with it. Read honestly: the two reds this criterion asks for — revert the constant alone, then move one carrier and not the rest — were not staged separately, so the pair is covered by one green rather than by two observed failures.
 - AC17 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T19:13:16+03:00 @ 274aa39b`, at or after the newest commit touching a watched path in this write set; `last-body-change` is the same sha before and after, which is the "no delta → no touch" half.
+
+**Evidences:** TOOL-aJoinedCanon-9
+
+- AC1 — `tomllib.load(open('tools/memory-tree/kit.toml','rb'))` — a real parse, not a grep: `required_keys_render` reads `['MEMORY_ROOT', 'READINESS_ROWS']` and `optional_keys` holds `READINESS_ROWS_CUTOFF`, and `READINESS_ROWS` is NOT in `optional_keys`. Each key in the one list §4 puts it in — a key the adopter refuses to render without is a `required_keys_render` key, which is what round 3's H8 corrected.
+- AC2 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — reports parity over 4 pairs after the render.
+- AC3 — `bash tools/lib/resolve-python.test.sh` — `PASS — resolve-python: 53 assertions held`, so all three `render_doc` copies carry the new transform byte-identically. The transform sits INSIDE the marked block for exactly this reason: a per-caller one would be a second duplication nothing compares.
+- AC3b — `bash tools/memory-tree/check-memory-hygiene.test.sh` — the first cut of this transform shipped a real defect and the suite caught it, TWICE, for two different reasons. First: `render_doc` reads `$READINESS_ROWS` under `set -u` and only `check-memory-hygiene.sh` had the preset, so `adopt-memory-tree.sh` and `kit-dogfood-parity.test.sh` aborted on an unbound variable — a reader that fails to RUN rather than one that fails. §4 had named that hazard and the fix is its prescription: all three readers preset above their conf source. Second, and this one was MINE rather than the design's: the REFUSAL I then added for a blank row set fired on the suite's own scaffold fixture, whose hand-written three-key conf predates the key. The same eight arms failed again for a different cause, which is why the first fix looked ineffective. `READINESS_ROWS` is a `required_keys_render` key, and a real adopter is seeded from the example that now ships it, so the FIXTURE is what had to declare it. Recorded as its own line rather than folded into AC3, because AC3 passed throughout: the parity table compares the three copies to each other and has no opinion about whether any of them can execute. THIRD, and the reason the first two diagnoses were wrong: the scaffold arm ran the scaffolder WITHOUT `&&` to the commit that follows it, so the subshell status came from `git commit` alone and a scaffolder that refused outright still reported as complete. The five registry arms below it carried the whole diagnosis, which is why two successive fixes looked ineffective against an unchanged failure set. The arm now joins with `&&`, which is a left-shift of this build's own cost rather than a tidy-up.
+- AC4 — `python tools/check-kit-placeholders.py` — exits 0 with `READINESS_ROWS` declared and substituted for this kit.
+- AC5 — `tFixture-180` — reds with `(§5 is missing declared READINESS_ROWS, required at/after READINESS_ROWS_CUTOFF 2026-08-20): risks`, naming the missing ROW and not just the file; `tFixture-181` is silent with every declared row present, and `tFixture-182` is silent pre-cutoff. Observed on a scratch tree before the arm landed.
+- AC6 — `bash tools/memory-tree/check-memory-hygiene.sh` — no §5 row finding at the shipped cutoff, every tracked spec predating it. Lowered to `2026-01-01` the run names **49** specs, re-derived at build time against §4's pinned 48; the table is one short of what the landed arm measures, and the arm is the authority. Reverted before the commit.
+- AC7 — `grep -c 'left-shift gates' memory/TEMPLATE-SPEC.md` and `grep -c 'rollback hazards'` — both 0. F3's trade observed rather than the tautology that a rendered file matches what it was rendered from: three rows lost their trailing guidance and this unit re-homes none of it.
+- AC8 — `sed -n '/^## 5. Production-readiness/,/^## 6./p' memory/TEMPLATE-SPEC.md` — eight bullets, no `a11y` and no `i18n`, while the shipped example declares ten. The divergence is legal and is the first demonstration that the set is per-project. Read honestly: the FULL bar has not run since this unit landed, so the leg-level half of this criterion is owed at the push boundary; the whole-tree hygiene run is green.
+- AC9 — `bash memory-tree/adopt-memory-tree.sh --scaffold` — both halves, in one scratch tree. With NO conf it writes `.memory-tree.conf` from the example carrying all ten rows and exits 1. The adopter then edits the declaration down to `security|risks`, re-runs, and the script exits 0 with `git diff --stat .memory-tree.conf` EMPTY and the rendered §5 carrying exactly those two bullets. A third run prints `already scaffolded by memory-tree — nothing to do.` and exits 0. The second half is what makes the first mean something.
+- AC10 — `grep -c 'READINESS_ROWS' tools/memory-tree/README.md` — both keys appear at the "Copy … and edit" step with the per-project statement and the one edit that changes it, and the same two facts sit in the `READINESS_ROWS` comment of the shipped example, which is the file an adopter meets first.
+- AC11 — `bash tools/memory-tree/check-memory-hygiene.sh` — a scratch conf declaring `READINESS_ROWS_CUTOFF` and an EMPTY `READINESS_ROWS` REFUSES: `HYGIENE REFUSING — READINESS_ROWS_CUTOFF is 2026-08-20 but READINESS_ROWS is empty, so the §5 row arm would grade no row and report the same zero as a conforming tree.` A blank cutoff with a declared row set turns the arm off silently instead, which is the other half.
+- AC12 — `bash tools/check-kit-versions.sh` — exits 0 with `KIT_MEMORY_TREE_VERSION` 2.66 → 2.67 and every carrier moved.
+- AC13 — `python tools/memory-tree/check-arms.py --check` — exits 0, `ARMS_FLOORS` unchanged: the arm reports through the existing `fail 12` and adds no shell call site, and the refusal is a `status=1` rather than a `fail` branch.
+- AC14 — `grep -n '^READINESS_ROWS' .memory-tree.conf tools/memory-tree/.memory-tree.conf.example` — both keys declared in both confs, gov's with eight rows and the example's with ten.
+- AC15 — `bash skills/session-kickoff/manifest-check.sh` — exits 0 with `last-audit` at `2026-09-06T20:59:22+03:00`; `last-body-change` unmoved.
+
+## OWED BEFORE LANDING: the date must be re-derived once more
+
+The clock rolled to 2026-09-07 mid-build, and all eight cutoffs this build introduces are pinned at
+2026-09-07 — which is now TODAY, a date the fleet can still write into, with two sibling unattended
+runs live in it. The owner ratified a RELATION, not a constant: strictly past the newest spec
+filename date on any branch AND past a date the fleet can still write into. That relation now
+returns 2026-09-08.
+
+This is the same re-derivation the build already performed once, and it is owed again for the same
+reason rather than because the first one was wrong. It is deliberately deferred to a single sweep
+after the last unit lands, so the closing diff review reads the final values and the sweep touches
+every key once instead of twice.
 
 ## What the date re-derivation changed
 

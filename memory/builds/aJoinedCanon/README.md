@@ -109,7 +109,7 @@ ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCano
 | [TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion](spec/2026-09-04-spec-TOOL-aJoinedCanon-6.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-06 |
 | [TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives](spec/2026-09-04-spec-TOOL-aJoinedCanon-7.md) | 7 | 2 | CLOSED | rev-6 | 2026-09-06 |
 | [TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions](spec/2026-09-04-spec-TOOL-aJoinedCanon-8.md) | 8 | 2 | CLOSED | rev-5 | 2026-09-06 |
-| [TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration](spec/2026-09-04-spec-TOOL-aJoinedCanon-9.md) | 9 | 2 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration](spec/2026-09-04-spec-TOOL-aJoinedCanon-9.md) | 9 | 2 | CLOSED | rev-5 | 2026-09-06 |
 | [TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there](spec/2026-09-04-spec-TOOL-aJoinedCanon-10.md) | 10 | 1 | SPECCED | rev-5 | 2026-09-05 |
 | [TOOL-aJoinedCanon-11 — the base sha resolves to a real object](spec/2026-09-04-spec-TOOL-aJoinedCanon-11.md) | 11 | 1 | SPECCED | rev-5 | 2026-09-05 |
 <!-- /gen:build-units -->

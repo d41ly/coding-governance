@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.66   # gov:kit memory-tree@2.66 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.67   # gov:kit memory-tree@2.67 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -67,6 +67,11 @@ LEDGER_LABEL_CUTOFF=""  # date; a ledger answer whose label the spec does not nu
 LEDGER_TOKEN_CUTOFF=""  # date; a ledger answer must share a backticked token with its own criterion (check 23); blank = never required
 # The NINTH cutoff, same semantics and preset for the same adopter argument (TOOL-aJoinedCanon-8).
 SPEC_EDGES_CUTOFF=""    # date; Tier-2 specs dated >= this must carry a `### Edges` block in §3 (check 12); blank = never required
+# TOOL-aJoinedCanon-9. The §5 row set is DECLARED, and there is exactly ONE literal copy of it — the
+# conf. This preset is `set -u` safety and NOT a default: a blank value with the cutoff armed is a
+# REFUSAL below, because an armed rule with no row set grades nothing and would pass silently.
+READINESS_ROWS=""
+READINESS_ROWS_CUTOFF="" # date; Tier-2 specs dated >= this must carry every declared §5 row (check 12); blank = never required
 # Check 6 caps an index file BY CLASS, and the split is between PROSE and ROWS (see check 6 for the
 # reasoning, which is a recorded decision). These are the DEFAULTS; a project overrides any of them
 # in .memory-tree.conf, because the value that suits one corpus is not the value that suits another
@@ -924,6 +929,13 @@ done
 # section canon ("ceremony is conditional"). Pre-cutoff specs are grandfathered by FILENAME date;
 # legacy-named files never match the glob. NOTE (shared idiom with checks 6/7/8): reads WORKTREE
 # content in --staged mode, not the staged blob — CI's full run is the tree-wide truth.
+# TOOL-aJoinedCanon-9: an armed READINESS_ROWS_CUTOFF with NO declared row set grades nothing and
+# reports the same zero a clean tree does. There is one literal row set and it is the conf, so a
+# blank here is a misconfiguration rather than a default to fall back on.
+if [ -n "$READINESS_ROWS_CUTOFF" ] && [ -z "$READINESS_ROWS" ]; then
+  echo "HYGIENE REFUSING — READINESS_ROWS_CUTOFF is $READINESS_ROWS_CUTOFF but READINESS_ROWS is empty, so the §5 row arm would grade no row and report the same zero as a conforming tree."
+  status=1
+fi
 if [ -n "$SPEC_FORMAT_CUTOFF" ]; then
 SPEC_CANON='## 1. Goal
 ## 2. Scope (IN)
@@ -967,7 +979,7 @@ if [ -n "$c12_sel" ]; then
 # portability would have to be argued rather than read. Interval expressions are spelled out
 # character by character for the same reason: on a build that does not honour `{8}` the header regex
 # would demand those literal bytes and never match, redding every post-cutoff spec.
-bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v stg="$STAGED" '
+bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v canon10="$SPEC_CANON10" -v cut10="$SPEC10_CUTOFF" -v mroot="$M" -v discalt="$DISC_ALT" -v scut="$STREAMS_CUTOFF" -v wcut="$SPEC_WITNESS_CUTOFF" -v fcut="$FORK_MARK_CUTOFF" -v ecut="$SPEC10_EVIDENCE_CUTOFF" -v revscopecut="$REV_SCOPE_CUTOFF" -v jcut="$SCOPE_JOIN_CUTOFF" -v fmcut="$SPEC_FAILURE_MODE_CUTOFF" -v edgecut="$SPEC_EDGES_CUTOFF" -v rrows="$READINESS_ROWS" -v rcut="$READINESS_ROWS_CUTOFF" -v stg="$STAGED" '
   $1 == "M" { print $2 " (tracked but missing from worktree)"; next }
   $1 != "P" { next }
   {
@@ -1373,6 +1385,31 @@ bad12_raw=$(printf '%s\n' "$c12_sel" | awk -F'\t' -v canon="$SPEC_CANON" -v cano
       # "the sibling was never graded" — a Tier-1 spec is `next`-ed above and a grandfathered one
       # never reaches here, and both are legitimate absences rather than disagreements.
       if (stg == 0) print "\003\tU\t" eg_slug "\t" eg_uid "\t" eg_ord "\t\t\t" f
+    }
+    # ---- TOOL-aJoinedCanon-9: every DECLARED §5 row appears in the body. The row set is a
+    # ---- `|`-separated conf declaration rather than ten literals in the skeleton, so a project that
+    # ---- ships no user interface drops `a11y` and `i18n` by editing one string. The arm sits at the
+    # ---- SAME NESTING LEVEL as the §10 evidence arm and OUTSIDE its ecut guard, so its population is
+    # ---- its own key and never an intersection of two. Matching is a plain substring over the §5
+    # ---- body: the labels carry `/` and spaces, and a regex over author-supplied conf values is the
+    # ---- interpolated-into-a-regex class this tree has already paid for once.
+    if (rcut != "" && fdate != "" && fdate >= rcut) {
+      rr_in5 = 0; rr_body = ""
+      for (i = 1; i <= n; i++) {
+        L = body[i]
+        if (L ~ /^## /) { rr_in5 = (L ~ /^## [0-9]+[.] Production-readiness checklist[ 	]*$/); continue }
+        if (rr_in5) rr_body = rr_body "\n" L
+      }
+      if (rr_in5 || rr_body != "") {
+        rr_nm = split(rrows, rr_a, "|")
+        rr_miss = ""; rr_nb = 0
+        for (i = 1; i <= rr_nm; i++) {
+          if (rr_a[i] == "") continue
+          if (index(rr_body, rr_a[i]) == 0) { rr_nb++; rr_miss = (rr_nb == 1) ? rr_a[i] : rr_miss ", " rr_a[i] }
+        }
+        if (rr_nb > 0)
+          print f " (§5 is missing declared READINESS_ROWS, required at/after READINESS_ROWS_CUTOFF " rcut "): " rr_miss
+      }
     }
     # ---- Tier-2 body assertions ----
     ng = 0; got = ""

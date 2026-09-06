@@ -130,11 +130,8 @@ arm "a blank SPEC_LEGLINE_CUTOFF turns the arm off" 0 "$d" "blank (arm off)"
 d=$base/nogates; scratch "$d"
 printf 'SPEC_LEGLINE_CUTOFF="2026-09-01"
 ' > "$d/.memory-tree.conf"
-python - "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md" <<'PYEOF'
-import sys
-p = sys.argv[1]; t = open(p, 'rb').read().decode('utf-8')
-open(p, 'wb').write(t.split('## 7. Gates')[0].encode('utf-8'))
-PYEOF
+awk '/^## 7[.] Gates$/{exit} {print}' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md" > "$d/.tmp.md"
+mv "$d/.tmp.md" "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
 git -C "$d" add -A >/dev/null
 arm "a post-cutoff spec with NO Gates heading is silent" 0 "$d" "1 carry no Gates heading to grade"
 

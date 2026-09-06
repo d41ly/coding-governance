@@ -103,6 +103,17 @@ LEDGER_TOKEN_CUTOFF=""
 # strictly ahead of your corpus as with the cutoffs above.
 SPEC_EDGES_CUTOFF=""
 
+# The §5 production-readiness row LABELS, in skeleton order, `|`-separated. This is the ONLY literal
+# row set — the spec template renders it through `{{READINESS_ROWS}}` and no script carries a default
+# copy. IT IS YOURS TO CHANGE: edit this one string and re-run the render. The ten below are a
+# starting point, not a rule; gov's own conf declares eight, having dropped `a11y` and `i18n` because
+# it ships no user interface. Keep it on ONE line — a wrapped value reaches the retrieval corpus by
+# its first row only.
+READINESS_ROWS="security|perf / scale|a11y|i18n|error / empty / loading states|observability|risks|testing|migration|user docs"
+# The date from which check 12 requires every declared row to appear in a Tier-2 spec's §5 body.
+# Blank = never required; set it strictly ahead of your corpus as with the cutoffs above.
+READINESS_ROWS_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.

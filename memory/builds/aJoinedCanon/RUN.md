@@ -36,3 +36,5 @@ base: 274aa39b786c886991726896927337c0e3048e0c
 2026-09-06T15:56:36Z dispatch · item e3d26f84 TOOL-aJoinedCanon-7 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md .memory-tree.conf memory/map/features/spec-tokens.md memory/guides/SESSION-KICKOFF.md
 
 2026-09-06T16:05:42Z dispatch · item 1430e86a TOOL-aJoinedCanon-8 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh .memory-tree.conf tools/memory-tree/.memory-tree.conf.example tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/HYGIENE.template.md memory/TEMPLATE-SPEC.md memory/HYGIENE.md memory/guides/SESSION-KICKOFF.md
+
+2026-09-06T17:49:08Z dispatch · item 769a62d6 TOOL-aJoinedCanon-9 · reason tools/lib/render-doc.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/kit.toml tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh .memory-tree.conf tools/memory-tree/.memory-tree.conf.example tools/memory-tree/README.md memory/guides/SESSION-KICKOFF.md
