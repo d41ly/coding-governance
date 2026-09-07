@@ -1,12 +1,13 @@
 # TOOL-aPooledSweep-1 — the sweep runs its suites in a bounded outer pool
 
-**Status:** OPEN · rev-1 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 1 · ratified 2026-09-07
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-07-build-TOOL-aPooledSweep-1-why-the-port-could-not-finish.md](../build/2026-09-07-build-TOOL-aPooledSweep-1-why-the-port-could-not-finish.md) | research | — |
+| [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPooledSweep-2 TOOL-aPooledSweep-3 |
 
 <!-- /gen:spec-records -->
 
@@ -19,18 +20,22 @@ falls toward the longest suite, over the whole population and with no suite rewr
 ## 2. Scope (IN)
 
 - **S1** — a `--sweep` mode that executes the resolved population through a bounded pool of
-  concurrent suite processes, reporting one verdict line per suite. Observed by AC1.
+  concurrent suite processes, reporting one verdict line per suite. Observed by AC1 and AC6.
 - **S2** — REPORTING IS DECLARATION-ORDERED whatever the width and whatever order the pool frees a
   slot in, so the output is byte-stable against the serial mode's ordering. Observed by AC2.
 - **S3** — THE COMPOSITE WIDTH INVARIANT IS PRESERVED: outer x inner never exceeds the profile row's
   declared width. `--sweep` re-divides it as `run-selftests.sh`'s own `OUTER=1` comment instructs,
-  and prints the pair it chose before the first verdict. Observed by AC3.
-- **S4** — the run's exit status is the SWEEP verdict alone: non-zero when any suite failed, zero
-  when none did. Observed by AC1 and AC4.
+  prints the pair it chose before the first verdict, and takes an explicit override from
+  `SELFTEST_OUTER_WIDTH`. Observed by AC3.
+- **S4** — the run's exit status is the SWEEP verdict alone. Non-zero when any suite failed,
+  observed by AC1; zero when none did, observed by AC7.
 - **S5** — the existing liveness refusal survives the new mode: a `--sweep` that resolved no suite
   REFUSES rather than printing a green line. Observed by AC4.
 - **S6** — the default (no-flag) mode is UNCHANGED, byte-for-byte in its output shape, because it is
   what `run-unattended-gates.sh` and every Definition of Done already invoke. Observed by AC5.
+- **S7** — EVERY POOLED SUITE IS BOUNDED, and the whole run is too. A suite that overruns its bound
+  is KILLED and rendered as a state distinguishable from both `ok` and `FAIL`; a run that overruns
+  the wall kills what is outstanding and REDS naming those suites. Observed by AC8 and AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -41,6 +46,11 @@ falls toward the longest suite, over the whole population and with no suite rewr
   `--shard` contract and dispatching its halves as independent pool members would lower the floor
   further; it is a follow-up, and it needs the shard-vs-whole-suite claim distinction that
   `run-unattended-gates.sh` records.
+- Not streaming verdicts as suites finish. S2's declaration-ordered rendering and a live stream are
+  incompatible, and S7's bounds are what stop a hang from suppressing the report — a completion-order
+  stream would trade a byte-stable output for partial progress the bounds already guarantee arrives.
+- Not fixing `TOOL-aBoundedVerdict-10`. Its per-leg deadline half stays open and belongs to
+  `run-gates.sh`; S7 bounds this mode's own exposure to it and does not close the row.
 - Not deciding what a contended reading means. That is `TOOL-aPooledSweep-2`.
 - Not proving the suites are safe to run together. That is `TOOL-aPooledSweep-3`.
 
@@ -51,7 +61,7 @@ falls toward the longest suite, over the whole population and with no suite rewr
 - **hands-off** `TOOL-aPooledSweep-3` — this unit runs suites together; that unit observes whether
   doing so dirtied anything outside their own scratch.
 - **consumes-from** external — `run-gates.sh --print-profile`, which already resolves the declared
-  width and is the runner's existing width source.
+  width AND the whole-run `wall`, and is the runner's existing width source.
 
 ## 4. Design
 
@@ -73,16 +83,49 @@ a red suite as "this shell has no `wait -n`" and degenerates to a barrier per su
 is PROBED ONCE, outside the loop, exactly as the harness probes it.
 
 Each suite runs as its own background process writing a verdict FILE, because a parent cannot read a
-variable a background job set. The verdict file holds the suite's exit status and its elapsed
-seconds; the rendering loop reads them by builtin in declaration order after the pool drains.
+variable a background job set. The verdict file holds the suite's exit status, its start stamp and
+its end stamp; the rendering loop reads them by builtin in declaration order after the pool drains.
+
+**The start and end stamps are not decoration — they are the only evidence the pool ran as one.**
+AC6 reads them, and without them the collapse this section describes is invisible from the output.
+
+### The hang bound, and why it is derived rather than declared per row
+
+Backgrounding 59 suites with no bound is strictly worse than the serial loop it replaces: the
+rendering is declaration-ordered and happens after the pool drains, so one non-returning suite
+suppresses every verdict line rather than one. `TOOL-aBoundedVerdict-10` is OPEN and records
+`unattended driver selftest` — a row in this population — hanging inside its first `--preflight`
+with zero output at 240 s. The bound is therefore a requirement of this mode, not a refinement of it.
+
+Two bounds, and both come from numbers that already exist:
+
+- **Per suite** — the row's declared budget multiplied by `sweep-ceiling-factor`, declared once in
+  `tools/run-gates/selftest-budgets.txt`'s header with its reading. `timeout -k` enforces it, the
+  same enforcement `lib-selftest.sh` uses per arm and for the same recorded reason: a captured pipe
+  read to EOF applies the bound to the verdict rather than to the clock.
+- **Per run** — the `wall` on the `--print-profile` line the mode already reads for the width.
+
+**This does not contradict the budgets header, and the distinction is worth stating because the
+header states the opposite in capitals.** That header says a budget is a cost verdict and the hang
+bound is the `ceiling` in `tools/gate-legs.json`. It is right, and this mode does not treat the
+budget AS a hang bound — it DERIVES one from it by a declared factor, exactly as those manifest
+ceilings are themselves derived at roughly 10x their recorded seconds. Reading the manifest ceilings
+directly was rejected below.
 
 ### The width
 
 `OUTER` stops being the constant `1` and becomes the resolved width in `--sweep`, with
 `SELFTEST_INNER_WIDTH` re-divided to `W / OUTER` by the arithmetic already in the file. At the
-declared width that is outer `W`, inner 1: the population is 59 suites and one ported suite, so
-outer parallelism is where the width buys anything. The product is what the invariant names, and it
-is unchanged.
+declared width that is outer `W`, inner 1. The product is what the invariant names, and it is
+unchanged.
+
+`SELFTEST_OUTER_WIDTH` overrides the outer half directly when set to a positive integer. It exists
+because the width otherwise arrives through `run-gates.sh --print-profile`, and
+`run-selftests.test.sh`'s `build_repo` copies exactly one file into its scratch repo — the runner —
+so that probe fails there, its stderr is swallowed, and `W` falls back to the hard-coded 2 for every
+arm. Without an override the fixture has ONE width and every width-varying criterion is constant.
+The alternative — staging `run-gates.sh` and `gate-profiles.txt` into the fixture — was rejected
+below.
 
 The runner PRINTS the pair it chose before the first verdict, as the serial mode already prints its
 own. A width figure that is not printed is a width nobody can check against the invariant.
@@ -90,13 +133,19 @@ own. A width figure that is not printed is a width nobody can check against the 
 ### Inventory
 
 - `--sweep` — the flag. Named against the lexicon before it is written.
-- `SWEEP_OUTER`, `SWEEP_ROOT`, `_rs_waitn` — the mode's locals. `_rs_` prefixed to match the file's
-  existing private-name habit and to keep them out of the exported surface.
-- No new file. The mode is ~50 lines inside the runner that already owns the population.
+- `SELFTEST_OUTER_WIDTH` — the outer-width override, named to match the existing
+  `SELFTEST_INNER_WIDTH` export it composes with.
+- `sweep-ceiling-factor` — the declared per-suite bound multiplier, a header key in
+  `tools/run-gates/selftest-budgets.txt` beside `port-majority-share` and `port-minimum-factor`.
+- `TIMEOUT` — the verdict state for a killed suite, distinct from `ok` and `FAIL`.
+- `SWEEP_ROOT`, `_rs_waitn` — the mode's locals. `_rs_` prefixed to match the file's existing
+  private-name habit and to keep them out of the exported surface.
+- No new file. The mode is inside the runner that already owns the population.
 
 ### Files touched (estimate)
 
-`tools/run-gates/run-selftests.sh` · `tools/run-gates/run-selftests.test.sh` · one build record.
+`tools/run-gates/run-selftests.sh` · `tools/run-gates/run-selftests.test.sh` ·
+`tools/run-gates/selftest-budgets.txt` (header key only) · one build record.
 
 ### Alternatives rejected
 
@@ -106,25 +155,41 @@ contract, and the two costliest — 32.2% of the population — were never surve
 ranking that would have selected them was produced by the same act as the survey. The research record
 beside this spec is the derivation.
 
-**A `GATE_JOBS`-shaped environment knob instead of a flag.** Rejected: the mode changes what the run
-MEANS, not merely how fast it goes, and an environment variable that silently withholds every cost
-verdict is exactly the invisible-mode-switch this repo gates against elsewhere.
+**A `GATE_JOBS`-shaped environment knob instead of a flag,** for the MODE. Rejected: the mode changes
+what the run MEANS, not merely how fast it goes, and an environment variable that silently withholds
+every cost verdict is exactly the invisible-mode-switch this repo gates against elsewhere. The
+argument is about the mode and does not reach the WIDTH, which is why `SELFTEST_OUTER_WIDTH` is a
+variable and `--sweep` is a flag.
+
+**Reading each row's hang bound from `tools/gate-legs.json`'s `ceiling`.** Rejected on two counts. It
+resolves for held legs and not for the six rows that are in no manifest — the `run-unattended-gates.sh`
+suites the 2026-08-23 ruling removed from both — so those six would still run unbounded, which is the
+half of the population containing the suite `TOOL-aBoundedVerdict-10` names. And a manifest ceiling
+is sized against the BAR's contended conditions while this runner's budget is sized against its own,
+so consuming both would give one suite two bounds from two conditions.
+
+**Staging `run-gates.sh` and `gate-profiles.txt` into the test fixture** to make the real resolver
+answer there. Rejected: it makes every width-varying arm depend on the host's detected cores and RAM,
+so the arm's width is whatever the machine says, and a criterion whose expected value is
+machine-dependent cannot be pinned.
 
 ## 5. Production-readiness checklist
 
 - security — N/A: no new execution path, no new input. The mode runs the same argv the serial mode
   runs, resolved by the same reader.
-- perf / scale — the unit's whole subject, and it is bounded above by the longest suite rather than
-  by the pool width.
+- perf / scale — the unit's whole subject. Bounded above by the longest suite's own bound, which is
+  what S7 makes true rather than assumed.
 - error / empty / loading states — a suite whose row could not be resolved keeps the serial mode's
-  `FAIL` line and its state token. An empty population REFUSES (S5).
-- observability — one verdict line per suite plus the chosen width pair, both on stdout.
+  `FAIL` line and its state token. A killed suite renders `TIMEOUT`. An empty population REFUSES.
+- observability — one verdict line per suite, the chosen width pair, and the start and end stamps
+  AC6 reads, all on stdout.
 - risks — the recorded one is the `wait -n` collapse, which turns the pool serial while still
-  printing a width; AC3 observes the width and the elapsed sum makes the collapse visible. The second
-  is cross-suite interference, which is `TOOL-aPooledSweep-3` and is why that unit exists.
+  printing a width. AC6 is what observes it, and AC6 exists because rev-1's criteria did not: every
+  one of them passed against a serial impostor, so the deliverable was commissioned and observed by
+  nothing. The second risk is cross-suite interference, which is `TOOL-aPooledSweep-3`.
 - testing — `tools/run-gates/run-selftests.test.sh` gains arms for the new mode, including its
-  failing case.
-- migration — additive: a new flag, no change to any existing mode. Reverts by deleting the branch.
+  failing cases.
+- migration — additive: a new flag, a new header key, no change to any existing mode.
 - user docs — none owed. The runner's `print_usage` is the surface and it gains a line.
 
 ## 6. Acceptance criteria
@@ -133,48 +198,79 @@ verdict is exactly the invisible-mode-switch this repo gates against elsewhere.
   suites include one that exits non-zero, it prints a verdict line for every suite and exits
   non-zero. Red when: a failing suite is reported `ok`, or the run exits 0 with a `FAIL` line
   printed.
-- **AC2** — When the same fixture population is swept twice at two different widths, by running
-  `bash tools/run-gates/run-selftests.sh --sweep` under two values of `GATE_JOBS`, the two stdouts
-  are byte-identical apart from the width pair and the elapsed figures. Red when: the verdict lines
-  reorder with the width.
+- **AC2** — When the same fixture population is swept twice under two values of
+  `SELFTEST_OUTER_WIDTH`, the two stdouts carry their verdict lines in the same order with the same
+  labels. Red when: the verdict lines reorder with the width.
   figure: DERIVED — the comparison runs the two widths at observation time.
-- **AC3** — When `--sweep` starts, it prints the outer and inner widths it chose, and their product
-  is at most the width `run-gates.sh --print-profile` reports. Red when: the product exceeds the
-  declared width, or no pair is printed.
+- **AC3** — When `--sweep` starts, it prints the outer and inner widths it chose, their product is at
+  most the resolved width, and `SELFTEST_OUTER_WIDTH` is what the outer half reports. Red when: the
+  product exceeds the resolved width, no pair is printed, or the override is ignored.
 - **AC4** — When `--sweep` is given a `--kit` filter matching nothing, it REFUSES with the existing
   liveness message and exits non-zero, printing no green line. Red when: an empty sweep exits 0.
 - **AC5** — When `bash tools/run-gates/run-selftests.sh --list` and the no-flag mode run before and
   after this change, their stdout shapes are unchanged. Red when: the default mode's output moves.
-  figure: DERIVED — compared against the pre-change binary at the pinned base.
+  figure: DERIVED — compared against the pre-change script at the pinned base.
+- **AC6** — When a fixture population of suites that each sleep a known interval is swept at
+  `SELFTEST_OUTER_WIDTH` above 1, the verdict files' start and end stamps show at least two suites
+  whose intervals OVERLAP. Red when: no two intervals overlap, which is what the `wait -n` collapse
+  in §4 produces while still printing a width pair.
+  figure: DERIVED — the stamps are read from the run under observation, never pinned.
+- **AC7** — When `--sweep` runs over a fixture population where every suite exits zero, it prints no
+  `FAIL` line and exits 0. Red when: an all-green sweep exits non-zero.
+- **AC8** — When a fixture suite runs longer than its derived per-suite bound, `--sweep` KILLS it and
+  renders it `TIMEOUT`, distinguishable from both `ok` and `FAIL`, and the run exits non-zero. Red
+  when: the suite runs to completion, or its row renders as an ordinary `FAIL`.
+  fixture: a budgets row whose budget times `sweep-ceiling-factor` is below a deliberately slow
+  fixture suite's runtime.
+- **AC9** — When the whole-run `wall` is exceeded, `--sweep` kills what is outstanding and REDS
+  NAMING those suites. Red when: the run continues past the wall, or reds without naming what it
+  killed.
 
 ## 7. Gates
 
 `run-selftests self-test` · `lexicon naming predicates` · `memory hygiene` · `testsuite counts (every bar self-test prints one)`
 
-New arm: `tools/run-gates/run-selftests.test.sh` · a fixture population holding one suite that exits
-non-zero and one that exits zero, swept · the suite's assertion floor moves by the number of arms
-added.
+New arm: `tools/run-gates/run-selftests.test.sh` · a sleeping fixture population swept at two outer
+widths, staged red by forcing the no-`wait -n` path so the pool collapses · the suite's assertion
+floor moves by the number of arms added.
+New arm: `tools/run-gates/run-selftests.test.sh` · an all-passing fixture population swept, staged
+red by forcing the exit expression to a constant · same floor move.
+New arm: `tools/run-gates/run-selftests.test.sh` · a fixture suite slower than its derived bound, and
+a population whose wall is exceeded · same floor move.
 
 ## 8. Open questions
 
 - **F1 — does `--sweep` re-divide to outer `W` / inner 1, or split the width between the two?**
-  RESOLVED (agent, 2026-09-07, delegated): outer `W`, inner 1. The population is 59 suites and
-  exactly one of them is on the inner harness, so inner width buys parallelism for 1/59th of the
-  work while outer width buys it for all of it. The invariant is the product and it is satisfied
-  either way; this split is the one that spends the width where the suites are.
+  RESOLVED (agent, 2026-09-07, delegated): outer `W`, inner 1. THREE of the 59 suites source
+  `tools/lib/lib-selftest.sh` at top level — `tools/check-line-length.test.sh`,
+  `tools/lib/extract-arms.test.sh` and `tools/run-gates/run-selftests.test.sh`, derived over the
+  tracked tree rather than counted from either figure rev-1 carried, both of which were wrong in
+  opposite directions. So inner width buys parallelism for 3/59ths of the work and outer width for
+  all of it. The invariant is the product and is satisfied either way; this split spends the width
+  where the suites are, and the corrected figure does not change the answer.
+- **F2 — where does a pooled suite's hang bound come from?** RESOLVED (agent, 2026-09-07,
+  delegated): derived from the row's own declared budget by a factor declared in that file's header,
+  plus the run `wall` already on the `--print-profile` line. §4 states why the manifest `ceiling` was
+  rejected, and the survivor is the only option that resolves for all 59 rows rather than 53 of them.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-07 · initial draft.
+- rev-2 · 2026-09-07 · §2 S3, S4, S7 · §3 · §4 · §6 AC2, AC3, AC6, AC7, AC8, AC9 · §7 · §8 F1, F2 ·
+  folded round-1 spec audit B1, B2, H1, H6, H7. B1: every rev-1 criterion passed against a serial
+  `--sweep`, so AC6 now observes overlap directly. B2: no hang bound at all over a population holding
+  an OPEN hang row, so S7 adds both bounds. H1: the fixture has no width resolver and the runner
+  never read `GATE_JOBS`, so AC2 and AC3 were constant. H6: no criterion ran an all-green sweep.
+  H7: the inner-harness suite count was wrong in both sub-specs.
 
 ## 10. Reuse audit
 
 The seam this unit extends is `tools/run-gates/run-selftests.sh` itself, which already resolves the
 population, the `--kit` filter, the width and every refusal — this adds an execution mode to it and
 reads nothing a second time. The pool shape is REUSED from `tools/lib/lib-selftest.sh`, whose
-`run_arms` carries the probed `wait -n` capability, the verdict-file protocol and the
-declaration-ordered rendering, all three of which this mode needs for the same reasons; the
-`reuse_lookup.py` probe for "run a shell self-test suite's arms in parallel with isolated scratch
+`run_arms` carries the probed `wait -n` capability, the verdict-file protocol, the `timeout -k`
+bound and the declaration-ordered rendering, all four of which this mode needs for the same reasons;
+the `reuse_lookup.py` probe for "run a shell self-test suite's arms in parallel with isolated scratch
 copies" returned `boundedParallel` and a `run` name-stem seam and named neither of these files, so
 the seam was verified against source rather than taken from the probe.
 

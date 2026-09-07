@@ -1,10 +1,12 @@
 # TOOL-aPooledSweep-3 — pool safety is observed, not assumed
 
-**Status:** OPEN · rev-1 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 3 · ratified 2026-09-07
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 |
 
 <!-- /gen:spec-records -->
 
@@ -18,14 +20,18 @@ rather than asserting that suites are hermetic because they call `mktemp -d`.
 
 - **S1** — each pooled suite runs with its own `TMPDIR`, so every `mktemp -d` inside it lands in a
   tree no sibling can reach. Observed by AC1.
-- **S2** — the sweep FINGERPRINTS the repository before and after the whole run and REDS on a
-  difference, naming what changed. The fingerprint covers the tracked working tree and the git
-  common dir, which are the two places a suite writing outside its scratch would land. Observed by
-  AC2.
+- **S2** — the sweep FINGERPRINTS THE TRACKED WORKING TREE before and after the whole run and REDS
+  on a difference, naming the paths that changed. One place, not two: §4 records why the git common
+  dir was dropped. Observed by AC2.
 - **S3** — the fingerprint has a LIVENESS assertion: a fingerprint that could not be taken REFUSES,
   and says the sweep is ungraded rather than reporting a clean tree. Observed by AC3.
 - **S4** — the refusal names the sweep as UNSOUND rather than naming a suite. A whole-run
   fingerprint cannot attribute, and it says so instead of guessing. Observed by AC2.
+- **S5** — A POOLED RED NAMES ITS OWN DISAMBIGUATION. `TOOL-dSpentCeiling-8` measured two rows of
+  this population — `run-gates turnstile` and `row-keyed merge driver replay` — redding under the
+  bar's own concurrency and green standalone, with no tree change between runs. A sweep that reds
+  therefore prints the serial re-run as the step that separates a broken mechanism from a busy box.
+  Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -39,6 +45,11 @@ rather than asserting that suites are hermetic because they call `mktemp -d`.
   more than that.
 - Not fingerprinting untracked files. A suite legitimately leaving an untracked artifact in the tree
   is not the failure this observes, and `.gitignore`d build output would red every run.
+- Not fingerprinting the git common dir. §4 records the reading that removed it; the residual gap —
+  a suite writing into repository metadata — is observed by nothing here and is named rather than
+  implied away.
+- Not resolving a load-sensitive red. S5 makes the ambiguity actionable by naming the serial re-run;
+  distinguishing a broken mechanism from a busy box is `TOOL-dSpentCeiling-8` and stays there.
 
 ### Edges
 
@@ -54,25 +65,39 @@ rather than asserting that suites are hermetic because they call `mktemp -d`.
 One `mktemp -d` for the sweep, one subdirectory per pool slot, `TMPDIR` exported into each suite
 process. Every suite in this population creates its own scratch with `mktemp -d` or a Python
 equivalent, and both honour `TMPDIR`, so the redirection reaches them without any suite being edited.
-Five suites in the population create no scratch of their own; four of those run on
-`tools/lib/lib-selftest.sh`, which calls `mktemp -d` itself and is therefore redirected identically.
+The suites that create no scratch of their own run on `tools/lib/lib-selftest.sh`, which calls
+`mktemp -d` itself and is therefore redirected identically. Derived over the tracked tree, THREE
+suites source that harness at top level: `tools/check-line-length.test.sh`,
+`tools/lib/extract-arms.test.sh` and `tools/run-gates/run-selftests.test.sh`. A grep for the
+harness's filename returns five, because `tools/lib/lib-selftest.test.sh` tests it as a SUBJECT and
+`tools/check-testsuite-counts.test.sh` only writes the spelling inside fixture strings.
 
-### The fingerprint
+### The fingerprint, and the arm that was dropped
 
-Two reads, before and after the whole sweep:
+One read, before and after the whole sweep: `git status --porcelain` over TRACKED paths. Equal is
+the pass. Different is a RED naming the differing paths.
 
-- `git status --porcelain` over TRACKED paths — a suite that wrote into the checkout.
-- a listing of `git rev-parse --git-common-dir` at one level, names and sizes — a suite that wrote
-  into the repository's own metadata, which is where the runner's ledger, its logs and the lander
-  marker live.
+**Rev-1 had a second arm and it is DELETED rather than narrowed.** It listed the git common dir at
+one level, on the reasoning that repository metadata is where an escaping suite would most likely
+write. Listing that directory on this checkout says why it cannot be an instrument: it holds
+`gate-bar-queue`, `gate-ledger.tsv`, `gate-logs`, `gate-run`, `gate-timings.tsv`,
+`unattended-landed`, `index`, `logs`, `refs` and `ORIG_HEAD`, every one of them written by ordinary
+tooling. `run-gates.sh` places `gate-bar-beacon` and `gate-bar-queue` there when a bar claims the
+turnstile, the directory is SHARED by every worktree of the repository, and this repo's own
+conventions assume concurrent sessions in sibling worktrees. The sweep's floor is the longest suite,
+so the window between the two readings is tens of minutes wide: any sibling session running the bar
+flips the listing, and S4 then forbids the refusal from naming a culprit. An operator would get an
+unattributable RED for something the sweep did not do, and an instrument that reds on innocent runs
+is ignored within two sightings.
 
-Equal before and after is the pass. Different is a RED naming the differing entries.
+The alternative was an exclusion list. Rejected below, and the residual gap is a declared non-goal
+rather than a silence.
 
 **The liveness assertion is the load-bearing half.** A fingerprint that returns an empty string
 because the command failed is indistinguishable from a clean tree, which is the exact
-green-by-absence shape this repo gates in a dozen places. So the BEFORE fingerprint must be
-non-empty in at least its git-common-dir arm — a git dir with no entries is not a state that exists
-— and an empty one REFUSES before a single suite starts.
+green-by-absence shape this repo gates in a dozen places. `git status --porcelain` is EMPTY on a
+clean tree, so emptiness cannot be the liveness test here: the assertion is that the command
+SUCCEEDED, and a non-zero exit or an unresolvable repository REFUSES before a single suite starts.
 
 ### Why a whole-run fingerprint and not a per-suite one
 
@@ -102,6 +127,11 @@ this path.
 
 **Comparing each suite's own scratch usage.** Rejected: a suite confined to `TMPDIR` is the case that
 needs no observation, and one escaping it does not do so through its scratch.
+
+**Keeping the git-common-dir arm behind an exclusion list.** Rejected: the list would have to name
+eleven entries today, and it grows every time any kit writes a new file there — a list nobody
+re-derives, guarding a signal that reds on innocent concurrent bars in the meantime. Deleting the
+arm and declaring the gap is the honest half of the same trade.
 
 ## 5. Production-readiness checklist
 
@@ -136,6 +166,10 @@ needs no observation, and one escaping it does not do so through its scratch.
 - **AC4** — When `--sweep` completes over an undirtied tree, it states that the fingerprint matched.
   Red when: a clean sweep is silent about the fingerprint, so a run where the check never fired is
   indistinguishable from one where it passed.
+- **AC5** — When a fixture suite writes a file into the git common dir during a sweep, `--sweep`
+  does NOT red; and when any suite reds, the summary NAMES the serial re-run as the disambiguation
+  step. Red when: a git-dir write reds the sweep, which is the false positive §4 deleted that arm to
+  avoid; or a red summary omits the re-run instruction.
 
 ## 7. Gates
 
@@ -144,6 +178,9 @@ needs no observation, and one escaping it does not do so through its scratch.
 New arm: `tools/run-gates/run-selftests.test.sh` · a fixture suite that writes into a tracked path,
 and a stubbed `git` that makes the fingerprint fail · the suite's assertion floor moves by the
 number of arms added.
+New arm: `tools/run-gates/run-selftests.test.sh` · a fixture suite that writes into the git common
+dir, asserted NOT to red, paired with the tracked-path arm so the two pin both edges of the
+predicate · same floor move.
 
 ## 8. Open questions
 
@@ -155,6 +192,12 @@ number of arms added.
 ## 9. Revision log
 
 - rev-1 · 2026-09-07 · initial draft.
+- rev-2 · 2026-09-07 · §2 S2, S5 · §3 · §4 · §6 AC5 · §7 · folded round-1 spec audit H2, H3, H4, H7.
+  H2: the git-common-dir arm reds on any sibling session running the bar, so it is deleted and the
+  gap declared, with AC5's negative arm pinning that it does not red. H4 dissolves with it — a
+  one-armed predicate owes one staged break, which AC2 already is. H3: `TOOL-dSpentCeiling-8`
+  measured two rows of this population redding under concurrency, so S5 makes a pooled red name its
+  own serial re-run. H7: the inner-harness suite count was four and is three.
 
 ## 10. Reuse audit
 

@@ -1,10 +1,12 @@
 # TOOL-aPooledSweep-2 — a contended reading grades no budget, and says so
 
-**Status:** OPEN · rev-1 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 2 · ratified 2026-09-07
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPooledSweep-1 TOOL-aPooledSweep-3 |
 
 <!-- /gen:spec-records -->
 
@@ -26,10 +28,9 @@ only for the kind that can carry one.
   mistakable for a budget-clean run. Observed by AC2.
 - **S4** — a pooled run writes no reading into any artifact that a later ranking reads. Observed by
   AC3.
-- **S5** — `--sweep` REFUSES `--rank`-style selection semantics by not participating in them: the
-  condition string a pooled reading carries is one `--rank` already refuses, so a pooled reading that
-  reached the budgets file would red the ranking rather than be silently sorted against serial ones.
-  Observed by AC3.
+- **S5** — `--rank` GAINS an explicit refusal for a pooled condition, because it has none today. A
+  budgets row whose reading names the pooled tag is reported unbacked by name and contributes to no
+  share, while a serial row beside it still ranks. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -83,6 +84,21 @@ so a green sweep announces on every run how many budgets it did not grade.
 This is the same shape the repo already uses for a held gate leg and for `lib-selftest.sh`'s
 declared-nothing refusal: an announced skip, never an omitted row.
 
+### The refusal that did not exist
+
+Rev-1's S5 asserted that `--rank` would already refuse a pooled reading. It does not.
+`run-selftests.sh:80` matches conditions with `measured (\d+)s (?:on )?(.+?)(?:,|$)`, whose second
+group accepts ANY text up to a comma or end of line — so `measured 42s pooled@8x1 on node a, x1.5`
+parses cleanly and ranks as a `direct` reading. The closed vocabulary is closed on the two reading
+SHAPES, not on the condition text after the seconds, and eleven of the fifty-nine rows already use
+that spelling, one of them already carrying a width clause. So the likely spelling is the one that
+slips through.
+
+The net is therefore BUILT rather than assumed: `CONDS` gains a pattern matching the pooled tag that
+routes the row to the same unbacked report an unrecognised condition takes. It is a refusal and not
+a lenient parse, because ranking a contended reading against serial ones is exactly the
+ranking-the-conditions defect `TOOL-aQuenchedHarness-6` S3a exists to prevent.
+
 ### Inventory
 
 - `SWEEP_CONDITION` — the composed tag.
@@ -133,6 +149,11 @@ this suite's own window. A per-suite clock under a pool is still a contended clo
   anywhere a ranking would later sort against a serial one.
 - **AC4** — When `bash tools/run-gates/run-selftests.sh --help` is read, it states that `--sweep`
   issues no cost verdict. Red when: the flag is documented as a faster equivalent of the default.
+- **AC5** — When a fixture budgets file carries one row whose reading names the pooled tag and one
+  ordinary serial row, `bash tools/run-gates/run-selftests.sh --rank` REPORTS the pooled row as
+  unbacked by name, computes no share that includes it, and still ranks the serial row. Red when:
+  the pooled row is ranked as a `direct` reading, or the refusal is a blanket that also drops the
+  serial row.
 
 ## 7. Gates
 
@@ -140,6 +161,8 @@ this suite's own window. A per-suite clock under a pool is still a contended clo
 
 New arm: `tools/run-gates/run-selftests.test.sh` · a fixture suite deliberately slower than its
 declared budget, run in both modes · the suite's assertion floor moves by the number of arms added.
+New arm: `tools/run-gates/run-selftests.test.sh` · a fixture budgets file carrying one pooled-tagged
+reading and one serial reading, ranked · same floor move.
 
 ## 8. Open questions
 
@@ -151,6 +174,10 @@ declared budget, run in both modes · the suite's assertion floor moves by the n
 ## 9. Revision log
 
 - rev-1 · 2026-09-07 · initial draft.
+- rev-2 · 2026-09-07 · §2 S5 · §4 · §6 AC5 · §7 · folded round-1 spec audit H5. S5 asserted a
+  `--rank` refusal that does not exist — its second condition pattern accepts any text after the
+  seconds — so the net is now built and AC5 observes it, staged both ways so the refusal is not a
+  blanket.
 
 ## 10. Reuse audit
 

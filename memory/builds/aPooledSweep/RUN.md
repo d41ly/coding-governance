@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
-phase: SPECCING
+witness: 70bd3cdba0eb34ebdf180b6cde382cd065a5aa90
+phase: REVIEWING
 branch-sha: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 branch-ref: refs/heads/branch/cg-harness-incomplete-porting-631c78
 mode: prompt
@@ -22,3 +22,5 @@ anchor-ref: refs/heads/main
 base: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 
 ## Parked
+
+2026-09-07T10:38:05Z review · item TOOL-aPooledSweep-1-2-3 · reason verdict BLOCKED · blockers 9
