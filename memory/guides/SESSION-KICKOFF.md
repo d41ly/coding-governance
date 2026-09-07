@@ -126,6 +126,8 @@ GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
+# The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the outstanding legs. TOOL-aQuenchedHarness-1
+bash tools/run-gates/run-selftests.sh  # the HELD population on demand, budget-timed. TOOL-aQuenchedHarness-4
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
@@ -210,9 +212,7 @@ does — hit three times in one file in one session) · `process-creation-is-the
   `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
-- The memory hygiene leg is minutes, not ~23: `TOOL-aThawedCorpus-4` and `-1` collapsed checks 23
-  and 21 to one `awk` each. 48 s QUIET (node a, 2026-08-29) but 139 s inside a full bar at width 8,
-  so a 120 s wrapper timeout around it WILL fire. Read it from `gate-ledger.tsv`, never from here.
+- The memory hygiene leg is MINUTES; a wrapper timeout sized in seconds fires. Read `gate-ledger.tsv`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.

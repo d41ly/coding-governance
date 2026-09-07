@@ -191,3 +191,8 @@ tools/govkit/subject-pins.tsv text eol=lf
 # line, so a CR would land inside the value field and a ceiling would parse as UNARMED.
 tools/memory-tree/build-readme-slot-limits.txt eol=lf
 tools/memory-tree/build-readme-slot-highwater.txt eol=lf
+
+# The run-gates declared-value tables are READ WITH A TAB SPLIT — `gate-profiles.txt` by
+# `awk -F'	'`, the ceiling pair by python — so a stray CR lands in the LAST field of every
+# row and corrupts the value nobody thought to strip. TOOL-aQuenchedHarness-2.
+tools/run-gates/*.txt text eol=lf

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 96 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 43 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 101 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 46 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -33,6 +33,8 @@ Inventories: gate-legs: 96 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 ·
 | `drift-audit records` | baseline |
 | `drift-audit selftest` | baseline |
 | `drift-audit wiring` | baseline |
+| `every held leg is budgeted, every budget row resolves` | run-gates |
+| `extract-arms self-test` | run-gates |
 | `gotchas selftest` | baseline |
 | `govkit acceptance matrix` | govkit |
 | `govkit refusal join` | govkit |
@@ -49,6 +51,7 @@ Inventories: gate-legs: 96 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 ·
 | `kit version markers` | memory-tree-hygiene |
 | `kit-placeholders self-test` | kit-placeholders |
 | `kit/dogfood doc parity` | memory-tree-hygiene |
+| `leg ceilings clear their evidenced maximum` | run-gates |
 | `lexicon naming predicates` | lexicon |
 | `lexicon selftest` | lexicon |
 | `lexicon wiring` | lexicon |
@@ -90,7 +93,9 @@ Inventories: gate-legs: 96 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 ·
 | `run-gates gov canary` | run-gates |
 | `run-gates turnstile` | run-gates |
 | `run-gates wiring` | run-gates |
+| `run-selftests self-test` | run-gates |
 | `scratch-guard self-test` | agent-cap |
+| `selftest harness self-test` | run-gates |
 | `settings-merge selftest` | baseline |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |
 | `spec-tokens self-test` | spec-tokens |
@@ -168,6 +173,7 @@ Inventories: gate-legs: 96 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 ·
 |---|---|
 | `a-pair-exists-and-it-is-the-wrong-one.md` | agent-cap |
 | `a-view-fix-trades-one-blindness-for-another.md` | agent-cap |
+| `ab-arm-never-did-the-work.md` | run-gates |
 | `absence-assertion-over-whole-file-text.md` | baseline |
 | `allowlist-narrower-than-the-root-it-guards.md` | agent-cap |
 | `amendment-leaves-its-other-half-standing.md` | build-method |
@@ -179,6 +185,7 @@ Inventories: gate-legs: 96 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 ·
 | `containment-tested-one-way.md` | unattended |
 | `criterion-asserts-what-its-own-command-cannot-show.md` | build-method |
 | `degradation-known-but-unreported.md` | review-harnesses |
+| `empty-field-collapses-unless-it-is-last.md` | run-gates |
 | `fallback-fabricates-the-passing-value.md` | unattended |
 | `fixture-inherits-ambient-machine-state.md` | unattended |
 | `fixture-passes-by-finding-nothing.md` | baseline |
@@ -202,6 +209,7 @@ Inventories: gate-legs: 96 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 ·
 | `status-set-in-a-subshell.md` | unattended |
 | `structured-record-split-on-whitespace.md` | unattended |
 | `subprocess-resolves-a-different-shell.md` | baseline |
+| `suite-invalidated-by-a-commit-under-it.md` | run-gates |
 | `text-mode-read-eats-a-bare-cr.md` | unattended |
 | `trace-profile-measures-itself.md` | unattended |
 | `trailing-comma-counted-as-an-element.md` | agent-cap |

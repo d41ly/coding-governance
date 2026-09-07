@@ -8,20 +8,37 @@ streams = ["tooling"]
 decisions = ["TOOL-aPacedTurnstile-1", "TOOL-aPacedTurnstile-2", "TOOL-aPacedTurnstile-4", "TOOL-aPacedTurnstile-5", "TOOL-aPacedTurnstile-6", "TOOL-aPacedTurnstile-3", "TOOL-aPacedTurnstile-7", "TOOL-aPacedTurnstile-16"]
 
 [claims]
-gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring", "profile-bar selftest", "run-gates turnstile"]
+gate-legs = ["run-gates gov canary", "run-gates adopter e2e", "run-gates wiring",
+  "profile-bar selftest", "run-gates turnstile",
+  "every held leg is budgeted, every budget row resolves", "run-selftests self-test",
+  "selftest harness self-test", "extract-arms self-test",
+  "leg ceilings clear their evidenced maximum"]
 kits = ["run-gates"]
 git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
-  "hookspath-resolves-into-another-checkout.md"]
+  "hookspath-resolves-into-another-checkout.md",
+  "ab-arm-never-did-the-work.md",
+  "empty-field-collapses-unless-it-is-last.md",
+  "suite-invalidated-by-a-commit-under-it.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
 [paths]
 globs = [
   "tools/run-gates/run-gates.sh",
+  "tools/run-gates/run-selftests.sh",
+  "tools/run-gates/run-selftests.test.sh",
+  "tools/run-gates/selftest-budgets.txt",
+  "tools/run-gates/derive-ceilings.py",
+  "tools/run-gates/ceiling-evidence.txt",
+  "tools/run-gates/ceiling-margin.txt",
+  "tools/lib/lib-selftest.sh",
+  "tools/lib/lib-selftest.test.sh",
+  "tools/lib/extract-arms.sh",
+  "tools/lib/extract-arms.test.sh",
   "tools/run-gates/adopt-run-gates.sh",
   "tools/run-gates/kit.toml",
   "tools/run-gates/profile_bar.py",

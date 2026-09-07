@@ -1180,6 +1180,28 @@
     "ceiling": 60
   },
   {
+    "name": "leg ceilings clear their evidenced maximum",
+    "argv": [
+      "python",
+      "tools/run-gates/derive-ceilings.py",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "every held leg is budgeted, every budget row resolves",
+    "argv": [
+      "bash",
+      "tools/run-gates/run-selftests.sh",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "spec-tokens self-test",
     "argv": [
       "bash",
@@ -1204,5 +1226,48 @@
     "chunk": "selftests",
     "subject": "kit",
     "ceiling": 120
+  },
+  {
+    "name": "selftest harness self-test",
+    "argv": [
+      "bash",
+      "tools/lib/lib-selftest.test.sh"
+    ],
+    "guard": [
+      "tools/lib/lib-selftest.sh",
+      "tools/lib/lib-selftest.test.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 370
+  },
+  {
+    "name": "extract-arms self-test",
+    "argv": [
+      "bash",
+      "tools/lib/extract-arms.test.sh"
+    ],
+    "guard": [
+      "tools/lib/extract-arms.sh",
+      "tools/lib/extract-arms.test.sh",
+      "tools/lib/lib-selftest.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
+    "name": "run-selftests self-test",
+    "argv": [
+      "bash",
+      "tools/run-gates/run-selftests.test.sh"
+    ],
+    "guard": [
+      "tools/run-gates/run-selftests.sh",
+      "tools/run-gates/run-selftests.test.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
   }
 ]

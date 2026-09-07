@@ -21,22 +21,38 @@ SCRIPT="$TMP/tools/check-testsuite-counts.sh"
 run() { bash "$SCRIPT" 2>&1; }
 
 # A COMPLIANT suite: the agreed count line plus a pinned floor.
-mk_ok()  { printf 'FLOOR_ASSERTIONS=3
+build_ok()  { printf 'FLOOR_ASSERTIONS=3
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || st=1
 echo "PASS ($n assertions)"
 ' > "$1"; }
 # SILENT: no count at all, which is the state 12 of 27 suites were in when the leg was written.
-mk_bad() { printf 'echo done\n' > "$1"; }
+build_bad() { printf 'echo done\n' > "$1"; }
 # A floor pinned with nothing printing a count to compare it against.
-mk_floor_only() { printf 'FLOOR_ASSERTIONS=3\necho done\n' > "$1"; }
+build_floor_only() { printf 'FLOOR_ASSERTIONS=3\necho done\n' > "$1"; }
 # A count and a floor that never MEET — the shape the reference suite actually had for its whole life.
-mk_uncompared() { printf 'FLOOR_ASSERTIONS=3
+build_uncompared() { printf 'FLOOR_ASSERTIONS=3
 echo "PASS ($n assertions)"
 ' > "$1"; }
 # A floor of ZERO: pinned, compared, and unable to bite.
-mk_zero() { printf 'FLOOR_ASSERTIONS=0
+build_zero() { printf 'FLOOR_ASSERTIONS=0
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || st=1
 echo "PASS ($n assertions)"
+' > "$1"; }
+
+# ---- THE HARNESS SPELLING. A suite on `tools/lib/lib-selftest.sh` prints no count of its own and
+# ---- compares no floor of its own: `run_arms` does both. These three fixtures are the same three
+# ---- states as the classic ones above, in that spelling.
+build_harness_ok()    { printf '. "$HERE/lib/lib-selftest.sh"
+SELFTEST_FLOOR=3
+run_arms t
+' > "$1"; }
+build_harness_zero()  { printf '. "$HERE/lib/lib-selftest.sh"
+SELFTEST_FLOOR=0
+run_arms t
+' > "$1"; }
+build_harness_inert() { printf '. "$HERE/lib/lib-selftest.sh"
+SELFTEST_FLOOR=3
+echo done
 ' > "$1"; }
 
 manifest() { # one argv entry per named suite
@@ -49,13 +65,13 @@ manifest() { # one argv entry per named suite
 : > memory/project/testsuite-count-waivers.txt
 
 # ---- GREEN CONTROL first. Every red arm below is worthless if a conforming tree is not silent.
-mk_ok tools/a.test.sh; manifest tools/a.test.sh
+build_ok tools/a.test.sh; manifest tools/a.test.sh
 out=$(run); rc=$?
 same "a conforming tree exits 0" "$rc" "0"
 same "a conforming tree prints nothing" "$out" ""
 
 # ---- a suite printing NO count, and not waived.
-mk_bad tools/b.test.sh; manifest tools/a.test.sh tools/b.test.sh
+build_bad tools/b.test.sh; manifest tools/a.test.sh tools/b.test.sh
 out=$(run)
 hit "$out" "a self-test on the bar prints no executed assertion count against a floor, so a block of its arms could be stranded past an exit and the suite would still report success: tools/b.test.sh"
 same "and it exits non-zero" "$(run >/dev/null 2>&1; echo $?)" "1"
@@ -66,33 +82,47 @@ same "a waived suite is silent" "$(run)" ""
 
 # ---- a STALE waiver: the suite now complies, so the row hides nothing and must red. Without this
 # ---- the list only ever grows, which is the opposite of a ratchet.
-mk_ok tools/b.test.sh
+build_ok tools/b.test.sh
 hit "$(run)" "a testsuite-count waiver names a suite that now complies, so the list has stopped shrinking and the row hides nothing: tools/b.test.sh"
 
 # ---- a waiver naming a suite the manifest does not run at all.
-mk_bad tools/b.test.sh
+build_bad tools/b.test.sh
 printf 'tools/b.test.sh\ntools/ghost.test.sh\n' > memory/project/testsuite-count-waivers.txt
 hit "$(run)" "a testsuite-count waiver names a suite the gate manifest does not run, so it waives nothing and outlives what it was written for: tools/ghost.test.sh"
 
 # ---- a floor with no count line to compare it to. Distinct message, because the fix is different.
 : > memory/project/testsuite-count-waivers.txt
-mk_floor_only tools/c.test.sh; manifest tools/a.test.sh tools/c.test.sh
+build_floor_only tools/c.test.sh; manifest tools/a.test.sh tools/c.test.sh
 hit "$(run)" "or never compares the two, so nothing reads the pin: tools/c.test.sh"
 
 # ...a count AND a floor that never meet — a pin nothing reads is the same nothing as no pin.
-mk_uncompared tools/e.test.sh; manifest tools/a.test.sh tools/e.test.sh
+build_uncompared tools/e.test.sh; manifest tools/a.test.sh tools/e.test.sh
 hit "$(run)" "or never compares the two, so nothing reads the pin: tools/e.test.sh"
 
 # ...a floor of ZERO, which nothing can fall below.
-mk_zero tools/g.test.sh; manifest tools/a.test.sh tools/g.test.sh
+build_zero tools/g.test.sh; manifest tools/a.test.sh tools/g.test.sh
 hit "$(run)" "a self-test pins a floor of ZERO, which nothing can fall below"
 
 # ---- THE DERIVED-POPULATION ARM. Adding a suite to the manifest reds the leg with NO edit to the
 # ---- leg itself; a hand-kept list would have stayed green and that is the defect being prevented.
 manifest tools/a.test.sh
 same "one compliant suite, silent" "$(run)" ""
-mk_bad tools/d.test.sh; manifest tools/a.test.sh tools/d.test.sh
+build_bad tools/d.test.sh; manifest tools/a.test.sh tools/d.test.sh
 hit "$(run)" "tools/d.test.sh"
+
+# ---- THE HARNESS SPELLING, all three states. Added when TOOL-aQuenchedHarness-6 ported the first
+# ---- suite onto the harness and every ported suite tripped this leg: the property is unchanged,
+# ---- the spelling is not.
+build_harness_ok tools/h.test.sh; manifest tools/h.test.sh
+out=$(run); rc=$?
+same "a harness-form suite is compliant" "$rc" "0"
+same "and a tree holding only harness-form suites is silent" "$out" ""
+
+build_harness_zero tools/hz.test.sh; manifest tools/h.test.sh tools/hz.test.sh
+hit "$(run)" "a harness self-test pins SELFTEST_FLOOR of ZERO, which nothing can fall below — a pin that cannot bite is the decoration this leg exists to remove: tools/hz.test.sh"
+
+build_harness_inert tools/hi.test.sh; manifest tools/h.test.sh tools/hi.test.sh
+hit "$(run)" "a harness self-test pins SELFTEST_FLOOR but never reaches run_arms, or does not source the harness, so nothing prints its executed count and nothing reads the pin: tools/hi.test.sh"
 
 # ---- a manifest naming a suite that is not on disk must NOT be skipped silently.
 manifest tools/a.test.sh tools/gone.test.sh
@@ -103,7 +133,7 @@ hit "$(run)" "the gate manifest names a self-test this leg cannot read, and skip
 manifest
 hit "$(run)" "the gate manifest names no *.test.sh, so this leg would grade an empty population"
 
-FLOOR_ASSERTIONS=14
+FLOOR_ASSERTIONS=18
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

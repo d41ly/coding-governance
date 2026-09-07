@@ -38,8 +38,24 @@ GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
 id_rows() {  # haystack-text · id  -> the lines carrying that id as a whole token
   printf '%s\n' "$1" | grep -E "(^|[^A-Za-z0-9-])$2([^A-Za-z0-9-]|\$)" || true
 }
+# PURE BASH, AND THIS ONE IS THE HOT PATH. `id_rows` forks a subshell and spawns a `grep` per
+# call, and `pass_commit` calls this once per commit in its window -- 1528 calls in one run of
+# `check-unattended.sh`, measured on node `a` 2026-09-07, which was the largest single spawn
+# population left in the leg after the `git log -1` removal above it.
+#
+# THE PATTERN IS `id_rows`'S, and the two are EQUIVALENT on a multi-line haystack even though
+# grep anchors per LINE and bash anchors per STRING: a newline is itself a member of the
+# negated class each anchor alternates with, so every position where grep's `^` or `$` would
+# match is a position where the character-class branch matches instead. That is the kind of
+# claim that is obviously true and occasionally false, so it was checked differentially over
+# seventeen cases -- both anchors, both multi-line edges, the `-1`/`-10` trap and the
+# hyphenated suffix -- before this landed, and the leg's whole stdout is byte-identical
+# across the change. TOOL-aQuenchedHarness-7.
+#
+# `id_rows` KEEPS its grep: it returns the matching LINES, which is a different job, and it is
+# not called per commit.
 id_in() {    # haystack-text · id  -> 0 when the id appears as a whole token
-  [ -n "$(id_rows "$1" "$2")" ]
+  [[ $1 =~ (^|[^A-Za-z0-9-])"$2"([^A-Za-z0-9-]|$) ]]
 }
 
 # --------------------------------------------------------------------------- paths, normalised
@@ -102,13 +118,27 @@ is_repo_root() {
 pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEAD]
   _pa=$1; _pu=$2; _prel=$3; _pto=${4:-HEAD}
   GIT rev-parse --verify --quiet "$_pa^{commit}" >/dev/null 2>&1 || return 1
-  for _pc in $(GIT log --reverse --format=%H "$_pa..$_pto" 2>/dev/null); do
-    id_in "$(GIT log -1 --format=%s "$_pc" 2>/dev/null)" "$_pu" || continue
+  # THE SUBJECT COMES OUT OF THE SAME WALK AS THE SHA. It used to cost a `git log -1` per
+  # commit in the window, on every call, and this function is called once per (anchor, unit)
+  # pair -- so the same commits were re-read once per pair. Profiled on node `a` 2026-09-07
+  # over a full run of `bash tools/unattended/check-unattended.sh`: 1528 of that run's 2513
+  # git spawns were this one line, against 31 for the `--follow` walk everyone assumes is the
+  # expensive one. `%H%x09%s` gets both out of one walk. TOOL-aQuenchedHarness-7.
+  #
+  # A HEREDOC, NEVER A PIPE: a piped `while` runs in a subshell and this loop RETURNS from the
+  # function. It reads LINES rather than word-splitting because a subject holds spaces, and
+  # the possibly-empty field is LAST for the reason
+  # memory/gotchas/empty-field-collapses-unless-it-is-last.md states.
+  while IFS=$'\t' read -r _pc _psub; do
+    [ -n "$_pc" ] || continue
+    id_in "$_psub" "$_pu" || continue
     _ptouch=$(GIT diff-tree --no-commit-id --name-only -r "$_pc" 2>/dev/null | grep -vxF -- "$_prel" || true)
     [ -n "$_ptouch" ] || continue
     printf '%s\n' "$_pc"
     return 0
-  done
+  done <<PASSCOMMITS
+$(GIT log --reverse --format="%H%x09%s" "$_pa..$_pto" 2>/dev/null)
+PASSCOMMITS
   return 1
 }
 

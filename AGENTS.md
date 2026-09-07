@@ -503,7 +503,8 @@ skip forever and silently, so the run-gates canary refuses one.
 **How the bar behaves**, because none of this is derivable from the manifest. Legs run through a
 bounded pool whose width is DECLARED rather than computed: `tools/run-gates/gate-profiles.txt` maps
 the detected cores and RAM to a named row of knobs, the runner prints the row it chose before the
-first leg verdict, and `GATE_JOBS` overrides the width alone. Legs are safe together because each
+first leg verdict, and `GATE_JOBS` overrides the width alone. That row also declares a whole-run
+`wall` (`GATE_WALL` overrides): a breach kills the outstanding legs and REDS naming them. Legs are safe together because each
 heavy one is hermetic — its own `mktemp -d` scratch repo, never the real tree. Order is
 scheduled longest-first from a timing cache the runner resolves and NAMES on its own profile line,
 while REPORTING is

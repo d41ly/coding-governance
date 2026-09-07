@@ -8630,6 +8630,112 @@ user_skills = "/tmp/gk-fake-skills"
     check("a GOV_BASH that is set and does not run is a Refusal, not a fall-through", refused,
           "resolve_bash fell through to another shell instead of naming the bad override")
 
+
+    # ============ TOOL-aQuenchedHarness-3 — a self-test never reaches an adopter ================
+    # The owner's ask: self-checks must not ship to adopters. The mechanism is a `[[files]]` rule
+    # per kit claiming its own self-test paths with `role = "project-owned"`, and the LEG half then
+    # falls out of machinery that already exists — `silenced_legs` refuses to emit a gate leg whose
+    # argv names a path the target does not hold, and `_cmd_apply` reports each one rather than
+    # shipping it. So this section grades BOTH halves over one real apply, and grades the
+    # over-reach direction too: a rule that swallowed the kit's own engine would satisfy every
+    # "the test file is gone" assertion and break the adopter completely.
+    with tempfile.TemporaryDirectory() as _qh:
+        _qt = pathlib.Path(_qh)
+        _qg = _qt / "adopter"
+        (_qg / "tools").mkdir(parents=True, exist_ok=True)
+        (_qg / "tools" / "legs.json").write_text(
+            json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
+            encoding="utf-8", newline="\n")
+        (_qg / ".governance").mkdir(exist_ok=True)
+        (_qg / ".governance" / "deploy.toml").write_text(
+            'gov_source = "local"\nprefix = "tools"\nkits = ["agent-cap"]\n\n'
+            '[answers]\nmemory_root = "memory"\n\n'
+            '[gate_runner]\nkind = "manifest"\nfile = "tools/legs.json"\n'
+            'grammar = "json-array"\ndedupe_key = "name"\n'
+            'command = ["bash", "tools/runner.sh"]\n'
+            'run_all_env = { GATE_FULL = "1" }\n'
+            'observed_ran = ["GATE ok    {name}"]\n'
+            'observed_failed = ["GATE FAIL  {name}"]\n',
+            encoding="utf-8", newline="\n")
+        git(_qg, "init", "-q", "-b", "main"); git(_qg, "config", "user.email", "t@e")
+        git(_qg, "config", "user.name", "t"); git(_qg, "config", "core.autocrlf", "false")
+        git(_qg, "add", "-A"); git(_qg, "commit", "-qm", "base")
+
+        _qa = run("apply", "--target", str(_qg), "--kits", "agent-cap")
+        check("aQuenchedHarness-3: the apply itself succeeds", _qa.returncode == 0,
+              _qa.stdout + _qa.stderr)
+
+        # LIVENESS FIRST, because every assertion below is about ABSENCE and absence is what a
+        # broken apply also produces. If the kit's engine did not land either, the withholding
+        # arms are grading a target that received nothing at all.
+        _qeng = _qg / "tools" / "hooks" / "agent-cap.js"
+        check("aQuenchedHarness-3 LIVENESS: the kit's ENGINE landed, so the absence arms below "
+              "are about withholding and not about an apply that did nothing",
+              _qeng.is_file(), str(sorted(p.name for p in (_qg / "tools").rglob("*"))))
+
+        # AC1 — the self-test FILES are withheld.
+        for _qf in ("agent-cap.test.sh", "scratch-guard.test.sh"):
+            check(f"aQuenchedHarness-3 AC1: {_qf} is NOT in the adopter's tree",
+                  not (_qg / "tools" / "hooks" / _qf).is_file(),
+                  str(sorted(p.name for p in (_qg / "tools" / "hooks").glob("*"))))
+
+        # AC2 — and no emitted leg NAMES one of those paths. This is the join: a manifest row
+        # pointing at a file the target never received is a leg that can only ever red.
+        _qlegs = json.loads((_qg / "tools" / "legs.json").read_text(encoding="utf-8"))
+        _qbad = [r for r in _qlegs
+                 if any(".test.sh" in str(a) or "selftest.py" in str(a) for a in r.get("argv", []))]
+        check("aQuenchedHarness-3 AC2: no emitted leg's argv names a withheld self-test path",
+              not _qbad, json.dumps(_qbad))
+
+        # AC2b — THE LEG IS DECLARED EXEMPT, not silenced. A first cut left the `[[gate_leg]]`
+        # rows in place and let `silenced_legs` drop them, which WORKED and was wrong: that
+        # function exists for gov's own defect -- a descriptor naming a file gov forgot to ship --
+        # and reports each hit with `r.fail`, so every adopter apply exited 1 with one problem per
+        # withheld suite. The precedent beside `run-gates.gov.test.sh` is the right shape and it
+        # was already written down: a withheld file's leg belongs in the registry as an
+        # `[[exempt_leg]]`, never in the descriptor.
+        _qreg = (pathlib.Path(__file__).resolve().parent / "registry.toml").read_text(
+            encoding="utf-8")
+        for _qn in ("agent-cap self-test", "scratch-guard self-test"):
+            check(f"aQuenchedHarness-3 AC2b: '{_qn}' is declared [[exempt_leg]] in registry.toml, "
+                  "so no descriptor claims a leg the target cannot carry",
+                  f'name = "{_qn}"' in _qreg, "")
+        check("aQuenchedHarness-3 AC2c: and the apply therefore exits CLEAN — a deliberate "
+              "withholding must not read as a deployer problem",
+              "which this target does not hold" not in _qa.stdout, _qa.stdout)
+
+        # AC4 — THE OVER-REACH DIRECTION. Three `subject = repo` suites are graded on the
+        # ADOPTER's own tree and must keep shipping; a rule that claimed them would silence legs
+        # an adopter needs, and every arm above would still pass.
+        _qmt = _qt / "adopter2"
+        (_qmt / "tools").mkdir(parents=True, exist_ok=True)
+        (_qmt / ".governance").mkdir(exist_ok=True)
+        (_qmt / ".governance" / "deploy.toml").write_text(
+            'gov_source = "local"\nprefix = "tools"\nkits = ["memory-tree"]\n\n'
+            '[answers]\nmemory_root = "memory"\n',
+            encoding="utf-8", newline="\n")
+        git(_qmt, "init", "-q", "-b", "main"); git(_qmt, "config", "user.email", "t@e")
+        git(_qmt, "config", "user.name", "t"); git(_qmt, "config", "core.autocrlf", "false")
+        git(_qmt, "add", "-A"); git(_qmt, "commit", "-qm", "base")
+        _qm = run("apply", "--target", str(_qmt), "--kits", "memory-tree")
+        if _qm.returncode == 0:
+            _qkeep = _qmt / "tools" / "memory-tree" / "kit-dogfood-parity.test.sh"
+            _qdrop = _qmt / "tools" / "memory-tree" / "check-memory-hygiene.test.sh"
+            check("aQuenchedHarness-3 AC4: kit-dogfood-parity.test.sh STILL SHIPS — its leg is "
+                  "subject = repo and is graded on the adopter's own tree",
+                  _qkeep.is_file(),
+                  str(sorted(p.name for p in (_qmt / "tools" / "memory-tree").glob("*.test.sh"))))
+            check("aQuenchedHarness-3 AC4b: while the kit's own self-test beside it does not",
+                  not _qdrop.is_file(),
+                  str(sorted(p.name for p in (_qmt / "tools" / "memory-tree").glob("*.test.sh"))))
+        else:
+            # ANNOUNCED, not skipped into silence: a memory-tree apply needs answers this fixture
+            # does not supply on every gov revision, and a green here would be a green over an
+            # arm that never ran.
+            check("aQuenchedHarness-3 AC4: SKIPPED — the memory-tree apply did not complete in "
+                  "this fixture, so the over-reach direction went UNGRADED (not passed)",
+                  True, _qm.stdout + _qm.stderr)
+
     print()
     if FAILURES:
         print(f"govkit-selftest: {len(FAILURES)} FAILED — {', '.join(FAILURES)}")

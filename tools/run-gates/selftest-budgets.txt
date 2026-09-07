@@ -1,0 +1,108 @@
+# selftest-budgets.txt — THE DECLARED SELF-TEST POPULATION, and a cost verdict for each row.
+# TOOL-aQuenchedHarness-4.
+#
+# WHY DECLARED AND NOT DERIVED. The obvious design is "every leg the bar HOLDS", and it is wrong by
+# six: `tools/unattended/run-unattended-gates.sh` runs six suites that appear in NEITHER
+# `tools/gate-legs.json` NOR `tools/unattended/kit.toml`, because the 2026-08-23 owner ruling removed
+# them from both. A derivation over the manifest cannot see a suite the manifest was told to forget,
+# so the population is written down and asserted in BOTH directions instead: every held leg has a
+# row, and every row that is not a held leg names an argv whose file is tracked.
+#
+# A BUDGET IS A COST VERDICT, NOT A HANG BOUND. The hang bound is the `ceiling` in
+# `tools/gate-legs.json`, sized against the 8-wide pool and graded by `derive-ceilings.py`. This
+# number is what the suite is ALLOWED to cost before somebody has to look, and the two are
+# deliberately different figures — `run-unattended-gates.sh` records the same separation and why.
+#
+# A MISSING ROW IS A FAILURE, not an exemption. A suite added here without one would be exempt from
+# the rule by the act of arriving, which is how every population in this repo has previously gone
+# quiet. Lifted from `run-unattended-gates.sh`, where it already exists.
+#
+# CALIBRATED FROM THE WORST OBSERVED READING x1.5, floored at 60s, over the retained
+# `<git-dir>/gate-run/` windows across every worktree on node `a`, 2026-09-07. A busy box WILL breach
+# these: this repo has measured the same leg varying 5.5x median and 47.1x worst under contention.
+# That is deliberate and is the same trade `run-unattended-gates.sh` documents — read a breach by
+# re-running on a quiet box before believing it, because a single integer cannot separate "the suite
+# regressed" from "the box was busy".
+#
+# THE SUM IS NOT WRITTEN HERE. `run-selftests.sh` derives and prints it; a total typed beside the
+# declarations that own it is the defect this repo keeps re-filing.
+#
+# ---- THE PORT SELECTION. TOOL-aQuenchedHarness-6 selects the suites it rebuilds from these rows and
+# ---- grades each port against the second number. Both are DECLARED here rather than inside the unit
+# ---- that grades itself with them, and `bash tools/run-gates/run-selftests.sh --rank` reads them.
+# ---- The share is a threshold, never a set: the SET is computed from the readings, so it moves when
+# ---- they do, and no suite list is typed anywhere.
+#
+# port-majority-share: 0.50
+#   A majority of the population's summed RECORDED seconds. Fifty percent because that is what
+#   "majority" means; a share chosen to fit whatever got ported is the criterion-that-cannot-fail
+#   this unit's rev-1 already had to delete once.
+#
+# port-minimum-factor: 3.0
+#   Read off the first port. `tools/check-line-length.test.sh` measured 31.9 s before (median of
+#   31.3 / 33.3 / 31.9, node `a` 2026-09-07, and the only shape that suite could run in — one shared
+#   mutable fixture, so no width existed for it) against 7.9 s after, at the width
+#   `run-selftests.sh` exports on this node. That is 4.03x. Declared at 3.0 so the criterion has room
+#   to FAIL rather than to describe: the same port measured 2.35x at width 2 and 1.37x serial, and
+#   this number reds against both of them.
+#
+# <name>	<budget seconds>	<argv, empty = take it from tools/gate-legs.json>	<the reading>
+agent-cap restatement self-test	520		worst of 11 readings 342s, x1.5
+agent-cap self-test	590		worst of 7 readings 389s, x1.5
+agent-instructions self-test	150		worst of 8 readings 96s, x1.5
+branch-guard self-test	60		worst of 8 readings 20s, x1.5
+build-index selftest	140		worst of 10 readings 88s, x1.5
+check-arms selftest	60		worst of 10 readings 17s, x1.5
+check-wiring self-test	3290		worst of 11 readings 2192s, x1.5
+codebase-map adopter e2e	70		worst of 7 readings 46s, x1.5
+codebase-map kit selftest	60		worst of 9 readings 27s, x1.5
+corpus-ids selftest	1080		worst of 10 readings 715s, x1.5
+dead-path carriers self-test	900		worst of 11 readings 599s, x1.5
+extract-arms self-test	60		measured 11s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
+drift-audit selftest	1290		worst of 8 readings 855s, x1.5
+gotchas selftest	90		worst of 10 readings 54s, x1.5
+govkit selftest	1600		worst of 7 readings 1065s, x1.5
+hook destinations self-test	510		worst of 4 readings 335s, x1.5
+install-prefix self-test	1180		worst of 11 readings 783s, x1.5
+kit-placeholders self-test	60		worst of 7 readings 24s, x1.5
+lexicon selftest	590		worst of 9 readings 389s, x1.5
+line-length gate selftest	60		measured 8s on node a 2026-09-07 under run-selftests.sh at its exported width 8 (was 208s worst-of-8 before the port), x1.5 floored at this file 60s minimum
+manifest-check self-test	3820		worst of 9 readings 2547s, x1.5
+memory-hygiene self-test	1220		worst of 8 readings 808s, x1.5
+memory-recall kit selftest	1260		worst of 8 readings 835s, x1.5
+method-carriers self-test	180		worst of 11 readings 116s, x1.5
+micro-format gate selftest	460		worst of 8 readings 303s, x1.5
+placeholder-catalogue self-test	80		worst of 8 readings 50s, x1.5
+playbook parity selftest	150		worst of 7 readings 93s, x1.5
+playbook render selftest	60		worst of 8 readings 10s, x1.5
+pre-push self-test	1020		worst of 8 readings 676s, x1.5
+profile-bar selftest	880		worst of 9 readings 586s, x1.5
+push-main self-test	320		worst of 11 readings 209s, x1.5
+pytest-guardrails self-test	60		worst of 8 readings 28s, x1.5
+python resolver (behaviour + inline parity + idiom ban)	150		worst of 11 readings 99s, x1.5
+recall floor arms	120		worst of 11 readings 79s, x1.5
+review-join self-test	460		worst of 8 readings 301s, x1.5
+row-grammar selftest	60		worst of 10 readings 36s, x1.5
+row-keyed merge driver replay	1620		worst of 10 readings 1077s, x1.5
+run-gates adopter e2e	300		worst of 8 readings 198s, x1.5
+run-gates canary	3660		worst of 12 readings 2436s, x1.5
+run-gates evidence	2250		worst of 12 readings 1500s, x1.5
+run-gates gov canary	60		worst of 11 readings 19s, x1.5
+run-gates turnstile	3630		worst of 9 readings 2419s, x1.5
+run-selftests self-test	60		measured 28s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
+scratch-guard self-test	220		worst of 8 readings 145s, x1.5
+selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
+settings-merge selftest	60		worst of 11 readings 4s, x1.5
+spec-tokens self-test	130		worst of 6 readings 80s, x1.5
+template size gate selftest	290		worst of 11 readings 190s, x1.5
+testsuite counts self-test	170		worst of 11 readings 109s, x1.5
+tier2-review self-test	60		worst of 8 readings 8s, x1.5
+unattended adopter e2e	60	bash tools/unattended/adopt-unattended.test.sh	measured 38s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended brief-recorded selftest	600	bash tools/unattended/check-brief-recorded.test.sh	measured 115s IDLE and 177s under load on node a 2026-09-05, carried from run-unattended-gates.sh BUDGET_brief_recorded_selftest at the merge that delegated it, x1.5
+unattended cross-component	510	bash tools/unattended/cross-component.test.sh	measured 339s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended driver selftest	3860	bash tools/unattended/unattended.test.sh	measured 2569s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended gate selftest	13600	bash tools/unattended/check-unattended.test.sh	measured 9067s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended pass-order selftest	170	bash tools/unattended/check-pass-order.test.sh	measured 111s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended playbook selftest	630	bash tools/unattended/check-playbook.test.sh	measured 418s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+verdict-epoch self-test	390		worst of 9 readings 257s, x1.5
+verifier fan-out self-test	230		worst of 8 readings 151s, x1.5

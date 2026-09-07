@@ -96,5 +96,5 @@ Ids no `spec-audit` record has ever named: TOOL-aBoundedCeiling-2 TOOL-aBoundedC
 
 <!-- gen:build-edges -->
 
-*This build declares no parent and no build declares it as one.*
+- **Child builds:** [aQuenchedHarness](../aQuenchedHarness/README.md)
 <!-- /gen:build-edges -->

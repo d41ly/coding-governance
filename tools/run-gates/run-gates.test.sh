@@ -45,7 +45,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=132
+FLOOR_ASSERTIONS=139
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -1033,7 +1033,7 @@ printf '%s\n' "$o" | grep -q 'big' \
 #     deliberately two separate statements — a knob added to the table reds here until an author
 #     edits this line, which is the moment they read the invariant. Collapsing the two would remove
 #     the only forcing function a coverage knob would ever meet.
-PINNED_KNOBS="timeout width"
+PINNED_KNOBS="timeout wall width"
 PTBL="$KITREL/gate-profiles.txt"
 n=$((n+1))
 if [ ! -f "$PTBL" ]; then
@@ -1482,6 +1482,85 @@ printf '%s' "$cout" | awk -F'\t' '$1=="chunk"{found=1} END{exit !found}' \
 printf '%s\n' "$csum" | awk -F'\t' '$1=="chunk" && $2=="one"{found=1} END{exit !found}' \
   || { echo "canary: the durable summary carries no chunk roll-up row"; fail=1; }
 rm -rf "$CK"
+# ================================================================================================
+# 4g. THE WHOLE-RUN WALL. TOOL-aQuenchedHarness-1. Five assertions over ONE scratch bar plus ONE
+#     control, because the property is a RELATION between them: "the walled run ended sooner than
+#     the unwalled one" is the only form that cannot pass on a fast box, and `TOOL-aProvenReuse-6`
+#     records this suite's wall-clock arms flaking under fleet load when they assert a literal.
+#
+#     THE LEG SPAWNS A GRANDCHILD that outlives its parent's own sleep, because reaching the
+#     descendant is the property MSYS is recorded failing
+#     (`memory/builds/aPacedTurnstile/reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md` B1) and a
+#     leg without one would grade a mechanism simpler than the shipped case.
+_wd=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the wall arms"; exit 2; }
+mkdir -p "$_wd/tools/run-gates" "$_wd/tools/lib"
+cp "$ROOT/$KITREL/run-gates.sh" "$ROOT/$KITREL/gate-profiles.txt" "$_wd/tools/run-gates/" 2>/dev/null
+cp "$ROOT/$KITREL/gate-fingerprint.sh" "$_wd/tools/run-gates/" 2>/dev/null || true
+cp "$ROOT/tools/lib/resolve-python.sh" "$_wd/tools/lib/" 2>/dev/null || true
+( cd "$_wd" && git init -q -b main . && git config user.email w@t.invalid && git config user.name w ) >/dev/null 2>&1
+printf 'x\n' > "$_wd/file.txt"
+printf '#!/bin/sh\n( sleep 120 ) &\nsleep 120\n' > "$_wd/slow.sh"
+printf '[\n { "name": "slow leg", "argv": ["bash", "slow.sh"], "chunk": "product", "subject": "repo", "ceiling": 600 }\n]\n' > "$_wd/legs.json"
+( cd "$_wd" && git add -A && git commit -qm base ) >/dev/null 2>&1
+
+# BOTH RUNS ARE BOUNDED FROM OUTSIDE, and both bounds sit far above anything either should reach:
+# a runner whose wall is broken must RED this arm, never hang the suite that grades it.
+#
+# THE LEG SLEEPS 120s AND THE WALL IS 8s, so the two runs differ by about 112 seconds of LEG time
+# while paying the SAME startup and teardown. That matters on this box: an earlier revision bounded
+# the control at 45s and compared raw wall clock, and it failed 3/3 runs because a loaded bar spends
+# 90-100s in startup and teardown alone -- the arm was grading the MACHINE, which is the class both
+# TOOL-aProvenReuse-6 and TOOL-aScannedThrottle-7 record. Overhead is additive to both arms, so the
+# DIFFERENCE survives any load this box can produce.
+_ws=$(date +%s)
+( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=8 \
+    timeout -k 5s 300 bash tools/run-gates/run-gates.sh ) > "$_wd/walled.out" 2>&1
+_wrc=$?
+_wel=$(( $(date +%s) - _ws ))
+
+_cs=$(date +%s)
+( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=0 \
+    timeout -k 5s 300 bash tools/run-gates/run-gates.sh ) > "$_wd/unwalled.out" 2>&1
+_cel=$(( $(date +%s) - _cs ))
+
+n=$((n+1))
+[ "$_wrc" = 1 ] || { echo "canary: a bar whose leg outlived the 8s wall exited $_wrc — a breach must exit 1 as a VERDICT, never 0 (a green over legs it killed) and never 2 (a configuration refusal, which is how an early revision misreported a hang)"; fail=1; }
+n=$((n+1))
+grep -q 'gates RED — the 8s wall fired' "$_wd/walled.out" \
+  || { echo "canary: the walled run printed no wall verdict; a breach that reports nothing is indistinguishable from a leg failure"; fail=1; }
+n=$((n+1))
+grep -q 'still running at the wall: slow leg' "$_wd/walled.out" \
+  || { echo "canary: the wall verdict did not NAME the leg that had not returned"; fail=1; }
+n=$((n+1))
+# THE RELATION, not a literal. If the control did not outlast the walled run this arm proves
+# nothing about the wall, and says so rather than passing.
+# GRADED AS A MARGIN, not as an ordering: where startup dwarfs both runs, a bare `-lt` can pass on
+# noise. The leg/wall gap is 112s; requiring 30 sits well inside it and well outside the jitter.
+if [ "$(( _cel - _wel ))" -lt 30 ]; then
+  echo "canary: the UNWALLED control finished in ${_cel}s against the walled run's ${_wel}s — a margin of"
+  echo "canary: $(( _cel - _wel ))s where the leg/wall gap is 112s. Either the wall did not shorten the run,"
+  echo "canary: or this box did not reproduce the unbounded case; either way the wall arms graded nothing."
+  fail=1
+fi
+n=$((n+1))
+grep -q 'wall 8s' "$_wd/walled.out" \
+  || { echo "canary: the profile line does not report the wall, so an operator cannot see the bound the run is under"; fail=1; }
+n=$((n+1))
+# THE DURABLE RECORD MUST SAY RED TOO. The run record is written from `gate_verdict`, and a killed
+# leg writes no .rc, so before this was fixed a breach could leave `verdict GREEN / ran 0 / failed 0`
+# on disk while stdout said RED. That file's ABSENCE is this runner's documented crash signal, so a
+# plausible green one is strictly worse than none.
+_wrec=$(ls -1d "$_wd"/.git/gate-run/*/ 2>/dev/null | tail -1)
+{ [ -n "$_wrec" ] && [ -f "$_wrec/verdict" ] && grep -q "RED" "$_wrec/verdict"; } \
+  || { echo "canary: the run record does not say RED after a wall breach (record: ${_wrec:-none}) — a breach that leaves a green durable verdict is the reassuring-zero class at the altitude of the whole bar"; fail=1; }
+n=$((n+1))
+# A BREACH MUST NOT STAMP A FULL GREEN. A killed leg writes no .rc, so `fails` stays 0 — the exact
+# state that would let a wedged bar record a green the push boundary later trusts.
+[ -f "$_wd/.git/gate-full-green" ] \
+  && { echo "canary: a wall breach stamped gate-full-green — the stamp reads a variable the breach leaves untouched"; fail=1; } \
+  || true
+rm -rf "$_wd" 2>/dev/null || true
+
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
 [ "$fail" = 0 ] && exit 0 || exit 1

@@ -18,6 +18,28 @@ requires = []
 include = "**"
 role = "engine"
 
+# THIS KIT'S SELF-TESTS ARE WITHHELD. TOOL-aQuenchedHarness-3. Each stages a break into a copy of a
+# checker in THIS directory and asserts the checker still catches it, so its subject is the checker
+# and it has a job only when the source here changes -- and none at all in a tree that copy-installs
+# the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
+# only to what runs.
+#
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
+# `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
+#
+# AND THE LEG GOES WITH THE FILE, through machinery that already exists: `silenced_legs` refuses to
+# emit a gate leg whose argv names a path the target does not hold, and `_cmd_apply` REPORTS each one
+# rather than shipping it. So this rule closes both halves and needs no deployer code.
+#
+# SCOPE, and it is the half a reader misses: this withholds from `govkit apply` ONLY. The
+# copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
+# this file, so that runbook removes them separately. The suites remain in the public repository for
+# anyone who edits a kit.
+[[files]]
+include = ["adopt-run-gates.test.sh", "profile_bar.test.sh", "run-gates.evidence.test.sh", "run-gates.test.sh", "run-gates.turnstile.test.sh", "run-selftests.test.sh"]
+role = "project-owned"
+
 # THE GOV-ONLY HARNESS IS WITHHELD. Its arms are keyed on THIS repo's corpus — gov's declared chunk
 # names, gov's network-calling leg names, a gov leg's guard — and in an adopter tree the manifest is
 # seeded empty and emitted from descriptors, so every one of them would red on arrival. That is
@@ -32,6 +54,26 @@ role = "engine"
 # naming a leg the target's manifest cannot carry is what reds the deployer's selfcheck.
 [[files]]
 include = ["run-gates.gov.test.sh"]
+role = "project-owned"
+
+# GOV'S OWN CEILING EVIDENCE, withheld for the reason above one line over: these two files
+# carry THIS repo's recorded seconds and the headroom declared against them, so an adopter
+# receiving them gets a pin measured on a corpus they do not have. `derive-ceilings.py`
+# itself DOES ship -- it is the tool, and it refuses rather than defaulting when no headroom
+# is declared, which is the announced-unarmed state rather than a silent one.
+# TOOL-aQuenchedHarness-2.
+[[files]]
+include = ["ceiling-evidence.txt", "ceiling-margin.txt"]
+role = "project-owned"
+
+# THE SELF-TEST DECLARATION IS GOV'S TOO. Its rows name this repo's suites and carry
+# readings taken on this node, so an adopter receiving it gets a population they do not have
+# and a gate that reds on arrival. `run-selftests.sh` itself DOES ship — it is the mechanism
+# the 2026-08-23 ruling always implied, and it refuses with a named message rather than
+# defaulting when no declaration is present, which is the announced-unarmed state.
+# TOOL-aQuenchedHarness-4.
+[[files]]
+include = ["selftest-budgets.txt"]
 role = "project-owned"
 
 [adopt]
@@ -50,46 +92,6 @@ means = "adopted"
 # in the same commit as that manifest row — a descriptor row naming a leg the manifest lacks reds
 # selfcheck at the adding unit's own landing. The count is DERIVED by govkit and is deliberately
 # not written here; the number that used to sit in this sentence was wrong one commit later.
-[[gate_leg]]
-name = "profile-bar selftest"
-subject = "kit"
-argv = ["bash", "{kit}/profile_bar.test.sh"]
-guard = ["{kit}/"]
-# Guarded on the kit dir ALONE, and that is COMPLETE rather than convenient: the harness drives the
-# profiler over its own `GATE_LEGS` fixtures in a scratch repo, so it reads nothing outside this kit —
-# not the real manifest, not the real timing cache. A guard may name what the leg READS.
-
-[[gate_leg]]
-name = "run-gates turnstile"
-subject = "kit"
-argv = ["bash", "{kit}/run-gates.turnstile.test.sh"]
-guard = ["{kit}/"]
-# Guarded on the kit dir ALONE. Every arm builds its own scratch repository and drives the runner
-# there, so the suite reads nothing outside this kit — not the real manifest, and deliberately not
-# the real beacon: a suite that queued against the repository it is testing would serialize itself
-# behind the very bar that is running it.
-
-[[gate_leg]]
-name = "run-gates canary"
-subject = "repo"
-argv = ["bash", "{kit}/run-gates.test.sh"]
-# Guarded on the kit dir ALONE. An earlier spelling also named `{prefix}/gate-legs.json`, which
-# `apply` itself creates in the target — so the leg's own arrival changed the file it guards on and
-# the target ended wedged. A guard may name what the leg READS, never what installing it WRITES.
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "run-gates evidence"
-subject = "kit"
-argv = ["bash", "{kit}/run-gates.evidence.test.sh"]
-guard = ["{kit}/"]
-
-[[gate_leg]]
-name = "run-gates adopter e2e"
-subject = "kit"
-argv = ["bash", "{kit}/adopt-run-gates.test.sh"]
-guard = ["{kit}/"]
-
 [[gate_leg]]
 name = "run-gates wiring"
 subject = "repo"

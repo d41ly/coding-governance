@@ -2099,6 +2099,10 @@ for f in $RUNS; do
     # AMBIGUOUS ATTRIBUTION is a refusal, never a guess: a subset test over a commit that could
     # belong to either of two passes proves nothing about either.
     dsother=""
+    # LOOP-INVARIANT, HOISTED. `$dshit` does not change inside this loop, so reading its
+    # subject once per SIBLING was a git spawn per sibling to answer the same question.
+    # TOOL-aQuenchedHarness-7.
+    dshitsub=$(GIT log -1 --format=%s "$dshit" 2>/dev/null)
     while IFS= read -r dssib; do
       [ -n "$dssib" ] || continue
       dssitem=${dssib#* dispatch · item }; dssitem=${dssitem%% · reason *}
@@ -2106,7 +2110,7 @@ for f in $RUNS; do
       [ "$dssunit" = "$dsunit" ] && continue
       # ANCHORED, like every other id test in this file. Left as a substring, a group holding a
       # `-1` and a `-10` reports the pair as ambiguous on the `-1` commit and reds a correct run.
-      id_in "$(GIT log -1 --format=%s "$dshit" 2>/dev/null)" "$dssunit" && dsother="$dssunit"
+      id_in "$dshitsub" "$dssunit" && dsother="$dssunit"
     done <<DSSIBS
 $(printf '%s\n' "$dsrows" | grep -F -- " dispatch · item $dsgrp ")
 DSSIBS

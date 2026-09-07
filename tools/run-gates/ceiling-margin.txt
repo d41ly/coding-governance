@@ -1,0 +1,26 @@
+# ceiling-margin.txt — how much headroom a leg ceiling must have above its evidenced maximum.
+#
+# TWO NUMBERS: a FLOOR in seconds and a FRACTION of the maximum. Required headroom is
+# `max(floor, fraction * max)`, and BOTH halves are load-bearing. Running the first cut with a flat
+# floor alone proved it: that rule forces every ceiling above the floor, so a 2.2 s leg with a 300 s
+# ceiling — 136x headroom — reported UNDER against a 1800 s margin. A fraction alone would give that
+# same leg 2.2 s of headroom, which any scheduling hiccup crosses.
+#
+# THIS IS NOT the multiplier `TOOL-dRetiredFork-40` rejected. That row rejected predicting a LOADED
+# reading from a QUIET one by multiplying, because the relationship is not a multiplier — it measured
+# 443 s under load against 583 s quiet, the wrong way round. Here the input is already the worst
+# OBSERVED reading, and the fraction only sizes headroom above it.
+#
+# WHAT IT IS FOR. A ceiling is a HANG bound, not a cost verdict. It must clear the worst thing a
+# healthy leg has done by enough that a worse-than-anything-yet-seen run still does not red, because
+# a bound that fires on a healthy leg teaches everyone to ignore the verdict — which that same row
+# records as strictly worse than a loose bound.
+#
+# THE READING, node `a` 2026-09-06 over the retained `<git-dir>/gate-run/` window: 47 legs carry two
+# or more readings and a leg's own max-to-min spread reaches 16x — `pass-order history` ran 334.9 s
+# at best and 5400.8 s at worst. Its declared ceiling is 5400, and its worst recorded reading is
+# 5400.8: IT WAS KILLED BY ITS OWN BOUND. A 1.0 fraction demands 10802 there and catches it. The
+# 120 s floor is what stops a two-second leg being asked for a two-second margin.
+#
+# <floor seconds>	<fraction of max>	<what it was set against>
+120	1.0	node a 2026-09-06, retained gate-run window, 47 legs with 2+ readings; pass-order history at 5400.8s was killed by its own 5400 ceiling

@@ -31,7 +31,7 @@ bad=0
 # Raised from 42 to 62 by TOOL-aReapedTicket-3, which adds arms 15-21 — the QUEUE side, which this
 # suite had no arm for at all. The 20 they contribute were counted by running them, not derived on
 # paper: 11 of the 20 are RED against the runner at that build's BASE and all 20 green after it.
-FLOOR_ASSERTIONS=62
+FLOOR_ASSERTIONS=65
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -215,7 +215,16 @@ else
   skipped "whether a progressing holder is held past several TTLs went UNGRADED, because the control above did not establish"
 fi
 
-# ----------------------- 4c: ONE leg longer than the TTL IS reaped, and it is a NAMED ceiling -----
+# ------------- 4c: a LIVE holder inside a long leg is NOT reaped (TOOL-aQuenchedHarness-8) --------
+# THIS ARM IS INVERTED FROM WHAT IT USED TO BE, and the inversion is the unit. It previously asserted
+# that a leg longer than the TTL IS reaped mid-run, and scored BOTH outcomes `ok` — which
+# `TOOL-aBoundedCeiling-8` records as an arm that cannot fail. Its only `nope` graded a source
+# COMMENT, which that row also names, and the comment was deleted with the cliff it described.
+#
+# What the runner does now: `ts_tick_start` refreshes the beacon on a TIMER at `TS_TTL / 6`, so a
+# holder inside a leg of any length stays live and the successor QUEUES. The old behaviour was
+# reproduced before the fix — a successor printed `reaping the beacon of a stalled holder
+# (heartbeat 13s old, ttl 6s)` against a holder that was alive and working, and both bars ran.
 R6=$tmp/ceiling; mk_repo "$R6"; B6=$(beacon "$R6")
 legs "$R6" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'
 ( cd "$R6" && env GATE_FULL=1 TS_LONG=8 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
@@ -223,11 +232,54 @@ h6=$!; sleep 5
 out6=$( cd "$R6" && env GATE_FULL=1 GATE_TURNSTILE_TTL=2 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh 2>&1 )
 wait "$h6" 2>/dev/null
 printf '%s' "$out6" | grep -q 'stalled holder' \
-  && ok "a single leg longer than the TTL with no per-leg deadline IS reaped mid-run (the named ceiling)" \
-  || ok "the successor did not need to reap (the holder finished first) — the ceiling is not reachable on this host at this timing"
-grep -q 'ponytail: a single leg longer than TS_TTL' "$HERE/run-gates.sh" \
-  && ok "the ceiling carries its ponytail: comment in the runner, naming the fix as setting timeout= on the profile row" \
-  || nope "the runner does not carry the ponytail: comment naming this ceiling"
+  && nope "a LIVE holder inside a leg longer than the TTL was reaped — the ticker is not refreshing the beacon" \
+  || ok "a live holder inside a leg longer than the TTL is NOT reaped; the successor queues instead"
+
+# ---- 4d: the ticker is DETACHED, so GATE_JOBS=1 still dispatches -------------------------------
+# The turnstile block and the dispatch pool are one shell. An undetached ticker is a live job
+# forever: `live()` counts it, `[ "$(live)" -lt "$JOBS" ]` is false at width 1 forever, and the
+# terminal `wait` never returns. GRADED ON ELAPSED TIME under a hard outer bound, not on a message —
+# a hung bar prints nothing to grep for, which is the whole point.
+R6b=$tmp/serial; mk_repo "$R6b"
+legs "$R6b" '[ {"name": "q1", "argv": ["bash", "fx/quick.sh"]}, {"name": "q2", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R6b" && env GATE_FULL=1 GATE_JOBS=1 GATE_TURNSTILE_TTL=12 GATE_TURNSTILE_TICK=1 timeout 60 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1
+rc6b=$?
+[ "$rc6b" != 124 ] && ok "a two-leg bar at GATE_JOBS=1 dispatches and completes with the ticker running (rc $rc6b)" \
+                   || nope "GATE_JOBS=1 hit the 60s outer bound — the ticker is counted as a live job and the pool never dispatches"
+
+# ---- 4e: a SIGKILLed holder's ticker stops, so nothing refreshes a beacon its owner has left ----
+# No trap runs on SIGKILL. The ticker's own nonce and pid guards are the mitigation, and this is the
+# arm that observes them: after the holder is killed outright, its beacon must go STALE. If the
+# orphan kept ticking it would refresh whatever later bar recreates that constant path, disabling
+# the stale-holder signal repo-wide — a permanent wedge arriving through the fix.
+R6c=$tmp/orphan; mk_repo "$R6c"; B6c=$(beacon "$R6c")
+legs "$R6c" '[ {"name": "long", "argv": ["bash", "fx/long.sh"]} ]'
+( cd "$R6c" && env GATE_FULL=1 TS_LONG=25 GATE_TURNSTILE_TTL=6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1 &
+h6c=$!
+for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do [ -f "$B6c/heartbeat" ] && break; sleep 1; done
+if [ -f "$B6c/pid" ]; then
+  hp6c=$(cat "$B6c/pid" 2>/dev/null)
+  sleep 2
+  kill -9 "$hp6c" 2>/dev/null || true
+  sleep 1; hb_at_kill=$(cat "$B6c/heartbeat" 2>/dev/null)
+  sleep 4
+  hb_after=$(cat "$B6c/heartbeat" 2>/dev/null)
+  [ "$hb_at_kill" = "$hb_after" ] \
+    && ok "a SIGKILLed holder's ticker stops writing, so its beacon goes stale and stays reapable" \
+    || nope "the beacon kept advancing after its holder was SIGKILLed ($hb_at_kill -> $hb_after) — an orphan ticker is still writing"
+else
+  nope "the holder never wrote a beacon pid, so the orphan-ticker arm graded nothing"
+fi
+{ kill -9 "$h6c"; wait "$h6c"; } 2>/dev/null || true
+
+# ---- 4f: no ticker survives a NORMAL run -------------------------------------------------------
+# The tidy path, asserted separately from 4e's violent one. `ts_tick_stop` runs first in every
+# handler; this checks it actually reaped rather than merely being written down.
+R6d=$tmp/tickerdead; mk_repo "$R6d"; B6d=$(beacon "$R6d")
+legs "$R6d" '[ {"name": "q", "argv": ["bash", "fx/quick.sh"]} ]'
+( cd "$R6d" && env GATE_FULL=1 GATE_TURNSTILE_TTL=6 GATE_TURNSTILE_TICK=1 bash $KIT_REL/run-gates.sh ) >/dev/null 2>&1
+[ -d "$B6d" ] && nope "the beacon directory survived a normal run" \
+              || ok "a normal run releases its beacon, and with it the ticker that refreshed it"
 
 # ------------------------------------------------------ 5/6: FIFO order, position, status file ----
 R7=$tmp/fifo; mk_repo "$R7"

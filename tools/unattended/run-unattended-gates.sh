@@ -62,14 +62,26 @@ cd "$ROOT" || exit 2
 # ---- former and is EXPECTED to fire on the latter. READ A BREACH THIS WAY: re-run it on an idle box
 # ---- before believing it. Making the shape load-aware instead of re-arguing the integer is
 # ---- `TOOL-aCollapsedScan-9`.
-BUDGET_kit_gate=240           # measured 187 s IDLE on node `a` 2026-08-26, after TOOL-aCollapsedScan-1
+# ---- RE-DECLARED UPWARD by TOOL-aQuenchedHarness-7, which made the leg 57% cheaper in processes.
+# ---- Both halves of that sentence are true and the second does not rescue the first: the 240 was
+# ---- set against 187 s IDLE on 2026-08-26, when this repo held 25 `RUN*.md` records and 71
+# ---- builds. It now holds 49 and 102 -- records x1.96 -- and the leg measured 625 s idle BEFORE
+# ---- this unit touched it, x3.34 over the same span. It grows FASTER than the tree does, because
+# ---- the number of (anchor, unit) pairs and the window each pair walks grow together, so the
+# ---- product is roughly quadratic in history. That is the finding; the number below is its
+# ---- consequence.
+# ---- The unit cut 5420 external processes to 2321 with the stdout byte-identical, and 435 s idle
+# ---- is where that lands. 660 is 435 x 1.5, the same headroom every other row here carries, and
+# ---- it is still LOWER than the 187 x 3.34 = 625 the growth alone would have demanded. A budget
+# ---- moving up while the code gets faster is what a monotonically growing population looks like
+# ---- from inside a single integer, and `TOOL-aCollapsedScan-9` is the row for making the SHAPE
+# ---- population-relative instead of re-arguing this figure a third time.
+BUDGET_kit_gate=660           # measured 435 s IDLE on node `a` 2026-09-07 on a frozen clone,
+                              # after TOOL-aQuenchedHarness-7; was 240 against 187 s on a tree
+                              # holding half the records
+
 BUDGET_playbook_validity_gate=120   # measured 13 s
 BUDGET_skill_wiring=60        # measured 0 s
-BUDGET_gate_selftest=3800     # MEASURED 3565 s end to end — TOOL-dNarrowedAnchor-1, see the note below
-BUDGET_driver_selftest=970    # measured 906 s (was 841; +65 s of TOOL-dNarrowedAnchor-1 arms)
-BUDGET_playbook_validity_selftest=300  # measured 140 s
-BUDGET_cross_component=300    # measured 92 s
-BUDGET_adopter_e2e=120        # measured 7 s
 BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to builds carrying no
                               # run-state file and added a pre-anchor probe per unresolved unit.
                               # THREE readings on node `a`, 2026-09-04/05, all with other builds
@@ -89,6 +101,11 @@ BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to bu
                               # bound under the 8-wide pool (TOOL-dRetiredFork-40) and this one is a
                               # cost verdict. The claim that they are one figure was deleted with
                               # this edit.
+# ---- THE TWO *_selftest BUDGETS THAT USED TO SIT HERE ARE GONE, and their absence is the merge
+# ---- rather than a deletion: TOOL-aQuenchedHarness-4 moved every self-test budget into
+# ---- `tools/run-gates/selftest-budgets.txt`, and this branch and main each added a suite while
+# ---- the other was in flight. `BUDGET_brief_recorded` stays because its leg is a REPOSITORY
+# ---- check on the merge bar, which is the line this delegation does not cross.
 BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day it landed, when the
                               # cutoff drops every build before any rev-list runs. 900 is NOT that
                               # measurement plus headroom - it is the sibling's declared ceiling,
@@ -100,20 +117,6 @@ BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day
                               # bound under the 8-wide pool, this one is a cost verdict — and the two
                               # coinciding here is arithmetic, not a claim. Moving one does not move
                               # the other, and neither should be edited to match.
-BUDGET_brief_recorded_selftest=600  # measured 115 s IDLE and 177 s under load on node `a`
-                              # 2026-09-05, over fixtures that are each a real git repo carrying a
-                              # 350 KB driver copy - process creation is the whole cost, so this
-                              # scales with the arm count and not with the work per arm. NO ARM COUNT
-                              # IS TYPED HERE: the suite prints its own on the `--- N arms` line, and
-                              # it moved once inside the pass that wrote this comment. 600 keeps this
-                              # file's measured-plus-headroom habit and matches the sibling suite.
-BUDGET_pass_order_selftest=600 # measured 149 s on node `a` 2026-09-05, up from 41 s: TOOL-aStagedLane-1
-                              # roughly tripled the suite, and every arm builds a real fixture
-                              # repository, so the cost is git PROCESS CREATION and scales with the arm
-                              # count rather than with the work each arm does. NO ARM COUNT IS TYPED
-                              # HERE: the suite prints its own on the `--- N arms` line, and the
-                              # figure moved three times inside the build that wrote this comment. Node d's AV taxes every
-                              # exec, so the ceiling carries margin over the node-`a` reading
 
 ONLY="${1:---selftests}"
 case "$ONLY" in
@@ -237,13 +240,28 @@ run_one "skill wiring"              checks bash "$HERE/adopt-unattended.sh" --ch
 run_one "pass-order history"        checks bash "$HERE/check-pass-order.sh"
 run_one "brief-recorded"            checks bash "$HERE/check-brief-recorded.sh"
 
-run_one "gate selftest"             selftests bash "$HERE/check-unattended.test.sh"
-run_one "driver selftest"           selftests bash "$HERE/unattended.test.sh"
-run_one "playbook validity selftest" selftests bash "$HERE/check-playbook.test.sh"
-run_one "cross-component"           selftests bash "$HERE/cross-component.test.sh"
-run_one "adopter e2e"               selftests bash "$HERE/adopt-unattended.test.sh"
-run_one "pass-order selftest"       selftests bash "$HERE/check-pass-order.test.sh"
-run_one "brief-recorded selftest"   selftests bash "$HERE/check-brief-recorded.test.sh"
+# THE SELF-TEST HALF IS DELEGATED. TOOL-aQuenchedHarness-4 S7. These six suites are now rows in
+# `tools/run-gates/selftest-budgets.txt` alongside every other kit's, and one runner executes them
+# all -- which is what the 2026-08-23 ruling always implied and what this file could only do for one
+# kit. Their budgets travelled with them; the `--checks` half above keeps its own, because those four
+# are REPOSITORY checks that stay on the merge bar and are not this delegation's business.
+#
+# WHY THEY WERE THE HARD CASE, recorded because it is why the population is declared rather than
+# derived: the ruling removed all six from `tools/gate-legs.json` AND from `tools/unattended/kit.toml`,
+# so they exist in no manifest at all. A runner deriving its population from held manifest legs sees
+# none of them, which a spec audit caught before this was built.
+# THE COUNT IS DERIVED, NOT TYPED. It read `ran + 6` and this merge is exactly why that was
+# wrong: main added a SEVENTH suite (`brief-recorded selftest`) while this delegation was in
+# flight, and a typed 6 would have under-reported the population forever without anything
+# noticing. `--list` prints the rows the declaration actually holds for this kit.
+if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
+  _uc=$(bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended --list 2>/dev/null \
+        | grep -cE "^  [a-z]" || true)
+  case "$_uc" in ''|*[!0-9]*|0) echo "run-unattended-gates: the declaration holds NO unattended row, so this half would grade nothing" >&2; st=1 ;;
+    *) ran=$((ran + _uc)) ;;
+  esac
+  bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended || st=1
+fi
 
 # LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a clean
 # sweep are indistinguishable from the outside, which is the class this kit has spent six review
