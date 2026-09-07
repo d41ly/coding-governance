@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-08-build-TOOL-aReapedSpinner-1-backend-and-kill-measurements.md](../build/2026-09-08-build-TOOL-aReapedSpinner-1-backend-and-kill-measurements.md) | research | — |
+| [2026-09-08-build-TOOL-aReapedSpinner-2-live-predicate-run.md](../build/2026-09-08-build-TOOL-aReapedSpinner-2-live-predicate-run.md) | research | TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 |
 | [2026-09-08-prompt-TOOL-aReapedSpinner-1.md](../prompts/2026-09-08-prompt-TOOL-aReapedSpinner-1.md) | research | — |
 
 <!-- /gen:spec-records -->

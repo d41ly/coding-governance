@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c
-phase: RESEARCHING
+witness: bb7581f5b4f31ad1ebede4268611edb549df7c47
+phase: REVIEWING
 branch-sha: e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c
 branch-ref: refs/heads/branch/gate-runner-process-monitor-0d0fa8
 mode: prompt

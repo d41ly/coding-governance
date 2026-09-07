@@ -76,9 +76,9 @@ ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReap
 | [TOOL-aReapedSpinner-7 — the gate runner reaps its own TREE, not just the pid it recorded](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 5 | 2 | OPEN | rev-1 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7.
+Ids no record names: TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7.
 
 Ids no `spec-audit` record has ever named: TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7.
 <!-- /gen:build-index -->
