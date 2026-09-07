@@ -5,7 +5,7 @@
 last-audit: 2026-09-07T03:07:38+03:00 @ 6892a833b7d16d8b5c6cce7fc0e536f3ec72887d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 67232c4f5ed8eb092d0e80872649e2701f5fe5b0
+last-body-change: ce7e60be986451d8e0b46f5362403842cb154d5c
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -184,6 +184,8 @@ does — hit three times in one file in one session) · `process-creation-is-the
 `trace-profile-measures-itself.md` · `fallback-fabricates-the-passing-value.md` ·
 `two-readers-of-one-config-one-re-derived.md` · `line-keyed-registry-reds-on-a-file-that-grew.md` (a waiver keyed `<path>:<line>`, and the sibling arm that is a BAN rather than a ratchet) · `naming-leg-grades-what-python-named.md` (nested helpers and dunders count, and arming follows `symbols.json`, so it only reds at the lander).
 
+- `tools/install-prefix-waivers.txt` is keyed `<path>:<line>`: prose added above a waived literal
+  reds it. RE-KEY, not re-waive.
 - A gate FIXTURE a node may not host: an IGNORED path is never staged, and a name differing only in
   CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`
   is ignored on node `d`, on node `a` at NO scope (2026-09-04): run `git check-ignore -v` on YOURS.
@@ -285,8 +287,7 @@ does — hit three times in one file in one session) · `process-creation-is-the
   Diff the merged id-set against BOTH inputs, never eyeball the output.
 - A HARNESS-CREATED WORKTREE carries CRLF on the four `eol=lf`-pinned `.claude/` renders and that
   GATES NOTHING: measured 2026-09-02 with CRLF forced into all four, every wiring leg and
-  `check-wiring.sh --check` (also `WIRING_CHECK`) exit 0 — committed bytes are LF. This bullet
-  claimed a red bar and a refusing `--preflight`; both were false.
+  `check-wiring.sh --check` (also `WIRING_CHECK`) exit 0 — committed bytes are LF.
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
