@@ -44,7 +44,7 @@ tools/drift-audit/kit.toml	1	codebase-map	a kit descriptor that gained the withh
 tools/gate-lint/README.md	3	gate-lint
 tools/gate-lint/kit.toml	1	gate-lint
 tools/gate-lint/ps-hygiene.py	1	gate-lint
-tools/govkit/registry.toml	57	(loose),agent-instructions,codebase-map,drift-audit,gate-lint,hooks,lexicon,lib,memory-recall,memory-tree,playbook,pytest-parallel-guardrails,run-gates,unattended,workflows	the deployer registry: every `[[exempt_leg]]` reason NAMES the descriptor that withholds the file, which is the whole content of the exemption. TOOL-aQuenchedHarness-3 added twenty-three of them and TOOL-aQuenchedHarness-6 two more. A registry that could not name a path could not record an exemption.
+tools/govkit/registry.toml	58	(loose),agent-instructions,codebase-map,drift-audit,gate-lint,hooks,lexicon,lib,memory-recall,memory-tree,playbook,pytest-parallel-guardrails,run-gates,unattended,workflows	the deployer registry: every `[[exempt_leg]]` reason NAMES the descriptor that withholds the file, which is the whole content of the exemption. TOOL-aQuenchedHarness-3 added twenty-three of them and TOOL-aQuenchedHarness-6 three more. A registry that could not name a path could not record an exemption.
 tools/hooks/README.md	4	(loose),workflows
 tools/hooks/agent-cap.js	7	(loose),hooks,workflows
 tools/hooks/agent-cap.test.sh	3	hooks,workflows
