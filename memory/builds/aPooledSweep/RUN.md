@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes, 0 surfaced — every fork was resolved in place and both review loops exited by FOLD, so nothing was deferred to the owner
 keepalive-reaped: yes
 witness: 6c6012c7afeadcf07b9e120556a6343ebedcc4cf
-phase: VERIFYING
+phase: LANDING
 branch-sha: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 branch-ref: refs/heads/branch/cg-harness-incomplete-porting-631c78
 mode: prompt
@@ -42,3 +42,9 @@ base: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 2026-09-07T13:24:59Z review · item aPooledSweep · reason verdict BLOCKED · blockers 6
 
 2026-09-07T14:37:25Z review · item aPooledSweep · reason verdict BLOCKED · blockers 8 · NON-CONVERGENT · disposition fold
+
+2026-09-07T15:50:58Z brief · item TOOL-aPooledSweep-1 · reason 6a73d1c8c0ed memory/builds/aPooledSweep/prompts/2026-09-07-prompt-TOOL-aPooledSweep-1-brief.md
+
+2026-09-07T15:50:59Z brief · item TOOL-aPooledSweep-2 · reason 84de17d566ca memory/builds/aPooledSweep/prompts/2026-09-07-prompt-TOOL-aPooledSweep-2-brief.md
+
+2026-09-07T15:51:01Z brief · item TOOL-aPooledSweep-3 · reason 3aebd1bb86c3 memory/builds/aPooledSweep/prompts/2026-09-07-prompt-TOOL-aPooledSweep-3-brief.md
