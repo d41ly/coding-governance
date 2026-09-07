@@ -471,12 +471,12 @@ EOF
   # `--untracked-files=no` IS LOAD-BEARING. Plain `--porcelain` lists untracked paths as `??`, so
   # without it every build artifact and freshly written record flips the reading -- this build's own
   # sweep would red on the review report it had just written.
-  _rs_fingerprint() { git status --porcelain --untracked-files=no 2>/dev/null; }
+  read_tree_fingerprint() { git status --porcelain --untracked-files=no 2>/dev/null; }
 
   # THE LIVENESS ASSERTION, and it is NOT emptiness: `git status --porcelain` is EMPTY on a clean
   # tree, so an empty reading is the ordinary case and cannot distinguish a working probe from a
   # broken one. What is asserted is that the command SUCCEEDED.
-  if ! FP_BEFORE=$(_rs_fingerprint) || ! git rev-parse --git-dir >/dev/null 2>&1; then
+  if ! FP_BEFORE=$(read_tree_fingerprint) || ! git rev-parse --git-dir >/dev/null 2>&1; then
     echo "run-selftests: the tree fingerprint could not be taken, so a sweep would be UNGRADED —" >&2
     echo "run-selftests: a failed reading and a clean tree are the same empty string, and this mode" >&2
     echo "run-selftests: would report the second while meaning the first. Nothing was run." >&2
@@ -506,9 +506,9 @@ EOF
   _rs_ns=0
   case "$(date +%N 2>/dev/null)" in ''|*[!0-9]*) : ;; *) _rs_ns=1 ;; esac
   if [ "$_rs_ns" = 1 ]; then
-    _rs_now_ms() { echo $(( $(date +%s%N) / 1000000 )); }
+    read_now_ms() { echo $(( $(date +%s%N) / 1000000 )); }
   else
-    _rs_now_ms() { echo $(( $(date +%s) * 1000 )); }
+    read_now_ms() { echo $(( $(date +%s) * 1000 )); }
     echo "run-selftests: this date has no sub-second %N, so stamps are whole seconds and the peak"
     echo "run-selftests: figure below cannot separate a pool handoff from a real overlap."
   fi
@@ -516,7 +516,7 @@ EOF
   # ONE SUITE, BOUNDED, ITS OWN SCRATCH. The verdict file carries the status, the two stamps and
   # nothing else; the captured output is its own file because a pooled FAIL that printed only an
   # exit code would be a mode you cannot debug without the serial re-run it exists to avoid.
-  _rs_sweep_one() {
+  run_sweep_one() {
     # TWO STATEMENTS, NOT ONE. `local k=$1 d="$SWEEP_ROOT/$k"` expands the whole line BEFORE `local`
     # assigns anything, so `$k` is unbound and `set -u` kills the arm — silently, in a background
     # job, leaving no verdict file. `lib-selftest.sh` sidesteps the same trap by writing `$1` twice.
@@ -525,7 +525,7 @@ EOF
     mkdir -p "$d/tmp" || return
     local bound=$(( ${SW_BUDGET[$((k - 1))]} * SWEEP_FACTOR ))
     local s e rc tp
-    s=$(_rs_now_ms)
+    s=$(read_now_ms)
     # THE WORKER'S OWN PID, NOT `$$`. A subshell INHERITS `$$` from its parent, so `echo $$` here
     # wrote the RUNNER's pid into every pid file and the wall watchdog SIGTERMed run-selftests.sh
     # itself — exit 143, no verdicts rendered, the suites orphaned and the scratch root deleted from
@@ -537,7 +537,7 @@ EOF
     echo "$tp" > "$d/pid"
     wait "$tp"
     rc=$?
-    e=$(_rs_now_ms)
+    e=$(read_now_ms)
     rm -f "$d/pid"
     printf '%s\t%s\t%s\n' "$rc" "$s" "$e" > "$d/v"
   }
@@ -573,7 +573,7 @@ EOF
     # of its own walk, and this is that line rather than a second invention.
     [ -e "$SWEEP_ROOT/wall-breached" ] && break
     if [ "${SW_STATE[$((i - 1))]}" = ok ]; then
-      _rs_sweep_one "$i" &
+      run_sweep_one "$i" &
       live=$((live + 1))
       if [ "$live" -ge "$OUTER" ]; then
         if [ "$_rs_waitn" = 1 ]; then wait -n; live=$((live - 1)); else wait; live=0; fi
@@ -688,7 +688,7 @@ EOF
   # empty string, which on a dirty tree compares unequal and reports the sweep UNSOUND -- a real
   # verdict for a reason that never happened -- and on a clean tree compares equal and reports a
   # match the probe never made.
-  if ! FP_AFTER=$(_rs_fingerprint); then
+  if ! FP_AFTER=$(read_tree_fingerprint); then
     st=1
     echo "run-selftests: the closing tree fingerprint could not be TAKEN, so this sweep is UNGRADED"
     echo "run-selftests: for pool safety. That is not the same as a clean tree and is not reported"

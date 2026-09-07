@@ -1,6 +1,6 @@
 # Brief — TOOL-aPooledSweep-1, the bounded outer pool
 
-**Serves:** brief TOOL-aPooledSweep-1
+**Serves:** journal TOOL-aPooledSweep-1
 
 What this pass was handed: the unit's spec at rev-3, the round-1 and round-2 spec audits, and
 `tools/run-gates/run-selftests.sh` at 96679934.

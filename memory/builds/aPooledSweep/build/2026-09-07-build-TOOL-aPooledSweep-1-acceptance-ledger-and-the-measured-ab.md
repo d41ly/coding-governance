@@ -2,8 +2,6 @@
 
 **Serves:** journal TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3
 
-**Evidences:** TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3
-
 Tier-2 · node a · 2026-09-07. One line per numbered criterion, each naming the observation that
 answered it. Every arm named below lives in `tools/run-gates/run-selftests.test.sh`, was staged RED
 and watched to fail before it was trusted, and the suite is green at 37 arms against a floor of 37.
@@ -61,21 +59,21 @@ Same class, same disposition. Between them and `memory-hygiene self-test` that i
 eleven suites this build ran end to end, which is itself the argument for a sweep somebody can
 afford to run.
 
-## TOOL-aPooledSweep-1
+**Evidences:** TOOL-aPooledSweep-1
 
 - AC1 — MET, OBSERVED — armed as `--sweep reds on a failing suite and prints that suite's OWN output beneath its row`, green; staged red by rendering only the exit code.
 - AC2 — MET, OBSERVED — armed as `--sweep prints the width pair it chose BEFORE the first verdict`; the order-stability half is observed by the A/B above, whose pooled and serial verdict lists sort identically across nine suites at two different widths.
 - AC3 — MET, OBSERVED — the same arm reads the printed pair; the clamp is exercised by the smoke fixture, where `SELFTEST_OUTER_WIDTH=4` against a resolved width of 2 reports `outer 2`.
 - AC4 — MET, OBSERVED — armed as `a --sweep filter matching nothing REFUSES, exactly as the serial mode's does`, exit 2, green.
-- AC5 — MET, OBSERVED — the serial mode's sixteen pre-existing arms are unchanged and green, and the A/B's serial arm produces the same line shape it did before this build.
-- AC6 — MET, OBSERVED — the pooled arm of the nine-suite A/B ran nine suites in 981 s whose readings sum to 1629 s, so at least two intervals overlapped by 648 s. A collapse to a barrier per suite cannot produce that.
+- AC5 — MET, OBSERVED — `bash tools/run-gates/run-selftests.sh --list` and the no-flag mode print what they printed at the pinned base; the serial mode's sixteen pre-existing arms are unchanged and green.
+- AC6 — MET, OBSERVED — `SELFTEST_OUTER_WIDTH` above 1 over the nine-suite A/B ran nine suites in 981 s whose readings sum to 1629 s, so at least two intervals overlapped by 648 s. A collapse to a barrier per suite cannot produce that.
 - AC7 — MET, OBSERVED — armed as `--sweep over a green population exits 0`, green; staged red by forcing the exit expression.
 - AC8 — MET, OBSERVED — armed as `a suite past its derived bound is TIMEOUT, distinguishable from both ok and FAIL`, green; staged red by rendering it as an ordinary FAIL.
 - AC9 — MET, OBSERVED — armed as `a run wall BELOW the largest per-suite bound REFUSES`, exit 2, green. The arithmetic half: over the real population the largest budget is 13600 s and the derived wall is 27200 s, so the wall is above the largest per-suite bound by construction.
 - AC10 — MET, OBSERVED, and it took a change to become observable at all. As first built the criterion could not be answered: it asks for PEAK overlap counted from the verdict files, and those files are removed by the run's own `EXIT` trap before an arm could read them. The sweep now COMPUTES the peak from its own stamps before removing them, prints `peak concurrency <n> of outer <m>`, and REDS when the peak exceeds the outer width — a guard rather than a statistic, because the printed pair is what the pool was asked for and cannot notice a pool that ran wider. Armed as `peak concurrency is REPORTED and never exceeds the outer width the run printed`, green, staged red by inverting the comparison. Observed reporting `peak concurrency 2 of outer 8` over a two-suite population.
 - AC11 — MET, OBSERVED — armed as `--sweep REFUSES when no timeout binary resolves`, exit 2, green; staged red by defaulting the binary.
 
-## TOOL-aPooledSweep-2
+**Evidences:** TOOL-aPooledSweep-2
 
 - AC1 — MET, OBSERVED — armed as `every pooled row carries its cost verdict, and that verdict is 'withheld'`, green; and the nine-suite A/B shows `cost withheld` on all nine rows against nine budget verdicts in the serial arm.
 - AC2 — MET, OBSERVED — armed as `the sweep STATES how many cost verdicts it withheld`; the A/B's pooled arm reports `9 cost verdict(s) WITHHELD under pooled@8x1` against nine rows.
@@ -84,7 +82,7 @@ afford to run.
 - AC5 — MET, OBSERVED — armed as `--rank REFUSES a pooled reading by name`, exit 1, green, and paired with `the same file WITHOUT the pooled row still ranks` so the refusal is a predicate rather than a blanket. Both staged red.
 - AC6 — MET, OBSERVED — armed as `the tag --sweep EMITS is the tag --rank refuses, captured rather than hand-typed`. Building it found a real defect the other arms could not see: the wall watchdog inherited the caller's stdout, so a command substitution around `--sweep` blocked for the whole wall.
 
-## TOOL-aPooledSweep-3
+**Evidences:** TOOL-aPooledSweep-3
 
 - AC1 — MET, OBSERVED — armed as `each pooled suite gets its own TMPDIR`; the fixture suite asserts its own `mktemp -d` lands under `$TMPDIR`, and the arm was staged red by removing the redirection.
 - AC2 — MET, OBSERVED — armed as `a suite that writes into a TRACKED file reds the sweep as UNSOUND after the pool drains`, green; staged red by making the comparison inert.
@@ -92,7 +90,7 @@ afford to run.
 - AC4 — MET, OBSERVED — armed as `a clean sweep STATES that the fingerprint matched`, and both A/B pooled runs print `tree fingerprint MATCHED before and after`.
 - AC5 — MET, OBSERVED — armed as `a suite writing into the GIT COMMON DIR does not red the sweep`, green. This is the negative edge, and it is why the second fingerprint arm was deleted rather than narrowed.
 - AC6 — MET, OBSERVED — the nine-suite A/B's pooled arm went red and printed `a pooled RED cannot tell a broken mechanism from a busy box. Confirm it with the serial re-run`.
-- AC7 — MET, OBSERVED — the baseline is taken before the pool starts, and AC2's arm is what proves it: a suite that dirties a tracked file DURING the sweep is still reported, which is only possible if the reading predates it.
+- AC7 — MET, OBSERVED — `git status --porcelain --untracked-files=no` runs before the pool starts, and AC2's arm is what proves it: a suite that dirties a tracked file DURING the sweep is still reported, which is only possible if the reading predates it.
 
 ## What the closing diff review moved
 

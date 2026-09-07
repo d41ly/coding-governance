@@ -8,6 +8,8 @@
 |---|---|---|
 | [2026-09-07-build-TOOL-aPooledSweep-1-acceptance-ledger-and-the-measured-ab.md](../build/2026-09-07-build-TOOL-aPooledSweep-1-acceptance-ledger-and-the-measured-ab.md) | journal | TOOL-aPooledSweep-2 TOOL-aPooledSweep-3 |
 | [2026-09-07-build-TOOL-aPooledSweep-1-why-the-port-could-not-finish.md](../build/2026-09-07-build-TOOL-aPooledSweep-1-why-the-port-could-not-finish.md) | research | — |
+| [2026-09-07-prompt-TOOL-aPooledSweep-1-brief.md](../prompts/2026-09-07-prompt-TOOL-aPooledSweep-1-brief.md) | journal | — |
+| [2026-09-07-prompt-TOOL-aPooledSweep-1.md](../prompts/2026-09-07-prompt-TOOL-aPooledSweep-1.md) | research | — |
 | [2026-09-07-review-TOOL-aPooledSweep-1-2-3-diff-review-round1.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-diff-review-round1.md) | diff-review | TOOL-aPooledSweep-2 TOOL-aPooledSweep-3 |
 | [2026-09-07-review-TOOL-aPooledSweep-1-2-3-diff-review-round2.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-diff-review-round2.md) | diff-review | TOOL-aPooledSweep-2 TOOL-aPooledSweep-3 |
 | [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPooledSweep-2 TOOL-aPooledSweep-3 |

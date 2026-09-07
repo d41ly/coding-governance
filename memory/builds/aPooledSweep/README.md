@@ -77,7 +77,7 @@ ids TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3 TOOL-aPooledSwee
 | [TOOL-aPooledSweep-3 — pool safety is observed, not assumed](spec/2026-09-07-spec-TOOL-aPooledSweep-3.md) | 3 | 2 | CLOSED | rev-3 | 2026-09-07 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

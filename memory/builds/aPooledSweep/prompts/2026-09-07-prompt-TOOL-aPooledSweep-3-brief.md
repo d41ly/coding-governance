@@ -1,6 +1,6 @@
 # Brief — TOOL-aPooledSweep-3, pool safety observed rather than assumed
 
-**Serves:** brief TOOL-aPooledSweep-3
+**Serves:** journal TOOL-aPooledSweep-3
 
 What this pass was handed: the unit's spec at rev-3, both spec audits, and the runner at a47abd9a.
 

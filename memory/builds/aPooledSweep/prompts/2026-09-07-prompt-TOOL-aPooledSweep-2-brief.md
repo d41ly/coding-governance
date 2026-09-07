@@ -1,6 +1,6 @@
 # Brief — TOOL-aPooledSweep-2, the withheld cost verdict
 
-**Serves:** brief TOOL-aPooledSweep-2
+**Serves:** journal TOOL-aPooledSweep-2
 
 What this pass was handed: the unit's spec at rev-3, both spec audits, and the runner at 6ab577de
 with unit 1's pool already in it.

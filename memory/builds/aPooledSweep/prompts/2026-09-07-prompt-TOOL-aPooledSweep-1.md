@@ -1,6 +1,6 @@
 # The prompt this build was started from
 
-**Serves:** prompt TOOL-aPooledSweep-1
+**Serves:** research TOOL-aPooledSweep-1
 
 Node `a`, 2026-09-07. Handed as `--prompt` with the prose inline; there was no path, so the bytes
 below are the value verbatim rather than a copy of a file that could be edited after the run began.
