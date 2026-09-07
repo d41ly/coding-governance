@@ -58,6 +58,13 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   with fewer than four fields. The `roster:` and `next:` lines are unchanged, which is what makes
   one `--paths` invocation the resume path's single source for both "which unit is next" and "where
   is its spec".
+  SEVERAL SLUGS may be given, and the single-slug form is then byte-identical to what it always
+  was, because the framing appears only for two or more. Each build's output is opened by
+  `unattended-plan-open: <slug>` and closed by `unattended-plan-rc: <slug> <rc>`, and each runs in
+  its own subshell, so one build's refusal cannot colour the next and the caller still sees a
+  per-build status it could otherwise not recover from a summary. It exists because this kit's own
+  gate leg grades this verb's output across many builds, and one driver launch per build was the
+  largest single item on the bar's longest leg.
 - `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer
