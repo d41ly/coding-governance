@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-parked-surfaced: 4
-keepalive-reaped: CronDelete 6a7a6206 — cancelled; CronList now empty
+parked-surfaced: yes
+keepalive-reaped: yes — CronDelete 6a7a6206, and CronList is now empty
 witness: d6623cd863d1209a391470364d8ad16a53369f59
 phase: BUILDING
 branch-sha: faaea5f5693deffbb3d2c44dee2453d9e01fa460
