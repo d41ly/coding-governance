@@ -1,6 +1,6 @@
 # TOOL-aPooledSweep-1 — the sweep runs its suites in a bounded outer pool
 
-**Status:** OPEN · rev-3 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 1 · ratified 2026-09-07
+**Status:** CLOSED · rev-3 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 1 · ratified 2026-09-07
 
 <!-- gen:spec-records -->
 

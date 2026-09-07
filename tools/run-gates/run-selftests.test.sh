@@ -21,7 +21,7 @@ cd "$ROOT" || exit 2
 RUNNER="$ROOT/tools/run-gates/run-selftests.sh"
 [ -f "$RUNNER" ] || { echo "run-selftests.test: no runner at $RUNNER"; exit 2; }
 
-SELFTEST_FLOOR=16
+SELFTEST_FLOOR=24
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -47,6 +47,7 @@ build_repo() {
     printf '# a fixture declaration.\n'
     printf '# port-majority-share: 0.50\n'
     printf '# port-minimum-factor: 3.0\n'
+    printf '# sweep-ceiling-factor: 2\n'
     printf 'held one\t60\t\tworst of 3 readings 10s, x1.5\n'
     printf 'free one\t60\tbash tools/suite-ok.sh\tmeasured 2s on node t 2026-09-07, x1.5\n'
   } > tools/run-gates/selftest-budgets.txt
@@ -133,5 +134,50 @@ arm "an EMPTY budget column is caught too, rather than collapsing into the argv"
 
 arm "the RUN loop refuses a row it cannot resolve instead of printing ok for a suite it never ran" 1     "this row could not be resolved into a runnable suite"     "printf 'hollow		bash tools/suite-ok.sh	worst of 3 readings 5s, x1.5
 ' >> $B && git add -A"     "$R"
+
+# ---------------------------------------------------------------- --sweep, TOOL-aPooledSweep-1
+# The pool answers ONE question and issues no cost verdict, so every arm here reads the sweep
+# verdict and none of them reads a budget. The budget arms above still read the serial mode.
+arm "--sweep over a green population exits 0 and SAYS it graded no cost" 0 \
+    "NO cost verdict was issued" \
+    'true' "$R --sweep"
+
+arm "--sweep prints the width pair it chose BEFORE the first verdict, so the invariant is checkable" 0 \
+    "(outer " \
+    'true' "$R --sweep"
+
+arm "--sweep reds on a failing suite and prints that suite's OWN output beneath its row" 1 \
+    "FAIL something" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B" \
+    "$R --sweep"
+
+# A suite past its bound did not FAIL and did not finish, and rendering it as either loses that.
+# suite-slow.sh sleeps 3s; a budget of 1 derives a 2s bound.
+arm "a suite past its derived bound is TIMEOUT, distinguishable from both ok and FAIL" 1 \
+    "TIMEOUT" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t1\tbash tools/suite-slow.sh|' $B" \
+    "$R --sweep"
+
+# The wall borrowed from run-gates.sh --print-profile was 10800s against a population declaring
+# 13600s for one suite, so it would have killed every real sweep for arriving on time. The
+# arithmetic is now a refusal rather than a comment.
+arm "a run wall BELOW the largest per-suite bound REFUSES rather than killing the run on time" 2 \
+    "would be killed before its" \
+    'true' "SELFTEST_WALL=5 $R --sweep"
+
+arm "a declaration with no sweep-ceiling-factor REFUSES rather than backgrounding unbounded suites" 2 \
+    "declares no sweep-ceiling-factor" \
+    "grep -v 'sweep-ceiling-factor' $B > tmp.b && mv tmp.b $B" \
+    "$R --sweep"
+
+# The bound is a probed capability. lib-selftest.sh runs UNBOUNDED without it, which is right for
+# arms that are seconds long and fatal here, where one hang suppresses every verdict line.
+arm "--sweep REFUSES when no timeout binary resolves, instead of running the bound silently inert" 2 \
+    "found none of" \
+    'true' "SELFTEST_TIMEOUT_BIN=definitely-not-a-binary $R --sweep"
+
+arm "a --sweep filter matching nothing REFUSES, exactly as the serial mode's does" 2 \
+    "so this run graded NOTHING at all" \
+    'true' "$R --sweep --kit tools/nowhere"
 
 run_arms run-selftests.test.sh

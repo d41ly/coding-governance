@@ -45,6 +45,14 @@ usage: bash tools/run-gates/run-selftests.sh [--kit <dir>] [--check] [--list]
               carries the declared majority share; REFUSES if any row's reading
               states no condition, because ranking two conditions together ranks
               the conditions
+  --sweep     the same population through a bounded OUTER pool, so the wall clock
+              falls toward the longest suite instead of the sum of all of them.
+              It answers ONE question -- did any suite fail -- and issues NO cost
+              verdict at all: every reading it takes is contended by the other
+              suites, and a contended clock cannot grade a budget. Use the no-flag
+              mode for that. SELFTEST_OUTER_WIDTH overrides the outer width
+              (clamped to the resolved one); SELFTEST_WALL overrides the run bound
+              and is REFUSED below the largest per-suite bound.
 USAGE
 }
 
@@ -55,6 +63,7 @@ while [ $# -gt 0 ]; do
     --check) MODE=check; shift ;;
     --list)  MODE=list; shift ;;
     --rank)  MODE=rank; shift ;;
+    --sweep) MODE=sweep; shift ;;
     -h|--help) print_usage; exit 0 ;;
     *) echo "run-selftests: unknown argument '$1'"; print_usage; exit 2 ;;
   esac
@@ -206,14 +215,33 @@ case "${W:-}" in ''|*[!0-9]*) W=2 ;; esac
 # caught this unit and the harness unit each reading that width independently, which at width 8 would
 # be 8 suites x 8 arms = 64 concurrent processes on a host where a bare spawn costs 319 ms.
 #
-# THE OUTER POOL IS 1 BECAUSE THE RUN LOOP BELOW IS SERIAL, and it is serial on purpose: this runner
-# grades each suite against its OWN declared budget, so two suites racing would charge each of them
-# the other's contention and a breach would name the wrong one. An earlier draft divided by a pool of
-# 4 that does not exist, which handed every ported suite a quarter of the width it was entitled to —
-# measured on `check-line-length.test.sh`: 13.6 s at the width that division produced against 7.9 s
-# at the declared one. RE-DIVIDE HERE if the loop ever runs suites concurrently; the invariant is the
-# product, not this constant.
+# THE OUTER POOL IS 1 IN THE DEFAULT MODE, because that loop is serial on purpose: it grades each
+# suite against its OWN declared budget, so two suites racing would charge each of them the other's
+# contention and a breach would name the wrong one. An earlier draft divided by a pool of 4 that does
+# not exist, which handed every ported suite a quarter of the width it was entitled to — measured on
+# `check-line-length.test.sh`: 13.6 s at the width that division produced against 7.9 s at the
+# declared one. The invariant is the PRODUCT, not the constant.
+#
+# `--sweep` IS THE RE-DIVISION that comment always anticipated (TOOL-aPooledSweep-1). It runs the
+# suites concurrently and therefore issues no cost verdict at all, which is what makes the trade
+# sound rather than a shortcut: the contention that would have misattributed a breach is admitted,
+# and the breach is simply not claimed. Outer takes the whole width there and inner falls to 1,
+# because THREE of the population's suites source `tools/lib/lib-selftest.sh` and the other
+# fifty-six have no inner width to spend — so inner parallelism buys 3/59ths of the work and outer
+# buys all of it.
 OUTER=1
+if [ "$MODE" = sweep ]; then
+  OUTER=$W
+  # THE OVERRIDE IS CLAMPED. The invariant is the product, so a knob that could exceed it would be a
+  # knob for breaking the one rule this block exists to keep.
+  case "${SELFTEST_OUTER_WIDTH:-}" in
+    ''|*[!0-9]*) : ;;
+    *) if [ "$SELFTEST_OUTER_WIDTH" -ge 1 ]; then
+         OUTER=$SELFTEST_OUTER_WIDTH
+         [ "$OUTER" -le "$W" ] || OUTER=$W
+       fi ;;
+  esac
+fi
 export SELFTEST_INNER_WIDTH=$(( W / OUTER )); [ "$SELFTEST_INNER_WIDTH" -ge 1 ] || SELFTEST_INNER_WIDTH=1
 
 POP=$(read_population)
@@ -284,6 +312,189 @@ fi
 if [ "$NROWS" -eq 0 ]; then
   echo "run-selftests: no suite matched${FILTER:+ --kit $FILTER}, so this run graded NOTHING at all" >&2
   exit 2
+fi
+
+# ---- --sweep: the population through a bounded OUTER pool. TOOL-aPooledSweep-1 -----------------
+# ---- It answers "did any suite fail" and NOTHING about cost. The serial loop below is the only
+# ---- mode that grades a budget, and that division is the whole reason this one is admissible.
+if [ "$MODE" = sweep ]; then
+  # THE BOUND IS A PROBED CAPABILITY, NOT AN ASSUMPTION, and its absence REFUSES rather than
+  # degrading quietly. `tools/lib/lib-selftest.sh` probes for `timeout` the same way and runs its
+  # arms UNBOUNDED when it is missing, which is right for arms that are seconds long. Here the
+  # missing binary deletes the whole property: this mode renders every verdict AFTER the pool
+  # drains, so one non-returning suite suppresses all of them, which is strictly worse than the
+  # serial loop it replaces.
+  # RESOLVED BY NAME, over a candidate list, because coreutils ships as `gtimeout` under a prefix on
+  # more than one platform and a hard-coded `timeout` would refuse those hosts for a spelling. The
+  # list is overridable so an adopter can name a third; that override is also what gives this
+  # refusal its failing case, which a hard-coded name has no honest way to stage.
+  SWEEP_TIMEOUT=""
+  for _cand in ${SELFTEST_TIMEOUT_BIN:-timeout gtimeout}; do
+    command -v "$_cand" >/dev/null 2>&1 && { SWEEP_TIMEOUT=$_cand; break; }
+  done
+  [ -n "$SWEEP_TIMEOUT" ] || {
+    echo "run-selftests: --sweep needs a 'timeout' binary to bound each suite and found none of:" >&2
+    echo "run-selftests:   ${SELFTEST_TIMEOUT_BIN:-timeout gtimeout}" >&2
+    echo "run-selftests: without one every suite below would run unbounded while this mode claims" >&2
+    echo "run-selftests: each one is bounded, and a single hang would suppress all $NROWS verdict" >&2
+    echo "run-selftests: lines. Use the no-flag mode, which reports each suite as it finishes." >&2
+    exit 2; }
+
+  # THE PER-SUITE BOUND IS DERIVED FROM THE ROW'S OWN BUDGET, and the declaration is refused when
+  # absent — a factor nobody wrote is not a factor, which is the rule `--rank` already applies to
+  # its share. This does NOT make the budget a hang bound: it derives one from it, exactly as the
+  # manifest ceilings this file's header points at are themselves derived from recorded seconds.
+  SWEEP_FACTOR=$(sed -n 's/^#[[:space:]]*sweep-ceiling-factor:[[:space:]]*\([0-9][0-9]*\).*/\1/p' "$BUDGETS" | head -1)
+  case "${SWEEP_FACTOR:-}" in ''|*[!0-9]*|0)
+    echo "run-selftests: $BUDGETS declares no sweep-ceiling-factor, so no suite could be bounded" >&2
+    echo "run-selftests: and --sweep would background $NROWS unbounded processes. Declare it in" >&2
+    echo "run-selftests: that file's header, beside the reading it was set against." >&2
+    exit 2 ;;
+  esac
+
+  # THE ROWS, INDEXED. Declaration order is the reporting order whatever the pool does with them,
+  # so the output is byte-stable against the serial mode's and against itself at another width.
+  SW_N=0; SW_STATE=(); SW_NAME=(); SW_BUDGET=(); SW_ARGV=()
+  SWEEP_LARGEST=0
+  while IFS=$'\t' read -r state name budget argv; do
+    [ -n "${name:-}" ] || continue
+    SW_N=$((SW_N + 1))
+    SW_STATE+=("$state"); SW_NAME+=("$name"); SW_BUDGET+=("$budget"); SW_ARGV+=("$argv")
+    if [ "$state" = ok ]; then
+      b=$(( budget * SWEEP_FACTOR ))
+      [ "$b" -gt "$SWEEP_LARGEST" ] && SWEEP_LARGEST=$b
+    fi
+  done <<EOF
+$POP
+EOF
+
+  # THE RUN WALL IS THE LARGEST PER-SUITE BOUND, and it is DERIVED here rather than borrowed from
+  # `run-gates.sh --print-profile`. That row declares 10800s while this population declares 13600s
+  # for `unattended gate selftest` alone, so a borrowed wall would sit BELOW the largest bound and
+  # kill every sweep for arriving on time. A pool cannot finish before its longest member's own
+  # bound expires; any smaller wall is an error, not a policy.
+  SWEEP_WALL=$SWEEP_LARGEST
+  case "${SELFTEST_WALL:-}" in
+    ''|*[!0-9]*) : ;;
+    *) SWEEP_WALL=$SELFTEST_WALL ;;
+  esac
+  if [ "$SWEEP_WALL" -lt "$SWEEP_LARGEST" ]; then
+    echo "run-selftests: the run wall is ${SWEEP_WALL}s but the largest per-suite bound in this" >&2
+    echo "run-selftests: population is ${SWEEP_LARGEST}s, so the run would be killed before its" >&2
+    echo "run-selftests: longest suite could legitimately finish. Raise SELFTEST_WALL, or lower" >&2
+    echo "run-selftests: the budget the bound derives from." >&2
+    exit 2
+  fi
+
+  SWEEP_ROOT=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
+  trap 'rm -rf "$SWEEP_ROOT" 2>/dev/null' EXIT
+
+  echo "run-selftests: SWEEP of $SW_N suite(s), width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH)"
+  echo "run-selftests: per-suite bound = budget x ${SWEEP_FACTOR}; run wall ${SWEEP_WALL}s; NO cost verdict is issued"
+
+  # THE REAP IS PROBED ONCE, OUTSIDE THE LOOP. `wait -n` returns the exit STATUS of the job that
+  # finished, so `wait -n || wait` reads a RED suite as "this shell has no wait -n" and falls back
+  # to waiting for all of them — the pool silently degenerates to a barrier per suite, which is
+  # serial with extra steps and still prints a width. `lib-selftest.sh` records the same trap.
+  _rs_waitn=0; ( : & wait -n ) >/dev/null 2>&1 && _rs_waitn=1
+
+  # ONE SUITE, BOUNDED, ITS OWN SCRATCH. The verdict file carries the status, the two stamps and
+  # nothing else; the captured output is its own file because a pooled FAIL that printed only an
+  # exit code would be a mode you cannot debug without the serial re-run it exists to avoid.
+  _rs_sweep_one() {
+    # TWO STATEMENTS, NOT ONE. `local k=$1 d="$SWEEP_ROOT/$k"` expands the whole line BEFORE `local`
+    # assigns anything, so `$k` is unbound and `set -u` kills the arm — silently, in a background
+    # job, leaving no verdict file. `lib-selftest.sh` sidesteps the same trap by writing `$1` twice.
+    local k=$1
+    local d="$SWEEP_ROOT/$k"
+    mkdir -p "$d/tmp" || return
+    local bound=$(( ${SW_BUDGET[$((k - 1))]} * SWEEP_FACTOR ))
+    local s e rc
+    s=$(date +%s)
+    echo $$ > "$d/pid"
+    TMPDIR="$d/tmp" "$SWEEP_TIMEOUT" -k 5 "$bound" bash -c "${SW_ARGV[$((k - 1))]}" > "$d/out" 2>&1
+    rc=$?
+    e=$(date +%s)
+    rm -f "$d/pid"
+    printf '%s\t%s\t%s\n' "$rc" "$s" "$e" > "$d/v"
+  }
+
+  # THE WALL WATCHDOG. It records the breach in a FILE before killing anything, so the renderer can
+  # tell "this suite was killed by the wall" from "this suite never wrote a verdict" — two states
+  # that look identical from a missing file alone.
+  ( sleep "$SWEEP_WALL"
+    : > "$SWEEP_ROOT/wall-breached"
+    for pf in "$SWEEP_ROOT"/*/pid; do
+      [ -r "$pf" ] || continue
+      read -r wp < "$pf" 2>/dev/null && kill -TERM "$wp" 2>/dev/null
+    done ) &
+  SWEEP_DOG=$!
+  # DISOWNED, and this is load-bearing rather than tidy: the watchdog sleeps for the whole wall, so
+  # a `wait` that can see it blocks until the wall fires even when every suite finished in seconds.
+  disown "$SWEEP_DOG" 2>/dev/null || true
+
+  i=1; live=0
+  while [ "$i" -le "$SW_N" ]; do
+    if [ "${SW_STATE[$((i - 1))]}" = ok ]; then
+      _rs_sweep_one "$i" &
+      live=$((live + 1))
+      if [ "$live" -ge "$OUTER" ]; then
+        if [ "$_rs_waitn" = 1 ]; then wait -n; live=$((live - 1)); else wait; live=0; fi
+      fi
+    fi
+    i=$((i + 1))
+  done
+  wait
+  kill "$SWEEP_DOG" 2>/dev/null || true
+
+  WALL_BREACHED=0; [ -e "$SWEEP_ROOT/wall-breached" ] && WALL_BREACHED=1
+
+  # RENDERED IN DECLARATION ORDER, by builtins, off the arrays. A suite's position in the output
+  # never depends on when the pool happened to free its slot.
+  st=0; ran=0; killed=0; walled=""
+  j=1
+  while [ "$j" -le "$SW_N" ]; do
+    name=${SW_NAME[$((j - 1))]}; state=${SW_STATE[$((j - 1))]}; d="$SWEEP_ROOT/$j"
+    if [ "$state" != ok ]; then
+      st=1
+      printf 'FAIL  %-46s        (%s: this row could not be resolved into a runnable suite)\n' "$name" "$state"
+      j=$((j + 1)); continue
+    fi
+    ran=$((ran + 1))
+    if [ ! -r "$d/v" ]; then
+      st=1
+      if [ "$WALL_BREACHED" = 1 ]; then
+        walled="$walled $name"
+        printf 'WALL  %-46s        (killed by the %ss run wall before it finished)\n' "$name" "$SWEEP_WALL"
+      else
+        printf 'FAIL  %-46s        (no verdict was written, so this suite could not start)\n' "$name"
+      fi
+      j=$((j + 1)); continue
+    fi
+    IFS=$'\t' read -r rc s e < "$d/v"
+    took=$(( e - s ))
+    if [ "$rc" = 0 ]; then
+      printf 'ok    %-46s %5ss\n' "$name" "$took"
+    elif [ "$rc" = 124 ] || [ "$rc" = 137 ]; then
+      st=1; killed=$((killed + 1))
+      printf 'TIMEOUT %-44s %5ss  (killed at its %ss bound — it did not fail, it did not finish)\n' \
+        "$name" "$took" "$(( ${SW_BUDGET[$((j - 1))]} * SWEEP_FACTOR ))"
+    else
+      st=1
+      printf 'FAIL  %-46s %5ss  (exit %s)\n' "$name" "$took" "$rc"
+      grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
+    fi
+    j=$((j + 1))
+  done
+
+  echo "----"
+  [ -n "$walled" ] && echo "run-selftests: the ${SWEEP_WALL}s run wall killed:$walled"
+  if [ "$st" -eq 0 ]; then
+    echo "sweep GREEN — $ran suite(s) ran concurrently; NO cost verdict was issued for any of them"
+  else
+    echo "sweep RED — $ran suite(s) ran concurrently, $killed killed at their bound; NO cost verdict was issued"
+  fi
+  exit "$st"
 fi
 
 echo "run-selftests: $NROWS suite(s), declared total $(( (TOTAL + 59) / 60 )) minutes, width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH)"

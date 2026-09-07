@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 70bd3cdba0eb34ebdf180b6cde382cd065a5aa90
-phase: REVIEWING
+witness: 96679934a717768124f4bb39eaf19ee17e72a3dc
+phase: BUILDING
 branch-sha: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 branch-ref: refs/heads/branch/cg-harness-incomplete-porting-631c78
 mode: prompt
@@ -26,3 +26,9 @@ base: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 2026-09-07T10:38:05Z review · item TOOL-aPooledSweep-1-2-3 · reason verdict BLOCKED · blockers 9
 
 2026-09-07T11:09:01Z review · item TOOL-aPooledSweep-1-2-3 · reason verdict BLOCKED · blockers 14 · NON-CONVERGENT · disposition fold
+
+2026-09-07T11:16:51Z dispatch · item 96679934 TOOL-aPooledSweep-1 · reason tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/run-gates/selftest-budgets.txt
+
+2026-09-07T11:33:02Z brief · item TOOL-aPooledSweep-1 · reason ccea0feac530 memory/builds/aPooledSweep/prompts/2026-09-07-brief-TOOL-aPooledSweep-1.md
+
+2026-09-07T11:34:39Z brief · item TOOL-aPooledSweep-1 · reason ccea0feac530 memory/builds/aPooledSweep/prompts/2026-09-07-prompt-TOOL-aPooledSweep-1-brief.md
