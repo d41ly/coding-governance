@@ -93,3 +93,47 @@ afford to run.
 - AC5 — MET, OBSERVED — armed as `a suite writing into the GIT COMMON DIR does not red the sweep`, green. This is the negative edge, and it is why the second fingerprint arm was deleted rather than narrowed.
 - AC6 — MET, OBSERVED — the nine-suite A/B's pooled arm went red and printed `a pooled RED cannot tell a broken mechanism from a busy box. Confirm it with the serial re-run`.
 - AC7 — MET, OBSERVED — the baseline is taken before the pool starts, and AC2's arm is what proves it: a suite that dirties a tracked file DURING the sweep is still reported, which is only possible if the reading predates it.
+
+## What the closing diff review moved
+
+Round 1 confirmed eleven findings resolving to six defects, precision 0.92, and all six were folded.
+Four were mechanisms that had never been SEEN working, which is the shape §7 names outright.
+
+- **D1 — the wall watchdog killed the runner, not the workers.** `echo $$` inside a backgrounded
+  subshell writes the PARENT's pid, because a subshell inherits `$$`. Every pid file held
+  `run-selftests.sh`'s own pid, so the watchdog SIGTERMed the runner — exit 143, no verdicts, the
+  suites orphaned and the scratch root deleted under them. The worker now records the `timeout`
+  child's pid and the kill reaches the work. Observed firing: a 12 s wall over an 18 s run killed
+  the third suite and the runner rendered all three rows.
+- **D1b, found by that same run.** A TERMed worker still writes its verdict file, so the `WALL`
+  branch — which only fired on a MISSING verdict — was unreachable even after D1 was fixed. A
+  wall-killed suite renders `WALL` now, distinguished from `TIMEOUT` by exit 143 against 124.
+- **D2 — the peak counted closed intervals on whole-second stamps**, so every pool handoff
+  double-counted. A strictly serial fixture reported peak 2, and the real 59-row population at outer
+  8 makes about fifty handoffs, so the guard would have redded every green sweep. Half-open now, and
+  the stamps are MILLISECONDS: at second granularity a handoff and an overlap are the same two
+  numbers, and a suite finishing inside one second has an empty interval that counts as nobody.
+- **D3 — the diff added root-install kit-path literals** without moving a shrink-only BAN, so
+  `tools/check-install-prefix.sh` exited 1 on this worktree with two ROSE rows. The runner's
+  self-reference is DERIVED from `$0` now, the fixture's manifest path is one variable rather than
+  three spellings, and the prose names kits without spelling their paths. The gate exits 0.
+- **D4 — the run wall covered one suite, not the run.** It derived from the largest per-suite bound
+  alone, so `SELFTEST_OUTER_WIDTH=1` — a documented setting — killed a perfectly clean run. It is
+  `largest bound x waves` now, waves derived from the population and the width.
+- **D5 — both knobs discarded a non-numeric value silently**, leaving the operator believing a bound
+  they never set. Both REFUSE by name.
+- **D6 — the after-fingerprint had no liveness assertion** where the before-reading did, so a `git
+  status` that failed at the end reported a clean tree or an unsound sweep depending only on whether
+  the tree was already dirty. It now reports UNGRADED, which is neither.
+
+Four arms added, floor 37 → 41, and the suite was run three times consecutively after the fold
+because the first version of the wall arm was a coin flip: the wall and the per-suite bound expired
+within a second of each other, so whichever won decided whether the row read `WALL` or `TIMEOUT`.
+The fixture now puts five seconds between them.
+
+**One announced gap.** The peak arm asserts that a strictly serial pool reports 1, which is the
+property that matters, but it no longer discriminates the half-open comparison specifically: with
+millisecond stamps a closed-interval bug needs a handoff to land on the same millisecond, so the
+staged break for D2 does not reliably red at two suites. Pinning that line on its own means testing
+the embedded awk in isolation, which this build does not do. Said here rather than left as a green
+row that looks like coverage.

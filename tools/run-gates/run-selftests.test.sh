@@ -21,7 +21,14 @@ cd "$ROOT" || exit 2
 RUNNER="$ROOT/tools/run-gates/run-selftests.sh"
 [ -f "$RUNNER" ] || { echo "run-selftests.test: no runner at $RUNNER"; exit 2; }
 
-SELFTEST_FLOOR=37
+# HOISTED ABOVE THE FIXTURE BUILDER so the generated helper below can interpolate them.
+# Re-spelling either path inside a printf would add a kit-path literal to this file, and
+# the install-prefix checker is a shrink-only BAN rather than a ratchet.
+R='bash tools/run-gates/run-selftests.sh'
+B='tools/run-gates/selftest-budgets.txt'
+LEGS='tools/gate-legs.json'
+
+SELFTEST_FLOOR=41
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -35,6 +42,12 @@ build_repo() {
   printf '#!/usr/bin/env bash\necho "suite ok"\nexit 0\n' > tools/suite-ok.sh
   printf '#!/usr/bin/env bash\necho "FAIL something"\nexit 1\n' > tools/suite-red.sh
   printf '#!/usr/bin/env bash\nsleep 3\nexit 0\n' > tools/suite-slow.sh
+  # THE WALL ARM'S PAIR. Its margins have to be SECONDS or the arm is a coin flip: the wall and
+  # the per-suite bound both expire near the same instant otherwise, and whichever wins decides
+  # whether the row renders WALL or TIMEOUT. A 5s first suite puts the wall 5s clear of the start
+  # and 5s clear of the second suite's own bound.
+  printf '#!/usr/bin/env bash\nsleep 5\nexit 0\n' > tools/suite-mid.sh
+  printf '#!/usr/bin/env bash\nsleep 30\nexit 0\n' > tools/suite-long.sh
 
   # ONE held leg — `subject: kit` is half of the hold predicate — plus one leg the bar does not
   # hold, so the forward direction has something to find and something to correctly ignore.
@@ -58,8 +71,8 @@ build_repo() {
   {
     printf '#!/usr/bin/env bash\n'
     printf 'set -u\n'
-    printf 'B=tools/run-gates/selftest-budgets.txt\n'
-    printf 'tag=$(bash tools/run-gates/run-selftests.sh --sweep 2>/dev/null |'
+    printf 'B=%s\n' "$B"
+    printf 'tag=$(%s --sweep 2>/dev/null |' "$R"
     printf ' sed -n "s/^run-selftests: condition: //p")\n'
     # AN EMPTY CAPTURE IS A REFUSAL, not a row with no tag in it: without this the arm would
     # write an ordinary reading, --rank would rank it, and the arm would red for a reason that
@@ -102,8 +115,6 @@ build_repo() {
 }
 build_fixture build_repo || exit 2
 
-R='bash tools/run-gates/run-selftests.sh'
-B='tools/run-gates/selftest-budgets.txt'
 
 # ---------------------------------------------------------------- --check, both directions
 arm "control · a clean declaration passes --check" 0 "declaration clean" \
@@ -126,7 +137,7 @@ arm "a row with no argv and no leg of that name reds" 1 "has no argv and no leg 
 # runner's own liveness line exists to refuse.
 arm "an EMPTY declaration reds rather than passing both directions by finding nothing" 1 \
     "the declaration is EMPTY, so both directions above passed by finding nothing" \
-    "printf '# only a comment\n' > $B && printf '%s\n' '[]' > tools/gate-legs.json && git add -A" \
+    "printf '# only a comment\n' > $B && printf '%s\n' '[]' > $LEGS && git add -A" \
     "$R --check"
 
 # ---------------------------------------------------------------- --rank
@@ -304,11 +315,46 @@ arm "a clean sweep STATES that the fingerprint matched, rather than being silent
 arm "a fingerprint that cannot be TAKEN refuses before running anything, rather than reading clean" 2 \
     "a sweep would be UNGRADED" \
     "mkdir -p shim && cp tools/git-nostatus.sh shim/git && chmod +x shim/git" \
-    'PATH="$PWD/shim:$PATH" bash tools/run-gates/run-selftests.sh --sweep'
+    "PATH=\"\$PWD/shim:\$PATH\" $R --sweep"
 
 # THE INVARIANT AS REACHED, not as printed. The width-pair arm reads what the pool was ASKED for; a
 # pool that ran wider than its outer bound would satisfy that arm and break the composite invariant
 # the whole re-division rests on. This reads the stamps the pool actually produced.
 arm "peak concurrency is REPORTED and never exceeds the outer width the run printed" 0     "peak concurrency"     'true' "$R --sweep"
+
+# ---------------------------------------------------------------- the closing review's fold
+# THE WALL, SEEN FIRING. Until now its only arm tested the pre-flight refusal, so the kill path had
+# never been observed -- and it was dead twice over: the watchdog SIGTERMed the runner itself
+# (`$$` in a backgrounded subshell is the PARENT's pid), and a TERMed worker still writes a verdict
+# file, so the WALL branch, which only fired on a MISSING one, was unreachable either way.
+#
+# THE FIXTURE IS BUILT FOR MARGIN. Budget 5 x factor 2 = a 10s per-suite bound; outer 1 makes two
+# waves, so a 10s wall clears the refusal. The first suite sleeps 5s and finishes well inside its
+# own bound; the second sleeps 30s, so its own bound would not expire until ~16s. The wall lands at
+# 10s -- five seconds clear of both, which is what keeps this arm from being a coin flip.
+arm "the run WALL kills an outstanding suite, renders it WALL, and NAMES it" 1 \
+    "run wall killed" \
+    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS" \
+    "SELFTEST_WALL=10 SELFTEST_OUTER_WIDTH=1 $R --sweep"
+
+# A POOL OF ONE IS SERIAL, and the peak figure must say so. It said 2, because the overlap test
+# used closed intervals on whole-second stamps and every slot handoff double-counted -- which on
+# the real population would have redded the peak guard on every green sweep.
+arm "a strictly serial pool reports peak 1, not a handoff double-counted as overlap" 0 \
+    "peak concurrency 1 of outer 1" \
+    'true' \
+    "SELFTEST_OUTER_WIDTH=1 $R --sweep"
+
+# A KNOB WITH A TYPO MUST NOT BE SILENTLY DISCARDED. Both of these used to fall through their case
+# arms, leaving the operator believing a bound or a width they never got.
+arm "a non-numeric SELFTEST_OUTER_WIDTH REFUSES rather than being silently ignored" 2 \
+    "which is not a positive" \
+    'true' \
+    "SELFTEST_OUTER_WIDTH=abc $R --sweep"
+
+arm "a non-numeric SELFTEST_WALL REFUSES rather than being silently ignored" 2 \
+    "which is not a number of seconds" \
+    'true' \
+    "SELFTEST_WALL=soon $R --sweep"
 
 run_arms run-selftests.test.sh

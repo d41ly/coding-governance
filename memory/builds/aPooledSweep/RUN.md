@@ -36,3 +36,5 @@ base: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 2026-09-07T11:50:02Z brief · item TOOL-aPooledSweep-2 · reason bb372803075e memory/builds/aPooledSweep/prompts/2026-09-07-prompt-TOOL-aPooledSweep-2-brief.md
 
 2026-09-07T12:08:12Z brief · item TOOL-aPooledSweep-3 · reason 1eb6d309c7ae memory/builds/aPooledSweep/prompts/2026-09-07-prompt-TOOL-aPooledSweep-3-brief.md
+
+2026-09-07T13:24:59Z review · item aPooledSweep · reason verdict BLOCKED · blockers 6
