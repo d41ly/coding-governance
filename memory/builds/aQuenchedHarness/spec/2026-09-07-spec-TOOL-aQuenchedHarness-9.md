@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-9 — the held suites that are red, and have been for nobody knows how long
 
-**Status:** DEFERRED · rev-1 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 9
+**Status:** WONTDO · rev-2 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 9 · superseded-by memory/backlog/TOOL.md row TOOL-aQuenchedHarness-9
 
 <!-- gen:spec-records -->
 
@@ -143,15 +143,17 @@ its own failing case observed.
 
 ## 8. Open questions
 
-- **F1 — what shape does S4 take?** OPEN. Three candidates are named in §4 and the reuse audit points
+- **F1 — what shape does S4 take?** RESOLVED (agent, 2026-09-07) as CARRIED: it is not answered here and is not meant to be. The unit is WONTDO and the question travels to the backlog row with it, where the design pass that takes it will choose. Three candidates are named in §4 and the reuse audit points
   at the drift-audit kit; none is chosen, because choosing it is a design pass this unit has not had.
-- **F2 — is `gate selftest` repairable before `TOOL-aQuenchedHarness-7`, or blocked behind it?** OPEN.
+- **F2 — is `gate selftest` repairable before `TOOL-aQuenchedHarness-7`, or blocked behind it?** RESOLVED (agent, 2026-09-07): unit 7 LANDED, so the dependency is discharged rather than answered — its checker moved and the suite has not been re-run against it. The repair now starts from a checker at 5420 -> 2321 processes with byte-identical output, which is the tree the suite must be re-measured on.
   It is the test of the checker unit 7 rebuilds, so a repair now may be work thrown away.
-- **F3 — are the four reds four defects or one?** OPEN. Two have unrelated named causes, which argues
+- **F3 — are the four reds four defects or one?** RESOLVED (agent, 2026-09-07) as BOTH, which is why S4 is the load-bearing item: two have unrelated named causes so the reds are four defects, and all four sat undetected because one visibility gap covers them, so the cause worth fixing is one. Two have unrelated named causes, which argues
   four; but all four are in one kit that left the bar on one date, which argues the cause is the
   visibility gap and the four are symptoms.
 
 ## 9. Revision log
+
+- rev-2 · 2026-09-07 · WONTDO, and RETIRED from the roster by `--rescope --act retire`. The id already had a home: a backlog row open since `govkit selftest`’s two red arms were found. Carrying it as a unit as well gave one question two answers. This file stays as the record of what was MEASURED — four of six unattended suites red, with seconds, budgets and a diagnosed cause for two — and the backlog row is where the repair gets scheduled.
 
 - rev-1 · 2026-09-07 · written by `TOOL-aQuenchedHarness-6` as the disposition of four parked
   decisions, so a cited id stops being an orphan and the owner gets a scoped unit rather than four
