@@ -408,6 +408,33 @@ EOF
   SWEEP_ROOT=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
   trap 'rm -rf "$SWEEP_ROOT" 2>/dev/null' EXIT
 
+  # ---- POOL SAFETY IS OBSERVED, NOT ASSUMED. TOOL-aPooledSweep-3 -------------------------------
+  # Running 59 suites together is sound only if each confines its writes to its own scratch. The
+  # private TMPDIR below is the redirection; this is the observation that it held.
+  #
+  # ONE ARM, over the TRACKED working tree. It listed the git common dir too and that arm is DELETED
+  # rather than narrowed: that directory is shared by every worktree of the repository and the bar
+  # itself writes `gate-bar-beacon` and `gate-bar-queue` at its top level when it claims the
+  # turnstile, alongside `gate-ledger.tsv`, `gate-logs`, `index`, `logs` and `refs`. The sweep's
+  # floor is its longest suite, so the window between the two readings is tens of minutes wide: any
+  # sibling session running a bar flips the listing, and a whole-run fingerprint cannot name a
+  # culprit. An instrument that reds on innocent runs is ignored within two sightings.
+  #
+  # `--untracked-files=no` IS LOAD-BEARING. Plain `--porcelain` lists untracked paths as `??`, so
+  # without it every build artifact and freshly written record flips the reading -- this build's own
+  # sweep would red on the review report it had just written.
+  _rs_fingerprint() { git status --porcelain --untracked-files=no 2>/dev/null; }
+
+  # THE LIVENESS ASSERTION, and it is NOT emptiness: `git status --porcelain` is EMPTY on a clean
+  # tree, so an empty reading is the ordinary case and cannot distinguish a working probe from a
+  # broken one. What is asserted is that the command SUCCEEDED.
+  if ! FP_BEFORE=$(_rs_fingerprint) || ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "run-selftests: the tree fingerprint could not be taken, so a sweep would be UNGRADED —" >&2
+    echo "run-selftests: a failed reading and a clean tree are the same empty string, and this mode" >&2
+    echo "run-selftests: would report the second while meaning the first. Nothing was run." >&2
+    exit 2
+  fi
+
   # THE CONDITION, COMPOSED ONCE. Not re-derived per row: the same fact spelled twice in a file
   # whose own header names that defect. It is printed in a stable shape because the `--rank` refusal
   # matches this exact token, and the arm that proves they agree captures it from here.
@@ -527,6 +554,20 @@ EOF
 
   echo "----"
   [ -n "$walled" ] && echo "run-selftests: the ${SWEEP_WALL}s run wall killed:$walled"
+  # THE AFTER READING, once the pool has DRAINED. Taken mid-pool it would race fifty-eight writers,
+  # which is why this instrument is whole-run and says so rather than pretending to attribute.
+  FP_AFTER=$(_rs_fingerprint)
+  if [ "$FP_BEFORE" != "$FP_AFTER" ]; then
+    st=1
+    echo "run-selftests: THE SWEEP IS UNSOUND — the tracked working tree changed while it ran, so a"
+    echo "run-selftests: suite wrote outside its own scratch. This cannot name which one: a whole-run"
+    echo "run-selftests: fingerprint has no way to attribute, and guessing would be worse than saying"
+    echo "run-selftests: so. Re-run the SERIAL mode, which can. What changed:"
+    printf '%s\n' "$FP_AFTER" | grep -vxF "$FP_BEFORE" 2>/dev/null | sed 's/^/  /' | head -20
+  else
+    echo "run-selftests: tree fingerprint MATCHED before and after — no suite wrote outside its scratch"
+  fi
+
   # THE COUNT IS WHAT STOPS THE WITHHOLDING BEING A SILENT PASS. A green sweep announces on every
   # run how many budgets it did not grade, so it can never be mistaken for a budget-clean run.
   echo "run-selftests: $withheld cost verdict(s) WITHHELD under $SWEEP_CONDITION — a contended clock cannot grade a budget"
@@ -535,6 +576,14 @@ EOF
     echo "sweep GREEN — $ran suite(s) ran concurrently; NO cost verdict was issued for any of them"
   else
     echo "sweep RED — $ran suite(s) ran concurrently, $killed killed at their bound; NO cost verdict was issued"
+    # A POOLED RED IS AMBIGUOUS BY CONSTRUCTION and the summary says which step resolves it.
+    # TOOL-dSpentCeiling-8 measured `run-gates turnstile` and `row-keyed merge driver replay` —
+    # both rows of this population — redding under the bar's own concurrency and green standalone,
+    # with no commit and no working-tree change between the runs. So a red here cannot separate "the
+    # mechanism is broken" from "this machine was too busy", and an operator handed that verdict
+    # with no next step will either re-run at random or stop trusting the mode.
+    echo "run-selftests: a pooled RED cannot tell a broken mechanism from a busy box. Confirm it with"
+    echo "run-selftests: the serial re-run: bash tools/run-gates/run-selftests.sh"
   fi
   exit "$st"
 fi

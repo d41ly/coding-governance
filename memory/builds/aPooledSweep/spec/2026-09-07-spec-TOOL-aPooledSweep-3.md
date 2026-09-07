@@ -1,6 +1,6 @@
 # TOOL-aPooledSweep-3 — pool safety is observed, not assumed
 
-**Status:** OPEN · rev-3 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 3 · ratified 2026-09-07
+**Status:** CLOSED · rev-3 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 3 · ratified 2026-09-07
 
 <!-- gen:spec-records -->
 

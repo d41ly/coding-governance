@@ -14,7 +14,6 @@ terminal status. Nothing here is edited by hand.
 | [aHonedRuleset](builds/aHonedRuleset/README.md) | SPECCED | a | 2026-09-04 | tooling+playbook+kickoff+deployer | 10 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
 | [aPacedTurnstile](builds/aPacedTurnstile/README.md) | SPECCED | a | 2026-08-18 | tooling | 16 |
-| [aPooledSweep](builds/aPooledSweep/README.md) | OPEN | a | 2026-09-07 | tooling | 3 |
 | [aPortableWarden](builds/aPortableWarden/README.md) | SPECCED | a | 2026-07-13 | tooling | 1 |
 | [aQuarriedLantern](builds/aQuarriedLantern/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 3 |
 | [aTetheredScratch](builds/aTetheredScratch/README.md) | INPROGRESS | a | 2026-08-20 | tooling | 4 |

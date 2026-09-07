@@ -21,7 +21,7 @@ cd "$ROOT" || exit 2
 RUNNER="$ROOT/tools/run-gates/run-selftests.sh"
 [ -f "$RUNNER" ] || { echo "run-selftests.test: no runner at $RUNNER"; exit 2; }
 
-SELFTEST_FLOOR=30
+SELFTEST_FLOOR=36
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -68,6 +68,36 @@ build_repo() {
     printf 'printf "roundtrip\\t60\\tbash tools/suite-ok.sh\\tmeasured 42s $tag on node t 2026-09-07, x1.5\\n" >> "$B"\n'
     printf 'git add -A >/dev/null 2>&1\n'
   } > tools/roundtrip.sh
+  # ---- TOOL-aPooledSweep-3's fixtures: a suite per escape route, and a git that can only fail
+  # ---- the one subcommand the fingerprint uses.
+  { printf '#!/usr/bin/env bash\n'
+    printf 'echo "FAIL tracked-write" >> subject.md\n'
+    printf 'echo "FAIL wrote-into-the-checkout"\n'
+    printf 'exit 1\n'
+  } > tools/suite-dirty.sh
+  { printf '#!/usr/bin/env bash\n'
+    printf 'echo x > "$(git rev-parse --git-common-dir)/aPooledSweep-probe"\n'
+    printf 'echo "FAIL wrote-into-the-git-dir"\n'
+    printf 'exit 1\n'
+  } > tools/suite-gitdir.sh
+  { printf '#!/usr/bin/env bash\n'
+    printf '[ -n "${TMPDIR:-}" ] || { echo "FAIL no-tmpdir"; exit 1; }\n'
+    printf 'case "$(mktemp -d)" in "$TMPDIR"*) echo "FAIL scratch-under-tmpdir";;'
+    printf ' *) echo "FAIL scratch-escaped";; esac\n'
+    printf 'exit 1\n'
+  } > tools/suite-tmpdir.sh
+  # A GIT THAT ANSWERS EVERY SUBCOMMAND THE RUNNER NEEDS AND REFUSES `status`. Deleting the git
+  # dir instead would break the runner's own root resolution, so the arm would observe a
+  # different refusal than the one it is written for.
+  { printf '#!/usr/bin/env bash\n'
+    printf 'case "$1" in status) exit 3;; esac\n'
+    # THE REAL GIT'S PATH IS RESOLVED AT FIXTURE-BUILD TIME and baked in. Resolving it inside the
+    # shim would find the shim, because the arm puts the shim's directory FIRST on PATH.
+    printf 'exec %s "$@"\n' "$(command -v git)"
+  } > tools/git-nostatus.sh
+  # The subject file the dirty suite appends to has to be TRACKED, or --untracked-files=no
+  # cannot see it and the arm passes by finding nothing.
+  printf 'a tracked subject\n' > subject.md
   git add -A >/dev/null 2>&1 || return 2
 }
 build_fixture build_repo || exit 2
@@ -233,5 +263,47 @@ arm "the tag --sweep EMITS is the tag --rank refuses, captured rather than hand-
     "carry no reading whose CONDITION this verb recognises" \
     'bash tools/roundtrip.sh' \
     "$R --rank"
+
+# ---------------------------------------------------------------- pool safety, TOOL-aPooledSweep-3
+# The private TMPDIR is the redirection; the fingerprint is the observation that it held. Neither
+# is a sandbox, and the arms below claim no more than that.
+arm "each pooled suite gets its own TMPDIR, so a mktemp inside it cannot collide with a sibling" 1 \
+    "FAIL scratch-under-tmpdir" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-tmpdir.sh|' $B" \
+    "$R --sweep"
+
+arm "a suite that writes into a TRACKED file reds the sweep as UNSOUND after the pool drains" 1 \
+    "THE SWEEP IS UNSOUND" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-dirty.sh|' $B" \
+    "$R --sweep"
+
+# S4: a whole-run fingerprint CANNOT attribute, so it must not pretend to. The refusal names the
+# serial mode as the tool that can, rather than guessing at a culprit.
+arm "the unsound verdict refuses to name a culprit suite and names the serial re-run instead" 1 \
+    "Re-run the SERIAL mode, which can" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-dirty.sh|' $B" \
+    "$R --sweep"
+
+# THE OTHER EDGE, and the reason the git-common-dir arm was deleted rather than narrowed: that
+# directory is written by the bar itself and by every sibling worktree, so a fingerprint over it
+# reds on innocent runs. This arm pins that it does not.
+arm "a suite writing into the GIT COMMON DIR does not red the sweep, which is why that arm was dropped" 1 \
+    "tree fingerprint MATCHED" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-gitdir.sh|' $B" \
+    "$R --sweep"
+
+# A CLEAN SWEEP SAYS THE CHECK FIRED. A run where the fingerprint never ran and one where it
+# passed are the same silence otherwise.
+arm "a clean sweep STATES that the fingerprint matched, rather than being silent about it" 0 \
+    "tree fingerprint MATCHED before and after" \
+    'true' \
+    "$R --sweep"
+
+# LIVENESS. `git status --porcelain` is EMPTY on a clean tree, so emptiness cannot be the test:
+# what is asserted is that the command SUCCEEDED, and a failure refuses before any suite runs.
+arm "a fingerprint that cannot be TAKEN refuses before running anything, rather than reading clean" 2 \
+    "a sweep would be UNGRADED" \
+    "mkdir -p shim && cp tools/git-nostatus.sh shim/git && chmod +x shim/git" \
+    'PATH="$PWD/shim:$PATH" bash tools/run-gates/run-selftests.sh --sweep'
 
 run_arms run-selftests.test.sh
