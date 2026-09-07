@@ -75,7 +75,7 @@ copy-installs a kit runs that kit's self-tests on every bar.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 8 unit(s) · node a · opened 2026-09-06 · streams tooling
+**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-09-06 · streams tooling
 ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 TOOL-aQuenchedHarness-9
 
 <!-- gen:build-units -->
@@ -89,13 +89,14 @@ ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL
 | [TOOL-aQuenchedHarness-5 — a self-test harness whose unit of cost is not a process](spec/2026-09-06-spec-TOOL-aQuenchedHarness-5.md) | 6 | 2 | INPROGRESS | rev-4 | 2026-09-06 |
 | [TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved](spec/2026-09-06-spec-TOOL-aQuenchedHarness-6.md) | 7 | 2 | INPROGRESS | rev-6 | 2026-09-06 |
 | [TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches](spec/2026-09-06-spec-TOOL-aQuenchedHarness-7.md) | 8 | 2 | OPEN | rev-3 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-9 — the held suites that are red, and have been for nobody knows how long](spec/2026-09-07-spec-TOOL-aQuenchedHarness-9.md) | 9 | 2 | DEFERRED | rev-1 | 2026-09-07 |
 <!-- /gen:build-units -->
 
 Records: 10 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aQuenchedHarness-9.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -110,6 +111,7 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 | 6 | `TOOL-aQuenchedHarness-5` | no |
 | 7 | `TOOL-aQuenchedHarness-6` | no |
 | 8 | `TOOL-aQuenchedHarness-7` | no |
+| 9 | `TOOL-aQuenchedHarness-9` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
