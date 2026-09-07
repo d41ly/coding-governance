@@ -9,8 +9,10 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 96679934a717768124f4bb39eaf19ee17e72a3dc
-phase: BUILDING
+parked-surfaced: yes, 0 surfaced — every fork was resolved in place and both review loops exited by FOLD, so nothing was deferred to the owner
+keepalive-reaped: yes
+witness: 6c6012c7afeadcf07b9e120556a6343ebedcc4cf
+phase: VERIFYING
 branch-sha: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 branch-ref: refs/heads/branch/cg-harness-incomplete-porting-631c78
 mode: prompt
