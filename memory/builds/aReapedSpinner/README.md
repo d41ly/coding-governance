@@ -51,12 +51,13 @@ and nothing ENUMERATES the population, which is why all three ran unseen for two
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aReapedSpinner-1` | PLANNED | the census: one bounded read of the process table, normalized to (pid, ppid, age, cpu, command), with a liveness assertion |
-| 2 | `TOOL-aReapedSpinner-2` | PLANNED | the scope fence: a process is attributable to this repo's agent work by a DECLARED root, or it is invisible to every other unit |
-| 3 | `TOOL-aReapedSpinner-3` | PLANNED | the classifier: declared ceilings and a two-sample progress probe decide SPIN, IDLE, ORPHAN, OVERAGE or OK |
-| 4 | `TOOL-aReapedSpinner-4` | PLANNED | the reaper: a bounded tree kill, children first, death VERIFIED, survivors named |
+| 1 | `TOOL-aReapedSpinner-1` | PLANNED | the census: a platform-selected read of the process table, normalized to (id, parent, age, cpu, command); on Windows a JOIN of `ps -W` and CIM, and an unrecognised platform REFUSES rather than reporting an empty table |
+| 2 | `TOOL-aReapedSpinner-2` | PLANNED | the scope fence: a row is attributable to this repo's agent work by a DECLARED root, or it is invisible to every other unit |
+| 3 | `TOOL-aReapedSpinner-3` | PLANNED | the classifier: a declared age ceiling DECIDES and the CPU rate LABELS, giving OK, OVERAGE, SPIN, IDLE or ORPHAN |
+| 4 | `TOOL-aReapedSpinner-4` | PLANNED | the reaper: walk the parent edges leaves-first, kill, VERIFY each death, name survivors. Not `taskkill /T`, which measured 25% effective, and not a process group, which reaps the caller |
 | 5 | `TOOL-aReapedSpinner-5` | PLANNED | the session seam: a throttled hook puts the verdict in front of an agent mid-turn and at session start |
-| 6 | `TOOL-aReapedSpinner-6` | PLANNED | the kit: conf, adopter, govkit entry, gate legs, README — the half that makes an adopter's integration a declaration |
+| 6 | `TOOL-aReapedSpinner-6` | PLANNED | the kit: conf, adopter, govkit entry, gate legs, README — the half that makes an adopter's integration a declaration rather than a port |
+| 7 | `TOOL-aReapedSpinner-7` | PLANNED | the gate runner reaps its own TREE at every exit path, delegating to unit 4 instead of killing a recorded pid and leaving the grandchildren |
 
 <!-- /roster:units -->
 
@@ -68,7 +69,7 @@ ids TOOL-aReapedSpinner-1
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
