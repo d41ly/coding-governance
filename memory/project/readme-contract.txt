@@ -131,3 +131,4 @@ memory/builds/aWeighedCanon/README.md
 memory/builds/aJoinedCanon/README.md
 memory/builds/aQuenchedHarness/README.md
 memory/builds/aPooledSweep/README.md
+memory/builds/aReapedSpinner/README.md
