@@ -55,8 +55,10 @@ Check 30 was measured separately, because it is the driver's cost rather than th
   1114 to 369; the most repeated single argv went from 52 to 5. Counted from the log at
   observation time, not asserted.
 - AC2 — `check-unattended.sh` — check 30 asked the driver about the five builds its scan selected.
-  The canary limb is UNEXERCISED on this tree, because the selection was never empty; it is one
-  assignment and its absence would show as AC2's own red.
+  The canary limb is UNEXERCISED on this corpus, because the selection was never empty. The kit's
+  own fixture reaches the liveness branch the canary protects, but does not distinguish which
+  limb supplied the slug, so nothing here observes the canary specifically. It fails SAFE: an
+  empty ask reds that branch rather than passing quietly.
 - AC3 — `2026-09-07-spec-TOOL-aQuenchedHarness-9.md` — removing that spec's `**Status:**` header took
   the scan's selection from five builds to six, adding `aQuenchedHarness`, which the scan had not
   selected before. The file was restored and `git diff` over it is empty.

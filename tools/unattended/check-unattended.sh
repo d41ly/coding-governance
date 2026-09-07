@@ -225,7 +225,7 @@ HEAD_SHA=$(GIT rev-parse HEAD 2>/dev/null || true)
 # measured, 30 calls fell through to a per-call `merge-base` for exactly that reason.
 declare -A _REV_OK _REV_FULL
 _REV_WARMED=0
-_rev_warm() {
+_load_rev_table() {
   [ "$_REV_WARMED" = 1 ] && return 0
   _REV_WARMED=1
   local _line _j _n
@@ -252,8 +252,8 @@ _rev_warm() {
   done
   return 0
 }
-rev_ok() {  # rev -> 0 it resolves to a commit in this history · 1 it does not
-  _rev_warm
+check_rev() {  # rev -> 0 it resolves to a commit in this history · 1 it does not
+  _load_rev_table
   [ -n "${_REV_OK[$1]+x}" ] && return "${_REV_OK[$1]}"
   if GIT rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then _REV_OK[$1]=0; else _REV_OK[$1]=1; fi
   return "${_REV_OK[$1]}"
@@ -265,17 +265,17 @@ rev_ok() {  # rev -> 0 it resolves to a commit in this history · 1 it does not
 # up in a table of full shas, so it falls back to the original call.
 declare -A _HEAD_REACH
 _HEAD_WARMED=0
-_head_warm() {
+_load_head_reach() {
   [ "$_HEAD_WARMED" = 1 ] && return 0
   _HEAD_WARMED=1
   local _h
   while IFS= read -r _h; do [ -n "$_h" ] && _HEAD_REACH[$_h]=1; done < <(GIT rev-list HEAD 2>/dev/null)
   return 0
 }
-in_head() {  # rev -> 0 an ancestor of HEAD, HEAD itself included · 1 not
-  _head_warm
+check_head_reaches() {  # rev -> 0 an ancestor of HEAD, HEAD itself included · 1 not
+  _load_head_reach
   local _r=$1
-  if [ ${#_r} != 40 ]; then _rev_warm; _r=${_REV_FULL[$1]:-$1}; fi
+  if [ ${#_r} != 40 ]; then _load_rev_table; _r=${_REV_FULL[$1]:-$1}; fi
   if [ ${#_r} = 40 ]; then
     [ -n "${_HEAD_REACH[$_r]+x}" ]
     return $?
@@ -288,7 +288,7 @@ in_head() {  # rev -> 0 an ancestor of HEAD, HEAD itself included · 1 not
 # reachable-from-ADV_HEAD, and this asks the narrower question.
 declare -A _ADVH_REACH
 _ADVH_WARMED=0
-_advh_warm() {
+_load_adv_reach() {
   [ "$_ADVH_WARMED" = 1 ] && return 0
   _ADVH_WARMED=1
   [ "${ADV_HEAD_OK:-0}" = 1 ] || return 0
@@ -296,10 +296,10 @@ _advh_warm() {
   while IFS= read -r _h; do [ -n "$_h" ] && _ADVH_REACH[$_h]=1; done < <(GIT rev-list "$ADV_HEAD" 2>/dev/null)
   return 0
 }
-in_adv_head() {  # rev -> 0 an ancestor of the advertised HEAD · 1 not
-  _advh_warm
+check_adv_reaches() {  # rev -> 0 an ancestor of the advertised HEAD · 1 not
+  _load_adv_reach
   local _r=$1
-  if [ ${#_r} != 40 ]; then _rev_warm; _r=${_REV_FULL[$1]:-$1}; fi
+  if [ ${#_r} != 40 ]; then _load_rev_table; _r=${_REV_FULL[$1]:-$1}; fi
   if [ "${ADV_HEAD_OK:-0}" = 1 ] && [ ${#_r} = 40 ]; then
     [ -n "${_ADVH_REACH[$_r]+x}" ]
     return $?
@@ -446,7 +446,7 @@ else
       # not a promotion. The status predicate is spelled EXACTLY as check 24's retire loop spells it,
       # so the two clauses cannot disagree about what a retired unit looks like.
       rv_now=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null | grep -vE '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
-      if [ -n "$rv_base" ] && rev_ok "$rv_base"; then
+      if [ -n "$rv_base" ] && check_rev "$rv_base"; then
         rv_then=$(GIT show "$rv_base:$rv_readme" 2>/dev/null | awk '/<!-- gen:build-units -->/{f=1;next} /<!-- \/gen:build-units -->/{f=0} f' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
         rv_readable=1
       fi
@@ -945,7 +945,7 @@ if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then 
 declare -A _PUB_REACH
 _PUB_WARMED=0
 _PUB_MISS=0
-_pub_warm() {
+_load_pub_reach() {
   [ "$_PUB_WARMED" = 1 ] && return 0
   _PUB_WARMED=1
   local _t _h _present="" _sha _ty
@@ -974,13 +974,13 @@ _pub_warm() {
 # Full sha for a rev, through the same batch, so an abbreviation is comparable. Falls back to the
 # rev itself when nothing resolves, which keeps the caller's own miss handling in charge.
 declare -A _PUB_FULL
-_pub_full() {  # rev -> full sha, or empty
+resolve_full_sha() {  # rev -> full sha, or empty
   [ -n "${_PUB_FULL[$1]+x}" ] && { printf '%s' "${_PUB_FULL[$1]}"; return 0; }
   local _r
   # The batch above has already resolved every rev recorded in a run-state file, which is where
   # every abbreviated fact this leg judges comes from. Only something outside that set costs a
   # process here.
-  _rev_warm
+  _load_rev_table
   _r=${_REV_FULL[$1]:-}
   [ -n "$_r" ] || _r=$(GIT rev-parse --verify --quiet "$1^{commit}" 2>/dev/null) || _r=""
   _PUB_FULL[$1]=$_r
@@ -1012,7 +1012,7 @@ is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a 
   #
   # AN ABBREVIATED COMMIT IS NORMALISED rather than missed. A 40-char set cannot answer an 8-char
   # argument, and answering "not published" there would turn a real publication into a red.
-  _pub_warm
+  _load_pub_reach
   local c="$1" _full
   # A FULL SHA COSTS NO PROCESS AT ALL: it is a table lookup. Only an abbreviation needs
   # resolving, and this tree holds very few, so the fallback runs a handful of times rather than
@@ -1021,7 +1021,7 @@ is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a 
   if [ ${#c} = 40 ]; then
     [ -n "${_PUB_REACH[$c]+x}" ] && return 0
   else
-    _full=$(_pub_full "$c")
+    _full=$(resolve_full_sha "$c")
     [ -n "$_full" ] && [ -n "${_PUB_REACH[$_full]+x}" ] && return 0
   fi
   # Not reachable. Whether that means NOT PUBLISHED or CANNOT TELL is the same question it always
@@ -1073,7 +1073,7 @@ while IFS= read -r f; do
     # ---- not fetched) are skipped, which is legal ONLY because check 5 already refused absence.
     case "$w" in
       [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*)
-        rev_ok "$w" \
+        check_rev "$w" \
           || fail 6 "a witness looks like a sha and resolves to no commit in this history: $w in $f" ;;
       *) ;;   # not sha-shaped: unjudgeable, and skipping it is the discipline, not an omission
     esac
@@ -1179,7 +1179,7 @@ while IFS= read -r f; do
         # either — the run writes `phase:`, so it would be a one-line escape from this check.
         # What actually matters, and what survives landing: the recorded BASE lies on the history the
         # ANCHOR names rather than on the branch the run authored.
-        if ! rev_ok "$rb"; then
+        if ! check_rev "$rb"; then
           fail 9 "a recorded BASE does not resolve to a commit in this history, and the record is written by the run: $rb in $f"
         else
           # CAPTURED, not read off $? two conditions later. Threading a three-way status through an
@@ -1187,7 +1187,7 @@ while IFS= read -r f; do
           # call, which is the guard-shares-state-with-what-it-guards shape this kit refuses.
           is_published "$rb"; _pubrc=$?
           if [ "$_pubrc" = 0 ]; then
-            if ! in_head "$rb"; then
+            if ! check_head_reaches "$rb"; then
               fail 9 "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on: $rb in $f"
             fi
           elif [ "$_pubrc" = 2 ]; then
@@ -1225,7 +1225,7 @@ while IFS= read -r f; do
             # GUARDED on a non-empty anchor. `$b` is the ADVERTISED HEAD tip now, and a remote that answers
             # with heads but no HEAD symref leaves it empty — `--is-ancestor "$w" ""` then fails, and this
             # fired on an honest LANDED record. The old `$b` was a loop variable that could not be empty.
-            if [ "$ph" = LANDED ] && [ -n "$b" ] && rev_ok "$w"; then
+            if [ "$ph" = LANDED ] && [ -n "$b" ] && check_rev "$w"; then
               # THE RECORDED ANCHOR KIND DECIDES WHICH HISTORY BLESSES THE WITNESS. A `local` record is
               # a claim about ONE clone: the protocol says plainly it is a RECORD of a merge and not an
               # OBSERVATION of one, so a clone that never had that merge cannot judge it and says so
@@ -1258,12 +1258,12 @@ while IFS= read -r f; do
                 if [ -n "$ADV_NAME" ] && GIT rev-parse --verify --quiet "refs/heads/$ADV_NAME" >/dev/null 2>&1 \
                    && GIT merge-base --is-ancestor "$w" "refs/heads/$ADV_NAME" 2>/dev/null; then
                   : # the local default branch carries it, which is the claim
-                elif in_adv_head "$w"; then
+                elif check_adv_reaches "$w"; then
                   : # ...or it reached the remote afterwards, which is an UPGRADE and not a defect
                 else
                   report "check 15 skipped for $f — a local-anchored LANDED names a witness this clone does not carry on its own default branch, and a local anchor is a record of a merge rather than an observation of one, so this clone cannot judge it"
                 fi
-              elif ! in_adv_head "$w"; then
+              elif ! check_adv_reaches "$w"; then
                 fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
               fi
             fi ;;
@@ -1284,7 +1284,7 @@ while IFS= read -r f; do
   # ---- same time: `rb` is read from a file the run writes. This is an internal-consistency assertion
   # ---- over run-written facts, stable and offline and deterministic - not an authorization verdict.
   # ---- What makes it one is running this same leg in a clone the run never touched.
-  if [ -n "$rb" ] && rev_ok "$rb"; then
+  if [ -n "$rb" ] && check_rev "$rb"; then
     bslug=${f#"$M/builds/"}; bslug=${bslug%%/*}
     bre="$M/builds/$bslug/README.md"
     if bb=$(GIT show "$rb:$bre" 2>/dev/null); then
@@ -1351,8 +1351,8 @@ while IFS= read -r f; do
         *" $dmode "*) ;;
         *)
           if [ "$ADV_HEAD_OK" = 1 ] \
-             && rev_ok "$rb" \
-             && ! in_adv_head "$rb"; then
+             && check_rev "$rb" \
+             && ! check_adv_reaches "$rb"; then
             fail 29 "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode $dmode, admissible on that anchor are $SECOND_ANCHOR_MODES, base $rb in $f"
           fi ;;
       esac
@@ -2242,11 +2242,11 @@ for f in $RUNS; do
     dsitem=${dsrow#* dispatch · item }; dsitem=${dsitem%% · reason *}
     dsgrp=${dsitem%% *}; dsunit=${dsitem#* }
     dsdecl=${dsrow#* · reason }
-    if ! rev_ok "$dsgrp"; then
+    if ! check_rev "$dsgrp"; then
       report "check 23 skipped for $dsunit in $f — the recorded group anchor does not resolve in this clone, so the commit window cannot be opened"
       continue
     fi
-    if ! in_head "$dsgrp"; then
+    if ! check_head_reaches "$dsgrp"; then
       report "check 23 skipped for $dsunit in $f — the group anchor is not an ancestor of HEAD, so this clone does not carry the history the declaration was made against"
       continue
     fi

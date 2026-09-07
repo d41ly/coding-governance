@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-10 — the leg asks git once per question, not once per record
 
-**Status:** INPROGRESS · rev-1 · 2026-09-07 · node a · Tier-2 · base ab58d1cc · streams tooling · order 10
+**Status:** CLOSED · rev-3 · 2026-09-07 · node a · Tier-2 · base ab58d1cc · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -23,10 +23,10 @@ and grade the builds that can produce a finding rather than all 102.
   remote advertises for its default branch is readable here. Measured on this tree, those two were
   re-asked 127 times between them. AC1, AC4.
 - **S2** — Existence of every sha-shaped token in every tracked run-state file resolves in ONE
-  `cat-file --batch-check`, behind a `rev_ok` accessor that falls back to the original single call
+  `cat-file --batch-check`, behind a `check_rev` accessor that falls back to the original single call
   for any key the warm-up did not collect. AC1, AC4.
-- **S3** — Ancestry becomes set membership over one `rev-list` per subject: `in_head` against `HEAD`,
-  `in_adv_head` against the advertised HEAD. Both keep the original `merge-base` call for an
+- **S3** — Ancestry becomes set membership over one `rev-list` per subject: `check_head_reaches` against `HEAD`,
+  `check_adv_reaches` against the advertised HEAD. Both keep the original `merge-base` call for an
   abbreviated rev, which a table of full shas cannot answer. AC1, AC4.
 - **S4** — `is_published` reads the object TYPE from the field `cat-file --batch-check` actually
   prints it in. The rebuilt warm-up read it one field late, which made every advertised tip look
@@ -72,9 +72,9 @@ reaching a record and a walk nobody asks for is the same waste one process at a 
 |---|---|---|---|
 | `$HEAD_SHA` | scalar | one `rev-parse HEAD` | 39 identical calls |
 | `$ADV_HEAD_OK` | scalar | one `cat-file -e` | 36 identical calls |
-| `rev_ok` | rev → 0/1 | one `cat-file --batch-check` over every sha-shaped token in the tracked run-state files | 290 calls at six sites |
-| `in_head` | sha → present | one `rev-list HEAD` | 81 calls at two sites |
-| `in_adv_head` | sha → present | one `rev-list $ADV_HEAD` | 66 calls at two sites |
+| `check_rev` | rev → 0/1 | one `cat-file --batch-check` over every sha-shaped token in the tracked run-state files | 290 calls at six sites |
+| `check_head_reaches` | sha → present | one `rev-list HEAD` | 81 calls at two sites |
+| `check_adv_reaches` | sha → present | one `rev-list $ADV_HEAD` | 66 calls at two sites |
 
 **Every accessor keeps the call it replaces as a fallback.** A key the warm-up did not collect is
 answered by the original single git call and then memoised. Correctness therefore does not depend on
@@ -87,9 +87,9 @@ and silently miss every abbreviated recorded fact, so the table is keyed by the 
 its reply by index. A reply count that does not match the request count leaves the table empty and
 every call falls back — a short read must not become a wrong answer.
 
-`in_head` and `in_adv_head` rest on `merge-base --is-ancestor A B` being true exactly when A is
+`check_head_reaches` and `check_adv_reaches` rest on `merge-base --is-ancestor A B` being true exactly when A is
 reachable from B, which is what `rev-list B` enumerates: same relation, same reflexive case, since
-`rev-list` emits B itself and B is its own ancestor. `in_adv_head` is a DIFFERENT set from the union
+`rev-list` emits B itself and B is its own ancestor. `check_adv_reaches` is a DIFFERENT set from the union
 `is_published` holds — reachable-from-any-advertised-tip does not imply reachable-from-ADV_HEAD — so
 it gets its own walk rather than reusing one that answers a wider question.
 
@@ -211,6 +211,18 @@ and whether they are worth their own unit depends on what the leg measures at af
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-07 · the eight new helpers renamed onto the declared verb table -
+  `check_rev`, `check_head_reaches`, `check_adv_reaches` and five `_load_*`/`resolve_*`
+  fillers. The `lexicon naming predicates` leg is a RATCHET on verb offenders and my first
+  spelling added eight, one per definition: `rev`, `in`, `pub` and `advh` are not verbs. The
+  count is back AT its pin with the eight definitions still graded, so nothing was waived. The
+  pin's value is not repeated here - `.lexicon.conf` owns it, and its own header says why a
+  count typed beside that file does not survive the next commit.
+- rev-2 · 2026-09-07 · built and measured. The check-30 rebuild moved two of this leg's own
+  fail branches, so `check-unattended.test.sh` gained arms for the selector's liveness and its
+  parity refusal and its branch-1 assertion was re-texted; the unguarded `harness arms` leg
+  catches exactly that, and did. §3 gained nothing and §2 gained nothing: the scope is as
+  specced.
 - rev-1 · 2026-09-07 · specced AFTER the code it describes, which is a deviation from the method and is recorded rather than tidied away: the unit began as a measurement of a leg already landed, and what it should build was not knowable until the measurement existed. The measurement: every git argv logged through
   a shim in `GIT()`, which is the only method that follows the driver's child processes — `bash -x`
   does not, and that blind spot is why the first attempt at this leg optimised the wrapper instead of

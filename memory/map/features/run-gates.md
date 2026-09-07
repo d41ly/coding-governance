@@ -22,7 +22,8 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "hookspath-resolves-into-another-checkout.md",
   "ab-arm-never-did-the-work.md",
   "empty-field-collapses-unless-it-is-last.md",
-  "suite-invalidated-by-a-commit-under-it.md"]
+  "suite-invalidated-by-a-commit-under-it.md",
+  "fixture-removes-the-path-under-test.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

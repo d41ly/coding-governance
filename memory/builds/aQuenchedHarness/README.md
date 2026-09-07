@@ -72,11 +72,11 @@ copy-installs a kit runs that kit's self-tests on every bar.
 | 6 | `TOOL-aQuenchedHarness-6` | CLOSED | ONE suite ported at 4.03x with its arms diffed identical; the other eleven candidates surveyed and unportable, AC5 recorded NOT MET |
 | 7 | `TOOL-aQuenchedHarness-7` | CLOSED | the longest leg on the bar: 5420 external processes to 2321, stdout byte-identical, wall target MISSED at 435s against 400s |
 | 8 | `TOOL-aQuenchedHarness-8` | CLOSED | the turnstile stops reaping its own live holder — observed serialising two real bars at the landing |
-| 10 | `TOOL-aQuenchedHarness-10` | INPROGRESS | the same leg again, on its git interaction: 1114 git spawns to 369 and 618s to 316s, stdout byte-identical — and check 30 grades the builds that can produce a finding rather than all 102 |
+| 10 | `TOOL-aQuenchedHarness-10` | CLOSED | the same leg again, on its git interaction: 1114 git spawns to 369 and 618s to 316s, stdout byte-identical — and check 30 grades the builds that can produce a finding rather than all 102 |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 10 unit(s) · node a · opened 2026-09-06 · streams tooling
+**Build status:** CLOSED · 10 unit(s) · node a · opened 2026-09-06 · streams tooling
 ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 TOOL-aQuenchedHarness-9 TOOL-aQuenchedHarness-10
 
 <!-- gen:build-units -->
@@ -91,7 +91,7 @@ ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL
 | [TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved](spec/2026-09-06-spec-TOOL-aQuenchedHarness-6.md) | 7 | 2 | CLOSED | rev-7 | 2026-09-07 |
 | [TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches](spec/2026-09-06-spec-TOOL-aQuenchedHarness-7.md) | 8 | 2 | CLOSED | rev-5 | 2026-09-07 |
 | [TOOL-aQuenchedHarness-9 — the held suites that are red, and have been for nobody knows how long](spec/2026-09-07-spec-TOOL-aQuenchedHarness-9.md) | 9 | 2 | WONTDO | rev-2 | 2026-09-07 |
-| [TOOL-aQuenchedHarness-10 — the leg asks git once per question, not once per record](spec/2026-09-07-spec-TOOL-aQuenchedHarness-10.md) | 10 | 2 | INPROGRESS | rev-1 | 2026-09-07 |
+| [TOOL-aQuenchedHarness-10 — the leg asks git once per question, not once per record](spec/2026-09-07-spec-TOOL-aQuenchedHarness-10.md) | 10 | 2 | CLOSED | rev-3 | 2026-09-07 |
 <!-- /gen:build-units -->
 
 Records: 22 bound to this build, across 4 record folder(s).
