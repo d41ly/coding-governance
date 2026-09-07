@@ -1,12 +1,13 @@
 # TOOL-aPooledSweep-2 — a contended reading grades no budget, and says so
 
-**Status:** OPEN · rev-2 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 2 · ratified 2026-09-07
+**Status:** OPEN · rev-3 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 2 · ratified 2026-09-07
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPooledSweep-1 TOOL-aPooledSweep-3 |
+| [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round2.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round2.md) | spec-audit | TOOL-aPooledSweep-1 TOOL-aPooledSweep-3 |
 
 <!-- /gen:spec-records -->
 
@@ -29,8 +30,11 @@ only for the kind that can carry one.
 - **S4** — a pooled run writes no reading into any artifact that a later ranking reads. Observed by
   AC3.
 - **S5** — `--rank` GAINS an explicit refusal for a pooled condition, because it has none today. A
-  budgets row whose reading names the pooled tag is reported unbacked by name and contributes to no
-  share, while a serial row beside it still ranks. Observed by AC5.
+  budgets row whose reading names the pooled tag joins the UNBACKED list by name, and `--rank` then
+  computes no share at all and exits non-zero — which is the refusal that already exists for an
+  unrecognised condition, not a new one. Observed by AC5.
+- **S6** — THE TAG THE RUNNER EMITS IS THE TAG THE REFUSAL MATCHES. One spelling, asserted as a round
+  trip rather than hand-typed twice. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -84,20 +88,29 @@ so a green sweep announces on every run how many budgets it did not grade.
 This is the same shape the repo already uses for a held gate leg and for `lib-selftest.sh`'s
 declared-nothing refusal: an announced skip, never an omitted row.
 
-### The refusal that did not exist
+### The refusal that did not exist, and where it has to sit
 
 Rev-1's S5 asserted that `--rank` would already refuse a pooled reading. It does not.
 `run-selftests.sh:80` matches conditions with `measured (\d+)s (?:on )?(.+?)(?:,|$)`, whose second
 group accepts ANY text up to a comma or end of line — so `measured 42s pooled@8x1 on node a, x1.5`
 parses cleanly and ranks as a `direct` reading. The closed vocabulary is closed on the two reading
 SHAPES, not on the condition text after the seconds, and eleven of the fifty-nine rows already use
-that spelling, one of them already carrying a width clause. So the likely spelling is the one that
+that spelling, three of them already carrying a width clause. So the likely spelling is the one that
 slips through.
 
-The net is therefore BUILT rather than assumed: `CONDS` gains a pattern matching the pooled tag that
-routes the row to the same unbacked report an unrecognised condition takes. It is a refusal and not
-a lenient parse, because ranking a contended reading against serial ones is exactly the
-ranking-the-conditions defect `TOOL-aQuenchedHarness-6` S3a exists to prevent.
+**It is NOT a new `CONDS` entry, and rev-2 had that backwards.** A `CONDS` match is precisely what
+RANKS a row: the loop at `run-selftests.sh:102` breaks on the first match and appends to `rows`,
+and only the `for…else` fall-through reaches `unbacked`. Adding a pooled pattern to that list would
+make a pooled reading rank rather than refuse — the exact inversion of the intent — and the lenient
+`measured` entry sits above it and would match first anyway.
+
+So the refusal is a REFUSE list consulted BEFORE the `CONDS` loop: a reading matching it goes
+straight to `unbacked` without being offered to the rankers. `unbacked` is already a total refusal —
+`run-selftests.sh:120-129` prints every offending row by name, states that no share was computed,
+and raises `SystemExit(1)` — and that is the correct behaviour rather than a limitation to work
+around: a denominator missing its largest members is not a majority of anything, which is what
+`TOOL-aQuenchedHarness-6` S2 already decided for the same file. Rev-2's AC5 asked for the serial row
+to "still rank" beside a refused one, which that path cannot do and should not.
 
 ### Inventory
 
@@ -150,10 +163,15 @@ this suite's own window. A per-suite clock under a pool is still a contended clo
 - **AC4** — When `bash tools/run-gates/run-selftests.sh --help` is read, it states that `--sweep`
   issues no cost verdict. Red when: the flag is documented as a faster equivalent of the default.
 - **AC5** — When a fixture budgets file carries one row whose reading names the pooled tag and one
-  ordinary serial row, `bash tools/run-gates/run-selftests.sh --rank` REPORTS the pooled row as
-  unbacked by name, computes no share that includes it, and still ranks the serial row. Red when:
-  the pooled row is ranked as a `direct` reading, or the refusal is a blanket that also drops the
-  serial row.
+  ordinary serial row, `bash tools/run-gates/run-selftests.sh --rank` NAMES the pooled row in its
+  unbacked list, computes no share at all, and exits non-zero; and when the pooled row is removed,
+  the same file ranks cleanly. Red when: the pooled row is ranked as a `direct` reading; or the
+  refusal fires on the file that carries only serial rows, which would make it a blanket rather than
+  a predicate.
+- **AC6** — When `--sweep` emits its condition tag and that exact emitted string is written into a
+  fixture budgets row, `--rank` refuses it. Red when: the emitter's spelling and the refusal's
+  pattern differ, which a fixture that hand-types the tag on both sides cannot detect.
+  figure: DERIVED — the tag is captured from a `--sweep` run rather than typed into the arm.
 
 ## 7. Gates
 
@@ -162,7 +180,10 @@ this suite's own window. A per-suite clock under a pool is still a contended clo
 New arm: `tools/run-gates/run-selftests.test.sh` · a fixture suite deliberately slower than its
 declared budget, run in both modes · the suite's assertion floor moves by the number of arms added.
 New arm: `tools/run-gates/run-selftests.test.sh` · a fixture budgets file carrying one pooled-tagged
-reading and one serial reading, ranked · same floor move.
+reading and one serial reading, ranked, plus the same file with the pooled row removed · same floor
+move.
+New arm: `tools/run-gates/run-selftests.test.sh` · the tag CAPTURED from a `--sweep` run and fed to
+`--rank`, so the emitter and the reader are joined rather than hand-typed twice · same floor move.
 
 ## 8. Open questions
 
@@ -178,6 +199,13 @@ reading and one serial reading, ranked · same floor move.
   `--rank` refusal that does not exist — its second condition pattern accepts any text after the
   seconds — so the net is now built and AC5 observes it, staged both ways so the refusal is not a
   blanket.
+- rev-3 · 2026-09-07 · §2 S5, S6 · §4 · §6 AC5, AC6 · §7 · folded round-2 spec audit B1, H2, H6, L1.
+  The loop exited NON-CONVERGENT at round 2, so every finding was disposed by FOLD. B1: `unbacked`
+  is a blanket `SystemExit` before any ranking, so rev-2's AC5 asked for behaviour the path cannot
+  have; the criterion now asserts the total refusal and stages the clean file beside it. H2: a
+  `CONDS` match RANKS a row, so a pooled entry there would have done the opposite of the intent —
+  the refusal moves ahead of that loop. H6: no criterion read the tag the runner emits, so AC6 makes
+  it a round trip. L1: three of the eleven `measured Ns` rows carry a width clause, not one.
 
 ## 10. Reuse audit
 

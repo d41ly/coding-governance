@@ -24,3 +24,5 @@ base: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 ## Parked
 
 2026-09-07T10:38:05Z review · item TOOL-aPooledSweep-1-2-3 · reason verdict BLOCKED · blockers 9
+
+2026-09-07T11:09:01Z review · item TOOL-aPooledSweep-1-2-3 · reason verdict BLOCKED · blockers 14 · NON-CONVERGENT · disposition fold

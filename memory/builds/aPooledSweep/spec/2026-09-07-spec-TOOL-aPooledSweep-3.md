@@ -1,12 +1,13 @@
 # TOOL-aPooledSweep-3 — pool safety is observed, not assumed
 
-**Status:** OPEN · rev-2 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 3 · ratified 2026-09-07
+**Status:** OPEN · rev-3 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 3 · ratified 2026-09-07
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 |
+| [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round2.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round2.md) | spec-audit | TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 |
 
 <!-- /gen:spec-records -->
 
@@ -22,7 +23,8 @@ rather than asserting that suites are hermetic because they call `mktemp -d`.
   tree no sibling can reach. Observed by AC1.
 - **S2** — the sweep FINGERPRINTS THE TRACKED WORKING TREE before and after the whole run and REDS
   on a difference, naming the paths that changed. One place, not two: §4 records why the git common
-  dir was dropped. Observed by AC2.
+  dir was dropped. The BEFORE reading is taken before any suite starts, observed by AC7; the
+  comparison is observed by AC2.
 - **S3** — the fingerprint has a LIVENESS assertion: a fingerprint that could not be taken REFUSES,
   and says the sweep is ungraded rather than reporting a clean tree. Observed by AC3.
 - **S4** — the refusal names the sweep as UNSOUND rather than naming a suite. A whole-run
@@ -44,7 +46,10 @@ rather than asserting that suites are hermetic because they call `mktemp -d`.
 - Not sandboxing a suite. A private `TMPDIR` is a redirection, not a jail, and this spec claims no
   more than that.
 - Not fingerprinting untracked files. A suite legitimately leaving an untracked artifact in the tree
-  is not the failure this observes, and `.gitignore`d build output would red every run.
+  is not the failure this observes. This is a FLAG and not a property of the command: plain
+  `git status --porcelain` lists untracked paths with `??` and hides ignored ones, so the reading
+  passes `--untracked-files=no` explicitly. Rev-2 resolved F1 against a default the command does not
+  have.
 - Not fingerprinting the git common dir. §4 records the reading that removed it; the residual gap —
   a suite writing into repository metadata — is observed by nothing here and is named rather than
   implied away.
@@ -74,8 +79,13 @@ harness's filename returns five, because `tools/lib/lib-selftest.test.sh` tests 
 
 ### The fingerprint, and the arm that was dropped
 
-One read, before and after the whole sweep: `git status --porcelain` over TRACKED paths. Equal is
+One read, before and after the whole sweep: `git status --porcelain --untracked-files=no`. Equal is
 the pass. Different is a RED naming the differing paths.
+
+**The flag is load-bearing.** `--porcelain` alone reports untracked paths as `??` rows, so without
+it every ordinary build artifact, editor swap file and freshly written record in the tree would flip
+the reading between the two takes — and this build's own sweep would red on the review report it had
+just written. `--untracked-files=no` is what makes the non-goal above true rather than assumed.
 
 **Rev-1 had a second arm and it is DELETED rather than narrowed.** It listed the git common dir at
 one level, on the reasoning that repository metadata is where an escaping suite would most likely
@@ -137,7 +147,8 @@ arm and declaring the gap is the honest half of the same trade.
 
 - security — N/A: the fingerprint reads, it does not write, and the private `TMPDIR` narrows rather
   than widens what a suite can reach.
-- perf / scale — two `git status` reads and two directory listings per sweep, not per suite.
+- perf / scale — two `git status` reads per sweep, not per suite. Rev-2 deleted the two directory
+  listings this row used to price alongside them.
 - error / empty / loading states — an unreadable fingerprint is the refusal S3 names, not an empty
   one.
 - observability — the differing entries are printed. A clean sweep says the fingerprint matched,
@@ -167,9 +178,15 @@ arm and declaring the gap is the honest half of the same trade.
   Red when: a clean sweep is silent about the fingerprint, so a run where the check never fired is
   indistinguishable from one where it passed.
 - **AC5** — When a fixture suite writes a file into the git common dir during a sweep, `--sweep`
-  does NOT red; and when any suite reds, the summary NAMES the serial re-run as the disambiguation
-  step. Red when: a git-dir write reds the sweep, which is the false positive §4 deleted that arm to
-  avoid; or a red summary omits the re-run instruction.
+  does NOT red. Red when: a git-dir write reds the sweep, which is the false positive §4 deleted
+  that arm to avoid.
+- **AC6** — When any suite in a sweep reds, the summary NAMES the serial re-run — the no-flag
+  `bash tools/run-gates/run-selftests.sh` — as the disambiguation step. Red when: a red summary omits the re-run instruction, leaving an operator
+  with a verdict that cannot separate a broken mechanism from a busy box.
+- **AC7** — When the fingerprint's BEFORE reading is taken, `git status --porcelain
+  --untracked-files=no` has run before the first suite starts: a fixture suite that dirties a
+  tracked file is still reported, rather than being baked into the baseline. Red when: the before-reading is taken after the pool starts, which makes every
+  suite's own writes invisible to the comparison and the whole check vacuous.
 
 ## 7. Gates
 
@@ -181,13 +198,17 @@ number of arms added.
 New arm: `tools/run-gates/run-selftests.test.sh` · a fixture suite that writes into the git common
 dir, asserted NOT to red, paired with the tracked-path arm so the two pin both edges of the
 predicate · same floor move.
+New arm: `tools/run-gates/run-selftests.test.sh` · an untracked file created in the fixture tree
+during a sweep, asserted NOT to red, and a suite whose write is ordered before the baseline would
+be taken · same floor move.
 
 ## 8. Open questions
 
 - **F1 — does the fingerprint cover untracked files in the checkout?** RESOLVED (agent, 2026-09-07,
-  delegated): no. `git status --porcelain` over tracked paths only. A suite legitimately leaving an
-  untracked artifact is not the failure this observes, and including untracked paths would red every
-  sweep on ordinary build output — M3's veto 1, since it would fail this unit's own AC4.
+  delegated): no, and it takes a FLAG to mean it. `git status --porcelain --untracked-files=no`.
+  Rev-2 resolved this against a property `--porcelain` does not have: it lists untracked paths as
+  `??` by default and hides ignored ones, so the unflagged form would have redded every sweep on
+  ordinary build output — M3's veto 1, since it would fail this unit's own AC4.
 
 ## 9. Revision log
 
@@ -198,6 +219,13 @@ predicate · same floor move.
   one-armed predicate owes one staged break, which AC2 already is. H3: `TOOL-dSpentCeiling-8`
   measured two rows of this population redding under concurrency, so S5 makes a pooled red name its
   own serial re-run. H7: the inner-harness suite count was four and is three.
+- rev-3 · 2026-09-07 · §2 S2 · §3 · §4 · §5 · §6 AC5, AC6, AC7 · §7 · §8 F1 · folded round-2 spec
+  audit H5, H7, M3, M4. The loop exited NON-CONVERGENT at round 2, so every finding was disposed by
+  FOLD. H5: S2 promised a before-and-after comparison and every criterion observed only the after,
+  so AC7 pins when the baseline is taken. H7: `git status --porcelain` reports untracked paths, so
+  the reading takes `--untracked-files=no` and F1 says so. M3: rev-2's AC5 conjoined a must-not-red
+  fixture with an observation that only exists when something reds, so it splits into AC5 and AC6.
+  M4: the readiness row still priced the two directory listings rev-2 deleted.
 
 ## 10. Reuse audit
 
