@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3
+unpushed-at-landing: 0
 parked-surfaced: yes, 0 surfaced — every fork was resolved in place and both review loops exited by FOLD, so nothing was deferred to the owner
 keepalive-reaped: yes
-witness: 6c6012c7afeadcf07b9e120556a6343ebedcc4cf
-phase: LANDING
+witness: f88cb8b48f128090e008dd5e2b4113ce962ba575
+phase: LANDED
 branch-sha: 05fb897c2f1275b49dc1aeb56fb453505e5a9681
 branch-ref: refs/heads/branch/cg-harness-incomplete-porting-631c78
 mode: prompt
