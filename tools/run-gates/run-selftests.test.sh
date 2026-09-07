@@ -21,7 +21,7 @@ cd "$ROOT" || exit 2
 RUNNER="$ROOT/tools/run-gates/run-selftests.sh"
 [ -f "$RUNNER" ] || { echo "run-selftests.test: no runner at $RUNNER"; exit 2; }
 
-SELFTEST_FLOOR=36
+SELFTEST_FLOOR=37
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -305,5 +305,10 @@ arm "a fingerprint that cannot be TAKEN refuses before running anything, rather 
     "a sweep would be UNGRADED" \
     "mkdir -p shim && cp tools/git-nostatus.sh shim/git && chmod +x shim/git" \
     'PATH="$PWD/shim:$PATH" bash tools/run-gates/run-selftests.sh --sweep'
+
+# THE INVARIANT AS REACHED, not as printed. The width-pair arm reads what the pool was ASKED for; a
+# pool that ran wider than its outer bound would satisfy that arm and break the composite invariant
+# the whole re-division rests on. This reads the stamps the pool actually produced.
+arm "peak concurrency is REPORTED and never exceeds the outer width the run printed" 0     "peak concurrency"     'true' "$R --sweep"
 
 run_arms run-selftests.test.sh

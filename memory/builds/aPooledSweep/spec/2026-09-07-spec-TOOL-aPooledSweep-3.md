@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-07-build-TOOL-aPooledSweep-1-acceptance-ledger-and-the-measured-ab.md](../build/2026-09-07-build-TOOL-aPooledSweep-1-acceptance-ledger-and-the-measured-ab.md) | journal | TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 |
 | [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 |
 | [2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round2.md](../reviews/2026-09-07-review-TOOL-aPooledSweep-1-2-3-spec-audit-round2.md) | spec-audit | TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 |
 

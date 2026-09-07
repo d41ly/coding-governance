@@ -554,6 +554,30 @@ EOF
 
   echo "----"
   [ -n "$walled" ] && echo "run-selftests: the ${SWEEP_WALL}s run wall killed:$walled"
+  # THE PEAK, COMPUTED FROM THE STAMPS BEFORE THE SCRATCH IS REMOVED. The printed width pair says
+  # what the pool was ASKED for; this says what it reached. They are different claims, and only the
+  # second can catch a pool that ran wide when it was told not to. It is also the number a reader
+  # actually wants: "peak 8 of outer 8" says the width was spent, "peak 1" says it was not.
+  SWEEP_PEAK=$(
+    for vf in "$SWEEP_ROOT"/*/v; do [ -r "$vf" ] && cut -f2,3 "$vf"; done 2>/dev/null | awk '
+      { s[NR]=$1; e[NR]=$2 }
+      END { peak=0
+            for (i=1; i<=NR; i++) { c=0
+              for (j=1; j<=NR; j++) if (s[j] <= s[i] && e[j] >= s[i]) c++
+              if (c > peak) peak=c }
+            print peak+0 }')
+  case "${SWEEP_PEAK:-}" in ''|*[!0-9]*) SWEEP_PEAK=0 ;; esac
+  echo "run-selftests: peak concurrency $SWEEP_PEAK of outer $OUTER"
+  # AND IT IS A GUARD, not a statistic. The composite invariant is outer x inner within the declared
+  # width; a pool that ran wider than its own outer bound has broken it, and the printed pair cannot
+  # notice because the pair is what the pool was ASKED for.
+  if [ "$SWEEP_PEAK" -gt "$OUTER" ]; then
+    st=1
+    echo "run-selftests: THE POOL RAN WIDER THAN ITS BOUND — peak $SWEEP_PEAK against an outer width"
+    echo "run-selftests: of $OUTER. The composite invariant (outer x inner <= the declared width) is"
+    echo "run-selftests: broken, so this run oversubscribed the box and every reading above is suspect."
+  fi
+
   # THE AFTER READING, once the pool has DRAINED. Taken mid-pool it would race fifty-eight writers,
   # which is why this instrument is whole-run and says so rather than pretending to attribute.
   FP_AFTER=$(_rs_fingerprint)
