@@ -788,6 +788,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "cmd_check",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "cmd_check_format",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -863,6 +868,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "cmd_report",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -906,6 +916,11 @@
       "id": "cmd_write",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "cmd_write",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
     },
     {
       "id": "collect",
@@ -1975,6 +1990,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
     },
     {
@@ -2478,6 +2498,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "read_evidence",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "read_fixture",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
@@ -2528,6 +2553,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_legs",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "read_lines",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -2543,9 +2573,19 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "read_margin",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "read_routed_cell",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_runs",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
     },
     {
       "id": "read_set",
@@ -2953,6 +2993,11 @@
       "file": "tools/codebase-map/check_gate_coverage.py"
     },
     {
+      "id": "resolve_git_dir",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "resolve_gov_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -2986,6 +3031,11 @@
       "id": "resolve_posix_shell",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "resolve_repo_root",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
     },
     {
       "id": "resolve_root",
