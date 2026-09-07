@@ -67,20 +67,20 @@ ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReap
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration](spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md) | 1 | 2 | OPEN | rev-1 | 2026-09-08 |
-| [TOOL-aReapedSpinner-1 — the census: one bounded read of the process table, or a refusal](spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md) | 2 | 2 | OPEN | rev-1 | 2026-09-08 |
-| [TOOL-aReapedSpinner-2 — the scope fence: attribution is positive, declared, and never the caller](spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md) | 3 | 2 | OPEN | rev-1 | 2026-09-08 |
-| [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-08 |
-| [TOOL-aReapedSpinner-4 — the reaper: walk the real edges, kill leaves first, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 4 | 2 | OPEN | rev-1 | 2026-09-08 |
-| [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 5 | 2 | OPEN | rev-1 | 2026-09-08 |
-| [TOOL-aReapedSpinner-7 — the gate runner reaps its own TREE, not just the pid it recorded](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 5 | 2 | OPEN | rev-1 | 2026-09-08 |
+| [TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration](spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md) | 1 | 2 | OPEN | rev-2 | 2026-09-08 |
+| [TOOL-aReapedSpinner-1 — the census: one bounded read of the process table, or a refusal](spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md) | 2 | 2 | OPEN | rev-2 | 2026-09-08 |
+| [TOOL-aReapedSpinner-2 — the scope fence: attribution is positive, path-shaped, and never the caller](spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md) | 3 | 2 | OPEN | rev-2 | 2026-09-08 |
+| [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 4 | 2 | OPEN | rev-2 | 2026-09-08 |
+| [TOOL-aReapedSpinner-4 — the reaper: walk the real edges, signal from the right namespace, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 5 | 2 | OPEN | rev-2 | 2026-09-08 |
+| [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 6 | 2 | OPEN | rev-2 | 2026-09-08 |
+| [TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 6 | 2 | OPEN | rev-2 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -89,9 +89,10 @@ Ids no `spec-audit` record has ever named: TOOL-aReapedSpinner-1 TOOL-aReapedSpi
 |---|---|---|
 | 1 | `TOOL-aReapedSpinner-6` | no |
 | 2 | `TOOL-aReapedSpinner-1` | no |
-| 3 | `TOOL-aReapedSpinner-2`, `TOOL-aReapedSpinner-3` | yes |
-| 4 | `TOOL-aReapedSpinner-4` | no |
-| 5 | `TOOL-aReapedSpinner-5`, `TOOL-aReapedSpinner-7` | yes |
+| 3 | `TOOL-aReapedSpinner-2` | no |
+| 4 | `TOOL-aReapedSpinner-3` | no |
+| 5 | `TOOL-aReapedSpinner-4` | no |
+| 6 | `TOOL-aReapedSpinner-5`, `TOOL-aReapedSpinner-7` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

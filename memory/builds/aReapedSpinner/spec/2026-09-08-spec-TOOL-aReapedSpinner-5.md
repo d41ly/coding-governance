@@ -1,10 +1,12 @@
 # TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled
 
-**Status:** OPEN · rev-1 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -43,7 +45,10 @@ whole fleet is in today.
 
 ### Edges
 
-- **consumes-from** `TOOL-aReapedSpinner-3` — the report path and its verdicts.
+- **consumes-from** `TOOL-aReapedSpinner-4` — the report path, which is `--sweep` in report mode.
+  Unit 4 owns the whole census-fence-classify chain after the round-1 fold; rev-1 of this spec
+  consumed unit 3's `--report`, which no longer resolves scope and so cannot answer what the hook
+  must print.
 - **consumes-from** `TOOL-aReapedSpinner-6` — `PROCMON_THROTTLE_S`, and the adopter that writes the
   settings entries.
 - **hands-off** external — the harness reads a hook's stdout; nothing in this repo asserts that it
@@ -155,6 +160,9 @@ arms, one suite.
 ## 9. Revision log
 
 - rev-1 · 2026-09-08 · initial draft.
+- rev-2 · 2026-09-08 · header order · §3 Edges · no findings against this unit in spec-audit round 1.
+  `order` moves 5 → 6 behind unit 3's and unit 4's shifts, and the report edge moves from unit 3 to
+  unit 4, which took ownership of the full chain under D5.
 
 ## 10. Reuse audit
 

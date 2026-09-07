@@ -1,10 +1,12 @@
 # TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration
 
-**Status:** OPEN · rev-1 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -18,16 +20,18 @@ the monitor by declaring its roots rather than by porting a script.
 
 - **S1** — `tools/process-monitor/kit.toml`, the descriptor: id, home, scope, `version_from`, the
   `[[files]]` roles, the `[adopt]` and `[check]` argv, and the `[[gate_leg]]` rows this kit brings.
-  Observed by AC1.
+  **`version_from` pins at `adopt-process-monitor.sh`**, a file THIS unit ships, carrying a
+  `KIT_PROCESS_MONITOR_VERSION=` line. Observed by AC1, AC7.
 - **S2** — a `[[entry]]` row in `tools/govkit/registry.toml` pointing at that descriptor. Observed
   by AC1.
 - **S3** — `.process-monitor.conf` at the repo root, holding every value the kit READS and nothing
-  it could derive: the scope roots, the age ceilings, the reap mode, and the report throttle.
+  it could derive: the scope roots INCLUDING the gate runner's scratch parent, the age ceiling,
+  the spin rate, the reap mode, and the report throttle.
   Every key carries its reason in a comment beside it, as the sibling confs do. Observed by AC2.
 - **S4** — `tools/process-monitor/adopt-process-monitor.sh`, with a `--check` mode that verifies
   wiring without repairing it. Observed by AC3.
-- **S5** — `tools/process-monitor/README.md`, stating what the kit checks AND what it does not.
-  Observed by AC4.
+- **S5** — `tools/process-monitor/README.md`, carrying a section stating what the kit does NOT
+  check. Observed by AC4, AC6.
 - **S6** — a `[[hole]]` declaration for the one value that ships unfillable: `PROCMON_ROOTS`, which
   is the adopter's own paths and cannot be seeded from this tree. Observed by AC5.
 
@@ -35,7 +39,10 @@ the monitor by declaring its roots rather than by porting a script.
 
 - **No engine.** This unit ships declarations, an adopter and a README. `census.py`, `scope.py`,
   `classify.py`, `reap.py` and the hook belong to units 1 to 5, and this unit must land green
-  WITHOUT them.
+  WITHOUT them. `version_from` therefore may not name one — rev-1 did, which is what made this
+  unit unlandable (D1).
+- **No `KIT_PROCESS_MONITOR_VERSION` in a python module.** The constant lives in the shell
+  adopter this unit ships. Unit 1 mints no version marker and needs none.
 - **No gate legs that run an engine that does not exist yet.** The `[[gate_leg]]` rows S1 declares
   are the kit's own wiring check only; the engine legs arrive with the units that build them.
 - **No adopter-facing ceilings measured against THIS corpus.** A pin measured here and shipped into
@@ -54,6 +61,9 @@ the monitor by declaring its roots rather than by porting a script.
 - **hands-off** `TOOL-aReapedSpinner-5` — the conf keys S3 declares are what the hook reads for its
   throttle; the hook declares no value of its own.
 - **hands-off** `TOOL-aReapedSpinner-4` — `PROCMON_REAP_MODE` is declared here and CONSUMED there.
+- **hands-off** `TOOL-aReapedSpinner-7` — the gate runner's scratch parent, declared in
+  `PROCMON_ROOTS` HERE rather than by that unit, because unit 5 shares that unit's `order` value
+  and reads this conf as a contract.
 - **consumes-from** external — `tools/govkit/registry.toml` and its `[surface]` globs, which
   already claim `tools/*` and therefore already reach this directory.
 
@@ -61,7 +71,9 @@ the monitor by declaring its roots rather than by porting a script.
 
 ### Inventory
 
-Identifiers this unit MINTS, each beside the cell that grades it:
+Identifiers this unit MINTS, each beside the cell that grades it. **Every row's `Where` names a
+file THIS unit ships** — rev-1 pointed one at `census.py`, which unit 6 is forbidden to ship, and
+`govkit.py:1194` reds on a `version_from` naming an absent file (D1).
 
 | Name | Cell | Where |
 |---|---|---|
@@ -70,7 +82,7 @@ Identifiers this unit MINTS, each beside the cell that grades it:
 | `PROCMON_SPIN_RATE` | conf key, ungraded | `.process-monitor.conf` |
 | `PROCMON_REAP_MODE` | conf key, ungraded | `.process-monitor.conf` |
 | `PROCMON_THROTTLE_S` | conf key, ungraded | `.process-monitor.conf` |
-| `KIT_PROCESS_MONITOR_VERSION` | `py.constant`, SCREAMING_SNAKE | `census.py`, per `version_from` |
+| `KIT_PROCESS_MONITOR_VERSION` | `sh` assignment, ungraded | `adopt-process-monitor.sh` |
 
 ### The conf, and why each key is DECLARED rather than derived
 
@@ -84,9 +96,18 @@ is stated in §8. The remaining two are tuning.
 scope fence match nothing, and a monitor that reports zero because it was never configured is
 indistinguishable from a clean tree. That is why S6 declares it as a `[[hole]]`.
 
+**WHAT THIS REPO'S OWN `PROCMON_ROOTS` MAY NOT CONTAIN, and it is a safety rule rather than a
+preference.** Not the shared temp root. Measured: every Claude Bash-tool shell on this machine
+carries an `export TEMP=` assignment naming the user's temp directory inside its argv, so a
+substring root naming that directory admits every agent session in every repository on the box
+(D11). Unit 7 needs the runner's scratch dirs admissible; unit 2 §4 answers it by matching
+program paths and path-shaped arguments rather than raw strings, and unit 7 grades the specific
+`mktemp -d` directory it created rather than the temp root. The README states this, because an
+adopter reading only the conf would reach for the obvious value.
+
 ### Files touched (estimate)
 
-New: `tools/process-monitor/{kit.toml,adopt-process-monitor.sh,README.md}`,
+New: `tools/process-monitor/{kit.toml,adopt-process-monitor.sh,adopt-process-monitor.test.sh,README.md}`,
 `.process-monitor.conf`. Edited: `tools/govkit/registry.toml` (one entry row), `.gitattributes`
 (LF pins for the shell and conf).
 
@@ -107,42 +128,49 @@ New: `tools/process-monitor/{kit.toml,adopt-process-monitor.sh,README.md}`,
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python tools/govkit/govkit.py selfcheck` runs with the entry row landed, it exits
-  0 and its output names `process-monitor` among the entries. Observed by
-  `tools/govkit/govkit.py`.
+- **AC1** — When `govkit.py selfcheck` runs with the entry row landed and NO engine file present,
+  it exits 0 and names `process-monitor` among the entries. Observed by `govkit.py`.
   Red when: a tracked file under the kit dir is claimed by no `[[files]]` rule, or the descriptor
   claims a path the kit does not ship — the assertion is bidirectional and both directions red.
-- **AC2** — When `.process-monitor.conf` is present with a BLANK `PROCMON_ROOTS`, the adopter's
-  `--check` exits non-zero naming that key. Observed by `adopt-process-monitor.sh`, arm staged in
-  `adopt-process-monitor.test.sh`.
+- **AC2** — When `.process-monitor.conf` carries a BLANK `PROCMON_ROOTS`, `--check` exits non-zero
+  naming that key. Observed by `adopt-process-monitor.test.sh`, arm `test_blank_roots_refuses`.
   Red when: a blank roots list is read as an empty set and `--check` passes, which would ship a
-  monitor that reports a clean tree because it was never configured.
-- **AC3** — When `adopt-process-monitor.sh --check` runs in this tree
-  after adoption, it exits 0; when run against a scratch tree missing the conf, it exits non-zero
-  naming the missing file. Observed by `adopt-process-monitor.test.sh`.
+  monitor reporting a clean tree it never examined.
+- **AC3** — When `adopt-process-monitor.sh --check` runs in this tree after adoption it exits 0;
+  against a scratch tree missing the conf it exits non-zero naming the missing file, and that
+  scratch tree is UNCHANGED afterwards. Observed by `adopt-process-monitor.test.sh`, arm
+  `test_check_refuses_without_repairing`.
   Red when: `--check` repairs anything. It is the non-repairing mode by contract, the same split
   `.unattended.conf` records for `WIRING_CHECK`.
-- **AC4** — When `README.md` is read, it carries a section stating what this kit does NOT check.
-  Observed by `check-kit-placeholders.py`, which already refuses an unfilled placeholder in a kit
-  README.
-  Red when: the README ships with template placeholders unfilled.
-- **AC5** — When `python tools/govkit/govkit.py selfcheck` runs, the `procmon-roots` hole is
-  reported as a declared hole with a discharge probe, and the probe exits non-zero on a blank
-  `PROCMON_ROOTS`. Observed by `tools/govkit/govkit.py`.
-  Red when: the hole is declared with a probe that cannot fail — the discharge command must be run
-  against a blank value before this unit closes, not merely written.
-- **AC6** — When this unit lands, `bash tools/run-gates/run-gates.sh` is green with NO engine file
-  present under the kit dir. Observed by `tools/run-gates/run-gates.sh`.
-  Red when: a `[[gate_leg]]` row declared here runs an engine unit 1 has not built, which would make
-  this unit unlandable on its own and collapse the build's ordering.
-  `cost:` a full bar, roughly 26 minutes of wall at this repo's floor.
+- **AC4** — When the descriptor declares a placeholder token the adopter never fills,
+  `check-kit-placeholders.py` exits non-zero. Observed by `check-kit-placeholders.py`.
+  Red when: the placeholder join is not on this unit's bar at all — rev-1 omitted the leg from §7
+  while naming the checker as an observer (D2).
+- **AC5** — When `govkit.py selfcheck` runs, the `procmon-roots` hole is reported as declared with
+  a discharge probe, AND that probe has been RUN against a blank `PROCMON_ROOTS` and observed to
+  exit non-zero. Observed by `govkit.py`.
+  Red when: the hole is declared with a probe nobody staged a failure for — a probe that cannot
+  fail is the class this repo gates against in a dozen places.
+- **AC6** — When `README.md` is searched for the negative-scope heading, it is present and its
+  section is non-empty. Observed by `adopt-process-monitor.test.sh`, arm
+  `test_readme_states_what_it_does_not_check`.
+  Red when: the section is absent. rev-1 witnessed this with `check-kit-placeholders.py`, whose own
+  header says it grades DECLARATIONS and never opens a README — a criterion its own command could
+  not show (D2).
+- **AC7** — When the descriptor's `version_from` is resolved, the file it names is one this unit's
+  `[[files]]` rules ship, and `govkit.py selfcheck` exits 0 with no engine file present. Observed
+  by `adopt-process-monitor.test.sh`, arm `test_version_from_names_a_file_this_unit_ships`.
+  Red when: `version_from` points into another unit's file, which reds `govkit selfcheck` and
+  `kit version markers` on every bar until that unit lands (D1) — both are `subject: repo` with no
+  guard, so there is no scoped run that hides it.
 
 ## 7. Gates
 
-`govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `line length` · `dead-path carriers (deleted files still named)` · `hook destinations (every declared hook path ships)` · `kit version markers`
+`govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `kit placeholders (a declared token its adopter substitutes)` · `line length` · `dead-path carriers (deleted files still named)` · `hook destinations (every declared hook path ships)` · `kit version markers`
 
 New arm: `tools/process-monitor/adopt-process-monitor.test.sh` · stages a missing conf, a blank
-`PROCMON_ROOTS`, and a descriptor claiming an absent path · no assertion floor yet, this suite is new.
+`PROCMON_ROOTS`, a descriptor claiming an absent path, a `version_from` naming a file this unit
+does not ship, and a README with the negative-scope section removed · no assertion floor yet, this suite is new.
 
 ## 8. Open questions
 
@@ -152,14 +180,25 @@ New arm: `tools/process-monitor/adopt-process-monitor.test.sh` · stages a missi
   RESOLVED (agent, 2026-09-08, delegated): `reap-orphans`. The owner's prompt names KILL as a
   required capability, so `report` under-delivers; `reap-all` would put an irreversible action on a
   single-sample heuristic, which template §9 forbids by default. `reap-orphans` is the class whose
-  evidence is strongest — a process whose parent is dead and which is hours past its ceiling has no
-  live claimant by construction — and it is the class every example in the prompt belongs to. The
-  vetoes pass: no criterion or non-goal is broken, no dependency is added, and the write surface
-  does not widen beyond what the unit was scoped for. `reap-all` stays reachable by declaration.
+  evidence is strongest — a process whose parent is dead and hours past its ceiling has no live
+  claimant by construction.
+  **Re-examined at rev-2 against D11 and HELD, but CONDITIONALLY.** The audit showed that
+  `reap-orphans`, plus a naive substring root, plus the shared temp directory, reaps sibling agent
+  sessions on the same machine — one such session in the live table already carries `ppid 1` and
+  would grade ORPHAN. The mode is defensible only once unit 2 matches PROGRAM PATHS rather than raw
+  strings, which is now that unit's AC8, and only while this repo's own roots exclude the temp root
+  per §4. If either of those is relaxed, the default must fall back to `report`. `reap-all` stays
+  reachable by declaration and is never this kit's default.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-08 · initial draft.
+- rev-2 · 2026-09-08 · S1 · S5 · §3 · §4 · AC1 · AC4 · AC5 · AC6 · AC7 · §7 · §8 · folded
+  spec-audit round 1. D1: `version_from` moved off `census.py` onto the shell adopter this unit
+  ships, the version row with it, AC7 added to assert the resolution. D2: AC4 split — the
+  placeholder join keeps its checker, the negative-scope section gets AC6 and a real arm, and the
+  `kit placeholders` leg joins §7. D11: §4 gains the rule that this repo's roots may not name the
+  shared temp directory.
 
 ## 10. Reuse audit
 
@@ -167,9 +206,12 @@ The seam this unit EXTENDS is `tools/govkit/registry.toml` and the descriptor gr
 `tools/drift-audit/kit.toml` demonstrates — `python tools/codebase-map/reuse_lookup.py "kill a hung
 or idle background process and report it to the session"` returned the `govkit` dossier and
 `registry.toml` as an affordance seam, and that is the one hit in the probe that was a real seam
-rather than a name collision. The descriptor is copied in SHAPE from `drift-audit`, which is the
-closest structural sibling: one directory, one engine, a conf owned elsewhere, a self-test withheld
-from adopters. Verified against source at BASE.
+rather than a name collision. The descriptor is copied in SHAPE from `drift-audit`, which is the closest structural sibling: one directory, one engine, a conf
+owned elsewhere, a self-test withheld from adopters. **The `version_from` spelling is taken from
+the sibling set rather than invented** — `codebase-map`, `drift-audit`, `hooks` and `lexicon` all
+pin at a file the entry itself ships, and `agent-instructions` and `gate-lint` use the
+`{ none = "<reason>" }` escape; rev-1 matched neither and named another unit's file. Verified
+against source at BASE.
 
 Recall terms used: `gate runner wall clock bound timeout kill children orphan process leg pool
 watchdog GATE_WALL background subprocess reaper`

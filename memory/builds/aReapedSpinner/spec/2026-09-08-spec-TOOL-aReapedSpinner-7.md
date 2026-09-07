@@ -1,172 +1,224 @@
-# TOOL-aReapedSpinner-7 — the gate runner reaps its own TREE, not just the pid it recorded
+# TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak
 
-**Status:** OPEN · rev-1 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
-Close the defect the owner's prompt opens with. `tools/run-gates/run-gates.sh` kills the leg pids it
-recorded and its own header explains why it cannot do better; the result is that every wall breach
-and every interrupted bar leaves a layer of grandchildren running. Have it call the reaper instead,
-where the reaper is present.
+Close the one gate-runner leak that is actually open. `run-gates.sh` already walks and kills leg
+descendants on its WALL path — rev-1 of this spec was written against a premise that source
+contradicts. What has no reaper at all is the SIGNAL path: `INT`, `TERM` and `HUP` run `cleanup()`,
+which removes the scratch dir and releases the turnstile and kills nothing. That is the mechanism
+behind the prompt's fourth example — a runner stopped 7.5 hours ago still running with its sweep
+and kit children.
 
 ## 2. Scope (IN)
 
-- **S1** — the runner's kill path delegates to `reap.py --kill <pid>` for each outstanding leg,
-  which walks that leg's descendants and verifies. Observed by AC1.
-- **S2** — CONDITIONAL delegation: the runner detects the monitor and falls back to its current
-  behaviour when it is absent, because an adopter may install `run-gates` and not this kit.
-  Observed by AC2.
-- **S3** — the fallback ANNOUNCES itself. A bar that reaped only pids prints one line saying the
-  tree was not walked, so a survivor is never mistaken for a clean stop. Observed by AC3.
-- **S4** — the runner's existing survivor report is kept and now carries the walked count beside
-  the killed count, so the two numbers are visible separately. Observed by AC4.
-- **S5** — the same delegation on the INTERRUPT path, not only the wall-breach path — a bar stopped
-  by a signal leaks exactly the same way. Observed by AC5.
+- **S1** — the `INT`/`TERM`/`HUP` traps reap the recorded leg pids AND their descendants before
+  `cleanup()` removes the scratch dir. Observed by AC1.
+- **S2** — the walk delegates to unit 4's `run_kill` when the monitor is present, which supplies
+  leaves-first ordering, verification as a return value, and no depth cap. Observed by AC2, AC5.
+- **S3** — CONDITIONAL delegation with an announced fallback: when the monitor is absent or would
+  refuse, the runner uses its existing `remove_descendants` and PRINTS which, with the profile
+  line. Observed by AC3, AC4.
+- **S4** — detection includes a PATH-mode admission probe of the runner's own scratch parent
+  through `scope.py --check-path`, resolved at profile time, so "present but would refuse" is known
+  before the first leg is dispatched. Observed by AC4.
+- **S5** — the report names the WALKED count and the KILLED count as separate figures on both
+  paths. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
 - **No change to WHEN the runner kills.** The wall, the per-leg ceiling and the turnstile decide
-  that today and this unit does not touch them. It changes only WHAT dies when they fire.
-- **No new dependency from `run-gates` to the monitor.** S2's detection is what keeps the runner
-  installable alone; a hard import would couple two kits the deployer ships separately.
+  that and this unit does not touch them.
+- **No change to the WALL path's behaviour when the monitor is absent.** It already works; S2 only
+  improves it where the monitor is installed. An adopter with `run-gates` alone must see today's
+  behaviour exactly.
+- **No hard dependency from `run-gates` to the monitor.** S3's detection is what keeps the runner
+  installable alone.
 - **No process-group kill and no `set -m`.** The runner's header records why it has neither, and
-  this build's research record measures that the group is the caller's own.
-- **No retry of the existing kill loop's semantics.** One signal, verified, survivors reported —
-  unit 4's contract, inherited rather than re-litigated here.
+  the research record measures that the group is the caller's own.
+- **No claim that the runner cannot reach a grandchild.** It can, on the wall path, since
+  `TOOL-aQuenchedHarness-1`. rev-1 asserted otherwise and its AC1 therefore passed against the
+  unchanged runner — a criterion that could not fail (D10).
+- **No fix for the depth-8 cap on the fallback path.** Unit 4 §8 F3 records the cycle-guard
+  alternative; changing `scan_descendants` itself is a separate unit and is named here as a
+  follow-up.
 
 ### Edges
 
-- **consumes-from** `TOOL-aReapedSpinner-4` — `run_kill`, and its guarantee that the walk is over
-  the killable namespace.
-- **consumes-from** `TOOL-aReapedSpinner-2` — transitively: the reaper re-checks the fence, so the
-  runner's declared roots must admit its own scratch dirs or the delegation refuses. This is the
-  interaction most likely to surprise, and AC6 observes it.
-- **hands-off** external — the unattended driver's `GATE_BOUND` path wraps the whole bar rather
-  than individual legs, and is NOT changed here. Named as a follow-up rather than silently left.
+- **consumes-from** `TOOL-aReapedSpinner-4` — `run_kill`, and its guarantee that the walk is in the
+  killable namespace.
+- **consumes-from** `TOOL-aReapedSpinner-2` — `scope.py --check-path`, which S4's profile-time
+  probe needs and which unit 2 S7 exists to provide.
+- **consumes-from** `TOOL-aReapedSpinner-6` — the scratch parent declared in `PROCMON_ROOTS`.
+  Declared THERE and not here, because unit 5 shares this unit's `order` and reads that conf.
+- **hands-off** external — the unattended driver's `GATE_BOUND` wraps the whole bar as one child
+  rather than individual legs, so the runner's own trap is what fires first; it is NOT changed
+  here, and §8 F1 records why.
 
 ## 4. Design
 
+### What is actually open, read from source at BASE
+
+- `scan_descendants` (`:428-443`) — a depth-8 ppid walk over ONE pre-kill `ps -ef` snapshot, with
+  the numeric field guard at `:432-436`.
+- `remove_descendants` (`:445-468`) — SIGKILLs every walked member at `:451`, re-reads with
+  `kill -0` at `:466-468`, prints survivors.
+- **Its only caller is `:1517`, inside the wall watcher.**
+- The traps at `:955-957` run `cleanup()` (`:953`), which is
+  `rm -rf "$WORK"; ts_release; ts_drop_ticket`. **No kill of any kind.**
+
+So a bar stopped by a signal — which is what a harness `TaskStop` and a Ctrl-C both produce — tears
+down its scratch directory and leaves every leg, and every leg's children, running. The scratch dir
+they are writing into is deleted out from under them, which is why the survivors show up later as
+processes doing nothing against paths that no longer exist.
+
+`TOOL-aQuenchedHarness-1` rev-6 additionally records that the descendant walk is itself ungraded.
+AC1 below is the first arm over it.
+
 ### Where it hooks in
 
-`tools/run-gates/run-gates.sh:435-468` holds the existing loop: a pid validation, `kill -9 "$p"`,
-then a `kill -0` survivor sweep collecting `left`. The change is inside that loop — replace the
-single `kill -9` with the delegated call, keep the survivor sweep exactly as it is, and add the
-walked count to what it prints.
+`cleanup()` gains a reaping step BEFORE the `rm -rf`, over the same recorded per-leg pids the wall
+watcher uses. Order matters: removing the scratch dir first is what turns a live leg into a process
+writing to a deleted path.
 
-Keeping the survivor sweep matters: it is an INDEPENDENT verification of the reaper's own, and unit
-4 §4 makes the same argument about not trusting an exit status. Two verifications by two mechanisms
-is not duplication here, it is the guard not sharing a variable with the thing it guards.
+The existing `kill -0` survivor sweep is KEPT on the fallback path even when `run_kill` also
+verifies — two verifications by two mechanisms is not duplication here, it is the guard not sharing
+a variable with the thing it guards.
 
-### Detection
+### Detection, at profile time, in three conditions
 
-Presence of `tools/process-monitor/reap.py` AND a readable `.process-monitor.conf`. Both, because
-the reaper refuses on a blank `PROCMON_ROOTS` and a runner that discovers that mid-kill would be
-reporting a monitoring fault as a gate fault. Detection resolves once, before the first leg is
-dispatched, so the announcement in S3 is printed with the profile line rather than at kill time.
+1. `tools/process-monitor/reap.py` present;
+2. `.process-monitor.conf` readable;
+3. **`scope.py --check-path "$TMPDIR"` (or the `mktemp -d` parent the run will use) answers
+   ADMITTED.**
 
-### The roots interaction
+The third is why unit 2 needs a path mode. rev-1 declared only the first two and then asked AC3 to
+announce a "present but refusing" state that those two cannot detect — the refusal could only
+surface mid-kill, which §4 itself called reporting a monitoring fault as a gate fault (D6).
 
-The runner's heavy legs run in `mktemp -d` scratch repos, not in the tree, so their command strings
-name a temp path. If `PROCMON_ROOTS` does not include the scratch root, the reaper refuses every
-leg pid and the runner falls back — correctly, but silently unless S3 speaks. `.process-monitor.conf`
-therefore ships this repo's own scratch root in its declared roots, and the README says why.
+**The runner declares its SCRATCH PARENT, not the shared temp root.** Unit 2 §4 and unit 6 §4 carry
+the reason: a root naming the user's temp directory admits every agent session on the machine.
 
 ### Files touched (estimate)
 
-Edited: `tools/run-gates/run-gates.sh` (the kill loop, the detection line, the trap path). Edited:
-`.process-monitor.conf` (the scratch root, if unit 6 did not already declare it). New arm in
-`tools/run-gates/run-gates.test.sh`.
+Edited: `tools/run-gates/run-gates.sh` (`cleanup`, the detection line, the delegation). New
+arms in `tools/run-gates/run-gates.test.sh`. **This unit does NOT edit
+`.process-monitor.conf`**: unit 5 shares its `order` value and READS that conf for its
+throttle, so writing it here would be a pass writing a file its concurrent sibling reads as a
+contract. The scratch root is declared by unit 6, which creates the conf.
 
 ## 5. Production-readiness checklist
 
-- security — the runner gains no authority it did not have; it already killed processes. What
-  changes is that the kill now reaches the descendants it was always meant to.
-- perf / scale — one census per kill, on a path that only runs when a bar is already failing. No
-  cost on a green bar.
-- error / empty / loading states — monitor absent → announced fallback (S3); monitor present but
-  refusing → announced fallback, same line, different reason.
-- observability — walked and killed counts printed separately (S4).
-- risks — the highest-risk file in this build. A defect here reds or wedges the merge bar for every
-  session. Mitigated by the conditional path defaulting to today's exact behaviour and by AC2
-  staging the monitor's absence directly.
-- testing — the runner's suite already stages a sleeping leg and a wall breach; the new arm extends
-  that fixture to a leg with a GRANDCHILD and asserts the grandchild dies.
-- migration — none. A tree without the monitor behaves exactly as it does today.
-- user docs — `tools/run-gates/README.md` gains the delegation note; the charter's bar section is
-  unchanged, because the leg list and the bar's behaviour are unaffected.
+- security — the runner gains no authority it did not have; it already killed processes on one
+  path. What changes is that the OTHER path stops leaking.
+- perf / scale — one census per kill, on a path that only runs when a bar is being torn down.
+- error / empty / loading states — monitor absent, or present-but-would-refuse: both announced with
+  the profile line (S3, S4), both fall back to today's code.
+- observability — walked and killed counts printed separately on both paths (S5).
+- risks — the highest-risk file in this build; a defect here wedges the merge bar for every session.
+  Mitigated by the conditional path defaulting to today's exact behaviour, by AC2 staging the
+  monitor's absence, and by the trap change being additive and ordered before an existing `rm -rf`.
+- testing — the runner's suite already stages a sleeping leg and a wall breach; the new arms extend
+  that fixture to a leg with a GRANDCHILD and drive the SIGNAL path, which nothing grades today.
+- migration — none. A tree without the monitor behaves as it does now, except that the interrupt
+  path reaps recorded pids where it previously reaped nothing.
+- user docs — `tools/run-gates/README.md` gains the delegation note.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a bar is staged whose leg spawns a grandchild and the wall fires, the grandchild is
-  gone afterwards. Observed by `run-gates.test.sh`, arm `test_wall_breach_reaps_the_grandchild`.
-  Red when: only the recorded leg pid dies — today's behaviour, and the defect the prompt opens
-  with.
-  `fixture:` a scratch bar with a `sleeper` leg that itself backgrounds a `sleep`, built the way
-  the existing turnstile fixture builds its own.
-- **AC2** — When the same fixture runs with `reap.py` absent, the bar still
-  kills its recorded pids, still reports survivors, and exits with the same status as before this
-  change. Observed by `run-gates.test.sh`, arm `test_absent_monitor_falls_back_unchanged`.
+- **AC1** — When a bar is staged whose leg spawns a grandchild and the runner is sent `TERM`, both
+  the leg and the grandchild are gone afterwards. Observed by `run-gates.test.sh`, arm
+  `test_signal_path_reaps_the_tree`.
+  Red when: `cleanup()` removes the scratch dir and kills nothing — TODAY'S behaviour, staged and
+  observed RED against the unchanged runner before this criterion is accepted. That observation is
+  the criterion's own precondition, because rev-1's AC1 described "today's behaviour" wrongly and
+  therefore passed unchanged (D10).
+- **AC2** — When the same fixture runs with `reap.py` absent, the signal path still kills the
+  recorded pids and their descendants via `remove_descendants`, and the run exits with the same
+  status as before. Observed by `run-gates.test.sh`, arm `test_absent_monitor_falls_back`.
   Red when: the runner errors or hangs because the monitor is missing, which would break every
   adopter that installs `run-gates` alone.
-- **AC3** — When the monitor is absent OR refusing, the run prints a line naming which, and the line
-  appears with the profile line rather than at kill time. Observed by `run-gates.test.sh`, arm
-  `test_fallback_announces_itself`.
+- **AC3** — When the monitor is absent, the run prints a line naming that, alongside the profile
+  line and before any leg runs. Observed by `run-gates.test.sh`, arm
+  `test_absent_monitor_announces_itself_at_profile_time`.
   Red when: the fallback is silent, which makes a leaked grandchild indistinguishable from a clean
-  stop — the announced-skip rule the charter states in §7.
-- **AC4** — When a kill runs with the monitor present, the runner's report names the walked count
-  and the killed count as separate figures. Observed by `run-gates.test.sh`, arm
+  stop.
+- **AC4** — When `PROCMON_ROOTS` does not admit the runner's scratch parent, the run announces the
+  fallback WITH the profile line — not at kill time — and does NOT report a gate failure. Observed
+  by `run-gates.test.sh`, arm `test_unadmitted_scratch_root_is_announced_before_dispatch`.
+  Red when: detection tests only for file presence, so the refusal cannot be known until a kill is
+  attempted (D6); or a monitoring refusal is surfaced as a red leg, which would make a
+  misconfigured conf block every push.
+- **AC5** — When the monitor IS present and admits the scratch parent, the signal path's kill goes
+  through `run_kill` and the staged grandchild is verified dead by re-read. Observed by
+  `run-gates.test.sh`, arm `test_delegated_kill_verifies`.
+  Red when: delegation is wired but its return is ignored, so a survivor is not reported.
+- **AC6** — When a kill runs on either path, the report names the walked count and the killed count
+  as separate figures. Observed by `run-gates.test.sh`, arm
   `test_walked_and_killed_are_reported_apart`.
   Red when: the two are summed, which hides a walk that found nothing.
-  `figure:` DERIVED — both counts come from the reaper's return, not from a literal.
-- **AC5** — When the staged bar is interrupted rather than wall-breached, the grandchild is gone
-  afterwards. Observed by `run-gates.test.sh`, arm `test_interrupt_path_reaps_the_tree_too`.
-  Red when: the delegation is wired into the wall branch only, leaving the signal path leaking —
-  which is how the `TaskStop`-stopped runner in the prompt kept its sweep and kit children.
-- **AC6** — When `PROCMON_ROOTS` does not admit the runner's scratch root, the bar falls back and
-  announces it, and does NOT report a gate failure. Observed by `run-gates.test.sh`, arm
-  `test_unadmitted_scratch_root_is_a_fallback_not_a_gate_failure`.
-  Red when: a monitoring refusal is surfaced as a red leg, which would make a misconfigured conf
-  block every push.
+  `figure:` DERIVED — both counts come from the run, not from a literal.
 
 ## 7. Gates
 
 `run-gates wiring` · `line length` · `govkit selfcheck` · `dead-path carriers (deleted files still named)`
 
-New arm: `tools/run-gates/run-gates.test.sh` · stages a leg with a grandchild, an absent monitor, a
-refusing monitor, and the interrupt path · this suite carries an assertion floor in `ARMS_FLOORS`
-and it MOVES with these arms; the floor is read from `.memory-tree.conf` at the time of the change
-rather than written here, since a literal would be stale on the next arm anyone adds.
+New arm: `tools/run-gates/run-gates.test.sh` · stages a leg with a grandchild driven through the
+SIGNAL path, an absent monitor, a monitor whose roots exclude the scratch parent, and the
+delegated-kill verification · this suite carries an assertion floor in `ARMS_FLOORS` and it MOVES
+with these arms; the floor is read from `.memory-tree.conf` at the time of the change rather than
+written here.
 
 ## 8. Open questions
 
 - **F1 — should the unattended driver's `GATE_BOUND` path delegate too?**
   RESOLVED (agent, 2026-09-08, delegated): NOT IN THIS UNIT. That bound wraps the whole bar as one
-  child, so the runner's own trap is what fires first and this unit already fixes that. Delegating
+  child, so the runner's own trap fires first and this unit's S1 already covers it. Delegating
   there as well would put two reapers on one tree with no ordering between them. Recorded in §3 as
-  a follow-up rather than built, which is the tie-break on fewer open questions.
+  a follow-up.
+- **F2 — should the wall path also delegate, or only the signal path?**
+  RESOLVED (agent, 2026-09-08, delegated): BOTH, but the signal path is the one that CHANGES
+  behaviour and is what AC1 grades. The wall path already reaps descendants correctly; delegating
+  it buys leaves-first ordering, a returned verdict and no depth cap — improvements, not fixes.
+  Splitting them would mean two code paths for one act. AC5 grades the delegated path and AC2 the
+  fallback, which covers both.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-08 · initial draft.
+- rev-2 · 2026-09-08 · §1 · S1 · S2 · S3 · S4 · §3 · §4 · AC1 · AC2 · AC3 · AC4 · AC5 · §8 F2 ·
+  §10 · folded spec-audit round 1. D10: the unit is RE-SCOPED. rev-1's premise — that the runner
+  cannot reach a grandchild — is contradicted by `run-gates.sh:428-474`, which has walked and
+  killed descendants since `TOOL-aQuenchedHarness-1`, so rev-1's AC1 passed against the unchanged
+  runner. The real gap is the SIGNAL path, whose traps run `cleanup()` and kill nothing, and AC1
+  now stages it and requires an observed RED first. D6: detection gains a third, profile-time
+  condition — a path-mode admission probe of the scratch parent — because file presence cannot
+  detect "present but would refuse". Order moves 5 → 6 behind unit 3's and unit 4's shifts.
 
 ## 10. Reuse audit
 
-`python tools/codebase-map/reuse_lookup.py "kill a hung or idle background process and report it
-to the session"` returned no seam for the kill itself, but the seam this unit EXTENDS was already
-known and is cited directly: `tools/run-gates/run-gates.sh`'s existing kill loop at `:435-468`,
-cited by path and verified against source at BASE — the pid validation, the `kill -9`, and the
-`kill -0` survivor sweep are all kept, and only the signal itself is replaced by the delegated
-walk. The recall probe returned this exact region as its second and eighth hits, both from
-`aPacedTurnstile` and `aPooledSweep` review records, and both confirm the same finding from the
-other side: no process group exists to signal, so descendants survive. Those records are the
-evidence that the seam is the right one and that the fix is not "add `set -m`", which was
-considered and rejected there.
+The seam this unit EXTENDS is `tools/run-gates/run-gates.sh`'s existing reaping machinery, read at
+BASE rather than inferred: `scan_descendants` at `:428-443`, `remove_descendants` at `:445-468`,
+its single caller at `:1517`, and the traps at `:955-957` calling `cleanup()` at `:953`. rev-1
+cited `:412-414` and `:451` and drew the opposite conclusion from the same file; the header at
+`:416-417` states plainly that the wall "kills RECORDED PER-LEG PIDS and their descendants", which
+is what makes rev-1's premise stale and its AC1 unfailable (D10). Corrected by opening the range.
+
+The four recorded corrections that machinery carries are inherited through unit 4 §10, by id, and
+are not re-derived here. `python tools/codebase-map/reuse_lookup.py "kill a hung or idle background
+process and report it to the session"` returned nothing for this unit, and the reason is recorded
+rather than left implicit: the map's own coverage line reports `unscanned layers: .sh`, so the
+shell function this whole unit is about is invisible to that probe. The grep that found it was
+`grep -n "remove_descendants\|scan_descendants" tools/run-gates/run-gates.sh`.
 
 Recall terms used: `gate runner wall clock bound timeout kill children orphan process leg pool
 watchdog GATE_WALL background subprocess reaper`
