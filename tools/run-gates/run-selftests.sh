@@ -29,7 +29,7 @@ cd "$ROOT" || exit 2
 # THIS SCRIPT'S OWN REPO-RELATIVE PATH, DERIVED. Spelling it as a literal would ship gov's
 # prefix into an adopter installed elsewhere, where it resolves to nothing -- the install-prefix
 # ban, which this file is graded by. An empty derivation REFUSES rather than printing `bash `.
-SELF=${0#"$ROOT"/}; SELF=${SELF#./}
+SELF="$(git -C "$(dirname -- "$0")" rev-parse --show-prefix 2>/dev/null)$(basename -- "$0")"
 [ -n "$SELF" ] || { echo "run-selftests: cannot derive this script's own path" >&2; exit 2; }
 
 BUDGETS="$HERE/selftest-budgets.txt"
@@ -266,7 +266,11 @@ if [ "$MODE" = sweep ]; then
       echo "run-selftests: SELFTEST_OUTER_WIDTH is '$SELFTEST_OUTER_WIDTH', which is not a positive" >&2
       echo "run-selftests: integer, so the width you asked for could not be applied. Nothing was run." >&2
       exit 2 ;;
-    *) OUTER=$SELFTEST_OUTER_WIDTH
+    *) # BASE TEN, FORCED. `08` and `007` pass the digit test above and then read as OCTAL in
+       # arithmetic, where `08` is not a number at all — the refusal is bypassed and the failure
+       # lands somewhere else entirely.
+       OUTER=$((10#$SELFTEST_OUTER_WIDTH))
+       [ "$OUTER" -ge 1 ] || { echo "run-selftests: SELFTEST_OUTER_WIDTH resolves to $OUTER" >&2; exit 2; }
        [ "$OUTER" -le "$W" ] || OUTER=$W ;;
   esac
 fi
@@ -406,10 +410,22 @@ EOF
   # setting -- fifty-nine suites run one after another and a one-suite wall kills a perfectly clean
   # run. Waves is the honest denominator, and it is derived from the population and the width rather
   # than guessed.
-  SW_RUNNABLE=0
-  for _st in "${SW_STATE[@]}"; do [ "$_st" = ok ] && SW_RUNNABLE=$((SW_RUNNABLE + 1)); done
-  SWEEP_WAVES=$(( (SW_RUNNABLE + OUTER - 1) / OUTER )); [ "$SWEEP_WAVES" -ge 1 ] || SWEEP_WAVES=1
-  SWEEP_WALL=$(( SWEEP_LARGEST * SWEEP_WAVES ))
+  # THE STRUCTURAL CEILING, not a multiple of the worst suite. `largest x waves` assumes every wave
+  # is as slow as the slowest suite, which over this population is 2x to 15x the real maximum -- a
+  # wall that large can never fire, and a backstop that cannot fire is not one. The true ceiling is
+  # the total bounded work spread over the pool, and it can never be below the longest single suite.
+  SW_RUNNABLE=0; SWEEP_TOTAL=0
+  _sx=0
+  while [ "$_sx" -lt "$SW_N" ]; do
+    if [ "${SW_STATE[$_sx]}" = ok ]; then
+      SW_RUNNABLE=$((SW_RUNNABLE + 1))
+      SWEEP_TOTAL=$(( SWEEP_TOTAL + ${SW_BUDGET[$_sx]} * SWEEP_FACTOR ))
+    fi
+    _sx=$((_sx + 1))
+  done
+  SWEEP_WALL=$(( (SWEEP_TOTAL + OUTER - 1) / OUTER ))
+  [ "$SWEEP_WALL" -ge "$SWEEP_LARGEST" ] || SWEEP_WALL=$SWEEP_LARGEST
+  SWEEP_DERIVED=$SWEEP_WALL
   case "${SELFTEST_WALL:-}" in
     '') : ;;
     *[!0-9]*)
@@ -419,15 +435,15 @@ EOF
       echo "run-selftests: SELFTEST_WALL is '$SELFTEST_WALL', which is not a number of seconds," >&2
       echo "run-selftests: so the run bound you asked for could not be applied. Nothing was run." >&2
       exit 2 ;;
-    *) SWEEP_WALL=$SELFTEST_WALL
-       if [ "$SWEEP_WALL" -lt "$(( SWEEP_LARGEST * SWEEP_WAVES ))" ]; then
+    *) SWEEP_WALL=$((10#$SELFTEST_WALL))
+       if [ "$SWEEP_WALL" -lt "$SWEEP_DERIVED" ]; then
          echo "run-selftests: NOTE — the wall you set (${SWEEP_WALL}s) is below the derived one"
-         echo "run-selftests: (${SWEEP_LARGEST}s x $SWEEP_WAVES wave(s) = $(( SWEEP_LARGEST * SWEEP_WAVES ))s), so a legitimately slow run can be killed."
+         echo "run-selftests: (${SWEEP_DERIVED}s, the bounded work over $OUTER slot(s)), so a legitimately slow run can be killed."
        fi ;;
   esac
   if [ "$SWEEP_WALL" -lt "$SWEEP_LARGEST" ]; then
     echo "run-selftests: the run wall is ${SWEEP_WALL}s but the largest per-suite bound in this" >&2
-    echo "run-selftests: population is ${SWEEP_LARGEST}s over $SWEEP_WAVES wave(s), so the run would be killed before its" >&2
+    echo "run-selftests: population is ${SWEEP_LARGEST}s, so the run would be killed before its" >&2
     echo "run-selftests: longest suite could legitimately finish. Raise SELFTEST_WALL, or lower" >&2
     echo "run-selftests: the budget the bound derives from." >&2
     exit 2
@@ -477,6 +493,22 @@ EOF
   # serial with extra steps and still prints a width. The selftest harness records the same trap.
   _rs_waitn=0; ( : & wait -n ) >/dev/null 2>&1 && _rs_waitn=1
 
+  # AND SO IS SUB-SECOND `date`. `%N` is a GNU extension: BSD `date` prints the literal `N`, so
+  # `$(( $(date +%s%N) / 1000000 ))` is an arithmetic syntax error that aborts EVERY worker before
+  # it runs its suite -- a total false RED blaming each suite for the runner's own arithmetic. This
+  # script already advertises the platform it cannot run on, by probing for `gtimeout`. Probed once,
+  # outside the loop, and the fallback is whole seconds with the resolution SAID rather than
+  # silently lost: the peak figure is then blind to a handoff inside one second.
+  _rs_ns=0
+  case "$(date +%N 2>/dev/null)" in ''|*[!0-9]*) : ;; *) _rs_ns=1 ;; esac
+  if [ "$_rs_ns" = 1 ]; then
+    _rs_now_ms() { echo $(( $(date +%s%N) / 1000000 )); }
+  else
+    _rs_now_ms() { echo $(( $(date +%s) * 1000 )); }
+    echo "run-selftests: this date has no sub-second %N, so stamps are whole seconds and the peak"
+    echo "run-selftests: figure below cannot separate a pool handoff from a real overlap."
+  fi
+
   # ONE SUITE, BOUNDED, ITS OWN SCRATCH. The verdict file carries the status, the two stamps and
   # nothing else; the captured output is its own file because a pooled FAIL that printed only an
   # exit code would be a mode you cannot debug without the serial re-run it exists to avoid.
@@ -489,7 +521,7 @@ EOF
     mkdir -p "$d/tmp" || return
     local bound=$(( ${SW_BUDGET[$((k - 1))]} * SWEEP_FACTOR ))
     local s e rc tp
-    s=$(( $(date +%s%N) / 1000000 ))
+    s=$(_rs_now_ms)
     # THE WORKER'S OWN PID, NOT `$$`. A subshell INHERITS `$$` from its parent, so `echo $$` here
     # wrote the RUNNER's pid into every pid file and the wall watchdog SIGTERMed run-selftests.sh
     # itself — exit 143, no verdicts rendered, the suites orphaned and the scratch root deleted from
@@ -501,7 +533,7 @@ EOF
     echo "$tp" > "$d/pid"
     wait "$tp"
     rc=$?
-    e=$(( $(date +%s%N) / 1000000 ))
+    e=$(_rs_now_ms)
     rm -f "$d/pid"
     printf '%s\t%s\t%s\n' "$rc" "$s" "$e" > "$d/v"
   }
@@ -529,6 +561,13 @@ EOF
 
   i=1; live=0
   while [ "$i" -le "$SW_N" ]; do
+    # THE BREACH STOPS THE DISPATCH, and this line is the whole wall. Before the pid fix the
+    # watchdog SIGTERMed the RUNNER, which stopped the run by accident; pointing the kill at the
+    # workers -- correct in itself -- removed the only thing that ended it, so the pool kept
+    # launching the rest of the population after the wall had fired. Reproduced three times at
+    # 16 s, 17 s and 23 s against a 10 s wall. `run-gates.sh` carries the identical guard at the top
+    # of its own walk, and this is that line rather than a second invention.
+    [ -e "$SWEEP_ROOT/wall-breached" ] && break
     if [ "${SW_STATE[$((i - 1))]}" = ok ]; then
       _rs_sweep_one "$i" &
       live=$((live + 1))
@@ -548,7 +587,7 @@ EOF
 
   # RENDERED IN DECLARATION ORDER, by builtins, off the arrays. A suite's position in the output
   # never depends on when the pool happened to free its slot.
-  st=0; ran=0; killed=0; walled=""; withheld=0
+  st=0; ran=0; killed=0; walled=""; unrun=""; withheld=0
   j=1
   while [ "$j" -le "$SW_N" ]; do
     name=${SW_NAME[$((j - 1))]}; state=${SW_STATE[$((j - 1))]}; d="$SWEEP_ROOT/$j"
@@ -557,17 +596,24 @@ EOF
       printf 'FAIL  %-46s        (%s: this row could not be resolved into a runnable suite)\n' "$name" "$state"
       j=$((j + 1)); continue
     fi
-    ran=$((ran + 1))
     if [ ! -r "$d/v" ]; then
       st=1
-      if [ "$WALL_BREACHED" = 1 ]; then
-        walled="$walled $name"
+      if [ ! -d "$d" ] && [ "$WALL_BREACHED" = 1 ]; then
+        # NEVER LAUNCHED. The wall stopped the dispatch, so this suite has no result of any kind —
+        # which is a different fact from a suite that started and was killed, and reporting both as
+        # "killed" would tell an operator this suite had been tried.
+        unrun="$unrun $name"
+        printf 'UNRUN %-46s        (the %ss run wall stopped the dispatch before this suite started)\n' "$name" "$SWEEP_WALL"
+      elif [ "$WALL_BREACHED" = 1 ]; then
+        ran=$((ran + 1)); walled="$walled $name"
         printf 'WALL  %-46s        (killed by the %ss run wall before it finished)\n' "$name" "$SWEEP_WALL"
       else
+        ran=$((ran + 1))
         printf 'FAIL  %-46s        (no verdict was written, so this suite could not start)\n' "$name"
       fi
       j=$((j + 1)); continue
     fi
+    ran=$((ran + 1))
     IFS=$'\t' read -r rc s e < "$d/v"
     took=$(( (e - s) / 1000 ))
     # EVERY ROW THAT RAN CARRIES ITS COST VERDICT, and that verdict is `withheld`. Printing the
@@ -599,6 +645,10 @@ EOF
 
   echo "----"
   [ -n "$walled" ] && echo "run-selftests: the ${SWEEP_WALL}s run wall killed:$walled"
+  # AN UNRUN SUITE IS AN UNGRADED SUITE, said separately because it is the fact an operator acts on:
+  # the sweep has no verdict for these at all, and a wall that stops a dispatch leaves more of them
+  # the wider the population is.
+  [ -n "$unrun" ] && echo "run-selftests: the wall stopped the dispatch, so these were NEVER RUN and are UNGRADED:$unrun"
   # THE PEAK, COMPUTED FROM THE STAMPS BEFORE THE SCRATCH IS REMOVED. The printed width pair says
   # what the pool was ASKED for; this says what it reached. They are different claims, and only the
   # second can catch a pool that ran wide when it was told not to. It is also the number a reader

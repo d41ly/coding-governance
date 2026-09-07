@@ -28,7 +28,7 @@ R='bash tools/run-gates/run-selftests.sh'
 B='tools/run-gates/selftest-budgets.txt'
 LEGS='tools/gate-legs.json'
 
-SELFTEST_FLOOR=41
+SELFTEST_FLOOR=43
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -356,5 +356,22 @@ arm "a non-numeric SELFTEST_WALL REFUSES rather than being silently ignored" 2 \
     "which is not a number of seconds" \
     'true' \
     "SELFTEST_WALL=soon $R --sweep"
+
+# THE WALL MUST STOP THE DISPATCH, not merely kill what is running. Pointing the watchdog's kill at
+# the workers -- which is correct -- removed the only thing that ended the run, because the runner
+# used to be the thing being killed. Reproduced at 16 s, 17 s and 23 s against a 10 s wall before
+# the guard went in.
+arm "the wall STOPS the dispatch, so a suite it never reached is reported UNRUN rather than killed" 1 \
+    "NEVER RUN and are UNGRADED" \
+    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS && printf 'three\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\nfour\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
+    "SELFTEST_WALL=10 SELFTEST_OUTER_WIDTH=1 $R --sweep"
+
+# THE DERIVED WALL IS THE RUN'S STRUCTURAL CEILING, not a multiple of its worst suite. `largest x
+# waves` assumed every wave was as slow as the slowest member, which over the real population is
+# 2x to 15x the true maximum -- and a backstop that can never fire is not one.
+arm "the derived run wall is the bounded work over the pool, printed so it can be checked" 0 \
+    "run wall 140s" \
+    "sed -i '0,/\t60\t/{s|\t60\t|\t10\t|}' $B" \
+    "SELFTEST_OUTER_WIDTH=1 $R --sweep"
 
 run_arms run-selftests.test.sh

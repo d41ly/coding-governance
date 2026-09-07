@@ -137,3 +137,45 @@ millisecond stamps a closed-interval bug needs a handoff to land on the same mil
 staged break for D2 does not reliably red at two suites. Pinning that line on its own means testing
 the embedded awk in isolation, which this build does not do. Said here rather than left as a green
 row that looks like coverage.
+
+## Round 2 of the closing review, and where the loop ended
+
+Round 2 confirmed fifteen findings resolving to EIGHT distinct defects against round 1's six —
+precision 0.94. Eight is not strictly smaller than six, so the loop is NON-CONVERGENT and the
+build method's exit applies: every finding still standing is DISPOSED, and all eight are defects in
+documents the review read, so all eight were FOLDED. Not promoted, not parked, not waived. The
+disposition is recorded on the round.
+
+- **BLOCKER — the wall stopped stopping the run.** Round 1's pid fix pointed the watchdog's kill at
+  the workers instead of the runner, which was correct and which removed the only thing that ended
+  the run: the dispatch loop never read the breach file, so the pool kept launching the rest of the
+  population after the wall had fired. Reproduced three times at 16 s, 17 s and 23 s against a 10 s
+  wall. `run-gates.sh` carries the identical one-line guard at the top of its own walk and this is
+  that line, not a second invention. Observed after the fix: a 10 s wall over a ~95 s serial
+  population returned in 13 s.
+- **HIGH — `date +%N` is a GNU extension.** On BSD it prints a literal `N`, so
+  `$(( $(date +%s%N) / 1000000 ))` is an arithmetic syntax error that aborts EVERY worker before it
+  runs its suite — a total false RED blaming each suite for the runner's own arithmetic. Probed once
+  now, with a whole-second fallback whose lost resolution is ANNOUNCED rather than silently taken.
+- **MEDIUM — the derived wall could never fire.** `largest bound x waves` assumes every wave is as
+  slow as the slowest suite, which over this population is 2x to 15x the real ceiling. It is the
+  bounded work over the pool now, floored at the longest single suite.
+- **MEDIUM — no arm asserted either the derivation or a post-breach launch**, which is the gap that
+  let the blocker land. Both are armed now, and the derivation arm was rebuilt once because equal
+  budgets make the two formulas agree exactly: the fixture lowers one row so 140 s and 240 s are
+  distinguishable, and the arm was staged red against the old formula.
+- **LOW x4** — a leading zero passed the digit test and then read as octal (`10#` now); a comment
+  its own commit had falsified; `SELF` came out ABSOLUTE because `cd && pwd` yields an MSYS path
+  while `git rev-parse --show-toplevel` yields a Windows one, so the prefix strip silently did
+  nothing (git answers both halves now); and a stale wall figure in this ledger.
+
+A ninth defect fell out of running the fix rather than reading it: a suite the wall stops from
+LAUNCHING has no result at all, which is a different fact from one that started and was killed.
+Reporting both as `killed` would tell an operator the suite had been tried. It renders `UNRUN` and
+the summary names those suites as UNGRADED.
+
+**What the exit costs, stated rather than left implicit.** This fold is unreviewed surface: round 1's
+fold contained three blockers that round 2 found, and nothing reviews round 2's. That is the price
+of the method's termination rule, which forbids re-reviewing at a non-convergent exit. The
+compensating check is the arm count — 43 against a floor of 43, every new arm staged red and watched
+to fail — and it is a weaker thing than a review.
