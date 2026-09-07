@@ -1,12 +1,13 @@
 # TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled
 
-**Status:** OPEN · rev-2 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
+**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -26,8 +27,11 @@ whole fleet is in today.
   by AC2, AC3.
 - **S3** — SILENCE ON CLEAN: with nothing flagged the hook prints NOTHING and exits 0, so the
   session's transcript carries a line only when there is something to act on. Observed by AC4.
-- **S4** — wiring: a `PostToolUse` hook on matcher `Bash|PowerShell` and a `SessionStart` line, both
-  added to `.claude/settings.json` by unit 6's adopter. Observed by AC5.
+- **S4** — wiring: a `PostToolUse` hook on matcher `Bash|PowerShell` and a `SessionStart` line,
+  both added to `.claude/settings.json` through `tools/settings-merge.py`. **This unit adds the
+  hook's `[[files]]` row and its destination to `kit.toml` itself**, because unit 6 at `order 1`
+  cannot declare a destination for a file only this unit ships — `hook destinations` asserts
+  every declared hook path exists (D23). Observed by AC5, AC9.
 - **S5** — the SessionStart arm reports the STANDING population unthrottled, because a fresh session
   has no stamp of its own and the two-and-a-half-day orphans are exactly what it must see. Observed
   by AC6.
@@ -49,8 +53,8 @@ whole fleet is in today.
   Unit 4 owns the whole census-fence-classify chain after the round-1 fold; rev-1 of this spec
   consumed unit 3's `--report`, which no longer resolves scope and so cannot answer what the hook
   must print.
-- **consumes-from** `TOOL-aReapedSpinner-6` — `PROCMON_THROTTLE_S`, and the adopter that writes the
-  settings entries.
+- **consumes-from** `TOOL-aReapedSpinner-6` — `PROCMON_THROTTLE_S`, the adopter, and the
+  descriptor this unit adds its own `[[files]]` row to.
 - **hands-off** external — the harness reads a hook's stdout; nothing in this repo asserts that it
   does, and AC1 observes the hook's own output rather than the harness's rendering of it.
 
@@ -132,6 +136,11 @@ via the existing `tools/settings-merge.py` seam rather than a hand-written JSON 
 - **AC7** — When the census raises, the hook prints one line naming the failure and exits 0.
   Observed by `selftest.py`, arm `test_broken_monitor_fails_open`.
   Red when: the hook exits non-zero, which blocks the session's tool call over a monitoring fault.
+- **AC9** — When `govkit.py selfcheck` runs after this unit lands, the hook's declared
+  destination resolves to a file this unit ships, and the `hook destinations` leg is green.
+  Observed by `govkit.py`.
+  Red when: the destination is declared at `order 1` by unit 6, where the file does not yet
+  exist, which reds that leg on every bar until this unit lands (D23).
 - **AC8** — When the census is made to hang, the hook returns within its declared bound and prints
   the timeout line. Observed by `selftest.py`, arm `test_hung_census_does_not_block_the_hook`.
   Red when: the bound is applied through a pipe, which bounds the verdict and not the clock — the
@@ -160,7 +169,11 @@ arms, one suite.
 ## 9. Revision log
 
 - rev-1 · 2026-09-08 · initial draft.
-- rev-2 · 2026-09-08 · header order · §3 Edges · no findings against this unit in spec-audit round 1.
+- rev-2 · 2026-09-08 · header order · §3 Edges · no findings in round 1.
+- rev-3 · 2026-09-08 · S4 · §3 Edges · AC9 · folded round 2. D23: the hook's `[[files]]` row
+  and destination move from unit 6 to this unit, because a destination declared at `order 1`
+  names a file no unit has shipped yet and reds the `hook destinations` leg until this one
+  lands. AC9 grades the join.
   `order` moves 5 → 6 behind unit 3's and unit 4's shifts, and the report edge moves from unit 3 to
   unit 4, which took ownership of the full chain under D5.
 

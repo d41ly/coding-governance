@@ -43,7 +43,13 @@ and nothing ENUMERATES the population, which is why all three ran unseen for two
 - **`nothing to report` must be distinguishable from `the probe could not run`.** A process monitor
   that reports zero when the table read failed is the purest instance of the class this repo gates
   against in a dozen places.
-- **No count of the live population is written in prose.** The census derives every figure it prints.
+- **No count of the live population is written in prose.** The census derives every figure it
+  prints.
+- **THE ARCHITECTURE, settled by two audit rounds and stated once.** The census keys on
+  `winpid`, the only id every process has, and carries BOTH parent graphs. Scope is a TREE
+  CLOSURE from attributable roots, not a per-row predicate. The signal is chosen per row:
+  MSYS `kill` where MSYS can address it, `taskkill //PID` otherwise. Each of the three replaced
+  an MSYS-only assumption that measured out at 10 of 313 rows.
 ## Parked decisions
 
 <!-- roster:units -->
@@ -67,16 +73,16 @@ ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReap
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration](spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md) | 1 | 2 | OPEN | rev-2 | 2026-09-08 |
-| [TOOL-aReapedSpinner-1 — the census: one bounded read of the process table, or a refusal](spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md) | 2 | 2 | OPEN | rev-2 | 2026-09-08 |
-| [TOOL-aReapedSpinner-2 — the scope fence: attribution is positive, path-shaped, and never the caller](spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md) | 3 | 2 | OPEN | rev-2 | 2026-09-08 |
-| [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 4 | 2 | OPEN | rev-2 | 2026-09-08 |
-| [TOOL-aReapedSpinner-4 — the reaper: walk the real edges, signal from the right namespace, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 5 | 2 | OPEN | rev-2 | 2026-09-08 |
-| [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 6 | 2 | OPEN | rev-2 | 2026-09-08 |
-| [TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 6 | 2 | OPEN | rev-2 | 2026-09-08 |
+| [TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration](spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md) | 1 | 2 | OPEN | rev-3 | 2026-09-08 |
+| [TOOL-aReapedSpinner-1 — the census: one bounded read, keyed on the id every process has](spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md) | 2 | 2 | OPEN | rev-3 | 2026-09-08 |
+| [TOOL-aReapedSpinner-2 — the scope fence: attribution is a TREE property, computed once](spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md) | 3 | 2 | OPEN | rev-3 | 2026-09-08 |
+| [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 4 | 2 | OPEN | rev-3 | 2026-09-08 |
+| [TOOL-aReapedSpinner-4 — the reaper: walk both graphs, signal per kind, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 5 | 2 | OPEN | rev-3 | 2026-09-08 |
+| [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 6 | 2 | OPEN | rev-3 | 2026-09-08 |
+| [TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 6 | 2 | OPEN | rev-3 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 4 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

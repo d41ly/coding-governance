@@ -1,12 +1,13 @@
 # TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak
 
-**Status:** OPEN · rev-2 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
+**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
 
 <!-- /gen:spec-records -->
 
@@ -22,15 +23,17 @@ and kit children.
 ## 2. Scope (IN)
 
 - **S1** — the `INT`/`TERM`/`HUP` traps reap the recorded leg pids AND their descendants before
-  `cleanup()` removes the scratch dir. Observed by AC1.
+  `cleanup()` removes the scratch dir. The reap is BOUNDED, and `ts_release`/`ts_drop_ticket`
+  run whether it succeeds, fails or times out. Observed by AC1, AC7.
 - **S2** — the walk delegates to unit 4's `run_kill` when the monitor is present, which supplies
   leaves-first ordering, verification as a return value, and no depth cap. Observed by AC2, AC5.
 - **S3** — CONDITIONAL delegation with an announced fallback: when the monitor is absent or would
   refuse, the runner uses its existing `remove_descendants` and PRINTS which, with the profile
   line. Observed by AC3, AC4.
-- **S4** — detection includes a PATH-mode admission probe of the runner's own scratch parent
-  through `scope.py --check-path`, resolved at profile time, so "present but would refuse" is known
-  before the first leg is dispatched. Observed by AC4.
+- **S4** — detection includes an admission probe of the RUNNER'S OWN PROCESS through
+  `scope.py --explain $$`, resolved at profile time, so "present but would refuse" is known
+  before the first leg is dispatched. The runner is the walk root's ancestor, so if it is in
+  scope every leg it dispatches is too. Observed by AC4.
 - **S5** — the report names the WALKED count and the KILLED count as separate figures on both
   paths. Observed by AC6.
 
@@ -56,10 +59,9 @@ and kit children.
 
 - **consumes-from** `TOOL-aReapedSpinner-4` — `run_kill`, and its guarantee that the walk is in the
   killable namespace.
-- **consumes-from** `TOOL-aReapedSpinner-2` — `scope.py --check-path`, which S4's profile-time
-  probe needs and which unit 2 S7 exists to provide.
-- **consumes-from** `TOOL-aReapedSpinner-6` — the scratch parent declared in `PROCMON_ROOTS`.
-  Declared THERE and not here, because unit 5 shares this unit's `order` and reads that conf.
+- **consumes-from** `TOOL-aReapedSpinner-2` — `scope.py --explain`, which S4's profile-time probe
+  needs, and the tree closure that makes a leg shell with a relative argv reapable at all.
+
 - **hands-off** external — the unattended driver's `GATE_BOUND` wraps the whole bar as one child
   rather than individual legs, so the runner's own trap is what fires first; it is NOT changed
   here, and §8 F1 records why.
@@ -98,23 +100,26 @@ a variable with the thing it guards.
 
 1. `tools/process-monitor/reap.py` present;
 2. `.process-monitor.conf` readable;
-3. **`scope.py --check-path "$TMPDIR"` (or the `mktemp -d` parent the run will use) answers
-   ADMITTED.**
+3. **`scope.py --explain $$` answers IN SCOPE for the runner's own process.**
 
-The third is why unit 2 needs a path mode. rev-1 declared only the first two and then asked AC3 to
-announce a "present but refusing" state that those two cannot detect — the refusal could only
-surface mid-kill, which §4 itself called reporting a monitoring fault as a gate fault (D6).
+The third is why unit 2 needs an explain mode. rev-1 declared only the first two and then asked
+AC3 to announce a "present but refusing" state they cannot detect (D6); rev-2 probed the SCRATCH
+PATH, which grades the wrong thing — the walk root is a leg process, not a directory, and unit 4
+grades that root against unit 2 (D20). Probing the runner's own process grades the actual
+precondition, because every leg is its descendant.
 
-**The runner declares its SCRATCH PARENT, not the shared temp root.** Unit 2 §4 and unit 6 §4 carry
-the reason: a root naming the user's temp directory admits every agent session on the machine.
+**No scratch root is declared, by this unit or any other.** rev-2 needed one and collided with
+unit 6 §4's prohibition, which on this node names the same directory (D16). Unit 2's rev-3
+closure removes the need: a leg is in scope because the runner that spawned it is, and the
+runner because the shell that invoked it names an absolute repo path.
 
 ### Files touched (estimate)
 
 Edited: `tools/run-gates/run-gates.sh` (`cleanup`, the detection line, the delegation). New
 arms in `tools/run-gates/run-gates.test.sh`. **This unit does NOT edit
-`.process-monitor.conf`**: unit 5 shares its `order` value and READS that conf for its
-throttle, so writing it here would be a pass writing a file its concurrent sibling reads as a
-contract. The scratch root is declared by unit 6, which creates the conf.
+  `.process-monitor.conf`**: unit 5 shares its `order` value and READS that conf, so writing it
+  here would be a pass writing a file its concurrent sibling reads as a contract. Nor does it
+  need to — unit 2's tree closure means no scratch root is declared anywhere (D16).
 
 ## 5. Production-readiness checklist
 
@@ -162,6 +167,12 @@ contract. The scratch root is declared by unit 6, which creates the conf.
   through `run_kill` and the staged grandchild is verified dead by re-read. Observed by
   `run-gates.test.sh`, arm `test_delegated_kill_verifies`.
   Red when: delegation is wired but its return is ignored, so a survivor is not reported.
+- **AC7** — When the reap in `cleanup()` is made to hang, the trap still completes within a
+  declared bound and `ts_release` and `ts_drop_ticket` still run. Observed by
+  `run-gates.test.sh`, arm `test_teardown_reap_cannot_strand_the_turnstile`.
+  Red when: an unbounded reap sits ahead of the turnstile release, so a hung monitor leaves a
+  ticket held and every later bar on this host queues behind it (D24). The reap is an
+  improvement to teardown; it may not become a new way to wedge the fleet.
 - **AC6** — When a kill runs on either path, the report names the walked count and the killed count
   as separate figures. Observed by `run-gates.test.sh`, arm
   `test_walked_and_killed_are_reported_apart`.
@@ -195,6 +206,12 @@ written here.
 ## 9. Revision log
 
 - rev-1 · 2026-09-08 · initial draft.
+- rev-3 · 2026-09-08 · S1 · S4 · §3 Edges · §4 · AC7 · folded round 2. D20: the profile-time
+  probe grades the RUNNER'S OWN PROCESS rather than the scratch path, because the walk root is a
+  leg process whose argv is relative and unit 4 grades that root against unit 2 — rev-2's probe
+  would have passed while every delegated `run_kill` refused. D16: no scratch root is declared
+  anywhere; unit 2's closure covers the legs by ancestry. D24: the teardown reap is BOUNDED and
+  cannot strand the turnstile, which AC7 grades.
 - rev-2 · 2026-09-08 · §1 · S1 · S2 · S3 · S4 · §3 · §4 · AC1 · AC2 · AC3 · AC4 · AC5 · §8 F2 ·
   §10 · folded spec-audit round 1. D10: the unit is RE-SCOPED. rev-1's premise — that the runner
   cannot reach a grandchild — is contradicted by `run-gates.sh:428-474`, which has walked and

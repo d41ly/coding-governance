@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS
 
-**Status:** OPEN · rev-2 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 4
+**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-08-build-TOOL-aReapedSpinner-2-live-predicate-run.md](../build/2026-09-08-build-TOOL-aReapedSpinner-2-live-predicate-run.md) | research | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -23,9 +24,9 @@ weight but WHY each one is judged so.
   returning one of the closed set `OK · SPIN · IDLE · ORPHAN · UNKNOWN`. Observed by AC1.
 - **S2** — the DECISION: a row is flagged when `age_s > PROCMON_AGE_CEILING`. Under the ceiling the
   verdict is `OK` whatever the rate or the parent. Observed by AC2.
-- **S3** — the LABELS, applied only to a flagged row, first match wins: `UNKNOWN` when `cpu_s` is
-  `None`; else `ORPHAN` when the row is parentless by §4's single predicate; else `SPIN` when
-  `cpu_s / age_s >= PROCMON_SPIN_RATE`; else `IDLE`. Observed by AC3, AC4, AC5, AC6.
+- **S3** — the LABELS, applied only to a flagged row, first match wins: `UNKNOWN` when `cpu_s`
+  is `None` OR the row is PARENT-UNKNOWN by §4; else `ORPHAN` when it is PARENTLESS by §4;
+  else `SPIN` when `cpu_s / age_s >= PROCMON_SPIN_RATE`; else `IDLE`. Observed by AC3-AC6.
 - **S4** — `classify.py --report` renders one line per flagged row plus a summary naming the rows
   HANDED TO IT and the flagged count, both derived. Observed by AC7.
 - **S5** — the report distinguishes "0 flagged of N graded" from "the input could not be read",
@@ -50,10 +51,11 @@ weight but WHY each one is judged so.
 
 ### Edges
 
-- **consumes-from** `TOOL-aReapedSpinner-1` — `age_s`, `cpu_s` and `ppid`. `cpu_s` may be `None`.
-- **consumes-from** `TOOL-aReapedSpinner-2` — grades only admitted rows; it does not re-derive
-  scope and would grade an out-of-scope row if handed one. This unit therefore sits at `order 4`,
-  AFTER unit 2, not beside it.
+- **consumes-from** `TOOL-aReapedSpinner-1` — `age_s`, `cpu_s` and `win_ppid`. The PARENTLESS
+  predicate uses the WINDOWS parent graph because it is the only one defined for every row;
+  `msys_ppid` being absent is a statement about backend visibility, never about a dead parent.
+- **consumes-from** `TOOL-aReapedSpinner-2` — grades only members of the in-scope SET, and does
+  not re-derive scope. This unit therefore sits at `order 4`, after unit 2, not beside it.
 - **consumes-from** `TOOL-aReapedSpinner-6` — `PROCMON_AGE_CEILING` and `PROCMON_SPIN_RATE`.
 - **hands-off** `TOOL-aReapedSpinner-4` — the reaper acts on the vocabulary S1 closes, owns the
   full chain, and `PROCMON_REAP_MODE=reap-orphans` names the `ORPHAN` member specifically.
@@ -77,27 +79,32 @@ two: both 53-hour `tail -f` processes with dead parents. **The label is meaningl
 fenced, over-ceiling population**, and a `reap-orphans` mode reading the label alone would have
 reaped `lsass.exe`.
 
-### The ORPHAN predicate, stated ONCE
+### The PARENTLESS and PARENT-UNKNOWN predicates, stated ONCE each
 
-**A row is parentless when its `ppid` is absent from the census, OR its `ppid` is 0 or 1.**
+**PARENTLESS: the row's `win_ppid` names no row in this census.** Its parent process is gone.
 
-That is the only statement of it in this document. rev-1 stated it three times and the three
-disagreed on the reparented case the kit exists for: S3 said "names no live process in the census",
-§4 said "a ppid of 1 is treated as dead by definition", and AC4 redded when liveness was inferred
-from `ppid != 1` alone — so on a backend where pid 1 is itself a census row, a reparented orphan was
-simultaneously ORPHAN and not-ORPHAN (D15).
+**PARENT-UNKNOWN: `msys_ppid` is absent, or `cpu_s` is `None`.** The backend could not describe the
+row fully. This grades `UNKNOWN` and is NEVER `ORPHAN`.
 
-`0` is in the predicate because of a measurement, not for symmetry: MSYS `ps -W` reports every
-non-MSYS Windows process with `ppid 0`, and a reparented MSYS process appeared with `ppid 1` in
-front of the probe during this build's research.
+The split is the whole of D18 and it is worth the two names. rev-2 folded `ppid 0` into "parentless"
+citing the measurement that says the opposite: `ps -W` reports EVERY non-MSYS Windows process with
+`ppid 0`, which is *parent not visible in this backend*, not *parent dead* — the live-predicate
+record names it as exactly what "the naive orphan predicate reads as parent is dead", 297 of 315
+rows. Combined with unit 2's program-path admission, that made every in-scope `python.exe` or
+`node.exe` grade ORPHAN the moment it passed the ceiling, with a live parent — and unit 6 §8 F1
+resolves the default mode to `reap-orphans` on the ground that an ORPHAN "has no live claimant by
+construction". **The kit's default would have killed healthy, live-parented, in-scope processes.**
 
-**The consequence, stated because it is the reason S2 must be evaluated first:** this repo's OWN
-freshly-spawned Bash-tool shells appear with `ppid 0` or `ppid 1` at age 0.00 h. They are
-parentless by this predicate and alive and wanted. Only the age ceiling separates them from the
-53-hour orphans, which is what "age DECIDES" means operationally.
+The fix is unit 1's, applied here: `win_ppid` is defined for every row and carries no sentinel, so
+the predicate needs none. The MSYS graph is used for the descendant walk (unit 4) and for nothing
+else.
 
-**Liveness is answered from the census snapshot**, not with a `kill -0` probe: the census is one
-consistent snapshot, and probing per row would spend a syscall on a question the snapshot answers.
+**The consequence that keeps S2 first:** this repo's own freshly-spawned shells are parentless the
+instant their launcher exits, and they are alive and wanted. Only the age ceiling separates them
+from the 53-hour orphans, which is what "age DECIDES" means operationally.
+
+**Liveness is answered from the census snapshot**, not with a per-row probe: the census is one
+consistent snapshot and probing per row spends a syscall on a question the snapshot answers.
 
 ### Alternatives rejected
 
@@ -141,14 +148,15 @@ unavailability, not on merit.
   its rate would have said `SPIN`. Observed by `selftest.py`, arm `test_orphan_outranks_rate`.
   Red when: the rate labels are tested first and a dead-parent row reports `SPIN`, which
   `reap-orphans` would then decline to kill.
-- **AC4** — When a flagged row's `ppid` is 1, and separately when it is 0, the verdict is `ORPHAN` —
-  including on a backend where pid 1 IS a census row. Observed by `selftest.py`, arm
-  `test_ppid_zero_and_one_are_both_parentless`.
-  Red when: the predicate is stated more than once and the statements disagree (D15), or `0` is
-  omitted and every non-MSYS Windows row grades not-ORPHAN by accident.
-- **AC5** — When a flagged row's `ppid` names a LIVE census row that is not 0 or 1, the verdict is
-  not `ORPHAN`. Observed by `selftest.py`, arm `test_live_parent_is_not_an_orphan`.
-  Red when: liveness is inferred from the ppid VALUE alone rather than from the snapshot.
+- **AC4** — When a flagged row's `win_ppid` names no census row, the verdict is `ORPHAN`. When a
+  flagged row has `msys_ppid` absent but a `win_ppid` that DOES name a live census row, the
+  verdict is `UNKNOWN` and never `ORPHAN`, and it is not reaped under `reap-orphans`. Observed
+  by `selftest.py`, arm `test_missing_msys_parent_is_unknown_not_orphan`.
+  Red when: an absent MSYS parent is read as a dead parent — 297 of 315 rows on this node,
+  including every native gate leg, which the default mode would then kill (D18).
+- **AC5** — When a flagged row's `win_ppid` names a LIVE census row, the verdict is not `ORPHAN`.
+  Observed by `selftest.py`, arm `test_live_windows_parent_is_not_an_orphan`.
+  Red when: liveness is inferred from a sentinel VALUE rather than from the snapshot.
 - **AC6** — When a flagged row's rate is at the declared threshold exactly the verdict is `SPIN`;
   just below it, `IDLE`. When `cpu_s` is `None` it is `UNKNOWN` and never `IDLE`. Observed by
   `selftest.py`, arm `test_rate_boundary_and_unknown`.
@@ -188,8 +196,13 @@ input · floor moves with unit 1's arms, one suite.
 ## 9. Revision log
 
 - rev-1 · 2026-09-08 · initial draft.
-- rev-2 · 2026-09-08 · header order · S1 · S3 · S4 · §3 · §4 · AC1 · AC4 · AC5 · AC6 · AC7 ·
-  §8 F2 · folded spec-audit round 1 and the live-predicate probe. D4: `OVERAGE` deleted — nothing
+- rev-2 · 2026-09-08 · header order · S1 · S3 · S4 · §3 · §4 · AC1 · AC4-AC7 · §8 F2 · folded
+  round 1 and the live-predicate probe.
+- rev-3 · 2026-09-08 · S3 · §3 Edges · §4 · AC4 · AC5 · folded round 2. D18: the predicate
+  SPLITS into PARENTLESS (`win_ppid` names no census row) and PARENT-UNKNOWN (`msys_ppid`
+  absent), which grades `UNKNOWN`. rev-2 folded the MSYS `ppid 0` sentinel into parentless
+  against the measurement that produced it, so every in-scope native process would have graded
+  ORPHAN with a live parent and `reap-orphans` would have killed it. D4: `OVERAGE` deleted — nothing
   could produce it — and AC1 now demands a producing fixture per member rather than a member count.
   D5: `order` moves 3 → 4 because this unit consumes unit 2, and the "scoped size" figure leaves
   `--report`; the whole chain becomes unit 4's `--sweep`. D15: the ORPHAN predicate is stated ONCE

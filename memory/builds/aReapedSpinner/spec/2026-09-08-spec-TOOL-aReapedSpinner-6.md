@@ -1,12 +1,13 @@
 # TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration
 
-**Status:** OPEN · rev-2 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-7 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -25,8 +26,8 @@ the monitor by declaring its roots rather than by porting a script.
 - **S2** — a `[[entry]]` row in `tools/govkit/registry.toml` pointing at that descriptor. Observed
   by AC1.
 - **S3** — `.process-monitor.conf` at the repo root, holding every value the kit READS and nothing
-  it could derive: the scope roots INCLUDING the gate runner's scratch parent, the age ceiling,
-  the spin rate, the reap mode, and the report throttle.
+  it could derive: the scope roots, the age ceiling, the spin rate, the reap mode, and the report
+  throttle. **No scratch or temp root is among them** — see §4.
   Every key carries its reason in a comment beside it, as the sibling confs do. Observed by AC2.
 - **S4** — `tools/process-monitor/adopt-process-monitor.sh`, with a `--check` mode that verifies
   wiring without repairing it. Observed by AC3.
@@ -61,9 +62,8 @@ the monitor by declaring its roots rather than by porting a script.
 - **hands-off** `TOOL-aReapedSpinner-5` — the conf keys S3 declares are what the hook reads for its
   throttle; the hook declares no value of its own.
 - **hands-off** `TOOL-aReapedSpinner-4` — `PROCMON_REAP_MODE` is declared here and CONSUMED there.
-- **hands-off** `TOOL-aReapedSpinner-7` — the gate runner's scratch parent, declared in
-  `PROCMON_ROOTS` HERE rather than by that unit, because unit 5 shares that unit's `order` value
-  and reads this conf as a contract.
+- **hands-off** `TOOL-aReapedSpinner-7` — the ABSENCE of a scratch root. That unit's legs are in
+  scope by ancestry under unit 2's closure, so nothing here declares the directory they run in.
 - **consumes-from** external — `tools/govkit/registry.toml` and its `[surface]` globs, which
   already claim `tools/*` and therefore already reach this directory.
 
@@ -96,14 +96,16 @@ is stated in §8. The remaining two are tuning.
 scope fence match nothing, and a monitor that reports zero because it was never configured is
 indistinguishable from a clean tree. That is why S6 declares it as a `[[hole]]`.
 
-**WHAT THIS REPO'S OWN `PROCMON_ROOTS` MAY NOT CONTAIN, and it is a safety rule rather than a
-preference.** Not the shared temp root. Measured: every Claude Bash-tool shell on this machine
+**WHAT THIS REPO'S OWN `PROCMON_ROOTS` MAY NOT CONTAIN, and AC8 grades it.** Not the shared temp
+root, and not any ancestor of it. Measured: every Claude Bash-tool shell on this machine
 carries an `export TEMP=` assignment naming the user's temp directory inside its argv, so a
 substring root naming that directory admits every agent session in every repository on the box
-(D11). Unit 7 needs the runner's scratch dirs admissible; unit 2 §4 answers it by matching
-program paths and path-shaped arguments rather than raw strings, and unit 7 grades the specific
-`mktemp -d` directory it created rather than the temp root. The README states this, because an
-adopter reading only the conf would reach for the obvious value.
+(D11). Unit 7 needs the runner's legs reapable, and rev-2 answered that by declaring the scratch parent — which on
+this node IS the temp root (`run-gates.sh:940` is a bare `mktemp -d` with no `TMPDIR` anywhere),
+so the conf told its own author two opposite things and no criterion graded either (D16).
+**Unit 2's rev-3 tree closure removes the need entirely**: a leg is in scope because its ancestry
+is, so no scratch root is declared and the contradiction does not exist. The README states this,
+because an adopter reading only the conf would reach for the obvious value.
 
 ### Files touched (estimate)
 
@@ -147,10 +149,20 @@ New: `tools/process-monitor/{kit.toml,adopt-process-monitor.sh,adopt-process-mon
   Red when: the placeholder join is not on this unit's bar at all — rev-1 omitted the leg from §7
   while naming the checker as an observer (D2).
 - **AC5** — When `govkit.py selfcheck` runs, the `procmon-roots` hole is reported as declared with
-  a discharge probe, AND that probe has been RUN against a blank `PROCMON_ROOTS` and observed to
-  exit non-zero. Observed by `govkit.py`.
-  Red when: the hole is declared with a probe nobody staged a failure for — a probe that cannot
-  fail is the class this repo gates against in a dozen places.
+  a discharge probe. Observed by `govkit.py`.
+  Red when: the hole is declared without one.
+- **AC5b** — When the discharge probe is RUN against a blank `PROCMON_ROOTS`, it exits non-zero.
+  Observed by `adopt-process-monitor.test.sh`, arm `test_roots_hole_probe_fails_when_blank`.
+  Red when: the probe cannot fail. rev-2 folded this conjunct into AC5 with `govkit.py` as its
+  only witness, and that command reports whether a probe is DECLARED, never whether anyone ran
+  it — an assertion with no witness (D26).
+- **AC8** — When the shipped `.process-monitor.conf` is read, no entry in `PROCMON_ROOTS` is an
+  ancestor of the system temp directory, AND `scope.py --check-path` answers ADMITTED for the
+  repository root. Observed by `adopt-process-monitor.test.sh`, arm
+  `test_shipped_roots_exclude_temp_and_admit_the_repo`.
+  Red when: either half fails. rev-2 stated the prohibition in prose and graded neither it nor
+  its counterpart, so an author could silently resolve the fork either way and every criterion
+  stayed green (D16).
 - **AC6** — When `README.md` is searched for the negative-scope heading, it is present and its
   section is non-empty. Observed by `adopt-process-monitor.test.sh`, arm
   `test_readme_states_what_it_does_not_check`.
@@ -193,6 +205,12 @@ does not ship, and a README with the negative-scope section removed · no assert
 ## 9. Revision log
 
 - rev-1 · 2026-09-08 · initial draft.
+- rev-3 · 2026-09-08 · S3 · §3 Edges · §4 · AC5 · AC5b · AC8 · folded round 2. D16: the scratch
+  root leaves S3 — unit 2's tree closure makes it unnecessary — and the temp-root prohibition
+  gains AC8, which grades both halves of a fork that rev-2 left to prose. D26: AC5's
+  "probe has been RUN" conjunct becomes AC5b with a real arm, since `govkit.py` can only
+  report that a probe is declared. D23: the hook destination row moves to unit 5, which ships
+  the file.
 - rev-2 · 2026-09-08 · S1 · S5 · §3 · §4 · AC1 · AC4 · AC5 · AC6 · AC7 · §7 · §8 · folded
   spec-audit round 1. D1: `version_from` moved off `census.py` onto the shell adopter this unit
   ships, the version row with it, AC7 added to assert the resolution. D2: AC4 split — the
