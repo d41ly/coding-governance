@@ -97,11 +97,11 @@ spec-tokens self-test	130		worst of 6 readings 80s, x1.5
 template size gate selftest	290		worst of 11 readings 190s, x1.5
 testsuite counts self-test	170		worst of 11 readings 109s, x1.5
 tier2-review self-test	60		worst of 8 readings 8s, x1.5
-unattended adopter e2e	120	bash tools/unattended/adopt-unattended.test.sh	carried verbatim from run-unattended-gates.sh's BUDGET_* block
-unattended cross-component	300	bash tools/unattended/cross-component.test.sh	carried verbatim from run-unattended-gates.sh's BUDGET_* block
-unattended driver selftest	970	bash tools/unattended/unattended.test.sh	carried verbatim from run-unattended-gates.sh's BUDGET_* block
-unattended gate selftest	3800	bash tools/unattended/check-unattended.test.sh	carried verbatim from run-unattended-gates.sh's BUDGET_* block
-unattended pass-order selftest	600	bash tools/unattended/check-pass-order.test.sh	carried verbatim from run-unattended-gates.sh's BUDGET_* block
-unattended playbook selftest	300	bash tools/unattended/check-playbook.test.sh	carried verbatim from run-unattended-gates.sh's BUDGET_* block
+unattended adopter e2e	60	bash tools/unattended/adopt-unattended.test.sh	measured 38s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended cross-component	510	bash tools/unattended/cross-component.test.sh	measured 339s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended driver selftest	3860	bash tools/unattended/unattended.test.sh	measured 2569s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended gate selftest	13600	bash tools/unattended/check-unattended.test.sh	measured 9067s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended pass-order selftest	170	bash tools/unattended/check-pass-order.test.sh	measured 111s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
+unattended playbook selftest	630	bash tools/unattended/check-playbook.test.sh	measured 418s on node a 2026-09-07, direct run of the whole kit on a frozen clone under run-unattended-gates.sh while another session held the box, x1.5
 verdict-epoch self-test	390		worst of 9 readings 257s, x1.5
 verifier fan-out self-test	230		worst of 8 readings 151s, x1.5

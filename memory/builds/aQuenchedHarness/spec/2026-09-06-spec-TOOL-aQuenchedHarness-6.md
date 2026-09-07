@@ -160,8 +160,9 @@ two prior instances this build cites.
   — read the twelve costliest rows and found that NONE of them is portable under this unit's own
   rules without changing them: three are python suites driving module internals with no CLI
   entrypoint, two print no recoverable inventory, four need arms to share state a per-arm copy
-  destroys, and the rest need assertion verbs the harness does not have. One suite ported, which
-  carries 208 s of a summed population several times that. The share is NOT lowered to fit: S6 exists
+  destroys, and the rest need assertion verbs the harness does not have. The arithmetic, once
+  every row carried a reading: the population is 36031 s, the declared 50% is carried by the TOP
+  FIVE suites, and the one suite this unit ported carries 208 s of it — **0.6%**. The share is NOT lowered to fit: S6 exists
   because rev-1 paired a criterion with a threshold it could not fail, and moving a threshold to
   match a result is that same defect with the sign flipped. S9's remainder is the survey record and
   it names every one with its recorded cost.

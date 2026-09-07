@@ -25,6 +25,38 @@ reading the harness and the already-ported suite first and then reporting from s
 | memory-hygiene self-test | 808 s | **no** | 289 | 14 | large | NO |
 | corpus-ids selftest | 715 s | **no** | 54 | 0 | large | yes |
 
+## The ranking, once every row had a reading
+
+This survey ran before the six unattended rows carried a measurement of their own — they held a
+budget carried verbatim from another script, which `--rank` refuses as a reading with no stated
+condition. Running the whole kit on a frozen clone produced them, and the verb then ran on the real
+tree for the first time:
+
+```
+run-selftests: 58 row(s), 36031 s of recorded time; the declared majority share is 50%
+   1  9067 s  cum  25.2%   direct              unattended gate selftest
+   2  2569 s  cum  32.3%   direct              unattended driver selftest
+   3  2547 s  cum  39.4%   worst of 9 windows  manifest-check self-test
+   4  2436 s  cum  46.1%   worst of 12         run-gates canary
+   5  2419 s  cum  52.8% < worst of 9          run-gates turnstile
+run-selftests: the declared share is carried by the TOP 5 suite(s) — 19038 s of 36031, 52.8%.
+```
+
+**One suite alone is a quarter of the population.** `unattended gate selftest` measured 9067 s —
+two and a half hours — against its declared 3800 s, and came back RED. It is the test of
+`check-unattended.sh`, which is separately the longest LEG on the merge bar and the subject of
+`TOOL-aQuenchedHarness-7`. The two facts are one fact: the checker nobody can afford to test is the
+checker nobody can afford to run.
+
+**And four of the six unattended suites are red.** adopter e2e, cross-component, driver and gate;
+only pass-order and playbook are green, and pass-order is green because `274aa39b` already rebuilt
+it — from 10184 s to 111 s as measured here. Every one of the four is red at BASE, so none is this
+build's doing. They are parked under `TOOL-aQuenchedHarness-9`.
+
+That number is what makes the share's arithmetic concrete: the declared 50% needs the TOP FIVE, of
+which the survey below rates one `no`, two `partial`/`large`, and two were not surveyed because they
+had no reading when it ran. The single suite this unit ported carries 208 s of 36031 — **0.6%**.
+
 ## What that means for the share
 
 **Not one of the twelve is portable under this unit's own rules without changing them, and the
