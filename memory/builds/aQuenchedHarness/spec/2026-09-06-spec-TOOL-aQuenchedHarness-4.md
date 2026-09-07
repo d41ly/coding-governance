@@ -1,11 +1,12 @@
 # TOOL-aQuenchedHarness-4 — one on-demand runner for every kit's self-tests, budget-graded
 
-**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 5
+**Status:** CLOSED · rev-5 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-07-build-TOOL-aQuenchedHarness-4-acceptance-ledger-on-demand-runner.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-4-acceptance-ledger-on-demand-runner.md) | journal | — |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
 
@@ -201,6 +202,8 @@ work · `bash tools/unattended/run-unattended-gates.sh --all`, this kit's declar
   conditions are unstated is the thing `run-unattended-gates.sh` had to apologise for in prose.
 
 ## 9. Revision log
+
+- rev-5 · 2026-09-07 · CLOSED, and it gained the failing case it landed without. `run-selftests.test.sh` gives the runner thirteen arms -- every refusal it carries, each observed RED -- and they found two defects on their first run: the `UNRESOLVED` branch was unreachable because tab is IFS whitespace and the empty argv field collapsed, and underneath it the emitter was writing CRLF, invisible until the field order changed. `--rank` was added here rather than in a new file, and the composite width bound was corrected: its run loop is serial on purpose, so dividing by an outer pool of 4 handed every ported suite a quarter of its width.
 
 - rev-1 · 2026-09-06 · initial draft.
 - rev-4 · 2026-09-07 · BUILT. S11's shared width resolver is `bash tools/run-gates/run-gates.sh

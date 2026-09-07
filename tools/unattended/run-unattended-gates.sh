@@ -60,7 +60,24 @@ cd "$ROOT" || exit 2
 # ---- former and is EXPECTED to fire on the latter. READ A BREACH THIS WAY: re-run it on an idle box
 # ---- before believing it. Making the shape load-aware instead of re-arguing the integer is
 # ---- `TOOL-aCollapsedScan-9`.
-BUDGET_kit_gate=240           # measured 187 s IDLE on node `a` 2026-08-26, after TOOL-aCollapsedScan-1
+# ---- RE-DECLARED UPWARD by TOOL-aQuenchedHarness-7, which made the leg 57% cheaper in processes.
+# ---- Both halves of that sentence are true and the second does not rescue the first: the 240 was
+# ---- set against 187 s IDLE on 2026-08-26, when this repo held 25 `RUN*.md` records and 71
+# ---- builds. It now holds 49 and 102 -- records x1.96 -- and the leg measured 625 s idle BEFORE
+# ---- this unit touched it, x3.34 over the same span. It grows FASTER than the tree does, because
+# ---- the number of (anchor, unit) pairs and the window each pair walks grow together, so the
+# ---- product is roughly quadratic in history. That is the finding; the number below is its
+# ---- consequence.
+# ---- The unit cut 5420 external processes to 2321 with the stdout byte-identical, and 435 s idle
+# ---- is where that lands. 660 is 435 x 1.5, the same headroom every other row here carries, and
+# ---- it is still LOWER than the 187 x 3.34 = 625 the growth alone would have demanded. A budget
+# ---- moving up while the code gets faster is what a monotonically growing population looks like
+# ---- from inside a single integer, and `TOOL-aCollapsedScan-9` is the row for making the SHAPE
+# ---- population-relative instead of re-arguing this figure a third time.
+BUDGET_kit_gate=660           # measured 435 s IDLE on node `a` 2026-09-07 on a frozen clone,
+                              # after TOOL-aQuenchedHarness-7; was 240 against 187 s on a tree
+                              # holding half the records
+
 BUDGET_playbook_validity_gate=120   # measured 13 s
 BUDGET_skill_wiring=60        # measured 0 s
 BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to builds carrying no

@@ -1,11 +1,12 @@
 # TOOL-aQuenchedHarness-3 — a self-test never reaches an adopter, as a leg or as a file
 
-**Status:** INPROGRESS · rev-5 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 3
+**Status:** CLOSED · rev-6 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-07-build-TOOL-aQuenchedHarness-3-acceptance-ledger-adopter-withholding.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-3-acceptance-ledger-adopter-withholding.md) | journal | — |
 | [2026-09-06-prompt-TOOL-aQuenchedHarness-1.md](../prompts/2026-09-06-prompt-TOOL-aQuenchedHarness-1.md) | research | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-5 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
@@ -178,6 +179,8 @@ the descriptor-shape legs, which grade every `kit.toml` this unit edits ·
   place rather than silently inherited.
 
 ## 9. Revision log
+
+- rev-6 · 2026-09-07 · CLOSED. Every kit descriptor withholds its own self-tests with a `project-owned` rule and each withheld leg carries an `[[exempt_leg]]` row, so `govkit selfcheck` is green and an adopter apply no longer exits 1 with one silenced-leg problem per suite. Ten arms green. The two suites this build added later, `run-selftests.test.sh` and `extract-arms.test.sh`, were declared the same way on arrival, which is the ratchet working rather than a follow-up.
 
 - rev-1 · 2026-09-06 · initial draft.
 - rev-2 · 2026-09-06 · folded spec-audit round 1: the filename predicate removed, the shared-reader

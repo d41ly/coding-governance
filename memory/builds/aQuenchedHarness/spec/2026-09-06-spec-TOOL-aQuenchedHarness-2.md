@@ -1,12 +1,13 @@
 # TOOL-aQuenchedHarness-2 — a leg ceiling carries the reading it was set against, in the tree
 
-**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 4
+**Status:** CLOSED · rev-5 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md](../build/2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md) | research | TOOL-aQuenchedHarness-8 |
+| [2026-09-07-build-TOOL-aQuenchedHarness-2-acceptance-ledger-ceiling-evidence.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-2-acceptance-ledger-ceiling-evidence.md) | journal | — |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
 
@@ -184,6 +185,8 @@ new verb's function names.
   `GATE_SELFTESTS=1` run, and a leg with no such run is reported as unevidenced rather than assumed.
 
 ## 9. Revision log
+
+- rev-5 · 2026-09-07 · CLOSED. `tools/run-gates/derive-ceilings.py` derives every ceiling from the retained `gate-run` leg readings, writes the tracked evidence file, and `--check` is green over the whole manifest -- 37 of 99 legs backed, every backed one clearing its evidenced maximum by the declared `max(120s, 1.0 x max)` headroom, and the 62 unbacked ones REPORTED rather than passed, because a leg that has never run has nothing to be measured against.
 
 - rev-1 · 2026-09-06 · initial draft.
 - rev-4 · 2026-09-06 · BUILT, and building it corrected S4 within the hour. A flat margin is wrong

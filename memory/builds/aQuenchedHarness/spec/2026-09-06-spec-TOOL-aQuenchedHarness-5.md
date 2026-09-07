@@ -1,11 +1,12 @@
 # TOOL-aQuenchedHarness-5 — a self-test harness whose unit of cost is not a process
 
-**Status:** INPROGRESS · rev-4 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 6
+**Status:** CLOSED · rev-5 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-07-build-TOOL-aQuenchedHarness-5-acceptance-ledger-spawn-cheap-harness.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-5-acceptance-ledger-spawn-cheap-harness.md) | journal | — |
 | [2026-09-07-build-TOOL-aQuenchedHarness-5-candidate-test.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-5-candidate-test.md) | research | — |
 | [2026-09-06-prompt-TOOL-aQuenchedHarness-1.md](../prompts/2026-09-06-prompt-TOOL-aQuenchedHarness-1.md) | research | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
@@ -198,6 +199,8 @@ landed.
   across ten kits to solve a problem F2 already removed.
 
 ## 9. Revision log
+
+- rev-5 · 2026-09-07 · CLOSED, after the first real port measured the harness at 62 s against the 32 s of the suite it replaced and sent it back for the rewrite it needed. Declarations moved into arrays the arm subshell inherits, the capture is read with `read -d ""`, the substring test is a `case`, setup and subject share one `bash -c` under one `timeout`: eleven processes per arm down to three. `wait -n || wait` was collapsing the pool to a barrier per arm. `build_fixture` now resets the batch, a silent-wrongness defect found by reading rather than running. Seventeen arms green, including the shrink floor that moved in from the suites so eighteen ports need not carry eighteen copies of it.
 
 - rev-1 · 2026-09-06 · initial draft.
 - rev-4 · 2026-09-07 · M12 CANDIDATE TEST RUN, and it inverted §8 F1's framing. Traced

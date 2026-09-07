@@ -1,11 +1,12 @@
 # TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved
 
-**Status:** INPROGRESS · rev-6 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
+**Status:** CLOSED · rev-7 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-07-build-TOOL-aQuenchedHarness-6-acceptance-ledger-port-and-survey.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-6-acceptance-ledger-port-and-survey.md) | journal | — |
 | [2026-09-07-build-TOOL-aQuenchedHarness-6-arm-inventory-check-line-length.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-6-arm-inventory-check-line-length.md) | journal | — |
 | [2026-09-07-build-TOOL-aQuenchedHarness-6-portability-survey.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-6-portability-survey.md) | research | — |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-7 |
@@ -198,6 +199,8 @@ which grades the per-suite build records this unit writes.
   in the set.
 
 ## 9. Revision log
+
+- rev-7 · 2026-09-07 · CLOSED with AC5 recorded as NOT MET and the arithmetic beside it, rather than met by a smaller share. What landed: the inventory extractor and its three named refusals, the declared share and factor, `--rank` and its condition grammar, ONE port at 4.03x with its 18 arms diffed identical, and the runner's own thirteen arms. What did not: the other eleven candidate suites, none of them portable under this unit's rules without changing them, each named with its recorded cost in the survey record. Three defects in the unit's OWN product were found and fixed along the way, two of them by reading rather than running, and the third by the extractor's own arms on their first execution.
 
 - rev-1 · 2026-09-06 · initial draft.
 - rev-6 · 2026-09-07 · AC5 is recorded as NOT MET rather than met by a smaller number, on the evidence

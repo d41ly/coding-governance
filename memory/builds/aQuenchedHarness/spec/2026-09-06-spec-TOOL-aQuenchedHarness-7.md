@@ -1,12 +1,15 @@
 # TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches
 
-**Status:** OPEN · rev-3 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 8
+**Status:** CLOSED · rev-5 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-07-build-TOOL-aQuenchedHarness-7-acceptance-ledger-longest-leg.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-7-acceptance-ledger-longest-leg.md) | journal | — |
 | [2026-09-07-build-TOOL-aQuenchedHarness-7-cost-hypothesis.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-7-cost-hypothesis.md) | research | — |
+| [2026-09-07-build-TOOL-aQuenchedHarness-7-id-in-equivalence.sh](../build/2026-09-07-build-TOOL-aQuenchedHarness-7-id-in-equivalence.sh) | journal | — |
+| [2026-09-07-build-TOOL-aQuenchedHarness-7-profile-and-result.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-7-profile-and-result.md) | journal | — |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-8 |
 
@@ -32,6 +35,25 @@ cliff `TOOL-aQuenchedHarness-8` fixes reachable in the first place.
   post-change spawn count, both written into §2 with the reading they were derived from, and a
   requirement that `BUDGET_kit_gate` be LOWER after this unit than the 240 it carries now. Without a
   declared figure every acceptance criterion here passes on a 1.01x change.
+
+  **THE DECLARATION, written 2026-09-07 from the BEFORE profile and before the after-reading
+  existed.** Profiled on node `a` on a frozen clone at `dd7d629b`, `PS4='+ ' bash -x` over a full
+  run: **625 s wall, 2513 git spawns over 49 `RUN*.md` records — 51.3 spawns per record.** The
+  composition refuted the hypothesis this unit was written against: not the `--follow` walk, which is
+  31 calls, but `GIT log -1 --format=%s <sha>` at **1528 calls**, 61% of every git spawn in the run.
+  It reads ONE commit's subject, and `pass_commit()` runs it once per commit in its window on every
+  call — once per (anchor, unit) pair, so the same commits are re-read once per pair.
+
+  The targets, each one able to fail:
+
+  - **spawns ≤ 22 per `RUN*.md` record**, denominator derived at run time. 1528 of 2513 are
+    removable by construction, leaving 985 over 49 records = 20.1; 22 leaves a little room and still
+    reds on any material regression. Against 51.3 today.
+  - **wall ≤ 400 s** in the same conditions — a frozen clone, quiet box, standalone. 625 s today. If
+    spawn count is the cost, removing 61% of the spawns should land near 250 s; 400 s is the number
+    that can be MISSED if the spawns are not the cost, which is the point of declaring it before
+    looking.
+  - `BUDGET_kit_gate` LOWER than 240, unchanged from rev-3.
 - **S4** — a spawn-count REGRESSION arm pinning a NORMALISED count — spawns per `RUN*.md` walked —
   with the population size DERIVED at run time and printed beside it. An absolute pin is wrong here
   and S2 says why: the same spec states the population grows monotonically as builds land, so an
@@ -164,7 +186,45 @@ which is this kit's declared compensating check · `GATE_SELFTESTS=1` for the ki
   self-tests, so the remaining work in this area is units 5 and 6's, not this unit's. S5 pins it and
   stops.
 
+**THE VERDICTS**, measured and recorded in
+`memory/builds/aQuenchedHarness/build/2026-09-07-build-TOOL-aQuenchedHarness-7-profile-and-result.md`:
+
+- **AC1 — MET.** The leg's stdout and exit status are BYTE-IDENTICAL across the change, 46 lines and
+  rc 1 on both arms, both arms asserting they did the work rather than only how long they took.
+- **AC2 — MET.** 20.9 git spawns per `RUN*.md` record against the declared 22, and 51.3 before. All
+  external processes: 5420 -> 2321, a 57% cut, which is the contention-independent figure.
+- **AC3 — MISSED on both halves, and neither is rescued.** Wall is 435 s and 487 s idle across two
+  back-to-back readings against the declared 400 s, so it is missed on both and by 9% at best; the 400 s came from a model that counted only GIT spawns, which turned out to
+  be 46% of the processes, so it was optimistic when it was written and it stays as written. And
+  `BUDGET_kit_gate` moves UP, 240 -> 660, because the tree it walks doubled: 25 `RUN*.md` records and
+  71 builds on 2026-08-26 against 49 and 102 now, records x1.96 while the leg's cost went x3.34. It
+  grows faster than the repository does. A budget set against half this tree cannot be met by making
+  the leg faster.
+- **AC4 — NOT DONE**, and named rather than quietly dropped. The spawn-count regression arm S4 asks
+  for has exactly one home, `tools/unattended/check-unattended.test.sh`, which measured 9067 s and is
+  RED. Adding a pin to a suite nobody can afford to run and nobody has seen pass is the shape this
+  build spent itself arguing against; a standalone leg is worse, because running the checker to count
+  its spawns costs the 435 s this unit exists to reduce. It is `TOOL-aQuenchedHarness-9`'s S4 problem
+  — a signal over held suites — wearing a different hat, and it belongs there.
+- **AC5, AC6 — NOT DONE.** The `check-pass-order.sh` erosion pin and the cross-pointer between
+  `run-unattended-gates.sh` and `tools/gate-legs.json`. Both are bookkeeping this unit did not reach;
+  neither blocks the change, and both are named here so the wrap-up can carry them.
+
 ## 9. Revision log
+
+- rev-5 · 2026-09-07 · CLOSED with AC1 and AC2 met, AC3 missed on both halves and AC4/AC5/AC6 not
+  done, each recorded above rather than trimmed. The unit made three semantics-preserving cuts —
+  `pass_commit` taking the commit subject out of the walk it already does, one loop-invariant hoist,
+  and `id_in` in native bash instead of fork-and-grep — for 57% of the leg's processes with its stdout
+  byte-identical. The THIRD came from measuring the first: after the git spawn left that loop, a
+  `grep` was still running in its place 1528 times, which is the same defect one layer down and is
+  why "declare the target, then measure" earned its keep twice in one unit.
+- rev-4 · 2026-09-07 · S3's targets DECLARED, from the before-profile and before the after-reading
+  existed, so AC2 and AC3 can fail. The profile REFUTED this spec's own cost hypothesis in the useful
+  direction — `memory/builds/aQuenchedHarness/build/2026-09-07-build-TOOL-aQuenchedHarness-7-cost-hypothesis.md`
+  predicted the per-record `--follow` walk and the answer is a per-COMMIT `git log -1` at 1528 calls,
+  which is the pass-order defect verbatim rather than a new one. The hypothesis record said what
+  would refute it, and this is that.
 
 - rev-1 · 2026-09-06 · initial draft.
 - rev-3 · 2026-09-06 · folded spec-audit round 2. H7: the spawn pin is NORMALISED — spawns per
