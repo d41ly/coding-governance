@@ -126,8 +126,8 @@ GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
-# The whole RUN has a wall too, per profile row; GATE_WALL overrides. A breach kills the outstanding legs and REDS naming them. TOOL-aQuenchedHarness-1
-bash tools/run-gates/run-selftests.sh   # the HELD population on demand, budget-timed; --check is the leg. TOOL-aQuenchedHarness-4
+# The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the outstanding legs. TOOL-aQuenchedHarness-1
+bash tools/run-gates/run-selftests.sh  # the HELD population on demand, budget-timed. TOOL-aQuenchedHarness-4
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
