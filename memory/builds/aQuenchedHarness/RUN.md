@@ -12,7 +12,7 @@ with its anchor evidence, and the parked decisions.
 parked-surfaced: yes
 keepalive-reaped: yes — CronDelete 6a7a6206, and CronList is now empty
 witness: d6623cd863d1209a391470364d8ad16a53369f59
-phase: BUILDING
+phase: LANDING
 branch-sha: faaea5f5693deffbb3d2c44dee2453d9e01fa460
 branch-ref: refs/heads/branch/self-test-gates-performance-7e2cf2
 mode: prompt
