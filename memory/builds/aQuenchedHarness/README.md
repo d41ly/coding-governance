@@ -117,4 +117,5 @@ Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-9.
 <!-- gen:build-edges -->
 
 - **Parent builds:** [aBoundedCeiling](../aBoundedCeiling/README.md)
+- **Child builds:** [aPooledSweep](../aPooledSweep/README.md)
 <!-- /gen:build-edges -->
