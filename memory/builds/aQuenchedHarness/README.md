@@ -64,14 +64,14 @@ copy-installs a kit runs that kit's self-tests on every bar.
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aQuenchedHarness-1` | OPEN | a bar's own wall, so a wedged run dies with a verdict instead of stalling a build |
-| 2 | `TOOL-aQuenchedHarness-2` | OPEN | a leg ceiling carries the reading it was set against, in the tree |
-| 3 | `TOOL-aQuenchedHarness-3` | OPEN | a self-test never reaches an adopter, as a leg or as a file at all |
-| 4 | `TOOL-aQuenchedHarness-4` | OPEN | one on-demand runner for the whole held population, budget-graded |
-| 5 | `TOOL-aQuenchedHarness-5` | OPEN | a spawn-cheap self-test harness the suites are rebuilt onto |
-| 6 | `TOOL-aQuenchedHarness-6` | OPEN | the dominant suites rebuilt onto it, arms preserved and a floor cleared |
-| 7 | `TOOL-aQuenchedHarness-7` | OPEN | the longest leg on the bar is a repo check the hold never reaches |
-| 8 | `TOOL-aQuenchedHarness-8` | OPEN | the turnstile stops reaping a live holder, so two bars stop running as one |
+| 1 | `TOOL-aQuenchedHarness-1` | CLOSED | the bar has its own wall — and the closing review found the wall's guarantee decorative twice over, both fixed |
+| 2 | `TOOL-aQuenchedHarness-2` | CLOSED | a leg ceiling carries the reading it was set against, in the tree |
+| 3 | `TOOL-aQuenchedHarness-3` | CLOSED | no kit's self-tests reach an adopter, as a leg or as a file |
+| 4 | `TOOL-aQuenchedHarness-4` | CLOSED | one on-demand runner for the whole held population, budget-graded — and it gained the arms it landed without |
+| 5 | `TOOL-aQuenchedHarness-5` | CLOSED | a self-test harness whose unit of cost is not a process, after the first port measured it AS the cost |
+| 6 | `TOOL-aQuenchedHarness-6` | CLOSED | ONE suite ported at 4.03x with its arms diffed identical; the other eleven candidates surveyed and unportable, AC5 recorded NOT MET |
+| 7 | `TOOL-aQuenchedHarness-7` | CLOSED | the longest leg on the bar: 5420 external processes to 2321, stdout byte-identical, wall target MISSED at 435s against 400s |
+| 8 | `TOOL-aQuenchedHarness-8` | CLOSED | the turnstile stops reaping its own live holder — observed serialising two real bars at the landing |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
