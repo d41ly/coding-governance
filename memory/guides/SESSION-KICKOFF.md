@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-07T03:07:38+03:00 @ 6892a833b7d16d8b5c6cce7fc0e536f3ec72887d
+last-audit: 2026-09-07T11:48:31+03:00 @ 50c99c5fedce843bf9869bb2d86efd5e61104752
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: ce7e60be986451d8e0b46f5362403842cb154d5c
@@ -121,12 +121,12 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 ```bash
 bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width tools/run-gates/gate-profiles.txt declares for the detected hardware; the leg list is single-sourced from tools/gate-legs.json — read THAT for it, not this line
-# Legs report in CHUNKS, each closing with its own verdict line, so a red is readable before the run ends. Chunks bound REPORTING only — dispatch is untouched, and a chunk whose every leg skipped reports as skipped, never green.
+# Legs report in CHUNKS, each closing with a verdict line, so a red is readable before the run ends. A chunk whose every leg skipped reports skipped, never green.
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
-# The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the outstanding legs. TOOL-aQuenchedHarness-1
+# The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1
 bash tools/run-gates/run-selftests.sh  # the HELD population on demand, budget-timed. TOOL-aQuenchedHarness-4
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
@@ -212,7 +212,7 @@ does — hit three times in one file in one session) · `process-creation-is-the
   `TOOL-aPacedTurnstile-2`.
 - All `.sh` + memory-tree data files are LF (`.gitattributes`); verify staged bytes with
   `git diff --cached --check`.
-- The memory hygiene leg is MINUTES; a wrapper timeout sized in seconds fires. Read `gate-ledger.tsv`.
+- The memory hygiene leg is MINUTES; a timeout sized in seconds fires. Read `gate-ledger.tsv`.
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
