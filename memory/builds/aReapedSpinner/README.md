@@ -4,9 +4,8 @@ node: a
 opened: 2026-09-08
 streams: tooling
 roster: TOOL
-status: OPEN
 authorized-by: prompt
-ids: TOOL-aReapedSpinner-1
+ids: TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7
 ---
 
 # aReapedSpinner — a process this fleet launched has no deadline, no witness and no reaper, so nothing observes it burning
@@ -51,34 +50,48 @@ and nothing ENUMERATES the population, which is why all three ran unseen for two
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aReapedSpinner-1` | PLANNED | the census: a platform-selected read of the process table, normalized to (id, parent, age, cpu, command); on Windows a JOIN of `ps -W` and CIM, and an unrecognised platform REFUSES rather than reporting an empty table |
-| 2 | `TOOL-aReapedSpinner-2` | PLANNED | the scope fence: a row is attributable to this repo's agent work by a DECLARED root, or it is invisible to every other unit |
-| 3 | `TOOL-aReapedSpinner-3` | PLANNED | the classifier: a declared age ceiling DECIDES and the CPU rate LABELS, giving OK, OVERAGE, SPIN, IDLE or ORPHAN |
-| 4 | `TOOL-aReapedSpinner-4` | PLANNED | the reaper: walk the parent edges leaves-first, kill, VERIFY each death, name survivors. Not `taskkill /T`, which measured 25% effective, and not a process group, which reaps the caller |
-| 5 | `TOOL-aReapedSpinner-5` | PLANNED | the session seam: a throttled hook puts the verdict in front of an agent mid-turn and at session start |
-| 6 | `TOOL-aReapedSpinner-6` | PLANNED | the kit: conf, adopter, govkit entry, gate legs, README — the half that makes an adopter's integration a declaration rather than a port |
-| 7 | `TOOL-aReapedSpinner-7` | PLANNED | the gate runner reaps its own TREE at every exit path, delegating to unit 4 instead of killing a recorded pid and leaving the grandchildren |
+| 1 | `TOOL-aReapedSpinner-1` | SPECCED | the census: a platform-selected read of the process table, normalized to (id, parent, age, cpu, command); on Windows a JOIN of `ps -W` and CIM, and an unrecognised platform REFUSES rather than reporting an empty table |
+| 2 | `TOOL-aReapedSpinner-2` | SPECCED | the scope fence: a row is attributable to this repo's agent work by a DECLARED root, or it is invisible to every other unit |
+| 3 | `TOOL-aReapedSpinner-3` | SPECCED | the classifier: a declared age ceiling DECIDES and the CPU rate LABELS, giving OK, OVERAGE, SPIN, IDLE or ORPHAN |
+| 4 | `TOOL-aReapedSpinner-4` | SPECCED | the reaper: walk the parent edges leaves-first, kill, VERIFY each death, name survivors. Not `taskkill /T`, which measured 25% effective, and not a process group, which reaps the caller |
+| 5 | `TOOL-aReapedSpinner-5` | SPECCED | the session seam: a throttled hook puts the verdict in front of an agent mid-turn and at session start |
+| 6 | `TOOL-aReapedSpinner-6` | SPECCED | the kit: conf, adopter, govkit entry, gate legs, README — the half that makes an adopter's integration a declaration rather than a port |
+| 7 | `TOOL-aReapedSpinner-7` | SPECCED | the gate runner reaps its own TREE at every exit path, delegating to unit 4 instead of killing a recorded pid and leaving the grandchildren |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-08 · streams tooling
-ids TOOL-aReapedSpinner-1
+**Build status:** OPEN · 7 unit(s) · node a · opened 2026-09-08 · streams tooling
+ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration](spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md) | 1 | 2 | OPEN | rev-1 | 2026-09-08 |
+| [TOOL-aReapedSpinner-1 — the census: one bounded read of the process table, or a refusal](spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md) | 2 | 2 | OPEN | rev-1 | 2026-09-08 |
+| [TOOL-aReapedSpinner-2 — the scope fence: attribution is positive, declared, and never the caller](spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md) | 3 | 2 | OPEN | rev-1 | 2026-09-08 |
+| [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-08 |
+| [TOOL-aReapedSpinner-4 — the reaper: walk the real edges, kill leaves first, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 4 | 2 | OPEN | rev-1 | 2026-09-08 |
+| [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 5 | 2 | OPEN | rev-1 | 2026-09-08 |
+| [TOOL-aReapedSpinner-7 — the gate runner reaps its own TREE, not just the pid it recorded](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 5 | 2 | OPEN | rev-1 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aReapedSpinner-6` | no |
+| 2 | `TOOL-aReapedSpinner-1` | no |
+| 3 | `TOOL-aReapedSpinner-2`, `TOOL-aReapedSpinner-3` | yes |
+| 4 | `TOOL-aReapedSpinner-4` | no |
+| 5 | `TOOL-aReapedSpinner-5`, `TOOL-aReapedSpinner-7` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
