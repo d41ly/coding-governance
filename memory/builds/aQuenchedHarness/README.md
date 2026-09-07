@@ -92,7 +92,7 @@ ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL
 | [TOOL-aQuenchedHarness-9 — the held suites that are red, and have been for nobody knows how long](spec/2026-09-07-spec-TOOL-aQuenchedHarness-9.md) | 9 | 2 | DEFERRED | rev-1 | 2026-09-07 |
 <!-- /gen:build-units -->
 
-Records: 20 bound to this build, across 4 record folder(s).
+Records: 21 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-aQuenchedHarness-9.
 

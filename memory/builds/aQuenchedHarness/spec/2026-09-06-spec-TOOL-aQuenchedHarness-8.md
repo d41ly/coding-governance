@@ -10,6 +10,7 @@
 | [2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md](../build/2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md) | research | TOOL-aQuenchedHarness-2 |
 | [2026-09-07-build-TOOL-aQuenchedHarness-8-acceptance-ledger-the-turnstile.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-8-acceptance-ledger-the-turnstile.md) | journal | — |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
+| [2026-09-07-review-TOOL-aQuenchedHarness-7-closing-diff-review.md](../reviews/2026-09-07-review-TOOL-aQuenchedHarness-7-closing-diff-review.md) | diff-review | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 
 <!-- /gen:spec-records -->
 
