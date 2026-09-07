@@ -9,6 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: 4
+keepalive-reaped: CronDelete 6a7a6206 — cancelled; CronList now empty
 witness: d6623cd863d1209a391470364d8ad16a53369f59
 phase: BUILDING
 branch-sha: faaea5f5693deffbb3d2c44dee2453d9e01fa460
@@ -40,3 +42,5 @@ base: faaea5f5693deffbb3d2c44dee2453d9e01fa460
 2026-09-07T06:52:42Z decision · item TOOL-aQuenchedHarness-7 · reason OWNER DECISION, asked and unanswered because the turn was a keepalive. Measured a clean full bar on a quiet box at 1192s (19.9 min), 47 legs, leg-sum 2671s, pool efficiency 2.2x against width 8 — because ONE leg, 'unattended kit gate', is 1118s of it, 94 percent of the wall. Wall clock cannot fall below the longest leg however wide the pool is, so the bar is that one leg plus noise. This unit took it from 5420 external processes to 2321 with stdout byte-identical, which is 1.44-2.43x standalone, and the bar is correspondingly cheaper but still twenty minutes. To make the bar POOL-limited rather than leg-limited that leg has to drop under about 334s. The next lever is identified and not taken: 703 of its remaining 1022 git spawns are per-item rev-parse, cat-file -e and merge-base answering existence and ancestry about a small set of shas, which one batch pass would collapse. NOT DONE HERE because it changes what the checker asks git rather than how often, and this unit's entire safety property is that its stdout does not move. The owner chooses: keep cutting, or land.
 
 2026-09-07T06:53:36Z rescope · item add TOOL-aQuenchedHarness-9 · reason The run discovered a unit it did not start with. Measuring the declared self-test population for unit 6's ranking meant RUNNING the six unattended suites, and four of them came back RED — all four red at BASE, so none is this build's doing and nobody could say how long they had been broken. Four parked decisions already named TOOL-aQuenchedHarness-9 and no spec carried it, which is the citing-a-dangling-id shape. It enters the roster DEFERRED: the findings are measured, the repair is not this build's, and folding an unbounded repair job into a unit whose job is a measured cost reduction would make both unfalsifiable.
+
+2026-09-07T07:49:01Z review · item aQuenchedHarness · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
