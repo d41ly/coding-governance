@@ -31,7 +31,7 @@ placeholders = ["KIT_DIR", "TOOL_ROOT"]
 include = ["SPEC-TEMPLATE.template.md"]
 role = "rendered"
 to = "{memory_root}/TEMPLATE-SPEC.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "READINESS_ROWS"]
 
 [[files]]
 include = ["BUILD-METHOD.template.md"]
@@ -49,8 +49,8 @@ placeholders = ["KIT_DIR", "TOOL_ROOT"]
 file = ".memory-tree.conf"
 owner = "memory-tree"
 required_keys_gate = ["MEMORY_ROOT", "DISCIPLINES", "FAMILIES"]
-required_keys_render = ["MEMORY_ROOT"]
-optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "ENTRY_CAP_UNIT"]
+required_keys_render = ["MEMORY_ROOT", "READINESS_ROWS"]
+optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF"]
 conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"]
 defaults = { MEMORY_ROOT = "memory" }
 

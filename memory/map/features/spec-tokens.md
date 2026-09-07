@@ -83,6 +83,28 @@ shape, never a waiver row, because a shape generalises to specs nobody has writt
   and the pre-wiring instrument section 7 of the charter requires before a predicate is wired.
 - `memory/project/spec-token-waivers.txt` — the shrink-only exception registry.
 
+## The section-7 contract (TOOL-aJoinedCanon-7)
+
+The Gates section is located by HEADING TEXT — `^## [0-9]+[.] Gates[ 	]*$` — and never by ordinal.
+A Tier-1 spec that drops the production-readiness checklist slides every later section up one, so
+the ordinal read graded whatever sat seventh; once `SPEC_LEGLINE_CUTOFF` turns the silent read into
+a verdict, that would red a spec the format permits.
+
+A token that IS a manifest name resolves BEFORE the `NOT_A_LEG` shape exclusions. Those exclusions
+drop commands, conf keys and graded files out of the join, but a real leg name carrying a `/`, or
+opening with a command verb, was discarded UNREAD — so a correct §7 contributed nothing and looked
+like prose. Measured on a fixture: the old reader graded 1 token where the new one grades 2.
+
+The run report carries the UNGRADED population in two separate fields: how many live specs carry a
+Gates heading contributing no leg name, and how many carry no Gates heading at all. They are kept
+apart because the remedies differ — the first is an author writing prose where the list goes, the
+second is the light profile being exercised, which is legal. Measured at this landing: **32 of 44**
+live specs were in the first field and 0 in the second, and before this the report said neither.
+
+`SPEC_LEGLINE_CUTOFF` (`.memory-tree.conf`, blank = off) makes the first field a verdict for any
+live spec dated at or after it that CARRIES a Gates heading. The heading precondition is the whole
+Tier-1 accommodation.
+
 ## Gaps
 
 - **The citation arm skips most of its corpus.** The majority of citations name an untracked path
@@ -92,3 +114,9 @@ shape, never a waiver row, because a shape generalises to specs nobody has writt
   affordable, and it is also the hole: a spec that names a dead leg in a sentence passes.
 - **Existence is not agreement.** The three joins prove a name resolves; no arm reads what it
   resolves TO, so a spec citing the wrong real line is invisible here.
+- **A MISSPELLED shape-excluded name is still skipped.** The manifest-first resolution rescues a leg
+  name that IS in the manifest; one that carries a `/` and is spelled wrong still falls through the
+  shape exclusion unread, so it neither resolves nor reds.
+- **The §6 witness walk still keys on its ORDINAL.** Only the Gates section moved to heading text.
+- **A spec that omits its Gates section is silent by design**, and the S7 arm cannot reach it. That
+  is the Tier-1 accommodation and the price of it.

@@ -1,6 +1,6 @@
 # TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-1 · base 750ca0ca · streams tooling · order 2 · ratified 2026-09-05
+**Status:** WONTDO · rev-6 · 2026-09-06 · node a · Tier-1 · base 750ca0ca · streams tooling · order 2 · ratified 2026-09-05 · retired: M1 budget leaves 12 B and section 1 needs 1046 B, see the run record parked entry
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
+| [2026-09-07-review-TOOL-aJoinedCanon-1-diff-review-round1.md](../reviews/2026-09-07-review-TOOL-aJoinedCanon-1-diff-review-round1.md) | diff-review | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 
 <!-- /gen:spec-records -->
 
@@ -530,6 +531,13 @@ lands. The exemption's compensating check is recorded in §5's testing row, per 
   gates; §6 fired §2 and §7, and caught AC7 dating a file's bytes by a revision of THIS document —
   "byte-identical to its rev-2 text" now names `base` 750ca0ca, verified as an empty `git diff` on
   that file; §2 fired §3, whose non-goals survive a table cell. §5 is in no fired row and is untouched.
+- rev-6 · 2026-09-06 · §9 · RETIRED at build time, an M2 amendment and not a design change: no
+  section of this spec is wrong, and the build cannot land it. `memory/guides/BUILD-METHOD.md` is
+  24564 B against M1's stated 24 KB ceiling, so §4's fold block at 1046 B breaches by 1034.
+  Raising that number is an owner call M3 excludes from the mandate by name, the only
+  non-instructional trim of that size is M1's own record of the prior owner budget calls, and
+  moving the table to the gotcha record fails AC1 and AC3. The run parked the question with the
+  measurement; an owner ruling reopens this as a new unit rather than editing this record.
 
 ## 10. Reuse audit
 

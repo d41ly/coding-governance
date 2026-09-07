@@ -1,14 +1,16 @@
 # TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion
 
-**Status:** SPECCED · rev-5 · 2026-09-05 · node a · Tier-2 · base 750ca0ca · streams tooling · order 6 · ratified 2026-09-05
+**Status:** CLOSED · rev-6 · 2026-09-06 · node a · Tier-2 · base 750ca0ca · streams tooling · order 6 · ratified 2026-09-05
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-aJoinedCanon-1-acceptance-ledger.md) | journal | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round1.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round2.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 | [2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-aJoinedCanon-1-spec-audit-round3.md) | spec-audit | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
+| [2026-09-07-review-TOOL-aJoinedCanon-1-diff-review-round1.md](../reviews/2026-09-07-review-TOOL-aJoinedCanon-1-diff-review-round1.md) | diff-review | TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 |
 
 <!-- /gen:spec-records -->
 
@@ -379,8 +381,15 @@ a remediation message naming three carriers when more existed.
   because containment matches where exact intersection would not.
 - **AC4** — When a fixture criterion's only backticked token sits on a CONTINUATION line rather than
   the bullet head, the run is green; the same fixture with the token deleted reds. The MIRROR case is
-  graded too, on the ledger side: a fixture whose ANSWER carries its only backticked token on a
-  continuation line is green, and reds with that token deleted. Both halves together are S3's
+  graded too, on the ledger side, and AMENDED at rev-6 to the only shape that is observable: a
+  fixture whose ANSWER carries a token on its head line and the SHARED token on a continuation line
+  is green, and reds when that continuation token is deleted. The rev-5 wording said "its ONLY
+  backticked token on a continuation line", which cannot be green and never could: `form` is
+  FIRST-LINE-scoped by §4's own design, so such an answer is classified `bad` by the pre-existing
+  neither-legal-form branch before arm B is consulted at all. Making it green would mean widening
+  `form` too, which silently loosens a landed check on every record whose backtick sits in the wrap
+  — a verdict change no scope item asks for. The amended shape isolates exactly what bullet-scoping
+  buys and is the only thing it can buy while `form` stays as it is. Both halves together are S3's
   bullet-scope assertion, and both would silently pass if the token capture stayed line-scoped the
   way `alledger`'s existing `form` classification is. Grading only the spec half is the fold that
   builds half of S3 and reads as covered.
@@ -639,6 +648,14 @@ a remediation message naming three carriers when more existed.
   This fold edits one file and cannot add the entry. The claim above is the record until it does, and
   the two names cannot collide with anything that registry holds, since it surveys check 12's
   invocation and this unit binds on check 23's.
+- rev-6 · 2026-09-06 · §6 AC4 · AMENDED at build time, not a design change: AC4's ledger-side
+  mirror asked for a green on an answer whose ONLY backticked token sits on a continuation line,
+  and that is unreachable. §4 keeps `form` FIRST-LINE-scoped on purpose, so such an answer is
+  `bad` under the pre-existing neither-legal-form branch and reds before arm B runs; the fixture
+  written to the rev-5 wording redded for exactly that reason. Widening `form` to match would
+  loosen a landed check on every record whose backtick is in the wrap. The criterion now asks for
+  a token on the head line and the SHARED token in the wrap, which isolates what bullet-scoping
+  actually buys.
 
 ## 10. Reuse audit
 

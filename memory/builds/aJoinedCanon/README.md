@@ -5,7 +5,7 @@ opened: 2026-09-04
 streams: tooling
 roster: TOOL
 parents: aWeighedCanon
-ids: TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11
+ids: TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 TOOL-aJoinedCanon-12 TOOL-aJoinedCanon-13 TOOL-aJoinedCanon-14
 ---
 
 # aJoinedCanon — the spec format starts joining what it already numbers
@@ -95,26 +95,26 @@ findings in `memory/builds/aWeighedCanon/build/2026-09-04-build-TOOL-aWeighedCan
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 11 unit(s) · node a · opened 2026-09-04 · streams tooling
-ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11
+**Build status:** CLOSED · 11 unit(s) · node a · opened 2026-09-04 · streams tooling
+ids TOOL-aJoinedCanon-1 TOOL-aJoinedCanon-2 TOOL-aJoinedCanon-3 TOOL-aJoinedCanon-4 TOOL-aJoinedCanon-5 TOOL-aJoinedCanon-6 TOOL-aJoinedCanon-7 TOOL-aJoinedCanon-8 TOOL-aJoinedCanon-9 TOOL-aJoinedCanon-10 TOOL-aJoinedCanon-11 TOOL-aJoinedCanon-12 TOOL-aJoinedCanon-13 TOOL-aJoinedCanon-14
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aJoinedCanon-1 — the revision log becomes a structured entry](spec/2026-09-04-spec-TOOL-aJoinedCanon-1.md) | 1 | 2 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set](spec/2026-09-04-spec-TOOL-aJoinedCanon-2.md) | 2 | 1 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it](spec/2026-09-04-spec-TOOL-aJoinedCanon-3.md) | 3 | 2 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red](spec/2026-09-04-spec-TOOL-aJoinedCanon-4.md) | 4 | 2 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed](spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md) | 5 | 1 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion](spec/2026-09-04-spec-TOOL-aJoinedCanon-6.md) | 6 | 2 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives](spec/2026-09-04-spec-TOOL-aJoinedCanon-7.md) | 7 | 2 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions](spec/2026-09-04-spec-TOOL-aJoinedCanon-8.md) | 8 | 2 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration](spec/2026-09-04-spec-TOOL-aJoinedCanon-9.md) | 9 | 2 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there](spec/2026-09-04-spec-TOOL-aJoinedCanon-10.md) | 10 | 1 | SPECCED | rev-5 | 2026-09-05 |
-| [TOOL-aJoinedCanon-11 — the base sha resolves to a real object](spec/2026-09-04-spec-TOOL-aJoinedCanon-11.md) | 11 | 1 | SPECCED | rev-5 | 2026-09-05 |
+| [TOOL-aJoinedCanon-1 — the revision log becomes a structured entry](spec/2026-09-04-spec-TOOL-aJoinedCanon-1.md) | 1 | 2 | CLOSED | rev-7 | 2026-09-07 |
+| [TOOL-aJoinedCanon-2 — the fold procedure gains a re-read set](spec/2026-09-04-spec-TOOL-aJoinedCanon-2.md) | 2 | 1 | WONTDO | rev-6 | 2026-09-06 |
+| [TOOL-aJoinedCanon-3 — a scope item names the criterion that observes it](spec/2026-09-04-spec-TOOL-aJoinedCanon-3.md) | 3 | 2 | CLOSED | rev-5 | 2026-09-06 |
+| [TOOL-aJoinedCanon-4 — a criterion names the break that would turn it red](spec/2026-09-04-spec-TOOL-aJoinedCanon-4.md) | 4 | 2 | CLOSED | rev-7 | 2026-09-07 |
+| [TOOL-aJoinedCanon-5 — a criterion declares what it needs before it can be observed](spec/2026-09-04-spec-TOOL-aJoinedCanon-5.md) | 5 | 1 | CLOSED | rev-5 | 2026-09-06 |
+| [TOOL-aJoinedCanon-6 — a ledger answer is joined to its own criterion](spec/2026-09-04-spec-TOOL-aJoinedCanon-6.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-06 |
+| [TOOL-aJoinedCanon-7 — section 7 states the shape its join reads, and names where a new arm lives](spec/2026-09-04-spec-TOOL-aJoinedCanon-7.md) | 7 | 2 | CLOSED | rev-7 | 2026-09-07 |
+| [TOOL-aJoinedCanon-8 — a unit declares its sibling edges and its external preconditions](spec/2026-09-04-spec-TOOL-aJoinedCanon-8.md) | 8 | 2 | CLOSED | rev-5 | 2026-09-06 |
+| [TOOL-aJoinedCanon-9 — the production-readiness row set becomes a declaration](spec/2026-09-04-spec-TOOL-aJoinedCanon-9.md) | 9 | 2 | CLOSED | rev-5 | 2026-09-06 |
+| [TOOL-aJoinedCanon-10 — the template stops claiming a declaration that is not there](spec/2026-09-04-spec-TOOL-aJoinedCanon-10.md) | 10 | 1 | CLOSED | rev-5 | 2026-09-07 |
+| [TOOL-aJoinedCanon-11 — the base sha resolves to a real object](spec/2026-09-04-spec-TOOL-aJoinedCanon-11.md) | 11 | 1 | CLOSED | rev-5 | 2026-09-07 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
