@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aQuenchedHarness
 authorized-by: prompt
-ids: TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3
+ids: TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3 TOOL-aPooledSweep-4 TOOL-aPooledSweep-5 TOOL-aPooledSweep-6 TOOL-aPooledSweep-7
 ---
 
 # aPooledSweep — the on-demand sweep stops being serial, so the port programme stops being the only lever
@@ -45,10 +45,14 @@ each suite while the runner that adds them up ran them one after another.
 - **A contended reading grades nothing.** This repo has measured one leg varying 5.5x median and
   47.1x worst under contention. Concurrency is admissible for the SWEEP verdict and inadmissible
   for the COST verdict, and the runner must say which it issued.
-- **The composite width invariant is the runner's own**: outer x inner never exceeds the profile
-  row's declared width. `run-selftests.sh` names it and instructs the re-division this build makes.
 - **Withholding is not passing.** A budget nobody could grade is reported as withheld and named.
   A silently-passed budget is the green-by-absence class this repo gates in a dozen places.
+- **Both review loops exited NON-CONVERGENT and were disposed by FOLD** — the spec audit 9 then 14,
+  the closing review 6 then 8. What that costs is in the acceptance ledger: the last fold of each is
+  unreviewed surface, and the previous fold of each held blockers the next round found.
+- **MEASURED, not projected: 1692 s serial to 981 s pooled over nine real suites**, against a
+  longest member of 972 s. A sweep pays in proportion to how UNDOMINATED its population is, and the
+  three-suite arm is a 10% LOSS. The whole-population figure is a projection and says so.
 
 ## Parked decisions
 
@@ -63,7 +67,7 @@ each suite while the runner that adds them up ran them one after another.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-09-07 · streams tooling
-ids TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3
+ids TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3 TOOL-aPooledSweep-4 TOOL-aPooledSweep-5 TOOL-aPooledSweep-6 TOOL-aPooledSweep-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

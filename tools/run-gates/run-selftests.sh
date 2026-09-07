@@ -58,6 +58,10 @@ usage: bash tools/run-gates/run-selftests.sh [--kit <dir>] [--check] [--list]
               mode for that. SELFTEST_OUTER_WIDTH overrides the outer width
               (clamped to the resolved one); SELFTEST_WALL overrides the run bound
               and is REFUSED below the largest per-suite bound.
+              IT PAYS IN PROPORTION TO HOW UNDOMINATED THE POPULATION IS. The wall
+              clock cannot fall below the longest member, so a selection of three
+              suites where one holds most of the time is a LOSS — measured at 56s
+              serial against 62s pooled. Nine suites measured 1692s against 981s.
 USAGE
 }
 
