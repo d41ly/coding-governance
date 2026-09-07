@@ -6,8 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aQuenchedHarness
 authorized-by: prompt
-status: OPEN
-ids: TOOL-aPooledSweep-1
+ids: TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3
 ---
 
 # aPooledSweep — the on-demand sweep stops being serial, so the port programme stops being the only lever
@@ -63,23 +62,31 @@ each suite while the runner that adds them up ran them one after another.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-07 · streams tooling
-ids TOOL-aPooledSweep-1
+**Build status:** OPEN · 3 unit(s) · node a · opened 2026-09-07 · streams tooling
+ids TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aPooledSweep-1 — the sweep runs its suites in a bounded outer pool](spec/2026-09-07-spec-TOOL-aPooledSweep-1.md) | 1 | 2 | OPEN | rev-1 | 2026-09-07 |
+| [TOOL-aPooledSweep-2 — a contended reading grades no budget, and says so](spec/2026-09-07-spec-TOOL-aPooledSweep-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-07 |
+| [TOOL-aPooledSweep-3 — pool safety is observed, not assumed](spec/2026-09-07-spec-TOOL-aPooledSweep-3.md) | 3 | 2 | OPEN | rev-1 | 2026-09-07 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aPooledSweep-2 TOOL-aPooledSweep-3.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aPooledSweep-1` | no |
+| 2 | `TOOL-aPooledSweep-2` | no |
+| 3 | `TOOL-aPooledSweep-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
