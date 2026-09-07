@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-aQuenchedHarness-8 TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-9
+unpushed-at-landing: 0
 parked-surfaced: yes
 keepalive-reaped: yes — CronDelete 6a7a6206, and CronList is now empty
-witness: d6623cd863d1209a391470364d8ad16a53369f59
-phase: LANDING
+witness: 42b54b7c3c5701fbd5badf0a99838b4aefa9ca29
+phase: LANDED
 branch-sha: faaea5f5693deffbb3d2c44dee2453d9e01fa460
 branch-ref: refs/heads/branch/self-test-gates-performance-7e2cf2
 mode: prompt
