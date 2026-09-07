@@ -133,6 +133,40 @@ Measured against a detached BASE worktree: the four naming VIOLATIONS in `hygien
 `TOOL-aWeldedTribunal-12` is the OPEN row recording that the verb pin is breached on `main` and
 refuses every landing. This build neither caused nor cleared it, and the lander will meet it.
 
+## Round 3 — the KIT self-test bar, which this build's DoD owes
+
+`GATE_FULL=1 GATE_SELFTESTS=1` ran every leg there is: 3 of 94 failed. Two are PRE-EXISTING, each
+verified by running the leg's own argv against a detached BASE worktree rather than by reasoning
+from the diff — the lexicon case had already shown that "not in my diff" is not sufficient, because
+there the violations were identical at BASE and only the EXIT differed.
+
+| leg | BASE | HEAD | verdict |
+|---|---|---|---|
+| `govkit selftest` | exit 1, same two arms | exit 1 | pre-existing |
+| `codebase-map adopter e2e` | exit 1, same two arms | exit 1 | pre-existing |
+| `memory-hygiene self-test` | 658 s ok | KILLED at 900 s | **mine** |
+
+`codebase-map adopter e2e` fails honestly and says so: *no dossiers under the map root: this check
+cannot judge an empty population* — the vacuous-population class refusing on a freshly seeded tree.
+
+### F8 — the self-test breaches its own ceiling under concurrency — CONFIRMED, PARKED
+
+This build grew that suite from 99 assertion points to 121, which is the coverage it was
+commissioned to add. Standalone it still passes — 369 assertions, exit 0, about 11 minutes against a
+900 s ceiling. Under the full bar at width 8 it exceeded 900 s and the runner killed it. That is
+cost-is-a-verdict working as written, not a defect in the suite.
+
+**Parked rather than decided, and the reason is the interesting part.** The charter sanctions
+re-declaring a ceiling with a reason — but a run raising a bound that its OWN additions breached has
+no external check on the judgement, and that is the one shape a cost gate must not have. The other
+option, making the suite cheaper, is unspecced restructuring of a kit this build was not
+commissioned to optimise, and its cost is process creation rather than logic.
+
+What it does not block: the bar that gates the push is GREEN at 42/42, and `chunk = selftests` is
+on-demand only — no boundary sets it. The likely truth is that the 900 s ceiling was already unsafe
+under full concurrency before this build (this repo has measured a hygiene leg going 48 s quiet to
+139 s at width 8) and was never observed, because that chunk is never run at a boundary.
+
 ## Left-shift summary
 
 Three findings, three backlog rows, none of them a gate this build could have added to itself: F1
