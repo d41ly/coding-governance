@@ -55,10 +55,13 @@ Check 30 was measured separately, because it is the driver's cost rather than th
   1114 to 369; the most repeated single argv went from 52 to 5. Counted from the log at
   observation time, not asserted.
 - AC2 — `check-unattended.sh` — check 30 asked the driver about the five builds its scan selected.
-  The canary limb is UNEXERCISED on this corpus, because the selection was never empty. The kit's
-  own fixture reaches the liveness branch the canary protects, but does not distinguish which
-  limb supplied the slug, so nothing here observes the canary specifically. It fails SAFE: an
-  empty ask reds that branch rather than passing quietly.
+  The canary limb is unexercised on THIS corpus, because the selection is never empty here - but
+  the kit's own `cross-component.test.sh` exercises it hard, and it is what found the unit's
+  worst defect. Those fixtures hold ONE build, so the ask was one slug, so `--plan` took its
+  unframed path and the frame-reading loop counted zero verdicts on a healthy tree. Every
+  fixture built inside this unit had many builds and could not produce the shape.
+  The canary is also a SAMPLE of three now rather than one build: liveness must not be hostage
+  to whether the build that happens to sort first is in a state that grades.
 - AC3 — `2026-09-07-spec-TOOL-aQuenchedHarness-9.md` — removing that spec's `**Status:**` header took
   the scan's selection from five builds to six, adding `aQuenchedHarness`, which the scan had not
   selected before. The file was restored and `git diff` over it is empty.

@@ -91,7 +91,7 @@ ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL
 | [TOOL-aQuenchedHarness-6 — the dominant suites rebuilt onto the harness, arm inventory preserved](spec/2026-09-06-spec-TOOL-aQuenchedHarness-6.md) | 7 | 2 | CLOSED | rev-7 | 2026-09-07 |
 | [TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches](spec/2026-09-06-spec-TOOL-aQuenchedHarness-7.md) | 8 | 2 | CLOSED | rev-5 | 2026-09-07 |
 | [TOOL-aQuenchedHarness-9 — the held suites that are red, and have been for nobody knows how long](spec/2026-09-07-spec-TOOL-aQuenchedHarness-9.md) | 9 | 2 | WONTDO | rev-2 | 2026-09-07 |
-| [TOOL-aQuenchedHarness-10 — the leg asks git once per question, not once per record](spec/2026-09-07-spec-TOOL-aQuenchedHarness-10.md) | 10 | 2 | CLOSED | rev-3 | 2026-09-07 |
+| [TOOL-aQuenchedHarness-10 — the leg asks git once per question, not once per record](spec/2026-09-07-spec-TOOL-aQuenchedHarness-10.md) | 10 | 2 | CLOSED | rev-4 | 2026-09-07 |
 <!-- /gen:build-units -->
 
 Records: 22 bound to this build, across 4 record folder(s).

@@ -65,6 +65,10 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   per-build status it could otherwise not recover from a summary. It exists because this kit's own
   gate leg grades this verb's output across many builds, and one driver launch per build was the
   largest single item on the bar's longest leg.
+  `--framed` asks for that framing at ANY arity, including one slug. It exists because deriving the
+  format from the slug COUNT gives a caller two output shapes for one verb: a frame-reading caller
+  handed a single-build corpus finds none of the lines it parses and reads the run as having graded
+  NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
 - `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer

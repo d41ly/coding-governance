@@ -3228,13 +3228,17 @@ if [ -d "$MEMORY_ROOT/builds" ]; then
   if ! grep -qF "$_pv_pid" "$_pv_drv" 2>/dev/null || ! grep -qF "$_pv_pst" "$_pv_drv" 2>/dev/null; then
     fail 30 "the driver no longer spells one of the two patterns this check selects its population with, so the selection below is keyed on a predicate the driver has moved away from and would quietly grade nothing: $_pv_drv"
   else
-    _pv_ok=""; _pv_cand=""; _pv_n=0; _pv_first=""
+    _pv_ok=""; _pv_cand=""; _pv_n=0; _pv_seed=""; _pv_nseed=0
     # `drop_working_specs` spelled as the driver spells it: a path under `spec/_<dir>/` is scratch,
     # not a spec, and enumerating one produced a NOT A UNIT row for a notes file.
     for _pv_f in $(GIT ls-files "$MEMORY_ROOT/builds/*/spec/*.md" 2>/dev/null | grep -vE '/spec/_[^/]*/'); do
       _pv_n=$((_pv_n+1))
       _pv_s=${_pv_f#"$MEMORY_ROOT/builds/"}; _pv_s=${_pv_s%%/*}
-      [ -n "$_pv_first" ] || _pv_first=$_pv_s
+      # THE CANARY SAMPLE, collected here because this is the only pass over the build slugs.
+      case " $_pv_seed " in
+        *" $_pv_s "*) ;;
+        *) [ "$_pv_nseed" -ge 3 ] || { _pv_seed="$_pv_seed $_pv_s"; _pv_nseed=$((_pv_nseed+1)); } ;;
+      esac
       if [ -r "$_pv_f" ] && [ -s "$_pv_f" ]; then
         _pv_ok="$_pv_ok$_pv_f
 "
@@ -3260,11 +3264,22 @@ if [ -d "$MEMORY_ROOT/builds" ]; then
     for _pv_s in $_pv_cand; do
       case " $_pv_slugs " in *" $_pv_s "*) ;; *) _pv_slugs="$_pv_slugs $_pv_s" ;; esac
     done
-    # NOTHING SELECTED STILL GRADES ONE BUILD. The liveness assertion below exists because the first
-    # cut of this check resolved the driver path wrongly and walked zero builds; on a corpus with no
-    # candidate at all that assertion would pass over an empty ask and stop meaning anything, so one
-    # build is graded to keep the driver path exercised.
-    [ -n "$_pv_slugs" ] || _pv_slugs=" $_pv_first"
+    # THE ASK ALWAYS CARRIES A CANARY SAMPLE, and it is a SAMPLE rather than one build.
+    # The liveness assertion below exists because the first cut of this check resolved the driver
+    # path wrongly and walked zero builds; on a corpus that selects nothing, that assertion would
+    # pass over an empty ask and stop meaning anything. So the driver is always asked about
+    # something.
+    #
+    # ONE canary was not enough, and the kit's own cross-component fixture proved it: a single
+    # build refusing for its own reasons - a broken units region, in that arm deliberately - drove
+    # `_pv_seen` to zero and RED a check that the old whole-corpus walk left silent, because some
+    # OTHER build there still graded. A refusal is a verdict this check has no opinion about, so
+    # liveness must not be hostage to which build happens to sort first. Three is enough to make
+    # that accident unlikely and is ~11 s, and the assertion stays honest: if all three refuse,
+    # something is wrong with the driver path and saying so is the whole point.
+    for _pv_s in $_pv_seed; do
+      case " $_pv_slugs " in *" $_pv_s "*) ;; *) _pv_slugs="$_pv_slugs $_pv_s" ;; esac
+    done
     if [ -n "$_pv_slugs" ]; then
       # ONE DRIVER PROCESS FOR THE WHOLE SELECTION. `--plan` takes several slugs and frames each
       # one's output with its own rc; each still runs in its own subshell, so one build's refusal
@@ -3292,7 +3307,10 @@ if [ -d "$MEMORY_ROOT/builds" ]; then
           *) [ -n "$_pv_cur" ] && _pv_buf="$_pv_buf
 $_pv_l" ;;
         esac
-      done < <(bash "$_pv_drv" --plan $_pv_slugs 2>/dev/null)
+      # `--framed` UNCONDITIONALLY: the loop below reads frames, so it must never be handed the
+    # unframed form. Letting the driver decide by arity meant a corpus of one build produced no
+    # frames, the loop counted no verdicts, and the liveness branch red a healthy tree.
+    done < <(bash "$_pv_drv" --plan --framed $_pv_slugs 2>/dev/null)
     fi
     # LIVENESS, IN TWO PARTS, because the check now has two stages and either can empty out. The
     # scan must have read specs - a selector over nothing selects nothing and looks clean - and the

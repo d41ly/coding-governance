@@ -4954,17 +4954,25 @@ while [ $# -gt 0 ]; do
                     # subshell gives the same isolation a separate process gave, at a fork instead of
                     # an exec. The per-slug rc is emitted rather than accumulated, because the caller
                     # skips a build whose plan REFUSES and cannot recover that from a summary status.
-                    PLAN_PATHS=""; _pl_slugs=""
+                    PLAN_PATHS=""; _pl_slugs=""; _pl_framed=""
                     while [ $# -gt 0 ]; do
                       case "${1:-}" in
-                        --paths) PLAN_PATHS=paths; shift ;;
+                        --paths)  PLAN_PATHS=paths; shift ;;
+                        --framed) _pl_framed=1; shift ;;
                         --*)     break ;;
                         "")      shift ;;
                         *)       _pl_slugs="$_pl_slugs $1"; shift ;;
                       esac
                     done
                     set -- $_pl_slugs
-                    if [ $# -le 1 ]; then verb_plan "${1:-}"; exit $?; fi
+                    # FRAMING IS A DECLARED MODE, NOT A CONSEQUENCE OF ARITY. Deriving it from the
+                    # slug COUNT made one slug and two slugs two different output formats, and a
+                    # caller that parses frames then reads a one-slug corpus as ZERO verdicts - it
+                    # is looking for lines the driver had no reason to print. That is exactly what
+                    # happened: `check-unattended.sh` check 30 red on every fixture holding a
+                    # single build, while the real corpus always gave it several and looked fine.
+                    # A caller that wants frames now SAYS so, and gets them at any arity.
+                    if [ $# -le 1 ] && [ -z "$_pl_framed" ]; then verb_plan "${1:-}"; exit $?; fi
                     for _pl_s in "$@"; do
                       printf 'unattended-plan-open: %s\n' "$_pl_s"
                       ( verb_plan "$_pl_s" ); _pl_one=$?

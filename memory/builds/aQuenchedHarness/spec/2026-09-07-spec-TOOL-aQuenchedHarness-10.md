@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-10 — the leg asks git once per question, not once per record
 
-**Status:** CLOSED · rev-3 · 2026-09-07 · node a · Tier-2 · base ab58d1cc · streams tooling · order 10
+**Status:** CLOSED · rev-4 · 2026-09-07 · node a · Tier-2 · base ab58d1cc · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -211,6 +211,15 @@ and whether they are worth their own unit depends on what the leg measures at af
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-07 · the kit's own self-test suites caught two defects that no fixture in this
+  unit could. `cross-component.test.sh` red on three arms because `--plan` decided its output
+  FORMAT from the slug COUNT: at one slug it emitted no frames, and check 30 - which reads
+  frames - counted zero verdicts and red a healthy tree. Every fixture I built had several
+  builds, so the one-slug shape never occurred in one. `--framed` makes the framing a declared
+  mode at any arity and the unframed one-slug form is unchanged; the verb doc and its shipped
+  template both say so. Separately the canary became a SAMPLE of three rather than one build,
+  because a single build refusing for its own reasons must not decide this check's liveness.
+  Both are §2 S5's mechanism, not new scope.
 - rev-3 · 2026-09-07 · the eight new helpers renamed onto the declared verb table -
   `check_rev`, `check_head_reaches`, `check_adv_reaches` and five `_load_*`/`resolve_*`
   fillers. The `lexicon naming predicates` leg is a RATCHET on verb offenders and my first

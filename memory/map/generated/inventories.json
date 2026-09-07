@@ -166,6 +166,7 @@
       "fixture-passes-by-finding-nothing.md",
       "fixture-removes-the-path-under-test.md",
       "fold-text-is-unreviewed-surface.md",
+      "format-derived-from-arity.md",
       "gate-green-by-accident-on-generated-bytes.md",
       "grammar-bound-to-the-wrong-root.md",
       "heredoc-escape-reaches-the-regex.md",
