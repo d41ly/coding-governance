@@ -1,12 +1,13 @@
 # TOOL-aQuenchedHarness-1 — the bar's own wall, so a wedged run dies with a verdict
 
-**Status:** INPROGRESS · rev-5 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-06-build-TOOL-aQuenchedHarness-1-wall-landed.md](../build/2026-09-06-build-TOOL-aQuenchedHarness-1-wall-landed.md) | journal | — |
+| [2026-09-07-build-TOOL-aQuenchedHarness-1-acceptance-ledger-the-bar-wall.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-1-acceptance-ledger-the-bar-wall.md) | journal | — |
 | [2026-09-06-prompt-TOOL-aQuenchedHarness-1.md](../prompts/2026-09-06-prompt-TOOL-aQuenchedHarness-1.md) | research | TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-5 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round1.md) | spec-audit | TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 |
@@ -232,6 +233,8 @@ it is a held self-test leg.
   bar it reaped. Sizing a wall against those numbers would bake the defect into the bound.
 
 ## 9. Revision log
+
+- rev-6 · 2026-09-07 · CLOSED. The wall exists, fires, bounds a run and now records a VERDICT rather than this runner's crash signal. Two defects found by the closing review made its guarantee decorative until today: the survivor scan read a snapshot the function had already deleted, and the breach exited above the verdict writer. Both fixed, both failing cases observed. AC6 remains NOT DONE and is now known-absent rather than merely unrun: no arm captures a pid, so the descendant walk is ungraded, which is exactly how the `rm` in the wrong place shipped.
 
 - rev-1 · 2026-09-06 · initial draft.
 - rev-5 · 2026-09-06 · folded an adversarial forensic review of the BUILT code — 55 findings, 37

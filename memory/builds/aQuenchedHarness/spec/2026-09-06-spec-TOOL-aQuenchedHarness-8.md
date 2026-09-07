@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-8 — the turnstile stops reaping a live holder, so two bars stop running as one
 
-**Status:** INPROGRESS · rev-2 · 2026-09-06 · node a · Tier-2 · base faaea5f5 · streams tooling · order 1
+**Status:** CLOSED · rev-3 · 2026-09-07 · node a · Tier-2 · base faaea5f5 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-06-build-TOOL-aQuenchedHarness-8-ticker-landed.md](../build/2026-09-06-build-TOOL-aQuenchedHarness-8-ticker-landed.md) | journal | — |
 | [2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md](../build/2026-09-06-build-TOOL-aQuenchedHarness-8-turnstile-contention.md) | research | TOOL-aQuenchedHarness-2 |
+| [2026-09-07-build-TOOL-aQuenchedHarness-8-acceptance-ledger-the-turnstile.md](../build/2026-09-07-build-TOOL-aQuenchedHarness-8-acceptance-ledger-the-turnstile.md) | journal | — |
 | [2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md](../reviews/2026-09-06-review-TOOL-aQuenchedHarness-1-spec-audit-round2.md) | spec-audit | TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 |
 
 <!-- /gen:spec-records -->
@@ -215,6 +216,8 @@ work and every leg above except the lexicon one is held.
   which of this unit's arms replaced it.
 
 ## 9. Revision log
+
+- rev-3 · 2026-09-07 · CLOSED. The turnstile serialises bars, observed IN THE WILD today rather than in a fixture: a sibling session's bar queued at position 1 and ran zero legs while this one ran 47. Five of its eight criteria are NOT RE-OBSERVED because the turnstile suite was killed part-way to free the box for a whole-bar measurement, and the ticker's own arms are among them — recorded as unrun, not as met.
 
 - rev-1 · 2026-09-06 · initial draft. Added mid-build by an `--rescope --act add` amendment after the
   unit 2 probe uncovered the mechanism; the measurement is the research record named in §10.

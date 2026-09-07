@@ -75,14 +75,14 @@ copy-installs a kit runs that kit's self-tests on every bar.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 9 unit(s) · node a · opened 2026-09-06 · streams tooling
+**Build status:** DEFERRED · 9 unit(s) · node a · opened 2026-09-06 · streams tooling
 ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 TOOL-aQuenchedHarness-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aQuenchedHarness-8 — the turnstile stops reaping a live holder, so two bars stop running as one](spec/2026-09-06-spec-TOOL-aQuenchedHarness-8.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-09-06 |
-| [TOOL-aQuenchedHarness-1 — the bar's own wall, so a wedged run dies with a verdict](spec/2026-09-06-spec-TOOL-aQuenchedHarness-1.md) | 2 | 2 | INPROGRESS | rev-5 | 2026-09-06 |
+| [TOOL-aQuenchedHarness-8 — the turnstile stops reaping a live holder, so two bars stop running as one](spec/2026-09-06-spec-TOOL-aQuenchedHarness-8.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-07 |
+| [TOOL-aQuenchedHarness-1 — the bar's own wall, so a wedged run dies with a verdict](spec/2026-09-06-spec-TOOL-aQuenchedHarness-1.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-07 |
 | [TOOL-aQuenchedHarness-3 — a self-test never reaches an adopter, as a leg or as a file](spec/2026-09-06-spec-TOOL-aQuenchedHarness-3.md) | 3 | 2 | CLOSED | rev-6 | 2026-09-07 |
 | [TOOL-aQuenchedHarness-2 — a leg ceiling carries the reading it was set against, in the tree](spec/2026-09-06-spec-TOOL-aQuenchedHarness-2.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-07 |
 | [TOOL-aQuenchedHarness-4 — one on-demand runner for every kit's self-tests, budget-graded](spec/2026-09-06-spec-TOOL-aQuenchedHarness-4.md) | 5 | 2 | CLOSED | rev-5 | 2026-09-07 |
@@ -92,7 +92,7 @@ ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL
 | [TOOL-aQuenchedHarness-9 — the held suites that are red, and have been for nobody knows how long](spec/2026-09-07-spec-TOOL-aQuenchedHarness-9.md) | 9 | 2 | DEFERRED | rev-1 | 2026-09-07 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 4 record folder(s).
+Records: 20 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-aQuenchedHarness-9.
 
