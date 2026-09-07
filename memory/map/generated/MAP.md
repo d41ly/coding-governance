@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 93 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 40 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 96 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 43 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -16,13 +16,16 @@ Inventories: gate-legs: 93 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 ·
 | `agent-instructions self-test` | baseline |
 | `agent-instructions wiring` | baseline |
 | `branch-guard self-test` | baseline |
+| `brief-recorded` | unattended |
 | `build README slot contract` | build-readme-surface |
 | `build-index selftest` | baseline |
+| `build-method size` | build-method |
 | `charter size` | playbook |
 | `check-arms selftest` | baseline |
 | `check-wiring self-test` | baseline |
 | `codebase-map adopter e2e` | codebase-map |
 | `codebase-map coverage + freshness` | codebase-map |
+| `codebase-map gate coverage` | codebase-map |
 | `codebase-map kit selftest` | codebase-map |
 | `corpus-ids selftest` | baseline |
 | `dead-path carriers (deleted files still named)` | install-prefix |
@@ -141,6 +144,7 @@ Inventories: gate-legs: 93 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 ·
 | `drift-audit-state.js` | review-harnesses |
 | `tier2-review.js` | review-harnesses |
 | `unattended-build.js` | unattended |
+| `unattended-unit.js` | unattended |
 
 ## skill-engines
 
@@ -184,7 +188,10 @@ Inventories: gate-legs: 93 · kits: 15 · git-hooks: 3 · workflow-scripts: 5 ·
 | `heredoc-escape-reaches-the-regex.md` | baseline |
 | `hookspath-resolves-into-another-checkout.md` | run-gates |
 | `id-matched-as-a-substring.md` | unattended |
+| `inline-fence-swallows-the-rest-of-the-file.md` | memory-tree-hygiene |
 | `inputs-inside-the-subjects-reach.md` | unattended |
+| `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
+| `naming-leg-grades-what-python-named.md` | lexicon |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `pin-copied-from-another-corpus.md` | baseline |
 | `process-creation-is-the-suite-cost.md` | unattended |

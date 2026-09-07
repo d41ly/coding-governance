@@ -64,7 +64,7 @@ git init -q . && git config user.email t@t.test && git config user.name t && git
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
 # 2026-08-10 ones must carry `streams`. That is the arm the REAL corpus cannot exercise, because the
 # cutoff is deliberately set ahead of every landed spec — so it is exercised here or nowhere.
-printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\n' > .memory-tree.conf
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\nSPEC_WITNESS_CUTOFF="2026-08-08"\nTOMBSTONE_ROOTS="docs"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nFORK_MARK_CUTOFF="2026-08-05"\nREVIEW_VERDICT_CUTOFF="2026-08-05"\nSPEC10_EVIDENCE_CUTOFF="2026-08-24"\nREV_SCOPE_CUTOFF="2026-08-20"\nSCOPE_JOIN_CUTOFF="2026-08-20"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\nSPEC_EDGES_CUTOFF="2026-08-20"\nREADINESS_ROWS="security|observability|risks"\nREADINESS_ROWS_CUTOFF="2026-08-20"\nBASE_RESOLVE_CUTOFF="2026-08-26"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
 
 D=memory/builds/tFixture
 mkdir -p "$D/spec/subspecs" "$D/build" memory/backlog
@@ -249,6 +249,111 @@ good10 | sed "s/base 0123abcd/base 0123abcd · streams architecture/" \
 # `if (hdr ~ /Tier-1/) next` cut, and without this fixture that scoping is asserted, not observed.
 printf '# t84\n\n**Status:** OPEN · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · fixture.\n\n## 10. Reuse audit\n\nNothing here.\n' \
   > "$D/spec/2026-08-25-spec-tFixture-84.md"
+
+# ---- TOOL-aJoinedCanon-1: the §9 rev-SCOPE arms. REV_SCOPE_CUTOFF is declared at 2026-08-20 in the
+# ---- conf above, between the two fixture eras, exactly as STREAMS_CUTOFF and SPEC_WITNESS_CUTOFF
+# ---- separate theirs. The real corpus cannot exercise this arm at all — the shipped cutoff sits
+# ---- strictly ahead of every dated spec on every branch, which is the ratified state and the reason
+# ---- the engine prints a zero-population notice — so these five fixtures are its ENTIRE coverage.
+# ---- Tier-1 throughout, deliberately: the arm sits above the Tier-1 cut and a Tier-1 fixture keeps
+# ---- the section canon out of the way, so a red here can only be this arm.
+write_rev_spec() { # $1 = fixture number, $2 = filename date, $3.. = the §9 entry lines
+  local num="$1" date="$2"; shift 2
+  { printf '# t%s\n\n**Status:** OPEN · rev-%s · %s · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 9. Revision log\n\n' \
+      "$num" "$([ $# -gt 1 ] && echo 2 || echo 1)" "$date"
+    printf '%s\n' "$@"
+    printf '\n## 10. Reuse audit\n\nNothing here.\n'
+  } > "$D/spec/$date-spec-tFixture-$num.md"
+}
+# 90 — post-cutoff, a rev-2 entry naming no section, scope id or acceptance id -> RED
+write_rev_spec 90 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review corrections.'
+# 91 — the same entry once it gains a section token -> silent
+write_rev_spec 91 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · §4 · folded the review corrections.'
+# 92 — PRE-cutoff twin of 90. Without it "no landed spec goes retroactively red" is an untested claim.
+write_rev_spec 92 2026-08-10 '- rev-1 · 2026-08-10 · initial draft.' '- rev-2 · 2026-08-10 · folded the review corrections.'
+# 93 — post-cutoff, rev-1 ONLY. A first draft moved the whole document, so it is exempt; without this
+#      fixture the exemption is asserted rather than observed, and it is 488 entries of the corpus.
+write_rev_spec 93 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.'
+# 94 — post-cutoff, the token on a WRAPPED continuation line rather than the head. This is the whole
+#      reason the arm accumulates per ENTRY: per LINE it marks about 30% of the corpus and reds half
+#      the specs that already do the right thing, because this house style wraps at ~100 columns.
+write_rev_spec 94 2026-08-25 '- rev-1 · 2026-08-25 · initial draft.' '- rev-2 · 2026-08-25 · folded the review
+  corrections, which moved §4 and the acceptance criteria beneath it.'
+
+# ---- TOOL-aJoinedCanon-3: the §2 scope-JOIN arms. SCOPE_JOIN_CUTOFF is declared at 2026-08-20 in
+# ---- the conf above, between the fixture eras. The shipped cutoff sits ahead of every dated spec on
+# ---- every branch, so the real corpus grades nothing and these six fixtures are the whole coverage.
+# ---- Tier-1 throughout: the arm is both-tiers by placement above the Tier-1 cut, and a Tier-1
+# ---- fixture keeps the section canon out of the way so a red here can only be this arm.
+write_join_spec() { # $1 = num, $2 = date, $3 = the §2 body, $4 = the §6 body (empty string = NO §6 heading)
+  { printf '# t%s\n\n**Status:** OPEN · rev-1 · %s · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n%s\n\n' "$1" "$2" "$3"
+    [ -n "$4" ] && printf '## 6. Acceptance criteria\n\n%s\n\n' "$4"
+    printf '## 9. Revision log\n\n- rev-1 · %s · initial draft.\n\n## 10. Reuse audit\n\nNothing here.\n' "$2"
+  } > "$D/spec/$2-spec-tFixture-$1.md"; }
+# 110 — post-cutoff, an item naming neither an AC label nor the escape -> RED, named by its S label
+write_join_spec 110 2026-08-25 '- **S1** — the thing this unit builds.' '- **AC1** — `token` — the observation.'
+# 111 — the same item once it names AC1 -> silent
+write_join_spec 111 2026-08-25 '- **S1** — the thing this unit builds. Observed by AC1.' '- **AC1** — `token` — the observation.'
+# 112 — PRE-cutoff twin of 110. Without it "no landed spec goes retroactively red" is untested.
+write_join_spec 112 2026-08-10 '- **S1** — the thing this unit builds.' '- **AC1** — `token` — the observation.'
+# 113 — the escape, with its reason -> silent. The prose spelling is NOT the escape; 114 pins that.
+write_join_spec 113 2026-08-25 '- **S1** — the thing this unit builds. NOT OBSERVED — it ships no observable.' '- **AC1** — `token` — the observation.'
+# 114 — the same sentence in ordinary lower case is NOT the escape and still reds. One spelling, and
+#       the corpus measured 0 of 3,207 items carrying it, so nothing landed is caught by the case.
+write_join_spec 114 2026-08-25 '- **S2** — the thing this unit builds. not observed in this build.' '- **AC1** — `token` — the observation.'
+# 115 — a Scope heading and NO Acceptance heading -> silent. This is dUnstalledConvoy M13: two closed
+#       Tier-1 specs number their criteria under §5 and carry Gates at §6, so an ordinal-keyed
+#       population reds a spec that is legal under the format.
+write_join_spec 115 2026-08-25 '- **S1** — the thing this unit builds.' ''
+# 116 — the item enumerates its criteria as SUB-bullets, which are continuations of the one item.
+{ printf '# t116\n\n**Status:** OPEN · rev-1 · 2026-08-25 · node a · Tier-1 · base 0123abcd · streams architecture\n\n## 2. Scope (IN)\n\n'
+  printf -- '- **S1** — the thing this unit builds.\n  - observed by AC1 for the arm\n  - and by AC2 for the render\n\n'
+  printf '## 6. Acceptance criteria\n\n- **AC1** — `token` — the observation.\n\n## 9. Revision log\n\n- rev-1 · 2026-08-25 · initial draft.\n\n## 10. Reuse audit\n\nNothing here.\n'
+} > "$D/spec/2026-08-25-spec-tFixture-116.md"
+
+# ---- TOOL-aJoinedCanon-4: the §6 failure-MODE arms. SPEC_FAILURE_MODE_CUTOFF is declared at
+# ---- 2026-08-20 in the shared conf above, between the fixture eras. The shipped cutoff sits ahead
+# ---- of every dated spec on every branch, so these six fixtures are the arm's whole coverage.
+# ---- 125 is deliberately NOT here: it needs the witness key ABSENT and so takes its own scratch
+# ---- tree and its own conf, further down, which is what makes AC7 a real observation of the hoist.
+write_failmode_spec() { # $1 = num, $2 = date, $3 = tier, $4.. = the §6 bullet lines
+  local num="$1" date="$2" tier="$3"; shift 3
+  { printf '# t%s
+
+**Status:** OPEN · rev-1 · %s · node a · Tier-%s · base 0123abcd · streams architecture
+
+## 6. Acceptance criteria
+
+' "$num" "$date" "$tier"
+    printf '%s
+' "$@"
+    printf '
+## 9. Revision log
+
+- rev-1 · %s · initial draft.
+
+## 10. Reuse audit
+
+Nothing here.
+' "$date"
+  } > "$D/spec/$date-spec-tFixture-$num.md"; }
+# 120 — post-cutoff, a bullet with no Red when: clause -> RED, named by its AC label
+write_failmode_spec 120 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-120`.'
+# 121 — the same bullet once it gains the clause -> silent
+write_failmode_spec 121 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-121`. Red when: the arm stays silent.'
+# 122 — PRE-cutoff twin of 120, dated strictly inside [SPEC_FORMAT_CUTOFF, SPEC_FAILURE_MODE_CUTOFF)
+write_failmode_spec 122 2026-08-10 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-122`.'
+# 123 — the clause on a CONTINUATION line rather than the opening line -> silent. This is the arm
+#       reading the ACCUMULATED bullet and not the head line, which is this corpus's wrap style.
+write_failmode_spec 123 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-123`.
+  Red when: the test is applied to the opening line instead of to the accumulated bullet.'
+# 124 — TIER-1, post-cutoff, no clause -> still RED. The arm sits above the `hdr ~ /Tier-1/ next`
+#       cut, so a Tier-1 spec is exempt from the canon and not from meaning what it writes.
+write_failmode_spec 124 2026-08-25 1 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-124`.'
+# 125 — the SIXTH, for AC7. It rides the same tree, but its assertion runs under a conf that arms
+#       THIS key and no other check-12 rule cutoff, further down. That run is the only thing in
+#       either spec that can tell a shared -v binding from two independent ones.
+write_failmode_spec 125 2026-08-25 2 '- **AC1** — When `check-memory-hygiene.sh` runs, it names `tFixture-125`.'
 
 # ---- TOOL-cSettledDocket-3: Tier-1 twins for the two assertions HOISTED above the Tier-1 cut.
 # ---- Before the hoist every one of these was silent, because `next` cut the record first.
@@ -549,6 +654,145 @@ mkdir -p "$D/build"
   printf '**Evidences:** ARCH-tFixture-72\n- AC1 — it just works.\n\n'
   printf '**Evidences:** ARCH-tFixture-73\n- AC1 — `x` — observed.\n'
 } > "$D/build/2026-08-20-build-ARCH-tFixture-70-1-ledger.md"
+
+# ---- TOOL-aJoinedCanon-6: the two ledger-JOIN arms. LEDGER_LABEL_CUTOFF and LEDGER_TOKEN_CUTOFF are
+# ---- both 2026-08-20 in the shared conf, so these four specs are in the graded era; what each
+# ---- fixture varies is the LEDGER side, which is the side no arm walked before this unit.
+ledspec 140 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `alpha.sh`.'
+ledspec 142 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `alpha.sh`.'
+ledspec 143 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `alpha.sh`.'
+ledspec 145 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing that works.'
+ledspec 144 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed by `alpha.sh`.'
+# 146 — AC4's SPEC-side half: the CRITERION's only token sits on its own continuation line.
+#       `form` does not reach the spec side at all, so this one needs no head token.
+ledspec 146 CLOSED 20 2 '6. Acceptance criteria' '- **AC1** — a thing, observed at length
+  by `alpha.sh`, which is named only here.'
+
+# ---- TOOL-aJoinedCanon-8: the four §3 EDGE arms. SPEC_EDGES_CUTOFF is 2026-08-20 in the shared
+# ---- conf. These are Tier-2 by construction: the arm sits BELOW the `hdr ~ /Tier-1/ next` cut,
+# ---- because declaring edges is a Tier-2 obligation and the light profile is exempt from it.
+write_edge_spec() {   # $1 num · $2 date-day · $3 order · $4 edges body (empty = NO Edges block)
+  { printf '# ARCH-tFixture-%s — a unit
+
+' "$1"
+    printf '**Status:** OPEN · rev-1 · 2026-08-%s · node a · Tier-2 · base 1234abcd · streams architecture · order %s
+
+' "$2" "$3"
+    printf '## 3. Non-goals (OUT)
+
+none.
+
+'
+    [ -n "$4" ] && printf '### Edges
+
+%s
+
+' "$4"
+    printf '## 9. Revision log
+
+- rev-1 · 2026-08-%s · initial draft.
+' "$2"
+  } > "$D/spec/2026-08-$2-spec-tFixture-$1.md"
+}
+# 160 — no Edges block at all. The SHAPE arm, and the only one that runs under --staged.
+write_edge_spec 160 25 1 ''
+# 161 — a declared `none`. Silent: an absent declaration and a declared absence are different bytes.
+write_edge_spec 161 25 2 'none'
+# 162 <-> 163 — a mutual pair, both directions declared. Silent.
+write_edge_spec 162 25 3 '- **hands-off** `ARCH-tFixture-163` — the second half.'
+write_edge_spec 163 25 4 '- **consumes-from** `ARCH-tFixture-162` — the first half.'
+# 164 -> 165 — one end declared and the other silent. RECIPROCITY.
+write_edge_spec 164 25 5 '- **hands-off** `ARCH-tFixture-165` — the second half.'
+write_edge_spec 165 25 6 'none'
+# 166 <-> 167 — mutual, and pointing the wrong way through the build order. ORDER, both directions.
+write_edge_spec 166 25 7 '- **consumes-from** `ARCH-tFixture-167` — taken.'
+write_edge_spec 167 25 8 '- **hands-off** `ARCH-tFixture-166` — given.'
+# 168 — a bullet whose head is the cut third verb. SHAPE again, and it names the offending head.
+write_edge_spec 168 25 9 '- **depends-on** `ARCH-tFixture-161` — the verb this format does not have.'
+# 169 — PRE-cutoff, no Edges block. Nothing landed goes retroactively red.
+write_edge_spec 169 10 10 ''
+# 170 — an `external` payload. Legal, and joined to nothing.
+write_edge_spec 170 25 11 '- **consumes-from** external — a precondition nobody in this build builds.'
+# 171 — a bullet with a legal verb and NO payload. The third join arm.
+write_edge_spec 171 25 12 '- **hands-off** — something, somewhere.'
+# 172 — an `external` payload whose PROSE names a sibling in this build. A joinable edge written
+#       as an unjoinable one, which both joins would otherwise skip in silence.
+write_edge_spec 172 25 13 '- **consumes-from** external — in practice the work `ARCH-tFixture-161` does.'
+
+# ---- TOOL-aJoinedCanon-9: the §5 declared-row arm. The scratch conf declares a THREE-row set, not
+# ---- gov's eight, so the fixtures stay short and the arm is sized against the declaration rather
+# ---- than against a literal that would have to be kept in step with the conf.
+write_rows_spec() {    # $1 num · $2 date-day · $3 the §5 body
+  { printf '# ARCH-tFixture-%s — a unit
+
+' "$1"
+    printf '**Status:** OPEN · rev-1 · 2026-08-%s · node a · Tier-2 · base 1234abcd · streams architecture
+
+' "$2"
+    printf '## 5. Production-readiness checklist
+
+%s
+
+' "$3"
+    printf '## 9. Revision log
+
+- rev-1 · 2026-08-%s · initial draft.
+' "$2"
+  } > "$D/spec/2026-08-$2-spec-tFixture-$1.md"
+}
+# 180 — a declared row missing from §5. RED, and it NAMES the row rather than the file alone.
+write_rows_spec 180 25 '- security
+- observability'
+# 181 — every declared row present. Silent.
+write_rows_spec 181 25 '- security
+- observability
+- risks'
+# 182 — PRE-cutoff twin of 180. Nothing landed goes retroactively red.
+write_rows_spec 182 10 '- security
+- observability'
+{ printf '# ledger two
+
+**Serves:** journal ARCH-tFixture-140 ARCH-tFixture-142 ARCH-tFixture-143 ARCH-tFixture-144 ARCH-tFixture-145 ARCH-tFixture-146
+
+'
+  # 140 — an answer labelled AC9 on a unit whose §6 stops at AC1. It satisfies nothing, blocks
+  # nothing, and before ARM A nothing walked the ledger side to notice.
+  printf '**Evidences:** ARCH-tFixture-140
+- AC1 — `alpha.sh` — observed.
+- AC9 — `alpha.sh` — observed a criterion nobody numbered.
+
+'
+  # 142 — the labels agree and the CONTENT does not. This is the defect on a CLOSED, green unit.
+  printf '**Evidences:** ARCH-tFixture-142
+- AC1 — `zulu.py` — observed something else entirely.
+
+'
+  # 143 — the shared token is on the answer CONTINUATION line, which is why the ledger emitter had to
+  # become bullet-scoped: this corpus wraps and puts the naming half in the wrap.
+  printf '**Evidences:** ARCH-tFixture-143
+- AC1 — `notes.md` — observed something, described at length,
+  and the thing observed was `alpha.sh`.
+
+'
+  # 144 — the SAME shape with the continuation token deleted. Its head token still makes it a legal
+  # OBSERVED line, so `form` is happy and only arm B can red it: this is the pair that proves the
+  # continuation accumulation is load-bearing rather than decorative.
+  printf '**Evidences:** ARCH-tFixture-144
+- AC1 — `notes.md` — observed something, described at length,
+  and the thing observed is not named here.
+
+'
+  # 145 — the CRITERION carries no token. That is check 12's acceptance-witness arm, not this one,
+  # and reporting it here would double-count a finding another arm already owns.
+  printf '**Evidences:** ARCH-tFixture-145
+- AC1 — `zulu.py` — observed.
+
+'
+  # 146 — the criterion names its token in ITS wrap and the answer names it on the head line.
+  printf '**Evidences:** ARCH-tFixture-146
+- AC1 — `alpha.sh` — observed.
+'
+} > "$D/build/2026-08-20-build-ARCH-tFixture-140-1-ledger.md"
 # CHECK 22's FIXTURES SIT ABOVE THE COMMIT, and that is load-bearing rather than tidy: the hygiene
 # engine selects its population with `git ls-files`, so a fixture written after this commit is
 # UNTRACKED and invisible to it. Written below, all six were ignored, check 22 graded nothing, and
@@ -570,7 +814,35 @@ printf '**Serves:** spec-audit ARCH-tFixture-1\n\n## Verdict: BLOCKED - 2 blocke
 printf '**Serves:** spec-audit ARCH-tFixture-1\n\nno verdict, and dated BEFORE the cutoff\n' \
   > "$D/reviews/2026-08-01-review-ARCH-tFixture-1-6.md"            # grandfathered -> silent
 
+# ---- TOOL-aJoinedCanon-11: the `base` sha resolves to a real commit. BASE_RESOLVE_CUTOFF is
+# ---- 2026-08-26 in the shared conf, one day past the newest fixture filename date in this file, so
+# ---- every pre-existing `base 0123abcd` fixture is grandfathered and only these are graded.
+write_base_spec() {   # $1 num · $2 date-day · $3 status · $4 tier · $5 base sha
+  printf '# ARCH-tFixture-%s — a unit
+
+**Status:** %s · rev-1 · 2026-08-%s · node a · Tier-%s · base %s · streams architecture
+
+## 9. Revision log
+
+- rev-1 · 2026-08-%s · initial draft.
+'     "$1" "$3" "$2" "$4" "$5" "$2" > "$D/spec/2026-08-$2-spec-tFixture-$1.md"
+}
+# 190 — LIVE, TIER-1, a base that resolves to nothing. Tier-1 deliberately: the arm sits ABOVE the
+#       `hdr ~ /Tier-1/ next` cut, and below it this fixture goes silent while the key reads armed.
+write_base_spec 190 26 OPEN 1 0123abcd
+# 192 — CLOSED with the same dead base. Silent: a landed record is frozen and is not rewritten to
+#       clear a hit, so the population is the specs a build can still change.
+write_base_spec 192 26 CLOSED 2 0123abcd
+# 193 — PRE-cutoff twin of 190. Nothing landed goes retroactively red.
+write_base_spec 193 10 OPEN 2 0123abcd
+
 git add -A && git commit -q -m fixtures --no-verify
+# 191 — the green twin, and it can only be written HERE: its base must name a commit that exists,
+#       which is not true of any sha until the fixtures commit above has been made. It commits
+#       BEFORE the rm below: `git add -A` would otherwise stage tFixture-13's deletion and
+#       destroy the tracked-but-absent state the very next arm grades.
+write_base_spec 191 26 OPEN 2 "$(git rev-parse --short=8 HEAD)"
+git add -A && git commit -q -m base-green --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 
 out=$(bash "$SCRIPT" 2>/dev/null)
@@ -605,6 +877,47 @@ miss 'ARCH-tFixture-74'                        # WONTDO owes nothing
 miss 'ARCH-tFixture-75'                        # Tier-1 whose section 6 is Gates: legal, and located by HEADING
 miss 'ARCH-tFixture-76'                        # dated before the cutoff
 hit  'a CLOSED unit numbers an acceptance criterion that no journal record evidences, so nothing says which observation answered it and conformance is unreadable'
+
+# ---- TOOL-aJoinedCanon-6: the two ledger-join arms, and the two `fail 23` branches they add.
+hit  'a journal record evidences a criterion label its own spec does not number, so the answer satisfies nothing and reads as coverage'
+hit  'ARCH-tFixture-140/AC9'                   # the answer labels a criterion §6 does not number
+miss 'ARCH-tFixture-140/AC1'                   # ...and its properly-labelled sibling is silent
+hit  'a ledger answer shares no backticked token with the criterion it claims to answer, so the two are joined by label alone and may describe different things'
+hit  'ARCH-tFixture-142/AC1'                   # labels agree, content shares nothing
+miss 'ARCH-tFixture-143/AC1'                   # the shared token is on the answer continuation line
+hit  'ARCH-tFixture-144/AC1'                   # ...and deleting that continuation token reds it
+miss 'ARCH-tFixture-146/AC1'                   # the CRITERION names its token in its own wrap
+
+# ---- TOOL-aJoinedCanon-8: the four §3 edge arms and the three `fail 12` branches the joins add.
+hit  'tFixture-160.md (§3 carries no `### Edges` block'
+miss 'tFixture-161.md (§3 carries no `### Edges` block'   # a declared `none`
+miss 'tFixture-169.md (§3 carries no `### Edges` block'   # PRE-cutoff, grandfathered
+hit  'tFixture-168.md (§3 `### Edges` bullets whose head is neither'
+hit  '**depends-on**'                                     # ...and it NAMES the offending head
+hit  'a §3 edge names a sibling that declares no matching edge back, so one author read the handoff and the other never saw it'
+hit  'tFixture-164.md (§3 declares **hands-off** `ARCH-tFixture-165` and that unit declares no matching **consumes-from**'
+miss 'tFixture-162.md (§3 declares'                       # the mutual pair is silent both ways
+miss 'tFixture-163.md (§3 declares'
+hit  'a §3 edge runs against the build order its own status headers declare'
+hit  'tFixture-166.md (§3 **consumes-from** `ARCH-tFixture-167`, whose `order` 8 is AFTER this unit at 7)'
+hit  'tFixture-167.md (§3 **hands-off** `ARCH-tFixture-166`, whose `order` 7 is BEFORE this unit at 8)'
+hit  'a §3 edge bullet carries no payload, so it names no sibling and declares nothing'
+hit  'tFixture-171.md (§3 `### Edges` bullet with no payload'
+miss 'tFixture-170.md (§3'                                # an `external` payload joins to nothing
+hit  'a §3 edge declares an external payload while its own prose names a sibling in this build, so a joinable edge was written as an unjoinable one'
+hit  'tFixture-172.md (§3 **consumes-from** external, and its prose names the sibling `ARCH-tFixture-161` in this build'
+
+# ---- TOOL-aJoinedCanon-9: the §5 declared-row arm.
+hit  'tFixture-180.md (§5 is missing declared READINESS_ROWS, required at/after READINESS_ROWS_CUTOFF 2026-08-20): risks'
+miss 'tFixture-181.md (§5 is missing declared'   # every declared row present
+miss 'tFixture-182.md (§5 is missing declared'   # PRE-cutoff, grandfathered
+
+# ---- TOOL-aJoinedCanon-11: the base-resolve arm.
+hit  'tFixture-190.md (status header `base 0123abcd` resolves to no commit in this object database'
+miss 'tFixture-191.md (status header `base'   # its base names the fixtures commit
+miss 'tFixture-192.md (status header `base'   # CLOSED: a frozen record is not graded
+miss 'tFixture-193.md (status header `base'   # PRE-cutoff, grandfathered
+miss 'ARCH-tFixture-145/AC1'                   # the CRITERION has no token: check 12's arm, not this
 hit  'an acceptance-ledger line is in neither legal form, and there is no third: OBSERVED carries a backticked token, AMENDED names the revision, and anything else is a checkbox'
 hit  'a CLOSED Tier-2 spec carries an acceptance-criteria section that numbers no criterion, so every claim about its coverage is vacuously true'
 
@@ -715,6 +1028,58 @@ hit  'tFixture-85.md (§10 Reuse audit does not record the recall terms used AND
 # count. This arm is the one that fails if the probe blob ever goes back to a per-line cut.
 hit  'tFixture-86.md (§10 Reuse audit does not record the probe result'
 miss 'tFixture-84.md (header rev-1 not logged'  # and it reds for no OTHER reason either
+
+# ---- TOOL-aJoinedCanon-1: §9 rev-scope. AC1-AC5.
+hit  'tFixture-90.md (revision entries naming no section, scope id or acceptance id'
+miss 'tFixture-91.md (revision entries naming no'   # the entry gained a §4 token
+miss 'tFixture-92.md (revision entries naming no'   # PRE-cutoff, grandfathered
+miss 'tFixture-93.md (revision entries naming no'   # rev-1 only, exempt
+miss 'tFixture-94.md (revision entries naming no'   # the token is on a wrapped continuation line
+
+# ---- TOOL-aJoinedCanon-3: §2 scope-join. AC1-AC5.
+hit  'tFixture-110.md (scope items naming neither an acceptance criterion nor NOT OBSERVED'
+miss 'tFixture-111.md (scope items naming neither'   # the item names AC1
+miss 'tFixture-112.md (scope items naming neither'   # PRE-cutoff, grandfathered
+miss 'tFixture-113.md (scope items naming neither'   # the NOT OBSERVED escape, with its reason
+hit  'tFixture-114.md (scope items naming neither'   # lower-case prose is NOT the escape
+miss 'tFixture-115.md (scope items naming neither'   # no Acceptance heading, so not graded at all
+miss 'tFixture-116.md (scope items naming neither'   # sub-bullets are continuations of the one item
+
+# ---- TOOL-aJoinedCanon-4: §6 failure mode. AC1-AC5.
+hit  'tFixture-120.md (acceptance bullets naming no failure mode'
+miss 'tFixture-121.md (acceptance bullets naming no failure mode'   # the clause is on the opening line
+miss 'tFixture-122.md (acceptance bullets naming no failure mode'   # PRE-cutoff, grandfathered
+miss 'tFixture-123.md (acceptance bullets naming no failure mode'   # the clause is on a continuation line
+hit  'tFixture-124.md (acceptance bullets naming no failure mode'   # TIER-1 is exempt from the canon, not from this
+# the offending LABEL rides the message, and the cutoff with it.
+n=$((n+1))
+grep -qF 'tFixture-120.md (acceptance bullets naming no failure mode, required at/after SPEC_FAILURE_MODE_CUTOFF 2026-08-20): AC1' <<<"$out" || { echo "FAIL the failure-mode rejection does not name its own cutoff and the offending label"; st=1; }
+# AC8 — the HOIST moved no acceptance-witness verdict. Those assertions are untouched above and this
+# is the arm that says so: the witness arm still reports exactly the labels it reported before.
+n=$((n+1))
+grep -qF "required at/after SPEC_WITNESS_CUTOFF): 2026-08-08" <<<"$out" || { echo "FAIL the hoist moved the witness arm off its own cutoff"; st=1; }
+# the OFFENDING ITEM rides the message, by its S label where it has one, and the cutoff with it.
+n=$((n+1))
+grep -qF 'tFixture-110.md (scope items naming neither an acceptance criterion nor NOT OBSERVED, required at/after SCOPE_JOIN_CUTOFF 2026-08-20): S1' <<<"$out" || { echo "FAIL the scope-join rejection does not name its own cutoff and the offending item"; st=1; }
+# the OFFENDING REV rides the message, not merely the file — a spec with a long §9 is otherwise a
+# search, and the cutoff rides it too, because check 12's own heading names SPEC_FORMAT_CUTOFF.
+n=$((n+1))
+grep -qF 'tFixture-90.md (revision entries naming no section, scope id or acceptance id, required at/after REV_SCOPE_CUTOFF 2026-08-20): rev-2' <<<"$out" \
+  || { echo "FAIL the rev-scope rejection does not name its own cutoff and the offending rev"; st=1; }
+# AC16 — no `-v` NAME is bound twice on the one check-12 awk invocation. Every cutoff arm in this
+# build binds a key there, it is ONE awk program so a repeated name is last-wins for the whole of it
+# SILENTLY, and each arm blanking its own key would then blank a sibling's binding too. Located by
+# the literal `bad12_raw=$(printf` rather than by line, because sibling units edit this engine.
+# LIVENESS: zero or several matches is a REFUSAL, not a clean zero — a later unit wrapping that
+# invocation would otherwise turn this into a check that passes because it looked at nothing.
+n=$((n+1))
+v12=$(grep -F 'bad12_raw=$(printf' "$SCRIPT")
+if [ "$(printf '%s\n' "$v12" | grep -c .)" != 1 ]; then
+  echo "FAIL the check-12 awk invocation locator matched $(printf '%s\n' "$v12" | grep -c .) lines, expected exactly 1 — this assertion cannot answer"; st=1
+else
+  dupv=$(printf '%s\n' "$v12" | grep -o -- ' -v [a-z0-9]*=' | sort | uniq -d)
+  [ -z "$dupv" ] || { echo "FAIL a -v name is bound twice on the one check-12 awk invocation:$dupv"; st=1; }
+fi
 miss 'tFixture-55.md ('   # the witness is on a continuation line and counts for its bullet
 miss 'tFixture-56.md ('   # a continuation opening with an AC reference is not a new bullet head
 # the cutoff rides the message: check 12's own heading names SPEC_FORMAT_CUTOFF, which is the wrong
@@ -958,6 +1323,15 @@ out3=$(bash "$SCRIPT" 2>/dev/null)
 if grep -qF 'on/after STREAMS_CUTOFF' <<<"$out3"; then echo "FAIL: the streams requirement fired with a blank STREAMS_CUTOFF"; st=1; fi
 n=$((n+1))
 if grep -qF 'no backticked witness' <<<"$out3"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
+# TOOL-aJoinedCanon-1 AC6 — the same run has REV_SCOPE_CUTOFF blank while check 12 is armed.
+n=$((n+1))
+if grep -qF 'revision entries naming no' <<<"$out3"; then echo "FAIL: the rev-scope requirement fired with a blank REV_SCOPE_CUTOFF"; st=1; fi
+# TOOL-aJoinedCanon-3 AC12 — the same run has SCOPE_JOIN_CUTOFF blank while check 12 is armed.
+n=$((n+1))
+if grep -qF 'scope items naming neither' <<<"$out3"; then echo "FAIL: the scope-join requirement fired with a blank SCOPE_JOIN_CUTOFF"; st=1; fi
+# TOOL-aJoinedCanon-4 AC6 — the same run has SPEC_FAILURE_MODE_CUTOFF blank while check 12 is armed.
+n=$((n+1))
+if grep -qF 'acceptance bullets naming no failure mode' <<<"$out3"; then echo "FAIL: the failure-mode requirement fired with a blank SPEC_FAILURE_MODE_CUTOFF"; st=1; fi
 # docs/legacy-note.md is still tracked in this run — only the conf key went away.
 n=$((n+1))
 if grep -qF 'is the only sanctioned memory root' <<<"$out3"; then echo "FAIL: check 11 ran with a blank TOMBSTONE_ROOTS"; st=1; fi
@@ -965,6 +1339,76 @@ if grep -qF 'is the only sanctioned memory root' <<<"$out3"; then echo "FAIL: ch
 n=$((n+1))
 grep -qF 'tFixture-20.md (streams value(s) outside the enum' <<<"$out3" \
   || { echo "FAIL: an illegal streams value went unchecked with a blank STREAMS_CUTOFF"; st=1; }
+# TOOL-aJoinedCanon-1 AC15 — INDEPENDENCE. The rev-scope arm has exactly ONE date guard, its own.
+# Nested inside the SPEC_WITNESS_CUTOFF block its real population would be the intersection of two
+# keys, so blanking an unrelated key would silently disarm it while its own key still read as armed.
+# That is round 1's blocker and round 2's blocker, and this run is the only local witness to it:
+# in the shipped conf both keys hold dates every graded spec clears, so the nesting is invisible.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nREV_SCOPE_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out3r=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'no backticked witness' <<<"$out3r"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
+n=$((n+1))
+grep -qF 'tFixture-90.md (revision entries naming no' <<<"$out3r" \
+  || { echo "FAIL: the rev-scope arm went silent when the UNRELATED SPEC_WITNESS_CUTOFF was blanked"; st=1; }
+# TOOL-aJoinedCanon-3 AC11 — the same INDEPENDENCE property for the scope-join arm, which needs its
+# own witness because it is a DIFFERENT block: it sits outside the wcut guard and reads only jcut.
+# It is also the regression net for TOOL-aJoinedCanon-4's hoist one order step later, since it reds
+# if any restructuring of the neighbouring block draws this branch back inside a guard.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSCOPE_JOIN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out3j=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'no backticked witness' <<<"$out3j"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
+n=$((n+1))
+grep -qF 'tFixture-110.md (scope items naming neither' <<<"$out3j" || { echo "FAIL: the scope-join arm went silent when the UNRELATED SPEC_WITNESS_CUTOFF was blanked"; st=1; }
+
+# TOOL-aJoinedCanon-4 AC7 — the HOIST, observed. This conf arms SPEC_FAILURE_MODE_CUTOFF and NO
+# other check-12 rule cutoff: no SPEC_WITNESS_CUTOFF, no SCOPE_JOIN_CUTOFF, no REV_SCOPE_CUTOFF.
+# The break it stages is the accumulator left nested inside the witness guard, where this arm's real
+# population is the intersection of two cutoffs. The shipped example conf ships the witness key
+# blank, so THIS is the adopter's ordinary state and the one the repo corpus can never exercise.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSPEC_FAILURE_MODE_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out3f=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'no backticked witness' <<<"$out3f"; then echo "FAIL: the witness requirement fired with a blank SPEC_WITNESS_CUTOFF"; st=1; fi
+n=$((n+1))
+grep -qF 'tFixture-125.md (acceptance bullets naming no failure mode' <<<"$out3f" || { echo "FAIL: the failure-mode arm went silent with only its OWN key armed — the accumulator is still nested in the witness guard"; st=1; }
+
+# ---- TOOL-aJoinedCanon-6: the three conf-shaped observations its arms owe. Each writes a conf, runs
+# ---- the engine over the SAME fixture tree, and reads one arm against the other.
+# AC5 — LEDGER_LABEL_CUTOFF set PAST the fixture spec's filename date: the orphan label stops being
+# reported, and the rest of check 23's verdict on that tree is unchanged (140/AC1 stays silent, and
+# the criterion-not-evidenced arm still reports 70/AC2).
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nLEDGER_LABEL_CUTOFF="2026-09-30"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out6a=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'ARCH-tFixture-140/AC9' <<<"$out6a"; then echo "FAIL: the orphan-label arm fired with LEDGER_LABEL_CUTOFF past the spec date"; st=1; fi
+n=$((n+1))
+grep -qF 'ARCH-tFixture-70/AC2' <<<"$out6a" || { echo "FAIL: raising LEDGER_LABEL_CUTOFF changed check 23's other verdicts"; st=1; }
+# AC6 — one new key BLANK, the other ARMED. The blanked arm's own red fixture goes green while the
+# armed arm's still reds. This is the only exercise of each `!= ""` conjunct, and it cannot be done
+# over the real tree: with both cutoffs ahead of the fleet a whole-tree run is green either way, so
+# a real-tree green cannot fail for the reason this criterion gives.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out6b=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'ARCH-tFixture-140/AC9' <<<"$out6b"; then echo "FAIL: the orphan-label arm fired with LEDGER_LABEL_CUTOFF blank"; st=1; fi
+n=$((n+1))
+grep -qF 'ARCH-tFixture-142/AC1' <<<"$out6b" || { echo "FAIL: blanking LEDGER_LABEL_CUTOFF also disarmed the TOKEN arm — the two share a binding"; st=1; }
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nACCEPTANCE_LEDGER_CUTOFF="2026-08-10"\nACCEPTANCE_LEDGER_GRANDFATHER="ARCH-tFixture-73"\nLEDGER_LABEL_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out6c=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qF 'ARCH-tFixture-142/AC1' <<<"$out6c"; then echo "FAIL: the token arm fired with LEDGER_TOKEN_CUTOFF blank"; st=1; fi
+n=$((n+1))
+grep -qF 'ARCH-tFixture-140/AC9' <<<"$out6c" || { echo "FAIL: blanking LEDGER_TOKEN_CUTOFF also disarmed the LABEL arm — the two share a binding"; st=1; }
+# AC15 — S9's NESTING, observed. Both new keys armed and ACCEPTANCE_LEDGER_CUTOFF BLANK, which is what
+# the shipped example conf gives every adopter: check 23 prints nothing at all and neither arm fires.
+n=$((n+1))
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nLEDGER_LABEL_CUTOFF="2026-08-20"\nLEDGER_TOKEN_CUTOFF="2026-08-20"\n' > .memory-tree.conf
+out6d=$(bash "$SCRIPT" 2>/dev/null)
+if grep -qE 'ARCH-tFixture-140/AC9|ARCH-tFixture-142/AC1' <<<"$out6d"; then echo "FAIL: a ledger-join arm fired with ACCEPTANCE_LEDGER_CUTOFF blank — the arms are not nested in check 23"; st=1; fi
+n=$((n+1))
+if grep -qF 'HYGIENE check 23' <<<"$out6d"; then echo "FAIL: check 23 ran at all with a blank ACCEPTANCE_LEDGER_CUTOFF"; st=1; fi
 printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nSTREAMS_CUTOFF="2026-08-05"\n' > .memory-tree.conf
 
 # ---- the legacy grandfather, BOTH STATES. Silence alone proves nothing here: an unwidened selector
@@ -1271,8 +1715,15 @@ n=$((n+1))
 A=$TMP/scaffolded
 mkdir -p "$A"
 ( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
-  bash "$HERE/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1
+  # READINESS_ROWS is a `required_keys_render` key (TOOL-aJoinedCanon-9), so this stand-in conf
+  # declares it exactly as a real adopter's does — theirs is seeded from .memory-tree.conf.example,
+  # which ships the key. Without it the scaffolder REFUSES rather than rendering a §5 holding one
+  # empty bullet, and that refusal is the reader-table behaviour rather than a fixture accident.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nREADINESS_ROWS="security|risks|testing"\n' > .memory-tree.conf
+  # `&&` to the scaffold, which it was not: the subshell's status came from the commit alone, so a
+  # scaffolder that refused outright still reported "did not complete" as a PASS and the five
+  # registry arms below carried the whole diagnosis. That cost two wrong diagnoses in this build.
+  bash "$HERE/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 &&
   git add -A && git commit -q -m scaffolded --no-verify ) || { echo "FAIL adopt-memory-tree.sh --scaffold did not complete"; st=1; }
 # The retired session machinery: five names under project/ the gate no longer admits, so writing any
 # of them would hand every new adopter a red tree on their first run. The prefix is interpolated
@@ -1304,7 +1755,10 @@ B=$TMP/scaffolded-inside
 mkdir -p "$B/tools"
 cp -r "$HERE" "$B/tools/" 2>/dev/null
 ( cd "$B" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf
+  # Declares READINESS_ROWS for the reason the sibling arm above states: it is a
+  # `required_keys_render` key, and without it the scaffolder refuses before it reaches the ceiling
+  # strip this arm exists to observe.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nREADINESS_ROWS="security|risks|testing"\n' > .memory-tree.conf
   bash "tools/$(basename "$HERE")/adopt-memory-tree.sh" --scaffold >/dev/null 2>&1 ) || true
 _lim="$B/tools/$(basename "$HERE")/build-readme-slot-limits.txt"
 if [ -f "$_lim" ]; then

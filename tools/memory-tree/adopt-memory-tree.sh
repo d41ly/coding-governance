@@ -49,7 +49,19 @@ if [ ! -f "$ROOT/.memory-tree.conf" ]; then
   echo "created .memory-tree.conf from the example — EDIT IT (MEMORY_ROOT, DISCIPLINES, FAMILIES), then re-run." >&2
   exit 1
 fi
+# TOOL-aJoinedCanon-9: PRESET above the conf source, and it is `set -u` safety rather than a
+# default — there is exactly ONE literal row set and it is the conf. Without this line every adopter
+# tree whose .memory-tree.conf predates the key ABORTS on an unbound variable inside render_doc,
+# which is a reader that fails to RUN rather than one that fails.
+READINESS_ROWS="${READINESS_ROWS:-}"
 . "$ROOT/.memory-tree.conf"
+# An armed render with no declared row set would write a §5 holding one empty bullet. There is
+# one literal row set and it is the conf, so a blank here is a misconfiguration to say out loud
+# rather than a default to fall back on.
+if [ -z "$READINESS_ROWS" ]; then
+  echo "adopt-memory-tree: REFUSING — READINESS_ROWS is not declared in .memory-tree.conf, so the §5 checklist would render as one empty bullet. Copy the line from .memory-tree.conf.example and edit it." >&2
+  exit 1
+fi
 M="$MEMORY_ROOT"
 
 # Idempotent converge: a tree already scaffolded by this kit (marker present) is a clean no-op; a
@@ -83,6 +95,14 @@ render_doc() {
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  # TOOL-aJoinedCanon-9: the §5 row set is DECLARED, not written into the skeleton. The transform
+  # sits INSIDE the marked block rather than in the callers, so the parity table already gating this
+  # block covers it too — a per-caller transform would be a second duplication nothing compares,
+  # because gov's live copy is written by the parity test and an adopter's by the adopter, so the
+  # two formatters never meet.
+  local rows=${READINESS_ROWS//|/$'
+'- }
+  out=${out//\{\{READINESS_ROWS\}\}/"- $rows"}
   printf '%s' "$out"
 }
 # <<< render_doc

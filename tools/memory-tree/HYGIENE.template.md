@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.61 -->
+<!-- gov:kit memory-tree@2.68 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -183,6 +183,26 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     Every acceptance bullet must name a witness in backticks once the filename date reaches
     `SPEC_WITNESS_CUTOFF`, on either tier. SHAPE only — that a bullet names something, never
     that the named thing exists.
+    Every numbered acceptance bullet must also name the BREAK that would turn it red, in a clause
+    marked `Red when:`, once the filename date reaches `SPEC_FAILURE_MODE_CUTOFF`, on either tier.
+    The per-bullet walk is shared with the witness arm above and each reads only its own key.
+    A LIVE spec must have the `base` sha in its status header RESOLVE to a real commit once the
+    filename date reaches `BASE_RESOLVE_CUTOFF`, on either tier. TERMINAL specs are excluded, so a
+    spec that goes SPECCED to CLOSED in one commit is never graded at all — a known bypass, named
+    here rather than implied away. Skipped with a stderr line in a shallow clone, where every
+    commit outside the fetch depth answers `missing`.
+    A Tier-2 spec must carry a `### Edges` block in §3 once the filename date reaches
+    `SPEC_EDGES_CUTOFF`: one bullet per edge, `**consumes-from**` or `**hands-off**` plus a
+    backticked sibling id or the bare word `external`, or the single word `none`. The SHAPE arm
+    runs under `--staged`; the reciprocity, order and payload JOINS are held there and announce it.
+    Every §2 scope item must name the acceptance criterion that observes it, or carry `NOT OBSERVED`
+    and a reason, once the filename date reaches `SCOPE_JOIN_CUTOFF`, on either tier — and only for a
+    spec carrying BOTH headings, matched by heading TEXT rather than by ordinal. SHAPE only.
+    Every §9 revision entry numbered rev-2 or higher must name what it MOVED — a `§<n>`, `S<n>` or
+    `AC<n>` token — once the filename date reaches `REV_SCOPE_CUTOFF`, on either tier. Graded per
+    ENTRY with continuation lines folded in, because this corpus wraps §9 and puts the detail in the
+    wrap; rev-1 is exempt, and the engine announces a zero population rather than passing silently
+    while the cutoff sits ahead of the corpus.
 
 13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
     and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so
@@ -292,7 +312,10 @@ carry it too:
 ## Acceptance ledger — how a built unit evidences its criteria
 
 Inside a record whose `**Serves:**` kind is `journal`, which is already defined as evidence of what
-was built. One `**Evidences:**` line per unit, and one line per criterion beneath it:
+was built. Two further arms once the SPEC's filename date reaches `LEDGER_LABEL_CUTOFF` and
+`LEDGER_TOKEN_CUTOFF`: an answer whose criterion label the spec does not number is a finding, and an
+answer must share a backticked token with the criterion it answers, case-folded and either way round.
+Both are branches of the same check, so a blank `ACCEPTANCE_LEDGER_CUTOFF` disarms them too. One `**Evidences:**` line per unit, and one line per criterion beneath it:
 
 ```
 **Evidences:** <id>

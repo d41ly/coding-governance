@@ -114,6 +114,17 @@
     "ceiling": 710
   },
   {
+    "name": "build-method size",
+    "argv": [
+      "bash",
+      "tools/check-template-size.sh",
+      "memory/guides/BUILD-METHOD.md"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "kickoff engine size <=18KiB",
     "argv": [
       "bash",
@@ -571,6 +582,19 @@
     "ceiling": 300
   },
   {
+    "name": "codebase-map gate coverage",
+    "argv": [
+      "python3",
+      "tools/codebase-map/check_gate_coverage.py"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "guard": [
+      "tools/codebase-map/"
+    ],
+    "ceiling": 60
+  },
+  {
     "name": "codebase-map coverage + freshness",
     "argv": [
       "python3",
@@ -719,7 +743,18 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
-    "ceiling": 2400
+    "ceiling": 5400
+  },
+  {
+    "name": "brief-recorded",
+    "argv": [
+      "bash",
+      "tools/unattended/check-brief-recorded.sh"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "guard": [],
+    "ceiling": 900
   },
   {
     "name": "playbook validity gate",

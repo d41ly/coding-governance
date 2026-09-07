@@ -51,7 +51,13 @@ protocol verbatim, and one bullet arrived carrying a sentence the same build the
   malformed is a named refusal, never a fall-back to the older spec-derived listing. It still joins
   the build README's AUTHORED roster pair against the tracked specs, so a planned unit nobody has
   specced is reported as MISSING — that question cannot be answered from a region rendered out of
-  the specs that exist.
+  the specs that exist. A trailing `--paths` swaps the padded table for TAB-separated rows carrying
+  a FOURTH field, the spec path this verb already resolves per unit and otherwise discards, empty
+  for a unit no tracked spec defines; the two `NOT A UNIT` diagnostics are keyed on a filename
+  rather than an id and stay padded in both modes, so a caller splits on TAB and skips any line
+  with fewer than four fields. The `roster:` and `next:` lines are unchanged, which is what makes
+  one `--paths` invocation the resume path's single source for both "which unit is next" and "where
+  is its spec".
 - `--status` — one line: the phase, the first non-terminal unit, and the parked counts.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`.
 - `--close` — evaluates the DoD set, blocks on any unmet item, records any override. The only writer

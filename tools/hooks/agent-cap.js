@@ -60,7 +60,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.12' // gov:kit agent-cap@1.12 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.13' // gov:kit agent-cap@1.13 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -1433,6 +1433,26 @@ function capFindings(script) {
 // from any other agent, because keying on "is this a verify agent" needs a session-to-build binding
 // no payload field provides — and the concurrency rule binds every fan-out to the same number
 // anyway, so a uniform cap needs no such binding.
+//
+// THE SLOT LEDGER AND THE SCRIPT RULES ARE MUTUALLY EXCLUSIVE BY DESIGN, and this paragraph is here
+// for whoever next reaches for "why not count `Workflow` calls too". Rules 1-3 read a script and
+// bound the fan-out INSIDE it; the slot ledger counts `Agent` payloads and bounds the fan-out made
+// without a script. Neither wants the other's population. A build harness that dispatches one
+// `Workflow` call per roster unit from a single prompt issues many calls that are each a bounded,
+// single-agent act, and extending the ledger over them would spend a per-prompt budget written for a
+// BURST of verifiers on a SEQUENCE of unit passes — denying such a build partway through its own
+// roster, a refusal with no fan-out behind it.
+//
+// AND THE REASON IS THE LEDGER'S OWN NATURE, stated fifteen lines above and easy to get backwards:
+// this budget is LIFETIME-PER-PROMPT, so it is the TOTAL and never the concurrency bound. A total is
+// exactly the wrong instrument for a dispatch sequence, because the dispatch count is a function of
+// the ROSTER SIZE — the shape that has no budget in it at all — while a verify fan-out's total is
+// what the charter fixes. Two rules, not one; the script rules bound concurrency inside a script and
+// this bounds the total outside one, and only the `Agent` matcher can tell the two populations apart
+// from the payload alone.
+//
+// NO ROSTER SIZE IS STATED HERE, deliberately. A distribution restated in a hook comment rots on the
+// next build, and this file may not name the harness whose shape would settle it.
 const AGENT_TTL_MS = 12 * 60 * 60 * 1000
 // A SLOT expires too, and that is a different clock from the turn-directory sweep above.
 //

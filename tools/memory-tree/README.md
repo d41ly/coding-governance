@@ -38,6 +38,14 @@ Copy `.memory-tree.conf.example` to your repo root as `.memory-tree.conf` and ed
 - `TOMBSTONE_ROOTS` — set to the old tree you migrated FROM (e.g. `docs`) so it can't resurrect; blank otherwise.
 - `SPEC_FORMAT_CUTOFF` — the date you adopt the kit; specs dated ≥ it must follow `TEMPLATE-SPEC.md` (check 12). Blank disables the check; older specs are grandfathered by filename date either way.
 - `SPEC10_EVIDENCE_CUTOFF` — a Tier-2 spec dated ≥ it must RECORD its reuse audit in §10: the recall terms used, AND the probe result (a `reuse_lookup` citation, an explicit "no existing seam fits", or a named `reuse-first` waiver). Blank disables it. Without it check 12 grades §10 on presence and non-emptiness alone, so `N/A — none` is a passing reuse audit and BUILD-METHOD M7's regrounding step 5 has no terms to re-run — measured on this kit's own corpus, a majority of specs recorded none. **Set it strictly ahead of every dated spec on every LIVE BRANCH, not just your own**: a cutoff on today's date reds this leg on the default branch for every in-flight branch carrying a spec dated today. What it does NOT check is whether either fact is true; that needs something watching the probes actually run.
+- `READINESS_ROWS` — the §5 production-readiness row LABELS, in skeleton order, `|`-separated. This
+  is the ONLY literal row set: the spec template renders it through `{{READINESS_ROWS}}` and no
+  script carries a default copy. **IT IS YOURS TO CHANGE** — edit that one string and re-render, and
+  nothing requires reading the checker. The example ships ten; this kit's own repo declares eight,
+  having dropped `a11y` and `i18n` because it ships no user interface. Keep it on ONE line.
+- `READINESS_ROWS_CUTOFF` — the date from which a Tier-2 spec dated ≥ it must carry every declared
+  row in its §5 body (check 12). Blank disables it. An armed cutoff with an empty `READINESS_ROWS`
+  is a REFUSAL rather than a silent pass, because that combination grades no row at all.
 
 Disciplines are yours to name. A SWEBOK v4 mapping is a reasonable default lens (Software Architecture,
 Construction, Testing, Security, Operations, …), but product streams (as inCMS uses) work equally well —

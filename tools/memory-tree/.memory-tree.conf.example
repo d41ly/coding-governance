@@ -54,6 +54,81 @@ SPEC10_CUTOFF="2026-08-04"
 # red and green fixtures for both.
 SPEC10_EVIDENCE_CUTOFF=""
 
+# Rev-scope ratchet (check 12): from this date, a §9 revision entry numbered rev-2 or higher must
+# name what it MOVED — at least one `§<n>`, `S<n>` or `AC<n>` token anywhere in the entry, with
+# continuation lines folded in. rev-1 is exempt, because a first draft moved everything. Blank =
+# never required. Set it STRICTLY AHEAD of every dated spec on every live branch AND ahead of a date
+# your fleet can still write into, as with the cutoffs above; your corpus then exercises neither arm,
+# which is why the kit self-test carries red and green fixtures for both. The engine prints a
+# zero-population notice while that is true, so the silence is announced rather than assumed.
+REV_SCOPE_CUTOFF=""
+
+# Scope-join ratchet (check 12): from this date, every column-0 item in a spec's `## N. Scope (IN)`
+# must name at least one acceptance criterion — `AC` followed by digits — or carry the marker
+# `NOT OBSERVED` and the reason none observes it. One escape spelling and no synonyms, because a
+# false red names its own remedy while a false pass is silent. The arm needs BOTH the Scope and the
+# Acceptance heading present, matched by heading TEXT rather than by ordinal, so a Tier-1 spec that
+# legitimately writes no acceptance section is untouched. Blank = never required. Set it STRICTLY
+# AHEAD of every dated spec on every live branch, as with the cutoffs above; the engine prints a
+# zero-population notice for as long as that leaves the arm grading nothing.
+SCOPE_JOIN_CUTOFF=""
+
+# Failure-mode ratchet (check 12): from this date, every numbered acceptance bullet must name the
+# break that would turn it red, in a clause marked `Red when:`, matched case-insensitively as a
+# substring so it may sit on a continuation line. No `N/A` and no second form. It reads THIS key and
+# no other — the per-bullet walk it rides is hoisted out of the acceptance-witness guard, so arming
+# this key while SPEC_WITNESS_CUTOFF stays blank gives you a live arm rather than a silent one.
+# Blank = never required; set it strictly ahead of your corpus as with the cutoffs above.
+SPEC_FAILURE_MODE_CUTOFF=""
+
+# Two BRANCHES of check 23 (the acceptance ledger), never independent checks: a blank
+# ACCEPTANCE_LEDGER_CUTOFF disarms both whatever these say. LEDGER_LABEL_CUTOFF walks the LEDGER
+# side and reds an answer whose criterion label the spec does not number — every other arm walks the
+# spec side, so that direction was unwatched. LEDGER_TOKEN_CUTOFF requires an answer to share a
+# backticked token with the criterion it answers, so the two are joined by content rather than by
+# label alone. Case-folded containment either way, and an empty list on either side is silent.
+# Blank = off for each; set them strictly ahead of your corpus as with the cutoffs above.
+LEDGER_LABEL_CUTOFF=""
+# Its own block, not a shared one: the contiguous comment lines directly above a key row are what
+# a reader and the gate both take as that key's documentation. Same rule — a BRANCH of check 23,
+# so a blank ACCEPTANCE_LEDGER_CUTOFF disarms it whatever this key says.
+LEDGER_TOKEN_CUTOFF=""
+
+# Sibling-edge ratchet (check 12): from this date a Tier-2 spec carries a `### Edges` sub-head inside
+# §3, holding one bullet per edge or the single word `none` — `**consumes-from**` or `**hands-off**`,
+# then a backticked sibling unit id or the bare word `external`. The SHAPE arm reads one spec and
+# runs under `--staged` too; the reciprocity, order and payload JOINS are held there and say so,
+# because the staged selection would report one end of a correct pair as missing. A join whose target
+# is outside the graded population is silent by design, not passing. Blank = never required; set it
+# strictly ahead of your corpus as with the cutoffs above.
+SPEC_EDGES_CUTOFF=""
+
+# The §5 production-readiness row LABELS, in skeleton order, `|`-separated. This is the ONLY literal
+# row set — the spec template renders it through `{{READINESS_ROWS}}` and no script carries a default
+# copy. IT IS YOURS TO CHANGE: edit this one string and re-run the render. The ten below are a
+# starting point, not a rule; gov's own conf declares eight, having dropped `a11y` and `i18n` because
+# it ships no user interface. Keep it on ONE line — a wrapped value reaches the retrieval corpus by
+# its first row only.
+READINESS_ROWS="security|perf / scale|a11y|i18n|error / empty / loading states|observability|risks|testing|migration|user docs"
+# The date from which check 12 requires every declared row to appear in a Tier-2 spec's §5 body.
+# Blank = never required; set it strictly ahead of your corpus as with the cutoffs above.
+READINESS_ROWS_CUTOFF=""
+
+# Base-resolve ratchet (check 12): from this date a LIVE spec must have the `base` sha in its status
+# header resolve to a real commit here. Both tiers — `base` is a field both carry. Terminal specs are
+# excluded, because a landed record is frozen. Every distinct sha goes through ONE
+# `git cat-file --batch-check`, and the arm SKIPS itself with a stderr line in a shallow clone, where
+# every commit outside the fetch depth answers `missing` and it could only red honest work. Blank =
+# never required; set it strictly ahead of your corpus as with the cutoffs above.
+BASE_RESOLVE_CUTOFF=""
+
+# Section-7 leg-line ratchet, read by the spec-tokens checker rather than by the hygiene engine:
+# from this date a LIVE spec that CARRIES a `## N. Gates` heading must contribute at least one leg
+# name your gate manifest resolves. A spec with no Gates heading is silent, which is the whole Tier-1
+# accommodation. Blank = never required. Declared here because a key that reaches only the shipping
+# repo's conf leaves an adopter a dead arm reading as armed.
+SPEC_LEGLINE_CUTOFF=""
+
 # Fork-mark ratchet (check 12): at or after this date, a spec whose §8 Open questions carries any
 # item must mark the SECTION with the documented resolution shape before its status may go terminal.
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.

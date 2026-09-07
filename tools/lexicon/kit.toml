@@ -17,13 +17,13 @@ version_from = { file = "lexicon.py", pattern = "^KIT_LEXICON_VERSION = " }
 include = "**"
 role = "engine"
 
-# The three waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a
+# The waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a
 # fresh install has somewhere to record its first deliberate exception, but their CONTENT is
 # per-repo and must never be overwritten by an upgrade — a waiver list copied from a larger tree is
 # the same defect as a pin copied from one. `seed` is the role that expresses "copied ONCE, then the
 # target owns it"; `project-owned` alone would still be written on every apply.
 [[files]]
-include = ["lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt", "lexicon-layer-waivers.txt"]
+include = ["lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt"]
 role = "seed"
 to = "{kit}/{relpath}"
 
@@ -35,7 +35,7 @@ to = "{kit}/{relpath}"
 include = ["SKILL.template.md"]
 role = "rendered"
 to = ".claude/skills/lexicon/SKILL.md"
-placeholders = ["VERBS_TABLE", "SUGGEST_CLI", "BRIEF_CLI", "GATE_CLI", "CONF", "KIT_VERSION"]
+placeholders = ["VERBS_TABLE", "SUGGEST_CLI", "GATE_CLI", "CONF", "KIT_VERSION"]
 
 [config]
 file = ".lexicon.conf"
@@ -60,9 +60,15 @@ means = "adopted"
 # The conf itself is deliberately NOT a guard pathspec. govkit partitions every guard into declared
 # classes — memory-root-relative, verbatim-repo-root, renamed, exempt, kit-relative — and a root-level
 # conf falls into none of them, so declaring one reds `selfcheck` rather than scoping anything.
-# Widening that taxonomy is a change to a different kit's contract. The cost of the narrower guard is
-# an early signal on a conf-only diff, never a merge verdict: the pre-push hook sets GATE_FULL=1,
-# which bypasses every guard, so the authoritative run stays total.
+# Widening that taxonomy is a change to a different kit's contract.
+#
+# SO THIS LEG IS THE EARLY SIGNAL AND NOT THE AUTHORITY, which is a correction to what this comment
+# used to claim. It said the cost was "an early signal on a conf-only diff, never a merge verdict"
+# because the pre-push hook bypasses every guard — but that force is bounded now (GATE_FULL_MAX_LAG),
+# so a scoped push inside the lag landed a raised pin with NO verdict computed. Closing review B1.
+# The grade moved onto `lexicon wiring` below, which carries an empty guard and already read the
+# declaration; the leg here keeps its guard and keeps saying the same thing sooner, under its own
+# name in the leg log.
 [[gate_leg]]
 name = "lexicon naming predicates"
 subject = "repo"
@@ -85,6 +91,13 @@ guard = ["{kit}/"]
 # guarded copy could never say anything the unguarded copy had not already said. Found by the closing
 # review; the map's gate-legs inventory had also gained an unclaimed key for the redundant leg, which
 # disappeared with it.
+#
+# AND SINCE CLOSING REVIEW B1 THIS LEG ALSO GRADES THE CORPUS, by running `{kit}/lexicon.py` from
+# `--check`. That is deliberately the same engine the guarded leg above runs, and it does NOT
+# re-earn the two-legs defect: what was struck there were two legs with one argv and different
+# guards, where neither could ever out-say the other. Here the unguarded copy is the merge verdict
+# and the guarded one is the fast fail on a `tools/` diff. Cost is one corpus walk, recorded per leg
+# in `<git-dir>/gate-ledger.tsv`.
 [[gate_leg]]
 name = "lexicon wiring"
 subject = "repo"
@@ -100,19 +113,11 @@ why = "`--scaffold` takes each verb's SPELLING from the kit's frozen canon and a
 discharge = { command = ["bash", "{kit}/adopt-lexicon.sh", "--check"] }
 
 [[hole]]
-id = "lexicon-layers"
-kind = "authoring"
-blocks_adopt = false
-blocks_gate = true
-why = "LAYERS ships EMPTY because a frequency count cannot observe intended architecture, so there is no derived proposal for P3. An empty declaration makes the engine report NOT ARMED and red rather than green: an unarmed predicate that exits 0 is indistinguishable from a satisfied one, and this is the hole where that distinction is bought."
-discharge = { command = ["python", "{kit}/lexicon.py"] }
-
-[[hole]]
 id = "lexicon-pins"
 kind = "measurement"
 blocks_adopt = false
 blocks_gate = true
-why = "The three offender pins are MEASURED against the adopting corpus at scaffold and are shrink-only. A pin copied from a larger tree is either vacuous or permanently red, which `.memory-tree.conf` states in its own words. The probe is the gate itself: an unmeasured pin set fails it."
+why = "The offender pins are MEASURED against the adopting corpus at scaffold and are a TWO-SIDED equality thereafter: a rise reds and so does an unrecorded drain. A pin copied from a larger tree is either vacuous or permanently red, which `.memory-tree.conf` states in its own words. The probe is the gate itself: an unmeasured pin set fails it."
 discharge = { command = ["python", "{kit}/lexicon.py"] }
 
 [[lf_pin]]

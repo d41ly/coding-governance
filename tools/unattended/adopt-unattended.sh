@@ -108,6 +108,14 @@ case "$KIT_REL" in
     exit 2 ;;
 esac
 
+# THE TOOL ROOT, derived exactly as `adopt-memory-tree.sh` derives it, and for the same reason: the
+# Skill names the harness scripts, which live BESIDE this kit rather than inside it. Spelled as a
+# literal they were `tools/workflows/…` in every render, which resolves to nothing in a root install
+# and disagreed with the build-method carrier that already spelled the same two paths through this
+# placeholder. Two carriers, one route, two answers. Closing-review F6.
+TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
+[ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
+
 TEMPLATE="$KIT_DIR/SKILL.template.md"
 [ -f "$TEMPLATE" ] || { echo "unattended: SKILL.template.md is missing from the kit at $KIT_DIR"; exit 1; }
 
@@ -230,6 +238,7 @@ render() { # [template] -> stdout; LF only (the render is pinned eol=lf in .gita
   out=${out%X}
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
+  out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
   out=${out//\{\{MEMORY_ROOT\}\}/"$MEMORY_ROOT"}
   out=${out//\{\{LANDER\}\}/"$LANDER"}
   out=${out//\{\{KEEPALIVE_CREATE\}\}/"$KEEPALIVE_CREATE"}

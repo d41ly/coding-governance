@@ -1320,12 +1320,19 @@ def test_version_marker():
     return f"{len(hits)} marker(s) == {v}"
 
 
-@check("bench.py and union.py are byte-identical to the upstream copies they were taken from")
+@check("union.py is byte-identical upstream; bench.py matches its recorded digest (one delta)")
 def test_verbatim_files():
     """Not a diff against upstream (no adopter has that repo) — a diff against the recorded digest.
 
-    These two carry no coupling on the query path, so they are re-pulled WHOLESALE on an upstream
-    fix rather than merged. An edit here means somebody forked them without saying so.
+    `union.py` carries no coupling on the query path, so it is re-pulled WHOLESALE on an upstream
+    fix rather than merged. An unexplained edit there means somebody forked it without saying so.
+
+    **`bench.py` IS forked, by one hunk.** `TOOL-dTracedLattice-7` made `run_rm3`'s expansion-term
+    selection independent of `PYTHONHASHSEED`; the file's own header says so. So a red here on
+    `bench.py` does NOT mean "re-pull it wholesale" — that would revert the fix and this pin would
+    then go GREEN over the revert. It means the digest and the file disagree: re-read the header,
+    keep the delta, and re-stamp. This label used to instruct the wholesale re-pull, and it is the
+    line an operator reads at the exact moment the pin reds.
     """
     pins = json.loads((KIT / "verbatim.json").read_text(encoding="utf-8"))
     bad = []

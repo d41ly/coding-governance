@@ -467,6 +467,7 @@ where this document says it may:
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
 | `PASS_ORDER_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT predates a conforming spec reds the `pass-order history` leg. Graded on the README's `opened:` date. BLANK turns the term OFF and the leg announces it |
+| `BRIEF_RECORDED_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT carries no usable `brief · item <id>` row reds the `brief-recorded` leg — usable meaning the LAST such row's twelve-hex hash still joins to a tracked file at that same commit. Graded on the README's `opened:` date. The anchor is the build commit and NOT its first parent, unlike the sibling above: `--brief` STAGES its row, so the row lands in the same commit as the pass, and a first-parent anchor would red the CONFORMING runs. The two terms are jointly satisfiable — a spec in an earlier commit, the brief row alongside the code. BLANK turns the term OFF and the leg announces it |
 | `SPEC_THIN_CUTOFF` | the date from which a CLOSED unit whose spec grades THIN — an empty scope, acceptance or gates section — blocks `build-complete`. Graded on the spec's FILENAME date, so no landed spec goes retroactively red. BLANK or absent turns the term OFF and `--close` announces that it did |
 | `UNITS_REGION_CUTOFF` | the date at which an absent units-region marker pair becomes a REFUSAL rather than an opt-out |
 | `RECALL_CLI` | the repo-relative path to the retrieval CLI whose query log `reuse-probed` reads. OPTIONAL: blank or absent means the recall kit is not adopted, and the item then reports an ANNOUNCED SKIP rather than an unmeetable UNMET, so a project that took this kit and not that one is not wedged by a core item it can never satisfy. A DECLARATION rather than a path in the driver, because a kit literal in shipped bytes resolves to nothing in a tree installed at another prefix — the carried-prefix ratchet reds on exactly that |
@@ -520,6 +521,13 @@ ordinary tools this kit calls. A run that skips the hook layer, by `--no-verify`
 an endpoint it seeded, which satisfies every URL comparison with one URL and one config source. A
 run that simply never creates a run-state file, since every leg check iterates over the tracked ones.
 And a run that gets one push past all of that, after which the remote's advertisement is genuine.
+And a run that rewrites the harness child's prompt between dispatches, which the fan-out guard's
+re-read does not reach: it feeds the burst rules and the join rule and nothing else, so a second
+`agent()` carrying any prompt admits. And a run that never calls `--dispatch` or `--brief` at all,
+since both are acts a run performs rather than gates a run meets, and the history legs that grade
+them afterwards grade only what a CLOSED unit's build commit carries. And a run that stops early
+with units unbuilt, since completeness rests on `build-complete` at `--close` alone and its escape
+is a recorded `--override`.
 
 **What actually binds.** None of those levers travels with a push. The same leg, re-run in a clone
 the run never touched by a party the run cannot execute code as — a required status check, or a
@@ -634,13 +642,20 @@ is a different reader. The failure is what you would predict: a unit built befor
 spec written afterwards, and no record of what the builder was handed.
 
 **The route is the kit's build harness**, taken in `prompt` and `slug` mode. It drives SPEC, AUDIT
-and BUILD as stages of ONE program, so BUILD is unreachable except through both and on a TERMINAL
-`--review` verdict. Recipe mode does not take it: its pieces are not specs.
+and DISPOSAL as stages of ONE program, and hands out the ordered roster only on a TERMINAL
+`--review` verdict. What the program holds is that the ROSTER IS NOT HANDED OUT EARLY — not that the
+build is unreachable early, which it never was: a run that ignores the roster can still build, and
+nothing inside a Workflow script can stop it. Recipe mode does not take it: its pieces are not specs.
 
 **TWO LIMITS, as rules rather than caveats, because a reader who assumes them away trusts the harness
 for what it cannot do.** It buys ORDER and never ENFORCEMENT — a Workflow script has no filesystem,
 so every observation it makes is a claim its own agent returned, and what refuses is `--dispatch` at
-the moment of the act and the pass-order leg over the commit graph. And it does not cover
+the moment of the act — on a MISSING or a THIN unit, and on no other state of a unit — and
+the pass-order leg over the commit graph afterwards, which refuses spec-after-code for CLOSED units.
+Enforced TWICE because the first half is bypassable by simply not calling the verb, and only the
+commit graph remembers the order. Those two states are the whole of what the verb inspects, and it
+accepts a second declaration for a unit it has already seen, so nothing there backstops the loop.
+And it does not cover
 orientation, preflight, the owner turn, closing, landing or the keepalive: those are main-loop acts,
 and the run-state file joins the two halves.
 

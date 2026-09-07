@@ -17,3 +17,5 @@ tools/unattended/PROTOCOL.template.md · §10 names the build method as the carr
 tools/drift-audit/drift_signals.py · TRACE_CUTOFF cites the commit that landed the method, because that commit is what dates the commit-subject convention this signal judges
 tools/gate-legs.json · a GUARD pathspec names the method file, because the kit/dogfood parity leg validates it — a path the leg reads, never a restatement of what the method says
 tools/workflows/unattended-build.js · the build harness POINTS at the method: its stage prompts tell each agent to read BUILD-METHOD.md whole before acting, and its BUILD prompt cites M4's two dispositions by name rather than restating either. It states no rule the method does not.
+tools/template-size-limits.txt · the DECLARED byte ceiling for the rendered method, and the identity of the leg that reads it — a row keyed by the file, never a restatement of what the method says
+tools/template-size-highwater.txt · the MEASURED high-water for the rendered method, written by --bump and never by hand — a measurement of the file, never a restatement of it

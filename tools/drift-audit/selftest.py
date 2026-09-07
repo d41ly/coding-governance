@@ -734,8 +734,8 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     conf = r / ".lexicon.conf"
     conf.write_text(
         'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
-        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
-        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n\nLAYERS:\n  src/* -> vendor/*\n',
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n',
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
@@ -785,6 +785,60 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     check("...and the signal is LIVE by derivation, not a hardcoded True",
           stale["live"] is True, f"{stale}")
 
+    # THE PATTERNS RESOLUTION, ARMED, and nothing armed it before. Both lexicon signals read
+    # `lex.PATTERN_SETS` — the SHIPPED constant — and skipped any extension whose pattern set was not
+    # in it, so a language armed only through a `PATTERNS:` row was passed over file by file while
+    # the signal reported a confident number with `live` still true off the Python half. That is
+    # green-by-absence on a gateable signal. Reverting `_resolve_lexicon_sets` back to the constant
+    # left this whole suite green, which is the defect this arm exists to make impossible.
+    #
+    # `vanish` is declared above and used by nothing. Its ONLY definition site now lives in a
+    # language reachable only through the declaration, so the signal falls to 0 exactly when the
+    # resolution is read and stays at 1 when it is not.
+    (r / "web").mkdir()
+    (r / "web" / "widget.ts").write_text("export function vanishThing() {}\n",
+                                         encoding="utf-8", newline="\n")
+    conf.write_text(
+        conf.read_text(encoding="utf-8").replace(
+            'LANGS="py:python-ast:parser js:js-regex:probe"',
+            'LANGS="py:python-ast:parser js:js-regex:probe ts:ts-regex:probe"')
+        + "\nPATTERNS:\n"
+        + r"  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)" + "\n",
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "arm a language through PATTERNS alone", "--no-verify"], r)
+    armed = report(r)["lexicon_verbs_declared_but_unused"]
+    check("a language armed ONLY by a PATTERNS row is read: the verb it defines stops being unused",
+          armed["value"] == 0, f"{armed}")
+    check("...and the signal stays LIVE over that widened population", armed["live"] is True,
+          f"{armed}")
+
+    # H1 OF THE CLOSING REVIEW — AN UNSHIPPED `parser` ID MUST NOT TAKE THE WHOLE REPORT DOWN.
+    #
+    # `_build_armed_exts` dropped `dark` rows and unknown-`probe` rows and KEPT a `parser` row whose
+    # pattern-set id the kit does not ship, so `extract_text` reached `PARSERS[pset]` and raised
+    # `KeyError`. Neither `except` tuple downstream covered it and `main()` evaluates every signal
+    # unguarded, so ONE legal-looking `LANGS` row cost all eight signals and printed a traceback —
+    # on a leg that carries no guard and runs on every bar. The engine's own `scan_corpus` refuses
+    # the same row by name, so the two readers of one declaration disagreed; `_load_lexicon`'s
+    # docstring promises "never a raise and never a red" for exactly this class.
+    #
+    # A TYPO IS THE WHOLE POPULATION. Nothing validates the id upstream — `langs()` checks the MODE
+    # token, `check_declaration` checks the CELLS/PINS cross-references — so an adopter is one
+    # mistyped set id away from a dead report.
+    conf.write_text(conf.read_text(encoding="utf-8")
+                    .replace("py:python-ast:parser", "py:bogus-parser:parser"),
+                    encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "a parser id the kit does not ship", "--no-verify"], r)
+    _raw = run([sys.executable, "drift-audit/drift_report.py", "--json"], r)
+    check("H1: an unshipped `parser` pattern-set id does not raise out of the report",
+          "Traceback" not in _raw.stderr and "KeyError" not in _raw.stderr,
+          _raw.stderr.strip()[-400:])
+    check("H1: ...and the report still returns every signal rather than none",
+          _raw.returncode == 0 and _raw.stdout.strip().startswith("["),
+          f"rc={_raw.returncode} {_raw.stdout.strip()[:200]}")
+
 
 def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     """The marginal-offense-rate signal: four states, and each one must be distinguishable.
@@ -814,8 +868,8 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (r / ".lexicon.conf").write_text(
         'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
-        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\nLAYER_OFFENDER_PIN="0"\n'
-        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n\nLAYERS:\n  src/* -> vendor/*\n',
+        'VERB_OFFENDER_PIN="99"\nSUFFIX_OFFENDER_PIN="0"\n'
+        'ratified="2999-01-01 node t"\n\nVERBS:\n  build  make a thing\n',
         encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], r)
@@ -873,6 +927,40 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     check("...and the population grew by the CONTROL alone, so the ungradeable name left both operands",
           after["of"] == before["of"] + 1, f"before={before['of']} after={after['of']}")
 
+    # THE SECOND RESOLUTION SITE. It was ungated until a re-verification pass reverted it ALONE and
+    # watched both suites stay green. `build_lexicon_marginal_offense_rate` reads the resolved pattern
+    # sets in three places -- the armed-extension set and both per-sha reads -- and the arm covering
+    # the OTHER lexicon signal reaches none of them. Two call sites and one arm between them is the
+    # same green-by-absence shape that sibling arm exists to abolish, one signal over.
+    #
+    # THE POPULATION IS THE OPERAND THAT MOVES. A language armed only through a `PATTERNS:` row is
+    # invisible to the shipped constant, so its definitions never enter `of`. One gradeable definition
+    # in that language must raise `of` by exactly one; with the resolution dropped it raises it by
+    # nothing and the signal reports a confident rate over the Python half alone. Asserting `value`
+    # holds STILL is the other half: a population that grew while the rate moved would mean the added
+    # name was graded off-table, which would make this arm pass for the wrong reason.
+    (r / "web").mkdir()
+    (r / "web" / "panel.ts").write_text(
+        "export function buildPanel() {}" + chr(10), encoding="utf-8", newline=chr(10))
+    ts_regex = r"  ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)"
+    conf_p = r / ".lexicon.conf"
+    conf_p.write_text(
+        conf_p.read_text(encoding="utf-8").replace(
+            'LANGS="py:python-ast:parser"', 'LANGS="py:python-ast:parser ts:ts-regex:probe"')
+        + chr(10) + "PATTERNS:" + chr(10) + ts_regex + chr(10),
+        encoding="utf-8", newline=chr(10))
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "arm a second language through PATTERNS alone", "--no-verify"], r)
+    widened = report(r)[name]
+    check("the marginal rate READS a language armed only by a PATTERNS row: its population grows",
+          widened["of"] == after["of"] + 1,
+          f"of before={after['of']} after={widened['of']} -- a population that did not grow means "
+          "build_lexicon_marginal_offense_rate never resolved the declared pattern sets")
+    check("...and the rate itself did not move, so the population grew by an ON-TABLE name",
+          widened["value"] == after["value"],
+          f"value before={after['value']} after={widened['value']}")
+
+
     # ...and a window in which EVERY added definition is ungradeable must say so rather than read as
     # a clean measured window. The round-1 L4 fix pointed every operand at `gradeable` and left the
     # emptiness guard reading `added`, so that window returned value 0, of 0, live True and no
@@ -889,9 +977,8 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     (b / ".lexicon.conf").write_text(
         'BANNED_SUFFIXES="Manager"' + chr(10) + 'LANGS="py:python-ast:parser"' + chr(10)
         + 'VERB_OFFENDER_PIN="99"' + chr(10) + 'SUFFIX_OFFENDER_PIN="0"' + chr(10)
-        + 'LAYER_OFFENDER_PIN="0"' + chr(10) + 'ratified="2999-01-01 node t"' + chr(10) + chr(10)
-        + "VERBS:" + chr(10) + "  build  make a thing" + chr(10) + chr(10)
-        + "LAYERS:" + chr(10) + "  src/* -> vendor/*" + chr(10),
+        + 'ratified="2999-01-01 node t"' + chr(10) + chr(10)
+        + "VERBS:" + chr(10) + "  build  make a thing" + chr(10),
         encoding="utf-8", newline=chr(10))
     run(["git", "add", "-A"], b)
     run(["git", "commit", "-q", "-m", "adopt the lexicon", "--no-verify"], b)

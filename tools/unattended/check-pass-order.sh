@@ -98,8 +98,11 @@ while IFS= read -r -d '' _ck; do
   case "$_ck" in
     __CONF_IMPORT_OK__) _conf_ok=1 ;;
     # AN ALLOW-LIST, NOT A GLOB, and this is where the spliced block had to be adapted rather than
-    # copied. The sibling assigns EVERY uppercase key it sees, which is safe THERE because that
-    # script sets nothing it cares about above the import. This one sets DRIVER at :51 — the path it
+    # copied. `check-unattended.sh` CARRIED the same open glob and had to stop for the same reason:
+    # it sets HERE, DRIVER, CONF and SCOPE above its own import, and two exploits were reproduced
+    # through exactly that gap before it took a declared key list of its own. Both legs now carry
+    # one. The sentence here used to say the glob was safe THERE, which described neither the code
+    # nor the risk and is the reasoning that produced the hole. This one sets DRIVER at :51 — the path it
     # eval's the classifier out of — so one tracked conf line `DRIVER="tools/unattended/evil.sh"`
     # made the leg eval an attacker-chosen file and exit 0 with its own FAILED line printed.
     # Reproduced end to end before this line existed. Only the keys this leg DECLARES are assignable,
@@ -214,6 +217,41 @@ esac
   exit 2
 }
 
+# ------------------------------------------------------------------- THE SUBJECT CACHE
+# ONE PASS OVER HISTORY, then no process inside any per-commit loop. This is a performance change
+# with no verdict in it, and it is written here rather than left to be rediscovered because the
+# shape it replaces cost 10184 s — 2.8 hours — against a declared ceiling this leg had already been
+# re-declared once to clear, which reds the whole bar on COST while passing on CONTENT.
+# `_find_build_commit` ran TWO processes per commit walked: `git log -1 --format=%s` for the subject
+# and a `printf | tr` subshell to tokenise it. Each unit walks its own `base..HEAD` window and, when
+# that finds nothing, a capped pre-anchor window, so the spawn count is the walked depth times the
+# graded population — and BOTH of those only grow. Measured on node `a`, 2026-09-06: that pair of
+# spawns costs 751 ms per commit walked under this Cygwin bash, which is the whole leg. The git work
+# itself was always trivial; the SPAWNS were the leg. Do not read a commit COUNT out of this
+# paragraph — the walk short-circuits at the first build commit, so the depth is not the range size.
+#
+# THE TOKENISATION IS DONE HERE, BY THE SAME `tr` SET, so the cached value is byte-identical to what
+# the per-commit substitution produced — including its leading and trailing space, which is what the
+# `*" $id "*` membership test needs on both sides. `tr` is per-character, so one invocation over the
+# whole stream and one per subject cannot differ. `\n` joins the preserved set (a subject never
+# contains one, but the stream's line structure must survive) and the literal `-` moves to the END of
+# the set, because `9-\n` would parse as a reversed range rather than as two members.
+#
+# THE COUNT IS ASSERTED, not assumed. A read loop that truncates leaves a cache that answers "no such
+# commit" for every id, every unit grades unbuilt-in-range, and the leg exits 0 — a silent green of
+# exactly the shape this file's own liveness doctrine exists to refuse. Equality is exact because
+# shas are unique, so this cannot pass on a partial cache.
+declare -A _SUBJ=()
+while IFS= read -r _cl; do
+  _SUBJ[${_cl%% *}]=" ${_cl#* } "
+done < <(GIT log --format='%H %s' HEAD 2>/dev/null | tr -c 'A-Za-z0-9\n-' ' ')
+_n_hist=$(GIT rev-list --count HEAD 2>/dev/null)
+case "$_n_hist" in ''|*[!0-9]*) _n_hist=-1 ;; esac
+if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
+  echo "pass-order: the subject cache holds ${#_SUBJ[@]} commit(s) where history has $_n_hist, so the build-commit walk below would miss commits and report every unit unbuilt-in-range — which is a clean bill this leg has not earned"
+  exit 2
+fi
+
 graded=0; skipped_cutoff=0; norun_graded=0; unbuilt=0; preanchor_hits=0; waived_n=0; truncated=0
 violations=""; waived_seen=""; previews=""
 
@@ -296,32 +334,11 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
     # `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up sequence is a prefix of
     # nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
     #
-    # THE EXCLUSION IS THE BUILD'S WHOLE FOLDER PLUS THE GENERATED INDEXES, and getting this wrong
-    # made a CONFORMING run unlandable. It was `spec/` and `reviews/` alone, and a spec pass
-    # legitimately writes more than those two: the regenerated index, the build README, the run-state
-    # file and the month ledger all sit outside them. So a SPEC commit naming the unit id won the
-    # selection and step 2 then graded ITS parent — where, correctly, no spec exists yet — and the leg
-    # reported "the spec was written after the code" about a run that did the opposite. Reproduced on
-    # the spec-first fixture. The shape is this corpus's norm rather than a corner: `spec(<slug>):
-    # <id> ...` subjects are everywhere, and this build escaped only because its own spec commit
-    # named the slug and no unit id. With `red_after_land = true` and history append-only, the next
-    # conforming run would have been unlandable short of a bypass.
-    #
-    # `GENERATED_INDEXES` is read from the conf as `index:generator` pairs; only the index half is an
-    # excluded path, because a commit touching the GENERATOR is touching product code.
-    # THE RECORD SURFACE a spec pass legitimately writes: this build's folder, the generated indexes,
-    # AND the SHARED RECORDS. The last was omitted at first and it is not a corner — template section
-    # 1 MANDATES a backlog row, so a conforming spec-first run writes `memory/backlog/<FAMILY>.md`
-    # in the same commit, which put the commit back outside the exclusion and redded the run that
-    # followed the method exactly. Reproduced on this kit's own fixture.
-    _gen_ex=""
-    for _gi in $GENERATED_INDEXES; do
-      _gp=${_gi%%:*}
-      [ -n "$_gp" ] && _gen_ex="$_gen_ex -e ^$_gp"
-    done
-    for _sr in $SHARED_RECORDS; do
-      [ -n "$_sr" ] && _gen_ex="$_gen_ex -e ^$_sr"
-    done
+    # THE EXCLUSION SET AND THE SELECTION BOTH LIVE IN `build_commit`, in the kit library, since
+    # TOOL-aHoistedPass-7. What used to sit here — the `_gen_ex` assembly and the whole
+    # `_find_build_commit` body — was INDENTED inside this loop, so it existed only while this block
+    # ran and no sibling script could source this file and reuse it. The rationale comments moved
+    # with the code rather than being left behind as prose about somewhere else.
     _report() {
       previews="$previews
 $1"
@@ -331,51 +348,9 @@ $1"
 $1" ;;
       esac
     }
-    # ONE PREDICATE, TWO WINDOWS. `_find_build_commit <rev-range>` is the whole build-commit
-    # definition and both the in-range walk and the pre-anchor probe call it. A second copy would be
-    # two answers to one question, and the copy would be the one that drifts.
-    _find_build_commit() {
-      # THE CAP BOUNDS THE ENUMERATION, not only the loop body. `for _c in $(rev-list ...)` runs the
-      # whole traversal in a command substitution BEFORE the first iteration, so a loop-only cap
-      # bounds the VERDICT and not the WORK — the `bounded-through-a-pipe-is-unbounded` class. The
-      # pre-anchor window is the entire history behind the anchor, so `--max-count` is what bounds it.
-      #
-      # THE TWO WINDOWS WALK IN OPPOSITE DIRECTIONS, and getting that wrong is what made the probe
-      # unable to see its own target. The IN-RANGE walk wants the EARLIEST build commit, so it is
-      # `--reverse`. The PRE-ANCHOR probe wants ANY violating commit behind the anchor, and the
-      # nearest is both the likeliest and the one that must survive truncation — so it walks
-      # NEWEST-FIRST and truncates the FAR end.
-      #
-      # WHAT WENT WRONG, because it is worth one reader's minute. `rev-list --reverse --max-count=N`
-      # applies the count during traversal and reverses AFTER, so the anchor is the LAST element of
-      # the window, not the first. The probe was written `--reverse` for both windows on the belief
-      # that it yielded the commits nearest the anchor; it yields the farthest. So the one commit the
-      # probe exists to reach was dropped by the cap whenever the history behind it was deeper — and
-      # the truncation arm could not see that, because it used the record-only fixture, where the
-      # correct and the broken behaviour give the same verdict.
-      #
-      # Truncation is therefore reported AFTER the walk, on the count actually emitted.
-      local _range="$1" _cap="$2" _ord="$3" _c _subj _n=0 _mc=""
-      # `cap+1` FETCHED, `cap` GRADED, so truncation is EXACT. With `--max-count=$_cap` a complete
-      # walk of an exactly-cap-deep window is indistinguishable from a truncated one, and the leg
-      # reported TRUNCATED for a probe that had in fact seen everything. Fetching one extra is the
-      # only way to know there was more.
-      [ -n "$_cap" ] && _mc="--max-count=$((_cap+1))"
-      for _c in $(GIT rev-list $_ord $_mc $_range 2>/dev/null); do
-        _n=$((_n+1))
-        # the (cap+1)-th commit is the SENTINEL: proof that more exists, never graded.
-        if [ -n "$_cap" ] && [ "$_n" -gt "$_cap" ]; then printf 'TRUNCATED'; return 0; fi
-        _subj=$(GIT log -1 --format=%s "$_c" 2>/dev/null)
-        case " $(printf '%s' "$_subj" | tr -c 'A-Za-z0-9-' ' ') " in *" $id "*) ;; *) continue ;; esac
-        # Did it touch anything outside this build's own record surface?
-        if GIT show --pretty=format: --name-only "$_c" 2>/dev/null \
-           | grep -v '^$' | grep -qv -e "^$bdir/" $_gen_ex; then
-          printf '%s' "$_c"; return 0
-        fi
-      done
-      return 0
-    }
-    build_c=$(_find_build_commit "${base:+$base..}HEAD" "" "--reverse")
+    # THE IN-RANGE WINDOW, which is `build_commit`'s default: unbounded, `--reverse`, so the
+    # EARLIEST qualifying commit wins.
+    build_c=$(build_commit "${base:+$base..}HEAD" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")
     if [ -z "$build_c" ]; then
       # S2c - THE PRE-ANCHOR PROBE, and it runs ONLY for the derived-range population. A commit that
       # writes product code for a unit touches nothing under the build folder, so it sits STRICTLY
@@ -392,7 +367,7 @@ $1" ;;
       # S2d - BOUNDED BY CONSTRUCTION, because the miss rate over the widened population could not be
       # measured before this landed. A probe that gives up is COUNTED, never reported as a miss.
       if [ "$norun" = 1 ] && [ -n "$base" ]; then
-        pre_c=$(_find_build_commit "$base" "$PREANCHOR_CAP" "")
+        pre_c=$(build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
         if [ "$pre_c" = TRUNCATED ]; then
           truncated=$((truncated+1))
         elif [ -n "$pre_c" ]; then
@@ -414,7 +389,35 @@ $1" ;;
     # refuse the shape the method mandates. What this anchor refuses is authoring it AFTERWARDS.
     parent=$(GIT rev-parse "$build_c^" 2>/dev/null) || { unbuilt=$((unbuilt+1)); continue; }
     found=""; state=""
+    # THE CANDIDATE FILTER, and it is a filter rather than the selection itself. Reading every spec
+    # blob under the build to find the one naming the id is quadratic in a build's own size: a
+    # 29-unit build reads 29 blobs 29 times, and each read is a `git show` plus a `head | tr`
+    # subshell, so the two largest builds alone owed over a thousand of this leg's process spawns.
+    # One `git grep` answers the same question for the whole build in one process.
+    #
+    # `-n` AND NOT `-l`, and the difference is the whole reason this is exact. `-l` names every spec
+    # that mentions the id ANYWHERE, and in this corpus every sibling spec cross-references its
+    # neighbours — measured on the 29-unit build, `-l` returned 30 of 30 files and filtered nothing.
+    # `-n` carries the LINE NUMBER, so the `<= 5` test below reproduces the `head -5` window the
+    # predicate under it actually grades.
+    #
+    # IT CANNOT CHANGE THE VERDICT. The pattern is the library's own whole-token join, the same one
+    # the tokenised test below applies, so the two agree on which lines carry the id; restricting to
+    # lines 1-5 makes the candidate set equal to — not merely a superset of — what the test accepts.
+    # A token cannot straddle a line break under either reading, because `tr` turns the newline into
+    # a delimiter exactly as `grep` treats the line end as one. The ORDER stays `ls-tree`'s rather
+    # than `git grep`'s, so first-match-wins picks the same spec it always did. And the ORIGINAL test
+    # still decides: this only skips blobs it was going to reject, so a filter that broke would red
+    # every unit loudly rather than green one quietly.
+    _cands=" "
+    while IFS= read -r _g; do
+      _g=${_g#*:}; _gp=${_g%%:*}; _g=${_g#*:}; _gl=${_g%%:*}
+      case "$_gl" in ''|*[!0-9]*) continue ;; esac
+      [ "$_gl" -le 5 ] || continue
+      case "$_cands" in *" $_gp "*) ;; *) _cands="$_cands$_gp " ;; esac
+    done < <(GIT grep -n -E "(^|[^A-Za-z0-9-])$id([^A-Za-z0-9-]|\$)" "$parent" -- "$bdir/spec/" 2>/dev/null)
     for sp in $(GIT ls-tree -r --name-only "$parent" -- "$bdir/spec/" 2>/dev/null); do
+      case "$_cands" in *" $sp "*) ;; *) continue ;; esac
       blob=$(GIT show "$parent:$sp" 2>/dev/null) || continue
       case " $(printf '%s' "$blob" | head -5 | tr -c 'A-Za-z0-9-' ' ') " in *" $id "*) ;; *) continue ;; esac
       tmp=$(mktemp) || exit 2

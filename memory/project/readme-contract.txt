@@ -127,3 +127,5 @@ memory/builds/aHonedRuleset/README.md
 memory/builds/aWeldedTribunal/README.md
 memory/builds/dTracedLattice/README.md
 memory/builds/aKeyedAnnotation/README.md
+memory/builds/aWeighedCanon/README.md
+memory/builds/aJoinedCanon/README.md

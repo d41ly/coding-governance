@@ -1,6 +1,6 @@
 # TOOL-dTracedLattice-7 — a merge-bar substrate whose score depends on the hash seed
 
-**Status:** SPECCED · rev-2 · 2026-09-05 · node d · Tier-2 · base 22d75b31 · streams tooling · order 7
+**Status:** CLOSED · rev-4 · 2026-09-06 · node d · Tier-2 · base 22d75b31 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -18,6 +18,10 @@
 | [2026-09-05-build-TOOL-dTracedLattice-1-recall-report.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-recall-report.md) | research | TOOL-dTracedLattice-1 |
 | [2026-09-05-build-TOOL-dTracedLattice-1-resolver.py](../build/2026-09-05-build-TOOL-dTracedLattice-1-resolver.py) | research | TOOL-dTracedLattice-1 |
 | [2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-scen-adversarial-seams.md) | research | TOOL-dTracedLattice-1 |
+| [2026-09-06-build-TOOL-dTracedLattice-7-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-dTracedLattice-7-1-acceptance-ledger.md) | journal | — |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 |
+| [2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md](../reviews/2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md) | diff-review | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 |
+| [2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round2.md](../reviews/2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round2.md) | diff-review | TOOL-dTracedLattice-1 TOOL-dTracedLattice-2 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 |
 
 <!-- /gen:spec-records -->
 
@@ -87,7 +91,10 @@ everywhere else the same idiom appears.
 - risks — the re-pin is the risk. A change landed without S2 leaves `selftest.py` asserting stale
   bytes, which is a green gate over a file nobody is checking.
 - testing + left-shift gates — S3 is the left-shift, and it generalises: the arm asks whether a
-  substrate is seed-stable, so a future substrate inherits the question.
+  substrate is seed-stable, so a future substrate inherits the question. **Stated plainly because
+  rev-2 implied otherwise: this repository's own `recall floor` leg does NOT exercise `rm3`.** Its
+  pinned substrate is `fts5`, so the merge bar is not where this fix is verified — S3's arm under
+  `recall floor arms` is, and that leg is held.
 - migration / rollback — a project whose floor is pinned to `rm3` may see its measured score move
   once, to a stable value. S4 tells them before they meet it.
 - user docs — `tools/memory-recall/README.md`, per S4.
@@ -99,8 +106,22 @@ everywhere else the same idiom appears.
   implementation before the fix lands.
 - **AC2** — When `python tools/memory-recall/selftest.py` runs after the change, the `verbatim.json`
   pin for `bench.py` matches the new bytes, so the assertion is against what ships.
-- **AC3** — When `bash tools/run-gates/run-gates.sh` runs the `recall floor` leg twice on an
-  unchanged tree, both runs report the same score.
+- **AC3** — When the same query is scored under DIFFERENT `PYTHONHASHSEED` values on an unchanged
+  tree, `run_rm3` returns the same RANKING — not the same aggregate SCORE.
+
+  **AMENDED at rev-4 by the pass that measured it, and this criterion has now been wrong twice in
+  the same direction.** Rev-2 pointed it at the `recall floor` leg, which is pinned to `fts5` and
+  never executes `run_rm3`; rev-3 repointed it at `bench.py --subs rm3` under two seeds. Measured,
+  that is ALSO a could-not-fail shape: over a symmetric candidate set the aggregate recall counts
+  how many queries hit, and exactly `RM3_TERMS` of them hit whichever terms were chosen — `0.29` on
+  every seed, before the fix and after. The instability is in WHICH documents come back, so the
+  ranking is the object and the score is not. Verified both ways on a purpose-built fixture; the
+  figures are in the acceptance ledger. Rev-2 pointed this criterion at the `recall floor` leg, which cannot fail:
+  `.memory-tree.conf:286` pins `RECALL_FLOOR="records:fts5:r@5>=0.81"`, so
+  `tools/memory-recall/check-recall.py:203` dispatches `fts5` and `tools/memory-recall/bench.py:308-330`
+  never reaches `run_rm3` at all — green before the fix, after it, and after a revert, and §3 forbids
+  re-pinning the substrate so it cannot be made red either. That is the could-not-fail shape
+  `AGENTS.md` §7 names.
 - **AC4** — When `tools/memory-recall/README.md` is read, it names which substrates are seed-stable
   and which are not.
 
@@ -109,9 +130,14 @@ everywhere else the same idiom appears.
 `memory-recall kit selftest` · `recall floor` · `recall floor arms` ·
 `harness arms (fail branches armed or pinned)`.
 
-The kit-subject legs are HELD on a plain bar; verifying this unit needs
-`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. The runner names every held leg, so they are
-announced rather than silent.
+TWO of these are held and rev-2 named the wrong predicate. `tools/run-gates/run-gates.sh` holds a
+leg when `subject = kit` OR `chunk = selftests`, so `memory-recall kit selftest` (subject) AND
+`recall floor arms` (chunk) both need `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`.
+`recall floor` and `harness arms` are `chunk: declarations` and run on a plain bar. This matters
+because `recall floor arms` is `python3 tools/memory-recall/test_recall_floor.py`, the home of S3's
+multi-`PYTHONHASHSEED` arm and the leg that grades AC1 — a builder who believes it runs on a plain
+bar can land the fix with the arm never having executed, which is the green-by-absence shape S3
+exists to close. The runner names every held leg, so they are announced rather than silent.
 
 ## 8. Open questions
 
@@ -137,6 +163,17 @@ announced rather than silent.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-06 · built. AC3 is amended a second time, in the same direction and for a
+  measured reason: an aggregate recall score over a symmetric candidate set is invariant to which
+  expansion terms are chosen, so a score comparison passes on a broken build. The criterion grades
+  the RANKING, which is what moves. Status CLOSED.
+- rev-3 · 2026-09-06 · folded the round-3 spec audit, this spec's FIRST review: H9 (§7 inverted the
+  hold — the runner holds on `subject = kit` OR `chunk = selftests`, so `recall floor arms` is held
+  too and `recall floor` is not, and the held one is where AC1 is graded), H11 (AC3 asked the
+  `recall floor` leg for a stable score, but that leg is pinned to `fts5` and never executes
+  `run_rm3`, so it was green before the fix, after it and after a revert — restated over
+  `bench.py --subs rm3` under differing seeds, with §5 saying plainly that this repo's floor leg
+  does not exercise `rm3`).
 - rev-2 · 2026-09-05 · Q1 resolved by pointing: `TOOL-aTunedCompass-2`, `-3` and `-9` already own
   the fixture and floor question this unit had parked, and the 83-question figure is re-framed as
   evidence for `-9` with the k and question-set difference named.

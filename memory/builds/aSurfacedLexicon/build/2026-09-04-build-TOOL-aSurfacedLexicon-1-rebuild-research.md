@@ -726,6 +726,16 @@ stop rule; under the other the condition is met.
 **Recommended default: settle it in `drift_report.py` as the single carrier** and supersede the prose
 copies, before today's 3.6% is cited as authority for anything.
 
+> **CORRECTED by `TOOL-aSurfacedLexicon-12`, 2026-09-05.** The recommendation was ratified as owner
+> ruling Q8 and stands. The READING does not: the 3.6% quoted here and in this record's own inventory
+> table is 5 of 138, and 138 is this pass's coverage count rather than the arm's `added`. Re-run,
+> `python tools/drift-audit/drift_report.py --json` prints on the `lexicon_marginal_offense_rate`
+> signal's fresh-file arm `added 340`, `offenders 181`, `rate_pct 53.2` — ABOVE the docstring's
+> roughly 5% bar, not a second sub-5% reading. The docstring's other branch is the live one, so the
+> rebuild is not building past a stop rule that was met; it is building while the rate CLIMBS, which
+> is the evidence promoting `TOOL-dScaffoldedMirror-9` from probation to scheduled. Two operands and
+> one conclusion, all three superseded, and none of them acted on here.
+
 **Q9 — Which records get written, with ids?**
 Three are owed and none is optional. (a) A **supersession of TOOL-dScaffoldedMirror-18**, live at
 `memory/DECISIONS.md:100`, which instructs a reader to build a 459-row grandfather backfill for a

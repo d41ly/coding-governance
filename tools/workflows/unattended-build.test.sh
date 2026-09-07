@@ -17,6 +17,15 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/../.." && pwd)"
 F="$HERE/unattended-build.js"
 [ -f "$F" ] || { echo "FAIL cannot find unattended-build.js beside this test"; exit 2; }
+# THE CHILD IS IN THIS SUITE'S SCOPE, and it has no suite of its own. The parent hands out a roster
+# and the child builds one unit off it, so the two halves of the mode contract — the parent PUTTING
+# the mode in `dispatch.args` and the child BRANCHING on it — are one property split across two
+# files. Arming only the parent's half is what let the child go mode-blind. Both paths are derived
+# from `$HERE`, so nothing here spells an install prefix.
+C="$HERE/unattended-unit.js"
+[ -f "$C" ] || { echo "FAIL cannot find unattended-unit.js beside this test"; exit 2; }
+# The driver, for the DERIVED refusal set the child arms read. `$KIT_REL` above is the one knob.
+DRV="$ROOT/$KIT_REL/unattended/unattended.sh"
 
 same() { n=$((n+1)); if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 -- got '$2' want '$3'"; st=1; fi }
 has()  { n=$((n+1)); case "$2" in *"$3"*) echo "ok   $1" ;; *) echo "FAIL $1 -- output lacked '$3'"; st=1 ;; esac }
@@ -26,7 +35,9 @@ hasnt_(){ n=$((n+1)); case "$2" in *"$3"*) echo "FAIL $1 -- output carried '$3' 
 # THE RUNNER. Evaluates the script the way its runtime does, with stub hooks that RECORD rather than
 # spawn. `$1` is a JS expression for `args`; `$2` is a JS object literal mapping a stage label prefix
 # to the value its agent returns, or the string `null` to simulate a dead stage.
-run_wf() { # args-expr · returns-expr -> prints the trace, then RESULT/THROW
+# `$3` is the SCRIPT, defaulting to the parent — the child runs on the same runtime with the same
+# stubs, so pointing this at `$C` is the whole child-side harness.
+run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RESULT/THROW
   node -e '
     const fs = require("fs")
     const src = fs.readFileSync(process.argv[1], "utf8").replace(/^\s*export\s+const\s+meta\s*=/m, "const meta =")
@@ -68,12 +79,15 @@ run_wf() { # args-expr · returns-expr -> prints the trace, then RESULT/THROW
     fn(JSON.parse(process.argv[2]), agent, parallel, pipeline, phase, log, budget, workflow)
       .then((r) => { console.log(trace.join("\n")); console.log("RESULT " + JSON.stringify(r)) })
       .catch((e) => { console.log(trace.join("\n")); console.log("THROW " + e.message) })
-  ' "$F" "$1" "$2" 2>&1
+  ' "${3:-$F}" "$1" "$2" 2>&1
 }
 
 UNITS='{"repo":"/tmp/r","slug":"tB","subjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
 SPEC_OK='{"authored":["A-tB-1"],"alreadyPresent":["A-tB-2","A-tB-3"],"refused":[],"summary":"ok"}'
-BUILD_OK='{"committed":["A-tB-1","A-tB-2","A-tB-3"],"unbuilt":[],"summary":"ok"}'
+# TOOL-aHoistedPass-6 - the BUILD double is gone with the stage. What a terminal verdict now
+# reaches is the DISPOSAL stage, and past it the roster hand-out, which is a return rather than an
+# agent. `returns` takes an optional THIRD argument so an arm can hand back a FAILED disposal.
+DISPOSE_OK='{"disposed":true,"standing":[],"summary":"ok"}'
 # THE DOUBLE RETURNS THE CALLEE'S REAL KEYS, and the first version of it did not. It invented
 # `verdict` and `reportPath`, so all 28 arms passed on two fields `tier2-review.js` has never
 # returned — the harness and its callee had never met. Its actual returns carry `blockers`,
@@ -84,8 +98,8 @@ review_out() { printf '{"blockers":%s,"report":"r.md","highs":0,"precision":1,"n
 rec() { printf '{"token":"%s","exitCode":0}' "$1"; }
 # `audit <token> <blockers>` still reads as one thing at the call sites, but it now feeds the two
 # halves their own shapes.
-returns() { printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"build:":%s}' \
-  "$SPEC_OK" "$(review_out "${2:-0}")" "$(rec "$1")" "$BUILD_OK"; }
+returns() { printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+  "$SPEC_OK" "$(review_out "${2:-0}")" "$(rec "$1")" "${3:-$DISPOSE_OK}"; }
 audit() { printf '%s' "$1"; }
 
 # ---- AC2: THE ARGS GUARD, BOTH DIRECTIONS. The first cut of the guard this ports from tested
@@ -103,23 +117,27 @@ o=$(run_wf '{"repo":"/tmp/r","units":[{"id":"A-tB-1"}]}' '{}')
 has "args: an object with no slug is REFUSED" "$o" "must carry an explicit \`slug\`"
 o=$(run_wf '{"repo":"/tmp/r","slug":"tB","units":[]}' '{}')
 has "args: an empty unit set is REFUSED rather than reported clean" "$o" "carries no \`units\`"
+# AC14 - and the refusal names the MODE that can supply a spec path. The bare `--plan` it used to
+# name resolves each unit's path internally and discards it, so a caller following the message
+# literally could not build the array the next line refuses it for missing.
+has "args: the empty-set refusal names --plan <slug> --paths" "$o" "--plan <slug> --paths"
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has "args: a VALID object is accepted — the passing case" "$o" "RESULT"
 
 # ---- AC3: THE STAGE ORDER, asserted on the emitted sequence. A reordering reds this.
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 seq=$(printf '%s\n' "$o" | grep '^phase:' | tr '\n' ' ')
-same "stage order is Spec then Audit then Build" "$seq" "phase:Spec phase:Audit phase:Build "
+same "stage order is Spec then Audit then Disposal" "$seq" "phase:Spec phase:Audit phase:Disposal "
 
 # ---- AC7: THE GATE ON THE VERDICT, over all four driver states. A gate tested only on the state
 # ---- that OPENS it is a gate nothing proved closes.
 o=$(run_wf "$UNITS" "$(returns CONVERGING 3)")
 has "CONVERGING: BUILD is not reached" "$o" "HELD AT AUDIT"
-n=$((n+1)); case "$o" in *"phase:Build"*) echo "FAIL CONVERGING reached the Build phase, which is the one thing this gate exists to stop"; st=1 ;; *) echo "ok   CONVERGING: the Build phase never ran" ;; esac
+n=$((n+1)); case "$o" in *"phase:Disposal"*) echo "FAIL CONVERGING reached the Disposal phase, which is the one thing this gate exists to stop"; st=1 ;; *) echo "ok   CONVERGING: the Disposal phase never ran" ;; esac
 has "CONVERGING: the caller is told what to do next" "$o" "re-invoke this harness with round"
 for v in CONVERGED NON-CONVERGENT CEILING; do
   o=$(run_wf "$UNITS" "$(returns "$v" 0)")
-  n=$((n+1)); case "$o" in *"phase:Build"*) echo "ok   $v: admits BUILD" ;; *) echo "FAIL $v did not admit BUILD, so a terminal verdict cannot land a build"; st=1 ;; esac
+  n=$((n+1)); case "$o" in *'"roster":[{'*) echo "ok   $v: hands out a roster" ;; *) echo "FAIL $v handed out no roster, so a terminal verdict cannot land a build"; st=1 ;; esac
 done
 
 # ---- TOOL-dRatifiedSeam-1. THE STAGE THAT COULD NEVER COMPLETE ------------------------------
@@ -141,19 +159,19 @@ has "S3 CONVERGING with 0 blockers THROWS" "$o" "THROW"
 has "S3 ...and the refusal names the pairing rather than a generic failure" "$o" \
     "CONVERGING paired with 0 blockers"
 n=$((n+1)); case "$o" in
-  *"phase:Build"*) echo "FAIL S3 the impossible pairing still reached BUILD"; st=1 ;;
-  *) echo "ok   S3 ...and BUILD is not reached" ;;
+  *"phase:Disposal"*) echo "FAIL S3 the impossible pairing still reached DISPOSAL"; st=1 ;;
+  *) echo "ok   S3 ...and DISPOSAL is not reached" ;;
 esac
 
 # S2 — A NON-INTEGER BLOCKER COUNT IS A DEGRADED RUN AND IS REPORTED AS ONE. tier2-review yields
 # `null` there BY DESIGN, never 0, so reading it as 0 would make every degraded audit look clean:
 # unattended.sh emits CONVERGED only on a count of 0.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"blockers":null,"report":"r.md"},"audit:record":%s,"build:":%s}' \
-    "$SPEC_OK" "$(rec CONVERGED)" "$BUILD_OK")")
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"blockers":null,"report":"r.md"},"audit:record":%s,"dispose:":%s}' \
+    "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has "S2 a null blocker count THROWS rather than rounding to zero" "$o" "non-integer blocker count"
 n=$((n+1)); case "$o" in
-  *"phase:Build"*) echo "FAIL S2 a degraded audit reached BUILD"; st=1 ;;
-  *) echo "ok   S2 ...and a degraded audit does not reach BUILD" ;;
+  *"phase:Disposal"*) echo "FAIL S2 a degraded audit reached DISPOSAL"; st=1 ;;
+  *) echo "ok   S2 ...and a degraded audit does not reach DISPOSAL" ;;
 esac
 
 # THE SUBJECT GUARD. An unpinned subject audits whatever the file happens to say when the lens
@@ -164,10 +182,10 @@ has "an unpinned subject blob is REFUSED before the sub-workflow runs" "$o" "7-4
 
 # ---- AC9: A DEAD AUDIT STAGE IS A REFUSAL, never a silent pass to BUILD. This is the absence that
 # ---- would otherwise let the harness build on an unreviewed spec set.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"build:":%s}' "$SPEC_OK" "$BUILD_OK")")
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"dispose:":%s}' "$SPEC_OK" "$DISPOSE_OK")")
 has "a dead AUDIT stage THROWS" "$o" "THROW"
 has "the throw says an absent verdict is not a convergence" "$o" "must never read as CONVERGED"
-o=$(run_wf "$UNITS" "$(printf '{"workflow":%s,"audit:record":%s,"build:":%s}' "$(review_out 0)" "$(rec CONVERGED)" "$BUILD_OK")")
+o=$(run_wf "$UNITS" "$(printf '{"workflow":%s,"audit:record":%s,"dispose:":%s}' "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 # The message moved with TOOL-aStagedLane-3: the stage is a FAN now, so the refusal is keyed on
 # the live WRITER COUNT rather than on a falsy return. The arm follows the message rather than
 # the message being frozen for the arm — `arm-literal-strands-on-message-edit`, met head on.
@@ -175,10 +193,9 @@ has "a dead SPEC stage THROWS rather than auditing nothing" "$o" "EVERY spec wri
 
 # ---- AC6: A DEGRADED RUN SAYS SO. `degradation-known-but-unreported` is the class where a pipeline
 # ---- computes how badly it degraded and does not report it.
-o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"build:":%s}' \
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
     '{"authored":[],"alreadyPresent":["A-tB-1"],"refused":["A-tB-2","A-tB-3"],"summary":"s"}' \
-    "$(review_out 0)" "$(rec CONVERGED)" \
-    '{"committed":["A-tB-1"],"unbuilt":["A-tB-2","A-tB-3"],"summary":"s"}')")
+    "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has "a degraded run reports DEGRADED, not complete" "$o" "DEGRADED"
 has "the refused units are NAMED, not merely counted" "$o" "A-tB-2"
 
@@ -200,10 +217,13 @@ n=$((n+1)); if grep -q "out.push(...(await parallel(" "$F"; then
 else
   echo "FAIL a fan-out primitive is called outside the bounded helper"; st=1
 fi
-n=$((n+1)); if grep -q "ONE AT A TIME and IN THIS ORDER" "$F"; then
-  echo "ok   BUILD dispatch is still strictly sequential"
+# RE-POINTED AT TOOL-aHoistedPass-6. The claim used to live in the BUILD prompt, which is deleted;
+# the file's own header still carries it, and the roster's per-entry `order` is what a caller
+# dispatches on. Pointing the arm at the surviving carrier is not the same as deleting it.
+n=$((n+1)); if grep -q "DISPATCH IS STRICTLY SEQUENTIAL" "$F"; then
+  echo "ok   dispatch is still declared strictly sequential"
 else
-  echo "FAIL the BUILD stage no longer tells its agent to work one unit at a time"; st=1
+  echo "FAIL the file no longer declares per-unit dispatch sequential"; st=1
 fi
 if [ -f "$ROOT/tools/hooks/agent-cap.js" ]; then
   o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"tools/workflows/unattended-build.js"}}' \
@@ -225,28 +245,30 @@ n=$((n+1)); grep -qE "kind: ['\"]spec-audit['\"]" "$F" \
 # than a return value.
 
 # ---- AC2: the DEFAULT is unchanged. Every existing caller keeps the contract it had.
-o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"build":{"committed":["A-tB-1"],"unbuilt":[],"summary":"b"}}')
+o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 has  "default mode: the round IS recorded through the driver" "$o" "agent:audit:record"
-has  "default mode: the BUILD prompt still names --dispatch" "$o" "--dispatch"
-has  "default mode: reaches BUILD" "$o" "agent:build:tB"
+has  "default mode: the return names the child the caller dispatches" "$o" '"scriptPath":"tools/workflows/unattended-unit.js"'
+has  "default mode: hands out a roster" "$o" '"roster":[{'
 
 # ---- AC1: attended mode reaches BUILD and spawns NO recorder agent.
 A_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1","planState":"READY"}]}'
-o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":["A-tB-1"],"unbuilt":[],"summary":"b"}}')
-has   "attended: reaches the build stage" "$o" "agent:build:tB"
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
+has   "attended: hands out a roster" "$o" '"roster":[{'
 hasnt_ "attended: no round is recorded through the driver" "$o" "agent:audit:record"
 has   "attended: it SAYS the round was not recorded" "$o" "no round was recorded"
 
 # ---- AC8: the BUILD prompt drops the verbs that refuse without a run-state file — AND still carries
 # ---- the surrounding instruction. The paired positive is the point: an absence assertion passes just
 # ---- as well when the whole clause is empty.
-hasnt_ "attended prompt: no --dispatch INSTRUCTION" "$o" "--dispatch tB"
-# The verbs are NAMED in the attended prompt, to say they are unavailable. The assertion must
+hasnt_ "attended: NO agent prompt carries a --dispatch INSTRUCTION" "$o" "--dispatch tB"
+# The verbs are NAMED in the attended preamble, to say they are unavailable. The assertion must
 # therefore target the INSTRUCTION form `--brief <slug>`, not the word — an absence arm aimed at
 # the word fails on the sentence explaining the absence.
-hasnt_ "attended prompt: no --brief INSTRUCTION" "$o" "--brief tB"
-has   "attended prompt: the per-unit build instruction SURVIVES" "$o" "BUILD every unit below, ONE AT A TIME"
-has   "attended prompt: it says why the verbs are absent" "$o" "recording verbs are unavailable"
+hasnt_ "attended: NO agent prompt carries a --brief INSTRUCTION" "$o" "--brief tB"
+# TOOL-aHoistedPass-6 - the per-unit build INSTRUCTION left with the BUILD prompt and is now the
+# child's, so the arm that graded it is gone rather than re-pointed at a weaker witness. What
+# survives is the preamble sentence, which is where the attended honesty statement actually lives.
+has   "attended preamble: it says why the recording verbs are absent" "$o" "recording verbs are unavailable"
 
 # ---- AC9: no agent is told it holds a mandate. In this repo a mandate IS the authority to merge and
 # ---- push with no owner turn, so the unattended preamble is a falsehood in attended mode.
@@ -257,7 +279,7 @@ has   "attended preamble: it says an owner is in the loop" "$o" "OWNER in the lo
 # ---- BUILD over open blockers and satisfy every other criterion here.
 o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":2,"report":"r.md"}}')
 has   "attended, 2 blockers: CONVERGING" "$o" "CONVERGING"
-hasnt_ "attended, 2 blockers: BUILD is NOT reached" "$o" "agent:build:tB"
+hasnt_ "attended, 2 blockers: NO roster is handed out" "$o" '"roster":[{'
 
 # ---- AC3: a null blocker count REFUSES in attended mode too. tier2-review.js yields null on its
 # ---- degraded paths BY DESIGN, and reading it as 0 would make every degraded audit look clean.
@@ -278,16 +300,19 @@ has  "attended, FORKED unit: names the state" "$o" "FORKED"
 # ---- what a closed build reports for a unit whose underlying grade was not READY, and a five-token
 # ---- allow-list halts on it — round-1's halt-at-unit-one, for the third time.
 D_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE (FORKED)"},{"id":"A-tB-2","order":2,"specPath":"s2","planState":"READY"}]}'
-o=$(run_wf "$D_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
+o=$(run_wf "$D_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended, DONE (FORKED): SKIPPED, not refused" "$o" "SKIPPING 1 terminal unit"
-has  "attended, terminal units: still reaches BUILD" "$o" "agent:build:tB"
-# H4 - the skip must reach the ROSTER the agent is handed, not only the log line. This arm reads
-# the composed build prompt: a run that reports a skip and then orders the build is worse than one
-# that never claimed to skip.
+has  "attended, terminal units: still hands out a roster" "$o" '"roster":[{'
+# H4 - the skip must reach the ROSTER, not only the log line. It used to be read off the composed
+# build prompt; the roster is now a RETURNED array and is read there. AC25: `roster` and
+# `skippedTerminal` are different arrays, and a roster built from `ordered` would hand every
+# already-terminal unit out for dispatch — the same defect one layer over.
 ob=$(printf '%s
-' "$o" | grep '^prompt:build:tB:')
-hasnt_ "attended: a SKIPPED unit is absent from the build prompt" "$ob" "A-tB-1"
-has   "attended: a surviving unit is still IN the build prompt" "$ob" "A-tB-2"
+' "$o" | grep '^RESULT ' | sed 's/.*"roster"://; s/,"dispatch".*//')
+hasnt_ "attended: a SKIPPED unit is absent from the ROSTER" "$ob" "A-tB-1"
+has   "attended: a surviving unit is still IN the ROSTER" "$ob" "A-tB-2"
+has   "AC25: units still counts the WHOLE ordered set, not the roster" "$o" '"units":2'
+has   "AC25: the skipped unit is still reported in skippedTerminal" "$o" '"skippedTerminal":["A-tB-1"]'
 
 # ---- AC13: a state outside every arm refuses BY NAME. Neither building nor skipping an unknown state
 # ---- is safe, and this vocabulary has been mis-transcribed twice already.
@@ -307,15 +332,15 @@ has  "attended, no planState: names the field" "$o" "planState"
 # ---- between the stages at which a caller could re-run --plan — so the entry-time value is stale by
 # ---- construction and the stage must not refuse the build it just specced.
 N_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"MISSING"}]}'
-o=$(run_wf "$N_UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":["A-tB-1"],"unbuilt":[],"summary":"b"}}')
-has  "attended, unit AUTHORED this invocation: builds despite entry-time MISSING" "$o" "agent:build:tB"
+o=$(run_wf "$N_UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+has  "attended, unit AUTHORED this invocation: rostered despite entry-time MISSING" "$o" '"roster":[{'
 # and the control: the same MISSING state, NOT specced by stage 1, must still refuse.
 o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":["A-tB-1"],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended, MISSING and NOT specced: still refuses" "$o" "THROW"
 # M1 - `alreadyPresent` must NOT exempt. Those are the units the stage did NOT touch, so their
 # entry-time grade is current; exempting them bypassed the THIN/FORKED refusal on an agent's
 # say-so. Only `authored` is stale by construction.
-o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
+o=$(run_wf "$N_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended, MISSING but only alreadyPresent: still refuses" "$o" "THROW"
 
 # ---- S1: the mode is a CLOSED pair. A typo must not fall back to a default that hands the caller
@@ -329,10 +354,10 @@ has  "bad mode: names the closed set" "$o" "unattended, attended"
 # ---- caller that supplies nothing gets no warning, which is a hole the header names rather than one
 # ---- a reader has to infer.
 W_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","runStateExists":true,"subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"READY"}]}'
-o=$(run_wf "$W_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"build":{"committed":["A-tB-1"],"unbuilt":[],"summary":"b"}}')
+o=$(run_wf "$W_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
 has  "attended + run-state file: WARNS" "$o" "WARNING: attended mode was requested"
 has  "attended + run-state file: names the slug" "$o" "tB"
-has  "attended + run-state file: CONTINUES to build" "$o" "agent:build:tB"
+has  "attended + run-state file: CONTINUES to the hand-out" "$o" '"roster":[{'
 
 # ---- The run-integrity note must SAY the run was attended. A pipeline that computes how weak its own
 # ---- run was and returns a bare "complete" is the degradation-known-but-unreported class, and the
@@ -361,7 +386,7 @@ S3='{"repo":"/tmp/r","slug":"tB","subjects":[{"path":"s1","blob":"abc1234"}],"un
   {"id":"A-tB-1","order":1,"specPath":"s1","specBriefPath":"bf1"},
   {"id":"A-tB-2","order":2,"specPath":"s2","specBriefPath":"bf2"},
   {"id":"A-tB-3","order":3,"specPath":"s3","specBriefPath":"bf3"}]}'
-o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
+o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "fan: three slices spawn three writers" "$o" "3 slice(s) -> 3 writer(s)"
 has "fan: writer 0 spawned" "$o" "agent:spec:tB:g0"
 has "fan: writer 2 spawned" "$o" "agent:spec:tB:g2"
@@ -381,7 +406,7 @@ S7='{"repo":"/tmp/r","slug":"tB","subjects":[{"path":"s1","blob":"abc1234"}],"un
   {"id":"A-tB-3","order":3,"specPath":"s3"},{"id":"A-tB-4","order":4,"specPath":"s4"},
   {"id":"A-tB-5","order":5,"specPath":"s5"},{"id":"A-tB-6","order":6,"specPath":"s6"},
   {"id":"A-tB-7","order":7,"specPath":"s7"}]}'
-o=$(run_wf "$S7" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
+o=$(run_wf "$S7" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 # FOUR, not five, and not seven. `chunk(x, ceil(N/K))` chunks by SIZE, so 7 slices at a cap of 5
 # give groups of 2 and therefore 4 groups. The RULE is that the writer total never EXCEEDS the
 # cap, not that it equals it; asserting 5 would have been asserting my arithmetic, not the bound.
@@ -395,23 +420,23 @@ has   "above cap: one wave, and it is at or under the cap" "$o" "parallel:4"
 has "fallback: the unit with no brief is named" "$o" "A-tB-1 has no specBriefPath"
 
 # ---- AC4: one dead writer is REFUSED, not dropped, and its siblings still return.
-o=$(run_wf "$S3" '{"spec:tB:g0":null,"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
+o=$(run_wf "$S3" '{"spec:tB:g0":null,"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "one dead writer: reported as DEGRADED" "$o" "DEGRADED — 1 of 3 writer(s) returned nothing"
 has "one dead writer: its unit lands in refused" "$o" "A-tB-1"
-has "one dead writer: the stage still completes" "$o" "agent:build:tB"
+has "one dead writer: the run still reaches the hand-out" "$o" '"roster":[{'
 
 # ---- AC4, second half: EVERY writer dead must THROW. The old guard was `if (!specced)` on a falsy
 # ---- return, and a merged object is always truthy — so without this an entirely dead spec stage
 # ---- reaches AUDIT and BUILD on whatever specs already existed, with the refusal this file spends
 # ---- six lines justifying silently deleted.
-o=$(run_wf "$S3" '{"spec":null,"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
+o=$(run_wf "$S3" '{"spec":null,"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has   "ALL writers dead: THROWS" "$o" "THROW"
 has   "ALL writers dead: says every writer returned nothing" "$o" "EVERY spec writer returned nothing"
-hasnt_ "ALL writers dead: BUILD is never reached" "$o" "agent:build:tB"
+hasnt_ "ALL writers dead: no roster is ever handed out" "$o" '"roster"'
 
 # ---- AC7/S3c: the writers are told to AUTHOR and never COMMIT, and not to run the generator. That is
 # ---- half of clause 3 of the disjointness proof, and no gate downstream of here reads a prompt.
-o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"build":{"committed":[],"unbuilt":[],"summary":"b"}}')
+o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "writers: told to author and NOT commit" "$o" "AUTHOR ONLY — DO NOT COMMIT"
 has "writers: told the caller commits once after them" "$o" "the caller commits once after all of you"
 # AC9 - S4's generator prohibition, which had no criterion at all before this arm.
@@ -420,9 +445,165 @@ has "writers: told not to run the index generator" "$o" "do not run the build-in
 # ---- AC10/S3d: the file's own header no longer claims every stage is one agent, and says why the
 # ---- ratified `parallelism route: none` verdict does not reach this fan.
 HDR3=$(sed -n '1,120p' "$F")
-has "header: the one-agent claim is scoped to BUILD" "$HDR3" "THE BUILD STAGE IS ONE AGENT"
+has "header: the one-agent claim names the stage it still applies to" "$HDR3" "THE DISPOSAL STAGE IS ONE AGENT"
 has "header: it names the ratified verdict it does not contradict" "$HDR3" "parallelism route:"
 has "header: it says why — the writers do not commit" "$HDR3" "author and never commit"
+
+# ============================ TOOL-aHoistedPass-6 — DISPOSAL, AND THE ROSTER HAND-OUT
+# The BUILD stage is gone. What a terminal verdict now reaches is a whole-set DISPOSAL stage and
+# then a RETURN carrying an ordered roster, which the caller dispatches one main-loop `Workflow`
+# call per unit. Every arm below reads a return or the trace, because that is where the change is.
+
+# ---- AC4: CONVERGED skips disposal and SAYS SO. A skip that looks like a pass is indistinguishable
+# ---- from coverage, so the announcement is the arm — an absence alone would pass over a stage that
+# ---- was never written at all.
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
+hasnt_ "AC4 CONVERGED: no disposal agent is spawned" "$o" "agent:dispose:"
+has    "AC4 CONVERGED: the skip is ANNOUNCED in the log" "$o" "disposal: skipped"
+has    "AC4 CONVERGED: and the roster is still handed out" "$o" '"roster":[{'
+
+# ---- AC5: a disposal that did NOT finish hands out NO roster. There is no partial hand-out: a
+# ---- roster minus the units a blocker touches is a judgement this runtime cannot make, having no
+# ---- filesystem.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":false,"standing":["b1"],"summary":"x"}')")
+has "AC5 failed disposal: the disposal agent DID run" "$o" "agent:dispose:tB"
+has "AC5 failed disposal: the roster is EMPTY" "$o" '"roster":[]'
+has "AC5 failed disposal: the note is DEGRADED and says what stood" "$o" "DEGRADED — blockers were not disposed"
+# NAMED IN THE NOTE, not merely present in the output. A bare `b1` is satisfied by the fixture's own
+# `"briefPath":"b1"`, which is the fixture-passes-by-finding-nothing class inside the arm itself —
+# observed here, green against the unchanged source, before it was tightened.
+has "AC5 failed disposal: the standing blocker is NAMED in the note" "$o" "were not disposed: b1"
+n=$((n+1)); case "$(printf '%s\n' "$o" | grep '^agent:' | tail -1)" in
+  "agent:dispose:tB") echo "ok   AC5 no agent runs after a failed disposal" ;;
+  *) echo "FAIL AC5 an agent ran after the failed disposal"; st=1 ;;
+esac
+
+# ---- AC5b: a DEAD disposal stage is the same refusal as a negative one. `d.disposed !== true`
+# ---- covers both, and a double returning null is how the stage dies in practice.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2 'null')")
+has "AC5b dead disposal stage: the roster is EMPTY" "$o" '"roster":[]'
+has "AC5b dead disposal stage: it says the stage returned nothing" "$o" "returned nothing at all"
+
+# ---- AC6: EVERY non-throwing exit carries `roster`, so `roster.length === 0` is the caller's whole
+# ---- stop condition. NEITHER of these two carried the key before this unit, and a caller reading
+# ---- `roster.length` would have read a property of `undefined` and thrown.
+o=$(run_wf "$UNITS" "$(returns CONVERGING 3)")
+has "AC6 the CONVERGING exit carries an empty roster" "$o" '"roster":[]'
+T_UNITS='{"repo":"/tmp/r","slug":"tB","mode":"attended","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","planState":"DONE"}]}'
+o=$(run_wf "$T_UNITS" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"}}')
+has "AC6 the attended every-unit-terminal exit carries an empty roster" "$o" '"roster":[]'
+has "R2F1 the attended every-unit-terminal exit says what stood" "$o" '"standing":'
+has "AC6 ...and still says why" "$o" "every unit was already terminal"
+
+# ---- AC7/AC8: the hand-out itself. The roster is asserted WHOLE — key set, key order, values and
+# ---- sequence in one comparison — because an arm that greps for an id passes over a roster whose
+# ---- entries carry the wrong fields.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
+has "AC7 the roster is the ordered array of {id, order, specPath, briefPath}" "$o" \
+  '"roster":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]'
+has "AC7 dispatch names the child script by its repo-relative path" "$o" \
+  '"scriptPath":"tools/workflows/unattended-unit.js"'
+has "AC7 dispatch names the command that resolves the rest of the paths" "$o" '--plan tB --paths'
+has "AC7 the note names the hand-out" "$o" "prologue complete"
+# `dispatch` is sliced out and asserted on its own: the child receives its own unit and never the
+# list, which is the whole shape change.
+d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
+has    "AC8 dispatch.args carries the repo" "$d" '"repo":"/tmp/r"'
+has    "AC8 dispatch.args carries the slug" "$d" '"slug":"tB"'
+has    "AC8 dispatch.args carries the driver" "$d" '"driver":"bash tools/unattended/unattended.sh"'
+has    "AC8 dispatch.args carries the bug-class checklist" "$d" '"checklist":"python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD"'
+has    "AC8 dispatch names the three per-unit fields and only those" "$d" '"perUnit":["unitId","specPath","briefPath"]'
+hasnt_ "AC8 the child never receives the roster list" "$d" '"roster"'
+
+# ---- S4: the keys the old BUILD return carried are GONE, not left reading zero. A caller that
+# ---- still read `built` would see a number that means nothing.
+# SINGLE-QUOTED LABELS, and that is not style. Double-quoted, the backticks below are COMMAND
+# SUBSTITUTION: the shell ran `built` and `unbuilt` while composing the label, printed two
+# `command not found` lines to stderr and left both verdicts naming nothing. The suite still exited
+# 0, which is why it survived a landing. The same trap is recorded against `_bm31` in
+# check-unattended.test.sh, where it cost a 50-minute run to find.
+hasnt_ 'S4 the return no longer carries a `built` count' "$o" '"built":'
+hasnt_ 'S4 the return no longer carries an `unbuilt` list' "$o" '"unbuilt":'
+# ...and the run-integrity fields every return at BASE carried are still on it.
+has "S4 the mode still travels on the hand-out" "$o" '"mode":"unattended"'
+has "S4 skippedTerminal still travels on the hand-out" "$o" '"skippedTerminal":'
+
+
+# ========================= F2 (closing review, BLOCKER) — THE MODE REACHES THE CHILD
+# The child was MODE-BLIND and ordered `--dispatch` and `--brief` unconditionally, both of which
+# `fail 49` without a run-state file — which is the state attended mode is DEFINED by — while
+# telling the child a refusal is BINDING. So every attended dispatch halted at unit one. That is the
+# failure the plan-state grading twelve screens up was moved forward to prevent, arriving one layer
+# down.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
+d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
+has "F2 dispatch.args carries the mode — unattended" "$d" '"mode":"unattended"'
+o=$(run_wf "$A_UNITS" '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":{"blockers":0,"report":"r.md"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
+d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
+has "F2 dispatch.args carries the mode — attended" "$d" '"mode":"attended"'
+
+# THE GENERAL FORM, not a substring arm. The refusal set is DERIVED from the driver itself — every
+# verb whose body refuses with `fail 4N "no run-state file` — so this keeps holding when a seventh
+# verb joins it, which a hand-typed list of two would not. The needle is the INSTRUCTION form
+# `--<verb> <slug>` and never the bare word: the attended text NAMES three of these verbs in the
+# sentence explaining that they are unavailable, and an arm aimed at the word would fail on the
+# explanation. That trap is already recorded against the attended preamble arm above.
+CHILD_ARGS='{"repo":"/tmp/r","slug":"tB","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. ","checklist":"CK","mode":"%s"}'
+childU=$(run_wf "$(printf "$CHILD_ARGS" unattended)" '{}' "$C")
+childA=$(run_wf "$(printf "$CHILD_ARGS" attended)" '{}' "$C")
+norun_verbs=''
+[ -f "$DRV" ] && norun_verbs=$(awk '
+  /^verb_[a-z]+\(\)/ { v = $0; sub(/^verb_/, "", v); sub(/\(\).*/, "", v); next }
+  v != "" && /fail 4[0-9] "no run-state file/ { print "--" v; v = "" }
+' "$DRV" | sort -u)
+# A DERIVED SET THAT CAME BACK EMPTY IS NOT A CLEAN PASS. Without this the loop below iterates zero
+# times and every absence arm silently ceases to exist — the vacuous-selector shape, inside the arm.
+n=$((n+1)); nv=$(printf '%s\n' "$norun_verbs" | grep -c .)
+if [ "$nv" -ge 3 ]; then echo "ok   F2 the no-run-state refusal set derived $nv verb(s) from the driver"
+else echo "FAIL F2 the no-run-state refusal set derived $nv verb(s) — the absence arms below would be vacuous"; st=1; fi
+
+# THE POSITIVE HALF FIRST. An absence assertion over the attended prompt passes just as well when
+# the whole clause is empty, so the unattended prompt is armed for the same instructions BEING there.
+has "F2 the UNATTENDED child prompt orders --dispatch" "$childU" "--dispatch tB"
+has "F2 the UNATTENDED child prompt orders --brief" "$childU" "--brief tB"
+has "F2 the UNATTENDED child prompt still says a refusal is BINDING" "$childU" "A REFUSAL FROM IT IS BINDING"
+has "F2 the ATTENDED child prompt says the recording verbs are unavailable" "$childA" "recording verbs are unavailable"
+has "F2 the ATTENDED child prompt orders the paths written down instead" "$childA" "Write down the paths"
+for verb in $norun_verbs; do
+  hasnt_ "F2 the ATTENDED child prompt issues no $verb instruction" "$childA" "$verb tB"
+done
+# AND THE MODE IS A CLOSED SET IN THE CHILD TOO. A typo silently selecting the unattended text by
+# default is this same defect wearing a different hat, so the child refuses rather than defaults.
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. ","checklist":"CK","mode":"atttended"}' '{}' "$C")
+has "F2 the child REFUSES a mode outside the closed set" "$o" "THROW"
+has "F2 ...and names the value it was given" "$o" '"atttended"'
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","unitId":"A-tB-1","specPath":"s1","briefPath":"b1","driver":"bash drv.sh","ground":"G. ","checklist":"CK"}' '{}' "$C")
+has "F2 the child REFUSES an absent mode rather than defaulting one" "$o" "THROW"
+
+# ========================= F4 (closing review, HIGH) — DISPOSED-BUT-STANDING IS NOT DISPOSED
+# `{disposed:true, standing:['b1']}` validated against DISPOSAL_SCHEMA, cleared a guard that tested
+# only `disposed !== true`, logged `disposal: done` and handed out the FULL roster over an undisposed
+# blocker — under a prompt whose own words are NAME in `standing` every blocker you did NOT dispose.
+# Reachable on exactly the two verdicts that structurally guarantee standing blockers.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2 '{"disposed":true,"standing":["b1"],"summary":"x"}')")
+has "F4 disposed:true with a standing blocker: the roster is EMPTY" "$o" '"roster":[]'
+has "F4 disposed:true with a standing blocker: the note is DEGRADED" "$o" "DEGRADED — blockers were not disposed"
+has "F4 disposed:true with a standing blocker: the blocker is NAMED" "$o" "were not disposed: b1"
+# ROUND 2, finding 1: the DEGRADED return is the ONE path where `stood` can be non-empty, and it
+# carried no `standing` key at all. The arm below asserts the payload, not the empty case. The
+# hand-out arm further down asserts `[]` and passes on a fixture that could not have produced
+# anything else, so it proves the key is PRESENT there and nothing about its value.
+has "F4 the DEGRADED return names what stood, as a key and not only in prose" "$o" '"standing":["b1"]'
+hasnt_ "F4 disposed:true with a standing blocker: disposal is NOT logged done" "$o" "disposal: done"
+# CEILING is the other verdict that reaches the stage, and it takes the same path.
+o=$(run_wf "$UNITS" "$(returns CEILING 4 '{"disposed":true,"standing":["b2"],"summary":"x"}')")
+has "F4 the same pairing under CEILING hands out no roster" "$o" '"roster":[]'
+# AND WHAT STOOD TRAVELS OUT. `standing` never reached the hand-out at all, which is
+# degradation-known-but-unreported — a class this harness names three times in its own comments. It
+# is a REQUIRED field and never an absence: an empty list said out loud is not the same fact as a
+# missing key, which is indistinguishable from a stage that never ran.
+o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
+has "F4 the hand-out carries what stood, empty and explicit" "$o" '"standing":[]'
 
 echo "--- $n arms, exit $st"
 exit $st

@@ -52,11 +52,11 @@ tools/unattended/unattended.sh	29	2	cannot retire the finished record, and a hal
 tools/unattended/check-unattended.sh	2	11	the driver declares owed rescope ACTS but this leg cannot find the closed act alternation --rescope validates against, so the act axis would be graded against nothing
 tools/unattended/check-unattended.sh	2	12	the parked-ACT taxonomy names an act --rescope's own closed case cannot accept, so no row can ever carry it and the surfaced count is silently narrower than the set says
 tools/unattended/check-unattended.sh	2	13	the driver declares no readable PARK_ACTS_OWED, so the act axis of the surfaced count would range over an empty set and a retirement would silently stop being owed
-tools/unattended/check-unattended.sh	16	13	cannot read DOD_NO_OVERRIDE from the driver, so the join below would compare the Skill against an empty set and pass by finding nothing
-tools/unattended/check-unattended.sh	16	14	the kit ships no SKILL.template.md, so the non-overridable set an agent reads cannot be joined to the constant the verb enforces
-tools/unattended/check-unattended.sh	16	15	the Skill template carries no non-overridable paragraph this leg can read, so the join would compare the driver's set against nothing and pass by finding nothing; the sentence it looks for names the items and the item names are backticked
-tools/unattended/check-unattended.sh	16	16	the driver refuses an override on an item the Skill's non-overridable paragraph does not name, so a run meets a refusal its own instructions said could not happen
-tools/unattended/check-unattended.sh	16	17	the Skill's non-overridable paragraph names an item the driver does not refuse an override on, so a run is told a route is closed that is open
+tools/unattended/check-unattended.sh	16	14	cannot read DOD_NO_OVERRIDE from the driver, so the join below would compare the Skill against an empty set and pass by finding nothing
+tools/unattended/check-unattended.sh	16	15	the kit ships no SKILL.template.md, so the non-overridable set an agent reads cannot be joined to the constant the verb enforces
+tools/unattended/check-unattended.sh	16	16	the Skill template carries no non-overridable paragraph this leg can read, so the join would compare the driver's set against nothing and pass by finding nothing; the sentence it looks for names the items and the item names are backticked
+tools/unattended/check-unattended.sh	16	17	the driver refuses an override on an item the Skill's non-overridable paragraph does not name, so a run meets a refusal its own instructions said could not happen
+tools/unattended/check-unattended.sh	16	18	the Skill's non-overridable paragraph names an item the driver does not refuse an override on, so a run is told a route is closed that is open
 # `git hash-object` on a path this verb has already proven is a tracked file cannot fail without
 # git itself failing, so there is no constructible fixture. Pinned rather than armed with a
 # synthetic break, which proves the mechanism for the synthetic value and not the real one.

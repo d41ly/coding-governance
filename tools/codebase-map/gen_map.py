@@ -195,7 +195,7 @@ def _seed_affordances(top: int) -> None:
         return
     for cand, fanin in worklist:
         print(
-            f"- {cand.name}  [fan-in {fanin} | {cand.kind} | {cand.file}]  "
+            f"- {cand.name}  [fan-in {fanin} | {cand.kind} | {', '.join(cand.files)}]  "
             f"-> add `seam: {cand.name} - reuse for <need>; extend via <point>` to its dossier"
         )
 

@@ -69,6 +69,14 @@ LIVE = re.compile(r"^\*\*Status:\*\*\s*(OPEN|SPECCED|INPROGRESS|BLOCKED)", re.M)
 # A prose line naming a leg is therefore NOT graded, which is the honest limit of this arm and is
 # reported as such rather than implied away.
 LEG_LINE = re.compile(r"^[\s]*(`[^`\n]+`[\s]*[·,]?[\s]*)+\.?[\s]*$")
+# TOOL-aJoinedCanon-7: the Gates section is located by HEADING TEXT and never by ordinal.
+GATES_HEAD = re.compile(r"^## [0-9]+[.] Gates[ \t]*$", re.M)
+# The dated demand, the owner's ruling on this unit's fork. From this date a LIVE spec that CARRIES a
+# Gates heading must contribute at least one graded leg name from it. The heading precondition is the
+# whole of the Tier-1 accommodation: under the light profile a spec may legally omit the section, and
+# one that omits it stays silent rather than red. Blank or absent turns the arm off.
+LEGLINE_KEY = "SPEC_LEGLINE_CUTOFF"
+SPEC_DATE = re.compile(r"/([0-9]{4}-[0-9]{2}-[0-9]{2})-spec-")
 
 
 def run(*args):
@@ -82,6 +90,36 @@ def read_tracked(root):
 def extract_section(text, num):
     m = re.search(SEC % num, text, re.S | re.M)
     return m.group(1) if m else ""
+
+
+def extract_gates(text):
+    """Section 7 by its HEADING TEXT, never by its ordinal.
+
+    TOOL-aJoinedCanon-7. A Tier-1 spec under the light profile may legally drop
+    `## 5. Production-readiness checklist`, which slides every later section up one — so the ordinal
+    read grades whatever happens to sit seventh, and once the S7 arm below turns a silent read into a
+    VERDICT that becomes a red on a spec the format permits. The pattern is check 12's
+    acceptance-witness regex with one word changed: bracketed dot, tab class and end anchor intact.
+
+    Returns None when the spec carries NO Gates heading at all. That is a different fact from an
+    empty section and the report keeps the two apart, because they have different remedies.
+    """
+    m = GATES_HEAD.search(text)
+    if not m:
+        return None
+    rest = text[m.end():]
+    nxt = re.search(r"^## ", rest, re.M)
+    return rest[:nxt.start()] if nxt else rest
+
+
+def read_conf_key(root, key):
+    """One key out of `.memory-tree.conf`, by plain assignment. Absent or blank means OFF."""
+    p = root / ".memory-tree.conf"
+    if not p.exists():
+        return ""
+    m = re.search(r'^%s="?([^"\n]*)"?\s*$' % re.escape(key),
+                  p.read_bytes().decode("utf-8", "replace"), re.M)
+    return m.group(1).strip() if m else ""
 
 
 def check_path_shaped(tok, files):
@@ -158,18 +196,44 @@ def main(argv):
               "decision nobody made")
         return 1
 
+    legline_cut = read_conf_key(root, LEGLINE_KEY)
     hits, skipped, graded, seen_waived = [], 0, 0, set()
+    ungraded, noheading = 0, 0
     for f in specs:
         text = (root / f).read_bytes().decode("utf-8", "replace")
-        for line in extract_section(text, 7).splitlines():
+        gates = extract_gates(text)
+        if gates is None:
+            # No Gates heading at all. Silent by design, and counted apart from the section that
+            # exists and contributes nothing: the two silences have different remedies, so a single
+            # "ungraded" number would tell a reader to fix the wrong half.
+            noheading += 1
+            gates = ""
+        contributed = 0
+        for line in gates.splitlines():
             if not LEG_LINE.match(line):
                 continue
             for tok in TICK.findall(line):
-                if NOT_A_TOKEN.match(tok) or NOT_A_LEG.search(tok):
+                if NOT_A_TOKEN.match(tok):
+                    continue
+                # A token that IS a manifest name resolves BEFORE the shape exclusions. Those
+                # exclusions exist to drop commands, conf keys and graded files out of the join, and
+                # they were written against tokens that are none of them — but a real leg name
+                # carrying a `/`, or opening with a command verb, was being discarded UNREAD, so a
+                # correct §7 contributed nothing and the spec looked like prose.
+                if tok not in legs and NOT_A_LEG.search(tok):
                     continue
                 graded += 1
+                contributed += 1
                 if tok not in legs:
                     hits.append((f, "leg", tok, f"not a name in {LEGS}"))
+        if not contributed and extract_gates(text) is not None:
+            ungraded += 1
+            if legline_cut:
+                m = SPEC_DATE.search("/" + f)
+                if m and m.group(1) >= legline_cut:
+                    hits.append((f, "legline", f,
+                                 "section 7 carries a Gates heading and contributes no leg name, "
+                                 f"required at/after {LEGLINE_KEY} {legline_cut}"))
         for bullet in re.findall(r"^- .*(?:\n  .*)*", extract_section(text, 6), re.M):
             for tok in TICK.findall(bullet):
                 for word in tok.split():
@@ -206,6 +270,15 @@ def main(argv):
     print(f"spec-tokens: {len(specs)} live spec(s) · {frozen} terminal spec(s) not graded · "
           f"{graded} token(s) graded · {skipped} citation(s) skipped (untracked path) · "
           f"{len(waivers)} waiver(s)")
+    # THE UNGRADED POPULATION, which the report used to leave out entirely. A leg join that reads N
+    # specs and grades a leg name in far fewer of them looks identical to one that graded them all
+    # and found nothing wrong. These two numbers are what separate the cases, and they are kept
+    # apart because they have different remedies: a section that exists and names no leg is an
+    # author writing prose where the list goes, and no section at all is a Tier-1 spec exercising
+    # the light profile, which is legal.
+    print(f"spec-tokens: {ungraded} live spec(s) carry a Gates heading contributing NO leg name · "
+          f"{noheading} carry no Gates heading to grade · "
+          + (f"{LEGLINE_KEY} {legline_cut}" if legline_cut else f"{LEGLINE_KEY} blank (arm off)"))
 
     if listing:
         return 0

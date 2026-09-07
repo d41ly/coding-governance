@@ -30,9 +30,15 @@ MAP_DIFF_CMD="python codebase-map/map_diff.py"
 # --- reuse-convergence layer (optional; only meaningful with the SYMBOL recall tier) ----------
 
 # Layers you deliberately do NOT cover with a SYMBOL_EXTRACTOR (map_extractors.py) — a
-# space/comma-separated list. reuse_lookup.py names them in its partial-recall notice so an empty
-# "no seam fits" is never falsely confident (a seam in a recall-dark layer won't be in the corpus).
-# Leave empty when every layer has an extractor. Quote it — it has spaces.
+# space/comma-separated list of FILE EXTENSIONS, each with its leading dot: ".sh .ts". Language
+# NAMES are the old spelling and are REFUSED, not reinterpreted: reading `bash` as `.sh` is right
+# once and wrong for `c` or `go`, and an adopter carrying the old value has to be told rather than
+# guessed at.
+#
+# You do not have to author this from memory. The set is DERIVED from the corpus walk, so a layer
+# that is present, has no extractor and is not listed here makes `reuse_lookup.py` REFUSE and name
+# the extension and its file count. Run it once and paste back the layers you meant to leave dark.
+# Leave empty when every present layer has an extractor. Quote it — it has spaces.
 RECALL_DARK_LAYERS=""
 
 # Fan-in at/above which a symbol counts as a reusable "seam": referenced from >= this many distinct

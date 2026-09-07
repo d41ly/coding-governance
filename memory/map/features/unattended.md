@@ -8,10 +8,10 @@ streams = ["tooling", "playbook", "kickoff", "deployer"]
 decisions = []
 
 [claims]
-gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history"]
+gate-legs = ["unattended kit gate", "unattended skill wiring", "pass-order history", "brief-recorded"]
 kits = ["unattended"]
 git-hooks = []
-workflow-scripts = ["unattended-build.js"]
+workflow-scripts = ["unattended-build.js", "unattended-unit.js"]
 skill-engines = ["session-kickoff"]
 rendered-skills = ["unattended"]
 gotcha-classes = ["text-mode-read-eats-a-bare-cr.md",
@@ -44,12 +44,13 @@ written by the run, and why reachability from the pinned BASE is part of the con
 author its own authorization has none, and every gate downstream would certify it.
 
 **THE HARNESS BUYS STAGE ORDER AND CANNOT BUY ENFORCEMENT.** `tools/workflows/unattended-build.js`
-drives SPEC then AUDIT then BUILD as stages of one program, so BUILD is unreachable except through
-both and on a TERMINAL `--review` verdict — control flow, not a rule an agent remembers. It
+runs SPEC then AUDIT then DISPOSAL and hands the run an ordered ROSTER it dispatches one `Workflow`
+call per unit, so the hand-out is unreachable except through all three and on a TERMINAL `--review`
+verdict — control flow, not a rule an agent remembers. It
 verifies nothing: a Workflow script has no filesystem, so every observation is a claim its own agent
 returned, and the refusals live below. TWO SHAPES ARE FORCED BY `agent-cap.js`, which denied an
-`agent()` in any loop body until `TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: each stage is
-ONE agent over the ordered list, and the convergence LOOP sits in the caller while the harness holds
+`agent()` in any loop body until `TOOL-dFoldedVerdict-4` admitted a MARKED bounded one: DISPOSAL is
+ONE agent over the whole set, and the convergence LOOP sits in the caller while the harness holds
 the GATE, its iteration count being data-dependent and so unboundable.
 
 **PASS ORDER IS ENFORCED TWICE: ONE PLACE IS BYPASSABLE.** The method's hard floor
@@ -216,12 +217,11 @@ core sets are not editable from the project layer.
 
 ## Gaps
 
-*Re-derived 2026-08-20 against the tree rather than carried forward. The authored region
-carries twelve facts — it said seven here, and eleven in the protocol pair, and five in the driver's own
-resume comment, all at the same time. Three carriers, three values, none of them counted by any gate, which is why the unit that added the twelfth fact enumerated the
-carriers by path rather than trusting a builder to find them. Dossier prose is ungated — only the
-claims tables above are — so this section rots silently and is worth re-deriving whenever the feature
-is touched.*
+*Re-derived 2026-08-20 against the tree rather than carried forward. The authored region carries
+twelve facts, and three carriers gave three different counts at once — seven here, eleven in the
+protocol pair, five in the driver's resume comment — none counted by any gate, which is why the unit
+that added the twelfth enumerated the carriers by path. Dossier prose is ungated, so this section
+rots silently and is worth re-deriving whenever the feature is touched.*
 
 - **A run has been driven end to end, and it exposed two defects rather than confirming the
   design.** `aSealedCaravan` preflighted, built, and landed at `7a4f904` with the full bar green.

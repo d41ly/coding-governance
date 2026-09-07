@@ -1,14 +1,18 @@
 # TOOL-dTracedLattice-2 — the freshness gate announces a tier it did not compare
 
-**Status:** SPECCED · rev-4 · 2026-09-05 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
+**Status:** CLOSED · rev-6 · 2026-09-06 · node d · Tier-2 · base c4fcf5ad · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md](../build/2026-09-05-build-TOOL-dTracedLattice-1-design-dossier.md) | research | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-06-build-TOOL-dTracedLattice-2-1-acceptance-ledger.md](../build/2026-09-06-build-TOOL-dTracedLattice-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round1.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
 | [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round2.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 |
+| [2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md](../reviews/2026-09-05-review-TOOL-dTracedLattice-1-spec-audit-round3.md) | spec-audit | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
+| [2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md](../reviews/2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round1.md) | diff-review | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
+| [2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round2.md](../reviews/2026-09-06-review-TOOL-dTracedLattice-1-2-3-4-5-6-7-diff-review-round2.md) | diff-review | TOOL-dTracedLattice-1 TOOL-dTracedLattice-3 TOOL-dTracedLattice-4 TOOL-dTracedLattice-5 TOOL-dTracedLattice-6 TOOL-dTracedLattice-7 |
 
 <!-- /gen:spec-records -->
 
@@ -93,7 +97,7 @@ and needs its failing case observed on a fixture that has a committed artifact a
 `codebase-map coverage + freshness` · `codebase-map kit selftest` ·
 `harness arms (fail branches armed or pinned)`.
 
-Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit-subject legs and are HELD on a plain bar; a builder verifying this unit needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. The runner names every held leg, so they are announced rather than silent.
+`codebase-map kit selftest` is a `subject: kit` leg and is HELD on a plain bar, so a builder verifying this unit needs `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` to reach it; the runner names every held leg, so it is announced rather than silent. `codebase-map coverage + freshness` is NOT held — `tools/gate-legs.json` gives it `subject: repo`, `chunk: declarations` and no guard, and `tools/run-gates/run-gates.sh` holds a leg only when `subject = kit` OR `chunk = selftests` — so it runs on every bar here and in every adopter, and a red there fails the bar of every commit. Read the classification from `tools/gate-legs.json`, never from this sentence.
 
 ## 8. Open questions
 
@@ -107,6 +111,14 @@ Both `codebase-map kit selftest` and `codebase-map coverage + freshness` are kit
 
 - rev-1 · 2026-09-05 · initial draft, from the dTracedLattice skeptic round, which staged the break
   and observed the gate pass with the symbol tier absent.
+- rev-6 · 2026-09-06 · built. `CONDITIONAL_TIERS` makes the tier list the mechanism, so S3's class
+  fix needs no reporting line per tier; the announcement moved BEFORE the compare loop because the
+  AC1/AC4 arm caught a skip line an unrelated staleness failure had swallowed, and "which tiers did
+  not run" is what a reader needs most when something else is red. Status CLOSED.
+- rev-5 · 2026-09-06 · folded the round-3 spec audit: H6 (the held-legs sentence claimed
+  `codebase-map coverage + freshness` is kit-subject and held; `tools/gate-legs.json` gives it
+  `subject: repo`, `chunk: declarations` and no guard, so it runs on every bar — and its argv is this
+  unit's own write target, which is the gate a builder most needed to read correctly).
 - rev-4 · 2026-09-05 · moved to order 3; the owner's lexicon-rescue ruling inserted a unit ahead of
   the set and nothing else in this spec changed.
 - rev-3 · 2026-09-05 · folded the round-2 spec audit: M1 (§7 discloses that the kit legs are held,

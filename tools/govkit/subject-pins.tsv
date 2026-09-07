@@ -16,13 +16,16 @@ agent-cap self-test	kit	selftests
 agent-instructions self-test	kit	selftests
 agent-instructions wiring	repo	wiring
 branch-guard self-test	repo	selftests
+brief-recorded	repo	declarations
 build README slot contract	repo	records
 build-index selftest	kit	selftests
+build-method size	repo	product
 charter size	repo	product
 check-arms selftest	kit	selftests
 check-wiring self-test	kit	selftests
 codebase-map adopter e2e	kit	e2e
 codebase-map coverage + freshness	repo	declarations
+codebase-map gate coverage	repo	declarations
 codebase-map kit selftest	kit	selftests
 corpus-ids selftest	kit	selftests
 dead-path carriers (deleted files still named)	repo	declarations
