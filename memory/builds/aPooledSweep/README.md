@@ -57,7 +57,7 @@ each suite while the runner that adds them up ran them one after another.
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aPooledSweep-1` | CLOSED | the sweep runs its suites in a bounded outer pool, both bounds derived from the budgets file |
-| 2 | `TOOL-aPooledSweep-2` | OPEN | a contended reading grades no budget, and says so |
+| 2 | `TOOL-aPooledSweep-2` | CLOSED | a contended reading grades no budget, and the --rank refusal rev-1 assumed is now built |
 | 3 | `TOOL-aPooledSweep-3` | OPEN | pool safety is checked, not assumed |
 <!-- /roster:units -->
 
@@ -69,7 +69,7 @@ ids TOOL-aPooledSweep-1 TOOL-aPooledSweep-2 TOOL-aPooledSweep-3
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aPooledSweep-1 — the sweep runs its suites in a bounded outer pool](spec/2026-09-07-spec-TOOL-aPooledSweep-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-07 |
-| [TOOL-aPooledSweep-2 — a contended reading grades no budget, and says so](spec/2026-09-07-spec-TOOL-aPooledSweep-2.md) | 2 | 2 | OPEN | rev-3 | 2026-09-07 |
+| [TOOL-aPooledSweep-2 — a contended reading grades no budget, and says so](spec/2026-09-07-spec-TOOL-aPooledSweep-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-09-07 |
 | [TOOL-aPooledSweep-3 — pool safety is observed, not assumed](spec/2026-09-07-spec-TOOL-aPooledSweep-3.md) | 3 | 2 | OPEN | rev-3 | 2026-09-07 |
 <!-- /gen:build-units -->
 

@@ -21,7 +21,7 @@ cd "$ROOT" || exit 2
 RUNNER="$ROOT/tools/run-gates/run-selftests.sh"
 [ -f "$RUNNER" ] || { echo "run-selftests.test: no runner at $RUNNER"; exit 2; }
 
-SELFTEST_FLOOR=24
+SELFTEST_FLOOR=30
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -52,6 +52,22 @@ build_repo() {
     printf 'free one\t60\tbash tools/suite-ok.sh\tmeasured 2s on node t 2026-09-07, x1.5\n'
   } > tools/run-gates/selftest-budgets.txt
 
+  # THE ROUND-TRIP SETUP, as a file rather than as an arm string. The capture needs a sed
+  # expression, a tab and a newline, and an arm string is eval'd inside a fresh `bash -c` --
+  # three quoting layers deep, which is where the first attempt at this arm died.
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf 'set -u\n'
+    printf 'B=tools/run-gates/selftest-budgets.txt\n'
+    printf 'tag=$(bash tools/run-gates/run-selftests.sh --sweep 2>/dev/null |'
+    printf ' sed -n "s/^run-selftests: condition: //p")\n'
+    # AN EMPTY CAPTURE IS A REFUSAL, not a row with no tag in it: without this the arm would
+    # write an ordinary reading, --rank would rank it, and the arm would red for a reason that
+    # has nothing to do with the join it exists to observe.
+    printf '[ -n "$tag" ] || { echo "the sweep emitted no condition line"; exit 1; }\n'
+    printf 'printf "roundtrip\\t60\\tbash tools/suite-ok.sh\\tmeasured 42s $tag on node t 2026-09-07, x1.5\\n" >> "$B"\n'
+    printf 'git add -A >/dev/null 2>&1\n'
+  } > tools/roundtrip.sh
   git add -A >/dev/null 2>&1 || return 2
 }
 build_fixture build_repo || exit 2
@@ -179,5 +195,43 @@ arm "--sweep REFUSES when no timeout binary resolves, instead of running the bou
 arm "a --sweep filter matching nothing REFUSES, exactly as the serial mode's does" 2 \
     "so this run graded NOTHING at all" \
     'true' "$R --sweep --kit tools/nowhere"
+
+# ---------------------------------------------------------------- the withheld verdict, TOOL-aPooledSweep-2
+# The pool's readings are contended by construction, so the budget comparison is WITHHELD rather
+# than passed. Withheld is not passed: the count is stated on every run, and the row says so too.
+arm "every pooled row carries its cost verdict, and that verdict is 'withheld'" 0 \
+    "cost withheld" \
+    'true' "$R --sweep"
+
+arm "the sweep STATES how many cost verdicts it withheld, so a green sweep is never budget-clean" 0 \
+    "cost verdict(s) WITHHELD under pooled@" \
+    'true' "$R --sweep"
+
+arm "the sweep names the SERIAL mode as where a cost verdict comes from" 0 \
+    "for a cost verdict, run the serial mode" \
+    'true' "$R --sweep"
+
+# --rank sorts by recorded seconds, and a contended reading sorted against serial ones ranks the
+# CONDITIONS. Nothing refused one until now: CONDS' second pattern accepts any text after the
+# seconds, and a match there is what RANKS a row rather than what refuses it.
+arm "--rank REFUSES a pooled reading by name rather than sorting it as a direct one" 1 \
+    "carry no reading whose CONDITION this verb recognises" \
+    "printf 'contended\t60\tbash tools/suite-ok.sh\tmeasured 42s pooled@8x1 on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
+    "$R --rank"
+
+# THE OTHER EDGE. A refusal that also drops the ordinary rows is a blanket, not a predicate, and the
+# arm above cannot tell the two apart on its own.
+arm "the same file WITHOUT the pooled row still ranks, so the refusal is a predicate not a blanket" 0 \
+    "the declared share is carried by the TOP" \
+    'true' "$R --rank"
+
+# THE EMITTER AND THE READER, JOINED. The two arms above hand-type the tag on both sides, so they
+# observe the refusal and observe nothing about whether it matches what --sweep actually prints.
+# This one CAPTURES the tag from a real sweep and feeds that exact string to --rank; a spelling
+# drift on either side reds here and nowhere else.
+arm "the tag --sweep EMITS is the tag --rank refuses, captured rather than hand-typed" 1 \
+    "carry no reading whose CONDITION this verb recognises" \
+    'bash tools/roundtrip.sh' \
+    "$R --rank"
 
 run_arms run-selftests.test.sh

@@ -83,6 +83,11 @@ import re, sys
 # a held leg, and a direct timed invocation for a suite with no manifest row — so sorting them
 # together ranks the CONDITIONS as much as the suites. A phrasing not listed here is not ranked
 # leniently; it is reported as unbacked. Adding one is a deliberate edit, which is the point.
+# CONTENDED READINGS ARE REFUSED, NOT RANKED. `--sweep` composes this token, so the emitter and this
+# reader share one spelling; `run-selftests.test.sh` captures the tag from a real sweep and feeds it
+# here, because a fixture that hand-types it on both sides observes nothing about the join.
+REFUSED = [re.compile(r"pooled@")]
+
 CONDS = [
     (re.compile(r"worst of (\d+) readings (\d+)s"),
      lambda m: (int(m.group(2)), "worst of %s gate-run windows" % m.group(1))),
@@ -108,6 +113,20 @@ for line in open(sys.argv[1], encoding="utf-8"):
     if len(f) < 2:
         continue
     name, reading = f[0], (f[3] if len(f) > 3 else "")
+    # REFUSED BEFORE THE RANKERS ARE OFFERED THE ROW, and the order is the whole mechanism. A CONDS
+    # match is what RANKS a row -- the loop below breaks on the first hit and appends to `rows`, and
+    # only the for/else fall-through reaches `unbacked`. So a pooled pattern added to CONDS would
+    # make a contended reading RANK, the exact inverse of the intent; and the lenient `measured`
+    # entry accepts any text after the seconds, so it would match `measured 42s pooled@8x1 on node
+    # a` first anyway. Eleven rows in this file already use that spelling, three of them with a
+    # width clause, so it is the likely spelling rather than a contrived one.
+    #
+    # What it buys: `--sweep` states its own condition and a reading taken under it can be pasted
+    # into this file by any hand. Ranking it against serial ones is the ranking-the-conditions
+    # defect TOOL-aQuenchedHarness-6 S3a exists to prevent, and nothing refused it until now.
+    if any(rx.search(reading) for rx in REFUSED):
+        unbacked.append((name, reading))
+        continue
     for rx, take in CONDS:
         m = rx.search(reading)
         if m:
@@ -389,7 +408,12 @@ EOF
   SWEEP_ROOT=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
   trap 'rm -rf "$SWEEP_ROOT" 2>/dev/null' EXIT
 
+  # THE CONDITION, COMPOSED ONCE. Not re-derived per row: the same fact spelled twice in a file
+  # whose own header names that defect. It is printed in a stable shape because the `--rank` refusal
+  # matches this exact token, and the arm that proves they agree captures it from here.
+  SWEEP_CONDITION="pooled@${OUTER}x${SELFTEST_INNER_WIDTH}"
   echo "run-selftests: SWEEP of $SW_N suite(s), width $W (outer $OUTER, inner $SELFTEST_INNER_WIDTH)"
+  echo "run-selftests: condition: $SWEEP_CONDITION"
   echo "run-selftests: per-suite bound = budget x ${SWEEP_FACTOR}; run wall ${SWEEP_WALL}s; NO cost verdict is issued"
 
   # THE REAP IS PROBED ONCE, OUTSIDE THE LOOP. `wait -n` returns the exit STATUS of the job that
@@ -422,12 +446,19 @@ EOF
   # THE WALL WATCHDOG. It records the breach in a FILE before killing anything, so the renderer can
   # tell "this suite was killed by the wall" from "this suite never wrote a verdict" — two states
   # that look identical from a missing file alone.
-  ( sleep "$SWEEP_WALL"
+  # ITS OUTPUT GOES TO /dev/null, AND THAT IS NOT TIDINESS. A background job inherits the caller's
+  # stdout, so under `out=$(... --sweep ...)` the watchdog holds the command substitution's pipe open
+  # and the CAPTURE blocks for the whole wall even though the sweep finished in seconds. Measured:
+  # the round-trip arm below hit its 120s bound against a fixture whose suites take two. It is the
+  # same class `lib-selftest.sh` records for `timeout` and a surviving grandchild.
+  #
+  # AND ITS SLEEP IS RECORDED, because killing the subshell orphans the sleep rather than ending it.
+  ( sleep "$SWEEP_WALL" & echo $! > "$SWEEP_ROOT/dog.sleep"; wait $!
     : > "$SWEEP_ROOT/wall-breached"
     for pf in "$SWEEP_ROOT"/*/pid; do
       [ -r "$pf" ] || continue
       read -r wp < "$pf" 2>/dev/null && kill -TERM "$wp" 2>/dev/null
-    done ) &
+    done ) >/dev/null 2>&1 &
   SWEEP_DOG=$!
   # DISOWNED, and this is load-bearing rather than tidy: the watchdog sleeps for the whole wall, so
   # a `wait` that can see it blocks until the wall fires even when every suite finished in seconds.
@@ -446,12 +477,15 @@ EOF
   done
   wait
   kill "$SWEEP_DOG" 2>/dev/null || true
+  if [ -r "$SWEEP_ROOT/dog.sleep" ]; then
+    read -r _ds < "$SWEEP_ROOT/dog.sleep" 2>/dev/null && kill "$_ds" 2>/dev/null
+  fi
 
   WALL_BREACHED=0; [ -e "$SWEEP_ROOT/wall-breached" ] && WALL_BREACHED=1
 
   # RENDERED IN DECLARATION ORDER, by builtins, off the arrays. A suite's position in the output
   # never depends on when the pool happened to free its slot.
-  st=0; ran=0; killed=0; walled=""
+  st=0; ran=0; killed=0; walled=""; withheld=0
   j=1
   while [ "$j" -le "$SW_N" ]; do
     name=${SW_NAME[$((j - 1))]}; state=${SW_STATE[$((j - 1))]}; d="$SWEEP_ROOT/$j"
@@ -473,15 +507,19 @@ EOF
     fi
     IFS=$'\t' read -r rc s e < "$d/v"
     took=$(( e - s ))
+    # EVERY ROW THAT RAN CARRIES ITS COST VERDICT, and that verdict is `withheld`. Printing the
+    # seconds and nothing else would be a budget silently not graded, which is the green-by-absence
+    # class; printing `ok` for the cost would be a verdict taken from a clock this run contended.
+    withheld=$((withheld + 1))
     if [ "$rc" = 0 ]; then
-      printf 'ok    %-46s %5ss\n' "$name" "$took"
+      printf 'ok    %-46s %5ss  cost withheld\n' "$name" "$took"
     elif [ "$rc" = 124 ] || [ "$rc" = 137 ]; then
       st=1; killed=$((killed + 1))
       printf 'TIMEOUT %-44s %5ss  (killed at its %ss bound — it did not fail, it did not finish)\n' \
         "$name" "$took" "$(( ${SW_BUDGET[$((j - 1))]} * SWEEP_FACTOR ))"
     else
       st=1
-      printf 'FAIL  %-46s %5ss  (exit %s)\n' "$name" "$took" "$rc"
+      printf 'FAIL  %-46s %5ss  cost withheld  (exit %s)\n' "$name" "$took" "$rc"
       grep -E '^(FAIL|nope|.*FAILED)' "$d/out" 2>/dev/null | head -4 | sed 's/^/        /'
     fi
     j=$((j + 1))
@@ -489,6 +527,10 @@ EOF
 
   echo "----"
   [ -n "$walled" ] && echo "run-selftests: the ${SWEEP_WALL}s run wall killed:$walled"
+  # THE COUNT IS WHAT STOPS THE WITHHOLDING BEING A SILENT PASS. A green sweep announces on every
+  # run how many budgets it did not grade, so it can never be mistaken for a budget-clean run.
+  echo "run-selftests: $withheld cost verdict(s) WITHHELD under $SWEEP_CONDITION — a contended clock cannot grade a budget"
+  echo "run-selftests: for a cost verdict, run the serial mode: bash tools/run-gates/run-selftests.sh"
   if [ "$st" -eq 0 ]; then
     echo "sweep GREEN — $ran suite(s) ran concurrently; NO cost verdict was issued for any of them"
   else

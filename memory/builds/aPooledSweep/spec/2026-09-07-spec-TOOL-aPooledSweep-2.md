@@ -1,6 +1,6 @@
 # TOOL-aPooledSweep-2 — a contended reading grades no budget, and says so
 
-**Status:** OPEN · rev-3 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 2 · ratified 2026-09-07
+**Status:** CLOSED · rev-3 · 2026-09-07 · node a · Tier-2 · base 05fb897c · streams tooling · order 2 · ratified 2026-09-07
 
 <!-- gen:spec-records -->
 
