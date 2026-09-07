@@ -71,6 +71,27 @@ include = ["scratch-guard.fragment.json"]
 role = "engine"
 to = "{prefix}/hooks/scratch-guard.fragment.json"
 
+[adopt]
+# RESTORED. TOOL-aQuenchedHarness-3 removed two `[[gate_leg]]` rows from this file and took
+# the `[adopt]` table and the whole `[check]` block out with them -- the hunk boundaries ran
+# past the rows it meant to delete. `agent-cap` was then the only descriptor of thirteen
+# carrying neither, and `govkit check <target>` reds on exactly that for every adopter that
+# selected it. Found by the closing review of the build that deleted them.
+argv = ["python", "{prefix}/settings-merge.py"]
+mutates_index = false
+
+[check]
+# Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
+# reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+#
+# The reason is UNCHANGED except for its first clause, which said the kit "ships a self-test
+# that rides the bar as its own leg". It no longer ships one: TOOL-aQuenchedHarness-3
+# withheld both suites, and they are legs on GOV's bar alone. The rest of the argument --
+# no adopter verb, no rendered artifact, wiring is check-wiring's question -- holds as it did.
+none = """
+this kit ships a hook and a settings fragment and nothing that runs: its two self-tests are withheld from every adopter and are legs on gov's bar alone, and there is no rendered artifact. Whether the hook is WIRED is check-wiring's question, not this kit's
+"""
+
 [[lf_pin]]
 pattern = "*.fragment.json"
 why = "check-wiring.sh reads the fragment with sed; a trailing CR lands inside the captured matcher and the arm reports UNWIRED against a correctly wired repo"

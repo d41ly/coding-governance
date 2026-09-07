@@ -2,8 +2,9 @@
 #
 # SOURCED, never executed. Three verbs and nothing else: `build_fixture`, `arm`, `run_arms`. It is not
 # a test framework — no discovery, no fixtures-by-convention, no assertion library. Those exist and
-# this repo does not need one; what it needs is for 11.7 hours of declared self-test budget to stop
-# being 11.7 hours.
+# this repo does not need one; what it needs is for a declared self-test budget measured in HOURS
+# to stop being measured in hours. The figure is not written here: `run-selftests.sh --list`
+# derives it, and the two copies that used to sit in this sentence were 30% stale within a day.
 #
 # ---- WHAT THE MEASUREMENT SAID, because every decision below follows from it and none of it was
 # ---- reasoned out in advance. `memory/builds/aQuenchedHarness/build/2026-09-07-build-TOOL-aQuenchedHarness-5-candidate-test.md`

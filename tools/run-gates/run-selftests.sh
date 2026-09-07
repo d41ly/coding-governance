@@ -15,8 +15,11 @@
 # touching a kit is a GREEN verdict from it pasted into the landing report.
 #
 # AND THE COST OF THAT, said just as plainly, because it is the argument for units 5 and 6 rather
-# than an aside: the declared budgets sum to about ELEVEN AND A HALF HOURS of leg-seconds. Nobody
-# runs an eleven-hour check, which is why `TOOL-aQuenchedHarness-9` exists — `govkit selftest` sat
+# than an aside: the declared budgets sum to more leg-seconds than anyone will sit through, and
+# `--list` prints the figure rather than this comment carrying one -- a number typed beside the
+# declarations that own it is the defect this same file names sixty lines down, and it had
+# already gone 30% stale before the closing review caught it. Nobody runs a check measured in
+# hours, which is why `TOOL-aQuenchedHarness-9` exists — `govkit selftest` sat
 # with two arms red for long enough that nobody can say when they broke.
 set -u
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -172,6 +175,15 @@ for line in open(budgets, encoding="utf-8"):
     if len(f) < 2:
         continue
     name, budget, argv = f[0], f[1], (f[2] if len(f) > 2 else "")
+    # A BUDGET NOBODY CAN COMPARE IS NOT A BUDGET. An empty second column emitted `ok` for a row
+    # whose argv then read back EMPTY -- the run loop `eval`'d nothing, got rc 0, and printed a
+    # green line at 0s for a suite it never executed; and `[ "$took" -gt "$budget" ]` on a
+    # non-number errors with `integer expression expected`, returns 2, and reads as "not over
+    # budget", so the cost verdict went quiet too. Neither direction of `--check` could see it:
+    # the forward one matches names and the reverse one iterates an empty argv zero times.
+    if not budget.isdigit():
+        print("\t".join(["BADBUDGET", name, budget, argv]))
+        continue
     if not argv:
         leg = legs.get(name)
         if not leg:
@@ -238,6 +250,10 @@ PY
       echo "run-selftests: row '$name' has no argv and no leg of that name in the manifest" >&2
       fails=1; continue
     fi
+    if [ "$state" = BADBUDGET ]; then
+      echo "run-selftests: row '$name' declares a budget that is not a number ('$budget'), so its cost verdict could never fire" >&2
+      fails=1; continue
+    fi
     for tok in $argv; do
       case "$tok" in
         */*) git ls-files --error-unmatch -- "$tok" >/dev/null 2>&1 \
@@ -274,6 +290,15 @@ echo "run-selftests: $NROWS suite(s), declared total $(( (TOTAL + 59) / 60 )) mi
 st=0; ran=0; over=0
 while IFS=$'\t' read -r state name budget argv; do
   [ -n "${name:-}" ] || continue
+  # THE STATE IS READ HERE TOO. This loop used to ignore it entirely, so an UNRESOLVED row -- whose
+  # argv is empty by construction -- was `eval`'d as the empty string, returned 0, and printed a
+  # green line for a suite that does not exist. `--check` is a separate leg and a separate run; a
+  # runner that trusts it has two answers to one question.
+  if [ "$state" != ok ]; then
+    st=1
+    printf 'FAIL  %-46s        (%s: this row could not be resolved into a runnable suite)\n' "$name" "$state"
+    continue
+  fi
   ran=$((ran + 1))
   s=$(date +%s)
   out=$(eval "$argv" 2>&1); rc=$?

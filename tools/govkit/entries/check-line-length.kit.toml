@@ -17,9 +17,24 @@ selectable = "conditional"
 version_from = { none = "it grades whatever a target declares and carries no behaviour of its own to version" }
 
 [[files]]
-include = ["check-line-length.sh", "check-line-length.test.sh"]
+include = ["check-line-length.sh"]
 role = "engine"
 to = "{prefix}/{relpath}"
+
+# THE SELF-TEST IS WITHHELD, and this one is not the 2026-08-23 ruling -- it is a hard
+# dependency an adopter cannot satisfy. TOOL-aQuenchedHarness-6 ported the suite onto
+# `tools/lib/lib-selftest.sh`, and `tools/lib` is a standing registry exemption: gov-internal,
+# claimed by no descriptor, shipped to nobody. `silenced_legs` cannot catch the mismatch,
+# because it drops a leg whose argv names a MISSING path and the argv names the suite, which
+# WAS being shipped -- so every adopter selecting this kit got a wired merge-bar leg that reds
+# on arrival with `build_fixture: command not found`. That is the exact class
+# `tools/run-gates/kit.toml` records as the historical reason run-gates itself was
+# un-shippable. The ruling would have withheld it anyway; this makes the reason the stronger
+# one, and it is the question every future port has to answer, because the harness is the one
+# file every ported suite needs and the one file no adopter can receive.
+[[files]]
+include = ["check-line-length.test.sh"]
+role = "project-owned"
 
 [adopt]
 argv = []
@@ -36,8 +51,7 @@ name = "line length"
 subject = "repo"
 argv = ["bash", "{prefix}/check-line-length.sh"]
 
-[[gate_leg]]
-name = "line-length gate selftest"
-subject = "kit"
-argv = ["bash", "{prefix}/check-line-length.test.sh"]
-guard = ["{prefix}/check-line-length.sh", "{prefix}/check-line-length.test.sh"]
+# The `line-length gate selftest` leg is NOT declared here. It is a leg on GOV's bar and carries
+# an [[exempt_leg]] row in tools/govkit/registry.toml, for the reason recorded beside
+# `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds
+# the deployer, and it made every adopter apply exit 1 with one silenced-leg problem per suite.

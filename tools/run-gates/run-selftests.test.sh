@@ -21,7 +21,7 @@ cd "$ROOT" || exit 2
 RUNNER="$ROOT/tools/run-gates/run-selftests.sh"
 [ -f "$RUNNER" ] || { echo "run-selftests.test: no runner at $RUNNER"; exit 2; }
 
-SELFTEST_FLOOR=13
+SELFTEST_FLOOR=16
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -119,5 +119,19 @@ arm "a suite that overruns its declared budget reds and NAMES the number it brok
     "OVER BUDGET" \
     "sed -i 's|free one\t60|free one\t1|; s|bash tools/suite-ok.sh|bash tools/suite-slow.sh|' $B" \
     "$R"
+
+# ---------------------------------------------------------------- the state field is READ
+# The run loop used to ignore `$state` entirely, and the emitter used to accept any budget. Together
+# that made a row with an empty budget print a GREEN line at 0s for a suite it never executed: the
+# empty column collapsed under IFS=tab, argv read back empty, `eval ""` returned 0, and the budget
+# comparison errored into "not over budget". Both halves are armed here, in both readers.
+arm "a NON-NUMERIC budget is a named refusal in --check, not a row that cannot be graded" 1     "declares a budget that is not a number"     "printf 'lopsided	lots	bash tools/suite-ok.sh	worst of 3 readings 5s, x1.5
+' >> $B && git add -A"     "$R --check"
+
+arm "an EMPTY budget column is caught too, rather than collapsing into the argv" 1     "declares a budget that is not a number"     "printf 'hollow		bash tools/suite-ok.sh	worst of 3 readings 5s, x1.5
+' >> $B && git add -A"     "$R --check"
+
+arm "the RUN loop refuses a row it cannot resolve instead of printing ok for a suite it never ran" 1     "this row could not be resolved into a runnable suite"     "printf 'hollow		bash tools/suite-ok.sh	worst of 3 readings 5s, x1.5
+' >> $B && git add -A"     "$R"
 
 run_arms run-selftests.test.sh

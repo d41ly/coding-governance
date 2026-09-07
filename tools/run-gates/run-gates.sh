@@ -450,14 +450,24 @@ remove_descendants() {
     case "$p" in ''|*[!0-9]*) continue ;; esac
     kill -9 "$p" 2>/dev/null || true
   done
-  rm -f "$snap" 2>/dev/null || true
   # WHAT IT COULD NOT KILL IS REPORTED, and this is where the wall's liveness assertion lives now.
   # A host where the walk cannot reach a leg's descendants says so with the pids, at the moment the
   # fact matters, instead of a startup probe guessing at it for every run that never breaches.
+  #
+  # THE SNAPSHOT IS DELETED AFTER THIS LOOP, NOT BEFORE IT. It used to be removed one line above,
+  # and this loop then re-scanned the deleted path: `scan_descendants` reads it under
+  # `2>/dev/null`, so a missing file yields an empty frontier and the walk returns its SEED --
+  # the root pid alone. The survivor loop could therefore never examine a descendant and the
+  # message below could never name one. That is byte-for-byte the failure the deleted startup
+  # probe had, described a few lines further down in this same file, reintroduced by an `rm` in
+  # the wrong place -- and since this is the wall's ONLY liveness assertion, the guarantee was
+  # decorative. Found by the closing review of the build that wrote it. TOOL-aQuenchedHarness-1,
+  # corrected in TOOL-aQuenchedHarness-7's closing pass.
   for p in $(scan_descendants "$1" "$snap" 2>/dev/null); do
     case "$p" in ''|*[!0-9]*) continue ;; esac
     kill -0 "$p" 2>/dev/null && left="$left $p"
   done
+  rm -f "$snap" 2>/dev/null || true
   [ -n "$left" ] && printf 'run-gates: the wall could not reach these descendants of %s, so they are still running:%s\n' "$1" "$left" >&2
   return 0
 }
@@ -1644,6 +1654,27 @@ if [ -f "$WORK/wall.breach" ]; then
   fi
   printf '%b' "$WALL_STUCK"
   echo "gates RED — the ${WALL}s wall fired; the run was killed, not the legs"
+  # THE RUN RECORD GETS ITS VERDICT BEFORE THIS EXIT. This block `exit 1`s above the verdict
+  # writer at the foot of the file, so a breach left a run directory with a header and NO
+  # verdict -- which is precisely the state this runner documents as its crash signal. A wall
+  # firing is the most deliberate outcome the runner has and it was recording itself as a crash,
+  # so the one condition the wall exists to make legible was the one it made unreadable. The
+  # `[ -f "$WORK/wall.breach" ] && gate_verdict=RED` line further down could never fire for the
+  # same reason, and its own neighbour comment already said so. TOOL-aQuenchedHarness-1,
+  # corrected in TOOL-aQuenchedHarness-7's closing pass.
+  if [ -n "$RUNDIR" ]; then
+    {
+      printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      printf 'verdict\t%s\n' RED
+      printf 'ran\t%s\n' "$ran"
+      printf 'failed\t%s\n' "$fails"
+      printf 'skipped\t%s\n' "$skips"
+      printf 'held\t%s\n' "${ondemands:-0}"
+      printf 'reused\t%s\n' "$reuses"
+      printf 'wall_breach\t%s\n' "$WALL"
+    } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
+    chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
+  fi
   exit 1
 fi
 
