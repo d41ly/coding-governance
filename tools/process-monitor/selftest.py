@@ -435,5 +435,98 @@ def test_live_scope_is_not_empty():
     check_true("test_live_scope_is_not_empty", len(sc) > 0,
                "(the shipped conf admits NOTHING on this machine)")
 
+
+# ================================================================ classify (unit 3)
+
+import classify  # noqa: E402
+
+CEIL, RATE = 100.0, 0.5
+
+
+def build_graded(**kw):
+    r = build_row(kw.pop("winpid", 1), kw.pop("win_ppid", 999), kw.pop("command", "/x"),
+                  age=kw.pop("age", 200.0), cpu=kw.pop("cpu", 1.0), **kw)
+    return r
+
+
+def test_every_verdict_member_has_a_producing_fixture():
+    """Counting members is not coverage; PRODUCING them is. rev-3 carried an OVERAGE member no
+    input could emit, and the closed-set arm passed on the spelling of the enum."""
+    live = {999}
+    produced = {
+        classify.derive_verdict(build_graded(age=50.0), CEIL, RATE, live),
+        classify.derive_verdict(build_graded(cpu=None), CEIL, RATE, live),
+        classify.derive_verdict(build_graded(win_ppid=4242), CEIL, RATE, live),
+        classify.derive_verdict(build_graded(cpu=180.0), CEIL, RATE, live),
+        classify.derive_verdict(build_graded(cpu=1.0), CEIL, RATE, live),
+    }
+    check("test_every_verdict_member_has_a_producing_fixture",
+          (sorted(produced), sorted(classify.VERDICTS)),
+          (sorted(classify.VERDICTS), sorted(classify.VERDICTS)))
+
+
+def test_ceiling_decides_before_any_label():
+    """A young row is OK even at rate 1.0 with no live parent — otherwise every healthy gate leg
+    and every fresh shell on the box reds."""
+    check("test_ceiling_decides_before_any_label",
+          (classify.derive_verdict(build_graded(age=99.0, cpu=99.0, win_ppid=4242), CEIL, RATE, {999}),
+           classify.derive_verdict(build_graded(age=101.0, cpu=101.0, win_ppid=4242), CEIL, RATE, {999})),
+          ("OK", "ORPHAN"))
+
+
+def test_native_parentless_row_is_orphan_and_reaped():
+    """`msys_ppid` absent is the NATIVE majority. It must not make the row UNKNOWN — that was
+    rev-3's defect and it made reap-orphans inert over the whole target population."""
+    r = build_graded(win_ppid=4242, msys_pid=None, msys_ppid=None)
+    check("test_native_parentless_row_is_orphan_and_reaped",
+          classify.derive_verdict(r, CEIL, RATE, {999}), "ORPHAN")
+
+
+def test_live_windows_parent_is_not_an_orphan():
+    check("test_live_windows_parent_is_not_an_orphan",
+          classify.derive_verdict(build_graded(win_ppid=999), CEIL, RATE, {999}), "IDLE")
+
+
+def test_no_cpu_row_is_unknown():
+    check("test_no_cpu_row_is_unknown",
+          classify.derive_verdict(build_graded(cpu=None, win_ppid=4242), CEIL, RATE, {999}),
+          "UNKNOWN")
+
+
+def test_rate_boundary_is_inclusive():
+    check("test_rate_boundary_is_inclusive",
+          (classify.derive_verdict(build_graded(age=200.0, cpu=100.0), CEIL, RATE, {999}),
+           classify.derive_verdict(build_graded(age=200.0, cpu=99.0), CEIL, RATE, {999})),
+          ("SPIN", "IDLE"))
+
+
+def test_msys_ppid_participates_in_no_predicate():
+    """Two rows identical but for msys_ppid must grade the same."""
+    a = build_graded(winpid=1, win_ppid=999, msys_pid=None, msys_ppid=None)
+    b = build_graded(winpid=2, win_ppid=999, msys_pid=50, msys_ppid=51)
+    check("test_msys_ppid_participates_in_no_predicate",
+          classify.derive_verdict(a, CEIL, RATE, {999}) ==
+          classify.derive_verdict(b, CEIL, RATE, {999}), True)
+
+
+def test_summary_counts_are_derived_from_the_run():
+    rows = [build_row(1, 999, "/c/projects/gov/a", age=200.0, cpu=1.0),
+            build_row(2, 4242, "/c/projects/gov/b", age=200.0, cpu=1.0),
+            build_row(999, 1, "/c/projects/gov/parent", age=500.0, cpu=1.0)]
+    graded, counts = classify.scan_verdicts(rows, {1: {}, 2: {}, 999: {}}, CEIL, RATE)
+    text = classify.render_report(graded, counts)
+    check("test_summary_counts_are_derived_from_the_run",
+          (counts["census"], counts["scoped"], counts["flagged"] == len(graded),
+           str(len(graded)) in text.splitlines()[-1]),
+          (3, 3, True, True))
+
+
+def test_out_of_scope_rows_are_never_graded():
+    """The ordering that keeps explorer.exe alive: an unadmitted row is not graded at all."""
+    rows = [build_row(90, 4242, "C:/Windows/explorer.exe", age=300000.0, cpu=1.0)]
+    graded, counts = classify.scan_verdicts(rows, {}, CEIL, RATE)
+    check("test_out_of_scope_rows_are_never_graded", (len(graded), counts["flagged"]), (0, 0))
+
+
 if __name__ == "__main__":
     sys.exit(main())
