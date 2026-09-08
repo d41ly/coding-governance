@@ -9,10 +9,10 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-parked-surfaced: two decisions parked: the skipped bar with its five documented pre-existing legs, and the two out-of-scope fixes
-keepalive-reaped: CronDelete bc67bed5, then CronList returned no scheduled jobs
+parked-surfaced: yes
+keepalive-reaped: yes
 witness: ed127313834f9cb9ca2d06996c361c1be221bf12
-phase: REVIEWING
+phase: LANDING
 branch-sha: e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c
 branch-ref: refs/heads/branch/gate-runner-process-monitor-0d0fa8
 mode: prompt
@@ -62,3 +62,5 @@ base: e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c
 2026-09-08T19:14:30Z decision · item The full GATE_SELFTESTS bar was never seen green, and landing proceeded on owner instruction to skip it · reason Five legs are red on clean main with verified one-line fixes filed (rows 11, 18, 19) and were deliberately not fixed here, since they sit in govkit, codebase-map and memory-recall, which this build's diff does not touch. A sixth class is new: TOOL-aReapedSpinner-23, ceilings calibrated against the ticker hang. The last bar this build saw was RED at 13/104, and none of the 13 was traced to this kit.
 
 2026-09-08T19:14:32Z decision · item Two pre-existing defects were fixed outside this build's scope · reason The ticker fd-hold and the canary's unreachable wall arm, both in tools/run-gates/ which this build already edits, both one line, both recorded (rows 17 and 21, decisions 20 and 22). Each is independently revertable. Without them no full selftests bar can pass at all, so the alternative was a Definition of Done that could never be met.
+
+2026-09-08T19:24:53Z override · item gates-green · reason Owner instruction, 2026-09-08: skip the bar and land it. The last full GATE_SELFTESTS run was RED at 13/104 and none of the 13 was traced to this kit — five reproduce on clean main at d499258d with verified fixes filed (rows 11, 18, 19), and the rest are TOOL-aReapedSpinner-23, ceilings calibrated against the ticker hang this build removed. The kit's own two legs pass: census selftest 66 assertions, adopter selftest 31.
