@@ -28,6 +28,20 @@
 # pin the other does not have.
 GIT_PIN_REPLACE=core.useReplaceRefs=false
 GIT_PIN_GRAFTADV=advice.graftFileDeprecated=false
+# NO MEMO LIVES HERE, and the attempt is recorded because it looked obviously right.
+# TOOL-aQuenchedHarness-10 cached this wrapper on argv, having measured that 436 of the leg's
+# 1008 git calls are byte-identical repeats. It bought almost nothing: about twenty call sites
+# invoke `GIT` inside `$( )`, and whole functions — `pass_commit`, `next_anchor`,
+# `baseline_units`, `pinned_units` — are themselves called through command substitution, so
+# every cache entry they filled died with the subshell that filled it. `rev-parse HEAD` still
+# cost 39 spawns with the cache active.
+#
+# It also RED-ED check 28, which is the better reason it is gone: that check reads this
+# definition LINE and requires the replace-ref pin on it, so a wrapper whose body carries the
+# pin while its signature does not is exactly the unpinned-wrapper shape it exists to catch.
+# The lesson the measurement actually supports: fill tables ONCE in the main shell before the
+# loops, which is what `is_published` now does, rather than caching a wrapper that is mostly
+# called from subshells.
 GIT() { git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" "$@"; }
 
 # ------------------------------------------------------------------------------- ids, anchored
