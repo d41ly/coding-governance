@@ -5,7 +5,7 @@ opened: 2026-09-08
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 TOOL-aReapedSpinner-8 TOOL-aReapedSpinner-9 TOOL-aReapedSpinner-10 TOOL-aReapedSpinner-11 TOOL-aReapedSpinner-12 TOOL-aReapedSpinner-13 TOOL-aReapedSpinner-14 TOOL-aReapedSpinner-15 TOOL-aReapedSpinner-16 TOOL-aReapedSpinner-17 TOOL-aReapedSpinner-18 TOOL-aReapedSpinner-19 TOOL-aReapedSpinner-20 TOOL-aReapedSpinner-21 TOOL-aReapedSpinner-22
+ids: TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 TOOL-aReapedSpinner-8 TOOL-aReapedSpinner-9 TOOL-aReapedSpinner-10 TOOL-aReapedSpinner-11 TOOL-aReapedSpinner-12 TOOL-aReapedSpinner-13 TOOL-aReapedSpinner-14 TOOL-aReapedSpinner-15 TOOL-aReapedSpinner-16 TOOL-aReapedSpinner-17 TOOL-aReapedSpinner-18 TOOL-aReapedSpinner-19 TOOL-aReapedSpinner-20 TOOL-aReapedSpinner-21 TOOL-aReapedSpinner-22 TOOL-aReapedSpinner-23
 ---
 
 # aReapedSpinner — a process this fleet launched has no deadline, no witness and no reaper, so nothing observes it burning
@@ -69,7 +69,7 @@ and nothing ENUMERATES the population, which is why all three ran unseen for two
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-09-08 · streams tooling
 ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 TOOL-aReapedSpinner-8 TOOL-aReapedSpinner-9 TOOL-aReapedSpinner-10 TOOL-aReapedSpinner-11 TOOL-aReapedSpinner-12 TOOL-aReapedSpinner-13
-ids TOOL-aReapedSpinner-14 TOOL-aReapedSpinner-15 TOOL-aReapedSpinner-16 TOOL-aReapedSpinner-17 TOOL-aReapedSpinner-18 TOOL-aReapedSpinner-19 TOOL-aReapedSpinner-20 TOOL-aReapedSpinner-21 TOOL-aReapedSpinner-22
+ids TOOL-aReapedSpinner-14 TOOL-aReapedSpinner-15 TOOL-aReapedSpinner-16 TOOL-aReapedSpinner-17 TOOL-aReapedSpinner-18 TOOL-aReapedSpinner-19 TOOL-aReapedSpinner-20 TOOL-aReapedSpinner-21 TOOL-aReapedSpinner-22 TOOL-aReapedSpinner-23
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
