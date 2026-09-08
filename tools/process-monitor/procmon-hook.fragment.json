@@ -1,0 +1,7 @@
+{
+  "name": "procmon-report",
+  "event": "PostToolUse",
+  "matcher": "Bash|PowerShell",
+  "marker": "procmon-hook.js",
+  "hook_path": "{kit}/process-monitor/procmon-hook.js"
+}

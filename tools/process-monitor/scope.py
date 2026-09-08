@@ -86,6 +86,15 @@ def check_root_shape(roots):
             "would match nothing and every report would read as a clean tree it never examined.")
     for r in roots:
         norm = build_normalized(r)
+        # ABSOLUTE, and the test is not decoration. `PROCMON_ROOTS` is whitespace-delimited on both
+        # sides of the comparison, so `C:/Users/John Doe/proj` splits into `c:/users/john` and
+        # `doe/proj` -- a bare profile prefix that widens the fence to the whole user, and a
+        # relative fragment. Both cleared the length test at 13 characters each.
+        if not (norm.startswith("/") or re.match(r"^[a-z]:/", norm)):
+            raise ScopeRefused(
+                "PROCMON_ROOTS entry %r is not an absolute path. A root may not contain "
+                "whitespace either: the declaration is whitespace-split, so a path with a space "
+                "in it becomes two shorter roots, one of which is your profile directory." % r)
         if len(norm) < MIN_ROOT_LEN or norm in ("", "/", "c:"):
             raise ScopeRefused(
                 "PROCMON_ROOTS entry %r is too broad to be a declaration — it would admit "
@@ -196,12 +205,23 @@ def derive_scope(rows, roots, self_chain=()):
 
 
 def read_roots(conf_text):
-    """PROCMON_ROOTS out of a conf file's text."""
-    for line in conf_text.splitlines():
-        line = line.strip()
-        if line.startswith("PROCMON_ROOTS="):
-            return line.split("=", 1)[1].strip().strip("\"'").split()
-    return []
+    """PROCMON_ROOTS out of a conf file's text.
+
+    LAST-WINS, and a duplicate assignment REFUSES. The adopter SOURCES the conf, where a later
+    assignment overwrites an earlier one; this reader used to take the FIRST and return. Two
+    readers of one declaration disagreeing about which line is authoritative is the defect class
+    this kit's own gates are written against, so the two now agree and a conf that could make them
+    differ is refused outright.
+    """
+    hits = [ln.strip() for ln in conf_text.split("\n") if ln.strip().startswith("PROCMON_ROOTS=")]
+    if len(hits) > 1:
+        raise ScopeRefused(
+            "the conf carries %d PROCMON_ROOTS assignments. One declaration, one value: a second "
+            "one makes the shell reader and this one disagree about which is authoritative."
+            % len(hits))
+    if not hits:
+        return []
+    return hits[0].split("=", 1)[1].strip().strip("\"'").split()
 
 
 def load_conf(root_dir):
@@ -213,7 +233,18 @@ def load_conf(root_dir):
 
 
 def build_self_chain(rows, winpid):
-    """The calling process and its ancestors, over the same union graph, under a visited-set."""
+    """The calling process and its ancestors, over the same union graph, under a visited-set.
+
+    REFUSES when the caller is absent from the census. A chain that cannot see itself collapses to
+    a singleton, and every one of the caller's ancestors then grades killable -- the safety
+    property failing silently in the direction that costs a session. A probe that cannot move says
+    so; it does not return an empty set.
+    """
+    if winpid not in {r["winpid"] for r in rows}:
+        raise ScopeRefused(
+            "winpid %s is not in this census, so the self chain cannot be walked. If this is an "
+            "MSYS id, translate it through the census first -- the two namespaces are different "
+            "numbers." % winpid)
     edges, _dropped, _unmapped = build_edges(rows)
     chain, frontier = set(), [winpid]
     while frontier:

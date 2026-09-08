@@ -83,7 +83,11 @@ def run_bounded(argv, timeout=BACKEND_TIMEOUT_S):
 def parse_cim(text):
     """CIM lines -> {winpid: (win_ppid, cpu_s, age_s, command)} plus the rejected-row count."""
     rows, rejected = {}, 0
-    for line in text.splitlines():
+    # THE PRODUCER'S TERMINATOR, not Python's. `str.splitlines()` also breaks on \v, \f, \x1c,
+    # \x1d, \x1e, \x85, U+2028 and U+2029, while the CIM query strips only [\r\n]. A process whose
+    # own command line embeds any of those splits across rows, and the well-formed fragment
+    # OVERWRITES the row for whatever winpid it names -- a forged census row, with rejected=0.
+    for line in text.replace("\r", "").split("\n"):
         if not line.strip():
             continue
         parts = line.split(_CIM_SEP)
@@ -114,7 +118,7 @@ def parse_ps_w(text):
     and matched ZERO of 315 rows in a tree full of agent processes.
     """
     rows, rejected = {}, 0
-    for line in text.splitlines()[1:]:
+    for line in text.replace("\r", "").split("\n")[1:]:
         if not line.strip():
             continue
         hit = _PS_W_ROW.match(line)
@@ -165,7 +169,7 @@ def parse_posix(text):
     the row contract records.
     """
     rows, rejected = [], 0
-    for line in text.splitlines()[1:]:
+    for line in text.replace("\r", "").split("\n")[1:]:
         parts = line.split(None, 4)
         if len(parts) < 4 or not parts[0].isdigit() or not parts[1].isdigit() \
                 or not parts[2].isdigit():

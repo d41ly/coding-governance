@@ -552,7 +552,7 @@ def test_leaves_are_killed_first():
 def test_out_of_scope_root_refuses_before_the_walk():
     got = "no refusal"
     try:
-        reap.run_kill(1, build_tree_rows(), {2, 3, 4}, dry_run=True)
+        reap.run_kill(1, build_tree_rows(), build_scope(2, 3, 4), dry_run=True)
     except reap.ReapRefused as exc:
         got = "refused" if "not in scope" in str(exc) else "refused for the wrong reason"
     check("test_out_of_scope_root_refuses_before_the_walk", got, "refused")
@@ -562,7 +562,7 @@ def test_wrong_namespace_id_refuses_with_its_own_message():
     """An MSYS id handed to a winpid interface must say so, not give the out-of-scope refusal."""
     got = ""
     try:
-        reap.run_kill(4198485, build_tree_rows(), {1, 2, 3, 4})
+        reap.run_kill(4198485, build_tree_rows(), build_scope(1, 2, 3, 4))
     except reap.ReapRefused as exc:
         got = "namespace" if "namespace" in str(exc) else str(exc)[:40]
     check("test_wrong_namespace_id_refuses_with_its_own_message", got, "namespace")
@@ -570,13 +570,13 @@ def test_wrong_namespace_id_refuses_with_its_own_message():
 
 def test_member_outside_the_scope_set_is_dropped():
     """Dropped and reported, not killed — and the rest of the tree still dies."""
-    rep = reap.run_kill(1, build_tree_rows(), {1, 2, 4}, dry_run=True)
+    rep = reap.run_kill(1, build_tree_rows(), build_scope(1, 2, 4), dry_run=True)
     check("test_member_outside_the_scope_set_is_dropped",
           (sorted(rep["dropped"]), sorted(rep["kill_set"])), ([3], [1, 2, 4]))
 
 
 def test_dry_run_walks_the_same_set_and_kills_nothing():
-    dry = reap.run_kill(1, build_tree_rows(), {1, 2, 3, 4}, dry_run=True)
+    dry = reap.run_kill(1, build_tree_rows(), build_scope(1, 2, 3, 4), dry_run=True)
     check("test_dry_run_walks_the_same_set_and_kills_nothing",
           (dry["walked"], dry["signalled"], dry["dry_run"]),
           (reap.build_walk(build_tree_rows(), 1), [], True))
@@ -584,7 +584,7 @@ def test_dry_run_walks_the_same_set_and_kills_nothing():
 
 def test_survivor_is_derived_from_a_re_read():
     """The return comes from a SECOND census, never from a signal's exit status."""
-    rep = reap.run_kill(1, build_tree_rows(), {1, 2, 3, 4}, dry_run=True)
+    rep = reap.run_kill(1, build_tree_rows(), build_scope(1, 2, 3, 4), dry_run=True)
     rep = reap.check_survivors(rep, [build_row(3, 2, "/usr/bin/sleep 900")])
     check("test_survivor_is_derived_from_a_re_read",
           (rep["survivors"], sorted(rep["killed"])), ([3], [1, 2, 4]))
@@ -595,7 +595,7 @@ def test_unaddressable_row_is_reported_not_claimed():
     reap.resolve_signal_binaries = lambda: {"msys": None, "native": None}
     reap.check_msys_addressable = lambda row, binaries: False
     try:
-        rep = reap.run_kill(1, build_tree_rows(), {1, 2, 3, 4})
+        rep = reap.run_kill(1, build_tree_rows(), build_scope(1, 2, 3, 4))
     finally:
         reap.resolve_signal_binaries, reap.check_msys_addressable = saved_res, saved_chk
     check("test_unaddressable_row_is_reported_not_claimed",
@@ -619,6 +619,101 @@ def test_already_gone_is_not_a_signal_error():
         src = _fh.read()
     check("test_already_gone_is_not_a_signal_error",
           ("already_gone" in src and "not found" in src), True)
+
+
+def build_scope(*winpids, **kw):
+    """The mapping `derive_scope` returns. Arms take this, never a bare set of keys: flattening it
+    is precisely the defect the closing review found at both real call sites."""
+    unkillable = set(kw.get("unkillable", ()))
+    return {w: {"root": "/c/projects/gov", "killable": w not in unkillable} for w in winpids}
+
+
+def test_run_kill_refuses_a_bare_set():
+    """The type guard. The `killable` flag is a safety property computed in one module, and it was
+    lost at the boundary into this one; a set of keys must now refuse rather than silently mean
+    'everything is killable'."""
+    got = "accepted"
+    try:
+        reap.run_kill(1, build_tree_rows(), {1, 2, 3, 4}, dry_run=True)
+    except reap.ReapRefused as exc:
+        got = "refused" if "MAPPING" in str(exc) else "refused for the wrong reason"
+    check("test_run_kill_refuses_a_bare_set", got, "refused")
+
+
+def test_self_chain_target_is_refused_by_run_kill():
+    """IN SCOPE and NOT KILLABLE are different answers. Reproduced live before this arm existed:
+    four self-chain rows accepted, and the caller's own winpid inside the kill set."""
+    scope = build_scope(1, 2, 3, 4, unkillable=(1,))
+    got = "accepted"
+    try:
+        reap.run_kill(1, build_tree_rows(), scope, dry_run=True)
+    except reap.ReapRefused as exc:
+        got = "refused" if "NOT KILLABLE" in str(exc) else "refused for the wrong reason"
+    check("test_self_chain_target_is_refused_by_run_kill", got, "refused")
+
+
+def test_non_killable_descendant_is_withheld_not_signalled():
+    scope = build_scope(1, 2, 3, 4, unkillable=(3,))
+    rep = reap.run_kill(1, build_tree_rows(), scope, dry_run=True)
+    check("test_non_killable_descendant_is_withheld_not_signalled",
+          (rep["withheld"], sorted(rep["kill_set"])), ([3], [1, 2, 4]))
+
+
+def test_self_chain_absent_from_the_census_refuses():
+    """A chain that cannot see itself collapses to a singleton and every ancestor grades killable —
+    the safety property failing silently in the direction that costs a session."""
+    got = "returned"
+    try:
+        scope.build_self_chain(build_corpus(), 999999)
+    except scope.ScopeRefused as exc:
+        got = "refused" if "not in this census" in str(exc) else "refused for the wrong reason"
+    check("test_self_chain_absent_from_the_census_refuses", got, "refused")
+
+
+def test_relative_and_spaced_roots_are_refused():
+    """`PROCMON_ROOTS` is whitespace-split, so `C:/Users/John Doe/proj` becomes a profile prefix
+    plus a relative fragment, and both cleared the old length test at 13 characters."""
+    outcomes = []
+    for bad in (["doe/proj/repo"], ["relative/path/here"], ["../up/one/level"]):
+        try:
+            scope.derive_scope(build_corpus(), bad)
+            outcomes.append("admitted")
+        except scope.ScopeRefused:
+            outcomes.append("refused")
+    check("test_relative_and_spaced_roots_are_refused", outcomes, ["refused"] * 3)
+    # The OTHER half of the split -- `c:/users/john`, the profile prefix a spaced path leaves
+    # behind -- is absolute and long enough, so no predicate over the STRING can refuse it. It is
+    # the adopter's `[ -d ]` test that catches it, and that arm lives in
+    # adopt-process-monitor.test.sh. Said here rather than left implicit, because an arm that
+    # silently covers one half of a defect certifies the whole of it.
+
+
+def test_duplicate_roots_assignment_refuses():
+    got = "returned"
+    try:
+        scope.read_roots('PROCMON_ROOTS="/c/a/bbbbbbb"\nPROCMON_ROOTS="/c/b/ccccccc"\n')
+    except scope.ScopeRefused:
+        got = "refused"
+    check("test_duplicate_roots_assignment_refuses", got, "refused")
+
+
+def test_read_roots_is_last_wins():
+    check("test_read_roots_is_last_wins",
+          scope.read_roots('# a comment\nPROCMON_ROOTS="/c/only/onexxxx"\n'),
+          ["/c/only/onexxxx"])
+
+
+def test_exotic_line_terminators_cannot_forge_a_row():
+    """`str.splitlines()` breaks on seven separators the producer never emits, so a command line
+    carrying one splits across rows and the well-formed fragment OVERWRITES another winpid's row.
+    A table over all seven, because an arm testing one character certifies the wrong thing."""
+    s = census._CIM_SEP
+    results = []
+    for sep in ("\x0b", "\x0c", "\x1c", "\x1d", "\x1e", "\x85", "\u2028", "\u2029"):
+        text = s.join(["4242", "1000", "1.0", "60", "prog" + sep + "9999" + s + "1" + s + "1.0" + s + "60" + s + "forged"])
+        rows, _rej = census.parse_cim(text)
+        results.append(9999 in rows)
+    check("test_exotic_line_terminators_cannot_forge_a_row", any(results), False)
 
 
 def test_live_tree_dies_completely():
@@ -661,7 +756,7 @@ def test_live_tree_dies_completely():
             print("  FAIL test_live_tree_dies_completely (the staged tree is not in scope; the "
                   "fence, not the reaper, is what this arm then measured)", file=sys.stderr)
             return
-        rep = reap.run_kill(target, rows, set(sc))
+        rep = reap.run_kill(target, rows, sc)
         fresh, _c2 = census.scan_processes()
         rep = reap.check_survivors(rep, fresh)
         check("test_live_tree_dies_completely",

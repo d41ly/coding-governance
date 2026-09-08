@@ -83,25 +83,45 @@ def build_walk(rows, target):
     return [w for w, _d in sorted(depth.items(), key=lambda kv: -kv[1])]
 
 
-def run_kill(target, rows, scope_set, dry_run=False):
+def run_kill(target, rows, scope, dry_run=False):
     """Kill `target` and its descendants. Returns a report dict; NEVER a bare success.
 
-    The membership test is against the set the fence computed ONCE over the whole census. There is
-    no per-member re-derivation here: rev-2 had one, with an inheritance clause that admitted every
-    member unconditionally, so the refusal it retained had no reachable failing case.
+    `scope` is the MAPPING `derive_scope` returns — winpid -> {"root", "killable"} — and it must
+    stay a mapping the whole way down. It used to be flattened to `set(scope)` at both call sites,
+    which threw the `killable` flag away and made a SELF-CHAIN row an acceptable walk root and kill
+    target: reproduced live, four self-chain rows accepted and the caller's own winpid inside the
+    kill set. The fence computed the property correctly and the boundary discarded it, which is the
+    shape four of this build's closing findings share.
+
+    The membership test is therefore against that mapping, not a set of its keys. There is no
+    per-member re-derivation here: an earlier revision had one whose inheritance clause admitted
+    every member unconditionally, so the refusal it retained had no reachable failing case.
     """
+    if not hasattr(scope, "get"):
+        raise ReapRefused(
+            "run_kill was handed a %s, not the scope MAPPING derive_scope returns. The `killable` "
+            "flag lives in that mapping, and flattening it to a set of keys silently makes the "
+            "caller's own session an acceptable kill target." % type(scope).__name__)
     by_win = {r["winpid"]: r for r in rows}
     if target not in by_win:
         raise ReapRefused("winpid %s is not in this census — wrong namespace? `run_kill` is keyed "
                           "on winpid, and an MSYS id here resolves to nothing." % target)
-    if target not in scope_set:
+    if target not in scope:
         raise ReapRefused("winpid %s is not in scope. The walk ROOT is graded before anything is "
                           "walked, so an out-of-scope root refuses the whole call." % target)
+    if not scope[target].get("killable"):
+        raise ReapRefused(
+            "winpid %s is IN SCOPE but NOT KILLABLE — it is this session's own process or one of "
+            "its ancestors. Being ours and being a kill target are two questions, and the fence "
+            "answers them separately." % target)
 
     binaries = resolve_signal_binaries()
     walked = build_walk(rows, target)
-    dropped = [w for w in walked if w not in scope_set]
-    kill_set = [w for w in walked if w in scope_set]
+    dropped = [w for w in walked if w not in scope]
+    # A walked member that is in scope but NOT killable is withheld and REPORTED, never signalled:
+    # a descendant reached only through the caller's own chain is ours and is not a target.
+    withheld = [w for w in walked if w in scope and not scope[w].get("killable")]
+    kill_set = [w for w in walked if w in scope and scope[w].get("killable")]
 
     signalled, unsignalable, errors, already_gone = [], [], [], []
     if not dry_run:
@@ -138,6 +158,7 @@ def run_kill(target, rows, scope_set, dry_run=False):
         "walked": walked,
         "kill_set": kill_set,
         "dropped": dropped,
+        "withheld": withheld,
         "signalled": signalled,
         "unsignalable": unsignalable,
         "errors": errors,
@@ -159,9 +180,10 @@ def check_survivors(report, rescan):
 
 
 def render_kill(report):
-    out = ["reap: %s target %d · walked %d · in scope %d · dropped %d"
+    out = ["reap: %s target %d · walked %d · in scope %d · dropped %d · withheld %d"
            % ("DRY RUN" if report["dry_run"] else "kill", report["target"],
-              len(report["walked"]), len(report["kill_set"]), len(report["dropped"]))]
+              len(report["walked"]), len(report["kill_set"]), len(report["dropped"]),
+              len(report.get("withheld", ())))]
     if "killed" in report:
         out.append("reap: killed %d · survivors %d · already gone %d · unsignalable %d "
                    "· signal errors %d"
@@ -207,7 +229,7 @@ def run_sweep(root_dir, mode, dry_run, backend=""):
     reports = []
     for winpid in targets:
         try:
-            rep = run_kill(winpid, rows, set(scope), dry_run=dry_run)
+            rep = run_kill(winpid, rows, scope, dry_run=dry_run)
         except ReapRefused as exc:
             reports.append({"target": winpid, "refused": str(exc)})
             continue
@@ -297,7 +319,7 @@ def main(argv):
             chain = scope_mod.build_self_chain(rows, os.getpid())
             scope, _sc = scope_mod.derive_scope(rows, scope_mod.read_roots(text), chain)
             # The explicit path bypasses the MODE, never the FENCE.
-            rep = run_kill(target, rows, set(scope), dry_run=dry_run)
+            rep = run_kill(target, rows, scope, dry_run=dry_run)
             if not dry_run:
                 fresh, _ = census.scan_processes(backend)
                 rep = check_survivors(rep, fresh)

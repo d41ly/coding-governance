@@ -63,6 +63,14 @@ to = ".process-monitor.conf"
 include = ["procmon-hook.js"]
 role = "engine"
 
+# THE FRAGMENT IS WHAT MAKES THE HOOK GRADEABLE. `check-hook-destinations.sh` quantifies over
+# tracked `*.fragment.json`, so a kit that ships a hook without one contributes nothing to the
+# population that leg already checks — and the adopter said "wiring ok" while wiring nothing.
+# Declaring it moves this kit into a gate that exists rather than patching the gap here.
+[[files]]
+include = ["procmon-hook.fragment.json"]
+role = "engine"
+
 [config]
 file = ".process-monitor.conf"
 owner = "process-monitor"

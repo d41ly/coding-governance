@@ -129,10 +129,10 @@ function main() {
         : 'unknown failure')
     // A named failure, never silence, and never a non-zero exit.
     process.stdout.write(`process-monitor: could NOT run — ${why}\n`)
-    touch(stamp)
+    writeStamp(stamp)
     return 0
   }
-  touch(stamp)
+  writeStamp(stamp)
 
   const lines = out.split('\n').filter((l) => l.trim())
   const flagged = lines.filter((l) => /^(ORPHAN|SPIN|IDLE|UNKNOWN)\s/.test(l))
@@ -149,7 +149,7 @@ function main() {
   return 0
 }
 
-function touch(stamp) {
+function writeStamp(stamp) {
   if (!stamp) return
   try {
     fs.mkdirSync(path.dirname(stamp), { recursive: true })

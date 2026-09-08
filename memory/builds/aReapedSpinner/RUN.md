@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: a6352db27de02e08b82e164c5b3f97b2dc805281
-phase: BUILDING
+witness: ed127313834f9cb9ca2d06996c361c1be221bf12
+phase: REVIEWING
 branch-sha: e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c
 branch-ref: refs/heads/branch/gate-runner-process-monitor-0d0fa8
 mode: prompt
@@ -52,3 +52,5 @@ base: e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c
 2026-09-08T01:09:38Z brief · item TOOL-aReapedSpinner-5 · reason ec696ec086bd memory/builds/aReapedSpinner/prompts/2026-09-08-prompt-TOOL-aReapedSpinner-5-brief.md
 
 2026-09-08T01:17:53Z brief · item TOOL-aReapedSpinner-7 · reason 4c6b2ab3ff4b memory/builds/aReapedSpinner/prompts/2026-09-08-prompt-TOOL-aReapedSpinner-7-brief.md
+
+2026-09-08T01:44:44Z review · item aReapedSpinner · reason verdict BLOCKED · blockers 3

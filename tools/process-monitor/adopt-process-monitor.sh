@@ -7,8 +7,13 @@
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is DERIVED
 # from it, so a root install still works.
 #
-#   tools/process-monitor/adopt-process-monitor.sh           # seed .process-monitor.conf, wire hooks
-#   tools/process-monitor/adopt-process-monitor.sh --check   # verify wiring; REPAIRS NOTHING
+#   tools/process-monitor/adopt-process-monitor.sh           # grade the declaration
+#   tools/process-monitor/adopt-process-monitor.sh --check   # grade it again; REPAIRS NOTHING
+#
+# WHAT IT DOES NOT DO, said here because the header used to claim both: it does NOT create
+# `.process-monitor.conf` (the roots are yours and a placeholder root is worse than none), and it
+# does NOT write `.claude/settings.json`. It REPORTS whether the hook is wired; wiring it is
+# `python tools/settings-merge.py --fragment tools/process-monitor/procmon-hook.fragment.json`.
 #
 # `--check` is the merge-bar arm and it is deliberately non-repairing, the same split
 # `.unattended.conf` records for its own WIRING_CHECK: a repairing mode on a bar rewrites the thing
@@ -84,6 +89,13 @@ for _r in $PROCMON_ROOTS; do
   if [ "${#_r}" -lt "$MIN_ROOT_LEN" ]; then
     add_problem "PROCMON_ROOTS entry '$_r' is shorter than $MIN_ROOT_LEN characters — too broad to be a declaration"
   fi
+  # IT MUST BE A REAL DIRECTORY, and this is the half of the split-root defect no test over the
+  # STRING can catch. `PROCMON_ROOTS` is whitespace-delimited, so `C:/Users/John Doe/proj` becomes
+  # `C:/Users/John` plus `Doe/proj` — the first is absolute and long enough and would widen the
+  # fence to the whole user profile. It is not a directory, and that is what refuses it.
+  if [ ! -d "$_r" ]; then
+    add_problem "PROCMON_ROOTS entry '$_r' is not a directory. If your path contains a SPACE, the declaration split it in two: a root may not contain whitespace, because both readers are whitespace-delimited"
+  fi
 done
 
 # ---------------------------------------------------------------- 4. no root may be the temp root
@@ -125,11 +137,35 @@ if [ "$FAIL" -ne 0 ]; then
 fi
 
 _roots_n=0; for _r in $PROCMON_ROOTS; do _roots_n=$((_roots_n + 1)); done
+# ---------------------------------------------------------------- 6b. is the hook actually wired?
+# The leg is named "process-monitor wiring" and until now it graded the CONF and nothing else, while
+# printing "wiring ok". A leg whose name overstates what it checks is worse than no leg.
+_hook_n=0
+if [ -f "$ROOT/.claude/settings.json" ]; then
+  _hook_n=$(grep -c 'procmon-hook' "$ROOT/.claude/settings.json" 2>/dev/null || true)
+fi
+case "$_hook_n" in ''|*[!0-9]*) _hook_n=0 ;; esac
+
 if [ "$MODE" = "--check" ]; then
-  print_note "wiring ok — conf at .process-monitor.conf, $_roots_n declared root(s), mode $PROCMON_REAP_MODE, ceiling ${PROCMON_AGE_CEILING}s"
-  print_note "NOT CHECKED HERE: whether those roots actually admit this repo's own work. That needs a census and a closure, so it is the scope unit's own arm; this script grades the DECLARATION only."
+  if [ "$_hook_n" -eq 0 ]; then
+    print_note "the engine is configured but the HOOK IS NOT WIRED — nothing will report a hung process to a session. Wire it: python tools/settings-merge.py --fragment $KIT_REL/procmon-hook.fragment.json"
+  fi
+  print_note "declaration ok — conf at .process-monitor.conf, $_roots_n declared root(s), mode $PROCMON_REAP_MODE, ceiling ${PROCMON_AGE_CEILING}s, hook entries $_hook_n"
+  # ONE DECLARATION, ONE READER. This script SOURCES the conf; the engine parses it literally. Two
+  # readers of one file is the class this repo gates against everywhere else, so the roots question
+  # is delegated to the engine's own reader, which also gives `--check-conf` its first caller.
+  if [ -f "$KIT_DIR/scope.py" ] && command -v python >/dev/null 2>&1; then
+    if PROCMON_ROOT="$ROOT" python "$KIT_DIR/scope.py" --check-conf >/dev/null 2>&1; then
+      print_note "the engine's own reader agrees, and those roots admit live work on this machine"
+    else
+      print_note "the engine's reader REFUSES this conf, or its roots admit nothing live here — run: PROCMON_ROOT=\"$ROOT\" python $KIT_REL/scope.py --check-conf"
+      exit 1
+    fi
+  else
+    print_note "NOT CHECKED: whether those roots admit this repo's own work — the engine is not installed here, so the declaration is all this can grade."
+  fi
   exit 0
 fi
-print_note "adopted — $_roots_n declared root(s), mode $PROCMON_REAP_MODE, ceiling ${PROCMON_AGE_CEILING}s"
+print_note "adopted — $_roots_n declared root(s), mode $PROCMON_REAP_MODE, ceiling ${PROCMON_AGE_CEILING}s, hook entries $_hook_n"
 print_note "next: $KIT_REL/adopt-process-monitor.sh --check"
 exit 0

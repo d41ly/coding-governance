@@ -986,7 +986,7 @@ WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
 # the legs are still alive is what turns a live leg into a process writing to a deleted path, which
 # is how the survivors in the opening sweep came to be doing nothing against directories that no
 # longer existed. The release runs afterwards unconditionally.
-cleanup() { reap_outstanding_legs; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+cleanup() { run_outstanding_reap; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
 trap 'cleanup; exit 130' INT
 trap 'cleanup; exit 143' TERM
@@ -1550,7 +1550,7 @@ arm_wall() {
       _i=${_f##*/}; _i=${_i%.pid}
       [ -f "$_work/$_i.rc" ] && continue
       _p=$(cat "$_f" 2>/dev/null) || continue
-      [ -n "$_p" ] && reap_leg_tree "$_p"
+      [ -n "$_p" ] && run_leg_reap "$_p"
     done
   ) &
   WALL_PID=$!
@@ -1562,7 +1562,7 @@ arm_wall() {
 # it is the guard not sharing a variable with the thing it guards. Its walked/killed figures are
 # the monitor's own and are printed as SEPARATE numbers -- summing them hides a walk that found
 # nothing.
-reap_leg_tree() {
+run_leg_reap() {
   _rlt_pid="$1"
   [ -n "$_rlt_pid" ] || return 0
   if [ "${PROCMON_OK:-0}" = 1 ]; then
@@ -1584,7 +1584,7 @@ reap_leg_tree() {
 # new way to wedge the fleet: `ts_release` and `ts_drop_ticket` run after it whatever it did, so a
 # hung monitor cannot strand a turnstile ticket and queue every later bar on this host behind it.
 GATE_REAP_BOUND=${GATE_REAP_BOUND:-120}
-reap_outstanding_legs() {
+run_outstanding_reap() {
   [ -n "${WORK:-}" ] && [ -d "${WORK:-}" ] || return 0
   _rol_deadline=$(( EPOCHSECONDS + GATE_REAP_BOUND ))
   for _rol_f in "$WORK"/*.pid; do
@@ -1596,7 +1596,7 @@ reap_outstanding_legs() {
     _rol_i=${_rol_f##*/}; _rol_i=${_rol_i%.pid}
     [ -f "$WORK/$_rol_i.rc" ] && continue
     _rol_p=$(cat "$_rol_f" 2>/dev/null) || continue
-    [ -n "$_rol_p" ] && reap_leg_tree "$_rol_p"
+    [ -n "$_rol_p" ] && run_leg_reap "$_rol_p"
   done
   return 0
 }

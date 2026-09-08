@@ -1567,7 +1567,7 @@ rm -rf "$_wd" 2>/dev/null || true
 # the turnstile and killed NOTHING, so a bar stopped by a signal -- a harness TaskStop, a Ctrl-C --
 # deleted the directory its legs were writing into and left the whole tree running.
 #
-# EXERCISED DIRECTLY, not through a whole bar. `reap_outstanding_legs` reads `$WORK/*.pid` and reaps
+# EXERCISED DIRECTLY, not through a whole bar. `run_outstanding_reap` reads `$WORK/*.pid` and reaps
 # each unfinished leg's tree; that is the unit of behaviour, and staging it needs a scratch dir with
 # a pid file rather than a 26-minute gate run. Observed RED against the pre-change runner: the leg
 # and its grandchild both survived.
@@ -1579,12 +1579,12 @@ _tdw=$(mktemp -d)
 # process writing to a deleted path.
 _tdc=$(grep -E '^cleanup\(\) \{' "$KITDIR/run-gates.sh")
 case "$_tdc" in
-  *reap_outstanding_legs*rm\ -rf*) ;;
+  *run_outstanding_reap*rm\ -rf*) ;;
   *) echo "canary: cleanup does not reap BEFORE removing the scratch dir (structural): $_tdc"; fail=1 ;;
 esac
 n=$((n+1))
 case "$_tdc" in
-  *reap_outstanding_legs*ts_release*ts_drop_ticket*) ;;
+  *run_outstanding_reap*ts_release*ts_drop_ticket*) ;;
   *) echo "canary: the turnstile release does not follow the teardown reap (structural) — a hung reap could strand a ticket and queue every later bar on this host"; fail=1 ;;
 esac
 n=$((n+1))
@@ -1600,14 +1600,14 @@ n=$((n+1))
   PROCMON_OK=0
   WORK="$_tdw"
   # shellcheck disable=SC1090
-  eval "$(sed -n '/^scan_descendants() {/,/^}/p;/^remove_descendants() {/,/^}/p;/^reap_leg_tree() {/,/^}/p;/^GATE_REAP_BOUND=/p;/^reap_outstanding_legs() {/,/^}/p' "$KITDIR/run-gates.sh")"
+  eval "$(sed -n '/^scan_descendants() {/,/^}/p;/^remove_descendants() {/,/^}/p;/^run_leg_reap() {/,/^}/p;/^GATE_REAP_BOUND=/p;/^run_outstanding_reap() {/,/^}/p' "$KITDIR/run-gates.sh")"
   bash -c "bash -c 'sleep 300 # $_tdm-gc' & sleep 300 # $_tdm-leg" &
   _tdleg=$!
   sleep 2
   echo "$_tdleg" > "$WORK/1.pid"
   _tdgc=$(ps -ef | grep -F "$_tdm-gc" | grep -vc grep)
   [ "$_tdgc" -ge 1 ] || { echo "canary: the teardown fixture staged no grandchild, so this arm proves nothing"; exit 2; }
-  reap_outstanding_legs
+  run_outstanding_reap
   sleep 2
   _tdgc2=$(ps -ef | grep -F "$_tdm-gc" | grep -vc grep)
   _tdlg2=$(ps -ef | grep -F "$_tdm-leg" | grep -vc grep)
