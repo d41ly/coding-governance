@@ -27,16 +27,31 @@ role = "engine"
 include = ["adopt-process-monitor.test.sh"]
 role = "project-owned"
 
-# `selftest.py` is NOT claimed here. It is shipped by the census unit at `order 2`, and a descriptor
-# claiming a path no unit has shipped yet reds `govkit selfcheck` on every bar until that unit
-# lands — the same class as declaring a hook destination before the hook exists. That unit adds its
-# own rule alongside this one.
+[[files]]
+include = ["selftest.py"]
+role = "project-owned"
+
+# The engine's own gate leg. `subject = "kit"` and `chunk = "selftests"`, so it is HELD by default
+# per the 2026-08-23 owner ruling: a suite whose subject is a checker in this directory has a job
+# only when that checker's source changes. Guarded on the engine and the suite together, so a
+# records-only commit does not run it.
+[[gate_leg]]
+name = "process-monitor census selftest"
+subject = "kit"
+argv = ["python", "{kit}/selftest.py"]
+guard = ["{kit}/census.py", "{kit}/selftest.py"]
+
+[[gate_leg]]
+name = "process-monitor adopter selftest"
+subject = "kit"
+argv = ["bash", "{kit}/adopt-process-monitor.test.sh"]
+guard = ["{kit}/adopt-process-monitor.sh", "{kit}/adopt-process-monitor.test.sh"]
 
 # The conf is the ADOPTER'S to write and this kit may not create it: the roots are that adopter's
 # own paths and a seeded conf carrying a placeholder root is worse than an absent one, because it
 # looks configured. Shipped as a template the adopter copies and edits, never as the live file.
 [[files]]
-include = ["process-monitor.conf.template"]
+include = ["process-monitor.template.conf"]
 role = "seed"
 to = ".process-monitor.conf"
 

@@ -31,7 +31,7 @@ editor invisible.
 
 ```bash
 cp -r <this kit> <your repo>/tools/process-monitor
-cp tools/process-monitor/process-monitor.conf.template .process-monitor.conf   # then EDIT it
+cp tools/process-monitor/process-monitor.template.conf .process-monitor.conf   # then EDIT it
 bash tools/process-monitor/adopt-process-monitor.sh
 bash tools/process-monitor/adopt-process-monitor.sh --check
 ```

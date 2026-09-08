@@ -724,6 +724,34 @@
     "ceiling": 60
   },
   {
+    "name": "process-monitor census selftest",
+    "argv": [
+      "python",
+      "tools/process-monitor/selftest.py"
+    ],
+    "guard": [
+      "tools/process-monitor/census.py",
+      "tools/process-monitor/selftest.py"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 180
+  },
+  {
+    "name": "process-monitor adopter selftest",
+    "argv": [
+      "bash",
+      "tools/process-monitor/adopt-process-monitor.test.sh"
+    ],
+    "guard": [
+      "tools/process-monitor/adopt-process-monitor.sh",
+      "tools/process-monitor/adopt-process-monitor.test.sh"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 180
+  },
+  {
     "name": "drift-audit records",
     "argv": [
       "python",
