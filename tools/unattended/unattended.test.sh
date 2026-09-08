@@ -4082,7 +4082,7 @@ none
 git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
 n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it"*) echo "ok   dispatch: a THIN unit is refused" ;; *) echo "FAIL dispatch: a THIN unit is refused -- $o"; st=1 ;; esac
-printf '# t
+printf '# ARCH-tRun-1 — u
 
 **Status:** SPECCED · rev-1 · 2026-09-01 · node d · Tier-2 · base 0123abcd · order 2x
 
