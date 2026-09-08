@@ -279,5 +279,161 @@ def main():
     return 1 if FAIL else 0
 
 
+
+
+# ================================================================ scope (unit 2)
+
+import scope  # noqa: E402
+
+ROOTS = ["/c/projects/gov"]
+
+
+def build_row(winpid, win_ppid, command, age=100.0, msys_pid=None, msys_ppid=None, cpu=1.0):
+    return {"winpid": winpid, "msys_pid": msys_pid, "win_ppid": win_ppid,
+            "msys_ppid": msys_ppid, "kind": "msys" if msys_pid else "native",
+            "age_s": age, "cpu_s": cpu, "command": command, "backend": "windows-join"}
+
+
+def build_corpus():
+    """A tree we own, a native grandchild, a no-command descendant, and NOT-OURS rows.
+
+    The not-ours rows are the point: a fixture holding only in-scope rows cannot fail in the
+    direction that matters. `explorer.exe` here is parentless and ancient, exactly the shape the
+    live table carries 18 of.
+    """
+    return [
+        build_row(10, 1, "/c/projects/gov/x/bash.exe -c 'run'", age=500.0),   # ROOT
+        build_row(11, 10, "bash -c ./relative.sh", age=400.0),                # relative argv
+        build_row(12, 11, "/usr/bin/sleep 900", age=300.0),                   # bare argv
+        build_row(13, 12, "python.exe -c pass", age=200.0),                   # native grandchild
+        build_row(14, 13, None, age=100.0),                                   # no command
+        build_row(90, 1, "C:/Windows/explorer.exe", age=300000.0),            # NOT ours, ancient
+        build_row(91, 90, "C:/Windows/system32/lsass.exe", age=300000.0),     # NOT ours
+        build_row(92, 1, "bash -c \"export TEMP='/c/projects/gov' && echo hi\"", age=50.0),
+    ]
+
+
+def test_scope_over_the_frozen_corpus_is_exact():
+    sc, counts = scope.derive_scope(build_corpus(), ROOTS)
+    check("test_scope_over_the_frozen_corpus_is_exact",
+          (sorted(sc), 90 in sc, 91 in sc, 92 in sc),
+          ([10, 11, 12, 13, 14], False, False, False))
+
+
+def test_declared_root_admits_and_names_it():
+    sc, _ = scope.derive_scope(build_corpus(), ROOTS)
+    check("test_declared_root_admits_and_names_it", sc[10]["root"], "/c/projects/gov")
+
+
+def test_closure_reaches_bare_argv_and_native_descendants():
+    """rev-2 refused three of these four. It is D9, D20 and D22 in one fixture."""
+    sc, _ = scope.derive_scope(build_corpus(), ROOTS)
+    check("test_closure_reaches_bare_argv_and_native_descendants",
+          (11 in sc, 12 in sc, 13 in sc), (True, True, True))
+
+
+def test_self_chain_is_in_scope_but_not_killable():
+    sc, _ = scope.derive_scope(build_corpus(), ROOTS, self_chain={10, 11})
+    check("test_self_chain_is_in_scope_but_not_killable",
+          (10 in sc, sc[10]["killable"], sc[11]["killable"], sc[12]["killable"]),
+          (True, False, False, True))
+
+
+def test_blank_roots_refuses():
+    got = "no refusal"
+    try:
+        scope.derive_scope(build_corpus(), [])
+    except scope.ScopeRefused:
+        got = "refused"
+    check("test_blank_roots_refuses", got, "refused")
+
+
+def test_root_that_claims_everything_refuses():
+    outcomes = []
+    for bad in ("/", "c:", "/c/x"):
+        try:
+            scope.derive_scope(build_corpus(), [bad])
+            outcomes.append("admitted")
+        except scope.ScopeRefused:
+            outcomes.append("refused")
+    check("test_root_that_claims_everything_refuses", outcomes, ["refused"] * 3)
+
+
+def test_prefix_is_separator_anchored():
+    rows = [build_row(20, 1, "/c/projects/gov-scratch/x/bash.exe"),
+            build_row(21, 1, "/c/projects/gov/x/bash.exe")]
+    sc, _ = scope.derive_scope(rows, ROOTS)
+    check("test_prefix_is_separator_anchored", (20 in sc, 21 in sc), (False, True))
+
+
+def test_assignment_inside_a_dash_c_body_does_not_admit():
+    """CONSTRUCTED, and stated as such: checked against the live table, in zero of the nine rows
+    carrying `export TEMP=` is the assignment the ONLY occurrence of the root. The vector is real,
+    the isolated instance is not, so the fixture is built rather than claimed to be captured."""
+    rows = [build_row(30, 1, "bash -c \"source /x/y && export TEMP='/c/projects/gov' && echo\"")]
+    sc, _ = scope.derive_scope(rows, ROOTS)
+    check("test_assignment_inside_a_dash_c_body_does_not_admit", 30 in sc, False)
+
+
+def test_a_real_path_inside_a_dash_c_body_does_admit():
+    """The other direction: the tokenizer must not simply discard `-c` bodies."""
+    rows = [build_row(31, 1, "bash -c \"/c/projects/gov/tools/run.sh --flag\"")]
+    sc, _ = scope.derive_scope(rows, ROOTS)
+    check("test_a_real_path_inside_a_dash_c_body_does_admit", 31 in sc, True)
+
+
+def test_recycled_parent_edge_is_dropped_and_counted():
+    rows = build_corpus() + [build_row(40, 10, "/usr/bin/other", age=900.0)]  # older than its parent
+    sc, counts = scope.derive_scope(rows, ROOTS)
+    check("test_recycled_parent_edge_is_dropped_and_counted",
+          (40 in sc, counts["dropped_edges"] > 0), (False, True))
+
+
+def test_no_command_row_can_be_a_descendant_but_not_a_root():
+    sc, _ = scope.derive_scope([build_row(50, 1, None)], ROOTS)
+    sc2, _ = scope.derive_scope(build_corpus(), ROOTS)
+    check("test_no_command_row_can_be_a_descendant_but_not_a_root",
+          (50 in sc, 14 in sc2), (False, True))
+
+
+def test_msys_edges_are_translated_before_the_union():
+    """The MSYS parent names an MSYS id, which must be joined to a winpid first. An untranslated
+    union looks up 7000 in the winpid map and finds nothing — or worse, finds an unrelated row."""
+    rows = [build_row(60, 1, "/c/projects/gov/x/bash.exe", msys_pid=7000, msys_ppid=1),
+            build_row(61, 999, "/usr/bin/sleep 900", msys_pid=7001, msys_ppid=7000)]
+    sc, counts = scope.derive_scope(rows, ROOTS)
+    check("test_msys_edges_are_translated_before_the_union",
+          (60 in sc, 61 in sc), (True, True))
+
+
+def test_cyclic_graph_terminates():
+    rows = [build_row(70, 71, "/c/projects/gov/x/a", age=100.0),
+            build_row(71, 70, "/usr/bin/b", age=100.0)]
+    sc, _ = scope.derive_scope(rows, ROOTS)
+    check("test_cyclic_graph_terminates", 70 in sc, True)
+
+
+def test_tokenizer_strips_assignments_everywhere():
+    check("test_tokenizer_strips_assignments_everywhere",
+          (scope.parse_tokens("export A=/c/x B=/c/y prog /c/z"),
+           scope.parse_tokens("A=/c/x prog")),
+          (["prog", "/c/z"], ["prog"]))
+
+
+def test_live_scope_is_not_empty():
+    """The fence, invoked the way the PRODUCT invokes it. Every fence defect across three audit
+    rounds was invisible because the fence was only ever exercised over planted fixtures."""
+    if not sys.platform.startswith("win"):
+        print("  SKIP test_live_scope_is_not_empty (windows-join backend only)")
+        return
+    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"], capture_output=True,
+        text=True).stdout.strip()
+    rows, _ = census.scan_processes()
+    sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
+                               scope.build_self_chain(rows, os.getpid()))
+    check_true("test_live_scope_is_not_empty", len(sc) > 0,
+               "(the shipped conf admits NOTHING on this machine)")
+
 if __name__ == "__main__":
     sys.exit(main())

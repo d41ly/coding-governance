@@ -57,7 +57,7 @@ and nothing ENUMERATES the population, which is why all three ran unseen for two
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aReapedSpinner-1` | CLOSED | the census: a platform-selected read of the process table, normalized to (id, parent, age, cpu, command); on Windows a JOIN of `ps -W` and CIM, and an unrecognised platform REFUSES rather than reporting an empty table |
-| 2 | `TOOL-aReapedSpinner-2` | SPECCED | the scope fence: a row is attributable to this repo's agent work by a DECLARED root, or it is invisible to every other unit |
+| 2 | `TOOL-aReapedSpinner-2` | CLOSED | the scope fence: a row is attributable to this repo's agent work by a DECLARED root, or it is invisible to every other unit |
 | 3 | `TOOL-aReapedSpinner-3` | SPECCED | the classifier: a declared age ceiling DECIDES and the CPU rate LABELS, giving OK, OVERAGE, SPIN, IDLE or ORPHAN |
 | 4 | `TOOL-aReapedSpinner-4` | SPECCED | the reaper: walk the parent edges leaves-first, kill, VERIFY each death, name survivors. Not `taskkill /T`, which measured 25% effective, and not a process group, which reaps the caller |
 | 5 | `TOOL-aReapedSpinner-5` | SPECCED | the session seam: a throttled hook puts the verdict in front of an agent mid-turn and at session start |
@@ -82,7 +82,7 @@ ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReap
 | [TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 6 | 2 | OPEN | rev-4 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 4 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
