@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 parents: aBoundedCeiling
 authorized-by: prompt
-ids: TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 TOOL-aQuenchedHarness-9 TOOL-aQuenchedHarness-10
+ids: TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 TOOL-aQuenchedHarness-9 TOOL-aQuenchedHarness-10 TOOL-aQuenchedHarness-11
 ---
 
 # aQuenchedHarness — self-checks that cannot wedge a build, and that adopters never run
@@ -76,8 +76,8 @@ copy-installs a kit runs that kit's self-tests on every bar.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 10 unit(s) · node a · opened 2026-09-06 · streams tooling
-ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 TOOL-aQuenchedHarness-9 TOOL-aQuenchedHarness-10
+**Build status:** SPECCED · 11 unit(s) · node a · opened 2026-09-06 · streams tooling
+ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL-aQuenchedHarness-4 TOOL-aQuenchedHarness-5 TOOL-aQuenchedHarness-6 TOOL-aQuenchedHarness-7 TOOL-aQuenchedHarness-8 TOOL-aQuenchedHarness-9 TOOL-aQuenchedHarness-10 TOOL-aQuenchedHarness-11
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -92,13 +92,14 @@ ids TOOL-aQuenchedHarness-1 TOOL-aQuenchedHarness-2 TOOL-aQuenchedHarness-3 TOOL
 | [TOOL-aQuenchedHarness-7 — the longest leg on the bar is a repo check the hold never reaches](spec/2026-09-06-spec-TOOL-aQuenchedHarness-7.md) | 8 | 2 | CLOSED | rev-5 | 2026-09-07 |
 | [TOOL-aQuenchedHarness-9 — the held suites that are red, and have been for nobody knows how long](spec/2026-09-07-spec-TOOL-aQuenchedHarness-9.md) | 9 | 2 | WONTDO | rev-2 | 2026-09-07 |
 | [TOOL-aQuenchedHarness-10 — the leg asks git once per question, not once per record](spec/2026-09-07-spec-TOOL-aQuenchedHarness-10.md) | 10 | 2 | CLOSED | rev-5 | 2026-09-07 |
+| [TOOL-aQuenchedHarness-11 — the strays a stopped run leaves behind, named on demand](spec/2026-09-08-spec-TOOL-aQuenchedHarness-11.md) | 11 | 2 | SPECCED | rev-1 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
 Ids no record names: TOOL-aQuenchedHarness-9.
 
-Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-10 TOOL-aQuenchedHarness-9.
+Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-10 TOOL-aQuenchedHarness-9 TOOL-aQuenchedHarness-11.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -115,6 +116,7 @@ Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-10 TOOL-aQuench
 | 8 | `TOOL-aQuenchedHarness-7` | no |
 | 9 | `TOOL-aQuenchedHarness-9` | no |
 | 10 | `TOOL-aQuenchedHarness-10` | no |
+| 11 | `TOOL-aQuenchedHarness-11` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
