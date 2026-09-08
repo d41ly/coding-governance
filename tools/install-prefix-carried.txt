@@ -8,7 +8,7 @@
 .githooks/pre-commit	2	(loose),memory-tree
 .githooks/pre-push	2	(loose),run-gates
 .githooks/pre-push.test.sh	2	(loose)
-WIRE-INTO-PROJECT.md	47	(loose),codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,playbook,workflows	the 29th is `contribute`, a GOV-SIDE verb an adopter never runs: it is invoked from a gov checkout against an adopter tree, so the path is gov's own and is correct at gov's prefix. DEPL-dRetiredFork-6. The other 28 predate this column and are recorded, not justified.
+WIRE-INTO-PROJECT.md	53	(loose),codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,playbook,process-monitor,workflows	the 29th is `contribute`, a GOV-SIDE verb an adopter never runs: it is invoked from a gov checkout against an adopter tree, so the path is gov's own and is correct at gov's prefix. DEPL-dRetiredFork-6. The other 28 predate this column and are recorded, not justified. RAISED 47 -> 53 by hand, 2026-09-08, for the process-monitor section 3e: this file is the RUNBOOK, so an install path an operator types is its content rather than a carried literal, and the six new hits are the adopter, the two scope probes, the two gate legs and the sweep. Deriving them would hand the operator a variable to expand. TOOL-aReapedSpinner-11.
 coding-governance-agents.template.md	3	(loose),hooks,playbook
 skills/session-kickoff/SKILL.md	2	codebase-map,playbook
 skills/session-kickoff/manifest-check.sh	2	lib,unattended
@@ -91,7 +91,7 @@ tools/playbook/kit.toml	1	govkit
 tools/playbook/render_playbook.py	1	run-gates
 tools/process-monitor/README.md	2	process-monitor	the install commands a human copies. A derived spelling would print a token rather than a runnable line, which is the opposite of what a README is for.
 tools/process-monitor/adopt-process-monitor.sh	5	(loose),lib,process-monitor	an adopter's own USAGE lines plus the settings-merge invocation it tells an operator to run. The runtime paths in this file are all derived through KIT_REL, which is git rev-parse --show-prefix; what is recorded here is prose a human reads and one command a human types. The `lib` hit is the inlined resolve_python's canonical-copy pointer, which the sibling adopters carry identically.
-tools/process-monitor/adopt-process-monitor.test.sh	4	process-monitor	a suite that must name the files it grades. It is `project-owned` in kit.toml and is withheld from `govkit apply`, so no adopter ever receives these bytes at any prefix.
+tools/process-monitor/adopt-process-monitor.test.sh	1	process-monitor	a suite that must name the files it grades. It is `project-owned` in kit.toml and is withheld from `govkit apply`, so no adopter ever receives these bytes at any prefix. LOWERED 4 -> 1, 2026-09-08: the four adopter invocations now go through KIT_REL, derived from git rev-parse --show-prefix. What is left is one usage line a human reads.
 tools/push-main.test.sh	10	(loose)
 tools/pytest-parallel-guardrails/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	3	lib

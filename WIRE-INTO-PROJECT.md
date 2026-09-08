@@ -263,6 +263,39 @@ no agents. It reads `.memory-tree.conf` and **refuses** without it, so §3 comes
    `bash tools/drift-audit/adopt-drift-audit.sh --check`, and
    `python tools/drift-audit/drift_report.py --check`.
 
+## 3e — Adopt the process-monitor kit (optional, recommended)
+
+Every deadline this chain owns bounds a command a CHECKER launched. Nothing bounds a process an
+AGENT launched, and that is where the observed failures come from: spin loops hours old holding
+core-hours of CPU, suites still running long after the session that started them was stopped, a gate
+runner surviving its own harness. This kit identifies those, reports them to the session, and kills
+them on request.
+
+1. `cp -r <gov>/tools/process-monitor <project>/tools/process-monitor`
+2. **Write `.process-monitor.conf` at the project root.** `PROCMON_ROOTS` is the whole safety fence
+   and it is the one value nobody can write for you — it declares which directory trees a process
+   must be attributable to before this kit will look at it, let alone signal it. Everything outside
+   is invisible BY DESIGN. Do not name a filesystem root, your home directory, or the system temp
+   directory; the adopter refuses all three.
+3. `bash tools/process-monitor/adopt-process-monitor.sh --check` — it grades the DECLARATION, not
+   the result. Exit 0 means the conf is well-formed and the hook is wired, never that your roots
+   admit your own work.
+4. **Answer the roots question separately**, because step 3 does not:
+   `python tools/process-monitor/scope.py --check-conf`, and
+   `python tools/process-monitor/scope.py --explain <winpid>` on a process you care about.
+5. Wire the reporting hook (the adopter writes the fragment) and two legs into your gate runner:
+   `python tools/process-monitor/selftest.py` and
+   `bash tools/process-monitor/adopt-process-monitor.test.sh`.
+6. `python tools/process-monitor/reap.py --sweep --dry-run` before you ever pass `--kill`. The walk
+   root is graded before anything is walked, and a dry run is how you find out that your roots are
+   narrower — or wider — than you assumed.
+
+**Read the kit README's "What this kit does NOT check" before you trust a clean report.** The
+limitation that costs most: a process whose command line names no declared root AND whose ancestry
+has died is unattributable, and the report names that count rather than passing over it. A tree
+launched by a relative path falls into it the moment its parent exits — which is why a launcher
+worth monitoring invokes its program by absolute path.
+
 ### 3a — Migrating an existing repo off the sharded session ledger (BREAKING)
 
 **The sharded authored session ledger is RETIRED** at **playbook v2.4 / memory-tree kit 1.8** — two

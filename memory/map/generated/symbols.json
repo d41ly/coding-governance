@@ -2798,6 +2798,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "read_live_census",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "read_log",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -4278,6 +4283,16 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_explain_answers_one_row",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_explicit_kill_still_obeys_membership",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_extract_failure_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -4508,12 +4523,27 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_mixed_namespace_tree_dies_completely",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_mode_bounds_the_act",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_msys_edges_are_translated_before_the_union",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_msys_ppid_participates_in_no_predicate",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_msys_row_is_signalled_by_the_kill_binary",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },
@@ -4588,6 +4618,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_non_msys_row_is_signalled_by_taskkill",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_non_utf8_backend_output_survives",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -4601,6 +4636,11 @@
       "id": "test_one_walk_two_callers",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_orphan_outranks_rate",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_out_of_scope_root_refuses_before_the_walk",
@@ -4688,7 +4728,7 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
-      "id": "test_rate_boundary_is_inclusive",
+      "id": "test_rate_boundary_and_unknown",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },
@@ -4818,6 +4858,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "test_shipped_conf_admits_this_repo",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_signals_can_move",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
@@ -4858,12 +4903,12 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
-      "id": "test_summary_counts_are_derived_from_the_run",
+      "id": "test_survivor_is_derived_from_a_re_read",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },
     {
-      "id": "test_survivor_is_derived_from_a_re_read",
+      "id": "test_sweep_counts_are_derived_and_complete",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },
@@ -4924,6 +4969,11 @@
     },
     {
       "id": "test_unjoined_row_keeps_native_kind",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_unreadable_input_is_not_a_clean_report",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
     },

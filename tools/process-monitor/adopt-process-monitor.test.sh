@@ -15,6 +15,9 @@ set -u
 KIT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ADOPT="$KIT_DIR/adopt-process-monitor.sh"
 ROOT="$(cd "$KIT_DIR" && git rev-parse --show-toplevel)"
+# The kit's own prefix, DERIVED — a scratch adopter tree is built at it, and spelling it out
+# is exactly the literal the install-prefix ban refuses.
+KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)"; KIT_REL="${KIT_REL%/}"
 # The floor the merge bar's `check-testsuite-counts.sh` reads: a suite that prints no
 # executed count against a declared floor could strand a block of its arms past an exit and
 # still report success.
@@ -56,7 +59,7 @@ run_against() {
   # settings entry would pin the permissive exit the closing review flagged.
   mkdir -p "$repo/.claude"
   printf '%s\n' '{"hooks":{"PostToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node procmon-hook.js"}]}]}}' > "$repo/.claude/settings.json"
-  ( cd "$repo" && bash tools/process-monitor/adopt-process-monitor.sh --check ) >"$WORK/out" 2>&1
+  ( cd "$repo" && bash "$KIT_REL/adopt-process-monitor.sh" --check ) >"$WORK/out" 2>&1
   echo $?
 }
 
@@ -111,7 +114,7 @@ check_equal "test_non_numeric_throttle_refuses" \
 check_equal "test_absent_conf_refuses" "$(run_against "__ABSENT__")" 1
 _repo="$WORK/norepair"; mkdir -p "$_repo/tools/process-monitor"; git -C "$_repo" init -q 2>/dev/null
 cp "$ADOPT" "$_repo/tools/process-monitor/"
-( cd "$_repo" && bash tools/process-monitor/adopt-process-monitor.sh --check ) >/dev/null 2>&1 || true
+( cd "$_repo" && bash "$KIT_REL/adopt-process-monitor.sh" --check ) >/dev/null 2>&1 || true
 [ -f "$_repo/.process-monitor.conf" ] \
   && add_fail "test_check_refuses_without_repairing (a conf was created)" \
   || add_pass "test_check_refuses_without_repairing"
@@ -132,7 +135,7 @@ fi
 
 # --- AC8 over the SHIPPED conf, not a fixture: this repo's own declaration must obey the rule
 if [ -f "$ROOT/.process-monitor.conf" ]; then
-  ( cd "$ROOT" && bash tools/process-monitor/adopt-process-monitor.sh --check ) >/dev/null 2>&1 \
+  ( cd "$ROOT" && bash "$KIT_REL/adopt-process-monitor.sh" --check ) >/dev/null 2>&1 \
     && add_pass "test_shipped_conf_is_accepted" || add_fail "test_shipped_conf_is_accepted"
 else
   add_fail "test_shipped_conf_is_accepted (add_fail shipped conf — the arm cannot run, and a skip here would be indistinguishable from coverage)"
@@ -195,10 +198,9 @@ printf '\nadopt-process-monitor: %d passed, %d failed (%d assertions)\n' "$PASS"
 # ---- the five arms units 5 and 6 name and nothing implemented -------------------------------
 # A flagged census, staged by lowering the ceiling in a scratch conf rather than by waiting for a
 # real process to age past four hours.
-_pmdir="$WORK/flagged"; mkdir -p "$_pmdir/tools"
-git -C "$_pmdir" init -q 2>/dev/null
+_pmdir="$WORK/flagged"; mkdir -p "$_pmdir/$(dirname "$KIT_REL")"
 # The hook resolves reap.py under its OWN root, so this fixture needs the kit, not just a conf.
-cp -r "$KIT_DIR" "$_pmdir/tools/process-monitor"
+cp -r "$KIT_DIR" "$_pmdir/$KIT_REL"
 git -C "$_pmdir" init -q 2>/dev/null
 sed 's|^PROCMON_AGE_CEILING=.*|PROCMON_AGE_CEILING="1"|' "$ROOT/.process-monitor.conf" > "$_pmdir/.process-monitor.conf"
 rm -f "$GD/procmon-stamp" 2>/dev/null
@@ -221,10 +223,10 @@ rm -f "$GD/procmon-stamp" 2>/dev/null
 # it: node's execFileSync refuses a .cmd without shell:true (CVE-2024-27980), so the shim never
 # ran and the arm passed in 0s over a bound it had not touched. What the hook actually bounds is
 # the reap.py under its own root, so the fixture supplies one that sleeps.
-_slowdir="$WORK/slowroot"; mkdir -p "$_slowdir/tools/process-monitor"
+_slowdir="$WORK/slowroot"; mkdir -p "$_slowdir/$KIT_REL"
 git -C "$_slowdir" init -q 2>/dev/null
 cp "$ROOT/.process-monitor.conf" "$_slowdir/.process-monitor.conf"
-printf 'import time\ntime.sleep(600)\n' > "$_slowdir/tools/process-monitor/reap.py"
+printf 'import time\ntime.sleep(600)\n' > "$_slowdir/$KIT_REL/reap.py"
 rm -f "$GD/procmon-stamp" 2>/dev/null
 _t0=$(date +%s)
 _out=$(printf '%s' '{"hook_event_name":"PostToolUse"}' | CLAUDE_PROJECT_DIR="$_slowdir" timeout 200 node "$HOOK" 2>&1); _rc=$?
@@ -248,7 +250,7 @@ check_equal "test_roots_hole_probe_fails_when_blank" \
 
 # The SHIPPED conf, not a fixture: this repo's own declaration must obey the temp-root rule.
 if grep -q '^PROCMON_ROOTS=' "$ROOT/.process-monitor.conf"; then
-  ( cd "$ROOT" && bash tools/process-monitor/adopt-process-monitor.sh --check ) >/dev/null 2>&1 \
+  ( cd "$ROOT" && bash "$KIT_REL/adopt-process-monitor.sh" --check ) >/dev/null 2>&1 \
     && add_pass "test_shipped_roots_exclude_the_temp_root" \
     || add_fail "test_shipped_roots_exclude_the_temp_root"
 else
