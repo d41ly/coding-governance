@@ -84,6 +84,8 @@ placeholder-catalogue self-test	80		worst of 8 readings 50s, x1.5
 playbook parity selftest	150		worst of 7 readings 93s, x1.5
 playbook render selftest	60		worst of 8 readings 10s, x1.5
 pre-push self-test	1020		worst of 8 readings 676s, x1.5
+process-monitor adopter selftest	330		worst of 2 readings 220s, x1.5; the spread is wide (120s and 220s) because one arm waits out a real census bound
+process-monitor census selftest	40		worst of 2 readings 23s, x1.5
 profile-bar selftest	880		worst of 9 readings 586s, x1.5
 push-main self-test	320		worst of 11 readings 209s, x1.5
 pytest-guardrails self-test	60		worst of 8 readings 28s, x1.5
