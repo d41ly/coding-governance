@@ -307,12 +307,22 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
   # So the pipeline below produces a fully normalised VALUE - comment gone, key gone, CR gone, ends
   # trimmed - and nothing is asked about it until it is. A `#` at position zero is then unambiguous:
   # a TOML value cannot begin with one, so it is a comment on a key with no value at all.
-  local raw
-  raw=$(printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
-        | sed 's/[[:space:]][[:space:]]*#.*$//' \
-        | sed "s/^$2[[:space:]]*=[[:space:]]*//" \
-        | tr -d '\r' \
-        | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+  # TEN PROCESSES BECAME ZERO, on the same terms as its scalar sibling and in the same order.
+  local raw="" _l _r
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    _r=${_l#"$2"}; [ "$_r" != "$_l" ] || continue
+    while :; do case $_r in [[:space:]]*) _r=${_r#?} ;; *) break ;; esac; done
+    case $_r in '='*) ;; *) continue ;; esac
+    raw=${_l%%[[:space:]]#*}
+    raw=${raw#"$2"}
+    while :; do case $raw in [[:space:]]*) raw=${raw#?} ;; *) break ;; esac; done
+    raw=${raw#=}
+    while :; do case $raw in [[:space:]]*) raw=${raw#?} ;; *) break ;; esac; done
+    raw=${raw//$'\r'/}
+    while :; do case $raw in [[:space:]]*) raw=${raw#?} ;; *) break ;; esac; done
+    while :; do case $raw in *[[:space:]]) raw=${raw%?} ;; *) break ;; esac; done
+    break
+  done <<< "$1"
   case "$raw" in '#'*) raw='' ;; esac
   # AND THE CLOSER IS ANCHORED AT BOTH ENDS. A value is an array only if it STARTS with `[`, so
   # `k = "a[0]"` is not one and is not refused for failing to close; an array that starts is closed
@@ -321,8 +331,13 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
     '['*']') ;;
     '['*) return 2 ;;
   esac
-  printf '%s\n' "$raw" | tr -d '"' \
-    | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+  local _m=${raw//'"'/}
+  _m=${_m#'['}; _m=${_m%']'}
+  _m=${_m//,/ }
+  while :; do case $_m in *'  '*) _m=${_m//  / } ;; *) break ;; esac; done
+  while :; do case $_m in [[:space:]]*) _m=${_m#?} ;; *) break ;; esac; done
+  while :; do case $_m in *[[:space:]]) _m=${_m%?} ;; *) break ;; esac; done
+  printf '%s\n' "$_m"
 }
 
 declared_scalar() { # body · key -> the scalar it declares, comment/quotes/space stripped
@@ -342,11 +357,30 @@ declared_scalar() { # body · key -> the scalar it declares, comment/quotes/spac
   # THE `#` AT POSITION ZERO, for its sibling's reason: the trailing-comment strip needs whitespace
   # before the `#` and a key with no value at all leaves none, so `k =# note` and `k =#note` came back
   # as their own comment text at rc 0. A TOML value cannot begin with `#`.
-  printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
-    | sed 's/[[:space:]][[:space:]]*#.*$//' \
-    | sed "s/^$2[[:space:]]*=[[:space:]]*//" | sed 's/^#.*$//' | tr -d '\r' \
-    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
-    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+  # EIGHT PROCESSES BECAME ZERO. This was `grep | sed | sed | sed | tr | sed | sed | sed`, and the
+  # leg that drives this kit ran it often enough that the pipeline, not the work, was the cost. The
+  # steps below are the same steps in the same order; what changed is that bash does them.
+  local _l _v _r
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    _r=${_l#"$2"}; [ "$_r" != "$_l" ] || continue
+    while :; do case $_r in [[:space:]]*) _r=${_r#?} ;; *) break ;; esac; done
+    case $_r in '='*) ;; *) continue ;; esac
+    _v=${_l%%[[:space:]]#*}
+    _v=${_v#"$2"}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    _v=${_v#=}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    case $_v in '#'*) _v='' ;; esac
+    _v=${_v//$'\r'/}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    while :; do case $_v in *[[:space:]]) _v=${_v%?} ;; *) break ;; esac; done
+    _v=${_v#'"'}; _v=${_v%'"'}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    while :; do case $_v in *[[:space:]]) _v=${_v%?} ;; *) break ;; esac; done
+    printf '%s\n' "$_v"
+    return 0
+  done <<< "$1"
+  return 0
 }
 
 # ------------------------------------------------------------------------ per playbook
