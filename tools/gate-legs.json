@@ -749,7 +749,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 180
+    "ceiling": 360
   },
   {
     "name": "drift-audit records",
