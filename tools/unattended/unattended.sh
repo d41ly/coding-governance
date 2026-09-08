@@ -4937,9 +4937,48 @@ while [ $# -gt 0 ]; do
     --blockers)     RV_BLOCKERS="${2:-}"; shift 2 || shift ;;
     --disposition)  RV_DISPOSITION="${2:-}"; shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || exit 1
-                    PL_SLUG=${1:-}; shift 2>/dev/null || true
-                    PLAN_PATHS=""; [ "${1:-}" = "--paths" ] && PLAN_PATHS=paths
-                    verb_plan "$PL_SLUG"; exit $? ;;
+                    # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
+                    # what it always was — the framing below only appears when more than one slug is
+                    # given, so no existing caller sees a new byte. TOOL-aQuenchedHarness-10.
+                    #
+                    # WHY: `check-unattended.sh` check 30 runs this verb once per tracked build to
+                    # grade the driver's OWN verdict, which is the right shape — reimplementing the
+                    # predicate inside the leg would make it a second implementation rather than a
+                    # second opinion. But it launched a fresh driver for each of 102 builds, and a
+                    # driver launch is this file plus the library plus the conf before any work
+                    # starts: measured at ~1.16 s wall each, so roughly two minutes of the leg's cost
+                    # was 102 identical startups.
+                    #
+                    # EACH SLUG STILL RUNS IN ITS OWN SUBSHELL. `verb_plan` sets `status` through
+                    # `fail`, and one build's refusal must not colour the next one's verdict; a
+                    # subshell gives the same isolation a separate process gave, at a fork instead of
+                    # an exec. The per-slug rc is emitted rather than accumulated, because the caller
+                    # skips a build whose plan REFUSES and cannot recover that from a summary status.
+                    PLAN_PATHS=""; _pl_slugs=""; _pl_framed=""
+                    while [ $# -gt 0 ]; do
+                      case "${1:-}" in
+                        --paths)  PLAN_PATHS=paths; shift ;;
+                        --framed) _pl_framed=1; shift ;;
+                        --*)     break ;;
+                        "")      shift ;;
+                        *)       _pl_slugs="$_pl_slugs $1"; shift ;;
+                      esac
+                    done
+                    set -- $_pl_slugs
+                    # FRAMING IS A DECLARED MODE, NOT A CONSEQUENCE OF ARITY. Deriving it from the
+                    # slug COUNT made one slug and two slugs two different output formats, and a
+                    # caller that parses frames then reads a one-slug corpus as ZERO verdicts - it
+                    # is looking for lines the driver had no reason to print. That is exactly what
+                    # happened: `check-unattended.sh` check 30 red on every fixture holding a
+                    # single build, while the real corpus always gave it several and looked fine.
+                    # A caller that wants frames now SAYS so, and gets them at any arity.
+                    if [ $# -le 1 ] && [ -z "$_pl_framed" ]; then verb_plan "${1:-}"; exit $?; fi
+                    for _pl_s in "$@"; do
+                      printf 'unattended-plan-open: %s\n' "$_pl_s"
+                      ( verb_plan "$_pl_s" ); _pl_one=$?
+                      printf 'unattended-plan-rc: %s %s\n' "$_pl_s" "$_pl_one"
+                    done
+                    exit 0 ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }

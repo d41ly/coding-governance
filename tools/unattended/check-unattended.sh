@@ -198,6 +198,114 @@ if [ "$_conf_ok" != 1 ]; then
   exit "$status"
 fi
 M="$MEMORY_ROOT"
+
+# ====================================================================== bulk git, warmed once
+# ---- THE SAME QUESTION, ABOUT THE SAME COMMIT, 127 TIMES. Measured on this tree with every git
+# ---- argv logged: `rev-parse --verify <HEAD>` ran 52 times, `rev-parse HEAD` 39 and
+# ---- `cat-file -e <HEAD>` 36 - all one immutable fact, each costing a process. A git process on
+# ---- this platform costs ~130 ms whatever it is asked, so this leg's wall clock IS its process
+# ---- count and almost nothing else: 777 of them for the leg's own checks, against 435 s of leg.
+# ----
+# ---- The helpers below answer those questions from tables filled by ONE query each. Every one of
+# ---- them KEEPS THE ORIGINAL CALL as a fallback for a key the warm-up did not collect, so
+# ---- correctness never depends on the pre-scan being complete: a miss is slow, never wrong. That
+# ---- is also why the warm-ups are lazy - several checks exit before reaching a record, and a walk
+# ---- nobody asks for is the same waste one process at a time was.
+# ---- TOOL-aQuenchedHarness-10.
+
+# HEAD does not move while this leg runs; it was being re-resolved once per record.
+HEAD_SHA=$(GIT rev-parse HEAD 2>/dev/null || true)
+
+# ---- every sha-shaped token in every tracked run-state file, resolved in ONE batch.
+# It enumerates its own file list rather than reading `$RUNS`, because the first caller runs well
+# above where `$RUNS` is built and a warm-up that ran early against an unset list would mark itself
+# warmed while holding nothing - a cache that is empty and believes it is full.
+# `_REV_FULL` costs nothing extra: the batch reply's first field IS the full sha, and holding it
+# lets the ancestry tables answer an ABBREVIATED recorded rev, which they otherwise cannot -
+# measured, 30 calls fell through to a per-call `merge-base` for exactly that reason.
+declare -A _REV_OK _REV_FULL
+_REV_WARMED=0
+_load_rev_table() {
+  [ "$_REV_WARMED" = 1 ] && return 0
+  _REV_WARMED=1
+  local _line _j _n
+  local -a _revs=() _out=()
+  while IFS= read -r _line; do
+    [ -n "$_line" ] && _revs+=("$_line")
+  done < <(GIT ls-files "$M/builds/*/RUN*.md" 2>/dev/null \
+           | xargs -r grep -hoE '[0-9a-f]{7,40}' 2>/dev/null | sort -u)
+  _n=${#_revs[@]}
+  [ "$_n" -gt 0 ] || return 0
+  while IFS= read -r _line; do _out+=("$_line"); done < <(
+    printf '%s^{commit}\n' "${_revs[@]}" | GIT cat-file --batch-check 2>/dev/null)
+  # ONE REPLY PER REQUEST, IN ORDER - which is what makes zipping them sound. Keying the table on
+  # the REPLY's first field would key it by full sha and miss every abbreviated recorded fact, and
+  # a short count means something went wrong: leave the table empty and let every call fall back.
+  [ "${#_out[@]}" = "$_n" ] || return 0
+  for ((_j = 0; _j < _n; _j++)); do
+    case "${_out[$_j]}" in
+      *" commit "*)
+        _REV_OK[${_revs[$_j]}]=0
+        _REV_FULL[${_revs[$_j]}]=${_out[$_j]%% *} ;;
+      *) _REV_OK[${_revs[$_j]}]=1 ;;
+    esac
+  done
+  return 0
+}
+check_rev() {  # rev -> 0 it resolves to a commit in this history · 1 it does not
+  _load_rev_table
+  [ -n "${_REV_OK[$1]+x}" ] && return "${_REV_OK[$1]}"
+  if GIT rev-parse --verify --quiet "$1^{commit}" >/dev/null 2>&1; then _REV_OK[$1]=0; else _REV_OK[$1]=1; fi
+  return "${_REV_OK[$1]}"
+}
+
+# ---- ancestry is set membership, and one walk answers every record.
+# `merge-base --is-ancestor A B` is true exactly when A is reachable from B, which is what
+# `rev-list B` enumerates - same relation, same reflexive case. An abbreviated rev cannot be looked
+# up in a table of full shas, so it falls back to the original call.
+declare -A _HEAD_REACH
+_HEAD_WARMED=0
+_load_head_reach() {
+  [ "$_HEAD_WARMED" = 1 ] && return 0
+  _HEAD_WARMED=1
+  local _h
+  while IFS= read -r _h; do [ -n "$_h" ] && _HEAD_REACH[$_h]=1; done < <(GIT rev-list HEAD 2>/dev/null)
+  return 0
+}
+check_head_reaches() {  # rev -> 0 an ancestor of HEAD, HEAD itself included · 1 not
+  _load_head_reach
+  local _r=$1
+  if [ ${#_r} != 40 ]; then _load_rev_table; _r=${_REV_FULL[$1]:-$1}; fi
+  if [ ${#_r} = 40 ]; then
+    [ -n "${_HEAD_REACH[$_r]+x}" ]
+    return $?
+  fi
+  GIT merge-base --is-ancestor "$1" HEAD 2>/dev/null
+}
+
+# The same, against the tip the remote advertises for its own default branch. It is a DIFFERENT set
+# from the union `is_published` holds: reachable-from-any-advertised-tip does not imply
+# reachable-from-ADV_HEAD, and this asks the narrower question.
+declare -A _ADVH_REACH
+_ADVH_WARMED=0
+_load_adv_reach() {
+  [ "$_ADVH_WARMED" = 1 ] && return 0
+  _ADVH_WARMED=1
+  [ "${ADV_HEAD_OK:-0}" = 1 ] || return 0
+  local _h
+  while IFS= read -r _h; do [ -n "$_h" ] && _ADVH_REACH[$_h]=1; done < <(GIT rev-list "$ADV_HEAD" 2>/dev/null)
+  return 0
+}
+check_adv_reaches() {  # rev -> 0 an ancestor of the advertised HEAD · 1 not
+  _load_adv_reach
+  local _r=$1
+  if [ ${#_r} != 40 ]; then _load_rev_table; _r=${_REV_FULL[$1]:-$1}; fi
+  if [ "${ADV_HEAD_OK:-0}" = 1 ] && [ ${#_r} = 40 ]; then
+    [ -n "${_ADVH_REACH[$_r]+x}" ]
+    return $?
+  fi
+  GIT merge-base --is-ancestor "$1" "${ADV_HEAD:-}" 2>/dev/null
+}
 for k in LANDER BYPASS_BAN GATE_CMD WIRING_CHECK KEEPALIVE_CREATE KEEPALIVE_DELETE; do
   eval "v=\${$k}"
   [ -n "$v" ] || fail 1 "a required key is undeclared in .unattended.conf, and an undeclared value is not a defaulted one: $k"
@@ -338,7 +446,7 @@ else
       # not a promotion. The status predicate is spelled EXACTLY as check 24's retire loop spells it,
       # so the two clauses cannot disagree about what a retired unit looks like.
       rv_now=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null | grep -vE '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
-      if [ -n "$rv_base" ] && GIT cat-file -e "$rv_base^{commit}" 2>/dev/null; then
+      if [ -n "$rv_base" ] && check_rev "$rv_base"; then
         rv_then=$(GIT show "$rv_base:$rv_readme" 2>/dev/null | awk '/<!-- gen:build-units -->/{f=1;next} /<!-- \/gen:build-units -->/{f=0} f' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
         rv_readable=1
       fi
@@ -808,6 +916,77 @@ fi
 #
 # The driver has carried the distinction for longer (its check 30, "the remote advertises a tip this
 # clone does not have"); this side had not been given it.
+# ---- TWO GIT PROCESSES FOR THE WHOLE FUNCTION, however many commits it judges.
+# ---- TOOL-aQuenchedHarness-10.
+#
+# `is_published` asks one question — is this commit an ancestor of ANY tip the remote advertises —
+# and it used to answer it with two processes per commit per tip: `cat-file -e` to see whether the
+# tip is readable, then `merge-base --is-ancestor`. Measured on this repo: 87 identical `cat-file -e`
+# calls for `$ADV_HEAD` alone and 121 ancestry calls, every one of them against that same tip.
+#
+# ANCESTOR-OF-ANY IS A UNION, so it is ONE walk and not one per tip. `merge-base --is-ancestor A B`
+# is true exactly when A is reachable from B, and `git rev-list B C D` enumerates everything
+# reachable from B or C or D — so the union set answers the disjunction directly. A first attempt at
+# this warmed one set per tip and cost 8.88 s against 1.31 s for the union, on the 28 heads this
+# origin advertises; that mistake is recorded here because the per-tip shape looks more careful and
+# is strictly worse.
+#
+# THE `miss` LIMB IS WHY EXISTENCE IS STILL ASKED SEPARATELY. The function must return 2 —
+# CANNOT TELL — when any advertised tip is unreadable, and a union walk cannot distinguish "absent
+# from the union" from "a tip we could not read". One `cat-file --batch-check` answers existence for
+# every tip in one process, and it NORMALISES too: the reply's first field is the full 40-hex sha,
+# which is what makes an abbreviated record fact like `witness: a9560632` comparable against a set
+# of full shas instead of silently missing it.
+# Whether the advertised HEAD is readable here is fixed for the run; it was being re-asked once
+# per record, 36 times, always about the same sha.
+ADV_HEAD_OK=0
+if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then ADV_HEAD_OK=1; fi
+
+declare -A _PUB_REACH
+_PUB_WARMED=0
+_PUB_MISS=0
+_load_pub_reach() {
+  [ "$_PUB_WARMED" = 1 ] && return 0
+  _PUB_WARMED=1
+  local _t _h _present="" _sha _ty
+  # ---- ONE PROCESS: which advertised tips are readable, and what their full shas are.
+  # `cat-file --batch-check` prints `<oid> <type> <size>` and does NOT echo its input, so the
+  # TYPE IS THE SECOND FIELD. Reading it as the third made every tip look unreadable and turned
+  # every answer into CANNOT TELL, which reds check 9 on every record in the tree. The A/B that
+  # should have caught it ran against a clone with the remote detached, so `$ADV_TIPS` was empty
+  # and this function never ran at all. A fixture that disables the path under test measures the
+  # other paths twice. TOOL-aQuenchedHarness-10.
+  while read -r _sha _ty _; do
+    case "$_ty" in
+      commit) _present="$_present $_sha" ;;
+      *)      _PUB_MISS=1 ;;
+    esac
+  done < <(for _t in $ADV_HEAD $ADV_TIPS; do [ -n "$_t" ] && printf '%s^{commit}\n' "$_t"; done \
+           | GIT cat-file --batch-check 2>/dev/null)
+  # ---- one process: everything reachable from any of them
+  [ -n "$_present" ] || return 0
+  while IFS= read -r _h; do
+    [ -n "$_h" ] && _PUB_REACH[$_h]=1
+  done < <(GIT rev-list $_present 2>/dev/null)
+  return 0
+}
+
+# Full sha for a rev, through the same batch, so an abbreviation is comparable. Falls back to the
+# rev itself when nothing resolves, which keeps the caller's own miss handling in charge.
+declare -A _PUB_FULL
+resolve_full_sha() {  # rev -> full sha, or empty
+  [ -n "${_PUB_FULL[$1]+x}" ] && { printf '%s' "${_PUB_FULL[$1]}"; return 0; }
+  local _r
+  # The batch above has already resolved every rev recorded in a run-state file, which is where
+  # every abbreviated fact this leg judges comes from. Only something outside that set costs a
+  # process here.
+  _load_rev_table
+  _r=${_REV_FULL[$1]:-}
+  [ -n "$_r" ] || _r=$(GIT rev-parse --verify --quiet "$1^{commit}" 2>/dev/null) || _r=""
+  _PUB_FULL[$1]=$_r
+  printf '%s' "$_r"
+}
+
 is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a tip could not be read
   # THE INVARIANT IS "EVERY TIP WAS READABLE", not "at least one was". The first cut tracked PRESENCE
   # and returned 2 only when ALL advertised tips were absent, so a single stale locally-present branch
@@ -815,22 +994,39 @@ is_published() { # commit -> 0 published · 1 not published · 2 CANNOT TELL, a 
   # advertised, one present and two absent, so `have` was 1 and the answer came back a definite
   # "not published" computed from a third of the evidence. Sound form: not-published requires that no
   # present tip contains the commit AND that nothing was unreadable; anything less is cannot-tell.
-  local c="$1" t miss=0
-  if [ -n "$ADV_HEAD" ]; then
-    if GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null; then
-      GIT merge-base --is-ancestor "$c" "$ADV_HEAD" 2>/dev/null && return 0
-    else
-      miss=1
-    fi
+  # ---- THE TIPS ARE RESOLVED ONCE, NOT ONCE PER COMMIT. TOOL-aQuenchedHarness-10.
+  #
+  # `$ADV_HEAD` and `$ADV_TIPS` are fixed for the whole run: they come from one `ls-remote`
+  # observation before any record is read. This function was re-asking git whether each of them
+  # EXISTS on every call, and it is called once per commit under judgement — measured at 87
+  # `cat-file -e` calls for `$ADV_HEAD` alone in a single run of this leg, all of them the same
+  # question with the same answer.
+  #
+  # AND ANCESTOR-OF-ANY IS ONE UNION WALK, not 121 processes and not one walk per tip.
+  # `merge-base --is-ancestor A B` is true exactly when A is reachable from B, and
+  # `git rev-list B C D` enumerates everything reachable from B or C or D — so the union answers the
+  # disjunction directly. Same reachability relation, same reflexive case: rev-list emits B itself,
+  # and B is an ancestor of itself. A first cut warmed one set PER TIP and cost 8.88 s against
+  # 1.31 s for the union over the 28 heads this origin advertises, so the per-tip shape looks more
+  # careful and is strictly worse.
+  #
+  # AN ABBREVIATED COMMIT IS NORMALISED rather than missed. A 40-char set cannot answer an 8-char
+  # argument, and answering "not published" there would turn a real publication into a red.
+  _load_pub_reach
+  local c="$1" _full
+  # A FULL SHA COSTS NO PROCESS AT ALL: it is a table lookup. Only an abbreviation needs
+  # resolving, and this tree holds very few, so the fallback runs a handful of times rather than
+  # once per record. Normalising unconditionally would have put a `rev-parse` back on every
+  # record and given back most of what the union walk just bought.
+  if [ ${#c} = 40 ]; then
+    [ -n "${_PUB_REACH[$c]+x}" ] && return 0
+  else
+    _full=$(resolve_full_sha "$c")
+    [ -n "$_full" ] && [ -n "${_PUB_REACH[$_full]+x}" ] && return 0
   fi
-  for t in $ADV_TIPS; do
-    if GIT cat-file -e "$t^{commit}" 2>/dev/null; then
-      GIT merge-base --is-ancestor "$c" "$t" 2>/dev/null && return 0
-    else
-      miss=1
-    fi
-  done
-  [ "$miss" = 0 ] || return 2
+  # Not reachable. Whether that means NOT PUBLISHED or CANNOT TELL is the same question it always
+  # was: it is only a definite answer when every advertised tip was readable.
+  [ "$_PUB_MISS" = 0 ] || return 2
   return 1
 }
 
@@ -877,7 +1073,7 @@ while IFS= read -r f; do
     # ---- not fetched) are skipped, which is legal ONLY because check 5 already refused absence.
     case "$w" in
       [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*)
-        GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1 \
+        check_rev "$w" \
           || fail 6 "a witness looks like a sha and resolves to no commit in this history: $w in $f" ;;
       *) ;;   # not sha-shaped: unjudgeable, and skipping it is the discipline, not an omission
     esac
@@ -975,7 +1171,7 @@ while IFS= read -r f; do
       # that has not fetched does not have — and `--is-ancestor` against a missing object fails,
       # which red three honest LANDED records. An absent tip disables the ancestry half only.
       b="$ADV_HEAD"
-      GIT rev-parse --verify --quiet "$b^{commit}" >/dev/null 2>&1 || b=""
+      [ "$ADV_HEAD_OK" = 1 ] || b=""
         # ANCESTRY, NOT EQUALITY — and the reason is the kit's own first success. Equality wedged the
         # bar permanently: merging then pushing, the two acts an authorization grants, move the
         # merge-base past the pin forever, so a LANDED record red every later default-branch push.
@@ -983,7 +1179,7 @@ while IFS= read -r f; do
         # either — the run writes `phase:`, so it would be a one-line escape from this check.
         # What actually matters, and what survives landing: the recorded BASE lies on the history the
         # ANCHOR names rather than on the branch the run authored.
-        if ! GIT rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
+        if ! check_rev "$rb"; then
           fail 9 "a recorded BASE does not resolve to a commit in this history, and the record is written by the run: $rb in $f"
         else
           # CAPTURED, not read off $? two conditions later. Threading a three-way status through an
@@ -991,7 +1187,7 @@ while IFS= read -r f; do
           # call, which is the guard-shares-state-with-what-it-guards shape this kit refuses.
           is_published "$rb"; _pubrc=$?
           if [ "$_pubrc" = 0 ]; then
-            if ! GIT merge-base --is-ancestor "$rb" HEAD 2>/dev/null; then
+            if ! check_head_reaches "$rb"; then
               fail 9 "a recorded BASE is not an ancestor of HEAD, so the run-state file pins a commit this working history does not build on: $rb in $f"
             fi
           elif [ "$_pubrc" = 2 ]; then
@@ -1011,7 +1207,7 @@ while IFS= read -r f; do
         # which cannot meet its obligations. Reachable for the first time now that a verb writes it.
         case "$ph" in
           LANDING|LANDED|VERIFYING)
-            [ "$rb" != "$(GIT rev-parse HEAD)" ] || fail 9 "the recorded BASE equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read: $f" ;;
+            [ "$rb" != "$HEAD_SHA" ] || fail 9 "the recorded BASE equals HEAD at a phase that claims work was done, so the run authored every byte an authorization comparison would read: $f" ;;
         esac
         # ---- 15, SECOND HALF: the LANDED witness lies on the history the ANCHOR blesses. The first
         # ---- half above already refused a witness that is not sha-shaped, so reaching this with an
@@ -1029,7 +1225,7 @@ while IFS= read -r f; do
             # GUARDED on a non-empty anchor. `$b` is the ADVERTISED HEAD tip now, and a remote that answers
             # with heads but no HEAD symref leaves it empty — `--is-ancestor "$w" ""` then fails, and this
             # fired on an honest LANDED record. The old `$b` was a loop variable that could not be empty.
-            if [ "$ph" = LANDED ] && [ -n "$b" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1; then
+            if [ "$ph" = LANDED ] && [ -n "$b" ] && check_rev "$w"; then
               # THE RECORDED ANCHOR KIND DECIDES WHICH HISTORY BLESSES THE WITNESS. A `local` record is
               # a claim about ONE clone: the protocol says plainly it is a RECORD of a merge and not an
               # OBSERVATION of one, so a clone that never had that merge cannot judge it and says so
@@ -1062,12 +1258,12 @@ while IFS= read -r f; do
                 if [ -n "$ADV_NAME" ] && GIT rev-parse --verify --quiet "refs/heads/$ADV_NAME" >/dev/null 2>&1 \
                    && GIT merge-base --is-ancestor "$w" "refs/heads/$ADV_NAME" 2>/dev/null; then
                   : # the local default branch carries it, which is the claim
-                elif GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+                elif check_adv_reaches "$w"; then
                   : # ...or it reached the remote afterwards, which is an UPGRADE and not a defect
                 else
                   report "check 15 skipped for $f — a local-anchored LANDED names a witness this clone does not carry on its own default branch, and a local anchor is a record of a merge rather than an observation of one, so this clone cannot judge it"
                 fi
-              elif ! GIT merge-base --is-ancestor "$w" "$b" 2>/dev/null; then
+              elif ! check_adv_reaches "$w"; then
                 fail 15 "a record claims LANDED with a witness that is not an ancestor of the anchor, so the work it says reached the remote is not on the branch the remote calls its default: $w against $b in $f"
               fi
             fi ;;
@@ -1088,7 +1284,7 @@ while IFS= read -r f; do
   # ---- same time: `rb` is read from a file the run writes. This is an internal-consistency assertion
   # ---- over run-written facts, stable and offline and deterministic - not an authorization verdict.
   # ---- What makes it one is running this same leg in a clone the run never touched.
-  if [ -n "$rb" ] && GIT rev-parse --verify --quiet "$rb^{commit}" >/dev/null 2>&1; then
+  if [ -n "$rb" ] && check_rev "$rb"; then
     bslug=${f#"$M/builds/"}; bslug=${bslug%%/*}
     bre="$M/builds/$bslug/README.md"
     if bb=$(GIT show "$rb:$bre" 2>/dev/null); then
@@ -1154,9 +1350,9 @@ while IFS= read -r f; do
       case " $SECOND_ANCHOR_MODES " in
         *" $dmode "*) ;;
         *)
-          if [ -n "$ADV_HEAD" ] && GIT cat-file -e "$ADV_HEAD^{commit}" 2>/dev/null \
-             && GIT cat-file -e "$rb^{commit}" 2>/dev/null \
-             && ! GIT merge-base --is-ancestor "$rb" "$ADV_HEAD" 2>/dev/null; then
+          if [ "$ADV_HEAD_OK" = 1 ] \
+             && check_rev "$rb" \
+             && ! check_adv_reaches "$rb"; then
             fail 29 "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode $dmode, admissible on that anchor are $SECOND_ANCHOR_MODES, base $rb in $f"
           fi ;;
       esac
@@ -2046,11 +2242,11 @@ for f in $RUNS; do
     dsitem=${dsrow#* dispatch · item }; dsitem=${dsitem%% · reason *}
     dsgrp=${dsitem%% *}; dsunit=${dsitem#* }
     dsdecl=${dsrow#* · reason }
-    if ! GIT rev-parse --verify --quiet "$dsgrp^{commit}" >/dev/null 2>&1; then
+    if ! check_rev "$dsgrp"; then
       report "check 23 skipped for $dsunit in $f — the recorded group anchor does not resolve in this clone, so the commit window cannot be opened"
       continue
     fi
-    if ! GIT merge-base --is-ancestor "$dsgrp" HEAD 2>/dev/null; then
+    if ! check_head_reaches "$dsgrp"; then
       report "check 23 skipped for $dsunit in $f — the group anchor is not an ancestor of HEAD, so this clone does not carry the history the declaration was made against"
       continue
     fi
@@ -3000,22 +3196,129 @@ fi
 # A build whose --plan REFUSES is skipped: a refusal is a verdict this check has no opinion about.
 if [ -d "$MEMORY_ROOT/builds" ]; then
   _pv_seen=0; _pv_bad=""; _pv_drv="$(cd "$(dirname "$0")" && pwd)/unattended.sh"
-  for _pv_rm in $(GIT ls-files "$MEMORY_ROOT/builds/*/README.md" 2>/dev/null); do
-    _pv_slug=$(basename "$(dirname "$_pv_rm")")
-    _pv_out=$(bash "$_pv_drv" --plan "$_pv_slug" 2>/dev/null) || continue
-    _pv_seen=$((_pv_seen+1))
-    case "$_pv_out" in
-      *"NOT A UNIT"*)
-        case "$_pv_out" in
-          *"every tracked spec is terminal"*) _pv_bad="$_pv_bad $_pv_slug" ;;
-        esac ;;
-    esac
-  done
-  # LIVENESS. A loop that graded nothing would report clean, which is the vacuous-selector shape
-  # this tree gates against everywhere else - and this assertion is not decoration: the first cut
-  # of this check resolved the driver path wrongly, walked zero builds, and this line caught it.
-  [ "$_pv_seen" -gt 0 ] || fail 30 "check 30 walked no build whose --plan returned a verdict, so a clean result here is about an empty population rather than about the corpus: $MEMORY_ROOT/builds"
-  [ -z "$_pv_bad" ] || fail 30 "a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it:$_pv_bad"
+  # ---- THE DRIVER IS ASKED ABOUT THE BUILDS THAT CAN POSSIBLY RED, not about all of them.
+  # TOOL-aQuenchedHarness-10.
+  #
+  # Getting the verdict from the driver is the right shape and is unchanged: deciding it here would
+  # be a second implementation of the driver's predicate rather than a second opinion on its output.
+  # What was wrong was the POPULATION. Every tracked build got its own `--plan`, and one `--plan`
+  # costs 3.8 s on this tree - 29 spawned processes, 13 awk and 9 grep of them, re-reading spec files
+  # this leg can read once for the whole corpus. Over 102 builds that was ~390 s, the largest single
+  # item on the longest leg of the bar, spent almost entirely on builds that cannot produce the row
+  # this check looks for.
+  #
+  # THE FILTER IS A NECESSARY CONDITION AND NEVER THE VERDICT. A `NOT A UNIT` row is emitted at
+  # exactly two places in the driver, and both are keyed on one spec: its status header did not
+  # parse, or its heading id did not. A build with no such spec cannot emit the row, so passing over
+  # it cannot hide a red. A build WITH one is handed to the driver, which decides both halves of the
+  # conjunction - this filter says nothing at all about the terminal half, and over-selecting is
+  # free. On this tree it selects five builds, which are the same five the check redded on the day
+  # it was written.
+  #
+  # THE PATTERNS ARE THE DRIVER'S OWN AND ARE ASSERTED AGAINST IT. A filter keyed on a predicate
+  # spelled twice is a filter that silently stops selecting when one copy moves, and a check whose
+  # population quietly empties reports clean forever. If `spec_facts` stops spelling either pattern
+  # this way, this REFUSES instead.
+  #
+  # AN UNREADABLE OR EMPTY SPEC SELECTS ITS BUILD, because that is what the driver does with one:
+  # `spec_facts` emits an empty row for a path it cannot read, and awk's `FNR==1` never fires for a
+  # zero-length file, so neither yields an id or a status and both become `NOT A UNIT`.
+  _pv_pid='^# [A-Za-z0-9][A-Za-z0-9-]* '
+  _pv_pst='^\*\*Status:\*\* [A-Z]+ '
+  if ! grep -qF "$_pv_pid" "$_pv_drv" 2>/dev/null || ! grep -qF "$_pv_pst" "$_pv_drv" 2>/dev/null; then
+    fail 30 "the driver no longer spells one of the two patterns this check selects its population with, so the selection below is keyed on a predicate the driver has moved away from and would quietly grade nothing: $_pv_drv"
+  else
+    _pv_ok=""; _pv_cand=""; _pv_n=0; _pv_seed=""; _pv_nseed=0
+    # `drop_working_specs` spelled as the driver spells it: a path under `spec/_<dir>/` is scratch,
+    # not a spec, and enumerating one produced a NOT A UNIT row for a notes file.
+    for _pv_f in $(GIT ls-files "$MEMORY_ROOT/builds/*/spec/*.md" 2>/dev/null | grep -vE '/spec/_[^/]*/'); do
+      _pv_n=$((_pv_n+1))
+      _pv_s=${_pv_f#"$MEMORY_ROOT/builds/"}; _pv_s=${_pv_s%%/*}
+      # THE CANARY SAMPLE, collected here because this is the only pass over the build slugs.
+      case " $_pv_seed " in
+        *" $_pv_s "*) ;;
+        *) [ "$_pv_nseed" -ge 3 ] || { _pv_seed="$_pv_seed $_pv_s"; _pv_nseed=$((_pv_nseed+1)); } ;;
+      esac
+      if [ -r "$_pv_f" ] && [ -s "$_pv_f" ]; then
+        _pv_ok="$_pv_ok$_pv_f
+"
+      else
+        _pv_cand="$_pv_cand $_pv_s"
+      fi
+    done
+    # ONE AWK PASS OVER THE WHOLE CORPUS, chunked by xargs because 551 spec paths are 41 KB of argv
+    # and Windows caps a command line at 32 KB - a single invocation would fail on the platform this
+    # leg is most often run on, and it would fail by not running rather than by reporting.
+    if [ -n "$_pv_ok" ]; then
+      while IFS= read -r _pv_f; do
+        [ -n "$_pv_f" ] || continue
+        _pv_s=${_pv_f#"$MEMORY_ROOT/builds/"}; _pv_cand="$_pv_cand ${_pv_s%%/*}"
+      done < <(printf '%s' "$_pv_ok" | xargs -s 20000 awk '
+        { sub(/\r$/,"") }
+        FNR==1 { if (f != "" && (id == "" || st == "")) print f; f=FILENAME; id=""; st="" }
+        /^# [A-Za-z0-9][A-Za-z0-9-]* / { if (id == "") id=$2 }
+        /^\*\*Status:\*\* [A-Z]+ / { if (st == "") st=$2 }
+        END { if (f != "" && (id == "" || st == "")) print f }' 2>/dev/null)
+    fi
+    _pv_slugs=""
+    for _pv_s in $_pv_cand; do
+      case " $_pv_slugs " in *" $_pv_s "*) ;; *) _pv_slugs="$_pv_slugs $_pv_s" ;; esac
+    done
+    # THE ASK ALWAYS CARRIES A CANARY SAMPLE, and it is a SAMPLE rather than one build.
+    # The liveness assertion below exists because the first cut of this check resolved the driver
+    # path wrongly and walked zero builds; on a corpus that selects nothing, that assertion would
+    # pass over an empty ask and stop meaning anything. So the driver is always asked about
+    # something.
+    #
+    # ONE canary was not enough, and the kit's own cross-component fixture proved it: a single
+    # build refusing for its own reasons - a broken units region, in that arm deliberately - drove
+    # `_pv_seen` to zero and RED a check that the old whole-corpus walk left silent, because some
+    # OTHER build there still graded. A refusal is a verdict this check has no opinion about, so
+    # liveness must not be hostage to which build happens to sort first. Three is enough to make
+    # that accident unlikely and is ~11 s, and the assertion stays honest: if all three refuse,
+    # something is wrong with the driver path and saying so is the whole point.
+    for _pv_s in $_pv_seed; do
+      case " $_pv_slugs " in *" $_pv_s "*) ;; *) _pv_slugs="$_pv_slugs $_pv_s" ;; esac
+    done
+    if [ -n "$_pv_slugs" ]; then
+      # ONE DRIVER PROCESS FOR THE WHOLE SELECTION. `--plan` takes several slugs and frames each
+      # one's output with its own rc; each still runs in its own subshell, so one build's refusal
+      # cannot colour the next. The frames are read with a state machine rather than split on, so a
+      # build whose plan output happens to contain the marker text cannot merge two verdicts.
+      _pv_cur=""; _pv_buf=""
+      while IFS= read -r _pv_l || [ -n "$_pv_l" ]; do
+        case "$_pv_l" in
+          "unattended-plan-open: "*) _pv_cur=${_pv_l#unattended-plan-open: }; _pv_buf="" ;;
+          "unattended-plan-rc: "*)
+            _pv_rest=${_pv_l#unattended-plan-rc: }
+            _pv_s=${_pv_rest%% *}; _pv_rc=${_pv_rest##* }
+            # A build whose --plan REFUSES is skipped: a refusal is a verdict this check has no
+            # opinion about, which is what the old `|| continue` said.
+            if [ "$_pv_s" = "$_pv_cur" ] && [ "$_pv_rc" = 0 ]; then
+              _pv_seen=$((_pv_seen+1))
+              case "$_pv_buf" in
+                *"NOT A UNIT"*)
+                  case "$_pv_buf" in
+                    *"every tracked spec is terminal"*) _pv_bad="$_pv_bad $_pv_s" ;;
+                  esac ;;
+              esac
+            fi
+            _pv_cur=""; _pv_buf="" ;;
+          *) [ -n "$_pv_cur" ] && _pv_buf="$_pv_buf
+$_pv_l" ;;
+        esac
+      # `--framed` UNCONDITIONALLY: the loop below reads frames, so it must never be handed the
+    # unframed form. Letting the driver decide by arity meant a corpus of one build produced no
+    # frames, the loop counted no verdicts, and the liveness branch red a healthy tree.
+    done < <(bash "$_pv_drv" --plan --framed $_pv_slugs 2>/dev/null)
+    fi
+    # LIVENESS, IN TWO PARTS, because the check now has two stages and either can empty out. The
+    # scan must have read specs - a selector over nothing selects nothing and looks clean - and the
+    # driver must have returned a verdict for something it was asked about.
+    [ "$_pv_n" -gt 0 ] || fail 30 "the spec scan that selects this check's population read no tracked spec at all, so both the selection and the clean result below are about an empty corpus rather than about the builds: $MEMORY_ROOT/builds"
+    [ "$_pv_seen" -gt 0 ] || fail 30 "the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus:$_pv_slugs"
+    [ -z "$_pv_bad" ] || fail 30 "a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it:$_pv_bad"
+  fi
 fi
 
 

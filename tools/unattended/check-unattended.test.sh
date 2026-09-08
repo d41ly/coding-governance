@@ -474,7 +474,22 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # `--witness` is NOT here: it is read inside the --phase handler rather than dispatched as its own
 # case arm, so it never enters the derived population and exempting it removed nothing. The
 # assertion below caught that on its first run, which is the entire reason it exists.
-_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set'
+# `--framed` and `--paths` are flags of `--plan`: each selects an output MODE and dispatches
+# nothing, so demanding either a Skill section would demand a section nobody should write.
+# TOOL-aQuenchedHarness-10.
+#
+# BOTH ARE HERE BECAUSE THAT UNIT PUT THEM IN THE POPULATION. Rewriting `--plan`'s argument
+# loop turned `[ "${1:-}" = "--paths" ]` into a `--paths)` case arm, and this population is
+# derived from case arms - so a refactor that changed no behaviour added a verb to a set it
+# never meant to touch. I first recorded `--paths` as a pre-existing red on the strength of it
+# appearing equally in both trees; a baseline run of this suite against main named only
+# `--disposition` and `--unit`, which is what settled it. Counting occurrences of a flag is not
+# the same question as whether it is DISPATCHED.
+#
+# NOT FIXED HERE: `--unit` and `--disposition` are flags too and are still graded as verbs,
+# which is why this arm reds on a tree nobody has touched. Denying them changes what this arm
+# grades AND its floor, which is TOOL-aQuenchedHarness-9's deferred work, not this unit's.
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths'
 for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)
@@ -1639,7 +1654,13 @@ hit "$(run)" "the Skill template names no --preflight invocation, so there is no
 reset_tree
 mutate memory/builds/tRun/README.md '/gen:build-units/d'
 mutate memory/builds/tPlanOk/README.md '/gen:build-units/d'
-hit "$(run)" "check 30 walked no build whose --plan returned a verdict, so a clean result here is about an empty population rather than about the corpus"
+hit "$(run)" "the driver returned no verdict for any build this check asked it about, so a clean result here is about a driver path that answered nothing rather than about the corpus"
+# ---- AND THIS IS THE ARM THAT EXERCISES THE CANARY. TOOL-aQuenchedHarness-10 gave check 30 a
+# ---- selection stage, so on a corpus where nothing is selected the driver would be asked about
+# ---- NOTHING and this liveness branch would pass over an empty ask - the exact vacuity it exists
+# ---- to catch. One build is therefore graded anyway. Every `--plan` in this fixture refuses, so
+# ---- the branch above fires whether the slug came from the selection or from the canary - this
+# ---- arm grades that the ask is never EMPTY, not which limb supplied it.
 
 # ---- 30 branch 2: the VERDICT the walk exists to reach. Branch 1 above grades the walk's LIVENESS
 # ---- and nothing else, so `check-arms.py` reports this branch as carrying no positive assertion and
@@ -1657,6 +1678,33 @@ Ratified centrally. Not a unit spec, and carries no status header.
 ' > memory/builds/tPlanOk/spec/contracts.md
 git add memory/builds/tPlanOk/spec/contracts.md
 hit "$(run)" "a build's --plan reports NOT A UNIT rows AND claims every tracked spec is terminal, so a reader picking up work is told a build is finished by a verb that graded nothing on it: tPlanOk"
+
+# ---- 30 branch 3 (TOOL-aQuenchedHarness-10): the SELECTOR's own liveness. The check no longer
+# ---- asks the driver about every build - it scans the spec corpus and asks about the ones that
+# ---- can produce a NOT A UNIT row. A scan reading no spec selects nothing, asks nothing, and
+# ---- reports clean; that is a second empty population one level above the one branch 1 guards,
+# ---- and it needs its own assertion because branch 1 cannot see it.
+# ---- The break is the INDEX, not the worktree: the scan enumerates with `git ls-files`, so a
+# ---- spec still on disk but no longer tracked is invisible to it - which is also the real shape
+# ---- this could take in a live tree.
+reset_tree
+# UNTRACK THE WHOLE POPULATION, not two builds by name. Naming tRun and tPlanOk left every
+# other fixture build's specs tracked, so the scan still read specs, the check never fired,
+# and this arm asserted a message the tool had no reason to emit. The fixture-no-op guard
+# below is what caught it - which is the entire reason `mutate` and this arm carry one.
+git ls-files -z "memory/builds/*/spec/*.md" | xargs -0 -r git rm -q --cached >/dev/null 2>&1
+n=$((n+1)); [ -z "$(git ls-files "memory/builds/*/spec/*.md")" ] || { echo "FAIL fixture no-op: specs still tracked"; st=1; }
+hit "$(run)" "the spec scan that selects this check's population read no tracked spec at all, so both the selection and the clean result below are about an empty corpus rather than about the builds"
+
+# ---- 30 branch 4 (TOOL-aQuenchedHarness-10): the selector is keyed on TWO patterns copied from
+# ---- the driver's own `spec_facts`, and a predicate spelled in two places is one that stops
+# ---- selecting when a copy moves. A selector that silently selects nothing reports clean
+# ---- forever, so the check greps both literals out of the driver first and REFUSES without them.
+# ---- The mutation is anchored on `spec_facts`'s own status action so it moves that one awk
+# ---- pattern and nothing else the leg parses out of this file.
+reset_tree
+mutate $KIT_REL/unattended.sh '/if (st == "")/s/Status:/Stat_us:/'
+hit "$(run)" "the driver no longer spells one of the two patterns this check selects its population with, so the selection below is keyed on a predicate the driver has moved away from and would quietly grade nothing"
 
 # ---- 31 (TOOL-aHoistedPass-9): the route the `passes-harnessed` directive names RESOLVES in this
 # ---- tree, and every case the check cannot COMPARE announces itself on the REPORT channel instead
