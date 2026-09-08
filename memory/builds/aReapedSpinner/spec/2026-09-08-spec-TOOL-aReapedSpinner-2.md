@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-2 — the scope fence: attribution is a TREE property, computed once
 
-**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 3
+**Status:** CLOSED · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 3 · ratified 2026-09-08
 
 <!-- gen:spec-records -->
 

@@ -271,9 +271,25 @@ def main(argv):
         return 1
 
     try:
-        if "--kill" in argv:
-            target = int(argv[argv.index("--kill") + 1])
+        if "--kill-msys" in argv or "--kill" in argv:
+            flag = "--kill-msys" if "--kill-msys" in argv else "--kill"
+            raw = argv[argv.index(flag) + 1] if len(argv) > argv.index(flag) + 1 else ""
+            if not raw.isdigit():
+                sys.stderr.write("reap: REFUSED — %s takes an id, got %r\n" % (flag, raw))
+                return 1
+            target = int(raw)
             rows, _c = census.scan_processes(backend)
+            if flag == "--kill-msys":
+                # THE TRANSLATION LIVES HERE, not in the caller. A bash-recorded leg pid is an MSYS
+                # id by construction, and `run_kill` is keyed on winpid — passing one through
+                # unchanged resolves to nothing or, worse, to an unrelated row. The kit owns the
+                # namespace question, so the shell asks it rather than answering it.
+                hit = next((r["winpid"] for r in rows if r.get("msys_pid") == target), None)
+                if hit is None:
+                    sys.stderr.write("reap: REFUSED — msys pid %d resolves to no census row; it "
+                                     "may already have exited\n" % target)
+                    return 1
+                target = hit
             import scope as scope_mod
             with open(os.path.join(root_dir, ".process-monitor.conf"), "r",
                       encoding="utf-8", errors="replace") as fh:

@@ -60,7 +60,7 @@ and nothing ENUMERATES the population, which is why all three ran unseen for two
 | 2 | `TOOL-aReapedSpinner-2` | CLOSED | the scope fence: a row is attributable to this repo's agent work by a DECLARED root, or it is invisible to every other unit |
 | 3 | `TOOL-aReapedSpinner-3` | CLOSED | the classifier: a declared age ceiling DECIDES and the CPU rate LABELS, giving OK, OVERAGE, SPIN, IDLE or ORPHAN |
 | 4 | `TOOL-aReapedSpinner-4` | CLOSED | the reaper: walk the parent edges leaves-first, kill, VERIFY each death, name survivors. Not `taskkill /T`, which measured 25% effective, and not a process group, which reaps the caller |
-| 5 | `TOOL-aReapedSpinner-5` | SPECCED | the session seam: a throttled hook puts the verdict in front of an agent mid-turn and at session start |
+| 5 | `TOOL-aReapedSpinner-5` | CLOSED | the session seam: a throttled hook puts the verdict in front of an agent mid-turn and at session start |
 | 6 | `TOOL-aReapedSpinner-6` | CLOSED | the kit: conf, adopter, govkit entry, gate legs, README — the half that makes an adopter's integration a declaration rather than a port |
 | 7 | `TOOL-aReapedSpinner-7` | SPECCED | the gate runner reaps its own TREE at every exit path, delegating to unit 4 instead of killing a recorded pid and leaving the grandchildren |
 
@@ -73,16 +73,16 @@ ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReap
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration](spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md) | 1 | 2 | OPEN | rev-4 | 2026-09-08 |
-| [TOOL-aReapedSpinner-1 — the census: one bounded read, keyed on the id every process has](spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md) | 2 | 2 | OPEN | rev-4 | 2026-09-08 |
-| [TOOL-aReapedSpinner-2 — the scope fence: attribution is a TREE property, computed once](spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md) | 3 | 2 | OPEN | rev-4 | 2026-09-08 |
-| [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 4 | 2 | OPEN | rev-4 | 2026-09-08 |
-| [TOOL-aReapedSpinner-4 — the reaper: walk both graphs, signal per kind, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 5 | 2 | OPEN | rev-4 | 2026-09-08 |
-| [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 6 | 2 | OPEN | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration](spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-1 — the census: one bounded read, keyed on the id every process has](spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md) | 2 | 2 | CLOSED | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-2 — the scope fence: attribution is a TREE property, computed once](spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-4 — the reaper: walk both graphs, signal per kind, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 6 | 2 | CLOSED | rev-4 | 2026-09-08 |
 | [TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 6 | 2 | OPEN | rev-4 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 13 bound to this build, across 4 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

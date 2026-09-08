@@ -19,7 +19,7 @@ PASS=0; FAIL=0
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK" 2>/dev/null || true' EXIT
 
-add_pass()  { PASS=$((PASS + 1)); printf '  add_pass   %s\n' "$1"; }
+add_pass()  { PASS=$((PASS + 1)); printf '  ok   %s\n' "$1"; }
 add_fail()  { FAIL=$((FAIL + 1)); printf '  FAIL %s\n' "$1" >&2; }
 check_equal() { if [ "$2" = "$3" ]; then add_pass "$1"; else add_fail "$1 (got '$2', wanted '$3')"; fi; }
 
@@ -119,6 +119,59 @@ if [ -f "$ROOT/.process-monitor.conf" ]; then
     && add_pass "test_shipped_conf_is_accepted" || add_fail "test_shipped_conf_is_accepted"
 else
   add_fail "test_shipped_conf_is_accepted (add_fail shipped conf — the arm cannot run, and a skip here would be indistinguishable from coverage)"
+fi
+
+# ---- TOOL-aReapedSpinner-5: the session seam -------------------------------------------------
+# Three DISTINGUISHABLE states, and keeping them apart is the unit's whole job: clean is SILENT,
+# flagged is a short list, and a broken monitor is ONE named line. Collapsing the first and third is
+# how "nothing to report" becomes indistinguishable from "the probe could not run".
+HOOK="$KIT_DIR/procmon-hook.js"
+GD=$(git -C "$ROOT" rev-parse --git-common-dir 2>/dev/null)
+_hookrun() { printf '%s' "$1" | CLAUDE_PROJECT_DIR="$ROOT" PROCMON_PYTHON="${2:-python}" node "$HOOK" 2>&1; }
+
+if [ -f "$HOOK" ] && command -v node >/dev/null 2>&1; then
+  rm -f "$GD/procmon-stamp" 2>/dev/null
+  _out=$(_hookrun '{"hook_event_name":"PostToolUse"}')
+  if [ -z "$_out" ]; then add_pass "test_clean_is_silent"; else add_fail "test_clean_is_silent (got: $_out)"; fi
+
+  # The stamp is written AFTER the work: a hook that stamps first throttles itself out of ever
+  # running again the moment it crashes, and that silence reads exactly like a clean tree.
+  if [ -f "$GD/procmon-stamp" ]; then add_pass "test_stamp_is_written_after_the_run"; else add_fail "test_stamp_is_written_after_the_run"; fi
+
+  # The throttled path must spawn NOTHING. Shimming python to a name that cannot exist proves it:
+  # had the early exit run a census, this would report the failure instead of staying silent.
+  _out=$(_hookrun '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim)
+  if [ -z "$_out" ]; then add_pass "test_throttled_path_spawns_nothing"; else add_fail "test_throttled_path_spawns_nothing (got: $_out)"; fi
+
+  # SessionStart ignores the window: a fresh session inherits another session's stamp, and that is
+  # precisely how a two-day-old orphan goes unseen.
+  _out=$(_hookrun '{"hook_event_name":"SessionStart"}' nonesuch-python-shim)
+  case "$_out" in
+    *"could NOT run"*) add_pass "test_session_start_ignores_the_throttle" ;;
+    *) add_fail "test_session_start_ignores_the_throttle (got: $_out)" ;;
+  esac
+
+  # A broken monitor names the failure and STILL exits 0 — a monitoring fault may not block a tool
+  # call, and a silent failure is the one outcome this unit exists to prevent.
+  rm -f "$GD/procmon-stamp" 2>/dev/null
+  _out=$(_hookrun '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim); _rc=$?
+  case "$_out" in
+    *"could NOT run"*) add_pass "test_broken_monitor_names_the_failure" ;;
+    *) add_fail "test_broken_monitor_names_the_failure (got: $_out)" ;;
+  esac
+  if [ "$_rc" = 0 ]; then add_pass "test_broken_monitor_fails_open"; else add_fail "test_broken_monitor_fails_open (rc=$_rc)"; fi
+  rm -f "$GD/procmon-stamp" 2>/dev/null
+
+  if grep -q 'procmon-hook.js' "$KIT_DIR/kit.toml"; then
+    add_pass "test_hook_destination_is_declared_by_the_unit_that_ships_it"
+  else
+    add_fail "test_hook_destination_is_declared_by_the_unit_that_ships_it"
+  fi
+
+  _n=$(grep -c 'procmon-hook' "$ROOT/.claude/settings.json" 2>/dev/null || true)
+  if [ "$_n" = 2 ]; then add_pass "test_wiring_is_idempotent (2 entries)"; else add_fail "test_wiring_is_idempotent (found ${_n:-0}, wanted 2)"; fi
+else
+  add_fail "the session-seam arms could not run (no hook file or no node) — a skip here would be indistinguishable from coverage"
 fi
 
 printf '\nadopt-process-monitor: %d passed, %d failed (%d assertions)\n' "$PASS" "$FAIL" "$((PASS + FAIL))"

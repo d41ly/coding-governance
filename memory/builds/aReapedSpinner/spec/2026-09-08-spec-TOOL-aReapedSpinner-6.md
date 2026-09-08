@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration
 
-**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 1 · ratified 2026-09-08
 
 <!-- gen:spec-records -->
 

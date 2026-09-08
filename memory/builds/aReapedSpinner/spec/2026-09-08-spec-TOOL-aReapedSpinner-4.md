@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-4 — the reaper: walk both graphs, signal per kind, VERIFY
 
-**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 5
+**Status:** CLOSED · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 5 · ratified 2026-09-08
 
 <!-- gen:spec-records -->
 

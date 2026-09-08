@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS
 
-**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 4
+**Status:** CLOSED · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 4 · ratified 2026-09-08
 
 <!-- gen:spec-records -->
 

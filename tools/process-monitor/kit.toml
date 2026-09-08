@@ -55,6 +55,14 @@ include = ["process-monitor.template.conf"]
 role = "seed"
 to = ".process-monitor.conf"
 
+# THE HOOK'S DESTINATION IS DECLARED BY THE UNIT THAT SHIPS IT. `hook destinations` asserts every
+# declared hook path exists, so declaring this at `order 1` -- before the file was written -- would
+# have redded that leg on every bar until this unit landed. Same class as the `version_from` defect
+# the kit skeleton's spec records.
+[[files]]
+include = ["procmon-hook.js"]
+role = "engine"
+
 [config]
 file = ".process-monitor.conf"
 owner = "process-monitor"

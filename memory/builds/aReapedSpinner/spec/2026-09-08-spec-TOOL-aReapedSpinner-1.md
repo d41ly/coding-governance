@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-1 — the census: one bounded read, keyed on the id every process has
 
-**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 2 · ratified 2026-09-08
 
 <!-- gen:spec-records -->
 
