@@ -46,6 +46,14 @@
 #   to FAIL rather than to describe: the same port measured 2.35x at width 2 and 1.37x serial, and
 #   this number reds against both of them.
 #
+# sweep-ceiling-factor: 2
+#   The multiplier `--sweep` derives a suite's HANG bound from, over that suite's own budget row.
+#   Not a second cost verdict: the budget above is already the worst observed reading x1.5, so x2 on
+#   top of it is a suite running three times its worst observed time before anything kills it, which
+#   is a hang rather than a slow box. TOOL-aPooledSweep-1 S7. An integer, because the derivation is
+#   shell arithmetic; a factor that is absent, non-numeric or zero REFUSES the sweep rather than
+#   defaulting, for the reason the two thresholds above give.
+#
 # <name>	<budget seconds>	<argv, empty = take it from tools/gate-legs.json>	<the reading>
 agent-cap restatement self-test	520		worst of 11 readings 342s, x1.5
 agent-cap self-test	590		worst of 7 readings 389s, x1.5
