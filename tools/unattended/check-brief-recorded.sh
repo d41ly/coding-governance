@@ -167,6 +167,30 @@ case "$BRIEF_RECORDED_CUTOFF" in
   *) echo "brief-recorded: BRIEF_RECORDED_CUTOFF is not an ISO date, and a cutoff nothing can compare grades every build or none: $BRIEF_RECORDED_CUTOFF"; exit 2 ;;
 esac
 
+# ---- THE SUBJECT CACHE, which this leg was built WITHOUT. TOOL-aQuenchedHarness-13.
+#
+# `build_commit` walks the whole in-range history ONCE PER UNIT, and for every commit it needs that
+# commit's subject. Its own header says the cache is not an optimisation a caller may drop, and
+# prices the sibling leg at 591 s cached against 3977-5401 s uncached. This leg declared no `_SUBJ`
+# at all - `grep -c _SUBJ` returned ZERO - so every unit paid a `git log -1` plus a `tr` on every
+# commit in range. Measured at main tip d499258d: 1760 s against a 900 s ceiling, ALREADY RED before
+# this build merged anything, and rising with each landed unit.
+#
+# This is the sibling's block, ported rather than re-derived, INCLUDING its size assertion. That
+# assertion is the load-bearing half: a read loop that truncates leaves a cache answering "no such
+# commit" for every id, every unit grades unbuilt-in-range, and the leg exits 0 - a silent green of
+# exactly the shape this kit refuses. Equality is exact because shas are unique.
+declare -A _SUBJ=()
+while IFS= read -r _cl; do
+  _SUBJ[${_cl%% *}]=" ${_cl#* } "
+done < <(GIT log --format='%H %s' HEAD 2>/dev/null | tr -c 'A-Za-z0-9\n-' ' ')
+_n_hist=$(GIT rev-list --count HEAD 2>/dev/null)
+case "$_n_hist" in ''|*[!0-9]*) _n_hist=-1 ;; esac
+if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
+  echo "brief-recorded: the subject cache holds ${#_SUBJ[@]} commit(s) where history has $_n_hist, so the build-commit walk below would miss commits and report every unit unbuilt-in-range - which is a clean bill this leg has not earned"
+  exit 2
+fi
+
 graded=0; skipped_cutoff=0; nobase=0; unbuilt=0
 violations=""
 

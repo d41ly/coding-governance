@@ -1692,8 +1692,7 @@ reset_tree
 # other fixture build's specs tracked, so the scan still read specs, the check never fired,
 # and this arm asserted a message the tool had no reason to emit. The fixture-no-op guard
 # below is what caught it - which is the entire reason `mutate` and this arm carry one.
-git ls-files "memory/builds/*/spec/*.md" | tr '
-' ' ' | xargs -0 -r git rm -q --cached >/dev/null 2>&1
+git ls-files -z "memory/builds/*/spec/*.md" | xargs -0 -r git rm -q --cached >/dev/null 2>&1
 n=$((n+1)); [ -z "$(git ls-files "memory/builds/*/spec/*.md")" ] || { echo "FAIL fixture no-op: specs still tracked"; st=1; }
 hit "$(run)" "the spec scan that selects this check's population read no tracked spec at all, so both the selection and the clean result below are about an empty corpus rather than about the builds"
 
