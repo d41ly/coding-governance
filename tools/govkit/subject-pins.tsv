@@ -76,6 +76,7 @@ playbook render selftest	kit	selftests
 playbook render wiring	repo	wiring
 playbook validity gate	repo	declarations
 pre-push self-test	repo	selftests
+process-monitor wiring	repo	records
 profile-bar selftest	kit	selftests
 push-main self-test	repo	selftests
 pytest-guardrails self-test	kit	selftests

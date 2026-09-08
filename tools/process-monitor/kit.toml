@@ -1,0 +1,88 @@
+# kit.toml — this entry, declared as data. Read by tools/govkit/.
+# Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md
+
+id = "process-monitor"
+home = "tools/process-monitor"
+scope = "repo"
+
+# PINNED AT THE SHELL ADOPTER, not at an engine module, and the reason is a landing constraint
+# rather than a preference. This entry lands at `order 1` with NO engine file present — the census,
+# the fence, the classifier, the reaper and the hook are separate units — and `govkit.py` refuses a
+# `version_from` naming a file that does not exist. A `.py` pin here reds `govkit selfcheck` AND
+# `kit version markers` on every bar until the unit that ships that file lands, and both are
+# `subject: repo` with no guard, so no scoped run hides it. TOOL-aReapedSpinner-6 D1.
+version_from = { file = "adopt-process-monitor.sh", pattern = "^KIT_PROCESS_MONITOR_VERSION=" }
+
+[[files]]
+include = "**"
+role = "engine"
+
+# THIS KIT'S SELF-TESTS ARE WITHHELD from `govkit apply`, per the 2026-08-23 owner ruling that a
+# suite whose subject is a checker in THIS directory has no job in a tree that copy-installs the kit
+# and never edits it. Withheld by CLAIMING THE DESTINATION — govkit has no `exclude` key, a `**`
+# rule's pool drops only what another rule owns, and `project-owned` is absent from LANDABLE_ROLES
+# so `apply` never writes it. `silenced_legs` then refuses to emit any gate leg whose argv names a
+# path the target does not hold, so the leg goes with the file and needs no deployer change.
+[[files]]
+include = ["adopt-process-monitor.test.sh"]
+role = "project-owned"
+
+# `selftest.py` is NOT claimed here. It is shipped by the census unit at `order 2`, and a descriptor
+# claiming a path no unit has shipped yet reds `govkit selfcheck` on every bar until that unit
+# lands — the same class as declaring a hook destination before the hook exists. That unit adds its
+# own rule alongside this one.
+
+# The conf is the ADOPTER'S to write and this kit may not create it: the roots are that adopter's
+# own paths and a seeded conf carrying a placeholder root is worse than an absent one, because it
+# looks configured. Shipped as a template the adopter copies and edits, never as the live file.
+[[files]]
+include = ["process-monitor.conf.template"]
+role = "seed"
+to = ".process-monitor.conf"
+
+[config]
+file = ".process-monitor.conf"
+owner = "process-monitor"
+required_keys_render = []
+
+[adopt]
+argv = ["bash", "{kit}/adopt-process-monitor.sh"]
+mutates_index = false
+
+[check]
+argv = ["bash", "{kit}/adopt-process-monitor.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = ".process-monitor.conf" }
+means = "adopted"
+
+[[gate_leg]]
+name = "process-monitor wiring"
+subject = "repo"
+argv = ["bash", "{kit}/adopt-process-monitor.sh", "--check"]
+guard = []
+
+# THE ONE HOLE, and it is an authoring hole rather than a measurement one: PROCMON_ROOTS is the
+# adopter's own paths and cannot be seeded from this tree. It BLOCKS the gate, because the failure
+# mode of leaving it blank is not silence — the fence matches nothing, every sweep reports a clean
+# tree, and the kit certifies a machine it never examined. That is the green-by-absence class this
+# repo gates against in a dozen places, and it is the one place this kit could produce it.
+[[hole]]
+id = "procmon-roots"
+kind = "authoring"
+blocks_adopt = false
+blocks_gate = true
+why = "PROCMON_ROOTS ships blank and the scope fence then admits nothing, so every report reads as a clean tree and every sweep kills nothing — indistinguishable, to an operator, from a machine with no abandoned processes on it. Unlike a dark signal this one INVENTS an answer rather than staying silent."
+discharge = { command = ["bash", "{kit}/adopt-process-monitor.sh", "--check"] }
+
+# Line-ending pins this kit needs in a TARGET. The shell and the conf are execution-sensitive: a
+# stray CR breaks the shebang and turns a declared value into one carrying an invisible byte, which
+# is the worst possible failure mode for a path prefix nothing else validates.
+[[lf_pin]]
+pattern = "tools/process-monitor/*.sh"
+why = "a stray CR breaks the shebang and silently corrupts a declared path prefix"
+
+[[lf_pin]]
+pattern = ".process-monitor.conf"
+why = "a CR at the end of a PROCMON_ROOTS value makes the prefix match nothing, and nothing else validates it"

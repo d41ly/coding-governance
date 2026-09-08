@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: efe8d7de235c63aaba0ecc19934e4fb46481a02f
-phase: FOLDING
+witness: a6352db27de02e08b82e164c5b3f97b2dc805281
+phase: BUILDING
 branch-sha: e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c
 branch-ref: refs/heads/branch/gate-runner-process-monitor-0d0fa8
 mode: prompt
@@ -28,3 +28,7 @@ base: e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c
 2026-09-07T23:28:44Z review · item TOOL-aReapedSpinner-1 · reason verdict BLOCKED · blockers 5
 
 2026-09-08T00:04:36Z review · item TOOL-aReapedSpinner-1 · reason verdict BLOCKED · blockers 8 · NON-CONVERGENT · disposition fold
+
+2026-09-08T00:08:15Z dispatch · item a6352db2 TOOL-aReapedSpinner-6 · reason tools/process-monitor/kit.toml tools/process-monitor/adopt-process-monitor.sh tools/process-monitor/adopt-process-monitor.test.sh tools/process-monitor/README.md .process-monitor.conf tools/govkit/registry.toml .gitattributes
+
+2026-09-08T00:14:42Z brief · item TOOL-aReapedSpinner-6 · reason eabdd4264895 memory/builds/aReapedSpinner/prompts/2026-09-08-prompt-TOOL-aReapedSpinner-6-brief.md

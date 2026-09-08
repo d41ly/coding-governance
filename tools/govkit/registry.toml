@@ -69,6 +69,10 @@ id = "drift-audit"
 descriptor = "tools/drift-audit/kit.toml"
 
 [[entry]]
+id = "process-monitor"
+descriptor = "tools/process-monitor/kit.toml"
+
+[[entry]]
 id = "agent-instructions"
 descriptor = "tools/agent-instructions/kit.toml"
 

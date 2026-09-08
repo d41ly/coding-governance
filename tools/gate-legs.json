@@ -713,6 +713,17 @@
     "ceiling": 300
   },
   {
+    "name": "process-monitor wiring",
+    "argv": [
+      "bash",
+      "tools/process-monitor/adopt-process-monitor.sh",
+      "--check"
+    ],
+    "chunk": "records",
+    "subject": "repo",
+    "ceiling": 60
+  },
+  {
     "name": "drift-audit records",
     "argv": [
       "python",
@@ -729,7 +740,7 @@
       "bash",
       "tools/unattended/check-unattended.sh"
     ],
-    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint — the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
+    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint \u2014 the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
     "chunk": "declarations",
     "subject": "repo",
     "ceiling": 16040
