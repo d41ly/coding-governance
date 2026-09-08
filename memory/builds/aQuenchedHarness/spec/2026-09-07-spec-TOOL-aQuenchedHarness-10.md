@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-10 — the leg asks git once per question, not once per record
 
-**Status:** CLOSED · rev-4 · 2026-09-07 · node a · Tier-2 · base ab58d1cc · streams tooling · order 10
+**Status:** CLOSED · rev-5 · 2026-09-07 · node a · Tier-2 · base ab58d1cc · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -16,6 +16,13 @@
 process costs about 130 ms on this platform whatever it is asked, and the leg spawns 1114 of them.
 Ask each question once — one batch where there were 290 calls, one graph walk where there were 87 —
 and grade the builds that can produce a finding rather than all 102.
+
+The BASELINE THIS UNIT WAS OPENED AGAINST WAS WRONG, and the record says so rather than quietly
+using the right one: the leg's recorded 541 s, and every figure this unit quoted before its
+closing measurement, were read on a box carrying this session's own orphaned processes. On a
+quiet box the unmodified leg is 331 s. The process-count argument above is unaffected — spawn
+counts do not care what else is running — but the wall-clock case for the unit was overstated by
+roughly 3x for its whole life. §9 rev-5 carries the correction.
 
 ## 2. Scope (IN)
 
@@ -211,6 +218,14 @@ and whether they are worth their own unit depends on what the leg measures at af
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-08 · CLOSING MEASUREMENT, and a correction to every earlier one. AC6 MET:
+  197.0 s under the 8-wide pool against a 334 s target, on a green bar of 203 s wall; standalone
+  331.4 s to 169.1 s over four arms in A-B-B-A order. Three earlier readings of AC6 were
+  reported before they were checked and all three were contaminated - a fixture clone that is
+  not representative for time, then two of this session's own 11-hour spin loops, then four
+  subagents running during the BEFORE arm. The fix was not arithmetic: it was a harness that
+  samples the box THROUGHOUT each arm and refuses to report an arm it did not observe quiet.
+  Nothing in §2 or §3 moved.
 - rev-4 · 2026-09-07 · the kit's own self-test suites caught two defects that no fixture in this
   unit could. `cross-component.test.sh` red on three arms because `--plan` decided its output
   FORMAT from the slug COUNT: at one slug it emitted no frames, and check 30 - which reads

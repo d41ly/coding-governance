@@ -474,7 +474,16 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # `--witness` is NOT here: it is read inside the --phase handler rather than dispatched as its own
 # case arm, so it never enters the derived population and exempting it removed nothing. The
 # assertion below caught that on its first run, which is the entire reason it exists.
-_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set'
+# `--framed` joins them as a flag of `--plan`, the same shape as `--paths`: it selects an output
+# MODE and dispatches nothing, so demanding it a Skill section would be demanding a section
+# nobody should write. TOOL-aQuenchedHarness-10.
+#
+# NOT FIXED HERE, and named so it is not mistaken for absent: `--paths`, `--unit` and
+# `--disposition` are flags too and are still graded as verbs, which is why this arm reds on a
+# tree nobody has touched. The comment below already records that four of main's flags were
+# never denied. Denying them is a change to what this arm grades AND to its floor, which is
+# TOOL-aQuenchedHarness-9's deferred work, not this unit's.
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed'
 for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)

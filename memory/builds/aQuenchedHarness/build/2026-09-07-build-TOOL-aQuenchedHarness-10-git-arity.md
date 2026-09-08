@@ -72,11 +72,35 @@ Check 30 was measured separately, because it is the driver's cost rather than th
   record in the tree.
 - AC5 — `grep -qF` — against a driver copy with `Status:` rewritten, the parity assertion fails and
   check 30 refuses. Observed on a doctored copy, not on the tracked driver.
-- AC6 — `date +%s%3N` — 618 s to 316 s on the fixture, against a target of 334 s. Timed at
-  observation, on the same clone, same remote, back to back. The recorded figure for this leg
-  on the real bar was 541 s where this fixture measured 618 s, so the fixture runs about 14%
-  slow and the real figure should land below this one rather than above it - but that is an
-  inference and the bar has not been re-timed.
+- AC6 — `date +%s%3N` — MET. **197.0 s under the 8-wide pool** against a target of 334 s, read
+  from `<git-dir>/gate-ledger.tsv` on a green bar whose whole wall was 203 s. Standalone,
+  four arms in A-B-B-A order on a box asserted quiet throughout each arm: **331.4 s to
+  169.1 s**, each side's two readings within 4% of each other.
+  figure: DERIVED at observation.
+  **THREE EARLIER READINGS OF THIS CRITERION WERE WRONG AND WERE REPORTED TO THE OWNER.**
+  They are recorded rather than deleted, because the failure is the interesting part: 618 s to
+  316 s on a fixture clone that is not representative for time at all; 946 s to 451 s on the
+  real tree while two of this session's own spin loops pegged two cores; 1376 s to 394 s with
+  the BEFORE arm running under four subagents, which biased toward flattering the change. The
+  repo's own recorded 541 s for this leg is from the same contaminated family. On a quiet box
+  the UNMODIFIED leg is 331 s, so the leg was never the multi-minute monster its recorded
+  figure implied - most of that number was contention nobody had measured.
+  The control that finally worked is a harness that samples system CPU THROUGHOUT each arm and
+  refuses to report a number for any arm it did not observe on a quiet box, plus alternating
+  the arm order so a cold object cache cannot favour one side. Boundary sampling alone was
+  tried first and is not enough: a 400 s arm can be quiet at both ends and busy in between.
+
+## What the measurement cost, and what actually controlled it
+
+Four attempts, three of them wrong, and every wrong one was reported before it was checked.
+The common cause was not the harness arithmetic - it was that nothing observed the BOX. A
+process table probe found two `until ...; do :; done` waiters of this session's own, 11.4 h
+old and holding 46221 CPU-seconds between them, waiting on a file from a superseded
+experiment that could never gain the content they grepped for; a `run-unattended-gates.sh`
+run stopped with TaskStop 7.5 h earlier still running with its whole child tree; nine
+concurrent copies of one suite where one was intentional; and five `grep --line-buffered`
+monitors 52-61 h old with dead parents. Killing them reclaimed 13.2 core-hours of RUNNING
+CPU. None of it was visible in the output files being watched.
 
 ## What was left, and why it is not an oversight
 
