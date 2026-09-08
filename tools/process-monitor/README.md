@@ -51,9 +51,11 @@ because a monitor that seems to cover more than it does is worse than one that c
   dead.** That population is real — on the build machine a 7.5-hour `sleep 27200` and three
   `tail -f /tmp/…` were unattributable — and the report NAMES the count rather than passing over
   it. Declare more roots, or accept that those are invisible.
-- **It does not see a third of the process table's command lines.** On Windows, 199 of 314 rows
-  reported a `CommandLine` at all; the rest are protected or system processes. Those cannot be
-  roots. They can still be descendants of one.
+- **It does not see every process's command line.** On Windows a large minority report none at all
+  — protected and system processes — and those cannot be ROOTS, though they can still be
+  descendants of one. The share is a property of YOUR machine, not a constant: `census.py --print`
+  reports the live count, and no figure for it is written here because a number typed beside a
+  population it does not derive is wrong on the next boot.
 - **"Parentless" is not "abandoned".** On Windows a parent exiting neither reparents its children
   nor clears the field, so `explorer.exe`, `csrss.exe` and every long-lived desktop process reads
   parentless. The SCOPE FENCE is the only thing separating those from a genuine orphan — which is

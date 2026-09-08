@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-08T03:25:24+03:00 @ d499258daca17f851ab1e4a359bb6c6aa106c0f6
+last-audit: 2026-09-08T04:17:53+03:00 @ d499258daca17f851ab1e4a359bb6c6aa106c0f6
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: ce7e60be986451d8e0b46f5362403842cb154d5c
+last-body-change: d499258daca17f851ab1e4a359bb6c6aa106c0f6
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -75,8 +75,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   the handles are written here — that is the drift the pointer design exists to avoid. Two invert
   the reflex: a discovery is ADOPTED not parked; the keepalive precedes orienting. §11 and §5.
 
-- **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`.** A breach is KILLED, and `gates-green`
-  then says the bar never RETURNED — not the same fact as a leg FAILING. `TOOL-aBoundedCeiling-6`.
+- **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`; `GATE_REAP_BOUND` the
+  teardown reap.** A breach is KILLED, and `gates-green` then says the bar never RETURNED
+  — not a leg FAILING. None of them bounds an AGENT-launched
+  process; see `tools/process-monitor/`. `TOOL-aBoundedCeiling-6`.
 
 - **An unattended run declares a MODE, and which one decides what binds it**: the authorization
   discipline, WHICH ANCHOR may authorize it, which scoped directives apply, and whether the
@@ -96,10 +98,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   read Gates as acceptance (`TOOL-dBriefedPass-1`). Date-grandfathered on the spec's FILENAME against
   `.unattended.conf`'s `SPEC_THIN_CUTOFF`; BLANK turns the term OFF. `TOOL-aGradedMandate-4`.
 
-- **Before starting work inside a kit, check whether another node is already rewriting it.**
-  `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command. Two builds rewrote
-  `tools/unattended/` concurrently on 2026-08-21 and neither noticed until the landing: 25 conflicting
-  files, and four merge-bar legs red on the merged tree with none red on either parent. §3's rule is
+- **Before starting work inside a kit, check whether another node is already rewriting
+  it.** `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one command.
+  Two builds rewrote `tools/unattended/` concurrently on 2026-08-21 and neither noticed
+  until the landing; the conflict count is in those build records. §3's rule is
   own STREAMS not files, and a kit is the unit that rule is about.
 
 - **Every tracked build README owes an authored `<!-- roster:units -->` pair** — absent, duplicated
