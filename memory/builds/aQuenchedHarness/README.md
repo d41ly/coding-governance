@@ -98,9 +98,9 @@ ids TOOL-aQuenchedHarness-13
 | [TOOL-aQuenchedHarness-13 — the sibling's subject cache, which this leg never had](spec/2026-09-08-spec-TOOL-aQuenchedHarness-13.md) | 13 | 2 | CLOSED | rev-1 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 23 bound to this build, across 4 record folder(s).
+Records: 24 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aQuenchedHarness-9 TOOL-aQuenchedHarness-13.
+Ids no record names: TOOL-aQuenchedHarness-9.
 
 Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-10 TOOL-aQuenchedHarness-9 TOOL-aQuenchedHarness-11 TOOL-aQuenchedHarness-13.
 <!-- /gen:build-index -->
