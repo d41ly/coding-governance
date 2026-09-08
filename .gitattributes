@@ -196,3 +196,7 @@ tools/memory-tree/build-readme-slot-highwater.txt eol=lf
 # `awk -F'	'`, the ceiling pair by python — so a stray CR lands in the LAST field of every
 # row and corrupts the value nobody thought to strip. TOOL-aQuenchedHarness-2.
 tools/run-gates/*.txt text eol=lf
+
+# process-monitor kit (TOOL-aReapedSpinner-6): the shell and the conf are execution-sensitive.
+tools/process-monitor/*.sh text eol=lf
+.process-monitor.conf text eol=lf

@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.5   # gov:kit run-gates@1.5
+KIT_RUN_GATES_VERSION=1.6   # gov:kit run-gates@1.6
 # 1.0 -> 1.1: the manifest gained `subject`, and the canary's pinned key set gained it with
 # the runner. A target below 1.1 REDS on a leg row carrying the key, so govkit withholds it
 # there rather than breaking a bar it was only passing through. TOOL-dUnstalledConvoy-26.
@@ -520,6 +520,38 @@ fi
 
 echo "$PROF_LINE"
 
+# ---- PROCESS-MONITOR DELEGATION. TOOL-aReapedSpinner-7.
+#
+# WHAT WAS ACTUALLY BROKEN, because this unit's first draft got it wrong and the spec audit caught
+# it: the WALL path has walked and killed leg descendants since TOOL-aQuenchedHarness-1. The SIGNAL
+# path never has. `cleanup` at the INT/TERM/HUP traps removed the scratch dir and released the
+# turnstile and killed NOTHING, so a bar stopped by a signal -- a harness TaskStop, a Ctrl-C --
+# deleted the directory its legs were writing into and left the whole tree running. That is the
+# fourth failure in the sweep this kit was opened over.
+#
+# DETECTION IS THREE CONDITIONS AND IT RESOLVES HERE, before the first leg is dispatched, so a
+# fallback is announced with the profile line rather than discovered mid-kill. The third condition
+# is the one a file-presence test cannot see: the monitor may be installed and still refuse, if its
+# declared roots do not admit this runner. The walk root is a leg process, and every leg is this
+# runner's descendant, so asking whether THIS process is in scope answers it for all of them.
+PROCMON_REAP="$ROOT/tools/process-monitor/reap.py"
+PROCMON_SCOPE="$ROOT/tools/process-monitor/scope.py"
+PROCMON_OK=0
+PROCMON_WHY="not installed; tree kills use the runner's own depth-8 walk"
+if [ -f "$PROCMON_REAP" ] && [ -f "$PROCMON_SCOPE" ] && [ -f "$ROOT/.process-monitor.conf" ]; then
+  _pm_win=$(ps -W 2>/dev/null | awk -v p="$$" '$1==p {print $4}')
+  if [ -z "$_pm_win" ]; then
+    PROCMON_WHY="installed, but this runner has no resolvable winpid; tree kills fall back"
+  elif PROCMON_ROOT="$ROOT" "$PYBIN" "$PROCMON_SCOPE" --explain "$_pm_win" 2>/dev/null \
+       | grep -q "IN SCOPE"; then
+    PROCMON_OK=1
+    PROCMON_WHY="delegating tree kills to process-monitor"
+  else
+    PROCMON_WHY="installed, but its declared roots do not admit this runner; tree kills fall back"
+  fi
+fi
+echo "run-gates: process-monitor: $PROCMON_WHY"
+
 
 # ---- the turnstile: one bar per repository at a time (the turnstile unit) -------------------------
 # Nothing coordinated two bars before this. `git worktree list` reports well into double figures on
@@ -622,7 +654,14 @@ ts_tick_start() {
       printf '%s' "$(ts_now)" > "$_d/heartbeat.tmp" 2>/dev/null \
         && mv -f "$_d/heartbeat.tmp" "$_d/heartbeat" 2>/dev/null || true
     done
-  ) &
+  # STDIO GOES NOWHERE, and that is the whole point. Backgrounded and disowned, this
+  # subshell and its `sleep` still INHERIT the runner's fd 1 and 2, and the sleep outlives
+  # the bar with ppid 1 -- so anything reading the bar's output to EOF blocked for up to
+  # TS_TICK_EVERY seconds AFTER it had already exited. `ts_tick_stop` does not help: it
+  # kills this subshell and the sleep survives holding the fd. Measured on a 2-leg fixture:
+  # captured 307s -> 19s. The body writes only to files and already swallows its own
+  # errors, and the degraded-start NOTE is emitted below, outside this subshell.
+  ) >/dev/null 2>&1 &
   TS_TICK_PID=$!
   disown "$TS_TICK_PID" 2>/dev/null || true
   if ts_alive "$TS_TICK_PID"; then
@@ -950,7 +989,55 @@ WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
 # SUPERSEDES the claim-time trap above with the same release plus the scratch dir. `trap` replaces
 # rather than appends, which is what makes this safe: there is never a moment with no handler, and
 # never two handlers racing to remove the same directory.
-cleanup() { rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+# THE REAP COMES FIRST, and the order is the correctness of it: removing the scratch dir while
+# the legs are still alive is what turns a live leg into a process writing to a deleted path, which
+# is how the survivors in the opening sweep came to be doing nothing against directories that no
+# longer existed. The release runs afterwards unconditionally.
+# The teardown/wall reaper. Delegates when the monitor is usable and ALWAYS also runs the
+# runner's own `remove_descendants`: two verifications by two mechanisms is not duplication here,
+# it is the guard not sharing a variable with the thing it guards. Its walked/killed figures are
+# the monitor's own and are printed as SEPARATE numbers -- summing them hides a walk that found
+# nothing.
+run_leg_reap() {
+  _rlt_pid="$1"
+  [ -n "$_rlt_pid" ] || return 0
+  if [ "${PROCMON_OK:-0}" = 1 ]; then
+    # Bounded where `timeout -k` actually runs, unbounded where the runner already established
+    # it does not -- the same CEILINGS_LIVE gate every other ceiling in this file respects,
+    # rather than a second opinion about the host.
+    if [ "${CEILINGS_LIVE:-0}" = 1 ]; then
+      _rlt_out=$(PROCMON_ROOT="$ROOT" timeout -k 5s 60 "$PYBIN" "$PROCMON_REAP" \
+                   --kill-msys "$_rlt_pid" 2>&1) || true
+    else
+      _rlt_out=$(PROCMON_ROOT="$ROOT" "$PYBIN" "$PROCMON_REAP" --kill-msys "$_rlt_pid" 2>&1) || true
+    fi
+    printf '%s\n' "$_rlt_out" | sed 's/^/run-gates: /' >&2
+  fi
+  remove_descendants "$_rlt_pid"
+}
+
+# Every outstanding leg's tree, BOUNDED as a whole. The bound is what keeps this from becoming a
+# new way to wedge the fleet: `ts_release` and `ts_drop_ticket` run after it whatever it did, so a
+# hung monitor cannot strand a turnstile ticket and queue every later bar on this host behind it.
+GATE_REAP_BOUND=${GATE_REAP_BOUND:-120}
+run_outstanding_reap() {
+  [ -n "${WORK:-}" ] && [ -d "${WORK:-}" ] || return 0
+  _rol_deadline=$(( EPOCHSECONDS + GATE_REAP_BOUND ))
+  for _rol_f in "$WORK"/*.pid; do
+    [ -e "$_rol_f" ] || continue
+    if [ "$EPOCHSECONDS" -ge "$_rol_deadline" ]; then
+      echo "run-gates: teardown reap hit its ${GATE_REAP_BOUND}s bound; the remaining legs were not walked" >&2
+      break
+    fi
+    _rol_i=${_rol_f##*/}; _rol_i=${_rol_i%.pid}
+    [ -f "$WORK/$_rol_i.rc" ] && continue
+    _rol_p=$(cat "$_rol_f" 2>/dev/null) || continue
+    [ -n "$_rol_p" ] && run_leg_reap "$_rol_p"
+  done
+  return 0
+}
+
+cleanup() { run_outstanding_reap; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
 trap 'cleanup; exit 130' INT
 trap 'cleanup; exit 143' TERM
@@ -1514,7 +1601,7 @@ arm_wall() {
       _i=${_f##*/}; _i=${_i%.pid}
       [ -f "$_work/$_i.rc" ] && continue
       _p=$(cat "$_f" 2>/dev/null) || continue
-      [ -n "$_p" ] && remove_descendants "$_p"
+      [ -n "$_p" ] && run_leg_reap "$_p"
     done
   ) &
   WALL_PID=$!

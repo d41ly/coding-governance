@@ -438,21 +438,48 @@ else
     # unit id were all silent, and only a fabricated id fired it. Promotion adds a NEW unit id, so
     # what has to be observed is an id present at HEAD and ABSENT at the run's own pinned BASE.
     rv_base=$(awk -F': ' '/^base: /{ sub(/\r$/,"",$2); print $2; exit }' "$rvf")
-    rv_now=""; rv_then=""; rv_readable=0
+    rv_new=""; rv_readable=0
     if [ -f "$rv_readme" ]; then
       # NON-WONTDO ONLY. The promotion clause discharges an exited loop by counting NEW unit ids,
       # and it never looked at their status - so three thin specs flipped to `WONTDO` satisfied it,
       # and `build-complete` saw no non-terminal row either. A promoted blocker that was retired is
       # not a promotion. The status predicate is spelled EXACTLY as check 24's retire loop spells it,
       # so the two clauses cannot disagree about what a retired unit looks like.
-      rv_now=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null | grep -vE '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
+      #
+      # SEVEN PROCESSES PER RECORD BECAME ZERO. This was `grep -vE | grep -oE | sort -u` on the HEAD
+      # side, `grep -oE | sort -u` on the BASE side, and `comm -23 | grep -c` to difference them --
+      # ten spawns a record, of which only the COUNT is consumed, by the awk below via `-v newids`.
+      # Two associative arrays do `sort -u`'s dedupe and `comm -23`'s difference, and unlike `comm`
+      # they need no sorted input at all, so the ordering coupling between the three goes with them.
+      #
+      # THE MATCH IS A LOOP, NOT ONE `[[ =~ ]]`, and that is the whole correctness of it. `grep -oE`
+      # emits EVERY id on a line while a bare match takes only the first, so a units row naming two
+      # ids would under-count -- and this count feeds the promotion clause, where under-counting
+      # reads as "no promotion happened": a FALSE GREEN, the one direction that must not be possible.
+      # Both sides use the identical loop, because two spellings would manufacture phantom ids.
+      declare -A _rv_h=() _rv_b=()
+      _rv_blob=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null || true)
+      while IFS= read -r _rv_l || [ -n "$_rv_l" ]; do
+        case $_rv_l in *'| WONTDO |'*) continue ;; esac
+        while [[ $_rv_l =~ [A-Z]+-[A-Za-z]+-[0-9]+ ]]; do
+          _rv_h[${BASH_REMATCH[0]}]=1; _rv_l=${_rv_l#*"${BASH_REMATCH[0]}"}
+        done
+      done <<< "$_rv_blob"
       if [ -n "$rv_base" ] && check_rev "$rv_base"; then
-        rv_then=$(GIT show "$rv_base:$rv_readme" 2>/dev/null | awk '/<!-- gen:build-units -->/{f=1;next} /<!-- \/gen:build-units -->/{f=0} f' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
+        _rv_blob=$(GIT show "$rv_base:$rv_readme" 2>/dev/null | awk '/<!-- gen:build-units -->/{f=1;next} /<!-- \/gen:build-units -->/{f=0} f' || true)
+        while IFS= read -r _rv_l || [ -n "$_rv_l" ]; do
+          while [[ $_rv_l =~ [A-Z]+-[A-Za-z]+-[0-9]+ ]]; do
+            _rv_b[${BASH_REMATCH[0]}]=1; _rv_l=${_rv_l#*"${BASH_REMATCH[0]}"}
+          done
+        done <<< "$_rv_blob"
         rv_readable=1
       fi
+      if [ "$rv_readable" = 1 ]; then
+        _rv_n=0
+        for _rv_k in "${!_rv_h[@]}"; do [ -n "${_rv_b[$_rv_k]:-}" ] || _rv_n=$((_rv_n + 1)); done
+        rv_new=$_rv_n
+      fi
     fi
-    rv_new=""
-    [ "$rv_readable" = 1 ] && rv_new=$(comm -23 <(printf '%s\n' "$rv_now") <(printf '%s\n' "$rv_then") | grep -c . || true)
     # GRADED ON THE RECORD'S OWN FIRST-COMMIT DATE, the idiom LANDED_ANCHOR_CUTOFF already uses. A
     # record whose first commit is at or after the cutoff is read for its dispositions; one before it
     # keeps the id-delta proxy verbatim, messages included.
@@ -532,7 +559,7 @@ else
         }
       }' "$rvf")"
   done
-  [ -z "$(printf '%s' "$rv_bad" | tr -d '[:space:]')" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers:$rv_bad"
+  [ -z "${rv_bad//[[:space:]]/}" ] || fail 2 "review loops that ran past the ceiling, stalled without recording it, or exited without accounting for their blockers:$rv_bad"
 fi
 
 # ---- THE HALT VOCABULARY: a shrink-only floor, and every aborted record carrying a legal code.
@@ -575,7 +602,7 @@ if [ -n "$HALT_CODES_CORE" ]; then
       esac
     fi
   done
-  [ -z "$(printf '%s' "$hc_bad" | tr -d '[:space:]')" ] || fail 2 "aborted run-state records whose halt code is missing or outside the effective vocabulary:$hc_bad"
+  [ -z "${hc_bad//[[:space:]]/}" ] || fail 2 "aborted run-state records whose halt code is missing or outside the effective vocabulary:$hc_bad"
 fi
 
 # ---- THE PARKED-KIND TAXONOMY, joined against the code that WRITES those kinds. One direction only,
@@ -648,9 +675,9 @@ if [ -n "$CORE_FLOOR" ]; then
   [ -n "$pfloor" ] && [ -n "$dfloor" ] \
     || fail 1 "CORE_FLOOR is malformed and both shrink-only floors are therefore unenforced; want two integers separated by a colon: $CORE_FLOOR"
 fi
-[ -n "$(printf '%s' "$PHASES" | tr -d '[:space:]')" ] \
+[ -n "${PHASES//[[:space:]]/}" ] \
   || fail 2 "the effective phase vocabulary is empty, which makes every phase check below vacuously true"
-nphase=$(printf '%s\n' $PHASES_CORE | grep -c . || true)
+nphase=$(_wc=(${PHASES_CORE}); echo ${#_wc[@]})
 if [ -n "${pfloor:-}" ] && [ "$nphase" -lt "$pfloor" ]; then
   fail 2 "the kit's CORE phase vocabulary has shrunk below its floor, and deleting a core member is a silent, reason-free override of everything keyed on it: $nphase against $pfloor"
 fi
@@ -660,9 +687,9 @@ for t in $PHASES_TERMINAL; do
   case " $PHASES " in *" $t "*) ;;
     *) fail 2 "a TERMINAL phase is not in the effective vocabulary, so no run could ever reach it: $t";; esac
 done
-[ -n "$(printf '%s' "$DOD" | tr -d '[:space:]')" ] \
+[ -n "${DOD//[[:space:]]/}" ] \
   || fail 3 "the effective Definition-of-Done set is empty, so --close would block on nothing"
-ndod=$(printf '%s\n' $DOD_CORE | grep -c . || true)
+ndod=$(_wc=(${DOD_CORE}); echo ${#_wc[@]})
 if [ -n "${dfloor:-}" ] && [ "$ndod" -lt "$dfloor" ]; then
   fail 3 "the kit's CORE Definition-of-Done set has shrunk below its floor, and deleting an item is a silent, reason-free override of everything keyed on it: $ndod against $dfloor"
 fi
@@ -1121,7 +1148,7 @@ while IFS= read -r f; do
   case " $PHASES_TERMINAL " in *" $ph "*) term=1 ;; esac
   a=$(region "$f" '<!-- run:generated -->' '<!-- /run:generated -->' 2>/dev/null) || \
     fail 8 "a run-state file's generated markers are malformed: $f"
-  [ "$term" = 1 ] || [ -z "$(printf '%s' "$a" | tr -d '[:space:]')" ] || \
+  [ "$term" = 1 ] || [ -z "${a//[[:space:]]/}" ] || \
     fail 8 "a run-state file's generated region carries a COPY of the unit list; that list is DERIVED from the build README on every read, so a copy here is a second answer waiting to go stale. Empty the region between its markers: $f"
 
   # ---- 9: the recorded BASE must be the merge-base git reproduces. A pin the run can quietly move
@@ -1939,8 +1966,8 @@ else
 ' "$_no_core") <(printf '%s
 ' "$_no_tbl") | tr '
 ' ' ')
-    [ -z "$(printf '%s' "$_no_only_drv" | tr -d '[:space:]')" ] || fail 16 "the driver refuses an override on an item the Skill's non-overridable paragraph does not name, so a run meets a refusal its own instructions said could not happen:$_no_only_drv"
-    [ -z "$(printf '%s' "$_no_only_tbl" | tr -d '[:space:]')" ] || fail 16 "the Skill's non-overridable paragraph names an item the driver does not refuse an override on, so a run is told a route is closed that is open:$_no_only_tbl"
+    [ -z "${_no_only_drv//[[:space:]]/}" ] || fail 16 "the driver refuses an override on an item the Skill's non-overridable paragraph does not name, so a run meets a refusal its own instructions said could not happen:$_no_only_drv"
+    [ -z "${_no_only_tbl//[[:space:]]/}" ] || fail 16 "the Skill's non-overridable paragraph names an item the driver does not refuse an override on, so a run is told a route is closed that is open:$_no_only_tbl"
   fi
 fi
 
@@ -1950,7 +1977,7 @@ fi
 # CONSTRUCTION and cannot fire on the deletion it exists to catch. This build shipped exactly that:
 # the bump to 13 was reverted by a `git checkout --` during an unrelated probe, and arm C passed
 # because it only ever asked whether the count met the floor, never whether the floor met the kit.
-_ndc=$(printf '%s\n' $DIRECTIVES_CORE | grep -c . || true)
+_ndc=$(_wc=(${DIRECTIVES_CORE}); echo ${#_wc[@]})
 if [ -n "$DIRECTIVES_FLOOR" ] && [ "$DIRECTIVES_FLOOR" -lt "$_ndc" ] 2>/dev/null; then
   fail 16 "DIRECTIVES_FLOOR is declared below the kit's own core directive count, so the shrink-only pin is slack by construction and a deleted core handle would pass it: $DIRECTIVES_FLOOR against $_ndc"
 fi
@@ -1959,7 +1986,7 @@ if [ -z "$DIRECTIVES_FLOOR" ]; then
 else
   case "$DIRECTIVES_FLOOR" in
     ''|*[!0-9]*) fail 16 "DIRECTIVES_FLOOR is not a plain integer, so the shrink-only pin on the directive set is unenforced while the conf still looks configured: $DIRECTIVES_FLOOR" ;;
-    *) ndir=$(printf '%s\n' $DIRECTIVES_CORE | grep -c . || true)
+    *) ndir=$(_wc=(${DIRECTIVES_CORE}); echo ${#_wc[@]})
        [ "$ndir" -ge "$DIRECTIVES_FLOOR" ] \
          || fail 16 "the kit's CORE directive set has shrunk below its floor, and deleting a directive is a silent, reason-free relaxation of everything keyed on it: $ndir against $DIRECTIVES_FLOOR" ;;
   esac
@@ -2456,7 +2483,7 @@ fi
 VERBS_SLUG=$(core_of VERBS_SLUG)
 VERBS_INLINE=$(core_of VERBS_INLINE)
 VERBS_ALL="$VERBS_SLUG $VERBS_INLINE"
-nverbs=$(printf '%s\n' $VERBS_ALL | grep -c . || true)
+nverbs=$(_wc=(${VERBS_ALL}); echo ${#_wc[@]})
 if [ "$nverbs" -lt 10 ]; then
   fail 26 "cannot read the driver's verb declarations, so every carrier below would be joined against an empty set and this check would pass over nothing: $DRIVER"
 else

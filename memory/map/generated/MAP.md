@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 101 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 48 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 104 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 48 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -76,6 +76,9 @@ Inventories: gate-legs: 101 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 �
 | `playbook render wiring` | playbook |
 | `playbook validity gate` | playbook-mode |
 | `pre-push self-test` | baseline |
+| `process-monitor adopter selftest` | process-monitor |
+| `process-monitor census selftest` | process-monitor |
+| `process-monitor wiring` | process-monitor |
 | `profile-bar selftest` | run-gates |
 | `push-main self-test` | baseline |
 | `pytest-guardrails self-test` | baseline |
@@ -127,6 +130,7 @@ Inventories: gate-legs: 101 · kits: 15 · git-hooks: 3 · workflow-scripts: 6 �
 | `memory-recall` | memory-recall |
 | `memory-tree` | memory-tree-hygiene |
 | `playbook` | playbook |
+| `process-monitor` | process-monitor |
 | `pytest-parallel-guardrails` | baseline |
 | `run-gates` | run-gates |
 | `unattended` | unattended |

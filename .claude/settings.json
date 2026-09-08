@@ -28,6 +28,14 @@
             "command": "bash \"${CLAUDE_PROJECT_DIR}/tools/check-wiring.sh\" --session"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/process-monitor/procmon-hook.js\""
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -37,6 +45,15 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/tools/memory-recall/recall-opened.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/process-monitor/procmon-hook.js\""
           }
         ]
       }

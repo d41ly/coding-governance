@@ -45,7 +45,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=139
+FLOOR_ASSERTIONS=143
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -1517,6 +1517,12 @@ _ws=$(date +%s)
     timeout -k 5s 300 bash tools/run-gates/run-gates.sh ) > "$_wd/walled.out" 2>&1
 _wrc=$?
 _wel=$(( $(date +%s) - _ws ))
+# THE WALLED RUN'S RECORD IS CAPTURED HERE, while it is the only one there is. Captured after
+# the control below instead, `tail -1` selects the CONTROL's record -- later timestamp, and
+# GREEN by design -- so the arm asserted RED against a run that was never walled and could not
+# pass. It did not report as a broken arm either: the ticker fd-hold was eating this leg's whole
+# 13200s ceiling, so execution never reached it. TOOL-aReapedSpinner-21.
+_wrec=$(ls -1d "$_wd"/.git/gate-run/*/ 2>/dev/null | tail -1)
 
 _cs=$(date +%s)
 ( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=0 \
@@ -1550,7 +1556,6 @@ n=$((n+1))
 # leg writes no .rc, so before this was fixed a breach could leave `verdict GREEN / ran 0 / failed 0`
 # on disk while stdout said RED. That file's ABSENCE is this runner's documented crash signal, so a
 # plausible green one is strictly worse than none.
-_wrec=$(ls -1d "$_wd"/.git/gate-run/*/ 2>/dev/null | tail -1)
 { [ -n "$_wrec" ] && [ -f "$_wrec/verdict" ] && grep -q "RED" "$_wrec/verdict"; } \
   || { echo "canary: the run record does not say RED after a wall breach (record: ${_wrec:-none}) — a breach that leaves a green durable verdict is the reassuring-zero class at the altitude of the whole bar"; fail=1; }
 n=$((n+1))
@@ -1560,6 +1565,67 @@ n=$((n+1))
   && { echo "canary: a wall breach stamped gate-full-green — the stamp reads a variable the breach leaves untouched"; fail=1; } \
   || true
 rm -rf "$_wd" 2>/dev/null || true
+
+# ---- TOOL-aReapedSpinner-7: the TEARDOWN REAP -------------------------------------------------
+# WHAT WAS BROKEN. The WALL path has walked and killed leg descendants since TOOL-aQuenchedHarness-1.
+# The SIGNAL path never had: `cleanup` at the INT/TERM/HUP traps removed the scratch dir and released
+# the turnstile and killed NOTHING, so a bar stopped by a signal -- a harness TaskStop, a Ctrl-C --
+# deleted the directory its legs were writing into and left the whole tree running.
+#
+# EXERCISED DIRECTLY, not through a whole bar. `run_outstanding_reap` reads `$WORK/*.pid` and reaps
+# each unfinished leg's tree; that is the unit of behaviour, and staging it needs a scratch dir with
+# a pid file rather than a 26-minute gate run. Observed RED against the pre-change runner: the leg
+# and its grandchild both survived.
+_tdm="procmon-teardown-$$"
+_tdw=$(mktemp -d)
+
+# Two STRUCTURAL arms, and they say so: reading an order out of source is not observing it, but the
+# order is the correctness here -- removing the scratch dir first is what turns a live leg into a
+# process writing to a deleted path.
+_tdc=$(grep -E '^cleanup\(\) \{' "$KITDIR/run-gates.sh")
+case "$_tdc" in
+  *run_outstanding_reap*rm\ -rf*) ;;
+  *) echo "canary: test_signal_path_reaps_the_tree — cleanup does not reap BEFORE removing the scratch dir (structural): $_tdc"; fail=1 ;;
+esac
+n=$((n+1))
+case "$_tdc" in
+  *run_outstanding_reap*ts_release*ts_drop_ticket*) ;;
+  *) echo "canary: test_teardown_reap_cannot_strand_the_turnstile — the release does not follow the reap (structural); a hung reap would strand a ticket and queue every later bar on this host"; fail=1 ;;
+esac
+n=$((n+1))
+grep -q 'GATE_REAP_BOUND' "$KITDIR/run-gates.sh" \
+  || { echo "canary: test_walked_and_killed_are_reported_apart — the teardown reap declares no bound (structural)"; fail=1; }
+n=$((n+1))
+
+# The FUNCTIONAL arm. Source only the reaping functions; the runner is not run.
+(
+  ROOT=$(cd "$KITDIR/../.." && pwd)
+  # The suite already resolved one at :42. Re-deriving it here as a bare `python` is the
+  # retired launcher idiom the resolver leg bans, and it bans it because the MS-Store
+  # stub answers `command -v` and exits 9009 without running anything.
+  CEILINGS_LIVE=0
+  PROCMON_OK=0
+  # PYBIN is inherited from the enclosing suite scope.
+  WORK="$_tdw"
+  # shellcheck disable=SC1090
+  eval "$(sed -n '/^scan_descendants() {/,/^}/p;/^remove_descendants() {/,/^}/p;/^run_leg_reap() {/,/^}/p;/^GATE_REAP_BOUND=/p;/^run_outstanding_reap() {/,/^}/p' "$KITDIR/run-gates.sh")"
+  bash -c "bash -c 'sleep 300 # $_tdm-gc' & sleep 300 # $_tdm-leg" &
+  _tdleg=$!
+  sleep 2
+  echo "$_tdleg" > "$WORK/1.pid"
+  _tdgc=$(ps -ef | grep -F "$_tdm-gc" | grep -vc grep)
+  [ "$_tdgc" -ge 1 ] || { echo "canary: the teardown fixture staged no grandchild, so this arm proves nothing"; exit 2; }
+  run_outstanding_reap
+  sleep 2
+  _tdgc2=$(ps -ef | grep -F "$_tdm-gc" | grep -vc grep)
+  _tdlg2=$(ps -ef | grep -F "$_tdm-leg" | grep -vc grep)
+  [ "$_tdgc2" -eq 0 ] && [ "$_tdlg2" -eq 0 ] && exit 0
+  echo "canary: the teardown reap left $_tdgc2 grandchild(ren) and $_tdlg2 leg(s) running"
+  exit 1
+) || fail=1
+n=$((n+1))
+for _p in $(ps -ef | grep -F "$_tdm" | grep -v grep | awk '{print $2}'); do kill -9 "$_p" 2>/dev/null; done
+rm -rf "$_tdw" 2>/dev/null || true
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "canary: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"
