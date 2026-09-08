@@ -1517,6 +1517,12 @@ _ws=$(date +%s)
     timeout -k 5s 300 bash tools/run-gates/run-gates.sh ) > "$_wd/walled.out" 2>&1
 _wrc=$?
 _wel=$(( $(date +%s) - _ws ))
+# THE WALLED RUN'S RECORD IS CAPTURED HERE, while it is the only one there is. Captured after
+# the control below instead, `tail -1` selects the CONTROL's record -- later timestamp, and
+# GREEN by design -- so the arm asserted RED against a run that was never walled and could not
+# pass. It did not report as a broken arm either: the ticker fd-hold was eating this leg's whole
+# 13200s ceiling, so execution never reached it. TOOL-aReapedSpinner-21.
+_wrec=$(ls -1d "$_wd"/.git/gate-run/*/ 2>/dev/null | tail -1)
 
 _cs=$(date +%s)
 ( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=0 \
@@ -1550,7 +1556,6 @@ n=$((n+1))
 # leg writes no .rc, so before this was fixed a breach could leave `verdict GREEN / ran 0 / failed 0`
 # on disk while stdout said RED. That file's ABSENCE is this runner's documented crash signal, so a
 # plausible green one is strictly worse than none.
-_wrec=$(ls -1d "$_wd"/.git/gate-run/*/ 2>/dev/null | tail -1)
 { [ -n "$_wrec" ] && [ -f "$_wrec/verdict" ] && grep -q "RED" "$_wrec/verdict"; } \
   || { echo "canary: the run record does not say RED after a wall breach (record: ${_wrec:-none}) — a breach that leaves a green durable verdict is the reassuring-zero class at the altitude of the whole bar"; fail=1; }
 n=$((n+1))
