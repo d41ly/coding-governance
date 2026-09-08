@@ -330,21 +330,48 @@ else
     # unit id were all silent, and only a fabricated id fired it. Promotion adds a NEW unit id, so
     # what has to be observed is an id present at HEAD and ABSENT at the run's own pinned BASE.
     rv_base=$(awk -F': ' '/^base: /{ sub(/\r$/,"",$2); print $2; exit }' "$rvf")
-    rv_now=""; rv_then=""; rv_readable=0
+    rv_new=""; rv_readable=0
     if [ -f "$rv_readme" ]; then
       # NON-WONTDO ONLY. The promotion clause discharges an exited loop by counting NEW unit ids,
       # and it never looked at their status - so three thin specs flipped to `WONTDO` satisfied it,
       # and `build-complete` saw no non-terminal row either. A promoted blocker that was retired is
       # not a promotion. The status predicate is spelled EXACTLY as check 24's retire loop spells it,
       # so the two clauses cannot disagree about what a retired unit looks like.
-      rv_now=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null | grep -vE '\| WONTDO \|' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
+      #
+      # SEVEN PROCESSES PER RECORD BECAME ZERO. This was `grep -vE | grep -oE | sort -u` on the HEAD
+      # side, `grep -oE | sort -u` on the BASE side, and `comm -23 | grep -c` to difference them --
+      # ten spawns a record, of which only the COUNT is consumed, by the awk below via `-v newids`.
+      # Two associative arrays do `sort -u`'s dedupe and `comm -23`'s difference, and unlike `comm`
+      # they need no sorted input at all, so the ordering coupling between the three goes with them.
+      #
+      # THE MATCH IS A LOOP, NOT ONE `[[ =~ ]]`, and that is the whole correctness of it. `grep -oE`
+      # emits EVERY id on a line while a bare match takes only the first, so a units row naming two
+      # ids would under-count -- and this count feeds the promotion clause, where under-counting
+      # reads as "no promotion happened": a FALSE GREEN, the one direction that must not be possible.
+      # Both sides use the identical loop, because two spellings would manufacture phantom ids.
+      declare -A _rv_h=() _rv_b=()
+      _rv_blob=$(region "$rv_readme" '<!-- gen:build-units -->' '<!-- /gen:build-units -->' 2>/dev/null || true)
+      while IFS= read -r _rv_l || [ -n "$_rv_l" ]; do
+        case $_rv_l in *'| WONTDO |'*) continue ;; esac
+        while [[ $_rv_l =~ [A-Z]+-[A-Za-z]+-[0-9]+ ]]; do
+          _rv_h[${BASH_REMATCH[0]}]=1; _rv_l=${_rv_l#*"${BASH_REMATCH[0]}"}
+        done
+      done <<< "$_rv_blob"
       if [ -n "$rv_base" ] && GIT cat-file -e "$rv_base^{commit}" 2>/dev/null; then
-        rv_then=$(GIT show "$rv_base:$rv_readme" 2>/dev/null | awk '/<!-- gen:build-units -->/{f=1;next} /<!-- \/gen:build-units -->/{f=0} f' | grep -oE '[A-Z]+-[A-Za-z]+-[0-9]+' | sort -u || true)
+        _rv_blob=$(GIT show "$rv_base:$rv_readme" 2>/dev/null | awk '/<!-- gen:build-units -->/{f=1;next} /<!-- \/gen:build-units -->/{f=0} f' || true)
+        while IFS= read -r _rv_l || [ -n "$_rv_l" ]; do
+          while [[ $_rv_l =~ [A-Z]+-[A-Za-z]+-[0-9]+ ]]; do
+            _rv_b[${BASH_REMATCH[0]}]=1; _rv_l=${_rv_l#*"${BASH_REMATCH[0]}"}
+          done
+        done <<< "$_rv_blob"
         rv_readable=1
       fi
+      if [ "$rv_readable" = 1 ]; then
+        _rv_n=0
+        for _rv_k in "${!_rv_h[@]}"; do [ -n "${_rv_b[$_rv_k]:-}" ] || _rv_n=$((_rv_n + 1)); done
+        rv_new=$_rv_n
+      fi
     fi
-    rv_new=""
-    [ "$rv_readable" = 1 ] && rv_new=$(comm -23 <(printf '%s\n' "$rv_now") <(printf '%s\n' "$rv_then") | grep -c . || true)
     # GRADED ON THE RECORD'S OWN FIRST-COMMIT DATE, the idiom LANDED_ANCHOR_CUTOFF already uses. A
     # record whose first commit is at or after the cutoff is read for its dispositions; one before it
     # keeps the id-delta proxy verbatim, messages included.
