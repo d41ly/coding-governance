@@ -528,5 +528,158 @@ def test_out_of_scope_rows_are_never_graded():
     check("test_out_of_scope_rows_are_never_graded", (len(graded), counts["flagged"]), (0, 0))
 
 
+# ================================================================ reap (unit 4)
+
+import reap  # noqa: E402
+
+
+def build_tree_rows():
+    """root -> child -> grandchild, plus a native great-grandchild and an out-of-scope stray."""
+    return [
+        build_row(1, 999, "/c/projects/gov/x/bash.exe -c run", age=500.0),
+        build_row(2, 1, "bash -c ./rel.sh", age=400.0),
+        build_row(3, 2, "/usr/bin/sleep 900", age=300.0),
+        build_row(4, 3, "python.exe -c pass", age=200.0),
+        build_row(50, 999, "C:/Windows/explorer.exe", age=900.0),
+    ]
+
+
+def test_leaves_are_killed_first():
+    order = reap.build_walk(build_tree_rows(), 1)
+    check("test_leaves_are_killed_first", (order[0], order[-1], len(order)), (4, 1, 4))
+
+
+def test_out_of_scope_root_refuses_before_the_walk():
+    got = "no refusal"
+    try:
+        reap.run_kill(1, build_tree_rows(), {2, 3, 4}, dry_run=True)
+    except reap.ReapRefused as exc:
+        got = "refused" if "not in scope" in str(exc) else "refused for the wrong reason"
+    check("test_out_of_scope_root_refuses_before_the_walk", got, "refused")
+
+
+def test_wrong_namespace_id_refuses_with_its_own_message():
+    """An MSYS id handed to a winpid interface must say so, not give the out-of-scope refusal."""
+    got = ""
+    try:
+        reap.run_kill(4198485, build_tree_rows(), {1, 2, 3, 4})
+    except reap.ReapRefused as exc:
+        got = "namespace" if "namespace" in str(exc) else str(exc)[:40]
+    check("test_wrong_namespace_id_refuses_with_its_own_message", got, "namespace")
+
+
+def test_member_outside_the_scope_set_is_dropped():
+    """Dropped and reported, not killed — and the rest of the tree still dies."""
+    rep = reap.run_kill(1, build_tree_rows(), {1, 2, 4}, dry_run=True)
+    check("test_member_outside_the_scope_set_is_dropped",
+          (sorted(rep["dropped"]), sorted(rep["kill_set"])), ([3], [1, 2, 4]))
+
+
+def test_dry_run_walks_the_same_set_and_kills_nothing():
+    dry = reap.run_kill(1, build_tree_rows(), {1, 2, 3, 4}, dry_run=True)
+    check("test_dry_run_walks_the_same_set_and_kills_nothing",
+          (dry["walked"], dry["signalled"], dry["dry_run"]),
+          (reap.build_walk(build_tree_rows(), 1), [], True))
+
+
+def test_survivor_is_derived_from_a_re_read():
+    """The return comes from a SECOND census, never from a signal's exit status."""
+    rep = reap.run_kill(1, build_tree_rows(), {1, 2, 3, 4}, dry_run=True)
+    rep = reap.check_survivors(rep, [build_row(3, 2, "/usr/bin/sleep 900")])
+    check("test_survivor_is_derived_from_a_re_read",
+          (rep["survivors"], sorted(rep["killed"])), ([3], [1, 2, 4]))
+
+
+def test_unaddressable_row_is_reported_not_claimed():
+    saved_res, saved_chk = reap.resolve_signal_binaries, reap.check_msys_addressable
+    reap.resolve_signal_binaries = lambda: {"msys": None, "native": None}
+    reap.check_msys_addressable = lambda row, binaries: False
+    try:
+        rep = reap.run_kill(1, build_tree_rows(), {1, 2, 3, 4})
+    finally:
+        reap.resolve_signal_binaries, reap.check_msys_addressable = saved_res, saved_chk
+    check("test_unaddressable_row_is_reported_not_claimed",
+          (len(rep["unsignalable"]), rep["signalled"]), (4, []))
+
+
+def test_taskkill_argv_uses_one_slash():
+    """`//PID` is an MSYS SHELL idiom. A list argv is not shell-mangled, and taskkill rejects the
+    doubled form with rc 1 from a non-shell exec."""
+    with open(os.path.join(HERE, "reap.py"), encoding="utf-8") as _fh:
+        src = _fh.read()
+    check("test_taskkill_argv_uses_one_slash",
+          ('"/PID"' in src, '"//PID"' in src, '"/T"' in src), (True, False, False))
+
+
+def test_already_gone_is_not_a_signal_error():
+    """Measured against a real tree: a leaves-first kill still cascades, so an ancestor's remaining
+    descendants are gone by the time the walk reaches them. Reporting that as an error trains an
+    operator to ignore the field that matters."""
+    with open(os.path.join(HERE, "reap.py"), encoding="utf-8") as _fh:
+        src = _fh.read()
+    check("test_already_gone_is_not_a_signal_error",
+          ("already_gone" in src and "not found" in src), True)
+
+
+def test_live_tree_dies_completely():
+    """The arm this whole build exists for: a real bash -> bash -c -> sleep tree PLUS a native
+    python grandchild, killed by winpid, verified by re-read. A fixture cannot show this.
+
+    The tree is launched with `bash -c` rather than from a script file, so the arm writes nothing
+    into the repo. Its command line carries the repo root, which is what puts it in scope.
+    """
+    if not sys.platform.startswith("win"):
+        print("  SKIP test_live_tree_dies_completely (windows-join backend only)")
+        return
+    import time
+    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    marker = "procmon-selftest-tree"
+    body = (
+        "cd '" + root_dir + "' ; "
+        "bash -c 'bash -c \"sleep 613\" & sleep 613' & "
+        "python -c 'import time; time.sleep(613)' & "
+        "sleep 613"
+    )
+    launched = subprocess.Popen(["bash", "-c", "# " + marker + "\n" + body],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(3)
+    try:
+        rows, _c = census.scan_processes()
+        target = next((r["winpid"] for r in rows
+                       if r.get("command") and marker in r["command"]), None)
+        if target is None:
+            FAIL.append("test_live_tree_dies_completely")
+            print("  FAIL test_live_tree_dies_completely (the staged tree was not found in the "
+                  "census, so the arm could not run — a skip here is indistinguishable from "
+                  "coverage)", file=sys.stderr)
+            return
+        sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
+                                   scope.build_self_chain(rows, os.getpid()))
+        if target not in sc:
+            FAIL.append("test_live_tree_dies_completely")
+            print("  FAIL test_live_tree_dies_completely (the staged tree is not in scope; the "
+                  "fence, not the reaper, is what this arm then measured)", file=sys.stderr)
+            return
+        rep = reap.run_kill(target, rows, set(sc))
+        fresh, _c2 = census.scan_processes()
+        rep = reap.check_survivors(rep, fresh)
+        check("test_live_tree_dies_completely",
+              (len(rep["walked"]) >= 4, rep["survivors"], rep["errors"]),
+              (True, [], []))
+    finally:
+        try:
+            launched.kill()
+        except OSError:
+            pass
+        listing = subprocess.run(["ps", "-ef"], capture_output=True).stdout.decode(
+            "utf-8", "replace")
+        for line in listing.splitlines():
+            if "sleep 613" in line or marker in line:
+                bits = line.split()
+                if len(bits) > 1 and bits[1].isdigit():
+                    subprocess.run(["kill", "-9", bits[1]], capture_output=True)
+
+
 if __name__ == "__main__":
     sys.exit(main())

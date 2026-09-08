@@ -248,7 +248,11 @@ def main(argv):
         return 0
 
     if "--explain" in argv:
-        want = argv[argv.index("--explain") + 1]
+        want = argv[argv.index("--explain") + 1] if len(argv) > argv.index("--explain") + 1 else ""
+        if not want.isdigit():
+            sys.stderr.write("scope: REFUSED — --explain takes a WINPID, got %r. A caller holding "
+                             "an MSYS id translates it through the census first.\n" % want)
+            return 1
         hit = scope.get(int(want))
         if hit is None:
             print("scope: %s is NOT in scope (no declared root reaches it)" % want)
