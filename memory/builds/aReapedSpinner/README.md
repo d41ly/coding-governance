@@ -5,7 +5,7 @@ opened: 2026-09-08
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7
+ids: TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 TOOL-aReapedSpinner-8 TOOL-aReapedSpinner-9 TOOL-aReapedSpinner-10
 ---
 
 # aReapedSpinner — a process this fleet launched has no deadline, no witness and no reaper, so nothing observes it burning
@@ -68,7 +68,7 @@ and nothing ENUMERATES the population, which is why all three ran unseen for two
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 7 unit(s) · node a · opened 2026-09-08 · streams tooling
-ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7
+ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 TOOL-aReapedSpinner-8 TOOL-aReapedSpinner-9 TOOL-aReapedSpinner-10
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -79,10 +79,10 @@ ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReap
 | [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 4 | 2 | CLOSED | rev-4 | 2026-09-08 |
 | [TOOL-aReapedSpinner-4 — the reaper: walk both graphs, signal per kind, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 5 | 2 | CLOSED | rev-4 | 2026-09-08 |
 | [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 6 | 2 | CLOSED | rev-4 | 2026-09-08 |
-| [TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 6 | 2 | CLOSED | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 6 | 2 | CLOSED | rev-5 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 18 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

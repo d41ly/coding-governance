@@ -143,8 +143,11 @@ function main() {
   )
   for (const l of flagged.slice(0, 8)) process.stdout.write(`  ${l}\n`)
   if (flagged.length > 8) process.stdout.write(`  ... and ${flagged.length - 8} more\n`)
+  // DERIVED, never a literal: this kit sits wherever the adopter installed it, and a `tools/`
+  // literal in shipped bytes prints a command that does not exist at another prefix.
+  const rel = path.relative(root, path.join(__dirname, 'reap.py')).split(path.sep).join('/')
   process.stdout.write(
-    '  reap them with: python tools/process-monitor/reap.py --sweep   (--dry-run to look first)\n',
+    `  reap them with: python ${rel} --sweep   (--dry-run to look first)\n`,
   )
   return 0
 }

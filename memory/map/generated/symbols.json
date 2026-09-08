@@ -18,6 +18,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "CensusRefused",
+      "kind": "class",
+      "file": "tools/process-monitor/census.py"
+    },
+    {
       "id": "CheckRefused",
       "kind": "class",
       "file": "tools/memory-recall/check-recall.py"
@@ -133,6 +138,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "ReapRefused",
+      "kind": "class",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "Refusal",
       "kind": "class",
       "file": "tools/govkit/govkit.py"
@@ -151,6 +161,11 @@
       "id": "RowLoss",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
+    },
+    {
+      "id": "ScopeRefused",
+      "kind": "class",
+      "file": "tools/process-monitor/scope.py"
     },
     {
       "id": "Shortlist",
@@ -378,9 +393,19 @@
       "file": "tools/memory-recall/query.py"
     },
     {
+      "id": "build_cim_fixture",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "build_clusters",
       "kind": "function",
       "file": "tools/lexicon/canon.py"
+    },
+    {
+      "id": "build_corpus",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "build_cutoff",
@@ -398,6 +423,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_edges",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
+    },
+    {
       "id": "build_filtered",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -411,6 +441,11 @@
       "id": "build_gov_index",
       "kind": "function",
       "file": "tools/govkit/census.py"
+    },
+    {
+      "id": "build_graded",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "build_index",
@@ -448,6 +483,16 @@
       "file": "tools/lexicon/lexicon_conf.py"
     },
     {
+      "id": "build_normalized",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "build_ps_w_fixture",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "build_readme_mechanism_drift",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -468,6 +513,21 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "build_row",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "build_scope",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "build_self_chain",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
+    },
+    {
       "id": "build_source_cited_ids_with_no_record",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -486,6 +546,21 @@
       "id": "build_tempdir",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "build_tree_rows",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "build_walk",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "build_windows_rows",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
     },
     {
       "id": "cache_dir",
@@ -565,6 +640,11 @@
     {
       "id": "check",
       "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "check",
+      "kind": "function",
       "file": "tools/workflows/unattended-unit.js"
     },
     {
@@ -586,6 +666,11 @@
       "id": "checkSeqMarker",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "checkThrottled",
+      "kind": "function",
+      "file": "tools/process-monitor/procmon-hook.js"
     },
     {
       "id": "checkUnderRoot",
@@ -633,9 +718,19 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "check_is_root",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
+    },
+    {
       "id": "check_marker_line",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "check_msys_addressable",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
     },
     {
       "id": "check_packing",
@@ -673,6 +768,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "check_root_shape",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
+    },
+    {
       "id": "check_self_containment",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -683,9 +783,24 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_survivors",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "check_target_reads_subject",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_token_under",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "check_true",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "checks",
@@ -1213,6 +1328,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "derive_scope",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
+    },
+    {
       "id": "derive_source_paths",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -1231,6 +1351,11 @@
       "id": "derive_unsatisfied_requires",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_verdict",
+      "kind": "function",
+      "file": "tools/process-monitor/classify.py"
     },
     {
       "id": "derive_width",
@@ -1743,6 +1868,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "load_conf",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
+    },
+    {
       "id": "load_corpus",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -2010,6 +2140,36 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/process-monitor/census.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/process-monitor/classify.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
@@ -2106,6 +2266,11 @@
       "id": "measure_recall",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "measure_rows",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
     },
     {
       "id": "measure_run",
@@ -2258,6 +2423,11 @@
       "file": "tools/lexicon/lexicon_conf.py"
     },
     {
+      "id": "parse_cim",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
+    },
+    {
       "id": "parse_conf",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -2266,6 +2436,11 @@
       "id": "parse_conf_line",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "parse_cpu_clock",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
     },
     {
       "id": "parse_dossier",
@@ -2298,6 +2473,16 @@
       "file": "tools/memory-tree/check-arms.py"
     },
     {
+      "id": "parse_posix",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
+    },
+    {
+      "id": "parse_ps_w",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
+    },
+    {
       "id": "parse_registry",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
@@ -2311,6 +2496,11 @@
       "id": "parse_spec",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "parse_tokens",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
     },
     {
       "id": "parse_verdicts",
@@ -2443,6 +2633,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "readInput",
+      "kind": "function",
+      "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
       "id": "readStdin",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -2451,6 +2646,11 @@
       "id": "readStdin",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readThrottleSeconds",
+      "kind": "function",
+      "file": "tools/process-monitor/procmon-hook.js"
     },
     {
       "id": "readTokenAt",
@@ -2611,6 +2811,11 @@
       "id": "read_margin",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "read_roots",
+      "kind": "function",
+      "file": "tools/process-monitor/scope.py"
     },
     {
       "id": "read_routed_cell",
@@ -2853,6 +3058,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "render_kill",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "render_layer_refusal",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -2898,6 +3108,16 @@
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
+      "id": "render_report",
+      "kind": "function",
+      "file": "tools/process-monitor/classify.py"
+    },
+    {
+      "id": "render_rows",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
+    },
+    {
       "id": "render_shards",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -2911,6 +3131,11 @@
       "id": "render_swapped_name",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "render_sweep",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
     },
     {
       "id": "render_symbols_json",
@@ -2973,9 +3198,24 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveRoot",
+      "kind": "function",
+      "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
+      "id": "resolveStamp",
+      "kind": "function",
+      "file": "tools/process-monitor/procmon-hook.js"
+    },
+    {
       "id": "resolve_adopter",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "resolve_backend",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
     },
     {
       "id": "resolve_bash",
@@ -3118,6 +3358,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_signal_binaries",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "resolve_slot_data_dir",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3258,6 +3503,11 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "run_bounded",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
+    },
+    {
       "id": "run_case",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -3313,6 +3563,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "run_kill",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
+    },
+    {
       "id": "run_kit_check",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -3346,6 +3601,11 @@
       "id": "run_suggest",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "run_sweep",
+      "kind": "function",
+      "file": "tools/process-monitor/reap.py"
     },
     {
       "id": "scan",
@@ -3418,6 +3678,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "scan_processes",
+      "kind": "function",
+      "file": "tools/process-monitor/census.py"
+    },
+    {
       "id": "scan_produced_destinations",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -3456,6 +3721,11 @@
       "id": "scan_unarmed_slots",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "scan_verdicts",
+      "kind": "function",
+      "file": "tools/process-monitor/classify.py"
     },
     {
       "id": "scan_written_destinations",
@@ -3653,6 +3923,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_a_real_path_inside_a_dash_c_body_does_admit",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_absent_fixture_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -3688,6 +3963,16 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_already_gone_is_not_a_signal_error",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_assignment_inside_a_dash_c_body_does_not_admit",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_attribution",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -3721,6 +4006,16 @@
       "id": "test_baseline_green",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_blank_roots_refuses",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_both_kinds_are_present_and_distinguished",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_both_red_on_wholesale_drop",
@@ -3768,6 +4063,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_ceiling_decides_before_any_label",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_chunk_arm_rolls_up",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -3776,6 +4076,11 @@
       "id": "test_clis_refuse_an_unadopted_root",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_closure_reaches_bare_argv_and_native_descendants",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_conditional_tier_refuses_an_orphaned_artifact",
@@ -3798,14 +4103,29 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_continuation_rows_are_rejected_and_counted",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_coverage_directions",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_cpu_clock_parses_every_shape",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_crlf_working_copy_is_not_drift",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_cyclic_graph_terminates",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_dead_alias_is_loud",
@@ -3821,6 +4141,11 @@
       "id": "test_declared_layer_is_named_dark_in_the_banner",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_declared_root_admits_and_names_it",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_declared_source_absent_is_skipped",
@@ -3858,6 +4183,16 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_dry_run_walks_the_same_set_and_kills_nothing",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_duplicate_roots_assignment_refuses",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_durable_derives_families",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -3881,6 +4216,11 @@
       "id": "test_empty_graded_set_refuses",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_empty_read_refuses_rather_than_reporting_zero",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_empty_spine_is_loud",
@@ -3908,6 +4248,16 @@
       "file": "tools/codebase-map/test_codebase_map.py"
     },
     {
+      "id": "test_every_live_row_answers_its_own_liveness_probe",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_every_verdict_member_has_a_producing_fixture",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_eviction",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -3921,6 +4271,11 @@
       "id": "test_evidence_oracle",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_exotic_line_terminators_cannot_forge_a_row",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_extract_failure_refuses",
@@ -4018,6 +4373,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_hung_backend_is_bounded",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_identifier_tokens_corpus_recall",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -4053,6 +4413,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_leaves_are_killed_first",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_legacy_backlog_is_named_and_never_deleted",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -4081,6 +4446,26 @@
       "id": "test_live_backlog_rows",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_live_read_sees_itself",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_live_scope_is_not_empty",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_live_tree_dies_completely",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_live_windows_parent_is_not_an_orphan",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_local_grammar_matches_the_extractor",
@@ -4118,6 +4503,31 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_member_outside_the_scope_set_is_dropped",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_msys_edges_are_translated_before_the_union",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_msys_ppid_participates_in_no_predicate",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_native_is_the_majority_on_this_node",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_native_parentless_row_is_orphan_and_reaped",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_neighbour_cap_ranks_before_truncating",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -4133,6 +4543,16 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_no_backend_refuses",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_no_command_row_can_be_a_descendant_but_not_a_root",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_no_conf_adopt",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -4141,6 +4561,11 @@
       "id": "test_no_conf_query",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_no_cpu_row_is_unknown",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_no_scan_is_not_an_empty_corpus",
@@ -4158,6 +4583,16 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_non_killable_descendant_is_withheld_not_signalled",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_non_utf8_backend_output_survives",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_one_retirement_is_free",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -4166,6 +4601,16 @@
       "id": "test_one_walk_two_callers",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_out_of_scope_root_refuses_before_the_walk",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_out_of_scope_rows_are_never_graded",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_out_of_vocabulary_pin_reds",
@@ -4183,6 +4628,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_partial_rows_survive_and_are_counted_apart",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_patch_is_installed",
       "kind": "function",
       "file": "tools/pytest-parallel-guardrails/aiosqlite_worker_resilience.test-template.py"
@@ -4196,6 +4646,16 @@
       "id": "test_per_id_reds_alone",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_posix_fixture_collapses_both_namespaces",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_prefix_is_separator_anchored",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_present_layers_see_outside_the_symbol_roots",
@@ -4228,9 +4688,29 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_rate_boundary_is_inclusive",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_read_roots_is_last_wins",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_readme_mechanism_drift",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_recycled_parent_edge_is_dropped_and_counted",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_relative_and_spaced_roots_are_refused",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_remedy_paths_are_real",
@@ -4273,6 +4753,21 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_root_that_claims_everything_refuses",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_row_contract_is_complete",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_run_kill_refuses_a_bare_set",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_scaffold_converges",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -4283,9 +4778,29 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_scope_over_the_frozen_corpus_is_exact",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_self_chain_absent_from_the_census_refuses",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_self_chain_is_in_scope_but_not_killable",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_self_chain_target_is_refused_by_run_kill",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_shell_constructs",
@@ -4338,6 +4853,21 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_summary_counts_are_derived",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_summary_counts_are_derived_from_the_run",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_survivor_is_derived_from_a_re_read",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_symbol_extractors_fail_closed",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -4351,6 +4881,11 @@
       "id": "test_symbols_render_deterministic_and_fail_closed",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_taskkill_argv_uses_one_slash",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_tautological_fixture_reds",
@@ -4368,6 +4903,16 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_tokenizer_strips_assignments_everywhere",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_unaddressable_row_is_reported_not_claimed",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
+    },
+    {
       "id": "test_undeclared_file_stays_out",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -4376,6 +4921,11 @@
       "id": "test_undeclared_layer_refuses_with_both_remedies",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_unjoined_row_keeps_native_kind",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_verbatim_files",
@@ -4396,6 +4946,11 @@
       "id": "test_writes_nothing_in_worktree",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_wrong_namespace_id_refuses_with_its_own_message",
+      "kind": "function",
+      "file": "tools/process-monitor/selftest.py"
     },
     {
       "id": "test_zero_records_is_loud",
@@ -4481,6 +5036,11 @@
       "id": "write",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
+    },
+    {
+      "id": "writeStamp",
+      "kind": "function",
+      "file": "tools/process-monitor/procmon-hook.js"
     },
     {
       "id": "write_block",

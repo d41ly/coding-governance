@@ -44,7 +44,7 @@ tools/drift-audit/kit.toml	1	codebase-map	a kit descriptor that gained the withh
 tools/gate-lint/README.md	3	gate-lint
 tools/gate-lint/kit.toml	1	gate-lint
 tools/gate-lint/ps-hygiene.py	1	gate-lint
-tools/govkit/registry.toml	58	(loose),agent-instructions,codebase-map,drift-audit,gate-lint,hooks,lexicon,lib,memory-recall,memory-tree,playbook,pytest-parallel-guardrails,run-gates,unattended,workflows	the deployer registry: every `[[exempt_leg]]` reason NAMES the descriptor that withholds the file, which is the whole content of the exemption. TOOL-aQuenchedHarness-3 added twenty-three of them and TOOL-aQuenchedHarness-6 three more. A registry that could not name a path could not record an exemption.
+tools/govkit/registry.toml	59	(loose),agent-instructions,codebase-map,drift-audit,gate-lint,hooks,lexicon,lib,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows	the deployer registry: every `[[exempt_leg]]` reason NAMES the descriptor that withholds the file, which is the whole content of the exemption. TOOL-aQuenchedHarness-3 added twenty-three of them and TOOL-aQuenchedHarness-6 three more. A registry that could not name a path could not record an exemption. RAISED 58 -> 59, TOOL-aReapedSpinner-6: this file IS the declared deployable population, so every entry it gains is one more path literal by construction. There is nothing to derive — a registry that globbed its own entries would stop being a declaration, which is the whole reason it is not a directory listing.
 tools/hooks/README.md	4	(loose),workflows
 tools/hooks/agent-cap.js	7	(loose),hooks,workflows
 tools/hooks/agent-cap.test.sh	3	hooks,workflows
@@ -89,6 +89,9 @@ tools/playbook/README.md	3	govkit,playbook
 tools/playbook/adopt-playbook.sh	3	playbook
 tools/playbook/kit.toml	1	govkit
 tools/playbook/render_playbook.py	1	run-gates
+tools/process-monitor/README.md	2	process-monitor	the install commands a human copies. A derived spelling would print a token rather than a runnable line, which is the opposite of what a README is for.
+tools/process-monitor/adopt-process-monitor.sh	5	(loose),lib,process-monitor	an adopter's own USAGE lines plus the settings-merge invocation it tells an operator to run. The runtime paths in this file are all derived through KIT_REL, which is git rev-parse --show-prefix; what is recorded here is prose a human reads and one command a human types. The `lib` hit is the inlined resolve_python's canonical-copy pointer, which the sibling adopters carry identically.
+tools/process-monitor/adopt-process-monitor.test.sh	4	process-monitor	a suite that must name the files it grades. It is `project-owned` in kit.toml and is withheld from `govkit apply`, so no adopter ever receives these bytes at any prefix.
 tools/push-main.test.sh	10	(loose)
 tools/pytest-parallel-guardrails/kit.toml	1	codebase-map	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	3	lib

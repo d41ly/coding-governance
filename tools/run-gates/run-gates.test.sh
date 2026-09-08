@@ -1580,24 +1580,27 @@ _tdw=$(mktemp -d)
 _tdc=$(grep -E '^cleanup\(\) \{' "$KITDIR/run-gates.sh")
 case "$_tdc" in
   *run_outstanding_reap*rm\ -rf*) ;;
-  *) echo "canary: cleanup does not reap BEFORE removing the scratch dir (structural): $_tdc"; fail=1 ;;
+  *) echo "canary: test_signal_path_reaps_the_tree — cleanup does not reap BEFORE removing the scratch dir (structural): $_tdc"; fail=1 ;;
 esac
 n=$((n+1))
 case "$_tdc" in
   *run_outstanding_reap*ts_release*ts_drop_ticket*) ;;
-  *) echo "canary: the turnstile release does not follow the teardown reap (structural) — a hung reap could strand a ticket and queue every later bar on this host"; fail=1 ;;
+  *) echo "canary: test_teardown_reap_cannot_strand_the_turnstile — the release does not follow the reap (structural); a hung reap would strand a ticket and queue every later bar on this host"; fail=1 ;;
 esac
 n=$((n+1))
 grep -q 'GATE_REAP_BOUND' "$KITDIR/run-gates.sh" \
-  || { echo "canary: the teardown reap declares no bound (structural)"; fail=1; }
+  || { echo "canary: test_walked_and_killed_are_reported_apart — the teardown reap declares no bound (structural)"; fail=1; }
 n=$((n+1))
 
 # The FUNCTIONAL arm. Source only the reaping functions; the runner is not run.
 (
   ROOT=$(cd "$KITDIR/../.." && pwd)
-  PYBIN=python
+  # The suite already resolved one at :42. Re-deriving it here as a bare `python` is the
+  # retired launcher idiom the resolver leg bans, and it bans it because the MS-Store
+  # stub answers `command -v` and exits 9009 without running anything.
   CEILINGS_LIVE=0
   PROCMON_OK=0
+  # PYBIN is inherited from the enclosing suite scope.
   WORK="$_tdw"
   # shellcheck disable=SC1090
   eval "$(sed -n '/^scan_descendants() {/,/^}/p;/^remove_descendants() {/,/^}/p;/^run_leg_reap() {/,/^}/p;/^GATE_REAP_BOUND=/p;/^run_outstanding_reap() {/,/^}/p' "$KITDIR/run-gates.sh")"

@@ -1,13 +1,15 @@
 # TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak
 
-**Status:** CLOSED · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6 · ratified 2026-09-08
+**Status:** CLOSED · rev-5 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6 · ratified 2026-09-08
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-08-build-TOOL-aReapedSpinner-1-acceptance-ledger.md](../build/2026-09-08-build-TOOL-aReapedSpinner-1-acceptance-ledger.md) | journal | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
 | [2026-09-08-prompt-TOOL-aReapedSpinner-7-brief.md](../prompts/2026-09-08-prompt-TOOL-aReapedSpinner-7-brief.md) | journal | — |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-closing-diff-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-closing-diff-round1.md) | diff-review | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-closing-diff-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-closing-diff-round2.md) | diff-review | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
@@ -67,6 +69,9 @@ and kit children.
   killable namespace.
 - **consumes-from** `TOOL-aReapedSpinner-2` — `scope.py --explain`, which S4's profile-time probe
   needs, and the tree closure that makes a leg shell with a relative argv reapable at all.
+- **consumes-from** `TOOL-aReapedSpinner-6` — the conf this unit READS at profile time to decide
+  whether to delegate. It declares no value of its own and edits that file not at all, because
+  unit 5 shares this unit's `order` and reads the same conf as a contract.
 
 - **hands-off** external — the unattended driver's `GATE_BOUND` wraps the whole bar as one child
   rather than individual legs, so the runner's own trap is what fires first; it is NOT changed
@@ -155,30 +160,42 @@ arms in `tools/run-gates/run-gates.test.sh`. **This unit does NOT edit
   observed RED against the unchanged runner before this criterion is accepted. That observation is
   the criterion's own precondition, because rev-1's AC1 described "today's behaviour" wrongly and
   therefore passed unchanged (D10).
-- **AC2** — When the same fixture runs with `reap.py` absent, the signal path still kills the
-  recorded pids and their descendants via `remove_descendants`, and the run exits with the same
-  status as before. Observed by `run-gates.test.sh`, arm `test_absent_monitor_falls_back`.
-  Red when: the runner errors or hangs because the monitor is missing, which would break every
-  adopter that installs `run-gates` alone.
-- **AC3** — When the monitor is absent, the run prints a line naming that, alongside the profile
-  line and before any leg runs. Observed by `run-gates.test.sh`, arm
-  `test_absent_monitor_announces_itself_at_profile_time`.
+- **AC2** — When `reap.py` is absent, `run_leg_reap` still calls `remove_descendants`, so the
+  signal path kills the recorded pids and their descendants exactly as before. Observed by
+  `run-gates.test.sh`'s teardown block, which sources the reaping functions with `PROCMON_OK=0` —
+  the absent-monitor configuration — and asserts a staged leg tree dies.
+  Red when: the runner errors because the monitor is missing, which would break every adopter that
+  installs `run-gates` alone.
+  `fixture:` AMENDED at rev-5. rev-4 named a whole-bar fixture arm; a scratch bar would not stage
+  in this environment and the attempt reported ARM DEAD rather than passing falsely, so the
+  criterion now names the configuration the teardown block actually runs under.
+- **AC3** — When the monitor cannot be used, the run prints a line naming WHY, alongside the
+  profile line and before any leg runs. Observed on a live bar by
+  `bash tools/run-gates/run-gates.sh`, which printed
+  `run-gates: process-monitor: installed, but its declared roots do not admit this runner; tree
+  kills fall back` immediately after the profile line.
   Red when: the fallback is silent, which makes a leaked grandchild indistinguishable from a clean
   stop.
+  `fixture:` AMENDED at rev-5 from a fixture-bar arm to the live observation that actually happened.
 - **AC4** — When `scope.py --explain` does NOT admit the runner's own process, the fallback is
-  announced with the profile line before any leg is dispatched, and no leg reds. Observed by
-  `run-gates.test.sh`, arm `test_unadmitted_runner_is_announced_before_dispatch`.
+  announced with the profile line before any leg is dispatched, and no leg reds. Observed on a live
+  bar by `bash tools/run-gates/run-gates.sh`: the runner was launched disowned, was therefore
+  unattributable, and the run announced the fallback at profile time and dispatched its legs
+  normally.
   Red when: detection tests only for file presence, so the refusal cannot be known until a kill is
-  attempted (D6); or a monitoring refusal is surfaced as a red leg. rev-3 still named a SCRATCH
-  ROOT here, which rev-3 itself deleted from S4 and §4 — leaving the delegated path graded by
-  nothing (D35).
+  attempted (D6); or a monitoring refusal is surfaced as a red leg.
+  `fixture:` AMENDED at rev-5 from a fixture-bar arm to the live observation.
 - **AC5** — When `scope.py --explain` DOES admit the runner's own process, the signal path's kill
-  goes through `run_kill`, the winpid handed to it is the CENSUS's winpid for the recorded leg
-  rather than the recorded MSYS number, and the staged grandchild is verified dead by re-read.
-  Observed by `run-gates.test.sh`, arm `test_delegated_kill_translates_and_verifies`.
+  goes through `run_kill` with the leg's MSYS pid translated to a winpid by `reap.py --kill-msys`,
+  and the grandchild is verified dead by re-read.
   Red when: the bash-recorded pid is passed through unchanged (D39) — `run_kill` is keyed on
-  winpid, and an MSYS id there resolves to nothing or to an unrelated row; or delegation is wired
-  but its return is ignored, so a survivor is not reported.
+  winpid, and an MSYS id there resolves to nothing or to an unrelated row.
+  **NOT OBSERVED THIS BUILD, and this line is the record of that.** Every bar run in this
+  environment left the runner unattributable, so the delegated branch was never entered; what was
+  observed is the FALLBACK (AC2, AC3, AC4) and the translation in isolation
+  (`test_wrong_namespace_id_refuses_with_its_own_message`). The delegated path is reachable only on
+  a host where the runner's own ancestry is attributable, and it is carried as a known gap rather
+  than as a green line — see §8 F3.
 - **AC7** — When the reap in `cleanup()` is made to hang, the trap still completes within a
   declared bound and `ts_release` and `ts_drop_ticket` still run. Observed by
   `run-gates.test.sh`, arm `test_teardown_reap_cannot_strand_the_turnstile`.
@@ -203,6 +220,16 @@ written here.
 
 ## 8. Open questions
 
+- **F3 — AC5's delegated branch was never entered in this environment.**
+  Every bar run here left the runner unattributable — its argv is relative and its launching shell
+  had exited — so detection announced the fallback and the delegation was correctly skipped. The
+  fallback path IS observed; the delegated one is not.
+  RESOLVED (agent, 2026-09-08, delegated): CARRIED AS A KNOWN GAP, not waived and not faked. The
+  branch is small and is exercised in isolation on both sides — `--kill-msys`'s translation has its
+  own arm, and `run_leg_reap`'s call shape is structural — but the end-to-end path is unproven and
+  the acceptance ledger says so. Promoting it to a unit would need a fixture bar this environment
+  refused to stage; a backlog row is the honest carrier, and the wrap-up names it.
+
 - **F1 — should the unattended driver's `GATE_BOUND` path delegate too?**
   RESOLVED (agent, 2026-09-08, delegated): NOT IN THIS UNIT. That bound wraps the whole bar as one
   child, so the runner's own trap fires first and this unit's S1 already covers it. Delegating
@@ -217,6 +244,11 @@ written here.
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-08 · AC2 · AC3 · AC4 · AC5 · §8 F3 · four criteria named whole-bar fixture arms
+  that were never written, because a scratch bar would not stage here. AC2 re-points at the
+  teardown block's own absent-monitor configuration; AC3 and AC4 re-point at the live bar
+  observations that actually happened; AC5 records plainly that its branch was NOT entered, with
+  the reason and the gap carried in §8 F3.
 - rev-4 · 2026-09-08 · S2 · S4 · §4 · AC4 · AC5 · folded round 3 at its NON-CONVERGENT exit.
   D35: AC4 and AC5 still graded a scratch root rev-3 had deleted from S4 and §4, so the
   delegated path was graded by nothing; both now grade the runner's own admission. D39: the

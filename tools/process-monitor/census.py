@@ -91,7 +91,7 @@ def parse_cim(text):
         if not line.strip():
             continue
         parts = line.split(_CIM_SEP)
-        # The ROW GUARD. Adopted by citation from tools/run-gates/run-gates.sh:432-436, which
+        # The ROW GUARD. Adopted by citation from the gate runner's own scan_descendants, which
         # records the hazard: a command line containing a newline splits one process across rows
         # "whose field 2 and 3 are attacker-or-accident-chosen text", and without an anchored
         # numeric test "this walk feeds arbitrary text to kill -9". Counted, never dropped silently.

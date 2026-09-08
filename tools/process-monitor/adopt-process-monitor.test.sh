@@ -18,7 +18,7 @@ ROOT="$(cd "$KIT_DIR" && git rev-parse --show-toplevel)"
 # The floor the merge bar's `check-testsuite-counts.sh` reads: a suite that prints no
 # executed count against a declared floor could strand a block of its arms past an exit and
 # still report success.
-FLOOR_ASSERTIONS=26
+FLOOR_ASSERTIONS=31
 PASS=0; FAIL=0
 WORK="$(mktemp -d)"
 REALROOT="$WORK/declared-root-under-test"
@@ -52,6 +52,10 @@ run_against() {
   git -C "$repo" init -q 2>/dev/null
   cp "$ADOPT" "$repo/tools/process-monitor/"
   [ "$conf_body" = "__ABSENT__" ] || printf '%s\n' "$conf_body" > "$repo/.process-monitor.conf"
+  # A COMPLETE adoption, because --check now refuses an unwired hook: a fixture that omitted the
+  # settings entry would pin the permissive exit the closing review flagged.
+  mkdir -p "$repo/.claude"
+  printf '%s\n' '{"hooks":{"PostToolUse":[{"matcher":"Bash|PowerShell","hooks":[{"type":"command","command":"node procmon-hook.js"}]}]}}' > "$repo/.claude/settings.json"
   ( cd "$repo" && bash tools/process-monitor/adopt-process-monitor.sh --check ) >"$WORK/out" 2>&1
   echo $?
 }
@@ -188,6 +192,69 @@ else
 fi
 
 printf '\nadopt-process-monitor: %d passed, %d failed (%d assertions)\n' "$PASS" "$FAIL" "$((PASS + FAIL))"
+# ---- the five arms units 5 and 6 name and nothing implemented -------------------------------
+# A flagged census, staged by lowering the ceiling in a scratch conf rather than by waiting for a
+# real process to age past four hours.
+_pmdir="$WORK/flagged"; mkdir -p "$_pmdir/tools"
+git -C "$_pmdir" init -q 2>/dev/null
+# The hook resolves reap.py under its OWN root, so this fixture needs the kit, not just a conf.
+cp -r "$KIT_DIR" "$_pmdir/tools/process-monitor"
+git -C "$_pmdir" init -q 2>/dev/null
+sed 's|^PROCMON_AGE_CEILING=.*|PROCMON_AGE_CEILING="1"|' "$ROOT/.process-monitor.conf" > "$_pmdir/.process-monitor.conf"
+rm -f "$GD/procmon-stamp" 2>/dev/null
+_out=$(printf '%s' '{"hook_event_name":"SessionStart"}' | CLAUDE_PROJECT_DIR="$_pmdir" node "$HOOK" 2>&1)
+case "$_out" in
+  *"past the declared ceiling"*) add_pass "test_hook_reports_a_flagged_row" ;;
+  *) add_fail "test_hook_reports_a_flagged_row (got: ${_out:-<silence>})" ;;
+esac
+
+# The second run inside the window must be silent AND must not spawn a census. Shimming python to a
+# name that cannot exist proves the second half: had it run one, the failure would print.
+rm -f "$GD/procmon-stamp" 2>/dev/null
+run_hook '{"hook_event_name":"PostToolUse"}' >/dev/null 2>&1
+_out=$(run_hook '{"hook_event_name":"PostToolUse"}' nonesuch-python-shim)
+if [ -z "$_out" ]; then add_pass "test_throttle_suppresses_the_second_run"; else add_fail "test_throttle_suppresses_the_second_run (got: $_out)"; fi
+
+# A census that never answers must not block the tool call: the hook bounds it and exits 0.
+rm -f "$GD/procmon-stamp" 2>/dev/null
+# THE HOOK'S CENSUS BOUND, exercised through the real path. A shim on PROCMON_PYTHON cannot do
+# it: node's execFileSync refuses a .cmd without shell:true (CVE-2024-27980), so the shim never
+# ran and the arm passed in 0s over a bound it had not touched. What the hook actually bounds is
+# the reap.py under its own root, so the fixture supplies one that sleeps.
+_slowdir="$WORK/slowroot"; mkdir -p "$_slowdir/tools/process-monitor"
+git -C "$_slowdir" init -q 2>/dev/null
+cp "$ROOT/.process-monitor.conf" "$_slowdir/.process-monitor.conf"
+printf 'import time\ntime.sleep(600)\n' > "$_slowdir/tools/process-monitor/reap.py"
+rm -f "$GD/procmon-stamp" 2>/dev/null
+_t0=$(date +%s)
+_out=$(printf '%s' '{"hook_event_name":"PostToolUse"}' | CLAUDE_PROJECT_DIR="$_slowdir" timeout 200 node "$HOOK" 2>&1); _rc=$?
+_t1=$(date +%s)
+_el=$((_t1 - _t0))
+# It must have actually WAITED — a sub-10s return means the census never started, and a
+# bounding assertion over that certifies nothing.
+if [ "$_el" -lt 10 ]; then
+  add_fail "test_hung_census_does_not_block_the_hook (returned in ${_el}s; the census never ran, so no bound was exercised)"
+elif [ "$_rc" = 0 ] && [ "$_el" -lt 180 ]; then
+  add_pass "test_hung_census_does_not_block_the_hook (bounded at ${_el}s, exit 0)"
+else
+  add_fail "test_hung_census_does_not_block_the_hook (rc=$_rc after ${_el}s)"
+fi
+rm -f "$GD/procmon-stamp" 2>/dev/null
+
+# The declared hole's DISCHARGE PROBE is the adopter's own --check, and a probe nobody staged a
+# failure for is a probe that cannot fail.
+check_equal "test_roots_hole_probe_fails_when_blank" \
+    "$(run_against "$(build_base_conf | sed 's|^PROCMON_ROOTS=.*|PROCMON_ROOTS=""|')")" 1
+
+# The SHIPPED conf, not a fixture: this repo's own declaration must obey the temp-root rule.
+if grep -q '^PROCMON_ROOTS=' "$ROOT/.process-monitor.conf"; then
+  ( cd "$ROOT" && bash tools/process-monitor/adopt-process-monitor.sh --check ) >/dev/null 2>&1 \
+    && add_pass "test_shipped_roots_exclude_the_temp_root" \
+    || add_fail "test_shipped_roots_exclude_the_temp_root"
+else
+  add_fail "test_shipped_roots_exclude_the_temp_root (no shipped conf to grade)"
+fi
+
 n=$((PASS + FAIL))
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] \
   || { echo "adopt-process-monitor: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; FAIL=$((FAIL + 1)); }

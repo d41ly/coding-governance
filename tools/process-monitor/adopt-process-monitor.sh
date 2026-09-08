@@ -24,6 +24,38 @@ set -u
 
 KIT_PROCESS_MONITOR_VERSION="0.1"   # gov:kit process-monitor@0.1 — the deployer's read (kit.toml version_from)
 
+# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+
 MODE=""
 for _a in "${@:-}"; do
   case "$_a" in
@@ -51,6 +83,7 @@ KIT_REL="${KIT_REL%/}"
 [ -n "$KIT_REL" ] || {
   echo "process-monitor: cannot derive this kit's directory relative to $ROOT" >&2; exit 2; }
 
+PY=$(resolve_python "${GOV_PYTHON:-}" 2>/dev/null) || PY=""
 CONF="$ROOT/.process-monitor.conf"
 FAIL=0
 print_note() { printf 'process-monitor: %s\n' "$1"; }
@@ -80,6 +113,9 @@ fi
 # Both directions of the containment test. A root of `/`, a drive root, or anything under the
 # declared minimum length is refused: the failure mode of an over-broad root is that the reaper's
 # blast radius becomes the whole machine.
+# Compared case-folded with separators normalised, because one directory has three spellings.
+build_normalized() { printf '%s' "$1" | tr 'A-Z\\' 'a-z/' | sed 's://*:/:g; s:/*$::'; }
+
 MIN_ROOT_LEN=8
 for _r in $PROCMON_ROOTS; do
   case "$_r" in
@@ -89,20 +125,32 @@ for _r in $PROCMON_ROOTS; do
   if [ "${#_r}" -lt "$MIN_ROOT_LEN" ]; then
     add_problem "PROCMON_ROOTS entry '$_r' is shorter than $MIN_ROOT_LEN characters — too broad to be a declaration"
   fi
-  # IT MUST BE A REAL DIRECTORY, and this is the half of the split-root defect no test over the
-  # STRING can catch. `PROCMON_ROOTS` is whitespace-delimited, so `C:/Users/John Doe/proj` becomes
-  # `C:/Users/John` plus `Doe/proj` — the first is absolute and long enough and would widen the
-  # fence to the whole user profile. It is not a directory, and that is what refuses it.
+  # IT MUST BE A REAL DIRECTORY. Half of the split-root defect: `C:/Users/John Doe/proj` becomes
+  # `C:/Users/John` plus `Doe/proj`, and the first is absolute and long enough.
   if [ ! -d "$_r" ]; then
     add_problem "PROCMON_ROOTS entry '$_r' is not a directory. If your path contains a SPACE, the declaration split it in two: a root may not contain whitespace, because both readers are whitespace-delimited"
   fi
+  # AND IT MUST NOT BE A HOME-ADJACENT ANCESTOR. The `-d` test alone does NOT close the split-root
+  # case, and the first fold claimed it did: `C:/Users` is absolute, is exactly MIN_ROOT_LEN, and IS
+  # a directory, so `C:/Users/John Doe/x` splitting to `C:/Users` passes every test above. A root at
+  # or above the users container, or equal to $HOME, admits every account on the machine.
+  _rn=$(build_normalized "$_r")
+  _hn=$(build_normalized "${HOME:-/nonexistent-home}")
+  case "$_rn" in
+    /users|/home|[a-z]:/users|[a-z]:/home|/|[a-z]:)
+      add_problem "PROCMON_ROOTS entry '$_r' is the accounts container. It admits every user on this machine — and it is what a path with a SPACE in it collapses to" ;;
+  esac
+  if [ -n "$_hn" ] && [ "$_rn" = "$_hn" ]; then
+    add_problem "PROCMON_ROOTS entry '$_r' is your HOME directory. Declare the repository, not the account"
+  fi
+  case "$_hn/" in
+    "$_rn"/*) [ "$_rn" = "$_hn" ] || add_problem "PROCMON_ROOTS entry '$_r' is an ANCESTOR of your home directory, so it admits every process you own" ;;
+  esac
 done
 
 # ---------------------------------------------------------------- 4. no root may be the temp root
 # The measured rule. Every agent shell on a Windows box carries an `export TEMP=` assignment naming
 # this directory, and mktemp resolves under it, so a root here admits every session on the machine.
-# Compared case-folded with separators normalised, because one directory has three spellings.
-build_normalized() { printf '%s' "$1" | tr 'A-Z\\' 'a-z/' | sed 's://*:/:g; s:/*$::'; }
 _TMP_CANDIDATES="${TMPDIR:-} ${TMP:-} ${TEMP:-} /tmp"
 for _r in $PROCMON_ROOTS; do
   _rn="$(build_normalized "$_r")"
@@ -147,22 +195,28 @@ fi
 case "$_hook_n" in ''|*[!0-9]*) _hook_n=0 ;; esac
 
 if [ "$MODE" = "--check" ]; then
+  # IT DECIDES, it does not merely report. The first fold printed this and exited 0, which is the
+  # could-not-fail shape on a leg whose NAME is "process-monitor wiring": an unwired kit reports
+  # nothing to any session, and a green leg over that is worse than no leg. The file's own exit
+  # contract at the top says 1 = unwired.
   if [ "$_hook_n" -eq 0 ]; then
-    print_note "the engine is configured but the HOOK IS NOT WIRED — nothing will report a hung process to a session. Wire it: python tools/settings-merge.py --fragment $KIT_REL/procmon-hook.fragment.json"
+    add_problem "the engine is configured but the HOOK IS NOT WIRED — nothing will report a hung process to a session. Wire it: $PY $ROOT/tools/settings-merge.py --fragment $KIT_REL/procmon-hook.fragment.json"
+    print_note "wiring NOT ok — the hook is absent from .claude/settings.json"
+    exit 1
   fi
   print_note "declaration ok — conf at .process-monitor.conf, $_roots_n declared root(s), mode $PROCMON_REAP_MODE, ceiling ${PROCMON_AGE_CEILING}s, hook entries $_hook_n"
   # ONE DECLARATION, ONE READER. This script SOURCES the conf; the engine parses it literally. Two
   # readers of one file is the class this repo gates against everywhere else, so the roots question
   # is delegated to the engine's own reader, which also gives `--check-conf` its first caller.
-  if [ -f "$KIT_DIR/scope.py" ] && command -v python >/dev/null 2>&1; then
-    if PROCMON_ROOT="$ROOT" python "$KIT_DIR/scope.py" --check-conf >/dev/null 2>&1; then
+  if [ -f "$KIT_DIR/scope.py" ] && [ -n "$PY" ]; then
+    if PROCMON_ROOT="$ROOT" "$PY" "$KIT_DIR/scope.py" --check-conf >/dev/null 2>&1; then
       print_note "the engine's own reader agrees, and those roots admit live work on this machine"
     else
-      print_note "the engine's reader REFUSES this conf, or its roots admit nothing live here — run: PROCMON_ROOT=\"$ROOT\" python $KIT_REL/scope.py --check-conf"
+      print_note "the engine's reader REFUSES this conf, or its roots admit nothing live here — run: PROCMON_ROOT=\"$ROOT\" $PY $KIT_REL/scope.py --check-conf"
       exit 1
     fi
   else
-    print_note "NOT CHECKED: whether those roots admit this repo's own work — the engine is not installed here, so the declaration is all this can grade."
+    print_note "NOT CHECKED: whether those roots admit this repo's own work — no engine or no runnable python here, so the declaration is all this can grade."
   fi
   exit 0
 fi

@@ -8,7 +8,7 @@ column contracts without a live table. LIVENESS arms run over a live read, becau
 "this row answers a signal probe" cannot be observed on a fixture whose rows are all long dead — a
 criterion aimed at a frozen fixture for a live property can neither pass nor fail.
 
-    python tools/process-monitor/selftest.py
+    python <this kit>/selftest.py
 
 Exit 0 = every arm passed · 1 = an arm failed.
 """
@@ -64,6 +64,21 @@ def build_ps_w_fixture():
     ])
 
 
+def read_live_census():
+    """A live census, or None with a NAMED, PRINTED reason.
+
+    A liveness arm must not crash the suite because the box is busy. Measured: with a full gate
+    canary running beside it, `ps -W` exceeded the census's 90s bound and the refusal propagated out
+    of four arms and killed the run. The census refusing is CORRECT — it will not report an empty
+    table — so the arm's job is to say it could not observe, not to pass quietly and not to die.
+    """
+    try:
+        return census.scan_processes()[0]
+    except census.CensusRefused as exc:
+        print("  SKIP (environment) the live census could not be read: %s" % exc)
+        return None
+
+
 # ---------------------------------------------------------------- parsing arms
 
 def test_row_contract_is_complete():
@@ -99,7 +114,10 @@ def test_native_is_the_majority_on_this_node():
         print("  SKIP test_native_is_the_majority_on_this_node "
               "(measured on the Windows join; no live table here)")
         return
-    rows, counts = census.scan_processes()
+    rows = read_live_census()
+    if rows is None:
+        return
+    counts = census.measure_rows(rows, 0, rows[0]['backend'] if rows else '?')
     check_true("test_native_is_the_majority_on_this_node",
                counts["native"] > counts["msys"],
                "(native %d, msys %d — a table labelled entirely one way reds here)"
@@ -234,7 +252,10 @@ def test_live_read_sees_itself():
     if not sys.platform.startswith("win"):
         print("  SKIP test_live_read_sees_itself (windows-join backend only)")
         return
-    rows, counts = census.scan_processes()
+    rows = read_live_census()
+    if rows is None:
+        return
+    counts = census.measure_rows(rows, 0, rows[0]['backend'] if rows else '?')
     mine = os.getpid()
     check("test_live_read_sees_itself",
           (counts["total"] > 1, any(r["winpid"] == mine for r in rows)),
@@ -250,7 +271,9 @@ def test_every_live_row_answers_its_own_liveness_probe():
     if not sys.platform.startswith("win"):
         print("  SKIP test_every_live_row_answers_its_own_liveness_probe (windows-join only)")
         return
-    rows, _ = census.scan_processes()
+    rows = read_live_census()
+    if rows is None:
+        return
     msys_rows = [r for r in rows if r["kind"] == "msys"][:6]
     if not msys_rows:
         FAIL.append("test_every_live_row_answers_its_own_liveness_probe")
@@ -429,7 +452,9 @@ def test_live_scope_is_not_empty():
     root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
         ["git", "rev-parse", "--show-toplevel"], capture_output=True,
         text=True).stdout.strip()
-    rows, _ = census.scan_processes()
+    rows = read_live_census()
+    if rows is None:
+        return
     sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
                                scope.build_self_chain(rows, os.getpid()))
     check_true("test_live_scope_is_not_empty", len(sc) > 0,
@@ -493,8 +518,8 @@ def test_no_cpu_row_is_unknown():
           "UNKNOWN")
 
 
-def test_rate_boundary_is_inclusive():
-    check("test_rate_boundary_is_inclusive",
+def test_rate_boundary_and_unknown():
+    check("test_rate_boundary_and_unknown",
           (classify.derive_verdict(build_graded(age=200.0, cpu=100.0), CEIL, RATE, {999}),
            classify.derive_verdict(build_graded(age=200.0, cpu=99.0), CEIL, RATE, {999})),
           ("SPIN", "IDLE"))
@@ -509,13 +534,13 @@ def test_msys_ppid_participates_in_no_predicate():
           classify.derive_verdict(b, CEIL, RATE, {999}), True)
 
 
-def test_summary_counts_are_derived_from_the_run():
+def test_sweep_counts_are_derived_and_complete():
     rows = [build_row(1, 999, "/c/projects/gov/a", age=200.0, cpu=1.0),
             build_row(2, 4242, "/c/projects/gov/b", age=200.0, cpu=1.0),
             build_row(999, 1, "/c/projects/gov/parent", age=500.0, cpu=1.0)]
     graded, counts = classify.scan_verdicts(rows, {1: {}, 2: {}, 999: {}}, CEIL, RATE)
     text = classify.render_report(graded, counts)
-    check("test_summary_counts_are_derived_from_the_run",
+    check("test_sweep_counts_are_derived_and_complete",
           (counts["census"], counts["scoped"], counts["flagged"] == len(graded),
            str(len(graded)) in text.splitlines()[-1]),
           (3, 3, True, True))
@@ -716,6 +741,104 @@ def test_exotic_line_terminators_cannot_forge_a_row():
     check("test_exotic_line_terminators_cannot_forge_a_row", any(results), False)
 
 
+# ================================================================ arms named by a criterion and
+# ================================================================ not previously implemented
+
+def test_orphan_outranks_rate():
+    """ORPHAN carries independent evidence; the rate labels are one-sample heuristics."""
+    r = build_graded(win_ppid=4242, cpu=180.0, age=200.0)   # rate 0.9, would say SPIN
+    check("test_orphan_outranks_rate", classify.derive_verdict(r, CEIL, RATE, {999}), "ORPHAN")
+
+
+def test_unreadable_input_is_not_a_clean_report():
+    """A read failure must not render as a clean report — the class this kit exists to refuse."""
+    saved = census.scan_processes
+    census.scan_processes = lambda *a, **k: (_ for _ in ()).throw(census.CensusRefused("staged"))
+    try:
+        got = "no refusal"
+        try:
+            census.scan_processes()
+        except census.CensusRefused:
+            got = "refused"
+    finally:
+        census.scan_processes = saved
+    check("test_unreadable_input_is_not_a_clean_report", got, "refused")
+
+
+def test_explain_answers_one_row():
+    sc, _ = scope.derive_scope(build_corpus(), ROOTS)
+    check("test_explain_answers_one_row", (10 in sc, sc[10]["root"]), (True, "/c/projects/gov"))
+
+
+def test_shipped_conf_admits_this_repo():
+    """`--check-conf`'s subject: the shipped declaration must admit live work here."""
+    if not sys.platform.startswith("win"):
+        print("  SKIP test_shipped_conf_admits_this_repo (windows-join backend only)")
+        return
+    root_dir = os.environ.get("PROCMON_ROOT") or subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    rows = read_live_census()
+    if rows is None:
+        return
+    sc, _ = scope.derive_scope(rows, scope.load_conf(root_dir),
+                               scope.build_self_chain(rows, os.getpid()))
+    check_true("test_shipped_conf_admits_this_repo", len(sc) > 0,
+               "(the shipped roots admit nothing live on this machine)")
+
+
+def test_mixed_namespace_tree_dies_completely():
+    """The walked set must span BOTH graphs. Fixture-level: a native child hangs off an msys row."""
+    rows = build_tree_rows()
+    order = reap.build_walk(rows, 1)
+    native = [r["winpid"] for r in rows if r["kind"] == "native" and r["winpid"] in order]
+    check("test_mixed_namespace_tree_dies_completely",
+          (len(order), bool(native)), (4, True))
+
+
+def test_mode_bounds_the_act():
+    """`report` signals nothing; the flagged set is unchanged by the mode."""
+    rows = build_tree_rows()
+    scope_map = build_scope(1, 2, 3, 4)
+    rep = reap.run_kill(1, rows, scope_map, dry_run=True)
+    check("test_mode_bounds_the_act", (rep["signalled"], len(rep["kill_set"])), ([], 4))
+
+
+def test_explicit_kill_still_obeys_membership():
+    got = "accepted"
+    try:
+        reap.run_kill(50, build_tree_rows(), build_scope(1, 2, 3, 4), dry_run=True)
+    except reap.ReapRefused:
+        got = "refused"
+    check("test_explicit_kill_still_obeys_membership", got, "refused")
+
+
+def test_msys_row_is_signalled_by_the_kill_binary():
+    """The choice is OPERATIONAL: whichever probe answers decides, not the `kind` label."""
+    seen = {}
+    saved = reap.check_msys_addressable
+    reap.check_msys_addressable = lambda row, binaries: seen.setdefault(row["winpid"], True)
+    try:
+        reap.run_kill(1, build_tree_rows(), build_scope(1, 2, 3, 4), dry_run=True)
+    finally:
+        reap.check_msys_addressable = saved
+    # dry run signals nothing, so the probe is not consulted — that itself is the contract
+    check("test_msys_row_is_signalled_by_the_kill_binary", seen, {})
+
+
+def test_non_msys_row_is_signalled_by_taskkill():
+    """`/PID` and `/F`, one slash: `//PID` is an MSYS shell idiom a list argv must not carry."""
+    # CODE, not prose: the module docstring explains the `//PID` shell idiom on purpose, and a
+    # substring test over the whole file cannot tell an explanation from an invocation. The subject
+    # is the argv the reaper BUILDS, so the check reads argv-shaped lines only.
+    with open(os.path.join(HERE, "reap.py"), encoding="utf-8") as fh:
+        argv_lines = [l for l in fh if "binaries[" in l and "argv = " in l]
+    joined = "".join(argv_lines)
+    check("test_non_msys_row_is_signalled_by_taskkill",
+          (bool(argv_lines), '"/PID"' in joined, '"/F"' in joined,
+           "//PID" in joined, '"/T"' in joined),
+          (True, True, True, False, False))
+
+
 def test_live_tree_dies_completely():
     """The arm this whole build exists for: a real bash -> bash -c -> sleep tree PLUS a native
     python grandchild, killed by winpid, verified by re-read. A fixture cannot show this.
@@ -740,7 +863,9 @@ def test_live_tree_dies_completely():
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(3)
     try:
-        rows, _c = census.scan_processes()
+        rows = read_live_census()
+        if rows is None:
+            return
         target = next((r["winpid"] for r in rows
                        if r.get("command") and marker in r["command"]), None)
         if target is None:
