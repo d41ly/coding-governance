@@ -1,0 +1,60 @@
+slot	rc	secs	bound	name
+1	0	301	1040	agent-cap restatement self-test
+2	124	1181	1180	agent-cap self-test
+3	0	79	300	agent-instructions self-test
+4	0	15	120	branch-guard self-test
+5	0	75	280	build-index selftest
+6	0	11	120	check-arms selftest
+7	0	1759	6580	check-wiring self-test
+8	124	143	140	codebase-map adopter e2e
+9	1	31	120	codebase-map kit selftest
+10	0	619	2160	corpus-ids selftest
+11	0	509	1800	dead-path carriers self-test
+12	0	84	120	extract-arms self-test
+13	0	789	2580	drift-audit selftest
+14	0	55	180	gotchas selftest
+15	124	3201	3200	govkit selftest
+16	0	314	1020	hook destinations self-test
+17	0	626	2360	install-prefix self-test
+18	0	23	120	kit-placeholders self-test
+19	0	585	1180	lexicon selftest
+20	124	121	120	line-length gate selftest
+21	0	1884	7640	manifest-check self-test
+22	124	2442	2440	memory-hygiene self-test
+23	0	664	2520	memory-recall kit selftest
+24	0	115	360	method-carriers self-test
+25	0	195	920	micro-format gate selftest
+26	0	35	160	placeholder-catalogue self-test
+27	124	301	300	playbook parity selftest
+28	0	5	120	playbook render selftest
+29	0	560	2040	pre-push self-test
+30	124	1761	1760	profile-bar selftest
+31	0	175	640	push-main self-test
+32	0	26	120	pytest-guardrails self-test
+33	1	112	300	python resolver (behaviour + inline parity + idiom ban)
+34	1	32	240	recall floor arms
+35	0	234	920	review-join self-test
+36	0	34	120	row-grammar selftest
+37	0	739	3240	row-keyed merge driver replay
+38	0	145	600	run-gates adopter e2e
+39	124	7323	7320	run-gates canary
+40	0	3105	4500	run-gates evidence
+41	0	14	120	run-gates gov canary
+42	1	4443	7260	run-gates turnstile
+43	124	122	120	run-selftests self-test
+44	0	119	440	scratch-guard self-test
+45	0	63	120	selftest harness self-test
+46	0	2	120	settings-merge selftest
+47	0	130	260	spec-tokens self-test
+48	0	187	580	template size gate selftest
+49	0	122	340	testsuite counts self-test
+50	0	5	120	tier2-review self-test
+51	124	122	120	unattended adopter e2e
+52	0	556	1200	unattended brief-recorded selftest
+53	124	1022	1020	unattended cross-component
+54	124	7722	7720	unattended driver selftest
+55	-	-	27200	unattended gate selftest
+56	124	341	340	unattended pass-order selftest
+57	124	1261	1260	unattended playbook selftest
+58	0	251	780	verdict-epoch self-test
+59	0	122	460	verifier fan-out self-test

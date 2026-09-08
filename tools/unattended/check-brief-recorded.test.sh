@@ -285,5 +285,36 @@ has  "unusable run BASE: the build is COUNTED as ungradeable" "$o" "1 build(s) w
 has  "unusable run BASE: and nothing was graded" "$o" "graded 0 closed unit"
 rm -rf "$T"
 
+# ---- THE SUBJECT CACHE MUST BE COMPLETE, and a truncated one must REFUSE rather than grade.
+# ---- TOOL-aQuenchedHarness-13. The cache is what makes this leg affordable: without it every unit
+# ---- re-walks the in-range history reading one subject per commit, measured at 1760 s on main tip
+# ---- against a 900 s ceiling. With it, 255 s and byte-identical output.
+# ---- The DANGEROUS failure is not slowness, it is a cache that reads SHORT: it then answers "no
+# ---- such commit" for every id, every unit grades unbuilt-in-range, and the leg exits 0 with a
+# ---- clean bill it never earned. The size assertion is what makes that impossible, so it is armed
+# ---- here rather than trusted. The break is staged into a COPY of the leg beside a copy of the
+# ---- library, because the leg refuses to run without one.
+T=$(mkfixture ok)
+D="$T/.brk"; mkdir -p "$D"
+cp "$LEG" "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$D/" 2>/dev/null
+# `#` as the delimiter, because the thing being inserted IS a pipe. The first spelling used `|`
+# and `&`, which re-inserts the match and produced `2>/dev/null head -5 |` - making `head` an
+# argument to `git log` rather than a stage after it. The fixture guard below is what catches that.
+# TRUNCATE BY EXACTLY ONE COMMIT, not to a fixed count. The first spelling used `head -5`, and the
+# fixture's history is shorter than five - so it truncated NOTHING, the cache matched history, the
+# leg exited 0 and this arm asserted a refusal that had no reason to happen. `head -n -1` drops the
+# last line whatever the length, which is also the sharper test: off-by-one is the realistic way a
+# cache reads short, and it must refuse just as loudly as an empty one.
+sed -i 's#| tr -c#| head -n -1 | tr -c#' "$D/$(basename "$LEG")"
+# THE GUARD ASSERTS THE EFFECT, not the edit. Checking that the text was inserted is what let the
+# no-op through: the pipeline was patched and changed nothing. Two commits are what make a
+# one-line truncation observable.
+_nc=$(cd "$T" && git rev-list --count HEAD 2>/dev/null || echo 0)
+n=$((n+1)); [ "${_nc:-0}" -ge 2 ] || { echo "FAIL fixture no-op: history is $_nc commit(s), so dropping one leaves nothing to detect"; st=1; }
+o=$(cd "$T" && bash "$D/$(basename "$LEG")" 2>&1); rc=$?
+same "a truncated subject cache REFUSES" "$rc" "2"
+has  "a truncated subject cache names the shortfall" "$o" "so the build-commit walk below would miss commits and report every unit unbuilt-in-range"
+rm -rf "$T"
+
 echo "--- $n arms, exit $st"
 exit $st

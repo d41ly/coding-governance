@@ -32,7 +32,9 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [fallback-fabricates-the-passing-value](fallback-fabricates-the-passing-value.md) | class | 1 |  | a degraded-mode substitute spelled with the value some assertion reads as clean turns a broken subject into a silent green |
 | [fixture-inherits-ambient-machine-state](fixture-inherits-ambient-machine-state.md) | class | 2 |  | a hermetic-looking fixture silently reads machine-global config, so it passes everywhere it was written and fails where it was not |
 | [fixture-passes-by-finding-nothing](fixture-passes-by-finding-nothing.md) | class | 1 | yes | a test arm whose fixture never triggers the rule passes, and proves nothing |
+| [fixture-removes-the-path-under-test](fixture-removes-the-path-under-test.md) | class | 1 |  | a fixture stabilised by DELETING a dependency stops the branch under test from executing, so both A/B arms run the other code twice and agree |
 | [fold-text-is-unreviewed-surface](fold-text-is-unreviewed-surface.md) | class | 4 |  | a review round's fixes are folded into fresh prose nobody has reviewed, and that prose is where the next round's findings are |
+| [format-derived-from-arity](format-derived-from-arity.md) | class | 3 |  | a producer that picks its output FORMAT from the number of items has two shapes, and a consumer written against the many-item one reads the single-item case as empty |
 | [gate-green-by-accident-on-generated-bytes](gate-green-by-accident-on-generated-bytes.md) | class | 2 |  | a byte-compare gate over a generated file is CRLF-red on Windows and green only right after a render |
 | [grammar-bound-to-the-wrong-root](grammar-bound-to-the-wrong-root.md) | class | 2 |  | a module-level grammar resolved at import describes the repo the KIT lives in, not the tree being classified |
 | [heredoc-escape-reaches-the-regex](heredoc-escape-reaches-the-regex.md) | class | 0 | yes | source written through a shell heredoc into a non-raw string turns an escape into a control byte, and the symptom never looks like a quoting problem |
@@ -61,6 +63,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [two-readers-of-one-config-one-re-derived](two-readers-of-one-config-one-re-derived.md) | class | 5 |  | one reader of a config file re-parses what the others source, so a legal spelling gives the guard a value nothing can match while it reports itself armed |
 | [vacuous-selector-empty-population](vacuous-selector-empty-population.md) | class | 2 |  | a path selector that matches nothing prints nothing, and nothing is what a passing check prints |
 
-46 record(s): 46 class, 0 note, 0 superseded · 5 universal · 0 unanchored
+48 record(s): 48 class, 0 note, 0 superseded · 5 universal · 0 unanchored
 
 <!-- END GENERATED -->

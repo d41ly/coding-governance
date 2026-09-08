@@ -3591,7 +3591,7 @@ $_bcnon"
         printf '%s\n' "$_sa_named" | grep -qxF -- "$_sa_id" || _sa_miss="$_sa_miss $_sa_id"
       done
       if [ -n "$_sa_miss" ]; then
-        if [ -z "$(printf '%s' "$_sa_named" | tr -d '[:space:]')" ]; then
+        if [ -z "${_sa_named//[[:space:]]/}" ]; then
           DOD_OUT="no TRACKED record under this build carries a spec-audit binding line at all, so the pre-code review pass the build method makes MUST-by-default left no evidence; units closed without one:$_sa_miss"
         else
           DOD_OUT="a CLOSED unit is named by no tracked spec-audit record, so its spec was never audited before its code was written:$_sa_miss"
@@ -3664,7 +3664,7 @@ $_bcnon"
         _want="$_want $_ml"
         [ -f "$_ml" ] && _have="$_have $_ml"
       fi
-      if [ -z "$(printf '%s' "$_have" | tr -d '[:space:]')" ]; then
+      if [ -z "${_have//[[:space:]]/}" ]; then
         DOD_OUT="every declared probe log is ABSENT, so this item cannot answer its question rather than answering it with a zero — looked for:$_want. Run a declared probe, or override with a reason"
         return 1
       fi
@@ -3801,12 +3801,22 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
   # So the pipeline below produces a fully normalised VALUE - comment gone, key gone, CR gone, ends
   # trimmed - and nothing is asked about it until it is. A `#` at position zero is then unambiguous:
   # a TOML value cannot begin with one, so it is a comment on a key with no value at all.
-  local raw
-  raw=$(printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
-        | sed 's/[[:space:]][[:space:]]*#.*$//' \
-        | sed "s/^$2[[:space:]]*=[[:space:]]*//" \
-        | tr -d '\r' \
-        | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+  # TEN PROCESSES BECAME ZERO, on the same terms as its scalar sibling and in the same order.
+  local raw="" _l _r
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    _r=${_l#"$2"}; [ "$_r" != "$_l" ] || continue
+    while :; do case $_r in [[:space:]]*) _r=${_r#?} ;; *) break ;; esac; done
+    case $_r in '='*) ;; *) continue ;; esac
+    raw=${_l%%[[:space:]]#*}
+    raw=${raw#"$2"}
+    while :; do case $raw in [[:space:]]*) raw=${raw#?} ;; *) break ;; esac; done
+    raw=${raw#=}
+    while :; do case $raw in [[:space:]]*) raw=${raw#?} ;; *) break ;; esac; done
+    raw=${raw//$'\r'/}
+    while :; do case $raw in [[:space:]]*) raw=${raw#?} ;; *) break ;; esac; done
+    while :; do case $raw in *[[:space:]]) raw=${raw%?} ;; *) break ;; esac; done
+    break
+  done <<< "$1"
   case "$raw" in '#'*) raw='' ;; esac
   # AND THE CLOSER IS ANCHORED AT BOTH ENDS. A value is an array only if it STARTS with `[`, so
   # `k = "a[0]"` is not one and is not refused for failing to close; an array that starts is closed
@@ -3815,8 +3825,13 @@ declared_list() { # body · key -> members space-separated; rc 2 on an untermina
     '['*']') ;;
     '['*) return 2 ;;
   esac
-  printf '%s\n' "$raw" | tr -d '"' \
-    | sed 's/^\[//; s/\]$//; s/,/ /g' | tr -s ' ' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+  local _m=${raw//'"'/}
+  _m=${_m#'['}; _m=${_m%']'}
+  _m=${_m//,/ }
+  while :; do case $_m in *'  '*) _m=${_m//  / } ;; *) break ;; esac; done
+  while :; do case $_m in [[:space:]]*) _m=${_m#?} ;; *) break ;; esac; done
+  while :; do case $_m in *[[:space:]]) _m=${_m%?} ;; *) break ;; esac; done
+  printf '%s\n' "$_m"
 }
 
 declared_scalar() { # body · key -> the scalar it declares, comment/quotes/space stripped
@@ -3836,11 +3851,30 @@ declared_scalar() { # body · key -> the scalar it declares, comment/quotes/spac
   # THE `#` AT POSITION ZERO, for its sibling's reason: the trailing-comment strip needs whitespace
   # before the `#` and a key with no value at all leaves none, so `k =# note` and `k =#note` came back
   # as their own comment text at rc 0. A TOML value cannot begin with `#`.
-  printf '%s\n' "$1" | grep -m1 -E "^$2[[:space:]]*=" \
-    | sed 's/[[:space:]][[:space:]]*#.*$//' \
-    | sed "s/^$2[[:space:]]*=[[:space:]]*//" | sed 's/^#.*$//' | tr -d '\r' \
-    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | sed 's/^"//; s/"$//' \
-    | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+  # EIGHT PROCESSES BECAME ZERO. This was `grep | sed | sed | sed | tr | sed | sed | sed`, and the
+  # leg that drives this kit ran it often enough that the pipeline, not the work, was the cost. The
+  # steps below are the same steps in the same order; what changed is that bash does them.
+  local _l _v _r
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    _r=${_l#"$2"}; [ "$_r" != "$_l" ] || continue
+    while :; do case $_r in [[:space:]]*) _r=${_r#?} ;; *) break ;; esac; done
+    case $_r in '='*) ;; *) continue ;; esac
+    _v=${_l%%[[:space:]]#*}
+    _v=${_v#"$2"}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    _v=${_v#=}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    case $_v in '#'*) _v='' ;; esac
+    _v=${_v//$'\r'/}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    while :; do case $_v in *[[:space:]]) _v=${_v%?} ;; *) break ;; esac; done
+    _v=${_v#'"'}; _v=${_v%'"'}
+    while :; do case $_v in [[:space:]]*) _v=${_v#?} ;; *) break ;; esac; done
+    while :; do case $_v in *[[:space:]]) _v=${_v%?} ;; *) break ;; esac; done
+    printf '%s\n' "$_v"
+    return 0
+  done <<< "$1"
+  return 0
 }
 
 kinds_re() { # word-list -> word|word|word
@@ -4094,7 +4128,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition
     CONVERGED)      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED — the loop is done for this subject" ;;
     NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT · disposition $disposition — the count did not shrink, so the loop STOPS here and $(review_exit_note "$disposition")" ;;
     CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $(review_exit_note "$disposition"); record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
-    *)              if [ -z "$(printf '%s' "$prior" | tr -d '[:space:]')" ]; then
+    *)              if [ -z "${prior//[[:space:]]/}" ]; then
                       echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
                     else
                       echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CONVERGING — smaller than the round before it, so the loop may re-arm"
@@ -4937,9 +4971,48 @@ while [ $# -gt 0 ]; do
     --blockers)     RV_BLOCKERS="${2:-}"; shift 2 || shift ;;
     --disposition)  RV_DISPOSITION="${2:-}"; shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || exit 1
-                    PL_SLUG=${1:-}; shift 2>/dev/null || true
-                    PLAN_PATHS=""; [ "${1:-}" = "--paths" ] && PLAN_PATHS=paths
-                    verb_plan "$PL_SLUG"; exit $? ;;
+                    # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
+                    # what it always was — the framing below only appears when more than one slug is
+                    # given, so no existing caller sees a new byte. TOOL-aQuenchedHarness-10.
+                    #
+                    # WHY: `check-unattended.sh` check 30 runs this verb once per tracked build to
+                    # grade the driver's OWN verdict, which is the right shape — reimplementing the
+                    # predicate inside the leg would make it a second implementation rather than a
+                    # second opinion. But it launched a fresh driver for each of 102 builds, and a
+                    # driver launch is this file plus the library plus the conf before any work
+                    # starts: measured at ~1.16 s wall each, so roughly two minutes of the leg's cost
+                    # was 102 identical startups.
+                    #
+                    # EACH SLUG STILL RUNS IN ITS OWN SUBSHELL. `verb_plan` sets `status` through
+                    # `fail`, and one build's refusal must not colour the next one's verdict; a
+                    # subshell gives the same isolation a separate process gave, at a fork instead of
+                    # an exec. The per-slug rc is emitted rather than accumulated, because the caller
+                    # skips a build whose plan REFUSES and cannot recover that from a summary status.
+                    PLAN_PATHS=""; _pl_slugs=""; _pl_framed=""
+                    while [ $# -gt 0 ]; do
+                      case "${1:-}" in
+                        --paths)  PLAN_PATHS=paths; shift ;;
+                        --framed) _pl_framed=1; shift ;;
+                        --*)     break ;;
+                        "")      shift ;;
+                        *)       _pl_slugs="$_pl_slugs $1"; shift ;;
+                      esac
+                    done
+                    set -- $_pl_slugs
+                    # FRAMING IS A DECLARED MODE, NOT A CONSEQUENCE OF ARITY. Deriving it from the
+                    # slug COUNT made one slug and two slugs two different output formats, and a
+                    # caller that parses frames then reads a one-slug corpus as ZERO verdicts - it
+                    # is looking for lines the driver had no reason to print. That is exactly what
+                    # happened: `check-unattended.sh` check 30 red on every fixture holding a
+                    # single build, while the real corpus always gave it several and looked fine.
+                    # A caller that wants frames now SAYS so, and gets them at any arity.
+                    if [ $# -le 1 ] && [ -z "$_pl_framed" ]; then verb_plan "${1:-}"; exit $?; fi
+                    for _pl_s in "$@"; do
+                      printf 'unattended-plan-open: %s\n' "$_pl_s"
+                      ( verb_plan "$_pl_s" ); _pl_one=$?
+                      printf 'unattended-plan-rc: %s %s\n' "$_pl_s" "$_pl_one"
+                    done
+                    exit 0 ;;
     --phase)        shift; PH_SLUG=${1:-}; shift 2>/dev/null || true; PH_WANT=${1:-}; shift 2>/dev/null || true
                     PH_WIT=""
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
