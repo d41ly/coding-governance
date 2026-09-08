@@ -679,7 +679,7 @@ CANONEOF
     # merely starts with those letters — `nonempty-rows` read as "declares nothing", and the item
     # returned MET with no record, no verdict and no override entry.
     case "$schk" in none|'none '*|none[!A-Za-z0-9-]*) schk="" ;; esac
-    if [ -n "$COUNTS_FOR" ] || [ -z "$(printf '%s' "$schk" | tr -d '[:space:]')" ]; then :; else
+    if [ -n "$COUNTS_FOR" ] || [ -z "${schk//[[:space:]]/}" ]; then :; else
       # The run ids come from the PIECE records, so this reports on the runs that actually produced
       # something here rather than on a roster no merge-bar run can see.
       # THE INNER ENUMERATION IS SPLIT-SAFE, the outer one does not need to be: run ids are the
