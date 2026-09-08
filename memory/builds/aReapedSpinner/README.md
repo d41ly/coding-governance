@@ -73,16 +73,16 @@ ids TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReap
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration](spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md) | 1 | 2 | OPEN | rev-3 | 2026-09-08 |
-| [TOOL-aReapedSpinner-1 — the census: one bounded read, keyed on the id every process has](spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md) | 2 | 2 | OPEN | rev-3 | 2026-09-08 |
-| [TOOL-aReapedSpinner-2 — the scope fence: attribution is a TREE property, computed once](spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md) | 3 | 2 | OPEN | rev-3 | 2026-09-08 |
-| [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 4 | 2 | OPEN | rev-3 | 2026-09-08 |
-| [TOOL-aReapedSpinner-4 — the reaper: walk both graphs, signal per kind, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 5 | 2 | OPEN | rev-3 | 2026-09-08 |
-| [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 6 | 2 | OPEN | rev-3 | 2026-09-08 |
-| [TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 6 | 2 | OPEN | rev-3 | 2026-09-08 |
+| [TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration](spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md) | 1 | 2 | OPEN | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-1 — the census: one bounded read, keyed on the id every process has](spec/2026-09-08-spec-TOOL-aReapedSpinner-1.md) | 2 | 2 | OPEN | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-2 — the scope fence: attribution is a TREE property, computed once](spec/2026-09-08-spec-TOOL-aReapedSpinner-2.md) | 3 | 2 | OPEN | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS](spec/2026-09-08-spec-TOOL-aReapedSpinner-3.md) | 4 | 2 | OPEN | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-4 — the reaper: walk both graphs, signal per kind, VERIFY](spec/2026-09-08-spec-TOOL-aReapedSpinner-4.md) | 5 | 2 | OPEN | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled](spec/2026-09-08-spec-TOOL-aReapedSpinner-5.md) | 6 | 2 | OPEN | rev-4 | 2026-09-08 |
+| [TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak](spec/2026-09-08-spec-TOOL-aReapedSpinner-7.md) | 6 | 2 | OPEN | rev-4 | 2026-09-08 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

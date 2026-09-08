@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-3 — the classifier: age DECIDES, the CPU rate LABELS
 
-**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 4
+**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-08-build-TOOL-aReapedSpinner-2-union-graph-measured.md](../build/2026-09-08-build-TOOL-aReapedSpinner-2-union-graph-measured.md) | research | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -26,7 +27,7 @@ weight but WHY each one is judged so.
 - **S2** — the DECISION: a row is flagged when `age_s > PROCMON_AGE_CEILING`. Under the ceiling the
   verdict is `OK` whatever the rate or the parent. Observed by AC2.
 - **S3** — the LABELS, applied only to a flagged row, first match wins: `UNKNOWN` when `cpu_s`
-  is `None` OR the row is PARENT-UNKNOWN by §4; else `ORPHAN` when it is PARENTLESS by §4;
+  is `None`, which is the whole of PARENT-UNKNOWN by §4; else `ORPHAN` when it is PARENTLESS by §4;
   else `SPIN` when `cpu_s / age_s >= PROCMON_SPIN_RATE`; else `IDLE`. Observed by AC3-AC6.
 - **S4** — `classify.py --report` renders one line per flagged row plus a summary naming the rows
   HANDED TO IT and the flagged count, both derived. Observed by AC7.
@@ -84,8 +85,22 @@ reaped `lsass.exe`.
 
 **PARENTLESS: the row's `win_ppid` names no row in this census.** Its parent process is gone.
 
-**PARENT-UNKNOWN: `msys_ppid` is absent, or `cpu_s` is `None`.** The backend could not describe the
-row fully. This grades `UNKNOWN` and is NEVER `ORPHAN`.
+**PARENTLESS IS A LABEL AND NEVER A LICENCE.** Measured on this node: 24 of 337 rows are
+parentless and 18 are older than an hour — `csrss.exe`, `wininit.exe`, `winlogon.exe`,
+`explorer.exe`, `Spotify.exe`, `msedge.exe`. On Windows a parent exiting neither reparents its
+children nor clears the field, so parentless is the ORDINARY state of a long-lived desktop
+process and no age ceiling separates it from an abandoned one. The only thing between
+`reap-orphans` and `explorer.exe` is unit 2's fence, which is why this unit grades only members of
+the in-scope set and why that ordering is a safety requirement rather than tidiness.
+
+**PARENT-UNKNOWN: `cpu_s` is `None`, and nothing else.** The backend could not describe the row
+fully. This grades `UNKNOWN` and is NEVER `ORPHAN`.
+
+**`msys_ppid` is NOT part of either predicate.** rev-3 put it in PARENT-UNKNOWN, which grades every
+NATIVE row unknown — 300-plus of 313 here — and so makes `reap-orphans` inert over the entire
+population the kit exists to reap (D32). The parent question moved onto `win_ppid` at rev-3
+precisely because it has no sentinel; the MSYS graph carries no parent signal in this unit at all,
+and this unit's §3 Edges never claimed it did.
 
 The split is the whole of D18 and it is worth the two names. rev-2 folded `ppid 0` into "parentless"
 citing the measurement that says the opposite: `ps -W` reports EVERY non-MSYS Windows process with
@@ -149,12 +164,13 @@ unavailability, not on merit.
   its rate would have said `SPIN`. Observed by `selftest.py`, arm `test_orphan_outranks_rate`.
   Red when: the rate labels are tested first and a dead-parent row reports `SPIN`, which
   `reap-orphans` would then decline to kill.
-- **AC4** — When a flagged row's `win_ppid` names no census row, the verdict is `ORPHAN`. When a
-  flagged row has `msys_ppid` absent but a `win_ppid` that DOES name a live census row, the
-  verdict is `UNKNOWN` and never `ORPHAN`, and it is not reaped under `reap-orphans`. Observed
-  by `selftest.py`, arm `test_missing_msys_parent_is_unknown_not_orphan`.
-  Red when: an absent MSYS parent is read as a dead parent — 297 of 315 rows on this node,
-  including every native gate leg, which the default mode would then kill (D18).
+- **AC4** — When a flagged NATIVE row (`msys_ppid` absent) has a `win_ppid` naming no census row,
+  the verdict is `ORPHAN`, and under `reap-orphans` it IS killed. When a flagged row has
+  `cpu_s is None`, the verdict is `UNKNOWN` and it is NOT killed. Observed by `selftest.py`, arms
+  `test_native_parentless_row_is_orphan_and_reaped` and `test_no_cpu_row_is_unknown`.
+  Red when: `msys_ppid` participates in either predicate. rev-3 keyed PARENT-UNKNOWN on it, which
+  grades every native row unknown and makes `reap-orphans` inert over the whole target
+  population (D32) — the mirror image of D18, and introduced by D18's own repair.
 - **AC5** — When a flagged row's `win_ppid` names a LIVE census row, the verdict is not `ORPHAN`.
   Observed by `selftest.py`, arm `test_live_windows_parent_is_not_an_orphan`.
   Red when: liveness is inferred from a sentinel VALUE rather than from the snapshot.
@@ -196,6 +212,12 @@ input · floor moves with unit 1's arms, one suite.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-08 · S3 · §4 · AC4 · folded round 3 at its NON-CONVERGENT exit. D32:
+  PARENT-UNKNOWN drops its `msys_ppid` clause and is `cpu_s is None` alone — rev-3's version
+  graded every native row UNKNOWN and made the default mode inert over the entire target
+  population, which is D18's repair overshooting into D18's mirror image. §4 also gains the
+  measured false-positive population for PARENTLESS, so no later reader can read the label as
+  a licence.
 - rev-1 · 2026-09-08 · initial draft.
 - rev-2 · 2026-09-08 · header order · S1 · S3 · S4 · §3 · §4 · AC1 · AC4-AC7 · §8 F2 · folded
   round 1 and the live-predicate probe.

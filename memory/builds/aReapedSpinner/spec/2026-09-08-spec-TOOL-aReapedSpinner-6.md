@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-6 — the kit skeleton: a declared population an adopter joins by declaration
 
-**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 1
+**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-7 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-7 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -157,12 +158,13 @@ New: `tools/process-monitor/{kit.toml,adopt-process-monitor.sh,adopt-process-mon
   only witness, and that command reports whether a probe is DECLARED, never whether anyone ran
   it — an assertion with no witness (D26).
 - **AC8** — When the shipped `.process-monitor.conf` is read, no entry in `PROCMON_ROOTS` is an
-  ancestor of the system temp directory, AND `scope.py --check-path` answers ADMITTED for the
-  repository root. Observed by `adopt-process-monitor.test.sh`, arm
-  `test_shipped_roots_exclude_temp_and_admit_the_repo`.
-  Red when: either half fails. rev-2 stated the prohibition in prose and graded neither it nor
-  its counterpart, so an author could silently resolve the fork either way and every criterion
-  stayed green (D16).
+  ancestor of the resolved system temp directory. A pure text assertion over the conf, gradable at
+  `order 1`. Observed by `adopt-process-monitor.test.sh`, arm
+  `test_shipped_roots_exclude_the_temp_root`.
+  Red when: the prohibition is prose nobody grades (D16). **The counterpart — that the declared
+  roots actually ADMIT this repo's own work — is unit 2's AC15**, because it needs a census and a
+  closure and neither exists at `order 1`; rev-3 asked this unit for it and named a `--check-path`
+  mode no unit ships (D36).
 - **AC6** — When `README.md` is searched for the negative-scope heading, it is present and its
   section is non-empty. Observed by `adopt-process-monitor.test.sh`, arm
   `test_readme_states_what_it_does_not_check`.
@@ -204,6 +206,11 @@ does not ship, and a README with the negative-scope section removed · no assert
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-08 · AC8 · folded round 3 at its NON-CONVERGENT exit. D36: AC8 splits — the
+  temp-root prohibition stays here as a text assertion gradable at `order 1`, and the
+  roots-admit-this-repo half moves to unit 2 AC15, which has the census and the closure. rev-3
+  folded round 2's suggested fix literally and reintroduced D1's class: an order-1 unit citing
+  a mode shipped at order 3.
 - rev-1 · 2026-09-08 · initial draft.
 - rev-3 · 2026-09-08 · S3 · §3 Edges · §4 · AC5 · AC5b · AC8 · folded round 2. D16: the scratch
   root leaves S3 — unit 2's tree closure makes it unnecessary — and the temp-root prohibition

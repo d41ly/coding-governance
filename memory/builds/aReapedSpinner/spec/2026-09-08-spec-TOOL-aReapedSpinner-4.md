@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-4 — the reaper: walk both graphs, signal per kind, VERIFY
 
-**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 5
+**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-08-build-TOOL-aReapedSpinner-4-signal-namespace-measured.md](../build/2026-09-08-build-TOOL-aReapedSpinner-4-signal-namespace-measured.md) | research | TOOL-aReapedSpinner-1 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -27,8 +28,8 @@ exists for, and the only irreversible thing the kit does.
 - **S3** — the MEMBERSHIP test: every walked member must be in `scope_set`, the set unit 2 computed
   once over the whole census. A member outside it is DROPPED from the kill set and REPORTED; the
   call refuses entirely only when the walk ROOT is outside it. Observed by AC4, AC8.
-- **S4** — the SIGNAL is chosen per row: MSYS `kill` for a row MSYS can address, else
-  `taskkill //PID <winpid> //F` — the SINGLE-PID form, never `/T`. An unresolvable signal binary for
+- **S4** — the SIGNAL is chosen per row: MSYS `kill` for a row MSYS can address,   else `taskkill /PID <winpid> /F` — the SINGLE-PID form, never `/T`, invoked as a LIST ARGV
+  through `subprocess` with no shell. An unresolvable signal binary for
   a row's kind REFUSES for that row and reports it. Observed by AC9, AC10, AC11.
 - **S5** — `reap.py --sweep` owns the whole chain — census, scope, classify, kill per mode — and
   prints the census, scoped, flagged, killed and survivor counts, all derived. `--dry-run` runs the
@@ -71,7 +72,9 @@ exists for, and the only irreversible thing the kit does.
 
 ### The walk
 
-Build a child map from `win_ppid ∪ msys_ppid`, collect the transitive descendants of the target,
+Build a child map from the union of the two parent graphs — with every `msys_ppid` TRANSLATED to a
+`winpid` through the census's `msys_pid`→`winpid` join first, exactly as unit 2 §4 specifies, and a
+raw MSYS id never looked up in the winpid-keyed map (D37). Collect the transitive descendants,
 order by DEPTH DESCENDING, signal each before the target. Leaves first, because killing a parent
 first is what CREATES the orphans this kit reaps — measured, killing the top left all four
 descendants alive and one reparented in front of the probe. A visited-set terminates the walk on any
@@ -87,7 +90,17 @@ needed and neither substitutes for the other.
 | row | signal | why |
 |---|---|---|
 | MSYS can address it | the resolved MSYS `kill` binary | the namespace the MSYS edges are in; the arm that killed 5 of 5 |
-| MSYS cannot | `taskkill //PID <winpid> //F` | the only thing that killed a non-child native process |
+| MSYS cannot | `taskkill /PID <winpid> /F` | the only thing that killed a non-child native process |
+
+**`/PID` and `/F`, one slash.** The `//PID` spelling measured in this build's records is an MSYS
+SHELL idiom — the doubling is how bash is told not to path-mangle the argument — and a fixed-argv
+caller must not use it: verified on this node, `taskkill //PID` from a non-shell exec returns rc 1
+with an invalid-option error (D41). A bash-issued equivalent needs `//`; the Python one must not.
+Recorded here so the next reader does not "correct" it back.
+
+A non-zero exit from a signal binary is CLASSIFIED, not collapsed: invalid-argument,
+access-denied and no-such-process are three outcomes, and reporting all three as "survivor" is
+D21's failure mode with a different cause.
 
 The kind test is OPERATIONAL, not a label: `kill -0 <msys_pid>` answering is what makes MSYS the
 signal for that row. A row that answers neither probe is reported unsignalable rather than signalled
@@ -177,8 +190,8 @@ of four. The survivor set is `walked ∩ still-present` from a second census, RE
 - **AC10** — When a native process THIS SHELL DID NOT SPAWN is staged (via `Start-Process`) and
   targeted, it is dead by re-read, and an arm asserts `taskkill //PID` was the signal used.
   Observed by `selftest.py`, arm `test_non_msys_row_is_signalled_by_taskkill`.
-  Red when: the MSYS `kill` binary is used for it. Measured: it answers `No such process` and the
-  process survives, so a single-signal reaper reports that row a survivor forever (D21).
+  Red when: the MSYS `kill` binary is used for it, or the argv carries `//PID`, which a non-shell
+  exec rejects with rc 1 (D41). The arm asserts the argv the child actually RECEIVED.
   `fixture:` the arm spawns its own detached process; a process spawned by the test shell would be
   MSYS-addressable and would pass under the WRONG signal, which is the confound that nearly
   refuted this finding.
@@ -230,6 +243,11 @@ instance fix.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-08 · S4 · §4 · AC10 · folded round 3 at its NON-CONVERGENT exit. D37: the
+  walk's union is stated over TRANSLATED ids, mirroring unit 2 §4. D41: the `taskkill` spelling
+  is `/PID`/`/F` as a list argv — `//PID` is an MSYS shell idiom that a fixed-argv caller
+  cannot use, and rev-3 pinned the shell spelling as the exec'd one. A non-zero signal exit is
+  now classified rather than collapsed to "survivor".
 - rev-1 · 2026-09-08 · initial draft.
 - rev-2 · 2026-09-08 · S3 · S4 · S5 · AC1 · AC4 · AC6 · AC8-AC10 · §10 · folded round 1
   (D7, D8, D9, D12).

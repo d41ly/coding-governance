@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-7 — the gate runner's INTERRUPT path kills nothing, and that is the leak
 
-**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
+**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 |
 
 <!-- /gen:spec-records -->
 
@@ -26,12 +27,15 @@ and kit children.
   `cleanup()` removes the scratch dir. The reap is BOUNDED, and `ts_release`/`ts_drop_ticket`
   run whether it succeeds, fails or times out. Observed by AC1, AC7.
 - **S2** — the walk delegates to unit 4's `run_kill` when the monitor is present, which supplies
-  leaves-first ordering, verification as a return value, and no depth cap. Observed by AC2, AC5.
+  leaves-first ordering, verification as a return value, and no depth cap. **The recorded leg pids
+  are MSYS ids and are TRANSLATED to winpids through the census join before `run_kill` is
+  called**; a leg pid with no census row is reported UNRESOLVABLE rather than passed through.
+  Observed by AC2, AC5.
 - **S3** — CONDITIONAL delegation with an announced fallback: when the monitor is absent or would
   refuse, the runner uses its existing `remove_descendants` and PRINTS which, with the profile
   line. Observed by AC3, AC4.
 - **S4** — detection includes an admission probe of the RUNNER'S OWN PROCESS through
-  `scope.py --explain $$`, resolved at profile time, so "present but would refuse" is known
+  `scope.py --explain <winpid>`, its own MSYS pid translated first, resolved at profile time, so "present but would refuse" is known
   before the first leg is dispatched. The runner is the walk root's ancestor, so if it is in
   scope every leg it dispatches is too. Observed by AC4.
 - **S5** — the report names the WALKED count and the KILLED count as separate figures on both
@@ -100,7 +104,9 @@ a variable with the thing it guards.
 
 1. `tools/process-monitor/reap.py` present;
 2. `.process-monitor.conf` readable;
-3. **`scope.py --explain $$` answers IN SCOPE for the runner's own process.**
+3. **`scope.py --explain <the runner's own WINPID>` answers IN SCOPE.** The winpid is resolved
+   through the census's `msys_pid`→`winpid` join; `$$` is an MSYS id and unit 2 S7 takes a winpid
+   (D42).
 
 The third is why unit 2 needs an explain mode. rev-1 declared only the first two and then asked
 AC3 to announce a "present but refusing" state they cannot detect (D6); rev-2 probed the SCRATCH
@@ -157,16 +163,20 @@ arms in `tools/run-gates/run-gates.test.sh`. **This unit does NOT edit
   `test_absent_monitor_announces_itself_at_profile_time`.
   Red when: the fallback is silent, which makes a leaked grandchild indistinguishable from a clean
   stop.
-- **AC4** — When `PROCMON_ROOTS` does not admit the runner's scratch parent, the run announces the
-  fallback WITH the profile line — not at kill time — and does NOT report a gate failure. Observed
-  by `run-gates.test.sh`, arm `test_unadmitted_scratch_root_is_announced_before_dispatch`.
+- **AC4** — When `scope.py --explain` does NOT admit the runner's own process, the fallback is
+  announced with the profile line before any leg is dispatched, and no leg reds. Observed by
+  `run-gates.test.sh`, arm `test_unadmitted_runner_is_announced_before_dispatch`.
   Red when: detection tests only for file presence, so the refusal cannot be known until a kill is
-  attempted (D6); or a monitoring refusal is surfaced as a red leg, which would make a
-  misconfigured conf block every push.
-- **AC5** — When the monitor IS present and admits the scratch parent, the signal path's kill goes
-  through `run_kill` and the staged grandchild is verified dead by re-read. Observed by
-  `run-gates.test.sh`, arm `test_delegated_kill_verifies`.
-  Red when: delegation is wired but its return is ignored, so a survivor is not reported.
+  attempted (D6); or a monitoring refusal is surfaced as a red leg. rev-3 still named a SCRATCH
+  ROOT here, which rev-3 itself deleted from S4 and §4 — leaving the delegated path graded by
+  nothing (D35).
+- **AC5** — When `scope.py --explain` DOES admit the runner's own process, the signal path's kill
+  goes through `run_kill`, the winpid handed to it is the CENSUS's winpid for the recorded leg
+  rather than the recorded MSYS number, and the staged grandchild is verified dead by re-read.
+  Observed by `run-gates.test.sh`, arm `test_delegated_kill_translates_and_verifies`.
+  Red when: the bash-recorded pid is passed through unchanged (D39) — `run_kill` is keyed on
+  winpid, and an MSYS id there resolves to nothing or to an unrelated row; or delegation is wired
+  but its return is ignored, so a survivor is not reported.
 - **AC7** — When the reap in `cleanup()` is made to hang, the trap still completes within a
   declared bound and `ts_release` and `ts_drop_ticket` still run. Observed by
   `run-gates.test.sh`, arm `test_teardown_reap_cannot_strand_the_turnstile`.
@@ -205,6 +215,11 @@ written here.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-08 · S2 · S4 · §4 · AC4 · AC5 · folded round 3 at its NON-CONVERGENT exit.
+  D35: AC4 and AC5 still graded a scratch root rev-3 had deleted from S4 and §4, so the
+  delegated path was graded by nothing; both now grade the runner's own admission. D39: the
+  bash-recorded leg pids are MSYS ids and are translated to winpids before `run_kill`, which
+  is keyed on winpid. D42: the probe passes a winpid, not `$$`.
 - rev-1 · 2026-09-08 · initial draft.
 - rev-3 · 2026-09-08 · S1 · S4 · §3 Edges · §4 · AC7 · folded round 2. D20: the profile-time
   probe grades the RUNNER'S OWN PROCESS rather than the scratch path, because the walk root is a

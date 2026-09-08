@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-5 — the session seam: the verdict reaches an agent, throttled
 
-**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
+**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -87,8 +88,12 @@ rules require to stay visible, and silence is reserved for the genuinely clean c
 
 ### Files touched (estimate)
 
-New: `tools/process-monitor/procmon-hook.js`. Edited: `.claude/settings.json` (by unit 6's adopter,
-via the existing `tools/settings-merge.py` seam rather than a hand-written JSON edit).
+New: `tools/process-monitor/procmon-hook.js`. Edited: `.claude/settings.json` (through
+`tools/settings-merge.py`, never a hand-written JSON edit), `tools/process-monitor/kit.toml` (this
+unit's own `[[files]]` row and hook destination, per S4), `tools/process-monitor/adopt-process-monitor.sh`
+(the wiring step), and `tools/process-monitor/adopt-process-monitor.test.sh` (AC5's arm). rev-3 listed
+only the first two while S4 mandated the rest, so the disjointness argument for the order-6 pair
+rested on an incomplete file set (D45) — it still holds, but now on evidence.
 
 ## 5. Production-readiness checklist
 
@@ -168,6 +173,8 @@ arms, one suite.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-08 · §4 Files touched · folded round 3. D45: the file list omitted
+  three files S4 mandates editing, so the order-6 disjointness argument held by luck.
 - rev-1 · 2026-09-08 · initial draft.
 - rev-2 · 2026-09-08 · header order · §3 Edges · no findings in round 1.
 - rev-3 · 2026-09-08 · S4 · §3 Edges · AC9 · folded round 2. D23: the hook's `[[files]]` row

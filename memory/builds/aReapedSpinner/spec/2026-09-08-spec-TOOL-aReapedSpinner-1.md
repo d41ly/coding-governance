@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-1 — the census: one bounded read, keyed on the id every process has
 
-**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 2
+**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -13,6 +13,7 @@
 | [2026-09-08-prompt-TOOL-aReapedSpinner-1.md](../prompts/2026-09-08-prompt-TOOL-aReapedSpinner-1.md) | research | — |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md) | spec-audit | TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -31,8 +32,10 @@ consumer.
 - **S2** — the WINDOWS backend, a JOIN: `Get-CimInstance Win32_Process` supplies `winpid`,
   `win_ppid`, `cpu_s`, the creation time and `command` for EVERY process; MSYS `ps -W` supplies
   `msys_pid` and `msys_ppid` for the MSYS subset, joined on `WINPID`. Observed by AC2, AC7.
-- **S3** — `kind` is `msys` when `ps -W` supplied an msys id for that winpid, else `native`. Both
-  are first-class; neither is dropped. Observed by AC2, AC11.
+- **S3** — `kind` is decided by the `0x400000` BIT on the `ps -W` PID column: a PID carrying it is
+  a SYNTHETIC id for a non-cygwin process and yields `kind = 'native'` with `msys_pid = None`;
+  only a PID without it is a real MSYS id and yields `kind = 'msys'`. Both are first-class and
+  neither is dropped. Observed by AC2.
 - **S4** — the POSIX backend, one `ps -eo pid,ppid,etimes,times,args` read, where `winpid` and
   `msys_pid` are the same id, `win_ppid` and `msys_ppid` are the same id, and `kind` is `msys`.
   Observed by AC3.
@@ -97,8 +100,11 @@ backend    str         'windows-join' | 'posix-ps'
 is a NATIVE row, and its children are native rows. A census keyed on MSYS ids describes 3% of the
 population and structurally excludes the processes this kit exists to reap.
 
-**`ps -W`'s PID column is not a Windows pid.** Measured: it is `winpid | 0x400000`; all 321 rows had
-`PID != WINPID` (PID 4223612 against WINPID 29308). It is an MSYS id and is stored as `msys_pid`.
+**`ps -W`'s PID column is not a Windows pid, and it is not always an MSYS id either.** Measured: a
+non-cygwin process gets `winpid | 0x400000` (PID 4223612 against WINPID 29308), which addresses
+nothing MSYS can signal. **That bit IS the discriminator S3 uses.** Without it every row would be
+labelled `msys` — `ps -W` supplies a PID for all of them — and the whole native population would
+be handed to a signal that cannot reach it (D33).
 
 ### The two parent graphs, and which is for what
 
@@ -165,12 +171,14 @@ and the caller sees an `AttributeError` far from the cause.
   `selftest.py`, arm `test_row_contract_is_complete`.
   Red when: a backend adds or drops a field, or `winpid` is ever absent — it is the primary key and
   every consumer joins on it.
-- **AC2** — When the Windows backend runs, the returned set contains at least one `kind == 'msys'`
-  row AND at least one `kind == 'native'` row; the msys row's `msys_ppid` equals what `ps -ef`
+- **AC2** — When the Windows backend runs, `native` rows are the MAJORITY and a run grading fewer
+  than half the rows native REDS; the msys row's `msys_ppid` equals what `ps -ef`
   reports for it, and the native row's `msys_pid` is `None` while its `win_ppid` is an integer.
   Observed by `selftest.py`, arm `test_both_kinds_are_present_and_distinguished`.
-  Red when: the census returns only the MSYS subset — 10 of 313 rows here — which is what rev-2's
-  key produced and what makes every native descendant unwalkable (D22).
+  Red when: the census returns only the MSYS subset (D22), or grades the whole table `msys`
+  because no discriminator was applied (D33). "At least one of each" was the rev-3 wording and
+  it passes on a table labelled entirely one way — a partition criterion must assert the
+  partition's SHAPE against the measurement, which here is 10 msys of 313.
   `fixture:` needs live MSYS `ps` and PowerShell; off Windows the arm SKIPS with a named reason,
   printed, never silent.
 - **AC3** — When the POSIX backend parses a captured `ps -eo` fixture, its rows carry `winpid ==
@@ -215,11 +223,15 @@ and the caller sees an `AttributeError` far from the cause.
   `test_summary_counts_are_derived`.
   Red when: any count is a literal, or one is omitted so a class goes missing unnoticed.
   `figure:` DERIVED — the arm compares the printed counts against the fixture's own length.
-- **AC11** — When every row of the frozen fixture is put to the liveness probe its OWN `kind`
-  implies — `kill -0 <msys_pid>` for `msys`, a CIM presence check on `winpid` for `native` — every
-  row answers. Observed by `selftest.py`, arm `test_every_row_answers_its_own_liveness_probe`.
-  Red when: the census claims a row whose namespace nothing can address, which is the state rev-2
-  shipped for 300 of 313 rows and the precondition for unit 4 signalling into a void (D21).
+- **AC11** — When every row of a LIVE census read on this node is put to the liveness probe its own
+  `kind` implies — `kill -0 <msys_pid>` for `msys`, a CIM presence check on `winpid` for
+  `native` — every row answers, and the count of non-answering rows is reported. A row that dies
+  between the scan and the probe is re-read once before being counted. Observed by
+  `selftest.py`, arm `test_every_live_row_answers_its_own_liveness_probe`; SKIPPED with a named,
+  printed reason off Windows.
+  Red when: the census claims a row whose namespace nothing can address (D21). rev-3 aimed this
+  at the FROZEN fixture, whose rows are all long dead, so it could neither pass nor fail (D40):
+  a criterion whose observation is a LIVE property needs a live subject.
 
 ## 7. Gates
 
@@ -250,6 +262,11 @@ suite is new.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-08 · S3 · §4 · AC2 · AC11 · folded spec-audit round 3 at its NON-CONVERGENT
+  exit. D33: `kind` gains its discriminator — the `0x400000` bit — which rev-3 never stated, so
+  every row would have graded `msys`. AC2 now asserts the partition's SHAPE against the
+  measured 10-of-313, because "at least one of each" passes on a table labelled entirely one
+  way. D40: AC11 moves off the frozen fixture, whose rows are dead, onto a live read.
 - rev-1 · 2026-09-08 · initial draft.
 - rev-2 · 2026-09-08 · S2 · S7 · S8 · S9 · AC2 · AC7-AC10 · §10 · folded spec-audit round 1
   (D13, D14) and the live-predicate probe.

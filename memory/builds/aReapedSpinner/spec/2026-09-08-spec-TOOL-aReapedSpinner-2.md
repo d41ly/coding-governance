@@ -1,6 +1,6 @@
 # TOOL-aReapedSpinner-2 — the scope fence: attribution is a TREE property, computed once
 
-**Status:** OPEN · rev-3 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 3
+**Status:** OPEN · rev-4 · 2026-09-08 · node a · Tier-2 · base e2b82a53 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-08-build-TOOL-aReapedSpinner-2-union-graph-measured.md](../build/2026-09-08-build-TOOL-aReapedSpinner-2-union-graph-measured.md) | research | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-3 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round1.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 | [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round2.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
+| [2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md](../reviews/2026-09-08-review-TOOL-aReapedSpinner-1-spec-audit-round3.md) | spec-audit | TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-7 |
 
 <!-- /gen:spec-records -->
 
@@ -25,18 +26,24 @@ This is the safety property the whole kit rests on.
   returning the in-scope SET of winpids plus, per member, the ROOT that admitted it. One call over
   the whole census; not a per-row predicate. Observed by AC1.
 - **S2** — ATTRIBUTABLE ROOTS: a row is a root when a declared `PROCMON_ROOTS` prefix matches its
-  resolved program path or one of its path-shaped argument TOKENS, per §4's tokenizer, and it is
-  not in `self_chain`. Observed by AC1, AC2, AC8.
+  resolved program path or one of its path-shaped argument TOKENS, per §4's tokenizer. **Being in
+  `self_chain` does NOT disqualify a root.** Observed by AC1, AC2, AC8, AC12.
 - **S3** — THE CLOSURE: the in-scope set is the roots plus their transitive descendants over the
-  UNION of the census's two parent graphs. Nothing else is in scope. Observed by AC3, AC9.
-- **S4** — the SELF fence: the calling process, every ancestor of it, and their descendants reached
-  only through them are excluded, and a root is never taken from `self_chain`. Observed by AC4.
+  UNION of the census's two parent graphs, **TRANSLATED into the `winpid` namespace first** and
+  walked under a VISITED-SET. Nothing else is in scope. Observed by AC3, AC9, AC13, AC14.
+- **S4** — the SELF fence, restated: self-chain rows ARE in scope and MAY be roots; they are never
+  KILL TARGETS and never WALK ROOTS. Unit 4 S3 enforces the second half. Observed by AC4, AC12.
 - **S5** — a blank or absent `PROCMON_ROOTS` REFUSES, and so does a root shorter than a declared
   minimum or equal to a filesystem root. Observed by AC5, AC6.
 - **S6** — prefix matching is normalized, case-folded and separator-anchored, so `…/repo` does not
   admit `…/repo-other`. Observed by AC7.
 - **S7** — `scope.py --explain <winpid>` prints whether one row is in scope and by which root and
-  chain. Observed by AC10.
+  chain. The argument is a WINPID; a caller holding an MSYS id translates it first. Observed by
+  AC10.
+- **S9** — `scope.py --check-conf` asserts the SHIPPED `PROCMON_ROOTS` admits this repo's own work:
+  `derive_scope` over the frozen corpus with the shipped conf returns a non-empty set. Unit 6
+  cannot make this assertion at `order 1` — neither the census nor the closure exists there
+  (D36). Observed by AC15.
 - **S8** — a row whose `command` is `None` cannot be a ROOT, but may still be a DESCENDANT of one.
   Unattributable rows that are in no closure are COUNTED and the count is printed. Observed by AC11.
 
@@ -97,6 +104,23 @@ rows carrying `export TEMP=` also name a real path under it. That is why no temp
 declared at all (§3), and why unit 6 §4 keeps the prohibition. The tokenizer closes the assignment
 vector; the non-declaration closes the rest.
 
+### The namespace translation, which the union is meaningless without
+
+`msys_ppid` names an MSYS id. The census is keyed on `winpid`. So every `msys_ppid` is mapped
+through the census's own `msys_pid`→`winpid` join BEFORE it joins the union, and a raw MSYS id is
+never looked up in the winpid-keyed map. An `msys_ppid` with no such mapping contributes NO edge
+and is COUNTED. rev-3 wrote `win_ppid ∪ msys_ppid` as if the two were the same kind of number
+(D37); they are not, and the union without the translation either silently degenerates to the
+Windows graph or attaches an unrelated process whose winpid happens to equal an MSYS id.
+
+### The walk terminates, and the guarantee is in this unit
+
+The closure and the `self_chain` walk both carry a VISITED-SET. This build measured at least one
+cycle in the union graph over 337 live rows, so termination is not an assumption. Cycle-broken
+edges are counted beside the start-time dropped-edge count, so a cyclic graph is visible in the
+output rather than inferred from a hang. Unit 4 §8 F3 carries the same guarantee for its own
+walk; rev-3 put it there and not here (D38).
+
 ### The closure, and why it is the whole fence
 
 Roots are computed over the census. The in-scope set is their transitive descendant closure over
@@ -117,11 +141,17 @@ precede its parent's: an edge whose child is OLDER than its claimed parent is dr
 closure and counted. That is the corroboration round 2 asked for, applied where it belongs — in the
 graph, once, rather than per member inside the reaper.
 
-### The self fence
+### The self fence, and why it may not bar a root
 
-`self_chain` is the calling process and its ancestors, walked over the same union graph. Those rows
-are never roots. A row reachable ONLY through the self chain is excluded with them; a row also
-reachable from a genuine root stays in scope, because it is genuinely ours.
+`self_chain` is the calling process and its ancestors, walked over the same translated union graph
+under a visited-set. **They are IN SCOPE and they may be ROOTS.** What they may never be is a kill
+target or a walk root.
+
+rev-3 barred them from being roots, and that empties the in-scope set in the shape the kit
+actually ships into (D34): the monitor runs FROM a session whose shell is the process carrying the
+absolute repo path, so that shell is both the only attributable root and a member of the self
+chain. Barring it leaves nothing to close over. Conflating "ours" with "killable" is what caused
+it; they are two questions and this unit answers only the first.
 
 ### Files touched (estimate)
 
@@ -146,9 +176,11 @@ reachable from a genuine root stays in scope, because it is genuinely ours.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `derive_scope` runs over the frozen fixture, the returned set equals a
-  hand-enumerated expected set recorded in the test, and each member names the root that admitted
-  it. Observed by `selftest.py`, arm `test_scope_over_the_frozen_corpus_is_exact`.
+- **AC1** — When `derive_scope` runs over the frozen fixture — which INCLUDES at least one
+  genuinely parentless, genuinely ancient, genuinely not-ours row such as `explorer.exe` — the
+  returned set equals a hand-enumerated expected set, each member names the root that admitted it,
+  and that not-ours row is NOT in it. Observed by `selftest.py`, arm
+  `test_scope_over_the_frozen_corpus_is_exact`.
   Red when: the set differs in either direction. This is the corpus arm round 2 asked for: a
   carve-out whose precondition never occurs reds at authoring time rather than at adoption.
 - **AC2** — When a row's program path is under a declared root, it is a ROOT and its verdict names
@@ -159,11 +191,27 @@ reachable from a genuine root stays in scope, because it is genuinely ours.
   python.exe(native)`, all four are in scope and the last two are in scope ONLY by closure.
   Observed by `selftest.py`, arm `test_closure_reaches_bare_argv_and_native_descendants`.
   Red when: any is refused. rev-2 refused three of the four, which is D9, D20 and D22 together.
-- **AC4** — When the calling process and its ancestors are graded, none is a root, and a row
-  reachable only through them is not in scope; a row also reachable from a genuine root IS.
-  Observed by `selftest.py`, arm `test_self_chain_is_never_a_root`.
-  Red when: only the immediate parent is excluded, leaving the session's own shell killable; or the
-  whole self-reachable subtree is excluded, which would exclude everything the session started.
+- **AC4** — When the calling process's ancestor carries a declared root in its argv, that ancestor
+  IS a root, its descendants ARE in scope, and the returned set marks every self-chain member
+  NOT-KILLABLE. Observed by `selftest.py`, arm `test_self_chain_is_in_scope_but_not_killable`.
+  Red when: self-chain rows are barred from being roots, which empties the set in the shape the
+  product runs in (D34); or they are killable, which lets a sweep reap its own session.
+- **AC12** — When `derive_scope` is invoked the way the PRODUCT invokes it — from this process,
+  with the real ancestry as `self_chain`, over a LIVE census on this node — the returned in-scope
+  set is NON-EMPTY. Observed by `selftest.py`, arm `test_live_scope_is_not_empty`.
+  Red when: it is empty. Every fence defect across three audit rounds was invisible because the
+  fence was only ever exercised over planted fixtures; this is the liveness assertion on the one
+  component whose failure mode is silent success.
+- **AC13** — When a fixture carries a row whose MSYS parent and Windows parent DIFFER and only the
+  MSYS edge reaches the child, the child is in the closure; and when an `msys_ppid` maps to no
+  census row, no edge is added and the unmapped count is non-zero. Observed by `selftest.py`, arm
+  `test_msys_edges_are_translated_before_the_union`.
+  Red when: raw MSYS ids are looked up in the winpid-keyed map (D37) — measured, the two graphs
+  disagree on 7 of 330 overlaid rows, so this is not hypothetical.
+- **AC14** — When the fixture contains a two-row cycle, `derive_scope` RETURNS and reports a
+  non-zero cycle-broken count. Observed by `selftest.py`, arm `test_cyclic_graph_terminates`.
+  Red when: the walk has no visited-set (D38). At least one cycle was measured over 337 live rows
+  on this node.
 - **AC5** — When `PROCMON_ROOTS` is blank, `derive_scope` raises and `scope.py` exits non-zero
   naming the key. Observed by `selftest.py`, arm `test_blank_roots_refuses`.
   Red when: a blank list yields an empty set and the kit reports a clean tree it never examined.
@@ -198,6 +246,12 @@ reachable from a genuine root stays in scope, because it is genuinely ours.
   `selftest.py`, arm `test_no_command_row_can_be_a_descendant_but_not_a_root`.
   Red when: such rows are silently dropped — measured, 115 of 314 rows here — or promoted to roots.
 
+- **AC15** — When `scope.py --check-conf` runs with the shipped conf, it exits 0 and names the
+  admitted count; with a conf whose roots name an unrelated directory, it exits non-zero.
+  Observed by `selftest.py`, arm `test_shipped_conf_admits_this_repo`.
+  Red when: the assertion is left at unit 6, which runs at `order 1` where the mode it needs does
+  not exist — D1's class, regressed (D36).
+
 ## 7. Gates
 
 `line length` · `lexicon naming predicates` · `govkit selfcheck` · `dead-path carriers (deleted files still named)`
@@ -226,6 +280,14 @@ one suite.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-08 · S2 · S3 · S4 · S7 · S9 · §4 · AC1 · AC4 · AC12-AC15 · folded round 3 at
+  its NON-CONVERGENT exit. D34: self-chain rows are IN SCOPE and MAY be roots — rev-3 barred
+  them, which empties the set in the shape the product runs in, because the session shell is
+  both the only attributable root and a self-chain member. D37: `msys_ppid` is translated to a
+  winpid before the union; the two graphs disagree on 7 of 330 rows. D38: the closure and the
+  self-chain walk carry a visited-set, over a graph measured to contain a cycle. D36: the
+  conf-admits-this-repo assertion moves here from unit 6, which cannot make it at `order 1`.
+  AC1's corpus now carries a not-ours row, per the union-graph measurement.
 - rev-1 · 2026-09-08 · initial draft.
 - rev-2 · 2026-09-08 · S2 · S6 · S7 · S8 · §4 · AC6-AC10 · folded round 1 (D3, D6, D9, D11).
 - rev-3 · 2026-09-08 · §1 · S1 · S2 · S3 · S4 · S8 · §3 · §4 · every AC · §8 F2 · folded round 2.
