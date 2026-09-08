@@ -1688,7 +1688,12 @@ hit "$(run)" "a build's --plan reports NOT A UNIT rows AND claims every tracked 
 # ---- spec still on disk but no longer tracked is invisible to it - which is also the real shape
 # ---- this could take in a live tree.
 reset_tree
-git rm -q -r --cached memory/builds/tRun/spec memory/builds/tPlanOk/spec >/dev/null 2>&1
+# UNTRACK THE WHOLE POPULATION, not two builds by name. Naming tRun and tPlanOk left every
+# other fixture build's specs tracked, so the scan still read specs, the check never fired,
+# and this arm asserted a message the tool had no reason to emit. The fixture-no-op guard
+# below is what caught it - which is the entire reason `mutate` and this arm carry one.
+git ls-files "memory/builds/*/spec/*.md" | tr '
+' ' ' | xargs -0 -r git rm -q --cached >/dev/null 2>&1
 n=$((n+1)); [ -z "$(git ls-files "memory/builds/*/spec/*.md")" ] || { echo "FAIL fixture no-op: specs still tracked"; st=1; }
 hit "$(run)" "the spec scan that selects this check's population read no tracked spec at all, so both the selection and the clean result below are about an empty corpus rather than about the builds"
 
