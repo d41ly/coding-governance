@@ -1,6 +1,6 @@
 # TOOL-aQuenchedHarness-11 — the strays a stopped run leaves behind, named on demand
 
-**Status:** SPECCED · rev-1 · 2026-09-08 · node a · Tier-2 · base ab58d1cc · streams tooling · order 11
+**Status:** WONTDO · rev-2 · 2026-09-08 · node a · Tier-2 · base ab58d1cc · streams tooling · order 11 · superseded-by tools/process-monitor on branch/gate-runner-process-monitor-0d0fa8
 
 <!-- gen:spec-records -->
 
@@ -175,6 +175,22 @@ decision for whoever picks up `TOOL-aBoundedCeiling-12`.
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-08 · WONTDO, superseded before a line was written. Another live worktree on
+  this machine holds a CLOSED seven-unit build, `aReapedSpinner`, shipping
+  `tools/process-monitor/` and pushed to `branch/gate-runner-process-monitor-0d0fa8`. It is
+  strictly larger than this spec: its census REFUSES an unrecognised platform rather than
+  reporting an empty table, its classifier emits a SPIN label this spec declared OUT OF REACH,
+  its reaper walks leaves-first and VERIFIES each death after measuring `taskkill /T` at 25%
+  effective, and it carries a throttled session hook that puts the verdict in front of an agent
+  mid-turn instead of waiting to be asked. Building this would have been a second
+  implementation of a solved problem.
+  WHY THE §10 AUDIT MISSED IT, because that is the reusable part: memory-recall answers from
+  the committed corpus of the branch it runs on. Eight worktrees are live on this machine and
+  the index sees one. A reuse probe that cannot see sibling worktrees cannot answer "has anyone
+  built this", which is the question it exists for. Backlog row filed.
+  The research record stays: its two measured facts - the msys/Windows pid split and /proc
+  covering 12 of 41 processes - are true regardless of who ships the tool, and the surviving
+  build reached the same conclusion about the pid boundary independently.
 - rev-1 · 2026-09-08 · specced from a four-lens survey and three adversarially-judged designs, all
   three of which scored 3/10 from their own reviewers. Two design-killing facts were verified
   directly on this box rather than taken from the survey: the msys/Windows pid split, and `/proc`
