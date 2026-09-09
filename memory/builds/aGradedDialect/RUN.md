@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: d13576732e6837e4be62edf5c60eb43631f94cd0
-phase: RESEARCHING
+witness: d3291c5b69f17710789c6e1f7fac1bc4ee0aaa62
+phase: SPECCING
 branch-sha: d13576732e6837e4be62edf5c60eb43631f94cd0
 branch-ref: refs/heads/branch/lexicon-kit-typescript-34c322
 mode: prompt
@@ -22,3 +22,7 @@ anchor-ref: refs/heads/main
 base: d13576732e6837e4be62edf5c60eb43631f94cd0
 
 ## Parked
+
+2026-09-09T22:02:28Z review · item aGradedDialect-spec-set · reason verdict BLOCKED · blockers 3
+
+2026-09-09T22:03:04Z review · item TOOL-aGradedDialect-1 · reason verdict BLOCKED · blockers 3

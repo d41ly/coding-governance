@@ -69,20 +69,24 @@ coverage 19.3%. The decision named its own revisit test, and both halves now hol
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-09-10 · streams tooling
+**Build status:** INPROGRESS · 5 unit(s) · node a · opened 2026-09-10 · streams tooling
 ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aGradedDialect-1 — the mechanism fork for reading TypeScript, resolved against the compiler](spec/2026-09-10-spec-TOOL-aGradedDialect-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-09-10 |
+| [TOOL-aGradedDialect-1 — the mechanism fork for reading TypeScript, resolved against the compiler](spec/2026-09-10-spec-TOOL-aGradedDialect-1.md) | 1 | 2 | INPROGRESS | rev-2 | 2026-09-10 |
+| [TOOL-aGradedDialect-2 — the conformance corpus: fixtures a compiler extracted, frozen before the reader exists](spec/2026-09-10-spec-TOOL-aGradedDialect-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-10 |
+| [TOOL-aGradedDialect-3 — the TypeScript extractor: a tokenizer, a definition locator, and a coverage mode it has to earn](spec/2026-09-10-spec-TOOL-aGradedDialect-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-10 |
+| [TOOL-aGradedDialect-4 — the declaration surface for TypeScript, and the `.tsx` casing row as a declared refusal](spec/2026-09-10-spec-TOOL-aGradedDialect-4.md) | 4 | 2 | SPECCED | rev-2 | 2026-09-10 |
+| [TOOL-aGradedDialect-5 — the records: the darkness ruling retired where it is actually carried](spec/2026-09-10-spec-TOOL-aGradedDialect-5.md) | 5 | 1 | SPECCED | rev-1 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aGradedDialect-1.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -90,6 +94,10 @@ Ids no `spec-audit` record has ever named: TOOL-aGradedDialect-1.
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aGradedDialect-1` | no |
+| 2 | `TOOL-aGradedDialect-2` | no |
+| 3 | `TOOL-aGradedDialect-3` | no |
+| 4 | `TOOL-aGradedDialect-4` | no |
+| 5 | `TOOL-aGradedDialect-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

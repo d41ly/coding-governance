@@ -242,14 +242,147 @@ git ls-files '*.ts' '*.tsx' > /tmp/tsfiles.txt
 TS_MODULE=<adopter-root>/node_modules/typescript node ts-oracle.js /tmp/tsfiles.txt > /tmp/oracle.jsonl
 ```
 
-`regex_vs_oracle.py` — the scoring arm. Reading A is copied verbatim from
+`regex_vs_oracle.py` — the scoring arm, reproduced HERE in full. Reading A is copied verbatim from
 `tools/lexicon/lexicon.py`'s `PATTERN_SETS["js-regex"]`, so the arm grades the shipped bytes rather
 than a paraphrase of them; reading B is the four function patterns and four type patterns §4.1
 describes. Both readings drop a short control-keyword stop-list from the method arm only. It prints
-recall, precision, the A-versus-B disagreement count, and B's per-file recall distribution. The full
-source, including reading B's eight patterns, is reproduced in
-`memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-2.md` §4, where the fixture
-unit that owns the oracle can keep it beside the format it feeds.
+recall, precision, the A-versus-B disagreement count, and B's per-file recall distribution.
+
+**An earlier revision of this section forwarded the source to unit 2's spec §4 and did not carry it.**
+That spec declined to hold it, in writing, so two specs in one set stated opposite facts about one
+artifact and the 22.4% figure that kills C1 and C4 re-derived from nothing. Round 1 of the spec audit
+found it as a blocker; the bytes are below, and the forward-pointer is gone.
+
+```python
+"""Read-only: how far a REGEX reading of TypeScript is from the compiler's own reading.
+
+The discriminating experiment for aGradedDialect unit 1. It scores two regex readings against the
+`typescript` compiler ground truth produced by `ts-oracle.js`, over the adopter's whole tracked
+`.ts`/`.tsx` corpus, and it also scores the two regex readings against EACH OTHER -- which is the
+measurement the shell precedent turned on ("a number a second regex moves by half is not a
+population").
+
+Writes nothing outside stdout. Reads the adopter tree only for file bytes.
+"""
+import json
+import re
+import sys
+
+ROOT = sys.argv[1]          # adopter repo root
+ORACLE = sys.argv[2]        # oracle.jsonl
+
+# ---- reading A: exactly what the kit SHIPS today, applied to .ts/.tsx ------------------------
+# Copied verbatim from tools/lexicon/lexicon.py PATTERN_SETS["js-regex"] so the arm grades the
+# shipped bytes and not a paraphrase of them.
+A_FUNCS = [
+    re.compile(r"^\s*(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)", re.M),
+    re.compile(r"^\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>", re.M),
+]
+A_TYPES = [re.compile(r"^\s*(?:export\s+)?class\s+([A-Za-z_$][\w$]*)", re.M)]
+
+# ---- reading B: a good-faith TypeScript-aware regex set, the best C1/C4 could plausibly ship --
+B_FUNCS = [
+    # function declarations, incl. `export default function` and generics
+    re.compile(r"^\s*(?:export\s+)?(?:default\s+)?(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)", re.M),
+    # const/let/var arrow or function-expression bindings, tolerating a type annotation
+    re.compile(r"^\s*(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=]+)?=\s*(?:async\s*)?"
+               r"(?:function\b|<[^>]*>\s*\(|\()", re.M),
+    # class methods / object-literal methods: `  name(args) {` with modifiers
+    re.compile(r"^\s*(?:(?:public|private|protected|readonly|static|abstract|override|async|get|set)\s+)*"
+               r"([A-Za-z_$][\w$]*)\s*(?:<[^>]*>)?\s*\([^;]*\)\s*(?::[^{;]+)?\{", re.M),
+    # class property arrows: `  name = (args) => {`
+    re.compile(r"^\s*(?:(?:public|private|protected|readonly|static|override)\s+)*"
+               r"([A-Za-z_$][\w$]*)\s*(?::[^=]+)?=\s*(?:async\s*)?\([^)]*\)\s*(?::[^=]+)?=>", re.M),
+]
+B_TYPES = [
+    re.compile(r"^\s*(?:export\s+)?(?:default\s+)?(?:abstract\s+)?class\s+([A-Za-z_$][\w$]*)", re.M),
+    re.compile(r"^\s*(?:export\s+)?interface\s+([A-Za-z_$][\w$]*)", re.M),
+    re.compile(r"^\s*(?:export\s+)?type\s+([A-Za-z_$][\w$]*)", re.M),
+    re.compile(r"^\s*(?:export\s+)?(?:const\s+)?enum\s+([A-Za-z_$][\w$]*)", re.M),
+]
+
+# Keywords a same-line method regex cannot tell from a definition. Kept EXPLICIT rather than
+# tuned away: the point of the arm is to report what a regex reading actually costs, and a
+# stop-list this short is what any shipped set would carry.
+CONTROL = {"if", "for", "while", "switch", "catch", "return", "do", "else", "try", "function",
+           "class", "constructor", "await", "typeof", "in", "of", "new", "delete", "void", "with"}
+
+
+def read_regex(src, funcs, types):
+    """Names a regex reading finds. Control keywords are dropped from the method arm only."""
+    f = set()
+    for i, rx in enumerate(funcs):
+        for m in rx.finditer(src):
+            n = m.group(1)
+            if n not in CONTROL:
+                f.add(n)
+    t = set()
+    for rx in types:
+        t.update(m.group(1) for m in rx.finditer(src))
+    return f, t
+
+
+def score(hit, truth):
+    """(true positives, misses, spurious) for one file."""
+    return len(hit & truth), len(truth - hit), len(hit - truth)
+
+
+tot = {k: [0, 0, 0] for k in ("A.func", "A.type", "B.func", "B.type")}
+truth_n = {"func": 0, "type": 0}
+disagree_func = 0
+files = 0
+per_file_recall_b = []
+
+for line in open(ORACLE, encoding="utf-8"):
+    rec = json.loads(line)
+    try:
+        src = open(ROOT + "/" + rec["file"], encoding="utf-8", errors="replace").read()
+    except OSError:
+        continue
+    files += 1
+    tf = {n for n, _ in rec["funcs"]}
+    tt = {n for n, _ in rec["types"]}
+    truth_n["func"] += len(tf)
+    truth_n["type"] += len(tt)
+
+    af, at_ = read_regex(src, A_FUNCS, A_TYPES)
+    bf, bt = read_regex(src, B_FUNCS, B_TYPES)
+    disagree_func += len(af ^ bf)
+    if tf:
+        per_file_recall_b.append(len(bf & tf) / len(tf))
+
+    for key, (hit, truth) in {"A.func": (af, tf), "A.type": (at_, tt),
+                              "B.func": (bf, tf), "B.type": (bt, tt)}.items():
+        tp, miss, spur = score(hit, truth)
+        tot[key][0] += tp
+        tot[key][1] += miss
+        tot[key][2] += spur
+
+print(f"corpus: {files} file(s); oracle found {truth_n['func']} function/method definition(s) "
+      f"and {truth_n['type']} type definition(s)")
+print()
+for key in ("A.func", "A.type", "B.func", "B.type"):
+    tp, miss, spur = tot[key]
+    truth = tp + miss
+    hit = tp + spur
+    rec_ = tp / truth * 100 if truth else float("nan")
+    prec = tp / hit * 100 if hit else float("nan")
+    print(f"{key:7s} recall {rec_:5.1f}%  ({tp} of {truth})   "
+          f"precision {prec:5.1f}%  ({tp} of {hit})   missed {miss}  spurious {spur}")
+print()
+print(f"A vs B disagreement on functions: {disagree_func} name(s) one reading has and the other "
+      f"does not, against an oracle total of {truth_n['func']}")
+if per_file_recall_b:
+    per_file_recall_b.sort()
+    n = len(per_file_recall_b)
+    print(f"B per-file function recall: median {per_file_recall_b[n // 2] * 100:.1f}%, "
+          f"worst-decile {per_file_recall_b[n // 10] * 100:.1f}%, "
+          f"files at 0% {sum(1 for r in per_file_recall_b if r == 0)} of {n}")
+```
+
+```bash
+python regex_vs_oracle.py <adopter-root> /tmp/oracle.jsonl
+```
 
 ## 7. What this record does NOT claim
 

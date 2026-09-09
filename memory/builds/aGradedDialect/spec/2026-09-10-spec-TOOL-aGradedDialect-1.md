@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-1 — the mechanism fork for reading TypeScript, resolved against the compiler
 
-**Status:** INPROGRESS · rev-1 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 1 · ratified 2026-09-10
+**Status:** INPROGRESS · rev-2 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 1 · ratified 2026-09-10
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-10-build-TOOL-aGradedDialect-1-typescript-extraction-research.md](../build/2026-09-10-build-TOOL-aGradedDialect-1-typescript-extraction-research.md) | research | — |
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
+| [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 
 <!-- /gen:spec-records -->
 
@@ -118,9 +119,11 @@ sibling unit.
 - **AC4** — When the record's §4.4 is read, it states the casing distribution per EXTENSION and the
   `canon.py` verb-lead rate for both, each as a measured figure with its date.
   Red when: §4.4 argues either objection away instead of reporting a number.
-- **AC5** — When §5 of the record is read, it names the pick, the three losses with their tests, and
-  the `.tsx` role-split problem the pick does not solve, and it refuses a `case:` selector kind by
-  the vacuity argument rather than leaving it open.
+- **AC5** — When §3, §4 and §5 of
+  `2026-09-10-build-TOOL-aGradedDialect-1-typescript-extraction-research.md` are read, §3 names the
+  four losing conditions, §4.1 and §4.3 report the three losses against them, and §5 names the pick,
+  the `.tsx` role-split problem the pick does not solve, and the `case:` selector refusal by the
+  vacuity argument.
   Red when: the record claims the pick solves the casing split, which the `.tsx` figures refuse.
 
 ## 7. Gates
@@ -147,6 +150,13 @@ must not red. The extractor's arms are units 2 and 3.
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft, authored after the research it records.
+- rev-2 · 2026-09-10 · AC5 · S5 · folded spec-audit round 1. AC5 addressed §5 of the record alone
+  while S5 scopes three clauses that land in §3, §4.1 and §4.3; the criterion now names the sections
+  that actually carry each one, rather than inviting a fold that would copy them into §5.
+  Its Red-when is unchanged and still traps a claim the record does not make. The round's blocker
+  against §4 and §5 was folded in the RECORD rather than here: `regex_vs_oracle.py` is now
+  reproduced in that record's §6, so this spec's "both probe snippets runnable" claim became true
+  where it stood instead of needing a retraction.
 
 ## 10. Reuse audit
 
