@@ -2363,8 +2363,8 @@ user_skills = "/tmp/gk-fake-skills"
                   str(sorted(_declared_writes)))
 
             marks = measure_plan_marks(pl2.stdout)
-            check("the default selection previews exactly 4 SIDE|rendered rows",
-                  marks.get("SIDE|rendered") == 4, str(marks))
+            check("the default selection previews exactly 5 SIDE|rendered rows",
+                  marks.get("SIDE|rendered") == 5, str(marks))
             # `ORDER|project-owned` is 4, and the four are NAMED: memory-recall's
             # `recall-fixture.json`, `check-recall.py` and `test_recall_floor.py`, withheld from the
             # payload by a `project-owned` rule with no sibling producer (TOOL-aWalkedCorpus-3 S8);
@@ -2380,7 +2380,7 @@ user_skills = "/tmp/gk-fake-skills"
             # ORDER row tells an adopter to supply a file gov does not want them to have. Recorded as
             # TOOL-aWalkedCorpus-6 rather than papered over here.
             check("...and the playbook file previews as a seed WRITE, not as an order",
-                  marks.get("write|seed") == 3 and marks.get("ORDER|project-owned") == 4,
+                  marks.get("write|seed") == 3 and marks.get("ORDER|project-owned") == 27,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
@@ -8648,7 +8648,10 @@ user_skills = "/tmp/gk-fake-skills"
             encoding="utf-8", newline="\n")
         (_qg / ".governance").mkdir(exist_ok=True)
         (_qg / ".governance" / "deploy.toml").write_text(
-            'gov_source = "local"\nprefix = "tools"\nkits = ["agent-cap"]\n\n'
+            'gov_source = "local"\nprefix = "tools"\n'
+            # settings-merge is DECLARED by agent-cap as a dependency, and govkit refuses a
+            # selection that omits it rather than widening one on the caller's behalf.
+            'kits = ["agent-cap", "settings-merge"]\n\n'
             '[answers]\nmemory_root = "memory"\n\n'
             '[gate_runner]\nkind = "manifest"\nfile = "tools/legs.json"\n'
             'grammar = "json-array"\ndedupe_key = "name"\n'
@@ -8661,7 +8664,7 @@ user_skills = "/tmp/gk-fake-skills"
         git(_qg, "config", "user.name", "t"); git(_qg, "config", "core.autocrlf", "false")
         git(_qg, "add", "-A"); git(_qg, "commit", "-qm", "base")
 
-        _qa = run("apply", "--target", str(_qg), "--kits", "agent-cap")
+        _qa = run("apply", "--target", str(_qg), "--kits", "agent-cap,settings-merge")
         check("aQuenchedHarness-3: the apply itself succeeds", _qa.returncode == 0,
               _qa.stdout + _qa.stderr)
 

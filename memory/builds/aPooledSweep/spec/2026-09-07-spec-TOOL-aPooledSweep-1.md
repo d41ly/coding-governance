@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-07-build-TOOL-aPooledSweep-1-acceptance-ledger-and-the-measured-ab.md](../build/2026-09-07-build-TOOL-aPooledSweep-1-acceptance-ledger-and-the-measured-ab.md) | journal | TOOL-aPooledSweep-2 TOOL-aPooledSweep-3 |
 | [2026-09-07-build-TOOL-aPooledSweep-1-why-the-port-could-not-finish.md](../build/2026-09-07-build-TOOL-aPooledSweep-1-why-the-port-could-not-finish.md) | research | — |
+| [2026-09-08-build-TOOL-aPooledSweep-1-full-sweep-rows.tsv](../build/2026-09-08-build-TOOL-aPooledSweep-1-full-sweep-rows.tsv) | journal | — |
 | [2026-09-08-build-TOOL-aPooledSweep-1-the-full-sweep-and-what-it-refutes.md](../build/2026-09-08-build-TOOL-aPooledSweep-1-the-full-sweep-and-what-it-refutes.md) | journal | — |
 | [2026-09-07-prompt-TOOL-aPooledSweep-1-brief.md](../prompts/2026-09-07-prompt-TOOL-aPooledSweep-1-brief.md) | journal | — |
 | [2026-09-07-prompt-TOOL-aPooledSweep-1.md](../prompts/2026-09-07-prompt-TOOL-aPooledSweep-1.md) | research | — |
