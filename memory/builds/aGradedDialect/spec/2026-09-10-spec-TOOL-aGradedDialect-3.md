@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-3 — the TypeScript extractor: a tokenizer, a definition locator, and a coverage mode it has to earn
 
-**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 3 · ratified 2026-09-10
+**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 3 · ratified 2026-09-10
 
 <!-- gen:spec-records -->
 
@@ -199,8 +199,11 @@ as a JSX element, and one lexer mode necessarily mis-reads one of the two popula
   possibly empty for a file that defines nothing. A file that does not tokenize RAISES, which
   `scan_corpus` surfaces as a named refusal. A file that cannot be read is already a separate refusal
   and stays separate, because an unreadable file is not an unparseable one.
-- observability — every run already prints the mode per armed extension, and the conformance arm
-  prints the measured score beside the floor rather than a boolean, so a passing run says by how much.
+- observability — the green `lexicon OK` line prints a mode for every DECLARED extension, dark ones
+  included, and prints nothing at all on a red run; both halves of "every run prints the mode per
+  armed extension" were wrong and round 3 said so. What carries the mode on a failure is the
+  conformance arm's own printed verdict, which reports the measured score beside the floor rather
+  than a boolean, so a run says by how much it cleared or missed.
 - risks — the reader is hand-written and its blind spots are whatever the fixtures do not carry, and
   the fixtures come from ONE adopter tree, so a construct absent there is untested rather than
   proven. The overload-signature refusal is the named instance: 0.0% of that corpus, so its arm is a
@@ -274,8 +277,13 @@ as a JSX element, and one lexer mode necessarily mis-reads one of the two popula
   `DEAD SNIFFER` problem.
   `fixture:` a new fixture in `selftest.py`; the tree this repo tracks carries zero `.ts` files, so
   no bar over gov's own corpus can observe this and a fixture is the only route.
+  The same run FIRST asserts a positive: it reports non-zero graded populations for `ts` and `tsx`,
+  with both fixture files appearing as extractor carriers. An empty `blind` set is only evidence once
+  something was extracted — an unarmed fixture produces the same empty set and would satisfy a pure
+  negative.
   Red when: `DEFINITION_SNIFF` is narrowed back — dropping `interface` alone is enough — and the
-  arm reports the fixture's carriers as blind. The arm is written per ARMED LANGUAGE rather than per
+  arm reports the fixture's carriers as blind. Red also when `blind` is empty over ZERO extractor
+  carriers, which is the fixture proving nothing rather than the sniffer agreeing. The arm is written per ARMED LANGUAGE rather than per
   file, so the next language added to `KNOWN_EXTS` inherits the check instead of rediscovering the
   refusal.
 ## 7. Gates
@@ -350,6 +358,11 @@ New arm: `tools/lexicon/selftest.py` · `DEFINITION_SNIFF` narrowed back — dro
   amendment's other half once AC9 arrived; it now names AC9 too and states that AC8 alone rides the
   ordinary bar. §7 also gained the `New arm:` line for AC9's staged break, which every other arm in
   this unit already carried.
+- rev-3 · 2026-09-10 · §5 · AC9 · folded spec-audit round 3, the disposal round. AC9 was a pure
+  NEGATIVE — an empty `blind` set — which an unarmed fixture satisfies exactly as well as a widened
+  sniffer does, so it now asserts non-zero graded populations for both extensions FIRST and carries
+  a second Red-when for the zero-carrier case. §5's observability row claimed every run prints the
+  mode per armed extension; the real line prints per DECLARED extension and only on a green run.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-4 — the declaration surface for TypeScript, and the `.tsx` casing row as a declared refusal
 
-**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 4 · ratified 2026-09-10
+**Status:** SPECCED · rev-4 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 4 · ratified 2026-09-10
 
 <!-- gen:spec-records -->
 
@@ -177,7 +177,7 @@ function and lands under `py.function snake`, leading with a canon verb.
 | `tools/lexicon/lexicon.py` | two `KNOWN_EXTS` rows |
 | `tools/lexicon/scaffold_lexicon.py` | four `SEED_CONVENTIONS` rows, the `CELLS` comment, the verb-pin comment |
 | `tools/lexicon/selftest.py` | one arm group for S4 |
-| `tools/lexicon/kit.toml` | the kit version, shared with units 3 and 5 rather than owned here |
+| `tools/lexicon/kit.toml` | NOT TOUCHED — the kit version is `TOOL-aGradedDialect-5` S6 and this file carries no version of its own; kept as a stated non-edit so a builder does not go looking |
 
 ## 5. Production-readiness checklist
 
@@ -194,7 +194,10 @@ function and lands under `py.function snake`, leading with a canon verb.
   green bar says nothing about it. That is the green-by-absence class, and §6 answers it by resting
   every criterion on a fixture or on a constant rather than on a gov-tree run.
 - testing — S4's arm is the left-shift, and it is landed only once its failing case has been watched:
-  point a `KNOWN_EXTS` parser id at a name `PARSERS` does not hold, confirm RED, unstage.
+  point a `KNOWN_EXTS` pattern-set id at a token present in NEITHER `PARSERS` nor `PATTERN_SETS`,
+  confirm RED, unstage. NOT "a parser id `PARSERS` does not hold" — S4's rule is mode-agnostic and
+  such an id may legitimately resolve through `PATTERN_SETS`, so that break can come back GREEN and
+  certify nothing.
 - migration — none for this repo. For an adopter who already ran `--scaffold`, the seeded rows arrive
   only on a re-scaffold; an existing declaration is theirs and this unit does not rewrite it.
 - user docs — `TOOL-aGradedDialect-5` owns every reader-facing carrier. What this unit writes is the
@@ -203,10 +206,16 @@ function and lands under `py.function snake`, leading with a canon verb.
 ## 6. Acceptance criteria
 
 - **AC1** — When `tools/lexicon/scaffold_lexicon.py` runs over a fixture tree carrying one `.ts` and
-  one `.tsx` file, the `LANGS` line it emits names `ts` and `tsx` at the mode
-  `python tools/lexicon/lexicon.py` reports for those extensions, rather than `ts::dark tsx::dark`.
-  `figure:` DERIVED — the mode is read from the tool's own output, never compared to a literal, so
-  the criterion holds under either verdict `TOOL-aGradedDialect-3` reaches.
+  one `.tsx` file, the `LANGS` line it emits names `ts` and `tsx` at mode tokens equal to
+  `lex.KNOWN_EXTS["ts"][1]` and `lex.KNOWN_EXTS["tsx"][1]`, read directly from
+  `tools/lexicon/lexicon.py`, rather than `ts::dark tsx::dark`.
+  `figure:` DERIVED — the expected token is read from the CATALOG, so the criterion holds under
+  either verdict `TOOL-aGradedDialect-3` reaches without naming one.
+  The rev-2 wording compared the emitted line against what `python tools/lexicon/lexicon.py` prints,
+  and `scaffold_lexicon.py` derives its `LANGS` line from that same catalog through that same tool —
+  so the criterion compared the scaffolder's output against the scaffolder's output and could not
+  fail. Round 3 found it; the operand is now the catalog the artifact READS rather than what it
+  emits, which is the shape `TOOL-aGradedDialect-5` AC1 already uses.
   `fixture:` the end-to-end scaffold arm in `tools/lexicon/selftest.py` builds a temp git repo today
   and commits one `.py` file; this criterion needs two more files in it.
   Red when: the rows are keyed `.ts` and `.tsx` with the dot. `ext_of` returns the token WITHOUT its
@@ -243,9 +252,9 @@ function and lands under `py.function snake`, leading with a canon verb.
 
 `lexicon naming predicates` · `lexicon selftest` · `lexicon wiring` · `memory hygiene`
 
-New arm: `tools/lexicon/selftest.py` · point a `KNOWN_EXTS` parser id at a name `PARSERS` does not
-hold, and set one `SEED_CONVENTIONS` value to a token outside `CONVENTIONS` · none, the file declares
-no assertion floor.
+New arm: `tools/lexicon/selftest.py` · point a `KNOWN_EXTS` pattern-set id at a token present in
+NEITHER `PARSERS` nor `PATTERN_SETS` on a non-final catalog row, and set one `SEED_CONVENTIONS` value
+to a token outside `CONVENTIONS` · none, the file declares no assertion floor.
 
 ## 8. Open questions
 
@@ -297,6 +306,13 @@ no assertion floor.
   `PARSERS` under both verdicts instead of a catalog nothing populates. §3 also gained an explicit
   `DEFINITION_SNIFF` non-goal: the widening is real and is allocated to `-3` S8, and round 2 found
   it held by no unit at all.
+- rev-4 · 2026-09-10 · §4 · §5 · §7 · AC1 · folded spec-audit round 3, the disposal round. AC1
+  compared the emitted `LANGS` mode against what `python tools/lexicon/lexicon.py` prints, and the
+  scaffolder derives that line from the same catalog through the same tool — S1's only criterion
+  could not fail. It now reads `KNOWN_EXTS` directly. The staged break in §5 and §7 was "a parser id
+  `PARSERS` does not hold", which S4's mode-agnostic rule lets resolve through `PATTERN_SETS` and
+  come back GREEN; it now names a token in neither catalog. §4's `kit.toml` row declared a version
+  edit no scope item owns, on a file carrying no version.
 - rev-3 · 2026-09-10 · §3 · declared the missing `consumes-from` edge to `TOOL-aGradedDialect-2`.
   That unit's §3 hands the declared FLOOR to this one and this side never wrote the reciprocal, which
   is the disagreement hygiene check 12 reports against the other file. It is a real dependency and not

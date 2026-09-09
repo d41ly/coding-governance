@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-2 — the conformance corpus: fixtures a compiler extracted, frozen before the reader exists
 
-**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -31,8 +31,9 @@ unit, the FLOOR that reader must clear before it may call itself `parser`.
   CONTAINS the readings that break a same-line regex rather than only the ones that do not.
   Observed by **AC2**.
 - **S4** — the FLOOR: what agreement with the oracle a reader must reach to declare `parser`, what
-  refusal budget it may spend getting there, and why each number is what it is. Observed by
-  **AC4**.
+  refusal budget it may spend getting there, and why each number is what it is. The constants being
+  READABLE is observed by **AC4**; the refusal budget being ENFORCED is observed by **AC6**, and the
+  two are separate criteria because a ceiling nothing compares against is a number, not a budget.
 - **S5** — the conformance runner and its arms in `tools/lexicon/selftest.py`, including the
   liveness case that proves the runner can FAIL: the shipped `js-regex` set scored against this
   corpus must miss the floor. Observed by **AC5** and **AC4**.
@@ -194,9 +195,10 @@ That ordering is the whole answer to `TOOL-dScaffoldedMirror-13`'s tautology obj
 checkable after the fact:
 
 ```bash
-git log --diff-filter=A --format=%H -- tools/lexicon/ts-conformance-fixtures.json
-git log --format=%H --reverse -S'scan_ts_tokens' -- tools/lexicon/lexicon.py | head -1
-git merge-base --is-ancestor <corpus-add-sha> <extractor-first-touch-sha>
+corpus_sha=$(git log --diff-filter=A --format=%H -- tools/lexicon/ts-conformance-fixtures.json)
+ext_sha=$(git log --format=%H --reverse -S'scan_ts_tokens' -- tools/lexicon/lexicon.py | head -1)
+test "$corpus_sha" != "$ext_sha"                       # STRICTLY earlier, not merely not-later
+git merge-base --is-ancestor "$corpus_sha" "$ext_sha"
 ```
 
 **The second query is a `-S` pickaxe and NOT a `--diff-filter=A`, and the difference is the whole
@@ -206,6 +208,12 @@ made the ancestor test FALSE for a perfectly correct build, so the criterion red
 sequencing it exists to certify. Round 1 of the spec audit found it. The pickaxe answers the
 question actually being asked — when did the extractor first EXIST — rather than when its host file
 was created.
+
+**And the inequality is not decoration: `--is-ancestor` is REFLEXIVE.** A commit is its own
+ancestor, so a single pass that added the corpus and the reader together satisfies the ancestor test
+perfectly — which is the exact case the ordering exists to refuse, since fixtures frozen in the same
+breath as the reader had that reader available to their author. Round 3 found it. The two shas must
+DIFFER and be ordered, and the `test` line above is what asserts the first half.
 
 This is a DOCUMENTED CHECK and not a gate leg, because `selftest.py` runs the kit inside a throwaway
 git repo and has no history to read there. It is run at the closing review and its result is written
@@ -251,9 +259,11 @@ so it is withheld from `govkit apply` exactly as the self-tests are), `.gitattri
   was a round-2 finding.** A `cp -r` copy-install does not read `kit.toml`, so a copy-installing
   adopter receives the corpus unless the runbook tells them to delete it. `WIRE-INTO-PROJECT.md:340`
   already carries exactly that step for `codebase-map`'s gov-only files; the matching line for this
-  corpus is `TOOL-aGradedDialect-5` S6.
+  corpus is `TOOL-aGradedDialect-5` S7.
 - perf / scale — the loader reads one file of at most a few hundred kilobytes and the runner walks
-  at most 150 records. It sits inside an 880-second leg ceiling with no measurable movement.
+  at most 150 records, with no measurable movement against the wall-clock ceiling it sits inside.
+  That ceiling is the `lexicon selftest` row in `tools/gate-legs.json`, read there and deliberately
+  not typed here — a figure beside the manifest that owns it is what this build's README forbids.
 - error / empty / loading states — an unreadable or empty corpus is a REFUSAL naming the file, never
   a skipped arm; a record missing a declared field names the record id.
 - observability — every arm prints the population it judged: the record count, the per-construct
@@ -290,6 +300,9 @@ so it is withheld from `govkit apply` exactly as the self-tests are), `.gitattri
   throwaway repo — so it is a documented check run at the closing review, not a gate leg.
   Red when: the extractor's first-touch commit is not a descendant, which would mean the fixtures
   were frozen after the reader existed and the tautology objection is unanswered. Red also when the
+  two queries return the SAME sha — `--is-ancestor` is reflexive, so a single pass carrying both the
+  corpus and the reader passes an ordering test it should fail, and that is precisely the case the
+  ordering exists to refuse. Red also when the
   extractor half is run as `--diff-filter=A` against a path already tracked at this build's base,
   which returns a commit predating the build and refutes a correct ordering.
 - **AC4** — When the conformance arm runs with no TypeScript entry in `PARSERS` or the resolved
@@ -303,6 +316,16 @@ so it is withheld from `govkit apply` exactly as the self-tests are), `.gitattri
   Red when: `js-regex` clears the floor, which would mean the corpus contains nothing a same-line
   regex cannot read and grades no reader at all.
 
+- **AC6** — When the conformance runner scores a reader, it COMPUTES the share of the corpus's
+  oracle definition sites covered by that reader's declared refusal list, asserts it at or under
+  `TS_FLOOR_REFUSAL_SHARE`, and asserts that every construct named in `parse_ts_defs.__doc__` has at
+  least one fixture on which the reader RAISES.
+  `figure:` DERIVED at observation time from the corpus and the docstring; no share is written into
+  this spec.
+  Red when: the refusal list names a construct no fixture exercises, which is a budget spent on a
+  refusal nobody demonstrated. Red also when the share is merely READABLE and compared to nothing —
+  which is what §4's F2 budget was until round 3, a declared ceiling with no arm reading it, and the
+  reason F1 was reachable by refusing enough.
 ## 7. Gates
 
 `lexicon selftest` · `lexicon naming predicates` · `govkit selfcheck` · `memory hygiene`
@@ -331,7 +354,7 @@ wearing a pass.
   rejected at extraction, and the corpus withheld from `govkit apply`. "So no adopter receives it"
   was the rev-1 wording and it OVERSTATED the containment: `govkit apply` honours `kit.toml` and a
   `cp -r` does not, so the copy-install path needs its own runbook step, allocated as
-  `TOOL-aGradedDialect-5` S6 against the `codebase-map` precedent at `WIRE-INTO-PROJECT.md:340`.
+  `TOOL-aGradedDialect-5` S7 against the `codebase-map` precedent at `WIRE-INTO-PROJECT.md:340`.
   With that step the price holds as priced; without it, a copy-installing adopter receives the
   corpus, and the honest sentence is the one that says so.
 - **F2 — does the floor grade imports?** RESOLVED (agent, 2026-09-10, delegated): no. The oracle
@@ -354,12 +377,20 @@ wearing a pass.
 - rev-3 · 2026-09-10 · §3 · §5 · §7 · §8 · folded spec-audit round 2. §5's security row and §8 F1
   priced the disclosure on `kit.toml` alone and claimed "no adopter receives it"; a `cp -r`
   copy-install does not read `kit.toml`, so the containment needed a runbook step and now cites one,
-  allocated as `TOOL-aGradedDialect-5` S6. §7 now states that `lexicon selftest` is a HELD leg, so
+  allocated as `TOOL-aGradedDialect-5` S7. §7 now states that `lexicon selftest` is a HELD leg, so
   this unit's DoD runs `GATE_SELFTESTS=1` — four criteria are observable nowhere else and an
   ordinary green bar says nothing about them. §3's `regex_vs_oracle.py` non-goal accused unit 1's
   record of a defect that rev-2 of that record fixed, and booked a closing follow-up for it; both
   are discharged and the follow-up is deleted. Note for a later fold: rev-3 of this spec landed
   after round 2 read it, so round 2's subject blob is not this text.
+- rev-4 · 2026-09-10 · S4 · §4 · §5 · AC3 · AC6 · folded spec-audit round 3, the disposal round.
+  NEW AC6: §4's F2 refusal budget was declared and read by nothing, so F1's exact-agreement floor
+  stayed reachable by refusing enough — the arm now computes the share and asserts each named
+  refusal has a fixture that raises. The freeze proof used `--is-ancestor` alone, which is
+  REFLEXIVE: one commit carrying both the corpus and the reader passed the ordering test it exists
+  to fail, so §4 and AC3 now require the two shas to DIFFER first. §5's perf row typed an 880 s
+  ceiling beside `tools/gate-legs.json`, which owns it. Three citations of the containment's payer
+  said S6; it is S7.
 - rev-3 · 2026-09-10 · §3 · the `hands-off` edge to `TOOL-aGradedDialect-4` named only the
   per-record `kind` and JSX construct tags, which that unit's §8 F1 does not decide on — so the edge
   read as an overreach and hygiene check 12's reciprocity arm redded on this file. It named the wrong

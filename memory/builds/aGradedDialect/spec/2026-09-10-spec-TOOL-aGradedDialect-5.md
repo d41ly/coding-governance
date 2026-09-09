@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-5 — the records: the darkness ruling retired where it is actually carried
 
-**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
+**Status:** SPECCED · rev-4 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -181,7 +181,7 @@ version only) · `tools/lexicon/canon.py` (marker only) · `.claude/skills/lexic
 - perf / scale — N/A. No runtime changes.
 - error / empty / loading states — N/A. The unit ships no runtime surface.
 - observability — the version markers ARE the observability: `kit version markers` reds when the
-  five carriers disagree, which is the only failure mode this unit can introduce mechanically.
+  four carriers disagree, which is the only failure mode this unit can introduce mechanically.
 - risks — the real risk is writing a coverage mode that unit 3 did not earn. §6 AC1 is written
   against that break specifically, and the edge to unit 3 is declared in §3 for the same reason.
 - testing — no new arm. Every criterion is observed by an existing merge-bar leg or by reading a
@@ -222,20 +222,30 @@ version only) · `tools/lexicon/canon.py` (marker only) · `.claude/skills/lexic
   non-`DEFERRED` token from the status vocabulary and a pointer to `builds/aGradedDialect/`, and the
   `memory hygiene` leg stays green over it.
   `fixture:` the row exists today at `memory/backlog/TOOL.md`, verified 2026-09-10.
+  The same criterion reads `memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-13.md`
+  and asserts its status-header TAIL names `builds/aGradedDialect/` as the superseding record. S4
+  scopes both halves and only the backlog half was observed; a DEFERRED spec whose header points
+  nowhere is the half that keeps it honest.
   Red when: the row's status moves while its one-liner still asserts the kit is blind to the
-  adopter's language, which relocates the contradiction rather than removing it.
+  adopter's language, which relocates the contradiction rather than removing it. Red also when the
+  row moves while that spec's header still names no successor.
 - **AC5** — When `bash tools/run-gates/run-gates.sh` runs `codebase-map coverage + freshness`, no
   key minted by units 2 to 4 is unclaimed and no claim in `memory/map/features/lexicon.md` names a
   key that does not exist.
   Red when: a key is claimed that no unit minted — the dead-key half of the same ratchet, and the
   failure mode of guessing the claims before units 2 to 4 land.
-- **AC6** — When `bash tools/check-kit-versions.sh` runs, the `gov:kit lexicon@` marker in every
-  carrier equals `KIT_LEXICON_VERSION`, at a value higher than the `1.2` this unit was written
-  against.
+- **AC6** — TWO clauses, because two different legs grade two different carrier sets.
+  FIRST: when `bash tools/check-kit-versions.sh` runs, the `gov:kit lexicon@` marker in each of the
+  FOUR carriers that gate pairs equals `KIT_LEXICON_VERSION`, at a value higher than the `1.2` this
+  unit was written against.
+  SECOND: `lexicon wiring` — `adopt-lexicon.sh --check` — is green over the RE-RENDERED Skill, which
+  is the carrier that gate does not pair and the reason a five-carrier claim here was wrong.
   `figure:` PINNED — `1.2` is the value read from `tools/lexicon/lexicon.py` on 2026-09-10; the
-  criterion asserts the relation, not the successor.
+  criterion asserts the relation, not the successor. The carrier COUNT is derived by the gate itself
+  and is named here only to say which of the two clauses owns which.
   Red when: `LEXICON.md` or `canon.py` keeps the old marker, which is the four-carrier stamp trap
-  this repo already has a gotcha record for.
+  this repo already has a gotcha record for. Red also when the Skill was not re-rendered and the
+  first clause passed anyway, which is the case a single-clause AC6 could not see.
 
 - **AC7** — When `WIRE-INTO-PROJECT.md` is read, it carries a `govkit:entry lexicon` anchor with a
   non-empty section body, and that section's `rm -f` line names exactly two paths: the kit's
@@ -276,13 +286,13 @@ This unit adds and moves no gate arm; the legs above are the ones its edits must
   under a live row — so nothing measures the state this resolution leaves behind.
 - **F2 — which unit bumps the kit version?** Units 3 and 4 both edit kit source, so any of the three
   could. RESOLVED (agent, 2026-09-10, delegated): this one, once, as §4 records. Three bumps for one
-  release would put three values through five carriers and red `kit version markers` twice on the
+  release would put three values through four carriers and red `kit version markers` twice on the
   way; this is an M2 AMEND of this build's own scope, which the mandate delegates, and it is
   declared here so a sibling spec claiming the same edit is a disagreement a cross-read can see.
 
 ## 9. Revision log
 
-- rev-1 · 2026-09-10 · initial draft, authored against the spec brief and against the five carriers
+- rev-1 · 2026-09-10 · initial draft, authored against the spec brief and against the four carriers
 - rev-2 · 2026-09-10 · S2 · S5 · S6 · S7 · §4 · AC1 · AC2 · AC7 · folded spec-audit round 2.
   AC1 compared against a mode string this repo CANNOT produce — it tracks zero `.ts` files — and now
   reads `KNOWN_EXTS` directly; it also picked up S1's compensating-check clause, which its rev-1
@@ -315,6 +325,12 @@ This unit adds and moves no gate arm; the legs above are the ones its edits must
   the runbook step, which is the version bump — that is round 3's finding 8, a MEDIUM, and it is not
   folded here because it lives in another spec and a rev bump there would re-open a reviewed
   document to fix a one-token citation. The step it should cite is S7 and has not moved.
+- rev-4 · 2026-09-10 · §4 · §5 · AC4 · AC6 · folded spec-audit round 3's non-blockers. AC4
+  observed only the backlog half of S4; the superseding pointer in `-13`'s own status header, which
+  is the half that keeps a DEFERRED spec honest, was observed by nothing and now has its own clause
+  and Red-when. AC6 graded the re-rendered Skill under `check-kit-versions.sh`, which does not pair
+  that carrier — the gate pairs FOUR and `lexicon wiring` is what guards the Skill — so AC6 is now
+  two clauses over two legs.
 
 ## 10. Reuse audit
 
