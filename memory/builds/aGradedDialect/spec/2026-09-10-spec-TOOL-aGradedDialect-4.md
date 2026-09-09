@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-4 — the declaration surface for TypeScript, and the `.tsx` casing row as a declared refusal
 
-**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 4 · ratified 2026-09-10
+**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 4 · ratified 2026-09-10
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-5 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-5 |
+| [2026-09-10-review-TOOL-aGradedDialect-1-round2.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round2.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-5 |
 
 <!-- /gen:spec-records -->
 
@@ -32,15 +33,25 @@ function of role — without an exception list and without re-arming the rule
 - **S3** — the comment the scaffold emits above `VERB_OFFENDER_PIN` states, from the two figures that
   walk has just measured, what a large offender share means and which door answers it. Observed by
   **AC3**.
-- **S4** — one self-test arm asserting that every shipped declaration row RESOLVES: a `parser` id
-  against `PARSERS`, a `probe` id against `PATTERN_SETS`, every `SEED_CONVENTIONS` key and value
-  against the closed sets in `tools/lexicon/lexicon_conf.py`, and the presence of S2's fourth key.
-  Observed by **AC4**.
+- **S4** — one self-test arm asserting that every shipped declaration row RESOLVES, MODE-AGNOSTICALLY:
+  every `KNOWN_EXTS` pattern-set id resolves in `PARSERS` OR in `PATTERN_SETS`, every
+  `SEED_CONVENTIONS` key and value resolves against the closed sets in
+  `tools/lexicon/lexicon_conf.py`, and S2's fourth key is present. **A mode-KEYED form would red a
+  correct build** — `TOOL-aGradedDialect-3` §8 F1 widens the `probe` dispatch precisely so a
+  below-floor tokenizer resolves through `PARSERS` under the `probe` token, and that unit writes no
+  `PATTERN_SETS` row at all, so "a `probe` id against `PATTERN_SETS`" refuses the exact configuration
+  the rev-2 fold amended this unit to survive. AC4 always carried the permissive rule; round 1's fold
+  landed in one carrier of three and this is the other two. Observed by **AC4**.
 - **S5** — the emitted `CELLS` block carries the reason the `tsx.function` row is `dark`, stated as a
   rule rather than as a figure measured on somebody else's corpus. Observed by **AC5**.
 
 ## 3. Non-goals (OUT)
 
+- **No `DEFINITION_SNIFF` widening.** Arming TypeScript trips the ratified `DEAD SNIFFER` refusal,
+  because six of the definition forms the locator returns sniff negative today. That is real and it
+  is `TOOL-aGradedDialect-3` S8's, whose §4 owns the form table — one owner for the forms, rather
+  than a second copy of them here. Named as a non-goal rather than left unmentioned, because round 2
+  found the obligation held by nobody.
 - **No tokenizer and no `PARSERS` entries.** This unit declares two parser ids; the functions those
   ids resolve to are `TOOL-aGradedDialect-3`'s. A declaration is not an implementation.
 - **No new `SELECTOR_KINDS` entry.** §8 resolves the `.tsx` fork against adding one, and §4 records
@@ -59,14 +70,20 @@ function of role — without an exception list and without re-arming the rule
 
 ### Edges
 
-- **consumes-from** `TOOL-aGradedDialect-3` — the two extractor entries the ids in S1 name, in
-  whichever catalog that unit's earned mode routes them to: `PARSERS` under `parser`, `PATTERN_SETS`
-  under `probe`. Without them `scan_corpus` refuses every `.ts` file by name, because an id absent
-  from the catalog its own mode selects is a named refusal there. That is why this unit's `order` is above that unit's, and it is
+- **consumes-from** `TOOL-aGradedDialect-3` — the two `PARSERS` entries the ids in S1 name, under
+  BOTH verdicts. That unit's S2 has no verdict branch and it writes no `PATTERN_SETS` row: its §8 F1
+  widens the `probe` dispatch so a pattern-set id naming a parser resolves through `PARSERS` whatever
+  the mode token says. Without those entries `scan_corpus` refuses every `.ts` file by name. The
+  rev-2 text said `PATTERN_SETS under probe`, which describes a row nothing in this build creates. That is why this unit's `order` is above that unit's, and it is
   a hard sequence rather than a preference.
 - **consumes-from** `TOOL-aGradedDialect-1` — the casing and verb-lead figures the fork in §8 is
   decided on, measured 2026-09-10 against `C:/projects/incms/main` and recorded in that unit's
   research record.
+- **consumes-from** `TOOL-aGradedDialect-2` — the declared FLOOR, which is what decides the mode S1
+  transcribes. S1 names `parser` at or above that floor and `probe` below it, so with no floor there
+  is no verdict for this unit to read. That unit also hands over its per-record `kind` and JSX
+  construct tags, as secondary evidence only. §8 F1 is resolved on `TOOL-aGradedDialect-1`'s casing
+  census instead, and the tags are what the role-derived selector §4 defers would restart from.
 - **hands-off** `TOOL-aGradedDialect-5` — the ruling in `LEXICON.md` and the kit README section on
   arming an unshipped language, both of which describe a world this unit ends.
 - **hands-off** external — the role-derived selector kind for React components. §8 refuses it on this
@@ -272,6 +289,20 @@ no assertion floor.
   unchanged. §3's `consumes-from` edge was the amendment's other half — it named
   `PARSERS` alone, which presupposes the very verdict the rest of this fold stopped presupposing —
   and now names the catalog the earned mode selects.
+- rev-3 · 2026-09-10 · S4 · §3 · folded spec-audit round 2. S4 specified the new self-test arm
+  MODE-KEYED — a `probe` id against `PATTERN_SETS` — which reds the exact build rev-2 amended this
+  unit to survive, since `TOOL-aGradedDialect-3` registers both ids in `PARSERS` under either
+  verdict and writes no `PATTERN_SETS` row. S4 now states AC4's permissive rule, and §3's edge names
+  `PARSERS` under both verdicts instead of a catalog nothing populates. §3 also gained an explicit
+  `DEFINITION_SNIFF` non-goal: the widening is real and is allocated to `-3` S8, and round 2 found
+  it held by no unit at all.
+- rev-3 · 2026-09-10 · §3 · declared the missing `consumes-from` edge to `TOOL-aGradedDialect-2`.
+  That unit's §3 hands the declared FLOOR to this one and this side never wrote the reciprocal, which
+  is the disagreement hygiene check 12 reports against the other file. It is a real dependency and not
+  a rubber stamp: S1 has always read the mode as `parser` at or above that floor, so this unit rested
+  a scope item on a sibling it had declared no edge to. The tags that unit also hands over are named
+  as the secondary evidence they are, because §8 F1 is resolved on `TOOL-aGradedDialect-1`'s census.
+  No criterion, option or resolution moved.
 
 ## 10. Reuse audit
 

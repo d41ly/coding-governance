@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-3 — the TypeScript extractor: a tokenizer, a definition locator, and a coverage mode it has to earn
 
-**Status:** SPECCED · rev-1 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 3 · ratified 2026-09-10
+**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 3 · ratified 2026-09-10
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
+| [2026-09-10-review-TOOL-aGradedDialect-1-round2.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round2.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 
 <!-- /gen:spec-records -->
 
@@ -34,7 +35,18 @@ a probe-grade reading is the defect this build's README names as its own bar.
 - **S6** — the dispatch that makes a tokenizer-shaped reader REACHABLE under the `probe` mode token,
   which today refuses it before it runs. Observed by **AC7**.
 - **S7** — the kit hygiene this unit's own edits owe: the offender pins re-measured rather than
-  raised, the kit version stamped, and the rendered Skill re-rendered. Observed by **AC8**.
+  raised, and the rendered Skill re-rendered. The kit VERSION stamp is deliberately not here —
+  `TOOL-aGradedDialect-5` §8 F2 allocates it, and two units claiming one bump with neither observing
+  it is how a stamp gets bumped twice or not at all. Observed by **AC8**.
+- **S8** — `DEFINITION_SNIFF` in `tools/lexicon/lexicon.py` widened to the definition forms §4's
+  locator table returns. Measured 2026-09-10 against the shipped regex, six of them sniff NEGATIVE:
+  `export interface Props`, `export type Id =`, `export enum`, `export const Card: React.FC = () =>`,
+  `const pick = <T,>(x) =>` and `export default function App()`. Because `extractor_carriers` is
+  populated by `if funcs or types_`, a `types.ts` carrying only an `interface` and a `type` — a
+  near-universal shape in a real TypeScript tree — lands in `blind` and appends the ratified
+  `DEAD SNIFFER` problem, which REDS the run. So the first adopter file arming this feature reds
+  their gate on the run right after `--scaffold`, which is the feature's only intended consumer
+  path. Cited to `TOOL-dScaffoldedMirror-6` S6, which ratified that refusal. Observed by **AC9**.
 
 ## 3. Non-goals (OUT)
 
@@ -156,10 +168,10 @@ as a JSX element, and one lexer mode necessarily mis-reads one of the two popula
 
 | file | why |
 |---|---|
-| `tools/lexicon/lexicon.py` | the tokenizer, the locator, two `PARSERS` rows, the two dispatch edits, the version constant |
+| `tools/lexicon/lexicon.py` | the tokenizer, the locator, two `PARSERS` rows, the FOUR armedness-predicate edits F1 names, and the `DEFINITION_SNIFF` widening S8 owns |
 | `tools/lexicon/selftest.py` | the sentinel, the construct arms, the refusal arms, the end-to-end arm, the conformance arm |
 | `.lexicon.conf` | only if the new names move an offender pin, and then as a RE-MEASURED value |
-| `.claude/skills/lexicon/SKILL.md` | re-rendered because the kit version is one of its placeholders and its own gate byte-compares it |
+| `.claude/skills/lexicon/SKILL.md` | re-rendered because its own gate byte-compares it against the declaration; the version placeholder it carries is bumped by `TOOL-aGradedDialect-5` |
 
 ### Alternatives rejected
 
@@ -176,10 +188,12 @@ as a JSX element, and one lexer mode necessarily mis-reads one of the two popula
 - security — the reader never evaluates, expands or executes what it reads, and imports stdlib only;
   the kit's self-containment refusal reds on any import that is neither stdlib nor a sibling file. It
   treats adopter source as untrusted TEXT and returns names and line numbers.
-- perf / scale — one linear pass per file with no backtracking, over a corpus walk that already opens
-  every tracked file once. The `lexicon selftest` leg carries a 300-second-class ceiling in
-  `tools/gate-legs.json`; the conformance arm's own cost is measured when it lands, not estimated
-  here.
+- perf / scale — the reader is a single pass per file and the fixtures are bounded by
+  `TOOL-aGradedDialect-2`'s corpus size. The wall-clock ceiling this unit must stay under is the
+  `lexicon selftest` row in `tools/gate-legs.json`, READ there and deliberately not typed here: an
+  earlier revision stated 300 s against a manifest that declares roughly three times that, which is
+  a number typed beside the source that owns it and is what this build's README forbids.
+
 - error / empty / loading states — three states and no fourth. A file that tokenizes returns a list,
   possibly empty for a file that defines nothing. A file that does not tokenize RAISES, which
   `scan_corpus` surfaces as a named refusal. A file that cannot be read is already a separate refusal
@@ -241,14 +255,29 @@ as a JSX element, and one lexer mode necessarily mis-reads one of the two popula
 - **AC7** — When a fixture declaration arming a `probe` row whose pattern-set id names a parser is
   graded end to end, the run reads that corpus and reports the extension as armed, rather than
   refusing the row as a set the kit does not ship.
+  The same run's printed `coverage — armed` line COUNTS that fixture's `.ts` files, which is the
+  reporting half of F1's four sites and is asserted separately: a row can extract correctly and still
+  be tallied unarmed, and a criterion that observed only the extraction would not see it.
   Red when: the run refuses with the unshipped-set message, which is what `tools/lexicon/lexicon.py`
-  does today and is the entire reason §8 F1 exists.
+  does today and is the entire reason §8 F1 exists. Red also when the extension extracts but the
+  coverage line does not count it, which is the two reporting sites disagreeing with the two
+  dispatch sites.
 - **AC8** — When `python tools/lexicon/lexicon.py` runs over this repo after the unit lands, it exits
   0, and any movement in `VERB_OFFENDER_PIN` is a re-measured value committed beside the names that
   moved it.
   Red when: a pin is RAISED to absorb a new name rather than the name being changed, which turns a
   two-sided equality into a rubber stamp.
 
+- **AC9** — When `tools/lexicon/selftest.py` grades a fixture tree whose only `.tsx` file defines
+  exactly one typed const arrow and one `interface`, and whose only `.ts` file defines exactly one
+  `export type` and one `export enum`, the run reports an EMPTY `blind` set and prints no
+  `DEAD SNIFFER` problem.
+  `fixture:` a new fixture in `selftest.py`; the tree this repo tracks carries zero `.ts` files, so
+  no bar over gov's own corpus can observe this and a fixture is the only route.
+  Red when: `DEFINITION_SNIFF` is narrowed back — dropping `interface` alone is enough — and the
+  arm reports the fixture's carriers as blind. The arm is written per ARMED LANGUAGE rather than per
+  file, so the next language added to `KNOWN_EXTS` inherits the check instead of rediscovering the
+  refusal.
 ## 7. Gates
 
 `lexicon selftest` · `lexicon naming predicates` · `lexicon wiring` · `codebase-map kit selftest` · `memory hygiene`
@@ -278,10 +307,16 @@ New arm: `tools/lexicon/selftest.py` · the conformance run scoring below the de
   its pre-registered test. `dark` empties a graded population the drift signal reads as a weakening,
   and it contradicts the build-level rule above. The survivor trips no M3 veto: no new dependency, no
   new install location, no signature change, and no governance carrier moves. It is also the reading
-  the modes table's own third column already carries, and the one `LANG_MODE_RANK` already ranks. Two
-  edits, both in `tools/lexicon/lexicon.py`: the `probe` branch of `extract_text` dispatches to
-  `PARSERS` when the id names one, and the matching refusal in `scan_corpus` skips such an id.
-  `_probe_defs` and the `parser` branch are untouched. The cost is a record: the kit README's modes
+  the modes table's own third column already carries, and the one `LANG_MODE_RANK` already ranks.
+  FOUR edit sites, not two, and the count is the correction: the armedness predicate — "is this
+  (extension, mode, pset) actually graded by something" — is spelled at four places in
+  `tools/lexicon/lexicon.py`, and an earlier revision named only the two that DISPATCH. The two
+  dispatch sites are the `probe` branch of `extract_text`, which reaches `PARSERS` when the id names
+  one, and the matching refusal in `scan_corpus`, which skips such an id. The two REPORTING sites are
+  the coverage-fraction walk and the armed-extension tally, which decide armedness independently and
+  would otherwise count a `probe`-declared parser as unarmed while the extractor read it — the
+  fraction and the extraction disagreeing about the same file. All four call ONE derived helper so
+  they cannot diverge again. `_probe_defs` and the `parser` branch are untouched. The cost is a record: the kit README's modes
   table names a `probe` extractor as a regex pattern set, which stops being true, and that sentence
   is handed to `TOOL-aGradedDialect-5` in §3's Edges rather than left standing beside code that
   contradicts it.
@@ -299,6 +334,16 @@ New arm: `tools/lexicon/selftest.py` · the conformance run scoring below the de
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft.
+- rev-2 · 2026-09-10 · S7 · S8 · §4 · §5 · §8 · AC7 · AC9 · folded spec-audit round 2. NEW S8 and
+  AC9: arming TypeScript walks into the ratified `DEAD SNIFFER` refusal, because six of §4's
+  definition forms sniff negative against the shipped `DEFINITION_SNIFF` and a types-only module
+  therefore lands in `blind` — the first adopter file after `--scaffold` would red their gate. §8 F1
+  named two edit sites and the armedness predicate lives at four; the two REPORTING sites are now
+  named and all four route through one derived helper, with AC7 gaining the coverage-line clause
+  that observes them. S7 and Files-touched no longer claim the kit version stamp, which
+  `TOOL-aGradedDialect-5` §8 F2 allocates and which neither unit was observing. §5's perf row stated
+  a 300 s leg ceiling against a manifest declaring roughly three times that, and now points at
+  `tools/gate-legs.json` instead of restating it.
 
 ## 10. Reuse audit
 

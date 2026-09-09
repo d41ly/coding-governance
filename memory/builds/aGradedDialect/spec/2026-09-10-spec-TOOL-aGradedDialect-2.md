@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-2 — the conformance corpus: fixtures a compiler extracted, frozen before the reader exists
 
-**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-1 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
+| [2026-09-10-review-TOOL-aGradedDialect-1-round2.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round2.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 
 <!-- /gen:spec-records -->
 
@@ -50,12 +51,11 @@ unit, the FLOOR that reader must clear before it may call itself `parser`.
 - **No whole adopter files, and no vendoring beyond a definition site.** An excerpt is the smallest
   span that parses standalone and reproduces its construct, capped per record. The corpus is
   withheld from `govkit apply` for the same reason the self-tests are.
-- **No reproduction of `regex_vs_oracle.py`.** `TOOL-aGradedDialect-1`'s record §6 points at this
-  spec's §4 for that script's full source. Its bytes were not committed, and reconstructing eight
-  regexes from a prose description and labelling the result a reproduction is the
-  substitute-a-synthetic-value class. The pointer is a defect in that record rather than in this
-  spec; it is named here as a follow-up for the closing fold, and the fork it served is closed
-  either way.
+- **No reproduction of `regex_vs_oracle.py`.** It is not needed here: `TOOL-aGradedDialect-1`'s
+  record now carries that script's full source in its own §6, folded at rev-2 on 2026-09-10 as
+  round 1's first blocker, and the forward-pointer that used to aim at this spec's §4 is gone. An
+  earlier revision of this bullet called that pointer a defect and booked a follow-up for the closing
+  fold; both are discharged, and the follow-up is deleted rather than left to be chased.
 
 ### Edges
 
@@ -67,8 +67,11 @@ unit, the FLOOR that reader must clear before it may call itself `parser`.
   Nothing this unit commits imports either, and the gate never runs them.
 - **hands-off** `TOOL-aGradedDialect-3` — the frozen corpus, the runner that scores a reading
   against it, the declared floor, and the skipping arm that unit flips live.
-- **hands-off** `TOOL-aGradedDialect-4` — the per-record `kind` and JSX construct tags, which are
-  the evidence for the `.tsx` role split that unit's §8 fork has to weigh.
+- **hands-off** `TOOL-aGradedDialect-4` — the declared FLOOR, which is what decides the coverage mode
+  that unit's S1 transcribes: `parser` at or above it, `probe` below it. Without the floor there is no
+  verdict for that unit to read. The per-record `kind` and JSX construct tags go with it, but as
+  secondary evidence only — that unit's §8 F1 is resolved on `TOOL-aGradedDialect-1`'s casing census
+  instead, and the tags are what a later role-derived selector would restart from.
 
 ## 4. Design
 
@@ -243,7 +246,11 @@ so it is withheld from `govkit apply` exactly as the self-tests are), `.gitattri
 - security — the corpus carries bounded excerpts of a third-party tree. Every span is the smallest
   that parses, capped at 60 lines, provenance-stamped, and withheld from `govkit apply`. Extraction
   rejects any candidate whose span carries a credential-shaped literal, and the reviewer reads the
-  committed corpus before it lands.
+  committed corpus before it lands. **`kit.toml` is only HALF the containment, and saying otherwise
+  was a round-2 finding.** A `cp -r` copy-install does not read `kit.toml`, so a copy-installing
+  adopter receives the corpus unless the runbook tells them to delete it. `WIRE-INTO-PROJECT.md:340`
+  already carries exactly that step for `codebase-map`'s gov-only files; the matching line for this
+  corpus is `TOOL-aGradedDialect-5` S6.
 - perf / scale — the loader reads one file of at most a few hundred kilobytes and the runner walks
   at most 150 records. It sits inside an 880-second leg ceiling with no measurable movement.
 - error / empty / loading states — an unreadable or empty corpus is a REFUSAL naming the file, never
@@ -302,6 +309,13 @@ so it is withheld from `govkit apply` exactly as the self-tests are), `.gitattri
 New arm: `tools/lexicon/selftest.py` · the shipped `js-regex` set scored against the frozen corpus,
 which must miss the floor · no assertion floor moves; `ARMS_FLOORS` does not carry this suite.
 
+**`lexicon selftest` is `subject = kit`, `chunk = selftests`, so the ORDINARY bar HOLDS it.** Four of
+this unit's criteria are observed only inside that leg, so a green `bash tools/run-gates/run-gates.sh`
+says nothing about them. This unit's Definition of Done therefore runs
+`GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, or `python tools/lexicon/selftest.py` directly.
+Stated here because a criterion observable only inside a held leg, with nothing saying so, is a skip
+wearing a pass.
+
 ## 8. Open questions
 
 - **F1 — may bounded excerpts of the adopter tree be committed to this repository at all?** The
@@ -313,7 +327,12 @@ which must miss the floor · no assertion floor moves; `ARMS_FLOORS` does not ca
   extracted from real adopter files rather than authored", which is a ratified decision naming this
   artifact, so the disclosure is priced rather than widened. The constraints in §5's security row
   are the price: smallest parsing span, 60-line cap, provenance stamped, credential-shaped literals
-  rejected at extraction, and the corpus withheld from `govkit apply` so no adopter receives it.
+  rejected at extraction, and the corpus withheld from `govkit apply`. "So no adopter receives it"
+  was the rev-1 wording and it OVERSTATED the containment: `govkit apply` honours `kit.toml` and a
+  `cp -r` does not, so the copy-install path needs its own runbook step, allocated as
+  `TOOL-aGradedDialect-5` S6 against the `codebase-map` precedent at `WIRE-INTO-PROJECT.md:340`.
+  With that step the price holds as priced; without it, a copy-installing adopter receives the
+  corpus, and the honest sentence is the one that says so.
 - **F2 — does the floor grade imports?** RESOLVED (agent, 2026-09-10, delegated): no. The oracle
   collects functions and types, the predicate that read imports was deleted with `P3 layer`, and a
   floor over a value nothing consumes would be a criterion no reader could fail meaningfully. The
@@ -331,6 +350,22 @@ which must miss the floor · no assertion floor moves; `ARMS_FLOORS` does not ca
   the §4 block and AC3 now use a `-S'scan_ts_tokens'` pickaxe over `lexicon.py` for the extractor
   half and keep `--diff-filter=A` for the corpus JSON, and AC3's Red-when gained the
   already-tracked-path trap so the same mistake cannot return silently.
+- rev-3 · 2026-09-10 · §3 · §5 · §7 · §8 · folded spec-audit round 2. §5's security row and §8 F1
+  priced the disclosure on `kit.toml` alone and claimed "no adopter receives it"; a `cp -r`
+  copy-install does not read `kit.toml`, so the containment needed a runbook step and now cites one,
+  allocated as `TOOL-aGradedDialect-5` S6. §7 now states that `lexicon selftest` is a HELD leg, so
+  this unit's DoD runs `GATE_SELFTESTS=1` — four criteria are observable nowhere else and an
+  ordinary green bar says nothing about them. §3's `regex_vs_oracle.py` non-goal accused unit 1's
+  record of a defect that rev-2 of that record fixed, and booked a closing follow-up for it; both
+  are discharged and the follow-up is deleted. Note for a later fold: rev-3 of this spec landed
+  after round 2 read it, so round 2's subject blob is not this text.
+- rev-3 · 2026-09-10 · §3 · the `hands-off` edge to `TOOL-aGradedDialect-4` named only the
+  per-record `kind` and JSX construct tags, which that unit's §8 F1 does not decide on — so the edge
+  read as an overreach and hygiene check 12's reciprocity arm redded on this file. It named the wrong
+  payload rather than the wrong unit. The real handoff is the declared FLOOR: that unit's S1 has
+  always read the mode as `parser` at or above it and `probe` below it, so it rests a scope item on
+  this corpus. The edge now names the floor first and the tags as secondary evidence, matching the
+  `consumes-from` that unit declared at its own rev-3.
 
 ## 10. Reuse audit
 

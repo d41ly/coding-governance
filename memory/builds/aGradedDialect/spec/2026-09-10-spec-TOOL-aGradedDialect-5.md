@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-5 — the records: the darkness ruling retired where it is actually carried
 
-**Status:** SPECCED · rev-1 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 |
+| [2026-09-10-review-TOOL-aGradedDialect-1-round2.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round2.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 |
 
 <!-- /gen:spec-records -->
 
@@ -23,9 +24,13 @@ the copy that rots.
 - **S1** — `tools/lexicon/LEXICON.md` gains a `.ts`/`.tsx` paragraph naming the coverage mode
   `TOOL-aGradedDialect-3` actually earned and the compensating check for whatever stays unread.
   This is an ADDITION and not a replacement, and the correction is in §4. Observed by **AC1**.
-- **S2** — `tools/lexicon/README.md` is corrected in the two sections TypeScript falsifies:
-  "Arming a language this kit does not ship" and the parser sentence under "Coverage modes".
-  Observed by **AC2**.
+- **S2** — `tools/lexicon/README.md` is corrected in the sections TypeScript falsifies: "Arming a
+  language this kit does not ship", the parser sentence under "Coverage modes", and the TWO further
+  sentences `TOOL-aGradedDialect-3` §8 F1 hands over — the modes-table cell describing a `probe`
+  extractor as a regex pattern set, and "the kit ships exactly one". That unit DECLARES the handoff
+  in its §3 Edges; before this rev nothing in the set received it, so a resolved fork's stated cost
+  had no payer. Correction is a REWRITE, never a deletion: the section still teaches the `PATTERNS:`
+  block and still names Go, Rust and C#. Observed by **AC2**.
 - **S3** — the one comment in kit source that names `TOOL-dScaffoldedMirror-13` as the standing
   owner of the question is rewritten. Prose only, inside a comment, and no predicate is touched.
   Observed by **AC3**.
@@ -33,10 +38,18 @@ the copy that rots.
   re-aimed at this build, and that spec's status header tail gains a superseding pointer. The
   status token on the spec itself does NOT move, for the reason §8 F1 records. Observed by **AC4**.
 - **S5** — `memory/map/features/lexicon.md` claims every inventory key units 2 to 4 minted, and its
-  prose stops naming TypeScript among the languages an adopter can only declare dark.
-  Observed by **AC5**.
+  prose stops naming TypeScript among the languages an adopter can only declare dark. The KEY half is
+  observed by **AC5**; the PROSE half is observed by **AC2**, whose grep names this file as a third
+  carrier — the coverage ratchet reads keys and is blind to a stale sentence beside them.
 - **S6** — the lexicon kit version is bumped ONCE for this build, in every carrier that repeats it,
-  and the Skill is re-rendered so its marker agrees. Observed by **AC6**.
+  and the Skill is re-rendered so its marker agrees. `TOOL-aGradedDialect-3` S7 no longer claims this
+  stamp, so the allocation §8 F2 records has exactly one payer. Observed by **AC6**.
+- **S7** — `WIRE-INTO-PROJECT.md` gains a `rm -f` line for the gov-only files this build adds to
+  `tools/lexicon/`, chiefly `TOOL-aGradedDialect-2`'s conformance corpus. `kit.toml` withholds them
+  from `govkit apply`, but a `cp -r` does not read `kit.toml`, so the copy-install path needs its own
+  step — exactly the shape `WIRE-INTO-PROJECT.md:340` already carries for `codebase-map`. Without it
+  that unit's §8 F1 prices a disclosure on a containment only half of the install paths honour.
+  Observed by **AC7**.
 
 ## 3. Non-goals (OUT)
 
@@ -85,6 +98,9 @@ What DOES carry claims this build falsifies, each verified by reading the file o
 | `tools/lexicon/lexicon.py` `DEFINITION_SNIFF` header | "`TOOL-dScaffoldedMirror-13` still owns the `.ts`/`.tsx` question" | that decision is superseded here |
 | `memory/map/features/lexicon.md` "Shared seams" | "an adopter with TypeScript, Go or C# could only declare their language `dark`" | the README claim, mirrored |
 | `memory/backlog/TOOL.md` the `-13` row | "the adopter's primary language is INVISIBLE to the kit" | the condition the row tracks is removed |
+| `tools/lexicon/lexicon.py:26` | "TWO PARSERS SHIP" | the SECOND carrier of that claim, which a README-only grep leaves standing |
+| `tools/lexicon/README.md` "Coverage modes" table | `probe` → "a regex pattern set" | `TOOL-aGradedDialect-3` §8 F1 makes a `probe` id resolve through `PARSERS`, so the mode no longer implies a regex |
+| `tools/lexicon/README.md` "Arming a language" | "`probe` needs a pattern set, and the kit ships exactly one" | the same F1 handoff; the sentence has no receiver until this row exists |
 
 The parser sentence is the interesting one and it is fixed by DERIVING rather than by recounting.
 `TWO PARSERS SHIP` is a literal beside the `LANGS` rows that own the number, so a third parser
@@ -142,15 +158,29 @@ version only) · `tools/lexicon/canon.py` (marker only) · `.claude/skills/lexic
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `tools/lexicon/LEXICON.md` is read, it carries a `.ts`/`.tsx` paragraph naming the
-  coverage mode the shipped extractor declares, and that mode token is the one
-  `python tools/lexicon/lexicon.py` prints for those extensions on a run of this repo.
-  Red when: the paragraph says `parser` where the extractor declares `probe`, which is the
-  two-answers-to-one-question class committed inside the fix for it.
-- **AC2** — When `grep -n "TWO PARSERS SHIP\|could only declare their language" tools/lexicon/README.md`
-  runs, it returns no hit.
-  Red when: either sentence survives, because a prose count and a stale language list are exactly
-  what the next reader will believe.
+- **AC1** — When `tools/lexicon/LEXICON.md` is read, it carries a `.ts`/`.tsx` paragraph whose mode
+  token equals `lex.KNOWN_EXTS["ts"][1]` read directly from `tools/lexicon/lexicon.py`, and the
+  paragraph names each refusal in `parse_ts_defs.__doc__` beside the check that compensates for it.
+  `fixture:` this repo tracks ZERO `.ts` files, so `python tools/lexicon/lexicon.py` prints no mode
+  for those extensions here and cannot be the operand — the rev-1 wording asked for a comparison
+  against a string this tree cannot produce. `KNOWN_EXTS` is readable regardless of corpus.
+  Red when: the paragraph says `parser` where `KNOWN_EXTS` declares `probe`, which is the
+  two-answers-to-one-question class committed inside the fix for it. Red also when a mode token
+  stands alone with no compensating check beside it, since S1 scopes both and an exemption is not
+  coverage.
+- **AC2** — Two halves, because a zero-hit grep alone reds the fix §4 prescribes.
+  NEGATIVE: `grep -n "TWO PARSERS SHIP\|could only declare their language" tools/lexicon/README.md
+  tools/lexicon/lexicon.py memory/map/features/lexicon.md` returns no hit in ANY of the three.
+  `TWO PARSERS SHIP` has two carriers — the README and `tools/lexicon/lexicon.py:26` — and the
+  language-list sentence has a third copy in the map dossier; a grep naming one file leaves the
+  others standing and observed by nothing.
+  POSITIVE: after the edit "Arming a language this kit does not ship" still names Go, Rust and C#,
+  still teaches the `PATTERNS:` block, and still states the kit does not decline to run an adopter's
+  own extractor — it simply no longer names TypeScript among the languages that can only go dark.
+  The modes-table cell and the "ships exactly one" sentence are corrected in the same pass, since
+  `TOOL-aGradedDialect-3` §8 F1 makes a `probe` extractor no longer necessarily a regex set.
+  Red when: the negative half passes because the whole section was deleted, which removes the stale
+  sentence by removing the capability's documentation with it.
 - **AC3** — When `grep -rn "dScaffoldedMirror-13" tools/` runs, no surviving hit describes that
   decision as the standing owner of the `.ts`/`.tsx` question.
   Red when: `lexicon.py`'s `DEFINITION_SNIFF` header still says `still owns`, which points a reader
@@ -174,6 +204,12 @@ version only) · `tools/lexicon/canon.py` (marker only) · `.claude/skills/lexic
   Red when: `LEXICON.md` or `canon.py` keeps the old marker, which is the four-carrier stamp trap
   this repo already has a gotcha record for.
 
+- **AC7** — When `WIRE-INTO-PROJECT.md` is read, its lexicon section carries a `rm -f` line naming
+  `TOOL-aGradedDialect-2`'s conformance corpus, and every path that line names is a path
+  `tools/lexicon/kit.toml` also withholds from `govkit apply`.
+  Red when: the two lists disagree in either direction — a file withheld from `apply` and not named
+  in the `rm -f` reaches a copy-installing adopter, and a file named there but shipped by `apply`
+  tells them to delete something the supported path just installed.
 ## 7. Gates
 
 `memory hygiene` · `kit version markers` · `codebase-map coverage + freshness` · `lexicon wiring` · `lexicon naming predicates`
@@ -206,6 +242,15 @@ This unit adds and moves no gate arm; the legs above are the ones its edits must
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft, authored against the spec brief and against the five carriers
+- rev-2 · 2026-09-10 · S2 · S5 · S6 · S7 · §4 · AC1 · AC2 · AC7 · folded spec-audit round 2.
+  AC1 compared against a mode string this repo CANNOT produce — it tracks zero `.ts` files — and now
+  reads `KNOWN_EXTS` directly; it also picked up S1's compensating-check clause, which its rev-1
+  form silently dropped. AC2 was a zero-hit grep over one file, which reds the rewrite §4 prescribes
+  and misses two further carriers, so it now has a positive half and names all three. §4's table
+  gained `lexicon.py:26` as `TWO PARSERS SHIP`'s second carrier and the two sentences
+  `TOOL-aGradedDialect-3` §8 F1 hands over, which no unit was receiving. NEW S7 and AC7: the
+  copy-install `rm -f` line, without which `TOOL-aGradedDialect-2` §8 F1 prices its disclosure on a
+  containment `cp -r` does not honour.
   read on that date.
 
 ## 10. Reuse audit
