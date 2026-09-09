@@ -59,9 +59,10 @@ function of role — without an exception list and without re-arming the rule
 
 ### Edges
 
-- **consumes-from** `TOOL-aGradedDialect-3` — the two `PARSERS` entries the ids in S1 name. Without
-  them `scan_corpus` refuses every `.ts` file by name, because a `parser` mode whose set id is not in
-  `PARSERS` is a named refusal there. That is why this unit's `order` is above that unit's, and it is
+- **consumes-from** `TOOL-aGradedDialect-3` — the two extractor entries the ids in S1 name, in
+  whichever catalog that unit's earned mode routes them to: `PARSERS` under `parser`, `PATTERN_SETS`
+  under `probe`. Without them `scan_corpus` refuses every `.ts` file by name, because an id absent
+  from the catalog its own mode selects is a named refusal there. That is why this unit's `order` is above that unit's, and it is
   a hard sequence rather than a preference.
 - **consumes-from** `TOOL-aGradedDialect-1` — the casing and verb-lead figures the fork in §8 is
   decided on, measured 2026-09-10 against `C:/projects/incms/main` and recorded in that unit's
@@ -263,12 +264,14 @@ no assertion floor.
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft, authored against the pinned base and the research record.
-- rev-2 · 2026-09-10 · S1 · §4 · AC1 · folded spec-audit round 1. The `parser` mode was
+- rev-2 · 2026-09-10 · S1 · §3 · §4 · AC1 · folded spec-audit round 1. The `parser` mode was
   written as a literal in S1, in §4's Data model table and in AC1, one unit before
   `TOOL-aGradedDialect-3` measures it. All three now name it as that unit's earned VERDICT, and AC1
   asserts against the tool's own reported mode instead of a token, so a reader that honestly scores
   below the floor and declares `probe` no longer reds this unit. AC1's dotted-key Red-when is
-  unchanged.
+  unchanged. §3's `consumes-from` edge was the amendment's other half — it named
+  `PARSERS` alone, which presupposes the very verdict the rest of this fold stopped presupposing —
+  and now names the catalog the earned mode selects.
 
 ## 10. Reuse audit
 
