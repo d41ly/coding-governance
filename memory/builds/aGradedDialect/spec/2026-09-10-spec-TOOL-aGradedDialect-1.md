@@ -1,11 +1,12 @@
 # TOOL-aGradedDialect-1 — the mechanism fork for reading TypeScript, resolved against the compiler
 
-**Status:** INPROGRESS · rev-2 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 1 · ratified 2026-09-10
+**Status:** CLOSED · rev-2 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 1 · ratified 2026-09-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-10-build-TOOL-aGradedDialect-1-acceptance.md](../build/2026-09-10-build-TOOL-aGradedDialect-1-acceptance.md) | journal | — |
 | [2026-09-10-build-TOOL-aGradedDialect-1-typescript-extraction-research.md](../build/2026-09-10-build-TOOL-aGradedDialect-1-typescript-extraction-research.md) | research | — |
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |

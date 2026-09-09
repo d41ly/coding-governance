@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 0b407bf429ddaf73fb67f1f604a057ac24ab4c95
-phase: REVIEWING
+witness: aeed871b41744657655ff3500b586ecb2ef26288
+phase: BUILDING
 branch-sha: d13576732e6837e4be62edf5c60eb43631f94cd0
 branch-ref: refs/heads/branch/lexicon-kit-typescript-34c322
 mode: prompt
