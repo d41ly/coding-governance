@@ -63,7 +63,15 @@
 # verdict, which `TOOL-dRetiredFork-40` records as strictly worse than a loose one. What it buys is
 # that a WEDGED bar is bounded at three hours instead of at the sum of every ceiling it can reach.
 # The lower rows scale with the pool term, which is the only part that moves with the width.
-capable	8	24000	width=8,timeout=0,wall=10800
+# RAISED 2026-09-09, TOOL-aReapedSpinner-16. The wall must exceed the LARGEST DECLARED CEILING or
+# it fires on a healthy bar -- which is the exact failure the paragraph above calls strictly worse
+# than a loose bound. `unattended kit gate` declares 16040 s, so at wall=10800 a bar that dispatched
+# it could not finish however wide the pool was: observed 2026-09-09 with 23 legs green, 0 failed,
+# and the run killed with that leg still running. 21600 is not a new number -- it is what the
+# `minimal` row below already declares, and it clears the largest ceiling with the pool term to
+# spare. The wedged-bar bound this buys is six hours rather than three; that is the price of a
+# verdict that means something.
+capable	8	24000	width=8,timeout=0,wall=21600
 
 # --- the 4-core class ------------------------------------------------------------------------------
 # Deliberately BEHAVIOUR-NEUTRAL: the built-in formula already yields width 4 there. Moving the
@@ -71,7 +79,7 @@ capable	8	24000	width=8,timeout=0,wall=10800
 # matters, and a knob whose first landing is also its first behaviour change has no control. This
 # row's PURPOSE is its RAM threshold of zero paired with the row above: it is what a high-core,
 # low-RAM box falls to.
-modest	4	0	width=4,timeout=0,wall=14400
+modest	4	0	width=4,timeout=0,wall=21600
 
 # --- the catch-all, and the detection-failure row --------------------------------------------------
 # Zero thresholds, so it can never fail to match. Width 2 rather than 1 because unknown hardware is
