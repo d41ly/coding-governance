@@ -267,7 +267,6 @@ as a JSX element, and one lexer mode necessarily mis-reads one of the two popula
   moved it.
   Red when: a pin is RAISED to absorb a new name rather than the name being changed, which turns a
   two-sided equality into a rubber stamp.
-
 - **AC9** — When `tools/lexicon/selftest.py` grades a fixture tree whose only `.tsx` file defines
   exactly one typed const arrow and one `interface`, and whose only `.ts` file defines exactly one
   `export type` and one `export enum`, the run reports an EMPTY `blind` set and prints no
@@ -283,13 +282,16 @@ as a JSX element, and one lexer mode necessarily mis-reads one of the two popula
 `lexicon selftest` · `lexicon naming predicates` · `lexicon wiring` · `codebase-map kit selftest` · `memory hygiene`
 
 `lexicon selftest` is a `selftests` chunk with a `kit` subject, so an ordinary bar HOLDS it and AC1
-through AC7 are observed only under `GATE_SELFTESTS=1`. That is stated here rather than left to be
+through AC7 and AC9 are observed only under `GATE_SELFTESTS=1`. AC8 is the exception: it is the
+`lexicon naming predicates` leg, which an ordinary bar runs. That is stated here rather than left to be
 discovered, because this is KIT work and the 2026-08-23 owner ruling says a kit's Definition of Done
 is the one that owes those legs.
 
 New arm: `tools/lexicon/selftest.py` · a tokenizer that emits a word out of a template literal, a locator that misses a recognised form, a refusal that returns a list instead of raising · none
 
 New arm: `tools/lexicon/selftest.py` · the conformance run scoring below the declared floor while the printed mode still reads `parser` · none — the floor is `TOOL-aGradedDialect-2`'s declared number and this unit does not move it
+
+New arm: `tools/lexicon/selftest.py` · `DEFINITION_SNIFF` narrowed back — dropping `interface` alone suffices — so the types-only fixture reports its carriers as blind and the run prints `DEAD SNIFFER` · none
 
 ## 8. Open questions
 
@@ -343,7 +345,10 @@ New arm: `tools/lexicon/selftest.py` · the conformance run scoring below the de
   that observes them. S7 and Files-touched no longer claim the kit version stamp, which
   `TOOL-aGradedDialect-5` §8 F2 allocates and which neither unit was observing. §5's perf row stated
   a 300 s leg ceiling against a manifest declaring roughly three times that, and now points at
-  `tools/gate-legs.json` instead of restating it.
+  `tools/gate-legs.json` instead of restating it. §7's held-leg sentence named AC1 through AC7 and was the
+  amendment's other half once AC9 arrived; it now names AC9 too and states that AC8 alone rides the
+  ordinary bar. §7 also gained the `New arm:` line for AC9's staged break, which every other arm in
+  this unit already carried.
 
 ## 10. Reuse audit
 
