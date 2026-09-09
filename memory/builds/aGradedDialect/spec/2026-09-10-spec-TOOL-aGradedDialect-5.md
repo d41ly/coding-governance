@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-5 — the records: the darkness ruling retired where it is actually carried
 
-**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round2.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round2.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 |
+| [2026-09-10-review-TOOL-aGradedDialect-1-round3.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round3.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 |
 
 <!-- /gen:spec-records -->
 
@@ -44,11 +45,18 @@ the copy that rots.
 - **S6** — the lexicon kit version is bumped ONCE for this build, in every carrier that repeats it,
   and the Skill is re-rendered so its marker agrees. `TOOL-aGradedDialect-3` S7 no longer claims this
   stamp, so the allocation §8 F2 records has exactly one payer. Observed by **AC6**.
-- **S7** — `WIRE-INTO-PROJECT.md` gains a `rm -f` line for the gov-only files this build adds to
-  `tools/lexicon/`, chiefly `TOOL-aGradedDialect-2`'s conformance corpus. `kit.toml` withholds them
-  from `govkit apply`, but a `cp -r` does not read `kit.toml`, so the copy-install path needs its own
-  step — exactly the shape `WIRE-INTO-PROJECT.md:340` already carries for `codebase-map`. Without it
-  that unit's §8 F1 prices a disclosure on a containment only half of the install paths honour.
+- **S7** — `WIRE-INTO-PROJECT.md` gains a lexicon adoption section, because it has none. The rev-2
+  wording asked only for a `rm -f` line, inside a section that does not exist: that file's anchors
+  are `kickoff-manifest`, `playbook`, `memory-tree`, `drift-audit`, `codebase-map`, `memory-recall`
+  and `push-main`, and the kit's only mention is the §0 menu bullet. So this unit writes the MINIMAL
+  anchored section in the shape of the `codebase-map` one the same file already carries: the
+  `govkit:entry lexicon` anchor, the `cp -r` of the kit dir under its fixed name, the `rm -f` line,
+  the `.lexicon.conf` step, and `adopt-lexicon.sh --scaffold` then `--check`. The `rm -f` line names
+  the gov-only GRADING INSTRUMENTS a `cp -r` delivers — `tools/lexicon/selftest.py` and
+  `TOOL-aGradedDialect-2`'s conformance corpus — and deliberately NOT
+  `tools/lexicon/SKILL.template.md` or the two waiver seeds; §4 states why that population and not
+  "everything `kit.toml` withholds". A `cp -r` does not read `kit.toml`, so without this section
+  `TOOL-aGradedDialect-2` §8 F1 prices a disclosure on a containment no install path carries.
   Observed by **AC7**.
 
 ## 3. Non-goals (OUT)
@@ -64,6 +72,12 @@ the copy that rots.
   installation holds here too.
 - **No restatement of the build's measured figures.** Every number this unit's prose needs is cited
   from the research record by date, or derived by the reader from the snippets in its §6.
+- **No repair of the runbook-parity gap as a CLASS.** `tools/govkit/check_runbook_parity.py`
+  computes every registry entry with no anchored section and has no gate leg; the count and its date
+  are `TOOL-dScaffoldedMirror-15`'s and `TOOL-aHonedRuleset-9`'s and are not restated here. S7 writes
+  the ONE section its own criterion needs, because that section is the carrier
+  `TOOL-aGradedDialect-2` §8 F1 prices its disclosure on. Wiring the checker and closing the rest
+  stay those rows'.
 - **No repair of the two `selftest.py` comments about TypeScript.** They cite a measurement that
   remains true and describe the fixture's own conventions; they are unaffected by this build.
 
@@ -122,13 +136,32 @@ the rendered `.claude/skills/lexicon/SKILL.md`. `tools/check-kit-versions.sh` co
 against the source, so a bump in one carrier reds the bar. Bumping once, in the last unit that
 touches the kit, is one edit set instead of three; §8 F2 records that allocation.
 
+### The runbook section, and the population its `rm -f` line ranges over
+
+Verified 2026-09-10 by reading the file: `WIRE-INTO-PROJECT.md` offers the lexicon kit in its §0
+menu and then never tells anyone how to install it. There is no `govkit:entry lexicon` anchor and no
+lexicon `rm -f` line anywhere in it. That is why S7 writes a section rather than a line, and it is
+prose in a reader-facing document — neither a predicate nor an adoption, so §3's non-goals stand.
+
+**Why the `rm -f` line is not the set `kit.toml` withholds.** `ROLE_KINDS` maps `project-owned` to
+`order` and `rendered` to `side-effect`, and `LANDABLE_ROLES` is derived as the `write` kinds — so
+`govkit apply` withholds `selftest.py` AND `SKILL.template.md`, and only the first is a gov-only
+grading instrument. `SKILL.template.md` is the file `adopt-lexicon.sh` renders the adopter's Skill
+FROM; delete it and `--check` prints `not installed, nothing to render` and grades nothing. An
+equality demanding "every withheld file appears in the `rm -f`" would therefore instruct an adopter
+to delete the input of the step immediately below it, and would red a correct build. The two waiver
+registries are `seed`, which IS landable, so they ship and are not candidates either. The
+`codebase-map` section omits `tools/codebase-map/map_extractors.py` from its own line for the same
+reason. The population is the gov-only instruments a `cp -r` delivers: `selftest.py` today, plus
+`TOOL-aGradedDialect-2`'s conformance corpus once it lands.
+
 ### Files touched (estimate)
 
 `tools/lexicon/LEXICON.md` · `tools/lexicon/README.md` · `tools/lexicon/lexicon.py` (comment and
 version only) · `tools/lexicon/canon.py` (marker only) · `.claude/skills/lexicon/SKILL.md`
 (re-rendered, never hand-edited) · `memory/backlog/TOOL.md` ·
 `memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-13.md` (header tail only) ·
-`memory/map/features/lexicon.md`.
+`memory/map/features/lexicon.md` · `WIRE-INTO-PROJECT.md` (one new anchored section, S7).
 
 ### Alternatives rejected
 
@@ -204,12 +237,22 @@ version only) · `tools/lexicon/canon.py` (marker only) · `.claude/skills/lexic
   Red when: `LEXICON.md` or `canon.py` keeps the old marker, which is the four-carrier stamp trap
   this repo already has a gotcha record for.
 
-- **AC7** — When `WIRE-INTO-PROJECT.md` is read, its lexicon section carries a `rm -f` line naming
-  `TOOL-aGradedDialect-2`'s conformance corpus, and every path that line names is a path
-  `tools/lexicon/kit.toml` also withholds from `govkit apply`.
-  Red when: the two lists disagree in either direction — a file withheld from `apply` and not named
-  in the `rm -f` reaches a copy-installing adopter, and a file named there but shipped by `apply`
-  tells them to delete something the supported path just installed.
+- **AC7** — When `WIRE-INTO-PROJECT.md` is read, it carries a `govkit:entry lexicon` anchor with a
+  non-empty section body, and that section's `rm -f` line names exactly two paths: the kit's
+  `selftest.py` and this build's conformance corpus `ts-conformance-fixtures.json`.
+  `fixture:` verified 2026-09-10 — the file's anchors are `kickoff-manifest`, `playbook`,
+  `memory-tree`, `drift-audit`, `codebase-map`, `memory-recall` and `push-main`, and `lexicon` is
+  absent; the rev-2 wording of this criterion presupposed a section that does not exist and could
+  not be observed at all.
+  The list is NOT the set `tools/lexicon/kit.toml` withholds from `govkit apply`, and §4 says why:
+  `rendered` and `project-owned` are both non-landable, so that set also holds
+  `tools/lexicon/SKILL.template.md`, which is the input the adopter's own `--scaffold` renders their
+  Skill from — an equality over it would tell an adopter to delete a file the supported path needs,
+  and would red a correct build.
+  Red when: the anchor is absent or its body empty; or the line omits a file this build adds to
+  `tools/lexicon/` that `govkit apply` withholds, which is a gov-only grading instrument reaching a
+  copy-installing adopter; or it names a file `govkit apply` does install.
+
 ## 7. Gates
 
 `memory hygiene` · `kit version markers` · `codebase-map coverage + freshness` · `lexicon wiring` · `lexicon naming predicates`
@@ -252,6 +295,28 @@ This unit adds and moves no gate arm; the legs above are the ones its edits must
   copy-install `rm -f` line, without which `TOOL-aGradedDialect-2` §8 F1 prices its disclosure on a
   containment `cp -r` does not honour.
   read on that date.
+- rev-3 · 2026-09-10 · S7 · AC7 · §3 · §4 · DISPOSAL of spec-audit round 3's two blockers, which
+  were the same S7/AC7 pair rev-2 added. Both FOLDED here; neither was parked or waived, and the
+  round exited non-convergent so this is M4's exit disposition rather than another fold cycle.
+  Blocker 1: AC7 read "its lexicon section carries a `rm -f` line" over a file with no lexicon
+  section — no `govkit:entry lexicon` anchor and no lexicon `rm -f` line exist in
+  `WIRE-INTO-PROJECT.md`, so the criterion could not be observed and §4's Files touched did not name
+  the file. S7 now writes the section, §4 states what goes in it, §3 keeps the class — the other
+  entries with no section, and wiring `check_runbook_parity.py` — with `TOOL-dScaffoldedMirror-15`
+  and `TOOL-aHonedRuleset-9` where it already sits, and Files touched names the runbook. Not
+  promoted, because a section of markdown in a reader-facing document is this unit's own mechanism
+  and needs none the build lacks; the gate the review proposed for the class is what the build lacks,
+  and that stays those two rows'.
+  Blocker 2: AC7's bidirectional equality against the withheld set reds a correct build. `ROLE_KINDS`
+  makes both `project-owned` and `rendered` non-landable, so the set holds `selftest.py` — withheld
+  since `TOOL-aQuenchedHarness-3` — and `SKILL.template.md`, which `adopt-lexicon.sh` renders the
+  Skill from and which must survive a copy-install. AC7 now ranges over the same named population S7
+  builds, one direction plus a stated exclusion, and `codebase-map`'s own line omitting
+  `map_extractors.py` is recorded in §4 as the precedent rather than cited as a contradiction.
+  Residue, stated rather than left to be found: `-2` §5 and §8 F1 still cite this unit's **S6** for
+  the runbook step, which is the version bump — that is round 3's finding 8, a MEDIUM, and it is not
+  folded here because it lives in another spec and a rev bump there would re-open a reviewed
+  document to fix a one-token citation. The step it should cite is S7 and has not moved.
 
 ## 10. Reuse audit
 
