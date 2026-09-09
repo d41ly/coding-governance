@@ -9,10 +9,13 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+landed-anchor: remote
+units-at-landing: TOOL-aReapedSpinner-6 TOOL-aReapedSpinner-1 TOOL-aReapedSpinner-2 TOOL-aReapedSpinner-3 TOOL-aReapedSpinner-4 TOOL-aReapedSpinner-5 TOOL-aReapedSpinner-7
+unpushed-at-landing: 0
 parked-surfaced: yes
 keepalive-reaped: yes
-witness: ed127313834f9cb9ca2d06996c361c1be221bf12
-phase: LANDING
+witness: 3d92046bb33b44b5df944430bafbda82f57c12a5
+phase: LANDED
 branch-sha: e2b82a53dd8e9e422aea96bd57bcf6e63b5eb96c
 branch-ref: refs/heads/branch/gate-runner-process-monitor-0d0fa8
 mode: prompt
