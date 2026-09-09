@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 authorized-by: prompt
 status: OPEN
-ids: TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7 TOOL-aGradedDialect-8 TOOL-aGradedDialect-9 TOOL-aGradedDialect-10 TOOL-aGradedDialect-11 TOOL-aGradedDialect-12
+ids: TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5
 ---
 
 # aGradedDialect — the lexicon kit cannot read TypeScript, and the one repo that would adopt it is 20% TypeScript by file
@@ -71,13 +71,13 @@ coverage 19.3%. The decision named its own revisit test, and both halves now hol
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-10 · streams tooling
-ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7 TOOL-aGradedDialect-8 TOOL-aGradedDialect-9 TOOL-aGradedDialect-10 TOOL-aGradedDialect-11 TOOL-aGradedDialect-12
+ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5
 
 <!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
