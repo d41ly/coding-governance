@@ -292,7 +292,7 @@ This unit adds and moves no gate arm; the legs above are the ones its edits must
 
 ## 9. Revision log
 
-- rev-1 · 2026-09-10 · initial draft, authored against the spec brief and against the four carriers
+- rev-1 · 2026-09-10 · initial draft, authored against the spec brief and against the five carriers
 - rev-2 · 2026-09-10 · S2 · S5 · S6 · S7 · §4 · AC1 · AC2 · AC7 · folded spec-audit round 2.
   AC1 compared against a mode string this repo CANNOT produce — it tracks zero `.ts` files — and now
   reads `KNOWN_EXTS` directly; it also picked up S1's compensating-check clause, which its rev-1
@@ -330,7 +330,9 @@ This unit adds and moves no gate arm; the legs above are the ones its edits must
   is the half that keeps a DEFERRED spec honest, was observed by nothing and now has its own clause
   and Red-when. AC6 graded the re-rendered Skill under `check-kit-versions.sh`, which does not pair
   that carrier — the gate pairs FOUR and `lexicon wiring` is what guards the Skill — so AC6 is now
-  two clauses over two legs.
+  two clauses over two legs. The rev-1 line above is left saying FIVE on purpose: it records what
+  that draft was written against, and editing a landed revision entry to agree with a later
+  correction is how a revision log stops being a history.
 
 ## 10. Reuse audit
 

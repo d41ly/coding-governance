@@ -333,6 +333,10 @@ so it is withheld from `govkit apply` exactly as the self-tests are), `.gitattri
 New arm: `tools/lexicon/selftest.py` · the shipped `js-regex` set scored against the frozen corpus,
 which must miss the floor · no assertion floor moves; `ARMS_FLOORS` does not carry this suite.
 
+New arm: `tools/lexicon/selftest.py` · AC6's budget arm — a reader whose declared refusal list
+covers more of the corpus's oracle definition sites than `TS_FLOOR_REFUSAL_SHARE` allows, and a
+refusal named in the docstring with no fixture that raises on it · none, same reason
+
 **`lexicon selftest` is `subject = kit`, `chunk = selftests`, so the ORDINARY bar HOLDS it.** Four of
 this unit's criteria are observed only inside that leg, so a green `bash tools/run-gates/run-gates.sh`
 says nothing about them. This unit's Definition of Done therefore runs
