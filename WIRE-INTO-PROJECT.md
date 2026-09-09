@@ -341,7 +341,7 @@ pointer stub or self-prune rule from your kickoff manifest (§4) and your instan
    **Then delete the GOV-ONLY file that copy brings with it.** `kit.toml` withholds it from
    `govkit apply`, but a `cp -r` does not read `kit.toml`, so this path needs its own step:
    ```bash
-   rm -f <project>/tools/codebase-map/{replay-phrases.py,rank_harness.py,scen-adversarial.json}
+   rm -f <project>/tools/codebase-map/{replay-phrases.py,rank_harness.py,scen-adversarial.json,adopt-codebase-map.test.sh,selftest.py,test_codebase_map.py}
    ```
    All three are gov's own grading instruments. `replay-phrases.py` reads `memory/builds/**` for
    recorded probe phrases and the seam each spec's §10 names, and grades the ranker against that

@@ -383,8 +383,13 @@ def test_kit_payload_withholds():
     pool = {pathlib.PurePosixPath(p).name for p in G.resolve_rule_pool(ROOT, desc, wild, ctx, home)}
     leaked = {"recall-fixture.json", "check-recall.py", "test_recall_floor.py"} & pool
     assert not leaked, f"these ship to every adopter: {sorted(leaked)}"
-    assert "selftest.py" in pool, "the adopter-run kit selftest must still ship"
-    return f"3 withheld, selftest.py still shipped ({len(pool)} files in the ** pool)"
+    # ANCHORED, not deleted. selftest.py was withheld by the 2026-08-23 ruling, so asserting
+    # it ships is permanently red; but an arm that only checks for ABSENCE passes just as
+    # well on a pool that resolved empty, which is the shape this whole file exists against.
+    assert "adopt-memory-recall.sh" in pool, (
+        "the ** pool resolved without the adopter -- it is empty or misresolved, and the\n"
+        "absence assertions above would then prove nothing")
+    return f"3 withheld, adopter still shipped ({len(pool)} files in the ** pool)"
 
 
 @check("the overlap audit reds NOT MEASURED on an unresolvable target, never a passing 0.000")

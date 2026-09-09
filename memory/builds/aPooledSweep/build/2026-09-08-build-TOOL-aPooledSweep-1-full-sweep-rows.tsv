@@ -1,3 +1,5 @@
+# **Serves:** journal TOOL-aPooledSweep-1
+# One row per leg from the full sweep: slot, exit code, measured seconds, declared bound, name.
 slot	rc	secs	bound	name
 1	0	301	1040	agent-cap restatement self-test
 2	124	1181	1180	agent-cap self-test
