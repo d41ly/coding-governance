@@ -32,3 +32,5 @@ base: d13576732e6837e4be62edf5c60eb43631f94cd0
 2026-09-09T22:37:18Z review · item TOOL-aGradedDialect-1 · reason verdict BLOCKED · blockers 2
 
 2026-09-09T23:20:01Z review · item TOOL-aGradedDialect-1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold
+
+2026-09-09T23:26:06Z dispatch · item f2348281 TOOL-aGradedDialect-2 · reason tools/lexicon/ts-conformance-fixtures.json tools/lexicon/selftest.py tools/lexicon/kit.toml .gitattributes memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-2.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-2-acceptance.md
