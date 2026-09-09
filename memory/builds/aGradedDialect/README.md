@@ -5,7 +5,6 @@ opened: 2026-09-10
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-status: OPEN
 ids: TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5
 ---
 
@@ -70,23 +69,27 @@ coverage 19.3%. The decision named its own revisit test, and both halves now hol
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-10 · streams tooling
+**Build status:** INPROGRESS · 1 unit(s) · node a · opened 2026-09-10 · streams tooling
 ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aGradedDialect-1 — the mechanism fork for reading TypeScript, resolved against the compiler](spec/2026-09-10-spec-TOOL-aGradedDialect-1.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aGradedDialect-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aGradedDialect-1` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
