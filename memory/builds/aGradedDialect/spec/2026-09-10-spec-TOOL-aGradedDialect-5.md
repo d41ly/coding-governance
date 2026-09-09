@@ -244,11 +244,9 @@ version only) · `tools/lexicon/canon.py` (marker only) · `.claude/skills/lexic
   `memory-tree`, `drift-audit`, `codebase-map`, `memory-recall` and `push-main`, and `lexicon` is
   absent; the rev-2 wording of this criterion presupposed a section that does not exist and could
   not be observed at all.
-  The list is NOT the set `tools/lexicon/kit.toml` withholds from `govkit apply`, and §4 says why:
-  `rendered` and `project-owned` are both non-landable, so that set also holds
-  `tools/lexicon/SKILL.template.md`, which is the input the adopter's own `--scaffold` renders their
-  Skill from — an equality over it would tell an adopter to delete a file the supported path needs,
-  and would red a correct build.
+  The list is NOT the set `tools/lexicon/kit.toml` withholds from `govkit apply` — that set also
+  holds `tools/lexicon/SKILL.template.md`, which this criterion's line must NOT name. §4 owns the
+  derivation and it is deliberately not repeated in the criterion.
   Red when: the anchor is absent or its body empty; or the line omits a file this build adds to
   `tools/lexicon/` that `govkit apply` withholds, which is a gov-only grading instrument reaching a
   copy-installing adopter; or it names a file `govkit apply` does install.
