@@ -1,11 +1,12 @@
 # TOOL-aGradedDialect-3 — the TypeScript extractor: a tokenizer, a definition locator, and a coverage mode it has to earn
 
-**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 3 · ratified 2026-09-10
+**Status:** CLOSED · rev-4 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 3 · ratified 2026-09-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-10-build-TOOL-aGradedDialect-3-acceptance.md](../build/2026-09-10-build-TOOL-aGradedDialect-3-acceptance.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 | [2026-09-10-prompt-TOOL-aGradedDialect-3-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-3-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
@@ -282,11 +283,17 @@ as a JSX element, and one lexer mode necessarily mis-reads one of the two popula
   with both fixture files appearing as extractor carriers. An empty `blind` set is only evidence once
   something was extracted — an unarmed fixture produces the same empty set and would satisfy a pure
   negative.
-  Red when: `DEFINITION_SNIFF` is narrowed back — dropping `interface` alone is enough — and the
-  arm reports the fixture's carriers as blind. Red also when `blind` is empty over ZERO extractor
+  Red when: `DEFINITION_SNIFF` is narrowed BACK to the rows shipped before this unit, and the arm
+  reports the fixture's carriers as blind. Rev-3 said dropping `interface` alone was enough and
+  measured against this fixture it is not: each file sniffs positive through TWO of the widened
+  rows — the `.tsx` file through `interface` AND through the const row, because its arrow carries a
+  type annotation, and the `.ts` file through `type` AND through `enum` — so no single row's
+  removal blinds either, and the staged break reverts the whole three-row widening, which blinds
+  both. Red also when `blind` is empty over ZERO extractor
   carriers, which is the fixture proving nothing rather than the sniffer agreeing. The arm is written per ARMED LANGUAGE rather than per
-  file, so the next language added to `KNOWN_EXTS` inherits the check instead of rediscovering the
-  refusal.
+  file: the fixture table is the whole declaration and the `LANGS` rows, the `CELLS` rows and the
+  assertions are all derived from it, so a language added there inherits the check instead of
+  rediscovering the refusal.
 ## 7. Gates
 
 `lexicon selftest` · `lexicon naming predicates` · `lexicon wiring` · `codebase-map kit selftest` · `memory hygiene`
@@ -301,7 +308,7 @@ New arm: `tools/lexicon/selftest.py` · a tokenizer that emits a word out of a t
 
 New arm: `tools/lexicon/selftest.py` · the conformance run scoring below the declared floor while the printed mode still reads `parser` · none — the floor is `TOOL-aGradedDialect-2`'s declared number and this unit does not move it
 
-New arm: `tools/lexicon/selftest.py` · `DEFINITION_SNIFF` narrowed back — dropping `interface` alone suffices — so the types-only fixture reports its carriers as blind and the run prints `DEAD SNIFFER` · none
+New arm: `tools/lexicon/selftest.py` · `DEFINITION_SNIFF` narrowed back to the rows shipped before this unit, so the types-only fixture reports its carriers as blind and the run prints `DEAD SNIFFER` · none
 
 ## 8. Open questions
 
@@ -359,6 +366,18 @@ New arm: `tools/lexicon/selftest.py` · `DEFINITION_SNIFF` narrowed back — dro
   amendment's other half once AC9 arrived; it now names AC9 too and states that AC8 alone rides the
   ordinary bar. §7 also gained the `New arm:` line for AC9's staged break, which every other arm in
   this unit already carried.
+- rev-4 · 2026-09-10 · §7 · AC9 · the build's own divergences, changed here before the code. TWO.
+  AC9's Red-when claimed a single-row narrowing of `DEFINITION_SNIFF` would blind the fixture, and
+  measured against the fixture AC9 itself specifies it does not: both files sniff positive through
+  two of the widened rows each, so the staged break reverts the whole widening. §7's matching
+  `New arm:` line carried the same claim and moves with it. SECOND, the conformance arm's reader
+  lookup: `read_ts_readers` read `KNOWN_EXTS`, which §3 forbids this unit to touch, so the SKIP
+  could not have been removed without changing what that function reads. It now reads `PARSERS`
+  against the two ids S2 names, which is the honest source — `KNOWN_EXTS` is the DECLARATION and
+  `TOOL-aGradedDialect-4`'s, and a floor measurable only after the declaration landed would be
+  measured by the unit that spends the verdict rather than the one that earns it. The arm scores
+  under the `probe` mode token for the same reason: the token cannot change the reading, so the
+  weaker one costs nothing and stops the run passing over a dispatch that only works for `parser`.
 - rev-3 · 2026-09-10 · §5 · AC9 · folded spec-audit round 3, the disposal round. AC9 was a pure
   NEGATIVE — an empty `blind` set — which an unarmed fixture satisfies exactly as well as a widened
   sniffer does, so it now asserts non-zero graded populations for both extensions FIRST and carries

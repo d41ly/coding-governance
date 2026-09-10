@@ -3870,6 +3870,352 @@ check("AC6: ...naming a NON-ZERO live-cluster count, or the sentence is true of 
       bool(re.search(r"All [1-9][0-9]* cluster\(s\)", _ac6)), _ac6[:400])
 
 # =================================================================================================
+# TOOL-aGradedDialect-3 — THE TYPESCRIPT READER: the tokenizer, the locator, and the refusals.
+#
+# EVERY FIXTURE IS KEYED ON THE CONSTRUCT, never on a line in a tracked file — the discipline the
+# shell parser's arms already follow, and doubly so here: this repo tracks ZERO TypeScript files, so
+# a fixture is the only route to any of these arms and always will be.
+#
+# WHAT THESE ARMS DO NOT CHECK. They do not score the reader against the frozen corpus — that is the
+# conformance arm at the foot of this file, and it is the only thing that decides which coverage
+# MODE the reader has earned. These arms grade shape: that each recognised form comes back once at
+# its NAME's line, that the constructs which defeat a same-line regex yield nothing, and that every
+# refusal raises with a needle no sibling refusal's message contains.
+# =================================================================================================
+
+#: The frozen `.ts` SENTINEL. Same job as `SHELL_SENTINEL`: a parser that goes inert must fail HERE
+#: rather than pass green over a real repo forever. It carries one instance of every definition form
+#: `parse_ts_defs`'s header names, INCLUDING the four the conformance corpus does not carry at all —
+#: a getter, a setter, a `constructor` and an `enum` — plus the overload signature its refusal 3
+#: names, which unit 1 measured at 0.0% of that adopter tree and which therefore can never be a
+#: corpus read.
+TS_SENTINEL = """\
+export interface Shape {
+  area: (n: number) => number;
+}
+export type Id = string | number;
+export enum Tone {
+  Info = "info",
+  Warn = "warn",
+}
+export default function buildApp(): void {}
+export async function loadRows(x: Id): Promise<Id[]> {
+  return [x];
+}
+function* scanIds(): Generator<Id> {}
+const renderTag = (cls?: string): string => `<b class="${cls}">x</b>`;
+let checkTone: (t: Tone) => boolean = function (t) {
+  return t === Tone.Info;
+};
+export const table = {
+  addRow(id: Id) {
+    return id;
+  },
+  readRow: (id: Id) => id,
+  nested: { writeRow: async (id: Id) => id },
+};
+export class Widget extends Base<{ a: string }, { b: number }> {
+  private seen = 0;
+  constructor(private id: Id) {
+    super();
+  }
+  get label(): string {
+    return "x";
+  }
+  set label(v: string) {
+    this.seen += 1;
+  }
+  static readTone(t: Tone) {
+    return t;
+  }
+  renderSelf = (): string => "x";
+}
+declare function parseLegacy(a: string): Id;
+declare function parseLegacy(a: number): Id;
+"""
+
+#: The frozen `.tsx` SENTINEL, and it is a separate constant because it grades a separate LEXER.
+#: Every arrow inside a JSX expression container here is a definition the oracle counts and this
+#: reader refuses by design (§8 F2), so this fixture is also where that refusal is observed.
+TSX_SENTINEL = """\
+interface Props {
+  onPick: (v: string) => void;
+}
+export type Id = string;
+export const Card: React.FC<Props> = ({ onPick }) => (
+  <div className="card" onClick={() => onPick("x")}>
+    {`function notADefinition() { return 1 }`}
+    <span>a =&gt; b is text, and so is {"{"} this</span>
+  </div>
+);
+const pick = <T,>(x: T) => x;
+export default function App() {
+  return (
+    <>
+      <Card onPick={(v) => v} />
+      {[1, 2].map((n) => (
+        <b key={n}>{n}</b>
+      ))}
+    </>
+  );
+}
+"""
+
+
+def test_ts_sentinel():
+    """AC2 — every recognised form, once, at the line its NAME sits on."""
+    funcs, types_, imports = lex.parse_ts_defs(TS_SENTINEL)
+    check("ts sentinel: the frozen fixture yields a non-zero definition count",
+          len(funcs) >= 10 and len(types_) >= 4, f"{len(funcs)} func(s), {len(types_)} type(s)")
+    check("AC2: every recognised FUNCTION form comes back once, at its NAME's line",
+          funcs == [("buildApp", 9), ("loadRows", 10), ("scanIds", 13), ("renderTag", 14),
+                    ("checkTone", 15), ("addRow", 19), ("readRow", 22), ("writeRow", 23),
+                    ("constructor", 27), ("label", 30), ("label", 33), ("readTone", 36),
+                    ("renderSelf", 39)], f"{funcs}")
+    check("AC2: ...and the types carry the interface, the type alias, the enum and the class",
+          types_ == [("Shape", 1), ("Id", 4), ("Tone", 5), ("Widget", 25)], f"{types_}")
+    check("ts sentinel: imports are an empty list, which is refusal 6 rather than an omission",
+          imports == [], f"{imports}")
+
+    funcs, types_, _imports = lex.parse_tsx_defs(TSX_SENTINEL)
+    check("AC2: the tsx sentinel locates the typed const arrow, the generic arrow and the default "
+          "export", funcs == [("Card", 5), ("pick", 11), ("App", 12)], f"{funcs}")
+    check("AC2: ...and its interface and type alias", types_ == [("Props", 1), ("Id", 4)],
+          f"{types_}")
+
+
+def test_ts_constructs():
+    """AC1 — one arm per construct that defeats a same-line regex, and one per suppressed span."""
+    # A `function` keyword inside a template literal is DATA. The conformance corpus carries the
+    # live instance: a Facebook pixel snippet embedded in a `.tsx` template literal, whose body
+    # holds three of them.
+    got = lex.parse_ts_defs(
+        "const src = `!function(f){ function inner() {} }`;\nfunction realOne() {}\n")[0]
+    check("ts: a `function` keyword inside a template literal is not a definition",
+          got == [("realOne", 2)], f"{got}")
+
+    # A regex literal carrying a brace. The `{` inside it would open a block for any reader that
+    # does not decide `/` by the previously lexed token.
+    got = lex.parse_ts_defs(
+        "const re = /^\\{a\\}$/;\nconst rest = { readIt: () => 1 };\nfunction after() {}\n")[0]
+    check("ts: a regex literal carrying a brace does not open a block",
+          got == [("readIt", 2), ("after", 3)], f"{got}")
+
+    # A nested template expression — measured in 43.6% of that adopter tree's files, and the reason
+    # the tokenizer carries a STACK rather than a pair of flags.
+    got = lex.parse_ts_defs(
+        "const deep = `a${`b${`c`}`}d`;\nfunction afterNesting() {}\n")[0]
+    check("ts: a nested template expression closes at the right backtick",
+          got == [("afterNesting", 2)], f"{got}")
+
+    # JSX TEXT carrying a fat arrow, and a JSX expression container holding a real arrow. The first
+    # is text; the second is §8 F2's declared refusal.
+    got = lex.parse_tsx_defs(
+        "function Row() {\n  return <p onDone={() => 1}>a =&gt; b</p>;\n}\n")[0]
+    check("ts: JSX text and a JSX expression container yield no definition (F2's refusal)",
+          got == [("Row", 1)], f"{got}")
+
+    # THE REFUSAL'S OTHER HALF, and it is asserted rather than assumed: a definition written inside
+    # a template substitution is one the oracle counts and this reader deliberately does not.
+    got = lex.parse_ts_defs("const s = `${(() => { const readIt = () => 1; return readIt; })()}`;\n")[0]
+    check("ts: a definition inside a template ${} substitution is suppressed (F2's refusal)",
+          got == [], f"{got}")
+
+    # THE SEPARATOR A REGEX CANNOT SEE. `render: (el) => string` is a property SIGNATURE in an
+    # interface and a property ASSIGNMENT in an object literal, spelled identically. The conformance
+    # corpus carries the live instance in `declare global { interface Window { … } }`.
+    src = ("interface Api {\n  render: (el: string) => string;\n}\n"
+           "const api = {\n  render: (el: string) => el,\n};\n")
+    funcs, types_, _ = lex.parse_ts_defs(src)
+    check("ts: an interface property signature is a TYPE and the identical object property is a "
+          "DEFINITION", funcs == [("render", 5)] and types_ == [("Api", 1)], f"{funcs} {types_}")
+
+    # An OVERLOAD SIGNATURE has no body, and TypeScript reports the implementation. Refusal 3.
+    got = lex.parse_ts_defs(
+        "function pick(a: string): string;\nfunction pick(a: number): string;\n"
+        "function pick(a: unknown): string {\n  return String(a);\n}\n")[0]
+    check("ts: an overload SIGNATURE is not a definition; only the implementation is (refusal 3)",
+          got == [("pick", 3)], f"{got}")
+
+    # A return type that is itself a type literal, whose `{` is not the body's and whose `;` is not
+    # the overload terminator.
+    got = lex.parse_ts_defs(
+        "function runTsc(): { status: number; output: string } {\n  return { status: 0 };\n}\n")[0]
+    check("ts: a type-literal return annotation does not hide the body", got == [("runTsc", 1)],
+          f"{got}")
+
+    # `.ts` and `.tsx` read one source two ways, which is why two `PARSERS` ids ship rather than one
+    # reader plus a path. This is that divergence, staged: the `.ts` lexer reads a generic arrow.
+    got = lex.parse_ts_defs("const identity = <T>(x: T) => x;\n")[0]
+    check("ts: `<T>(x) => x` is a GENERIC ARROW under the .ts lexer", got == [("identity", 1)],
+          f"{got}")
+
+
+def test_ts_refusals():
+    """AC3 and AC4 — every refusal, each observed the only way it CAN be observed."""
+    # THE THIRD COLUMN IS THE POINT, exactly as it is for the shell parser: every message here
+    # starts "unterminated ", so an arm asserting only that scores a pass whenever ANY sibling
+    # refusal fires first. Each row names the CONSTRUCT its refusal must print.
+    rows = (
+        ("an unterminated single quote", "const a = 'oops\n", "unterminated ' string", False),
+        ("an unterminated double quote", 'const a = "oops\n', 'unterminated " string', False),
+        ("an unterminated template literal", "const a = `oops\n", "unterminated template literal",
+         False),
+        ("an unterminated ${ substitution", "const a = `x${ y\n", "unterminated ${ substitution",
+         False),
+        ("an unterminated /* comment", "/* oops\nconst a = 1;\n", "unterminated /* comment", False),
+        ("an unterminated regex literal", "const a = /oops\n", "unterminated regex literal", False),
+        ("an unterminated { block", "function f() {\n  const a = 1;\n", "unterminated { block",
+         False),
+        ("an unterminated JSX element", "const el = <div>\n", "unterminated JSX element", True),
+    )
+    for label, src, needle, jsx in rows:
+        reader = lex.parse_tsx_defs if jsx else lex.parse_ts_defs
+        try:
+            reader(src)
+        except SyntaxError as exc:
+            check(f"ts refusal: {label} RAISES, names the CONSTRUCT and its line",
+                  needle in str(exc) and "line" in str(exc), str(exc))
+        else:
+            check(f"ts refusal: {label} RAISES, names the CONSTRUCT and its line", False,
+                  "returned a list instead of raising")
+
+    needles = [n for _l, _s, n, _j in rows]
+    shared = sorted({(a, b) for a in needles for b in needles if a != b and a in b})
+    check("AC3: no refusal's needle is a substring of another's, or one firing first scores a pass "
+          "for a sibling that is unarmed", not shared, f"{shared}")
+
+    # AC4 — THE ONLY OBSERVATION THE THREE BEHAVIOURLESS REFUSALS GET. Without this a header naming
+    # one refusal and omitting the rest would pass every arm in this file.
+    doc = lex.parse_ts_defs.__doc__ or ""
+    for token in ("SyntaxError", "unterminated string", "`${…}` substitution",
+                  "JSX `{…}` expression", "OVERLOAD SIGNATURE", "eval", "import",
+                  "COMPUTED or string-literal property key", "IMPORTS ARE AN EMPTY LIST",
+                  "NOT AN INTERPRETER"):
+        check(f"AC4: parse_ts_defs' docstring enumerates {token!r}", token in doc,
+              "missing from the docstring")
+    check("AC4: parse_tsx_defs carries a header of its own rather than a partial's None",
+          bool((lex.parse_tsx_defs.__doc__ or "").strip()), f"{lex.parse_tsx_defs.__doc__!r}")
+
+
+test_ts_sentinel()
+test_ts_constructs()
+test_ts_refusals()
+
+# ---- AC7: the `probe` dispatch, end to end -------------------------------------------------------
+#
+# A `probe` row whose pattern-set id names a PARSER is what §8 F1 exists to make reachable: the id
+# selects the reader and the mode token carries only the STANDING, so a reader that missed its
+# conformance floor has somewhere to run. Before F1 the run refused such a row one line before the
+# extension could be graded at all.
+
+#: The declaration for those arms. Separate from `BASE_CONF` because that one declares `py` and
+#: would put this suite's own extensions into a population these arms are not about.
+TS_CONF = """\
+BANNED_SUFFIXES="Manager"
+LANGS="ts:ts-tokens:probe tsx:tsx-tokens:probe conf::dark"
+VERB_OFFENDER_PIN="0"
+SUFFIX_OFFENDER_PIN="0"
+ratified="2026-09-10 node a"
+
+VERBS:
+  read    pull bytes or records from a named source — NOT `get`
+  render  turn structure into text — NOT `format`
+"""
+
+TS_FILES = {"core/a.ts": "export function readRows(): string[] {\n  return [];\n}\n",
+            "core/b.tsx": "export function RenderTile() {\n  return <b>x</b>;\n}\n"}
+
+code, out = run_case(TS_FILES, TS_CONF)
+check("AC7: a `probe` row naming a PARSER is graded rather than refused as an unshipped set",
+      code == 0 and "does not ship" not in out, out)
+check("AC7: ...and the run reports the extension's declared mode", ".ts=probe" in out, out)
+check("AC7: ...and the printed coverage line COUNTS the fixture's .ts and .tsx files, which is the "
+      "REPORTING half of F1's four sites",
+      "coverage — armed 2 of 2" in out, out)
+
+# THE FAILING CASE, OBSERVED, for each half of F1 separately — a gate whose red has never been seen
+# is an assertion about nothing.
+code, out = run_case(
+    TS_FILES, TS_CONF,
+    patch=("    if pset in PARSERS:\n        return PARSERS[pset]\n",
+           '    if pset in PARSERS and mode == "parser":\n        return PARSERS[pset]\n'))
+check("AC7 red: with the DISPATCH half of F1 reverted, the run refuses the row by name",
+      code != 0 and "does not ship" in out, out)
+
+code, out = run_case(
+    TS_FILES, TS_CONF,
+    patch=('    armed_exts = {e for e, (ps, m) in declared.items()\n'
+           '                  if resolve_extractor(m, ps, measured["sets"]) is not None}',
+           '    armed_exts = {e for e, (ps, m) in declared.items()\n'
+           '                  if m == "parser" or (m == "probe" and ps in measured["sets"])}'))
+check("AC7 red: with the REPORTING half reverted, the extension extracts and the coverage line "
+      "calls it unarmed — the two halves of one run disagreeing about one file",
+      "coverage — armed 0 of 2" in out, out)
+
+# ---- AC9: the coverage sniffer agrees with the TypeScript extractor ------------------------------
+#
+# `DEAD SNIFFER` REDS when an ARMED extractor finds a definition in a file the sniffer reads as
+# empty, and six of this reader's definition forms sniffed NEGATIVE against the rows shipped before
+# TOOL-aGradedDialect-3 S8. A `types.ts` carrying only an alias and an enum is a near-universal
+# shape in a real TypeScript tree, so the first adopter file arming this feature would have redded
+# their gate on the run right after `--scaffold`.
+#
+# WRITTEN PER ARMED LANGUAGE rather than per file: the fixture table below is the whole declaration,
+# and the LANGS row, the CELLS rows and the assertions are all derived from it, so the next language
+# added here inherits the check instead of rediscovering the refusal.
+SNIFF_FIXTURES = {
+    "tsx": ("core/tile.tsx", "tsx-tokens",
+            "export interface TileProps {\n  onPick: (v: string) => void;\n}\n"
+            "export const RenderTile: React.FC<TileProps> = () => null;\n",
+            ("tsx.function", "tsx.type")),
+    "ts": ("core/tone.ts", "ts-tokens",
+           "export type TileId = string;\n"
+           'export enum TileTone {\n  Info = "info",\n}\n',
+           ("ts.type",)),
+}
+
+_sniff_files = {row[0]: row[2] for row in SNIFF_FIXTURES.values()}
+_sniff_cells = sorted({c for row in SNIFF_FIXTURES.values() for c in row[3]})
+_sniff_conf = (TS_CONF.replace(
+    'LANGS="ts:ts-tokens:probe tsx:tsx-tokens:probe conf::dark"',
+    'LANGS="' + " ".join(f"{ext}:{row[1]}:probe" for ext, row in sorted(SNIFF_FIXTURES.items()))
+    + ' conf::dark"')
+    + "\nCELLS:\n" + "\n".join(f"  {c}  pascal\n" for c in _sniff_cells))
+
+code, out = run_case(_sniff_files, _sniff_conf)
+# THE POSITIVE FIRST. An empty `blind` set over an unarmed fixture proves exactly nothing — it is
+# the same empty set a widened sniffer produces — so every declared cell has to report a NON-ZERO
+# graded population before the absence of a refusal means anything.
+for _cell in _sniff_cells:
+    _pop = re.search(rf"{re.escape(_cell)}\.conv \d+ of (\d+)", out)
+    check(f"AC9: the fixture's `{_cell}` population is NON-ZERO, so the empty `blind` set below is "
+          f"evidence rather than an unarmed corpus",
+          bool(_pop) and int(_pop.group(1)) > 0, out)
+check("AC9: ...over every armed language's fixture file, all of them definition-carrying",
+      f"coverage — armed {len(_sniff_files)} of {len(_sniff_files)}" in out, out)
+check("AC9: a types-only TypeScript module does not land in `blind`, so no DEAD SNIFFER is printed",
+      code == 0 and "DEAD SNIFFER" not in out, out)
+
+#: The three TypeScript rows S8 added to `DEFINITION_SNIFF`, and the single row they were widened
+#: FROM. Held here as bytes so the arm below can narrow the sniffer BACK inside a kit copy; an edit
+#: to either spelling makes `run_case` refuse the patch by name rather than scoring a silent pass.
+_SNIFF_WIDE = (
+    r"(?:export[ \t]+)?(?:declare[ \t]+)?(?:interface|enum)[ \t]+\w  # ts, java, kotlin, c#" "\n"
+    r"        | (?:export[ \t]+)?type[ \t]+\w[\w$]*[ \t]*[<=]   # ts type alias" "\n"
+    r"        | (?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*(?:[ \t]*:[^=\n]+)?"
+    r"[ \t]*=[ \t]*(?:async[ \t]*)?[(<]")
+_SNIFF_NARROW = (r"(?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*[ \t]*=[ \t]*"
+                 r"(?:async[ \t]*)?\(  # js arrow")
+
+code, out = run_case(_sniff_files, _sniff_conf, patch=(_SNIFF_WIDE, _SNIFF_NARROW))
+check("AC9 red: narrowed BACK to the rows shipped before S8, the sniffer reads both fixture files "
+      "as empty and the run REDS with DEAD SNIFFER",
+      code != 0 and "DEAD SNIFFER" in out, out)
+check("AC9 red: ...naming the count of files the extractor read and the sniffer did not",
+      f"found no definition in {len(_sniff_files)} file(s)" in out, out)
+
+# =================================================================================================
 # TOOL-aGradedDialect-2 — THE TYPESCRIPT CONFORMANCE CORPUS, and the floor a reader has to clear
 # before it may call itself `parser`.
 #
@@ -4027,20 +4373,41 @@ def check_ts_reading(records, reader, refusals=()):
     return v
 
 
-def read_ts_readers():
-    """`{kind: (pattern-set id, mode)}` for every TypeScript extension the kit declares a reader for.
+#: The `PARSERS` id each TypeScript extension's reader is registered under. TOOL-aGradedDialect-3
+#: S2 CHOSE these two names, so they are spelled here rather than guessed at: an earlier revision
+#: read `KNOWN_EXTS` because the id did not exist yet, and a grader scanning `PARSERS` for a
+#: TypeScript-looking id would arm on the wrong name or on none.
+TS_PARSER_IDS = {"ts": "ts-tokens", "tsx": "tsx-tokens"}
 
-    Empty while `KNOWN_EXTS` declares `ts` and `tsx` dark, which is the state this unit lands in and
-    the state the conformance arm's SKIP announces. It reads `KNOWN_EXTS` rather than scanning
-    `PARSERS` for a TypeScript-looking id, because the id is TOOL-aGradedDialect-3's to choose and a
-    grader guessing at it would arm on the wrong name or on none.
+
+def read_ts_readers():
+    """`{kind: (pattern-set id, mode)}` for every TypeScript extension the kit SHIPS a reader for.
+
+    Empty on a kit that ships neither, which is the state the conformance arm's SKIP announces and
+    the state every kit predating TOOL-aGradedDialect-3 is in. It reads `PARSERS` rather than
+    `KNOWN_EXTS` because those two answer different questions: `KNOWN_EXTS` is the DECLARATION and
+    belongs to TOOL-aGradedDialect-4, and a floor that could only be measured after the declaration
+    landed would be measured by the unit that spends the verdict rather than the one that earns it.
+
+    THE MODE TOKEN IS `probe` AND THAT IS DELIBERATE. It cannot change the reading — the pattern-set
+    id selects the reader, which is §8 F1's whole resolution — so scoring under the WEAKER token
+    costs nothing and buys one thing: the conformance run cannot pass over a dispatch that only
+    works for `parser`. Which token the reader has EARNED is `read_ts_mode`'s answer, below, and it
+    is derived from the score rather than assumed by the call that produces it.
     """
-    out = {}
-    for ext in ("ts", "tsx"):
-        pset, mode = lex.KNOWN_EXTS.get(ext, ("", "dark"))
-        if mode != "dark":
-            out[ext] = (pset, mode)
-    return out
+    return {ext: (pid, "probe") for ext, pid in TS_PARSER_IDS.items() if pid in lex.PARSERS}
+
+
+def read_ts_mode(verdict):
+    """The coverage mode a reading of this corpus EARNS: `parser` at or above the floor, `probe`
+    below it. TOOL-aGradedDialect-3 S5 and AC6.
+
+    It reads the verdict and decides nothing else. The floor is TOOL-aGradedDialect-2's and lives in
+    `check_ts_reading`; this is the one place the two-way mapping from a SCORE to a LABEL is
+    written, so a `parser` label over a probe-grade reading is one function to falsify rather than a
+    sentence somebody typed beside a number.
+    """
+    return "parser" if verdict["clears_floor"] else "probe"
 
 
 def build_ts_reader(readers, sets=None):
@@ -4274,14 +4641,13 @@ if not _ts_readers:
     # A BARE `print`, and deliberately: `check` prints labels only for FAILURES, so a skip written as
     # `check(<label>, True)` reaches no output on a green run and is a comment wearing a check's
     # clothes. This file's other skip uses the same idiom for the same reason.
-    print("lexicon selftest SKIPPED — the TypeScript conformance arm: no TypeScript extractor is "
-          "declared. `KNOWN_EXTS` carries no `ts` or `tsx` row, so neither `PARSERS` nor the "
-          "resolved pattern sets hold a reader to score, and the FLOOR itself goes unexercised. "
-          "One arm unexercised; TOOL-aGradedDialect-3 is what removes this skip.")
+    print("lexicon selftest SKIPPED — the TypeScript conformance arm: this kit ships no TypeScript "
+          "reader. `PARSERS` carries neither of `TS_PARSER_IDS`, so there is nothing to score and "
+          "the FLOOR itself goes unexercised. One arm unexercised.")
 else:
-    # A PARTLY ARMED DECLARATION IS A LEGAL OUTCOME, not an error and not a full run. `ts` and `tsx`
-    # are separate rows in `KNOWN_EXTS` and TOOL-aGradedDialect-4 owns both; arming one and leaving
-    # the other dark is a disposition unit 1's §5 leaves genuinely open. So the arm scores the
+    # A PARTLY ARMED KIT IS A LEGAL OUTCOME, not an error and not a full run. `ts` and `tsx` take
+    # two `PARSERS` ids and two lexer modes, so shipping one and not the other is a state this arm
+    # has to survive rather than assume away. So the arm scores the
     # records it has a reader FOR and says out loud how many it did not — a floor cleared over half
     # the corpus is not a floor cleared, and the half has to be visible for anyone to know which it
     # was. Staged before this existed, the arm died on `KeyError: 'tsx'` instead.
@@ -4305,6 +4671,49 @@ else:
               "`parser`", _ts_verdict["clears_floor"],
               f"F1 {_ts_verdict['clears_f1']} F2 {_ts_verdict['clears_f2']} "
               f"share {_ts_verdict['refusal_share']:.4f}")
+
+        # ---- TOOL-aGradedDialect-3 AC5: RECALL and PRECISION, per side, against the floor -------
+        #
+        # NO SCORE IS WRITTEN INTO THIS FILE. Both figures are DERIVED at observation time from the
+        # records actually scored, and the floor they are compared against is F1 — EXACT agreement,
+        # which is recall 1 and precision 1 on both sides. A percentage would need a threshold, and
+        # any threshold under exact agreement cannot tell a complete reader from an incomplete one.
+        _ts_sides = {"func": sum(len(r["funcs"]) for r in _ts_scored),
+                     "type": sum(len(r["types"]) for r in _ts_scored)}
+        for _side, _want in sorted(_ts_sides.items()):
+            _hit = _want - _ts_verdict[_side + "_missing"]
+            _found = _hit + _ts_verdict[_side + "_spurious"]
+            _recall = (_hit / _want) if _want else 0.0
+            _precision = (_hit / _found) if _found else 0.0
+            print(f"lexicon selftest — TypeScript {_side} recall {_hit}/{_want} "
+                  f"({_recall:.4f}) · precision {_hit}/{_found} ({_precision:.4f}) · floor: EXACT "
+                  f"agreement, so both are 1.0000 or the reading is below it")
+            check(f"AC5: the {_side} side agrees EXACTLY with the oracle over a non-empty population",
+                  _want > 0 and _hit == _want and _found == _want,
+                  f"want {_want} hit {_hit} found {_found}")
+
+        # ---- TOOL-aGradedDialect-3 AC6: the mode verdict, beside the number that decided it -----
+        _ts_mode = read_ts_mode(_ts_verdict)
+        print(f"lexicon selftest — TypeScript coverage mode EARNED: {_ts_mode} — "
+              f"{_ts_verdict['exact']} of {_ts_verdict['records']} record(s) in exact agreement, "
+              f"refusal share {_ts_verdict['refusal_share']:.4f} against the declared ceiling "
+              f"{TS_FLOOR_REFUSAL_SHARE}. TOOL-aGradedDialect-4 spends this verdict; nothing here "
+              f"declares it.")
+        check("AC6: the printed mode is the one the SCORE earns, not the one the reader hopes for",
+              _ts_mode == ("parser" if _ts_verdict["clears_floor"] else "probe"), _ts_mode)
+
+# AC6's STAGED BREAK, and it sits outside the arm above because it must run whether or not a reader
+# ships: the defect this whole build was framed around is a `parser` label over a probe-grade
+# reading, and an arm that can only be exercised by a reader which already clears the floor could
+# never observe it. `_ts_js` is the shipped `js-regex` set scored against this corpus — a genuinely
+# below-floor reading — and `_ts_perfect` is the oracle's own answer.
+check("AC6 red: a reading BELOW the floor earns `probe`, never `parser`",
+      read_ts_mode(_ts_js) == "probe", f"{read_ts_mode(_ts_js)} over {_ts_js['exact']} exact")
+check("AC6 green: ...and a reading at or above it earns `parser`, so the two are distinguishable",
+      read_ts_mode(_ts_perfect) == "parser", f"{read_ts_mode(_ts_perfect)}")
+check("AC6: ...and a refusal-blown reading earns `probe` too, so F2 reaches the label and not "
+      "only F1", read_ts_mode(_ts_all) == "probe" and _ts_all["clears_f1"],
+      f"{read_ts_mode(_ts_all)} clears_f1={_ts_all['clears_f1']}")
 
 
 if FAILURES:

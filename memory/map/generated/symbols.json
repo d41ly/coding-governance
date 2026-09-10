@@ -553,6 +553,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "build_ts_reader",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "build_walk",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -801,6 +806,26 @@
       "id": "check_true",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "check_ts_arrow",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "check_ts_body",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "check_ts_generic",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "check_ts_reading",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "checks",
@@ -2503,6 +2528,16 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "parse_ts_defs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "parse_tsx_defs",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "parse_verdicts",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -2818,6 +2853,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "read_oracle_answer",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
       "id": "read_roots",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -2883,9 +2923,74 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "read_ts_angle_end",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_ts_block_kind",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_ts_brace_end",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_ts_fixtures",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_ts_mode",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_ts_paren_end",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "read_ts_readers",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_ts_type_end",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_waivers",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "read_with_one_refusal",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_with_over_budget_refusal",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_with_total_refusal",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_with_undeclared_refusal",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_with_unexercised_refusal",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "reconcile",
@@ -3266,6 +3371,11 @@
       "id": "resolve_entry_version_at",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_extractor",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "resolve_gate_path",
@@ -3716,6 +3826,11 @@
       "id": "scan_tracked_specs",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
+      "id": "scan_ts_tokens",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "scan_type_names",
@@ -4951,6 +5066,21 @@
       "id": "test_tokenizer_strips_assignments_everywhere",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_ts_constructs",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "test_ts_refusals",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "test_ts_sentinel",
+      "kind": "function",
+      "file": "tools/lexicon/selftest.py"
     },
     {
       "id": "test_unaddressable_row_is_reported_not_claimed",
