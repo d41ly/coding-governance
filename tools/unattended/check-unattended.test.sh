@@ -103,6 +103,26 @@ DIRECTIVES_EXTRA_TABLE=""
 # 50-minute suite run to find, which is the only reason it is this loud.
 HALT_CODES_EXTRA=""
 HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
+# DECLARED HERE, AND THAT IS A FIXTURE FIX RATHER THAN A PRODUCT ONE (TOOL-dFoldedVerdict-2 fallout).
+# The key was absent from this block, so the DEFAULT fixture took check 2's blank branch and the leg
+# announced it on stdout once per run. That announcement is CORRECT for a blank cutoff and wrong for
+# the tree every other arm treats as conforming: this suite's opening control asserts that a
+# conforming tree prints NOTHING, so it and every absence assertion below it were graded against a
+# tree that already talks.
+#
+# 2099-01-01, not a real date and not today's. A cutoff AHEAD of every fixture record forces the
+# pre-cutoff id-delta proxy, which is byte-for-byte what the blank branch did, so declaring the key
+# moves no other arm's verdict. A date behind the records would silently switch ~290 arms onto the
+# recorded-disposition predicate instead, which is a different fixture wearing the same name.
+#
+# THE BLANK BRANCH IS STILL ARMED. The arm that wants it now STRIPS this key rather than relying on
+# its absence here - see the blank-cutoff arm in region one. Leaving one arm to depend on a hole in
+# the shared fixture is what made this a suite-wide red rather than one arm's problem.
+#
+# WHAT THIS DOES NOT FIX: an adopter who copies .unattended.conf.example verbatim gets the key BLANK
+# and therefore the same announcement on every bar. Whether it should fire there is dFoldedVerdict's
+# question, not this fixture's, and it is untouched.
+DISPOSITION_CUTOFF="2099-01-01"
 EOF
 }
 
@@ -809,7 +829,10 @@ reset_tree
 # ---- inferring one from ids. Every arm pins the cutoff to a date the fixture cannot drift past:
 # ---- 2000-01-01 forces grading, 2099-01-01 forces the pre-cutoff proxy. Neither depends on the day
 # ---- the suite runs, which a cutoff of "today" would.
-dispconf() { mkconf; printf 'DISPOSITION_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
+# STRIPS BEFORE IT APPENDS, since mkconf now declares the key itself. Appending alone would leave the
+# conf carrying two declarations of one key: the leg's import reads the last and would behave, but a
+# fixture that declares a key twice is a fixture check 22 grades on a key set nobody meant to write.
+dispconf() { mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf; printf 'DISPOSITION_CUTOFF="%s"\n' "$1" >> .unattended.conf; }
 mkdisp() { # base-region-rows · head-region-rows · run rows
   mkdir -p memory/builds/tDisp
   printf '# tDisp\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n%b<!-- /gen:build-units -->\n' "$1" > memory/builds/tDisp/README.md
@@ -867,7 +890,13 @@ hit "$(run)" "1 subject(s) EXITED without converging and the generated units reg
 
 # A BLANK CUTOFF grandfathers everything AND SAYS SO, unconditionally and on stdout. A silently
 # disabled clause reads exactly like a clause finding nothing wrong.
-reset_tree; mkconf
+#
+# THE KEY IS STRIPPED EXPLICITLY, and it used to be a bare `mkconf` relying on the shared fixture not
+# declaring it. That made one arm's break the DEFAULT state of every other arm's tree, so the whole
+# suite ran against a tree that announced. This is the UNDECLARED shape, which is the one an adopter
+# actually hits; the leg defaults the variable to empty before the branch, so blank and undeclared
+# are the same state by the time it is read.
+reset_tree; mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf
 hit "$(run)" "DISPOSITION_CUTOFF is blank or undeclared, so check 2 clause 3 grades EVERY record on the id-delta proxy"
 
 # A MALFORMED CUTOFF is a REFUSAL, never a defaulted value — S6's one new branch, and the reason the
