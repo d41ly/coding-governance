@@ -679,6 +679,62 @@ code, out = run_case({"core/ok.sh": "build_thing() {\n  :\n}\n"},
 check("a LANGS `parser` row naming an unshipped parser REFUSES rather than silently grading Python",
       code != 0 and "does not ship" in out and "no-such-parser" in out, out)
 
+# M7 — ONE extension catalog, asserted by IDENTITY. The two copies had already diverged on the `py`
+# pattern-set id inside a single build, which is what makes an equality assertion too weak here: a
+# future re-fork that happens to start equal would pass it and drift on the next edit.
+import scaffold_lexicon as _scaf  # noqa: E402
+check("the scaffold and the engine share ONE extension catalog object",
+      _scaf.KNOWN is lex.KNOWN_EXTS,
+      f"scaffold={_scaf.KNOWN!r} engine={lex.KNOWN_EXTS!r}")
+check("...and that catalog is non-empty, or the identity above holds vacuously",
+      len(lex.KNOWN_EXTS) >= 2, repr(lex.KNOWN_EXTS))
+
+# S4 (TOOL-aGradedDialect-4) — EVERY SHIPPED DECLARATION ROW RESOLVES, checked here rather than
+# discovered on an adopter's first run. `scan_corpus` already refuses a row whose reader is absent,
+# per file, by name; this moves that discovery to the kit's own suite, where a catalog edit is what
+# reds instead of somebody else's corpus.
+#
+# THE RULE IS MODE-AGNOSTIC, and that is the whole care in it. The pattern-set id selects the reader
+# and the mode token carries only the standing (`resolve_extractor`), so a tokenizer that honestly
+# scored below `TOOL-aGradedDialect-2`'s floor ships as `probe` while still resolving through
+# `PARSERS`. An arm keyed on the mode — a `probe` id looked up in `PATTERN_SETS` — would red that
+# correct configuration, which is why the two catalogs are ORed here and `resolve_extractor` itself,
+# whose whole job is to answer for one declared pair, is not the operand.
+#
+# THE WHOLE CATALOG IS GRADED, not its last row: an arm that iterated and asserted on the final
+# value would pass whenever the broken row was anywhere else, so the staged break for this group
+# goes on a NON-final row.
+#
+# AND IT SITS ABOVE THE FIXTURE WALKS ON PURPOSE, which is why the M7 arms moved up here with it.
+# These arms read two dicts and no tree, so they cost nothing wherever they are — but a catalog
+# break also breaks the `--scaffold` and re-scaffold blocks below, which read the seed they write
+# through an UNGUARDED `load_conf`. A `SEED_CONVENTIONS` value outside the closed set therefore
+# kills the interpreter on a ConfError, and the summary that would have named this arm is printed
+# at the END, so a traceback swallows it. Observed while staging exactly that break: the run reds
+# either way, and from up here the recorded failure at least precedes the crash rather than
+# following it. Guarding those two reads is a separate change to a separate unit's arms.
+_UNRESOLVED = sorted(f"{_e}:{_pset}" for _e, (_pset, _m) in lex.KNOWN_EXTS.items()
+                     if _pset not in lex.PARSERS and _pset not in lex.PATTERN_SETS)
+check("S4: every KNOWN_EXTS row names a pattern set some shipped reader answers",
+      not _UNRESOLVED and bool(lex.KNOWN_EXTS),
+      f"unresolved={_UNRESOLVED} of {len(lex.KNOWN_EXTS)} row(s): {lex.KNOWN_EXTS!r}")
+
+# The seed table's own rows, against the two CLOSED sets its reader grades a declaration by. A typo
+# here arms nothing and reports nothing: the pair simply never matches, `.get` returns `dark`, and
+# the adopter reads a `dark` row where the kit believed it had a prescription.
+_BAD_SEED = sorted(f"{_e}.{_s}={_c}" for (_e, _s), _c in _scaf.SEED_CONVENTIONS.items()
+                   if _s not in lex.SURFACES or _c not in lex.CONVENTIONS)
+check("S4: every SEED_CONVENTIONS row names a surface and a convention the reader's closed sets hold",
+      not _BAD_SEED and bool(_scaf.SEED_CONVENTIONS),
+      f"outside={_BAD_SEED} of {len(_scaf.SEED_CONVENTIONS)} row(s)")
+
+# THE ONLY OBSERVATION THAT CAN SEE THE FOURTH ROW. `("tsx", "function")` at `dark` emits the same
+# bytes as the `.get` default, so no assertion over the emitted conf can tell a DECLARED refusal
+# from an absent opinion — the difference is legible only in this dict. AC4.
+check("S4: the `tsx.function` refusal is DECLARED in the catalog, not left to the `.get` default",
+      _scaf.SEED_CONVENTIONS.get(("tsx", "function")) == "dark",
+      repr(sorted(_scaf.SEED_CONVENTIONS)))
+
 # ---- the --scaffold path, end to end -------------------------------------------------------------
 # Nothing exercised this before, which is how a scaffolder that could emit a row its OWN reader
 # refuses went unnoticed: `leading_verb` can return a digit run (`2fa_check` -> `2`) and the conf
@@ -692,8 +748,21 @@ with build_tempdir() as td:
     (root / "src" / "a.py").write_text(
         "def build_x():\n    pass\n\n\ndef load_y():\n    pass\n\n\ndef 十_bad():\n    pass\n"
         .replace("十_bad", "_2fa_check"), encoding="utf-8")
+    # THE TYPESCRIPT HALF OF THE FIXTURE (TOOL-aGradedDialect-4). This repo tracks ZERO `.ts` and
+    # `.tsx` files, so nothing about the two catalog rows can be observed on a gov bar and a green
+    # one says nothing about them — the green-by-absence class, answered by putting the population
+    # in the fixture instead. One function and one type per extension, which is the population
+    # `UNDECLARED CELL` grades and therefore the four cells the seed has to cover. The `.tsx`
+    # function is deliberately a PascalCase component: it is the definition the `tsx.function` row
+    # declines to grade, so a fixture without one could not tell a `dark` row from an armed one.
+    (root / "src" / "a.ts").write_text(
+        "export function loadThing(): string {\n  return \"x\";\n}\n\n"
+        "export interface ThingProps {\n  id: string;\n}\n", encoding="utf-8")
+    (root / "src" / "a.tsx").write_text(
+        "export function Card(): JSX.Element {\n  return <div />;\n}\n\n"
+        "export interface CardProps {\n  id: string;\n}\n", encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=root, check=True)
-    subprocess.run(["git", "add", "--", "src/a.py"], cwd=root, check=True, capture_output=True)
+    subprocess.run(["git", "add", "--", "src"], cwd=root, check=True, capture_output=True)
     r = subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", str(root / ".lexicon.conf")],
                        cwd=root, capture_output=True, text=True)
     check("scaffold: exits 0", r.returncode == 0, r.stdout + r.stderr)
@@ -720,6 +789,82 @@ with build_tempdir() as td:
               "2" not in parsed["VERBS"], f"{sorted(parsed['VERBS'])}")
     except ConfError as e:
         check("scaffold: the file it wrote PARSES through its own reader", False, str(e))
+
+    # ---- TOOL-aGradedDialect-4: THE TYPESCRIPT SEED, READ OUT OF THE FILE IT WROTE -------------
+    #
+    # THE EXPECTED MODE IS THE CATALOG'S, never a token spelled here. `TOOL-aGradedDialect-3`
+    # measures its reader against a declared floor and DECLARES `parser` or `probe` from the
+    # result; an arm naming either one would red this seed on a correct build that honestly earned
+    # the other. So the operand is `lex.KNOWN_EXTS`, which is the constant the scaffolder READS —
+    # not what it emits, which would compare the scaffolder's output against itself.
+    _langs_line = next((_l for _l in conf_text.splitlines() if _l.startswith("LANGS=")), "")
+    _langs_toks = set(_langs_line.split('"')[1].split()) if '"' in _langs_line else set()
+    for _e in ("ts", "tsx"):
+        # `.get`, NOT `[...]`, and the difference was observed rather than reasoned: a dotted `".ts"`
+        # key is the exact defect the next arm exists to catch, and subscripting the catalog with the
+        # bare token made THIS arm raise KeyError on it — the run died in the guard instead of
+        # reporting it. A predicate taken out by the fault it grades is not a predicate.
+        _row = lex.KNOWN_EXTS.get(_e)
+        check(f"AC1: the emitted LANGS names `{_e}` at the catalog's own pattern set and mode",
+              bool(_row) and f"{_e}:{_row[0]}:{_row[1]}" in _langs_toks,
+              f"catalog={_row} line={_langs_line}")
+        # THE DOTTED-KEY BREAK, which is the one that looks correct to a reader. `ext_of` returns
+        # the token WITHOUT its dot, so a `".ts"` key in the catalog is never looked up and the
+        # seed keeps emitting the undeclared-extension form while the dict reads fine.
+        check(f"AC1: ...and not the undeclared form `{_e}::dark`", f"{_e}::dark" not in _langs_toks,
+              _langs_line)
+
+    # The CELLS rows, through the ONE reader rather than a second parse of its grammar. Only the
+    # three rows that DIFFER from the `.get` default are asserted here: `tsx.function` emits `dark`
+    # whether the catalog declares it or the default supplies it, so an assertion over these bytes
+    # cannot tell a declared refusal from an absent one. That row is observed in the S4 group.
+    try:
+        _seeded = load_conf(root / ".lexicon.conf").get("CELLS") or {}
+    except ConfError:
+        _seeded = {}
+    _seeded_flat = {_k: _v[0] for _k, _v in _seeded.items()}
+    for _cell, _want in (("ts.function", "camel"), ("ts.type", "pascal"), ("tsx.type", "pascal")):
+        check(f"AC2: the emitted CELLS block carries `{_cell}` at `{_want}`",
+              _seeded_flat.get(_cell) == _want, f"CELLS={_seeded_flat}")
+
+    _lines = conf_text.splitlines()
+
+    def read_note_above(pred) -> tuple[int, str]:
+        """The contiguous run of comment lines directly above the first line `pred` selects.
+
+        `(-1, "")` when nothing matches, and every arm below tests the index: an absent row makes
+        an empty note, and `"%" not in ""` is a pass over a file that never carried the row.
+        """
+        _i = next((n for n, _l in enumerate(_lines) if pred(_l)), -1)
+        _run: list[str] = []
+        _j = _i - 1
+        while _i >= 0 and _j >= 0 and _lines[_j].strip().startswith("#"):
+            _run.insert(0, _lines[_j].strip())
+            _j -= 1
+        return _i, " ".join(_run)
+
+    # AC3 — the verb pin's comment says what a large share MEANS and which door answers it. The
+    # share is MEASURED: a percentage typed into the scaffolder would pin one repo's measurement
+    # into every adopter's declaration, which is the defect the two scalar pins already carry a
+    # paragraph about.
+    _pin_i, _pin_note = read_note_above(lambda _l: _l.startswith("VERB_OFFENDER_PIN="))
+    _pin_val = _lines[_pin_i].split('"')[1] if _pin_i >= 0 else ""
+    check("AC3: the comment above VERB_OFFENDER_PIN states the offender share as a measured figure",
+          _pin_i >= 0 and bool(re.search(r"\d+ of \d+ definition", _pin_note)) and "%" in _pin_note,
+          _pin_note[:240])
+    check("AC3: ...whose numerator is the pin this same walk wrote, not a figure of its own",
+          _pin_i >= 0 and f"{_pin_val} of " in _pin_note, f"pin={_pin_val!r} {_pin_note[:240]}")
+    check("AC3: ...and it names the CANON: overlay as the door rather than a wider VERBS table",
+          _pin_i >= 0 and "CANON:" in _pin_note, _pin_note[:240])
+
+    # AC5 — the `tsx.function` row's reason is a RULE. A figure would be somebody else's corpus,
+    # and a to-do would re-arm the casing rule §8 F1 refused, at the one place an adopter is most
+    # likely to act on the invitation.
+    _tsx_i, _tsx_note = read_note_above(lambda _l: _l.strip().startswith("tsx.function"))
+    check("AC5: the emitted `tsx.function` row carries the ROLE rule as its reason",
+          _tsx_i >= 0 and "JSX" in _tsx_note and "role" in _tsx_note.lower(), _tsx_note[:240])
+    check("AC5: ...stated without a percentage, which would pin another corpus's measurement here",
+          _tsx_i >= 0 and "%" not in _tsx_note, _tsx_note[:240])
 
     r = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--check"], cwd=root,
                        capture_output=True, text=True)
@@ -1341,15 +1486,6 @@ for _bad, _want, _cell in (
 # separate defects and watched both stay green through all of them. An exact assertion on the swap
 # makes an absence assertion beside it redundant by construction.
 
-# M7 — ONE extension catalog, asserted by IDENTITY. The two copies had already diverged on the `py`
-# pattern-set id inside a single build, which is what makes an equality assertion too weak here: a
-# future re-fork that happens to start equal would pass it and drift on the next edit.
-import scaffold_lexicon as _scaf  # noqa: E402
-check("the scaffold and the engine share ONE extension catalog object",
-      _scaf.KNOWN is lex.KNOWN_EXTS,
-      f"scaffold={_scaf.KNOWN!r} engine={lex.KNOWN_EXTS!r}")
-check("...and that catalog is non-empty, or the identity above holds vacuously",
-      len(lex.KNOWN_EXTS) >= 2, repr(lex.KNOWN_EXTS))
 
 # N1 — an unreadable KIT_LEXICON_VERSION must REFUSE, not render a version-less marker. The capture
 # is a pipeline, and a pipeline takes its LAST command's status, so `head -1` succeeding on empty
@@ -2860,9 +2996,19 @@ _LOOSE = [i + 1 for i, ln in enumerate(_SCAFFOLD_SRC) if "CANON" in ln]
 _NARROW = [i + 1 for i, ln in enumerate(_SCAFFOLD_SRC) if _lex._CANON_HEADER_RE.search(ln)]
 check("AC9: the narrowed predicate matches nothing in the shipped scaffold", not _NARROW,
       repr(_NARROW))
-check("AC9: ...while the LOOSE form matches exactly one line, the descriptive comment it would "
-      "have forced a rewording of", len(_LOOSE) == 1
-      and "PROPOSED from the SHIPPED CANON" in _SCAFFOLD_SRC[_LOOSE[0] - 1], repr(_LOOSE))
+# THE LOOSE HALF IS GRADED AS A CLASS, not pinned at a count, and the count is why. It asserted
+# `len(_LOOSE) == 1` and that the one hit was the `PROPOSED from the SHIPPED CANON` line —
+# a figure beside the population it counts, which went stale the moment a second sentence had reason
+# to name the overlay: TOOL-aGradedDialect-4's verb-pin comment names `CANON:` as the door a large
+# offender share is answered through, and that landing redded this arm while the narrow predicate,
+# the one thing here that guards anything, stayed correctly empty. What the near-miss actually is
+# is PROSE — a source comment, or a line emitting a conf COMMENT — and every hit being prose is the
+# property worth asserting. A hit that is neither reds, and so does an empty population.
+_LOOSE_PROSE = [_n for _n in _LOOSE if _SCAFFOLD_SRC[_n - 1].lstrip().startswith("#")
+                or '"#' in _SCAFFOLD_SRC[_n - 1] or "'#" in _SCAFFOLD_SRC[_n - 1]]
+check("AC9: ...while every LOOSE hit is prose — a comment the narrowing spares a rewording of, "
+      "never an emitted block header", bool(_LOOSE) and _LOOSE_PROSE == _LOOSE,
+      f"loose={_LOOSE} prose={_LOOSE_PROSE}")
 
 # S5 — THE RECORDED HALF OF THE DOOR, on `adopt-lexicon.sh --check`, and it was the largest hole in
 # this unit. NOTHING exercised either stamp refusal: this repo declares no `CANON:` block, so the

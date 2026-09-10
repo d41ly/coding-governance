@@ -52,3 +52,9 @@ base: d13576732e6837e4be62edf5c60eb43631f94cd0
 2026-09-10T01:19:32Z dispatch · item 7c75bf52 TOOL-aGradedDialect-3 · reason tools/lexicon/lexicon.py tools/lexicon/selftest.py .lexicon.conf .claude/skills/lexicon/SKILL.md memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-3.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-3-acceptance.md memory/map/generated/symbols.json
 
 2026-09-10T01:22:45Z dispatch · item 7c75bf52 TOOL-aGradedDialect-3 · reason tools/lexicon/lexicon.py tools/lexicon/selftest.py .lexicon.conf .claude/skills/lexicon/SKILL.md memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-3.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-3-acceptance.md memory/map/generated/symbols.json memory/builds/aGradedDialect/README.md
+
+2026-09-10T01:35:52Z brief · item TOOL-aGradedDialect-4 · reason 17a9d9782fdc memory/builds/aGradedDialect/prompts/2026-09-10-prompt-TOOL-aGradedDialect-4-brief.md
+
+2026-09-10T01:36:01Z dispatch · item 81a1bacf TOOL-aGradedDialect-4 · reason tools/lexicon/lexicon.py tools/lexicon/scaffold_lexicon.py tools/lexicon/selftest.py memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-4.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-4-acceptance.md
+
+2026-09-10T01:39:47Z dispatch · item 81a1bacf TOOL-aGradedDialect-4 · reason tools/lexicon/lexicon.py tools/lexicon/scaffold_lexicon.py tools/lexicon/selftest.py memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-4.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-4-acceptance.md memory/builds/aGradedDialect/README.md

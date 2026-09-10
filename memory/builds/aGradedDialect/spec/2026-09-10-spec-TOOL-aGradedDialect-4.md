@@ -1,11 +1,12 @@
 # TOOL-aGradedDialect-4 — the declaration surface for TypeScript, and the `.tsx` casing row as a declared refusal
 
-**Status:** SPECCED · rev-4 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 4 · ratified 2026-09-10
+**Status:** CLOSED · rev-5 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 4 · ratified 2026-09-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-10-build-TOOL-aGradedDialect-4-acceptance.md](../build/2026-09-10-build-TOOL-aGradedDialect-4-acceptance.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-5 |
 | [2026-09-10-prompt-TOOL-aGradedDialect-4-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-4-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-5 |
@@ -177,7 +178,7 @@ function and lands under `py.function snake`, leading with a canon verb.
 |---|---|
 | `tools/lexicon/lexicon.py` | two `KNOWN_EXTS` rows |
 | `tools/lexicon/scaffold_lexicon.py` | four `SEED_CONVENTIONS` rows, the `CELLS` comment, the verb-pin comment |
-| `tools/lexicon/selftest.py` | one arm group for S4 |
+| `tools/lexicon/selftest.py` | one arm group for S4, the `.ts`/`.tsx` fixture files AC1 needs, and two arms that MOVE rather than arrive — see the rev-5 §9 line |
 | `tools/lexicon/kit.toml` | NOT TOUCHED — the kit version is `TOOL-aGradedDialect-5` S6 and this file carries no version of its own; kept as a stated non-edit so a builder does not go looking |
 
 ## 5. Production-readiness checklist
@@ -314,6 +315,22 @@ to a token outside `CONVENTIONS` · none, the file declares no assertion floor.
   `PARSERS` does not hold", which S4's mode-agnostic rule lets resolve through `PATTERN_SETS` and
   come back GREEN; it now names a token in neither catalog. §4's `kit.toml` row declared a version
   edit no scope item owns, on a file carrying no version.
+- rev-5 · 2026-09-10 · §2 S4 · §4 · declared at BUILD time what the build had to touch beyond the
+  estimate, in `tools/lexicon/selftest.py` and nowhere else. TWO existing arms moved rather than
+  one group being added. (1) S3's comment names `CANON:` as the door, which makes a SECOND line in
+  `scaffold_lexicon.py` match the LOOSE `CANON` predicate — and the AC9 near-miss arm pinned that
+  population at exactly ONE line and required the sole hit to be the `PROPOSED from the SHIPPED
+  CANON` comment. That is a count written beside the population it counts, so it redded on a
+  correct landing while the NARROW predicate, the only half that guards anything, stayed correctly
+  empty. The arm now grades the CLASS: every loose hit is prose — a source comment or a line
+  emitting a conf comment — and an empty population reds too. (2) The M7 catalog arms and S4's new
+  group moved ABOVE the `--scaffold` fixture block. A `SEED_CONVENTIONS` value outside `CONVENTIONS`
+  reaches two UNGUARDED `load_conf` reads in the fixture blocks and kills the interpreter, and the
+  arm summary prints last, so the staged break redded the suite through a traceback rather than
+  through the arm that had already named the cause. From above the fixtures the record at least
+  precedes the crash; guarding those two reads belongs to whichever unit owns those arms. No
+  criterion, scope item or resolution moved, and the shipped bytes of the two catalogs are exactly
+  what rev-4 specified.
 - rev-3 · 2026-09-10 · §3 · declared the missing `consumes-from` edge to `TOOL-aGradedDialect-2`.
   That unit's §3 hands the declared FLOOR to this one and this side never wrote the reciprocal, which
   is the disagreement hygiene check 12 reports against the other file. It is a real dependency and not

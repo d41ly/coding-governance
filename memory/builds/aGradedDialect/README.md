@@ -78,11 +78,11 @@ ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGrad
 | [TOOL-aGradedDialect-1 — the mechanism fork for reading TypeScript, resolved against the compiler](spec/2026-09-10-spec-TOOL-aGradedDialect-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-10 |
 | [TOOL-aGradedDialect-2 — the conformance corpus: fixtures a compiler extracted, frozen before the reader exists](spec/2026-09-10-spec-TOOL-aGradedDialect-2.md) | 2 | 2 | CLOSED | rev-7 | 2026-09-10 |
 | [TOOL-aGradedDialect-3 — the TypeScript extractor: a tokenizer, a definition locator, and a coverage mode it has to earn](spec/2026-09-10-spec-TOOL-aGradedDialect-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-10 |
-| [TOOL-aGradedDialect-4 — the declaration surface for TypeScript, and the `.tsx` casing row as a declared refusal](spec/2026-09-10-spec-TOOL-aGradedDialect-4.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-10 |
+| [TOOL-aGradedDialect-4 — the declaration surface for TypeScript, and the `.tsx` casing row as a declared refusal](spec/2026-09-10-spec-TOOL-aGradedDialect-4.md) | 4 | 2 | CLOSED | rev-5 | 2026-09-10 |
 | [TOOL-aGradedDialect-5 — the records: the darkness ruling retired where it is actually carried](spec/2026-09-10-spec-TOOL-aGradedDialect-5.md) | 5 | 1 | SPECCED | rev-4 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 13 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

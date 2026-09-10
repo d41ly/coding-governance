@@ -89,8 +89,20 @@ WAIVER_FILES = {
 #: code paths, and they do not — `extract_text` dispatches on `mode` alone and reads `pset` only
 #: under `probe`, so nothing anywhere compares a pattern-set id against `""`. A fix comment is read
 #: as provenance, so an overstated one is worse than none. Closing review M7, trimmed by round 2.
+#:
+#: THE TWO TYPESCRIPT MODES ARE A TRANSCRIBED VERDICT, not a choice made here. TOOL-aGradedDialect-3
+#: measured `parse_ts_defs` and `parse_tsx_defs` against TOOL-aGradedDialect-2's frozen conformance
+#: records and its declared floor, and EARNED `parser`: 115 of 115 records in exact agreement,
+#: refusal share 0.0000. `probe` was the other outcome and would have been written here instead, so
+#: nothing about the rows below is this unit's opinion. TOOL-aGradedDialect-4 S1.
+#:
+#: TWO EXTENSIONS AND TWO IDS, because there is no alias mechanism: `ext_of` returns the last dot
+#: segment and `scan_corpus` looks it up in this plain dict, so an undeclared `tsx` is dark and
+#: silently so. The two ids are separate for the reason `PARSERS` states — `<T>(x) => x` is a
+#: generic in one dialect and an element in the other, and `extract_text` never sees a path.
 KNOWN_EXTS = {"py": ("python-ast", "parser"), "js": ("js-regex", "probe"),
-              "sh": ("shell-tokens", "parser")}
+              "sh": ("shell-tokens", "parser"), "ts": ("ts-tokens", "parser"),
+              "tsx": ("tsx-tokens", "parser")}
 
 PIN_KEYS = {"verb": "VERB_OFFENDER_PIN", "suffix": "SUFFIX_OFFENDER_PIN"}
 
