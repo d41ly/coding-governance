@@ -56,6 +56,19 @@ coverage 19.3%. The decision named its own revisit test, and both halves now hol
 
 ## Parked decisions
 
+- **OWNER RULING 2026-09-10 — the closing review's BLOCKER, disposed.** The conformance
+  corpus publishes verbatim excerpts of a PRIVATE tree into this PUBLIC one. A five-lens
+  scan read all 115 records and confirmed ZERO findings across credentials, PII,
+  proprietary logic, infrastructure and licensing; 28 raw candidates were all refuted by a
+  refute-by-default skeptic. The owner accepted the disclosure on that evidence and
+  directed the build to land. What the scan did NOT clear, stated because it is the part
+  no lens called a finding: the excerpts are still architecture and security-model prose,
+  readable by anyone.
+- **The corpus is oversized and that is recorded rather than fixed here.** It carries 115
+  records over 12 distinct construct combinations, and four of the five defects the
+  closing review confirmed had NO trigger in it at all. Shrinking it is a subset of the
+  existing freeze, never a redraw, because the freeze ordering cannot be re-earned.
+
 <!-- roster:units -->
 
 | # | Unit | Status | Mechanism |
