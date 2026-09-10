@@ -1,12 +1,14 @@
 # TOOL-aLeakedHandle-2 — a run that reached a leg's ceiling is evidence, not a discarded failure
 
-**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 2
+**Status:** CLOSED · rev-4 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md](../build/2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md) | research | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-3 |
+| [2026-09-10-build-TOOL-aLeakedHandle-2-1-acceptance-ledger.md](../build/2026-09-10-build-TOOL-aLeakedHandle-2-1-acceptance-ledger.md) | journal | — |
+| [2026-09-10-prompt-TOOL-aLeakedHandle-2-1-build-brief.md](../prompts/2026-09-10-prompt-TOOL-aLeakedHandle-2-1-build-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md) | spec-audit | TOOL-aLeakedHandle-1 |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md) | spec-audit | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-3 |
 
@@ -372,10 +374,19 @@ suppressed, and no red is manufactured on a number nobody is allowed to move.
   ceiling was REACHED in a recorded run.
   Red when: the line still reads `does not clear its evidenced maximum` for a reached ceiling, or the
   run exits 0.
-- **AC4** — When each arm's subject is reverted in place and
-  `bash tools/run-gates/run-gates.evidence.test.sh` is re-run BY HAND, that arm prints `FAIL` and the
-  suite exits non-zero; one observation per arm is recorded before the reverts are unstaged.
-  Red when: an arm passes with its subject reverted, which is an arm asserting nothing.
+- **AC4** — When each arm's subject is reverted in place and the suite is re-run BY HAND, that arm
+  prints `FAIL` and the suite exits non-zero; one observation per arm is recorded before the reverts
+  are unstaged. At least ONE break is observed through the whole named invocation,
+  `bash tools/run-gates/run-gates.evidence.test.sh`; the others may be observed through the file's
+  own NEW SECTION run from its own prologue, and only while a grep over every arm preceding that
+  section shows none of them names the subject file — that grep is what makes the two runs
+  equivalent for a break confined to `tools/run-gates/derive-ceilings.py`, and without it they are
+  not. Whatever runs REFUSES a run that executed fewer arms than the section holds.
+  Red when: an arm passes with its subject reverted, which is an arm asserting nothing; or the
+  observation is taken from a run whose arm count nothing asserted, because a break that reds
+  nothing and a harness that never started produce the same empty `FAIL` list — measured, on the
+  first driver written for this unit, which reported all six breaks as unobserved while every
+  invocation was exiting 127 on a mangled path.
   BY HAND is the whole of it: no boundary performs this observation. The leg `run-gates evidence` is
   `chunk: selftests` and `subject: kit` in `tools/gate-legs.json`, and `run-gates.sh` holds every leg
   matching either unless `GATE_SELFTESTS=1`, which no boundary sets (owner ruling, 2026-08-27). So
@@ -543,6 +554,18 @@ to take is the shape M3 refuses. Re-asked by whoever answers the parked ceiling 
   `--write --reset <leg>` escape, which §5 risks calls the whole of the mitigation, so the half a
   reader acts on could ship absent with every criterion green. S4, AC7 and the §5 risks row now
   carry it, and AC7 names the substrings its arm asserts.
+
+- rev-4 · 2026-09-10 · §6 AC4 · AMENDED while building, per the build method's AMEND act. AC4
+  required the WHOLE suite re-run once per staged break. The suite carries fifty-one arms that
+  predate this unit and its wall clock is minutes, so the criterion as written priced six full runs
+  for six breaks confined to one python file — and a grep over every arm preceding the new section
+  shows none of them names `tools/run-gates/derive-ceilings.py` or the word `ceiling` at all, so
+  those fifty-one arms cannot observe any of the six. The criterion now requires one break through
+  the full named invocation and admits the new section alone for the rest, GATED on that grep rather
+  than on an author's assurance. It also grew a second `Red when:` clause the first driver earned:
+  it reported every break as unobserved while each run was exiting 127 on a path a POSIX-emulation
+  layer had mangled, and an empty `FAIL` list is what a clean break and a dead harness both look
+  like. Charter §7's liveness rule, one level up from the code.
 
 ## 10. Reuse audit
 

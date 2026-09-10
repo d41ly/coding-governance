@@ -35,6 +35,22 @@ HERE = pathlib.Path(__file__).resolve().parent
 EVIDENCE = HERE / "ceiling-evidence.txt"
 MARGIN_FILE = HERE / "ceiling-margin.txt"
 
+# How far ABOVE its declared ceiling a failing reading may sit and still be admitted as evidence.
+# 5 s of it is arithmetic: `run-gates.sh` wraps a bounded leg in `timeout -k 5s "$bound"`, so
+# SIGKILL lands five seconds after SIGTERM and nothing the leg decides can put its death later.
+# The other 30 s is a teardown allowance — `runleg` stamps its end time after `cat`-ing the leg's
+# output, so a file read and a `date` spawn sit inside the measured seconds, all of it competing
+# with the rest of a full bar. Sized against what this repo has recorded rather than against
+# comfort: the worst overshoot on record is 0.481 s and the worst single process spawn measured on
+# a degraded node is 1.297 s (TOOL-aMeteredTurnstile-6). Widening this buys margin nothing has
+# needed and widens the inert-host band `read_runs` discloses; tightening it silently discards the
+# readings this filter exists to admit.
+#
+# WRITTEN AS A SUM, so the two halves are stated once each and the total is derived. A literal 35
+# beside a comment saying "5 plus 30" is two answers to one question, and the comment is the copy
+# that rots.
+CEILING_WINDOW_S = 5 + 30
+
 
 def resolve_repo_root() -> pathlib.Path:
     out = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--show-toplevel"],
@@ -87,11 +103,36 @@ def read_margin() -> tuple[int, float, str]:
              f"<floor seconds>, tab, <fraction> row")
 
 
-def read_runs(gd: pathlib.Path) -> dict:
-    """Every recorded reading per leg, from the per-run leg files.
+def read_runs(gd: pathlib.Path, legs: dict) -> dict:
+    """Every recorded reading per leg, from the per-run leg files. Returns {name: [seconds, ...]}.
 
-    Returns {name: [seconds, ...]}. Only `ok` rows count: a leg that FAILED may have failed fast,
-    and a maximum taken over failures is a measurement of the failure and not of the work.
+    THE ADMISSION RULE. An `ok` row counts at any duration, because a completed run measured the
+    work whatever bound was or was not in force around it. A NON-`ok` row counts only when its
+    seconds land inside the CLOSED WINDOW `[ceiling, ceiling + CEILING_WINDOW_S]`, against the
+    ceiling the leg manifest declares for that leg TODAY: that is a run the ceiling itself
+    stopped, so its seconds are a LOWER BOUND on the work, which is the one property a monotone
+    maximum needs and the property `ok` rows are admitted for. Every other failing row stays
+    excluded — a leg that failed fast measures the failure and not the work, and a maximum that
+    admits it holds a ceiling above a number nothing did. A leg with no integer ceiling admits
+    `ok` rows only, because there is nothing for a failing row to have reached. `legs` is
+    `read_legs`'s map and is REQUIRED rather than defaulted: a defaulted ceilings map is how one
+    call site keeps the old `ok`-only behaviour while every other criterion still passes green.
+
+    THE WINDOW IS CLOSED AT BOTH ENDS, and the upper edge carries as much of the rule as the lower.
+    `seconds >= ceiling` proves the bound expired only where the ceiling WAS the bound, and two
+    states break that. A host whose `CEILINGS_LIVE` probe fails runs every leg UNBOUNDED, and the
+    `.leg` row carries no bound field, so a leg that ran far past its ceiling and failed on its own
+    would enter a MONOTONE file as though a bound had stopped it. A ceiling edited after a row was
+    recorded breaks it the same way, since the comparison uses today's manifest against a
+    historical run. A reading materially above its ceiling is itself evidence that no such bound
+    produced it. What survives is a residual band the width of the window on such a host.
+
+    WHAT THIS CANNOT TELL APART, because the record holds one signature for all three: a leg that
+    is merely slow, a leg that was contended by its neighbours on a wide bar, and a leg that hung.
+    The runner records nothing that would separate them — no pool width, no neighbour count, no
+    bound. The evidence file is MONOTONE, so a contended or hung reading admitted once holds a
+    floor under that ceiling until somebody lowers it, and lowering one is `--write --reset <leg>`,
+    which exists for exactly this and records that somebody chose it.
     """
     per: dict[str, list[float]] = {}
     for f in glob.glob(str(gd / "gate-run" / "*" / "*.leg")):
@@ -101,12 +142,19 @@ def read_runs(gd: pathlib.Path) -> dict:
             continue
         for line in txt.splitlines():
             p = line.split("\t")
-            if len(p) < 4 or p[1] != "ok":
+            if len(p) < 4:
                 continue
             try:
-                per.setdefault(p[0], []).append(float(p[3]))
+                secs = float(p[3])
             except ValueError:
                 continue
+            if p[1] != "ok":
+                ceiling = (legs.get(p[0]) or {}).get("ceiling")
+                if not isinstance(ceiling, int):
+                    continue
+                if not ceiling <= secs <= ceiling + CEILING_WINDOW_S:
+                    continue
+            per.setdefault(p[0], []).append(secs)
     return per
 
 
@@ -129,7 +177,8 @@ def read_evidence() -> dict:
 
 
 def cmd_report(root, gd, args) -> int:
-    legs, runs = read_legs(root), read_runs(gd)
+    legs = read_legs(root)
+    runs = read_runs(gd, legs)
     floor, frac, mline = read_margin()
     if not runs:
         print(f"derive-ceilings: DEAD PROBE — no readings under {gd}/gate-run/. Nothing was "
@@ -172,7 +221,11 @@ def cmd_write(root, gd, args) -> int:
     evidenced maximum and, with it, the floor the gate holds every ceiling above. Lowering takes
     `--reset <leg>`, which records that somebody chose it.
     """
-    runs = read_runs(gd)
+    # THE CEILINGS ARE READ HERE TOO, and this call is the whole of a criterion. `read_runs`'s
+    # admission rule compares against them, and this is the only path that produces the tracked
+    # artifact — a write path still holding an `ok`-only filter is invisible to `--check`, which
+    # reads no run file at all.
+    runs = read_runs(gd, read_legs(root))
     if not runs:
         print("derive-ceilings: DEAD PROBE — no readings to write.", file=sys.stderr)
         return 2
@@ -236,7 +289,17 @@ def cmd_check(root, gd, args) -> int:
             bad.append(f"{name}: no ceiling declared, but {row[0]:.1f}s is recorded")
             continue
         need = max(floor, frac * row[0])
-        if ceiling < row[0] + need:
+        # A REACHED ceiling is a strict sub-case of the headroom failure below — required headroom
+        # never drops under the floor — so this branch changes no verdict, only the sentence. It
+        # exists because the headroom arithmetic reads as an invitation to size a new ceiling from
+        # the evidenced maximum, and a reading AT a ceiling is a lower bound on the work rather
+        # than its cost. Derived at check time from the two tracked files, so there is no stored
+        # flag to keep fresh and no way for the message to disagree with the row.
+        if row[0] >= ceiling:
+            bad.append(f"{name}: ceiling {ceiling}s was REACHED in a recorded run at "
+                       f"{row[0]:.1f}s — that reading is a LOWER BOUND on the work and not its "
+                       f"duration, so do not size a new ceiling from it")
+        elif ceiling < row[0] + need:
             bad.append(f"{name}: ceiling {ceiling}s does not clear its evidenced maximum "
                        f"{row[0]:.1f}s by the required max({floor}s, {frac}x) = {need:.0f}s "
                        f"(short by {row[0] + need - ceiling:.0f}s)")
