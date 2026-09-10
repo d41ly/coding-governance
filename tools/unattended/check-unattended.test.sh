@@ -805,7 +805,15 @@ reset_tree
 # ---- THE PROMOTION CLAUSE, which had NO arm at all - neither of its two messages was assertedanywhere, so the rewrite that made it count across subjects was landed unobserved. Two subjects both
 # ---- exit NON-CONVERGENT and the region gains exactly ONE id since the run BASE, so the count is
 # ---- short by one and the clause must say so. A per-subject reading would have passed this.
-reset_tree; mkconf
+#
+# ---- THE CUTOFF IS STRIPPED, and that is load-bearing rather than tidiness. This record is STAGED
+# ---- and never committed, so it carries no first-commit date - and check 2 grades exactly that case
+# ---- "whatever the cutoff says, being the one case that can still record a disposition"
+# ---- (check-unattended.sh:483). With a cutoff DECLARED, these two rows take the recorded-disposition
+# ---- path, record none, and the leg emits the no-disposition message instead of the promotion count
+# ---- this arm asserts. Measured: declaring the key in mkconf broke this one arm and only this one.
+# ---- The arm wants the blank branch, so it now says so instead of inheriting it from the fixture.
+reset_tree; mkconf; sed -i '/^DISPOSITION_CUTOFF=/d' .unattended.conf
 mkdir -p memory/builds/tProm
 printf '# tProm\n\n<!-- gen:build-units -->\n| Unit | Status |\n|---|---|\n| TOOL-tProm-1 | CLOSED |\n<!-- /gen:build-units -->\n' > memory/builds/tProm/README.md
 git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m promobase --no-verify
