@@ -359,8 +359,11 @@ def main(argv: list[str]) -> int:
     print_populations(findings, scanned)
     problems = malformed + check_registry(build_measured(findings), declared)
     if not problems:
-        print(f"sh-hygiene: OK — {len(declared)} declared site(s), no undeclared loop fed by a "
-              f"command substitution")
+        # SITES, not ROWS, and the two are different numbers: a row keys on (file, delimiter)
+        # and carries a COUNT, so one row can cover several sites. Printing the row count
+        # beside a hit line that counts sites made one run report one population two ways.
+        print(f"sh-hygiene: OK — {sum(declared.values())} declared site(s) in "
+              f"{len(declared)} row(s), no undeclared loop fed by a command substitution")
         return 0
     print(f"sh-hygiene: {len(problems)} finding(s). A `while … done` fed by a heredoc or here-string "
           f"whose body holds a command substitution reads until EOF, and EOF can never arrive.")

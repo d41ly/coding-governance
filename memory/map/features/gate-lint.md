@@ -118,7 +118,7 @@ that must land green over a non-compliant population without keying on a line nu
   is empty and whose green line proves nothing — the refusal `sh_hygiene.py` now implements would
   red it on the first run. The honest fix is the same refusal in the PowerShell scanner plus a leg
   that an adopter with `.ps1` files receives; neither is built.
-- **Nineteen carried sites and nothing that schedules the drain.** The registry ratchets — the count
+- **The carried sites, and nothing that schedules the drain.** The registry ratchets — the count
   can only fall — but a ratchet that never drains is a waiver wearing a ratchet's clothes. The drain
   is a backlog row against the tooling family, not a unit of the build that wired the leg.
 - **The scan reads SHAPE, not reachability.** A `$(printf …)` in a loop heredoc body is a hit even

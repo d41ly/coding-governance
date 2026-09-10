@@ -12,7 +12,8 @@
 # its row out in the same commit instead of leaving a widened exemption behind, and the count can
 # only fall with the sites.
 #
-# WHY THESE NINETEEN ARE CARRIED RATHER THAN DRAINED. The unit that wired this leg fixed the ONE
+# WHY THE ROWS BELOW ARE CARRIED RATHER THAN DRAINED — and the count is the rows, never a number
+# written in this paragraph. The unit that wired this leg fixed the ONE
 # site that had actually deadlocked — `pass_commit`, which held a merge-bar leg at zero CPU for 63
 # minutes on 2026-09-10. The rest are nineteen edits across six files in two kits and the tool root,
 # none of which has been observed to hang, and draining them is a bigger and riskier diff than the
