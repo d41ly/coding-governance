@@ -3869,6 +3869,410 @@ check("AC6: ...and says in words that it proposes nothing, rather than printing 
 check("AC6: ...naming a NON-ZERO live-cluster count, or the sentence is true of an empty corpus too",
       bool(re.search(r"All [1-9][0-9]* cluster\(s\)", _ac6)), _ac6[:400])
 
+# =================================================================================================
+# TOOL-aGradedDialect-2 — THE TYPESCRIPT CONFORMANCE CORPUS, and the floor a reader has to clear
+# before it may call itself `parser`.
+#
+# WHAT THE CORPUS IS. `ts-conformance-fixtures.json` holds excerpts drawn mechanically from a real
+# adopter tree, each carrying the reading `typescript@5.9.3` produced for the COMMITTED bytes. The
+# compiler is independent of everything this kit ships, so a reader graded against it is graded by
+# something it did not write. That is the answer to TOOL-dScaffoldedMirror-13's tautology objection,
+# and the MECHANISM is the ORDER: the corpus is committed in a pass that precedes the first commit
+# touching a TypeScript extractor. Spec §4, TOOL-aGradedDialect-2.
+#
+# WHAT THESE ARMS DO NOT CHECK, stated here because a structural check reads as a semantic one to
+# everyone who did not write it:
+#
+#   - NOTHING HERE PROVES THAT ORDERING. This file runs the kit inside a throwaway git repo and has
+#     no history to read. The proof is a DOCUMENTED CHECK — two git queries in the spec's §4 — run at
+#     the closing review, with both shas written into the review record. Its two traps live there
+#     too: the extractor half is a `-S` pickaxe over `lexicon.py` and not a `--diff-filter=A` over a
+#     file already tracked at this build's base, and the two shas must DIFFER, because
+#     `--is-ancestor` is reflexive and one commit carrying both halves would pass it.
+#   - NOTHING HERE STOPS A LATER SESSION editing an expectation to make a failing reader pass. Git
+#     shows the edit on this path; the rule is that an expectation changes only by re-running the
+#     oracle; no arm enforces it, because any digest a session can recompute it can recompute after
+#     editing both halves.
+#   - THE CORPUS GRADES FUNCTIONS AND TYPES. Imports are ungraded and the records carry none — spec
+#     §8 F2, and the predicate that read them went with `P3 layer`.
+#   - THE FLOOR IS UNEXERCISED UNTIL A READER EXISTS. While the kit declares none, the conformance
+#     arm SKIPS and says so; TOOL-aGradedDialect-3 is what removes the skip. Everything else below —
+#     the corpus's own shape, its composition, and the `js-regex` liveness case — is graded today.
+# =================================================================================================
+
+import json  # noqa: E402
+from collections import Counter  # noqa: E402
+
+TS_FIXTURES_FILE = KIT / "ts-conformance-fixtures.json"
+
+#: The nine declared fields of a record. Spec §4's data model, in its order.
+TS_FIELDS = ("id", "kind", "src", "funcs", "types", "constructs", "from", "oracle", "extracted")
+
+#: §4's record band: a corpus smaller than this grades too little, larger than this vendors too much
+#: of somebody else's tree.
+TS_CORPUS_BAND = (100, 150)
+
+#: §4's composition table. The five construct rows are counted from a record's own `constructs`
+#: tags; `tsx` and `types` are counted by PREDICATE, because neither is a construct — `tsx` is the
+#: record's `kind` and `types` is "carries at least one type definition".
+#:
+#: THESE ARE PINNED POLICY AND NOT MEASUREMENTS, and the reason is in the spec: unit 1's construct
+#: shares were measured per FILE over a whole tree, and a 60-line excerpt is far less likely to
+#: carry a construct than a whole file is, so demanding the shares would select construct-heavy code
+#: and distort the sample toward one reading. What unit 1's shares decide is the ORDER of these
+#: rows, never their values. The `types` floor is the one row that is not about a construct: the
+#: shipped `js-regex` set reads 8 of 1369 TYPES in that tree, and a corpus with a handful of type
+#: sites could not observe that — F1's type half would be exact agreement over a population small
+#: enough to clear by accident.
+TS_FIXTURE_MINIMA = {"template": 30, "jsx": 25, "generic": 20, "nested": 15, "regex": 10,
+                     "tsx": 40, "types": 20}
+
+#: F2's refusal budget: the share of the corpus's oracle definition sites that a reader's declared
+#: refusals may cover. PINNED policy, not a measurement — unit 1 measured the constructs a locator
+#: genuinely cannot name at a fraction of one percent, and the oracle drops computed method keys
+#: before they ever reach a record, so this is an order of magnitude of headroom rather than a
+#: licence. Without a budget, F1's exact agreement is reachable by REFUSING enough, which is the
+#: fixture-passes-by-finding-nothing class one level up.
+TS_FLOOR_REFUSAL_SHARE = 0.02
+
+
+def read_ts_fixtures(path=TS_FIXTURES_FILE):
+    """The frozen corpus as a list of records, or a REFUSAL naming the file.
+
+    An unreadable, unparseable or EMPTY corpus raises rather than returning `[]`. A grader handed an
+    empty population reports agreement with everything, so the one failure mode this loader must
+    never have is the quiet one: spec §5's error row says a missing corpus is a refusal naming the
+    file and never a skipped arm.
+    """
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise SystemExit(f"lexicon selftest: the TypeScript conformance corpus is unreadable at "
+                         f"{path}: {exc}")
+    try:
+        records = json.loads(raw)
+    except ValueError as exc:
+        raise SystemExit(f"lexicon selftest: the TypeScript conformance corpus at {path} is not "
+                         f"JSON: {exc}")
+    if not isinstance(records, list) or not records:
+        raise SystemExit(f"lexicon selftest: the TypeScript conformance corpus at {path} is empty, "
+                         f"and a grader over an empty corpus agrees with every reader")
+    # THE FIVE FIELDS EVERY ARM DEREFERENCES, refused HERE and by record id. AC1 grades the full
+    # nine, which is the criterion; these five are the subset an arm cannot report a defect WITHOUT,
+    # so a record short of one has to be named before any arm reads it rather than surfacing as a
+    # KeyError traceback from whichever line got there first.
+    thin = [i for i, r in enumerate(records)
+            if not isinstance(r, dict) or any(f not in r for f in ("id", "kind", "src", "funcs",
+                                                                   "types"))]
+    if thin:
+        raise SystemExit(f"lexicon selftest: {len(thin)} record(s) in {path} are missing a field "
+                         f"every arm dereferences (id, kind, src, funcs, types); first at index "
+                         f"{thin[0]}: {str(records[thin[0]])[:120]}")
+    return records
+
+
+def check_ts_reading(records, reader, refusals=()):
+    """Score one reading of the corpus against the oracle. Returns a verdict; decides nothing.
+
+    `reader` is called as `reader(src, kind)` and returns `(functions, types)`, each a sequence of
+    `(name, line)` with `line` 1-based within `src` — or it RAISES `SyntaxError`, the way
+    `parse_shell_defs` raises, on a construct it refuses to guess at. A raise is a REFUSAL: the
+    record leaves F1's population and its definition sites are charged to F2's budget.
+
+    `refusals` is the reader's own header refusal list, supplied by the CALLER rather than parsed
+    out of `__doc__` here. The header's grammar belongs to the reader, and a second parser for it
+    living in the grader is a second answer waiting to disagree. What this function does enforce is
+    the BINDING between the two, in both directions: every name in `refusals` must appear in the
+    reader's docstring, so a list cannot grant itself budget the header never declared; and every
+    name must be NAMED BY AN ACTUAL RAISE over this corpus, so a refusal nobody demonstrated cannot
+    be spent. The second is why a refusal message has to name its construct — the discipline
+    `parse_shell_defs` already follows, and the only handle a grader has on what was refused.
+    """
+    sites = sum(len(r["funcs"]) + len(r["types"]) for r in records)
+    doc = getattr(reader, "__doc__", None) or ""
+    v = {"records": len(records), "sites": sites, "exact": 0, "disagreements": [], "raised": {},
+         "func_missing": 0, "func_spurious": 0, "type_missing": 0, "type_spurious": 0,
+         "refusal_sites": 0,
+         "undeclared_refusals": [n for n in refusals if n not in doc]}
+    named_by_a_raise = set()
+    for r in records:
+        try:
+            got_funcs, got_types = reader(r["src"], r["kind"])
+        except SyntaxError as exc:
+            v["raised"][r["id"]] = str(exc)
+            v["refusal_sites"] += len(r["funcs"]) + len(r["types"])
+            named_by_a_raise.update(n for n in refusals if n in str(exc))
+            continue
+        agrees = True
+        for key, want, got in (("func", r["funcs"], got_funcs), ("type", r["types"], got_types)):
+            wanted = Counter(tuple(x) for x in want)
+            found = Counter(tuple(x) for x in got)
+            missing, spurious = wanted - found, found - wanted
+            v[key + "_missing"] += sum(missing.values())
+            v[key + "_spurious"] += sum(spurious.values())
+            if missing or spurious:
+                agrees = False
+                v["disagreements"].append((r["id"], key, sorted(missing.elements()),
+                                           sorted(spurious.elements())))
+        if agrees:
+            v["exact"] += 1
+    # A corpus with no sites would divide by zero AND hand every reader a free pass; the loader
+    # refuses an empty corpus, and this is the same refusal expressed as a number.
+    v["refusal_share"] = v["refusal_sites"] / sites if sites else 1.0
+    v["unexercised_refusals"] = [n for n in refusals if n not in named_by_a_raise]
+    v["clears_f1"] = not v["disagreements"]
+    v["clears_f2"] = (v["refusal_share"] <= TS_FLOOR_REFUSAL_SHARE
+                      and not v["unexercised_refusals"] and not v["undeclared_refusals"])
+    v["clears_floor"] = v["clears_f1"] and v["clears_f2"]
+    return v
+
+
+def read_ts_readers():
+    """`{kind: (pattern-set id, mode)}` for every TypeScript extension the kit declares a reader for.
+
+    Empty while `KNOWN_EXTS` declares `ts` and `tsx` dark, which is the state this unit lands in and
+    the state the conformance arm's SKIP announces. It reads `KNOWN_EXTS` rather than scanning
+    `PARSERS` for a TypeScript-looking id, because the id is TOOL-aGradedDialect-3's to choose and a
+    grader guessing at it would arm on the wrong name or on none.
+    """
+    out = {}
+    for ext in ("ts", "tsx"):
+        pset, mode = lex.KNOWN_EXTS.get(ext, ("", "dark"))
+        if mode != "dark":
+            out[ext] = (pset, mode)
+    return out
+
+
+def build_ts_reader(readers, sets=None):
+    """A `reader(src, kind)` over `extract_text`, which is the call every graded reading goes
+    through — so what this corpus scores is the same dispatch a real run of the kit takes."""
+    def read_defs(src, kind):
+        pset, mode = readers[kind]
+        funcs, types_, _imports = lex.extract_text(src, mode, pset, sets=sets)
+        return funcs, types_
+    return read_defs
+
+
+TS_RECORDS = read_ts_fixtures()
+TS_BY_SRC = {r["src"]: r for r in TS_RECORDS}
+
+# ---- AC1: the corpus's own shape ----------------------------------------------------------------
+# THE SHAPE ARMS RUN BEFORE THE SUMMARY LINE, and that ordering is a staged finding rather than
+# taste: the summary reads `oracle` off every record, so a record short of one field killed the
+# whole suite with a KeyError traceback naming a line — before the arm whose entire job is to say
+# WHICH record is short of WHICH field had run. A suite that dies on the defect it exists to name
+# reports a line number to a reader who needed a record id. The summary below also stops trusting
+# the fields it summarises, for the same reason.
+_lo, _hi = TS_CORPUS_BAND
+check(f"AC1: the corpus holds {_lo}-{_hi} records", _lo <= len(TS_RECORDS) <= _hi,
+      f"{len(TS_RECORDS)}")
+check("AC1: every record carries all nine declared fields",
+      not [r.get("id", "<no id>") for r in TS_RECORDS if any(f not in r for f in TS_FIELDS)],
+      str([r.get("id", "<no id>") for r in TS_RECORDS if any(f not in r for f in TS_FIELDS)][:5]))
+check("AC1: every `kind` is ts or tsx",
+      not [r["id"] for r in TS_RECORDS if r["kind"] not in ("ts", "tsx")],
+      str([r["id"] for r in TS_RECORDS if r["kind"] not in ("ts", "tsx")][:5]))
+check("AC1: record ids are unique", len({r["id"] for r in TS_RECORDS}) == len(TS_RECORDS),
+      str([i for i, n in Counter(r["id"] for r in TS_RECORDS).items() if n > 1][:5]))
+check("AC1: every record's provenance triple is complete, with a 40-hex blob",
+      not [r["id"] for r in TS_RECORDS
+           if not re.fullmatch(r"[0-9a-f]{40}", str(r.get("from", {}).get("blob", "")))
+           or not r.get("from", {}).get("path") or not r.get("from", {}).get("lines")],
+      str([r["id"] for r in TS_RECORDS
+           if not re.fullmatch(r"[0-9a-f]{40}", str(r.get("from", {}).get("blob", "")))][:5]))
+
+_ts_funcs = sum(len(r["funcs"]) for r in TS_RECORDS)
+_ts_types = sum(len(r["types"]) for r in TS_RECORDS)
+print(f"lexicon selftest — TypeScript conformance corpus: {len(TS_RECORDS)} record(s), "
+      f"{_ts_funcs} function and {_ts_types} type definition(s), oracle "
+      f"{sorted({r.get('oracle', '<missing>') for r in TS_RECORDS})}")
+
+# THE HAND-EDITED-EXPECTATION ARM. A line an excerpt does not have is the shape an expectation takes
+# when it is written rather than read off the oracle, and it is the cheapest of these to check.
+_ts_overflow = [(r["id"], name, line) for r in TS_RECORDS
+                for name, line in list(r["funcs"]) + list(r["types"])
+                if not 1 <= line <= r["src"].count("\n")]
+check("AC1: no expectation names a line its own excerpt does not have", not _ts_overflow,
+      str(_ts_overflow[:5]))
+# ...over a NON-EMPTY population of lines, or the arm above is true of a corpus with no expectations
+# in it at all — which is the exact corpus this whole unit exists to refuse.
+check("AC1: ...over a corpus that actually carries expectations", _ts_funcs + _ts_types > 0,
+      f"{_ts_funcs} funcs, {_ts_types} types")
+check("AC1: every record carries at least one definition, so no record grades nothing",
+      not [r["id"] for r in TS_RECORDS if not r["funcs"] and not r["types"]],
+      str([r["id"] for r in TS_RECORDS if not r["funcs"] and not r["types"]][:5]))
+
+# ---- AC2: composition, derived from the records' own tags ---------------------------------------
+_ts_census = Counter(c for r in TS_RECORDS for c in r["constructs"])
+_ts_census["tsx"] = sum(1 for r in TS_RECORDS if r["kind"] == "tsx")
+_ts_census["types"] = sum(1 for r in TS_RECORDS if r["types"])
+print("lexicon selftest — corpus census: " +
+      " · ".join(f"{k} {_ts_census[k]}/{TS_FIXTURE_MINIMA[k]}" for k in sorted(TS_FIXTURE_MINIMA)))
+for _key, _floor in sorted(TS_FIXTURE_MINIMA.items()):
+    check(f"AC2: the corpus carries at least {_floor} record(s) tagged {_key}",
+          _ts_census[_key] >= _floor, f"{_ts_census[_key]}")
+
+# ---- AC4: the floor constants are DECLARED, and well-formed --------------------------------------
+check("AC4: the refusal budget is a share strictly between 0 and 1",
+      isinstance(TS_FLOOR_REFUSAL_SHARE, float) and 0 < TS_FLOOR_REFUSAL_SHARE < 1,
+      f"{TS_FLOOR_REFUSAL_SHARE!r}")
+check("AC4: every composition floor is a positive integer",
+      TS_FIXTURE_MINIMA and all(isinstance(v, int) and v > 0 for v in TS_FIXTURE_MINIMA.values()),
+      f"{TS_FIXTURE_MINIMA}")
+
+# ---- the runner's GREEN control, without which every red arm below proves nothing -----------------
+# A perfect reader is the oracle's own answer keyed on the excerpt. Without it, "js-regex misses the
+# floor" is satisfied by a runner that reds on everything, which is the arm-that-cannot-fail class
+# the corpus exists one level down to refuse.
+def read_oracle_answer(src, _kind):
+    """The oracle's recorded reading of this excerpt. Refuses nothing."""
+    r = TS_BY_SRC[src]
+    return [tuple(x) for x in r["funcs"]], [tuple(x) for x in r["types"]]
+
+
+_ts_perfect = check_ts_reading(TS_RECORDS, read_oracle_answer)
+check("the runner is capable of GREEN: a reader returning the oracle's own answer clears the floor",
+      _ts_perfect["clears_floor"], f"{_ts_perfect['disagreements'][:3]}")
+check("...over every record, not a subset", _ts_perfect["exact"] == len(TS_RECORDS),
+      f"{_ts_perfect['exact']} of {len(TS_RECORDS)}")
+
+# ---- AC5: the failing case, observed on the day this lands ----------------------------------------
+# The shipped `js-regex` set, pointed at the TypeScript corpus. This is the best an adopter can do
+# today with no code change at all, and unit 1 measured it at 0.6% type recall over the whole tree.
+_ts_js = check_ts_reading(TS_RECORDS, build_ts_reader({"ts": ("js-regex", "probe"),
+                                                       "tsx": ("js-regex", "probe")}))
+print(f"lexicon selftest — js-regex against the TypeScript corpus: {_ts_js['exact']} of "
+      f"{_ts_js['records']} record(s) in exact agreement; functions short by "
+      f"{_ts_js['func_missing']} of {_ts_funcs} (spurious {_ts_js['func_spurious']}); types short "
+      f"by {_ts_js['type_missing']} of {_ts_types} (spurious {_ts_js['type_spurious']})")
+check("AC5: the shipped js-regex set MISSES the floor over this corpus, so the runner can red",
+      not _ts_js["clears_floor"], f"{_ts_js['exact']} of {_ts_js['records']} exact")
+check("AC5: ...and it misses on TYPES, which is unit 1's sharpest measurement",
+      _ts_js["type_missing"] > 0, f"{_ts_js['type_missing']}")
+check("AC5: ...and on FUNCTIONS too, so the miss is not one predicate's",
+      _ts_js["func_missing"] > 0, f"{_ts_js['func_missing']}")
+for _id, _side, _missing, _spurious in _ts_js["disagreements"][:3]:
+    print(f"    js-regex {_id} {_side}: missed {_missing} · spurious {_spurious}")
+
+# ---- AC6: the refusal budget is COMPUTED and COMPARED, not merely readable -------------------------
+# Four staged readers, because a declared ceiling nothing reads is a number rather than a budget —
+# which is what F2 was until the spec's round-3 audit. Each stages one way a reader could spend
+# budget it has not earned, and the green control above is what stops all four passing vacuously.
+_ts_cheapest = min(TS_RECORDS, key=lambda r: len(r["funcs"]) + len(r["types"]))
+_ts_cheapest_share = (len(_ts_cheapest["funcs"]) + len(_ts_cheapest["types"])) / _ts_perfect["sites"]
+check("AC6: one refusal on the corpus's smallest record fits inside the budget, or the within-budget "
+      "arm below could not be staged at all",
+      _ts_cheapest_share <= TS_FLOOR_REFUSAL_SHARE,
+      f"{_ts_cheapest_share:.4f} > {TS_FLOOR_REFUSAL_SHARE}")
+
+
+def read_with_one_refusal(src, kind):
+    """Perfect, except it refuses the computed key construct."""
+    if src == _ts_cheapest["src"]:
+        raise SyntaxError("computed key: refused, line 1")
+    return read_oracle_answer(src, kind)
+
+
+def read_with_total_refusal(src, _kind):
+    """Refuses the computed key construct, everywhere."""
+    raise SyntaxError("computed key: refused, line 1")
+
+
+def read_with_undeclared_refusal(src, kind):
+    """Perfect, except on one record, and its header declares no refusal at all."""
+    if src == _ts_cheapest["src"]:
+        raise SyntaxError("decorator: refused, line 1")
+    return read_oracle_answer(src, kind)
+
+
+def read_with_unexercised_refusal(src, kind):
+    """Perfect, and its header declares a refusal for the overload signature construct."""
+    return read_oracle_answer(src, kind)
+
+
+_ts_one = check_ts_reading(TS_RECORDS, read_with_one_refusal, refusals=("computed key",))
+print(f"lexicon selftest — refusal budget: one refusal costs "
+      f"{_ts_one['refusal_share']:.4f} of {_ts_perfect['sites']} oracle definition site(s), "
+      f"ceiling {TS_FLOOR_REFUSAL_SHARE}")
+check("AC6 green: a declared refusal, demonstrated by a raise and inside the budget, clears the floor",
+      _ts_one["clears_floor"], f"{_ts_one['refusal_share']} {_ts_one['unexercised_refusals']} "
+                               f"{_ts_one['undeclared_refusals']}")
+
+_ts_all = check_ts_reading(TS_RECORDS, read_with_total_refusal, refusals=("computed key",))
+check("AC6 red: refusing the whole corpus BLOWS the budget rather than clearing F1 by refusing",
+      not _ts_all["clears_floor"] and not _ts_all["clears_f2"],
+      f"share {_ts_all['refusal_share']}")
+check("AC6 red: ...and F1 alone would have been satisfied by it, which is why F2 exists",
+      _ts_all["clears_f1"], f"{_ts_all['disagreements'][:2]}")
+
+_ts_undecl = check_ts_reading(TS_RECORDS, read_with_undeclared_refusal, refusals=("decorator",))
+check("AC6 red: a refusal the reader's own header does not name is refused",
+      not _ts_undecl["clears_f2"] and _ts_undecl["undeclared_refusals"] == ["decorator"],
+      f"{_ts_undecl['undeclared_refusals']}")
+
+_ts_unex = check_ts_reading(TS_RECORDS, read_with_unexercised_refusal,
+                            refusals=("overload signature",))
+check("AC6 red: a refusal named in the header that NO fixture makes it raise on is refused",
+      not _ts_unex["clears_f2"] and _ts_unex["unexercised_refusals"] == ["overload signature"],
+      f"{_ts_unex['unexercised_refusals']}")
+
+# THE ARM THAT PROVES THE CEILING IS READ, and it is here because staging the other two showed it was
+# not. `nothing refused` against `everything refused` is separated just as well by a hard-coded
+# comparison against zero as by the declared share: raising TS_FLOOR_REFUSAL_SHARE to 0.999 moved no
+# verdict, because a total refusal is 1.0 and clears no ceiling under 1. A refusal JUST OVER the
+# declared share is the only shape whose verdict depends on the number. Its population is derived
+# from the corpus rather than picked, so it stays just-over as the corpus changes.
+_ts_over = []
+_ts_over_sites = 0
+for _r in sorted(TS_RECORDS, key=lambda r: len(r["funcs"]) + len(r["types"])):
+    if _ts_over_sites > TS_FLOOR_REFUSAL_SHARE * _ts_perfect["sites"]:
+        break
+    _ts_over.append(_r["src"])
+    _ts_over_sites += len(_r["funcs"]) + len(_r["types"])
+_ts_over = set(_ts_over)
+
+
+def read_with_over_budget_refusal(src, kind):
+    """Perfect, except it refuses the computed key construct on a few of the cheapest records."""
+    if src in _ts_over:
+        raise SyntaxError("computed key: refused, line 1")
+    return read_oracle_answer(src, kind)
+
+
+_ts_overv = check_ts_reading(TS_RECORDS, read_with_over_budget_refusal, refusals=("computed key",))
+check("AC6 red: a declared, demonstrated refusal JUST OVER the budget is still refused — which is "
+      "the arm whose verdict depends on TS_FLOOR_REFUSAL_SHARE's value",
+      not _ts_overv["clears_floor"] and not _ts_overv["clears_f2"],
+      f"share {_ts_overv['refusal_share']:.4f} ceiling {TS_FLOOR_REFUSAL_SHARE}")
+check("AC6 red: ...and it is genuinely a NEAR-MISS rather than a total refusal in disguise",
+      TS_FLOOR_REFUSAL_SHARE < _ts_overv["refusal_share"] < 4 * TS_FLOOR_REFUSAL_SHARE,
+      f"{_ts_overv['refusal_share']:.4f}")
+check("AC6 red: ...with F1 itself still clean, so the budget is the only thing refusing it",
+      _ts_overv["clears_f1"], f"{_ts_overv['disagreements'][:2]}")
+
+# ---- AC4: the conformance arm itself ---------------------------------------------------------------
+_ts_readers = read_ts_readers()
+if not _ts_readers:
+    # A BARE `print`, and deliberately: `check` prints labels only for FAILURES, so a skip written as
+    # `check(<label>, True)` reaches no output on a green run and is a comment wearing a check's
+    # clothes. This file's other skip uses the same idiom for the same reason.
+    print("lexicon selftest SKIPPED — the TypeScript conformance arm: no TypeScript extractor is "
+          "declared. `KNOWN_EXTS` carries no `ts` or `tsx` row, so neither `PARSERS` nor the "
+          "resolved pattern sets hold a reader to score, and the FLOOR itself goes unexercised. "
+          "One arm unexercised; TOOL-aGradedDialect-3 is what removes this skip.")
+else:
+    _ts_verdict = check_ts_reading(TS_RECORDS, build_ts_reader(_ts_readers))
+    print(f"lexicon selftest — declared TypeScript reader {_ts_readers}: {_ts_verdict['exact']} of "
+          f"{_ts_verdict['records']} record(s) in exact agreement, refusal share "
+          f"{_ts_verdict['refusal_share']:.4f}")
+    for _id, _side, _missing, _spurious in _ts_verdict["disagreements"][:10]:
+        print(f"    {_id} {_side}: missed {_missing} · spurious {_spurious}")
+    check("AC4: the declared TypeScript reader clears the floor, or it may not call itself `parser`",
+          _ts_verdict["clears_floor"],
+          f"F1 {_ts_verdict['clears_f1']} F2 {_ts_verdict['clears_f2']} "
+          f"share {_ts_verdict['refusal_share']:.4f}")
+
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

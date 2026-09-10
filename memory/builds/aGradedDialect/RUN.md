@@ -34,3 +34,11 @@ base: d13576732e6837e4be62edf5c60eb43631f94cd0
 2026-09-09T23:20:01Z review · item TOOL-aGradedDialect-1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition fold
 
 2026-09-09T23:26:06Z dispatch · item f2348281 TOOL-aGradedDialect-2 · reason tools/lexicon/ts-conformance-fixtures.json tools/lexicon/selftest.py tools/lexicon/kit.toml .gitattributes memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-2.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-2-acceptance.md
+
+2026-09-09T23:26:48Z brief · item TOOL-aGradedDialect-2 · reason 15e74fe80f85 memory/builds/aGradedDialect/prompts/2026-09-10-prompt-TOOL-aGradedDialect-2-brief.md
+
+2026-09-09T23:28:25Z dispatch · item ccc0511b TOOL-aGradedDialect-2 · reason tools/lexicon/ts-conformance-fixtures.json tools/lexicon/selftest.py tools/lexicon/kit.toml .gitattributes memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-2.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-2-acceptance.md
+
+2026-09-10T00:18:41Z dispatch · item ccc0511b TOOL-aGradedDialect-2 · reason tools/lexicon/ts-conformance-fixtures.json tools/lexicon/selftest.py tools/lexicon/kit.toml .gitattributes memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-2.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-2-acceptance.md memory/builds/aGradedDialect/README.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-1-acceptance.md .memory-tree.conf
+
+2026-09-10T00:21:46Z dispatch · item ccc0511b TOOL-aGradedDialect-2 · reason tools/lexicon/ts-conformance-fixtures.json tools/lexicon/selftest.py tools/lexicon/kit.toml .gitattributes memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-2.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-2-acceptance.md memory/builds/aGradedDialect/README.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-1-acceptance.md .memory-tree.conf memory/guides/SESSION-KICKOFF.md

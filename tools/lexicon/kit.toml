@@ -35,8 +35,20 @@ role = "engine"
 # copy-install path in `WIRE-INTO-PROJECT.md` is a plain `cp -r` of the kit dir and does not read
 # this file, so that runbook removes them separately. The suites remain in the public repository for
 # anyone who edits a kit.
+#
+# THE TYPESCRIPT CONFORMANCE CORPUS GOES WITH THEM, and for a reason of its own on top of the two
+# above. `ts-conformance-fixtures.json` holds bounded, provenance-stamped excerpts of a THIRD-PARTY
+# tree, drawn to grade this kit's TypeScript reader. Only `selftest.py` reads it, so an adopter who
+# never edits the kit has nothing to run it with — and shipping somebody else's source into every
+# adopter's tree is a disclosure with no consumer at the far end. Same mechanism, same rule:
+# claiming the destination is what withholds it, because `project-owned` is absent from
+# LANDABLE_ROLES and `apply` never writes it. TOOL-aGradedDialect-2.
+#
+# AND THE SAME HALF IS STILL MISSING HERE: `cp -r` does not read this file either, so the
+# copy-install runbook removes the corpus separately. That step is TOOL-aGradedDialect-5 S7, against
+# the `codebase-map` precedent at WIRE-INTO-PROJECT.md.
 [[files]]
-include = ["selftest.py"]
+include = ["selftest.py", "ts-conformance-fixtures.json"]
 role = "project-owned"
 
 # The waiver registries are the ADOPTER's, not the kit's. They ship as empty headed files so a

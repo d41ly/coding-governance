@@ -21,9 +21,9 @@ re-running the two derived criteria. Both were re-run at close on 2026-09-10, on
   **1123** function names against an oracle total of 5017, which is **22.4%** and over the 20% the
   criterion names. Both halves hold, so the pre-registered losing condition fired and C1 and C4
   remain refuted on re-measurement rather than on the first run alone.
-- AC4 — the record's §4.4 states the casing distribution per EXTENSION in a four-row table and the
-  `canon.py` verb-lead rate for both extensions, each measured 2026-09-10 and dated in the section's
-  opening line.
+- AC4 — `canon.py` and the §4.4 census: that section states the casing distribution per EXTENSION in
+  a four-row table and the `canon.py` verb-lead rate for both extensions, each measured 2026-09-10
+  and dated in the section's opening line.
 - AC5 — amended rev-2. The criterion originally addressed §5 of the record alone while S5 scopes
   three clauses that land in §3, §4.1 and §4.3; §9's rev-2 line logs the move. As amended it holds:
   §3 names the four losing conditions, §4.1 and §4.3 report the three losses against them, and §5

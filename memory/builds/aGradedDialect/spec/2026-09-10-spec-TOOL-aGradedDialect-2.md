@@ -1,11 +1,12 @@
 # TOOL-aGradedDialect-2 — the conformance corpus: fixtures a compiler extracted, frozen before the reader exists
 
-**Status:** SPECCED · rev-4 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
+**Status:** CLOSED · rev-5 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-10-build-TOOL-aGradedDialect-2-acceptance.md](../build/2026-09-10-build-TOOL-aGradedDialect-2-acceptance.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-1 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 | [2026-09-10-prompt-TOOL-aGradedDialect-2-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-2-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
@@ -109,6 +110,16 @@ Run once, offline, on node `a`, against a read-only checkout. It is a procedure 
 committed program: the only piece that does not already exist is the selector, and the expectation
 half is unit 1's `ts-oracle.js` unchanged.
 
+0. A construct TAG is decided from the compiler's own syntax tree, and a tag on a record is a claim
+   about that EXCERPT rather than about the file it came from. §4.2's census was text-level and two
+   of its five rows over-count for that reason: `template literal` counted every file holding a
+   backtick, comments included, and `JSX element` counted every file holding a `<Tag`-shaped run,
+   which in a `.ts` file is a generic or a comparison and not JSX — measured on 2026-09-10 at 1135
+   and 907 files against 546 and 531 by the tree. The other three rows reproduce to within 2%,
+   including `nested template expression`, which the tree reads exactly as §4.2's prose glosses it:
+   a template literal carrying a `${}` substitution. This changes no number in this spec, because
+   §4.2's shares are the ORDER of the minima table and never its values; it changes what a record
+   ASSERTS about itself, and AC2's arm certifies the corpus from those assertions.
 1. For each construct in §4.2's rank order, list the adopter files carrying it, sorted by path. The
    sort is what makes the draw reproducible; nothing is chosen by eye.
 2. Walk that list on a fixed stride sized to the construct's minimum, and at each file take the
@@ -121,11 +132,24 @@ half is unit 1's `ts-oracle.js` unchanged.
    is a file, and it is skipped with its reason recorded.
 5. Write the record with the oracle's reading of the accepted span, its construct tags, and its
    provenance triple.
+6. The two CORPUS-level floors below are then topped up by continuing a stride the same way: the
+   `kind: tsx` floor over the JSX pool, which is `tsx` by construction, and the type-definition
+   floor over the generic pool taking the nearest TYPE site rather than the nearest definition
+   site. A per-construct draw alone cannot reach either, and the second is why: the constructs that
+   defeat a regex live in function BODIES, so a draw ordered by them selects functions and leaves
+   the type half of the floor grading almost nothing.
 
 ### The sample, and why its minima are counts rather than shares
 
-The corpus holds between 100 and 150 records, of which at least 40 are `kind: tsx`. Per-construct
-minima, in the rank order §4.2 measured:
+The corpus holds between 100 and 150 records, of which at least 40 are `kind: tsx` and at least 20
+carry a type definition. **The type floor is the one number here that is not about a construct**,
+and it is pinned because unit 1's sharpest measurement is about types: the shipped `js-regex` set
+reads 8 of 1369 of them. A corpus that grades a handful of type sites cannot observe that, so F1's
+type half would be exact agreement over a population small enough to clear by accident — the
+`fixture-passes-by-finding-nothing` class one level up, which is the class this whole unit answers.
+20 is PINNED policy: it is roughly the share of definition sites unit 1 measured as types, applied
+to a corpus of this size, and it is a floor rather than a target. Per-construct minima, in the rank
+order §4.2 measured:
 
 | construct | minimum records |
 |---|---|
@@ -233,7 +257,8 @@ recompute is one it can recompute after editing both halves.
 | `read_ts_fixtures` | `selftest.py` | `py.function` — `--suggest` confirms `read` is on the table |
 | `TS_FIXTURES` | `selftest.py`, the loaded corpus | constant, not graded by a verb cell |
 | `TS_FLOOR_REFUSAL_SHARE` | `selftest.py`, F2's 2% | constant |
-| `TS_FIXTURE_MINIMA` | `selftest.py`, the §4 composition table | constant |
+| `TS_FIXTURE_MINIMA` | `selftest.py`, the §4 composition table — the per-construct rows plus the `tsx` and type-definition floors, which are counted by predicate rather than by tag | constant |
+| `TS_CORPUS_BAND` | `selftest.py`, §4's 100–150 record band | constant |
 | `check_ts_reading` | `selftest.py`, the runner | `py.function` — `--suggest` REFUSED `grade_ts_reading`: `grade` is unruled and no canon cluster holds it |
 
 ### Files touched (estimate)
@@ -287,8 +312,8 @@ so it is withheld from `govkit apply` exactly as the self-tests are), `.gitattri
   Red when: a record names an expectation at a line its excerpt does not have, which is the shape a
   hand-edited expectation takes.
 - **AC2** — When the same run reaches the composition arm, it derives the per-construct census from
-  the records' own `constructs` tags and asserts every minimum in §4's table plus at least 40
-  `kind: tsx` records.
+  the records' own `constructs` tags and asserts every minimum in §4's table, plus at least 40
+  `kind: tsx` records and at least 20 records carrying a type definition.
   `figure:` DERIVED — the arm counts the corpus; the minima it compares against are PINNED policy
   with their reason in §4.
   Red when: a construct falls below its minimum, which is the corpus quietly losing the readings it
@@ -403,6 +428,16 @@ wearing a pass.
   always read the mode as `parser` at or above it and `probe` below it, so it rests a scope item on
   this corpus. The edge now names the floor first and the tags as secondary evidence, matching the
   `consumes-from` that unit declared at its own rev-3.
+- rev-5 · 2026-09-10 · §4 · AC2 · the build pass, two divergences recorded before the code. FIRST,
+  the construct tags are read from the compiler's syntax tree rather than by §4.2's text-level
+  census, because a tag on a record is a claim about that excerpt and AC2 certifies the corpus from
+  those claims: a `.ts` file's `a < b` is not a JSX element and a backtick in a comment is not a
+  template literal. Two of §4.2's five rows over-count for that reason and three reproduce; the
+  minima table is untouched, since §4.2's shares were already declared to be the table's ORDER and
+  not its values. SECOND, a type-definition floor of 20 records, and step 6 of the procedure to
+  reach it. The per-construct draw alone produced six type sites in the whole corpus, because every
+  construct in the rank order lives in a function BODY — so F1's type half would have been exact
+  agreement over a population too small to fail, against the one reading unit 1 measured at 0.6%.
 
 ## 10. Reuse audit
 
