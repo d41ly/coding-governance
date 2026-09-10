@@ -19,7 +19,9 @@ rides the ordinary bar as `lexicon naming predicates`.
   definition beside it; a regex literal carrying `\{a\}` does not open a block; a nested
   `` `a${`b${`c`}`}d` `` closes at the right backtick; JSX text and a JSX expression container
   holding a live arrow yield nothing but the component; a definition written inside a template
-  `${}` substitution yields nothing at all; and `render: (el) => string` comes back as a TYPE inside
+  `${}` substitution is suppressed while the one on the line after it is located — a positive
+  beside the negative, which the first cut of that arm lacked and the bug-class checklist named on
+  this unit's own commit; and `render: (el) => string` comes back as a TYPE inside
   an interface and as a DEFINITION inside the object literal one line down. Red when: a word token
   escapes one of those spans, which is what each arm's expected list refuses.
 - AC2 — `tools/lexicon/selftest.py`'s `test_ts_sentinel` over the frozen `TS_SENTINEL` and

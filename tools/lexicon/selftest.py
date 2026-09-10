@@ -4017,9 +4017,18 @@ def test_ts_constructs():
 
     # THE REFUSAL'S OTHER HALF, and it is asserted rather than assumed: a definition written inside
     # a template substitution is one the oracle counts and this reader deliberately does not.
-    got = lex.parse_ts_defs("const s = `${(() => { const readIt = () => 1; return readIt; })()}`;\n")[0]
-    check("ts: a definition inside a template ${} substitution is suppressed (F2's refusal)",
-          got == [], f"{got}")
+    #
+    # A POSITIVE SITS BESIDE THE NEGATIVE, and the first cut of this arm did not have one: it
+    # asserted an EMPTY list, which a tokenizer that had stopped emitting anything at all would
+    # satisfy exactly as well as a correct suppression does. The definition after the substitution
+    # is what makes the empty half evidence. `fixture-passes-by-finding-nothing`, found by the
+    # bug-class checklist on this unit's own commit.
+    got = lex.parse_ts_defs(
+        "const s = `${(() => { const readIt = () => 1; return readIt; })()}`;\n"
+        "function afterSuppression() {}\n")[0]
+    check("ts: a definition inside a template ${} substitution is suppressed while the one AFTER it "
+          "is located (F2's refusal, with a positive beside it)",
+          got == [("afterSuppression", 2)], f"{got}")
 
     # THE SEPARATOR A REGEX CANNOT SEE. `render: (el) => string` is a property SIGNATURE in an
     # interface and a property ASSIGNMENT in an object literal, spelled identically. The conformance
