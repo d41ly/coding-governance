@@ -5,7 +5,7 @@ opened: 2026-09-10
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 TOOL-aLeakedHandle-4
+ids: TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 TOOL-aLeakedHandle-4 TOOL-aLeakedHandle-5
 ---
 
 # aLeakedHandle — two reds traced to their causes, and the reporting that made one of them unreadable
@@ -63,7 +63,7 @@ reported at four times its real cost.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node a · opened 2026-09-10 · streams tooling
-ids TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 TOOL-aLeakedHandle-4
+ids TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 TOOL-aLeakedHandle-4 TOOL-aLeakedHandle-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
