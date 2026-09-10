@@ -823,6 +823,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_ts_generic_fn_type",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "check_ts_member_annotation",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
