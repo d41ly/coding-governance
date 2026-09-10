@@ -46,7 +46,14 @@ at all. They were observed by `python tools/lexicon/selftest.py` directly, which
   are declared in `selftest.py` beside the runner, and two arms grade their SHAPE:
   `TS_FLOOR_REFUSAL_SHARE` is asserted to be a share strictly between 0 and 1 and every
   `TS_FIXTURE_MINIMA` value a positive integer, so a later edit zeroing a floor reds rather than
-  disarming it quietly.
+  disarming it quietly. **The branch behind the skip was EXECUTED rather than left for unit 3**, by
+  staging `ts` and `tsx` rows into `KNOWN_EXTS` pointing at the shipped `js-regex` set: the arm ran,
+  named the reader, and redded on the floor exactly as it should. Staging only the `ts` row found a
+  real defect in that branch — it died on `KeyError: 'tsx'`, a traceback where it owed a verdict —
+  and a partly armed declaration is a legal outcome, since those are two separate rows owned by
+  `TOOL-aGradedDialect-4`. Fixed and re-observed: the arm now scores the 52 records it has a reader
+  for, prints how many go unscored, and refuses a kind it cannot read by name. Spec rev-6 records
+  the third state.
 - AC5 — the same run scores the shipped `js-regex` set against the corpus and prints
   `js-regex against the TypeScript corpus: 68 of 114 record(s) in exact agreement; functions short by 37 of 118 (spurious 1); types short by 20 of 20 (spurious 0)`
   and asserts that the shipped set MISSES the floor, misses on types, and misses on functions too.

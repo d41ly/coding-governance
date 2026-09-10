@@ -4045,8 +4045,16 @@ def read_ts_readers():
 
 def build_ts_reader(readers, sets=None):
     """A `reader(src, kind)` over `extract_text`, which is the call every graded reading goes
-    through — so what this corpus scores is the same dispatch a real run of the kit takes."""
+    through — so what this corpus scores is the same dispatch a real run of the kit takes.
+
+    A `kind` with no declared reader is a REFUSAL naming it, never a KeyError. The caller filters
+    the corpus to the declared kinds before scoring, so reaching this line means the two disagree,
+    and a grader that dies on a traceback tells a reader a line number where it owed a verdict.
+    """
     def read_defs(src, kind):
+        if kind not in readers:
+            raise SystemExit(f"lexicon selftest: asked to score a `{kind}` fixture, but the kit "
+                             f"declares a reader only for {sorted(readers)}")
         pset, mode = readers[kind]
         funcs, types_, _imports = lex.extract_text(src, mode, pset, sets=sets)
         return funcs, types_
@@ -4261,16 +4269,32 @@ if not _ts_readers:
           "resolved pattern sets hold a reader to score, and the FLOOR itself goes unexercised. "
           "One arm unexercised; TOOL-aGradedDialect-3 is what removes this skip.")
 else:
-    _ts_verdict = check_ts_reading(TS_RECORDS, build_ts_reader(_ts_readers))
-    print(f"lexicon selftest — declared TypeScript reader {_ts_readers}: {_ts_verdict['exact']} of "
-          f"{_ts_verdict['records']} record(s) in exact agreement, refusal share "
-          f"{_ts_verdict['refusal_share']:.4f}")
-    for _id, _side, _missing, _spurious in _ts_verdict["disagreements"][:10]:
-        print(f"    {_id} {_side}: missed {_missing} · spurious {_spurious}")
-    check("AC4: the declared TypeScript reader clears the floor, or it may not call itself `parser`",
-          _ts_verdict["clears_floor"],
-          f"F1 {_ts_verdict['clears_f1']} F2 {_ts_verdict['clears_f2']} "
-          f"share {_ts_verdict['refusal_share']:.4f}")
+    # A PARTLY ARMED DECLARATION IS A LEGAL OUTCOME, not an error and not a full run. `ts` and `tsx`
+    # are separate rows in `KNOWN_EXTS` and TOOL-aGradedDialect-4 owns both; arming one and leaving
+    # the other dark is a disposition unit 1's §5 leaves genuinely open. So the arm scores the
+    # records it has a reader FOR and says out loud how many it did not — a floor cleared over half
+    # the corpus is not a floor cleared, and the half has to be visible for anyone to know which it
+    # was. Staged before this existed, the arm died on `KeyError: 'tsx'` instead.
+    _ts_scored = [r for r in TS_RECORDS if r["kind"] in _ts_readers]
+    _ts_dark = sorted({r["kind"] for r in TS_RECORDS} - set(_ts_readers))
+    if _ts_dark:
+        print(f"lexicon selftest — the TypeScript conformance arm is PARTLY armed: "
+              f"{' '.join(_ts_dark)} declares no reader, so {len(TS_RECORDS) - len(_ts_scored)} of "
+              f"{len(TS_RECORDS)} record(s) go UNSCORED and the floor below covers only the rest.")
+    check("AC4: the declared TypeScript reader has a non-empty population to be graded on",
+          bool(_ts_scored), f"declared {_ts_readers}, corpus kinds "
+                            f"{sorted({r['kind'] for r in TS_RECORDS})}")
+    if _ts_scored:
+        _ts_verdict = check_ts_reading(_ts_scored, build_ts_reader(_ts_readers))
+        print(f"lexicon selftest — declared TypeScript reader {_ts_readers}: "
+              f"{_ts_verdict['exact']} of {_ts_verdict['records']} record(s) in exact agreement, "
+              f"refusal share {_ts_verdict['refusal_share']:.4f}")
+        for _id, _side, _missing, _spurious in _ts_verdict["disagreements"][:10]:
+            print(f"    {_id} {_side}: missed {_missing} · spurious {_spurious}")
+        check("AC4: the declared TypeScript reader clears the floor, or it may not call itself "
+              "`parser`", _ts_verdict["clears_floor"],
+              f"F1 {_ts_verdict['clears_f1']} F2 {_ts_verdict['clears_f2']} "
+              f"share {_ts_verdict['refusal_share']:.4f}")
 
 
 if FAILURES:

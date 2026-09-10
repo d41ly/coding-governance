@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-2 — the conformance corpus: fixtures a compiler extracted, frozen before the reader exists
 
-**Status:** CLOSED · rev-5 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -94,7 +94,7 @@ no gain. A `.gitattributes` row pins it `text eol=lf` beside the existing `tools
 | `src` | the excerpt, verbatim, as a JSON string |
 | `funcs` | the oracle's function and method definitions, `[name, line]`, line 1-based within `src` |
 | `types` | the oracle's class, interface, type-alias and enum definitions, same shape |
-| `constructs` | the census tags this record carries, from §4.2 of unit 1's record |
+| `constructs` | the construct tags this EXCERPT carries. The tag NAMES are §4.2's of unit 1's record; which tags a record gets is decided by the compiler's syntax tree, per step 0 below, and not by that section's text-level census |
 | `from` | `{path, blob, lines}` — the adopter path, its 40-hex blob sha, and the line range taken |
 | `oracle` | the oracle's package and version, `typescript@5.9.3` |
 | `extracted` | the extraction date |
@@ -147,9 +147,12 @@ and it is pinned because unit 1's sharpest measurement is about types: the shipp
 reads 8 of 1369 of them. A corpus that grades a handful of type sites cannot observe that, so F1's
 type half would be exact agreement over a population small enough to clear by accident — the
 `fixture-passes-by-finding-nothing` class one level up, which is the class this whole unit answers.
-20 is PINNED policy: it is roughly the share of definition sites unit 1 measured as types, applied
-to a corpus of this size, and it is a floor rather than a target. Per-construct minima, in the rank
-order §4.2 measured:
+20 is PINNED policy and is a floor rather than a target. It is a RECORDS figure, deliberately: the
+per-construct rows are records and mixing units inside one table would make the arm read two ways.
+Roughly one record in six carrying a type is the smallest population in which the type half of F1
+can fail on more than a rounding error; it is not derived from unit 1's 21% type share, which is a
+share of definition SITES over whole files and does not transfer to a table of excerpts.
+Per-construct minima, in the rank order §4.2 measured:
 
 | construct | minimum records |
 |---|---|
@@ -206,6 +209,15 @@ The arm that grades the TypeScript reader announces `SKIPPED — no TypeScript e
 while `PARSERS` and the resolved pattern sets hold no TypeScript entry, naming the arm and the
 reason. A skip that looks like a pass is indistinguishable from coverage, so the skip is printed
 rather than implied, and `TOOL-aGradedDialect-3` removing it is that unit's business.
+
+**There is a THIRD state and it is neither of those two: a PARTLY armed declaration.** `ts` and
+`tsx` are separate `KNOWN_EXTS` rows owned by `TOOL-aGradedDialect-4`, and arming one while leaving
+the other dark is a disposition unit 1's §5 leaves genuinely open — so it is a legal outcome rather
+than an error. The arm then scores the records it holds a reader for and PRINTS how many it did
+not, because a floor cleared over half the corpus is not a floor cleared and the half has to be
+visible for anyone to know which it was. A kind with no reader is a refusal naming it; before this
+was written the arm died on a `KeyError`, which tells a reader a line number where it owed a
+verdict.
 
 The failing case is observed on the day this lands, without the extractor: the shipped `js-regex`
 set is scored against this corpus and must MISS the floor. Unit 1 measured that set at 0.6% type
@@ -438,6 +450,15 @@ wearing a pass.
   reach it. The per-construct draw alone produced six type sites in the whole corpus, because every
   construct in the rank order lives in a function BODY — so F1's type half would have been exact
   agreement over a population too small to fail, against the one reading unit 1 measured at 0.6%.
+- rev-6 · 2026-09-10 · §4 · the post-commit bug-class pass, which named three classes this text was
+  carrying. The `constructs` data-model row still said the tags come from §4.2, which rev-5 had just
+  changed underneath it — an amendment with its other half left standing. The type floor's reason
+  said "roughly the share of definition sites unit 1 measured as types", which reads as a derivation
+  and is not one: 20 is a RECORDS floor and unit 1's 21% is a share of SITES over whole files, so
+  the sentence now says what the number is rather than borrowing authority from a figure it does not
+  follow from. And the runner section named two states where there are three: `ts` and `tsx` are
+  separate `KNOWN_EXTS` rows, so a PARTLY armed declaration is legal, and the arm scoring it was
+  staged and died on a `KeyError` rather than refusing.
 
 ## 10. Reuse audit
 
