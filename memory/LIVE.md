@@ -6,6 +6,7 @@ terminal status. Nothing here is edited by hand.
 
 | Build | Status | Node | Opened | Streams | Ids (n) |
 |---|---|---|---|---|---|
+| [aBatchedArm](builds/aBatchedArm/README.md) | OPEN | a | 2026-09-10 | tooling | 1 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 |
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 |
