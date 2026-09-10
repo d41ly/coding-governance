@@ -103,6 +103,7 @@ run-selftests self-test	60		measured 28s on node a 2026-09-07 at inner width 4, 
 scratch-guard self-test	220		worst of 8 readings 145s, x1.5
 selftest harness self-test	60		measured 37s on node a 2026-09-07, x1.5
 settings-merge selftest	60		worst of 11 readings 4s, x1.5
+shell-hygiene selftest	60		measured 0.3s on node a 2026-09-10 by direct invocation, x1.5 floored at this file 60s minimum
 spec-tokens self-test	130		worst of 6 readings 80s, x1.5
 template size gate selftest	290		worst of 11 readings 190s, x1.5
 testsuite counts self-test	170		worst of 11 readings 109s, x1.5

@@ -1475,9 +1475,22 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
        # its own ceiling and PROF_TIMEOUT stayed 0 -- which is every shipped profile row -- a killed
        # leg reported a bare `(exit 124)` naming nothing. TOOL-aBoundedCeiling-1.
        local fired; fired=$(cat "$WORK/$i.bound" 2>/dev/null || printf 0)
+       # THE SECONDS THE LEG ACTUALLY RAN, from the file that already holds them. `runleg` writes
+       # `.sec` before it writes `.rc`, and the ledger block below reads that same file as its field
+       # 2 -- so this is a THIRD READER of one value, never a second source. Read VERBATIM, decimals
+       # and all, because byte-equality with the ledger row is the property; a `?` when it is
+       # unreadable, because any numeric fallback would be a second wrong answer. TOOL-aLeakedHandle-3.
+       local secs; secs=$(cat "$WORK/$i.sec" 2>/dev/null) || secs=""
        ftail="(exit $rc)"
+       # 124 KEEPS THE CEILING DELIBERATELY, and the asymmetry with 137 below is a decision rather
+       # than an oversight. rc=124 means `timeout` fired its own TERM, so the ceiling is the CAUSE of
+       # the verdict and true by construction, while the elapsed value on that path is the ceiling
+       # plus kill-path overhead -- measured at 12 s against a 2 s bound under load, which would send
+       # a reader hunting for a bound nobody declared. rc=137 is the opposite case: SIGKILL says
+       # nothing about who sent it, and `timeout -k`, an operator, an OOM killer and a CI cancel all
+       # arrive here identically, so the verb states the kill and the two numbers stay apart.
        { [ "$rc" = 124 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(timed out after ${fired}s)"
-       { [ "$rc" = 137 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(timed out after ${fired}s, killed)"
+       { [ "$rc" = 137 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(killed after ${secs:-?}s, ceiling ${fired}s)"
        printf 'GATE FAIL  %s  %s\n' "${names[$i]}" "$ftail"; sed 's/^/    /' "$WORK/$i.out"
        FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  $ftail"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY

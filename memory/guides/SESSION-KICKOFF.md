@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-10T03:22:11+03:00 @ 013b1af9611570b3afd3ad99ba53e295e787b035
+last-audit: 2026-09-10T19:10:04+03:00 @ 094a1ce93ae5142e866e1d82695968b3fa3f5332
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: d499258daca17f851ab1e4a359bb6c6aa106c0f6
+last-body-change: 094a1ce93ae5142e866e1d82695968b3fa3f5332
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -104,9 +104,6 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   until the landing; the conflict count is in those build records. §3's rule is
   own STREAMS not files, and a kit is the unit that rule is about.
 
-- **Every tracked build README owes an authored `<!-- roster:units -->` pair** — absent, duplicated
-  or transposed is a slot-leg refusal (`TOOL-dHonouredPark-1`). The WHOLE tracked set, not the
-  readme-contract's bound subset. Seed a new build's from its own spec ids.
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
 
@@ -243,10 +240,11 @@ does — hit three times in one file in one session) · `process-creation-is-the
   swallows the failure. Parse by constructing an `AsyncFunction`: `tools/workflows/check-workflow-syntax.js`.
 - A kit that resolves the repo root by counting directories UP breaks SILENTLY at any other install
   prefix — codebase-map answered from an empty corpus. Walk up for the conf, bounded by `.git`.
-- A build README is a slot SEQUENCE and, since `TOOL-dFramedEntrypoint`, a closed heading CANON with
-  per-slot byte budgets — both on `gen_build_index.py --check-format`, binding only what
-  `memory/project/readme-contract.txt` declares. Order is authored on the SPECS as `· order <n>`;
-  records render in the spec they serve. All of it: `memory/map/features/build-readme-surface.md`.
+- `gen_build_index.py --check-format` grades TWO populations: the `<!-- roster:units -->` pair and
+  slot POSITION bind EVERY tracked build README (`TOOL-dHonouredPark-1`; seed a new one from its own
+  spec ids), the closed heading CANON and its per-slot byte budgets only what
+  `memory/project/readme-contract.txt` declares. All of it:
+  `memory/map/features/build-readme-surface.md`.
 - `--write` CREATES a missing generated region pair; `--check` never demands one. Rely on that when
   adding a region: it is what lets a new one ship without re-rendering the corpus in the same commit.
 - Check 8's population is the backlog shards ALONE: `memory/builds/*/STATUS.md` was retired at

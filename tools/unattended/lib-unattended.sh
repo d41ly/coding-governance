@@ -139,20 +139,42 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   # git spawns were this one line, against 31 for the `--follow` walk everyone assumes is the
   # expensive one. `%H%x09%s` gets both out of one walk. TOOL-aQuenchedHarness-7.
   #
-  # A HEREDOC, NEVER A PIPE: a piped `while` runs in a subshell and this loop RETURNS from the
-  # function. It reads LINES rather than word-splitting because a subject holds spaces, and
-  # the possibly-empty field is LAST for the reason
-  # memory/gotchas/empty-field-collapses-unless-it-is-last.md states.
+  # A FILE, NEVER A PIPE AND NO LONGER A HEREDOC. The heredoc was here for a real reason and the
+  # reason still stands: a piped `while` runs in a subshell and this loop RETURNS from the function,
+  # so the `return 0` below would exit the subshell and the function would fall through. What the
+  # heredoc solved in one direction it broke in the other, because its body was a COMMAND
+  # SUBSTITUTION: `$( )` reads until EOF, EOF arrives when the LAST inherited write end closes, and
+  # `GIT` is a shell FUNCTION — so the substitution forks a subshell which forks `git`, and the
+  # reader waits on a grandchild's write end. On 2026-09-10 that never closed: the `unattended kit
+  # gate` leg sat at zero CPU for 63 minutes, with the forked subshell holding both ends of its own
+  # pipe on fd 3 and fd 4 and no descendant alive, until an operator killed it.
+  #
+  # The walk therefore runs in the CURRENT shell with its stdout redirected to a scratch file, and
+  # the loop reads that file by redirect. No pipe exists, so no EOF has to arrive; a redirect from a
+  # file creates no subshell, so `return 0` still returns from `pass_commit`. Both properties at
+  # once, which is what the heredoc could not do.
+  # `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` is the class; the `shell hygiene (a loop
+  # fed by a command substitution)` merge-bar leg now refuses it repo-wide. TOOL-aLeakedHandle-1.
+  #
+  # A SCRATCH FILE THAT CANNOT BE CREATED IS A NAMED REFUSAL, not a fall-through to `return 1`.
+  # `return 1` already MEANS "this pass has not committed yet", so answering a broken TMPDIR with it
+  # would report every open pass as open forever and read as a correct answer. Both callers spell
+  # `$(pass_commit … || true)`, so rc 2 reaches them as the same empty answer rc 1 does — the
+  # difference is the stderr line, which is the only thing that makes a broken TMPDIR visible.
+  _pf=$(mktemp) || { printf 'lib-unattended: pass_commit cannot create a scratch file, so it cannot say whether this pass committed\n' >&2; return 2; }
+  GIT log --reverse --format="%H%x09%s" "$_pa..$_pto" >"$_pf" 2>/dev/null || :
+  # It reads LINES rather than word-splitting because a subject holds spaces, and the possibly-empty
+  # field is LAST for the reason memory/gotchas/empty-field-collapses-unless-it-is-last.md states.
   while IFS=$'\t' read -r _pc _psub; do
     [ -n "$_pc" ] || continue
     id_in "$_psub" "$_pu" || continue
     _ptouch=$(GIT diff-tree --no-commit-id --name-only -r "$_pc" 2>/dev/null | grep -vxF -- "$_prel" || true)
     [ -n "$_ptouch" ] || continue
     printf '%s\n' "$_pc"
+    rm -f "$_pf"
     return 0
-  done <<PASSCOMMITS
-$(GIT log --reverse --format="%H%x09%s" "$_pa..$_pto" 2>/dev/null)
-PASSCOMMITS
+  done <"$_pf"
+  rm -f "$_pf"
   return 1
 }
 

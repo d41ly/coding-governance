@@ -93,6 +93,8 @@
       "scratch-guard self-test",
       "selftest harness self-test",
       "settings-merge selftest",
+      "shell hygiene (a loop fed by a command substitution)",
+      "shell-hygiene selftest",
       "spec tokens (a spec's own names resolve)",
       "spec-tokens self-test",
       "template size <=48KiB",

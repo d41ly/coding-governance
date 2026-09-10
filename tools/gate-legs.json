@@ -136,6 +136,31 @@
     "ceiling": 300
   },
   {
+    "name": "shell hygiene (a loop fed by a command substitution)",
+    "argv": [
+      "python3",
+      "tools/gate-lint/sh_hygiene.py",
+      "memory/project/substitution-fed-loops.txt"
+    ],
+    "chunk": "product",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
+    "name": "shell-hygiene selftest",
+    "argv": [
+      "python3",
+      "tools/gate-lint/sh_hygiene.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/gate-lint/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "kit version markers",
     "argv": [
       "bash",

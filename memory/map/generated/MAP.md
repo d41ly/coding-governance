@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 104 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 48 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 48 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -100,6 +100,8 @@ Inventories: gate-legs: 104 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 �
 | `scratch-guard self-test` | agent-cap |
 | `selftest harness self-test` | run-gates |
 | `settings-merge selftest` | baseline |
+| `shell hygiene (a loop fed by a command substitution)` | gate-lint |
+| `shell-hygiene selftest` | gate-lint |
 | `spec tokens (a spec's own names resolve)` | spec-tokens |
 | `spec-tokens self-test` | spec-tokens |
 | `template size <=48KiB` | baseline |
@@ -122,7 +124,7 @@ Inventories: gate-legs: 104 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 �
 | `agent-instructions` | baseline |
 | `codebase-map` | codebase-map |
 | `drift-audit` | baseline |
-| `gate-lint` | baseline |
+| `gate-lint` | gate-lint |
 | `govkit` | govkit |
 | `hooks` | agent-cap |
 | `lexicon` | lexicon |

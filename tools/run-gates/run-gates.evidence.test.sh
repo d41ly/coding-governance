@@ -24,7 +24,7 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=51
+FLOOR_ASSERTIONS=70
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -613,6 +613,293 @@ if [ -f "$ROOT/tools/run-gates/profile_bar.py" ]; then
 else
   ok "no profiler ships beside the runner here, so its reuse grammar is not gradeable (stated)"
 fi
+
+# =================================================================================================
+# THE ADMISSION RULE (TOOL-aLeakedHandle-2). `derive-ceilings.py` built its evidence from `ok` rows
+# only, so a leg that never finishes inside the retained window acquired no row at all and its
+# ceiling was held above nothing — the gate that exists to catch an unsafe ceiling passing green on
+# the very bar where that ceiling fired. A failing row is now admitted when its seconds land in the
+# CLOSED window `[ceiling, ceiling + CEILING_WINDOW_S]`, and not otherwise.
+#
+# EVERY ARM RUNS AGAINST A COPY. `--write` writes to the SCRIPT's own directory, so an arm that
+# reached the installed file would rewrite the tracked `ceiling-evidence.txt` — a self-test that
+# edits the artifact its own merge-bar leg reads.
+DC_T=$(mktemp -d)
+mkdir -p "$DC_T/tools/run-gates"
+cp "$ROOT/tools/run-gates/derive-ceilings.py" "$ROOT/tools/run-gates/ceiling-margin.txt" \
+   "$DC_T/tools/run-gates/" || { echo "evidence-test: cannot copy the ceiling kit"; exit 2; }
+( cd "$DC_T" && git init -q -b main . ) >/dev/null 2>&1 \
+  || { echo "evidence-test: cannot init the ceiling fixture repo"; exit 2; }
+DC_SCRIPT="$DC_T/tools/run-gates/derive-ceilings.py"
+DC_EV="$DC_T/tools/run-gates/ceiling-evidence.txt"
+# The launcher is RESOLVED, not assumed: this suite's other python arm falls back to a bare
+# `python`, and on Windows that name can be the Store stub that answers `command -v` and exits 9009.
+# An arm that dies on the launcher would print FAIL and accuse the subject of a defect it never saw.
+DC_PY="${PYBIN:-}"
+if [ -z "$DC_PY" ] && [ -f "$ROOT/tools/lib/resolve-python.sh" ]; then
+  . "$ROOT/tools/lib/resolve-python.sh"
+  DC_PY=$(resolve_python 2>/dev/null)
+fi
+[ -n "$DC_PY" ] || DC_PY=python
+# Three legs, ONE ceiling, three failing readings: AT it, well BELOW it, and at FOUR TIMES it. The
+# third is the class the window's upper edge refuses. It is not decoration — `run-gates.sh` sets
+# `bound=0` and runs every leg UNBOUNDED when its CEILINGS_LIVE probe fails, and the `.leg` row
+# carries no bound field, so an implementation spelling the predicate `secs >= ceiling` admits a
+# leg that failed on its own at 4x its ceiling as though a bound had stopped it. That is the
+# failure-duration-as-floor case the `ok`-only filter existed to prevent, and it enters a MONOTONE
+# file. This arm gates that CLASS, not the 900.240 s instance the unit was written from.
+#
+# A FOURTH LEG CARRIES THE KILL-PATH OVERSHOOT AT A REALISTIC MAGNITUDE. `kill-overhead`'s ceiling
+# and reading are sized from the elapsed-above-bound figure `run-gates.sh`'s rc=124 block records
+# under load — read it THERE; this comment cites the source rather than copying its number, which is
+# the defect this same commit removes from `derive-ceilings.py`. Nothing here re-verifies that
+# figure: a different one would leave the fixture a valid clamp test, so the citation is provenance
+# for the choice and never a parity claim. Two things need this leg and neither is served by the
+# existing 100/100.4 pair:
+# the window has to actually ADMIT the worst overshoot this repo has measured, and the clamp arm
+# below needs a fixture where raw elapsed and the ceiling are far enough apart that reading one for
+# the other is unmistakable rather than a rounding argument.
+printf '%s\n' '[' \
+  '  {"name": "at-ceiling",    "argv": ["true"], "ceiling": 100},' \
+  '  {"name": "below-ceiling", "argv": ["true"], "ceiling": 100},' \
+  '  {"name": "way-over",      "argv": ["true"], "ceiling": 100},' \
+  '  {"name": "kill-overhead", "argv": ["true"], "ceiling": 2}' \
+  ']' > "$DC_T/tools/gate-legs.json"
+mkdir -p "$DC_T/.git/gate-run/r1"
+{ printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\n'
+  printf 'below-ceiling\tfail\t1\t40.0\t0\t0\t-\n'
+  printf 'way-over\tfail\t137\t400.0\t0\t0\t-\n'
+  printf 'kill-overhead\tfail\t124\t12.0\t0\t0\t-\n'; } > "$DC_T/.git/gate-run/r1/1.leg"
+
+dc_out=$("$DC_PY" "$DC_SCRIPT" --report 2>&1)
+printf '%s\n' "$dc_out" | awk -F'\t' '$1=="at-ceiling" && $2=="100.0" {f=1} END{exit !f}' \
+  && ok "a fail row AT its leg's ceiling is admitted as evidence" \
+  || { nope "the row at the ceiling was not admitted — the change is absent"; printf '%s\n' "$dc_out" | sed 's/^/      /'; }
+printf '%s\n' "$dc_out" | awk -F'\t' 'NF>=4 && $1=="below-ceiling" {f=1} END{exit !f}' \
+  && nope "a fail row BELOW its ceiling was admitted — the ceiling comparison is gone" \
+  || ok "a fail row below its ceiling stays excluded"
+printf '%s\n' "$dc_out" | awk -F'\t' 'NF>=4 && $1=="way-over" {f=1} END{exit !f}' \
+  && nope "a fail row at FOUR TIMES its ceiling was admitted — the window's upper edge is gone, which is the unbounded-run case" \
+  || ok "a fail row at four times its ceiling stays excluded (the window is closed at the top)"
+# THE CONTROL. A report that printed no table at all satisfies both exclusions above by finding
+# nothing, which is the shape those two arms exist to rule out.
+printf '%s\n' "$dc_out" | grep -q 'UNBACKED' \
+  && printf '%s\n' "$dc_out" | grep 'UNBACKED' | grep -q 'below-ceiling' \
+  && printf '%s\n' "$dc_out" | grep 'UNBACKED' | grep -q 'way-over' \
+  && ok "control: both excluded legs are NAMED on the UNBACKED line, so the exclusions above are verdicts and not an empty report" \
+  || { nope "the UNBACKED line does not name both excluded legs"; printf '%s\n' "$dc_out" | sed 's/^/      /'; }
+
+# --- the WRITE path reads the ceilings too ---------------------------------------------------------
+# The defaulted-parameter case, and it is the reason this arm drives `--write` rather than trusting
+# the report. Give `read_runs` the ceilings map with a DEFAULT, pass it at `cmd_report` and forget
+# `cmd_write`, and the only path that produces the tracked artifact keeps its `ok`-only behaviour
+# while every arm above stays green. The merge-bar leg cannot see it either: it runs `--check`,
+# which reads the two tracked files and no run file.
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+awk -F'\t' '$1=="at-ceiling" && $2=="100.0" {f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && ok "--write records the ceiling-reaching leg's FAILING reading" \
+  || { nope "--write wrote no row for the ceiling-reaching leg — the write path still filters on ok"; sed 's/^/      /' "$DC_EV" 2>/dev/null; }
+awk -F'\t' '$1=="below-ceiling" || $1=="way-over" {f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && { nope "--write recorded a row for a leg the window excludes"; sed 's/^/      /' "$DC_EV"; } \
+  || ok "--write records neither excluded leg"
+
+# --- AN ADMITTED FAILING ROW IS CLAMPED TO ITS CEILING (TOOL-aLeakedHandle-1 F6) -------------------
+# Only the ceiling is a provable lower bound on the work: `timeout` killed the leg there, and the
+# elapsed value on that path is the ceiling PLUS kill-path overhead, which `run-gates.sh`'s own
+# rc=124 block states. The artifact is MONOTONE, so an entry carrying that overhead never comes back
+# down and permanently inflates the headroom `--check` demands above it. An EQUALITY, not a bound:
+# `< 12.0` is satisfied by the row being absent, which is the shape the `ok`-only filter this unit
+# removed would produce.
+awk -F'\t' '$1=="kill-overhead" && $2=="2.0" {f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && ok "an admitted rc=124 row enters the artifact at its ceiling (2.0), not at its 12.0 elapsed" \
+  || { nope "the admitted rc=124 row did not enter at its ceiling — kill-path teardown is being recorded as work, permanently"; sed 's/^/      /' "$DC_EV" 2>/dev/null; }
+
+# --- the check-time sentence -----------------------------------------------------------------------
+# Written by hand rather than chained off the `--write` above, so a defect there cannot make this
+# arm fail for a reason that is not its own.
+printf 'at-ceiling\t100.4\t1\ta\t2026-09-10\n' > "$DC_EV"
+dc_chk=$("$DC_PY" "$DC_SCRIPT" --check 2>&1); dc_rc=$?
+if [ "$dc_rc" != 0 ] && printf '%s\n' "$dc_chk" | grep -q 'REACHED in a recorded run'; then
+  ok "--check exits non-zero and says the ceiling was REACHED in a recorded run"
+else
+  nope "--check did not report the reached ceiling (rc=$dc_rc)"; printf '%s\n' "$dc_chk" | sed 's/^/      /'
+fi
+printf '%s\n' "$dc_chk" | grep -q 'does not clear its evidenced maximum' \
+  && nope "a REACHED ceiling still reports the headroom arithmetic, which invites sizing a new ceiling from a lower bound" \
+  || ok "a reached ceiling does not report the headroom sentence"
+
+# --- THE TWO READERS OF ONE ARTIFACT AGREE (TOOL-aLeakedHandle-1 F5) -------------------------------
+# A PARITY arm, not two per-reader assertions, and the difference is the whole point. `--check` was
+# amended to withdraw the headroom sentence from a ceiling-reaching reading; `--report` — the table
+# an operator actually sizes a ceiling FROM — was left calling the same reading UNDER and printing a
+# `need` target beside it. Two readers of one artifact get one arm that joins them, or the next
+# amendment lands on one side again. Graded on the SAME two values both readers derive from.
+dc_rep_state=$(printf '%s\n' "$dc_out" | awk -F'\t' '$1=="at-ceiling"{print $7}')
+dc_rep_need=$(printf '%s\n' "$dc_out" | awk -F'\t' '$1=="at-ceiling"{print $6}')
+if printf '%s\n' "$dc_chk" | grep -q 'REACHED in a recorded run' \
+   && [ "$dc_rep_state" = "REACHED" ] && [ "$dc_rep_need" = "-" ]; then
+  ok "--report and --check agree on a ceiling-reaching reading: both say REACHED, and the table offers no need target to size a ceiling from"
+else
+  nope "--report and --check disagree on a ceiling-reaching reading (report state='$dc_rep_state' need='$dc_rep_need') — the human-facing reader is the one still inviting a sizing"
+fi
+# THE CONTROL for the arm above: the headroom sentence must still exist for the row it was written
+# for, or its absence is a default rather than a verdict.
+printf 'below-ceiling\t40.0\t1\ta\t2026-09-10\n' > "$DC_EV"
+"$DC_PY" "$DC_SCRIPT" --check 2>&1 | grep -q 'does not clear its evidenced maximum' \
+  && ok "control: a row BELOW its ceiling still gets the headroom sentence" \
+  || nope "no row gets the headroom sentence at all, so the arm above proves nothing"
+
+# --- the admitted failing row must reach the number the gate consumes ------------------------------
+# An `ok` reading BELOW the ceiling, alongside the failing one at it: admission that never reaches
+# the maximum is admission that changed nothing.
+printf 'at-ceiling\tok\t0\t20.0\t0\t0\t-\n' >> "$DC_T/.git/gate-run/r1/1.leg"
+dc_out=$("$DC_PY" "$DC_SCRIPT" --report 2>&1)
+printf '%s\n' "$dc_out" | awk -F'\t' '$1=="at-ceiling" && $2=="100.0" && $3=="2" {f=1} END{exit !f}' \
+  && ok "with an ok row below the ceiling too, the reported max is the FAILING row's seconds over both readings" \
+  || { nope "the reported maximum is not the failing row's"; printf '%s\n' "$dc_out" | sed 's/^/      /'; }
+
+# --- `--write --reset <leg>` ACTUALLY LOWERS, WITH THE OFFENDING RUN STILL RETAINED (F4) -----------
+# The docstring rests the entire mitigation of the monotone-floor hazard on this escape, so the
+# escape is EXERCISED rather than read. `--reset` bypassed the monotone hold and nothing else, which
+# is inert for the whole GATE_RUN_KEEP window: `max(vals)` was re-derived from the same retained
+# `.leg` rows and the identical value went straight back. That window is the only one an operator
+# reaches for it in — the offending run is what put the row there — so the promise was falsifiable
+# exactly where it was made and never falsified.
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+dc_before=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+"$DC_PY" "$DC_SCRIPT" --write --reset at-ceiling >/dev/null 2>&1
+dc_after=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+# THE CONTROL FIRST: a reset that lowered nothing and a reset with nothing to lower produce the same
+# `dc_after`, so the row it has to clear is proved present before the lowering is graded.
+# Graded as a PROPERTY (the row is a ceiling-reaching reading) rather than against a literal, so it
+# does not silently couple to whatever the block above last wrote into the evidence file.
+awk -v a="$dc_before" 'BEGIN{exit !(a != "" && a+0 >= 100)}' \
+  && ok "control: the pre-reset row ($dc_before) is a ceiling-reaching reading, so the reset has something to lower" \
+  || nope "the pre-reset row is '$dc_before', below its 100s ceiling — the reset arm below would grade nothing"
+if [ -n "$dc_before" ] && [ -n "$dc_after" ] \
+   && awk -v a="$dc_before" -v b="$dc_after" 'BEGIN{exit !(b<a)}'; then
+  ok "--write --reset LOWERED the row while the run that produced the reading was still retained ($dc_before -> $dc_after)"
+else
+  nope "--write --reset left the row at '$dc_after' — the documented escape from an admitted killed reading is inert for the whole retention window"
+fi
+# THE ARM THAT ACTUALLY GRADES THE ESCAPE, and the one the arm above cannot be (TOOL-aLeakedHandle-1
+# D1). A reset that lowers the row for exactly ONE invocation satisfies every assertion up to here:
+# the second revision of this escape filtered the killed reading per-process and left it sitting in
+# the retention window, so the next ordinary `--write` re-admitted it, `max(vals)` handed the cleared
+# value back, and the summary said `1 raised`. 100.0 -> 20.0 -> 100.0, all three greens. What
+# separates a discard from a filter is therefore what the row READS one ordinary write later, and
+# nothing shorter than that write can ask it.
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+dc_later=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+if [ -n "$dc_later" ] \
+   && awk -v a="$dc_after" -v b="$dc_later" 'BEGIN{exit !(a != "" && b+0 == a+0)}'; then
+  ok "the reset value ($dc_after) SURVIVES the next ordinary --write, with the run that produced the killed reading still retained"
+else
+  nope "an ordinary --write put the row back to '$dc_later' from the same retained killed reading — the reset lasted one invocation, not the retention window"
+fi
+# THE SUMMARY LINE IS GRADED TOO, because it is the only feedback `--write` gives and it was
+# reporting the opposite of what happened (D4). A reset re-deriving the value already stored was
+# forced out of the monotone hold by its own `name not in reset` clause and counted as a RAISE.
+# TWO RESETS BACK TO BACK, deliberately: the equal-value case is only reachable on the SECOND, and
+# re-running the reset is exactly the gesture an operator makes when the first appeared not to
+# stick. Graded on the COUNTER against the row's own movement, not on the row alone — the row is
+# unchanged either way, which is what made this invisible.
+"$DC_PY" "$DC_SCRIPT" --write --reset at-ceiling >/dev/null 2>&1
+dc_noop_pre=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+dc_noop=$("$DC_PY" "$DC_SCRIPT" --write --reset at-ceiling 2>&1)
+dc_noop_row=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+dc_raised=$(printf '%s\n' "$dc_noop" | grep -o '[0-9]* raised' | head -1 | cut -d' ' -f1)
+if awk -v r="$dc_noop_row" -v p="$dc_noop_pre" 'BEGIN{exit !(r != "" && p != "" && r+0 == p+0)}' \
+   && [ "$dc_raised" = 0 ]; then
+  ok "a repeated reset re-derives the identical value ($dc_noop_pre -> $dc_noop_row) and reports no movement (raised=$dc_raised)"
+else
+  nope "a repeated reset left the row at '$dc_noop_row' from '$dc_noop_pre' and printed '$dc_raised raised' — a count of work nobody did, in the only line --write prints"
+fi
+
+# AND WHEN NOTHING SURVIVES THE RESET, THE ROW GOES. `kill-overhead` has only the killed reading, so
+# a reset leaves it nothing to re-derive from. Carrying the previous row forward there would hand
+# back the exact value the operator asked to clear while printing that the reset ran, which is worse
+# than doing nothing because it looks like it worked. UNBACKED is `--check`'s reported, non-failing
+# state, and the next ordinary `--write` re-derives the leg once a finished run is in the window.
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+awk -F'\t' '$1=="kill-overhead"{f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && ok "control: the ordinary write restored kill-overhead's row, so its absence below is the reset's doing" \
+  || nope "kill-overhead has no row before the drop arm, so that arm would pass by finding nothing"
+"$DC_PY" "$DC_SCRIPT" --write --reset kill-overhead >/dev/null 2>&1
+awk -F'\t' '$1=="kill-overhead"{f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && { nope "a reset leg with no surviving reading kept its old row — the reset silently restored the value it was asked to clear"; sed 's/^/      /' "$DC_EV" 2>/dev/null; } \
+  || ok "a reset leg with no surviving reading loses its row rather than carrying the cleared value forward"
+awk -F'\t' '$1=="at-ceiling"{f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
+  && ok "control: the untouched leg kept its row on that same write, so the drop above is a verdict and not an emptied file" \
+  || nope "no row survived that write at all — the drop arm above proves nothing"
+# THE DROP HAS THE IDENTICAL LIFETIME QUESTION, so it gets the identical arm. A dropped row whose
+# killed reading is still retained comes straight back on the next ordinary write, at the value the
+# operator cleared, and the absence asserted above would have been true for one invocation only.
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+dc_ko_later=$(awk -F'\t' '$1=="kill-overhead"{print $2}' "$DC_EV" 2>/dev/null)
+dc_ac_later=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+# ITS OWN CONTROL, because the arm below grades an ABSENCE and an absence is what an empty file, a
+# failed write and a working drop all look like. The untouched leg proves this write produced rows.
+[ -n "$dc_ac_later" ] \
+  && ok "control: the untouched leg still reads $dc_ac_later after that write, so the absence graded below is a verdict and not an empty file" \
+  || nope "no row at all survived the write before the drop-lifetime arm, so that arm would pass by finding nothing"
+[ -z "$dc_ko_later" ] \
+  && ok "the dropped row STAYS dropped across the next ordinary --write, rather than being re-derived from the killed reading it was cleared of" \
+  || nope "an ordinary --write re-derived kill-overhead at '$dc_ko_later' from the reading the reset discarded — the drop lasted one invocation"
+
+# --- THE RESET LEG IS THE ONLY LEG WITH A READING (TOOL-aLeakedHandle-1 D3) ------------------------
+# The state the DEAD-PROBE return was preempting: `cmd_write` asked "what survives the reset" and
+# printed the answer to "was anything measured at all", so a reset naming the only leg with a
+# retained reading exited 2 saying nothing was measured — of readings it had just excluded itself —
+# and the stale row it was asked to clear survived. Reachable without contrivance: GATE_LEGS
+# produces a one-leg bar, guards scope a run to a handful, and resetting every leg that currently
+# has a retained reading is the plain case. The fixture above cannot see it, because `at-ceiling`
+# keeps an `ok` row there and `runs` is never empty.
+printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\n' > "$DC_T/.git/gate-run/r1/1.leg"
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+dc_lonely_pre=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+awk -v a="$dc_lonely_pre" 'BEGIN{exit !(a != "" && a+0 >= 100)}' \
+  && ok "control: the sole-reading leg holds a ceiling-reaching row ($dc_lonely_pre) before the reset, so the arm below has something to clear" \
+  || nope "the sole-reading leg reads '$dc_lonely_pre' before the reset — the arm below would grade an absence"
+dc_lonely=$("$DC_PY" "$DC_SCRIPT" --write --reset at-ceiling 2>&1); dc_lonely_rc=$?
+dc_lonely_row=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+if [ "$dc_lonely_rc" = 0 ] && [ -z "$dc_lonely_row" ] \
+   && ! printf '%s\n' "$dc_lonely" | grep -q 'DEAD PROBE'; then
+  ok "resetting the only leg with a reading runs the drop path: exit 0, the row gone, and no DEAD PROBE misdiagnosis"
+else
+  nope "resetting the only leg with a reading exited $dc_lonely_rc leaving the row at '$dc_lonely_row' — the liveness return fired above the drop path it was supposed to let through"
+  printf '%s\n' "$dc_lonely" | sed 's/^/      /'
+fi
+# THE LIVENESS CONTROL FOR THAT SPLIT. Asking the emptiness question without the reset filter must
+# not stop it being asked: with the run record genuinely empty, DEAD PROBE still fires, or the arm
+# above is satisfied by a check that was deleted rather than moved.
+rm -f "$DC_T/.git/gate-run/r1/1.leg"
+dc_dead=$("$DC_PY" "$DC_SCRIPT" --write 2>&1); dc_dead_rc=$?
+if [ "$dc_dead_rc" = 2 ] && printf '%s\n' "$dc_dead" | grep -q 'DEAD PROBE'; then
+  ok "control: with no retained reading at all, --write still exits 2 with DEAD PROBE"
+else
+  nope "control: an empty run record no longer reports DEAD PROBE (rc=$dc_dead_rc) — the liveness assertion was removed, not relocated"
+fi
+
+# --- the docstring is the only written statement of any of this ------------------------------------
+# §5 rests the whole mitigation of the monotone-floor hazard on it, so it is OBSERVED rather than
+# assumed. The substrings are named by the criterion, not chosen here, so the arm grades content
+# rather than a builder's choice of grep.
+dc_doc=$("$DC_PY" -c 'import ast,sys
+for n in ast.parse(open(sys.argv[1],encoding="utf-8").read()).body:
+    if isinstance(n, ast.FunctionDef) and n.name == "read_runs":
+        print(ast.get_docstring(n) or "")' "$DC_SCRIPT" 2>&1)
+dc_miss=""
+for dc_w in ceiling slow contended hung; do
+  printf '%s\n' "$dc_doc" | grep -q -- "$dc_w" || dc_miss="$dc_miss $dc_w"
+done
+[ -z "$dc_miss" ] \
+  && ok "read_runs's docstring states the ceiling comparison and names slow, contended and hung as the causes it cannot tell apart" \
+  || nope "read_runs's docstring omits:$dc_miss — a rule with no written statement, or a statement of what it cannot distinguish that omits it"
+printf '%s\n' "$dc_doc" | grep -q -- '--reset' \
+  && ok "read_runs's docstring names the --write --reset <leg> escape, which is the half a reader ACTS on" \
+  || nope "read_runs's docstring omits --reset, so the entire mitigation of the monotone-floor hazard ships undocumented"
+rm -rf "$DC_T"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "run-gates evidence: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }

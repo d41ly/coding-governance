@@ -8280,15 +8280,27 @@ user_skills = "/tmp/gk-fake-skills"
         _p6self = run("selfcheck")
         check("[-6] AC2 selfcheck is GREEN over gov's own descriptors after the S5 withdrawal",
               _p6self.returncode == 0, _p6self.stdout[-1200:] + _p6self.stderr[-600:])
-        check("[-6] S4 ...and it SAYS what it checked, with a derived count rather than silence",
-              "gate legs: every argv path checked against the shipped map · 0 unshippable"
-              in _p6self.stdout, _p6self.stdout[-800:])
-        # S5, ASSERTED ON THE TREE rather than on the run: the leg is gone from the descriptor and
-        # the exemption that replaced it names it. Without this pair the arm above passes on any
-        # tree where the leg was deleted and nothing recorded why.
         _kmk = (HERE.parent / "govkit" / "entries" / "kickoff-manifest.kit.toml").read_text(
             encoding="utf-8")
         _regs = (HERE / "registry.toml").read_text(encoding="utf-8")
+        # ---- THE POPULATION IS THE VALUE, and this arm asserts it rather than the note's presence.
+        # ---- Round 2's D2: the check graded 21 of 26 entries while its note counted argv over all
+        # ---- 26, and THIS arm was green throughout — it had been loosened, in the same commit that
+        # ---- introduced the narrow grading, from a literal to the substring `· 0 naming a path no
+        # ---- rule produces`, which says nothing about who was graded. `_n_entries` is counted out
+        # ---- of registry.toml's own bytes, so it does not travel through the loader the note
+        # ---- derives from: a selection that narrows again prints `21 of 26` and reds here.
+        _n_entries = _regs.count("\n[[entry]]\n")
+        check("[-6] S4 ...over EVERY registry entry, stated by value and not merely present",
+              _n_entries > 0
+              and f"gate legs: {_n_entries} of {_n_entries} registry entries graded · "
+              in _p6self.stdout
+              and "· 0 naming a path no rule produces" in _p6self.stdout,
+              f"registry declares {_n_entries} entr(y|ies); note read: "
+              + "".join(ln for ln in _p6self.stdout.split("\n") if "gate legs:" in ln))
+        # S5, ASSERTED ON THE TREE rather than on the run: the leg is gone from the descriptor and
+        # the exemption that replaced it names it. Without this pair the arm above passes on any
+        # tree where the leg was deleted and nothing recorded why.
         check("[-6] S5 the unshippable leg is gone from the kickoff-manifest descriptor",
               "kickoff engine size" not in _kmk, "the gate_leg block is still declared")
         check("[-6] S5 ...and an [[exempt_leg]] row carries it, with a reason",
