@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 status: OPEN
 authorized-by: prompt
-ids: TOOL-aLeakedHandle-1
+ids: TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3
 ---
 
 # aLeakedHandle — two reds traced to their causes, and the reporting that made one of them unreadable
@@ -71,13 +71,13 @@ holds the true figure, so the summary and the ledger disagree by a factor of fou
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-10 · streams tooling
-ids TOOL-aLeakedHandle-1
+ids TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3
 
 <!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
