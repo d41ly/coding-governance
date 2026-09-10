@@ -50,8 +50,18 @@ listed as one below rather than closed by association.
 shell scanner grades a repository's own sites, so the list of carried exceptions is nothing but
 literals naming files outside the kit — which the carried-prefix ban refuses in a shipped kit body.
 So the registry lives at `memory/project/substitution-fed-loops.txt` beside the other gate
-registries and arrives as the leg's argv. The same decision is what makes the scanner usable by an
-adopter who has their own sites and their own registry, which a hard-coded path could not be.
+registries and arrives as the leg's argv, through a `{memory_root}` token rather than a literal.
+
+**Naming the registry is not shipping it, and the first cut only named it.** `TOOL-aLeakedHandle-1`
+landed the leg with an argv pointing at a path no descriptor rule wrote, so `silenced_legs` withheld
+the leg at every adopter, `govkit apply` exited 1, and the receipt recorded no coverage — while the
+descriptor comment beside it declared the `gate-lint-leg-wiring` hole discharged. A `seed` rule now
+ships an EMPTY registry to that path: copied once, owned by the adopter from then on, so a later
+install cannot delete rows they declared, and gov's own carried sites do not travel to a tree where
+the scan would report every one of them as gone. Its closing review is the record; the class is
+gated by `govkit selfcheck`'s `gate legs` check, which used to skip any argv element carrying a
+token it could not resolve — most of them — and now resolves every one against a bare target. That
+check derives and prints its own population on each run; read the count there.
 
 **The scan grades the LOOP-FEEDING forms alone, and that boundary was measured rather than argued.**
 Run over this tree before the ban was wired, the predicate separated four populations that a looser

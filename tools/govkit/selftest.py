@@ -8281,8 +8281,8 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-6] AC2 selfcheck is GREEN over gov's own descriptors after the S5 withdrawal",
               _p6self.returncode == 0, _p6self.stdout[-1200:] + _p6self.stderr[-600:])
         check("[-6] S4 ...and it SAYS what it checked, with a derived count rather than silence",
-              "gate legs: every argv path checked against the shipped map · 0 unshippable"
-              in _p6self.stdout, _p6self.stdout[-800:])
+              "· 0 naming a path no rule produces" in _p6self.stdout,
+              _p6self.stdout[-800:])
         # S5, ASSERTED ON THE TREE rather than on the run: the leg is gone from the descriptor and
         # the exemption that replaced it names it. Without this pair the arm above passes on any
         # tree where the leg was deleted and nothing recorded why.

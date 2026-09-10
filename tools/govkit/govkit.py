@@ -39,6 +39,7 @@ import posixpath
 import re
 import subprocess
 import sys
+import tempfile
 import time
 
 KIT_GOVKIT_VERSION = "1.10"  # gov:kit govkit@1.10 — kit identity; set HERE, never from a conf
@@ -1814,38 +1815,59 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # ---- gated: `apply`'s bar catches the leg at ONE adopter's install, after the descriptor has
     # ---- already shipped; this catches it here, before any adopter can receive it.
     #
-    # THE POPULATION IS `shipped_owner`, the map arm 7h3 already builds — derived from the file
-    # rules the way `apply` resolves them, not from `claims`, which covers a fraction of the rules
-    # in this tree and would have quantified over a third of the payload while reporting a confident
-    # zero over the rest.
+    # IT IS `silenced_legs` ITSELF NOW, pointed at a bare target — one predicate, not a second
+    # spelling of its question. TOOL-aLeakedHandle-1's closing review, F1. The first cut compared
+    # each argv element against `shipped_owner`, the gov-SOURCE map arm 7h3 builds, and SKIPPED any
+    # element carrying a token other than `{prefix}` because the map could not resolve one. Measured
+    # on this tree at the moment it failed: 20 argv elements graded, 113 skipped — every `{kit}` and
+    # every `{memory_root}` path, which is nearly all of them — while its note printed a confident
+    # `0 unshippable`. A leg naming `{memory_root}/project/…` sailed through it, shipped, and
+    # withheld itself at every adopter with `apply` exiting 1. That is the could-not-fail shape
+    # arriving as an under-derived population rather than as a wrong predicate.
     #
-    # `{prefix}/x` IS A TARGET-SIDE DESTINATION and the map is keyed by GOV SOURCE, so the two are
-    # compared by TAIL rather than by substitution. Substituting `tools` for the token was tried
-    # first and run over the real tree before being wired — the standing rule here — and it redded
-    # an innocent leg: the kickoff kit's own ratchet argv spells `{prefix}/manifest-check.sh` while
-    # gov's copy lives under `skills/session-kickoff/`, so the substituted form named a file that
-    # was never gov's spelling of it. A tail match asks the question the spec actually poses: does
-    # SOME kit ship this file. An element carrying no `{prefix}` is a gov-relative path already and
-    # is compared whole.
-    _shipped = set(shipped_owner)
-    _leg_hits = 0
-    for eid, (d, _dpath) in sorted(descs.items()):
-        for leg in d.get("gate_leg", []):
-            for a in leg.get("argv", []):
-                if "/" not in a or "{" in a.replace("{prefix}", ""):
-                    continue          # not a path, or carries a token this arm cannot resolve
-                if a.startswith("{prefix}/"):
-                    _tail = a[len("{prefix}/"):]
-                    if any(s == _tail or s.endswith("/" + _tail) for s in _shipped):
-                        continue
-                elif a in _shipped:
-                    continue
-                _leg_hits += 1
-                r.fail(f"entry '{eid}' declares gate leg '{leg.get('name')}' whose argv names "
-                       f"'{a}', which no kit ships — so no adopter can ever receive the engine this "
-                       f"leg runs. `apply` would emit the row and the receipt would record it as "
-                       f"coverage for a leg that cannot run. Withdraw the leg, or ship the file")
-    r.note(f"gate legs: every argv path checked against the shipped map · {_leg_hits} unshippable")
+    # THE FIXTURE IS A BARE TARGET: a scratch directory holding nothing. A target that holds nothing
+    # cannot supply a path by accident, so every argv element the predicate resolves must be
+    # accounted for by some rule in some descriptor or it names nothing anywhere. Nothing is written
+    # to it and nothing is read from it — `planned_writes` walks GOV's tree, and the directory is
+    # only ever a resolution root. This resolves `{prefix}` by substitution rather than by the tail
+    # match the source-keyed map needed: the question is now "does a rule PUT a file there", which
+    # is the question `apply` asks, so the kickoff ratchet's `{prefix}/manifest-check.sh` — gov's
+    # copy of which lives under `skills/session-kickoff/` — passes on its DESTINATION and needs no
+    # special case.
+    #
+    # `have` IS EVERY RESOLVED PLAN DESTINATION AT EVERY KIND, and NOT the `write` set `cmd_plan`
+    # passes. The difference is what makes this gateable: a leg naming a `project-owned` path is a
+    # DELIBERATE withhold — `process-monitor` documents that mechanism in its own descriptor and
+    # `drift-audit` copies it, both relying on `silenced_legs` to drop the leg with the file — and
+    # failing on those would red a design. A leg naming a path NO rule resolves to at ANY role is
+    # the defect. Measured before wiring: 3 hits, of which 2 were those withholds and 1 was F1.
+    #
+    # WHAT THIS DOES NOT CHECK. Whether the file gov ships to that path is the RIGHT one, whether
+    # the leg passes, or an argv element carrying an UNANSWERED intake token — this fixture answers
+    # nothing on purpose, and `silenced_legs` leaves an unresolved element to the sibling refusal at
+    # `apply`. It answers one question: does some rule put a file where this leg's argv looks.
+    with tempfile.TemporaryDirectory() as _bare:
+        _bare_t = pathlib.Path(_bare)
+        _bare_deploy = {"gov_source": "local", "prefix": "tools"}
+        _bare_sel = derive_install_order(all_kits(descs), descs)
+        # ITS OWN REPORT, discarded. A bare target answers no intake token, so `planned_writes`
+        # legitimately refuses a destination for every kit that takes one; those are findings about
+        # the FIXTURE and not about gov, and the rows carrying them are excluded from `have` below
+        # by the same `missing` key.
+        _bare_rows = planned_writes(root, _bare_t, _bare_deploy, descs, _bare_sel, Report())
+        _bare_have = {x["dest"] for x in _bare_rows if not x["missing"]}
+        _leg_argv = sum(len(leg.get("argv", []))
+                        for d, _p in descs.values() for leg in d.get("gate_leg", []))
+        _silent = silenced_legs(descs, _bare_sel, _bare_t, _bare_deploy, _bare_have)
+        for _eid, _nm, _bad in sorted(_silent):
+            r.fail(f"entry '{_eid}' declares gate leg '{_nm}' whose argv names "
+                   f"{', '.join(_bad)}, which NO rule in any descriptor writes, seeds, orders or "
+                   f"produces — so `apply` withholds the leg and exits 1 at every target selecting "
+                   f"this kit, and the receipt records no coverage for it. Ship the file (a `seed` "
+                   f"rule is how a leg's data file travels), or take the path from an intake answer "
+                   f"the operator supplies")
+        r.note(f"gate legs: {_leg_argv} argv element(s) resolved against a bare target · "
+               f"{len(_silent)} naming a path no rule produces")
 
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`
     #          entries declare `home = "tools"` as a source-resolution base, and quantifying over

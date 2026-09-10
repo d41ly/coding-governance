@@ -40,6 +40,10 @@ who did not write it:
     continuation. Neither exists in the tree this landed against. A repo that writes them gets a
     silent MISS rather than a refusal, and it is written down because a heuristic with an
     unstated blind spot is how the sibling scanner in this kit got its first one.
+  * Quoting carried ACROSS lines. `extract_code` cuts the comment half of each line on its own,
+    so an unterminated quote opened on a previous line leaves this one's tail reading as code.
+    The failure direction is a MISS and never a false RED, which is the way round this leg needs
+    it: it is `subject = repo` with no guard, so a red on an innocent file blocks every push.
 
 THE REGISTRY is a shrink-only declaration of the sites that predate the gate, one row per
 `<path>\t<delimiter>\t<count>\t<reason>`, keyed on the delimiter and NEVER on a line number — a
@@ -85,12 +89,47 @@ GATED = [key for key, _label, gated in CLASSES if gated]
 #: A printed count nothing reads is the same nothing as no count: this repository has shipped
 #: nine arms stranded past an unconditional exit while the suite printed a total and every
 #: other gate held. Raise it with the arms; it may never be lowered to fit a regression.
-FLOOR_ASSERTIONS = 18
+FLOOR_ASSERTIONS = 24
 
 
 def check_substitution(text: str) -> bool:
     """True when the text holds a command substitution rather than a plain expansion."""
     return bool(SUBSTITUTION.search(text))
+
+
+def extract_code(line: str) -> str:
+    """The CODE half of one line: everything before the `#` that opens an unquoted comment.
+
+    A line that is code with a trailing comment used to be classified WHOLE, so `# … <<EOF` in the
+    comment was matched as a real heredoc opener, the rest of the file became its body, and an
+    innocent file was reported under a GATED key. This leg is `subject = repo` with no guard, so it
+    runs at the push boundary — a false RED here blocks every push with no remedy the registry can
+    supply, and a gate whose steady state is red gets bypassed.
+
+    A `#` opens a comment only where the shell says it does: outside quotes, and at the start of a
+    word. `x=a#b` and `${x#y}` keep their `#`, and a quoted one is data. The backslash escape is
+    honoured everywhere but inside single quotes, where bash does not honour it either.
+
+    WHAT THIS DOES NOT DO: track quoting ACROSS lines. An unterminated quote makes this line's tail
+    look like code; that direction can only cost a hit, never invent one, and a heredoc body is
+    read by `extract_heredoc_body` and never by this.
+    """
+    quote = ""
+    i = 0
+    while i < len(line):
+        ch = line[i]
+        if ch == "\\" and quote != "'":
+            i += 2
+            continue
+        if quote:
+            if ch == quote:
+                quote = ""
+        elif ch in "'\"":
+            quote = ch
+        elif ch == "#" and (i == 0 or line[i - 1] in " \t;&|("):
+            return line[:i]
+        i += 1
+    return line
 
 
 def extract_heredoc_body(lines: list[str], start: int, dash: str, tag: str) -> tuple[list[str], int]:
@@ -99,11 +138,18 @@ def extract_heredoc_body(lines: list[str], start: int, dash: str, tag: str) -> t
     An unterminated heredoc returns the rest of the file and -1. The caller must then NOT skip
     ahead: swallowing the remainder of a file on one malformed tag is how a scan goes dark over
     everything below it, which is worse than reporting the tail twice.
+
+    THE TERMINATOR IS EXACT, because bash's is: for an unquoted `<<TAG` the body ends only on a line
+    that is the tag and nothing else, and tabs are stripped only for `<<-`. A `.strip()` here ended
+    the body at an INDENTED line bash reads as body — so the scanner resumed at a fake terminator
+    and graded the real body as code, missing the gated class outright. The `\\r` is the one
+    tolerance the strip was actually buying: on a CRLF checkout every terminator carries one, and
+    a naive column-0 match flips innocent sites into GATED hits.
     """
     body = []
     for i in range(start + 1, len(lines)):
         probe = lines[i].lstrip("\t") if dash else lines[i]
-        if probe.strip() == tag:
+        if probe.rstrip("\r") == tag:
             return body, i
         body.append(lines[i])
     return body, -1
@@ -115,15 +161,17 @@ def scan_file(text: str) -> dict[str, list[tuple[int, str]]]:
     Returns `{class-key: [(1-based line, delimiter), ...]}`. A heredoc BODY is skipped once its
     terminator is known, so a fixture that writes a shell script through a heredoc is graded as the
     data it is rather than as code this repository runs.
+
+    EVERY CLASSIFIER READS THE CODE HALF of the line and never the comment — `extract_code` says
+    why. The BODY is read from `lines` untouched: a body is data, and a `#` in it is a character.
     """
     lines = text.split("\n")
     found: dict[str, list[tuple[int, str]]] = {key: [] for key, _l, _g in CLASSES}
     i = 0
     while i < len(lines):
-        line = lines[i]
-        if line.lstrip().startswith("#"):
-            i += 1
-            continue
+        # A whole-line comment strips to its own indentation and matches no classifier, so the
+        # skip that used to sit here is this call's tail case rather than a second predicate.
+        line = extract_code(lines[i])
         loop = bool(DONE.search(line))
         if loop and PROCESS_SUB.search(line):
             found["procsub"].append((i + 1, "<("))
@@ -293,6 +341,41 @@ def run_selftest() -> int:
              ["loop-heredoc-sub"]), 0)
     test("an unterminated heredoc still reports rather than swallowing the file",
          len(scan_file("while read x; do :; done <<NEVER\n$(ls)\n")["loop-heredoc-sub"]), 1)
+
+    # ---- the FALSE-POSITIVE half, which shipped without one --------------------------------------
+    # A false-positive arm alone passes when the scanner goes dark, so each of the two below is
+    # paired with a control proving the same run still names the real thing. This leg is
+    # `subject = repo` with no guard and runs at the push boundary, so a red on an innocent file
+    # blocks every push on the repository it is installed in.
+    test("a trailing comment mentioning a heredoc is NOT an opener",
+         scan_file('while read -r x; do :; done < "$f"   # used to be <<EOF\n$(git log)\n')
+         ["loop-heredoc-sub"], [])
+    test("the CONTROL — the same line with the comment marker gone is still a hit",
+         [d for _l, d in scan_file("while read -r x; do :; done <<EOF\n$(git log)\nEOF\n")
+          ["loop-heredoc-sub"]], ["EOF"])
+    test("a trailing comment mentioning a here-string is NOT one",
+         scan_file('while read -r x; do :; done < "$f"   # see <<<"$(x)"\n')
+         ["loop-herestring-sub"], [])
+    test("a `#` inside quotes is data, so the opener beside it is still graded",
+         [d for _l, d in scan_file('while read -r x; do echo "# $x"; done <<EOF\n$(git log)\nEOF\n')
+          ["loop-heredoc-sub"]], ["EOF"])
+
+    # ---- the terminator is EXACT, and the CR tolerance is the only thing the old strip bought ----
+    _indented = "while read -r x; do :; done <<EOF\n  EOF\n$(git log)\nEOF\n"
+    test("an INDENTED line is body, not a terminator, so the gated class is still named",
+         [d for _l, d in scan_file(_indented)["loop-heredoc-sub"]], ["EOF"])
+    # The CR tolerance, pinned on a fixture where it CHANGES the verdict. The indented one above
+    # cannot do that job: dropping the tolerance makes it unterminated, whose body is the rest of
+    # the file, which is a hit either way — an arm that agrees with itself for the wrong reason.
+    # Here the body is clean and the substitution sits BELOW the terminator, so a terminator missed
+    # over one CR swallows the code under it and turns an innocent site into a GATED hit. That is
+    # measured, not hypothetical: three live sites in one tracked script of the kit's home repo
+    # flip from a near miss to a GATED hit on a CRLF checkout when the tolerance is dropped. The
+    # file is not named here — a kit body naming a path outside itself is banned, and the ban is
+    # what the sibling `install-prefix` arm enforces.
+    _crlf = "while read -r x; do :; done <<EOF\nplain body, no fork\nEOF\ny=$(git log)\n"
+    test("a CRLF terminator still ENDS the body, so the code under it is not swallowed",
+         scan_file(_crlf.replace("\n", "\r\n")), scan_file(_crlf))
 
     # ---- the registry, in both directions and on both malformed shapes -------------------------
     measured = {("a.sh", "HIT"): 1}

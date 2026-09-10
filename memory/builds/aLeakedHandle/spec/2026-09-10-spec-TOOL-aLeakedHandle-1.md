@@ -10,6 +10,7 @@
 | [2026-09-10-build-TOOL-aLeakedHandle-1-2-acceptance-ledger.md](../build/2026-09-10-build-TOOL-aLeakedHandle-1-2-acceptance-ledger.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aLeakedHandle-1-0-run-mandate.md](../prompts/2026-09-10-prompt-TOOL-aLeakedHandle-1-0-run-mandate.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aLeakedHandle-1-1-build-brief.md](../prompts/2026-09-10-prompt-TOOL-aLeakedHandle-1-1-build-brief.md) | journal | — |
+| [2026-09-10-review-TOOL-aLeakedHandle-1-diff-review.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-diff-review.md) | diff-review | TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md) | spec-audit | TOOL-aLeakedHandle-2 |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md) | spec-audit | TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 |
 

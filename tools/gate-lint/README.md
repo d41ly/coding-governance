@@ -45,9 +45,16 @@ a scratch FILE — redirect the walk to it, then read it by redirect, which keep
 current shell so a `return` inside it still returns from the enclosing function.
 
 It takes the registry path as an ARGUMENT and derives its population from `git ls-files`, so it
-names nothing outside the kit and an adopter points it at their own list. The registry is
-shrink-only and keyed on the file plus the redirect delimiter, never on a line number: set
-equality runs in both directions, so a new site fails AND a row whose site is gone fails.
+names nothing outside the kit by literal. The registry itself SHIPS: `kit.toml` seeds an empty one
+to `{memory_root}/project/substitution-fed-loops.txt`, which is where the leg's argv points, and
+`seed` means it is copied once and owned by that repository from then on — a later install never
+overwrites the rows an adopter has declared. Declaring the leg without shipping the file is what
+`TOOL-aLeakedHandle-1` first landed, and it made `govkit apply` exit 1 at every adopter with the leg
+withheld and no coverage recorded; the arm that now catches that class is `govkit selfcheck`'s
+`gate legs` check. The registry is shrink-only and keyed on the file plus the redirect delimiter,
+never on a line number: set equality runs in both directions, so a new site fails AND a row whose
+site is gone fails. Fill it on the first install from what the leg reports — the seeded header says
+how.
 
 It counts `done < <(…)` and prints the count WITHOUT gating it. That form carries the same EOF
 dependency, and it is the only one left for a NUL stream, because command substitution strips NUL

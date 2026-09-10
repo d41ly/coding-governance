@@ -1518,6 +1518,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "extract_code",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "extract_declarations",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"

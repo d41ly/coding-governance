@@ -1,0 +1,25 @@
+# substitution-fed-loops.txt — the shrink-only declaration of the sites that PREDATE this gate.
+# Seeded EMPTY by `govkit apply` and owned by this repository from that moment: govkit copies it
+# once and never again, so nothing here is overwritten by a later install.
+#
+# Read by `<tool-root>/gate-lint/sh_hygiene.py`, which takes this file's path as its argument. One
+# row per declared site, TAB-separated:
+#
+#     <path>\t<delimiter>\t<count>\t<why it is carried>
+#
+# The key is the path plus the redirect DELIMITER — the heredoc tag, or `<<<` for a here-string —
+# and never a line number: a line-keyed registry reds on an edit above the waived line, and a gate
+# whose steady state is red gets bypassed.
+#
+# Set equality runs in BOTH directions. A measured site with no row fails, and a row the scan no
+# longer finds fails, so draining a site forces its row out in the same commit instead of leaving a
+# widened exemption behind. The count may FALL with the sites and may not rise.
+#
+# FILLING IT ON A FIRST INSTALL. Run the leg. Every pre-existing site in this tree is reported as
+# undeclared, with its path and delimiter — write one row per reported site, with a real reason,
+# and the gate becomes a ratchet over what you already had. An empty file is the correct state for
+# a tree that has none, and the scanner refuses a run that graded no files at all rather than
+# reporting that same zero.
+#
+# NO COUNT IS WRITTEN IN THIS HEADER. The scanner derives the site and row totals and prints both
+# on every run, green included; a number typed here would be wrong on the next commit.
