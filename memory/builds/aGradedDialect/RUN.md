@@ -60,3 +60,11 @@ base: d13576732e6837e4be62edf5c60eb43631f94cd0
 2026-09-10T01:39:47Z dispatch · item 81a1bacf TOOL-aGradedDialect-4 · reason tools/lexicon/lexicon.py tools/lexicon/scaffold_lexicon.py tools/lexicon/selftest.py memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-4.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-4-acceptance.md memory/builds/aGradedDialect/README.md
 
 2026-09-10T02:29:25Z brief · item TOOL-aGradedDialect-5 · reason b159a308c5e7 memory/builds/aGradedDialect/prompts/2026-09-10-prompt-TOOL-aGradedDialect-5-brief.md
+
+2026-09-10T02:30:23Z dispatch · item d0c8921f TOOL-aGradedDialect-5 · reason tools/lexicon/LEXICON.md tools/lexicon/README.md tools/lexicon/lexicon.py tools/lexicon/kit.toml .claude/skills/lexicon/SKILL.md WIRE-INTO-PROJECT.md memory/map/features/lexicon.md memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-13.md memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-5.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-5-acceptance.md
+
+2026-09-10T02:35:09Z dispatch · item d0c8921f TOOL-aGradedDialect-5 · reason tools/lexicon/LEXICON.md tools/lexicon/README.md tools/lexicon/lexicon.py tools/lexicon/canon.py tools/lexicon/kit.toml .claude/skills/lexicon/SKILL.md WIRE-INTO-PROJECT.md memory/map/features/lexicon.md memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-13.md memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-5.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-5-acceptance.md
+
+2026-09-10T02:35:13Z brief · item TOOL-aGradedDialect-5 · reason 788481d957b1 memory/builds/aGradedDialect/prompts/2026-09-10-prompt-TOOL-aGradedDialect-5-brief.md
+
+2026-09-10T02:45:25Z dispatch · item d0c8921f TOOL-aGradedDialect-5 · reason tools/lexicon/LEXICON.md tools/lexicon/README.md tools/lexicon/lexicon.py tools/lexicon/canon.py tools/lexicon/kit.toml .claude/skills/lexicon/SKILL.md WIRE-INTO-PROJECT.md memory/map/features/lexicon.md memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-13.md memory/builds/aGradedDialect/spec/2026-09-10-spec-TOOL-aGradedDialect-5.md memory/builds/aGradedDialect/build/2026-09-10-build-TOOL-aGradedDialect-5-acceptance.md memory/builds/aGradedDialect/README.md memory/LIVE.md memory/ledger/2026-09.md

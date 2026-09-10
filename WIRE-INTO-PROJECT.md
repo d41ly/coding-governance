@@ -467,6 +467,55 @@ memory-tree owns that file, which is why §0 makes this decision depend on §3.
 5. Commit `memory-recall/` + `.claude/skills/memory-recall/SKILL.md` (+ the hook, `tools/settings-merge.py`
    and the settings block if step 4 was taken) as one landing.
 
+<!-- govkit:entry lexicon -->
+## 3f — Adopt the lexicon kit (if chosen in §0)
+
+A closed verb table every definition leads with, a banned type-suffix list, and a (language,
+surface) case-convention matrix. Opt-in: with no `.lexicon.conf` the engine reports NOT ADOPTED and
+exits 0, so an installed-but-undeclared kit is a legal state rather than a red.
+
+1. Copy the kit dir into the project as a directory **named `lexicon`** (don't rename):
+   `cp -r <gov-repo>/tools/lexicon <project>/tools/lexicon`. The name AND the one-segment
+   `tools/` prefix are both load-bearing here: `codebase-map`'s `lexicon-verbs` inventory resolves
+   the kit at `<root>/tools/lexicon` to borrow its conf reader, so a kit installed anywhere else
+   yields an empty verb inventory rather than an error.
+
+   **Then delete the GOV-ONLY GRADING INSTRUMENTS that copy brings with it.** `kit.toml` withholds
+   them from `govkit apply`, but a `cp -r` does not read `kit.toml`, so this path needs its own step:
+   ```bash
+   rm -f <project>/tools/lexicon/{selftest.py,ts-conformance-fixtures.json}
+   ```
+   Both grade the KIT, not your tree. `selftest.py` stages breaks into copies of the checkers in
+   this directory and asserts the checkers still catch them, which has a job only when the kit's own
+   source changes and none at all in a tree that copy-installs it. `ts-conformance-fixtures.json`
+   holds bounded, provenance-stamped excerpts of a THIRD-PARTY TypeScript tree, drawn to score this
+   kit's TypeScript reader — `selftest.py` is its only reader, so shipping it onward would be a
+   disclosure of somebody else's source with no consumer at the far end.
+   **Delete nothing else.** `SKILL.template.md` is withheld from `apply` too, and it must SURVIVE a
+   copy-install: it is the file step 3 renders the adopter's Skill from. Delete it before rendering
+   and `--check` prints `not installed, nothing to render` and grades nothing; delete it AFTER, and
+   `--check` reds with `cannot verify drift` — neither is a state you want. The two waiver registries ship as
+   empty headed files and are yours to fill. The `codebase-map` section above omits
+   `map_extractors.py` from its own `rm -f` line for the same reason.
+2. `bash <project>/tools/lexicon/adopt-lexicon.sh --scaffold` — DERIVES a proposed verb table
+   (which concepts are live in YOUR corpus; each verb's SPELLING from the kit's frozen canon, never
+   from your identifiers), seeds the `LANGS` and `CELLS` rows for the extensions it recognises,
+   MEASURES both offender pins against your tree, writes `.lexicon.conf` at the project root and
+   renders the Skill.
+3. **Curate the seed, then stamp it.** The seed lands marked PROPOSED with an empty `ratified` key
+   and `--check` reds while that key is empty, so an uncurated table cannot reach your merge bar
+   disguised as a vocabulary. Write the NEGATIVE definitions your domain needs (`LEXICON.md` is the
+   authoring guide), delete rows you did not mean, arm or leave `dark` each `CELLS` row, then set
+   `ratified="<date> node <tag>"`. Re-render with `--render` after any conf edit; the wiring check
+   byte-compares, so an edit nobody re-rendered reds.
+4. `bash <project>/tools/lexicon/adopt-lexicon.sh --check` — the drift mode, green when the conf
+   parses, the stamp is present and the Skill is in sync. `govkit apply` emits two gate legs
+   (`lexicon naming predicates`, `lexicon wiring`); a `cp -r` install wires them into your own gate
+   runner by hand.
+5. Commit `tools/lexicon/`, `.lexicon.conf`, the two waiver registries and
+   `.claude/skills/lexicon/SKILL.md` as one landing. Pin the Skill to LF — it is a rendered artifact
+   its own gate byte-compares.
+
 ## 4 — Write the kickoff manifest (the engine's project layer)
 
 The engine (§1) discovers the manifest by searching `<project>`, **first hit wins**:

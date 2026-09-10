@@ -1,11 +1,12 @@
 # TOOL-aGradedDialect-5 — the records: the darkness ruling retired where it is actually carried
 
-**Status:** SPECCED · rev-4 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
+**Status:** CLOSED · rev-5 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-10-build-TOOL-aGradedDialect-5-acceptance.md](../build/2026-09-10-build-TOOL-aGradedDialect-5-acceptance.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 |
 | [2026-09-10-prompt-TOOL-aGradedDialect-5-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-5-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 |
@@ -159,7 +160,8 @@ reason. The population is the gov-only instruments a `cp -r` delivers: `selftest
 ### Files touched (estimate)
 
 `tools/lexicon/LEXICON.md` · `tools/lexicon/README.md` · `tools/lexicon/lexicon.py` (comment and
-version only) · `tools/lexicon/canon.py` (marker only) · `.claude/skills/lexicon/SKILL.md`
+version only) · `tools/lexicon/canon.py` (marker only) · `tools/lexicon/kit.toml` (one comment, whose
+"the same half is STILL MISSING" sentence S7 falsifies) · `.claude/skills/lexicon/SKILL.md`
 (re-rendered, never hand-edited) · `memory/backlog/TOOL.md` ·
 `memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-13.md` (header tail only) ·
 `memory/map/features/lexicon.md` · `WIRE-INTO-PROJECT.md` (one new anchored section, S7).
@@ -334,6 +336,39 @@ This unit adds and moves no gate arm; the legs above are the ones its edits must
   two clauses over two legs. The rev-1 line above is left saying FIVE on purpose: it records what
   that draft was written against, and editing a landed revision entry to agree with a later
   correction is how a revision log stops being a history.
+
+- rev-5 · 2026-09-10 · S2 · S3 · S5 · §4 · AC3 · AC5 · the three divergences BUILDING found, each
+  changed here before the code was written, per the build method's READY rule.
+  **S2 reaches a second carrier the criterion's grep does not span.** The modes table's `probe` cell
+  is spelled TWICE — once in `tools/lexicon/README.md` and once in the module docstring of
+  `tools/lexicon/lexicon.py`, which carries the same three-row table as indented prose and the same
+  `a regex pattern set` gloss. AC2's grep keys on `TWO PARSERS SHIP` and the language-list sentence
+  and cannot see it, so a README-only fix would have left `TOOL-aGradedDialect-3` §8 F1's handoff
+  half-paid inside the engine it changed. Both carriers now say the mode token carries the STANDING
+  and the pattern-set id selects the READER; §4's table row for that cell covers two files, not one.
+  **S3 was already discharged and this unit writes no edit for it.** The sentence §4's table quotes
+  — `TOOL-dScaffoldedMirror-13` still owns the `.ts`/`.tsx` question, at `lexicon.py:144` at this
+  spec's BASE — was DELETED by `TOOL-aGradedDialect-3` S8, which rewrote that whole `DEFINITION_SNIFF`
+  header for its own reasons. `grep -rn "dScaffoldedMirror-13" tools/` now returns two hits, both in
+  `selftest.py` and neither about ownership, so AC3 holds over the tree as it stands. Recorded rather
+  than passed over in silence: a scope item nobody edited and a scope item nobody needed to edit are
+  the same diff, and only one of them is honest.
+  **S5's KEY half needed no edit either, for a mechanical reason worth writing down.** The dossier's
+  claims are COARSE — `lexicon-verbs` claims leading verbs, not symbols — and units 2 to 4 minted
+  `parse_ts_defs`, `parse_tsx_defs`, `scan_ts_tokens` and `resolve_extractor`, whose leading tokens
+  `parse`, `scan` and `resolve` the dossier already claimed. So `codebase-map coverage + freshness`
+  was green before this unit touched anything, which AC5 observes and cannot distinguish from a
+  green it caused; the PROSE half of S5 is the part this unit actually wrote.
+  **And one pre-existing RED, found at BUILDING and NOT repaired here** — §7's leg set is unchanged,
+  and this is recorded because leaving it for the closing review to rediscover is what §7 exists
+  against.
+  `bash tools/check-install-prefix.sh` exits 1 with
+  `ROSE tools/lexicon/selftest.py 22 -> 23`. It is not this unit's: `git diff HEAD --
+  tools/lexicon/selftest.py` is empty over this pass, the row is a hand-written ratchet entry with a
+  reason column, and `git log -- tools/lexicon/selftest.py` puts the last two touches on
+  `TOOL-aGradedDialect-4`. §3 forbids this unit from touching that file and the registry row is
+  priced on the unit that added the literal, so it is REPORTED rather than absorbed: the discharge is
+  a fourth-column reason on that row, and it belongs to whoever closes unit 3 or 4.
 
 ## 10. Reuse audit
 

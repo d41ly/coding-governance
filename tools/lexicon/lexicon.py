@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.2
+# gov:kit lexicon@1.3
 """lexicon.py — two naming predicates over a DECLARED vocabulary, plus one self-containment refusal.
 
 THE INVOCATIONS ARE NOT LISTED HERE. Run the file with no recognised mode and it prints them, with
@@ -20,15 +20,26 @@ look like coverage while silently skipping what it forgot. That law binds here, 
 in the corpus carries a DECLARED mode and an undeclared one is a named refusal:
 
     parser  a real parse                  complete over its extension
-    probe   a regex pattern set           incomplete BY CONSTRUCTION, reported as such every run
+    probe   whatever the pset id names    incomplete BY CONSTRUCTION, reported as such every run
     dark    none, declared explicitly     named every run, never silently absent
 
-TWO PARSERS SHIP, and which one runs is the `LANGS` row's pattern-set id, not a second mode token:
-`python-ast` is `ast`, `shell-tokens` is the tokenizer in `parse_shell_defs`. That law above is why
-the shell one is a tokenizer: the naive same-line regex over this corpus over-counts a JavaScript
-function sitting inside a bash heredoc, AND a heredoc-aware refinement of that same regex loses
-real definitions to a quoted run of `<` characters it mistakes for an opener. Two regex readings of
-one population, each wrong where the other is not, which is the whole argument for tokenizing.
+THE MODE TOKEN CARRIES THE STANDING AND THE PATTERN-SET ID SELECTS THE READER — one question, one
+answer, and `resolve_extractor` is where it is answered. `probe` used to mean "a regex set" by
+construction, and TOOL-aGradedDialect-3 §8 F1 widened the dispatch so a tokenizer-shaped reader that
+honestly MISSED its conformance floor has somewhere to run; the middle row above says what a `probe`
+still guarantees, which is the incompleteness rather than the implementation. Which reader runs is
+the `LANGS` row's pattern-set id and never a second mode token: `python-ast` is `ast`, `shell-tokens`
+is the tokenizer in `parse_shell_defs`, and the `PARSERS` rows below are the whole answer. NO COUNT
+OF THEM IS WRITTEN HERE. This paragraph opened with a spelled-out count of the parsers that ship for
+two releases, and the dict grew a third and a fourth underneath it — a figure typed beside the
+population that owns it, which is the class this file's own `KNOWN_EXTS` comment states the rule for.
+TOOL-aGradedDialect-5 S2.
+
+That law above is why the shell one is a tokenizer: the naive same-line regex over this corpus
+over-counts a JavaScript function sitting inside a bash heredoc, AND a heredoc-aware refinement of
+that same regex loses real definitions to a quoted run of `<` characters it mistakes for an opener.
+Two regex readings of one population, each wrong where the other is not, which is the whole
+argument for tokenizing.
 NO FIGURE IS QUOTED HERE and the omission is deliberate: this header and the kit README each
 carried a number for that loss and they disagreed with each other, which is one fact with two
 carriers and no gate between them. The reason this used to give — that the refinement "was never
@@ -75,7 +86,7 @@ from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, SURFACES, langs
 from subtokens import (check_convention, classify, leading_verb, read_stem,  # noqa: E402
                        render_convention, subtokens)
 
-KIT_LEXICON_VERSION = "1.2"
+KIT_LEXICON_VERSION = "1.3"
 
 CONF_NAME = ".lexicon.conf"
 WAIVER_FILES = {
