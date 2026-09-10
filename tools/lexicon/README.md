@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.2 -->
+<!-- gov:kit lexicon@1.3 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import
@@ -231,11 +231,22 @@ undeclared one is a named refusal.
 | Mode | Extractor | Standing |
 |---|---|---|
 | `parser` | a real parse | complete over its extension |
-| `probe` | a regex pattern set | incomplete BY CONSTRUCTION, reported as such every run |
+| `probe` | whatever the pattern-set id names | incomplete BY CONSTRUCTION, reported as such every run |
 | `dark` | none, declared explicitly | named every run, never silently absent |
 
-TWO PARSERS SHIP and the `LANGS` row's pattern-set id says which runs: `python-ast` is `ast`,
-`shell-tokens` is the tokenizer below. A `parser` row naming neither is a refusal, not a
+**The mode token carries the STANDING and the pattern-set id selects the READER.** That middle row
+used to read "a regex pattern set", and it stopped being true when `TOOL-aGradedDialect-3` §8 F1
+widened the dispatch: a tokenizer-shaped reader that honestly MISSED its conformance floor now has
+somewhere to run, under the mode that promises incompleteness rather than under the one that
+promises a complete parse. `resolve_extractor` in `lexicon.py` is the one place that question is
+answered, for all four sites that ask it. So a `probe` guarantees you the incompleteness and the
+per-run report, never a particular implementation.
+
+Which reader runs is the `LANGS` row's pattern-set id and never a second mode token: `python-ast` is
+`ast`, `shell-tokens` is the tokenizer below, and `PARSERS` in `lexicon.py` is the whole list. **No
+count of them is written here** — this paragraph opened with one for two releases and the dict grew
+underneath it, which is a figure typed beside the population that owns it. A `parser` row naming an
+id that is in neither catalog is a refusal, not a
 fallthrough to Python. A new mode TOKEN was the other shape available and it is refused:
 `drift-audit` ranks `parser` above `probe` above `dark` and reads an unknown mode as ABSENT, so
 a language moving from `dark` to a freshly named mode would score as a weakening and fire a
@@ -281,20 +292,23 @@ meaningful rather than noisy.
 
 ### Arming a language this kit does not ship
 
-`probe` needs a pattern set, and the kit ships exactly one — `js-regex`. Before this, a TypeScript,
-Go, Rust or C# adopter could only declare their language `dark`, so the whole vocabulary-and-
-convention apparatus graded nothing; the alternative was editing `PATTERN_SETS` inside
-`lexicon.py`, which is an `engine`-role file the next `apply` overwrites.
+`PATTERN_SETS` holds the shipped regex sets and `js-regex` is the only one in it. **TypeScript is no
+longer on the list of languages this reaches for**: `.ts` and `.tsx` ship as declared extensions with
+their own readers, and what they read and refuse is `parse_ts_defs`'s header and `LEXICON.md`'s
+`.ts`/`.tsx` section. A Go, Rust or C# adopter is still where a TypeScript one used to be — the whole
+vocabulary-and-convention apparatus grades nothing for them until something is declared, and the
+alternative is editing `PATTERN_SETS` inside `lexicon.py`, which is an `engine`-role file the next
+`apply` overwrites.
 
 Declare the extractor instead. A `PATTERNS:` block holds one row per
 `<pattern-set-id>.<functions|types|imports>`, and the rest of the row is one Python regex, taken
 verbatim to end of line and compiled with `re.M` exactly as the shipped sets are:
 
-    LANGS="... ts:ts-regex:probe"
+    LANGS="... go:go-regex:probe"
 
     PATTERNS:
-      ts-regex.functions  ^\s*(?:export\s+)?function\s+([A-Za-z_$][\w$]*)
-      ts-regex.types      ^\s*(?:export\s+)?(?:interface|class)\s+([A-Za-z_$][\w$]*)
+      go-regex.functions  ^\s*func\s+(?:\([^)]*\)\s*)?([A-Za-z_]\w*)
+      go-regex.types      ^\s*type\s+([A-Za-z_]\w*)
 
 EXACTLY ONE CAPTURING GROUP per row, and it captures the NAME. Zero groups, two groups, a regex that
 does not compile, or a repeated row key is a refusal naming the file and the line — never a dropped
@@ -307,7 +321,11 @@ disarming the rest of the set; a row naming an unshipped id builds a new set who
 empty. Nothing mutates the shipped constant, and every run prints which shipped keys a declaration
 replaced, so a set weakened rather than emptied is read rather than inferred.
 
-THE BOUNDARY. This buys grading, never a lexer. A declared set is a `probe` on exactly the terms the
+THE BOUNDARY. This buys grading, never a lexer. **The kit does not decline to run an adopter's own
+extractor** — a declared set is compiled and walked exactly as a shipped one is, by the same corpus
+walk, the same coverage fraction and the same measured pins. What a declaration cannot hand itself is
+the `parser` standing: that is EARNED by a reader scored against a conformance corpus, never granted
+by writing the token. A declared set is a `probe` on exactly the terms the
 table above states — incomplete by construction, reported as such every run — and the law at the top
 of this section still binds: if a regex over a language would look like coverage while silently
 skipping what it forgot, `dark` is the honest declaration. Two vacuity arms watch a declared set: an

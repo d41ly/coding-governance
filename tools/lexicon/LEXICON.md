@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.2 -->
+<!-- gov:kit lexicon@1.3 -->
 # LEXICON.md — how to write the table this gate reads
 
 The engine grades against `.lexicon.conf`. This file is how a human decides what goes in it. It is
@@ -88,6 +88,72 @@ table is describing the code rather than constraining it.
 A type named `…Manager` is a type nobody scoped. The seeded eight are prescriptive and safe to
 inherit, unlike the verb table. Scope is DEFINITION sites only: a blanket ban breaks on contact with
 imported names and with parameters, and Go's `context` is the standing example.
+
+## `.ts` and `.tsx` — what a TypeScript tree can declare
+
+The answer used to be "nothing". It is not "nothing" any more, and this section exists because
+`LEXICON.md` was silent on the question for the whole life of the kit while a deferred ruling
+promised to answer it here.
+
+`KNOWN_EXTS` in `lexicon.py` carries `ts` and `tsx`, and the mode on both rows is **`parser`**. Read
+it there rather than trusting this sentence — that dict is the one declaration, and a mode written
+into prose beside it is the copy that rots. The token is `parser` because the reader EARNED it: a
+frozen conformance corpus drawn from a real third-party TypeScript tree grades every record it
+holds, and the label is whatever the score allows. `probe` was the other outcome and would have
+shipped instead. **No figure from that measurement is quoted here.** The conformance arm in
+`selftest.py` prints the agreement count, the per-side recall and precision, the refusal share and
+the mode those earn, on every run — a number typed into this page could disagree with the arm that
+computes it, and this page would be the copy nobody re-ran.
+
+**Two extensions, two pattern-set ids** — `ts-tokens` and `tsx-tokens`, both reaching
+`parse_ts_defs` with the lexer switched. `<T>(x) => x` is a generic arrow in one dialect and an
+element in the other, so one lexer mode necessarily mis-reads one of the two populations. There is
+no alias mechanism: an undeclared `tsx` is dark, and silently so.
+
+**The cells `--scaffold` seeds**, all four prescriptive and none of them read off your corpus:
+`ts.function` camel, `ts.type` pascal, `tsx.type` pascal, and `tsx.function` **`dark`**. That last
+one is a declared refusal rather than a gap. A `.tsx` function's case is decided by its ROLE — a
+React component is PascalCase and a plain helper is camelCase — and this kit reads no roles, so a
+single convention over that cell would red correct code whichever one it picked. Arm it if your tree
+has a rule the kit cannot see. **That reason is spelled twice on purpose, and this copy is the
+lesser one:** the scaffolder emits it as a comment directly beside the row, which is where an
+adopter meets it, and this page states it for a reader deciding whether to adopt at all — who has no
+conf yet. If the two ever disagree, the emitted comment is the one to trust.
+
+### The six refusals, each beside what compensates for it
+
+**`parse_ts_defs`'s own header is the enumeration and this page is the PAIRING.** The header owes you
+all six because three have no runtime failure to stage; what this page adds is the check that keeps
+each one from being a silent hole. So the direction of truth runs one way: a refusal the header
+gains and this list does not is a defect HERE, and a row here the header does not carry is fiction.
+
+1. **A source it cannot tokenize** — an unterminated string, template literal, `${` substitution,
+   comment, regex literal, block or JSX element. It RAISES, naming the construct and the line, and
+   never returns a partial or empty list. *Compensating check:* `scan_corpus` turns the raise into a
+   named refusal, so an unreadable file under an armed declaration reds instead of laundering `[]`
+   into a clean run.
+2. **A definition inside a template `${…}` or JSX `{…}` expression container** is suppressed rather
+   than located. *Compensating check:* every such name is a recall miss against the conformance
+   oracle, so the cost is PRICED by the floor the arm above enforces — a suppression that cost too
+   much would take the `parser` label away rather than passing quietly.
+3. **An overload signature** — a `function` declaration ended by `;` with no body — is not a
+   definition. *Compensating check:* the same floor. TypeScript itself reports the implementation, so
+   the oracle records the implementation and a reader that returned both would score as spurious.
+4. **A name constructed by `eval`, by a decorator, or arriving through an `import`** is not found.
+   *Compensating check:* none is owed, and that is the honest answer rather than a missing row —
+   there is no definition SITE to grade, so no naming rule could apply to it. `parse_shell_defs`
+   refuses `eval` and `source` on exactly this ground.
+5. **A computed or string-literal property key** — `[k]: () => …`, `"on-change": () => …`. *Compensating
+   check:* the floor again. The oracle drops computed keys before they reach a record, for the same
+   reason: this kit names a definition by its identifier and there is none to name.
+6. **Imports come back as an empty list.** *Compensating check:* the corpus walk discards the third
+   element and the only import consumer — the self-containment refusal — reads this kit's own Python
+   directly, so nothing reads a list that would otherwise be an ungraded population with a fixture
+   obligation. The three-list return shape is unchanged.
+
+Refusals 2, 3 and 5 therefore share ONE compensating check, and stating it three times is
+deliberate: they are three separate ways to lose a name and the floor is what makes each of them
+affordable rather than each of them being argued away.
 
 ## Layers — there is no longer anything to declare
 

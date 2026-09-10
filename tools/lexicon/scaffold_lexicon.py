@@ -70,12 +70,22 @@ BANNED_SUFFIXES = ("Manager", "Helper", "Util", "Utils", "Handler", "Processor",
 #:
 #: A pair with no row is seeded `dark`, which is a declaration and not a gap: the row is written, it
 #: is named on every run, and arming it is one word.
+#:
+#: `("tsx", "function")` IS WRITTEN OUT AT `dark` RATHER THAN LEFT TO THE `.get` DEFAULT, and the two
+#: emit the same bytes. What differs is what the catalog HOLDS: a declared refusal, not an absent
+#: opinion, and the difference is legible only here. The REASON is emitted beside the row in the
+#: `CELLS` block below, where the adopter meets the decision, and is not restated here — it is one
+#: rule with one carrier. TOOL-aGradedDialect-4 §8 F1 argues it, against arming either case.
 SEED_CONVENTIONS = {
     ("py", "function"): "snake",
     ("py", "type"): "pascal",
     ("js", "function"): "camel",
     ("js", "type"): "pascal",
     ("sh", "function"): "snake",
+    ("ts", "function"): "camel",
+    ("ts", "type"): "pascal",
+    ("tsx", "function"): "dark",
+    ("tsx", "type"): "pascal",
 }
 
 
@@ -267,6 +277,24 @@ def main(argv: list[str]) -> int:
     body.append("# The pin is a TWO-SIDED equality thereafter: a count that RISES reds, and a count")
     body.append("# that FALLS reds too, printing the row to paste. A drain lands in the declaration")
     body.append("# or it is not landed -- an unrecorded drain leaves a pin nothing can ever meet.")
+    # S3 — WHAT A LARGE PIN MEANS, and the door that answers it, stated from the two figures this
+    # walk has just measured. Both are computed rather than written: a percentage typed here would
+    # be one repo's measurement pinned into every other repo's declaration, and the share is the
+    # number an adopter actually reacts to. The door is named because the obvious reaction to a big
+    # pin is to widen the `VERBS` table until the tree passes, which is the mirror this kit refuses.
+    if total_defs:
+        body.append(f"# MEASURED ON THIS CORPUS: {verb_offenders} of {total_defs} definition(s), "
+                    f"{100.0 * verb_offenders / total_defs:.1f}%, lead with a token")
+        body.append("# the VERBS proposal below does not hold.")
+    else:
+        body.append("# MEASURED ON THIS CORPUS: no definitions were extracted at all, so the offender")
+        body.append("# share is undefined rather than zero.")
+    body.append("# A LARGE share is not a tree full of bad names -- it is usually a canon that does not")
+    body.append("# carry this domain's concepts. Widening the VERBS table to legalise what is already")
+    body.append("# here is the mirror shape this seed exists to avoid, so that is not the door. The")
+    body.append("# door is the CANON: overlay: an owner ADDS a cluster there, with a dated reason in")
+    body.append("# `canon_unfrozen`, and the gate reads it beside the frozen table. Everything else is")
+    body.append("# a rename, which is what the RENAMES work list below is for.")
     body.append(f'VERB_OFFENDER_PIN="{verb_offenders}"')
     body.append(f'SUFFIX_OFFENDER_PIN="{suffix_offenders}"')
     body.append("")
@@ -346,6 +374,18 @@ def main(argv: list[str]) -> int:
         body.append("# change here moves the matching `.conv` pin below; `--measure` reprints them.")
         body.append("CELLS:")
         for _k, _v in seeded_cells.items():
+            # S5 — THE ONE ROW THAT OWES A REASON, carried beside the row rather than in the block
+            # preamble, because a reader meets the decision at the row. It is a RULE and not a
+            # figure: a share measured on some other repo's components, pinned into this
+            # declaration, is the same defect as a hardcoded pin one section up.
+            if _k == "tsx.function":
+                body.append("  # A React component is a function that RETURNS JSX, so the case of a")
+                body.append("  # name in this cell follows the definition's ROLE and not its surface")
+                body.append("  # -- which is the one distinction an (extension, surface) cell cannot")
+                body.append("  # make. `dark` is that refusal, declared: BOTH cases are correct here,")
+                body.append("  # for different definitions, and arming either would make the other")
+                body.append("  # half offenders. Every name in this cell is still extracted,")
+                body.append("  # verb-graded and named; it is the CASING verdict that is withheld.")
             body.append(f"  {_k:<14} {_v}")
         body.append("")
         _pins = [(k, len(r["verdicts"])) for k, r in _measured.items()

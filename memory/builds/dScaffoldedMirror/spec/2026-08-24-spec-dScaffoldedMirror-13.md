@@ -1,6 +1,6 @@
 # TOOL-dScaffoldedMirror-13 — the .ts/.tsx darkness, decided rather than inherited
 
-**Status:** DEFERRED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling · shrink to a LEXICON.md ruling; the spec itself is not the deliverable
+**Status:** DEFERRED · rev-1 · 2026-08-24 · node d · Tier-1 · base 9ddcc5c9 · streams tooling · shrink to a LEXICON.md ruling; the spec itself is not the deliverable · SUPERSEDED IN PART by builds/aGradedDialect/, which wrote that ruling and shipped the reader; the status stays DEFERRED because §8 F3, the adoption onto a real tree, is the owner's and untouched
 
 <!-- gen:spec-records -->
 

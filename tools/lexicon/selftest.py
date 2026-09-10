@@ -679,6 +679,62 @@ code, out = run_case({"core/ok.sh": "build_thing() {\n  :\n}\n"},
 check("a LANGS `parser` row naming an unshipped parser REFUSES rather than silently grading Python",
       code != 0 and "does not ship" in out and "no-such-parser" in out, out)
 
+# M7 — ONE extension catalog, asserted by IDENTITY. The two copies had already diverged on the `py`
+# pattern-set id inside a single build, which is what makes an equality assertion too weak here: a
+# future re-fork that happens to start equal would pass it and drift on the next edit.
+import scaffold_lexicon as _scaf  # noqa: E402
+check("the scaffold and the engine share ONE extension catalog object",
+      _scaf.KNOWN is lex.KNOWN_EXTS,
+      f"scaffold={_scaf.KNOWN!r} engine={lex.KNOWN_EXTS!r}")
+check("...and that catalog is non-empty, or the identity above holds vacuously",
+      len(lex.KNOWN_EXTS) >= 2, repr(lex.KNOWN_EXTS))
+
+# S4 (TOOL-aGradedDialect-4) — EVERY SHIPPED DECLARATION ROW RESOLVES, checked here rather than
+# discovered on an adopter's first run. `scan_corpus` already refuses a row whose reader is absent,
+# per file, by name; this moves that discovery to the kit's own suite, where a catalog edit is what
+# reds instead of somebody else's corpus.
+#
+# THE RULE IS MODE-AGNOSTIC, and that is the whole care in it. The pattern-set id selects the reader
+# and the mode token carries only the standing (`resolve_extractor`), so a tokenizer that honestly
+# scored below `TOOL-aGradedDialect-2`'s floor ships as `probe` while still resolving through
+# `PARSERS`. An arm keyed on the mode — a `probe` id looked up in `PATTERN_SETS` — would red that
+# correct configuration, which is why the two catalogs are ORed here and `resolve_extractor` itself,
+# whose whole job is to answer for one declared pair, is not the operand.
+#
+# THE WHOLE CATALOG IS GRADED, not its last row: an arm that iterated and asserted on the final
+# value would pass whenever the broken row was anywhere else, so the staged break for this group
+# goes on a NON-final row.
+#
+# AND IT SITS ABOVE THE FIXTURE WALKS ON PURPOSE, which is why the M7 arms moved up here with it.
+# These arms read two dicts and no tree, so they cost nothing wherever they are — but a catalog
+# break also breaks the `--scaffold` and re-scaffold blocks below, which read the seed they write
+# through an UNGUARDED `load_conf`. A `SEED_CONVENTIONS` value outside the closed set therefore
+# kills the interpreter on a ConfError, and the summary that would have named this arm is printed
+# at the END, so a traceback swallows it. Observed while staging exactly that break: the run reds
+# either way, and from up here the recorded failure at least precedes the crash rather than
+# following it. Guarding those two reads is a separate change to a separate unit's arms.
+_UNRESOLVED = sorted(f"{_e}:{_pset}" for _e, (_pset, _m) in lex.KNOWN_EXTS.items()
+                     if _pset not in lex.PARSERS and _pset not in lex.PATTERN_SETS)
+check("S4: every KNOWN_EXTS row names a pattern set some shipped reader answers",
+      not _UNRESOLVED and bool(lex.KNOWN_EXTS),
+      f"unresolved={_UNRESOLVED} of {len(lex.KNOWN_EXTS)} row(s): {lex.KNOWN_EXTS!r}")
+
+# The seed table's own rows, against the two CLOSED sets its reader grades a declaration by. A typo
+# here arms nothing and reports nothing: the pair simply never matches, `.get` returns `dark`, and
+# the adopter reads a `dark` row where the kit believed it had a prescription.
+_BAD_SEED = sorted(f"{_e}.{_s}={_c}" for (_e, _s), _c in _scaf.SEED_CONVENTIONS.items()
+                   if _s not in lex.SURFACES or _c not in lex.CONVENTIONS)
+check("S4: every SEED_CONVENTIONS row names a surface and a convention the reader's closed sets hold",
+      not _BAD_SEED and bool(_scaf.SEED_CONVENTIONS),
+      f"outside={_BAD_SEED} of {len(_scaf.SEED_CONVENTIONS)} row(s)")
+
+# THE ONLY OBSERVATION THAT CAN SEE THE FOURTH ROW. `("tsx", "function")` at `dark` emits the same
+# bytes as the `.get` default, so no assertion over the emitted conf can tell a DECLARED refusal
+# from an absent opinion — the difference is legible only in this dict. AC4.
+check("S4: the `tsx.function` refusal is DECLARED in the catalog, not left to the `.get` default",
+      _scaf.SEED_CONVENTIONS.get(("tsx", "function")) == "dark",
+      repr(sorted(_scaf.SEED_CONVENTIONS)))
+
 # ---- the --scaffold path, end to end -------------------------------------------------------------
 # Nothing exercised this before, which is how a scaffolder that could emit a row its OWN reader
 # refuses went unnoticed: `leading_verb` can return a digit run (`2fa_check` -> `2`) and the conf
@@ -692,8 +748,21 @@ with build_tempdir() as td:
     (root / "src" / "a.py").write_text(
         "def build_x():\n    pass\n\n\ndef load_y():\n    pass\n\n\ndef 十_bad():\n    pass\n"
         .replace("十_bad", "_2fa_check"), encoding="utf-8")
+    # THE TYPESCRIPT HALF OF THE FIXTURE (TOOL-aGradedDialect-4). This repo tracks ZERO `.ts` and
+    # `.tsx` files, so nothing about the two catalog rows can be observed on a gov bar and a green
+    # one says nothing about them — the green-by-absence class, answered by putting the population
+    # in the fixture instead. One function and one type per extension, which is the population
+    # `UNDECLARED CELL` grades and therefore the four cells the seed has to cover. The `.tsx`
+    # function is deliberately a PascalCase component: it is the definition the `tsx.function` row
+    # declines to grade, so a fixture without one could not tell a `dark` row from an armed one.
+    (root / "src" / "a.ts").write_text(
+        "export function loadThing(): string {\n  return \"x\";\n}\n\n"
+        "export interface ThingProps {\n  id: string;\n}\n", encoding="utf-8")
+    (root / "src" / "a.tsx").write_text(
+        "export function Card(): JSX.Element {\n  return <div />;\n}\n\n"
+        "export interface CardProps {\n  id: string;\n}\n", encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=root, check=True)
-    subprocess.run(["git", "add", "--", "src/a.py"], cwd=root, check=True, capture_output=True)
+    subprocess.run(["git", "add", "--", "src"], cwd=root, check=True, capture_output=True)
     r = subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", str(root / ".lexicon.conf")],
                        cwd=root, capture_output=True, text=True)
     check("scaffold: exits 0", r.returncode == 0, r.stdout + r.stderr)
@@ -720,6 +789,84 @@ with build_tempdir() as td:
               "2" not in parsed["VERBS"], f"{sorted(parsed['VERBS'])}")
     except ConfError as e:
         check("scaffold: the file it wrote PARSES through its own reader", False, str(e))
+
+    # ---- TOOL-aGradedDialect-4: THE TYPESCRIPT SEED, READ OUT OF THE FILE IT WROTE -------------
+    #
+    # THE EXPECTED MODE IS THE CATALOG'S, never a token spelled here. `TOOL-aGradedDialect-3`
+    # measures its reader against a declared floor and DECLARES `parser` or `probe` from the
+    # result; an arm naming either one would red this seed on a correct build that honestly earned
+    # the other. So the operand is `lex.KNOWN_EXTS`, which is the constant the scaffolder READS —
+    # not what it emits, which would compare the scaffolder's output against itself.
+    _langs_line = next((_l for _l in conf_text.splitlines() if _l.startswith("LANGS=")), "")
+    _langs_toks = set(_langs_line.split('"')[1].split()) if '"' in _langs_line else set()
+    for _e in ("ts", "tsx"):
+        # `.get`, NOT `[...]`, and the difference was observed rather than reasoned: a dotted `".ts"`
+        # key is the exact defect the next arm exists to catch, and subscripting the catalog with the
+        # bare token made THIS arm raise KeyError on it — the run died in the guard instead of
+        # reporting it. A predicate taken out by the fault it grades is not a predicate.
+        _row = lex.KNOWN_EXTS.get(_e)
+        check(f"AC1: the emitted LANGS names `{_e}` at the catalog's own pattern set and mode",
+              bool(_row) and f"{_e}:{_row[0]}:{_row[1]}" in _langs_toks,
+              f"catalog={_row} line={_langs_line}")
+        # THE DOTTED-KEY BREAK, which is the one that looks correct to a reader. `ext_of` returns
+        # the token WITHOUT its dot, so a `".ts"` key in the catalog is never looked up and the
+        # seed keeps emitting the undeclared-extension form while the dict reads fine.
+        # `bool(_langs_toks)` is not decoration: an ABSENT `LANGS` line leaves this set empty, and
+        # `not in` over nothing is a pass. An absence assertion needs its population asserted.
+        check(f"AC1: ...and not the undeclared form `{_e}::dark`",
+              bool(_langs_toks) and f"{_e}::dark" not in _langs_toks, _langs_line)
+
+    # The CELLS rows, through the ONE reader rather than a second parse of its grammar. Only the
+    # three rows that DIFFER from the `.get` default are asserted here: `tsx.function` emits `dark`
+    # whether the catalog declares it or the default supplies it, so an assertion over these bytes
+    # cannot tell a declared refusal from an absent one. That row is observed in the S4 group.
+    try:
+        _seeded = load_conf(root / ".lexicon.conf").get("CELLS") or {}
+    except ConfError:
+        _seeded = {}
+    _seeded_flat = {_k: _v[0] for _k, _v in _seeded.items()}
+    for _cell, _want in (("ts.function", "camel"), ("ts.type", "pascal"), ("tsx.type", "pascal")):
+        check(f"AC2: the emitted CELLS block carries `{_cell}` at `{_want}`",
+              _seeded_flat.get(_cell) == _want, f"CELLS={_seeded_flat}")
+
+    _lines = conf_text.splitlines()
+
+    def read_note_above(pred) -> tuple[int, str]:
+        """The contiguous run of comment lines directly above the first line `pred` selects.
+
+        `(-1, "")` when nothing matches, and every arm below tests the index: an absent row makes
+        an empty note, and `"%" not in ""` is a pass over a file that never carried the row.
+        """
+        _i = next((n for n, _l in enumerate(_lines) if pred(_l)), -1)
+        _run: list[str] = []
+        _j = _i - 1
+        while _i >= 0 and _j >= 0 and _lines[_j].strip().startswith("#"):
+            _run.insert(0, _lines[_j].strip())
+            _j -= 1
+        return _i, " ".join(_run)
+
+    # AC3 — the verb pin's comment says what a large share MEANS and which door answers it. The
+    # share is MEASURED: a percentage typed into the scaffolder would pin one repo's measurement
+    # into every adopter's declaration, which is the defect the two scalar pins already carry a
+    # paragraph about.
+    _pin_i, _pin_note = read_note_above(lambda _l: _l.startswith("VERB_OFFENDER_PIN="))
+    _pin_val = _lines[_pin_i].split('"')[1] if _pin_i >= 0 else ""
+    check("AC3: the comment above VERB_OFFENDER_PIN states the offender share as a measured figure",
+          _pin_i >= 0 and bool(re.search(r"\d+ of \d+ definition", _pin_note)) and "%" in _pin_note,
+          _pin_note[:240])
+    check("AC3: ...whose numerator is the pin this same walk wrote, not a figure of its own",
+          _pin_i >= 0 and f"{_pin_val} of " in _pin_note, f"pin={_pin_val!r} {_pin_note[:240]}")
+    check("AC3: ...and it names the CANON: overlay as the door rather than a wider VERBS table",
+          _pin_i >= 0 and "CANON:" in _pin_note, _pin_note[:240])
+
+    # AC5 — the `tsx.function` row's reason is a RULE. A figure would be somebody else's corpus,
+    # and a to-do would re-arm the casing rule §8 F1 refused, at the one place an adopter is most
+    # likely to act on the invitation.
+    _tsx_i, _tsx_note = read_note_above(lambda _l: _l.strip().startswith("tsx.function"))
+    check("AC5: the emitted `tsx.function` row carries the ROLE rule as its reason",
+          _tsx_i >= 0 and "JSX" in _tsx_note and "role" in _tsx_note.lower(), _tsx_note[:240])
+    check("AC5: ...stated without a percentage, which would pin another corpus's measurement here",
+          _tsx_i >= 0 and "%" not in _tsx_note, _tsx_note[:240])
 
     r = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--check"], cwd=root,
                        capture_output=True, text=True)
@@ -1120,6 +1267,30 @@ with build_tempdir() as _td:
     check("S8: ...and a DEAD pin key is not emitted either",
           "LAYER_OFFENDER_PIN" not in _conf, _conf[:200])
 
+# AC3's DEGENERATE CORPUS (TOOL-aGradedDialect-4). The offender share is a division, and a repo of
+# nothing but prose is a real first adoption: every tracked file `dark`, zero definitions extracted,
+# `total_defs == 0`. Without the guarded branch the adopter's FIRST command dies on
+# ZeroDivisionError, which is the class this file already carries two scars from — a flag taken as a
+# destination and a `CELLS` block nobody emitted. The branch says the share is UNDEFINED rather than
+# printing a reassuring `0.0%`, because zero offenders out of zero definitions is not a clean tree.
+with build_tempdir() as _td:
+    _r = Path(_td)
+    shutil.copytree(KIT, _r / "tools" / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (_r / "docs").mkdir(parents=True, exist_ok=True)
+    (_r / "docs" / "readme.md").write_text("# prose only\n\nNothing here defines anything.\n",
+                                           encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "add", "--", "docs/readme.md"], cwd=_r, check=True, capture_output=True)
+    _rr = subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", ".lexicon.conf"],
+                         cwd=_r, capture_output=True, text=True)
+    check("AC3: --scaffold survives a corpus with ZERO extracted definitions",
+          _rr.returncode == 0 and "ZeroDivision" not in _rr.stdout + _rr.stderr,
+          f"rc={_rr.returncode} {_rr.stdout + _rr.stderr}")
+    _conf = (_r / ".lexicon.conf").read_text(encoding="utf-8") if (
+        _r / ".lexicon.conf").is_file() else ""
+    check("AC3: ...and calls the share UNDEFINED there rather than printing a reassuring 0%",
+          "no definitions were extracted at all" in _conf and "0.0%" not in _conf, _conf[:400])
+
 # ---- closing-review left-shifts (round 1) --------------------------------------------------------
 #
 # Both arms below gate a CLASS. The review's own words on why: "a single-site fix certifies coverage
@@ -1341,15 +1512,6 @@ for _bad, _want, _cell in (
 # separate defects and watched both stay green through all of them. An exact assertion on the swap
 # makes an absence assertion beside it redundant by construction.
 
-# M7 — ONE extension catalog, asserted by IDENTITY. The two copies had already diverged on the `py`
-# pattern-set id inside a single build, which is what makes an equality assertion too weak here: a
-# future re-fork that happens to start equal would pass it and drift on the next edit.
-import scaffold_lexicon as _scaf  # noqa: E402
-check("the scaffold and the engine share ONE extension catalog object",
-      _scaf.KNOWN is lex.KNOWN_EXTS,
-      f"scaffold={_scaf.KNOWN!r} engine={lex.KNOWN_EXTS!r}")
-check("...and that catalog is non-empty, or the identity above holds vacuously",
-      len(lex.KNOWN_EXTS) >= 2, repr(lex.KNOWN_EXTS))
 
 # N1 — an unreadable KIT_LEXICON_VERSION must REFUSE, not render a version-less marker. The capture
 # is a pipeline, and a pipeline takes its LAST command's status, so `head -1` succeeding on empty
@@ -2860,9 +3022,19 @@ _LOOSE = [i + 1 for i, ln in enumerate(_SCAFFOLD_SRC) if "CANON" in ln]
 _NARROW = [i + 1 for i, ln in enumerate(_SCAFFOLD_SRC) if _lex._CANON_HEADER_RE.search(ln)]
 check("AC9: the narrowed predicate matches nothing in the shipped scaffold", not _NARROW,
       repr(_NARROW))
-check("AC9: ...while the LOOSE form matches exactly one line, the descriptive comment it would "
-      "have forced a rewording of", len(_LOOSE) == 1
-      and "PROPOSED from the SHIPPED CANON" in _SCAFFOLD_SRC[_LOOSE[0] - 1], repr(_LOOSE))
+# THE LOOSE HALF IS GRADED AS A CLASS, not pinned at a count, and the count is why. It asserted
+# `len(_LOOSE) == 1` and that the one hit was the `PROPOSED from the SHIPPED CANON` line —
+# a figure beside the population it counts, which went stale the moment a second sentence had reason
+# to name the overlay: TOOL-aGradedDialect-4's verb-pin comment names `CANON:` as the door a large
+# offender share is answered through, and that landing redded this arm while the narrow predicate,
+# the one thing here that guards anything, stayed correctly empty. What the near-miss actually is
+# is PROSE — a source comment, or a line emitting a conf COMMENT — and every hit being prose is the
+# property worth asserting. A hit that is neither reds, and so does an empty population.
+_LOOSE_PROSE = [_n for _n in _LOOSE if _SCAFFOLD_SRC[_n - 1].lstrip().startswith("#")
+                or '"#' in _SCAFFOLD_SRC[_n - 1] or "'#" in _SCAFFOLD_SRC[_n - 1]]
+check("AC9: ...while every LOOSE hit is prose — a comment the narrowing spares a rewording of, "
+      "never an emitted block header", bool(_LOOSE) and _LOOSE_PROSE == _LOOSE,
+      f"loose={_LOOSE} prose={_LOOSE_PROSE}")
 
 # S5 — THE RECORDED HALF OF THE DOOR, on `adopt-lexicon.sh --check`, and it was the largest hole in
 # this unit. NOTHING exercised either stamp refusal: this repo declares no `CANON:` block, so the
@@ -3868,6 +4040,1072 @@ check("AC6: ...and says in words that it proposes nothing, rather than printing 
       "nothing to propose" in _ac6 and "already carry a row" in _ac6, _ac6[:400])
 check("AC6: ...naming a NON-ZERO live-cluster count, or the sentence is true of an empty corpus too",
       bool(re.search(r"All [1-9][0-9]* cluster\(s\)", _ac6)), _ac6[:400])
+
+# =================================================================================================
+# TOOL-aGradedDialect-3 — THE TYPESCRIPT READER: the tokenizer, the locator, and the refusals.
+#
+# EVERY FIXTURE IS KEYED ON THE CONSTRUCT, never on a line in a tracked file — the discipline the
+# shell parser's arms already follow, and doubly so here: this repo tracks ZERO TypeScript files, so
+# a fixture is the only route to any of these arms and always will be.
+#
+# WHAT THESE ARMS DO NOT CHECK. They do not score the reader against the frozen corpus — that is the
+# conformance arm at the foot of this file, and it is the only thing that decides which coverage
+# MODE the reader has earned. These arms grade shape: that each recognised form comes back once at
+# its NAME's line, that the constructs which defeat a same-line regex yield nothing, and that every
+# refusal raises with a needle no sibling refusal's message contains.
+# =================================================================================================
+
+#: The frozen `.ts` SENTINEL. Same job as `SHELL_SENTINEL`: a parser that goes inert must fail HERE
+#: rather than pass green over a real repo forever. It carries one instance of every definition form
+#: `parse_ts_defs`'s header names, INCLUDING the four the conformance corpus does not carry at all —
+#: a getter, a setter, a `constructor` and an `enum` — plus the overload signature its refusal 3
+#: names, which unit 1 measured at 0.0% of that adopter tree and which therefore can never be a
+#: corpus read.
+TS_SENTINEL = """\
+export interface Shape {
+  area: (n: number) => number;
+}
+export type Id = string | number;
+export enum Tone {
+  Info = "info",
+  Warn = "warn",
+}
+export default function buildApp(): void {}
+export async function loadRows(x: Id): Promise<Id[]> {
+  return [x];
+}
+function* scanIds(): Generator<Id> {}
+const renderTag = (cls?: string): string => `<b class="${cls}">x</b>`;
+let checkTone: (t: Tone) => boolean = function (t) {
+  return t === Tone.Info;
+};
+export const table = {
+  addRow(id: Id) {
+    return id;
+  },
+  readRow: (id: Id) => id,
+  nested: { writeRow: async (id: Id) => id },
+};
+export class Widget extends Base<{ a: string }, { b: number }> {
+  private seen = 0;
+  constructor(private id: Id) {
+    super();
+  }
+  get label(): string {
+    return "x";
+  }
+  set label(v: string) {
+    this.seen += 1;
+  }
+  static readTone(t: Tone) {
+    return t;
+  }
+  renderSelf = (): string => "x";
+}
+declare function parseLegacy(a: string): Id;
+declare function parseLegacy(a: number): Id;
+"""
+
+#: The frozen `.tsx` SENTINEL, and it is a separate constant because it grades a separate LEXER.
+#: Every arrow inside a JSX expression container here is a definition the oracle counts and this
+#: reader refuses by design (§8 F2), so this fixture is also where that refusal is observed.
+TSX_SENTINEL = """\
+interface Props {
+  onPick: (v: string) => void;
+}
+export type Id = string;
+export const Card: React.FC<Props> = ({ onPick }) => (
+  <div className="card" onClick={() => onPick("x")}>
+    {`function notADefinition() { return 1 }`}
+    <span>a =&gt; b is text, and so is {"{"} this</span>
+  </div>
+);
+const pick = <T,>(x: T) => x;
+export default function App() {
+  return (
+    <>
+      <Card onPick={(v) => v} />
+      {[1, 2].map((n) => (
+        <b key={n}>{n}</b>
+      ))}
+    </>
+  );
+}
+"""
+
+
+def test_ts_sentinel():
+    """AC2 — every recognised form, once, at the line its NAME sits on."""
+    funcs, types_, imports = lex.parse_ts_defs(TS_SENTINEL)
+    check("ts sentinel: the frozen fixture yields a non-zero definition count",
+          len(funcs) >= 10 and len(types_) >= 4, f"{len(funcs)} func(s), {len(types_)} type(s)")
+    check("AC2: every recognised FUNCTION form comes back once, at its NAME's line",
+          funcs == [("buildApp", 9), ("loadRows", 10), ("scanIds", 13), ("renderTag", 14),
+                    ("checkTone", 15), ("addRow", 19), ("readRow", 22), ("writeRow", 23),
+                    ("constructor", 27), ("label", 30), ("label", 33), ("readTone", 36),
+                    ("renderSelf", 39)], f"{funcs}")
+    check("AC2: ...and the types carry the interface, the type alias, the enum and the class",
+          types_ == [("Shape", 1), ("Id", 4), ("Tone", 5), ("Widget", 25)], f"{types_}")
+    check("ts sentinel: imports are an empty list, which is refusal 6 rather than an omission",
+          imports == [], f"{imports}")
+
+    funcs, types_, _imports = lex.parse_tsx_defs(TSX_SENTINEL)
+    check("AC2: the tsx sentinel locates the typed const arrow, the generic arrow and the default "
+          "export", funcs == [("Card", 5), ("pick", 11), ("App", 12)], f"{funcs}")
+    check("AC2: ...and its interface and type alias", types_ == [("Props", 1), ("Id", 4)],
+          f"{types_}")
+
+
+def test_ts_constructs():
+    """AC1 — one arm per construct that defeats a same-line regex, and one per suppressed span."""
+    # A `function` keyword inside a template literal is DATA. The conformance corpus carries the
+    # live instance: a Facebook pixel snippet embedded in a `.tsx` template literal, whose body
+    # holds three of them.
+    got = lex.parse_ts_defs(
+        "const src = `!function(f){ function inner() {} }`;\nfunction realOne() {}\n")[0]
+    check("ts: a `function` keyword inside a template literal is not a definition",
+          got == [("realOne", 2)], f"{got}")
+
+    # A regex literal carrying a brace. The `{` inside it would open a block for any reader that
+    # does not decide `/` by the previously lexed token.
+    got = lex.parse_ts_defs(
+        "const re = /^\\{a\\}$/;\nconst rest = { readIt: () => 1 };\nfunction after() {}\n")[0]
+    check("ts: a regex literal carrying a brace does not open a block",
+          got == [("readIt", 2), ("after", 3)], f"{got}")
+
+    # A nested template expression — measured in 43.6% of that adopter tree's files, and the reason
+    # the tokenizer carries a STACK rather than a pair of flags.
+    got = lex.parse_ts_defs(
+        "const deep = `a${`b${`c`}`}d`;\nfunction afterNesting() {}\n")[0]
+    check("ts: a nested template expression closes at the right backtick",
+          got == [("afterNesting", 2)], f"{got}")
+
+    # JSX TEXT carrying a fat arrow, and a JSX expression container holding a real arrow. The first
+    # is text; the second is §8 F2's declared refusal.
+    got = lex.parse_tsx_defs(
+        "function Row() {\n  return <p onDone={() => 1}>a =&gt; b</p>;\n}\n")[0]
+    check("ts: JSX text and a JSX expression container yield no definition (F2's refusal)",
+          got == [("Row", 1)], f"{got}")
+
+    # THE REFUSAL'S OTHER HALF, and it is asserted rather than assumed: a definition written inside
+    # a template substitution is one the oracle counts and this reader deliberately does not.
+    #
+    # A POSITIVE SITS BESIDE THE NEGATIVE, and the first cut of this arm did not have one: it
+    # asserted an EMPTY list, which a tokenizer that had stopped emitting anything at all would
+    # satisfy exactly as well as a correct suppression does. The definition after the substitution
+    # is what makes the empty half evidence. `fixture-passes-by-finding-nothing`, found by the
+    # bug-class checklist on this unit's own commit.
+    got = lex.parse_ts_defs(
+        "const s = `${(() => { const readIt = () => 1; return readIt; })()}`;\n"
+        "function afterSuppression() {}\n")[0]
+    check("ts: a definition inside a template ${} substitution is suppressed while the one AFTER it "
+          "is located (F2's refusal, with a positive beside it)",
+          got == [("afterSuppression", 2)], f"{got}")
+
+    # THE SEPARATOR A REGEX CANNOT SEE. `render: (el) => string` is a property SIGNATURE in an
+    # interface and a property ASSIGNMENT in an object literal, spelled identically. The conformance
+    # corpus carries the live instance in `declare global { interface Window { … } }`.
+    src = ("interface Api {\n  render: (el: string) => string;\n}\n"
+           "const api = {\n  render: (el: string) => el,\n};\n")
+    funcs, types_, _ = lex.parse_ts_defs(src)
+    check("ts: an interface property signature is a TYPE and the identical object property is a "
+          "DEFINITION", funcs == [("render", 5)] and types_ == [("Api", 1)], f"{funcs} {types_}")
+
+    # An OVERLOAD SIGNATURE has no body, and TypeScript reports the implementation. Refusal 3.
+    got = lex.parse_ts_defs(
+        "function pick(a: string): string;\nfunction pick(a: number): string;\n"
+        "function pick(a: unknown): string {\n  return String(a);\n}\n")[0]
+    check("ts: an overload SIGNATURE is not a definition; only the implementation is (refusal 3)",
+          got == [("pick", 3)], f"{got}")
+
+    # A return type that is itself a type literal, whose `{` is not the body's and whose `;` is not
+    # the overload terminator.
+    got = lex.parse_ts_defs(
+        "function runTsc(): { status: number; output: string } {\n  return { status: 0 };\n}\n")[0]
+    check("ts: a type-literal return annotation does not hide the body", got == [("runTsc", 1)],
+          f"{got}")
+
+    # `.ts` and `.tsx` read one source two ways, which is why two `PARSERS` ids ship rather than one
+    # reader plus a path. This is that divergence, staged: the `.ts` lexer reads a generic arrow.
+    got = lex.parse_ts_defs("const identity = <T>(x: T) => x;\n")[0]
+    check("ts: `<T>(x) => x` is a GENERIC ARROW under the .ts lexer", got == [("identity", 1)],
+          f"{got}")
+
+
+def test_ts_refusals():
+    """AC3 and AC4 — every refusal, each observed the only way it CAN be observed."""
+    # THE THIRD COLUMN IS THE POINT, exactly as it is for the shell parser: every message here
+    # starts "unterminated ", so an arm asserting only that scores a pass whenever ANY sibling
+    # refusal fires first. Each row names the CONSTRUCT its refusal must print.
+    rows = (
+        ("an unterminated single quote", "const a = 'oops\n", "unterminated ' string", False),
+        ("an unterminated double quote", 'const a = "oops\n', 'unterminated " string', False),
+        ("an unterminated template literal", "const a = `oops\n", "unterminated template literal",
+         False),
+        ("an unterminated ${ substitution", "const a = `x${ y\n", "unterminated ${ substitution",
+         False),
+        ("an unterminated /* comment", "/* oops\nconst a = 1;\n", "unterminated /* comment", False),
+        ("an unterminated regex literal", "const a = /oops\n", "unterminated regex literal", False),
+        ("an unterminated { block", "function f() {\n  const a = 1;\n", "unterminated { block",
+         False),
+        ("an unterminated JSX element", "const el = <div>\n", "unterminated JSX element", True),
+    )
+    for label, src, needle, jsx in rows:
+        reader = lex.parse_tsx_defs if jsx else lex.parse_ts_defs
+        try:
+            reader(src)
+        except SyntaxError as exc:
+            check(f"ts refusal: {label} RAISES, names the CONSTRUCT and its line",
+                  needle in str(exc) and "line" in str(exc), str(exc))
+        else:
+            check(f"ts refusal: {label} RAISES, names the CONSTRUCT and its line", False,
+                  "returned a list instead of raising")
+
+    # ---- The four defects the aGradedDialect closing diff review confirmed, each staged RED --------
+    #
+    # Every case below was observed RAISING, or returning the wrong list, against the reader as it
+    # stood at 8e39c2e0 and before the fix that follows it. The frozen corpus could not substitute
+    # for any of them: it scored 115/115 while the reader carried all four, because none of its 115
+    # records asks these questions. Four of the five triggers appear in ZERO records.
+
+    # D1a -- a LEFT SHIFT is not a JSX element. `check_ts_generic` answers False for anything that
+    # is not an identifier, which sent every shift form down the JSX branch and refused the WHOLE
+    # file: `a << 3`, `flags | (1 << bit)`, and the textbook string hash below.
+    got = lex.parse_tsx_defs("const x = 1 << 3;\nfunction afterShift() {}\n")[0]
+    check("ts: a left shift in .tsx does not open a JSX element",
+          got == [("afterShift", 2)], f"{got}")
+    got = lex.parse_tsx_defs("const h2 = (h << 5) - h;\nfunction afterHash() {}\n")[0]
+    check("ts: the string-hash shift form does not open a JSX element",
+          got == [("afterHash", 2)], f"{got}")
+
+    # D1b -- a generic FUNCTION TYPE is type syntax, and JSX cannot appear in a type position. The
+    # comma/extends tie-break `check_ts_generic` implements exists only in EXPRESSION position, so
+    # both of these refused the whole `.tsx` file while parsing correctly as `.ts`.
+    got = lex.parse_tsx_defs("type Mapper = <T>(x: T) => T;\nfunction afterAlias() {}\n")[0]
+    check("ts: a generic function type in a `type` alias is not a JSX element",
+          got == [("afterAlias", 2)], f"{got}")
+    got = lex.parse_tsx_defs("const f: <T>(x: T) => T = (x) => x;\nfunction afterAnnot() {}\n")[0]
+    check("ts: a generic function type in a declarator ANNOTATION is not a JSX element",
+          got == [("f", 1), ("afterAnnot", 2)], f"{got}")
+    # ...and the annotation rule must NOT reach an object literal, where a `<` after a `:` really is
+    # an element. 39 of the frozen corpus's records carry JSX, so a rule keyed on the colon alone
+    # would have traded four false reds for dozens.
+    got = lex.parse_tsx_defs("function Row() {\n  return <Menu icon={{ a: 1 }} />;\n}\n")[0]
+    check("ts: ...and a JSX element still opens where one legally may",
+          got == [("Row", 1)], f"{got}")
+
+    # D2 -- `/` after `++`, `--` or a non-null `!`. The tokenizer's catch-all cleared `expr_end` for
+    # every character it did not dispatch on, so after a postfix bump or an assertion the lexer
+    # believed it was NOT after an expression and sent the following `/` to `read_regex`. TWO shapes
+    # from one defect, and the second is the worse one.
+    got = lex.parse_ts_defs("const q = i++ / 2;\nfunction afterBump() {}\n")[0]
+    check("ts: a division after a postfix `++` is not a regex literal",
+          got == [("afterBump", 2)], f"{got}")
+    got = lex.parse_ts_defs("const half = count! / 2;\nfunction afterBang() {}\n")[0]
+    check("ts: a division after a non-null assertion is not a regex literal",
+          got == [("afterBang", 2)], f"{got}")
+    # THE SILENT HALF. With a second `/` on the same line the regex read SUCCEEDS and swallows the
+    # span between, so there is no error to assert on and the definition after it still extracts.
+    # The only observation that separates the two readings is the TOKEN STREAM: ` total ` was
+    # consumed as a regex body and vanished. An arm asserting only the definition list passes on
+    # either reading, which is why this one reads tokens.
+    toks = [t[1] for t in lex.scan_ts_tokens("const pct = done++ / total / 2;\n") if t[0] == "word"]
+    check("ts: ...and the SILENT mis-lex, where two slashes on one line swallowed the span between",
+          "total" in toks, f"{toks}")
+    # The negative beside the positives: a PREFIX `!` must still leave a real regex readable.
+    got = lex.parse_ts_defs("const bad = !/^a$/.test(s);\nfunction afterPrefix() {}\n")[0]
+    check("ts: ...while a prefix `!` still lets a real regex literal lex",
+          got == [("afterPrefix", 2)], f"{got}")
+
+    # D3 -- a class property's ANNOTATION graded as the function name. BOTH directions are asserted:
+    # an arm that only looked for `onChange` would have passed against the broken reader, which
+    # appended `void` and never appended the property's real name at all.
+    got = lex.parse_ts_defs(
+        "class Store {\n  private onChange: (e: Event) => void = (e) => {};\n}\n")[0]
+    check("ts: a class property's NAME is graded, and its annotation's last word is not",
+          got == [("onChange", 2)], f"{got}")
+    got = lex.parse_ts_defs(
+        "class Btn {\n  handleClick: React.MouseEventHandler = () => {};\n}\n")[0]
+    check("ts: ...and a dotted annotation does not leave its last segment behind either",
+          got == [("handleClick", 2)], f"{got}")
+
+    # D4 -- DEAD SNIFFER on an object literal of arrow properties. The extractor read them and the
+    # sniffer did not, which is exactly the contradiction that refusal exists to report -- and it
+    # exits 1 with NO waiver registry, so an adopter meeting it cannot proceed except by disarming
+    # the language. The CLASS is wider than the filed instance: the two corpus records carrying it
+    # are `vi.mock` factories with no `const ... =` anywhere, so widening that one row left both red.
+    check("ts: an object literal of arrow properties sniffs as a definition carrier",
+          bool(lex.DEFINITION_SNIFF.search("export const handlers = { readRow: () => 1 };\n")),
+          "the const-bound form")
+    check("ts: ...and so does one with no declaration in front of it at all",
+          bool(lex.DEFINITION_SNIFF.search(
+              'vi.mock("m", () => ({\n  notFound: () => 1,\n}));\n')),
+          "the factory-returned form, which is the shape the frozen corpus carries twice")
+
+    # ---- Round 2 of the closing review: four entries, three of them regressions from round 1 ------
+    #
+    # 56f1f135 fixed four reader defects and introduced three new ones, all invisible to the frozen
+    # corpus for the same reason the first four were: measured over the 115 records, ZERO are
+    # semicolon-free, ZERO carry a class ASI property pair, and the two carrying `.type ===` both
+    # carry it at a stack depth that cannot arm the predicate. A 115/115 green looked like coverage
+    # and was not, twice running. These arms are the instances; the corpus-wide arm below is the class.
+
+    # R1 -- a semicolon-free type alias must not suppress JSX for the rest of the file. The first cut
+    # of the type-position rule was a FLAG cleared only at a depth-0 `;`, so one ASI alias refused
+    # every later `<` in the file. The flag is gone; the reading is decided from the token tail.
+    got = lex.parse_tsx_defs("type Props = { a: string }\nfunction Row() { return <p>x</p>; }\n")[0]
+    check("ts: a semicolon-free `type` alias does not suppress JSX after it",
+          got == [("Row", 2)], f"{got}")
+    got = lex.parse_tsx_defs("export type X = 1 | 2\nconst B = () => <>hi</>;\n")[0]
+    check("ts: ...nor before a fragment", got == [("B", 2)], f"{got}")
+
+    # R2 -- the same flag armed on ANY depth-0 word `type`, with the alias name optional and `=`
+    # indistinguishable from `===`, so a discriminated-union ternary at module scope refused the
+    # whole file. All three shapes below carry their semicolons and still refused, so R1's fix alone
+    # would not have reached them.
+    got = lex.parse_tsx_defs(
+        'const label = item.type === 1 ? <b>on</b> : "off";\nfunction after() {}\n')[0]
+    check("ts: `item.type === 1 ? <b>on</b>` is a ternary, not a type alias",
+          got == [("after", 2)], f"{got}")
+    got = lex.parse_tsx_defs("const type = 'button';\nconst Bar = () => <i>x</i>;\n")[0]
+    check("ts: ...and `const type =` is a binding whose name happens to be `type`",
+          got == [("Bar", 2)], f"{got}")
+    got = lex.parse_tsx_defs("type<Foo>(1);\nconst B = () => <i>x</i>;\n")[0]
+    check("ts: ...and `type<Foo>(1)` is a call", got == [("B", 2)], f"{got}")
+
+    # R3 -- the class-property annotation walk ran past the member boundary. `read_ts_type_end` stops
+    # at a depth-0 `;` or `,` and ASI supplies neither between members, so the walk found the NEXT
+    # member's `=`, graded the first member's annotation word, and skipped the real name. BOTH
+    # directions are asserted: the arrow property appears AND the fabricated name does not. This is
+    # D3's own defect reintroduced by D3's own fix, and it was SILENT -- green bar, wrong population.
+    got = lex.parse_ts_defs("class A {\n  label: string\n  onClick = () => {}\n}\n")[0]
+    check("ts: an ASI class member pair grades the arrow property, not the annotation word",
+          got == [("onClick", 3)], f"{got}")
+    got = lex.parse_ts_defs("class A {\n  x = cond ? aVal : bVal\n  onClick = () => {}\n}\n")[0]
+    check("ts: ...and a value-position ternary colon does not fire the annotation arm at all",
+          got == [("onClick", 3)], f"{got}")
+
+    # R5 -- `check_ts_tag_start` skipped only space and tab where `check_ts_generic` skips all
+    # whitespace, so a newline between `<` and its tag name became a fresh, undeclared refusal.
+    got = lex.parse_tsx_defs("export const A = () => (\n  <\n    div>hi</div>\n);\n")[0]
+    check("ts: a newline between `<` and its tag name is still a tag start",
+          got == [("A", 1)], f"{got}")
+
+    # THE REGRESSION GUARDS. Every round-1 case these fixes could have undone, asserted here rather
+    # than trusted: the alias that ends in a semicolon, the declarator annotation, the object
+    # literal whose colon precedes a REAL element, and the annotation D3 was written for.
+    got = lex.parse_tsx_defs("type Mapper = <T>(x: T) => T;\nfunction ok() {}\n")[0]
+    check("ts guard: the semicolon-terminated alias still parses", got == [("ok", 2)], f"{got}")
+    got = lex.parse_tsx_defs("const f: <T>(x: T) => T = (x) => x;\nfunction ok() {}\n")[0]
+    check("ts guard: the declarator annotation still parses",
+          got == [("f", 1), ("ok", 2)], f"{got}")
+    got = lex.parse_tsx_defs("function Row() {\n  return <Menu icon={{ a: 1 }} />;\n}\n")[0]
+    check("ts guard: an object literal's colon still precedes a real JSX element",
+          got == [("Row", 1)], f"{got}")
+    got = lex.parse_ts_defs(
+        "class Store {\n  private onChange: (e: Event) => void = (e) => {};\n}\n")[0]
+    check("ts guard: the class annotation D3 was written for still grades the property name",
+          got == [("onChange", 2)], f"{got}")
+
+    needles = [n for _l, _s, n, _j in rows]
+    shared = sorted({(a, b) for a in needles for b in needles if a != b and a in b})
+    check("AC3: no refusal's needle is a substring of another's, or one firing first scores a pass "
+          "for a sibling that is unarmed", not shared, f"{shared}")
+
+    # AC4 — THE ONLY OBSERVATION THE THREE BEHAVIOURLESS REFUSALS GET. Without this a header naming
+    # one refusal and omitting the rest would pass every arm in this file.
+    doc = lex.parse_ts_defs.__doc__ or ""
+    for token in ("SyntaxError", "unterminated string", "`${…}` substitution",
+                  "JSX `{…}` expression", "OVERLOAD SIGNATURE", "eval", "import",
+                  "COMPUTED or string-literal property key", "IMPORTS ARE AN EMPTY LIST",
+                  "NOT AN INTERPRETER"):
+        check(f"AC4: parse_ts_defs' docstring enumerates {token!r}", token in doc,
+              "missing from the docstring")
+    check("AC4: parse_tsx_defs carries a header of its own rather than a partial's None",
+          bool((lex.parse_tsx_defs.__doc__ or "").strip()), f"{lex.parse_tsx_defs.__doc__!r}")
+
+
+test_ts_sentinel()
+test_ts_constructs()
+test_ts_refusals()
+
+# ---- AC7: the `probe` dispatch, end to end -------------------------------------------------------
+#
+# A `probe` row whose pattern-set id names a PARSER is what §8 F1 exists to make reachable: the id
+# selects the reader and the mode token carries only the STANDING, so a reader that missed its
+# conformance floor has somewhere to run. Before F1 the run refused such a row one line before the
+# extension could be graded at all.
+
+#: The declaration for those arms. Separate from `BASE_CONF` because that one declares `py` and
+#: would put this suite's own extensions into a population these arms are not about.
+TS_CONF = """\
+BANNED_SUFFIXES="Manager"
+LANGS="ts:ts-tokens:probe tsx:tsx-tokens:probe conf::dark"
+VERB_OFFENDER_PIN="0"
+SUFFIX_OFFENDER_PIN="0"
+ratified="2026-09-10 node a"
+
+VERBS:
+  read    pull bytes or records from a named source — NOT `get`
+  render  turn structure into text — NOT `format`
+"""
+
+TS_FILES = {"core/a.ts": "export function readRows(): string[] {\n  return [];\n}\n",
+            "core/b.tsx": "export function RenderTile() {\n  return <b>x</b>;\n}\n"}
+
+code, out = run_case(TS_FILES, TS_CONF)
+check("AC7: a `probe` row naming a PARSER is graded rather than refused as an unshipped set",
+      code == 0 and "does not ship" not in out, out)
+check("AC7: ...and the run reports the extension's declared mode", ".ts=probe" in out, out)
+check("AC7: ...and the printed coverage line COUNTS the fixture's .ts and .tsx files, which is the "
+      "REPORTING half of F1's four sites",
+      "coverage — armed 2 of 2" in out, out)
+
+# THE FAILING CASE, OBSERVED, for each half of F1 separately — a gate whose red has never been seen
+# is an assertion about nothing.
+code, out = run_case(
+    TS_FILES, TS_CONF,
+    patch=("    if pset in PARSERS:\n        return PARSERS[pset]\n",
+           '    if pset in PARSERS and mode == "parser":\n        return PARSERS[pset]\n'))
+check("AC7 red: with the DISPATCH half of F1 reverted, the run refuses the row by name",
+      code != 0 and "does not ship" in out, out)
+
+code, out = run_case(
+    TS_FILES, TS_CONF,
+    patch=('    armed_exts = {e for e, (ps, m) in declared.items()\n'
+           '                  if resolve_extractor(m, ps, measured["sets"]) is not None}',
+           '    armed_exts = {e for e, (ps, m) in declared.items()\n'
+           '                  if m == "parser" or (m == "probe" and ps in measured["sets"])}'))
+check("AC7 red: with the REPORTING half reverted, the extension extracts and the coverage line "
+      "calls it unarmed — the two halves of one run disagreeing about one file",
+      "coverage — armed 0 of 2" in out, out)
+
+# ---- AC9: the coverage sniffer agrees with the TypeScript extractor ------------------------------
+#
+# `DEAD SNIFFER` REDS when an ARMED extractor finds a definition in a file the sniffer reads as
+# empty, and six of this reader's definition forms sniffed NEGATIVE against the rows shipped before
+# TOOL-aGradedDialect-3 S8. A `types.ts` carrying only an alias and an enum is a near-universal
+# shape in a real TypeScript tree, so the first adopter file arming this feature would have redded
+# their gate on the run right after `--scaffold`.
+#
+# WRITTEN PER ARMED LANGUAGE rather than per file: the fixture table below is the whole declaration,
+# and the LANGS row, the CELLS rows and the assertions are all derived from it, so the next language
+# added here inherits the check instead of rediscovering the refusal.
+SNIFF_FIXTURES = {
+    "tsx": ("core/tile.tsx", "tsx-tokens",
+            "export interface TileProps {\n  onPick: (v: string) => void;\n}\n"
+            "export const RenderTile: React.FC<TileProps> = () => null;\n",
+            ("tsx.function", "tsx.type")),
+    "ts": ("core/tone.ts", "ts-tokens",
+           "export type TileId = string;\n"
+           'export enum TileTone {\n  Info = "info",\n}\n',
+           ("ts.type",)),
+}
+
+_sniff_files = {row[0]: row[2] for row in SNIFF_FIXTURES.values()}
+_sniff_cells = sorted({c for row in SNIFF_FIXTURES.values() for c in row[3]})
+_sniff_conf = (TS_CONF.replace(
+    'LANGS="ts:ts-tokens:probe tsx:tsx-tokens:probe conf::dark"',
+    'LANGS="' + " ".join(f"{ext}:{row[1]}:probe" for ext, row in sorted(SNIFF_FIXTURES.items()))
+    + ' conf::dark"')
+    + "\nCELLS:\n" + "\n".join(f"  {c}  pascal\n" for c in _sniff_cells))
+
+code, out = run_case(_sniff_files, _sniff_conf)
+# THE POSITIVE FIRST. An empty `blind` set over an unarmed fixture proves exactly nothing — it is
+# the same empty set a widened sniffer produces — so every declared cell has to report a NON-ZERO
+# graded population before the absence of a refusal means anything.
+for _cell in _sniff_cells:
+    _pop = re.search(rf"{re.escape(_cell)}\.conv \d+ of (\d+)", out)
+    check(f"AC9: the fixture's `{_cell}` population is NON-ZERO, so the empty `blind` set below is "
+          f"evidence rather than an unarmed corpus",
+          bool(_pop) and int(_pop.group(1)) > 0, out)
+check("AC9: ...over every armed language's fixture file, all of them definition-carrying",
+      f"coverage — armed {len(_sniff_files)} of {len(_sniff_files)}" in out, out)
+check("AC9: a types-only TypeScript module does not land in `blind`, so no DEAD SNIFFER is printed",
+      code == 0 and "DEAD SNIFFER" not in out, out)
+
+#: The TypeScript rows in `DEFINITION_SNIFF`, and the single row they were widened FROM. The set
+#: grew again when the aGradedDialect closing review found DEAD SNIFFER reading an object literal
+#: of arrow properties as empty: the const row now accepts `{`, and an arrow-valued PROPERTY row
+#: joined it, because the two corpus records carrying that shape are `vi.mock` factories with no
+#: declaration in front of them at all. Held here as bytes so the arm below can narrow the sniffer BACK inside a kit copy; an edit
+#: to either spelling makes `run_case` refuse the patch by name rather than scoring a silent pass.
+_SNIFF_WIDE = (
+    r"(?:export[ \t]+)?(?:declare[ \t]+)?(?:interface|enum)[ \t]+\w  # ts, java, kotlin, c#" "\n"
+    r"        | (?:export[ \t]+)?type[ \t]+\w[\w$]*[ \t]*[<=]   # ts type alias" "\n"
+    r"        | (?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*(?:[ \t]*:[^=\n]+)?"
+    r"[ \t]*=[ \t]*(?:async[ \t]*)?[(<{]" "\n"
+    r"        | \w[\w$]*[ \t]*:[ \t]*(?:async[ \t]*)?\([^)]*\)[ \t]*(?::[^=\n]+)?=>"
+    r"  # arrow-valued property")
+_SNIFF_NARROW = (r"(?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*[ \t]*=[ \t]*"
+                 r"(?:async[ \t]*)?\(  # js arrow")
+
+code, out = run_case(_sniff_files, _sniff_conf, patch=(_SNIFF_WIDE, _SNIFF_NARROW))
+check("AC9 red: narrowed BACK to the rows shipped before S8, the sniffer reads both fixture files "
+      "as empty and the run REDS with DEAD SNIFFER",
+      code != 0 and "DEAD SNIFFER" in out, out)
+check("AC9 red: ...naming the count of files the extractor read and the sniffer did not",
+      f"found no definition in {len(_sniff_files)} file(s)" in out, out)
+
+# =================================================================================================
+# TOOL-aGradedDialect-2 — THE TYPESCRIPT CONFORMANCE CORPUS, and the floor a reader has to clear
+# before it may call itself `parser`.
+#
+# WHAT THE CORPUS IS. `ts-conformance-fixtures.json` holds excerpts drawn mechanically from a real
+# adopter tree, each carrying the reading `typescript@5.9.3` produced for the COMMITTED bytes. The
+# compiler is independent of everything this kit ships, so a reader graded against it is graded by
+# something it did not write. That is the answer to TOOL-dScaffoldedMirror-13's tautology objection,
+# and the MECHANISM is the ORDER: the corpus is committed in a pass that precedes the first commit
+# touching a TypeScript extractor. Spec §4, TOOL-aGradedDialect-2.
+#
+# WHAT THESE ARMS DO NOT CHECK, stated here because a structural check reads as a semantic one to
+# everyone who did not write it:
+#
+#   - NOTHING HERE PROVES THAT ORDERING. This file runs the kit inside a throwaway git repo and has
+#     no history to read. The proof is a DOCUMENTED CHECK — two git queries in the spec's §4 — run at
+#     the closing review, with both shas written into the review record. Its two traps live there
+#     too: the extractor half is a `-S` pickaxe over `lexicon.py` and not a `--diff-filter=A` over a
+#     file already tracked at this build's base, and the two shas must DIFFER, because
+#     `--is-ancestor` is reflexive and one commit carrying both halves would pass it.
+#   - NOTHING HERE STOPS A LATER SESSION editing an expectation to make a failing reader pass. Git
+#     shows the edit on this path; the rule is that an expectation changes only by re-running the
+#     oracle; no arm enforces it, because any digest a session can recompute it can recompute after
+#     editing both halves.
+#   - THE CORPUS GRADES FUNCTIONS AND TYPES. Imports are ungraded and the records carry none — spec
+#     §8 F2, and the predicate that read them went with `P3 layer`.
+#   - THE FLOOR IS UNEXERCISED UNTIL A READER EXISTS. While the kit declares none, the conformance
+#     arm SKIPS and says so; TOOL-aGradedDialect-3 is what removes the skip. Everything else below —
+#     the corpus's own shape, its composition, and the `js-regex` liveness case — is graded today.
+# =================================================================================================
+
+import json  # noqa: E402
+from collections import Counter  # noqa: E402
+
+TS_FIXTURES_FILE = KIT / "ts-conformance-fixtures.json"
+
+#: The nine declared fields of a record. Spec §4's data model, in its order.
+TS_FIELDS = ("id", "kind", "src", "funcs", "types", "constructs", "from", "oracle", "extracted")
+
+#: §4's record band: a corpus smaller than this grades too little, larger than this vendors too much
+#: of somebody else's tree.
+TS_CORPUS_BAND = (100, 150)
+
+#: §4's composition table. The five construct rows are counted from a record's own `constructs`
+#: tags; `tsx` and `types` are counted by PREDICATE, because neither is a construct — `tsx` is the
+#: record's `kind` and `types` is "carries at least one type definition".
+#:
+#: THESE ARE PINNED POLICY AND NOT MEASUREMENTS, and the reason is in the spec: unit 1's construct
+#: shares were measured per FILE over a whole tree, and a 60-line excerpt is far less likely to
+#: carry a construct than a whole file is, so demanding the shares would select construct-heavy code
+#: and distort the sample toward one reading. What unit 1's shares decide is the ORDER of these
+#: rows, never their values. The `types` floor is the one row that is not about a construct: the
+#: shipped `js-regex` set reads 8 of 1369 TYPES in that tree, and a corpus with a handful of type
+#: sites could not observe that — F1's type half would be exact agreement over a population small
+#: enough to clear by accident.
+TS_FIXTURE_MINIMA = {"template": 30, "jsx": 25, "generic": 20, "nested": 15, "regex": 10,
+                     "tsx": 40, "types": 20}
+
+#: F2's refusal budget: the share of the corpus's oracle definition sites that a reader's declared
+#: refusals may cover. PINNED policy, not a measurement — unit 1 measured the constructs a locator
+#: genuinely cannot name at a fraction of one percent, and the oracle drops computed method keys
+#: before they ever reach a record, so this is an order of magnitude of headroom rather than a
+#: licence. Without a budget, F1's exact agreement is reachable by REFUSING enough, which is the
+#: fixture-passes-by-finding-nothing class one level up.
+TS_FLOOR_REFUSAL_SHARE = 0.02
+
+
+def read_ts_fixtures(path=TS_FIXTURES_FILE):
+    """The frozen corpus as a list of records, or a REFUSAL naming the file.
+
+    An unreadable, unparseable or EMPTY corpus raises rather than returning `[]`. A grader handed an
+    empty population reports agreement with everything, so the one failure mode this loader must
+    never have is the quiet one: spec §5's error row says a missing corpus is a refusal naming the
+    file and never a skipped arm.
+    """
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise SystemExit(f"lexicon selftest: the TypeScript conformance corpus is unreadable at "
+                         f"{path}: {exc}")
+    try:
+        records = json.loads(raw)
+    except ValueError as exc:
+        raise SystemExit(f"lexicon selftest: the TypeScript conformance corpus at {path} is not "
+                         f"JSON: {exc}")
+    if not isinstance(records, list) or not records:
+        raise SystemExit(f"lexicon selftest: the TypeScript conformance corpus at {path} is empty, "
+                         f"and a grader over an empty corpus agrees with every reader")
+    # THE FIVE FIELDS EVERY ARM DEREFERENCES, refused HERE and by record id. AC1 grades the full
+    # nine, which is the criterion; these five are the subset an arm cannot report a defect WITHOUT,
+    # so a record short of one has to be named before any arm reads it rather than surfacing as a
+    # KeyError traceback from whichever line got there first.
+    thin = [i for i, r in enumerate(records)
+            if not isinstance(r, dict) or any(f not in r for f in ("id", "kind", "src", "funcs",
+                                                                   "types"))]
+    if thin:
+        raise SystemExit(f"lexicon selftest: {len(thin)} record(s) in {path} are missing a field "
+                         f"every arm dereferences (id, kind, src, funcs, types); first at index "
+                         f"{thin[0]}: {str(records[thin[0]])[:120]}")
+    return records
+
+
+def check_ts_reading(records, reader, refusals=()):
+    """Score one reading of the corpus against the oracle. Returns a verdict; decides nothing.
+
+    `reader` is called as `reader(src, kind)` and returns `(functions, types)`, each a sequence of
+    `(name, line)` with `line` 1-based within `src` — or it RAISES `SyntaxError`, the way
+    `parse_shell_defs` raises, on a construct it refuses to guess at. A raise is a REFUSAL: the
+    record leaves F1's population and its definition sites are charged to F2's budget.
+
+    `refusals` is the reader's own header refusal list, supplied by the CALLER rather than parsed
+    out of `__doc__` here. The header's grammar belongs to the reader, and a second parser for it
+    living in the grader is a second answer waiting to disagree. What this function does enforce is
+    the BINDING between the two, in both directions: every name in `refusals` must appear in the
+    reader's docstring, so a list cannot grant itself budget the header never declared; and every
+    name must be NAMED BY AN ACTUAL RAISE over this corpus, so a refusal nobody demonstrated cannot
+    be spent. The second is why a refusal message has to name its construct — the discipline
+    `parse_shell_defs` already follows, and the only handle a grader has on what was refused.
+    """
+    sites = sum(len(r["funcs"]) + len(r["types"]) for r in records)
+    doc = getattr(reader, "__doc__", None) or ""
+    v = {"records": len(records), "sites": sites, "exact": 0, "disagreements": [], "raised": {},
+         "func_missing": 0, "func_spurious": 0, "type_missing": 0, "type_spurious": 0,
+         "refusal_sites": 0,
+         "undeclared_refusals": [n for n in refusals if n not in doc]}
+    named_by_a_raise = set()
+    for r in records:
+        try:
+            got_funcs, got_types = reader(r["src"], r["kind"])
+        except SyntaxError as exc:
+            v["raised"][r["id"]] = str(exc)
+            v["refusal_sites"] += len(r["funcs"]) + len(r["types"])
+            named_by_a_raise.update(n for n in refusals if n in str(exc))
+            continue
+        agrees = True
+        for key, want, got in (("func", r["funcs"], got_funcs), ("type", r["types"], got_types)):
+            wanted = Counter(tuple(x) for x in want)
+            found = Counter(tuple(x) for x in got)
+            missing, spurious = wanted - found, found - wanted
+            v[key + "_missing"] += sum(missing.values())
+            v[key + "_spurious"] += sum(spurious.values())
+            if missing or spurious:
+                agrees = False
+                v["disagreements"].append((r["id"], key, sorted(missing.elements()),
+                                           sorted(spurious.elements())))
+        if agrees:
+            v["exact"] += 1
+    # A corpus with no sites would divide by zero AND hand every reader a free pass; the loader
+    # refuses an empty corpus, and this is the same refusal expressed as a number.
+    v["refusal_share"] = v["refusal_sites"] / sites if sites else 1.0
+    v["unexercised_refusals"] = [n for n in refusals if n not in named_by_a_raise]
+    v["clears_f1"] = not v["disagreements"]
+    v["clears_f2"] = (v["refusal_share"] <= TS_FLOOR_REFUSAL_SHARE
+                      and not v["unexercised_refusals"] and not v["undeclared_refusals"])
+    v["clears_floor"] = v["clears_f1"] and v["clears_f2"]
+    return v
+
+
+#: The `PARSERS` id each TypeScript extension's reader is registered under. TOOL-aGradedDialect-3
+#: S2 CHOSE these two names, so they are spelled here rather than guessed at: an earlier revision
+#: read `KNOWN_EXTS` because the id did not exist yet, and a grader scanning `PARSERS` for a
+#: TypeScript-looking id would arm on the wrong name or on none.
+TS_PARSER_IDS = {"ts": "ts-tokens", "tsx": "tsx-tokens"}
+
+
+def read_ts_readers():
+    """`{kind: (pattern-set id, mode)}` for every TypeScript extension the kit SHIPS a reader for.
+
+    Empty on a kit that ships neither, which is the state the conformance arm's SKIP announces and
+    the state every kit predating TOOL-aGradedDialect-3 is in. It reads `PARSERS` rather than
+    `KNOWN_EXTS` because those two answer different questions: `KNOWN_EXTS` is the DECLARATION and
+    belongs to TOOL-aGradedDialect-4, and a floor that could only be measured after the declaration
+    landed would be measured by the unit that spends the verdict rather than the one that earns it.
+
+    THE MODE TOKEN IS `probe` AND THAT IS DELIBERATE. It cannot change the reading — the pattern-set
+    id selects the reader, which is §8 F1's whole resolution — so scoring under the WEAKER token
+    costs nothing and buys one thing: the conformance run cannot pass over a dispatch that only
+    works for `parser`. Which token the reader has EARNED is `read_ts_mode`'s answer, below, and it
+    is derived from the score rather than assumed by the call that produces it.
+    """
+    return {ext: (pid, "probe") for ext, pid in TS_PARSER_IDS.items() if pid in lex.PARSERS}
+
+
+def read_ts_mode(verdict):
+    """The coverage mode a reading of this corpus EARNS: `parser` at or above the floor, `probe`
+    below it. TOOL-aGradedDialect-3 S5 and AC6.
+
+    It reads the verdict and decides nothing else. The floor is TOOL-aGradedDialect-2's and lives in
+    `check_ts_reading`; this is the one place the two-way mapping from a SCORE to a LABEL is
+    written, so a `parser` label over a probe-grade reading is one function to falsify rather than a
+    sentence somebody typed beside a number.
+    """
+    return "parser" if verdict["clears_floor"] else "probe"
+
+
+def build_ts_reader(readers, sets=None):
+    """A `reader(src, kind)` over `extract_text`, which is the call every graded reading goes
+    through — so what this corpus scores is the same dispatch a real run of the kit takes.
+
+    A `kind` with no declared reader is a REFUSAL naming it, never a KeyError. The caller filters
+    the corpus to the declared kinds before scoring, so reaching this line means the two disagree,
+    and a grader that dies on a traceback tells a reader a line number where it owed a verdict.
+    """
+    def read_defs(src, kind):
+        if kind not in readers:
+            raise SystemExit(f"lexicon selftest: asked to score a `{kind}` fixture, but the kit "
+                             f"declares a reader only for {sorted(readers)}")
+        pset, mode = readers[kind]
+        funcs, types_, _imports = lex.extract_text(src, mode, pset, sets=sets)
+        return funcs, types_
+    return read_defs
+
+
+TS_RECORDS = read_ts_fixtures()
+TS_BY_SRC = {r["src"]: r for r in TS_RECORDS}
+
+# ---- AC1: the corpus's own shape ----------------------------------------------------------------
+# THE SHAPE ARMS RUN BEFORE THE SUMMARY LINE, and that ordering is a staged finding rather than
+# taste: the summary reads `oracle` off every record, so a record short of one field killed the
+# whole suite with a KeyError traceback naming a line — before the arm whose entire job is to say
+# WHICH record is short of WHICH field had run. A suite that dies on the defect it exists to name
+# reports a line number to a reader who needed a record id. The summary below also stops trusting
+# the fields it summarises, for the same reason.
+_lo, _hi = TS_CORPUS_BAND
+check(f"AC1: the corpus holds {_lo}-{_hi} records", _lo <= len(TS_RECORDS) <= _hi,
+      f"{len(TS_RECORDS)}")
+check("AC1: every record carries all nine declared fields",
+      not [r.get("id", "<no id>") for r in TS_RECORDS if any(f not in r for f in TS_FIELDS)],
+      str([r.get("id", "<no id>") for r in TS_RECORDS if any(f not in r for f in TS_FIELDS)][:5]))
+check("AC1: every `kind` is ts or tsx",
+      not [r["id"] for r in TS_RECORDS if r["kind"] not in ("ts", "tsx")],
+      str([r["id"] for r in TS_RECORDS if r["kind"] not in ("ts", "tsx")][:5]))
+check("AC1: record ids are unique", len({r["id"] for r in TS_RECORDS}) == len(TS_RECORDS),
+      str([i for i, n in Counter(r["id"] for r in TS_RECORDS).items() if n > 1][:5]))
+
+# AND SO ARE THE EXCERPTS, which is a stronger claim than unique ids and a confirmed finding rather
+# than a precaution. The type top-up drew `type Props = Record<string, unknown>;` from six separate
+# test files, and those six copies filled six of the twenty type sites: a floor that exists to make
+# F1's type half able to fail, three-tenths satisfied by one line any regex reads. Distinct ids do
+# not catch it, because the ids differ. It is also what makes keying a reader on `src` sound, which
+# the staged readers below do.
+check("AC1: no two records carry the SAME excerpt, so the corpus grades what it says it grades",
+      len({r["src"] for r in TS_RECORDS}) == len(TS_RECORDS),
+      str([s[:60] for s, n in Counter(r["src"] for r in TS_RECORDS).items() if n > 1][:3]))
+check("AC1: every record's provenance triple is complete, with a 40-hex blob",
+      not [r["id"] for r in TS_RECORDS
+           if not re.fullmatch(r"[0-9a-f]{40}", str(r.get("from", {}).get("blob", "")))
+           or not r.get("from", {}).get("path") or not r.get("from", {}).get("lines")],
+      str([r["id"] for r in TS_RECORDS
+           if not re.fullmatch(r"[0-9a-f]{40}", str(r.get("from", {}).get("blob", "")))][:5]))
+
+_ts_funcs = sum(len(r["funcs"]) for r in TS_RECORDS)
+_ts_types = sum(len(r["types"]) for r in TS_RECORDS)
+print(f"lexicon selftest — TypeScript conformance corpus: {len(TS_RECORDS)} record(s), "
+      f"{_ts_funcs} function and {_ts_types} type definition(s), oracle "
+      f"{sorted({r.get('oracle', '<missing>') for r in TS_RECORDS})}")
+
+# THE HAND-EDITED-EXPECTATION ARM. A line an excerpt does not have is the shape an expectation takes
+# when it is written rather than read off the oracle, and it is the cheapest of these to check.
+_ts_overflow = [(r["id"], name, line) for r in TS_RECORDS
+                for name, line in list(r["funcs"]) + list(r["types"])
+                if not 1 <= line <= r["src"].count("\n")]
+check("AC1: no expectation names a line its own excerpt does not have", not _ts_overflow,
+      str(_ts_overflow[:5]))
+# ...over a NON-EMPTY population of lines, or the arm above is true of a corpus with no expectations
+# in it at all — which is the exact corpus this whole unit exists to refuse.
+check("AC1: ...over a corpus that actually carries expectations", _ts_funcs + _ts_types > 0,
+      f"{_ts_funcs} funcs, {_ts_types} types")
+check("AC1: every record carries at least one definition, so no record grades nothing",
+      not [r["id"] for r in TS_RECORDS if not r["funcs"] and not r["types"]],
+      str([r["id"] for r in TS_RECORDS if not r["funcs"] and not r["types"]][:5]))
+
+# ---- AC2: composition, derived from the records' own tags ---------------------------------------
+_ts_census = Counter(c for r in TS_RECORDS for c in r["constructs"])
+_ts_census["tsx"] = sum(1 for r in TS_RECORDS if r["kind"] == "tsx")
+_ts_census["types"] = sum(1 for r in TS_RECORDS if r["types"])
+print("lexicon selftest — corpus census: " +
+      " · ".join(f"{k} {_ts_census[k]}/{TS_FIXTURE_MINIMA[k]}" for k in sorted(TS_FIXTURE_MINIMA)))
+for _key, _floor in sorted(TS_FIXTURE_MINIMA.items()):
+    check(f"AC2: the corpus carries at least {_floor} record(s) tagged {_key}",
+          _ts_census[_key] >= _floor, f"{_ts_census[_key]}")
+
+# ---- AC4: the floor constants are DECLARED, and well-formed --------------------------------------
+check("AC4: the refusal budget is a share strictly between 0 and 1",
+      isinstance(TS_FLOOR_REFUSAL_SHARE, float) and 0 < TS_FLOOR_REFUSAL_SHARE < 1,
+      f"{TS_FLOOR_REFUSAL_SHARE!r}")
+check("AC4: every composition floor is a positive integer",
+      TS_FIXTURE_MINIMA and all(isinstance(v, int) and v > 0 for v in TS_FIXTURE_MINIMA.values()),
+      f"{TS_FIXTURE_MINIMA}")
+
+# ---- the runner's GREEN control, without which every red arm below proves nothing -----------------
+# A perfect reader is the oracle's own answer keyed on the excerpt. Without it, "js-regex misses the
+# floor" is satisfied by a runner that reds on everything, which is the arm-that-cannot-fail class
+# the corpus exists one level down to refuse.
+def read_oracle_answer(src, _kind):
+    """The oracle's recorded reading of this excerpt. Refuses nothing."""
+    r = TS_BY_SRC[src]
+    return [tuple(x) for x in r["funcs"]], [tuple(x) for x in r["types"]]
+
+
+_ts_perfect = check_ts_reading(TS_RECORDS, read_oracle_answer)
+check("the runner is capable of GREEN: a reader returning the oracle's own answer clears the floor",
+      _ts_perfect["clears_floor"], f"{_ts_perfect['disagreements'][:3]}")
+check("...over every record, not a subset", _ts_perfect["exact"] == len(TS_RECORDS),
+      f"{_ts_perfect['exact']} of {len(TS_RECORDS)}")
+
+# ---- AC5: the failing case, observed on the day this lands ----------------------------------------
+# The shipped `js-regex` set, pointed at the TypeScript corpus. This is the best an adopter can do
+# today with no code change at all, and unit 1 measured it at 0.6% type recall over the whole tree.
+_ts_js = check_ts_reading(TS_RECORDS, build_ts_reader({"ts": ("js-regex", "probe"),
+                                                       "tsx": ("js-regex", "probe")}))
+print(f"lexicon selftest — js-regex against the TypeScript corpus: {_ts_js['exact']} of "
+      f"{_ts_js['records']} record(s) in exact agreement; functions short by "
+      f"{_ts_js['func_missing']} of {_ts_funcs} (spurious {_ts_js['func_spurious']}); types short "
+      f"by {_ts_js['type_missing']} of {_ts_types} (spurious {_ts_js['type_spurious']})")
+check("AC5: the shipped js-regex set MISSES the floor over this corpus, so the runner can red",
+      not _ts_js["clears_floor"], f"{_ts_js['exact']} of {_ts_js['records']} exact")
+check("AC5: ...and it misses on TYPES, which is unit 1's sharpest measurement",
+      _ts_js["type_missing"] > 0, f"{_ts_js['type_missing']}")
+check("AC5: ...and on FUNCTIONS too, so the miss is not one predicate's",
+      _ts_js["func_missing"] > 0, f"{_ts_js['func_missing']}")
+for _id, _side, _missing, _spurious in _ts_js["disagreements"][:3]:
+    print(f"    js-regex {_id} {_side}: missed {_missing} · spurious {_spurious}")
+
+# ---- AC6: the refusal budget is COMPUTED and COMPARED, not merely readable -------------------------
+# Four staged readers, because a declared ceiling nothing reads is a number rather than a budget —
+# which is what F2 was until the spec's round-3 audit. Each stages one way a reader could spend
+# budget it has not earned, and the green control above is what stops all four passing vacuously.
+_ts_cheapest = min(TS_RECORDS, key=lambda r: len(r["funcs"]) + len(r["types"]))
+_ts_cheapest_share = (len(_ts_cheapest["funcs"]) + len(_ts_cheapest["types"])) / _ts_perfect["sites"]
+check("AC6: one refusal on the corpus's smallest record fits inside the budget, or the within-budget "
+      "arm below could not be staged at all",
+      _ts_cheapest_share <= TS_FLOOR_REFUSAL_SHARE,
+      f"{_ts_cheapest_share:.4f} > {TS_FLOOR_REFUSAL_SHARE}")
+
+
+def read_with_one_refusal(src, kind):
+    """Perfect, except it refuses the computed key construct."""
+    if src == _ts_cheapest["src"]:
+        raise SyntaxError("computed key: refused, line 1")
+    return read_oracle_answer(src, kind)
+
+
+def read_with_total_refusal(src, _kind):
+    """Refuses the computed key construct, everywhere."""
+    raise SyntaxError("computed key: refused, line 1")
+
+
+def read_with_undeclared_refusal(src, kind):
+    """Perfect, except on one record, and its header declares no refusal at all."""
+    if src == _ts_cheapest["src"]:
+        raise SyntaxError("decorator: refused, line 1")
+    return read_oracle_answer(src, kind)
+
+
+def read_with_unexercised_refusal(src, kind):
+    """Perfect, and its header declares a refusal for the overload signature construct."""
+    return read_oracle_answer(src, kind)
+
+
+_ts_one = check_ts_reading(TS_RECORDS, read_with_one_refusal, refusals=("computed key",))
+print(f"lexicon selftest — refusal budget: one refusal costs "
+      f"{_ts_one['refusal_share']:.4f} of {_ts_perfect['sites']} oracle definition site(s), "
+      f"ceiling {TS_FLOOR_REFUSAL_SHARE}")
+check("AC6 green: a declared refusal, demonstrated by a raise and inside the budget, clears the floor",
+      _ts_one["clears_floor"], f"{_ts_one['refusal_share']} {_ts_one['unexercised_refusals']} "
+                               f"{_ts_one['undeclared_refusals']}")
+
+_ts_all = check_ts_reading(TS_RECORDS, read_with_total_refusal, refusals=("computed key",))
+check("AC6 red: refusing the whole corpus BLOWS the budget rather than clearing F1 by refusing",
+      not _ts_all["clears_floor"] and not _ts_all["clears_f2"],
+      f"share {_ts_all['refusal_share']}")
+check("AC6 red: ...and F1 alone would have been satisfied by it, which is why F2 exists",
+      _ts_all["clears_f1"], f"{_ts_all['disagreements'][:2]}")
+
+_ts_undecl = check_ts_reading(TS_RECORDS, read_with_undeclared_refusal, refusals=("decorator",))
+check("AC6 red: a refusal the reader's own header does not name is refused",
+      not _ts_undecl["clears_f2"] and _ts_undecl["undeclared_refusals"] == ["decorator"],
+      f"{_ts_undecl['undeclared_refusals']}")
+
+_ts_unex = check_ts_reading(TS_RECORDS, read_with_unexercised_refusal,
+                            refusals=("overload signature",))
+check("AC6 red: a refusal named in the header that NO fixture makes it raise on is refused",
+      not _ts_unex["clears_f2"] and _ts_unex["unexercised_refusals"] == ["overload signature"],
+      f"{_ts_unex['unexercised_refusals']}")
+
+# THE ARM THAT PROVES THE CEILING IS READ, and it is here because staging the other two showed it was
+# not. `nothing refused` against `everything refused` is separated just as well by a hard-coded
+# comparison against zero as by the declared share: raising TS_FLOOR_REFUSAL_SHARE to 0.999 moved no
+# verdict, because a total refusal is 1.0 and clears no ceiling under 1. A refusal JUST OVER the
+# declared share is the only shape whose verdict depends on the number. Its population is derived
+# from the corpus rather than picked, so it stays just-over as the corpus changes.
+_ts_over = []
+_ts_over_sites = 0
+for _r in sorted(TS_RECORDS, key=lambda r: len(r["funcs"]) + len(r["types"])):
+    if _ts_over_sites > TS_FLOOR_REFUSAL_SHARE * _ts_perfect["sites"]:
+        break
+    _ts_over.append(_r["src"])
+    _ts_over_sites += len(_r["funcs"]) + len(_r["types"])
+_ts_over = set(_ts_over)
+
+
+def read_with_over_budget_refusal(src, kind):
+    """Perfect, except it refuses the computed key construct on a few of the cheapest records."""
+    if src in _ts_over:
+        raise SyntaxError("computed key: refused, line 1")
+    return read_oracle_answer(src, kind)
+
+
+_ts_overv = check_ts_reading(TS_RECORDS, read_with_over_budget_refusal, refusals=("computed key",))
+check("AC6 red: a declared, demonstrated refusal JUST OVER the budget is still refused — which is "
+      "the arm whose verdict depends on TS_FLOOR_REFUSAL_SHARE's value",
+      not _ts_overv["clears_floor"] and not _ts_overv["clears_f2"],
+      f"share {_ts_overv['refusal_share']:.4f} ceiling {TS_FLOOR_REFUSAL_SHARE}")
+check("AC6 red: ...and it is genuinely a NEAR-MISS rather than a total refusal in disguise",
+      TS_FLOOR_REFUSAL_SHARE < _ts_overv["refusal_share"] < 4 * TS_FLOOR_REFUSAL_SHARE,
+      f"{_ts_overv['refusal_share']:.4f}")
+check("AC6 red: ...with F1 itself still clean, so the budget is the only thing refusing it",
+      _ts_overv["clears_f1"], f"{_ts_overv['disagreements'][:2]}")
+
+# ---- AC4: the conformance arm itself ---------------------------------------------------------------
+_ts_readers = read_ts_readers()
+if not _ts_readers:
+    # A BARE `print`, and deliberately: `check` prints labels only for FAILURES, so a skip written as
+    # `check(<label>, True)` reaches no output on a green run and is a comment wearing a check's
+    # clothes. This file's other skip uses the same idiom for the same reason.
+    print("lexicon selftest SKIPPED — the TypeScript conformance arm: this kit ships no TypeScript "
+          "reader. `PARSERS` carries neither of `TS_PARSER_IDS`, so there is nothing to score and "
+          "the FLOOR itself goes unexercised. One arm unexercised.")
+else:
+    # A PARTLY ARMED KIT IS A LEGAL OUTCOME, not an error and not a full run. `ts` and `tsx` take
+    # two `PARSERS` ids and two lexer modes, so shipping one and not the other is a state this arm
+    # has to survive rather than assume away. So the arm scores the
+    # records it has a reader FOR and says out loud how many it did not — a floor cleared over half
+    # the corpus is not a floor cleared, and the half has to be visible for anyone to know which it
+    # was. Staged before this existed, the arm died on `KeyError: 'tsx'` instead.
+    _ts_scored = [r for r in TS_RECORDS if r["kind"] in _ts_readers]
+    _ts_dark = sorted({r["kind"] for r in TS_RECORDS} - set(_ts_readers))
+    if _ts_dark:
+        print(f"lexicon selftest — the TypeScript conformance arm is PARTLY armed: "
+              f"{' '.join(_ts_dark)} declares no reader, so {len(TS_RECORDS) - len(_ts_scored)} of "
+              f"{len(TS_RECORDS)} record(s) go UNSCORED and the floor below covers only the rest.")
+    check("AC4: the declared TypeScript reader has a non-empty population to be graded on",
+          bool(_ts_scored), f"declared {_ts_readers}, corpus kinds "
+                            f"{sorted({r['kind'] for r in TS_RECORDS})}")
+    if _ts_scored:
+        _ts_verdict = check_ts_reading(_ts_scored, build_ts_reader(_ts_readers))
+        print(f"lexicon selftest — declared TypeScript reader {_ts_readers}: "
+              f"{_ts_verdict['exact']} of {_ts_verdict['records']} record(s) in exact agreement, "
+              f"refusal share {_ts_verdict['refusal_share']:.4f}")
+        for _id, _side, _missing, _spurious in _ts_verdict["disagreements"][:10]:
+            print(f"    {_id} {_side}: missed {_missing} · spurious {_spurious}")
+        check("AC4: the declared TypeScript reader clears the floor, or it may not call itself "
+              "`parser`", _ts_verdict["clears_floor"],
+              f"F1 {_ts_verdict['clears_f1']} F2 {_ts_verdict['clears_f2']} "
+              f"share {_ts_verdict['refusal_share']:.4f}")
+
+        # ---- TOOL-aGradedDialect-3 AC5: RECALL and PRECISION, per side, against the floor -------
+        #
+        # NO SCORE IS WRITTEN INTO THIS FILE. Both figures are DERIVED at observation time from the
+        # records actually scored, and the floor they are compared against is F1 — EXACT agreement,
+        # which is recall 1 and precision 1 on both sides. A percentage would need a threshold, and
+        # any threshold under exact agreement cannot tell a complete reader from an incomplete one.
+        # THE POPULATION IS THE RECORDS ACTUALLY COMPARED, never every record handed in. A record
+        # the reader RAISED on was never compared, so its sites are in no `_missing` tally -- summing
+        # over `_ts_scored` credited them as HITS. A reader refusing the whole corpus therefore
+        # printed recall 1.0000 and precision 1.0000, which is F1 satisfied by finding nothing: the
+        # `fixture-passes-by-finding-nothing` class inside the arm that prints the verdict. The
+        # refusal budget is what grades the raised half, and it is F2's job, not this line's.
+        _ts_compared = [r for r in _ts_scored if r["id"] not in _ts_verdict["raised"]]
+        _ts_sides = {"func": sum(len(r["funcs"]) for r in _ts_compared),
+                     "type": sum(len(r["types"]) for r in _ts_compared)}
+        for _side, _want in sorted(_ts_sides.items()):
+            _hit = _want - _ts_verdict[_side + "_missing"]
+            _found = _hit + _ts_verdict[_side + "_spurious"]
+            _recall = (_hit / _want) if _want else 0.0
+            _precision = (_hit / _found) if _found else 0.0
+            print(f"lexicon selftest — TypeScript {_side} recall {_hit}/{_want} "
+                  f"({_recall:.4f}) · precision {_hit}/{_found} ({_precision:.4f}) · floor: EXACT "
+                  f"agreement, so both are 1.0000 or the reading is below it")
+            check(f"AC5: the {_side} side agrees EXACTLY with the oracle over a non-empty population",
+                  _want > 0 and _hit == _want and _found == _want,
+                  f"want {_want} hit {_hit} found {_found}")
+
+        # A ZERO REFUSAL SHARE IS ONLY EVIDENCE IF SOMETHING ASSERTS IT. The corpus is CLEAN source
+        # by construction, so the shipped reader should raise on none of it, and the five construct
+        # refusals its header declares are silent scope limits that never raise at all -- they are
+        # demonstrated by `test_ts_refusals`' own fixtures, which is where a raise can be staged.
+        # So the honest corpus-side check is this one rather than a caller-supplied refusal list:
+        # handing the six declared names to `check_ts_reading` would mark all six UNEXERCISED over a
+        # clean population and demote a CORRECT reader from `parser` to `probe`.
+        check("AC5: the shipped reader raises on NO record of the clean corpus, so its refusal "
+              "share of zero is an observation rather than an assumption",
+              not _ts_verdict["raised"],
+              f"raised on {sorted(_ts_verdict['raised'])[:5]}")
+
+        # THE DURABLE GATE FOR THE ANNOTATION-AS-NAME CLASS, not just its one instance. A class
+        # property's type annotation used to be graded as the function name, so `void` and
+        # `MouseEventHandler` entered the population as fabricated identifiers. A fixture catches
+        # that instance; this catches anything that ever puts a type keyword in the graded set.
+        _ts_kw = {"void", "string", "number", "boolean", "any", "unknown", "never", "object",
+                  "symbol", "bigint", "undefined", "null", "this", "readonly", "public", "private",
+                  "protected", "static", "abstract", "declare", "type", "interface", "enum"}
+        _ts_phantoms = sorted({n for r in _ts_compared
+                               for n, _ln in lex.extract_text(
+                                   r["src"], "parser",
+                                   "tsx-tokens" if r["kind"] == "tsx" else "ts-tokens")[0]
+                               if n in _ts_kw})
+        check("AC5: no extracted identifier is a TypeScript keyword or primitive type name, which "
+              "is what an annotation graded as a name looks like from the grader's side",
+              not _ts_phantoms, f"{_ts_phantoms}")
+
+
+        # ---- THE SEMICOLON-FREE CLASS, gated over the whole corpus rather than per instance --------------
+        #
+        # Three of round 2's four entries needed semicolon-free source, and the frozen corpus carries NONE:
+        # measured, 0 of 115 records lack a semicolon. So the corpus certified a reader that refused whole
+        # files of ordinary `semi: false` TypeScript, twice. This arm strips every statement-terminating
+        # semicolon from each record and asserts the reader does not RAISE on the result. It gates the CLASS
+        # -- any future edit that makes the reader depend on a semicolon reds here -- and it costs one pass
+        # over a corpus the suite has already loaded. The reviewer named it the highest-value left-shift of
+        # the round and it is the reason these three did not need three separate structural gates.
+        _TS_SEMI = re.compile(r";\s*$", re.M)
+        _ts_asi_raised = []
+        for _r in TS_RECORDS:
+            _mode = TS_PARSER_IDS.get(_r["kind"])
+            if _mode is None or _mode not in lex.PARSERS:
+                continue
+            try:
+                lex.extract_text(_TS_SEMI.sub("", _r["src"]), "parser", _mode)
+            except SyntaxError as _exc:
+                _ts_asi_raised.append((_r["id"], str(_exc)))
+        check("AC5: with every statement-terminating semicolon stripped, the reader RAISES on no record -- "
+              "the semicolon-free class the corpus itself cannot exercise",
+              not _ts_asi_raised, f"{_ts_asi_raised[:5]}")
+
+        # ---- TOOL-aGradedDialect-3 AC6: the mode verdict, beside the number that decided it -----
+        _ts_mode = read_ts_mode(_ts_verdict)
+        print(f"lexicon selftest — TypeScript coverage mode EARNED: {_ts_mode} — "
+              f"{_ts_verdict['exact']} of {_ts_verdict['records']} record(s) in exact agreement, "
+              f"refusal share {_ts_verdict['refusal_share']:.4f} against the declared ceiling "
+              f"{TS_FLOOR_REFUSAL_SHARE}. TOOL-aGradedDialect-4 spends this verdict; nothing here "
+              f"declares it.")
+        check("AC6: the printed mode is the one the SCORE earns, not the one the reader hopes for",
+              _ts_mode == ("parser" if _ts_verdict["clears_floor"] else "probe"), _ts_mode)
+
+# AC6's STAGED BREAK, and it sits outside the arm above because it must run whether or not a reader
+# ships: the defect this whole build was framed around is a `parser` label over a probe-grade
+# reading, and an arm that can only be exercised by a reader which already clears the floor could
+# never observe it. `_ts_js` is the shipped `js-regex` set scored against this corpus — a genuinely
+# below-floor reading — and `_ts_perfect` is the oracle's own answer.
+check("AC6 red: a reading BELOW the floor earns `probe`, never `parser`",
+      read_ts_mode(_ts_js) == "probe", f"{read_ts_mode(_ts_js)} over {_ts_js['exact']} exact")
+check("AC6 green: ...and a reading at or above it earns `parser`, so the two are distinguishable",
+      read_ts_mode(_ts_perfect) == "parser", f"{read_ts_mode(_ts_perfect)}")
+check("AC6: ...and a refusal-blown reading earns `probe` too, so F2 reaches the label and not "
+      "only F1", read_ts_mode(_ts_all) == "probe" and _ts_all["clears_f1"],
+      f"{read_ts_mode(_ts_all)} clears_f1={_ts_all['clears_f1']}")
+
 
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
