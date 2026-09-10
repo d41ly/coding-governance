@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-5 — the records: the darkness ruling retired where it is actually carried
 
-**Status:** CLOSED · rev-5 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
+**Status:** CLOSED · rev-6 · 2026-09-10 · node a · Tier-1 · base d1357673 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -33,9 +33,16 @@ the copy that rots.
   extractor as a regex pattern set, and "the kit ships exactly one". That unit DECLARES the handoff
   in its §3 Edges; before this rev nothing in the set received it, so a resolved fork's stated cost
   had no payer. Correction is a REWRITE, never a deletion: the section still teaches the `PATTERNS:`
-  block and still names Go, Rust and C#. Observed by **AC2**.
-- **S3** — the one comment in kit source that names `TOOL-dScaffoldedMirror-13` as the standing
-  owner of the question is rewritten. Prose only, inside a comment, and no predicate is touched.
+  block and still names Go, Rust and C#. **The modes table and the parser sentence each have a SECOND
+  carrier in `tools/lexicon/lexicon.py`'s module docstring, and both are corrected in the same pass**
+  — AC2's grep spans that file but keys on strings that do not reach the table, so the README-only
+  reading of this item would have left F1's handoff half-paid inside the engine that made it. rev-5.
+  Observed by **AC2** for the README half and by reading the docstring for the other.
+- **S3** — no comment in kit source may name `TOOL-dScaffoldedMirror-13` as the standing owner of the
+  question. **DISCHARGED UPSTREAM**: the one comment that did was deleted by `TOOL-aGradedDialect-3`
+  S8 when it rewrote the `DEFINITION_SNIFF` header, so this unit writes no edit here and AC3 observes
+  the tree rather than a change to it. rev-5 records it, because a scope item nobody edited and a
+  scope item nobody needed to edit produce the same diff and only one of them is honest.
   Observed by **AC3**.
 - **S4** — the `TOOL-dScaffoldedMirror-13` backlog row moves off `DEFERRED` with its pointer
   re-aimed at this build, and that spec's status header tail gains a superseding pointer. The
@@ -44,6 +51,9 @@ the copy that rots.
   prose stops naming TypeScript among the languages an adopter can only declare dark. The KEY half is
   observed by **AC5**; the PROSE half is observed by **AC2**, whose grep names this file as a third
   carrier — the coverage ratchet reads keys and is blind to a stale sentence beside them.
+  **The KEY half needed no edit and rev-5 says why:** the dossier claims leading VERBS, and every
+  symbol units 2 to 4 minted leads with one already claimed. So the PROSE half is the whole of what
+  this unit wrote here, and AC5 records a green it did not cause.
 - **S6** — the lexicon kit version is bumped ONCE for this build, in every carrier that repeats it,
   and the Skill is re-rendered so its marker agrees. `TOOL-aGradedDialect-3` S7 no longer claims this
   stamp, so the allocation §8 F2 records has exactly one payer. Observed by **AC6**.
@@ -111,11 +121,12 @@ What DOES carry claims this build falsifies, each verified by reading the file o
 |---|---|---|
 | `tools/lexicon/README.md` "Arming a language this kit does not ship" | a TypeScript adopter "could only declare their language `dark`" | TypeScript leaves that list |
 | `tools/lexicon/README.md` "Coverage modes" | "TWO PARSERS SHIP" | a count of a derived population, typed in prose |
-| `tools/lexicon/lexicon.py` `DEFINITION_SNIFF` header | "`TOOL-dScaffoldedMirror-13` still owns the `.ts`/`.tsx` question" | that decision is superseded here |
+| `tools/lexicon/lexicon.py` `DEFINITION_SNIFF` header | "`TOOL-dScaffoldedMirror-13` still owns the `.ts`/`.tsx` question" | that decision is superseded here — **and this row was already discharged before BUILDING opened**: the sentence sat at `lexicon.py:144` at this spec's BASE and `TOOL-aGradedDialect-3` S8 deleted it when it rewrote that whole header. AC3 observes the state; rev-5 records that S3 owes no edit |
 | `memory/map/features/lexicon.md` "Shared seams" | "an adopter with TypeScript, Go or C# could only declare their language `dark`" | the README claim, mirrored |
 | `memory/backlog/TOOL.md` the `-13` row | "the adopter's primary language is INVISIBLE to the kit" | the condition the row tracks is removed |
 | `tools/lexicon/lexicon.py:26` | "TWO PARSERS SHIP" | the SECOND carrier of that claim, which a README-only grep leaves standing |
 | `tools/lexicon/README.md` "Coverage modes" table | `probe` → "a regex pattern set" | `TOOL-aGradedDialect-3` §8 F1 makes a `probe` id resolve through `PARSERS`, so the mode no longer implies a regex |
+| `tools/lexicon/lexicon.py` module docstring | the SAME three-row modes table, with the same `probe` → "a regex pattern set" gloss | the SECOND carrier of the row above, and AC2's grep keys on other strings so it cannot see this one. Found at BUILDING; rev-5 records the widening |
 | `tools/lexicon/README.md` "Arming a language" | "`probe` needs a pattern set, and the kit ships exactly one" | the same F1 handoff; the sentence has no receiver until this row exists |
 
 The parser sentence is the interesting one and it is fixed by DERIVING rather than by recounting.
@@ -369,6 +380,16 @@ This unit adds and moves no gate arm; the legs above are the ones its edits must
   `TOOL-aGradedDialect-4`. §3 forbids this unit from touching that file and the registry row is
   priced on the unit that added the literal, so it is REPORTED rather than absorbed: the discharge is
   a fourth-column reason on that row, and it belongs to whoever closes unit 3 or 4.
+
+- rev-6 · 2026-09-10 · S2 · S3 · S5 · §4 · the follow-up commit's own bug-class checklist landed
+  `amendment-leaves-its-other-half-standing` on rev-5, and this is that fold. rev-5 recorded three
+  divergences in §9 and left the SCOPE items and the §4 carrier table saying the old thing: S3 still
+  read "the one comment … is rewritten" for an edit this unit does not make, S2 still named the
+  README alone for a correction that lands in two files, S5 still implied the key claims moved, and
+  §4's `DEFINITION_SNIFF` row still described a sentence that no longer exists in the tree. One rule
+  returning two verdicts is exactly the class, and a §9 entry is not where a scope item gets fixed.
+  All four now say what happened; §4 also gains the module-docstring row for the modes table, which
+  no row named before and which AC2's grep provably cannot see.
 
 ## 10. Reuse audit
 

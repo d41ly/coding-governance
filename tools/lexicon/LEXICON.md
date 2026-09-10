@@ -115,13 +115,17 @@ no alias mechanism: an undeclared `tsx` is dark, and silently so.
 one is a declared refusal rather than a gap. A `.tsx` function's case is decided by its ROLE — a
 React component is PascalCase and a plain helper is camelCase — and this kit reads no roles, so a
 single convention over that cell would red correct code whichever one it picked. Arm it if your tree
-has a rule the kit cannot see; the seeded comment beside the row says the same thing.
+has a rule the kit cannot see. **That reason is spelled twice on purpose, and this copy is the
+lesser one:** the scaffolder emits it as a comment directly beside the row, which is where an
+adopter meets it, and this page states it for a reader deciding whether to adopt at all — who has no
+conf yet. If the two ever disagree, the emitted comment is the one to trust.
 
 ### The six refusals, each beside what compensates for it
 
-`parse_ts_defs`'s own header enumerates these, and the reason it owes you all six is that three have
-no runtime failure to stage. What follows is the pairing — the refusal, then the check that keeps it
-from being a silent hole.
+**`parse_ts_defs`'s own header is the enumeration and this page is the PAIRING.** The header owes you
+all six because three have no runtime failure to stage; what this page adds is the check that keeps
+each one from being a silent hole. So the direction of truth runs one way: a refusal the header
+gains and this list does not is a defect HERE, and a row here the header does not carry is fiction.
 
 1. **A source it cannot tokenize** — an unterminated string, template literal, `${` substitution,
    comment, regex literal, block or JSX element. It RAISES, naming the construct and the line, and
