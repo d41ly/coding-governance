@@ -68,12 +68,12 @@ ids TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aLeakedHandle-1 — the pipe whose write end nobody closed, and the gate for its class](spec/2026-09-10-spec-TOOL-aLeakedHandle-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-10 |
-| [TOOL-aLeakedHandle-2 — a run that reached a leg's ceiling is evidence, not a discarded failure](spec/2026-09-10-spec-TOOL-aLeakedHandle-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-10 |
-| [TOOL-aLeakedHandle-3 — a killed leg reports the seconds it ran, not the ceiling it did not reach](spec/2026-09-10-spec-TOOL-aLeakedHandle-3.md) | — | 1 | SPECCED | rev-1 | 2026-09-10 |
+| [TOOL-aLeakedHandle-1 — the pipe whose write end nobody closed, and the gate for its class](spec/2026-09-10-spec-TOOL-aLeakedHandle-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-10 |
+| [TOOL-aLeakedHandle-2 — a run that reached a leg's ceiling is evidence, not a discarded failure](spec/2026-09-10-spec-TOOL-aLeakedHandle-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-10 |
+| [TOOL-aLeakedHandle-3 — a killed leg reports the seconds it ran, not the ceiling it did not reach](spec/2026-09-10-spec-TOOL-aLeakedHandle-3.md) | — | 1 | SPECCED | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 4 record folder(s).
+Records: 4 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

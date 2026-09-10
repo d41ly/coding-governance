@@ -1,12 +1,13 @@
 # TOOL-aLeakedHandle-2 — a run that reached a leg's ceiling is evidence, not a discarded failure
 
-**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md](../build/2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md) | research | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-3 |
+| [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md) | spec-audit | TOOL-aLeakedHandle-1 |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md) | spec-audit | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-3 |
 
 <!-- /gen:spec-records -->
@@ -21,10 +22,12 @@ where that ceiling fired.
 
 ## 2. Scope (IN)
 
-- **S1** — `read_runs` admits a non-`ok` row when its seconds reach the leg's declared ceiling, and
-  keeps excluding every other failing row. Every command path that reads the run window supplies the
-  ceilings it compares against, which means `cmd_write` acquires the `read_legs` call it does not
-  make today. Observed by AC1, AC2, AC5 and AC6.
+- **S1** — `read_runs` admits a non-`ok` row when its seconds land inside a BOUNDED window at the
+  leg's declared ceiling — at or above that ceiling, and no more than 35 s above it — and keeps
+  excluding every other failing row. The upper edge is what refuses a row produced with no bound in
+  force at all; §4 names the two states that produce one and defends the 35. Every command path that
+  reads the run window supplies the ceilings it compares against, which means `cmd_write` acquires
+  the `read_legs` call it does not make today. Observed by AC1, AC2, AC5 and AC6.
 - **S2** — `cmd_check`'s failure line for a leg whose evidenced maximum is at or above its own
   ceiling says the ceiling was REACHED in a recorded run, instead of quoting headroom arithmetic
   over a number that is a lower bound rather than a duration. Observed by AC3.
@@ -33,10 +36,11 @@ where that ceiling fired.
   with its failing case observed RED before it lands. The arm count is READ from the suite rather
   than pinned here, and so is the `FLOOR_ASSERTIONS` move, because both drift the moment an arm
   splits. Observed by AC4.
-- **S4** — `read_runs`'s own docstring states the admission rule and names the three causes it
-  cannot tell apart. It is the only written statement of either fact, and §5 risks rests the whole
-  mitigation of the monotone-floor hazard on it, so it is OBSERVED rather than assumed. Observed by
-  AC7.
+- **S4** — `read_runs`'s own docstring states the admission rule, names the three causes it cannot
+  tell apart, and names `--write --reset <leg>` as the way to lower a row admitted from one of them.
+  It is the only written statement of any of the three, and §5 risks rests the whole mitigation of
+  the monotone-floor hazard on the last one, so all three are OBSERVED rather than assumed. Observed
+  by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -66,14 +70,20 @@ where that ceiling fired.
 
 - **consumes-from** external — the retained `<git-dir>/gate-run/` window must still hold a reading at
   a ceiling for AC5 to be observable on the live tree. That window is node-local, the runner prunes
-  it, and an ordinary bar cannot refill it for the one leg AC5 names, because that leg is held. AC5
-  carries a fixture line naming the invocation that can; every other criterion is observed on a
-  built fixture and needs none.
-- **consumes-from** `TOOL-aLeakedHandle-3` — the mirror of that unit's hands-off, and it is
-  load-bearing rather than bookkeeping. This unit's admission rule reads a `.leg` row's SECONDS
-  field and compares it against the declared ceiling, and unit 3 edits the reporting path that
-  produces that field. Unit 3 asserts it re-declares no ceiling and leaves the `.leg` row shape
-  unchanged; this unit relies on exactly that, so the pair is declared rather than assumed.
+  it, and an ordinary bar cannot refill it for the one leg AC5 names, because that leg is both HELD
+  and GUARDED and `run-gates.sh` evaluates those as two separate passes. Refilling it takes
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — the first flag lifts the guard,
+  the second lifts the hold — which AC5's fixture line spells out with its cost. Every other
+  criterion is observed on a built fixture and needs none.
+- **consumes-from** `TOOL-aLeakedHandle-3` — the mirror of that unit's hands-off, and it is an
+  acknowledgement of what that unit ASSERTS rather than a data dependency. Both units land in
+  `tools/run-gates/`. This unit's admission rule is a function of two things unit 3 declares it does
+  not move: the seven-field `.leg` row `runleg` writes, with its seconds semantics intact, and every
+  `ceiling` value in `tools/gate-legs.json`. What unit 3 changes is what `report_one` PRINTS for one
+  exit code, and `report_one` writes no `.leg` row on any path, so it produces nothing this unit
+  reads. No §6 criterion here consumes anything unit 3 builds: AC1, AC2, AC3, AC6 and AC7 run on
+  built fixtures and AC5 on the live window. The edge therefore carries no landing order in either
+  direction.
 - **hands-off** external — the refresh of the tracked evidence artifact, and any ceiling decision it
   then forces, stay with the owner.
 
@@ -87,9 +97,16 @@ so the row records what happened and not what caused it. `read_runs` reads field
 The change adds one comparison against a fifth number that is not in the row at all — the leg's
 `ceiling` in `tools/gate-legs.json`, which `read_legs` loads.
 
-The admission rule becomes: a row counts when its status is `ok`, OR when its seconds are at or above
-the ceiling that `tools/gate-legs.json` declares for that leg today. A leg with no integer ceiling
-admits `ok` rows only, because there is nothing for a failing row to have reached.
+The admission rule becomes: a row counts when its status is `ok`, OR when its seconds land inside the
+CLOSED window `[ceiling, ceiling + 35]`, against the ceiling that `tools/gate-legs.json` declares for
+that leg today. The window is closed at both ends and the upper edge carries as much of the rule as
+the lower one — *Why the elapsed comparison is the discriminator* defends the 35 and names what the
+edge refuses. A leg with no integer ceiling admits `ok` rows only, because there is nothing for a
+failing row to have reached.
+
+The window governs the non-`ok` clause alone. An `ok` row is admitted at any duration, including one
+above its own ceiling, because a completed run measured the work whatever bound was or was not in
+force around it.
 
 ### Which command paths already hold the ceilings, and which one does not
 
@@ -123,6 +140,17 @@ ceiling of 900. A run that reached the ceiling did not stop for anything the leg
 because the bound expired, so its seconds are a lower bound on the work — the one property a monotone
 maximum needs, and the property `ok` rows are admitted for.
 
+**That inference needs a bound to have been in force, and one was not always.** `seconds >= ceiling`
+is evidence that the bound expired only where the ceiling WAS the bound. `run-gates.sh:1393` reads
+`[ "$CEILINGS_LIVE" = 1 ] || bound=0`, and `CEILINGS_LIVE` is a runtime capability probe at
+`run-gates.sh:371`: on a host where `timeout -k 1s 10 true` fails, the runner announces that every
+declared ceiling is INERT and runs every leg unbounded. A leg that then runs 2000 s under a 900 s
+ceiling and fails on its own would satisfy an open-ended `>=` and enter a MONOTONE file as *the bound
+expired* — which is the failure-duration-as-floor case the `ok`-only filter exists to prevent, and
+the fourth row of the table below is where it now lands. So the comparison is a CLOSED WINDOW,
+`[ceiling, ceiling + 35]`, and the upper edge is not decoration: a row materially above its ceiling
+is itself evidence that no bound produced it.
+
 **The exit code cannot carry that distinction and the elapsed time can.** rc=124 is what GNU
 `timeout` reports when its deadline expires, and `run-gates.sh:1395` wraps every bounded leg in
 `timeout -k 5s "$bound"`. But rc=124 is also what a leg exits when it runs a `timeout` of its own
@@ -131,18 +159,44 @@ is SIGKILL, which an operator, an OOM killer or a CI cancel produce as readily a
 `TOOL-aLeakedHandle-3` establishes that the runner's own rc=137 branch mislabels such a kill as a
 full-ceiling timeout, so the reporting side cannot be used as a witness for the recording side.
 
-So the rule tests neither code. It tests whether the run reached the bound, which is a fact about the
-row and the manifest and needs no belief about signals. The three cases settle themselves:
+So the rule tests neither code. It tests whether the run reached the bound AND stopped where a bound
+would have stopped it, which is a fact about the row and the manifest and needs no belief about
+signals.
 
-| row in the live window | rc | seconds | ceiling | admitted | why |
-|---|---|---|---|---|---|
-| `memory-hygiene self-test` | 124 | 900.240 | 900 | yes | the bound expired; the seconds bound the work |
-| `unattended kit gate` | 137 | 4168.392 | 16040 | no | killed at a quarter of its bound, so no bound expired |
-| `govkit selftest` | 1 | 1177.363 | 11750 | no | the leg stopped itself well inside its bound |
+**The width is `5 + 30`, and only the first half is read from source.** `run-gates.sh:1395` wraps a
+bounded leg in `timeout -k 5s "$bound"`: SIGTERM at the bound, SIGKILL five seconds later. Nothing
+the leg itself decides can put its death later than that, so 5 is arithmetic rather than judgment.
+
+**The 30 is mine, and its job is process teardown.** `runleg` takes its end timestamp AFTER `cat`-ing
+the leg's raw output file, so a file read and a `date` spawn sit inside the measured seconds
+alongside the teardown, all of it competing with the rest of a full bar. Sized against what this repo
+has actually recorded rather than against comfort: the two `memory-hygiene self-test` rows overshot a
+900 s ceiling by 0.481 s and 0.240 s, and `TOOL-aMeteredTurnstile-6` measured a single process spawn
+on a degraded node `a` at 581 ms for `bash -c true` and 1297 ms for `python -c pass`. 30 s is 62x the
+worst overshoot on record and room for twenty-three of the worst-measured spawns. That is generous in
+the direction the evidence asks for, because a window too TIGHT silently discards the exact readings
+this unit exists to admit and discards them with no message. It is not open-ended in the other
+direction either: every second of slack is a second of the inert-host band the next sub-head
+discloses, so a larger number would buy margin nothing has needed and widen the one hole the edge
+closes. The two overshoots are PINNED — read from `<git-dir>/gate-run/` on node `a`, 2026-09-10 —
+and so are the two spawn costs, read from the backlog row cited.
+
+The four cases then settle themselves. The first three rows are PINNED from the live window on node
+`a`, 2026-09-10; the fourth is CONSTRUCTED, because this node's ceilings are live and it has no such
+row to show.
+
+| row | rc | seconds | ceiling | window | admitted | why |
+|---|---|---|---|---|---|---|
+| `memory-hygiene self-test` | 124 | 900.240 | 900 | 900–935 | yes | inside: the bound expired, so the seconds bound the work |
+| `unattended kit gate` | 137 | 4168.392 | 16040 | 16040–16075 | no | below: killed at a quarter of its bound, so no bound expired |
+| `govkit selftest` | 1 | 1177.363 | 11750 | 11750–11785 | no | below: the leg stopped itself well inside its bound |
+| constructed: any leg on a host with inert ceilings | any | 2000.0 | 900 | 900–935 | no | above: no bound of 900 s could have produced that duration |
 
 The rc=137 row is refused by the elapsed comparison alone, without trusting or distrusting the
-signal, which is the answer this unit wants: a 137 row at or above its ceiling would be admitted on
-exactly the same terms as a 124 one, because on those terms it is the same observation.
+signal, which is the answer this unit wants: a 137 row inside its window would be admitted on exactly
+the same terms as a 124 one, because on those terms it is the same observation. The fourth row is
+refused for the same kind of reason and in the same currency: not because 137 or 1 is a suspicious
+code, but because no bound the manifest declares could have stopped a run there.
 
 ### What the rule cannot tell apart, stated in the docstring
 
@@ -157,7 +211,26 @@ would support one — the pool width and neighbour count `TOOL-aSurfacedLexicon-
 the `.leg` row, and adding them is that row's own candidate. And the escape already exists and is the
 right shape: `--write --reset <leg>` lowers a row and, by the file's own header, records that
 somebody chose it. The docstring says all of this where the predicate is, so a reader who meets a
-surprising row is told what it does and does not mean.
+surprising row is told what it does and does not mean, and is told what to DO about it. S4 requires
+all three statements and AC7 reads them.
+
+**Two further states the rule cannot tell apart from a real kill, named because neither is exotic.**
+The first is `CEILINGS_LIVE=0`, described above: on such a host every leg runs unbounded, so a leg
+that fails on its own anywhere between its ceiling and 35 s above it is admitted as though a bound
+had stopped it. The upper edge BOUNDS that state rather than removing it, and the surviving 35 s band
+is the residual, disclosed here rather than left for a reader to discover. What it can cost is
+stated rather than waved at: a row admitted through the band holds a monotone floor at most 35 s
+above the ceiling, which is the hazard §5 risks already names, at a bounded size, with the same
+`--reset` escape and no other.
+The second is a ceiling edited after a row was recorded: the comparison uses today's manifest number
+against a historical run, so a ceiling lowered from 5400 to 900 would, with an open-ended `>=`,
+retroactively admit every failing row between the two, and with the window admits only rows within
+35 s of the new number.
+
+Neither state is legible in the row itself. `runleg` writes name, status, rc, seconds, started, ended
+and key at `run-gates.sh:1425-1428` and no bound field, and the `$WORK/<i>.bound` file that holds the
+bound is scratch and never reaches `<git-dir>/gate-run/`. What IS retained is the run-level regime,
+and §4 Alternatives rejected records where it lives and why this unit does not read it.
 
 ### Why this is not the inference that was withdrawn
 
@@ -228,6 +301,21 @@ suppressed, and no red is manufactured on a number nobody is allowed to move.
   at three seconds under a nine-hundred-second bound.
 - **Store a censored flag in a sixth evidence column.** A stored fact that a two-file comparison can
   derive is a fact that can go stale, and it changes a tracked format for nothing.
+- **Record the bound in an eighth `.leg` field and compare against the bound that actually fired.**
+  This is the structurally correct fix and it is rejected deliberately, not overlooked. It changes
+  what the runner records, which §3 forbids; it edits `tools/run-gates/run-gates.sh`, the file a
+  concurrent sibling unit is editing; and it answers nothing for the rows already sitting in the
+  retained window, which is where AC5 makes its live observation. The window costs one comparison,
+  needs no new file and covers both breaking states today. A later unit that wants the field reopens
+  that non-goal on its own terms rather than having this one work around it.
+- **Read `leg_ceilings` from the run's own `header` instead of bounding the window.**
+  `run-gates.sh:1315` writes `leg_ceilings live|inert` into `<git-dir>/gate-run/<runid>/header`, the
+  sibling of the `.leg` files `read_runs` already globs, so the regime IS retained and reading it
+  would change nothing about what the runner records either. Rejected on two counts. It covers ONE
+  of the two breaking states and says nothing at all about a ceiling edited after the fact. And a
+  retained run directory written before that key existed carries no `leg_ceilings`, which forces a
+  choice between discarding real evidence and reinstating the defect, with no third answer. Recorded
+  rather than discarded: it is the discriminator to reach for if the 35 s band ever proves too wide.
 - **Fail on an unbacked ceiling as part of this unit.** A separate policy change with its own blast
   radius, and it is §8 F1 rather than a silent rider here.
 - **Write the arms against the installed kit.** `--write` writes to the script's own directory, so a
@@ -236,7 +324,7 @@ suppressed, and no red is manufactured on a number nobody is allowed to move.
 ## 5. Production-readiness checklist
 
 - security — N/A. No new input, no new write path; the copied fixture writes only under `mktemp -d`.
-- perf / scale — one dict lookup and one float comparison per `.leg` row, over a window of five
+- perf / scale — one dict lookup and two float comparisons per `.leg` row, over a window of five
   retained runs. The `leg ceilings clear their evidenced maximum` leg ran 0.579 s on 2026-09-10 and
   is unaffected, since `cmd_check` reads no run files.
 - error / empty / loading states — a leg with no integer ceiling, an unparseable seconds field and an
@@ -246,7 +334,13 @@ suppressed, and no red is manufactured on a number nobody is allowed to move.
 - risks — a contended or hung reading admitted once holds a monotone floor under that ceiling.
   Mitigated by `--reset`, which exists and records the choice, and named in `read_runs`'s docstring
   rather than discovered by the next reader. That docstring is the whole of the mitigation, so AC7
-  observes it; before rev-2 no criterion read it and the mitigation could have shipped absent.
+  observes all three of its statements, the `--write --reset <leg>` escape included, because the
+  escape is the half a reader ACTS on; before rev-2 no criterion read the docstring at all, and
+  before rev-3 AC7 read the rule and the three causes while leaving the escape free to ship absent.
+  A second risk arrives with the window itself: on a host whose ceilings are inert, a leg that fails
+  on its own inside the 35 s band above its ceiling is still admitted. Bounded rather than removed,
+  disclosed in §4, and the discriminator that would remove it is recorded in §4 Alternatives
+  rejected rather than left to be rediscovered.
 - testing — one fixture arm per criterion AC1, AC2, AC3, AC6 and AC7, each with its break staged RED
   before landing, plus one live-tree observation. The gate had no self-test of any kind before this
   unit. The suite is `chunk: selftests` and no boundary runs it; §7 says what that costs.
@@ -258,14 +352,21 @@ suppressed, and no red is manufactured on a number nobody is allowed to move.
 ## 6. Acceptance criteria
 
 - **AC1** — When the copied `tools/run-gates/derive-ceilings.py --report` runs over a fixture
-  `gate-run` holding one `fail` row at its leg's declared ceiling and one `fail` row below it, the
-  report prints a table row for the first leg and names only the second on its UNBACKED line.
-  Red when: both are admitted, which is the ceiling comparison dropped, or neither is, which is the
-  change absent.
-- **AC2** — When that same fixture gives one leg an `ok` row below its ceiling and a `fail` row above
-  it, the reported `max_s` for that leg is the failing row's seconds.
+  `gate-run` holding three `fail` rows on three legs — one AT its leg's declared ceiling, one BELOW
+  it, and one at FOUR TIMES it — the report prints a table row for the first leg only and names the
+  other two on its UNBACKED line.
+  Red when: the row below the ceiling is admitted, which is the ceiling comparison dropped; or the
+  row at four times the ceiling is admitted, which is the upper edge dropped and is the unbounded-run
+  case §4 names; or none of the three is admitted, which is the change absent.
+  The four-times row is the reason this criterion has three legs rather than two. It gates the CLASS
+  the `[ceiling, ceiling + 35]` window refuses, not the 900.240 s instance the unit was written from,
+  and an implementation that spells the predicate `secs >= ceiling` passes every other criterion here
+  while failing this one.
+- **AC2** — When that same fixture gives the ceiling-reaching leg an `ok` row below its ceiling as
+  well, the reported `max_s` for that leg is the failing row's seconds and not the `ok` one's.
   Red when: the maximum is the `ok` reading, so admission happened but never reached the number the
-  gate consumes.
+  gate consumes. The failing row is the one AT the ceiling, inside the window, because a row above
+  the window is excluded by AC1 and would make this criterion assert the opposite of that one.
 - **AC3** — When the copied `derive-ceilings.py --check` runs against a fixture evidence file whose
   row for a leg is at or above that leg's ceiling, it exits 1 and its line for that leg says the
   ceiling was REACHED in a recorded run.
@@ -291,28 +392,41 @@ suppressed, and no red is manufactured on a number nobody is allowed to move.
   legs to the same manifest and an empty UNBACKED set is not this unit's to deliver.
   fixture: the retained `<git-dir>/gate-run/` window must hold a reading at that leg's ceiling. It
   held two on 2026-09-10, at 900.481 s and 900.240 s. The runner prunes that window, and an ORDINARY
-  bar cannot refill it: `memory-hygiene self-test` is `chunk: selftests` with `subject: kit`, so
-  `run-gates.sh` holds it and writes no run row for it at all. A later session restores the reading
-  only with `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, and pays that leg's own 900 s bound
-  to do it.
+  bar cannot refill it, because TWO separate passes stop that leg and one flag lifts only one of
+  them. `memory-hygiene self-test` is `chunk: selftests` with `subject: kit`, which the hold pass
+  refuses unless `GATE_SELFTESTS=1`; it ALSO carries `guard: ["tools/lib/", "tools/memory-tree/"]`,
+  and the guard pass runs on the very next lines whatever the hold did. `changed()` short-circuits
+  on `GATE_FULL` or an unresolvable BASE and never on `GATE_SELFTESTS`, so a diff touching neither
+  guarded path still writes `skip` — announced as `GATE skip  <leg>  (unchanged vs <branch>)`, and
+  this unit touches only `tools/run-gates/`. A later session restores the reading only with
+  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, and pays that leg's own 900 s
+  bound to do it. A direct `bash tools/memory-tree/check-memory-hygiene.test.sh` does not work
+  either: only `run-gates.sh` writes `gate-run/*.leg` rows, so the suite would run and record
+  nothing this criterion reads.
   figure: DERIVED — the printed maximum is whatever the window holds. The two readings above are
   PINNED as what it held on 2026-09-10, node `a`.
 - **AC6** — When the copied `tools/run-gates/derive-ceilings.py --write` runs over the same fixture
   AC1 builds, the evidence file it writes carries a row for the ceiling-reaching leg whose seconds
-  are that failing row's, and carries no row for the leg whose only failing row sits below its
-  ceiling.
-  Red when: the ceiling-reaching leg gets no row, or gets one carrying the `ok` reading instead.
+  are that failing row's, and no row for either of the other two — the leg below its ceiling or the
+  leg at four times it.
+  Red when: the ceiling-reaching leg gets no row, or gets one carrying the `ok` reading instead, or
+  either excluded leg gets a row at all.
   That is the defaulted-parameter case named in §4: `read_runs` gains the ceilings map with a
   default, `cmd_report` passes it, `cmd_write` never does, and the write path keeps its `ok`-only
   behaviour with AC1 through AC5 all green.
   fixture: the arm runs against a COPY of the kit, so `--write` cannot reach the tracked
   `tools/run-gates/ceiling-evidence.txt`. §4 Alternatives records why every arm does this.
 - **AC7** — When the arm reads `read_runs`'s docstring out of the copied
-  `tools/run-gates/derive-ceilings.py`, that docstring states the ceiling comparison as the admission
-  rule, and names slow, contended and hung as the three causes it cannot tell apart.
-  Red when: the docstring still describes an `ok`-only filter, or states the rule while omitting what
-  it cannot distinguish. §5 risks makes that second sentence the entire mitigation of the
-  monotone-floor hazard, so without this criterion it can ship absent with every other one green.
+  `tools/run-gates/derive-ceilings.py`, that docstring states the bounded-window comparison as the
+  admission rule, names slow, contended and hung as the three causes it cannot tell apart, and names
+  `--write --reset <leg>` as the way to lower a row admitted from one of them. The arm asserts the
+  substrings `ceiling`, `slow`, `contended`, `hung` and `--reset`, named here so the witness grades
+  content rather than a builder's choice of `grep`.
+  Red when: the docstring still describes an `ok`-only filter; or states the rule while omitting what
+  it cannot distinguish; or states both while omitting the escape, which is the half a reader ACTS
+  on. §5 risks makes that escape the entire mitigation of the monotone-floor hazard, so without this
+  clause it can ship absent with every other criterion green — which is verbatim the argument that
+  minted AC7 at rev-2, applied one clause over.
 
 ## 7. Gates
 
@@ -328,9 +442,11 @@ predicate therefore has ZERO boundary-enforced coverage: a green bar must not be
 and the compensating check is the direct invocation AC4 names.
 
 New arm: `tools/run-gates/run-gates.evidence.test.sh` · AC1 and AC2 stage RED by restoring the bare
-`ok`-only predicate in `read_runs`, AC3 stages RED by restoring the headroom sentence in `cmd_check`,
-AC6 stages RED by dropping the added `read_legs` call from `cmd_write`, AC7 stages RED by cutting the
-rule out of `read_runs`'s docstring, and each is confirmed red before being unstaged · the suite's
+`ok`-only predicate in `read_runs`, AC1's four-times-the-ceiling assertion stages RED separately by
+reopening the window at the top to `secs >= ceiling`, AC3 stages RED by restoring the headroom
+sentence in `cmd_check`, AC6 stages RED by dropping the added `read_legs` call from `cmd_write`, AC7
+stages RED twice, once by cutting the rule out of `read_runs`'s docstring and once by cutting only
+its `--reset` clause, and each is confirmed red before being unstaged · the suite's
 `FLOOR_ASSERTIONS` constant moves by one per assertion, read from the suite at the time of the change
 rather than pinned here.
 
@@ -392,6 +508,41 @@ to take is the shape M3 refuses. Re-asked by whoever answers the parked ceiling 
   alone, correctly, because it was scoped to one file and the sibling was being edited
   concurrently. The mirror is written as a real dependency rather than as bookkeeping: this
   unit's admission rule reads the `.leg` SECONDS field that unit 3's reporting change touches.
+  That last sentence is FALSE and rev-3 D2 below is its correction; it stands here as history.
+
+- rev-3 · 2026-09-10 · §2 §3 §4 §5 §6 §7 S1 S4 AC1 AC5 AC7 · folded round-2 spec-audit defects D1,
+  D2, D3 and D5.
+  D1 (BLOCKER) — the admission rule read `seconds >= ceiling` as proof that a bound expired, and
+  `run-gates.sh:1393` sets `bound=0` and runs every leg unbounded when the `CEILINGS_LIVE` probe
+  fails, while the `.leg` row records no bound field. A leg that ran unbounded and failed on its own
+  was therefore admitted as evidence into a MONOTONE file, which is the failure-duration-as-floor
+  case the `ok`-only filter existed to prevent. The comparison becomes a closed window,
+  `[ceiling, ceiling + 35]`: 5 s is the `-k` escalation read from `run-gates.sh:1395`, 30 s is this
+  author's teardown allowance and §4 defends the number against the 0.481 s worst overshoot on
+  record and `TOOL-aMeteredTurnstile-6`'s spawn measurements. Both breaking states — an inert-ceiling
+  host and a ceiling edited after a row was recorded — are named in *What the rule cannot tell
+  apart*, with the residual 35 s band disclosed rather than claimed away, and AC1 grows a third
+  fixture leg at four times its ceiling so the upper edge is observed and not merely written. The
+  eighth-`.leg`-field fix is REJECTED deliberately in §4 Alternatives rather than worked around, and
+  the run `header`'s retained `leg_ceilings` key is recorded there as the discriminator to reach for
+  if the band proves too wide.
+  D2 — the `consumes-from` bullet for `TOOL-aLeakedHandle-3` stated a mechanism that source and all
+  three specs refute: `runleg` produces the SECONDS field and `report_one` writes no `.leg` row on
+  any path. The edge stays, because unit 3 declares the matching hands-off and check 12's
+  reciprocity arm reds without it; its body now says what is true, that it acknowledges an assertion
+  and carries no data dependency and no landing order. The rev-2 orchestrator note recorded the
+  invented mechanism and is left standing as history rather than rewritten, marked false in place.
+  D3 — AC5's fixture line named `GATE_SELFTESTS=1` where the hold and the guard are two separate
+  passes and `changed()` short-circuits on `GATE_FULL` only, so the named invocation would have
+  produced an announced skip and no reading. AC5 and the §3 Edges bullet now name
+  `GATE_FULL=1 GATE_SELFTESTS=1`, say which flag lifts which pass, and record that a direct
+  `bash tools/memory-tree/check-memory-hygiene.test.sh` writes no `.leg` row either. AC4's
+  `GATE_SELFTESTS=1` is deliberately UNCHANGED — `run-gates evidence` guards on `tools/`, which this
+  unit's own diff makes dirty.
+  D5 — S4 and AC7 required the docstring's rule and its three causes but not the
+  `--write --reset <leg>` escape, which §5 risks calls the whole of the mitigation, so the half a
+  reader acts on could ship absent with every criterion green. S4, AC7 and the §5 risks row now
+  carry it, and AC7 names the substrings its arm asserts.
 
 ## 10. Reuse audit
 

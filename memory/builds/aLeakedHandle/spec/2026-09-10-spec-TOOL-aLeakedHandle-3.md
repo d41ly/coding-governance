@@ -1,6 +1,6 @@
 # TOOL-aLeakedHandle-3 — a killed leg reports the seconds it ran, not the ceiling it did not reach
 
-**Status:** SPECCED · rev-1 · 2026-09-10 · node a · Tier-1 · base 013b1af9 · streams tooling
+**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-1 · base 013b1af9 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -92,8 +92,19 @@ carry are one value in one file, and this unit adds a third reader rather than a
 The write order is what makes the read safe. `runleg` writes `.sec` before it writes `.rc`, and
 `report_one` reaches the failing branch only for a leg whose `.rc` holds a numeric code, which only
 `runleg` writes. A leg decided by a guard, a reuse or an on-demand hold never enters `runleg` and
-never reaches this branch. The wall-watcher path is safe for the same reason: `run_leg_reap` kills
-the leg's own process and leaves the `runleg` subshell to finish, so `.sec` is written there too.
+never reaches this branch.
+
+The whole-run wall guard is safe for a DIFFERENT reason, and rev-1 of this paragraph stated the
+mechanism backwards. `runleg` writes its own `$BASHPID` to `$WORK/<i>.pid` at `run-gates.sh:1367`,
+the watcher hands that pid to `run_leg_reap`, and `scan_descendants` seeds its result set with the
+root pid itself at `run-gates.sh:429` — so `remove_descendants` SIGKILLs the `runleg` subshell along
+with its children. A wall-killed leg writes neither `.sec` nor `.rc`, and `report_one` returns at its
+`[ ! -f "$WORK/$i.rc" ]` guard at `run-gates.sh:1449` with `(no result)`, before any tail is built.
+The read this unit adds is safe on that path because the rc=137 branch is UNREACHABLE there, not
+because the file is present. `TOOL-aLeakedHandle-1` AC2's third `Red when:` states the same
+mechanism from the ledger side, where the absent `.sec` makes the ledger loop skip the leg and carry
+its previous row forward; the pair agrees once that spec keeps its clause as written. Verified
+against source on 2026-09-10 at base `013b1af9`.
 
 ### The replacement
 
@@ -260,8 +271,10 @@ new killed tail alongside the unchanged 124 tail · no floor change.
 
 - **F1 — should an rc=137 leg that declared NO ceiling also report its seconds?** Today it reports
   `(exit 137)` and states no number, so it is outside the class this unit closes and section 3 cuts
-  it. The case is real: a leg killed by the whole-run wall watcher or by an operator while running
-  unbounded names a bare exit code, and the operator then reads the ledger to learn how long it ran.
+  it. The case is real: a leg killed by an operator or an OOM killer while running unbounded names a
+  bare exit code, and the operator then reads the ledger to learn how long it ran. The whole-run wall
+  guard is NOT one of those cases, for the reason section 4 now gives: it kills the `runleg` subshell,
+  so the leg has no `.rc` and reports `(no result)` with no tail built at all.
   Closing it costs one more branch, `(killed after ${secs}s)` with no ceiling clause, and one more
   assertion. Against it: this unit's mandate is the wrong number, not the missing one, and every
   line added to `report_one` is a line the tail contract has to keep true. Recommendation: leave it
@@ -278,6 +291,16 @@ mandate is the wrong one. The row keeps it findable if a leg ever ships unbounde
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft.
+- rev-2 · 2026-09-10 · §4 · §8 F1 · folded the round-2 spec audit's D6, the one defect that round
+  assigns to this unit. §4's claim that `run_leg_reap` kills only the leg's own process and lets the
+  `runleg` subshell finish is FALSE and is replaced by the mechanism the source shows: the `.pid`
+  file holds the subshell's own `$BASHPID` (`run-gates.sh:1367`), `scan_descendants` seeds its result
+  with that root pid (`run-gates.sh:429`), so the subshell is SIGKILLed, no `.sec` and no `.rc` are
+  written, and `report_one` returns `(no result)` at `run-gates.sh:1449` before any tail is built.
+  The conclusion is unchanged — the new `.sec` read is safe on the wall path — but the reason is now
+  that the rc=137 branch is unreachable there rather than that the file exists. F1's description
+  carried the same false premise in one clause and is corrected with it; the fork's RESOLVED mark and
+  its decision are untouched.
 
 ## 10. Reuse audit
 

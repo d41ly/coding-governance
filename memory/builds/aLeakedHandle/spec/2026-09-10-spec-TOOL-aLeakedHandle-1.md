@@ -1,6 +1,6 @@
 # TOOL-aLeakedHandle-1 — the pipe whose write end nobody closed, and the gate for its class
 
-**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md](../build/2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md) | research | TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 |
 | [2026-09-10-prompt-TOOL-aLeakedHandle-1-0-run-mandate.md](../prompts/2026-09-10-prompt-TOOL-aLeakedHandle-1-0-run-mandate.md) | journal | — |
+| [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md) | spec-audit | TOOL-aLeakedHandle-2 |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md) | spec-audit | TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 |
 
 <!-- /gen:spec-records -->
@@ -41,6 +42,36 @@ occurrence of a class this repo has recorded twice is also the last one found by
   because it currently states that the kit ships no leg of its own. A leg NAME is a `gate-legs`
   inventory key, so the same step claims both new names in the codebase map and re-renders the
   generated map artifacts in that commit. Observed by AC7, AC8 and AC10.
+  Both rows declare all four fields the manifest requires; a row is otherwise unbuildable, because
+  `run-gates.gov.test.sh:260` reds a row whose `ceiling` is absent or is not a positive integer, and
+  `govkit.py`'s 7h reds a leg no descriptor claims. Every one of the 104 rows in the manifest carries
+  `name`, `argv`, `chunk`, `subject` and `ceiling`, and 61 of them carry `guard`; of the 51 rows in
+  `chunk: selftests`, 45 declare `subject: kit` and 47 carry a `guard`. Those five figures are
+  PINNED, read out of `tools/gate-legs.json` on 2026-09-10 at base `013b1af9`.
+  - `shell hygiene (a loop fed by a command substitution)`, the tree scan — `chunk: product`,
+    `subject: repo`, NO guard, `ceiling: 300`. All eleven `chunk: product` rows are repo-wide source
+    scans and every one of them carries no guard, `line length` and
+    `install-prefix (shipped surface)` included — PINNED, counted on 2026-09-10 at base `013b1af9`.
+    This leg grades every tracked `*.sh`, so no subset of paths bounds it and a guard could only make
+    it skip the file that just broke. `subject: repo` because a failure of this leg is a statement
+    about THIS repository's shell tree, not about the kit that ships the scanner.
+  - `shell-hygiene selftest`, the `--selftest` arm — `chunk: selftests`, `subject: kit`,
+    `guard: ["tools/gate-lint/"]`, `ceiling: 300`. That is the majority shape among the self-test
+    rows counted above, and it puts this leg under the 2026-08-23 kit-self-test hold deliberately: a
+    suite that stages breaks into a copy of a scanner has a job only when that scanner's source
+    changes. The guard names the kit dir the scanner lives in, so the leg runs when the thing it
+    grades moves and skips when it has not.
+  - Both ceilings are 300, which is the value every fast leg in the manifest carries and which clears
+    `ceiling-margin.txt`'s declared headroom of `max(120s, 1.0 x max)` for a scan measured in
+    seconds. Neither row is added to `tools/run-gates/ceiling-evidence.txt`: a leg with no evidence
+    row is REPORTED by `derive-ceilings.py --check` and is not a failure, verified by reading that
+    function on 2026-09-10.
+  - The held row takes a `tools/run-gates/selftest-budgets.txt` row and the unheld one does not.
+    `run-selftests.sh --check` demands a budget row for every leg whose `subject` is `kit` OR whose
+    `chunk` is `selftests`, which is the self-test row alone.
+  - `tools/gate-lint/kit.toml` gains a `[[gate_leg]]` block per row, each naming the same `subject`
+    the manifest declares. `govkit.py`'s 7h compares the two spellings in both directions and reds a
+    descriptor that disagrees with the manifest about which side of the bar a leg sits on.
 - **S6** — `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` gains a gating clause naming this
   leg and the construct its predicate actually matches. The record's existing sentence that nothing
   sweeps other kits for the `out=$(timeout` form STAYS, because this leg does not scan for that form.
@@ -55,7 +86,11 @@ occurrence of a class this repo has recorded twice is also the last one found by
   profile from fixing the one that deadlocked.
 - The `done < <(…)` process-substitution form is NOT banned. It is counted and reported by the scan
   and is out of the failing population; see §8 fork A.
-- No ceiling is declared, raised or re-derived. `unattended kit gate` keeps the ceiling it has.
+- No EXISTING ceiling is raised, lowered or re-derived. `unattended kit gate` keeps the 16040 s it
+  has, and `derive-ceilings.py` is not re-run. The non-goal is scoped to the ceilings that exist at
+  the base sha, because a leg row that declares no ceiling is refused by
+  `run-gates.gov.test.sh:260`: the two rows S5 mints each declare one of their own, and S5 states
+  both numbers.
 - The leg's own timeout and kill REPORTING is untouched.
 - The performance shape `TOOL-aQuenchedHarness-7` landed is preserved, not revisited. The subject and
   the sha still come out of one walk.
@@ -255,7 +290,9 @@ about to remove; landing the fix first leaves the class ungated for the length o
 | `tools/gate-lint/kit.toml` | the `[check]` declaration and the `gate-lint-leg-wiring` hole |
 | `memory/project/substitution-fed-loops.txt` | new, 19 rows |
 | `.memory-tree.conf` | `PROJECT_REGISTRY_EXTRA` gains the filename |
-| `tools/gate-legs.json` | two rows |
+| `tools/gate-legs.json` | two rows, each declaring `chunk`, `subject`, guard-or-none and `ceiling` |
+| `tools/run-gates/selftest-budgets.txt` | one row, for the held self-test leg only |
+| `tools/govkit/subject-pins.tsv` | regenerated, because a new leg reds `govkit selfcheck` unpinned |
 | `memory/map/features/gate-lint.md` | new, the dossier claiming both new leg names and the `gate-lint` kit key |
 | `memory/map/baseline.toml` | the `gate-lint` row under `kits` is deleted |
 | `memory/map/generated/MAP.md` | re-rendered |
@@ -286,9 +323,9 @@ about to remove; landing the fix first leaves the class ungated for the length o
 
 - security — N/A. No new write path, no untrusted input, no egress. The scan reads tracked source and
   writes only its own registry under `--write`.
-- perf / scale — the scan is a single pass over 105 tracked `*.sh` and costs milliseconds; a ceiling
-  is declared with its leg row. The fix trades one subshell fork for one `mktemp` spawn per
-  (anchor, unit) pair.
+- perf / scale — the scan is a single pass over 105 tracked `*.sh` and costs milliseconds; each new
+  leg row declares its own ceiling of 300 s, which S5 states and defends. The fix trades one subshell
+  fork for one `mktemp` spawn per (anchor, unit) pair.
 - error / empty / loading states — an empty scan population is a REFUSAL, not a pass, because a scan
   that graded nothing reports the same zero as a clean tree. An unreadable registry is a refusal. A
   `mktemp` failure in the fix is the named refusal S2 specifies.
@@ -298,9 +335,13 @@ about to remove; landing the fix first leaves the class ungated for the length o
 - risks — each with its remedy, and the first of them is the one the round-1 spec audit caught
   missing. `codebase-map coverage + freshness` reds on both new leg names as unclaimed inventory
   keys; it carries no guard, so it runs on every bar, and the remedy is the dossier §4 specifies
-  rather than a regen. `every held leg is budgeted, every budget row resolves` refuses
-  a new leg with no budget row, so the two rows are added with the leg. `harness arms (fail branches
-  armed or pinned)` grades the new file's refusal branches, which may want an `ARMS_FLOORS` row.
+  rather than a regen. `every held leg is budgeted, every budget row resolves` refuses a HELD leg
+  with no budget row, and S5 declares exactly one of the two rows held, so one budget row is added
+  with it. `govkit selfcheck` reds a new leg until `tools/govkit/subject-pins.tsv` carries a row for
+  it, so both names are pinned in the same commit with
+  `python tools/govkit/govkit.py selfcheck --write`; that file is GENERATED and is regenerated
+  rather than hand-edited. `harness arms (fail branches armed or pinned)` grades the new file's
+  refusal branches, which may want an `ARMS_FLOORS` row.
   `install-prefix (shipped surface)` grades tool-root and kit files for carried kit-path literals;
   the registry lives under `memory/project/` partly for that reason, and `tools/dead-path-waivers.txt`
   is the precedent for a registry that names kit paths and passes today.
@@ -327,6 +368,20 @@ about to remove; landing the fix first leaves the class ungated for the length o
   fixture: a tree carrying dispatch rows for that leg to walk; this worktree has one.
   figure: DERIVED — the seconds and the status are read from the ledger at observation time. The
   4168 s and the ceiling of 16040 are PINNED at 2026-09-10 on base `013b1af9`.
+  THE THIRD `Red when:` CLAUSE CONTRADICTS `TOOL-aLeakedHandle-3` §4, and this side is the one that
+  matches source. That spec's *The value to print* paragraph says `run_leg_reap` kills the leg's own
+  process and leaves the `runleg` subshell to finish, so `.sec` is written there too. It is not:
+  `runleg` writes its own `$BASHPID` to `$WORK/<i>.pid` at `run-gates.sh:1367`, the wall watcher
+  feeds that pid to `run_leg_reap` at `run-gates.sh:1604`, and `scan_descendants` seeds its kill set
+  with the pid it was given at `run-gates.sh:429`. The subshell dies before `run-gates.sh:1409`
+  writes `.sec`, the ledger loop's `[ -f "$WORK/$i.sec" ] || continue` at `run-gates.sh:1673` skips
+  it, and the awk carry-forward at `run-gates.sh:1690` preserves the previous run's row — which is
+  the whole reason this clause exists, because a stale `fail` row surviving a killed run is how an
+  observer records a green from a row the run did not produce. Verified against source on
+  2026-09-10 at base `013b1af9`. Unit 3's CONCLUSION survives: `report_one` returns early when `.rc`
+  is absent, so its rc=137 branch is unreachable on the wall path and its new `.sec` read is safe —
+  safe because the branch is unreachable, not because the file exists. Reconcile the pair before
+  either lands; nothing in this unit changes either way.
   ONE INVOCATION, deliberately. A direct `bash tools/unattended/check-unattended.sh` run emits the
   verdict and nothing else: that script contains no reference to a ledger, and every row of
   `<git-dir>/gate-ledger.tsv` is written by the one block in `tools/run-gates/run-gates.sh` that owns
@@ -349,6 +404,11 @@ about to remove; landing the fix first leaves the class ungated for the length o
   and not the second, printing its executed assertion count.
   Red when: an arm is stranded past an early exit and the count falls, or the selftest passes on a
   fixture whose failing case was never built.
+  Run it directly, as the `--selftest` arm of `sh_hygiene.py` under `tools/gate-lint/`, rather than
+  through the bar. The leg S5 wraps it in is `chunk: selftests` and `subject: kit`, so no push
+  boundary and no default bar executes it; AC8 is the criterion that observes it as a LEG, and it
+  pays a flagged bar to do so. The path is cited by basename because `check-spec-tokens.py` joins
+  §6's backticked path tokens against `git ls-files`, and this file does not exist yet.
 - **AC6** — When a row in `substitution-fed-loops.txt` is edited to name a delimiter that no longer
   appears in its file, the leg REFUSES and names that row; and when a row is written with a line
   number in its key, the leg refuses it as malformed.
@@ -372,6 +432,13 @@ about to remove; landing the fix first leaves the class ungated for the length o
   `bash tools/run-gates/run-gates.sh` shows the untracked-path arm as a row and never runs it. That
   matters here rather than in the abstract: `run-gates gov canary`'s own guard names
   `tools/gate-legs.json`, which S5 edits.
+  ONE FLAG IS ENOUGH HERE AND IS NOT ENOUGH IN GENERAL. `GATE_SELFTESTS=1` lifts the HOLD; a leg's
+  `guard` is a separate pass that only `GATE_FULL=1` or an unresolvable BASE short-circuits. This
+  criterion needs no `GATE_FULL=1` because every guard involved is dirty on this unit's own diff:
+  `run-gates gov canary` guards on `tools/gate-legs.json`, `shell-hygiene selftest` guards on
+  `tools/gate-lint/`, `run-gates canary` guards on `tools/`, and S5 edits all three. A later session
+  re-running this observation on a tree where those paths are clean gets an announced skip rather
+  than a reading, and needs `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`.
 - **AC9** — When `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` is re-read, its gating
   section carries a NEW clause naming this leg and the construct its predicate matches, which is a
   `while` loop fed by a heredoc or here-string whose body holds a command substitution; the section
@@ -417,6 +484,14 @@ are named anyway because `run-gates gov canary`'s guard names `tools/gate-legs.j
 and because the canaries hold the arm that refuses a guard naming an untracked path, which is exactly
 the mistake a new leg row can make. Run them by hand for this unit; AC8 names the invocation. Every
 other leg on that line runs on an ordinary bar with no flag.
+
+**Of the two legs S5 mints, an ordinary bar runs the tree scan and holds the self-test.**
+`shell hygiene (a loop fed by a command substitution)` is `chunk: product`, `subject: repo` and
+carries no guard, so every bar runs it, diff-scoped ones included — which is the point, since the
+construct it refuses can arrive in any tracked `*.sh`. `shell-hygiene selftest` is `chunk: selftests`
+and `subject: kit`, so the runner holds it unless `GATE_SELFTESTS=1` is set, and no boundary sets
+that. AC5 is therefore observed by running the file directly and AC8 by the flagged bar; neither
+observation is bought by a push.
 
 New arm: tools/gate-lint/sh_hygiene.py --selftest · a fixture shell file carrying one loop fed by a command substitution and one fed by a plain heredoc, asserting the scan names the first and not the second · none
 
@@ -480,6 +555,21 @@ than carrying a per-file count of its own.
   came out of the same row rather than being re-measured.
   D10: AC2 is one invocation. `check-unattended.sh` writes no ledger row and applies no ceiling, so
   the criterion now rides the bar run that produces both halves.
+- rev-3 · 2026-09-10 · §2 S5 · §3 · §4 · §5 · §6 AC2 · AC5 · AC8 · §7 · folded the round-2 spec
+  audit's D4 and D6, the two mediums it assigns to this unit.
+  D4: S5 declares `chunk`, `subject`, guard-or-none-with-its-reason and `ceiling` for each of the two
+  new manifest rows, plus the budget row and the descriptor `[[gate_leg]]` blocks those values imply.
+  The tree scan is `product`/`repo`/unguarded/300 and the self-test is `selftests`/`kit`/guarded on
+  `tools/gate-lint/`/300. §3's ceiling non-goal is scoped to EXISTING ceilings, which removes its
+  contradiction with §5 perf/scale; §5 risks now says the budget rule reaches the HELD row only and
+  names the `subject-pins.tsv` regeneration a new leg owes; the files table gains that pin file and
+  the budget file; §7 says which of the two an ordinary bar runs. AC5 and AC8 disclose the hold and
+  the guard separately, because `GATE_SELFTESTS=1` lifts only the first.
+  D6: AC2 is unchanged and now carries a pointer that its third `Red when:` clause contradicts
+  `TOOL-aLeakedHandle-3` §4, with the five source lines that decide it. The wall guard kills the
+  `runleg` subshell, so a wall-killed leg writes no `.sec` and the ledger carries its previous row
+  forward. Unit 3's conclusion holds for a different reason than the one it writes down, and that
+  repair is unit 3's to make.
 
 ## 10. Reuse audit
 
