@@ -73,11 +73,11 @@ ids TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3
 | [TOOL-aLeakedHandle-3 — a killed leg reports the seconds it ran, not the ceiling it did not reach](spec/2026-09-10-spec-TOOL-aLeakedHandle-3.md) | — | 1 | SPECCED | rev-1 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 3 record folder(s).
+Records: 3 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

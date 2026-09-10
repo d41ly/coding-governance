@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: eff1b6b15081355897038b3df3b9497d94f4b069
-phase: RUNNING
+witness: 1e9252e63b36f0f009e12f1bc36e219388b941c5
+phase: REVIEWING
 branch-sha: eff1b6b15081355897038b3df3b9497d94f4b069
 branch-ref: refs/heads/branch/full-bar-test-results-935278
 mode: prompt
@@ -22,3 +22,9 @@ anchor-ref: refs/heads/main
 base: eff1b6b15081355897038b3df3b9497d94f4b069
 
 ## Parked
+
+2026-09-10T07:57:39Z review · item TOOL-aLeakedHandle-1 · reason verdict BLOCKED · blockers 1
+
+2026-09-10T07:57:44Z review · item TOOL-aLeakedHandle-2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-10T07:57:49Z review · item TOOL-aLeakedHandle-3 · reason verdict CLEAN · blockers 0 · CONVERGED
