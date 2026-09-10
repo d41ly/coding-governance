@@ -42,3 +42,7 @@ base: eff1b6b15081355897038b3df3b9497d94f4b069
 2026-09-10T09:27:35Z dispatch · item 7269fda9 TOOL-aLeakedHandle-1 · reason memory/gotchas/INDEX.md
 
 2026-09-10T10:08:07Z dispatch · item 7269fda9 TOOL-aLeakedHandle-1 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-09-10T10:33:59Z dispatch · item 0aa54c96 TOOL-aLeakedHandle-1 · reason .unattended.conf
+
+2026-09-10T10:34:25Z dispatch · item 0aa54c96 TOOL-aLeakedHandle-1 · reason memory/guides/SESSION-KICKOFF.md memory/builds/aLeakedHandle/spec memory/builds/aLeakedHandle/build memory/builds/aLeakedHandle/README.md memory/LIVE.md memory/ledger/2026-09.md tools/gate-lint/sh_hygiene.py

@@ -1,6 +1,6 @@
 # TOOL-aLeakedHandle-1 — the pipe whose write end nobody closed, and the gate for its class
 
-**Status:** CLOSED · rev-4 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -78,6 +78,9 @@ occurrence of a class this repo has recorded twice is also the last one found by
   leg and the construct its predicate actually matches. The record's existing sentence that nothing
   sweeps other kits for the `out=$(timeout` form STAYS, because this leg does not scan for that form.
   Observed by AC9.
+- **S7** — `.unattended.conf`'s `SHARED_RECORDS` gains `memory/project/readme-contract.txt`. An
+  ADDED scope item, per the build method's AMEND rule: building uncovered it and speccing could
+  not have. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -473,6 +476,23 @@ about to remove; landing the fix first leaves the class ungated for the length o
   on an ordinary bar: `codebase-map coverage + freshness` is `chunk: declarations` and carries no
   guard, so nothing about this one is held.
 
+- **AC11** — When `bash tools/unattended/check-pass-order.sh` and
+  `bash tools/unattended/check-brief-recorded.sh` run over the tree with this unit CLOSED and its
+  build commit landed, both exit 0 and neither names `TOOL-aLeakedHandle-1`; the corpus-wide
+  populations are unchanged at 150 closed units graded by the first, and both rows in
+  `memory/project/pass-order-waiver.txt` still resolve rather than reporting as stale.
+  Red when: the exclusion is widened far enough to change another unit's selected build commit,
+  which shows up as a moved graded-unit count or a waiver row that has gone stale — the shape a
+  blanket cutoff move would have.
+  figure: DERIVED — both legs print their own populations. 150 is PINNED at 2026-09-10.
+  WHY THIS IS AN AMENDMENT AND NOT A FIX TO THIS UNIT'S OWN CODE. Neither leg is about
+  `pass_commit` or the scan. They went red the moment this unit's status header read CLOSED,
+  because that is when a unit becomes graded, and the commit they misread is this build's SPEC
+  commit — which appended the README-contract row a new build folder owes. History is append-only
+  and that commit cannot be re-shaped, so the choice was between a declared exemption and naming
+  the file what it is. `pass-order history` has a waiver registry and `brief-recorded`
+  deliberately has none, so an exemption could only have closed half of it.
+
 ## 7. Gates
 
 `unattended kit gate` · `pass-order history` · `brief-recorded` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `govkit selfcheck` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `every held leg is budgeted, every budget row resolves` · `testsuite counts (every bar self-test prints one)` · `install-prefix (shipped surface)` · `line length` · `codebase-map coverage + freshness` · `run-gates canary` · `run-gates gov canary`
@@ -596,6 +616,19 @@ than carrying a per-file count of its own.
   passed on the broken shape.
   AC5's basename note is retired: the file is staged by this unit's own commit, so the full path
   resolves against `git ls-files` and the token join is satisfied.
+
+- rev-5 · 2026-09-10 · §2 S7 · §6 AC11 · the build pass, one AMEND the method's own rule covers.
+  `.unattended.conf`'s `SHARED_RECORDS` gains `memory/project/readme-contract.txt`. Both
+  commit-reading legs in §7 went RED the moment this unit's header read CLOSED, and neither was
+  about this unit's code: `build_commit` excludes the build folder, the generated indexes and the
+  declared shared records from selection, this file is in none of them, and a new build folder is
+  OBLIGED to append its README row to it — so this build's spec commit carried one path outside
+  the build folder and both legs read the SPEC commit as the build commit.
+  It is an ADD rather than a waiver because the file IS a shared mutable record by condition 3's
+  own definition, and because only one of the two legs has a waiver registry at all — the other
+  says in its own source that an exemption is not coverage. Measured over the whole corpus before
+  and after: same 150 closed units graded, both existing waiver rows still resolve, no other
+  verdict moved. AC11 is the observation.
 
 ## 10. Reuse audit
 
