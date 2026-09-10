@@ -782,6 +782,39 @@ if [ -n "$dc_before" ] && [ -n "$dc_after" ] \
 else
   nope "--write --reset left the row at '$dc_after' — the documented escape from an admitted killed reading is inert for the whole retention window"
 fi
+# THE ARM THAT ACTUALLY GRADES THE ESCAPE, and the one the arm above cannot be (TOOL-aLeakedHandle-1
+# D1). A reset that lowers the row for exactly ONE invocation satisfies every assertion up to here:
+# the second revision of this escape filtered the killed reading per-process and left it sitting in
+# the retention window, so the next ordinary `--write` re-admitted it, `max(vals)` handed the cleared
+# value back, and the summary said `1 raised`. 100.0 -> 20.0 -> 100.0, all three greens. What
+# separates a discard from a filter is therefore what the row READS one ordinary write later, and
+# nothing shorter than that write can ask it.
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+dc_later=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+if [ -n "$dc_later" ] \
+   && awk -v a="$dc_after" -v b="$dc_later" 'BEGIN{exit !(a != "" && b+0 == a+0)}'; then
+  ok "the reset value ($dc_after) SURVIVES the next ordinary --write, with the run that produced the killed reading still retained"
+else
+  nope "an ordinary --write put the row back to '$dc_later' from the same retained killed reading — the reset lasted one invocation, not the retention window"
+fi
+# THE SUMMARY LINE IS GRADED TOO, because it is the only feedback `--write` gives and it was
+# reporting the opposite of what happened (D4). A reset re-deriving the value already stored was
+# forced out of the monotone hold by its own `name not in reset` clause and counted as a RAISE.
+# TWO RESETS BACK TO BACK, deliberately: the equal-value case is only reachable on the SECOND, and
+# re-running the reset is exactly the gesture an operator makes when the first appeared not to
+# stick. Graded on the COUNTER against the row's own movement, not on the row alone — the row is
+# unchanged either way, which is what made this invisible.
+"$DC_PY" "$DC_SCRIPT" --write --reset at-ceiling >/dev/null 2>&1
+dc_noop_pre=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+dc_noop=$("$DC_PY" "$DC_SCRIPT" --write --reset at-ceiling 2>&1)
+dc_noop_row=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+dc_raised=$(printf '%s\n' "$dc_noop" | grep -o '[0-9]* raised' | head -1 | cut -d' ' -f1)
+if awk -v r="$dc_noop_row" -v p="$dc_noop_pre" 'BEGIN{exit !(r != "" && p != "" && r+0 == p+0)}' \
+   && [ "$dc_raised" = 0 ]; then
+  ok "a repeated reset re-derives the identical value ($dc_noop_pre -> $dc_noop_row) and reports no movement (raised=$dc_raised)"
+else
+  nope "a repeated reset left the row at '$dc_noop_row' from '$dc_noop_pre' and printed '$dc_raised raised' — a count of work nobody did, in the only line --write prints"
+fi
 
 # AND WHEN NOTHING SURVIVES THE RESET, THE ROW GOES. `kill-overhead` has only the killed reading, so
 # a reset leaves it nothing to re-derive from. Carrying the previous row forward there would hand
@@ -799,6 +832,48 @@ awk -F'\t' '$1=="kill-overhead"{f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
 awk -F'\t' '$1=="at-ceiling"{f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
   && ok "control: the untouched leg kept its row on that same write, so the drop above is a verdict and not an emptied file" \
   || nope "no row survived that write at all — the drop arm above proves nothing"
+# THE DROP HAS THE IDENTICAL LIFETIME QUESTION, so it gets the identical arm. A dropped row whose
+# killed reading is still retained comes straight back on the next ordinary write, at the value the
+# operator cleared, and the absence asserted above would have been true for one invocation only.
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+dc_ko_later=$(awk -F'\t' '$1=="kill-overhead"{print $2}' "$DC_EV" 2>/dev/null)
+[ -z "$dc_ko_later" ] \
+  && ok "the dropped row STAYS dropped across the next ordinary --write, rather than being re-derived from the killed reading it was cleared of" \
+  || nope "an ordinary --write re-derived kill-overhead at '$dc_ko_later' from the reading the reset discarded — the drop lasted one invocation"
+
+# --- THE RESET LEG IS THE ONLY LEG WITH A READING (TOOL-aLeakedHandle-1 D3) ------------------------
+# The state the DEAD-PROBE return was preempting: `cmd_write` asked "what survives the reset" and
+# printed the answer to "was anything measured at all", so a reset naming the only leg with a
+# retained reading exited 2 saying nothing was measured — of readings it had just excluded itself —
+# and the stale row it was asked to clear survived. Reachable without contrivance: GATE_LEGS
+# produces a one-leg bar, guards scope a run to a handful, and resetting every leg that currently
+# has a retained reading is the plain case. The fixture above cannot see it, because `at-ceiling`
+# keeps an `ok` row there and `runs` is never empty.
+printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\n' > "$DC_T/.git/gate-run/r1/1.leg"
+"$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
+dc_lonely_pre=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+awk -v a="$dc_lonely_pre" 'BEGIN{exit !(a != "" && a+0 >= 100)}' \
+  && ok "control: the sole-reading leg holds a ceiling-reaching row ($dc_lonely_pre) before the reset, so the arm below has something to clear" \
+  || nope "the sole-reading leg reads '$dc_lonely_pre' before the reset — the arm below would grade an absence"
+dc_lonely=$("$DC_PY" "$DC_SCRIPT" --write --reset at-ceiling 2>&1); dc_lonely_rc=$?
+dc_lonely_row=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+if [ "$dc_lonely_rc" = 0 ] && [ -z "$dc_lonely_row" ] \
+   && ! printf '%s\n' "$dc_lonely" | grep -q 'DEAD PROBE'; then
+  ok "resetting the only leg with a reading runs the drop path: exit 0, the row gone, and no DEAD PROBE misdiagnosis"
+else
+  nope "resetting the only leg with a reading exited $dc_lonely_rc leaving the row at '$dc_lonely_row' — the liveness return fired above the drop path it was supposed to let through"
+  printf '%s\n' "$dc_lonely" | sed 's/^/      /'
+fi
+# THE LIVENESS CONTROL FOR THAT SPLIT. Asking the emptiness question without the reset filter must
+# not stop it being asked: with the run record genuinely empty, DEAD PROBE still fires, or the arm
+# above is satisfied by a check that was deleted rather than moved.
+rm -f "$DC_T/.git/gate-run/r1/1.leg"
+dc_dead=$("$DC_PY" "$DC_SCRIPT" --write 2>&1); dc_dead_rc=$?
+if [ "$dc_dead_rc" = 2 ] && printf '%s\n' "$dc_dead" | grep -q 'DEAD PROBE'; then
+  ok "control: with no retained reading at all, --write still exits 2 with DEAD PROBE"
+else
+  nope "control: an empty run record no longer reports DEAD PROBE (rc=$dc_dead_rc) — the liveness assertion was removed, not relocated"
+fi
 
 # --- the docstring is the only written statement of any of this ------------------------------------
 # §5 rests the whole mitigation of the monotone-floor hazard on it, so it is OBSERVED rather than

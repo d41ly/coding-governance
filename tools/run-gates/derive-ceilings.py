@@ -151,16 +151,23 @@ def read_runs(gd: pathlib.Path, legs: dict, reset) -> dict:
     floor under that ceiling until somebody lowers it, and lowering one is `--write --reset <leg>`,
     which exists for exactly this and records that somebody chose it.
 
-    `reset` IS THAT ESCAPE, AND IT ACTS HERE RATHER THAN ON THE MONOTONE HOLD ALONE. A named leg
-    admits its `ok` readings ONLY, so the reset re-derives from the runs where the leg finished and
-    the killed reading stops counting. Bypassing the hold and nothing else made `--reset` INERT for
-    the whole `GATE_RUN_KEEP` window — `max(vals)` was re-derived from the same retained rows and
-    the identical value went straight back — which is precisely the window an operator reaches for
-    it in, since the offending run is what put the row there. A named leg with no `ok` reading at
-    all yields nothing here and `cmd_write` then DROPS its row rather than carrying the old one
-    forward: an escape that silently restored the value it was asked to clear would be worse than
-    one that does nothing, because it looks like it worked. `reset` is REQUIRED rather than
-    defaulted, for the reason `legs` is.
+    `reset` IS THAT ESCAPE, AND WHAT IT DOES HERE IS THE PREVIEW OF IT, NOT THE DISCARD. A named
+    leg admits its `ok` readings ONLY, so the reset re-derives from the runs where the leg finished
+    and the killed reading stops counting. THAT FILTER LASTS ONE INVOCATION, which is the whole of
+    what `--report --reset` needs and is NOT enough on the write path. Two revisions of this escape
+    were inert in two different ways: bypassing the monotone hold alone re-derived the identical
+    value from the same retained rows, and adding this filter beside it moved the inertness one
+    step later rather than removing it — the next plain `--write` re-admitted those same rows,
+    `max(vals)` handed the cleared value straight back, and the summary line called it `1 raised`.
+    Measured on a fixture: 100.0 -> 20.0 -> 100.0. So `cmd_write` takes those rows OUT of the
+    retained run files as well (`remove_reset_rows`), and the discard outlives the process that
+    chose it — which is the only version of this escape an operator can reach for inside the
+    `GATE_RUN_KEEP` window, and that window is the only one they ever reach for it in, since the
+    offending run is what put the row there. A named leg with no `ok` reading at all yields nothing
+    here and `cmd_write` then DROPS its row rather than carrying the old one forward: an escape
+    that silently restored the value it was asked to clear would be worse than one that does
+    nothing, because it looks like it worked. `reset` is REQUIRED rather than defaulted, for the
+    reason `legs` is.
     """
     per: dict[str, list[float]] = {}
     reset = set(reset or ())
@@ -188,6 +195,63 @@ def read_runs(gd: pathlib.Path, legs: dict, reset) -> dict:
                 secs = min(secs, float(ceiling))
             per.setdefault(p[0], []).append(secs)
     return per
+
+
+def remove_reset_rows(gd: pathlib.Path, reset) -> int:
+    """Take the reset legs' non-`ok` rows OUT of the retained run files. Returns rows removed.
+
+    THIS IS WHAT MAKES `--reset` STICK, and without it the escape is inert one `--write` later.
+    `read_runs`'s filter is per-invocation; the `.leg` file holding the killed reading stays in the
+    `GATE_RUN_KEEP` window, so the very next ordinary `--write` re-admits it and the monotone
+    maximum restores the floor the operator just cleared. Deleting the row is what "somebody chose
+    it" has to mean: these files are UNTRACKED, per-worktree, node-local scratch — the same
+    property the module docstring gives as the reason a gate may not read them — and a discard that
+    expires with the process is not a discard.
+
+    ROWS, NOT FILES, and only the ones the reset names: `run-gates.sh` writes one row per file, but
+    a file may carry several (a fixture does), and a reset leg's `ok` readings are exactly what the
+    escape re-derives from. A file left with nothing is removed, since an empty `.leg` is a row
+    nobody wrote. Every retained run but one is read by nothing except this module.
+
+    THE ONE IT DOES NOT EXEMPT IS THE RUN IN FLIGHT, and that is a choice rather than an oversight.
+    `run-gates.sh` re-reads its OWN `<RUNDIR>/<i>.leg` at ledger time, so a reset racing a live bar
+    can take a row out from under it and leave that leg recorded as `ok` with no reuse key. The
+    obvious guard — skip the directory `gate-run/current` names — is worse than the race: `current`
+    survives the run that wrote it, so the exemption would fall on the most RECENTLY finished run,
+    which is precisely the run whose killed reading an operator is resetting, and the escape would
+    be inert again for the only case it exists for. The race needs two deliberate concurrent
+    gestures on one worktree; the exemption would break the single one.
+
+    A row that cannot be rewritten is NOT counted. The count is the operator's only evidence that
+    the scratch record actually moved, and one that included a failed `unlink` would be the same
+    could-not-fail shape as the summary line this fold is repairing.
+    """
+    reset = set(reset or ())
+    if not reset:
+        return 0
+    gone = 0
+    for f in glob.glob(str(gd / "gate-run" / "*" / "*.leg")):
+        p = pathlib.Path(f)
+        try:
+            lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
+        except OSError:
+            continue
+        # THE SAME PARSE `read_runs` USES, deliberately: a row this module would not read is a row
+        # it has no business deleting, so a short or malformed line survives a reset untouched.
+        keep = [ln for ln in lines
+                if not (len(ln.split("\t")) >= 4
+                        and ln.split("\t")[0] in reset and ln.split("\t")[1] != "ok")]
+        if len(keep) == len(lines):
+            continue
+        try:
+            if keep:
+                p.write_text("\n".join(keep) + "\n", encoding="utf-8", newline="\n")
+            else:
+                p.unlink()
+        except OSError:
+            continue
+        gone += len(lines) - len(keep)
+    return gone
 
 
 def read_evidence() -> dict:
@@ -261,19 +325,30 @@ def cmd_write(root, gd, args) -> int:
 
     `gate-run` retains a handful of runs, so a pruned or quiet window would otherwise LOWER an
     evidenced maximum and, with it, the floor the gate holds every ceiling above. Lowering takes
-    `--reset <leg>`, which records that somebody chose it.
+    `--reset <leg>`, which records that somebody chose it — and, here, MAKES it stick by removing
+    the discarded readings from the retained run files rather than filtering them for one process.
     """
     reset = set(args.reset or ())
+    legs = read_legs(root)
+    # THE LIVENESS QUESTION IS ASKED WITHOUT THE RESET FILTER, and the two are different questions.
+    # "Is there any reading at all" is what DEAD PROBE answers; "what survives the reset" is what
+    # the write consumes. Asking the second and printing the first misdiagnosed the one state this
+    # verb exists for: a reset naming the only leg with a reading emptied the map, and the early
+    # return fired forty lines above the drop path documented below, so the run exited 2 saying
+    # nothing was measured — of readings it had just excluded itself — and the stale row survived.
+    live = read_runs(gd, legs, ())
+    if not live:
+        print("derive-ceilings: DEAD PROBE — no readings to write.", file=sys.stderr)
+        return 2
+    # THE DISCARD IS PERSISTED BEFORE THE READ, so nothing downstream can re-admit it. `read_runs`
+    # is still passed `reset` below: it is the belt for a row this call could not rewrite, and it
+    # is what `--report --reset` previews with.
+    removed = remove_reset_rows(gd, reset)
     # THE CEILINGS ARE READ HERE TOO, and this call is the whole of a criterion. `read_runs`'s
     # admission rule compares against them, and this is the only path that produces the tracked
     # artifact — a write path still holding an `ok`-only filter is invisible to `--check`, which
-    # reads no run file at all. `reset` goes the same way and for the same reason: bypassing the
-    # monotone hold below cannot lower anything while the run that produced the reading is still
-    # retained, because `max(vals)` is re-derived from it.
-    runs = read_runs(gd, read_legs(root), reset)
-    if not runs:
-        print("derive-ceilings: DEAD PROBE — no readings to write.", file=sys.stderr)
-        return 2
+    # reads no run file at all.
+    runs = read_runs(gd, legs, reset) if reset else live
     have = read_evidence()
     node = os.environ.get("GOV_NODE") or "a"
     date = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs"],
@@ -287,10 +362,19 @@ def cmd_write(root, gd, args) -> int:
             held += 1
         else:
             rows[name] = (mx, len(vals), node, date)
+            # TALLIED ON MOVEMENT, never on which branch got here. A reset leg whose re-derived
+            # maximum EQUALS the stored one lands in this branch because `name not in reset` forced
+            # it out of the hold, and the old `elif prev` then reported `1 raised` for a row that
+            # did not move — work nobody did, printed in the only line `--write` gives an operator,
+            # and printed in answer to the gesture they make when the first reset appeared not to
+            # stick. Equal is `held`: the value is the previous maximum, whatever the row's other
+            # fields were refreshed to.
             if prev and mx < prev[0]:
                 lowered += 1
-            elif prev:
+            elif prev and mx > prev[0]:
                 raised += 1
+            elif prev:
+                held += 1
     dropped = 0
     for name, prev in have.items():                     # rows this run measured nothing for
         # A RESET LEG IS NOT CARRIED FORWARD. Reaching here with one means every reading it had was
@@ -312,7 +396,9 @@ def cmd_write(root, gd, args) -> int:
         "#",
         "# MONOTONE. A row only ever rises. `gate-run` retains a handful of runs, so a quiet window",
         "# would otherwise lower the evidenced maximum and with it the floor every ceiling is held",
-        "# above. `--reset <leg>` lowers one, and that is a decision somebody made.",
+        "# above. `--write --reset <leg>` lowers one by DELETING that leg's killed readings from the",
+        "# untracked run record, so no later write can hand the value back — which is what a",
+        "# decision somebody made has to mean here.",
         "#",
         "# <leg>\t<max seconds>\t<readings>\t<node>\t<date>",
     ]
@@ -320,8 +406,13 @@ def cmd_write(root, gd, args) -> int:
         mx, n, nd, dt = rows[name]
         lines.append(f"{name}\t{mx:.1f}\t{n}\t{nd}\t{dt}")
     EVIDENCE.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    # `removed` IS THE LIVENESS HALF OF THIS LINE. `lowered` and `dropped` say the artifact moved;
+    # only this says the scratch reading that would have restored it is gone, which is the property
+    # the escape is actually asked for. A reset printing `1 lowered` over a run record it failed to
+    # touch is the one report this fold exists to make impossible.
     print(f"derive-ceilings: wrote {len(rows)} row(s) to {EVIDENCE.name} "
           f"({raised} raised, {lowered} lowered by --reset, {dropped} dropped by --reset, "
+          f"{removed} killed reading(s) removed by --reset, "
           f"{held} held at a previous maximum)")
     return 0
 
@@ -391,7 +482,9 @@ def main() -> int:
     ap.add_argument("--reset", action="append", metavar="LEG",
                     help="re-derive this leg from its `ok` readings alone, so a killed reading "
                          "stops holding a floor under its ceiling; with --write it also lifts the "
-                         "monotone hold, and drops the row entirely when no `ok` reading remains")
+                         "monotone hold, DELETES those killed readings from the untracked run "
+                         "record so a later write cannot restore them, and drops the row entirely "
+                         "when no `ok` reading remains")
     args = ap.parse_args()
     root = resolve_repo_root()
     gd = resolve_git_dir(root)
