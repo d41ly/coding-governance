@@ -58,6 +58,14 @@ the shard split is unit 1 of the three.
 **The baseline is RED and is the oracle.** Equivalence is the `FAIL` line set plus the executed
 assertion count — NOT a per-arm inventory, because the helpers are silent on a pass.
 
+**OWNER RULINGS, 2026-09-10, answering the parked scope question.** (1) The route is the SHARED
+RUNNER: `tools/run-gates/run-selftests.sh` gets a slash-tolerant row checker and DECLARED execution
+modes, so pooled is available and **serial stays possible when it is deliberately declared**. That
+ruling resolves the tension this build parked on — `OUTER=1` exists so racing suites do not charge
+each other's contention to the wrong budget, and a declared mode carries that contract explicitly
+instead of implying it. (2) The batching units are BUILT, after the shard route, not retired.
+(3) Everything on this branch lands.
+
 ## Parked decisions
 
 None yet.
