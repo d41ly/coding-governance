@@ -4,7 +4,6 @@ node: a
 opened: 2026-09-10
 streams: tooling
 roster: TOOL
-status: OPEN
 authorized-by: prompt
 ids: TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3
 ---
@@ -13,24 +12,17 @@ ids: TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3
 
 ## The problem this build exists to solve
 
-A `GATE_FULL=1 GATE_SELFTESTS=1` bar on node `a` on 2026-09-10 returned RED at 2 of 104 legs. Neither
-red is new, and the reason nobody has closed either is that the evidence needed to diagnose them is
-destroyed by the machinery that reports them.
+A `GATE_FULL=1 GATE_SELFTESTS=1` bar on node `a`, 2026-09-10, returned RED at 2 of 104 legs.
+Neither red is new. The root-cause trace under `build/` carries the evidence; this slot states
+the shape only.
 
-**`unattended kit gate` deadlocked, and the runner called it a timeout.** Traced live from `/proc`
-before the kill: the leg's bash reads fd 3 from a process-substitution pipe, and its subshell holds
-BOTH ends of a second pipe on fd 3 and fd 4 with no descendant left alive. EOF can never arrive. This
-is `memory/gotchas/bounded-through-a-pipe-is-unbounded.md`, a class this repo has already recorded
-twice and never gated.
+`unattended kit gate` deadlocked on a pipe whose write end nobody closed, and burned 4168 s
+before an operator killed it. `memory-hygiene self-test` hit its 900 s ceiling while the gate
+that exists to catch an unsafe ceiling passed green, because a leg that never passes acquires
+no evidence row at all.
 
-**`memory-hygiene self-test` hit its 900 s ceiling, and the gate that should have caught the unsafe
-ceiling is green by absence.** `tools/run-gates/derive-ceilings.py` counts only `ok` rows, so a leg
-that has never passed inside the retained window acquires no evidence row at all. 37 of 104 legs have
-one. `memory-hygiene self-test` has none, so its ceiling is held above nothing.
-
-**And the runner prints a leg's ceiling where its elapsed time belongs.** `run-gates.sh:1480` renders
-rc=137 as `timed out after ${fired}s, killed`. The kill at 4168 s was reported as 16040 s. The ledger
-holds the true figure, so the summary and the ledger disagree by a factor of four.
+And the runner printed a declared ceiling where the elapsed time belongs, so one red was
+reported at four times its real cost.
 
 ## Expected improvements
 
@@ -70,23 +62,32 @@ holds the true figure, so the summary and the ledger disagree by a factor of fou
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-10 · streams tooling
+**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-09-10 · streams tooling
 ids TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aLeakedHandle-1 — the pipe whose write end nobody closed, and the gate for its class](spec/2026-09-10-spec-TOOL-aLeakedHandle-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-10 |
+| [TOOL-aLeakedHandle-2 — a run that reached a leg's ceiling is evidence, not a discarded failure](spec/2026-09-10-spec-TOOL-aLeakedHandle-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-10 |
+| [TOOL-aLeakedHandle-3 — a killed leg reports the seconds it ran, not the ceiling it did not reach](spec/2026-09-10-spec-TOOL-aLeakedHandle-3.md) | — | 1 | SPECCED | rev-1 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aLeakedHandle-1` | no |
+| 2 | `TOOL-aLeakedHandle-2` | no |
+
+Unordered: `TOOL-aLeakedHandle-3`.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
