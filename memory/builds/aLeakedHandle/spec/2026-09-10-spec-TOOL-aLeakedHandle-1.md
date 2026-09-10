@@ -1,13 +1,15 @@
 # TOOL-aLeakedHandle-1 — the pipe whose write end nobody closed, and the gate for its class
 
-**Status:** SPECCED · rev-3 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md](../build/2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md) | research | TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 |
+| [2026-09-10-build-TOOL-aLeakedHandle-1-2-acceptance-ledger.md](../build/2026-09-10-build-TOOL-aLeakedHandle-1-2-acceptance-ledger.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aLeakedHandle-1-0-run-mandate.md](../prompts/2026-09-10-prompt-TOOL-aLeakedHandle-1-0-run-mandate.md) | journal | — |
+| [2026-09-10-prompt-TOOL-aLeakedHandle-1-1-build-brief.md](../prompts/2026-09-10-prompt-TOOL-aLeakedHandle-1-1-build-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md) | spec-audit | TOOL-aLeakedHandle-2 |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md) | spec-audit | TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 |
 
@@ -254,10 +256,10 @@ run time and prints them.
 |---|---|---|---|
 | Loop fed by a heredoc holding a command substitution | 19 | 6 | yes |
 | Loop fed by a here-string holding a command substitution | 1 | 1 | yes |
-| Loop fed by a heredoc with NO command substitution | 29 | 17 | no |
-| Non-loop heredoc holding a command substitution | 2 | 2 | no |
+| Loop fed by a heredoc with NO command substitution | 29 | 13 | no |
+| Non-loop heredoc holding a command substitution | 3 | 2 | no |
 | Non-loop here-string holding a command substitution | 21 | 3 | no |
-| Loop fed by a process substitution, `done < <(…)` | 21 | 10 | no, counted and reported |
+| Loop fed by a process substitution, `done < <(…)` | 27 | 10 | no, counted and reported |
 
 The twenty in the failing population sit in seven files: `check-microformats.sh` (1),
 `check-verdict-epoch.sh` (2), `check-unattended.sh` (8), `lib-unattended.sh` (1), `unattended.sh` (6),
@@ -266,7 +268,7 @@ The twenty in the failing population sit in seven files: `check-microformats.sh`
 
 The near-miss rows matter as much as the hit rows. The 29 loop-heredocs with no substitution are the
 false-positive class: their bodies are a plain `$var` expansion, they fork nothing, and a predicate
-that redded them would red seventeen innocent files. The 21 non-loop here-strings are assertion
+that redded them would red thirteen innocent files. The 21 non-loop here-strings are assertion
 helpers in test files, where the substitution's output is an argument and not a stream. Running the
 candidate predicate over the real tree before wiring it is what separated those four populations, and
 it is why the ban is written against the loop-feeding forms alone.
@@ -329,7 +331,8 @@ about to remove; landing the fix first leaves the class ungated for the length o
 - error / empty / loading states — an empty scan population is a REFUSAL, not a pass, because a scan
   that graded nothing reports the same zero as a clean tree. An unreadable registry is a refusal. A
   `mktemp` failure in the fix is the named refusal S2 specifies.
-- observability — the scan prints its four measured populations on every run, green included, so the
+- observability — the scan prints EVERY measured population on every run — the six rows of §4's
+  population table, in that order — green included, so the
   reported-not-gated process-substitution count is never mistaken for coverage. The leg header states
   what it does NOT check.
 - risks — each with its remedy, and the first of them is the one the round-1 spec audit caught
@@ -357,8 +360,12 @@ about to remove; landing the fix first leaves the class ungated for the length o
   over a range whose first qualifying commit is not the last, and checks the printed sha, the function
   prints that sha and returns 0; and when `TMPDIR` is set to a path that cannot be created, the same
   call prints the refusal on stderr and returns 2.
-  Red when: the fix puts the loop behind a pipe, so `return 0` exits a subshell, the function falls
-  through and prints nothing.
+  Red when: the fix puts the loop behind a pipe, so `return 0` exits the SUBSHELL rather than the
+  function, execution falls through to the trailing `return 1`, and the function answers "this
+  pass has not committed" for a pass that has. OBSERVED at rev-4 on a staged copy: `rc=1` with
+  the correct sha still on stdout, because stdout is shared with the pipeline's subshell. An arm
+  asserting only the printed value is satisfied by the broken shape; the return code is the half
+  that moves.
 - **AC2** — When `bash tools/run-gates/run-gates.sh` runs on node `a` with the fix in place, the row
   for `unattended kit gate` in `<git-dir>/gate-ledger.tsv` reads status `ok` with a seconds figure
   below that leg's declared ceiling of 16040.
@@ -394,21 +401,22 @@ about to remove; landing the fix first leaves the class ungated for the length o
   Red when: the fix leaves the substitution in place and the site is carried in the registry instead.
 - **AC4** — When the scan runs over the tree at the base sha with the fix applied, it reports 19 sites
   in 6 files as its failing population, and names none of the 29 substitution-free loop heredocs, the
-  2 non-loop heredocs, the 21 non-loop here-strings or the 21 process-substitution loops.
+  3 non-loop heredocs, the 21 non-loop here-strings or the 27 process-substitution loops.
   Red when: the predicate names a loop heredoc whose body holds no command substitution, which is the
-  false-positive class and the one that would red seventeen innocent files.
+  false-positive class and the one that would red thirteen innocent files.
   figure: DERIVED — the scan prints every count; the six figures above are PINNED at 2026-09-10 on
-  base `013b1af9`.
+  base `013b1af9`, and three of the NEAR-MISS figures moved at rev-4 when the shipped predicate
+  re-measured them. No figure in the failing population moved.
 - **AC5** — When the scan runs with `--selftest`, it builds a fixture holding one loop fed by a
   command substitution and one fed by a plain heredoc, and asserts that the predicate names the first
   and not the second, printing its executed assertion count.
   Red when: an arm is stranded past an early exit and the count falls, or the selftest passes on a
   fixture whose failing case was never built.
-  Run it directly, as the `--selftest` arm of `sh_hygiene.py` under `tools/gate-lint/`, rather than
+  Run it directly, as the `--selftest` arm of `tools/gate-lint/sh_hygiene.py`, rather than
   through the bar. The leg S5 wraps it in is `chunk: selftests` and `subject: kit`, so no push
   boundary and no default bar executes it; AC8 is the criterion that observes it as a LEG, and it
-  pays a flagged bar to do so. The path is cited by basename because `check-spec-tokens.py` joins
-  §6's backticked path tokens against `git ls-files`, and this file does not exist yet.
+  pays a flagged bar to do so. The full path resolves because `check-spec-tokens.py` joins §6's
+  backticked path tokens against `git ls-files`, and the unit's own commit stages that file.
 - **AC6** — When a row in `substitution-fed-loops.txt` is edited to name a delimiter that no longer
   appears in its file, the leg REFUSES and names that row; and when a row is written with a line
   number in its key, the leg refuses it as malformed.
@@ -570,6 +578,24 @@ than carrying a per-file count of its own.
   `runleg` subshell, so a wall-killed leg writes no `.sec` and the ledger carries its previous row
   forward. Unit 3's conclusion holds for a different reason than the one it writes down, and that
   repair is unit 3's to make.
+
+- rev-4 · 2026-09-10 · §4 · §5 · §6 AC1 · AC4 · AC5 · the build pass, correcting four figures the
+  shipped predicate re-measured and one failure mode a staged control disproved.
+  §4's population table and AC4: the three NEAR-MISS counts moved — 29 substitution-free loop
+  heredocs sit in 13 files and not 17, the non-loop heredocs holding a substitution are 3 and not
+  2, and the process-substitution loops are 27 and not 21. Nothing in the FAILING population
+  moved: 19 heredoc sites in 6 files plus 1 here-string at the base sha, 19 sites in 6 files with
+  the fix applied, and the seven-file split §3 names is exact. The corrected figures are what
+  `tools/gate-lint/sh_hygiene.py` prints, so prose and source now agree and the source is the one
+  that cannot go stale.
+  §5 observability: the scan prints SIX populations, which is §4's table, not four.
+  AC1's `Red when:` was wrong about the failure it describes, and the control that proves it was
+  run rather than reasoned. A copy of the library with the loop behind a pipe returns 1 and STILL
+  PRINTS the sha, because the pipeline's subshell shares stdout — so the criterion as written
+  ("prints nothing") named a symptom the defect does not have, and an arm built to it would have
+  passed on the broken shape.
+  AC5's basename note is retired: the file is staged by this unit's own commit, so the full path
+  resolves against `git ls-files` and the token join is satisfied.
 
 ## 10. Reuse audit
 

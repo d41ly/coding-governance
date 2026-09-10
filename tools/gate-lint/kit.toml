@@ -16,17 +16,38 @@ argv = []
 mutates_index = false
 why_no_adopter = "the kit ships no adopter. Its README carries no copy or install instruction either, and the runbook's claim that the README hands leg wiring to the consuming project is not borne out by the README — recorded as a gap rather than papered over."
 
-[[hole]]
-id = "gate-lint-leg-wiring"
-kind = "authoring"
-blocks_adopt = false
-blocks_gate = false
-why = "the kit declares no legs of its own and no document says which lints a target should wire. Nothing in a target observes this, which is why it is declared as a hole rather than left as silence."
-discharge = { command = ["bash", "-c", "exit 1"] }
-
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
 # reason, because one string for "nothing was measured" and "measured and broken" is not a verdict.
+#
+# THE HOLE `gate-lint-leg-wiring` IS GONE, discharged rather than deleted. It declared that this kit
+# shipped no leg of its own and that nothing in a target observed it, and it carried
+# `discharge = { command = ["bash", "-c", "exit 1"] }` — undischargeable by construction, which is
+# how a permanent gap gets recorded honestly. The two `[[gate_leg]]` blocks below are what closes
+# it: the kit now declares legs, and a target that copies it receives them. TOOL-aLeakedHandle-1.
+#
+# What has NOT changed is the adopter. There is still none, still no rendered artifact, and so still
+# nothing for `check` to measure — a gate leg is run by the merge bar, not by this verb.
 none = """
-the kit ships no adopter, no rendered artifact and no leg of its own — there is nothing to measure, which is also why its only hole is declared undischargeable by construction
+the kit ships no adopter and no rendered artifact, so there is nothing for this verb to run; its two gate legs are declared below and are executed by the bar rather than by `check`
 """
+
+# The tree scan. `subject = "repo"` because a failure of this leg is a statement about the graded
+# repository's shell tree and not about the kit that ships the scanner, and NO guard, because it
+# grades every tracked `*.sh`: no subset of paths bounds it, and a guard could only make it skip the
+# file that just broke.
+[[gate_leg]]
+name = "shell hygiene (a loop fed by a command substitution)"
+subject = "repo"
+argv = ["python3", "{kit}/sh_hygiene.py", "{memory_root}/project/substitution-fed-loops.txt"]
+guard = []
+
+# The self-test arm. `subject = "kit"` puts it under the 2026-08-23 kit-self-test hold deliberately:
+# a suite that stages breaks into a copy of a scanner has a job only when that scanner's source
+# changes, and none at all in an adopter's repo that copy-installs the kit and never edits it. The
+# guard names the kit dir the scanner lives in, so it runs when the thing it grades moves.
+[[gate_leg]]
+name = "shell-hygiene selftest"
+subject = "kit"
+argv = ["python3", "{kit}/sh_hygiene.py", "--selftest"]
+guard = ["{kit}/"]

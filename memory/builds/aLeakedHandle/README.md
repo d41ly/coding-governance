@@ -55,7 +55,7 @@ reported at four times its real cost.
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aLeakedHandle-1` | MISSING | the pipe whose write end the subshell never closed, and the gate for its class |
+| 1 | `TOOL-aLeakedHandle-1` | CLOSED | the pipe whose write end the subshell never closed, and the gate for its class |
 | 2 | `TOOL-aLeakedHandle-2` | MISSING | a timeout is evidence, so a ceiling stops being held above nothing |
 | 3 | `TOOL-aLeakedHandle-3` | MISSING | a killed leg reports the seconds it ran, not the ceiling it did not reach |
 
@@ -68,12 +68,12 @@ ids TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aLeakedHandle-1 — the pipe whose write end nobody closed, and the gate for its class](spec/2026-09-10-spec-TOOL-aLeakedHandle-1.md) | 1 | 2 | SPECCED | rev-3 | 2026-09-10 |
+| [TOOL-aLeakedHandle-1 — the pipe whose write end nobody closed, and the gate for its class](spec/2026-09-10-spec-TOOL-aLeakedHandle-1.md) | 1 | 2 | CLOSED | rev-4 | 2026-09-10 |
 | [TOOL-aLeakedHandle-2 — a run that reached a leg's ceiling is evidence, not a discarded failure](spec/2026-09-10-spec-TOOL-aLeakedHandle-2.md) | 2 | 2 | SPECCED | rev-3 | 2026-09-10 |
 | [TOOL-aLeakedHandle-3 — a killed leg reports the seconds it ran, not the ceiling it did not reach](spec/2026-09-10-spec-TOOL-aLeakedHandle-3.md) | — | 1 | SPECCED | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 4 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
