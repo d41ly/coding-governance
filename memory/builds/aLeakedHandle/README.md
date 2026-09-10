@@ -73,7 +73,7 @@ ids TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 TOOL-aLeakedHandle-3 TOOL-aLeakedH
 | [TOOL-aLeakedHandle-3 — a killed leg reports the seconds it ran, not the ceiling it did not reach](spec/2026-09-10-spec-TOOL-aLeakedHandle-3.md) | — | 1 | CLOSED | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

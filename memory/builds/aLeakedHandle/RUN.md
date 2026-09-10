@@ -64,3 +64,5 @@ base: eff1b6b15081355897038b3df3b9497d94f4b069
 2026-09-10T12:39:06Z dispatch · item 2489d058 TOOL-aLeakedHandle-3 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/README.md memory/builds/aLeakedHandle/spec memory/builds/aLeakedHandle/build memory/builds/aLeakedHandle/README.md memory/LIVE.md memory/ledger/2026-09.md memory/guides/SESSION-KICKOFF.md
 
 2026-09-10T13:13:19Z review · item aLeakedHandle · reason verdict BLOCKED · blockers 1
+
+2026-09-10T14:16:22Z review · item aLeakedHandle · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · disposition fold

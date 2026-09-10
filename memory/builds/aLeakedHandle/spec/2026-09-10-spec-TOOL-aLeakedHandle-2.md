@@ -9,6 +9,7 @@
 | [2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md](../build/2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md) | research | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-3 |
 | [2026-09-10-build-TOOL-aLeakedHandle-2-1-acceptance-ledger.md](../build/2026-09-10-build-TOOL-aLeakedHandle-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-10-prompt-TOOL-aLeakedHandle-2-1-build-brief.md](../prompts/2026-09-10-prompt-TOOL-aLeakedHandle-2-1-build-brief.md) | journal | — |
+| [2026-09-10-review-TOOL-aLeakedHandle-1-diff-review-round2.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-diff-review-round2.md) | diff-review | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-3 |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-diff-review.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-diff-review.md) | diff-review | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-3 |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit-round2.md) | spec-audit | TOOL-aLeakedHandle-1 |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md) | spec-audit | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-3 |
