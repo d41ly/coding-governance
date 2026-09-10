@@ -80,3 +80,29 @@ sets that. The compensating check is the direct invocation recorded above, run w
 Nothing here measures the rc=137 branch on a host where `timeout` is absent. Both runs above had
 `HAVE_TIMEOUT=1`, so arm 4h-kill executed rather than announcing its skip; the skip message itself
 is unexercised text.
+
+## The bug-class checklist over this commit, and the two it left standing
+
+`python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` selected eleven classes over the
+build commit. Nine are discharged by the work itself and are not re-argued here — the staged break
+was the SHIPPED source rather than a synthetic simplification, the arm was observed RED before
+landing, the liveness half sits inside assertion 2, `awk -F'\t'` does not collapse a run of tabs so
+an empty seconds field still reports as field 2 and reds rather than shifting, and neither the
+`$( )` capture in the arm nor the `cat` in `report_one` can block on a pipe nobody closed. Two are
+left standing deliberately, and standing is not the same as unnoticed:
+
+**`two-answers-to-one-question`, one literal, KEPT.** Assertion 3's failure message says *under a
+declared ceiling of 600* while the fixture five lines above declares `"ceiling": 600`. That is the
+class: change the fixture and the message lies. It is kept because the duplicate lives inside one
+twenty-line arm, in a DIAGNOSTIC string no checker reads, and removing it costs a re-observation of
+the red side — the message is on the branch that only runs when the arm fires, so an edit to it is
+an edit to observed evidence. A three-word improvement priced at a second full 800 s cycle is the
+trade this repo's own cost rule says to refuse. Recorded so it is a decision rather than an
+oversight, and so the next hand knows the pair moves together.
+
+**`fold-text-is-unreviewed-surface`, live and unclosable here.** The source comments, the
+`tools/run-gates/README.md` clause and this record are fresh prose no review round has read, and
+none is available to read them: this spec's audit loop recorded CLEAN at round 1, which check 37
+treats as terminal. The same gap unit 2 recorded, for the same reason, and it is the owner's rather
+than this pass's. What bounds it: no acceptance criterion, scope item or gate in the spec moved, so
+the unreviewed surface is explanation and never contract.
