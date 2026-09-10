@@ -60,8 +60,13 @@ ships an EMPTY registry to that path: copied once, owned by the adopter from the
 install cannot delete rows they declared, and gov's own carried sites do not travel to a tree where
 the scan would report every one of them as gone. Its closing review is the record; the class is
 gated by `govkit selfcheck`'s `gate legs` check, which used to skip any argv element carrying a
-token it could not resolve — most of them — and now resolves every one against a bare target. That
-check derives and prints its own population on each run; read the count there.
+token it could not resolve — most of them — and now offers every entry's argv to one predicate
+against a bare target. Not every element is graded even so: an element carrying an intake token no
+bare target can answer, and one holding no path at all, are both left where they were, to `apply`'s
+own refusal. Its replacement then graded a NARROWER population than it counted — the non-conditional
+entries only, while the count beside it covered the registry — which round 2 caught as D2 and which
+is why that line now states the graded selection against the registry. The check derives and prints
+its own population on each run; read the counts there.
 
 **The scan grades the LOOP-FEEDING forms alone, and that boundary was measured rather than argued.**
 Run over this tree before the ban was wired, the predicate separated four populations that a looser

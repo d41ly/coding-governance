@@ -1846,10 +1846,20 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # the leg passes, or an argv element carrying an UNANSWERED intake token — this fixture answers
     # nothing on purpose, and `silenced_legs` leaves an unresolved element to the sibling refusal at
     # `apply`. It answers one question: does some rule put a file where this leg's argv looks.
+    #
+    # THE POPULATION IS EVERY REGISTRY ENTRY, and the first cut of THIS arm got that wrong in F1's
+    # own direction — round 2, D2. It selected `all_kits(descs)`, which drops every entry marked
+    # `selectable = "conditional"`: 21 of 26 graded while the note beside it counted argv over all
+    # 26, so one output disagreed with itself. A conditional entry is excluded from `--all`, not
+    # from installation — `resolve_selection`'s `kits` mode validates against `descs` — so
+    # `apply --kits check-microformats` installs one and emits its legs, and the five dropped here
+    # carried 9 legs and 20 argv elements ungraded. The count below is therefore summed over the
+    # SELECTION the predicate visits and states that selection against the registry, so a narrower
+    # population can never again be reported as the whole one.
     with tempfile.TemporaryDirectory() as _bare:
         _bare_t = pathlib.Path(_bare)
         _bare_deploy = {"gov_source": "local", "prefix": "tools"}
-        _bare_sel = derive_install_order(all_kits(descs), descs)
+        _bare_sel = derive_install_order(sorted(descs), descs)
         # ITS OWN REPORT, discarded. A bare target answers no intake token, so `planned_writes`
         # legitimately refuses a destination for every kit that takes one; those are findings about
         # the FIXTURE and not about gov, and the rows carrying them are excluded from `have` below
@@ -1857,7 +1867,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         _bare_rows = planned_writes(root, _bare_t, _bare_deploy, descs, _bare_sel, Report())
         _bare_have = {x["dest"] for x in _bare_rows if not x["missing"]}
         _leg_argv = sum(len(leg.get("argv", []))
-                        for d, _p in descs.values() for leg in d.get("gate_leg", []))
+                        for _e in _bare_sel for leg in descs[_e][0].get("gate_leg", []))
         _silent = silenced_legs(descs, _bare_sel, _bare_t, _bare_deploy, _bare_have)
         for _eid, _nm, _bad in sorted(_silent):
             r.fail(f"entry '{_eid}' declares gate leg '{_nm}' whose argv names "
@@ -1866,7 +1876,8 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                    f"this kit, and the receipt records no coverage for it. Ship the file (a `seed` "
                    f"rule is how a leg's data file travels), or take the path from an intake answer "
                    f"the operator supplies")
-        r.note(f"gate legs: {_leg_argv} argv element(s) resolved against a bare target · "
+        r.note(f"gate legs: {len(_bare_sel)} of {len(descs)} registry entries graded · "
+               f"{_leg_argv} argv element(s) offered against a bare target · "
                f"{len(_silent)} naming a path no rule produces")
 
     # ---- 7i: per-file claim inside a NON-FLAT entry's home. Scoped deliberately: five `kind="flat"`

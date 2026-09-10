@@ -48,10 +48,12 @@ MARGIN_FILE = HERE / "ceiling-margin.txt"
 # one question and the copy is what rots. Read it there. What this comment owns is the SIZING
 # ARGUMENT over it: the overhead is a FIXED cost — arm 1c's own words are that it "does NOT shrink
 # when the sleeper does" — so a teardown allowance has to clear the largest ABSOLUTE overshoot on
-# record rather than the largest one relative to its ceiling, and the recorded worst is a
-# single-digit-seconds figure that 30 clears several times over. Widening this widens the
-# inert-host band `read_runs` discloses; tightening it silently discards the readings this filter
-# exists to admit.
+# record rather than the largest one relative to its ceiling. THE MAGNITUDE IS NOT PARAPHRASED HERE
+# EITHER, and that is the same ban one level down: the first cut of this comment sized the worst
+# reading in words instead of copying it, understated it, and stood beside the two sources it was
+# understating. An adjective is the same second answer to one question that a numeral would be.
+# Read the size at those sources. Widening this widens the inert-host band `read_runs` discloses;
+# tightening it silently discards the readings this filter exists to admit.
 #
 # WRITTEN AS A SUM, so the two halves are stated once each and the total is derived. A literal 35
 # beside a comment saying "5 plus 30" is two answers to one question, and the comment is the copy
