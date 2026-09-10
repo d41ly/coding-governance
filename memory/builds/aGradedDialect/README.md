@@ -5,7 +5,7 @@ opened: 2026-09-10
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7 TOOL-aGradedDialect-8 TOOL-aGradedDialect-9
+ids: TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7 TOOL-aGradedDialect-8 TOOL-aGradedDialect-9 TOOL-aGradedDialect-10
 ---
 
 # aGradedDialect — the lexicon kit cannot read TypeScript, and the one repo that would adopt it is 20% TypeScript by file
@@ -64,6 +64,12 @@ coverage 19.3%. The decision named its own revisit test, and both halves now hol
   directed the build to land. What the scan did NOT clear, stated because it is the part
   no lens called a finding: the excerpts are still architecture and security-model prose,
   readable by anyone.
+- **`TOOL-aGradedDialect-4` §8 F1 is SUPERSEDED by `TOOL-aGradedDialect-10`, 2026-09-11.** That
+  resolution declared `tsx.function` dark and refused the role-derived selector on two vetoes;
+  the first adopter to arm the cell blind measured 951 offenders of 3145 and asked for the
+  selector by name. Veto 2 — the frozen return shape cannot carry a per-definition fact — was
+  already answered by the `decorator` kind's additive accessor, and the new kind rides the same
+  shape. The spec's §8 text stands as written; the backlog row is the superseding record.
 - **The corpus is oversized and that is recorded rather than fixed here.** It carries 115
   records over 12 distinct construct combinations, and four of the five defects the
   closing review confirmed had NO trigger in it at all. Shrinking it is a subset of the
@@ -83,7 +89,7 @@ coverage 19.3%. The decision named its own revisit test, and both halves now hol
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 5 unit(s) · node a · opened 2026-09-10 · streams tooling
-ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7 TOOL-aGradedDialect-8 TOOL-aGradedDialect-9
+ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7 TOOL-aGradedDialect-8 TOOL-aGradedDialect-9 TOOL-aGradedDialect-10
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

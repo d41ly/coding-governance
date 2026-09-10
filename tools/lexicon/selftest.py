@@ -683,6 +683,7 @@ check("a LANGS `parser` row naming an unshipped parser REFUSES rather than silen
 # pattern-set id inside a single build, which is what makes an equality assertion too weak here: a
 # future re-fork that happens to start equal would pass it and drift on the next edit.
 import scaffold_lexicon as _scaf  # noqa: E402
+import lexicon_conf as _lc  # noqa: E402
 check("the scaffold and the engine share ONE extension catalog object",
       _scaf.KNOWN is lex.KNOWN_EXTS,
       f"scaffold={_scaf.KNOWN!r} engine={lex.KNOWN_EXTS!r}")
@@ -728,12 +729,20 @@ check("S4: every SEED_CONVENTIONS row names a surface and a convention the reade
       not _BAD_SEED and bool(_scaf.SEED_CONVENTIONS),
       f"outside={_BAD_SEED} of {len(_scaf.SEED_CONVENTIONS)} row(s)")
 
-# THE ONLY OBSERVATION THAT CAN SEE THE FOURTH ROW. `("tsx", "function")` at `dark` emits the same
-# bytes as the `.get` default, so no assertion over the emitted conf can tell a DECLARED refusal
-# from an absent opinion — the difference is legible only in this dict. AC4.
-check("S4: the `tsx.function` refusal is DECLARED in the catalog, not left to the `.get` default",
-      _scaf.SEED_CONVENTIONS.get(("tsx", "function")) == "dark",
-      repr(sorted(_scaf.SEED_CONVENTIONS)))
+# THE FOURTH ROW WAS `dark` and is now a PAIR: the parent at the helper's case and a `returns:jsx`
+# selector at the component's (TOOL-aGradedDialect-10). Its old arm asserted `dark` because that
+# value was indistinguishable from the `.get` default in the emitted bytes; `camel` is not, so
+# the AC2 arm over the emitted file now observes it and this arm grades the selector seed, whose
+# three tokens each come from a closed set the conf reader refuses a stranger to.
+_BAD_SEL = sorted(
+    f"{_e}.{_s}+{_sel}={_c}" for (_e, _s), (_sel, _c) in _scaf.SEED_SELECTORS.items()
+    if _sel.partition(":")[0] not in _lc.SELECTOR_KINDS
+    or (_sel.startswith("returns:") and _sel.partition(":")[2] not in _lc.RETURNS_LITERALS)
+    or _c not in lex.CONVENTIONS or (_e, _s) not in _scaf.SEED_CONVENTIONS)
+check("S4: every SEED_SELECTORS row names a known kind, a known literal, a convention and a seeded "
+      "parent", not _BAD_SEL and _scaf.SEED_SELECTORS.get(("tsx", "function")) == ("returns:jsx", "pascal")
+      and _scaf.SEED_CONVENTIONS.get(("tsx", "function")) == "camel",
+      f"outside={_BAD_SEL} seed={_scaf.SEED_CONVENTIONS.get(('tsx', 'function'))}")
 
 # ---- the --scaffold path, end to end -------------------------------------------------------------
 # Nothing exercised this before, which is how a scaffolder that could emit a row its OWN reader
@@ -816,18 +825,22 @@ with build_tempdir() as td:
         check(f"AC1: ...and not the undeclared form `{_e}::dark`",
               bool(_langs_toks) and f"{_e}::dark" not in _langs_toks, _langs_line)
 
-    # The CELLS rows, through the ONE reader rather than a second parse of its grammar. Only the
-    # three rows that DIFFER from the `.get` default are asserted here: `tsx.function` emits `dark`
-    # whether the catalog declares it or the default supplies it, so an assertion over these bytes
-    # cannot tell a declared refusal from an absent one. That row is observed in the S4 group.
+    # The CELLS rows, through the ONE reader rather than a second parse of its grammar. All five
+    # rows differ from the `.get` default since TOOL-aGradedDialect-10 turned `tsx.function` from
+    # `dark` into a camel parent with a `returns:jsx` selector beneath it, so every one is
+    # observable in the emitted bytes. The fixture's `Card` returns an element, which is what
+    # makes the selector's subset non-empty and the row proposable at all.
     try:
         _seeded = load_conf(root / ".lexicon.conf").get("CELLS") or {}
     except ConfError:
         _seeded = {}
     _seeded_flat = {_k: _v[0] for _k, _v in _seeded.items()}
-    for _cell, _want in (("ts.function", "camel"), ("ts.type", "pascal"), ("tsx.type", "pascal")):
+    for _cell, _want in (("ts.function", "camel"), ("ts.type", "pascal"), ("tsx.type", "pascal"),
+                         ("tsx.function", "camel"), ("tsx.function+returns:jsx", "pascal")):
         check(f"AC2: the emitted CELLS block carries `{_cell}` at `{_want}`",
               _seeded_flat.get(_cell) == _want, f"CELLS={_seeded_flat}")
+    check("AC2: ...and a MEASURED pin row for the selector, at the count the engine computed",
+          "tsx.function+returns:jsx.conv  0" in conf_text, conf_text[-600:])
 
     _lines = conf_text.splitlines()
 
@@ -867,6 +880,11 @@ with build_tempdir() as td:
           _tsx_i >= 0 and "JSX" in _tsx_note and "role" in _tsx_note.lower(), _tsx_note[:240])
     check("AC5: ...stated without a percentage, which would pin another corpus's measurement here",
           _tsx_i >= 0 and "%" not in _tsx_note, _tsx_note[:240])
+    check("AC5: ...naming the `+returns:jsx` row as the door and what stays behind it",
+          _tsx_i >= 0 and "+returns:jsx" in _tsx_note and "null" in _tsx_note
+          and "container" in _tsx_note, _tsx_note[:400])
+    check("AC5: ...and it no longer calls the cell `dark`, which it is not",
+          _tsx_i >= 0 and "dark" not in _tsx_note, _tsx_note[:400])
 
     r = subprocess.run(["bash", "tools/lexicon/adopt-lexicon.sh", "--check"], cwd=root,
                        capture_output=True, text=True)
@@ -973,6 +991,33 @@ with build_tempdir() as td:
               "usage" in out.lower(), out)
         check(f"scaffold: no file named {flag} is left behind",
               not (root / flag).exists(), f"{flag} exists in {root}")
+
+# ---- the selector seed is CONDITIONAL on its subset (TOOL-aGradedDialect-10) -------------------
+#
+# A `.tsx` tree with no component in it -- a helpers-only test file -- must get the camel parent
+# and NO `+returns:jsx` row: a selector matching nothing is a `DEAD CELL` refusal on the adopter's
+# first `--check`, which is the exact row the scaffolder's own law forbids it to propose. The
+# block above observes the row PRESENT over a fixture whose `Card` returns an element; this one
+# observes it ABSENT, and an arm with only the first half passes on a seed that emits the row
+# unconditionally.
+with build_tempdir() as td:
+    root = Path(td)
+    shutil.copytree(KIT, root / "tools" / "lexicon",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (root / "src").mkdir()
+    (root / "src" / "a.tsx").write_text(
+        "export const buildProbe = () => mount(<Probe />);\nexport const loadCount = () => 1;\n",
+        encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "add", "--", "src"], cwd=root, check=True, capture_output=True)
+    r = subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", str(root / ".lexicon.conf")],
+                       cwd=root, capture_output=True, text=True)
+    _cf = root / ".lexicon.conf"
+    _txt = _cf.read_text(encoding="utf-8") if _cf.exists() else ""
+    check("scaffold: over a `.tsx` tree where nothing returns an element, the camel parent is seeded "
+          "and the `+returns:jsx` row is NOT",
+          r.returncode == 0 and re.search(r"^  tsx\.function +camel$", _txt, re.M) is not None
+          and "+returns:jsx" not in _txt, _txt[-500:] or (r.stdout + r.stderr))
 
 # ---- RE-SCAFFOLDING MEASURES OVER THE EXISTING DECLARATION, and this arm is the gate for it -------
 #
@@ -2547,6 +2592,179 @@ check("AC5: a decorator selector routes the DECORATED definition and nothing els
 code, out = run_case(_DECO, _SEL_PARENT + "\n  py.function+decorator:route  pascal\n")
 check("AC5: ...and a DOTTED decorator is selectable by its last segment",
       code != 0 and "VIOLATION  build_y  satisfies snake, not pascal" in out, out)
+
+# ---- the `returns` selector (TOOL-aGradedDialect-10) ----------------------------------------------
+#
+# The role-derived kind TOOL-aGradedDialect-4 §8 deferred, built once an adopter armed `tsx.function`
+# blind and read 951 offenders of 3145 — React components beside helpers, exactly as predicted. Three
+# semantics were measured on that corpus before one was kept: "body CONTAINS an element" pinned 254,
+# "contains, declared names only" 162, "RETURNS an element, declared names only" 86. The arms below
+# pin each word of the kept rule, and R14 pins the ceiling so a change to it is noticed.
+_TSX_CONF = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
+                              'LANGS="py:python-ast:parser ts:ts-tokens:parser '
+                              'tsx:tsx-tokens:parser conf::dark"')
+assert _TSX_CONF != BASE_CONF, "the LANGS line the returns arms rewrite has moved"
+
+# R1..R4 — RETURNED, in the four spellings a component takes: an expression body, a parenthesised
+# multi-line body, a `return` inside a block, and a ternary or `&&` whose branches are parenthesised.
+# The grouping `(` after `return`, `=>`, `?` and `&&` is the whole of R4: counted as a call, every
+# prettier-formatted conditional render would fall into the parent cell.
+got = lex.read_ts_jsx_defs("const A = () => <div />;\nconst buildX = () => 1;\n")
+check("returns R1: an expression-bodied arrow whose value is an element is routed, its sibling not",
+      got == [("A", 1)], f"{got}")
+got = lex.read_ts_jsx_defs("const A = () => (\n  <div>\n    <span />\n  </div>\n);\n")
+check("returns R2: ...and a parenthesised multi-line body", got == [("A", 1)], f"{got}")
+got = lex.read_ts_jsx_defs("export default function Page({ a }: P) {\n  if (a) { return <A />; }\n"
+                           "  return null;\n}\n")
+check("returns R3: ...and a `return` inside a nested block of a block body", got == [("Page", 1)],
+      f"{got}")
+got = lex.read_ts_jsx_defs("function A() {\n  return loading ? (\n    <Spinner />\n  ) : (\n    <Page />\n"
+                           "  );\n}\nconst B = () => open && (\n  <Modal />\n);\n")
+check("returns R4: a grouping `(` after `?`, `:` or `&&` is transparent, so the conditional render "
+      "is returned", got == [("A", 1), ("B", 8)], f"{got}")
+
+# R5..R6 — HELD, NOT RETURNED. The element is an argument or an item, and the definition is a test
+# helper or a factory: `html`, `host`, `mount` and `renderToStaticMarkup` are what the adopter's 40
+# camel-cased element-returning names mostly are, and they stay in the parent cell.
+got = lex.read_ts_jsx_defs("const html = (p = {}) =>\n  renderToStaticMarkup(<Form {...p} />);\n"
+                           "function host(x) {\n  return mount(<Host x={x} />);\n}\n")
+check("returns R5: an element PASSED to a call is not the value, so the helper is not routed",
+      got == [], f"{got}")
+got = lex.read_ts_jsx_defs("function useEl() {\n  return { el: <div /> };\n}\n"
+                           "function buildRows() {\n  return [{ el: <div /> }];\n}\n"
+                           "function A() {\n  const el = <div />;\n  return el;\n}\n"
+                           "function B() {\n  if (x) return null;\n  const el = <div />;\n  return el;\n}\n")
+check("returns R6: ...nor one held in an object or array literal, nor one bound to a local first "
+      "-- even with an earlier `return` in the same body, which the back-walk must not reach past "
+      "a `;` to find", got == [], f"{got}")
+
+# R7..R8 — OWNERSHIP is the innermost function, named or not, and only a declared name routes.
+got = lex.read_ts_jsx_defs("function useThing() {\n  const Row = () => <tr />;\n  return Row;\n}\n")
+check("returns R7: a component defined inside a hook is the hook's inner scope, not the hook",
+      got == [("Row", 2)], f"{got}")
+got = lex.read_ts_jsx_defs("const withAuth = (C) => {\n  return (props) => <C {...props} />;\n};\n"
+                           "function withLog(C) {\n  return (p) => { return <C {...p} />; };\n}\n"
+                           "const List = () => items.map((i) => <li key={i} />);\n")
+check("returns R8: an anonymous callback ABSORBS its element, so a HOC and a `.map` body do not route",
+      got == [], f"{got}")
+got = lex.read_ts_jsx_defs("function withAuth(C) {\n  return function Wrapped(p) { return <C {...p} />; "
+                           "};\n}\nexport const Input = forwardRef<A, B>(function Input({ x }, ref) {\n"
+                           "  return <input ref={ref} />;\n});\n")
+check("returns R9: ...while a NAMED function expression is a declared name and routes itself",
+      got == [("Wrapped", 2), ("Input", 4)], f"{got}")
+
+# R10 — MEMBERS NEVER ROUTE, because a member's name is its container's key. The adopter corpus
+# holds 121 `render: (r) => <td />` slots spelled by the API that reads them; a rule that routed
+# them would pin 121 names nobody can rename.
+got = lex.read_ts_jsx_defs("const cols = { render: (r) => <td>{r}</td> };\n"
+                           "class X {\n  render() { return <div />; }\n  view = () => <b />;\n}\n")
+_all = lex.parse_tsx_defs("const cols = { render: (r) => <td>{r}</td> };\n"
+                          "class X {\n  render() { return <div />; }\n  view = () => <b />;\n}\n")[0]
+check("returns R10: an object property, a method and a class property return elements and are NOT "
+      "routed", got == [] and len(_all) == 3, f"routed {got} of {_all}")
+
+# R11..R12 — the marker is invisible to the definition arms and absent from a `.ts` read.
+check("returns R11: a module-level element belongs to nobody",
+      lex.read_ts_jsx_defs("const el = <div />;\nfunction buildX() { return 1; }\n") == [],
+      "module-level")
+_with = lex.parse_tsx_defs("const A = () => <div />;\nfunction B() { return <p />; }\n")
+_sans = lex.parse_tsx_defs("const A = () => null;\nfunction B() { return null; }\n")
+check("returns R12: the `jsx` marker token moves NO definition — the population is identical with "
+      "the elements replaced by null", _with == _sans, f"{_with} vs {_sans}")
+check("returns R12: ...and it is emitted at all, exactly once per element opened from code",
+      [t for t in lex.scan_ts_tokens("const A = () => <div><b /></div>;", jsx=True) if t[0] == "jsx"]
+      == [("jsx", "<jsx>", 1)], "marker")
+check("returns R13: a `.ts` read emits no marker and marks nothing, because `<T>` is a generic there",
+      not [t for t in lex.scan_ts_tokens("const A = <T,>(x: T) => x;", jsx=False) if t[0] == "jsx"]
+      and lex.parse_ts_source("const A = <T,>(x: T) => x;", jsx=False)[2] == set(), "ts mode")
+_calls: set = set()
+_toks = lex.scan_ts_tokens("foo(1); (2); return (3); a.b(c)(d);", calls=_calls)
+check("returns R13: ...and the lexer records a CALL `(` after an expression and never a grouping one",
+      sorted(_calls) == [1, 16, 19] and [_toks[i - 1][1] for i in (1, 16, 19)] == ["foo", "b", ")"],
+      f"calls={sorted(_calls)} toks={_toks}")
+
+# R14 — THE CEILING, pinned so a change to it is a red and not a surprise. A bare multi-line
+# ternary body ends at `cond` under the ASI rule, because `?` is an operator this lexer does not
+# emit; prettier parenthesises the shape, which is why the rule is the line and not the semicolon.
+got = lex.read_ts_jsx_defs("const A = () => cond\n  ? <A />\n  : <B />;\nfunction buildX() { return 2; }\n")
+check("returns R14: the documented ceiling — a bare multi-line ternary body is NOT attributed",
+      got == [], f"{got}")
+check("returns R14: ...and the other reading, the next semicolon, is refused: a helper followed by a "
+      "module-level element on the next line stays a helper",
+      lex.read_ts_jsx_defs("const buildX = () => 1\nconst el = <div />\n") == [], "no-ASI")
+
+# D1..D5 — the declaration: one legal spelling, four named refusals at the row.
+check("returns D1: `tsx.function+returns:jsx` parses to its four parts",
+      lex.parse_cell_key("tsx.function+returns:jsx") == ("tsx", "function", "returns", "jsx"),
+      repr(lex.parse_cell_key("tsx.function+returns:jsx")))
+for _bad, _needle in (("tsx.function+returns:html", "closed set is jsx"),
+                      ("tsx.type+returns:jsx", "only the `function` surface")):
+    try:
+        lex.parse_cell_key(_bad)
+        check(f"returns D2: `{_bad}` is refused", False, "no ConfError")
+    except lex.ConfError as _e:
+        check(f"returns D2: `{_bad}` is refused, naming why", _needle in str(_e), str(_e))
+for _ext, _pset in (("ts", "ts-tokens"), ("py", "python-ast")):
+    code, out = run_case({"src/a.tsx": "const A = () => <div />;\n"},
+                         _TSX_CONF + "\nCELLS:\n  tsx.function  camel\n\n  " + _ext
+                         + ".function+returns:jsx  pascal\n")
+    check(f"returns D3: a `returns` selector on `{_ext}` is a declaration-time refusal naming "
+          f"`{_pset}` and `tsx-tokens`",
+          code != 0 and f"reads with '{_pset}'" in out and "only tsx-tokens" in out, out)
+check("returns D4: every pattern set the conf reader lets a `returns` selector ride resolves in "
+      "PARSERS to the JSX reader",
+      bool(_lc.RETURNS_PATTERN_SETS)
+      and all(lex.PARSERS.get(_p) is lex.parse_tsx_defs for _p in _lc.RETURNS_PATTERN_SETS),
+      repr(_lc.RETURNS_PATTERN_SETS))
+check("returns D5: the kind is in the closed set and its literal set is non-empty",
+      "returns" in _lc.SELECTOR_KINDS and _lc.RETURNS_LITERALS == ("jsx",),
+      f"{_lc.SELECTOR_KINDS} {_lc.RETURNS_LITERALS}")
+
+# E1..E5 — the routing, end to end through the engine.
+_RET_FILES = {"src/a.tsx": "export const BuildCard = () => <div />;\n"
+                           "export function loadPanel() {\n  return <p />;\n}\n"
+                           "const buildRow = () => 1;\nconst LoadRow = () => 2;\n"
+                           "const cols = [{ add: (r) => <td>{r}</td>, load: () => <b /> }];\n"
+                           "function loadHtml() { return mount(<BuildCard />); }\n"}
+_RET_CONF = _TSX_CONF + "\nCELLS:\n  tsx.function  camel\n\n  tsx.function+returns:jsx  pascal\n"
+code, out = run_case(_RET_FILES, _RET_CONF)
+check("returns E1: the component with a camel name reds in the SELECTOR's row, against pascal",
+      code != 0 and "VIOLATION  loadPanel  satisfies camel, not pascal" in out, out)
+check("returns E1: ...the helper with a pascal name reds in the PARENT's row, against camel",
+      "VIOLATION  LoadRow  satisfies pascal, not camel" in out, out)
+check("returns E1: ...and the partition is 2 routed of 7, so the two members and the test helper "
+      "stayed in the parent",
+      "tsx.function+returns:jsx.conv 1 of 2 against pascal" in out
+      and "tsx.function.conv 1 of 5 against camel" in out, out)
+check("returns E1: ...where the `add` and `load` members are NOT violations of either row",
+      "VIOLATION  add " not in out and "VIOLATION  load " not in out, out)
+code, out = run_case({"src/a.tsx": _RET_FILES["src/a.tsx"].replace("loadPanel", "LoadPanel")
+                      .replace("LoadRow", "loadRow")},
+                     _RET_CONF + "\nPINS:\n  tsx.function.conv  0\n\n  tsx.function+returns:jsx.conv  0\n")
+check("returns E2: with both names at their role's case and both pins at 0, the run is GREEN",
+      code == 0, out)
+code, out = run_case(_RET_FILES, _RET_CONF, args=("--suggest", "loadPanel", "--as", "tsx.function"))
+check("returns E3: `--suggest` on the parent says a `returns` selector cannot be resolved from a "
+      "name, so its answer is the parent's",
+      "declares a `returns` selector (`jsx`)" in out and "this answer is the parent cell's" in out,
+      out)
+code, out = run_case({"src/a.tsx": "const renderRow = () => <tr />;\nconst buildX = () => 1;\n"},
+                     _RET_CONF + "\n  tsx.function+prefix:render  camel\n")
+_amb = [ln for ln in out.splitlines() if "AMBIGUOUS SELECTOR" in ln]
+check("returns E4: a render helper matching BOTH a prefix and the returns selector is refused as "
+      "AMBIGUOUS, naming `+returns:jsx` on the refusal line — the composition this grammar does "
+      "not offer, stated rather than resolved by row order",
+      code != 0 and len(_amb) == 1 and "+returns:jsx" in _amb[0] and "+prefix:render" in _amb[0],
+      repr(_amb))
+code, out = run_case({"src/a.tsx": "const buildX = () => 1;\nfunction loadY() { return mount(<A />); }\n"},
+                     _RET_CONF)
+check("returns E5: a corpus where nothing returns an element reds the selector as a DEAD CELL",
+      code != 0 and "DEAD CELL — `tsx.function+returns:jsx`" in out, out)
+code, out = run_case({"src/a.tsx": "export const BuildCard = () => <div />;\n"},
+                     _RET_CONF + "\nPINS:\n  tsx.function.conv  0\n\n  tsx.function+returns:jsx.conv  0\n")
+check("returns E6: a PARENT whose selector routed every name is NOT a dead cell — the partition "
+      "is complete, and a components-only tree is green until its first helper lands",
+      code == 0 and "DEAD CELL —" not in out and "tsx.function.conv 0 of 0 against camel" in out, out)
 
 # ---- S4: the selector's pin, and what an ABSENT one means ---------------------------------------
 #
