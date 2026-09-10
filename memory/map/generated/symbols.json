@@ -823,9 +823,24 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "check_ts_member_annotation",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "check_ts_reading",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "check_ts_tag_start",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "check_ts_type_position",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "checks",
