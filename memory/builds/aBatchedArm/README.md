@@ -37,23 +37,15 @@ one suite." This build is that follow-up. Target: a verdict in under 20 minutes,
 
 ## Build-level rules
 
-**The port is CLOSED, by ratified decision and not by preference.** `TOOL-aPooledSweep-3`: `arm`
-takes one POSITIVE substring, these suites assert negatives, so a port rewrites the assertion and the
-inventory diff refuses it. This suite carries 101 `miss` and 27 `same`. Re-opening it starts with the
-harness vocabulary `TOOL-aPooledSweep-7` enumerates, and that is a different build.
-
-**Cutting spawns cannot reach the target.** `TOOL-aTracedSpawn-2` measured roughly 2 s per invocation
-of real non-spawn work, a ~586 s floor at 293 invocations. Only invocations move the number.
-
-**The batching premise has a counter-example this build inherits.** `TOOL-aDrainedSluice-5` N17 found
-it false where callers short-circuit. Reproduced here 2026-09-10: eight staged breaks emitted four
-checks, one tripping check 1, whose branch exits at `check-unattended.sh:198`.
+**Three routes are closed and the specs own the evidence, not this slot.** The `lib-selftest` port,
+by ratified `TOOL-aPooledSweep-3`; further spawn cutting, bounded by `TOOL-aTracedSpawn-2`; and
+batching the control arms, by `TOOL-dScriptedRepeat-15` S3. Each is argued with its measurement in
+`TOOL-aBatchedArm-1` §3 and §4.
 
 **A CHECK NUMBER IS NOT A BRANCH IDENTIFIER, and that killed the first design.** Only 6 of 29 check
-numbers carry a single branch; check 16 carries 34. So no control can be witnessed by a sibling
-firing under the same number, `TOOL-dScriptedRepeat-15` S3 stands unqualified, and no `miss` or
-`same` arm is batched at all. That exclusion is why batching alone measures 40 to 44 minutes and why
-the shard split is unit 1 of the three.
+numbers carry a single branch; check 16 carries 34. So no control is witnessed by a sibling firing
+under the same number, and no `miss` or `same` arm is batched at all. That exclusion is why batching
+alone measures 40 to 44 minutes.
 
 **The baseline is RED and is the oracle.** Equivalence is the `FAIL` line set plus the executed
 assertion count — NOT a per-arm inventory, because the helpers are silent on a pass.
