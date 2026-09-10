@@ -4082,6 +4082,16 @@ check("AC1: every `kind` is ts or tsx",
       str([r["id"] for r in TS_RECORDS if r["kind"] not in ("ts", "tsx")][:5]))
 check("AC1: record ids are unique", len({r["id"] for r in TS_RECORDS}) == len(TS_RECORDS),
       str([i for i, n in Counter(r["id"] for r in TS_RECORDS).items() if n > 1][:5]))
+
+# AND SO ARE THE EXCERPTS, which is a stronger claim than unique ids and a confirmed finding rather
+# than a precaution. The type top-up drew `type Props = Record<string, unknown>;` from six separate
+# test files, and those six copies filled six of the twenty type sites: a floor that exists to make
+# F1's type half able to fail, three-tenths satisfied by one line any regex reads. Distinct ids do
+# not catch it, because the ids differ. It is also what makes keying a reader on `src` sound, which
+# the staged readers below do.
+check("AC1: no two records carry the SAME excerpt, so the corpus grades what it says it grades",
+      len({r["src"] for r in TS_RECORDS}) == len(TS_RECORDS),
+      str([s[:60] for s, n in Counter(r["src"] for r in TS_RECORDS).items() if n > 1][:3]))
 check("AC1: every record's provenance triple is complete, with a 40-hex blob",
       not [r["id"] for r in TS_RECORDS
            if not re.fullmatch(r"[0-9a-f]{40}", str(r.get("from", {}).get("blob", "")))

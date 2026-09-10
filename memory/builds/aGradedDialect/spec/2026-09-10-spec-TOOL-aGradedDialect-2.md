@@ -1,6 +1,6 @@
 # TOOL-aGradedDialect-2 — the conformance corpus: fixtures a compiler extracted, frozen before the reader exists
 
-**Status:** CLOSED · rev-6 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
+**Status:** CLOSED · rev-7 · 2026-09-10 · node a · Tier-2 · base d1357673 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -129,7 +129,10 @@ half is unit 1's `ts-oracle.js` unchanged.
    definition; otherwise take the next candidate on the stride and RECORD the rejection with its
    reason, so a construct that could not be sampled is visible rather than absent.
 4. Cap each accepted span at 60 lines. A site needing more context than that is not a fixture, it
-   is a file, and it is skipped with its reason recorded.
+   is a file, and it is skipped with its reason recorded. Reject a span whose TEXT is already in the
+   corpus, not merely one from a span already taken: the same one-line type alias lives in dozens of
+   this tree's test files, and six copies of it satisfied six of the type floor's twenty sites on
+   the first draw. Distinct ids do not catch that, because the ids differ.
 5. Write the record with the oracle's reading of the accepted span, its construct tags, and its
    provenance triple.
 6. The two CORPUS-level floors below are then topped up by continuing a stride the same way: the
@@ -320,9 +323,12 @@ so it is withheld from `govkit apply` exactly as the self-tests are), `.gitattri
 
 - **AC1** — When `python tools/lexicon/selftest.py` runs, the corpus loader reports the record count
   and asserts that every record carries all nine declared fields, that `kind` is `ts` or `tsx`, that
-  ids are unique, and that no `funcs` or `types` line exceeds its own record's `src` line count.
+  ids are unique, that no two records carry the same `src`, and that no `funcs` or `types` line
+  exceeds its own record's `src` line count.
   Red when: a record names an expectation at a line its excerpt does not have, which is the shape a
-  hand-edited expectation takes.
+  hand-edited expectation takes. Red also when two records carry the SAME excerpt under different
+  ids — a corpus that counts one line six times reports a population it does not have, and the
+  floors it feeds are satisfied by copies.
 - **AC2** — When the same run reaches the composition arm, it derives the per-construct census from
   the records' own `constructs` tags and asserts every minimum in §4's table, plus at least 40
   `kind: tsx` records and at least 20 records carrying a type definition.
@@ -459,6 +465,14 @@ wearing a pass.
   follow from. And the runner section named two states where there are three: `ts` and `tsx` are
   separate `KNOWN_EXTS` rows, so a PARTLY armed declaration is legal, and the arm scoring it was
   staged and died on a `KeyError` rather than refusing.
+- rev-7 · 2026-09-10 · §4 · AC1 · the corpus was RE-DRAWN, and this is the finding that made it necessary.
+  The draw deduplicated on `path:lines` and not on the excerpt TEXT, so the type top-up took
+  `type Props = Record<string, unknown>;` from six separate test files — six copies of a one-line
+  alias any regex reads correctly, filling six of the twenty type sites the floor exists to make
+  failable. Distinct ids do not catch it, because the ids differ. Step 4 now rejects an excerpt
+  already in the corpus, AC1 asserts distinctness as a shipped arm, and the arm's failing case was
+  staged and observed. The redraw is still a FREEZE before any reader exists, which is the property
+  that matters; the re-drawn corpus is the one the acceptance ledger's figures describe.
 
 ## 10. Reuse audit
 
