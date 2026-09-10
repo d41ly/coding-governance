@@ -1,6 +1,6 @@
 # TOOL-aLeakedHandle-1 — the pipe whose write end nobody closed, and the gate for its class
 
-**Status:** SPECCED · rev-1 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -38,16 +38,21 @@ occurrence of a class this repo has recorded twice is also the last one found by
   longer finds is a refusal, so a stale exception cannot hide a live hit. Observed by AC6.
 - **S5** — The scan and its self-test wired as legs in `tools/gate-legs.json`, the registry filename
   declared in `.memory-tree.conf`, and `tools/gate-lint/kit.toml`'s `[check]` declaration rewritten,
-  because it currently states that the kit ships no leg of its own. Observed by AC7 and AC8.
-- **S6** — `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` updated where it says nothing
-  sweeps the tree for this class, which this unit falsifies. Observed by AC9.
+  because it currently states that the kit ships no leg of its own. A leg NAME is a `gate-legs`
+  inventory key, so the same step claims both new names in the codebase map and re-renders the
+  generated map artifacts in that commit. Observed by AC7, AC8 and AC10.
+- **S6** — `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` gains a gating clause naming this
+  leg and the construct its predicate actually matches. The record's existing sentence that nothing
+  sweeps other kits for the `out=$(timeout` form STAYS, because this leg does not scan for that form.
+  Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
 - The other nineteen sites the scan finds are NOT fixed here. They are carried in the registry and
-  drained by a separate unit, if the owner wants them drained at all; see §8 fork B. Fixing twenty
-  call sites inside `check-unattended.sh` and `unattended.sh` is a different diff with a different
-  risk profile from fixing the one that deadlocked.
+  drained by a separate unit, if the owner wants them drained at all; see §8 fork B. Those nineteen
+  sit in six files spread over the tool root, the memory-tree kit and the unattended kit, and the §4
+  population table owns the per-file split. Draining them is a different diff with a different risk
+  profile from fixing the one that deadlocked.
 - The `done < <(…)` process-substitution form is NOT banned. It is counted and reported by the scan
   and is out of the failing population; see §8 fork A.
 - No ceiling is declared, raised or re-derived. `unattended kit gate` keeps the ceiling it has.
@@ -130,6 +135,14 @@ output is the same kind of failure one language over. The kit's own `kit.toml` d
 `gate-lint-leg-wiring`, saying it declares no legs and nothing in a target observes it; this unit is
 what discharges that.
 
+There is a prior decision in the neighbourhood and it is cited rather than quietly stepped over.
+`memory/gotchas/bounded-through-a-pipe-is-unbounded.md` records, in its gating section, that adding a
+repo-wide source scan is cheap and is not done there. That sentence is about the `out=$(timeout`
+form, and this unit does not build a scan for it. What this unit builds is a repo-wide scan for the
+sibling construct, and the decision not to sweep for the substitution-captured timeout stands
+untouched — the seam now exists if a later unit wants it, which is a fact for that unit's author and
+not a licence this one takes.
+
 The engine goes in the kit; the REGISTRY does not. A kit file names nothing outside itself by literal
 (`tools/hooks/README.md`), and a registry of this repo's own sites is nothing but literals naming
 files outside the kit. So the registry lives at `memory/project/`, beside the other gate registries,
@@ -160,7 +173,7 @@ behind. The count may fall and may not rise.
 
 | Identifier | Cell that grades it | Note |
 |---|---|---|
-| `tools/gate-lint/sh_hygiene.py` | `py.function` snake | UNDERSCORE, not the sibling's hyphen. `ps-hygiene.py` is one of the eight hyphenated Python basenames `TOOL-aSurfacedLexicon-15` exists to rename; adding a ninth grows a debt that already has a unit waiting. |
+| `tools/gate-lint/sh_hygiene.py` | `py.file`, and it is UN-ARMED | UNDERSCORE, not the sibling's hyphen, and NOTHING GRADES THAT. The cell for a file basename is `py.file`; `.lexicon.conf`'s `CELLS:` block declares four rows and that is not one of them, so `lexicon naming predicates` cannot fail on this name either way. The underscore is a documented convention with no gate behind it. `ps-hygiene.py` is one of the hyphenated Python basenames `TOOL-aSurfacedLexicon-15` exists to rename, and matching it would grow a debt that already has a unit waiting. |
 | `memory/project/substitution-fed-loops.txt` | none | Declared in `PROJECT_REGISTRY_EXTRA`; hygiene check 3 admits `memory/project/` members only through that key. |
 | leg `shell hygiene (a loop fed by a command substitution)` | none | The tree scan. |
 | leg `shell-hygiene selftest` | none | The `--selftest` arm. |
@@ -168,6 +181,33 @@ behind. The count may fall and may not rise.
 Every function the new file mints is snake_case. `sh.function` is armed with `sh.function.conv` pinned
 at 6 as a two-sided equality, so a non-conforming shell function name added by the fix would move a
 pin in the wrong direction; the fix mints no shell function.
+
+### The map claim, and why it is not optional
+
+Rows 3 and 4 of that table are not only leg names. `map_extractors.py` builds the `gate-legs`
+inventory by reading every leg's `name` out of `tools/gate-legs.json`, so each new name is a new
+inventory key, and `codebase-map coverage + freshness` refuses an unclaimed one.
+
+This was REPRODUCED on 2026-09-10 against base `013b1af9`, not predicted. `compute_coverage` over the
+live map tree returns clean today; with the two declared names added to that inventory it returns
+`unclaimed: {'gate-legs': [both new names]}`. That leg carries no `guard` in the manifest, so it runs
+on every bar including a diff-scoped one, and `baseline.toml` cannot absorb the keys — its own header
+reserves additions for the initial backfill.
+
+The claim is a NEW dossier, `gate-lint.md` under `memory/map/features/`. `gate-lint` is today an
+unclaimed `kits` key sitting in `baseline.toml` with no dossier, so the kit gets its first one and it
+claims both new leg names and that kit key. Claiming the kit key deletes its `baseline.toml` row in
+the same commit, because the ratchet's fourth assert refuses a key that is both claimed and
+baselined. A new dossier is also graded for a `## Reuse affordance` section: `affordance-exempt.toml`
+is shrink-only and graces only the dossiers that existed when it was seeded.
+
+The three artifacts under `memory/map/generated/` are byte-compared by that same leg and are
+re-rendered with `python3 tools/codebase-map/gen_map.py --write`. `symbols.json` moves too, and for a
+reason unrelated to the legs: the symbol tier indexes the Python under `tools/`, `ps-hygiene.py`
+included, so a new Python file in this kit adds rows to it.
+
+The remedy is authored prose, not a script run. Budget it as such — the regen is seconds and the
+dossier is not.
 
 ### The population, measured
 
@@ -216,6 +256,11 @@ about to remove; landing the fix first leaves the class ungated for the length o
 | `memory/project/substitution-fed-loops.txt` | new, 19 rows |
 | `.memory-tree.conf` | `PROJECT_REGISTRY_EXTRA` gains the filename |
 | `tools/gate-legs.json` | two rows |
+| `memory/map/features/gate-lint.md` | new, the dossier claiming both new leg names and the `gate-lint` kit key |
+| `memory/map/baseline.toml` | the `gate-lint` row under `kits` is deleted |
+| `memory/map/generated/MAP.md` | re-rendered |
+| `memory/map/generated/inventories.json` | re-rendered |
+| `memory/map/generated/symbols.json` | re-rendered, because the new Python file adds symbols |
 | `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` | the gating paragraph |
 
 ### Alternatives rejected
@@ -225,9 +270,11 @@ about to remove; landing the fix first leaves the class ungated for the length o
   shell, and it is correct about that, but it does not close this hole: `GIT` is a shell function, so
   the substitution forks a bash subshell which forks `git`, and the reader still depends on a
   grandchild's write end closing. It replaces one pipe with another.
-- **A ban with no registry, draining all twenty sites in this unit.** Rejected on blast radius. Twenty
-  edits across `check-unattended.sh` and `unattended.sh` is a bigger and riskier diff than the
-  deadlock it closes, and the registry ratchets the same outcome without one landing.
+- **A ban with no registry, draining every measured site in this unit.** Rejected on blast radius.
+  That is every row of the population table above, spread over seven files in the unattended kit, the
+  memory-tree kit and the tool root — a bigger and riskier diff than the deadlock it closes, and the
+  registry ratchets the same outcome without one landing. The table owns the per-file split; no
+  count is restated here.
 - **A new top-level `tools/check-*.sh`.** Rejected for `tools/gate-lint/`, which already owns this
   kind. A second scanner for the same kind at the tool root is the copy-instead-of-extend shape §12
   names, and it would owe a `govkit` entry descriptor that the kit route does not.
@@ -248,7 +295,10 @@ about to remove; landing the fix first leaves the class ungated for the length o
 - observability — the scan prints its four measured populations on every run, green included, so the
   reported-not-gated process-substitution count is never mistaken for coverage. The leg header states
   what it does NOT check.
-- risks — three, each with its remedy. `every held leg is budgeted, every budget row resolves` refuses
+- risks — each with its remedy, and the first of them is the one the round-1 spec audit caught
+  missing. `codebase-map coverage + freshness` reds on both new leg names as unclaimed inventory
+  keys; it carries no guard, so it runs on every bar, and the remedy is the dossier §4 specifies
+  rather than a regen. `every held leg is budgeted, every budget row resolves` refuses
   a new leg with no budget row, so the two rows are added with the leg. `harness arms (fail branches
   armed or pinned)` grades the new file's refusal branches, which may want an `ARMS_FLOORS` row.
   `install-prefix (shipped surface)` grades tool-root and kit files for carried kit-path literals;
@@ -268,16 +318,22 @@ about to remove; landing the fix first leaves the class ungated for the length o
   call prints the refusal on stderr and returns 2.
   Red when: the fix puts the loop behind a pipe, so `return 0` exits a subshell, the function falls
   through and prints nothing.
-- **AC2** — When `bash tools/unattended/check-unattended.sh` runs to completion on node `a`, it emits
-  a verdict and the run's own gate ledger carries a seconds figure for the leg below its declared
-  ceiling.
-  Red when: the leg again produces no verdict inside its ceiling.
-  cost: the leg's own wall clock, measured at 4168 s on the killed run of 2026-09-10.
-  fixture: a full run of that leg on a tree carrying dispatch rows; this worktree has one.
-  figure: DERIVED — the seconds are read from the ledger at observation time; the 4168 s is PINNED at
-  2026-09-10. A green here does not by itself PROVE the deadlock is gone, because the hang was
-  intermittent and the leg passed on other runs with the defect present. AC3 is the criterion that
-  proves it, by absence of the construct.
+- **AC2** — When `bash tools/run-gates/run-gates.sh` runs on node `a` with the fix in place, the row
+  for `unattended kit gate` in `<git-dir>/gate-ledger.tsv` reads status `ok` with a seconds figure
+  below that leg's declared ceiling of 16040.
+  Red when: the row still reads `fail`, or its seconds exceed 16040, or the run's wall guard kills
+  the leg and it writes no `.sec` at all, so no row for it is rewritten this run.
+  cost: one bar. The leg alone measured 4168 s on the killed run of 2026-09-10.
+  fixture: a tree carrying dispatch rows for that leg to walk; this worktree has one.
+  figure: DERIVED — the seconds and the status are read from the ledger at observation time. The
+  4168 s and the ceiling of 16040 are PINNED at 2026-09-10 on base `013b1af9`.
+  ONE INVOCATION, deliberately. A direct `bash tools/unattended/check-unattended.sh` run emits the
+  verdict and nothing else: that script contains no reference to a ledger, and every row of
+  `<git-dir>/gate-ledger.tsv` is written by the one block in `tools/run-gates/run-gates.sh` that owns
+  it. Splitting the observation across two commands is how an observer records a green from the half
+  that could not produce it. A green here does not by itself PROVE the deadlock is gone, because the
+  hang was intermittent and the leg passed on other runs with the defect present. AC3 is the
+  criterion that proves it, by absence of the construct.
 - **AC3** — When the scan runs over the tree, `lib-unattended.sh` appears in neither its hit list nor
   the registry, and `grep -c 'PASSCOMMITS'` over that file returns 0.
   Red when: the fix leaves the substitution in place and the site is carried in the registry instead.
@@ -303,24 +359,64 @@ about to remove; landing the fix first leaves the class ungated for the length o
   green. This is the gate's failing case, observed before the unit lands.
   Red when: the staged break passes, which would mean the leg is graded by its registry rather than by
   the tree.
-- **AC8** — When `bash tools/run-gates/run-gates.sh` runs with the new rows in place, both new legs
-  appear in the reported set, and the legs named in §7 stay green — the budget leg included, which
-  refuses a held leg carrying no budget row.
-  Red when: a new leg lands with no budget row, or with a guard naming an untracked path, which the
-  run-gates canary refuses.
+- **AC8** — When `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs with the new rows in
+  place, both new legs appear in the reported set and every leg named in §7 is green, the two
+  canaries and the budget leg included.
+  Red when: a new leg lands with no budget row, which `every held leg is budgeted, every budget row
+  resolves` refuses; or with a guard naming an untracked path, which `run-gates canary` refuses.
+  cost: a bar with every self-test run, which is the most expensive form of this observation.
+  THE DEFAULT BAR CANNOT OBSERVE THE SECOND HALF. `run-gates canary` and `run-gates gov canary` are
+  both `chunk: selftests`, and the runner holds every `subject = kit` or `chunk = selftests` leg
+  unless `GATE_SELFTESTS=1` is set, which no boundary sets. Held legs still print, as
+  `GATE held <name> (self-test, set GATE_SELFTESTS=1 to run)`, so a plain
+  `bash tools/run-gates/run-gates.sh` shows the untracked-path arm as a row and never runs it. That
+  matters here rather than in the abstract: `run-gates gov canary`'s own guard names
+  `tools/gate-legs.json`, which S5 edits.
 - **AC9** — When `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` is re-read, its gating
-  section names this leg rather than saying nothing sweeps the tree, and hygiene check 18 stays green
-  over it under `check-memory-hygiene.sh`.
-  Red when: the record still reads "Nothing sweeps other kits", which is the stale-claim class this
-  repo audits for.
+  section carries a NEW clause naming this leg and the construct its predicate matches, which is a
+  `while` loop fed by a heredoc or here-string whose body holds a command substitution; the section
+  still carries its existing sentence that nothing sweeps other kits for the `out=$(timeout` form;
+  and hygiene check 18 stays green over the record under `check-memory-hygiene.sh`.
+  Red when: the added clause claims the leg covers the `out=$(timeout` form, or the existing sentence
+  is deleted or weakened to make room for it.
+  WHY THE SENTENCE STAYS, because the obvious edit is the wrong one. `out=$(timeout N cmd)` is a
+  plain assignment, and this unit's §4 population table puts every non-loop command substitution
+  OUTSIDE the failing population. So that sentence is TRUE before this unit lands and TRUE after it,
+  and a criterion that reds until somebody rewrites it would go green only once a correct coverage
+  claim had been replaced by a false one — inside the record that exists to catalogue exactly that
+  failure. The gap this leg closes is a sibling construct, and the record says so in its own words.
+- **AC10** — When `python3 tools/codebase-map/test_codebase_map.py` runs over the tree with both new
+  leg rows and the new dossier in place, it passes: neither new leg name is reported unclaimed,
+  neither is reported as a stale claim, `gate-lint` no longer appears in `memory/map/baseline.toml`,
+  and the three artifacts under `memory/map/generated/` byte-match a fresh render.
+  Red when: the leg rows land without the dossier, which is the reproduced failure — that suite then
+  names both leg names under UNCLAIMED. It reds a second way if the dossier claims the `gate-lint`
+  kit key while the `baseline.toml` row survives, because a key that is both claimed and baselined
+  fails the ratchet's fourth assert.
+  figure: DERIVED — the suite names every offending key itself.
+  This is the criterion that makes the map claim an observation rather than an intention, and it runs
+  on an ordinary bar: `codebase-map coverage + freshness` is `chunk: declarations` and carries no
+  guard, so nothing about this one is held.
 
 ## 7. Gates
 
-`unattended kit gate` · `pass-order history` · `brief-recorded` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `govkit selfcheck` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `every held leg is budgeted, every budget row resolves` · `testsuite counts (every bar self-test prints one)` · `install-prefix (shipped surface)` · `line length`
+`unattended kit gate` · `pass-order history` · `brief-recorded` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `govkit selfcheck` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `every held leg is budgeted, every budget row resolves` · `testsuite counts (every bar self-test prints one)` · `install-prefix (shipped surface)` · `line length` · `codebase-map coverage + freshness` · `run-gates canary` · `run-gates gov canary`
 
 The three unattended legs are named because all three source the changed library; `pass-order history`
 and `brief-recorded` both source `lib-unattended.sh` without calling `pass_commit`, so they are the
 regression surface for the file rather than for the function.
+
+`codebase-map coverage + freshness` is named because S5's two leg names are two new `gate-legs`
+inventory keys. It is `chunk: declarations` with no guard, so it runs on every bar and reds on this
+unit unless the map claim lands with the leg rows. §4 has the reproduction.
+
+**Two of the legs above are HELD on an ordinary bar, and the list would lie without this line.**
+`run-gates canary` and `run-gates gov canary` are both `chunk: selftests`, which the runner holds
+unless `GATE_SELFTESTS=1` is set — and no boundary sets it, by the owner ruling of 2026-08-27. They
+are named anyway because `run-gates gov canary`'s guard names `tools/gate-legs.json`, which S5 edits,
+and because the canaries hold the arm that refuses a guard naming an untracked path, which is exactly
+the mistake a new leg row can make. Run them by hand for this unit; AC8 names the invocation. Every
+other leg on that line runs on an ordinary bar with no flag.
 
 New arm: tools/gate-lint/sh_hygiene.py --selftest · a fixture shell file carrying one loop fed by a command substitution and one fed by a plain heredoc, asserting the scan names the first and not the second · none
 
@@ -339,8 +435,11 @@ New arm: tools/gate-lint/sh_hygiene.py (the tree scan) · stage the banned const
   incomplete gate that lands and a complete one that contradicts a landed decision.
 - **Fork B — are the 19 carried sites drained, and by whom?** The registry is shrink-only, so they can
   sit at 19 forever without redding anything, and a ratchet that never drains is a waiver wearing a
-  ratchet's clothes — this repo's own phrase, from the `py.file` pin. Against draining: twenty edits
-  inside the two largest gate scripts in the tree, none of which has been observed to hang.
+  ratchet's clothes. That phrase is this repo's own, from the `.lexicon.conf` comment recording why
+  `py.file` and `py.constant` were left UN-ARMED rather than pinned over rows nobody can drain; there
+  is no live `py.file` pin, and the four-row `CELLS:` block is the check. Against draining: nineteen
+  edits across six files in the unattended kit, the memory-tree kit and the tool root, none of which
+  has been observed to hang. The §4 population table owns the per-file split.
   Recommendation: a backlog row against the tooling family rather than a unit of this build, so the
   drain is scheduled rather than either forgotten or forced into this diff.
 
@@ -353,14 +452,34 @@ skip-must-announce-itself rule is what makes the incomplete gate honest rather t
 absence.
 
 RESOLVED (agent, 2026-09-10, delegated) Fork B: a backlog row against the tooling family, not a
-unit of this build. Draining is twenty edits inside the two largest gate scripts in the tree,
-none of which has been observed to hang, while this build is repairing that same machinery. M3
-tie-breaks on fewer open questions and on reuse; the row records the debt where the next session
-reads it.
+unit of this build. Draining is nineteen edits across six files in the unattended kit, the
+memory-tree kit and the tool root, none of which has been observed to hang, while this build is
+repairing that same machinery. M3 tie-breaks on fewer open questions and on reuse; the row records
+the debt where the next session reads it, and it cites the §4 population table for the split rather
+than carrying a per-file count of its own.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft.
+- rev-2 · 2026-09-10 · §2 S5 · S6 · §3 · §4 · §5 · §6 AC2 · AC8 · AC9 · AC10 · §7 · §8 · folded the
+  round-1 spec audit's D1, D2, D5, D8, D9 and D10.
+  D1, the blocker: a leg NAME is a `gate-legs` inventory key, and `compute_coverage` returns both new
+  names UNCLAIMED against the live map tree — reproduced here, not taken on the reviewer's word. §4
+  gains the map-claim section and five `memory/map/` rows in the files table, §5's risks gains the
+  leg it had missed, §7 names the gate, and AC10 observes the claim.
+  D2: §7 discloses that both run-gates canaries are `chunk: selftests` and held on an ordinary bar,
+  and AC8 moved to the invocation that actually runs them.
+  D5: S6 and AC9 no longer demand that the gotcha's true `out=$(timeout` coverage sentence be
+  deleted. The record gains a clause naming this leg's own class and keeps the sentence.
+  D8: the "twenty edits in two files" figure is gone from §3, §4 Alternatives, fork B and fork B's
+  RESOLVED mark. The mark's DECISION is unchanged; only its blast-radius figure moved, to agree with
+  the §4 population table, which the four passages now point at instead of restating.
+  D9: the Inventory row's cell is `py.file` and is marked UN-ARMED, so the underscore is disclosed as
+  a convention nothing grades. Fork B's "waiver wearing a ratchet's clothes" is re-attributed to the
+  `.lexicon.conf` comment; no `py.file` pin exists. The stale count of hyphenated Python basenames
+  came out of the same row rather than being re-measured.
+  D10: AC2 is one invocation. `check-unattended.sh` writes no ledger row and applies no ceiling, so
+  the criterion now rides the bar run that produces both halves.
 
 ## 10. Reuse audit
 

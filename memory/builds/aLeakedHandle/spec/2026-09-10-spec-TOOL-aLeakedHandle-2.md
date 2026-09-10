@@ -1,6 +1,6 @@
 # TOOL-aLeakedHandle-2 — a run that reached a leg's ceiling is evidence, not a discarded failure
 
-**Status:** SPECCED · rev-1 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-2 · base 013b1af9 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -22,14 +22,21 @@ where that ceiling fired.
 ## 2. Scope (IN)
 
 - **S1** — `read_runs` admits a non-`ok` row when its seconds reach the leg's declared ceiling, and
-  keeps excluding every other failing row. The docstring states the rule and states what the rule
-  cannot distinguish. Observed by AC1, AC2 and AC5.
+  keeps excluding every other failing row. Every command path that reads the run window supplies the
+  ceilings it compares against, which means `cmd_write` acquires the `read_legs` call it does not
+  make today. Observed by AC1, AC2, AC5 and AC6.
 - **S2** — `cmd_check`'s failure line for a leg whose evidenced maximum is at or above its own
   ceiling says the ceiling was REACHED in a recorded run, instead of quoting headroom arithmetic
   over a number that is a lower bound rather than a duration. Observed by AC3.
-- **S3** — four arms in `tools/run-gates/run-gates.evidence.test.sh`, each run against a COPY of the
-  kit so no arm can write the tracked artifact, and each with its failing case observed RED before
-  it lands. Observed by AC4.
+- **S3** — the arms in `tools/run-gates/run-gates.evidence.test.sh` that observe AC1, AC2, AC3, AC6
+  and AC7, each run against a COPY of the kit so no arm can write the tracked artifact, and each
+  with its failing case observed RED before it lands. The arm count is READ from the suite rather
+  than pinned here, and so is the `FLOOR_ASSERTIONS` move, because both drift the moment an arm
+  splits. Observed by AC4.
+- **S4** — `read_runs`'s own docstring states the admission rule and names the three causes it
+  cannot tell apart. It is the only written statement of either fact, and §5 risks rests the whole
+  mitigation of the monotone-floor hazard on it, so it is OBSERVED rather than assumed. Observed by
+  AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -48,12 +55,25 @@ where that ceiling fired.
   and the seconds. This unit reads them differently and writes none of them.
 - **No claim about WHY a leg reached its ceiling.** Slow, contended and hung are three causes with
   one signature in the record, and §4 states the consequence rather than inventing a discriminator.
+- **The UNBACKED population is NOT this unit's to hold at zero, and no criterion here asserts it
+  is.** `TOOL-aLeakedHandle-1` is `order 1` and adds two rows to `tools/gate-legs.json`, and a leg
+  minted in that commit carries no reading in the retained window until a bar has run it, so it is
+  UNBACKED for reasons that have nothing to do with this change. Worth stating even though it is not
+  an edge: it runs one way, it needs nothing from either unit's authors, and it is why AC5 names one
+  named leg rather than an empty set.
 
 ### Edges
 
 - **consumes-from** external — the retained `<git-dir>/gate-run/` window must still hold a reading at
-  a ceiling for AC5 to be observable on the live tree. That window is node-local and the runner
-  prunes it, so AC5 carries a fixture line and every other criterion is observed on a built fixture.
+  a ceiling for AC5 to be observable on the live tree. That window is node-local, the runner prunes
+  it, and an ordinary bar cannot refill it for the one leg AC5 names, because that leg is held. AC5
+  carries a fixture line naming the invocation that can; every other criterion is observed on a
+  built fixture and needs none.
+- **consumes-from** `TOOL-aLeakedHandle-3` — the mirror of that unit's hands-off, and it is
+  load-bearing rather than bookkeeping. This unit's admission rule reads a `.leg` row's SECONDS
+  field and compares it against the declared ceiling, and unit 3 edits the reporting path that
+  produces that field. Unit 3 asserts it re-declares no ceiling and leaves the `.leg` row shape
+  unchanged; this unit relies on exactly that, so the pair is declared rather than assumed.
 - **hands-off** external — the refresh of the tracked evidence artifact, and any ceiling decision it
   then forces, stay with the owner.
 
@@ -65,12 +85,30 @@ A `.leg` row is written by `runleg` in `tools/run-gates/run-gates.sh` as seven t
 name, status, rc, seconds, started, ended, key. `status` is `ok` when rc is 0 and `fail` otherwise,
 so the row records what happened and not what caused it. `read_runs` reads fields 1, 2 and 4 today.
 The change adds one comparison against a fifth number that is not in the row at all — the leg's
-`ceiling` in `tools/gate-legs.json`, which `read_legs` already loads for every command path that
-calls `read_runs`.
+`ceiling` in `tools/gate-legs.json`, which `read_legs` loads.
 
 The admission rule becomes: a row counts when its status is `ok`, OR when its seconds are at or above
 the ceiling that `tools/gate-legs.json` declares for that leg today. A leg with no integer ceiling
 admits `ok` rows only, because there is nothing for a failing row to have reached.
+
+### Which command paths already hold the ceilings, and which one does not
+
+Read at BASE, `derive-ceilings.py` splits three ways. `cmd_report` calls `read_legs` and `read_runs`
+together on `derive-ceilings.py:132`. `cmd_check` calls `read_legs` alone on line 220 and reads no
+run files. `cmd_write` calls `read_runs` on line 175 and **never calls `read_legs` at all**. So the
+ceilings map the new predicate needs is already in hand on the reporting path and is absent on the
+writing path, which is the only path that produces the tracked artifact.
+
+`cmd_write` therefore acquires one added call, `read_legs(root)`. Its signature is
+`cmd_write(root, gd, args)`, so `root` is already there and no plumbing is needed above it.
+
+**The failure mode this exists to prevent, stated so a builder cannot reach it by accident.** The
+natural way to avoid breaking the second call site is to give `read_runs` the ceilings map as a
+DEFAULTED parameter. Do that, pass it at `cmd_report`, and forget `cmd_write`, and the write path
+silently keeps its `ok`-only behaviour while every criterion that drives `--report` still passes
+green. The merge bar cannot see it either: `leg ceilings clear their evidenced maximum` runs
+`--check`, which reads the two tracked files and no run file. AC6 drives `--write` for exactly this
+reason, and its Red-when names this case rather than the criterion's own negation.
 
 ### Why the elapsed comparison is the discriminator, and the exit code is not
 
@@ -179,7 +217,7 @@ suppressed, and no red is manufactured on a number nobody is allowed to move.
 | File | Change |
 |---|---|
 | `tools/run-gates/derive-ceilings.py` | `read_runs` predicate and docstring, one call site in `cmd_write`, one message branch in `cmd_check` |
-| `tools/run-gates/run-gates.evidence.test.sh` | four arms, one kit copy, the assertion floor |
+| `tools/run-gates/run-gates.evidence.test.sh` | the arms for AC1, AC2, AC3, AC6 and AC7, one kit copy, the assertion floor |
 
 ### Alternatives rejected
 
@@ -206,13 +244,16 @@ suppressed, and no red is manufactured on a number nobody is allowed to move.
 - observability — the `--report` UNBACKED line and the `--check` unbacked count both shrink as legs
   acquire rows, which is the visible signal that the pipeline changed.
 - risks — a contended or hung reading admitted once holds a monotone floor under that ceiling.
-  Mitigated by `--reset`, which exists and records the choice, and named in the docstring rather than
-  discovered by the next reader.
-- testing — four arms in the fixture harness, each with its break staged RED before landing, plus one
-  live-tree observation. The gate had no self-test of any kind before this unit.
+  Mitigated by `--reset`, which exists and records the choice, and named in `read_runs`'s docstring
+  rather than discovered by the next reader. That docstring is the whole of the mitigation, so AC7
+  observes it; before rev-2 no criterion read it and the mitigation could have shipped absent.
+- testing — one fixture arm per criterion AC1, AC2, AC3, AC6 and AC7, each with its break staged RED
+  before landing, plus one live-tree observation. The gate had no self-test of any kind before this
+  unit. The suite is `chunk: selftests` and no boundary runs it; §7 says what that costs.
 - migration — none. The artifact format is unchanged and the file is not rewritten by this unit.
-- user docs — N/A. This repo ships no user-facing doc tree, and `derive-ceilings.py` is agent-facing
-  tooling whose own module docstring is where the admission rule is documented.
+- user docs — N/A as a doc TREE: this repo ships none, and `derive-ceilings.py` is agent-facing
+  tooling. The admission rule is documented in `read_runs`'s own docstring, beside the predicate it
+  describes rather than in the module header, and AC7 is what makes that a claim with a witness.
 
 ## 6. Acceptance criteria
 
@@ -230,30 +271,68 @@ suppressed, and no red is manufactured on a number nobody is allowed to move.
   ceiling was REACHED in a recorded run.
   Red when: the line still reads `does not clear its evidenced maximum` for a reached ceiling, or the
   run exits 0.
-- **AC4** — When each arm's subject is reverted in place and `tools/run-gates/run-gates.evidence.test.sh`
-  is re-run, that arm prints `FAIL` and the suite exits non-zero; the four observations are recorded
-  before the reverts are unstaged.
+- **AC4** — When each arm's subject is reverted in place and
+  `bash tools/run-gates/run-gates.evidence.test.sh` is re-run BY HAND, that arm prints `FAIL` and the
+  suite exits non-zero; one observation per arm is recorded before the reverts are unstaged.
   Red when: an arm passes with its subject reverted, which is an arm asserting nothing.
+  BY HAND is the whole of it: no boundary performs this observation. The leg `run-gates evidence` is
+  `chunk: selftests` and `subject: kit` in `tools/gate-legs.json`, and `run-gates.sh` holds every leg
+  matching either unless `GATE_SELFTESTS=1`, which no boundary sets (owner ruling, 2026-08-27). So
+  the observation is the direct invocation above, or a whole bar run as
+  `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. A green ordinary bar observes none of it.
   cost: the suite's own wall clock, whose recorded maximum is 1385.1 s.
   figure: PINNED — read from `tools/run-gates/ceiling-evidence.txt` on 2026-09-10, node `a`.
-- **AC5** — When `derive-ceilings.py --report` runs on node `a` in this worktree after the change, it
-  prints a row for `memory-hygiene self-test` at or above 900 s and emits no UNBACKED line at all,
-  where before the change it printed no row for that leg and named it as the only unbacked one.
-  Red when: the leg is still absent from stdout, or still named on the UNBACKED line.
-  fixture: the retained `<git-dir>/gate-run/` window must still hold a reading at that leg's ceiling.
-  It held two on 2026-09-10, at 900.481 s and 900.240 s; the runner prunes that window, so a later
-  session may have to run a bar before this criterion is observable.
+- **AC5** — When `python tools/run-gates/derive-ceilings.py --report` runs on node `a` in this
+  worktree after the change, it prints a table row for `memory-hygiene self-test` at or above 900 s
+  and no longer names that leg on the UNBACKED line, where before the change it printed no row for
+  it and named it as the only unbacked leg.
+  Red when: the leg is still absent from stdout, or is still named on the UNBACKED line. The
+  criterion says nothing about the SIZE of that line, because §3 records that a sibling unit adds
+  legs to the same manifest and an empty UNBACKED set is not this unit's to deliver.
+  fixture: the retained `<git-dir>/gate-run/` window must hold a reading at that leg's ceiling. It
+  held two on 2026-09-10, at 900.481 s and 900.240 s. The runner prunes that window, and an ORDINARY
+  bar cannot refill it: `memory-hygiene self-test` is `chunk: selftests` with `subject: kit`, so
+  `run-gates.sh` holds it and writes no run row for it at all. A later session restores the reading
+  only with `GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, and pays that leg's own 900 s bound
+  to do it.
   figure: DERIVED — the printed maximum is whatever the window holds. The two readings above are
-  PINNED as what it held on 2026-09-10.
+  PINNED as what it held on 2026-09-10, node `a`.
+- **AC6** — When the copied `tools/run-gates/derive-ceilings.py --write` runs over the same fixture
+  AC1 builds, the evidence file it writes carries a row for the ceiling-reaching leg whose seconds
+  are that failing row's, and carries no row for the leg whose only failing row sits below its
+  ceiling.
+  Red when: the ceiling-reaching leg gets no row, or gets one carrying the `ok` reading instead.
+  That is the defaulted-parameter case named in §4: `read_runs` gains the ceilings map with a
+  default, `cmd_report` passes it, `cmd_write` never does, and the write path keeps its `ok`-only
+  behaviour with AC1 through AC5 all green.
+  fixture: the arm runs against a COPY of the kit, so `--write` cannot reach the tracked
+  `tools/run-gates/ceiling-evidence.txt`. §4 Alternatives records why every arm does this.
+- **AC7** — When the arm reads `read_runs`'s docstring out of the copied
+  `tools/run-gates/derive-ceilings.py`, that docstring states the ceiling comparison as the admission
+  rule, and names slow, contended and hung as the three causes it cannot tell apart.
+  Red when: the docstring still describes an `ok`-only filter, or states the rule while omitting what
+  it cannot distinguish. §5 risks makes that second sentence the entire mitigation of the
+  monotone-floor hazard, so without this criterion it can ship absent with every other one green.
 
 ## 7. Gates
 
 `leg ceilings clear their evidenced maximum` · `run-gates evidence` · `testsuite counts (every bar self-test prints one)` · `lexicon naming predicates` · `line length` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
+**What that list does NOT mean, because one of its names is held.** `run-gates evidence` is
+`chunk: selftests` and `subject: kit` in `tools/gate-legs.json`, and `run-gates.sh` holds every leg
+matching either unless `GATE_SELFTESTS=1` — which the charter records no boundary sets (owner ruling,
+2026-08-27). So every arm of S3 binds at NO merge bar and is run by hand. Of the seven names above,
+the only one that touches this unit's own predicate at a boundary is `leg ceilings clear their
+evidenced maximum`, and it runs `--check`, which §4 Rollout states reads no run file. The changed
+predicate therefore has ZERO boundary-enforced coverage: a green bar must not be read as covering it,
+and the compensating check is the direct invocation AC4 names.
+
 New arm: `tools/run-gates/run-gates.evidence.test.sh` · AC1 and AC2 stage RED by restoring the bare
 `ok`-only predicate in `read_runs`, AC3 stages RED by restoring the headroom sentence in `cmd_check`,
-and each is confirmed red before being unstaged · the suite's `FLOOR_ASSERTIONS` constant moves by
-one per arm, read from the suite at the time of the change rather than pinned here.
+AC6 stages RED by dropping the added `read_legs` call from `cmd_write`, AC7 stages RED by cutting the
+rule out of `read_runs`'s docstring, and each is confirmed red before being unstaged · the suite's
+`FLOOR_ASSERTIONS` constant moves by one per assertion, read from the suite at the time of the change
+rather than pinned here.
 
 ## 8. Open questions
 
@@ -288,6 +367,31 @@ to take is the shape M3 refuses. Re-asked by whoever answers the parked ceiling 
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft.
+- rev-2 · 2026-09-10 · §2 §3 §4 §5 §6 §7 S1 S3 S4 AC4 AC5 AC6 AC7 · folded round-1 spec-audit
+  defects D3, D4, D6 and D7.
+  D3 — §4 Data model said `read_legs` was already loaded on every path that calls `read_runs`, which
+  the source refutes: `cmd_write` never calls it. The clause is replaced by the three-way split read
+  at BASE with its line numbers, and by the defaulted-parameter failure mode it enables. AC6 now
+  drives `--write`, so the one path that produces the tracked artifact is observed instead of
+  assumed, and S1 names it.
+  D4 — AC5 demanded no UNBACKED line at all, which a sibling unit's two new manifest rows break for
+  reasons outside this unit, and its fixture line told a later session to run a bar that cannot
+  produce the reading, because the leg it names is held on an ordinary bar. The criterion is scoped
+  to the one leg it is about, the fixture line names `GATE_SELFTESTS=1` and its cost, and §3 records
+  that the UNBACKED set is not this unit's to empty.
+  D6 — §7 listed `run-gates evidence` without saying it is `chunk: selftests` and `subject: kit`, so
+  a held leg read as a green one. §7 and AC4 now disclose the hold, name the invocation that
+  observes the arms, and state that the changed predicate has no boundary-enforced coverage.
+  D7 — S1 claimed the docstring was observed by AC1, AC2 and AC5, none of which reads it, while §5
+  rested a named hazard's only mitigation on it. The clause is split out as S4 and given a real
+  witness in AC7; §5's user-docs row is corrected from the module docstring to `read_runs`'s own.
+
+  ORCHESTRATOR EDIT, same fold pass, not a separate rev: `TOOL-aLeakedHandle-3` declares
+  **hands-off** `TOOL-aLeakedHandle-2` and this spec declared no matching **consumes-from**,
+  which check 12's reciprocity arm reds at the push boundary. The fold agent saw it and left it
+  alone, correctly, because it was scoped to one file and the sibling was being edited
+  concurrently. The mirror is written as a real dependency rather than as bookkeeping: this
+  unit's admission rule reads the `.leg` SECONDS field that unit 3's reporting change touches.
 
 ## 10. Reuse audit
 
