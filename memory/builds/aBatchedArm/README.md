@@ -12,10 +12,12 @@ authorized-by: prompt
 
 ## The problem this build exists to solve
 
-`unattended gate selftest` is rank 1 of 61 in the declared self-test population at 9067 s, a quarter
-of all recorded self-test seconds, and the member the pooled runner's wall clock cannot fall below.
-It costs that because it re-runs the whole 31-check program once per arm: 293 invocations, 83 % of
-which feed at most one assertion.
+`unattended gate selftest` is the costliest row in the declared self-test population and the member
+the pooled runner's wall clock cannot fall below. It costs that because it re-runs the whole checker
+once per arm. **The figures live in `TOOL-aBatchedArm-1` §1 and §4 and are not restated here**, which
+is `two-answers-to-one-question` applied to this file: the spec carries a base sha, so its numbers
+are a measurement at a commit, and a second copy in prose beside it is the copy that rots. The
+current ranking is one command away: `bash tools/run-gates/run-selftests.sh --rank`.
 
 `TOOL-aPooledSweep-7` names the remedy and does not build it: "Falling further means dividing that
 one suite." This build is that follow-up. Target: a verdict in under 20 minutes, no assertion deleted.
