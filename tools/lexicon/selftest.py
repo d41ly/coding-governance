@@ -1123,8 +1123,14 @@ with build_tempdir() as _td:
     _all = _got.stdout + _got.stderr
     check("S6: a BLIND sniffer reds as DEAD SNIFFER rather than reporting perfect coverage",
           _got.returncode != 0 and "DEAD SNIFFER" in _all, _all[-300:])
-    check("S6: ...and it names the reading it contradicts",
-          "ARMED extractor did" in _all, _all[-300:])
+    # The message used to say the sniffer "found no definition ... where an ARMED extractor
+    # did" and then blame the denominator for undercounting. Both halves were rewritten: the
+    # disagreement is SYMMETRIC, and fixing it RAISES the fraction rather than lowering it. So
+    # this arm now asserts what the rewrite was for -- that both readings are named and both
+    # repairs offered -- instead of a phrase that merely happened to be in the old string.
+    check("S6: ...and it names BOTH readings and BOTH repairs, not just the sniffer",
+          "DISAGREE" in _all and "EITHER side" in _all
+          and "widen the sniffer" in _all and "narrow the extractor" in _all, _all[-400:])
 
 # ---- TOOL-dScaffoldedMirror-8 S6: the table's own shape ------------------------------------------
 #
@@ -4407,6 +4413,85 @@ def test_ts_refusals():
     check("ts guard: the class annotation D3 was written for still grades the property name",
           got == [("onChange", 2)], f"{got}")
 
+    # ---- The LIVE-CORPUS defects, reported by an adopter and found to be four classes ------------
+    #
+    # The 115 frozen records are 60-line EXCERPTS with a MEDIAN of 13 lines, and a cascading lexer
+    # state error in a 700-to-2200-line file has nowhere to manifest in one. Measured: six reader
+    # variants spanning 45 raising adopter files down to 0 all score an identical 115/115 with zero
+    # per-record diffs. A fixture set whose verdict does not move when the reader does is not
+    # measuring the reader, so these arms are WHOLE FILES, small enough to author and complete
+    # enough to lex.
+
+    # L1 -- the `jsxtag` frame had NO comment handling, so everything inside a comment in an opening
+    # tag was lexed as tag content: an apostrophe opened a string, a `>` closed the tag. 24 of 45.
+    got = lex.parse_tsx_defs("const A = () => <em\n  // it\'s fine\n  id=\"a\"\n/>;\n")[0]
+    check("ts live: a line comment inside an opening tag, carrying an apostrophe",
+          got == [("A", 1)], f"{got}")
+    got = lex.parse_tsx_defs("const A = () => <em /* it\'s fine */ id=\"a\" />;\n")[0]
+    check("ts live: ...and the block-comment spelling", got == [("A", 1)], f"{got}")
+    got = lex.parse_tsx_defs(
+        "const A = () => <em // a > b\n  id=\"a\"\n/>;\nfunction f() { return 1; }\n")[0]
+    check("ts live: ...and a comment whose text contains a `>`",
+          got == [("A", 1), ("f", 4)], f"{got}")
+
+    # L2 -- a JSX element may carry an explicit TYPE ARGUMENT. The frame had no case for `<`, so the
+    # type argument's own `>` ended the opening tag and the element's real `/>` became text. 21 of 45.
+    # This edit may not land before L1: unrestricted, it consumed a `<noscript>` written inside an
+    # in-tag comment and turned a green file red, which is what the guard below pins.
+    got = lex.parse_tsx_defs("const A = () => <Tabs<Tab> value={1} />;\n")[0]
+    check("ts live: an explicit type argument on a self-closing JSX element",
+          got == [("A", 1)], f"{got}")
+    got = lex.parse_tsx_defs(
+        "const A = () => (\n  <Tag\n    // a <noscript> tag, SSR\'d\n  >{c}</Tag>\n);\n")[0]
+    check("ts live: ...and a comment naming a tag, inside a tag, stays green (L2 needs L1)",
+          got == [("A", 1)], f"{got}")
+
+    # L3 -- `read_string` broke at a newline. Right for a code string, wrong for a JSX ATTRIBUTE
+    # value, which may legally wrap. 5 files, and the only fix that reaches one of them.
+    got = lex.parse_tsx_defs("const A = () => <Card desc=\"a long\n  wrapped string\" />;\n")[0]
+    check("ts live: a JSX attribute string that wraps across a line",
+          got == [("A", 1)], f"{got}")
+
+    # L4 -- an interface or type-literal MEMBER SIGNATURE is a type position. Closes
+    # TOOL-aGradedDialect-8, filed on a hypothesis and supplied an instance by the live corpus.
+    # A POSITIVE SITS BESIDE THE NEGATIVE. Asserting only that `funcs` is empty is satisfied by
+    # a reader that extracts nothing at all, which is the shape that hid four defects behind a
+    # 115/115 corpus. The interface must be graded as a TYPE and the function after it found.
+    _f, _t, _ = lex.extract_text(
+        "interface A {\n  run: <T>(x: T) => T;\n}\nfunction after() {}\n", "parser",
+        "tsx-tokens")
+    check("ts live: an interface member whose type is a generic function is not JSX, and the "
+          "interface IS still graded as a type",
+          _f == [("after", 4)] and _t == [("A", 1)], f"funcs {_f} types {_t}")
+    _f, _t, _ = lex.extract_text(
+        "type A = { run: <T>(x: T) => T };\nfunction after() {}\n", "parser", "tsx-tokens")
+    check("ts live: ...and the type-literal spelling, with the alias still graded",
+          _f == [("after", 2)] and _t == [("A", 1)], f"funcs {_f} types {_t}")
+    # THE GUARD THAT MATTERS MOST HERE. Keying the member rule on the separator ALONE broke this:
+    # an object-literal property presents the identical `, name :` tail, so a green file went red.
+    # The discriminator is the angle run's TAIL -- `(` for a signature, children for an element.
+    got = lex.parse_tsx_defs(
+        "const p = [];\np.push({ key: \"k\", node: <span>{t}</span> });\nfunction f() {}\n")[0]
+    check("ts live: ...while an object-literal property's `<` is still a JSX element",
+          got == [("f", 3)], f"{got}")
+
+    # L5 -- the two shapes the SNIFFER could not see, which is what the adopter's DEAD SNIFFER was.
+    # Both are definitions by the oracle's reading and by `parse_ts_defs`; only the sniffer disagreed.
+    check("ts live: an arrow property MID-LINE sniffs as a definition carrier",
+          bool(lex.DEFINITION_SNIFF.search(
+              "expect(f(new Error(\"x\"), { errorMessage: () => \"\" })).toEqual({});\n")),
+          "the inline arrow property")
+    check("ts live: ...and a named function EXPRESSION passed as an argument",
+          bool(lex.DEFINITION_SNIFF.search(
+              "export const Input = forwardRef<A, B>(function Input({ x }, ref) {\n")),
+          "the named function expression")
+    # ...and the bound that keeps the function row off prose. A bare `function` keyword in a sentence
+    # or a string is not a definition, and an unbounded row read 13 to 15 of this repo's own lines.
+    check("ts live: ...while prose and a string mentioning `function` do not",
+          not lex.DEFINITION_SNIFF.search("A pure function of the memory tree, and nothing else.\n")
+          and not lex.DEFINITION_SNIFF.search("if (typeof x === \"function\") return x;\n"),
+          "the bounded prefix admits too much")
+
     needles = [n for _l, _s, n, _j in rows]
     shared = sorted({(a, b) for a in needles for b in needles if a != b and a in b})
     check("AC3: no refusal's needle is a substring of another's, or one firing first scores a pass "
@@ -4530,13 +4615,8 @@ check("AC9: a types-only TypeScript module does not land in `blind`, so no DEAD 
 #: joined it, because the two corpus records carrying that shape are `vi.mock` factories with no
 #: declaration in front of them at all. Held here as bytes so the arm below can narrow the sniffer BACK inside a kit copy; an edit
 #: to either spelling makes `run_case` refuse the patch by name rather than scoring a silent pass.
-_SNIFF_WIDE = (
-    r"(?:export[ \t]+)?(?:declare[ \t]+)?(?:interface|enum)[ \t]+\w  # ts, java, kotlin, c#" "\n"
-    r"        | (?:export[ \t]+)?type[ \t]+\w[\w$]*[ \t]*[<=]   # ts type alias" "\n"
-    r"        | (?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*(?:[ \t]*:[^=\n]+)?"
-    r"[ \t]*=[ \t]*(?:async[ \t]*)?[(<{]" "\n"
-    r"        | \w[\w$]*[ \t]*:[ \t]*(?:async[ \t]*)?\([^)]*\)[ \t]*(?::[^=\n]+)?=>"
-    r"  # arrow-valued property")
+_SNIFF_WIDE = '(?:export[ \\t]+)?(?:declare[ \\t]+)?(?:interface|enum)[ \\t]+\\w  # ts, java, kotlin, c#\n        | (?:export[ \\t]+)?type[ \\t]+\\w[\\w$]*[ \\t]*[<=]   # ts type alias\n        | (?:export[ \\t]+)?(?:const|let|var)[ \\t]+\\w[\\w$]*(?:[ \\t]*:[^=\\n]+)?[ \\t]*=[ \\t]*(?:async[ \\t]*)?[(<{]\n        | [^\\n]*?\\w[\\w$]*[ \\t]*:[ \\t]*(?:async[ \\t]*)?\\([^)]*\\)[ \\t]*(?::[^=\\n]+)?=>  # arrow property, ANYWHERE on the line\n        | [^\\n]*?[(,=\\\\[:>][ \\t]*(?:async[ \\t]+)?function[ \\t]*\\*?[ \\t]*\\w[\\w$]*[ \\t]*[(<]  # named function EXPRESSION'
+
 _SNIFF_NARROW = (r"(?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*[ \t]*=[ \t]*"
                  r"(?:async[ \t]*)?\(  # js arrow")
 
@@ -4545,7 +4625,9 @@ check("AC9 red: narrowed BACK to the rows shipped before S8, the sniffer reads b
       "as empty and the run REDS with DEAD SNIFFER",
       code != 0 and "DEAD SNIFFER" in out, out)
 check("AC9 red: ...naming the count of files the extractor read and the sniffer did not",
-      f"found no definition in {len(_sniff_files)} file(s)" in out, out)
+      f"in {len(_sniff_files)} file(s) that the coverage sniffer" in out, out)
+check("AC9 red: ...and stating the direction the fraction moves, which the old wording had "
+      "backwards", "RAISES the reported coverage" in out, out)
 
 # =================================================================================================
 # TOOL-aGradedDialect-2 — THE TYPESCRIPT CONFORMANCE CORPUS, and the floor a reader has to clear

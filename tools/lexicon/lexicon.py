@@ -184,7 +184,8 @@ DEFINITION_SNIFF = re.compile(
         | (?:export[ \t]+)?(?:declare[ \t]+)?(?:interface|enum)[ \t]+\w  # ts, java, kotlin, c#
         | (?:export[ \t]+)?type[ \t]+\w[\w$]*[ \t]*[<=]   # ts type alias
         | (?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*(?:[ \t]*:[^=\n]+)?[ \t]*=[ \t]*(?:async[ \t]*)?[(<{]
-        | \w[\w$]*[ \t]*:[ \t]*(?:async[ \t]*)?\([^)]*\)[ \t]*(?::[^=\n]+)?=>  # arrow-valued property
+        | [^\n]*?\w[\w$]*[ \t]*:[ \t]*(?:async[ \t]*)?\([^)]*\)[ \t]*(?::[^=\n]+)?=>  # arrow property, ANYWHERE on the line
+        | [^\n]*?[(,=\\[:>][ \t]*(?:async[ \t]+)?function[ \t]*\*?[ \t]*\w[\w$]*[ \t]*[(<]  # named function EXPRESSION
         | func[ \t]+\w                                    # go, swift
         | fn[ \t]+\w                                      # rust
         | (?:public|private|protected)[ \t]+[\w<>\[\]]+[ \t]+\w+[ \t]*\(   # java, c#
@@ -193,6 +194,15 @@ DEFINITION_SNIFF = re.compile(
     re.M | re.X,
 )
 
+#: TWO ROWS ARE DELIBERATELY UN-ANCHORED, and an adopter's red is why. A definition does not have
+#: to start a line: `expect(f(x, { errorMessage: () => "..." }))` holds an arrow property mid-line,
+#: and `forwardRef<...>(function Input(...) {` holds a named function EXPRESSION after a `(`. The
+#: oracle counts both, `parse_ts_defs` extracts both, and a line-anchored sniffer saw neither --
+#: which put each file in `blind` and redded the adopter's whole gate on a DEAD SNIFFER whose
+#: message blamed the sniffer's denominator. The function row carries a BOUNDED prefix
+#: (`[(,=[:>]` then the keyword then a NAME then `(` or `<`) rather than a bare `\\bfunction`,
+#: because the bare spelling admits prose -- "a pure function of" -- and `typeof x === "function"`.
+#:
 #: Extensions the sniffer never opens. Not a vocabulary — a read-cost bound. A binary or a lockfile
 #: cannot carry a definition and reading it is wasted I/O; being wrong here can only UNDERCOUNT the
 #: denominator, which reports coverage as better than it is, so the list is kept short deliberately.
@@ -866,7 +876,38 @@ _TS_DECLARATORS = frozenset(
     ("const", "let", "var", "readonly", "public", "private", "protected", "static", "declare"))
 
 
-def check_ts_type_position(toks: list) -> bool:
+def check_ts_generic_fn_type(src: str, i: int) -> bool:
+    """A `<` at `i` opens a generic parameter list belonging to a FUNCTION TYPE.
+
+    `<T>(x: T) => T` is a type; `<span>{x}</span>` is an element. The tails are what tell them
+    apart -- a generic parameter list is followed by the `(` of the signature it belongs to,
+    and an element is followed by its children. Needed because the TOKEN TAIL cannot: an
+    interface member and an object-literal property both present `, name :`, and keying the
+    member rule on that alone turned `parts.push({ key: "x", node: <span>{t}</span> })` from
+    green to a refusal. Round 2 of the closing review predicted that exact shape.
+    """
+    depth, j, n = 0, i, len(src)
+    while j < n:
+        if src.startswith("=>", j):
+            j += 2
+            continue
+        ch = src[j]
+        if ch == "<":
+            depth += 1
+        elif ch == ">":
+            depth -= 1
+            if depth == 0:
+                j += 1
+                break
+        j += 1
+    else:
+        return False
+    while j < n and src[j] in " \t":
+        j += 1
+    return src[j:j + 1] == "("
+
+
+def check_ts_type_position(toks: list, src: str = "", i: int = -1) -> bool:
     """The tokens just emitted put this `<` in a TYPE position, where JSX cannot appear.
 
     Two shapes, and both were measured refusing valid `.tsx` source before this existed:
@@ -880,7 +921,18 @@ def check_ts_type_position(toks: list) -> bool:
     # deliberately NOT on the colon alone -- an object literal's `{ icon: <Home/> }` has a colon too
     # and its `<` really is an element, which 39 of the frozen corpus's records depend on.
     if toks[-1][0] == "op" and toks[-1][1] == ":" and toks[-2][0] == "word":
-        return toks[-3][0] == "word" and toks[-3][1] in _TS_DECLARATORS
+        if toks[-3][0] == "word" and toks[-3][1] in _TS_DECLARATORS:
+            return True
+        # A MEMBER SIGNATURE inside an interface or a type literal: `{ run: <T>(x: T) => T }`.
+        # The separator before the name is NOT enough on its own and the first cut of this arm
+        # proved it: an object-literal property presents the identical `, name :` tail, so
+        # `parts.push({ key: "x", node: <span>{t}</span> })` went from green to a refusal. What
+        # separates them is the TAIL of the angle run -- a generic parameter list is followed by
+        # the `(` of its signature, an element by its children -- so the source position is
+        # required and the token tail alone cannot answer this. Round-2 finding 4, filed as
+        # TOOL-aGradedDialect-8 on a hypothesis; the live corpus supplied the instance.
+        return (toks[-3][0] == "op" and toks[-3][1] in ("{", ";", ",")
+                and i >= 0 and check_ts_generic_fn_type(src, i))
     # A TYPE-ALIAS body: `type Mapper = <T>(x: T) => T`. This replaced a `type_alias` FLAG that was
     # armed on the alias header and cleared at a depth-0 `;`, and the flag was wrong twice over. It
     # never cleared in semicolon-free source, so one ASI alias suppressed JSX for the rest of the
@@ -935,14 +987,21 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
         if not suppress:
             toks.append((kind, text, line))
 
-    def read_string(j: int, q: str) -> int:
-        """The index just past the `q` that closes a string opened before `j`."""
+    def read_string(j: int, q: str, wrap: bool = False) -> int:
+        """The index just past the `q` that closes a string opened before `j`.
+
+        `wrap` is passed ONLY from the `jsxtag` frame. A code string may not cross a newline
+        and a JSX ATTRIBUTE VALUE may, so breaking at the newline unconditionally refused
+        every wrapped attribute -- five files on a live adopter corpus, one of which no other
+        fix reaches. The code-path callers stay byte-identical rather than sharing a
+        loosened rule they do not want.
+        """
         while j < n:
             c2 = src[j]
             if c2 == "\\":
                 j += 2
                 continue
-            if c2 == "\n":
+            if c2 == "\n" and not wrap:
                 break
             if c2 == q:
                 return j + 1
@@ -1037,12 +1096,67 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
                 expr_end = True
                 i += 2
                 continue
+            # COMMENTS ARE LEGAL INSIDE AN OPENING TAG and this frame had no case for them,
+            # which was 24 of the 45 files a LIVE adopter corpus refused. Everything inside a
+            # comment was lexed as tag content: `// it's fine` opened a string on the
+            # apostrophe and `// a > b` ended the tag on the `>`, and each then cascaded to a
+            # refusal hundreds of lines later naming a construct that was not there. Mirrored
+            # from the code section below rather than re-derived, so two readings of one
+            # comment cannot drift apart.
+            #
+            # AFTER the `/>` case and BEFORE every other one. `/>` cannot collide with `//` or
+            # `/*`, so this position is safe, and sitting ahead of the quote and `>` cases is
+            # what makes it work at all.
+            if src.startswith("//", i):
+                j = src.find("\n", i)
+                i = n if j < 0 else j
+                continue
+            if src.startswith("/*", i):
+                j = src.find("*/", i + 2)
+                if j < 0:
+                    raise SyntaxError(f"unterminated /* comment opened at line {line}")
+                line += src.count("\n", i, j)
+                i = j + 2
+                continue
+            if c == "<":
+                # AN EXPLICIT TYPE ARGUMENT on the element itself -- `<Tabs<Tab> v={1} />`.
+                # Without this the type argument's own `>` ended the opening tag and the
+                # element's real `/>` became JSX text, refusing the file. 21 of 45.
+                #
+                # UNCONDITIONAL, and that is only safe because the comment branches above run
+                # FIRST. An unrestricted balanced run consumed a `<noscript>` written inside
+                # an in-tag comment and turned a green file red, which is the whole reason
+                # this edit may not land before the comment fix. A `<` cannot otherwise reach
+                # here: an attribute value's angle brackets sit inside a string or an
+                # expression container and both have their own case above. Keying it on
+                # `toks[-1]` was tried and could not fire at all -- this frame never emits the
+                # tag NAME as a token. `=>` is skipped so an arrow inside the type argument
+                # does not decrement the depth.
+                depth, j = 0, i
+                while j < n:
+                    if src.startswith("=>", j):
+                        j += 2
+                        continue
+                    if src[j] == "<":
+                        depth += 1
+                    elif src[j] == ">":
+                        depth -= 1
+                        if depth == 0:
+                            j += 1
+                            break
+                    elif src[j] == "\n":
+                        line += 1
+                    j += 1
+                else:
+                    j = i + 1
+                i = j
+                continue
             if c == ">":
                 stack[-1] = "jsxchildren"
                 i += 1
                 continue
             if c in "\"'":
-                j = read_string(i + 1, c)
+                j = read_string(i + 1, c, wrap=True)
                 line += src.count("\n", i, j)
                 i = j
                 continue
@@ -1101,7 +1215,7 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
         if c == "<":
             if jsx and not expr_end and not check_ts_generic(src, i) \
                     and check_ts_tag_start(src, i) \
-                    and not check_ts_type_position(toks):
+                    and not check_ts_type_position(toks, src, i):
                 stack.append("jsxtag")
                 opens.append(("JSX element", line))
                 i += 1
@@ -2441,6 +2555,13 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict, clusters=Non
     # one definition-carrier scan it did not before, which is the honest price of the two modes
     # answering the same question.
     #
+    # THE MESSAGE NAMES BOTH SIDES, and it used to name one. It asserted that the denominator was
+    # undercounting and so reported coverage as BETTER than it is, which is backwards: a blind file
+    # is absent from `carriers` and its extension is armed, so seeing it adds one to the numerator
+    # AND the denominator, and the fraction goes UP. An adopter met this refusal, read it as an
+    # accusation against their own source, and had no waiver to reach for. The disagreement is
+    # symmetric and the repair depends on which reading is wrong, so the string says so.
+    #
     # WHAT IT ASSERTS IS AGREEMENT, not "some dark extension carries a definition" — that wording
     # reds an honest adopter whose dark extensions are all data files. Every file an ARMED extractor
     # found a definition in must also sniff positive: two independent readings of one population, so
@@ -2448,9 +2569,12 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict, clusters=Non
     carriers = scan_definition_carriers(root, files)
     blind = sorted(extractor_carriers - carriers)
     if blind:
-        problems.append(f"DEAD SNIFFER (the coverage sniffer found no definition in {len(blind)} "
-                        f"file(s) where an ARMED extractor did, e.g. {blind[0]}; the denominator is "
-                        f"undercounting, which reports coverage as BETTER than it is)")
+        problems.append(f"DEAD SNIFFER (two readings of one file DISAGREE: an armed extractor "
+                        f"found a definition in {len(blind)} file(s) that the coverage sniffer "
+                        f"reads as empty, e.g. {blind[0]}. EITHER side may be the wrong one -- "
+                        f"widen the sniffer if the extractor is right, narrow the extractor if it "
+                        f"is not. Fixing it RAISES the reported coverage, because a blind file is "
+                        f"in neither the numerator nor the denominator)")
 
     # --- TOOL-aSurfacedLexicon-6: the cell matrix's own three populations ---------------------
     #
