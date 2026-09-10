@@ -183,7 +183,8 @@ DEFINITION_SNIFF = re.compile(
         | (?:export[ \t]+)?(?:abstract[ \t]+)?class[ \t]+\w   # js, ts, php, java, kotlin
         | (?:export[ \t]+)?(?:declare[ \t]+)?(?:interface|enum)[ \t]+\w  # ts, java, kotlin, c#
         | (?:export[ \t]+)?type[ \t]+\w[\w$]*[ \t]*[<=]   # ts type alias
-        | (?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*(?:[ \t]*:[^=\n]+)?[ \t]*=[ \t]*(?:async[ \t]*)?[(<]
+        | (?:export[ \t]+)?(?:const|let|var)[ \t]+\w[\w$]*(?:[ \t]*:[^=\n]+)?[ \t]*=[ \t]*(?:async[ \t]*)?[(<{]
+        | \w[\w$]*[ \t]*:[ \t]*(?:async[ \t]*)?\([^)]*\)[ \t]*(?::[^=\n]+)?=>  # arrow-valued property
         | func[ \t]+\w                                    # go, swift
         | fn[ \t]+\w                                      # rust
         | (?:public|private|protected)[ \t]+[\w<>\[\]]+[ \t]+\w+[ \t]*\(   # java, c#
@@ -833,6 +834,50 @@ def check_ts_generic(src: str, i: int) -> bool:
     return src[k:k + 1] == "," or src[k:k + 8] == "extends "
 
 
+def check_ts_tag_start(src: str, i: int) -> bool:
+    """A `<` in a `.tsx` source: can what follows it legally OPEN a JSX element?
+
+    A CLOSING TAG reaches here too, and leaving `/` out of the set was a regression this arm caught:
+    inside JSX TEXT the `</span>` of a nested element comes back through this dispatch rather than
+    through the `jsxtag` frame, and rejecting it emitted `op '<'` and sent the `/` to `read_regex`.
+    The rejection is safe only where a JSX element could legally open, since the caller reaches this
+    at all only when `expr_end` is False -- `a < /re/.test(x)` never gets here.
+
+    `check_ts_generic` decides the AMBIGUOUS case — `<T>` element versus `<T,>` type parameters —
+    and answers False for everything that is not an identifier, which sent `1 << 3` down the JSX
+    branch and refused the whole file. A tag name starts with an identifier character and a fragment
+    opens `<>`; `<`, `=`, `!` and a digit are operator continuations and can only be arithmetic or a
+    comparison, and `/` opens the closing tag the paragraph above is about.
+    """
+    j = i + 1
+    while j < len(src) and src[j] in " 	":
+        j += 1
+    c = src[j:j + 1]
+    return bool(c) and (c.isalpha() or c in "_$>/")
+
+
+#: The declarator keywords a `<name>:` annotation can sit under. An object literal's `{ icon: <Home/> }`
+#: has a `:` too and its `<` IS an element, so the annotation rule keys on this set rather than on the
+#: colon alone — 39 of the frozen corpus's records carry JSX and several carry exactly that shape.
+_TS_DECLARATORS = frozenset(
+    ("const", "let", "var", "readonly", "public", "private", "protected", "static", "declare"))
+
+
+def check_ts_type_position(toks: list) -> bool:
+    """The tokens just emitted put this `<` in a TYPE position, where JSX cannot appear.
+
+    Two shapes, and both were measured refusing valid `.tsx` source before this existed:
+    `const f: <T>(x: T) => T = ...`, an annotation under a declarator, and the tail of a `type X =`
+    alias, which the caller tracks separately because its body outlives the tokens visible here.
+    JSX is a value and a type position holds no values, so a `<` here is always type syntax.
+    """
+    if len(toks) < 3:
+        return False
+    if toks[-1][0] == "op" and toks[-1][1] == ":" and toks[-2][0] == "word":
+        return toks[-3][0] == "word" and toks[-3][1] in _TS_DECLARATORS
+    return False
+
+
 def scan_ts_tokens(src: str, jsx: bool = False) -> list:
     """`[(kind, text, line)]` for TypeScript source: every CODE token, and nothing that is not code.
 
@@ -867,6 +912,11 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
     opens: list = []
     suppress = 0
     expr_end = False
+    #: A `type X = ...` alias body, which is a TYPE POSITION until its depth-0 `;`. Tracked here
+    #: rather than in `check_ts_type_position` because the body outlives the token tail that
+    #: function can see. `type` is not a reserved word, so the flag arms only where the word is
+    #: followed by a name and an `=`, which is the alias header and nothing else.
+    type_alias = False
     i, n, line = 0, len(src), 1
 
     def add_token(kind: str, text: str) -> None:
@@ -1038,7 +1088,9 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
             expr_end = False
             continue
         if c == "<":
-            if jsx and not expr_end and not check_ts_generic(src, i):
+            if jsx and not expr_end and not check_ts_generic(src, i) \
+                    and check_ts_tag_start(src, i) \
+                    and not type_alias and not check_ts_type_position(toks):
                 stack.append("jsxtag")
                 opens.append(("JSX element", line))
                 i += 1
@@ -1075,6 +1127,12 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
             expr_end = False
             continue
         if c in "()[]=:;,>@":
+            # A depth-0 `;` ENDS a type-alias body. This lives inside the op dispatch rather than
+            # beside it: `;` is consumed here and `continue`s, so a guard placed after this branch
+            # is dead code -- which is exactly what the first cut of it was, leaving the flag armed
+            # for the rest of the file and turning the next `</span>` into a regex literal.
+            if c == ";" and len(stack) == 1:
+                type_alias = False
             add_token("op", c)
             i += 1
             expr_end = c in ")]"
@@ -1086,7 +1144,29 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
             text = src[i:j]
             add_token("word", text)
             expr_end = text not in _TS_EXPR_WORDS
+            if text == "type" and len(stack) == 1:
+                k2 = j
+                while k2 < n and src[k2] in " 	":
+                    k2 += 1
+                while k2 < n and (src[k2].isalnum() or src[k2] in "_$"):
+                    k2 += 1
+                while k2 < n and src[k2] in " 	":
+                    k2 += 1
+                type_alias = src[k2:k2 + 1] in ("=", "<")
             i = j
+            continue
+        if c == "!":
+            # PREFIX negation arrives with `expr_end` already False and a TypeScript NON-NULL
+            # assertion with it already True, so the following `/` is decided correctly either way
+            # by what preceded the `!`. Clearing it here made `count! / 2` read as a regex.
+            i += 1
+            continue
+        if c in "+-" and src[i + 1:i + 2] == c:
+            # `++` and `--` as ONE token. A postfix bump leaves the lexer after an expression and a
+            # prefix one leaves it before one; both are already right in `expr_end`. Consuming these
+            # one character at a time cleared it and sent `i++ / 2` to `read_regex` — loudly when the
+            # line held one more `/`, and SILENTLY when it held two, swallowing the span between.
+            i += 2
             continue
         i += 1
         expr_end = False
@@ -1396,6 +1476,23 @@ def parse_ts_defs(src: str, jsx: bool = False):
                     and check_ts_arrow(toks, j + 1):
                 funcs.append((nt, nxt[2]))
             k += 1
+            continue
+
+        if cur == "class" and _TS_NAME.match(text) and nt == ":" and nxt[0] == "op":
+            # A class PROPERTY carrying a type ANNOTATION. Without this arm the `nt == "="` arm
+            # below sees the annotation's LAST WORD sitting in front of the `=` and grades that:
+            # `private onChange: (e: Event) => void = (e) => {}` appended `void`, and a realistic
+            # `handleClick: React.MouseEventHandler = () => {}` appended `MouseEventHandler`. A
+            # FABRICATED identifier entered the graded population -- P1 offenders, the `.conv` cell
+            # pins, `--list` -- while the property's real name was never graded at all. `_TS_NAME`
+            # matches `void`, so no downstream keyword filter caught it. The `const` arm at the top
+            # of this loop has always stepped its annotation this way; the class arm did not.
+            e = read_ts_type_end(toks, k + 2, "=")
+            if e is not None and e < m and toks[e][0] == "op" and toks[e][1] == "="                     and check_ts_arrow(toks, e + 1):
+                funcs.append((text, ln))
+            # Step past the annotation whether or not it held an arrow, so that no token INSIDE it
+            # can reach the arms below and be graded as a name.
+            k = e if e is not None else k + 1
             continue
 
         if cur in ("object", "class") and _TS_NAME.match(text):
