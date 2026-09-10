@@ -54,3 +54,11 @@ base: eff1b6b15081355897038b3df3b9497d94f4b069
 2026-09-10T10:54:49Z brief · item TOOL-aLeakedHandle-2 · reason 4350847250da memory/builds/aLeakedHandle/prompts/2026-09-10-prompt-TOOL-aLeakedHandle-2-1-build-brief.md
 
 2026-09-10T10:59:37Z dispatch · item 5c3c32e7 TOOL-aLeakedHandle-2 · reason tools/run-gates/derive-ceilings.py tools/run-gates/run-gates.evidence.test.sh tools/run-gates/ceiling-evidence.txt tools/gate-legs.json memory/builds/aLeakedHandle/spec memory/builds/aLeakedHandle/build memory/builds/aLeakedHandle/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-10T12:03:13Z dispatch · item 2489d058 TOOL-aLeakedHandle-3 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/README.md memory/builds/aLeakedHandle/spec memory/builds/aLeakedHandle/build memory/builds/aLeakedHandle/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-10T12:03:34Z brief · item TOOL-aLeakedHandle-3 · reason 0aaede9bd899 memory/builds/aLeakedHandle/prompts/2026-09-10-prompt-TOOL-aLeakedHandle-3-1-build-brief.md
+
+2026-09-10T12:22:11Z decision · item TOOL-aLeakedHandle-3 section 8 F1 says the fork is carried as a TOOL backlog row, and no such row exists in memory/backlog/TOOL.md · reason The fork was resolved by the delegated fold pass, not by this build pass, and memory/backlog is a SHARED_RECORDS member in .unattended.conf — --dispatch refuses a pass declaration that overlaps one, so this pass may not write the row and did not try. Options seen: widen the write set (refused by the verb, correctly); write it anyway outside the declaration (that is the exact act the shared-record rule exists to stop); park it. The row is owed by whichever commit next opens the shared records, and until it lands the spec's RESOLVED mark cites a record that is not there. The decision it records is unaffected: F1 stays out of this unit, all 104 legs in tools/gate-legs.json declare a ceiling, so the branch it would add would ship dead today.
+
+2026-09-10T12:39:06Z dispatch · item 2489d058 TOOL-aLeakedHandle-3 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/README.md memory/builds/aLeakedHandle/spec memory/builds/aLeakedHandle/build memory/builds/aLeakedHandle/README.md memory/LIVE.md memory/ledger/2026-09.md memory/guides/SESSION-KICKOFF.md

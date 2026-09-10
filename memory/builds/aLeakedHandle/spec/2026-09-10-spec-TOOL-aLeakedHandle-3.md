@@ -1,12 +1,14 @@
 # TOOL-aLeakedHandle-3 — a killed leg reports the seconds it ran, not the ceiling it did not reach
 
-**Status:** SPECCED · rev-2 · 2026-09-10 · node a · Tier-1 · base 013b1af9 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-09-10 · node a · Tier-1 · base 013b1af9 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md](../build/2026-09-10-build-TOOL-aLeakedHandle-1-1-root-cause-trace.md) | research | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 |
+| [2026-09-10-build-TOOL-aLeakedHandle-3-1-acceptance-ledger.md](../build/2026-09-10-build-TOOL-aLeakedHandle-3-1-acceptance-ledger.md) | journal | — |
+| [2026-09-10-prompt-TOOL-aLeakedHandle-3-1-build-brief.md](../prompts/2026-09-10-prompt-TOOL-aLeakedHandle-3-1-build-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md](../reviews/2026-09-10-review-TOOL-aLeakedHandle-1-spec-audit.md) | spec-audit | TOOL-aLeakedHandle-1 TOOL-aLeakedHandle-2 |
 
 <!-- /gen:spec-records -->
