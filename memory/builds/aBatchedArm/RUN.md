@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: e9ed269bc7ae7a7a5453156eff5431abf7280bcc
-phase: RUNNING
+witness: 5632f34a830e149fccc702740a32b75c5e4fa36c
+phase: SPECCING
 branch-sha: e9ed269bc7ae7a7a5453156eff5431abf7280bcc
 branch-ref: refs/heads/branch/unattended-checks-performance-a37d8d
 mode: prompt
@@ -22,3 +22,7 @@ anchor-ref: refs/heads/main
 base: e9ed269bc7ae7a7a5453156eff5431abf7280bcc
 
 ## Parked
+
+2026-09-10T10:55:53Z review · item TOOL-aBatchedArm-1 · reason verdict BLOCKED · blockers 3
+
+2026-09-10T10:58:32Z rescope · item add TOOL-aBatchedArm-2 · reason spec-audit round 1 named one structural group linter as the left-shift for five of its six findings. It grades the LINKAGE between a group's emitted set and its miss/same arms, which TOOL-aBatchedArm-1 states as a rule and cannot enforce per group. A separate mechanism under M2, so a unit rather than a scope item.

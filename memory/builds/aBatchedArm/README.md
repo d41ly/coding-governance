@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-10
 streams: tooling
 roster: TOOL
-ids: TOOL-aBatchedArm-1
+ids: TOOL-aBatchedArm-1 TOOL-aBatchedArm-2
 authorized-by: prompt
 ---
 
@@ -71,20 +71,21 @@ rewritten assertion is what closed the port. The liveness pin is not a second me
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 1 unit(s) · node a · opened 2026-09-10 · streams tooling
-ids TOOL-aBatchedArm-1
+**Build status:** OPEN · 2 unit(s) · node a · opened 2026-09-10 · streams tooling
+ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 1 | 2 | OPEN | rev-1 | 2026-09-10 |
+| [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 1 | 2 | OPEN | rev-2 | 2026-09-10 |
+| [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aBatchedArm-2.
 
-Ids no `spec-audit` record has ever named: TOOL-aBatchedArm-1.
+Ids no `spec-audit` record has ever named: TOOL-aBatchedArm-2.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -92,6 +93,7 @@ Ids no `spec-audit` record has ever named: TOOL-aBatchedArm-1.
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aBatchedArm-1` | no |
+| 2 | `TOOL-aBatchedArm-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
