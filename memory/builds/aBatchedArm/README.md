@@ -59,39 +59,43 @@ respect short-circuits; set equality is what makes a truncated batch red rather 
 None yet.
 
 <!-- roster:units -->
-| Unit | Mechanism |
-|---|---|
-| `TOOL-aBatchedArm-1` | one assertion helper, `emitted`, plus the grouping of arms whose breaks do not interfere onto one tree and one invocation |
+| Order | Unit | Mechanism |
+|---|---|---|
+| 1 | `TOOL-aBatchedArm-3` | grade the suite as EIGHT declared shards the runner's pool executes concurrently. This is the half that meets the goal. |
+| 2 | `TOOL-aBatchedArm-1` | one assertion helper, `emitted`, plus the grouping of arms whose breaks do not interfere. An optimisation on top of the split, measured at 40 to 44 minutes alone. |
+| 3 | `TOOL-aBatchedArm-2` | the structural group linter that enforces unit 1's partition, which unit 1 can state and cannot check per group. |
 
-Decomposed to ONE unit deliberately. The earlier plan carried four — a declarative arm table, a
-partition solver, a golden-set oracle and a liveness pin — and §4 of the spec rejects that shape on
-the measurement: a table rewrites 377 assertions to reach a target one helper reaches, and a
-rewritten assertion is what closed the port. The liveness pin is not a second mechanism either, since
-`FLOOR_ASSERTIONS` survives the conversion and is re-measured under S4.
+**The order is the reverse of the order they were written in, and that is the build's own finding.**
+The batching unit was specced first and audited twice; round 2 then measured that it cannot reach the
+goal alone, because excluding the control arms `TOOL-dScriptedRepeat-15` S3 forbids batching leaves
+95 blocks carrying 136 solo invocations. The shard split reaches it with no new oracle. Unit 3 was
+adopted under protocol §11 after that measurement, not planned.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 2 unit(s) · node a · opened 2026-09-10 · streams tooling
+**Build status:** OPEN · 3 unit(s) · node a · opened 2026-09-10 · streams tooling
 ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
+| [TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards](spec/2026-09-10-spec-TOOL-aBatchedArm-3.md) | 1 | 2 | OPEN | rev-1 | 2026-09-10 |
 | [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 2 | 2 | OPEN | rev-3 | 2026-09-10 |
 | [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 3 | 2 | OPEN | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aBatchedArm-3.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aBatchedArm-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
+| 1 | `TOOL-aBatchedArm-3` | no |
 | 2 | `TOOL-aBatchedArm-1` | no |
 | 3 | `TOOL-aBatchedArm-2` | no |
 <!-- /gen:build-order -->
