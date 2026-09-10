@@ -343,6 +343,20 @@ New arm: tools/gate-lint/sh_hygiene.py (the tree scan) · stage the banned const
   Recommendation: a backlog row against the tooling family rather than a unit of this build, so the
   drain is scheduled rather than either forgotten or forced into this diff.
 
+RESOLVED (agent, 2026-09-10, delegated) Fork A: the failing population is the
+substitution-carrying heredoc only. The process-substitution form is COUNTED and its count
+PRINTED on every run, so a green line never reads as covering it. Banning it would contradict
+TOOL-dScriptedRepeat-13, which records that a NUL stream cannot ride a heredoc, and M3 veto 1
+refuses an option that breaks a landed decision this spec does not own. Charter section 7's
+skip-must-announce-itself rule is what makes the incomplete gate honest rather than green by
+absence.
+
+RESOLVED (agent, 2026-09-10, delegated) Fork B: a backlog row against the tooling family, not a
+unit of this build. Draining is twenty edits inside the two largest gate scripts in the tree,
+none of which has been observed to hang, while this build is repairing that same machinery. M3
+tie-breaks on fewer open questions and on reuse; the row records the debt where the next session
+reads it.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft.

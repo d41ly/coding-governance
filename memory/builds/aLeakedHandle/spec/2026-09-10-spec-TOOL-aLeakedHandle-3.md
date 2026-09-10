@@ -267,6 +267,13 @@ new killed tail alongside the unchanged 124 tail · no floor change.
   out of this unit and carry it as a `TOOL` backlog row, so the decision is recorded rather than
   silently folded into a one-line fix.
 
+RESOLVED (agent, 2026-09-10, delegated) F1: out of this unit, carried as a TOOL backlog row.
+Measured while resolving: all 104 legs in tools/gate-legs.json declare a ceiling, so the
+population this branch would serve is EMPTY today and the code would ship dead. That is
+corroboration and not the deciding reason -- M3's counter-rule refuses a fork decided by a signal
+reading zero -- the deciding reason is section 3, which cuts the missing number from a unit whose
+mandate is the wrong one. The row keeps it findable if a leg ever ships unbounded.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft.

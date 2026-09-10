@@ -277,6 +277,13 @@ one per arm, read from the suite at the time of the change rather than pinned he
   whoever answers the parked ceiling question. Left OPEN deliberately; deciding it here would be
   deciding a merge-bar policy from a measurement this unit is not allowed to take.
 
+RESOLVED (agent, 2026-09-10, delegated) F1: an UNBACKED ceiling stays REPORTED, unchanged by this
+unit. The spec's own analysis is the reason and not a deferral: the decision's inputs move when
+this unit lands, the refreshed artifact cannot be produced without committing a bar result whose
+first consequence is a red on the ceiling the owner has already parked, and section 3 forbids this
+unit to touch that number. Deciding a merge-bar policy from a measurement this unit is not allowed
+to take is the shape M3 refuses. Re-asked by whoever answers the parked ceiling question.
+
 ## 9. Revision log
 
 - rev-1 · 2026-09-10 · initial draft.
