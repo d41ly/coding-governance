@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.2
+# gov:kit settings-merge@1.3
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 tools/hooks/agent-cap.js verbatim):
@@ -28,6 +28,9 @@ Usage:
                      the built-in agent-cap PreToolUse fragment (matcher "Workflow|Agent")
       --hook-path    override the fragment's hook_path (the copied hook, repo-relative)
       --check        report drift without writing: exit 1 if a merge WOULD change the file
+    With neither, agent-cap's copy is located by `[kit.agent-cap] prefix` in the target's
+    `.governance/deploy.toml` when one is declared, and by this file's own install prefix
+    otherwise — an entry may be installed somewhere other than where settings-merge.py sits.
       --selftest     run the in-file assert suite in a tempdir; exit 0 on pass
 Exit: 0 wired (already present OR merged this run) · 1 --check found drift · 2 error.
 
@@ -43,11 +46,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import tempfile
 from pathlib import Path
 
-KIT_SETTINGS_MERGE_VERSION = "1.2"  # gov:kit settings-merge@1.2 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.3"  # gov:kit settings-merge@1.3 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 
@@ -69,6 +73,63 @@ def _kit_rel() -> str:
     except (ValueError, OSError):
         return "tools"
 
+
+# A path fragment and nothing else — the character class govkit's own `demand_safe_token` grades
+# `prefix` with, plus containment. This value is target-supplied and lands inside a command string
+# Claude Code executes, which is the class govkit reproduced twice; a `prefix` carrying a shell
+# metacharacter or climbing out of the tree is refused here rather than resolved.
+_SAFE_PREFIX = re.compile(r"^[A-Za-z0-9_.~@+-]+(?:/[A-Za-z0-9_.~@+-]+)*$")
+
+
+def _load_declared_prefix(kit_id: str, root: Path = Path(".")) -> str | None:
+    """The install home the TARGET declared for `kit_id`, out of `.governance/deploy.toml`.
+
+    `_kit_rel()` answers "where does THIS FILE live", and that is the right answer for agent-cap
+    only while both entries share one install home. A target may give an entry its own:
+    `[kit.agent-cap] prefix = ".claude"` puts the hook there while settings-merge.py stays at the
+    top-level prefix. Deriving agent-cap's home from this file's then names a path that is not
+    there — the merge REFUSES to wire, and `--check` reports DRIFT against a settings.json that was
+    correct all along. REPRODUCED on a fixture before this was written, and pinned by selftest 12.
+
+    None whenever the declaration is absent, unreadable or unsafe. Absent is the common case and it
+    is not a failure: an adopter who copy-installed the kits by hand per WIRE-INTO-PROJECT.md has no
+    deploy.toml, and the derivation above is exactly right for them. `tomllib` is 3.11+, so a 3.10
+    interpreter also lands here and keeps the pre-existing behaviour rather than crashing.
+    """
+    try:
+        import tomllib
+    except ImportError:
+        return None
+    try:
+        with (root / ".governance" / "deploy.toml").open("rb") as fh:
+            deploy = tomllib.load(fh)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(deploy, dict):
+        return None
+    per = (deploy.get("kit") or {}).get(kit_id) or {}
+    pfx = (per.get("prefix") if isinstance(per, dict) else None) or deploy.get("prefix")
+    if not isinstance(pfx, str) or not pfx.strip("/"):
+        return None
+    pfx = pfx.strip("/")
+    if not _SAFE_PREFIX.match(pfx) or ".." in pfx.split("/"):
+        print(f"settings-merge: ignoring an unsafe prefix for {kit_id} in .governance/deploy.toml: "
+              f"{pfx!r} — a prefix becomes a path inside a command Claude Code runs", file=sys.stderr)
+        return None
+    return pfx
+
+
+def _resolve_agent_cap_hook_path(root: Path = Path(".")) -> str:
+    """agent-cap's shipped copy: the target's declaration first, this file's own location second.
+
+    ONE composition, in one place, so the arm that stages the break has something to red on. It is
+    also the only reader of `_load_declared_prefix`: the `{kit}` fragments need no lookup at all,
+    because a fragment ships beside its hook, so resolving `{kit}` against the FRAGMENT's own
+    location already follows whatever prefix that kit was installed at.
+    """
+    return (_load_declared_prefix("agent-cap", root) or _kit_rel()) + "/hooks/agent-cap.js"
+
+
 # The built-in fragment. Identical to the three values this script hardcoded before --fragment
 # existed, so a no-argument run is unchanged in behaviour AND in what it prints.
 AGENT_CAP = {
@@ -80,7 +141,7 @@ AGENT_CAP = {
     # the merge below finds the existing group by this exact matcher value.
     "matcher": "Workflow|Agent",
     "marker": HOOK_MARKER,
-    "hook_path": _kit_rel() + "/hooks/agent-cap.js",
+    "hook_path": _resolve_agent_cap_hook_path(),
 }
 _FRAGMENT_KEYS = tuple(AGENT_CAP)
 
@@ -319,6 +380,30 @@ def _selftest() -> int:
         assert main([str(sf9), "--hook-path", str(gone), "--check"]) == 1, "--check is a report, not a merge"
         there.write_text("// stub\n", encoding="utf-8")
         assert main([str(sf9), "--hook-path", str(there)]) == 0 and sf9.exists()
+
+        # 12) a PER-ENTRY `prefix` in the target's deploy.toml decides agent-cap's home, and this
+        #     file's own location does not. Staged as the reported break: settings-merge at the
+        #     top-level prefix, the hook at its own. Before the fix the composition below read
+        #     "scripts/hooks/agent-cap.js" and the merge refused a settings.json that was correct.
+        gov = root / "dep" / ".governance"
+        gov.mkdir(parents=True)
+        dep = gov / "deploy.toml"
+        dep.write_text('prefix = "scripts"\n\n[kit.agent-cap]\nprefix = ".claude"\n',
+                       encoding="utf-8", newline="\n")
+        # THE COMPOSITION, not just the reader: reverting the lookup has to red something. This
+        # assertion is what fails on the pre-fix engine, which answered "<this file's prefix>/hooks/
+        # agent-cap.js" and then refused to wire a tree whose settings.json was already right.
+        assert _resolve_agent_cap_hook_path(gov.parent) == ".claude/hooks/agent-cap.js"
+        assert _resolve_agent_cap_hook_path(root).endswith("/hooks/agent-cap.js")     # no deploy.toml -> derived
+        assert _load_declared_prefix("agent-cap", gov.parent) == ".claude"
+        assert _load_declared_prefix("settings-merge", gov.parent) == "scripts"   # falls back to top-level
+        assert _load_declared_prefix("agent-cap", root) is None                   # no deploy.toml at all
+        # An unsafe value is REFUSED, not resolved into a command Claude Code runs. Every one of
+        # these is VALID TOML on purpose: a value that merely breaks the parse would be rejected by
+        # tomllib and the character class would go unexercised.
+        for evil in ('../../PWNED', 'x; touch PWNED', 'x$(id)', 'C:/abs'):
+            dep.write_text(f'[kit.agent-cap]\nprefix = "{evil}"\n', encoding="utf-8", newline="\n")
+            assert _load_declared_prefix("agent-cap", gov.parent) is None, evil
 
         # 10) the SHIPPED fragment beside this script parses and declares the schema check-wiring
         #     joins on. Skipped, not failed, in a project that did not adopt memory-recall.
