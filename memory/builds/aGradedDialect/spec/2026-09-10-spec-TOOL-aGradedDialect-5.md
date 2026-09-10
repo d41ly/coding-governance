@@ -47,6 +47,11 @@ the copy that rots.
 - **S4** — the `TOOL-dScaffoldedMirror-13` backlog row moves off `DEFERRED` with its pointer
   re-aimed at this build, and that spec's status header tail gains a superseding pointer. The
   status token on the spec itself does NOT move, for the reason §8 F1 records. Observed by **AC4**.
+  **The two halves land in two passes, and the reason is mechanical rather than a scoping
+  preference.** The build method names a backlog a shared mutable record, so `--dispatch` REFUSES
+  `memory/backlog/TOOL.md` and no unit pass may declare it: the row is written by the parent run
+  directly, in a pass of its own. This unit's half is the header tail, and its ledger records the
+  split rather than claiming the edit — so AC4 reads HALF OBSERVED until that pass lands. rev-6.
 - **S5** — `memory/map/features/lexicon.md` claims every inventory key units 2 to 4 minted, and its
   prose stops naming TypeScript among the languages an adopter can only declare dark. The KEY half is
   observed by **AC5**; the PROSE half is observed by **AC2**, whose grep names this file as a third
@@ -176,6 +181,14 @@ version only) · `tools/lexicon/canon.py` (marker only) · `tools/lexicon/kit.to
 (re-rendered, never hand-edited) · `memory/backlog/TOOL.md` ·
 `memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-13.md` (header tail only) ·
 `memory/map/features/lexicon.md` · `WIRE-INTO-PROJECT.md` (one new anchored section, S7).
+
+**What the estimate got wrong, corrected at rev-6 against what was actually written.**
+`memory/backlog/TOOL.md` is NOT in this unit's write set — `--dispatch` refuses it, per S4 — so it is
+listed above as the pair's other half and not as a file this unit touches. And the estimate omits
+three things a status flip to `CLOSED` necessarily drags in: this unit's acceptance ledger under
+`memory/builds/aGradedDialect/build/`, and the GENERATED `memory/LIVE.md`,
+`memory/ledger/2026-09.md` and the `gen:` regions of `memory/builds/aGradedDialect/README.md`, which
+are re-rendered rather than reconciled and land in the same commit as the flip.
 
 ### Alternatives rejected
 
@@ -390,6 +403,13 @@ This unit adds and moves no gate arm; the legs above are the ones its edits must
   returning two verdicts is exactly the class, and a §9 entry is not where a scope item gets fixed.
   All four now say what happened; §4 also gains the module-docstring row for the modes table, which
   no row named before and which AC2's grep provably cannot see.
+  The SAME class was selected again over the fold and found two more halves, folded in the same rev
+  rather than in a third: **S4** read as though this unit moves the backlog row, when `--dispatch`
+  refuses that path and the parent run writes it in a pass of its own, and §4's Files-touched still
+  named that backlog while omitting the acceptance ledger and the three generated artifacts a
+  `CLOSED` flip re-renders. The stopping rule is CONVERGENCE and not the selector going quiet: the
+  class stays selected for as long as the diff touches a spec, so the pass ends when no half is left
+  standing, which it now is not.
 
 ## 10. Reuse audit
 

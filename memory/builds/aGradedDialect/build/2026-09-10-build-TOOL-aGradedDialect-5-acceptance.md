@@ -127,7 +127,12 @@ follow-up commit at all. rev-5 recorded three divergences in §9 and left §2's 
 carrier table still asserting the old wording — S3 still read "the one comment … is rewritten" for an
 edit this unit does not make, S2 still named the README alone, S5 still implied the key claims moved,
 and §4 still described a `DEFINITION_SNIFF` sentence that no longer exists. rev-6 folds all four. A
-revision log is not where a scope item gets corrected.
+revision log is not where a scope item gets corrected. Re-running the checklist over the fold
+selected the same class again and it found two more halves — S4 read as though this unit moves the
+backlog row, and §4's Files-touched named that backlog while omitting the ledger and the three
+generated artifacts a `CLOSED` flip re-renders. Both folded into rev-6 rather than into a third
+commit. The stopping rule is convergence, not the selector going quiet: this class stays selected
+for as long as the diff touches a spec.
 
 `two-answers-to-one-question` landed a third time, on this unit's own new prose, and both instances
 are duplications AC1 REQUIRES rather than ones it could delete. The `.ts`/`.tsx` section restates the
