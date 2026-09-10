@@ -167,7 +167,9 @@ a line-based conf and `map_lib.load_conf()` has no multi-line support.
 
 That reader now also decides WHICH LANGUAGES ARE ARMED, which moved a seam. `PATTERN_SETS` in
 `lexicon.py` used to be the whole answer, and it sits in an `engine`-role file an upgrade
-overwrites — so an adopter with TypeScript, Go or C# could only declare their language `dark`.
+overwrites — so an adopter with Go or C# has no shipped extractor to reach for, and TypeScript was
+in that list until `TOOL-aGradedDialect-3` shipped `ts-tokens` and `tsx-tokens` as declared
+extensions of their own.
 A `PATTERNS:` block in the declaration now carries `<pattern-set-id>.<part>` rows, and
 `resolve_pattern_sets` merges them over the shipped constant PER KEY into a new mapping that every
 reader takes: the engine's one corpus walk, the coverage fraction, the scaffold's measured pins, and
