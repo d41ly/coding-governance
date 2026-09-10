@@ -837,6 +837,12 @@ awk -F'\t' '$1=="at-ceiling"{f=1} END{exit !f}' "$DC_EV" 2>/dev/null \
 # operator cleared, and the absence asserted above would have been true for one invocation only.
 "$DC_PY" "$DC_SCRIPT" --write >/dev/null 2>&1
 dc_ko_later=$(awk -F'\t' '$1=="kill-overhead"{print $2}' "$DC_EV" 2>/dev/null)
+dc_ac_later=$(awk -F'\t' '$1=="at-ceiling"{print $2}' "$DC_EV" 2>/dev/null)
+# ITS OWN CONTROL, because the arm below grades an ABSENCE and an absence is what an empty file, a
+# failed write and a working drop all look like. The untouched leg proves this write produced rows.
+[ -n "$dc_ac_later" ] \
+  && ok "control: the untouched leg still reads $dc_ac_later after that write, so the absence graded below is a verdict and not an empty file" \
+  || nope "no row at all survived the write before the drop-lifetime arm, so that arm would pass by finding nothing"
 [ -z "$dc_ko_later" ] \
   && ok "the dropped row STAYS dropped across the next ordinary --write, rather than being re-derived from the killed reading it was cleared of" \
   || nope "an ordinary --write re-derived kill-overhead at '$dc_ko_later' from the reading the reset discarded — the drop lasted one invocation"
