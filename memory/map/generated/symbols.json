@@ -473,6 +473,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_measured",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "build_module_index",
       "kind": "function",
       "file": "tools/codebase-map/map_imports.py"
@@ -773,6 +778,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "check_registry",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "check_root_shape",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -786,6 +796,11 @@
       "id": "check_slot_table",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "check_substitution",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "check_survivors",
@@ -1543,6 +1558,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "extract_code",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "extract_declarations",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
@@ -1561,6 +1581,11 @@
       "id": "extract_gates",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "extract_heredoc_body",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "extract_phrases",
@@ -2041,6 +2066,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/gate-lint/ps-hygiene.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "main",
@@ -2593,6 +2623,11 @@
       "file": "tools/run-gates/profile_bar.py"
     },
     {
+      "id": "print_populations",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "print_summary",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
@@ -2873,6 +2908,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_registry",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "read_roots",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -3061,6 +3101,11 @@
       "id": "remove_fenced",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "remove_reset_rows",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
     },
     {
       "id": "render",
@@ -3720,6 +3765,11 @@
     {
       "id": "run_selftest",
       "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
       "file": "tools/playbook/render_playbook.py"
     },
     {
@@ -3788,6 +3838,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "scan_file",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
       "id": "scan_file_stems",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -3841,6 +3896,11 @@
       "id": "scan_tracked_specs",
       "kind": "function",
       "file": "tools/codebase-map/replay-phrases.py"
+    },
+    {
+      "id": "scan_tree",
+      "kind": "function",
+      "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
       "id": "scan_ts_tokens",

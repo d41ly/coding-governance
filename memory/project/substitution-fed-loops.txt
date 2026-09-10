@@ -1,0 +1,39 @@
+# substitution-fed-loops.txt — the sites that PREDATE the `shell hygiene (a loop fed by a command
+# substitution)` leg. TOOL-aLeakedHandle-1.
+#
+# A row is `<path> TAB <delimiter> TAB <count> TAB <reason>`. The key is the file and the REDIRECT
+# DELIMITER — a heredoc tag, or the literal `<<<` for a here-string — and NEVER a line number. A
+# line-keyed registry reds on an unrelated edit above the waived line, and a gate whose steady state
+# is red gets bypassed; this repo has already paid two cycles for one. The count is how many sites
+# in that file carry that delimiter, which is what makes `EOF` keyable in a file holding several.
+#
+# SET EQUALITY IN BOTH DIRECTIONS, and the counts too. A measured site with no row fails, a row the
+# scan no longer finds fails, and a count that no longer matches fails. So draining a site FORCES
+# its row out in the same commit instead of leaving a widened exemption behind, and the count can
+# only fall with the sites.
+#
+# WHY THE ROWS BELOW ARE CARRIED RATHER THAN DRAINED — and the count is the rows, never a number
+# written in this paragraph. The unit that wired this leg fixed the ONE
+# site that had actually deadlocked — `pass_commit`, which held a merge-bar leg at zero CPU for 63
+# minutes on 2026-09-10. The rest are the rows below, spread across two kits and the tool root, none
+# of which has been observed to hang, and draining them is a bigger and riskier diff than the
+# deadlock it closes. The drain is a backlog row against the tooling family; see the build's §8
+# fork B. Nothing here says these are SAFE — only that they are known, counted, and cannot grow.
+tools/check-microformats.sh	EOF	1	predates the gate
+tools/memory-tree/check-memory-hygiene.sh	<<<	1	predates the gate — the only here-string in the population
+tools/memory-tree/check-verdict-epoch.sh	EOF	2	predates the gate
+tools/unattended/check-unattended.sh	DSSIBS	1	predates the gate
+tools/unattended/check-unattended.sh	KEYEOF	1	predates the gate
+tools/unattended/check-unattended.sh	RAWEOF	1	predates the gate
+tools/unattended/check-unattended.sh	RCEOF	1	predates the gate
+tools/unattended/check-unattended.sh	TPLKEOF	1	predates the gate
+tools/unattended/check-unattended.sh	TPLSKEOF	1	predates the gate
+tools/unattended/check-unattended.sh	WAIVERS	1	predates the gate
+tools/unattended/check-unattended.sh	WDEOF	1	predates the gate
+tools/unattended/unattended.sh	BRIEFED	1	predates the gate
+tools/unattended/unattended.sh	BRIEFROWS	1	predates the gate
+tools/unattended/unattended.sh	PARKED	1	predates the gate
+tools/unattended/unattended.sh	PROPOSED	1	predates the gate
+tools/unattended/unattended.sh	RESCOPED	1	predates the gate
+tools/unattended/unattended.sh	WTS	1	predates the gate
+tools/unattended/unattended.test.sh	EOF	1	predates the gate

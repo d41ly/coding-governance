@@ -45,7 +45,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=143
+FLOOR_ASSERTIONS=146
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -970,6 +970,11 @@ printf '#!/usr/bin/env bash\nbash -c "sleep 20" &\nsleep 20\nexit 0\n' > "$P/fx/
 # The first spelling mapped 124 alone, so the very case `-k` exists for reported as a bare exit code
 # that reads like an OOM.
 printf '#!/usr/bin/env bash\ntrap "" TERM\nsleep 25\nexit 0\n' > "$P/fx/stubborn.sh"
+# A leg SIGKILLED BY SOMETHING THAT IS NOT THE CEILING. `timeout` returns 128+9 for a command killed
+# by a signal, so the runner sees rc=137 from a kill it never ordered — an operator, an OOM killer or
+# a CI cancel, staged without any of them and in about two seconds. Nothing else in this file
+# produces a 137 whose ceiling did NOT fire, which is the whole class arm 4h-kill grades.
+printf '#!/usr/bin/env bash\nsleep 2\nkill -9 $$\n' > "$P/fx/selfkill.sh"
 cat > "$P/tools/gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
@@ -1117,6 +1122,12 @@ n=$((n+1))
 n=$((n+1))
 n=$((n+1))
 n=$((n+1))
+# arm 4h-kill's three, counted HERE for arm 4h's own reason: the floor is a count of EXECUTED
+# assertions, so counting inside the guard drops the executed total by three on a host with no
+# runnable `timeout` and reds a correct suite there.
+n=$((n+1))
+n=$((n+1))
+n=$((n+1))
 if [ "$HAVE_TIMEOUT" = 1 ]; then
   o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
   # THE LEG'S CLOCK, NOT THE PROCESS TREE'S. The first spelling subtracted two WHOLE-RUN wall clocks,
@@ -1153,8 +1164,42 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
 JSON
 n=$((n+1))
   o=$(runp GATE_PROFILES=fx/tbl-tight.txt)
-  printf '%s\n' "$o" | grep -qE '^GATE FAIL  stubborn  [(]timed out after 3s(, killed)?[)]$' \
+  # THE TAIL MOVED WITH TOOL-aLeakedHandle-3 and this assertion accepts either signal winning, as it
+  # always has — which one wins is the host's business. TERM winning still says `timed out after 3s`;
+  # KILL winning now says `killed after <n>s, ceiling 3s`, and that is more honest about this very
+  # path, because the leg ran the bound PLUS the five-second kill-after and the old line's `3s` was
+  # already wrong by 5 s.
+  printf '%s\n' "$o" | grep -qE '^GATE FAIL  stubborn  [(](timed out after 3s|killed after [0-9][0-9.]*s, ceiling 3s)[)]$' \
     || { echo "canary: a leg that IGNORES SIGTERM was not reported with a timeout tail — the kill-after escalates to SIGKILL and that path exits 137, not 124, so it is the one case -k exists for"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+
+  # 4h-kill. A KILLED LEG REPORTS THE SECONDS IT RAN, NOT THE CEILING IT NEVER REACHED. The class is
+  #     a failure tail whose number disagrees with the ledger row for the same leg, and the arm grades
+  #     that class rather than the rc=137 instance: it extracts whatever seconds the tail states and
+  #     compares them against field 2 of the ledger, so any future branch that invents a number reds
+  #     it too. Observed RED against the source before TOOL-aLeakedHandle-3, where the tail said the
+  #     declared 600 and the ledger said 2.0xx — a factor of three hundred on one run.
+  cat > "$P/tools/gate-legs.json" <<'JSON'
+[
+  {"name": "one", "argv": ["bash", "fx/a.sh"]},
+  {"name": "selfkilled", "argv": ["bash", "fx/selfkill.sh"], "ceiling": 600}
+]
+JSON
+  # tbl-loose, so PROF_TIMEOUT is 0 and the leg's DECLARED 600 is the only bound in play: a tail
+  # naming 600 can then only have come from the ceiling, never from the profile's fallback.
+  o=$(runp GATE_PROFILES=fx/tbl-loose.txt)
+  kt=$(printf '%s\n' "$o" | grep -m1 '^GATE FAIL  selfkilled  ')
+  [ -n "$kt" ] \
+    || { echo "canary: a leg SIGKILLed by its own command was not reported as a named FAIL — rc=137 is a RED naming its leg, whoever sent the signal"; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  # THE LIVENESS HALF IS INSIDE THE ASSERTION. An absent ledger row, or a tail this extraction did
+  # not match, fails saying the arm could not measure — never quietly passes on two empty strings.
+  ks=$(printf '%s\n' "$kt" | sed -n 's/.*after \([0-9][0-9.]*\)s.*/\1/p')
+  kl=$(awk -F'\t' '$1=="selfkilled" { print $2; exit }' "$P/.git/gate-ledger.tsv" 2>/dev/null)
+  { [ -n "$ks" ] && [ -n "$kl" ] && [ "$ks" = "$kl" ]; } \
+    || { echo "canary: the failure tail for a killed leg states '${ks:-<no number found>}'s where gate-ledger.tsv records '${kl:-<no row>}'s for the same leg on the same run. The summary and the ledger must read ONE value from one file, or a diagnosis starts by picking which number to believe."; printf '%s\n' "$o" | sed 's/^/    /'; fail=1; }
+  case "$kt" in
+    *"timed out"*) echo "canary: a leg killed at ${ks:-?}s under a declared ceiling of 600 was reported as having TIMED OUT. The ceiling never fired; rc=137 is what an operator, an OOM killer or a CI cancel produces too, and the verb may not claim a bound it cannot know about. Got: $kt"; fail=1 ;;
+  esac
+
   cat > "$P/tools/gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
@@ -1162,7 +1207,7 @@ n=$((n+1))
 ]
 JSON
 else
-  echo "canary: SKIP arm 4h — no working \`timeout\` on this host, so no leg can be bounded and the runner takes its INERT branch instead; arm 4m grades that branch. The assertions are counted either way, so the executed total does not move with host capability."
+  echo "canary: SKIP arms 4h and 4h-kill — no working \`timeout\` on this host, so no leg can be bounded and the runner takes its INERT branch instead; arm 4m grades that branch. 4h-kill's fixture kills itself rather than waiting for a ceiling, but it still reads a tail the runner only builds under a live bound, so it skips with its sibling. The assertions are counted either way, so the executed total does not move with host capability."
 fi
 cat > "$P/tools/gate-legs.json" <<'JSON'
 [

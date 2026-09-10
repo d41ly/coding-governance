@@ -129,6 +129,13 @@ is KILLED and reported `GATE FAIL <leg> (timed out after Ns)` — never skipped,
 the one way a knob here may change a verdict: it converts an unbounded hang into a RED naming its
 leg. Before it existed, one leg that never returned wedged the whole bar and named nothing.
 
+**A KILLED leg names the seconds it RAN and its ceiling separately.** `timeout` exits 124 when its
+own TERM fires and 137 when a SIGKILL ends the leg — its `-k` escalation, an operator, an OOM killer
+and a CI cancel all arrive as 137 and cannot be told apart. So that tail reads
+`GATE FAIL <leg>  (killed after Ns, ceiling Ms)`: N is the elapsed value the runner measured, byte
+for byte the same figure `gate-ledger.tsv` carries for that leg, and M is the bound it may never have
+reached. Neither is passed off as the other, and the verb does not claim a timeout it cannot observe.
+
 **A leg that declares no ceiling runs UNBOUNDED, and is COUNTED rather than refused.** The runner
 prints `N of M legs declare no ceiling and run unbounded this run` on stderr and carries on. It
 cannot tell a leg somebody forgot from a leg you deliberately left alone, so it reports and leaves

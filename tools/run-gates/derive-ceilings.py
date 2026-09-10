@@ -35,6 +35,31 @@ HERE = pathlib.Path(__file__).resolve().parent
 EVIDENCE = HERE / "ceiling-evidence.txt"
 MARGIN_FILE = HERE / "ceiling-margin.txt"
 
+# How far ABOVE its declared ceiling a failing reading may sit and still be admitted as evidence.
+# 5 s of it is arithmetic: `run-gates.sh` wraps a bounded leg in `timeout -k 5s "$bound"`, so
+# SIGKILL lands five seconds after SIGTERM and nothing the leg decides can put its death later.
+# The other 30 s is a teardown allowance — `runleg` stamps its end time after `cat`-ing the leg's
+# output, so a file read and a `date` spawn sit inside the measured seconds, all of it competing
+# with the rest of a full bar.
+#
+# NO OVERSHOOT FIGURE IS WRITTEN HERE, deliberately. `run-gates.sh`'s rc=124 block owns that
+# measurement and states it beside the code that produces it, and `run-gates.test.sh` arm 1c owns
+# the reading it was taken from; a copy of the number in this comment would be a second answer to
+# one question and the copy is what rots. Read it there. What this comment owns is the SIZING
+# ARGUMENT over it: the overhead is a FIXED cost — arm 1c's own words are that it "does NOT shrink
+# when the sleeper does" — so a teardown allowance has to clear the largest ABSOLUTE overshoot on
+# record rather than the largest one relative to its ceiling. THE MAGNITUDE IS NOT PARAPHRASED HERE
+# EITHER, and that is the same ban one level down: the first cut of this comment sized the worst
+# reading in words instead of copying it, understated it, and stood beside the two sources it was
+# understating. An adjective is the same second answer to one question that a numeral would be.
+# Read the size at those sources. Widening this widens the inert-host band `read_runs` discloses;
+# tightening it silently discards the readings this filter exists to admit.
+#
+# WRITTEN AS A SUM, so the two halves are stated once each and the total is derived. A literal 35
+# beside a comment saying "5 plus 30" is two answers to one question, and the comment is the copy
+# that rots.
+CEILING_WINDOW_S = 5 + 30
+
 
 def resolve_repo_root() -> pathlib.Path:
     out = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--show-toplevel"],
@@ -87,13 +112,65 @@ def read_margin() -> tuple[int, float, str]:
              f"<floor seconds>, tab, <fraction> row")
 
 
-def read_runs(gd: pathlib.Path) -> dict:
-    """Every recorded reading per leg, from the per-run leg files.
+def read_runs(gd: pathlib.Path, legs: dict, reset) -> dict:
+    """Every recorded reading per leg, from the per-run leg files. Returns {name: [seconds, ...]}.
 
-    Returns {name: [seconds, ...]}. Only `ok` rows count: a leg that FAILED may have failed fast,
-    and a maximum taken over failures is a measurement of the failure and not of the work.
+    THE ADMISSION RULE. An `ok` row counts at any duration, because a completed run measured the
+    work whatever bound was or was not in force around it. A NON-`ok` row counts only when its
+    seconds land inside the CLOSED WINDOW `[ceiling, ceiling + CEILING_WINDOW_S]`, against the
+    ceiling the leg manifest declares for that leg TODAY: that is a run the ceiling itself
+    stopped, so the CEILING is a LOWER BOUND on the work, which is the one property a monotone
+    maximum needs and the property `ok` rows are admitted for. Every other failing row stays
+    excluded — a leg that failed fast measures the failure and not the work, and a maximum that
+    admits it holds a ceiling above a number nothing did. A leg with no integer ceiling admits
+    `ok` rows only, because there is nothing for a failing row to have reached. `legs` is
+    `read_legs`'s map and is REQUIRED rather than defaulted: a defaulted ceilings map is how one
+    call site keeps the old `ok`-only behaviour while every other criterion still passes green.
+
+    AN ADMITTED FAILING ROW ENTERS AT ITS CEILING, NOT AT ITS ELAPSED SECONDS. Only the ceiling is
+    provable: the leg was killed there, and `run-gates.sh`'s own rc=124 block states that the
+    elapsed value on that path is the ceiling PLUS kill-path overhead. Storing the raw elapsed
+    number asserts that the work took it, which nothing measured, and this file is MONOTONE, so
+    that assertion never comes back down and permanently inflates the headroom `--check` demands.
+    `min(secs, ceiling)` stores exactly the property the paragraph above claims and drops the
+    teardown noise, without touching which rows are admitted.
+
+    THE WINDOW IS CLOSED AT BOTH ENDS, and the upper edge carries as much of the rule as the lower.
+    `seconds >= ceiling` proves the bound expired only where the ceiling WAS the bound, and two
+    states break that. A host whose `CEILINGS_LIVE` probe fails runs every leg UNBOUNDED, and the
+    `.leg` row carries no bound field, so a leg that ran far past its ceiling and failed on its own
+    would enter a MONOTONE file as though a bound had stopped it. A ceiling edited after a row was
+    recorded breaks it the same way, since the comparison uses today's manifest against a
+    historical run. A reading materially above its ceiling is itself evidence that no such bound
+    produced it. What survives is a residual band the width of the window on such a host.
+
+    WHAT THIS CANNOT TELL APART, because the record holds one signature for all three: a leg that
+    is merely slow, a leg that was contended by its neighbours on a wide bar, and a leg that hung.
+    The runner records nothing that would separate them — no pool width, no neighbour count, no
+    bound. The evidence file is MONOTONE, so a contended or hung reading admitted once holds a
+    floor under that ceiling until somebody lowers it, and lowering one is `--write --reset <leg>`,
+    which exists for exactly this and records that somebody chose it.
+
+    `reset` IS THAT ESCAPE, AND WHAT IT DOES HERE IS THE PREVIEW OF IT, NOT THE DISCARD. A named
+    leg admits its `ok` readings ONLY, so the reset re-derives from the runs where the leg finished
+    and the killed reading stops counting. THAT FILTER LASTS ONE INVOCATION, which is the whole of
+    what `--report --reset` needs and is NOT enough on the write path. Two revisions of this escape
+    were inert in two different ways: bypassing the monotone hold alone re-derived the identical
+    value from the same retained rows, and adding this filter beside it moved the inertness one
+    step later rather than removing it — the next plain `--write` re-admitted those same rows,
+    `max(vals)` handed the cleared value straight back, and the summary line called it `1 raised`.
+    Measured on a fixture: 100.0 -> 20.0 -> 100.0. So `cmd_write` takes those rows OUT of the
+    retained run files as well (`remove_reset_rows`), and the discard outlives the process that
+    chose it — which is the only version of this escape an operator can reach for inside the
+    `GATE_RUN_KEEP` window, and that window is the only one they ever reach for it in, since the
+    offending run is what put the row there. A named leg with no `ok` reading at all yields nothing
+    here and `cmd_write` then DROPS its row rather than carrying the old one forward: an escape
+    that silently restored the value it was asked to clear would be worse than one that does
+    nothing, because it looks like it worked. `reset` is REQUIRED rather than defaulted, for the
+    reason `legs` is.
     """
     per: dict[str, list[float]] = {}
+    reset = set(reset or ())
     for f in glob.glob(str(gd / "gate-run" / "*" / "*.leg")):
         try:
             txt = pathlib.Path(f).read_text(encoding="utf-8", errors="replace")
@@ -101,13 +178,80 @@ def read_runs(gd: pathlib.Path) -> dict:
             continue
         for line in txt.splitlines():
             p = line.split("\t")
-            if len(p) < 4 or p[1] != "ok":
+            if len(p) < 4:
                 continue
             try:
-                per.setdefault(p[0], []).append(float(p[3]))
+                secs = float(p[3])
             except ValueError:
                 continue
+            if p[1] != "ok":
+                if p[0] in reset:
+                    continue
+                ceiling = (legs.get(p[0]) or {}).get("ceiling")
+                if not isinstance(ceiling, int):
+                    continue
+                if not ceiling <= secs <= ceiling + CEILING_WINDOW_S:
+                    continue
+                secs = min(secs, float(ceiling))
+            per.setdefault(p[0], []).append(secs)
     return per
+
+
+def remove_reset_rows(gd: pathlib.Path, reset) -> int:
+    """Take the reset legs' non-`ok` rows OUT of the retained run files. Returns rows removed.
+
+    THIS IS WHAT MAKES `--reset` STICK, and without it the escape is inert one `--write` later.
+    `read_runs`'s filter is per-invocation; the `.leg` file holding the killed reading stays in the
+    `GATE_RUN_KEEP` window, so the very next ordinary `--write` re-admits it and the monotone
+    maximum restores the floor the operator just cleared. Deleting the row is what "somebody chose
+    it" has to mean: these files are UNTRACKED, per-worktree, node-local scratch — the same
+    property the module docstring gives as the reason a gate may not read them — and a discard that
+    expires with the process is not a discard.
+
+    ROWS, NOT FILES, and only the ones the reset names: `run-gates.sh` writes one row per file, but
+    a file may carry several (a fixture does), and a reset leg's `ok` readings are exactly what the
+    escape re-derives from. A file left with nothing is removed, since an empty `.leg` is a row
+    nobody wrote. Every retained run but one is read by nothing except this module.
+
+    THE ONE IT DOES NOT EXEMPT IS THE RUN IN FLIGHT, and that is a choice rather than an oversight.
+    `run-gates.sh` re-reads its OWN `<RUNDIR>/<i>.leg` at ledger time, so a reset racing a live bar
+    can take a row out from under it and leave that leg recorded as `ok` with no reuse key. The
+    obvious guard — skip the directory `gate-run/current` names — is worse than the race: `current`
+    survives the run that wrote it, so the exemption would fall on the most RECENTLY finished run,
+    which is precisely the run whose killed reading an operator is resetting, and the escape would
+    be inert again for the only case it exists for. The race needs two deliberate concurrent
+    gestures on one worktree; the exemption would break the single one.
+
+    A row that cannot be rewritten is NOT counted. The count is the operator's only evidence that
+    the scratch record actually moved, and one that included a failed `unlink` would be the same
+    could-not-fail shape as the summary line this fold is repairing.
+    """
+    reset = set(reset or ())
+    if not reset:
+        return 0
+    gone = 0
+    for f in glob.glob(str(gd / "gate-run" / "*" / "*.leg")):
+        p = pathlib.Path(f)
+        try:
+            lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
+        except OSError:
+            continue
+        # THE SAME PARSE `read_runs` USES, deliberately: a row this module would not read is a row
+        # it has no business deleting, so a short or malformed line survives a reset untouched.
+        keep = [ln for ln in lines
+                if not (len(ln.split("\t")) >= 4
+                        and ln.split("\t")[0] in reset and ln.split("\t")[1] != "ok")]
+        if len(keep) == len(lines):
+            continue
+        try:
+            if keep:
+                p.write_text("\n".join(keep) + "\n", encoding="utf-8", newline="\n")
+            else:
+                p.unlink()
+        except OSError:
+            continue
+        gone += len(lines) - len(keep)
+    return gone
 
 
 def read_evidence() -> dict:
@@ -129,7 +273,8 @@ def read_evidence() -> dict:
 
 
 def cmd_report(root, gd, args) -> int:
-    legs, runs = read_legs(root), read_runs(gd)
+    legs = read_legs(root)
+    runs = read_runs(gd, legs, args.reset)
     floor, frac, mline = read_margin()
     if not runs:
         print(f"derive-ceilings: DEAD PROBE — no readings under {gd}/gate-run/. Nothing was "
@@ -150,12 +295,22 @@ def cmd_report(root, gd, args) -> int:
         need = max(floor, frac * mx)
         over = (ceiling - mx) if isinstance(ceiling, int) else None
         state = "ok"
+        # THE REACHED BRANCH IS `cmd_check`'s, ON THE SAME CONDITION AND FROM THE SAME TWO VALUES.
+        # This is the table an operator actually sizes a ceiling FROM, so it is the reader that
+        # most needs to be told a reading is a LOWER BOUND on the work rather than its duration —
+        # and it was the one left saying `UNDER` with a `need` target beside it, which is the
+        # invitation the sibling reader was amended to withdraw. `have` and `need` print as `-`
+        # here for the same reason: there is no headroom to state above a number the work merely
+        # got to, and an arithmetic target offered against one is a sizing instruction.
         if over is None:
             state = "no-ceiling"
+        elif mx >= ceiling:
+            state = "REACHED"
         elif over < need:
             state = "UNDER"          # the ceiling does not clear the evidenced max by the headroom
-        print(f"{name}\t{mx:.1f}\t{len(vals)}\t{ceiling}\t"
-              f"{('%.0f' % over) if over is not None else '-'}\t{need:.0f}\t{state}")
+        cells = ("-", "-") if state == "REACHED" else (
+            ("%.0f" % over) if over is not None else "-", "%.0f" % need)
+        print(f"{name}\t{mx:.1f}\t{len(vals)}\t{ceiling}\t{cells[0]}\t{cells[1]}\t{state}")
     # REPORTED, never silent: a leg with no reading is a leg whose ceiling nothing supports, and it
     # is a different state from a leg whose ceiling is wrong.
     if unbacked:
@@ -170,28 +325,67 @@ def cmd_write(root, gd, args) -> int:
 
     `gate-run` retains a handful of runs, so a pruned or quiet window would otherwise LOWER an
     evidenced maximum and, with it, the floor the gate holds every ceiling above. Lowering takes
-    `--reset <leg>`, which records that somebody chose it.
+    `--reset <leg>`, which records that somebody chose it — and, here, MAKES it stick by removing
+    the discarded readings from the retained run files rather than filtering them for one process.
     """
-    runs = read_runs(gd)
-    if not runs:
+    reset = set(args.reset or ())
+    legs = read_legs(root)
+    # THE LIVENESS QUESTION IS ASKED WITHOUT THE RESET FILTER, and the two are different questions.
+    # "Is there any reading at all" is what DEAD PROBE answers; "what survives the reset" is what
+    # the write consumes. Asking the second and printing the first misdiagnosed the one state this
+    # verb exists for: a reset naming the only leg with a reading emptied the map, and the early
+    # return fired forty lines above the drop path documented below, so the run exited 2 saying
+    # nothing was measured — of readings it had just excluded itself — and the stale row survived.
+    live = read_runs(gd, legs, ())
+    if not live:
         print("derive-ceilings: DEAD PROBE — no readings to write.", file=sys.stderr)
         return 2
+    # THE DISCARD IS PERSISTED BEFORE THE READ, so nothing downstream can re-admit it. `read_runs`
+    # is still passed `reset` below: it is the belt for a row this call could not rewrite, and it
+    # is what `--report --reset` previews with.
+    removed = remove_reset_rows(gd, reset)
+    # THE CEILINGS ARE READ HERE TOO, and this call is the whole of a criterion. `read_runs`'s
+    # admission rule compares against them, and this is the only path that produces the tracked
+    # artifact — a write path still holding an `ok`-only filter is invisible to `--check`, which
+    # reads no run file at all.
+    runs = read_runs(gd, legs, reset) if reset else live
     have = read_evidence()
     node = os.environ.get("GOV_NODE") or "a"
     date = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cs"],
                           capture_output=True, text=True).stdout.strip() or "unknown"
-    rows, raised, held = {}, 0, 0
+    rows, raised, held, lowered = {}, 0, 0, 0
     for name, vals in runs.items():
         mx = max(vals)
         prev = have.get(name)
-        if prev and prev[0] >= mx and name not in (args.reset or []):
+        if prev and prev[0] >= mx and name not in reset:
             rows[name] = prev
             held += 1
         else:
             rows[name] = (mx, len(vals), node, date)
-            if prev:
+            # TALLIED ON MOVEMENT, never on which branch got here. A reset leg whose re-derived
+            # maximum EQUALS the stored one lands in this branch because `name not in reset` forced
+            # it out of the hold, and the old `elif prev` then reported `1 raised` for a row that
+            # did not move — work nobody did, printed in the only line `--write` gives an operator,
+            # and printed in answer to the gesture they make when the first reset appeared not to
+            # stick. Equal is `held`: the value is the previous maximum, whatever the row's other
+            # fields were refreshed to.
+            if prev and mx < prev[0]:
+                lowered += 1
+            elif prev and mx > prev[0]:
                 raised += 1
+            elif prev:
+                held += 1
+    dropped = 0
     for name, prev in have.items():                     # rows this run measured nothing for
+        # A RESET LEG IS NOT CARRIED FORWARD. Reaching here with one means every reading it had was
+        # the killed one the reset was asked to discard, so restoring the old row would hand back
+        # exactly the value the operator was clearing while printing that the reset ran. The row
+        # goes, the leg reads UNBACKED — which `--check` reports and does not fail on — and the
+        # next ordinary `--write` re-derives it once the window holds a finished run.
+        if name in reset:
+            if name not in rows:                        # COUNTED ONLY WHEN A ROW ACTUALLY WENT:
+                dropped += 1                            # a reset leg that kept `ok` readings was
+            continue                                    # re-derived, not dropped
         rows.setdefault(name, prev)
     lines = [
         "# ceiling-evidence.txt — the recorded maximum per gate leg, TRACKED so a gate can read it.",
@@ -202,7 +396,9 @@ def cmd_write(root, gd, args) -> int:
         "#",
         "# MONOTONE. A row only ever rises. `gate-run` retains a handful of runs, so a quiet window",
         "# would otherwise lower the evidenced maximum and with it the floor every ceiling is held",
-        "# above. `--reset <leg>` lowers one, and that is a decision somebody made.",
+        "# above. `--write --reset <leg>` lowers one by DELETING that leg's killed readings from the",
+        "# untracked run record, so no later write can hand the value back — which is what a",
+        "# decision somebody made has to mean here.",
         "#",
         "# <leg>\t<max seconds>\t<readings>\t<node>\t<date>",
     ]
@@ -210,8 +406,14 @@ def cmd_write(root, gd, args) -> int:
         mx, n, nd, dt = rows[name]
         lines.append(f"{name}\t{mx:.1f}\t{n}\t{nd}\t{dt}")
     EVIDENCE.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    # `removed` IS THE LIVENESS HALF OF THIS LINE. `lowered` and `dropped` say the artifact moved;
+    # only this says the scratch reading that would have restored it is gone, which is the property
+    # the escape is actually asked for. A reset printing `1 lowered` over a run record it failed to
+    # touch is the one report this fold exists to make impossible.
     print(f"derive-ceilings: wrote {len(rows)} row(s) to {EVIDENCE.name} "
-          f"({raised} raised, {held} held at a previous maximum)")
+          f"({raised} raised, {lowered} lowered by --reset, {dropped} dropped by --reset, "
+          f"{removed} killed reading(s) removed by --reset, "
+          f"{held} held at a previous maximum)")
     return 0
 
 
@@ -236,7 +438,17 @@ def cmd_check(root, gd, args) -> int:
             bad.append(f"{name}: no ceiling declared, but {row[0]:.1f}s is recorded")
             continue
         need = max(floor, frac * row[0])
-        if ceiling < row[0] + need:
+        # A REACHED ceiling is a strict sub-case of the headroom failure below — required headroom
+        # never drops under the floor — so this branch changes no verdict, only the sentence. It
+        # exists because the headroom arithmetic reads as an invitation to size a new ceiling from
+        # the evidenced maximum, and a reading AT a ceiling is a lower bound on the work rather
+        # than its cost. Derived at check time from the two tracked files, so there is no stored
+        # flag to keep fresh and no way for the message to disagree with the row.
+        if row[0] >= ceiling:
+            bad.append(f"{name}: ceiling {ceiling}s was REACHED in a recorded run at "
+                       f"{row[0]:.1f}s — that reading is a LOWER BOUND on the work and not its "
+                       f"duration, so do not size a new ceiling from it")
+        elif ceiling < row[0] + need:
             bad.append(f"{name}: ceiling {ceiling}s does not clear its evidenced maximum "
                        f"{row[0]:.1f}s by the required max({floor}s, {frac}x) = {need:.0f}s "
                        f"(short by {row[0] + need - ceiling:.0f}s)")
@@ -268,7 +480,11 @@ def main() -> int:
     g.add_argument("--write", action="store_true", help="refresh the tracked evidence file")
     g.add_argument("--check", action="store_true", help="the gate: tracked files only")
     ap.add_argument("--reset", action="append", metavar="LEG",
-                    help="with --write, allow this leg's row to LOWER")
+                    help="re-derive this leg from its `ok` readings alone, so a killed reading "
+                         "stops holding a floor under its ceiling; with --write it also lifts the "
+                         "monotone hold, DELETES those killed readings from the untracked run "
+                         "record so a later write cannot restore them, and drops the row entirely "
+                         "when no `ok` reading remains")
     args = ap.parse_args()
     root = resolve_repo_root()
     gd = resolve_git_dir(root)
