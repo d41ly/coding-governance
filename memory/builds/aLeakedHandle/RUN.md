@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 7269fda93629d45a4c41d8888f9fb47b1f644115
-phase: BUILDING
+witness: 9f93ac713bf854aa98859bceb81c2a95a07fbf99
+phase: REVIEWING
 branch-sha: eff1b6b15081355897038b3df3b9497d94f4b069
 branch-ref: refs/heads/branch/full-bar-test-results-935278
 mode: prompt
@@ -62,3 +62,5 @@ base: eff1b6b15081355897038b3df3b9497d94f4b069
 2026-09-10T12:22:11Z decision · item TOOL-aLeakedHandle-3 section 8 F1 says the fork is carried as a TOOL backlog row, and no such row exists in memory/backlog/TOOL.md · reason The fork was resolved by the delegated fold pass, not by this build pass, and memory/backlog is a SHARED_RECORDS member in .unattended.conf — --dispatch refuses a pass declaration that overlaps one, so this pass may not write the row and did not try. Options seen: widen the write set (refused by the verb, correctly); write it anyway outside the declaration (that is the exact act the shared-record rule exists to stop); park it. The row is owed by whichever commit next opens the shared records, and until it lands the spec's RESOLVED mark cites a record that is not there. The decision it records is unaffected: F1 stays out of this unit, all 104 legs in tools/gate-legs.json declare a ceiling, so the branch it would add would ship dead today.
 
 2026-09-10T12:39:06Z dispatch · item 2489d058 TOOL-aLeakedHandle-3 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/README.md memory/builds/aLeakedHandle/spec memory/builds/aLeakedHandle/build memory/builds/aLeakedHandle/README.md memory/LIVE.md memory/ledger/2026-09.md memory/guides/SESSION-KICKOFF.md
+
+2026-09-10T13:13:19Z review · item aLeakedHandle · reason verdict BLOCKED · blockers 1
