@@ -304,6 +304,10 @@ about to remove; landing the fix first leaves the class ungated for the length o
 | `memory/map/generated/inventories.json` | re-rendered |
 | `memory/map/generated/symbols.json` | re-rendered, because the new Python file adds symbols |
 | `memory/gotchas/bounded-through-a-pipe-is-unbounded.md` | the gating paragraph |
+| `.unattended.conf` | S7's one member on `SHARED_RECORDS` — the AMEND, added at rev-5 |
+| `tools/gate-lint/README.md` | the sentence saying the kit ships no leg of its own, which S5 made false |
+| `memory/gotchas/INDEX.md` | re-rendered; the record's anchor count moved |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamped, twice; three watched files moved |
 
 ### Alternatives rejected
 
