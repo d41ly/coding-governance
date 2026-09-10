@@ -6,7 +6,6 @@ streams: tooling
 roster: TOOL
 ids: TOOL-aBatchedArm-1
 authorized-by: prompt
-status: OPEN
 ---
 
 # aBatchedArm — divide the suite that floors the pool
@@ -58,27 +57,39 @@ respect short-circuits; set equality is what makes a truncated batch red rather 
 None yet.
 
 <!-- roster:units -->
-*Unspecced. The roster is authored here as units are decomposed.*
+| Unit | Mechanism |
+|---|---|
+| `TOOL-aBatchedArm-1` | one assertion helper, `emitted`, plus the grouping of arms whose breaks do not interfere onto one tree and one invocation |
+
+Decomposed to ONE unit deliberately. The earlier plan carried four — a declarative arm table, a
+partition solver, a golden-set oracle and a liveness pin — and §4 of the spec rejects that shape on
+the measurement: a table rewrites 377 assertions to reach a target one helper reaches, and a
+rewritten assertion is what closed the port. The liveness pin is not a second mechanism either, since
+`FLOOR_ASSERTIONS` survives the conversion and is re-measured under S4.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-10 · streams tooling
+**Build status:** OPEN · 1 unit(s) · node a · opened 2026-09-10 · streams tooling
 ids TOOL-aBatchedArm-1
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 1 | 2 | OPEN | rev-1 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aBatchedArm-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aBatchedArm-1` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
