@@ -5,7 +5,7 @@ opened: 2026-09-10
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5
+ids: TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7
 ---
 
 # aGradedDialect — the lexicon kit cannot read TypeScript, and the one repo that would adopt it is 20% TypeScript by file
@@ -70,7 +70,7 @@ coverage 19.3%. The decision named its own revisit test, and both halves now hol
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 5 unit(s) · node a · opened 2026-09-10 · streams tooling
-ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5
+ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
