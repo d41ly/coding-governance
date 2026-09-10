@@ -82,7 +82,7 @@ ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGrad
 | [TOOL-aGradedDialect-5 — the records: the darkness ruling retired where it is actually carried](spec/2026-09-10-spec-TOOL-aGradedDialect-5.md) | 5 | 1 | SPECCED | rev-4 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
