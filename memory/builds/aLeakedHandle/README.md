@@ -1,0 +1,95 @@
+---
+slug: aLeakedHandle
+node: a
+opened: 2026-09-10
+streams: tooling
+roster: TOOL
+status: OPEN
+authorized-by: prompt
+ids: TOOL-aLeakedHandle-1
+---
+
+# aLeakedHandle — two reds traced to their causes, and the reporting that made one of them unreadable
+
+## The problem this build exists to solve
+
+A `GATE_FULL=1 GATE_SELFTESTS=1` bar on node `a` on 2026-09-10 returned RED at 2 of 104 legs. Neither
+red is new, and the reason nobody has closed either is that the evidence needed to diagnose them is
+destroyed by the machinery that reports them.
+
+**`unattended kit gate` deadlocked, and the runner called it a timeout.** Traced live from `/proc`
+before the kill: the leg's bash reads fd 3 from a process-substitution pipe, and its subshell holds
+BOTH ends of a second pipe on fd 3 and fd 4 with no descendant left alive. EOF can never arrive. This
+is `memory/gotchas/bounded-through-a-pipe-is-unbounded.md`, a class this repo has already recorded
+twice and never gated.
+
+**`memory-hygiene self-test` hit its 900 s ceiling, and the gate that should have caught the unsafe
+ceiling is green by absence.** `tools/run-gates/derive-ceilings.py` counts only `ok` rows, so a leg
+that has never passed inside the retained window acquires no evidence row at all. 37 of 104 legs have
+one. `memory-hygiene self-test` has none, so its ceiling is held above nothing.
+
+**And the runner prints a leg's ceiling where its elapsed time belongs.** `run-gates.sh:1480` renders
+rc=137 as `timed out after ${fired}s, killed`. The kill at 4168 s was reported as 16040 s. The ledger
+holds the true figure, so the summary and the ledger disagree by a factor of four.
+
+## Expected improvements
+
+- The hung leg returns a verdict instead of holding a pool slot until its ceiling.
+- The pipe-EOF class is refused by a gate rather than remembered by a gotcha file.
+- A leg that times out contributes evidence, so its ceiling stops being unconstrained.
+- An externally killed leg is reported as killed, with the seconds it actually ran.
+- A wrong number stops entering diagnosis, which is how `TOOL-dRetiredFork-40` was misread twice.
+
+## Detriments if this is not built
+
+- The unattended leg keeps costing up to 4 h 27 m of wall clock per full bar, silently.
+- The next instance of the pipe class is found the same way: by hand, from `/proc`, after an hour.
+- Ceilings keep being declared against evidence that structurally excludes the legs that need it.
+- Every operator kill, OOM and CI cancel keeps reading as a full-ceiling timeout.
+
+## Build-level rules
+
+- **Each red gets its own spec.** Three mechanisms, three units, no shared diff.
+- **The class is gated, never the instance.** Fixing one reader and scanning one file certifies coverage this build does not have.
+- **Every gate here has its failing case observed RED before it lands.** Staged break, confirmed red, unstaged.
+- **No ceiling is re-declared by this build.** `aJoinedCanon` parked that question for the owner on 2026-09-07 and it is still theirs; this build fixes the evidence pipeline, not the number.
+- **A contended measurement is not a regression.** `TOOL-aReapedSpinner-23` was withdrawn for exactly that inference, and a concurrent unattended run held this box during the bar.
+
+## Parked decisions
+
+- None yet.
+
+<!-- roster:units -->
+
+| # | Unit | Status | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-aLeakedHandle-1` | MISSING | the pipe whose write end the subshell never closed, and the gate for its class |
+| 2 | `TOOL-aLeakedHandle-2` | MISSING | a timeout is evidence, so a ceiling stops being held above nothing |
+| 3 | `TOOL-aLeakedHandle-3` | MISSING | a killed leg reports the seconds it ran, not the ceiling it did not reach |
+
+<!-- /roster:units -->
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-10 · streams tooling
+ids TOOL-aLeakedHandle-1
+
+<!-- gen:build-units -->
+*No spec under this build carries a status header; the status above is declared in the front matter.*
+<!-- /gen:build-units -->
+
+Records: 1 bound to this build, across 1 record folder(s).
+
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
