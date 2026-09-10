@@ -811,8 +811,10 @@ with build_tempdir() as td:
         # THE DOTTED-KEY BREAK, which is the one that looks correct to a reader. `ext_of` returns
         # the token WITHOUT its dot, so a `".ts"` key in the catalog is never looked up and the
         # seed keeps emitting the undeclared-extension form while the dict reads fine.
-        check(f"AC1: ...and not the undeclared form `{_e}::dark`", f"{_e}::dark" not in _langs_toks,
-              _langs_line)
+        # `bool(_langs_toks)` is not decoration: an ABSENT `LANGS` line leaves this set empty, and
+        # `not in` over nothing is a pass. An absence assertion needs its population asserted.
+        check(f"AC1: ...and not the undeclared form `{_e}::dark`",
+              bool(_langs_toks) and f"{_e}::dark" not in _langs_toks, _langs_line)
 
     # The CELLS rows, through the ONE reader rather than a second parse of its grammar. Only the
     # three rows that DIFFER from the `.get` default are asserted here: `tsx.function` emits `dark`
@@ -1264,6 +1266,30 @@ with build_tempdir() as _td:
           str(_pin_lines))
     check("S8: ...and a DEAD pin key is not emitted either",
           "LAYER_OFFENDER_PIN" not in _conf, _conf[:200])
+
+# AC3's DEGENERATE CORPUS (TOOL-aGradedDialect-4). The offender share is a division, and a repo of
+# nothing but prose is a real first adoption: every tracked file `dark`, zero definitions extracted,
+# `total_defs == 0`. Without the guarded branch the adopter's FIRST command dies on
+# ZeroDivisionError, which is the class this file already carries two scars from — a flag taken as a
+# destination and a `CELLS` block nobody emitted. The branch says the share is UNDEFINED rather than
+# printing a reassuring `0.0%`, because zero offenders out of zero definitions is not a clean tree.
+with build_tempdir() as _td:
+    _r = Path(_td)
+    shutil.copytree(KIT, _r / "tools" / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    (_r / "docs").mkdir(parents=True, exist_ok=True)
+    (_r / "docs" / "readme.md").write_text("# prose only\n\nNothing here defines anything.\n",
+                                           encoding="utf-8")
+    subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
+    subprocess.run(["git", "add", "--", "docs/readme.md"], cwd=_r, check=True, capture_output=True)
+    _rr = subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", ".lexicon.conf"],
+                         cwd=_r, capture_output=True, text=True)
+    check("AC3: --scaffold survives a corpus with ZERO extracted definitions",
+          _rr.returncode == 0 and "ZeroDivision" not in _rr.stdout + _rr.stderr,
+          f"rc={_rr.returncode} {_rr.stdout + _rr.stderr}")
+    _conf = (_r / ".lexicon.conf").read_text(encoding="utf-8") if (
+        _r / ".lexicon.conf").is_file() else ""
+    check("AC3: ...and calls the share UNDEFINED there rather than printing a reassuring 0%",
+          "no definitions were extracted at all" in _conf and "0.0%" not in _conf, _conf[:400])
 
 # ---- closing-review left-shifts (round 1) --------------------------------------------------------
 #

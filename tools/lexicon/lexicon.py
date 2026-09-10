@@ -92,9 +92,11 @@ WAIVER_FILES = {
 #:
 #: THE TWO TYPESCRIPT MODES ARE A TRANSCRIBED VERDICT, not a choice made here. TOOL-aGradedDialect-3
 #: measured `parse_ts_defs` and `parse_tsx_defs` against TOOL-aGradedDialect-2's frozen conformance
-#: records and its declared floor, and EARNED `parser`: 115 of 115 records in exact agreement,
-#: refusal share 0.0000. `probe` was the other outcome and would have been written here instead, so
-#: nothing about the rows below is this unit's opinion. TOOL-aGradedDialect-4 S1.
+#: records and its declared floor, and EARNED `parser`; `probe` was the other outcome and would have
+#: been written here instead, so nothing about the rows below is this unit's opinion. NO SCORE IS
+#: QUOTED HERE: the figures belong to the arm that measures them, which prints them on every run of
+#: `selftest.py`, and a copy of a measurement beside code that does not make it is the shape this
+#: file's own header is an epitaph for. TOOL-aGradedDialect-4 S1.
 #:
 #: TWO EXTENSIONS AND TWO IDS, because there is no alias mechanism: `ext_of` returns the last dot
 #: segment and `scan_corpus` looks it up in this plain dict, so an undeclared `tsx` is dark and

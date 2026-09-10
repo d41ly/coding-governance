@@ -13,10 +13,17 @@ block's throwaway git repo.
 **The leg that observes most of this is HELD by the ordinary bar.** `lexicon selftest` is
 `subject = kit`, `chunk = selftests` in `tools/gate-legs.json`, so `bash tools/run-gates/run-gates.sh`
 runs none of these arms. They were observed by `python tools/lexicon/selftest.py` directly:
-`lexicon selftest OK — 663 arm(s)`, exit 0. The two legs that DO ride an ordinary bar were run too:
+`lexicon selftest OK — 665 arm(s)`, exit 0. The two legs that DO ride an ordinary bar were run too:
 `python tools/lexicon/lexicon.py` exits 0 with `lexicon OK — 1864 tracked file(s)`, and
 `bash tools/lexicon/adopt-lexicon.sh --check` exits 0 with
 `.lexicon.conf parses, ratified, 23 verb(s) declared, Skill in sync, declaration grades clean`.
+
+**How many arms this unit added is DERIVED, not counted by hand.** The suite prints its own arm
+count, and it moved 648 -> 665 across this unit's two commits: seventeen new arms, plus one re-formed
+and two moved. **The first commit's message says "nine", and it is wrong** — a figure typed beside a
+population, which is the class this repo names most often and which its own commit message managed
+to break. It is recorded here rather than rewritten there, because history is not edited to make a
+record look tidy.
 
 **Evidences:** TOOL-aGradedDialect-4
 
@@ -47,6 +54,12 @@ runs none of these arms. They were observed by `python tools/lexicon/selftest.py
   undefined rather than dividing. Staged red twice: replacing the measured sentence with the
   research record's literal `13.7%` reds the first two arms, and spelling the door `canon overlay`
   without the block-header colon reds the third.
+  A FOURTH observation covers the division itself, added on the follow-up commit after the bug-class
+  checklist selected `armed-but-unreachable-rule`: the share is a quotient, and a repo of nothing but
+  prose extracts zero definitions, so the guarded branch is on a real first-adoption path. Two arms
+  over a definitionless fixture repo require the scaffolder to exit 0 and to call the share UNDEFINED
+  rather than print a reassuring `0.0%` — zero offenders out of zero definitions is not a clean tree.
+  Observed by hand before the arm was written, on a fixture carrying one `.md` file.
 - AC4 — three arms in a new group in `tools/lexicon/selftest.py`, all three over CONSTANTS and no
   tree. (1) Every `KNOWN_EXTS` row's pattern-set id must resolve in `PARSERS` **or** in
   `PATTERN_SETS` — MODE-AGNOSTIC, so a tokenizer that honestly scored below the floor and shipped
@@ -58,7 +71,8 @@ runs none of these arms. They were observed by `python tools/lexicon/selftest.py
   NEITHER catalog, not merely a parser id `PARSERS` lacks — reds arm 1 naming
   `unresolved=['ts:no-such-reader'] of 5 row(s)`; the surface-token break above reds arm 2 naming
   `outside=['ts.func=camel'] of 9 row(s)`; deleting the `("tsx", "function")` row reds arm 3 **and
-  nothing else in 663 arms**, which is the AC2/AC4 split demonstrated rather than argued.
+  nothing else in the 663 arms the first commit shipped**, which is the AC2/AC4 split
+  demonstrated rather than argued.
 - AC5 — two arms over the comment run directly above the emitted `tsx.function` row. One requires
   the ROLE rule — the words `JSX` and `role` — and the other requires NO percent sign anywhere in
   that run. Both test the row's index first, so an absent row is a failure rather than a vacuous
@@ -77,6 +91,25 @@ arm records its failure first and the record is lost with the summary. That is w
 were moved above those fixture blocks, and why the surface-token break above exists: it is the same
 clause with a break that stays silent everywhere except the arm. Guarding those two reads is not
 this unit's — they belong to the arms that own them, and the spec's rev-5 §9 line says so.
+
+## What the bug-class checklist changed, after the first commit
+
+`python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` selected eleven classes over the first
+commit. Three of them landed on it and were fixed in the follow-up:
+
+- `two-answers-to-one-question` — the `KNOWN_EXTS` comment quoted `TOOL-aGradedDialect-3`'s score,
+  `115 of 115` and `refusal share 0.0000`, beside code that does not measure it. The figures are
+  gone and the comment points at the arm that prints them on every run. The `SEED_CONVENTIONS`
+  comment restated the ROLE rule the emitted `CELLS` comment already carries; it now points there
+  and the rule has one carrier.
+- `fixture-passes-by-finding-nothing` — AC1's second arm is an ABSENCE assertion, and an absent
+  `LANGS` line leaves the token set empty, where `not in` passes over nothing. It now asserts its
+  own population first.
+- `armed-but-unreachable-rule` — the zero-corpus branch of the share, described under AC3 above.
+
+The other eight were read and do not land: no shell field parsing, no heredoc-authored regex, no
+fence in either record, no arm resting on a substituted shipped value, and every staged break was
+reverted before the green run that preceded the commit.
 
 ## What this unit did NOT observe, stated rather than left out
 

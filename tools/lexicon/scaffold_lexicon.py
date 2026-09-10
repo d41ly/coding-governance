@@ -73,11 +73,9 @@ BANNED_SUFFIXES = ("Manager", "Helper", "Util", "Utils", "Handler", "Processor",
 #:
 #: `("tsx", "function")` IS WRITTEN OUT AT `dark` RATHER THAN LEFT TO THE `.get` DEFAULT, and the two
 #: emit the same bytes. What differs is what the catalog HOLDS: a declared refusal, not an absent
-#: opinion. The `.tsx` function population splits by ROLE and not by surface — a React component is
-#: a function that returns JSX — so no `(extension, surface)` cell can grade it, and arming either
-#: case makes one legitimate half of the population offenders. That is the rule
-#: `TOOL-dScaffoldedMirror-13` refused this whole feature over, and the row is where the refusal is
-#: recorded instead of re-armed. TOOL-aGradedDialect-4 §8 F1.
+#: opinion, and the difference is legible only here. The REASON is emitted beside the row in the
+#: `CELLS` block below, where the adopter meets the decision, and is not restated here — it is one
+#: rule with one carrier. TOOL-aGradedDialect-4 §8 F1 argues it, against arming either case.
 SEED_CONVENTIONS = {
     ("py", "function"): "snake",
     ("py", "type"): "pascal",
