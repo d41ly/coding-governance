@@ -77,8 +77,8 @@ ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 1 | 2 | OPEN | rev-2 | 2026-09-10 |
-| [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 2 | 2 | OPEN | rev-1 | 2026-09-10 |
+| [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 2 | 2 | OPEN | rev-3 | 2026-09-10 |
+| [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 3 | 2 | OPEN | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 3 record folder(s).
@@ -92,8 +92,8 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-aBatchedArm-1` | no |
-| 2 | `TOOL-aBatchedArm-2` | no |
+| 2 | `TOOL-aBatchedArm-1` | no |
+| 3 | `TOOL-aBatchedArm-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

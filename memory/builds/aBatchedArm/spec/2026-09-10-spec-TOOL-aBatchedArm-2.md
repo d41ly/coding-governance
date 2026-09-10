@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-2 — the structural group linter over the batched self-test
 
-**Status:** OPEN · rev-1 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -53,22 +53,37 @@ over a branch that was never evaluated.
 
 ### Data model
 
-A group is the text between one `reset_tree` call and the next, which is the same delimiter
-`TOOL-aBatchedArm-1` batches on, so the two cannot disagree about where a group starts. Within a
-group the linter extracts: the `emitted` argument if present, each `hit`/`miss`/`same` call with its
-helper name and its literal text, and each `$(run` capture with its assignment target.
+A group is the text between one tree-reset and the next. **The delimiter is NOT a bare `reset_tree`
+grep, and rev-1 said it was.** Round 2 measured 24 group boundaries that a bare grep cannot see:
+`reset_tree` is called from inside `anchor_break`, `anchor_restore` and `seed_ros`, plus `wreset` at
+`check-unattended.test.sh:1582` and the two `in_shard` region seams. A linter that misses a boundary
+merges two real groups into one and then grades the merged thing, which manufactures rule-B and
+rule-C reds on correct code and hides real ones. So the delimiter is the CALL SET — `reset_tree` and
+every helper that calls it, resolved once from the file and asserted non-empty — and the boundary
+count it found is printed on every run beside the group count.
+
+Within a group the linter extracts: the `emitted` argument if present, each `hit`/`miss`/`same` call
+with its helper name and its literal text, and each `$(run` capture with its assignment target.
 
 ### The three rules
 
-| Rule | Reds when | Round-1 finding it left-shifts |
+| Rule | Reds when | What it left-shifts |
 |---|---|---|
-| A | a `miss` or `same` names a check outside the group's `emitted` set | 18, 25, 10 |
-| B | two arms in one group carry an identical assertion text | 26 |
-| C | a capture in a group is assigned to a name other than that group's `out` | 21 |
+| A | a group of more than one arm contains a `miss` or a `same` AT ALL | r1 18, 25, 10 · r2's kill of the admissibility rule |
+| B | two arms in one group carry an identical assertion text | r1 26 |
+| C | a capture in a group is assigned to a name other than that group's `out` | r1 21 |
 
-Rule A is the load-bearing one and it encodes the admissibility rule
-`TOOL-aBatchedArm-1` §4 states: a control is admissible only when the check it is silent about is one
-the group makes fire, so the firing witnesses that the branch was reached.
+**Rule A is now a flat exclusion, and rev-1's linkage version is WITHDRAWN.** rev-1 had it red when a
+control named a check outside its group's `emitted` set — i.e. it enforced `TOOL-aBatchedArm-1`
+rev-2's admissibility rule. Round 2 killed that rule: only 6 of 29 check numbers carry a single
+branch, so a fired number witnesses one of up to 34 branches and never the one a control is silent
+about. With the rule gone the linkage has no sound subject, so rule A enforces the simpler and
+stronger thing `TOOL-dScriptedRepeat-15` S3 always said — a control is not batched at all.
+
+**That deletes this unit's only inference.** rev-1's rule A needed a text-to-check-number join
+borrowed from `check-arms.py`; round 2 measured that join resolving 5 of 101 `miss` arms and 0 of 27
+`same` arms, so it could not have worked. Rule A now reads the helper name alone, which is a token on
+the line. F1 is answered by deletion rather than by a decision.
 
 **Rule A needs the check number of a `miss`, and the arm does not carry one.** The text does. The
 linter resolves text to check number by the same join `check-arms.py` uses — the interpolation-stripped
@@ -164,6 +179,16 @@ RED then unstaged · floor to move: none, the suite is new and declares its own.
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-10 · §4 rules table · §4 delimiter · order · folded spec-audit round 2 (BLOCKED,
+  NON-CONVERGENT, disposition FOLD, so this is the loop's exit and this spec is not re-reviewed).
+  Round 2 called this unit unimplementable as written and was right on both counts. **Rule A's
+  linkage form is WITHDRAWN** — it enforced an admissibility rule round 2 killed, and its
+  text-to-check join was measured resolving 5 of 101 `miss` arms and 0 of 27 `same`; it is now a flat
+  exclusion reading the helper name, which deletes the unit's only inference. **The delimiter was
+  wrong** — `reset_tree` is called from inside `anchor_break` (9 sites), `anchor_restore` (9),
+  `seed_ros` (3) and `wreset` (5), plus two `in_shard` seams, so a bare grep merges real groups and
+  manufactures reds on correct code; the delimiter is now the resolved call set, asserted non-empty.
+  Order moved to 3, behind the arity raise and the conversion it grades.
 - rev-1 · 2026-09-10 · initial draft, from spec-audit round 1 of `TOOL-aBatchedArm-1`, which named
   this linter as the left-shift for five of its six findings and specified its three rules and its
   failing case. Added to the build by `--rescope --act add` rather than folded into that unit,

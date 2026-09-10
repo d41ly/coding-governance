@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state
 
-**Status:** OPEN · rev-2 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 1
+**Status:** OPEN · rev-3 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -21,8 +21,10 @@ without deleting an assertion.
 
 ## 2. Scope (IN)
 
-- **S1** — add one assertion helper, `emitted <check-numbers> <output>`, which grades the SET of
-  check numbers a captured run emitted against the set the batch expects. It runs the batch with
+- **S1** — add one assertion helper, `emitted <signatures> <output>`, which grades the SET of
+  interpolation-stripped failure SIGNATURES a captured run emitted against the set the batch expects.
+  Signatures, not check numbers: only 6 of 29 check numbers carry a single branch, so a number
+  witnesses nothing about which branch fired. It runs the batch with
   `GOV_UNATTENDED_REPORT=1`, REDS when a `^unattended-report:` skip line names any check the group
   asserts against, and strips those lines from `$out` before the verbatim assertions see it. Its
   failure message prints the expected set, the observed set, and any skip lines it saw. Observed by
@@ -34,9 +36,10 @@ without deleting an assertion.
   relocate it, or leave a control without a witness. The list, and it is the unit's load-bearing
   declaration: the three check-1 branches that `exit` at `check-unattended.sh:114`, `:198` and
   `:385`; every arm asserting on exit code alone; every arm asserting the output is EMPTY; the
-  anchor, PATH-stub and remote-rewriting arms; **every `miss` and `same` arm whose check number no
-  group-mate makes fire**; and the whole-run EQUALITY arms together with the non-empty baseline they
-  compare against (`_f1_clean` at `check-unattended.test.sh:360`, read by `:371` and `:378`).
+  anchor, PATH-stub and remote-rewriting arms; **EVERY `miss` AND EVERY `same` ARM, unconditionally,
+  which is `TOOL-dScriptedRepeat-15` S3 taken without the escape rev-2 invented**; and the whole-run
+  EQUALITY arms together with the non-empty baseline they compare against
+  (`_f1_clean` at `check-unattended.test.sh:360`, read by `:371` and `:378`).
   Observed by **AC4** and **AC7**.
 - **S4** — re-measure and re-declare `FLOOR_ASSERTIONS` and both per-shard floors against the
   converted suite, with the reading beside each number. Observed by **AC5**.
@@ -55,8 +58,8 @@ without deleting an assertion.
   assertion byte-identical, which is what keeps the equivalence proof available.
 - **Cutting spawns further.** `TOOL-aTracedSpawn-2` bounds it at roughly 2 s per invocation of real
   non-spawn work.
-- **Raising `SHARD_ARITY` above 2.** A live owner ruling of 2026-08-29 permits it; named as the
-  follow-up if AC6 misses.
+- **Raising `SHARD_ARITY` above 2.** No longer a follow-up: round 2's measurement made it the half
+  that meets the goal, so it is `TOOL-aBatchedArm-3` and AC6 grades the pair.
 - **Repairing the suite's pre-existing RED.** `TOOL-aQuenchedHarness-9` and `TOOL-aHoistedPass-38`
   own those. This unit must not change any arm's verdict, red ones included.
 
@@ -88,14 +91,34 @@ hit  "$out" "<B's own failure text>"
 miss "$out" "<C's near-miss text under check 14>"
 ```
 
-### The admissibility rule, which is what makes `emitted` load-bearing for a control
+### NO CONTROL IS BATCHED, and rev-2's admissibility rule that said otherwise is WITHDRAWN
 
-**A group's `miss` or `same` assertion against check N is admissible ONLY when N is in that group's
-`emitted` set.** The check's own firing is then the liveness assertion that the branch was reached at
-all, which §7 of the charter demands of every signal. A control whose check no group-mate makes fire
-has no witness and runs on its own tree, by S3.
+**rev-2 stated: a group's `miss` or `same` against check N is admissible when N is in that group's
+`emitted` set, so the check's own firing witnesses that the branch was reached. Round 2 killed it on
+one measurement, and the rule is gone rather than narrowed.** A check NUMBER is not a branch
+identifier. Measured at BASE: 178 `fail` branches over 29 check numbers, and only **6 of those 29
+carry a single branch** — check 16 carries 34, check 28 carries 31, check 2 carries 18, check 9
+carries 12. So `emitted` naming check 16 witnesses that one of thirty-four branches fired, and says
+nothing whatever about the one a control is silent about. The rule dressed a proxy up as a witness.
 
-Without this rule the mechanism is unsound, and round 1 proved it rather than argued it. `fail()` at
+**The replacement is the ratified prior, taken without the escape rev-2 invented.**
+`TOOL-dScriptedRepeat-15` S3 says an arm asserting ABSENCE may not be scoped, full stop. So no `miss`
+and no `same` arm is batched at all, and S3 carries that as a flat exclusion rather than a
+conditional one. 128 of 377 assertions therefore stay solo.
+
+**`emitted` keys on the interpolation-stripped SIGNATURE, not the check number**, because the
+signature is the only per-branch identifier the checker emits and the number demonstrably is not.
+That also deletes `TOOL-aBatchedArm-2`'s rule-A join, which had no sound subject left and resolved
+5 of 101 `miss` arms anyway.
+
+**AND THE UNIT NO LONGER MEETS §1's TARGET ALONE. Measured, not projected:** excluding the control
+arms leaves 95 blocks carrying 136 solo invocations — 36 minutes before a single batch runs — so the
+converted suite lands at 40 to 44 minutes unsharded at every group size tried (5, 7 and 10 blocks per
+batch). `TOOL-aBatchedArm-3` raises `SHARD_ARITY` and is what reaches the goal; this unit is the
+optimisation on top of it. §1's target is restated against the pair, and AC6 now grades the pair.
+
+The dark-check hazard rev-2 named is REAL and survives the withdrawal, which is why S1 keeps the
+report-channel detector: `fail()` at
 `check-unattended.sh:93` is the SOLE emitter of `UNATTENDED check N` — one hit in the file. Every
 SKIP goes through `report()` at `:761`, gated on `GOV_UNATTENDED_REPORT` at `:760`, and there are 15
 such sites covering checks 15, 23, 24 and 31. So a check pushed onto a skip path by a group-mate
@@ -195,18 +218,18 @@ records.
 - **AC5** — When the converted suite runs unsharded and at each shard index, the executed assertion
   count meets the re-declared `FLOOR_ASSERTIONS` and per-shard floors, each carrying its reading.
   Red when: a floor is carried across from the unconverted suite, which is a number and not a floor.
-- **AC6** — When the converted suite runs UNSHARDED on a frozen clone on an idle box, it completes in
-  under 20 minutes, measured with `date +%s` around it and recorded.
+- **AC6** — When the converted suite runs on a frozen clone on an idle box WITH
+  `TOOL-aBatchedArm-3`'s arity in effect, the longest shard completes in under 20 minutes, measured
+  with `date +%s` and recorded.
   `figure:` DERIVED from that run and written into `tools/run-gates/selftest-budgets.txt`.
-  Red when: the unsharded run exceeds 20 minutes, which sends the unit to the `SHARD_ARITY` follow-up
-  in §3 rather than to a lowered target.
-  **Unsharded is the subject on purpose.** §1 sets the target on the suite's verdict, the whole-suite
-  claim exists only in a run with no `--shard` argument (`check-unattended.test.sh:3161-3162`,
-  `run-unattended-gates.sh:157-158`), and the declared argv in `selftest-budgets.txt:114` is
-  unsharded. rev-1 graded the longer shard, which is a different subject.
-- **AC7** — When a group carries a `miss` or `same` assertion against a check its `emitted` set does
-  not name, the suite REDS naming that arm.
-  Red when: such a group runs green, which is the round-1 blocker exactly.
+  Red when: the longest shard exceeds 20 minutes.
+  **This unit alone cannot satisfy it and the criterion says so rather than pretending.** Measured
+  2026-09-10: excluding the control arms leaves 95 blocks carrying 136 solo invocations, so the
+  converted suite lands at 40 to 44 minutes unsharded at 5, 7 and 10 blocks per batch. rev-2's
+  unsharded target was unreachable by this unit and rev-1's longer-shard target graded the wrong
+  subject; the pair is the honest subject, and `TOOL-aBatchedArm-3` is the half that carries it.
+- **AC7** — When the converted file is scanned, NO group contains a `miss` or a `same` assertion.
+  Red when: any group contains one, which is what rev-2's withdrawn admissibility rule permitted.
 
 ## 7. Gates
 
@@ -231,6 +254,17 @@ under S4.
 
 ## 9. Revision log
 
+- rev-3 · 2026-09-10 · §2 S1 · §2 S3 · §3 · §4 · AC6 · AC7 · order · folded spec-audit round 2
+  (BLOCKED, 13 blockers, NON-CONVERGENT, disposition FOLD, so this is the loop's exit and this spec
+  is not re-reviewed). **rev-2's admissibility rule is WITHDRAWN, not narrowed.** It keyed a control's
+  witness on a check NUMBER, and only 6 of 29 check numbers carry a single branch — check 16 carries
+  34 — so a fired number witnesses one of up to 34 branches and never the one a control is silent
+  about. Replaced by `TOOL-dScriptedRepeat-15` S3 taken flat: no `miss` and no `same` is batched.
+  `emitted` re-keyed from check numbers to interpolation-stripped signatures for the same reason,
+  which also deletes `TOOL-aBatchedArm-2`'s rule-A join. AC6 retargeted again, to the PAIR: measured,
+  this unit alone lands at 40 to 44 minutes because 95 control-carrying blocks hold 136 solo
+  invocations, so `TOOL-aBatchedArm-3` is the half that meets §1 and this unit is the optimisation.
+  Order moved to 2 behind it.
 - rev-2 · 2026-09-10 · §2 S1 · §2 S3 · §3 · §4 · AC3 · AC6 · AC7 · F1 · folded spec-audit round 1
   (BLOCKED, 3 blockers, 2 highs, 1 medium). The three blockers were one hole: `emitted` and AC3 were
   both blind to the 101 `miss` controls, so a batched control could pass over a branch never
