@@ -2983,6 +2983,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "remove_reset_rows",
+      "kind": "function",
+      "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
       "id": "render",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
