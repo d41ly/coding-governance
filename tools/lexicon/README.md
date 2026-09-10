@@ -96,8 +96,8 @@ in `lexicon.py`; the only literal is `jsx`, the reader is `tsx-tokens` alone, an
 What it cannot see stays in the parent and is PINNED there: a component that returns `null`, a
 portal, or a callback's result, and a `vi.mock` module shape whose keys mirror another file's
 exports. What it sees and you may not want routed is pinned in the selector's row: a render helper
-that returns an element under a camel name. Measured on the adopter tree this was built for —
-601 `.tsx` files, 3145 functions — arming the cell blind pinned 951 names; the pair above pins 86,
+that returns an element under a camel name. Measured 2026-09-11 on the adopter tree this was built
+for — 601 `.tsx` files, 3145 functions — arming the cell blind pinned 951 names; the pair above pins 86,
 and a `render*` prefix cannot take the 40 on the selector's side, because a name matching two
 selectors is refused rather than resolved (below). That composition is the grammar's open edge,
 stated rather than papered.

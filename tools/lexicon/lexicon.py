@@ -1660,8 +1660,9 @@ def parse_ts_source(src: str, jsx: bool = False):
     `functions` whose own body holds a JSX element.
 
     A DEFINITION OWNS AN ELEMENT WHEN THE ELEMENT IS ITS VALUE, and three words in that rule each
-    cost a measurement against the adopter corpus this build exists for (601 `.tsx` files, 3145
-    functions, 951 offenders when the cell is armed blind).
+    cost a measurement against the adopter corpus this build exists for, read 2026-09-11 (601
+    `.tsx` files, 3145 functions, 951 offenders when the cell is armed blind). Every figure below
+    is that read; none is derivable here, which is why each carries the date.
 
     DEFINITION means a DECLARED name — `function name` whether statement or named expression, and
     `const`, `let` or `var` bound to an arrow or a function expression. An object property, a
@@ -1676,7 +1677,7 @@ def parse_ts_source(src: str, jsx: bool = False):
     literal or an object literal does. So `=> <A />` and `return x ? <A /> : null` are returned,
     and `=> mount(<A />)`, `return renderToStaticMarkup(<A />)` and `return [{ el: <A /> }]` are
     not — a component RETURNS an element, a test helper hands one to something. "Contains" was
-    the first cut and it pinned 162 names on that corpus; this pins 88.
+    the first cut and it pinned 162 names on that corpus; this pins 86.
 
     OWNS means the INNERMOST function spanning the element, named or not, and only a declared
     name routes. So a hook that defines a component inside itself is not one — `function

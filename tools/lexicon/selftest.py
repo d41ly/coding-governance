@@ -762,8 +762,9 @@ with build_tempdir() as td:
     # one says nothing about them — the green-by-absence class, answered by putting the population
     # in the fixture instead. One function and one type per extension, which is the population
     # `UNDECLARED CELL` grades and therefore the four cells the seed has to cover. The `.tsx`
-    # function is deliberately a PascalCase component: it is the definition the `tsx.function` row
-    # declines to grade, so a fixture without one could not tell a `dark` row from an armed one.
+    # function is deliberately a PascalCase component that RETURNS an element: it is the definition
+    # the `+returns:jsx` row routes, so a fixture without one could not make that row proposable
+    # and the seed would emit the bare camel parent, which is the helpers-only shape asserted below.
     (root / "src" / "a.ts").write_text(
         "export function loadThing(): string {\n  return \"x\";\n}\n\n"
         "export interface ThingProps {\n  id: string;\n}\n", encoding="utf-8")
@@ -2664,9 +2665,12 @@ check("returns R10: an object property, a method and a class property return ele
       "routed", got == [] and len(_all) == 3, f"routed {got} of {_all}")
 
 # R11..R12 — the marker is invisible to the definition arms and absent from a `.ts` read.
-check("returns R11: a module-level element belongs to nobody",
-      lex.read_ts_jsx_defs("const el = <div />;\nfunction buildX() { return 1; }\n") == [],
-      "module-level")
+check("returns R11: a module-level element belongs to nobody, before or after a helper -- and the "
+      "helper is READ, so this is not a reader that found nothing",
+      lex.read_ts_jsx_defs("const el = <div />;\nfunction buildX() { return 1; }\n") == []
+      and lex.read_ts_jsx_defs("function buildX() { return 1; }\nconst el = <div />;\n") == []
+      and lex.parse_tsx_defs("function buildX() { return 1; }\nconst el = <div />;\n")[0]
+      == [("buildX", 1)], "module-level")
 _with = lex.parse_tsx_defs("const A = () => <div />;\nfunction B() { return <p />; }\n")
 _sans = lex.parse_tsx_defs("const A = () => null;\nfunction B() { return null; }\n")
 check("returns R12: the `jsx` marker token moves NO definition — the population is identical with "
