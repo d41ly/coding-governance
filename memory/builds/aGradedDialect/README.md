@@ -5,7 +5,7 @@ opened: 2026-09-10
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7
+ids: TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7 TOOL-aGradedDialect-8
 ---
 
 # aGradedDialect — the lexicon kit cannot read TypeScript, and the one repo that would adopt it is 20% TypeScript by file
@@ -83,7 +83,7 @@ coverage 19.3%. The decision named its own revisit test, and both halves now hol
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 5 unit(s) · node a · opened 2026-09-10 · streams tooling
-ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7
+ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 TOOL-aGradedDialect-6 TOOL-aGradedDialect-7 TOOL-aGradedDialect-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -95,7 +95,7 @@ ids TOOL-aGradedDialect-1 TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGrad
 | [TOOL-aGradedDialect-5 — the records: the darkness ruling retired where it is actually carried](spec/2026-09-10-spec-TOOL-aGradedDialect-5.md) | 5 | 1 | CLOSED | rev-6 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 17 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

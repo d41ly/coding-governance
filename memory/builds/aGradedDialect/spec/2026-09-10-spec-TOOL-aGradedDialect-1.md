@@ -10,6 +10,7 @@
 | [2026-09-10-build-TOOL-aGradedDialect-1-typescript-extraction-research.md](../build/2026-09-10-build-TOOL-aGradedDialect-1-typescript-extraction-research.md) | research | — |
 | [2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md](../prompts/2026-09-10-prompt-TOOL-aGradedDialect-1-spec-brief.md) | journal | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-diff-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-diff-round1.md) | diff-review | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
+| [2026-09-10-review-TOOL-aGradedDialect-1-diff-round2.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-diff-round2.md) | diff-review | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round1.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round1.md) | spec-audit | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round2.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round2.md) | spec-audit | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |
 | [2026-09-10-review-TOOL-aGradedDialect-1-round3.md](../reviews/2026-09-10-review-TOOL-aGradedDialect-1-round3.md) | spec-audit | TOOL-aGradedDialect-2 TOOL-aGradedDialect-3 TOOL-aGradedDialect-4 TOOL-aGradedDialect-5 |

@@ -4342,6 +4342,71 @@ def test_ts_refusals():
               'vi.mock("m", () => ({\n  notFound: () => 1,\n}));\n')),
           "the factory-returned form, which is the shape the frozen corpus carries twice")
 
+    # ---- Round 2 of the closing review: four entries, three of them regressions from round 1 ------
+    #
+    # 56f1f135 fixed four reader defects and introduced three new ones, all invisible to the frozen
+    # corpus for the same reason the first four were: measured over the 115 records, ZERO are
+    # semicolon-free, ZERO carry a class ASI property pair, and the two carrying `.type ===` both
+    # carry it at a stack depth that cannot arm the predicate. A 115/115 green looked like coverage
+    # and was not, twice running. These arms are the instances; the corpus-wide arm below is the class.
+
+    # R1 -- a semicolon-free type alias must not suppress JSX for the rest of the file. The first cut
+    # of the type-position rule was a FLAG cleared only at a depth-0 `;`, so one ASI alias refused
+    # every later `<` in the file. The flag is gone; the reading is decided from the token tail.
+    got = lex.parse_tsx_defs("type Props = { a: string }\nfunction Row() { return <p>x</p>; }\n")[0]
+    check("ts: a semicolon-free `type` alias does not suppress JSX after it",
+          got == [("Row", 2)], f"{got}")
+    got = lex.parse_tsx_defs("export type X = 1 | 2\nconst B = () => <>hi</>;\n")[0]
+    check("ts: ...nor before a fragment", got == [("B", 2)], f"{got}")
+
+    # R2 -- the same flag armed on ANY depth-0 word `type`, with the alias name optional and `=`
+    # indistinguishable from `===`, so a discriminated-union ternary at module scope refused the
+    # whole file. All three shapes below carry their semicolons and still refused, so R1's fix alone
+    # would not have reached them.
+    got = lex.parse_tsx_defs(
+        'const label = item.type === 1 ? <b>on</b> : "off";\nfunction after() {}\n')[0]
+    check("ts: `item.type === 1 ? <b>on</b>` is a ternary, not a type alias",
+          got == [("after", 2)], f"{got}")
+    got = lex.parse_tsx_defs("const type = 'button';\nconst Bar = () => <i>x</i>;\n")[0]
+    check("ts: ...and `const type =` is a binding whose name happens to be `type`",
+          got == [("Bar", 2)], f"{got}")
+    got = lex.parse_tsx_defs("type<Foo>(1);\nconst B = () => <i>x</i>;\n")[0]
+    check("ts: ...and `type<Foo>(1)` is a call", got == [("B", 2)], f"{got}")
+
+    # R3 -- the class-property annotation walk ran past the member boundary. `read_ts_type_end` stops
+    # at a depth-0 `;` or `,` and ASI supplies neither between members, so the walk found the NEXT
+    # member's `=`, graded the first member's annotation word, and skipped the real name. BOTH
+    # directions are asserted: the arrow property appears AND the fabricated name does not. This is
+    # D3's own defect reintroduced by D3's own fix, and it was SILENT -- green bar, wrong population.
+    got = lex.parse_ts_defs("class A {\n  label: string\n  onClick = () => {}\n}\n")[0]
+    check("ts: an ASI class member pair grades the arrow property, not the annotation word",
+          got == [("onClick", 3)], f"{got}")
+    got = lex.parse_ts_defs("class A {\n  x = cond ? aVal : bVal\n  onClick = () => {}\n}\n")[0]
+    check("ts: ...and a value-position ternary colon does not fire the annotation arm at all",
+          got == [("onClick", 3)], f"{got}")
+
+    # R5 -- `check_ts_tag_start` skipped only space and tab where `check_ts_generic` skips all
+    # whitespace, so a newline between `<` and its tag name became a fresh, undeclared refusal.
+    got = lex.parse_tsx_defs("export const A = () => (\n  <\n    div>hi</div>\n);\n")[0]
+    check("ts: a newline between `<` and its tag name is still a tag start",
+          got == [("A", 1)], f"{got}")
+
+    # THE REGRESSION GUARDS. Every round-1 case these fixes could have undone, asserted here rather
+    # than trusted: the alias that ends in a semicolon, the declarator annotation, the object
+    # literal whose colon precedes a REAL element, and the annotation D3 was written for.
+    got = lex.parse_tsx_defs("type Mapper = <T>(x: T) => T;\nfunction ok() {}\n")[0]
+    check("ts guard: the semicolon-terminated alias still parses", got == [("ok", 2)], f"{got}")
+    got = lex.parse_tsx_defs("const f: <T>(x: T) => T = (x) => x;\nfunction ok() {}\n")[0]
+    check("ts guard: the declarator annotation still parses",
+          got == [("f", 1), ("ok", 2)], f"{got}")
+    got = lex.parse_tsx_defs("function Row() {\n  return <Menu icon={{ a: 1 }} />;\n}\n")[0]
+    check("ts guard: an object literal's colon still precedes a real JSX element",
+          got == [("Row", 1)], f"{got}")
+    got = lex.parse_ts_defs(
+        "class Store {\n  private onChange: (e: Event) => void = (e) => {};\n}\n")[0]
+    check("ts guard: the class annotation D3 was written for still grades the property name",
+          got == [("onChange", 2)], f"{got}")
+
     needles = [n for _l, _s, n, _j in rows]
     shared = sorted({(a, b) for a in needles for b in needles if a != b and a in b})
     check("AC3: no refusal's needle is a substring of another's, or one firing first scores a pass "
@@ -4993,6 +5058,30 @@ else:
         check("AC5: no extracted identifier is a TypeScript keyword or primitive type name, which "
               "is what an annotation graded as a name looks like from the grader's side",
               not _ts_phantoms, f"{_ts_phantoms}")
+
+
+        # ---- THE SEMICOLON-FREE CLASS, gated over the whole corpus rather than per instance --------------
+        #
+        # Three of round 2's four entries needed semicolon-free source, and the frozen corpus carries NONE:
+        # measured, 0 of 115 records lack a semicolon. So the corpus certified a reader that refused whole
+        # files of ordinary `semi: false` TypeScript, twice. This arm strips every statement-terminating
+        # semicolon from each record and asserts the reader does not RAISE on the result. It gates the CLASS
+        # -- any future edit that makes the reader depend on a semicolon reds here -- and it costs one pass
+        # over a corpus the suite has already loaded. The reviewer named it the highest-value left-shift of
+        # the round and it is the reason these three did not need three separate structural gates.
+        _TS_SEMI = re.compile(r";\s*$", re.M)
+        _ts_asi_raised = []
+        for _r in TS_RECORDS:
+            _mode = TS_PARSER_IDS.get(_r["kind"])
+            if _mode is None or _mode not in lex.PARSERS:
+                continue
+            try:
+                lex.extract_text(_TS_SEMI.sub("", _r["src"]), "parser", _mode)
+            except SyntaxError as _exc:
+                _ts_asi_raised.append((_r["id"], str(_exc)))
+        check("AC5: with every statement-terminating semicolon stripped, the reader RAISES on no record -- "
+              "the semicolon-free class the corpus itself cannot exercise",
+              not _ts_asi_raised, f"{_ts_asi_raised[:5]}")
 
         # ---- TOOL-aGradedDialect-3 AC6: the mode verdict, beside the number that decided it -----
         _ts_mode = read_ts_mode(_ts_verdict)

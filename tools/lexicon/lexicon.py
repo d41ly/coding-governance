@@ -850,7 +850,10 @@ def check_ts_tag_start(src: str, i: int) -> bool:
     comparison, and `/` opens the closing tag the paragraph above is about.
     """
     j = i + 1
-    while j < len(src) and src[j] in " 	":
+    # `.isspace()`, matching `check_ts_generic` thirty lines up. Skipping only space and tab made a
+    # newline between `<` and its tag name a fresh refusal on legal JSX, and the divergence between
+    # two lookaheads over the same character was a slip rather than an argument.
+    while j < len(src) and src[j].isspace():
         j += 1
     c = src[j:j + 1]
     return bool(c) and (c.isalpha() or c in "_$>/")
@@ -873,8 +876,21 @@ def check_ts_type_position(toks: list) -> bool:
     """
     if len(toks) < 3:
         return False
+    # A declarator ANNOTATION: `const f: <T>(x: T) => T = ...`. Keyed on the declarator keyword and
+    # deliberately NOT on the colon alone -- an object literal's `{ icon: <Home/> }` has a colon too
+    # and its `<` really is an element, which 39 of the frozen corpus's records depend on.
     if toks[-1][0] == "op" and toks[-1][1] == ":" and toks[-2][0] == "word":
         return toks[-3][0] == "word" and toks[-3][1] in _TS_DECLARATORS
+    # A TYPE-ALIAS body: `type Mapper = <T>(x: T) => T`. This replaced a `type_alias` FLAG that was
+    # armed on the alias header and cleared at a depth-0 `;`, and the flag was wrong twice over. It
+    # never cleared in semicolon-free source, so one ASI alias suppressed JSX for the rest of the
+    # file and every later `<` walked its `/` into `read_regex`. And it armed on any depth-0 word
+    # `type` with the name optional and `=` indistinguishable from `===`, so an ordinary
+    # `item.type === 1 ? <b>on</b>` refused the whole file. A token tail carries no state between
+    # statements, so neither failure has anywhere to live: the reading is decided where it is used.
+    if toks[-1][0] == "op" and toks[-1][1] == "=" and toks[-2][0] == "word" \
+            and toks[-3][0] == "word" and toks[-3][1] == "type":
+        return True
     return False
 
 
@@ -912,11 +928,6 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
     opens: list = []
     suppress = 0
     expr_end = False
-    #: A `type X = ...` alias body, which is a TYPE POSITION until its depth-0 `;`. Tracked here
-    #: rather than in `check_ts_type_position` because the body outlives the token tail that
-    #: function can see. `type` is not a reserved word, so the flag arms only where the word is
-    #: followed by a name and an `=`, which is the alias header and nothing else.
-    type_alias = False
     i, n, line = 0, len(src), 1
 
     def add_token(kind: str, text: str) -> None:
@@ -1090,7 +1101,7 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
         if c == "<":
             if jsx and not expr_end and not check_ts_generic(src, i) \
                     and check_ts_tag_start(src, i) \
-                    and not type_alias and not check_ts_type_position(toks):
+                    and not check_ts_type_position(toks):
                 stack.append("jsxtag")
                 opens.append(("JSX element", line))
                 i += 1
@@ -1127,12 +1138,6 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
             expr_end = False
             continue
         if c in "()[]=:;,>@":
-            # A depth-0 `;` ENDS a type-alias body. This lives inside the op dispatch rather than
-            # beside it: `;` is consumed here and `continue`s, so a guard placed after this branch
-            # is dead code -- which is exactly what the first cut of it was, leaving the flag armed
-            # for the rest of the file and turning the next `</span>` into a regex literal.
-            if c == ";" and len(stack) == 1:
-                type_alias = False
             add_token("op", c)
             i += 1
             expr_end = c in ")]"
@@ -1144,15 +1149,6 @@ def scan_ts_tokens(src: str, jsx: bool = False) -> list:
             text = src[i:j]
             add_token("word", text)
             expr_end = text not in _TS_EXPR_WORDS
-            if text == "type" and len(stack) == 1:
-                k2 = j
-                while k2 < n and src[k2] in " 	":
-                    k2 += 1
-                while k2 < n and (src[k2].isalnum() or src[k2] in "_$"):
-                    k2 += 1
-                while k2 < n and src[k2] in " 	":
-                    k2 += 1
-                type_alias = src[k2:k2 + 1] in ("=", "<")
             i = j
             continue
         if c == "!":
@@ -1359,6 +1355,36 @@ def read_ts_block_kind(prev, cur: str, pend) -> str:
     return "statement"
 
 
+#: Tokens that can END a line and still continue a type on the next one. Anything else at a line
+#: end is an ASI MEMBER BOUNDARY: `label: string` then a newline then `onClick = () => {}` is TWO
+#: members, and a walk that crosses it finds the SECOND member's `=`, grades the first member's
+#: annotation word as a function name, and skips the real name entirely.
+_TS_TYPE_CONTINUES = frozenset(("=", "|", "&", ",", "<", "(", "[", ":", "extends", "keyof",
+                                "typeof", "infer", "readonly", "new", "=>"))
+
+#: What may sit directly before a class member's NAME. A ternary's `:` sits after a VALUE, so
+#: keying the annotation arm on this set is what stops `x = cond ? aVal : bVal` grading `aVal`.
+_TS_MEMBER_HEAD = frozenset(("{", "}", ";", "public", "private", "protected", "readonly",
+                             "static", "abstract", "override", "declare", "async"))
+
+
+def check_ts_member_annotation(toks: list, k: int, e: int) -> bool:
+    """The span `k`..`e` is ONE class member's type annotation, not a walk across a boundary.
+
+    `read_ts_type_end` stops at a depth-0 `;` or `,` or an unbalanced closer, and ASI supplies
+    none of them between two class members. So the bound here is the LINE: a token opening a new
+    line whose predecessor could not continue a type ends the annotation, whatever
+    `read_ts_type_end` thought. Measured before this existed:
+    `class A { label: string NEWLINE onClick = () => {} }` graded `label` and never graded
+    `onClick` -- D3's own defect, reintroduced by D3's own fix.
+    """
+    for j in range(k + 1, min(e, len(toks))):
+        prev = toks[j - 1]
+        if toks[j][2] > prev[2] and prev[1] not in _TS_TYPE_CONTINUES:
+            return False
+    return True
+
+
 def parse_ts_defs(src: str, jsx: bool = False):
     """TypeScript definitions as `(functions, types, imports)`, from a TOKENIZER not a regex.
 
@@ -1478,7 +1504,8 @@ def parse_ts_defs(src: str, jsx: bool = False):
             k += 1
             continue
 
-        if cur == "class" and _TS_NAME.match(text) and nt == ":" and nxt[0] == "op":
+        if cur == "class" and _TS_NAME.match(text) and nt == ":" and nxt[0] == "op" \
+                and (k == 0 or toks[k - 1][1] in _TS_MEMBER_HEAD):
             # A class PROPERTY carrying a type ANNOTATION. Without this arm the `nt == "="` arm
             # below sees the annotation's LAST WORD sitting in front of the `=` and grades that:
             # `private onChange: (e: Event) => void = (e) => {}` appended `void`, and a realistic
@@ -1488,11 +1515,16 @@ def parse_ts_defs(src: str, jsx: bool = False):
             # matches `void`, so no downstream keyword filter caught it. The `const` arm at the top
             # of this loop has always stepped its annotation this way; the class arm did not.
             e = read_ts_type_end(toks, k + 2, "=")
-            if e is not None and e < m and toks[e][0] == "op" and toks[e][1] == "="                     and check_ts_arrow(toks, e + 1):
+            bounded = e is not None and check_ts_member_annotation(toks, k + 2, e)
+            if bounded and e < m and toks[e][0] == "op" and toks[e][1] == "=" \
+                    and check_ts_arrow(toks, e + 1):
                 funcs.append((text, ln))
-            # Step past the annotation whether or not it held an arrow, so that no token INSIDE it
-            # can reach the arms below and be graded as a name.
-            k = e if e is not None else k + 1
+            # Step past the annotation whether or not it held an arrow, so that no token INSIDE
+            # it can reach the arms below and be graded as a name -- but ONLY when the span really
+            # was this member's annotation. An unbounded `k = e` jumped to the NEXT member's `=`,
+            # so rejecting the cross-boundary walk stopped `label` being graded and lost `onClick`
+            # with it. Trading a fabricated name for a missing one is not a fix.
+            k = e if bounded else k + 1
             continue
 
         if cur in ("object", "class") and _TS_NAME.match(text):

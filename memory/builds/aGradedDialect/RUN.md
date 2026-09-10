@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 56f1f1358e0e310c4e60b15522e9818e13565418
-phase: RUNNING
+witness: 67964f144d2543cc509dc2fe07afc78675788ad2
+phase: REVIEWING
 branch-sha: 56f1f1358e0e310c4e60b15522e9818e13565418
 branch-ref: refs/heads/branch/lexicon-kit-typescript-34c322
 mode: prompt
@@ -22,3 +22,7 @@ anchor-ref: refs/heads/main
 base: 56f1f1358e0e310c4e60b15522e9818e13565418
 
 ## Parked
+
+2026-09-10T07:32:44Z review · item aGradedDialect · reason verdict BLOCKED · blockers 1
+
+2026-09-10T07:32:45Z review · item aGradedDialect · reason verdict BLOCKED · blockers 3 · NON-CONVERGENT · disposition fold
