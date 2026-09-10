@@ -77,6 +77,12 @@ not, say so rather than leaving it for the closing review to discover.
   sentence has three.
 - Your declared write set is `tools/lexicon/LEXICON.md`, `tools/lexicon/README.md`,
   `tools/lexicon/lexicon.py`, `tools/lexicon/kit.toml`, `.claude/skills/lexicon/SKILL.md`,
-  `WIRE-INTO-PROJECT.md`, `memory/backlog/TOOL.md`, `memory/map/features/lexicon.md`,
+  `WIRE-INTO-PROJECT.md`, `memory/map/features/lexicon.md`,
   `memory/builds/dScaffoldedMirror/spec/2026-08-24-spec-dScaffoldedMirror-13.md`, your own spec, and
   your acceptance ledger. Widen through `--dispatch` BEFORE the commit if you need more.
+- **`memory/backlog/TOOL.md` IS NOT YOURS, and the reason is mechanical rather than a scoping
+  preference.** `--dispatch` REFUSES it: the build method names the backlog a shared mutable record
+  outright, so no pass may declare it. AC4's backlog half is therefore written by the parent run
+  directly, in a pass of its own, and your ledger records that split rather than claiming the edit.
+  Do everything else AC4 asks: the superseding pointer in `-13`'s status-header tail is yours, and
+  that file IS in your write set.
