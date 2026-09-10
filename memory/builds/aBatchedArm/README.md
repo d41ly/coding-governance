@@ -24,12 +24,10 @@ one suite." This build is that follow-up. Target: a verdict in under 20 minutes,
 
 ## Expected improvements
 
-- One invocation per BATCH of mutually independent breaks, instead of one per arm.
-- `set(emitted signatures) == set(expected)` as the assertion, which is the RED observation for every
-  break in the batch AND the GREEN control for every branch outside it. The paired-control doctrine
-  is absorbed rather than weakened.
-- All 178 branch signatures are unique under `check-arms.py`'s own normaliser, verified 2026-09-10,
-  so the set has a sound key.
+- Eight declared shard rows the runner's pool executes concurrently, so the verdict arrives in
+  roughly a tenth of the wall clock with no assertion changed and no new oracle.
+- Batching on top of that split, for the arms that can share a tree.
+- A structural linter that enforces the partition, so a mis-grouped arm reds instead of passing.
 
 ## Detriments if this is not built
 
@@ -49,10 +47,16 @@ of real non-spawn work, a ~586 s floor at 293 invocations. Only invocations move
 
 **The batching premise has a counter-example this build inherits.** `TOOL-aDrainedSluice-5` N17 found
 it false where callers short-circuit. Reproduced here 2026-09-10: eight staged breaks emitted four
-checks, one tripping check 1, whose branch exits at `check-unattended.sh:198`. The partition must
-respect short-circuits; set equality is what makes a truncated batch red rather than green.
+checks, one tripping check 1, whose branch exits at `check-unattended.sh:198`.
 
-**The baseline is RED and is the oracle.** Equivalence is verdict identity per arm, not a green run.
+**A CHECK NUMBER IS NOT A BRANCH IDENTIFIER, and that killed the first design.** Only 6 of 29 check
+numbers carry a single branch; check 16 carries 34. So no control can be witnessed by a sibling
+firing under the same number, `TOOL-dScriptedRepeat-15` S3 stands unqualified, and no `miss` or
+`same` arm is batched at all. That exclusion is why batching alone measures 40 to 44 minutes and why
+the shard split is unit 1 of the three.
+
+**The baseline is RED and is the oracle.** Equivalence is the `FAIL` line set plus the executed
+assertion count — NOT a per-arm inventory, because the helpers are silent on a pass.
 
 ## Parked decisions
 
