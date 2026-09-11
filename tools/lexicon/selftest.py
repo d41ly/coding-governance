@@ -1015,10 +1015,16 @@ with build_tempdir() as td:
                        cwd=root, capture_output=True, text=True)
     _cf = root / ".lexicon.conf"
     _txt = _cf.read_text(encoding="utf-8") if _cf.exists() else ""
+    # THE ROW, not the token: the comment above the parent names `+returns:jsx` on purpose in
+    # this very case, to say why no such row follows. An arm grepping the token would red on a
+    # correct seed — the closing review found it before it ever ran, which is the one order a
+    # staged break cannot be observed in.
     check("scaffold: over a `.tsx` tree where nothing returns an element, the camel parent is seeded "
-          "and the `+returns:jsx` row is NOT",
+          "and the `+returns:jsx` ROW is NOT, while the comment says why",
           r.returncode == 0 and re.search(r"^  tsx\.function +camel$", _txt, re.M) is not None
-          and "+returns:jsx" not in _txt, _txt[-500:] or (r.stdout + r.stderr))
+          and re.search(r"^  tsx\.function\+returns:jsx", _txt, re.M) is None
+          and "no `tsx.function+returns:jsx  pascal` row is proposed" in _txt,
+          _txt[-700:] or (r.stdout + r.stderr))
 
 # ---- RE-SCAFFOLDING MEASURES OVER THE EXISTING DECLARATION, and this arm is the gate for it -------
 #
@@ -2598,8 +2604,9 @@ check("AC5: ...and a DOTTED decorator is selectable by its last segment",
 #
 # The role-derived kind TOOL-aGradedDialect-4 §8 deferred, built once an adopter armed `tsx.function`
 # blind and read 951 offenders of 3145 — React components beside helpers, exactly as predicted. Three
-# semantics were measured on that corpus before one was kept: "body CONTAINS an element" pinned 254,
-# "contains, declared names only" 162, "RETURNS an element, declared names only" 86. The arms below
+# semantics were measured on that corpus before one was kept — "body CONTAINS an element", "contains,
+# declared names only", "RETURNS an element, declared names only" — and the dated figures live in
+# `parse_ts_source`'s header alone. The arms below
 # pin each word of the kept rule, and R14 pins the ceiling so a change to it is noticed.
 _TSX_CONF = BASE_CONF.replace('LANGS="py:python-ast:parser conf::dark"',
                               'LANGS="py:python-ast:parser ts:ts-tokens:parser '
@@ -2687,15 +2694,99 @@ check("returns R13: ...and the lexer records a CALL `(` after an expression and 
       sorted(_calls) == [1, 16, 19] and [_toks[i - 1][1] for i in (1, 16, 19)] == ["foo", "b", ")"],
       f"calls={sorted(_calls)} toks={_toks}")
 
-# R14 — THE CEILING, pinned so a change to it is a red and not a surprise. A bare multi-line
-# ternary body ends at `cond` under the ASI rule, because `?` is an operator this lexer does not
-# emit; prettier parenthesises the shape, which is why the rule is the line and not the semicolon.
-got = lex.read_ts_jsx_defs("const A = () => cond\n  ? <A />\n  : <B />;\nfunction buildX() { return 2; }\n")
-check("returns R14: the documented ceiling — a bare multi-line ternary body is NOT attributed",
-      got == [], f"{got}")
+# R14 — THE ASI RULE AND ITS CEILING, pinned so a change to either is a red and not a surprise.
+# An ELEMENT opening a line continues the line before it, because the lexer opens one only after
+# an operator — so the bare multi-line ternary whose branches are elements IS attributed. What
+# remains is a line opening with a plain operand after an invisible `?`: `cond` / `? a` /
+# `: <B />` ends at `cond`, and prettier parenthesises that shape.
+got = lex.read_ts_jsx_defs("const A = () => cond\n  ? <A />\n  : <B />;\nfunction buildX() { return 2; }\n"
+                           "function C() {\n  return cond\n    ? <B />\n    : <D />;\n}\n")
+check("returns R14: a bare multi-line ternary whose branches are elements is attributed, in both "
+      "the expression-body and the block-body spelling", got == [("A", 1), ("C", 5)], f"{got}")
+got = lex.read_ts_jsx_defs("const A = () => cond\n  ? a\n  : <B />;\n")
+check("returns R14: ...and the ceiling that remains — a plain operand opening the line after the "
+      "invisible `?` — is NOT, stated rather than papered", got == [], f"{got}")
 check("returns R14: ...and the other reading, the next semicolon, is refused: a helper followed by a "
       "module-level element on the next line stays a helper",
       lex.read_ts_jsx_defs("const buildX = () => 1\nconst el = <div />\n") == [], "no-ASI")
+
+# R15..R16 — CLOSING REVIEW ROUND 1, two reader defects with a fix each and a positive half each.
+# R15: in SEMICOLON-FREE source nothing but a statement keyword marks where `if (!open) return null`
+# ends and `const el = <Modal />` begins, and a `return` followed by a newline returns nothing (ASI).
+got = lex.read_ts_jsx_defs("function useModal(open) {\n  if (!open) return null\n  const el = <Modal />\n"
+                           "  return createPortal(el, document.body)\n}\n"
+                           "function useX() {\n  return\n  <A />\n}\n"
+                           "function useY(open) {\n  if (!open) return null\n  el = <Modal />\n  return 1\n}\n"
+                           "function A(p) {\n  const x = p.x\n  return <div>{x}</div>\n}\n")
+check("returns R15: a semicolon-free hook whose element is an initializer or an assignment after "
+      "an earlier `return` is NOT routed, an ASI `return` returns nothing, and the semicolon-free "
+      "component beside them still IS routed", got == [("A", 15)], f"{got}")
+# R16: a METHOD body is a function and absorbs like an anonymous one. A HOC returning a class
+# component and a factory returning `{ render() {...} }` are the two React shapes that route the
+# enclosing function otherwise; the arrow spelling of the same member already absorbed.
+got = lex.read_ts_jsx_defs("function withLogger(W) {\n  return class extends React.Component {\n"
+                           "    render() { return <W {...this.props} />; }\n  };\n}\n"
+                           "function buildColumns() {\n  return { render() { return <td />; } };\n}\n"
+                           "function A() {\n  const o = { render() { return <td />; } };\n"
+                           "  return <T o={o} />;\n}\n")
+check("returns R16: a method's element is the method's, so a class-returning HOC and a factory are "
+      "not routed, while the component that returns its own element beside a method still is",
+      got == [("A", 9)], f"{got}")
+# R17: the one population change this walk makes, owned rather than denied. An anonymous
+# `function` as a member's value used to reach the member arm as an identifier and graded a
+# definition called `function` beside the member; the scope arm that now consumes the word is what
+# removed it. The old reader is not here to compare against, so the arm pins the shape directly.
+_f = lex.parse_tsx_defs("const o = { foo: function () { return 1; } };\nclass X { m = function () {} }\n")[0]
+check("returns R17: an anonymous function expression as a member's value grades the MEMBER and never "
+      "a definition named `function`", _f == [("foo", 1), ("m", 2)], f"{_f}")
+# R18..R20: the rest of round 1. A `}` closing an object literal INSIDE the return expression is
+# stepped over, not stopped at; `f<T>(` and `f?.(` are calls; and two declared functions on one line
+# carry their own marks, keyed on the site with its name.
+got = lex.read_ts_jsx_defs("function A() {\n  return cond ? build({ x }) : <B />;\n}\n"
+                           "function C() {\n  const f = () => { a; b; };\n  return f() ? <D /> : null;\n}\n")
+check("returns R18: a balanced group before the element in the return expression is stepped over "
+      "backward, so an object literal or a nested block does not hide the `return`",
+      got == [("A", 1), ("C", 4)], f"{got}")
+got = lex.read_ts_jsx_defs("const html = () => mount<P>(<C />);\nconst also = () => render?.(<C />);\n"
+                           "const A = () => (x < y) ? <B /> : null;\n")
+check("returns R19: a generic call and an optional call hold their element, while a comparison `<` "
+      "before a returned element is not read as a type-argument run",
+      got == [("A", 3)], f"{got}")
+
+# R21 — THE PROPERTY the closing review asked for: one expression, three spellings, one verdict.
+# Every expression-body fixture above is rewritten as a block body with a `;` and as a
+# semicolon-free block body, and the three must agree — routed or not. Both halves of round 1's
+# HIGH were one spelling grading differently from its siblings, and this is the class.
+_NL = "\n"
+_EXPRS = ("<div />", "(" + _NL + "  <div />" + _NL + ")", "loading ? (" + _NL + "  <Spinner />" + _NL + ") : (" + _NL + "  <Page />" + _NL + ")",
+          "open && (" + _NL + "  <Modal />" + _NL + ")", "cond ? build({ x }) : <B />", "mount(<C />)",
+          "mount<P>(<C />)", "render?.(<C />)", "renderToStaticMarkup(<Form {...p} />)",
+          "{ el: <div /> }", "[{ el: <div /> }]", "items.map((i) => <li key={i} />)",
+          "(x < y) ? <B /> : null", "cond" + _NL + "  ? <A />" + _NL + "  : <B />")
+_DISAGREE = []
+for _e in _EXPRS:
+    _three = (lex.read_ts_jsx_defs("const A = () => " + _e + ";" + _NL),
+              lex.read_ts_jsx_defs("function A() {" + _NL + "  return " + _e + ";" + _NL + "}" + _NL),
+              lex.read_ts_jsx_defs("function A() {" + _NL + "  return " + _e + _NL + "}" + _NL))
+    if len({bool(_t) for _t in _three}) != 1:
+        _DISAGREE.append((_e, _three))
+check("returns R21: every expression grades the same as an arrow body, a `return` with `;` and a "
+      "semicolon-free `return` -- and the set is non-empty and split",
+      not _DISAGREE and len(_EXPRS) > 10
+      and {bool(lex.read_ts_jsx_defs("const A = () => " + _e + ";" + _NL)) for _e in _EXPRS} == {True, False},
+      f"{_DISAGREE}")
+
+# R22 — THE MARKER'S WAKE, both directions, asserted on the HEAD population. The marker occupies a
+# position: an arm reading the token after `=` now sees it instead of the next statement's head
+# (a 1.3 false positive in ASI-style source, gone), and the brace-kind read looks back PAST it
+# (a member 1.4 first lost, restored). "Byte-identical by construction" was the claim these
+# two shapes refuted; the population is pinned instead of the claim.
+_f = lex.parse_tsx_defs("const el = <A />" + _NL + "function buildX() { return 1; }" + _NL)[0]
+check("returns R22: an element followed by a `function` statement on the next line does NOT make "
+      "the element's binding a function", _f == [("buildX", 2)], f"{_f}")
+_f = lex.parse_tsx_defs("function f() { return <A /> || { render: () => 1 }; }" + _NL)[0]
+check("returns R22: ...and a brace after an element is classified by the token BEFORE the element, "
+      "so the member is still graded", _f == [("f", 1), ("render", 1)], f"{_f}")
 
 # D1..D5 — the declaration: one legal spelling, four named refusals at the row.
 check("returns D1: `tsx.function+returns:jsx` parses to its four parts",
@@ -2769,6 +2860,14 @@ code, out = run_case({"src/a.tsx": "export const BuildCard = () => <div />;\n"},
 check("returns E6: a PARENT whose selector routed every name is NOT a dead cell — the partition "
       "is complete, and a components-only tree is green until its first helper lands",
       code == 0 and "DEAD CELL —" not in out and "tsx.function.conv 0 of 0 against camel" in out, out)
+# ONE LINE, two DECLARATIONS. Not a declarator list -- `const a = () => 1, b = () => 2` yields only
+# `a` from this reader, a pre-existing gap filed as TOOL-aGradedDialect-11 -- but two statements.
+code, out = run_case({"src/a.tsx": "export function BuildA() { return <a />; } function loadB() { return 1; }\n"},
+                     _RET_CONF + "\nPINS:\n  tsx.function.conv  0\n\n  tsx.function+returns:jsx.conv  0\n")
+check("returns E7: two declared functions on ONE line carry their own marks -- the helper stays camel "
+      "in the parent and the component alone is routed, so the run is GREEN",
+      code == 0 and "tsx.function.conv 0 of 1 against camel" in out
+      and "tsx.function+returns:jsx.conv 0 of 1 against pascal" in out, out)
 
 # ---- S4: the selector's pin, and what an ABSENT one means ---------------------------------------
 #

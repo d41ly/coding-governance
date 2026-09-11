@@ -116,7 +116,8 @@ last one, when your tree holds a component at all, `tsx.function+returns:jsx` **
 function's case is decided by its ROLE — a React component is PascalCase and a plain helper is
 camelCase — and until kit 1.4 this kit read no roles, so that cell shipped `dark` as a declared
 refusal: a single convention over it would have redded correct code whichever one it picked, and
-the one adopter who armed it blind read 951 offenders of 3145. The `returns:jsx` selector reads
+the one adopter who armed it blind read a third of the cell as offenders — the dated figures are
+`parse_ts_source`'s header in `lexicon.py`, and nowhere else. The `returns:jsx` selector reads
 the role from the body — a declared function whose VALUE is an element is a component — and the
 pair grades helpers at camel and components at pascal, pinning what the reader cannot see: a
 component returning `null` or a portal stays in the parent, and a render helper returning an

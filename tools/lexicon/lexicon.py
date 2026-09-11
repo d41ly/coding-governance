@@ -958,9 +958,12 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
     like everything else in there. It is the fact the `returns:jsx` selector routes on: a
     definition whose value is one is a component by the only reading that does not consult its
     name. No definition form keys on it — its text matches no op, no keyword and not `_TS_NAME` —
-    so `parse_ts_defs` walks past it exactly as it walks past nothing, and the definition
-    population is byte-identical with and without it. Measured, not argued: the conformance arm
-    and the whole-file arms score the same either side of the marker.
+    so `parse_ts_defs` walks past it. It is NOT invisible by construction: the marker occupies a
+    position, so a form that read the token AFTER an element as part of the element's own
+    statement — `const A = <div />` then `(x) => x` on the next line, an arrow where valid code
+    has none — reads differently with it. That is a difference on invalid source only, and it
+    is measured rather than argued: the conformance arm and the whole-file arms score the same
+    either side of the marker, and every one of 1257 adopter files read identically.
 
     `calls`, when a set is passed, receives the INDEX of every `(` that opened a CALL rather than
     a grouping. The lexer already knows: `expr_end` is the state that tells `a / b` from `/re/`,
@@ -1269,7 +1272,11 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
             expr_end = False
             continue
         if c in "()[]=:;,>@":
-            if c == "(" and expr_end and calls is not None and not suppress:
+            # `?.(` is an OPTIONAL CALL, and the `?` and `.` before it each cleared `expr_end`
+            # on the way through the catch-all — so the state says grouping where the source
+            # says application. The two bytes before the paren settle it.
+            if c == "(" and (expr_end or src[i - 2:i] == "?.") and calls is not None \
+                    and not suppress:
                 calls.add(len(toks))
             add_token("op", c)
             i += 1
@@ -1432,8 +1439,8 @@ def check_ts_arrow(toks: list, k: int) -> bool:
 def read_ts_body_start(toks: list, k: int):
     """The index of the body `{` of the callable whose parameter list opens at `k`, or `None`.
 
-    `check_ts_body` is this reader asked as a yes/no; the index is what the `body:jsx` selector
-    needs, because a body is a SCOPE and a scope has a start.
+    `check_ts_body` is this reader asked as a yes/no; the index is what the `returns:jsx`
+    selector needs, because a body is a SCOPE and a scope has a start.
     """
     j = read_ts_paren_end(toks, k)
     if j is None:
@@ -1517,23 +1524,27 @@ def read_ts_arrow_body(toks: list, k: int):
 _TS_EXPR_CONTINUES = frozenset(("(", "[", "{", "=", ":", ",", "<", ">", "=>", "@")) | _TS_EXPR_WORDS
 
 
+
 def read_ts_expr_end(toks: list, k: int) -> int:
     """The index just past the brace-less arrow body that starts at `k`.
 
     It ends at a depth-0 `;` or `,`, at an unbalanced closer, or at a line break whose predecessor
-    cannot continue an expression — the ASI rule, applied to the tokens this lexer emits. The
-    ceiling is the operator this lexer does NOT emit: a bare multi-line ternary, `cond` then a
-    newline then `? <A/> : <B/>`, ends here at `cond`, so its elements are attributed to the
-    enclosing scope rather than to this arrow. Prettier parenthesises that shape, which is why
-    the rule is the line and not the next semicolon: the other reading swallows every
-    semicolon-less statement after the arrow, and a module-level element two lines down would
-    make a plain helper a component.
+    cannot continue an expression — the ASI rule, applied to the tokens this lexer emits. An
+    ELEMENT opening a line continues the line before it: the lexer opens one only where an
+    operator preceded (`?`, `&&`, `||` — the ones it does not emit), since after an operand a
+    `<` is a comparison, so `cond` then a newline then `? <A/> : <B/>` reads as one expression.
+    So does a line opening with `:` or `,`. The ceiling that remains is a line opening with a
+    plain operand after one of those invisible operators — `cond` / `? a` / `: <B/>` — which
+    ends here at `cond`. The rule is the line and not the next semicolon, because the other
+    reading swallows every semicolon-less statement after the arrow, and a module-level
+    element two lines down would make a plain helper a component.
     """
     depth, m, j = 0, len(toks), k
     while j < m:
         kind, text, ln = toks[j]
         if depth == 0 and j > k and ln > toks[j - 1][2] \
-                and toks[j - 1][1] not in _TS_EXPR_CONTINUES:
+                and toks[j - 1][1] not in _TS_EXPR_CONTINUES \
+                and kind != "jsx" and text not in (":", ","):
             return j
         if kind == "op":
             if text in ("(", "[", "{"):
@@ -1684,8 +1695,10 @@ def parse_ts_source(src: str, jsx: bool = False):
     useThing() { const Row = () => <tr />; return Row; }` routes `Row` and leaves `useThing` in
     the parent — and an anonymous callback ABSORBS what it renders: `return (props) => <C />` is a
     higher-order function returning a component, not a component, and the element is the
-    arrow's. Every `=>` and every nameless `function` opens such a scope; a declared arrow's
-    `=>` opens a duplicate with identical bounds, and the named one wins the tie. What this
+    arrow's. Every `=>`, every nameless `function` and every METHOD body opens such a scope —
+    a HOC returning `class extends Component { render() { return <W /> } }` is not routed for
+    its member's element either; a declared arrow's `=>` opens a duplicate with identical bounds,
+    and the named one wins the tie. What this
     reading therefore misses is the component whose whole value is a callback's — `const List =
     () => items.map((i) => <li />)` — beside `return createPortal(<A />, el)` and `return null`,
     a component with no element to see. A scope is a body brace to its match, or a brace-less
@@ -1694,8 +1707,14 @@ def parse_ts_source(src: str, jsx: bool = False):
 
     The two lists are the ones `parse_ts_defs` has always returned, computed by the same
     predicates in the same order; the scope reads run only after a name is appended, so they
-    cannot move the population. That is the whole reason this is one walk and not a second
-    parser over the same tokens.
+    cannot move the population — with ONE deliberate exception the closing review made this
+    header own. The anonymous-function scope arm consumes a `function` word that no name follows,
+    and before it existed that word FELL THROUGH to the member arm, matched `_TS_NAME`, and
+    entered the population as a definition called `function`: `{ foo: function () {} }` graded
+    `foo` AND `function`. That was a fabricated identifier of the class the class-annotation arm
+    documents, it is gone, and the 1257-file identity measurement did not see it only because
+    the adopter corpus writes members as arrows. Pinned by an arm. Otherwise this is one walk
+    and not a second parser over the same tokens.
     """
     calls: set = set()
     toks = scan_ts_tokens(src, jsx, calls)
@@ -1732,7 +1751,14 @@ def parse_ts_source(src: str, jsx: bool = False):
                 k = j if j is not None else k + 1
                 continue
             if text == "{":
-                want = read_ts_block_kind(toks[k - 1] if k else None, cur, pend)
+                # THE PREV TOKEN IS READ PAST THE MARKER. `return <A /> || { render: () => 1 }`
+                # classified its brace by `return` in 1.3 and by the marker in 1.4, which made it
+                # a `statement` block and LOST the member — the one silent shrink the closing
+                # review found in the marker's wake. The marker is not a token any form reads.
+                p = k - 1
+                while p >= 0 and toks[p][0] == "jsx":
+                    p -= 1
+                want = read_ts_block_kind(toks[p] if p >= 0 else None, cur, pend)
                 pend = None
                 if want == "type":
                     # A type carries no definition site, so it is stepped over whole rather than
@@ -1825,6 +1851,10 @@ def parse_ts_source(src: str, jsx: bool = False):
         if cur in ("object", "class") and _TS_NAME.match(text):
             if nt == "(" and nxt[0] == "op" and check_ts_body(toks, k + 1):
                 funcs.append((text, ln))
+                # A METHOD is a function too: its body absorbs like an anonymous one, so a HOC
+                # returning a class component, or a factory returning `{ render() {...} }`,
+                # is not routed for what its member renders. Owner -1 by the header's rule.
+                add_scope(read_ts_body_start(toks, k + 1), -1)
             elif cur == "object" and nt == ":" and nxt[0] == "op" \
                     and check_ts_arrow(toks, k + 2):
                 funcs.append((text, ln))
@@ -1847,32 +1877,76 @@ def parse_ts_source(src: str, jsx: bool = False):
 def check_ts_returned(toks: list, calls: set, start: int, mk: int) -> bool:
     """Is the element at `mk` the VALUE of the body that starts at `start`?
 
+    `m_` below is the token count, bound once because two walks need it.
+
     For a block body the value expression is the one after the nearest `return` before `mk` —
-    reached without crossing a `;`, `{` or `}`, so an element in an initializer or an object
-    literal is not it. For a brace-less body it is the body. Within that expression every `(`
-    the lexer recorded in `calls` opens an argument list, and `[` or `{` opens a literal; an
-    element under any of them is passed or held, not returned. A grouping `(` is transparent.
+    reached without crossing a `;`, an unmatched `{`, or a line break that ends a statement under
+    ASI, so an element in an initializer or an object literal is not it whether or not the source
+    writes its semicolons. A `return` whose next token sits on a later line returns nothing (ASI), so the
+    element after it is an expression statement and not the value. For a brace-less body the
+    value expression is the body. Within that expression every `(` the lexer recorded in
+    `calls` opens an argument list, and `[` or `{` opens a literal; an element under any of them
+    is passed or held, not returned. A grouping `(` is transparent. `f<T>(` and `f?.(` are calls
+    too: the first is read from the angle run here, the second is recorded by the lexer.
     """
+    m_ = len(toks)
     if toks[start][0] == "op" and toks[start][1] == "{":
+        # BACKWARD, over balanced groups: a `}` that closes an object literal inside the return
+        # expression — `return cond ? build({ x }) : <B />` — is stepped over whole, and only an
+        # UNMATCHED `{`, a `;`, or an ASI line break at depth zero ends the walk. Closing review
+        # round 1: the first cut stopped at any `}` and lost that component, and stopped at no
+        # line break and took an earlier statement's `return` in semicolon-free source.
         r = None
+        depth = 0
         for j in range(mk - 1, start, -1):
             kind, text, _ln = toks[j]
+            if kind == "op" and text in (")", "]", "}"):
+                depth += 1
+                continue
+            if kind == "op" and text in ("(", "[", "{"):
+                # An unmatched `{` is the block this statement lives in; an unmatched `(` or
+                # `[` is a group the element sits INSIDE — `return (` — and is walked past.
+                if depth == 0 and text == "{":
+                    break
+                if depth:
+                    depth -= 1
+                continue
+            if depth:
+                continue
+            # THE ASI RULE, backward: a line break after a token that cannot continue an
+            # expression is a statement boundary even with no `;` and no keyword —
+            # `if (!open) return null` then `el = <Modal />` on the next line. A `:`, a `,` or
+            # an ELEMENT opening the later line continues the earlier one — the lexer opens an
+            # element only after an operator, so a marker at line start means the `?` or `&&`
+            # this lexer does not emit sat before it. `read_ts_expr_end` states the ceiling.
+            if toks[j][2] < toks[j + 1][2] and text not in _TS_EXPR_CONTINUES \
+                    and toks[j + 1][0] != "jsx" and toks[j + 1][1] not in (":", ",", "="):
+                break
             if kind == "word" and text == "return":
                 r = j + 1
                 break
-            if kind == "op" and text in (";", "{", "}"):
+            if kind == "op" and text == ";":
                 break
-        if r is None:
+        if r is None or toks[r][2] > toks[r - 1][2]:
             return False
     else:
         r = start
+    # A CALL WITH TYPE ARGUMENTS — `mount<P>(<C />)` — closes its angle run with a `>` that clears
+    # the lexer's `expr_end`, so its `(` is not in `calls`. The token walk can see what the
+    # lexer could not: a balanced run after a word, followed by `(`, is an application.
+    generic: set = set()
+    for j in range(r, mk):
+        if toks[j][0] == "op" and toks[j][1] == "<" and j and toks[j - 1][0] == "word":
+            e = read_ts_angle_end(toks, j)
+            if e is not None and e < m_ and toks[e][0] == "op" and toks[e][1] == "(":
+                generic.add(e)
     held: list = []
     for j in range(r, mk):
         kind, text, _ln = toks[j]
         if kind != "op":
             continue
         if text == "(":
-            held.append(j in calls)
+            held.append(j in calls or j in generic)
         elif text in ("[", "{"):
             held.append(True)
         elif text in (")", "]", "}") and held:
@@ -2285,7 +2359,9 @@ def scan_module_constants(scanned: list, root: Path, declared: dict, ext: str):
 
 
 def extract_decorators(scanned: list, root: Path, declared: dict, ext: str) -> dict:
-    """`{(path, lineno): {decorator-name, …}}` for a `python-ast` extension, `{}` for every other.
+    """`{(path, lineno, name): {decorator-name, …}}` for a `python-ast` extension, `{}` for every
+    other. Keyed on the definition SITE including its name, because two definitions can share a
+    line and a mark keyed on the line alone bleeds to both (closing review round 1).
 
     THE ADDITIVE ACCESSOR (TOOL-aSurfacedLexicon-13 S3), and it is a separate walk rather than a
     third element on each function entry ON PURPOSE. `extract` and `extract_text` return
@@ -2327,12 +2403,12 @@ def extract_decorators(scanned: list, root: Path, declared: dict, ext: str) -> d
                     # `node.lineno` is the `def`/`class` line on every Python this kit runs on, which
                     # is the line `_python_defs` records — so these keys align with that population
                     # by construction rather than by an offset nobody re-checks.
-                    out.setdefault((rel, node.lineno), set()).add(name)
+                    out.setdefault((rel, node.lineno, node.name), set()).add(name)
     return out
 
 
 def extract_jsx_defs(scanned: list, root: Path, declared: dict, ext: str) -> dict:
-    """`{(path, lineno): {"jsx"}}` for every declared function whose value is a JSX element, over
+    """`{(path, lineno, name): {"jsx"}}` for every declared function whose value is a JSX element, over
     an extension read by `tsx-tokens`; `{}` for every other extension.
 
     THE SECOND ADDITIVE ACCESSOR, shaped exactly like `extract_decorators` for the reason that one
@@ -2352,8 +2428,8 @@ def extract_jsx_defs(scanned: list, root: Path, declared: dict, ext: str) -> dic
         # `got is None` is the unreadable file `scan_corpus` already refused by name, so the read
         # below cannot raise: it is the same source through the same tokenizer.
         src = (root / rel).read_text(encoding="utf-8", errors="replace")
-        for _name, lineno in read_ts_jsx_defs(src):
-            out.setdefault((rel, lineno), set()).add("jsx")
+        for name, lineno in read_ts_jsx_defs(src):
+            out.setdefault((rel, lineno, name), set()).add("jsx")
     return out
 
 
@@ -2361,7 +2437,7 @@ def scan_routes(names: list, selectors: list, marks: dict):
     """Route each name to at most ONE selector. Returns `(complement, {cell: names}, ambiguous)`.
 
     `selectors` is `[(cell, kind, literal)]` for ONE parent cell and `names` is that parent's whole
-    population as `[(path, line, name)]`. `marks` is `{(path, line): {literal, …}}`, the union of
+    population as `[(path, line, name)]`. `marks` is `{(path, line, name): {literal, …}}`, the union of
     every additive accessor the selectors need — decorator names, the `jsx` value mark — and a
     `decorator` or `returns` selector matches a name whose site carries its literal. A `prefix`
     selector reads the name itself and needs no mark.
@@ -2383,7 +2459,7 @@ def scan_routes(names: list, selectors: list, marks: dict):
         path, line, name = entry
         hit = [(cell, kind, lit) for cell, kind, lit in selectors
                if (name.startswith(lit) if kind == "prefix"
-                   else lit in marks.get((path, line), ()))]
+                   else lit in marks.get((path, line, name), ()))]
         if len(hit) > 1:
             ambiguous.append((entry, [f"+{k}:{l}" for _c, k, l in hit]))
         elif hit:
@@ -2935,13 +3011,15 @@ def measure_pass(root: Path, kit: Path, conf: dict, declared: dict, clusters=Non
         # every name is empty because the partition is COMPLETE, not because nothing matched. A
         # `.tsx` tree holding components and no helper yet — an adopter's first file, this kit's
         # own scaffold fixture — leaves the camel parent nothing to grade until the first helper
-        # lands, which is the declaration working. The denominator is the whole (ext, surface)
-        # population, so the test is that the selector rows beneath this one sum to it; a
-        # selector row has no rows beneath it and is never exempt this way.
+        # lands, which is the declaration working. The test is that the selector rows beneath
+        # this one routed SOMETHING: an empty parent whose selectors took at least one name was
+        # not empty to begin with. Not the denominator — for the `constant` surface that figure
+        # is not the population count, and a test keyed on it would exempt or refuse by
+        # accident (closing review round 1). A selector row has no rows beneath it and is
+        # never exempt this way.
         routed = sum(r["population"] for k, r in cells.items() if k.startswith(cell + "+"))
         if (row["convention"] != "dark" and not row["population"]
-                and parse_cell_key(cell)[0] in present_exts
-                and not (row["denominator"] and routed == row["denominator"])):
+                and parse_cell_key(cell)[0] in present_exts and not routed):
             problems.append(
                 f"DEAD CELL — `{cell}` is armed at `{row['convention']}` and its population rule "
                 f"({row['rule']}) selected NOTHING. A cell grading an empty population passes green "
