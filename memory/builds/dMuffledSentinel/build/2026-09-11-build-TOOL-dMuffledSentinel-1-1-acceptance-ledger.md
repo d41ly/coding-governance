@@ -34,5 +34,12 @@ could have surfaced before.
 
 ## Residue
 
-None in this repo. The inCMS copy of the engine keeps the swallow until its next pull, which that
-repo tracks as `ABL-dMuffledSentinel-1`.
+- **`pass-order history` reds on this unit, and that is true.** The spec was written after the code
+  and both landed in `a3b4ca1e`, so at its parent `75b85708` no spec for the id exists. The leg only
+  saw it once the unit went CLOSED. It is neither waived nor rewritten into a spec-first order: the
+  waiver registry exists for units already landed, and a reordered branch would state an authoring
+  order that did not happen. Whether to land it under a waiver is the owner's decision.
+- The same full bar reds `python resolver` on `tools/run-gates/run-gates.evidence.test.sh:643`, which
+  is on `origin/main` since `d4c05068` and blocks any push until someone fixes it.
+- The inCMS copy of the engine keeps the swallow until its next pull, which that repo tracks as
+  `ABL-dMuffledSentinel-1`.
