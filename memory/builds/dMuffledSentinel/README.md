@@ -30,6 +30,16 @@ check 21 printed one line, from the one branch that does not read the parse.
   fail and reads as green.
 - The engine keeps one delegate whose failure is silent, beside four that are not.
 
+## Build-level rules
+
+- **The adopter half is not here.** inCMS's forked generator gained the mode in its own repo, as
+  `ARCH-dMuffledSentinel-1`. This build changes only what the engine does when a generator cannot
+  answer, and that change is right for every adopter, forked or not.
+
+## Parked decisions
+
+- None yet.
+
 <!-- roster:units -->
 
 | # | Unit | Tier | Mechanism |
@@ -38,20 +48,14 @@ check 21 printed one line, from the one branch that does not read the parse.
 
 <!-- /roster:units -->
 
-## Build-level rules
-
-- **The adopter half is not here.** inCMS's forked generator gained the mode in its own repo, as
-  `ARCH-dMuffledSentinel-1`. This build changes only what the engine does when a generator cannot
-  answer, and that change is right for every adopter, forked or not.
-
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-09-11 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-09-11 · streams tooling
 ids TOOL-dMuffledSentinel-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dMuffledSentinel-1 — check 21 refuses a bindings parse that did not complete](spec/2026-09-11-spec-TOOL-dMuffledSentinel-1.md) | — | 1 | INPROGRESS | rev-1 | 2026-09-11 |
+| [TOOL-dMuffledSentinel-1 — check 21 refuses a bindings parse that did not complete](spec/2026-09-11-spec-TOOL-dMuffledSentinel-1.md) | — | 1 | CLOSED | rev-2 | 2026-09-12 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).

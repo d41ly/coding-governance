@@ -1,6 +1,6 @@
 # TOOL-dMuffledSentinel-1 — check 21 refuses a bindings parse that did not complete
 
-**Status:** INPROGRESS · rev-1 · 2026-09-11 · node d · Tier-1 · base 75b85708 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-09-12 · node d · Tier-1 · base 75b85708 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -79,8 +79,9 @@ knob that a caller could point at a different program.
 
 ## 7. Gates
 
-`memory-hygiene self-test` · `harness arms` · `kit version markers` · `verdict epoch` · `kit/dogfood
-doc parity` · `memory hygiene` · `bash tools/run-gates/run-gates.sh`.
+`memory-hygiene self-test` · `harness arms (fail branches armed or pinned)` · `kit version markers`
+`verdict epoch (kit version dates the engine)` · `kit/dogfood doc parity` · `memory hygiene`
+`build README slot contract` · `codebase-map coverage + freshness` · `drift-audit records`
 
 ## 8. Open questions
 
@@ -89,3 +90,6 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-11 · opened and built in one pass, from the inCMS measurement that found it.
+- rev-2 · 2026-09-12 · §7 S5 · the full bar's findings on rev-1's records, all record-side: §7 named
+  its legs by abbreviation and wrapped one across a line, so it contributed none; the README was not
+  in the slot contract; S5's class was claimed by no dossier. Status CLOSED, landing with the merge.
