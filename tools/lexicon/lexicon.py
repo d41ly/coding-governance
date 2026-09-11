@@ -1777,6 +1777,15 @@ def parse_ts_source(src: str, jsx: bool = False):
                 pend = None
             if text == "=>":
                 add_scope(k + 1, -1)
+            if text == "(" and cur in ("object", "class"):
+                # A METHOD BODY absorbs like an anonymous function's, and it is opened on the
+                # syntactic body — a parameter list followed by a brace, inside a member
+                # block — whatever spells the key: a word, `render<T>(`, `[k](`, `'render'(`.
+                # Round 2 of the closing review: keyed on the population arm, three of those
+                # spellings leaked their element to the enclosing declared function. A `(`
+                # inside a member VALUE that is not a method finds no body brace and opens
+                # nothing.
+                add_scope(read_ts_body_start(toks, k), -1)
             k += 1
             continue
 
@@ -1851,10 +1860,8 @@ def parse_ts_source(src: str, jsx: bool = False):
         if cur in ("object", "class") and _TS_NAME.match(text):
             if nt == "(" and nxt[0] == "op" and check_ts_body(toks, k + 1):
                 funcs.append((text, ln))
-                # A METHOD is a function too: its body absorbs like an anonymous one, so a HOC
-                # returning a class component, or a factory returning `{ render() {...} }`,
-                # is not routed for what its member renders. Owner -1 by the header's rule.
-                add_scope(read_ts_body_start(toks, k + 1), -1)
+                # The method's SCOPE is opened by the `(` branch above, on the body rather
+                # than on this arm, so a method this arm cannot name still absorbs.
             elif cur == "object" and nt == ":" and nxt[0] == "op" \
                     and check_ts_arrow(toks, k + 2):
                 funcs.append((text, ln))
@@ -1872,6 +1879,18 @@ def parse_ts_source(src: str, jsx: bool = False):
         if inner is not None and inner[2] >= 0 and check_ts_returned(toks, calls, inner[0], mk):
             owned.add(inner[2])
     return funcs, types_, owned
+
+
+def check_ts_generic_close(toks: list, j: int) -> bool:
+    """Does the `>` at `j` CLOSE a type-argument run that follows a word — `Foo<Bar>` — rather
+    than compare? Read backward for the `<` whose balanced run ends exactly here.
+    """
+    if toks[j][0] != "op" or toks[j][1] != ">":
+        return False
+    for i in range(j - 1, max(j - 400, 0), -1):
+        if toks[i][0] == "op" and toks[i][1] == "<" and read_ts_angle_end(toks, i) == j + 1:
+            return toks[i - 1][0] == "word"
+    return False
 
 
 def check_ts_returned(toks: list, calls: set, start: int, mk: int) -> bool:
@@ -1900,6 +1919,22 @@ def check_ts_returned(toks: list, calls: set, start: int, mk: int) -> bool:
         depth = 0
         for j in range(mk - 1, start, -1):
             kind, text, _ln = toks[j]
+            # THE ASI RULE, backward, and FIRST — before the bracket bookkeeping, so a closer
+            # ending a line at depth zero is a boundary too: `if (!open) return noop()` then
+            # `const el = <Modal />` on the next line, and `return []`, `return {}`. Round 2
+            # of the closing review found the test nineteen lines below the closer branch that
+            # pre-empted it, so it held for `return null` alone. A line break after a token
+            # that cannot continue an expression is a statement boundary even with no `;`. A
+            # `:`, a `,` or an ELEMENT opening the later line continues the earlier one — the
+            # lexer opens an element only after an operator, so a marker at line start means
+            # the `?` or `&&` this lexer does not emit sat before it. And a `>` at line end is
+            # two things: the close of a generic run after a word (`return v as Foo<Bar>`), a
+            # boundary; or a comparison (`return a >` newline `b ? <B /> : null`), a
+            # continuation. `read_ts_expr_end` states the ceiling.
+            if depth == 0 and toks[j][2] < toks[j + 1][2] \
+                    and (text not in _TS_EXPR_CONTINUES or check_ts_generic_close(toks, j)) \
+                    and toks[j + 1][0] != "jsx" and toks[j + 1][1] not in (":", ",", "="):
+                break
             if kind == "op" and text in (")", "]", "}"):
                 depth += 1
                 continue
@@ -1913,15 +1948,6 @@ def check_ts_returned(toks: list, calls: set, start: int, mk: int) -> bool:
                 continue
             if depth:
                 continue
-            # THE ASI RULE, backward: a line break after a token that cannot continue an
-            # expression is a statement boundary even with no `;` and no keyword —
-            # `if (!open) return null` then `el = <Modal />` on the next line. A `:`, a `,` or
-            # an ELEMENT opening the later line continues the earlier one — the lexer opens an
-            # element only after an operator, so a marker at line start means the `?` or `&&`
-            # this lexer does not emit sat before it. `read_ts_expr_end` states the ceiling.
-            if toks[j][2] < toks[j + 1][2] and text not in _TS_EXPR_CONTINUES \
-                    and toks[j + 1][0] != "jsx" and toks[j + 1][1] not in (":", ",", "="):
-                break
             if kind == "word" and text == "return":
                 r = j + 1
                 break
@@ -2386,7 +2412,7 @@ def extract_decorators(scanned: list, root: Path, declared: dict, ext: str) -> d
 
     if (declared.get(ext) or ("", "dark"))[0] != "python-ast":
         return {}
-    out: dict[tuple[str, int], set] = {}
+    out: dict[tuple[str, int, str], set] = {}
     for rel, e, got, _p in scanned:
         if e != ext or got is None:
             continue
@@ -2421,7 +2447,7 @@ def extract_jsx_defs(scanned: list, root: Path, declared: dict, ext: str) -> dic
     """
     if PARSERS.get((declared.get(ext) or ("", "dark"))[0]) is not parse_tsx_defs:
         return {}
-    out: dict[tuple[str, int], set] = {}
+    out: dict[tuple[str, int, str], set] = {}
     for rel, e, got, _p in scanned:
         if e != ext or got is None:
             continue

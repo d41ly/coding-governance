@@ -410,8 +410,9 @@ def main(argv: list[str]) -> int:
                 else:
                     # THE OTHER HALF, stated: a comment promising a row beneath it that is not
                     # there reads as a scaffolder that forgot. Closing review round 1.
+                    _row = SEED_SELECTORS[("tsx", "function")]
                     body.append("  # make. No declared function in this corpus RETURNS an element yet,")
-                    body.append("  # so no `tsx.function+returns:jsx  pascal` row is proposed beneath")
+                    body.append(f"  # so no `{_k}+{_row[0]}  {_row[1]}` row is proposed beneath")
                     body.append("  # this one -- a selector matching nothing is a DEAD CELL refusal.")
                     body.append("  # Add that row when the first component lands; `--measure` prints")
                     body.append("  # its pin.")

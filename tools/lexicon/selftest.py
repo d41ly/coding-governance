@@ -1023,7 +1023,8 @@ with build_tempdir() as td:
           "and the `+returns:jsx` ROW is NOT, while the comment says why",
           r.returncode == 0 and re.search(r"^  tsx\.function +camel$", _txt, re.M) is not None
           and re.search(r"^  tsx\.function\+returns:jsx", _txt, re.M) is None
-          and "no `tsx.function+returns:jsx  pascal` row is proposed" in _txt,
+          and ("no `tsx.function+" + _scaf.SEED_SELECTORS[("tsx", "function")][0] + "  "
+               + _scaf.SEED_SELECTORS[("tsx", "function")][1] + "` row is proposed") in _txt,
           _txt[-700:] or (r.stdout + r.stderr))
 
 # ---- RE-SCAFFOLDING MEASURES OVER THE EXISTING DECLARATION, and this arm is the gate for it -------
@@ -2603,7 +2604,7 @@ check("AC5: ...and a DOTTED decorator is selectable by its last segment",
 # ---- the `returns` selector (TOOL-aGradedDialect-10) ----------------------------------------------
 #
 # The role-derived kind TOOL-aGradedDialect-4 §8 deferred, built once an adopter armed `tsx.function`
-# blind and read 951 offenders of 3145 — React components beside helpers, exactly as predicted. Three
+# blind and read what that spec predicted — React components beside helpers, a third of the cell. Three
 # semantics were measured on that corpus before one was kept — "body CONTAINS an element", "contains,
 # declared names only", "RETURNS an element, declared names only" — and the dated figures live in
 # `parse_ts_source`'s header alone. The arms below
@@ -2662,8 +2663,8 @@ check("returns R9: ...while a NAMED function expression is a declared name and r
       got == [("Wrapped", 2), ("Input", 4)], f"{got}")
 
 # R10 — MEMBERS NEVER ROUTE, because a member's name is its container's key. The adopter corpus
-# holds 121 `render: (r) => <td />` slots spelled by the API that reads them; a rule that routed
-# them would pin 121 names nobody can rename.
+# holds `render: (r) => <td />` slots spelled by the API that reads them, and the header counts
+# them; a rule that routed them would pin names nobody can rename.
 got = lex.read_ts_jsx_defs("const cols = { render: (r) => <td>{r}</td> };\n"
                            "class X {\n  render() { return <div />; }\n  view = () => <b />;\n}\n")
 _all = lex.parse_tsx_defs("const cols = { render: (r) => <td>{r}</td> };\n"
@@ -2717,10 +2718,15 @@ got = lex.read_ts_jsx_defs("function useModal(open) {\n  if (!open) return null\
                            "  return createPortal(el, document.body)\n}\n"
                            "function useX() {\n  return\n  <A />\n}\n"
                            "function useY(open) {\n  if (!open) return null\n  el = <Modal />\n  return 1\n}\n"
+                           "function useZ(open) {\n  if (!open) return noop()\n  const el = <Modal />\n  return 1\n}\n"
+                           "function useCols() {\n  if (!x) return []\n  const el = <Modal />\n  return 1\n}\n"
+                           "function useObj() {\n  if (!x) return {\n    a: 1,\n  }\n  const el = <Modal />\n  return 1\n}\n"
+                           "function useGen(v) {\n  if (!v) return v as Foo<Bar>\n  const el = <A />\n  return el\n}\n"
                            "function A(p) {\n  const x = p.x\n  return <div>{x}</div>\n}\n")
 check("returns R15: a semicolon-free hook whose element is an initializer or an assignment after "
-      "an earlier `return` is NOT routed, an ASI `return` returns nothing, and the semicolon-free "
-      "component beside them still IS routed", got == [("A", 15)], f"{got}")
+      "an earlier `return` -- word-ended, call-ended, array-, object- and generic-close-ended -- "
+      "is NOT routed, an ASI `return` returns nothing, and the semicolon-free component beside "
+      "them still IS routed", got == [("A", 37)], f"{got}")
 # R16: a METHOD body is a function and absorbs like an anonymous one. A HOC returning a class
 # component and a factory returning `{ render() {...} }` are the two React shapes that route the
 # enclosing function otherwise; the arrow spelling of the same member already absorbed.
@@ -2732,6 +2738,12 @@ got = lex.read_ts_jsx_defs("function withLogger(W) {\n  return class extends Rea
 check("returns R16: a method's element is the method's, so a class-returning HOC and a factory are "
       "not routed, while the component that returns its own element beside a method still is",
       got == [("A", 9)], f"{got}")
+# ...and EVERY key spelling TypeScript has, in one list, so the next one is added here rather
+# than found by an adopter: the scope opens on the body, not on the name.
+_LEAK = [_key for _key in ("render", "render<T>", "[k]", "'render'", "async render", "get el", "42")
+         if lex.read_ts_jsx_defs("function buildCols() {\n  return { " + _key + "() { return <td />; } };\n}\n")]
+check("returns R16: ...whatever spells the key -- a word, a generic, a computed key, a string, an "
+      "accessor, a number -- the container is never routed", not _LEAK, f"leaked: {_LEAK}")
 # R17: the one population change this walk makes, owned rather than denied. An anonymous
 # `function` as a member's value used to reach the member arm as an identifier and graded a
 # definition called `function` beside the member; the scope arm that now consumes the word is what
@@ -2743,9 +2755,9 @@ check("returns R17: an anonymous function expression as a member's value grades 
 # stepped over, not stopped at; `f<T>(` and `f?.(` are calls; and two declared functions on one line
 # carry their own marks, keyed on the site with its name.
 got = lex.read_ts_jsx_defs("function A() {\n  return cond ? build({ x }) : <B />;\n}\n"
-                           "function C() {\n  const f = () => { a; b; };\n  return f() ? <D /> : null;\n}\n")
-check("returns R18: a balanced group before the element in the return expression is stepped over "
-      "backward, so an object literal or a nested block does not hide the `return`",
+                           "function C() {\n  return f(() => { a; b; }) ? <D /> : null;\n}\n")
+check("returns R18: a balanced group between the `return` and the element is stepped over "
+      "backward -- an object literal, and a nested block whose `;` sits above depth zero",
       got == [("A", 1), ("C", 4)], f"{got}")
 got = lex.read_ts_jsx_defs("const html = () => mount<P>(<C />);\nconst also = () => render?.(<C />);\n"
                            "const A = () => (x < y) ? <B /> : null;\n")
@@ -2753,16 +2765,22 @@ check("returns R19: a generic call and an optional call hold their element, whil
       "before a returned element is not read as a type-argument run",
       got == [("A", 3)], f"{got}")
 
-# R21 — THE PROPERTY the closing review asked for: one expression, three spellings, one verdict.
-# Every expression-body fixture above is rewritten as a block body with a `;` and as a
-# semicolon-free block body, and the three must agree — routed or not. Both halves of round 1's
-# HIGH were one spelling grading differently from its siblings, and this is the class.
+# R21 — TWO PROPERTIES the closing review asked for, over one expression list. (1) Three
+# spellings of the same value — an arrow body, a `return` with `;`, a semicolon-free `return` —
+# agree, routed or not; this pins the balanced-group half of round 1's HIGH and the ceiling, and
+# it can NOT red on the boundary half, because a one-statement body has no boundary to cross.
+# (2) The same expression bound to a local behind a closer-ended early return, in a
+# semicolon-free body, is NEVER routed — that is the boundary half, and it reds when the walk
+# crosses into `return noop()`. Round 2 proposed the early return in front of the element's own
+# `return`, which the walk never reaches past; the initializer is the spelling that reaches it.
+# R15 pins the instances.
 _NL = "\n"
 _EXPRS = ("<div />", "(" + _NL + "  <div />" + _NL + ")", "loading ? (" + _NL + "  <Spinner />" + _NL + ") : (" + _NL + "  <Page />" + _NL + ")",
           "open && (" + _NL + "  <Modal />" + _NL + ")", "cond ? build({ x }) : <B />", "mount(<C />)",
           "mount<P>(<C />)", "render?.(<C />)", "renderToStaticMarkup(<Form {...p} />)",
           "{ el: <div /> }", "[{ el: <div /> }]", "items.map((i) => <li key={i} />)",
-          "(x < y) ? <B /> : null", "cond" + _NL + "  ? <A />" + _NL + "  : <B />")
+          "(x < y) ? <B /> : null", "cond" + _NL + "  ? <A />" + _NL + "  : <B />",
+          "a >" + _NL + "  b ? <B /> : null")
 _DISAGREE = []
 for _e in _EXPRS:
     _three = (lex.read_ts_jsx_defs("const A = () => " + _e + ";" + _NL),
@@ -2775,6 +2793,11 @@ check("returns R21: every expression grades the same as an arrow body, a `return
       not _DISAGREE and len(_EXPRS) > 10
       and {bool(lex.read_ts_jsx_defs("const A = () => " + _e + ";" + _NL)) for _e in _EXPRS} == {True, False},
       f"{_DISAGREE}")
+_CROSSED = [_e for _e in _EXPRS if lex.read_ts_jsx_defs(
+    "function A() {" + _NL + "  if (!x) return noop()" + _NL + "  const el = " + _e + _NL + "  return el" + _NL + "}" + _NL)]
+check("returns R21: ...and the same expression bound to a local behind a closer-ended early return, "
+      "semicolon-free, is NEVER routed -- the boundary half, for every expression at once",
+      not _CROSSED, f"crossed: {_CROSSED}")
 
 # R22 — THE MARKER'S WAKE, both directions, asserted on the HEAD population. The marker occupies a
 # position: an arm reading the token after `=` now sees it instead of the next statement's head
