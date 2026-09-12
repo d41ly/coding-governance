@@ -3,9 +3,9 @@ slug: dPolishedVitrine
 node: d
 opened: 2026-09-12
 streams: tooling+deployer
-roster: TOOL
+roster: TOOL+DEPL
 authorized-by: prompt
-ids: TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9 TOOL-dPolishedVitrine-10
+ids: DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9 TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12
 ---
 
 # dPolishedVitrine — the build harness is rendered at install, so its paths name the adopter's tree
@@ -46,6 +46,9 @@ the same checklist path, and it breaks the same way.
 - **The lexicon pin rose 984 -> 986** for the template's two helper names, which `agent-cap.js`
   recognises by name. The agent resolved it under the brief; `TOOL-aWeldedTribunal-12` keeps the
   underlying tension, every conforming harness costing two offenders, for the owner.
+- **`update` still keeps a schema-3 receipt's `engine` role** when a kit makes that destination
+  `rendered`. Round 1 repaired it for this release by a fixture-verified consumer migration.
+  `DEPL-dPolishedVitrine-1` holds the govkit move, whose blast radius is the owner's to rule on.
 
 <!-- roster:units -->
 
@@ -57,12 +60,13 @@ the same checklist path, and it breaks the same way.
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-09-12 · streams tooling+deployer
-ids TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9 TOOL-dPolishedVitrine-10
+ids DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9
+ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-4 | 2026-09-12 |
+| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-5 | 2026-09-12 |
 <!-- /gen:build-units -->
 
 Records: 3 bound to this build, across 4 record folder(s).

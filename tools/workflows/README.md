@@ -25,15 +25,24 @@ argument is the leg that grades them:
 the bug-class checklist, the review sub-workflow it awaits and the child it hands the caller. A
 workflow script has no filesystem when it runs, so it cannot find its siblings, and apply would
 write a shipped copy verbatim, naming this repo's `tools/` layout in every adopter. So the kit
-renders it instead, and `kit.toml`'s `[[regenerate]]` block re-runs the render on an update.
+renders it instead, and `kit.toml`'s `[[regenerate]]` block re-runs the render on an update run
+with `GOVKIT_RERENDER=1`. With `GOVKIT_RERENDER` unset `update` re-renders nothing and prints
+nothing about it, and the parity leg is what reds the stale copy at your next bar.
 
 **`MEMORY_TREE_DIR` is probed, not derived.** An adopter may install the memory-tree kit flat in
 its tool root, so the tool root plus `memory-tree/` is not an answer. The render takes the first
-TRACKED of `{{TOOL_ROOT}}memory-tree/gotchas.py` and `{{TOOL_ROOT}}gotchas.py`, and refuses when
-neither is tracked. If yours is somewhere else, run the render with `MEMORY_TREE_DIR=<dir>` exported.
-That override comes only from the environment, so a tree that needs it on its bar exports it there
-too. A template in this directory with no pair in the script is a red, so a new one cannot ship
-ungraded.
+TRACKED of `{{TOOL_ROOT}}memory-tree/gotchas.py` and `{{TOOL_ROOT}}gotchas.py`. When neither is
+tracked it SKIPS the harness pair out loud and still renders and grades the protocol, because this
+kit requires only agent-cap and an install without the memory-tree kit is legal. If yours is
+somewhere else, run the render with `MEMORY_TREE_DIR=<dir>` exported; an override naming nothing
+tracked is refused. That override comes only from the environment, so a tree that needs it on its
+bar exports it there too. A template in this directory with no pair in the script is a red, so a
+new one cannot ship ungraded.
+
+**An install from before 1.8 rows the harness as an engine file**, and `update` keeps that role, so
+it writes gov's own render and cannot move the row. The migration that converges, verified on a
+fixture, is in the coding-governance runbook's Maintenance section, under "The build harness is
+rendered from review-harness 1.8".
 
 ## How the three find things — stated ONCE, for all of them
 

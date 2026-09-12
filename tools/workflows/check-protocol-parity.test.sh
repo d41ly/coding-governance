@@ -19,7 +19,8 @@
 # filesystem at run time, so it cannot derive those paths itself. Rendering at install is the one
 # derivation it can have, and the owner chose it on 2026-09-12 over having each caller pass the paths
 # in. `kit.toml` declares both pairs `rendered` and names `--render` as the entry's `[[regenerate]]`
-# argv, so an update re-renders them rather than leaving either a vintage stale.
+# argv, so an update run with GOVKIT_RERENDER=1 re-renders them. With GOVKIT_RERENDER unset
+# `update` re-renders nothing and says nothing about it, and this leg is what reds the stale copy.
 #
 # THREE TOKENS, and each one is DERIVED here rather than typed:
 #   KIT_DIR          this kit's directory, repo-relative — the harness's own siblings live in it
@@ -28,8 +29,10 @@
 # The third is NOT derivable from the second. Both adopters measured when this was written install
 # the memory-tree kit FLAT, directly in their tool root, so `TOOL_ROOT` plus `memory-tree/` names a
 # file neither of them has. It is PROBED instead: the first TRACKED of the nested and the flat
-# spelling wins, and neither being tracked is a REFUSAL naming the override. It never guesses,
-# because a guessed path renders a checklist command that runs nothing and reads as a clean one.
+# spelling wins. It never guesses, because a guessed path renders a checklist command that runs
+# nothing and reads as a clean one. Neither being tracked SKIPS, out loud and by name, only the pair
+# whose template carries the token, so an install without the memory-tree kit still renders and
+# grades the protocol; an override naming nothing tracked is still a refusal.
 #
 # WHAT THIS DOES NOT CHECK. It compares each render against its template and asserts no placeholder
 # survives. It does NOT prove a rendered path RESOLVES: `TOOL_ROOT` plus `unattended/` is taken on
@@ -74,12 +77,21 @@ $KITREL/unattended-build.js|$KITREL/unattended-build.template.js"
 
 check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
 
-# MEMORY_TREE_DIR — the probe, then the refusal. The OVERRIDE is an environment variable and it is a
-# HAND-INSTALL channel only: the gate leg runs this file with no environment of its own, so a tree
-# that needs the override on its bar has to export it there too. That is the drift-audit adopter's
-# recorded limit for its own sibling override, met again rather than solved. An override is asserted
-# exactly as a probe answer is, because a wrong answer typed by a person runs nothing either.
-MTD=""
+# MEMORY_TREE_DIR — the probe, then what an unanswered probe costs. The OVERRIDE is an environment
+# variable and it is a HAND-INSTALL channel only: the gate leg runs this file with no environment of
+# its own, so a tree that needs the override on its bar has to export it there too. That is the
+# drift-audit adopter's recorded limit for its own sibling override, met again rather than solved.
+# An override is asserted exactly as a probe answer is, because a wrong answer typed by a person
+# runs nothing either.
+#
+# WARN WHEN ABSENT, REFUSE WHEN MISPLACED, and only for the pair whose template carries the token.
+# This kit requires agent-cap and nothing else, so an install with no memory-tree kit is legal, and
+# in one nothing tracks a `gotchas.py`. The probe used to exit 2 before any pair was graded, so that
+# install lost `REVIEW-PROTOCOL.md` as well: the document stating the concurrency cap could be
+# neither rendered nor graded, over a harness only the unattended kit runs (round 1, F3). An unset
+# probe with nothing to find now SKIPS the pairs that need it, by name and out loud. An override that
+# names nothing tracked is still a refusal, because that is a person's wrong answer, not an absence.
+MTD=""; MTD_SKIP=""
 if [ -n "${MEMORY_TREE_DIR:-}" ]; then
   _mtd=${MEMORY_TREE_DIR%/}
   if check_tracked "$_mtd/gotchas.py"; then MTD="$_mtd"
@@ -93,14 +105,7 @@ else
   for _c in "${TOOLROOT}memory-tree/gotchas.py" "${TOOLROOT}gotchas.py"; do
     if check_tracked "$_c"; then MTD=$(dirname "$_c"); break; fi
   done
-  if [ -z "$MTD" ]; then
-    echo "protocol-parity: cannot derive MEMORY_TREE_DIR — neither ${TOOLROOT}memory-tree/gotchas.py"
-    echo "  nor ${TOOLROOT}gotchas.py is tracked in this repo. The build harness names the memory-tree"
-    echo "  kit's bug-class checklist by path, and a guessed path is a command that runs nothing."
-    echo "  If that kit is installed somewhere else, set MEMORY_TREE_DIR=<the directory holding"
-    echo "  gotchas.py> and re-run. Nothing was written."
-    exit 2
-  fi
+  [ -n "$MTD" ] || MTD_SKIP="neither ${TOOLROOT}memory-tree/gotchas.py nor ${TOOLROOT}gotchas.py is tracked in this repo"
 fi
 # AN UNSUPPORTED CHARACTER IS A REFUSAL. Both values land inside a single-quoted JS string in the
 # harness and inside a shell command an agent runs, so a quote ends the string early and a space
@@ -154,11 +159,20 @@ fi
 
 TMPD=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMPD"' EXIT
-bad=0; i=0
+bad=0; i=0; skipped=" "; nskip=0
 while IFS='|' read -r LIVE SHIP; do
   [ -n "$LIVE" ] || continue
   i=$((i+1))
   [ -f "$SHIP" ] || { echo "protocol-parity: missing shipped copy $SHIP"; bad=1; continue; }
+  # THE SKIP, per pair and out loud. It names what went ungraded and what would grade it, because a
+  # skip that reads as a pass is indistinguishable from coverage.
+  if [ -n "$MTD_SKIP" ] && grep -qF '{{MEMORY_TREE_DIR}}' "$SHIP"; then
+    echo "protocol-parity: SKIP $LIVE — its template names the memory-tree kit's gotchas.py, and"
+    echo "  $MTD_SKIP, so this pair was neither rendered nor graded$([ -f "$LIVE" ] && echo " (the live copy that exists was NOT checked)")."
+    echo "  If that kit is installed somewhere else, set MEMORY_TREE_DIR=<the directory holding"
+    echo "  gotchas.py> and re-run. A guessed path is a checklist command that runs nothing."
+    skipped="$skipped$i "; nskip=$((nskip+1)); continue
+  fi
   if ! render "$SHIP" > "$TMPD/$i"; then
     echo "protocol-parity: the render of $SHIP FAILED — the template could not be read"; bad=1; continue
   fi
@@ -198,6 +212,7 @@ if [ "$MODE" = --render ]; then
   while IFS='|' read -r LIVE SHIP; do
     [ -n "$LIVE" ] || continue
     i=$((i+1))
+    case "$skipped" in *" $i "*) continue ;; esac
     mkdir -p "$(dirname "$LIVE")" && cp "$TMPD/$i" "$LIVE" || { echo "protocol-parity: could not write $LIVE"; exit 1; }
     echo "protocol-parity: rendered $LIVE from $SHIP"
   done <<EOF
@@ -244,4 +259,8 @@ for _sec in 'The hard cap' 'Concurrency'; do
     || { echo "protocol-parity: $LIVE's '$_sec' section states a bound without naming the file that RESOLVES it (expected 'agent-cap.js' inside that section) — a bound an agent cannot look up"; _p_bad=1; }
 done
 [ "$_p_bad" = 0 ] || exit 1
-echo "protocol-parity: in parity — $i rendered pair(s) match their templates for '$KITREL' (MEMORY_TREE_DIR '$MTD')"
+if [ "$nskip" -gt 0 ]; then
+  echo "protocol-parity: in parity — $((i-nskip)) rendered pair(s) match their templates for '$KITREL'; $nskip pair(s) SKIPPED (MEMORY_TREE_DIR unresolved)"
+else
+  echo "protocol-parity: in parity — $i rendered pair(s) match their templates for '$KITREL' (MEMORY_TREE_DIR '$MTD')"
+fi

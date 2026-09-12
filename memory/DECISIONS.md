@@ -92,6 +92,7 @@
 - TOOL-dSettledRoster-2 · closing a pre-cutoff spec pulls it into drift signal 6, whose grandfather keys on the CLOSE date while its evidence keys on the BUILD date. Remedy is `memory/project/trace-waiver.txt` per cTracedPromise-1 §3 — not a raised pin, not a filename key; an unused row reds
 - TOOL-dNarrowedAnchor-1 · the second anchor is admissible PER MODE. `ANCHOR_SCOPE` was a whole-project switch, so enabling the prompt path also let a `slug` run push its own authorization. `SECOND_ANCHOR_MODES="prompt recipe"`; `slug`, an absent `authorized-by:`, reds `fail 50` and leg `fail 29`
 - TOOL-dPolishedVitrine-1 · OWNER RULING 2026-09-12: the build harness is RENDERED at install rather than handed paths in args. Its install literals become KIT_DIR, TOOL_ROOT and MEMORY_TREE_DIR, the last PROBED from a tracked gotchas.py and refused when absent: adopters install memory-tree flat
+- TOOL-dPolishedVitrine-12 · round 1: F1 is repaired by a migration (update, commit, `adopt --re-adopt` pinning every recorded base) and not a govkit role move, filed DEPL-dPolishedVitrine-1; F3 SUPERSEDES -1's refusal in the parity script: a missing gotchas.py skips only the pair naming it
 
 ## DEPL — deployer
 
@@ -147,3 +148,4 @@
 - **TOOL-aReapedSpinner-20** — **a backgrounded subshell inherits the fds of the shell that spawned it, and disown does not close them**: the turnstile ticker's `sleep` outlived every bar holding stdout, so any captured run waited 300s after exit. builds/aReapedSpinner/. — _2026-09-08, `a`_
 - **TOOL-aReapedSpinner-22** — **a suite that times out hides every assertion after the hang, so fixing the hang is how you find out what was never graded**: the canary's wall arm had been unreachable and unconditionally red. builds/aReapedSpinner/. — _2026-09-08, `a`_
 - **TOOL-dMuffledSentinel-1** — **check 21 refuses a bindings parse that did not complete**: `2>/dev/null || true` turned an adopter generator lacking the mode into a clean corpus over 1531 records. The N row is the liveness half. builds/dMuffledSentinel/. — _2026-09-11, `d`_
+- DEPL-dPolishedVitrine-3 · govkit 1.11: `update` lands an unclaimed source BEFORE it re-renders, so a kit's new template reaches its `[[regenerate]]` in the same run, and a failed regenerate stops promising a rollback its kit's `[check]` cannot give. Amends TOOL-dPolishedVitrine-1 §3

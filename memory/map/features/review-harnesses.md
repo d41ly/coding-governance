@@ -129,4 +129,6 @@ check-verifier-fanout.sh already does.
 seam: check-protocol-parity.test.sh — reuse as this kit's ONLY renderer, and as the leg that grades
 what it rendered; extend by adding a `PAIRS` row and a `rendered` rule in `kit.toml`, never by
 writing a second renderer. A template in the kit dir with no row reds, so a new one cannot ship
-ungraded.
+ungraded. A token only some templates carry is resolved PER PAIR: an unanswered probe skips, by name
+and out loud, only the pairs whose template needs it, so a new token cannot cost an install the
+pairs that never use it (`TOOL-dPolishedVitrine-1`, round 1 F3).

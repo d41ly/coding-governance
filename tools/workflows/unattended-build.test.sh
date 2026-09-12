@@ -629,14 +629,16 @@ has "F4 the hand-out carries what stood, empty and explicit" "$o" '"standing":[]
 LAY=$(mktemp -d) || exit 2
 trap 'rm -rf "$LAY"' EXIT
 
-build_layout() { # dir · kit dir · unattended dir · checklist script, or '' for none -> a git repo
+build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklist script, or '' for none -> a git repo
   local d=$1 kd=$2 ud=$3 gp=$4
-  mkdir -p "$d/$kd" "$d/$ud" "$d/memory/guides"
+  mkdir -p "$d/$kd" "$d/memory/guides"
   ( cd "$d" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
       && git config core.autocrlf false )
   cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" \
      "$HERE/REVIEW-PROTOCOL.template.md" "$HERE/tier2-review.js" "$HERE/unattended-unit.js" "$d/$kd/"
-  printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"
+  # `-` IS A REVIEW-HARNESS-ONLY INSTALL, which `requires` permits: this kit requires agent-cap and
+  # nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
+  if [ "$ud" != - ]; then mkdir -p "$d/$ud"; printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"; fi
   if [ -n "$gp" ]; then mkdir -p "$(dirname "$d/$gp")"; printf '# a stub checklist\n' > "$d/$gp"; fi
   ( cd "$d" && git add -A )
 }
@@ -718,10 +720,13 @@ RF="$LAY/rootflat"; build_layout "$RF" workflows unattended gotchas.py
 run_layout "$RF" workflows --render >/dev/null
 check_layout "PV-AC3 root, flat memory-tree:" "$RF" workflows "" . GGGGG
 
-# ---- AC4: no checklist script anywhere the probe looks is a REFUSAL, and nothing is written.
+# ---- AC4: no checklist script anywhere the probe looks SKIPS the harness pair out loud, and no
+# ---- harness is written. rev-5: this was a whole-run exit 2 until round 1's F3 scoped it to the pair
+# ---- whose template carries the token; the review-harness-only arms below are why.
 NO="$LAY/none"; build_layout "$NO" scripts/workflows scripts/unattended ""
 o=$(run_layout "$NO" scripts/workflows --render)
-has "PV-AC4 no gotchas.py: --render refuses at exit 2" "$o" "rc=2"
+has "PV-AC4 no gotchas.py: --render skips the harness pair by name" "$o" "SKIP scripts/workflows/unattended-build.js"
+has "PV-AC4 ...at exit 0, because the protocol pair still rendered" "$o" "rc=0"
 has "PV-AC4 ...and names the override" "$o" "set MEMORY_TREE_DIR="
 absent_harness=yes; [ -e "$NO/scripts/workflows/unattended-build.js" ] && absent_harness=no
 same "PV-AC4 ...and writes no harness" "$absent_harness" "yes"
@@ -738,6 +743,30 @@ mkdir -p "$OV/vendor/m t" && printf '# stub\n' > "$OV/vendor/m t/gotchas.py" && 
 o=$( (cd "$OV" && MEMORY_TREE_DIR='vendor/m t' bash scripts/workflows/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
 has "PV-AC4 a tracked override holding a space is refused" "$o" "holds a character outside"
 has "PV-AC4 ...at exit 2" "$o" "rc=2"
+
+# ---- ROUND 1 F3: A REFUSAL THAT BELONGS TO ONE PAIR'S TOKEN NEVER BLOCKS A PAIR WITHOUT IT. This
+# ---- kit requires agent-cap and nothing else, so an install with no memory-tree kit and no
+# ---- unattended kit is legal, and in it nothing tracks a `gotchas.py`. The probe used to exit 2
+# ---- before any pair was graded, so that install lost `REVIEW-PROTOCOL.md` too: the document that
+# ---- states the concurrency cap could be neither rendered nor graded, over a harness it never runs.
+RO="$LAY/review-only"; build_layout "$RO" scripts/workflows - ""
+o=$(run_layout "$RO" scripts/workflows --render)
+has "PV-F3 review-harness only: --render still renders the protocol" "$o" "rendered memory/guides/REVIEW-PROTOCOL.md from"
+has "PV-F3 ...at exit 0" "$o" "rc=0"
+has "PV-F3 ...and SKIPS the harness pair out loud, naming why" "$o" "SKIP scripts/workflows/unattended-build.js"
+has "PV-F3 ...and names the override that would render it" "$o" "set MEMORY_TREE_DIR="
+absent_harness=yes; [ -e "$RO/scripts/workflows/unattended-build.js" ] && absent_harness=no
+same "PV-F3 ...and writes no harness" "$absent_harness" "yes"
+o=$(run_layout "$RO" scripts/workflows)
+has "PV-F3 --check grades the protocol and passes" "$o" "in parity"
+has "PV-F3 ...at exit 0" "$o" "rc=0"
+has "PV-F3 ...and the green line says a pair went ungraded" "$o" "1 pair(s) SKIPPED"
+# THE PROTOCOL IS GRADED, NOT MERELY UNBLOCKED. A skip that also swallowed the protocol pair would pass
+# every arm above, so its drift has to still red.
+printf 'a hand edit\n' >> "$RO/memory/guides/REVIEW-PROTOCOL.md"
+o=$(run_layout "$RO" scripts/workflows)
+has "PV-F3 a drifted protocol still reds in that install" "$o" "DRIFT"
+has "PV-F3 ...at exit 1" "$o" "rc=1"
 
 # ---- AC5: the parity script catches what it exists to catch.
 cp "$FL/scripts/workflows/unattended-build.js" "$LAY/flat-render.js"

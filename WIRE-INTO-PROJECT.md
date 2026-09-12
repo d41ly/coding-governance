@@ -671,9 +671,10 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
 - Then run `bash <project>/tools/workflows/check-protocol-parity.test.sh --render` once. The kit
   ships the unattended build harness as `unattended-build.template.js`, and this writes
   `unattended-build.js` beside it with your install paths filled in, and the protocol copy with it.
-  A copied template with no render is a harness that does not exist. The render refuses, and writes
-  nothing, when the memory-tree kit's `gotchas.py` is tracked at neither `<tool root>memory-tree/`
-  nor `<tool root>`; export `MEMORY_TREE_DIR=<dir>` if yours lives elsewhere.
+  A copied template with no render is a harness that does not exist. When the memory-tree kit's
+  `gotchas.py` is tracked at neither `<tool root>memory-tree/` nor `<tool root>`, the render SKIPS
+  the harness out loud, by name, and still renders the protocol; export `MEMORY_TREE_DIR=<dir>` if
+  yours lives elsewhere, and an override naming nothing tracked is refused.
 - Verify all five workflow legs, not two — the dogfood bar runs every one of these:
   `bash <project>/.claude/hooks/agent-cap.test.sh` · `bash <project>/tools/workflows/check-protocol-parity.test.sh` ·
   `bash <project>/tools/workflows/check-verifier-fanout.sh` · `bash <project>/tools/workflows/check-review-join.sh` ·
@@ -983,6 +984,71 @@ The full contract, including why this kit will never grow a plugin loader, is in
 kit's own README.
 
 ## Maintenance
+
+### The build harness is rendered from review-harness 1.8 — migrating a receipt that rows it as an engine file
+
+Before review-harness 1.8, `unattended-build.js` shipped as an engine file, so a receipt written
+then rows `<kit>/unattended-build.js` with role `engine`. From 1.8 it is `rendered` from
+`unattended-build.template.js`, and **`update` does not move the row**. It takes each row's role
+from the receipt and re-resolves it only below receipt schema 2, so on a schema-3 receipt it writes
+gov's own render, which spells gov's `tools/` layout, over yours. Every later run then grades that
+row as an engine file, and a correct render reads as a local edit. This needs govkit 1.11 or later,
+which lands a new template BEFORE it re-renders; an older govkit refuses the render with
+`missing shipped copy`.
+
+The sequence that converges, from `<project>`'s root with `<gov>` checked out at the vintage you are
+moving to:
+
+```bash
+# 1. Move forward and re-render. The template lands, then the harness is rendered from it.
+GOVKIT_RERENDER=1 python <gov>/tools/govkit/govkit.py update --target <project> --write
+bash <kit>/check-protocol-parity.test.sh                  # in parity, 2 rendered pair(s)
+git add -A && git commit -m "govkit update: review-harness 1.8"
+
+# 2. Re-row it: re-adopt at that vintage, pinning every row's recorded base.
+TO=$(git -C <gov> rev-parse HEAD)
+PINS=$(python -c 'import json, subprocess, sys
+t, to = sys.argv[1], sys.argv[2]
+tracked = set(subprocess.run(["git", "-C", t, "ls-files"], capture_output=True, text=True).stdout.split())
+for f in json.load(open(t + "/.governance/install.json", encoding="utf-8"))["files"]:
+    if f["path"] in tracked and f.get("role") not in ("merged", "attributes", "project-owned", "generated"):
+        base = f.get("commit") or (to if f.get("role") == "rendered" else "")
+        if base:
+            print("--pin", f["path"] + "=" + base)' . "$TO")
+python <gov>/tools/govkit/govkit.py adopt --target <project> --re-adopt $PINS           # READ-ONLY: read it
+python <gov>/tools/govkit/govkit.py adopt --target <project> --re-adopt $PINS --write
+git add -A && git commit -m "govkit adopt --re-adopt: the build harness is rendered"
+```
+
+**Why the re-adopt.** It is the only verb that re-reads a row's role from the descriptor, and it
+re-measures EVERY row, not just this one.
+
+**Why the pins, and every one of them.** Unpinned, a row carrying a local edit matches no gov
+vintage and comes back `unattributed`, which loses the base its three-way merge needs. Every
+`rendered` row comes back `unattributed` too, because a render never equals its template. After
+either, every later `update` withholds its re-stamp. The rule pins each tracked row that records a
+`commit` to that commit, so its base survives. It pins each tracked `rendered` row that records none
+to the vintage you moved to. It leaves block rows (`merged`, `attributes`) and rows gov supplies no
+bytes for (`project-owned`, `generated`) to `adopt`, which re-synthesizes them.
+
+**Read the read-only run.** Its tally should show `pinned` and `verbatim`, and no `unattributed` row
+that the old receipt attributed. `adopt` re-measures only the kits `.governance/deploy.toml` names in
+`kits`, so check that list covers every kit the receipt claims first. The pin list is split on
+whitespace, so a path holding a space needs its flags passed by hand.
+
+**A local edit to the old harness does not survive step 1.** The re-render overwrites the harness
+with the template's render. Carry the edit into `<kit>/unattended-build.template.js` after step 1,
+re-run `bash <kit>/check-protocol-parity.test.sh --render`, then commit; step 2 records it as the
+template row's local delta.
+
+**Done looks like this.** The receipt rows the harness `rendered` with `evidence: "pinned"`. No row is
+`unattributed` that was not before. The index blob of every non-rendered row equals its receipt
+`oid`. The next `update` writes nothing to the harness and re-stamps, and both parity legs are green.
+That end state was measured on a fixture installed at gov `24f8c712` at prefix `scripts`, with the
+memory-tree kit flat, the unattended kit present and one local edit. The record is build
+`dPolishedVitrine`'s journal, and the govkit selftest's `[-PV]` arms run the same sequence on every
+self-test run. `update` learning to move a role itself is `DEPL-dPolishedVitrine-1`, and it retires
+this section when it lands.
 
 ### The hooks ship ONE copy each — migrating a tree that has two
 

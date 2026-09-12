@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived
 
-**Status:** INPROGRESS · rev-4 · 2026-09-12 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
+**Status:** INPROGRESS · rev-5 · 2026-09-12 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -54,6 +54,12 @@ Skill's copy of the same checklist line is fixed the same way.
   READMEs say what is rendered, `memory/project/method-carriers.txt` declares the template, the
   review-harnesses dossier claims the new inventory key and records the renderer as a seam, and the
   lexicon pin moves by the template's two forced names. Observed by AC11.
+- **S8** — round 1's repairs, rev-5. govkit's `update` lands an unclaimed source before it runs a
+  kit's `[[regenerate]]`, a failed regenerate says what its kit's check can and cannot roll back,
+  selfcheck gains arm 7l over every kit declaring `[[regenerate]]`, and govkit moves 1.10 to 1.11.
+  The parity script resolves `MEMORY_TREE_DIR` per pair, so an unanswered probe skips only the pair
+  that needs it. The parity leg is unguarded in both carriers. The runbook's Maintenance section and
+  the kit README carry the consumer migration. Observed by AC4, AC13, AC14, AC15 and AC16.
 
 ## 3. Non-goals (OUT)
 
@@ -66,9 +72,15 @@ Skill's copy of the same checklist line is fixed the same way.
   bump that kit and every one of its template markers. That is not a one-line fix on this token, so
   it is a backlog row.
 - **No consumer is touched.** Core and NicoCares re-pull this release in their own trees.
-- **govkit is not changed.** No write-time relocate of engine bodies. `govkit.py` calls its carry
-  derivation a proof instrument, not a write-time transform, and a relocate would mis-carry the
-  checklist line anyway (§4 Alternatives rejected).
+- **govkit changes only where round 1 found the update path broken.** rev-5 amends this bullet,
+  which read "govkit is not changed". The introducing update could not render the harness, so the
+  landing now precedes the regenerate; S8 lists the rest. `update` still does NOT re-resolve a row's
+  role at schema 3. That durable repair reaches every row whose descriptor role moved, including the
+  self-tests `TOOL-aQuenchedHarness-3` withheld, so it waits for its own spec as
+  `DEPL-dPolishedVitrine-1`, and the consumer migration in §4 Rollout stands in for it. There is
+  still no write-time relocate of engine bodies. `govkit.py` calls its carry derivation a proof
+  instrument, not a write-time transform, and a relocate would mis-carry the checklist line anyway
+  (§4 Alternatives rejected).
 - **The harness suite stays on no bar.** `TOOL-dBriefedPass-7` owns that question.
 - **The override is not persisted.** `MEMORY_TREE_DIR` is read from the environment only. A tree whose
   bar needs it exports it for the gate too, which is the drift-audit adopter's recorded limit for its
@@ -82,11 +94,15 @@ Skill's copy of the same checklist line is fixed the same way.
 ### Edges
 
 - **consumes-from** external — the memory-tree kit's `gotchas.py` must be tracked at one of the two
-  probed spellings, or named by the override, before either renderer will write anything.
-- **hands-off** external — the consumer re-pulls. That covers `update --kits review-harness,unattended`
-  with `GOVKIT_RERENDER=1`, and NicoCares carrying its cap carve-out into the template. It also
-  covers retiring core's untagged Skill delta and NicoCares' untagged driver delta, and adding the
-  parity leg core lacks.
+  probed spellings, or named by the override, before the harness renders. The parity script still
+  renders the protocol without it, and the unattended adopter refuses without it.
+- **hands-off** external — the consumer re-pulls by the runbook's migration, not by `update` alone.
+  On govkit 1.11 or later: `update --write` with `GOVKIT_RERENDER=1`, commit, then
+  `adopt --re-adopt --write` with one `--pin` per tracked receipt row, each at the row's recorded
+  commit or, for a `rendered` row recording none, at the new vintage, then commit. §4 Rollout says why
+  each step is there. The hand-off also covers NicoCares carrying its cap carve-out into the template
+  between the update and its commit, retiring core's untagged Skill delta and NicoCares' untagged
+  driver delta, and adding the parity leg core lacks.
 
 ## 4. Design
 
@@ -131,8 +147,11 @@ comment lines and nowhere else. AC1 pins that.
 
 The probe asks git, not the filesystem. A path counts only when `git ls-files --error-unmatch`
 answers for it, so an untracked scratch copy cannot satisfy it. When neither spelling is tracked, the
-renderer exits 2, names `MEMORY_TREE_DIR` as the override and writes nothing. An override is checked
-the same way: it must name a directory whose `gotchas.py` is tracked, or it is refused too. A wrong
+parity script SKIPS the harness pair out loud, names `MEMORY_TREE_DIR` as the override, writes no
+harness, and still renders and grades the protocol, because the review-harness kit requires only
+agent-cap (rev-5, round 1 F3). The unattended adopter exits 2 there instead, because that kit
+requires the memory-tree kit. An override is checked the same way in both: it must name a directory
+whose `gotchas.py` is tracked, or it is refused. A wrong
 answer typed by a person runs nothing either. Both renderers also refuse a value holding a character
 outside a path's set, because the value lands inside a single-quoted JS string and inside a shell
 command. There a quote ends the string and a space splits the command.
@@ -183,10 +202,27 @@ Minted by this unit, with the cell that grades each:
 
 The template ships as an engine file under the kit's `**` rule, because an adopter's render reads
 it. The render is claimed by the new `rendered` rule, so it drops out of the engine pool. In gov the
-render stays tracked at its old path, because this repo runs its own harness. A consumer re-pulls
-with `update`. With `GOVKIT_RERENDER=1` the two `[[regenerate]]` blocks re-render both kits'
-artifacts before post-write verification. Without the flag, `update` names both kits as one vintage
-stale.
+render stays tracked at its old path, because this repo runs its own harness.
+
+That last fact is why `update` alone cannot migrate a consumer (rev-5, round 1 F1). Both consumer
+receipts are schema 3 and row the harness as `engine`. `update` takes a row's role from the receipt,
+and gov still tracks the source, so the raw arm writes gov's own `tools/`-spelled render. So the
+consumer migrates in two moves, verified on a fixture installed at 24f8c712, prefix `scripts`, with
+memory-tree flat:
+
+1. `update --write` with `GOVKIT_RERENDER=1` on govkit 1.11 or later. The template lands as an
+   unclaimed source, and then both `[[regenerate]]` blocks render. Then commit.
+2. `adopt --re-adopt --write`, which is the only verb that re-reads a role from the descriptor, so
+   the harness row becomes `rendered`. It re-measures EVERY row, so it takes one `--pin` per tracked
+   row: the row's recorded commit, or the new vintage for a `rendered` row that records none. Then
+   commit. Unpinned, a row with a local edit and every render come back `unattributed`, and every
+   later `update` then withholds its re-stamp. That was measured on the same fixture.
+
+With `GOVKIT_RERENDER` unset, `update` runs neither regenerate and prints nothing about it. The
+review-harness renders are then left stale in silence, and the parity leg reds them at the next bar.
+The unattended kit is worse off. Its template lands, its Skill is left stale, and its own post-write
+check rolls the kit back, which is the 2026-09-11 NicoCares event. That was read from the code, not
+run.
 
 ### Files touched (estimate)
 
@@ -225,7 +261,7 @@ review-harnesses dossier, the generated map, and this build's records.
 - testing — five harness fixtures, two negative controls, three parity refusals, and four adopter
   arms. Every new arm is observed red before the fix, and the journal records it.
 - migration — none in gov: its render is byte-identical at every code line. Consumers migrate by
-  `update`, handed off in §3.
+  the two moves in §4 Rollout, handed off in §3, and not by `update` alone.
 - user docs — N/A as a `help/` tree, which this repo does not ship. The runbook's copy-install step
   and both kit READMEs are the agent-facing docs, and S7 updates them.
 
@@ -252,10 +288,12 @@ review-harnesses dossier, the generated map, and this build's records.
   Red when: a root install renders a leading slash or a stray prefix, or the nested spelling loses
   the probe to the flat one.
 - **AC4** — When the flat layout carries no `gotchas.py`, `check-protocol-parity.test.sh --render`
-  exits 2, names `MEMORY_TREE_DIR`, and leaves no harness render behind. With the override pointing at
-  a tracked vendor/mt/gotchas.py, the checklist renders as python vendor/mt/gotchas.py --for-diff
-  HEAD~1..HEAD.
-  Red when: the refusal exits 0, writes a file, or names no override; or the override is ignored.
+  prints a SKIP naming the harness pair and `MEMORY_TREE_DIR`, exits 0 because the protocol pair still
+  rendered, and leaves no harness render behind. With the override pointing at a tracked
+  vendor/mt/gotchas.py, the checklist renders as python vendor/mt/gotchas.py --for-diff HEAD~1..HEAD,
+  and an override naming nothing tracked still exits 2.
+  Red when: the skip is silent, writes a harness, or names no override; or the override is ignored,
+  or a misplaced one is accepted.
 - **AC5** — When a green flat render is hand-edited, `check-protocol-parity.test.sh` exits 1 printing
   `DRIFT`. When the kit dir tracks a stray `*.template.*`, it exits 1 naming that file. When the live
   copy is absent, `--check` exits 1 and `--render` creates it.
@@ -298,10 +336,32 @@ review-harnesses dossier, the generated map, and this build's records.
   rendered Skill tells the run to execute.
   Red when: the two copies of the probe drift, so the harness and the Skill name two different
   checklist scripts for one tree while each renderer's own arms still pass.
+- **AC13** — When a target installed at vintage A rows a kit's file as `engine`, and gov's vintage B
+  claims that destination `rendered` while still tracking the file, the §4 Rollout migration leaves
+  the row `rendered` with the destination holding the target's render. An edited row keeps its
+  recorded base, and the next `update` writes nothing and re-stamps. The govkit selftest's `[-PV] F1`
+  arms run it, with an unpinned control.
+  Red when: `update` alone is taken for the migration, so the row stays `engine` over gov's bytes; or
+  the pins are dropped, so a render or an edited row comes back `unattributed`.
+- **AC14** — When the introducing update of such a kit runs with `GOVKIT_RERENDER=1`, its
+  `[[regenerate]]` exits 0 in that same run, reading a template the same run landed. When a
+  regenerate fails in a kit whose `[check]` is `none`, the run fails and promises no rollback. The
+  govkit selftest's `[-PV] F2` arms run both.
+  Red when: the re-render runs before the unclaimed-source landing, or the failure text promises a
+  rollback nothing performs.
+- **AC15** — When a review-harness install tracks no `gotchas.py` anywhere, which `requires` allows,
+  `check-protocol-parity.test.sh --render` still renders the protocol and names the skipped harness
+  pair. `--check` then passes with the skip counted, and a drifted protocol still reds.
+  Red when: the probe's refusal blocks the pair that carries no `MEMORY_TREE_DIR` token.
+- **AC16** — When a kit declares `[[regenerate]]`, `govkit selfcheck` reds on any sentence in that
+  kit's tracked files or descriptor that names `update` and a re-render without naming
+  `GOVKIT_RERENDER`.
+  Red when: a carrier promises a re-render the flag-off run does not perform, and selfcheck stays
+  green.
 
 ## 7. Gates
 
-`review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `verifier fan-out` · `install-prefix (shipped surface)` · `kit version markers` · `kit placeholders (a declared token its adopter substitutes)` · `govkit selfcheck` · `unattended skill wiring` · `unattended kit gate` · `lexicon naming predicates` · `method carriers (every pointer declared)` · `codebase-map coverage + freshness` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `memory-hygiene self-test` · `spec tokens (a spec's own names resolve)`
+`review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `verifier fan-out` · `install-prefix (shipped surface)` · `kit version markers` · `kit placeholders (a declared token its adopter substitutes)` · `govkit selfcheck` · `govkit selftest` · `kickoff-manifest ratchet` · `drift-audit records` · `unattended skill wiring` · `unattended kit gate` · `lexicon naming predicates` · `method carriers (every pointer declared)` · `codebase-map coverage + freshness` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `memory-hygiene self-test` · `spec tokens (a spec's own names resolve)`
 
 Two suites carry this unit's arms, and neither is on any bar. `unattended-build.test.sh` is on none
 (`TOOL-dBriefedPass-7`), and `adopt-unattended.test.sh` runs only through
@@ -311,6 +371,9 @@ repo's bar and NicoCares'. Core has to add it.
 New arm: `tools/workflows/unattended-build.test.sh` · HEAD's verbatim harness in the flat fixture, the half-fix template, and an adopter forced to the prefix-only answer · none
 New arm: `tools/workflows/check-protocol-parity.test.sh` · a stray template, a missing gotchas.py, a hand-edited render · none
 New arm: `tools/unattended/adopt-unattended.test.sh` · a seed tracking no gotchas.py · none
+New arm: `tools/govkit/selftest.py` · the old hand-off, HEAD's engine order, a no-rollback promise · none
+New arm: `tools/govkit/govkit.py` · the five carriers round 1 named, unfixed · none
+New arm: `tools/workflows/unattended-build.test.sh` · a review-harness-only install · none
 
 ## 8. Open questions
 
@@ -350,6 +413,17 @@ New arm: `tools/unattended/adopt-unattended.test.sh` · a seed tracking no gotch
   empty output and a DoD-floor arm's `sed` no longer matches `DOD_CORE`. The criterion now compares
   the tip's FAIL set with base's. S6 grows the memory-hygiene self-test's fixture fix, which the
   full bar forced: that fixture drops history, and this spec's `base` cannot resolve without it.
+- rev-5 · 2026-09-12 · S8 · §3 · §4 · §5 · AC4 · AC13–AC16 · §7 · AMENDED by the round-1 Tier-2 diff
+  review, verdict BLOCKED on five defects. SCOPE grows into govkit, which §3 had excluded. The
+  introducing `update` could not render the harness, because its re-render ran before the landing
+  that brings in the template, so S8 moves that landing and takes govkit to 1.11. S8 also makes the
+  regenerate's failure text truthful and adds selfcheck arm 7l for the class behind F5. §3's govkit
+  bullet and its hand-off are rewritten. §4 Rollout is replaced by the fixture-verified consumer
+  migration, because `update` keeps an existing receipt's `engine` role at schema 3. The durable
+  govkit repair stays OUT as `DEPL-dPolishedVitrine-1`. AC4 inverts to a per-pair skip with the
+  refusal kept for a misplaced override, and §4's probe paragraph follows it. AC13 to AC16 name the
+  four new gates. The parity leg loses its guard in both carriers, and that needs no criterion,
+  because the change adds nothing that could be observed failing.
 
 ## 10. Reuse audit
 

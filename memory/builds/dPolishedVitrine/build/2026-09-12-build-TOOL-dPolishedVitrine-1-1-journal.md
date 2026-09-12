@@ -165,6 +165,76 @@ of them applied, and both were acted on in rev-3.
   the prefix-only answer after its probe, the flat layout's Skill said
   `python scripts/memory-tree/gotchas.py` while the harness said `python scripts/gotchas.py`.
 
+## What the round-1 review changed
+
+The round-1 Tier-2 diff review of `24f8c712...0c0e1757` returned BLOCKED on five defects. Its
+report is committed under `reviews/` beside this journal. Each defect is below: what changed, the
+gate it left behind, and the red that gate showed before the fix. The consumer fixture behind F1
+and F2 was built by `govkit apply` from a gov clone at `24f8c712`. The target sits at prefix
+`scripts`, with the memory-tree kit flat and the review harness at `scripts/workflows`. Its receipt
+is schema 3 and rows `scripts/workflows/unattended-build.js` as `engine`, with both identities at
+`75763c4e`, which is the consumer shape the review read off both real receipts.
+
+- **F1, blocker: the existing receipt keeps the harness an engine row.** Reproduced first. At the
+  tip, `GOVKIT_RERENDER=1 update --write` graded the row `stale` and raw-wrote gov's render
+  `ac362480`, which carries all four `tools/` literals. Once committed, the index held a correct
+  render while the receipt still named `ac362480`, so receipt-sync reds. The next `update` graded
+  the row `patched [engine]`. The repair in scope is the consumer migration now in §4 Rollout, the
+  runbook's Maintenance section and the kit README. It ran verbatim on two fixtures, one with the
+  review harness alone and one with the unattended kit as well, and each carried one local edit.
+  Both ended with the row `rendered` and `pinned`, and no row `unattributed`. In both, every
+  non-rendered row's index blob equalled its receipt `oid`, the next `update` wrote nothing and
+  re-stamped, every parity and wiring check passed, and the harness spelled no `tools/` path. The
+  pins are load-bearing. An unpinned re-adopt left the harness render, the protocol render and the
+  edited row `unattributed`, and the next `update` withheld its re-stamp over all three. The gate is
+  the govkit selftest's `[-PV] F1` arms on a synthetic kit of the same shape, with an unpinned
+  control. Observed red: with the re-adopt swapped for a `check`, which is the old hand-off, five
+  migration arms redded, and the next `update` graded the correct render `carried (relocate)
+  [engine]`. NOT done here: `update` re-resolving roles at schema 3, filed as `DEPL-dPolishedVitrine-1`.
+  Its blast radius reaches every row whose descriptor role moved, including the self-tests
+  `TOOL-aQuenchedHarness-3` withheld as `project-owned`, and that is an owner's call. Until it lands,
+  `update` still grades such a row as an engine file rather than naming the move.
+- **F2, high: the regenerate ran before its input.** govkit's unclaimed-source landing now precedes
+  the re-render block. That is a swap of two adjacent blocks, and nothing in the landing reads
+  what the re-render writes. The failure text no longer promises a rollback. It now says what the
+  kit's own check can and cannot undo. govkit moves 1.10 to 1.11, because consumers run it from gov
+  and the hand-off has to name the vintage that works. The gate is the `[-PV] F2` arms, plus a
+  NEGATIVE in which a failing regenerate in a `[check] none` kit fails the run and promises nothing.
+  Observed red on HEAD's engine: four F2 arms, and two F1 arms that need the render. On the consumer
+  fixture the run read `ran review-harness: … --render -> exit 1 REFUSED` and `rolled back 0`, and
+  withheld its stamp. After the fix it read `-> exit 0`, re-stamped, and the parity leg was green.
+  These are the first arms anywhere that set `GOVKIT_RERENDER=1`. The `_D1_ANNOUNCED` comment said
+  "the S6 arms below" did, none of them does, and that comment is corrected. NOT done: running a
+  regenerate when no row touched its kit, filed as `DEPL-dPolishedVitrine-2`.
+- **F3, medium: one pair's refusal blocked both.** The parity script resolves `MEMORY_TREE_DIR` per
+  pair. When the probe finds nothing and no override is set, only the pairs whose template carries
+  the token are SKIPPED, by name and with the override named. A misplaced override still exits 2.
+  The gate is the `PV-F3` arms over a review-harness-only layout with no memory-tree and no
+  unattended kit. There `--render` renders the protocol and names the skip, `--check` passes counting
+  it, and a drifted protocol still reds. Observed red: eight of the ten before the fix. AC4's arm
+  now asserts the skip.
+- **F4, low: the guard missed the leg's new input.** The parity leg is unguarded in both carriers,
+  and the kickoff manifest is re-stamped in the same commit. No new gate. It is recorded as the
+  known positive on `TOOL-aPacedTurnstile-9`.
+- **F5, low: carriers promised a flag-off re-render.** Every carrier now names `GOVKIT_RERENDER` in
+  the sentence that promises the re-render, and says what happens without it. The gate is govkit
+  selfcheck arm 7l. For each kit declaring `[[regenerate]]`, a sentence in its tracked files or
+  descriptor that names `update` with a re-render word must also name the flag. Before it was wired,
+  the predicate ran over the real tree, printing hits and near-misses. It found the four in-kit
+  carriers the review named, plus one it did not, in `tools/unattended/kit.toml`, and no near-miss
+  that was a claim. Observed red: `5 problem(s)` on the unfixed carriers, then two more on this
+  round's own first rewording, which said "that flag".
+
+Found while fixing, and not this unit's:
+
+- The unattended fixture shows `fixture-records/tools~…` churning on every update. `update` restores
+  them as `missing`, and the regenerate deletes them again. Filed as `TOOL-dPolishedVitrine-11`.
+- The first names for the new selftest helpers took a `pv_` prefix. The verb gate counted five
+  offenders over its pin, 991 against 986, so they were renamed through `--suggest`.
+- Citing this unit's id from product source while its spec is INPROGRESS raised drift signal
+  `non_terminal_specs_cited_by_product_source` to 3 over its pin of 2. Those comments now cite
+  the build slug instead.
+
 ## Hand-off to the lander
 
 `main` moved while this branch was open. `09a22d2b` landed the third unit of build
@@ -186,9 +256,10 @@ reads.
   to (v), after the same arms were seen red on base blob `75763c4e` in that layout.
 - AC3 — `tools/workflows/unattended-build.test.sh` — OBSERVED: nested, root, and root-with-flat
   memory-tree layouts pass all five arms. The root driver renders without a prefix.
-- AC4 — `MEMORY_TREE_DIR` — OBSERVED: no tracked `gotchas.py` refuses at exit 2 naming the override,
-  and no harness is written. The override renders `vendor/mt`, an untracked override is refused,
-  and a tracked override holding a space is refused.
+- AC4 — amended rev-5 — no tracked `gotchas.py` now SKIPS the harness pair at exit 0 and still
+  renders the protocol, where it used to refuse the whole run at exit 2. The skip names the override
+  and writes no harness. The override still renders `vendor/mt`, and an untracked override or one
+  holding a space is still refused. That is spec section 9's rev-5 line.
 - AC5 — `DRIFT` — OBSERVED: a hand-edited render reds, an unpaired template reds naming its path,
   and a missing live copy reds under the check mode and is created by the render mode.
 - AC6 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the verbatim spelling reds all five
@@ -207,3 +278,14 @@ reads.
 - AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
   through both kits' own renderers, name one checklist command. With the adopter forced to the
   prefix-only answer, the flat layout redded naming both commands.
+- AC13 — `tools/govkit/selftest.py` — OBSERVED: the `[-PV] F1` arms pass inside the whole suite,
+  which printed `all arms held`. With the re-adopt swapped for the old hand-off, five of them redded.
+  The same sequence converged on both consumer fixtures described above.
+- AC14 — `GOVKIT_RERENDER` — OBSERVED: the `[-PV] F2` arms pass, and on HEAD's engine three of them
+  and the negative's no-promise arm redded. The consumer fixture read `-> exit 1 REFUSED` before
+  the move and `-> exit 0` after it.
+- AC15 — `check-protocol-parity.test.sh --render` — OBSERVED: the `PV-F3` arms in
+  `tools/workflows/unattended-build.test.sh` pass, and eight of the ten redded against the unfixed
+  parity script.
+- AC16 — `govkit selfcheck` — OBSERVED: arm 7l reported `5 problem(s)` on the unfixed carriers and
+  exits 0 on the corrected ones.
