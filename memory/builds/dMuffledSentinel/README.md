@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-11
 streams: tooling
 roster: TOOL
-ids: TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2
+ids: TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2 TOOL-dMuffledSentinel-3
 authorized-by: prompt
 ---
 
@@ -51,25 +51,27 @@ Unit 2 is what closing inCMS's half ran into: both waiver registries are hard-co
 |---|---|---|---|
 | 1 | `TOOL-dMuffledSentinel-1` | 1 | check 21 refuses a bindings parse that did not complete |
 | 2 | `TOOL-dMuffledSentinel-2` | 1 | the pass-order and trace waiver registries take a declared path |
+| 3 | `TOOL-dMuffledSentinel-3` | 1 | the drift-audit and unattended versions move with those bytes |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-09-11 · streams tooling
-ids TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2
+**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-09-11 · streams tooling
+ids TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2 TOOL-dMuffledSentinel-3
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dMuffledSentinel-1 — check 21 refuses a bindings parse that did not complete](spec/2026-09-11-spec-TOOL-dMuffledSentinel-1.md) | — | 1 | CLOSED | rev-2 | 2026-09-12 |
 | [TOOL-dMuffledSentinel-2 — the pass-order and trace waiver registries take a declared path](spec/2026-09-12-spec-TOOL-dMuffledSentinel-2.md) | — | 1 | CLOSED | rev-2 | 2026-09-12 |
+| [TOOL-dMuffledSentinel-3 — the drift-audit and unattended versions move with the bytes unit 2 changed](spec/2026-09-12-spec-TOOL-dMuffledSentinel-3.md) | — | 1 | CLOSED | rev-2 | 2026-09-12 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2.
+Ids no `spec-audit` record has ever named: TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2 TOOL-dMuffledSentinel-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
