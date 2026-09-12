@@ -5,7 +5,7 @@ opened: 2026-09-12
 streams: tooling+deployer
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8
+ids: TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9
 ---
 
 # dPolishedVitrine — the build harness is rendered at install, so its paths name the adopter's tree
@@ -57,12 +57,12 @@ the same checklist path, and it breaks the same way.
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-09-12 · streams tooling+deployer
-ids TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8
+ids TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-3 | 2026-09-12 |
+| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-4 | 2026-09-12 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).

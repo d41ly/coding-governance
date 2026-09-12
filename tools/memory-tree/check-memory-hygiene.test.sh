@@ -2232,6 +2232,14 @@ cp "$GOVROOT/$KIT_REL/check-memory-hygiene.sh" "$PKD/$KIT_REL/" 2>/dev/null
 cp "$GOVROOT/.memory-tree.conf" "$PKD/.memory-tree.conf.base" 2>/dev/null
 ( cd "$PKD" && git init -q . && git config user.email t@t && git config user.name t \
     && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
+# THE FIXTURE BORROWS THE REAL OBJECT DATABASE. `git archive` drops the history, and from
+# BASE_RESOLVE_CUTOFF onward check 12 RESOLVES a live spec's `base` against the object database. So
+# a branch carrying one live Tier-2 spec redded the clean-fixture arm and every arm after it, over a
+# sha this fixture had no way to hold, which is every branch in the middle of an ordinary build.
+# Measured on the unit that first carried one. An alternates entry lends the objects without
+# copying them and changes no other input the checker reads.
+printf '%s/objects\n' "$(git -C "$GOVROOT" rev-parse --path-format=absolute --git-common-dir)" \
+  >> "$PKD/.git/objects/info/alternates"
 pk_set() {   # $1 = a conf line, or empty for the shipped default
   cp "$PKD/.memory-tree.conf.base" "$PKD/.memory-tree.conf"
   [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$PKD/.memory-tree.conf"

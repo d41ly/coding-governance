@@ -82,6 +82,29 @@ render and exited 1. The suite runs only on demand, so nothing noticed. It now c
   backslash-escaped space inserted a bare one, which ends a `case` pattern. The staged break was
   redone without a backslash.
 
+## The full bar at the tip, and what its three reds were
+
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at `2a29ae3c` ran 08:36 to 09:02
+UTC. 103 of 106 legs were green. Three were red:
+
+- `python resolver (behaviour + inline parity + idiom ban)` was red for the reason recorded at base.
+- `run-selftests self-test` timed out at its 300 s ceiling. The session had put other work on the
+  node during the bar, and this run came in under that load. Run alone at the same tip it printed
+  `PASS (43 arms, width 1)` in 103 s.
+- `memory-hygiene self-test` timed out at its 900 s ceiling. Run alone, it did NOT pass. Its
+  project-keys block copies the tree with `git archive HEAD` into a fresh repository that has no
+  history. Since `BASE_RESOLVE_CUTOFF`, check 12 resolves a live spec's `base` against the object
+  database, and this unit's own INPROGRESS spec names `base 24f8c712`, which that fixture could not
+  hold. So the clean-fixture arm and the four arms after it redded, and any branch in the middle of
+  an ordinary Tier-2 build hits the same five reds. Reproduced by hand with the same steps: check 12
+  names this spec's base.
+
+  The fixture now borrows the real object database through an alternates entry. It gets the same
+  objects without a copy, and nothing else the checker reads changes. With the entry, the same
+  reproduction exits 0, and the suite run alone at the same tree prints `PASS (374 assertions)`. The sibling fixture in
+  `hygiene-parity.test.sh` has the same exposure, but it was not observed, so it is carried as
+  `TOOL-dPolishedVitrine-9` rather than changed.
+
 ## Found by the bug-class checklist, after the build
 
 `python tools/memory-tree/gotchas.py --for-diff 24f8c712..HEAD` named 30 classes over this diff. Two

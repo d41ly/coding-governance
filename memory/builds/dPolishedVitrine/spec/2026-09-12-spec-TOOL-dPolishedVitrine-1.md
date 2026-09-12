@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived
 
-**Status:** INPROGRESS · rev-3 · 2026-09-12 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
+**Status:** INPROGRESS · rev-4 · 2026-09-12 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -46,7 +46,9 @@ Skill's copy of the same checklist line is fixed the same way.
   `tools/unattended/adopt-unattended.test.sh`, with their failing cases observed before the fix and
   recorded in the build journal. The adopter suite's `seed()` copies the kit's `*.template.md` by
   glob, because its hand list had fallen two templates behind the adopter and every adopt in it
-  was red at base. Observed by AC2, AC3, AC4, AC5, AC6, AC8 and AC12.
+  was red at base. The memory-hygiene self-test's project-keys fixture borrows the real object
+  database, because this unit's own live spec left its `base` unresolvable there and redded that
+  block. Observed by AC2, AC3, AC4, AC5, AC6, AC8, AC11 and AC12.
 - **S7** — the knock-on declarations. The runbook's copy-install step names the render, both kit
   READMEs say what is rendered, `memory/project/method-carriers.txt` declares the template, the
   review-harnesses dossier claims the new inventory key and records the renderer as a seam, and the
@@ -283,8 +285,10 @@ review-harnesses dossier, the generated map, and this build's records.
   Red when: a carrier is left at the old version and the gate stays green.
 - **AC11** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs on the
   branch tip, every leg is green except a leg that is also red at base, and the report names that
-  leg. `bash tools/unattended/run-unattended-gates.sh` prints GREEN.
-  Red when: a leg that was green at base is red at the tip.
+  leg. The suites `bash tools/unattended/run-unattended-gates.sh` delegates to show no FAIL at the
+  tip that the same suite does not show at base.
+  Red when: a leg that was green at base is red at the tip, or an unattended self-test arm that
+  passes at base fails at the tip.
   cost: the full bar with self-tests, sixteen minutes of wall on node `d` at base, plus the
   unattended self-tests, which run on demand and are measured in hours.
   figure: PINNED — 07:41 to 07:57 UTC on 2026-09-12, the base run this unit's journal records.
@@ -296,7 +300,7 @@ review-harnesses dossier, the generated map, and this build's records.
 
 ## 7. Gates
 
-`review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `verifier fan-out` · `install-prefix (shipped surface)` · `kit version markers` · `kit placeholders (a declared token its adopter substitutes)` · `govkit selfcheck` · `unattended skill wiring` · `unattended kit gate` · `lexicon naming predicates` · `method carriers (every pointer declared)` · `codebase-map coverage + freshness` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `verifier fan-out` · `install-prefix (shipped surface)` · `kit version markers` · `kit placeholders (a declared token its adopter substitutes)` · `govkit selfcheck` · `unattended skill wiring` · `unattended kit gate` · `lexicon naming predicates` · `method carriers (every pointer declared)` · `codebase-map coverage + freshness` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `memory-hygiene self-test` · `spec tokens (a spec's own names resolve)`
 
 Two suites carry this unit's arms, and neither is on any bar. `unattended-build.test.sh` is on none
 (`TOOL-dBriefedPass-7`), and `adopt-unattended.test.sh` runs only through
@@ -339,6 +343,12 @@ New arm: `tools/unattended/adopt-unattended.test.sh` · a seed tracking no gotch
   dossier. The probe is written twice, once per kit, and two comments claimed the two carriers
   cannot disagree while nothing checked it, which is the two-answers class: AC12 and its arm
   compare the two renders, and S6 names it.
+- rev-4 · 2026-09-12 · S6 · AC11 · AMENDED at the gate. AC11 asked the unattended kit's on-demand
+  runner to print GREEN, and at base it cannot: its gate selftest carries reds measured at
+  `24f8c712`, where a warning about an undeclared `DISPOSITION_CUTOFF` leaks into arms that expect
+  empty output and a DoD-floor arm's `sed` no longer matches `DOD_CORE`. The criterion now compares
+  the tip's FAIL set with base's. S6 grows the memory-hygiene self-test's fixture fix, which the
+  full bar forced: that fixture drops history, and this spec's `base` cannot resolve without it.
 
 ## 10. Reuse audit
 
