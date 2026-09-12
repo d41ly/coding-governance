@@ -1,0 +1,78 @@
+---
+slug: dPolishedVitrine
+node: d
+opened: 2026-09-12
+streams: tooling+deployer
+roster: TOOL
+authorized-by: prompt
+ids: TOOL-dPolishedVitrine-1
+---
+
+# dPolishedVitrine — the build harness is rendered at install, so its paths name the adopter's tree
+
+## The problem this build exists to solve
+
+`unattended-build.js` shipped as an engine file, and apply writes those verbatim. Its four install
+paths name the driver, the bug-class checklist, the review sub-workflow and the child it hands out,
+and every one reads `tools/…`. Both measured adopters install at `scripts`, so in their trees the
+AUDIT stage cannot reach its callee. They also install the memory-tree kit flat, so a fix that
+derived only the prefix would still name a checklist neither tree has. The unattended Skill spells
+the same checklist path, and it breaks the same way.
+
+## Expected improvements
+
+- The harness names files the installing tree actually has, at any prefix and any memory-tree layout.
+- One kit release fixes both adopters, with no hand-repath and no untagged delta.
+- A missing checklist script is a refusal at render time, never a command that runs nothing.
+
+## Detriments if this is not built
+
+- Every adopter at a non-`tools` prefix keeps a harness whose AUDIT stage cannot run.
+- Each adopter keeps repathing by hand, and re-pulling rolls those hand-edits back.
+
+## Build-level rules
+
+- **Derive, never guess.** The checklist's directory is probed from the tracked tree. A path nobody
+  has proved exists is a refusal that names the override.
+- **Every new arm is observed red before it lands.** HEAD's verbatim harness is the staged break.
+- **Consumers are not touched here.** Core and NicoCares re-pull this release later, and their own
+  records carry that.
+
+## Parked decisions
+
+- None yet.
+
+<!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dPolishedVitrine-1` | 2 | render the harness and the Skill's checklist line at install, with the memory-tree directory probed |
+
+<!-- /roster:units -->
+
+<!-- gen:build-index -->
+**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-09-12 · streams tooling+deployer
+ids TOOL-dPolishedVitrine-1
+
+<!-- gen:build-units -->
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-09-12 |
+<!-- /gen:build-units -->
+
+Records: 1 bound to this build, across 2 record folder(s).
+
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: TOOL-dPolishedVitrine-1.
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+*This build declares no parent and no build declares it as one.*
+<!-- /gen:build-edges -->
