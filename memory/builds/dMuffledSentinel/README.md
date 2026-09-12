@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-11
 streams: tooling
 roster: TOOL
-ids: TOOL-dMuffledSentinel-1
+ids: TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2
 authorized-by: prompt
 ---
 
@@ -18,17 +18,22 @@ the status away. inCMS carries a forked generator that never gained the mode, so
 there and all four population branches read an empty string. Measured over inCMS's 1531 records,
 check 21 printed one line, from the one branch that does not read the parse.
 
+Unit 2 is what closing inCMS's half ran into: both waiver registries are hard-coded under
+`<MEMORY_ROOT>/project/`, a directory inCMS retired, so an adopter without it cannot waive either leg.
+
 ## Expected improvements
 
 - A parse that exits non-zero, or exits zero without its `N` row, fails check 21 by name.
 - The refusal carries the delegate's own last lines, so an adopter sees the missing mode at once.
 - The class is catalogued, so a review of any gate that delegates is asked about it.
+- An adopter declares where its pass-order and trace waivers live, and gov's defaults do not move.
 
 ## Detriments if this is not built
 
 - Any adopter whose generator lacks the mode, or crashes on its corpus, keeps a check that cannot
   fail and reads as green.
 - The engine keeps one delegate whose failure is silent, beside four that are not.
+- An adopter without `memory/project/` must either re-open it or leave true findings unwaivable.
 
 ## Build-level rules
 
@@ -45,24 +50,26 @@ check 21 printed one line, from the one branch that does not read the parse.
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-dMuffledSentinel-1` | 1 | check 21 refuses a bindings parse that did not complete |
+| 2 | `TOOL-dMuffledSentinel-2` | 1 | the pass-order and trace waiver registries take a declared path |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 1 unit(s) · node d · opened 2026-09-11 · streams tooling
-ids TOOL-dMuffledSentinel-1
+**Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-09-11 · streams tooling
+ids TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dMuffledSentinel-1 — check 21 refuses a bindings parse that did not complete](spec/2026-09-11-spec-TOOL-dMuffledSentinel-1.md) | — | 1 | CLOSED | rev-2 | 2026-09-12 |
+| [TOOL-dMuffledSentinel-2 — the pass-order and trace waiver registries take a declared path](spec/2026-09-12-spec-TOOL-dMuffledSentinel-2.md) | — | 1 | INPROGRESS | rev-1 | 2026-09-12 |
 <!-- /gen:build-units -->
 
 Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dMuffledSentinel-2.
 
-Ids no `spec-audit` record has ever named: TOOL-dMuffledSentinel-1.
+Ids no `spec-audit` record has ever named: TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
