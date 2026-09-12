@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md](../build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md) | journal | — |
 | [2026-09-12-prompt-TOOL-dPolishedVitrine-1-0-owner-ruling.md](../prompts/2026-09-12-prompt-TOOL-dPolishedVitrine-1-0-owner-ruling.md) | journal | — |
+| [2026-09-12-review-TOOL-dPolishedVitrine-1-diff-review-round1.md](../reviews/2026-09-12-review-TOOL-dPolishedVitrine-1-diff-review-round1.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
