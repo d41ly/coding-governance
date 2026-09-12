@@ -1,10 +1,12 @@
 # TOOL-dMuffledSentinel-3 — the drift-audit and unattended versions move with the bytes unit 2 changed
 
-**Status:** INPROGRESS · rev-1 · 2026-09-12 · node d · Tier-1 · base 551a555e · streams tooling
+**Status:** CLOSED · rev-2 · 2026-09-12 · node d · Tier-1 · base 551a555e · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-12-build-TOOL-dMuffledSentinel-3-1-acceptance-ledger.md](../build/2026-09-12-build-TOOL-dMuffledSentinel-3-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -58,3 +60,5 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · §2 S1 S2 · opened after inCMS's `kit-versions` leg refused the pull of unit 2.
+- rev-2 · 2026-09-12 · S1 · the drift workflows' `meta.version` joins S1's carriers, found by AC1's first
+  run. Status CLOSED, every criterion met.
