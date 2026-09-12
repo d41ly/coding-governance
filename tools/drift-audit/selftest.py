@@ -608,6 +608,36 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     check("a waived spec is silent", v6w1["value"] == 0,
           f"got {v6w1['detail']} -- the waiver is not being read")
 
+    # THE REGISTRY'S PATH IS DECLARABLE (TOOL-dMuffledSentinel-2), over the same fixture. Moved out of
+    # `memory/project/` with no key, the spec FIRES again: that is the precondition, because an arm
+    # over a spec a stray file already silenced would pass without the key doing anything. Then the
+    # key names the new home and it is silent; then a declared path that is not there, and one outside
+    # the tree, each come back as a finding of their own rather than as an empty waiver set.
+    sigp = r / "drift-audit" / "drift_signals.py"
+    sig_base = sigp.read_text(encoding="utf-8")
+    moved = r / "waivers" / "trace.txt"
+    moved.parent.mkdir(parents=True, exist_ok=True)
+    moved.write_text(waiver.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
+    waiver.unlink()
+    v6m0 = report(r)["closed_specs_with_no_product_commit"]
+    check("a relocated registry with no TRACE_WAIVER waives nothing",
+          [d["id"] for d in v6m0["detail"]] == ["TOOL-aWaived-1"],
+          f"got {v6m0['detail']} -- the TRACE_WAIVER arm below would pass vacuously")
+    for decl, want, why in (
+        ("waivers/trace.txt", [], "TRACE_WAIVER reads the registry where it is declared"),
+        ("waivers/missing.txt", ["(declared TRACE_WAIVER)", "TOOL-aWaived-1"],
+         "a declared TRACE_WAIVER that is not there is a finding, not an empty waiver set"),
+        ("../trace.txt", ["(declared TRACE_WAIVER)", "TOOL-aWaived-1"],
+         "a declared TRACE_WAIVER outside the tree is a finding, not an empty waiver set"),
+    ):
+        sigp.write_text(sig_base + f'\nTRACE_WAIVER = "{decl}"\n', encoding="utf-8", newline="\n")
+        got = report(r)["closed_specs_with_no_product_commit"]
+        check(why, sorted(d["id"] for d in got["detail"]) == want, f"got {got['detail']}")
+    sigp.write_text(sig_base, encoding="utf-8", newline="\n")
+    waiver.write_text(moved.read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
+    moved.unlink()
+    moved.parent.rmdir()
+
     # A row must not outlive its subject. Deleting the spec leaves the row behind, which is the shape
     # that silently widens the exemption, so it has to come back as a finding rather than as silence.
     wspec.unlink()
