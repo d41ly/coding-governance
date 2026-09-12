@@ -39,10 +39,39 @@ role = "rendered"
 to = "{memory_root}/guides/REVIEW-PROTOCOL.md"
 placeholders = ["TOOL_ROOT"]
 
+# THE BUILD HARNESS IS RENDERED, not shipped. It went out as an engine file under the `**` rule
+# above, and apply writes those verbatim, so the four install paths it spells reached every adopter
+# at another prefix naming files that adopter does not have: the driver, the bug-class checklist, the
+# review sub-workflow it awaits and the child it hands the caller. A workflow script has no filesystem
+# at run time, so it cannot find its siblings itself; the render is the one derivation it can have.
+# The owner chose it on 2026-09-12 over having each caller pass the paths in.
+#
+# CLAIMING THE DESTINATION is what takes the old file out of the engine pool — `scan_claimed_paths`
+# drops from `**` every path another rule owns — while the TEMPLATE still ships under `**`, because
+# the adopter's render reads it. The playbook fixture made the same engine-to-rendered move one kit
+# over, for the same class, and its rule in the unattended descriptor says so.
+#
+# THREE TOKENS. `KIT_DIR` and `TOOL_ROOT` come from the kit's own location. `MEMORY_TREE_DIR` does
+# NOT come from `TOOL_ROOT`: an adopter may install the memory-tree kit flat in its tool root, and
+# both measured adopters do, so `TOOL_ROOT` plus `memory-tree/` names a file neither has. The renderer
+# PROBES the tracked tree for `gotchas.py` and refuses when it finds none.
+[[files]]
+include = ["unattended-build.template.js"]
+role = "rendered"
+to = "{kit}/unattended-build.js"
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR"]
+
 [adopt]
 argv = []
 mutates_index = false
-why_no_adopter = "the harness is copied and its protocol rendered; the render is performed by the parity gate's own --render mode rather than by a separate adopter"
+why_no_adopter = "both rendered artifacts, the review protocol and the build harness, are written by the parity gate's own --render mode rather than by a separate adopter; the [[regenerate]] block below runs that mode, so an update re-renders them"
+
+# THE RE-RENDER an update runs, with GOVKIT_RERENDER=1. Without it `update` lands a new template and
+# names this kit one vintage stale, because no adopter exists to refresh the two rendered rows. The
+# argv is this kit's own gate in its render mode, so the renderer and the leg that grades its output
+# are one file and cannot disagree about a token.
+[[regenerate]]
+argv = ["bash", "{kit}/check-protocol-parity.test.sh", "--render"]
 
 [[gate_leg]]
 name = "verifier fan-out"

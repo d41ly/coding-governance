@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# check-protocol-parity.test.sh — the review protocol this repo RUNS ON must equal the one this kit
-# SHIPS, modulo the declared install prefix. Exit 0 = in parity · 1 = drift · 2 = misconfigured.
+# check-protocol-parity.test.sh — every artifact this kit RENDERS must equal its template rendered
+# for this install. Exit 0 = in parity · 1 = drift · 2 = misconfigured.
 #
 #   bash tools/workflows/check-protocol-parity.test.sh            # assert parity
-#   bash tools/workflows/check-protocol-parity.test.sh --render    # rewrite the shipped copy
+#   bash tools/workflows/check-protocol-parity.test.sh --render    # (re)write every rendered copy
 #
 # WHY THIS KIT OWNS IT. `tools/memory-tree/kit-dogfood-parity.test.sh` does exactly this job for the
 # memory-tree kit's two documents, and the obvious move was to add a third pair to its list. That
@@ -11,55 +11,203 @@
 # memory-tree alone would get a gate demanding a file their tree has no reason to contain, and the
 # memory-tree kit would carry knowledge of a kit it does not depend on. Each kit gates its own pairs.
 #
-# THE SUBSTITUTION is the same one, for the same reason: the kit ships TOOL-ROOT-RELATIVE paths
-# (`workflows/…`, `hooks/…`) because an adopter chooses where the kits live, and this repo installs
-# them under `tools/`. Only that leading prefix may differ; anything else is drift.
+# THE PAIRS, declared once in `PAIRS` below, and there are TWO. The review protocol this repo RUNS ON,
+# and the unattended BUILD HARNESS. The harness joined this list when it stopped shipping verbatim:
+# apply writes an engine file's bytes unchanged, so every install path it spelled arrived in a tree
+# installed at another prefix naming files that tree does not have — the driver, the bug-class
+# checklist, the sub-workflow it awaits and the child it hands the caller. A workflow script has no
+# filesystem at run time, so it cannot derive those paths itself. Rendering at install is the one
+# derivation it can have, and the owner chose it on 2026-09-12 over having each caller pass the paths
+# in. `kit.toml` declares both pairs `rendered` and names `--render` as the entry's `[[regenerate]]`
+# argv, so an update re-renders them rather than leaving either a vintage stale.
+#
+# THREE TOKENS, and each one is DERIVED here rather than typed:
+#   KIT_DIR          this kit's directory, repo-relative — the harness's own siblings live in it
+#   TOOL_ROOT        the directory the kits sit in, with a trailing slash; empty at a root install
+#   MEMORY_TREE_DIR  the directory holding the memory-tree kit's `gotchas.py`
+# The third is NOT derivable from the second. Both adopters measured when this was written install
+# the memory-tree kit FLAT, directly in their tool root, so `TOOL_ROOT` plus `memory-tree/` names a
+# file neither of them has. It is PROBED instead: the first TRACKED of the nested and the flat
+# spelling wins, and neither being tracked is a REFUSAL naming the override. It never guesses,
+# because a guessed path renders a checklist command that runs nothing and reads as a clean one.
+#
+# WHAT THIS DOES NOT CHECK. It compares each render against its template and asserts no placeholder
+# survives. It does NOT prove a rendered path RESOLVES: `TOOL_ROOT` plus `unattended/` is taken on
+# the kit-layout convention, and only `MEMORY_TREE_DIR` is asserted to exist. The harness's own
+# suite, `unattended-build.test.sh`, holds the class arm that every path the harness emits is
+# tracked, and it is a kit self-test that no boundary runs.
 set -u
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "protocol-parity: not a git repo"; exit 2; }
-cd "$ROOT" || exit 2
-MEMORY_ROOT=memory
-[ -f "$ROOT/.memory-tree.conf" ] && . "$ROOT/.memory-tree.conf"
-M="$MEMORY_ROOT"
+MODE="${1:---check}"
+case "$MODE" in
+  --check|--render) ;;
+  *) echo "usage: $0 [--check|--render]"; exit 2 ;;
+esac
+
+# THE KIT'S OWN LOCATION, BY A LOGICAL WALK TO THE NEAREST `.git`. This used to strip the repo root
+# off the kit dir as two path STRINGS, and under MSYS one directory has two spellings — git reports
+# `C:/Users/…/Temp/x` while a caller standing in `/tmp/x` reports that — so the strip no-opped and
+# the script refused a kit that was plainly inside the repo. The walk compares nothing: it builds
+# the relative path from basenames and stops at the first `.git`, which is a FILE in a linked
+# worktree, hence `-e`. The unattended adopter's walk, copied rather than invented.
 HERE="$(cd "$(dirname "$0")" && pwd)"
-# Both sides through the same `cd … && pwd`: under MSYS one directory has two spellings, and a raw
-# prefix strip across those flavors silently yields an absolute path.
-ROOT_N="$(cd "$ROOT" && pwd)"
-KITREL=${HERE#"$ROOT_N"/}
-[ "$KITREL" = "$HERE" ] && { echo "protocol-parity: cannot locate this kit inside the repo ($HERE vs $ROOT_N)"; exit 2; }
+KIT_ROOT=""; KITREL=""; _p="$HERE"
+while : ; do
+  _parent="$(dirname "$_p")"
+  [ "$_parent" = "$_p" ] && break
+  KITREL="$(basename "$_p")${KITREL:+/$KITREL}"
+  if [ -e "$_parent/.git" ]; then KIT_ROOT="$_parent"; break; fi
+  _p="$_parent"
+done
+[ -n "$KIT_ROOT" ] || { echo "protocol-parity: the kit at $HERE is not inside a git repository"; exit 2; }
+cd "$KIT_ROOT" || exit 2
+git rev-parse --show-toplevel >/dev/null 2>&1 || { echo "protocol-parity: not a git repo"; exit 2; }
+MEMORY_ROOT=memory
+[ -f .memory-tree.conf ] && . ./.memory-tree.conf
+M="$MEMORY_ROOT"
 TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
 [ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"   # "tools/" at a prefix, "" at a root install
 
-LIVE="$M/guides/REVIEW-PROTOCOL.md"
-SHIP="$KITREL/REVIEW-PROTOCOL.template.md"
-MODE="${1:---check}"
+# The pairs: `<live copy>|<template>`, both repo-relative. The render of each template is the live
+# copy's ENTIRE expected content.
+PAIRS="$M/guides/REVIEW-PROTOCOL.md|$KITREL/REVIEW-PROTOCOL.template.md
+$KITREL/unattended-build.js|$KITREL/unattended-build.template.js"
 
-# A RENDER, not a strip. The shipped template carries a brace-delimited TOOL_ROOT placeholder and
-# this substitutes it, so what the gate grades is exactly what an adopter installs. The old form was
-# an unanchored global `sed "s|tools/||g"` over the LIVE copy, which stripped every occurrence of
-# `tools/` rather than a leading kit path, and left the SHIPPED template spelling a root install — so
-# an adopter at a prefix installed a protocol document naming files they do not have.
-render() { sed -e "s|{{TOOL_ROOT}}|$TOOLROOT|g" -e 's/\r$//' "$1"; }
+check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
 
-[ -f "$LIVE" ] || { echo "protocol-parity: missing live copy $LIVE"; exit 1; }
-case "$MODE" in
-  --render) render "$SHIP" > "$LIVE"; echo "protocol-parity: rendered $LIVE from $SHIP"; exit 0 ;;
-  --check) ;;
-  *) echo "usage: $0 [--check|--render]"; exit 2 ;;
+# MEMORY_TREE_DIR — the probe, then the refusal. The OVERRIDE is an environment variable and it is a
+# HAND-INSTALL channel only: the gate leg runs this file with no environment of its own, so a tree
+# that needs the override on its bar has to export it there too. That is the drift-audit adopter's
+# recorded limit for its own sibling override, met again rather than solved. An override is asserted
+# exactly as a probe answer is, because a wrong answer typed by a person runs nothing either.
+MTD=""
+if [ -n "${MEMORY_TREE_DIR:-}" ]; then
+  _mtd=${MEMORY_TREE_DIR%/}
+  if check_tracked "$_mtd/gotchas.py"; then MTD="$_mtd"
+  else
+    echo "protocol-parity: MEMORY_TREE_DIR is set to '$MEMORY_TREE_DIR', and '$_mtd/gotchas.py' is not"
+    echo "  tracked in this repo. The harness would render a checklist command naming a file that does"
+    echo "  not exist. Point it at the directory that holds the memory-tree kit's gotchas.py."
+    exit 2
+  fi
+else
+  for _c in "${TOOLROOT}memory-tree/gotchas.py" "${TOOLROOT}gotchas.py"; do
+    if check_tracked "$_c"; then MTD=$(dirname "$_c"); break; fi
+  done
+  if [ -z "$MTD" ]; then
+    echo "protocol-parity: cannot derive MEMORY_TREE_DIR — neither ${TOOLROOT}memory-tree/gotchas.py"
+    echo "  nor ${TOOLROOT}gotchas.py is tracked in this repo. The build harness names the memory-tree"
+    echo "  kit's bug-class checklist by path, and a guessed path is a command that runs nothing."
+    echo "  If that kit is installed somewhere else, set MEMORY_TREE_DIR=<the directory holding"
+    echo "  gotchas.py> and re-run. Nothing was written."
+    exit 2
+  fi
+fi
+# AN UNSUPPORTED CHARACTER IS A REFUSAL. Both values land inside a single-quoted JS string in the
+# harness and inside a shell command an agent runs, so a quote ends the string early and a space
+# splits the command. The set is a path's, and no install measured so far needs more.
+case "$KITREL/$MTD" in
+  *[!A-Za-z0-9._/+@-]*)
+    echo "protocol-parity: the kit path '$KITREL' or MEMORY_TREE_DIR '$MTD' holds a character outside"
+    echo "  [A-Za-z0-9._/+@-]. Both are interpolated into a JS string literal and a shell command, where"
+    echo "  a quote ends the string and a space splits the command. Nothing was written."
+    exit 2 ;;
 esac
-[ -f "$SHIP" ] || { echo "protocol-parity: missing shipped copy $SHIP"; exit 1; }
-if ! diff -q <(sed 's/\r$//' "$LIVE") <(render "$SHIP") >/dev/null; then
-  echo "protocol-parity: DRIFT — $LIVE does not match $SHIP rendered for this install ('$KITREL')"
-  diff <(sed 's/\r$//' "$LIVE") <(render "$SHIP") | head -30 | sed 's/^/    /'
-  echo "    fix: bash $KITREL/check-protocol-parity.test.sh --render"
+
+# A RENDER, not a strip, and no `sed`. Parameter substitution with a QUOTED replacement treats `&`,
+# `|` and `\` in a value as themselves; `sed` would read the first two as syntax, and the override
+# above is a value a person types. `$( )` strips every trailing newline, hence the `X` sentinel, and
+# `cat` exits the substitution itself because a substitution reports its LAST command's status.
+# Only a CR that ENDS a line is dropped, which is what the `sed 's/\r$//'` this replaced did.
+render() { # template -> stdout
+  local out
+  out=$( cat "$1" || exit 1; printf X ) || return 1
+  out=${out%X}
+  out=${out//$'\r\n'/$'\n'}; out=${out%$'\r'}
+  out=${out//\{\{KIT_DIR\}\}/"$KITREL"}
+  out=${out//\{\{TOOL_ROOT\}\}/"$TOOLROOT"}
+  out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MTD"}
+  printf '%s' "$out"
+}
+read_lf() { sed 's/\r$//' "$1"; }
+
+# EVERY TEMPLATE THIS KIT SHIPS IS A PAIR. A template with no pair renders nowhere, and its live
+# copy — if anything writes one — is graded by nobody. Asserted over the tracked set, so a new
+# template reds here the day it lands rather than the day somebody notices its render drifted.
+_unpaired=""
+# Captured FIRST and fed from a variable: a loop reading a heredoc that holds a command substitution
+# is the shape the shell-hygiene leg bans, because its reader can wait on EOF forever under MSYS.
+_tpls=$(git ls-files -- "$KITREL/*.template.*")
+while IFS= read -r _t; do
+  [ -n "$_t" ] || continue
+  case "
+$PAIRS
+" in *"|$_t
+"*) ;; *) _unpaired="$_unpaired $_t" ;; esac
+done <<EOF
+$_tpls
+EOF
+if [ -n "$_unpaired" ]; then
+  echo "protocol-parity: a template this kit ships renders to nothing this script grades:$_unpaired"
+  echo "  add its pair to PAIRS and a \`rendered\` rule to kit.toml, or it ships an artifact nobody checks"
   exit 1
 fi
-# A surviving placeholder would ship a literal token into an adopter's protocol document, and the
-# diff above cannot see it: a live copy rendered by the same broken substitution matches perfectly.
-if render "$SHIP" | grep -q '{{[A-Z_]*}}'; then
-  echo "protocol-parity: $SHIP still holds an unsubstituted placeholder after rendering:"
-  render "$SHIP" | grep -n '{{[A-Z_]*}}' | head -5 | sed 's/^/    /'
-  exit 1
+
+TMPD=$(mktemp -d) || exit 2
+trap 'rm -rf "$TMPD"' EXIT
+bad=0; i=0
+while IFS='|' read -r LIVE SHIP; do
+  [ -n "$LIVE" ] || continue
+  i=$((i+1))
+  [ -f "$SHIP" ] || { echo "protocol-parity: missing shipped copy $SHIP"; bad=1; continue; }
+  if ! render "$SHIP" > "$TMPD/$i"; then
+    echo "protocol-parity: the render of $SHIP FAILED — the template could not be read"; bad=1; continue
+  fi
+  [ -s "$TMPD/$i" ] || { echo "protocol-parity: the render of $SHIP is EMPTY, and an empty file matches an empty file"; bad=1; continue; }
+  # A surviving placeholder would ship a literal token into an adopter's tree, and the diff below
+  # cannot see it: a live copy rendered by the same broken substitution matches perfectly.
+  if grep -q '{{[A-Z_]*}}' "$TMPD/$i"; then
+    echo "protocol-parity: $SHIP still holds an unsubstituted placeholder after rendering:"
+    grep -n '{{[A-Z_]*}}' "$TMPD/$i" | head -5 | sed 's/^/    /'
+    bad=1; continue
+  fi
+  if [ "$MODE" = --render ]; then
+    continue
+  fi
+  if [ ! -f "$LIVE" ]; then
+    echo "protocol-parity: missing live copy $LIVE"
+    echo "    fix: bash $KITREL/check-protocol-parity.test.sh --render"
+    bad=1; continue
+  fi
+  if ! diff -q <(read_lf "$LIVE") "$TMPD/$i" >/dev/null; then
+    echo "protocol-parity: DRIFT — $LIVE does not match $SHIP rendered for this install ('$KITREL')"
+    diff <(read_lf "$LIVE") "$TMPD/$i" | head -30 | sed 's/^/    /'
+    echo "    fix: bash $KITREL/check-protocol-parity.test.sh --render"
+    bad=1
+  fi
+done <<EOF
+$PAIRS
+EOF
+[ "$i" -gt 0 ] || { echo "protocol-parity: PAIRS resolved to nothing, so this run graded nothing"; exit 1; }
+
+# --render WRITES ONLY WHEN EVERY PAIR RENDERED CLEAN. A half-written set is two vintages of one
+# kit, and the check that follows would report the half nobody wrote as drift somewhere else.
+# A MISSING live copy is created: an update that lands this kit fresh has none to overwrite.
+if [ "$MODE" = --render ]; then
+  [ "$bad" = 0 ] || { echo "protocol-parity: nothing was written"; exit 1; }
+  i=0
+  while IFS='|' read -r LIVE SHIP; do
+    [ -n "$LIVE" ] || continue
+    i=$((i+1))
+    mkdir -p "$(dirname "$LIVE")" && cp "$TMPD/$i" "$LIVE" || { echo "protocol-parity: could not write $LIVE"; exit 1; }
+    echo "protocol-parity: rendered $LIVE from $SHIP"
+  done <<EOF
+$PAIRS
+EOF
+  exit 0
 fi
+[ "$bad" = 0 ] || exit 1
+
+LIVE="$M/guides/REVIEW-PROTOCOL.md"
 # A parity check that compares two empty files passes. Assert the population is real: the live copy
 # must carry the rule this document exists to state, or "in parity" means "both are wrong".
 #
@@ -96,4 +244,4 @@ for _sec in 'The hard cap' 'Concurrency'; do
     || { echo "protocol-parity: $LIVE's '$_sec' section states a bound without naming the file that RESOLVES it (expected 'agent-cap.js' inside that section) — a bound an agent cannot look up"; _p_bad=1; }
 done
 [ "$_p_bad" = 0 ] || exit 1
-echo "protocol-parity: in parity — $LIVE == $SHIP rendered for '$KITREL'"
+echo "protocol-parity: in parity — $i rendered pair(s) match their templates for '$KITREL' (MEMORY_TREE_DIR '$MTD')"

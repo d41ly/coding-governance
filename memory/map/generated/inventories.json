@@ -139,6 +139,7 @@
       "drift-audit-state.js",
       "tier2-review.js",
       "unattended-build.js",
+      "unattended-build.template.js",
       "unattended-unit.js"
     ],
     "skill-engines": [

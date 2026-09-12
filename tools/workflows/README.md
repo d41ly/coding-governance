@@ -11,6 +11,30 @@ Three gates in this directory read the tree and delegate their verdict to the ag
 `tier2-review.js` is the ready-made harness they exist to protect. It carries this directory's
 version under **two** kit ids, and both are paired — see its line 3 and `check-kit-versions.sh`.
 
+## What this kit RENDERS, and its one renderer
+
+`check-protocol-parity.test.sh --render` writes both artifacts below, and the same script with no
+argument is the leg that grades them:
+
+| rendered | from | tokens |
+|---|---|---|
+| `<memory root>/guides/REVIEW-PROTOCOL.md` | `REVIEW-PROTOCOL.template.md` | `TOOL_ROOT` |
+| `unattended-build.js`, beside its template | `unattended-build.template.js` | `KIT_DIR`, `TOOL_ROOT`, `MEMORY_TREE_DIR` |
+
+**Edit the template, never the render.** The build harness names four install paths: the driver,
+the bug-class checklist, the review sub-workflow it awaits and the child it hands the caller. A
+workflow script has no filesystem when it runs, so it cannot find its siblings, and apply would
+write a shipped copy verbatim, naming this repo's `tools/` layout in every adopter. So the kit
+renders it instead, and `kit.toml`'s `[[regenerate]]` block re-runs the render on an update.
+
+**`MEMORY_TREE_DIR` is probed, not derived.** An adopter may install the memory-tree kit flat in
+its tool root, so the tool root plus `memory-tree/` is not an answer. The render takes the first
+TRACKED of `{{TOOL_ROOT}}memory-tree/gotchas.py` and `{{TOOL_ROOT}}gotchas.py`, and refuses when
+neither is tracked. If yours is somewhere else, run the render with `MEMORY_TREE_DIR=<dir>` exported.
+That override comes only from the environment, so a tree that needs it on its bar exports it there
+too. A template in this directory with no pair in the script is a red, so a new one cannot ship
+ungraded.
+
 ## How the three find things — stated ONCE, for all of them
 
 **None of these scripts spells an install prefix.** They ran with `tools/` hard-coded until

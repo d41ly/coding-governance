@@ -222,11 +222,11 @@ if (attended && a.runStateExists === true) {
   )
 }
 
-const DRIVER = 'bash tools/unattended/unattended.sh'
+const DRIVER = 'bash {{TOOL_ROOT}}unattended/unattended.sh'
 // THE BUG-CLASS CHECKLIST TRAVELS IN `dispatch.args`. It used to be spelled inside the BUILD prompt
 // this unit deletes, and the child cannot carry it: a shipped kit file names nothing outside itself
 // by literal, so it lives in the parent, whose install paths are filled in when it is rendered.
-const CHECKLIST = 'python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD'
+const CHECKLIST = 'python {{MEMORY_TREE_DIR}}/gotchas.py --for-diff HEAD~1..HEAD'
 const ordered = units.slice().sort(function (x, y) {
   const ox = Number.isInteger(x.order) ? x.order : 1e9
   const oy = Number.isInteger(y.order) ? y.order : 1e9
@@ -477,7 +477,7 @@ if (specRefused.length) log('spec stage: ' + specRefused.length + ' unit(s) REFU
 phase('Audit')
 // ============================ TOOL-dRatifiedSeam-1 S1 — THE SPAWN MOVED TO WHERE THE TOOL IS ====
 // WHAT WAS WRONG. This stage used to spawn an AGENT whose prompt said: run the shipped harness as
-// a Workflow, with `scriptPath: tools/workflows/tier2-review.js`. That agent is a SIDECHAIN agent,
+// a Workflow, with `scriptPath: {{KIT_DIR}}/tier2-review.js`. That agent is a SIDECHAIN agent,
 // and a sidechain holds neither `Workflow` nor `Agent` — the capability is ABSENT, not policed, as
 // `AGENTS.md` §8 states and as the stage agent proved by searching the deferred registry three
 // times, refusing to fabricate a verdict, and writing nothing. It was right on every count. The
@@ -495,7 +495,7 @@ phase('Audit')
 // at depth zero; which is exactly why a stale sentence about it would sit unread until it misled
 // somebody.
 //
-// FIRST CALLER IN THE REPO. `grep -rnE '\bworkflow\(' tools/workflows/*.js` returned nothing before
+// FIRST CALLER IN THE REPO. `grep -rnE '\bworkflow\(' {{KIT_DIR}}/*.js` returned nothing before
 // this line, which is why S4 OBSERVES the route end to end rather than asserting it.
 //
 // THE SPLIT IS FORCED, NOT CHOSEN, and measuring it is what produced this shape. `tier2-review.js`
@@ -544,7 +544,7 @@ if (badSubject !== -1) {
 }
 
 const auRaw = await workflow(
-  { scriptPath: 'tools/workflows/tier2-review.js' },
+  { scriptPath: '{{KIT_DIR}}/tier2-review.js' },
   {
     kind: 'spec-audit',
     repo: repo,
@@ -906,7 +906,7 @@ return {
   // reaches it except through its BRIEF file, because `--brief` is the only carrier that hashes
   // anything; nothing hashes a prompt string.
   dispatch: {
-    scriptPath: 'tools/workflows/unattended-unit.js',
+    scriptPath: '{{KIT_DIR}}/unattended-unit.js',
     // THE MODE IS AN INVARIANT AND IT TRAVELS. Left off, the child was mode-blind and ordered
     // `--dispatch` and `--brief` unconditionally — both `fail 49` without a run-state file, which is
     // the state attended mode is DEFINED by, under a child prompt saying a refusal is BINDING. So

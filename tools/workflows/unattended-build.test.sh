@@ -605,5 +605,173 @@ has "F4 the same pairing under CEILING hands out no roster" "$o" '"roster":[]'
 o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
 has "F4 the hand-out carries what stood, empty and explicit" "$o" '"standing":[]'
 
+# ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
+# The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
+# spelled reached a tree installed at another prefix naming files that tree does not have: the
+# driver, the bug-class checklist, the review sub-workflow it awaits and the child it hands out.
+# Both adopters measured when this landed install at `scripts`, and both install the memory-tree kit
+# FLAT. So the fixture carrying the weight is the flat one: a fix that derived only the prefix passes
+# a nested layout and still names a checklist script the flat one does not have.
+#
+# EACH LAYOUT IS A REAL REPOSITORY built from this kit's own files, and it is rendered by the
+# fixture's OWN copy of the parity script, which is the command the kit's `[[regenerate]]` block runs
+# in an adopter. The expected values are TYPED per layout and never read back out of a render: an
+# expectation derived by the same derivation it grades agrees with whatever that derivation did.
+#
+# ARM (v) IS THE CLASS ARM and the independent oracle. Every `.js`, `.sh` and `.py` path the harness
+# emits, in its trace or its return, has to be one `git ls-files` answers for in the fixture. The
+# other four arms name the four sites this unit knows about; this one catches a fifth nobody named.
+#
+# TWO NEGATIVE CONTROLS keep the five arms honest on every run, because an arm only ever seen to pass
+# is an assertion about nothing. The harness spelled for this repo's own install — which is what
+# apply wrote before this unit — reds all five. A template whose checklist is `{{TOOL_ROOT}}memory-tree/`
+# reds (iv) and (v) and passes the rest, which is the prefix-only fix measured in one line.
+LAY=$(mktemp -d) || exit 2
+trap 'rm -rf "$LAY"' EXIT
+
+build_layout() { # dir · kit dir · unattended dir · checklist script, or '' for none -> a git repo
+  local d=$1 kd=$2 ud=$3 gp=$4
+  mkdir -p "$d/$kd" "$d/$ud" "$d/memory/guides"
+  ( cd "$d" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false )
+  cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" \
+     "$HERE/REVIEW-PROTOCOL.template.md" "$HERE/tier2-review.js" "$HERE/unattended-unit.js" "$d/$kd/"
+  printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"
+  if [ -n "$gp" ]; then mkdir -p "$(dirname "$d/$gp")"; printf '# a stub checklist\n' > "$d/$gp"; fi
+  ( cd "$d" && git add -A )
+}
+run_layout() { # dir · kit dir · [--render] -> the parity script's output, then `rc=<exit>`
+  ( cd "$1" && bash "$2/check-protocol-parity.test.sh" ${3:-} 2>&1; echo "rc=$?" )
+}
+read_field() { # json · dotted key -> the value, or an empty line
+  node -e 'let v = JSON.parse(process.argv[1]); for (const k of process.argv[2].split(".")) v = v == null ? v : v[k]; console.log(v == null ? "" : v)' "$1" "$2"
+}
+check_layout() { # label · dir · kit dir · tool root · checklist dir · five expected verdicts, G or R
+  local label=$1 d=$2 kd=$3 tr=$4 mt=$5 want=$6 o res toks tok miss="" pop got="" k g w
+  o=$(run_wf "$UNITS" "$(returns CONVERGED 0)" "$d/$kd/unattended-build.js")
+  res=$(printf '%s\n' "$o" | sed -n 's/^RESULT //p')
+  # A HARNESS THAT DID NOT RETURN CANNOT BE GRADED. Five reds from a throw would satisfy a negative
+  # control while grading nothing, which is the vacuous-selector shape one level inside the arm.
+  n=$((n+1))
+  if [ -z "$res" ]; then
+    echo "FAIL $label -- the harness did not return: $(printf '%s\n' "$o" | tail -1)"; st=1; return
+  fi
+  echo "ok   $label -- the harness ran to its hand-out"
+  printf '%s\n' "$o" | grep -qxF "workflow:$kd/tier2-review.js" && got="${got}G" || got="${got}R"
+  [ "$(read_field "$res" dispatch.scriptPath)" = "$kd/unattended-unit.js" ] && got="${got}G" || got="${got}R"
+  [ "$(read_field "$res" dispatch.args.driver)" = "bash ${tr}unattended/unattended.sh" ] && got="${got}G" || got="${got}R"
+  [ "$(read_field "$res" dispatch.args.checklist)" = "python $mt/gotchas.py --for-diff HEAD~1..HEAD" ] && got="${got}G" || got="${got}R"
+  # The population is every path-shaped token in the whole output, NOT the four sites above, and its
+  # size is asserted: fewer than four means the extraction found nothing to grade.
+  toks=$(printf '%s\n' "$o" | grep -oE '(^|[^A-Za-z0-9_./~-])[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)+\.(js|sh|py)' \
+         | sed -E 's#^[^A-Za-z0-9_.-]##' | sort -u)
+  pop=$(printf '%s\n' "$toks" | grep -c . || true)
+  while IFS= read -r tok; do
+    [ -n "$tok" ] || continue
+    git -C "$d" ls-files --error-unmatch -- ":(literal)$tok" >/dev/null 2>&1 || miss="$miss $tok"
+  done <<EOF
+$toks
+EOF
+  [ "$pop" -ge 4 ] && [ -z "$miss" ] && got="${got}G" || got="${got}R"
+  set -- "(i) the AUDIT stage awaits $kd/tier2-review.js" \
+         "(ii) dispatch.scriptPath is $kd/unattended-unit.js" \
+         "(iii) dispatch.args.driver runs ${tr}unattended/unattended.sh" \
+         "(iv) dispatch.args.checklist runs $mt/gotchas.py" \
+         "(v) all $pop emitted js/sh/py path(s) are tracked in the layout"
+  for k in 1 2 3 4 5; do
+    g=${got:k-1:1}; w=${want:k-1:1}; n=$((n+1))
+    if [ "$g" = "$w" ]; then
+      [ "$w" = G ] && echo "ok   $label $1" || echo "ok   $label $1 -- REDS, as this control requires"
+    else
+      echo "FAIL $label $1 -- got $g, want $w"; st=1
+    fi
+    shift
+  done
+  if [ "$got" != "$want" ]; then
+    echo "     driver    '$(read_field "$res" dispatch.args.driver)'"
+    echo "     checklist '$(read_field "$res" dispatch.args.checklist)'"
+    echo "     untracked:${miss:- none}"
+  fi
+}
+
+# ---- AC2: the FLAT layout, which is what both measured adopters are.
+FL="$LAY/flat"; build_layout "$FL" scripts/workflows scripts/unattended scripts/gotchas.py
+o=$(run_layout "$FL" scripts/workflows)
+has "PV-AC5 --check before any render: a missing live copy is a red" "$o" "missing live copy scripts/workflows/unattended-build.js"
+has "PV-AC5 ...and it exits 1" "$o" "rc=1"
+o=$(run_layout "$FL" scripts/workflows --render)
+has "PV-AC5 --render creates the missing live copy" "$o" "rendered scripts/workflows/unattended-build.js from"
+has "PV-AC5 ...at exit 0" "$o" "rc=0"
+check_layout "PV-AC2 flat:" "$FL" scripts/workflows scripts/ scripts GGGGG
+o=$(run_layout "$FL" scripts/workflows)
+has "PV-AC2 flat: the parity leg passes on its own render" "$o" "rc=0"
+has "PV-AC2 flat: ...and names the directory it probed" "$o" "MEMORY_TREE_DIR 'scripts'"
+
+# ---- AC3: the NESTED layout, and two ROOT installs, one of each memory-tree shape.
+NE="$LAY/nested"; build_layout "$NE" scripts/workflows scripts/unattended scripts/memory-tree/gotchas.py
+run_layout "$NE" scripts/workflows --render >/dev/null
+check_layout "PV-AC3 nested:" "$NE" scripts/workflows scripts/ scripts/memory-tree GGGGG
+RT="$LAY/root"; build_layout "$RT" workflows unattended memory-tree/gotchas.py
+run_layout "$RT" workflows --render >/dev/null
+check_layout "PV-AC3 root:" "$RT" workflows "" memory-tree GGGGG
+RF="$LAY/rootflat"; build_layout "$RF" workflows unattended gotchas.py
+run_layout "$RF" workflows --render >/dev/null
+check_layout "PV-AC3 root, flat memory-tree:" "$RF" workflows "" . GGGGG
+
+# ---- AC4: no checklist script anywhere the probe looks is a REFUSAL, and nothing is written.
+NO="$LAY/none"; build_layout "$NO" scripts/workflows scripts/unattended ""
+o=$(run_layout "$NO" scripts/workflows --render)
+has "PV-AC4 no gotchas.py: --render refuses at exit 2" "$o" "rc=2"
+has "PV-AC4 ...and names the override" "$o" "set MEMORY_TREE_DIR="
+absent_harness=yes; [ -e "$NO/scripts/workflows/unattended-build.js" ] && absent_harness=no
+same "PV-AC4 ...and writes no harness" "$absent_harness" "yes"
+# The OVERRIDE, both directions: honoured where it names a tracked script, refused where it does not.
+OV="$LAY/override"; build_layout "$OV" scripts/workflows scripts/unattended vendor/mt/gotchas.py
+o=$( (cd "$OV" && MEMORY_TREE_DIR=vendor/mt bash scripts/workflows/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
+has "PV-AC4 override: --render honours MEMORY_TREE_DIR" "$o" "rc=0"
+check_layout "PV-AC4 override:" "$OV" scripts/workflows scripts/ vendor/mt GGGGG
+o=$( (cd "$OV" && MEMORY_TREE_DIR=vendor/nowhere bash scripts/workflows/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
+has "PV-AC4 override naming an untracked script is refused" "$o" "rc=2"
+# A TRACKED override that holds a space still refuses: the value lands in a shell command an agent
+# runs, where the space splits it. The tracked test passes first, so only the charset arm can stop it.
+mkdir -p "$OV/vendor/m t" && printf '# stub\n' > "$OV/vendor/m t/gotchas.py" && ( cd "$OV" && git add -A )
+o=$( (cd "$OV" && MEMORY_TREE_DIR='vendor/m t' bash scripts/workflows/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
+has "PV-AC4 a tracked override holding a space is refused" "$o" "holds a character outside"
+has "PV-AC4 ...at exit 2" "$o" "rc=2"
+
+# ---- AC5: the parity script catches what it exists to catch.
+cp "$FL/scripts/workflows/unattended-build.js" "$LAY/flat-render.js"
+# APPENDED rather than substituted. The first cut edited one path in place, and when the template it
+# ran against spelled that path differently the edit matched nothing, the render stayed pristine and
+# this arm reported a missing DRIFT for a break that was never staged. An appended line cannot miss.
+printf '// a hand edit an adopter made in place\n' >> "$FL/scripts/workflows/unattended-build.js"
+o=$(run_layout "$FL" scripts/workflows)
+has "PV-AC5 a hand-edited render reds the parity leg" "$o" "DRIFT"
+has "PV-AC5 ...at exit 1" "$o" "rc=1"
+cp "$LAY/flat-render.js" "$FL/scripts/workflows/unattended-build.js"
+cp "$FL/scripts/workflows/REVIEW-PROTOCOL.template.md" "$FL/scripts/workflows/stray.template.md"
+( cd "$FL" && git add scripts/workflows/stray.template.md )
+o=$(run_layout "$FL" scripts/workflows)
+has "PV-AC5 a template with no pair reds the parity leg" "$o" "renders to nothing this script grades: scripts/workflows/stray.template.md"
+has "PV-AC5 ...at exit 1" "$o" "rc=1"
+( cd "$FL" && git rm -q --cached scripts/workflows/stray.template.md ) && rm -f "$FL/scripts/workflows/stray.template.md"
+o=$(run_layout "$FL" scripts/workflows)
+has "PV-AC5 control: with the render and the pairs restored the leg is green again" "$o" "rc=0"
+
+# ---- AC6: the two NEGATIVE CONTROLS.
+# The harness spelled for THIS repo's install, which is what apply shipped before this unit. The
+# three values are this repo's own layout and none of them names a file, so the carried-prefix ban
+# has nothing here to count.
+VB="$LAY/verbatim"; build_layout "$VB" scripts/workflows scripts/unattended scripts/gotchas.py
+sed -e 's|{{KIT_DIR}}|tools/workflows|g' -e 's|{{TOOL_ROOT}}|tools/|g' -e 's|{{MEMORY_TREE_DIR}}|tools/memory-tree|g' \
+    "$HERE/unattended-build.template.js" > "$VB/scripts/workflows/unattended-build.js"
+check_layout "PV-AC6 the verbatim spelling:" "$VB" scripts/workflows scripts/ scripts RRRRR
+# The prefix-only half-fix: correct for this repo, and wrong for both measured adopters.
+HF="$LAY/halffix"; build_layout "$HF" scripts/workflows scripts/unattended scripts/gotchas.py
+sed -i 's|{{MEMORY_TREE_DIR}}/gotchas.py|{{TOOL_ROOT}}memory-tree/gotchas.py|' "$HF/scripts/workflows/unattended-build.template.js"
+( cd "$HF" && git add -A )
+run_layout "$HF" scripts/workflows --render >/dev/null
+check_layout "PV-AC6 the prefix-only half-fix:" "$HF" scripts/workflows scripts/ scripts GGGRR
+
 echo "--- $n arms, exit $st"
 exit $st

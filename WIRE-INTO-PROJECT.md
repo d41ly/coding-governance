@@ -668,6 +668,12 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   (`tier2-review.js`): four finder lenses, then at most five BATCHED verifiers, then one synthesis
   pass — 6–10 agents over the whole run, all within the verify-stage and concurrency bounds
   `tools/hooks/agent-cap.js` resolves.
+- Then run `bash <project>/tools/workflows/check-protocol-parity.test.sh --render` once. The kit
+  ships the unattended build harness as `unattended-build.template.js`, and this writes
+  `unattended-build.js` beside it with your install paths filled in, and the protocol copy with it.
+  A copied template with no render is a harness that does not exist. The render refuses, and writes
+  nothing, when the memory-tree kit's `gotchas.py` is tracked at neither `<tool root>memory-tree/`
+  nor `<tool root>`; export `MEMORY_TREE_DIR=<dir>` if yours lives elsewhere.
 - Verify all five workflow legs, not two — the dogfood bar runs every one of these:
   `bash <project>/.claude/hooks/agent-cap.test.sh` · `bash <project>/tools/workflows/check-protocol-parity.test.sh` ·
   `bash <project>/tools/workflows/check-verifier-fanout.sh` · `bash <project>/tools/workflows/check-review-join.sh` ·

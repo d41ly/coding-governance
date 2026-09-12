@@ -338,6 +338,11 @@
       "file": "tools/workflows/unattended-build.js"
     },
     {
+      "id": "boundedParallel",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
       "id": "branches",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
@@ -886,6 +891,11 @@
       "id": "chunk",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "chunk",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "claimant_index",
@@ -2400,6 +2410,11 @@
     {
       "id": "meta",
       "kind": "const-export",
+      "file": "tools/workflows/unattended-build.template.js"
+    },
+    {
+      "id": "meta",
+      "kind": "const-export",
       "file": "tools/workflows/unattended-unit.js"
     },
     {
@@ -3176,6 +3191,11 @@
       "id": "renderRoster",
       "kind": "function",
       "file": "tools/workflows/unattended-build.js"
+    },
+    {
+      "id": "renderRoster",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.template.js"
     },
     {
       "id": "renderShippedBlanks",
