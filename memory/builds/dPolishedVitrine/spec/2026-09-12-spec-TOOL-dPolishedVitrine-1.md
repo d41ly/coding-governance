@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived
 
-**Status:** INPROGRESS · rev-5 · 2026-09-12 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
+**Status:** INPROGRESS · rev-6 · 2026-09-12 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -40,8 +40,8 @@ Skill's copy of the same checklist line is fixed the same way.
   `adopt-unattended.sh` gains the same probe, refusal and override. `tools/unattended/kit.toml`
   declares the placeholder and a `[[regenerate]]` block running the adopter. `cross-component.test.sh`
   gets the missing entry in its hand-kept sed chain. Observed by AC8 and AC9.
-- **S5** — version bumps. review-harness goes 1.7 to 1.8 and unattended 1.18 to 1.19, at every
-  carrier `tools/check-kit-versions.sh` reads. Then `--write-ratchet` DROPS the two carried rows
+- **S5** — version bumps. review-harness goes 1.7 to 1.8 and unattended 1.18 to 1.20, at every
+  carrier `tools/check-kit-versions.sh` reads; 1.19 was taken by `main` while this branch was open. Then `--write-ratchet` DROPS the two carried rows
   that reached zero. Observed by AC7 and AC10.
 - **S6** — the arms, in `tools/workflows/unattended-build.test.sh` and
   `tools/unattended/adopt-unattended.test.sh`, with their failing cases observed before the fix and
@@ -319,8 +319,8 @@ review-harnesses dossier, the generated map, and this build's records.
   `python tools/check-kit-placeholders.py` exits 0 with the placeholder declared.
   Red when: the adopter does not substitute the token, which reds the placeholder join; or gov's own
   checklist line changes.
-- **AC10** — When `bash tools/check-kit-versions.sh` runs, it exits 0 with review-harness at 1.8 and
-  unattended at 1.19. With one carrier reverted, it exits 1 naming that carrier.
+- **AC10** — When `bash tools/check-kit-versions.sh` runs, it exits 0 with review-harness at 1.8,
+  unattended at 1.20 and govkit at 1.11. With one carrier reverted, it exits 1 naming that carrier.
   Red when: a carrier is left at the old version and the gate stays green.
 - **AC11** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs on the
   branch tip, every leg is green except a leg that is also red at base, and the report names that
@@ -424,6 +424,10 @@ New arm: `tools/workflows/unattended-build.test.sh` · a review-harness-only ins
   refusal kept for a misplaced override, and §4's probe paragraph follows it. AC13 to AC16 name the
   four new gates. The parity leg loses its guard in both carriers, and that needs no criterion,
   because the change adds nothing that could be observed failing.
+- rev-6 · 2026-09-12 · S5 · AC10 · AMENDED at the merge of `main` at `09a22d2b`. That commit shipped
+  its own unattended 1.19 for other content, and the two version lines merged byte for byte, so
+  the merge takes unattended to 1.20 at every carrier the version gate reads and at the kit
+  README's marker. AC10 now names 1.20, and govkit's 1.11 from rev-5 as well.
 
 ## 10. Reuse audit
 

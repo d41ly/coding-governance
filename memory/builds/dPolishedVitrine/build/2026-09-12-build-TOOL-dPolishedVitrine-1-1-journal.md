@@ -246,6 +246,16 @@ different kits would both ship as 1.19, and `check-kit-versions.sh` would pass, 
 carrier agrees. The merge has to take the unattended kit to 1.20 at every carrier the version gate
 reads.
 
+Done at the merge, after round 1's repairs. Every carrier the gate reads moved to 1.20: the four
+script constants and their same-line markers, and the five templates. So did the kit README's
+line-1 marker, which the gate does not read (`DEPL-aHoistedPass-10`). The five gov renders were
+re-rendered by the adopter and not edited, and each moved by its marker line alone. The only
+conflict was the generated ledger, which was re-rendered. `memory/DECISIONS.md` merged cleanly
+through the row-keyed driver. Checked per file against the merge base: every line either parent
+added is in the result, 48 files on this side and 31 on `main`'s. review-harness 1.8 and govkit
+1.11 are unclaimed on `main`, which holds 1.7 and 1.10. `main` touched no kickoff watch path, and
+`manifest-check.sh` passes after the merge, so the manifest was not re-stamped again.
+
 ## The criteria
 
 **Evidences:** TOOL-dPolishedVitrine-1
@@ -270,8 +280,8 @@ reads.
   arms 7 to 9 were seen red against the unfixed adopter.
 - AC9 — `python tools/check-kit-placeholders.py` — OBSERVED: exit 0 with the placeholder declared,
   `adopt-unattended.sh --check` in sync, and gov's Skill line 583 unchanged. Item 7 above is the red.
-- AC10 — `bash tools/check-kit-versions.sh` — OBSERVED: exit 0 at 1.8 and 1.19. Item 6 above is the
-  red.
+- AC10 — amended rev-6 — the gate exits 0 at review-harness 1.8, unattended 1.20 and govkit 1.11
+  after the merge. Item 6 above is still the red, and spec section 9's rev-6 line logs the move.
 - AC11 — amended rev-4 — the unattended clause now compares the tip's FAIL set with base's, and
   every shard's set is identical at both. The full bar at `44be8934` was green on 102 of 106 legs.
   The python resolver is red at base too, and the other three pass when run alone at that tip.
