@@ -124,6 +124,24 @@ two that are red at base were also run at `24f8c712`, in a scratch repository ho
   predate this unit: `TOOL-aHoistedPass-38` and `TOOL-aTracedSpawn-3` carry them, and rev-4 records
   why the runner cannot print GREEN at base.
 
+## The full bar at `44be8934`, and its reruns
+
+The bar ran again at `44be8934`, 10:15 to 10:44 UTC, while other sessions' suites were running on
+the node. 102 of 106 legs were green, and four were red:
+
+- `python resolver (behaviour + inline parity + idiom ban)` was red, as it is at base.
+- `memory-hygiene self-test` and `hook destinations self-test` both timed out at their 900 s
+  ceilings. This unit touches the first suite's fixture and not the second. Rerun alone through the
+  runner at the same tip, they passed in 422 s and 135 s.
+- `run-gates turnstile` failed two arms after its own control could not establish, because the
+  holder did not claim the beacon within 30 s. This unit touches nothing under `tools/run-gates/`.
+  Run directly at the same tip, it printed `PASS (65 assertions)` in 703 s.
+
+The first turnstile rerun is not evidence, and it is recorded here as a trap. It went through the
+runner with `GATE_LEGS` naming a three-leg file. The suite's inner runners inherit that variable,
+and it outranks their own legs file, so eight arms failed. Run directly with the variable unset,
+the suite passed. `TOOL-dPolishedVitrine-10` carries the leak.
+
 ## Found by the bug-class checklist, after the build
 
 `python tools/memory-tree/gotchas.py --for-diff 24f8c712..HEAD` named 30 classes over this diff. Two
@@ -177,8 +195,8 @@ reads.
 - AC10 — `bash tools/check-kit-versions.sh` — OBSERVED: exit 0 at 1.8 and 1.19. Item 6 above is the
   red.
 - AC11 — amended rev-4 — the unattended clause now compares the tip's FAIL set with base's, and
-  every shard's set is identical at both. The full bar at `2a29ae3c` was green on 103 of 106 legs.
-  The python resolver is red at base too, and both self-test timeouts pass when run alone at the tip.
+  every shard's set is identical at both. The full bar at `44be8934` was green on 102 of 106 legs.
+  The python resolver is red at base too, and the other three pass when run alone at that tip.
 - AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
   through both kits' own renderers, name one checklist command. With the adopter forced to the
   prefix-only answer, the flat layout redded naming both commands.
