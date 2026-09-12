@@ -82,6 +82,33 @@ render and exited 1. The suite runs only on demand, so nothing noticed. It now c
   backslash-escaped space inserted a bare one, which ends a `case` pattern. The staged break was
   redone without a backslash.
 
+## Found by the bug-class checklist, after the build
+
+`python tools/memory-tree/gotchas.py --for-diff 24f8c712..HEAD` named 30 classes over this diff. Two
+of them applied, and both were acted on in rev-3.
+
+- **amendment-leaves-its-other-half-standing.** rev-2 moved the new inventory key from the
+  unattended dossier to the review-harnesses dossier in S7. The same move was left undone in two
+  places in §4, which still named the unattended dossier. rev-3 corrects both.
+- **two-answers-to-one-question.** The `MEMORY_TREE_DIR` probe is written twice, once in each kit,
+  because the kits install separately and share no code. Two comments claimed the two carriers
+  "cannot disagree", and nothing checked that claim. AC12 and its arm now check it. One layout is
+  rendered through both kits' own renderers, and the two checklist commands they produce are
+  compared, flat and nested. The arm was observed RED by a staged break: with the adopter forced to
+  the prefix-only answer after its probe, the flat layout's Skill said
+  `python scripts/memory-tree/gotchas.py` while the harness said `python scripts/gotchas.py`.
+
+## Hand-off to the lander
+
+`main` moved while this branch was open. `09a22d2b` landed the third unit of build dMuffledSentinel, which bumps
+the unattended kit 1.18 to 1.19 for its own changes. This branch also bumps the unattended kit 1.18 to
+1.19, for different content. A trial `git merge-tree` of `main` with this branch conflicts only on the
+generated `memory/ledger/2026-09.md`, which is re-rendered and never reconciled. Every unattended
+version line merges CLEANLY, because both sides wrote the same bytes, and that is the hazard: two
+different kits would both ship as 1.19, and `check-kit-versions.sh` would pass, because every
+carrier agrees. The merge has to take the unattended kit to 1.20 at every carrier the version gate
+reads.
+
 ## The criteria
 
 **Evidences:** TOOL-dPolishedVitrine-1
@@ -107,3 +134,6 @@ render and exited 1. The suite runs only on demand, so nothing noticed. It now c
   `adopt-unattended.sh --check` in sync, and gov's Skill line 583 unchanged. Item 7 above is the red.
 - AC10 — `bash tools/check-kit-versions.sh` — OBSERVED: exit 0 at 1.8 and 1.19. Item 6 above is the
   red.
+- AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
+  through both kits' own renderers, name one checklist command. With the adopter forced to the
+  prefix-only answer, the flat layout redded naming both commands.

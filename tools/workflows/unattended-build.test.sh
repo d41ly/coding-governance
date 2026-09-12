@@ -773,5 +773,40 @@ sed -i 's|{{MEMORY_TREE_DIR}}/gotchas.py|{{TOOL_ROOT}}memory-tree/gotchas.py|' "
 run_layout "$HF" scripts/workflows --render >/dev/null
 check_layout "PV-AC6 the prefix-only half-fix:" "$HF" scripts/workflows scripts/ scripts GGGRR
 
+# ---- PV-AC12: THE TWO CARRIERS OF ONE COMMAND AGREE. The build harness hands each child the
+# ---- bug-class checklist, and the unattended Skill tells the run to execute the same checklist.
+# ---- Each kit derives the path with ITS OWN copy of the probe, because kits install separately and
+# ---- share no code — and two copies of one derivation drift apart without anyone deciding to change
+# ---- either. So this arm renders BOTH in one layout, through each kit's own renderer, and compares
+# ---- the two commands they produce, rather than trusting two sources to stay alike.
+UK="$ROOT/$KIT_REL/unattended"
+if [ -f "$UK/adopt-unattended.sh" ]; then
+  for shape in flat nested; do
+    X="$LAY/carriers-$shape"
+    case $shape in flat) gp=scripts/gotchas.py ;; *) gp=scripts/memory-tree/gotchas.py ;; esac
+    build_layout "$X" scripts/workflows scripts/unattended "$gp"
+    cp "$UK/adopt-unattended.sh" "$UK/unattended.sh" "$UK/lib-unattended.sh" "$UK/check-unattended.sh" \
+       "$UK"/*.template.md "$X/scripts/unattended/"
+    printf 'MEMORY_ROOT=memory\nLANDER="true"\nKEEPALIVE_CREATE="c"\nKEEPALIVE_DELETE="d"\nKEEPALIVE_INTERVAL="i"\n' \
+      > "$X/.unattended.conf"
+    ( cd "$X" && git add -A )
+    run_layout "$X" scripts/workflows --render >/dev/null
+    ( cd "$X" && bash scripts/unattended/adopt-unattended.sh >/dev/null 2>&1 )
+    o=$(run_wf "$UNITS" "$(returns CONVERGED 0)" "$X/scripts/workflows/unattended-build.js")
+    hc=$(read_field "$(printf '%s\n' "$o" | sed -n 's/^RESULT //p')" dispatch.args.checklist)
+    sc=""
+    [ -f "$X/.claude/skills/unattended/SKILL.md" ] && \
+      sc=$(grep -oE 'python [^ ]*gotchas[.]py --for-diff HEAD~1[.][.]HEAD' "$X/.claude/skills/unattended/SKILL.md" | head -1)
+    n=$((n+1))
+    if [ -n "$hc" ] && [ "$hc" = "$sc" ]; then
+      echo "ok   PV-AC12 $shape: the harness and the Skill name one checklist command -- $hc"
+    else
+      echo "FAIL PV-AC12 $shape: the harness hands out '$hc' and the Skill tells the run '$sc'"; st=1
+    fi
+  done
+else
+  echo "SKIP PV-AC12 -- no unattended adopter at $UK, so the two carriers were NOT compared on this run"
+fi
+
 echo "--- $n arms, exit $st"
 exit $st

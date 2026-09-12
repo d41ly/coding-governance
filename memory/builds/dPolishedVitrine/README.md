@@ -40,6 +40,9 @@ the same checklist path, and it breaks the same way.
 
 ## Parked decisions
 
+- **The lander must take unattended to 1.20.** `main` gained its own unattended 1.19 at `09a22d2b`
+  while this branch was open, and this branch bumps 1.18 to 1.19 for other content. The two merge
+  cleanly byte for byte, so two different kits would ship as 1.19 and the version gate would pass.
 - **The lexicon pin rose 984 -> 986** for the template's two helper names, which `agent-cap.js`
   recognises by name. The agent resolved it under the brief; `TOOL-aWeldedTribunal-12` keeps the
   underlying tension, every conforming harness costing two offenders, for the owner.
@@ -59,7 +62,7 @@ ids TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-09-12 |
+| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-3 | 2026-09-12 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).
