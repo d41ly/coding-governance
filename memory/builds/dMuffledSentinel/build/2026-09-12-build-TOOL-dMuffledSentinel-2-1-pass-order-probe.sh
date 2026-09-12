@@ -31,7 +31,7 @@ n0=$(grep -cvE '^[[:space:]]*(#|$)' "$REG")
 [ "$n0" -gt 0 ] || { echo "probe: $REG carries no rows, so every arm below would pass vacuously"; exit 2; }
 
 fail=0
-want() {   # $1 = name, $2 = the exit status wanted, $3 = a fixed string the output must carry
+check_leg() {   # $1 = name, $2 = the exit status wanted, $3 = a fixed string the output must carry
   bash tools/unattended/check-pass-order.sh > "$T/out" 2>&1
   rc=$?
   if [ "$rc" = "$2" ] && grep -qF -- "$3" "$T/out"; then
@@ -43,21 +43,21 @@ want() {   # $1 = name, $2 = the exit status wanted, $3 = a fixed string the out
   fi
 }
 
-want "AC2 — the default registry waives its $n0 row(s) with the key blank" 0 \
+check_leg "AC2 — the default registry waives its $n0 row(s) with the key blank" 0 \
   "$n0 waived by $REG"
 
 mkdir -p probe
 git mv "$REG" probe/pass-order-waiver.txt
 git commit -q -m "probe: the registry leaves memory/project/" --no-verify
-want "precondition — relocated with no key, the default path is empty and the units red" 1 \
+check_leg "precondition — relocated with no key, the default path is empty and the units red" 1 \
   "0 waived by $REG"
 
 printf '\nPASS_ORDER_WAIVER="probe/pass-order-waiver.txt"\n' >> .unattended.conf
-want "AC1 — PASS_ORDER_WAIVER reads the registry where it is declared" 0 \
+check_leg "AC1 — PASS_ORDER_WAIVER reads the registry where it is declared" 0 \
   "$n0 waived by probe/pass-order-waiver.txt"
 
 sed -i 's|^PASS_ORDER_WAIVER=.*|PASS_ORDER_WAIVER="probe/absent.txt"|' .unattended.conf
-want "AC3 — a declared registry not tracked at HEAD refuses and names the key" 2 \
+check_leg "AC3 — a declared registry not tracked at HEAD refuses and names the key" 2 \
   "PASS_ORDER_WAIVER names probe/absent.txt"
 
 [ "$fail" = 0 ] && echo "probe: PASS at $SHA" || echo "probe: FAILED at $SHA"
