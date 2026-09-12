@@ -101,9 +101,28 @@ UTC. 103 of 106 legs were green. Three were red:
 
   The fixture now borrows the real object database through an alternates entry. It gets the same
   objects without a copy, and nothing else the checker reads changes. With the entry, the same
-  reproduction exits 0, and the suite run alone at the same tree prints `PASS (374 assertions)`. The sibling fixture in
-  `hygiene-parity.test.sh` has the same exposure, but it was not observed, so it is carried as
-  `TOOL-dPolishedVitrine-9` rather than changed.
+  reproduction exits 0, and the suite run alone at the same tree prints `PASS (374 assertions)`.
+  The sibling fixture in `hygiene-parity.test.sh` has the same exposure, but it was not observed,
+  so it is carried as `TOOL-dPolishedVitrine-9` rather than changed.
+
+## The unattended kit's on-demand self-tests, tip against base
+
+Work touching the unattended kit owes the seven suites `run-unattended-gates.sh` delegates to, and
+`run-selftests.sh --kit tools/unattended --list` names them. Each was run directly at the tip. The
+two that are red at base were also run at `24f8c712`, in a scratch repository holding
+`git archive 24f8c712`, side by side with the tip on the same node:
+
+- `adopt-unattended.test.sh` printed `PASS (71 assertions)` at the tip. It was red at base with 22
+  failures, which is the seed defect recorded above.
+- `cross-component.test.sh`, `check-playbook.test.sh`, `check-pass-order.test.sh` and
+  `check-brief-recorded.test.sh` all exited 0 at the tip.
+- `unattended.test.sh` and `check-unattended.test.sh` each ran as `--shard 1/2` and `--shard 2/2`.
+  Their FAIL lines were compared shard by shard, with the kit directory and temp paths normalised,
+  and every pair of sets is identical. The driver's shard 1 prints `PASS (240 assertions)` at both,
+  and its shard 2 fails the same 53 lines at both. The checker fails the same 12 lines in shard 1
+  and the same 23 in shard 2. No FAIL line is new at the tip, and none went missing. These reds
+  predate this unit: `TOOL-aHoistedPass-38` and `TOOL-aTracedSpawn-3` carry them, and rev-4 records
+  why the runner cannot print GREEN at base.
 
 ## Found by the bug-class checklist, after the build
 
@@ -123,8 +142,8 @@ of them applied, and both were acted on in rev-3.
 
 ## Hand-off to the lander
 
-`main` moved while this branch was open. `09a22d2b` landed the third unit of build dMuffledSentinel, which bumps
-the unattended kit 1.18 to 1.19 for its own changes. This branch also bumps the unattended kit 1.18 to
+`main` moved while this branch was open. `09a22d2b` landed the third unit of build
+dMuffledSentinel, which bumps the unattended kit 1.18 to 1.19 for its own changes. This branch also bumps the unattended kit 1.18 to
 1.19, for different content. A trial `git merge-tree` of `main` with this branch conflicts only on the
 generated `memory/ledger/2026-09.md`, which is re-rendered and never reconciled. Every unattended
 version line merges CLEANLY, because both sides wrote the same bytes, and that is the hazard: two
@@ -157,6 +176,9 @@ reads.
   `adopt-unattended.sh --check` in sync, and gov's Skill line 583 unchanged. Item 7 above is the red.
 - AC10 — `bash tools/check-kit-versions.sh` — OBSERVED: exit 0 at 1.8 and 1.19. Item 6 above is the
   red.
+- AC11 — amended rev-4 — the unattended clause now compares the tip's FAIL set with base's, and
+  every shard's set is identical at both. The full bar at `2a29ae3c` was green on 103 of 106 legs.
+  The python resolver is red at base too, and both self-test timeouts pass when run alone at the tip.
 - AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
   through both kits' own renderers, name one checklist command. With the adopter forced to the
   prefix-only answer, the flat layout redded naming both commands.
