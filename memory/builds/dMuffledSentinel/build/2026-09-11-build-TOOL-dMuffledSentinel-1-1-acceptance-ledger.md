@@ -36,9 +36,9 @@ could have surfaced before.
 
 - **`pass-order history` reds on this unit, and that is true.** The spec was written after the code
   and both landed in `a3b4ca1e`, so at its parent `75b85708` no spec for the id exists. The leg only
-  saw it once the unit went CLOSED. It is neither waived nor rewritten into a spec-first order: the
-  waiver registry exists for units already landed, and a reordered branch would state an authoring
-  order that did not happen. Whether to land it under a waiver is the owner's decision.
+  saw it once the unit went CLOSED. It was not rewritten into a spec-first order, since a reordered
+  branch would state an authoring order that did not happen. The owner chose to land it as it is on
+  2026-09-12, so it carries a row in `memory/project/pass-order-waiver.txt` saying exactly that.
 - The same full bar reds `python resolver` on `tools/run-gates/run-gates.evidence.test.sh:643`, which
   is on `origin/main` since `d4c05068` and blocks any push until someone fixes it.
 - The inCMS copy of the engine keeps the swallow until its next pull, which that repo tracks as
