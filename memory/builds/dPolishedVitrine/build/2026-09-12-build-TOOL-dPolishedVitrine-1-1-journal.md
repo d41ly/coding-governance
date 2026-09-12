@@ -235,6 +235,25 @@ Found while fixing, and not this unit's:
   `non_terminal_specs_cited_by_product_source` to 3 over its pin of 2. Those comments now cite
   the build slug instead.
 
+## The full bar after round 1 and the merge
+
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at `4ce472e3`, which holds round 1's
+repairs and the merge of `main`, ran from 13:14 to 13:27 UTC with nothing else of this session on the
+node. 105 of 106 legs were green, and every chunk was green but `wiring`. The one red is
+`python resolver (behaviour + inline parity + idiom ban)`, on the same line as at base:
+`tools/run-gates/run-gates.evidence.test.sh:643`, `DC_PY=python`. Neither this unit nor `main`'s
+side of the merge touches that file. The govkit selftest passed inside the bar, and so did every leg
+round 1 touched: the parity leg, `govkit selfcheck` with arm 7l, the kit version markers, the
+kickoff-manifest ratchet, the lexicon at its pin, the drift records and memory hygiene. No leg timed
+out, so there was nothing to re-run alone.
+
+Five of the unattended kit's on-demand suites were run directly at the same tip afterwards, and all
+five passed: `adopt-unattended.test.sh` with 71 assertions, `cross-component.test.sh` with 19,
+`check-playbook.test.sh` with 123, `check-pass-order.test.sh` with 72 arms and
+`check-brief-recorded.test.sh` with 46. The two long suites, `unattended.test.sh` and
+`check-unattended.test.sh`, were NOT re-run at the merged tip. Their FAIL sets were compared with
+base at `44be8934`, and the merge brings in `main`'s changes to the checkers they drive.
+
 ## Hand-off to the lander
 
 `main` moved while this branch was open. `09a22d2b` landed the third unit of build
@@ -284,7 +303,9 @@ added is in the result, 48 files on this side and 31 on `main`'s. review-harness
   after the merge. Item 6 above is still the red, and spec section 9's rev-6 line logs the move.
 - AC11 — amended rev-4 — the unattended clause now compares the tip's FAIL set with base's, and
   every shard's set is identical at both. The full bar at `44be8934` was green on 102 of 106 legs.
-  The python resolver is red at base too, and the other three pass when run alone at that tip.
+  The python resolver is red at base too, and the other three pass when run alone at that tip. After
+  round 1 and the merge, the bar at `4ce472e3` was green on 105 of 106, and its one red is that same
+  python resolver line.
 - AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
   through both kits' own renderers, name one checklist command. With the adopter forced to the
   prefix-only answer, the flat layout redded naming both commands.
