@@ -1,11 +1,12 @@
 # TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived
 
-**Status:** INPROGRESS · rev-1 · 2026-09-12 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
+**Status:** INPROGRESS · rev-2 · 2026-09-12 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md](../build/2026-09-12-build-TOOL-dPolishedVitrine-1-1-journal.md) | journal | — |
 | [2026-09-12-prompt-TOOL-dPolishedVitrine-1-0-owner-ruling.md](../prompts/2026-09-12-prompt-TOOL-dPolishedVitrine-1-0-owner-ruling.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -43,11 +44,13 @@ Skill's copy of the same checklist line is fixed the same way.
   that reached zero. Observed by AC7 and AC10.
 - **S6** — the arms, in `tools/workflows/unattended-build.test.sh` and
   `tools/unattended/adopt-unattended.test.sh`, with their failing cases observed before the fix and
-  recorded in the build journal. Observed by AC2, AC3, AC4, AC5, AC6 and AC8.
+  recorded in the build journal. The adopter suite's `seed()` copies the kit's `*.template.md` by
+  glob, because its hand list had fallen two templates behind the adopter and every adopt in it
+  was red at base. Observed by AC2, AC3, AC4, AC5, AC6 and AC8.
 - **S7** — the knock-on declarations. The runbook's copy-install step names the render, both kit
   READMEs say what is rendered, `memory/project/method-carriers.txt` declares the template, the
-  unattended dossier claims the new inventory key, and the lexicon pin moves by the template's two
-  forced names. Observed by AC11.
+  review-harnesses dossier claims the new inventory key and records the renderer as a seam, and the
+  lexicon pin moves by the template's two forced names. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -170,7 +173,8 @@ Minted by this unit, with the cell that grades each:
 - `MEMORY_TREE_DIR`: a placeholder token, and the environment variable that overrides it.
 - `check_tracked` and `read_lf` in the parity script, and `check_tracked` in the adopter, all in cell
   `sh.function`. Each was asked of `--suggest --as sh.function` before it was written.
-- `build_layout`, `check_layout` and `read_field` in the harness suite, same cell, same question.
+- `build_layout`, `run_layout`, `check_layout` and `read_field` in the harness suite, same cell, same
+  question.
 
 ### Rollout
 
@@ -281,7 +285,9 @@ unattended dossier, the generated map, and this build's records.
   branch tip, every leg is green except a leg that is also red at base, and the report names that
   leg. `bash tools/unattended/run-unattended-gates.sh` prints GREEN.
   Red when: a leg that was green at base is red at the tip.
-  cost: the full bar with self-tests, about forty minutes on node `d`, plus the unattended self-tests.
+  cost: the full bar with self-tests, sixteen minutes of wall on node `d` at base, plus the
+  unattended self-tests, which run on demand and are measured in hours.
+  figure: PINNED — 07:41 to 07:57 UTC on 2026-09-12, the base run this unit's journal records.
 
 ## 7. Gates
 
@@ -315,6 +321,13 @@ New arm: `tools/unattended/adopt-unattended.test.sh` · a seed tracking no gotch
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · initial draft, from the scouting report's section 5 and the owner's ruling.
+- rev-2 · 2026-09-12 · S6 · S7 · §4 · AC11 · AMENDED while building. S7 named the unattended dossier
+  for the new inventory key, and that dossier sits ten bytes under its declared cap, so the key and a
+  `seam:` line for the renderer went to the review-harnesses dossier, whose kit renders the template.
+  S6 grew the adopter suite's `seed()` fix: its hand list of templates had fallen two behind the
+  adopter, every adopt in that suite was red at base, and the new arms could not be observed until it
+  was fixed. §4's inventory gains `run_layout`. AC11's cost is replaced by the base run's measured
+  wall.
 
 ## 10. Reuse audit
 

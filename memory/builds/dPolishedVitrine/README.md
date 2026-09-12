@@ -5,7 +5,7 @@ opened: 2026-09-12
 streams: tooling+deployer
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dPolishedVitrine-1
+ids: TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8
 ---
 
 # dPolishedVitrine — the build harness is rendered at install, so its paths name the adopter's tree
@@ -40,7 +40,9 @@ the same checklist path, and it breaks the same way.
 
 ## Parked decisions
 
-- None yet.
+- **The lexicon pin rose 984 -> 986** for the template's two helper names, which `agent-cap.js`
+  recognises by name. The agent resolved it under the brief; `TOOL-aWeldedTribunal-12` keeps the
+  underlying tension, every conforming harness costing two offenders, for the owner.
 
 <!-- roster:units -->
 
@@ -52,15 +54,15 @@ the same checklist path, and it breaks the same way.
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-09-12 · streams tooling+deployer
-ids TOOL-dPolishedVitrine-1
+ids TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-09-12 |
+| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-09-12 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,0 +1,109 @@
+# Build journal — TOOL-dPolishedVitrine-1
+
+**Serves:** journal TOOL-dPolishedVitrine-1
+
+Tier-2 · node d · 2026-09-12 · base 24f8c712 · worktree `.claude/worktrees/derived-harness-paths`
+
+## The bar at base, before any edit
+
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` at `24f8c712` finished 105 of 106
+legs green in sixteen minutes of wall (07:41 to 07:57 UTC). The one red is
+`python resolver (behaviour + inline parity + idiom ban)`, on
+`tools/run-gates/run-gates.evidence.test.sh:643`, where `DC_PY=python` is a launcher nobody
+resolved. It is red at base and this unit touches neither file. The dMuffledSentinel ledger records
+the same red as on `origin/main` since `d4c05068`.
+
+## Every new arm, observed red before its fix
+
+Each break below was staged, run, recorded and unstaged. The raw outputs were kept in the session
+scratchpad; what matters from each is quoted.
+
+1. **HEAD's verbatim harness, installed the way apply installs an engine file.** Base blob
+   `75763c4e` went into a flat consumer layout at `scripts/workflows`, with a tracked
+   `scripts/gotchas.py`, and was graded by the suite's own `check_layout` expecting all green.
+   The harness ran to its hand-out, and arms (i) to (v) all failed. The driver read
+   `bash tools/unattended/unattended.sh`, the checklist `python tools/memory-tree/gotchas.py
+   --for-diff HEAD~1..HEAD`, and the class arm listed four untracked paths: the two workflow
+   scripts, the driver and the checklist. That is all four install literals, named by the arm
+   that does not know which four to look for.
+2. **The prefix-only half-fix, on the real template.** With `CHECKLIST` changed to
+   `{{TOOL_ROOT}}memory-tree/gotchas.py`, the flat layout redded (iv) and (v) on
+   `scripts/memory-tree/gotchas.py`, and so did the flat root install and the override layout. The
+   NESTED layout and the nested root install stayed green. That is the whole reason the flat
+   fixture carries the weight. The same run also redded the hand-edit arm, which was the arm's own
+   fault rather than the parity script's: its first cut edited a path in place, and under this
+   template that path was spelled differently, so nothing was edited and no DRIFT could appear. It
+   now appends a line, which cannot miss.
+3. **The parity script's charset refusal, disabled.** With a space admitted to the allowed set, a
+   tracked override `vendor/m t` rendered cleanly. Both new assertions redded, and nothing else did.
+4. **The unattended adopter, before its fix.** With the suite's seed repaired (below) and the
+   adopter unchanged, the flat layout rendered the literal nested path, a tree with no `gotchas.py`
+   adopted at exit 0 and wrote a Skill, and an override naming nothing tracked adopted anyway.
+   Arm 1's nested assertion PASSED against the unfixed adopter, because the nested seed is this
+   repo's own layout. That pass is the defect in miniature, and it is why arms 7 to 9 exist.
+5. **The adopter's charset refusal, disabled.** The three space-override assertions redded and
+   nothing else did.
+6. **A half-bumped version.** Reverting the Skill template's marker to 1.18 and the review-harness
+   marker to 1.7 made `tools/check-kit-versions.sh` exit 1, naming both carriers.
+7. **The adopter's new substitution, deleted.** `tools/check-kit-placeholders.py` exited 1 naming
+   `{{MEMORY_TREE_DIR}}` on the unattended kit. `adopt-unattended.sh --check` exited 1 at Skill line
+   583, where the template's placeholder would ship unfilled.
+8. **The install-prefix ban, both ways.** With the new `rendered` rule deleted from the workflows
+   descriptor, the render stayed a shipped source and its row read `6 -> 5` rather than dropping.
+   So the claim is what removes it, not the rewording. With the old `tools/hooks/agent-cap.js`
+   comment restored in the template, the template reported UNRECORDED.
+
+## What the arms measure, and the population behind arm (v)
+
+The class arm extracts every relative path ending in `.js`, `.sh` or `.py` from the harness's whole
+output: the trace, the prompts it composed and the return. Over every layout the population was
+exactly four tokens, the same four sites the other arms name, with no near-miss outside them.
+The arm asserts at least four, so an extraction that silently found nothing reds rather than passing.
+
+gov's own render against its base blob, by `diff`, differs at lines 3, 76 and 228, all three
+comments. Every code line renders back to this repo's own path.
+
+## Found red at base, and fixed because the new arms needed it
+
+`tools/unattended/adopt-unattended.test.sh` was red at `24f8c712` with 22 failures. Its `seed()`
+copied a hand list of three templates. The adopter gained the verb carrier and the playbook
+fixture's template after that list was written, so every adopt in the suite stopped at the fixture
+render and exited 1. The suite runs only on demand, so nothing noticed. It now copies the kit's
+`*.template.md` by glob, which is the class and not the instance.
+
+## Traps met, recorded so the next session does not pay for them again
+
+- **A Python text-mode rewrite eats raw CR bytes.** `adopt-unattended.sh` carries twelve literal CRs
+  inside `tr -d` arguments. Reading and writing it through Python's universal-newline mode turned
+  each one into a line break, and the adopter stopped working for reasons unrelated to the break
+  being staged. Every later edit went through `sed -i` on a line number or through `cp` restores,
+  and CR counts were compared against HEAD before each commit.
+- **This session's shell mangles `\\` in a command.** A `sed` replacement meant to insert a
+  backslash-escaped space inserted a bare one, which ends a `case` pattern. The staged break was
+  redone without a backslash.
+
+## The criteria
+
+**Evidences:** TOOL-dPolishedVitrine-1
+
+- AC1 — `75763c4e` — OBSERVED: `diff` of the base blob against the render shows lines 3, 76 and 228
+  and nothing else, and the parity leg exits 0 with `2 rendered pair(s)`.
+- AC2 — `bash tools/workflows/unattended-build.test.sh` — OBSERVED: the flat layout passes arms (i)
+  to (v), after the same arms were seen red on base blob `75763c4e` in that layout.
+- AC3 — `tools/workflows/unattended-build.test.sh` — OBSERVED: nested, root, and root-with-flat
+  memory-tree layouts pass all five arms. The root driver renders without a prefix.
+- AC4 — `MEMORY_TREE_DIR` — OBSERVED: no tracked `gotchas.py` refuses at exit 2 naming the override,
+  and no harness is written. The override renders `vendor/mt`, an untracked override is refused,
+  and a tracked override holding a space is refused.
+- AC5 — `DRIFT` — OBSERVED: a hand-edited render reds, an unpaired template reds naming its path,
+  and a missing live copy reds under the check mode and is created by the render mode.
+- AC6 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the verbatim spelling reds all five
+  arms, and the prefix-only half-fix reds (iv) and (v) only, on every run of the suite.
+- AC7 — `bash tools/check-install-prefix.sh` — OBSERVED: exit 0 after `--write-ratchet` dropped
+  exactly the two rows. Both breaks in item 8 above redded as the criterion says.
+- AC8 — `bash tools/unattended/adopt-unattended.test.sh` — OBSERVED: `PASS (71 assertions)`, after
+  arms 7 to 9 were seen red against the unfixed adopter.
+- AC9 — `python tools/check-kit-placeholders.py` — OBSERVED: exit 0 with the placeholder declared,
+  `adopt-unattended.sh --check` in sync, and gov's Skill line 583 unchanged. Item 7 above is the red.
+- AC10 — `bash tools/check-kit-versions.sh` — OBSERVED: exit 0 at 1.8 and 1.19. Item 6 above is the
+  red.

@@ -91,6 +91,7 @@
 
 - TOOL-dSettledRoster-2 · closing a pre-cutoff spec pulls it into drift signal 6, whose grandfather keys on the CLOSE date while its evidence keys on the BUILD date. Remedy is `memory/project/trace-waiver.txt` per cTracedPromise-1 §3 — not a raised pin, not a filename key; an unused row reds
 - TOOL-dNarrowedAnchor-1 · the second anchor is admissible PER MODE. `ANCHOR_SCOPE` was a whole-project switch, so enabling the prompt path also let a `slug` run push its own authorization. `SECOND_ANCHOR_MODES="prompt recipe"`; `slug`, an absent `authorized-by:`, reds `fail 50` and leg `fail 29`
+- TOOL-dPolishedVitrine-1 · OWNER RULING 2026-09-12: the build harness is RENDERED at install rather than handed paths in args. Its install literals become KIT_DIR, TOOL_ROOT and MEMORY_TREE_DIR, the last PROBED from a tracked gotchas.py and refused when absent: adopters install memory-tree flat
 
 ## DEPL — deployer
 
