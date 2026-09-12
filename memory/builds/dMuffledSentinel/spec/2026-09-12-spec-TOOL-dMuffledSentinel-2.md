@@ -1,12 +1,13 @@
 # TOOL-dMuffledSentinel-2 — the pass-order and trace waiver registries take a declared path
 
-**Status:** INPROGRESS · rev-1 · 2026-09-12 · node d · Tier-1 · base 24f8c712 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-09-12 · node d · Tier-1 · base 24f8c712 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-12-build-TOOL-dMuffledSentinel-2-1-pass-order-probe.sh](../build/2026-09-12-build-TOOL-dMuffledSentinel-2-1-pass-order-probe.sh) | journal | — |
+| [2026-09-12-build-TOOL-dMuffledSentinel-2-2-acceptance-ledger.md](../build/2026-09-12-build-TOOL-dMuffledSentinel-2-2-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -32,6 +33,7 @@ default.
 - **S4** A declared `TRACE_WAIVER` that is absent, absolute, or climbs out of the tree becomes a
   finding row in its signal, never an empty waiver set. Observed by AC5.
 - **S5** The keys are documented beside their siblings: `tools/unattended/.unattended.conf.example`,
+  the protocol's binding key table in `tools/unattended/PROTOCOL.template.md`,
   `tools/drift-audit/drift_signals.template.py` and the drift-audit README's layout table.
   NOT OBSERVED by a criterion here: that is prose, and no criterion grades prose.
 
@@ -90,3 +92,5 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-12 · §2 S1 S2 S3 S4 S5 · opened, and committed before any code this time.
+- rev-2 · 2026-09-12 · S5 · the protocol's binding key table joins S5, because the unattended kit
+  gate's check 22 reds a conf key it does not document. Status CLOSED, every criterion met.

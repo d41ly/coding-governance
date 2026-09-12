@@ -55,17 +55,17 @@ Unit 2 is what closing inCMS's half ran into: both waiver registries are hard-co
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-09-11 · streams tooling
+**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-09-11 · streams tooling
 ids TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dMuffledSentinel-1 — check 21 refuses a bindings parse that did not complete](spec/2026-09-11-spec-TOOL-dMuffledSentinel-1.md) | — | 1 | CLOSED | rev-2 | 2026-09-12 |
-| [TOOL-dMuffledSentinel-2 — the pass-order and trace waiver registries take a declared path](spec/2026-09-12-spec-TOOL-dMuffledSentinel-2.md) | — | 1 | INPROGRESS | rev-1 | 2026-09-12 |
+| [TOOL-dMuffledSentinel-2 — the pass-order and trace waiver registries take a declared path](spec/2026-09-12-spec-TOOL-dMuffledSentinel-2.md) | — | 1 | CLOSED | rev-2 | 2026-09-12 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
