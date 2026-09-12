@@ -142,6 +142,13 @@ runner with `GATE_LEGS` naming a three-leg file. The suite's inner runners inher
 and it outranks their own legs file, so eight arms failed. Run directly with the variable unset,
 the suite passed. `TOOL-dPolishedVitrine-10` carries the leak.
 
+The records commit after it, `ff663e2e`, ran the same bar with `GATE_REUSE=1`, so 54 legs whose
+inputs were unchanged reused their green and the other 52 executed. Two were red. One was the
+python resolver. The other was the turnstile, on one timing arm, `not every queued runner
+acquired`, while another session's suite held the node. The turnstile suite was then run at the
+tip and at base side by side. Both printed `PASS (65 assertions)`, in 688 s and 686 s, and both
+skipped the same two arms because the holder did not claim the beacon within 30 s.
+
 ## Found by the bug-class checklist, after the build
 
 `python tools/memory-tree/gotchas.py --for-diff 24f8c712..HEAD` named 30 classes over this diff. Two
