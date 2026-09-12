@@ -134,3 +134,4 @@ memory/builds/aPooledSweep/README.md
 memory/builds/aReapedSpinner/README.md
 memory/builds/aGradedDialect/README.md
 memory/builds/aLeakedHandle/README.md
+memory/builds/dMuffledSentinel/README.md

@@ -1817,10 +1817,27 @@ chit 21 'records carrying the unbound Serves form outnumber their pin — bind t
 chit 21 'record filenames whose family, slug and ordinal name an id their own Serves line does not list'
 cblock "$out" 21 | grep -qF '2026-08-01-review-ARCH-tOne-1-f.md' \
   && { echo "FAIL check 21 flagged a CROSS-BUILD record correctly named for the id it serves"; st=1; }
+# the parse-refusal branch is SILENT while the real generator answers — its green control.
+cnot 21 'the bindings parse did not complete'
 # branch 3 — the pin UNDECLARED is a refusal, not a disabled check.
 ( cd "$K" && printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\n' > .memory-tree.conf )
 out=$(cd "$K" && bash "$SCRIPT" 2>/dev/null)
 chit 21 'RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus'
+# branch 0 — the PARSE itself did not answer (TOOL-dMuffledSentinel-1). Reproduced as an adopter
+# meets it: a COPY of the kit whose sibling generator lacks the mode, run over the fixture above,
+# which still holds the no-Serves record branch 1 names. Two stubs, because the two ways a delegate
+# fails to answer take different exits: a generator that refuses the flag (exit 2, the measured
+# adopter case) and one that reads an unknown flag as its default and exits 0 having graded nothing.
+# The fixture record must stay UNNAMED in both, since naming it would mean the stub was not reached.
+KC=$TMP/kit21
+mkdir -p "$KC" && cp "$HERE"/*.sh "$HERE"/*.py "$KC"/
+for _stub in 'import sys; print("usage: gen_build_index.py [--check|--write]", file=sys.stderr); sys.exit(2)' \
+             'print("build-index: 2 builds, 2 views current")'; do
+  printf '%s\n' "$_stub" > "$KC/gen_build_index.py"
+  out=$(cd "$K" && bash "$KC/check-memory-hygiene.sh" 2>/dev/null)
+  chit 21 'the bindings parse did not complete, so no record was graded and every branch below would read as a clean corpus — gen_build_index.py --print-bindings exited'
+  cnot 21 '2026-08-01-review-ARCH-tOne-1-a.md'
+done
 
 # ---- CHECK 6 — the per-class caps are DECLARATIONS (TOOL-aLoosenedCeiling-2).
 # ---- Every arm runs BOTH DIRECTIONS OVER ONE FIXTURE: the same file is silent at a loose cap and
