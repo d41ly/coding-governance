@@ -21,6 +21,7 @@ terminal status. Nothing here is edited by hand.
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 |
 | [aWeighedCanon](builds/aWeighedCanon/README.md) | OPEN | a | 2026-09-04 | tooling | 2 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
+| [dMuffledSentinel](builds/dMuffledSentinel/README.md) | INPROGRESS | d | 2026-09-11 | tooling | 3 |
 | [dNarrowedAnchor](builds/dNarrowedAnchor/README.md) | INPROGRESS | d | 2026-08-24 | tooling | 3 |
 | [dPromptedSeam](builds/dPromptedSeam/README.md) | DEFERRED | d | 2026-08-25 | tooling | 4 |
 | [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 |
