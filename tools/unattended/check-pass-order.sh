@@ -73,7 +73,7 @@ CONF="$ROOT/.unattended.conf"
 [ -f "$DRIVER" ] || { echo "pass-order: no driver beside this script, and the classifier below is sliced out of it"; exit 2; }
 
 MEMORY_ROOT=""; PASS_ORDER_CUTOFF=""; GENERATED_INDEXES=""; SHARED_RECORDS=""
-PASS_ORDER_PREANCHOR_CAP=""
+PASS_ORDER_PREANCHOR_CAP=""; PASS_ORDER_WAIVER=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL, and this block is `check-unattended.sh`'s
 # ---- verbatim rather than a third hand-written reader. `$CONF` is a TRACKED file the graded run
 # ---- commits, so sourcing it here executes it, and both siblings hardened this one recorded
@@ -107,7 +107,7 @@ while IFS= read -r -d '' _ck; do
     # made the leg eval an attacker-chosen file and exit 0 with its own FAILED line printed.
     # Reproduced end to end before this line existed. Only the keys this leg DECLARES are assignable,
     # so the stream cannot reach a name the leg did not ask for.
-    MEMORY_ROOT|PASS_ORDER_CUTOFF|GENERATED_INDEXES|SHARED_RECORDS|PASS_ORDER_PREANCHOR_CAP) eval "$_ck=\$_cv" ;;
+    MEMORY_ROOT|PASS_ORDER_CUTOFF|GENERATED_INDEXES|SHARED_RECORDS|PASS_ORDER_PREANCHOR_CAP|PASS_ORDER_WAIVER) eval "$_ck=\$_cv" ;;
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
           for _n in $_conf_names; do eval "_cval=\${$_n:-}"; printf '%s\0%s\0' "$_n" "$_cval"; done
@@ -180,7 +180,23 @@ esac
 # AND A STALE ROW REDS. A waiver naming a unit this leg no longer reports is an exemption that has
 # outlived its reason, and leaving it silently widens the surface it was written to narrow - the same
 # posture every other declared population in this repo takes.
+#
+# THE PATH IS DECLARABLE (TOOL-dMuffledSentinel-2): `PASS_ORDER_WAIVER`, repo-relative, for an adopter
+# whose memory tree has no `project/` directory. Blank keeps the path below. A DECLARED path must
+# resolve at HEAD, because the only reason to declare one is to use it, and one that does not resolve
+# reads exactly like having nothing waived. The default may still be absent, which is how a tree with
+# nothing to waive starts.
 WAIVER_FILE="$MEMORY_ROOT/project/pass-order-waiver.txt"
+if [ -n "$PASS_ORDER_WAIVER" ]; then
+  case "/$PASS_ORDER_WAIVER/" in
+    //*|*/../*) echo "pass-order: PASS_ORDER_WAIVER is not a repo-relative path inside the tree: $PASS_ORDER_WAIVER"; exit 2 ;;
+  esac
+  WAIVER_FILE="$PASS_ORDER_WAIVER"
+  if ! GIT cat-file -e "HEAD:$WAIVER_FILE" 2>/dev/null; then
+    echo "pass-order: PASS_ORDER_WAIVER names $WAIVER_FILE, which is not tracked at HEAD, so nothing it would waive is waived"
+    exit 2
+  fi
+fi
 waived_ids=""
 # READ FROM THE GRADED COMMIT, not the working tree. A registry read from disk waives on an
 # UNCOMMITTED file — and then its stale-row red cannot fire for anybody else, because the file is

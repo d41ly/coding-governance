@@ -835,8 +835,20 @@ def signal_closed_specs_untraceable(ctx) -> dict:
     # becomes a finding in its own right, because a waiver outliving its subject silently widens
     # the surface it was written to narrow.
     waived: dict[str, str] = {}
-    wpath = ctx.root / ctx.memory_root / "project" / "trace-waiver.txt"
-    if wpath.is_file():
+    # THE PATH IS DECLARABLE (TOOL-dMuffledSentinel-2), and a DECLARED path must resolve. The default
+    # may be absent, which is how an adopter with nothing to waive starts. A declared one may not: the
+    # only reason to declare it is to use it, and one that does not resolve reads exactly like having
+    # nothing waived. So it becomes a row of its own, carried the way a stale waiver is.
+    declared = ctx.trace_waiver
+    bad_declaration = ""
+    if declared:
+        posix = pathlib.PurePosixPath(declared.replace("\\", "/"))
+        if posix.is_absolute() or pathlib.PureWindowsPath(declared).is_absolute() or ".." in posix.parts:
+            bad_declaration = "is not a repo-relative path inside the tree"
+        elif not (ctx.root / posix).is_file():
+            bad_declaration = "names a file that is not there, so nothing it would waive is waived"
+    wpath = ctx.root / (declared or f"{ctx.memory_root}/project/trace-waiver.txt")
+    if not bad_declaration and wpath.is_file():
         for raw_row in wpath.read_text(encoding="utf-8", errors="replace").splitlines():
             if not raw_row.strip() or raw_row.lstrip().startswith("#"):
                 continue
@@ -884,6 +896,11 @@ def signal_closed_specs_untraceable(ctx) -> dict:
         suspect.append({
             "file": rel, "id": "(stale waiver)", "slug": "(stale waiver)", "closed": "",
             "note": "waives a spec that is absent, not terminal, or traceable again",
+        })
+    if bad_declaration:
+        suspect.append({
+            "file": declared, "id": "(declared TRACE_WAIVER)", "slug": "(declared TRACE_WAIVER)",
+            "closed": "", "note": f"TRACE_WAIVER {bad_declaration}",
         })
     return {
         "signal": "closed_specs_with_no_product_commit",
@@ -1760,6 +1777,11 @@ class Ctx:
         # kickoff manifest, and a records commit touching those would certify the record.
         self.trace_cutoff = (getattr(proj, "TRACE_CUTOFF", "") or "").strip()
         self.trace_globs = list(getattr(proj, "TRACE_GLOBS", None) or proj.PRODUCT_GLOBS)
+        # TOOL-dMuffledSentinel-2. Where signal 6's waiver registry lives, repo-relative. BLANK keeps
+        # `<memory-root>/project/trace-waiver.txt`; an adopter whose memory tree has no `project/`
+        # directory declares somewhere it does have. The same getattr-and-fallback as above, so a
+        # project layer that never heard of the key keeps today's path.
+        self.trace_waiver = (getattr(proj, "TRACE_WAIVER", "") or "").strip()
         # EVIDENCE_GLOBS — signal 2's own population, narrower than PRODUCT_GLOBS for the same
         # reason TRACE_GLOBS is: a citation from a test file is the house's own bookkeeping
         # certifying the bookkeeping. getattr-and-fallback, so an older adopter's project layer

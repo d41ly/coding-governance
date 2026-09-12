@@ -223,6 +223,13 @@ LANDED_ANCHOR_CUTOFF=""
 # knows nothing about. Blank turns the term OFF and the leg announces that it did.
 PASS_ORDER_CUTOFF=""
 
+# PASS_ORDER_WAIVER - where the pass-order leg's waiver registry lives, repo-relative
+# (TOOL-dMuffledSentinel-2). One row per waived unit, `<unit-id><TAB><reason>`, read from the graded
+# commit. BLANK keeps `<MEMORY_ROOT>/project/pass-order-waiver.txt`, where an absent file is an empty
+# waiver set. Declare it when your memory tree has no `project/` directory. A DECLARED path must be
+# tracked at HEAD or the leg refuses, because a mistyped one would otherwise waive nothing in silence.
+PASS_ORDER_WAIVER=""
+
 # DISPOSITION_CUTOFF - the date from which check 2 clause 3 reads a review exit's recorded
 # disposition instead of inferring one from new unit ids. Graded on the run-state record's own
 # first-commit date. A record before it keeps the id-delta proxy verbatim — except one with no

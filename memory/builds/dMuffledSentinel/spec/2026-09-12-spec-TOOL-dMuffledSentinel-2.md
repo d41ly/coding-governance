@@ -4,7 +4,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-12-build-TOOL-dMuffledSentinel-2-1-pass-order-probe.sh](../build/2026-09-12-build-TOOL-dMuffledSentinel-2-1-pass-order-probe.sh) | journal | — |
 
 <!-- /gen:spec-records -->
 

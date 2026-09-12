@@ -65,9 +65,9 @@ ids TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2
 | [TOOL-dMuffledSentinel-2 — the pass-order and trace waiver registries take a declared path](spec/2026-09-12-spec-TOOL-dMuffledSentinel-2.md) | — | 1 | INPROGRESS | rev-1 | 2026-09-12 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-dMuffledSentinel-2.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2.
 <!-- /gen:build-index -->
