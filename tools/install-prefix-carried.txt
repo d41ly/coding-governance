@@ -111,7 +111,6 @@ tools/run-gates/run-selftests.test.sh	5	(loose),lib,run-gates	the arms for that 
 tools/run-gates/selftest-budgets.txt	14	(loose),run-gates,unattended	gov's declared self-test population: every row names a gov suite by path, which is what the file IS. Withheld from adopters by a `project-owned` rule for exactly that reason. TOOL-aQuenchedHarness-4. The fourteenth arrived at the landing merge: main added a seventh unattended suite while this branch delegated the six, so its row came with it.
 tools/settings-merge.py	4	(loose),hooks
 tools/unattended/.unattended.conf.example	6	(loose),memory-tree,run-gates
-tools/unattended/SKILL.template.md	1	memory-tree
 tools/unattended/adopt-unattended.sh	2	unattended
 tools/unattended/adopt-unattended.test.sh	2	unattended
 tools/unattended/check-brief-recorded.sh	2	unattended	WRITTEN BY HAND, TOOL-aHoistedPass-7, and the same two shapes the sibling row below carries: the usage line in the file header, which names the leg the way an operator invokes it, and the `evil.sh` path inside the comment recording the incident where a tracked conf line redirected the sibling's DRIVER. Neither is a path this script resolves at runtime -- both are prose about paths -- and a derived spelling in either would make the header unreadable and the incident unciteable.

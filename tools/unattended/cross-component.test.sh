@@ -55,7 +55,7 @@ cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
 sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|tools/unattended|g' \
     -e 's|{{KEEPALIVE_CREATE}}|CronCreate|g' -e 's|{{KEEPALIVE_DELETE}}|CronDelete|g' \
     -e 's|{{KEEPALIVE_INTERVAL}}|every 10 minutes|g' -e 's|{{LANDER}}|bash tools/push-main.sh|g' \
-    -e 's|{{ANCHOR_SCOPE}}|published|g' -e 's|{{TOOL_ROOT}}|tools/|g' -e 's|{{AUTH_PARAM}}|--prompt|g'     "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
+    -e 's|{{ANCHOR_SCOPE}}|published|g' -e 's|{{TOOL_ROOT}}|tools/|g' -e 's|{{MEMORY_TREE_DIR}}|tools/memory-tree|g' -e 's|{{AUTH_PARAM}}|--prompt|g'     "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
 # TOOL-aNamedGesture-1 - this chain is a SECOND hand-kept renderer, and nothing downstream reads the
 # file it writes closely enough to notice a placeholder nobody added an entry for. So the fixture
 # asserts its own render, which is what turns an omission here into a failure instead of a silent

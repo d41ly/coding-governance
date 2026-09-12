@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.18 -->
+<!-- gov:kit unattended@1.19 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -20,6 +20,14 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 
 Copied artifacts carry no placeholder, so rendering them would be a second spelling of `cat`. The
 two rendered ones do carry placeholders, and for them a render is the only correct install.
+
+**One Skill placeholder is probed rather than read.** The Skill tells a run to execute the
+memory-tree kit's bug-class checklist, so it names that kit's `gotchas.py` by path. An adopter may
+install the memory-tree kit flat in its tool root, so the adopter takes the first TRACKED of the
+nested and the flat spelling, and refuses when git tracks neither. Nothing is written in that case.
+`MEMORY_TREE_DIR=<dir>` in the environment overrides the probe, and it must name a directory whose
+`gotchas.py` is tracked. The review-harness kit's build harness carries the same command and fills
+it the same way.
 
 ## The fixture is rendered, and this is the one thing to know about it
 
