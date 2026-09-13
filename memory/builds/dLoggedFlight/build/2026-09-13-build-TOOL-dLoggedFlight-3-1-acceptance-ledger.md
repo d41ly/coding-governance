@@ -2,11 +2,12 @@
 
 **Serves:** journal TOOL-dLoggedFlight-3
 
-Tier-2 · node d · 2026-09-13 · the build pass of the gate runner's run-log line, against spec rev-5.
-Every line is OBSERVED except AC6, which is written as owed. `<suite>` is
-`tools/run-gates/run-gates.runlog.test.sh`, run directly and never through the gate runner. Its final
-run printed `PASS (188 assertions)` against a floor of 188. No gate leg was run, per the owner's
-instruction of 2026-09-13, and no suite that existed under `tools/unattended/` before this build ran.
+Tier-2 · node d · 2026-09-13 · the build pass of the gate runner's run-log line, against spec rev-5,
+and the fold of its bug-class checklist, against rev-6. Every line is OBSERVED except AC6, which is
+written as owed. `<suite>` is `tools/run-gates/run-gates.runlog.test.sh`, run directly and never
+through the gate runner. Its last run, after the fold, printed `PASS (192 assertions)` against a
+floor of 192. No gate leg was run, per the owner's instruction of 2026-09-13, and no suite that
+existed under `tools/unattended/` before this build ran.
 
 ## The criteria
 
@@ -32,14 +33,17 @@ instruction of 2026-09-13, and no suite that existed under `tools/unattended/` b
   a two-leg bar with the journal directory present made 19 external execs after its last leg on the
   base runner and 19 on this unit's. The recurring arm counts the same 19 against a copy whose
   `cleanup` no longer calls the writer, and a clone's first bar pays exactly one more, a `mkdir`.
-  RED seen with a `date` added to the writer, and with an unconditional `mkdir -p`: 20 each.
+  RED seen with a `date` added to the writer, and with an unconditional `mkdir -p`: 20 each. Since the
+  fold both traced bars must also run green, RED seen with a baseline that refuses after faking the
+  trace line the window opens on.
 - AC5 — `GOV_RUNLOG=0` (`check_ac5_write_failure`) — with the journal directory replaced by a file,
   a green and a red bar kept the switch-off `rc` and stdout, and stderr gained one
   `run-gates: run log` line naming `runlog/gates.log` and nothing else. `GOV_RUNLOG=0` wrote no line
   and `GOV_RUNLOG=1` wrote one. RED seen with the failed write ending in `exit 5`, with the warning
-  sent to stdout, and with the switch test removed.
+  sent to stdout, and with the switch test removed. Since the fold the switch-off bar must also run
+  green, RED seen with its one leg made red, a mirror the rc and stdout comparison alone had passed.
 - AC6 — `GATE_SELFTESTS=1` — OWED to the post-build gate run, which records it: the
-  `run-gates run-log line` leg at or above its floor and inside its 160 s budget row, the
+  `run-gates run-log line` leg at or above its floor and inside its 280 s budget row, the
   `kit version markers` leg green at 1.7, and the `govkit selfcheck` leg resolving the suite as
   `project-owned`. What this pass observed is the declarations, through `check_ac6_declarations`:
   the suite in the kit's project-owned list, a budget row, one held, guarded and bounded manifest leg,
@@ -86,7 +90,8 @@ Two breaks first came back NOT RED, and each changed the suite before the final 
 `RUNLOG_RC` passed the three signal bars, because a signal that interrupts `wait -n` leaves `$?` at
 128+n, so the held TERM was added. An exec placed ahead of the switch test ran on both sides of a
 `GOV_RUNLOG=0` baseline, so AC4's baseline became a copy that never calls the writer. Both are in the
-spec's rev-5 section 4.
+spec's rev-5 section 4. The checklist fold staged two more, a refusing AC4 baseline and a red AC5
+switch-off bar, and both went RED.
 
 ## Owed to the post-build gate run
 
@@ -108,6 +113,12 @@ Every leg of the spec's section 7, and the run records each verdict after it:
   first one by the run-gates dossier.
 - The kit's other suites, the canary among them, pin `cleanup`'s single-line shape and its order of
   work. The line keeps both, but those suites run only after the build.
+- The runlog kit's golden gates line, in its fixtures, carries illustrative values this runner never
+  writes: `stage=legs`, an epoch `started` and `wall_breach=0`. Its keys match the data model and the
+  grammar test passes on them; the values are the closing review's to align, since that fixture sits
+  outside this unit's write set and its self-test is a gate leg this pass may not run.
+- The budget row was raised from 160 s to 280 s when a loaded run took 186 s, and the ceiling from
+  900 s to 1200 s with it. Six direct runs ranged from 62 s to 186 s on one node in one evening.
 - `tools/govkit/subject-pins.tsv` was extended by hand with the one row the generator writes for the
   new leg, in its sorted place, rather than by running `govkit selfcheck --write`, since that verb
   runs the selfcheck gate as it writes.

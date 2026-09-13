@@ -923,7 +923,7 @@
     ],
     "chunk": "selftests",
     "subject": "kit",
-    "ceiling": 900
+    "ceiling": 1200
   },
   {
     "name": "run-gates adopter e2e",

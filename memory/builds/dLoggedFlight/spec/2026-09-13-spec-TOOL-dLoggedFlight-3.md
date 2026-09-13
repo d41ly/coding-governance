@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-3 — the gate runner writes one verdict line per bar run
 
-**Status:** CLOSED · rev-5 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 3
+**Status:** CLOSED · rev-6 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -133,6 +133,7 @@ wall_breach rc fail.1..fail.20 fail_more kit`.
 | `write_runlog_verdict`, `read_record_keys` | shell functions | `sh.function`, verb-led |
 | `RUNLOG_RC`, `GOV_RUNLOG` | a signal's status, the environment's switch | runner variables |
 | `RGRL_BEFORE` | the runner AC4 traces as its baseline | suite environment seam |
+| `RGRL_ARMS` | the arms a selected run grades, never against the floor | suite environment seam |
 | `run-gates run-log line` | leg, `kit` / `selftests` | manifest |
 
 ### Files touched (estimate)
@@ -235,6 +236,12 @@ none
   the failing-leg order, the `stage` rule, the keys left empty, the two-step fit, the text-and-count key
   of the exit enumeration with its two subshell exemptions, INT delivered through `timeout`, and AC4's
   trace window and baseline seam. The inventory gains the two variables and the seam.
+- rev-6 · 2026-09-13 · §4 Inventory · the fold of the bug-class checklist over the build commit. The
+  rev-5 line above names less than rev-5's section 4 says: that section also carries the TERM held
+  behind a command substitution and AC4's baseline as a copy that never calls the writer, both added
+  when their first staged breaks came back green. The build also recorded a second gotcha class,
+  `async-job-starts-with-sigint-ignored`, beside the one S7 names. The inventory gains `RGRL_ARMS`,
+  which rev-5 left out.
 
 ## 10. Reuse audit
 

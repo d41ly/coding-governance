@@ -40,7 +40,7 @@
 # by its own staged arms.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
-FLOOR_ASSERTIONS=188
+FLOOR_ASSERTIONS=192
 # Where the scratch clone installs the runner: a FIXTURE-INTERNAL path, bound once, never gov's prefix.
 KR=kit/run-gates
 n=0; st=0
@@ -379,7 +379,7 @@ run_traced() { # trace file · runner · NAME=VALUE... -> one bar under xtrace i
 }
 
 check_ac4_spawns() {
-  local before after l0 off on first extra
+  local before after l0 off on first extra rc
   write_legs ac4 '[{"name": "one", "argv": ["bash", "fx/ok.sh"]}, {"name": "two", "argv": ["bash", "fx/ok.sh"]}]'
   # WARM, so both traced bars find a ledger and a journal directory already there: the first bar in a
   # clone takes the ledger's no-merge branch and the one-time mkdir, which are not the writer's cost.
@@ -399,9 +399,12 @@ check_ac4_spawns() {
       "$(grep -c '^cleanup() {.*write_runlog_verdict' "$WORK/no-writer.sh")|$(grep -c '^cleanup() { run_outstanding_reap;' "$WORK/no-writer.sh")" "0|1"
     before=$(build_traced_runner before "$WORK/no-writer.sh")
   fi
-  run_traced "$WORK/t.off" "$before" GATE_LEGS="$WORK/ac4.json"
+  run_traced "$WORK/t.off" "$before" GATE_LEGS="$WORK/ac4.json"; rc=$?
+  # BOTH SIDES DID THE WORK: equal counts from two bars that refused early would compare nothing.
+  check "AC4 the baseline bar ran green" "$rc" 0
   check "AC4 the baseline bar wrote no line" "$(measure_lines)" "$l0"
-  run_traced "$WORK/t.on" "$after" GATE_LEGS="$WORK/ac4.json"
+  run_traced "$WORK/t.on" "$after" GATE_LEGS="$WORK/ac4.json"; rc=$?
+  check "AC4 the writer's bar ran green" "$rc" 0
   check "AC4 the traced bar with the writer on wrote one line" "$(measure_lines)" "$((l0 + 1))"
   off=$(measure_execs "$WORK/t.off" "$before"); on=$(measure_execs "$WORK/t.on" "$after")
   check "AC4 the window opens in the baseline trace" "$([ "$off" != nowindow ] && echo yes)" yes
@@ -411,7 +414,8 @@ check_ac4_spawns() {
   check "AC4 the writer adds no external exec after the last leg" "$on" "$off"
   # The one sanctioned spawn: a clone's FIRST bar makes the journal directory, once.
   mv "$REPO/.git/runlog" "$WORK/runlog.keep"
-  run_traced "$WORK/t.first" "$after" GATE_LEGS="$WORK/ac4.json"
+  run_traced "$WORK/t.first" "$after" GATE_LEGS="$WORK/ac4.json"; rc=$?
+  check "AC4 the first bar ran green" "$rc" 0
   first=$(measure_execs "$WORK/t.first" "$after")
   extra=$(comm -13 <(printf '%s\n' ${on#* } | sort) <(printf '%s\n' ${first#* } | sort) | tr '\n' ' ')
   check "AC4 a clone's first bar pays exactly one mkdir" "$extra" "mkdir "
@@ -429,6 +433,7 @@ check_ac5_write_failure() {
   mv "$REPO/.git/runlog" "$WORK/runlog.keep"
   : > "$REPO/.git/runlog"
   run_bar GATE_LEGS="$WORK/ac5.json" GOV_RUNLOG=0; out_off=$OUT; rc_off=$RC; err_off=$ERR
+  check "AC5 the switch-off bar is green, so rc and stdout are compared between two bars that ran" "$rc_off" 0
   run_bar GATE_LEGS="$WORK/ac5.json"
   check "AC5 a failed append leaves rc alone" "$RC" "$rc_off"
   check "AC5 a failed append leaves stdout alone" "$OUT" "$out_off"
