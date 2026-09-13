@@ -4,7 +4,7 @@ node: c
 opened: 2026-09-12
 streams: tooling
 roster: TOOL
-ids: TOOL-cGradedDebt-1 TOOL-cGradedDebt-2 TOOL-cGradedDebt-3
+ids: TOOL-cGradedDebt-1 TOOL-cGradedDebt-2 TOOL-cGradedDebt-3 TOOL-cGradedDebt-4 TOOL-cGradedDebt-5
 authorized-by: prompt
 ---
 
@@ -65,7 +65,7 @@ ROWS, so it reports a green verdict over an 88% waived population and prints no 
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 2 unit(s) · node c · opened 2026-09-12 · streams tooling
-ids TOOL-cGradedDebt-1 TOOL-cGradedDebt-2 TOOL-cGradedDebt-3
+ids TOOL-cGradedDebt-1 TOOL-cGradedDebt-2 TOOL-cGradedDebt-3 TOOL-cGradedDebt-4 TOOL-cGradedDebt-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
