@@ -49,7 +49,7 @@ the same checklist path, and it breaks the same way.
   underlying tension, every conforming harness costing two offenders, for the owner.
 - **`update` still keeps a schema-3 receipt's `engine` role** when a kit makes that destination
   `rendered`. Round 1 repaired it for this release by a consumer migration, and round 2 found that
-  migration wedged at core's commit-time receipt check; rev-7's two runbook blocks are what the
+  migration wedged at core's commit-time receipt check; rev-7's three runbook blocks are what the
   govkit selftest now runs, verbatim, on a hooked and `adopt`-bootstrapped fixture.
   `DEPL-dPolishedVitrine-1` holds the govkit move, whose blast radius is the owner's to rule on.
 

@@ -63,14 +63,15 @@ Skill's copy of the same checklist line is fixed the same way.
   The parity script resolves `MEMORY_TREE_DIR` per pair, so an unanswered probe skips only the pair
   that needs it. The parity leg is unguarded in both carriers. The runbook's Maintenance section and
   the kit README carry the consumer migration. Observed by AC4, AC13, AC14, AC15 and AC16.
-- **S9** — round 2's repairs, rev-7. The runbook's migration becomes two blocks the govkit selftest
-  cuts out of `WIRE-INTO-PROJECT.md` and runs: block 1 stops on update's exit code, commits only
-  update's own writes with the receipt, derives the pins from `plan`, and checks a read-only re-adopt
-  that counts the rows it leaves unattributed; block 2 re-adopts, commits the renders with the
-  receipt, and re-adopts once more. The `[-PV]` arms run it on an `adopt`-bootstrapped fixture with
-  a receipt hook, over this repo's real parity script. The parity script gains `--tracked-only` and
-  the regenerate argv passes it. Selfcheck arm 7l gains its negative half, and three carriers stop
-  calling a flag-off update silent. Observed by AC13, AC17, AC18, AC19 and AC20.
+- **S9** — round 2's repairs, rev-7. The runbook's migration becomes three blocks the govkit
+  selftest cuts out of `WIRE-INTO-PROJECT.md` and runs: block 1 stops on update's exit code and
+  commits only update's own writes with the receipt; block 2, read-only and re-runnable, derives the
+  pins from `plan` and checks a read-only re-adopt that counts the rows it leaves unattributed;
+  block 3 re-adopts, commits the renders with the receipt, and re-adopts once more. The `[-PV]`
+  arms run it on an `adopt`-bootstrapped fixture with a receipt hook, over this repo's real parity
+  script. The parity script gains `--tracked-only` and the regenerate argv passes it. Selfcheck arm
+  7l gains its negative half, and three carriers stop calling a flag-off update silent. Observed by
+  AC13, AC17, AC18, AC19 and AC20.
 
 ## 3. Non-goals (OUT)
 
@@ -111,10 +112,10 @@ Skill's copy of the same checklist line is fixed the same way.
   probed spellings, or named by the override, before the harness renders. The parity script still
   renders the protocol without it, and the unattended adopter refuses without it.
 - **hands-off** external — the consumer re-pulls by the runbook's migration, not by `update` alone.
-  On govkit 1.11 or later it runs the runbook's two blocks, verbatim, and reads block 1's FLAG lines
-  between them. §4 Rollout says why each step is there (rev-7; rev-5's sequence wedged at core's
+  On govkit 1.11 or later it runs the runbook's three blocks, verbatim, and reads block 2's FLAG
+  lines before block 3. §4 Rollout says why each step is there (rev-7; rev-5's sequence wedged at core's
   commit-time receipt check). The hand-off also covers NicoCares carrying its cap carve-out into the
-  template after block 2, retiring core's untagged Skill delta and NicoCares' untagged driver delta,
+  template after block 3, retiring core's untagged Skill delta and NicoCares' untagged driver delta,
   and adding the parity leg core lacks.
 
 ## 4. Design
@@ -220,7 +221,7 @@ render stays tracked at its old path, because this repo runs its own harness.
 That last fact is why `update` alone cannot migrate a consumer (rev-5, round 1 F1). Both consumer
 receipts are schema 3 and row the harness as `engine`. `update` takes a row's role from the receipt,
 and gov still tracks the source, so the raw arm writes gov's own `tools/`-spelled render. So the
-consumer migrates by the runbook's two blocks, on govkit 1.11 or later (rev-7, round 2):
+consumer migrates by the runbook's three blocks, on govkit 1.11 or later (rev-7, round 2):
 
 1. Block 1 runs `update --write` with `GOVKIT_RERENDER=1`: the template lands as an unclaimed
    source, and then every `[[regenerate]]` block renders. It STOPS unless update exits 0 with no
@@ -232,19 +233,19 @@ consumer migrates by the runbook's two blocks, on govkit 1.11 or later (rev-7, r
    engine blobs with the receipt reds the re-rendered harness, and the re-adopt refuses a staged
    tree (R2-1). The regenerate's changes to tracked files are recorded by name; a file it created is
    flagged and never staged (R2-3).
-3. It derives the pins. A tracked row that records a commit, and that the plan still resolves, is
-   pinned to that commit. A tracked destination that `plan` at the new vintage resolves as
-   `rendered` is pinned to that vintage when its kit's regenerate ran at exit 0, and left unpinned
-   otherwise, so a declined render is never recorded as current (R2-2). The rendered set comes from
-   the plan, not the receipt, because a receipt `adopt` bootstrapped never rows a destination
-   tracked after it was written (R2-5), and a rendered destination is never pinned to a recorded
-   commit (R2-6).
+3. Block 2, which writes nothing to the tree and can be run again after a STOP, derives the pins.
+   A tracked row that records a commit, and that the plan still resolves, is pinned to that commit.
+   A tracked destination that `plan` at the new vintage resolves as `rendered` is pinned to that
+   vintage when its kit's regenerate ran at exit 0, and left unpinned otherwise, so a declined
+   render is never recorded as current (R2-2). The rendered set comes from the plan, not the
+   receipt, because a receipt `adopt` bootstrapped never rows a destination tracked after it was
+   written (R2-5), and a rendered destination is never pinned to a recorded commit (R2-6).
 4. It runs the re-adopt READ-ONLY and checks it. Every row new to the receipt is flagged, every row
    left `unattributed` is flagged with its reason, a row that loses a recorded base stops the block,
    and the last line counts the unattributed rows.
-5. Block 2 runs `adopt --re-adopt --write` with the pins, which is the only verb that re-reads a role
-   from the descriptor, so the harness row becomes `rendered`. It stages the recorded renders with
-   the receipt and commits, which the receipt check exempts, because the rows are now `rendered`.
+5. Block 3 runs `adopt --re-adopt --write` with the pins. That is the only verb that re-reads a
+   role from the descriptor, so the harness row becomes `rendered`. It stages the recorded renders
+   with the receipt and commits, which the receipt check exempts, because the rows are `rendered`.
 6. It re-adopts once more with the same pins, because step 5 read each render's identity from the
    index before the render was staged, and commits the receipt. The end state asserted is the one
    where the receipt's `oid` is the committed render's blob.
@@ -253,7 +254,7 @@ Done is: the harness row `rendered` and `pinned`, and the next `update --write` 
 and either re-stamps or withholds the stamp over exactly the rows step 4 counted (R2-4). At both
 consumers it withholds, because each carries rows that were unattributed before. That message
 suggests the bare `adopt --re-adopt --write`, which drops every pin, so the runbook says to re-run
-block 2 instead; making the message name the pinned form is `DEPL-dPolishedVitrine-1`'s.
+block 3 instead; making the message name the pinned form is `DEPL-dPolishedVitrine-1`'s.
 
 With `GOVKIT_RERENDER` unset, `update` declines both regenerates without printing a line naming
 them, yet it still prints each moved render's row as `re-rendered` although no render ran (R2-7).
@@ -301,7 +302,7 @@ review-harnesses dossier, the generated map, and this build's records.
 - testing — five harness fixtures, two negative controls, three parity refusals, and four adopter
   arms. Every new arm is observed red before the fix, and the journal records it.
 - migration — none in gov: its render is byte-identical at every code line. Consumers migrate by
-  the runbook's two blocks in §4 Rollout, handed off in §3, and not by `update` alone.
+  the runbook's three blocks in §4 Rollout, handed off in §3, and not by `update` alone.
 - user docs — N/A as a `help/` tree, which this repo does not ship. The runbook's copy-install step
   and both kit READMEs are the agent-facing docs, and S7 updates them.
 
@@ -399,9 +400,9 @@ review-harnesses dossier, the generated map, and this build's records.
   `GOVKIT_RERENDER`.
   Red when: a carrier promises a re-render the flag-off run does not perform, and selfcheck stays
   green.
-- **AC17** — When the runbook's two blocks, cut from `WIRE-INTO-PROJECT.md`, run on a target whose
+- **AC17** — When the runbook's three blocks, cut from `WIRE-INTO-PROJECT.md`, run on a target whose
   pre-commit refuses a staged engine blob its receipt does not record, every commit they make lands,
-  and the tree ends clean. The govkit selftest's `[-PV] R2-1` arms run them on an `apply`-built and
+  block 2 moves neither HEAD nor the tree however often it runs, and the tree ends clean. The govkit selftest's `[-PV] R2-1` arms run them on an `apply`-built and
   an `adopt`-bootstrapped target, and a LIVENESS arm shows the hook refusing an engine edit.
   Red when: block 1 stages the regenerated harness before the re-adopt, as rev-5's `git add -A` did,
   and the hook refuses the commit.
@@ -409,7 +410,7 @@ review-harnesses dossier, the generated map, and this build's records.
   before it, a render from a kit with no regenerate, and two tracked destinations it never rowed,
   the pins cover every tracked destination the plan renders whose kit regenerated, at the new
   vintage and never at an older commit; the declined render is left unpinned and the next update
-  grades it `re-rendered`; block 1 flags both new destinations and counts the unattributed rows, and
+  grades it `re-rendered`; block 2 flags both new destinations and counts the unattributed rows, and
   the next update withholds its stamp over exactly that count. A conflicted step 1 stops the block
   before its commit, with no pin derived. The `[-PV] R2-2`, `R2-4`, `R2-5` and `R2-6` arms run it.
   Red when: the pins come from the receipt, as rev-5's rule took them; the declined render is pinned
@@ -445,7 +446,7 @@ New arm: `tools/govkit/selftest.py` · the old hand-off, HEAD's engine order, a 
 New arm: `tools/govkit/govkit.py` · the five carriers round 1 named, unfixed · none
 New arm: `tools/workflows/unattended-build.test.sh` · a review-harness-only install · none
 New arm: `tools/workflows/unattended-build.test.sh` · the regenerate argv without `--tracked-only` · none
-New arm: `tools/govkit/selftest.py` · rev-5's `git add -A`, its receipt pin rule, a step 1 that ignores update's exit, a check blind to new rows, a relabelled flag-off verdict · none
+New arm: `tools/govkit/selftest.py` · rev-5's `git add -A`, its receipt pin rule, a step 1 that ignores update's exit, a check blind to new rows, a block 2 that writes, a relabelled flag-off verdict · none
 New arm: `tools/govkit/govkit.py` · the three carriers calling a flag-off update silent · none
 
 ## 8. Open questions
@@ -503,11 +504,11 @@ New arm: `tools/govkit/govkit.py` · the three carriers calling a flag-off updat
   README's marker. AC10 now names 1.20, and govkit's 1.11 from rev-5 as well.
 - rev-7 · 2026-09-13 · S3 · S9 · §3 · §4 · §5 · AC13 · AC17–AC20 · §7 · AMENDED by the round-2
   Tier-2 diff review, verdict BLOCKED on round 1's F1 still open at core, with eight defects in all.
-  §4 Rollout is replaced by the runbook's two blocks, because rev-5's step-1 `git add -A` staged the
+  §4 Rollout is replaced by the runbook's three blocks, because rev-5's step-1 `git add -A` staged the
   regenerated harness while its row was still `engine`, core's commit-time receipt check refused
   it, and the re-adopt that would clear it refuses a staged tree (R2-1). The pins now come from
   `plan` and from each kit's regenerate, not from the receipt (R2-2, R2-5, R2-6); step 1 stops on
-  update's exit code (R2-6); Done names the count block 1's check prints (R2-4). The regenerate argv
+  update's exit code (R2-6); Done names the count block 2's check prints (R2-4). The regenerate argv
   passes `--tracked-only` (R2-3). Selfcheck arm 7l gains its negative half, and the flag-off
   sentences say the row still prints `re-rendered` (R2-7). S9 and AC17 to AC20 carry them. R2-8 is
   this rev's S3, §5 and build-README text, and its Check is this list of every `refus` clause that

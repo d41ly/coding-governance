@@ -996,8 +996,8 @@ row as an engine file, and a correct render reads as a local edit. This needs go
 which lands a new template BEFORE it re-renders; an older govkit refuses the render with
 `missing shipped copy`.
 
-**The migration is two blocks, with a reading step between them.** Set three variables in the shell
-you run them from, at `<project>`'s root:
+**The migration is three blocks, with a reading step before the last.** Run block 1 once, from a
+clean tree. Set three variables in the shell you run them from, at `<project>`'s root:
 
 ```bash
 GOV=<gov>        # a gov checkout at the vintage you are moving to
@@ -1006,7 +1006,7 @@ PY=python        # whatever runs Python 3 here
 ```
 
 Each block is a subshell, so a `STOP` ends that block and leaves your shell standing. Everything
-the two blocks pass between them, including the small program block 1 writes, sits in your git
+the blocks pass between them, including the small program block 1 writes, sits in your git
 directory and never in the tree.
 
 <!-- harness-migration 1 -->
@@ -1042,8 +1042,8 @@ if mode == "step1":
     upd, par = read("update"), read("parity")
     rc = re.search(r"^update exit (\d+)", upd, re.M).group(1)
     if rc != "0" or " 0 conflict(s)" not in upd:
-        stop(f"update exited {rc} or left a conflict. Resolve what it names, re-run update by "
-             "hand until it exits 0, then run this block again.")
+        stop(f"update exited {rc} or left a conflict. Nothing is committed. Resolve what it names, "
+             "return the tree to HEAD, and run this block again.")
     if "review-harness" not in ran_ok():
         stop("the review-harness regenerate did not run at exit 0, so the harness is gov's render.")
     if not re.search(r"^parity exit 0$", par, re.M) or re.search(r"SKIP \S*unattended-build\.js", par):
@@ -1100,11 +1100,17 @@ PY
   echo "parity exit $?" >> "$G/harness-migration-parity.txt"; cat "$G/harness-migration-parity.txt"
   "$PY" "$G/harness-migration.py" "$G" step1 || exit 1
   # 2. Commit update's own writes with the receipt that records them, and nothing the regenerate
-  #    wrote: those stay unstaged until block 2 rows them `rendered`.
+  #    wrote: those stay unstaged until block 3 rows them `rendered`.
   git add -- .governance/install.json .governance/install.sums
   git commit -q -m "govkit update: review-harness 1.8" || { echo "STOP: that commit was refused."; exit 1; }
-  git diff --name-only -z > "$G/harness-migration-renders.z"
+  git diff --name-only -z > "$G/harness-migration-renders.z" )
+```
+
+<!-- harness-migration 2 -->
+```bash
+( G=$(git rev-parse --git-dir); rm -f "$G/harness-migration-ready"
   # 3. Derive the pins from the plan at this vintage. 4. Run the re-adopt READ-ONLY and check it.
+  #    Nothing here writes to the tree, so this block can be run again after you fix a STOP.
   "$PY" "$GOV/tools/govkit/govkit.py" plan --target . > "$G/harness-migration-plan.txt" \
     || { echo "STOP: plan failed."; exit 1; }
   "$PY" "$G/harness-migration.py" "$G" pins "$(git -C "$GOV" rev-parse HEAD)" || exit 1
@@ -1114,13 +1120,13 @@ PY
   "$PY" "$G/harness-migration.py" "$G" check && touch "$G/harness-migration-ready" )
 ```
 
-Read every `FLAG` line block 1 printed before you run block 2. Each names its reason, and the
-paragraphs after block 2 say why each reason is expected.
+Read every `FLAG` line block 2 printed before you run block 3. Each names its reason, and the
+paragraphs after block 3 say why each reason is expected.
 
-<!-- harness-migration 2 -->
+<!-- harness-migration 3 -->
 ```bash
 ( G=$(git rev-parse --git-dir); PINS=$(cat "$G/harness-migration-pins.txt")
-  [ -f "$G/harness-migration-ready" ] || { echo "STOP: block 1 has not finished clean."; exit 1; }
+  [ -f "$G/harness-migration-ready" ] || { echo "STOP: block 2 has not finished clean."; exit 1; }
   # 5. Re-row, then commit the re-rendered files with the receipt that now rows them `rendered`.
   "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $PINS --write || { echo "STOP: adopt refused."; exit 1; }
   git add -- .governance/install.json .governance/install.sums
@@ -1143,15 +1149,21 @@ re-measures EVERY row, not just this one.
 **Why step 1 stops on update's exit code, and not on the parity check.** When the three-way merge
 conflicts on a file, `update` leaves that row untouched at its old commit, writes an order under
 `.governance/outbox/` and exits 1, and the regenerate still runs, so the parity check alone passes.
-Carried on, block 2 would record the regenerated harness as current over an edit the merge could not
-place. Resolve the order, re-run `update` until it exits 0, then run block 1 again.
+Carried on, block 3 would record the regenerated harness as current over an edit the merge could not
+place. Any STOP in block 1 leaves update's writes in the tree uncommitted, and `update` refuses to
+run over dirty paths it claims, so return the tree to HEAD before running block 1 again. A conflict
+on the harness itself is the local edit the paragraph on local edits below carries into the
+template: set it aside and restore the harness to the blob its receipt row records. A conflict
+anywhere else is resolved the way `update`'s own message asks.
 
-**Why block 1 commits only what `update` staged.** Until block 2 the receipt still rows the harness
+**Why block 1 commits only what `update` staged.** Until block 3 the receipt still rows the harness
 as an engine file. A commit-time check that compares staged engine blobs with the receipt therefore
 reds the re-rendered harness, and the re-adopt that would clear that refuses a staged tree. So step
 2 commits update's own writes with the receipt that records them, which passes such a check, and
-block 2 stages the renders once their rows are `rendered`. It stages them by name, from the list
-step 2 recorded. A file step 1 CREATED is flagged and never staged, because nothing rows it.
+block 3 stages the renders once their rows are `rendered`. It stages them by name, from the list
+step 2 recorded. A file step 1 CREATED is flagged and never staged, because nothing rows it. Once
+step 2 has committed, block 1 is done: its regenerated files stay unstaged, and `update` would
+refuse them as dirty. Block 2 writes nothing to the tree, so run it again as often as a STOP needs.
 
 **Why these pins, and where each one comes from.**
 
@@ -1176,7 +1188,7 @@ step 2 recorded. A file step 1 CREATED is flagged and never staged, because noth
 - Block rows (`merged`, `attributes`) and rows gov supplies no bytes for (`project-owned`,
   `generated`) are left to `adopt`, which re-synthesizes them.
 
-**What block 1's check reports.** It flags every row new to the receipt, pinned or not, because
+**What block 2's check reports.** It flags every row new to the receipt, pinned or not, because
 nothing recorded a base for it before. It flags every row the re-adopt leaves `unattributed`, with
 one of four reasons: new to the receipt, unattributed before, a render its kit did not regenerate,
 or a row that recorded no base before. It STOPs on a row the receipt recorded a base for that the
@@ -1186,23 +1198,23 @@ counts the unattributed rows. `adopt` re-measures only the kits `.governance/dep
 whitespace, so a path holding a space needs its flags passed by hand.
 
 **A local edit to the old harness does not survive step 1.** The re-render overwrites the harness
-with the template's render. Carry the edit into `<kit>/unattended-build.template.js` after block 2,
+with the template's render. Carry the edit into `<kit>/unattended-build.template.js` after block 3,
 re-run `bash <kit>/check-protocol-parity.test.sh --render`, commit the template and its render, then
-run block 2 again, which records the template's delta. A target whose pre-commit compares staged
+run block 3 again, which records the template's delta. A target whose pre-commit compares staged
 engine blobs with its receipt refuses that commit, as it refuses any local edit to an engine file,
 and that is its own check's rule rather than this migration's.
 
 **Done looks like this.** The receipt rows the harness `rendered` with `evidence: "pinned"`, and
-every row block 1 did not flag keeps the attribution it had. The next `update --write` writes
+every row block 2 did not flag keeps the attribution it had. The next `update --write` writes
 nothing to the harness. It either re-stamps, or it withholds the stamp over exactly the rows block
-1's last line counted, and says how many. **Do not answer that message with the bare
+2's last line counted, and says how many. **Do not answer that message with the bare
 `adopt --re-adopt --write` it suggests.** That is the unpinned re-adopt, and it drops the harness's
-`pinned` evidence and every edited row's base. Run block 2 again, which carries the pins, or pass
+`pinned` evidence and every edited row's base. Run block 3 again, which carries the pins, or pass
 `--allow-ungraded` to `update` knowingly. Having the message name the pinned form is
 `DEPL-dPolishedVitrine-1`'s, and so is `update` learning to move a role itself, which retires this
 section.
 
-The govkit selftest's `[-PV]` arms cut these two blocks out of this file and run them on every
+The govkit selftest's `[-PV]` arms cut these three blocks out of this file and run them on every
 self-test run, so the text you copy is the text that was tested. They run on a fixture `apply`
 installed and on one `adopt` bootstrapped, which carries a commit-time receipt check, a row
 unattributed before the migration, a kit that declines its regenerate, and two destinations the

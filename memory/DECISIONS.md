@@ -93,7 +93,7 @@
 - TOOL-dNarrowedAnchor-1 · the second anchor is admissible PER MODE. `ANCHOR_SCOPE` was a whole-project switch, so enabling the prompt path also let a `slug` run push its own authorization. `SECOND_ANCHOR_MODES="prompt recipe"`; `slug`, an absent `authorized-by:`, reds `fail 50` and leg `fail 29`
 - TOOL-dPolishedVitrine-1 · OWNER RULING 2026-09-12: the build harness is RENDERED at install rather than handed paths in args. Its install literals become KIT_DIR, TOOL_ROOT and MEMORY_TREE_DIR, the last PROBED from a tracked gotchas.py and refused when absent: adopters install memory-tree flat
 - TOOL-dPolishedVitrine-12 · round 1: F1 is repaired by a migration (update, commit, `adopt --re-adopt` pinning every recorded base) and not a govkit role move, filed DEPL-dPolishedVitrine-1; F3 SUPERSEDES -1's refusal in the parity script: a missing gotchas.py skips only the pair naming it
-- TOOL-dPolishedVitrine-13 · round 2 SUPERSEDES -12's sequence: two runbook blocks commit update's own writes before any render and pin renders from `plan` and their kit's regenerate, not the receipt; the govkit selftest runs them verbatim; the regenerate creates no live copy
+- TOOL-dPolishedVitrine-13 · round 2 SUPERSEDES -12's sequence: three runbook blocks commit update's own writes before any render and pin renders from `plan` and their kit's regenerate, not the receipt; the govkit selftest runs them verbatim; the regenerate creates no live copy
 
 ## DEPL — deployer
 

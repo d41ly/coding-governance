@@ -286,16 +286,24 @@ taken before it, and `cmp` confirmed each restore.
 The fixture itself changed first, because each finding was a way the old one differed from a real
 consumer. The `[-PV]` kit is now `review-harness`, and its regenerate runs this repo's real
 `check-protocol-parity.test.sh` through the argv the real `kit.toml` declares, over small templates.
-The migration's two blocks are cut out of `WIRE-INTO-PROJECT.md` by their markers and run by bash,
+The migration's three blocks are cut out of `WIRE-INTO-PROJECT.md` by their markers and run by bash,
 so `derive_pv_pins`, which was a hand copy of the runbook's pin rule, is gone. There are now four
 targets. One is built by `apply`, one is bootstrapped by `adopt` the way core's receipt was, one
 carries a harness edit beside gov's change, and one is the unpinned control. Every commit on them
 after setup is a real `git commit` through a pre-commit hook written from core's receipt-check rule.
 
+The sequence is three blocks rather than two. `update` refuses a tree whose claimed paths are dirty,
+and once step 2 has committed the regenerated harness is, so block 1 can run only once. Steps 3 and
+4 write nothing, so they became their own block, which an operator can run again after fixing a
+STOP. An arm asserts that block 2 leaves HEAD and the tree as block 1 left them, and another that a
+second run counts the same. Observed red: with `--write` added to block 2's re-adopt, the first arm
+redded, and so did R2-5's two flag arms, because the check then read the receipt block 2 had just
+rewritten.
+
 - **R2-1, blocker: step 1's commit wedged at core.** rev-5's `git add -A` staged the regenerated
   harness while its row was still `engine`. Core's commit-time receipt check refuses that, and the
   re-adopt that would clear it refuses a staged tree. Block 1 now commits only update's own writes
-  with the receipt that records them. Block 2 stages the recorded renders once their rows are
+  with the receipt that records them. Block 3 stages the recorded renders once their rows are
   `rendered`, then re-adopts again so the receipt's `oid` names the committed render. That is the
   end state the arms assert. The gate is the hook, with a LIVENESS arm that shows it refusing an
   engine edit, and the `[-PV] R2-1` arms, which assert that every commit lands and the tree ends
@@ -318,14 +326,14 @@ after setup is a real `git commit` through a pre-commit hook written from core's
   the flag taken out of the argv, the regenerate created the protocol and block 1 flagged it
   `step 1 created it and nothing rows it`. govkit reporting such a file itself is a govkit change
   outside §3, added to `DEPL-dPolishedVitrine-2`.
-- **R2-4, medium: the Done state could not be met at a consumer.** Block 1's check now counts the
+- **R2-4, medium: the Done state could not be met at a consumer.** Block 2's check now counts the
   rows the re-adopt leaves `unattributed`, each with its reason. Done says the next update either
   re-stamps or withholds its stamp over exactly that count. The runbook also warns against the bare
   re-adopt that message suggests. The gate is the bootstrapped fixture, which starts with two rows
   unattributed and gains one new to its receipt. On it the check counts 3 and the next update
   withholds over 3. Under rev-5's Done the same run would have had to re-stamp, and it printed
   `NOT re-stamped: 3 row(s)`. Observed red: with the check blind to rows new to the receipt, which is
-  what rev-5's reading guidance was, block 1 counted 2 against a withheld 3, and three arms redded.
+  what rev-5's reading guidance was, block 2 counted 2 against a withheld 3, and three arms redded.
   The message naming the pinned form is added to `DEPL-dPolishedVitrine-1`.
 - **R2-5, low: the pin set came from the old receipt.** Rendered destinations now come from `plan`
   at the new vintage, intersected with what the tree tracks. The check flags every row new to the
@@ -411,11 +419,11 @@ Found while fixing, and not this unit's:
   parity script.
 - AC16 — `govkit selfcheck` — OBSERVED: arm 7l reported `5 problem(s)` on the unfixed carriers and
   exits 0 on the corrected ones.
-- AC17 — `WIRE-INTO-PROJECT.md` — OBSERVED: both blocks, cut from the runbook, run clean through the
+- AC17 — `WIRE-INTO-PROJECT.md` — OBSERVED: all three blocks, cut from the runbook, run clean through the
   receipt hook on the `apply` and `adopt` fixtures, and every commit lands. rev-5's `git add -A` is
   the red recorded under R2-1 above.
 - AC18 — `R2-4` — OBSERVED: on the bootstrapped fixture the pins cover the protocol and the harness
-  at B and never `notes.md`, the next update grades `notes.md` `re-rendered`, block 1 counts 3, and
+  at B and never `notes.md`, the next update grades `notes.md` `re-rendered`, block 2 counts 3, and
   the next update withholds over 3. The conflicted fixture stops at step 1 with no commit and no pin.
   The reds are under R2-2, R2-4, R2-5 and R2-6 above.
 - AC19 — `--tracked-only` — OBSERVED: the eleven `PV-R2-3` arms pass, and the `[-PV] R2-3` arm
