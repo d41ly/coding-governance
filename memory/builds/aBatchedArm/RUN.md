@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: c2db2f5d2d6100af08a09da113086d114c67b603
-phase: RUNNING
+witness: 8d2c065e0341e35a4d082c23a1f63faa35536cd6
+phase: BUILDING
 branch-sha: c2db2f5d2d6100af08a09da113086d114c67b603
 branch-ref: refs/heads/branch/unattended-checks-performance-a37d8d
 mode: prompt
@@ -32,3 +32,5 @@ base: c2db2f5d2d6100af08a09da113086d114c67b603
 2026-09-13T11:20:53Z review · item TOOL-aBatchedArm-4 · reason verdict BLOCKED · blockers 3
 
 2026-09-13T11:53:08Z review · item TOOL-aBatchedArm-4 · reason verdict BLOCKED · blockers 4 · NON-CONVERGENT · disposition fold
+
+2026-09-13T11:59:15Z brief · item TOOL-aBatchedArm-4 · reason b56f676efee7 memory/builds/aBatchedArm/prompts/2026-09-13-prompt-TOOL-aBatchedArm-4-build-brief.md
