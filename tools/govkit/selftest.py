@@ -8773,8 +8773,12 @@ user_skills = "/tmp/gk-fake-skills"
         # R3-7. PYTHON'S UTF-8 MODE IS OFF IN EVERY BLOCK RUN, whatever this node exports. govkit prints
         # an em dash on every update line, and outside UTF-8 mode a redirected stdout on Windows is the
         # ANSI code page, which the migration's program could not read. This node exports both
-        # variables, and the arms passed here while the runbook crashed on a fresh node.
-        _pvENV = {k: v for k, v in os.environ.items() if k not in ("PYTHONUTF8", "PYTHONIOENCODING")}
+        # variables, and the arms passed here while the runbook crashed on a fresh node. The runbook's
+        # own variables go too, so a node that happens to export `TRAILER`, `MEMORY_TREE_DIR` or
+        # `GOVKIT_RERENDER` cannot decide an arm that was written without them.
+        _pvENV = {k: v for k, v in os.environ.items()
+                  if k not in ("PYTHONUTF8", "PYTHONIOENCODING", "TRAILER", "MEMORY_TREE_DIR",
+                               "GOVKIT_RERENDER", "GOV", "KIT", "PY")}
         _pvENV["PYTHONUTF8"] = "0"
 
         # A FILE, NOT `bash -c`. On Windows an argv reaches bash through one command line, and MSYS

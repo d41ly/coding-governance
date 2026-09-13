@@ -498,6 +498,13 @@ Traps met, recorded so the next session does not pay for them again:
   fixture named this unit's id as its `record`, which would have raised
   `non_terminal_specs_cited_by_product_source` exactly as round 1's comments did. It names a closed
   record instead.
+- **The runbook's own variables are ambient state too.** The bug-class checklist over the fold named
+  `fixture-inherits-ambient-machine-state`, and it applied one level past the UTF-8 variables: a node
+  exporting `TRAILER` would hand it to the arm that runs block 1 without one. Observed red: with a
+  `TRAILER` exported and the block environment stripped of only the UTF-8 variables, that arm redded,
+  because block 1 landed. The environment now drops `TRAILER`, `MEMORY_TREE_DIR`,
+  `GOVKIT_RERENDER`, `GOV`, `KIT` and `PY` as well, and the same run with `TRAILER` and a bad
+  `MEMORY_TREE_DIR` exported held all 84 arms.
 
 Found while fixing, and not this unit's:
 
