@@ -82,7 +82,7 @@ ids TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceW
 |---|---|---|---|---|---|
 | [TOOL-cSpliceWarden-1 — rotation becomes a DECLARED mode, and one semantics replaces two](spec/2026-09-12-spec-TOOL-cSpliceWarden-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-13 |
 | [TOOL-cSpliceWarden-2 — hygiene check 10 reaches a backlog archive, and stops reporting a reassuring zero](spec/2026-09-12-spec-TOOL-cSpliceWarden-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-13 |
-| [TOOL-cSpliceWarden-4 — the archive repair: superseded, evacuated, and fifteen rows re-homed](spec/2026-09-12-spec-TOOL-cSpliceWarden-4.md) | 3 | 1 | CLOSED | rev-2 | 2026-09-13 |
+| [TOOL-cSpliceWarden-4 — the archive repair: superseded, evacuated, and fifteen rows re-homed](spec/2026-09-12-spec-TOOL-cSpliceWarden-4.md) | 3 | 1 | CLOSED | rev-3 | 2026-09-13 |
 | [TOOL-cSpliceWarden-3 — hygiene check 20 scans a rotated backlog shard](spec/2026-09-12-spec-TOOL-cSpliceWarden-3.md) | 4 | 2 | CLOSED | rev-2 | 2026-09-13 |
 | [TOOL-cSpliceWarden-5 — two rows filing one gap become one, and a false retirement is superseded](spec/2026-09-12-spec-TOOL-cSpliceWarden-5.md) | 5 | 1 | CLOSED | rev-2 | 2026-09-13 |
 <!-- /gen:build-units -->

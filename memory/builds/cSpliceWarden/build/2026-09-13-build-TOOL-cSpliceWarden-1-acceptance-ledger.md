@@ -77,10 +77,12 @@ grades the declared rotation mode at all.
 - AC2 — `python tools/memory-tree/row_grammar.py --report` over the repaired archive: 24 rows, all
   CLOSED, zero duplicate ids. The partition was verified as exact before it was applied —
   49 + 15 + 2 + 24 = 90, with no row in two sets and none in none.
-- AC3 — the live shard gained exactly 15 rows, all CLOSED, and zero ids now sit in both the archive
-  and the shard. Each body came from its closing commit on `origin/main` rather than from the
-  archive; 4 of the 15 differ, and re-homing the archive text would have re-asserted claims the tree
-  refutes.
+- AC3 — amended rev-3 — the criterion asserted a global `grep -c '· CLOSED ·'` delta of 15 and was
+  never observable: this build also closed two consolidated rows and added one, so the real delta is
+  18. Re-stated per id and logged in that spec's §9. What WAS observed against the amended criterion:
+  `grep` over `memory/backlog/TOOL.md` shows each of the 15 re-homed ids reading CLOSED, zero ids sit
+  in both the archive and the shard, and 4 of the 15 carry a body differing from the archive's
+  because their closing commit rewrote the sentence as well as the token.
 - AC4 — `bash tools/memory-tree/check-memory-hygiene.sh` reports no check-10 finding, and all four
   archives resolve and are announced.
 

@@ -1,6 +1,6 @@
 # TOOL-cSpliceWarden-4 — the archive repair: superseded, evacuated, and fifteen rows re-homed
 
-**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-1 · base 09a22d2b · streams tooling · order 3 · ratified 2026-09-12
+**Status:** CLOSED · rev-3 · 2026-09-13 · node c · Tier-1 · base 09a22d2b · streams tooling · order 3 · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -107,9 +107,12 @@ defect wearing the repair's clothes.
   24 rows, all terminal, with zero duplicate ids.
   Red when: the count is not 24, which means the partition was applied wrongly.
   figure: DERIVED — the criterion re-parses the file.
-- **AC3** — When `grep -c '· CLOSED ·' memory/backlog/TOOL.md` is compared before and after, it rises
-  by exactly 15, and each re-homed row's body equals the closing commit's body.
+- **AC3** — When each of the 15 re-homed ids is grepped in `memory/backlog/TOOL.md`, every one reads
+  `· CLOSED ·` and carries the body its closing commit wrote.
   Red when: any re-homed row carries OPEN, or the archive's stale body.
+  figure: DERIVED per id. A global `grep -c '· CLOSED ·'` delta was the rev-2 wording and it was NOT
+  observable — this build also closed two consolidated rows and added one CLOSED row, so the real
+  delta is 18 and the criterion could never have been met as stated.
 - **AC4** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs with unit 2's check 10 in
   place, it reports no check-10 finding.
   Red when: `TOOL.2026-08-17b.md` is still referenced from nowhere.
@@ -129,3 +132,4 @@ defect wearing the repair's clothes.
 
 - rev-1 · 2026-09-12 · the first draft.
 - rev-2 · 2026-09-13 · §4 · AC2 — the four-way partition and the (a)/(c) overlap written in after deriving it; AC2 given a backticked witness
+- rev-3 · 2026-09-13 · AC3 — the criterion was UNOBSERVABLE: it asserted a global CLOSED-count delta of 15, and this build's own consolidations make the real delta 18. Re-stated per id, which is what the evacuation actually guarantees. Found by the Tier-2 review's data-integrity lens

@@ -8,7 +8,10 @@ touching a rotated archive.
 
 ## The measured state, all of it derived
 
-Every figure was derived by reading the files at base `09a22d2b`, never carried from prose.
+Every figure was derived by reading the files at base `09a22d2b` on 2026-09-12, never carried from
+prose. They describe the file AS FOUND, not as written: it was created on 2026-08-17 holding 13
+rows, and merges that day and after appended to it — 17 at `c1af5dd2`, 29 at `b7e49c99`, 34 at
+`0bea5595`. The 90-row state is where this repair found it, a month later.
 Re-derive with `python tools/memory-tree/row_grammar.py --report` and the partition query below.
 
 | fact | value |

@@ -397,7 +397,6 @@ def cmd_selftest():
         c4 = _tree(t4, "- ARCH-tOne-1 · one\n", pin="1")
         arm("a pin above the real count reds, so a repair must lower it",
             "the pin is shrink-only", lambda: cap(t4, c4))
-        # An UNDECLARED pin is a refusal, not a disabled check.
         t5 = os.path.join(base, "nopin"); os.makedirs(t5)
         c5 = _tree(t5, "\n".join(["- ARCH-tOne-1 · one",
                                   "- ARCH-tOne-1 · the same id twice", ""]))

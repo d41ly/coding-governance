@@ -531,12 +531,13 @@ printf 'x\n' > memory/guides/kickoff-prompt.md                   # loose in the 
 # ---- two directories would break the green arm for a reason that has nothing to do with check 2.
 printf '# links\n\n[alive](kickoff-prompt.md)\n[dead](no-such-file.md)\n' > memory/guides/links.md
 
-# ---- CHECK 10: a rotated archive is announced in lines 1-3 of the index it was cut from. Two
+# ---- CHECK 10: a rotated archive is announced in the PREAMBLE of the index it was cut from —
+# ---- everything above that index's first row, and never fewer than its first three lines. Two
 # ---- archives, one index, one mention — the referenced one is the control.
 mkdir -p memory/archive
 printf '# Decisions\n\nRotated: DECISIONS.2026-08-02.md\n\n- ARCH-tFixture-1 · a decision\n' > memory/DECISIONS.md
 printf '# rotated\n' > memory/archive/DECISIONS.2026-08-01.md    # unreferenced   -> RED
-printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the head -> silent
+printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the preamble -> silent
 
 # ---- CHECK 6: the index byte/line cap. `guides/*.md` is in INDEX_SET — a guide is mandatory reading
 # ---- the charter points a session at, and check 16 refuses a charter-cited file nothing caps — and

@@ -85,7 +85,7 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
   under a header promising terminal ones only, with 49 of its ids also live in the shard and 7 of
   those disagreeing about status.
 - **Either mode:** the fresh or surviving index notes the rotation in its PREAMBLE, naming the archive
-  file and what moved (check 10); rotated archives stay inside `memory/` so the all-time id-collision
+  file (check 10, which greps for that basename and reads nothing else) and what moved; rotated archives stay inside `memory/` so the all-time id-collision
   grep still reaches them; and rotation never rewrites or renumbers a ratified record.
 - **The live-row floor.** Non-terminal rows survive the rotation under either mode, so a shard's floor
   is its LIVE ROW COUNT: when nothing terminal is left, rotating is a no-op and the next row breaches

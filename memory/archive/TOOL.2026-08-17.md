@@ -7,8 +7,9 @@
 
 > **SUPERSEDED 2026-09-12 by `TOOL-cSpliceWarden-4`.** The header ABOVE is the corrected one. The
 > header this file shipped with read "Terminal rows only, moved byte-identical from
-> `../backlog/TOOL.md` … deduplicated by id", and it was false in three ways. As written on
-> 2026-08-17 this file held 90 rows, not terminal rows only: 66
+> `../backlog/TOOL.md` … deduplicated by id", and it was false in three ways. To be exact about when:
+> the file was CREATED on 2026-08-17 holding 13 rows, and merges that day and after appended to it;
+> by 2026-09-12, where this repair found it, it held 90 rows and not terminal rows only: 66
 > were non-terminal (60 OPEN, 5 SPECCED, 1 DEFERRED). 49 of its ids were ALSO live in
 > `../backlog/TOOL.md`, and 7 of those disagreed about status. It was not deduplicated by id —
 > `TOOL-aBranchedMandate-2` and `-3` each appeared twice.
