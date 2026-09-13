@@ -11,8 +11,8 @@
 # APPROVED BY THE OWNER 2026-09-13, AND NOT A GATE LEG. This kit's self-tests stay off the merge bar
 # (the 2026-08-23 ruling recorded in kit.toml) and out of adopters' trees (TOOL-aQuenchedHarness-3),
 # so this suite is withheld by kit.toml's project-owned list and budgeted as a NON-held row of the
-# self-test budget file. Run it directly, never through the kit's own gate runner, which would run
-# every sibling suite with it.
+# self-test budget file. The kit's own on-demand runner picks it up from that row with every sibling
+# suite; run it ALONE, directly, wherever the siblings are held back, since the runner cannot run one.
 #
 # ONE ARM PER ACCEPTANCE CRITERION of the unit's spec, named by it:
 #   AC1  a START and an END per call; `rc`, `checks` and `phase_to` from the driver and the file
@@ -27,7 +27,8 @@
 #   AC9  this suite's own declarations: withheld, budgeted, never a manifest leg
 #   AC10 the protocol paragraph, the key row, the example line and the verbs sentence
 #   AC11 a linked worktree writes the COMMON journal, not its own git dir
-#   AC13 the unit field comes from the verb's own unit argument, and free text never reaches a line
+#   AC13 the unit field comes from the verb's own unit argument, free text never reaches a line, and
+#        the writer's unit shape agrees with `_ids_of`'s grammar on a fixed probe set
 #   CAP  a line over 2048 bytes is cut exactly as the runlog kit's `render_line` cuts it
 # AC12 is `gotchas.py --for-paths` over the driver, a command of its own, and is not repeated here.
 #
@@ -37,7 +38,7 @@
 # which is the population the runlog kit's README assigns to a producer's suite, and nothing wider.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
-FLOOR_ASSERTIONS=154
+FLOOR_ASSERTIONS=163
 SLUG=sLug
 # Where the scratch clone installs the kit: a FIXTURE-INTERNAL path, bound once, never gov's prefix.
 KR=tools/unattended
@@ -600,6 +601,19 @@ check_ac13_units() {
   check "AC13 and not written" "$(read_field $l unit)" "<absent>"
   run_driver --dispatch "$SLUG" --pass "X-$SLUG-1-2" --writes work/one
   check "AC13 a unit with a dash too many is flagged" "$(read_field $(measure_lines) unit_bad)" 1
+  # ONE GRAMMAR, TWO SPELLINGS, JOINED HERE. The writer tests the unit shape in pure bash because
+  # `_ids_of` forks a grep, and a second spelling of one grammar drifts unless something compares
+  # them. The ERE is read from `_ids_of`'s own line, and each probe must get the same verdict from it
+  # as from the writer. A missing ERE is a failure, never a skip.
+  local ere probe want got
+  ere=$(sed -n "s/^_ids_of() { grep -oE '\\([^']*\\)'.*/\\1/p" "$KR/unattended.sh")
+  check "AC13 the unit-id grammar is read from _ids_of" "$([ -n "$ere" ] && echo read)" read
+  for probe in TOOL-dLoggedFlight-2 X-a1-7 x-Lower-1 TOOL-a-b-2 TOOL--2 TOOL-a-2x "TOOL-é-1" -a-1; do
+    want=$(printf '%s\n' "$probe" | grep -cxE "$ere")
+    run_driver --brief "$SLUG" --unit "$probe" --path nofile
+    got=0; [ "$(read_field $(measure_lines) unit)" = "$probe" ] && got=1
+    check "AC13 the writer and _ids_of agree on [$probe]" "$got" "$want"
+  done
   check_pairs AC13
 }
 

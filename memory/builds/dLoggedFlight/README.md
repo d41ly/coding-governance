@@ -86,7 +86,7 @@ ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedF
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses](spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md) | 1 | 2 | CLOSED | rev-6 | 2026-09-13 |
-| [TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb](spec/2026-09-13-spec-TOOL-dLoggedFlight-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-13 |
+| [TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb](spec/2026-09-13-spec-TOOL-dLoggedFlight-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-13 |
 | [TOOL-dLoggedFlight-3 — the gate runner writes one verdict line per bar run](spec/2026-09-13-spec-TOOL-dLoggedFlight-3.md) | 3 | 2 | SPECCED | rev-4 | 2026-09-13 |
 | [TOOL-dLoggedFlight-4 — the pre-push hook writes one line per push](spec/2026-09-13-spec-TOOL-dLoggedFlight-4.md) | 4 | 2 | SPECCED | rev-4 | 2026-09-13 |
 | [TOOL-dLoggedFlight-5 — one redaction table, applied once on read, with a staged positive per rule](spec/2026-09-13-spec-TOOL-dLoggedFlight-5.md) | 5 | 2 | SPECCED | rev-2 | 2026-09-13 |

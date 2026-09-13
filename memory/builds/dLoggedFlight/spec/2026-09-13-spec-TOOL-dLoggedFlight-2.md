@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb
 
-**Status:** CLOSED · rev-5 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -63,8 +63,9 @@ process spawn on the hot path and must not change how the driver dies.
   2026-09-13. It is withheld from adopters in `tools/unattended/kit.toml`'s `project-owned` list and
   budgeted as a non-held row in `tools/run-gates/selftest-budgets.txt`. It is NOT a gate leg: the
   2026-08-23 owner ruling in `tools/unattended/kit.toml` keeps this kit's self-tests off the bar, and
-  TOOL-aQuenchedHarness-3 keeps them out of adopters' trees. It runs directly, never through
-  `run-unattended-gates.sh`. Observed by AC9.
+  TOOL-aQuenchedHarness-3 keeps them out of adopters' trees. `run-unattended-gates.sh` derives its
+  population from the budget rows and so picks it up with its siblings; a build bound not to run
+  those siblings runs this suite alone, directly. Observed by AC9.
 - **S11** Carriers: a run-log paragraph in the protocol's section 2, a key row in its section 8, and
   one sentence in the verbs preamble. Each goes to its template and its installed byte copy, and the
   kit version moves from 1.19 to 1.20 across its carriers. Observed by AC10.
@@ -273,8 +274,10 @@ one build folder, and never runs the existing unattended suites.
 - **AC13** — When `--brief`, `--dispatch`, `--rescope` and `--review` each run with a unit-id argument,
   and `--phase` runs with a slug, each END carries that value in `unit` or `slug`. When
   `--park --item "<free text>"` runs, no line contains the item text. When a unit-bearing verb is given
-  a value that is not unit-shaped, its END carries `unit_bad=1`.
-  Red when: `PK_ITEM` is read for a free-text verb, or an unset variable aborts the trap.
+  a value that is not unit-shaped, its END carries `unit_bad=1`. Over a fixed probe set, `--brief`
+  writes `unit` exactly where the ERE read from `_ids_of`'s own line matches the probe.
+  Red when: `PK_ITEM` is read for a free-text verb, an unset variable aborts the trap, or the
+  writer's unit shape and `_ids_of`'s grammar disagree on a probe.
 
 ## 7. Gates
 
@@ -311,6 +314,11 @@ none
   rule and graded against it. AC7's trace moves to its own descriptor, since the stderr trace of this
   very call missed three execs inside `2>/dev/null` callees, and its before-and-after pair becomes a
   ledger observation with a perpetual on-and-off arm in the suite.
+- rev-6 · 2026-09-13 · S10 · AC13 · the bug-class checklist over the build commit. S10 no longer
+  says the suite never runs through `run-unattended-gates.sh`, which derives its population from
+  the budget rows and so does run it. AC13 joins the writer's pure-bash unit shape to the ERE in
+  `_ids_of`, because a second spelling of one grammar is the two-answers class and nothing compared
+  them; the arm was staged RED from each side.
 
 ## 10. Reuse audit
 

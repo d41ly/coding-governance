@@ -2,9 +2,10 @@
 
 **Serves:** journal TOOL-dLoggedFlight-2
 
-Tier-2 · node d · 2026-09-13 · the build pass of the driver's run-log writer, against spec rev-5.
+Tier-2 · node d · 2026-09-13 · the build pass of the driver's run-log writer, against spec rev-5, and
+the fold of its bug-class checklist, against rev-6.
 Every line is OBSERVED. `<suite>` is `tools/unattended/runlog-writer.test.sh`, run directly and never
-through the kit's gate runner; its final run printed `PASS (154 assertions)` against a floor of 154.
+through the kit's gate runner; its final run printed `PASS (163 assertions)` against a floor of 163.
 No suite that existed under `tools/unattended/` before this build was run.
 
 ## The criteria
@@ -24,8 +25,9 @@ No suite that existed under `tools/unattended/` before this build was run.
   the five exemptions once each above the install and every other exit marked. On the base driver it
   finds exactly the fifteen sites the spec names. Every run stages its own failing cases into copies:
   an unmarked exit in a verb body, one in the library, and a second copy of an exempt text all red,
-  and a marked control passes. RED seen five ways: the install moved after the argument loop (35 arms),
-  a conf trap taking effect after the install (5), a plain `trap` (7), and the marker removed from
+  and a marked control passes. RED seen six ways: the install moved after the argument loop (35 arms),
+  the install and its functions moved before the conf source (17, the conf's trap winning among
+  them), a conf trap re-set after the install (5), a plain `trap` (7), and the marker removed from
   `--version`'s exit (2) and from `exit "$status"` (3).
 - AC3 — `<suite>` (`check_ac3_signals`) — TERM sent once the stub's ready file named a live pid:
   the driver exited while the stub still ran, and END read `exit=unclean`. KILL left a START alone,
@@ -52,7 +54,7 @@ No suite that existed under `tools/unattended/` before this build was run.
 - AC9 — `bash tools/run-gates/run-selftests.sh --kit tools/unattended/runlog-writer.test.sh` —
   `ok` in 51 s against its 110 s row; `--check` clean at 64 rows; `govkit plan` into a scratch target
   listed the suite as `ORDER [project-owned]`. RED seen with the budget row renamed, with a manifest
-  leg added, with the suite dropped from the project-owned list, and with the floor raised to 155.
+  leg added, with the suite dropped from the project-owned list, and with the floor one past the count.
 - AC10 — `bash tools/unattended/adopt-unattended.sh --check` — in sync, and `check-kit-versions.sh`
   exited 0 at 1.20 across 15 carriers; the `unattended kit gate` leg exited 0 with the new key in both
   directions of check 22. The suite's anchored greps found the section 2 paragraph, the section 8 row,
@@ -66,13 +68,14 @@ No suite that existed under `tools/unattended/` before this build was run.
   another's index row removed (check 17).
 - AC13 — `<suite>` (`check_ac13_units`) — `--brief`, `--dispatch`, `--rescope` and `--review` carried
   their unit, `--phase` its slug, a free-text `--park` item reached no line and judged no unit, and a
-  malformed unit set `unit_bad=1`. RED seen with `PK_ITEM` read for `--park` and with an unset
-  variable in the trap.
+  malformed unit set `unit_bad=1`. Over eight probes the writer's unit shape matched the ERE read
+  from `_ids_of`. RED seen with `PK_ITEM` read for `--park`, with an unset variable in the trap, and
+  with either grammar widened to a lowercase family, the writer's and then `_ids_of`'s.
 
 ## Staged RED
 
-33 breaks, each applied to a MIRROR of the kits in a scratch dir, never to the working tree, and
-each run through the mirror's own copy of the suite. All 33 went RED, each on a named arm, and an
+36 breaks, each applied to a MIRROR of the kits in a scratch dir, never to the working tree, and
+each run through the mirror's own copy of the suite. All 36 went RED, each on a named arm, and an
 unmodified mirror stayed green before and after. AC12's two were made on the working tree's records
 and restored from a copy, never with a checkout.
 
