@@ -63,7 +63,8 @@ check-unattended.sh              # the kit gate
 check-playbook.sh                # playbook validity, including the fixture
 check-pass-order.sh              # refuses a unit built before it was specced
 check-brief-recorded.sh          # refuses a closed unit whose build commit records no brief
-run-unattended-gates.sh          # the kit's self-tests, ON DEMAND ONLY
+run-unattended-gates.sh --serial # the kit's self-tests, ON DEMAND ONLY; the mode is declared,
+                                 # --pooled withholds every cost verdict, and bare REFUSES
 ```
 
 The self-tests are deliberately **not** on the merge bar. A suite that stages breaks into a copy of

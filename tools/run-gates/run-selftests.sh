@@ -74,33 +74,42 @@ PYBIN=$(resolve_python) || { echo "run-selftests: no usable python"; exit 2; }
 
 print_usage() {
   cat <<'USAGE'
-usage: bash tools/run-gates/run-selftests.sh [--kit <dir>] [--check] [--list]
-  (no flag)   run the declared population, time each suite, RED on a breach
-  --kit <dir> only the suites whose argv lies under <dir>; a filter matching
-              nothing is a REFUSAL, because an unknown filter and a clean sweep
-              are indistinguishable from outside
-  --check     the gate: assert the declaration against tools/gate-legs.json in
-              BOTH directions, run nothing
-  --list      print the population and the derived total, run nothing
-  --rank      rank the population by its RECORDED seconds and mark the set that
-              carries the declared majority share; REFUSES if any row's reading
-              states no condition, because ranking two conditions together ranks
-              the conditions
-  --sweep     the same population through a bounded OUTER pool, so the wall clock
+usage: bash tools/run-gates/run-selftests.sh (--serial|--pooled) [--kit <dir>] | --check | --list | --rank
+  --serial    run the declared population ONE suite at a time, time each against
+              its own budget, RED on a breach. The only mode that issues a cost
+              verdict, because an uncontended clock is the only one that can grade
+              a budget.
+  --pooled    the same population through a bounded OUTER pool, so the wall clock
               falls toward the longest suite instead of the sum of all of them.
               It answers ONE question -- did any suite fail -- and issues NO cost
               verdict at all: every reading it takes is contended by the other
-              suites, and a contended clock cannot grade a budget. Use the no-flag
-              mode for that. SELFTEST_OUTER_WIDTH overrides the outer width
+              suites, and a contended clock cannot grade a budget. Use --serial
+              for that. SELFTEST_OUTER_WIDTH overrides the outer width
               (clamped to the resolved one); SELFTEST_WALL overrides the run bound
-              and is REFUSED below the largest per-suite bound.
+              and is REFUSED below the largest per-suite bound. --sweep is an
+              alias, kept so every recorded invocation still runs.
               IT PAYS IN PROPORTION TO HOW UNDOMINATED THE POPULATION IS. The wall
               clock cannot fall below the longest member, so a selection of three
               suites where one holds most of the time is a LOSS — measured at 56s
               serial against 62s pooled. Nine suites measured 1692s against 981s.
+  (no mode)   REFUSED. A run that executes a suite declares --serial or --pooled;
+              a silent default in either direction is a verdict nobody asked for.
+  --kit <dir> only the suites whose argv lies under <dir>; a filter matching
+              nothing is a REFUSAL, because an unknown filter and a clean sweep
+              are indistinguishable from outside
+  --check     the gate: assert the declaration against tools/gate-legs.json in
+              BOTH directions, run nothing; takes no mode
+  --list      print the population and the derived total, run nothing; no mode
+  --rank      rank the population by its RECORDED seconds and mark the set that
+              carries the declared majority share; REFUSES if any row's reading
+              states no condition, because ranking two conditions together ranks
+              the conditions; takes no mode
 USAGE
 }
 
+# `run` IS THE UNDECLARED STATE, NOT A MODE. Nothing below executes a suite under it: the refusal
+# past the --list exit turns it away, so the serial loop at the bottom is reached only by --serial
+# and the pool only by --pooled. TOOL-aBatchedArm-4 S2.
 MODE=run; FILTER=""
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -108,7 +117,10 @@ while [ $# -gt 0 ]; do
     --check) MODE=check; shift ;;
     --list)  MODE=list; shift ;;
     --rank)  MODE=rank; shift ;;
-    --sweep) MODE=sweep; shift ;;
+    --serial) MODE=serial; shift ;;
+    # ONE BRANCH, TWO SPELLINGS. --sweep is the name every recorded invocation carries and --pooled
+    # is the declared mode; an alias that kept its own branch would be two answers to one question.
+    --pooled|--sweep) MODE=sweep; shift ;;
     -h|--help) print_usage; exit 0 ;;
     *) echo "run-selftests: unknown argument '$1'"; print_usage; exit 2 ;;
   esac
@@ -279,7 +291,7 @@ case "${W:-}" in ''|*[!0-9]*) W=2 ;; esac
 # caught this unit and the harness unit each reading that width independently, which at width 8 would
 # be 8 suites x 8 arms = 64 concurrent processes on a host where a bare spawn costs 319 ms.
 #
-# THE OUTER POOL IS 1 IN THE DEFAULT MODE, because that loop is serial on purpose: it grades each
+# THE OUTER POOL IS 1 UNDER --serial, because that loop is serial on purpose: it grades each
 # suite against its OWN declared budget, so two suites racing would charge each of them the other's
 # contention and a breach would name the wrong one. An earlier draft divided by a pool of 4 that does
 # not exist, which handed every ported suite a quarter of the width it was entitled to — measured on
@@ -384,6 +396,23 @@ if [ "$MODE" = list ]; then
   exit 0
 fi
 
+# ---- THE MODE IS DECLARED, NEVER DEFAULTED. TOOL-aBatchedArm-4 S2. A run that executes a suite
+# ---- says which clock it runs on: --serial grades budgets, --pooled withholds them. A silent
+# ---- default in EITHER direction is a coupling nobody declared — the one caller that reports
+# ---- cost read only the exit code, so a pooled default would have printed GREEN with every
+# ---- budget withheld, and a serial default is the contract this refusal makes explicit.
+# ---- IT SITS HERE, after --check and --list, which execute nothing and take no mode (--check is
+# ---- the unguarded bar leg, and a refusal above it would red every bar), and BEFORE the
+# ---- filter-liveness refusal below, because the mode is the invocation's shape and the filter
+# ---- is its content: a wrong filter under a declared mode still reds by name.
+if [ "$MODE" = run ]; then
+  echo "run-selftests: no execution mode was given, and a run that executes a suite declares --serial or --pooled:" >&2
+  echo "run-selftests:   --serial   one suite at a time, each graded against its own budget" >&2
+  echo "run-selftests:   --pooled   a bounded outer pool, every cost verdict withheld" >&2
+  echo "run-selftests: Nothing was run." >&2
+  exit 2
+fi
+
 # ---- LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a
 # ---- clean sweep are indistinguishable from the outside, which is the class this kit's sibling
 # ---- spent six review rounds on.
@@ -411,11 +440,11 @@ if [ "$MODE" = sweep ]; then
     command -v "$_cand" >/dev/null 2>&1 && { SWEEP_TIMEOUT=$_cand; break; }
   done
   [ -n "$SWEEP_TIMEOUT" ] || {
-    echo "run-selftests: --sweep needs a 'timeout' binary to bound each suite and found none of:" >&2
+    echo "run-selftests: --pooled needs a 'timeout' binary to bound each suite and found none of:" >&2
     echo "run-selftests:   ${SELFTEST_TIMEOUT_BIN:-timeout gtimeout}" >&2
     echo "run-selftests: without one every suite below would run unbounded while this mode claims" >&2
     echo "run-selftests: each one is bounded, and a single hang would suppress all $NROWS verdict" >&2
-    echo "run-selftests: lines. Use the no-flag mode, which reports each suite as it finishes." >&2
+    echo "run-selftests: lines. Use --serial, which reports each suite as it finishes." >&2
     exit 2; }
 
   # THE PER-SUITE BOUND IS DERIVED FROM THE ROW'S OWN BUDGET, and the declaration is refused when
@@ -749,7 +778,7 @@ EOF
   # THE COUNT IS WHAT STOPS THE WITHHOLDING BEING A SILENT PASS. A green sweep announces on every
   # run how many budgets it did not grade, so it can never be mistaken for a budget-clean run.
   echo "run-selftests: $withheld cost verdict(s) WITHHELD under $SWEEP_CONDITION — a contended clock cannot grade a budget"
-  echo "run-selftests: for a cost verdict, run the serial mode: bash $SELF"
+  echo "run-selftests: for a cost verdict, run the serial mode: bash $SELF --serial"
   if [ "$st" -eq 0 ]; then
     echo "sweep GREEN — $ran suite(s) ran concurrently; NO cost verdict was issued for any of them"
   else
@@ -761,7 +790,7 @@ EOF
     # mechanism is broken" from "this machine was too busy", and an operator handed that verdict
     # with no next step will either re-run at random or stop trusting the mode.
     echo "run-selftests: a pooled RED cannot tell a broken mechanism from a busy box. Confirm it with"
-    echo "run-selftests: the serial re-run: bash $SELF"
+    echo "run-selftests: the serial re-run: bash $SELF --serial"
   fi
   exit "$st"
 fi

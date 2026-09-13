@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-10T03:22:11+03:00 @ 013b1af9611570b3afd3ad99ba53e295e787b035
-watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
+last-audit: 2026-09-13T15:26:46+03:00 @ fdd754bf62d1833361350ab7cb0b0f393027d99a
+watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: d499258daca17f851ab1e4a359bb6c6aa106c0f6
+last-body-change: fdd754bf62d1833361350ab7cb0b0f393027d99a
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -129,7 +129,7 @@ GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githo
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
 # Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
 # The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1
-bash tools/run-gates/run-selftests.sh  # the HELD population on demand, budget-timed. TOOL-aQuenchedHarness-4
+bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts; bare REFUSES. TOOL-aQuenchedHarness-4, TOOL-aBatchedArm-4
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 ```
@@ -166,7 +166,7 @@ re-renders them from build front matter); there is no authored ledger to update.
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
-  `--selftests` only when they ask. The cost is process creation, not logic:
+  `--selftests --serial` only when they ask. The cost is process creation, not logic:
   `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
 
 
@@ -182,9 +182,8 @@ path) · `absence-assertion-over-whole-file-text.md` (a new gate predicate run f
 against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc-escape-reaches-the-regex.md`
 · `assertion-between-two-derived-values.md` (a core-subset-of-effective assertion the checker itself
 composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs) ·
-`arm-literal-strands-on-message-edit.md` (editing a `fail` message strands its arm; the signature
-runs to the first interpolation, so lengthening a message always strands it and shortening never
-does — hit three times in one file in one session) · `process-creation-is-the-suite-cost.md` ·
+`arm-literal-strands-on-message-edit.md` (lengthening a `fail` message always strands its arm,
+shortening never does) · `process-creation-is-the-suite-cost.md` ·
 `trace-profile-measures-itself.md` · `fallback-fabricates-the-passing-value.md` ·
 `two-readers-of-one-config-one-re-derived.md` · `line-keyed-registry-reds-on-a-file-that-grew.md` (a waiver keyed `<path>:<line>`, and the sibling arm that is a BAN rather than a ratchet) · `naming-leg-grades-what-python-named.md` (nested helpers and dunders count, and arming follows `symbols.json`, so it only reds at the lander).
 

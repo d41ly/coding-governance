@@ -1,11 +1,12 @@
 # TOOL-aBatchedArm-4 — declared execution modes for the self-test runner
 
-**Status:** OPEN · rev-4 · 2026-09-13 · node a · Tier-2 · base c2db2f5d · streams tooling · order 1
+**Status:** CLOSED · rev-5 · 2026-09-13 · node a · Tier-2 · base c2db2f5d · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-13-build-TOOL-aBatchedArm-4-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-aBatchedArm-4-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-aBatchedArm-4-build-brief.md](../prompts/2026-09-13-prompt-TOOL-aBatchedArm-4-build-brief.md) | journal | — |
 | [2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round1.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round2.md) | spec-audit | — |
@@ -87,6 +88,16 @@ deserves its own spec rather than a paragraph in this one.
   armed at `run-selftests.test.sh:272-275`. Shard budgets stay serial readings.
 - **Taking the turnstile.** `pooled@8x1` is byte-equal on an idle box and on one where another
   worktree's bar is running. Real, named, not built here.
+- **A self-test file for the kit runner.** rev-4 §5 and §7 named `run-unattended-gates.test.sh` as
+  if it existed; it does not — `git ls-files 'tools/unattended/*.test.sh'` lists six suites and none
+  invokes `run-unattended-gates.sh`. A seventh suite is a tenth file and owes a
+  `selftest-budgets.txt` row, and that row is a carried literal the install-prefix BAN refuses:
+  the raise §3 already hands to `TOOL-aBatchedArm-3`. Landing the file without the row is a suite
+  nobody runs, the class the runner's own header names. So the three route refusals are observed
+  by AC4's direct invocations — the real kit runner and the real shared runner over a three-suite
+  fixture — and their failing case by staging the refusal out and watching the bare form dispatch a
+  suite run. The suite is a follow-up that lands WITH the budgets-file raise, and it is named here
+  so it is not mistaken for coverage this unit shipped.
 
 ### Edges
 
@@ -162,9 +173,11 @@ one of them redding it.
   the withheld count beside it, so neither GREEN can be read as a cost claim.
 - risks — the pooled mode has killed a quarter of its population once, and this unit inherits that
   bound unchanged behind a declared, non-default invocation. Unit 5 is the guard.
-- testing — the runner's self-test gains one arm per refusal, one per mode, and one for the regex in
-  each direction; the kit runner's self-test gains one arm per route-without-mode refusal; each
-  staged and observed RED first.
+- testing — the runner's self-test gains one arm per refusal, one per mode, one for the regex in
+  each direction, one per remedy that interpolates the runner's own path, and the two-mode pair
+  over one breaching suite; each staged and observed RED first. The kit runner has no self-test in
+  the tree and this unit adds none (§3, last item): its three route refusals are observed by AC4's
+  direct invocations over a fixture, and the failing case by staging the refusal out.
 - migration — `--sweep` aliases `--pooled`; the five bare-mode arms, every caller and every carrier
   declare `--serial` in the same commit; the pooled default is landed dark and flipped by unit 5.
 - user docs — both `--help` texts and the three manifest and README lines teach the declared forms.
@@ -189,7 +202,8 @@ one of them redding it.
   `--pooled` — the summary carries ` · pooled, <k> cost verdicts withheld` where `<k>` equals the row
   count `run-selftests.sh --kit tools/unattended --list` prints at observation time, the `_uc` the
   kit runner derives at `:258`; and the runner's `peak concurrency P of outer O` line shows O equal to
-  the lesser of the resolved width and that row count, with P at least 2;
+  the runner's resolved outer width — it never clamps outer to the row count, so rev-4's "lesser of"
+  was an expectation the runner cannot print — with P at least 2;
   `--checks` — runs with no mode and no refusal.
   `figure:` `<k>` DERIVED at observation, never pinned.
   `fixture:` the seven tracked unattended rows at `selftest-budgets.txt:110-116`; on a host whose
@@ -236,11 +250,10 @@ reads `AGENTS.md`; `lexicon naming predicates` grades every touched `.sh`; the m
 manifest is `SESSION-KICKOFF.md`; `unattended skill wiring` reads `kit.toml` and `run-unattended-gates.sh`.
 The three `.githooks/`-guarded self-tests run on the kit-work bar and are not listed one by one.
 
-New arm: `tools/run-gates/run-selftests.test.sh` · the bare-`run` refusal, the regex admitting a ratio
-and refusing a digit-led path, the pooled-withholds-serial-grades pair, and the `:412` remedy naming a
-mode · `tools/unattended/run-unattended-gates.test.sh` · one refusal per route reaching the self-test
-half without a mode · each staged and observed RED then unstaged · floor to move: each suite's own,
-up by the arms added.
+New arm: `tools/run-gates/run-selftests.test.sh` · the bare-`run` refusal, `--list` taking no mode,
+the regex admitting a ratio and refusing a digit-led path, `--pooled` over a green population, the
+pooled-withholds-serial-grades pair, and the three remedies naming a mode · each staged and
+observed RED then unstaged · floor moved 43 to 53. No kit-runner suite: §3, last item.
 
 ## 8. Open questions
 
@@ -256,6 +269,18 @@ up by the arms added.
 
 ## 9. Revision log
 
+- rev-5 · 2026-09-13 · status CLOSED · §3 · §5 testing · §6 AC4 · §7 · two amendments the build
+  uncovered, both M2 AMEND acts and neither a design change. (1) rev-4's §5 and §7 named
+  `tools/unattended/run-unattended-gates.test.sh` as the home of the kit runner's route-refusal
+  arms; no such file exists, §4 counts nine files without it, and a seventh unattended suite owes
+  the `selftest-budgets.txt` install-prefix raise §3 hands to unit 3 — so the arms are withdrawn,
+  the refusals are observed by AC4's direct invocations over a fixture, and the suite is recorded
+  as a follow-up under §3 rather than mistaken for coverage. (2) AC4's pooled clause expected O to
+  be the lesser of the resolved width and the row count; the runner sets outer to the resolved
+  width and never clamps it to the population, so the clause now reads what the runner prints. Also
+  recorded: the digit-led path that discriminates the regex from the glob leads with a digit on
+  BOTH sides of the slash (`1abc/2suite.sh`), because the glob's second half wants a digit too —
+  `1abc/suite.sh` passed under both predicates and proved nothing.
 - rev-4 · 2026-09-13 · §2 S3 through S8 · §3 · Edges · §4 · §5 · §6 AC4 through AC9 · §7 · F3 ·
   folded spec-audit round 3 (BLOCKED, 4 blocker rows in one defect, NON-CONVERGENT by rows against
   round 2's 3, disposition FOLD — this spec is not re-reviewed). The defect: rev-3's S3 stated the

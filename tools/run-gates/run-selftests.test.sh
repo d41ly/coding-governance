@@ -28,7 +28,7 @@ R='bash tools/run-gates/run-selftests.sh'
 B='tools/run-gates/selftest-budgets.txt'
 LEGS='tools/gate-legs.json'
 
-SELFTEST_FLOOR=45
+SELFTEST_FLOOR=53
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -48,6 +48,10 @@ build_repo() {
   # and 5s clear of the second suite's own bound.
   printf '#!/usr/bin/env bash\nsleep 5\nexit 0\n' > tools/suite-mid.sh
   printf '#!/usr/bin/env bash\nsleep 30\nexit 0\n' > tools/suite-long.sh
+  # THE WITNESS THAT A SUITE RAN. The refusal arms claim the runner executed nothing, and a
+  # suite's stdout cannot show that -- the serial loop swallows it on a pass and the pool files
+  # it. A file it leaves behind can.
+  printf '#!/usr/bin/env bash\ntouch ran.marker\nexit 0\n' > tools/suite-mark.sh
 
   # ONE held leg — `subject: kit` is half of the hold predicate — plus one leg the bar does not
   # hold, so the forward direction has something to find and something to correctly ignore.
@@ -174,23 +178,43 @@ arm "--rank REFUSES a declaration that ranks no row at all" 2 \
     "grep '^#' $B > tmp.b && mv tmp.b $B" \
     "$R --rank"
 
+# ---------------------------------------------------------------- the declared mode, TOOL-aBatchedArm-4 S2
+# A bare run REFUSES. It used to be the serial default, and the one caller that reported cost read
+# only the exit code, so a silent pooled default would have printed GREEN with every budget withheld
+# and a silent serial one was a contract nobody had written down. The five arms below that used to
+# invoke the runner bare now declare --serial; this one is the refusal, and the marker suite is
+# what proves "executes no suite" rather than the runner asserting it.
+arm "a run with NO mode REFUSES naming both spellings, and executes no suite" 2 \
+    "declares --serial or --pooled" \
+    "sed -i 's|bash tools/suite-ok.sh|bash tools/suite-mark.sh|' $B" \
+    "( $R; rc=\$?; [ -e ran.marker ] && exit 99; exit \$rc )"
+
+# The refusal sits AFTER --check and --list: both execute nothing and take no mode, and --check is
+# the unguarded bar leg, so a refusal above it would red every bar. The control arm at the top of
+# this file is the --check half; this is --list.
+arm "--list takes no mode and is not refused, because it executes nothing" 0 \
+    "declared total" \
+    'true' "$R --list"
+
 # ---------------------------------------------------------------- the run, and its liveness
+# AND IT SITS BEFORE THE FILTER-LIVENESS REFUSAL, which still fires by name under a declared mode:
+# the mode is the invocation's shape, the filter its content, and a wrong filter still reds.
 arm "a --kit filter matching nothing REFUSES, because an unknown filter and a clean sweep look alike" 2 \
     "so this run graded NOTHING at all" \
-    'true' "$R --kit tools/nowhere"
+    'true' "$R --serial --kit tools/nowhere"
 
 arm "a population whose every suite passes reports GREEN and says none of it runs on the bar" 0 \
     "self-tests GREEN" \
-    'true' "$R"
+    'true' "$R --serial"
 
 arm "a suite that fails reds the run" 1 "self-tests RED" \
     "sed -i 's|bash tools/suite-ok.sh|bash tools/suite-red.sh|' $B" \
-    "$R"
+    "$R --serial"
 
 arm "a suite that overruns its declared budget reds and NAMES the number it broke" 1 \
     "OVER BUDGET" \
     "sed -i 's|free one\t60|free one\t1|; s|bash tools/suite-ok.sh|bash tools/suite-slow.sh|' $B" \
-    "$R"
+    "$R --serial"
 
 # ---------------------------------------------------------------- the state field is READ
 # The run loop used to ignore `$state` entirely, and the emitter used to accept any budget. Together
@@ -204,7 +228,7 @@ arm "an EMPTY budget column is caught too, rather than collapsing into the argv"
 ' >> $B && git add -A"     "$R --check"
 
 arm "the RUN loop refuses a row it cannot resolve instead of printing ok for a suite it never ran" 1     "this row could not be resolved into a runnable suite"     "printf 'hollow		bash tools/suite-ok.sh	worst of 3 readings 5s, x1.5
-' >> $B && git add -A"     "$R"
+' >> $B && git add -A"     "$R --serial"
 
 # ---------------------------------------------------------------- --sweep, TOOL-aPooledSweep-1
 # The pool answers ONE question and issues no cost verdict, so every arm here reads the sweep
@@ -265,6 +289,42 @@ arm "the sweep STATES how many cost verdicts it withheld, so a green sweep is ne
 arm "the sweep names the SERIAL mode as where a cost verdict comes from" 0 \
     "for a cost verdict, run the serial mode" \
     'true' "$R --sweep"
+
+# ---------------------------------------------------------------- --pooled, TOOL-aBatchedArm-4 S2/S5
+# --pooled is the declared spelling of the branch --sweep reaches, so the arms above cover its
+# mechanism; these cover the spelling, the pair of verdicts one suite gets under the two modes,
+# and the three remedies that now name a mode instead of the bare form (S6).
+arm "--pooled over a green population exits 0 and SAYS it graded no cost" 0 \
+    "NO cost verdict was issued" \
+    'true' "$R --pooled"
+
+# THE PAIR. One suite, one budget, two modes, two verdicts. suite-mid.sh sleeps 5s against a
+# budget of 4: --serial grades it OVER BUDGET, --pooled withholds — the bound is 4 x 2 = 8s, so
+# the suite finishes and the withholding is the ONLY thing standing between it and a verdict.
+arm "under --serial a breaching suite gets OVER BUDGET, because an uncontended clock can grade it" 1 \
+    "OVER BUDGET" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t4\tbash tools/suite-mid.sh|' $B" \
+    "$R --serial"
+
+arm "under --pooled the SAME breaching suite is 'cost withheld' and the run is green, not OVER BUDGET" 0 \
+    "cost withheld" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t4\tbash tools/suite-mid.sh|' $B" \
+    "$R --pooled"
+
+# THE REMEDIES NAME A MODE. Three lines interpolate the runner's own path, so a grep over the
+# source could not have caught one still spelling the bare form; each is exercised instead.
+arm "the missing-timeout refusal names --serial as the remedy, not the bare form" 2 \
+    "Use --serial, which reports each suite" \
+    'true' "SELFTEST_TIMEOUT_BIN=definitely-not-a-binary $R --pooled"
+
+arm "a completed pooled run points at --serial for a cost verdict, by its own path" 0 \
+    "for a cost verdict, run the serial mode: $R --serial" \
+    'true' "$R --pooled"
+
+arm "a RED pooled run points at the --serial re-run, by its own path" 1 \
+    "the serial re-run: $R --serial" \
+    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B" \
+    "$R --pooled"
 
 # --rank sorts by recorded seconds, and a contended reading sorted against serial ones ranks the
 # CONDITIONS. Nothing refused one until now: CONDS' second pattern accepts any text after the

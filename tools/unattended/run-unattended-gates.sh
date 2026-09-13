@@ -24,7 +24,10 @@
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
 # nothing runs the self-tests automatically. A change under this directory that guts a check lands
 # green. The compensating check is a person invoking this script, and the DoD for any work touching
-# `tools/unattended/` is a GREEN verdict from `--selftests` pasted into the landing report.
+# `tools/unattended/` is a GREEN verdict from `run-unattended-gates.sh --selftests --serial` pasted
+# into the landing report. The mode is DECLARED (TOOL-aBatchedArm-4): --serial grades each suite
+# against its budget, --pooled runs them through the runner's pool and withholds every cost verdict,
+# and a route that reaches the self-test half with neither REFUSES rather than defaulting.
 #
 # WHAT THIS DOES NOT CHECK: whether an unattended run was HONEST. These read records and stage
 # fixtures; §9 of the protocol says what a check running under the run's own uid can and cannot buy,
@@ -118,15 +121,30 @@ BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day
                               # coinciding here is arithmetic, not a claim. Moving one does not move
                               # the other, and neither should be edited to match.
 
-ONLY="${1:---selftests}"
-case "$ONLY" in
+# TWO POSITIONALS, EITHER ORDER: a VERB and a MODE. TOOL-aBatchedArm-4 S3. The verb defaults to
+# --selftests, as it always has (F3: the smaller diff, and the one that fits the charter's byte
+# headroom). The mode never defaults: three routes reach the self-test half — bare, --selftests,
+# --all — and a rule covering one of them would let --all print RED with "12 ran" for seven suites
+# that never ran, which is the defect rev-3 of the spec was built on. --checks reaches no self-test
+# and takes no mode.
+ONLY=selftests; MODE=""
+for _arg in "$@"; do
+case "$_arg" in
   --all)       ONLY="" ;;
   --checks)    ONLY=checks ;;
   --selftests) ONLY=selftests ;;
+  --serial|--pooled)
+    # A SECOND MODE IS NOT A DECLARATION. Last-wins would run the one the caller typed last and
+    # never say so, which is the silent-default class in a new coat.
+    [ -z "$MODE" ] || { echo "run-unattended-gates: two modes were given (--$MODE and $_arg); declare ONE" >&2; exit 2; }
+    MODE=${_arg#--} ;;
   -h|--help)
-    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--checks|--all]"
-    echo "  --selftests  every suite that stages breaks into this kit (default), and the only"
-    echo "               thing that exercises them since none is a bar leg."
+    echo "usage: bash tools/unattended/run-unattended-gates.sh [--selftests|--all] (--serial|--pooled) | --checks"
+    echo "  --selftests  every suite that stages breaks into this kit, and the only thing that"
+    echo "               exercises them since none is a bar leg. The verb when none is given."
+    echo "               It REFUSES without a mode: --serial runs each suite alone and grades it"
+    echo "               against its budget; --pooled runs them through the runner's bounded pool"
+    echo "               and WITHHOLDS every cost verdict, saying how many on the summary line."
     # THE BUDGET IS DERIVED, NEVER TYPED. Round 7's low 2: this help text quoted ~60 minutes beside a
     # ceiling this same unit had just re-declared, in the same file - a value stated in prose beside
     # the source that owns it, broken inside the file that owns it. The sum below is the declarations.
@@ -151,14 +169,24 @@ case "$ONLY" in
     echo "               EXIT CODE for that reason."
     echo "  --checks     the record/wiring checks, which are ALSO merge-bar legs. Their own"
     echo "               ceilings are in the same BUDGET_* block; no wall figure is typed here,"
-    echo "               because the one that was is what round 8 filed."
-    echo "  --all        both"
+    echo "               because the one that was is what round 8 filed. Takes no mode."
+    echo "  --all        both, and it REFUSES without a mode exactly as --selftests does"
     echo ""
     echo "The suites are run UNSHARDED on purpose. Each carries its own note that a --shard run is"
     echo "evidence about its region and nothing else, so the whole-suite claim exists only here."
     exit 0 ;;
-  *) echo "run-unattended-gates: unknown argument '$ONLY'"; exit 2 ;;
+  *) echo "run-unattended-gates: unknown argument '$_arg'"; exit 2 ;;
 esac
+done
+# EVERY ROUTE TO THE SELF-TEST HALF REFUSES WITHOUT A MODE, and the refusal names both spellings so
+# the caller who reads only the exit code is told what to type rather than what went wrong.
+if [ "$ONLY" != checks ] && [ -z "$MODE" ]; then
+  echo "run-unattended-gates: no execution mode was given, and every route to the self-test half (bare, --selftests, --all) declares --serial or --pooled:" >&2
+  echo "run-unattended-gates:   --serial   each suite alone, graded against its budget — the recorded DoD path" >&2
+  echo "run-unattended-gates:   --pooled   the runner's bounded pool, every cost verdict withheld" >&2
+  echo "run-unattended-gates: --checks takes no mode. Nothing was run." >&2
+  exit 2
+fi
 
 #
 # THE GATE SELFTEST'S CEILING WAS RE-DECLARED RATHER THAN MET, which TOOL-dScriptedRepeat-15's own
@@ -200,11 +228,12 @@ esac
 # from a spawn count and a per-spawn cost, both measured, and not from a stopwatch on the whole thing.
 # The equivalence that replaces it is 19 staged breaks, 18 of them red, whose output and exit status
 # are byte-identical before and after the unit. To settle it, one command:
-#   bash tools/unattended/run-unattended-gates.sh --selftests
+#   bash tools/unattended/run-unattended-gates.sh --selftests --serial
 
 st=0
 ran=0
 over=0
+MODE_TOKEN=""
 run_one() { # label · kind · argv...
   local label=$1 kind=$2; shift 2
   case "$ONLY" in ''|"$kind") ;; *) return 0 ;; esac
@@ -260,7 +289,26 @@ if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
   case "$_uc" in ''|*[!0-9]*|0) echo "run-unattended-gates: the declaration holds NO unattended row, so this half would grade nothing" >&2; st=1 ;;
     *) ran=$((ran + _uc)) ;;
   esac
-  bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended || st=1
+  # THE MODE IS PASSED THROUGH, and the two paths differ in one more way than the flag. Under
+  # --serial the runner's output streams exactly as it always has -- byte-identical to the bare
+  # run this replaced, which is what a recorded DoD verdict is compared against. Under --pooled
+  # the same stream is ALSO captured to a file, because the summary line below states how many
+  # cost verdicts the pool withheld and that number is the runner's own, parsed from its
+  # `cost verdict(s) WITHHELD` line rather than typed here. TOOL-aBatchedArm-4 S4/S5.
+  if [ "$MODE" = pooled ]; then
+    _pf=$(mktemp) || { echo "run-unattended-gates: cannot create a scratch file for the pooled withheld count" >&2; exit 2; }
+    bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended --pooled | tee "$_pf"
+    [ "${PIPESTATUS[0]}" -eq 0 ] || st=1
+    _k=$(sed -n 's/^run-selftests: \([0-9][0-9]*\) cost verdict(s) WITHHELD .*/\1/p' "$_pf" | head -1)
+    rm -f "$_pf"
+    # AN UNPARSED COUNT IS SAID, NOT ZEROED. The runner refuses before that line on a missing
+    # timeout binary or an unbounded declaration, and "0 withheld" would read as a budget-clean run.
+    [ -n "$_k" ] || _k="an UNPARSED number of"
+    MODE_TOKEN=" · pooled, $_k cost verdicts withheld"
+  else
+    bash "$ROOT/tools/run-gates/run-selftests.sh" --kit tools/unattended --serial || st=1
+    MODE_TOKEN=" · serial"
+  fi
 fi
 
 # LIVENESS. A run that executed nothing must not print a green line: an unknown filter and a clean
@@ -271,11 +319,14 @@ if [ "$ran" -eq 0 ]; then
   exit 2
 fi
 echo "----"
+# ONE MODE TOKEN, APPENDED, whenever the self-test half ran: ` · serial`, or ` · pooled, <k> cost
+# verdicts withheld` so neither GREEN can be read as a cost claim. `--checks` ran no suite under
+# any mode and carries none.
 if [ "$st" -eq 0 ]; then
-  echo "unattended gates GREEN — $ran ran on demand; no self-test here runs on the merge bar"
+  echo "unattended gates GREEN — $ran ran on demand; no self-test here runs on the merge bar$MODE_TOKEN"
 elif [ "$over" -gt 0 ]; then
-  echo "unattended gates RED — $ran ran on demand, $over over budget"
+  echo "unattended gates RED — $ran ran on demand, $over over budget$MODE_TOKEN"
 else
-  echo "unattended gates RED — $ran ran on demand"
+  echo "unattended gates RED — $ran ran on demand$MODE_TOKEN"
 fi
 exit "$st"
