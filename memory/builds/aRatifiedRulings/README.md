@@ -68,10 +68,10 @@ ids TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded](spec/2026-09-13-spec-TOOL-aRatifiedRulings-1.md) | — | 2 | SPECCED | rev-1 | 2026-09-13 |
-| [TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names](spec/2026-09-13-spec-TOOL-aRatifiedRulings-2.md) | — | 2 | SPECCED | rev-1 | 2026-09-13 |
-| [TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus](spec/2026-09-13-spec-TOOL-aRatifiedRulings-3.md) | — | 2 | SPECCED | rev-1 | 2026-09-13 |
-| [TOOL-aRatifiedRulings-4 — a leg killed with no ceiling in play names the seconds it ran](spec/2026-09-13-spec-TOOL-aRatifiedRulings-4.md) | — | 1 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded](spec/2026-09-13-spec-TOOL-aRatifiedRulings-1.md) | — | 2 | SPECCED | rev-2 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names](spec/2026-09-13-spec-TOOL-aRatifiedRulings-2.md) | — | 2 | SPECCED | rev-2 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus](spec/2026-09-13-spec-TOOL-aRatifiedRulings-3.md) | — | 2 | SPECCED | rev-2 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-4 — a leg killed with no ceiling in play names the seconds it ran](spec/2026-09-13-spec-TOOL-aRatifiedRulings-4.md) | — | 1 | SPECCED | rev-2 | 2026-09-13 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).

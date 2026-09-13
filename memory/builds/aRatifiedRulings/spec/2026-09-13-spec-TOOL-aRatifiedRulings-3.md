@@ -1,6 +1,6 @@
 # TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -29,9 +29,11 @@ clean, one run per arm, with every arm asserting the VALUE it grades rather than
   overlay `cp` of the working checker, `GOVROOT` and the fixture commit at lines 2222-2233 are
   removed. Observed by AC1 and AC2.
 - **S2** — The clean run over that tree serves the check-16 note arms AND the project-key control
-  arm ("the fixture is clean with no key set"): one invocation, three assertions. Each arm that must
-  observe an ABORT captures rc and stdout from ONE invocation instead of a `pk_rc` run followed by a
-  `pk_out` run. Observed by AC1.
+  arm ("the fixture is clean with no key set"): one invocation, three assertions. That invocation
+  is the one at `check-memory-hygiene.test.sh:2198` today, the direct `bash "$HERE/check-memory-hygiene.sh"`
+  whose rc and output land in `_b1rc` and `_b1out`; the control reads those two variables and
+  nothing routed through `pk_out`. Each arm that must observe an ABORT captures rc and stdout from
+  ONE invocation instead of a `pk_rc` run followed by a `pk_out` run. Observed by AC1.
 - **S3** — The arms that grade a RED assert the finding's text, never rc alone: the violated
   `BUILD_SLUG_RE` arm reads `HYGIENE check 4 FAILED` and the folder line naming `memory/builds/tOne`;
   the `PROJECT_REGISTRY_EXTRA` arm commits BOTH `my-registry.txt` and `unlisted-probe.txt` under
@@ -39,12 +41,19 @@ clean, one run per arm, with every arm asserting the VALUE it grades rather than
   control arm reads rc 0 AND the `READ_PATH_CEILING is declared` notice the fixture's conf provokes,
   so a clean verdict carries proof the run reached check 16. Observed by AC5.
 - **S4** — No assertion is removed. The executed count `n` the suite prints does not fall below the
-  count measured before the change, `FLOOR_ASSERTIONS` never falls, and every `ok` label the section
-  prints today is printed after. Observed by AC4.
-- **S5** — The suite's standalone wall clock and its full-bar row both land inside the untouched
-  ceiling, measured on this node before and after by the method in
-  `memory/gotchas/process-creation-is-the-suite-cost.md`, and recorded in the unit's acceptance
-  ledger with the invocation count beside each figure. Observed by AC2 and AC3.
+  count measured before the change, and every `ok` label the section prints today is printed after.
+  The `FLOOR_ASSERTIONS` comparison MOVES from `check-memory-hygiene.test.sh:2212-2213` to
+  immediately above the `PASS` line at `:2306`, so the value it grades is the value the `PASS` line
+  prints, and the constant is RAISED to that post-change `n` in the same commit that measures it
+  (§8 F2). Observed by AC4.
+- **S5** — The suite's cost is measured on this node twice, by the method in
+  `memory/gotchas/process-creation-is-the-suite-cost.md`: a PAIRED standalone reading, the same
+  invocation before and after on the same box back-to-back (AC2), and the one full-bar row the
+  landing bar produces (AC3). Both readings go into the unit's acceptance ledger with the
+  checker-invocation count beside each figure, whatever they read. The standalone pair must show
+  the cut; the full-bar row is OBSERVED against the untouched ceiling and its red has the disposition
+  AC3 and §8 F3 state, because this repo's own record says the loaded reading is not derivable from
+  the quiet one. Observed by AC2 and AC3.
 - **S6** — Every arm this unit adds or moves has its failing case observed RED by hand before it
   lands, from a driver that refuses a run which executed fewer arms than the section holds.
   Observed by AC6.
@@ -69,21 +78,25 @@ clean, one run per arm, with every arm asserting the VALUE it grades rather than
   spelled as N × 900.
 - **No assertion is deleted to buy time**, and the two other self-tests the 2026-09-07 park found
   red at BASE (`govkit selftest`, `codebase-map adopter e2e`) are not this unit's.
-- **The main-tree section and the scratch trees are NOT restructured.** They are 55% of a run
-  (§4), every one of their re-runs varies a conf or a tree state that the arms read, and the ruling
-  names the project-key section. What they cost is recorded so the next unit starts from a number.
+- **The main-tree section and the scratch trees are NOT restructured.** They are the two largest
+  rows of the region table in §4 after the project-key section, and that table is where their share
+  is read rather than a figure restated here; every one of their re-runs varies a conf or a tree
+  state that the arms read, and the ruling names the project-key section. What they cost is
+  recorded so the next unit starts from a number.
 
 ### Edges
 
 - **consumes-from** external — a full concurrent bar on this node, `GATE_FULL=1 GATE_SELFTESTS=1`
   at the width `tools/run-gates/gate-profiles.txt` picks for it, is the load condition AC3 observes
   under. Nothing in the tree can substitute for it, because the breach the ruling answers was only
-  ever seen there; the run pays it once and copies the row into the ledger before the runner prunes
+  ever seen there and because the quiet-to-loaded relationship for this suite is on record as not a
+  multiplier (§4); the run pays it once and copies the row into the ledger before the runner prunes
   the window.
 - **hands-off** external — the per-invocation floor of the checker itself: 8.0 s over a 29-file
   tree, of which `corpus_ids.py --check` is 3.2 s because it re-enters the checker in a print mode
   after probing every `bash` on PATH, times the 66 invocations one suite run makes. That is a unit
-  on the engine, with the bump obligation §3 names, and it is the lever after this one.
+  on the engine, with the bump obligation §3 names, and it is the lever after this one. If AC3
+  reads red, its row is that unit's input, parked per §8 F3; this unit does not promote it.
 - **hands-off** external — re-calibration of the `selftest-budgets.txt` row and any lowering of the
   ceiling, both from post-change readings, both by the rule each file states.
 
@@ -107,7 +120,28 @@ Every figure below is PINNED to that measurement; the ledger re-derives them aft
 
 Two consecutive quiet runs differ by 1.32×. The gotcha says wall clock on this node is not
 measurable to better than a factor of two, and the acceptance below is written against that spread
-rather than against one reading.
+rather than against one reading: AC2 is a paired reading of the same invocation back-to-back, with
+the deterministic invocation count (AC1) as the claim actually written down, which is the proxy
+the gotcha itself says to prefer.
+
+This tree holds two more standalone readings of the suite that are NOT in the table, and both are
+admitted here so the spread is honest. `memory/builds/aJoinedCanon/RUN.md` records about 660 s on
+2026-09-07 at the park; `TOOL-aPooledSweep-4` records 1126 s serial and 972 s pooled on the same
+day, inside a sweep A/B whose box state is not recorded, so it cannot be called quiet and cannot be
+excluded either. The whole standalone band this suite has ever shown on node `a` is therefore
+598.7 s to 1126 s, a 1.88× spread, which is the gotcha's factor of two seen on this suite. A
+pinned wall-clock bound anywhere inside that band is a coin flip, and no criterion below pins one.
+
+**The loaded reading is not derivable from the quiet one, and this spec does not derive it.** The
+records this repo holds on the relationship for THIS suite: the park saw about 660 s standalone
+killed past the 900 s ceiling under `GATE_FULL=1 GATE_SELFTESTS=1` at width 8, at least 1.36×;
+`TOOL-dRetiredFork-40` measured 443 s under load against 583 s quiet, the wrong way round, and
+concluded "the relationship is not a multiplier and cannot be guessed"; and a different hygiene leg
+went 48 s quiet to 139 s inside a full bar, 2.9×. Three readings, three ratios, one of them below
+one. The post-cut standalone projection is 433 s on the traced reading and 811 s on the 1126 s
+reading at the same share (the 0.72 derived under "The mechanism"); times 0.76, 1.36 and 2.9 that
+is 329 s to 2352 s, which straddles the ceiling from both sides. So the full-bar figure is OBSERVED by AC3 and never predicted, and AC3
+carries the disposition for a red rather than an arithmetic that says it cannot happen.
 
 The suite is RED at `16da4c6a`. The first project-key arm reports `the fixture is not clean unset
 (rc=1) — every arm below is meaningless`, and the archive run's output says why: check 21 and check
@@ -201,17 +235,32 @@ at line 2206. This unit keeps it and makes it the project-key tree:
   notice on every invocation.
 - `pk_out` becomes the one runner: it runs `"$HERE/check-memory-hygiene.sh"` from the fixture root,
   the way the `_b1` arm already does, captures stdout and stderr, and returns the checker's rc. Every
-  arm that today calls `pk_rc` then `pk_out` calls it once. `pk_rc` goes, or stays as a one-line
-  wrapper if its removal moves the lexicon pin — read off the tool, see Inventory.
-- The control arm reads `_b1rc` and `_b1out` from the existing run: rc 0, and the notice present.
-  No second run.
+  arm that today calls `pk_rc` then `pk_out` calls it once. `pk_rc` is REMOVED, and
+  `VERB_OFFENDER_PIN` in `.lexicon.conf` is lowered in the same commit to the value
+  `python tools/lexicon/lexicon.py --check` prints. There is no "keep it as a wrapper" branch: the
+  pin is an equality in both directions (`lexicon.py` reds UNDER the pin as well as over it, and
+  `--list` names `pk_rc` as a P1 offender at line 2240), so removing the definition always moves
+  the pin and the only consistent shape is remove-and-lower together.
+- The control arm reads `_b1rc` and `_b1out` from the existing run at `check-memory-hygiene.test.sh:2198`:
+  rc 0, and the notice present. No second run, and nothing routed through `pk_out`, which is why
+  its staged break (AC5, AC6) is applied to that invocation and not to the runner.
 - The violated-slug arm asserts `HYGIENE check 4 FAILED` and `memory/builds/tOne (bad folder name`
   in the captured output. The registry arm commits `memory/project/my-registry.txt` beside the
   `unlisted-probe.txt` it already commits and asserts the probe is named and the registry is not.
   The six abort arms keep their `2:*KEY*` case over rc and output from the single run.
-- The section's cost after the change, predicted from the table: seven runs at 8.0 s, six aborts at
-  0.08 s, no archive build, no separate control run — about 57 s where 222.9 s were, a 28% cut of
-  the traced run and, at the same share, a 37% cut of the plain one.
+- The `FLOOR_ASSERTIONS` comparison at lines 2212-2213 moves to immediately above the `PASS` line
+  at line 2306, and the constant is raised to the post-change `n`. Today the comparison sits BEFORE
+  the project-key section, so it grades `n` minus that section's thirteen increments while the
+  `PASS` line prints the final `n`; a floor pinned to the printed number would red the suite on its
+  first run. Hoisting the comparison makes the pin mean the printed number. `tools/check-testsuite-counts.sh`
+  reads the `FLOOR_ASSERTIONS=<n>` line and a comparison against it by shape, not by position, so
+  the move is invisible to that leg.
+- The section's cost after the change, predicted from the table: six runs at 8.0 s under a key plus
+  the one clean run the control now shares with the check-16 note arms, six aborts at 0.08 s, no
+  archive build, no separate control run — about 57 s where 222.9 s were. On the traced reading
+  that is 598.7 − (222.9 − 57) = 433 s, a ratio of 0.72; the plain reading at the same share
+  projects to 569 s at the same 0.72. AC2 asserts the ratio, not a wall figure, because 0.72 is a
+  property of the mechanism and any single wall reading is a property of the box.
 
 ### Data model
 
@@ -223,10 +272,11 @@ suite already writes, plus one committed registry file under its `memory/project
 No leg, no conf key and no file is minted. Shell function names in this suite are graded by the
 `sh.function` cell of `.lexicon.conf`, and `pk_set`, `pk_rc` and `pk_out` are among the P1
 offenders this file already contributes to `VERB_OFFENDER_PIN`, which is a two-sided equality
-(`python tools/lexicon/lexicon.py --list` names them).
-Removing `pk_rc` lowers the offender count by one and the pin moves with it in the same commit,
-read off `python tools/lexicon/lexicon.py --check` on the tree, never predicted. A new helper, if
-one is wanted, leads with a declared verb (`run` is in the table; `pk` is not, per `--suggest`).
+(`python tools/lexicon/lexicon.py --list` names them at lines 2235, 2240 and 2241).
+Removing `pk_rc` lowers the offender count by exactly one and the pin moves with it in the same
+commit, to the value `python tools/lexicon/lexicon.py --check` prints on the tree, never a value
+predicted here. That edit is certain, not conditional, per "The mechanism". A new helper, if one
+is wanted, leads with a declared verb (`run` is in the table; `pk` is not, per `--suggest`).
 The carried-literal row for this file in `tools/install-prefix-carried.txt` may fall when the
 `$KIT_REL/check-memory-hygiene.sh` invocations go; a fall is permitted by that file's rule and the
 count is read off `bash tools/check-install-prefix.sh`.
@@ -249,10 +299,10 @@ a red suite is what it is today.
 
 ### Files touched (estimate)
 
-- `tools/memory-tree/check-memory-hygiene.test.sh` — the project-key section and the check-16 note
-  fixture's teardown; the only product file.
-- `.lexicon.conf` — `VERB_OFFENDER_PIN`, only if a graded helper departs or arrives; value read off
-  the tool.
+- `tools/memory-tree/check-memory-hygiene.test.sh` — the project-key section, the check-16 note
+  fixture's teardown, and the `FLOOR_ASSERTIONS` comparison hoisted to above the `PASS` line; the
+  only product file.
+- `.lexicon.conf` — `VERB_OFFENDER_PIN`, lowered by one when `pk_rc` goes; value read off the tool.
 - `tools/install-prefix-carried.txt` — this file's row, only if its carried count falls; value read
   off the gate.
 - `memory/map/features/memory-tree-hygiene.md` — refreshed on touch: today it names the self-test as
@@ -276,8 +326,9 @@ a red suite is what it is today.
 - security — N/A: a self-test over `mktemp -d` scratch trees under a `trap` that removes them; no
   tracked path is written by any arm, and the `git archive` of this repository disappears.
 - perf / scale — the subject of the unit. Before and after figures are §4 and the ledger; the
-  residual cost structure (55% in the main-tree and scratch sections, 8.0 s per invocation floor) is
-  recorded so the next unit starts from a number rather than from a diagnosis.
+  residual cost structure is the §4 region table for the main-tree and scratch rows and the 8.0 s
+  per-invocation floor beneath it, recorded there so the next unit starts from a number rather
+  than from a diagnosis, and not restated here where it would be a second answer.
 - error / empty / loading states — a run that could not START is told from a red: the control arm
   asserts rc 0 plus a positive notice, the red arms assert finding text, and the abort arms assert rc
   2 plus the key's name. The small tree is asserted non-empty for every check-12 population by the
@@ -287,9 +338,13 @@ a red suite is what it is today.
 - risks — (1) the four keys are graded against a 29-file corpus, so a key whose defect shows only
   at scale is not caught here; every key is validated in the preset block before any walk, and the
   `memory hygiene` leg runs the checker over the real tree on every bar. (2) Wall clock on this
-  node varies 1.32× between quiet runs and up to 2× per the gotcha; AC2 is bounded with that spread,
-  and AC3 is the full-bar observation. (3) `VERB_OFFENDER_PIN` and the carried-literal row can red
-  the bar if a helper departs and the pin is not re-read; Inventory names both.
+  node varies 1.88× across the standalone readings §4 admits and the loaded reading is not a
+  multiple of the quiet one; AC2 is therefore a back-to-back ratio with the invocation count as the
+  deterministic claim, and AC3 is the full-bar observation whose red is disposed by §8 F3 rather
+  than argued away. (3) `VERB_OFFENDER_PIN` and the carried-literal row can red the bar if a helper
+  departs and the pin is not re-read; Inventory names both. (4) The hoisted floor comparison reds
+  the suite itself if the constant is set above the `n` the section actually executes; AC4 reads
+  the pin off the `PASS` line for that reason.
 - testing — the arms themselves, each with its failing case observed RED first (AC6); the driver
   refuses a run that executed fewer arms than the section holds.
 - migration — N/A: no shape moves and no kit version is owed, see §4 Migration.
@@ -299,30 +354,56 @@ a red suite is what it is today.
 
 - **AC1** — When `PS4='+ ${LINENO} ' bash -x tools/memory-tree/check-memory-hygiene.test.sh`
   runs to completion with stderr captured, the trace shows no `git archive` line, and the count of
-  checker invocations made from the project-key section is one per arm that needs a run: seven that
-  proceed and six that abort, where the 2026-09-13 trace showed 19 (12 through `pk_rc`, 7 through
-  `pk_out`) and a `git archive` at line 2227.
-  Red when: the trace still carries a `git archive`, or an abort arm still makes two invocations, or
+  checker invocations over the check-16 note fixture's tree equals the number the arm list needs:
+  one clean run shared by the two check-16 note arms and the project-key control, six runs under a
+  key that proceed, and six that abort, thirteen in all, where the 2026-09-13 trace showed the
+  project-key section alone making 19 (12 through `pk_rc`, 7 through `pk_out`) over an archive
+  fixture, plus a separate clean run, and a `git archive` at line 2227. This is the deterministic
+  observation of the ruling's word CHEAPER; AC2's wall clock is its evidence.
+  Red when: the trace still carries a `git archive`, or the count of invocations over that tree
+  exceeds the arm list's need — an abort arm still making two, a control still making its own — or
   a proceeding run's cwd is not the check-16 note fixture's root.
-  figure: the before count 19 is PINNED, read from the 2026-09-13 trace on node `a`; the after count
-  is DERIVED from the arm list at observation time.
+  figure: the before counts 19 and 1 are PINNED, read from the 2026-09-13 trace on node `a`; the
+  after count is DERIVED from the arm list at observation time and resolves to 13 on the arm list
+  this spec holds.
 - **AC2** — When `time bash tools/memory-tree/check-memory-hygiene.test.sh` runs on node `a` with
-  `TIMEFORMAT='real %R user %U sys %S'` and at most three `bash.exe` processes alive before it
-  starts (read with `ps -W`), the suite exits 0, prints `PASS (n assertions)`, and `real` is at most
-  600 s.
-  Red when: `real` exceeds 600 s on a quiet box, or the suite exits non-zero, or no `PASS` line is
-  printed. The bound is the worst of the three quiet readings this tree has (660 s on 2026-09-07,
-  790.7 s and 598.7 s on 2026-09-13) scaled by the 63% that survives §4's cut, which is 498 s, plus
-  headroom for the 1.32× spread the two 2026-09-13 readings showed. A change that only cuts four of
-  the seven archive runs — candidate A's shape — lands at about 490-640 s, inside the bound on two of
-  the three readings, and prints no `PASS` line at all, which is the half of this criterion it
-  cannot meet.
-  figure: the three before readings are PINNED as above; the after reading is DERIVED by the command.
+  `TIMEFORMAT='real %R user %U sys %S'` as a PAIRED reading — before at `16da4c6a` from a frozen
+  `git clone --local` under a short root, after at the landed tip, interleaved before-after-before-after
+  on the same box with the same `ps -W` process count at each start — the minimum `real` of the two
+  after runs is at most 0.8 times the minimum `real` of the two before runs, every after run exits
+  0 and prints `PASS (n assertions)`, and each of the four readings goes into the ledger with its
+  checker-invocation count from a `PS4` trace beside it, which is the positive artifact that the
+  arm ran the suite and not a stub.
+  Red when: the after-over-before ratio exceeds 0.8, or an after run exits non-zero or prints no
+  `PASS` line, or a reading is recorded without its invocation count. The bound is derived from
+  the mechanism, not from a reading: §4 predicts 0.72 (433 s of 598.7 s traced), and 0.8 leaves the
+  residual noise of a back-to-back pair eight points. A change that only cuts four of the seven
+  archive runs — candidate A's shape — saves about 112 s of the traced 598.7 s, a ratio of 0.81,
+  and prints no `PASS` line, so it reds on both halves. A pair that lands between 0.72 and 0.8 is
+  green; one above 0.8 with AC1 green is re-measured once with a second interleaved pair per the
+  gotcha's take-the-minimum rule and reds if it stays above, because the ruling's word is CHEAPER
+  and an invocation count alone does not prove a wall clock fell on this box.
+  cost: four suite runs on this node, about 40 to 75 minutes by the standalone band §4 admits.
+  fixture: the before clone lives under a short root such as `%TEMP%`, not the session scratchpad,
+  because `git clone --local` into the scratchpad's path fails with "Filename too long" on this
+  node; and it is FROZEN — no commit lands in it between the two before runs, since a suite run
+  over a tree that moved under it measures nothing.
+  figure: no wall figure is pinned; 0.8 is DERIVED from §4's 0.72 as stated; the four readings and
+  their counts are DERIVED by the commands.
 - **AC3** — When `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` runs on node `a`
   after the change, the run's `.leg` row for `memory-hygiene self-test` under the runner's
-  `gate-run` window records status `ok`, rc 0 and seconds below 900, and the ledger copies that row.
+  `gate-run` window records status `ok`, rc 0 and seconds below the ceiling `tools/gate-legs.json`
+  declares for that leg, and the ledger copies that row with its seconds whatever they read.
   Red when: the row records rc 124 or 137, which is the ceiling kill the 2026-09-07 park recorded at
-  900.481 s and 900.240 s, or seconds at or above 900 with any status.
+  900.481 s and 900.240 s, or seconds at or above the ceiling with any status.
+  Disposition of a red, stated here because no number in this spec implies this criterion holds
+  (§4: the quiet-to-loaded relationship is on record as not a multiplier): the row is recorded red
+  in the ledger with its seconds and invocation count; it is parked in the build README's
+  "Parked decisions" as the ruling's next input, with candidate C's figures from §4 beside it; the
+  ceiling stays untouched per §3; and this unit does not promote candidate C, per §8 F3. The
+  unit's other criteria decide its landing, because the leg is held on every boundary and a red row
+  blocks no push, but the close then states that the build README's expected improvement for this
+  leg is NOT met by this unit alone.
   cost: one full bar with the self-tests, whose leg-sum was 4926 s with a 1565 s longest leg on node
   `d` on 2026-08-23; the run pays it once and no other criterion needs it.
   permission: `GATE_SELFTESTS=1` is on demand and no boundary sets it (owner, 2026-08-27); the run
@@ -331,38 +412,60 @@ a red suite is what it is today.
   same pass that observes it. The bar as a whole is expected RED on the two self-tests the
   2026-09-07 park found red at BASE; this criterion reads one leg's row and says nothing about the
   bar's verdict.
-  figure: DERIVED — the seconds are whatever the row holds; the 900 is the ceiling read from
-  `tools/gate-legs.json` at observation time, never from this file.
+  figure: DERIVED — the seconds are whatever the row holds; the ceiling is read from
+  `tools/gate-legs.json` at observation time, never from this file, and the 900 written in §1 and §3
+  is the ruling's word for it, not a second declaration.
 - **AC4** — When the suite passes, the `n` in its `PASS (n assertions)` line is at least 374,
-  `FLOOR_ASSERTIONS` in `tools/memory-tree/check-memory-hygiene.test.sh` is at least the 235 it
-  reads today, and every `ok` label the project-key section printed in the 2026-09-13 baseline
+  `FLOOR_ASSERTIONS` in `tools/memory-tree/check-memory-hygiene.test.sh` EQUALS that printed `n`,
+  the comparison against it is the last statement before the `PASS` line so the value graded is the
+  value printed, and every `ok` label the project-key section printed in the 2026-09-13 baseline
   output is printed by the section after the change.
-  Red when: `n` is below 374, or the constant fell, or an `ok` label is gone — an arm removed to buy
-  time is exactly what this criterion exists to refuse.
+  Red when: `n` is below 374; or the constant is below the printed `n` (slack, the OPEN reading of
+  §8 F2 that a build which never raises the pin would satisfy) or above it (the suite reds itself,
+  which is what a pin read off the `PASS` line does while the comparison still sits at line 2212,
+  before the section's thirteen increments); or the comparison is anywhere but immediately above the
+  `PASS` line; or an `ok` label is gone — an arm removed to buy time is exactly what this criterion
+  exists to refuse. The slack half is observed by `grep -nE '^FLOOR_ASSERTIONS=' tools/memory-tree/check-memory-hygiene.test.sh`
+  against the `PASS` line of the same run.
   figure: 374 is PINNED, read as the counter's final value from the 2026-09-13 trace because a red
-  suite prints no `PASS` line; 235 is PINNED from the file at `16da4c6a`; `n` after is DERIVED.
+  suite prints no `PASS` line; 235 is the value at `16da4c6a` and is superseded; `n` after and the
+  constant are DERIVED, the constant from the `PASS` line of the run that measures it.
 - **AC5** — When the violated-slug arm runs with `BUILD_SLUG_RE="^zzz[A-Za-z]+$"`, it asserts
   `HYGIENE check 4 FAILED` and `memory/builds/tOne (bad folder name` in the captured output; when
   the registry arm runs with `PROJECT_REGISTRY_EXTRA="my-registry.txt"` and both `my-registry.txt`
   and `unlisted-probe.txt` committed under the fixture's `memory/project/`, it asserts check 3 names
   the probe and does not name the registry; and the control arm asserts rc 0 AND the
-  `READ_PATH_CEILING is declared` notice.
-  Red when: any of the three is satisfied by rc alone — staged by pointing the runner at a script
-  path that does not exist, so every invocation exits 127, and observing that the arm still prints
-  `ok`. That is the state the 2026-09-13 baseline recorded for the violated-slug arm, which printed
-  `ok` on a fixture that was red for a reason no key controls.
-- **AC6** — When each arm this unit adds or moves has its subject reverted in place and the section
-  is re-run BY HAND, that arm prints `FAIL` and the suite exits non-zero, one observation per arm
-  recorded before the reverts are unstaged: `pk_set` made a no-op so no key line reaches the conf
-  (the violated-slug arm and the six abort arms go red), the runner pointed at a missing path (the
-  three value arms of AC5 go red), and the registry commit dropped (the registry arm goes red).
+  `READ_PATH_CEILING is declared` notice, read from the `_b1rc` and `_b1out` of the invocation at
+  line 2198, not from `pk_out`.
+  Red when: any assertion is satisfied by rc alone, staged per ASSERTION because one break cannot
+  tell an rc-only form from a value form on every arm. The violated-slug arm — staged by pointing `pk_out` at a
+  script path that does not exist so it exits 127 with no check-4 text, on which the rc-only form
+  `[ "$r" != 0 ]` prints `ok` and the value form reds; that is the state the 2026-09-13 baseline
+  recorded for this arm, which printed `ok` on a fixture that was red for a reason no key controls.
+  The registry arm's "does not name the registry" half is staged by making `pk_set` a no-op so
+  `PROJECT_REGISTRY_EXTRA` never reaches the conf and check 3 names both files; its "names the
+  probe" half is staged by dropping the probe commit. The control arm's notice half is staged by
+  dropping the `READ_PATH_CEILING` line from the fixture's conf for that one run, which leaves rc 0
+  and no notice, so an rc-only control prints `ok` and the value form reds; the 127 break does not
+  reach this arm at all, since it reads line 2198, and would red an rc-only control anyway.
+- **AC6** — When each assertion this unit adds or moves has its subject reverted in place and the
+  section is re-run BY HAND, the arm that owns it prints `FAIL` and the suite exits non-zero, one
+  observation per assertion recorded before the reverts are unstaged, the breaks being exactly the
+  ones AC5 names plus the abort arms' own: `pk_set` made a no-op (the violated-slug arm, the six
+  abort arms and the registry arm's registry half go red), `pk_out` pointed at a missing path (the
+  violated-slug arm's value form goes red where its rc-only form stayed `ok`), the probe commit
+  dropped (the registry arm's probe half goes red), and the `READ_PATH_CEILING` line dropped from
+  the check-16 fixture conf for that one run (the control arm's notice half goes red at rc 0). The
+  ledger row per break names the break AND the invocation the arm read, line 2198 or `pk_out`.
   At least one break is observed through the whole named invocation,
   `bash tools/memory-tree/check-memory-hygiene.test.sh`; the rest may be observed through the
   section run from its own prologue. Whatever runs REFUSES a run whose count of `ok` and `FAIL`
   lines from the section differs from the arm count the section holds.
-  Red when: an arm passes with its subject reverted, or an observation is taken from a run whose arm
-  count nothing asserted — a break that reds nothing and a harness that never started print the same
-  empty `FAIL` list, which is what the parent build's first driver did for six breaks.
+  Red when: an assertion passes with its subject reverted, or a value assertion's only staged break
+  is one that also reds its rc-only form (the 127 break applied to the control), or an observation
+  is taken from a run whose arm count nothing asserted — a break that reds nothing and a harness
+  that never started print the same empty `FAIL` list, which is what the parent build's first driver
+  did for six breaks.
   permission: the leg is held on every boundary, so nothing performs this observation but the hand
   run; the same holds for AC1, AC2, AC4 and AC5, and §7 says so once.
 
@@ -389,12 +492,13 @@ Inventory names; `every held leg is budgeted` because the leg's budget row is un
 still resolve; `leg ceilings clear their evidenced maximum` because the ceiling is untouched and the
 evidence file is not refreshed; `spec tokens` over this file.
 
-New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · AC5's three value arms stage RED by
-pointing the runner at a script path that does not exist; the abort and violated-slug arms stage RED
-by making `pk_set` a no-op; the registry arm stages RED by dropping its probe commit; each is
-confirmed red before being unstaged · `FLOOR_ASSERTIONS` does not move down; whether it moves up is
-§8 F2, and the executed count is read from the suite at the time of the change rather than pinned
-here.
+New arm: `tools/memory-tree/check-memory-hygiene.test.sh` · one staged break per ASSERTION, as AC5
+and AC6 list them: `pk_out` at a missing path for the violated-slug arm's value form; `pk_set` a
+no-op for the abort arms, the violated-slug arm and the registry arm's registry half; the probe
+commit dropped for the registry arm's probe half; the `READ_PATH_CEILING` conf line dropped for the
+control arm's notice half at rc 0; each confirmed red before being unstaged · `FLOOR_ASSERTIONS`
+moves UP to the post-change `n` per §8 F2, read off the `PASS` line of the run that measures it,
+and its comparison moves to immediately above that line.
 
 ## 8. Open questions
 
@@ -412,19 +516,42 @@ here.
   than by luck. Against: a floor at the exact count reds the next legitimate arm removal in an
   unrelated unit, and 235 has been the value since the merge that set it. Recommendation: raise it to
   the post-change `n` less nothing, per the suite's precedent, in the same commit that measures it.
-  Left OPEN: it is a policy on the suite's pin, the hard rule binds only the direction, and the owner
-  may prefer the slack.
-
-RESOLVED (agent, 2026-09-13, delegated) F2: `FLOOR_ASSERTIONS` is RAISED to the post-change
-executed count in the same commit that measures it, per the suite's own precedent that the
-tighter surviving pin wins. The counter-argument is the ratchet working as designed: an
-unrelated unit that removes an arm SHOULD red until someone re-pins on purpose, because a floor
-with slack is how a block of arms stranded past an exit goes unnoticed. The slack the owner
-might prefer is exactly the slack that hides the class this pin exists to catch.
+  RESOLVED (agent, 2026-09-13, delegated): `FLOOR_ASSERTIONS` is RAISED to the post-change executed
+  count in the same commit that measures it, per the suite's own precedent that the tighter
+  surviving pin wins, and the comparison is hoisted to immediately above the `PASS` line so the
+  pinned number is the printed one (S4, AC4). The counter-argument is the ratchet working as
+  designed: an unrelated unit that removes an arm SHOULD red until someone re-pins on purpose,
+  because a floor with slack is how a block of arms stranded past an exit goes unnoticed. The slack
+  the owner might prefer is exactly the slack that hides the class this pin exists to catch. The
+  hoist is part of the pick rather than a separate fork: a raised pin graded at line 2212, before
+  the section's thirteen increments, reds the suite on its first run, so the mark cannot be met
+  without it.
+- **F3 — when AC3 reads red, promote candidate C into this build, or park the row?** The ruling's
+  answer is "cheaper" and its measurement is the full bar; §4 shows no quiet reading predicts the
+  loaded one, so a red is a live possibility and not a hypothetical. Promoting C lands it in one
+  build with its measurement, but it is a fifth unit under a four-unit mandate, moves an engine line
+  in `check-verdict-epoch.sh`'s scan set, and owes the five-carrier kit bump that unit 2's F1
+  assigns to the closing pass. Parking the row leaves the ruling's expected improvement unmet by
+  this unit alone and says so. Recommendation: park.
+  RESOLVED (agent, 2026-09-13, delegated): park. The red row is recorded in the ledger and written
+  into the build README's "Parked decisions" as the ruling's next input, with candidate C's §4
+  figures beside it; the ceiling stays untouched; the unit lands on its other criteria and its close
+  names the unmet improvement. Adding a unit and a kit bump is a build-plan change the delegated
+  mechanism choice does not reach, and the owner's own README rule already makes whether the number
+  then moves "a separate decision with a measurement behind it" — the parked row is that measurement.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft, from the ruling and two timed runs on node `a`.
+- rev-2 · 2026-09-13 · §2 S2 S4 S5 · §3 · §4 · §5 · AC1 AC2 AC3 AC4 AC5 AC6 · §7 · §8 F2 F3 · folded
+  round-1 spec audit clusters H (id 45), G (ids 5, 46), I (ids 7, 22), J (ids 20, 31), K (ids 23,
+  24). H: the loaded reading is not derived from a multiplier — this repo's own record
+  (`TOOL-dRetiredFork-40`) says the relationship is not one — so AC3 stays the full-bar observation
+  and gains a red disposition, F3. G: AC2 is a paired back-to-back ratio with AC1's invocation count
+  as the deterministic claim; the 600 s pin is gone and the two omitted readings are admitted. I:
+  one staged break per assertion, the control's applied to line 2198 at rc 0. J: F2's body agrees
+  with its mark, and the floor comparison hoists to above the `PASS` line. K: the 55% figure points
+  at the §4 table; `pk_rc` goes and the pin lowers, no wrapper branch.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aRatifiedRulings-4 — a leg killed with no ceiling in play names the seconds it ran
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node a · Tier-1 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-1 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -32,11 +32,19 @@ row that carried it is `TOOL-aLeakedHandle-5`.
   existing `selfkill.sh` fixture under the existing `tbl-loose` profile with the `ceiling` key
   DROPPED from the manifest row, and asserts the tail's shape and its value against the ledger. It
   sits OUTSIDE the suite's `HAVE_TIMEOUT` guard, its assertions are counted beside it, and
-  `FLOOR_ASSERTIONS` rises by the number of increments the arm adds. Observed by AC1, AC2, AC4 and
-  AC5.
+  `FLOOR_ASSERTIONS` rises by the number of increments the arm adds. The `tbl-loose` profile write
+  at `run-gates.test.sh:1150` is HOISTED above the guard's `if` at `:1131`, beside the three
+  counters already hoisted there for the same reason, because today that file is written only
+  inside the guard and on a timeout-less host the arm would run under the runner's silent built-in
+  fallback (`run-gates.sh:270`) while claiming the profile. Observed by AC1, AC2, AC4 and AC5.
 - **S4** — `tools/run-gates/README.md` gains one clause, in the paragraph that already documents
   the `(killed after Ns, ceiling Ms)` tail, naming the no-ceiling form. NOT OBSERVED — no gate
   reads that paragraph, for the reason S2 gives.
+- **S5** — The obligation the S1 edit incurs, in the same commit as that edit: the kickoff manifest
+  `last-audit` re-stamp in `memory/guides/SESSION-KICKOFF.md`, with a delta line in the commit
+  message, because `tools/run-gates/run-gates.sh` is on that manifest's `watch:` line and
+  `skills/session-kickoff/manifest-check.sh` check 5 reds a watched change with no stamp at or after
+  it, on every bar. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -56,6 +64,15 @@ row that carried it is `TOOL-aLeakedHandle-5`.
   live; §4 says why the observation is fixture-only and what that costs.
 - **No new leg, no new identifier.** The arm joins the existing `run-gates canary` suite, so no
   gate-legs inventory key, no `memory/map` claim, no subject-pins row and no budget row are owed.
+- **`KIT_RUN_GATES_VERSION` stays at 1.6, here and at this build's closing pass.** No gate in this
+  repo ties that constant to the runner's bytes: `tools/check-kit-versions.sh` grades the constant
+  at `run-gates.sh:19` against the two `gov:kit run-gates@` markers for AGREEMENT, and the verdict
+  epoch leg is hardcoded to the memory-tree engine. The precedent is the parent's own edit of this
+  same function, `922fd926`, which left 1.6 in place, as did the four commits before it since
+  `6462556a` last moved it. The residual is the adopter class `TOOL-dMuffledSentinel-3` records, a
+  pull refused because bytes moved under one version; whoever next bumps this kit should know 1.6
+  then spans `6462556a`, `922fd926` and this unit. Unit 2 F1 of this build assigns the UNATTENDED
+  bump to the closing pass and says nothing about run-gates, so no sibling declaration is owed.
 
 ### Edges
 
@@ -64,6 +81,12 @@ row that carried it is `TOOL-aLeakedHandle-5`.
   landed, which already reads both. If `.bound` stops being written as a number, the new predicate
   reads 0 through `${fired:-0}` and the tail says `killed after` for a leg that may have had a bound;
   if `.sec` stops being written, the tail degrades to `?` rather than to a wrong number.
+- **hands-off** external — a `runp` that REFUSES a `GATE_PROFILES` naming an absent path, so no arm
+  in `tools/run-gates/run-gates.test.sh` can run under the runner's built-in fallback while
+  believing it runs under a fixture. The round-1 audit proposed it as the left-shift for the S3
+  defect; it changes a helper every section-4 arm routes through and is outside a ruling scoped to
+  one branch plus one arm. The runner's own silent fallback at `run-gates.sh:270` stays either way,
+  because it is the documented rollback.
 
 ## 4. Design
 
@@ -159,11 +182,35 @@ the row that carried this fork was written so it stays findable if one ever does
 
 The arm sits OUTSIDE `HAVE_TIMEOUT` because the branch it grades is the one path that needs no
 `timeout`. On a host with a runnable `timeout`, `bound` is 0 because no ceiling and no profile
-timeout were declared; on a host without one, `CEILINGS_LIVE=0` sets `bound` to 0 anyway. Both
-reach the same branch with the same fixture, so the arm executes on every host and its increments
-are counted beside it with no skip. That is the opposite of 4h-kill, which reads a tail the runner
-only builds under a live bound and skips with its sibling; the two arms are deliberately placed on
-opposite sides of the same `fi`.
+timeout were declared; on a host without one, `CEILINGS_LIVE=0` at `run-gates.sh:1394` sets `bound`
+to 0 anyway, and the profile's `timeout=0` is then redundant rather than load-bearing. Both reach
+the same branch, so the arm executes on every host and its increments are counted beside it with no
+skip. That is the opposite of 4h-kill, which reads a tail the runner only builds under a live bound
+and skips with its sibling; the two arms are deliberately placed on opposite sides of the same `fi`.
+
+**The fixture is not on both sides of that `fi` today, and the arm moves it.** `fx/tbl-loose.txt`
+is written at `run-gates.test.sh:1150`, INSIDE the guard that opens at `:1131` and closes at
+`:1211`; only `selfkill.sh` at `:977` is outside it. On a timeout-less host the file therefore does
+not exist when the arm runs, and `run-gates.sh:270` (`if [ -f "$PROFILES" ]`) falls back to the
+built-in formula without a word, as the runner's header at `:9-10` documents. The arm would still
+pass there, because `CEILINGS_LIVE=0` forces the same branch, but it would pass under a profile it
+did not name, and an arm whose fixture claim the run never checks is not driving the fixture it
+says it drives. The one-line `printf` at `:1150` is therefore HOISTED to sit beside the three
+`n=$((n+1))` counters above the `if` at `:1131`, which were moved there for the same
+host-independence reason and say so in their own comment; 4h keeps reading the file from inside the
+guard, byte-identical.
+That is a move, not a new fixture. The alternative, the arm writing its own copy of the row, is a
+second literal of one profile line and is refused for that.
+
+Measured 2026-09-13 on this host: with a `timeout` stub that exits 1 placed first on `PATH`, the
+suite's probe at `run-gates.test.sh:145` reads `HAVE_TIMEOUT=0` and the runner's at
+`run-gates.sh:371` reads `CEILINGS_LIVE=0`; the runner's only other `timeout` call, the reaper at
+`:1009`, is gated on the same `CEILINGS_LIVE`. So the timeout-less host class is reachable from this
+box by one `PATH` entry, and AC5 names that invocation rather than conceding the class. One
+counter, the `stubborn` arm's at `run-gates.test.sh:1165`, still sits inside the guard, so a
+stubbed run closes one below the ordinary one; the last `run-gates canary` log closed at 148
+against a floor of 146, so that slack exists today and this unit neither spends it nor moves that
+counter, which is the 4h comment's own class and not this ruling's.
 
 ### Inventory
 
@@ -175,13 +222,26 @@ block in an existing suite under an existing leg name.
 | File | Change |
 |---|---|
 | `tools/run-gates/run-gates.sh` | one guarded assignment added in `report_one`; one comment clause amended |
-| `tools/run-gates/run-gates.test.sh` | one arm of about fifteen lines outside the `HAVE_TIMEOUT` guard; three `n=$((n+1))` beside it; `FLOOR_ASSERTIONS` raised by three |
+| `tools/run-gates/run-gates.test.sh` | one arm of about fifteen lines outside the `HAVE_TIMEOUT` guard; three `n=$((n+1))` beside it; the `tbl-loose` `printf` at `:1150` moved above the guard's `if` at `:1131`; `FLOOR_ASSERTIONS` raised by three |
 | `tools/run-gates/README.md` | one clause in the existing killed-tail paragraph |
+| `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamped, in the commit that edits `run-gates.sh` |
 
 `FLOOR_ASSERTIONS` is a literal at `run-gates.test.sh:48`; its value is read from the file at build
 time and is DERIVED here, not pinned. It rises by exactly the number of `n=$((n+1))` lines the arm
 adds, unless a sibling unit lands increments into the same file first, in which case the suite's own
 closing `PASS (<n> assertions)` line is the figure to set it from.
+
+### Rollout
+
+One commit carries the `run-gates.sh` edit and the `last-audit` re-stamp together, and the message
+carries the delta line. The bundle is not a preference: `manifest-check.sh`'s staged leg C5s at
+`:408-420` refuses a commit whose staged set touches a watched file while the staged manifest's
+audit block still carries HEAD's stamp, and `.githooks/pre-commit:53-55` runs that leg whenever a
+watched file is staged, so a re-stamp as a follow-up commit never gets past the hook. The parent's
+unit 3 paid for this at dispatch: its 12:03:13Z row in
+`memory/builds/aLeakedHandle/RUN.md` declares no manifest and its 12:39:06Z row re-dispatches with
+`memory/guides/SESSION-KICKOFF.md` appended. This unit declares it at dispatch. The suite edit and
+the README clause may ride the same commit or their own; neither is watched.
 
 ### Alternatives rejected
 
@@ -203,6 +263,13 @@ closing `PASS (<n> assertions)` line is the figure to set it from.
 - **Place the arm inside the `HAVE_TIMEOUT` guard beside 4h-kill**, for symmetry. It would skip
   on exactly the host where the branch is MOST reachable, since an absent `timeout` makes every leg
   run unbounded.
+- **Have the arm write its own `tbl-loose` row** instead of hoisting the write at
+  `run-gates.test.sh:1150`. Same bytes on a timeout host, a second literal of one profile line in
+  the file, and the two copies drift the first time someone tunes 4h's width. The hoist is one
+  line moved and leaves one source.
+- **Make the arm announce a skip on a timeout-less host** instead of running there. The branch is
+  reachable on that host, so a skip would report a capability gap the box does not have; a skip
+  that announces itself is the right shape only for an arm whose subject the host cannot exercise.
 
 ## 5. Production-readiness checklist
 
@@ -218,7 +285,8 @@ closing `PASS (<n> assertions)` line is the figure to set it from.
   the suite parses the tail's contents; consumers split a verdict line on the double space and read
   the verb and the leg name.
 - testing — one new arm in `tools/run-gates/run-gates.test.sh`, its failing case staged and observed
-  RED against the unpatched runner, on a fixture the spec names as the only observation available.
+  RED against the unpatched runner, on a fixture the spec names as the only observation available;
+  the timeout-less host class observed once on this box through the `PATH` stub AC5 names.
 - migration — N/A. No stored file, manifest key or record format changes.
 - user docs — one clause in `tools/run-gates/README.md`; the existing sentences stay true.
 
@@ -259,31 +327,52 @@ closing `PASS (<n> assertions)` line is the figure to set it from.
   Red when: the arm passes against the unfixed source, which would mean it asserts something the
   defect already satisfies — the `fixture-passes-by-finding-nothing` class the suite's arm 1c header
   names.
-- **AC5** — When the suite finishes on this host, its closing `PASS (<n> assertions)` line reports
-  an `<n>` at or above the raised `FLOOR_ASSERTIONS` in `tools/run-gates/run-gates.test.sh`, and the
-  arm's three increments sit outside the `HAVE_TIMEOUT` guard beside the arm itself.
-  Red when: the arm or its increments are placed inside the guard, so a host with no runnable
-  `timeout` skips an arm whose branch it can reach, or executes three fewer than the raised floor
-  and reds a correct suite.
-  permission: the timeout-less half of that Red-when cannot be observed by this run, because no such
-  host is reachable from here. The placement is verified by reading the source on both sides of the
-  guard's closing `fi`.
+- **AC5** — When `bash tools/run-gates/run-gates.test.sh` runs with a `timeout` stub that exits 1
+  first on `PATH`, so the suite's probe at `run-gates.test.sh:145` reads `HAVE_TIMEOUT=0`, the run
+  prints the SKIP lines for arms 1c/1d/1e, 4g's timeout half and 4h/4h-kill, prints NO skip naming
+  the new arm, reports the `selfkilled` leg under `gate profile: loose` rather than a built-in row,
+  and closes `PASS (<n> assertions)` with `<n>` at or above the raised `FLOOR_ASSERTIONS`; the
+  ordinary run on the same host closes exactly one higher, the `stubborn` increment at
+  `run-gates.test.sh:1165` being the one counter the guard still holds.
+  Red when: the arm, its increments or the `tbl-loose` write sit inside the `HAVE_TIMEOUT` guard,
+  so the stubbed run skips an arm whose branch it can reach, executes three fewer than the raised
+  floor, or reports the leg under the runner's silent built-in profile because the `tbl-loose`
+  row was never written.
+  cost: a second full canary run, 22 to 27 minutes by the last two `run-gates canary` rows in
+  `<git-dir>/gate-ledger.tsv`, read 2026-09-13.
+  fixture: the stub is one two-line script in a scratch dir; `run-gates.sh:371` reads
+  `CEILINGS_LIVE=0` from the same probe and its reaper at `:1009` is gated on that value, so the
+  stub reaches no other `timeout` call in the runner, verified 2026-09-13 by reading both sites.
+- **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs at the landed tip, its check 5
+  reports no watched file changed since `last-audit`, because the commit that edits
+  `tools/run-gates/run-gates.sh` re-stamps the `last-audit` line in
+  `memory/guides/SESSION-KICKOFF.md` with a delta line in its message.
+  Red when: the runner edit lands without the re-stamp and check 5 names
+  `tools/run-gates/run-gates.sh` as a watched file changed after the stamp, which is what one
+  appended comment line to that file printed in the round-1 audit's scratch clone; or the stamp
+  lands as a later commit and the staged leg C5s refuses the first.
 
 ## 7. Gates
 
-`run-gates canary` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `kickoff-manifest ratchet` · `kit version markers` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 Each leg's chunk and guard, read from `tools/gate-legs.json` on 2026-09-13: `run-gates canary` is
 chunk `selftests` with guard `tools/`, `tools/gate-legs.json` and `tools/lib/`, so it is HELD on
 every boundary bar and no boundary sets `GATE_SELFTESTS=1` — AC1 through AC5 all ride it and are
-observed by the direct invocation AC1 names. `memory hygiene` is chunk `records` with no guard, and
-grades this file. `spec tokens (a spec's own names resolve)` is chunk `declarations` with no guard,
-and joins this section's leg line and §6's paths against the tree.
+observed by the direct invocations AC1 and AC5 name. `kickoff-manifest ratchet` is chunk `records`
+with no guard, so every bar runs it; AC6 rides it, and it is the leg the round-1 audit showed RED on
+one unstamped comment line to `run-gates.sh`. `kit version markers` is chunk `declarations` with no
+guard; it grades that `KIT_RUN_GATES_VERSION` at `run-gates.sh:19` and the two `gov:kit
+run-gates@` markers still agree after the S1 and S4 edits to the files that carry them, and §3
+states the constant does not move. `memory hygiene` is chunk `records` with no guard, and grades
+this file. `spec tokens (a spec's own names resolve)` is chunk `declarations` with no guard, and
+joins this section's leg line and §6's paths against the tree.
 
 New arm: `tools/run-gates/run-gates.test.sh` · the 4h-kill manifest row with its `ceiling` key
-removed under the `tbl-loose` profile, so `runleg` execs `selfkill.sh` directly with `bound` at 0
-and the unpatched runner prints `(exit 137)` against a ledger row of about 2 s · `FLOOR_ASSERTIONS`
-rises by the arm's three increments, from whatever `run-gates.test.sh:48` reads at build time.
+removed under the `tbl-loose` profile, whose write moves above the `HAVE_TIMEOUT` guard so the file
+exists on every host, so `runleg` execs `selfkill.sh` directly with `bound` at 0 and the unpatched
+runner prints `(exit 137)` against a ledger row of about 2 s · `FLOOR_ASSERTIONS` rises by the
+arm's three increments, from whatever `run-gates.test.sh:48` reads at build time.
 
 ## 8. Open questions
 
@@ -296,6 +385,16 @@ rises by the arm's three increments, from whatever `run-gates.test.sh:48` reads 
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · §2 S3 S5 · §3 · §4 · §5 · AC5 AC6 · §7 · §10 · folded round-1 spec audit
+  clusters M (ids 10, 15, 29) and N (ids 16, 33). M: the `run-gates.sh` edit owes the kickoff
+  manifest `last-audit` re-stamp, which the parent's unit 3 only discovered at re-dispatch; S5,
+  the files row, the Rollout, AC6 and the `kickoff-manifest ratchet` leg now carry it, and §3
+  states that `KIT_RUN_GATES_VERSION` stays at 1.6 with the `kit version markers` leg named. N:
+  `fx/tbl-loose.txt` was written inside the `HAVE_TIMEOUT` guard, so the arm as specced ran under
+  the runner's silent built-in fallback on a timeout-less host while claiming the profile; the
+  write is hoisted above the guard, §4 says why and refuses the duplicate-row alternative, AC5 now
+  observes the timeout-less class on this host through a `PATH` stub instead of conceding it, and
+  §10's "adds no fixture" is qualified to a move.
 
 ## 10. Reuse audit
 
@@ -310,7 +409,9 @@ into `fired` and `$WORK/<i>.sec` into `secs` on the failing path, both landed by
 `TOOL-aLeakedHandle-3`, and this unit adds one guarded assignment over those two values and mints
 nothing. On the test side the seam is the suite's existing `selfkill.sh` fixture, its `tbl-loose`
 profile row, the `runp` helper and the inline `awk` over `$P/.git/gate-ledger.tsv` that the 4h-kill
-arm already drives; the new arm reuses all four and adds no fixture.
+arm already drives; the new arm reuses all four and adds no fixture. It MOVES one: the
+`tbl-loose` write leaves the `HAVE_TIMEOUT` guard so the row exists on every host, which is a
+relocation of a line 4h keeps reading, not a second copy of it. `selfkill.sh` is untouched.
 
 Recall terms used: `python tools/memory-recall/query.py "why does a killed leg with no declared
 ceiling print a bare exit 137 in the run-gates failure tail" --terms run-gates report_one rc 137

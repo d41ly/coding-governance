@@ -1,6 +1,6 @@
 # TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -42,10 +42,13 @@ same question again. The park that motivated it is the `2026-09-10T08:43:58Z dec
   `CLEAN WITH FIXES` at zero blockers, so the subject records `CONVERGED`, then a `BLOCKED` round at
   one blocker — and asserts the refusal text and that the run-state file still holds exactly one
   review row for that subject. Observed by AC3, AC4 and AC5.
-- **S5** — The obligations the two edits incur, in the same commit as the edit that incurs them:
+- **S5** — The obligations the method edit incurs, in the same commit as the edit that incurs them:
   the kickoff manifest `last-audit` re-stamp, because `memory/guides/BUILD-METHOD.md` is on its
-  watch list; the unattended kit version, 1.19 to 1.20, across every carrier; the memory-tree kit
-  version, 2.69 to 2.70, across every carrier and re-rendered. Observed by AC6 and AC7.
+  watch list; the memory-tree kit version, 2.69 to 2.70, across every carrier and re-rendered. The
+  unattended kit version does NOT move in this pass: `TOOL-aRatifiedRulings-2` §8 F1, RESOLVED,
+  assigns the single 1.19 to 1.20 bump to the closing pass, after every unit that edits the
+  unattended kit has landed, and this unit leaves `KIT_UNATTENDED_VERSION` at 1.19 in all four
+  scripts. Observed by AC6 and AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -70,6 +73,12 @@ same question again. The park that motivated it is the `2026-09-10T08:43:58Z dec
 
 ### Edges
 
+- **hands-off** external — the `KIT_UNATTENDED_VERSION` bump, 1.19 to 1.20, across every carrier
+  `tools/check-kit-versions.sh` pairs and the renders `adopt-unattended.sh` re-makes. The closing
+  pass owns it, once for the kit, per `TOOL-aRatifiedRulings-2` §8 F1. No epoch gate observes that
+  bump's placement: `check-verdict-epoch.sh` is hardcoded to the memory-tree engine, which
+  `tools/check-kit-versions.sh:49` says in its own comment, so the closing pass's declaration is the
+  only record of which commit moved the constant relative to the two commits that moved the bytes.
 - **hands-off** external — the status flip of backlog row `TOOL-dCarriedReceipt-2`, which records
   this exact collision between the terminal rule and M4's rev-moved clause. It is owed by whichever
   commit next opens the shared records; until then that row reads OPEN against a ruling that closed
@@ -113,10 +122,15 @@ check 6 if M1's own `**Budget:` line ever disagrees with that row; the line half
 which `tools/template-size-limits.txt` says in its own comment. Both figures here are PINNED at the
 date above; AC2 re-derives them.
 
-The two edits, staged in the scratch copy and rendered, cost 310 bytes and 4 lines: the render
-measured 26749 bytes and 340 lines, leaving 899 bytes and 10 lines under M1, and 192 bytes under the
-26941 high-water in `tools/template-size-highwater.txt`. So no `--bump` is owed and the leg prints no
-`TEMPLATE-SIZE WARN` line. The figures are the scratch render's and AC2 derives the real ones.
+The two edits cost 304 bytes and 4 lines: the paragraph quoted below is 258 bytes with the blank
+line that separates it from M5, and the qualifier below it adds 46, one comma out and one em-dash
+pair in. Re-measured on 2026-09-13 by staging both edits into a copy of the template at base
+`16da4c6a` with `stat -c%s` and `wc -l`; the render costs the same, because neither edit carries a
+`{{KIT_DIR}}` or `{{TOOL_ROOT}}` token and a wrap moves a space to a newline at no byte cost. The
+render therefore measures 26743 bytes and 340 lines, leaving 905 bytes and 10 lines under M1, and
+198 bytes under the 26941 high-water in `tools/template-size-highwater.txt`. So no `--bump` is owed
+and the leg prints no `TEMPLATE-SIZE WARN` line. The figures are PINNED at that date and AC2
+derives the real ones.
 
 The added paragraph, placed directly after the paragraph that opens `**A BLOCKED verdict has a
 disposition**`, in the template's own wrap style:
@@ -219,19 +233,28 @@ nothing to grade.
 
 The pass writes `tools/memory-tree/BUILD-METHOD.template.md`, `memory/guides/BUILD-METHOD.md` (by
 `--render`), `tools/unattended/unattended.sh`, `tools/unattended/unattended.test.sh`,
-`memory/guides/SESSION-KICKOFF.md` (the `last-audit` line only), the unattended version carriers —
-`KIT_UNATTENDED_VERSION` in its four scripts, every `gov:kit unattended@` stamp in its templates and
-fixtures, the rendered copies re-made with `bash tools/unattended/adopt-unattended.sh` — and the
-memory-tree version carriers — `KIT_MEMORY_TREE_VERSION` in `tools/memory-tree/check-memory-hygiene.sh`,
-the marker in each shipped `.template.md` under `tools/memory-tree/`, the four renders re-made by
-`--render`.
+`memory/guides/SESSION-KICKOFF.md` (the `last-audit` line only), its own acceptance ledger under
+`memory/builds/aRatifiedRulings/build/`, and the memory-tree version carriers —
+`KIT_MEMORY_TREE_VERSION` in `tools/memory-tree/check-memory-hygiene.sh`, the marker in each shipped
+`.template.md` under `tools/memory-tree/`, the four renders re-made by `--render`. No unattended
+carrier moves here; section 3's edge names who owns that.
 
-The write set intersects a sibling's. Unit 2 of this build edits check 23, which also lives in
-`tools/unattended/unattended.sh`, and stages its red arm in `tools/unattended/unattended.test.sh`.
-Under M6's `parallel-when-disjoint` the two passes are SEQUENCED, never concurrent, and the
-unattended version moves once per build: the first of the two to land performs the 1.19 to 1.20
-move and the second asserts the carriers agree. Which lands first is the run's M2 roster decision,
-not this spec's.
+The write set is DISJOINT from unit 2's. `TOOL-aRatifiedRulings-2` §4 lists
+`tools/unattended/check-unattended.sh`, where check 23 of the LEG opens at `check-unattended.sh:2222`
+and closes at `:2361`, `tools/unattended/check-unattended.test.sh`, and its own ledger under
+`build/`; the `fail 23` at `unattended.sh:712` is the driver's object-substitution refusal and unit 2
+does not touch it.
+Nothing in this unit's list appears in that one. Under M6's `parallel-when-disjoint` condition 1, and
+`--dispatch` check 49 at `unattended.sh:4853` which refuses only an overlap, the pair may run
+concurrently, and this spec derives no ordering rule: the unattended version bump was the only
+shared line and the closing pass owns it. Two facts the roster still weighs, stated so it does not
+re-derive them: each unit's self-test reads the other's product file at lines the other does not
+move — `check-unattended.test.sh:147` greps `unattended.sh` for its `_CORE` constants, and
+`unattended.test.sh:3729` greps `check-unattended.sh` for `ls-remote` — which is M6 condition 2 at
+file grain and false at line grain; and both units write under
+`memory/builds/aRatifiedRulings/build/`, so each declares its ledger by FILE, never the directory,
+or check 49's prefix `overlaps` refuses the second declaration. Which order the M2 roster picks, if
+it sequences anyway, is not this spec's.
 
 Landing owes no data step. Existing `review` rows keep their grammar and their meaning; a run-state
 file written before this unit reads identically after it.
@@ -242,10 +265,11 @@ file written before this unit reads identically after it.
 |---|---|
 | `tools/memory-tree/BUILD-METHOD.template.md` | one paragraph added in M4, one clause qualified in M4's first paragraph, marker bumped |
 | `memory/guides/BUILD-METHOD.md` | re-rendered from the template |
-| `tools/unattended/unattended.sh` | one message extended at branch 10, version constant bumped |
+| `tools/unattended/unattended.sh` | one message extended at branch 10; `KIT_UNATTENDED_VERSION` stays 1.19 |
 | `tools/unattended/unattended.test.sh` | two `hit` strings moved, one five-line block added |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamped |
-| unattended and memory-tree version carriers | stamps moved, renders re-made |
+| memory-tree version carriers | `KIT_MEMORY_TREE_VERSION` 2.69 to 2.70, template markers moved, renders re-made |
+| `memory/builds/aRatifiedRulings/build/<date>-build-TOOL-aRatifiedRulings-1-1-acceptance-ledger.md` | one row per criterion, declared by file |
 
 ### Alternatives rejected
 
@@ -265,8 +289,8 @@ file written before this unit reads identically after it.
 ## 5. Production-readiness checklist
 
 - security — N/A. Two guide sentences and a refusal message; no write path, no input boundary.
-- perf / scale — the method grows by 310 bytes against M7's whole-file re-read, 899 bytes under M1
-  and 192 under the recorded high-water. The refusal path adds no spawn; the suite adds one driver
+- perf / scale — the method grows by 304 bytes against M7's whole-file re-read, 905 bytes under M1
+  and 198 under the recorded high-water. The refusal path adds no spawn; the suite adds one driver
   call pair.
 - error / empty / loading states — the refusal is the only state this unit touches and it keeps
   exit 1 and writes nothing, which AC5 asserts as a row count.
@@ -306,7 +330,7 @@ file written before this unit reads identically after it.
   which prints the WARN and means a `--bump` this spec says is not owed has become owed; or the line
   count passes 350, which no leg reads and only this criterion does.
   figure: both bounds are DERIVED at observation from `tools/template-size-limits.txt` and the M1
-  `**Budget:` line; the 26749 and 340 in section 4 are PINNED from the scratch render of
+  `**Budget:` line; the 26743 and 340 in section 4 are PINNED from the staged measurement of
   2026-09-13.
 - **AC3** — When the message at `tools/unattended/unattended.sh:4096` is extended and the two arms
   in `tools/unattended/unattended.test.sh` still quote the old text,
@@ -346,15 +370,27 @@ file written before this unit reads identically after it.
   with a delta line in its message.
   Red when: the render lands without the re-stamp and check 5 names `memory/guides/BUILD-METHOD.md`
   as a watched file changed after the stamp.
-- **AC7** — When `bash tools/check-kit-versions.sh` runs at the landed tip, it exits 0 with
-  `KIT_UNATTENDED_VERSION=1.20` in `tools/unattended/unattended.sh` and `KIT_MEMORY_TREE_VERSION=2.70`
-  in `tools/memory-tree/check-memory-hygiene.sh`, every carrier it enumerates agreeing, and
-  `bash tools/memory-tree/check-verdict-epoch.sh` prints `clean`.
-  Red when: a carrier still reads 1.19 or 2.69, which the leg names; or the bump lands in a commit
-  BEFORE the one that moves the bytes it dates, which the epoch gate refuses.
-  figure: 1.20 and 2.70 are PINNED as the next values above base; if a sibling unit has already
-  moved the unattended constant when this pass lands, the observed value is that one and this unit
-  moves it no further.
+- **AC7** — When `bash tools/check-kit-versions.sh` runs at the landed tip, it prints
+  `kit-versions: 0 problem(s)` and exits 0, with `KIT_MEMORY_TREE_VERSION=2.70` at
+  `tools/memory-tree/check-memory-hygiene.sh:20` and every tracked `tools/memory-tree/*.template.md`
+  marker reading `gov:kit memory-tree@2.70`; `grep -c '^KIT_UNATTENDED_VERSION=1\.19 ' tools/unattended/*.sh`
+  reports `1` for `unattended.sh`, `check-unattended.sh`, `check-pass-order.sh` and
+  `check-brief-recorded.sh` and `0` for every other file; and `bash tools/memory-tree/check-verdict-epoch.sh`
+  prints `clean`. The commit that changes the constant's VALUE, found by
+  `git log -G'^KIT_MEMORY_TREE_VERSION=' <base>..<tip> -- tools/memory-tree/check-memory-hygiene.sh`,
+  also lists `tools/memory-tree/BUILD-METHOD.template.md` in its `git diff-tree --name-only`.
+  Red when: a memory-tree carrier still reads 2.69, which the leg names as
+  `marker != KIT_MEMORY_TREE_VERSION`; or any of those four counts reads `0`, which means this pass
+  performed the bump `TOOL-aRatifiedRulings-2` §8 F1 assigns to the closing pass, or moved a
+  constant the closing pass expects to find at 1.19; or the value-changing commit's tree does not
+  carry the template, which means the bump and
+  the bytes it dates landed apart and S5's same-commit rule was not kept.
+  figure: 2.70 is PINNED as the next value above base `16da4c6a`, where every memory-tree carrier
+  reads 2.69; 1.19 is DERIVED from the four `tools/unattended/` scripts at that base and this unit
+  moves it nowhere. `clean` here is the gate's `no behaviour-bearing engine line moved` form, since
+  its scan set is the engine and six delegates and never the template; it cannot grade the
+  placement of a template-only bump, which is why the `git log -G` join above does that job, and it
+  says nothing about the unattended kit at all.
 
 ## 7. Gates
 
@@ -383,9 +419,9 @@ quote the new signature in full · no floor moves.
 
 - **F1 — does the ruling reach M4's first paragraph, or only the loop paragraph?** The ruling
   says "an M4 sentence"; the rev-moved clause in the first paragraph is where the method spells
-  the re-arm the ruling refuses. Option A, add the terminal paragraph and leave the clause: 264
+  the re-arm the ruling refuses. Option A, add the terminal paragraph and leave the clause: 258
   bytes, and M4 keeps instructing a round the driver refuses. Option B, add the paragraph and
-  qualify the clause: 310 bytes, and the two halves of M4 agree. Recommendation: B.
+  qualify the clause: 304 bytes, and the two halves of M4 agree. Recommendation: B.
   RESOLVED (agent, 2026-09-13, delegated): B. Both edits sit inside the section the ruling names
   and both implement its "no re-arm on a rev bump" clause; A leaves the method contradicting the
   driver it points at, which is the `a directive names a route that does not run` class. Veto 2
@@ -404,6 +440,14 @@ quote the new signature in full · no floor moves.
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft, from ruling `TOOL-aLeakedHandle-6` and the park it answers.
+- rev-2 · 2026-09-13 · S5 · §3 · §4 · §5 · AC7 · §8 · folded round-1 spec-audit clusters A (ids 1,
+  12, 30, 43), B (ids 2, 13, 34, 44) and L (id 26). A: the in-pass `KIT_UNATTENDED_VERSION` bump
+  left S5, the Rollout carrier list, Files touched and AC7; the closing pass owns it per
+  `TOOL-aRatifiedRulings-2` §8 F1, and AC7 now asserts the constant UNCHANGED at 1.19 beside the
+  memory-tree 2.70 move. B: the Rollout write-set paragraph named unit 2's files wrongly and derived
+  a sequencing rule from that; it now states the sets are disjoint against unit 2's own §4 and
+  `unattended.sh:4853`. L: the M4 cost re-measured at 304 bytes, not 310, and its headroom pair
+  moved with it in §4, §5 and F1's option figures; the F1 mark stands.
 
 ## 10. Reuse audit
 
