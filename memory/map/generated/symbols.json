@@ -5183,6 +5183,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "test_redact_table_header",
+      "kind": "function",
+      "file": "tools/runlog/selftest.py"
+    },
+    {
       "id": "test_refusals_named",
       "kind": "function",
       "file": "tools/runlog/selftest.py"

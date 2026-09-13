@@ -3,11 +3,12 @@
 **Serves:** journal TOOL-dLoggedFlight-5
 
 Tier-2 · node d · 2026-09-14 · the build pass of the redaction table, against spec rev-3, which this
-pass wrote before its code. Every criterion line is OBSERVED. The gate legs are written as owed.
-`<suite>` is `tools/runlog/selftest.py`, run directly and never through the gate runner. Its three
-timed runs over the staged kit printed `368 passed, 0 failed (368 assertions, floor 368)` in 3.4 to
-3.6 s. No gate leg was run, per the owner's instruction of 2026-09-13, and no suite that existed under
-`tools/unattended/` before this build ran.
+pass wrote before its code, and the fold of its bug-class checklist. Every criterion line is OBSERVED.
+The gate legs are written as owed. `<suite>` is `tools/runlog/selftest.py`, run directly and never
+through the gate runner. Its three timed runs at the build commit printed
+`368 passed, 0 failed (368 assertions, floor 368)` in 3.4 to 3.6 s, and its runs after the fold
+printed `370 passed, 0 failed (370 assertions, floor 370)`. No gate leg was run, per the owner's
+instruction of 2026-09-13, and no suite that existed under `tools/unattended/` before this build ran.
 
 ## The criteria
 
@@ -49,7 +50,7 @@ timed runs over the staged kit printed `368 passed, 0 failed (368 assertions, fl
   row, every row's id is declared, and each row carries a positive and a negative. The same comparison
   run over a scratch table missing its last row named that id as missing, and over one with an
   undeclared `rogue-class` row named it as extra. RED seen on mirrors two ways: the `named-token` row
-  deleted (4 arms, and the count fell to 360 under the floor of 368), and an undeclared row added (7
+  deleted (4 arms, and the count fell to 362 under the floor of 370), and an undeclared row added (7
   arms, the class comparison among them).
 
 ## The edges the criteria do not name
@@ -62,22 +63,36 @@ A value two rules match goes once to the earlier row: an assignment of a `ghp_` 
 `*_TOKEN` name renders as `github-token`, and a bearer header holding one renders as `auth-header`.
 RED seen with the CRLF tolerance removed (1 arm), the overlap rule removed (2 arms, each value
 rendered twice over) and the placeholder skip removed (6 arms, each a rendered positive matched again).
-The floor rose from 183 to 368, and a mirror with it at 369 exited 1, "under its floor".
+The floor rose from 183 to 370, and a mirror with it at 371 exited 1, "under its floor".
 
 ## Staged RED
 
-14 breaks, each applied to a MIRROR of the kit: a copy in a scratch dir, made a git repository so that
-`git ls-files` resolves in it, and never the working tree. All 14 went RED on FAIL lines naming the
-arm their break aimed at, and an unmodified mirror printed `368 passed` before each batch. One break
-first went RED for the wrong reason: the undeclared-row mirror crashed the suite with a traceback,
-because the in-suite comparison loaded a table carrying that row twice. The comparison now returns
-the loader's refusal as its value, and the same break reds seven named arms.
+17 breaks, each applied to a MIRROR of the kit: a copy in a scratch dir, made a git repository so that
+`git ls-files` resolves in it, and never the working tree. All 17 went RED on FAIL lines naming the
+arm their break aimed at, re-run in one batch against the folded kit, where an unmodified mirror
+printed `370 passed` first. One break first went RED for the wrong reason: the undeclared-row mirror
+crashed the suite with a traceback, because the in-suite comparison loaded a table carrying that row
+twice. The comparison now returns the loader's refusal as its value, and the same break reds seven
+named arms.
+
+## The checklist over the build commit
+
+`gotchas.py --for-diff HEAD~1..HEAD` selected eleven classes, and one was violated.
+`two-answers-to-one-question`: the table's header states the 196-character bound and the template
+classes for the author of a new row, while the suite enforces its own copies of both, and nothing
+held the two together. The fold added `test_redact_table_header`, which reads the header and
+compares both. RED seen three ways on mirrors: the suite's bound moved to 190, a template class the
+header does not name, and a class dropped from the header. The dossier's typed string count went
+with it, since the suite owns that number. The others were checked and hold. Each negative reaches
+its own regex, so no arm passes by finding nothing. The in-memory breaks replace the pattern, which
+is the subject, and never the shipped positives and negatives it is graded against. Every nested
+helper leads with a declared verb. The table was written by a script file, never through a heredoc.
 
 ## Owed to the post-build gate run
 
 Every leg of the spec's section 7, and the run records each verdict after it:
 
-- `runlog selftest`, at or above its floor of 368 inside its 60 s budget row;
+- `runlog selftest`, at or above its floor of 370 inside its 60 s budget row;
 - `lexicon naming predicates`, `install-prefix (shipped surface)` and `govkit selfcheck`;
 - `codebase-map coverage + freshness` and `memory hygiene`;
 - `every held leg is budgeted, every budget row resolves`, since the budget row's evidence changed;

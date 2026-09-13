@@ -69,7 +69,8 @@ negative. The positives are TEMPLATES expanded at test time, because this reposi
 push protection blocks a literal key; the self-test scans the kit's own tracked files with the table,
 so a literal credential committed anywhere in it reds. Each rule compiles alone, because one combined
 alternation was measured to change which rules match once inline flags go global. The prefilter's cost
-claim is a COUNT: over 50,000 strings, the wrapped patterns' searches equal the hint-matched pairs.
+claim is a COUNT: over a generated population, the wrapped patterns' searches equal the hint-matched
+pairs, and the wall time is printed report-only.
 
 ## Shared seams
 

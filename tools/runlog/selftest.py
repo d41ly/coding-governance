@@ -40,9 +40,9 @@ import runlog_lib as rl  # noqa: E402
 
 # The count this suite executed when it landed. A block of arms stranded behind an early return
 # would still print "0 failed"; the floor is what makes that a red rather than a smaller green.
-# RAISED 183 -> 368 by TOOL-dLoggedFlight-5: the redaction arms run per row of the table, so a row
+# RAISED 183 -> 370 by TOOL-dLoggedFlight-5: the redaction arms run per row of the table, so a row
 # deleted from it lowers the count as well as redding the class comparison.
-ASSERTION_FLOOR = 368
+ASSERTION_FLOOR = 370
 
 PASS = []
 FAIL = []
@@ -873,6 +873,22 @@ def test_redact_ac4_prefilter_count():
     check("redact AC4: no string without a plant yields a span, near misses included", stray[:5], [])
     print("  info report-only: scanned %d strings in %.2fs; %d of %d (string, rule) pairs reached "
           "a regex" % (len(strings), wall, expected, total))
+
+
+def test_redact_table_header():
+    """The table's header documents what this suite enforces: the template classes and the bound.
+
+    The header is the one copy an author of a new row reads, and this suite is the copy that is
+    enforced. Two statements of one rule drift, so this arm makes them one fact.
+    """
+    raw = (HERE / rl.TABLE_NAME).read_bytes().decode("utf-8")
+    header = " ".join(" ".join(ln.lstrip("#").split()) for ln in raw.split("\n") if ln.startswith("#"))
+    check_true("redact: the table header states the positive bound this suite enforces",
+               f"At most {POSITIVE_MAX} characters" in header, header[:80])
+    m = re.search(r"The classes are (.*?) and `\{NL\}`", header)
+    named = sorted(re.findall(r"(?<![A-Za-z])([A-Za-z]) (?=[A-Za-z])", m.group(1))) if m else []
+    check("redact: the table header names exactly the template classes this suite expands", named,
+          sorted(TEMPLATE_CLASSES))
 
 
 def test_redact_ac5_class_ids():
