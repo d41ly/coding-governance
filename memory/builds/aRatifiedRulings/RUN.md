@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 7ade2b08e83e257ea8e37728f4092eca07fc55d6
-phase: VERIFYING
+witness: fc6ee211db75bf2efd76b8a6ce952286afc196f7
+phase: REVIEWING
 branch-sha: 16da4c6abdb5d74ad80891f51f254cd5205d0b17
 branch-ref: refs/heads/branch/aRatifiedRulings
 mode: prompt
@@ -56,3 +56,5 @@ base: 16da4c6abdb5d74ad80891f51f254cd5205d0b17
 2026-09-13T20:24:30Z dispatch · item e96cf2f4 TOOL-aRatifiedRulings-4 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/README.md memory/guides/SESSION-KICKOFF.md memory/builds/aRatifiedRulings/build memory/builds/aRatifiedRulings/spec memory/builds/aRatifiedRulings/prompts memory/builds/aRatifiedRulings/README.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-13T20:24:54Z brief · item TOOL-aRatifiedRulings-4 · reason 87d51c529a50 memory/builds/aRatifiedRulings/prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-4-1-build-brief.md
+
+2026-09-13T21:36:35Z review · item aRatifiedRulings · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
