@@ -25,7 +25,7 @@ GATE_FILE=tests/test_codebase_map.py
 # adopt-codebase-map.sh STAMPS this line with the kit's real prefix when it creates the conf, so
 # the value below is only the shape. Adjust if your launcher differs — `uv run python …`,
 # `python3 …` — and keep the path pointing at the kit dir you actually installed.
-MAP_DIFF_CMD="python codebase-map/map_diff.py"
+MAP_DIFF_CMD="python codebase-map/map_diff.py"   # gov:root-fixture — the pre-stamp default; adopt-codebase-map.sh rewrites this line per prefix
 
 # --- reuse-convergence layer (optional; only meaningful with the SYMBOL recall tier) ----------
 

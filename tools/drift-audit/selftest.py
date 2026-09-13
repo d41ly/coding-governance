@@ -3,7 +3,7 @@
 
 gov:kit drift-audit@1.10
 
-    python drift-audit/selftest.py
+    python <kit>/selftest.py
 
 The kit's central claim is that a metric which cannot move is worse than no metric. That claim
 obliges the kit to prove its OWN signals can move, so every gateable signal is exercised twice: once
@@ -30,6 +30,11 @@ import tempfile
 sys.dont_write_bytecode = True
 
 KIT = pathlib.Path(__file__).resolve().parent
+# The report's path INSIDE the scratch repos this file builds, which install the kit at the ROOT
+# prefix on purpose — that is the dual-spelling support gov keeps for its not-retrofitted adopters,
+# and a selftest that could not build one could not test it. Written ONCE here rather than twelve
+# times below: a literal repeated twelve times is twelve chances for eleven of them to be updated.
+REPORT_REL = "drift-audit/drift_report.py"  # gov:root-fixture — scratch-repo path, never gov's own
 FAILS: list[str] = []
 SKIPS: list[str] = []
 
@@ -298,7 +303,7 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
 def report(r: pathlib.Path, *extra: str) -> dict:
     import json
 
-    out = run([sys.executable, "drift-audit/drift_report.py", "--json", *extra], r)
+    out = run([sys.executable, REPORT_REL, "--json", *extra], r)
     if out.returncode != 0 or not out.stdout.strip():
         raise AssertionError(f"report failed rc={out.returncode}: {out.stderr.strip()[:300]}")
     return {s["signal"]: s for s in json.loads(out.stdout)}
@@ -652,13 +657,13 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     # --- 3 — --check honours the pin in BOTH directions -------------------------------------
     print("--check pin semantics")
     sig = r / "drift-audit" / "drift_signals.py"
-    over = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    over = run([sys.executable, REPORT_REL, "--check"], r)
     check("--check reds while a gateable signal is over its (default 0) pin", over.returncode == 1,
           f"rc={over.returncode}")
     sig.write_text(sig.read_text(encoding="utf-8").replace(
         "PINS = {}", "PINS = {'non_terminal_specs_cited_by_product_source': 1}"),
         encoding="utf-8", newline="\n")
-    at = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    at = run([sys.executable, REPORT_REL, "--check"], r)
     check("--check greens once the pin is seeded at the measured value", at.returncode == 0,
           f"rc={at.returncode} stderr={at.stderr.strip()[:200]}")
 
@@ -703,14 +708,14 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     unset = report(r)["closed_specs_with_no_product_commit"]
     check("unset cutoff: the signal is not gateable", unset["gateable"] is False,
           f"gateable={unset['gateable']}")
-    quiet6 = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    quiet6 = run([sys.executable, REPORT_REL, "--check"], r)
     check("unset cutoff: --check stays green rather than reding a dead gateable probe",
           quiet6.returncode == 0, f"rc={quiet6.returncode} stderr={quiet6.stderr.strip()[:200]}")
     sig.write_text(keep, encoding="utf-8", newline="\n")
 
     # --- a missing project layer is a REFUSAL, never a default ------------------------------
     sig.unlink()
-    gone = run([sys.executable, "drift-audit/drift_report.py"], r)
+    gone = run([sys.executable, REPORT_REL], r)
     check("a missing project layer refuses with rc 2", gone.returncode == 2, f"rc={gone.returncode}")
 
 
@@ -861,7 +866,7 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
                     encoding="utf-8", newline="\n")
     run(["git", "add", "-A"], r)
     run(["git", "commit", "-q", "-m", "a parser id the kit does not ship", "--no-verify"], r)
-    _raw = run([sys.executable, "drift-audit/drift_report.py", "--json"], r)
+    _raw = run([sys.executable, REPORT_REL, "--json"], r)
     check("H1: an unshipped `parser` pattern-set id does not raise out of the report",
           "Traceback" not in _raw.stderr and "KeyError" not in _raw.stderr,
           _raw.stderr.strip()[-400:])
@@ -1375,14 +1380,14 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
           f"live={drained['live']}")
     check("drained: it reports 0 rather than a stale count", drained["value"] == 0,
           f"got {drained['value']}")
-    quiet = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    quiet = run([sys.executable, REPORT_REL, "--check"], r)
     check("drained + declared: --check stays green", quiet.returncode == 0,
           f"rc={quiet.returncode} stderr={quiet.stderr.strip()[:200]}")
 
     # THE DISCRIMINATING ASSERTION of direction one. The three above hold just as well for a signal
     # `--check` is merely ignoring; only the PRINTED status tells a reader "empty on purpose" from
     # "blind", and that line is the one a human acts on.
-    human = run([sys.executable, "drift-audit/drift_report.py"], r)
+    human = run([sys.executable, REPORT_REL], r)
     row = next((ln for ln in human.stdout.splitlines()
                 if "ledger_rows_contradicting_git" in ln), "")
     check("drained + declared: the printed row reads 'empty by declaration'",
@@ -1417,7 +1422,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
     check("still declared, a row returns: and it scores the contradiction", still["value"] == 1,
           f"got {still['value']}")
     # THE DISCRIMINATING ARM. A declaration that survived into the over-pin filter would green this.
-    muzzle = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    muzzle = run([sys.executable, REPORT_REL, "--check"], r)
     check("still declared, a row returns: --check REDS — the declaration was not a muzzle",
           muzzle.returncode == 1, f"rc={muzzle.returncode} stderr={muzzle.stderr.strip()[:200]}")
     check("still declared, a row returns: ...and names the signal on stderr",
@@ -1425,7 +1430,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
           f"stderr={muzzle.stderr.strip()[:200]}")
     # ...and the human-facing print must stop excusing it too. The status ladder reads the same
     # declaration set, so a muzzle can hide there just as easily as in the gate.
-    printed = run([sys.executable, "drift-audit/drift_report.py"], r)
+    printed = run([sys.executable, REPORT_REL], r)
     prow = next((ln for ln in printed.stdout.splitlines()
                  if "ledger_rows_contradicting_git" in ln), "")
     check("still declared, a row returns: the printed row reads OVER PIN, not 'empty by declaration'",
@@ -1447,7 +1452,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
     check("declaration lifted: the probe is still LIVE", back["live"] is True, f"live={back['live']}")
     check("declaration lifted: and still scores the contradiction", back["value"] == 1,
           f"got {back['value']}")
-    fires = run([sys.executable, "drift-audit/drift_report.py", "--check"], r)
+    fires = run([sys.executable, REPORT_REL, "--check"], r)
     check("declaration lifted: --check reds identically", fires.returncode == 1,
           f"rc={fires.returncode}")
     check("declaration lifted: ...and names the signal on stderr",
@@ -2073,7 +2078,7 @@ def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None
     NL = chr(10)
 
     def read_human_table() -> str:
-        out = run([sys.executable, "drift-audit/drift_report.py"], r)
+        out = run([sys.executable, REPORT_REL], r)
         assert out.returncode == 0, out.stderr[:300]
         return out.stdout
 
