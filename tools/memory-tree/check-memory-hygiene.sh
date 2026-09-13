@@ -231,21 +231,24 @@ APPEND_ONLY_ERE="^$M/(DECISIONS\.md$|decisions/|archive/)"
 #
 # The alternation is DERIVED from FAMILIES, never typed: a family added to the conf must join the id
 # grammar and this set together, or a rotated shard of it goes unscanned while its rows still key.
-_fam_alt=$(printf '%s\n' $FAMILIES | sed 's/^[^:]*://' | tr '\n' '|')
-_fam_alt=${_fam_alt%|}
+# ARCH|DEPLOY|... for regexes. DEFINED HERE, above the print modes, because they return before the
+# body runs and `ROTATED_ARCHIVE_ERE` needs it. It used to sit below them, which is why this build
+# first added a SECOND derivation two lines up — two answers to one question, in the build that
+# added an arm to catch exactly that. One derivation, and every later consumer inherits its guards.
+FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)
 # REFUSED, not defaulted, and for the same two reasons `declared_families()` refuses on the Python
 # side — one reader that raises and one that shrugs is the divergence this pair is built to avoid.
 # An EMPTY alternation renders `(DECISIONS|)`, whose empty branch widens the ERE; a token carrying an
 # ERE metacharacter renders e.g. `A+B`, which matches `AAB`. Python `re.escape`s each token, so the
 # shell must either escape too or refuse the input — refusing is the smaller and louder of the two,
 # because a family token outside this class is a conf defect rather than something to accommodate.
-case "$_fam_alt" in
+case "$FAM_ALT" in
   "") echo "HYGIENE — cannot run: FAMILIES declares no family, so the rotated-archive predicate would carry an empty alternation and match names it was never meant to"; exit 2 ;;
 esac
-case "$_fam_alt" in
-  *[!A-Za-z0-9_\|]*) echo "HYGIENE — cannot run: a FAMILIES token carries a character that is an ERE metacharacter ('$_fam_alt'); the rotated-archive predicate would silently widen. Family tokens are [A-Za-z0-9_]"; exit 2 ;;
+case "$FAM_ALT" in
+  *[!A-Za-z0-9_\|]*) echo "HYGIENE — cannot run: a FAMILIES token carries a character that is an ERE metacharacter ('$FAM_ALT'); the rotated-archive predicate would silently widen. Family tokens are [A-Za-z0-9_]"; exit 2 ;;
 esac
-ROTATED_ARCHIVE_ERE="^$M/archive/(DECISIONS|$_fam_alt)\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md$"
+ROTATED_ARCHIVE_ERE="^$M/archive/(DECISIONS|$FAM_ALT)\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md$"
 case "${1:-}" in
   --print-append-only-ere) printf '%s\n' "$APPEND_ONLY_ERE"; exit 0 ;;
   --print-rotated-archive-ere) printf '%s\n' "$ROTATED_ARCHIVE_ERE"; exit 0 ;;
@@ -301,7 +304,6 @@ resolve_python() {
 # <<< resolve_python
 _PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
-FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)   # ARCH|DEPLOY|... for regexes
 DISC_ALT=$(printf '%s\n' $DISCIPLINES | paste -sd'|' -)                   # the streams enum, for check 12
 # THE recording-name tail, in ONE place. A multi-unit build names its sub-specs
 # `<date>-spec-<slug>-<seq>-u6-indexed-join.md`, and both check 5's name grammar and check 12's
