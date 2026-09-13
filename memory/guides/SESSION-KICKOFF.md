@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-12T08:54:46+03:00 @ 7f5b63f832d44085bce58145b11b3531472adbcb
+last-audit: 2026-09-13T01:45:00+03:00 @ 993b64c54f456ea0e3c49710d069342102a2765b
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 094a1ce93ae5142e866e1d82695968b3fa3f5332
@@ -103,6 +103,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   Two builds rewrote `tools/unattended/` concurrently on 2026-08-21 and neither noticed
   until the landing; the conflict count is in those build records. §3's rule is
   own STREAMS not files, and a kit is the unit that rule is about.
+
+- **`ROTATION_MODE` (`.memory-tree.conf`, `cut` here) IS GRADED BY NOTHING.** A green bar is not
+  evidence an archive holds what the mode says. `TOOL-cSpliceWarden-6` is the unbuilt grader.
 
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
