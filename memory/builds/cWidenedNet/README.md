@@ -67,18 +67,18 @@ does not have.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node c · opened 2026-09-13 · streams tooling
+**Build status:** CLOSED · 1 unit(s) · node c · opened 2026-09-13 · streams tooling
 ids TOOL-cWidenedNet-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-cWidenedNet-1 — the extension class widens, the gate derives its own sidecars, and the root spelling is graded over the received set](spec/2026-09-13-spec-TOOL-cWidenedNet-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-cWidenedNet-1 — the extension class widens, the gate derives its own sidecars, and the root spelling is graded over the received set](spec/2026-09-13-spec-TOOL-cWidenedNet-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-cWidenedNet-1.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-cWidenedNet-1.
 <!-- /gen:build-index -->

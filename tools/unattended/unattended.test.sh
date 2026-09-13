@@ -925,7 +925,7 @@ rm -f "$(_rp_log)" "$(_rp_maplog)"
 out=$(_rp_close)
 hit "$out" "every declared probe log is ABSENT"
 hit "$out" "recall/queries.jsonl"
-hit "$out" "codebase-map/lookups.jsonl"
+hit "$out" "codebase-map/lookups.jsonl"  # gov:root-fixture — expected-output substring from a fixture probe log
 
 # 4e. ADOPTED AND PRESENT — a map log naming THIS tree, and NO recall log. MET on the map half
 #     alone, which is the arm the closed unit claimed and never had: before this reader existed the

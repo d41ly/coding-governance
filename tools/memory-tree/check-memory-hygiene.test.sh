@@ -7,7 +7,7 @@
 # states), one carrying a .codebase-map.conf (the only place check 7's MAP_SUB branch is reachable),
 # and one built by adopt-memory-tree.sh --scaffold itself, so the scaffolder is asserted against the
 # GATE rather than against a second description of the scaffolder.
-#   bash memory-tree/check-memory-hygiene.test.sh    # "PASS" + exit 0 = good
+#   bash <kit>/check-memory-hygiene.test.sh    # "PASS" + exit 0 = good
 #
 # The tree is FLAT (kit 1.5): builds/<slug>/, backlog/<FAMILY>.md, one root DECISIONS.md. The
 # discipline is a value in the spec status header, not a directory.

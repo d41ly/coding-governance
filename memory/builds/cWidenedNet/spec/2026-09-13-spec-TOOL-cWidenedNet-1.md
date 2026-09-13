@@ -1,10 +1,12 @@
 # TOOL-cWidenedNet-1 — the extension class widens, the gate derives its own sidecars, and the root spelling is graded over the received set
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node c · Tier-2 · base c4f02308 · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-2 · base c4f02308 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-13-build-TOOL-cWidenedNet-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cWidenedNet-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
