@@ -41,6 +41,14 @@ change goes into the spec first, as a rev bump with its section 9 line.
   descriptor `[[gate_leg]]`. The `recall floor` rows there are the precedent. Then regenerate
   `tools/govkit/subject-pins.tsv` with `python tools/govkit/govkit.py selfcheck --write`. Unit 2's
   suite differs, and its spec says how.
+- **A `project-owned` list takes file names, never globs.** govkit's `rule_sources` silently ignores
+  any element holding a glob, so `fixtures/**` ships every fixture as `engine`. `govkit selfcheck`
+  cannot see that, and `govkit plan` into a scratch target can. A new runlog fixture is added by name
+  to `tools/runlog/kit.toml`, where a self-test arm checks the list against the files on disk.
+- **A watched file needs the kickoff manifest re-stamped.** `tools/gate-legs.json` is among the paths
+  `memory/guides/SESSION-KICKOFF.md` watches, so pre-commit refuses a commit touching one until its
+  `last-audit` line is re-stamped. Stamp it at `git merge-base origin/main HEAD`, with your real
+  local time and offset. Say in the commit message what changed, or why nothing in the body did.
 - **A new leg** in `tools/gate-legs.json` has a `name`, an `argv`, a `chunk`, a `subject`, a `ceiling`
   and, for a self-test, a `guard` on its kit dir. A leg in the `selftests` chunk needs a row in
   `tools/run-gates/selftest-budgets.txt`. A new ceiling must clear `python tools/run-gates/derive-ceilings.py --check`.
@@ -50,16 +58,21 @@ change goes into the spec first, as a rev bump with its section 9 line.
   and unit 11 rides that move. run-gates moves 1.6 to 1.7 in unit 3, memory-tree 2.69 to 2.70 in unit
   7, and drift-audit 1.10 to 1.11 in unit 13. If `bash tools/check-kit-versions.sh` asks for a move
   your spec does not name, make it and bump the spec.
-- **Run one leg by name**, never the full bar:
-  `python -c "import json,subprocess,sys;L={l['name']:l['argv'] for l in json.load(open('tools/gate-legs.json'))};sys.exit(subprocess.call(L[sys.argv[1]]))" "memory hygiene"`
+- **Run one leg by name**, never the full bar. Print its argv, then run that argv yourself from Git
+  Bash:
+  `python -c "import json,sys;print(' '.join(next(l['argv'] for l in json.load(open('tools/gate-legs.json')) if l['name']==sys.argv[1])))" "memory hygiene"`.
+  Never route a bash leg through Python's `subprocess`. On this node it finds WSL's `bash`, which
+  fails with "not a git repository".
 - **Stage before you grade.** Every gate reads `git ls-files`, so an unstaged new file is invisible to
   it and a green verdict covers only the tracked subset.
 
 ## By unit
 
-- **1, the runlog kit.** Copy `tools/process-monitor/kit.toml`: `id` equals the dir name, and a
+- **1, the runlog kit.** Landed at 03ae473c and 9ac609ec. Read `tools/runlog/README.md` for the
+  grammar and `tools/runlog/runlog_lib.py` for the reader before you extend either. The kit has a
+  `tools/playbook-kit-waivers.txt` row, which clears itself once the charter names the kit. Copy `tools/process-monitor/kit.toml`: `id` equals the dir name, and a
   `version_from` pattern matches exactly one line of a file this unit lands. Put `include = "**"` under
-  `engine`, with `selftest.py` and `fixtures/**` as `project-owned`. The version pair is
+  `engine`, with `selftest.py` and each fixture, by name, as `project-owned`. The version pair is
   `KIT_RUNLOG_VERSION = "1.0"` on a line carrying `gov:kit runlog@1.0`. The dossier
   `memory/map/features/runlog.md` opens with a toml fence carrying these keys:
   - `feature`, `title`, `status` and `streams`;
