@@ -1,12 +1,14 @@
 # TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** CLOSED · rev-4 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-13-build-TOOL-aRatifiedRulings-1-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-aRatifiedRulings-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-aRatifiedRulings-1-0-run-mandate.md](../prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-1-0-run-mandate.md) | journal | — |
+| [2026-09-13-prompt-TOOL-aRatifiedRulings-1-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-1-1-build-brief.md) | journal | — |
 | [2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md) | spec-audit | TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4 |
 | [2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md) | spec-audit | TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4 |
 
@@ -396,8 +398,10 @@ file written before this unit reads identically after it.
   with a delta line in its message.
   Red when: the render lands without the re-stamp and check 5 names `memory/guides/BUILD-METHOD.md`
   as a watched file changed after the stamp.
-- **AC7** — When `bash tools/check-kit-versions.sh` runs at the landed tip, it prints
-  `kit-versions: 0 problem(s)` and exits 0, with `KIT_MEMORY_TREE_VERSION=2.70` at
+- **AC7** — When `bash tools/check-kit-versions.sh` runs at the landed tip, it exits 0 and prints
+  NOTHING — its one summary line, `kit-versions: <n> problem(s)`, is printed on failure alone, at
+  `check-kit-versions.sh:270` behind `[ "$fails" = 0 ] && exit 0`, so a `0 problem(s)` line never
+  exists to observe — with `KIT_MEMORY_TREE_VERSION=2.70` at
   `tools/memory-tree/check-memory-hygiene.sh:20` and every tracked `tools/memory-tree/*.template.md`
   marker reading `gov:kit memory-tree@2.70`; `grep -c '^KIT_UNATTENDED_VERSION=1\.19 ' tools/unattended/*.sh`
   reports `1` for `unattended.sh`, `check-unattended.sh`, `check-pass-order.sh` and
@@ -504,6 +508,12 @@ quote the new signature in full · no floor moves.
   SEQUENTIAL. F: AC4's redirect carries stderr, where the MARK lives. G: the closing pass's carrier
   set is the derived fifteen-file probe, `README.md:1` included, not the paired-plus-two
   enumeration. I: the parity leg's guard list quoted as the manifest has it, six paths.
+- rev-4 · 2026-09-13 · AC7 · the build pass. AC7 expected `kit-versions: 0 problem(s)` on stdout,
+  a line `tools/check-kit-versions.sh` never prints: it exits 0 silently and prints its
+  `<n> problem(s)` summary only past a failure, so the criterion as spelled could not be observed
+  against a correct build. The observation is now exit 0 with empty stdout. §4's pinned render
+  figures reproduced exactly, 26743 B / 340 lines; the rest of §6 is graded in the acceptance
+  ledger under `build/`.
 
 ## 10. Reuse audit
 

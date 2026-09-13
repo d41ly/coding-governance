@@ -54,7 +54,7 @@ the parks that motivated them live under `builds/aLeakedHandle/`.
 
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aRatifiedRulings-1` | MISSING | a converged subject's later blocker is disposed, never re-rounded — M4 and check 37 |
+| 1 | `TOOL-aRatifiedRulings-1` | CLOSED | a converged subject's later blocker is disposed, never re-rounded — M4 and check 37 |
 | 2 | `TOOL-aRatifiedRulings-2` | MISSING | check 23 excludes the path a brief row names |
 | 3 | `TOOL-aRatifiedRulings-3` | MISSING | one checker run serves several hygiene self-test arms |
 | 4 | `TOOL-aRatifiedRulings-4` | MISSING | the rc=137 tail for a leg with no declared ceiling |
@@ -68,13 +68,13 @@ ids TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded](spec/2026-09-13-spec-TOOL-aRatifiedRulings-1.md) | — | 2 | SPECCED | rev-3 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded](spec/2026-09-13-spec-TOOL-aRatifiedRulings-1.md) | — | 2 | CLOSED | rev-4 | 2026-09-13 |
 | [TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names](spec/2026-09-13-spec-TOOL-aRatifiedRulings-2.md) | — | 2 | SPECCED | rev-3 | 2026-09-13 |
 | [TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus](spec/2026-09-13-spec-TOOL-aRatifiedRulings-3.md) | — | 2 | SPECCED | rev-3 | 2026-09-13 |
 | [TOOL-aRatifiedRulings-4 — a leg killed with no ceiling in play names the seconds it ran](spec/2026-09-13-spec-TOOL-aRatifiedRulings-4.md) | — | 1 | SPECCED | rev-3 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

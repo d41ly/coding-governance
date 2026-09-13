@@ -4093,7 +4093,7 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   # subject or a park reason that merely quotes one. Both are restored, with -F still doing the
   # subject comparison so the subject is never a pattern.
   if grep -E '^[0-9][0-9-]*T[0-9:]*Z review · item ' "$rel" 2>/dev/null      | grep -F -- " · item $subj · reason "      | sed 's/.* · reason //'      | grep -qE '(CONVERGED|NON-CONVERGENT|CEILING)'; then
-    fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history: $subj"
+    fail 37 "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4, fold or promote, and never re-rounded: $subj"
     return 1
   fi
   state=$(review_state "$prior" "$blockers")
