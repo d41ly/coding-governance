@@ -3583,6 +3583,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "rotated_re",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "row_docs",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
