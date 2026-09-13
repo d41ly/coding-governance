@@ -1285,6 +1285,13 @@ if [ -n "$gd" ]; then
     echo "run-gates: cannot create the run record at $RUNDIR" >&2; exit 2
   fi
 fi
+# A PINNED ID PINS THIS RUN AND NO OTHER — TOOL-dLoggedFlight-4. The pre-push hook exports one so its
+# push line joins this bar's run-log line by id, and nothing here scrubs a leg's environment: left
+# set, every leg inherits it, and a leg that drives a nested runner, as this kit's own suites do in
+# scratch clones, would reuse ONE run directory for every nested bar it starts. That is the per-run
+# uniqueness the paragraph above calls a correctness property. Read above, removed here, before any
+# leg starts.
+unset GATE_RUN_ID
 
 FPRINT="$KITREL/gate-fingerprint.sh"
 fingerprint() { [ -f "$FPRINT" ] || { printf ''; return; }; bash "$FPRINT" "$@" 2>/dev/null; }

@@ -68,6 +68,7 @@
       "playbook render selftest",
       "playbook render wiring",
       "playbook validity gate",
+      "pre-push run-log line",
       "pre-push self-test",
       "process-monitor adopter selftest",
       "process-monitor census selftest",

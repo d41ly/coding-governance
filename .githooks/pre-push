@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # coding-governance pre-push: the authoritative merge bar. On a push to the default branch it runs the
-# FULL gate (tools/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes do nothing.
+# FULL gate (tools/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes are not
+# gated. Every push this hook sees, gated or not, leaves its lines in the run log (see THE RUN LOG).
 # Install once per clone: git config core.hooksPath .githooks. Override: git push --no-verify.
 #
 # Drift note: the ACTIVE hook is the TRACKED .githooks/ dir (core.hooksPath), and check-wiring.sh
@@ -51,6 +52,228 @@ if ! cd "$top"; then
   exit 1
 fi
 
+# ---- THE RUN LOG — TOOL-dLoggedFlight-4 ------------------------------------------------------------
+# Every push this hook sees leaves lines in `pushes.log` under `runlog/` in the git COMMON dir, in the
+# runlog kit's grammar, which that kit's README states; this block writes it and reads none of it. A
+# push that reaches the ref loop writes a START after the loop and an END from the EXIT trap. The
+# three default-branch refusals come BEFORE that loop, so each writes one `ev=once` line and no pair.
+# The two refusals above this block write nothing: no journal root is known yet.
+#
+# A LINE RECORDS AN ATTEMPT, never a landing. Git fires this hook for a `--dry-run` and for a push the
+# remote later rejects, and whether anything landed is git's answer. A `--no-verify` push runs no hook.
+#
+# THE URL IS NEVER WRITTEN, because it can carry credentials. `remote=<name>` is written only when git
+# passed a name, which it shows by making $1 differ from $2; a push to a bare URL passes the URL as
+# both and writes `remote_unnamed=1`. Either way `url_userinfo=1` records a `user@` part in the URL.
+#
+# EVIDENCE, NEVER AN INPUT. Nothing below branches on a line, and no gating decision, refusal or
+# signal behaviour moved. A failed append prints ONE `pre-push: run log` line on stderr and changes
+# neither the exit code nor stdout. `GOV_RUNLOG=0` in the environment writes nothing.
+#
+# NO SIGNAL TRAP, ON PURPOSE. A trapped TERM waits for the foreground child, and the child here is the
+# merge bar, so a TERM trap would hold a killed push for as long as the bar runs. Every exit the hook
+# CHOOSES after the trap sets RUNLOG_CLEAN=1 immediately before it, and the EXIT trap, which an
+# untrapped TERM still runs, writes `exit=clean` or `exit=unclean` from that mark. A KILL runs no
+# trap, so a START with no END is its signature. An unclean END's `rc` is whatever `$?` the trap saw,
+# often 0: read `exit=` first. The run-log suite beside this file enumerates every `exit` in it.
+#
+# ZERO SPAWNS: builtin reads, parameter expansion, `EPOCHREALTIME` and one `printf >>` per line. A
+# clone's first push pays one `mkdir` for the journal directory, and a clone that has one pays nothing.
+#
+# THE JOIN TO THE BAR. When this hook runs the bar it exports `GATE_RUN_ID` as `push-<digits>-<pid>`
+# and writes the same value as `gate_run` on END, so the bar's own run-log line, which names its run,
+# joins this push exactly. The runner removes the variable once read, so no leg inherits it.
+#
+# ROLLOUT. `core.hooksPath` is absolute, so a push from ANY worktree runs the PRIMARY tree's copy of
+# this file: its lines appear once the primary tree has checked this change out, and not before.
+#
+# WHAT THIS DOES NOT CATCH. The two refusals above; a KILL; and an `exit`, or an EXIT trap of its own,
+# inside the repository's `.githooks/gate-env.sh`, which is sourced below and is not this file. Every
+# read in the EXIT trap is defaulted, because `set -u` holds there and a handler that aborts on an
+# unset name writes nothing for exactly the push it exists to record.
+RUNLOG_MAX_BYTES=2048   # the grammar's line cap, LF not counted
+RUNLOG_REF_CAP=10       # ref.1 .. ref.10 on START; every ref line past them is counted into ref_more
+RUNLOG_SWITCH=${GOV_RUNLOG:-}
+RUNLOG_ARG1=${1-}; RUNLOG_ARG2=${2-}
+RUNLOG_GITDIR=""; RUNLOG_DIR=""; RUNLOG_N=""; RUNLOG_DECISION=""; RUNLOG_GATE_RUN=""
+RUNLOG_CLEAN=""; RUNLOG_WARNED=""; RUNLOG_MKDIR=""; RUNLOG_REF_MORE=0
+RUNLOG_REFS=(); RUNLOG_REMOTE=()
+
+# The two directories, with no `git` process: this tree's git dir holds the lander's marker, and the
+# COMMON dir holds the journal. `.git` is a directory in a primary tree and a `gitdir:` file in a
+# linked worktree, whose `commondir` names the common dir relative to it; `../` is folded so a path
+# this prints is the one git would print. A primary tree has no `commondir` and its git dir IS the
+# common dir. Never `.git/worktrees/<name>/runlog`, which would split one clone's journal in two.
+resolve_push_dirs() { # work tree -> sets RUNLOG_GITDIR and RUNLOG_DIR; rc 1 when no git dir resolves
+  local g="${1:-.}/.git" l="" c=""
+  if [ -f "$g" ]; then
+    { IFS= read -r l < "$g"; } 2>/dev/null || [ -n "$l" ] || return 1
+    l=${l%$'\r'}
+    case "$l" in "gitdir: "?*) g=${l#gitdir: } ;; *) return 1 ;; esac
+    case "$g" in /*|[A-Za-z]:[/\\]*) ;; *) g="${1:-.}/$g" ;; esac
+  elif [ ! -d "$g" ]; then
+    return 1
+  fi
+  RUNLOG_GITDIR=$g
+  if [ -f "$g/commondir" ]; then
+    { IFS= read -r c < "$g/commondir"; } 2>/dev/null || [ -n "$c" ] || return 1
+    c=${c%$'\r'}
+    case "$c" in
+      /*|[A-Za-z]:[/\\]*) ;;
+      *) while :; do
+           case "$c" in
+             ..)   g=${g%/*}; c=""; break ;;
+             ../*) g=${g%/*}; c=${c#../} ;;
+             *)    break ;;
+           esac
+         done
+         c="$g${c:+/$c}" ;;
+    esac
+  else
+    c=$g
+  fi
+  RUNLOG_DIR="$c/runlog"
+  return 0
+}
+
+# S3's fields, rendered ONCE for both lines that carry them, so the refusal line cannot carry a weaker
+# guard than START. The URL never leaves this function; only two facts about it do. Its authority is
+# the part after `://` up to the next `/`, or for scp-like `user@host:path` the part before the colon;
+# a plain path, a drive-letter one included, has neither and so holds no userinfo.
+render_push_remote() { # remote name · url -> sets RUNLOG_REMOTE to its key/value pairs
+  local a="" u="${2-}"
+  RUNLOG_REMOTE=()
+  if [ -n "${1-}" ] && [ "${1-}" != "$u" ]; then RUNLOG_REMOTE+=(remote "$1")
+  else RUNLOG_REMOTE+=(remote_unnamed 1); fi
+  case "$u" in
+    *://*) a=${u#*://}; a=${a%%/*} ;;
+    *:*)   a=${u%%:*}; case "$a" in */*) a="" ;; esac ;;
+  esac
+  case "$a" in *@*) RUNLOG_REMOTE+=(url_userinfo 1) ;; esac
+  return 0
+}
+
+# THE ONE APPEND, in the grammar's own bytes. Each value is escaped backslash FIRST, then TAB, LF and
+# CR, so the first pass cannot re-escape the others. A line over the cap is fitted by the runlog kit's
+# REFERENCE rule, and the run-log suite compares the result with that kit's `render_line`: drop whole
+# indexed fields, highest index first, counting each into its `_more`; only when none is left, cut the
+# longest value outside `v n t p ev` and the `_more` counts from its end, never inside a UTF-8
+# character and never inside an escape, and measure again. `LC_ALL=C` for this function alone, so
+# `${#v}` counts BYTES, which is what the cap counts.
+write_push_line() { # key value [key value ...] -> one line appended to the push journal
+  [ "${RUNLOG_SWITCH:-}" != 0 ] || return 0
+  local LC_ALL=C bs='\' tab=$'\t' line="" v i nm f size=0 best blen top cut b need
+  local -a key=() val=()
+  while [ "$#" -ge 2 ]; do
+    v=${2//"$bs"/"$bs$bs"}; v=${v//$'\t'/'\t'}; v=${v//$'\n'/'\n'}; v=${v//$'\r'/'\r'}
+    key+=("$1"); val+=("$v"); shift 2
+  done
+  for i in "${!key[@]}"; do size=$(( size + ${#key[i]} + ${#val[i]} + 2 )); done
+  size=$(( size - 1 ))
+  # STEP ONE: whole indexed fields, the highest index first, a tie going to the later field.
+  while [ "$size" -gt "$RUNLOG_MAX_BYTES" ]; do
+    best=-1; top=-1
+    for i in "${!key[@]}"; do
+      case "${key[i]}" in
+        *.*) nm=${key[i]#*.}
+             case "$nm" in ""|*[!0-9]*) ;; *) [ "$((10#$nm))" -ge "$top" ] && { best=$i; top=$((10#$nm)); } ;; esac ;;
+      esac
+    done
+    [ "$best" -ge 0 ] || break
+    nm="${key[best]%%.*}_more"
+    size=$(( size - ${#key[best]} - ${#val[best]} - 2 ))
+    key=("${key[@]:0:best}" "${key[@]:best+1}"); val=("${val[@]:0:best}" "${val[@]:best+1}")
+    f=-1
+    for i in "${!key[@]}"; do [ "${key[i]}" = "$nm" ] && { f=$i; break; }; done
+    if [ "$f" -ge 0 ]; then
+      size=$(( size - ${#val[f]} )); val[f]=$(( ${val[f]} + 1 )); size=$(( size + ${#val[f]} ))
+    else
+      key+=("$nm"); val+=(1); size=$(( size + ${#nm} + 3 ))
+    fi
+  done
+  # STEP TWO: cut the longest value outside the protected keys, the first of equals, from its end.
+  while [ "$size" -gt "$RUNLOG_MAX_BYTES" ]; do
+    best=-1; blen=0
+    for i in "${!key[@]}"; do
+      case "${key[i]}" in v|n|t|p|ev|*_more) continue ;; esac
+      [ "${#val[i]}" -gt "$blen" ] && { best=$i; blen=${#val[i]}; }
+    done
+    [ "$best" -ge 0 ] || break
+    b=$(( blen - (size - RUNLOG_MAX_BYTES) )); [ "$b" -gt 0 ] || b=0
+    cut=${val[best]:0:b}
+    # A character cut in half is dropped whole, as the reference's decode drops it: count the
+    # continuation bytes that end the value, then ask the lead byte before them how many it needed.
+    b=0
+    while [ "$b" -lt "${#cut}" ] && [ "$b" -lt 3 ]; do
+      case "${cut:$(( ${#cut} - b - 1 )):1}" in [$'\x80'-$'\xbf']) b=$((b + 1)) ;; *) break ;; esac
+    done
+    if [ "$b" -lt "${#cut}" ]; then
+      case "${cut:$(( ${#cut} - b - 1 )):1}" in
+        [$'\xc0'-$'\xdf']) need=1 ;;
+        [$'\xe0'-$'\xef']) need=2 ;;
+        [$'\xf0'-$'\xf7']) need=3 ;;
+        *)                 need=0 ;;
+      esac
+      [ "$b" -lt "$need" ] && cut=${cut:0:$(( ${#cut} - b - 1 ))}
+    fi
+    # ...and an escape cut in half leaves an ODD run of trailing backslashes: drop one.
+    b=0
+    while [ "$b" -lt "${#cut}" ] && [ "${cut:$(( ${#cut} - b - 1 )):1}" = "$bs" ]; do b=$((b + 1)); done
+    [ $(( b % 2 )) -eq 1 ] && cut=${cut%?}
+    size=$(( size - blen + ${#cut} )); val[best]=$cut
+  done
+  for i in "${!key[@]}"; do line+="${line:+$tab}${key[i]}=${val[i]}"; done
+  if [ -n "$RUNLOG_DIR" ] && [ ! -d "$RUNLOG_DIR" ] && [ -z "$RUNLOG_MKDIR" ]; then
+    RUNLOG_MKDIR=1; mkdir "$RUNLOG_DIR" 2>/dev/null
+  fi
+  [ -n "$RUNLOG_DIR" ] && { printf '%s\n' "$line" >> "$RUNLOG_DIR/pushes.log"; } 2>/dev/null && return 0
+  if [ -z "$RUNLOG_WARNED" ]; then
+    RUNLOG_WARNED=1
+    printf 'pre-push: run log — cannot append to %s, so this push is not recorded there; its gate, its output and its exit code are unaffected\n' \
+      "${RUNLOG_DIR:-(no git dir resolved)}/pushes.log" >&2
+  fi
+  return 0
+}
+
+# A default-branch refusal that comes before the ref loop: one unpaired line, since no START exists.
+write_push_once() { # decision -> one ev=once line
+  local t lander=0
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; else printf -v t '%(%s)T' -1; fi
+  [ -n "$RUNLOG_GITDIR" ] && [ -f "$RUNLOG_GITDIR/push-main-active" ] && lander=1
+  render_push_remote "$RUNLOG_ARG1" "$RUNLOG_ARG2"
+  write_push_line v 1 t "$t" p pushes ev once decision "${1:-}" "${RUNLOG_REMOTE[@]}" \
+    lander "$lander" wt "${top:-}"
+}
+
+# After the ref loop: every ref line up to the count cap, the lander's marker, and the nonce END pairs on.
+write_push_start() { # -> the START line, and the nonce END reads
+  local t d r i=0 lander=0
+  local -a f=()
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; d=${t//[!0-9]/}
+  else printf -v t '%(%s)T' -1; d="${t}000000"; fi
+  RUNLOG_N="$$.$d"
+  [ -n "$RUNLOG_GITDIR" ] && [ -f "$RUNLOG_GITDIR/push-main-active" ] && lander=1
+  render_push_remote "$RUNLOG_ARG1" "$RUNLOG_ARG2"
+  f=(v 1 t "$t" p pushes ev start n "$RUNLOG_N" "${RUNLOG_REMOTE[@]}" lander "$lander" wt "${top:-}")
+  for r in ${RUNLOG_REFS[@]+"${RUNLOG_REFS[@]}"}; do i=$((i + 1)); f+=("ref.$i" "$r"); done
+  [ "$RUNLOG_REF_MORE" -gt 0 ] && f+=(ref_more "$RUNLOG_REF_MORE")
+  write_push_line "${f[@]}"
+}
+
+# Called by the EXIT trap and nothing else. EVERY read is defaulted: `set -u` holds inside a trap, and
+# a trap that aborts on an unset name writes nothing for exactly the push it exists to record.
+write_push_end() { # the status the EXIT trap saw -> the END line
+  local rc="${1:-}" ex=unclean t
+  local -a f=()
+  [ "${RUNLOG_CLEAN:-}" = 1 ] && ex=clean
+  if [ -n "${EPOCHREALTIME:-}" ]; then t=${EPOCHREALTIME/,/.}; else printf -v t '%(%s)T' -1; fi
+  f=(v 1 t "$t" p pushes ev end n "${RUNLOG_N:-}" rc "$rc" exit "$ex" decision "${RUNLOG_DECISION:-}")
+  [ -n "${RUNLOG_GATE_RUN:-}" ] && f+=(gate_run "$RUNLOG_GATE_RUN")
+  write_push_line "${f[@]}"
+}
+
+resolve_push_dirs "$top" || { RUNLOG_GITDIR=""; RUNLOG_DIR=""; }
+
 # ---- WHERE THIS TREE KEEPS ITS KITS — TOOL-dRetiredFork-11 ---------------------------------------
 # This hook ships VERBATIM to every push-main adopter, so a hardcoded prefix ships too. It spelled
 # `tools/` at five functional sites; at an adopter installed anywhere else the fingerprint helper and
@@ -92,32 +315,41 @@ obs=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null); obs=${obs#
 env_def=${GOV_DEFAULT_BRANCH:-}
 if [ -n "$obs" ] && [ -n "$env_def" ] && [ "$obs" != "$env_def" ]; then
   echo "pre-push: GOV_DEFAULT_BRANCH names a branch this clone does not observe as the default, and the pushed ref is classified by that name — so an unrecognised one skips the bar entirely: env '$env_def' against observed '$obs'." >&2
-  exit 1
+  write_push_once refuse-default-branch; exit 1
 fi
 def=${obs:-$env_def}
 if [ -z "$def" ]; then
   echo "pre-push: can't determine the default branch (origin/HEAD unset and GOV_DEFAULT_BRANCH unset)." >&2
   echo "  Refusing to guess — silently assuming 'main' would BYPASS this gate on a non-main default." >&2
   echo "  Fix once: git remote set-head origin -a   — or export GOV_DEFAULT_BRANCH=<branch>." >&2
-  exit 1
+  write_push_once refuse-default-branch; exit 1
 fi
 if ! git rev-parse --verify --quiet "refs/heads/$def" >/dev/null 2>&1 \
    && ! git rev-parse --verify --quiet "refs/remotes/origin/$def" >/dev/null 2>&1; then
   echo "pre-push: the default branch resolves to a name that is no branch in this clone, so every pushed ref would classify as 'not the default branch' and skip the gate: $def" >&2
   echo "  Fix once: git remote set-head origin -a   — or export GOV_DEFAULT_BRANCH=<a branch that exists>." >&2
-  exit 1
+  write_push_once refuse-default-branch; exit 1
 fi
 
 # git feeds one line per pushed ref on stdin: <local ref> <local sha> <remote ref> <remote sha>.
 # Classify on the 3rd field (remote_ref) — `git push origin feat:refs/heads/main` updates the default
 # branch from a differently-named local ref. Read ALL lines here; run the gate ONCE after the loop.
+# The run log keeps each line too, rejoined with git's single spaces, up to its count cap.
 main_local=""
 while read -r _localref localsha remoteref _remotesha; do
   [ "$remoteref" = "refs/heads/$def" ] && main_local=$localsha
+  if [ "${#RUNLOG_REFS[@]}" -lt "$RUNLOG_REF_CAP" ]; then
+    RUNLOG_REFS+=("$_localref $localsha $remoteref $_remotesha")
+  else
+    RUNLOG_REF_MORE=$((RUNLOG_REF_MORE + 1))
+  fi
 done
+write_push_start
+trap 'write_push_end "$?"' EXIT
+# FROM HERE ON, every exit sets its decision and RUNLOG_CLEAN=1 immediately before it.
 
-[ -z "$main_local" ] && exit 0                       # no push to the default branch → nothing to gate
-[ -z "${main_local//0/}" ] && exit 0                 # all-zero local sha = a delete → nothing to gate
+[ -z "$main_local" ] && { RUNLOG_DECISION=skip-nondefault; RUNLOG_CLEAN=1; exit 0; }   # no push to the default branch → nothing to gate
+[ -z "${main_local//0/}" ] && { RUNLOG_DECISION=skip-delete; RUNLOG_CLEAN=1; exit 0; }   # all-zero local sha = a delete → nothing to gate
 
 # MOVED BELOW THE "NOTHING TO GATE" EXITS, and the move is the whole fix. This refusal used to
 # sit beside the kit-root probe, ABOVE every question about which ref is being pushed — so an
@@ -145,7 +377,7 @@ if [ ! -f "$top/$GOV_KITROOT/gate-legs.json" ]; then
     echo "  Left alone, the two forcing predicates that read that path would match NOTHING and the" >&2
     echo "  push would be scoped against a green earned on a different leg set." >&2
     echo "  Deliberate override, as always: git push --no-verify" >&2
-    exit 1
+    RUNLOG_DECISION=refuse-manifest; RUNLOG_CLEAN=1; exit 1
   fi
 fi
 
@@ -156,7 +388,7 @@ fi
 # unmarked default-branch push is refused.
 if [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then
   echo "pre-push: refusing a raw push to $def — land via $GOV_KITROOT/push-main.sh (it reconciles before the gate), or --no-verify to bypass." >&2
-  exit 1
+  RUNLOG_DECISION=refuse-raw; RUNLOG_CLEAN=1; exit 1
 fi
 
 # The tree the hook validates must BE the pushed default-branch tip, else the gate certifies content
@@ -165,7 +397,7 @@ head=$(git rev-parse HEAD 2>/dev/null || true)
 if [ "$main_local" != "$head" ]; then
   echo "pre-push: refusing — pushing $def @ ${main_local:0:8} but this working tree is at ${head:0:8}."
   echo "  Push $def from the primary tree checked out at the pushed tip (playbook §3), or --no-verify."
-  exit 1
+  RUNLOG_DECISION=refuse-head; RUNLOG_CLEAN=1; exit 1
 fi
 
 # ---- the boundary DECIDES, and the obligation it replaces is bounded rather than deleted --------
@@ -285,12 +517,19 @@ fi
 if [ -n "$force" ]; then
   echo "pre-push: FULL gate on $def push (${main_local:0:8}) — $force"
   export GATE_FULL=1
+  RUNLOG_DECISION=full
 else
   echo "pre-push: scoped gate on $def push (${main_local:0:8}) — full green ${rec_sha:0:8} is ${lag:-0} commit(s) back, within $GATE_FULL_MAX_LAG"
   export GATE_BASE="$rec_sha"
+  RUNLOG_DECISION=scoped
 fi
+# THE BAR'S RUN ID, pinned so this push's END joins the bar's own run-log line by id. Set BEFORE the
+# bar, like the decision, so a push killed mid-bar still names the bar it was waiting on.
+if [ -n "${EPOCHREALTIME:-}" ]; then RUNLOG_GATE_RUN="push-${EPOCHREALTIME//[!0-9]/}-$$"
+else printf -v RUNLOG_GATE_RUN 'push-%(%s)T-%s' -1 "$$"; fi
+export GATE_RUN_ID="$RUNLOG_GATE_RUN"
 gate=${GOV_GATE_CMD:-bash $GOV_KITROOT/run-gates/run-gates.sh}
 $gate </dev/null
 rc=$?
 [ "$rc" -eq 0 ] || echo "pre-push: gate RED — push blocked (fix, or 'git push --no-verify' to override deliberately)."
-exit "$rc"
+RUNLOG_CLEAN=1; exit "$rc"

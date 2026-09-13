@@ -114,6 +114,12 @@ row and one redacted `<i>.out` copy land per leg; the `verdict` is written last,
 the crash signal. `GATE_RUN_KEEP` run directories are kept, swept after the verdict and never before
 dispatch, so a crashed run's record survives the next few ordinary runs.
 
+A caller may pin the run id with `GATE_RUN_ID`, and the pre-push hook does, so its push line joins
+this run's line exactly. The runner reads the pin and then REMOVES it from its environment before any
+leg starts: left set, every leg would inherit it, and a leg that drives a nested runner, as this
+kit's own suites do in scratch clones, would reuse one run directory for every nested bar. A pin
+names ONE run.
+
 **Every bar also leaves one line in the run log.** From its EXIT trap the runner appends one
 `ev=once` line to `runlog/gates.log` under the git COMMON dir, in the runlog kit's grammar, so the
 primary tree and every linked worktree of a clone write one file, and a run that ran the bar

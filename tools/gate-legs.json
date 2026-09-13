@@ -470,6 +470,21 @@
     "ceiling": 1780
   },
   {
+    "name": "pre-push run-log line",
+    "argv": [
+      "bash",
+      ".githooks/pre-push.runlog.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "tools/runlog/",
+      "tools/run-gates/"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 600
+  },
+  {
     "name": "push-main self-test",
     "argv": [
       "bash",

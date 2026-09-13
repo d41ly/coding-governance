@@ -5,10 +5,10 @@ feature = "runlog"
 title = "The line grammar the three run-log producers write, and the one reader every consumer parses them through"
 status = "shipped"
 streams = ["tooling"]
-decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2"]
+decisions = ["TOOL-dLoggedFlight-1", "TOOL-dLoggedFlight-2", "TOOL-dLoggedFlight-4"]
 
 [claims]
-gate-legs = ["runlog selftest"]
+gate-legs = ["runlog selftest", "pre-push run-log line"]
 kits = ["runlog"]
 git-hooks = []
 workflow-scripts = []
@@ -22,6 +22,7 @@ lexicon-verbs = []
 [paths]
 globs = [
   "tools/runlog/**",
+  ".githooks/pre-push.runlog.test.sh",
 ]
 ```
 
@@ -64,7 +65,10 @@ counters can move. Wall time is printed report-only, and the leg's budget row is
 - The producers — `TOOL-dLoggedFlight-2`, `TOOL-dLoggedFlight-3` and `TOOL-dLoggedFlight-4` — write
   this grammar. The driver's writer shipped first, and its three gotcha classes are claimed here
   rather than beside the driver, whose dossier sits at its byte cap. The gate runner's shipped second,
-  and its two classes are claimed by the run-gates dossier. Each producer's golden line sits
+  and its two classes are claimed by the run-gates dossier. The pre-push hook's shipped third, and
+  its suite's leg is claimed HERE: no dossier claims the hook, whose two legs sit in the map
+  baseline. The hook pins the bar's run id, so a push line joins its gate line exactly, and the
+  runner drops that id before any leg starts. Each producer's golden line sits
   in this kit's fixtures, so a producer spec that changes its data model changes the golden line in
   the same pass and the self-test reds on any key the grammar would refuse.
 - The consumers — the extractor, the run model and the committed record, units 6, 8 and 9 — import
@@ -81,7 +85,8 @@ counters can move. Wall time is printed report-only, and the leg's budget row is
   it writes no indexed family, so `TOOL-dLoggedFlight-2` fits its lines by that rule and its suite
   compares them with `render_line`. The gate runner reaches both steps, dropping `fail.<i>` fields
   first and then cutting its run id, and `TOOL-dLoggedFlight-3`'s suite compares each the same way.
-  Nothing on a cut line says it was cut.
+  So does the pre-push hook, dropping `ref.<i>` fields and then cutting the longest value, graded the
+  same way by `TOOL-dLoggedFlight-4`'s suite. Nothing on a cut line says it was cut.
 - **The kit is waived from playbook parity** until the charter template or the runbook names it.
   That edit is a governance-carrier change outside this build's mandate; the waiver row reds the day
   either file does.

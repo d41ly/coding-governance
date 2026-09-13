@@ -65,7 +65,9 @@ asked for it to move into the record and its own reasoning argued the other way;
 disagreement. A scratch name nothing outside the process can predict cannot be planted, while a run
 directory has a nameable path and the runner accepts a pinned id through `GATE_RUN_ID`. Measured:
 with the suppressor in the record, a planted `<i>.rc` suppressed its leg and the run reported the
-plant's verdict as the leg's own.
+plant's verdict as the leg's own. A pin names ONE run: the runner drops `GATE_RUN_ID` from its
+environment once read, because the pre-push hook exports one and every leg would otherwise inherit
+it, and a nested runner a leg starts would reuse one directory for every bar (TOOL-dLoggedFlight-4).
 
 **Every bar leaves one run-log line, from the EXIT trap and from nowhere else.** `cleanup` appends one
 `ev=once` line to `runlog/gates.log` under the git common dir, every value read back from the run

@@ -1,12 +1,13 @@
 # TOOL-dLoggedFlight-4 — the pre-push hook writes one line per push
 
-**Status:** SPECCED · rev-4 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 4
+**Status:** CLOSED · rev-5 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md](../build/2026-09-13-build-TOOL-dLoggedFlight-1-design-research.md) | research | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
+| [2026-09-13-build-TOOL-dLoggedFlight-4-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-dLoggedFlight-4-1-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-dLoggedFlight-1-1-build-brief.md) | journal | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round1.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
 | [2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-dLoggedFlight-1-spec-audit-round2.md) | spec-audit | TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 |
@@ -45,16 +46,23 @@ to `pushes.log`, and pin the bar's run id so a push joins to its gate line exact
   installed, because a trapped signal waits for the foreground bar, so a killed hook reads
   `exit=unclean`. Observed by AC1 and AC3.
 - **S5** When the hook runs the bar, it exports `GATE_RUN_ID` as `push-<epoch digits>-<pid>` and records
-  it as `gate_run=` on END, so the push line joins the gate line of `TOOL-dLoggedFlight-3` by id.
-  Observed by AC4.
+  it as `gate_run=` on END, so the push line joins the gate line of `TOOL-dLoggedFlight-3` by id. The
+  runner reads that id and then removes it from its environment, before any leg starts. Left there,
+  it reaches every leg, and a leg that drives a nested runner, as the runner's own suites do, would
+  reuse one run directory for every nested bar it starts. The runner calls per-run uniqueness a
+  correctness property, and `TOOL-aQuenchedHarness-11` refused an export of this variable for this
+  reason. Observed by AC4.
 - **S6** No added process spawn beyond the first-ever `mkdir` of the journal directory. Time is
   `EPOCHREALTIME` and appends are builtin. A failed write changes neither the exit code nor stdout and
   prints one `pre-push: run log` line on stderr. `GOV_RUNLOG=0` turns the lines off. Observed by AC5
   and AC7.
 - **S7** A new small suite, `.githooks/pre-push.runlog.test.sh`, with its leg and budget row. It is
   claimed by the `push-main` govkit entry as `project-owned`, with its leg carried by an
-  `[[exempt_leg]]` registry row, per TOOL-aQuenchedHarness-3. That row raises the
-  `tools/govkit/registry.toml` row of `tools/install-prefix-carried.txt` by hand, with its reason, per
+  `[[exempt_leg]]` registry row, per TOOL-aQuenchedHarness-3. That row's reason names the entry's
+  descriptor, which sits one directory below the kit dir, and the carried-prefix predicate counts a
+  file only directly under one. So the `tools/govkit/registry.toml` row of
+  `tools/install-prefix-carried.txt` stays at its count, measured by applying that predicate's pattern
+  to the registry before and after. A reason naming a counted literal would raise it by hand, per
   TOOL-dRetiredFork-17. `.githooks/pre-push.test.sh` ships to adopters today, and changing that is not
   this unit's. Observed by AC8.
 
@@ -93,7 +101,17 @@ fails on one that maps to no decision and is not one of the two named exemptions
 The hook resolves no git dir before `:157` today, and the lines must be writable on the early skips,
 so the builtin resolution is added at `:49`. `GATE_RUN_ID` is an existing seam of the gate runner
 (`tools/run-gates/run-gates.sh:1080-1095`), which reuses a pinned id through `mkdir -p`. A time-and-pid
-id cannot collide with a live run.
+id cannot collide with a live run. It can collide with a NESTED one: the runner scrubs nothing from
+its legs' environment, so the export reached every leg, and a runner suite that starts several bars
+in one scratch clone would give them all one run directory. The runner therefore removes the
+variable once it has read it (S5), one builtin line beside the assignment it feeds.
+
+Every line goes through one append, `write_push_line`, in the grammar's bytes: each value escaped
+backslash first, then TAB, LF and CR. A line over the cap is fitted by the runlog kit's reference
+rule, the same two steps the gate runner implements. Whole `ref.<i>` fields drop first, highest
+index first, into the `ref_more` the count cap may already have written. Only when none is left is
+the longest unprotected value cut, never inside a UTF-8 character or an escape. `LC_ALL=C` holds for
+that function alone, so a length counts bytes.
 
 ### Data model
 
@@ -106,24 +124,31 @@ under the 2048-byte cap.
 
 | identifier | kind | cell |
 |---|---|---|
-| `write_push_start`, `write_push_end`, `write_push_once`, `render_push_remote`, `resolve_push_dirs` | shell functions | `sh.function`, verb-led |
+| `write_push_start`, `write_push_end`, `write_push_once`, `write_push_line`, `render_push_remote`, `resolve_push_dirs` | shell functions | `sh.function`, verb-led |
+| `pre-push run-log line` | leg, `repo` / `selftests`, as `pre-push self-test` is | manifest |
 
 `render_push_remote` renders the remote fields of S3 once, and both `write_push_start` and
 `write_push_once` call it, so the refusal line cannot carry a weaker guard than START.
-| `pre-push run-log line` | leg, `repo` / `selftests`, as `pre-push self-test` is | manifest |
+`write_push_line` is the one append and the one fit; the three writers only assemble fields.
 
 ### Files touched (estimate)
 
 `.githooks/pre-push`, `.githooks/pre-push.runlog.test.sh`, `tools/govkit/entries/push-main.kit.toml`,
-`.gitattributes`, `tools/gate-legs.json`, `tools/govkit/{registry.toml,subject-pins.tsv}`,
-`tools/install-prefix-carried.txt`,
-`tools/run-gates/selftest-budgets.txt`, the dossier that claims the hook's legs, and the regenerated map.
+`tools/gate-legs.json`, `tools/govkit/{registry.toml,subject-pins.tsv}`,
+`tools/run-gates/selftest-budgets.txt`, `tools/run-gates/run-gates.sh` and its README, the runlog
+kit's README, and the regenerated map. `.gitattributes` is not touched: its `*.sh` rule already pins
+the suite LF, and the hook has its own row. No dossier claims the hook's legs, which sit in the map
+baseline, so the new leg is claimed by the runlog dossier, which already names this unit as a
+producer. `tools/install-prefix-carried.txt` does not move (S7).
 
 ### Alternatives rejected
 
 - A journal line from `tools/push-main.sh`: rejected because it sees only lander pushes, and the push
   worth seeing is the one that bypasses the lander.
 - Arms in `.githooks/pre-push.test.sh`: rejected by cost. Its budget row is 1020 s.
+- Reading the runner's `gate-run/current` pointer after the bar instead of pinning an id: rejected,
+  because another bar in the same clone can move it, and the join must be exact.
+- Leaving `GATE_RUN_ID` in the bar's environment: rejected, for the nested-runner reason in S5.
 
 ## 5. Production-readiness checklist
 
@@ -167,13 +192,18 @@ remote and a work clone the way `.githooks/pre-push.test.sh` does, with the bar 
   have elapsed.
   Red when: a TERM trap is added, so the hook outlives the signal until the bar returns.
 - **AC4** — When the hook runs the stubbed bar, the stub sees `GATE_RUN_ID` equal to the END line's
-  `gate_run`.
-  Red when: the id is not exported, or differs.
+  `gate_run`. When the hook runs a copy of the real runner instead, that runner's `gates.log` line
+  reads `run=` the END line's `gate_run`, and a leg of that bar sees no `GATE_RUN_ID` at all.
+  Red when: the id is not exported, or differs, or the runner leaves it in its legs' environment.
 - **AC5** — When the journal directory is a file, the hook's `rc` and stdout are unchanged and stderr
   carries one `pre-push: run log` line. With `GOV_RUNLOG=0` no line is written.
   Red when: a failed write changes the push outcome, or fails silently.
-- **AC6** — When `bash <suite>` pushes 21 long-named refs, START carries `ref.10`, no `ref.11`,
-  `ref_more=11`, and stays at or under 2048 bytes.
+- **AC6** — When `bash <suite>` pushes 21 refs, named short enough that eleven would fit the byte
+  cap, START carries `ref.10`, no `ref.11`, `ref_more=11`, and stays at or under 2048 bytes. Names
+  long enough that only ten fit would let the byte cap alone write the same fields, so the count cap
+  would go unobserved. A START whose ten refs overflow the cap, and one
+  whose remote name alone does, are each fitted byte for byte as the runlog kit's `render_line` fits
+  them: `ref.<i>` fields drop into `ref_more` first, and a value is cut only once none is left.
   Red when: the cap is not applied, or a value is cut instead.
 - **AC7** — When `bash -x` traces the skip-nondefault and full paths from a linked worktree and from a
   primary clone with no `commondir` file, both lines land in `<common-dir>/runlog/pushes.log`, and the
@@ -187,7 +217,7 @@ remote and a work clone the way `.githooks/pre-push.test.sh` does, with the bar 
 
 ## 7. Gates
 
-`pre-push self-test` · `push-main self-test` · `testsuite counts (every bar self-test prints one)` · `every held leg is budgeted, every budget row resolves` · `govkit selfcheck` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene`
+`pre-push self-test` · `pre-push run-log line` · `push-main self-test` · `run-gates run-log line` · `run-gates canary` · `run-gates evidence` · `testsuite counts (every bar self-test prints one)` · `every held leg is budgeted, every budget row resolves` · `govkit selfcheck` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene`
 
 New arm: `.githooks/pre-push.runlog.test.sh` · each AC staged RED by removing the property it observes · floor set at landing
 
@@ -211,6 +241,15 @@ none
 - rev-4 · 2026-09-13 · S7 · §4 · AC2 · folded round-3 spec audit M6 (the refusal line's remote fields
   meet the credential check through one shared renderer) and M10 (the carried-prefix row is raised by
   hand, and the registry is in the write set).
+- rev-5 · 2026-09-13 · S5 S7 · §4 · AC4 AC6 · §7 · the build pass, before its code. S5: the runner
+  removes `GATE_RUN_ID` once read, because the export reached every leg and a nested runner would
+  reuse one run directory, the class the `TOOL-aQuenchedHarness-11` probe design refused the export
+  for. S7: the carried-prefix row does not move, since the new reason names a descriptor one
+  directory below the kit dir, which the predicate does not count. §4: the one append and its fit,
+  and the corrected files list. AC4: the join graded against a real runner copy. AC6: the fit graded
+  against `render_line`, and "long-named" refs replaced by refs short enough that the count cap is
+  the only thing that can remove `ref.11`, since with long names the byte cap writes the same line.
+  §7: the legs of the runner suites the S5 line touches.
 
 ## 10. Reuse audit
 
