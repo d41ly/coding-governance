@@ -93,8 +93,10 @@ change goes into the spec first, as a rev bump with its section 9 line.
   its EXIT trap, and `tools/run-gates/run-gates.runlog.test.sh` shows its real lines.
 - **4, the pre-push line.** Landed at 4ac1ebc0 and 4c7385eb. The hook exports `GATE_RUN_ID` to the
   bar, and the runner unsets it before any leg starts.
-- **5, the redaction table.** Every credential a fixture plants is a template expanded at test time,
-  so the kit's scan of its own tree stays clean.
+- **5, the redaction table.** Landed at d78f659c, 19a0c232 and 9f384608: `tools/runlog/redaction.tsv`
+  with `load_rules`, `scan_secrets` and `render_redacted` in `tools/runlog/runlog_lib.py`. Every
+  credential a fixture plants is a template expanded at test time, since the kit's self-test scans
+  its own tracked files with the table.
 - **6, the extractor.** A test never reads or writes a real store: every root the spec names points
   at scratch. `extract --measure` over the real store is report-only, and nothing it prints is
   committed.
