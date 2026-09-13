@@ -74,7 +74,7 @@ ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 T
 | [TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live](spec/2026-09-13-spec-TOOL-dPolishedVitrine-14.md) | — | 2 | INPROGRESS | rev-2 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 4 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

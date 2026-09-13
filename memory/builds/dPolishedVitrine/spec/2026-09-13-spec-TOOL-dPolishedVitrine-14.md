@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-13-build-TOOL-dPolishedVitrine-14-1-journal.md](../build/2026-09-13-build-TOOL-dPolishedVitrine-14-1-journal.md) | journal | — |
 | [2026-09-13-prompt-TOOL-dPolishedVitrine-14-0-owner-ruling.md](../prompts/2026-09-13-prompt-TOOL-dPolishedVitrine-14-0-owner-ruling.md) | journal | — |
 
 <!-- /gen:spec-records -->
