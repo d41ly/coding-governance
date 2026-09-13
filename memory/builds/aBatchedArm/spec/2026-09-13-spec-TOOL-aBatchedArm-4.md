@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-4 — declared execution modes for the self-test runner
 
-**Status:** OPEN · rev-3 · 2026-09-13 · node a · Tier-2 · base c2db2f5d · streams tooling · order 1
+**Status:** OPEN · rev-4 · 2026-09-13 · node a · Tier-2 · base c2db2f5d · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round1.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round2.md) | spec-audit | — |
+| [2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round3.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-4-spec-audit-round3.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -27,47 +28,56 @@ deserves its own spec rather than a paragraph in this one.
   is a REGEX, `^[0-9]+/[0-9]+$`, not a glob: a glob's `[0-9]*` is one digit then anything, so a
   digit-led directory name would skip the tracked-path check — staged and proven. Observed by
   **AC1**.
-- **S2** — the executing mode is DECLARED: `--serial` and `--pooled` are the two spellings, the
-  bare `run` invocation REFUSES naming both, and `--sweep` stays as an alias of `--pooled` so no
+- **S2** — the RUNNER's executing mode is DECLARED: `--serial` and `--pooled` are the two spellings,
+  the bare `run` invocation REFUSES naming both, and `--sweep` stays as an alias of `--pooled` so no
   recorded invocation breaks. `--check`, `--list` and `--rank` execute nothing and take no mode.
   The refusal sits AFTER the `--list` exit at `:374` and BEFORE the filter-liveness refusal at
-  `:383`, pinned by line rather than by "after `--check`", because the width block before `:322`
-  runs on every bar and a refusal there reds the merge bar. Observed by **AC2** and **AC3**.
-- **S3** — the kit runner gets BOTH spellings and the risky one lands DARK. `run-unattended-gates.sh
-  --selftests --serial` is today's behaviour byte-for-byte; `--selftests --pooled` exists and is not
-  the default; bare `--selftests` REFUSES naming both, the same rule the runner applies one level
-  down. The four tracked carriers that record the DoD command — `.githooks/gate-env.sh:27`,
-  `tools/unattended/kit.toml:125-126`, `run-unattended-gates.sh:26-27` and `:203`, and
-  `AGENTS.md:519` — say `--serial` in the same commit, so the verdict they name is the one that was
-  measured. **The flip of that default to `--pooled` is `TOOL-aBatchedArm-5`'s act**, taken only once
-  the bound is sound: the full-sweep TSV rows 51 to 57 show FIVE of the seven current unattended rows
-  killed at rc=124 under exactly the bound `--pooled` would inherit today, so a flipped default would
-  ship five TIMEOUTs on the DoD command. Under either spelling the kit runner's summary line names the
-  mode and, under pooled, the withheld count parsed from the runner's own summary line. The FIVE arms
-  of `run-selftests.test.sh` that invoke the bare mode declare `--serial`, and the strings they assert
-  — `self-tests GREEN|RED`, `OVER BUDGET`, the unresolved-row `FAIL` line, the filter-liveness
-  refusal — are emitted unchanged. Observed by **AC4** and **AC5**.
-- **S4** — cost verdicts are issued ONLY under `--serial`; `--pooled` withholds and counts them
-  exactly as `--sweep` does today at `:659-664`. Observed by **AC6**.
-- **S5** — every printed remedy and the usage line name a DECLARED invocation. Today
-  `run-selftests.sh`'s own remedies and `memory/guides/SESSION-KICKOFF.md:132` teach the bare form,
-  which after S2 is the refused one. Observed by **AC7**.
-- **S6** — the `tools/install-prefix-carried.txt` BAN on `run-selftests.sh` stays at exactly six.
-  The usage line S5 rewrites is ALREADY one of the six counted literals, so the rewrite edits that
-  occurrence in place and adds none: a raise here would red the leg `SLACK`, the ban firing in the
-  other direction. rev-2 said "raise for the new literal" on a false premise. Observed by **AC8**.
+  `:383`, pinned by line, because the width block before `:322` runs on every bar through the
+  unguarded `--check` leg and a refusal there reds the merge bar. Observed by **AC2** and **AC3**.
+- **S3** — the KIT RUNNER's grammar, stated once because three routes reach its self-test half and
+  rev-3 covered one. `run-unattended-gates.sh` takes a VERB and a MODE as two positionals in either
+  order, parsed at `:121-161`. The verb is `--selftests`, `--checks` or `--all`, and the no-argument
+  default to `--selftests` is KEPT. The mode is `--serial` or `--pooled`. **Every route that reaches
+  the self-test half — bare, `--selftests`, `--all` — REFUSES at `:121-161` when no mode is given,
+  naming both spellings; `--checks` reaches no self-test and takes no mode.** `--serial` runs the
+  self-test half exactly as today; `--pooled` runs it through the runner's pool and exists so unit 3
+  can measure it; **neither is the default, and the flip to `--pooled` is `TOOL-aBatchedArm-5`'s
+  act** once the bound is sound — the full-sweep TSV rows 51 to 57 show FIVE of the seven current
+  unattended rows killed at rc=124 under exactly the bound `--pooled` inherits today. Observed by
+  **AC4**.
+- **S4** — the kit runner's summary line gains exactly ONE mode token under both spellings, in the
+  shape `unattended gates GREEN — <n> ran on demand · serial` (or `· pooled, <k> cost verdicts
+  withheld`), with `<k>` parsed from the runner's own `cost verdict(s) WITHHELD` line on stdout.
+  Everything else the kit runner prints, and its exit code, is byte-identical to today under
+  `--serial`. Observed by **AC4**.
+- **S5** — cost verdicts are issued ONLY under `--serial`; `--pooled` withholds and counts them
+  exactly as `--sweep` does today at `:659-664`. Observed by **AC5**.
+- **S6** — every carrier that records or teaches an invocation of either runner spells a declared
+  mode, all in the same commit as S2 and S3. The RUNNER's sites: its usage line at `:77-78` and
+  `:93-94`, the three printed remedies at `:412`, `:746` and `:758`, and
+  `memory/guides/SESSION-KICKOFF.md:132`. The KIT RUNNER's sites: its own `--help` at `:127-130`
+  (drop `(default)`, list both modes, keep the literal on its line), `:26-27` and `:203`,
+  `.githooks/gate-env.sh:27`, `tools/unattended/kit.toml:125-126` (both lines), `AGENTS.md:519`,
+  `tools/unattended/README.md:66`, and `SESSION-KICKOFF.md:168-169`. The runner joins
+  `SESSION-KICKOFF.md`'s `watch:` list and `last-audit` is re-stamped in this commit. Observed by
+  **AC6** and **AC7**.
+- **S7** — the `AGENTS.md:519` edit is budgeted: the file sits 18 bytes under the unguarded
+  charter-size cap, and appending ` --serial` costs 9, so the edit is the appended flag and nothing
+  else. Measured at staging by the leg, not asserted. Observed by **AC8**.
+- **S8** — the `tools/install-prefix-carried.txt` BAN on `run-selftests.sh` stays at exactly six and
+  the one on `run-unattended-gates.sh` stays at its count: every usage line S6 rewrites is ALREADY a
+  counted literal, so each rewrite edits its occurrence in place and adds none. A raise would red
+  `SLACK`. Observed by **AC9**.
 
 ## 3. Non-goals (OUT)
 
 - **The pooled hang bound.** `--pooled` inherits `--sweep`'s bound unchanged: budget times
   `sweep-ceiling-factor`. That shape killed 14 of 58 suites in the full sweep of 2026-09-08 and three
   records rejected it as a predictor — `TOOL-dRetiredFork-40`, `TOOL-aPooledSweep-2` §3, and the
-  sweep record's own remedy. Replacing it with `derive-ceilings.py`'s evidence shape (a per-row
-  pooled reading carrying the runner's condition token, monotone, with `ceiling-margin.txt`'s
-  `max(120 s, 1.0 × max)` headroom) is `TOOL-aBatchedArm-5`. rev-1 put a declared factor here and
-  round 1 was right that it was the rejected design with a larger integer.
+  sweep record's own remedy. Replacing it with `derive-ceilings.py`'s evidence shape and re-pointing
+  the carriers to `--pooled` is `TOOL-aBatchedArm-5`.
 - **The eight shard rows, the arity raise, and their serial calibration pass.** `TOOL-aBatchedArm-3`,
-  which now declares `consumes-from` this unit.
+  which declares `consumes-from` this unit.
 - **A contention model that makes a pooled cost verdict sound.** `TOOL-aPooledSweep-2` left that as
   an explicit edge; withholding is the honest verdict until one exists.
 - **A per-row mode column.** Every reader stops at `f[3]`, a fifth column lands in `argv` and is
@@ -82,27 +92,31 @@ deserves its own spec rather than a paragraph in this one.
 - **consumes-from** `none` — this is the prerequisite: nothing in it needs a shard row to exist.
 - **hands-off** `TOOL-aBatchedArm-3` — the eight rows, the `SHARD_ARITY` raise, the one-off serial
   pass that produces their budgets, and the `selftest-budgets.txt` install-prefix raise.
-- **hands-off** `TOOL-aBatchedArm-5` — the evidence-derived pooled hang bound.
+- **hands-off** `TOOL-aBatchedArm-5` — the evidence-derived pooled hang bound, and re-pointing the
+  carriers from `--serial` to `--pooled` once it holds.
 
 ## 4. Design
 
-### Why the mode is per invocation and why bare `run` refuses
+### Why the mode is declared at both runners and why every bare form refuses
 
-Two facts from the tree: the one caller that reports cost, `run-unattended-gates.sh:263`, invokes
-the runner bare and reads only the exit code, so a silent pooled default prints GREEN with every
-budget withheld; and five arms of the runner's held self-test assert serial-only strings on the bare
-invocation. A silent default in EITHER direction is a coupling nobody declared. Bare `run` refuses,
-every caller declares, and the refusal names both spellings.
+The runner: the one caller that reports cost invoked it bare and read only the exit code, so a
+silent pooled default would print GREEN with every budget withheld; five arms of its held self-test
+assert serial-only strings on the bare invocation. The kit runner: three routes reach its self-test
+half (bare defaults to `--selftests` at `:121`; `--all` at `:123`; `--selftests` at `:125`), and
+`TOOL-aQuenchedHarness-4` AC6 records `--all` as a compensating check — a rule covering one route
+would let `--all` print RED with "12 ran" for seven suites that never ran. A silent default in EITHER
+direction, at EITHER runner, is a coupling nobody declared. Every bare form refuses naming both
+spellings; every carrier declares.
 
-### Why the kit runner's verdict path is pooled and its cost path is declared
+### Why `--serial` stays the recorded verdict and `--pooled` is landed dark
 
-The owner's ruling is pooled-primary: "pooled is available and serial stays possible when it is
-deliberately declared". rev-1 inverted it for the one consumer, wiring `:263` to `--serial` and
-leaving nothing in the tree issuing `--pooled` — so every criterion could go green with the build's
-goal unmet on any invocation that existed, and the eight shard rows would have run one after another
-paying seven extra prologues. The verdict path is the pooled one; the serial cost pass is its own
-declared invocation, which is also the periodic serial sweep `TOOL-aQuenchedHarness-9` already calls
-owed.
+The DoD verdict path is `--serial`, by declaration at every carrier, and it is byte-identical to
+today except for the one appended mode token. `--pooled` is a declared invocation that exists, is
+exercised by AC4 here and by `TOOL-aBatchedArm-3` AC4's measurement, and is named by NO carrier until
+`TOOL-aBatchedArm-5` re-points them. Said plainly: after this unit, nothing in the tree issues
+`--pooled` by a recorded DoD command, and that is deliberate — the bound it would run under has
+killed a quarter of its population once, and §1's own rule is that risky behaviour lands dark and
+is flipped on after in-place verification. rev-2 flipped it on; round 2 verified the five kills.
 
 ### Why a pooled cost verdict is withheld and not scaled
 
@@ -113,47 +127,46 @@ be predicted from the declared condition is a number a verdict must not rest on.
 
 ### What the cost model says about the goal
 
-The gate self-test is fork-bound on a SERIALISED spawn path — roughly 53,000 forks at roughly 190 ms —
-and "a pool contends on precisely the resource the work is made of". The nine-suite A/B reached 1.72x
-at width 8, not 8x; the three-suite A/B was a loss. Eight shards 8-wide share that path. Whether
-they reach 20 minutes is `TOOL-aBatchedArm-3` AC4's measurement, made runnable by this unit's S3, and
-designed so it can FAIL and be read. On a node without the on-access scanner (19 to 39 ms per spawn
-against 251 here) the same split is trivially inside the target. The target may be a property of
-the host.
+The gate self-test is fork-bound on a SERIALISED spawn path — roughly 53,000 forks per run — and "a
+pool contends on precisely the resource the work is made of". Per spawn on node `a`: 251 ms,
+recorded in `TOOL-aGradedDoorway-10`; on node `d`, with the scanner present, 19 to 39 ms. The
+nine-suite A/B reached 1.72x at width 8, not 8x; the three-suite A/B was a loss. Eight shards 8-wide
+share that path. Whether they reach 20 minutes is `TOOL-aBatchedArm-3` AC4's measurement, made
+runnable by this unit's `--pooled`, and designed so it can FAIL and be read. The target may be a
+property of the host.
 
 ### Rollout
 
-S1 alone first. S2, S3, S5 in one commit — the refusal, the callers that satisfy it, and the strings
-that teach it cannot be split across a bar. S6 in that same commit, since the usage line is the new
-literal. S4 is already the tree's behaviour under `--sweep` and lands as the alias.
+S1 alone first. S2 through S8 in ONE commit — the refusals, every caller and carrier that satisfies
+them, the summary shape, the byte budget and the literal counts cannot be split across a bar without
+one of them redding it.
 
 ### Files touched (estimate)
 
-`tools/run-gates/run-selftests.sh`, `tools/run-gates/run-selftests.test.sh`,
-`tools/unattended/run-unattended-gates.sh`, `memory/guides/SESSION-KICKOFF.md` (the `:132` line,
-and the runner joins its `watch:` list so the manifest ratchet sees the next edit, with `last-audit`
-re-stamped in the S5 commit), `.githooks/gate-env.sh`, `tools/unattended/kit.toml`, `AGENTS.md`
-(the four DoD carriers), and this build's records. `tools/install-prefix-carried.txt` is READ by
-AC8 and not edited.
+`tools/run-gates/run-selftests.sh` · `tools/run-gates/run-selftests.test.sh` ·
+`tools/unattended/run-unattended-gates.sh` · `tools/unattended/README.md` ·
+`tools/unattended/kit.toml` · `.githooks/gate-env.sh` · `AGENTS.md` ·
+`memory/guides/SESSION-KICKOFF.md` · this build's records. Nine files.
+`tools/install-prefix-carried.txt` is READ by AC9 and not edited.
 
 ## 5. Production-readiness checklist
 
 - security — N/A. Scheduling and verdict wording; no suite's subject changes.
 - perf / scale — this unit makes the pooled path REACHABLE; unit 3 makes it fast and unit 5 makes
   it safe. On its own it changes no suite's wall clock.
-- error / empty / loading states — bare `run` refuses naming both modes; an unknown mode token
-  refuses as today; the filter-liveness refusal at `:383` is unchanged and sits after the mode
-  refusal, so a wrong filter under a declared mode still reds by name.
-- observability — a pooled run prints the width pair and the withheld count on its summary line, and
-  the kit runner repeats both, so neither GREEN can be read as a cost claim.
+- error / empty / loading states — every bare form at both runners refuses naming both modes; an
+  unknown token refuses as today; the runner's filter-liveness refusal at `:383` still fires after
+  the mode refusal, so a wrong filter under a declared mode still reds by name.
+- observability — one mode token on the kit runner's summary under both spellings, and under pooled
+  the withheld count beside it, so neither GREEN can be read as a cost claim.
 - risks — the pooled mode has killed a quarter of its population once, and this unit inherits that
-  bound unchanged. Stated in §3 rather than hidden; unit 5 is the guard.
+  bound unchanged behind a declared, non-default invocation. Unit 5 is the guard.
 - testing — the runner's self-test gains one arm per refusal, one per mode, and one for the regex in
-  each direction, each staged and observed RED first.
-- migration — `--sweep` aliases `--pooled`; the five bare-mode arms, the one bare caller and the four
-  DoD carriers declare `--serial` in the same commit, so every recorded verdict is the one that was
-  measured; the pooled default is landed dark and flipped by unit 5.
-- user docs — the usage line and `SESSION-KICKOFF.md:132` teach the declared forms.
+  each direction; the kit runner's self-test gains one arm per route-without-mode refusal; each
+  staged and observed RED first.
+- migration — `--sweep` aliases `--pooled`; the five bare-mode arms, every caller and every carrier
+  declare `--serial` in the same commit; the pooled default is landed dark and flipped by unit 5.
+- user docs — both `--help` texts and the three manifest and README lines teach the declared forms.
 
 ## 6. Acceptance criteria
 
@@ -168,58 +181,96 @@ AC8 and not edited.
   when it is given an unknown `--kit` filter under a declared mode, the filter-liveness refusal at
   `:383` still fires by name.
   Red when: the mode refusal reaches the `--check` path, or it shadows the liveness refusal.
-- **AC4** — When `run-unattended-gates.sh --selftests --serial` runs, its summary line names
-  `serial`, carries an `OVER BUDGET` line for any breach, and is byte-identical to today's bare
-  invocation's; when `--selftests --pooled` runs, the summary names `pooled` and a withheld count of
-  exactly 7, parsed from the runner's own `cost verdict(s) WITHHELD` line on stdout; when bare
-  `--selftests` runs, it exits 2 naming both spellings and executes nothing.
-  `fixture:` the seven tracked unattended rows at `selftest-budgets.txt:110-116`; no new fixture.
-  `cost:` one serial pass of those rows, roughly 12657 s of readings, plus one pooled pass.
-  Red when: any of the three prints the other mode's summary, the pooled count is not 7, or bare
-  `--selftests` runs a suite.
-- **AC5** — When the five bare-mode arms of `run-selftests.test.sh` run with `--serial` added, each
-  passes asserting its existing string unchanged.
-  Red when: any asserted string changes, or an arm is left invoking the refused bare form.
-- **AC6** — When a suite runs under `--pooled`, its cost verdict is WITHHELD and counted; under
+- **AC4** — When `run-unattended-gates.sh` runs in each of these forms:
+  bare, `--selftests`, `--all` — each exits 2 naming both modes and executes no suite;
+  `--serial` and `--selftests --serial` — the output is byte-identical to today's bare run except
+  for the appended ` · serial` on the summary line, and the exit code is unchanged;
+  `--pooled` — the summary carries ` · pooled, <k> cost verdicts withheld` where `<k>` equals the row
+  count `run-selftests.sh --kit tools/unattended --list` prints at observation time, the `_uc` the
+  kit runner derives at `:258`; and the runner's `peak concurrency P of outer O` line shows O equal to
+  the lesser of the resolved width and that row count, with P at least 2;
+  `--checks` — runs with no mode and no refusal.
+  `figure:` `<k>` DERIVED at observation, never pinned.
+  `fixture:` the seven tracked unattended rows at `selftest-budgets.txt:110-116`; on a host whose
+  resolved width is 1 the pooled arm cannot pass and SKIPS naming itself and why.
+  `cost:` one serial pass, roughly 12657 s of readings; one pooled pass bounded at the largest row
+  budget times the factor, 27200 s at HEAD.
+  Red when: any refusing form runs a suite, the serial output differs beyond the token, `<k>` is not
+  the derived count, or O or P is 1 on a host whose width is not.
+- **AC5** — When a suite runs under `--pooled`, its cost verdict is WITHHELD and counted; under
   `--serial` the same suite gets an `OVER BUDGET` line when it breaches.
   Red when: a pooled run prints `OVER BUDGET`, which is a verdict resting on an unpredictable number.
-- **AC7** — When each of the five sites that teach an invocation is EXERCISED — the usage line via
-  `run-selftests.sh --help`, the three printed remedies via the refusals that print them (they
-  interpolate `$SELF`, so a grep cannot see them), and `memory/guides/SESSION-KICKOFF.md:132` read as
-  text — every emitted or written command names `--serial` or `--pooled`.
-  Red when: any emitted remedy or the manifest line names the bare form, which rev-2's grep could not
-  have caught for four of the five.
-- **AC8** — When this unit's commit is staged, `bash tools/check-install-prefix.sh` is green with the
-  `run-selftests.sh` count UNCHANGED at six.
-  Red when: the leg reds `ROSE` or `SLACK` — the first is a literal added, the second is the count
-  raised for a literal that already existed, and rev-2 would have caused the second.
+- **AC6** — When each site that teaches an invocation is EXERCISED — the runner's usage via
+  `run-selftests.sh --help`, its remedy at `:412` via `SELFTEST_TIMEOUT_BIN=nonexistent --pooled`,
+  its remedy at `:746` via any completed `--pooled` run over the test fixture, its remedy at `:758`
+  via a RED one, the kit runner's usage via `run-unattended-gates.sh --help`, and
+  `SESSION-KICKOFF.md:132` and `:168-169`, `tools/unattended/README.md:66` read as text — every
+  emitted or written command names `--serial` or `--pooled`, and NONE spells the bare form or
+  `(default)`.
+  Red when: any emitted remedy or written line names the bare form, which a grep could not have
+  caught for the three remedies that interpolate the runner's own path.
+- **AC7** — When the carrier lines `.githooks/gate-env.sh:27`, `tools/unattended/kit.toml:125` and
+  `:126`, `run-unattended-gates.sh:26-27` and `:203`, and `AGENTS.md:519` are read as text after the
+  S6 commit, each names `--serial` beside `run-unattended-gates.sh`.
+  Red when: any spells the bare form, which is the recorded DoD command pointing at a refusal.
+- **AC8** — When the S7 commit is staged, the `charter size` leg is green with `AGENTS.md` inside its
+  cap.
+  Red when: the leg reds, which is 9 bytes spent against 18 of headroom by an edit that added more
+  than the flag.
+- **AC9** — When the S2 through S8 commit is staged, `bash tools/check-install-prefix.sh` is green
+  with the `run-selftests.sh` count UNCHANGED at six and the `run-unattended-gates.sh` count
+  unchanged.
+  Red when: the leg reds `ROSE` or `SLACK` — the first is a literal added, the second is a count
+  raised for a literal that already existed.
 
 ## 7. Gates
 
 `memory hygiene` · `install-prefix (shipped surface)` · `run-selftests self-test` · `run-gates canary`
-· `every held leg is budgeted, every budget row resolves` · `kickoff-manifest ratchet` · `run-gates gov canary`
+· `run-gates gov canary` · `every held leg is budgeted, every budget row resolves` · `kickoff-manifest ratchet`
+· `charter size` · `lexicon naming predicates` · `unattended skill wiring`
 
-Derived from `tools/gate-legs.json` against Files touched, as round 2 M1 asked: the three added are
-the `--check` leg S1 rewrites (unguarded, on every bar), the manifest ratchet whose manifest S5
-edits, and the gov canary guarded on `tools/run-gates/`. `unattended skill wiring` is dropped; it
-reads none of the five touched files.
+Derived over the nine files in Files touched by this rule: every leg whose `guard` covers a touched
+path or whose `argv` names one, plus the unguarded legs that read a touched file. `charter size`
+reads `AGENTS.md`; `lexicon naming predicates` grades every touched `.sh`; the manifest ratchet's
+manifest is `SESSION-KICKOFF.md`; `unattended skill wiring` reads `kit.toml` and `run-unattended-gates.sh`.
+The three `.githooks/`-guarded self-tests run on the kit-work bar and are not listed one by one.
 
 New arm: `tools/run-gates/run-selftests.test.sh` · the bare-`run` refusal, the regex admitting a ratio
-and refusing a digit-led path, and the pooled-withholds-serial-grades pair, each staged and observed
-RED then unstaged · floor to move: the suite's own, up by the arms added.
+and refusing a digit-led path, the pooled-withholds-serial-grades pair, and the `:412` remedy naming a
+mode · `tools/unattended/run-unattended-gates.test.sh` · one refusal per route reaching the self-test
+half without a mode · each staged and observed RED then unstaged · floor to move: each suite's own,
+up by the arms added.
 
 ## 8. Open questions
 
 - **F1 · Should bare `run` refuse, or default to `--serial` with a printed notice?** Refuse. A printed
   notice on a caller that reads only the exit code is a notice nobody reads. RESOLVED (agent,
-  2026-09-13, delegated): refuse; the one caller and five arms are edited in the same commit.
-- **F2 · Where does the refusal sit?** Between `:374` and `:383`, so `--list` still exits before it
-  and the filter-liveness refusal still fires after it. RESOLVED (agent, 2026-09-13, delegated):
-  pinned by line in S2, because "after `--check`" left it anywhere in a 30-line span and round 1 H3
-  showed the fifth arm's verdict depends on which side of `:383` it lands.
+  2026-09-13, delegated): refuse at both runners; every caller and carrier is edited in one commit.
+- **F2 · Where does the runner's refusal sit?** Between `:374` and `:383`. RESOLVED (agent,
+  2026-09-13, delegated): pinned by line in S2, because "after `--check`" left it anywhere in a
+  30-line span and the fifth arm's verdict depends on which side of `:383` it lands.
+- **F3 · Keep or drop the kit runner's no-argument default to `--selftests`?** Keep. RESOLVED
+  (agent, 2026-09-13, delegated): it is the smaller diff, the carriers then read ` --serial` alone,
+  and that is what fits `AGENTS.md`'s 18-byte headroom; the refusal is on the MODE, not the verb.
 
 ## 9. Revision log
 
+- rev-4 · 2026-09-13 · §2 S3 through S8 · §3 · Edges · §4 · §5 · §6 AC4 through AC9 · §7 · F3 ·
+  folded spec-audit round 3 (BLOCKED, 4 blocker rows in one defect, NON-CONVERGENT by rows against
+  round 2's 3, disposition FOLD — this spec is not re-reviewed). The defect: rev-3's S3 stated the
+  kit runner's mode rule for `--selftests` only, while the tree reaches the self-test half by the
+  bare form (`:121` default) and by `--all` (`:123`) too, three carriers spell those routes, and the
+  parser takes one positional; built as written, `--all` would print RED for seven suites that never
+  ran with every criterion green. S3 now states the grammar once — verb and mode as two positionals,
+  every route to the self-test half refuses without a mode — and F3 keeps the no-argument default.
+  Also folded: AC4's serial clause was unsatisfiable (a mode token AND byte-identity), now scoped to
+  "identical except the token"; the carriers were observed by nothing, now AC7; three more sites
+  teach the bare form (the kit runner's own `--help`, `README.md:66`, `SESSION-KICKOFF.md:168-169`),
+  now in S6 and AC6; `AGENTS.md` had 18 bytes of headroom, now S7 and AC8; §4 still argued rev-2's
+  pooled-primary design and §5 still hardcoded `:263`, both rewritten; §7 re-derived over nine
+  files with the rule stated; AC4's pooled arm was green on a width-1 pool, now asserts the runner's
+  peak line and skips by name where it cannot; AC4 typed 7 for a derived count, now derived; AC7's
+  mechanism named by line and trigger with the negative clause restored; the scanner cite folded.
 - rev-3 · 2026-09-13 · §2 S3 · §2 S6 · §4 Files · §5 migration · §7 · AC4 · AC7 · AC8 · folded
   spec-audit round 2 (BLOCKED, 3 blockers, CONVERGING from 8, precision 0.57). The blocker: rev-2
   flipped the DoD command's default to `--pooled` at the inherited budget x2 bound, and the sweep TSV
@@ -245,17 +296,20 @@ RED then unstaged · floor to move: the suite's own, up by the arms added.
 
 - **The seam is the runner's existing mode machinery**, verified at source: `MODE` at
   `run-selftests.sh:104`, the `--sweep` branch at `:297`, the withheld counter at `:659-664`, the
-  refusal shape `SELFTEST_OUTER_WIDTH` already uses at `:301-315`. Nothing is invented: two spellings
-  for one existing branch, one refusal in the existing shape, one regex for one glob. The `--rank`
-  refusal of `pooled@` at `:134` and `:172` is REUSED as-is. The reuse probe was run —
+  refusal shape `SELFTEST_OUTER_WIDTH` already uses at `:301-315`; and at the kit runner, the
+  verb parser at `run-unattended-gates.sh:121-161` and the `_uc` derivation at `:258`. Nothing is
+  invented: two spellings for one existing branch, one refusal in the existing shape at each runner,
+  one regex for one glob. The `--rank` refusal of `pooled@` at `:134` and `:172` is REUSED as-is. The
+  reuse probe was run —
   `python tools/codebase-map/reuse_lookup.py "declare a self-test runner's execution mode per invocation and withhold cost verdicts under a pool"`
   — and returned `build_self_chain` and `scan_verdicts` from the process-monitor kit, neither of
-  which is this seam; it reports `unscanned layers: .sh`, so it cannot see the runner and its result
-  is not evidence either way. The seam was found by reading the file. **Disposition of every record
-  §10 cites**, since round 1's left-shift asked for one: `TOOL-aPooledSweep-1` through `-7` REUSED
-  (the mode machinery and the withholding); `TOOL-aPooledSweep-2` §3 REFUSED-BY (the factor, now
-  unit 5's problem to answer); `TOOL-dRetiredFork-40` REFUSED-BY (same); `TOOL-aReapedSpinner-23`
-  NOT-THIS-SEAM (nested pools, withdrawn); `TOOL-aQuenchedHarness-6` S3a REUSED (the `--rank`
-  refusal).
+  which is this seam; it reports `unscanned layers: .sh`, so it cannot see either runner and its
+  result is not evidence either way. The seams were found by reading the files. **Disposition of
+  every record §10 cites**: `TOOL-aPooledSweep-1` through `-7` REUSED (the mode machinery and the
+  withholding); `TOOL-aPooledSweep-2` §3 REFUSED-BY (the factor, now unit 5's to answer);
+  `TOOL-dRetiredFork-40` REFUSED-BY (same); `TOOL-aReapedSpinner-23` NOT-THIS-SEAM (nested pools,
+  withdrawn); `TOOL-aQuenchedHarness-6` S3a REUSED (the `--rank` refusal); `TOOL-aQuenchedHarness-4`
+  AC6 REUSED (the `--all` compensating check, which is why `--all` is a route S3 covers);
+  `TOOL-aGradedDoorway-10` REUSED (the per-spawn figures in §4).
 - **The retrieval arguments, verbatim:**
   `python tools/memory-recall/query.py "why does the self-test runner run suites serially by default and pool only under sweep, and what was measured about cost attribution under contention" --terms "run-selftests OUTER pool sweep serial budget contention dilation attribution width verdict withheld mode declared"`.
