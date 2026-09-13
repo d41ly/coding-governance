@@ -28,3 +28,5 @@ base: c2db2f5d2d6100af08a09da113086d114c67b603
 2026-09-13T10:50:23Z review · item TOOL-aBatchedArm-4 · reason verdict BLOCKED · blockers 8
 
 2026-09-13T10:53:13Z rescope · item add TOOL-aBatchedArm-5 · reason Spec-audit round 1 of TOOL-aBatchedArm-4 B5: its S5 pooled hang bound was a scalar factor over the serial reading, the shape TOOL-dRetiredFork-40, TOOL-aPooledSweep-2 section 3 and the full-sweep record all rejected, and derive-ceilings.py already owns the evidence shape - a per-row observed reading under the declared condition, monotone, with ceiling-margin.txt's max(120s, 1.0 x max) headroom. That bound is the mechanism that killed 14 of 58 suites once, so it is its own unit under M2 rather than a paragraph in the mode unit. Consumes the rows from unit 3 and the modes from unit 4.
+
+2026-09-13T11:20:53Z review · item TOOL-aBatchedArm-4 · reason verdict BLOCKED · blockers 3

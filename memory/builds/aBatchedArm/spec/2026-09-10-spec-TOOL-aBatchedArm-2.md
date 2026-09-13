@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-2 — the structural group linter over the batched self-test
 
-**Status:** OPEN · rev-2 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 5
 
 <!-- gen:spec-records -->
 

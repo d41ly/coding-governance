@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state
 
-**Status:** OPEN · rev-3 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 2
+**Status:** OPEN · rev-3 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 4
 
 <!-- gen:spec-records -->
 

@@ -65,15 +65,17 @@ None yet.
 <!-- roster:units -->
 | Order | Unit | Mechanism |
 |---|---|---|
-| 1 | `TOOL-aBatchedArm-3` | grade the suite as EIGHT declared shards the runner's pool executes concurrently. This is the half that meets the goal. |
-| 2 | `TOOL-aBatchedArm-1` | one assertion helper, `emitted`, plus the grouping of arms whose breaks do not interfere. An optimisation on top of the split, measured at 40 to 44 minutes alone. |
-| 3 | `TOOL-aBatchedArm-2` | the structural group linter that enforces unit 1's partition, which unit 1 can state and cannot check per group. |
+| 1 | `TOOL-aBatchedArm-4` | declared execution modes for the shared runner: `--serial` and `--pooled`, bare run refuses, the row checker admits a shard token. The prerequisite. |
+| 2 | `TOOL-aBatchedArm-3` | grade the suite as EIGHT declared shard rows. The split that reaches the goal, once the runner can run it. |
+| 3 | `TOOL-aBatchedArm-5` | the evidence-derived pooled hang bound, and the flip of the kit runner's default to pooled once it is sound. UNSPECCED. |
+| 4 | `TOOL-aBatchedArm-1` | one assertion helper, `emitted`, plus the grouping of arms whose breaks do not interfere. Measured at 40 to 44 minutes alone. |
+| 5 | `TOOL-aBatchedArm-2` | the structural group linter that enforces unit 1's partition. |
 
-**The order is the reverse of the order they were written in, and that is the build's own finding.**
-The batching unit was specced first and audited twice; round 2 then measured that it cannot reach the
-goal alone, because excluding the control arms `TOOL-dScriptedRepeat-15` S3 forbids batching leaves
-95 blocks carrying 136 solo invocations. The shard split reaches it with no new oracle. Unit 3 was
-adopted under protocol §11 after that measurement, not planned.
+**The order is the reverse of the order the first three were written in, and that is the build's own
+finding.** Batching was specced first and audited twice; round 2 measured that it cannot reach the
+goal alone. The shard split reaches it — but only through a runner that can run shards concurrently,
+which is unit 4, and only safely under a bound that is not the one that killed 14 of 58 suites, which
+is unit 5. Units 4 and 5 were adopted after those measurements, not planned.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
@@ -83,13 +85,13 @@ ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBatchedArm-4 — declared execution modes for the self-test runner](spec/2026-09-13-spec-TOOL-aBatchedArm-4.md) | 1 | 2 | OPEN | rev-2 | 2026-09-13 |
-| [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 2 | 2 | OPEN | rev-3 | 2026-09-10 |
+| [TOOL-aBatchedArm-4 — declared execution modes for the self-test runner](spec/2026-09-13-spec-TOOL-aBatchedArm-4.md) | 1 | 2 | OPEN | rev-3 | 2026-09-13 |
 | [TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards](spec/2026-09-10-spec-TOOL-aBatchedArm-3.md) | 2 | 2 | OPEN | rev-2 | 2026-09-13 |
-| [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 3 | 2 | OPEN | rev-2 | 2026-09-10 |
+| [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 4 | 2 | OPEN | rev-3 | 2026-09-10 |
+| [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 5 | 2 | OPEN | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -101,8 +103,9 @@ Ids no `spec-audit` record has ever named: none — every unit id has one.
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aBatchedArm-4` | no |
-| 2 | `TOOL-aBatchedArm-1`, `TOOL-aBatchedArm-3` | yes |
-| 3 | `TOOL-aBatchedArm-2` | no |
+| 2 | `TOOL-aBatchedArm-3` | no |
+| 4 | `TOOL-aBatchedArm-1` | no |
+| 5 | `TOOL-aBatchedArm-2` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
