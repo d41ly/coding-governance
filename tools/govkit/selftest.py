@@ -9270,6 +9270,27 @@ user_skills = "/tmp/gk-fake-skills"
               and f"'{_pvLC}' diverged and the three-way conflicts" in _pvtyb1.stdout,
               _pvtyb1.stdout[-1500:])
         git(_pvty, "reset", "-q", "--hard", "HEAD")        # the STOP's first instruction
+        # A ROW CARRYING A RELOCATE RUNG IS REFUSED, because gov's blob at its base spells gov's
+        # prefix: restored raw, the file would name paths this tree does not have. The rung is
+        # written into the committed receipt, then the commit is undone.
+        _pvtyrc = json.loads((_pvty / ".governance" / "install.json").read_text(encoding="utf-8"))
+        for _f in _pvtyrc.get("files", []):
+            if _f.get("path") == _pvLC:
+                _f["carry"] = "relocate"
+        (_pvty / ".governance" / "install.json").write_text(json.dumps(_pvtyrc, indent=2) + "\n",
+                                                            encoding="utf-8", newline="\n")
+        _pvtyrcm = run_pv_commit(_pvty, "a relocate rung on the conflicted row",
+                                 ".governance/install.json")
+        _pvtyrr = run_pv_block(_pvty, _pvg, "restore")
+        check("[-PV] W4 the restore block refuses a row carrying a relocate rung, and writes nothing",
+              _pvtyrcm.returncode == 0 and _pvtyrr.returncode != 0
+              and "carries a relocate rung" in _pvtyrr.stdout
+              and (_pvty / _pvLC).read_text(encoding="utf-8")
+              == _pvLOCAL_A.replace("line two", "line two, as this tree has it")
+              and gout(_pvty, "status", "--porcelain", "--untracked-files=no").strip() == "",
+              f"rc {_pvtyrcm.returncode}/{_pvtyrr.returncode}: " + _pvtyrr.stdout[-700:]
+              + _pvtyrcm.stderr[-300:])
+        git(_pvty, "reset", "-q", "--hard", "HEAD~1")
         _pvtyr = run_pv_block(_pvty, _pvg, "restore")
         _pvtyk = _pvty / ".git" / "harness-migration-local-edits" / _pvLC
         check("[-PV] W4 the restore block resolves it and commits through the hooks: gov's blob at the "

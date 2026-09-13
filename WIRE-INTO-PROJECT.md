@@ -1093,7 +1093,8 @@ def templates(gov):  # {rendered destination: [gov template]}, from gov's own de
                         out.setdefault(dest, []).extend(srcs)
     return out
 def moved(gov, to, dest, tmpl, rec):  # does every template `dest` renders from hold gov's blob at `to`?
-    copies = {f.get("source"): p for p, f in rec.items() if f.get("role") != "rendered"}
+    copies = {f["source"]: p for p, f in rec.items()
+              if f.get("source") and f.get("role") != "rendered"}
     for src in tmpl.get(dest) or [None]:
         if src not in copies:
             return False
@@ -1211,6 +1212,9 @@ elif mode == "restore":
         row = rows.get(path, {})
         if not (row.get("commit") and row.get("source") and row.get("gov_oid")):
             stop(f"the receipt records no gov base for {path}, so there is no blob to restore it to.")
+        if row.get("carry") == "relocate":
+            stop(f"{path}'s row carries a relocate rung, so gov's blob at its base spells gov's "
+                 "prefix and not this tree's. Resolve it by hand, the way update's order asks.")
         if git("ls-files", "-s", "--", path).stdout.split()[1:2] == [row["gov_oid"]]:
             stop(f"{path} already holds gov's blob at its recorded base, so this conflict is not a "
                  "local edit's. Resolve it the way update's order asks.")
@@ -1334,7 +1338,8 @@ last `update` named as conflicting to its row's `gov_oid`, which is gov's blob a
 `commit`, and commits that. It judges whether the file holds a local edit by its INDEX blob, never
 by the row's `oid`, because a receipt `apply` wrote records gov's blob there whatever the tree did
 to the file since, while in a receipt `adopt` measured `oid` is your edited bytes, so restoring to
-it would recreate the conflict. It reads gov's bytes with `git -C "$GOV" show <commit>:<source>`,
+it would recreate the conflict. It refuses a row that carries a `relocate` rung, because gov's
+blob at its base spells gov's prefix and not yours; resolve that one by hand. It reads gov's bytes with `git -C "$GOV" show <commit>:<source>`,
 saves each edit under `harness-migration-local-edits/` in the git directory, and sets each row's
 `oid` to the restored blob in the same commit, which is what a commit-time receipt check needs.
 Then run block 1 again, which merges gov's change over the restored file. Carry each edit back
