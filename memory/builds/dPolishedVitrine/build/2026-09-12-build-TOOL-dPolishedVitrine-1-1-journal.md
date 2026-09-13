@@ -643,6 +643,30 @@ govkit stays at 1.11. `main` still holds 1.10 at `09a22d2b`, so 1.11 is unreleas
 consumers ran it from this branch. The two govkit changes ride the same number rather than minting a
 1.12 nobody has pulled.
 
+## The full bar after the consumer runs
+
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` ran twice.
+
+- **At `34b85b04`, 22:00 to 22:12 UTC, 103 of 106 legs were green.** The python resolver was red on
+  its base line. `process-monitor census selftest` failed its arm
+  `test_native_is_the_majority_on_this_node`, which counts this node's processes by kind, and read
+  467 msys against 449 native while the bar's own shells ran. `run-gates turnstile` failed one arm,
+  a beacon that outlived a TERM for longer than a leg. Both are load-timing arms, and this fold
+  touches neither kit. The two hardenings above landed after this bar.
+- **At `f981fe2f`, 22:16 to 22:28 UTC, 104 of 106 legs were green.** The two reds were the python
+  resolver, on `tools/run-gates/run-gates.evidence.test.sh:643`, `DC_PY=python`, which is red at
+  `24f8c712` too and is not fixed here, and the census arm again, at 449 msys against 427 native.
+  Run alone after that bar, the census selftest passed 66 of 66 and the turnstile 65 assertions. The
+  govkit selftest passed inside the bar, all 103 `[-PV]` arms included.
+
+The govkit dossier gained a `seam:` line for the coupling derivation after the second bar. The legs
+that read it passed on that tree: codebase-map coverage, freshness and gate coverage, memory
+hygiene, drift-audit records, the recall floor and its arms, method carriers and spec tokens.
+
+`tools/unattended/` and `tools/workflows/` are untouched by this fold, so the unattended kit's
+on-demand suites and `tools/workflows/unattended-build.test.sh` were not re-run; round 3's record of
+them stands.
+
 ## The criteria
 
 **Evidences:** TOOL-dPolishedVitrine-1
@@ -676,6 +700,8 @@ consumers ran it from this branch. The two govkit changes ride the same number r
   python resolver line. After round 2, the bar at `72ac1a96` was green on 104 of 106: the same
   python resolver line, and the census self-test's timing arm, which passed when run alone. After
   round 3, the bar at `728a59a4` was green on 105 of 106, its one red that python resolver line.
+  After the consumer runs, the bar at `f981fe2f` was green on 104 of 106: that python resolver line,
+  and the census self-test's process-majority arm, which passed when run alone.
 - AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
   through both kits' own renderers, name one checklist command. With the adopter forced to the
   prefix-only answer, the flat layout redded naming both commands.

@@ -108,6 +108,11 @@ seam: `govkit.py selfcheck` — reuse for asserting a declared population agains
 both directions; extend via a new arm inside `selfcheck`, which is the single home for every
 registry-shaped assertion this unit adds.
 
+seam: `derive_marker_coupling` — reuse for "which kits must move together because one ships the
+other's version marker", read from each descriptor's `marker_carriers` and owned through
+`entry_members`; `update --kits` closes its scope over it. Extend via a descriptor's
+`marker_carriers`, never by naming a kit pair in code.
+
 seam: `refusal_join.py` — reuse for "is every branch of this shape reached by something that
 asserts it", over any Python population; extend via the matcher in `_is_refusal`, which is the one
 place the branch SHAPES are named. Its anchor is module-function-ordinal rather than a line, so it
