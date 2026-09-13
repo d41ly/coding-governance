@@ -232,7 +232,20 @@ APPEND_ONLY_ERE="^$M/(DECISIONS\.md$|decisions/|archive/)"
 # The alternation is DERIVED from FAMILIES, never typed: a family added to the conf must join the id
 # grammar and this set together, or a rotated shard of it goes unscanned while its rows still key.
 _fam_alt=$(printf '%s\n' $FAMILIES | sed 's/^[^:]*://' | tr '\n' '|')
-ROTATED_ARCHIVE_ERE="^$M/archive/(DECISIONS|${_fam_alt%|})\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md$"
+_fam_alt=${_fam_alt%|}
+# REFUSED, not defaulted, and for the same two reasons `declared_families()` refuses on the Python
+# side — one reader that raises and one that shrugs is the divergence this pair is built to avoid.
+# An EMPTY alternation renders `(DECISIONS|)`, whose empty branch widens the ERE; a token carrying an
+# ERE metacharacter renders e.g. `A+B`, which matches `AAB`. Python `re.escape`s each token, so the
+# shell must either escape too or refuse the input — refusing is the smaller and louder of the two,
+# because a family token outside this class is a conf defect rather than something to accommodate.
+case "$_fam_alt" in
+  "") echo "HYGIENE — cannot run: FAMILIES declares no family, so the rotated-archive predicate would carry an empty alternation and match names it was never meant to"; exit 2 ;;
+esac
+case "$_fam_alt" in
+  *[!A-Za-z0-9_\|]*) echo "HYGIENE — cannot run: a FAMILIES token carries a character that is an ERE metacharacter ('$_fam_alt'); the rotated-archive predicate would silently widen. Family tokens are [A-Za-z0-9_]"; exit 2 ;;
+esac
+ROTATED_ARCHIVE_ERE="^$M/archive/(DECISIONS|$_fam_alt)\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md$"
 case "${1:-}" in
   --print-append-only-ere) printf '%s\n' "$APPEND_ONLY_ERE"; exit 0 ;;
   --print-rotated-archive-ere) printf '%s\n' "$ROTATED_ARCHIVE_ERE"; exit 0 ;;
