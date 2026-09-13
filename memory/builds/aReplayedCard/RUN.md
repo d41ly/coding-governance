@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 5faaf23226786078f24681e04480f53db3bf100a
-phase: FOLDING
+witness: 5a551aa557895221637a7904d6e49043349cd684
+phase: BUILDING
 branch-sha: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 branch-ref: refs/heads/branch/session-orientation-tooling-2faa9f
 mode: prompt
@@ -48,3 +48,7 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-13T21:10:43Z review · item TOOL-aReplayedCard-2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
 2026-09-13T22:02:25Z review · item TOOL-aReplayedCard-1 · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · disposition fold
+
+2026-09-13T22:19:51Z dispatch · item 5a551aa5 TOOL-aReplayedCard-4 · reason memory/gotchas memory/guides/SESSION-KICKOFF.md memory/map memory/builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-4.md memory/builds/aReplayedCard/build/2026-09-14-build-TOOL-aReplayedCard-4-1-acceptance-ledger.md memory/builds/aReplayedCard/README.md memory/LIVE.md memory/ledger
+
+2026-09-13T22:20:41Z brief · item TOOL-aReplayedCard-4 · reason 821b06de1dc9 memory/builds/aReplayedCard/prompts/2026-09-14-prompt-TOOL-aReplayedCard-4-brief.md

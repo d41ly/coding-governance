@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 49 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 · skill-engines: 2 · rendered-skills: 4 · gotcha-classes: 61 · guides: 7 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -177,6 +177,7 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 �
 
 | key | claimant |
 |---|---|
+| `a-new-leg-trips-a-growing-set-of-meta-gates.md` | run-gates |
 | `a-pair-exists-and-it-is-the-wrong-one.md` | agent-cap |
 | `a-view-fix-trades-one-blindness-for-another.md` | agent-cap |
 | `ab-arm-never-did-the-work.md` | run-gates |
@@ -187,7 +188,9 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 �
 | `armed-but-unreachable-rule.md` | lexicon |
 | `assertion-between-two-derived-values.md` | unattended |
 | `bounded-through-a-pipe-is-unbounded.md` | run-gates, unattended |
+| `check-format-grades-two-populations.md` | build-readme-surface |
 | `concurrency-is-not-a-budget.md` | baseline |
+| `conf-value-interpolated-into-a-regex.md` | agent-cap |
 | `containment-tested-one-way.md` | unattended |
 | `criterion-asserts-what-its-own-command-cannot-show.md` | build-method |
 | `degradation-known-but-unreported.md` | review-harnesses |
@@ -207,11 +210,18 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 �
 | `inputs-inside-the-subjects-reach.md` | unattended |
 | `line-keyed-registry-reds-on-a-file-that-grew.md` | lexicon |
 | `naming-leg-grades-what-python-named.md` | lexicon |
+| `node-check-is-not-a-syntax-gate.md` | review-harnesses |
 | `one-value-field-records-a-mixed-outcome.md` | build-method |
 | `pin-copied-from-another-corpus.md` | baseline |
+| `pin-gated-checks-arm-nothing-without-a-pin.md` | memory-tree-hygiene |
 | `process-creation-is-the-suite-cost.md` | unattended |
 | `record-citing-a-foreign-id-defines-or-orphans-it.md` | memory-tree-hygiene |
+| `record-without-serves-or-with-a-round-counter.md` | memory-tree-hygiene |
+| `row-driver-emits-a-plausible-file-with-rows-missing.md` | memory-tree-merge-driver |
 | `second-implementation-is-not-a-second-opinion.md` | unattended |
+| `settings-edit-takes-effect-mid-session.md` | agent-cap |
+| `shipped-checker-edit-is-an-adopter-contract-change.md` | session-kickoff |
+| `sourced-conf-blank-overrides-the-default.md` | memory-tree-hygiene |
 | `spec-names-code-its-base-lacks.md` | unattended |
 | `staged-break-substitutes-a-synthetic-value.md` | unattended |
 | `status-set-in-a-subshell.md` | unattended |
@@ -226,6 +236,8 @@ Inventories: gate-legs: 106 · kits: 16 · git-hooks: 3 · workflow-scripts: 6 �
 | `two-guards-one-question-two-answers.md` | unattended |
 | `two-readers-of-one-config-one-re-derived.md` | unattended |
 | `vacuous-selector-empty-population.md` | baseline |
+| `waiver-row-that-hides-nothing-reds.md` | memory-tree-hygiene |
+| `worktree-crlf-outside-the-gated-population.md` | run-gates |
 
 ## guides
 

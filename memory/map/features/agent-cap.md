@@ -29,6 +29,8 @@ gotcha-classes = [
   "allowlist-narrower-than-the-root-it-guards.md",
   "a-pair-exists-and-it-is-the-wrong-one.md",
   "a-view-fix-trades-one-blindness-for-another.md",
+  "settings-edit-takes-effect-mid-session.md",
+  "conf-value-interpolated-into-a-regex.md",
 ]
 guides = ["REVIEW-PROTOCOL.md"]
 backlog-shards = []

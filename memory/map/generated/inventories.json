@@ -152,6 +152,7 @@
       "unattended"
     ],
     "gotcha-classes": [
+      "a-new-leg-trips-a-growing-set-of-meta-gates.md",
       "a-pair-exists-and-it-is-the-wrong-one.md",
       "a-view-fix-trades-one-blindness-for-another.md",
       "ab-arm-never-did-the-work.md",
@@ -162,7 +163,9 @@
       "armed-but-unreachable-rule.md",
       "assertion-between-two-derived-values.md",
       "bounded-through-a-pipe-is-unbounded.md",
+      "check-format-grades-two-populations.md",
       "concurrency-is-not-a-budget.md",
+      "conf-value-interpolated-into-a-regex.md",
       "containment-tested-one-way.md",
       "criterion-asserts-what-its-own-command-cannot-show.md",
       "degradation-known-but-unreported.md",
@@ -182,11 +185,18 @@
       "inputs-inside-the-subjects-reach.md",
       "line-keyed-registry-reds-on-a-file-that-grew.md",
       "naming-leg-grades-what-python-named.md",
+      "node-check-is-not-a-syntax-gate.md",
       "one-value-field-records-a-mixed-outcome.md",
       "pin-copied-from-another-corpus.md",
+      "pin-gated-checks-arm-nothing-without-a-pin.md",
       "process-creation-is-the-suite-cost.md",
       "record-citing-a-foreign-id-defines-or-orphans-it.md",
+      "record-without-serves-or-with-a-round-counter.md",
+      "row-driver-emits-a-plausible-file-with-rows-missing.md",
       "second-implementation-is-not-a-second-opinion.md",
+      "settings-edit-takes-effect-mid-session.md",
+      "shipped-checker-edit-is-an-adopter-contract-change.md",
+      "sourced-conf-blank-overrides-the-default.md",
       "spec-names-code-its-base-lacks.md",
       "staged-break-substitutes-a-synthetic-value.md",
       "status-set-in-a-subshell.md",
@@ -200,7 +210,9 @@
       "two-answers-to-one-question.md",
       "two-guards-one-question-two-answers.md",
       "two-readers-of-one-config-one-re-derived.md",
-      "vacuous-selector-empty-population.md"
+      "vacuous-selector-empty-population.md",
+      "waiver-row-that-hides-nothing-reds.md",
+      "worktree-crlf-outside-the-gated-population.md"
     ],
     "guides": [
       "ANNOTATION-STYLE.md",
