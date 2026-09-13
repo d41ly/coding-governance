@@ -87,9 +87,8 @@ change goes into the spec first, as a rev bump with its section 9 line.
 - **2, the driver writer.** Landed at 796c148a and 83e6024d. The driver now writes `driver.log` lines, so
   read `tools/unattended/runlog-writer.test.sh` before writing a test that reads them. The suites that
   were already under `tools/unattended/` are NEVER run: that is a standing owner rule.
-- **3, the gate verdict line.** Run only the new suite you write,
-  `tools/run-gates/run-gates.runlog.test.sh`. `GATE_CMD` stubs keep every arm off the real bar, and
-  the existing run-gates suites run after the build.
+- **3, the gate verdict line.** Landed at 33f1db94 and 78d97a48. The runner writes `gates.log` from
+  its EXIT trap, and `tools/run-gates/run-gates.runlog.test.sh` shows its real lines.
 - **4, the pre-push line.** The hook gates every push from this clone, the landing push included. Arm
   it through its own suite with `GOV_GATE_CMD` stubs, and never by pushing.
 - **5, the redaction table.** Every credential a fixture plants is a template expanded at test time,
@@ -100,7 +99,11 @@ change goes into the spec first, as a rev bump with its section 9 line.
 - **7, the `Decided:` trailer.** The method template and its rendered copy stay byte-paired, and the
   method stays under its row in `tools/template-size-limits.txt`, which the post-build run grades.
 - **8, 9 and 10, the model, the record and the schema leg.** Build on the fixtures of the units
-  before. Unit 8's real-population figures are re-measured, not copied from the spec. Build run-state
+  before. Unit 8's real-population figures are re-measured, not copied from the spec. Unit 1's golden
+  lines in `tools/runlog/fixtures/golden-lines.txt` were typed from the specs before any producer
+  existed. So unit 8 first re-derives each one from its producer's real output, in the suites of units
+  2, 3 and 4, and corrects the fixture in its own pass. Unit 3 found the gates line wrong: the runner
+  never writes `stage=legs`, and its `started` is not an epoch. Build run-state
   fixtures the way the driver's verbs leave them, never as typed `witness:` lines. Remember that
   `--close` writes no witness. The self-test arm that reads the driver's source is withheld and needs a
   carried row.
