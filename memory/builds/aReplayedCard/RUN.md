@@ -46,3 +46,5 @@ base: cf401f0ef134882d58a9da7fa3c0110097dbd95d
 2026-09-13T21:10:39Z review · item TOOL-aReplayedCard-1 · reason verdict BLOCKED · blockers 1
 
 2026-09-13T21:10:43Z review · item TOOL-aReplayedCard-2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-13T22:02:25Z review · item TOOL-aReplayedCard-1 · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · disposition fold
