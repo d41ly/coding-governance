@@ -22,6 +22,9 @@
 set -u
 st=0; n=0
 LEG="tools/unattended/check-brief-recorded.sh"
+# The fixture's own driver, beside the fixture's own leg. Derived from LEG rather than spelled, so the
+# fixture layout is written in one place.
+DRV="${LEG%/*}/unattended.sh"
 KIT="$(cd "$(dirname "$0")" && pwd)"
 [ -f "$KIT/check-brief-recorded.sh" ] || { echo "FAIL cannot find check-brief-recorded.sh beside this test"; exit 2; }
 
@@ -73,6 +76,30 @@ RM
     printf '# tBrief — run state\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\n## Parked\n' "$BASE" > memory/builds/tBrief/RUN.md
     git add -A >/dev/null; git commit -q -m "run state" --no-verify
 
+    # THE RUN'S PHASE, for the arms TOOL-dPolishedVitrine-14 added. A record carrying base, phase and
+    # witness in the grammar the driver writes. Every mode written before that unit falls through
+    # this case untouched and grades the phase-less record above, which is the fixture it always
+    # graded. `copied` lands a FIRST run and retires it before the unit is built, so the claim the
+    # build commit forges is one a retired record already made.
+    R=memory/builds/tBrief/RUN.md
+    REC='# tBrief — run state\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\nphase: %s\nwitness: %s\n## Parked\n'
+    case "$mode" in
+      live|reopened|baseonly) printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
+      landing|flip)           printf "$REC" "$BASE" LANDING "$BASE" > "$R" ;;
+      postrun)                printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
+      postrun-aborted|rotated|migrated) printf "$REC" "$BASE" ABORTED "$BASE" > "$R" ;;
+      copied)
+        printf "$REC" "$BASE" LANDED "$BASE" > "$R"
+        git add -A >/dev/null; git commit -q -m "records: the first run landed" --no-verify
+        H8=$(git hash-object "$R" | cut -c1-8)
+        git mv "$R" "memory/builds/tBrief/RUN.LANDED.$H8.md"
+        printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
+    esac
+    case "$mode" in
+      live|reopened|baseonly|landing|flip|postrun|postrun-aborted|rotated|migrated|copied)
+        git add -A >/dev/null; git commit -q -m "records: the run's phase" --no-verify ;;
+    esac
+
     # THE BUILD PASS. The brief file is written and hashed, then the row is appended to the run-state
     # file, then the product lands -- all in ONE commit, because `--brief` STAGES its row rather than
     # committing it. That is the whole reason this leg anchors on the build commit and not on its
@@ -114,12 +141,43 @@ RM
         # newest row is the dead one, and it must RED.
         printf '\n2026-06-02T00:00:00Z brief · item ARCH-tBrief-1 · reason %s memory/builds/tBrief/prompts/brief.md\n' "$H" >> memory/builds/tBrief/RUN.md
         printf '\n2026-06-02T01:00:00Z brief · item ARCH-tBrief-1 · reason 000000000000 memory/builds/tBrief/prompts/brief.md\n' >> memory/builds/tBrief/RUN.md ;;
+      # THE POST-RUN MODES RECORD NO BRIEF, every one of them: a unit built by hand after its run
+      # is exactly the shape the owner ruled out of this leg, and the modes that must still RED
+      # need the missing row to have something to red on.
+      live|landing|postrun|postrun-aborted|rotated|migrated) ;;
+      # THE BOUNDARY: the build commit is the one that writes the terminal phase.
+      flip) printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
+      # THE FORGERY, two ways. The build commit claims the run finished and the next commit makes it
+      # live again; `copied` forges a claim a record retired BEFORE the build commit already made.
+      reopened|copied) printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
+      # A record carrying a base and nothing else, and a base that spells a terminal phase. With no
+      # terminator on the claim, that base is what a phase read returns.
+      baseonly) printf '## Run facts\nbase: LANDED\n' > "$R" ;;
       *)
         printf '\n2026-06-02T00:00:00Z brief · item ARCH-tBrief-1 · reason %s memory/builds/tBrief/prompts/brief.md\n' "$H" >> memory/builds/tBrief/RUN.md ;;
     esac
     printf 'the product\n' > tools/product.sh
     printf 'regenerated index\n' > memory/LIVE.md
     git add -A >/dev/null; git commit -q -m "ARCH-tBrief-1: build the thing" --no-verify
+
+    # AFTER THE BUILD COMMIT. The forgeries put the run back to live, which no driver verb does; the
+    # rotation retires the finished record the way `--preflight` does, by renaming it to the name
+    # its own phase and blob derive, and starts a second run in the same commit.
+    case "$mode" in
+      reopened|copied|baseonly)
+        printf "$REC" "$BASE" BUILDING "$BASE" > "$R"
+        git add -A >/dev/null; git commit -q -m "records: the run is live again" --no-verify ;;
+      rotated)
+        H8=$(git hash-object "$R" | cut -c1-8)
+        git mv "$R" "memory/builds/tBrief/RUN.ABORTED.$H8.md"
+        printf "$REC" "$BASE" RUNNING "$BASE" > "$R"
+        git add -A >/dev/null; git commit -q -m "records: a second run, the first one retired" --no-verify ;;
+      migrated)
+        # The shape a kit migration gave six real aborted records: a fact ADDED to a finished record,
+        # which moves its bytes and none of its claim.
+        sed -i 's/^phase: ABORTED$/phase: ABORTED\nhalt-code: scope-approval-needed/' "$R"
+        git add -A >/dev/null; git commit -q -m "records: migrate a halt code onto the finished record" --no-verify ;;
+    esac
   ) >/dev/null 2>&1
   printf '%s' "$T"
 }
@@ -230,6 +288,8 @@ has   "liveness: the graded population is named" "$o" "graded 1 closed unit"
 has   "liveness: the cutoff population is named" "$o" "skipped by the"
 has   "liveness: the no-BASE population is named" "$o" "with no pinned run BASE"
 has   "liveness: the unbuilt population is named" "$o" "0 unit(s) unbuilt-in-range"
+has   "liveness: the post-run population is named, at zero" "$o" "0 unit(s) built after their run finished"
+has   "liveness: the unborne-claim population is named, at zero" "$o" "0 unit(s) built under a finished claim"
 has   "liveness: the exclusion set is printed beside the counts" "$o" "the record surface excluded from build-commit selection was"
 hasnt "liveness: it never claims a bare 'clean'" "$o" "clean"
 rm -rf "$T"
@@ -296,7 +356,10 @@ rm -rf "$T"
 # ---- library, because the leg refuses to run without one.
 T=$(mkfixture ok)
 D="$T/.brk"; mkdir -p "$D"
-cp "$LEG" "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$D/" 2>/dev/null
+# FROM `$KIT`, NOT `$LEG`. `$LEG` is relative to the cwd, so this copied whatever leg the invoking
+# shell happened to sit beside - the repo's own from the root, nothing at all from anywhere else - and
+# a suite run against a staged COPY of the kit graded the wrong leg here. Found by exactly such a run.
+cp "$KIT/check-brief-recorded.sh" "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$D/" 2>/dev/null
 # `#` as the delimiter, because the thing being inserted IS a pipe. The first spelling used `|`
 # and `&`, which re-inserts the match and produced `2>/dev/null head -5 |` - making `head` an
 # argument to `git log` rather than a stage after it. The fixture guard below is what catches that.
@@ -314,6 +377,123 @@ n=$((n+1)); [ "${_nc:-0}" -ge 2 ] || { echo "FAIL fixture no-op: history is $_nc
 o=$(cd "$T" && bash "$D/$(basename "$LEG")" 2>&1); rc=$?
 same "a truncated subject cache REFUSES" "$rc" "2"
 has  "a truncated subject cache names the shortfall" "$o" "so the build-commit walk below would miss commits and report every unit unbuilt-in-range"
+rm -rf "$T"
+
+# =============================================================================================
+# ONLY A UNIT BUILT DURING A RUN IS GRADED. TOOL-dPolishedVitrine-14, owner ruling 2026-09-13.
+# Every fixture below records NO brief, so each verdict is decided by the phase the run-state
+# record carried at the build commit and by nothing else. Each was observed against the leg as it
+# stood before the unit, and the build journal records what each one did there.
+# =============================================================================================
+
+# ---- THE RULING'S CASE. The run LANDED, then the unit was built by hand. Announced by id and
+# ---- reason, counted, and not graded.
+T=$(mkfixture postrun)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "built after the run LANDED: exits 0 with no brief recorded" "$rc" "0"
+has   "post-run: the skip ANNOUNCES itself and names the unit" "$o" "NOT GRADED — ARCH-tBrief-1"
+has   "post-run: it names the phase the record carried at the build commit" "$o" "read LANDED"
+has   "post-run: it says why no brief was owed" "$o" "built outside any run"
+has   "post-run: it names the record that still makes the claim at HEAD" "$o" "memory/builds/tBrief/RUN.md still makes that claim at HEAD"
+has   "post-run: the population is COUNTED on the liveness line" "$o" "1 unit(s) built after their run finished, not graded"
+hasnt "post-run: nothing is reported as a violation" "$o" "FAILED"
+rm -rf "$T"
+
+# ---- THE OTHER TERMINAL PHASE, and the set is the DRIVER'S. Staging ABORTED out of the fixture's
+# ---- driver must turn the same history RED, which is what shows the leg reads the set rather than
+# ---- spelling it. The guard is the effect: if the driver ever spells the line differently the sed
+# ---- changes nothing, the fixture stays green, and the assertion that it reds is what fails.
+T=$(mkfixture postrun-aborted)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "built after the run ABORTED: exits 0" "$rc" "0"
+has   "post-abort: announced, naming the phase" "$o" "read ABORTED"
+( cd "$T" && sed -i 's/^PHASES_TERMINAL="LANDED ABORTED"$/PHASES_TERMINAL="LANDED"/' "$DRV" )
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "ABORTED staged out of the driver's terminal set: the same history REDS" "$rc" "1"
+has   "terminal set staged: graded, and redded for the missing row" "$o" "NO brief row"
+( cd "$T" && sed -i '/^PHASES_TERMINAL=/d' "$DRV" )
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "driver declares no terminal set: REFUSES rather than grading every unit as live" "$rc" "2"
+has   "no terminal set: it says DEAD PROBE and names the declaration" "$o" "DEAD PROBE — the driver's PHASES_TERMINAL"
+hasnt "no terminal set: it printed no liveness line" "$o" "graded"
+( cd "$T" && printf 'PHASES_TERMINAL="LANDED aborted"\n' >> "$DRV" )
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "a terminal set carrying a non-token: REFUSES" "$rc" "2"
+rm -rf "$T"
+
+# ---- BUILT DURING THE RUN, with no brief: still RED, exactly as before this unit, and nothing is
+# ---- announced about a finished run because none was claimed.
+T=$(mkfixture live)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "built while the record read BUILDING, no brief: REDS" "$rc" "1"
+has   "during the run: the ordinary violation" "$o" "NO brief row"
+hasnt "during the run: no post-run skip" "$o" "NOT GRADED"
+hasnt "during the run: no unborne-claim notice" "$o" "GRADED ANYWAY"
+has   "during the run: the post-run count stays zero" "$o" "0 unit(s) built after their run finished"
+rm -rf "$T"
+
+# ---- THE BOUNDARY, from both sides. LANDING is the last live phase, so a unit built under it is
+# ---- graded; the commit that WRITES the terminal phase is the first one outside the run, because
+# ---- `--landed`'s witness is already on the remote and that commit's code is not in it.
+T=$(mkfixture landing)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "boundary: built while the record read LANDING, no brief: REDS" "$rc" "1"
+hasnt "boundary LANDING: no post-run skip" "$o" "NOT GRADED"
+rm -rf "$T"
+T=$(mkfixture flip)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "boundary: the build commit itself writes LANDED: exits 0" "$rc" "0"
+has   "boundary flip: announced and not graded" "$o" "NOT GRADED — ARCH-tBrief-1"
+rm -rf "$T"
+
+# ---- A RETIRED RECORD STILL MAKES ITS CLAIM. The unit was built under an ABORTED record that a
+# ---- second run's preflight then retired, so HEAD's run-state file is a different, live record.
+# ---- The retired one did not exist at the build commit and still carries the claim.
+T=$(mkfixture rotated)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "built after an ABORTED run a later run retired: exits 0" "$rc" "0"
+has   "rotated: announced and not graded" "$o" "NOT GRADED — ARCH-tBrief-1"
+has   "rotated: the retired record is what still makes the claim" "$o" "RUN.ABORTED."
+rm -rf "$T"
+
+# ---- THE CLAIM, NOT THE BYTES. A finished record edited after it finished, the way a kit migration
+# ---- edited six real ones, still bears out the claim the build commit read. A byte comparison would
+# ---- announce a forgery here; measured on the real tree, it would have done so for 17 of 25 units.
+T=$(mkfixture migrated)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+n=$((n+1)); [ "$(cd "$T" && git show HEAD:memory/builds/tBrief/RUN.md | grep -c '^halt-code:')" = 1 ] \
+  && echo "ok   migrated: the fixture's record really was edited after it finished" \
+  || { echo "FAIL fixture no-op: the migration edit did not land, so this arm would test nothing"; st=1; }
+same  "a finished record migrated after the build commit: exits 0" "$rc" "0"
+has   "migrated: still announced and not graded" "$o" "NOT GRADED — ARCH-tBrief-1"
+rm -rf "$T"
+
+# ---- THE FORGERY, both shapes. A finished claim nothing at HEAD bears out is ANNOUNCED and the unit
+# ---- is graded as though its run were live. `reopened` takes the claim back one commit later;
+# ---- `copied` forges the claim of a record retired BEFORE the build commit, which HEAD does carry,
+# ---- so only the absence test separates it from `rotated` above.
+T=$(mkfixture reopened)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "finished at the build commit, live again after it: REDS" "$rc" "1"
+has   "reopened: announced as graded anyway, naming the unit" "$o" "GRADED ANYWAY — ARCH-tBrief-1"
+has   "reopened: graded, and redded for the missing row" "$o" "NO brief row"
+has   "reopened: the population is COUNTED" "$o" "1 unit(s) built under a finished claim HEAD does not bear out, graded"
+hasnt "reopened: not skipped" "$o" "NOT GRADED"
+rm -rf "$T"
+T=$(mkfixture copied)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "a claim copied from a record retired BEFORE the build commit: REDS" "$rc" "1"
+has   "copied: announced as graded anyway" "$o" "GRADED ANYWAY — ARCH-tBrief-1"
+rm -rf "$T"
+
+# ---- THE CLAIM'S TERMINATOR. A record carrying a base and nothing else, whose base spells a terminal
+# ---- phase. Graded as an ordinary live unit; with the terminator gone the phase read returns the base
+# ---- and the leg announces a finished run nobody claimed.
+T=$(mkfixture baseonly)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "a base-only record at the build commit: graded as live, REDS" "$rc" "1"
+hasnt "base-only: the base is never read as a phase" "$o" "GRADED ANYWAY"
+hasnt "base-only: and never skips the unit" "$o" "NOT GRADED"
 rm -rf "$T"
 
 echo "--- $n arms, exit $st"
