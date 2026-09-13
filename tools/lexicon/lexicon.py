@@ -946,7 +946,7 @@ def check_ts_type_position(toks: list, src: str = "", i: int = -1) -> bool:
     return False
 
 
-def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
+def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None) -> list:
     """`[(kind, text, line)]` for TypeScript source: every CODE token, and nothing that is not code.
 
     `kind` is `word`, `op` or `jsx`. `op` is one of `( ) { } [ ] = : ; , < > =>` and `@` — the
@@ -971,6 +971,16 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
     or `,` is a parenthesis. The token itself is the same `op` either way, so nothing that reads
     the stream can tell the difference — only the owner walk asks, and it is the difference
     between `=> <A/>` returned and `=> mount(<A/>)` passed.
+
+    `conts`, when a set is passed, receives the INDEX of every token that opens a LINE while an
+    operator this lexer does not emit was the last thing consumed — `isValid(a) &&` then a
+    newline then `isValid(b)`, or `getItems()` then `.length`. The token stream cannot tell that
+    line from `return noop()` then `const el`, and the two ASI readers need to: the first
+    continues an expression, the second ends a statement. `pend` is the flag — set where an
+    operator is consumed silently, cleared where an operand ends, whether or not the operand
+    emitted a token (a string, a template, a regex and an element do not). Closing review
+    round 3: keying this on `expr_end` instead re-opened the generic-close boundary, because a
+    `>` clears `expr_end` too.
 
     WHAT IT CONSUMES WITHOUT EMITTING, which is the whole reason this is not a regex: single- and
     double-quoted strings, a template literal's TEXT, `//` and `/* */` comments, a regex literal,
@@ -1001,10 +1011,16 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
     expr_end = False
     i, n, line = 0, len(src), 1
 
+    pend = False
+
     def add_token(kind: str, text: str) -> None:
-        """Emit one token, unless we are inside a suppressed span."""
+        """Emit one token, unless we are inside a suppressed span; note a continuation."""
+        nonlocal pend
         if not suppress:
+            if pend and conts is not None and toks and line > toks[-1][2]:
+                conts.add(len(toks))
             toks.append((kind, text, line))
+        pend = False
 
     def read_string(j: int, q: str, wrap: bool = False) -> int:
         """The index just past the `q` that closes a string opened before `j`.
@@ -1063,6 +1079,7 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
                 stack.pop()
                 opens.pop()
                 expr_end = True
+                pend = False
                 i += 1
                 continue
             if src.startswith("${", i):
@@ -1089,6 +1106,7 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
                 stack.pop()
                 opens.pop()
                 expr_end = True
+                pend = False
                 continue
             if c == "<":
                 stack.append("jsxtag")
@@ -1113,6 +1131,7 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
                 stack.pop()
                 opens.pop()
                 expr_end = True
+                pend = False
                 i += 2
                 continue
             # COMMENTS ARE LEGAL INSIDE AN OPENING TAG and this frame had no case for them,
@@ -1215,6 +1234,7 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
             line += src.count("\n", i, j)
             i = j
             expr_end = True
+            pend = False
             continue
         if c == "`":
             stack.append("tmpl")
@@ -1227,9 +1247,11 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
                 line += src.count("\n", i, j)
                 i = j
                 expr_end = True
+                pend = False
                 continue
             i += 1
             expr_end = False
+            pend = True
             continue
         if c == "<":
             if jsx and not expr_end and not check_ts_generic(src, i) \
@@ -1306,6 +1328,7 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None) -> list:
             continue
         i += 1
         expr_end = False
+        pend = True
 
     if len(stack) > 1:
         construct, ln = opens[-1]
@@ -1453,10 +1476,23 @@ def read_ts_body_start(toks: list, k: int):
                 return j
             if depth == 0 and text in (";", ")", "}", ","):
                 return None
-            if text in ("(", "[", "<"):
+            if text == "<":
+                # A balanced run is an annotation's type arguments and is stepped over whole;
+                # an unbalanced `<` compares, and a comparison after a parameter list is a
+                # VALUE, not a return type. Counting it as a bracket let `(x) => x > 1` in a
+                # member value walk into a later `if (a < b) {` and take that block for the
+                # body (closing review round 3).
+                e = read_ts_angle_end(toks, j)
+                if e is None:
+                    return None
+                j = e
+                continue
+            if text in ("(", "["):
                 depth += 1
-            elif text in (")", "]", ">"):
+            elif text in (")", "]"):
                 depth -= 1
+                if depth < 0:
+                    return None
         j += 1
     return None
 
@@ -1525,25 +1561,29 @@ _TS_EXPR_CONTINUES = frozenset(("(", "[", "{", "=", ":", ",", "<", ">", "=>", "@
 
 
 
-def read_ts_expr_end(toks: list, k: int) -> int:
+def read_ts_expr_end(toks: list, k: int, conts=frozenset()) -> int:
     """The index just past the brace-less arrow body that starts at `k`.
 
-    It ends at a depth-0 `;` or `,`, at an unbalanced closer, or at a line break whose predecessor
-    cannot continue an expression — the ASI rule, applied to the tokens this lexer emits. An
-    ELEMENT opening a line continues the line before it: the lexer opens one only where an
-    operator preceded (`?`, `&&`, `||` — the ones it does not emit), since after an operand a
-    `<` is a comparison, so `cond` then a newline then `? <A/> : <B/>` reads as one expression.
-    So does a line opening with `:` or `,`. The ceiling that remains is a line opening with a
-    plain operand after one of those invisible operators — `cond` / `? a` / `: <B/>` — which
-    ends here at `cond`. The rule is the line and not the next semicolon, because the other
-    reading swallows every semicolon-less statement after the arrow, and a module-level
-    element two lines down would make a plain helper a component.
+    It ends at a depth-0 `;` or `,`, at an unbalanced closer, or at a line break that ends a
+    statement under ASI — the rule applied to the tokens this lexer emits, plus two facts the
+    lexer hands over. A line continues the one before it when its first token is in `conts`
+    (an operator this lexer does not emit was the last thing consumed: `isValid(a) &&` then
+    `isValid(b)`, `cond` then `? a`), when it opens with an ELEMENT (the lexer opens one only
+    after an operator), or with `:` or `,`; and it ends when the earlier line closed with a
+    token that cannot continue — a word, a closer, or a `>` that closes a generic run after
+    `as`, `satisfies` or `new`, while a comparison `>` continues. The ceiling that remains is a
+    line opening with `(` or `[` after an operand, read as a new statement — the one ASI hazard
+    every semicolon-free style guide tells its readers to avoid. The rule is the line and not
+    the next semicolon, because the other reading swallows every semicolon-less statement
+    after the arrow, and a module-level element two lines down would make a plain helper a
+    component. `check_ts_returned` is the backward twin and reads the same facts.
     """
     depth, m, j = 0, len(toks), k
     while j < m:
         kind, text, ln = toks[j]
-        if depth == 0 and j > k and ln > toks[j - 1][2] \
-                and toks[j - 1][1] not in _TS_EXPR_CONTINUES \
+        if depth == 0 and j > k and ln > toks[j - 1][2] and j not in conts \
+                and (toks[j - 1][1] not in _TS_EXPR_CONTINUES
+                     or check_ts_generic_close(toks, j - 1)) \
                 and kind != "jsx" and text not in (":", ","):
             return j
         if kind == "op":
@@ -1707,17 +1747,22 @@ def parse_ts_source(src: str, jsx: bool = False):
 
     The two lists are the ones `parse_ts_defs` has always returned, computed by the same
     predicates in the same order; the scope reads run only after a name is appended, so they
-    cannot move the population — with ONE deliberate exception the closing review made this
-    header own. The anonymous-function scope arm consumes a `function` word that no name follows,
-    and before it existed that word FELL THROUGH to the member arm, matched `_TS_NAME`, and
-    entered the population as a definition called `function`: `{ foo: function () {} }` graded
-    `foo` AND `function`. That was a fabricated identifier of the class the class-annotation arm
-    documents, it is gone, and the 1257-file identity measurement did not see it only because
-    the adopter corpus writes members as arrows. Pinned by an arm. Otherwise this is one walk
-    and not a second parser over the same tokens.
+    cannot move the population — with TWO deliberate exceptions the closing review made this
+    header own, both fabricated identifiers of the class the class-annotation arm documents.
+    The anonymous-function scope arm consumes a `function` word that no name follows, and
+    before it existed that word FELL THROUGH to the member arm, matched `_TS_NAME`, and entered
+    the population as a definition called `function`: `{ foo: function () {} }` graded `foo`
+    AND `function`. And `read_ts_body_start` once counted `<` and `>` as brackets and never
+    refused below zero, so a CALL inside an array or object member — `rail: [blk("Callout",
+    { title: "R" })]` — could balance by accident onto a later `{` and be graded as a method
+    named `blk`. Both are gone. Measured 2026-09-13 against the base reader over the adopter
+    corpus: 1261 of 1265 files identical, and the four that differ lose nine such call sites
+    and gain nothing. Each is pinned by an arm. Otherwise this is one walk and not a second
+    parser over the same tokens.
     """
     calls: set = set()
-    toks = scan_ts_tokens(src, jsx, calls)
+    conts: set = set()
+    toks = scan_ts_tokens(src, jsx, calls, conts)
     funcs: list = []
     types_: list = []
     scopes: list = []
@@ -1737,7 +1782,7 @@ def parse_ts_source(src: str, jsx: bool = False):
         if toks[body][0] == "op" and toks[body][1] == "{":
             scopes.append((body, read_ts_brace_end(toks, body), owner))
         else:
-            scopes.append((body, read_ts_expr_end(toks, body), owner))
+            scopes.append((body, read_ts_expr_end(toks, body, conts), owner))
 
     while k < m:
         kind, text, ln = toks[k]
@@ -1876,24 +1921,37 @@ def parse_ts_source(src: str, jsx: bool = False):
     owned: set = set()
     for mk in (i for i, t in enumerate(toks) if t[0] == "jsx"):
         inner = max((sc for sc in scopes if sc[0] <= mk < sc[1]), default=None)
-        if inner is not None and inner[2] >= 0 and check_ts_returned(toks, calls, inner[0], mk):
+        if inner is not None and inner[2] >= 0 \
+                and check_ts_returned(toks, calls, conts, inner[0], mk):
             owned.add(inner[2])
     return funcs, types_, owned
 
 
+#: What may sit before the dotted name of a generic run that ENDS a statement: `v as Foo<Bar>`,
+#: `x satisfies Foo<T>`, `new Map<string, Foo>` with no call parens. A `>` that pairs with an
+#: earlier `<` under any other head is a comparison — `a < b && c >` newline `d ? ...` — and
+#: continues (closing review round 3).
+_TS_GENERIC_HEADS = frozenset(("as", "satisfies", "new"))
+
+
 def check_ts_generic_close(toks: list, j: int) -> bool:
-    """Does the `>` at `j` CLOSE a type-argument run that follows a word — `Foo<Bar>` — rather
-    than compare? Read backward for the `<` whose balanced run ends exactly here.
+    """Does the `>` at `j` CLOSE a statement-ending type-argument run — `v as Foo<Bar>` — rather
+    than compare? Read backward for the `<` whose balanced run ends exactly here, then over the
+    dotted name before it (consecutive words, since `.` is not emitted) to the keyword that
+    heads it; anything but `as`, `satisfies` or `new` there is a comparison pair.
     """
     if toks[j][0] != "op" or toks[j][1] != ">":
         return False
     for i in range(j - 1, max(j - 400, 0), -1):
         if toks[i][0] == "op" and toks[i][1] == "<" and read_ts_angle_end(toks, i) == j + 1:
-            return toks[i - 1][0] == "word"
+            p = i - 1
+            while p >= 0 and toks[p][0] == "word" and toks[p][1] not in _TS_GENERIC_HEADS:
+                p -= 1
+            return p >= 0 and p < i - 1 and toks[p][0] == "word" and toks[p][1] in _TS_GENERIC_HEADS
     return False
 
 
-def check_ts_returned(toks: list, calls: set, start: int, mk: int) -> bool:
+def check_ts_returned(toks: list, calls: set, conts: set, start: int, mk: int) -> bool:
     """Is the element at `mk` the VALUE of the body that starts at `start`?
 
     `m_` below is the token count, bound once because two walks need it.
@@ -1930,8 +1988,11 @@ def check_ts_returned(toks: list, calls: set, start: int, mk: int) -> bool:
             # the `?` or `&&` this lexer does not emit sat before it. And a `>` at line end is
             # two things: the close of a generic run after a word (`return v as Foo<Bar>`), a
             # boundary; or a comparison (`return a >` newline `b ? <B /> : null`), a
-            # continuation. `read_ts_expr_end` states the ceiling.
-            if depth == 0 and toks[j][2] < toks[j + 1][2] \
+            # continuation. A token in `conts` opens its line after an operator the lexer
+            # consumed silently — `isValid(a) &&` then `isValid(b)` — and continues too; round 3
+            # found the closer-first ordering breaking INSIDE that expression, on prettier's own
+            # output. `read_ts_expr_end` states the ceiling.
+            if depth == 0 and toks[j][2] < toks[j + 1][2] and (j + 1) not in conts \
                     and (text not in _TS_EXPR_CONTINUES or check_ts_generic_close(toks, j)) \
                     and toks[j + 1][0] != "jsx" and toks[j + 1][1] not in (":", ",", "="):
                 break
