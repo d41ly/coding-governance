@@ -58,6 +58,9 @@ each other's contention to the wrong budget, and a declared mode carries that co
 instead of implying it. (2) The batching units are BUILT, after the shard route, not retired.
 (3) Everything on this branch lands.
 
+**OWNER RULING, 2026-09-13.** The build agents run no self-test on every step: build first, then
+ONE verification pass when the build is complete. Unit 3's first pass was stopped for it.
+
 ## Parked decisions
 
 None yet.

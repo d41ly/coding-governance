@@ -52,65 +52,77 @@ No arm's verdict changes. The suite is RED at BASE and stays RED; that is not yo
 `memory/builds/aBatchedArm/` (records). Declare all seven with `--dispatch` before the first edit;
 if building uncovers an eighth, re-declare WIDER before the commit, never narrower.
 
-## The order, because six of the runs cost twenty minutes to two hours each
+## OWNER RULING 2026-09-13 — no self-test runs during the build; ONE verification pass at the end
 
-Every long run goes on a FROZEN clone — `git clone --local` into a SHORT path under `$TEMP`
-(a clone into the scratchpad hits MAX_PATH) — with its stdout redirected to a file. Never read a
-result through `tail`; grep the file. The Bash tool's ceiling is ten minutes, so start each long
-run with `run_in_background` and wait for its completion notification; do not poll it with sleep
-loops, which spawn and contaminate the timing. Before each TIMED run, `ps` the box for another
-`run-gates`/`run-selftests`/`check-unattended` and record the answer; a timing taken beside another
-bar is NO READING.
+The first pass of this unit was stopped after three hours with ten suites running concurrently on a
+box that was also carrying this session's own orphaned A/B runs; every timed reading it took was NO
+READING by its own ledger, and its untimed runs were still going. The owner ruled: **the build
+agents do not run self-tests on every step. Build everything first, then run the verification
+once, when the build is complete.** This supersedes the spec's §4 Rollout where that section grades
+each commit by a suite run — AC12's "own commit, graded alone" is satisfied by the final pass's
+unsharded `FAIL` set at HEAD equalling the one at BASE, since an unsharded run executes every arm
+whatever the arity; if that equality fails, bisect THEN, not before. Write a rev-8 §9 line recording
+the ruling and this reading of AC12.
 
-1. **AC4 arm one, at BASE, first.** On the frozen clone, two concurrent direct invocations
-   `bash tools/unattended/check-unattended.test.sh --shard 1/2` and `--shard 2/2`, each wrapped in
-   `date +%s` before and after, each captured to its own file. A reading exists only if its file
-   carries the trailer `(this leg ran shard k/2 only …)`; a red-but-complete run prints NO `PASS`
-   and NO `FAIL executed`, so neither is the witness. Record both walls and the longest.
-2. **The unsharded run at BASE**, same clone, captured whole: it yields AC12's baseline `FAIL` set
-   and AC6's pre-split floor-graded count (`$n` as the floor grade reads it — the PASS line, if any,
-   is 2 higher). It is not a timing, so it may overlap your editing, but not step 1 or step 8.
-3. **Commit one — the leak delete alone** (S5's `reset_tree` change, AC12). Derive the leaked set
-   from BOTH stores, delete the origin half through ONE extra spawn
-   `git --git-dir="$ORIGIN" update-ref --stdin` and the local half through the clone-side batch
-   that already exists. Then the unsharded run again on a fresh frozen clone at that commit: its
-   `FAIL` set must be byte-identical to step 2's, and `git ls-remote --heads "$ORIGIN"` plus
-   `git for-each-ref refs/heads` after a reset must show the fresh set. Both facts in the ledger.
-4. **Commit two — S1, S3, the replays and S6 together.** The cut, the hoist (derive the population:
-   every `name() {` between `:299` and the floor line; write the count into the HOIST SET note from
-   that derivation), eight floors, the per-boundary topology capture and replay, and the `MUT`
-   counter. The capture is ENV-GATED and inert by default — it must add no assertion and change no
-   verdict; set the variable only for the AC8 runs. Expect the derived leaked set to be EMPTY at
-   every boundary once commit one is in: seven skip lines naming the boundary is then the correct
-   AC8 record, and the ANCESTRY half of the capture (`git merge-base --is-ancestor unit main` and
-   whatever else a later arm depends on) is where the replays are actually owed. Do not manufacture
-   a plant to make a negative non-vacuous.
-5. **The staged breaks**, each against ONE shard run, each observed RED then unstaged: a mis-cut
-   region (AC2), a removed replay (AC8), the separated control (AC9), one un-hoisted helper (AC10),
-   a block stranded past an `exit` (AC11).
-6. **The serial readings, and the re-balance.** The rows need readings and the `--serial` pass
-   needs rows, so stage the eight rows with the OLD row's budget as a placeholder, run
+**Where the tree stands.** Commit one (`94a6b677`, the leak delete) and a CHECKPOINT (`cbf8ebce`)
+are on the branch. The checkpoint carries the stopped pass's edits UNVERIFIED: `SHARD_ARITY=8` cut
+at `reset_tree`-led edges, 27 helpers hoisted (derived, the spec's 28 counted a string inside a
+loop), `topo_capture` at every boundary with `replay_landed_main` at the boundary whose unsharded
+capture carries `unit<main`, the `MUT`/`MUT_EXPECTED` counter (13 cycles, block-declared), eight
+placeholder floors of `1`, the shard join in `run-selftests.sh --check` with two arms in its test,
+and both whole-suite notes retargeted. Its acceptance ledger at
+`memory/builds/aBatchedArm/build/2026-09-13-build-TOOL-aBatchedArm-3-1-acceptance-ledger.md` holds
+AC5 and AC12's head-set half already observed, and the trace-based per-line cost method it used.
+Read the checkpoint's diff (`git show cbf8ebce --stat`, then the suite file's diff against
+`94a6b677`) before editing: it is yours to keep, correct or redo, and nothing in it has been graded.
+
+**Phase A — finish every edit, run nothing.** What is left: the eight budget rows (S2) with a
+PLACEHOLDER budget equal to the old row's, the `install-prefix-carried.txt` count raised by hand
+with its fourth-column reason, any `--check`-visible defect in the join, and the `--check` and
+`--list` gates themselves (those are seconds, not suites, and are not what the ruling forbids).
+Commit as `TOOL-aBatchedArm-3 S1-S6: …`. The floors and the budgets stay placeholders until Phase B
+has readings; they are re-set in the closing commit.
+
+**Phase B — ONE verification pass, on an idle box.** Before it starts: `ps -ef` for any
+`check-unattended`, `run-selftests`, `run-gates` or `unattended.test` process; if any exists, it is
+an orphan of a dead turn or another session's run — record it, and do not start until the box is
+clear (kill only what `ps` shows descends from a dead ancestor; never another session's). Every run
+goes on a frozen `git clone --local` under a SHORT `$TEMP` path, stdout to a file, started with
+`run_in_background` and awaited through the completion notification — no sleep loops, no `tail`.
+The runs, in this order, each SERIAL with respect to the others unless stated:
+
+1. On a clone at BASE `0422ea2e`: the unsharded run (AC12's baseline `FAIL` set and AC6's
+   pre-split floor-graded count), then the two-shard reading as two CONCURRENT direct invocations
+   `--shard 1/2` and `--shard 2/2` stamped with `date +%s` (AC4 arm one). A reading exists only if
+   its output carries the trailer `(this leg ran shard k/2 only …)`.
+2. On a clone at HEAD (the Phase A commit): the eight shards through
    `bash tools/run-gates/run-selftests.sh --serial --kit tools/unattended/check-unattended.test.sh`
-   on a frozen clone of the staged tree, and read the eight walls from the runner's own rows. Those
-   same eight outputs are AC1's eight floor-graded counts and AC6's eight `FAIL` sets; ONE unsharded
-   run at the same tree gives the ninth count and the unsharded `FAIL` set. If `max(shard)` is
-   outside your DECLARED tolerance of `sum / 8`, move whole `reset_tree`-led blocks across the
-   nearest boundary and take one more serial pass; every candidate's readings go in the ledger
-   beside the one chosen. Each iteration costs a whole serial pass, so declare the tolerance before
-   the first reading and stop when it holds.
-7. **Commit three — S2 and S4**: the eight rows with their serial readings as budgets,
-   the `install-prefix-carried.txt` count raised by hand with a fourth-column reason naming the eight
-   literals, the ported join inside `run-selftests.sh --check`, its new arm in
-   `run-selftests.test.sh` (a deleted shard row reds naming the index; `unattended.test.sh` does not
-   red), and the two whole-suite notes retargeted.
-8. **AC4 arm two, at HEAD, on a fresh frozen clone, no other bar on the box:**
-   `bash tools/run-gates/run-selftests.sh --pooled --kit tools/unattended/check-unattended.test.sh`,
-   captured whole. The `SWEEP of 8 suite(s), width 8 (outer 8, inner 1)` line is the fixture
-   assertion; the eight walls come from the runner's own rows, each a reading only if that row's
-   output carries its trailer. Then compute: max, mean, the 20-minute verdict, and the ratio
-   max(eight) / longest(two-shard). At or above 0.5 the arity is LOWERED with both readings beside
-   it — that is F2's fallback and it is a finding, not a failure — and the lowering is a further
-   commit that re-cuts, re-floors and re-rows, not a note.
+   — one pass, eight rows one after another. It yields the eight serial walls (S2's budgets), the
+   eight floor-graded counts (AC1, S3's floors) and the eight `FAIL` sets (AC6). Then the
+   unsharded run at HEAD: the ninth count, the unsharded `FAIL` set (AC6, and AC12 against run 1).
+   With `CHECK_UNATTENDED_TOPO=1` (the checkpoint's env gate, `:467`) set on BOTH the unsharded
+   run and the eight, the captures are AC8's; the same outputs, no extra run.
+3. The staged breaks, batched into ONE concurrent batch of shard runs on a scratch copy: a mis-cut
+   region (AC2), a removed replay (AC8), the separated control (AC9), one un-hoisted helper (AC10),
+   a block stranded past an `exit` (AC11) — five breaks staged in five DIFFERENT shard indices of
+   one copy, the five shards run concurrently, each observed RED for its own reason, then the copy
+   discarded. One batch, not five runs.
+4. `bash tools/run-gates/run-selftests.sh --pooled --kit tools/unattended/check-unattended.test.sh`
+   on a fresh clone at HEAD with the box otherwise idle (AC4 arm two). The
+   `SWEEP of 8 suite(s), width 8 (outer 8, inner 1)` line is the fixture assertion; the eight walls
+   from the runner's rows; then max, mean, the 20-minute verdict, and max(eight) / longest(two).
+5. `bash tools/run-gates/run-selftests.test.sh` once, and `--check` and `--list` on the real tree
+   (AC3, AC5, AC7).
+
+If the balance is outside the tolerance you DECLARE before run 2 (`max(shard)` against `sum / 8`),
+re-cut using the per-line costs the checkpoint's trace method gives you and re-run ONLY run 2's
+eight rows — that is the one permitted repeat, and it is recorded as a candidate beside the chosen.
+
+**Phase C — the closing commit.** Floors from run 2's counts within ~3 % headroom, budgets from
+run 2's walls, the arity decision from run 4 (at or above 0.5 the arity is LOWERED with both
+readings beside it, a further re-cut commit, and run 2 and run 4 taken again for the new arity —
+the ruling's one-pass rule yields to F2's fallback, which is the spec's own repeat), every reading
+in the ledger with its witness, the spec header CLOSED with the rev-8 line.
 
 ## Traps this repo has already recorded, so you do not pay for them again
 
@@ -151,11 +163,11 @@ bar is NO READING.
 - `bash tools/run-gates/run-gates.gov.test.sh` still GREEN (its shard-contract half reads
   `gate-legs.json`, which you do not touch).
 - The install-prefix, memory-hygiene and line-length gates green on each staged diff.
-- Three commits in the Rollout's order, a fourth if F2's fallback fires, each with the unit id in
-  its subject; the spec's status header set to CLOSED in the last one, with a rev-8 §9 line if
-  anything diverged from rev-7.
+- Two commits after the checkpoint — Phase A and Phase C — a third if F2's fallback fires, each
+  with the unit id in its subject; the spec's status header set to CLOSED in the last one, with the
+  rev-8 §9 line recording the owner ruling and anything else that diverged from rev-7.
 - `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` run after each commit and acted on.
 
 Do NOT run `run-unattended-gates.sh` in any mode, the driver suite `unattended.test.sh`, or the
-bar's full self-test population as verification; the unit's measurement is the runs above and nothing
-else is owed.
+bar's full self-test population as verification, and do NOT run any suite before Phase B; the
+unit's measurement is Phase B and nothing else is owed.
