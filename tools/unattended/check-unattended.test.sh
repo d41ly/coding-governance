@@ -477,6 +477,14 @@ topo_capture() { # <boundary index>
   echo "topo boundary=$1 origin=[$o] local=[$l] unit<main=$a unit<origin-main=$b"
   echo "topo-at boundary=$1 t=$SECONDS n=$n"
 }
+# THE NAMED NEGATIVE's plant (AC8). A capture that always prints the fresh set is dead, and nothing
+# above can tell. CHECK_UNATTENDED_PLANT names heads, space-separated, that a fresh start does NOT
+# carry — the derived leaked set, `ahead` and `trunk` at this base — and they are created in BOTH
+# stores here, before any region, so shard k's opening capture must show them and differ from the
+# same shard's unplanted capture. Inert unless set; the region's first `reset_tree` deletes them.
+for _plant in ${CHECK_UNATTENDED_PLANT:-}; do
+  git branch -f "$_plant" HEAD >/dev/null 2>&1 && git push -q origin "refs/heads/$_plant" >/dev/null 2>&1
+done
 
 # ---- REGION 1 ------------------------------------------------------------------------------------
 # Bodies are NOT reindented: `check-arms.py` reads lines and skips comments, so an unindented wrapper

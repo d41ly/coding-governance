@@ -67,6 +67,47 @@ the commit-one blob) and the arm lines it leaves are byte-identical to commit on
   all three leaks survive, which is what the delete exists to stop. The `FAIL`-set half of this
   criterion is `s2base` against `s3c1` and is written below them when both end.
 
+## The second pass — under the 2026-09-13 owner ruling
+
+The first pass was stopped for running suites per step; its edits are the checkpoint `cbf8ebce`
+and nothing in it had been graded. `s2base` and `s3c1` above ended with no reading written, so
+every figure they were to yield is re-taken in Phase B below. This pass runs NO suite before
+Phase B, and Phase B is one verification pass.
+
+**Phase A, the static half.** Dispatch re-declared at `77f3946f` with `memory/guides/SESSION-KICKOFF.md`
+added, which the checkpoint touched and the first row did not name. Kept from the checkpoint:
+the cut, the 27 hoists, `topo_capture` at boundaries 2..8, `replay_landed_main` at 4, the `MUT`
+counter with `MUT_EXPECTED=13` (re-counted: 13 non-comment `reset_tree` calls from the
+declaration to the control, the control's own `reset_tree` included), eight placeholder floors,
+the join and its two arms, both notes. Added: the eight budget rows at the old row's `13600`
+as PLACEHOLDERS naming themselves so, the carried count `14 -> 21` raised by hand with its
+reason, and a `CHECK_UNATTENDED_PLANT` hook in the prologue, because AC8's negative needs the
+derived leaked set PLANTED before a shard's opening capture and the fixture is built inside the
+process where nothing outside can reach it. Inert unless set.
+
+**The three carriers, scanned at the eight-region cut (S5):**
+- functions — `awk` for `^name() {` between the first `in_shard` line and the floor line: 0
+  definitions remain inside any region; the 27 are in the prologue.
+- variables — two readings of one scan (`varscan.py`, scratch): a variable read in a region that
+  never assigns it while another region does: 0; order-aware, a variable read in a region before
+  that region's own first assignment while another region assigns it: 0. 27 variables are
+  prologue-assigned and read in regions, which is the direction a cut cannot break.
+- refs — traced by reading every `push`/`branch -f`/`checkout main`/`merge` line. Region 3's
+  lifecycle control (the text `land the run`, pushed) leaves `unit` an ancestor of `main` in BOTH
+  stores and its closing `reset_tree` moves neither `main`; region 4's tWaive tail (the text
+  `git reset -q --hard "$ANCHOR0"; git push -q -f origin main`) restores both. Every other ref move
+  in regions 1..8 is an `anchor_break`/`anchor_restore` pair or an in-arm restore. Predicted:
+  boundary 4 owes the replay, boundaries 2, 3, 5, 6, 7, 8 match a fresh start. Derived leaked set
+  per boundary: `{ahead}` at 4..8 (pushed at the text `"$ahead:refs/heads/ahead"` in region 3),
+  EMPTY at 2 and 3 (`trunk` is created in region 8 and leaks past no boundary). Phase B run 2's
+  captures are the observation; this is the prediction they are checked against.
+
+Gates run in Phase A, seconds each, none a suite: `run-selftests.sh --check` — `declaration clean
+— 68 row(s)`; `--kit tools/unattended/check-unattended.test.sh --list` — exactly the eight rows,
+`declared total 108800s`; `check-install-prefix.sh` — RED first (`ROSE tools/run-gates/selftest-budgets.txt 14 -> 21`,
+the brief's predicted red), then clean after the hand raise; `check-line-length.sh` OK;
+`check-arms.py --check` rc 0; `run-gates.gov.test.sh` `PASS (16 assertions)`; `bash -n` on the suite.
+
 ## What this ledger does not evidence
 
-Pending.
+Pending Phase B.
