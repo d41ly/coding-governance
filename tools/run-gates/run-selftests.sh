@@ -356,7 +356,13 @@ PY
     fi
     for tok in $argv; do
       case "$tok" in
-        */*) git ls-files --error-unmatch -- "$tok" >/dev/null 2>&1 \
+        */*)
+          # A NUMERIC RATIO IS A SHARD TOKEN, NOT A PATH. `--shard 1/8` carries a slash and is what a
+          # sharded row's argv says, so it must not be handed to `git ls-files`. TOOL-aBatchedArm-4 S1.
+          # A REGEX, deliberately: the glob `[0-9]*/[0-9]*` reads as ONE digit then anything, so a
+          # digit-led directory name would slip past the tracked-path check — staged and proven.
+          [[ "$tok" =~ ^[0-9]+/[0-9]+$ ]] && continue
+          git ls-files --error-unmatch -- "$tok" >/dev/null 2>&1 \
                || { echo "run-selftests: row '$name' names '$tok', which git does not track" >&2; fails=1; } ;;
       esac
     done

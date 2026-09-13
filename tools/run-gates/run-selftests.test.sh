@@ -28,7 +28,7 @@ R='bash tools/run-gates/run-selftests.sh'
 B='tools/run-gates/selftest-budgets.txt'
 LEGS='tools/gate-legs.json'
 
-SELFTEST_FLOOR=43
+SELFTEST_FLOOR=45
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -131,6 +131,20 @@ arm "a row naming a path git does not track reds" 1 "which git does not track" \
 
 arm "a row with no argv and no leg of that name reds" 1 "has no argv and no leg of that name" \
     "printf 'orphan\t60\t\tworst of 3 readings 5s, x1.5\n' >> $B" \
+    "$R --check"
+
+# ---------------------------------------------------------------- the shard token, TOOL-aBatchedArm-4 S1
+# `--shard 1/8` carries a slash and is not a path. The predicate that admits it is a REGEX over the
+# whole token; a glob's `[0-9]*` is one digit then anything, so the second arm is the direction the
+# glob would have lost: a digit-led directory name is still handed to git and still reds.
+arm "a numeric-ratio token such as --shard 1/8 is admitted by --check, because it is not a path" 0 \
+    "declaration clean" \
+    "printf 'sharded\t60\tbash tools/suite-ok.sh --shard 1/8\tmeasured 2s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
+    "$R --check"
+
+arm "a DIGIT-LED untracked path is still refused by name, so the ratio predicate is a regex and not a glob" 1 \
+    "names '1abc/2suite.sh', which git does not track" \
+    "printf 'digitled\t60\tbash 1abc/2suite.sh\tmeasured 2s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
     "$R --check"
 
 # An EMPTY declaration passes BOTH directions by finding nothing in either, which is the vacuity the
