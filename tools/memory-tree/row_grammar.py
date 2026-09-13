@@ -109,7 +109,19 @@ def derive_families(conf):
     the conf would have joined the id grammar and NOT the document set, so its rotated archive would
     have gone unscanned while every row in it still keyed.
     """
-    fams = [p.split(":")[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
+    fams = []
+    for p in conf.get("FAMILIES", "").split():
+        # REFUSED, never dropped, and the shell refuses the same token for the same reason. The two
+        # derivations are different expressions over one declaration, so a malformed token is where
+        # they diverge: `nocolon` is dropped by both, but `spare:` is dropped by the shell's `*:?*`
+        # case and kept HERE as an empty string, which renders an empty alternation branch that
+        # matches `.2026-01-01.md`. Refusing is what makes the two agree by construction.
+        head, sep, tail = p.partition(":")
+        if not sep or not tail:
+            raise Problem(f"row-grammar: FAMILIES token '{p}' is not <discipline>:<FAMILY> with a "
+                          f"non-empty family; this module and check 10 derive the family set by "
+                          f"different expressions and would select different archives from it")
+        fams.append(tail)
     if not fams:
         raise Problem("row-grammar: FAMILIES is empty, so no row could be recognised and this check "
                       "would pass by finding nothing")
@@ -493,9 +505,13 @@ def cmd_selftest():
                               # THE POSITIVE. Without one that MUST be selected, both readers
                               # returning nothing is "agreement", and the arm passes over a predicate
                               # that selects nothing at all.
-                              "ARCH.2026-02-02.md": "- ARCH-tYes-1 · a real rotation, selected\n"})
-        arm("a frozen non-row file under archive/ is NOT scanned",
-            "row-grammar: clean (2 row(s)", lambda: cap(t11, c11))
+                              "ARCH.2026-02-02.md": "- ARCH-tYes-1 · a real rotation, selected\n",
+                              # THE SAME-DAY DISAMBIGUATOR, which nothing else exercises: delete
+                              # `[a-z0-9]*` from either reader and every other arm stays green.
+                              # `TOOL.2026-08-17b.md` in the dogfood repo is why it exists.
+                              "ARCH.2026-02-02b.md": "- ARCH-tYes-2 · the second rotation of one day\n"})
+        arm("a frozen non-row file under archive/ is NOT scanned, and a same-day disambiguated one IS",
+            "row-grammar: clean (3 row(s)", lambda: cap(t11, c11))
 
         # THE TWO READERS OF ONE RULE. check 10 in check-memory-hygiene.sh enumerates the same set in
         # shell; this module does it in Python. Neither can import the other, so the rule would be

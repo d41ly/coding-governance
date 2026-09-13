@@ -35,12 +35,21 @@ The 2026-08-17 rotation happened TWICE, on two branches, on one day, to one file
 that wrote `memory/archive/TOOL.2026-08-17.md` had never seen the commits that closed the rows it
 froze.
 
-`TOOL-cBriefedPilot-1` is the clean specimen. Its spec has read `**Status:** CLOSED` since rev-3 on
-2026-08-16, and commit `c32161be` flipped its backlog row OPEN → CLOSED on 2026-08-15. Walking
-`origin/main`'s ancestry, the row's status then alternates between CLOSED and OPEN nine times across
-three days before going absent entirely. `9d41abb1`, the commit whose branch created the archive, is
-**not** a descendant of `c32161be` — the two sat on parallel branches, and the one that rotated was
-the one that still believed the row was open.
+`TOOL-cBriefedPilot-1` is the clean specimen, and the decisive commit is a MERGE rather than a
+rotation. Its spec has read `**Status:** CLOSED` since rev-3 on 2026-08-16, and commit `c32161be`
+flipped its backlog row OPEN → CLOSED on 2026-08-15. Walking `origin/main`'s ancestry, the row's
+status then alternates between CLOSED and OPEN nine times across three days before going absent.
+
+The archive's copy was FIXED at `a39b2ef8`, whose two parents disagreed about this very row:
+`cfd40114` held 86 rows with it OPEN, `31d08316` held 35 rows with it CLOSED. The merge produced 90
+rows and took **OPEN**. That is the whole mechanism in one commit — not a branch that rotated in
+ignorance, but a merge that chose the stale side of a row its other parent had already closed.
+
+An earlier draft of this record named `9d41abb1` instead, on the strength of its not being a
+descendant of `c32161be`. That is true and irrelevant: `9d41abb1`'s copy of the archive holds 13 rows
+and contains no `TOOL-cBriefedPilot-1` row at all, so it cannot explain a state it never carried. The
+correction came from the Tier-2 review, and it is recorded rather than quietly swapped because the
+first version was a plausible story that the file's own history refutes.
 
 The row-keyed merge driver was failing during exactly that window. `c1af5dd2`'s own message records
 it: *"The row-keyed merge driver had failed (the known linked-worktree ConfError), so both index
@@ -85,8 +94,11 @@ and no id gone from the memory tree at all.
 
 ## The re-homed rows carry a recovered body, not the archive's
 
-All 15 grade CLOSED, established twice over: from each id's spec status header, and from the closing
-commit on `origin/main`'s ancestry. The two agree in every case. The archive preserves the PRE-close
+All 15 grade CLOSED, established twice over: from each id's spec status header WHERE ONE EXISTS — 13
+of 15 — and from the closing commit on `origin/main`'s ancestry. The two agree in every case.
+`TOOL-aStandingWrit-3` and `TOOL-cFinalBerth-3` have no spec of their own; for those the second
+witness is `cBriefedPilot-20`'s AC4, which names both, plus the tree itself, where neither defect
+reproduces. Stated exactly because "twice over" was written before the two exceptions were checked. The archive preserves the PRE-close
 body, because a closing commit often rewrote the sentence as well as the token — **4 of the 15
 differ**. Re-homing the archive text verbatim would have re-asserted claims the tree refutes:
 `TOOL-aStandingWrit-3`'s archive body says the unattended instruction layer "is unowned in this

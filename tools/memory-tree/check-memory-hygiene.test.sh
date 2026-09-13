@@ -1654,7 +1654,11 @@ mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$
   printf -- '---\nslug: tRot\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRot-1\n---\n\n# tRot\n' > memory/builds/tRot/README.md
   printf '# ARCH-tRot-1 — the owning unit\n\nIt cites ARCH-tMoved-1 in prose, so the moved id is CITED from outside the archive.\n' > memory/builds/tRot/spec/2026-08-01-spec-tRot-1.md
   # The live shard AFTER the rotation: the moved row is gone from here in both states below.
-  printf '# ARCH backlog\n\n> Rotated 2026-08-01 to [../archive/ARCH.2026-08-01.md](../archive/ARCH.2026-08-01.md).\n\n- ARCH-tRot-1 · OPEN · the owning unit\n' > memory/backlog/ARCH.md
+  # THE ROTATION NOTE SITS ON LINE 4, DELIBERATELY. A `head -3` window cannot see it, so the green
+  # control below can only be satisfied by the widened preamble window — which is the whole of what
+  # this build changed about that window, and was previously asserted by nothing. The dogfood shard
+  # carries its own notes on lines 4 and 5 for the same reason: two rotations plus a preamble line.
+  printf '# ARCH backlog\n\n> Mutable. Each row leads with one status token.\n> Rotated 2026-08-01 to [../archive/ARCH.2026-08-01.md](../archive/ARCH.2026-08-01.md).\n> Rotated 2026-08-02 to [../archive/ARCH.2026-08-02b.md](../archive/ARCH.2026-08-02b.md).\n\n- ARCH-tRot-1 · OPEN · the owning unit\n' > memory/backlog/ARCH.md
   printf '# rotated\n\n- ARCH-tMoved-1 · CLOSED · the moved row, which DEFINES its own id on this line\n' > memory/archive/ARCH.2026-08-01.md
   # CHECK 10 rides this tree, because it is the only fixture with a rotated BACKLOG shard — the case
   # the shipped check could not reach at all. ARCH.2026-08-01.md is named in the shard's preamble
@@ -1663,6 +1667,9 @@ mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$
   # not exist, and the `[ -f ]` guard skipped them. The RED arm is what fails without the fix; the
   # green control is what fails if the fix over-reaches and reds a shard that DID announce its cut.
   printf '# rotated, and announced by nobody\n' > memory/archive/ARCH.2026-08-03.md
+  # A SAME-DAY DISAMBIGUATED name, announced on line 5. Without it the `[a-z0-9]*` in both readers'
+  # patterns is dead weight that can be deleted with every arm still green.
+  printf '# rotated, second of its day\n' > memory/archive/ARCH.2026-08-02b.md
   git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
   git commit -q -m rotated --no-verify )
 outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null)
@@ -1677,7 +1684,10 @@ grep -qF 'memory/archive/ARCH.2026-08-03.md' <<<"$outa" \
   || { echo "FAIL check 10 did not reach a rotated BACKLOG archive — its live index is memory/backlog/ARCH.md, one level below the memory root, and resolving the stem at the root skips it in silence"; st=1; }
 n=$((n+1))
 grep -qF 'memory/archive/ARCH.2026-08-01.md' <<<"$outa" \
-  && { echo "FAIL check 10 red an archive its shard DOES announce — memory/backlog/ARCH.md names it on line 3, so this is the preamble window being too narrow or the resolution over-reaching"; st=1; }
+  && { echo "FAIL check 10 red an archive its shard DOES announce — memory/backlog/ARCH.md names it on LINE 4, which only the widened preamble window reaches; a head -3 window or an over-reaching resolution fails here"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/ARCH.2026-08-02b.md' <<<"$outa" \
+  && { echo "FAIL check 10 red a SAME-DAY DISAMBIGUATED archive its shard announces on line 5 — either the [a-z0-9]* suffix left the filename anchor or the preamble window is short"; st=1; }
 # ---- ...and now the SAME rotation with the archive unstaged. This is the state cSteadyMetronome saw.
 n=$((n+1))
 ( cd "$A" && git rm -q --cached memory/archive/ARCH.2026-08-01.md >/dev/null 2>&1 \

@@ -125,10 +125,10 @@ section honest rather than merely correct today: `check-wiring.sh` RUNS the conf
 scratch three-way before it reports `ok`, and `check-wiring.test.sh` DERIVES both spellings above by
 running `--fix` in a fixture of each layout, so a stray third spelling in this file reds the bar.
 
-## Upgrading to 2.71 — check 20's population widened, and your bar may red on arrival
+## Upgrading to 2.72 — check 20's population widened, and your bar may red on arrival
 
 Before 2.71, hygiene check 20 admitted a rotated archive only when its basename began `DECISIONS.`,
-so **every rotated BACKLOG shard went unscanned**. From 2.71 an archive is recognised by the name of
+so **every rotated BACKLOG shard went unscanned**. From 2.72 an archive is recognised by the name of
 the document it ROTATED — `DECISIONS` or a value declared in `FAMILIES`, plus a date and an optional
 same-day disambiguator such as the `b` in `TOOL.2026-08-17b.md`.
 

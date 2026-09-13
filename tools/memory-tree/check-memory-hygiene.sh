@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.71   # gov:kit memory-tree@2.71 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.72   # gov:kit memory-tree@2.72 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -184,9 +184,17 @@ esac
 [ -n "$_cfgbad" ] && { echo "HYGIENE — cannot run: project key(s) declared in .memory-tree.conf are unusable:$_cfgbad"; exit 2; }
 
 # OBSERVABILITY: a divergent configuration is visible without opening the conf.
+# ON STDERR, and that is load-bearing rather than tidy. The PRINT MODES below write one VALUE to
+# stdout and siblings compile it: `corpus_ids.py` does `re.compile(ask_shell("--print-append-only-ere",
+# root).strip())` and `gotchas.py` the same. With these lines on stdout the compiled pattern was the
+# two notices PLUS the ERE, which matches no path at all — MEASURED on this repo 2026-09-13:
+# `append_only` matched none of `memory/DECISIONS.md`, `memory/decisions/x.md` or
+# `memory/archive/…`, so the append-only exemption had been silently dead for as long as any project
+# key was set. A print mode that prepends prose to its value is a delegate answering a question it
+# was not asked, and the consumer cannot tell. Found by the Tier-2 review of TOOL-cSpliceWarden.
 for _dk in BUILD_SLUG_RE PROJECT_REGISTRY_EXTRA RECORD_SERVES_CUTOFF ENTRY_CAP_UNIT ROTATION_MODE; do
   eval "_dv=\${$_dk}"
-  [ -n "$_dv" ] && echo "memory-hygiene: project key $_dk='$_dv' (gov's default is blank)"
+  [ -n "$_dv" ] && echo "memory-hygiene: project key $_dk='$_dv' (gov's default is blank)" >&2
 done
 # CONVERGED. This branch (TOOL-aRelaxedShard-1) built the same feature independently and arrived at
 # two byte-only keys with blank resolving FORWARD to a shipped default. main's scheme is kept because
@@ -235,6 +243,15 @@ APPEND_ONLY_ERE="^$M/(DECISIONS\.md$|decisions/|archive/)"
 # body runs and `ROTATED_ARCHIVE_ERE` needs it. It used to sit below them, which is why this build
 # first added a SECOND derivation two lines up — two answers to one question, in the build that
 # added an arm to catch exactly that. One derivation, and every later consumer inherits its guards.
+# EVERY token is validated BEFORE the alternation is built, in the main shell. An `exit` inside the
+# `$( )` below would leave only the subshell and the script would carry on with the token silently
+# dropped — which is how the first cut of this guard returned rc=0 on `FAMILIES="a:ARCH nocolon"`.
+for _p in $FAMILIES; do
+  case "$_p" in
+    *:?*) ;;
+    *) echo "HYGIENE — cannot run: FAMILIES token '$_p' is not <discipline>:<FAMILY> with a non-empty family. Dropping it silently is not an option: this shell and row_grammar.py derive the family set by different expressions, and a malformed token makes them select DIFFERENT archives — a colon-less token is dropped by both, but a token with an empty family is dropped here and kept as an empty alternation branch there."; exit 2 ;;
+  esac
+done
 FAM_ALT=$(for p in $FAMILIES; do echo "${p#*:}"; done | paste -sd'|' -)
 # REFUSED, not defaulted, and for the same two reasons `derive_families()` refuses on the Python
 # side — one reader that raises and one that shrugs is the divergence this pair is built to avoid.
