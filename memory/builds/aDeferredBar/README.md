@@ -72,7 +72,7 @@ ids TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 TOOL-aDeferredBa
 | [TOOL-aDeferredBar-3 — the act refusal: a PreToolUse hook denies a flagged bar or a suite before VERIFYING](spec/2026-09-13-spec-TOOL-aDeferredBar-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-09-14 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
