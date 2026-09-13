@@ -34,7 +34,7 @@ ids TOOL-cRefutedPremise-1
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-cRefutedPremise-1 — two refuted claims, corrected in every live carrier rather than in the two that were reported](spec/2026-09-12-spec-TOOL-cRefutedPremise-1.md) | — | 1 | CLOSED | rev-1 | 2026-09-12 |
+| [TOOL-cRefutedPremise-1 — two refuted claims, corrected in every live carrier rather than in the two that were reported](spec/2026-09-12-spec-TOOL-cRefutedPremise-1.md) | — | 1 | CLOSED | rev-2 | 2026-09-13 |
 <!-- /gen:build-units -->
 
 Records: 0 bound to this build, across 1 record folder(s).

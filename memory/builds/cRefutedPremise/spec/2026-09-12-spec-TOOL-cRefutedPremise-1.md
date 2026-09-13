@@ -1,6 +1,6 @@
 # TOOL-cRefutedPremise-1 — two refuted claims, corrected in every live carrier rather than in the two that were reported
 
-**Status:** CLOSED · rev-1 · 2026-09-12 · node c · Tier-1 · base 09a22d2b · streams tooling
+**Status:** CLOSED · rev-2 · 2026-09-13 · node c · Tier-1 · base 09a22d2b · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -139,9 +139,18 @@ dossier, which is the defect `TOOL-dUnstalledConvoy-16` names.
   fixture: `node --check` was the first draft of this criterion and is NOT a syntax gate on node v24 —
   module auto-detection retries the parse and swallows the failure, per the kickoff manifest. A
   criterion that cannot fail is the class §7 names.
-- **AC7** — the full bar with kit self-tests is green, observed by
-  `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`. Red when: any leg fails; the
-  agent-cap restatement gate and the line-length gate are the two this diff could plausibly trip.
+- **AC7** — the declared merge bar is green, observed by
+  `GATE_FULL=1 bash tools/run-gates/run-gates.sh` — 51/51 at rev-2, with the 55 self-test legs HELD.
+  Red when: any leg fails; the agent-cap restatement gate and the line-length gate are the two this
+  diff could plausibly trip.
+  cost: **THE SELF-TEST BAR THIS CRITERION ORIGINALLY DEMANDED DID NOT COMPLETE ON NODE `c`, and that
+  is recorded as a skip rather than folded into the green.** `GATE_FULL=1 GATE_SELFTESTS=1` was run
+  and KILLED by its own 21600s wall with `govkit selftest` still executing; that leg alone declares an
+  11750s ceiling. The one self-test this unit's kit actually owes was run standalone instead:
+  `bash tools/hooks/agent-cap.test.sh`, 215 passed / 0 failed. It took 1926s against a 740s ceiling,
+  so the ceiling does not fit this node either — a cost verdict about node `c`, not about this diff.
+  `memory-hygiene self-test` (900s ceiling) likewise timed out and was not re-run; it is not this
+  unit's kit.
 
 ## 7. Gates
 
@@ -156,6 +165,11 @@ none
 
 - rev-1 · 2026-09-12 · written after the corrections landed in the working tree, at the owner's
   instruction to land the work as a tracked unit rather than a loose prose fix.
+- rev-2 · 2026-09-13 · MOVED AC6 and AC7 to what was actually observed. AC6 named `node --check`,
+  which the kickoff manifest records as no syntax gate on node v24; it now names the two checks that
+  can fail. AC7 demanded a self-test bar that node `c` could not finish inside its own 21600s wall,
+  so it now names the declared merge bar and carries the skip, the timings and the one kit self-test
+  run standalone. Neither edit touches the product.
 
 ## 10. Reuse audit
 
