@@ -24,3 +24,5 @@ base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 ## Parked
 
 2026-09-13T13:09:10Z review · item dLoggedFlight-spec-set · reason verdict BLOCKED · blockers 4
+
+2026-09-13T14:39:51Z review · item dLoggedFlight-spec-set · reason verdict BLOCKED · blockers 1
