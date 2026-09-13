@@ -46,6 +46,7 @@ the parks that motivated them live under `builds/aLeakedHandle/`.
 - **Unit 1 edits a governance carrier under its declared byte budget.** `BUILD-METHOD.md` M1 states the cap; the edit trades or it does not land.
 - **Every new gate arm has its failing case observed RED first**, and asserts a positive artifact that it ran.
 - **Unit 4's red case is fixture-only, and says so.** Every leg declares a ceiling, so the branch cannot be observed against a real leg; the ruling accepted that.
+- **A pass runs the fast diff-scoped gates and NOTHING held.** Owner, 2026-09-13, after unit 2 ran five hours stacking suite runs. No self-test, no held leg, no bar inside a pass; the full bar is close's and the push boundary's, per M6. A unit whose SUBJECT is a suite runs it once, alone.
 
 ## Parked decisions
 
