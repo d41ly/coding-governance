@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -24,7 +24,8 @@ process spawn on the hot path and must not change how the driver dies.
 
 - **S1** A START line written before the argument loop, and an END line written from an EXIT trap,
   both to `driver.log` under the journal root in the grammar of `TOOL-dLoggedFlight-1`. From a linked
-  worktree the line lands in the common dir, never under `.git/worktrees/`. Observed by AC1 and AC11.
+  worktree the line lands in the common dir, never under `.git/worktrees/`. The END line's `unit` and
+  `slug` fields follow the per-verb rule in §4. Observed by AC1, AC11 and AC13.
 - **S2** END carries `rc` and `exit=clean|unclean`. Every shell exit the driver makes after the
   trap is installed sets a clean-exit marker immediately before it, so `exit=clean` means the driver
   chose its exit and `rc` is that exit's status. A call killed by a signal reaches the EXIT trap with
@@ -61,9 +62,10 @@ process spawn on the hot path and must not change how the driver dies.
 - **S11** Carriers: a run-log paragraph in the protocol's section 2, a key row in its section 8, and
   one sentence in the verbs preamble. Each goes to its template and its installed byte copy, and the
   kit version moves from 1.19 to 1.20 across its carriers. Observed by AC10.
-- **S12** Two gotcha records under `memory/gotchas/`, one for `-nt` against a missing file and one
-  for a trapped signal waiting on a foreground child. Each is registered with `gotchas.py --write`
-  and claimed by a dossier. Observed by AC12.
+- **S12** Three gotcha records under `memory/gotchas/`: `-nt` against a missing file is true; a
+  trapped signal waits for the foreground child; and a fixed sleep before a signal does not place the
+  signal inside the child it means to interrupt. Each is registered with `gotchas.py --write` and
+  claimed by a dossier. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -93,13 +95,19 @@ process spawn on the hot path and must not change how the driver dies.
   replacing it. The install uses `builtin trap`, so a conf function named `trap` cannot intercept it.
 - Every shell exit after the install sets `RUNLOG_CLEAN=1` first. The sites are `:4973`, `:5009`,
   `:5015`, `:5019`, `:5020`, `:5032`, `:5039`, `:5040` and `:5059`. `:5021` is `--version`, which is not
-  journaled. The suite enumerates every `exit` after the install line and fails if one lacks the
-  marker, so a future exit site cannot slip past.
+  journaled. The suite enumerates every `exit` across the whole of `tools/unattended/unattended.sh`
+  and `tools/unattended/lib-unattended.sh`, excluding awk program text and comments, and fails on one
+  without the marker. The only exemptions are the named pre-install lines `:74`, `:275`, `:276`, `:279`
+  and `:310`. So an exit added later inside a verb body, the likeliest place, cannot slip past.
 - The START verb is `$1` when it is a declared verb. The START slug is `$2` when it matches the grammar
   `check_slug` enforces at `tools/unattended/unattended.sh:1060-1070`, a letter followed by letters,
   digits or dashes, bounded at 64. The shape test is factored out of `check_slug` into one predicate
-  both call, so there is no second grammar. END uses the parsed `VERB`, `SLUG`, `PH_SLUG` and the unit
-  field from whichever of `BR_UNIT`, the dispatch pass, `RS_ITEM` or `RV_SUBJECT` the verb set.
+  both call, so there is no second grammar. END uses the parsed `VERB` and `SLUG`, and reads every
+  other variable as `${NAME:-}` because the driver runs under `set -u`. The unit field comes from
+  `BR_UNIT` for `--brief`, `PK_ITEM` for `--dispatch` and `--rescope` only, and `RV_SUBJECT` for
+  `--review`. `PH_SLUG` is read for `--phase` only. `PK_ITEM` is also the free-text item of `--park`,
+  `--propose` and `--attest`, so it is never read for those. `unit` is written only when the value
+  matches the unit-id shape; otherwise `unit_bad=1` is set.
 
 ### Why no signal traps
 
@@ -181,8 +189,9 @@ one build folder, and never runs the existing unattended suites.
 
 - **AC1** — When `--park`, a refused `--park` (unknown argument, check 14) and `--phase` run in the
   sandbox, `driver.log` holds a START and an END for each. The END lines carry `rc=0`, `rc=1
-  checks=14` and a `phase_to` read from the file, all with `exit=clean`.
-  Red when: `fail()` stops recording checks, or `phase_to` is taken from `rc`.
+  checks=14` and a `phase_to` read from the file, all with `exit=clean`. Over the whole journal the
+  suite writes, every END nonce has a START.
+  Red when: `fail()` stops recording checks, `phase_to` is taken from `rc`, or an END is unpaired.
 - **AC2** — When a verb exits through each shell exit shape the driver has, END reads `exit=clean` with
   `rc` equal to the process exit status. The shapes are `exit "$status"`, an inline `--phase` exit and
   a usage error. A sandbox conf that sets its own `trap 'exit 0' EXIT` changes neither. The suite also
@@ -190,9 +199,10 @@ one build folder, and never runs the existing unattended suites.
   with no clean-exit marker. Observed with `bash <suite>`.
   Red when: the trap is installed after the argument loop, or before the conf source, or an exit site
   loses its marker.
-- **AC3** — When `--close` runs in the sandbox with `GATE_CMD` set to a 20 s `sleep` and the driver is
-  sent TERM after one second, its END reads `exit=unclean` and the driver has exited before the
-  child's 20 s would have elapsed. When a verb is sent KILL, its START stands alone and the nonce has no
+- **AC3** — When `--close` runs in the sandbox with `GATE_CMD` set to a stub that writes a ready file
+  as its first act and then sleeps 20 s, and the driver is sent TERM only after that file appears,
+  checked with a bounded poll that also asserts the stub is still running, its END reads
+  `exit=unclean` and the driver has exited before the stub's 20 s would have elapsed. When a verb is sent KILL, its START stands alone and the nonce has no
   END.
   Red when: a TERM trap is added, so the driver outlives the signal until the child returns, or the END
   reads `exit=clean`.
@@ -214,19 +224,28 @@ one build folder, and never runs the existing unattended suites.
   are unchanged and stderr carries one `unattended: run log` line.
   Red when: the write failure changes `rc` or prints to stdout.
 - **AC9** — When `bash <suite>` runs, it passes at or above its
-  `FLOOR_ASSERTIONS`, prints `PASS (<n> assertions)` and finishes inside its budget row, and
-  `tools/gate-legs.json` names no `tools/unattended/*.test.sh`.
-  Red when: the suite is unbudgeted, under its floor, or appears as a manifest leg.
+  `FLOOR_ASSERTIONS`, prints `PASS (<n> assertions)` and finishes inside its budget row.
+  `tools/gate-legs.json` names no `tools/unattended/*.test.sh`, and the suite is in the
+  `project-owned` include of `tools/unattended/kit.toml`.
+  Red when: the suite is unbudgeted, under its floor, appears as a manifest leg, or ships to adopters.
 - **AC10** — When `bash tools/unattended/adopt-unattended.sh --check` and `bash tools/check-kit-versions.sh`
   run, both are green with the protocol and verbs copies byte-identical to their templates at 1.20,
-  and check 22 of `tools/unattended/check-unattended.sh` accepts the new key.
-  Red when: the section 8 row or the example line is missing.
+  and check 22 of `tools/unattended/check-unattended.sh` accepts the new key. An anchored `grep -n` finds
+  the run-log paragraph in section 2 of `memory/guides/UNATTENDED-PROTOCOL.md` and the preamble
+  sentence in `memory/guides/UNATTENDED-VERBS.md`.
+  Red when: the section 8 row or the example line is missing, or the paragraph or sentence is absent
+  from both copies, which byte identity alone would pass.
 - **AC11** — When the suite runs a verb from a linked worktree of its sandbox and from the sandbox's
   primary tree, both lines land in `<common-dir>/runlog/driver.log`.
   Red when: the linked worktree writes under `.git/worktrees/`, or the primary tree finds no journal.
 - **AC12** — When `python tools/memory-tree/gotchas.py --for-paths tools/unattended/unattended.sh`
-  runs, it selects both new gotcha classes.
+  runs, it selects all three new gotcha classes.
   Red when: a record is unregistered or unanchored.
+- **AC13** — When `--brief`, `--dispatch`, `--rescope` and `--review` each run with a unit-id argument,
+  and `--phase` runs with a slug, each END carries that value in `unit` or `slug`. When
+  `--park --item "<free text>"` runs, no line contains the item text. When a unit-bearing verb is given
+  a value that is not unit-shaped, its END carries `unit_bad=1`.
+  Red when: `PK_ITEM` is read for a free-text verb, or an unset variable aborts the trap.
 
 ## 7. Gates
 
@@ -247,6 +266,11 @@ none
   defers a killed `--close` up to `GATE_BOUND`), M5 (no stamp means no `oob`), L1 (START's slug uses
   `check_slug`'s grammar through one shared predicate), H3 (a linked-worktree arm) and the two gotcha
   records the audit's left-shifts name.
+- rev-3 · 2026-09-13 · S1 S12 · §4 · AC1 AC2 AC3 AC9 AC10 AC12 AC13 · folded round-2 spec audit M3 (the unit
+  field reads `PK_ITEM` only for the verbs whose item is a unit, and every variable under `set -u`
+  defaults), M12 (AC3's TERM waits on a ready file the stub writes), L4 (the exit enumeration spans
+  both driver files), M13 (anchored presence greps for the carriers) and M1 (AC9 observes the
+  withholding), with the pairing duty and a third gotcha record.
 
 ## 10. Reuse audit
 

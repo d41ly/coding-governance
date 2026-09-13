@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
+**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -43,6 +43,10 @@ schema, independently of the renderer.
 - **S5** A render-then-grade arm. The clean fixture the leg is tested against is produced by
   `render_record` from a model fixture that populates every section with one value of each closed
   class. So a renderer and a leg that disagree fail the self-test. Observed by AC1.
+- **S6** A real-population arm for the runkey. The leg also derives, through
+  `derive_run_starts`, the start commit of every tracked `memory/builds/*/RUN*.md`, and refuses a build
+  in which two records share one. That uses one extra git call for the whole population. On this tree
+  it grades six rotated builds. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -53,7 +57,7 @@ schema, independently of the renderer.
 ### Edges
 
 - **consumes-from** `TOOL-dLoggedFlight-9` — the closed schema, the record naming and the renderer the
-  clean fixture comes from.
+  clean fixture comes from, with the run starts it reads from the model.
 - **hands-off** `TOOL-dLoggedFlight-11` — the leg that grades this run's own record before its landing.
 
 ## 4. Design
@@ -113,8 +117,14 @@ command.
   pointed at a pattern the renderer does not write, the self-test fails.
   Red when: an empty population reads as a green grade with no announcement.
 - **AC4** — When `check-records` runs over fixture indexes of 1 and of 100 records, it makes the same
-  number of git subprocess calls for both, and `tools/gate-legs.json` declares its ceiling.
-  Red when: the leg reads git per record.
+  number of git subprocess calls for both, and `tools/gate-legs.json` declares its ceiling. When a
+  staged record violates S2 while its working copy is clean, the leg reds, and in the reverse case it
+  stays green.
+  Red when: the leg reads git per record, or grades the working tree instead of the index.
+- **AC5** — When `check-records` runs on this tree, it reports the start commits of the six rotated
+  builds as pairwise distinct, and on a fixture build whose two records share a start commit it exits 1
+  naming both.
+  Red when: the key derivation collapses an archive into its successor and the leg stays green.
 
 ## 7. Gates
 
@@ -132,6 +142,8 @@ none
 - rev-2 · 2026-09-13 · S4 S5 · AC1 AC4 · folded round-1 spec audit B3 (the clean fixture is rendered by
   `render_record` from a model fixture carrying every closed class, so renderer-leg disagreement reds)
   and H9 (AC4's wall-clock floor becomes a constant git-call count), and L2 (the hand-off to unit 11).
+- rev-3 · 2026-09-13 · S6 · AC4 AC5 · folded round-2 spec audit L2 (an index-versus-working-tree arm) and
+  B1's left-shift (the leg asserts every build's run keys are distinct over the real population).
 
 ## 10. Reuse audit
 

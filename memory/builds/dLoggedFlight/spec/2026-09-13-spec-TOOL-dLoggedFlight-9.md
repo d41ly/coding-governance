@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
+**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -24,11 +24,13 @@ leg can prove nothing else got in.
 - **S1** `runlog.py record <slug> [--run <n>] --write` writes
   `memory/builds/<slug>/build/<date>-build-<FAMILY>-<slug>-<seq>-runlog-<runkey>.md`.
   `<FAMILY>-<slug>-<seq>` is the lowest unit id the record serves, which check 21's filename
-  projection requires. `<runkey>` is the first 8 hex of the commit that CREATED the run's run-state
-  file, found with `git log --diff-filter=A --follow`. That commit is tracked, fixed at preflight,
-  never rewritten, and distinct for every preflight, including a rotated record's. So every run
-  renders, journals or not, and two runs of one build on one date never collide. A run-state file
-  that was never committed has no key, and the command refuses with a named line. Observed by AC1.
+  projection requires. `<runkey>` is the first 8 hex of the commit that STARTED the run, read from the
+  model's `derive_run_starts` in `TOOL-dLoggedFlight-8` and never re-derived here, so the filename and
+  the window cannot disagree. Every run has a start commit, journals or not, and rotation gives each
+  run its own (TOOL-dClosedLexicon-11). A re-render of a run whose record already exists writes to that
+  record's existing path, found by its runkey, so a later render date never makes a second file. A
+  run-state file that was never committed has no start commit, and the command refuses with a named
+  line. Observed by AC1.
 - **S2** The head carries `**Serves:** journal <ids>`, listing the unit ids the run dispatched or
   closed, as ranges where contiguous, and only ids a spec H1 in this build defines. A run with no
   spec-defined id writes no tracked record and says so, since an unbound record moves a shrink-only
@@ -49,13 +51,13 @@ leg can prove nothing else got in.
   - closed vocabularies, each a list `RECORD_SCHEMA` owns:
     - coverage states: `present`, `absent`, `partial`, `dead` and `not-local`;
     - source names: `run-state`, `driver`, `gates`, `pushes`, `git`, `transcripts` and `build-folder`;
-    - ledger sources: `parked`, `rescope`, `override`, `review`, `trailer`, `spec-mark`,
-      `decision-log` and `ledger`;
+    - ledger sources: `decision`, `abort`, `override`, `waiver`, `rescope-retire`, `rescope-supersede`,
+      `review`, `trailer`, `spec-mark`, `decision-log` and `ledger`;
     - owner-turn positions: `launch`, `pre-run`, `in-window` and `post-close`;
     - gate verdicts: `GREEN`, `RED`, `REFUSED` and `NONE`;
     - the push decisions of `TOOL-dLoggedFlight-4`;
-    - the conformance items, conformance states, anomaly kinds and sub-classes of
-      `TOOL-dLoggedFlight-8`;
+    - the conformance items, conformance states, anomaly kinds and merged sub-classes of
+      `TOOL-dLoggedFlight-8`, with `no-progress` among the anomaly kinds;
     - review verdicts and exits.
 
   There is no free text, no absolute path, no session id, no host id and no command. Owner turns
@@ -63,10 +65,16 @@ leg can prove nothing else got in.
 - **S5** The integrity commitment: the sha256, line count and first and last timestamps of the journal
   lines attributed to this run, so an edit to the journal made after the render is detectable on the
   producing node. `runlog.py verify <record>` recomputes them. A run with no journal lines records
-  `commitment=none`. Observed by AC5.
-- **S6** A size cap of 24 KB, kept reachable for every input. The timeline is elided beyond its first
-  and last 60 rows, with the elided count stated. Anomalies and conformance rows beyond 40 each are
-  aggregated by kind with counts. The summary is never elided. Observed by AC6.
+  `commitment=none`, and `verify` on it exits 0 with a line saying there is nothing to verify.
+  Observed by AC5.
+- **S6** A size cap of 24 KB, kept reachable for every input by a bound on every section that grows:
+  - the timeline is elided beyond its first and last 60 rows, with the elided count stated;
+  - anomalies and conformance aggregate by kind with counts past 40 rows each;
+  - units aggregate by status with counts past 40 rows;
+  - decisions aggregate by ledger source with counts past 40 entries.
+
+  The summary is never elided. The `Data` twin is elided and aggregated by the same rules and carries
+  the same counts, so it can never exceed what the markdown shows. Observed by AC6.
 - **S7** The command renders from the model, writes the file, and prints the one follow-up it cannot
   run itself: re-render the build index, which the render step of `TOOL-dLoggedFlight-11` runs and
   stages. It also prints that the commit subject names the slug, never a unit id. Observed by AC7.
@@ -82,7 +90,7 @@ leg can prove nothing else got in.
 
 ### Edges
 
-- **consumes-from** `TOOL-dLoggedFlight-8` — the model this record renders.
+- **consumes-from** `TOOL-dLoggedFlight-8` — the model this record renders, and its run starts.
 - **hands-off** `TOOL-dLoggedFlight-10` — the schema leg that holds every committed record to S3 and S4.
 - **hands-off** `TOOL-dLoggedFlight-11` — the Skill step that renders, re-indexes and commits.
 - **hands-off** `TOOL-dLoggedFlight-12` — the question-answering skill reads this record first.
@@ -103,7 +111,7 @@ leaving a stale index for check 9 to find at the push.
 | identifier | kind | cell |
 |---|---|---|
 | `tools/runlog/record.py` | module | none |
-| `render_record`, `write_record`, `derive_runkey`, `derive_serves`, `measure_commitment`, `check_commitment` | functions | `py.function`, verb-led |
+| `render_record`, `write_record`, `derive_runkey`, `derive_serves`, `measure_commitment`, `check_commitment`, `resolve_record_path` | functions | `py.function`, verb-led |
 | `RECORD_SCHEMA` | constant | none |
 | `cmd_record`, `cmd_verify` | CLI subcommands | reserved `cmd` |
 
@@ -116,6 +124,8 @@ leaving a stale index for check 9 to find at the push.
 - A JSON file beside the markdown: rejected by check 21 (see §3).
 - A runkey from the driver's preflight nonce: rejected, since a run that started before the writers
   existed, this one included, has no such nonce.
+- A runkey from the run-state path's creation commit: rejected, since all six rotated builds resolve
+  their archive and their live record to one such commit.
 - Owner-turn clock times: rejected as new public data about when the owner was at the keyboard.
 
 ## 5. Production-readiness checklist
@@ -124,7 +134,8 @@ leaving a stale index for check 9 to find at the push.
   `TOOL-dLoggedFlight-10` over committed bytes.
 - perf / scale — rendering is proportional to the model, with no git call per row (AC8).
 - error / empty / loading states — a run with no specs writes no record and says why. A run with no
-  journals renders from its run-state file and git, with its coverage block saying so.
+  journals renders from its run-state file and git, with its coverage block saying so and
+  `commitment=none`.
 - observability — the coverage block, and a summary line naming how many sources were present.
 - risks — a public record describes timing and failure counts. That is already true of run-state rows
   and commit times; owner presence is kept out.
@@ -138,12 +149,14 @@ leaving a stale index for check 9 to find at the push.
 `<kit>` below is `tools/runlog`. Every criterion runs `python <kit>/selftest.py` unless it names another
 command.
 
-- **AC1** — When `render_record` renders two fixture runs of one build on one date, one with journals
-  and one with none, their file names differ in `<runkey>`, each key is the creating commit of that
-  run's run-state file, and each passes check 5's name grammar and check 21's projection in
-  `bash tools/memory-tree/check-memory-hygiene.sh` over a scratch tree. A never-committed run-state
-  file refuses with a named line.
-  Red when: the name drops the family or the runkey, or the journal-less run cannot be named.
+- **AC1** — When `render_record` renders the two runs of a fixture build rotated the way the driver
+  rotates, one run with journals and one with none, on one date, their file names differ in
+  `<runkey>`. Each key equals that run's `derive_run_starts` value, and each passes check 5's name
+  grammar and check 21's projection in `bash tools/memory-tree/check-memory-hygiene.sh` over a scratch
+  tree. Re-rendering the first run on a later date rewrites its existing file. A never-committed
+  run-state file refuses with a named line.
+  Red when: the two runs share a key, the name drops the family or the runkey, or a re-render makes a
+  second file.
 - **AC2** — When `derive_serves` reads a fixture run that dispatched units 2, 3 and 5 of a build whose
   specs define 1 to 5, the record serves `…-2..3 …-5`. A fixture with no spec-defined id writes nothing
   and exits 0 with a `no spec-defined unit` line.
@@ -156,12 +169,13 @@ command.
   appears and none of the four intruders does.
   Red when: a closed-vocabulary value is refused, or any field outside `RECORD_SCHEMA` reaches the file.
 - **AC5** — When `python <kit>/runlog.py verify` reads a record whose journal was edited after the
-  render, it exits 1 naming the mismatch, and exits 0 on the untouched journal.
-  Red when: the commitment is computed over nothing and always matches.
-- **AC6** — When `render_record` renders a fixture run with 500 timeline rows, 30 units and 200
-  anomalies, the record stays under 24 KB, states the elided and aggregated counts, and keeps every
-  anomaly kind that occurred.
-  Red when: the cap is passed, or an anomaly kind disappears.
+  render, it exits 1 naming the mismatch, and exits 0 on the untouched journal. On AC1's journal-less
+  record it reads `commitment=none` and exits 0 with its nothing-to-verify line.
+  Red when: the commitment is computed over nothing and always matches, or `commitment=none` fails.
+- **AC6** — When `render_record` renders a fixture run with 500 timeline rows, 60 units, 200 anomalies
+  and 300 ledger entries, the record stays under 24 KB. It states every elided and aggregated count,
+  keeps every anomaly kind that occurred, and its `Data` twin carries the same counts.
+  Red when: the cap is passed, an anomaly kind disappears, or the twin carries rows the markdown elided.
 - **AC7** — When `record --write` runs, stdout names the index re-render command and the slug-only
   commit subject.
   Red when: the command exits silently, leaving a stale index.
@@ -182,11 +196,14 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
-- rev-2 · 2026-09-13 · S1 S4 S5 S6 S8 · §4 · AC1 AC2 AC4 AC6 AC8 · folded round-1 spec audit B2 (the
-  runkey is the run-state file's creating commit, which every run has, so a journal-less run renders),
-  B3 (`RECORD_SCHEMA` enumerates every closed vocabulary the sections are made of, and AC4 renders one
-  value of each), M16 (anomalies and conformance aggregate past 40 rows so the cap stays reachable) and
-  L3 (the render's cost is a counted zero, and its time is report-only).
+- rev-2 · 2026-09-13 · S1 S4 S5 S6 S8 · §4 · AC1 AC2 AC4 AC6 AC8 · folded round-1 spec audit B2 (a runkey
+  every run has), B3 (`RECORD_SCHEMA` enumerates every closed vocabulary the sections are made of),
+  M16 (anomalies and conformance aggregate past 40 rows) and L3 (the render's cost is a counted zero).
+- rev-3 · 2026-09-13 · S1 S4 S5 S6 · AC1 AC5 AC6 · folded round-2 spec audit B1 (the runkey is the run's
+  start commit, read from the model, since a path's creation commit is shared by an archive and its
+  successor; a re-render keeps its file), M2 (units and decisions aggregate too, and the twin follows
+  the markdown's elision), L1 (`commitment=none` and its `verify` are observed) and L5 (the ledger
+  sources are the driver's four owed kinds and two owed acts).
 
 ## 10. Reuse audit
 

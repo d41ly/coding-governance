@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -22,7 +22,10 @@ producer invents a format and no consumer re-parses one.
 ## 2. Scope (IN)
 
 - **S1** A new kit at `tools/runlog/`: `kit.toml`, `README.md`, a `tools/govkit/registry.toml` entry
-  and a codebase-map dossier `memory/map/features/runlog.md`. Observed by AC1.
+  and a codebase-map dossier `memory/map/features/runlog.md`. The self-test and every file under
+  `fixtures/` are withheld from adopters by a `project-owned` rule, and the leg is carried by an
+  `[[exempt_leg]]` registry row rather than a descriptor `[[gate_leg]]`, per TOOL-aQuenchedHarness-3:
+  a self-test never reaches an adopter, as a leg or as a file. Observed by AC1.
 - **S2** The journal location contract: the directory `runlog` under the git COMMON dir, holding one
   file per producer, `driver.log`, `gates.log` and `pushes.log`. It is a data location, not a kit
   path. `resolve_journal_root` returns the same absolute path from the primary tree and from any
@@ -35,7 +38,7 @@ producer invents a format and no consumer re-parses one.
   `orphan-end`. Observed by AC3 and AC4.
 - **S5** A CLI entry `tools/runlog/runlog.py` with one subcommand here, `journal`, which prints the
   parsed lines of one producer file as JSON, with the bad-line count and the resolved path on stderr.
-  Observed by AC5 and AC7.
+  Observed by AC5, AC7 and AC9.
 - **S6** The kit self-test `tools/runlog/selftest.py`, a new held leg `runlog selftest`, and its
   budget row. Observed by AC6.
 
@@ -73,6 +76,7 @@ One act is one line. A line is TAB-separated fields, and every field is `key=val
 | `ev` values | `start` and `end` pair on `n`, the nonce; `once` is an unpaired act |
 | line length | at most 2048 bytes. A producer that would exceed it drops whole indexed fields, highest index first, and records how many as `<key>_more=<n>`, before it cuts any value |
 | unknown keys | preserved; a reader never drops a line for an extra key |
+| pairing duty | every `ev=end` line's nonce has an `ev=start` line in the same file; each producer's suite asserts it over its whole journal |
 
 Small appends are atomic in practice here: 8 concurrent shell writers produced 1600 of 1600 intact
 lines, measured 2026-09-13 on node `a` by the acquisition probe (PINNED). The grammar does not rely
@@ -140,9 +144,11 @@ the file is absent, which is a named state, not an error.
 because the spec-tokens leg joins every path a live spec's criteria name against the tracked tree.
 
 - **AC1** — When `python tools/govkit/govkit.py selfcheck` runs after this unit, it is green with the
-  `runlog` entry claiming every file under the kit, and the codebase-map leg is green with the new
-  dossier claiming the kit and its leg.
-  Red when: the registry entry or the dossier claim is missing and either leg names the kit.
+  `runlog` entry claiming every file under the kit, `selftest.py` and `fixtures/` resolving to
+  `project-owned`, and `runlog selftest` carried by an `[[exempt_leg]]` row. The codebase-map leg is
+  green with the new dossier claiming the kit and its leg.
+  Red when: the registry entry or the dossier claim is missing, or the self-test resolves to a landable
+  role.
 - **AC2** — When `parse_line` in `<kit>/runlog_lib.py` reads back a line whose values carry a TAB, a
   newline, a CR and a backslash, every value comes back byte-identical to what was written.
   Red when: the escaping is dropped from either direction and the arm compares a mangled value.
@@ -169,6 +175,10 @@ because the spec-tokens leg joins every path a live spec's criteria name against
   of zero, and a line with 30 indexed fields rendered through the kit's reference truncation stays at
   or under 2048 bytes with a `_more` count.
   Red when: the key grammar rejects a producer's key, or a value is cut before an indexed field drops.
+- **AC9** — When `python <kit>/runlog.py journal --producer driver` reads a fixture holding two good
+  lines and one torn line, stdout carries two JSON objects whose keys match the lines, and stderr
+  carries a bad-line count of 1 and the resolved path.
+  Red when: `journal` prints nothing, drops a key, or omits the count.
 
 ## 7. Gates
 
@@ -188,6 +198,9 @@ none
   uppercase dotted suffix its own example and the driver use; golden lines per producer), M4 (the
   truncation order: whole indexed fields drop into `_more` before any value is cut) and H9 (AC4's
   wall-clock floor becomes a count of per-line spawns and compiles).
+- rev-3 · 2026-09-13 · S1 S5 · §4 · AC1 AC9 · folded round-2 spec audit M1 (the self-test and fixtures
+  are withheld, per TOOL-aQuenchedHarness-3, and AC1 observes it), M14 (`journal`'s success output gains
+  AC9) and H3's left-shift (the grammar states the start-end pairing duty every producer suite checks).
 
 ## 10. Reuse audit
 

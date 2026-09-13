@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-6 — the transcript extractor: a run's action sequence, owner turns and cost
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
+**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -58,9 +58,10 @@ streamed, located through the session ids the driver recorded, and kept under th
   scans local sessions for a Bash call running `unattended.sh --preflight <slug>`, and marks the
   attribution `heuristic`. Observed by AC7.
 - **S8** A report-only measurement, `runlog.py extract --measure <tree>`, that prints rate and peak
-  working memory over a real tree and grades nothing. The self-test never reads a real transcript
-  store: it points `CLAUDE_CONFIG_DIR` and `--transcripts` at its own scratch tree before any arm
-  runs. Observed by AC8.
+  working memory over a real tree and grades nothing. The self-test never reads or writes a real
+  store. Before any arm runs it points every root the kit resolves at scratch: `CLAUDE_CONFIG_DIR` and
+  `--transcripts` for reads, and `RUNLOG_STATE_DIR`, `HOME`, `USERPROFILE`, `LOCALAPPDATA` and
+  `XDG_STATE_HOME` for writes. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -151,10 +152,11 @@ tree unless it names another command.
   Red when: the last copy wins or the order is file order.
 - **AC3** — When `scan_owner_turns` reads a fixture holding one human record, one null-origin
   `/compact`, one absorbed `queued_command`, one interrupt, one keepalive fire and one
-  `<local-command-…>` echo, it reports four owner turns and one keepalive. The written extract contains
+  `<local-command-…>` echo, it reports four owner turns and one keepalive. The keepalive's prompt
+  wording matches none of the three measured keepalive prefixes, so only the `CronCreate` join finds it. The written extract contains
   none of the fixture's free-text strings.
   Red when: the echo counts as a turn, the keepalive counts as one, or any fixture sentence appears
-  in the output file.
+  in the output file, or a prefix matcher finds the keepalive.
 - **AC4** — When `extract_session` reads a fixture holding a background Bash call whose notification
   arrives later as a queue enqueue, the call's end time is the enqueue's timestamp, not the launch
   acknowledgement's.
@@ -169,10 +171,10 @@ tree unless it names another command.
   it attributes that session to `tFixture` with `attribution=heuristic`.
   Red when: discovery attributes a session whose only mention is inside tool output.
 - **AC8** — When `read_records` streams a generated scratch tree of 20,000 records, the high-water
-  count of records it holds at once stays at one per open file, and the self-test's environment
-  points `CLAUDE_CONFIG_DIR` at the scratch tree. `extract --measure` prints a rate and a peak and
-  exits 0 without grading either.
-  Red when: a hold-everything reader returns, or an arm reads the real store.
+  count of records it holds at once stays at one per open file. The self-test's environment points every
+  root S8 names at scratch, and a sentinel file planted in a decoy "real" state root is untouched after
+  every arm. `extract --measure` prints a rate and a peak and exits 0 without grading either.
+  Red when: a hold-everything reader returns, or an arm reads or writes a real store.
 - **AC9** — When `build_usage` reads a fixture whose `requestId` repeats across three records, with
   usage in the main file, a direct agent file and a workflow agent file, the request counts once and
   the totals split three ways.
@@ -202,6 +204,9 @@ New arm: `tools/runlog/selftest.py` · each rule staged RED on its fixture · fl
   and every kind, class and flag, gain criteria), H9 and H10 (AC8 grades a bounded resident count over
   a synthetic scratch tree; the real-tree rate moves to a report-only command), M10's fixture note
   (planted credentials are templates) and M14 and M15's hand-off of positions and cost to the model.
+- rev-3 · 2026-09-13 · S8 · AC3 AC8 · folded round-2 spec audit M10 (the self-test isolates every root
+  it writes as well as reads, with a sentinel arm) and L3 (the keepalive fixture's wording defeats a
+  prefix matcher).
 
 ## 10. Reuse audit
 

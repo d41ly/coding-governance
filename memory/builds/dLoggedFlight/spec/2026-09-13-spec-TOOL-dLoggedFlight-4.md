@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-4 — the pre-push hook writes one line per push
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 4
+**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -24,8 +24,10 @@ to `pushes.log`, and pin the bar's run id so a push joins to its gate line exact
 - **S1** Right after `cd "$top"` at `.githooks/pre-push:49`, the hook resolves its git dir from
   `$top/.git`, a directory or the `gitdir:` line of a file, and its common dir as
   `<git-dir>/<commondir contents>` when that file exists, else the git dir itself. Both use builtin
-  reads. After the stdin loop it writes a START line in the grammar of `TOOL-dLoggedFlight-1`. Observed
-  by AC1 and AC7.
+  reads. After the stdin loop it writes a START line in the grammar of `TOOL-dLoggedFlight-1` and
+  installs the EXIT trap. The three default-branch refusals at `:95`, `:102` and `:108` run before the
+  stdin loop, so each writes one `ev=once` line instead, carrying `decision=refuse-default-branch`,
+  the remote fields, `lander` and the worktree, and no START or END. Observed by AC1 and AC7.
 - **S2** START carries every ref line from stdin as `ref.<i>=<local-ref> <local-sha> <remote-ref>
   <remote-sha>`, up to 10, with `ref_more=<n>` beyond. It also carries `lander=1` or `lander=0`, always
   written, according to whether the `push-main-active` marker exists in the git dir, and the
@@ -35,9 +37,9 @@ to `pushes.log`, and pin the bar's run id so a push joins to its gate line exact
   `remote_unnamed=1` instead. Either way the line records `url_userinfo=1` when `$2` holds a `user@`
   part. Observed by AC2.
 - **S4** An EXIT trap writes the END line with `rc`, `exit=clean|unclean` and a `decision`. The
-  decision is set before each exit and is one of `skip-nondefault`, `skip-delete`,
-  `refuse-default-branch`, `refuse-manifest`, `refuse-raw`, `refuse-head`, `full` and `scoped`. Every
-  exit after `:49` sets the clean-exit marker immediately before it. No TERM, HUP or INT trap is
+  decision is set before each exit after the stdin loop and is one of `skip-nondefault`,
+  `skip-delete`, `refuse-manifest`, `refuse-raw`, `refuse-head`, `full` and `scoped`. Every exit after
+  the trap is installed sets the clean-exit marker immediately before it. No TERM, HUP or INT trap is
   installed, because a trapped signal waits for the foreground bar, so a killed hook reads
   `exit=unclean`. Observed by AC1 and AC3.
 - **S5** When the hook runs the bar, it exports `GATE_RUN_ID` as `push-<epoch digits>-<pid>` and records
@@ -47,8 +49,10 @@ to `pushes.log`, and pin the bar's run id so a push joins to its gate line exact
   `EPOCHREALTIME` and appends are builtin. A failed write changes neither the exit code nor stdout and
   prints one `pre-push: run log` line on stderr. `GOV_RUNLOG=0` turns the lines off. Observed by AC5
   and AC7.
-- **S7** A new small suite, `.githooks/pre-push.runlog.test.sh`, shipped through the `push-main`
-  govkit entry beside `.githooks/pre-push.test.sh`, with its leg and budget row. Observed by AC8.
+- **S7** A new small suite, `.githooks/pre-push.runlog.test.sh`, with its leg and budget row. It is
+  claimed by the `push-main` govkit entry as `project-owned`, with its leg carried by an
+  `[[exempt_leg]]` registry row, per TOOL-aQuenchedHarness-3. `.githooks/pre-push.test.sh` ships to
+  adopters today, and changing that is not this unit's. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -77,9 +81,10 @@ loop gains an array of every ref line. Its exits are:
 - the bar's pass-through `exit "$rc"`, whose decision is `full` or `scoped`, with the marker set only
   after the bar returns.
 
-Each sets `RUNLOG_DECISION` and the clean-exit marker before it exits, and the EXIT trap reads both.
-The suite enumerates every `exit` in the hook and fails on one that maps to no decision and is not one
-of the two named exemptions.
+The three default-branch refusals come before the stdin loop, so each writes its own `ev=once` line and
+exits; the EXIT trap does not exist yet. Every later exit sets `RUNLOG_DECISION` and the clean-exit
+marker before it exits, and the EXIT trap reads both. The suite enumerates every `exit` in the hook and
+fails on one that maps to no decision and is not one of the two named exemptions.
 
 The hook resolves no git dir before `:157` today, and the lines must be writable on the early skips,
 so the builtin resolution is added at `:49`. `GATE_RUN_ID` is an existing seam of the gate runner
@@ -89,7 +94,8 @@ id cannot collide with a live run.
 ### Data model
 
 START: `v t p=pushes ev=start n remote remote_unnamed url_userinfo lander wt ref.1..ref.10 ref_more`.
-END: `v t p=pushes ev=end n rc exit decision gate_run`. Ten refs at about 180 bytes each keep START
+END: `v t p=pushes ev=end n rc exit decision gate_run`. A pre-loop refusal: `v t p=pushes ev=once
+decision remote remote_unnamed url_userinfo lander wt`. Ten refs at about 180 bytes each keep START
 under the 2048-byte cap.
 
 ### Inventory
@@ -135,15 +141,19 @@ remote and a work clone the way `.githooks/pre-push.test.sh` does, with the bar 
 - **AC1** — When `bash <suite>` pushes a feature branch, then the default branch with the marker and a
   green stub, then the default branch with no marker, `pushes.log` holds three START and END pairs.
   Their decisions are `skip-nondefault`, `full` or `scoped`, and `refuse-raw`, with `rc` 0, 0 and 1,
-  `lander` 0, 1 and 0, and `exit=clean`. A default-branch refusal at `:95` writes
-  `decision=refuse-default-branch`.
-  Red when: the trap misses an early exit, the refs are not recorded, or `lander=0` is omitted.
+  `lander` 0, 1 and 0, and `exit=clean`. A default-branch refusal at `:95` writes one `ev=once` line
+  with `decision=refuse-default-branch` and its worktree. Over the whole journal the suite writes,
+  every END nonce has a START.
+  Red when: the trap misses an early exit, the refs are not recorded, `lander=0` is omitted, or an END
+  is unpaired.
 - **AC2** — When `bash <suite>` pushes once through a named remote whose URL carries `user:pass@` and
   once to that bare URL, both line pairs carry `url_userinfo=1`, the bare push carries
   `remote_unnamed=1`, and no line contains `pass`.
   Red when: `$1` or `$2` reaches the line.
-- **AC3** — When the stubbed bar sleeps 20 s and the hook is sent TERM after one second, the END reads
-  `exit=unclean` and the hook has exited before the stub's 20 s would have elapsed.
+- **AC3** — When the stubbed bar writes a ready file as its first act and then sleeps 20 s, and the
+  hook is sent TERM only after that file appears, checked with a bounded poll that also asserts the stub
+  is still running, the END reads `exit=unclean` and the hook has exited before the stub's 20 s would
+  have elapsed.
   Red when: a TERM trap is added, so the hook outlives the signal until the bar returns.
 - **AC4** — When the hook runs the stubbed bar, the stub sees `GATE_RUN_ID` equal to the END line's
   `gate_run`.
@@ -161,8 +171,8 @@ remote and a work clone the way `.githooks/pre-push.test.sh` does, with the bar 
   figure: the exec count is DERIVED at observation time.
 - **AC8** — When `GATE_SELFTESTS=1` runs the `pre-push run-log line` leg, it passes at or above
   `FLOOR_ASSERTIONS` inside its budget, and `python tools/govkit/govkit.py selfcheck` is green with
-  the suite claimed by the `push-main` entry.
-  Red when: the suite ships unclaimed or unbudgeted.
+  the suite claimed by the `push-main` entry as `project-owned`.
+  Red when: the suite ships to adopters, or is unclaimed or unbudgeted.
 
 ## 7. Gates
 
@@ -183,6 +193,10 @@ none
   (ten refs, not twenty, fit the cap), M13 (the default-branch refusals get a decision, and `:47` and
   `:51` are named as unloggable), M17 (the stderr line) and M18 (no signal traps; a clean-exit marker
   instead).
+- rev-3 · 2026-09-13 · S1 S4 S7 · §4 · AC1 AC3 AC8 · folded round-2 spec audit H3 (the pre-loop refusals
+  write an `ev=once` line, so no END is ever unpaired, and AC1 checks the pairing over the journal),
+  M12 (AC3's TERM waits on a ready file the stub writes) and the withholding of the new suite per
+  TOOL-aQuenchedHarness-3.
 
 ## 10. Reuse audit
 

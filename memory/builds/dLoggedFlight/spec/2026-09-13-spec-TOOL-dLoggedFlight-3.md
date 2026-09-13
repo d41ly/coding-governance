@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-3 — the gate runner writes one verdict line per bar run
 
-**Status:** SPECCED · rev-2 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -42,8 +42,9 @@ the one seam every exit path after startup passes through, with no added process
 - **S5** A failed write never changes the runner's exit code or its stdout; it prints one stderr line.
   `GOV_RUNLOG=0` turns the line off. Observed by AC5.
 - **S6** A new small suite, `tools/run-gates/run-gates.runlog.test.sh`, with its held leg and budget
-  row. The kit version moves from 1.6 to 1.7 across its carriers, and the README's run-record section
-  names the line. Observed by AC6.
+  row. It is added to `tools/run-gates/kit.toml`'s `project-owned` list and its leg is carried by an
+  `[[exempt_leg]]` registry row, per TOOL-aQuenchedHarness-3. The kit version moves from 1.6 to 1.7
+  across its carriers, and the README's run-record section names the line. Observed by AC6.
 - **S7** A gotcha record under `memory/gotchas/` for the shape a signal trap takes when it calls the
   exit handler and then exits: the handler runs twice. It is anchored on `tools/run-gates/run-gates.sh`
   and claimed by a dossier. Observed by AC10.
@@ -150,7 +151,8 @@ builds `rec_repo`.
   Red when: a failed write changes `rc`, or the switch is ignored.
 - **AC6** — When `GATE_SELFTESTS=1` runs the `run-gates run-log line` leg, it passes at or above
   `FLOOR_ASSERTIONS` and inside its budget, and `bash tools/check-kit-versions.sh` is green at 1.7.
-  Red when: the suite is unbudgeted, uncounted, or the version carriers disagree.
+  `python tools/govkit/govkit.py selfcheck` resolves the suite as `project-owned`.
+  Red when: the suite is unbudgeted, uncounted, ships to adopters, or the version carriers disagree.
 - **AC7** — When `bash <suite>` runs a bar with 21 failing legs, its line carries `fail.20` and no
   `fail.21`, with `fail_more=1`, and stays at or under 2048 bytes.
   Red when: the cap is not applied, or the line overflows.
@@ -183,6 +185,8 @@ none
   counts lines for all three signals), M1 (`:1093` and `:1182` come after the trap and write a
   pre-header line), M2 (the pinned run id and the 21-leg cap are observed), H2 (the primary tree has no
   `commondir` file; the git dir itself is the common dir) and H3 (a linked-worktree arm).
+- rev-3 · 2026-09-13 · S6 · AC6 · folded round-2 spec audit M1 (the suite is withheld from adopters, per
+  TOOL-aQuenchedHarness-3, and AC6 observes it).
 
 ## 10. Reuse audit
 
