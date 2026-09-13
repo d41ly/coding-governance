@@ -1,6 +1,6 @@
 # TOOL-aReplayedCard-5 — `orient-counterfactual.js` measures one stage-2 arm per call
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node a · Tier-1 · base c4f02308 · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-1 · base c4f02308 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -24,12 +24,14 @@ the next session can run the matrix rather than design it.
 ## 2. Scope (IN)
 
 - **S1** `tools/workflows/orient-counterfactual.js`, a Workflow script taking `args`
-  `{repo, task, arm: {agent, recall, reuse}, runs}`. It spawns `runs` kickoff agents of the arm's
-  type from a two-element array literal, sequentially, each told to run the kickoff engine's Steps
-  0–4 for `task`, to run or skip the recall probe and the reuse probe per the arm, and to return
-  the READY line, the card bytes it would append, and its own start and end epoch milliseconds read
-  with `date`. It records `budget.spent()` before and after each spawn as the arm's token figure.
-  Observed by AC1 and AC2.
+  `{repo, task, arm: {agent, recall, reuse}}`. The run count is FIXED at two by a marked constant
+  literal, `const RUNS = [0, 1]` carrying `gov:fixed-verifiers`, iterated by a `for (const i of
+  RUNS)` header carrying `gov:sequential-agents(2)`, so the two kickoffs run one after the other
+  and never share the repository's wall clock. Each agent is spawned with the arm's type, told to
+  run the kickoff engine's Steps 0–4 for `task`, to run or skip the recall probe and the reuse
+  probe per the arm, and to return the READY line, the card bytes it would append, and its own
+  start and end epoch milliseconds read with `date`. The script records `budget.spent()` before
+  and after each spawn as the run's token figure. Observed by AC1 and AC2.
 - **S2** The script RETURNS the record — the arm, each run's token delta and wall, and the READY
   lines — because a workflow script has no filesystem access. The caller writes it under
   `memory/builds/<slug>/build/` in the ledger grammar, and the README says so in one line. Observed
@@ -39,10 +41,16 @@ the next session can run the matrix rather than design it.
   worktree isolation — shipped as a template. The harness's README states the install: copy it to
   `.claude/agents/orient.md` for the run and remove it after; nothing in this build wires it.
   Observed by AC3.
-- **S4** An arm whose agent type cannot be spawned is a named refusal in the record, never a zero:
-  the script catches the throw and returns `arm unavailable: <reason>`. Observed by AC3.
-- **S5** The script passes `tools/hooks/agent-cap.js` unmarked: its only fan is a two-element
-  literal and it calls no raw primitive. Observed by AC4.
+- **S4** Every run carries a closed `outcome` field — `spawned`, `null`, `threw` or
+  `refused-step` — so a dead arm is a named value the caller can grep, never a zero: a spawn that
+  throws is caught and recorded as `threw` with the message; a null return, which is the harness's
+  documented dead-agent shape, is `null`; an agent that spawned but reports it could not execute
+  a step, an Explore-typed one refused Bash say, is `refused-step` with the step named, and the
+  script then re-runs that arm once with the default workflow agent type, recording which type
+  ran. Observed by AC1 and AC3.
+- **S5** The script passes `tools/hooks/agent-cap.js` WITH the sequential marker: the one loop is
+  the marked `for (const i of RUNS)` over the marked literal, and it calls no raw primitive.
+  Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -64,7 +72,8 @@ One Workflow call per arm; eight calls for the matrix. `Date.now()` is unavailab
 workflow script, so wall is measured by the agent with `date +%s%N` at its first and last Bash call
 and returned in the schema; the harness never stamps time itself. Tokens are `budget.spent()`
 deltas, which count the workflow's own output tokens and are the only per-agent figure a script can
-read.
+read. Functions the script defines are graded by the js probe cell of `.lexicon.conf`, so they
+lead with table verbs: `runArm`, `measureRun`, `renderRecord`.
 
 ### Files touched (estimate)
 
@@ -81,8 +90,11 @@ read.
 - perf / scale — one arm is two kickoffs; the matrix is sixteen.
 - error / empty / loading states — S4.
 - observability — the record per call.
-- risks — the agent definition's discovery time is UNVERIFIED (design record §7 decision 2); AC3
-  settles whether a definition copied in mid-session is spawnable.
+- risks — the design record's §7 decision 2 records as UNVERIFIED whether an Explore-typed agent
+  can run Bash and the Skill tool, which bears on the Explore half of the matrix; S4's
+  `refused-step` outcome and fallback record the answer rather than a zero. Whether a definition
+  copied to `.claude/agents/` mid-session is spawnable is a second unknown the record does not
+  state; AC3 settles it.
 - testing — `check-workflow-syntax.js` on the script; AC1 runs one arm.
 - migration — none.
 - user docs — the workflows README.
@@ -90,9 +102,11 @@ read.
 ## 6. Acceptance criteria
 
 - **AC1** — When the harness is invoked once with `arm: {agent: "Explore", recall: true, reuse:
-  true}` and `runs: 2` on this repository, its return holds two runs, each with a non-zero token
-  delta and a wall figure, and that return is written to this build's `build/` folder.
-  Red when: a run returns null and the record reports zero for it.
+  true}` on this repository, its return holds two runs, each with an `outcome` field, a token
+  delta and a wall figure, the second run's start is after the first run's end, and that return is
+  written to this build's `build/` folder; a run whose outcome is not `spawned` names the type that
+  ran in its place or the reason none did.
+  Red when: a run returns null and the record reports zero for it, or the two runs overlap.
   cost: two Explore-typed kickoffs, minutes.
 - **AC2** — When that written record is read, it names the arm's four fields and states that the
   token figure is the `budget.spent()` output-token delta.
@@ -104,12 +118,13 @@ read.
   Red when: an unspawnable arm reports a measurement.
 - **AC4** — When `node tools/workflows/check-workflow-syntax.js` and
   `bash tools/workflows/check-verifier-fanout.sh` run at the landing commit, the new script passes
-  both.
-  Red when: the fan is read as unbounded or the file does not parse as an async function body.
+  both, and the fan-out check names the marked sequential loop as the one loop it admitted.
+  Red when: the loop is unmarked and read as an unbounded fan, or the file does not parse as an
+  async function body.
 
 ## 7. Gates
 
-`workflow script syntax` · `verifier fan-out` · `review-join ban (no ref-keyed join)` · `codebase-map coverage + freshness` · `memory hygiene`
+`workflow script syntax` · `verifier fan-out` · `review-join ban (no ref-keyed join)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `codebase-map coverage + freshness` · `memory hygiene`
 
 ## 8. Open questions
 
@@ -118,6 +133,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · §4 · §5 · §7 · S1 · S4 · S5 · AC1 · AC4 · folded the round-1 spec audit.
+  The run count is a marked two-element literal iterated by a `gov:sequential-agents(2)` loop, so
+  the kickoffs never overlap and the hook admits the shape (M6); every run carries a closed
+  `outcome` and an Explore arm that cannot run a step falls back to the default type, recorded
+  (M7); the design record's decision 2 is cited for what it says (M7); the lexicon and
+  install-prefix legs join §7 and the functions lead with table verbs (L3).
 
 ## 10. Reuse audit
 

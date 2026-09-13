@@ -1,6 +1,6 @@
 # TOOL-aReplayedCard-3 — the unattended Skill's resume section kicks off after `--resume`
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node a · Tier-2 · base c4f02308 · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base c4f02308 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -49,6 +49,8 @@ continues. The prompt path's step 1 stays where it is, and nothing above the tem
   READY card that never lands and stays denied.
 - **consumes-from** `TOOL-aReplayedCard-1` — the deny that makes a resumed run's un-oriented
   commit visible at all.
+- **consumes-from** `TOOL-aReplayedCard-2` — the wired writer; AC2 needs a fresh session's card to
+  append to, which exists only once the SessionStart entries are wired.
 - **hands-off** external — the kit self-test for `check-unattended.sh`, held by the 2026-08-23
   ruling; AC4 runs the check itself, not its suite.
 
@@ -105,12 +107,15 @@ should re-orient; the design record's improvement 7.
   section names `/session-kickoff` after the paragraph on scheduling the replacement keepalive and
   before `## Close`.
   Red when: the step is added above the reap paragraph, so a resumed run orients before it reaps.
-- **AC2** — When a run in a fresh session executes the resume section against a live run-state
-  file on this branch, the transcript shows the READY card and the orientation card ends with a
-  `READY —` line naming the build slug.
+- **AC2** — When a fresh session executes the resume section in a scratch clone of this branch
+  holding a throwaway run-state file in a non-terminal phase, written by `--preflight` against a
+  keepalive id that session scheduled itself, the transcript shows the READY card and that clone's
+  orientation card ends with a `READY —` line naming the throwaway build's slug.
   Red when: Step 5b halts at the READY stop because the run-state file was not read first.
-  fixture: this build's own `RUN.md`, resumed once from a fresh session; recorded in the ledger.
-  cost: one kickoff.
+  fixture: a scratch clone and a throwaway `RUN.md` — never this build's own, because the resume
+  section's first act reaps the recorded keepalive, and reaping the live run's job from a second
+  session is the failure the section exists to prevent; recorded in the ledger with the clone path.
+  cost: one kickoff, one keepalive scheduled and reaped by the fixture session.
 - **AC3** — When `bash tools/unattended/check-unattended.sh` runs at the landing commit, the
   rendered-versus-template byte compare passes.
   Red when: the template moved and the render did not.
@@ -131,6 +136,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · §3 · §6 · AC2 · folded the round-1 spec audit. AC2's fixture is a scratch
+  clone with a throwaway run-state file and its own keepalive, never this build's live `RUN.md`,
+  whose keepalive the resume section would reap from a second session (H9); a `consumes-from
+  TOOL-aReplayedCard-2` edge and order 5, because AC2 needs a wired writer (M5).
 
 ## 10. Reuse audit
 

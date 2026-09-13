@@ -1,6 +1,6 @@
 # KICK-aReplayedCard-2 — `--card --append` and `--card --check` run the batched citation check
 
-**Status:** SPECCED · rev-1 · 2026-09-13 · node a · Tier-2 · base c4f02308 · streams kickoff · order 3
+**Status:** SPECCED · rev-2 · 2026-09-13 · node a · Tier-2 · base c4f02308 · streams kickoff · order 3
 
 <!-- gen:spec-records -->
 
@@ -15,33 +15,42 @@
 ## 1. Goal
 
 Let the kickoff engine append its curated orientation to the card through the checker rather than
-by hand, with every cited path, line range and record id checked for EXISTENCE in one batched git
-call, an annotation on every miss, and a refusal when the card would breach its cap. The accuracy
-review the objective asked for is this mechanical half; truth at the cited line stays with the
-charter's verify-before-act rule.
+by hand, with every cited path, line range and record id checked for EXISTENCE in two batched
+spawns, an annotation on every miss, and a refusal when the card would breach its cap or carry a
+stale BASE. The accuracy review the objective asked for is this mechanical half; truth at the cited
+line stays with the charter's verify-before-act rule.
 
 ## 2. Scope (IN)
 
 - **S1** `--card --append --session <sid>` reads stdin, extracts every path-shaped token and every
-  id-shaped token, runs ONE `git ls-files -- <paths>` and ONE `git grep -l -F -f <tokenfile>` over
-  the memory root, and appends the body to the card. A path token carrying `:lo-hi` is a miss when
-  `hi` exceeds the file's line count. Observed by AC1, AC2 and AC3.
+  id-shaped token, and resolves them in TWO spawns: `git ls-files -- <paths>`, whose output is
+  per path, and `python tools/memory-tree/corpus_ids.py --print-defined-ids`, a new read-only verb
+  on the reader that already owns the id grammar and hygiene check 14, set-differenced against the
+  id tokens. A path token carrying `:lo-hi` is a miss when `hi` exceeds the file's line count. A
+  basename citation, the house style `run-gates.sh:407`, is resolved against `git ls-files` when
+  exactly one tracked file has that basename and is a miss when none or several do. Observed by
+  AC1, AC2, AC3 and AC9.
 - **S2** A miss is never dropped. The row stays and one `UNVERIFIED — <token>` line is added beneath
-  it, so an absent citation is visible and a present one is not mistaken for a vetted one.
-  Observed by AC2.
+  it, with `(ambiguous: <n> matches)` on a basename that resolved to several files, so an absent
+  citation is visible and a present one is not mistaken for a vetted one. Observed by AC2 and AC9.
 - **S3** Zero extractable tokens in the body is `DEAD PROBE: nothing to check`, exit 1, and nothing
   is appended. A probe that cannot move says so. Observed by AC3.
-- **S4** An append whose result would exceed the cap constant `KICK-aReplayedCard-1` declares
-  exits 2 naming the overage and leaves the file byte-identical. Observed by AC4.
-- **S5** A body carrying a `READY —` line replaces the card's `READY — none yet` sentinel in place
-  rather than adding a second READY line; a body with no READY line leaves the sentinel. Observed by
-  AC5.
-- **S6** `--card --check --session <sid>` re-runs S1's check over the whole stored card, prints each
-  miss, and exits 1 on any. It writes nothing. Observed by AC6.
-- **S7** The verb's header states what it does NOT check: relevance, scope correctness, tier, and
+- **S4** An append whose result would exceed `CARD_CAP_BYTES`, the constant `KICK-aReplayedCard-1`
+  declares, exits 2 naming the overage and leaves the file byte-identical. Observed by AC4.
+- **S5** A body carrying a `READY —` line whose tail is not `none yet` replaces the card's
+  `READY — none yet` sentinel in place, so the card holds exactly one READY line; a body with no
+  such line leaves the sentinel. Observed by AC5.
+- **S6** A body whose READY line carries a `base <sha>` that is not `git rev-parse HEAD` at append
+  time is refused with exit 2 naming both shas, so a BASE stale by a commit, a compaction or a
+  resume cannot land on the card whatever engine text produced it. Observed by AC8.
+- **S7** `--card --check --session <sid>` re-runs S1's check over the whole stored card, skipping
+  the `UNVERIFIED —` annotation lines themselves, prints each miss, and exits 1 on any. It writes
+  nothing. Observed by AC6.
+- **S8** The verb's header states what it does NOT check: relevance, scope correctness, tier, and
   the truth of a claim at the line it cites. NOT OBSERVED by a criterion: prose, read at review.
-- **S8** Every `fail` site added is armed and the `ARMS_FLOORS` entry moves in the same commit.
-  Observed by AC7.
+- **S9** Every refusal uses the script's `MANIFEST env ERROR — …` shape with its exit code, not the
+  numbered `fail` recorder, so `ARMS_FLOORS` does not move; every refusal is armed in
+  `manifest-check.test.sh` and `FLOOR_ASSERTIONS` moves in the same commit. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -51,6 +60,8 @@ charter's verify-before-act rule.
 - No waiver line; owner decision 2.
 - No per-token git spawn. The design record's verdict 40 measured the loop at 25–50 s for thirty
   tokens against ~1.1 s batched.
+- No second spelling of the id grammar in shell. `TOOL-cSpliceWarden-6` ruled that a check grading
+  a declared grammar delegates to the reader that owns it; `corpus_ids.py` is that reader.
 
 ### Edges
 
@@ -58,8 +69,8 @@ charter's verify-before-act rule.
   `READY — none yet` sentinel; without the card there is nothing to append to.
 - **hands-off** `KICK-aReplayedCard-3` — the engine's Step 5 body shape and the pipe into this verb.
 - **hands-off** `TOOL-aReplayedCard-1` — the single `READY —` line the deny reads.
-- **consumes-from** external — `git grep -F -f` over the tracked memory tree; an untracked record is
-  invisible to it and is reported as a miss, which the header states.
+- **consumes-from** external — `git ls-files` over the tracked tree and `corpus_ids.py`'s defined-id
+  set; an untracked record is invisible to both and is reported as a miss, which the header states.
 
 ## 4. Design
 
@@ -78,9 +89,11 @@ READY — <slug> · node <tag> · <branch> · base <sha> · Tier-<n> · gates <l
 ```
 
 Token extraction: a path token is a backticked or bare token with a slash and an extension, the
-same rule `tools/check-spec-tokens.py` uses at its line 142; an id token matches the families the
-conf declares, `FAMILY-<slug>-<seq>`. The two sets are written to one temp file and resolved by the
-two git calls. Line ranges are checked against `wc -l` of the resolved file.
+same rule `tools/check-spec-tokens.py` uses at its line 142, plus a basename-with-extension token
+followed by `:<line>`, which that lint counts and skips and this verb resolves when unique; an id
+token matches the families the conf declares, extracted by the same regex `corpus_ids.py` exposes.
+Paths go to one `git ls-files -- …` call; ids are joined against the defined set one python spawn
+prints. Line ranges are checked against `wc -l` of the resolved file.
 
 ### Inventory
 
@@ -89,6 +102,8 @@ two git calls. Line ranges are checked against `wc -l` of the resolved file.
 | `extract_card_tokens` | shell function | `manifest-check.sh` | leads with `extract`, a declared shape out of text |
 | `check_card_citations` | shell function | `manifest-check.sh` | leads with `check`, a verdict |
 | `add_card_body` | shell function | `manifest-check.sh` | leads with `add`, membership in the file |
+| `--print-defined-ids` | verb | `corpus_ids.py` | a print-only verb beside `--report` and `--measure` |
+| `print_defined_ids` | python function | `corpus_ids.py` | leads with `print`, stdout for a caller |
 
 ### Migration
 
@@ -103,9 +118,9 @@ Callable by hand from the commit that lands it; the engine pipes into it from
 
 | Path | Change |
 |---|---|
-| `skills/session-kickoff/manifest-check.sh` | three functions, the two verbs, the miss annotation |
-| `skills/session-kickoff/manifest-check.test.sh` | arms for S2, S3, S4, S5, S6 |
-| `.memory-tree.conf` | `ARMS_FLOORS` |
+| `skills/session-kickoff/manifest-check.sh` | three functions, the two verbs, the miss annotation, the BASE refusal |
+| `skills/session-kickoff/manifest-check.test.sh` | arms for S2, S3, S4, S5, S6, S7, S9; `FLOOR_ASSERTIONS` |
+| `tools/memory-tree/corpus_ids.py` | the `--print-defined-ids` verb |
 | `memory/guides/SESSION-KICKOFF.md` | `last-audit` re-stamp |
 
 ### Alternatives rejected
@@ -116,55 +131,77 @@ wrote; the annotation keeps the claim and marks it.
 **Checking truth at the line.** No cheap reader can; the header says so and the charter's §5 rule
 owns the rest.
 
+**`git grep -l -F -f` for ids.** `-l` names files, not tokens, so one call cannot say which id was
+absent; `-F` without `-w` lets `X-1` match inside `X-10`, the class
+`memory/gotchas/id-matched-as-a-substring.md` records; and a mention is not a definition, which is
+what hygiene check 14 exists to tell apart.
+
+**Skipping basename citations.** Half the corpus cites by basename; a silent skip on the card reads
+as vetted, and the lint this rule comes from prints its skip count for exactly that reason.
+
 ## 5. Production-readiness checklist
 
-- security — stdin is treated as data; tokens reach git only through `-f <file>` and `--`, never
-  through shell interpolation.
-- perf / scale — two git spawns per append, ~1.1 s measured for thirty tokens; the append happens
-  once per kickoff.
-- error / empty / loading states — zero tokens is DEAD PROBE; an over-cap body is refused; a missing
-  card is a refusal naming `--card` as the remedy.
+- security — stdin is treated as data; tokens reach git only through `--`, and the id set is read
+  from a python process's stdout, never through shell interpolation.
+- perf / scale — two spawns per append, ~1.1 s measured for thirty tokens on the git side; the
+  python spawn costs one interpreter start; the append happens once per kickoff.
+- error / empty / loading states — zero tokens is DEAD PROBE; an over-cap body is refused; a stale
+  BASE is refused; a missing card is a refusal naming `--card --write` as the remedy.
 - observability — every miss is printed and annotated; `--check` reports the whole card.
 - risks — an id that exists but is irrelevant passes; the header states existence-only.
 - testing — arms in `manifest-check.test.sh`, staged RED first.
 - migration — none.
-- user docs — the kit README's verb table.
+- user docs — the script's own header; the kit ships no README.
 
 ## 6. Acceptance criteria
 
 - **AC1** — When a body citing `skills/session-kickoff/SKILL.md:47-60` and the id
-  `TOOL-cBriefedPilot-11` is piped to `--card --append --session t2`, the card gains the body, no
-  `UNVERIFIED` line, and exactly two git processes were spawned by the check, observed with the
-  self-test's shadowed `git` function counting invocations.
-  Red when: a per-token loop spawns one git per token.
-  figure: DERIVED — the shadow counts at observation.
-- **AC2** — When a body cites a path that is not tracked, an id no record defines, and a range whose
-  `hi` exceeds the file's line count, the card carries each row followed by its own
-  `UNVERIFIED — <token>` line, and the append exits 0.
-  Red when: a miss is dropped or the append refuses.
+  `TOOL-cBriefedPilot-11` is piped to `--card --append --session t2` with a READY line whose base is
+  `git rev-parse HEAD`, the card gains the body, no `UNVERIFIED` line, and exactly one git process
+  and one python process were spawned by the check, observed with the self-test's shadowed `git`
+  and `python` functions counting invocations.
+  Red when: a per-token loop spawns one process per token.
+  figure: DERIVED — the shadows count at observation.
+- **AC2** — When a body cites a path that is not tracked, an id no spec defines though a record
+  cites it, an id `X-1` while `X-10` is defined, and a range whose `hi` exceeds the file's line
+  count, the card carries each row followed by its own `UNVERIFIED — <token>` line, and the append
+  exits 0.
+  Red when: a miss is dropped, the substring id passes, or the cited-but-undefined id passes.
 - **AC3** — When a body with no path-shaped and no id-shaped token is piped, stdout carries
   `DEAD PROBE`, the exit is 1, and the card is byte-identical.
   Red when: an empty check appends and exits 0.
 - **AC4** — When a body sized past `CARD_CAP_BYTES` is piped to `--card --append`, the exit is 2
   naming the overage and the card is byte-identical.
   Red when: a truncated append lands.
-- **AC5** — When a body carrying a `READY —` line is appended, the card holds exactly one line
-  starting `READY —` and it is the body's; a second append without one leaves it.
+- **AC5** — When a body carrying a `READY — t · node a` line is appended, the card holds exactly one
+  line starting `READY —` and it is the body's; a second append without one leaves it; a body whose
+  only READY line is `READY — none yet` leaves the sentinel and the card still holds one.
   Red when: `READY — none yet` survives beside the real line and the deny reads the wrong one.
 - **AC6** — When `--card --check --session t2` runs over a card holding one annotated miss, it
   prints the miss and exits 1; over a clean card it prints nothing and exits 0.
   Red when: `--check` reads the annotation lines as tokens and reports them as misses.
-- **AC7** — When `python tools/memory-tree/check-arms.py --check` runs, this script's floor has
-  moved by the `fail` sites added here and none is in `unarmed-branches.txt`.
-  Red when: an arm lands unasserted.
+- **AC7** — When `bash skills/session-kickoff/manifest-check.test.sh` runs, it prints `PASS` at or
+  above the moved `FLOOR_ASSERTIONS`, and `check-arms.py --check` reports this script's floor
+  unchanged.
+  Red when: an arm lands unasserted, or a refusal was written as `fail`.
+- **AC8** — When a body whose READY line carries a `base` eight commits behind `git rev-parse HEAD`
+  is piped, the exit is 2 naming both shas and the card is byte-identical.
+  Red when: a stale BASE lands and the charter's diff-scoping runs against the wrong sha.
+- **AC9** — When a body cites `manifest-check.sh:60` and `README.md:1`, the first resolves and is
+  not annotated and the second is annotated `UNVERIFIED — README.md:1 (ambiguous: <n> matches)`
+  with `n` equal to the count of tracked files named `README.md`.
+  Red when: a basename citation is neither resolved nor annotated.
+  figure: DERIVED — `git ls-files | grep -c '/README.md$'` at observation.
 
 ## 7. Gates
 
-`manifest-check self-test` · `harness arms (fail branches armed or pinned)` · `kickoff-manifest ratchet` · `lexicon naming predicates` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene`
+`manifest-check self-test` · `kickoff-manifest ratchet` · `lexicon naming predicates` · `shell hygiene (a loop fed by a command substitution)` · `memory hygiene` · `install-prefix (shipped surface)`
 
-New arm: `skills/session-kickoff/manifest-check.test.sh` · a body with an untracked path, an undefined id and an over-long range · this script's `ARMS_FLOORS` entry
-New arm: `skills/session-kickoff/manifest-check.test.sh` · a token-free body · same floors
-New arm: `skills/session-kickoff/manifest-check.test.sh` · a body past the cap · same floors
+New arm: `skills/session-kickoff/manifest-check.test.sh` · an untracked path, a cited-but-undefined id, `X-1` beside a defined `X-10`, an over-long range · `FLOOR_ASSERTIONS`
+New arm: `skills/session-kickoff/manifest-check.test.sh` · a token-free body · same
+New arm: `skills/session-kickoff/manifest-check.test.sh` · a body past the cap · same
+New arm: `skills/session-kickoff/manifest-check.test.sh` · a READY line with a stale base · same
+New arm: `skills/session-kickoff/manifest-check.test.sh` · a unique and an ambiguous basename citation · same
 
 The full bar is owed with `GATE_SELFTESTS=1`.
 
@@ -175,15 +212,23 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · §1 · §2 · §3 · §4 · §6 · §7 · S1 · S2 · S5 · S6 · S7 · S9 · AC1 · AC2
+  · AC5 · AC7 · AC8 · AC9 · folded the round-1 spec audit. Id existence delegates to a new
+  `corpus_ids.py --print-defined-ids` verb instead of a mention grep (H4, M8); basename citations
+  resolve when unique and annotate when not (M9); the sentinel exclusion is spelled in S5 (H1); a
+  READY line with a stale base is refused at the write boundary (M3's left-shift); `--check` skips
+  its own annotations (S7); refusals use the env-error shape and `ARMS_FLOORS` is dropped for
+  `FLOOR_ASSERTIONS` (M10); the user-docs row names the script header (L1).
 
 ## 10. Reuse audit
 
-The seam is the path-shaped rule in `tools/check-spec-tokens.py` line 142, reused verbatim rather
-than re-spelled, and the batched `git grep -F -f` shape the design record's skeptic measured
-against the per-token loop. `python tools/codebase-map/reuse_lookup.py "session orientation card
-written at session start, replayed after compaction, commit denied until READY"` returned
-`manifest-check.sh` as the seam and reported the shell layer unscanned; the extraction rule was
-found by reading the spec-token lint. The `UNVERIFIED —` annotation reuses the spelling the
-spec template already reserves for a claim not verified against source.
+The seams are `tools/memory-tree/corpus_ids.py`, the reader that owns the id grammar and hygiene
+check 14 and gains one print verb beside its `--report` and `--measure`, and the path-shaped rule in
+`tools/check-spec-tokens.py` line 142, reused rather than re-spelled. `python
+tools/codebase-map/reuse_lookup.py "session orientation card written at session start, replayed
+after compaction, commit denied until READY"` returned `manifest-check.sh` as the seam and reported
+the shell layer unscanned; the id reader was found through `TOOL-cSpliceWarden-6`, which ruled that
+a check grading a declared grammar delegates to its owner. The `UNVERIFIED —` annotation reuses
+the spelling the spec template already reserves for a claim not verified against source.
 
 Recall terms used: `manifest-check verb kickoff engine scratch-guard PreToolUse deny SessionStart matcher settings-merge fragment check-wiring arm session card compaction`
