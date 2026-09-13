@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards
 
-**Status:** OPEN · rev-6 · 2026-09-13 · node a · Tier-2 · base 0422ea2e · streams tooling · order 2
+**Status:** OPEN · rev-7 · 2026-09-13 · node a · Tier-2 · base 0422ea2e · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round4.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round4.md) | spec-audit | — |
+| [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round5.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round5.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -54,24 +55,28 @@ number so a moved line is a moved anchor rather than a wrong one.
   calls WITH `--shard`. Retarget BOTH whole-suite notes at it in the same commit: the kit runner's
   help text at `run-unattended-gates.sh` (the text `run UNSHARDED on purpose`) and the suite's own
   note at the text `WHAT A GREEN SHARD LEG IS EVIDENCE ABOUT`. Observed by **AC5**.
-- **S5** — the replay rule REUSES `TOOL-aShardedFloor-3` AC2's oracle, which sharded this file
-  once and rejected the two oracles this spec has tried since: **compare STATE, not verdicts.** At
-  each boundary the cut produces, the unsharded run captures `git ls-remote --heads "$ORIGIN"` and
-  `git for-each-ref refs/heads refs/remotes` at that line, and shard k captures the same at its
-  start; **a replay is owed at every boundary where the two differ, and is correct when they match
-  after it**, failing with both listings named. Verdict sets cannot do this: the helpers print only
-  on failure, so a red-at-BASE arm, a vacuous control or a shared needle leaves the `FAIL` set
-  unchanged with the state wrong — the blindness that record names and that rev-5 re-derived.
-  **The named negative, per boundary:** run the shard with the boundary's leaked refs planted and
-  again with them absent and require a DIFFERENCE in the capture, naming the arm each boundary
-  breaks, so the check reads the leak rather than passing over it. The leaks are DERIVED, not named:
-  every head `ls-remote` shows on the fixture origin that a fresh start does not — `refs/heads/ahead`
-  from the text `"$ahead:refs/heads/ahead"` and `trunk` from the text `refs/heads/trunk` are the two
-  at this base, and the derivation catches a third the day one lands. `reset_tree` gains one
-  origin-side delete of that derived set, batched into the `update-ref --stdin` it already runs on
-  the bare repo rather than one push per ref, so the unsharded run pays one spawn and not one per
-  leaked head per reset. The three carriers — variables, functions, refs — are scanned per boundary
-  and the scan is recorded. Observed by **AC8** and **AC12**.
+- **S5** — the replay rule compares TOPOLOGY, not verdicts and not shas. `TOOL-aShardedFloor-3`
+  AC2 rejected verdict vectors for the right reason and then compared sha-bearing listings, which
+  differ between any two processes and which its own build never discharged — so that oracle is
+  REFUSED here after round 5 measured it, and what survives of it is the STATE-not-verdict rule and
+  the named negative. The capture at each boundary is the set of ref NAMES on the fixture origin
+  and locally, plus the ANCESTRY relations among them that any later arm depends on — today the one
+  the `SH_I = 2` replay establishes, `unit` an ancestor of `main` — expressed as
+  `git merge-base --is-ancestor` verdicts, never as shas. The unsharded run captures that at each
+  boundary's line; shard k captures it at its start; **a replay is owed where the two differ and is
+  correct when they match after it**, both captures named on failure. **The named negative, per
+  boundary:** where the boundary's derived leaked set is non-empty, run the shard with it planted
+  and absent and require the NAME set to differ; where it is empty, the arm SKIPS naming the
+  boundary and that nothing existed to plant — a skip that announces itself, never a pass by
+  vacuity. The leaks are DERIVED from both stores: every head on the fixture origin or in the local
+  `refs/heads` that a fresh start does not carry. At this base that is `ahead` (origin, from the
+  text `"$ahead:refs/heads/ahead"`) and `trunk` (BOTH — created locally at the text
+  `git branch -f trunk main` and pushed at the next line). `reset_tree` gains the delete of that
+  derived set as ONE invocation against the bare origin, `git --git-dir="$ORIGIN" update-ref
+  --stdin`, because the `update-ref --stdin` it runs today addresses the CLONE and cannot reach the
+  origin; the local half rides the clone-side batch that already exists. The three carriers —
+  variables, functions, refs — are scanned per boundary and the scan is recorded. Observed by
+  **AC8** and **AC12**.
 - **S6** — the accumulation-dependent control gets a MECHANISM, not a placement, and the count it
   asserts is DECLARED BY ITS BLOCK, not typed here. The population by the note's own key is ONE arm,
   at the text `the tree is still clean after nine mutations`. Its block (the text `Nine branches,
@@ -140,9 +145,11 @@ AC1 by 14 on a correct cut.
 
 ### Rollout
 
-S1, S3, S5 and S6 land together — a re-cut region without its floor, its replay or its instrumented
-control is a shard that cannot fail on coverage. S2 follows once the serial readings exist. S4 last.
-AC4's two-shard reading is taken FIRST, at BASE, before any of it.
+The leak delete (S5's `reset_tree` change) lands FIRST in its own commit, with AC12 observed, so its
+effect on the unsharded verdict is never confounded with the re-cut's. Then S1, S3, the replays and
+S6 together — a re-cut region without its floor, its replay or its instrumented control is a shard
+that cannot fail on coverage. S2 once the serial readings exist. S4 last. AC4's two-shard reading is
+taken before any of it, at BASE.
 
 ### Alternatives rejected
 
@@ -195,10 +202,12 @@ join · `tools/unattended/run-unattended-gates.sh`, the whole-suite note · this
   two-shard longest wall taken on the SAME frozen clone at this spec's BASE, before S1 landed,
   as two concurrent direct invocations `check-unattended.test.sh --shard 1/2` and `--shard 2/2`
   timed with `date +%s` — direct, because at BASE no shard row exists for the runner to pool and
-  the arity-2 contract does. **Every timed invocation, all ten, is a reading only if its own
-  summary line (`PASS (…)` or `FAIL executed …`) is present in its captured output**; a timing with
-  no summary is an arm that did not run to its end, the class this repo's `ab-arm-must-prove-it-ran`
-  note records, and it is recorded as NO READING rather than as a number.
+  the arity-2 contract does. **Every timed invocation, all ten, is a reading only if the suite's
+  own TRAILER is present in its captured output** — the line at the text `this leg ran shard` for a
+  shard, the `PASS (…)` line for a green unsharded run, and for a red-but-complete unsharded run the
+  last `FAIL` line followed by exit; `PASS` and `FAIL executed` alone are NOT the witness, because a
+  red-but-complete run prints neither. A timing with no trailer is an arm that did not reach its
+  end, the class this repo's `ab-arm-must-prove-it-ran` note records, and is recorded as NO READING.
   `figure:` every number DERIVED from the two runs.
   `fixture:` the eight rows via the substring filter the runner honours; the profile row; the
   two-shard reading needs no row.
@@ -221,23 +230,26 @@ join · `tools/unattended/run-unattended-gates.sh`, the whole-suite note · this
 - **AC7** — When the eight rows are staged, `bash tools/check-install-prefix.sh` is green with the
   budgets-file count raised by hand and a fourth-column reason naming the eight literals.
   Red when: `ROSE`.
-- **AC8** — When shard k starts at each of the seven boundaries, its ref-state capture
-  (`git ls-remote --heads "$ORIGIN"` plus `git for-each-ref refs/heads refs/remotes`) EQUALS the
-  unsharded run's capture at that boundary's line, and the build log carries both listings per
-  boundary; and the named negative holds at every boundary: the same shard with that boundary's
-  derived leaked refs planted and with them absent yields two DIFFERENT captures, with the arm each
-  boundary breaks named.
-  `cost:` one unsharded run capturing at seven lines, seven shard starts, and seven planted/absent
-  pairs, on the frozen clone.
-  Red when: any boundary's captures differ after the replay, any negative shows no difference, or
-  a boundary has no recorded pair. No shard is required to run GREEN; the suite is red at BASE and
-  §3 forbids changing that.
+- **AC8** — When shard k starts at each of the seven boundaries, its topology capture — the ref
+  NAME sets from `git ls-remote --heads "$ORIGIN"` and `git for-each-ref --format='%(refname)'
+  refs/heads`, plus the `git merge-base --is-ancestor` verdicts the replay establishes — EQUALS the
+  unsharded run's capture at that boundary's line, both captures in the build log; and at every
+  boundary whose derived leaked set is non-empty, the same shard with that set planted and absent
+  yields two DIFFERENT name sets, the arm each boundary breaks named; and at every boundary whose
+  set is empty, the log carries the skip line naming it.
+  `cost:` one unsharded run capturing at seven lines, seven shard starts, and up to seven
+  planted/absent pairs, on the frozen clone.
+  Red when: any boundary's captures differ after the replay, a non-empty negative shows no
+  difference, or a boundary is neither paired nor named as skipped. No shard is required to run
+  GREEN; the suite is red at BASE and §3 forbids changing that. Shas are not compared, because two
+  processes never share one.
 - **AC12** — When `reset_tree` runs after the leak-producing arms, `git ls-remote --heads` on the
-  fixture origin shows the same head set a fresh start shows; and the unsharded run's `FAIL` set
-  with the delete in place is byte-identical to its `FAIL` set at this spec's base.
-  Red when: a leaked head survives a reset, or the delete moved any unsharded verdict — which would
-  be this unit changing an arm's verdict through a fixture fix, the thing §3 forbids and AC6 cannot
-  see when both sides change together.
+  fixture origin AND `git for-each-ref refs/heads` in the clone each show the head set a fresh start
+  shows; and the unsharded run's `FAIL` set with the delete in place is byte-identical to its `FAIL`
+  set at this spec's base — observed in its OWN commit, landed before the re-cut, so the two changes
+  are never graded together.
+  Red when: a leaked head survives a reset in either store, or the delete moved any unsharded
+  verdict — this unit changing a verdict through a fixture fix, which §3 forbids.
 - **AC9** — When the `still clean after nine mutations` control is separated from its counted block,
   the shard carrying it REDS on the `same` over `$MUT` against `$MUT_EXPECTED`; and the correct
   unsharded run stays GREEN on the same assertion.
@@ -274,6 +286,19 @@ move: `FLOOR_ASSERTIONS` plus eight new per-shard floors, measured under S3.
 
 ## 9. Revision log
 
+- rev-7 · 2026-09-13 · §2 S5 · §4 Rollout · §6 AC4 · AC8 · AC12 · §10 · folded spec-audit round 5
+  (BLOCKED, 12 blocker rows in 3 defects, NON-CONVERGENT by rows against round 4's 4, precision
+  0.75, disposition FOLD — the loop's exit; this spec is not re-reviewed). The oracle rev-6 reused
+  from `TOOL-aShardedFloor-3` AC2 is sha-bearing and per-process, so it reds a correct cut at every
+  boundary, and that build never discharged it — REFUSED here, keeping its state-not-verdict rule
+  and its named negative. The capture is now TOPOLOGY: ref NAME sets plus `merge-base --is-ancestor`
+  verdicts, never shas. The negative SKIPS by name at an empty boundary rather than redding by
+  "no pair". AC4's witness was `PASS` or `FAIL executed`, neither of which a red-but-complete run
+  prints; it is now the suite's trailer. `reset_tree`'s `update-ref --stdin` addresses the CLONE, so
+  the origin delete is its own `--git-dir="$ORIGIN"` invocation and rev-6's "batched into the one it
+  already runs on the bare repo" was false at source. `trunk` is created LOCALLY before it is pushed,
+  so the derivation covers both stores. The delete lands in its own commit ahead of the re-cut so
+  AC12 grades it alone.
 - rev-6 · 2026-09-13 · §1 · §2 S5 · §4 · §6 AC4 · AC6 · AC8 · AC11 · AC12 · F2 · folded spec-audit
   round 4 (BLOCKED, 4 blocker rows, CONVERGING from 8, precision 0.40, scoped to S5/S6/AC4/AC8/AC9).
   S6, AC9 and the base bump drew zero confirmed findings and stand. The blocker: rev-5's
@@ -333,9 +358,11 @@ move: `FLOOR_ASSERTIONS` plus eight new per-shard floors, measured under S3.
   — and returned `build_self_chain`, `git` and `resolve_shell_argv`, none of which is any of these
   seams; it reports `unscanned layers: .sh`, so it cannot see the suite or the runner and its result
   is not evidence either way. The seams were found by reading the files.
-  **Disposition of every record cited**: `TOOL-aShardedFloor-2` and `-3` REUSED (the contract, the
-  block-edge cut rule, and — found at round 4 rather than at rev-1, which is the finding — `-3`'s AC2
-  state-equality oracle with its named negative, which S5 and AC8 now carry verbatim in shape); `TOOL-aPacedTurnstile-8` REUSED (the crossover and "both must move
+  **Disposition of every record cited**: `TOOL-aShardedFloor-2` and `-3` REUSED for the contract
+  and the block-edge cut rule; `-3`'s AC2 REUSED for its state-not-verdict rule and its named
+  negative and REFUSED-BY for its sha-bearing capture, which round 5 measured redding a correct cut
+  and which that build's own ledger never discharged — recorded because a reuse audit that finds a
+  seam owes the reader whether the seam was ever seen working; `TOOL-aPacedTurnstile-8` REUSED (the crossover and "both must move
   together"); `TOOL-aScannedThrottle-6` REUSED (the dilation); `TOOL-aGradedDoorway-7` S2 SUPERSEDED
   for this suite; `TOOL-aGradedDoorway-8` REUSED (the join, one function two feeders);
   `TOOL-aTracedSpawn-1` REUSED (the driver's remedy); `TOOL-dScriptedRepeat-15` NOT-THIS-SEAM (a
