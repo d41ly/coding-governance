@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-13T13:09:26+03:00 @ 09a22d2bf5c3fc51bdc3ccee8c727b0793664106
+last-audit: 2026-09-13T12:03:07+03:00 @ 09a22d2bf5c3fc51bdc3ccee8c727b0793664106
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 094a1ce93ae5142e866e1d82695968b3fa3f5332
@@ -224,6 +224,9 @@ does — hit three times in one file in one session) · `process-creation-is-the
   writes under the home directory outside the roots it derives from `TMPDIR`/`TEMP`/`TMP` plus
   `~/.claude`. A blocked command is a real refusal, not a harness glitch — put the write in the
   scratchpad. Note `%TEMP%` is INSIDE `$HOME` on Windows, which is why the allowlist is derived.
+- **A `PreToolUse` hook FIRES inside a `Workflow` sidechain**, measured 2026-09-12 by `scratch-guard`
+  itself. A sidechain holds neither `Agent` nor `Workflow`, so it cannot fan out — that is the reason,
+  never "hooks stop at the boundary". `TOOL-cRefutedPremise-1`.
 - A conf value interpolated into a REGEX must be VALIDATED, not escaped: `MEMORY_ROOT="docs/mem"`
   matched nothing and `docs|memory` swallowed a subtree, both silently. A vacuity arm firing only at
   zero cannot see a PARTIAL exclusion. Detail: `memory/builds/aDeclaredBound/reviews/`.

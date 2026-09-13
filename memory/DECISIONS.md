@@ -91,6 +91,10 @@
 
 - TOOL-dSettledRoster-2 · closing a pre-cutoff spec pulls it into drift signal 6, whose grandfather keys on the CLOSE date while its evidence keys on the BUILD date. Remedy is `memory/project/trace-waiver.txt` per cTracedPromise-1 §3 — not a raised pin, not a filename key; an unused row reds
 - TOOL-dNarrowedAnchor-1 · the second anchor is admissible PER MODE. `ANCHOR_SCOPE` was a whole-project switch, so enabling the prompt path also let a `slug` run push its own authorization. `SECOND_ANCHOR_MODES="prompt recipe"`; `slug`, an absent `authorized-by:`, reds `fail 50` and leg `fail 29`
+- TOOL-aLeakedHandle-6 · OWNER RULING (2026-09-13): a blocker found on a subject whose review loop already CONVERGED is DISPOSED under M4 fold/promote and never re-rounded; no re-arm on a rev bump. Owes an M4 sentence and a check-37 message. Options and cost: builds/aLeakedHandle/RUN.md.
+- TOOL-aLeakedHandle-7 · OWNER RULING (2026-09-13): check 23 EXCLUDES the path a `brief · item <unit>` row names, since `--brief` stages it and the pass never had a write to declare. Clears 30 corpus lines; the class still fires elsewhere. Owes one staged-red arm. builds/aLeakedHandle/RUN.md.
+- TOOL-aLeakedHandle-8 · OWNER RULING (2026-09-13): the memory-hygiene self-test ceiling breach is answered by making the SUITE CHEAPER, not by re-declaring 900 s. pk_rc/pk_out re-run the whole checker per arm; one run must serve several. Tier-2 unit. Measurement: aJoinedCanon's 2026-09-07 park.
+- TOOL-aLeakedHandle-9 · OWNER RULING (2026-09-13): BUILD the no-ceiling rc=137 branch of report_one, `(killed after <secs>s)`, from backlog row TOOL-aLeakedHandle-5. Every leg declares a ceiling today, so its red case is fixture-only; ratified anyway. Tier-1, one branch plus one arm.
 
 ## DEPL — deployer
 
@@ -148,3 +152,4 @@
 - **TOOL-dMuffledSentinel-1** — **check 21 refuses a bindings parse that did not complete**: `2>/dev/null || true` turned an adopter generator lacking the mode into a clean corpus over 1531 records. The N row is the liveness half. builds/dMuffledSentinel/. — _2026-09-11, `d`_
 - **TOOL-dMuffledSentinel-2** — **the pass-order and trace waiver registries take a declared path**: `PASS_ORDER_WAIVER` and `TRACE_WAIVER`, blank keeping memory/project/, and a declared path must resolve. builds/dMuffledSentinel/. — _2026-09-12, `d`_
 - **TOOL-dMuffledSentinel-3** — **drift-audit 1.10 and unattended 1.19, over the bytes unit 2 changed**: an adopter pulling unit 2 could not tell the vintages apart, and inCMS refused the pull. builds/dMuffledSentinel/. — _2026-09-12, `d`_
+- **TOOL-cRefutedPremise-1** — **a refuted premise outlives review when its conclusion keeps testing true**: `agent-cap` gave two false reasons for two sound rules, and one was already refuted in `SESSION-KICKOFF.md`. All seven carriers corrected. builds/cRefutedPremise/. — _2026-09-12, `c`_

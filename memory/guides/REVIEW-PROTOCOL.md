@@ -72,11 +72,17 @@ session spawns agents:
   sixth. The precise fix is a release keyed on `tool_use_id`, which the harness guarantees identifies
   ONE tool execution across `PreToolUse` and `PostToolUse`. It is not built, and the reason is a
   single unmeasured fact: whether the `Agent` tool fires `PostToolUse` at all. Settle it with a
-  `PostToolUse[Agent]` probe plus a `PostToolUse[Bash]` CONTROL, in a FRESH session — settings are
-  not hot-reloaded, which is why it could not be settled where it was found. The public hooks reference says Agent skips both tool events in favour of
-  `SubagentStart`/`SubagentStop`, and `SubagentStop` carries no `tool_use_id` to correlate on — while
-  the measurement in the bullet above says `PreToolUse` DOES fire for Agent, re-confirmed by watching
-  a real spawn claim a slot. Both cannot be right, and wiring a release for an event that never
+  `PostToolUse[Agent]` probe plus a `PostToolUse[Bash]` CONTROL, wired IN PLACE. This document used to
+  send that probe to a FRESH session because settings are not hot-reloaded; that reason is wrong. The
+  public hooks reference says direct edits to hooks in settings files are normally picked up by the
+  file watcher, and OBSERVED on node `d` in session `a6d954d0` the wired agent-cap command CHANGED
+  mid-session after commit `206af3de` retargeted `.claude/settings.json` — two denials in one
+  transcript naming two different commands. A fresh session is still the tidier control, because it
+  removes the question of WHEN the watcher caught the edit; it is no longer a precondition. That same
+  reference says Agent skips both tool events in favour of `SubagentStart`/`SubagentStop`, and
+  `SubagentStop` carries no `tool_use_id` to correlate on — while the measurement in the bullet above
+  says `PreToolUse` DOES fire for Agent, re-confirmed by watching a real spawn claim a slot. Both
+  cannot be right, and wiring a release for an event that never
   arrives would ship exactly the mechanism-that-cannot-fire this repo gates.
 
   Why slots and not a running count: read-then-decide loses updates (measured — a four-call burst
@@ -98,9 +104,12 @@ alone still contains the string `agent-cap.js` and used to report the tree corre
   asking it to report what arrived before it read anything: a sidechain agent holds no `Agent` tool
   at all — `ToolSearch` for it returns nothing — so it cannot fan out, and the arity rule has nothing
   to bind at that depth. The capability is ABSENT rather than unpoliced, which is the stronger
-  property and not the one this bullet used to claim. Whether a `PreToolUse` hook would fire there
-  is UNMEASURED: the matcher covers `Workflow|Agent`, neither of which a sidechain holds, so the
-  experiment never ran. A matcher on a tool it does hold — `Bash` — would answer it.
+  property and not the one this bullet used to claim. A `PreToolUse` hook DOES fire there, and that
+  is no longer unmeasured: MEASURED 2026-09-12 on node `d`, the project-level guard on matcher
+  `Bash|PowerShell` (`tools/hooks/scratch-guard.js`) DENIED a Bash command issued by an agent
+  inside a `Workflow` sidechain — the matcher-on-a-tool-it-does-hold experiment this bullet asked
+  for. So the spawns above are missed because the matcher covers `Workflow|Agent` and a sidechain
+  holds neither, NOT because hooks stop at the sidechain boundary.
 - A session whose token directory cannot be resolved at all — no git dir, or a payload missing
   `session_id` / `prompt_id` / `tool_use_id`. That fails OPEN and silently, because a hook that
   denies every spawn on a filesystem hiccup is worse than the burst it prevents. A token that could
@@ -221,6 +230,7 @@ on one unescaped backslash and regenerating whole.
   `system-reminder` holding `CLAUDE.md` and the whole of `AGENTS.md` before it read anything, and a
   `SubagentStart` hook fired and was obeyed, arriving with its own verbatim header. No
   `SessionStart`-shaped injection was observed — recorded as not-observed rather than as absent.
-  Measured by dispatching a probe and asking it to report what arrived before it read anything.
+  `PreToolUse` fires there too, MEASURED 2026-09-12 on node `d`: a project-level guard on
+  `Bash|PowerShell` denied a Bash command issued from inside a sidechain.
   The cap is still enforced at the tool call rather than inside the script, but because the
   orchestrator is where the fan-out decision is MADE — not because nothing reaches a sidechain.
