@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 5b309d66cc325ff11606404c79c00e285ae754e4
-phase: SPECCING
+witness: 27ba9c0ca79451c90db30515e7f813181608cdd7
+phase: FOLDING
 branch-sha: b2a330be17b8e195981002f3a5aa4b07d2256bd8
 branch-ref: refs/heads/branch/unattended-build-gates-timing-4af880
 mode: prompt
@@ -22,3 +22,5 @@ anchor-ref: refs/heads/main
 base: b2a330be17b8e195981002f3a5aa4b07d2256bd8
 
 ## Parked
+
+2026-09-13T21:09:57Z review · item aDeferredBar-spec-set · reason verdict BLOCKED · blockers 1
