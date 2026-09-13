@@ -46,3 +46,5 @@ base: c2db2f5d2d6100af08a09da113086d114c67b603
 2026-09-13T15:51:57Z review · item TOOL-aBatchedArm-3 · reason verdict BLOCKED · blockers 12 · NON-CONVERGENT · disposition fold
 
 2026-09-13T16:16:02Z brief · item TOOL-aBatchedArm-3 · reason 15b11de5028a memory/builds/aBatchedArm/prompts/2026-09-13-prompt-TOOL-aBatchedArm-3-build-brief.md
+
+2026-09-13T16:26:37Z dispatch · item ecc3a3cc TOOL-aBatchedArm-3 · reason tools/unattended/check-unattended.test.sh tools/run-gates/selftest-budgets.txt tools/install-prefix-carried.txt tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/unattended/run-unattended-gates.sh memory/builds/aBatchedArm/spec/2026-09-10-spec-TOOL-aBatchedArm-3.md memory/builds/aBatchedArm/build/2026-09-13-build-TOOL-aBatchedArm-3-1-acceptance-ledger.md memory/builds/aBatchedArm/README.md memory/LIVE.md memory/ledger/2026-09.md

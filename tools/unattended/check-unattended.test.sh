@@ -237,12 +237,22 @@ PRISTINE=$(git rev-parse HEAD)
 # green controls quietly start measuring something else. Batched through one `update-ref --stdin`
 # because a git process per ref per arm dominates this suite's wall time. `--no-deref`, or deleting
 # the symbolic `origin/HEAD` deletes the ref it POINTS AT instead of itself.
+#
+# BOTH STORES, not just the clone (TOOL-aBatchedArm-3 S5). Two arms leave HEADS behind that a fresh
+# start does not carry: check 9's `ahead` is pushed to the ORIGIN, and the LANDED control's `trunk`
+# is created locally and then pushed, so it leaks into both. The clone-side batch below now sweeps
+# `refs/heads/` too, keeping only the two heads the fixture is born with; the origin is a separate
+# store this batch cannot reach, so its half is ONE more `update-ref --stdin` against the bare repo.
+# The set is DERIVED, not guessed - every `git push`/`git branch` in this file whose target is not
+# `main` or `unit` - and re-deriving it is one grep when an arm grows a new head: a `delete` of a
+# ref that does not exist is a silent no-op, so a stale entry costs nothing and a MISSING one leaks.
 reset_tree() {
   git reset -q --hard "$PRISTINE"; git clean -qfd
-  { git for-each-ref --format='delete %(refname)' refs/remotes/ refs/replace/ \
-      | grep -v ' refs/remotes/origin/main$'
+  { git for-each-ref --format='delete %(refname)' refs/remotes/ refs/replace/ refs/heads/ \
+      | grep -v -e ' refs/remotes/origin/main$' -e ' refs/heads/main$' -e ' refs/heads/unit$'
     printf 'update refs/remotes/origin/main %s\n' "$ANCHOR0"
   } | git update-ref --stdin --no-deref
+  printf 'delete refs/heads/ahead\ndelete refs/heads/trunk\n' | git --git-dir="$ORIGIN" update-ref --stdin
 }
 run() { bash "$SCRIPT" 2>&1; }
 # A scratch dir for STUBBED BINARIES, prepended to PATH by the arms that need one. Used to fire a
