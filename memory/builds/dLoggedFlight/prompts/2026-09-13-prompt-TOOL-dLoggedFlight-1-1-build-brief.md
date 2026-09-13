@@ -24,8 +24,10 @@ change goes into the spec first, as a rev bump with its section 9 line.
   a shipped file.
 - **A carried-prefix count is raised by hand.** `tools/install-prefix-carried.txt` is a ban list
   (TOOL-dRetiredFork-17), so `--write-ratchet` can lower a row and never raise one. When a new literal
-  raises a count, edit that row by hand and extend its fourth-column reason in the same pass. The
-  `tools/govkit/registry.toml` row rises with every new registry entry or `[[exempt_leg]]` row.
+  raises a count, edit that row by hand and extend its fourth-column reason in the same pass. Count
+  with the gate's own pattern first. A literal it does not match, such as a path one directory below
+  a kit dir like `tools/govkit/entries/push-main.kit.toml`, raises nothing, and a row raised past its
+  real count reds as SLACK.
 - **The memory root is declared, not spelled.** Address the memory tree through `MEMORY_ROOT` in
   `.memory-tree.conf`. That means `resolve_memory_root` in the runlog lib once unit 1 lands it, and
   `ctx.memory_root` in drift-audit. A shipped file never spells the root.
@@ -89,8 +91,8 @@ change goes into the spec first, as a rev bump with its section 9 line.
   were already under `tools/unattended/` are NEVER run: that is a standing owner rule.
 - **3, the gate verdict line.** Landed at 33f1db94 and 78d97a48. The runner writes `gates.log` from
   its EXIT trap, and `tools/run-gates/run-gates.runlog.test.sh` shows its real lines.
-- **4, the pre-push line.** The hook gates every push from this clone, the landing push included. Arm
-  it through its own suite with `GOV_GATE_CMD` stubs, and never by pushing.
+- **4, the pre-push line.** Landed at 4ac1ebc0 and 4c7385eb. The hook exports `GATE_RUN_ID` to the
+  bar, and the runner unsets it before any leg starts.
 - **5, the redaction table.** Every credential a fixture plants is a template expanded at test time,
   so the kit's scan of its own tree stays clean.
 - **6, the extractor.** A test never reads or writes a real store: every root the spec names points
@@ -124,7 +126,8 @@ change goes into the spec first, as a rev bump with its section 9 line.
    restore it.
 3. Run no gate. Run the unit's own test file directly, and stage each refusal RED with it.
 4. Write the acceptance ledger at
-   `memory/builds/dLoggedFlight/build/2026-09-13-build-TOOL-dLoggedFlight-<n>-1-acceptance-ledger.md`
+   `memory/builds/dLoggedFlight/build/<date>-build-TOOL-dLoggedFlight-<n>-1-acceptance-ledger.md`,
+   where `<date>` is the day you write it,
    with `**Serves:** journal TOOL-dLoggedFlight-<n>` and `**Evidences:** TOOL-dLoggedFlight-<n>`. Give
    one line per criterion, `- AC1 — \`<command or path>\` — <what was observed>`, with the backticked
    token on the `- ACn —` line itself and not on a continuation line. An AC observed by a gate leg
