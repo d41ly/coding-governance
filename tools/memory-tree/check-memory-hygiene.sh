@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.73   # gov:kit memory-tree@2.73 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.74   # gov:kit memory-tree@2.74 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -282,6 +282,40 @@ while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
 in_legacy() { [ -n "${LEGACY_SET[$1]+x}" ]; }
 in_debt()   { [ -n "${DEBT_SET[$1]+x}" ]; }
 fail() { echo "HYGIENE check $1 FAILED — $2"; status=1; }
+
+# --- THE CURATION-DEBT PARTITION. Checks 6, 7 and 8 used to drop a listed file out of their
+# --- population with `in_debt "$f" && continue`, which is why a row whose fault was fixed — or
+# --- whose cap was RAISED past it — stayed green forever. `memory/backlog/TOOL.md` was listed on
+# --- 2026-08-18 for a byte cap raised past it the same day, and outlived the fault by three weeks.
+# --- So the listed files stay IN the population and their findings are partitioned here instead:
+# --- the unwaived ones fail exactly as before, the waived ones are RECORDED, and the stale-entry
+# --- guard beside the tracked-path one below reds a row that recorded nothing. This is the shape the
+# --- testsuite-count waiver's own gate already spells for its registry, one tool root up.
+#
+# --- IT ASSIGNS TO A GLOBAL AND RETURNS NOTHING. A `$( )` capture or a `|` would run this in a
+# --- SUBSHELL and the DEBT_EARNED writes would be discarded at the closing paren, leaving a guard
+# --- that reds every listed row. Reading the array from a subshell is fine; only writes are lost.
+declare -A DEBT_EARNED
+_UNWAIVED=""
+derive_waived() { # check-number · findings → sets _UNWAIVED to the failing ones, records the rest
+  local _l _p
+  _UNWAIVED=""
+  [ -n "$2" ] || return 0
+  while IFS= read -r _l; do
+    [ -n "$_l" ] || continue
+    # Every one of the three finding formats leads with the path, closed by a space or a colon.
+    # A path holding a space would extract SHORT and match no registry key, which leaves the
+    # finding in the failing set — loud, not silent. The safe direction is structural here rather
+    # than a property of a corpus that happens to hold no such path.
+    _p=${_l%%[ :]*}
+    # Recorded at most ONCE per check: a file over the entry budget on five lines earns check 7
+    # once, not five times, and the report is a list of checks rather than a tally of findings.
+    if in_debt "$_p"; then
+      case " ${DEBT_EARNED[$_p]-}" in *" $1 "*) ;; *) DEBT_EARNED["$_p"]="${DEBT_EARNED[$_p]-}$1 " ;; esac
+    else _UNWAIVED="$_UNWAIVED$_l"$'\n'; fi
+  done <<<"$2"
+  _UNWAIVED=${_UNWAIVED%$'\n'}
+}
 
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
 # not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
@@ -649,7 +683,7 @@ case "${1:-}" in --print-index-set) printf '%s\n' "$INDEX_SET"; exit 0 ;; esac  
 # Batched wc: one `wc -c` + one `wc -l` over the whole selected set (was 2 forks PER index file).
 # Findings emit in index_set order (the -l stream's arg order); multi-file wc `total` lines are
 # skipped by name; `+0` coerces the counts.
-sel6=$(printf '%s\n' "$INDEX_SET" | while IFS= read -r f; do in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
+sel6=$(printf '%s\n' "$INDEX_SET" | while IFS= read -r f; do in_scope "$f" || continue; printf '%s\n' "$f"; done)
 bad6=""
 if [ -n "$sel6" ]; then
   cbytes=$(printf '%s\n' "$sel6" | xargs -r wc -c)
@@ -698,6 +732,7 @@ if [ -n "$sel6" ]; then
               else      printf "%s (%dB > %dB; no line cap for this class)\n", f, b[f]+0, cb } } }
   ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines"))
 fi
+derive_waived 6 "$bad6"; bad6="$_UNWAIVED"
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
 $bad6"
 # TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out 5/20`. Eight sibling checks already
@@ -726,7 +761,7 @@ ex7='/guides/[^/]+\.md$|/builds/[^/]+/RUN(\.[A-Z]+\.[0-9a-f]{8})?\.md$'
 # today. Check 8 at the batched `LC_ALL=C xargs -r awk` seventeen lines below is NOT the pattern to
 # copy here — it sorts, it does not measure.
 sel7=$(printf '%s\n' "$INDEX_SET" | grep -vE "$ex7" | while IFS= read -r f; do
-  in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"
+  in_scope "$f" || continue; printf '%s\n' "$f"
 done)
 bad7=""
 if [ -n "$sel7" ]; then
@@ -774,6 +809,7 @@ if [ -n "$sel7" ]; then
       close(f)
     }' <<<"$sel7")
 fi
+derive_waived 7 "$bad7"; bad7="$_UNWAIVED"
 [ -n "$bad7" ] && fail 7 "index entry lines over their declared cap:
 $bad7"
 
@@ -792,10 +828,10 @@ $bad7"
 pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)
 pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
 files8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | while IFS= read -r f; do
-  [ -f "$f" ] || continue; in_debt "$f" && continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
-bad8=""
+  [ -f "$f" ] || continue; in_scope "$f" || continue; printf '%s\n' "$f"; done)
+bad8=""; rows8=0; shards8=0
 if [ -n "$files8" ]; then
-  bad8=$(printf '%s\n' "$files8" | LC_ALL=C xargs -r awk '
+  out8=$(printf '%s\n' "$files8" | LC_ALL=C xargs -r awk '
     function nmatch(s,   c,first,nc,ok) { c=0; first=1
       while (length(s)>0) {
         if (first) ok=match(s,/([·|]|^[[:space:]]*-)[[:space:]]*(OPEN|SPECCED|INPROGRESS|BLOCKED|DEFERRED|CLOSED|WONTDO)/)
@@ -805,18 +841,31 @@ if [ -n "$files8" ]; then
         if (nc=="" || nc !~ /[A-Za-z0-9_]/) { c++; s=substr(s,RSTART+RLENGTH); first=0 }
         else { s=substr(s,RSTART+1); first=0 }
       } return c }
-    FNR==1 { uln=0; fence="" }
+    FNR==1 { uln=0; fence=""; shards++ }
     { line=$0; sub(/\r$/,"",line)
       if (line ~ /^[[:space:]]*(```|~~~)/) { m=(line ~ /^[[:space:]]*```/)?"```":"~~~"
         if (fence=="") { fence=m; next }
         if (m==fence) { fence=""; next } }
       if (fence!="") next
       uln++
-      if (line ~ /^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]/ && nmatch(line)!=1) print FILENAME ":" uln
-    }')
+      if (line ~ /^[[:space:]]*[|-].*[A-Z]+-[A-Za-z0-9]*-?[0-9]/) { rows++
+        if (nmatch(line)!=1) print FILENAME ":" uln }
+    }
+    # The GRADED-ROW population, on a sentinel line stripped below. `pop_guard` counts shard FILES,
+    # which is why a waiver over 438 of 499 rows read as a green check and printed no number at all.
+    # Emitted here rather than counted in a second pass: a second predicate over the same question
+    # is the class this engine keeps being bitten by. `#` cannot open a finding, which always
+    # leads with a path, and the two counts are SUMMED below because a long file list makes `xargs`
+    # invoke awk more than once and each invocation runs its own END.
+    END { printf "#rows %d %d\n", rows+0, shards+0 }')
+  rows8=$(printf '%s\n' "$out8" | awk '/^#rows /{r+=$2} END{printf "%d", r+0}')
+  shards8=$(printf '%s\n' "$out8" | awk '/^#rows /{s+=$3} END{printf "%d", s+0}')
+  bad8=$(printf '%s\n' "$out8" | grep -v '^#rows ' || true)
 fi
+derive_waived 8 "$bad8"; bad8="$_UNWAIVED"
 [ -n "$bad8" ] && fail 8 "backlog rows without exactly one status token (OPEN SPECCED INPROGRESS BLOCKED DEFERRED CLOSED WONTDO):
 $bad8"
+[ "$STAGED" = 1 ] || printf 'memory-hygiene: check 8 graded %s backlog row(s) across %s shard(s)\n' "$rows8" "$shards8"
 
 # 9 — build-index drift (delegates to the sibling generator). The retired directory listing carried
 # PATHS, which git already prints better; this carries STATUS, which git does not — and the status is
@@ -1857,6 +1906,49 @@ $badL"
   badD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do [ -n "${TRACKED_SET[$p]+x}" ] || echo "$p"; done)
   [ -n "$badD" ] && fail 6 "curation-debt.txt lists paths that no longer exist (stale-line guard):
 $badD"
+fi
+
+# curation-debt STALE-ENTRY guard, and the per-row report. Its sibling above grades whether a listed
+# path still EXISTS; this one grades whether it still HIDES anything, which is the question the
+# registry is actually about. Populated by `derive_waived` during checks 6, 7 and 8.
+#
+# HELD UNDER --staged: there the selection is the staged set, so a listed file nobody staged records
+# nothing and would read as stale. The same reason `pop_guard` holds.
+#
+# The REPORT is not a second verdict. A row silences all three checks whatever it earns, so a waiver
+# wider than its fault is real debt — but failing it needs a per-line or per-check waiver grammar
+# this registry does not have, and would red two rows on the day this lands, one of them the subject
+# of an open owner call. Naming the width costs a line and pre-empts nobody.
+if [ "$STAGED" = 0 ] && [ -n "$DEBT" ]; then
+  # TWO absences, and NEITHER is this guard's question. A path git no longer tracks is the SIBLING
+  # guard's finding. A path still in the INDEX but gone from the WORKTREE is in no check's population
+  # either — `index_set` and `files8` both end on `[ -f "$f" ]` — so it records nothing by being
+  # absent rather than by being compliant, and printing "delete the row" at it would drain a waiver
+  # that is still load-bearing the moment the file comes back. `TRACKED_SET` is in scope because a
+  # non-empty `$DEBT` is one of the two things that fills it.
+  staleD=$(printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do
+    [ -n "${TRACKED_SET[$p]+x}" ] || continue
+    [ -f "$p" ] || continue
+    [ -n "${DEBT_EARNED[$p]+x}" ] || printf '%s\n' "$p"; done)
+  [ -n "$staleD" ] && fail 6 "curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived, so the row hides nothing and the registry has stopped shrinking — delete the row rather than re-justifying it:
+$staleD"
+  # The denominator is DERIVED, never the literal `6 7 8`. A build README is structurally outside
+  # check 8's population and a RUN.md outside check 7's, so a constant denominator reports a row
+  # whose waiver is exactly as wide as its fault as though it were two checks over-wide — which is
+  # the opposite of what this report is for. The three selections are still in scope.
+  printf '%s\n' "$DEBT" | grep . | while IFS= read -r p; do
+    [ -n "${DEBT_EARNED[$p]+x}" ] || continue
+    _appl=""
+    grep -qxF "$p" <<<"$sel6"   && _appl="${_appl}6 "
+    grep -qxF "$p" <<<"$sel7"   && _appl="${_appl}7 "
+    grep -qxF "$p" <<<"$files8" && _appl="${_appl}8 "
+    printf 'memory-hygiene: curation-debt.txt — %s earns check(s) %sof the %sit is waived from\n' \
+      "$p" "${DEBT_EARNED[$p]}" "$_appl"
+  done
+else
+  # A skip that looks like a pass is indistinguishable from coverage, and this one is silent in the
+  # leg a pre-commit hook runs. Its two siblings in this same run announce their holds; so does this.
+  [ "$STAGED" = 1 ] && printf 'memory-hygiene: the curation-debt stale-ENTRY guard and its per-row report are HELD under --staged — the selection is the staged set, so a listed file nobody staged would record nothing and read as stale\n'
 fi
 
 # ---- 23: every acceptance criterion of a CLOSED Tier-2 unit is EVIDENCED or AMENDED.

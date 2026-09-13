@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.73 -->
+<!-- gov:kit memory-tree@2.74 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -112,7 +112,10 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
   exempt from the recording-file naming check. Should not grow after the initial adoption.
 - **`curation-debt.txt`** — index files pending slimming, exempt from the cap / entry-budget / status-vocabulary
-  checks while listed. Every curation sweep deletes lines; empty = fully strict. CI fails if a listed path is gone.
+  checks while listed. Every curation sweep deletes lines; empty = fully strict. CI fails if a listed path is gone,
+  and — since `TOOL-cGradedDebt-1` — if a listed path would PASS all three unwaived, because a row
+  that hides nothing has stopped shrinking. The same run prints which of the three each row earns,
+  so a waiver wider than its fault is visible without being failed. Held under `--staged`.
 - **`id-orphan-waiver.txt`** — ids cited but never defined, deliberately (check 14). Shrink-only
   against `ORPHAN_ID_PIN`, with a stale-entry guard: a waived id that now resolves reds.
 - **`corpus-path-unresolved.txt`** — rooted repo-path citations that resolve to nothing (check 15),
@@ -180,6 +183,8 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 7. **entry budget** — index entry lines ≤ `ENTRY_CAP_CHARS` (300 by default), a build `README.md`
    ≤ `BUILD_README_ENTRY_CAP_CHARS` (350) (grandfather: `curation-debt.txt`).
 8. **status vocabulary** — `backlog/<FAMILY>.md` rows carry exactly one slot status token (grandfather: `curation-debt.txt`).
+   It REPORTS the number of rows it graded, because its population guard counts shard FILES: a waiver
+   over most of the rows otherwise reads as a green check over a population nobody sees.
 9. **build-index drift** — `tools/memory-tree/gen_build_index.py --check` must be clean. The index is
    DERIVED from each build's README front matter (`slug node opened streams roster ids [status]`, at
    column 0, opening at line 1) plus every `**Status:**` header under its `spec/`. A build with no

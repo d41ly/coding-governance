@@ -983,9 +983,16 @@ miss 'tFixture-42.md ('
 c5block() { awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED/&&!/check 5 FAILED/{g=0} g' <<<"$1"; }
 # ...and the same slice for any check number. Attribution is not optional: checks 1, 2, 5, 9 and 12
 # all print bare paths, so an unattributed `hit '<path>'` is satisfied by the wrong check's finding.
+# A `memory-hygiene: ` REPORT line closes the window too. `fail` is not the only thing this engine
+# prints, and a report emitted after the last `fail` of a run left the window open to EOF, swallowing
+# every report line into that check's block. Measured at TOOL-cGradedDebt-1: the curation-debt per-row
+# report follows its own `fail 6` inside one `if`, and a report line NAMES a path — so a `cnot 6
+# '<path>'` was satisfied by the report rather than by the finding, and fired against a correct gate.
+# All 15 call sites route through here, so the close belongs here and nowhere else.
 cblock() { awk -v n="$2" '
-    index($0, "HYGIENE check " n " FAILED") == 1 { g = 1 }
+    index($0, "HYGIENE check " n " FAILED") == 1 { g = 1 }   # gov:one-extractor
     g && index($0, "HYGIENE check") == 1 && index($0, "HYGIENE check " n " FAILED") != 1 { g = 0 }
+    g && index($0, "memory-hygiene: ") == 1 { g = 0 }
     g' <<<"$1"; }
 chit()  { n=$((n+1)); cblock "$out" "$1" | grep -qF "$2" || { echo "FAIL check $1 did not report: $2"; st=1; }; }
 cnot()  { n=$((n+1)); cblock "$out" "$1" | grep -qF "$2" && { echo "FAIL check $1 reported: $2"; st=1; }; }
@@ -1298,6 +1305,25 @@ n=$((n+1))
 grep -qE '^[[:space:]]*_c7env=""' "$SCRIPT" \
   && echo "ok   check 7 locale switch defaults to empty" \
   || { echo "FAIL check 7 locale switch has no empty default — every adopter would be re-decided"; st=1; }
+# 5. THIS SUITE HAS EXACTLY ONE BLOCK EXTRACTOR, and every copy of it is a future copy of one bug.
+#    `cblock()` closes a check's block on the next `HYGIENE check` header AND on a `memory-hygiene: `
+#    report line. Two inline re-spellings carried only the first close, so a report emitted after the
+#    LAST `fail` of a run left the window open to EOF — and a report line NAMES a path, which
+#    satisfied a `grep -qF '<path>'` that was asserting the finding ABSENT. Measured: that fired a
+#    FAIL against a correct gate, and the same latent hole sat at every one of the helper's call
+#    sites. TOOL-cGradedDebt-4, from the round-1 review of TOOL-cGradedDebt-1, finding B2.
+#
+#    The predicate is the extractor's own SHAPE rather than a count, so it cannot go slack as the
+#    suite grows, and the one legitimate instance carries `gov:one-extractor` inside cblock's awk
+#    program. Whitespace-tolerant because the two re-spellings differed from the definition only in
+#    spacing, which is precisely how a copy escapes a literal search.
+n=$((n+1))
+respell=$(grep -nE 'index\(\$0, ?"HYGIENE check " ?n ?" FAILED"\) ?== ?1' \
+            "$HERE/check-memory-hygiene.test.sh" | grep -v 'gov:one-extractor' || true)
+[ -z "$respell" ] \
+  && echo "ok   one block extractor, no re-spelling" \
+  || { echo "FAIL a block extractor is re-spelled outside cblock() — route it through the helper, which is the only copy that closes on a report line:
+$respell"; st=1; }
 # 5. Check 7's exemption expression keeps ONE spelling of the guides/ alternative. The MAP_SUB branch
 #    used to REBUILD the whole expression, and the rebuild silently omitted `guides/` — so on any repo
 #    carrying a .codebase-map.conf every guide entered the entry-budget population and no assertion
@@ -1453,9 +1479,71 @@ grep -qF 'memory/project/also-gone.md' <<<"$outst" \
 # branch 1 must now stay silent about it. That is the grandfather working and the guard not
 # over-firing, in one assertion.
 n=$((n+1))
-awk -v n=6 'index($0,"HYGIENE check " n " FAILED")==1{g=1} g&&index($0,"HYGIENE check")==1&&index($0,"HYGIENE check " n " FAILED")!=1{g=0} g' <<<"$outst" \
+cblock "$outst" 6 \
   | grep -qF 'memory/backlog/ARCH.md (' \
   && { echo "FAIL a curation-debt-listed file was still capped by check 6"; st=1; }
+# ---- the curation-debt STALE-ENTRY guard (TOOL-cGradedDebt-1), which is a DIFFERENT question from
+# ---- the stale-LINE guard above: that one asks whether the path still exists, this one whether the
+# ---- row still hides anything.
+# ---- TWO subjects, because a guard with only a positive is indistinguishable from "the registry is
+# ---- non-empty". `tRunOk/README.md` is tracked, in the index set, and compliant on all three, so
+# ---- listing it buys nothing and must RED. `tRunBig/RUN.md` is the file check 6 already names three
+# ---- hundred lines up (`chit 6`), so listing it buys a real silence and must NOT be named.
+# ---- NEITHER subject is `ARCH.md`, deliberately: the assertion above it grades that check 6 stays
+# ---- SILENT on a listed ARCH.md, which is equally true of a file earning nothing, so resting this
+# ---- arm on it would rest it on a property that arm never established. Measured: it earns none.
+n=$((n+1))
+printf '# debt\nmemory/builds/tRunBig/RUN.md\nmemory/builds/tRunOk/README.md\n' > memory/project/curation-debt.txt
+git add -A >/dev/null 2>&1; git commit -q -m stalerow --no-verify
+outsr=$(bash "$SCRIPT" 2>/dev/null)
+# THE WHOLE LITERAL SIGNATURE, not a readable prefix. `check-arms.py` reads a branch's signature up
+# to its first interpolation, and a prefix leaves the branch UNARMED — which reds the `harness arms`
+# leg rather than this suite, so the suite would have looked fine while the bar did not.
+grep -qF 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived, so the row hides nothing and the registry has stopped shrinking — delete the row rather than re-justifying it:' <<<"$outsr" \
+  || { echo "FAIL the curation-debt stale-ENTRY guard did not fire on a row that hides nothing"; st=1; }
+n=$((n+1))
+cblock "$outsr" 6 | grep -qF 'memory/builds/tRunOk/README.md' \
+  || { echo "FAIL the curation-debt stale-ENTRY guard did not name the row that hides nothing"; st=1; }
+n=$((n+1))
+cblock "$outsr" 6 | grep -qF 'memory/builds/tRunBig/RUN.md' \
+  && { echo "FAIL the stale-ENTRY guard named a row that is still earning its listing"; st=1; }
+# the PER-ROW report names what the EARNING row earns, which is the half that makes an over-wide
+# waiver visible: this row is waived from three checks and buys one.
+n=$((n+1))
+# BOTH HALVES, and the denominator is the half that shipped wrong. `RUN.md` is in check 6's
+# population, exempt from 7 by `ex7`, and structurally outside 8 — so its applicable set is `6`
+# ALONE, and this row's waiver is exactly as wide as its fault. A constant `6 7 8` denominator
+# reported it as two checks over-wide, which inverts the signal the report exists to send.
+grep -qF 'memory-hygiene: curation-debt.txt — memory/builds/tRunBig/RUN.md earns check(s) 6 of the 6 it is waived from' <<<"$outsr" \
+  || { echo "FAIL the curation-debt per-row report did not name what the earning row earns, over its APPLICABLE checks"; st=1
+       printf '%s\n' "$outsr" | grep -F 'memory-hygiene: curation-debt.txt' | sed 's/^/     DUMP /'; }
+# the GRADED-ROW population of check 8. `pop_guard` counts shard FILES, so a waiver over most of the
+# rows reported green and printed no number at all; this is the liveness half.
+n=$((n+1))
+grep -qE '^memory-hygiene: check 8 graded [1-9][0-9]* backlog row\(s\) across [1-9][0-9]* shard\(s\)$' <<<"$outsr" \
+  || { echo "FAIL check 8 did not report its graded-row population"; st=1; }
+n=$((n+1))
+grep -qF '#rows ' <<<"$outsr" \
+  && { echo "FAIL check 8's row-count sentinel leaked into the findings"; st=1; }
+# ---- TWO ABSENCES, AND NEITHER IS THE STALE-ENTRY GUARD'S QUESTION (TOOL-cGradedDebt-5, from the
+# ---- round-1 review's L1). A path still in the INDEX but gone from the WORKTREE records nothing —
+# ---- `index_set` and `files8` both end on `[ -f "$f" ]` — so without the worktree test it reads as
+# ---- compliant and the guard prints "delete the row" at a waiver that is still load-bearing the
+# ---- moment the file returns. This pair is the ONLY thing separating "the row hides nothing" from
+# ---- "the file is not there to hide anything", which is the whole distinction the guard rests on.
+# ---- The stale-LINE guard must stay silent too: the path IS still tracked, so neither guard owns
+# ---- this state and a run that names it under either one is naming the wrong defect.
+n=$((n+1))
+printf '# debt\nmemory/builds/tRunBig/RUN.md\n' > memory/project/curation-debt.txt
+git add -A >/dev/null 2>&1; git commit -q -m debtworktree --no-verify
+rm memory/builds/tRunBig/RUN.md                      # NOT `git rm` — still in the index
+outwt=$(bash "$SCRIPT" 2>/dev/null)
+grep -qF 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived' <<<"$outwt" \
+  && { echo "FAIL the stale-ENTRY guard fired on a listed path that is merely ABSENT from the worktree, so its remedy would drain a load-bearing row"; st=1; }
+n=$((n+1))
+grep -qF 'curation-debt.txt lists paths that no longer exist' <<<"$outwt" \
+  && { echo "FAIL the stale-LINE guard fired on a listed path git still tracks"; st=1; }
+git checkout -q -- memory/builds/tRunBig/RUN.md
 printf '# legacy\n' > memory/project/legacy-files.txt
 printf '# debt\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m unstale --no-verify
@@ -2267,6 +2355,16 @@ PKD=$(mktemp -d)
 # six invalid-value arms passed against HEAD and proved nothing.
 cp "$GOVROOT/$KIT_REL/check-memory-hygiene.sh" "$PKD/$KIT_REL/" 2>/dev/null
 cp "$GOVROOT/.memory-tree.conf" "$PKD/.memory-tree.conf.base" 2>/dev/null
+# BASE_RESOLVE_CUTOFF OFF IN THIS FIXTURE, and it is not a convenience. The tree below is a
+# `git archive` into a FRESH `git init`, so its object database holds exactly one commit: every LIVE
+# spec's `base` sha answers `missing`, and check 12 reds for a reason that is a property of the
+# fixture rather than of the corpus or of any key under test. The engine already skips this arm on a
+# shallow clone for that exact reason — "a tree it cannot grade" — and a synthetic one-commit repo is
+# the same case the skip's own test does not recognise. Measured at TOOL-cGradedDebt-1: with two live
+# post-cutoff specs in the corpus, `pk_base` came back 1 and the suite's own liveness line correctly
+# declared every arm below it meaningless. Left unfixed, this block dies the first time anyone leaves
+# a live spec in the tree, which is most of the time.
+printf 'BASE_RESOLVE_CUTOFF=""\n' >> "$PKD/.memory-tree.conf.base"
 ( cd "$PKD" && git init -q . && git config user.email t@t && git config user.name t \
     && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
 pk_set() {   # $1 = a conf line, or empty for the shipped default
