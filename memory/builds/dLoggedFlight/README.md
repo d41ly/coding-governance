@@ -4,9 +4,8 @@ node: d
 opened: 2026-09-13
 streams: tooling
 roster: TOOL
-status: OPEN
 authorized-by: prompt
-ids: TOOL-dLoggedFlight-1
+ids: TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13
 ---
 
 # dLoggedFlight — unattended runs recorded as they happen, and a record any node can read
@@ -78,23 +77,52 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-09-13 · streams tooling
-ids TOOL-dLoggedFlight-1
+**Build status:** SPECCED · 13 unit(s) · node d · opened 2026-09-13 · streams tooling
+ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8 TOOL-dLoggedFlight-9 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses](spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-2 — the unattended driver writes a start and an end line for every run verb](spec/2026-09-13-spec-TOOL-dLoggedFlight-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-3 — the gate runner writes one verdict line per bar run](spec/2026-09-13-spec-TOOL-dLoggedFlight-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-4 — the pre-push hook writes one line per push](spec/2026-09-13-spec-TOOL-dLoggedFlight-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-5 — one redaction table, applied once on read, with a staged positive per rule](spec/2026-09-13-spec-TOOL-dLoggedFlight-5.md) | 5 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-6 — the transcript extractor: a run's action sequence, owner turns and cost](spec/2026-09-13-spec-TOOL-dLoggedFlight-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-7 — the `Decided:` commit trailer, so a choice with no commit of its own has a home](spec/2026-09-13-spec-TOOL-dLoggedFlight-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-8 — the run model: every source joined into one timeline, decision ledger, conformance block and anomaly set](spec/2026-09-13-spec-TOOL-dLoggedFlight-8.md) | 8 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-9 — the committed per-run record: a closed-schema report and its JSON twin](spec/2026-09-13-spec-TOOL-dLoggedFlight-9.md) | 9 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-10 — the schema leg: a committed run record outside the closed schema reds the bar](spec/2026-09-13-spec-TOOL-dLoggedFlight-10.md) | 10 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-11 — the unattended Skill renders the record at abort and after landing, and the keepalive becomes a heartbeat](spec/2026-09-13-spec-TOOL-dLoggedFlight-11.md) | 11 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-12 — the runlog skill answers questions about a run from its record and its local extracts](spec/2026-09-13-spec-TOOL-dLoggedFlight-12.md) | 12 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | SPECCED | rev-1 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-10 TOOL-dLoggedFlight-11 TOOL-dLoggedFlight-12 TOOL-dLoggedFlight-13 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedFlight-4 TOOL-dLoggedFlight-5 TOOL-dLoggedFlight-6 TOOL-dLoggedFlight-7 TOOL-dLoggedFlight-8
+TOOL-dLoggedFlight-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dLoggedFlight-1` | no |
+| 2 | `TOOL-dLoggedFlight-2` | no |
+| 3 | `TOOL-dLoggedFlight-3` | no |
+| 4 | `TOOL-dLoggedFlight-4` | no |
+| 5 | `TOOL-dLoggedFlight-5` | no |
+| 6 | `TOOL-dLoggedFlight-6` | no |
+| 7 | `TOOL-dLoggedFlight-7` | no |
+| 8 | `TOOL-dLoggedFlight-8` | no |
+| 9 | `TOOL-dLoggedFlight-9` | no |
+| 10 | `TOOL-dLoggedFlight-10` | no |
+| 11 | `TOOL-dLoggedFlight-11` | no |
+| 12 | `TOOL-dLoggedFlight-12` | no |
+| 13 | `TOOL-dLoggedFlight-13` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
