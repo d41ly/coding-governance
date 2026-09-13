@@ -26,10 +26,11 @@
 # an earlier commit and the brief row alongside the code. Two guards asking one question two ways is a
 # recorded class in this tree; these ask two questions.
 #
-# ONLY A UNIT BUILT DURING A RUN IS GRADED. TOOL-dPolishedVitrine-14, owner ruling 2026-09-13. A brief
-# is what a run hands the agent that builds a unit, so a unit built after its build's run had already
-# finished was built outside any run and was owed none. The first adopter to meet this built a unit by
-# hand the day after its run landed, and this leg redded it for a row no run was there to write.
+# ONLY A UNIT BUILT DURING A RUN IS GRADED, by the owner's ruling of 2026-09-13, recorded in build
+# `dPolishedVitrine`. A brief is what a run hands the agent that builds a unit, so a unit built after
+# its build's run had already finished was built outside any run and was owed none. The first
+# adopter to meet this built a unit by hand the day after its run landed, and this leg redded it for
+# a row no run was there to write.
 #
 # THE PREDICATE IS THE PHASE OF THE RUN-STATE FILE AT THE BUILD COMMIT, the commit this leg already
 # reads the brief row from. That file names the record that was live, or had last finished, at that
@@ -193,9 +194,8 @@ fi
 
 # ----------------------------------------------------------------------------- THE TERMINAL SET
 # WHICH PHASES MEAN "THIS RUN HAS FINISHED" IS THE DRIVER'S `PHASES_TERMINAL`, and this file does not
-# spell it a second time. TOOL-dPolishedVitrine-14. It is PARSED, never sourced, with the kit gate's
-# grammar for a core declaration: the first line that is exactly `PHASES_TERMINAL="…"`, trailing
-# whitespace allowed.
+# spell it a second time. It is PARSED, never sourced, with the kit gate's grammar for a core
+# declaration: the first line that is exactly `PHASES_TERMINAL="…"`, trailing whitespace allowed.
 #
 # A SET THIS LEG CANNOT READ IS A DEAD PROBE, never an empty set. An empty set grades every unit as
 # though every run were still live, which is the verdict this unit exists to correct, delivered

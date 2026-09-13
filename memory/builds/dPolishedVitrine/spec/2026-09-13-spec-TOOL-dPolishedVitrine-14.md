@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live
 
-**Status:** INPROGRESS · rev-1 · 2026-09-13 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
+**Status:** INPROGRESS · rev-2 · 2026-09-13 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -237,7 +237,8 @@ real population, and it arrives when NicoCares re-pulls the kit.
   Red when: a set the leg cannot read is treated as empty and every unit is graded as live.
 - **AC9** — When `tools/unattended/check-brief-recorded.sh` is read, its header names the predicate,
   the boundary, the corroboration, the rejected reachability predicate and both new things it does not
-  check, and it cites `TOOL-dPolishedVitrine-14`.
+  check, and it points at the owner's 2026-09-13 ruling in build `dPolishedVitrine`. It does not cite
+  this unit's id while this spec is live; `tools/unattended/check-brief-recorded.test.sh` does.
   Red when: a reader has to open this spec to learn why a unit went ungraded.
 - **AC10** — When `tools/unattended/check-brief-recorded.test.sh` runs from a directory other than
   the repository root, and when it runs against a staged copy of the kit, every arm grades the leg
@@ -290,6 +291,10 @@ New arm: `tools/unattended/check-brief-recorded.test.sh` · the leg at `f1e58789
 ## 9. Revision log
 
 - rev-1 · 2026-09-13 · initial draft.
+- rev-2 · 2026-09-13 · §6 · AC9 · the leg's header points at the ruling and the build instead of
+  citing this unit's id. The full bar redded `drift-audit records` on it: signal 2 reads a live
+  spec's id in shipped source as a status nobody closed, and its pin is shrink-only. The suite, which
+  that signal does not read, carries the id, as `TOOL-dPolishedVitrine-1`'s own suite does.
 
 ## 10. Reuse audit
 
