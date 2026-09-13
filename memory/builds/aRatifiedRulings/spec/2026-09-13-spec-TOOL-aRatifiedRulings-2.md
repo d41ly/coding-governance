@@ -530,14 +530,18 @@ epoch-gate observation the kit has no gate to make.
   reverted by `git checkout` was made on a frozen copy of `tools/unattended/` instead, one
   copy per run, so the seven suite runs could go concurrently and no working-tree edit existed
   to revert; the acceptance ledger under `build/` names each copy's one-line delta. Status CLOSED.
-- rev-5 · 2026-09-14 · §4 · after close, from the closing diff review round 1, and only the prose
-  that review names. Ids 2 and 5: the "What this does NOT buy" paragraph credited `brief-recorded`
+- rev-5 · 2026-09-14 · §3 · §4 · after close, from the closing diff review round 1, and only the
+  prose that review names. Ids 2 and 5: the "What this does NOT buy" paragraph credited `brief-recorded`
   with a join it does not make; it now states what that leg proves (CLOSED units, the build commit,
   the last row, hash-only) and that a stray-path row is joined by nothing. Id 7, the HIGH, is a
   code fix outside this spec's prose and is recorded here for the reader of §4's "The exclusion":
   the brief-row parse moved into the kit library as `read_brief_paths`, `pass_commit` subtracts
   that set before it selects a commit, and check 23 calls the same helper; fixture F in the suite
-  pins the `{run-state, brief}` bookkeeping commit as skipped. No re-declaration; status unchanged.
+  pins the `{run-state, brief}` bookkeeping commit as skipped. §3's "No change to `pass_commit`"
+  and "No new shell function in either file" bullets bound this unit's own pass and are
+  superseded by that repair; they stand as written because they were true of the pass, and the
+  bug-class checklist for the fix commit (`amendment-leaves-its-other-half-standing`) is why this
+  line names them. No re-declaration; status unchanged.
 
 ## 10. Reuse audit
 
