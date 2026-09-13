@@ -1,6 +1,6 @@
 # TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards
 
-**Status:** OPEN · rev-1 · 2026-09-10 · node a · Tier-2 · base e9ed269b · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-09-13 · node a · Tier-2 · base e9ed269b · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -25,8 +25,10 @@ no assertion changed and no new oracle.
   Observed by **AC1**.
 - **S2** — replace the single unsharded row in `tools/run-gates/selftest-budgets.txt` with eight
   rows, one per shard, each carrying its own measured budget. **Without this the arity raise buys
-  NOTHING**, and that is the unit's central fact rather than a caveat. Observed by **AC3** and
-  **AC4**.
+  NOTHING**, and that is the unit's central fact rather than a caveat. The rows' explicit argv
+  literals raise `selftest-budgets.txt`'s count in `tools/install-prefix-carried.txt`, a BAN the
+  ratchet cannot raise, so the count is raised by hand with a fourth-column reason in the same
+  commit. Observed by **AC3** and **AC4**.
 - **S3** — declare eight per-shard assertion floors and re-measure `FLOOR_ASSERTIONS`, each number
   carrying the reading it was set against. Observed by **AC2**.
 - **S4** — a shard-join assertion, so eight green shards constitute a whole-suite claim rather than
@@ -45,7 +47,11 @@ no assertion changed and no new oracle.
 
 ### Edges
 
-- **consumes-from** `none`
+- **consumes-from** `TOOL-aBatchedArm-4` — the regex that lets a `--shard i/8` row pass `--check`, the
+  declared `--pooled` mode, and the kit runner's pooled path that runs the eight rows concurrently.
+  Without it the rows red the always-on budget leg and would run serially if they resolved.
+- **hands-off** `TOOL-aBatchedArm-5` — the evidence-derived pooled hang bound; this unit's rows run
+  under `--sweep`'s inherited bound until it lands, and AC4's reading is what seeds its evidence.
 - **hands-off** `TOOL-aBatchedArm-1` — the conversion, which lands on top of this split and whose AC6
   grades the pair.
 
@@ -159,6 +165,12 @@ its state, and a deleted shard row, each staged and observed RED then unstaged �
 
 ## 9. Revision log
 
+- rev-2 · 2026-09-13 · Edges · §2 S2 · order · mirrors `TOOL-aBatchedArm-4` rev-2's split: this unit
+  now declares `consumes-from` unit 4 (the regex, the mode, the kit runner's pooled path) and
+  `hands-off` unit 5 (the evidence-derived bound), and moves to order 2 behind the prerequisite.
+  Takes the `selftest-budgets.txt` install-prefix raise, which is the rows' and not the runner's.
+  Round 1's own eight blockers are NOT folded here: the loop for this subject is still armed and the
+  fold lands when the runner unit's shape is settled, since three of them were about the runner.
 - rev-1 · 2026-09-10 · initial draft, from round 2's measurement that batching alone lands at 40 to
   44 minutes. Added to the build by `--rescope --act add` under protocol §11 rather than parked: it
   makes the measured observable strictly better, makes nothing worse, and trips no M3 veto. Records

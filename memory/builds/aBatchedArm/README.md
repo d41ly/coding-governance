@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-10
 streams: tooling
 roster: TOOL
-ids: TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4
+ids: TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 TOOL-aBatchedArm-5
 authorized-by: prompt
 ---
 
@@ -78,30 +78,30 @@ adopted under protocol §11 after that measurement, not planned.
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 4 unit(s) · node a · opened 2026-09-10 · streams tooling
-ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4
+ids TOOL-aBatchedArm-1 TOOL-aBatchedArm-2 TOOL-aBatchedArm-3 TOOL-aBatchedArm-4 TOOL-aBatchedArm-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards](spec/2026-09-10-spec-TOOL-aBatchedArm-3.md) | 1 | 2 | OPEN | rev-1 | 2026-09-10 |
-| [TOOL-aBatchedArm-4 — declared execution modes for the self-test runner](spec/2026-09-13-spec-TOOL-aBatchedArm-4.md) | 1 | 2 | OPEN | rev-1 | 2026-09-13 |
+| [TOOL-aBatchedArm-4 — declared execution modes for the self-test runner](spec/2026-09-13-spec-TOOL-aBatchedArm-4.md) | 1 | 2 | OPEN | rev-2 | 2026-09-13 |
 | [TOOL-aBatchedArm-1 — batch the gate self-test's arms by tree state](spec/2026-09-10-spec-TOOL-aBatchedArm-1.md) | 2 | 2 | OPEN | rev-3 | 2026-09-10 |
+| [TOOL-aBatchedArm-3 — grade the gate self-test as eight declared shards](spec/2026-09-10-spec-TOOL-aBatchedArm-3.md) | 2 | 2 | OPEN | rev-2 | 2026-09-13 |
 | [TOOL-aBatchedArm-2 — the structural group linter over the batched self-test](spec/2026-09-10-spec-TOOL-aBatchedArm-2.md) | 3 | 2 | OPEN | rev-2 | 2026-09-10 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aBatchedArm-4.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aBatchedArm-4.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-aBatchedArm-3`, `TOOL-aBatchedArm-4` | yes |
-| 2 | `TOOL-aBatchedArm-1` | no |
+| 1 | `TOOL-aBatchedArm-4` | no |
+| 2 | `TOOL-aBatchedArm-1`, `TOOL-aBatchedArm-3` | yes |
 | 3 | `TOOL-aBatchedArm-2` | no |
 <!-- /gen:build-order -->
 
