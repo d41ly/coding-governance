@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.3 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-13T21:40:00+03:00 @ 5677452c4905bef99d923ad11d9264e5152603f0
+last-audit: 2026-09-14T02:17:29+03:00 @ c4f0230860daf81e2988f247ab29eea73a931dba
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 2661b66b0d82063dcccadfc527e4c5525c129d28
+last-body-change: 1447605bee171961d3a186963f673353790ec694
 check-script: skills/session-kickoff/manifest-check.sh
 -->
 
@@ -260,8 +260,10 @@ does — hit three times in one file in one session) · `process-creation-is-the
   so QUOTING a stale artifact that contains one reds the spec. Paraphrase the shape instead.
 - A new tool at the REPO ROOT rather than under `tools/` silently leaves the enforced surface: the
   source-level gates, the codebase-map inventories and drift-audit's globs all scope to `tools/**`.
-- Adding ONE gate leg trips a SET of meta-gates that GROWS as new ones land — run the full bar,
-  never a list. A leg needs a `[[gate_leg]]` in its kit's `kit.toml`, else an `[[exempt_leg]]`.
+- Adding ONE gate leg trips a SET of meta-gates that GROWS as new ones land — at the push boundary
+  run the full bar, never a list; inside a build pass run each meta-gate's own script by hand,
+  never the bar (BUILD-METHOD M6). A leg needs a `[[gate_leg]]` in its kit's `kit.toml`, else an
+  `[[exempt_leg]]`.
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
@@ -309,6 +311,3 @@ does — hit three times in one file in one session) · `process-creation-is-the
 - The hygiene engine PRE-SETS its conf keys and sources `.memory-tree.conf` OVER them, so a blank line
   overrides a default WITH BLANK — which every measured pin uses to mean "skip". A key that must not be
   skippable is captured BEFORE the source and restored after; `SPEC10_CUTOFF` is the seam.
-- A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
-  RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
-  before and after, never estimate, and record every movement beside the number.

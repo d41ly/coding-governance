@@ -41,7 +41,7 @@
 // ratchet row and no method-carriers row.
 export const meta = {
   name: 'unattended-unit',
-  version: '1.0', // gov:kit unattended-unit@1.0 — engine identity (deployed verbatim)
+  version: '1.1', // gov:kit unattended-unit@1.1 — engine identity (deployed verbatim)
   description:
     'Builds exactly ONE unit of an unattended build, in a sidechain whose orientation is that unit spec and that unit brief. The roster is not in scope here; the parent holds it and holds the order.',
   phases: [{ title: 'Unit', detail: 'read the brief and the spec, declare the write set, build, commit' }],
@@ -148,6 +148,11 @@ const PROMPT =
   '. The spec is the design; where you must diverge, CHANGE THE SPEC FIRST as a rev-N bump with its ' +
   'section 9 line, then write the code.\n' +
   DRIVER_STEPS +
+  'RUN NO MERGE BAR AND NO SELF-TEST SUITE in this unit: not run-gates.sh in any form, not a ' +
+  'GATE_FULL= or GATE_SELFTESTS= prefix, not run-selftests.sh, not run-unattended-gates.sh, not any ' +
+  '*.test.sh suite. Verify with the DIRECT check the spec\'s acceptance names — a checker run on a ' +
+  'staged break, a `--selftest` flag, a fixture. A criterion only a suite can observe is not run ' +
+  'here: name it in `summary` and the main loop runs the owed bar once, after every unit is terminal.\n' +
   'Commit with the unit id in the subject. IN THAT SAME COMMIT, set this unit\'s spec status header ' +
   'to CLOSED — or to WONTDO with a reason. That header is the only fact the driver\'s --plan verb ' +
   'reads to decide a unit is finished, so a unit built without it leaves the run\'s own loop counter ' +

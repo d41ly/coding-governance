@@ -1,12 +1,13 @@
 # TOOL-aDeferredBar-1 — the instruction: no bar and no suite inside a pass, at every carrier a build agent reads
 
-**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 1
+**Status:** CLOSED · rev-4 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-TOOL-aDeferredBar-1-1-research-bar-in-a-pass.md](../build/2026-09-13-build-TOOL-aDeferredBar-1-1-research-bar-in-a-pass.md) | research | TOOL-aDeferredBar-2 TOOL-aDeferredBar-3 |
+| [2026-09-14-build-TOOL-aDeferredBar-1-2-acceptance-ledger.md](../build/2026-09-14-build-TOOL-aDeferredBar-1-2-acceptance-ledger.md) | journal | — |
 | [2026-09-13-prompt-TOOL-aDeferredBar-1-0-run-mandate.md](../prompts/2026-09-13-prompt-TOOL-aDeferredBar-1-0-run-mandate.md) | journal | — |
 | [2026-09-13-prompt-TOOL-aDeferredBar-1-1-spec-brief.md](../prompts/2026-09-13-prompt-TOOL-aDeferredBar-1-1-spec-brief.md) | journal | — |
 | [2026-09-14-prompt-TOOL-aDeferredBar-1-2-build-brief.md](../prompts/2026-09-14-prompt-TOOL-aDeferredBar-1-2-build-brief.md) | journal | — |
@@ -49,7 +50,10 @@ the operator's transcript store came from inside a sidechain.
 - **S5** — Line 263 of `memory/guides/SESSION-KICKOFF.md` is qualified in place so the "run the
   full bar, never a list" trap reads as the push-boundary sentence it is, and the manifest is
   re-stamped in the same commit: `last-audit` and `last-body-change`, with a `manifest-audit: delta`
-  line in the commit message. Observed by AC12 and AC13.
+  line in the commit message. The manifest sat 14 bytes under `manifest-check.sh` C7's 25600-byte
+  file cap before this unit, so the qualification is paid for by deleting the one traps bullet
+  that restated a §B bullet — the retired read-path budget, `TOOL-dSpentCeiling-1`, which §B
+  still records. Observed by AC12 and AC13.
 - **S6** — This spec obeys the rule it states: no criterion in §6 names a bar, a `GATE_*=` prefix
   or a `*.test.sh` suite as its observation, and its §7 leg line resolves against the manifest.
   Observed by AC14 for the joins and by AC16 for the bar-token absence. This file is OUTSIDE the
@@ -209,7 +213,11 @@ carries none.
 >   `[[exempt_leg]]`.
 
 It sits in `### Environment traps worth front-loading`, where `manifest-check.sh` C11 caps a bullet
-at 400 bytes; the new bullet is about 330 and AC12 observes the cap through the checker. The
+at 400 bytes; the new bullet is about 330 and AC12 observes the cap through the checker. C7 caps
+the whole FILE at 25600 bytes and it measured 25586 at the base, so the bullet's +130 is paid for
+by deleting the trap that began "A spent budget blocks RECORDING work" (271 bytes): its one fact,
+that the read-path ceiling is retired under `TOOL-dSpentCeiling-1`, is the §B bullet two sections
+up. C7 says trim and never raise, so no other disposition existed. The
 manifest is WATCHED on `tools/memory-tree/check-memory-hygiene.sh` and `memory/guides/BUILD-METHOD.md`,
 both of which S3 edits, so C5 and its staged form C5s demand the re-stamp in the SAME commit:
 `last-audit` takes a datetime that advances and the sha of `git merge-base origin/main HEAD`,
@@ -271,7 +279,7 @@ sentence is inert until an agent reads it, and the version bumps are the rollout
 | `tools/unattended/unattended.sh` · `check-unattended.sh` · `check-pass-order.sh` · `check-brief-recorded.sh` | constant and same-line marker to `1.20` |
 | `tools/unattended/PLAYBOOK-TEMPLATE.template.md` · `PROTOCOL.template.md` · `VERBS.template.md` · `playbook.fixture.template.md` · `README.md` | marker only |
 | `memory/guides/PLAYBOOK-TEMPLATE.md` · `UNATTENDED-PROTOCOL.md` · `UNATTENDED-VERBS.md` · `tools/unattended/playbook.fixture.md` | re-copied, marker only |
-| `memory/guides/SESSION-KICKOFF.md` | line 263 qualified; `last-audit` and `last-body-change` re-stamped |
+| `memory/guides/SESSION-KICKOFF.md` | line 263 qualified; one duplicate traps bullet deleted for C7; `last-audit` and `last-body-change` re-stamped |
 | this spec | status to `CLOSED` in the build commit |
 
 Twenty-eight files: five carry a rule, twenty-two carry a marker, one is this record. The count is
@@ -390,8 +398,8 @@ DERIVED from the two `git grep -l` populations above plus the five carriers and 
   figure: PINNED — fifteen, counted 2026-09-13 at `e3d0f68c` by the same `git grep -l` over `1.19`.
 - **AC12** — When `grep -c 'inside a build pass run each meta-gate' memory/guides/SESSION-KICKOFF.md`
   runs, it prints `1`, and `bash skills/session-kickoff/manifest-check.sh` exits 0.
-  Red when: the count is `0`, C11 reports the bullet over 400 bytes, or C5 reports a watched change
-  with no re-stamp.
+  Red when: the count is `0`, C11 reports the bullet over 400 bytes, C7 reports the file over
+  25600 bytes, or C5 reports a watched change with no re-stamp.
 - **AC13** — When `git log -1 --format=%B | grep -c 'manifest-audit: delta'` runs at the build
   commit, it prints `1`, `grep -c "@ $(git merge-base origin/main HEAD)" memory/guides/SESSION-KICKOFF.md`
   prints `1`, and `grep -c "^last-body-change: $(git rev-parse HEAD~1)" memory/guides/SESSION-KICKOFF.md`
@@ -502,6 +510,12 @@ mark rather than the record.
   this file's acceptance tokens, printing `0`, with a liveness command printing `1`; recorded as
   Fork E in §8. AC16 is `grep -P` rather than the `-E` the audit spelled, because ERE has no
   `(?:` and printed `0` over a bar token when probed. §5 perf names the pipeline.
+- rev-4 · 2026-09-14 · S5 · §4 · AC12 · the build pass: `manifest-check.sh` C7 redded at 25716
+  bytes against its 25600-byte file cap once the S5 bullet was written, a cap rev-3 priced only
+  per bullet (C11). C7 says trim and never raise, so the traps bullet restating the retired
+  read-path budget (`TOOL-dSpentCeiling-1`, still recorded in §B) is deleted, 271 bytes, and S5,
+  the §4 carrier-5 paragraph, the files table and AC12's red-when record it. Status to CLOSED in
+  the build commit.
 
 ## 10. Reuse audit
 
