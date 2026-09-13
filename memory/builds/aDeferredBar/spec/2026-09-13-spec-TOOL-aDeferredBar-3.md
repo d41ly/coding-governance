@@ -1,6 +1,6 @@
 # TOOL-aDeferredBar-3 — the act refusal: a PreToolUse hook denies a flagged bar or a suite before VERIFYING
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 3 · ratified 2026-09-13
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 3 · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -78,8 +78,14 @@ the corpus in §4 shows close to half of those runs come from there.
   criteria are direct because the build README's fifth rule and the child prompt unit 1 ships bind
   the pass regardless, and because once S4 lands the hook itself denies a suite invocation in the
   pass that built it. Every deny shape is a §4 table row, §6 cites rows and never spells an
-  invocation as an observation, and the suite S5 names appears in §6 only as prose. Row D1 reads
-  the empty assignment as the OFF spelling, which is the plain bar, and unit 2's predicate agrees.
+  invocation as an observation, and the suite S5 names appears in §6 as prose and once as a
+  `grep` argument with `grep` at command position, never bare inside a backticked token. Unit
+  2's `BAR` regex, typed from its §4, matches no backticked token of this §6's bullets or of §7's
+  leg line: probed 2026-09-14 on that regex over this file's two graded populations with the
+  checker's own `TICK`, `LEG_LINE` and `extract_gates`, and the probe's liveness control is the
+  same regex matching a bare suite basename. Round 2 M2 found the one token rev-2 had left, in
+  AC9; rev-3 removed it. Row D1 reads the empty assignment as the OFF spelling, which is the
+  plain bar, and unit 2's predicate agrees.
 
 ### Edges
 
@@ -93,10 +99,11 @@ the corpus in §4 shows close to half of those runs come from there.
   `PreToolUse` hook fires inside a `Workflow` sidechain. Nothing here re-measures it; if it were
   false the hook would still bind the main loop and nothing else.
 - **hands-off** external — a `check-wiring.sh` arm for this hook, a govkit `selfcheck` arm for a
-  `*.test.sh` in a kit directory with a budget row and no `project-owned` claim (a backlog row the
-  main loop files at landing; the resolution probe in AC9 found `check-brief-recorded.test.sh`
-  shipping through the `**` rule today), and a real tokenizer if the textual ceiling above ever
-  stops being enough.
+  `*.test.sh` in a kit directory with a budget row and no `project-owned` claim (already filed as
+  `TOOL-aDeferredBar-4` from round-1 M8, in the same commit as rev-2, so the landing files no
+  second row; the resolution probe in AC9 found `check-brief-recorded.test.sh` shipping through
+  the `**` rule today), and a real tokenizer if the textual ceiling above ever stops being
+  enough.
 
 ## 4. Design
 
@@ -283,7 +290,7 @@ so rather than letting a reader assume it is graded.
 | `tools/unattended/unattended.sh` | the `run-branch:` preflight write beside the `anchor-kind` pin at line 2724, pinned once in the same idiom, from `git symbolic-ref HEAD`, skipped when that does not resolve |
 | `tools/unattended/PROTOCOL.template.md` | fact 13 in section 2's numbered list, and the sentence after fact 12 amended so fact 13 is named as always written when `HEAD` is a branch |
 | `memory/guides/UNATTENDED-PROTOCOL.md` | re-copied by `bash tools/unattended/adopt-unattended.sh`, never edited; check 10 of `check-unattended.sh` grades the pair |
-| `tools/unattended/unattended.test.sh` | one arm beside 50d at line 2897: a default-branch-anchored preflight writes `run-branch: refs/heads/main`; its budget row (3860 s against 2569 s measured) does not move for one arm on an existing fixture |
+| `tools/unattended/unattended.test.sh` | one arm beside 50d at line 2897: a default-branch-anchored preflight writes `run-branch:` equal to `$(git symbolic-ref HEAD)` read from the fixture at the moment of the preflight, and the arm asserts against that read, never a literal — `reset_tree` at line 355 checks out `unit`, so the value there is `refs/heads/unit`, and a preflight with `HEAD` on `main` is refused outright at `unattended.sh:903` where the merge-base equals `HEAD`; its budget row (3860 s against 2569 s measured) does not move for one arm on an existing fixture |
 | `tools/unattended/gate-guard.test.sh` | new, the withheld suite; every fixture is a scratch repo under `mktemp -d` holding a `.git` `HEAD`, a conf and a record, never the real tree; prints `PASS (<n> assertions)` against a derived `FLOOR_ASSERTIONS` as `scratch-guard.test.sh:239` does; carries the `PHASES_CORE` parity arm and every payload §6 feeds by hand |
 | `tools/unattended/adopt-unattended.test.sh` | `seed()` gains `gate-guard.fragment.json` in its copy list and writes a `.claude/settings.json` carrying the fragment's marker, so its two `--check` arms at lines 76 and 119 keep exit 0 once the S6 arm exists; its 60 s budget row (38 s measured) does not move for one file write and one grep |
 | `tools/unattended/kit.toml` | `gate-guard.test.sh` joins the `project-owned` include list; the `**` engine rule already ships the hook and the fragment |
@@ -294,7 +301,8 @@ so rather than letting a reader assume it is graded.
 | `tools/unattended/SKILL.template.md` | the half-sentence appended to the bullet unit 1 adds; pinned phrase above |
 | `.claude/skills/unattended/SKILL.md` | re-rendered by `bash tools/unattended/adopt-unattended.sh`, never edited |
 | the version step | `KIT_UNATTENDED_VERSION` in `unattended.sh`, `check-unattended.sh`, `check-pass-order.sh` and `check-brief-recorded.sh` with their same-line markers, every `tools/unattended/*.template.md` marker, `README.md`, `playbook.fixture.md`, and the four installed copies the adopter re-copies or re-renders under `memory/guides/` and `.claude/skills/` — one step past the value read from `unattended.sh` at dispatch, DERIVED there and not pinned here |
-| `memory/map/features/unattended.md` | prose refresh on touch naming the hook; no inventory key is claimed, because `git-hooks` enumerates `.githooks/` and no class enumerates a `PreToolUse` hook |
+| `memory/map/features/unattended.md` | prose refresh on touch naming the hook; no inventory key is claimed in `memory/map/generated/inventories.json`, because `git-hooks` enumerates `.githooks/` and no class enumerates a `PreToolUse` hook |
+| `memory/map/generated/` | `symbols.json` re-rendered by `python tools/codebase-map/gen_map.py --write` after the hook lands, in the same commit: the `kit-js` symbol layer (`map_extractors.py:212`, `enumerate_exports` plus `scan_js_definitions` over all of `tools/`) indexes every kit `.js` and already carries `scratch-guard.js` and `procmon-hook.js`, so a new `gate-guard.js` exporting ten functions moves the artifact and the freshness test reds until the regen |
 | `memory/guides/SESSION-KICKOFF.md` | one trap line beside the `scratch-guard` line at `SESSION-KICKOFF.md:221`, with BOTH stamps re-stamped in the same commit as unit 1's S5 spells them: `last-audit` (datetime advanced, sha of `git merge-base origin/main HEAD`) and `last-body-change` (the sha of the commit's parent, the way `a4a512de` stamped `2661b66b`), and a `manifest-audit: delta` line in the commit message |
 
 ### Alternatives rejected
@@ -401,15 +409,20 @@ no deny shape.
   prints `1`; when `grep -cP 'selftest-budgets\.txt\t15\t' tools/install-prefix-carried.txt` runs,
   it prints `1`; and when
   `python -c "import sys,pathlib as p;sys.path.insert(0,str(p.Path('tools','govkit')));import govkit as g;r=p.Path('.');print(sorted(g.resolve_entry(r,g.load_toml(p.Path('tools','unattended','kit.toml')),g.canonical_ctx('unattended'))['carved']))"`
-  runs, its printed set names `gate-guard.test.sh` under the kit directory — the resolution govkit
+  runs, its printed set names the suite S5 names, under the kit directory — the resolution govkit
   applies, so the `**` rule's pool has dropped the file.
   Red when: the budget row is absent, which is a suite exempt from the cost rule by arriving; or
   the printed set lacks the suite, which is the `**` rule shipping it to every adopter.
 - **AC10** — When `(cd "$FIX" && bash tools/unattended/adopt-unattended.sh --check); echo "rc=$?"`
-  runs in a scratch tree seeded as the adopter suite's `seed()` seeds one but with no
-  `.claude/settings.json`, it prints `rc=1` and stdout names the hook UNWIRED and the `--fragment`
-  remedy; with the marker present it prints `rc=0` and the arm is silent. Observed RED first: the
-  unseeded tree against the adopter as it stands prints `rc=0`.
+  runs in a scratch tree prepared in this order — seeded as the adopter suite's `seed()` seeds one,
+  THEN the adopter's install run inside it with no verb, `bash tools/unattended/adopt-unattended.sh`
+  from `FIX` as the suite's arm 1 does at its line 63, so the five existing artifacts are present, THEN
+  `.claude/settings.json` omitted or removed — it prints `rc=1` and stdout names the hook UNWIRED
+  and the `--fragment` remedy; with the marker present it prints `rc=0` and the arm is silent. The
+  install step is the precondition: `--check` refuses sequentially and its first arm
+  (`adopt-unattended.sh:259`, the unrendered Skill) exits 1 on a tree that is only seeded, before
+  any sixth arm runs, so a seed-only fixture observes the Skill arm and not this one. Observed RED
+  first: the installed-then-unwired tree against the adopter as it stands prints `rc=0`.
   Red when: an unwired tree passes `--check`, which is the silent-unwiring class.
 - **AC11** — When `node "$PROBE" "$HOOK" ~/.claude/projects` runs, where `PROBE` is the probe
   script the build record carries verbatim and which requires the hook's exported `scanDenyHits`
@@ -422,9 +435,16 @@ no deny shape.
   Red when: a listed near-miss is a run, which means the command-position grammar admits a shape
   the blanked view then hides.
 - **AC12** — When `python tools/codebase-map/test_codebase_map.py` runs, it exits 0 with the
-  `unattended` dossier refreshed and no new key claimed; and when `python tools/lexicon/lexicon.py`
-  runs, it reports no new offender in cell `js.function camel`.
-  Red when: a hook function leads with a verb outside the declared table.
+  `unattended` dossier refreshed, no new key claimed in `memory/map/generated/inventories.json`, and
+  `memory/map/generated/symbols.json` re-rendered by `python tools/codebase-map/gen_map.py --write`
+  in the same commit as the hook — its `test_generated_artifacts_are_fresh` byte-compares that
+  artifact against a live render, and the `kit-js` layer indexes the new file's ten exports, so
+  the test passes only after the regen; and when `python tools/lexicon/lexicon.py` runs, it
+  reports no new offender in cell `js.function camel`. Observed RED first: the freshness test
+  against the tracked `symbols.json` with the hook present and no regen, which reds naming the
+  regen remedy.
+  Red when: a hook function leads with a verb outside the declared table, or `symbols.json` is
+  stale, which is a generated artifact landed for the main loop's bar to red.
 - **AC13** — When `grep -c 'gate-guard' memory/guides/SESSION-KICKOFF.md` runs after the trap line
   lands, it prints `1`; `bash skills/session-kickoff/manifest-check.sh` exits 0;
   `git log -1 --format=%B | grep -c 'manifest-audit: delta'` prints `1` at the build commit;
@@ -438,9 +458,14 @@ no deny shape.
   prints `1`; when `grep -c "^13\. \*\*The run's local branch ref" tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md`
   runs, it prints `1` for each; and when `wc -c memory/guides/UNATTENDED-PROTOCOL.md` runs, it
   prints a figure under 61440. The driver suite's arm that preflights a default-branch fixture and
-  reads the fact back is the main loop's at `VERIFYING`.
+  reads the fact back is the main loop's at `VERIFYING`, and it asserts the value against
+  `$(git symbolic-ref HEAD)` read from the fixture at the preflight, never a literal: the fixture
+  sits on `unit` after `reset_tree`, so `refs/heads/main` is a value it cannot produce, and a
+  preflight with `HEAD` on `main` is refused at `unattended.sh:903` before any fact is written.
   Red when: the template and the render disagree, which check 10 of `check-unattended.sh` also
-  reds; or the render crosses the guide cap, which `memory hygiene` check 6 reds.
+  reds; or the render crosses the guide cap, which `memory hygiene` check 6 reds; or the arm
+  spells the expected branch as a literal, which the fixture fails at `VERIFYING` inside the
+  driver suite's 2569 s.
 - **AC15** — When `grep -c 'refused at the tool call, not only forbidden' tools/unattended/README.md`
   runs, it prints `1`; when `grep -c 'gate-guard.js refuses it at the tool call' tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md`
   runs, it prints `1` for each; and when `grep -c 'gate-guard.js' memory/map/features/unattended.md`
@@ -458,7 +483,7 @@ mentions this kit nowhere. `memory hygiene` joins for the protocol render's byte
 
 New arm: tools/unattended/gate-guard.test.sh · a fixture record at BUILDING and the flagged bar, one arm per §6 payload, the `PHASES_CORE` parity arm, and the default-branch record keyed by `run-branch:` · `FLOOR_ASSERTIONS` derived at the suite's first green, none moved
 
-New arm: tools/unattended/unattended.test.sh · a default-branch-anchored preflight read back for `run-branch:`; the break is a driver that does not write it · none
+New arm: tools/unattended/unattended.test.sh · a default-branch-anchored preflight read back for `run-branch:` against the fixture's own `git symbolic-ref HEAD`, never a literal; the break is a driver that does not write it · none
 
 New arm: tools/unattended/adopt-unattended.test.sh · no new arm — `seed()` writes the settings file the S6 arm reads; the break is an unseeded tree, `--check` exits 1 · none
 
@@ -506,7 +531,10 @@ New arm: tools/unattended/adopt-unattended.test.sh · no new arm — `seed()` wr
   build README's fifth rule and unit 1's child prompt bind the pass whichever way unit 2's
   predicate reads, and with unit 2's cutoff at 2026-09-14 this spec is outside that gate's
   population either way; widening the predicate to admit a bare suite basename would reverse unit
-  2's fork D for a document that no longer needs it.
+  2's fork D, and this document does not need it: rev-2 wrote that sentence while AC9 still
+  carried one bare `*.test.sh` basename inside a backticked token, which round 2 M2 found, and
+  rev-3 un-backticked it, so the premise holds by the probe §3's last bullet states rather than
+  by assertion. The resolution stands.
 
 ## 9. Revision log
 
@@ -517,10 +545,21 @@ New arm: tools/unattended/adopt-unattended.test.sh · no new arm — `seed()` wr
   §8 F7: the `run-branch:` fact on both anchors with the `branch-ref:` fallback, the protocol's
   fact 13 and its headroom, the driver-suite arm) · H5 (the adopter suite's `seed()` row and its
   unmoved budget) · M5 (AC2's separator payloads, AC5's `grep` payload) · M8 (AC9's role
-  resolution through `resolve_entry`; the govkit `selfcheck` arm is the backlog row §3 hands off)
-  · L1 (§4 pinned phrases, AC13's delta-line grep, AC15) · L2 (unit 1 §4 Carrier 3 cited in §3
-  and §4) · L4 (the manifest row names both stamps, AC13 observes both) · L5 (the retired
-  per-branch invariant deleted from §4 The key).
+  resolution through `resolve_entry`; the govkit `selfcheck` arm is the backlog row §3 hands off,
+  `TOOL-aDeferredBar-4`) · L1 (§4 pinned phrases, AC13's delta-line grep, AC15) · L2 (unit 1 §4
+  Carrier 3 cited in §3 and §4) · L4 (the manifest row names both stamps, AC13 observes both) ·
+  L5 (the retired per-branch invariant deleted from §4 The key).
+- rev-3 · 2026-09-14 · §3 · §4 · §6 · §7 · §8 · AC9 · AC10 · AC12 · AC14 · folded review round 2:
+  M2 (AC9's second suite mention un-backticked; §3's last bullet now states the `BAR` probe over
+  this file's two graded populations, run 2026-09-14 and printing zero hits, instead of asserting
+  it; §8 F8's premise sentence rewritten, its resolution kept) · M3 (AC10's fixture precondition:
+  seed, run the adopter's install with no verb, THEN omit or remove `.claude/settings.json`, then
+  `--check`; the RED-first re-stated on that fixture) · M4 (the `unattended.test.sh` files-table
+  row, the §7 `New arm:` line and AC14 assert `run-branch:` against the fixture's own
+  `git symbolic-ref HEAD`, never the impossible literal `refs/heads/main`) · M5 (a
+  `memory/map/generated/` row for the `symbols.json` regen the `kit-js` layer forces; AC12 names
+  the freshness test's subject and its RED-first) · L4 (§3 hands-off edge and the rev-2 line cite
+  `TOOL-aDeferredBar-4` instead of promising a row the landing would file twice).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aDeferredBar-2 — the spec gate: a bar or suite invocation is not an acceptance observation
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 2
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -28,22 +28,28 @@ Tier-2 by the manifest's tier rule: it changes the spec template's rules and a s
 - **S1** — The join itself in `tools/check-spec-tokens.py`: the predicate, the two populations it
   reads — the acceptance section located by heading text through `AC_HEAD` and
   `extract_acceptance`, the leg line as today — the cutoff read through `read_conf_key`, the hit
-  kind `bar`, a refusal text that names the substitute, and a report line printed on every run.
-  Observed by AC1, AC2, AC3, AC4, AC5, AC8, AC15 and AC16.
+  kind `bar`, a refusal text that names the substitute, a report line printed on every run, and a
+  REFUSAL of a cutoff value that is not strictly past the date of the commit that set it, naming the
+  key, the value and that date (§4 Date gate). Observed by AC1, AC2, AC3, AC4, AC5, AC8, AC15, AC16
+  and AC17.
 - **S2** — The module docstring: the population list gains the fourth join and says the bullet loop
   now finds the acceptance section by heading text; the WHAT IT DOES NOT CHECK paragraph gains what
   this join cannot see — a path built at runtime, the body of a `sh -c` string, the body of a fenced
-  block, and a suite named in prose. NOT OBSERVED — a sentence in a docstring has no command that
-  observes it; the spec audit reads it.
+  block, and a suite named in prose. Each of those five clauses carries one pinned phrase, spelled in
+  §4 Docstring phrases and grepped by AC18, so a clause dropped or half-written reds rather than
+  reading as covered.
 - **S3** — `--list` prints every near-miss of the predicate as a `NEAR` line, exit 0. Observed by
   AC3 and AC9.
-- **S4** — The key `SPEC_DIRECT_CUTOFF` in `.memory-tree.conf` at `2026-09-14`, with a register
-  comment in the idiom of its neighbours that carries the ref-wide reading §4 records, and a blank
-  row in `tools/memory-tree/.memory-tree.conf.example`. Observed by AC8 and AC14.
-- **S5** — Nine arms in `tools/check-spec-tokens.test.sh`, sharing one scratch repo per fixture
-  family, and its assertion floor moved to the count the suite prints. Observed by AC1 through AC7,
-  AC15 and AC16, each arm's fixture exercised by the direct checker; the suite's own verdict is the
-  main loop's at `VERIFYING`, per the build README's rule 6.
+- **S4** — The key `SPEC_DIRECT_CUTOFF` in `.memory-tree.conf` at the relation's answer at the
+  build commit — 2026-09-15 by both clauses as measured 2026-09-14, re-derived at that commit and
+  again at landing — with a register comment in the idiom of its neighbours that carries both
+  clauses of the relation and the reading §4 Rollout records, and a blank row in
+  `tools/memory-tree/.memory-tree.conf.example`. Observed by AC8 and AC14.
+- **S5** — Ten arms in `tools/check-spec-tokens.test.sh`, sharing one scratch repo per fixture
+  family, and its assertion floor `FLOOR_ASSERTIONS` moved from 20 to 32, the count the suite prints
+  when every arm runs. Observed by AC1 through AC7, AC15, AC16 and AC17, each arm's fixture exercised
+  by the direct checker, and the floor by AC19; the suite's own verdict is the main loop's at
+  `VERIFYING`, per the build README's rule 6.
 - **S6** — One paragraph in `tools/memory-tree/SPEC-TEMPLATE.template.md` under the §6 rules,
   beside the `SPEC_WITNESS_CUTOFF` and `SPEC_FAILURE_MODE_CUTOFF` paragraphs, stating the rule and
   the substitute; rendered to `memory/TEMPLATE-SPEC.md`. Observed by AC10.
@@ -64,14 +70,19 @@ Tier-2 by the manifest's tier rule: it changes the spec template's rules and a s
   defect M2 exists to prevent.
 - No live spec of another build is rewritten, and there is no drain, and nothing in flight is
   folded. What was measured, and where: at `b2a330be`, 23 live specs carry such a token, the newest
-  dated 2026-09-04; on this tree at HEAD the count is 24, because this build's own unit 3 is one.
-  Measured 2026-09-14 over every local and remote ref and every live worktree by the §4 command, the
-  newest spec filename date anywhere is 2026-09-13, and four live specs at that date on two other
-  refs carry a bar token — tooling unit 5 of build aBatchedArm, and kickoff units 1 and 2 plus
-  tooling unit 1 of build aReplayedCard, named in full by the round-1 audit and paraphrased here so
-  this file does not cite ids the tree never defines. The cutoff `2026-09-14` sits strictly past
-  every one of them, so none reds at its merge and none needs a fold — this build's own three specs
-  included, which are dated 2026-09-13 and are therefore not graded either.
+  dated 2026-09-04; at `dd8968c4`, the tip this rev-3 was folded against, the count is 24, because
+  unit 3's AC9 there backticks a bare suite basename — round-2 M2, whose fold in the same rev-3
+  commit as this one takes the count back to 23. Measured 2026-09-14 over every local and remote
+  ref (77) and every live worktree by the §4 command, the newest spec filename date anywhere is
+  2026-09-13, and four live specs at that date on two other refs carry a bar token — tooling unit 5
+  of build aBatchedArm, and kickoff units 1 and 2 plus tooling unit 1 of build aReplayedCard, named
+  in full by the round-1 audit and paraphrased here so this file does not cite ids the tree never
+  defines. The cutoff — 2026-09-15 as measured 2026-09-14, and the relation's answer at the build
+  commit and again at landing — sits strictly past every one of them AND past the day it is set, so
+  none reds at its merge and none needs a fold — this build's own three specs included, which are
+  dated 2026-09-13 and are therefore not graded either — and a spec any node dates on the setting
+  day cannot red either, which is what the relation's second clause buys and what rev-2's value,
+  the measuring day itself, did not (round-2 H1).
 - The act — a bar run that no spec named — is `TOOL-aDeferredBar-3`'s, and the wording at the
   method's M6 and at the manifest is `TOOL-aDeferredBar-1`'s. This unit sees only the instruction
   as a spec writes it.
@@ -142,9 +153,13 @@ diff-scoped bar at `BUILDING` because it grades the ACT and this join grades the
 the alignment does NOT do: a bare `*.test.sh` basename with no launcher inside a backticked §6
 bullet stays a hit, because naming a suite as the observation is the exact shape the owner forbade,
 and a simple command carrying one of unit 3's read-only verbs stays a hit for the same reason —
-fork D stands. Measured on this tree at HEAD over the two graded populations of the 31 live specs:
-the old and new spellings agree on 59 tokens in 24 specs and differ on exactly one, unit 3's bare
-`GATE_FULL=`, which is unit 3's own fold to make.
+fork D stands. Measured at `dd8968c4` over the two graded populations of the 31 live specs, with
+the checker's own `TICK`, `LEG_LINE` and `extract_gates` and an `AC_HEAD`-located acceptance
+section: the old and new spellings agree on every graded token — 52 tokens in 24 specs — and differ
+on none. rev-2 reported one differing token, a bare flag assignment in unit 3, but that was measured
+against unit 3 rev-1; unit 3 rev-2 carries that spelling in prose only, and its one graded token at
+`dd8968c4` is the bare suite basename in its AC9 that round-2 M2 names, which both spellings hit and
+which leaves with M2's fold, taking the carrier count to 23 (round-2 L3).
 
 Measured over the 1164 backticked tokens in the two graded populations of the 28 live specs at
 `b2a330be`, this predicate and the brief's substring spelling agree on 49 tokens in 23 specs across
@@ -178,6 +193,40 @@ answer different questions.
 two populations are COUNTED, so the skip announces its size. A blank or absent key is OFF, and the
 report line says so together with that same count — the OFF state cannot hide how much it hides.
 
+**The relation, asserted — the one refusal this unit adds.** When the key is set, the checker asks
+the tree's own history when that value landed, one spawn:
+`git log -1 --format=%cs -G'^SPEC_DIRECT_CUTOFF="?<value>"?$' -- .memory-tree.conf`. A value that
+is not STRICTLY PAST that date is refused before any spec is graded, exit 1, on a line naming the
+key, the value and the date it saw:
+
+```
+spec-tokens: REFUSING — SPEC_DIRECT_CUTOFF <value> is not strictly past <date>, the day the
+value was committed; the register's rule is the day AFTER the later of the newest spec filename
+date on any ref and the setting commit's own date
+```
+
+Why the commit date and not the newest spec date on the tree, which is the arm round-2 H1
+sketched: the graded population is the specs dated at or after the cutoff, so from the day after
+landing a tree-only "cutoff is not past the newest spec" comparison refuses the very specs the
+join exists to grade, and a predicate that cannot tell the graded population from a violated
+relation is the vacuous-selector class. The commit date is a standing invariant — a re-derived
+value always lands in a commit dated before it — and it is the register's own sentence, "any
+value carried across a day boundary is stale by construction", made mechanical: rev-2's value,
+2026-09-14 committed on 2026-09-14, is exactly what it refuses, while no spec was dated that day
+for the sketched arm to see. It mechanises the second clause outright and the first for every spec
+dated no later than the day it was committed; the first clause's ref-wide reading stays a
+documented check at the register comment and is observed for this unit by AC8's red-when. An
+uncommitted value — the query prints nothing — cannot be checked and is not refused: the bar line
+carries `relation unchecked: value not yet committed`, so the pre-commit run of the build commit
+itself announces the skip and the push-boundary run, where the value is in history, asserts it.
+Measured 2026-09-14 on node `a`: the query costs 0.08 s when the value is in history and 0.33 s
+walking the conf's history when it is not; in a one-commit fixture both are the hit cost.
+
+**Docstring phrases.** The five sentences S2 adds each carry one phrase spelled verbatim, without
+backticks, and AC18 greps each: `a path built at runtime` · `inside a sh -c string` · `the body of a
+fenced block` · `a suite named in prose` · `finds the acceptance section by heading text`. All five
+print 0 on this tree today, which is the RED-first observation.
+
 **Hit shape.** `(f, "bar", tok, WHY)` with the token as the third field, so the existing waiver
 lookup keys on it unchanged and the existing stale-row rule applies. `WHY` is the refusal text:
 
@@ -194,6 +243,10 @@ spec-tokens: bar join · <k> token(s) examined in <n> live spec(s) at/after SPEC
 spec-tokens: bar join · SPEC_DIRECT_CUTOFF blank (arm off) · <p> live spec(s) carry a bar token
 ```
 
+The first shape gains ` · relation unchecked: value not yet committed` as a trailing field when the
+history query of the Date gate prints nothing, and carries nothing extra when the value is in
+history and strictly past its commit date — a skip announces itself; a pass does not decorate.
+
 **`--list` near-misses.** Every `TICK` token of a live spec's whole text that `BAR` matches and that
 is not one of that spec's graded-population tokens, plus every graded-population match in a
 pre-cutoff spec, prints as `spec-tokens: NEAR   [bar] <spec> :: <token> — <where>` where `<where>` is
@@ -206,15 +259,20 @@ the same house convention the `[path]` and `[leg]` rows already follow. The chec
 token and reads no kind; the kind is for the reader dispositioning the row. Stated here so nobody
 later builds a kind-reader on the assumption one exists.
 
-**The suite's fixtures.** The nine arms share two scratch repos rather than building nine, because
+**The suite's fixtures.** The ten arms share two scratch repos rather than building ten, because
 the cost of this leg is the `git init` and first commit, not the checker (§5). The DATED family —
-AC1, AC2, AC3, AC4, AC5, AC15, AC16 — shares one repo whose committed clean state is the suite's
-existing `scratch` fixture plus an empty tracked `tools/run-gates/run-gates.sh`, so the paths join
-stays green over a runner token and the only hit an arm can produce is the bar's. The WAIVER family
-— AC6, AC7 — shares a second, whose committed clean state is the AC1 fixture. Every arm is one edit
-from its family's committed clean state and is followed by `git add -A` as the existing arms are;
-between arms the repo is returned to that state with a single `git reset --hard`, never a fresh
-init. The fixture tokens, spelled here in a fence so the join never reads them as an instruction:
+AC1, AC2, AC3, AC4, AC5, AC15, AC16, AC17 — shares one repo whose committed clean state is the
+suite's existing `scratch` fixture plus an empty tracked `tools/run-gates/run-gates.sh`, so the
+paths join stays green over a runner token and the only hit an arm can produce is the bar's. The
+WAIVER family — AC6, AC7 — shares a second, whose committed clean state is the AC1 fixture. Every
+arm is one edit from its family's committed clean state and is followed by `git add -A` as the
+existing arms are — AC17 alone also COMMITS its edit, because the refusal it observes reads the
+value's commit date and a staged value is the announced skip, not the refusal; between arms the
+repo is returned to the clean state with a single `git reset --hard <clean-sha>`, the sha captured
+once after the family's first commit, never a fresh init. The DATED family's other arms leave their
+conf edits uncommitted, so their bar line carries the `relation unchecked` field and their cutoffs
+— dated before the fixture's commit day — are never refused. The fixture tokens, spelled here in a
+fence so the join never reads them as an instruction:
 
 ```
 AC1, AC2, AC4, AC5, AC6, AC7, AC15   GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh
@@ -223,6 +281,7 @@ AC3, the §7 `New arm:` line          bash tools/check-spec-tokens.test.sh
 AC3, the fence body under a §6 bullet, un-backticked   bash tools/run-gates/run-selftests.sh
 AC16, no hit                         GATE_FULL= cat tools/gate-legs.json
 AC16, hit                            GATE_FULL=1 cat tools/gate-legs.json
+AC17, committed conf, no token       SPEC_DIRECT_CUTOFF="2026-09-02"   (the fixture spec's own date)
 ```
 
 ### Inventory
@@ -245,15 +304,24 @@ uses. An adopter whose conf predates it sees the join off and announced, never r
 
 ### Rollout
 
-The cutoff is `2026-09-14`, and it is a RELATION rather than a constant: the owner's ruling at
-`TOOL-aJoinedCanon-1` §8 F1, repeated on every cutoff row in `.memory-tree.conf` since, puts a new
-cutoff strictly past the newest spec filename date on ANY ref — local, remote, live worktrees — so
-nothing in flight goes red at its merge. rev-1 measured at the base only, which the round-1 audit
-caught (H3). The reading that produces the value, run 2026-09-14 on node `a` over 75 refs and every
-worktree of `git worktree list`, returned `2026-09-13` on every ref that holds a spec at that date
-and on every worktree; the relation returns the day after. The command, which the conf comment
-carries beside the value and which is re-run at the build commit — if the day has rolled and a
-sibling has landed a spec dated 2026-09-14, the relation moves and the key follows it:
+The cutoff is a RELATION rather than a constant, and the relation has TWO clauses: the owner's
+ruling at `TOOL-aJoinedCanon-1` §8 F1, recorded on the `REV_SCOPE_CUTOFF` row of
+`.memory-tree.conf` and repeated on every cutoff row since, puts a new cutoff strictly past the
+newest spec filename date on ANY ref — local, remote, live worktrees — AND past a date this fleet
+can still write into, so nothing in flight goes red at its merge and nothing any node dates on the
+setting day can either. In the register's own idiom, the value is the day after the LATER of (a)
+the newest spec filename date on any ref or worktree and (b) the setting commit's own date,
+`git log -1 --format=%cs`, re-derived at the build commit and again at landing. rev-1 measured (a)
+at the base only, which the round-1 audit caught (H3); rev-2 applied (a) alone and set the
+measuring day itself, which round 2 caught (H1) and which is the class the register comment
+records correcting twice for `REV_SCOPE_CUTOFF` and once, a week earlier, for
+`SPEC10_EVIDENCE_CUTOFF`. The reading
+that produces the value, run 2026-09-14 on node `a` over 77 refs and every worktree of
+`git worktree list`: (a) returned `2026-09-13` on every ref that holds a spec at that date and on
+every worktree, (b) returned `2026-09-14`, the later is 2026-09-14, and the relation returns
+`2026-09-15`. The three commands, which the conf comment carries beside the value and which are
+re-run at the build commit and at landing — if the day has rolled, or a sibling has landed a spec
+dated later, the relation moves and the key follows it:
 
 ```
 git for-each-ref --format='%(refname)' refs/heads refs/remotes \
@@ -262,24 +330,30 @@ git for-each-ref --format='%(refname)' refs/heads refs/remotes \
 git worktree list --porcelain | grep '^worktree ' | cut -d' ' -f2 \
   | while read w; do ls "$w"/memory/builds/*/spec/*.md; done 2>/dev/null \
   | grep -oE '/[0-9]{4}-[0-9]{2}-[0-9]{2}-spec-' | sort -u | tail -1
+git log -1 --format=%cs
 ```
 
+The Date gate's refusal is the second clause made mechanical on the tree the checker grades; the
+first clause's ref-wide reading has no tree-side form — a bar grades one tree, not the fleet — and
+stays a documented check at the register comment, observed for this unit by AC8's red-when.
+
 THE COST, stated rather than buried, in the idiom `BRIEF_RECORDED_CUTOFF` records in
-`.unattended.conf`: the join grades ZERO tracked specs at landing, this build's own three included,
-because every spec anywhere is dated 2026-09-13 or earlier. The nine fixtures of S5 are its entire
-coverage on day one, and every pre-cutoff carrier is COUNTED on the report line and listed under
-`--list`, so the zero is announced and not silent. Its first real verdict arrives with the first
-spec dated 2026-09-14 or later. There is no waiver clause: `memory/project/spec-token-waivers.txt`
-is shrink-only by its header and stays untouched. `SPEC_DIRECT_CUTOFF` is a merge-bar knob: the conf
-comment says why the date is the relation's answer, carries the reading, and says what blank does.
+`.unattended.conf`: the join grades ZERO tracked specs on the landing day, this build's own three
+included, because the relation puts the cutoff past every spec anywhere and past that day itself.
+The ten fixtures of S5 are its entire coverage on day one, and every pre-cutoff carrier is COUNTED
+on the report line and listed under `--list`, so the zero is announced and not silent. Its first
+real verdict arrives with the first spec dated after landing. There is no waiver clause:
+`memory/project/spec-token-waivers.txt` is shrink-only by its header and stays untouched.
+`SPEC_DIRECT_CUTOFF` is a merge-bar knob: the conf comment says why the date is the relation's
+answer, states both clauses, carries the reading, and says what blank does.
 
 ### Files touched (estimate)
 
 | file | change |
 |---|---|
-| `tools/check-spec-tokens.py` | `DIRECT_KEY`, `AC_HEAD`, `BAR`, `extract_acceptance`, the bullet loop on it, the bar test first in both loops, the date gate, the counts, the report line, the `NEAR` printing, the docstring — about 55 lines |
-| `tools/check-spec-tokens.test.sh` | nine arms plus one inline `--list` assertion over two shared scratch repos; `FLOOR_ASSERTIONS` from 20 to the count the suite prints, 31 if all land |
-| `.memory-tree.conf` | the key at `2026-09-14` with a register comment: what it gates, the relation and the ref-wide reading that produced the date, the zero-population cost, what blank does |
+| `tools/check-spec-tokens.py` | `DIRECT_KEY`, `AC_HEAD`, `BAR`, `extract_acceptance`, the bullet loop on it, the bar test first in both loops, the date gate, the relation refusal and its one history query, the counts, the report line with its `relation unchecked` field, the `NEAR` printing, the docstring with its five pinned phrases — about 65 lines |
+| `tools/check-spec-tokens.test.sh` | ten arms plus one inline `--list` assertion over two shared scratch repos, AC17's arm the only one that commits; `FLOOR_ASSERTIONS` from 20 to 32, the count the suite prints when every arm runs |
+| `.memory-tree.conf` | the key at the relation's answer at the build commit — 2026-09-15 as measured 2026-09-14 — with a register comment: what it gates, BOTH clauses of the relation and the three readings that produced the date, the zero-population cost, what blank does |
 | `tools/memory-tree/.memory-tree.conf.example` | the key blank, with a comment in the idiom of the `SPEC_LEGLINE_CUTOFF` row; by hand, because the example-parity arm derives its key set from the engine alone |
 | `tools/memory-tree/SPEC-TEMPLATE.template.md` | one paragraph beside the two §6 cutoff paragraphs; the marker line |
 | `memory/TEMPLATE-SPEC.md` | the render of the above |
@@ -312,6 +386,13 @@ a watched-file touch owes stamps in several carriers is what this table is for.
 - **A cutoff at this build's own date, so its three specs are graded.** Rejected by the ratified
   relation: four live specs on two other refs sit at that date and would red at their merge, and
   the waiver registry cannot absorb a class (`TOOL-aKeyedAnnotation-9`).
+- **A cutoff at the measuring day**, rev-2's value. Rejected by the relation's second clause: the
+  measuring day is one the fleet can still write into, so a spec any node dated that day and gave
+  a bar token would red at its merge — the H3 class rev-2 recorded as closed, reopened (round-2 H1).
+- **A tree-only relation refusal comparing the cutoff to the newest spec date on the tree**, the
+  arm round-2 H1 sketched. Rejected: from the day after landing that comparison refuses the graded
+  population itself, and it would not have caught rev-2's actual defect, which no spec date
+  exhibited. The commit-date comparison of §4 Date gate catches that defect and holds forever.
 - **A file-keyed waiver row.** Rejected: the registry's grammar is one token per row and every
   consumer of it reads that shape; a bar token waived is waived in every spec, which is the same
   latitude a path token has today.
@@ -320,47 +401,60 @@ a watched-file touch owes stamps in several carriers is what this table is for.
   docstring already claims `paths` reads the acceptance section; measured, the switch moves no
   live spec's population anywhere in the fleet.
 - **One scratch repo per new arm**, the suite's existing habit. Rejected on the §5 split: the init
-  and first commit are the cost, and nine of them would put the leg's projected idle reading within
+  and first commit are the cost, and ten of them would put the leg's projected idle reading within
   ten seconds of its ceiling.
 
 ## 5. Production-readiness checklist
 
 - security — N/A. The checker reads tracked files and the conf and writes nothing.
 - perf / scale — two legs, priced apart. `spec tokens (a spec's own names resolve)` grows by one
-  regex per backticked token over two populations of at most the live-spec count it already prints;
-  1.586 s in the ledger at the base against a 60 s ceiling, and it does not move. The leg this unit
-  GROWS is `spec-tokens self-test`: 76.061 s idle in the ledger for the suite's 20 scratch repos,
-  worst of six readings 80 s per `tools/run-gates/selftest-budgets.txt`, budget row 130 s, ceiling
-  120 s in `tools/gate-legs.json`. The per-repo split, measured 2026-09-14 on node `a` with the
-  suite's own `scratch` body: the init and first commit 2.4 s, one checker run 0.8 to 1.2 s, an
-  in-place edit plus `git add` 0.4 s. Nine arms each on their own repo would add about 34 s, a
-  projected 110 s idle and 114 s from the worst reading — inside the ceiling by six seconds. Two
-  shared repos, one reset per arm, add about 24 s: a projected 100 s idle and 104 s from the worst
-  reading, inside both the ceiling and the budget row. Neither number is re-declared by this unit,
-  because both are calibrated from the worst OBSERVED reading and a projection is not an
-  observation: a breach at `VERIFYING` is the ceiling doing its job, and the re-declaration then
-  carries a reading. The contended case is the owed flagged bar at `VERIFYING`, which runs legs
+  regex per backticked token over two populations of at most the live-spec count it already prints,
+  plus ONE git spawn when the key is set, the Date gate's history query — 0.08 s on a hit and
+  0.33 s on a miss, measured 2026-09-14 on node `a`; 1.586 s in the ledger at the base against a
+  60 s ceiling, and it moves by under half a second. The leg this unit GROWS is
+  `spec-tokens self-test`: 76.061 s idle in the ledger for the suite's 20 scratch repos, worst of
+  six readings 80 s per `tools/run-gates/selftest-budgets.txt`, budget row 130 s, ceiling 120 s in
+  `tools/gate-legs.json`. The per-repo split, measured 2026-09-14 on node `a` with the suite's own
+  `scratch` body: the init and first commit 2.4 s, one checker run 0.8 to 1.2 s, an in-place edit
+  plus `git add` 0.4 s. Nine arms each on their own repo would add about 34 s, a projected 110 s
+  idle and 114 s from the worst reading — inside the ceiling by six seconds. Two shared repos, one
+  reset per arm, add about 24 s for nine arms; the tenth arm adds one checker run, one edit, one
+  commit and one reset, about 2 s, and the twelve armed checker runs each pay the history query in
+  a one-commit repo, about 1 s in all: a projected 103 s idle and 107 s from the worst reading,
+  inside both the ceiling and the budget row. Neither number is re-declared by this unit, because
+  both are calibrated from the worst OBSERVED reading and a projection is not an observation: a
+  breach at `VERIFYING` is the ceiling doing its job, and the re-declaration then carries a
+  reading. The contended case is the owed flagged bar at `VERIFYING`, which runs legs
   concurrently; the split above is idle.
 - error / empty / loading states — a blank key is OFF and announced with the carrier count; a key
   set with no live spec at or after it prints `0 live spec(s) at/after`, an empty population that
-  names itself, and that IS the landing state (§4 Rollout); the existing zero-spec, missing-manifest
-  and missing-registry refusals are untouched; a spec with no acceptance heading at all is an empty
+  names itself, and that IS the landing state (§4 Rollout); a key whose value is not strictly past
+  the day it was committed is REFUSED before grading, and a value not yet in history is announced
+  as unchecked rather than refused or passed; the existing zero-spec, missing-manifest and
+  missing-registry refusals are untouched; a spec with no acceptance heading at all is an empty
   bullet population, as the ordinal read already made it.
-- observability — the bar line on every run, green included; `NEAR` lines under `--list`; the
-  refusal text names the substitute.
-- risks — six. (1) `NOT_A_TOKEN` and `NOT_A_LEG` drop the motivating token unread unless the bar
+- observability — the bar line on every run, green included, with the `relation unchecked` field
+  when the value is uncommitted; `NEAR` lines under `--list`; the refusal texts name the substitute
+  and the relation respectively.
+- risks — seven. (1) `NOT_A_TOKEN` and `NOT_A_LEG` drop the motivating token unread unless the bar
   test runs first; AC1 and AC2 pin the ordering. (2) A sibling spec of this build reds at the bar —
   not at this landing, since none is graded, but at the first rev dated at or after the cutoff; the
   remedy is a fold on that spec, never a waiver row. (3) Built before unit 1 lands, the version
   step collides; `order 2` and the §3 edge sequence it. (4) The example-conf parity arm cannot see
   the key, so the example row is by hand and AC14 observes it. (5) An author evades with a path
-  built at runtime or inside `sh -c`; the docstring says so, and the act is unit 3's. (6) The
-  heading-text read moves the `paths` population for a future live light-profile spec; that is the
-  grading the docstring claims and the class M6 of the round-1 audit named, and AC15 pins it.
-- testing — nine arms and one inline `--list` assertion, each fixture one edit from its family's
-  committed clean state; every failing case observed RED by the direct checker on that fixture
-  before the arm lands, AC15's on today's ordinal read and AC16's on rev-1's regex; the suite itself
-  runs at `VERIFYING` under the main loop.
+  built at runtime or inside `sh -c`; the docstring says so, AC18 pins the saying, and the act is
+  unit 3's. (6) The heading-text read moves the `paths` population for a future live light-profile
+  spec; that is the grading the docstring claims and the class M6 of the round-1 audit named, and
+  AC15 pins it. (7) The relation refusal reads the value's commit date, so the pre-commit run of
+  the build commit itself sees an uncommitted value and only announces; the assertion lands at the
+  push boundary and at AC8, where the value is in history — and a landing that rolls the day
+  without re-deriving the key is exactly what it refuses there.
+- testing — ten arms and one inline `--list` assertion, each fixture one edit from its family's
+  committed clean state, AC17's committed; every failing case observed RED by the direct checker on
+  that fixture before the arm lands, AC15's on today's ordinal read, AC16's on rev-1's regex and
+  AC17's on today's checker, which grades that fixture clean instead of refusing it; the five
+  docstring phrases of AC18 print 0 today; the suite itself runs at `VERIFYING` under the main
+  loop.
 - migration — N/A; additive key, blank-means-off.
 - user docs — the template paragraph, rendered; the dossier; the checker's own header. This repo
   keeps no `help/` tree.
@@ -407,19 +501,28 @@ a watched-file touch owes stamps in several carriers is what this table is for.
   Red when: exit 0.
   fixture: as AC6.
 - **AC8** — When `python tools/check-spec-tokens.py` runs on this tree at the build commit, it exits
-  0; its bar line reads `0 token(s) examined in 0 live spec(s) at/after SPEC_DIRECT_CUTOFF 2026-09-14`
-  and a pre-cutoff carrier count equal to the number of distinct specs on AC9's `NEAR` lines; and
+  0; its bar line reads `0 token(s) examined in 0 live spec(s) at/after SPEC_DIRECT_CUTOFF <date>`
+  with no `relation unchecked` field, where `<date>` is the value
+  `grep ^SPEC_DIRECT_CUTOFF= .memory-tree.conf` prints and is strictly past BOTH clauses' readings
+  at that commit — the newest spec filename date the two §4 Rollout ref and worktree commands
+  return, and `git log -1 --format=%cs`; the line's pre-cutoff carrier count equals the number of
+  distinct specs on AC9's `NEAR` lines; and
   `git diff --stat b2a330be -- memory/project/spec-token-waivers.txt` prints nothing.
-  Red when: a hit at or after the cutoff; a new waiver row; or the date the line names is not
-  strictly past the newest spec filename date the §4 Rollout command returns at that commit, which
-  is the relation being carried instead of re-derived.
-  figure: DERIVED by the run. At `b2a330be` this predicate counts 23 pre-cutoff carriers and on
-  this tree at HEAD 24; the brief's 25 was measured with a differently spelled predicate, and none
-  of the three is pinned. The zero is the designed day-one state, announced on the line and paired
-  with AC9's positive count and the S5 fixtures, not a signal that failed to move.
+  Red when: a hit at or after the cutoff; a new waiver row; the date the line names is not strictly
+  past the newest spec filename date the §4 Rollout commands return at that commit; or the cutoff
+  is not strictly past `git log -1 --format=%cs` of the build commit — either being the relation
+  carried instead of re-derived, and the second the one the checker itself refuses.
+  figure: DERIVED at the build commit; 2026-09-14 was the first-clause reading on 2026-09-14 and
+  2026-09-15 the two-clause reading the same day, and neither is pinned. The carrier count is
+  DERIVED too: at `b2a330be` this predicate counts 23, at `dd8968c4` 24, and 23 again once round-2
+  M2 is folded in unit 3; the brief's 25 was measured with a differently spelled predicate. The
+  zero is the designed day-one state, announced on the line and paired with AC9's positive count
+  and the S5 fixtures, not a signal that failed to move.
 - **AC9** — When `python tools/check-spec-tokens.py --list` runs on this tree at the build commit,
-  it exits 0 and prints at least one `NEAR` line reading `predates SPEC_DIRECT_CUTOFF 2026-09-14`,
-  and the number of distinct specs on such lines equals the pre-cutoff count AC8's bar line reports.
+  it exits 0 and prints at least one `NEAR` line reading `predates SPEC_DIRECT_CUTOFF <date>`, with
+  `<date>` the same conf value AC8 names, and the number of distinct specs on such lines equals the
+  pre-cutoff count AC8's bar line reports and does not include unit 3's spec once round-2 M2 is
+  folded there.
   Red when: the two counts disagree, or no `NEAR` line prints while AC8 counts carriers.
   figure: DERIVED, the same run.
 - **AC10** — When `grep -c SPEC_DIRECT_CUTOFF tools/memory-tree/SPEC-TEMPLATE.template.md` and
@@ -464,6 +567,33 @@ a watched-file touch owes stamps in several carriers is what this table is for.
   assignment unit 3's row D1 reads as the OFF spelling; or the second exits 0, the branch matching
   nothing at all.
   fixture: as AC1.
+- **AC17** — When the DATED family's conf sets `SPEC_DIRECT_CUTOFF` to 2026-09-02 — the fixture
+  spec's own date, and a day not strictly past the commit that sets it — and that conf is
+  COMMITTED, `python tools/check-spec-tokens.py` exits 1 and stdout carries `REFUSING`,
+  `SPEC_DIRECT_CUTOFF`, `2026-09-02` and the commit's date, and no `[bar]`, `graded` or `NEAR`
+  line, because the refusal precedes grading.
+  Red when: exit 0 — today's checker grades that fixture clean; or the refusal fires with the value
+  merely staged, which is the announced skip of AC1's family read as a refusal; or the line names
+  the key without the date it compared against.
+  fixture: the DATED family's shared scratch repo of §4, its conf committed for this arm alone
+  and the repo reset to the family's clean sha afterwards. Its conf arms `SPEC_DIRECT_CUTOFF`
+  alone.
+- **AC18** — When `grep -c 'a path built at runtime' tools/check-spec-tokens.py`,
+  `grep -c 'inside a sh -c string' tools/check-spec-tokens.py`,
+  `grep -c 'the body of a fenced block' tools/check-spec-tokens.py`,
+  `grep -c 'a suite named in prose' tools/check-spec-tokens.py` and
+  `grep -c 'finds the acceptance section by heading text' tools/check-spec-tokens.py` run at the
+  build commit, each prints 1.
+  Red when: any prints 0, a docstring clause dropped or reworded away from its pin, or 2, the
+  phrase duplicated outside the docstring; all five print 0 on this tree today.
+- **AC19** — When `grep -c '^FLOOR_ASSERTIONS=32' tools/check-spec-tokens.test.sh` runs at the
+  build commit, it prints 1, and the suite's own `PASS (32 assertions)` line at `VERIFYING` names
+  the same count — the twenty existing arms, the ten of S5 with AC16's two runs, and AC3's inline
+  `--list` assertion sum to it.
+  Red when: 0 — the floor left at 20 while 32 assertions execute, so eleven arms could strand past
+  an early exit with the suite green, the green-by-absence class round-1 M8 named.
+  figure: PINNED — the floor is a shrink-only literal the suite reads, so the count is static and
+  the grep is how a pin is observed.
 
 ## 7. Gates
 
@@ -472,11 +602,12 @@ a watched-file touch owes stamps in several carriers is what this table is for.
 `spec-tokens self-test` is `chunk: selftests`, `subject: kit`, guarded on `tools/`, so an ordinary
 bar holds it; the main loop's flagged bar at `VERIFYING` runs it. It is the leg this unit grows and
 §5 prices it: 76 s idle in the ledger at the base, 120 s ceiling, 130 s budget row, projected to
-about 100 s idle with the two shared scratch repos of §4, and neither bound is re-declared on a
-projection. `verdict epoch` is named because the constant moves; the move dates no engine change,
-which the topological rule permits, and it is the kit-versions leg that demands it.
+about 103 s idle with the two shared scratch repos of §4 and the history query, and neither bound
+is re-declared on a projection. `verdict epoch` is named because the constant moves; the move
+dates no engine change, which the topological rule permits, and it is the kit-versions leg that
+demands it.
 
-New arm: tools/check-spec-tokens.test.sh · nine arms over two shared scratch repos, each arm one edit from its family's committed clean state and reset between arms — a post-cutoff §6 bullet, a §7 leg-line entry, the three not-hit placements in one spec with an inline `--list` count, a pre-cutoff date, a blank key, a clearing `[bar]` row, a stale one, a light-profile spec, the empty and the non-empty flag assignment — asserted per AC1 through AC7, AC15 and AC16 · `FLOOR_ASSERTIONS` from 20 to the count the suite prints, 31 if all land
+New arm: tools/check-spec-tokens.test.sh · ten arms over two shared scratch repos, each arm one edit from its family's committed clean state and reset between arms, AC17's edit committed — a post-cutoff §6 bullet, a §7 leg-line entry, the three not-hit placements in one spec with an inline `--list` count, a pre-cutoff date, a blank key, a clearing `[bar]` row, a stale one, a light-profile spec, the empty and the non-empty flag assignment, and a committed cutoff not strictly past its own commit day — asserted per AC1 through AC7, AC15, AC16 and AC17 · `FLOOR_ASSERTIONS` from 20 to 32, observed by AC19
 
 ## 8. Open questions
 
@@ -488,14 +619,18 @@ New arm: tools/check-spec-tokens.test.sh · nine arms over two shared scratch re
   puts `govkit selftest` at 3445 s and `manifest-check self-test` at 2162 s beside the unattended
   pair.
 - **Fork C — cutoff or drain, and which date.** RESOLVED (agent, 2026-09-14, delegated): a cutoff
-  at `2026-09-14`, re-derived by the ratified relation of `TOOL-aJoinedCanon-1` F1 — strictly past
-  the newest spec filename date on any local or remote ref or live worktree, which the §4 Rollout
-  command measured as 2026-09-13 on 2026-09-14. rev-1 took the landing date from a base-only
+  at the relation's answer at the build commit, re-derived there and again at landing by BOTH
+  clauses of the ratified relation of `TOOL-aJoinedCanon-1` F1 — the day after the later of the
+  newest spec filename date on any local or remote ref or live worktree and the setting commit's
+  own date — which the §4 Rollout commands measured on 2026-09-14 as 2026-09-13 and 2026-09-14,
+  so the value is 2026-09-15 as measured that day. rev-1 took the landing date from a base-only
   measurement, and four live specs at 2026-09-13 on two other refs would have redded at their
-  merge (round-1 H3). Consequence, stated: the join grades zero tracked specs at landing, this
-  build's three included, and the S5 fixtures are its coverage on day one; the four in-flight
-  specs are not graded and are not folded; S10 carries no waiver clause. The drain stays rejected:
-  the carriers are other builds' live specs.
+  merge (round-1 H3); rev-2 applied the first clause alone and set the measuring day, so a spec
+  any node dated that day would have redded at its merge (round-2 H1). Consequence, stated: the
+  join grades zero tracked specs on the landing day, this build's three included, and the S5
+  fixtures are its coverage on day one; its first real verdict arrives with the first spec dated
+  after landing; the four in-flight specs are not graded and are not folded; S10 carries no
+  waiver clause. The drain stays rejected: the carriers are other builds' live specs.
 - **Fork D — the predicate's shape: the brief's substring spelling, or invocation shape.**
   RESOLVED (agent, 2026-09-13, delegated): invocation shape, on the §4 measurement. Same 49 tokens
   either way; the two disagree on one citation and one suite-with-argument, and the invocation shape
@@ -526,6 +661,23 @@ New arm: tools/check-spec-tokens.test.sh · nine arms over two shared scratch re
   share one scratch repo per fixture family; the ceiling is not re-declared on a projection. B1's
   alignment: §4 `BAR`'s flag branch requires a non-empty value, Fork E records it as no reversal of
   fork D, and AC16 observes both sides. Arms seven to nine, floor 20 to 31.
+- rev-3 · 2026-09-14 · spec-audit round 2 folded — H1 · M1 · L1 · L2 · L3. H1: §4 Rollout, S4,
+  Fork C and §3 state both clauses of the ratified relation and derive the value as the day after
+  the later of the newest spec filename date on any ref or worktree and the setting commit's own
+  date, 2026-09-15 by both clauses as measured 2026-09-14 and re-derived at the build commit and
+  at landing; AC8's red-when gains the second clause; the landing-day consequence is recorded; and
+  the left-shift lands as S1's relation refusal, §4 Date gate, AC17 and the tenth arm of S5 — the
+  refusal compares the value to the date of the commit that set it rather than to the newest spec
+  date on the tree, because the latter refuses the graded population from the day after landing
+  and would not have caught rev-2's defect; §4 Alternatives records both rejections. M1: AC8 and
+  AC9 assert the conf's value and the relation instead of a date literal, with AC8's `figure:`
+  line naming the two readings taken 2026-09-14; S4 and Fork C state the value as the relation's
+  answer at the build commit. L1: S5 and the §7 `New arm:` line pin `FLOOR_ASSERTIONS` at 32,
+  observed by AC19. L2: S2 drops `NOT OBSERVED`; §4 Docstring phrases pins five phrases and AC18
+  greps each. L3: §3 and §4's alignment paragraph re-measure at `dd8968c4` — the two spellings
+  agree on all 52 graded tokens in 24 specs, unit 3's one is the bare suite basename round-2 M2
+  names, and the count is 23 once that fold lands. §5 re-prices the two legs for the tenth arm and
+  the history query.
 
 ## 10. Reuse audit
 
@@ -539,7 +691,7 @@ already give a dated, conf-gated arm its shape — `LEGLINE_KEY` is the exact pr
 is written beside it, and `GATES_HEAD` with `extract_gates` is the exact precedent for locating a
 section by heading text, which `AC_HEAD` and `extract_acceptance` copy. The map probe printed
 `unscanned layers: .sh`, so the suite side was read by hand: `tools/check-spec-tokens.test.sh`'s
-`scratch` and `arm` helpers take the nine arms without a new function. Two recall hits changed the
+`scratch` and `arm` helpers take the ten arms without a new function. Two recall hits changed the
 design: TOOL-aJoinedCanon-13 says the example-conf parity arm cannot see a key this checker reads,
 so the example row is by hand and observed by AC14; TOOL-aDeclaredBound-2 says the last env
 override for a cutoff was removed because the conf already won, so this key gets none. Recall's

@@ -1,6 +1,6 @@
 # TOOL-aDeferredBar-1 — the instruction: no bar and no suite inside a pass, at every carrier a build agent reads
 
-**Status:** SPECCED · rev-2 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-14 · node a · Tier-2 · base b2a330be · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -51,10 +51,13 @@ the operator's transcript store came from inside a sidechain.
   line in the commit message. Observed by AC12 and AC13.
 - **S6** — This spec obeys the rule it states: no criterion in §6 names a bar, a `GATE_*=` prefix
   or a `*.test.sh` suite as its observation, and its §7 leg line resolves against the manifest.
-  Observed by AC14 for the joins; the bar-token absence is hand-checked at the acceptance ledger
-  until `TOOL-aDeferredBar-2` lands the gate that grades it. AC1's greps carry two banned
-  spellings as grep ARGUMENTS, with `grep` at command position; the `BAR` regex unit 2 §4 spells
-  matches none of AC1's five tokens, probed 2026-09-14 on that regex typed from the section.
+  Observed by AC14 for the joins and by AC16 for the bar-token absence. This file is OUTSIDE the
+  population of the gate `TOOL-aDeferredBar-2` lands, by that gate's cutoff: `SPEC_DATE` reads the
+  filename date, 2026-09-13, which never changes, and the cutoff sits strictly past it. So the
+  acceptance-ledger check AC16 spells is the observation there will ever be, not a stopgap. AC1's
+  greps carry two banned spellings as grep ARGUMENTS, with `grep` at command position; the `BAR`
+  regex unit 2 §4 spells matches none of §6's backticked tokens, probed 2026-09-14 on that regex
+  typed from the section, which is the probe AC16 runs.
 
 ## 3. Non-goals (OUT)
 
@@ -70,7 +73,10 @@ the operator's transcript store came from inside a sidechain.
 - No refusal mechanism. Nothing here reads a command or denies a tool call; that is
   `TOOL-aDeferredBar-3`. No spec gate; that is `TOOL-aDeferredBar-2`.
 - The twenty live-or-landed specs the research record counts as naming a bar in §6 or §7 are not
-  rewritten. A terminal spec is frozen, and the live ones are unit 2's population.
+  rewritten. A terminal spec is frozen, and a live one is graded by unit 2 only when its filename
+  date is at or after that unit's cutoff — which none of them is, this build's own three included,
+  because the cutoff sits strictly past every spec date on any ref. Their bar tokens are COUNTED on
+  unit 2's report line and not graded.
 - No ceiling in `tools/gate-legs.json` moves, and no `*.test.sh` leaves the manifest.
 - M1's byte budget is not raised and its `**Budget:**` prose line is untouched, so
   `check-template-size.sh`'s exit-6 parity arm keeps reading the same figure on both sides.
@@ -289,8 +295,8 @@ DERIVED from the two `git grep -l` populations above plus the five carriers and 
 
 - security — N/A. Prose in five carriers and two version constants; no write path, no input, no
   egress.
-- perf / scale — the direct observations in §6 are greps, a `sed` render, `wc`, and nine leg
-  scripts run by hand — the eight names on the §7 line plus `spec tokens` in AC14, with AC15
+- perf / scale — the direct observations in §6 are greps, a `sed` render, AC16's token pipeline
+  over this one file, `wc`, and nine leg scripts run by hand — the eight names on the §7 line plus `spec tokens` in AC14, with AC15
   carrying the two the round-1 audit found unrun — each of which finished in under 84 s on the
   last recorded bar (`<git-dir>/gate-ledger.tsv`, re-read 2026-09-14; `memory hygiene` 83 s,
   `method carriers` 14 s, the rest under 20 s). The rule itself is what removes minutes-to-hours
@@ -386,10 +392,12 @@ DERIVED from the two `git grep -l` populations above plus the five carriers and 
   Red when: the count is `0`, C11 reports the bullet over 400 bytes, or C5 reports a watched change
   with no re-stamp.
 - **AC13** — When `git log -1 --format=%B | grep -c 'manifest-audit: delta'` runs at the build
-  commit, it prints `1`, and `grep -c "@ $(git merge-base origin/main HEAD)" memory/guides/SESSION-KICKOFF.md`
-  prints `1`.
-  Red when: the commit message carries no delta line, or `last-audit` names a sha that is not the
-  merge-base.
+  commit, it prints `1`, `grep -c "@ $(git merge-base origin/main HEAD)" memory/guides/SESSION-KICKOFF.md`
+  prints `1`, and `grep -c "^last-body-change: $(git rev-parse HEAD~1)" memory/guides/SESSION-KICKOFF.md`
+  prints `1` — the second stamp S5 owes, which `manifest-check.sh` grades only as non-empty and
+  un-stalled, so nothing but this grep ties it to the body edit.
+  Red when: the commit message carries no delta line, `last-audit` names a sha that is not the
+  merge-base, or `last-body-change` still names `2661b66b`.
 - **AC14** — When `python tools/check-spec-tokens.py` runs over the tree carrying this spec, it
   exits 0, and `python tools/check-spec-tokens.py --list` resolves every name on this spec's §7 leg
   line against `tools/gate-legs.json`.
@@ -402,6 +410,17 @@ DERIVED from the two `git grep -l` populations above plus the five carriers and 
   Red when: either exits non-zero; the failing line that this unit can cause names
   `memory/guides/BUILD-METHOD.md` (the guide cap) or `.claude/skills/unattended/SKILL.md` (a
   `## M<n>` heading the bullet must not carry).
+- **AC16** — When `sed -n '/^## 6\. Acceptance criteria/,/^## 7\./p' memory/builds/aDeferredBar/spec/2026-09-13-spec-TOOL-aDeferredBar-1.md | grep -oP '\x60[^\x60]+\x60' | tr -d '\140' | grep -cP '(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+\S+\s+)?(?:bash\s+|sh\s+)?(?:\S*/)?(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh(?=\s|$)|(?:^|\s)GATE_(?:FULL|SELFTESTS)=\S'`
+  runs, it prints `0`: every backticked token of this file's acceptance section, one per line, run
+  through unit 2's `BAR` regex typed verbatim from its §4, so `^` is the token start as the checker
+  reads it and not a line start. It is a `grep -P`, not the `-E` the audit spelled, because ERE has
+  neither `(?:` nor `(?=` and GNU grep 3.0 under `-E` printed `0` over a bar token rather than an
+  error, probed 2026-09-14 — the could-not-fail shape this criterion exists to refuse. Liveness:
+  `echo bash tools/run-gates/run-gates.sh | grep -cP '(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+\S+\s+)?(?:bash\s+|sh\s+)?(?:\S*/)?(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh(?=\s|$)|(?:^|\s)GATE_(?:FULL|SELFTESTS)=\S'`
+  prints `1`, so the regex as typed can match, and a copy of this file with a runner token spliced
+  into an AC bullet printed `1` on the same date. Heredoc-free, because the ledger cannot run one.
+  Red when: the first command prints `1` or more — a §6 token became a bar or suite invocation —
+  or the liveness command prints `0`, which is a regex typed wrong and never a clean section.
 
 ## 7. Gates
 
@@ -449,6 +468,15 @@ mark rather than the record.
   both are direct scripts, 83 s and 14 s on the last recorded bar, and neither is a suite.
   RESOLVED (agent, 2026-09-14, delegated): the criterion, AC15; the §7 sentence stands as written
   and is now true.
+- **Fork E — the round-2 audit's M7: a criterion for the bar-token absence S6 claims, or the S6
+  probe sentence alone?** Unit 2's gate never grades this file — its cutoff sits past every spec
+  date on any ref and `SPEC_DATE` reads the filename, so the "until unit 2 lands" hand check rev-2
+  called temporary was the only observation there would ever be. Against the sentence alone: a
+  claim with no command beside it is the shape this build's audits keep finding. Against the
+  criterion: only its cost, one `grep -P` over one file.
+  RESOLVED (agent, 2026-09-14, delegated): the criterion, AC16, in the heredoc-free one-line form
+  the audit asked for; S6 and the §3 population bullet reworded so neither waits for a verdict
+  that cannot arrive.
 
 ## 9. Revision log
 
@@ -463,6 +491,16 @@ mark rather than the record.
   AC6 its own `wc -l` observation for the 350-line clause the size checker never reads. §5 perf
   counts nine hand-run leg scripts instead of seven; S6 records that AC1's grep arguments are not
   hits under unit 2's `BAR`.
+- rev-3 · 2026-09-14 · S6 · §3 · §5 · §8 · AC13 · AC16 · folded round 2 of the spec audit,
+  `reviews/2026-09-14-review-TOOL-aDeferredBar-1-spec-audit-round2.md`: M6 appends to AC13 the
+  `last-body-change` grep against `HEAD~1`, so the second stamp S5 owes is observed rather than
+  declared, with `2661b66b` named in its red-when; M7 rewords S6 and the §3 population bullet —
+  this file is outside unit 2's population by that gate's cutoff, so the ledger check is the
+  observation and not a stopgap, and no live spec is graded until one is dated at or after the
+  cutoff — and adds AC16, unit 2's `BAR` regex typed from its §4 into one heredoc-free line over
+  this file's acceptance tokens, printing `0`, with a liveness command printing `1`; recorded as
+  Fork E in §8. AC16 is `grep -P` rather than the `-E` the audit spelled, because ERE has no
+  `(?:` and printed `0` over a bar token when probed. §5 perf names the pipeline.
 
 ## 10. Reuse audit
 
