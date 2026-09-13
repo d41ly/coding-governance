@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-code',
-  version: '1.9',
+  version: '1.10',
   description:
     'Drift audit Tier 2, wave 1: dead / inefficient / unwired / duplicated code + instrument integrity. Project-agnostic; all repo facts arrive via args.',
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.9
+// gov:kit drift-audit@1.10
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
 // budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.

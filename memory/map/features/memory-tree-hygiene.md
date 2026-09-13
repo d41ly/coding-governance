@@ -15,7 +15,7 @@ workflow-scripts = []
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["inline-fence-swallows-the-rest-of-the-file.md",
-  "record-citing-a-foreign-id-defines-or-orphans-it.md"]
+  "record-citing-a-foreign-id-defines-or-orphans-it.md", "swallowed-delegate-reads-as-clean.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -115,6 +115,9 @@ bytes only; extend by adding a branch to the awk after the class it must overrid
 the message split reads the same variable, so a new class gets the right output for free.
 seam: `--print-index-set` — reuse for any sibling that needs this engine's population instead of
 guessing it; extend by adding a print mode beside it rather than exporting the variable.
+seam: the DELEGATE-STATUS idiom — reuse for any check that hands its parse to a sibling module: the
+capture keeps `$?`, and a row the delegate prints on every run is the liveness test, so a delegate
+that exited 0 having done nothing is refused too. Check 21's `_b21rc` and `n21` are the worked case.
 
 ## Gaps
 

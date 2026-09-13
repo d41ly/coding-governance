@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.68 -->
+<!-- gov:kit memory-tree@2.69 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -308,6 +308,9 @@ carry it too:
 - `gen_build_index.py --print-bindings` is the read-only report: it classifies every record, writes
   nothing, and always exits 0. It is both the migration checklist and the gate's own predicate, so a
   seed list and a gate that disagree is structurally impossible.
+- The check REFUSES when that report exits non-zero or prints no `N` row. The report is the only
+  thing check 21 reads, so a report that did not run would otherwise look exactly like a clean
+  corpus. An adopter whose generator is a fork must carry the mode, or this check names that first.
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

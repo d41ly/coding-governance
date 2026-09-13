@@ -193,6 +193,7 @@
       "structured-record-split-on-whitespace.md",
       "subprocess-resolves-a-different-shell.md",
       "suite-invalidated-by-a-commit-under-it.md",
+      "swallowed-delegate-reads-as-clean.md",
       "text-mode-read-eats-a-bare-cr.md",
       "trace-profile-measures-itself.md",
       "trailing-comma-counted-as-an-element.md",

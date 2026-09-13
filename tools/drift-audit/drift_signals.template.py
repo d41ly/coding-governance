@@ -1,6 +1,6 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.9
+gov:kit drift-audit@1.10
 
 Copied from tools/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
 then run `python tools/drift-audit/drift_report.py`.
@@ -94,6 +94,13 @@ HANDKEPT: list[dict] = [
 TRACE_CUTOFF: str = ""
 
 TRACE_GLOBS: list[str] = []
+
+# TRACE_WAIVER: where the signal's per-spec waiver registry lives, repo-relative. One row per waived
+# spec, `<spec path><TAB><reason>`, for a CLOSED unit no TRACE_GLOBS subject can ever name, such as a
+# records-only or tooling-only deliverable. BLANK keeps `<MEMORY_ROOT>/project/trace-waiver.txt`,
+# where an absent file is an empty waiver set. Declare it when your memory tree has no `project/`
+# directory. A DECLARED path that is absent or outside the tree is a finding of its own.
+TRACE_WAIVER: str = ""
 
 # EVIDENCE_GLOBS — signal 2's population, narrower than PRODUCT_GLOBS. A citation from a test
 # file is the house's own bookkeeping certifying the bookkeeping, so signal 2 should not read

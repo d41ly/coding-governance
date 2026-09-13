@@ -22,6 +22,13 @@
 # Both are the same shape: one commit carrying the unit's spec AND its product code, so at that
 # commit's first parent no spec for the id exists. That is the act the leg refuses, committed before
 # the leg could see this build.
+#
+# THE THIRD ROW IS A DIFFERENT KIND, and it is kept apart from the two above so nobody reads it as
+# precedent for them. The leg DID see TOOL-dMuffledSentinel-1 before it landed: its spec was written
+# after the code, in the same session, and both went into one commit. It was not rewritten into a
+# spec-first order, because that would record an authoring order that did not happen. The owner chose
+# to land it as it is, 2026-09-12. Its own acceptance ledger says the same.
 
 DEPL-dGaugedVintage-12	spec and product code in one commit (9ba3757d); landed 2026-09-01, before the leg graded run-state-free builds
 DEPL-dGaugedVintage-13	spec and product code in one commit (34492bb6); landed 2026-09-01, before the leg graded run-state-free builds
+TOOL-dMuffledSentinel-1	spec written after the code, both in one commit (a3b4ca1e); seen by the leg before landing and landed as-is by owner decision 2026-09-12

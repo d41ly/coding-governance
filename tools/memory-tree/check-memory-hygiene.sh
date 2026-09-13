@@ -17,7 +17,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.68   # gov:kit memory-tree@2.68 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.69   # gov:kit memory-tree@2.69 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -826,7 +826,23 @@ c21_sel=$(printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/(build|prompts|revi
 pop_guard 21 "no record under $M/builds/*/{build,prompts,reviews}/" \
   "$(printf '%s\n' "$c21_sel" | grep -c . || true)" "$PRE_BINDABLE"
 if [ "$STAGED" = 0 ] && printf '%s\n' "$c21_sel" | grep -q .; then
-  b21=$("$_PY" "$HERE/gen_build_index.py" --print-bindings 2>/dev/null || true)
+  # THE PARSE'S EXIT STATUS AND ITS N ROW ARE PART OF ITS ANSWER (TOOL-dMuffledSentinel-1). This
+  # call read `2>/dev/null || true`, so a generator that could not answer handed every branch below
+  # an empty string, and an empty string is exactly what a clean corpus prints. Measured on an
+  # adopter whose forked generator never gained the mode: exit 2, and for the life of that fork the
+  # four population branches could not fire on any record. Every other delegate in this file already
+  # fails on its status (checks 9, 13-16, 17-19 and 20); this was the one that did not.
+  # The N row is the LIVENESS half. `--print-bindings` prints it on every run, so a zero exit without
+  # it is a mode that did nothing -- an unknown flag another generator reads as its default -- and it
+  # is refused the same way. stderr joins the capture because the branches below select their rows
+  # by a leading kind letter and a tab, so a stray line cannot become a finding.
+  b21=$("$_PY" "$HERE/gen_build_index.py" --print-bindings 2>&1); _b21rc=$?
+  n21=$(printf '%s\n' "$b21" | sed -n 's/^N\t\([0-9]*\)$/\1/p' | head -1)
+  if [ "$_b21rc" -ne 0 ] || [ -z "$n21" ]; then
+    fail 21 "the bindings parse did not complete, so no record was graded and every branch below would read as a clean corpus — gen_build_index.py --print-bindings exited $_b21rc, ending:
+$(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
+    b21=""
+  fi
   miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
   # S3 — RECORD_SERVES_CUTOFF. A project adopting this kit mid-life has landed records that
   # predate the Serves grammar; NicoCares measured 549 of them. A cutoff is one value where a
@@ -859,8 +875,8 @@ $miss21"
   [ -n "$bad21" ] && fail 21 "Serves or Commissions lines naming an id that no spec in this tree defines:
 $bad21"
   # The unbound escape. An UNDECLARED pin is a refusal, not a disabled check: `none` is a deliberate
-  # declaration and the number of them is the thing a reader is entitled to see bounded.
-  n21=$(printf '%s\n' "$b21" | sed -n 's/^N\t\([0-9]*\)$/\1/p' | head -1)
+  # declaration and the number of them is the thing a reader is entitled to see bounded. `n21` was
+  # read above, where its absence is the parse's liveness test.
   pin21=${RECORD_UNBOUND_PIN-}
   if [ -z "$pin21" ]; then
     fail 21 "RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus"
