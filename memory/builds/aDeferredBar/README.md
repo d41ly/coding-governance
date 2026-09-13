@@ -4,7 +4,6 @@ node: a
 opened: 2026-09-13
 streams: tooling
 roster: TOOL
-status: OPEN
 authorized-by: prompt
 ids: TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3
 ---
@@ -62,23 +61,31 @@ than the bar, and nothing at the act that refuses. The trace and the corpus coun
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-09-13 · streams tooling
+**Build status:** SPECCED · 3 unit(s) · node a · opened 2026-09-13 · streams tooling
 ids TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aDeferredBar-1 — the instruction: no bar and no suite inside a pass, at every carrier a build agent reads](spec/2026-09-13-spec-TOOL-aDeferredBar-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-aDeferredBar-2 — the spec gate: a bar or suite invocation is not an acceptance observation](spec/2026-09-13-spec-TOOL-aDeferredBar-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-13 |
+| [TOOL-aDeferredBar-3 — the act refusal: a PreToolUse hook denies a flagged bar or a suite before VERIFYING](spec/2026-09-13-spec-TOOL-aDeferredBar-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 2 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aDeferredBar-1 TOOL-aDeferredBar-2 TOOL-aDeferredBar-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aDeferredBar-1` | no |
+| 2 | `TOOL-aDeferredBar-2` | no |
+| 3 | `TOOL-aDeferredBar-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
