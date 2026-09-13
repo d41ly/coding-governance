@@ -100,7 +100,7 @@ ids TOOL-dLoggedFlight-1 TOOL-dLoggedFlight-2 TOOL-dLoggedFlight-3 TOOL-dLoggedF
 | [TOOL-dLoggedFlight-13 — drift-audit reports run records left non-terminal after their build merged](spec/2026-09-13-spec-TOOL-dLoggedFlight-13.md) | 13 | 2 | SPECCED | rev-4 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 4 record folder(s).
+Records: 6 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
