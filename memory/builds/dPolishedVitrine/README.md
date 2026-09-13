@@ -5,7 +5,7 @@ opened: 2026-09-12
 streams: tooling+deployer
 roster: TOOL+DEPL
 authorized-by: prompt
-ids: DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9 TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13
+ids: DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9 TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13 TOOL-dPolishedVitrine-14 TOOL-dPolishedVitrine-15
 ---
 
 # dPolishedVitrine — the build harness is rendered at install, so its paths name the adopter's tree
@@ -58,25 +58,27 @@ the same checklist path, and it breaks the same way.
 | # | Unit | Tier | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-dPolishedVitrine-1` | 2 | render the harness and the Skill's checklist line at install, with the memory-tree directory probed |
+| 2 | `TOOL-dPolishedVitrine-14` | 2 | `brief-recorded` grades only units built while a run was live, per the owner's 2026-09-13 ruling |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-09-12 · streams tooling+deployer
+**Build status:** INPROGRESS · 2 unit(s) · node d · opened 2026-09-12 · streams tooling+deployer
 ids DEPL-dPolishedVitrine-1 DEPL-dPolishedVitrine-2 DEPL-dPolishedVitrine-3 TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-2 TOOL-dPolishedVitrine-3 TOOL-dPolishedVitrine-4 TOOL-dPolishedVitrine-5 TOOL-dPolishedVitrine-6 TOOL-dPolishedVitrine-7 TOOL-dPolishedVitrine-8 TOOL-dPolishedVitrine-9
-ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13
+ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 TOOL-dPolishedVitrine-13 TOOL-dPolishedVitrine-14 TOOL-dPolishedVitrine-15
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-7 | 2026-09-13 |
+| [TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live](spec/2026-09-13-spec-TOOL-dPolishedVitrine-14.md) | — | 2 | INPROGRESS | rev-1 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 4 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dPolishedVitrine-1.
+Ids no `spec-audit` record has ever named: TOOL-dPolishedVitrine-1 TOOL-dPolishedVitrine-14.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
