@@ -9,8 +9,8 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-witness: 2f11f32dbfd9feb92daef3226d10d8b248e46f25
-phase: SPECCING
+witness: 1dd6f3da2c121d1226864b6c6d3af56aa7df05c0
+phase: REVIEWING
 branch-sha: a4007553c89f244136b3783b3a0b1bd3223f25ab
 branch-ref: refs/heads/branch/unattended-build-transparency-ea83a5
 mode: prompt
@@ -22,3 +22,5 @@ anchor-ref: refs/heads/main
 base: a4007553c89f244136b3783b3a0b1bd3223f25ab
 
 ## Parked
+
+2026-09-13T13:09:10Z review · item dLoggedFlight-spec-set · reason verdict BLOCKED · blockers 4
