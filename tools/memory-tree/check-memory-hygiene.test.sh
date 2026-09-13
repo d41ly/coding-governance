@@ -989,7 +989,7 @@ c5block() { awk '/^HYGIENE check 5 FAILED/{g=1} g&&/^HYGIENE check [0-9]+ FAILED
 # '<path>'` was satisfied by the report rather than by the finding, and fired against a correct gate.
 # All 15 call sites route through here, so the close belongs here and nowhere else.
 cblock() { awk -v n="$2" '
-    index($0, "HYGIENE check " n " FAILED") == 1 { g = 1 }
+    index($0, "HYGIENE check " n " FAILED") == 1 { g = 1 }   # gov:one-extractor
     g && index($0, "HYGIENE check") == 1 && index($0, "HYGIENE check " n " FAILED") != 1 { g = 0 }
     g && index($0, "memory-hygiene: ") == 1 { g = 0 }
     g' <<<"$1"; }
@@ -1304,6 +1304,25 @@ n=$((n+1))
 grep -qE '^[[:space:]]*_c7env=""' "$SCRIPT" \
   && echo "ok   check 7 locale switch defaults to empty" \
   || { echo "FAIL check 7 locale switch has no empty default — every adopter would be re-decided"; st=1; }
+# 5. THIS SUITE HAS EXACTLY ONE BLOCK EXTRACTOR, and every copy of it is a future copy of one bug.
+#    `cblock()` closes a check's block on the next `HYGIENE check` header AND on a `memory-hygiene: `
+#    report line. Two inline re-spellings carried only the first close, so a report emitted after the
+#    LAST `fail` of a run left the window open to EOF — and a report line NAMES a path, which
+#    satisfied a `grep -qF '<path>'` that was asserting the finding ABSENT. Measured: that fired a
+#    FAIL against a correct gate, and the same latent hole sat at every one of the helper's call
+#    sites. TOOL-cGradedDebt-4, from the round-1 review of TOOL-cGradedDebt-1, finding B2.
+#
+#    The predicate is the extractor's own SHAPE rather than a count, so it cannot go slack as the
+#    suite grows, and the one legitimate instance carries `gov:one-extractor` inside cblock's awk
+#    program. Whitespace-tolerant because the two re-spellings differed from the definition only in
+#    spacing, which is precisely how a copy escapes a literal search.
+n=$((n+1))
+respell=$(grep -nE 'index\(\$0, ?"HYGIENE check " ?n ?" FAILED"\) ?== ?1' \
+            "$HERE/check-memory-hygiene.test.sh" | grep -v 'gov:one-extractor' || true)
+[ -z "$respell" ] \
+  && echo "ok   one block extractor, no re-spelling" \
+  || { echo "FAIL a block extractor is re-spelled outside cblock() — route it through the helper, which is the only copy that closes on a report line:
+$respell"; st=1; }
 # 5. Check 7's exemption expression keeps ONE spelling of the guides/ alternative. The MAP_SUB branch
 #    used to REBUILD the whole expression, and the rebuild silently omitted `guides/` — so on any repo
 #    carrying a .codebase-map.conf every guide entered the entry-budget population and no assertion
@@ -1459,7 +1478,7 @@ grep -qF 'memory/project/also-gone.md' <<<"$outst" \
 # branch 1 must now stay silent about it. That is the grandfather working and the guard not
 # over-firing, in one assertion.
 n=$((n+1))
-awk -v n=6 'index($0,"HYGIENE check " n " FAILED")==1{g=1} g&&index($0,"HYGIENE check")==1&&index($0,"HYGIENE check " n " FAILED")!=1{g=0} g' <<<"$outst" \
+cblock "$outst" 6 \
   | grep -qF 'memory/backlog/ARCH.md (' \
   && { echo "FAIL a curation-debt-listed file was still capped by check 6"; st=1; }
 # ---- the curation-debt STALE-ENTRY guard (TOOL-cGradedDebt-1), which is a DIFFERENT question from
@@ -1505,6 +1524,25 @@ grep -qE '^memory-hygiene: check 8 graded [1-9][0-9]* backlog row\(s\) across [1
 n=$((n+1))
 grep -qF '#rows ' <<<"$outsr" \
   && { echo "FAIL check 8's row-count sentinel leaked into the findings"; st=1; }
+# ---- TWO ABSENCES, AND NEITHER IS THE STALE-ENTRY GUARD'S QUESTION (TOOL-cGradedDebt-5, from the
+# ---- round-1 review's L1). A path still in the INDEX but gone from the WORKTREE records nothing —
+# ---- `index_set` and `files8` both end on `[ -f "$f" ]` — so without the worktree test it reads as
+# ---- compliant and the guard prints "delete the row" at a waiver that is still load-bearing the
+# ---- moment the file returns. This pair is the ONLY thing separating "the row hides nothing" from
+# ---- "the file is not there to hide anything", which is the whole distinction the guard rests on.
+# ---- The stale-LINE guard must stay silent too: the path IS still tracked, so neither guard owns
+# ---- this state and a run that names it under either one is naming the wrong defect.
+n=$((n+1))
+printf '# debt\nmemory/builds/tRunBig/RUN.md\n' > memory/project/curation-debt.txt
+git add -A >/dev/null 2>&1; git commit -q -m debtworktree --no-verify
+rm memory/builds/tRunBig/RUN.md                      # NOT `git rm` — still in the index
+outwt=$(bash "$SCRIPT" 2>/dev/null)
+grep -qF 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived' <<<"$outwt" \
+  && { echo "FAIL the stale-ENTRY guard fired on a listed path that is merely ABSENT from the worktree, so its remedy would drain a load-bearing row"; st=1; }
+n=$((n+1))
+grep -qF 'curation-debt.txt lists paths that no longer exist' <<<"$outwt" \
+  && { echo "FAIL the stale-LINE guard fired on a listed path git still tracks"; st=1; }
+git checkout -q -- memory/builds/tRunBig/RUN.md
 printf '# legacy\n' > memory/project/legacy-files.txt
 printf '# debt\n' > memory/project/curation-debt.txt
 git add -A >/dev/null 2>&1; git commit -q -m unstale --no-verify
