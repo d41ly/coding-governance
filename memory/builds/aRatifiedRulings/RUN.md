@@ -38,3 +38,9 @@ base: 16da4c6abdb5d74ad80891f51f254cd5205d0b17
 2026-09-13T13:13:54Z brief · item TOOL-aRatifiedRulings-1 · reason 20e640d1ce04 memory/builds/aRatifiedRulings/prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-1-1-build-brief.md
 
 2026-09-13T13:19:59Z dispatch · item da9b9a33 TOOL-aRatifiedRulings-1 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/HYGIENE.template.md tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/ANNOTATION-STYLE.template.md memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/guides/ANNOTATION-STYLE.md memory/builds/aRatifiedRulings/prompts
+
+2026-09-13T14:06:54Z dispatch · item dba6053a TOOL-aRatifiedRulings-2 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aRatifiedRulings/build memory/builds/aRatifiedRulings/spec memory/builds/aRatifiedRulings/prompts memory/builds/aRatifiedRulings/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-13T14:07:13Z brief · item TOOL-aRatifiedRulings-2 · reason 679ae7ed8bc8 memory/builds/aRatifiedRulings/prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-2-1-build-brief.md
+
+2026-09-13T14:12:59Z dispatch · item dba6053a TOOL-aRatifiedRulings-2 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aRatifiedRulings/build memory/builds/aRatifiedRulings/spec memory/builds/aRatifiedRulings/prompts memory/builds/aRatifiedRulings/README.md memory/LIVE.md memory/ledger/2026-09.md

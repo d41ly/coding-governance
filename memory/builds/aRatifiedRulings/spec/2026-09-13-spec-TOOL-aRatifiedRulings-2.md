@@ -1,11 +1,13 @@
 # TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node a · Tier-2 · base 9fac2b53 · streams tooling · ratified 2026-09-13
+**Status:** CLOSED · rev-4 · 2026-09-13 · node a · Tier-2 · base 9fac2b53 · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-13-build-TOOL-aRatifiedRulings-2-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-aRatifiedRulings-2-1-acceptance-ledger.md) | journal | — |
+| [2026-09-13-prompt-TOOL-aRatifiedRulings-2-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-2-1-build-brief.md) | journal | — |
 | [2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md) | spec-audit | TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4 |
 | [2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md) | spec-audit | TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4 |
 
@@ -300,7 +302,8 @@ key of any kind the codebase map enumerates, so `memory/map/generated/` is untou
   after the measured run rather than re-declared.
 - error / empty / loading states — a pass commit whose tree holds no run-state file, or no brief
   row for the unit, yields an empty set and today's behaviour; a row with nothing after the hash
-  yields an empty path, which matches no committed path.
+  yields the hash token as its path under the sibling's three expansions, which matches no
+  committed path.
 - observability — the default output loses exactly the brief paths; the report channel names each
   exclusion. No new skip line, because nothing is skipped.
 - risks — two readers of one row grammar in two legs, both spelling the sibling's parse; the
@@ -513,6 +516,13 @@ epoch-gate observation the kit has no gate to make.
   hands-off edge derive the carrier set from the scoped `git grep`, 15 files at base including
   `tools/unattended/README.md`, citing `b8e8d6dc` as the commit shape; the RESOLVED mark is
   unchanged.
+- rev-4 · 2026-09-13 · §5 · the build pass. §5 said a row with nothing after the hash yields an
+  EMPTY path; under the sibling's three expansions, which §4 mandates verbatim, `${rest#* }` on a
+  spaceless rest is the rest itself, so the path is the hash token. Same outcome, matches nothing,
+  stated as built. Every staged break and floor over-pin §4 and §6 spell as an in-place edit
+  reverted by `git checkout` was made on a frozen copy of `tools/unattended/` instead, one
+  copy per run, so the seven suite runs could go concurrently and no working-tree edit existed
+  to revert; the acceptance ledger under `build/` names each copy's one-line delta. Status CLOSED.
 
 ## 10. Reuse audit
 

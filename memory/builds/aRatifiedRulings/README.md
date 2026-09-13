@@ -27,7 +27,8 @@ the parks that motivated them live under `builds/aLeakedHandle/`.
 ## Expected improvements
 
 - The review loop's terminal state has a documented second exit, and check 37's refusal names it.
-- Thirty corpus lines of check-23 noise clear, and the class keeps firing for real undeclared writes.
+- The brief path leaves the check-23 lines whose pass commit carries its row; real undeclared
+  writes keep firing. Unit 2's ledger: 5 of 29 lines clear, 23 lose the brief, 1 keeps it by construction.
 - `memory-hygiene self-test` runs inside its 900 s ceiling under a full concurrent bar, measured.
 - A leg killed while running unbounded reports how long it ran.
 
@@ -55,7 +56,7 @@ the parks that motivated them live under `builds/aLeakedHandle/`.
 | # | Unit | Status | Mechanism |
 |---|---|---|---|
 | 1 | `TOOL-aRatifiedRulings-1` | CLOSED | a converged subject's later blocker is disposed, never re-rounded — M4 and check 37 |
-| 2 | `TOOL-aRatifiedRulings-2` | MISSING | check 23 excludes the path a brief row names |
+| 2 | `TOOL-aRatifiedRulings-2` | CLOSED | check 23 excludes the path a brief row names |
 | 3 | `TOOL-aRatifiedRulings-3` | MISSING | one checker run serves several hygiene self-test arms |
 | 4 | `TOOL-aRatifiedRulings-4` | MISSING | the rc=137 tail for a leg with no declared ceiling |
 
@@ -69,12 +70,12 @@ ids TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded](spec/2026-09-13-spec-TOOL-aRatifiedRulings-1.md) | — | 2 | CLOSED | rev-4 | 2026-09-13 |
-| [TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names](spec/2026-09-13-spec-TOOL-aRatifiedRulings-2.md) | — | 2 | SPECCED | rev-3 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names](spec/2026-09-13-spec-TOOL-aRatifiedRulings-2.md) | — | 2 | CLOSED | rev-4 | 2026-09-13 |
 | [TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus](spec/2026-09-13-spec-TOOL-aRatifiedRulings-3.md) | — | 2 | SPECCED | rev-3 | 2026-09-13 |
 | [TOOL-aRatifiedRulings-4 — a leg killed with no ceiling in play names the seconds it ran](spec/2026-09-13-spec-TOOL-aRatifiedRulings-4.md) | — | 1 | SPECCED | rev-3 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 4 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

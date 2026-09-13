@@ -2237,6 +2237,17 @@ done
 # ---- THE WINDOW is the FIRST commit after the group anchor naming the unit, and nothing later. A
 # ---- pass's own review fold or spec bump lands after its group has ended and is outside it by
 # ---- construction; grading those would red an ordinary sequential fold with no in-band repair.
+# ----
+# ---- THE BRIEF LEAVES THE POPULATION (TOOL-aLeakedHandle-7). `--brief` records the brief a pass was
+# ---- handed and stages only the run-state file; the brief is already tracked, so the pass's one
+# ---- commit carries it, and the pass never declared it because the pass never wrote it. Two
+# ---- boundaries, both load-bearing: the PATH the row names and not its directory — a row naming
+# ---- `prompts/` excludes nothing under it, or a pass could hide any write there — and the rows in the
+# ---- PASS COMMIT'S TREE and not the working copy, so a row appended after the commit hides nothing.
+# ---- What that does NOT buy: a run that writes the brief row and a stray file into the same pass
+# ---- commit still hides the stray file — both artifacts are the run's, the limit stated above for
+# ---- dispatch rows, and a row naming a path no brief was handed at is a lie the `brief-recorded`
+# ---- leg joins against the build commit.
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
@@ -2341,10 +2352,34 @@ DSSIBS
       printf 'unattended: check 23 — one commit names two passes of the same dispatch group, so a subset test over it cannot say which pass wrote what and the attribution this comparison rests on is not available: %s and %s in %s\n' "$dsunit" "$dsother" "$f"
       continue
     fi
+    # THE EXCLUSION SET: every path a ` brief · item <unit> · reason ` row names for THIS unit, read
+    # from the run-state file AT THE PASS COMMIT — a row appended afterwards is outside that tree by
+    # construction, which is the ordering `pass_commit` obtains for itself. Selected on the whole
+    # field with both separators, so `-1` is not a prefix of `-10`; parsed with the sibling leg's own
+    # three expansions (`check-brief-recorded.sh`), so a grammar change breaks both readers the same
+    # way. Only the row's side is normalised: `diff-tree` already prints git's canonical spelling.
+    # The read lands in a VARIABLE and the loop reads the variable — a substitution in the heredoc
+    # body is the class `pass_commit` deadlocked on. Newline-delimited with a newline at both ends,
+    # so the membership test below is an exact match and never a prefix or a containment.
+    dsnl=$'\n'; dsbrief=$dsnl
+    dsrun=$(GIT show "$dshit:$f" 2>/dev/null || true)
+    while IFS= read -r dsbr; do
+      case "$dsbr" in *" brief · item $dsunit · reason "*) ;; *) continue ;; esac
+      dsbr=${dsbr#* · reason }; dsbr=${dsbr#* }
+      dsbrief="$dsbrief$(normpath "$dsbr")$dsnl"
+    done <<DSBRIEF
+$dsrun
+DSBRIEF
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
     # declaration is the defect.
     dsout=""
     for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
+      # EXACT membership, deliberately not `covers`: that is a containment test, and a row naming a
+      # directory would then hide everything under it.
+      case "$dsbrief" in *"$dsnl$dsq$dsnl"*)
+        report "check 23 excluded $dsq for $dsunit in $f — the path its brief row names, staged by --brief rather than written by the pass"
+        continue ;;
+      esac
       dsok=0
       for dsp in $dsdecl; do
         # THROUGH THE LIBRARY, which normalises. A bare `case` graded the recorded spelling as a
