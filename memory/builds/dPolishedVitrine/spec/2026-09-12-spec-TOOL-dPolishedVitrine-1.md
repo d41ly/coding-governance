@@ -419,10 +419,12 @@ review-harnesses dossier, the generated map, and this build's records.
 - **AC19** — When the regenerate argv `tools/workflows/kit.toml` declares runs over an install that
   tracks the harness and has no protocol copy, it refreshes the harness, writes no protocol, and
   names the pair it skipped; `--check --tracked-only` passes over the same install and still reds a
-  drifted harness; and a hand `--render` still creates the protocol. The `PV-R2-3` arms in
+  drifted harness; and a hand `--render` still creates the protocol. A protocol that is tracked but
+  deleted, or present but untracked, is still rendered by the declared argv. The `PV-R2-3` arms in
   `tools/workflows/unattended-build.test.sh` read that argv out of the descriptor, and a `[-PV]`
   arm runs it through `update`.
-  Red when: the declared argv creates a live copy the install never had.
+  Red when: the declared argv creates a live copy the install never had, or the skip keys on only
+  one of absent and untracked.
 - **AC20** — When a kit declares `[[regenerate]]`, `govkit selfcheck` reds a sentence in its tracked
   files or descriptor that names `update`, the flag and a silence word without naming the
   `re-rendered` line a flag-off update still prints. And a flag-off `update` over a moved template
@@ -445,7 +447,7 @@ New arm: `tools/unattended/adopt-unattended.test.sh` · a seed tracking no gotch
 New arm: `tools/govkit/selftest.py` · the old hand-off, HEAD's engine order, a no-rollback promise · none
 New arm: `tools/govkit/govkit.py` · the five carriers round 1 named, unfixed · none
 New arm: `tools/workflows/unattended-build.test.sh` · a review-harness-only install · none
-New arm: `tools/workflows/unattended-build.test.sh` · the regenerate argv without `--tracked-only` · none
+New arm: `tools/workflows/unattended-build.test.sh` · the regenerate argv without `--tracked-only`, and the skip keyed on only the index or only the disk · none
 New arm: `tools/govkit/selftest.py` · rev-5's `git add -A`, its receipt pin rule, a step 1 that ignores update's exit, a check blind to new rows, a block 2 that writes, a relabelled flag-off verdict · none
 New arm: `tools/govkit/govkit.py` · the three carriers calling a flag-off update silent · none
 

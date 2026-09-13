@@ -807,6 +807,23 @@ printf '// drift\n' >> "$RG/scripts/workflows/unattended-build.js"
 o=$( (cd "$RG" && bash scripts/workflows/check-protocol-parity.test.sh --tracked-only 2>&1; echo "rc=$?") )
 has "PV-R2-3 ...and a drifted harness still reds under it" "$o" "DRIFT"
 
+# THE SKIP NEEDS BOTH HALVES, absent AND untracked, and each half is armed from its own side. A skip
+# keyed on the index alone would pass a present untracked copy by, and one keyed on the disk alone
+# would leave a tracked copy somebody deleted uninstalled; the arms above see neither.
+for rg_case in tracked-deleted present-untracked; do
+  RC="$LAY/regenerate-$rg_case"; build_layout "$RC" scripts/workflows scripts/unattended scripts/gotchas.py
+  run_layout "$RC" scripts/workflows --render >/dev/null
+  if [ "$rg_case" = tracked-deleted ]; then
+    ( cd "$RC" && git add -A ) && rm -f "$RC/memory/guides/REVIEW-PROTOCOL.md"
+  else
+    ( cd "$RC" && git add scripts/workflows/unattended-build.js )
+    printf 'an untracked copy, stale\n' > "$RC/memory/guides/REVIEW-PROTOCOL.md"
+  fi
+  o=$( (cd "$RC" && "${rg_words[@]}" 2>&1; echo "rc=$?") )
+  has "PV-R2-3 $rg_case: the declared regenerate still renders the protocol" "$o" "rendered memory/guides/REVIEW-PROTOCOL.md from"
+  hasnt_ "PV-R2-3 $rg_case: ...and does not skip it" "$o" "SKIP memory/guides/REVIEW-PROTOCOL.md"
+done
+
 # CREATION STAYS WITH THE HAND RENDER a fresh install runs, which the runbook's copy-install step
 # prescribes: without the flag, the same install gets the protocol it asks for.
 

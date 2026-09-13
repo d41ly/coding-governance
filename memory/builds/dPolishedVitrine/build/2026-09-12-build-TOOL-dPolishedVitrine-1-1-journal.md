@@ -325,7 +325,11 @@ rewritten.
   failed against the unfixed script and argv, and the protocol was written. At the govkit level, with
   the flag taken out of the argv, the regenerate created the protocol and block 1 flagged it
   `step 1 created it and nothing rows it`. govkit reporting such a file itself is a govkit change
-  outside §3, added to `DEPL-dPolishedVitrine-2`.
+  outside §3, added to `DEPL-dPolishedVitrine-2`. The bug-class checklist over the fold then named
+  `containment-tested-one-way`: the skip needs its copy absent AND untracked, and no arm held either
+  half. Four more arms render a protocol that is tracked but deleted, and one that is present but
+  untracked. Observed red: with the skip keyed on the index alone the second case skipped, and with
+  it keyed on the disk alone the first did, two arms each.
 - **R2-4, medium: the Done state could not be met at a consumer.** Block 2's check now counts the
   rows the re-adopt leaves `unattributed`, each with its reason. Done says the next update either
   re-stamps or withholds its stamp over exactly that count. The runbook also warns against the bare
@@ -426,7 +430,7 @@ Found while fixing, and not this unit's:
   at B and never `notes.md`, the next update grades `notes.md` `re-rendered`, block 2 counts 3, and
   the next update withholds over 3. The conflicted fixture stops at step 1 with no commit and no pin.
   The reds are under R2-2, R2-4, R2-5 and R2-6 above.
-- AC19 — `--tracked-only` — OBSERVED: the eleven `PV-R2-3` arms pass, and the `[-PV] R2-3` arm
+- AC19 — `--tracked-only` — OBSERVED: the fifteen `PV-R2-3` arms pass, and the `[-PV] R2-3` arm
   passes through `update`. Six of the suite's arms, and the govkit-level one, are the reds recorded
   under R2-3 above.
 - AC20 — `re-rendered` — OBSERVED: `govkit selfcheck` is green on the reworded carriers after
