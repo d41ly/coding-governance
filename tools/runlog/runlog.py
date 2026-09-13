@@ -10,7 +10,10 @@ garbage is loud rather than filtered out. The journal root is the git common dir
 command runs IN, so every worktree of one clone reads the same file.
 
 Exit 0 = the file was read, or is absent (a named state: no producer has written yet) · 2 = no
-journal root resolves, or the file exists and cannot be read.
+journal root resolves, or the file exists and cannot be read. A file holding bad lines still exits 0
+DELIBERATELY, and the bad count on stderr is its verdict: a torn line is what a writer killed
+mid-append leaves behind, so it is an outcome of the run being read, not a failure of the reader. A
+run log is evidence, never an input, and no caller may branch on this status to decide a run's fate.
 """
 import argparse
 import json

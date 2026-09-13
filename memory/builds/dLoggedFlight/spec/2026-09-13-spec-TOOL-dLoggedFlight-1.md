@@ -1,6 +1,6 @@
 # TOOL-dLoggedFlight-1 — the runlog kit and its line grammar: one format every producer writes, one reader every consumer parses
 
-**Status:** CLOSED · rev-5 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
+**Status:** CLOSED · rev-6 · 2026-09-13 · node d · Tier-2 · base 9fac2b53 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -168,11 +168,13 @@ cover, and the row drains itself: the leg reds on it the day either file names t
 because the spec-tokens leg joins every path a live spec's criteria name against the tracked tree.
 
 - **AC1** — When `python tools/govkit/govkit.py selfcheck` runs after this unit, it is green with the
-  `runlog` entry claiming every file under the kit, `selftest.py` and `fixtures/` resolving to
-  `project-owned`, and `runlog selftest` carried by an `[[exempt_leg]]` row. The codebase-map leg is
-  green with the new dossier claiming the kit and its leg.
-  Red when: the registry entry or the dossier claim is missing, or the self-test resolves to a landable
-  role.
+  `runlog` entry claiming every file under the kit and `runlog selftest` carried by an
+  `[[exempt_leg]]` row. `govkit plan` into a scratch target lists `selftest.py` and every file under
+  `fixtures/` as `project-owned`, and nothing else of the kit's. The codebase-map leg is green with the
+  new dossier claiming the kit and its leg.
+  Red when: the registry entry is missing (selfcheck) or the dossier claim is (the codebase-map leg),
+  or the self-test or a fixture resolves to a landable role. `plan` and the self-test's declaration
+  arm see that last one; selfcheck grades no file's role, so it cannot.
 - **AC2** — When `parse_line` in `<kit>/runlog_lib.py` reads back a line whose values carry a TAB, a
   newline, a CR and a backslash, every value comes back byte-identical to what was written.
   Red when: the escaping is dropped from either direction and the arm compares a mangled value.
@@ -196,8 +198,8 @@ because the spec-tokens leg joins every path a live spec's criteria name against
   worktree of it, both return the same absolute `<common-dir>/runlog`, and `journal` names that path.
   Red when: the linked worktree resolves under `.git/worktrees/`.
 - **AC8** — When the self-test parses the four golden lines of §4, each parses with a bad-line count
-  of zero, and a line with 30 indexed fields rendered through the kit's reference truncation stays at
-  or under 2048 bytes with a `_more` count.
+  of zero, and a line with 30 indexed fields rendered through `render_line`, the kit's reference
+  truncation, stays at or under 2048 bytes with a `_more` count.
   Red when: the key grammar rejects a producer's key, or a value is cut before an indexed field drops.
 - **AC9** — When `python <kit>/runlog.py journal --producer driver` reads a fixture holding two good
   lines and one torn line, stdout carries two JSON objects whose keys match the lines, and stderr
@@ -243,6 +245,10 @@ none
   literal paths only, so a `fixtures/**` element claimed nothing and `govkit plan` shipped every
   fixture as `engine`. `govkit selfcheck` does not see that, so AC1's third red condition is
   observed by `govkit plan` into a scratch target and by a self-test arm over the declaration.
+- rev-6 · 2026-09-13 · AC1 AC8 · the bug-class checklist over the build commit. rev-5 recorded the
+  AC1 amendment in this log and left AC1's own text claiming selfcheck sees the self-test's role;
+  AC1 now names the observation that does. AC8 names `render_line`, which rev-5 added to the
+  inventory.
 
 ## 10. Reuse audit
 

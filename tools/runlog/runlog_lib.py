@@ -5,26 +5,10 @@ KIT_RUNLOG_VERSION below is the version constant a deployer greps; the README ca
 
 Three producers append one line per act to a machine-local journal: the unattended driver, the gate
 runner and the pre-push hook. They are shell scripts, several consumers read what they write, and a
-format that each side re-derives drifts on the first edit. So the grammar is stated once in this
-kit's README, implemented once here, and graded by the self-test against a golden line copied from
-every producer's data model.
-
-THE GRAMMAR, in the order a reader applies it. One act is one line, ending in LF. Fields are
-TAB-separated and every field is `key=value`, split on the FIRST `=`, so a value may carry `=`.
-Field 1 is `v=<grammar version>`, and a version this reader does not know is refused rather than
-guessed at. A key is `[a-z][a-z0-9_]*` with an optional `.` suffix of `[A-Za-z0-9_]+`; the suffix is
-an INDEX when it is all digits. Values escape exactly four bytes — backslash, TAB, LF and CR — and
-nothing else. `v`, `t`, `p` and `ev` are required. `ev` is `start`, `end` or `once`, and a `start` or
-an `end` also requires `n`, the nonce the pair shares. A key a reader does not know is KEPT.
-
-WHAT THIS DOES NOT CHECK, stated because a structural check reads as a semantic one:
-  - whether a VALUE means anything. `rc=banana` parses. The grammar is syntax; each producer's own
-    suite grades its values.
-  - whether a line cut at a field boundary was cut. A writer killed after `ev=start\tn=1` and before
-    the rest leaves a line that still parses. A torn line is caught only when the cut breaks the
-    grammar — a missing required key, a broken escape, a missing LF at end of file — and is then
-    COUNTED rather than dropped, which is the most a line-local reader can promise.
-  - whether a journal is complete. A producer that never wrote leaves nothing to count.
+format that each side re-derives drifts on the first edit. So the grammar is implemented once HERE
+and stated once in this kit's README, which is also where the reader's limits are listed. Neither is
+restated in this docstring: a second prose copy of a grammar is the copy that rots. The self-test
+grades this implementation against a golden line copied from every producer's data model.
 
 Every path this module touches is passed in or resolved from git; it names nothing outside itself.
 """
@@ -202,11 +186,9 @@ def check_line(raw: str) -> str | None:
 def render_line(fields: dict) -> str:
     """The kit's REFERENCE writer: escape every value and fit the line under the cap. No LF appended.
 
-    The truncation order is the grammar's, and it is the half a producer is most likely to get wrong:
-    drop WHOLE indexed fields, highest index first, counting each family's drops into
-    `<base>_more` (added to any count the producer already wrote), and only when no indexed field is
-    left, cut the longest non-required value from its end. A cut never ends inside an escape. A cut
-    value carries no marker; no producer's data model reaches that step, and the README says so.
+    The truncation order it implements is the README's, stated there and nowhere else, because it is
+    the half of the grammar a shell producer is most likely to get wrong and one statement of it is
+    what that producer is graded against.
     """
     items = [[str(k), _render_value(str(v))] for k, v in fields.items()]
     if not items or items[0][0] != "v":

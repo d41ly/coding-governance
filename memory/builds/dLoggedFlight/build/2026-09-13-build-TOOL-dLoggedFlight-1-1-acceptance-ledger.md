@@ -11,12 +11,13 @@ OBSERVED. Where a criterion was answered by something other than what it names, 
 
 - AC1 — `python tools/govkit/govkit.py selfcheck` — rc 0 with `runlog` an entry, `runlog selftest` on
   an `[[exempt_leg]]` row, and its subject pin regenerated. The codebase-map leg is green with the new
-  dossier claiming the kit and the leg. AMENDED in one respect: selfcheck does NOT red when the
-  self-test turns landable. Deleting its `project-owned` rule left it at rc 0. That condition is
-  therefore observed by `govkit plan` into a scratch target, which lists `selftest.py` and all four
-  fixtures as `ORDER [project-owned]` and only the four engine files as `write`. It is also observed by
-  the self-test's declaration arm. The same plan exposed a defect: a `fixtures/**` element claimed
-  nothing, because a list include drops glob elements, so each fixture is now named.
+  dossier claiming the kit and the leg. Selfcheck does NOT red when the self-test turns landable:
+  deleting its `project-owned` rule left it at rc 0. That condition is observed by `govkit plan` into a
+  scratch target, which lists `selftest.py` and all four fixtures as `ORDER [project-owned]` and only
+  the four engine files as `write`, and by the self-test's declaration arm. Spec rev-6 rewrote AC1 to
+  name those two, after the checklist over the build commit found rev-5 had amended only its log. The
+  same plan exposed a defect: a `fixtures/**` element claimed nothing, because a list include drops
+  glob elements, so each fixture is now named.
   RED seen three ways. Removing the registry entry took selfcheck to rc 1 with `tools/runlog`
   unclaimed. Removing the dossier's leg claim took the coverage leg to rc 1, UNCLAIMED. Three
   declaration breaks each redded the arm: a fixture left off the list, a glob instead of the list, and

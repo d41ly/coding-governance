@@ -40,9 +40,10 @@ with one builtin `printf >>` and no process spawn, which is the producers' own c
 **Field 1 is the grammar version, and a reader refuses a version it does not know.** A reader that
 guessed at a v2 line would report it as data. The refusal is counted, never silent.
 
-**A bad line is COUNTED, never dropped.** Appends from concurrent writers measured intact on node
-`a`, 1600 of 1600, but the grammar does not rely on that: a torn line fails to parse and surfaces as
-the bad-line count every `journal` run prints. A final line with no LF is torn by definition.
+**A bad line is COUNTED, never dropped.** Concurrent appends measured intact, and the spec's data
+model carries that measurement with its node and date, but the grammar does not rely on it: a torn
+line fails to parse and surfaces as the bad-line count every `journal` run prints. A final line with
+no LF is torn by definition.
 
 **The journal lives in the git COMMON dir, resolved with one git call.** `--path-format=absolute` is
 load-bearing twice over: the bare form prints a relative `.git` in the primary tree, and
@@ -70,7 +71,7 @@ counters can move. Wall time is printed report-only, and the leg's budget row is
 
 ## Gaps
 
-- **Retention.** Nothing prunes the journals; they grow at about 75 KB per run.
+- **Retention.** Nothing prunes the journals; the spec's non-goals carry the growth estimate.
 - **A line cut at a field boundary still parses.** Only a cut that breaks the grammar is caught.
 - **A cut value carries no marker.** The reference writer cuts a value only after every indexed field
   has dropped, and no producer's data model reaches that step, so the case is named rather than

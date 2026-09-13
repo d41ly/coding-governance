@@ -89,7 +89,7 @@ verdict.
   that still parses. A torn line is caught only when the cut breaks the grammar, and it is then
   COUNTED rather than dropped.
 - **Whether a journal is complete.** A producer that never wrote leaves nothing to count.
-- **Retention.** Nothing prunes the journals. They grow at about 75 KB per run.
+- **Retention.** Nothing prunes the journals, and every run adds to them.
 - **A cut value is not marked.** No producer's data model reaches the value-cutting step, so nothing
   records that it happened.
 
