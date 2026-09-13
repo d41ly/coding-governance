@@ -15,6 +15,13 @@
 
 ## TOOL — tooling
 
+- TOOL-cSpliceWarden-6 · a check that grades a declared mode DELEGATES to whatever owns the grammar it reads. Spelling a second row predicate in shell let five of six evasions pass, a bold-wrapped id among them, and the decision index carries fifteen of those
+- TOOL-cSpliceWarden-7 · an archive pair is made to partition by DELETING the duplicate side, never by widening what the invariant asserts. Lossless because the rows were byte-identical, which was checked before choosing rather than assumed after
+- TOOL-cSpliceWarden-8 · a false clause beside a sound conclusion does not overturn it. The retirement it questioned was correct when written; the audit's finding is that the coverage claim was never load-bearing, and that there were four carriers of it, not three
+- TOOL-cSpliceWarden-1 · rotation semantics is DECLARED per project, `ROTATION_MODE` = `cut` or `snapshot`, because both are coherent disciplines and neither is a safe default. HYGIENE.md had stated both in one paragraph, and the pair writes every live row into a frozen file
+- TOOL-cSpliceWarden-4 · a ratified archive is repaired by SUPERSESSION plus evacuation, never a silent rewrite: the note states every false claim and quotes every removed row. 17 archive-only IDS were 15 ROWS — two already had a correct CLOSED row there
+- TOOL-cSpliceWarden-2 · a rotated archive's live index resolves by BASENAME anywhere under the memory root, and zero-or-many is a named finding, never a skip. Two filed rows had half the defect each; the `head -3` window was the half only a real-tree run found
+- TOOL-cSpliceWarden-3 · check 20 recognises a rotated archive by the document it ROTATED, `DECISIONS` or a declared FAMILY plus a date — NOT every `.md` under `archive/`, which sweeps in frozen snapshots where a quoted row would red a file nobody may edit
 - TOOL-dRetiredFork-4 · inCMS's D1 is nested template INTERPOLATION, not a nested agent loop; two spec revisions argued a fixture the adopter never claimed. At HEAD the view still corrupts, the fail-open does not. Disposition (b); latent scalar is `TOOL-dRetiredFork-24`
 - TOOL-aWarmedTether-2 · the bar runs INSIDE the push, so the connection idles its whole duration and the server closes it; the push dies AFTER a green gate and the refusal names auth, not a timeout. `push-main.sh` defaults SSH keepalives; HTTPS here cannot exercise it. Measured on an adopter
 - TOOL-aWarmedTether-1 · three arms in `check-unattended.test.sh` graded nothing, found by an adopter running the suite we ship: WRITE_RE omits `_` so our own `_pv_rm` reds the no-write arm; check 30's liveness arm breaks only tRun though tPlanOk grades (0 hits vs 1); branch 2 shipped unarmed
@@ -91,6 +98,10 @@
 
 - TOOL-dSettledRoster-2 · closing a pre-cutoff spec pulls it into drift signal 6, whose grandfather keys on the CLOSE date while its evidence keys on the BUILD date. Remedy is `memory/project/trace-waiver.txt` per cTracedPromise-1 §3 — not a raised pin, not a filename key; an unused row reds
 - TOOL-dNarrowedAnchor-1 · the second anchor is admissible PER MODE. `ANCHOR_SCOPE` was a whole-project switch, so enabling the prompt path also let a `slug` run push its own authorization. `SECOND_ANCHOR_MODES="prompt recipe"`; `slug`, an absent `authorized-by:`, reds `fail 50` and leg `fail 29`
+- TOOL-aLeakedHandle-6 · OWNER RULING (2026-09-13): a blocker found on a subject whose review loop already CONVERGED is DISPOSED under M4 fold/promote and never re-rounded; no re-arm on a rev bump. Owes an M4 sentence and a check-37 message. Options and cost: builds/aLeakedHandle/RUN.md.
+- TOOL-aLeakedHandle-7 · OWNER RULING (2026-09-13): check 23 EXCLUDES the path a `brief · item <unit>` row names, since `--brief` stages it and the pass never had a write to declare. Clears 30 corpus lines; the class still fires elsewhere. Owes one staged-red arm. builds/aLeakedHandle/RUN.md.
+- TOOL-aLeakedHandle-8 · OWNER RULING (2026-09-13): the memory-hygiene self-test ceiling breach is answered by making the SUITE CHEAPER, not by re-declaring 900 s. pk_rc/pk_out re-run the whole checker per arm; one run must serve several. Tier-2 unit. Measurement: aJoinedCanon's 2026-09-07 park.
+- TOOL-aLeakedHandle-9 · OWNER RULING (2026-09-13): BUILD the no-ceiling rc=137 branch of report_one, `(killed after <secs>s)`, from backlog row TOOL-aLeakedHandle-5. Every leg declares a ceiling today, so its red case is fixture-only; ratified anyway. Tier-1, one branch plus one arm.
 
 ## DEPL — deployer
 
@@ -150,3 +161,4 @@
 - **TOOL-dMuffledSentinel-3** — **drift-audit 1.10 and unattended 1.19, over the bytes unit 2 changed**: an adopter pulling unit 2 could not tell the vintages apart, and inCMS refused the pull. builds/dMuffledSentinel/. — _2026-09-12, `d`_
 - **TOOL-cGradedDebt-1** — **a waiver row that hides nothing now REDS**: `curation-debt.txt` asserted only that a listed path was tracked, so the `TOOL.md` row outlived its fault by three weeks. Listed files stay IN checks 6/7/8, findings partitioned. builds/cGradedDebt/. — _2026-09-12, `c`_
 - **TOOL-cGradedDebt-2** — **`WITHDRAWN` is a synonym for `WONTDO`; the vocabulary stays at seven**: two rows also quoted a table cell whose PIPE check 8 reads as a delimiter, so closing the backtick spaces fixed nothing. builds/cGradedDebt/. — _2026-09-12, `c`_
+- **TOOL-cRefutedPremise-1** — **a refuted premise outlives review when its conclusion keeps testing true**: `agent-cap` gave two false reasons for two sound rules, and one was already refuted in `SESSION-KICKOFF.md`. All seven carriers corrected. builds/cRefutedPremise/. — _2026-09-12, `c`_

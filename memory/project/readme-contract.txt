@@ -26,13 +26,14 @@
 # every run. TOOL-dFramedEntrypoint-7 converts rows to bound, one build at a time, and lowers the pin
 # in the same commit as the file it describes.
 
-exempt-pin: 67
+exempt-pin: 68
 
 !memory/builds/aBatchedLintel/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBatchedTribunal/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBoundedVerdict/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aBranchedMandate/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aCandidStub/README.md - predates the contract; drains when its build's owner conforms it
+!memory/builds/cRefutedPremise/README.md - CLOSED at landing, so the header's terminal rule applies: its two judgement slots are forward-looking and cannot be honestly authored after the build closed
 memory/builds/aCollapsedScan/README.md
 !memory/builds/aDeclaredBound/README.md - predates the contract; drains when its build's owner conforms it
 !memory/builds/aDeclaredCeiling/README.md - predates the contract; drains when its build's owner conforms it
@@ -136,3 +137,4 @@ memory/builds/aGradedDialect/README.md
 memory/builds/aLeakedHandle/README.md
 memory/builds/dMuffledSentinel/README.md
 memory/builds/cGradedDebt/README.md
+memory/builds/cSpliceWarden/README.md

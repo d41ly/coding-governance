@@ -182,6 +182,30 @@ DOSSIER_CAP_LINES="0"
 # because it reds every line rather than expressing an intent.
 ENTRY_CAP_CHARS="300"           # a row document
 BUILD_README_ENTRY_CAP_CHARS="350"  # a build README, whose authored rows were measured wider
+
+# ROTATION_MODE — what a ROTATION MEANS for a status-bearing shard. TWO values and no third:
+#   cut       the archive holds TERMINAL rows only (CLOSED/WONTDO); every non-terminal row stays in
+#             the live shard. Live and archive PARTITION the family, so an id sits in exactly ONE
+#             file and its status has exactly one owner.
+#   snapshot  `git mv` the whole index to the archive, then open a fresh one carrying the
+#             non-terminal rows forward. A live id then sits in TWO files, the archived copy being a
+#             dated photograph of the index rather than a second answer about that id's status.
+# BOTH ARE COHERENT. They are different DISCIPLINES, not different strictnesses, which is why there
+# is no default and no forward resolution: neither is the safe fallback, and a tree graded under the
+# other project's discipline reports green over rows nobody reconciled.
+# THIS REPO DECLARES cut. The shipped example declares snapshot — the deliberate example/gov
+# divergence READINESS_ROWS above already records — because snapshot is what this kit's prose has
+# always described and what inCMS practises (its scripts/rotate_index.py R1-R6 and carry_backlog.py).
+# MEASURED, and the reason the key exists: memory/HYGIENE.md stated BOTH procedures in one paragraph
+# — move the whole file AND carry every non-terminal row forward — and the pair writes every live row
+# into a frozen file. memory/archive/TOOL.2026-08-17.md is what that produced: a header promising
+# terminal rows only over 90 rows of which 66 were not, 49 ids also live in the shard and 7 of those
+# disagreeing about status. TOOL-cSpliceWarden-1, owner-ratified 2026-09-12.
+# BLANK IS UNDECLARED, and nothing refuses it today. That is the honest cost of not breaking every
+# adopter tree on a kit upgrade, and it is weaker than this comment's "no default" reads: an adopter
+# can run forever undeclared. An UNRECOGNISED value is a different answer from a blank one and does
+# NOT collapse into it — it aborts the engine at exit 2, beside ENTRY_CAP_UNIT.
+ROTATION_MODE="snapshot"
 # Path prefixes that are NOT repo CONTENT (e.g. a worktree root). Resolution is `git ls-files`
 # membership plus a prefix scan and never touches the filesystem, so a checkout LOCATION classifies
 # identically on every node — which is why the answer is declared here rather than probed.

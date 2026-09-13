@@ -531,12 +531,13 @@ printf 'x\n' > memory/guides/kickoff-prompt.md                   # loose in the 
 # ---- two directories would break the green arm for a reason that has nothing to do with check 2.
 printf '# links\n\n[alive](kickoff-prompt.md)\n[dead](no-such-file.md)\n' > memory/guides/links.md
 
-# ---- CHECK 10: a rotated archive is announced in lines 1-3 of the index it was cut from. Two
+# ---- CHECK 10: a rotated archive is announced in the PREAMBLE of the index it was cut from —
+# ---- everything above that index's first row, and never fewer than its first three lines. Two
 # ---- archives, one index, one mention — the referenced one is the control.
 mkdir -p memory/archive
 printf '# Decisions\n\nRotated: DECISIONS.2026-08-02.md\n\n- ARCH-tFixture-1 · a decision\n' > memory/DECISIONS.md
 printf '# rotated\n' > memory/archive/DECISIONS.2026-08-01.md    # unreferenced   -> RED
-printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the head -> silent
+printf '# rotated\n' > memory/archive/DECISIONS.2026-08-02.md    # named in the preamble -> silent
 
 # ---- CHECK 6: the index byte/line cap. `guides/*.md` is in INDEX_SET — a guide is mandatory reading
 # ---- the charter points a session at, and check 16 refuses a charter-cited file nothing caps — and
@@ -1186,7 +1187,7 @@ cnot 8 'memory/builds/tRunBig/RUN.md'
 # check 9's green half is the freshly-scaffolded tree at the bottom of this file, which renders the
 # index and then asserts the WHOLE gate exits 0. This tree never renders it, so it drifts.
 hit  'generated build index differs from a fresh render'
-hit  'rotated archives not referenced from their live index (lines 1-3)'
+hit  'rotated archives not referenced from their live index preamble'
 chit 10 'memory/archive/DECISIONS.2026-08-01.md'
 cnot 10 'DECISIONS.2026-08-02.md'
 hit  '/ is the only sanctioned memory root'
@@ -1735,14 +1736,32 @@ cblock "$outn" 6 | grep -qF 'memory/backlog/ARCH.md' \
 A=$TMP/rotarchive
 mkdir -p "$A/memory/builds/tRot/spec" "$A/memory/archive" "$A/memory/backlog" "$A/memory/project"
 ( cd "$A" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
+  # DEPL is declared and has NO live shard, deliberately: the archive below is named for it, so its
+  # stem resolves to ZERO live indexes. That branch is the one whose `continue` made check 10 inert
+  # for every backlog archive, and until this fixture existed it shipped unobserved.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH deployer:DEPL"\nORPHAN_ID_PIN="0"\nDEAD_PATH_PIN="0"\n' > .memory-tree.conf
   printf '# r\n' > memory/README.md
   printf '# legacy\n' > memory/project/legacy-files.txt
   printf -- '---\nslug: tRot\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRot-1\n---\n\n# tRot\n' > memory/builds/tRot/README.md
   printf '# ARCH-tRot-1 — the owning unit\n\nIt cites ARCH-tMoved-1 in prose, so the moved id is CITED from outside the archive.\n' > memory/builds/tRot/spec/2026-08-01-spec-tRot-1.md
   # The live shard AFTER the rotation: the moved row is gone from here in both states below.
-  printf '# ARCH backlog\n\n> Rotated 2026-08-01 to [../archive/ARCH.2026-08-01.md](../archive/ARCH.2026-08-01.md).\n\n- ARCH-tRot-1 · OPEN · the owning unit\n' > memory/backlog/ARCH.md
+  # THE ROTATION NOTE SITS ON LINE 4, DELIBERATELY. A `head -3` window cannot see it, so the green
+  # control below can only be satisfied by the widened preamble window — which is the whole of what
+  # this build changed about that window, and was previously asserted by nothing. The dogfood shard
+  # carries its own notes on lines 4 and 5 for the same reason: two rotations plus a preamble line.
+  printf '# ARCH backlog\n\n> Mutable. Each row leads with one status token.\n> Rotated 2026-08-01 to [../archive/ARCH.2026-08-01.md](../archive/ARCH.2026-08-01.md).\n> Rotated 2026-08-02 to [../archive/ARCH.2026-08-02b.md](../archive/ARCH.2026-08-02b.md).\n\n- ARCH-tRot-1 · OPEN · the owning unit\n' > memory/backlog/ARCH.md
   printf '# rotated\n\n- ARCH-tMoved-1 · CLOSED · the moved row, which DEFINES its own id on this line\n' > memory/archive/ARCH.2026-08-01.md
+  # CHECK 10 rides this tree, because it is the only fixture with a rotated BACKLOG shard — the case
+  # the shipped check could not reach at all. ARCH.2026-08-01.md is named in the shard's preamble
+  # (line 3) and is the GREEN control; this second archive is named nowhere and is the RED. Before
+  # the basename resolution both were invisible: the stem projected onto memory/ARCH.md, which does
+  # not exist, and the `[ -f ]` guard skipped them. The RED arm is what fails without the fix; the
+  # green control is what fails if the fix over-reaches and reds a shard that DID announce its cut.
+  printf '# rotated, and announced by nobody\n' > memory/archive/ARCH.2026-08-03.md
+  # A SAME-DAY DISAMBIGUATED name, announced on line 5. Without it the `[a-z0-9]*` in both readers'
+  # patterns is dead weight that can be deleted with every arm still green.
+  printf '# rotated, second of its day\n' > memory/archive/ARCH.2026-08-02b.md
+  printf '# rotated from a family with no live shard\n' > memory/archive/DEPL.2026-08-04.md
   git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null 2>&1; git add -A
   git commit -q -m rotated --no-verify )
 outa=$(cd "$A" && bash "$SCRIPT" 2>/dev/null)
@@ -1752,6 +1771,24 @@ n=$((n+1))
 # BOTH arms would pass by finding nothing. Measured before trusting either direction.
 grep -qF 'ARCH-tMoved-1' <<<"$outa" \
   && { echo "FAIL check 14 called a rotated-and-STAGED id an orphan — rotation between two tracked paths cannot orphan anything, so this is the arithmetic going wrong"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/ARCH.2026-08-03.md' <<<"$outa" \
+  || { echo "FAIL check 10 did not reach a rotated BACKLOG archive — its live index is memory/backlog/ARCH.md, one level below the memory root, and resolving the stem at the root skips it in silence"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/ARCH.2026-08-01.md' <<<"$outa" \
+  && { echo "FAIL check 10 red an archive its shard DOES announce — memory/backlog/ARCH.md names it on LINE 4, which only the widened preamble window reaches; a head -3 window or an over-reaching resolution fails here"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/ARCH.2026-08-02b.md' <<<"$outa" \
+  && { echo "FAIL check 10 red a SAME-DAY DISAMBIGUATED archive its shard announces on line 5 — either the [a-z0-9]* suffix left the filename anchor or the preamble window is short"; st=1; }
+# ---- the ZERO-RESOLUTION branch, which is the one whose `continue` made this check inert. An
+# ---- archive whose stem names no live index must be NAMED, and the message must say how many it
+# ---- resolved to, because "skipped in silence" and "referenced" printed the same nothing before.
+n=$((n+1))
+grep -qF "resolves to 0 live index(es)" <<<"$outa" \
+  || { echo "FAIL check 10 SKIPPED an archive whose stem resolves to no live index instead of naming it — that silent \`continue\` is exactly how this check graded 1 of 4 archives for a month"; st=1; }
+n=$((n+1))
+grep -qF 'memory/archive/DEPL.2026-08-04.md' <<<"$outa" \
+  || { echo "FAIL check 10's zero-resolution finding does not name the archive it is about"; st=1; }
 # ---- ...and now the SAME rotation with the archive unstaged. This is the state cSteadyMetronome saw.
 n=$((n+1))
 ( cd "$A" && git rm -q --cached memory/archive/ARCH.2026-08-01.md >/dev/null 2>&1 \
@@ -2387,6 +2424,26 @@ case "$r:$o" in
   2:*ENTRY_CAP_UNIT*) echo "ok   ENTRY_CAP_UNIT='glyphs' ABORTS naming the key" ;;
   *) echo "FAIL ENTRY_CAP_UNIT='glyphs' did not abort (rc=$r)"; st=1 ;;
 esac
+
+# ROTATION_MODE — a CLOSED set whose BLANK is a different answer from an invalid one, which is the
+# whole reason it is validated rather than merely read. The blank arm is the load-bearing one: an
+# adopter conf predating the key must not red on a kit upgrade, so a missing key has to pass, and an
+# arm that only tested the abort would leave that free to regress silently. TOOL-cSpliceWarden-1.
+for rmode in cut snapshot; do
+  pk_set "ROTATION_MODE=\"$rmode\""; r=$(pk_rc)
+  n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE=$rmode is accepted"     || { echo "FAIL ROTATION_MODE=$rmode redded (rc=$r)"; st=1; }
+done
+pk_set 'ROTATION_MODE=""'; r=$(pk_rc)
+n=$((n+1)); [ "$r" = 0 ] && echo "ok   ROTATION_MODE blank is UNDECLARED and passes"   || { echo "FAIL ROTATION_MODE blank redded (rc=$r) — an adopter conf predating the key would red on upgrade"; st=1; }
+# Case matters, and the near-miss is the arm worth having: `Cut` is the typo a human makes.
+for rbad in Cut rotate; do
+  pk_set "ROTATION_MODE=\"$rbad\""; r=$(pk_rc); o=$(pk_out)
+  n=$((n+1))
+  case "$r:$o" in
+    2:*ROTATION_MODE*) echo "ok   ROTATION_MODE='$rbad' ABORTS naming the key" ;;
+    *) echo "FAIL ROTATION_MODE='$rbad' did not abort (rc=$r)"; st=1 ;;
+  esac
+done
 
 # PROJECT_REGISTRY_EXTRA — it only WIDENS, so the arm that matters is that it does not widen to
 # everything. The first cut of this key sat above the named cases in check 3 and matched all of

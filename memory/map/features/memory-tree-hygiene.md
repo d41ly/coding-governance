@@ -148,5 +148,13 @@ that exited 0 having done nothing is refused too. Check 21's `_b21rc` and `n21` 
   class whose ONLY bound is bytes is currently unarmed.
 - Checks 6 and 7 measure RAW working-tree bytes, so an adopter without the `eol=lf` pin gets a
   platform-dependent cap: a CRLF checkout adds one byte per line — `TOOL-aRootedPrefix-3`.
-- Check 10 resolves a rotated index's live counterpart by fixed path, so it is blind to every
-  `backlog/*.md` shard — `TOOL-cTracedPromise-6`.
+- CLOSED by `TOOL-cSpliceWarden-2`: check 10 resolved a rotated index's live counterpart by fixed
+  path, so it was blind to every `backlog/*.md` shard — it graded 1 of 4 archives here and skipped 3
+  in silence. It now resolves by BASENAME anywhere under the memory root, names a stem that resolves
+  to zero or several rather than skipping it, admits a same-day disambiguator after the date, and
+  reads the reference from the index PREAMBLE instead of a fixed `head -3`. The last two were unfiled
+  and the fourth was found only by running the candidate over the real tree, where fixing the path
+  alone reds three files and two of those reds are false.
+- Check 10 grades ANNOUNCEMENT, never CONTENTS. Nothing in this engine asserts that an archive holds
+  what the declared `ROTATION_MODE` says it should: the key is validated against its closed set and
+  then read by no check — `TOOL-cSpliceWarden-6`.

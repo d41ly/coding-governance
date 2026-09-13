@@ -13,8 +13,9 @@
 //
 // IT NEVER NESTS, AND NOTHING CHECKS THAT. The fan-out guard contains no occurrence of the nesting
 // primitive's call form at all, so it does not look at nesting; a nested call here would be legal
-// at the hook, and one fired from inside this sidechain reaches no hook either. Asserted once, when
-// the file lands. Held after that by review alone.
+// at the hook, and one fired from inside this sidechain is not a tool call, so no matcher sees it
+// either — hooks DO reach a sidechain (measured 2026-09-12); they simply have nothing here to match.
+// Asserted once, when the file lands. Held after that by review alone.
 //
 // IT IS NEARLY ONE STRAIGHT LINE — A STYLE RULE WITH NO ENFORCER, AND ONE DELIBERATE EXCEPTION. No
 // loop, no array method, no Promise combinator and no arrow, so the one spawn below is visible in a
