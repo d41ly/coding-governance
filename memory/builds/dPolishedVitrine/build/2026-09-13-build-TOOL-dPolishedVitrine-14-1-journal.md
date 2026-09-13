@@ -167,6 +167,15 @@ tree the leg exits 0 with all three post-run counts at zero.
 
 The spec moves to rev-3, and its §9 line logs S6, S8, §4, §5, AC15, AC16 and §7.
 
+The full bar at `728a59a4`, 18:19 to 18:31 UTC, was green on 105 of 106 legs, the one red the python
+resolver line that is red at `24f8c712`. `brief-recorded` passed in 18 s, `pass-order history` in
+82 s, and `unattended kit gate`, whose protocol parity check compares the edited row's two copies,
+in 123 s. `pass-order history` printed 550 bytes of stdout, the size its run at `f1e58789`
+printed; this time the bytes themselves were not compared. `TOOL-dPolishedVitrine-1`'s journal
+records that bar and the one before it, whose reds were that unit's. `check-pass-order.test.sh` passed 72 arms, `adopt-unattended.test.sh` 71
+assertions and `cross-component.test.sh` 19, each run by hand on the fold's tree.
+`check-unattended.test.sh` and `unattended.test.sh` were NOT run, for the reason that journal gives.
+
 ## Acceptance ledger
 
 **Evidences:** TOOL-dPolishedVitrine-14
@@ -179,8 +188,8 @@ The spec moves to rev-3, and its §9 line logs S6, S8, §4, §5, AC15, AC16 and 
 - AC7 — `migrated` — exits 0 with NOT GRADED after a halt code is added to the finished record; red on the staged byte comparison.
 - AC8 — `DEAD PROBE` — a deleted or lowercase `PHASES_TERMINAL` line exits 2 with no liveness line.
 - AC9 — amended rev-2 — the header points at the ruling in build `dPolishedVitrine` instead of citing this unit's id, which the suite carries; section 9's rev-2 line logs the drift red that forced it. Read at `e99df7d8`, `tools/unattended/check-brief-recorded.sh` names the predicate, the boundary, the corroboration, the rejected reachability predicate and both new non-checks.
-- AC10 — `tools/unattended/check-brief-recorded.test.sh` — 88 arms, exit 0, run from the repository root and from a scratch directory; every staged kit copy showed only its targeted arms red.
-- AC11 — `tools/unattended/check-unattended.sh` — the kit gate passed, check 10 included, over `tools/unattended/PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md`, which are byte-identical.
+- AC10 — `tools/unattended/check-brief-recorded.test.sh` — 88 arms, exit 0, run from the repository root and from a scratch directory; every staged kit copy showed only its targeted arms red. At rev-3 it passes 94 arms, `misselect` included.
+- AC11 — `tools/unattended/check-unattended.sh` — the kit gate passed, check 10 included, over `tools/unattended/PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md`, which are byte-identical. It passed again on the bar at `728a59a4`, after rev-3 extended the row in both copies.
 - AC12 — `tools/check-kit-versions.sh` — exit 0, every unattended carrier still at 1.20.
 - AC13 — `tools/unattended/check-pass-order.sh` — stdout byte-identical to its run at `f1e58789` on both bars, and `tools/unattended/check-pass-order.test.sh` passed 72 arms; `git diff` over it and the library is empty.
 - AC14 — `tools/unattended/check-brief-recorded.sh` — in the scratch clone with the cutoff lifted, 25 skipped, 0 unborne, the same 25 ids the probe found. Re-run at `c9bc0b2a` with rev-3's leg: the same 25 ids, and 0 graded at a later commit.

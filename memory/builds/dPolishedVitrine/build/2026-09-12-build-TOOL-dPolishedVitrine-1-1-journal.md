@@ -520,6 +520,34 @@ The spec moves to rev-8, and its §9 line logs S10, §3, §4, AC21 to AC28 and �
 reading makes this fold one that is not re-reviewed, because one blocker after one after one is not
 fewer, and whether that governs is still the lander's call.
 
+## The full bar after round 3
+
+`GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` ran twice over the fold, while
+other sessions' work shared the node.
+
+- **At `d8fda984`, 18:04 to 18:17 UTC, 102 of 106 legs were green.** Two reds were this fold's, with
+  one cause. `codebase-map coverage + freshness` named `fixture-lacks-a-gate-the-consumer-has.md` as
+  a key in the `gotcha-classes` inventory that no dossier claimed, and the codebase-map kit selftest
+  redded because that left the generated inventory stale. `728a59a4` claims the key in the govkit
+  dossier, whose selftest carries the gate, and regenerates the map; both legs then passed alone.
+  `process-monitor census selftest` failed its timing arm `test_live_tree_dies_completely`, with a
+  pid alive after the tree kill. Run alone from a command line naming this repo, it passed 66 of 66.
+  The python resolver was red on its base line.
+- **At `728a59a4`, 18:19 to 18:31 UTC, 105 of 106 legs were green**, and every chunk but `wiring`
+  was green. The one red is `python resolver (behaviour + inline parity + idiom ban)`, on
+  `tools/run-gates/run-gates.evidence.test.sh:643`, `DC_PY=python`, which is red at `24f8c712` too
+  and is not fixed here. The govkit selftest passed inside the bar, all 84 `[-PV]` arms included, in
+  474 s against its 11750 s ceiling.
+
+`tools/workflows/unattended-build.test.sh`, which no bar runs, printed `237 arms, exit 0` at
+`728a59a4`. The unattended kit's on-demand suites that read what this fold changed were run by hand
+on the fold's tree, which the two later commits leave unchanged under `tools/unattended/`:
+`check-brief-recorded.test.sh` passed 94 arms, `adopt-unattended.test.sh` 71 assertions,
+`cross-component.test.sh` 19 and `check-pass-order.test.sh` 72 arms. `check-unattended.test.sh` and
+`unattended.test.sh` were NOT run. Both read the conf example, but by its key names and values, and
+this fold changed only one key's comment there. The protocol row they could see is compared by the
+kit gate's parity check, which passed on both bars.
+
 ## The criteria
 
 **Evidences:** TOOL-dPolishedVitrine-1
@@ -551,7 +579,8 @@ fewer, and whether that governs is still the lander's call.
   The python resolver is red at base too, and the other three pass when run alone at that tip. After
   round 1 and the merge, the bar at `4ce472e3` was green on 105 of 106, and its one red is that same
   python resolver line. After round 2, the bar at `72ac1a96` was green on 104 of 106: the same
-  python resolver line, and the census self-test's timing arm, which passed when run alone.
+  python resolver line, and the census self-test's timing arm, which passed when run alone. After
+  round 3, the bar at `728a59a4` was green on 105 of 106, its one red that python resolver line.
 - AC12 — `tools/workflows/unattended-build.test.sh` — OBSERVED: the flat and nested layouts, rendered
   through both kits' own renderers, name one checklist command. With the adopter forced to the
   prefix-only answer, the flat layout redded naming both commands.
