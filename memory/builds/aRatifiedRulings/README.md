@@ -65,12 +65,12 @@ the parks that motivated them live under `builds/aLeakedHandle/`.
 | 1 | `TOOL-aRatifiedRulings-1` | CLOSED | a converged subject's later blocker is disposed, never re-rounded — M4 and check 37 |
 | 2 | `TOOL-aRatifiedRulings-2` | CLOSED | check 23 excludes the path a brief row names |
 | 3 | `TOOL-aRatifiedRulings-3` | CLOSED | one checker run serves several hygiene self-test arms |
-| 4 | `TOOL-aRatifiedRulings-4` | MISSING | the rc=137 tail for a leg with no declared ceiling |
+| 4 | `TOOL-aRatifiedRulings-4` | CLOSED | the rc=137 tail for a leg with no declared ceiling |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 4 unit(s) · node a · opened 2026-09-13 · streams tooling
+**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-09-13 · streams tooling
 ids TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL-aRatifiedRulings-4
 
 <!-- gen:build-units -->
@@ -79,10 +79,10 @@ ids TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 TOOL
 | [TOOL-aRatifiedRulings-1 — a converged subject's later blocker is disposed, never re-rounded](spec/2026-09-13-spec-TOOL-aRatifiedRulings-1.md) | — | 2 | CLOSED | rev-4 | 2026-09-13 |
 | [TOOL-aRatifiedRulings-2 — check 23 stops reporting the brief `--brief` staged, by the path its row names](spec/2026-09-13-spec-TOOL-aRatifiedRulings-2.md) | — | 2 | CLOSED | rev-4 | 2026-09-13 |
 | [TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus](spec/2026-09-13-spec-TOOL-aRatifiedRulings-3.md) | — | 2 | CLOSED | rev-5 | 2026-09-13 |
-| [TOOL-aRatifiedRulings-4 — a leg killed with no ceiling in play names the seconds it ran](spec/2026-09-13-spec-TOOL-aRatifiedRulings-4.md) | — | 1 | SPECCED | rev-3 | 2026-09-13 |
+| [TOOL-aRatifiedRulings-4 — a leg killed with no ceiling in play names the seconds it ran](spec/2026-09-13-spec-TOOL-aRatifiedRulings-4.md) | — | 1 | CLOSED | rev-4 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 4 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

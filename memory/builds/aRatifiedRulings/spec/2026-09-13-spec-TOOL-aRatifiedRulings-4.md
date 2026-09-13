@@ -1,11 +1,13 @@
 # TOOL-aRatifiedRulings-4 — a leg killed with no ceiling in play names the seconds it ran
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node a · Tier-1 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** CLOSED · rev-4 · 2026-09-13 · node a · Tier-1 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-13-build-TOOL-aRatifiedRulings-4-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-aRatifiedRulings-4-1-acceptance-ledger.md) | journal | — |
+| [2026-09-13-prompt-TOOL-aRatifiedRulings-4-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-4-1-build-brief.md) | journal | — |
 | [2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md) | spec-audit | TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 |
 | [2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md) | spec-audit | TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-3 |
 
@@ -535,6 +537,14 @@ arm's three increments, from whatever `run-gates.test.sh:48` reads at build time
   paragraph contradicted the timeout-less host the same section names; it now qualifies the claim
   to hosts with a runnable `timeout`. B, id 9: the Rollout states passes are sequential under
   check 49 condition 1 and that this unit and unit 1 both declare `SESSION-KICKOFF.md`.
+- rev-4 · 2026-09-13 · AC1 AC2 AC4 AC5 AC7 · the build pass, under the owner's per-pass rule in the
+  build README: a pass runs the fast diff-scoped gates and nothing held, and the suite the arm
+  joins is held. AC1, AC2 and AC4 are observed through the arm's own fixture in isolation, its
+  three assertions byte-identical to the suite's, RED against the unfixed runner with both numbers
+  printed and GREEN byte-equal against the fixed one; AC5 and AC7's stubbed half are the closing
+  pass's, which buys the suite run. AC8's half-bump red was seen live on this tree. The mechanism
+  is built as §4 states it, one line, the sibling byte-identical; the ledger under `build/`
+  carries the figures. Status CLOSED.
 
 ## 10. Reuse audit
 
