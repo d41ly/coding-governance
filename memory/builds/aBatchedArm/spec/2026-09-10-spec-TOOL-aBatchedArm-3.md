@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-13-prompt-TOOL-aBatchedArm-3-build-brief.md](../prompts/2026-09-13-prompt-TOOL-aBatchedArm-3-build-brief.md) | journal | — |
 | [2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md](../reviews/2026-09-10-review-TOOL-aBatchedArm-3-spec-audit-round1.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round2.md) | spec-audit | — |
 | [2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md](../reviews/2026-09-13-review-TOOL-aBatchedArm-3-spec-audit-round3.md) | spec-audit | — |
