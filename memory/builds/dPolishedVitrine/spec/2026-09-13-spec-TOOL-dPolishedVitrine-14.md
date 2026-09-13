@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live
 
-**Status:** INPROGRESS · rev-2 · 2026-09-13 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
+**Status:** INPROGRESS · rev-3 · 2026-09-13 · node d · Tier-2 · base 09a22d2b · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-13-build-TOOL-dPolishedVitrine-14-1-journal.md](../build/2026-09-13-build-TOOL-dPolishedVitrine-14-1-journal.md) | journal | — |
 | [2026-09-13-prompt-TOOL-dPolishedVitrine-14-0-owner-ruling.md](../prompts/2026-09-13-prompt-TOOL-dPolishedVitrine-14-0-owner-ruling.md) | journal | — |
+| [2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round3.md](../reviews/2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round3.md) | diff-review | TOOL-dPolishedVitrine-1 |
 
 <!-- /gen:spec-records -->
 
@@ -39,11 +40,15 @@ exactly as before.
   against the leg at `f1e58789`, and each guard arm against a staged break of its own guard. The
   suite's truncated-cache arm stops copying the cwd-relative `$LEG` and copies from `$KIT`, because
   a run against a staged copy of the kit graded the wrong leg there. Observed by AC10.
-- **S6** — the protocol's `BRIEF_RECORDED_CUTOFF` row and the conf example's description say which
-  units are graded. The shipped protocol template and this repo's installed copy move together.
-  Observed by AC11.
+- **S6** — the protocol's `BRIEF_RECORDED_CUTOFF` row says which units are graded, and the conf
+  example's description points at that row rather than restating it (rev-3). The shipped protocol
+  template and this repo's installed copy move together. Observed by AC11 and AC16.
 - **S7** — the change rides unattended 1.20, which this branch carries and `main` has not released,
   so no version carrier moves. Observed by AC12.
+- **S8** — before a skip is honoured, the leg asks every later commit that `build_commit`'s own
+  predicate accepts for the id the same phase question, and grades the unit at the first one made
+  while a run was live, announced with both commits and counted on the liveness line (rev-3).
+  Observed by AC15.
 
 ## 3. Non-goals (OUT)
 
@@ -102,6 +107,29 @@ The boundary is the commit that WRITES the terminal phase. A unit whose code rid
 the run, because `--landed`'s witness is a commit already on the remote, so the code in the commit
 recording it is not in what landed. LANDING is the last live phase and is still graded.
 
+### A wrongly picked build commit
+
+The predicate above is only as good as the commit it is asked about. `build_commit` returns the
+EARLIEST in-range commit that names the id as a whole token and touches a path outside the build
+folder and the conf's exclusions, and a hand commit made between two runs qualifies. At that commit
+the record still reads the first run's terminal phase. The second run's preflight retires that record
+only afterwards, so a retired record at HEAD still bears the claim out, and the unit, built during
+the second run while it was live, was skipped. Round 3 of the closing review reproduced that, and it
+contradicts §1, which grades every unit built during a run.
+
+So before a skip is honoured, the leg walks `build_c..HEAD` in order and asks every commit that
+`build_commit`'s own predicate accepts for this id the same phase question. The subject cache
+filters first, so the predicate runs only on a commit whose subject names the id, and the predicate
+itself is the library's, called on that one commit, so there is no second copy of it. The first
+commit made while a run was live, an absent or phase-less record included, is where the unit is
+graded. The leg announces it with both commits and both phases and counts it on the liveness line.
+
+This fails CLOSED. A later commit that names the id while a run is live grades the unit even when it
+touched only a file the conf forgot to exclude, which at NicoCares, whose conf declares no exclusions,
+includes a records commit. That is the pre-unit verdict for such a unit, and it is announced, so a
+reader who looks sees why. `lib-unattended.sh` is not changed, so `pass-order` keeps its pick, and the
+wrong pick there is older than this unit.
+
 ### The corroboration
 
 The run authors the phase it commits. A record reading LANDED at one commit and BUILDING at the next
@@ -143,8 +171,8 @@ before and after.
 ### Inventory
 
 No new function is defined in either file, so the lexicon's verb population does not move. The
-leg gains the shell variables `TERMINAL_PHASES`, `CLAIM_AWK`, `postrun`, `unborne` and `announced`.
-No gate leg, file, kit or conf key is added.
+leg gains the shell variables `TERMINAL_PHASES`, `CLAIM_AWK`, `postrun`, `unborne` and `announced`,
+and rev-3 adds `regraded`, `_live_c` and `_live_ph`. No gate leg, file, kit or conf key is added.
 
 ### Rollout
 
@@ -159,8 +187,9 @@ real population, and it arrives when NicoCares re-pulls the kit.
   read, the two counts and the header.
 - `tools/unattended/check-brief-recorded.test.sh` — ten fixture modes, their arms, and the `$KIT` copy.
 - `tools/unattended/PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md` — one sentence
-  in the `BRIEF_RECORDED_CUTOFF` row.
-- `tools/unattended/.unattended.conf.example` — one sentence in the key's description.
+  in the `BRIEF_RECORDED_CUTOFF` row, which rev-3 extends by the later-commit condition.
+- `tools/unattended/.unattended.conf.example` — the key's description, which rev-3 turns into a
+  pointer at that row.
 
 ### Alternatives rejected
 
@@ -188,7 +217,9 @@ real population, and it arrives when NicoCares re-pulls the kit.
   the cheapest forgery, and §3 names the one it does not close.
 - perf / scale — one awk per graded unit with a build commit, and one per build. A finished claim
   that HEAD's record does not match costs one `ls-tree` per retired record at HEAD. Over the real
-  tree the leg's wall moved from 14 s to 16 s.
+  tree the leg's wall moved from 14 s to 16 s. Rev-3's walk runs only for a unit whose build commit
+  read a terminal phase: one `rev-list` over the commits after it, and the library's predicate only
+  on a commit whose cached subject names the id.
 - error / empty / loading states — an unreadable terminal set refuses. An absent record, an absent
   phase and a malformed phase are graded as live, which is the pre-unit verdict.
 - observability — every skipped unit and every unborne claim gets its own line naming the unit, the
@@ -264,6 +295,17 @@ real population, and it arrives when NicoCares re-pulls the kit.
   figure: DERIVED at observation time; the journal records the count it found.
   Red when: the leg and the probe disagree on any unit, or the leg reports an unborne claim in history
   that no forgery produced.
+- **AC15** — When the suite's `misselect` fixture lands a first run, then a hand commit naming the
+  unit that touches a path outside the record surface, then a second run's preflight retiring the
+  first record, then the unit's build with no brief, the leg exits 1 with `NO brief row`, prints
+  `GRADED AT A LATER COMMIT` naming the unit, never prints `NOT GRADED`, and counts one such unit on
+  its liveness line.
+  Red when: `build_commit`'s earliest pick decides the skip, which is what the leg at `c9bc0b2a` did.
+- **AC16** — When `tools/unattended/.unattended.conf.example` is read, its `BRIEF_RECORDED_CUTOFF`
+  description points at the protocol's row for which units are graded and states no population of
+  its own.
+  Red when: the example restates the graded population, which is the copy round 3 found missing the
+  claim-at-HEAD condition.
 
 ## 7. Gates
 
@@ -273,6 +315,7 @@ The suite carrying this unit's arms is on no bar, like every self-test in this k
 through `run-unattended-gates.sh`, which is where the journal's green verdict comes from.
 
 New arm: `tools/unattended/check-brief-recorded.test.sh` · the leg at `f1e58789`, the corroboration removed, the absence test removed, the claim terminator removed, and a byte comparison in place of the claim · none
+New arm: `tools/unattended/check-brief-recorded.test.sh` · the leg at `c9bc0b2a`, whose skip trusted `build_commit`'s earliest pick · none
 
 ## 8. Open questions
 
@@ -296,6 +339,14 @@ New arm: `tools/unattended/check-brief-recorded.test.sh` · the leg at `f1e58789
   citing this unit's id. The full bar redded `drift-audit records` on it: signal 2 reads a live
   spec's id in shipped source as a status nobody closed, and its pin is shrink-only. The suite, which
   that signal does not read, carries the id, as `TOOL-dPolishedVitrine-1`'s own suite does.
+- rev-3 · 2026-09-13 · S6 · S8 · §4 · §5 · AC15 · AC16 · §7 · AMENDED by the round-3 Tier-2 diff
+  review. R3-4, HIGH: a unit built during a live run skipped grading when `build_commit` picked an
+  id-naming hand commit made between two runs, where the record still read the first run's LANDED
+  and a retired record at HEAD bore that claim out. S8 and §4's new subsection walk the later commits
+  the library's predicate accepts and grade the unit at the first one made while a run was live;
+  AC15 is its `misselect` arm, red against the leg at `c9bc0b2a`. R3-10, LOW: the conf example stated
+  the graded population without the claim-at-HEAD condition, so S6 and AC16 turn it into a pointer
+  at the protocol row, which now also carries the later-commit condition.
 
 ## 10. Reuse audit
 

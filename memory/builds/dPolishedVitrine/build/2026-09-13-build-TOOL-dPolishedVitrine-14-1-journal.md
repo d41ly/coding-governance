@@ -134,6 +134,39 @@ protocol parity check included.
 - `TOOL-dPolishedVitrine-15` files the one residual the corroboration leaves, a forged finished
   record that stays at HEAD, for the kit gate.
 
+## What the round-3 review changed
+
+The round-3 Tier-2 diff review of `d36549fb...c9bc0b2a` confirmed two defects in this unit. Its report
+sits under `reviews/`, and `TOOL-dPolishedVitrine-1`'s journal carries the other eight.
+
+- **R3-4, high: a wrongly picked build commit let a unit built during a live run skip grading.**
+  `build_commit` returns the earliest commit that names the id and touches a path outside the record
+  surface. A hand commit made between two runs qualifies, the record there still reads the first
+  run's LANDED, and the second run's preflight retires that record afterwards, so the retired record
+  at HEAD bore the claim out. The leg now walks the commits after the pick before it honours a skip.
+  For each one whose cached subject names the id, it calls the library's own `build_commit` on that
+  one commit, and the first one made while a run was live is where the unit is graded, announced
+  with both commits and counted on the liveness line. `lib-unattended.sh` is unchanged, so
+  `pass-order` keeps its pick, and `git diff c9bc0b2a` over both files is empty. The header states
+  the rule and that it fails closed, and spec §4 has a subsection for it. The gate is the `misselect`
+  arm, whose fixture is the review's reproduction. Observed red against the leg at `c9bc0b2a`: five
+  of its assertions failed, and the leg exited 0 printing `NOT GRADED` for a unit built under the
+  second run's BUILDING record. After the fix the suite passes 94 arms.
+- **R3-10, low: the conf example dropped the claim-at-HEAD condition.** Its description now points at
+  the protocol's `BRIEF_RECORDED_CUTOFF` row instead of restating which units are graded, and that
+  row gains R3-4's later-commit condition, in the template and in this repo's installed copy
+  together. The review asked for no new gate, because retiring the copy is the gate. The
+  `two-answers-to-one-question` gotcha records it as a live instance.
+
+The widest population was measured again. In a scratch clone at `c9bc0b2a` with the cutoff lifted to
+2026-01-01, the fixed leg and the leg at `c9bc0b2a` each skipped 25 units, the same 25 ids, which are
+the ids the probe found for AC14. The fixed leg graded 0 at a later commit, and its output differed
+from the old leg's only by the new count on the liveness line. So the fold moves no verdict in this
+repo's history, and its population is empty here, as this unit's own was when it landed. Over this
+tree the leg exits 0 with all three post-run counts at zero.
+
+The spec moves to rev-3, and its §9 line logs S6, S8, §4, §5, AC15, AC16 and §7.
+
 ## Acceptance ledger
 
 **Evidences:** TOOL-dPolishedVitrine-14
@@ -150,4 +183,6 @@ protocol parity check included.
 - AC11 — `tools/unattended/check-unattended.sh` — the kit gate passed, check 10 included, over `tools/unattended/PROTOCOL.template.md` and `memory/guides/UNATTENDED-PROTOCOL.md`, which are byte-identical.
 - AC12 — `tools/check-kit-versions.sh` — exit 0, every unattended carrier still at 1.20.
 - AC13 — `tools/unattended/check-pass-order.sh` — stdout byte-identical to its run at `f1e58789` on both bars, and `tools/unattended/check-pass-order.test.sh` passed 72 arms; `git diff` over it and the library is empty.
-- AC14 — `tools/unattended/check-brief-recorded.sh` — in the scratch clone with the cutoff lifted, 25 skipped, 0 unborne, the same 25 ids the probe found.
+- AC14 — `tools/unattended/check-brief-recorded.sh` — in the scratch clone with the cutoff lifted, 25 skipped, 0 unborne, the same 25 ids the probe found. Re-run at `c9bc0b2a` with rev-3's leg: the same 25 ids, and 0 graded at a later commit.
+- AC15 — `GRADED AT A LATER COMMIT` — the `misselect` fixture exits 1 with `NO brief row`, names the unit and counts one; against the leg at `c9bc0b2a` it exited 0 printing `NOT GRADED`, and five assertions failed.
+- AC16 — `tools/unattended/.unattended.conf.example` — its `BRIEF_RECORDED_CUTOFF` description points at the protocol row and states no population; the row carries the claim-at-HEAD and later-commit conditions in both copies.

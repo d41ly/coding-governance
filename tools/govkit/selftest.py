@@ -8428,7 +8428,7 @@ user_skills = "/tmp/gk-fake-skills"
               'tracked_target = set(tracked(target))' in _g6src
               and 'tracked_target = set(subprocess.run' not in _g6src, "inline reader still present")
 
-        # ---- BUILD dPolishedVitrine, ROUNDS 1 AND 2. THE ENGINE-TO-RENDERED MOVE, END TO END --------
+        # ---- BUILD dPolishedVitrine, ROUNDS 1 TO 3. THE ENGINE-TO-RENDERED MOVE, END TO END ---------
         # A kit shipped a file as an ENGINE row and then made it `rendered`, keeping its own render
         # tracked at the old path and adding a template the renderer reads. That is the review-harness
         # kit's `unattended-build.js`, and both measured consumers hold it as an engine row in a
@@ -8450,13 +8450,12 @@ user_skills = "/tmp/gk-fake-skills"
         # - THE KIT IS REVIEW-HARNESS, WITH ITS REAL RENDERER. The regenerate runs this repo's own
         #   `check-protocol-parity.test.sh` through the argv the real `kit.toml` declares, over small
         #   templates, so a change to either that breaks the runbook reds here.
-        # - THE RUNBOOK RUNS AS WRITTEN. Its three blocks are cut out of WIRE-INTO-PROJECT.md and run by
-        #   bash. The pin rule used to be copied into this file as `derive_pv_pins`, so three of round 2's
+        # - THE RUNBOOK RUNS AS WRITTEN. Its blocks are cut out of WIRE-INTO-PROJECT.md and run by bash.
+        #   The pin rule used to be copied into this file as `derive_pv_pins`, so three of round 2's
         #   defects lived in two places and this copy graded itself (R2-2).
-        # - EVERY CONSUMER COMMIT GOES THROUGH A RECEIPT HOOK. inCMS core's pre-commit refuses a staged
-        #   engine blob its receipt does not record, and `settle()` commits in a repo with no hooks, so
-        #   the step-1 commit that wedges there landed here (R2-1). Every hooked commit below is a real
-        #   `git commit`, and `settle()` is used only before a target's hook is written.
+        # - EVERY CONSUMER COMMIT GOES THROUGH THE CONSUMER'S HOOKS. `settle()` commits in a repo with no
+        #   hooks, so the step-1 commit that wedges at inCMS core landed here (R2-1). Every hooked commit
+        #   below is a real `git commit`, and `settle()` is used only before a target's hooks are written.
         # - ONE FIXTURE IS BOOTSTRAPPED BY `adopt`, as core's receipt was. It starts with rows unattributed
         #   before the migration (R2-4), a kit that declines its regenerate (R2-2), and two destinations
         #   its receipt never rowed (R2-5). A receipt `apply` wrote has none of those, which is how the
@@ -8464,6 +8463,25 @@ user_skills = "/tmp/gk-fake-skills"
         # - A CONFLICTED STEP 1 STOPS, and a pin for a rendered destination names the vintage moved to
         #   and nothing older (R2-6). A flag-off update over a moved template prints `re-rendered` while
         #   no render ran, and an arm pins that line, because three carriers said it prints nothing (R2-7).
+        #
+        # ROUND 3 FOUND IT WRONG AGAIN, and the blocker was the same CLASS as round 2's: a fixture that
+        # passes because it lacks a gate the consumer has. Round 2 modelled core's pre-commit and not its
+        # `commit-msg`, which refuses a message with no attribution line, so no runbook commit could land
+        # at core (R3-1). The hook set is now a DECLARATION below, listing every hook core installs, and a
+        # PRECONDITION holds the fixture to every one that fires on a plain `git commit`, so the next
+        # hook is a line in a table rather than a round. The rest, each an arm below:
+        # - A REGENERATE THAT DELETES OR EDITS A TRACKED FILE outside the renders. The unattended kit's
+        #   does both at both consumers, the old render list staged it, and block 3 stopped after its
+        #   commit had landed (R3-2). A third fixture kit, `churn`, does both; the receipt hook now
+        #   filters on `--diff-filter=ACMR` as core's does, so a staged deletion passes it as it does there.
+        # - A FLAG-OFF PULL TAKEN BEFORE THE MIGRATION, which leaves `update` nothing to regenerate (R3-3).
+        # - PINS REPLAYED AFTER A LATER UPDATE, which rewound every row that update moved (R3-5).
+        # - AN EDITED `project-owned` ROW WITH A BASE, which the pin rule left out and the check stopped
+        #   on (R3-6), and a FORK `adopt` cannot attribute, which the count missed (R3-8).
+        # - PYTHON'S UTF-8 MODE, which this node exports and a fresh Windows node does not: the blocks run
+        #   with it OFF, so an encoding dependency cannot hide behind this machine's settings (R3-7).
+        # - A HARNESS EDIT IN A RECEIPT `adopt` MEASURED, where the row's `oid` is the edited bytes and the
+        #   old recovery restored to it (R3-9).
         import tomllib as _pvtoml  # noqa: PLC0415
 
         def run_pv_govkit(g: pathlib.Path, *args: str, env: dict | None = None) -> subprocess.CompletedProcess:
@@ -8481,7 +8499,8 @@ user_skills = "/tmp/gk-fake-skills"
         _pvKIT_A = ('id = "review-harness"\nhome = "tools/workflows"\nversion_from = { none = "fixture" }\n\n'
                     '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
-                    '[[files]]\ninclude = ["unattended-build.test.sh"]\nrole = "project-owned"\n\n'
+                    '[[files]]\ninclude = ["unattended-build.test.sh", "review-local.txt"]\n'
+                    'role = "project-owned"\n\n'
                     '[adopt]\nargv = []\nmutates_index = false\n')
         # The protocol's rule arrives at B with the harness's. At A its template ships as an engine
         # file only, because `apply` fails an install whose rendered destination is absent after the
@@ -8495,13 +8514,27 @@ user_skills = "/tmp/gk-fake-skills"
                       '[[regenerate]]\nargv = ' + json.dumps(_pvREGEN) + '\n')
         # A SECOND KIT THAT SHIPS A RENDER AND DECLARES NO REGENERATE, which is what memory-tree,
         # drift-audit and memory-recall are at both consumers. Its template moves between A and B, so
-        # its render is one vintage stale after step 1, and the pin rule must not call it current.
+        # its render is one vintage stale after step 1, and the pin rule must not call it current. It
+        # also carries a FORK, as core's recall kit does, which `adopt` prints `forked` whatever it
+        # measured, and a target copy of it that matches no gov vintage (R3-8).
         _pvNOTES_KIT = ('id = "notes"\nhome = "tools/notes"\nversion_from = { none = "fixture" }\n\n'
                         '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                         '[[files]]\ninclude = ["notes.template.md"]\nrole = "rendered"\n'
                         'to = "{kit}/notes.md"\nplaceholders = ["KIT_DIR"]\n\n'
+                        '[[files]]\ninclude = ["forked-note.py"]\nrole = "forked"\n'
+                        'direction = "gov-from-target"\nrecord = "DEPL-dCarriedReceipt-10"\n\n'
                         '[adopt]\nargv = []\nmutates_index = false\n')
+        # A THIRD KIT WHOSE REGENERATE DELETES ONE TRACKED ENGINE FILE AND EDITS ANOTHER, which is what
+        # the unattended kit's fixture-record repath does at both consumers (R3-2). Neither file is a
+        # render, so neither may reach the commit block 3 makes for the renders.
+        _pvCHURN_KIT = ('id = "churn"\nhome = "tools/churn"\nversion_from = { none = "fixture" }\n\n'
+                        '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
+                        '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                        '[adopt]\nargv = []\nmutates_index = false\n\n'
+                        '[[regenerate]]\nargv = ["bash", "{kit}/churn.sh"]\n')
+        _pvCHURN_SH = ('d=$(dirname "$0")\nrm -f "$d/gone.txt"\n'
+                       'printf \'a line a regenerate appended\\n\' >> "$d/edit.txt"\n')
         _pvH_A = ("// harness v1\nconst DRIVER = 'bash tools/unattended/unattended.sh'\n"
                   "const CHECKLIST = 'python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD'\n"
                   "const REVIEW = 'tools/workflows/tier2-review.js'\n")
@@ -8525,21 +8558,26 @@ user_skills = "/tmp/gk-fake-skills"
                 '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["review-harness"]\n\n'
                 '[[entry]]\nid = "review-harness"\ndescriptor = "tools/workflows/kit.toml"\n\n'
                 '[[entry]]\nid = "notes"\ndescriptor = "tools/notes/kit.toml"\n\n'
+                '[[entry]]\nid = "churn"\ndescriptor = "tools/churn/kit.toml"\n\n'
                 '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            d = g / "tools" / "workflows"
-            d.mkdir(parents=True)
-            for _name, _body in (("kit.toml", _pvKIT_A), ("unattended-build.js", _pvH_A),
-                                 ("REVIEW-PROTOCOL.template.md", _pvPROTO_T),
-                                 ("tier2-review.js", "// the review harness\n"),
-                                 ("check-review-join.sh", "echo join\n"),
-                                 ("unattended-build.test.sh", "echo suite\n")):
-                (d / _name).write_text(_body, encoding="utf-8", newline="\n")
-            shutil.copy2(_pvREAL / "check-protocol-parity.test.sh", d / "check-protocol-parity.test.sh")
-            (g / "tools" / "notes").mkdir(parents=True)
-            (g / "tools" / "notes" / "kit.toml").write_text(_pvNOTES_KIT, encoding="utf-8", newline="\n")
-            (g / "tools" / "notes" / "notes.template.md").write_text(
-                "notes v1 for {{KIT_DIR}}\n", encoding="utf-8", newline="\n")
+            for _kd, _files in (("workflows", (("kit.toml", _pvKIT_A), ("unattended-build.js", _pvH_A),
+                                               ("REVIEW-PROTOCOL.template.md", _pvPROTO_T),
+                                               ("tier2-review.js", "// the review harness\n"),
+                                               ("check-review-join.sh", "echo join\n"),
+                                               ("unattended-build.test.sh", "echo suite\n"),
+                                               ("review-local.txt", "a rule this tree may edit\n"))),
+                                ("notes", (("kit.toml", _pvNOTES_KIT),
+                                           ("notes.template.md", "notes v1 for {{KIT_DIR}}\n"),
+                                           ("forked-note.py", "# gov's copy, derived from a target's\n"))),
+                                ("churn", (("kit.toml", _pvCHURN_KIT), ("churn.sh", _pvCHURN_SH),
+                                           ("keep.txt", "keep v1\n"), ("gone.txt", "gone\n"),
+                                           ("edit.txt", "edit\n")))):
+                (g / "tools" / _kd).mkdir(parents=True, exist_ok=True)
+                for _name, _body in _files:
+                    (g / "tools" / _kd / _name).write_text(_body, encoding="utf-8", newline="\n")
+            shutil.copy2(_pvREAL / "check-protocol-parity.test.sh",
+                         g / "tools" / "workflows" / "check-protocol-parity.test.sh")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")
@@ -8558,8 +8596,12 @@ user_skills = "/tmp/gk-fake-skills"
         _pvD = f"{_pvW}/tier2-review.js"
         _pvJ = f"{_pvW}/check-review-join.sh"
         _pvS = f"{_pvW}/unattended-build.test.sh"
+        _pvL = f"{_pvW}/review-local.txt"
         _pvP = "memory/guides/REVIEW-PROTOCOL.md"
         _pvN = "scripts/notes/notes.md"
+        _pvF = "scripts/notes/forked-note.py"
+        _pvCG = "scripts/churn/gone.txt"
+        _pvCE = "scripts/churn/edit.txt"
 
         def build_pv_target(g, name, harness_edit=None):
             """An install `apply` wrote at vintage A, with one local delta, which both measured
@@ -8579,13 +8621,17 @@ user_skills = "/tmp/gk-fake-skills"
             settle(t, "the install at A, and a local edit")
             return t
 
-        def build_pv_bootstrap(g, name):
+        _pvKITDIRS = {"review-harness": ("tools/workflows", _pvW), "notes": ("tools/notes", "scripts/notes"),
+                      "churn": ("tools/churn", "scripts/churn")}
+
+        def build_pv_bootstrap(g, name, kits=("review-harness", "notes", "churn"), harness_edit=None):
             """An install copied in by hand and given its receipt by `adopt`, which is how core's was
-            written. Its receipt starts with an edited row pinned, a rewritten row UNATTRIBUTED, and a
-            commit-less render from a kit with no regenerate; and after it was written, the tree began
-            tracking a render and an edited project-owned file that no row names."""
-            t = make_target(tmp / name, _pvDEPLOY.format(kits='["review-harness", "notes"]'))
-            for _src, _dst in (("tools/workflows", _pvW), ("tools/notes", "scripts/notes")):
+            written. Its receipt starts with an edited row pinned, a rewritten row UNATTRIBUTED, a
+            commit-less render from a kit with no regenerate, and a fork whose bytes are the target's;
+            and after it was written, the tree began tracking a render and a project-owned file that no
+            row names, and edited a project-owned file whose row records a base."""
+            t = make_target(tmp / name, _pvDEPLOY.format(kits=json.dumps(list(kits))))
+            for _src, _dst in (_pvKITDIRS[_k] for _k in kits):
                 for _rel in gout(g, "ls-files", "--", _src + "/").split():
                     _name = pathlib.PurePosixPath(_rel).name
                     if _name == "unattended-build.test.sh":
@@ -8596,43 +8642,88 @@ user_skills = "/tmp/gk-fake-skills"
             with (t / _pvD).open("a", encoding="utf-8", newline="\n") as _fh:
                 _fh.write("// a consumer's own line\n")
             (t / _pvJ).write_text("echo a join this tree wrote for itself\n", encoding="utf-8", newline="\n")
-            (t / _pvN).write_text("notes v1 for scripts/notes\n", encoding="utf-8", newline="\n")
+            _pins = ["--pin", f"{_pvD}={gout(g, 'rev-parse', 'HEAD').strip()}"]
+            if harness_edit:
+                (t / _pvH).write_text(harness_edit, encoding="utf-8", newline="\n")
+                _pins += ["--pin", f"{_pvH}={gout(g, 'rev-parse', 'HEAD').strip()}"]
+            if "notes" in kits:
+                (t / _pvN).write_text("notes v1 for scripts/notes\n", encoding="utf-8", newline="\n")
+                (t / _pvF).write_text("# this tree's own fork, which gov's copy derives from\n",
+                                      encoding="utf-8", newline="\n")
             settle(t, "a hand install at A, with this tree's own edits")
-            _ad = run_pv_govkit(g, "adopt", "--target", str(t), "--write",
-                                "--pin", f"{_pvD}={gout(g, 'rev-parse', 'HEAD').strip()}")
+            _ad = run_pv_govkit(g, "adopt", "--target", str(t), "--write", *_pins)
             check(f"[-PV] the {name} fixture's receipt is bootstrapped by adopt at vintage A",
                   _ad.returncode == 0, _ad.stdout[-900:] + _ad.stderr[-600:])
             settle(t, "the receipt adopt bootstrapped")
             (t / "memory" / "guides").mkdir(parents=True)
             (t / _pvP).write_text(_pvPROTO, encoding="utf-8", newline="\n")
             (t / _pvS).write_text("echo suite\n# this tree's own arm\n", encoding="utf-8", newline="\n")
-            settle(t, "a render and a project-owned file, tracked after the receipt was written")
+            with (t / _pvL).open("a", encoding="utf-8", newline="\n") as _fh:
+                _fh.write("and this tree's own rule\n")
+            settle(t, "a render and a project-owned file tracked, and a project-owned rule edited, "
+                      "after the receipt was written")
             return t
 
-        # THE CONSUMER'S COMMIT-TIME GATE, as inCMS core's `check_receipt.py` states its rule: a staged
-        # row outside the roles a target owns, whose index blob is not the `oid` the receipt records,
-        # refuses the commit. Read from the STAGED receipt, which is the one the commit would record.
+        # ---- THE CONSUMER'S COMMIT-TIME HOOKS, as a DECLARATION. Read from inCMS core's `.githooks/` and
+        # ---- its `core.hooksPath` on 2026-09-13, at round 3. Round 2 modelled one of the two hooks that
+        # ---- fire on a plain `git commit` and round 3's blocker was the other, so each hook core installs
+        # ---- is listed with what this fixture does about it. A hook that fires on a plain commit is
+        # ---- MODELLED or the PRECONDITION below reds; one that does not fires on nothing the runbook does.
+        # ---- NicoCares installs `post-checkout`, `pre-commit` and `pre-push`, and its pre-commit carries
+        # ---- no receipt arm and no trailer rule, so core's set is the stricter of the two.
+        _pvCOMMIT_HOOKS = ("pre-commit", "prepare-commit-msg", "commit-msg", "post-commit")
+        _pvCORE_HOOKS = {
+            "pre-commit": "modelled: its receipt arm. Its memory/ hygiene arm fires only on a staged "
+                          "memory/ path, and the one the runbook can stage is a protocol render core "
+                          "does not track",
+            "commit-msg": "modelled: a message with no attribution line is refused",
+            "post-checkout": "does not fire on a commit",
+            "post-merge": "does not fire on a commit",
+            "pre-merge-commit": "fires only on a merge commit, and the runbook makes none",
+            "pre-push": "fires on a push, and the runbook pushes nothing",
+        }
+        # core's `check_receipt.py --staged`: the staged scope is `--diff-filter=ACMR`, so a staged
+        # DELETION is never compared; the receipt is read from the WORKTREE; a row outside the roles a
+        # target owns whose index blob is not the `oid` it records refuses the commit.
         _pvHOOK = (
             "import json, subprocess, sys\n"
             "def git(*a):\n"
             "    return subprocess.run(['git', *a], capture_output=True, text=True).stdout\n"
-            "staged = {p for p in git('diff', '--cached', '--name-only', '-z').split(chr(0)) if p}\n"
+            "scope = {p for p in git('diff', '--cached', '--name-only', '--diff-filter=ACMR').splitlines()"
+            " if p.strip()}\n"
             "try:\n"
-            "    rows = json.loads(git('show', ':.governance/install.json')).get('files', [])\n"
-            "except ValueError:\n"
+            "    rows = json.load(open('.governance/install.json', encoding='utf-8')).get('files', [])\n"
+            "except (OSError, ValueError):\n"
             "    sys.exit(0)\n"
-            "owned = {'seed', 'project-owned', 'rendered', 'attributes', 'forked'}\n"
+            "oids = {}\n"
+            "for ln in git('ls-files', '-s').splitlines():\n"
+            "    if ln.strip():\n"
+            "        meta, path = ln.split(chr(9), 1)\n"
+            "        oids[path] = meta.split(' ')[1]\n"
+            "owned = ('seed', 'project-owned', 'rendered', 'attributes', 'forked')\n"
             "bad = []\n"
             "for f in rows:\n"
-            "    p = f.get('path')\n"
-            "    if p in staged and f.get('role', 'engine') not in owned and f.get('oid'):\n"
-            "        s = git('ls-files', '-s', '--', p).split()\n"
-            "        blob = s[1] if len(s) > 1 else '(deleted)'\n"
-            "        if blob != f['oid']:\n"
-            "            bad.append(p + ' is ' + blob[:8] + ' but the receipt records ' + f['oid'][:8])\n"
+            "    p, oid = f.get('path'), f.get('oid')\n"
+            "    if not p or not oid or (f.get('role') or '') in owned or p not in scope:\n"
+            "        continue\n"
+            "    have = oids.get(p)\n"
+            "    if have is None:\n"
+            "        bad.append(p + ' is not in the index')\n"
+            "    elif have != oid:\n"
+            "        bad.append(p + ' is ' + have[:8] + ' but the receipt records ' + oid[:8])\n"
             "if bad:\n"
             "    print('receipt check: ' + '; '.join(bad))\n"
             "    sys.exit(1)\n")
+        # core's `commit-msg`: a line that BEGINS with the attribution token, case-insensitively, or the
+        # commit does not happen, except inside a merge, revert or cherry-pick git itself is running.
+        _pvMSGHOOK = (
+            "#!/bin/sh\n"
+            "g=$(git rev-parse --git-dir 2>/dev/null || echo .git)\n"
+            "for f in MERGE_HEAD REVERT_HEAD CHERRY_PICK_HEAD; do [ -e \"$g/$f\" ] && exit 0; done\n"
+            "grep -qiE '^[[:space:]]*Co-Authored-By:[[:space:]]*Claude' \"$1\" && exit 0\n"
+            "echo 'commit-msg: REFUSED - no Co-Authored-By: Claude trailer' >&2\n"
+            "exit 1\n")
+        _pvTRAILER = "Co-Authored-By: Claude Fixture <noreply@anthropic.com>"
 
         def write_pv_hook(t):
             _hd = t / ".git" / "pv-hooks"
@@ -8641,39 +8732,78 @@ user_skills = "/tmp/gk-fake-skills"
             (_hd / "pre-commit").write_text(
                 f'#!/bin/sh\nexec "{pathlib.Path(sys.executable).as_posix()}" '
                 f'"{(_hd / "receipt_check.py").as_posix()}"\n', encoding="utf-8", newline="\n")
-            os.chmod(_hd / "pre-commit", 0o755)
+            (_hd / "commit-msg").write_text(_pvMSGHOOK, encoding="utf-8", newline="\n")
+            for _h in ("pre-commit", "commit-msg"):
+                os.chmod(_hd / _h, 0o755)
             git(t, "config", "core.hooksPath", _hd.as_posix())
 
         def run_pv_commit(t, msg, *paths):
-            """A consumer commit, THROUGH the hook. `settle()` is never used on a hooked target."""
+            """A consumer commit, THROUGH the hooks, carrying the attribution line core's wants.
+            `settle()` is never used on a hooked target."""
             if paths:
                 subprocess.run(["git", "-C", str(t), "add", "--", *paths], capture_output=True)
-            return subprocess.run(["git", "-C", str(t), "commit", "-q", "-m", msg],
+            return subprocess.run(["git", "-C", str(t), "commit", "-q", "-m", msg, "-m", _pvTRAILER],
                                   capture_output=True, text=True)
 
         def read_pv_row(t, path):
             _r = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
             return next((f for f in _r.get("files", []) if f.get("path") == path), {})
 
+        def read_pv_paths(t):
+            _r = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
+            return {f.get("path") for f in _r.get("files", [])}
+
         # THE RUNBOOK'S OWN TEXT. Each block is cut from WIRE-INTO-PROJECT.md by its marker and run
-        # by bash, with the three variables the runbook asks an operator to set.
-        _pvBLOCKS = {int(_m.group(1)): _m.group(2) for _m in _re.finditer(
-            r"<!-- harness-migration (\d+) -->\n```bash\n(.*?)\n```\n",
+        # by bash, with the variables the runbook asks an operator to set.
+        _pvBLOCKS = {_m.group(1): _m.group(2) for _m in _re.finditer(
+            r"<!-- harness-migration (\d+|restore) -->\n```bash\n(.*?)\n```\n",
             (HERE.parents[1] / "WIRE-INTO-PROJECT.md").read_text(encoding="utf-8"), _re.S)}
-        check("[-PV] LIVENESS the runbook's three migration blocks were cut out of WIRE-INTO-PROJECT.md",
-              sorted(_pvBLOCKS) == [1, 2, 3] and all("govkit.py" in _b for _b in _pvBLOCKS.values()),
-              str(sorted(_pvBLOCKS)))
+        check("[-PV] LIVENESS the runbook's three migration blocks and its restore block were cut out of "
+              "WIRE-INTO-PROJECT.md",
+              sorted(_pvBLOCKS) == ["1", "2", "3", "restore"]
+              and all("harness-migration" in _b for _b in _pvBLOCKS.values()), str(sorted(_pvBLOCKS)))
+        # R3-3's hand-run regenerate is the descriptor's argv, with `{kit}` spelled as the runbook's
+        # `$KIT`. A second copy of an argv is the two-answers class, so the pair is compared here.
+        _pvHANDRUN = " ".join(f'"$KIT/{_a[len("{kit}/"):]}"' if _a.startswith("{kit}/") else _a
+                              for _a in _pvREGEN)
+        check("[-PV] R3-3 the regenerate block 1 runs by hand is the argv the real descriptor declares",
+              _pvHANDRUN in _pvBLOCKS.get("1", ""), _pvHANDRUN)
         _pvBASH = govkit_module().resolve_bash()
 
-        def run_pv_block(t, g, n):
-            _env = dict(os.environ, GOV=g.as_posix(), KIT=_pvW,
-                        PY=pathlib.Path(sys.executable).as_posix())
-            return subprocess.run([_pvBASH, "-c", _pvBLOCKS.get(n, "exit 97")], cwd=str(t),
-                                  capture_output=True, text=True, env=_env)
+        # R3-7. PYTHON'S UTF-8 MODE IS OFF IN EVERY BLOCK RUN, whatever this node exports. govkit prints
+        # an em dash on every update line, and outside UTF-8 mode a redirected stdout on Windows is the
+        # ANSI code page, which the migration's program could not read. This node exports both
+        # variables, and the arms passed here while the runbook crashed on a fresh node.
+        _pvENV = {k: v for k, v in os.environ.items() if k not in ("PYTHONUTF8", "PYTHONIOENCODING")}
+        _pvENV["PYTHONUTF8"] = "0"
+
+        # A FILE, NOT `bash -c`. On Windows an argv reaches bash through one command line, and MSYS
+        # truncated block 1 there at 8186 bytes once round 3 grew it past that, so bash parsed half a
+        # block and reported an unmatched quote. An operator pastes the block into a shell and meets no
+        # such limit, so the fixture must not either.
+        def run_pv_block(t, g, n, trailer=True):
+            _env = dict(_pvENV, GOV=g.as_posix(), KIT=_pvW, PY=pathlib.Path(sys.executable).as_posix())
+            if trailer:
+                _env["TRAILER"] = _pvTRAILER
+            _bf = tmp / f"pv-block-{n}.sh"
+            _bf.write_text(_pvBLOCKS.get(str(n), "exit 97") + "\n", encoding="utf-8", newline="\n")
+            return subprocess.run([_pvBASH, _bf.as_posix()], cwd=str(t), capture_output=True,
+                                  text=True, encoding="utf-8", errors="replace", env=_env)
 
         def read_pv_pins(t):
             _pf = t / ".git" / "harness-migration-pins.txt"
             return _pf.read_text(encoding="utf-8").split() if _pf.is_file() else []
+
+        # THE ARM CAN FAIL ONLY WHERE THE CODE PAGE IS NOT UTF-8, and a skip must announce itself.
+        _pvenc = subprocess.run([sys.executable, "-c", "import sys; print(sys.stdout.encoding)"],
+                                capture_output=True, text=True, env=_pvENV).stdout.strip().lower()
+        if _pvenc.replace("-", "") in ("utf8", ""):
+            check(f"[-PV] R3-7 SKIPPED — a redirected stdout is `{_pvenc or 'unknown'}` here with UTF-8 "
+                  "mode off, so this node cannot show an encoding dependency; the arm is UNGRADED here, "
+                  "not passed", True)
+        else:
+            check(f"[-PV] R3-7 LIVENESS the blocks run where a redirected stdout is `{_pvenc}`, so a "
+                  "program that reads govkit's output as UTF-8 without asking for it crashes here", True)
 
         _pvg = build_pv_gov()
         _pvA = gout(_pvg, "rev-parse", "HEAD").strip()
@@ -8681,10 +8811,14 @@ user_skills = "/tmp/gk-fake-skills"
         _pvtf = build_pv_target(_pvg, "pv-tf")
         _pvtc = build_pv_target(_pvg, "pv-tc")
         # THE CONFLICT: this tree's harness edit sits on the line beside the one gov changes at B.
-        _pvtx = build_pv_target(_pvg, "pv-tx", harness_edit=_pvH_A.replace(
-            "'bash tools/unattended/unattended.sh'", "'bash vendor/driver.sh' // this tree's own"))
+        _pvXEDIT = _pvH_A.replace("'bash tools/unattended/unattended.sh'",
+                                  "'bash vendor/driver.sh' // this tree's own")
+        _pvtx = build_pv_target(_pvg, "pv-tx", harness_edit=_pvXEDIT)
+        _pvtm = build_pv_target(_pvg, "pv-tm")
         _pvq = build_pv_bootstrap(_pvg, "pv-q")
-        for _t in (_pvt, _pvtc, _pvtx, _pvq):
+        _pvqo = build_pv_bootstrap(_pvg, "pv-qo", kits=("review-harness",))
+        _pvqx = build_pv_bootstrap(_pvg, "pv-qx", kits=("review-harness",), harness_edit=_pvXEDIT)
+        for _t in (_pvt, _pvtc, _pvtx, _pvtm, _pvq, _pvqo, _pvqx):
             write_pv_hook(_t)
         check("[-PV] PRECONDITION the target rows the harness as an ENGINE file, the consumer shape",
               read_pv_row(_pvt, _pvH).get("role") == "engine"
@@ -8697,8 +8831,28 @@ user_skills = "/tmp/gk-fake-skills"
                         _pvP: None, _pvS: None}
               and not read_pv_row(_pvq, _pvN).get("commit")
               and all((_pvq / _p).is_file() for _p in (_pvP, _pvS)), str(_pvq0))
-        # THE HOOK REFUSES WHAT IT EXISTS TO REFUSE, or every commit below passes a gate that cannot
-        # fail: an edited engine file, staged, whose blob the receipt does not record.
+        _pvqL, _pvqF = read_pv_row(_pvq, _pvL), read_pv_row(_pvq, _pvF)
+        check("[-PV] PRECONDITION ...and core's two other shapes: a `project-owned` row recording a base "
+              "whose file this tree then edited, and a fork recorded with no base (R3-6, R3-8)",
+              _pvqL.get("role") == "project-owned" and bool(_pvqL.get("commit"))
+              and gout(_pvq, "ls-files", "-s", "--", _pvL).split()[1:2] != [_pvqL.get("oid")]
+              and _pvqF.get("role") == "forked" and _pvqF.get("evidence") == "unattributed"
+              and not _pvqF.get("commit"), str(_pvqL) + str(_pvqF))
+        check("[-PV] PRECONDITION ...and a kit whose regenerate deletes and edits tracked engine files, "
+              "each rowed with a base (R3-2)",
+              all(read_pv_row(_pvq, _p).get("role") == "engine" and read_pv_row(_pvq, _p).get("commit")
+                  for _p in (_pvCG, _pvCE)), str(read_pv_row(_pvq, _pvCG)) + str(read_pv_row(_pvq, _pvCE)))
+        # R3-1's CLASS: every hook core runs on a plain `git commit` is modelled, and the fixtures carry
+        # exactly the modelled set.
+        _pvmodelled = {_h for _h, _why in _pvCORE_HOOKS.items() if _why.startswith("modelled")}
+        _pvwritten = {_p.name for _p in (_pvt / ".git" / "pv-hooks").iterdir() if _p.suffix != ".py"}
+        check("[-PV] PRECONDITION every hook inCMS core runs on a plain `git commit` is modelled on the "
+              "fixtures, and every other hook it installs is named out of scope (R3-1)",
+              _pvmodelled == {_h for _h in _pvCORE_HOOKS if _h in _pvCOMMIT_HOOKS} == _pvwritten,
+              f"modelled {sorted(_pvmodelled)}, written {sorted(_pvwritten)}")
+        # THE HOOKS REFUSE WHAT THEY EXIST TO REFUSE, or every commit below passes a gate that cannot
+        # fail: an edited engine file, staged, whose blob the receipt does not record; and a message
+        # with no attribution line.
         with (_pvtc / _pvJ).open("a", encoding="utf-8", newline="\n") as _fh:
             _fh.write("# staged against the receipt\n")
         _pvhk = run_pv_commit(_pvtc, "an engine edit the receipt does not record", _pvJ)
@@ -8707,15 +8861,27 @@ user_skills = "/tmp/gk-fake-skills"
               f"rc {_pvhk.returncode}: " + _pvhk.stdout + _pvhk.stderr)
         git(_pvtc, "reset", "-q", "--", _pvJ)
         git(_pvtc, "checkout", "--", _pvJ)
+        (_pvtc / "note.txt").write_text("a target's own file\n", encoding="utf-8", newline="\n")
+        git(_pvtc, "add", "--", "note.txt")
+        _pvmk = subprocess.run(["git", "-C", str(_pvtc), "commit", "-q", "-m", "no attribution line"],
+                               capture_output=True, text=True)
+        check("[-PV] LIVENESS the commit-msg hook refuses a message with no attribution line (R3-1)",
+              _pvmk.returncode != 0 and "commit-msg: REFUSED" in _pvmk.stderr,
+              f"rc {_pvmk.returncode}: " + _pvmk.stdout + _pvmk.stderr)
+        _pvmk2 = run_pv_commit(_pvtc, "the same file, attributed")
+        check("[-PV] LIVENESS ...and passes the same commit carrying one",
+              _pvmk2.returncode == 0, _pvmk2.stdout + _pvmk2.stderr)
 
         # VINTAGE B: gov keeps tracking its own render at the old path and edits it, adds the template,
-        # claims the destination `rendered`, and declares the regenerate. The notes template moves too.
+        # claims the destination `rendered`, and declares the regenerate. The notes template moves, and
+        # so does a churn file, so that kit is touched and its regenerate runs.
         _pvd = _pvg / "tools" / "workflows"
         (_pvd / "kit.toml").write_text(_pvKIT_B, encoding="utf-8", newline="\n")
         (_pvd / "unattended-build.template.js").write_text(_pvT_B, encoding="utf-8", newline="\n")
         (_pvd / "unattended-build.js").write_text(_pvH_B, encoding="utf-8", newline="\n")
         (_pvg / "tools" / "notes" / "notes.template.md").write_text(
             "notes v2 for {{KIT_DIR}}\n", encoding="utf-8", newline="\n")
+        (_pvg / "tools" / "churn" / "keep.txt").write_text("keep v2\n", encoding="utf-8", newline="\n")
         settle(_pvg, "B: the harness is rendered, and gov keeps its own render tracked")
         _pvB = gout(_pvg, "rev-parse", "HEAD").strip()
         _pvGOV_H_B = gout(_pvg, "rev-parse", "HEAD:tools/workflows/unattended-build.js").strip()
@@ -8723,6 +8889,20 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-PV] PRECONDITION the template is an ADD in gov's diff, not a rename",
               "\nR" not in "\n" + _pvdiff and "A\ttools/workflows/unattended-build.template.js" in _pvdiff,
               _pvdiff)
+
+        # ---- R3-3's STARTING STATE. The consumer took its routine pull first: a flag-off `update
+        # ---- --write` to B, committed through its hooks, which is core's documented procedure.
+        _pvqou = run_pv_govkit(_pvg, "update", "--target", str(_pvqo), "--write",
+                               env={k: v for k, v in os.environ.items() if k != "GOVKIT_RERENDER"})
+        _pvqoc = run_pv_commit(_pvqo, "the routine pull", ".governance/install.json",
+                               ".governance/install.sums")
+        check("[-PV] R3-3 PRECONDITION the flag-off pull moved the tree to B and committed through the "
+              "hooks, with the harness still an ENGINE row holding gov's own render",
+              _pvqoc.returncode == 0 and read_pv_row(_pvqo, _pvH).get("role") == "engine"
+              and read_pv_row(_pvqo, _pvH).get("commit") == _pvB
+              and gout(_pvqo, "ls-files", "-s", "--", _pvH).split()[1:2] == [_pvGOV_H_B],
+              f"rc {_pvqoc.returncode}: " + _pvqoc.stdout + _pvqoc.stderr + _pvqou.stdout[-700:]
+              + str(read_pv_row(_pvqo, _pvH)))
 
         # ---- F2's NEGATIVE, first, because it is the one arm that calls `update` by hand. A kit whose
         # ---- `[check]` is `none` cannot be rolled back by the verify pass, so a failed regenerate must
@@ -8756,13 +8936,15 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-PV] R2-3 the regenerate creates no protocol in an install that never took one",
               not (_pvt / _pvP).exists() and "created it" not in _pvb1.stdout
               and f"SKIP {_pvP}" in _pvb1.stdout, _pvb1.stdout[-1500:])
-        check("[-PV] R2-1 block 1 runs clean through the receipt hook",
+        check("[-PV] R2-1 block 1 runs clean through the consumer's hooks, UTF-8 mode off (R3-1, R3-7)",
               _pvb1.returncode == 0, f"rc {_pvb1.returncode}: " + _pvb1.stdout[-1200:] + _pvb1.stderr[-600:])
-        check("[-PV] R2-1 ...and its commit LANDED, holding update's writes and the receipt",
+        check("[-PV] R2-1 ...and its commit LANDED, holding update's writes and the receipt, with the "
+              "attribution line as its own paragraph (R3-1)",
               gout(_pvt, "log", "-1", "--format=%s").strip() == "govkit update: review-harness 1.8"
+              and gout(_pvt, "log", "-1", "--format=%b").strip() == _pvTRAILER
               and _pvT in gout(_pvt, "show", "--name-only", "--format=", "HEAD").split()
               and ".governance/install.json" in gout(_pvt, "show", "--name-only", "--format=", "HEAD"),
-              gout(_pvt, "log", "-3", "--format=%s") + gout(_pvt, "show", "--stat", "HEAD"))
+              gout(_pvt, "log", "-3", "--format=%s%n%b") + gout(_pvt, "show", "--stat", "HEAD"))
         # F1. `update` ALONE DOES NOT MOVE THE ROLE. The committed receipt still rows the destination as
         # engine and the index holds gov's own render, while the correct render waits unstaged. This
         # is the gap block 3 exists for, and it FLIPS when `update` learns to re-resolve a role.
@@ -8787,7 +8969,7 @@ user_skills = "/tmp/gk-fake-skills"
               "that matters", f"{_pvH}={_pvB}" in _pvpins and f"{_pvD}={_pvA}" in _pvpins, str(_pvpins))
 
         _pvb3 = run_pv_block(_pvt, _pvg, 3)
-        check("[-PV] R2-1 block 3 runs clean and both its commits land through the hook",
+        check("[-PV] R2-1 block 3 runs clean and both its commits land through the hooks",
               _pvb3.returncode == 0 and gout(_pvt, "log", "-3", "--format=%s").splitlines()[:2]
               == ["govkit adopt --re-adopt: record the committed renders",
                   "govkit adopt --re-adopt: the build harness is rendered"],
@@ -8796,6 +8978,9 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-PV] R2-1 ...leaving nothing staged or modified in the tree",
               gout(_pvt, "status", "--porcelain", "--untracked-files=no").strip() == "",
               gout(_pvt, "status", "--porcelain"))
+        check("[-PV] R3-5 ...and block 3 DELETES its pins, so nothing can replay them after a later update",
+              not any((_pvt / ".git" / f"harness-migration-{_x}").exists()
+                      for _x in ("ready", "pins.txt", "stamp.txt")), str(read_pv_pins(_pvt)))
         _pvrow2 = read_pv_row(_pvt, _pvH)
         check("[-PV] F1 after the migration the row is `rendered`, sourced from the template",
               _pvrow2.get("role") == "rendered" and _pvrow2.get("evidence") == "pinned"
@@ -8826,20 +9011,38 @@ user_skills = "/tmp/gk-fake-skills"
         git(_pvt, "add", "--", ".governance/install.json", ".governance/install.sums")
         _pvcm = (run_pv_commit(_pvt, "the next update") if gout(_pvt, "diff", "--cached", "--name-only").strip()
                  else None)
-        check("[-PV] R2-1 ...and whatever it re-stamped commits through the hook",
+        check("[-PV] R2-1 ...and whatever it re-stamped commits through the hooks",
               _pvcm is None or _pvcm.returncode == 0,
               "" if _pvcm is None else _pvcm.stdout + _pvcm.stderr)
 
         # ---- THE BOOTSTRAPPED FIXTURE, which is where round 2 found the runbook wrong.
+        _pvq_rows0 = read_pv_paths(_pvq)
         _pvqb1 = run_pv_block(_pvq, _pvg, 1)
-        check("[-PV] R2-1 on the bootstrapped receipt block 1 runs clean through the hook",
+        check("[-PV] R2-1 on the bootstrapped receipt block 1 runs clean through the hooks",
               _pvqb1.returncode == 0 and gout(_pvq, "log", "-1", "--format=%s").strip()
               == "govkit update: review-harness 1.8",
               f"rc {_pvqb1.returncode}: " + _pvqb1.stdout[-1500:] + _pvqb1.stderr[-600:])
+        # R3-2. The churn kit's regenerate ran, deleted one tracked engine file and edited another. Both
+        # go back to what update left, each named, and neither reaches the render list block 3 stages.
+        _pvqz = (_pvq / ".git" / "harness-migration-renders.z")
+        _pvqrl = [_x for _x in (_pvqz.read_text(encoding="utf-8").split("\0") if _pvqz.is_file() else []) if _x]
+        check("[-PV] R3-2 the churn kit's regenerate ran in step 1",
+              "  ran churn: " in _pvqb1.stdout, _pvqb1.stdout[-1500:])
+        check("[-PV] R3-2 a regenerate's deletion and its edit of tracked files outside the renders are "
+              "each FLAGged and restored, never recorded as renders",
+              f"FLAG {_pvCG}: a regenerate deleted it" in _pvqb1.stdout
+              and f"FLAG {_pvCE}: a regenerate changed it" in _pvqb1.stdout
+              and (_pvq / _pvCG).is_file() and (_pvq / _pvCE).read_text(encoding="utf-8") == "edit\n"
+              and not {_pvCG, _pvCE} & set(_pvqrl) and _pvH in _pvqrl,
+              _pvqb1.stdout[-1500:] + str(_pvqrl))
         _pvqb2 = run_pv_block(_pvq, _pvg, 2)
         _pvqpins = read_pv_pins(_pvq)
         check("[-PV] R2-5 the pin rule covers a render the receipt never rowed, from the plan",
               _pvqb2.returncode == 0 and f"{_pvP}={_pvB}" in _pvqpins,
+              f"rc {_pvqb2.returncode}: " + str(_pvqpins) + _pvqb2.stdout[-900:])
+        check("[-PV] R3-6 the pin rule covers an edited `project-owned` row at the base it records, so "
+              "the check does not stop on it",
+              _pvqb2.returncode == 0 and f"{_pvL}={_pvA}" in _pvqpins and "STOP" not in _pvqb2.stdout,
               f"rc {_pvqb2.returncode}: " + str(_pvqpins) + _pvqb2.stdout[-900:])
         check("[-PV] R2-5 ...and block 2's check flags the edited project-owned row new to the receipt",
               f"FLAG {_pvS}: unattributed, because new to the receipt" in _pvqb2.stdout,
@@ -8851,10 +9054,13 @@ user_skills = "/tmp/gk-fake-skills"
               and "DECLINED notes" in _pvqb1.stdout, str(_pvqpins) + _pvqb1.stdout[-900:])
         _pvqn = _re.search(r"the re-adopt leaves (\d+) row\(s\) unattributed", _pvqb2.stdout)
         check("[-PV] R2-4 block 2 counts the rows the re-adopt leaves unattributed, each with its "
-              "reason: two unattributed before, one new to the receipt",
-              _pvqn is not None and _pvqn.group(1) == "3"
+              "reason: three unattributed before, a fork among them, and one new to the receipt",
+              _pvqn is not None and _pvqn.group(1) == "4"
               and f"FLAG {_pvJ}: unattributed, because it was unattributed before" in _pvqb2.stdout
               and f"FLAG {_pvN}: unattributed, because it was unattributed before" in _pvqb2.stdout,
+              _pvqb2.stdout[-1500:])
+        check("[-PV] R3-8 ...and the fork `adopt` prints `forked` with no base is one of them",
+              f"FLAG {_pvF}: unattributed, because it was unattributed before" in _pvqb2.stdout,
               _pvqb2.stdout[-1500:])
         # AND AGAIN, as the runbook tells an operator to after a STOP: the same count, nothing moved.
         _pvqst = (gout(_pvq, "rev-parse", "HEAD"), gout(_pvq, "status", "--porcelain"))
@@ -8866,14 +9072,22 @@ user_skills = "/tmp/gk-fake-skills"
               and (gout(_pvq, "rev-parse", "HEAD"), gout(_pvq, "status", "--porcelain")) == _pvqst,
               f"rc {_pvqb2b.returncode}: " + _pvqb2b.stdout[-700:] + gout(_pvq, "status", "--porcelain"))
         _pvqb3 = run_pv_block(_pvq, _pvg, 3)
-        check("[-PV] R2-1 block 3 lands both its commits through the hook on the bootstrapped receipt",
+        check("[-PV] R2-1 block 3 lands both its commits through the hooks on the bootstrapped receipt",
               _pvqb3.returncode == 0 and gout(_pvq, "log", "-1", "--format=%s").strip()
               == "govkit adopt --re-adopt: record the committed renders",
               f"rc {_pvqb3.returncode}: " + _pvqb3.stdout[-900:] + _pvqb3.stderr[-600:])
-        _pvqe = {_p: read_pv_row(_pvq, _p).get("evidence") for _p in (_pvH, _pvP, _pvD)}
-        check("[-PV] R2-4 the migrated rows end `pinned`: the harness, the new render, the edited row",
-              _pvqe == {_pvH: "pinned", _pvP: "pinned", _pvD: "pinned"}
+        _pvqe = {_p: read_pv_row(_pvq, _p).get("evidence") for _p in (_pvH, _pvP, _pvD, _pvL)}
+        check("[-PV] R2-4 the migrated rows end `pinned`: the harness, the new render, the edited rows",
+              _pvqe == {_pvH: "pinned", _pvP: "pinned", _pvD: "pinned", _pvL: "pinned"}
               and read_pv_row(_pvq, _pvH).get("role") == "rendered", str(_pvqe))
+        # R3-2's CLAIM, over the whole receipt: no row the receipt held before the migration is gone
+        # after it unless some block named it in a FLAG line.
+        _pvqflags = _pvqb1.stdout + _pvqb2.stdout + _pvqb2b.stdout
+        _pvqgone = sorted(_p for _p in _pvq_rows0 - read_pv_paths(_pvq) if f"FLAG {_p}:" not in _pvqflags)
+        check("[-PV] R3-2 no receipt row disappears without a FLAG, and the churned files keep theirs",
+              not _pvqgone and {_pvCG, _pvCE} <= read_pv_paths(_pvq)
+              and gout(_pvq, "status", "--porcelain", "--untracked-files=no").strip() == "",
+              str(_pvqgone) + gout(_pvq, "status", "--porcelain"))
         _pvqu = run_pv_govkit(_pvg, "update", "--target", str(_pvq), "--write",
                               env=dict(os.environ, GOVKIT_RERENDER="1"))
         _pvqw = _re.search(r"NOT re-stamped: (\d+) row\(s\)", _pvqu.stdout)
@@ -8909,7 +9123,98 @@ user_skills = "/tmp/gk-fake-skills"
               len(_pvrendered_pins) == 3 and all(_x.endswith("=" + _pvB) for _x in _pvrendered_pins),
               str(_pvrendered_pins))
 
-        # ---- THE CONTROL: the same migration WITHOUT the pins, committed through the hook the way the
+        # ---- R3-9. THE SAME CONFLICT IN A RECEIPT `adopt` MEASURED, where the row's `oid` is the edited
+        # ---- bytes and `gov_oid` is gov's. The recovery restores to `gov_oid`, through its own block and
+        # ---- the consumer's hooks, and block 1 then runs clean. Restoring to `oid` changes nothing.
+        _pvqxrow = read_pv_row(_pvqx, _pvH)
+        check("[-PV] R3-9 PRECONDITION the bootstrapped twin's harness row records a base, with `oid` "
+              "the edited bytes and `gov_oid` gov's",
+              bool(_pvqxrow.get("commit")) and _pvqxrow.get("oid") != _pvqxrow.get("gov_oid")
+              and gout(_pvqx, "ls-files", "-s", "--", _pvH).split()[1:2] == [_pvqxrow.get("oid")],
+              str(_pvqxrow))
+        _pvqxb1 = run_pv_block(_pvqx, _pvg, 1)
+        check("[-PV] R3-9 its step 1 conflicts on the harness and STOPS, as the apply fixture's did",
+              _pvqxb1.returncode != 0 and "STOP: update exited 1" in _pvqxb1.stdout
+              and "three-way conflicts" in _pvqxb1.stdout, _pvqxb1.stdout[-1200:])
+        git(_pvqx, "reset", "-q", "--hard", "HEAD")        # the runbook's "return the tree to HEAD"
+        _pvqxr = run_pv_block(_pvqx, _pvg, "restore")
+        _pvqxrow2 = read_pv_row(_pvqx, _pvH)
+        check("[-PV] R3-9 the restore block commits gov's blob at the row's base, through the hooks",
+              _pvqxr.returncode == 0 and _pvqxrow2.get("oid") == _pvqxrow.get("gov_oid")
+              and gout(_pvqx, "ls-files", "-s", "--", _pvH).split()[1:2] == [_pvqxrow.get("gov_oid")]
+              and gout(_pvqx, "status", "--porcelain", "--untracked-files=no").strip() == "",
+              f"rc {_pvqxr.returncode}: " + _pvqxr.stdout[-900:] + _pvqxr.stderr[-600:] + str(_pvqxrow2))
+        check("[-PV] R3-9 ...and sets this tree's edit aside in the git directory, byte for byte",
+              (_pvqx / ".git" / "harness-migration-local-edit.txt").is_file()
+              and (_pvqx / ".git" / "harness-migration-local-edit.txt").read_text(encoding="utf-8")
+              == _pvXEDIT, _pvqxr.stdout[-600:])
+        _pvqxb1b = run_pv_block(_pvqx, _pvg, 1)
+        check("[-PV] R3-9 ...and block 1 then runs clean, rendering the harness",
+              _pvqxb1b.returncode == 0 and (_pvqx / _pvH).read_text(encoding="utf-8") == _pvRENDERED,
+              f"rc {_pvqxb1b.returncode}: " + _pvqxb1b.stdout[-1500:] + _pvqxb1b.stderr[-600:])
+
+        # ---- R3-3. THE ROUTINE PULL WAS TAKEN FIRST, so `update` has nothing left to move in
+        # ---- review-harness and runs no regenerate. Block 1 runs the declared argv itself, and the
+        # ---- migration ends where it ends everywhere else.
+        _pvqob1 = run_pv_block(_pvqo, _pvg, 1)
+        check("[-PV] R3-3 after a flag-off pull, block 1 runs the regenerate update did not, and runs clean",
+              _pvqob1.returncode == 0 and "  ran review-harness:" not in _pvqob1.stdout.split("update exit")[0]
+              and f'  ran review-harness: bash {_pvW}/check-protocol-parity.test.sh --render --tracked-only '
+                  '-> exit 0' in _pvqob1.stdout
+              and (_pvqo / _pvH).read_text(encoding="utf-8") == _pvRENDERED,
+              f"rc {_pvqob1.returncode}: " + _pvqob1.stdout[-1500:] + _pvqob1.stderr[-600:])
+        _pvqob2 = run_pv_block(_pvqo, _pvg, 2)
+        _pvqob3 = run_pv_block(_pvqo, _pvg, 3)
+        _pvqorow = read_pv_row(_pvqo, _pvH)
+        check("[-PV] R3-3 ...and blocks 2 and 3 leave the harness `rendered` and `pinned` at B",
+              _pvqob2.returncode == 0 and _pvqob3.returncode == 0
+              and _pvqorow.get("role") == "rendered" and _pvqorow.get("evidence") == "pinned"
+              and _pvqorow.get("commit") == _pvB
+              and gout(_pvqo, "status", "--porcelain", "--untracked-files=no").strip() == "",
+              f"rc {_pvqob2.returncode}/{_pvqob3.returncode}: " + _pvqob2.stdout[-700:]
+              + _pvqob3.stdout[-500:] + str(_pvqorow))
+
+        # ---- R3-1, R3-2 AND R3-5, on one more `apply` fixture.
+        # ---- Without TRAILER, core's `commit-msg` refuses block 1's commit; the tree is returned to HEAD
+        # ---- as the runbook says, and the same block with TRAILER lands.
+        _pvtmh = gout(_pvtm, "rev-parse", "HEAD").strip()
+        _pvmb1 = run_pv_block(_pvtm, _pvg, 1, trailer=False)
+        check("[-PV] R3-1 without TRAILER, the consumer's commit-msg hook refuses block 1's commit and "
+              "the block STOPS",
+              _pvmb1.returncode != 0 and "STOP: that commit was refused" in _pvmb1.stdout
+              and "commit-msg: REFUSED" in _pvmb1.stderr
+              and gout(_pvtm, "rev-parse", "HEAD").strip() == _pvtmh,
+              f"rc {_pvmb1.returncode}: " + _pvmb1.stdout[-700:] + _pvmb1.stderr[-400:])
+        git(_pvtm, "reset", "-q", "--hard", "HEAD")
+        _pvmb1b = run_pv_block(_pvtm, _pvg, 1)
+        check("[-PV] R3-1 ...and with TRAILER, after the tree is returned to HEAD, the same block lands",
+              _pvmb1b.returncode == 0 and gout(_pvtm, "log", "-1", "--format=%b").strip() == _pvTRAILER,
+              f"rc {_pvmb1b.returncode}: " + _pvmb1b.stdout[-900:] + _pvmb1b.stderr[-400:])
+        # R3-2's second half: a row the receipt holds that the re-adopt no longer measures as installed
+        # is dropped by block 3, so block 2 names it.
+        git(_pvtm, "rm", "-q", "--", _pvJ)
+        _pvmrm = run_pv_commit(_pvtm, "this tree no longer carries the join check")
+        _pvmb2 = run_pv_block(_pvtm, _pvg, 2)
+        check("[-PV] R3-2 block 2 FLAGs a receipt row the re-adopt does not measure as installed, which "
+              "block 3 would drop",
+              _pvmrm.returncode == 0 and _pvmb2.returncode == 0
+              and f"FLAG {_pvJ}: the receipt rows it and the re-adopt does not measure it as installed"
+                  in _pvmb2.stdout,
+              f"rc {_pvmrm.returncode}/{_pvmb2.returncode}: " + _pvmrm.stderr + _pvmb2.stdout[-900:])
+        # R3-5, the receipt half: the bare re-adopt Done warns against, run between blocks 2 and 3,
+        # moves the receipt block 2 derived its pins from, and block 3 refuses to replay them over it.
+        run_pv_govkit(_pvg, "adopt", "--target", str(_pvtm), "--re-adopt", "--write")
+        _pvtmh2 = gout(_pvtm, "rev-parse", "HEAD").strip()
+        _pvmb3 = run_pv_block(_pvtm, _pvg, 3)
+        check("[-PV] R3-5 block 3 STOPS when the receipt moved after block 2 derived its pins, and "
+              "commits nothing",
+              _pvmb3.returncode != 0 and "STOP: GOV or the receipt moved" in _pvmb3.stdout
+              and gout(_pvtm, "rev-parse", "HEAD").strip() == _pvtmh2
+              and (_pvtm / ".git" / "harness-migration-pins.txt").is_file(),
+              f"rc {_pvmb3.returncode}: " + _pvmb3.stdout[-700:])
+        git(_pvtm, "checkout", "--", ".governance/install.json", ".governance/install.sums")
+
+        # ---- THE CONTROL: the same migration WITHOUT the pins, committed through the hooks the way the
         # ---- runbook commits. It must cost what the pin rule says it costs, or the pins are decoration.
         # ---- If `adopt` ever attributes a render natively this control flips, and the rendered half of
         # ---- the rule can go.
@@ -8931,15 +9236,22 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-PV] F1 CONTROL ...so the next update withholds its stamp",
               "NOT re-stamped" in _pvuc.stdout and "unattributed" in _pvuc.stdout, _pvuc.stdout[-700:])
 
-        # ---- R2-7. A FLAG-OFF UPDATE OVER A MOVED TEMPLATE IS NOT SILENT. The verdict loop relabels the
-        # ---- row `re-rendered` and prints it before the flag is read, so the carriers that said "prints
-        # ---- nothing" had an operator read that line as proof a render ran. Vintage C moves the
-        # ---- template once more, on the target the migration left clean.
+        # ---- VINTAGE C. The template moves once more, and so does the review harness's own engine
+        # ---- file, which every fixture carries an edit to: a later update three-way merges that row
+        # ---- forward, and a replay of the migration's pins would rewind it (R3-5).
         (_pvd / "unattended-build.template.js").write_text(
             _pvT_B.replace("harness v2", "harness v3"), encoding="utf-8", newline="\n")
         (_pvd / "unattended-build.js").write_text(
             _pvH_B.replace("harness v2", "harness v3"), encoding="utf-8", newline="\n")
-        settle(_pvg, "C: the template moves again")
+        (_pvd / "tier2-review.js").write_text("// gov's C header\n// the review harness\n",
+                                              encoding="utf-8", newline="\n")
+        settle(_pvg, "C: the template and the review harness move again")
+        _pvC = gout(_pvg, "rev-parse", "HEAD").strip()
+
+        # ---- R2-7. A FLAG-OFF UPDATE OVER A MOVED TEMPLATE IS NOT SILENT. The verdict loop relabels the
+        # ---- row `re-rendered` and prints it before the flag is read, so the carriers that said "prints
+        # ---- nothing" had an operator read that line as proof a render ran. It runs on the target the
+        # ---- migration left clean.
         _pvoff = run_pv_govkit(_pvg, "update", "--target", str(_pvt), "--write",
                                env={k: v for k, v in os.environ.items() if k != "GOVKIT_RERENDER"})
         _pvov = [ln for ln in _pvoff.stdout.splitlines()
@@ -8951,8 +9263,30 @@ user_skills = "/tmp/gk-fake-skills"
               "or decline is named", (_pvt / _pvH).read_text(encoding="utf-8") == _pvRENDERED
               and "ran review-harness" not in _pvoff.stdout and "DECLINED" not in _pvoff.stdout,
               _pvoff.stdout[-900:])
-
-
+        # R3-5, the later update: it moved the edited row to C, and it commits through the hooks. Block 3
+        # run now, as Done used to advise, must STOP rather than rewind that row to the migration's pin.
+        _pvoc = run_pv_commit(_pvt, "a later update", ".governance/install.json", ".governance/install.sums")
+        _pvdC = read_pv_row(_pvt, _pvD)
+        check("[-PV] R3-5 PRECONDITION the later update merged the edited row forward to C and committed",
+              _pvoc.returncode == 0 and _pvdC.get("commit") == _pvC
+              and "// a consumer's own line" in (_pvt / _pvD).read_text(encoding="utf-8"),
+              f"rc {_pvoc.returncode}: " + _pvoc.stdout + _pvoc.stderr + str(_pvdC) + _pvoff.stdout[-600:])
+        _pvb3c = run_pv_block(_pvt, _pvg, 3)
+        check("[-PV] R3-5 block 3 after a later update STOPS, and the row keeps the base that update gave it",
+              _pvb3c.returncode != 0 and "STOP:" in _pvb3c.stdout
+              and read_pv_row(_pvt, _pvD).get("commit") == _pvC,
+              f"rc {_pvb3c.returncode}: " + _pvb3c.stdout[-700:] + str(read_pv_row(_pvt, _pvD)))
+        # R3-5, the GOV half, on the fixture still holding pins derived at B: both later blocks refuse.
+        _pvmb3c = run_pv_block(_pvtm, _pvg, 3)
+        _pvmb2c = run_pv_block(_pvtm, _pvg, 2)
+        check("[-PV] R3-5 with GOV moved to C, block 3 refuses to replay pins derived at B",
+              _pvmb3c.returncode != 0 and "STOP: GOV or the receipt moved" in _pvmb3c.stdout
+              and read_pv_row(_pvtm, _pvH).get("role") == "engine",
+              f"rc {_pvmb3c.returncode}: " + _pvmb3c.stdout[-700:])
+        check("[-PV] R3-5 ...and block 2 refuses to derive pins at a vintage block 1 did not move to",
+              _pvmb2c.returncode != 0 and f"STOP: GOV is not at {_pvB}" in _pvmb2c.stdout
+              and not (_pvtm / ".git" / "harness-migration-ready").exists(),
+              f"rc {_pvmb2c.returncode}: " + _pvmb2c.stdout[-700:])
 
 
     # ---- the SEED -> EMIT -> READ round trip, over every entry that declares one ----------------

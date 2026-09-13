@@ -28,7 +28,7 @@ write a shipped copy verbatim, naming this repo's `tools/` layout in every adopt
 renders it instead, and `kit.toml`'s `[[regenerate]]` block re-runs the render on an update run
 with `GOVKIT_RERENDER=1`. With `GOVKIT_RERENDER` unset `update` declines that block without
 printing anything about it, yet it still prints the harness row as `re-rendered` although no render
-ran, and the parity leg is what reds the stale copy at your next bar.
+ran, and where your bar wires the parity leg, that leg reds the stale copy there.
 
 **The regenerate refreshes an install and never creates one.** It runs `--render --tracked-only`,
 which skips by name any pair whose live copy is absent and untracked, because govkit rows nothing

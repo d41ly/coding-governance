@@ -48,10 +48,15 @@ the same checklist path, and it breaks the same way.
   recognises by name. The agent resolved it under the brief; `TOOL-aWeldedTribunal-12` keeps the
   underlying tension, every conforming harness costing two offenders, for the owner.
 - **`update` still keeps a schema-3 receipt's `engine` role** when a kit makes that destination
-  `rendered`. Round 1 repaired it for this release by a consumer migration, and round 2 found that
-  migration wedged at core's commit-time receipt check; rev-7's three runbook blocks are what the
-  govkit selftest now runs, verbatim, on a hooked and `adopt`-bootstrapped fixture.
-  `DEPL-dPolishedVitrine-1` holds the govkit move, whose blast radius is the owner's to rule on.
+  `rendered`. Round 1 repaired it for this release by a consumer migration. Round 2 found that
+  migration wedged at core's commit-time receipt check, and round 3 found it refused by core's
+  `commit-msg` rule, the same class one hook over. Rev-8's blocks are what the govkit selftest now
+  runs, verbatim, on `apply`-built and `adopt`-bootstrapped fixtures held to a declaration of every
+  hook core installs. `DEPL-dPolishedVitrine-1` holds the govkit move, whose blast radius is the
+  owner's to rule on.
+- **Whether round 3's fold is re-reviewed is the lander's call.** Rounds 1, 2 and 3 each confirmed
+  one blocker, and `memory/guides/BUILD-METHOD.md` M4 re-arms the loop only on a strictly smaller
+  count, so read that way the fold is disposed of as a FOLD and not re-reviewed.
 
 <!-- roster:units -->
 
@@ -70,11 +75,11 @@ ids TOOL-dPolishedVitrine-10 TOOL-dPolishedVitrine-11 TOOL-dPolishedVitrine-12 T
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-7 | 2026-09-13 |
-| [TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live](spec/2026-09-13-spec-TOOL-dPolishedVitrine-14.md) | — | 2 | INPROGRESS | rev-2 | 2026-09-13 |
+| [TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived](spec/2026-09-12-spec-TOOL-dPolishedVitrine-1.md) | — | 2 | INPROGRESS | rev-8 | 2026-09-13 |
+| [TOOL-dPolishedVitrine-14 — brief-recorded grades only the units built while a run was live](spec/2026-09-13-spec-TOOL-dPolishedVitrine-14.md) | — | 2 | INPROGRESS | rev-3 | 2026-09-13 |
 <!-- /gen:build-units -->
 
-Records: 6 bound to this build, across 4 record folder(s).
+Records: 7 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

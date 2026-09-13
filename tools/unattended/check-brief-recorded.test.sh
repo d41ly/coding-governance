@@ -86,7 +86,7 @@ RM
     case "$mode" in
       live|reopened|baseonly) printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
       landing|flip)           printf "$REC" "$BASE" LANDING "$BASE" > "$R" ;;
-      postrun)                printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
+      postrun|misselect)      printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
       postrun-aborted|rotated|migrated) printf "$REC" "$BASE" ABORTED "$BASE" > "$R" ;;
       copied)
         printf "$REC" "$BASE" LANDED "$BASE" > "$R"
@@ -96,8 +96,22 @@ RM
         printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
     esac
     case "$mode" in
-      live|reopened|baseonly|landing|flip|postrun|postrun-aborted|rotated|migrated|copied)
+      live|reopened|baseonly|landing|flip|postrun|postrun-aborted|rotated|migrated|copied|misselect)
         git add -A >/dev/null; git commit -q -m "records: the run's phase" --no-verify ;;
+    esac
+    # THE WRONG PICK, for round 3's R3-4. Between the first run landing and the second starting, a hand
+    # commit names the unit and touches a path outside the record surface, so `build_commit`, which
+    # takes the EARLIEST such commit, picks it. The second run's preflight then retires the first
+    # record in the same commit that scaffolds the next, with its BASE before the hand commit, so the
+    # hand commit is in range and the retired record still makes the finished claim at HEAD.
+    case "$mode" in
+      misselect)
+        mkdir -p docs; printf 'approach notes\n' > docs/notes.md
+        git add -A >/dev/null; git commit -q -m "docs: ARCH-tBrief-1 approach notes" --no-verify
+        H8=$(git hash-object "$R" | cut -c1-8)
+        git mv "$R" "memory/builds/tBrief/RUN.LANDED.$H8.md"
+        printf "$REC" "$BASE" BUILDING "$BASE" > "$R"
+        git add -A >/dev/null; git commit -q -m "records: a second run, the first one retired" --no-verify ;;
     esac
 
     # THE BUILD PASS. The brief file is written and hashed, then the row is appended to the run-state
@@ -144,7 +158,7 @@ RM
       # THE POST-RUN MODES RECORD NO BRIEF, every one of them: a unit built by hand after its run
       # is exactly the shape the owner ruled out of this leg, and the modes that must still RED
       # need the missing row to have something to red on.
-      live|landing|postrun|postrun-aborted|rotated|migrated) ;;
+      live|landing|postrun|postrun-aborted|rotated|migrated|misselect) ;;
       # THE BOUNDARY: the build commit is the one that writes the terminal phase.
       flip) printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
       # THE FORGERY, two ways. The build commit claims the run finished and the next commit makes it
@@ -454,6 +468,25 @@ o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same  "built after an ABORTED run a later run retired: exits 0" "$rc" "0"
 has   "rotated: announced and not graded" "$o" "NOT GRADED — ARCH-tBrief-1"
 has   "rotated: the retired record is what still makes the claim" "$o" "RUN.ABORTED."
+rm -rf "$T"
+
+# ---- THE WRONG PICK. Round 3's R3-4 of build dPolishedVitrine. `build_commit` takes the EARLIEST
+# ---- commit that names the id and touches a path outside the record surface, and a hand commit made
+# ---- between two runs qualifies. At that commit the record reads the FIRST run's LANDED, and the
+# ---- second run's preflight retired that record afterwards, so HEAD still bears the claim out and the
+# ---- leg used to skip a unit built during the SECOND run, which was live. The skip is honoured only
+# ---- when no later commit the same predicate accepts was made while a run was live.
+T=$(mkfixture misselect)
+n=$((n+1)); [ "$(cd "$T" && git log --format=%s | grep -c '^docs: ARCH-tBrief-1 approach notes$')" = 1 ] \
+  && [ "$(cd "$T" && git show --pretty=format: --name-only HEAD~1 | grep -c '^memory/builds/tBrief/RUN\.LANDED\.')" = 1 ] \
+  && echo "ok   misselect: the fixture carries the id-naming hand commit and the retirement after it" \
+  || { echo "FAIL fixture no-op: the misselect history did not land, so this arm would test nothing"; st=1; }
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "misselect: a unit built in a live run behind an id-naming hand commit REDS" "$rc" "1"
+has   "misselect: graded, and redded for the missing row" "$o" "NO brief row"
+hasnt "misselect: never skipped as built after its run finished" "$o" "NOT GRADED"
+has   "misselect: it names the later commit it graded at, and why" "$o" "GRADED AT A LATER COMMIT — ARCH-tBrief-1"
+has   "misselect: the population is COUNTED" "$o" "1 unit(s) whose earliest commit fell after their run finished"
 rm -rf "$T"
 
 # ---- THE CLAIM, NOT THE BYTES. A finished record edited after it finished, the way a kit migration

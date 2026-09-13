@@ -1,6 +1,6 @@
 # TOOL-dPolishedVitrine-1 — the build harness is rendered at install, and its paths are derived
 
-**Status:** INPROGRESS · rev-7 · 2026-09-13 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
+**Status:** INPROGRESS · rev-8 · 2026-09-13 · node d · Tier-2 · base 24f8c712 · streams tooling+deployer · ratified 2026-09-12
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-12-prompt-TOOL-dPolishedVitrine-1-0-owner-ruling.md](../prompts/2026-09-12-prompt-TOOL-dPolishedVitrine-1-0-owner-ruling.md) | journal | — |
 | [2026-09-12-review-TOOL-dPolishedVitrine-1-diff-review-round1.md](../reviews/2026-09-12-review-TOOL-dPolishedVitrine-1-diff-review-round1.md) | diff-review | — |
 | [2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round2.md](../reviews/2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round2.md) | diff-review | — |
+| [2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round3.md](../reviews/2026-09-13-review-TOOL-dPolishedVitrine-1-diff-review-round3.md) | diff-review | TOOL-dPolishedVitrine-14 |
 
 <!-- /gen:spec-records -->
 
@@ -72,6 +73,16 @@ Skill's copy of the same checklist line is fixed the same way.
   script. The parity script gains `--tracked-only` and the regenerate argv passes it. Selfcheck arm
   7l gains its negative half, and three carriers stop calling a flag-off update silent. Observed by
   AC13, AC17, AC18, AC19 and AC20.
+- **S10** — round 3's repairs, rev-8. Every runbook commit passes an operator's `TRAILER` as its own
+  paragraph, and the `[-PV]` fixture carries core's `commit-msg` rule beside its receipt check, held
+  there by a declaration of every hook core installs. Every block exports `PYTHONUTF8=1`, and the
+  arms run the blocks with it off. Block 1 runs the declared regenerate itself when `update` ran
+  none, records only modified renders, and restores and flags any other change a regenerate made to
+  a tracked file. Block 2 refuses a GOV that moved since block 1, pins `project-owned` and
+  `generated` rows that record a base, counts a fork `adopt` prints with no base, and flags a
+  receipt row the re-adopt no longer measures. Block 3 refuses pins whose GOV or receipt moved and
+  deletes them when it finishes. A restore block sets a conflicting harness edit aside at the row's
+  `gov_oid`. Observed by AC21, AC22, AC23, AC24, AC25, AC26, AC27 and AC28.
 
 ## 3. Non-goals (OUT)
 
@@ -112,11 +123,12 @@ Skill's copy of the same checklist line is fixed the same way.
   probed spellings, or named by the override, before the harness renders. The parity script still
   renders the protocol without it, and the unattended adopter refuses without it.
 - **hands-off** external — the consumer re-pulls by the runbook's migration, not by `update` alone.
-  On govkit 1.11 or later it runs the runbook's three blocks, verbatim, and reads block 2's FLAG
-  lines before block 3. §4 Rollout says why each step is there (rev-7; rev-5's sequence wedged at core's
-  commit-time receipt check). The hand-off also covers NicoCares carrying its cap carve-out into the
-  template after block 3, retiring core's untagged Skill delta and NicoCares' untagged driver delta,
-  and adding the parity leg core lacks.
+  On govkit 1.11 or later it runs the runbook's three blocks, verbatim, in place of its routine pull
+  for the introducing vintage, with `TRAILER` set, and reads the FLAG lines of blocks 1 and 2 before
+  block 3. §4 Rollout says why each step is there (rev-8; rev-7's sequence could not commit through
+  core's `commit-msg` rule, and rev-5's wedged at its receipt check). The hand-off also covers
+  NicoCares carrying its cap carve-out into the template after block 3, retiring core's untagged Skill
+  delta and NicoCares' untagged driver delta, and adding the parity leg core lacks.
 
 ## 4. Design
 
@@ -221,47 +233,75 @@ render stays tracked at its old path, because this repo runs its own harness.
 That last fact is why `update` alone cannot migrate a consumer (rev-5, round 1 F1). Both consumer
 receipts are schema 3 and row the harness as `engine`. `update` takes a row's role from the receipt,
 and gov still tracks the source, so the raw arm writes gov's own `tools/`-spelled render. So the
-consumer migrates by the runbook's three blocks, on govkit 1.11 or later (rev-7, round 2):
+consumer migrates by the runbook's three blocks, on govkit 1.11 or later, in place of its routine
+pull for the introducing vintage (rev-7, round 2; rev-8, round 3). The operator sets `GOV`, `KIT`,
+`PY` and `TRAILER`. Every commit passes `TRAILER` as a paragraph of its own, because core's
+`commit-msg` hook refuses a message with no attribution line, and gov's charter mandates one on
+every agent commit (R3-1). Every block exports `PYTHONUTF8=1`, because govkit writes its em dashes
+in the ANSI code page on Windows outside UTF-8 mode, and the program reads its output as UTF-8
+(R3-7).
 
 1. Block 1 runs `update --write` with `GOVKIT_RERENDER=1`: the template lands as an unclaimed
-   source, and then every `[[regenerate]]` block renders. It STOPS unless update exits 0 with no
+   source, and then every `[[regenerate]]` block renders. When `update` exits 0 and ran no
+   review-harness regenerate, it runs the kit's declared regenerate argv itself and logs it in
+   update's own `ran` form. That is the tree a flag-off pull already moved to the vintage, where
+   `update` finds nothing left to act on in the kit (R3-3). It STOPS unless update exits 0 with no
    conflict, the review-harness regenerate exits 0, and the parity check grades the harness green
    under `--tracked-only`. A conflicted three-way leaves the row at its old commit while the
    regenerate still runs, so the parity check alone would pass it (R2-6).
 2. It commits update's own writes with the receipt that records them, and nothing the regenerate
    wrote. Until the re-adopt the row is still `engine`, so a commit-time check comparing staged
    engine blobs with the receipt reds the re-rendered harness, and the re-adopt refuses a staged
-   tree (R2-1). The regenerate's changes to tracked files are recorded by name; a file it created is
-   flagged and never staged (R2-3).
-3. Block 2, which writes nothing to the tree and can be run again after a STOP, derives the pins.
-   A tracked row that records a commit, and that the plan still resolves, is pinned to that commit.
-   A tracked destination that `plan` at the new vintage resolves as `rendered` is pinned to that
-   vintage when its kit's regenerate ran at exit 0, and left unpinned otherwise, so a declined
-   render is never recorded as current (R2-2). The rendered set comes from the plan, not the
-   receipt, because a receipt `adopt` bootstrapped never rows a destination tracked after it was
-   written (R2-5), and a rendered destination is never pinned to a recorded commit (R2-6).
-4. It runs the re-adopt READ-ONLY and checks it. Every row new to the receipt is flagged, every row
-   left `unattributed` is flagged with its reason, a row that loses a recorded base stops the block,
-   and the last line counts the unattributed rows.
-5. Block 3 runs `adopt --re-adopt --write` with the pins. That is the only verb that re-reads a
-   role from the descriptor, so the harness row becomes `rendered`. It stages the recorded renders
-   with the receipt and commits, which the receipt check exempts, because the rows are `rendered`.
+   tree (R2-1). It records, for block 3, only the tracked destinations the plan renders that a
+   regenerate modified. Any other change a regenerate made to a tracked file, a deletion included,
+   is restored to what `update` left and flagged (R3-2), and a file a regenerate created is flagged
+   and never staged (R2-3). Last, it records the GOV commit step 1 moved to.
+3. Block 2, which writes nothing to the tree and can be run again after a STOP, refuses a GOV that
+   is not at that commit, because step 1's log describes that vintage only (R3-5). It derives the
+   pins. Every tracked row that records a commit, and that the plan still resolves, is pinned to
+   that commit, `project-owned` and `generated` rows included, because `adopt` measures them with
+   the engine walk (R3-6). Block rows are left to `adopt`, and one list of those roles is read by
+   both the pin rule and the check. A tracked destination that `plan` at the new vintage resolves as
+   `rendered` is pinned to that vintage when its kit's regenerate ran at exit 0, and left unpinned
+   otherwise, so a declined render is never recorded as current (R2-2). The rendered set comes from
+   the plan, not the receipt, because a receipt `adopt` bootstrapped never rows a destination
+   tracked after it was written (R2-5), and a rendered destination is never pinned to a recorded
+   commit (R2-6).
+4. It runs the re-adopt READ-ONLY and checks it. Every row new to the receipt is flagged, and every
+   row left `unattributed` is flagged with its reason, a fork `adopt` prints with no base among them
+   (R3-8). Every receipt row the re-adopt does not measure as installed is flagged, because block 3
+   drops it (R3-2). A row that loses a recorded base stops the block, and the last line counts the
+   unattributed rows. It records GOV's commit and the receipt's hash beside the pins.
+5. Block 3 refuses unless GOV's commit and the receipt's hash are still what block 2 recorded, so
+   pins derived at one vintage are never replayed after a later update (R3-5). It runs
+   `adopt --re-adopt --write` with the pins. That is the only verb that re-reads a role from the
+   descriptor, so the harness row becomes `rendered`. It stages the recorded renders with the receipt
+   and commits, which the receipt check exempts, because the rows are `rendered`.
 6. It re-adopts once more with the same pins, because step 5 read each render's identity from the
    index before the render was staged, and commits the receipt. The end state asserted is the one
-   where the receipt's `oid` is the committed render's blob.
+   where the receipt's `oid` is the committed render's blob. Then it deletes the pins.
+
+A conflict on the harness in step 1 comes from a local edit. The runbook's restore block sets that
+edit aside by restoring the harness to the row's `gov_oid`, gov's blob at the row's `commit`, and
+committing it with the row's `oid` set to that blob, which is what a receipt check needs. Restoring
+to `oid` recreates the conflict wherever `adopt` measured the receipt, because there `oid` is the
+edited bytes (R3-9).
 
 Done is: the harness row `rendered` and `pinned`, and the next `update --write` writes nothing to it
 and either re-stamps or withholds the stamp over exactly the rows step 4 counted (R2-4). At both
-consumers it withholds, because each carries rows that were unattributed before. That message
-suggests the bare `adopt --re-adopt --write`, which drops every pin, so the runbook says to re-run
-block 3 instead; making the message name the pinned form is `DEPL-dPolishedVitrine-1`'s.
+consumers it withholds, because each carries rows that were unattributed before. That withheld stamp
+is the end state. The message suggests the bare `adopt --re-adopt --write`, which drops every pin,
+and re-running the migration measures the same rows the same way, so the runbook says to pass
+`--allow-ungraded` knowingly or leave the stamp withheld. Blocks 2 and 3 are re-run only to recover
+from a STOP, at the vintage block 1 moved to (R3-5). Making the message name the pinned form is
+`DEPL-dPolishedVitrine-1`'s.
 
 With `GOVKIT_RERENDER` unset, `update` declines both regenerates without printing a line naming
 them, yet it still prints each moved render's row as `re-rendered` although no render ran (R2-7).
-The review-harness renders are then left stale, and the parity leg reds them at the next bar. The
-unattended kit is worse off. Its template lands, its Skill is left stale, and its own post-write
-check rolls the kit back, which is the 2026-09-11 NicoCares event. That was read from the code, not
-run.
+The review-harness renders are then left stale, and the parity leg reds them at the next bar where
+it is wired. Core's bar does not wire it yet, which §3's hand-off covers (R3-3). The unattended kit
+is worse off. Its template lands, its Skill is left stale, and its own post-write check rolls the kit
+back, which is the 2026-09-11 NicoCares event. That was read from the code, not run.
 
 ### Files touched (estimate)
 
@@ -431,6 +471,50 @@ review-harnesses dossier, the generated map, and this build's records.
   prints that line while no render runs, which the `[-PV] R2-7` arms pin.
   Red when: a carrier says a flag-off update prints nothing and selfcheck stays green, or the
   printed line changes and no arm notices.
+- **AC21** — When the runbook's blocks run on a fixture whose `commit-msg` hook refuses a message
+  with no attribution line, as core's does, block 1 STOPs with `TRAILER` unset, and lands with it set
+  once the tree is returned to HEAD. Every migration commit carries the line as its own paragraph.
+  The `[-PV]` PRECONDITION holds the fixture's hooks to a declaration of every hook core installs,
+  and a LIVENESS arm shows each modelled hook refusing.
+  Red when: a runbook commit passes no `TRAILER`, or the declaration names a commit-time hook the
+  fixture does not model.
+  fixture: the declaration describes inCMS core's hooks as read on 2026-09-13; nothing here re-reads
+  them.
+- **AC22** — When a kit's `[[regenerate]]` deletes one tracked engine file and edits another in
+  step 1, block 1 FLAGs and restores both, neither reaches the render list, block 3 lands, and no
+  receipt row the migration started with is gone without a FLAG. When a receipt row's file is not
+  tracked before block 2, block 2 FLAGs that block 3 drops it. The `[-PV] R3-2` arms run both,
+  through a receipt hook that filters `--diff-filter=ACMR` as core's does.
+  Red when: the render list holds every unstaged change, as rev-7's did, or a dropped row is not
+  flagged.
+- **AC23** — When a bootstrapped fixture took a flag-off `update --write` to the vintage and
+  committed it through its hooks first, block 1 runs the declared regenerate argv itself, and the
+  three blocks leave the harness `rendered` and `pinned` at that vintage. An arm compares the argv
+  block 1 runs by hand with the one `tools/workflows/kit.toml` declares.
+  Red when: block 1 needs `update` to have run the regenerate, or its hand-run argv drifts from the
+  descriptor's.
+- **AC24** — When a later update moves an edited row after the migration finished, block 3 STOPs and
+  the row keeps the base that update gave it. When the receipt or GOV moves between blocks 2 and 3,
+  block 3 STOPs and commits nothing. When GOV moved since block 1, block 2 STOPs. The `[-PV] R3-5`
+  arms run all three.
+  Red when: block 3 replays pins block 2 derived at another vintage or over another receipt.
+- **AC25** — When a bootstrapped receipt records a base for a `project-owned` row whose file the
+  tree then edited, block 2 pins it to that base and passes, and the row ends `pinned`.
+  Red when: the pin rule leaves `project-owned` rows out, so the check stops on the row.
+- **AC26** — When `tools/govkit/selftest.py` runs the blocks, it runs them with `PYTHONUTF8=0` and
+  `PYTHONIOENCODING` unset, as files rather than as `bash -c` strings, and on a node whose
+  redirected stdout is not UTF-8 they run clean. A node whose code page is UTF-8 announces the arm
+  ungraded.
+  Red when: a block reads govkit's output outside UTF-8 mode, which crashes on byte 0x97 under
+  cp1251.
+- **AC27** — When a bootstrapped receipt carries a fork `adopt` cannot attribute, block 2 counts it
+  among the unattributed rows, and the next update withholds its stamp over exactly that count.
+  Red when: the check skips a row keyed `forked` whatever its base.
+- **AC28** — When an `adopt`-bootstrapped fixture's harness row records a base with an `oid` that is
+  the edited bytes, and step 1 conflicts on it, the runbook's `restore` block commits gov's blob at
+  the row's base through the hooks, sets the edit aside in the git directory, and block 1 then runs
+  clean.
+  Red when: the recovery restores the row's `oid`, which recreates the conflict.
 
 ## 7. Gates
 
@@ -450,6 +534,7 @@ New arm: `tools/workflows/unattended-build.test.sh` · a review-harness-only ins
 New arm: `tools/workflows/unattended-build.test.sh` · the regenerate argv without `--tracked-only`, and the skip keyed on only the index or only the disk · none
 New arm: `tools/govkit/selftest.py` · rev-5's `git add -A`, its receipt pin rule, a step 1 that ignores update's exit, a check blind to new rows, a block 2 that writes, a relabelled flag-off verdict · none
 New arm: `tools/govkit/govkit.py` · the three carriers calling a flag-off update silent · none
+New arm: `tools/govkit/selftest.py` · rev-7's runbook whole, and one staged break per round-3 finding in a copy of the fixed runbook: no `TRAILER`, no `PYTHONUTF8`, every unstaged change as a render, no dropped-row flag, no hand-run regenerate, pins replayed, block 2 at any vintage, `project-owned` left unpinned, a fork read by its key, and a restore to `oid` · none
 
 ## 8. Open questions
 
@@ -522,6 +607,19 @@ New arm: `tools/govkit/govkit.py` · the three carriers calling a flag-off updat
   §4's history of the string strip, the adopter's `AUTH_PARAM` and `no-project-layer` refusals, §5
   security's override refusal, §5 testing's three parity refusals, AC8, AC15's red-when, rev-5's log
   line, and §10's probe-and-refuse provenance.
+- rev-8 · 2026-09-13 · S10 · §3 · §4 · AC21–AC28 · §7 · AMENDED by the round-3 Tier-2 diff review,
+  verdict BLOCKED on one blocker, with ten distinct defects in all. The blocker, R3-1, was round 2's
+  class again: core's `commit-msg` rule refuses every commit the runbook made, and the fixture did
+  not carry it. Every runbook commit now passes `TRAILER`, and the fixture holds core's whole hook
+  set as a declaration a PRECONDITION grades. §4 Rollout is rewritten to match the runbook: block 1
+  runs the regenerate a flag-off pull left unrun (R3-3), records only modified renders and restores
+  and flags every other regenerate change (R3-2); block 2 refuses a moved GOV (R3-5), pins
+  `project-owned` and `generated` rows (R3-6), counts an unattributed fork (R3-8) and flags a row
+  the re-adopt drops (R3-2); block 3 refuses moved pins and deletes them (R3-5); every block exports
+  `PYTHONUTF8=1` (R3-7); a restore block sets a harness edit aside at `gov_oid` (R3-9). §3's hand-off
+  names `TRAILER` and the replaced routine pull, and §4's parity-leg sentence says where the leg is
+  wired. `TOOL-dPolishedVitrine-14` carries R3-4 and R3-10. Whether this fold is re-reviewed is the
+  lander's call, because M4's convergence rule counts one blocker after one after one as not fewer.
 
 ## 10. Reuse audit
 

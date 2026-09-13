@@ -407,6 +407,112 @@ held were removed before the next start.
 same tip. Round 2 leaves `tools/unattended/` untouched, so the unattended kit's on-demand suites
 were not re-run; round 1's record of them stands.
 
+## What the round-3 review changed
+
+The round-3 Tier-2 diff review of `d36549fb...c9bc0b2a` returned BLOCKED on one blocker, with ten
+distinct defects in all. Eight are this unit's and two are `TOOL-dPolishedVitrine-14`'s, whose
+journal carries them. The report is committed under `reviews/` beside this journal. The blocker was
+round 2's class a second time: the fixture lacked a commit-time gate core has.
+
+**How the reds below were observed.** The govkit selftest's `[-PV]` section was cut into a
+standalone runner in the session scratchpad, which reads the runbook from a named file. So every
+staged break was an edit to a copy of the runbook, never to this tree, and the arms graded it
+unchanged. Run against rev-7's runbook whole, 45 of the section's 84 arms failed. Run against the
+fixed runbook, all 84 passed. Each break below is one edit to a copy of the fixed runbook, and each
+redded only its own finding's arms and arms downstream of them.
+
+- **R3-1, blocker: no runbook commit carries the attribution trailer.** Every commit in the blocks now
+  passes an operator's `TRAILER` as a paragraph of its own, `${TRAILER:+-m "$TRAILER"}`, and the
+  runbook says core's `commit-msg` rule is why and the charter is why an agent always sets it. The
+  fixture's hooks gained core's `commit-msg` rule beside the receipt check. For the class, the
+  selftest now declares every hook core installs, with each that fires on a plain `git commit`
+  marked modelled and the rest named out of scope, and a PRECONDITION reds when the fixture's hooks
+  and the declaration disagree. A LIVENESS arm shows the new hook refusing. A fresh fixture runs
+  block 1 without `TRAILER`, sees it STOP, returns the tree to HEAD with `git reset --hard`, and
+  lands the same block with it. Observed red: with `TRAILER` dropped from the blocks, 38 arms failed,
+  and core's refusal text appeared six times, once for each fixture that commits in block 1. The
+  class is now a gotcha, `fixture-lacks-a-gate-the-consumer-has`.
+- **R3-2, high: the render list was every unstaged change.** Step 1 now records only tracked
+  destinations the plan renders that a regenerate modified. Every other change a regenerate made to
+  a tracked file, a deletion included, is restored to what `update` left and flagged. Block 2 also
+  flags every receipt row the re-adopt does not measure as installed, because block 3 drops it. The
+  fixture gained a third kit, `churn`, whose regenerate deletes one tracked engine file and edits
+  another, and its receipt hook now filters on `--diff-filter=ACMR` as core's does, so a staged
+  deletion passes there as it does at core. An arm asserts that no row the migration started with
+  is gone without a FLAG. Observed red: with rev-7's rule back, five arms failed, and the receipt
+  hook refused block 3's commit over the edited churn file. With the dropped-row flag removed, its
+  arm failed and nothing else did.
+- **R3-3, high: no way in for a tree a flag-off pull had moved.** When `update` exits 0 and ran no
+  review-harness regenerate, block 1 runs the kit's declared argv itself and logs it in update's own
+  `ran` form, which `ran_ok()` reads beside update's log. An arm compares that hand-run argv with the
+  one `tools/workflows/kit.toml` declares, because a second copy of an argv is the two-answers class.
+  The runbook now says this migration replaces the routine pull for the introducing vintage. The
+  parity-leg sentence says "where a bar wires it" in all four carriers, the descriptor, the kit
+  README, the parity script's header and spec §4, the last of which the review did not list. A fifth
+  fixture takes a flag-off pull first and commits it through the hooks. Observed red: with the
+  hand-run removed, both of its arms failed, and block 1 stopped on "the review-harness regenerate
+  did not run at exit 0".
+- **R3-5, medium: block 3 replayed pins made at migration time.** Block 1 records the GOV commit it
+  moved to, and block 2 refuses a GOV that is elsewhere. Block 2 records GOV's commit and the
+  receipt's hash beside the pins, and block 3 refuses unless both still match. Block 3 deletes its
+  pins when it finishes. Done no longer tells the operator to run block 3 again: the withheld stamp
+  is the end state, re-running the migration measures the same rows the same way, and
+  `--allow-ungraded` is named for anyone who wants the stamp anyway. At vintage C the fixture gov now
+  moves the review harness's own engine file, which every fixture edits, and a later update merges
+  that row forward before block 3 is run again. Observed red: with the stamp check and the deletion
+  removed, four arms failed, and block 3 ran at exit 0 over the later update and rewound the edited
+  row's base from C to A, which is the harm the review named. With block 2's vintage check removed,
+  its arm failed.
+- **R3-6, medium: the pin rule left `project-owned` rows out and the check stopped on them.** The pin
+  rule and the check now read one list of the roles left to `adopt`, which holds only the block
+  rows, so `project-owned` and `generated` rows that record a base are pinned to it. The runbook's
+  premise that gov supplies no bytes for those rows is corrected. The bootstrapped fixture gained an
+  edited `project-owned` file whose row records a base. Observed red: with `project-owned` back in
+  the exclusion, nine arms failed, and block 2 stopped on that row in two fixtures.
+- **R3-7, medium: the program read govkit's output as UTF-8, which govkit does not write on
+  Windows.** Every block exports `PYTHONUTF8=1`. The selftest runs the blocks with `PYTHONUTF8=0`
+  and `PYTHONIOENCODING` unset, and a LIVENESS arm measured a redirected stdout as `cp1251` on this
+  node, so the arm can fail here. A node whose code page is UTF-8 announces the arm ungraded.
+  Observed red: with the export removed, 41 arms failed, on `UnicodeDecodeError` for byte 0x97 six
+  times. That is the review's reproduction exactly.
+- **R3-8, medium: the count missed forks `adopt` cannot attribute.** The check captures the ` <- sha`
+  suffix and counts a row keyed `forked` with no base. The bootstrapped fixture's `notes` kit gained
+  a fork holding the target's own bytes, and its count is now 4, which the next update withholds
+  over. Observed red: with the key-only read back, three arms failed, counting 3 against a withheld 4.
+- **R3-9, low: the conflict recovery named `oid`, the edited bytes.** The recovery is now a block,
+  `restore`, which restores the harness to its row's `gov_oid` from gov's blob at the row's
+  `commit`, sets the edit aside in the git directory, and sets the row's `oid` to the restored blob
+  in the same commit. That last step is what lets the commit through a receipt hook, where a plain
+  restore of an engine file is refused. The fixture gained an `adopt`-bootstrapped twin of `pv-tx`,
+  whose harness row records a base with `oid` the edited bytes, and runs the recovery as written
+  through to a clean block 1. Observed red: restoring to `oid` changed nothing, so the restore had
+  nothing to commit, and block 1 conflicted again. Two arms failed.
+
+Traps met, recorded so the next session does not pay for them again:
+
+- **MSYS truncates a long `bash -c` argument.** Block 1 grew past 8 KB, and handed to bash as a `-c`
+  string through Python's `subprocess` it arrived cut at 8186 bytes, so bash reported an unmatched
+  quote on a line the block does not have. An operator pastes a block and meets no such limit. The
+  selftest now writes each block to a file and runs that.
+- **A fixture's `record` field is product source to a drift signal.** The first cut of the fork
+  fixture named this unit's id as its `record`, which would have raised
+  `non_terminal_specs_cited_by_product_source` exactly as round 1's comments did. It names a closed
+  record instead.
+
+Found while fixing, and not this unit's:
+
+- Core's `scripts/check_receipt.py` reads its receipt from the working tree in `--staged` mode,
+  while its pre-commit hook's comment says both operands come from the index. The fixture's hook
+  copies the code, not the comment. Nothing in the runbook depends on which one core means.
+- A local edit to an engine file has no clean commit path at a target whose pre-commit compares
+  staged engine blobs with its receipt, because `adopt`, which would re-measure the file, refuses a
+  staged tree. The runbook's local-edit paragraph already says so for the template, and the restore
+  block works around it for the harness by writing the row's identity itself.
+
+The spec moves to rev-8, and its §9 line logs S10, §3, §4, AC21 to AC28 and §7. The review's M4
+reading makes this fold one that is not re-reviewed, because one blocker after one after one is not
+fewer, and whether that governs is still the lander's call.
+
 ## The criteria
 
 **Evidences:** TOOL-dPolishedVitrine-1
@@ -467,3 +573,25 @@ were not re-run; round 1's record of them stands.
 - AC20 — `re-rendered` — OBSERVED: `govkit selfcheck` is green on the reworded carriers after
   printing `3 problem(s)` on the old ones, and the `[-PV] R2-7` arms pass after one redded against
   a relabelled verdict.
+- AC21 — `TRAILER` — OBSERVED: on the fixture carrying core's `commit-msg` rule, block 1 without it
+  STOPs on the hook's refusal and with it lands once the tree is back at HEAD; the hook-set
+  PRECONDITION and both LIVENESS arms pass. With `TRAILER` dropped from the blocks, 38 arms redded.
+- AC22 — `--diff-filter=ACMR` — OBSERVED: the churn kit's deletion and edit are flagged and restored,
+  block 3 lands, no row goes without a FLAG, and a row untracked before block 2 is flagged as
+  dropped. rev-7's render rule redded five arms, with the receipt hook refusing the churned edit.
+- AC23 — `tools/workflows/kit.toml` — OBSERVED: after a flag-off pull committed through the hooks,
+  block 1 runs the declared argv by hand and the harness ends `rendered` and `pinned` at B, and the
+  hand-run argv equals the descriptor's. With the hand-run removed, both arms redded.
+- AC24 — `[-PV] R3-5` — OBSERVED: block 3 STOPs after a later update and the edited row keeps C,
+  STOPs over a moved receipt and a moved GOV, and block 2 STOPs at a moved GOV. With the checks
+  removed, block 3 rewound that row from C to A at exit 0.
+- AC25 — `project-owned` — OBSERVED: the edited row is pinned at A and ends `pinned`, and block 2
+  passes. With the role back in the exclusion, block 2 stopped on it in two fixtures.
+- AC26 — `PYTHONUTF8=0` — OBSERVED: every block ran clean with UTF-8 mode off where a redirected
+  stdout measured `cp1251`, handed to bash as a file. Without the export, 41 arms redded on byte
+  0x97.
+- AC27 — `forked` — OBSERVED: block 2 counts 4 with the fork among them, and the next update
+  withholds over 4. The key-only read counted 3 against a withheld 4.
+- AC28 — `restore` — OBSERVED: on the `adopt` twin, step 1 conflicts and stops, the restore block
+  commits `gov_oid` through the hooks and keeps the edit byte for byte, and block 1 then runs
+  clean. Restoring to `oid` redded two arms.

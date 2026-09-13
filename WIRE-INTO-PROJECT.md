@@ -996,39 +996,58 @@ row as an engine file, and a correct render reads as a local edit. This needs go
 which lands a new template BEFORE it re-renders; an older govkit refuses the render with
 `missing shipped copy`.
 
+**For the vintage that introduces review-harness 1.8, this migration REPLACES your routine pull.**
+Run it instead of your usual `update --write`, not after it. A tree that already took that pull
+still migrates: `update` then finds nothing left to move in review-harness and runs no regenerate,
+so block 1 runs the kit's declared regenerate argv itself and carries on.
+
 **The migration is three blocks, with a reading step before the last.** Run block 1 once, from a
-clean tree. Set three variables in the shell you run them from, at `<project>`'s root:
+clean tree. Set four variables in the shell you run them from, at `<project>`'s root:
 
 ```bash
 GOV=<gov>        # a gov checkout at the vintage you are moving to
 KIT=<kit>        # where review-harness is installed, e.g. scripts/workflows
 PY=python        # whatever runs Python 3 here
+TRAILER=         # the attribution line your commit-msg hook requires, or empty where none does
 ```
+
+**`TRAILER` is what lets these commits land where a `commit-msg` hook refuses a message without
+an attribution line**, as inCMS core's does. Unset there, every commit below is refused. An agent
+sets it in every tree, to the attribution line its charter mandates, because the charter mandates
+it on every agent commit. Each commit passes it as a paragraph of its own with a second `-m`, so no
+`--trailer` support is needed.
 
 Each block is a subshell, so a `STOP` ends that block and leaves your shell standing. Everything
 the blocks pass between them, including the small program block 1 writes, sits in your git
-directory and never in the tree.
+directory and never in the tree. Each block also exports `PYTHONUTF8=1`, because govkit prints an
+em dash on every line and, on Windows outside UTF-8 mode, writes it in the ANSI code page, which
+the program then cannot read.
 
 <!-- harness-migration 1 -->
 ```bash
-( G=$(git rev-parse --git-dir); rm -f "$G/harness-migration-ready"
+( export PYTHONUTF8=1; G=$(git rev-parse --git-dir); V=$(git -C "$GOV" rev-parse HEAD)
+  rm -f "$G/harness-migration-ready" "$G/harness-migration-moved-to.txt"
   git ls-files -z --others --exclude-standard > "$G/harness-migration-before.txt"
   cat > "$G/harness-migration.py" <<'PY'
-import json, re, subprocess, sys
+import hashlib, json, re, subprocess, sys
 g, mode = sys.argv[1], sys.argv[2]
+RECEIPT = (".governance/install.json", ".governance/install.sums")
+BLOCK_ROLES = ("merged", "attributes")  # adopt re-synthesizes these, and prints no row for them
 def read(name):  # text mode, so output a platform wrote with CRLF reads the same
     with open(f"{g}/harness-migration-{name}.txt", encoding="utf-8") as fh:
         return fh.read()
 def stop(why):
     print("STOP: " + why); sys.exit(1)
+def git(*args):
+    return subprocess.run(["git", *args], capture_output=True, text=True)
 def ran_ok():  # kits whose every regenerate argv exited 0, unrefused, in step 1
     ok = {}
-    for kit, rest in re.findall(r"  ran ([\w.-]+): .*? -> exit (\d+.*)$", read("update"), re.M):
+    for kit, rest in re.findall(r"  ran ([\w.-]+): .*? -> exit (\d+.*)$",
+                                read("update") + read("regen"), re.M):
         ok[kit] = ok.get(kit, True) and rest.strip() == "0"
     return {k for k, v in ok.items() if v}
 def tracked(*args):
-    return {p for p in subprocess.run(["git", "ls-files", "-z", *args], capture_output=True,
-                                      text=True).stdout.split("\0") if p}
+    return {p for p in git("ls-files", "-z", *args).stdout.split("\0") if p}
 def planned():  # every destination the plan at this vintage resolves: {path: (role, kit)}
     return {d: (r, k) for m, r, d, k in re.findall(r"^  (\S+) +\[(\S+) *\] (.+?)   <- (\S+)$",
                                                    read("plan"), re.M) if m != "UNRES."}
@@ -1036,7 +1055,7 @@ def rendered_here():  # every TRACKED destination the plan renders, with its kit
     t = tracked()
     return {d: k for d, (r, k) in planned().items() if r == "rendered" and d in t}
 def receipt():
-    with open(".governance/install.json", encoding="utf-8") as fh:
+    with open(RECEIPT[0], encoding="utf-8") as fh:
         return {f.get("path"): f for f in json.load(fh).get("files", [])}
 if mode == "step1":
     upd, par = read("update"), read("parity")
@@ -1050,26 +1069,42 @@ if mode == "step1":
         stop("the parity check did not grade the harness green, and its output above says why.")
     for p in sorted(tracked("--others", "--exclude-standard") - set(read("before").split(chr(0)))):
         print(f"FLAG {p}: step 1 created it and nothing rows it, so it is NOT staged")
+    # The renders are the only regenerate output block 3 stages. Anything else a regenerate did to a
+    # tracked file, a deletion included, goes back to what update left, and is named.
+    rendered, renders, back = rendered_here(), [], []
+    z = git("diff", "--name-status", "-z").stdout.split("\0")
+    for st, p in zip(z[0::2], z[1::2]):
+        if p not in RECEIPT:
+            (renders if st == "M" and p in rendered else back).append((st, p))
+    if back and git("checkout", "--", *[p for _st, p in back]).returncode:
+        stop("a file a regenerate changed outside every rendered destination could not be restored.")
+    for st, p in back:
+        print(f"FLAG {p}: a regenerate {'deleted' if st == 'D' else 'changed'} it and no rendered "
+              "row names it, so it is restored to what update left and NOT staged")
+    with open(f"{g}/harness-migration-renders.z", "w", encoding="utf-8", newline="") as fh:
+        fh.write("".join(p + "\0" for _st, p in renders))
 elif mode == "pins":
     to, rendered, ran = sys.argv[3], rendered_here(), ran_ok()
     pins = [f"--pin {d}={to}" for d, k in sorted(rendered.items()) if k in ran]
     t, plan = tracked(), planned()
     for p, f in sorted(receipt().items()):
-        if (p in t and p in plan and p not in rendered and f.get("commit") and f.get("role")
-                not in ("merged", "attributes", "project-owned", "generated", "rendered")):
+        if (p in t and p in plan and p not in rendered and f.get("commit")
+                and f.get("role") not in BLOCK_ROLES + ("rendered",)):
             pins.append(f"--pin {p}={f['commit']}")
     with open(f"{g}/harness-migration-pins.txt", "w", encoding="utf-8") as fh:
         fh.write("".join(x + "\n" for x in pins))
 elif mode == "check":
     old, rendered = receipt(), rendered_here()
     pinned = {x.split(" ", 1)[1].rsplit("=", 1)[0] for x in read("pins").splitlines() if x}
-    counted, bad = [], []
-    for key, role, d in re.findall(r"^  (\S+) +\[(\S+) *\] (.+?)(?: <- [0-9a-f]+)?$",
-                                   read("adopt"), re.M):
-        was = old.get(d)
+    counted, bad, seen = [], [], set()
+    for key, role, d, base in re.findall(r"^  (\S+) +\[(\S+) *\] (.+?)( <- [0-9a-f]+)?$",
+                                         read("adopt"), re.M):
         if key == "not-installed":
             continue
-        if key != "unattributed":
+        was = old.get(d)
+        seen.add(d)
+        # adopt prints a fork's key as `forked` whatever it measured, and a base only when it has one
+        if key != "unattributed" and not (key == "forked" and not base):
             if was is None:
                 print(f"FLAG {d}: new to the receipt, measured {key}")
             continue
@@ -1086,61 +1121,113 @@ elif mode == "check":
             continue
         counted.append(d)
         print(f"FLAG {d}: unattributed, because {why}")
+    for d in sorted(set(old) - seen):
+        if old[d].get("role") not in BLOCK_ROLES:
+            print(f"FLAG {d}: the receipt rows it and the re-adopt does not measure it as "
+                  "installed, so block 3 drops its row")
     for d in bad:
         print(f"STOP: the receipt recorded a base for {d}, and the re-adopt cannot attribute it")
     print(f"the re-adopt leaves {len(counted)} row(s) unattributed, and the next update withholds "
           "its stamp over exactly those, or re-stamps when there are none")
     sys.exit(1 if bad else 0)
+elif mode == "restore":
+    gov, path = sys.argv[3], sys.argv[4]
+    with open(RECEIPT[0], encoding="utf-8") as fh:
+        doc = json.load(fh)
+    row = next((f for f in doc.get("files", []) if f.get("path") == path), {})
+    if not (row.get("commit") and row.get("source") and row.get("gov_oid")):
+        stop(f"the receipt records no gov base for {path}, so there is no blob to restore it to.")
+    if row.get("oid") == row["gov_oid"]:
+        stop(f"{path} already holds gov's blob at its recorded base, so this conflict is not a "
+             "local edit's. Resolve it the way update's order asks.")
+    body = subprocess.run(["git", "-C", gov, "show", f"{row['commit']}:{row['source']}"],
+                          capture_output=True)
+    if body.returncode:
+        stop(f"gov holds no {row['source']} at {row['commit'][:8]}.")
+    with open(path, "rb") as fh, open(f"{g}/harness-migration-local-edit.txt", "wb") as out:
+        out.write(fh.read())
+    with open(path, "wb") as fh:
+        fh.write(body.stdout)
+    if git("hash-object", "--", path).stdout.strip() != row["gov_oid"]:
+        stop(f"{path} does not hash to its row's gov_oid once restored.")
+    row["oid"], row["sha256"] = row["gov_oid"], hashlib.sha256(body.stdout).hexdigest()
+    with open(RECEIPT[0], "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(json.dumps(doc, indent=2) + "\n")
+    with open(RECEIPT[1], "w", encoding="utf-8", newline="\n") as fh:
+        fh.write("".join(f"{f['sha256']}  {f['path']}\n" for f in doc["files"] if "sha256" in f))
+    print(f"restored {path} to gov's blob at {row['commit'][:8]}, and set this tree's edit aside "
+          f"at {g}/harness-migration-local-edit.txt")
 PY
   # 1. Move forward and re-render, then grade the harness this install holds. STOP unless update
   #    exits 0 with no conflict, the review harness's regenerate exited 0, and the harness is green.
   GOVKIT_RERENDER=1 "$PY" "$GOV/tools/govkit/govkit.py" update --target . --write > "$G/harness-migration-update.txt"
-  echo "update exit $?" >> "$G/harness-migration-update.txt"; cat "$G/harness-migration-update.txt"
+  u=$?; echo "update exit $u" >> "$G/harness-migration-update.txt"; cat "$G/harness-migration-update.txt"
+  #    A tree a flag-off pull already moved leaves update nothing to act on in review-harness, so
+  #    update ran no regenerate there. Run the kit's declared regenerate argv the same way.
+  : > "$G/harness-migration-regen.txt"
+  if [ "$u" = 0 ] && ! grep -qF '  ran review-harness: ' "$G/harness-migration-update.txt"; then
+    { bash "$KIT/check-protocol-parity.test.sh" --render --tracked-only 2>&1
+      echo "  ran review-harness: bash $KIT/check-protocol-parity.test.sh --render --tracked-only -> exit $?"
+    } > "$G/harness-migration-regen.txt"; cat "$G/harness-migration-regen.txt"
+  fi
   bash "$KIT/check-protocol-parity.test.sh" --tracked-only > "$G/harness-migration-parity.txt" 2>&1
   echo "parity exit $?" >> "$G/harness-migration-parity.txt"; cat "$G/harness-migration-parity.txt"
+  "$PY" "$GOV/tools/govkit/govkit.py" plan --target . > "$G/harness-migration-plan.txt" \
+    || { echo "STOP: plan failed."; exit 1; }
   "$PY" "$G/harness-migration.py" "$G" step1 || exit 1
   # 2. Commit update's own writes with the receipt that records them, and nothing the regenerate
-  #    wrote: those stay unstaged until block 3 rows them `rendered`.
+  #    wrote: the renders stay unstaged until block 3 rows them `rendered`.
   git add -- .governance/install.json .governance/install.sums
-  git commit -q -m "govkit update: review-harness 1.8" || { echo "STOP: that commit was refused."; exit 1; }
-  git diff --name-only -z > "$G/harness-migration-renders.z" )
+  git diff --cached --quiet || git commit -q -m "govkit update: review-harness 1.8" ${TRAILER:+-m "$TRAILER"} \
+    || { echo "STOP: that commit was refused."; exit 1; }
+  echo "$V" > "$G/harness-migration-moved-to.txt" )
 ```
 
 <!-- harness-migration 2 -->
 ```bash
-( G=$(git rev-parse --git-dir); rm -f "$G/harness-migration-ready"
+( export PYTHONUTF8=1; G=$(git rev-parse --git-dir)
+  rm -f "$G/harness-migration-ready" "$G/harness-migration-stamp.txt"
+  V=$(cat "$G/harness-migration-moved-to.txt" 2>/dev/null) || { echo "STOP: block 1 has not finished clean."; exit 1; }
+  [ "$(git -C "$GOV" rev-parse HEAD)" = "$V" ] \
+    || { echo "STOP: GOV is not at $V, the vintage block 1 moved this tree to, so step 1's log says nothing about it."; exit 1; }
   # 3. Derive the pins from the plan at this vintage. 4. Run the re-adopt READ-ONLY and check it.
   #    Nothing here writes to the tree, so this block can be run again after you fix a STOP.
   "$PY" "$GOV/tools/govkit/govkit.py" plan --target . > "$G/harness-migration-plan.txt" \
     || { echo "STOP: plan failed."; exit 1; }
-  "$PY" "$G/harness-migration.py" "$G" pins "$(git -C "$GOV" rev-parse HEAD)" || exit 1
+  "$PY" "$G/harness-migration.py" "$G" pins "$V" || exit 1
   "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $(cat "$G/harness-migration-pins.txt") \
     > "$G/harness-migration-adopt.txt"; rc=$?; cat "$G/harness-migration-adopt.txt"
   [ "$rc" = 0 ] || { echo "STOP: the read-only re-adopt refused."; exit 1; }
-  "$PY" "$G/harness-migration.py" "$G" check && touch "$G/harness-migration-ready" )
+  "$PY" "$G/harness-migration.py" "$G" check || exit 1
+  echo "$V $(git hash-object .governance/install.json)" > "$G/harness-migration-stamp.txt"
+  touch "$G/harness-migration-ready" )
 ```
 
-Read every `FLAG` line block 2 printed before you run block 3. Each names its reason, and the
+Read every `FLAG` line blocks 1 and 2 printed before you run block 3. Each names its reason, and the
 paragraphs after block 3 say why each reason is expected.
 
 <!-- harness-migration 3 -->
 ```bash
-( G=$(git rev-parse --git-dir); PINS=$(cat "$G/harness-migration-pins.txt")
-  [ -f "$G/harness-migration-ready" ] || { echo "STOP: block 2 has not finished clean."; exit 1; }
+( export PYTHONUTF8=1; G=$(git rev-parse --git-dir); PINS=$(cat "$G/harness-migration-pins.txt" 2>/dev/null)
+  [ -f "$G/harness-migration-ready" ] || { echo "STOP: block 2 has not finished clean since the last block 3."; exit 1; }
+  [ "$(cat "$G/harness-migration-stamp.txt")" = "$(git -C "$GOV" rev-parse HEAD) $(git hash-object .governance/install.json)" ] \
+    || { echo "STOP: GOV or the receipt moved after block 2 derived these pins. Run block 2 again."; exit 1; }
   # 5. Re-row, then commit the re-rendered files with the receipt that now rows them `rendered`.
   "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $PINS --write || { echo "STOP: adopt refused."; exit 1; }
   git add -- .governance/install.json .governance/install.sums
   [ ! -s "$G/harness-migration-renders.z" ] \
     || git add --pathspec-from-file="$G/harness-migration-renders.z" --pathspec-file-nul
-  git diff --cached --quiet || git commit -q -m "govkit adopt --re-adopt: the build harness is rendered" \
-    || { echo "STOP: that commit was refused."; exit 1; }
+  git diff --cached --quiet || git commit -q -m "govkit adopt --re-adopt: the build harness is rendered" ${TRAILER:+-m "$TRAILER"} \
+    || { echo "STOP: that commit was refused. Unstage it with git reset -q, then run blocks 2 and 3 again."; exit 1; }
   # 6. Re-adopt once more. Step 5 read each render's identity from the index before the render was
-  #    staged, and this run reads the commit that holds it. Both commits are skipped when there is
-  #    nothing to commit, so this block can be run again.
+  #    staged, and this run reads the commit that holds it. A STOP from here on is recovered by
+  #    running block 2 again and then this block, whose commits are skipped when nothing is staged.
   "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $PINS --write || { echo "STOP: adopt refused."; exit 1; }
   git add -- .governance/install.json .governance/install.sums
-  git diff --cached --quiet || git commit -q -m "govkit adopt --re-adopt: record the committed renders" \
-    || { echo "STOP: that commit was refused."; exit 1; } )
+  git diff --cached --quiet || git commit -q -m "govkit adopt --re-adopt: record the committed renders" ${TRAILER:+-m "$TRAILER"} \
+    || { echo "STOP: that commit was refused. Unstage it with git reset -q, then run blocks 2 and 3 again."; exit 1; }
+  # These pins describe this receipt at this vintage and no later one, so they go with the migration.
+  rm -f "$G/harness-migration-ready" "$G/harness-migration-pins.txt" "$G/harness-migration-stamp.txt" )
 ```
 
 **Why the re-adopt.** It is the only verb that re-reads a row's role from the descriptor, and it
@@ -1151,19 +1238,43 @@ conflicts on a file, `update` leaves that row untouched at its old commit, write
 `.governance/outbox/` and exits 1, and the regenerate still runs, so the parity check alone passes.
 Carried on, block 3 would record the regenerated harness as current over an edit the merge could not
 place. Any STOP in block 1 leaves update's writes in the tree uncommitted, and `update` refuses to
-run over dirty paths it claims, so return the tree to HEAD before running block 1 again. A conflict
-on the harness itself is the local edit the paragraph on local edits below carries into the
-template: set it aside and restore the harness to the blob its receipt row records. A conflict
-anywhere else is resolved the way `update`'s own message asks.
+run over dirty paths it claims, so return the tree to HEAD with `git reset -q --hard HEAD` before
+running block 1 again. A conflict anywhere but the harness is resolved the way `update`'s own
+message asks.
+
+A conflict on the harness itself comes from a local edit, which the paragraph on local edits below
+carries into the template. Set the edit aside by restoring the harness to its row's `gov_oid`,
+which is gov's blob at the row's `commit`, and committing that. Do not restore it to the row's
+`oid`: in a receipt `adopt` measured, `oid` is your edited bytes, so restoring to it recreates the
+conflict. The block below does the restore from `git -C "$GOV" show <commit>:<source>`, saves your
+edit in the git directory, and sets the row's `oid` to the restored blob in the same commit, which
+is what a commit-time receipt check needs. Then run block 1 again.
+
+<!-- harness-migration restore -->
+```bash
+( export PYTHONUTF8=1; G=$(git rev-parse --git-dir)
+  [ -f "$G/harness-migration.py" ] || { echo "STOP: run block 1 first, which writes the program this block runs."; exit 1; }
+  [ -z "$(git status --porcelain --untracked-files=no)" ] || { echo "STOP: return the tree to HEAD first."; exit 1; }
+  "$PY" "$G/harness-migration.py" "$G" restore "$GOV" "$KIT/unattended-build.js" || exit 1
+  git add -- "$KIT/unattended-build.js" .governance/install.json .governance/install.sums
+  git commit -q -m "set the build harness's local edit aside: it holds gov's blob at its recorded base" ${TRAILER:+-m "$TRAILER"} \
+    || { echo "STOP: that commit was refused."; exit 1; } )
+```
 
 **Why block 1 commits only what `update` staged.** Until block 3 the receipt still rows the harness
 as an engine file. A commit-time check that compares staged engine blobs with the receipt therefore
 reds the re-rendered harness, and the re-adopt that would clear that refuses a staged tree. So step
 2 commits update's own writes with the receipt that records them, which passes such a check, and
 block 3 stages the renders once their rows are `rendered`. It stages them by name, from the list
-step 2 recorded. A file step 1 CREATED is flagged and never staged, because nothing rows it. Once
-step 2 has committed, block 1 is done: its regenerated files stay unstaged, and `update` would
-refuse them as dirty. Block 2 writes nothing to the tree, so run it again as often as a STOP needs.
+step 1 recorded, and that list holds only tracked destinations the plan renders that a regenerate
+modified. A file step 1 CREATED is flagged and never staged, because nothing rows it. Anything else
+a regenerate did to a tracked file, a deletion included, is restored to what `update` left and
+flagged. Staged, such a change would land under the renders' commit subject, and a deleted row the
+receipt still pins makes block 3's second re-adopt refuse after that commit has landed. Once step 2
+has committed, block 1 is done: its regenerated files stay unstaged, and `update` would refuse them
+as dirty. Block 2 writes nothing to the tree, so run it again as often as a STOP needs. Block 2 and
+block 3 each refuse a GOV that has moved since block 1, because step 1's log, which says which kits
+regenerated, describes that vintage and no other.
 
 **Why these pins, and where each one comes from.**
 
@@ -1185,40 +1296,55 @@ refuse them as dirty. Block 2 writes nothing to the tree, so run it again as oft
   `--allow-ungraded` can break, so that is an assertion you make by hand and never a default.
 - A rendered destination is never pinned to a recorded commit. After a conflicted step 1 that
   commit predates the template, and `adopt` refuses a pin naming a base gov does not hold.
-- Block rows (`merged`, `attributes`) and rows gov supplies no bytes for (`project-owned`,
-  `generated`) are left to `adopt`, which re-synthesizes them.
+- Block rows (`merged`, `attributes`) are left to `adopt`, which re-synthesizes them and prints no
+  row for them. Every other role that records a `commit` is pinned to it, `project-owned` and
+  `generated` included. `adopt` measures those with the same walk as an engine row, so an edited
+  one would come back `unattributed` without its pin, and the check would stop on it. The pins and
+  the check read one list of the roles left to `adopt`, so the two cannot disagree about a row.
 
 **What block 2's check reports.** It flags every row new to the receipt, pinned or not, because
 nothing recorded a base for it before. It flags every row the re-adopt leaves `unattributed`, with
 one of four reasons: new to the receipt, unattributed before, a render its kit did not regenerate,
-or a row that recorded no base before. It STOPs on a row the receipt recorded a base for that the
-re-adopt cannot attribute, because the migration would have made that row worse. Its last line
-counts the unattributed rows. `adopt` re-measures only the kits `.governance/deploy.toml` names in
-`kits`, so check that list covers every kit the receipt claims first. The pin list is split on
-whitespace, so a path holding a space needs its flags passed by hand.
+or a row that recorded no base before. A `forked` row counts as unattributed when `adopt` prints it
+with no base, because `adopt` prints a fork's key as `forked` whatever it measured. The check also
+flags every row the receipt holds that the re-adopt does not measure as installed, because block 3
+drops that row. It STOPs on a row the receipt recorded a base for that the re-adopt cannot
+attribute, because the migration would have made that row worse. Its last line counts the
+unattributed rows. `adopt` re-measures only the kits `.governance/deploy.toml` names in `kits`, so
+check that list covers every kit the receipt claims first. The pin list is split on whitespace, so
+a path holding a space needs its flags passed by hand.
 
 **A local edit to the old harness does not survive step 1.** The re-render overwrites the harness
 with the template's render. Carry the edit into `<kit>/unattended-build.template.js` after block 3,
 re-run `bash <kit>/check-protocol-parity.test.sh --render`, commit the template and its render, then
-run block 3 again, which records the template's delta. A target whose pre-commit compares staged
-engine blobs with its receipt refuses that commit, as it refuses any local edit to an engine file,
-and that is its own check's rule rather than this migration's.
+run blocks 2 and 3 again, which record the template's delta. A target whose pre-commit compares
+staged engine blobs with its receipt refuses that commit, as it refuses any local edit to an engine
+file, and that is its own check's rule rather than this migration's.
 
 **Done looks like this.** The receipt rows the harness `rendered` with `evidence: "pinned"`, and
-every row block 2 did not flag keeps the attribution it had. The next `update --write` writes
+every row blocks 1 and 2 did not flag keeps the attribution it had. The next `update --write` writes
 nothing to the harness. It either re-stamps, or it withholds the stamp over exactly the rows block
-2's last line counted, and says how many. **Do not answer that message with the bare
-`adopt --re-adopt --write` it suggests.** That is the unpinned re-adopt, and it drops the harness's
-`pinned` evidence and every edited row's base. Run block 3 again, which carries the pins, or pass
-`--allow-ungraded` to `update` knowingly. Having the message name the pinned form is
+2's last line counted, and says how many. That withheld stamp is the migration's end state, not a
+fault in it. **Do not answer that message with the bare `adopt --re-adopt --write` it suggests.**
+That is the unpinned re-adopt, and it drops the harness's `pinned` evidence and every edited row's
+base. Re-running the migration does not clear the message either, because it measures the same
+rows the same way. Pass `--allow-ungraded` to `update` knowingly, or live with the
+withheld stamp. Blocks 2 and 3 are run again only to recover from a STOP inside the migration, at
+the vintage block 1 moved to. Block 3 deletes its pins when it finishes, and blocks 2 and 3 refuse a
+GOV that has moved since block 1, because pins derived at one vintage and replayed after a later
+update would rewind every row that update moved. Having the message name the pinned form is
 `DEPL-dPolishedVitrine-1`'s, and so is `update` learning to move a role itself, which retires this
 section.
 
-The govkit selftest's `[-PV]` arms cut these three blocks out of this file and run them on every
-self-test run, so the text you copy is the text that was tested. They run on a fixture `apply`
-installed and on one `adopt` bootstrapped, which carries a commit-time receipt check, a row
-unattributed before the migration, a kit that declines its regenerate, and two destinations the
-receipt never rowed.
+The govkit selftest's `[-PV]` arms cut these blocks out of this file and run them on every
+self-test run, so the text you copy is the text that was tested. They run on fixtures `apply`
+installed and on ones `adopt` bootstrapped, through inCMS core's two commit-time hooks: a receipt
+check and a `commit-msg` rule that wants an attribution line. The fixtures carry a row unattributed
+before the migration, an edited `project-owned` row, a fork `adopt` cannot attribute, a kit that
+declines its regenerate, a kit whose regenerate deletes and edits tracked files, two destinations
+the receipt never rowed, a flag-off pull taken first, a conflicting harness edit, and a later
+update after Done. The blocks run with Python's UTF-8 mode off, so a node that exports it cannot
+hide an encoding dependency.
 
 ### The hooks ship ONE copy each — migrating a tree that has two
 

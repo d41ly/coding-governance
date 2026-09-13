@@ -24,7 +24,7 @@
 # `[[regenerate]]` argv, so an update run with GOVKIT_RERENDER=1 re-renders every pair this install
 # already holds. With GOVKIT_RERENDER unset `update` declines that block without printing anything
 # about it, yet it still prints each moved render's row as `re-rendered` although no render ran, and
-# this leg is what reds the stale copy.
+# this leg, wherever a bar wires it, is what reds the stale copy.
 #
 # WHY THE REGENERATE CREATES NOTHING (round 2, R2-3). govkit runs that argv with its output captured,
 # prints one `ran` line, and rows nothing the argv writes. A render mode that created a missing live

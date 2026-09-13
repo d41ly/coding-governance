@@ -43,6 +43,17 @@
 # outside the run, because `--landed`'s witness is a commit already on the remote and so the code in
 # the commit recording it is not in what landed. The last live phase, LANDING, is still graded.
 #
+# A WRONGLY PICKED BUILD COMMIT MAY NOT BUY A SKIP. `build_commit` returns the EARLIEST in-range commit
+# that names the id and touches a path outside the record surface, and a hand commit made between two
+# runs qualifies. At that commit the record still reads the first run's terminal phase, and the second
+# run's preflight retires the record only afterwards, so HEAD still bears the claim out. Round 3 of the
+# closing review of build `dPolishedVitrine` reproduced a unit built during the second, live run being
+# skipped exactly that way. So before a skip is honoured, every later commit that the same predicate
+# accepts for the id is asked the same phase question, and the first one made while a run was live is
+# where the unit is graded, announced by id with both commits and counted. This fails CLOSED: a later
+# commit that names the id while a run is live grades the unit even if it only touched a file the conf
+# forgot to exclude. The library is not changed, so `pass-order` keeps the pick it always had.
+#
 # THE CLAIM MUST STILL STAND AT HEAD, because the run authors the phase it commits. A record reading
 # LANDED at one commit and BUILDING at the next would otherwise buy a unit out of this leg with two
 # hand edits that leave nothing at HEAD. So the skip is honoured only while HEAD carries a record
@@ -279,7 +290,7 @@ if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
   exit 2
 fi
 
-graded=0; skipped_cutoff=0; nobase=0; unbuilt=0; postrun=0; unborne=0
+graded=0; skipped_cutoff=0; nobase=0; unbuilt=0; postrun=0; unborne=0; regraded=0
 violations=""; announced=""
 
 # THE POPULATION COMES FROM THE GRADED COMMIT, selector included. `git ls-files` enumerates the INDEX,
@@ -347,6 +358,29 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
       ''|*[!A-Z]*) ;;
       *) case " $TERMINAL_PHASES " in *" $_ph "*) _fin=1 ;; esac ;;
     esac
+    # THE PICK IS CHECKED BEFORE IT BUYS A SKIP. The header's section on a wrongly picked build commit
+    # is the argument. Every later commit that `build_commit`'s own predicate accepts for this id is
+    # asked the same phase question, the subject cache filtering first so the predicate runs only on a
+    # commit that names the id. The first one made while a run was live is where the unit is graded.
+    if [ "$_fin" = 1 ]; then
+      _live_c=""; _live_ph=""
+      for _lc in $(GIT rev-list --reverse "$build_c..HEAD" 2>/dev/null); do
+        case "${_SUBJ[$_lc]-}" in ''|*" $id "*) ;; *) continue ;; esac
+        [ -n "$(build_commit "$_lc^!" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")" ] || continue
+        _lph=$(GIT show "$_lc:$run" 2>/dev/null | awk "$CLAIM_AWK")
+        _lph=${_lph#*$'\n'}; _lph=${_lph%%$'\n'*}
+        case "$_lph" in ''|*[!A-Z]*) ;; *) case " $TERMINAL_PHASES " in *" $_lph "*) continue ;; esac ;; esac
+        _live_c=$_lc; _live_ph=$_lph; break
+      done
+      if [ -n "$_live_c" ]; then
+        regraded=$((regraded+1))
+        announced="$announced
+brief-recorded: GRADED AT A LATER COMMIT — $id: the earliest commit naming it, $(GIT rev-parse --short "$build_c"), was made while $run read $_ph, but $(GIT rev-parse --short "$_live_c") also names it and touches a path outside the record surface while $run read ${_live_ph:-no phase}, so the unit was worked on during a live run and is graded there"
+        build_c=$_live_c
+        _sb=$(GIT show "$build_c:$run" 2>/dev/null || true)
+        _fin=0
+      fi
+    fi
     if [ "$_fin" = 1 ]; then
       # WHO STILL MAKES THIS CLAIM AT HEAD: the run-state file itself, or a retired record that was
       # not yet retired at the build commit. The name is shape-checked against the one grammar the
@@ -443,12 +477,14 @@ done
 # protocol section 1 cost 2 concedes that - so what this buys is a trace, not a guard, and saying
 # which is the point.
 #
-# THE TWO POST-RUN COUNTS ARE SUBSETS OF `graded`, like `unbuilt-in-range`. The first is the population
+# THE THREE POST-RUN COUNTS ARE SUBSETS OF `graded`, like `unbuilt-in-range`. The first is the population
 # this leg does NOT grade, and a skip must announce itself: every such unit also gets its own line below
 # naming it, the commit and the phase. The second is graded as though its run were live, and it is
 # counted because a terminal claim HEAD does not bear out is either a hand edit or a forgery, and both
-# are worth a reader's eye whether or not the unit also carries a brief.
-echo "brief-recorded: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $BRIEF_RECORDED_CUTOFF cutoff · $nobase build(s) with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range · $postrun unit(s) built after their run finished, not graded · $unborne unit(s) built under a finished claim HEAD does not bear out, graded"
+# are worth a reader's eye whether or not the unit also carries a brief. The third is graded at a later
+# commit than the one `build_commit` picked, and it is counted because each is a pick the library got
+# wrong, which the sibling leg still trusts.
+echo "brief-recorded: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $BRIEF_RECORDED_CUTOFF cutoff · $nobase build(s) with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range · $postrun unit(s) built after their run finished, not graded · $unborne unit(s) built under a finished claim HEAD does not bear out, graded · $regraded unit(s) whose earliest commit fell after their run finished and a later one inside a live run, graded at the later"
 echo "brief-recorded: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
 if [ -n "$announced" ]; then
   printf '%s\n' "${announced#?}"
