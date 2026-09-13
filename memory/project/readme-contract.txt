@@ -139,3 +139,4 @@ memory/builds/dMuffledSentinel/README.md
 memory/builds/cGradedDebt/README.md
 memory/builds/cSpliceWarden/README.md
 memory/builds/cWidenedNet/README.md
+memory/builds/aRatifiedRulings/README.md

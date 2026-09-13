@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.74 -->
+<!-- gov:kit memory-tree@2.75 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -113,7 +113,7 @@ item present ONLY a conforming mark resolves it, the first line does not vote, a
 
 ## M4 — The spec audit — review every unreviewed spec before its code
 
-**Which**, and this is what `specs-reviewed` measures. Every spec with no review record naming it. A spec whose rev moved since its last review, or that you
+**Which**, and this is what `specs-reviewed` measures. Every spec with no review record naming it. A spec whose rev moved since its last review — by anything but that review's own fold — or that you
 authored this run, is unreviewed.
 
 **The harness needs a DECLARED subject.** `tier2-review.js` audits a spec only when the call
@@ -138,6 +138,10 @@ answerable from the tree instead of from memory. Grammar: `memory/HYGIENE.md`, "
 line), then **STOP**: once a synthesis pass calls the design clean, stop reviewing that spec.
 
 **A BLOCKED verdict has a disposition, and until now it had none.** The loop is bounded by CONVERGENCE, not a round count: a round re-arms only if its confirmed-blocker count is STRICTLY SMALLER than the one before — not merely "changed", which a 2, 1, 2 oscillation satisfies forever. **At the exit every blocker still standing is DISPOSED**: FOLD a defect in a document the review read, PROMOTE one needing a mechanism this build lacks and audit it as a SPEC; never parked, waived or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. A runaway ceiling backstops a defect in the predicate; reaching it is itself a defect, so the run promotes and lands anyway and says so in its output AND the build README's BUILD-LEVEL RULES slot.
+
+**CONVERGED is terminal for its subject, rev bumps included**: a blocker confirmed on it afterwards — in the
+fold text, say — takes the exit's own disposition, FOLD or PROMOTE, and never another round; `--review`
+refuses the round and names this route.
 
 ## M5 — Recall and reuse
 
