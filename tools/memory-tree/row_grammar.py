@@ -149,10 +149,17 @@ GENERIC_ID = re.compile(r"[A-Z][A-Z0-9]{1,9}-[A-Za-z0-9]+-[0-9]+[a-z]*")
 # The date half and the STEM half are a conjunction and each carries the other's weight — the date
 # keeps a family-named file that is not a rotation out, the stem keeps a dated file that is not a row
 # document out. The optional trailing `[a-z0-9]*` is a same-day DISAMBIGUATOR: two builds rotated to
-# one date on 2026-08-17 and the second is `TOOL.2026-08-17b.md`. Shared with check 10 in
-# `check-memory-hygiene.sh`, which enumerates the same set in shell and is joined to this one by an
-# arm in the self-test rather than by a promise.
-ROTATED = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md$")
+# one date on 2026-08-17 and the second is `TOOL.2026-08-17b.md`.
+#
+# ONE FULLMATCH, not startswith-plus-search. The first cut tested the stem with `startswith` and the
+# date with `search`, which admits a date ANYWHERE after the stem: `TOOL.notes.2026-01-01.md` passed
+# here and was refused by check 10, whose ERE anchors the date immediately after the stem's dot. Two
+# readers of one rule that disagree on a real filename is the defect the cross-reader arm exists to
+# catch, and it missed this one because its fixture held no such name — so the fixture now does.
+# Built from the declared stems so it is the same conjunction the shell spells, in the same order.
+def rotated_re(conf):
+    stems = "|".join(re.escape(x) for x in ["DECISIONS"] + declared_families(conf))
+    return re.compile(r"(?:" + stems + r")\.[0-9]{4}-[0-9]{2}-[0-9]{2}[a-z0-9]*\.md\Z")
 
 
 def row_docs(root, m, conf):
@@ -177,14 +184,14 @@ def row_docs(root, m, conf):
     a row document", and a declared answer cannot narrow behind your back.
     """
     tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
-    stems = tuple(f"{x}." for x in ["DECISIONS"] + declared_families(conf))
+    rot = rotated_re(conf)
     keep = []
     for p in tracked:
         base = os.path.basename(p)
         if p == f"{m}/DECISIONS.md" or p.startswith(f"{m}/backlog/"):
             keep.append(p)
         elif p.startswith(f"{m}/archive/") and "/" not in p[len(f"{m}/archive/"):]:
-            if base.startswith(stems) and ROTATED.search(base):
+            if rot.match(base):
                 keep.append(p)
     return sorted(keep)
 
@@ -477,10 +484,19 @@ def cmd_selftest():
                                                    "- ARCH-tNope-1 · and quoted twice\n",
                               "NOTAFAMILY.2026-01-01.md": "- ARCH-tNope-2 · dated, wrong stem\n"
                                                           "- ARCH-tNope-2 · twice\n",
+                              # The date must sit IMMEDIATELY after the stem's dot. This name has the
+                              # right stem and a date further along, and the two readers split on it
+                              # until the Python side became one anchored fullmatch.
+                              "ARCH.notes.2026-01-01.md": "- ARCH-tNope-4 · a date, but not a rotation\n"
+                                                          "- ARCH-tNope-4 · twice\n",
                               os.path.join("ledger", "a.md"): "- ARCH-tNope-3 · a retired shard\n"
-                                                              "- ARCH-tNope-3 · twice\n"})
+                                                              "- ARCH-tNope-3 · twice\n",
+                              # THE POSITIVE. Without one that MUST be selected, both readers
+                              # returning nothing is "agreement", and the arm passes over a predicate
+                              # that selects nothing at all.
+                              "ARCH.2026-02-02.md": "- ARCH-tYes-1 · a real rotation, selected\n"})
         arm("a frozen non-row file under archive/ is NOT scanned",
-            "row-grammar: clean", lambda: cap(t11, c11))
+            "row-grammar: clean (2 row(s)", lambda: cap(t11, c11))
 
         # THE TWO READERS OF ONE RULE. check 10 in check-memory-hygiene.sh enumerates the same set in
         # shell; this module does it in Python. Neither can import the other, so the rule would be
@@ -520,22 +536,30 @@ def cmd_selftest():
                         "agree")
             ere = _ask_shell(sh, t11)
             if ere is None:
-                return ("JOIN-OK SKIPPED — no candidate shell RAN `--print-rotated-archive-ere` on "
-                        "this node, so the two readers were NOT compared. Set GOV_BASH to a usable "
-                        "bash. This arm verifies nothing when it prints this line")
+                # PRINTED, not merely returned. `arm()` prints the label alone on success, so a skip
+                # returned as a passing value is indistinguishable from a verified one — which is the
+                # whole objection to a silent skip.
+                print("arm SKIP  the cross-reader join did NOT run: no candidate shell executed "
+                      "`--print-rotated-archive-ere` on this node. The two readers were NOT compared. "
+                      "Set GOV_BASH to a usable bash to exercise it.")
+                return ("JOIN-OK SKIPPED — announced above; this arm verified nothing")
             rx = re.compile(ere.replace("$M", "memory"))
             tracked = [x for x in run("git", "ls-files", "--", "memory/", cwd=t11).split("\n") if x]
             shell_set = sorted(x for x in tracked if rx.search(x))
             py_set = sorted(x for x in row_docs(t11, "memory", c11) if x.startswith("memory/archive/"))
             if shell_set != py_set:
                 return f"DISAGREE shell={shell_set} python={py_set}"
-            # Anti-vacuity: agreeing on two EMPTY sets is what a broken predicate on both sides also
-            # produces, and this fixture deliberately holds three archive-shaped files that must NOT
-            # be selected plus none that must, so the agreement has to be checked against a tree
-            # where the answer is known rather than merely equal.
-            if len(tracked) < 4:
-                return f"VACUOUS — the fixture held {len(tracked)} tracked files, too few to discriminate"
-            return f"JOIN-OK AGREE (both selected {len(py_set)} of {len(tracked)} tracked files)"
+            # ANTI-VACUITY, and it is the whole value of this arm. Two readers that both select
+            # NOTHING agree, and so do two that are both broken. The fixture holds names that must be
+            # selected and names that must not, so the comparison is checked against a tree whose
+            # answer is known rather than merely equal on both sides.
+            if not py_set:
+                return ("VACUOUS — both readers selected NOTHING, so the agreement says only that two "
+                        "predicates are equally silent; the fixture must hold a selectable archive")
+            if len(py_set) == len(tracked):
+                return ("VACUOUS — both readers selected EVERY tracked file, so nothing was "
+                        "discriminated")
+            return f"JOIN-OK AGREE (both selected {sorted(py_set)} of {len(tracked)} tracked files)"
         arm("check 10's shell enumeration and row_docs() select the same archives",
             "JOIN-OK", _joined)
 
