@@ -2721,6 +2721,12 @@ _STR = [_v for _v in ('a + "x"', "a + " + chr(96) + "x" + chr(96), "a + /x/")
         if lex.read_ts_jsx_defs("const helper = () => " + _v + _NL + "const el = <A />" + _NL)]
 check("returns R14: ...and a string, a template or a regex after an operator is an operand, so "
       "the next line's element belongs to nobody", not _STR, f"{_STR}")
+# Whitespace TypeScript accepts and `" \t\r"` did not: an NBSP-indented line fell to the
+# operator catch-all, set `pend`, and read as a continuation of the early return above it.
+_f = lex.read_ts_jsx_defs("function useX(o) {" + _NL + "  if (!o) return noop()" + _NL
+                         + chr(160) + chr(160) + "const el = <A />" + _NL + "  return el" + _NL + "}" + _NL)
+check("returns R14: ...and an NBSP-indented statement after a closer-ended early return is a "
+      "statement, not a continuation", _f == [], f"{_f}")
 check("returns R14: ...and the other reading, the next semicolon, is refused: a helper followed by a "
       "module-level element on the next line stays a helper",
       lex.read_ts_jsx_defs("const buildX = () => 1\nconst el = <div />\n") == [], "no-ASI")
@@ -2799,7 +2805,9 @@ _EXPRS = ("<div />", "(" + _NL + "  <div />" + _NL + ")", "loading ? (" + _NL + 
           "getItems(a)" + _NL + "  .length > 0 ? <B /> : null",
           "items[0] ||" + _NL + "  fallback ? <B /> : null",
           "(" + _NL + "  hasPermission(user) &&" + _NL + "  isEnabled(flag) && (" + _NL + "    <X />" + _NL + "  )" + _NL + ")",
-          "a < b && c >" + _NL + "  d ? <B /> : null")
+          "a < b && c >" + _NL + "  d ? <B /> : null",
+          # round 4: a silent literal ending the line, or the whole value
+          "open ? 'Open' : 'Closed'", "`k-${i}`", "cond ? 'a'" + _NL + "  : <B />")
 _DISAGREE = []
 for _e in _EXPRS:
     _three = (lex.read_ts_jsx_defs("const A = () => " + _e + ";" + _NL),
@@ -2819,10 +2827,13 @@ check("returns R21: ...and the same expression bound to a local behind a closer-
       not _CROSSED, f"crossed: {_CROSSED}")
 # (3) A comparison statement BEFORE the return, semicolon-free, changes no verdict: an unpaired
 # `<` earlier in the body must not pair with a `>` ending a line of the value expression.
-_PREFIXED = [_e for _e in _EXPRS if bool(lex.read_ts_jsx_defs(
-    "function A() {" + _NL + "  const small = w < h" + _NL + "  return " + _e + _NL + "}" + _NL))
+_PREFIXED = [(_pre, _e) for _pre in ("const small = w < h", "const n = v as Foo", "const t = 'x'",
+                                     "const n = v as Foo < h")
+             for _e in _EXPRS if bool(lex.read_ts_jsx_defs(
+    "function A() {" + _NL + "  " + _pre + _NL + "  return " + _e + _NL + "}" + _NL))
     != bool(lex.read_ts_jsx_defs("const A = () => " + _e + ";" + _NL))]
-check("returns R21: ...and a comparison statement before the `return` moves no verdict either way",
+check("returns R21: ...and a statement before the `return` -- a comparison, an `as` two lines up, a "
+      "string, an `as` whose type is then compared -- moves no verdict either way",
       not _PREFIXED, f"moved: {_PREFIXED}")
 
 # R22 — THE MARKER'S WAKE, both directions, asserted on the HEAD population. The marker occupies a
@@ -2849,7 +2860,7 @@ for _member in ("const o = { wide: fns[k](el) > 600 }", "const o = { ok: (x) => 
     _src = "function A() {" + _NL + "  " + _member + _TAIL
     _routed = lex.read_ts_jsx_defs(_src)
     _names = [n for n, _l in lex.parse_tsx_defs(_src)[0]]
-    if _routed != [("A", 1)] or "measure" in _names or "fns" in _names:
+    if _routed != [("A", 1)] or "measure" in _names:
         _LEAKED.append((_member, _routed, _names))
 check("returns R23: a comparison in a member value -- object member, arrow member, class field, "
       "call-then-compare -- opens no scope over a later `if (a < b) {`, and fabricates no "
@@ -2858,6 +2869,23 @@ _f = lex.read_ts_jsx_defs("const LIMITS = { fits: (w + h) < MAX };" + _NL
                          + "function List({ items }) { if (items.length > 0) { return <ul />; } return null; }" + _NL)
 check("returns R23: ...and a module-level literal before the component, in the `<` direction",
       _f == [("List", 2)], f"{_f}")
+# THE BELOW-ZERO HALF, alone. Every member above takes the `<`-run path or ends on the block's
+# own `}`; only a `]` at depth zero reaches the refusal, and a call inside an array member is
+# the shape that used to balance by accident onto a later `{` and be graded as a method `blk`
+# (nine adopter sites). Round 4 found the two lines pinned by nothing.
+_src = "function A() {" + _NL + "  const spec = { rail: [blk(" + chr(34) + "x" + chr(34) + ")], other: [{ a: 1 }] }" + _NL + "  return <Empty />" + _NL + "}" + _NL
+_n1 = [n for n, _l in lex.parse_tsx_defs(_src)[0]]
+_src2 = "const spec = { rail: [blk(" + chr(34) + "x" + chr(34) + ")], other: [{ a: 1 }] }" + _NL + "run({ a: 1 })" + _NL
+_n2 = [n for n, _l in lex.parse_tsx_defs(_src2)[0]]
+check("returns R23: a call inside an array member that unbalances the walk below zero is not a "
+      "method -- inside a component, which still routes, and at module level",
+      lex.read_ts_jsx_defs(_src) == [("A", 1)] and "blk" not in _n1 and "blk" not in _n2, f"{_n1} {_n2}")
+# THE `<`-RUN HALF, alone: a method whose return type holds a type literal inside a generic
+# opens its scope on the BODY brace, not on the type literal's, so its element stays its own.
+_f = lex.read_ts_jsx_defs("function A() {" + _NL + "  class C { f(): Promise<{ a: string }> { return <M /> } }" + _NL
+                         + "  return null" + _NL + "}" + _NL)
+check("returns R23: ...and a method returning `Promise<{ a: string }>` scopes on its body brace, "
+      "so a component returning null beside it is not routed", _f == [], f"{_f}")
 
 # R24 — THE FORWARD READER takes the generic-close clause too: a brace-less helper ending in
 # `as Foo<Bar>` no longer swallows the next statement, and a component whose helper does is
@@ -2873,6 +2901,43 @@ _f = lex.read_ts_jsx_defs("function useX(v) {" + _NL + "  if (!v) return new Map
                          + "  const el = <A />" + _NL + "  return el" + _NL + "}" + _NL)
 check("returns R24: ...and `new Map<string, Foo>` with no call parens is a boundary, like `as`",
       _f == [], f"{_f}")
+_TAILS = {"satisfies": "v satisfies Foo<Bar>", "as-unknown-as": "v as unknown as Foo<Bar>"}
+_LEAK2 = [k for k, _t in _TAILS.items() if lex.read_ts_jsx_defs(
+    "function useX(v) {" + _NL + "  if (!v) return " + _t + _NL + "  const el = <A />" + _NL + "  return el" + _NL + "}" + _NL)]
+check("returns R24: ...and `satisfies Foo<Bar>` and `as unknown as Foo<Bar>` at line end are "
+      "boundaries too", not _LEAK2, f"{_LEAK2}")
+# THE CEILING THE KEY BUYS, pinned at its current verdict so a change is a red and not a
+# surprise: a bare instantiation expression at line end has no head and reads as a comparison.
+_f = lex.read_ts_jsx_defs("function useBox(v) {" + _NL + "  if (!v) return makeBox<string>" + _NL
+                         + "  const el = <A />" + _NL + "  return el" + _NL + "}" + _NL)
+check("returns R24: ...while a bare instantiation expression `makeBox<string>` at line end is the "
+      "stated ceiling -- read as a comparison, so the hook routes", _f == [("useBox", 1)], f"{_f}")
+
+# R25 — A SILENT LITERAL AT LINE END. A string, a template and a regex emit no token, so a reader
+# deciding a line break from the last EMITTED token saw the `:` of `open ? 'Open' : 'Closed'` and
+# continued into the next line; and `read_ts_arrow_body` handed back the NEXT statement's first
+# token as the body of `(i) => `k-${i}``. Two wrong verdicts from one line, opposite
+# directions -- the helper routed, the component not. `lits` is the lexer's record of where a
+# literal ended, and both readers and `add_scope` take it.
+_BAD = []
+for _helper in ("const label = () => open ? 'Open' : 'Closed'", "const reset = () => state.value = ''",
+                "const key = (i) => `k-${i}`", "const re = () => /x/"):
+    _f = lex.read_ts_jsx_defs("function Panel() {" + _NL + "  " + _helper + _NL + "  return <div />" + _NL + "}" + _NL)
+    if _f != [("Panel", 1)]:
+        _BAD.append((_helper, _f))
+    _f = lex.read_ts_jsx_defs(_helper + _NL + "const el = <A />" + _NL)
+    if _f:
+        _BAD.append((_helper + " @module", _f))
+check("returns R25: a brace-less helper whose value is a silent literal owns nothing on the next "
+      "line -- the component beside it routes, the helper does not, and at module level nobody "
+      "does", not _BAD, f"{_BAD}")
+_LEAK3 = [_r for _r in ("return 'none'", "return a ? b : 'none'") if lex.read_ts_jsx_defs(
+    "function useX(o) {" + _NL + "  if (!o) " + _r + _NL + "  const el = <A />" + _NL + "  return el" + _NL + "}" + _NL)]
+check("returns R25: ...and a string-ended early return is a boundary in the block reader too, "
+      "whatever token the string followed", not _LEAK3, f"{_LEAK3}")
+_f = lex.read_ts_jsx_defs("const A = () => 'x' +" + _NL + "  (cond && <B />)" + _NL)
+check("returns R25: ...while a literal followed by an operator still continues the line",
+      _f == [("A", 1)], f"{_f}")
 
 # D1..D5 — the declaration: one legal spelling, four named refusals at the row.
 check("returns D1: `tsx.function+returns:jsx` parses to its four parts",

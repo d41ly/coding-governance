@@ -17,6 +17,7 @@
 | [2026-09-11-review-TOOL-aGradedDialect-4-diff-round1.md](../reviews/2026-09-11-review-TOOL-aGradedDialect-4-diff-round1.md) | diff-review | — |
 | [2026-09-11-review-TOOL-aGradedDialect-4-diff-round2.md](../reviews/2026-09-11-review-TOOL-aGradedDialect-4-diff-round2.md) | diff-review | — |
 | [2026-09-11-review-TOOL-aGradedDialect-4-diff-round3.md](../reviews/2026-09-11-review-TOOL-aGradedDialect-4-diff-round3.md) | diff-review | — |
+| [2026-09-11-review-TOOL-aGradedDialect-4-diff-round4.md](../reviews/2026-09-11-review-TOOL-aGradedDialect-4-diff-round4.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 

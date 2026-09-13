@@ -946,7 +946,7 @@ def check_ts_type_position(toks: list, src: str = "", i: int = -1) -> bool:
     return False
 
 
-def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None) -> list:
+def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None, lits=None) -> list:
     """`[(kind, text, line)]` for TypeScript source: every CODE token, and nothing that is not code.
 
     `kind` is `word`, `op` or `jsx`. `op` is one of `( ) { } [ ] = : ; , < > =>` and `@` — the
@@ -981,6 +981,11 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None) -> list:
     emitted a token (a string, a template, a regex and an element do not). Closing review
     round 3: keying this on `expr_end` instead re-opened the generic-close boundary, because a
     `>` clears `expr_end` too.
+
+    `lits`, when a set is passed, is the other half of the same blindness: the INDEX the next
+    token will take after a silent LITERAL — a string, a template, a regex — so a reader that
+    decides a line break from the last emitted token can see that `open ? 'Open' : 'Closed'`
+    closed its line with an operand and not with the `:`. Closing review round 4.
 
     WHAT IT CONSUMES WITHOUT EMITTING, which is the whole reason this is not a regex: single- and
     double-quoted strings, a template literal's TEXT, `//` and `/* */` comments, a regex literal,
@@ -1080,6 +1085,8 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None) -> list:
                 opens.pop()
                 expr_end = True
                 pend = False
+                if lits is not None and not suppress:
+                    lits.add(len(toks))
                 i += 1
                 continue
             if src.startswith("${", i):
@@ -1215,7 +1222,10 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None) -> list:
             line += 1
             i += 1
             continue
-        if c in " \t\r":
+        if c.isspace():
+            # `.isspace()`, not `" \t\r"`: an NBSP or a U+2028 fell through to the operator
+            # catch-all and set `pend`, so the next line read as a continuation. The other
+            # whitespace skip in this file took the same fix earlier. Closing review round 4.
             i += 1
             continue
         if src.startswith("//", i):
@@ -1235,6 +1245,8 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None) -> list:
             i = j
             expr_end = True
             pend = False
+            if lits is not None and not suppress:
+                lits.add(len(toks))
             continue
         if c == "`":
             stack.append("tmpl")
@@ -1248,6 +1260,8 @@ def scan_ts_tokens(src: str, jsx: bool = False, calls=None, conts=None) -> list:
                 i = j
                 expr_end = True
                 pend = False
+                if lits is not None and not suppress:
+                    lits.add(len(toks))
                 continue
             i += 1
             expr_end = False
@@ -1561,7 +1575,7 @@ _TS_EXPR_CONTINUES = frozenset(("(", "[", "{", "=", ":", ",", "<", ">", "=>", "@
 
 
 
-def read_ts_expr_end(toks: list, k: int, conts=frozenset()) -> int:
+def read_ts_expr_end(toks: list, k: int, conts=frozenset(), lits=frozenset()) -> int:
     """The index just past the brace-less arrow body that starts at `k`.
 
     It ends at a depth-0 `;` or `,`, at an unbalanced closer, or at a line break that ends a
@@ -1571,9 +1585,11 @@ def read_ts_expr_end(toks: list, k: int, conts=frozenset()) -> int:
     `isValid(b)`, `cond` then `? a`), when it opens with an ELEMENT (the lexer opens one only
     after an operator), or with `:` or `,`; and it ends when the earlier line closed with a
     token that cannot continue — a word, a closer, or a `>` that closes a generic run after
-    `as`, `satisfies` or `new`, while a comparison `>` continues. The ceiling that remains is a
-    line opening with `(` or `[` after an operand, read as a new statement — the one ASI hazard
-    every semicolon-free style guide tells its readers to avoid. The rule is the line and not
+    `as`, `satisfies` or `new`, while a comparison `>` continues; and it ends when the earlier
+    line closed with a silent LITERAL (`lits`: a string, a template, a regex), whatever token
+    was emitted before it. The ceiling that remains is a line opening with `(` or `[` after an
+    operand, read as a new statement — the one ASI hazard every semicolon-free style guide
+    tells its readers to avoid. The rule is the line and not
     the next semicolon, because the other reading swallows every semicolon-less statement
     after the arrow, and a module-level element two lines down would make a plain helper a
     component. `check_ts_returned` is the backward twin and reads the same facts.
@@ -1582,7 +1598,7 @@ def read_ts_expr_end(toks: list, k: int, conts=frozenset()) -> int:
     while j < m:
         kind, text, ln = toks[j]
         if depth == 0 and j > k and ln > toks[j - 1][2] and j not in conts \
-                and (toks[j - 1][1] not in _TS_EXPR_CONTINUES
+                and (j in lits or toks[j - 1][1] not in _TS_EXPR_CONTINUES
                      or check_ts_generic_close(toks, j - 1)) \
                 and kind != "jsx" and text not in (":", ","):
             return j
@@ -1762,7 +1778,8 @@ def parse_ts_source(src: str, jsx: bool = False):
     """
     calls: set = set()
     conts: set = set()
-    toks = scan_ts_tokens(src, jsx, calls, conts)
+    lits: set = set()
+    toks = scan_ts_tokens(src, jsx, calls, conts, lits)
     funcs: list = []
     types_: list = []
     scopes: list = []
@@ -1779,10 +1796,15 @@ def parse_ts_source(src: str, jsx: bool = False):
         """
         if body is None or body >= m:
             return
+        if body in lits and body not in conts and body and toks[body][2] > toks[body - 1][2]:
+            # The arrow's value was a silent literal — `(i) => `k-${i}`` — and `body` is the
+            # NEXT statement's first token; the scope is empty, and opening it there graded
+            # the next line's element as the helper's (closing review round 4).
+            return
         if toks[body][0] == "op" and toks[body][1] == "{":
             scopes.append((body, read_ts_brace_end(toks, body), owner))
         else:
-            scopes.append((body, read_ts_expr_end(toks, body, conts), owner))
+            scopes.append((body, read_ts_expr_end(toks, body, conts, lits), owner))
 
     while k < m:
         kind, text, ln = toks[k]
@@ -1922,7 +1944,7 @@ def parse_ts_source(src: str, jsx: bool = False):
     for mk in (i for i, t in enumerate(toks) if t[0] == "jsx"):
         inner = max((sc for sc in scopes if sc[0] <= mk < sc[1]), default=None)
         if inner is not None and inner[2] >= 0 \
-                and check_ts_returned(toks, calls, conts, inner[0], mk):
+                and check_ts_returned(toks, calls, conts, lits, inner[0], mk):
             owned.add(inner[2])
     return funcs, types_, owned
 
@@ -1930,7 +1952,10 @@ def parse_ts_source(src: str, jsx: bool = False):
 #: What may sit before the dotted name of a generic run that ENDS a statement: `v as Foo<Bar>`,
 #: `x satisfies Foo<T>`, `new Map<string, Foo>` with no call parens. A `>` that pairs with an
 #: earlier `<` under any other head is a comparison — `a < b && c >` newline `d ? ...` — and
-#: continues (closing review round 3).
+#: continues (closing review round 3). THE CEILING THAT KEY BUYS: a bare instantiation
+#: expression ending a line, `return makeBox<string>` (TypeScript 4.7), has no head and reads
+#: as a comparison, so the next line continues it. A head-free rule cannot tell that from
+#: `return a < b && c >`, and the comparison is the shape prettier emits (round 4, stated).
 _TS_GENERIC_HEADS = frozenset(("as", "satisfies", "new"))
 
 
@@ -1943,15 +1968,22 @@ def check_ts_generic_close(toks: list, j: int) -> bool:
     if toks[j][0] != "op" or toks[j][1] != ">":
         return False
     for i in range(j - 1, max(j - 400, 0), -1):
+        # No type-argument run holds a `;` or a statement keyword, so reaching one before the
+        # `<` means the `>` pairs with nothing in ITS statement — an `as` two statements up
+        # must not make a comparison here a boundary (closing review round 4).
+        if (toks[i][0] == "op" and toks[i][1] == ";") \
+                or (toks[i][0] == "word" and toks[i][1] in _TS_EXPR_WORDS):
+            return False
         if toks[i][0] == "op" and toks[i][1] == "<" and read_ts_angle_end(toks, i) == j + 1:
             p = i - 1
-            while p >= 0 and toks[p][0] == "word" and toks[p][1] not in _TS_GENERIC_HEADS:
+            while p >= 0 and toks[p][0] == "word" and toks[p][1] not in _TS_GENERIC_HEADS \
+                    and toks[p][1] not in _TS_EXPR_WORDS:
                 p -= 1
             return p >= 0 and p < i - 1 and toks[p][0] == "word" and toks[p][1] in _TS_GENERIC_HEADS
     return False
 
 
-def check_ts_returned(toks: list, calls: set, conts: set, start: int, mk: int) -> bool:
+def check_ts_returned(toks: list, calls: set, conts: set, lits: set, start: int, mk: int) -> bool:
     """Is the element at `mk` the VALUE of the body that starts at `start`?
 
     `m_` below is the token count, bound once because two walks need it.
@@ -1986,14 +2018,16 @@ def check_ts_returned(toks: list, calls: set, conts: set, start: int, mk: int) -
             # `:`, a `,` or an ELEMENT opening the later line continues the earlier one — the
             # lexer opens an element only after an operator, so a marker at line start means
             # the `?` or `&&` this lexer does not emit sat before it. And a `>` at line end is
-            # two things: the close of a generic run after a word (`return v as Foo<Bar>`), a
-            # boundary; or a comparison (`return a >` newline `b ? <B /> : null`), a
-            # continuation. A token in `conts` opens its line after an operator the lexer
+            # two things: the close of a generic run under `as`, `satisfies` or `new` (`return
+            # v as Foo<Bar>`), a boundary; or a comparison (`return a >` newline `b ? <B /> :
+            # null`), a continuation. A line that closed with a silent literal (`lits`) ended
+            # whatever token preceded the literal. A token in `conts` opens its line after an operator the lexer
             # consumed silently — `isValid(a) &&` then `isValid(b)` — and continues too; round 3
             # found the closer-first ordering breaking INSIDE that expression, on prettier's own
             # output. `read_ts_expr_end` states the ceiling.
             if depth == 0 and toks[j][2] < toks[j + 1][2] and (j + 1) not in conts \
-                    and (text not in _TS_EXPR_CONTINUES or check_ts_generic_close(toks, j)) \
+                    and ((j + 1) in lits or text not in _TS_EXPR_CONTINUES
+                         or check_ts_generic_close(toks, j)) \
                     and toks[j + 1][0] != "jsx" and toks[j + 1][1] not in (":", ",", "="):
                 break
             if kind == "op" and text in (")", "]", "}"):
