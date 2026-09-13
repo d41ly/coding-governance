@@ -23,8 +23,8 @@ review fold. Figures are derived from the run named in each line, not copied fro
   rev-1 it was the literal `6 7 8`, which reported a build README as two checks over-wide when a
   build README cannot be in check 8's population at all, and reported `aBoundedVerdict/README.md` as
   over-wide when its waiver is exactly as wide as its fault.
-- AC4 — `bash tools/memory-tree/check-memory-hygiene.sh` — `memory-hygiene: check 8 graded 500
-  backlog row(s) across 4 shard(s)`. It graded 61 before this unit. The figure is DERIVED and moved
+- AC4 — `memory-hygiene:` via `bash tools/memory-tree/check-memory-hygiene.sh` — the line reads
+  `check 8 graded 500 backlog row(s) across 4 shard(s)`. It graded 61 before this unit. The figure is DERIVED and moved
   from 499 to 500 inside this build, because the build filed a backlog row of its own — which is
   why the criterion no longer pins it.
 - AC5 — `python tools/memory-tree/check-arms.py --check` — exit 0 with this gate's `ARMS_FLOORS`

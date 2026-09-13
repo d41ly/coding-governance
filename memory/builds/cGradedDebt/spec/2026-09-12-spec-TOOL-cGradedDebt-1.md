@@ -88,7 +88,7 @@ to hold no such path.
 |---|---|---|---|
 | `DEBT_EARNED` | associative array | `check-memory-hygiene.sh` | shell global, screaming snake like `DEBT_SET` |
 | `_UNWAIVED` | string global | `check-memory-hygiene.sh` | shell scratch global, underscore-prefixed like `_c7env` |
-| `split_debt` | function | `check-memory-hygiene.sh` | shell function, verb-first like `in_debt` and `pop_guard` |
+| `derive_waived` | function | `check-memory-hygiene.sh` | shell function, leading with `derive`, which `.lexicon.conf` declares — `split` it does not |
 
 ### Migration
 
@@ -202,6 +202,8 @@ none
 
 - rev-1 · 2026-09-12 · initial draft.
 - rev-2 · 2026-09-13 · §4 · S4 · AC4 · folded round-1 diff review, BLOCKED, 14 confirmed of 19.
+  The helper is `derive_waived`, not `split_debt`: `split` is not a verb `.lexicon.conf` declares,
+  and the naming leg is a two-sided pin rather than a table to add a synonym to.
   The report denominator is DERIVED from the three selections rather than the literal `6 7 8` (M1),
   the stale guard skips a path absent from the WORKTREE as well as one absent from the index (L1),
   the `--staged` hold announces itself (L4), and AC4 stops pinning a row count its own commit
