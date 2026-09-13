@@ -227,6 +227,9 @@ does — hit three times in one file in one session) · `process-creation-is-the
   writes under the home directory outside the roots it derives from `TMPDIR`/`TEMP`/`TMP` plus
   `~/.claude`. A blocked command is a real refusal, not a harness glitch — put the write in the
   scratchpad. Note `%TEMP%` is INSIDE `$HOME` on Windows, which is why the allowlist is derived.
+- **A `PreToolUse` hook FIRES inside a `Workflow` sidechain**, measured 2026-09-12 by `scratch-guard`
+  itself. A sidechain holds neither `Agent` nor `Workflow`, so it cannot fan out — that is the reason,
+  never "hooks stop at the boundary". `TOOL-cRefutedPremise-1`.
 - A conf value interpolated into a REGEX must be VALIDATED, not escaped: `MEMORY_ROOT="docs/mem"`
   matched nothing and `docs|memory` swallowed a subtree, both silently. A vacuity arm firing only at
   zero cannot see a PARTIAL exclusion. Detail: `memory/builds/aDeclaredBound/reviews/`.
