@@ -31,3 +31,29 @@ they hold, and a reader re-deriving them re-runs the pair.
 The `-G` join in AC7 and the epoch gate's second clean form are properties of the commit and could
 not be observed before it was made. The records commit that follows the pass commit appends them
 to this ledger, below this line.
+
+### AC7's same-commit join, at the pass commit `59401f9710e1fd528600ee5ae851adf38f095f6c`
+
+`git log -G'^KIT_MEMORY_TREE_VERSION=' --format=%H 16da4c6a..HEAD -- tools/memory-tree/check-memory-hygiene.sh`
+prints exactly one sha, `59401f97`. `git show 59401f97 -- tools/memory-tree/BUILD-METHOD.template.md`
+piped through `grep -c '^+.*CONVERGED is terminal for its subject'` prints `1`, and the same pipe
+through `grep -c "^+.*by anything but that review.s own fold"` prints `1`. Both figures were read
+from stdout, never through `&&`. So the M4 bytes and the constant moved in one commit, which is the
+S5 rule the criterion joins on, and the two-commit split it names as the red case did not happen.
+
+`bash tools/memory-tree/check-verdict-epoch.sh` at that tip prints the second clean form,
+`verdict-epoch: clean — 2 line(s) moved in 59401f97… and the version moved 2.69 -> 2.70 in 59401f97…`,
+W and S the same sha as the criterion says they are by construction, exit 0. Before the commit the
+same gate printed the first form against `origin/main` at version 2.69, which is what a range
+holding no bump prints.
+
+Also at that tip: `bash tools/check-kit-versions.sh` exit 0, empty stdout; `python
+tools/drift-audit/drift_report.py --check` exit 0 with `closed_specs_with_no_product_commit = 1`
+against its pin of 1, where the staged tree before the commit read 2 for the reason the parent
+build's ledger records — the header read CLOSED and the product commit did not exist yet;
+`bash tools/unattended/check-pass-order.sh` and `bash tools/unattended/check-brief-recorded.sh`
+both exit 0 naming nothing of this build. `python tools/memory-tree/gotchas.py --for-diff
+HEAD~1..HEAD` selected 15 classes plus the 5 universal ones; each was walked against the diff and
+none was found violated, the two nearest being `two-guards-one-question-two-answers`, which this
+unit's S2 qualifier resolves rather than commits, and `vacuous-selector-empty-population`, whose
+liveness half is the reverted AC4 run reading 3 where the landed one reads 0.
