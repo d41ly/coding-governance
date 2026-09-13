@@ -45,6 +45,8 @@ say what a run did between two rows, why it stopped, what it decided unasked, or
   leg's budget row is the cost verdict.
 - **Fully tested.** Every acceptance criterion is observed, never asserted, and every new gate or
   refusal has its failing case seen RED before it lands.
+- **Gates run once, after every unit is built** (owner, 2026-09-13). A unit pass runs only the test
+  file it writes. An AC observed by a gate leg is owed to that run.
 - **The unattended kit's self-tests stay off the bar** (owner, 2026-08-23). The driver writer's new
   suite (owner, 2026-09-13) is withheld from adopters and run directly, never as a gate leg.
 - **Local store split** (owner, 2026-09-13): run logs in the git common dir, transcript extracts under
