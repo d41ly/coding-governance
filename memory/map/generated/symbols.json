@@ -1348,6 +1348,11 @@
       "file": "tools/codebase-map/rank_harness.py"
     },
     {
+      "id": "derive_marker_coupling",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_memory_disciplines",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"

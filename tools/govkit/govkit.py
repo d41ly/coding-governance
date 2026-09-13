@@ -549,6 +549,34 @@ def derive_unsatisfied_requires(selection: list[str], descs: dict[str, tuple[dic
     )
 
 
+def derive_marker_coupling(root: pathlib.Path,
+                           descs: dict[str, tuple[dict, str]]) -> dict[str, set[str]]:
+    """Which kits must move TOGETHER, because one ships a file carrying the other's version marker.
+
+    A descriptor's `marker_carriers` names files OUTSIDE its own claim that carry its `gov:kit`
+    marker, and selfcheck holds that list complete. The entry that owns such a file is the one that
+    ships it, so a pull moving the owner and not the declarer lands the declarer's new marker over
+    its old constant, and a pull moving the declarer and not the owner does the reverse. Either way
+    the tree's cross-kit version parity reds. Measured at NicoCares on 2026-09-13: review-harness 1.8
+    pulled alone wrote `drift-audit-code.js` at drift-audit 1.10 beside `drift_report.py` at 1.9,
+    and its parity leg's arm 9 redded.
+
+    SYMMETRIC, because both directions split the marker. The owner is found the way selfcheck finds
+    a claim, through `entry_members` and the same `{prefix}` spelling, never from a path's segments.
+    """
+    members = {eid: entry_members(root, eid, d, dp) for eid, (d, dp) in descs.items()}
+    edges: dict[str, set[str]] = {}
+    for eid, (d, _dp) in descs.items():
+        for carrier in d.get("marker_carriers") or []:
+            path = carrier.replace("{prefix}", "tools")
+            for owner, pref in members.items():
+                if owner != eid and any(path == m or path.startswith(m.rstrip("/") + "/")
+                                        for m in pref):
+                    edges.setdefault(eid, set()).add(owner)
+                    edges.setdefault(owner, set()).add(eid)
+    return edges
+
+
 def resolve_selection(reg: dict, descs: dict[str, tuple[dict, str]], mode: str,
                       kits: list[str], deploy: dict | None = None) -> list[str]:
     """Which entries this run installs.
@@ -6015,6 +6043,26 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 "`update` moves an INSTALLED set forward; widening it is `--add-kits` and an owner "
                 "decision. Refusing rather than silently classifying an entry the target never took")
         _want = set(kits)
+        # ---- THE SCOPE CARRIES A SHARED VERSION MARKER, which NicoCares' scoped pull split on
+        # ---- 2026-09-13. A kit the receipt claims that shares a marker with a kit in scope moves
+        # ---- WITH it, closed transitively, and each one is named. It only ever adds a kit this
+        # ---- receipt already claims, so it widens nothing the refusal above guards: splitting the
+        # ---- pair is not a narrower pull, it is a tree whose parity leg reds on the first bar.
+        _coupled = derive_marker_coupling(root, descs)
+        _added: dict[str, str] = {}
+        _todo = sorted(_want)
+        while _todo:
+            _via = _todo.pop()
+            for _other in sorted(_coupled.get(_via, set())):
+                if _other in _claimed and _other not in _want:
+                    _want.add(_other)
+                    _added[_other] = _via
+                    _todo.append(_other)
+        for _other in sorted(_added):
+            print(f"govkit update — scope: {_other} moves with {_added[_other]}, because one ships a "
+                  f"file carrying the other's version marker (`marker_carriers`); a pull moving only "
+                  f"one lands a marker its own constant does not match")
+        kits = list(kits) + sorted(_added)
         rows_all = [w for w in rows_all if str(w.get("kit") or "") in _want]
         print(f"govkit update — scope: --kits {', '.join(sorted(_want))} -> "
               f"{len(rows_all)} of {len(receipt.get('files') or [])} receipt row(s)")
@@ -8056,6 +8104,7 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     # The same flag already refuses loudly on its other two error classes, and the parser refuses a
     # missing `=` with the words "accepting it would silently pin nothing".
     pins_used: set[str] = set()
+    versions_at: dict[tuple[str, str], str] = {}
     for p in plan:
         dest = p["dest"]
         if dest not in idx:
@@ -8143,6 +8192,23 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
                 row["commit"], row["gov_oid"], rung = hit
                 row["carry"] = rung
                 row["evidence"] = "vintage-match"
+
+        # THE VERSION FOLLOWS THE BYTES, NOT THE VINTAGE THIS RUN MEASURES AT. A row attributed to an
+        # older commit whose gov blob this vintage no longer holds carries that kit's version AT that
+        # commit. Stamping every row with the measuring vintage's constant made a re-adopt that
+        # pinned a kit the migration never pulled report the new version over old bytes: NicoCares'
+        # `check-memory-hygiene.sh` row read 2.69 over commit 013b1af9 while the file declared 2.68,
+        # and `update`'s per-kit delta read `level` for a kit whose bytes were a version behind. A
+        # row whose blob is unchanged since its commit keeps the measuring vintage's, because its
+        # bytes are that vintage's too.
+        if row.get("commit") and row.get("gov_oid") and p["src"]:
+            _now = blob_at(root, commit, p["src"])
+            if _now is None or blob_oid(_now) != row["gov_oid"]:
+                _vk = (p["kit"], row["commit"])
+                if _vk not in versions_at:
+                    versions_at[_vk] = resolve_entry_version_at(root, descs[p["kit"]][0],
+                                                                row["commit"])
+                row["version"] = versions_at[_vk]
 
         ev = row["evidence"]
         key = "forked" if p["role"] == "forked" else (rung or ev)

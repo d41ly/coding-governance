@@ -8482,6 +8482,21 @@ user_skills = "/tmp/gk-fake-skills"
         #   with it OFF, so an encoding dependency cannot hide behind this machine's settings (R3-7).
         # - A HARNESS EDIT IN A RECEIPT `adopt` MEASURED, where the row's `oid` is the edited bytes and the
         #   old recovery restored to it (R3-9).
+        #
+        # ROUND 4 IS THE MIGRATION'S FIRST TWO REAL RUNS, at inCMS core and NicoCares on 2026-09-13,
+        # and neither converged as written. Every finding was a consumer shape the fixture lacked:
+        # - A KIT OUTSIDE THE RELEASE. Unscoped, block 1 moved every kit the tree was behind on, and at
+        #   core landed gate-lint's seed, which core's hygiene refused on every rerun (W1). `seedy` is
+        #   that kit, and the pre-commit now models the hygiene arm the hook declaration said the
+        #   runbook could not reach.
+        # - A VERSION MARKER IN ANOTHER KIT'S FILE. drift-audit's rides in review-harness's directory,
+        #   so a scoped pull split it from its constant at NicoCares (W2). churn's marker rides in a
+        #   review-harness file, and notes' in a churn file, so the scope is derived transitively.
+        # - A FORKED TEMPLATE. core's unattended Skill was pinned at the new vintage while its template
+        #   was a fork `update` never writes (the pin rule). `pv-qf` forks the protocol template.
+        # - A RE-ADOPT OVER ROWS THE MIGRATION NEVER MOVED, which stamped them with the new version (W3).
+        # - A CONFLICT THAT IS NOT THE HARNESS'S, whose STOP told the operator to resolve before the
+        #   reset that destroys the resolution (W4). `pv-ty` conflicts on a plain engine file.
         import tomllib as _pvtoml  # noqa: PLC0415
 
         def run_pv_govkit(g: pathlib.Path, *args: str, env: dict | None = None) -> subprocess.CompletedProcess:
@@ -8517,7 +8532,9 @@ user_skills = "/tmp/gk-fake-skills"
         # its render is one vintage stale after step 1, and the pin rule must not call it current. It
         # also carries a FORK, as core's recall kit does, which `adopt` prints `forked` whatever it
         # measured, and a target copy of it that matches no gov vintage (R3-8).
-        _pvNOTES_KIT = ('id = "notes"\nhome = "tools/notes"\nversion_from = { none = "fixture" }\n\n'
+        # ROUND 4: notes' version marker rides in a churn file, so notes moves with churn (W2).
+        _pvNOTES_KIT = ('id = "notes"\nhome = "tools/notes"\nversion_from = { none = "fixture" }\n'
+                        'marker_carriers = ["{prefix}/churn/notes-mark.txt"]\n\n'
                         '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                         '[[files]]\ninclude = ["notes.template.md"]\nrole = "rendered"\n'
@@ -8528,11 +8545,25 @@ user_skills = "/tmp/gk-fake-skills"
         # A THIRD KIT WHOSE REGENERATE DELETES ONE TRACKED ENGINE FILE AND EDITS ANOTHER, which is what
         # the unattended kit's fixture-record repath does at both consumers (R3-2). Neither file is a
         # render, so neither may reach the commit block 3 makes for the renders.
-        _pvCHURN_KIT = ('id = "churn"\nhome = "tools/churn"\nversion_from = { none = "fixture" }\n\n'
+        # ROUND 4: its version marker rides in a review-harness file, as drift-audit's two workflow
+        # harnesses do at both consumers, so a pull scoped to review-harness must carry it (W2).
+        _pvCHURN_KIT = ('id = "churn"\nhome = "tools/churn"\nversion_from = { none = "fixture" }\n'
+                        'marker_carriers = ["{prefix}/workflows/churn-mark.txt"]\n\n'
                         '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                         '[adopt]\nargv = []\nmutates_index = false\n\n'
                         '[[regenerate]]\nargv = ["bash", "{kit}/churn.sh"]\n')
+        # ROUND 4: A KIT OUTSIDE THE RELEASE, the shape of gate-lint and memory-tree at both consumers
+        # (W1, W3). It ships a SEED under the memory root that the consumer never kept, so every
+        # unscoped update lands it, and core's hygiene refuses a commit that adds it. Its version
+        # moves between A and B, so a re-adopt pinning its rows at A must not report B's version.
+        _pvSEEDY_KIT = ('id = "seedy"\nhome = "tools/seedy"\n'
+                        'version_from = { file = "seedy.sh", pattern = "^SEEDY_VERSION=" }\n\n'
+                        '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
+                        '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                        '[[files]]\ninclude = ["loops.template.txt"]\nrole = "seed"\n'
+                        'to = "{memory_root}/project/seedy-loops.txt"\n\n'
+                        '[adopt]\nargv = []\nmutates_index = false\n')
         _pvCHURN_SH = ('d=$(dirname "$0")\nrm -f "$d/gone.txt"\n'
                        'printf \'a line a regenerate appended\\n\' >> "$d/edit.txt"\n')
         _pvH_A = ("// harness v1\nconst DRIVER = 'bash tools/unattended/unattended.sh'\n"
@@ -8549,6 +8580,15 @@ user_skills = "/tmp/gk-fake-skills"
                       "The bound is what {{TOOL_ROOT}}hooks/agent-cap.js resolves.\n\n"
                       "## Concurrency\n\nSo is this one: {{TOOL_ROOT}}hooks/agent-cap.js.\n")
         _pvPROTO = _pvPROTO_T.replace("{{TOOL_ROOT}}", "scripts/")
+        # ROUND 4: gov's protocol template moves at B, and one consumer's copy is a FORK that spelled
+        # the same addition by hand, as core's `SKILL.template.md` was. `update` writes no fork, so
+        # the regenerate renders the fork, and the pin rule must not call that render B's.
+        _pvPROTO_TB = _pvPROTO_T + "\n## Cited by\n\n{{TOOL_ROOT}}workflows/unattended-build.js.\n"
+        _pvPROTO_FORK = _pvPROTO_T + "\n## Cited by\n\nscripts/workflows/unattended-build.js.\n"
+        # ROUND 4: a file one consumer edits on the very line gov changes at B, so its step 1
+        # conflicts on something that is not the harness (W4).
+        _pvLOCAL_A = "line one\nline two\nline three\n"
+        _pvLOCAL_B = "line one\nline two, as gov has it at B\nline three\n"
 
         def build_pv_gov():
             g = tmp / "pv-gov"
@@ -8559,11 +8599,13 @@ user_skills = "/tmp/gk-fake-skills"
                 '[[entry]]\nid = "review-harness"\ndescriptor = "tools/workflows/kit.toml"\n\n'
                 '[[entry]]\nid = "notes"\ndescriptor = "tools/notes/kit.toml"\n\n'
                 '[[entry]]\nid = "churn"\ndescriptor = "tools/churn/kit.toml"\n\n'
+                '[[entry]]\nid = "seedy"\ndescriptor = "tools/seedy/kit.toml"\n\n'
                 '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
             for _kd, _files in (("workflows", (("kit.toml", _pvKIT_A), ("unattended-build.js", _pvH_A),
                                                ("REVIEW-PROTOCOL.template.md", _pvPROTO_T),
                                                ("tier2-review.js", "// the review harness\n"),
+                                               ("check-local.sh", _pvLOCAL_A),
                                                ("check-review-join.sh", "echo join\n"),
                                                ("unattended-build.test.sh", "echo suite\n"),
                                                ("review-local.txt", "a rule this tree may edit\n"))),
@@ -8572,7 +8614,9 @@ user_skills = "/tmp/gk-fake-skills"
                                            ("forked-note.py", "# gov's copy, derived from a target's\n"))),
                                 ("churn", (("kit.toml", _pvCHURN_KIT), ("churn.sh", _pvCHURN_SH),
                                            ("keep.txt", "keep v1\n"), ("gone.txt", "gone\n"),
-                                           ("edit.txt", "edit\n")))):
+                                           ("edit.txt", "edit\n"))),
+                                ("seedy", (("kit.toml", _pvSEEDY_KIT), ("seedy.sh", "SEEDY_VERSION=1.0\n"),
+                                           ("loops.template.txt", "a site gov's own tree carries\n")))):
                 (g / "tools" / _kd).mkdir(parents=True, exist_ok=True)
                 for _name, _body in _files:
                     (g / "tools" / _kd / _name).write_text(_body, encoding="utf-8", newline="\n")
@@ -8602,6 +8646,10 @@ user_skills = "/tmp/gk-fake-skills"
         _pvF = "scripts/notes/forked-note.py"
         _pvCG = "scripts/churn/gone.txt"
         _pvCE = "scripts/churn/edit.txt"
+        _pvLC = f"{_pvW}/check-local.sh"
+        _pvPT = f"{_pvW}/REVIEW-PROTOCOL.template.md"
+        _pvSEED = "memory/project/seedy-loops.txt"
+        _pvSV = "scripts/seedy/seedy.sh"
 
         def build_pv_target(g, name, harness_edit=None):
             """An install `apply` wrote at vintage A, with one local delta, which both measured
@@ -8622,14 +8670,17 @@ user_skills = "/tmp/gk-fake-skills"
             return t
 
         _pvKITDIRS = {"review-harness": ("tools/workflows", _pvW), "notes": ("tools/notes", "scripts/notes"),
-                      "churn": ("tools/churn", "scripts/churn")}
+                      "churn": ("tools/churn", "scripts/churn"), "seedy": ("tools/seedy", "scripts/seedy")}
 
-        def build_pv_bootstrap(g, name, kits=("review-harness", "notes", "churn"), harness_edit=None):
+        def build_pv_bootstrap(g, name, kits=("review-harness", "notes", "churn", "seedy"), harness_edit=None,
+                               template_fork=None):
             """An install copied in by hand and given its receipt by `adopt`, which is how core's was
             written. Its receipt starts with an edited row pinned, a rewritten row UNATTRIBUTED, a
             commit-less render from a kit with no regenerate, and a fork whose bytes are the target's;
             and after it was written, the tree began tracking a render and a project-owned file that no
-            row names, and edited a project-owned file whose row records a base."""
+            row names, and edited a project-owned file whose row records a base. It never kept the
+            seed its out-of-release kit ships. `template_fork` replaces the protocol TEMPLATE's copy
+            before the receipt is written, so `adopt` records it unattributed, as core's forks were."""
             t = make_target(tmp / name, _pvDEPLOY.format(kits=json.dumps(list(kits))))
             for _src, _dst in (_pvKITDIRS[_k] for _k in kits):
                 for _rel in gout(g, "ls-files", "--", _src + "/").split():
@@ -8642,6 +8693,8 @@ user_skills = "/tmp/gk-fake-skills"
             with (t / _pvD).open("a", encoding="utf-8", newline="\n") as _fh:
                 _fh.write("// a consumer's own line\n")
             (t / _pvJ).write_text("echo a join this tree wrote for itself\n", encoding="utf-8", newline="\n")
+            if template_fork:
+                (t / _pvPT).write_text(template_fork, encoding="utf-8", newline="\n")
             _pins = ["--pin", f"{_pvD}={gout(g, 'rev-parse', 'HEAD').strip()}"]
             if harness_edit:
                 (t / _pvH).write_text(harness_edit, encoding="utf-8", newline="\n")
@@ -8672,10 +8725,12 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- NicoCares installs `post-checkout`, `pre-commit` and `pre-push`, and its pre-commit carries
         # ---- no receipt arm and no trailer rule, so core's set is the stricter of the two.
         _pvCOMMIT_HOOKS = ("pre-commit", "prepare-commit-msg", "commit-msg", "post-commit")
+        # ROUND 4 CORRECTED THE pre-commit LINE. It said the hygiene arm could meet only a protocol
+        # render core does not track, and an unscoped block 1 staged gate-lint's seed under
+        # `memory/project/`, which that arm refused on every run at core (W1, ABL-dMuffledSentinel-7).
         _pvCORE_HOOKS = {
-            "pre-commit": "modelled: its receipt arm. Its memory/ hygiene arm fires only on a staged "
-                          "memory/ path, and the one the runbook can stage is a protocol render core "
-                          "does not track",
+            "pre-commit": "modelled: its receipt arm, and its memory/ hygiene arm, which refuses a "
+                          "commit ADDING a memory/ file nothing adopts (checks 3 and 21)",
             "commit-msg": "modelled: a message with no attribution line is refused",
             "post-checkout": "does not fire on a commit",
             "post-merge": "does not fire on a commit",
@@ -8685,10 +8740,17 @@ user_skills = "/tmp/gk-fake-skills"
         # core's `check_receipt.py --staged`: the staged scope is `--diff-filter=ACMR`, so a staged
         # DELETION is never compared; the receipt is read from the WORKTREE; a row outside the roles a
         # target owns whose index blob is not the `oid` it records refuses the commit.
+        # core's hygiene arm, as far as a runbook commit can reach it: a memory/ path the commit ADDS.
         _pvHOOK = (
             "import json, subprocess, sys\n"
             "def git(*a):\n"
             "    return subprocess.run(['git', *a], capture_output=True, text=True).stdout\n"
+            "added = [p for p in git('diff', '--cached', '--name-only', '--diff-filter=A').splitlines()"
+            " if p.startswith('memory/')]\n"
+            "if added:\n"
+            "    print('HYGIENE check 21 FAILED - memory/ files this commit ADDS that nothing adopts: '"
+            " + ', '.join(added))\n"
+            "    sys.exit(1)\n"
             "scope = {p for p in git('diff', '--cached', '--name-only', '--diff-filter=ACMR').splitlines()"
             " if p.strip()}\n"
             "try:\n"
@@ -8725,15 +8787,19 @@ user_skills = "/tmp/gk-fake-skills"
             "exit 1\n")
         _pvTRAILER = "Co-Authored-By: Claude Fixture <noreply@anthropic.com>"
 
-        def write_pv_hook(t):
+        def write_pv_hook(t, receipt=True):
+            """core's two commit-time hooks. `receipt=False` models NicoCares, whose pre-commit has no
+            receipt arm, for the one flow core's receipt arm refuses by its own rule (ABL-dMuffledSentinel-3)."""
             _hd = t / ".git" / "pv-hooks"
             _hd.mkdir()
-            (_hd / "receipt_check.py").write_text(_pvHOOK, encoding="utf-8", newline="\n")
-            (_hd / "pre-commit").write_text(
-                f'#!/bin/sh\nexec "{pathlib.Path(sys.executable).as_posix()}" '
-                f'"{(_hd / "receipt_check.py").as_posix()}"\n', encoding="utf-8", newline="\n")
+            _hooks = ("pre-commit", "commit-msg") if receipt else ("commit-msg",)
+            if receipt:
+                (_hd / "receipt_check.py").write_text(_pvHOOK, encoding="utf-8", newline="\n")
+                (_hd / "pre-commit").write_text(
+                    f'#!/bin/sh\nexec "{pathlib.Path(sys.executable).as_posix()}" '
+                    f'"{(_hd / "receipt_check.py").as_posix()}"\n', encoding="utf-8", newline="\n")
             (_hd / "commit-msg").write_text(_pvMSGHOOK, encoding="utf-8", newline="\n")
-            for _h in ("pre-commit", "commit-msg"):
+            for _h in _hooks:
                 os.chmod(_hd / _h, 0o755)
             git(t, "config", "core.hooksPath", _hd.as_posix())
 
@@ -8822,8 +8888,16 @@ user_skills = "/tmp/gk-fake-skills"
         _pvq = build_pv_bootstrap(_pvg, "pv-q")
         _pvqo = build_pv_bootstrap(_pvg, "pv-qo", kits=("review-harness",))
         _pvqx = build_pv_bootstrap(_pvg, "pv-qx", kits=("review-harness",), harness_edit=_pvXEDIT)
-        for _t in (_pvt, _pvtc, _pvtx, _pvtm, _pvq, _pvqo, _pvqx):
+        # ROUND 4. A fork of the protocol TEMPLATE, and an edit on the line gov changes at B in a file
+        # that is not the harness.
+        _pvqf = build_pv_bootstrap(_pvg, "pv-qf", kits=("review-harness",), template_fork=_pvPROTO_FORK)
+        _pvty = build_pv_target(_pvg, "pv-ty")
+        (_pvty / _pvLC).write_text(_pvLOCAL_A.replace("line two", "line two, as this tree has it"),
+                                   encoding="utf-8", newline="\n")
+        settle(_pvty, "this tree's own second line")
+        for _t in (_pvt, _pvtc, _pvtx, _pvtm, _pvq, _pvqo, _pvqx, _pvty):
             write_pv_hook(_t)
+        write_pv_hook(_pvqf, receipt=False)
         check("[-PV] PRECONDITION the target rows the harness as an ENGINE file, the consumer shape",
               read_pv_row(_pvt, _pvH).get("role") == "engine"
               and read_pv_row(_pvq, _pvH).get("role") == "engine",
@@ -8875,6 +8949,23 @@ user_skills = "/tmp/gk-fake-skills"
         _pvmk2 = run_pv_commit(_pvtc, "the same file, attributed")
         check("[-PV] LIVENESS ...and passes the same commit carrying one",
               _pvmk2.returncode == 0, _pvmk2.stdout + _pvmk2.stderr)
+        (_pvtc / "memory" / "project").mkdir(parents=True, exist_ok=True)
+        (_pvtc / _pvSEED).write_text("a seed nothing adopts\n", encoding="utf-8", newline="\n")
+        _pvhy = run_pv_commit(_pvtc, "a memory/ file nothing adopts", _pvSEED)
+        check("[-PV] W1 LIVENESS the hygiene arm refuses a commit that ADDS a memory/ file nothing "
+              "adopts, as core's checks 3 and 21 refused gate-lint's seed",
+              _pvhy.returncode != 0 and "HYGIENE check 21 FAILED" in (_pvhy.stdout + _pvhy.stderr),
+              f"rc {_pvhy.returncode}: " + _pvhy.stdout + _pvhy.stderr)
+        git(_pvtc, "reset", "-q", "--", _pvSEED)
+        (_pvtc / _pvSEED).unlink()
+        # W1's RELEASE is gov's own declaration, so it can name only a kit gov ships.
+        _pvrel = _re.search(r"^\s*RELEASE=(\S+)", _pvBLOCKS.get("1", ""), _re.M)
+        _pvreg = _pvtoml.loads((HERE / "registry.toml").read_text(encoding="utf-8"))
+        _pvids = {_e.get("id") for _e in _pvreg.get("entry", [])}
+        check("[-PV] W1 LIVENESS block 1 names this release's kits, and each one is an entry of this "
+              "repo's registry", _pvrel is not None
+              and set(_pvrel.group(1).split(",")) <= _pvids and "review-harness" == _pvrel.group(1).split(",")[0],
+              str(_pvrel and _pvrel.group(1)))
 
         # VINTAGE B: gov keeps tracking its own render at the old path and edits it, adds the template,
         # claims the destination `rendered`, and declares the regenerate. The notes template moves, and
@@ -8886,6 +8977,11 @@ user_skills = "/tmp/gk-fake-skills"
         (_pvg / "tools" / "notes" / "notes.template.md").write_text(
             "notes v2 for {{KIT_DIR}}\n", encoding="utf-8", newline="\n")
         (_pvg / "tools" / "churn" / "keep.txt").write_text("keep v2\n", encoding="utf-8", newline="\n")
+        # ROUND 4: the protocol template, a file one consumer edits, and the out-of-release kit move.
+        (_pvd / "REVIEW-PROTOCOL.template.md").write_text(_pvPROTO_TB, encoding="utf-8", newline="\n")
+        (_pvd / "check-local.sh").write_text(_pvLOCAL_B, encoding="utf-8", newline="\n")
+        (_pvg / "tools" / "seedy" / "seedy.sh").write_text("SEEDY_VERSION=1.1\n", encoding="utf-8",
+                                                           newline="\n")
         settle(_pvg, "B: the harness is rendered, and gov keeps its own render tracked")
         _pvB = gout(_pvg, "rev-parse", "HEAD").strip()
         _pvGOV_H_B = gout(_pvg, "rev-parse", "HEAD:tools/workflows/unattended-build.js").strip()
@@ -9020,12 +9116,32 @@ user_skills = "/tmp/gk-fake-skills"
               "" if _pvcm is None else _pvcm.stdout + _pvcm.stderr)
 
         # ---- THE BOOTSTRAPPED FIXTURE, which is where round 2 found the runbook wrong.
+        # ---- ROUND 4, W2 FIRST, READ-ONLY: the coupling is derived from `marker_carriers`, both ways
+        # ---- and transitively, and only ever over kits the receipt claims.
         _pvq_rows0 = read_pv_paths(_pvq)
+        _pvqsym = run_pv_govkit(_pvg, "update", "--target", str(_pvq), "--kits", "notes")
+        check("[-PV] W2 a pull scoped to one kit carries every claimed kit it shares a version marker "
+              "with, both ways and transitively: notes takes churn, and churn takes review-harness",
+              "scope: churn moves with notes" in _pvqsym.stdout
+              and "scope: review-harness moves with churn" in _pvqsym.stdout
+              and "govkit update — scope: --kits churn, notes, review-harness -> " in _pvqsym.stdout,
+              _pvqsym.stdout[:2500] + _pvqsym.stderr[-600:])
         _pvqb1 = run_pv_block(_pvq, _pvg, 1)
         check("[-PV] R2-1 on the bootstrapped receipt block 1 runs clean through the hooks",
               _pvqb1.returncode == 0 and gout(_pvq, "log", "-1", "--format=%s").strip()
               == "govkit update: review-harness 1.8",
               f"rc {_pvqb1.returncode}: " + _pvqb1.stdout[-1500:] + _pvqb1.stderr[-600:])
+        # ---- ROUND 4, W1. Block 1 takes the release's scope. Unscoped, `update` moved every kit this
+        # ---- receipt is behind on, and landed a seed core's hygiene refuses on every rerun.
+        check("[-PV] W1 block 1 hands update this release's kits that the receipt claims, and update "
+              "adds the kits that share a version marker with them (W2)",
+              "govkit update — scope: --kits churn, notes, review-harness -> " in _pvqb1.stdout
+              and "scope: unattended is in this release and this receipt does not claim it" in _pvqb1.stdout,
+              _pvqb1.stdout[:2500])
+        check("[-PV] W1 ...and moves nothing outside it: the seed an unscoped pull lands is absent, and "
+              "that kit's rows keep their base",
+              not (_pvq / _pvSEED).exists() and read_pv_row(_pvq, _pvSV).get("commit") == _pvA,
+              str(read_pv_row(_pvq, _pvSV)) + _pvqb1.stdout[-900:])
         # R3-2. The churn kit's regenerate ran, deleted one tracked engine file and edited another. Both
         # go back to what update left, each named, and neither reaches the render list block 3 stages.
         _pvqz = (_pvq / ".git" / "harness-migration-renders.z")
@@ -9092,8 +9208,17 @@ user_skills = "/tmp/gk-fake-skills"
               not _pvqgone and {_pvCG, _pvCE} <= read_pv_paths(_pvq)
               and gout(_pvq, "status", "--porcelain", "--untracked-files=no").strip() == "",
               str(_pvqgone) + gout(_pvq, "status", "--porcelain"))
+        # ---- ROUND 4, W3. The re-adopt pinned the out-of-release kit's rows at A, where its version
+        # ---- was 1.0, and stamped B's 1.1 on them, so the next update read that kit `level`.
+        _pvqsv = read_pv_row(_pvq, _pvSV)
+        check("[-PV] W3 a row the migration did not move keeps the version of the vintage its bytes "
+              "come from, never the re-adopt's",
+              _pvqsv.get("commit") == _pvA and _pvqsv.get("version") == "SEEDY_VERSION=1.0", str(_pvqsv))
         _pvqu = run_pv_govkit(_pvg, "update", "--target", str(_pvq), "--write",
                               env=dict(os.environ, GOVKIT_RERENDER="1"))
+        _pvqsd = [ln for ln in _pvqu.stdout.splitlines() if ln.strip().startswith("seedy ")]
+        check("[-PV] W3 ...so the next update's per-kit delta shows that kit behind, never `level`",
+              len(_pvqsd) == 1 and "level" not in _pvqsd[0], str(_pvqsd) + _pvqu.stdout[-600:])
         _pvqw = _re.search(r"NOT re-stamped: (\d+) row\(s\)", _pvqu.stdout)
         check("[-PV] R2-4 the next update withholds its stamp over EXACTLY the rows block 2 counted",
               _pvqw is not None and _pvqn is not None and _pvqw.group(1) == _pvqn.group(1),
@@ -9127,6 +9252,38 @@ user_skills = "/tmp/gk-fake-skills"
               len(_pvrendered_pins) == 3 and all(_x.endswith("=" + _pvB) for _x in _pvrendered_pins),
               str(_pvrendered_pins))
 
+        # ---- ROUND 4, W4. THE STOP TEXT ORDERS ITS REMEDY. It said "resolve, return the tree to HEAD,
+        # ---- run again", and the reset discards an uncommitted resolution, which NicoCares met.
+        _pvxs = next((ln for ln in _pvxb1.stdout.splitlines() if ln.startswith("STOP: update exited")),
+                     "").lower()
+        _pvxo = [_pvxs.find(_w) for _w in ("return the tree to head", "resolve what that order names",
+                                           "commit the resolution", "run this block again")]
+        check("[-PV] W4 block 1's STOP puts the return to HEAD FIRST, then the resolution, its commit, "
+              "and the rerun, because the reset discards an uncommitted resolution",
+              min(_pvxo) >= 0 and _pvxo == sorted(_pvxo), _pvxs)
+        # ...and the order converges, on a conflict that is not the harness's, in a receipt `apply`
+        # wrote, whose row records gov's blob as `oid` whatever the tree then did to the file.
+        _pvtyh = gout(_pvty, "rev-parse", "HEAD").strip()
+        _pvtyb1 = run_pv_block(_pvty, _pvg, 1)
+        check("[-PV] W4 PRECONDITION a step 1 that conflicts on a file that is not the harness STOPS",
+              _pvtyb1.returncode != 0 and "STOP: update exited 1" in _pvtyb1.stdout
+              and f"'{_pvLC}' diverged and the three-way conflicts" in _pvtyb1.stdout,
+              _pvtyb1.stdout[-1500:])
+        git(_pvty, "reset", "-q", "--hard", "HEAD")        # the STOP's first instruction
+        _pvtyr = run_pv_block(_pvty, _pvg, "restore")
+        _pvtyk = _pvty / ".git" / "harness-migration-local-edits" / _pvLC
+        check("[-PV] W4 the restore block resolves it and commits through the hooks: gov's blob at the "
+              "row's base, with this tree's edit set aside byte for byte",
+              _pvtyr.returncode == 0 and gout(_pvty, "rev-parse", "HEAD~1").strip() == _pvtyh
+              and (_pvty / _pvLC).read_text(encoding="utf-8") == _pvLOCAL_A
+              and _pvtyk.is_file() and _pvtyk.read_text(encoding="utf-8")
+              == _pvLOCAL_A.replace("line two", "line two, as this tree has it"),
+              f"rc {_pvtyr.returncode}: " + _pvtyr.stdout[-900:] + _pvtyr.stderr[-600:])
+        _pvtyb1b = run_pv_block(_pvty, _pvg, 1)
+        check("[-PV] W4 ...and block 1 then runs clean, landing gov's line",
+              _pvtyb1b.returncode == 0 and (_pvty / _pvLC).read_text(encoding="utf-8") == _pvLOCAL_B,
+              f"rc {_pvtyb1b.returncode}: " + _pvtyb1b.stdout[-1500:] + _pvtyb1b.stderr[-600:])
+
         # ---- R3-9. THE SAME CONFLICT IN A RECEIPT `adopt` MEASURED, where the row's `oid` is the edited
         # ---- bytes and `gov_oid` is gov's. The recovery restores to `gov_oid`, through its own block and
         # ---- the consumer's hooks, and block 1 then runs clean. Restoring to `oid` changes nothing.
@@ -9148,10 +9305,9 @@ user_skills = "/tmp/gk-fake-skills"
               and gout(_pvqx, "ls-files", "-s", "--", _pvH).split()[1:2] == [_pvqxrow.get("gov_oid")]
               and gout(_pvqx, "status", "--porcelain", "--untracked-files=no").strip() == "",
               f"rc {_pvqxr.returncode}: " + _pvqxr.stdout[-900:] + _pvqxr.stderr[-600:] + str(_pvqxrow2))
+        _pvqxk = _pvqx / ".git" / "harness-migration-local-edits" / _pvH
         check("[-PV] R3-9 ...and sets this tree's edit aside in the git directory, byte for byte",
-              (_pvqx / ".git" / "harness-migration-local-edit.txt").is_file()
-              and (_pvqx / ".git" / "harness-migration-local-edit.txt").read_text(encoding="utf-8")
-              == _pvXEDIT, _pvqxr.stdout[-600:])
+              _pvqxk.is_file() and _pvqxk.read_text(encoding="utf-8") == _pvXEDIT, _pvqxr.stdout[-600:])
         _pvqxb1b = run_pv_block(_pvqx, _pvg, 1)
         check("[-PV] R3-9 ...and block 1 then runs clean, rendering the harness",
               _pvqxb1b.returncode == 0 and (_pvqx / _pvH).read_text(encoding="utf-8") == _pvRENDERED,
@@ -9177,6 +9333,53 @@ user_skills = "/tmp/gk-fake-skills"
               and gout(_pvqo, "status", "--porcelain", "--untracked-files=no").strip() == "",
               f"rc {_pvqob2.returncode}/{_pvqob3.returncode}: " + _pvqob2.stdout[-700:]
               + _pvqob3.stdout[-500:] + str(_pvqorow))
+        check("[-PV] W2 ...and a coupled kit this receipt does not claim is never added to the scope",
+              "govkit update — scope: --kits review-harness -> " in _pvqob1.stdout
+              and " moves with " not in _pvqob1.stdout, _pvqob1.stdout[:2000])
+
+        # ---- ROUND 4, THE PIN RULE (core). Block 2 pinned core's unattended Skill at the new vintage
+        # ---- because its kit's regenerate exited 0, while the template it renders from was a fork
+        # ---- `update` writes no bytes over. So the render was the fork's, and the pin said otherwise.
+        _pvqfb1 = run_pv_block(_pvqf, _pvg, 1)
+        check("[-PV] PIN PRECONDITION the fork's step 1 ran clean and rendered the forked template, "
+              "which `update` left alone",
+              _pvqfb1.returncode == 0 and (_pvqf / _pvPT).read_text(encoding="utf-8") == _pvPROTO_FORK
+              and "scripts/workflows/unattended-build.js." in (_pvqf / _pvP).read_text(encoding="utf-8"),
+              f"rc {_pvqfb1.returncode}: " + _pvqfb1.stdout[-1500:] + _pvqfb1.stderr[-600:])
+        _pvqfb2 = run_pv_block(_pvqf, _pvg, 2)
+        _pvqfpins = read_pv_pins(_pvqf)
+        check("[-PV] PIN a render whose template is a fork `update` did not move gets NO pin at the "
+              "vintage moved to, while the harness, whose template landed at it, does",
+              _pvqfb2.returncode == 0 and f"{_pvH}={_pvB}" in _pvqfpins
+              and not any(_x.startswith(_pvP + "=") for _x in _pvqfpins),
+              f"rc {_pvqfb2.returncode}: " + str(_pvqfpins) + _pvqfb2.stdout[-900:])
+        check("[-PV] PIN ...and block 2 counts it unattributed, naming the fork as the reason",
+              f"FLAG {_pvP}: unattributed, because its template does not hold gov's bytes"
+              in _pvqfb2.stdout, _pvqfb2.stdout[-1500:])
+        _pvqfb3 = run_pv_block(_pvqf, _pvg, 3)
+        # THE CARRY, where the runbook puts it: after block 3. gov's diff is carried into the fork,
+        # which here retires the fork's hand-spelled line, so the template is gov's bytes at B; the
+        # kit's regenerate argv re-renders it; both are committed; blocks 2 and 3 run again. This
+        # fixture carries no receipt hook, as NicoCares does not: core's refuses the carry's commit
+        # by its own rule, and the runbook says so (ABL-dMuffledSentinel-3).
+        (_pvqf / _pvPT).write_text(_pvPROTO_TB, encoding="utf-8", newline="\n")
+        _pvqfr = subprocess.run([_pvBASH, f"{_pvW}/check-protocol-parity.test.sh", "--render",
+                                 "--tracked-only"], cwd=str(_pvqf), capture_output=True, text=True,
+                                encoding="utf-8", errors="replace", env=_pvENV)
+        _pvqfc = run_pv_commit(_pvqf, "carry gov's diff into the forked template, and re-render",
+                               _pvPT, _pvP)
+        _pvqfb2b = run_pv_block(_pvqf, _pvg, 2)
+        _pvqfb3b = run_pv_block(_pvqf, _pvg, 3)
+        _pvqfrow, _pvqftrow = read_pv_row(_pvqf, _pvP), read_pv_row(_pvqf, _pvPT)
+        check("[-PV] PIN once gov's diff is carried into the template and the render regenerated, "
+              "blocks 2 and 3 run again and pin the render at the vintage moved to",
+              _pvqfb3.returncode == 0 and _pvqfr.returncode == 0 and _pvqfc.returncode == 0
+              and _pvqfb2b.returncode == 0 and _pvqfb3b.returncode == 0
+              and _pvqfrow.get("evidence") == "pinned" and _pvqfrow.get("commit") == _pvB
+              and _pvqftrow.get("evidence") == "vintage-match" and _pvqftrow.get("commit") == _pvB,
+              f"rc {_pvqfb3.returncode}/{_pvqfr.returncode}/{_pvqfc.returncode}/{_pvqfb2b.returncode}/"
+              f"{_pvqfb3b.returncode}: " + str(_pvqfrow) + str(_pvqftrow) + _pvqfc.stderr
+              + _pvqfb2b.stdout[-900:] + _pvqfb3b.stdout[-400:])
 
         # ---- R3-1, R3-2 AND R3-5, on one more `apply` fixture.
         # ---- Without TRAILER, core's `commit-msg` refuses block 1's commit; the tree is returned to HEAD
