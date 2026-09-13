@@ -44,3 +44,11 @@ base: 16da4c6abdb5d74ad80891f51f254cd5205d0b17
 2026-09-13T14:07:13Z brief · item TOOL-aRatifiedRulings-2 · reason 679ae7ed8bc8 memory/builds/aRatifiedRulings/prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-2-1-build-brief.md
 
 2026-09-13T14:12:59Z dispatch · item dba6053a TOOL-aRatifiedRulings-2 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aRatifiedRulings/build memory/builds/aRatifiedRulings/spec memory/builds/aRatifiedRulings/prompts memory/builds/aRatifiedRulings/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-13T19:36:18Z dispatch · item 90348fde TOOL-aRatifiedRulings-3 · reason tools/memory-tree/check-memory-hygiene.test.sh memory/builds/aRatifiedRulings/build memory/builds/aRatifiedRulings/spec memory/builds/aRatifiedRulings/prompts memory/builds/aRatifiedRulings/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-13T19:36:48Z brief · item TOOL-aRatifiedRulings-3 · reason 4fd7eaf7f15e memory/builds/aRatifiedRulings/prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-3-1-build-brief.md
+
+2026-09-13T19:43:25Z dispatch · item 90348fde TOOL-aRatifiedRulings-3 · reason tools/memory-tree/check-memory-hygiene.test.sh .lexicon.conf tools/install-prefix-carried.txt memory/map/features/memory-tree-hygiene.md memory/builds/aRatifiedRulings/build memory/builds/aRatifiedRulings/spec memory/builds/aRatifiedRulings/prompts memory/builds/aRatifiedRulings/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-13T20:14:12Z decision · item TOOL-aRatifiedRulings-3 AC2 ratio and AC3 full-bar row: re-measure or accept the count · reason unit 3's one after run read 775.7 s against the §4 quiet 598.7 s, ratio 1.296 over the 0.8 bound, on a box carrying thirteen sibling run-gates.sh bars; trace attribution puts the changed region at 0.59 of its §4 seconds and every untouched region at 1.3-9.2x, and the count fell 20 to 13 with zero git archive. Options: the paired quiet re-measure AC2 spells, the GATE_FULL=1 GATE_SELFTESTS=1 bar AC3 spells, or accept the count as the claim. Refused here because the owner's per-pass rule allows a pass one run of the suite and no bar

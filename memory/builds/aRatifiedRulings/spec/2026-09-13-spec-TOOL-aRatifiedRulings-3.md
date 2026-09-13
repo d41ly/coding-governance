@@ -1,11 +1,13 @@
 # TOOL-aRatifiedRulings-3 — the hygiene self-test's project-key arms stop re-running the checker over the whole corpus
 
-**Status:** SPECCED · rev-3 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
+**Status:** CLOSED · rev-4 · 2026-09-13 · node a · Tier-2 · base 16da4c6a · streams tooling · ratified 2026-09-13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-13-build-TOOL-aRatifiedRulings-3-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-aRatifiedRulings-3-1-acceptance-ledger.md) | journal | — |
+| [2026-09-13-prompt-TOOL-aRatifiedRulings-3-1-build-brief.md](../prompts/2026-09-13-prompt-TOOL-aRatifiedRulings-3-1-build-brief.md) | journal | — |
 | [2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round1.md) | spec-audit | TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-4 |
 | [2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md](../reviews/2026-09-13-review-TOOL-aRatifiedRulings-1-round2.md) | spec-audit | TOOL-aRatifiedRulings-1 TOOL-aRatifiedRulings-2 TOOL-aRatifiedRulings-4 |
 
@@ -60,6 +62,10 @@ clean, one run per arm, with every arm asserting the VALUE it grades rather than
   from the arm list. The standalone pair must show the cut; the full-bar row is OBSERVED against the
   untouched ceiling and its red has the disposition AC3 and §8 F3 state, because this repo's own
   record says the loaded reading is not derivable from the quiet one. Observed by AC2 and AC3.
+  **rev-4, the owner's per-pass rule** (build README, 2026-09-13): the build pass runs the suite
+  ONCE, alone, traced, as the after reading; the before reading is the §4 traced row, measured on
+  this node at `16da4c6a` with its count read from that trace; and the full bar is the closing
+  pass's and the push boundary's, so the AC3 row is appended to the ledger there, not here.
 - **S6** — Every arm this unit adds or moves has its failing case observed RED by hand before it
   lands, from a driver that refuses a run which executed fewer arms than the section holds.
   Observed by AC6.
@@ -399,6 +405,11 @@ a red suite is what it is today.
   green; one above 0.8 with AC1 green is re-measured once with a second interleaved pair per the
   gotcha's take-the-minimum rule and reds if it stays above, because the ruling's word is CHEAPER
   and an invocation count alone does not prove a wall clock fell on this box.
+  rev-4: under the owner's per-pass rule (S5) the pass takes ONE traced after run and the §4
+  traced row as its before — 598.7 s, rc 1, count 20 — so the ratio is that after over 598.7,
+  recorded as EVIDENCE with the box state beside it; the interleaved second pair is not available
+  to a pass, and the deterministic claim stays AC1's count. The pair the criterion spells is the
+  closing pass's to take if the owner wants the noise bounded.
   cost: four suite runs on this node, about 40 to 75 minutes by the standalone band §4 admits.
   fixture: the before clone lives under a short root such as `%TEMP%`, not the session scratchpad,
   because `git clone --local` into the scratchpad's path fails with "Filename too long" on this
@@ -429,6 +440,8 @@ a red suite is what it is today.
   same pass that observes it. The bar as a whole is expected RED on the two self-tests the
   2026-09-07 park found red at BASE; this criterion reads one leg's row and says nothing about the
   bar's verdict.
+  rev-4: that pass is the CLOSING pass, not the build pass — the owner's per-pass rule (S5)
+  forbids a bar inside a build pass; the ledger row is appended when `--close` buys the bar.
   figure: DERIVED — the seconds are whatever the row holds; the ceiling is read from
   `tools/gate-legs.json` at observation time, never from this file, and the 900 written in §1 and §3
   is the ruling's word for it, not a second declaration.
@@ -478,6 +491,10 @@ a red suite is what it is today.
   `bash tools/memory-tree/check-memory-hygiene.test.sh`; the rest may be observed through the
   section run from its own prologue. Whatever runs REFUSES a run whose count of `ok` and `FAIL`
   lines from the section differs from the arm count the section holds.
+  rev-4: the whole-invocation break is a third long run and the owner's per-pass rule (S5) allows
+  the pass two; every break is observed through the section run from its own prologue, and the
+  proof that the whole invocation REACHES the section is the after run itself, whose output holds
+  the section's thirteen `ok` lines and the `PASS` line, which no stranded section can print.
   Red when: an assertion passes with its subject reverted, or a value assertion's only staged break
   is one that also reds its rc-only form (the 127 break applied to the control), or an observation
   is taken from a run whose arm count nothing asserted — a break that reds nothing and a harness
@@ -574,6 +591,13 @@ and its comparison moves to immediately above that line.
   landing bar produces no such row (`GATE_CMD`, `.githooks/pre-push`). K: AC2's four readings are
   traced runs, each ledger count read from its own trace, on the class 0.8 was derived from; the
   full-bar row's count is AC1's derived one, said once in S5.
+- rev-4 · 2026-09-13 · S5 · AC2 AC3 AC6 · the build pass, under the owner's per-pass rule in the
+  build README (2026-09-13, after unit 2 stacked twenty suite runs): a pass runs the suite it edits
+  ONCE, alone, and nothing held. AC2 is one traced after run against the §4 traced before; AC3 is
+  the closing pass's bar and its ledger row lands there; AC6's whole-invocation break is not taken,
+  every break observed through the section from its own prologue. The mechanism is built as §4
+  states it, with `pk_set` hoisted above the check-16 fixture so the fixture and the arms write
+  the conf through one helper; `KIT_REL` left the suite with its last use. Status CLOSED.
 
 ## 10. Reuse audit
 
