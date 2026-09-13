@@ -48,9 +48,9 @@ SRC="$(cd "$HERE/.." && pwd)"
 # Where this repository keeps its kits, the hook's own default. The suite never ships, so only gov's
 # layout and a caller's override are ever asked for.
 KIT_REL="${KIT_REL:-tools}"
-FLOOR_ASSERTIONS=226
+FLOOR_ASSERTIONS=228
 n=0; st=0
-SEEN=" "
+SEEN=" "; WRITER_FNS=""
 
 # THE AMBIENT ENVIRONMENT IS CLEARED ONCE. A leg of the real bar inherits GATE_SELFTESTS, a push
 # boundary exports GATE_BASE and GATE_FULL, and the hook reads the first in its decision while AC4's
@@ -125,8 +125,10 @@ elif mode == "render":
     # ONE written START, rebuilt as the hook held it BEFORE the fit: its own fields in their order,
     # every ref line fed to it back in place under the count cap, and the uncut remote name when one is
     # given. The REFERENCE writer must fit that to the same bytes.
+    # The count cap is the HOOK's, read from it by the caller and passed in, never a second copy here.
     raw = open(sys.argv[3], "rb").read().decode("utf-8").rstrip("\n")
     refs = [x for x in open(sys.argv[4], "rb").read().decode("utf-8").split("\n") if x]
+    cap = int(sys.argv[6])
     fields = {}
     for part in raw.split("\t"):
         k, _, v = part.partition("=")
@@ -134,10 +136,10 @@ elif mode == "render":
     base = {k: v for k, v in fields.items() if not (k.startswith("ref.") or k == "ref_more")}
     if sys.argv[5] != "-":
         base["remote"] = open(sys.argv[5], "rb").read().decode("utf-8")
-    for i, ref in enumerate(refs[:10], 1):
+    for i, ref in enumerate(refs[:cap], 1):
         base[f"ref.{i}"] = ref
-    if len(refs) > 10:
-        base["ref_more"] = str(len(refs) - 10)
+    if len(refs) > cap:
+        base["ref_more"] = str(len(refs) - cap)
     same = r.render_line(base) == raw and r.check_line(raw) is None
     print(len(raw.encode("utf-8")), fields.get("ref_more", "-"), "SAME" if same else "DIFF")
 elif mode == "legs":
@@ -554,9 +556,11 @@ check_dec_rest() {
 #   and is cut: plain ASCII, a three-byte character behind a zero-, one- and two-byte prefix so a cut
 #   lands INSIDE a character, and TABs, whose two-byte escape a cut can halve, behind the same prefixes.
 check_cap_fit() {
-  local i nm res pre id short=0 halved=0 l l0 head
+  local i nm res pre id short=0 halved=0 l l0 head cap
   git checkout -q main
   head=$(git rev-parse HEAD)
+  cap=$(sed -n 's/^RUNLOG_REF_CAP=\([0-9][0-9]*\).*/\1/p' "$HOOK" | head -1)
+  check "CAP the hook's count cap is read from the hook" "$(case "$cap" in ''|*[!0-9]*) echo unread ;; *) echo read ;; esac)" read
   : > "$WORK/cap.refs"
   for i in $(seq -w 1 12); do
     nm="refs/heads/cap-$i-$(printf 'n%.0s' $(seq 1 180))"
@@ -565,7 +569,7 @@ check_cap_fit() {
   l0=$(measure_lines)
   run_hook "$WORK/cap.refs" origin "$WORK/remote.git"
   l=$((l0 + 1)); read_line "$l" > "$WORK/one.log"
-  res=$("$PY" "$WORK/jl.py" "$RUNLOG_KIT" render "$WORK/one.log" "$WORK/cap.refs" -)
+  res=$("$PY" "$WORK/jl.py" "$RUNLOG_KIT" render "$WORK/one.log" "$WORK/cap.refs" - "${cap:-0}")
   check "CAP step one: the START is fitted as render_line fits it" "${res##* }" SAME
   check "CAP step one: whole refs dropped into the ref_more the count cap wrote" \
     "$(read_field $l ref_more | awk '{ print ($1 > 2) ? "added" : "not added" }')" added
@@ -582,7 +586,7 @@ check_cap_fit() {
     run_hook "$WORK/none.refs" "$id" "$WORK/remote.git"
     l=$((l0 + 1)); read_line "$l" > "$WORK/one.log"
     check "CAP step two [$pre]: the push still ends, with its decision" "$RC|$(read_field $((l + 1)) decision)" "0|skip-nondefault"
-    res=$("$PY" "$WORK/jl.py" "$RUNLOG_KIT" render "$WORK/one.log" "$WORK/none.refs" "$WORK/full")
+    res=$("$PY" "$WORK/jl.py" "$RUNLOG_KIT" render "$WORK/one.log" "$WORK/none.refs" "$WORK/full" "${cap:-0}")
     check "CAP step two [$pre]: the remote name is cut as render_line cuts it" "${res##* }" SAME
     case "$pre" in
       tab*) case "$res" in "2047 "*) halved=$((halved + 1)) ;; esac ;;
@@ -606,10 +610,11 @@ check_cap_fit() {
 #                top-level line carrying one of its names. Measured, the first cut of this arm had
 #                only EXEC_ALL, and a `git` call added beside the journal-root line passed it.
 measure_execs() { # trace file · the hook it traced -> sets EXEC_ALL and EXEC_WRITER to "<count> <names>"
-  local known l w src fn ln c=0 names="" wc=0 wnames="" tok
+  local known l w src fn ln c=0 names="" wc=0 wnames="" tok alt
   known=" $(compgen -b | tr '\n' ' ') $(compgen -k | tr '\n' ' ') "
   known="$known$(sed -n 's/^[[:space:]]*\([A-Za-z_][A-Za-z0-9_]*\)[[:space:]]*()[[:space:]]*{.*/\1/p' "$2" | tr '\n' ' ') "
-  tok=" $(grep -nE 'RUNLOG_|write_push_|render_push_|resolve_push_dirs|GATE_RUN_ID' "$2" | cut -d: -f1 | tr '\n' ' ') "
+  alt=$(printf '%s\n' $WRITER_FNS | paste -sd'|' -)
+  tok=" $(grep -nE "RUNLOG_|GATE_RUN_ID${alt:+|$alt}" "$2" | cut -d: -f1 | tr '\n' ' ') "
   while IFS= read -r l; do
     case "$l" in +*) ;; *) continue ;; esac
     l=${l#"${l%%[!+]*}"}; l=${l# }
@@ -619,26 +624,34 @@ measure_execs() { # trace file · the hook it traced -> sets EXEC_ALL and EXEC_W
     case "$w" in ""|*=*|\(*) continue ;; esac
     case "$known" in *" $w "*) continue ;; esac
     c=$((c + 1)); names="$names$w"$'\n'
-    case "$fn" in
-      resolve_push_dirs|render_push_remote|write_push_line|write_push_once|write_push_start|write_push_end)
-        wc=$((wc + 1)); wnames="$wnames$w"$'\n' ;;
-      main) case "$tok" in *" $ln "*) wc=$((wc + 1)); wnames="$wnames$w"$'\n' ;; esac ;;
-    esac
+    if [ "$fn" = main ]; then
+      case "$tok" in *" $ln "*) wc=$((wc + 1)); wnames="$wnames$w"$'\n' ;; esac
+    else
+      case " $WRITER_FNS " in *" $fn "*) wc=$((wc + 1)); wnames="$wnames$w"$'\n' ;; esac
+    fi
   done < "$1"
   EXEC_ALL="$c $(printf '%s' "$names" | sort | tr '\n' ' ')"
   EXEC_WRITER="$wc $(printf '%s' "$wnames" | sort | tr '\n' ' ')"
+}
+
+# THE WRITER'S FUNCTIONS, derived from the hook by the naming its spec's inventory fixes, `*_push_*`,
+# and never listed here: a writer function this suite did not know would run on both sides of the
+# baseline and be owned by nobody, so its execs would pass unseen.
+read_writer_fns() { # hook -> the writer's function names, space-separated
+  sed -n 's/^\([a-z_]*_push_[a-z_]*\)() {.*/\1/p' "$1" | tr '\n' ' '
 }
 
 # THE BASELINE NEVER RUNS THE WRITER: every writer function returns at once, so it is this hook's
 # decisions with no line written. `GOV_RUNLOG=0` is not that, since the writer still does whatever it
 # does before it reads the switch, and an exec placed there would be counted on both sides.
 build_baseline() { # -> the baseline hook's path
+  local alt
   mkdir -p "$WORK/base"
   if [ -n "${PPRL_BEFORE:-}" ]; then
     cp "$PPRL_BEFORE" "$WORK/base/pre-push"
   else
-    sed -E 's/^(resolve_push_dirs|render_push_remote|write_push_line|write_push_once|write_push_start|write_push_end)\(\) \{/& return 0;/' \
-      "$HOOK" > "$WORK/base/pre-push"
+    alt=$(printf '%s\n' $WRITER_FNS | paste -sd'|' -)
+    sed -E "s/^(${alt:-no_writer_found})\(\) \{/& return 0;/" "$HOOK" > "$WORK/base/pre-push"
   fi
   printf '%s' "$WORK/base/pre-push"
 }
@@ -651,12 +664,16 @@ run_traced() { # trace file · hook · ref-lines file · NAME=VALUE... -> one ho
 }
 
 check_ac7_spawns() {
-  local base wt="$WORK/wt" tree label path want gd head l0 off on rcoff rcon skip_on="" first extra
+  local base wt="$WORK/wt" tree label path want gd head l0 off on rcoff rcon skip_on="" first extra nfn
+  WRITER_FNS=$(read_writer_fns "$HOOK")
+  nfn=$(printf '%s\n' $WRITER_FNS | grep -c .)
+  echo "AC7 the writer's functions, read from the hook: $WRITER_FNS"
+  check "AC7 the writer's functions are found in the hook" "$([ "$nfn" -gt 0 ] && echo found)" found
   base=$(build_baseline)
   if [ -n "${PPRL_BEFORE:-}" ]; then
     echo "AC7 baseline: the hook named by PPRL_BEFORE"
   else
-    check "AC7 the baseline copy's six writer functions return at once" "$(grep -cE '^[a-z_]+\(\) \{ return 0;' "$base")" 6
+    check "AC7 every writer function in the baseline copy returns at once" "$(grep -cE '^[a-z_]+\(\) \{ return 0;' "$base")" "$nfn"
   fi
   git checkout -q main
   git worktree add -q "$wt" -b wtside >/dev/null 2>&1

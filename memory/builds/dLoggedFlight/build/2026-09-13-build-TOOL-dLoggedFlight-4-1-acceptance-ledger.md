@@ -3,11 +3,13 @@
 **Serves:** journal TOOL-dLoggedFlight-4
 
 Tier-2 · node d · 2026-09-14 · the build pass of the pre-push hook's run-log lines, against spec
-rev-5, which this pass wrote before its code. Every line is OBSERVED except AC8's verdict half, which
-is written as owed. `<suite>` is `.githooks/pre-push.runlog.test.sh`, run directly from Git Bash and
-never through the gate runner. Its last three full runs printed `PASS (226 assertions)` against a
-floor of 226, in 32 to 39 s. No gate leg was run, per the owner's instruction of 2026-09-13, and no
-suite that existed under `tools/unattended/` before this build ran.
+rev-5, which this pass wrote before its code, and the fold of its bug-class checklist. Every line is
+OBSERVED except AC8's verdict half, which is written as owed. `<suite>` is
+`.githooks/pre-push.runlog.test.sh`, run directly from Git Bash and never through the gate runner.
+Its three full runs at the build commit printed `PASS (226 assertions)` in 32 to 39 s, and its run
+after the fold printed `PASS (228 assertions)` against a floor of 228, in 33 s. No gate leg was run,
+per the owner's instruction of 2026-09-13, and no suite that existed under `tools/unattended/` before
+this build ran.
 
 ## The criteria
 
@@ -95,6 +97,13 @@ the floor and the decision join. All 36 went RED on a FAIL line carrying the tex
 and an unmodified mirror printed `PASS (226 assertions)` before and after the batch. One break first
 came back NOT RED: a `git` call added at the top level passed AC7, because the baseline runs the same
 top-level line. AC7 then gained the writer attribution, and the break went RED.
+
+The checklist over the build commit selected `two-answers-to-one-question`, and the suite held two
+second copies. AC7 listed the writer's six function names by hand, twice, so a NEW writer function
+called from the top level ran on both sides of the baseline and was owned by nobody: staged on a
+mirror, the build commit's suite passed it and the folded suite, which reads the names from the hook
+by their `*_push_*` form, went RED. CAP's reconstruction typed the hook's count cap of 10, and now
+reads it from the hook: its control, the cap raised to 11 on a mirror, stays green.
 
 ## Owed to the post-build gate run
 
