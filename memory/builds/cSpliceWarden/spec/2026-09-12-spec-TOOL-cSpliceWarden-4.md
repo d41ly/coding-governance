@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md](../build/2026-09-13-build-TOOL-cSpliceWarden-1-acceptance-ledger.md) | journal | TOOL-cSpliceWarden-1 TOOL-cSpliceWarden-2 TOOL-cSpliceWarden-3 TOOL-cSpliceWarden-5 |
+| [2026-09-13-build-TOOL-cSpliceWarden-4-archive-forensics.md](../build/2026-09-13-build-TOOL-cSpliceWarden-4-archive-forensics.md) | journal | TOOL-cSpliceWarden-1 |
 
 <!-- /gen:spec-records -->
 
